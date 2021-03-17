@@ -1,0 +1,14 @@
+# Rapport de test api iode é
+$WsLoadVar ..\fun\fun
+$WsLoadScl ..\fun\fun
+$WsLoadEqs ..\fun\fun
+$DataCalcVar ACAG ACAF
+
+$ ModelSimulate 2005Y1 2010Y1
+$ ShellExec test.rtf
+$msg toto
+$show tata
+$PrintTblFile 2 ..\fun\fun
+$PrintDest test.htm  HTML
+$PrintVar 2000Y1:5[1;2] ACAF;ACAG
+$quit

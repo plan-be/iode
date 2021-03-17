@@ -1,0 +1,22 @@
+Panel color=white, border=0, rounded=16
+Grid color=gray, style=dot, width=1
+TitleFont name=Trebuchet MS, style=bold, size=12, color=c1
+AxisFont name=Trebuchet MS, style=regular, size=8, color=c1
+LegendFont name=Trebuchet MS, style=regular, size=8, color=c1
+Line color=c9, width=2, style=solid, pointer=nothing
+Line color=c5, width=3, style=solid, pointer=nothing
+Line color=c7, width=4, style=solid, pointer=nothing
+Line color=c6, width=2, style=solid, pointer=nothing
+Line color=c1, width=3, style=solid, pointer=nothing
+Line color=c5, width=4, style=solid, pointer=nothing
+Line color=c9, width=2, style=dash, pointer=nothing
+Line color=c5, width=3, style=dash, pointer=nothing
+Line color=c7, width=4, style=dash, pointer=nothing
+Line color=violet, width=2, style=dash, pointer=nothing
+Line color=paleblue, width=2, style=dash, pointer=nothing
+Bar color=c8, style=solid, border=0
+Bar color=c1, style=solid, border=0
+Bar color=c6, style=solid, border=0
+Bar color=c5, style=solid, border=0
+Bar color=c7, style=solid, border=0
+Bar color=c9, style=solid, border=0

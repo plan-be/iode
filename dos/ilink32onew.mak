@@ -1,0 +1,1 @@
+c0w32.obj sysinit.obj o_objs.obj s_iode.obj k_a2mrtf.obj chart.obj,iode.exe,,s32wo.lib s32widb.lib iodedos.lib iodeapi.lib odbc32.lib TeeLanguage923.lib teeui923.lib teeimage923.lib teepro923.lib tee923.lib rtl.lib xmlrtl.lib vcl.lib vclx.lib import32.lib cp32mt.lib htmlhelp.lib,,iode.res

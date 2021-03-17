@@ -1,0 +1,52 @@
+# Exemple de rapport IODE
+# Clear les WS
+#
+# Imprime des tables et des graphiques
+
+# Fixe la destination (fichier HTML) et divers paramŠtres
+$ printdest resfun.htm htm
+$printdest resfun.rtf rtf
+$printtablepage no
+$ printpagefooter Ecopol - @date("dd/mm/yy") - page%d
+$ printpageheader Hypothèses et résultats de la projection de base
+$printnbdec 2
+
+$PrintHtmlTableClass myTable
+$PrintHtmlTRClass 
+$PrintHtmlTHClass myTH
+$PrintHtmlTDClass myTD
+
+# Clear des WS
+$wsclearvar
+$wsclearscl
+$wscleareqs
+$wscleartbl
+$wsclearcmt
+$wsclearlst
+$wsclearidt
+
+# Load les WS utiles
+$define DIR c:\usr\iode_src\fun
+$WsLoadVar %DIR%\fun.var
+$WsLoadEqs %DIR%\fun.eqs
+$WsLoadScl %DIR%\fun.scl
+$wsloadtbl %DIR%\fun.tbl
+
+# Titre de premier niveau (a2m)
+.par1 tit_1
+1. HypothŠses
+
+# Imprime le tableau SCENARIOS sur un sample donne
+$PrintTbl 2000Y1:6;2010Y1 SCENARIOS
+
+# Imprime un nouveau titre
+.par1 tit_1
+2. R‚sultats
+
+# Print tables and graphics
+$PrintTbl 2000Y1:6;2010Y1 T1 T2
+$ViewTbl 2000Y1:6;2010Y1 T1 T2
+$PrintGr 2000Y1/1999Y1:11 XQBBP XPC
+$PrintGr 2000Y1:11 UY DEF2
+$quitode
+$msg fin du rapport
