@@ -33,3 +33,9 @@
 
 # IDE
 *.vscode
+*.suo
+/.vs
+*.pdb
+*.ilk
+*.exp
+*.pyd
