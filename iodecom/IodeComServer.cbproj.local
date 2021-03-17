@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2011/03/11 16:22:05.002.c,C:\usr\iode_src\iodecom\File1.c=C:\usr\iode_src\iodecom\nmoan.c</Transaction>
+    <Transaction>2011/03/11 16:22:22.316.c,C:\usr\iode_src\iodecom\nmoan.c=C:\usr\iode_src\iodecom\nomain.c</Transaction>
+    <Transaction>2011/04/04 16:37:08.337.c,C:\usr\iode_src\iodecom\File1.c=C:\usr\iode_src\iodecom\void.c</Transaction>
+  </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="k_errorv.c"/>
+    <File Path="sb_gui.c"/>
+    <File Path="s_iode.c"/>
+    <File Path="CCIodeImpl.cpp"/>
+    <File Path="frmMain.cpp"/>
+    <File Path="frmMain.cpp"/>
+    <File Path="frmMain.dfm"/>
+    <File Path="frmMain.h"/>
+    <File Path="IodeComServer.cpp"/>
+    <File Path="IodeComServer.res"/>
+    <File Path="IodeComServer.ridl"/>
+    <File Path="IodeComServer_ATL.cpp"/>
+    <File Path="IodeCom_TLB.cpp"/>
+  </ProjectSortOrder>
+</BorlandProject>

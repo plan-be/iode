@@ -1,0 +1,9 @@
+Line color=black, width=2, style=solid, pointer=nothing
+Line color=black, width=2, style=dash, pointer=nothing
+Line color=black, width=2, style=dot, pointer=nothing
+Line color=black, width=2, style=solid, pointer=circle
+Line color=black, width=2, style=solid, pointer=rectangle
+Bar color=gray, style=solid
+Bar color=black, style=fdiagonal
+Bar color=black, style=solid
+Bar color=black, style=cross

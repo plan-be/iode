@@ -1,0 +1,31 @@
+<STYLE>
+BODY
+{
+/*    BACKGROUND-IMAGE: url(title.gif); */
+    BACKGROUND-ATTACHMENT: fixed;
+    BACKGROUND-COLOR: blue;
+    BACKGROUND-POSITION: left top;
+    BACKGROUND-REPEAT: no-repeat;
+    COLOR: black;
+    FONT-FAMILY: Verdana, Arial;
+    MARGIN: 1em 1em 1em 100px;
+}
+
+H1 { color:#0050b2; font-style:bold; font-family:Verdana; font-size:16pt }
+H2 { color:#0050b2; font-style:bold; font-family:Verdana; font-size:14pt margin-left:10pt }
+H3 { color:#0050B2; font-style:bold; font-family:Verdana; font-size:12pt margin-left:10pt }
+H4 { color:#0050b2; font-style:bold; font-family:Verdana; font-size:12pt; }
+H5 { color:black; font-style:bold; font-family:Verdana; font-size:12pt; BACKGROUND: #ffa;}
+H6 { color:black; font-style:bold; font-family:Verdana; font-size:12pt; BACKGROUND: #ffa; margin-left:10pt;}
+P  { font-family:Verdana; font-size:12pt; margin-left:10pt;}
+P.CellDecimal {color: yellow; }
+TD { font-family:Verdana; font-size:16pt; }
+TH.A2mTH { background-color: gray; font-family:Verdana; font-size:16pt; }
+LI { font-family:Verdana; list-style-type:square; font-size:10pt; }
+UL { font-family:Verdana; font-size:10pt; }
+TT { font-family:Courier New; font-weight:bold; font-size:12pt; font-color:green;}
+TABLE.A2mTable {border: 2px solid blue; }
+PRE { font-family:Courier New; font-weight:bold; font-size:12pt; font-color:green; BACKGROUND-image: url(listing.gif); margin-left:10pt; padding-left:20pt;}
+a:hover {font-weight:bold; BACKGROUND: #ffa;}
+</STYLE>
+

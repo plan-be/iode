@@ -1,0 +1,92 @@
+<NotepadPlus>
+    <UserLang name="Iode Reports" ext="rep">
+        <Settings>
+            <Global caseIgnored="yes" />
+            <TreatAsSymbol comment="no" commentLine="no" />
+            <Prefix words1="no" words2="no" words3="no" words4="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Delimiters">%{0%}0</Keywords>
+            <Keywords name="Folder+"></Keywords>
+            <Keywords name="Folder-"></Keywords>
+            <Keywords name="Operators"></Keywords>
+            <Keywords name="Comment"> 1 2 0# 0$</Keywords>
+            <Keywords name="Words1">$label $goto $ask $abort $quitode $onerror $return $show $msg $beep 
+                                    $system $chdir $mkdir $rmdir $settime $incrtime $shift $define $debug 
+                                    $shellexec $repeat $repeatstring
+            </Keywords>
+            <Keywords name="Words2"> $fileimportvar $fileimportcmt $filedeletecmt $filedeleteeqs  $filedeleteidt  
+                                        $filedeletelst  $filedeletetbl  $filedeletescl  $filedeletevar 
+                                        $filerenamecmt $filerenameeqs $filerenameidt $filerenamelst $filerenametbl 
+                                        $filerenamescl $filerenamevar $filecopycmt $filecopyeqs $filecopyidt $filecopylst 
+                                        $filecopytbl $filecopyscl $filecopyvar $wssample $wsloadcmt $wsloadeqs $wsloadidt 
+                                        $wsloadlst $wsloadtbl $wsloadscl $wsloadvar $wscopycmt $wscopyeqs $wscopyidt 
+                                        $wscopylst $wscopytbl $wscopyscl $wscopyvar $wssavecmt $wssaveeqs $wssaveidt 
+                                        $wssavelst $wssavetbl $wssavescl $wssavevar $wssavecmpcmt $wssavecmpeqs $wssavecmpidt 
+                                        $wssavecmplst $wssavecmptbl $wssavecmpscl $wssavecmpvar $wsimportcmt $wsimporteqs 
+                                        $wsimportidt $wsimportlst $wsimporttbl $wsimportscl $wsimportvar $wsexportcmt 
+                                        $wsexporteqs $wsexportidt $wsexportlst $wsexporttbl $wsexportscl $wsexportvar 
+                                        $wsmergecmt $wsmergeeqs $wsmergeidt $wsmergelst $wsmergetbl $wsmergescl $wsmergevar 
+                                        $wsclearcmt $wscleareqs $wsclearidt $wsclearlst $wscleartbl $wsclearscl $wsclearvar 
+                                        $wsclearall $wsdescr $wsextrapolate $wsaggrchar $wsaggrsum $wsaggrmean $wsaggrprod 
+                                        $wshtollast $wshtolsum $wshtolmean $wsltohflow $wsltohstock $wsseasonadj $wstrend 
+                                        $dataeditcmt $dataediteqs $dataeditidt $dataeditlst $dataedittbl $dataeditscl 
+                                        $dataeditvar $dataupdatecmt $dataupdateeqs $dataupdateidt $dataupdatelst $dataupdatetbl 
+                                        $dataupdatescl $dataupdatevar $dataexistcmt $dataexisteqs $dataexistidt $dataexistlst 
+                                        $dataexisttbl $dataexistscl $dataexistvar $dataappendcmt $dataappendeqs $dataappendidt 
+                                        $dataappendlst $dataappendtbl $dataappendscl $dataappendvar $datacreatecmt $datacreateeqs 
+                                        $datacreateidt $datacreatelst $datacreatetbl $datacreatescl $datacreatevar $datadeletecmt 
+                                        $datadeleteeqs $datadeleteidt $datadeletelst $datadeletetbl $datadeletescl $datadeletevar 
+                                        $datarenamecmt $datarenameeqs $datarenameidt $datarenamelst $datarenametbl $datarenamescl 
+                                        $datarenamevar $datasearchcmt $datasearcheqs $datasearchidt $datasearchlst $datasearchtbl 
+                                        $datasearchscl $datasearchvar $dataduplicatecmt $dataduplicateeqs $dataduplicateidt 
+                                        $dataduplicatelst $dataduplicatetbl $dataduplicatescl $dataduplicatevar $datalistcmt 
+                                        $datalisteqs $datalistidt $datalistlst $datalisttbl $datalistscl $datalistvar $datacomparecmt 
+                                        $datacompareeqs $datacompareidt $datacomparelst $datacomparetbl $datacomparescl $datacomparevar 
+                                        $datalistsort $datadisplaygraph $dataprintgraph $dataeditcnf $datacalcvar $datacalclst $datarasvar 
+                                        $datascancmt $datascaneqs $datascanidt $datascanlst $datascantbl $datascanscl 
+                                        $datascanvar $datapatterncmt $datapatterneqs $datapatternidt $datapatternlst $datapatterntbl 
+                                        $datapatternscl $datapatternvar $excelgetcmt $excelgeteqs $excelgetidt $excelgetlst 
+                                        $excelgettbl $excelgetscl $excelgetvar $excelsetcmt $excelseteqs $excelsetidt 
+                                        $excelsetlst $excelsettbl $excelsetscl $excelsetvar $excelexecute $excelopen $excelnew 
+                                        $excelclose $excelprint $excelsave $excelsaveas $excelwrite $dsimportdb $statunitroot 
+                                        $datawidthvar $datandecvar $datamodevar $datastartvar $datawidthtbl $datawidthscl 
+                                        $datandecscl $viewwidth $viewwidth0 $viewndec $printobjtitle $printobjlec $printobjinfos 
+                                        $printobjdefcmt $printobjdefeqs $printobjdefidt $printobjdeflst $printobjdeftbl 
+                                        $printobjdefscl $printobjdefvar $printdest $printdestnew $printmulti $printnbdec 
+                                        $printlang $printtblfile $printtbl $printvar $viewtblfile $viewtbl $viewvar $viewbytbl 
+                                        $viewgr $printgrall $printgr $modelsimulate $modelsimulateparms $modelexchange 
+                                        $modelcompile $idtexecute $idtexecutevarfiles $idtexecutesclfiles $idtexecutetrace 
+                                        $eqsestimate $eqsstepwise $eqssetmethod $eqssetbloc $eqssetblock $eqssetsample 
+                                        $eqssetinstrs $eqssetcmt $reportexec $reportedit $prompt $minimize $maximize $sleep 
+                                        $printa2mappend $printfont $printtablefont $printtablebox $printtablecolor 
+                                        $printtablewidth $printtablebreak $printtablepage $printbackground $printgraphbox 
+                                        $printgraphbrush $printgraphsize $printgraphpage $printgraphtheme $printgraphband $printrtfhelp 
+                                        $printhtmlhelp $printrtftopic $printrtflevel $printrtftitle $printrtfcopyright 
+                                        $printparanum $printpageheader $printpagefooter $printorientation $printduplex 
+                                        $setprinter $printgiftranscolor $printgifbackcolor $printgifinterlaced $printgiftransparent $printgiffilled 
+                                        $printgiffont $printhtmlstrip $printhtmlstyle $ddeget $sysmovefile $syscopyfile 
+                                        $sysappendfile $sysdeletefile $a2mtohtml $a2mtomif $a2mtocsv $a2mtortf $a2mtoprinter
+                                        $graphdefault
+                     </Keywords>
+            <Keywords name="Words3"></Keywords>
+            <Keywords name="Words4"></Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" styleID="11" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="FOLDEROPEN" styleID="12" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="FOLDERCLOSE" styleID="13" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="KEYWORD1" styleID="5" fgColor="FF8040" bgColor="FFFFFF" fontName="" fontStyle="1" />
+            <WordsStyle name="KEYWORD2" styleID="6" fgColor="0000FF" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="KEYWORD3" styleID="7" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="KEYWORD4" styleID="8" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="COMMENT" styleID="1" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="COMMENT LINE" styleID="2" fgColor="808000" bgColor="FFFF80" fontName="" fontStyle="0" />
+            <WordsStyle name="NUMBER" styleID="4" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="OPERATOR" styleID="10" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="DELIMINER1" styleID="14" fgColor="008000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="DELIMINER2" styleID="15" fgColor="FF00FF" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="DELIMINER3" styleID="16" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>

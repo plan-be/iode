@@ -1,0 +1,10 @@
+$wssample 2000Y1 2020Y1
+$define max %1%
+$define nb 0
+$label again
+$datacalcvar A%nb% ln(t)*%nb%
+$define nb {%nb%+1}
+$goto again {%nb% < %max%}
+
+$wssavevar x.var
+

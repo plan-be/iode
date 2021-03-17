@@ -1,0 +1,89 @@
+[
+  uuid(093A7EC0-D7E8-11D4-9BB9-0001025007D6), 
+  version(1.0), 
+  helpstring("Iode Com Library")
+    
+]
+library IodeCom
+{
+
+  importlib("Stdole2.tlb");
+
+  [
+    uuid(093A7EC1-D7E8-11D4-9BB9-0001025007D6), 
+    version(1.0), 
+    helpstring("Dispatch interface for CCIode Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface ICCIode: IDispatch
+  {
+    [
+    id(0x00000001)
+    ]
+    HRESULT _stdcall MWsLoad([in] BSTR FileName, [in] int Type, [out, retval] int * Status );
+    [
+    id(0x00000004)
+    ]
+    HRESULT _stdcall MExecute([in] BSTR Cmd, [out, retval] int * Status );
+    [
+    id(0x00000002)
+    ]
+    HRESULT _stdcall MReport([in] BSTR FileName, [out, retval] int * Status );
+    [
+    id(0x00000003)
+    ]
+    HRESULT _stdcall MGetObject([in] BSTR Name, [in] int Type, [out, retval] BSTR * Object );
+    [
+    id(0x00000005)
+    ]
+    HRESULT _stdcall MGetVar([in] BSTR Name, [in] int T, [out, retval] VARIANT * Value );
+    [
+    id(0x00000006)
+    ]
+    HRESULT _stdcall MStatus([in] int Type, [out] long * Nb, [out, retval] BSTR * Name );
+    [
+    id(0x00000007)
+    ]
+    HRESULT _stdcall MGetVector([in] BSTR Name, [out, retval] VARIANT * Value );
+    [
+    id(0x00000008)
+    ]
+    HRESULT _stdcall MGetMaxt([out, retval] long * Value );
+    [
+    id(0x00000009)
+    ]
+    HRESULT _stdcall MGetFreq([out, retval] long * Value );
+    [
+    id(0x0000000A)
+    ]
+    HRESULT _stdcall MGetBegin([out] long * Year, [out] long * Sub, [out, retval] long * Freq );
+    [
+    id(0x0000000B)
+    ]
+    HRESULT _stdcall MGetEnd([out] long * Year, [out] long * Sub, [out, retval] long * Freq );
+    [
+    id(0x0000000C)
+    ]
+    HRESULT _stdcall MGetBeginYear([out, retval] long * Value );
+    [
+    id(0x0000000D)
+    ]
+    HRESULT _stdcall MGetBeginSub([out, retval] long * Value );
+    [
+    id(0x0000000F)
+    ]
+    HRESULT _stdcall MVector([in] BSTR Name, [out, retval] SAFEARRAY(double) * Value );
+  };
+
+  [
+    uuid(093A7EC3-D7E8-11D4-9BB9-0001025007D6), 
+    version(1.0), 
+    helpstring("CCIode Object")
+  ]
+  coclass CCIode
+  {
+    [default] interface ICCIode;
+  };
+
+}; 

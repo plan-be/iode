@@ -1,0 +1,24 @@
+
+1  ICON    DISCARDABLE     "iode.ico"
+
+2  ICON    DISCARDABLE     "cmt.ico"
+3  ICON    DISCARDABLE     "eqs.ico"
+4  ICON    DISCARDABLE     "idt2.ico"
+5  ICON    DISCARDABLE     "lst.ico"
+6  ICON    DISCARDABLE     "scl.ico"
+7  ICON    DISCARDABLE     "tbl.ico"
+8  ICON    DISCARDABLE     "var.ico"
+
+9   ICON    DISCARDABLE     "cmt_b.ico"
+10  ICON    DISCARDABLE     "eqs_b.ico"
+11  ICON    DISCARDABLE     "idt2_b.ico"
+12  ICON    DISCARDABLE     "lst_b.ico"
+13  ICON    DISCARDABLE     "scl_b.ico"
+14  ICON    DISCARDABLE     "tbl_b.ico"
+15  ICON    DISCARDABLE     "var_b.ico"
+
+16  ICON    DISCARDABLE     "rep.ico"
+17  ICON    DISCARDABLE     "rep_b.ico"
+18  ICON    DISCARDABLE     "a2m.ico"
+19  ICON    DISCARDABLE     "prf.ico"
+

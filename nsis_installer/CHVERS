@@ -1,0 +1,25 @@
+	DEFINITION DE LA VERSION
+	ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+..\api\vers.h  1
+..\api\iode.H  37       #define IODE_VERSION "IODE Modelling Software 4.44 - (c) 1994 Planning Office - Brussels"
+..\api\iode.H  39
+..\dos\COMMON.F        4       #define VERSION "I.O.D.E. 4.44"
+..\dos\COMMON.F        13          APPL_NAME   "I.O.D.E. Econometric development tools 4.44 (c) BUP 1994"
+..\dos\COMMON.F        88      ?ÚÙ  ßÜ Ú· ?ÀÙ ?Ú· ?ÀÙÜÛ Ú· ?ßÄÄÜ Ú·   Version 4.44 - 01/94 ?
+..\dos\COMMON.F        119          C_FN SCR_lock_screen("I.O.D.E. 4.44");
+..\dos\version.txt     1      IODE 6.46
+..\dos\iode.ini        1
+..\iodecom\frmMain.cpp   187
+..\man\intro.m1 94
+iode_mui.nsi 5
+iode_mui.nsi 21
+iode_mui_upd.nsi 5
+iode_mui_upd.nsi 21
+iode.rtf
+iode_upd.rtf
+makefile 8
+copy2wiki.bat 4
+
+
+

@@ -1,0 +1,16 @@
+$PrintDest test.rtf RTF
+.pardef header justify=right size=5 font=c
+.pghead Header de la page - %d -
+.pgfoot Footer de la page
+.par1 tit_0
+TITRE du document
+.par1 tit_1
+Para type tit_1
+
+par_0
+.par1 enum_1
+enum_1
+
+.page
+suite du texte
+$ quitode
