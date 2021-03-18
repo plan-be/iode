@@ -5,7 +5,7 @@ V           = -v
 SYSVERS     = bc32
 DEFS        = -DSCRPROTO -DDOS -DDOSWIN -DDOSW32 -DREALD -DWINDOWS -DIODEWIN -DNOEMS -DNOEMF
 
-!include ../dirs.mak
+!include ../../dirs.mak
 
 COMP      = bcc32 $(V) -5 -a1 -W -O -c -w-rvl -w-pro -w- -I$(SCRINCDIR);$(IODEINCDIR);$(TEECHART)\include $(DEFS)
 COMPLINK  = bcc32 $(V) -W -L$(SCRLIBDIR);$(IODELIBDIR) $(BCCWARN) $(ALLOCDOCON) $(TYPESQLODBC) $(CODEGEAR) -e$@
