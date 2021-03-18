@@ -5,9 +5,9 @@ V           = -v
 SYSVERS     = vc64
 DEFS        = -DDOS -DDOSWIN -DDOSW32 -DREALD -DWINDOWS -DSCRPROTO -DIODEWIN -DNOEMS -DNOEMF
 
-!include ../dirs.mak
+!include ../../dirs.mak
 
-COMP      = cl -DWINDOWS_IGNORE_PACKING_MISMATCH  -Zi -Zp1 -c -I$(SCRINCDIR) -I$(IODEINCDIR)  $(DEFS) -DVC $(ALLOCDOCON) $(TYPESQLODBC)
+COMP      = cl -DWINDOWS_IGNORE_PACKING_MISMATCH -Zi -Zp1 -c -I$(SCRINCDIR) -I$(IODEINCDIR)  $(DEFS) -DVC $(ALLOCDOCON) $(TYPESQLODBC)
 COMPLINK  = cl -Zi -Zp1 -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@
 COMPLINKW = cl -Zi -Zp1 -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib Winspool.lib legacy_stdio_definitions.lib /Fe:$@ /link /subsystem:windows
 LINK      = link 
