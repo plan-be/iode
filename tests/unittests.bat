@@ -1,26 +1,34 @@
-..\cmd\iodecmd -y -alloclog test.log .\data\args.rep 10
-..\cmd\iodecmd -y -alloclog test.log .\data\calc_ratio.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\Collectifs_inputs.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\datacmp.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\eviews.rep hermreg_5.txt
-..\cmd\iodecmd -y -alloclog test.log .\data\example.bug.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\example.convert.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\example.csv.rep
-::..\cmd\iodecmd -y -alloclog test.log .\data\example.excel.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\example.foreach.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\example.foreach2.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\example.proc.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\hh25.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\hhidt.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\ldo.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\PROJECTION_HH_2013.rep
-::..\cmd\iodecmd -y -alloclog test.log .\data\resfun.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\sh_dec.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\test.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\test2.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\test3.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\test4.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\test5.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\testapi.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\testlong.rep
-..\cmd\iodecmd -y -alloclog test.log .\data\testrtf.rep                    
+set compiler=vc64
+if /I [%1] == [-vc32] set compiler=vc32
+if /I [%1] == [-bc32] set compiler=bc32
+
+set iodecmd=..\cmd\%compiler%\iodecmd
+set alloclog=-alloclog test.log
+::set alloclog=
+
+%iodecmd% -y %alloclog% args.rep 10
+%iodecmd% -y %alloclog% calc_ratio.rep
+%iodecmd% -y %alloclog% Collectifs_inputs.rep
+%iodecmd% -y %alloclog% .cmp.rep
+%iodecmd% -y %alloclog% eviews.rep hermreg_5.txt
+%iodecmd% -y %alloclog% example.bug.rep
+%iodecmd% -y %alloclog% example.convert.rep
+%iodecmd% -y %alloclog% example.csv.rep
+::%iodecmd% -y %alloclog% example.excel.rep
+%iodecmd% -y %alloclog% example.foreach.rep
+%iodecmd% -y %alloclog% example.foreach2.rep
+%iodecmd% -y %alloclog% example.proc.rep
+%iodecmd% -y %alloclog% hh25.rep
+%iodecmd% -y %alloclog% hhidt.rep
+%iodecmd% -y %alloclog% ldo.rep
+%iodecmd% -y %alloclog% PROJECTION_HH_2013.rep
+::%iodecmd% -y %alloclog% resfun.rep
+%iodecmd% -y %alloclog% sh_dec.rep
+%iodecmd% -y %alloclog% test.rep
+%iodecmd% -y %alloclog% test2.rep
+%iodecmd% -y %alloclog% test3.rep
+%iodecmd% -y %alloclog% test4.rep
+%iodecmd% -y %alloclog% test5.rep
+%iodecmd% -y %alloclog% testapi.rep
+%iodecmd% -y %alloclog% testlong.rep
+%iodecmd% -y %alloclog% testrtf.rep                    
