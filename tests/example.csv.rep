@@ -1,0 +1,5 @@
+# Load a IODE var file and save vars in test.csv
+$WsLoadVar ..\dos\test.var
+$PrintDest test.csv csv
+$PrintVar 1990Y1:10 BRENT_;BRENT_X
+$WsSaveVar testcsv.csv
