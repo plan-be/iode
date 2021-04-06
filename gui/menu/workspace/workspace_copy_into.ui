@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>copy_into_workspace</class>
+ <widget class="QDialog" name="copy_into_workspace">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>340</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>340</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>340</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>COPY OBJECTS INTO WORKSPACE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>20</y>
+     <width>81</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>22</y>
+     <width>461</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_object_type">
+      <property name="text">
+       <string>Object type</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" colspan="2">
+     <widget class="QComboBox" name="comboBox_object_type">
+      <property name="maxCount">
+       <number>10</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>Comments</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Equations</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Identities</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lists</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Scalars</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Tables</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Variables</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_input_file">
+      <property name="text">
+       <string>Input file</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="4">
+     <widget class="QFileChooser" name="fileChooser_input_file" native="true"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_sample_from">
+      <property name="text">
+       <string>Sample From</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QSampleEdit" name="sampleEdit_sample_from">
+      <property name="toolTip">
+       <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+      </property>
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label_sample_to">
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QSampleEdit" name="sampleEdit_sample_to">
+      <property name="toolTip">
+       <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+      </property>
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_object_names">
+      <property name="text">
+       <string>Object names</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="4">
+     <widget class="QPlainTextEdit" name="plainTextEdit_object_names"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFileChooser</class>
+   <extends>QWidget</extends>
+   <header>custom_widgets/qfilechooser.h</header>
+   <container>1</container>
+   <slots>
+    <slot>updateFileType(QString)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>copy_into_workspace</receiver>
+   <slot>copy_into_workspace()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>copy_into_workspace</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>copy_into_workspace</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>540</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>169</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>copy_into_workspace()</slot>
+  <slot>help()</slot>
+ </slots>
+</ui>

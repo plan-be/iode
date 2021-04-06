@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>object_editor</class>
+ <widget class="QDialog" name="object_editor">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>320</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>320</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>OBJECT EDITOR</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>20</y>
+     <width>81</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>21</y>
+     <width>451</width>
+     <height>281</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_object_type">
+      <property name="text">
+       <string>Object type</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="comboBox_object_type">
+      <property name="maxCount">
+       <number>10</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>Comments</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Equations</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Identities</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lists</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Scalars</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Tables</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Variables</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_objects_to_edit">
+      <property name="text">
+       <string>List of
+objects to
+be edited
+
+(empty for
+all WS)</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QTextEdit" name="textEdit_objects_to_edit"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>object_editor</receiver>
+   <slot>edit_object()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>object_editor</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>object_editor</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>edit_object()</slot>
+  <slot>help()</slot>
+ </slots>
+</ui>
