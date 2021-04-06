@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>duplicate_objects</class>
+ <widget class="QDialog" name="duplicate_objects">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>130</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>500</width>
+    <height>130</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>500</width>
+    <height>130</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>DUPLICATE OBJECTS IN WORKSPACE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>20</y>
+     <width>81</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>361</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_object_type">
+      <property name="text">
+       <string>Object type</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="comboBox_object_type">
+      <property name="maxCount">
+       <number>10</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>Comments</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Equations</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Identities</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lists</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Scalars</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Tables</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Variables</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_duplicate">
+      <property name="text">
+       <string>Duplicate</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="lineEdit_duplicate"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_to">
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="lineEdit_to"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>duplicate_objects</receiver>
+   <slot>duplicate_object()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>duplicate_objects</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>duplicate_objects</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>help()</slot>
+  <slot>duplicate_object()</slot>
+ </slots>
+</ui>

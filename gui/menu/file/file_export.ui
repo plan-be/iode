@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>file_export</class>
+ <widget class="QDialog" name="file_export">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>340</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>340</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>340</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>EXPORT  FILE  BY  RULE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>20</y>
+     <width>91</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Save</set>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame_top">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>461</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="label_variable_file">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Variable file</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_comment_file">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comment file</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_rule_file">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rule file</string>
+    </property>
+   </widget>
+   <widget class="QFileChooser" name="fileChooser_rule_file" native="true">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>90</y>
+      <width>351</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QFileChooser" name="fileChooser_comment_file" native="true">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>50</y>
+      <width>351</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QFileChooser" name="fileChooser_variable_file" native="true">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>351</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_bottom">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>129</y>
+     <width>461</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="label_sample_from">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>20</y>
+      <width>31</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>From</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_sample_to">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>20</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>To</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_format">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>20</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Format</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_format">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>20</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>CSV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>DIF</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>WKS</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TSP</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Reverse CSV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="label_save_file">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>File</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_csv_only">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CSV only :</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_nan">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>100</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>NaN = </string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_nan">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>100</y>
+      <width>41</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>#N/A</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_separator">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>100</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Separator =</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_separator">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>100</y>
+      <width>21</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_debug">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug file</string>
+    </property>
+   </widget>
+   <widget class="QFileChooser" name="fileChooser_debug_file" native="true">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>140</y>
+      <width>351</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QFileChooser" name="fileChooser_save_file" native="true">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>60</y>
+      <width>351</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSampleEdit" name="sampleEdit_sample_to">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>20</y>
+      <width>61</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+    </property>
+    <property name="inputMask">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QSampleEdit" name="sampleEdit_sample_from">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>20</y>
+      <width>61</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+    </property>
+    <property name="inputMask">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_sample">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sample</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFileChooser</class>
+   <extends>QWidget</extends>
+   <header>custom_widgets/qfilechooser.h</header>
+   <container>1</container>
+   <slots>
+    <slot>updateFileType(QString)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>file_export</receiver>
+   <slot>save()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>file_export</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>file_export</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>help()</slot>
+  <slot>save()</slot>
+ </slots>
+</ui>

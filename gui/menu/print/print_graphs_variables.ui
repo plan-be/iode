@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>print_graphs_variables</class>
+ <widget class="QDialog" name="print_graphs_variables">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>280</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>280</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>280</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>GRAPH VARIABLES</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <widget class="QSplitter" name="splitter">
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>20</y>
+     <width>91</width>
+     <height>169</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <widget class="QPushButton" name="pushButton_display">
+    <property name="text">
+     <string>Display</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_print">
+    <property name="text">
+     <string>Print</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_apply">
+    <property name="text">
+     <string>Apply</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_setup">
+    <property name="text">
+     <string>Setup</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_cancel">
+    <property name="text">
+     <string>Cancel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_help">
+    <property name="text">
+     <string>Help</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>461</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_variables">
+      <property name="text">
+       <string>Variables</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" colspan="8">
+     <widget class="QTextEdit" name="textEdit_variables"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_sample">
+      <property name="text">
+       <string>Sample</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="comboBox_sample">
+      <item>
+       <property name="text">
+        <string>Level</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Differences</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Growth Rates</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>YoY Differences</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>YoY Growth Rates</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="label_sample_from">
+      <property name="text">
+       <string>From</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6">
+     <widget class="QLabel" name="label_sample_to">
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_layout">
+      <property name="text">
+       <string>Layout</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QComboBox" name="comboBox_layout">
+      <item>
+       <property name="text">
+        <string>Line Chart</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Scatter Chart</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Bar Chart</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Scatter Line Chart</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="2" column="2" colspan="3">
+     <widget class="QComboBox" name="comboBox_axis_option">
+      <item>
+       <property name="text">
+        <string>Standard Axis</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Log Axis</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Semi-log Axis</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Percent Axis</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_X_grid">
+      <property name="text">
+       <string>X grid</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QComboBox" name="comboBox_X_grid_thicks">
+      <item>
+       <property name="text">
+        <string>Major Thicks</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Minor Thicks</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>No Grids</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_Y_grid">
+      <property name="text">
+       <string>Y grid</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="comboBox_Y_grid_thicks">
+      <item>
+       <property name="text">
+        <string>Major Thicks</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Minor Thicks</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>No Grids</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="4" column="2" colspan="2">
+     <widget class="QLabel" name="label_min_Y">
+      <property name="text">
+       <string>Min Y</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <widget class="QLineEdit" name="lineEdit_min_Y"/>
+    </item>
+    <item row="4" column="5" colspan="3">
+     <widget class="QLabel" name="label_Max_Y">
+      <property name="text">
+       <string>Max Y</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="8">
+     <widget class="QLineEdit" name="lineEdit_max_Y"/>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_language">
+      <property name="text">
+       <string>Language</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QComboBox" name="comboBox_language">
+      <item>
+       <property name="text">
+        <string>English</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>French</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Dutch</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QSampleEdit" name="sampleEdit_sample_from">
+      <property name="toolTip">
+       <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+      </property>
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="8">
+     <widget class="QSampleEdit" name="sampleEdit_sample_to">
+      <property name="toolTip">
+       <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+      </property>
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_display</sender>
+   <signal>clicked()</signal>
+   <receiver>print_graphs_variables</receiver>
+   <slot>display()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_print</sender>
+   <signal>clicked()</signal>
+   <receiver>print_graphs_variables</receiver>
+   <slot>print()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_apply</sender>
+   <signal>clicked()</signal>
+   <receiver>print_graphs_variables</receiver>
+   <slot>apply()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_setup</sender>
+   <signal>clicked()</signal>
+   <receiver>print_graphs_variables</receiver>
+   <slot>setup()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>print_graphs_variables</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_help</sender>
+   <signal>clicked()</signal>
+   <receiver>print_graphs_variables</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>display()</slot>
+  <slot>print()</slot>
+  <slot>apply()</slot>
+  <slot>setup()</slot>
+  <slot>help()</slot>
+ </slots>
+</ui>
