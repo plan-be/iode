@@ -39,3 +39,9 @@
 *.ilk
 *.exp
 *.pyd
+/CppProperties.json
+/gui/exe/translations
+/gui/.qmake.stash
+/gui/ui_*.h
+/gui/*/moc_*
+*.ini
