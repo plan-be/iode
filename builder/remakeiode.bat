@@ -8,6 +8,7 @@ REM - cmd: compile only command line version of IODE
 REM - man: compile the IODE documentation
 REM - py: compile pyiode only
 REM - vc64: use vc64 compiler instead of bc (Borland)
+REM - vc32: use vc32
 
 REM defaults to rebuild all source files
 set objs=1
@@ -17,6 +18,7 @@ if /I [%2] == [-objs] set objs=0
 if /I [%3] == [-objs] set objs=0
 if /I [%4] == [-objs] set objs=0
 if /I [%5] == [-objs] set objs=0
+if /I [%6] == [-objs] set objs=0
 
 REM defaults to build all (command line only = false)
 set cmd_only=0
@@ -25,6 +27,7 @@ if /I [%2] == [-cmd] set cmd_only=1
 if /I [%3] == [-cmd] set cmd_only=1
 if /I [%4] == [-cmd] set cmd_only=1
 if /I [%5] == [-cmd] set cmd_only=1
+if /I [%6] == [-cmd] set cmd_only=1
 
 REM defaults to not build the documentation
 set man=0
@@ -33,6 +36,7 @@ if /I [%2] == [-man] set man=1
 if /I [%3] == [-man] set man=1
 if /I [%4] == [-man] set man=1
 if /I [%5] == [-man] set man=1
+if /I [%6] == [-man] set man=1
 
 REM defaults to not only build pyiode (pyiode only = false)
 set python_only=0
@@ -41,14 +45,23 @@ if /I [%2] == [-py] set python_only=1
 if /I [%3] == [-py] set python_only=1
 if /I [%4] == [-py] set python_only=1
 if /I [%5] == [-py] set python_only=1
+if /I [%6] == [-py] set python_only=1
 
 REM defaults to use Borland compiler
-set compiler=bc
-if /I [%1] == [-vc64] set compiler=vc64
-if /I [%2] == [-vc64] set compiler=vc64
-if /I [%3] == [-vc64] set compiler=vc64
-if /I [%4] == [-vc64] set compiler=vc64
-if /I [%5] == [-vc64] set compiler=vc64
+set compiler=vc64
+if /I [%1] == [-bc] set compiler=bc
+if /I [%2] == [-bc] set compiler=bc
+if /I [%3] == [-bc] set compiler=bc
+if /I [%4] == [-bc] set compiler=bc
+if /I [%5] == [-bc] set compiler=bc
+if /I [%6] == [-bc] set compiler=bc
+
+if /I [%1] == [-vc32] set compiler=vc32
+if /I [%2] == [-vc32] set compiler=vc32
+if /I [%3] == [-vc32] set compiler=vc32
+if /I [%4] == [-vc32] set compiler=vc32
+if /I [%5] == [-vc32] set compiler=vc32
+if /I [%6] == [-vc32] set compiler=vc32
 
 REM --- old paths below ---
 REM set iodepath=c:\usr\iode_src
@@ -59,6 +72,10 @@ set scr4path=%iodepath%\scr4
 
 
 if [%python_only%] == [1] goto :pyiode
+
+
+if [%compiler%] == [vc32] call %iodepath%\set32.bat
+if [%compiler%] == [vc64] call %iodepath%\set64.bat
 
 
 :: SCR
@@ -129,7 +146,7 @@ if [%man%] == [1] (
 )
 
 
-if [%cmd_only%] == [1] goto :pyiode 
+if [%cmd_only%] == [1] goto :succes 
 
 
 :: DOS

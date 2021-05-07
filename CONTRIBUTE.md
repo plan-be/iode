@@ -33,7 +33,8 @@ The `remakeiode.bat` script allows 5 optional arguments:
 - *-cmd*: build only the command line version of IODE
 - *-man*: compile the IODE documentation
 - *-py*: build pyiode only
-- *-vc64*: use vc64 (Visual Studio) compiler instead of bc (Borland)
+- *-bc*: use Broland compiler instead of vc64 (Visula Studio 64bits)
+- *-vc32*: use vc32 (Visual Studio 32bits) compiler instead of vc64 (Visual Studio 64bits)
 
 Requirements:
 - **full version**: You need to have Embarcadero, Visual Studio, NSIS, Python 3.6+, conda and Cython installed
