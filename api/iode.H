@@ -101,7 +101,7 @@
 #define KMAGIC(kdb)  ((kdb)->k_magic)
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-//#define KNAME(kdb)   ((kdb)->k_name) Supprimï¿½ pour ï¿½viter les oublis
+//#define KNAME(kdb)   ((kdb)->k_name) Supprimé pour éviter les oublis
 #define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
 #define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
@@ -995,24 +995,24 @@ typedef struct _tbl32_ {
 
 /*----------------------- COLS ---------------------------------*/
 typedef struct _col_ {
-    short   cl_opy;     /*opï¿½rateur sur pï¿½riode per1 opp per2*/
-    PERIOD  cl_per[2];  /*pï¿½riode 1 , pï¿½riode 2*/
-    short   cl_opf;     /*opï¿½rateur fichier  fich1 opf fich2 */
+    short   cl_opy;     /*op‚rateur sur p‚riode per1 opp per2*/
+    PERIOD  cl_per[2];  /*p‚riode 1 , p‚riode 2*/
+    short   cl_opf;     /*op‚rateur fichier  fich1 opf fich2 */
     short   cl_fnb[2];  /*fichier1 , fichier 2 */
     IODE_REAL    cl_val[2][2];
     /*   {{v00, v01},{v10,v11}} avec
 
-	   ï¿½            ï¿½
-	   ï¿½   fich1    ï¿½   fich2
-    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-    per1   ï¿½    v00     ï¿½    v01
-	   ï¿½ cl_val[0,0]ï¿½ cl_val[0,1]    v.. = valeur
-    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-    per2   ï¿½    v10     ï¿½    v11
-	   ï¿½ cl_val[1,0]ï¿½ cl_val[1,1]
-	   ï¿½            ï¿½
+	   ³            ³
+	   ³   fich1    ³   fich2
+    ÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ
+    per1   ³    v00     ³    v01
+	   ³ cl_val[0,0]³ cl_val[0,1]    v.. = valeur
+    ÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ
+    per2   ³    v10     ³    v11
+	   ³ cl_val[1,0]³ cl_val[1,1]
+	   ³            ³
       */
-    IODE_REAL    cl_res;   /* rï¿½sultat de (v00 opp v10) opf (v01 opp v11)*/
+    IODE_REAL    cl_res;   /* r‚sultat de (v00 opp v10) opf (v01 opp v11)*/
 } COL;
 
 typedef struct _cols_ {
@@ -1110,8 +1110,10 @@ typedef struct _token {
 typedef struct _lstack {        /* stack of operators used by L_analyse */
     unsigned ls_op      : 8;    /* operator */
     //unsigned ls_nb_args : 8;    /* nb of arguments */
-    unsigned ls_nb_args;    /* nb of arguments */ // Pour permettre de vï¿½rifier si plus de 255 arguments
+    unsigned ls_nb_args;    /* nb of arguments */ // Pour permettre de vérifier si plus de 255 arguments
 } LSTACK;
+
+
 
 /*------------------------ REPORTS ----------------------- */
 typedef struct _repfile_ {
@@ -1120,6 +1122,12 @@ typedef struct _repfile_ {
     int                 curline,
 			nblines;
 } REPFILE;
+
+
+#ifdef SCRCPP
+extern "C" {
+#endif
+
 
 extern REPFILE *CUR_REPFILE;
 
@@ -1310,11 +1318,16 @@ extern  int   (*K_pack[])();
 extern  int   (*K_cmpobj[])();
 extern  int   (*K_xdrobj[])();
 
+#ifdef SCRCPP
+}
+#endif
+
 /* -- Function declarations --
-1/3/2018 --> Function declaration are moved in iodebase.h and iodevarg.h.
+1/3/2018 --> Function declaration are moved into iodebase.h and iodevarg.h.
 */
 
 #include "iodebase.h"
 #include "iodevarg.h"
+
 
 #endif /* _IODE_H_ */

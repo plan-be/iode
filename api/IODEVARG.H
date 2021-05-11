@@ -1,6 +1,10 @@
 #ifndef _IODEVARG_
 #define _IODEVARG_
 
+#ifdef SCRCPP
+extern "C" {
+#endif
+
 /* k_errorv.c */
 extern void kerror(int ,...);
 extern void kmsg(char *, ...);
@@ -22,8 +26,12 @@ extern int W_printf(char *c1,...);
 
 /* objsv.c */
 extern int K_add(KDB *kdb, ...);
-
+	
 /* o_miscv.c */
 extern int ODE_error(int ,...);
+
+#ifdef SCRCPP
+}
+#endif
 
 #endif
