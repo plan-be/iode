@@ -1,5 +1,6 @@
 #ifndef _IODEBASE_
 #define _IODEBASE_
+
 #ifdef SCRCPP
 extern "C" {
 #endif
@@ -1363,8 +1364,8 @@ extern int o_var_gr_1(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,int ,int
 extern int o_var_gr(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,KDB *,char **);
 
 /* o_abort.c */
-extern int SW_abort(int ,char *);
-extern int SCR_panic(void);
+// extern int SW_abort(int ,char *);   	// JMP 10/5/2021 double de avec SCR
+// extern int SCR_panic(void);			// JMP 10/5/2021 double de avec SCR
 
 /* b_dde.c (MSC) */
 extern int __cdecl IodeDdeLocale(char *buf);

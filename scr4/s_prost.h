@@ -215,10 +215,10 @@ extern int InfDiv(char *a,char *b,char *res,char *reste);
 extern long SCR_free_mem(void);
 
 /* s_dirfp.c */
-extern char *SCR_fullpath(char *name,char *res);
+//extern char *SCR_fullpath(char *name,char *res); // JMP 10/5/2021 double emploi avec s_prodir.h
 
 /* s_dircwd.c */
-extern char *SCR_getcwd(int drive,char *dir);
+// extern char *SCR_getcwd(int drive,char *dir); // JMP 10/5/2021 double emploi avec s_prodir.h
 
 /* s_stutf8.c */
 extern unsigned char *SCR_OemToUTF8Char(int ch);
