@@ -6,8 +6,8 @@ extern "C" {
 
 
 /* Init */
-extern  IodeInit();
-extern  IodeEnd();
+extern  int IodeInit();
+extern  int IodeEnd();
 
 /* File Operations & Objects */
 extern  int  IodeLoad(char *name, int type);
@@ -41,7 +41,7 @@ extern  int     IodeSetScl(char *name, double value);
 
 extern  char    *IodeGetEqs(char *name);
 extern  char    *IodeGetTbl(char *name, char *smpl);
-extern  TBL* 	IodeGetTblDefinition(char *name);
+extern  TBL		*IodeGetTblDefinition(char *name);
 extern  char    *IodeGetTblTitle(char *name);
 extern  int     IodeSetTblFile(int ref, char *filename);
 

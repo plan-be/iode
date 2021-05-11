@@ -412,10 +412,10 @@ extern int PG_edit_field(PAGE *pg,int fld_nb);
 extern int SCR_term_vkey(int val);
 extern int SCR_check_key(void);
 extern int SCR_app_key(void);
-extern int STD_doscpout(char *from,char *to,int unit,int type);
-extern int STD_subshell(void);
-extern int STD_dosformat(int unit,int type);
-extern int STD_doscpin(char *from,char *to,int unit,int type);
+// extern int STD_doscpout(char *from,char *to,int unit,int type);  // JMP 6/5/2021 pour cpp double def
+//extern int STD_subshell(void);									// JMP 6/5/2021 pour cpp double def
+//extern int STD_dosformat(int unit,int type);						// JMP 6/5/2021 pour cpp double def
+//extern int STD_doscpin(char *from,char *to,int unit,int type);	// JMP 6/5/2021 pour cpp double def
 extern int SCR_config_screen(void);
 extern int SCR_cursor_off(void);
 extern int SCR_cursor_on(void);
