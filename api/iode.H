@@ -729,9 +729,12 @@ typedef struct  _okobj_ {
     char        o_pad[3];
 } OKOBJ;
 
+/**
+ * The KOBJ struct represents the pair <name, position in the buffer> associated with an element of the KDB struct
+ */
 typedef struct  _kobj_ {
-    SWHDL       o_val;      /* SWHDL=long */ /* IODE64K */
-    ONAME       o_name;
+    SWHDL       o_val;      /**< position of the element in the buffer */ /* SWHDL=long */ /* IODE64K */
+    ONAME       o_name;     /**< name of the element */
     char        o_pad[3];
 } KOBJ;
 
@@ -761,10 +764,21 @@ typedef struct _okdb643_ {
     char        k_reserved[63];         /* IODE64K */
 } OKDB643;
 
+/**
+ * The KDB struct represents the list of all elements of the same type.
+ * IODE defines 7 types:
+ * - Comments
+ * - Equations
+ * - Identities
+ * - Lists
+ * - Scalars
+ * - Tables
+ * - Variables
+ */
 typedef struct _kdb_ {
-    KOBJ        *k_objs;
-	long        k_nb;
-    short       k_type;
+    KOBJ        *k_objs;                /**< list pairs <name, \struct in buffer> for each comments/equations/entities/lists/scalars/tables/variables */
+    long        k_nb;                   /**< number of elements (cmt/eq/.../var) contained by the structure */
+    short       k_type;                 /**< type (comments/equations/entities/lists/scalars/tables/variables) represented by the structure */
     short       k_mode;
     char        k_arch[LMAGIC];
     char        k_magic[LMAGIC];
@@ -821,18 +835,24 @@ typedef struct _clec_ {
     LNAME   lnames[1];
 } CLEC;
 
-typedef IODE_REAL     *VAR;
+typedef IODE_REAL     *VAR;  /**< The VAR typedef represents the Variables type of IODE. */
 
+/**
+ * The SCL struct represents the Scalars type of IODE.
+ */
 typedef struct _scl_ {
     IODE_REAL    val;
     IODE_REAL    relax;
     IODE_REAL    std;
 } SCL;
 
-typedef char    *CMT;
+typedef char    *CMT;  /**< The CMT typedef represents the Comments type of IODE. */
 
-typedef char    *LIS;
+typedef char    *LIS;  /**< The LIS typedef represents the Lists type of IODE. */
 
+/**
+ * The IDT struct represents the Identites type of IODE.
+ */
 typedef struct _idt_ {
     char     *lec;
     CLEC     *clec;
@@ -840,6 +860,9 @@ typedef struct _idt_ {
 
 #define EQS_NBTESTS     20
 
+/**
+ * The EQ struct represents the Equations type of IODE.
+ */
 typedef struct _eq_ {
     char    *lec;
     CLEC    *clec;
@@ -870,6 +893,9 @@ typedef struct _tline_ {
     char    tl_pad[1];
 } TLINE;
 
+/**
+ * The TBL struct represents the Tables type of IODE.
+ */
 typedef struct _tbl_ {
     short   t_lang;
     short   t_free;     /* = 0, first column is frozen */
