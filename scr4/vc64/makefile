@@ -16,9 +16,9 @@ COMP      = cl -DWINDOWS_IGNORE_PACKING_MISMATCH  -Zi -Zp1 -c -I$(incdir) -I.. -
 COMPLINK  = cl -Zi -Zp1 -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@
 COMPLINKW = cl -Zi -Zp1 -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@ /link /subsystem:windows /MACHINE:X64
 
-COMP      = cl -Zi -c -I$(incdir) -I.. -DDOS -DDOSWIN -DWINDOWS -DDOSW32 -DREALD -DSCRPROTO -DIODEWIN -DNOEMS -DNOEMF -DVC $(ALLOCDOCON) $(TYPESQLODBC)
-COMPLINK  = cl -Zi -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@
-COMPLINKW = cl -Zi -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@ /link /subsystem:windows /MACHINE:X64
+#COMP      = cl -Zi -c -I$(incdir) -I.. -DDOS -DDOSWIN -DWINDOWS -DDOSW32 -DREALD -DSCRPROTO -DIODEWIN -DNOEMS -DNOEMF -DVC $(ALLOCDOCON) $(TYPESQLODBC)
+#COMPLINK  = cl -Zi -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@
+#COMPLINKW = cl -Zi -I.. $(TYPESQLODBC) ws2_32.lib gdi32.lib user32.lib advapi32.lib shell32.lib comdlg32.lib comctl32.lib  Winspool.lib legacy_stdio_definitions.lib /Fe:$@ /link /subsystem:windows /MACHINE:X64
 
 
 LINK     = link /MACHINE:X64
