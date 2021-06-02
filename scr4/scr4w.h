@@ -16,11 +16,11 @@
 
 #define __SIMPLE_LOCALES__
 #include <windows.h>
+#include <scr4.h>
 #include <s_swap.h>
 #include <s_mat.h>
 #include <s_xdr.h>
-#include <s_scroll.h>
-#include <scr4.h> 
+#include <s_scroll.h> 
 #include <ddeml.h>
 
 
