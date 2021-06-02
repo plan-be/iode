@@ -156,6 +156,10 @@ typedef struct _swstat_ {
 
 /* ======================= VARS =============================== */
 
+#ifdef SCRCPP
+extern "C" {
+#endif
+
 extern int      SW_ACTIVE;
 extern long     SW_AGE, SW_MIN_MEM;
 extern SWBLK    *SW_BLKS;
@@ -168,6 +172,10 @@ extern int      SW_FILE_POS;
 /* extern char     *SW_BUF;*/
 extern char     SW_FILE[];
 extern int      SW_SEG_SIZE; /* JMP 27-11-07 */
+
+#ifdef SCRCPP
+}
+#endif
 
 /* =================== FNS PROTOTYPES =========================== */
 
