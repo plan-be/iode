@@ -112,7 +112,8 @@ void MainWindow::about()
 
 void MainWindow::open_release_notes()
 {
-    QDesktopServices::openUrl(get_iode_release_notes());
+    QString path = QString("file:///%1/readme.htm").arg(get_iode_installation_path());
+    QDesktopServices::openUrl(QUrl(path));
 }
 
 void MainWindow::open_iode_home()
