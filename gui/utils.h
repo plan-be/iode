@@ -140,12 +140,6 @@ inline std::string get_version()
 }
 
 // TODO: move this function to IODE API
-inline QUrl get_iode_release_notes()
-{
-    return QUrl(QString("file:///%1/readme.htm").arg(get_iode_installation_path()));
-}
-
-// TODO: move this function to IODE API
 inline QUrl get_iode_manual()
 {
     return QUrl(QString("file:///%1/iode.chm").arg(get_iode_installation_path()));
