@@ -1,12 +1,12 @@
 #pragma once
 
+#include "../api/iode.h"
+
 #include <QString>
 
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
-
-#include "api/iode.h"
 
 /* I hope to one day fully rewrite the IODE API into full pure C++ code instead of C but,
    in the meantime, we need bridge functions here

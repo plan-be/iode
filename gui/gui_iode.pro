@@ -37,12 +37,11 @@ DEFINES += IODEWIN
 DEFINES += NOEMS 
 DEFINES += NOEMF
 
-# set root project directory as starting dir for all includes
-INCLUDEPATH += ..
-INCLUDEPATH += ../api
+# set root project directory as starting dir for all includes.
+# line below is required to execute includes of SCR4 header files in the beginning of iode.h
 INCLUDEPATH += ../scr4
 
-# specify libs to be linked with the application
+# LIBS specify libs to be linked with the application
 LIBS += -L"../api/vc32" -liodeapi
 LIBS += -L"../scr4/vc32" -ls4iode
 LIBS += ws2_32.lib
