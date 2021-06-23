@@ -25,7 +25,7 @@ QT += core
 QT += gui
 QT += widgets
 
-# specify the compilation DEFINES variables
+# DEFINES: specify the compilation DEFINES variables
 DEFINES += WINDOWS_IGNORE_PACKING_MISMATCH
 DEFINES += VC 
 DEFINES += DOS 
@@ -37,13 +37,17 @@ DEFINES += IODEWIN
 DEFINES += NOEMS 
 DEFINES += NOEMF
 
-# set root project directory as starting dir for all includes.
-# line below is required to execute includes of SCR4 header files in the beginning of iode.h
+# INCLUDEPATH: set root project directory as starting dir for all includes.
+# NOTE FOR THE DEVELOPPERS:
+# The line below is required to execute includes of SCR4 header files in the beginning of iode.h
 INCLUDEPATH += ../scr4
 
-# LIBS specify libs to be linked with the application
+# LIBS: specify libs to be linked with the application
 LIBS += -L"../api/vc32" -liodeapi
 LIBS += -L"../scr4/vc32" -ls4iode
+# NOTE FOR THE DEVELOPPERS:
+# The libs below have been added for the VC compiler. 
+# They are not required by Borland/Embarcadero.
 LIBS += ws2_32.lib
 LIBS += gdi32.lib
 LIBS += user32.lib
@@ -56,7 +60,11 @@ LIBS += legacy_stdio_definitions.lib
 LIBS += odbc32.lib
 LIBS += odbccp32.lib
 
-# list of UI files for the application (created using Qt Designer).
+# FORMS: list of UI files for the application (created using Qt Designer).
+# NOTE FOR THE DEVELOPPERS:
+# These files are used by QMake to generate ui_(...).h header files.
+# The generated header files (starting by ui_) MUST NOT be commited nor modified
+
 # Main Window
 FORMS += main_window.ui
 # File menu
