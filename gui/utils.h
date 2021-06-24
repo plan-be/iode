@@ -11,6 +11,8 @@
 #include <QDir>
 #include <QDialog>
 #include <QSettings>
+#include <QMessageBox>
+#include <QCoreApplication>
 #include <QDesktopServices>
 
 #include <string>
@@ -26,6 +28,7 @@
 // constexpr is better then #define (https://stackoverflow.com/questions/42388077/constexpr-vs-macros)
 constexpr char ORGANIZATION_NAME[] = "Federal Planning Bureau";
 constexpr char APPLICATION_NAME[] = "IODE";
+constexpr char DEFAULT_INSTALLATION_DIR[] = "c:/iode";               // see function HLP_filename() in dos/o_help.c
 constexpr char IODE_WEBSITE[] = "https://iode.plan.be/doku.php";
 
 
@@ -126,23 +129,26 @@ const static QMap<EnumIodeFile, IodeFileExtension> qmapIodeFileExtension =
  *          FUNCTIONS             *
  * ****************************** */
 
-// TODO: implement this function properly
-// TODO: move this function to IODE API
-inline const char* get_iode_installation_path()
-{
-    return "C:/soft/iode";
-}
-
 // TODO: move this function to IODE API
 inline std::string get_version()
 {
     return std::to_string(IODE_VERSION_MAJOR) + "." + std::to_string(IODE_VERSION_MINOR);
 }
 
-// TODO: move this function to IODE API
-inline QUrl get_iode_manual()
+// equivalent to function HLP_filename() in dos/o_help.c
+inline const QUrl get_url_iode_helpfile(const QString& filename)
 {
-    return QUrl(QString("file:///%1/iode.chm").arg(get_iode_installation_path()));
+    // try to find the help file in the application directory
+    QString filepath = QDir(QCoreApplication::applicationDirPath()).filePath(filename);
+    // if doesn't exist, build a path suing the default iode installation directory 
+    if (!QFileInfo(filepath).exists()) filepath = QDir(DEFAULT_INSTALLATION_DIR).filePath(filename);
+    filepath = "file:///" + filepath;
+    return QUrl(filepath);
+}
+
+inline const QUrl get_url_iode_manual()
+{
+    return get_url_iode_helpfile("iode.chm");
 }
 
 inline QSettings* get_local_settings()
@@ -209,7 +215,8 @@ public slots:
 
     void help()
     {
-        QDesktopServices::openUrl(get_iode_manual());
+        QUrl url = get_url_iode_manual();
+        QDesktopServices::openUrl(url);
     }
 
 protected:
