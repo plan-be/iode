@@ -83,6 +83,8 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::about()
 {
+    // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")
+    QString version = QString("%1.%2").arg(IODE_VERSION_MAJOR).arg(IODE_VERSION_MINOR);
     QMessageBox::about(this, tr("About IODE"),
         tr(R"(
             <style>
@@ -106,7 +108,7 @@ void MainWindow::about()
             <p>SCR/AL1(c) 1986-2020, JM.B.Paul</p>
            
             <h3>Website</h3>       
-            <p><a href='https://iode.plan.be/doku.php'>iode.plan.be</a></p>)").arg(QString::fromStdString(get_version()))
+            <p><a href='https://iode.plan.be/doku.php'>iode.plan.be</a></p>)").arg(version)
     );
 }
 
