@@ -129,11 +129,6 @@ const static QMap<EnumIodeFile, IodeFileExtension> qmapIodeFileExtension =
  *          FUNCTIONS             *
  * ****************************** */
 
-// TODO: move this function to IODE API
-inline std::string get_version()
-{
-    return std::to_string(IODE_VERSION_MAJOR) + "." + std::to_string(IODE_VERSION_MINOR);
-}
 
 // equivalent to function HLP_filename() in dos/o_help.c
 inline const QUrl get_url_iode_helpfile(const QString& filename)
