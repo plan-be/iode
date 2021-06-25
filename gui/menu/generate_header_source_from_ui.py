@@ -123,13 +123,15 @@ def parse_ui_file(ui_file):
 
 if __name__ == "__main__":
     prefix = ''
+    except_ = ['file_import', 'file_export', 'workspace_load', 'workspace_save']
 
     current_dir = Path('.').absolute()
     for ui_file in current_dir.glob(f'**/{prefix}*.ui'): 
         print(f"processing {ui_file.stem}...")
         header_file = ui_file.with_suffix('.h')
         source_file = ui_file.with_suffix('.cpp')
-        if not header_file.exists():        
+        #if not header_file.exists():        
+        if ui_file.stem not in except_:        
             ui_class, slots = parse_ui_file(ui_file)
             # from snake_case to CamelCase
             class_name = ''.join([x.title() for x in ui_class.split('_')]) + 'Dialog'

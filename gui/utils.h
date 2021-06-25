@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QDialog>
 #include <QSettings>
+#include <QCloseEvent>
 #include <QMessageBox>
 #include <QCoreApplication>
 #include <QDesktopServices>
@@ -188,10 +189,9 @@ public:
         QDialog(parent, f), settings(settings), className(""){ }
     ~MixinSettings() { }
 
-public slots:
-    void accept() override
+protected:
+    void saveSettings()
     {
-        // save settings
         settings.beginGroup(className);
         QMap<QString, BaseWrapper*>::iterator i;
         for (i = mapFields.begin(); i != mapFields.end(); ++i)
@@ -202,20 +202,10 @@ public slots:
             settings.setValue(name, value);
         }
         settings.endGroup();
-
-        QDialog::accept();
     }
 
-    void help()
-    {
-        QUrl url = get_url_iode_manual();
-        QDesktopServices::openUrl(url);
-    }
-
-protected:
     void loadSettings()
     {
-        // load settings
         settings.beginGroup(className);
         QMap<QString, BaseWrapper*>::iterator i;
         for (i = mapFields.begin(); i != mapFields.end(); ++i)
@@ -227,4 +217,30 @@ protected:
         }
         settings.endGroup();
     }
+
+    void closeEvent(QCloseEvent* event) override
+    {
+        saveSettings();
+        event->accept();
+    }
+
+public slots:
+    void help()
+    {
+        QUrl url = get_url_iode_manual();
+        QDesktopServices::openUrl(url);
+    }
+
+    void accept() override
+    {
+        saveSettings();
+        QDialog::accept();
+    }
+
+    void reject() override
+    {
+        saveSettings();
+        QDialog::reject();
+    }
+
 };
