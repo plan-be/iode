@@ -148,9 +148,7 @@ inline const QUrl get_url_iode_manual()
 
 inline QSettings* get_local_settings()
 {
-    QDir current_dir = QDir::current();
-    QString settings_filepath = current_dir.absoluteFilePath("settings.ini");
-    QSettings* settings = new QSettings(settings_filepath, QSettings::IniFormat);
+    QSettings* settings = new QSettings("settings.ini", QSettings::IniFormat);
     return settings;
 }
 
