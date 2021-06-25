@@ -45,3 +45,6 @@
 /gui/ui_*.h
 /gui/*/moc_*
 *.ini
+/gui/Makefile
+/gui/Makefile.Debug
+/gui/Makefile.Release
