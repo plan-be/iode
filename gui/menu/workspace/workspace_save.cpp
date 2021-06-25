@@ -23,28 +23,14 @@ SaveWorkspaceDialog::SaveWorkspaceDialog(QSettings& settings, QWidget* parent, Q
     mapFiles["Tables"] = new WrapperFileChooser(ui->pushButton_tables->text(), *ui->fileChooser_tables, Optional, TablesFile, FileMayExist);
     mapFiles["Variables"] = new WrapperFileChooser(ui->pushButton_variables->text(), *ui->fileChooser_variables, Optional, VariablesFile, FileMayExist);
 
-    int nb_elements;
-    QMap<QString, QLineEdit*> nb_elements_fields;
-    nb_elements_fields["Comments"] = ui->lineEdit_nb_comments;
-    nb_elements_fields["Equations"] = ui->lineEdit_nb_equations;
-    nb_elements_fields["Identities"] = ui->lineEdit_nb_identities;
-    nb_elements_fields["Lists"] = ui->lineEdit_nb_lists;
-    nb_elements_fields["Scalars"] = ui->lineEdit_nb_scalars;
-    nb_elements_fields["Tables"] = ui->lineEdit_nb_tables;
-    nb_elements_fields["Variables"] = ui->lineEdit_nb_variables;
-
-    QString type;
-    QLineEdit* field;
-    QMap<QString, QLineEdit*>::iterator i;
-    for (i = nb_elements_fields.begin(); i != nb_elements_fields.end(); ++i)
-    {
-        type = i.key();
-        field = i.value();
-
-        nb_elements = get_nb_elements_WS(qmapIodeTypes.value(type));
-        field->setText(QString::number(nb_elements));
-    }
-
+    ui->lineEdit_nb_comments->setText(QString::number(get_nb_elements_WS(Comments)));
+    ui->lineEdit_nb_equations->setText(QString::number(get_nb_elements_WS(Equations)));
+    ui->lineEdit_nb_identities->setText(QString::number(get_nb_elements_WS(Identities)));
+    ui->lineEdit_nb_lists->setText(QString::number(get_nb_elements_WS(Lists)));
+    ui->lineEdit_nb_scalars->setText(QString::number(get_nb_elements_WS(Scalars)));
+    ui->lineEdit_nb_tables->setText(QString::number(get_nb_elements_WS(Tables)));
+    ui->lineEdit_nb_variables->setText(QString::number(get_nb_elements_WS(Variables)));
+ 
     QMap<QString, WrapperFileChooser*>::iterator j;
     for (j = mapFiles.begin(); j != mapFiles.end(); ++j) mapFields[j.key()] = j.value();
 

@@ -23,7 +23,7 @@ public:
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const 
 	{ 
-		return get_nb_elements_WS(K_CMT); 
+		return get_nb_elements_WS(Comments); 
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const 
