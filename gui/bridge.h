@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../api/iode.h"
+#include "utils.h"
 
 #include <QString>
 
@@ -12,29 +13,29 @@
    in the meantime, we need bridge functions here
 */
 
-inline int get_nb_elements_WS(int type)
+inline int get_nb_elements_WS(EnumIodeType type)
 {
     return K_WS[K_CMT + type]->k_nb;
 }
 
-inline char* get_iode_object_name(int type, int pos)
+inline char* get_iode_object_name(EnumIodeType type, int pos)
 {
     return const_cast<char*>(K_WS[K_CMT + type]->k_objs[pos].o_name);
 }
 
-inline char* get_iode_object_value(int type, int pos)
+inline char* get_iode_object_value(EnumIodeType type, int pos)
 {
     return K_oval0(K_WS[K_CMT + type], pos);
 }
 
 inline char* get_comment_name(int pos)
 {
-    return get_iode_object_name(K_CMT, pos);
+    return get_iode_object_name(Comments, pos);
 }
 
 inline char* get_comment_value(int pos)
 {
-    return get_iode_object_value(K_CMT, pos);
+    return get_iode_object_value(Comments, pos);
 }
 
 

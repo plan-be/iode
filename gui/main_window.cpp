@@ -161,7 +161,7 @@ void MainWindow::open_load_workspace_dialog()
 {
     LoadWorkspaceDialog dialog(*settings, this);
     dialog.exec();
-    if (get_nb_elements_WS(K_CMT) != 0)
+    if (get_nb_elements_WS(Comments) != 0)
     {
         emit workspaceChanged();
         commentsView->show();
