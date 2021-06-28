@@ -15,4 +15,5 @@ public:
 	~CommentsView();
 
 	void setupModel(CommentsModel* model);
+	void update();
 };
