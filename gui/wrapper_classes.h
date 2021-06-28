@@ -35,8 +35,11 @@ class WrapperComboBox : public TemplateWrapper<QComboBox, int>
     const QMap<QString, int>& map_values;
 
 public:
-    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType& type, const QMap<QString, int>& map_values) :
-        TemplateWrapper(name, qfield, type), map_values(map_values) {};
+    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType& type, const QMap<QString, int>& map_values, bool editable=false) :
+        TemplateWrapper(name, qfield, type), map_values(map_values) 
+    {
+        qfield.setEditable(editable);
+    };
 
     QVariant getQValue()
     {
