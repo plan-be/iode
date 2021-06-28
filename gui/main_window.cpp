@@ -5,7 +5,7 @@ MainWindow::MainWindow() : QMainWindow()
     try 
     {
         // ---- setup SCR4 ----
-        init();
+        init_iode_api();
 
         // ---- setup the present class ----
         window = new Ui::MainWindow();
@@ -45,7 +45,7 @@ MainWindow::~MainWindow()
 
 // TODO: the User Interface implementation should NOT be aware of how the base API (iode.lib) is implemented.
 //       Please provide a higher level base API.
-void MainWindow::init()
+void MainWindow::init_iode_api()
 {
 
     SW_MIN_MEM = 120 * 1024L;
@@ -61,7 +61,7 @@ void MainWindow::init()
 
 // TODO: the User Interface implementation should NOT be aware of how the base API (iode.lib) is implemented.
 //       Please provide a higher level base API.
-void MainWindow::end()
+void MainWindow::end_iode_api()
 {
     // free Workspace
     K_end_ws(0);
@@ -76,7 +76,7 @@ void MainWindow::end()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    end();
+    end_iode_api();
     event->accept();
 }
 
