@@ -18,13 +18,13 @@ template <class T, class U> class TemplateWrapper : public BaseWrapper
 {
 protected:
     const QString name;
-    T& qitem;
+    T& qfield;
     const EnumItemType type;
 
 public:
-    TemplateWrapper(const QString name, T& qitem, const EnumItemType& type) : name(name), qitem(qitem), type(type) {};
+    TemplateWrapper(const QString name, T& qfield, const EnumItemType& type) : name(name), qfield(qfield), type(type) {};
 
-    T& getQItem() { return qitem; }
+    T& getQField() { return qfield; }
 
     virtual U extractAndVerify() = 0;
 };
@@ -35,12 +35,12 @@ class WrapperComboBox : public TemplateWrapper<QComboBox, int>
     const QMap<QString, int>& map_values;
 
 public:
-    WrapperComboBox(const QString name, QComboBox& qitem, const EnumItemType& type, const QMap<QString, int>& map_values) :
-        TemplateWrapper(name, qitem, type), map_values(map_values) {};
+    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType& type, const QMap<QString, int>& map_values) :
+        TemplateWrapper(name, qfield, type), map_values(map_values) {};
 
     QVariant getQValue()
     {
-        QString text = qitem.currentText();
+        QString text = qfield.currentText();
         int value = map_values.value(text, -1);
         return QVariant(value);
     }
@@ -48,14 +48,14 @@ public:
     void setQValue(const QVariant& qvalue)
     {
         int value = qvalue.toInt();
-        qitem.setCurrentIndex(value);
+        qfield.setCurrentIndex(value);
     }
 
-    // QString getTextValue() { return qitem.currentText(); }
+    // QString getTextValue() { return qfield.currentText(); }
 
     int extractAndVerify()
     {
-        QString text = qitem.currentText();
+        QString text = qfield.currentText();
         if (!map_values.contains(text)) throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
         int value = map_values.value(text);
         return value;
@@ -66,23 +66,23 @@ public:
 class WrapperQLineEdit : public TemplateWrapper<QLineEdit, QString>
 {
 public:
-    WrapperQLineEdit(const QString name, QLineEdit& qitem, const EnumItemType& type) : TemplateWrapper(name, qitem, type) {};
+    WrapperQLineEdit(const QString name, QLineEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {
-        QString value = qitem.text();
+        QString value = qfield.text();
         return QVariant(value);
     }
 
     void setQValue(const QVariant& qvalue)
     {
         QString value = qvalue.toString();
-        qitem.setText(value);
+        qfield.setText(value);
     }
 
     QString extractAndVerify()
     {
-        QString value = qitem.text();
+        QString value = qfield.text();
 
         if (type == Required && value.isEmpty())
             throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
@@ -97,29 +97,29 @@ public:
 class WrapperFileChooser : public TemplateWrapper<QFileChooser, QString>
 {
 public:
-    WrapperFileChooser(const QString name, QFileChooser& qitem, const EnumItemType& type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
-        TemplateWrapper(name, qitem, type)
+    WrapperFileChooser(const QString name, QFileChooser& qfield, const EnumItemType& type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
+        TemplateWrapper(name, qfield, type)
     {
-        this->qitem.setFileType(fileType);
-        this->qitem.setFileMode(fileMode);
+        this->qfield.setFileType(fileType);
+        this->qfield.setFileMode(fileMode);
     }
 
     QVariant getQValue()
     {
-        QString value = qitem.getFilepath();
+        QString value = qfield.getFilepath();
         return QVariant(value);
     }
 
     void setQValue(const QVariant& qvalue)
     {
         QString value = qvalue.toString();
-        qitem.setFilepath(value);
+        qfield.setFilepath(value);
     }
 
     QString extractAndVerify()
     {
-        qitem.verify(name, type);
-        return qitem.getFilepath();
+        qfield.verify(name, type);
+        return qfield.getFilepath();
     }
 };
 
@@ -127,22 +127,22 @@ public:
 class WrapperSampleEdit : public TemplateWrapper<QSampleEdit, QString>
 {
 public:
-    WrapperSampleEdit(const QString name, QSampleEdit& qitem, const EnumItemType& type) : TemplateWrapper(name, qitem, type) {};
+    WrapperSampleEdit(const QString name, QSampleEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {
-        QString value = qitem.text();
+        QString value = qfield.text();
         return QVariant(value);
     }
 
     void setQValue(const QVariant& qvalue) 
     { 
         QString value = qvalue.toString(); 
-        qitem.setText(value);
+        qfield.setText(value);
     }
 
     QString extractAndVerify() 
     {
-        return qitem.text();
+        return qfield.text();
     }
 };
