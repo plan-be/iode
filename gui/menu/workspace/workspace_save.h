@@ -27,7 +27,6 @@ class SaveWorkspaceDialog : public MixinSettings
 
 private:
     Ui::save_workspace* ui;
-    QMap<QString, WrapperFileChooser*> mapFiles;
 
 public:
     SaveWorkspaceDialog(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());

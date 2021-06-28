@@ -15,13 +15,13 @@ SaveWorkspaceDialog::SaveWorkspaceDialog(QSettings& settings, QWidget* parent, Q
     ui = new Ui::save_workspace();
     ui->setupUi(this);
 
-    mapFiles["Comments"] = new WrapperFileChooser(ui->pushButton_comments->text(), *ui->fileChooser_comments, Optional, CommentsFile, FileMayExist);
-    mapFiles["Equations"] = new WrapperFileChooser(ui->pushButton_equations->text(), *ui->fileChooser_equations, Optional, EquationsFile, FileMayExist);
-    mapFiles["Identities"] = new WrapperFileChooser(ui->pushButton_identities->text(), *ui->fileChooser_identities, Optional, IdentitiesFile, FileMayExist);
-    mapFiles["Lists"] = new WrapperFileChooser(ui->pushButton_lists->text(), *ui->fileChooser_lists, Optional, ListsFile, FileMayExist);
-    mapFiles["Scalars"] = new WrapperFileChooser(ui->pushButton_scalars->text(), *ui->fileChooser_scalars, Optional, ScalarsFile, FileMayExist);
-    mapFiles["Tables"] = new WrapperFileChooser(ui->pushButton_tables->text(), *ui->fileChooser_tables, Optional, TablesFile, FileMayExist);
-    mapFiles["Variables"] = new WrapperFileChooser(ui->pushButton_variables->text(), *ui->fileChooser_variables, Optional, VariablesFile, FileMayExist);
+    mapFields["Comments"] = new WrapperFileChooser(ui->pushButton_comments->text(), *ui->fileChooser_comments, Optional, CommentsFile, FileMayExist);
+    mapFields["Equations"] = new WrapperFileChooser(ui->pushButton_equations->text(), *ui->fileChooser_equations, Optional, EquationsFile, FileMayExist);
+    mapFields["Identities"] = new WrapperFileChooser(ui->pushButton_identities->text(), *ui->fileChooser_identities, Optional, IdentitiesFile, FileMayExist);
+    mapFields["Lists"] = new WrapperFileChooser(ui->pushButton_lists->text(), *ui->fileChooser_lists, Optional, ListsFile, FileMayExist);
+    mapFields["Scalars"] = new WrapperFileChooser(ui->pushButton_scalars->text(), *ui->fileChooser_scalars, Optional, ScalarsFile, FileMayExist);
+    mapFields["Tables"] = new WrapperFileChooser(ui->pushButton_tables->text(), *ui->fileChooser_tables, Optional, TablesFile, FileMayExist);
+    mapFields["Variables"] = new WrapperFileChooser(ui->pushButton_variables->text(), *ui->fileChooser_variables, Optional, VariablesFile, FileMayExist);
 
     ui->lineEdit_nb_comments->setText(QString::number(get_nb_elements_WS(Comments)));
     ui->lineEdit_nb_equations->setText(QString::number(get_nb_elements_WS(Equations)));
@@ -30,9 +30,6 @@ SaveWorkspaceDialog::SaveWorkspaceDialog(QSettings& settings, QWidget* parent, Q
     ui->lineEdit_nb_scalars->setText(QString::number(get_nb_elements_WS(Scalars)));
     ui->lineEdit_nb_tables->setText(QString::number(get_nb_elements_WS(Tables)));
     ui->lineEdit_nb_variables->setText(QString::number(get_nb_elements_WS(Variables)));
- 
-    QMap<QString, WrapperFileChooser*>::iterator j;
-    for (j = mapFiles.begin(); j != mapFiles.end(); ++j) mapFields[j.key()] = j.value();
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -51,7 +48,7 @@ void SaveWorkspaceDialog::save_component(const QString& type, const bool accept)
     try
     {
         int i_type = qmapIodeTypes.value(type);
-        WrapperFileChooser* field_filepath = mapFiles.value(type);
+        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(type));
         QString filepath = field_filepath->extractAndVerify();
         // accept = true means that the users clicked on an individual "Load XXX" button.
         // In that case and if the filepath is empty, we show warning box
