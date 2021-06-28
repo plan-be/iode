@@ -11,6 +11,9 @@ MainWindow::MainWindow() : QMainWindow()
         window = new Ui::MainWindow();
         window->setupUi(this);
 
+        // ---- initialize internal variables which point to objects defined using the Qt Designer (.ui file) ----
+        tabs = window->tabWidget_IODE_objs;
+
         // ---- Model/View components ----
         
         // Comments
@@ -18,9 +21,6 @@ MainWindow::MainWindow() : QMainWindow()
         commentsModel = new CommentsModel(this);
         commentsView->setupModel(commentsModel);
         commentsView->hide();
-
-        // ---- Connect SIGNALS and SLOTS ----
-        connect(this, &MainWindow::workspaceChanged, commentsModel, &CommentsModel::reset);
 
         // ---- Settings ----
         
@@ -71,6 +71,34 @@ void MainWindow::end_iode_api()
     W_close();
     // stops Dynamic Data Exchange (DDE)
     //IodeEndDde();
+}
+
+void MainWindow::updateCurrentTab()
+{
+    // get the index of the tab currently visible
+    int tabIndex = tabs->currentIndex();
+
+    // update the corresponding model and view
+    switch (tabIndex)
+    {
+    case Comments:
+        commentsView->update();
+        break;
+    case Equations:
+        break;
+    case Identities:
+        break;
+    case Lists:
+        break;
+    case Scalars:
+        break;
+    case Tables:
+        break;
+    case Variables:
+        break;
+    default:
+        break;
+    }
 }
 
 
@@ -161,15 +189,7 @@ void MainWindow::open_load_workspace_dialog()
 {
     LoadWorkspaceDialog dialog(*settings, this);
     dialog.exec();
-    emit workspaceChanged();
-    if (get_nb_elements_WS(Comments) > 0)
-    {
-        commentsView->show();
-    }
-    else
-    {
-        commentsView->hide();
-    }
+    updateCurrentTab();
 }
 
 void MainWindow::open_save_workspace_dialog()
@@ -182,60 +202,70 @@ void MainWindow::open_clear_workspace_dialog()
 {
     ClearWorkspaceDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_copy_into_workspace_dialog()
 {
     CopyIntoWorkspaceDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_merge_into_workspace_dialog()
 {
     MergeIntoWorkspaceDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_change_workspace_descriptions_dialog()
 {
     ChangeWorkspaceDescriptionsDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_change_variables_sample_dialog()
 {
     ChangeVariablesSampleDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_extrapolate_variables_dialog()
 {
     ExtrapolateVariablesDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_high_to_low_dialog()
 {
     HighToLowDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_low_to_high_dialog()
 {
     LowToHighDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_seasonal_adjustment_dialog()
 {
     SeasonalAdjustmentDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_trend_correction_dialog()
 {
     TrendCorrectionDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_object_editor_dialog()
@@ -247,42 +277,49 @@ void MainWindow::open_object_editor_dialog()
     ObjectEditorDialog dialog(*settings, this);
     //ObjectEditorDialog dialog(*settings, this, object_type);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_duplicate_objects_dialog()
 {
     DuplicateObjectsDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_compute_simulation_dialog()
 {
     ComputeSimulationDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_compute_model_dialog()
 {
     ComputeModelDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_compute_scc_decomposition_dialog()
 {
     ComputeSccDecompositionDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_compute_scc_simulation_dialog()
 {
     ComputeSccSimulationDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_compute_identities_dialog()
 {
     ComputIdentitiesDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_print_tables_dialog()
@@ -337,10 +374,12 @@ void MainWindow::open_execute_report_dialog()
 {
     ReportExecuteDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
 
 void MainWindow::open_execute_report_command_line_dialog()
 {
     ReportCommandLineDialog dialog(*settings, this);
     dialog.exec();
+    updateCurrentTab();
 }
