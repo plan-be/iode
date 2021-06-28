@@ -16,17 +16,13 @@ LoadWorkspaceDialog::LoadWorkspaceDialog(QSettings& settings, QWidget* parent, Q
     ui = new Ui::load_workspace();
     ui->setupUi(this);
 
-    mapFiles["Comments"] = new WrapperFileChooser(ui->pushButton_comments->text(), *ui->fileChooser_comments, Optional, CommentsFile, ExistingFile);
-    mapFiles["Equations"] = new WrapperFileChooser(ui->pushButton_equations->text(), *ui->fileChooser_equations, Optional, EquationsFile, ExistingFile);
-    mapFiles["Identities"] = new WrapperFileChooser(ui->pushButton_identities->text(), *ui->fileChooser_identities, Optional, IdentitiesFile, ExistingFile);
-    mapFiles["Lists"] = new WrapperFileChooser(ui->pushButton_lists->text(), *ui->fileChooser_lists, Optional, ListsFile, ExistingFile);
-    mapFiles["Scalars"] = new WrapperFileChooser(ui->pushButton_scalars->text(), *ui->fileChooser_scalars, Optional, ScalarsFile, ExistingFile);
-    mapFiles["Tables"] = new WrapperFileChooser(ui->pushButton_tables->text(), *ui->fileChooser_tables, Optional, TablesFile, ExistingFile);
-    mapFiles["Variables"] = new WrapperFileChooser(ui->pushButton_variables->text(), *ui->fileChooser_variables, Optional, VariablesFile, ExistingFile);
-
-
-    QMap<QString, WrapperFileChooser*>::iterator i;
-    for (i = mapFiles.begin(); i != mapFiles.end(); ++i) mapFields[i.key()] = i.value();
+    mapFields["Comments"] = new WrapperFileChooser(ui->pushButton_comments->text(), *ui->fileChooser_comments, Optional, CommentsFile, ExistingFile);
+    mapFields["Equations"] = new WrapperFileChooser(ui->pushButton_equations->text(), *ui->fileChooser_equations, Optional, EquationsFile, ExistingFile);
+    mapFields["Identities"] = new WrapperFileChooser(ui->pushButton_identities->text(), *ui->fileChooser_identities, Optional, IdentitiesFile, ExistingFile);
+    mapFields["Lists"] = new WrapperFileChooser(ui->pushButton_lists->text(), *ui->fileChooser_lists, Optional, ListsFile, ExistingFile);
+    mapFields["Scalars"] = new WrapperFileChooser(ui->pushButton_scalars->text(), *ui->fileChooser_scalars, Optional, ScalarsFile, ExistingFile);
+    mapFields["Tables"] = new WrapperFileChooser(ui->pushButton_tables->text(), *ui->fileChooser_tables, Optional, TablesFile, ExistingFile);
+    mapFields["Variables"] = new WrapperFileChooser(ui->pushButton_variables->text(), *ui->fileChooser_variables, Optional, VariablesFile, ExistingFile);
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -45,7 +41,7 @@ void LoadWorkspaceDialog::load_component(const QString& type, const bool accept)
     try
     {
         int i_type = qmapIodeTypes.value(type);
-        WrapperFileChooser* field_filepath = mapFiles.value(type);
+        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(type));
         QString filepath = field_filepath->extractAndVerify();
         // accept = true means that the users clicked on an individual "Load XXX" button.
         // In that case and if the filepath is empty, we show warning box
