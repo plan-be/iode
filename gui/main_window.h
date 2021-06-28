@@ -80,8 +80,8 @@ public:
 	~MainWindow();
 
 private:
-	void init();
-	void end();
+	void init_iode_api();
+	void end_iode_api();
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
