@@ -13,6 +13,7 @@ MainWindow::MainWindow() : QMainWindow()
 
         // ---- initialize internal variables which point to objects defined using the Qt Designer (.ui file) ----
         tabs = window->tabWidget_IODE_objs;
+        connect(tabs, &QTabWidget::currentChanged, this, &MainWindow::updateCurrentTab);
 
         // ---- Model/View components ----
         
@@ -73,13 +74,13 @@ void MainWindow::end_iode_api()
     //IodeEndDde();
 }
 
-void MainWindow::updateCurrentTab()
+void MainWindow::updateCurrentTab(int index)
 {
-    // get the index of the tab currently visible
-    int tabIndex = tabs->currentIndex();
+    // get the index of the tab currently visible if not passed to the method
+    if (index < 0) index = tabs->currentIndex();
 
     // update the corresponding model and view
-    switch (tabIndex)
+    switch (index)
     {
     case Comments:
         commentsView->update();
