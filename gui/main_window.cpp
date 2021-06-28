@@ -25,7 +25,7 @@ MainWindow::MainWindow() : QMainWindow()
         // ---- Settings ----
         
         // save the settings in a specific file located in the current directory
-        settings = get_local_settings();
+        settings = get_local_settings_instance();
     }
     catch (const std::exception& e)
     {

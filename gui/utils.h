@@ -147,7 +147,7 @@ inline const QUrl get_url_iode_manual()
     return get_url_iode_helpfile("iode.chm");
 }
 
-inline QSettings* get_local_settings()
+inline QSettings* get_local_settings_instance()
 {
     QSettings* settings = new QSettings("settings.ini", QSettings::IniFormat);
     return settings;
