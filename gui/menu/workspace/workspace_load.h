@@ -29,7 +29,6 @@ class LoadWorkspaceDialog : public MixinSettings
 
 private:
     Ui::load_workspace* ui;
-    QMap<QString, WrapperFileChooser*> mapFiles;
 
 public:
     LoadWorkspaceDialog(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
