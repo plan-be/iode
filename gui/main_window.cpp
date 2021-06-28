@@ -162,7 +162,14 @@ void MainWindow::open_load_workspace_dialog()
     LoadWorkspaceDialog dialog(*settings, this);
     dialog.exec();
     emit workspaceChanged();
-    if (get_nb_elements_WS(Comments) != 0) commentsView->show();
+    if (get_nb_elements_WS(Comments) > 0)
+    {
+        commentsView->show();
+    }
+    else
+    {
+        commentsView->hide();
+    }
 }
 
 void MainWindow::open_save_workspace_dialog()
