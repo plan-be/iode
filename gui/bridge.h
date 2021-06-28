@@ -39,7 +39,7 @@ inline char* get_comment_value(int pos)
 }
 
 
-inline void CPP_WsLoad(std::string arg, int type, std::string str_type)
+inline void CPP_WsLoad(std::string arg, EnumIodeType type, std::string str_type)
 {
     char* c_arg = const_cast<char*>(arg.c_str());
 
@@ -49,7 +49,7 @@ inline void CPP_WsLoad(std::string arg, int type, std::string str_type)
 }
 
 
-inline void CPP_WsSave(std::string arg, int type, std::string str_type)
+inline void CPP_WsSave(std::string arg, EnumIodeType type, std::string str_type)
 {
     char* c_arg = const_cast<char*>(arg.c_str());
 
@@ -59,7 +59,7 @@ inline void CPP_WsSave(std::string arg, int type, std::string str_type)
 }
 
 
-inline void CPP_XodeRuleImport(int type, std::string trace, std::string rule, std::string ode, std::string asc, std::string from, std::string to, int fmt, int lang) 
+inline void CPP_XodeRuleImport(EnumIodeType type, std::string trace, std::string rule, std::string ode, std::string asc, std::string from, std::string to, int fmt, int lang)
 {
     char* c_trace = const_cast<char*>(trace.c_str());
     char* c_rule = const_cast<char*>(rule.c_str());

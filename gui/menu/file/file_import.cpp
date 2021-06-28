@@ -66,7 +66,7 @@ void FileImportDialog::import()
 {
     try
     {
-        int type = input_type->extractAndVerify();
+        EnumIodeType type = static_cast<EnumIodeType>(input_type->extractAndVerify());
         int fmt = input_format->extractAndVerify();
         std::string asc = input_file->extractAndVerify().toStdString();
         std::string rule = rule_file->extractAndVerify().toStdString();

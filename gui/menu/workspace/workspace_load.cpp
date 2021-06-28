@@ -40,7 +40,7 @@ void LoadWorkspaceDialog::load_component(const QString& type, const bool accept)
 {
     try
     {
-        int i_type = qmapIodeTypes.value(type);
+        EnumIodeType i_type = static_cast<EnumIodeType>(qmapIodeTypes.value(type));
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(type));
         QString filepath = field_filepath->extractAndVerify();
         // accept = true means that the users clicked on an individual "Load XXX" button.
