@@ -109,20 +109,21 @@ struct IodeFileExtension
 {
     QString name;
     QString ext;
+    QString ascii;
 };
 
 const static QMap<EnumIodeFile, IodeFileExtension> qmapIodeFileExtension =
 {
-    {CommentsFile, {"Comments", "cmt"}},
-    {EquationsFile, {"Equations", "eqs"}},
-    {IdentitiesFile, {"Identities", "idt"}},
-    {ListsFile, {"Lists", "lst"}},
-    {ScalarsFile, {"Scalars", "scl"}},
-    {TablesFile, {"Tables", "tbl"}},
-    {VariablesFile, {"Variables", "var"}},
-    {LogsFile, {"Logs", "log"}},
-    {SettingsFile, {"Settings", "ini"}},
-    {AnyFile, {"Any", "*"}}
+    {CommentsFile, {"Comments", "cmt", "ac"}},
+    {EquationsFile, {"Equations", "eqs", "ae"}},
+    {IdentitiesFile, {"Identities", "idt", "ai"}},
+    {ListsFile, {"Lists", "lst", "al"}},
+    {ScalarsFile, {"Scalars", "scl", "as"}},
+    {TablesFile, {"Tables", "tbl", "at"}},
+    {VariablesFile, {"Variables", "var", "av"}},
+    {LogsFile, {"Logs", "log", ""}},
+    {SettingsFile, {"Settings", "ini", ""}},
+    {AnyFile, {"Any", "*", ""}}
 };
 
 
