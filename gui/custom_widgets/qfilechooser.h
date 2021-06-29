@@ -95,19 +95,21 @@ public:
 		if (fileInfo.isDir())  throw std::runtime_error((error + QString("The filepath %1 represents a directory, not a file").arg(file)).toStdString());
 		// check if correct/must provide extension
 		QString extension = fileInfo.suffix();
-		QString expectedExt = qmapIodeFileExtension.value(fileType).ext;
+		IodeFileExtension expectedExt = qmapIodeFileExtension.value(fileType);
 		if (extension.isEmpty()) 
 		{
-			if (expectedExt == anyExt) throw std::runtime_error(error.toStdString() + "You must provide a file extension");
-			fileInfo = QFileInfo(file + expectedExt);
+			if (expectedExt.ext == anyExt) throw std::runtime_error(error.toStdString() + "You must provide a file extension");
+			fileInfo = QFileInfo(file + expectedExt.ext);
 		}
 		else
 		{
-			if (expectedExt != anyExt && extension != expectedExt)
-				throw std::runtime_error((error + QString("Wrong file extension. Expected %1 but got %2").arg(expectedExt).arg(extension)).toStdString());
+			if (expectedExt.ext != anyExt && extension != expectedExt.ext && extension != expectedExt.ascii)
+				throw std::runtime_error((error + QString("Wrong file extension. Expected %1 or %2 but got %3")
+					.arg(expectedExt.ext).arg(expectedExt.ascii).arg(extension)).toStdString());
 		}
 		// check if file exists
-		if (!fileInfo.exists()) throw std::runtime_error((error + QString("The file %1 does not exist !").arg(file)).toStdString());
+		if (fileMode == ExistingFile && !fileInfo.exists())
+			throw std::runtime_error((error + QString("The file %1 does not exist !").arg(file)).toStdString());
 	}
 
 public slots:
@@ -120,12 +122,11 @@ private slots:
 	void browse()
 	{
 		QString filename = "";
-		QString fileTypeName = qmapIodeFileExtension.value(fileType).name;
-		QString expectedExt = qmapIodeFileExtension.value(fileType).ext;
+		IodeFileExtension expectedExt = qmapIodeFileExtension.value(fileType);
 
 		QString dir = QString();
-		QString caption = fileTypeName + " File";
-		QString filter = expectedExt == anyExt ? QString() : fileTypeName + " (*." + expectedExt + ")";
+		QString caption = expectedExt.name + " File";
+		QString filter = expectedExt.ext == anyExt ? QString() : expectedExt.name + " (*." + expectedExt.ext + " *." + expectedExt.ascii + ")";
 		if (fileMode == NewFile)
 		{
 			caption = "Save " + caption;
