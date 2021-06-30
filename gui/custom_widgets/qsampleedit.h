@@ -27,7 +27,8 @@ public:
 		// 0: character of the Number category permitted but not required.
 		// A: character of the Letter category required, such as A-Z, a-z.
 		this->setInputMask("9999A900");
-		QRegExp rx("\\d{4}[YQMW]\\d{3}");
+		// https://doc.qt.io/qt-5/qregexp.html
+		QRegExp rx("\\d{4}[YQMW]\\d{1,3}");
 		QValidator* validator = new QRegExpValidator(rx, this);
 		this->setValidator(validator);
 	}
