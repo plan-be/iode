@@ -129,10 +129,10 @@ public:
 };
 
 
-class WrapperSampleEdit : public TemplateWrapper<QSampleEdit, QString>
+class WrapperSampleEdit : public TemplateWrapper<QIodeSampleEdit, QString>
 {
 public:
-    WrapperSampleEdit(const QString name, QSampleEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
+    WrapperSampleEdit(const QString name, QIodeSampleEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {
