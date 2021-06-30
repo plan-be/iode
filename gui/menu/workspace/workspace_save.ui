@@ -89,7 +89,7 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QFileChooser" name="fileChooser_comments" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_comments" native="true"/>
     </item>
     <item row="1" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_comments">
@@ -118,7 +118,7 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QFileChooser" name="fileChooser_equations" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_equations" native="true"/>
     </item>
     <item row="2" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_equations">
@@ -147,7 +147,7 @@
      </widget>
     </item>
     <item row="3" column="1">
-     <widget class="QFileChooser" name="fileChooser_identities" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_identities" native="true"/>
     </item>
     <item row="3" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_identities">
@@ -176,7 +176,7 @@
      </widget>
     </item>
     <item row="4" column="1">
-     <widget class="QFileChooser" name="fileChooser_lists" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_lists" native="true"/>
     </item>
     <item row="4" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_lists">
@@ -205,7 +205,7 @@
      </widget>
     </item>
     <item row="5" column="1">
-     <widget class="QFileChooser" name="fileChooser_scalars" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_scalars" native="true"/>
     </item>
     <item row="5" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_scalars">
@@ -234,7 +234,7 @@
      </widget>
     </item>
     <item row="6" column="1">
-     <widget class="QFileChooser" name="fileChooser_tables" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_tables" native="true"/>
     </item>
     <item row="6" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_tables">
@@ -263,7 +263,7 @@
      </widget>
     </item>
     <item row="7" column="1">
-     <widget class="QFileChooser" name="fileChooser_variables" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_variables" native="true"/>
     </item>
     <item row="7" column="2">
      <widget class="QLineEdit" name="lineEdit_nb_variables">
@@ -283,7 +283,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>

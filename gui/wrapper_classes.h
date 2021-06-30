@@ -99,10 +99,10 @@ public:
 
 // ---- Custom Widgets ----
 
-class WrapperFileChooser : public TemplateWrapper<QFileChooser, QString>
+class WrapperFileChooser : public TemplateWrapper<QIodeFileChooser, QString>
 {
 public:
-    WrapperFileChooser(const QString name, QFileChooser& qfield, const EnumItemType& type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
+    WrapperFileChooser(const QString name, QIodeFileChooser& qfield, const EnumItemType& type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
         TemplateWrapper(name, qfield, type)
     {
         this->qfield.setFileType(fileType);

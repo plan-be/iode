@@ -78,7 +78,7 @@ by those defined in the named settings file.</string>
     </property>
    </widget>
   </widget>
-  <widget class="QFileChooser" name="fileChooser_profile" native="true">
+  <widget class="QIodeFileChooser" name="fileChooser_profile" native="true">
    <property name="geometry">
     <rect>
      <x>119</x>
@@ -104,7 +104,7 @@ by those defined in the named settings file.</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>

@@ -112,7 +112,7 @@
      </widget>
     </item>
     <item row="1" column="1" colspan="4">
-     <widget class="QFileChooser" name="fileChooser_input_file" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_input_file" native="true"/>
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="label_sample_from">
@@ -192,6 +192,11 @@
    <slots>
     <slot>updateFileType(QString)</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>QSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets/qsampleedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

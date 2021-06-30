@@ -45,7 +45,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -63,7 +63,7 @@
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QFileChooser" name="fileChooser_input_file" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_input_file" native="true"/>
     </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label_method">
@@ -120,7 +120,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>
