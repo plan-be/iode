@@ -115,10 +115,10 @@ public slots:
 private slots:
 	void browse()
 	{
-		QString filename = "";
+		QString filename;
 		IodeFileExtension expectedExt = qmapIodeFileExtension.value(fileType);
 
-		QString dir = QString();
+		QString dir;
 		QString caption = expectedExt.name + " File";
 		QString filter = expectedExt.ext == anyExt ? QString() : expectedExt.name + " (*." + expectedExt.ext + " *." + expectedExt.ascii + ")";
 		if (fileMode == NewFile)
