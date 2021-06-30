@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QHBoxLayout>
-#include <QComboBox>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QDir>
 #include <QFileDialog>
@@ -15,9 +15,6 @@
 
 #include "../utils.h"
 
-
-constexpr int MAX_VISIBLE_ITEMS = 10;
-constexpr int MAX_COUNT = 30;
 
 enum EnumFileMode
 {
@@ -37,7 +34,7 @@ public:
 	Q_ENUM(EnumFileMode)
 
 private:
-	QComboBox* comboBox;
+	QLineEdit* lineEdit;
 	QPushButton* browseButton;
 
 	EnumIodeFile fileType;
@@ -47,42 +44,39 @@ private:
 
 public:
 	QFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
-		comboBox(new QComboBox()), browseButton(new QPushButton()), fileType(AnyFile), fileMode(ExistingFile), anyExt(qmapIodeFileExtension.value(AnyFile).ext)
+		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(AnyFile), fileMode(ExistingFile), anyExt(qmapIodeFileExtension.value(AnyFile).ext)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setMargin(0);
 
-		comboBox->setPlaceholderText("*.*");
-		comboBox->setEditable(true);
-		comboBox->setMaxCount(MAX_COUNT);
-		comboBox->setMaxVisibleItems(MAX_VISIBLE_ITEMS);
-		layout->addWidget(comboBox);
+		lineEdit->setPlaceholderText("*.*");
+		layout->addWidget(lineEdit);
 
 		browseButton->setText("Browse");
 		browseButton->setFixedWidth(browseButton->fontMetrics().width("  " + browseButton->text() + "  "));
 		layout->addWidget(browseButton);
 
-		setFocusProxy(comboBox);
+		setFocusProxy(lineEdit);
 
 		connect(browseButton, SIGNAL(clicked()), this, SLOT(browse()));
 	}
 
 	~QFileChooser()
 	{
-		delete comboBox;
+		delete lineEdit;
 		delete browseButton;
 	}
 
 	void setFileType(const EnumIodeFile& fileType) { this->fileType = fileType; }
 	void setFileMode(const EnumFileMode& fileMode) { this->fileMode = fileMode; }
 
-	QString getFilepath() { return comboBox->currentText(); }
-	void setFilepath(const QString& filepath) { comboBox->setCurrentText(filepath); }
+	QString getFilepath() { return lineEdit->text(); }
+	void setFilepath(const QString& filepath) { lineEdit->setText(filepath); }
 
 	void verify(const QString& name, const EnumItemType& type)
 	{
 		QString error = QString("ERROR in field %1: ").arg(name);
-		QString file = comboBox->currentText();
+		QString file = lineEdit->text();
 		// check if empty
 		if (file.isEmpty())
 		{
@@ -137,6 +131,6 @@ private slots:
 			caption = "Open " + caption;
 			filename = QFileDialog::getOpenFileName(this, caption, dir, filter);
 		}
-		if (!filename.isEmpty()) comboBox->setCurrentText(filename);
+		if (!filename.isEmpty()) lineEdit->setText(filename);
 	}
 };
