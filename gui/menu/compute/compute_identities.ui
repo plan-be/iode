@@ -48,7 +48,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -73,7 +73,7 @@
      </widget>
     </item>
     <item row="0" column="2">
-     <widget class="QSampleEdit" name="sampleEdit_sample_from">
+     <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
       <property name="toolTip">
        <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
@@ -95,7 +95,7 @@
      </widget>
     </item>
     <item row="0" column="4">
-     <widget class="QSampleEdit" name="sampleEdit_sample_to">
+     <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
       <property name="toolTip">
        <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
@@ -196,7 +196,7 @@ Files</string>
     <item row="4" column="5">
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>                                                        </string>
+       <string/>
       </property>
      </widget>
     </item>
@@ -205,7 +205,7 @@ Files</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QSampleEdit</class>
+   <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
    <header>custom_widgets/qsampleedit.h</header>
   </customwidget>

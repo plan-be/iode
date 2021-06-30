@@ -122,7 +122,7 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QSampleEdit" name="sampleEdit_sample_from">
+     <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
       <property name="toolTip">
        <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
@@ -144,7 +144,7 @@
      </widget>
     </item>
     <item row="2" column="3">
-     <widget class="QSampleEdit" name="sampleEdit_sample_to">
+     <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
       <property name="toolTip">
        <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
@@ -180,12 +180,12 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QSampleEdit</class>
+   <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
    <header>custom_widgets/qsampleedit.h</header>
   </customwidget>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>

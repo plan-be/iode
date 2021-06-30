@@ -9,12 +9,12 @@
 #include "../utils.h"
 
 
-class QSampleEdit : public QLineEdit
+class QIodeSampleEdit : public QLineEdit
 {
 	Q_OBJECT
 
 public:
-	QSampleEdit(QWidget* parent = nullptr) : QLineEdit(parent)
+	QIodeSampleEdit(QWidget* parent = nullptr) : QLineEdit(parent)
 	{
 		this->setPlaceholderText("yyyyPppp");
 #if QT_CONFIG(tooltip)

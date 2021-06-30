@@ -312,7 +312,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QSampleEdit" name="sampleEdit_sample_from">
+   <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -333,7 +333,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QSampleEdit" name="sampleEdit_sample_to">
+   <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -446,7 +446,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QSampleEdit</class>
+   <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
    <header>custom_widgets/qsampleedit.h</header>
   </customwidget>
