@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QComboBox>
+
 #include "./custom_widgets/qfilechooser.h"
 #include "./custom_widgets/qsampleedit.h"
 #include "utils.h"
