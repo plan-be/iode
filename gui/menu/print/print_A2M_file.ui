@@ -82,12 +82,12 @@
      <string>File Name</string>
     </property>
    </widget>
-   <widget class="QFileChooser" name="fileChooser_input_file" native="true"/>
+   <widget class="QIodeFileChooser" name="fileChooser_input_file" native="true"/>
   </widget>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>

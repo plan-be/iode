@@ -119,14 +119,14 @@
      </widget>
     </item>
     <item row="1" column="1" colspan="2">
-     <widget class="QFileChooser" name="fileChooser_input_file" native="true"/>
+     <widget class="QIodeFileChooser" name="fileChooser_input_file" native="true"/>
     </item>
    </layout>
   </widget>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>

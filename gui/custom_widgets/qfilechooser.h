@@ -24,7 +24,7 @@ enum EnumFileMode
 };
 
 
-class QFileChooser : public QWidget
+class QIodeFileChooser : public QWidget
 {
 	Q_OBJECT
 
@@ -43,7 +43,7 @@ private:
 	QString anyExt;
 
 public:
-	QFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
+	QIodeFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
 		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(AnyFile), fileMode(ExistingFile), anyExt(qmapIodeFileExtension.value(AnyFile).ext)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
@@ -61,7 +61,7 @@ public:
 		connect(browseButton, SIGNAL(clicked()), this, SLOT(browse()));
 	}
 
-	~QFileChooser()
+	~QIodeFileChooser()
 	{
 		delete lineEdit;
 		delete browseButton;

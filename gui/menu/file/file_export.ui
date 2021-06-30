@@ -99,7 +99,7 @@
      <string>Rule file</string>
     </property>
    </widget>
-   <widget class="QFileChooser" name="fileChooser_rule_file" native="true">
+   <widget class="QIodeFileChooser" name="fileChooser_rule_file" native="true">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -109,7 +109,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QFileChooser" name="fileChooser_comment_file" native="true">
+   <widget class="QIodeFileChooser" name="fileChooser_comment_file" native="true">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -119,7 +119,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QFileChooser" name="fileChooser_variable_file" native="true">
+   <widget class="QIodeFileChooser" name="fileChooser_variable_file" native="true">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -310,7 +310,7 @@
      <string>Debug file</string>
     </property>
    </widget>
-   <widget class="QFileChooser" name="fileChooser_debug_file" native="true">
+   <widget class="QIodeFileChooser" name="fileChooser_debug_file" native="true">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -320,7 +320,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QFileChooser" name="fileChooser_save_file" native="true">
+   <widget class="QIodeFileChooser" name="fileChooser_save_file" native="true">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -389,7 +389,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFileChooser</class>
+   <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
    <header>custom_widgets/qfilechooser.h</header>
    <container>1</container>
