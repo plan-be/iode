@@ -22,7 +22,11 @@ public:
 		                 "-P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)\n"
 		                 "-ppp is the period of the year");
 #endif
-		this->setInputMask("9999AAAA");
+		// https://doc.qt.io/qt-5/qlineedit.html#inputMask-prop
+		// 9: character of the Number category required, e.g 0-9. 
+		// 0: character of the Number category permitted but not required.
+		// A: character of the Letter category required, such as A-Z, a-z.
+		this->setInputMask("9999A900");
 		QRegExp rx("\\d{4}[YQMW]\\d{3}");
 		QValidator* validator = new QRegExpValidator(rx, this);
 		this->setValidator(validator);
