@@ -41,6 +41,18 @@ Requirements:
 - **command line version**: requires to only have Visual Studio installed
 - **Python version**: requires Python 3.6+, (mini/ana)conda, cython and separated py36, py37 and base (Python 3.8) conda environments with larray package installed 
 
+# VCPKG
+
+**vcpkg** is a free C/C++ package manager for acquiring and managing libraries. 
+Maintained by the Microsoft C++ team and open source contributors.
+
+- **Github repository**: https://github.com/microsoft/vcpkg
+- **Documentation**: https://vcpkg.io/en/index.html
+- **Install vcpkg**: https://vcpkg.io/en/getting-started.html
+- **Install libraries for your project**: ``vcpkg install [packages to install]``
+- **Using vcpkg with MSBuild / Visual Studio**: ``vcpkg integrate install``
+- **Integration with Visual Studio**: [here](https://github.com/microsoft/vcpkg/blob/master/docs/users/integration.md#with-msbuild)
+
 # Qt
 
 Note: Since version 6, [Qt is build using CMake](https://www.qt.io/blog/qt-and-cmake-the-past-the-present-and-the-future).
