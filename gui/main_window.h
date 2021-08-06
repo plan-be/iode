@@ -18,6 +18,7 @@
 #include <stdexcept>
 
 #include "utils.h"
+#include "graph.h"
 
 #include "ui_main_window.h"
 

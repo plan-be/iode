@@ -24,6 +24,8 @@ TARGET = gui_iode
 QT += core
 QT += gui
 QT += widgets
+# required for QCustomPlot
+QT += printsupport
 
 # DEFINES: specify the compilation DEFINES variables
 DEFINES += WINDOWS_IGNORE_PACKING_MISMATCH
@@ -48,17 +50,17 @@ LIBS += -L"../scr4/vc32" -ls4iode
 # NOTE FOR THE DEVELOPPERS:
 # The libs below have been added for the VC compiler. 
 # They are not required by Borland/Embarcadero.
-LIBS += ws2_32.lib
-LIBS += gdi32.lib
-LIBS += user32.lib
-LIBS += advapi32.lib
-LIBS += shell32.lib
-LIBS += comdlg32.lib
-LIBS += comctl32.lib 
-LIBS += Winspool.lib
-LIBS += legacy_stdio_definitions.lib
-LIBS += odbc32.lib
-LIBS += odbccp32.lib
+LIBS += -lws2_32
+LIBS += -lgdi32
+LIBS += -luser32
+LIBS += -ladvapi32
+LIBS += -lshell32
+LIBS += -lcomdlg32
+LIBS += -lcomctl32 
+LIBS += -lWinspool
+LIBS += -llegacy_stdio_definitions
+LIBS += -lodbc32
+LIBS += -lodbccp32
 
 # FORMS: list of UI files for the application (created using Qt Designer).
 # NOTE FOR THE DEVELOPPERS:
@@ -67,6 +69,8 @@ LIBS += odbccp32.lib
 
 # Main Window
 FORMS += main_window.ui
+# Plotting
+FORMS += graph.ui
 # File menu
 FORMS += menu/file/file_import.ui
 FORMS += menu/file/file_export.ui
@@ -115,12 +119,17 @@ HEADERS += bridge.h
 # Custom widgets
 HEADERS += custom_widgets/qsampleedit.h
 HEADERS += custom_widgets/qfilechooser.h
+HEADERS += custom_widgets/qcustomplot.h
 
 # Models
 HEADERS += models/comments_model.h
 
 # Views
-HEADERS += views/comments_view.h 
+HEADERS += views/comments_view.h
+
+# Plotting
+HEADERS += qcustomplot.h
+HEADERS += graph.h
 
 # File menu
 HEADERS += menu/file/file_import.h
@@ -175,11 +184,17 @@ SOURCES += legacy/sb_gui.c
 SOURCES += main.cpp
 SOURCES += main_window.cpp
 
+# Custom widgets
+SOURCES += custom_widgets/qcustomplot.cpp
+
 # Models
 SOURCES += models/comments_model.cpp
 
 # Views
 SOURCES += views/comments_view.cpp
+
+# Plotting
+SOURCES += graph.cpp
 
 # File menu
 SOURCES += menu/file/file_import.cpp
