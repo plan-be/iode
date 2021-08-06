@@ -1,7 +1,7 @@
 // copied/pasted from the /cmd directory
 
 /************ Fonctions annulées ou a remplacees ************************/
-#include "iode.h"
+#include "../../api/iode.h"
 #include <s_a2m.h>
 
 /* sb_pdest.c */
