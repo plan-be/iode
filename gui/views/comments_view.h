@@ -3,17 +3,14 @@
 #include <QObject>
 #include <QTableView>
 
+#include "abstract_qtableview.h"
 #include "../models/comments_model.h"
 
 
-class CommentsView : public QTableView
+class CommentsView : public AbstractTableView<CommentsModel>
 {
 	Q_OBJECT
 
 public:
-	CommentsView(QWidget* parent = nullptr);
-	~CommentsView();
-
-	void setupModel(CommentsModel* model);
-	void update();
+	CommentsView(QWidget* parent = nullptr) : AbstractTableView(parent) {};
 };

@@ -5,12 +5,12 @@
 #include "abstract_qtablemodel.h"
 
 
-class CommentsModel : public IODEAbstractTableModel<Comments>
+class IdentitiesModel : public IODEAbstractTableModel<Identities>
 {
 	Q_OBJECT
 
 public:
-	CommentsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Comment" }, parent) {};
+	IdentitiesModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Identity" }, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const
@@ -18,7 +18,7 @@ private:
 		if (col == 0)
 			return QVariant(QString::fromLatin1(iodeItems.getObjectName(row)));
 		else
-			return QVariant(QString::fromLatin1(iodeItems.getObjectValue(row)));
+			return QVariant(QString::fromLatin1(iodeItems.getLec(row)));
 	}
 
 public slots:

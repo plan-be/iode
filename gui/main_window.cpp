@@ -22,6 +22,36 @@ MainWindow::MainWindow() : QMainWindow()
         commentsModel = new CommentsModel(this);
         commentsView->setupModel(commentsModel);
         commentsView->hide();
+        // Equations
+        equationsView = window->tableview_equations;
+        equationsModel = new EquationsModel(this);
+        equationsView->setupModel(equationsModel);
+        equationsView->hide();
+        // Identities
+        identitiesView = window->tableview_identities;
+        identitiesModel = new IdentitiesModel(this);
+        identitiesView->setupModel(identitiesModel);
+        identitiesView->hide();
+        // Lists
+        listsView = window->tableview_lists;
+        listsModel = new ListsModel(this);
+        listsView->setupModel(listsModel);
+        listsView->hide();         
+        // Scalars
+        scalarsView = window->tableview_scalars;
+        scalarsModel = new ScalarsModel(this);
+        scalarsView->setupModel(scalarsModel);
+        scalarsView->hide();   
+        // Tables
+        tablesView = window->tableview_tables;
+        tablesModel = new TablesModel(this);
+        tablesView->setupModel(tablesModel);
+        tablesView->hide();        
+        // Variables
+        variablesView = window->tableview_variables;
+        variablesModel = new VariablesModel(this);
+        variablesView->setupModel(variablesModel);
+        variablesView->hide();
 
         // ---- Settings ----
         
@@ -38,8 +68,23 @@ MainWindow::MainWindow() : QMainWindow()
 MainWindow::~MainWindow()
 {
     delete settings;
+
     delete commentsView;
+    delete equationsView;
+    delete identitiesView;
+    delete listsView;
+    delete scalarsView;
+    delete tablesView;
+    delete variablesView;
+
     delete commentsModel;
+    delete equationsModel;
+    delete identitiesModel;
+    delete listsModel;
+    delete scalarsModel;
+    delete tablesModel;
+    delete variablesModel;
+
     delete window;
 }
 
@@ -82,21 +127,21 @@ void MainWindow::updateCurrentTab(int index)
     // update the corresponding model and view
     switch (index)
     {
-    case Comments:
+    case COMMENTS:
         commentsView->update();
         break;
-    case Equations:
-        break;
-    case Identities:
-        break;
-    case Lists:
-        break;
-    case Scalars:
-        break;
-    case Tables:
-        break;
-    case Variables:
-        break;
+    case EQUATIONS:
+        equationsView->update();
+    case IDENTITIES:
+        identitiesView->update();
+    case LISTS:
+        listsView->update();
+    case SCALARS:
+        scalarsView->update();
+    case TABLES:
+        tablesView->update();
+    case VARIABLES:
+        variablesView->update();;
     default:
         break;
     }

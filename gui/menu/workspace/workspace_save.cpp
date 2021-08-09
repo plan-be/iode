@@ -23,13 +23,13 @@ SaveWorkspaceDialog::SaveWorkspaceDialog(QSettings& settings, QWidget* parent, Q
     mapFields["Tables"] = new WrapperFileChooser(ui->pushButton_tables->text(), *ui->fileChooser_tables, Optional, TablesFile, FileMayExist);
     mapFields["Variables"] = new WrapperFileChooser(ui->pushButton_variables->text(), *ui->fileChooser_variables, Optional, VariablesFile, FileMayExist);
 
-    ui->lineEdit_nb_comments->setText(QString::number(get_nb_elements_WS(Comments)));
-    ui->lineEdit_nb_equations->setText(QString::number(get_nb_elements_WS(Equations)));
-    ui->lineEdit_nb_identities->setText(QString::number(get_nb_elements_WS(Identities)));
-    ui->lineEdit_nb_lists->setText(QString::number(get_nb_elements_WS(Lists)));
-    ui->lineEdit_nb_scalars->setText(QString::number(get_nb_elements_WS(Scalars)));
-    ui->lineEdit_nb_tables->setText(QString::number(get_nb_elements_WS(Tables)));
-    ui->lineEdit_nb_variables->setText(QString::number(get_nb_elements_WS(Variables)));
+    ui->lineEdit_nb_comments->setText(QString::number(Comments().count()));
+    ui->lineEdit_nb_equations->setText(QString::number(Equations().count()));
+    ui->lineEdit_nb_identities->setText(QString::number(Identities().count()));
+    ui->lineEdit_nb_lists->setText(QString::number(Lists().count()));
+    ui->lineEdit_nb_scalars->setText(QString::number(Scalars().count()));
+    ui->lineEdit_nb_tables->setText(QString::number(Tables().count()));
+    ui->lineEdit_nb_variables->setText(QString::number(Variables().count()));
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
