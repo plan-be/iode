@@ -62,7 +62,7 @@
            <bool>true</bool>
           </attribute>
           <attribute name="verticalHeaderVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <attribute name="verticalHeaderStretchLastSection">
            <bool>true</bool>
@@ -75,31 +75,181 @@
        <attribute name="title">
         <string>Equations</string>
        </attribute>
+       <widget class="EquationsView" name="tableview_equations">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_identities">
        <attribute name="title">
         <string>Identities</string>
        </attribute>
+       <widget class="IdentitiesView" name="tableview_identities">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_lists">
        <attribute name="title">
         <string>Lists</string>
        </attribute>
+       <widget class="ListsView" name="tableview_lists">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_scalars">
        <attribute name="title">
         <string>Scalars</string>
        </attribute>
+       <widget class="ScalarsView" name="tableview_scalars">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_tables">
        <attribute name="title">
         <string>Tables</string>
        </attribute>
+       <widget class="TablesView" name="tableview_tables">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_variables">
        <attribute name="title">
         <string>Variables</string>
        </attribute>
+       <widget class="VariablesView" name="tableview_variables">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -873,6 +1023,36 @@
    <class>CommentsView</class>
    <extends>QTableView</extends>
    <header>./views/comments_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ListsView</class>
+   <extends>QTableView</extends>
+   <header>./views/lists_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>IdentitiesView</class>
+   <extends>QTableView</extends>
+   <header>./views/identities_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>EquationsView</class>
+   <extends>QTableView</extends>
+   <header>./views/equations_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TablesView</class>
+   <extends>QTableView</extends>
+   <header>./views/tables_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ScalarsView</class>
+   <extends>QTableView</extends>
+   <header>./views/scalars_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>VariablesView</class>
+   <extends>QTableView</extends>
+   <header>./views/variables_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

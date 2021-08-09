@@ -23,7 +23,20 @@
 #include "ui_main_window.h"
 
 #include "./views/comments_view.h"
+#include "./views/equations_view.h"
+#include "./views/identities_view.h"
+#include "./views/lists_view.h"
+#include "./views/scalars_view.h"
+#include "./views/tables_view.h"
+#include "./views/variables_view.h"
+
 #include "./models/comments_model.h"
+#include "./models/equations_model.h"
+#include "./models/identities_model.h"
+#include "./models/lists_model.h"
+#include "./models/scalars_model.h"
+#include "./models/tables_model.h"
+#include "./models/variables_model.h"
 
 #include "menu/file/file_import.h"
 #include "menu/file/file_export.h"
@@ -77,6 +90,24 @@ class MainWindow : public QMainWindow
 	// Comments
 	CommentsView* commentsView;
 	CommentsModel* commentsModel;
+	// Equations
+	EquationsView* equationsView;
+	EquationsModel* equationsModel;
+	// Identities
+	IdentitiesView* identitiesView;
+	IdentitiesModel* identitiesModel;
+	// Lists
+	ListsView* listsView;
+	ListsModel* listsModel;	
+	// Scalars
+	ScalarsView* scalarsView;
+	ScalarsModel* scalarsModel;
+	// Tables
+	TablesView* tablesView;
+	TablesModel* tablesModel;
+	// Variables
+	VariablesView* variablesView;
+	VariablesModel* variablesModel;
 
 public:
 	MainWindow();

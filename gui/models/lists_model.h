@@ -5,12 +5,12 @@
 #include "abstract_qtablemodel.h"
 
 
-class CommentsModel : public IODEAbstractTableModel<Comments>
+class ListsModel : public IODEAbstractTableModel<Lists>
 {
 	Q_OBJECT
 
 public:
-	CommentsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Comment" }, parent) {};
+	ListsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "List" }, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const

@@ -41,47 +41,47 @@ constexpr char IODE_WEBSITE[] = "https://iode.plan.be/doku.php";
  * enum documentation: https://en.cppreference.com/w/cpp/language/enum
  */
 
-// TODO: use scoped enums (C++) instead of C enums ?
-
 // TODO: Move this enum to IODE API
 enum EnumIodeType 
 {
-    Comments,
-    Equations,
-    Identities,
-    Lists,
-    Scalars,
-    Tables,
-    Variables
+    COMMENTS,
+    EQUATIONS,
+    IDENTITIES,
+    LISTS,
+    SCALARS,
+    TABLES,
+    VARIABLES
 };
 constexpr int nbIodeTypes = 7;
 
 const static QMap<QString, int> qmapIodeTypes =
 {
-    {"Comments", Comments},
-    {"Equations", Equations},
-    {"Identities", Identities},
-    {"Lists", Lists},
-    {"Scalars", Scalars},
-    {"Tables", Tables},
-    {"Variables", Variables}
+    {"Comments", COMMENTS},
+    {"Equations", EQUATIONS},
+    {"Identities", IDENTITIES},
+    {"Lists", LISTS},
+    {"Scalars", SCALARS},
+    {"Tables", TABLES},
+    {"Variables", VARIABLES}
 };
 
 // TODO: Move this enum + array to IODE API
 enum EnumLang
 {
-    English,
-    French,
-    Dutch
+    ENGLISH,
+    FRENCH,
+    DUTCH
 };
 constexpr int nbLangs = 3;
 
 const static QMap<QString, int> qmapLangs =
 {
-    {"English", English},
-    {"French", French},
-    {"Dutch", Dutch}
+    {"ENGLISH", ENGLISH},
+    {"French", FRENCH},
+    {"Dutch", DUTCH}
 };
+
+// TODO: use scoped enums (C++) instead of C enums below ?
 
 enum EnumItemType
 {

@@ -122,13 +122,27 @@ HEADERS += custom_widgets/qfilechooser.h
 HEADERS += custom_widgets/qcustomplot.h
 
 # Models
+HEADERS += models/abstract_qtablemodel.h
 HEADERS += models/comments_model.h
+HEADERS += models/equations_model.h
+HEADERS += models/identities_model.h
+HEADERS += models/lists_model.h
+HEADERS += models/scalars_model.h
+HEADERS += models/tables_model.h
+HEADERS += models/variables_model.h
 
 # Views
+HEADERS += views/abstract_view.h
+HEADERS += views/abstract_qtableview.h
 HEADERS += views/comments_view.h
+HEADERS += views/equations_view.h
+HEADERS += views/identities_view.h
+HEADERS += views/lists_view.h
+HEADERS += views/scalars_view.h
+HEADERS += views/tables_view.h
+HEADERS += views/variables_view.h
 
 # Plotting
-HEADERS += qcustomplot.h
 HEADERS += graph.h
 
 # File menu
@@ -186,12 +200,6 @@ SOURCES += main_window.cpp
 
 # Custom widgets
 SOURCES += custom_widgets/qcustomplot.cpp
-
-# Models
-SOURCES += models/comments_model.cpp
-
-# Views
-SOURCES += views/comments_view.cpp
 
 # Plotting
 SOURCES += graph.cpp

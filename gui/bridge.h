@@ -6,6 +6,7 @@
 #include <QString>
 
 #include <string>
+#include <vector>
 #include <stdexcept>
 #include <stdlib.h>
 
@@ -13,30 +14,137 @@
    in the meantime, we need bridge functions here
 */
 
-inline int get_nb_elements_WS(EnumIodeType type)
-{
-    return K_WS[K_CMT + type]->k_nb;
-}
+// using is the C++11 version of typedef
+using Comment = CMT;
+using Equation = EQ;
+using Identity = IDT;
+using List = LIS;
+using Scalar = SCL;
+using Table = TBL;
+using Variable = VAR;
 
-inline char* get_iode_object_name(EnumIodeType type, int pos)
-{
-    return const_cast<char*>(K_WS[K_CMT + type]->k_objs[pos].o_name);
-}
+using Sample = SAMPLE;
 
-inline char* get_iode_object_value(EnumIodeType type, int pos)
-{
-    return K_oval0(K_WS[K_CMT + type], pos);
-}
 
-inline char* get_comment_name(int pos)
+template <class T> class AbstractIODEObjects
 {
-    return get_iode_object_name(Comments, pos);
-}
+protected:
+    EnumIodeType type;
 
-inline char* get_comment_value(int pos)
+public:
+    AbstractIODEObjects(EnumIodeType type) : type(type) {};
+
+    KDB* kdb() const { return K_WS[type]; };
+
+    int getIODEType() const { return type; };
+
+    const char* getIODETypeName() { return qPrintable(qmapIodeTypes.keys(type)[0]); };
+    
+    const char* file() { return K_WS[type]->k_oname; };
+
+    int count() const { return K_WS[type]->k_nb; };
+
+    char* getObjectName(int pos) const { return const_cast<char*>(K_WS[type]->k_objs[pos].o_name); };
+    
+    virtual T getObjectValue(int pos) const = 0;
+};
+
+
+class Comments : public AbstractIODEObjects<Comment>
 {
-    return get_iode_object_value(Comments, pos);
-}
+public:
+    Comments() : AbstractIODEObjects(COMMENTS) {};
+
+    Comment getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
+};
+
+
+class Equations : public AbstractIODEObjects<Equation*>
+{
+public:
+    Equations() : AbstractIODEObjects(EQUATIONS) {};
+
+    Equation* getObjectValue(int pos) const { return KEVAL(kdb(), pos); };
+
+    char* getLec(int pos) const { return KELEC(kdb(), pos); }
+};
+
+
+class Identities : public AbstractIODEObjects<Identity>
+{
+public:
+    Identities() : AbstractIODEObjects(IDENTITIES) {};
+
+    Identity getObjectValue(int pos) const
+    {
+        Identity identity;
+        identity.lec = KILEC(kdb(), pos);
+        identity.clec = KICLEC(kdb(), pos);
+        return identity;
+    };
+
+    char* getLec(int pos) const { return KILEC(kdb(), pos); };
+};
+
+
+class Lists : public AbstractIODEObjects<List>
+{
+public:
+    Lists() : AbstractIODEObjects(LISTS) {};
+
+    List getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
+};
+
+
+class Scalars : public AbstractIODEObjects<Scalar*>
+{
+public:
+    Scalars() : AbstractIODEObjects(SCALARS) {};
+
+    Scalar* getObjectValue(int pos) const { return KSVAL(kdb(), pos); };
+};
+
+
+class Tables : public AbstractIODEObjects<Table*>
+{
+public:
+    Tables() : AbstractIODEObjects(TABLES) {};
+
+    // TODO: not tested yet
+    Table* getObjectValue(int pos) const { return KTVAL(kdb(), pos); };
+
+    char* getTitle(int pos) const 
+    {
+        Table* table = KTVAL(kdb(), pos);
+        char* title = (char*) T_get_title(table);
+        T_free(table);
+        return title;
+    }
+};
+
+
+class Variables : public AbstractIODEObjects<Variable>
+{
+public:
+    Variables() : AbstractIODEObjects(VARIABLES) {};
+
+    // TODO: not tested yet
+    Variable getObjectValue(int pos) const 
+    { 
+        return (Variable) SW_getptr(kdb()->k_objs[pos].o_val);
+    };
+
+    IODE_REAL getValue(int pos, int t, int mode) const { return KV_get(kdb(), pos, t, mode); };
+
+    int getNbPeriods() const { return KSMPL(kdb())->s_nb; }
+
+    char* getPeriod(int t) const
+    {
+        char period[10];
+        PER_pertoa(PER_addper(&(KSMPL(kdb())->s_p1), t), period);
+        return period;
+    }
+};
 
 
 inline void CPP_WsLoad(std::string arg, EnumIodeType type, std::string str_type)
