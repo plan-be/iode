@@ -132,14 +132,19 @@ void MainWindow::updateCurrentTab(int index)
         break;
     case EQUATIONS:
         equationsView->update();
+        break;
     case IDENTITIES:
         identitiesView->update();
+        break;
     case LISTS:
         listsView->update();
+        break;
     case SCALARS:
         scalarsView->update();
+        break;
     case TABLES:
         tablesView->update();
+        break;
     case VARIABLES:
         variablesView->update();;
     default:
