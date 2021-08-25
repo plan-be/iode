@@ -46,7 +46,13 @@ public:
 
     char* getObjectName(int pos) const { return const_cast<char*>(K_WS[type]->k_objs[pos].o_name); };
     
+    // TODO : implement this method 
+    //void setObjectName(char* name, int pos) { ... };
+    
     virtual T getObjectValue(int pos) const = 0;
+    
+    // TODO : implement this method
+    //virtual void setObjectValue(T value, int pos) const = 0;
 };
 
 
