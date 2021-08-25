@@ -49,10 +49,14 @@ public:
     // TODO : implement this method 
     //void setObjectName(char* name, int pos) { ... };
     
+    // TODO : return reference instead ? 
     virtual T getObjectValue(int pos) const = 0;
     
     // TODO : implement this method
     //virtual void setObjectValue(T value, int pos) const = 0;
+
+    // TODO : overload subscript operator ? 
+    //T& operator[](char* name) { ... }
 };
 
 
