@@ -2,9 +2,7 @@
 
 #include <QTableView>
 
-#include "abstract_view.h"
-
-template <class M> class AbstractTableView : public QTableView, AbstractView<M>
+template <class M> class AbstractTableView : public QTableView
 {
 public:
 	AbstractTableView(QWidget* parent = nullptr) : QTableView(parent) {};
