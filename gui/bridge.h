@@ -15,13 +15,13 @@
 */
 
 // using is the C++11 version of typedef
-using Comment = CMT;
+using Comment = char;
 using Equation = EQ;
 using Identity = IDT;
-using List = LIS;
+using List = char;
 using Scalar = SCL;
 using Table = TBL;
-using Variable = VAR;
+using Variable = IODE_REAL;
 
 using Sample = SAMPLE;
 
@@ -39,24 +39,40 @@ public:
     int getIODEType() const { return type; };
 
     const char* getIODETypeName() { return qPrintable(qmapIodeTypes.keys(type)[0]); };
-    
-    const char* file() { return K_WS[type]->k_oname; };
 
-    int count() const { return K_WS[type]->k_nb; };
+    int count() const 
+    { 
+        if (K_WS[type] != NULL) {
+            return K_WS[type]->k_nb;
+        }
+        else {
+            return 0;
+        }
+    };
 
-    char* getObjectName(int pos) const { return const_cast<char*>(K_WS[type]->k_objs[pos].o_name); };
+    char* getObjectName(int pos) const 
+    { 
+        if (K_WS[type] != NULL) {
+            return const_cast<char*>(K_WS[type]->k_objs[pos].o_name);
+        }
+        else {
+            return NULL;
+        }
+    };
     
-    // TODO : implement this method 
-    //void setObjectName(char* name, int pos) { ... };
-    
-    // TODO : return reference instead ? 
-    virtual T getObjectValue(int pos) const = 0;
+    virtual T* getObjectValue(int pos) const = 0;
+
+    // TODO: implement this method
+    //virtual T& getObjectValueByName(char* name) const = 0;
     
     // TODO : implement this method
-    //virtual void setObjectValue(T value, int pos) const = 0;
+    //virtual void setObjectValue(T& value, int pos) const = 0;
 
-    // TODO : overload subscript operator ? 
+    // TODO : overload subscript operator 
     //T& operator[](char* name) { ... }
+    
+    // TODO : overload subscript operator 
+    //T& operator[](int pos) { ... }
 };
 
 
@@ -65,16 +81,17 @@ class Comments : public AbstractIODEObjects<Comment>
 public:
     Comments() : AbstractIODEObjects(COMMENTS) {};
 
-    Comment getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
+    Comment* getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
 };
 
 
-class Equations : public AbstractIODEObjects<Equation*>
+class Equations : public AbstractIODEObjects<Equation>
 {
 public:
     Equations() : AbstractIODEObjects(EQUATIONS) {};
 
-    Equation* getObjectValue(int pos) const { return KEVAL(kdb(), pos); };
+    // TODO: create a Class Equation (with a destructor)
+    Equation* getObjectValue(int pos) const { return NULL; };
 
     char* getLec(int pos) const { return KELEC(kdb(), pos); }
 };
@@ -85,13 +102,7 @@ class Identities : public AbstractIODEObjects<Identity>
 public:
     Identities() : AbstractIODEObjects(IDENTITIES) {};
 
-    Identity getObjectValue(int pos) const
-    {
-        Identity identity;
-        identity.lec = KILEC(kdb(), pos);
-        identity.clec = KICLEC(kdb(), pos);
-        return identity;
-    };
+    Identity* getObjectValue(int pos) const { return NULL; };
 
     char* getLec(int pos) const { return KILEC(kdb(), pos); };
 };
@@ -102,11 +113,11 @@ class Lists : public AbstractIODEObjects<List>
 public:
     Lists() : AbstractIODEObjects(LISTS) {};
 
-    List getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
+    List* getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
 };
 
 
-class Scalars : public AbstractIODEObjects<Scalar*>
+class Scalars : public AbstractIODEObjects<Scalar>
 {
 public:
     Scalars() : AbstractIODEObjects(SCALARS) {};
@@ -115,13 +126,13 @@ public:
 };
 
 
-class Tables : public AbstractIODEObjects<Table*>
+class Tables : public AbstractIODEObjects<Table>
 {
 public:
     Tables() : AbstractIODEObjects(TABLES) {};
 
-    // TODO: not tested yet
-    Table* getObjectValue(int pos) const { return KTVAL(kdb(), pos); };
+    // TODO: create a Class Table (with a destructor)
+    Table* getObjectValue(int pos) const { return NULL; };
 
     char* getTitle(int pos) const 
     {
@@ -139,20 +150,18 @@ public:
     Variables() : AbstractIODEObjects(VARIABLES) {};
 
     // TODO: not tested yet
-    Variable getObjectValue(int pos) const 
+    Variable* getObjectValue(int pos) const 
     { 
-        return (Variable) SW_getptr(kdb()->k_objs[pos].o_val);
+        return (Variable*) SW_getptr(kdb()->k_objs[pos].o_val);
     };
 
     IODE_REAL getValue(int pos, int t, int mode) const { return KV_get(kdb(), pos, t, mode); };
 
     int getNbPeriods() const { return KSMPL(kdb())->s_nb; }
 
-    char* getPeriod(int t) const
+    void getPeriod(char* period, int t) const
     {
-        char period[10];
         PER_pertoa(PER_addper(&(KSMPL(kdb())->s_p1), t), period);
-        return period;
     }
 };
 
