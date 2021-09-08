@@ -76,7 +76,7 @@ constexpr int nbLangs = 3;
 
 const static QMap<QString, int> qmapLangs =
 {
-    {"ENGLISH", ENGLISH},
+    {"English", ENGLISH},
     {"French", FRENCH},
     {"Dutch", DUTCH}
 };
