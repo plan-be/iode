@@ -132,7 +132,6 @@ HEADERS += models/tables_model.h
 HEADERS += models/variables_model.h
 
 # Views
-HEADERS += views/abstract_view.h
 HEADERS += views/abstract_qtableview.h
 HEADERS += views/comments_view.h
 HEADERS += views/equations_view.h
