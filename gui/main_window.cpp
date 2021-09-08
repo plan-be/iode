@@ -146,7 +146,8 @@ void MainWindow::updateCurrentTab(int index)
         tablesView->update();
         break;
     case VARIABLES:
-        variablesView->update();;
+        variablesView->update();
+        break;
     default:
         break;
     }
