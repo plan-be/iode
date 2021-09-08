@@ -1,6 +1,9 @@
 #pragma once
 
+#include <QString>
+#include <QMap>
 #include <QComboBox>
+#include <QLineEdit>
 
 #include "./custom_widgets/qfilechooser.h"
 #include "./custom_widgets/qsampleedit.h"
