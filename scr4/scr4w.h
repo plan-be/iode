@@ -10,7 +10,10 @@
 #define _WSCR_
 
 #define NOCOMM
-#define _WINDOWS
+#ifndef _WINDOWS
+    #define _WINDOWS
+#endif 
+
 #define __SIMPLE_LOCALES__
 #include <windows.h>
 #include <s_swap.h>

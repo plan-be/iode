@@ -305,7 +305,8 @@ char *szService, *szTopic;
     SCR_strip(szTopic);
 
     // Initialize for using DDEML
-    if(idInst == NULL) {
+    // if(idInst == NULL) {
+    if(idInst == 0) {
 	if (DdeInitialize (&idInst, (PFNCALLBACK) &DdeCallback,
 			APPCLASS_STANDARD | APPCMD_CLIENTONLY, 0L))
 	 return(hConv) ;
