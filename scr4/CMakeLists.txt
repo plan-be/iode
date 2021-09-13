@@ -71,4 +71,5 @@ set (SCR_IODE ${IODE_INI})
 # Add source to this project's executable.
 add_library (scr4iode STATIC ${HEADER_IODE} ${SCR_IODE})
 
+target_include_directories (scr4iode PUBLIC ".")
 # TODO: Add tests and install targets if needed.
