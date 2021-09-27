@@ -6,7 +6,8 @@ cmake_minimum_required (VERSION 3.16)
 project ("iodeapi")
 
 # Add source to this project's executable.
-add_library (iodeapi STATIC "api.cpp" "api.h" "iode_init.c" "iode_init.h" "iode_ws.c" "iode_ws.h" "iode.H")
+add_library (iodeapi STATIC "api.cpp" "api.h" "iode_init.c" "iode_init.h" "iode.H" "iode_buffers.c" 
+	"iode_buffers.h" "iode_ws.c" "iode_ws.h" )
 
 target_link_libraries(iodeapi PUBLIC "scr4iode")
 target_include_directories(iodeapi PUBLIC "../scr4")

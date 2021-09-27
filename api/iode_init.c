@@ -10,7 +10,7 @@
  * - create 7 empty ws
  * - define list seps (?)
  */
-IodeInit()
+int IodeInit()
 {
     SW_MIN_MEM = 120 * 1024L;
     SW_MIN_SEGS = 2;
@@ -30,7 +30,7 @@ IodeInit()
  * Close an iode session.
  * 
  */
-IodeEnd()
+int IodeEnd()
 {
     SW_end();           // Close swap engine and free allocated mem segments
     W_close();          // Close current output session (if any)
@@ -40,4 +40,5 @@ IodeEnd()
     RP_proc_free_all(); // Free allocated report memory
     RP_free_bufs();     //  id.
     B_reset_error();    // 
+    return(0);
 }
