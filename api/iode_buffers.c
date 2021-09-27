@@ -11,7 +11,7 @@ int   BUF_LEN = 0;
 int   BUF_LCK = 0;
 
 /**
- * Allocates or reallocate the global buffer BUF_DATA to a min size of len bytes. 
+ * Allocates or reallocates the global buffer BUF_DATA to a min size of len bytes. 
  * The content of the buffer is lost after this function.
  * The buffer can be locked (against reallocation) by BUF_lock().
  * 
