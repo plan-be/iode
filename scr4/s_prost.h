@@ -146,6 +146,7 @@ extern int U_index(unsigned char *str,unsigned char *sstr);
 extern int U_is_in(int ch,char *string);
 extern int SCR_add_tbl(unsigned char ***tbl,int *nb,unsigned char *str);
 extern unsigned char **SCR_union(unsigned char **tbl1,unsigned char **tbl2);
+extern unsigned char** SCR_union_quick(unsigned char** tbl1, unsigned char** tbl2);
 extern unsigned char *SCR_union_list(unsigned char *str1,unsigned char *str2,unsigned char *seps);
 extern int U_pos(int ch,unsigned char *str);
 extern int SCR_is_upper(int ch);
