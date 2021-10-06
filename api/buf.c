@@ -25,7 +25,7 @@ static int     BUF_LCK = 0;
 /**
  * @brief Allocates or extends a global buffer of at least len bytes. 
  * 
- * Notes : 
+ * @details 
  *   - The buffer can be locked to garantee that successive operations can be achieved without interference.
  *   - If the buffer is "locked", the program stops with a message on stdout.
  *   - The content of the buffer is not set to 0. Use memset() to fill it.
