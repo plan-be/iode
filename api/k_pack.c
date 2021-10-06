@@ -19,24 +19,24 @@
  * 
  * Packing functions
  * ----------------- 
- * int K_cpack(char **pack, char *a1)
- * int K_epack(char **pack, char *a1, char *a2)
- * int K_ipack(char **pack, char *a1)
- * int K_lpack(char** pack, char* a1)
- * int K_spack(char **pack, char *a1)
- * int K_tpack(char** pack, char* a1)
- * int K_vpack(char **pack, IODE_REAL *a1, int *a2)
- * int K_opack(char** pack, char* a1, int* a2)
+ *      int K_cpack(char **pack, char *a1)
+ *      int K_epack(char **pack, char *a1, char *a2)
+ *      int K_ipack(char **pack, char *a1)
+ *      int K_lpack(char** pack, char* a1)
+ *      int K_spack(char **pack, char *a1)
+ *      int K_tpack(char** pack, char* a1)
+ *      int K_vpack(char **pack, IODE_REAL *a1, int *a2)
+ *      int K_opack(char** pack, char* a1, int* a2)
  * 
  * Unpacking functions
  * -------------------- 
- * TBL* K_tunpack(char *pack)
- * EQ* K_eunpack(char *pack)
+ *      TBL* K_tunpack(char *pack)
+ *      EQ* K_eunpack(char *pack)
  * 
- * Allocation functions
+ * Allocation functions (VAR & SCL only)
  * --------------------
- * int KS_alloc_scl()
- * int KV_alloc_var(int nb)
+ *      int KS_alloc_scl()
+ *      int KV_alloc_var(int nb)
  * 
  * @note The "modern" terminology for pack and unpack is "serialize" and "deserialize".
  * @see scr4/s_swap.h (http://www.xon.be/scr4/libs1/libs1236.htm) for more details.
