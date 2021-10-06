@@ -13,7 +13,7 @@
  *   - char *BUF_strcpy(char *ptr) : copy a null terminated string to the buffer
  * 
  *   - char *BUF_DATA : NULL or pointer to the allocated buffer
-  */
+ */
 
 #include <s_swap.h>
 #include <stdio.h>
@@ -34,7 +34,7 @@ static int     BUF_LCK = 0;
  * @return          char * BUF_DATA : pointer to the allocated buffer 
  * 
  * TODO: throw an exception if allocation error instead of exiting.
-*/
+ */
 char *BUF_alloc(int len)
 {
     if(BUF_LCK) {
@@ -58,7 +58,7 @@ char *BUF_alloc(int len)
 
 /**
  * @brief Frees the global buffer BUF_DATA.
-*/
+ */
 void BUF_free()
 {
     SW_nfree(BUF_DATA);
@@ -68,7 +68,7 @@ void BUF_free()
 
 /**
  * @brief Locks the global buffer BUF_DATA.
-*/
+ */
 void BUF_lock()
 {
     BUF_LCK = 1;
@@ -76,7 +76,7 @@ void BUF_lock()
 
 /**
  * @brief Unlocks the global buffer BUF_DATA.
-*/
+ */
 void BUF_unlock()
 {
     BUF_LCK = 0;
@@ -88,7 +88,7 @@ void BUF_unlock()
  * @param ptr   char *  address of the buffer to copy
  * @param lg    int     nb of bytes to copy
  * @return      char *  pointer to the global buffer BUF_DATA
-*/
+ */
 char *BUF_memcpy(char *ptr, int lg)
 {
     char    *buf;
@@ -102,18 +102,9 @@ char *BUF_memcpy(char *ptr, int lg)
  * @brief Copies a NULL terminated string  to the global buffer.
  * @param ptr   char *  address of the buffer to copy
  * @return      char *  pointer to the global buffer BUF_DATA
-*/
+ */
 
 char *BUF_strcpy(char *ptr)
 {
     return(BUF_memcpy(ptr, strlen(ptr) + 1));
 }
-
-
-
-
-
-
-
-
-
