@@ -79,7 +79,7 @@ int K_vpack(char **pack, IODE_REAL *a1, int *a2)
 */
 
 /**
- *  @brief Function to pack a TBL cell (in 32 and 64 bits)
+ *   Function to pack a TBL cell (in 32 and 64 bits)
  *  
  *  @param [in, out]    pack pointer to the pack before adding the cell (can be NULL)
  *  @param [in]         cell 
@@ -97,7 +97,7 @@ static char* K_tcell_pack(char *pack, TCELL *cell)
 }
 
 /**
- *  @brief Give the offset in bytes of a struct element.
+ *  Give the offset in bytes of a struct element.
  *  
  *  @param [in] base    position of the first field of the struct (&struct)
  *  @param [in] element position of the element (&(struct.element))
@@ -109,7 +109,7 @@ static int K_pos_struct(void* base, void* element)
 }
 
 /**
- *  @brief Convert a TCELL64 struct (64 bits architecture) into a TCELL32 (32 bits arch)
+ *  Convert a TCELL64 struct (64 bits architecture) into a TCELL32 (32 bits arch)
  *  
  *  @param [in, out] tc64 pointer to a TCELL32 (Table cell in 32 bits arch)
  *  @param [in]      tc32 pointer to a TCELL64 (Table cell in 64 bits arch)
@@ -133,7 +133,7 @@ static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
 }
 
 /**
- *  @brief Convert a TLINE64 into TLINE32 struct.
+ *  Convert a TLINE64 into TLINE32 struct.
  *  
  *  @param [in] tl64 TLINE in 64 bits arch
  *  @param [in] tl32 TLINE in 32 bit arch
@@ -152,7 +152,7 @@ static void K_tline64_32(TLINE* tl64, TLINE32* tl32)
 }
 
 /**
- *  @brief Convert a TBL64 into TBL32 struct.
+ *  Convert a TBL64 into TBL32 struct.
  *  
  *  @param [in] tbl64 TBL in 64 bits arch
  *  @param [in] tbl32 TBL in 32 bit arch
@@ -178,7 +178,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 }
 
 /**
- *  @brief Pack a 32 bits TBL struct.
+ *  Pack a 32 bits TBL struct.
  *  
  *  @param [in] pack pointer to the packed table placeholder
  *  @param [in] a1   pointer to the 32 bits TBL
@@ -236,7 +236,7 @@ static int K_tpack32(char **pack, char *a1)
 }
 
 /**
- *  @brief Packs a 64 bits TBL struct by first converting the TBL64, TLINE64 and TCELL64 into 32 bits struct.
+ *  Packs a 64 bits TBL struct by first converting the TBL64, TLINE64 and TCELL64 into 32 bits struct.
  *  
  *  @param [in] pack pointer to the packed table placeholder
  *  @param [in] a1   pointer to the 64 bits TBL
@@ -478,7 +478,7 @@ int K_lpack(char** pack, char* a1)
 }
 
 /**
- *  @brief Reserved for future new object.
+ *  Reserved for future new object.
  *  
  *  @param [out] pack  char **      placeholder for the pointer to the packed object
  *  @param [in]  a1    char*        NULL or pointer the the object.
@@ -527,7 +527,7 @@ void K_onpack() { }
 */
 
 /**
- * @brief Unpacks a packed TBL into a TBL structure in the current architecture (32|64 bits).
+ * Unpacks a packed TBL into a TBL structure in the current architecture (32|64 bits).
  * Converts simultaneously TLINE and TCELL to 32 bits structs.
  * 
  * @param [in]      pack char * packed TBL
@@ -623,7 +623,7 @@ static TBL* K_tunpack32(char *pack)
 }
 
 /**
- *  @brief Converts a 32 bits table **cell** (TCELL32) to a 64 bits TCELL. 
+ *  Converts a 32 bits table **cell** (TCELL32) to a 64 bits TCELL. 
  *  
  *  @param [in]         tc32 TCELL32 * pointer to the TCELL32 
  *  @param [in, out]    tc64 TCELL *   pointer to the resulting TCELL (64 bits)
@@ -644,7 +644,7 @@ static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
 }
 
 /**
- *  @brief Converts a 32 bits table **line** (TLINE32) to a 64 bits TLINE. 
+ *  Converts a 32 bits table **line** (TLINE32) to a 64 bits TLINE. 
  *  
  *  @param [in]         tc32 TLINE32 * pointer to the TLINE32 
  *  @param [in, out]    tc64 TLINE *   pointer to the resulting TLINE (64 bits)
@@ -664,7 +664,7 @@ static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 }
 
 /**
- *  @brief Converts a 32 bits table (TBL32) to a 64 bits TBL. 
+ *  Converts a 32 bits table (TBL32) to a 64 bits TBL. 
  *  
  *  @param [in]         tc32 TBL32 * pointer to the TBL32 
  *  @param [in, out]    tc64 TBL *   pointer to the resulting TBL (64 bits)
@@ -691,7 +691,7 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
 
 
 /**
- * @brief Unpacks a packed TBL into a TBL structure in the 64 bits architecture.
+ * Unpacks a packed TBL into a TBL structure in the 64 bits architecture.
  * @note Only used in 64 bit architecture.
  * 
  * @param [in]      pack char * packed TBL
@@ -766,7 +766,7 @@ static TBL* K_tunpack64(char *pack)
 
 
 /**
- * @brief Unpacks a packed TBL into a TBL structure in the current (32|64 bits) architecture.
+ * Unpacks a packed TBL into a TBL structure in the current (32|64 bits) architecture.
  * 
  * @param [in]      pack char * packed TBL
  *
@@ -783,7 +783,7 @@ TBL* K_tunpack(char *pack)
 
 
 /**
- * @brief Unpacks a packed EQ into a EQ structure in the current (32|64 bits) architecture.
+ * Unpacks a packed EQ into a EQ structure in the current (32|64 bits) architecture.
  * 
  * @param [in]      pack    char *     packed EQ
  *
@@ -832,7 +832,7 @@ EQ* K_eunpack(char *pack)
 /*-- ALLOC SCALAR AND VAR --*/
 
 /**
- *  @brief Allocates space for a new scalar (0.9, 1.0, NaN) in the the "swap area" and returns the allocated handle.
+ *  Allocates space for a new scalar (0.9, 1.0, NaN) in the the "swap area" and returns the allocated handle.
  *  
  *  @return Handle to the new scalar.
  *
