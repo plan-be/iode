@@ -10,8 +10,10 @@ set (SOURCES
 		 buf.c objs.c pack.c per.c
 		 k_pack.c  k_ws.c
 		 k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c 
-		 b_dir.c)
+		 b_dir.c DESCRIPTION.md)
+
 set (HEADERS iode.h iodebase.h iodevarg.h)
+
 add_library (iodeapi STATIC ${SOURCES} ${HEADERS})
 
 # Compiler options
