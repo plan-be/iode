@@ -1,7 +1,15 @@
 #include <QtWidgets/QApplication>
 
-int main(int argc, char *argv[])
+#include "utils.h"
+#include "main_window.h"
+
+int main(int argc, char* argv[])
 {
-    QApplication a(argc, argv);
-    return a.exec();
+    QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
+    QCoreApplication::setApplicationName(APPLICATION_NAME);
+
+    MainWindow main_window;
+    main_window.show();
+    return app.exec();
 }

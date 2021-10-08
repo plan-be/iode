@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../api/iode.h"
+#include "iode.h"
 
 #include <QObject>
 #include <QVariant>

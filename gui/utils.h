@@ -1,7 +1,7 @@
 #pragma once
 
 #pragma once
-#include "../api/iode.h"
+#include "iode.h"
 #include "bridge.h"
 
 #include <QObject>
