@@ -24,6 +24,12 @@
     <Filter Include="Source Files\legacy">
       <UniqueIdentifier>{bb9de6cb-7f36-4fd6-9c46-fc5c73485e30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\view">
+      <UniqueIdentifier>{9771b2c6-f45c-471a-a9f3-770a759121ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{825094e6-1bf7-4831-a87e-f89aa7ddea4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -46,6 +52,12 @@
     <ClInclude Include="bridge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tabs\abstract_table_view.h">
+      <Filter>Header Files\view</Filter>
+    </ClInclude>
+    <ClInclude Include="tabs\abstract_table_model.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="main_window.h">
@@ -53,6 +65,48 @@
     </QtMoc>
     <QtMoc Include="utils.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\tables_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\scalars_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\lists_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\identities_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\equations_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\comments_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\variables_view.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\variables_model.h">
+      <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\tables_model.h">
+      <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\scalars_model.h">
+      <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\lists_model.h">
+      <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\identities_model.h">
+      <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\equations_model.h">
+      <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\comments_model.h">
+      <Filter>Header Files\model</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
