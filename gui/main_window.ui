@@ -1,27 +1,1821 @@
-<UI version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="objectName" >
-   <string notr="true">MainWindow</string>
-  </property>
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>400</width>
-	<height>300</height>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>MainWindow</string>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>640</height>
+   </size>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <property name="windowTitle">
+   <string>IODE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <property name="statusTip">
+   <string/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>24</height>
+   </size>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget_IODE_objs">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_comments">
+       <attribute name="title">
+        <string>Comments</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="CommentsView" name="tableview_comments">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_equations">
+       <attribute name="title">
+        <string>Equations</string>
+       </attribute>
+       <widget class="EquationsView" name="tableview_equations">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_identities">
+       <attribute name="title">
+        <string>Identities</string>
+       </attribute>
+       <widget class="IdentitiesView" name="tableview_identities">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_lists">
+       <attribute name="title">
+        <string>Lists</string>
+       </attribute>
+       <widget class="ListsView" name="tableview_lists">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_scalars">
+       <attribute name="title">
+        <string>Scalars</string>
+       </attribute>
+       <widget class="ScalarsView" name="tableview_scalars">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_tables">
+       <attribute name="title">
+        <string>Tables</string>
+       </attribute>
+       <widget class="TablesView" name="tableview_tables">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_variables">
+       <attribute name="title">
+        <string>Variables</string>
+       </attribute>
+       <widget class="VariablesView" name="tableview_variables">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>958</width>
+          <height>592</height>
+         </rect>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionImport"/>
+    <addaction name="actionExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint_Setup"/>
+    <addaction name="separator"/>
+    <addaction name="actionPROFILES"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_profile"/>
+    <addaction name="actionSave_profile"/>
+    <addaction name="actionReset_profile"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuWorkspace">
+    <property name="title">
+     <string>&amp;Workspace</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionLoad_Work_Space"/>
+    <addaction name="actionSave_Work_Space"/>
+    <addaction name="actionClear_Work_Space"/>
+    <addaction name="separator"/>
+    <addaction name="actionCopy_into_Work_Space"/>
+    <addaction name="actionMerge_into_Work_Space"/>
+    <addaction name="actionDescribe_Work_Space"/>
+    <addaction name="actionSet_Variables_Sample"/>
+    <addaction name="actionExtrapolate_Variables"/>
+    <addaction name="separator"/>
+    <addaction name="actionHigh_to_Low"/>
+    <addaction name="actionLow_to_High"/>
+    <addaction name="actionSeasonal_Adjustment"/>
+    <addaction name="actionTrend_correction"/>
+   </widget>
+   <widget class="QMenu" name="menuData">
+    <property name="title">
+     <string>&amp;Data</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <widget class="QMenu" name="menuComments">
+     <property name="toolTip">
+      <string>Update, create, delete and browse current work space comments</string>
+     </property>
+     <property name="title">
+      <string>Comments</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Comments"/>
+     <addaction name="actionEdit_List_Comments"/>
+    </widget>
+    <widget class="QMenu" name="menuEquations">
+     <property name="toolTip">
+      <string>Update, create, delete, estimate and browse current work space equations</string>
+     </property>
+     <property name="title">
+      <string>Equations</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Equations"/>
+     <addaction name="actionEdit_List_Equations"/>
+    </widget>
+    <widget class="QMenu" name="menuIdentities">
+     <property name="toolTip">
+      <string>Update, create, delete and browse current work space identities</string>
+     </property>
+     <property name="title">
+      <string>Identities</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Identities"/>
+     <addaction name="actionEdit_List_Identities"/>
+    </widget>
+    <widget class="QMenu" name="menuLists">
+     <property name="toolTip">
+      <string>Update, create, delete and browse current work space lists</string>
+     </property>
+     <property name="title">
+      <string>Lists</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Lists"/>
+     <addaction name="actionEdit_List_Lists"/>
+     <addaction name="separator"/>
+     <addaction name="actionSort_and_Expand"/>
+     <addaction name="actionList_Calculus"/>
+     <addaction name="separator"/>
+     <addaction name="actionFile_Contents"/>
+     <addaction name="actionFile_Compare"/>
+     <addaction name="actionSearch_Text"/>
+     <addaction name="actionScan_Objects"/>
+    </widget>
+    <widget class="QMenu" name="menuScalars">
+     <property name="toolTip">
+      <string>Update, create, delete and browse current work space scalars</string>
+     </property>
+     <property name="title">
+      <string>Scalars</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Scalars"/>
+     <addaction name="actionEdit_List_Scalars"/>
+    </widget>
+    <widget class="QMenu" name="menuTables">
+     <property name="toolTip">
+      <string>Update, create, delete, test and browse current work space tables</string>
+     </property>
+     <property name="title">
+      <string>Tables</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Tables"/>
+     <addaction name="actionEdit_List_Tables"/>
+    </widget>
+    <widget class="QMenu" name="menuVariables">
+     <property name="toolTip">
+      <string>Update, create, delete, graph and browse current work space variables</string>
+     </property>
+     <property name="title">
+      <string>Variables</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionEdit_WS_Variables"/>
+     <addaction name="actionEdit_List_Variables"/>
+     <addaction name="actionEdit_Tables_Variables"/>
+    </widget>
+    <addaction name="actionDATA_EDIT"/>
+    <addaction name="separator"/>
+    <addaction name="menuComments"/>
+    <addaction name="menuEquations"/>
+    <addaction name="menuIdentities"/>
+    <addaction name="menuLists"/>
+    <addaction name="menuScalars"/>
+    <addaction name="menuTables"/>
+    <addaction name="menuVariables"/>
+    <addaction name="separator"/>
+    <addaction name="actionMISCELLANEOUS"/>
+    <addaction name="separator"/>
+    <addaction name="actionDuplicate_objects"/>
+   </widget>
+   <widget class="QMenu" name="menuCompute">
+    <property name="title">
+     <string>&amp;Compute</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionMODELS"/>
+    <addaction name="separator"/>
+    <addaction name="actionSimulation_Goal_Seeking"/>
+    <addaction name="actionCompile_Model"/>
+    <addaction name="separator"/>
+    <addaction name="actionSCC_Decomposition"/>
+    <addaction name="actionSCC_Simulation"/>
+    <addaction name="separator"/>
+    <addaction name="actionIDENTITIES"/>
+    <addaction name="separator"/>
+    <addaction name="actionExecute_Identities"/>
+   </widget>
+   <widget class="QMenu" name="menuPrint_Graph">
+    <property name="title">
+     <string>&amp;Print/Graph</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionPRINT"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint_View_Tables"/>
+    <addaction name="actionPrint_View_Variables"/>
+    <addaction name="actionObject_Definitions"/>
+    <addaction name="separator"/>
+    <addaction name="actionGRAPHICS"/>
+    <addaction name="separator"/>
+    <addaction name="actionGraphs_from_Tables"/>
+    <addaction name="actionGraphs_from_Variables"/>
+    <addaction name="separator"/>
+    <addaction name="actionFILES"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint_A2M_File"/>
+    <addaction name="actionPrint_Report"/>
+   </widget>
+   <widget class="QMenu" name="menuReport">
+    <property name="title">
+     <string>&amp;Report</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionEdit_report"/>
+    <addaction name="actionExecute_report"/>
+    <addaction name="actionExecute_a_report_line"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionIode_Manual"/>
+    <addaction name="actionIode_Home"/>
+    <addaction name="actionIode_Readme"/>
+    <addaction name="actionAbout_Iode"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuWorkspace"/>
+   <addaction name="menuData"/>
+   <addaction name="menuCompute"/>
+   <addaction name="menuPrint_Graph"/>
+   <addaction name="menuReport"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+   <property name="toolTip">
+    <string>Import files respecting certain rules to IODE</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+   <property name="toolTip">
+    <string>Export files respecting certain rules to IODE</string>
+   </property>
+  </action>
+  <action name="actionPrint_Setup">
+   <property name="text">
+    <string>Print Setup</string>
+   </property>
+   <property name="toolTip">
+    <string>Change Print Setup</string>
+   </property>
+  </action>
+  <action name="actionLoad_profile">
+   <property name="text">
+    <string>Load Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset profile and load a profile from disk to replace the current one</string>
+   </property>
+  </action>
+  <action name="actionSave_profile">
+   <property name="text">
+    <string>Save Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Save permanently the current profile on disk</string>
+   </property>
+  </action>
+  <action name="actionReset_profile">
+   <property name="text">
+    <string>Reset Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear current profile - Reset default values</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Leave I.O.D.E application</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
+  </action>
+  <action name="actionLoad_Work_Space">
+   <property name="text">
+    <string>Load Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Load new work space(s) from disk</string>
+   </property>
+  </action>
+  <action name="actionSave_Work_Space">
+   <property name="text">
+    <string>Save Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Save current work space(s) contents on disk</string>
+   </property>
+  </action>
+  <action name="actionClear_Work_Space">
+   <property name="text">
+    <string>Clear Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear current work space(s)</string>
+   </property>
+  </action>
+  <action name="actionCopy_into_Work_Space">
+   <property name="text">
+    <string>Copy into Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy object list from disk into the work space</string>
+   </property>
+  </action>
+  <action name="actionMerge_into_Work_Space">
+   <property name="text">
+    <string>Merge into Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Merge file from disk into the work space</string>
+   </property>
+  </action>
+  <action name="actionDescribe_Work_Space">
+   <property name="text">
+    <string>Describe Work Space</string>
+   </property>
+   <property name="toolTip">
+    <string>Change work spaces descriptions</string>
+   </property>
+  </action>
+  <action name="actionSet_Variables_Sample">
+   <property name="text">
+    <string>Set Variables Sample</string>
+   </property>
+   <property name="toolTip">
+    <string>Change current variables definition sample</string>
+   </property>
+  </action>
+  <action name="actionExtrapolate_Variables">
+   <property name="text">
+    <string>Extrapolate Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Extrapolate variables from WS</string>
+   </property>
+  </action>
+  <action name="actionHigh_to_Low">
+   <property name="text">
+    <string>High to Low</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy file with higher frequency into the work space</string>
+   </property>
+  </action>
+  <action name="actionLow_to_High">
+   <property name="text">
+    <string>Low to High</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy file with lower frequency into the work space</string>
+   </property>
+  </action>
+  <action name="actionSeasonal_Adjustment">
+   <property name="text">
+    <string>Seasonal Adjustment</string>
+   </property>
+   <property name="toolTip">
+    <string>Census II-method for Seasonal Adjustment</string>
+   </property>
+  </action>
+  <action name="actionTrend_correction">
+   <property name="text">
+    <string>Trend correction</string>
+   </property>
+   <property name="toolTip">
+    <string>Hodrick-Prescott filter for trend correction</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>WS MANAGEMENT</string>
+   </property>
+  </action>
+  <action name="actionPROFILES">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>PROFILES</string>
+   </property>
+  </action>
+  <action name="actionDATA_EDIT">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>DATA EDIT</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Comments">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Comments">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Equations">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Equations">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Identities">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Identities">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Lists">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+   <property name="toolTip">
+    <string>Update, create, delete and browse current work space lists</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Lists">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+   <property name="toolTip">
+    <string>Update, create, delete and browse current work space lists</string>
+   </property>
+  </action>
+  <action name="actionSort_and_Expand">
+   <property name="text">
+    <string>Sort and Expand</string>
+   </property>
+   <property name="toolTip">
+    <string>Expand and sort lists</string>
+   </property>
+  </action>
+  <action name="actionList_Calculus">
+   <property name="text">
+    <string>List Calculus</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute various logical operations on lists</string>
+   </property>
+  </action>
+  <action name="actionFile_Contents">
+   <property name="text">
+    <string>File Contents</string>
+   </property>
+   <property name="toolTip">
+    <string>Gives the contents of a file</string>
+   </property>
+  </action>
+  <action name="actionFile_Compare">
+   <property name="text">
+    <string>File Compare</string>
+   </property>
+   <property name="toolTip">
+    <string>Compares the contents of the WS and that of a file</string>
+   </property>
+  </action>
+  <action name="actionSearch_Text">
+   <property name="text">
+    <string>Search Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Search for a text in object definitions</string>
+   </property>
+  </action>
+  <action name="actionScan_Objects">
+   <property name="text">
+    <string>Scan Objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Scan for variables and scalars in object definitions</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Scalars">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Scalars">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Tables">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Tables">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+  </action>
+  <action name="actionEdit_WS_Variables">
+   <property name="text">
+    <string>Edit WS</string>
+   </property>
+  </action>
+  <action name="actionEdit_List_Variables">
+   <property name="text">
+    <string>Edit List</string>
+   </property>
+  </action>
+  <action name="actionEdit_Tables_Variables">
+   <property name="text">
+    <string>Edit Tables</string>
+   </property>
+  </action>
+  <action name="actionMISCELLANEOUS">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>MISCELLANEOUS</string>
+   </property>
+  </action>
+  <action name="actionDuplicate_objects">
+   <property name="text">
+    <string>Duplicate objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Duplicate objects in the current work space</string>
+   </property>
+  </action>
+  <action name="actionMODELS">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>MODELS</string>
+   </property>
+  </action>
+  <action name="actionSimulation_Goal_Seeking">
+   <property name="text">
+    <string>Simulation - Goal Seeking</string>
+   </property>
+   <property name="toolTip">
+    <string>Simulate a model</string>
+   </property>
+  </action>
+  <action name="actionCompile_Model">
+   <property name="text">
+    <string>Compile Model</string>
+   </property>
+   <property name="toolTip">
+    <string>Compile a set of equations</string>
+   </property>
+  </action>
+  <action name="actionSCC_Decomposition">
+   <property name="text">
+    <string>SCC Decomposition</string>
+   </property>
+   <property name="toolTip">
+    <string>SCC Decomposition and reordering</string>
+   </property>
+  </action>
+  <action name="actionSCC_Simulation">
+   <property name="text">
+    <string>SCC Simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Simulate a pre-ordered model</string>
+   </property>
+  </action>
+  <action name="actionIDENTITIES">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>IDENTITIES</string>
+   </property>
+  </action>
+  <action name="actionExecute_Identities">
+   <property name="text">
+    <string>Execute Identities</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute a set of identities and update current variables WorkSpace</string>
+   </property>
+  </action>
+  <action name="actionPRINT">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>PRINT</string>
+   </property>
+  </action>
+  <action name="actionPrint_View_Tables">
+   <property name="text">
+    <string>Print/View Tables</string>
+   </property>
+   <property name="toolTip">
+    <string>Compute tables and Display or Print results</string>
+   </property>
+  </action>
+  <action name="actionPrint_View_Variables">
+   <property name="text">
+    <string>Print/View Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Compare, Display or Print variables</string>
+   </property>
+  </action>
+  <action name="actionObject_Definitions">
+   <property name="text">
+    <string>Object Definitions</string>
+   </property>
+   <property name="toolTip">
+    <string>Print object definitions</string>
+   </property>
+  </action>
+  <action name="actionGRAPHICS">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>GRAPHICS</string>
+   </property>
+  </action>
+  <action name="actionGraphs_from_Tables">
+   <property name="text">
+    <string>Graphs from Tables</string>
+   </property>
+   <property name="toolTip">
+    <string>Compute tables and Display or Print</string>
+   </property>
+  </action>
+  <action name="actionGraphs_from_Variables">
+   <property name="text">
+    <string>Graphs from Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Display or Print series values</string>
+   </property>
+  </action>
+  <action name="actionFILES">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>FILES</string>
+   </property>
+  </action>
+  <action name="actionPrint_A2M_File">
+   <property name="text">
+    <string>Print A2M File</string>
+   </property>
+   <property name="toolTip">
+    <string>Print A2M File</string>
+   </property>
+  </action>
+  <action name="actionPrint_Report">
+   <property name="text">
+    <string>Print Report</string>
+   </property>
+   <property name="toolTip">
+    <string>Print IODE Report</string>
+   </property>
+  </action>
+  <action name="actionEdit_report">
+   <property name="text">
+    <string>Edit report</string>
+   </property>
+   <property name="toolTip">
+    <string>Create or modify a report</string>
+   </property>
+  </action>
+  <action name="actionExecute_report">
+   <property name="text">
+    <string>Execute report</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute IODE report</string>
+   </property>
+  </action>
+  <action name="actionExecute_a_report_line">
+   <property name="text">
+    <string>Execute a report line</string>
+   </property>
+   <property name="toolTip">
+    <string>Execute a single report command</string>
+   </property>
+  </action>
+  <action name="actionIode_Manual">
+   <property name="text">
+    <string>Iode Manual</string>
+   </property>
+   <property name="toolTip">
+    <string>Change Help system to HtmlHelp format</string>
+   </property>
+  </action>
+  <action name="actionIode_Home">
+   <property name="text">
+    <string>Iode Home</string>
+   </property>
+   <property name="toolTip">
+    <string>Go to IODE Web Site</string>
+   </property>
+  </action>
+  <action name="actionIode_Readme">
+   <property name="text">
+    <string>Iode Readme</string>
+   </property>
+   <property name="toolTip">
+    <string>Last changes in IODE</string>
+   </property>
+  </action>
+  <action name="actionAbout_Iode">
+   <property name="text">
+    <string>About Iode</string>
+   </property>
+   <property name="toolTip">
+    <string>Display introduction screen</string>
+   </property>
+  </action>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>CommentsView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/comments_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ListsView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/lists_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>IdentitiesView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/identities_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>EquationsView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/equations_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TablesView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/tables_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ScalarsView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/scalars_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>VariablesView</class>
+   <extends>QTableView</extends>
+   <header>./tabs/variables_view.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
- <connections/>
-</UI>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAbout_Iode</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>about()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExport</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_export_file_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionImport</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_import_file_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_profile</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_load_settings_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave_profile</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_save_settings_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionReset_profile</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_reset_settings_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_load_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_save_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClear_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_clear_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCopy_into_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_copy_into_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionMerge_into_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_merge_into_workspace_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDescribe_Work_Space</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_change_workspace_descriptions_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSet_Variables_Sample</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_change_variables_sample_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExtrapolate_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_extrapolate_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionHigh_to_Low</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_high_to_low_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLow_to_High</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_low_to_high_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSeasonal_Adjustment</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_seasonal_adjustment_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionTrend_correction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_trend_correction_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Comments</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Equations</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Identities</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Lists</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Scalars</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Tables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_List_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_object_editor_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDuplicate_objects</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_duplicate_objects_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSimulation_Goal_Seeking</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_simulation_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCompile_Model</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_model_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSCC_Decomposition</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_scc_decomposition_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSCC_Simulation</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_scc_simulation_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExecute_Identities</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_compute_identities_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_report</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_edit_report_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExecute_report</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_execute_report_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExecute_a_report_line</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_execute_report_command_line_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint_View_Tables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_tables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint_View_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionObject_Definitions</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_objects_definitions_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGraphs_from_Tables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_graphs_tables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGraphs_from_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_graphs_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint_A2M_File</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_A2M_file_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPrint_Report</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_report_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Readme</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_release_notes()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Home</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_iode_home()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionIode_Manual</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_iode_manual()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>about()</slot>
+  <slot>open_import_file_dialog()</slot>
+  <slot>open_export_file_dialog()</slot>
+  <slot>open_load_settings_dialog()</slot>
+  <slot>open_save_settings_dialog()</slot>
+  <slot>open_reset_settings_dialog()</slot>
+  <slot>open_load_workspace_dialog()</slot>
+  <slot>open_save_workspace_dialog()</slot>
+  <slot>open_clear_workspace_dialog()</slot>
+  <slot>open_copy_into_workspace_dialog()</slot>
+  <slot>open_merge_into_workspace_dialog()</slot>
+  <slot>open_change_workspace_descriptions_dialog()</slot>
+  <slot>open_change_variables_sample_dialog()</slot>
+  <slot>open_extrapolate_variables_dialog()</slot>
+  <slot>open_high_to_low_dialog()</slot>
+  <slot>open_low_to_high_dialog()</slot>
+  <slot>open_seasonal_adjustment_dialog()</slot>
+  <slot>open_trend_correction_dialog()</slot>
+  <slot>open_object_editor_dialog()</slot>
+  <slot>open_duplicate_objects_dialog()</slot>
+  <slot>open_compute_simulation_dialog()</slot>
+  <slot>open_compute_model_dialog()</slot>
+  <slot>open_compute_scc_decomposition_dialog()</slot>
+  <slot>open_compute_scc_simulation_dialog()</slot>
+  <slot>open_compute_identities_dialog()</slot>
+  <slot>open_edit_report_dialog()</slot>
+  <slot>open_execute_report_dialog()</slot>
+  <slot>open_execute_report_command_line_dialog()</slot>
+  <slot>open_print_tables_dialog()</slot>
+  <slot>open_print_variables_dialog()</slot>
+  <slot>open_print_objects_definitions_dialog()</slot>
+  <slot>open_graphs_tables_dialog()</slot>
+  <slot>open_graphs_variables_dialog()</slot>
+  <slot>open_print_A2M_file_dialog()</slot>
+  <slot>open_print_report_dialog()</slot>
+  <slot>open_release_notes()</slot>
+  <slot>open_iode_home()</slot>
+  <slot>open_iode_manual()</slot>
+ </slots>
+</ui>
