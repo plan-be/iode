@@ -1,9 +1,9 @@
 # IODE functions by source file
 
-## Utilities
+## Global Utilities
 
 ### buf.c
-Allocates or extends a global buffer of at least len bytes. 
+Function to share and reuse a large allocated buffer in different parts of the application. 
 
     char *BUF_alloc(int len) :  allocates or extends a global buffer of at least len bytes. 
     void BUF_free() : free the buffer
@@ -14,7 +14,7 @@ Allocates or extends a global buffer of at least len bytes.
     char *BUF_DATA : NULL or pointer to the allocated buffer
 
 ### pack.c
-Packing (serialize) and unpacking (deserialize) objects.
+Packing (serialize) and unpacking (deserialize) objects. 
 
     void *P_create()
     int P_free(char *ptr)
@@ -43,9 +43,17 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 
 ###### Miscellaneous functions 
 
-     int PER_nb(int ch): gives the nbr of periods in one year for the periodicity ch
-     int PER_nbper(PERIOD* period)
-     IODE_REAL PER_per2real(PERIOD* from, int i)
+    int PER_nb(int ch): gives the nbr of periods in one year for the periodicity ch
+    int PER_nbper(PERIOD* period)
+    IODE_REAL PER_per2real(PERIOD* from, int i)
+
+### yy.c
+
+    IODE_REAL K_read_real(YYFILE *yy)
+    long K_read_long(YYFILE* yy)
+    char* K_read_str(YYFILE* yy)
+    PERIOD *K_read_per(YYFILE* yy)
+    SAMPLE *K_read_smpl(YYFILE* yy)
 
 ## WS and Objects management
 
@@ -63,7 +71,7 @@ Functions for "packing" and "unpacking" IODE objects.
      int K_vpack(char **pack, IODE_REAL *a1, int *a2)
      int K_opack(char** pack, char* a1, int* a2)
 
-###### Unpacking functions
+###### Unpacking functions (for TBL and EQ only ?)
 
      TBL* K_tunpack(char *pack)
      EQ* K_eunpack(char *pack)
@@ -77,8 +85,12 @@ Functions for "packing" and "unpacking" IODE objects.
 
 ###  k_ws.c
 
-### k_cc*.c
-Function to import / export IODE files from/to ascii and csv format.
+### k_cccmt.c k_cceqs.c k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c_k_ccvar.c k_ccall.c_
+Function to import / export IODE files from/to ascii and LArray-csv format.
+
+    KDB *KV_load_asc(char *filename)
+    KV_save_asc(KDB* kdb, char* filename)
+    int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
 
 ## LEC 
 
