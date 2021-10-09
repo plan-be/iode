@@ -2,7 +2,7 @@
  * @author Jean-Marc PAUL
  * @author Geert BRYON
  *
- * Functions implementing the interface between the LEC library and the IODE objects.
+ * Functions implementing the virtual functions of the LEC library for IODE objects.
  *  
  *      IODE_REAL *L_getvar(KDB* kdb, int pos)
  *      IODE_REAL L_getscl(KDB* kdb, int pos)
