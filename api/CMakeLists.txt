@@ -6,15 +6,22 @@ cmake_minimum_required (VERSION 3.16)
 project ("iodeapi" C)
 
 # Add source to this project's executable.
-set (SOURCES 
-		 buf.c objs.c pack.c per.c yy.c
-		 k_pack.c  k_ws.c
-		 k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c 
-		 k_lec.c 
-		 b_dir.c 
-		 DESCRIPTION.md)
+set (UTILS buf.c objs.c pack.c per.c yy.c)
+set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
 
-set (HEADERS iode.h iodebase.h iodevarg.h)
+set (SOURCES 
+		${UTILS} 
+		k_vers.c
+		k_pack.c  k_ws.c
+		${CCS}
+		k_lec.c 
+		b_dir.c 
+		DESCRIPTION.md
+)
+
+set (HEADERS 
+		iode.h iodebase.h iodevarg.h
+)
 
 add_library (iodeapi STATIC ${SOURCES} ${HEADERS})
 
