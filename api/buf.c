@@ -2,8 +2,8 @@
  * @author Jean-Marc PAUL
  * @author Geert BRYON
  *
- * Group of functions for managing one global (but unique) buffer to avoid multiple 
- * reallocations resulting in memory fragmentation.
+ * Group of functions for managing one global buffer to avoid multiple 
+ * reallocations thus limiting memory fragmentation.
  *
  *   - char *BUF_alloc(int len) :  allocates or extends a global buffer of at least len bytes. 
  *   - void BUF_free() : free the buffer
