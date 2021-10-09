@@ -1,3 +1,16 @@
+/**
+ * @author Jean-Marc PAUL 
+ * @author Geert BRYON
+ * 
+ * Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV format.
+ *
+ *    KDB  *(*K_load_asc[])() : array of 7 functions to load files containing ASCII definitions of IODE objects.
+ *  
+ *    int (*K_save_asc[])(): array of 7 functions to save IODE objects in ascii files.
+ * 
+ *    int (*K_save_csv[])(): array of 7 functions to save IODE objects in csv format.
+ */
+
 #include "iode.h"
 
 KDB  *(*K_load_asc[])() = {
