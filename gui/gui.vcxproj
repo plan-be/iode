@@ -126,6 +126,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="legacy\k_errorv.c" />
+    <ClCompile Include="legacy\sb_gui.c" />
+    <ClCompile Include="legacy\s_iode.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main_window.cpp" />
   </ItemGroup>

@@ -21,6 +21,9 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Source Files\legacy">
+      <UniqueIdentifier>{bb9de6cb-7f36-4fd6-9c46-fc5c73485e30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -28,6 +31,15 @@
     </ClCompile>
     <ClCompile Include="main_window.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="legacy\k_errorv.c">
+      <Filter>Source Files\legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="legacy\s_iode.c">
+      <Filter>Source Files\legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="legacy\sb_gui.c">
+      <Filter>Source Files\legacy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
