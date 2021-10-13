@@ -126,7 +126,7 @@ struct BaseWrapper
 
 
 // Mixin class for handling settings in derived class. 
-class MixinSettings : public QDialog
+class QIodeSettings : public QDialog
 {
     Q_OBJECT
 
@@ -136,9 +136,9 @@ protected:
     QMap<QString, BaseWrapper*> mapFields;
 
 public:
-    MixinSettings(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) :
+    QIodeSettings(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) :
         QDialog(parent, f), settings(settings), className("") { }
-    ~MixinSettings() { }
+    ~QIodeSettings() { }
 
 protected:
     void saveSettings()
