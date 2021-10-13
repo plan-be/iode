@@ -35,10 +35,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     variablesModel = new VariablesModel(this);
     this->tableview_variables->setupModel(variablesModel);
     this->tableview_variables->hide();
+
+    // ---- Settings ----
+
+    // save the settings in a specific file located in the current directory
+    settings = get_local_settings_instance();
 }
 
 MainWindow::~MainWindow()
 {
+    delete settings;
+
     delete commentsModel;
     delete equationsModel;
     delete identitiesModel;
