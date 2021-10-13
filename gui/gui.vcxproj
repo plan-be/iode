@@ -111,6 +111,8 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;VC;DOS;DOSWIN;DOSW32;REALD;WINDOWS;IODEWIN;NOEMS;NOEMF</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\$(Platform)\scr4;$(SolutionDir)$(Configuration)\$(Platform)\api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -152,6 +154,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bridge.h" />
+    <QtMoc Include="custom_widgets\qfilechooser.h" />
+    <QtMoc Include="custom_widgets\qsampleedit.h" />
     <ClInclude Include="tabs\abstract_table_model.h" />
     <ClInclude Include="tabs\abstract_table_view.h" />
     <QtMoc Include="tabs\comments_model.h" />

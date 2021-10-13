@@ -30,6 +30,9 @@
     <Filter Include="Header Files\model">
       <UniqueIdentifier>{825094e6-1bf7-4831-a87e-f89aa7ddea4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\custom_widgets">
+      <UniqueIdentifier>{b0093c01-7ffb-4209-9ab3-0705670e7b27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -107,6 +110,12 @@
     </QtMoc>
     <QtMoc Include="tabs\comments_model.h">
       <Filter>Header Files\model</Filter>
+    </QtMoc>
+    <QtMoc Include="custom_widgets\qfilechooser.h">
+      <Filter>Header Files\custom_widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="custom_widgets\qsampleedit.h">
+      <Filter>Header Files\custom_widgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

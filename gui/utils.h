@@ -32,10 +32,11 @@
  * enum documentation: https://en.cppreference.com/w/cpp/language/enum
  */
 
+// OPTIONAL is a protected keyword -> must add _FIELD
 enum EnumItemType
 {
-    REQUIRED,
-    OPTIONAL
+    REQUIRED_FIELD,
+    OPTIONAL_FIELD
 };
 
 const static QMap<QString, int> qmapIodeTypes =
