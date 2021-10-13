@@ -15,6 +15,8 @@
 #include "tabs/tables_model.h"
 #include "tabs/variables_model.h"
 
+#include "menu/workspace/workspace_load.h"
+
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -36,5 +38,13 @@ public:
 	~MainWindow();
 
 private:
+	void init_iode_api();
+	void end_iode_api();
 	void updateCurrentTab(int index = -1);
+
+protected:
+	void closeEvent(QCloseEvent* event) override;
+
+public slots:
+	void open_load_workspace_dialog();
 };
