@@ -250,7 +250,6 @@ inline void CPP_WsLoad(std::string arg, EnumIodeType type, std::string str_type)
         throw std::runtime_error("Something went wrong when trying to import " + str_type + " from file " + arg);
 }
 
-
 inline void CPP_WsSave(std::string arg, EnumIodeType type, std::string str_type)
 {
     char* c_arg = const_cast<char*>(arg.c_str());
@@ -258,4 +257,11 @@ inline void CPP_WsSave(std::string arg, EnumIodeType type, std::string str_type)
     int res = B_WsSave(c_arg, type);
     if (res != EXIT_SUCCESS)
         throw std::runtime_error("Something went wrong when trying to save " + str_type + " to file " + arg);
+}
+
+inline void CPP_WsClear(EnumIodeType type, std::string str_type)
+{
+    int res = B_WsClear("", type);
+    if (res != EXIT_SUCCESS)
+        throw std::runtime_error("Something went wrong when trying to clear objets of type " + str_type);
 }

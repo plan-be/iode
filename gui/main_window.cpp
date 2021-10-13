@@ -145,6 +145,13 @@ void MainWindow::open_save_workspace_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_clear_workspace_dialog()
+{
+    QIodeMenuWorkspaceClear dialog(*settings, this);
+    dialog.exec();
+    updateCurrentTab();
+}
+
 void MainWindow::about()
 {
     // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")

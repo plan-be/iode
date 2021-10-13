@@ -17,6 +17,7 @@
 
 #include "menu/workspace/workspace_load.h"
 #include "menu/workspace/workspace_save.h"
+#include "menu/workspace/workspace_clear.h"
 
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
@@ -50,6 +51,7 @@ public slots:
 	// Workspace Menu
 	void open_load_workspace_dialog();
 	void open_save_workspace_dialog();
+	void open_clear_workspace_dialog();
 
 	// Help Menu
 	void about();
