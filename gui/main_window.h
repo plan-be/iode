@@ -46,5 +46,12 @@ protected:
 	void closeEvent(QCloseEvent* event) override;
 
 public slots:
+	// Workspace Menu
 	void open_load_workspace_dialog();
+
+	// Help Menu
+	void about();
+	void open_release_notes();
+	void open_iode_home();
+	void open_iode_manual();
 };
