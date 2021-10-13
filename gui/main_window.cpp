@@ -138,3 +138,51 @@ void MainWindow::open_load_workspace_dialog()
     dialog.exec();
     updateCurrentTab();
 }
+
+void MainWindow::about()
+{
+    // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")
+    QString version = QString("%1.%2").arg(IODE_VERSION_MAJOR).arg(IODE_VERSION_MINOR);
+    QMessageBox::about(this, tr("About IODE"),
+        tr(R"(
+            <style>
+            * {text-align: center;}
+            </style>
+
+            <h1>Welcome to IODE</h1>
+            <h2>MODELLING SOFTWARE</h2>
+            <h2>Version %1</h2>
+           
+            <h3>Developped by the Federal Planning Bureau (Belgium)</h3>
+            <p>
+            <ul> 
+                <li>Geert Bryon &nbsp;&nbsp;&nbsp;&nbsp;  
+                <li>Jean-Marc Paul
+                <li>Alix Damman &nbsp;&nbsp;&nbsp;   
+            </ul>
+            </p>
+           
+            <h3>Tools</h3>         
+            <p>SCR/AL1(c) 1986-2020, JM.B.Paul</p>
+           
+            <h3>Website</h3>       
+            <p><a href='https://iode.plan.be/doku.php'>iode.plan.be</a></p>)").arg(version)
+    );
+}
+
+void MainWindow::open_release_notes()
+{
+    QUrl url = get_url_iode_helpfile("readme.htm");
+    QDesktopServices::openUrl(url);
+}
+
+void MainWindow::open_iode_home()
+{
+    QDesktopServices::openUrl(QUrl(IODE_WEBSITE));
+}
+
+void MainWindow::open_iode_manual()
+{
+    QUrl url = get_url_iode_manual();
+    QDesktopServices::openUrl(url);
+}
