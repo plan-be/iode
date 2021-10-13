@@ -71,6 +71,9 @@
     <ClCompile Include="menu\workspace\workspace_load.cpp">
       <Filter>Source Files\menu\workspace</Filter>
     </ClCompile>
+    <ClCompile Include="menu\workspace\workspace_save.cpp">
+      <Filter>Source Files\menu\workspace</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bridge.h">
@@ -144,12 +147,18 @@
     <QtMoc Include="menu\workspace\workspace_load.h">
       <Filter>Header Files\menu\workspace</Filter>
     </QtMoc>
+    <QtMoc Include="menu\workspace\workspace_save.h">
+      <Filter>Header Files\menu\workspace</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="menu\workspace\workspace_load.ui">
+      <Filter>Form Files\menu\workspace</Filter>
+    </QtUic>
+    <QtUic Include="menu\workspace\workspace_save.ui">
       <Filter>Form Files\menu\workspace</Filter>
     </QtUic>
   </ItemGroup>
