@@ -16,7 +16,7 @@ enum EnumFileMode
 {
 	NEW_FILE,
 	EXISTING_FILE,
-	FILE_MAY_EXIST,
+	FILE_MAY_EXIST
 };
 
 
@@ -118,15 +118,15 @@ private slots:
 		QString dir;
 		QString caption = expectedExt.name + " File";
 		QString filter = expectedExt.ext == anyExt ? QString() : expectedExt.name + " (*." + expectedExt.ext + " *." + expectedExt.ascii + ")";
-		if (fileMode == NEW_FILE)
-		{
-			caption = "Save " + caption;
-			filename = QFileDialog::getSaveFileName(this, caption, dir, filter);
-		}
-		else
+		if (fileMode == EXISTING_FILE)
 		{
 			caption = "Open " + caption;
 			filename = QFileDialog::getOpenFileName(this, caption, dir, filter);
+		}
+		else
+		{
+			caption = "Save " + caption;
+			filename = QFileDialog::getSaveFileName(this, caption, dir, filter);
 		}
 		if (!filename.isEmpty()) lineEdit->setText(filename);
 	}

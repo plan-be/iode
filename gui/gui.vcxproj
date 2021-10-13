@@ -71,7 +71,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)api;$(SolutionDir)scr4;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)api;$(SolutionDir)scr4;.\;.\menu\workspace;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;VC;DOS;DOSWIN;DOSW32;REALD;WINDOWS;IODEWIN;NOEMS;NOEMF</PreprocessorDefinitions>
     </ClCompile>
     <PreBuildEvent>
@@ -107,7 +107,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)api;$(SolutionDir)scr4;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)api;$(SolutionDir)scr4;.\;.\menu\workspace;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;VC;DOS;DOSWIN;DOSW32;REALD;WINDOWS;IODEWIN;NOEMS;NOEMF</PreprocessorDefinitions>
@@ -152,10 +152,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main_window.cpp" />
     <ClCompile Include="menu\workspace\workspace_load.cpp" />
+    <ClCompile Include="menu\workspace\workspace_save.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bridge.h" />
     <QtMoc Include="menu\workspace\workspace_load.h" />
+    <QtMoc Include="menu\workspace\workspace_save.h" />
     <ClInclude Include="wrapper_classes.h" />
     <QtMoc Include="custom_widgets\qfilechooser.h" />
     <QtMoc Include="custom_widgets\qsampleedit.h" />
@@ -181,6 +183,7 @@
   <ItemGroup>
     <QtUic Include="main_window.ui" />
     <QtUic Include="menu\workspace\workspace_load.ui" />
+    <QtUic Include="menu\workspace\workspace_save.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

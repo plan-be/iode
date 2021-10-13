@@ -16,6 +16,7 @@
 #include "tabs/variables_model.h"
 
 #include "menu/workspace/workspace_load.h"
+#include "menu/workspace/workspace_save.h"
 
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
@@ -48,6 +49,7 @@ protected:
 public slots:
 	// Workspace Menu
 	void open_load_workspace_dialog();
+	void open_save_workspace_dialog();
 
 	// Help Menu
 	void about();
