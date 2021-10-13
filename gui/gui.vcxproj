@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bridge.h" />
+    <ClInclude Include="wrapper_classes.h" />
     <QtMoc Include="custom_widgets\qfilechooser.h" />
     <QtMoc Include="custom_widgets\qsampleedit.h" />
     <ClInclude Include="tabs\abstract_table_model.h" />
