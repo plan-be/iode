@@ -40,7 +40,7 @@ private:
 
 public:
 	QIodeFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
-		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(ANYFILE), fileMode(EXISTING_FILE), anyExt(qmapIodeFileExtension.value(ANYFILE).ext)
+		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(ANY_FILE), fileMode(EXISTING_FILE), anyExt(qmapIodeFileExtension.value(ANY_FILE).ext)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0, 0, 0, 0);

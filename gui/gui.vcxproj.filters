@@ -33,6 +33,24 @@
     <Filter Include="Header Files\custom_widgets">
       <UniqueIdentifier>{b0093c01-7ffb-4209-9ab3-0705670e7b27}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Form Files\menu">
+      <UniqueIdentifier>{4e95317b-5ad5-4afe-b741-57f7813a4c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\menu">
+      <UniqueIdentifier>{0c4fda8e-de65-43e8-9c98-8ba22aea59cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\menu">
+      <UniqueIdentifier>{e532da5c-1a9d-4d20-a82a-4c8f89503b22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form Files\menu\workspace">
+      <UniqueIdentifier>{94dea08b-d10f-409f-8bb8-232ecd3f098d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\menu\workspace">
+      <UniqueIdentifier>{94f389e0-c747-4184-a4ff-47173b5fab99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\menu\workspace">
+      <UniqueIdentifier>{94f215a4-64ea-4836-9aac-86abd4d26fa8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -49,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="legacy\sb_gui.c">
       <Filter>Source Files\legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="menu\workspace\workspace_load.cpp">
+      <Filter>Source Files\menu\workspace</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,10 +141,16 @@
     <QtMoc Include="custom_widgets\qsampleedit.h">
       <Filter>Header Files\custom_widgets</Filter>
     </QtMoc>
+    <QtMoc Include="menu\workspace\workspace_load.h">
+      <Filter>Header Files\menu\workspace</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
       <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="menu\workspace\workspace_load.ui">
+      <Filter>Form Files\menu\workspace</Filter>
     </QtUic>
   </ItemGroup>
 </Project>
