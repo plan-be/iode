@@ -22,7 +22,7 @@ Retourne un string alloué contenant le contenu du fichier
  *  @return     char* last version of IODE on the web site.
  *  
  *  @note   The function SCR_HttpGetFile("iode.plan.be", 80, "version.txt") does not work as expected. Therefore, 
- *          the value returned is the current IODE version (K_CurrentVersion()) as of version 6.xx.
+ *          the value returned is the current IODE version (K_CusrrentVersion()) as of version 6.xx.
  *  
  *   TODO: specify the version (6.xx) from which the file could no longer be read from the website.
  */
