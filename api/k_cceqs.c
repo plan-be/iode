@@ -1,6 +1,21 @@
+/**
+ * @author Jean-Marc PAUL 
+ * @author Geert BRYON
+ * 
+ * Functions to load and save ascii definitions of IODE EQ objects.
+ *
+ *     KDB *KE_load_asc(char* filename)
+ *     int KE_save_asc(KDB* kdb, char* filename)
+ *     int KE_save_csv(KDB *kdb, char *filename) : not implemented
+ *
+ */
+
 #include "iode.h"
 
-/* Read ascii file and add to DBEQS */
+/**
+ * Table of keywords recognized by YY in the context of an EQS ascii file (.ae).
+ * See s_yy function group for more informations (http://www.xon.be/scr4/libs1/libs157.htm).
+ */
 
 YYKEYS KE_TABLE[] = {
     "{",            KE_OPEN,
@@ -27,8 +42,58 @@ YYKEYS KE_TABLE[] = {
     "LOGLIK",       KE_LOGLIK
 };
 
-EQ  *KE_read_eq(yy)
-YYFILE  *yy;
+
+/**
+ *  Reads on an opened YY stream (file or string) the ascii definition of an IODE EQ. 
+ *  Subfn of KE_load_asc().
+ *  
+ *  Format: 
+ *    {
+ *      "LEC expression := LEC expression"
+ *      [COMMENT "text" ]       free comment
+ *      [{LSQ|ZELLNER|INF|GLS}] estimation method
+ *      [SAMPLE from to]                estimation sample
+ *      [DATE yyyymmdd]                 date of estimation
+ *      [BLOC "eq1;eq2;..."]            bloc of simultaneous estimated equations
+ *      [INSTRUMENTS "lec1;lec2..."]    instruments for INF method
+ *      [STDEV double]                  standard deviation
+ *      [MEANY double]                  mean of left side term 
+ *      [SSRES double]                  Sum of squares of residuals
+ *      [STDERR double]                 Standard error
+ *      [FSTAT double]                  F-Stat
+ *      [R2 double]                     R-square
+ *      [R2ADJ double]                  R-square adj
+ *      [DW double]                     Durbin-Watson : 
+ *      [LOGLIK double]                 Log likelihood : 
+ *    }
+ *  
+ *  Example : 
+ *  
+ *   {
+ *      "X := c1 + c2 * Y"        
+ *      LSQ        
+ *      BLOCK "X"        
+ *      COMMENT " "        
+ *      SAMPLE 1960Y1 1980Y1        
+ *      DATE 19921018        
+ *      STDEV 0.228351        
+ *      MEANY 2.68489        
+ *      SSRES 0.00182236        
+ *      STDERR 0.0142297        
+ *      FSTAT 2566.21        
+ *      R2 0.996505        
+ *      R2ADJ 0.996117        
+ *      DW 0.512136        
+ *      LOGLIK 32.272
+ *   }
+ *  
+ *  Splits the LEC expression in multiple lines of max 60 chars.
+ *  
+ *  @param [in, out]    yy      YY*     YY stream to read data from
+ *  @return                     EQ*     a new allocated EQ or NULL on error
+ *  
+ */
+EQ  *KE_read_eq(YYFILE* yy)
 {
     int     keyw;
     char    *lec;
@@ -41,7 +106,7 @@ YYFILE  *yy;
     if((keyw = YY_lex(yy)) != KE_OPEN)  {
         YY_unread(yy);
         lec = K_read_str(yy);
-        eq->lec = K_wrap(lec, 60);
+        eq->lec = K_wrap(lec, 60);  
         SW_nfree(lec);
 
         if(eq->lec == NULL) {
@@ -146,8 +211,20 @@ err :
 
 }
 
-KDB *KE_load_asc(filename)
-char  *filename;
+
+/**
+ *  Loads EQs from an ASCII file into a new KDB.
+ *  
+ *  Errors are displayed by a call to the function kerror().
+ *  For each read equations, kmsg() is called to send a message to the user. 
+ *  
+ *  The implementations of kerror() and kmsg() depend on the context.
+ *  @param [in] filename    char* ascii file to read
+ *  @return                 KDB*  NULL or allocated KDB of EQs
+ *  
+ */
+
+KDB *KE_load_asc(char* filename)
 {
 
     KDB     *kdb = NULL;
@@ -209,9 +286,17 @@ err:
 }
 
 
-KE_save_asc(kdb, filename)
-KDB     *kdb;
-char    *filename;
+/**
+ *  Saves a KDB of EQs into an ascii file (.ae) or to the stdout.
+ *  
+ *  @see KE_read_eq() the syntax. 
+ *  
+ *  @param [in] kdb         KDB*    KDB of EQs to save in ascii.
+ *  @param [in] filename    char*   name of the output file or "-" to write the result to the stdout.
+ *  @return                 int     0 on success, -1 if the file cannot be written.
+ *  
+ */
+int KE_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -237,9 +322,17 @@ char    *filename;
     return(0);
 }
 
-KE_print_eq(fd, eq)
-FILE    *fd;
-EQ      *eq;
+/**
+ *  Saves on the stream fd the ascii representation of one EQ.
+
+ *  @see KE_read_eq() the detailed syntax of an ascii equation. 
+ *  
+ *  @param [in, out]    fd      FILE*       output stream    
+ *  @param [in]         eq      EQ*         pointer to the EQ to print  
+ *  @return 
+ *  
+ */
+KE_print_eq(FILE* fd, EQ* eq)
 {
     char    from[21], to[21], *SCR_long_to_date();
 
@@ -290,17 +383,28 @@ EQ      *eq;
     return(0);
 }
 
-KE_print_test(fd, txt, val)
-FILE    *fd;
-IODE_REAL    val;
-char    *txt;
+
+/**
+ *  Prints the value of a statistical test on fd. 
+ *  If the value of the test is 0 or NaN , does not print anything. 
+ *  
+ *  @param [in, out]    fd      FILE*       output stream    
+ *  @param [in]         txt     char*       keyword of the test (ex. "DW")
+ *  @param [in]         val     IODE_REAL   value of the stat test
+ *  @return 
+ *  
+ */
+
+KE_print_test(FILE* fd, char* txt, IODE_REAL val)
 {
     if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %.15lg\n", txt, val); /* JMP 09-04-98 */
     return(0);
 }
 
+
 /* 
- * CSV
+ * Save a KDB of EQs in a file.
+ * NOT YET IMPLEMENTED.
  */
 int KE_save_csv(KDB *kdb, char *filename)
 {
