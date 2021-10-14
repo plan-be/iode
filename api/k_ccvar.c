@@ -13,6 +13,7 @@
 
 /**
  * Table of keywords recognized by YY in the context of an VAR ascii file (.av).
+ * See s_yy function group for more informations (http://www.xon.be/scr4/libs1/libs157.htm).
  */
 
 #define KV_SMPL     1
@@ -211,7 +212,6 @@ KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
  *  @param [in] filename    char*   name of the output file or "-" to write the result to the stdout.
  *  @return                 int     0 on success, -1 if the file cannot be written.
  *  
- *  @details 
  */
 int KV_save_asc(KDB* kdb, char* filename)
 {
@@ -244,18 +244,16 @@ int KV_save_asc(KDB* kdb, char* filename)
     return(0);
 }
 
+
 /**
- *  Prints the representation one value on fd. For NaN value, prints "na". 
+ *  Prints the representation of one value on fd. For NaN value, prints "na". 
  *  
  *  @param [in, out]    fd      FILE *      output stream    
  *  @param [in]         val     IODE_REAL   value to print  
  *  @return 
  *  
- *  @details 
  */
-KV_print_val(fd, val)
-FILE    *fd;
-IODE_REAL    val;
+KV_print_val(FILE* fd, IODE_REAL val)
 {
     if(L_ISAN(val))
 #ifdef REALD
