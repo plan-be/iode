@@ -1,6 +1,5 @@
 /**
- * @author Jean-Marc PAUL 
- * @author Geert BRYON
+ * @header4iode
  * 
  * Helper functions for reading and writing IODE ascii files.
  *
@@ -22,7 +21,7 @@
  *  Reads a token on the YY stream and interprets the token as a IODE_REAL (double) if possible.
  *  If not, returns L_NAN and rewinds the YY stream.
  *  
- *   The token can be a double, a long or the string "na". Other values are rejected.
+ *  The token can be a double, a long or the string "na". Other values are rejected.
  *  
  *  @param [in, out]    yy  YYFILE*     YY stream
  *  @return                 IODE_REAL   value of the next token or L_NAN.
@@ -149,6 +148,7 @@ err:
     return(NULL);
 }
 
+
 /**
  *  Reads the next tokens on the YY stream and tries to interpret them as a SAMPLE (2 x PERIOD) definition (<long><char><long> <long><char><long>).
  *  If it is not possible, returns NULL.
@@ -179,6 +179,33 @@ SAMPLE  *K_read_smpl(YYFILE* yy)
     SW_nfree(one);
     SW_nfree(two);
     return(smpl);
+}
+
+
+/**
+ *  Reads the next token on the YY stream: LEFT, RIGHT or CENTER.
+ *  If the token is not one of them, returns LEFT and rewinds yy.
+ *  
+ *  @param [in, out]    yy  YYFILE*     YY stream
+ *  @return                 int         1 for CENTER, 2 for RIGHT, 0 otherwise
+ *  
+ */
+int K_read_align(YYFILE* yy)
+{
+    int keyw;
+
+    keyw = YY_lex(yy);
+    switch(keyw) {
+        case KT_LEFT :
+            return(0);
+        case KT_CENTER:
+            return(1);
+        case KT_RIGHT :
+            return(2);
+        default       :
+            YY_unread(yy);
+            return(0);
+    }
 }
 
 
