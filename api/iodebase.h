@@ -134,6 +134,7 @@ extern long K_read_long(YYFILE *);
 extern char *K_read_str(YYFILE *);
 extern PERIOD *K_read_per(YYFILE *);
 extern SAMPLE *K_read_smpl(YYFILE *);
+extern int K_read_align(YYFILE* yy);
 extern void K_stracpy(char **,char *);
 extern int K_wrdef(FILE *,YYKEYS *,int );
 //extern int K_compare(YYKEYS *,YYKEYS *);
@@ -449,59 +450,40 @@ extern void E_savescl(double ,int ,char *);
 extern void E_savevar(char *,int ,MAT *);
 
 /* k_ccvar.c */
-extern KDB *KV_load_yy(YYFILE *,int );
 extern KDB *KV_load_str(char *);
 extern KDB *KV_load_asc(char *);
-extern int KV_read_vec(KDB *,YYFILE *,char *);
 extern int KV_save_asc(KDB *,char *);
-extern int KV_print_val(FILE *,double );
 extern int KV_save_csv(KDB *, char *, SAMPLE *, char **);
-extern int KE_save_csv(KDB *, char *);
-extern int KI_save_csv(KDB *, char *);
-extern int KL_save_csv(KDB *, char *);
-extern int KC_save_csv(KDB *, char *);
-extern int KS_save_csv(KDB *, char *);
-extern int KT_save_csv(KDB *, char *);
-
 
 /* k_cccmt.c */
 extern KDB *KC_load_asc(char *);
-extern int KC_read_cmt(KDB *,YYFILE *,char *);
 extern int KC_save_asc(KDB *,char *);
+extern int KC_save_csv(KDB *, char *);
 
 /* k_ccscl.c */
 extern KDB *KS_load_asc(char *);
-extern int KS_read_scl(KDB *,YYFILE *,char *);
-extern double KS_read_val(YYFILE *);
 extern int KS_save_asc(KDB *,char *);
-extern int KS_print_scl(FILE *,SCL *);
+extern int KS_save_csv(KDB *, char *);
 
 /* k_ccidt.c */
 extern KDB *KI_load_asc(char *);
 extern int KI_save_asc(KDB *,char *);
+extern int KI_save_csv(KDB *, char *);
 
 /* k_cclst.c */
 extern KDB *KL_load_asc(char *);
-extern int KL_read_lst(KDB *,YYFILE *,char *);
 extern int KL_save_asc(KDB *,char *);
+extern int KL_save_csv(KDB *, char *);
 
 /* k_cceqs.c */
-extern EQ *KE_read_eq(YYFILE *);
 extern KDB *KE_load_asc(char *);
 extern int KE_save_asc(KDB *,char *);
-extern int KE_print_eq(FILE *,EQ *);
-extern int KE_print_test(FILE *,char *,double );
+extern int KE_save_csv(KDB *, char *);
 
 /* k_cctbl.c */
-extern int KT_read_cell(TCELL *,YYFILE *,int );
-extern int KT_read_div(TBL *,YYFILE *);
-extern int KT_read_line(TBL *,YYFILE *);
-extern TBL *KT_read_tbl(YYFILE *);
 extern KDB *KT_load_asc(char *);
 extern int KT_save_asc(KDB *,char *);
-extern int  KT_print_tbl(FILE *,TBL *);
-extern void KT_print_cell(FILE *,TCELL *);
-extern int KT_print_attr(FILE *,int );
+extern int KT_save_csv(KDB *, char *);
 
 /* sb_xode.c */
 extern int SB_XodeRuleImport(void);
