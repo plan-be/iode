@@ -1,6 +1,19 @@
+/**
+ * @header4iode
+ * 
+ * Functions to load and save ascii definitions of IODE TBL objects.
+ *
+ *      KDB *KT_load_asc(char* filename)
+ *      int KT_save_asc(KDB* kdb, char* filename)
+ *      int KT_save_csv(KDB *kdb, char *filename)
+ */
+
 #include "iode.h"
 
-/* Read ascii file and add to DBTBL */
+/**
+ * Table of keywords recognized by YY in the context of a TBLs ascii file (.at).
+ * See s_yy function group for more informations (http://www.xon.be/scr4/libs1/libs157.htm).
+ */
 
 YYKEYS KT_TABLE[] = {
     "BOLD",         KT_BOLD,
@@ -42,17 +55,28 @@ YYKEYS KT_TABLE[] = {
     "GRSCATTER",    KT_GRSCATTER
 };
 
-KT_read_cell(cell, yy, mode)
-TCELL   *cell;
-YYFILE  *yy;
-int     mode;
+
+/**
+ *  Reads a TCELL definition on a YY stream.
+ *  
+ *  If mode is not null, the next token read on yy must be of type mode. For example, if mode == YY_STRING, the 
+ *  next token must be a string. If not, the stream yy is "rewound".
+ *  
+ *  @param [in, out] TCELL*     cell    cell to be read
+ *  @param [in, out] YYFILE*    yy      stream 
+ *  @param [in]      int        mode    if not null, type of the next token on the stream
+ *  @return          void
+ *  
+ */
+
+static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
 {
     int     keyw, ok = 0, align = KT_LEFT;
 
     keyw = YY_lex(yy);
     if(mode != 0 && mode != keyw) {
         YY_unread(yy);
-        return(0);
+        return;
     }
 
     cell->tc_type = KT_STRING;
@@ -107,12 +131,29 @@ int     mode;
 ret :
     cell->tc_attr |= align;
     YY_unread(yy);
-    return(0);
+    return;
 }
 
-KT_read_div(tbl, yy)
-TBL     *tbl;
-YYFILE  *yy;
+
+/**
+ *  Reads the TBL divisors on a YY stream. Each column of a table has its own divisor.
+ *  
+ *  Syntax of the section DIV
+ *  -------------------------
+ *  DIV div_col_1 div_col_2 ...
+ *  where div_col_n = {LEC "lec expression" | "free text"}
+ *  
+ *  Example for a 2-columns table
+ *  -----------------------------
+ *  DIV LEC "1" LEC "PIB[2010]"
+ *    
+ *  @param [in, out] TBL*       tbl    TBL whose divisors (one by column) is to be read
+ *  @param [in, out] YYFILE*    yy     stream 
+ *  @return          void
+ *  
+ */
+
+static void KT_read_div(TBL* tbl, YYFILE* yy)
 {
     int     i;
     TCELL   *cell;
@@ -120,12 +161,43 @@ YYFILE  *yy;
     cell = (TCELL *) (tbl->t_div).tl_val;
     for(i = 0; i < tbl->t_nc; i++)
         KT_read_cell(cell + i, yy, 0);
-    return(0);
 }
 
-KT_read_line(tbl, yy)
-TBL     *tbl;
-YYFILE  *yy;
+
+/**
+ *  Reads a TBL line on a YY stream. Each line has as many Cells as the number 
+ *  of columns in the table.
+ *  
+ *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
+ *
+ *  Partial syntax of a TABLE LINE 
+ *  -------------------------------
+ *  - TITLE "text accross all columns of the table"
+ *  - LINE  
+ *  - <cell> ... <cell> 
+ *  where cell1 ::= "text" <align> | LEC "lec expression" <align> <axis> <graph_type>
+ *  - FILES 
+ *  - MODE
+ *  - DATE 
+ *  
+ *  Example for a 2-columns table
+ *  -----------------------------
+ *  - TITLE "Table title" BOLD CENTER        
+ *  - LINE        
+ *  - "" "#s" CENTER LAXIS GRLINE
+ *  - LINE
+ *  - "line A" LEFT LEC "A" DECIMAL  LAXIS GRLINE        
+ *  - "line B" LEFT LEC "B" DECIMAL  LAXIS GRLINE
+ *  
+ *    
+ *  @param [in, out] TBL*       tbl    TBL where a new line will be added 
+ *  @param [in, out] YYFILE*    yy     stream 
+ *  @return          int                0 if success
+ *                                      -1 if the TBL cannot be created
+ *  
+ */
+
+static int KT_read_line(TBL* tbl, YYFILE* yy)
 {
     int     keyw, i;
     TLINE   *c_line;
@@ -213,28 +285,16 @@ YYFILE  *yy;
     }
 }
 
-int K_read_align(yy)
-YYFILE  *yy;
-{
-    int keyw;
-
-    keyw = YY_lex(yy);
-    switch(keyw) {
-        case KT_LEFT :
-            return(0);
-        case KT_CENTER:
-            return(1);
-        case KT_RIGHT :
-            return(2);
-        default       :
-            YY_unread(yy);
-            return(0);
-    }
-
-}
-
-TBL *KT_read_tbl(yy)
-YYFILE  *yy;
+/**
+ *  Reads on the stream yy the full definition of a TBL.
+ *  
+ *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
+ *  
+ *  @param [in]     yy  YYFILE*     stream to be read
+ *  @return             TBL*        new allocated table
+ *  
+ */
+static TBL *KT_read_tbl(YYFILE* yy)
 {
     int     keyw, dim = 2;
     TBL     *tbl = NULL;
@@ -323,8 +383,23 @@ err :
     return(NULL);
 }
 
-KDB *KT_load_asc(filename)
-char    *filename;
+/**
+ *  Loads TBLs definition from an ASCII file into a new KDB of TBLs.
+ *  
+ *  @see https://iode.plan.be/doku.php?id=format_ascii_des_tableaux for the full syntax.
+ *  
+ *  Errors are displayed by a call to the function kerror().
+ *  For each read TBL, kmsg() is called to send a message to the user. 
+ *  
+ *  The implementations of kerror() and kmsg() depend on the context.
+ *  
+ *  @param [in] filename    char*   ascii file to be read or
+ *                                  string containing the definition of the TBLs
+ *  @return                 KDB*    NULL or allocated KDB of TBLs
+ *  
+ */
+
+KDB *KT_load_asc(char* filename)
 {
     static  int sorted;
 
@@ -383,38 +458,18 @@ err:
 }
 
 
-KT_save_asc(kdb, filename)
-KDB   *kdb;
-char    *filename;
-{
-    FILE    *fd;
-    TBL     *tbl;
-    int     i;
+/*------- SAVE IN ASCII -------------------*/
 
-    if(filename[0] == '-') fd = stdout;
-    else {
-        fd = fopen(filename, "w+");
-        if(fd == 0) {
-            kerror(0, "Cannot create '%s'", filename);
-            return(-1);
-        }
-    }
-
-    for(i = 0 ; i < KNB(kdb); i++) {
-        fprintf(fd, "%s {", KONAME(kdb, i));
-        tbl = KTVAL(kdb, i);
-        KT_print_tbl(fd, tbl);
-        fprintf(fd, "}\n");
-        T_free(tbl);
-    }
-
-    if(filename[0] != '-') fclose(fd);
-    return(0);
-}
-
-KT_align(fd, align)
-FILE *fd;
-int align;
+/**
+ *  Prints the alignment value of the TBL.
+ *  
+ *  @param [in] fd      FILE*     output stream
+ *  @param [in] align   int       alignment keyword value
+ *  @return             void
+ *  
+ */
+ 
+void KT_align(FILE* fd, int align)
 {
     fprintf(fd, "\nALIGN ");
     switch(align) {
@@ -431,15 +486,18 @@ int align;
 
 }
 
-KT_min(fd, str, value)
-FILE    *fd;
-char    *str;
-float   value;
-{
-    if(L_ISAN(value)) fprintf(fd, "\n%s %f ", str, value);
-}
 
-KT_grinfo(fd, axis, type)
+/**
+ *  Prints the axis position (left or right) and type (BAR or LINE) of a TBL line.
+ *  
+ *  @param [in] fd      FILE*     output stream
+ *  @param [in] axis    int       0 for left axis, right axis otherwise
+ *  @param [in] type    int       2 for BAR type, LINE type otherwise
+ *  @return             void
+ *  
+ */
+ 
+static void KT_grinfo(fd, axis, type)
 FILE *fd;
 char axis, type;
 {
@@ -447,12 +505,93 @@ char axis, type;
     else          fprintf(fd, " RAXIS ");
 
     if(type == 2) fprintf(fd, " GRBAR ");
-    else           fprintf(fd, " GRLINE ");
+    else          fprintf(fd, " GRLINE ");
 }
 
-KT_print_tbl(fd, tbl)
-FILE    *fd;
-TBL     *tbl;
+
+/**
+ *  Prints the axis (min or max, left or right) of the TBL.
+ *  
+ *  @param [in] fd      FILE*     output stream
+ *  @param [in] align   int       alignment keyword value
+ *  @return             void
+ *  
+ */
+ 
+static void KT_min(FILE* fd, char* str, float value)
+{
+    if(L_ISAN(value)) fprintf(fd, "\n%s %f ", str, value);
+}
+
+
+/**
+ *  Prints the font attribute and the alignement of a cell. 
+ *  
+ *  @param [in] fd      FILE*     output stream
+ *  @param [in] attr    int       cell alignment and font attribute
+ *  @return             void
+ *  
+ */
+static void KT_print_attr(FILE* fd, int attr)
+{
+    if(attr & KT_BOLD)      fprintf(fd, "BOLD ");
+    if(attr & KT_ITALIC)    fprintf(fd, "ITALIC ");
+    if(attr & KT_UNDERLINE) fprintf(fd, "UNDERLINE ");
+
+    if(attr & KT_CENTER)    fprintf(fd, "CENTER ");
+    if(attr & KT_DECIMAL)   fprintf(fd, "DECIMAL ");
+    if(attr & KT_LEFT)      fprintf(fd, "LEFT ");
+    if(attr & KT_RIGHT)     fprintf(fd, "RIGHT ");
+    return(0);
+}
+
+
+/**
+ *  Prints a table cell definition. 
+ *  
+ *  @param [in] fd      FILE*       output stream
+ *  @param [in] cell    TCELL*      cell to print
+ *  @return             void
+ *  
+ */
+static void KT_print_cell(FILE *fd, TCELL *cell)
+{
+    U_ch 		buf[2560]; // JMP 8/4/2015
+
+    if((cell->tc_val) == NULL) {
+        fprintf(fd, "\"\" ");
+        return;
+    }
+    switch(cell->tc_type) {
+        case KT_STRING :
+            //fprintf(fd, "\"%s\" ", cell->tc_val);
+            // JMP 8/4/2015 -> escape "
+            SCR_fprintf_esc(fd, cell->tc_val, 1);
+            fprintf(fd, " ");
+            break;
+
+        case KT_LEC :
+            fprintf(fd, "LEC \"%s\" ", (char *)P_get_ptr(cell->tc_val, 0));
+            break;
+        default :
+            fprintf(fd, "\"\" ");
+            break;
+    }
+    if(cell->tc_val[0] != '\0') 
+        KT_print_attr(fd, cell->tc_attr);
+}
+
+
+/**
+ *  Prints a TBL definition.
+ *  
+ *  @param [in] fd      FILE*     output stream
+ *  @param [in] tbl     TBL*      table to print
+ *  @return             void
+ *  
+ */
+
+static void KT_print_tbl(FILE* fd, TBL* tbl)
 {
     TCELL   *cell;
     int     i, j;
@@ -506,50 +645,51 @@ TBL     *tbl;
         }
     }
     fprintf(fd, "\n/* END OF TABLE */\n");
+}
+
+
+/**
+ *  Saves a KDB of TBLs into an ascii file (.at) or to the stdout.
+ *  
+ *  @see KT_load_asc() for the syntax of the ascii tables. 
+ *  
+ *  @param [in] kdb         KDB*    KDB of TBLs
+ *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
+ *  @return                 int     0 on success, -1 if the file cannot be written.
+ *  
+ */
+int KT_save_asc(KDB* kdb, char* filename)
+{
+    FILE    *fd;
+    TBL     *tbl;
+    int     i;
+
+    if(filename[0] == '-') fd = stdout;
+    else {
+        fd = fopen(filename, "w+");
+        if(fd == 0) {
+            kerror(0, "Cannot create '%s'", filename);
+            return(-1);
+        }
+    }
+
+    for(i = 0 ; i < KNB(kdb); i++) {
+        fprintf(fd, "%s {", KONAME(kdb, i));
+        tbl = KTVAL(kdb, i);
+        KT_print_tbl(fd, tbl);
+        fprintf(fd, "}\n");
+        T_free(tbl);
+    }
+
+    if(filename[0] != '-') fclose(fd);
     return(0);
 }
 
 
-void KT_print_cell(FILE *fd, TCELL *cell)
-{
-    U_ch 		buf[2560]; // JMP 8/4/2015
-
-    if((cell->tc_val) == NULL) {
-        fprintf(fd, "\"\" ");
-        return;
-    }
-    switch(cell->tc_type) {
-        case KT_STRING :
-            //fprintf(fd, "\"%s\" ", cell->tc_val);
-            // JMP 8/4/2015 -> escape "
-            SCR_fprintf_esc(fd, cell->tc_val, 1);
-            fprintf(fd, " ");
-            break;
-
-        case KT_LEC :
-            fprintf(fd, "LEC \"%s\" ", (char *)P_get_ptr(cell->tc_val, 0));
-            break;
-        default :
-            fprintf(fd, "\"\" ");
-            break;
-    }
-    if(cell->tc_val[0] != '\0') KT_print_attr(fd, cell->tc_attr);
-}
-
-KT_print_attr(fd, attr)
-FILE *fd;
-int attr;
-{
-    if(attr & KT_BOLD)      fprintf(fd, "BOLD ");
-    if(attr & KT_ITALIC)    fprintf(fd, "ITALIC ");
-    if(attr & KT_UNDERLINE) fprintf(fd, "UNDERLINE ");
-
-    if(attr & KT_CENTER)    fprintf(fd, "CENTER ");
-    if(attr & KT_DECIMAL)   fprintf(fd, "DECIMAL ");
-    if(attr & KT_LEFT)      fprintf(fd, "LEFT ");
-    if(attr & KT_RIGHT)     fprintf(fd, "RIGHT ");
-    return(0);
-}
+/* 
+ * Save a KDB of TBLs in a .csv file.
+ * NOT IMPLEMENTED.
+ */
 
 int KT_save_csv(KDB *kdb, char *filename)
 {
