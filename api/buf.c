@@ -1,6 +1,5 @@
 /**
- * @author Jean-Marc PAUL
- * @author Geert BRYON
+ * @header4iode
  *
  * Group of functions for managing one global buffer to avoid multiple 
  * reallocations thus limiting memory fragmentation.
