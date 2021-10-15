@@ -2,10 +2,10 @@
 
 ## Global Utilities
 
- - buf.c
- - pack.c
- - per.c
- - yy.c
+ - buf.c : share a large allocated buffer in different parts of the application
+ - pack.c : packing (serialize) and unpacking (deserialize) objects.
+ - per.c : functions for manipulating PERIOD and SAMPLE in IODE.
+ - yy.c : helper functions for reading and writing IODE ascii files.
 
 ### buf.c
 Functions to share and reuse a large allocated buffer in different parts of the application. 
@@ -60,6 +60,13 @@ Helper functions for reading and writing IODE ascii files.
     char* K_read_str(YYFILE* yy)
     PERIOD *K_read_per(YYFILE* yy)
     SAMPLE *K_read_smpl(YYFILE* yy)
+    int K_read_align(YYFILE* yy)
+
+    void K_stracpy(char** to, char* from)
+    int K_wrdef(FILE* fd, YYKEYS* table, int def)
+    int K_compare(YYKEYS* yy1, YYKEYS* yy2)
+    char *K_wrap(char *in, int lg)
+
 
 ## IODE Version
 ### k_vers.c
@@ -68,7 +75,7 @@ Functions to retrieve the current IODE versions.
     char *K_LastVersion() 
     char *K_CurrentVersion()_
 
-## WS and Objects management
+## Objects management
 
 ###  k_pack.c
 Functions for "packing" and "unpacking" IODE objects.
@@ -94,23 +101,87 @@ Functions for "packing" and "unpacking" IODE objects.
      int KS_alloc_scl()
      int KV_alloc_var(int nb)
 
+## WS management
+
 ### objs.c
-Function to manpulate WS
+Function to manipulate workspaces
 
 ###  k_ws.c
 
-### k_cccmt.c k_cceqs.c k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c_k_ccvar.c k_ccall.c_
+
+## IODE ascii format
+Functions to load and save files in IODE ascii format and LArray csv format.
+
+**Ascii filenames**
+ * .ac: comments
+ * .ae: equations
+ * .ai: identities
+ * .al: lists
+ * .as: scalars
+ * .at: tables
+ * .av: variables
+ * .csv: LArray variables
+
+### k_ccall.c
+Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV format.
+
+    KDB  *(*K_load_asc[])()
+    int (*K_save_asc[])()
+    int (*K_save_csv[])()
+
+### k_cceqs.c
+Loading and saving IODE ascii equation files.
+
+    KDB *KE_load_asc(char* filename)
+    int KE_save_asc(KDB* kdb, char* filename)
+    int KE_save_csv(KDB *kdb, char *filename) : not implemented 
+
+### k_ccidt.c 
+Loading and saving IODE ascii identity files.
+
+    KDB *KI_load_asc(char* filename)
+    int KI_save_asc(KDB* kdb, char* filename)
+    int KI_save_csv(KDB *kdb, char *filename)
+
+### k_cclst.c
+Loading and saving IODE ascii list files.
+
+    KDB *KL_load_asc(char* filename)
+    int KL_save_asc(KDB* kdb, char* filename)
+    int KL_save_csv(KDB *kdb, char *filename)
+
+### k_ccscl.c
+Loading and saving IODE ascii scalar files.
+
+    KDB *KS_load_asc(char* filename)
+    int KS_save_asc(KDB* kdb, char* filename)
+    int KS_save_csv(KDB *kdb, char *filename)
+
+### k_cctbl.c_
+Loading and saving IODE ascii table files.
+
+    KDB *KT_load_asc(char* filename)
+    int KT_save_asc(KDB* kdb, char* filename)
+    int KT_save_csv(KDB *kdb, char *filename)
+
+### k_ccvar.c
 Functions to import and export IODE files to/from ascii and LArray-csv format.
 
     KDB *KV_load_asc(char *filename)
     KV_save_asc(KDB* kdb, char* filename)
     int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
 
+
 ## LEC 
 
 ### k_lec.c
-Functions implementing the virtual functions of the LEC library for IODE objects.
+Implemention of the LEC library virtual functions for SCL and VAR references.
 
+    IODE_REAL *L_getvar(KDB* kdb, int pos)
+    IODE_REAL L_getscl(KDB* kdb, int pos)
+    SAMPLE *L_getsmpl(KDB* kdb)
+    int L_findscl(KDB* kdb, char *name)
+    int L_findvar(KDB* kdb, char* name)
 
 ## Estimation
 
