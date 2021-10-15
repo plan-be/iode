@@ -1,9 +1,99 @@
+/**
+ * @header4iode
+ * 
+ * Functions to load and save ascii definitions of IODE LST objects.
+ *
+ *      KDB *KL_load_asc(char* filename)
+ *      int KL_save_asc(KDB* kdb, char* filename)
+ *      int KL_save_csv(KDB *kdb, char *filename)
+ *
+ */
+
 #include "iode.h"
 
-/* Read ascii file and add to DB */
+/**
+ *  Reads on an open YY stream (file or string) the ascii definition of an IODE LST and adds the new LST to kdb. 
+ *  Subfn of KC_load_asc().
+ *  
+ *  Reads the next token on yy. 
+ *      If a string (between "") is found, its content becomes the new content of the LST named *name*.
+ *      If not, "" is stored in LST *name*
+ *  The content of the list is split in max 60-chars lines.
+ *  
+ *  All other tokens found between the definition and the next name are ignored.
+ *  
+ *  @param [in, out ]   kdb     KDB*    KDB of LST
+ *  @param [in, out]    yy      YYFILE* stream (file or string) to be read from
+ *  @param [in]         name    char*   LST name
+ *  @return                     int     0 if the LST is read and saved, 
+ *                                      -1 if the LST can't be created. (call to kerror() in that case)
+ *  
+ */
 
-KDB *KL_load_asc(filename)
-char    *filename;
+static int KL_read_lst(KDB* kdb, YYFILE* yy, char* name)
+{
+    int     i, keyw, pos;
+    char    *lst;
+
+    /* READ A STRING */
+    keyw = YY_lex(yy);
+    if(keyw == YY_STRING)  lst = K_wrap(yy->yy_text, 60);
+    else {
+        lst = SW_nalloc(1);
+        lst[0] = '\0';
+        YY_unread(yy);
+    }
+
+    /* CONTINUE READING UNTIL END OF VALUES */
+    while(1) {
+        keyw = YY_lex(yy);
+        if(keyw == YY_WORD || keyw == YY_EOF) break;
+    }
+    YY_unread(yy);
+
+    pos = K_add(kdb, name, lst);
+    if(pos < 0) {
+        kerror(0, "%s : unable to create %s", YY_error(yy), name);
+        SW_nfree(lst);
+        return(-1);
+    }
+
+    SW_nfree(lst);
+    return(0);
+}
+
+
+/**
+ *  Loads LSTs from an ASCII file into a new KDB.
+ *  
+ *  Syntax of LST ascii definitions 
+ *  -------------------------------
+ *      LSTNAME "list of values separated by space, comma or semi-colon"
+ *  
+ *  Example
+ *  -------
+ *      COPY "$COPY0;$COPY1;"
+ *      COPY0 "ACAF;ACAG;AOUC;AQC;BENEF;BQY;BVY;CGU;COEFON;COTRES;DPU;
+ *               DPUF;DPUG;DPUGO;DPUH;DPUU;DTF;DTH;DTH1;DTH1C;EXC;EXCC;FLF;
+ *               FLG;GAP;GOSF;GOSG;GOSH;GOSH_;IDF;IDG;IDH;IFU;IHU;IT;ITCEE"
+ *      COPY1 "VMAB;VME;VMK;VMN;VMS;VMT;VS;VS_;VX;VXAB;VXB;VXE;VXK;VXN;VXS;
+ *               VXT;WBF;WBF_;WBG;WBGO;WBGP;WBU;WBU_;WCF;WCF_;WDOM;WG;WIND"
+ *
+ *  Error messages are sent to the function kerror().
+ *  
+ *  For each read LST, kmsg() is called to send a message to the user. 
+ *  
+ *  The implementations of kerror() and kmsg() depend on the context (GUI, command line...).
+ *  
+ *  @param [in] filename    char*   name of the ascii file to be read or 
+ *                                  string containing the definition of the identities
+ *  @return                 KDB*    new KDB of LST or NULL on error
+ *  
+ *  TODO: what if KL_read_lst returns an error code ?
+ *  
+ */
+
+KDB *KL_load_asc(char* filename)
 {
     int     cmpt = 0;
     KDB     *kdb = 0;
@@ -48,44 +138,17 @@ err:
     return((KDB *)0);
 }
 
-KL_read_lst(kdb, yy, name)
-KDB   *kdb;
-YYFILE  *yy;
-char    *name;
-{
-    int     i, keyw, pos;
-    char    *lst;
-
-    /* READ A STRING */
-    keyw = YY_lex(yy);
-    if(keyw == YY_STRING)  lst = K_wrap(yy->yy_text, 60);
-    else {
-        lst = SW_nalloc(1);
-        lst[0] = '\0';
-        YY_unread(yy);
-    }
-
-    /* CONTINUE READING UNTIL END OF VALUES */
-    while(1) {
-        keyw = YY_lex(yy);
-        if(keyw == YY_WORD || keyw == YY_EOF) break;
-    }
-    YY_unread(yy);
-
-    pos = K_add(kdb, name, lst);
-    if(pos < 0) {
-        kerror(0, "%s : unable to create %s", YY_error(yy), name);
-        SW_nfree(lst);
-        return(-1);
-    }
-
-    SW_nfree(lst);
-    return(0);
-}
-
-KL_save_asc(kdb, filename)
-KDB   *kdb;
-char  *filename;
+/**
+ *  Saves a KDB of LSTs in an ascii file (.al) or to the stdout.
+ *  
+ *  @see KL_load_asc() for the syntax. 
+ *  
+ *  @param [in] kdb         KDB*    KDB of LSTs
+ *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
+ *  @return                 int     0 on success, -1 if the file cannot be written.
+ *  
+ */
+int KL_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i, j;
@@ -112,6 +175,10 @@ char  *filename;
     return(0);
 }
 
+/* 
+ * Save a KDB of LSTs in a .csv file.
+ * NOT IMPLEMENTED.
+ */
 
 int KL_save_csv(KDB *kdb, char *filename)
 {
