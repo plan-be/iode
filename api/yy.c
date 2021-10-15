@@ -8,6 +8,8 @@
  *    char* K_read_str(YYFILE* yy)
  *    PERIOD *K_read_per(YYFILE* yy)
  *    SAMPLE *K_read_smpl(YYFILE* yy)
+ *    int K_read_align(YYFILE* yy)
+ *  
  *    void K_stracpy(char** to, char* from)
  *    int K_wrdef(FILE* fd, YYKEYS* table, int def)
  *    int K_compare(YYKEYS* yy1, YYKEYS* yy2)
