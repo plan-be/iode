@@ -1,9 +1,44 @@
+/**
+ * @header4iode 
+ 
+ * Functions to load and save ascii definitions of IODE IDT objects.
+ * 
+ *     KDB *KI_load_asc(char* filename)
+ *     int KI_save_asc(KDB* kdb, char* filename)
+ *     int KI_save_csv(KDB *kdb, char *filename)
+ *  
+ */
+
 #include "iode.h"
 
-/* Read ascii file and add to DBIDT */
+/**
+ *  Loads IDTs from an ASCII file into a new KDB.
+ *  
+ *  Syntax of IDT ascii definitions 
+ *  -------------------------------
+ *      IDTNAME "<valid lec expression>"
+ *  
+ *  Example
+ *  -------
+ *      
+ *      AOUC    "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]"
+ *      AOUC_   "exp(ln(((WCF/NFYH)/QL)+PKF/(QAFF/KNFFY))*(QAFF/(QX+QAFF)+.05)[-1]+
+ *                  ln PM*(QM/(QAFF+QM)-0.05)[-1])"
+ *  
+ *  Error messages are sent to the function kerror().
+ *  For each read CMT, kmsg() is called to send a message to the user. 
+ *  
+ *  The implementations of kerror() and kmsg() depend on the context (GUI, command line...).
+ *  
+ *  @param [in] filename    char*   name of the ascii file to be read or 
+ *                                  string containing the definition of the identities
+ *  @return                 KDB*    new KDB of IDT or NULL on error
+ *  
+ *  TODO: what if KC_read_cmt returns an error code ?
+ *  
+ */
 
-KDB *KI_load_asc(filename)
-char    *filename;
+KDB *KI_load_asc(char* filename)
 {
     char    *lec = NULL;
     int     cmpt = 0;
@@ -56,10 +91,18 @@ err:
     return((KDB *)0);
 }
 
+/**
+ *  Saves a KDB of IDTs into an ascii file (.ac) or to the stdout.
+ *  
+ *  @see KI_load_asc() for the syntax. 
+ *  
+ *  @param [in] kdb         KDB*    KDB of IDTs
+ *  @param [in] filename    char*   name of the output file or "-" to write the result on the stdout.
+ *  @return                 int     0 on success, -1 if the file cannot be written.
+ *  
+ */
 
-KI_save_asc(kdb, filename)
-KDB   *kdb;
-char    *filename;
+int KI_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i;
@@ -82,6 +125,10 @@ char    *filename;
     return(0);
 }
 
+/* 
+ * Save a KDB of IDTs in a .csv file.
+ * NOT IMPLEMENTED.
+ */
 
 int KI_save_csv(KDB *kdb, char *filename)
 {
