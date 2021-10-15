@@ -1,6 +1,5 @@
 /**
- * @author Jean-Marc PAUL 
- * @author Geert BRYON
+ * @header4iode
  * 
  * Functions to load and save ascii and csv definitions of IODE VAR objects.
  *
@@ -24,6 +23,50 @@ YYKEYS KV_TABLE[] = {
 
 
 /**
+ *  Reads one series on the stream YY. Subfunction of KV_load_yy().
+ 
+ *  The series is read until the next token is neither a number nor the token "na" (not a number).
+ *  The missing values till the end of the sample are fixed to na.
+ *  
+ *  @param [in, out] kdb    KDB*    KDB of vars
+ *  @param [in, out] yy     YY*     open stream 
+ *  @param [in]      name   char*   name of the variable that will be read .
+ *  @return                 int     0 on success, -1 if the var <name> cannot be created.
+ *  
+ */
+static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
+{
+    int     i, keyw, pos, nb;
+    IODE_REAL    *vec;
+    SAMPLE  *smpl;
+
+    smpl = (SAMPLE *) KDATA(kdb);
+    vec = (IODE_REAL *) SW_nalloc(smpl->s_nb * sizeof(IODE_REAL));
+
+    /* READ AT MOST nobs OBSERVATIONS */
+    for(i = 0; i < smpl->s_nb; i++)  vec[i] = K_read_real(yy);
+
+    /* CONTINUE READING UNTIL END OF VALUES */
+    while(1) {
+        keyw = YY_lex(yy);
+        if((keyw == YY_WORD && strcmp(yy->yy_text, "na")) || keyw == YY_EOF) break;
+    }
+    YY_unread(yy);
+
+    nb = smpl->s_nb;
+    pos = K_add(kdb, name, vec, &nb);
+    if(pos < 0) {
+        kerror(0, "%s : unable to create %s", YY_error(yy), name);
+        SW_nfree(vec);
+        return(-1);
+    }
+
+    SW_nfree(vec);
+    return(0);
+}
+
+
+/**
  *  Subfn of KV_load_asc().
  *  Reads ascii definitions of IODE variables from an opened YY stream and returns a new KDB*. 
  *  
@@ -37,7 +80,7 @@ YYKEYS KV_TABLE[] = {
  *  @return                     KDB*    a new KDB of IODE vars or NULL on error
  *  
  */
-KDB *KV_load_yy(YYFILE* yy, int ask)
+static KDB *KV_load_yy(YYFILE* yy, int ask)
 {
     KDB     *kdb = 0;
     int     nb, nobs, cmpt = 0;
@@ -162,46 +205,23 @@ KDB *KV_load_asc(char *filename)
 
 
 /**
- *  Reads one series on the stream YY. Subfunction of KV_load_yy().
- 
- *  The series is read until the next token is neither a number nor the token "na" (not a number).
- *  The missing values till the end of the sample are fixed to na.
+ *  Prints the representation of one value on fd. For NaN value, prints "na". 
  *  
- *  @param [in, out] kdb    KDB*    KDB of vars
- *  @param [in, out] yy     YY*     open stream 
- *  @param [in]      name   char*   name of the variable that will be read .
- *  @return                 int     0 on success, -1 if the var <name> cannot be created.
+ *  @param [in, out]    fd      FILE *      output stream    
+ *  @param [in]         val     IODE_REAL   value to print  
+ *  @return 
  *  
  */
-KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
+static void KV_print_val(FILE* fd, IODE_REAL val)
 {
-    int     i, keyw, pos, nb;
-    IODE_REAL    *vec;
-    SAMPLE  *smpl;
-
-    smpl = (SAMPLE *) KDATA(kdb);
-    vec = (IODE_REAL *) SW_nalloc(smpl->s_nb * sizeof(IODE_REAL));
-
-    /* READ AT MOST nobs OBSERVATIONS */
-    for(i = 0; i < smpl->s_nb; i++)  vec[i] = K_read_real(yy);
-
-    /* CONTINUE READING UNTIL END OF VALUES */
-    while(1) {
-        keyw = YY_lex(yy);
-        if((keyw == YY_WORD && strcmp(yy->yy_text, "na")) || keyw == YY_EOF) break;
-    }
-    YY_unread(yy);
-
-    nb = smpl->s_nb;
-    pos = K_add(kdb, name, vec, &nb);
-    if(pos < 0) {
-        kerror(0, "%s : unable to create %s", YY_error(yy), name);
-        SW_nfree(vec);
-        return(-1);
-    }
-
-    SW_nfree(vec);
-    return(0);
+    if(L_ISAN(val))
+#ifdef REALD
+        fprintf(fd, "%.15lg ", (double)(val)); /* JMP 09-04-98 */
+#else
+        fprintf(fd, "%.8lg ", (double)(val)); /* JMP 09-04-98 */
+#endif
+    else
+        fprintf(fd, "na ");
 }
 
 
@@ -245,27 +265,6 @@ int KV_save_asc(KDB* kdb, char* filename)
 }
 
 
-/**
- *  Prints the representation of one value on fd. For NaN value, prints "na". 
- *  
- *  @param [in, out]    fd      FILE *      output stream    
- *  @param [in]         val     IODE_REAL   value to print  
- *  @return 
- *  
- */
-KV_print_val(FILE* fd, IODE_REAL val)
-{
-    if(L_ISAN(val))
-#ifdef REALD
-        fprintf(fd, "%.15lg ", (double)(val)); /* JMP 09-04-98 */
-#else
-        fprintf(fd, "%.8lg ", (double)(val)); /* JMP 09-04-98 */
-#endif
-    else
-        fprintf(fd, "na ");
-
-    return(0);
-}
 
 /* --------------- CSV Files -------------------- */
 
