@@ -15,10 +15,14 @@ public:
 private:
 	QVariant dataCell(const int row, const int col) const
 	{
-		if (col == 0)
-			return QVariant(QString::fromLatin1(iodeItems.getObjectName(row)));
-		else
-			return QVariant(QString::fromLatin1(iodeItems.getObjectValue(row)));
+        if (col == 0)
+        {
+            return QVariant(QString(iodeItems.getObjectName(row)));
+        }
+        else
+        {
+            return QVariant(QString(iodeItems.getObjectValue(row)));
+        }
 	}
 
 public slots:
