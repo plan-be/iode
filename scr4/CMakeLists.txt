@@ -1,9 +1,6 @@
 ﻿# CMakeList.txt : CMake project for scr4, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.16)
-
-project ("scr4")
 
 # Header files
 set (HEADER_IODE 
@@ -65,5 +62,3 @@ add_library (scr4iode STATIC ${HEADER_IODE} ${SCR_IODE})
 add_compile_options(-Zi -Zp1)
 add_compile_definitions(DOS VC WINDOWS_IGNORE_PACKING_MISMATCH WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
 target_include_directories (scr4iode PUBLIC ".")
-
-# TODO: Add tests and install targets if needed.

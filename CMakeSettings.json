@@ -5,8 +5,8 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\..\\Debug\\x64\\api",
-      "installRoot": "${projectDir}\\..\\Debug\\x64\\api\\install",
+      "buildRoot": "${projectDir}\\out\\Debug\\x64",
+      "installRoot": "${projectDir}\\out\\Debug\\x64\\install",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": ""
@@ -16,8 +16,8 @@
       "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\..\\Release\\x64\\api",
-      "installRoot": "${projectDir}\\..\\Release\\x64\\api\\install",
+      "buildRoot": "${projectDir}\\out\\Release\\x64",
+      "installRoot": "${projectDir}\\out\\Release\\x64\\install",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": ""
