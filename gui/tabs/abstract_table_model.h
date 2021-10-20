@@ -5,6 +5,7 @@
 #include <QString>
 #include <QVariant>
 #include <QModelIndex>
+#include <QMessageBox>
 #include <QAbstractTableModel>
 
 #include "../utils.h"
@@ -83,8 +84,7 @@ public:
 	{
 		if (index.isValid() && role == Qt::EditRole) 
 		{
-
-			bool success = setDataCcell(index.row(), index.column(), value);
+			bool success = setDataCell(index.row(), index.column(), value);
 			if (success)
 			{
 				emit dataChanged(index, index, { role });
@@ -109,5 +109,35 @@ protected:
 	}
 
 	virtual QVariant dataCell(const int row, const int col) const = 0;
-	bool setDataCcell(const int row, const int column, const QVariant& value) { return false; }
+
+	bool setName(const int row, const QString& new_name)
+	{
+		try
+		{
+			char* char_new_name = new char[new_name.size() + 1];
+			strcpy(char_new_name, new_name.toUtf8().data());
+			int pos = iodeItems.setObjectName(row, char_new_name);
+			delete[] char_new_name;
+			return true;
+		}
+		catch (const std::runtime_error& e)
+		{
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+			return false;
+		}
+	}
+
+	bool setValue(const int row, const int column, const QVariant& value) { return false; }
+
+	bool setDataCell(const int row, const int column, const QVariant& value) 
+	{
+		if (column == 0)
+		{
+			return setName(row, value.toString());
+		}
+		else
+		{
+			return setValue(row, column, value);
+		}
+	}
 };

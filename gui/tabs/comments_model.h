@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QMessageBox>
 
 #include "abstract_table_model.h"
 

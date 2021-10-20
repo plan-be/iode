@@ -16,9 +16,9 @@ private:
 	QVariant dataCell(const int row, const int col) const
 	{
 		if (col == 0)
-			return QVariant(QString::fromLatin1(iodeItems.getObjectName(row)));
+			return QVariant(QString(iodeItems.getObjectName(row)));
 		else
-			return QVariant(QString::fromLatin1(iodeItems.getObjectValue(row)));
+			return QVariant(QString(iodeItems.getObjectValue(row)));
 	}
 
 public slots:

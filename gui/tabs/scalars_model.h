@@ -21,7 +21,7 @@ private:
 		switch (col)
 		{
 		case 0:
-			value = QString::fromLatin1(iodeItems.getObjectName(row));
+			value = QString(iodeItems.getObjectName(row));
 			break;
 		case 1:
 			value = L_ISAN(scalar->val) ? QString::number(scalar->val, 'g', 3) : NAN_REP;

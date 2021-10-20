@@ -18,10 +18,12 @@ private:
 		int mode = 0;
 		IODE_REAL var;
 
-		if (col == 0) {
-			return QVariant(QString::fromLatin1(iodeItems.getObjectName(row)));
+		if (col == 0) 
+		{
+			return QVariant(QString(iodeItems.getObjectName(row)));
 		}
-		else {
+		else 
+		{
 			var = iodeItems.getValue(row, col - 1, mode);
 			return L_ISAN(var) ? QString::number(var, 'g', 3) : NAN_REP;
 		}
