@@ -138,49 +138,102 @@ template <class T> class AbstractIODEObjects
 {
 protected:
     EnumIodeType type;
+    std::string type_name;
+
+protected:
+    KDB* getKDB() const
+    {
+        KDB* kdb = K_WS[type];
+        if (kdb == NULL) throw std::runtime_error("There is currently no " + type_name + " in memory.");
+        return kdb;
+    }
+
+    KOBJ getObject(const int pos) const
+    {
+        KDB* kdb = getKDB();
+        int nb_objs = count();
+        if (pos < 0 || pos > nb_objs) throw std::runtime_error(type_name + " at position " + std::to_string(pos) + " does not exist.");
+        return kdb->k_objs[pos];
+    }
+
+    int getPosition(const char* name) const
+    {
+        KDB* kdb = getKDB();
+        int pos = K_find(kdb, name);
+        if (pos < 0) throw std::runtime_error(type_name + " with name " + name + " does not exist.");
+        return pos;
+    }
 
 public:
-    AbstractIODEObjects(EnumIodeType type) : type(type) {};
-
-    KDB* kdb() const { return K_WS[type]; };
-
-    int getIODEType() const { return type; };
-
-    const char* getIODETypeName() { return qPrintable(qmapIodeTypes.keys(type)[0]); };
-
-    int count() const
+    AbstractIODEObjects(EnumIodeType type) : type(type) 
     {
-        if (K_WS[type] != NULL) {
-            return K_WS[type]->k_nb;
-        }
-        else {
-            return 0;
-        }
-    };
+        type_name = qmapIodeTypes.keys(type)[0].toStdString();
+    }
 
-    char* getObjectName(int pos) const
+    int getIODEType() const { return type; }
+
+    int count() const { return K_WS[type] != NULL ? K_WS[type]->k_nb : 0; }
+
+    char* getObjectName(const int pos) const
     {
-        if (K_WS[type] != NULL) {
-            return const_cast<char*>(K_WS[type]->k_objs[pos].o_name);
+        KOBJ obj = getObject(pos);
+        char* name = convert_oem_to_utf8(obj.o_name);
+        return name;
+    }
+
+    // Do not set const char* new_name because of K_ren definition
+    int setObjectName(const int pos, char* new_name)
+    {
+        // TODO : convert new_name to CP 437 ?
+        //        OR check with regex if no special characters except _ + no space + does not start with a number
+        char* old_name = getObjectName(pos);
+        renameObject(old_name, new_name);
+        return pos;
+    }
+
+    // Do not set const char* old/new_name because of K_ren definition
+    int renameObject(char* old_name, char* new_name)
+    {
+        // TODO : convert new_name to CP 437 ?
+        //        OR check with regex if no special characters except _ + no space + does not start with a number
+        if (strlen(new_name) > 20) throw std::runtime_error("Iode names cannot exceed 20 characters." + std::string(new_name) + " : " + std::to_string(strlen(new_name)));
+        KDB* kdb = getKDB();
+        int pos = K_ren(kdb, old_name, new_name);
+        // see K_ren documentation
+        if (pos < 0) 
+        {
+            std::string msg = type_name + " cannot be renamed as " + new_name + ".";
+            if (pos == -1) throw std::runtime_error(std::string("Name ") + old_name + " does not exist.\n" + msg);
+            else if (pos == -2) throw std::runtime_error(type_name + " with name " + new_name + " already exist.\n" + msg);
+            else throw std::runtime_error("Something went wrong.\n" + msg);
         }
-        else {
+        return pos;
+    }
+
+    virtual T* getObjectValue(const int pos) const = 0;
+
+    T* getObjectValueByName(const char* name) const
+    {
+        int pos = getPosition(name);
+        if (pos >= 0)
+        {
+            T* value = getObjectValue(pos);
+            return value;
+        }
+        else
+        {
             return NULL;
-        }
-    };
-
-    virtual T* getObjectValue(int pos) const = 0;
-
-    // TODO: implement this method
-    //virtual T& getObjectValueByName(char* name) const = 0;
+        }  
+    }
 
     // TODO : implement this method
-    //virtual void setObjectValue(T& value, int pos) const = 0;
+    // virtual void setObjectValue(const T* value, const int pos) const = 0;
 
     // TODO : overload subscript operator 
-    //T& operator[](char* name) { ... }
+    //T& operator[](cosnt char* name) { ... }
 
     // TODO : overload subscript operator 
-    //T& operator[](int pos) { ... }
+    //T& operator[](const int pos) { ... }
 };
 
 
@@ -189,11 +242,11 @@ class Comments : public AbstractIODEObjects<Comment>
 public:
     Comments() : AbstractIODEObjects(COMMENTS) {};
 
-    Comment* getObjectValue(int pos) const { 
-        char* oem = K_oval0(kdb(), pos);
+    Comment* getObjectValue(const int pos) const { 
+        char* oem = K_oval0(getKDB(), pos);
         char* comment = convert_oem_to_utf8(oem);
         return comment;
-    };
+    }
 };
 
 
@@ -203,9 +256,9 @@ public:
     Equations() : AbstractIODEObjects(EQUATIONS) {};
 
     // TODO: create a Class Equation (with a destructor)
-    Equation* getObjectValue(int pos) const { return NULL; };
+    Equation* getObjectValue(const int pos) const { return NULL; }
 
-    char* getLec(int pos) const { return KELEC(kdb(), pos); }
+    char* getLec(const int pos) const { return KELEC(getKDB(), pos); }
 };
 
 
@@ -214,18 +267,18 @@ class Identities : public AbstractIODEObjects<Identity>
 public:
     Identities() : AbstractIODEObjects(IDENTITIES) {};
 
-    Identity* getObjectValue(int pos) const { return NULL; };
+    Identity* getObjectValue(const int pos) const { return NULL; }
 
-    char* getLec(int pos) const { return KILEC(kdb(), pos); };
+    char* getLec(const int pos) const { return KILEC(getKDB(), pos); }
 };
 
 
 class Lists : public AbstractIODEObjects<List>
 {
 public:
-    Lists() : AbstractIODEObjects(LISTS) {};
+    Lists() : AbstractIODEObjects(LISTS) {}
 
-    List* getObjectValue(int pos) const { return K_oval0(kdb(), pos); };
+    List* getObjectValue(const int pos) const { return K_oval0(getKDB(), pos); }
 };
 
 
@@ -234,7 +287,7 @@ class Scalars : public AbstractIODEObjects<Scalar>
 public:
     Scalars() : AbstractIODEObjects(SCALARS) {};
 
-    Scalar* getObjectValue(int pos) const { return KSVAL(kdb(), pos); };
+    Scalar* getObjectValue(const int pos) const { return KSVAL(getKDB(), pos); }
 };
 
 
@@ -244,11 +297,11 @@ public:
     Tables() : AbstractIODEObjects(TABLES) {};
 
     // TODO: create a Class Table (with a destructor)
-    Table* getObjectValue(int pos) const { return NULL; };
+    Table* getObjectValue(const int pos) const { return NULL; }
 
-    char* getTitle(int pos) const
+    char* getTitle(const int pos) const
     {
-        Table* table = KTVAL(kdb(), pos);
+        Table* table = KTVAL(getKDB(), pos);
         char* title_oem = (char*)T_get_title(table);
         char* title = convert_oem_to_utf8(title_oem);
         T_free(table);
@@ -263,18 +316,22 @@ public:
     Variables() : AbstractIODEObjects(VARIABLES) {};
 
     // TODO: not tested yet
-    Variable* getObjectValue(int pos) const
+    Variable* getObjectValue(const int pos) const
     {
-        return (Variable*)SW_getptr(kdb()->k_objs[pos].o_val);
-    };
+        KOBJ obj = getObject(pos);
+        return (Variable*)SW_getptr(obj.o_val);
+    }
 
-    IODE_REAL getValue(int pos, int t, int mode) const { return KV_get(kdb(), pos, t, mode); };
+    IODE_REAL getValue(const int pos, const int t, const int mode) const 
+    { 
+        return KV_get(getKDB(), pos, t, mode); 
+    }
 
-    int getNbPeriods() const { return KSMPL(kdb())->s_nb; }
+    int getNbPeriods() const { return KSMPL(getKDB())->s_nb; }
 
-    void getPeriod(char* period, int t) const
+    void getPeriod(char* period, const int t) const
     {
-        PER_pertoa(PER_addper(&(KSMPL(kdb())->s_p1), t), period);
+        PER_pertoa(PER_addper(&(KSMPL(getKDB())->s_p1), t), period);
     }
 };
 
