@@ -1,6 +1,5 @@
 /**
- * @author Jean-Marc PAUL 
- * @author Geert BRYON
+ * @header4iode
  * 
  * Functions for manipulating PERIOD and SAMPLE in IODE.
  *
@@ -20,15 +19,15 @@
  * 
  *      char *PER_pertoa(per, text): creates a text representation of a PERIOD.
  *      PERIOD *PER_atoper(char *text): translates a text in a PERIOD.
- *      char *PER_smpltoa(SAMPLE* smpl, char* text)
- *      SAMPLE *PER_atosmpl(char* a1, char* a2): creates a SAMPLE based on two given PERIOD strings.
- *      SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2):
+ *      char *PER_smpltoa(SAMPLE* smpl, char* text) : writes a SAMPLE in a string
+ *      SAMPLE *PER_atosmpl(char* a1, char* a2): creates a SAMPLE based on two strings containing PERIODs.
+ *      SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2): returns a new allocated SAMPLE build on two given PERIOD.
  * 
  * Miscellaneous functions 
  * 
  *      int PER_nb(int ch): gives the nbr of periods in one year for the periodicity ch
- *      int PER_nbper(PERIOD* period)
- *      IODE_REAL PER_per2real(PERIOD* from, int i)
+ *      int PER_nbper(PERIOD* period): retrieves the number of periods in one year in a period.
+ *      IODE_REAL PER_per2real(PERIOD* from, int i): adds a number of sub-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).
  * 
  */
 
@@ -37,17 +36,21 @@
 /**
  *  Variables for period definitions: 
  *      L_PERIOD_CH : list of valid periodicities :
- *          Y = Year
- *          S = Half-Year
- *          ...
- *      L_PERIOD_NB : number of period in 1 year for each periodicity (oin the same defn order).
+ *          Y = Yearly
+ *          S = Half-Yearly
+ *          Q = Quaterly
+ *          M = Monthly
+ *          W = Weekly
+ *          D = Daily
+ *         
+ *      L_PERIOD_NB : number of periods in 1 year for each periodicity (in the same defn order).
  */
 
 char    L_PERIOD_CH[] = "YSQMWD";
 int     L_PERIOD_NB[] = {1, 2, 4, 12, 52, 365};
   
 /**
- *  Compute position of ch in string str.
+ *  Compute position of character ch in string str.
  *  
  *  @param [in] str char * string to be analyzed
  *  @param [in] ch  character search
@@ -120,6 +123,7 @@ int PER_diff_per(PERIOD *p1, PERIOD *p2)
  *  @note As the result is a static variable, its value is only valid until the next call to PER_addper().
  *  
  *  @param [in] period  PERIOD* First period
+ *  @param [in] shift   in      number of sub-periods to add to period
  *  @return             PERIOD* Pointer to a static PERIOD struct.
  *  
  */
@@ -158,9 +162,7 @@ PERIOD  *PER_addper(PERIOD *period, int shift)
  *  @return                     char * same as text
  *  
  */
-char *PER_pertoa(per, text)
-PERIOD  *per;
-char    *text;
+char *PER_pertoa(PERIOD* per, char* text)
 {
     static char buf[10];
 
@@ -304,7 +306,7 @@ err:
 }
 
 /**
- *  @brief Returns a new allocated SAMPLE build on two given PERIOD.
+ *  Returns a new allocated SAMPLE build on two given PERIOD.
  *  
  *  @param [in] p1 PERIOD* period 1. Must be <= period 2.
  *  @param [in] p2 PERIOD* period 2.
@@ -337,7 +339,7 @@ fin:
 */
 
 /**
- *  @brief Write a SAMPLE in a string.
+ *  Writes a SAMPLE in a string.
  *  
  *  @param [in]     smpl SAMPLE*    pointer to the sample to print
  *  @param [out]    text char*      pointer to the result
@@ -354,7 +356,7 @@ char *PER_smpltoa(SAMPLE* smpl, char* text)
 }
 
 /**
- *  @brief Retrieve the number of period in one year in a period.
+ *  Retrieves the number of periods in one year in a period.
  *  
  *  @param [in] period  PERIOD*  Period to analyse.
  *  @return             int      Nb of sub period in 1 year or 0 if period is NULL
