@@ -1,6 +1,16 @@
-# IODE functions by source file
+# IODE functions by group
 
-## Global Utilities
+Note on function names: as C does not allow "namespacing", we always give prefixes to function names, the prefix giving
+an indication of the group to which the function belongs. For example, P*() is the group of function for "packing" (aka serializing) 
+IODE objects, PER*() for manipulating PERIOD etc.
+
+Most of the filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
+
+ - k*: basic functions legacy of the "Kaa" software
+ - ... to be continued...
+
+
+## Group "Global Utilities"
 
  - buf.c : share a large allocated buffer in different parts of the application
  - pack.c : packing (serialize) and unpacking (deserialize) objects.
@@ -11,23 +21,24 @@
 Functions to share and reuse a large allocated buffer in different parts of the application. 
 
     char *BUF_alloc(int len) :  allocates or extends a global buffer of at least len bytes. 
-    void BUF_free() : free the buffer
-    void BUF_lock() : reserve the buffer utilisation
-    void BUF_unlock() : unlock the buffer
-    char *BUF_memcpy(char *ptr, int lg) : copy the the first lg bytes following address ptr to the buffer
-    char *BUF_strcpy(char *ptr) : copy a null terminated string to the buffer
+    void BUF_free() : frees the buffer
+    void BUF_lock() : reserves the buffer utilisation
+    void BUF_unlock() : unlocks the buffer
+    char *BUF_memcpy(char *ptr, int lg) : copies the the first lg bytes following address ptr to the buffer
+    char *BUF_strcpy(char *ptr) : copies a null terminated string to the buffer
+
     char *BUF_DATA : NULL or pointer to the allocated buffer
 
 ### pack.c
 Packing (serialize) and unpacking (deserialize) objects. 
 
-    void *P_create()
-    int P_free(char *ptr)
-    void *P_add(void *vptr1, void *vptr2, int lg)
-    void *P_get_ptr(void *vptr, int i)
-    OSIZE P_get_len(void *vptr, int i)
-    void *P_alloc_get_ptr(void *ptr, int p)
-    int P_nb(char *ptr)
+    void *P_create() : creates (allocated) a new pack object
+    int P_free(char *ptr) : frees a pack object
+    void *P_add(void *vptr1, void *vptr2, int lg) : appends to the pack pointed to by vptr1 the content pointed to by vptr2 which has a length of lg bytes. 
+    void *P_get_ptr(void *vptr, int i) : retrieves the pointer to the i'th element of a pack.
+    OSIZE P_get_len(void *vptr, int i) : retrieves the length (in bytes) of the i'th element of a pack or the length of the full pack if i < 0.
+    void *P_alloc_get_ptr(void *ptr, int p) : allocates space for the p'th element of a pack. Copies the pth element in the allocated space.
+    int P_nb(char *ptr) : retrieves the number of elements in the pack pointed to by ptr.
 
 ### per.c
 Functions for manipulating PERIOD and SAMPLE in IODE.
@@ -42,15 +53,16 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 
     char *PER_pertoa(per, text): creates a text representation of a PERIOD.
     PERIOD *PER_atoper(char *text): translates a text in a PERIOD.
-    char *PER_smpltoa(SAMPLE* smpl, char* text)
-    SAMPLE *PER_atosmpl(char* a1, char* a2): creates a SAMPLE based on two given PERIOD strings.
-    SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2):
+    char *PER_smpltoa(SAMPLE* smpl, char* text): writes a SAMPLE in a string.
+    SAMPLE *PER_atosmpl(char* a1, char* a2): creates a SAMPLE based on two strings containing PERIODs.
+    SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2): returns a new allocated SAMPLE build on two given PERIOD.
 
 ###### Miscellaneous functions 
 
     int PER_nb(int ch): gives the nbr of periods in one year for the periodicity ch
-    int PER_nbper(PERIOD* period)
-    IODE_REAL PER_per2real(PERIOD* from, int i)
+    int PER_nbper(PERIOD* period): retrieves the number of periods in one year in a period
+    IODE_REAL PER_per2real(PERIOD* from, int i): adds a number of sub-periods to a PERIOD and returns a 
+        numerical representation of the result (used mainly for tables and graphs formatting).
 
 ### yy.c
 Helper functions for reading and writing IODE ascii files.
@@ -68,14 +80,15 @@ Helper functions for reading and writing IODE ascii files.
     char *K_wrap(char *in, int lg)
 
 
-## IODE Version
+## Group "IODE Version"
 ### k_vers.c
 Functions to retrieve the current IODE versions.
 
     char *K_LastVersion() 
     char *K_CurrentVersion()_
 
-## Objects management
+
+## Group "Object management"
 
 ###  k_pack.c
 Functions for "packing" and "unpacking" IODE objects.
@@ -96,12 +109,12 @@ Functions for "packing" and "unpacking" IODE objects.
      TBL* K_tunpack(char *pack)
      EQ* K_eunpack(char *pack)
 
-###### Allocation functions (VAR & SCL only)
+###### Allocation functions (SCL & VAR only)
 
      int KS_alloc_scl()
      int KV_alloc_var(int nb)
 
-## WS management
+## Group "WS management"
 
 ### objs.c
 Function to manipulate workspaces
