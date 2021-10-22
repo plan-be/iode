@@ -13,7 +13,6 @@ set (SOURCES
 		${CCS}
 		k_lec.c 
 		b_dir.c 
-		DESCRIPTION.md
 )
 
 set (HEADERS 
