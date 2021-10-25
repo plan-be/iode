@@ -184,8 +184,6 @@ public:
     // Do not set const char* new_name because of K_ren definition
     int setObjectName(const int pos, char* new_name)
     {
-        // TODO : convert new_name to CP 437 ?
-        //        OR check with regex if no special characters except _ + no space + does not start with a number
         char* old_name = getObjectName(pos);
         renameObject(old_name, new_name);
         return pos;
@@ -194,8 +192,6 @@ public:
     // Do not set const char* old/new_name because of K_ren definition
     int renameObject(char* old_name, char* new_name)
     {
-        // TODO : convert new_name to CP 437 ?
-        //        OR check with regex if no special characters except _ + no space + does not start with a number
         if (strlen(new_name) > 20) throw std::runtime_error("Iode names cannot exceed 20 characters." + std::string(new_name) + " : " + std::to_string(strlen(new_name)));
         KDB* kdb = getKDB();
         int pos = K_ren(kdb, old_name, new_name);
