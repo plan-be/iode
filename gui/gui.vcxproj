@@ -163,6 +163,7 @@
     <ClInclude Include="wrapper_classes.h" />
     <QtMoc Include="custom_widgets\qfilechooser.h" />
     <QtMoc Include="custom_widgets\qsampleedit.h" />
+	<QtMoc Include="tabs\object_name_delegate.h" />
     <ClInclude Include="tabs\abstract_table_model.h" />
     <ClInclude Include="tabs\abstract_table_view.h" />
     <QtMoc Include="tabs\comments_model.h" />

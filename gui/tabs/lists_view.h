@@ -11,5 +11,5 @@ class ListsView : public AbstractTableView<ListsModel>
 	Q_OBJECT
 
 public:
-	ListsView(QWidget* parent = nullptr) : AbstractTableView(parent) {};
+	ListsView(QWidget* parent = nullptr) : AbstractTableView(LISTS, parent) {};
 };
