@@ -141,6 +141,9 @@
     <QtMoc Include="tabs\comments_model.h">
       <Filter>Header Files\model</Filter>
     </QtMoc>
+	<QtMoc Include="tabs\object_name_delegate.h">
+      <Filter>Header Files\view</Filter>
+    </QtMoc>
     <QtMoc Include="custom_widgets\qfilechooser.h">
       <Filter>Header Files\custom_widgets</Filter>
     </QtMoc>

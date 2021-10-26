@@ -11,5 +11,5 @@ class IdentitiesView : public AbstractTableView<IdentitiesModel>
 	Q_OBJECT
 
 public:
-	IdentitiesView(QWidget* parent = nullptr) : AbstractTableView(parent) {};
+	IdentitiesView(QWidget* parent = nullptr) : AbstractTableView(IDENTITIES, parent) {};
 };

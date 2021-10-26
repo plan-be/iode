@@ -11,5 +11,5 @@ class VariablesView : public AbstractTableView<VariablesModel>
 	Q_OBJECT
 
 public:
-	VariablesView(QWidget* parent = nullptr) : AbstractTableView(parent) {};
+	VariablesView(QWidget* parent = nullptr) : AbstractTableView(VARIABLES, parent) {};
 };
