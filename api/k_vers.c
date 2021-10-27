@@ -1,11 +1,10 @@
 /*
- * @author Jean-Marc PAUL
- * @author Geert BRYON
+ * @header4iode
  *
  * Functions to retrieve the current IODE version.
  *
- *    char *K_LastVersion()
- *    char *K_CurrentVersion()
+ *    char *K_LastVersion(): returns in an allocated string the current version of IODE. 
+ *    char *K_CurrentVersion(): returns in an allocated string the IODE version of the current executable.
  */
 
 #include "iode.h"
@@ -16,8 +15,9 @@ Retourne un string alloué contenant le contenu du fichier
 *********************************************************/
 
 /**
- *  Returns in an allocated string the content of the file http://iode.plan.be/version.txt. 
- *  That file contains the string "IODE <major>.<minor>" with the latest version of IODE.
+ *  Returns in an allocated string the current version of IODE. 
+ *  That string is retrieved in the file http://iode.plan.be/version.txt which contains "IODE <major>.<minor>" 
+ *  with the latest version of IODE.
  *  
  *  @return     char* last version of IODE on the web site.
  *  
@@ -44,13 +44,9 @@ char *K_LastVersion()
     return(K_CurrentVersion());
 }
 
-/********************************************************
-Retourne un string alloué contenant la version courante de IODE
-"IODE 6.45" par exemple.
-*********************************************************/
 
 /**
- *  Returns in an allocated string with the IODE version of the current executable in the form 
+ *  Returns in an allocated string the IODE version of the current executable in the form 
  *      "IODE <major>.<minor>" where minor and major come from iode.ini. 
  *  
  *  @return     char* current version of IODE
