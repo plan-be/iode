@@ -542,7 +542,7 @@ static void KT_print_attr(FILE* fd, int attr)
     if(attr & KT_DECIMAL)   fprintf(fd, "DECIMAL ");
     if(attr & KT_LEFT)      fprintf(fd, "LEFT ");
     if(attr & KT_RIGHT)     fprintf(fd, "RIGHT ");
-    return(0);
+    return;
 }
 
 
