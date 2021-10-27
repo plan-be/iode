@@ -3,12 +3,13 @@
  *
  * Functions for "packing" (serializing) and "unpacking" (deserializing) objects.
  * 
- * A 'pack' is a binary string structured as described below. A pack represents
+ * A 'pack' is a binary string structured as described below. A pack represents for example
  * an IODE object (the C struct, e.g. an equation) as a string concatenating 
- * the struct elements and their respective sizes. An IODE object is packed before being saved in a file 
- * and a pack in 'unpacked' to and IODE object when reread from the disk. 
+ * the struct elements and their positions in the pack. 
+ * An IODE object is packed before being saved in a file  
+ * and a pack in 'unpacked' into an IODE object when reread from the disk. 
  * 
- * Objects saved in memory (in swap segments) are also packed / unpacked via these functions.
+ * Objects saved in memory (in "swap segments") are also packed / unpacked via these functions.
  *
  * Requires 
  *    scr4iode.lib for the swap functions (sw_*).
