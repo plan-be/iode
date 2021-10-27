@@ -1,0 +1,310 @@
+/**
+ * @header4iode
+ *
+ * KDB management functions
+ * ------------------------
+ *     KDB *K_create(int type, int mode)                    allocates and initialises a KDB object.    
+ *     int K_free_kdb(KDB* kdb)                             frees a KDB but leaves its contents untouched.
+ *     int K_free(KDB* kdb)                                 frees a KDB and its contents.
+ *     int K_clear(KDB* kdb)                                deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
+ *     KDB *K_refer(KDB* kdb, int nb, char* names[])        creates a new kdb containing the references to the objects of the list names.
+ *     KDB *K_quick_refer(KDB *kdb, char *names[])          same as K_refer() but more efficient for large databases.
+ *     int K_merge(KDB* kdb1, KDB* kdb2, int replace)       merges two databases : kdb1 <- kdb1 + kdb2. 
+ *     int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+ */
+
+#include "iode.h"
+
+// Utilities 
+// ---------
+
+/**
+ *  Compares the names of 2 KOBJs. Used by K_sort().
+ *  
+ *  @param [in] p1  void*   pointer to the first KOBJ 
+ *  @param [in] p2  void*   pointer to the 2d KOBJ 
+ *  @return         int     0 if name of p1 = name of p2 (the names ares equal)
+ *                          -1 if p1 is < p2 or p1 is null
+ *                          1 if p1 is > p2 or p2 is null and is not null
+ *  
+ *  @details Calls strcmp() for string comparison (case sensitive)
+ */
+
+static int K_strcmp(const void *p1, const void *p2)
+{
+    KOBJ    *ko1 = (KOBJ *)p1, *ko2 = (KOBJ *)p2;
+
+    if(ko1 == 0) return(-1);
+    if(ko2 == 0) return(1);
+    return(strcmp(ko1->o_name, ko2->o_name));
+}
+
+
+/**
+ *  Sorts a KDB by object names. Names are case sensitive.
+ *  
+ *  @param [in, out] kdb     KDB*    kdb to be sorted
+ *  
+ */
+ 
+static void K_sort(KDB* kdb)
+{
+    qsort(KOBJS(kdb), (int) KNB(kdb), sizeof(KOBJ), K_strcmp);
+}
+
+// API 
+// ---
+
+/**
+ *  Allocates and initialises a KDB object.
+ *  
+ *  Depending on value of the mode parameter, the object names will be automatically translated to lower or upper case or let unmodified.
+ *    
+ *  @param [in] type    int     type of object the KDB will contain
+ *  @param [in] mode    int     case of the object name: K_UPPER, K_LOWER or K_ASIS 
+ *  @return             KDB*    new allocated KDB
+ *  
+ */
+
+KDB *K_create(int type, int mode)
+{
+    KDB   *kdb;
+
+    kdb = (KDB *) SW_nalloc(sizeof(KDB));
+    if(kdb == NULL) return(NULL);
+    strcpy(KARCH(kdb), ARCH);
+    KMODE(kdb) = mode;
+    KTYPE(kdb) = type;
+    KNAMEPTR(kdb) = SCR_stracpy("ws"); // JMP 29/9/2015
+    return(kdb);
+}
+
+
+/**
+ *  Frees a KDB but leaves its contents untouched.
+ *  
+ *  @param [in, out] kdb    KDB* kdb to be deleted.
+ *  @return                 int  0
+ *  
+ *  TODO: free KNAMEPTR ?
+ */
+
+int K_free_kdb(KDB* kdb)
+{
+    SW_nfree(KOBJS(kdb));
+    SW_nfree(kdb);
+    return(0);
+}
+
+
+/**
+ *  Frees a KDB and its contents.
+ *  
+ *  @param [in, out] kdb    KDB* kdb to be deleted
+ *  @return                 int  0
+ */
+
+int K_free(KDB* kdb)
+{
+    int i;
+
+    if(kdb == NULL) return(0);
+    for(i = 0; i < KNB(kdb); i++)
+        if(KOBJS(kdb)[i].o_val != 0) SW_free(KOBJS(kdb)[i].o_val);
+
+    SCR_free(KNAMEPTR(kdb)); 
+    KNAMEPTR(kdb) = 0;       
+    K_free_kdb(kdb);
+    return(0);
+}
+
+
+/**
+ *  Deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". But does not free the KDB struct.
+ *  
+ *  @param [in, out] kdb    KDB* kdb to be cleared
+ *  @return                 int  0
+ */
+
+int K_clear(KDB* kdb)
+{
+    int i;
+
+    for(i = 0; i < KNB(kdb); i++) SW_free(KOBJS(kdb)[i].o_val);
+    SW_nfree(KOBJS(kdb));
+    KOBJS(kdb) = NULL;
+    KNB(kdb) = 0;
+    SCR_free(KNAMEPTR(kdb)); // JMP 3/6/2015
+    KNAMEPTR(kdb) = 0;              // JMP 3/6/2015
+    memset(KSMPL(kdb), 0, sizeof(SAMPLE)); /* JMP 28-03-92 */
+    KNAMEPTR(kdb) = SCR_stracpy("ws"); // JMP 29/9/2015
+    return(0);
+}
+
+
+/**
+ *  Creates a new kdb containing the references to the objects of the list names. 
+ *  
+ *  The data is **not** duplicated ("shallow copy") .
+ *  
+ *  On error, calls B_seterrn: 
+ *      - 98 if one of the names is not found
+ *      - 99 if an entry cannot be created in the new DB
+ *  
+ *  @param [in] kdb   KDB*      source kdb
+ *  @param [in] nb    int       number of names 
+ *  @param [in] names char*[]   null terminated list of names
+ *  @return           KDB*      shallow copy of kdb[names] on success
+ *                              NULL if kdb is null or one of the names cannot be found
+ *  
+ *  TODO: replace B_seterrn() by sth else ?
+ */
+ 
+KDB *K_refer(KDB* kdb, int nb, char* names[])
+{
+    int     i, pos1, pos2, err = 0;
+    KDB     *tkdb;
+
+    if(kdb == NULL) return(NULL);
+    tkdb = K_create(KTYPE(kdb), KMODE(kdb));
+    memcpy(KDATA(tkdb), KDATA(kdb), K_MAX_DESC);
+
+    for(i = 0 ; i < nb && names[i]; i++) {
+        pos2 = K_find(kdb, names[i]);
+        if(pos2 < 0)  {
+            B_seterrn(98, names[i]);
+            err = 1;
+            continue;
+        }
+
+        pos1 = K_add_entry(tkdb, names[i]);
+        if(pos1 < 0) {
+            B_seterrn(99, names[i]);
+            K_free_kdb(tkdb);
+            tkdb = NULL;
+            err = 1;
+            break;
+        }
+        KSOVAL(tkdb, pos1) = KSOVAL(kdb, pos2);
+    }
+    if(err) B_display_last_error();
+    return(tkdb);
+}
+
+
+/**
+ *  Creates a new kdb containing the references to the objects of the list names. 
+ *  Same as K_refer() but more efficient for large databases.
+ *  
+ *  The data is **not** duplicated ("shallow copy") .
+ *  
+ *  @param [in] kdb   KDB*      source kdb
+ *  @param [in] names char*[]   null terminated list of names
+ *  @return           KDB*      shallow copy of kdb[names]
+ *                              NULL if kdb is null or one of the names cannot be found
+ *  
+ *  @note Quicker version of K_refer() (JMP 16/3/2012) by allocating KOBJS in one call instead
+ *          of calling K_add_entry for each name.
+ *  @note Programmed for Institut Erasme and Nemesis model (> 250.000 Vars)
+ */
+
+KDB *K_quick_refer(KDB *kdb, char *names[])
+{
+    int     i, pos, nb = SCR_tbl_size(names);
+    KDB     *tkdb;
+
+    if(kdb == NULL) return(NULL);
+
+    // Crée la nouvelle kdb avec le nombre exact d'entrées
+    tkdb = K_create(KTYPE(kdb), KMODE(kdb));
+    memcpy(KDATA(tkdb), KDATA(kdb), K_MAX_DESC);
+    KOBJS(tkdb) = (KOBJ *) SW_nalloc(sizeof(KOBJ) * K_CHUNCK * (1 + nb / K_CHUNCK));
+    KNB(tkdb) = nb;
+
+    // Copie les entrées dans tkdb
+    for(i = 0 ; i < nb; i++) {
+        pos = K_find(kdb, names[i]);
+        if(pos < 0) {
+            K_free_kdb(tkdb);
+            return(NULL);
+        }
+        memcpy(KOBJS(tkdb) + i, KOBJS(kdb) + pos, sizeof(KOBJ));
+    }
+
+    // Sort tkdb
+    K_sort(tkdb);
+
+    return(tkdb);
+}
+
+
+/**
+ *  Merges two databases : kdb1 <- kdb1 + kdb2. 
+ *   If replace == 0, existing elements in kdb1 are not overwritten.
+ *   If replace == 1, the values of existing elements are replaced.
+ *
+ *  kdb2 is kept unmodified.
+ *  
+ *  @param [in, out]    kdb1    KDB*      source and target KDB
+ *  @param [in]         kdb2    KDB*      source KDB
+ *  @param [in]         replace int       0 to keep elements of kdb1 when duplicate objects exist
+ *                                        1 to replace values in kdb1 by these in kdb2
+ *  @return                     int       -1 if kdb1 or kdb2 is null
+ */
+
+int K_merge(KDB* kdb1, KDB* kdb2, int replace)
+{
+    int     i, pos;
+    char    *ptr;
+
+    if(kdb1 == NULL || kdb2 == NULL) return(-1);
+    for(i = 0; i < KNB(kdb2); i++) {
+        pos = K_find(kdb1, KONAME(kdb2, i));
+        if(pos < 0) pos = K_add_entry(kdb1, KONAME(kdb2, i));
+        else {
+            if(!replace) continue;
+            SW_free(KSOVAL(kdb1, pos));
+        }
+
+        if(pos < 0) return(-1);
+        ptr = KGOVAL(kdb2, i);
+        KSOVAL(kdb1, pos) = SW_alloc(P_len(ptr));
+
+        ptr = KGOVAL(kdb2, i); /* GB 26/01/98 */
+        memcpy(KGOVAL(kdb1, pos), ptr, P_len(ptr));
+    }
+    return(0);
+}
+
+
+/**
+ *  Merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+ *   If replace == 0, existing elements in kdb1 are not overwritten.
+ *   If replace == 1, the values of existing elements are replaced.
+ *
+ *  
+ *  @param [in, out]    kdb1    KDB*      source and target KDB
+ *  @param [in, out     kdb2    KDB*      source KDB. Delete at the end of the function
+ *  @param [in]         replace int       0 to keep elements of kdb1 when duplicate objects exist
+ *                                        1 to replace values in kdb1 by these in kdb2
+ *  @return                     int       -1 if kdb1 or kdb2 is null or if kdb2 is empty.
+ */
+
+int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)
+{
+
+    if(kdb1 == NULL || kdb2 == NULL) return(-1);
+    if(KNB(kdb2) == 0) return(-1);
+    if(KNB(kdb1) == 0) {
+        KNB(kdb1) = KNB(kdb2);
+        KOBJS(kdb1) = KOBJS(kdb2);
+        KNB(kdb2) = 0;
+        KOBJS(kdb2) = 0;
+        K_free(kdb2);
+        return(0);
+    }
+
+    K_merge(kdb1, kdb2, replace);
+    K_free(kdb2);
+    return(0);
+}
