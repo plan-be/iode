@@ -1,7 +1,7 @@
 #include "iode.h"
 
 /**
- * HEADERS OF IODE FILES depending on the version of the software. 
+ * HEADERS OF IODE FILES defining IODE version and object contents. 
  * 
  * K_LABEL = current version
  * K_LABEL* =  previous versions
