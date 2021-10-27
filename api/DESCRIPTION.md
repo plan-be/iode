@@ -6,11 +6,20 @@ IODE objects, PER*() for manipulating PERIOD etc.
 
 Most of the filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
 
- - k*: basic functions legacy of the "Kaa" software
+ - k*: core functions (the prefix "k_" is a legacy of the "Kaa" software)
  - ... to be continued...
 
-
+## TOC
+- Group "Global Utilities"
+- Group "IODE Version"
+- Group "KDB management"
+- Group "Object management"
+- Group "IODE file management"
+- Group "IODE ascii format reading and writing"
+- Group "LEC language"
+- 
 ## Group "Global Utilities"
+
 
  - buf.c : share a large allocated buffer in different parts of the application
  - pack.c : packing (serialize) and unpacking (deserialize) objects.
@@ -82,13 +91,59 @@ Helper functions for reading and writing IODE ascii files.
 
 ## Group "IODE Version"
 ### k_vers.c
-Functions to retrieve the current IODE versions.
+Functions to retrieve the current IODE version.
 
-    char *K_LastVersion() 
-    char *K_CurrentVersion()_
+    char *K_LastVersion(): returns in an allocated string the current version of IODE. 
+    char *K_CurrentVersion(): returns in an allocated string the IODE version of the current executable.
 
+## Group "KDB management"
+
+### k_kdb.c
+Function to manage KDB, i.e. IODE object groups.
+
+     KDB *K_create(int type, int mode)                    allocates and initialises a KDB object.    
+     int K_free_kdb(KDB* kdb)                             frees a KDB but leaves its contents untouched.
+     int K_free(KDB* kdb)                                 frees a KDB and its contents.
+     int K_clear(KDB* kdb)                                deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
+     KDB *K_refer(KDB* kdb, int nb, char* names[])        creates a new kdb containing the references to the objects of the list names.
+     KDB *K_quick_refer(KDB *kdb, char *names[])          same as K_refer() but more efficient for large databases.
+     int K_merge(KDB* kdb1, KDB* kdb2, int replace)       merges two databases : kdb1 <- kdb1 + kdb2. 
+     int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+
+###  k_ws.c
+
+    ...
 
 ## Group "Object management"
+
+- k_objsv.c: function to create an IODE object of any type.
+- k_objs.c: functions to manipulate IODE objects.
+- k_objvers.c: functions to detect IODE object file version and to convert an object to the current IODE version._
+- k_pack.c: functions for "packing" and "unpacking" IODE objects.
+
+### k_objsv.c
+Function to create an IODE object and to record it in a KDB.
+
+     int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9): adds an 
+        object to a KDB. The number of arguments depends on object type.
+
+### k_objs.c
+Functions to manipulate IODE objects.
+
+    int K_key(char* name, int mode):                             Checks the validity of an object name and modify its "case" according to the value of mode.
+    int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2):   Duplicates an IODE object. Copies name1 of kdb1 to name2 in kdb2.
+    int K_ren(KDB* kdb, char* name1, char* name2):               Renames the object name1 in kdb into name2.
+    int K_add_entry(KDB* kdb, char* name):                       Adds the entry name in kdb and returns its position in the kdb. 
+    int K_find(KDB* kdb, char* name):                            Searches the position of an object name in a KDB.
+    int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB __without__ deleting the referenced object. 
+    int K_del(KDB* kdb, int pos):                                Deletes an object (and its data) from a KDB.
+    int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. _
+
+### k_objvers.c
+Functions to detect IODE object file version and to convert an object to the current IODE version._
+
+     int K_calcvers(char* label):               returns the current object version (0-2) from an IODE file header. 
+     void K_setvers(KDB* kdb, int i, int vers): converts an IODE object from IODE objects version 1 or 2 to the current version (0).
 
 ###  k_pack.c
 Functions for "packing" and "unpacking" IODE objects.
@@ -114,29 +169,40 @@ Functions for "packing" and "unpacking" IODE objects.
      int KS_alloc_scl()
      int KV_alloc_var(int nb)
 
-## Group "WS management"
+## Group "IODE file management"
 
-### objs.c
-Function to manipulate workspaces
+### k_objfile.c
+Functions to manipulate IODE object files.
 
-###  k_ws.c
+    char *K_set_ext(char* res, char* fname, int type):                               deletes left and right spaces in a filename and changes its extension according to the given type.
+    void K_strip(char* filename):                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
+    KDB  *K_load(int ftype, FNAME fname, int no, char** objs):                       loads a IODE object file. 
+    int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl):           retrieves infos on an IODE file: type, number of objects, SAMPLE
+    KDB *K_interpret(int type, char* filename): generalisation of K_load() :         interprets the content of a file, ascii files includes, and try to load ist content into a KDB.
+    int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl):   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
+    int K_backup(char* filename):                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
+    int K_save(KDB* kdb, FNAME fname):                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
+    int K_save_ws(KDB* kdb):                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
+    int K_setname(char* from, char* to):                                             replaces KNAMEPTR(kdb) in an IODE object file.
 
-
-## IODE ascii format
+## Group "IODE ascii format reading and writing"
 Functions to load and save files in IODE ascii format and LArray csv format.
 
 **Ascii filenames**
- * .ac: comments
- * .ae: equations
- * .ai: identities
- * .al: lists
- * .as: scalars
- * .at: tables
- * .av: variables
- * .csv: LArray variables
+
+ |Type             |Binary extension|Ascii extension|
+ |----             |----------------|---------------|
+ | comments        |.cmt            |.ac            |
+ | equations       |.cmt            |.ae            |
+ | identities      |.cmt            |.ai            |
+ | lists           |.cmt            |.al            |
+ | scalars         |.cmt            |.as            |
+ | tables          |.cmt            |.at            |
+ | variables       |.cmt            |.av            |
+ | LArray variables|.cmt            |.csv           |
 
 ### k_ccall.c
-Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV format.
+Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV formats.
 
     KDB  *(*K_load_asc[])()
     int (*K_save_asc[])()
@@ -185,7 +251,7 @@ Functions to import and export IODE files to/from ascii and LArray-csv format.
     int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
 
 
-## LEC 
+## Group "LEC language"
 
 ### k_lec.c
 Implemention of the LEC library virtual functions for SCL and VAR references.
