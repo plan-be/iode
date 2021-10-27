@@ -1,5 +1,26 @@
+/**
+ * @header4iode
+ * 
+ * Functions for managing IODE workspaces and files.
+ *
+ */
+ 
 #include "iode.h"
 
+
+/** 
+ *  Globals :
+ *    - K_WS = table containing pointers to the 7 KDB in memory, 1 per object type (CEILSTV)
+ *      - K_WS[0] : C=comments 
+ *      - K_WS[1] : E=equations
+ *      - ...
+ *    - K_RWS = table of max 5 KDB* per object type, used for ws comparison, for printing...
+ *      Only used for Vars at the moment (print vars, print tables with comparison)
+ *      - K_RWS[6][0] = first WS of VARS for comparison (ws)  
+ *      - K_RWS[6][1] = second WS of VARS for comparison (file 1)
+ *      - ...
+ *    - K_PWS =  table of "current" K_RWS number. Set to 0 and never used (yet).
+ */
 
 KDB     *K_WS[7];
 KDB     *K_RWS[7][5];
@@ -78,7 +99,7 @@ int     ws;
 }
 
 /*
-    Catenates the contents of a file to a given db
+    Catenates the contents of a file to a given kdb.
     If the file is an ascii file the fn_ascii function provided
     will interpret this file into a valid db
 */
