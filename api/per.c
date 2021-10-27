@@ -52,13 +52,12 @@ int     L_PERIOD_NB[] = {1, 2, 4, 12, 52, 365};
 /**
  *  Compute position of character ch in string str.
  *  
- *  @param [in] str char * string to be analyzed
- *  @param [in] ch  character search
- *  @return pos of ch in str or -1 if not found or str is NULL.
+ *  @param [in] str char*  string to be analyzed
+ *  @param [in] ch  int    character to be searched
+ *  @return         int    pos of ch in str or -1 if not found or str is NULL.
  *  
  *  TODO: replace L_pos(str, ch) by U_pos(ch, str) ?
  */
-
 int L_pos(char *str, int ch)
 {
     int     i;
