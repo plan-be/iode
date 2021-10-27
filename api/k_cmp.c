@@ -119,3 +119,37 @@ int (*K_cmpobj[])() = {
 //    K_cmplg
     K_cmpvar   // JMP 26/3/2012
 };
+
+
+/*
+    compares object name from 2 different kdb's
+    returns 0 : if name not in 1, not in 2
+	    1 ; if name in 1, not in 2
+	    2 ; if name not in 1, in 2
+	    3 ; if name in 1, in 2 and 1 = 2
+	    4 ; if name in 1, in 2 and 1 != 2
+*/
+
+int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
+{
+    int     p1, p2, l1, l2;
+    char    *pck1, *pck2;
+
+    if(KTYPE(kdb1) != KTYPE(kdb2)) return(-1);
+
+    p1 = K_find(kdb1, name);
+    p2 = K_find(kdb2, name);
+
+    if(p1 < 0) {
+        if(p2 < 0) return(0);   /* not 1, not 2 */
+        else return(2);         /* not 1, 2 */
+    }
+
+    if(p2 < 0) return(1);      /* 1, not 2 */
+
+    /* 1, 2 */
+    return(3 +
+           K_cmpobj[KTYPE(kdb1)](KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name));
+}
+
+
