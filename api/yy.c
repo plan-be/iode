@@ -1,19 +1,21 @@
 /**
  * @header4iode
  * 
- * Helper functions for reading and writing IODE ascii files.
+ * Helper functions for reading and writing IODE ascii files containing mostly IODE obect definitions.
+ * Some of these functions parse files and/or strings using the SCR4 group of functions "YY". 
+ * See http://www.xon.be/scr4/libs1/libs157.htm for more details.
  *
- *    IODE_REAL K_read_real(YYFILE *yy)
- *    long K_read_long(YYFILE* yy)
- *    char* K_read_str(YYFILE* yy)
- *    PERIOD *K_read_per(YYFILE* yy)
- *    SAMPLE *K_read_smpl(YYFILE* yy)
- *    int K_read_align(YYFILE* yy)
+ *    IODE_REAL K_read_real(YYFILE *yy):    reads a token on the YY stream and interprets the token as a IODE_REAL (double) if possible.
+ *    long K_read_long(YYFILE* yy):         reads the next token on the YY stream and returns a long. 
+ *    char* K_read_str(YYFILE* yy):         reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.  
+ *    PERIOD *K_read_per(YYFILE* yy):       reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition (<long><char><long>).
+ *    SAMPLE *K_read_smpl(YYFILE* yy):      reads the next tokens on the YY stream and tries to interpret them as a SAMPLE.
+ *    int K_read_align(YYFILE* yy):         reads the next token on the YY stream: LEFT, RIGHT or CENTER.
  *  
- *    void K_stracpy(char** to, char* from)
- *    int K_wrdef(FILE* fd, YYKEYS* table, int def)
- *    int K_compare(YYKEYS* yy1, YYKEYS* yy2)
- *    char *K_wrap(char *in, int lg)
+ *    void K_stracpy(char** to, char* from):         allocates and copies a null terminated string. 
+ *    int K_wrdef(FILE* fd, YYKEYS* table, int def): searches the position of a integer in a table of YYKEYS and writes the corresponding token onto fd. 
+ *    int K_compare(YYKEYS* yy1, YYKEYS* yy2):       helper function passed as parameter to qsort to sort a table of YYKEYS.
+ *    char *K_wrap(char *in, int lg):                wraps a string (by inserting \n) to limit each line to lg characters.
  *
  */
 
@@ -212,7 +214,7 @@ int K_read_align(YYFILE* yy)
 
 
 /**
- *  Alloc and copy a string. 
+ *  Allocates and copies a null terminated string. 
  *  
  *  @param [in, out] to   char**     placeholder for the new allocated pointer to from
  *  @param [in]      from char*      pointer to the string to cbe copied (cannot be NULL)
