@@ -3,14 +3,15 @@
 #
 
 # Add source to this project's executable.
-set (UTILS buf.c objs.c pack.c per.c yy.c)
+set (UTILS buf.c pack.c per.c yy.c)
 set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
+set (OBJS k_objs.c k_objsv.c k_pack.c k_objfile.C k_objvers.c k_kdb.c k_ws.c)
 
 set (SOURCES 
 		${UTILS} 
-		k_vers.c
-		k_pack.c  k_ws.c
+		${OBJS}
 		${CCS}
+		k_vers.c
 		k_lec.c 
 		b_dir.c 
 )
