@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-
 /* k_ws.c */
 extern KDB *K_init_kdb(int ,char *);
 extern void K_init_ws(int );
@@ -50,6 +49,7 @@ extern void kwrmsg(char *);
 extern int K_cmplg(char *,char *,char *);
 extern int K_cmpeqs(char *,char *,char *);
 extern int K_cmpidt(char *,char *,char *);
+extern int K_cmp(char *,KDB *,KDB *);
 
 /* k_lec.c */
 extern IODE_REAL *L_getvar(KDB *,int );
@@ -69,42 +69,39 @@ extern void *P_alloc_get_ptr(void *, int );
 /* k_descr.c */
 extern int K_filetype(char *,char *,int *,SAMPLE *);
 
-/* objs.c */
-extern int K_strcmp(const void *,const void *);
-extern int K_find_strcmp(const void *, const void *);
-extern void K_sort(KDB *);
+/* k_kdb.c */
 extern KDB *K_create(int ,int );
 extern int K_free(KDB *);
 extern int K_clear(KDB *);
 extern int K_free_kdb(KDB *);
+extern KDB *K_quick_refer(KDB *, char **names);
+
+/* k_objs.c */
+extern int K_key(char *,int );
 extern int K_dup(KDB *,char *,KDB *,char *);
 extern int K_ren(KDB *,char *,char *);
 extern int K_add_entry(KDB *,char *);
 extern int K_find(KDB *,char *);
 extern int K_del(KDB *,int );
 extern int K_del_entry(KDB *,int );
-extern int K_select(KDB *,int ,char **);
-extern KDB *K_refer(KDB *,int ,char **);
-extern KDB *K_quick_refer(KDB *, char **names);
+extern int K_del_by_name(KDB* kdb, char* name);
+
+/* k_objvers.c */
+extern int K_calcvers(char *);
+extern void K_setvers(KDB* kdb, int i, int vers);
+
+/* k_objfile.c */
+extern char *K_set_ext(char *,char *,int );
+extern void K_strip(char *);
 extern int K_merge(KDB *,KDB *,int );
 extern int K_merge_del(KDB *,KDB *,int );
-extern char *K_set_ext(char *,char *,int );
 extern KDB *K_load(int ,char *,int ,char **);
-extern int K_calcvers(char *);
-extern int K_setvers(KDB *,int ,int );
 extern KDB *K_interpret(int ,char *);
 extern int K_copy(KDB *,int ,char **,int ,char **,SAMPLE *);
-extern int K_copy_1(KDB *,char *,int ,char **,int *,SAMPLE *);
 extern int K_backup(char *);
-extern int K_save_kdb(KDB *,char *,int );
 extern int K_save(KDB *,char *);
 extern int K_save_ws(KDB *);
-extern char *K_add_ext(char *,char *);
-extern int K_key(char *,int );
-extern int K_findtype(char *,int );
-extern int K_setname(int ,char *,char *);
-extern int K_cmp(char *,KDB *,KDB *);
-extern void K_strip(char *);
+extern int K_setname(char *,char *);
 
 /* buf.c */
 extern char *BUF_alloc(int );
