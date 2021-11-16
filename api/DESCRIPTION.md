@@ -1,10 +1,10 @@
 # IODE functions by group
 
 Note on function names: as C does not allow "namespacing", we always give prefixes to function names, the prefix giving
-an indication of the group to which the function belongs. For example, P*() is the group of function for "packing" (aka serializing) 
-IODE objects, PER*() for manipulating PERIOD etc.
+an indication of the group the function belongs to. For example, P*() is the group of function for "packing" (aka serializing) 
+IODE objects, PER*() for manipulating PERIOD, L_* () for LEC compilation / execution, etc.
 
-Most of the filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
+Most filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
 
  - k*: core functions (the prefix "k_" is a legacy of the "Kaa" software)
  - ... to be continued...
@@ -101,18 +101,24 @@ Functions to retrieve the current IODE version.
 ### k_kdb.c
 Function to manage KDB, i.e. IODE object groups.
 
-     KDB *K_create(int type, int mode)                    allocates and initialises a KDB object.    
-     int K_free_kdb(KDB* kdb)                             frees a KDB but leaves its contents untouched.
-     int K_free(KDB* kdb)                                 frees a KDB and its contents.
-     int K_clear(KDB* kdb)                                deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
-     KDB *K_refer(KDB* kdb, int nb, char* names[])        creates a new kdb containing the references to the objects of the list names.
-     KDB *K_quick_refer(KDB *kdb, char *names[])          same as K_refer() but more efficient for large databases.
-     int K_merge(KDB* kdb1, KDB* kdb2, int replace)       merges two databases : kdb1 <- kdb1 + kdb2. 
-     int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+      KDB *K_init_kdb(int ,char *);                        allocates and initialises a KDB struct
+      void K_set_kdb_name(KDB *kdb, U_ch *filename);       changes the filename in a KDB
+      KDB *K_create(int type, int mode)                    allocates and initialises a KDB object.    
+      int K_free_kdb(KDB* kdb)                             frees a KDB but leaves its contents untouched.
+      int K_free(KDB* kdb)                                 frees a KDB and its contents.
+      int K_clear(KDB* kdb)                                deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
+      KDB *K_refer(KDB* kdb, int nb, char* names[])        creates a new kdb containing the references to the objects of the list names.
+      KDB *K_quick_refer(KDB *kdb, char *names[])          same as K_refer() but more efficient for large databases.
+      int K_merge(KDB* kdb1, KDB* kdb2, int replace)       merges two databases : kdb1 <- kdb1 + kdb2. 
+      int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
 
 ###  k_ws.c
+Variables and functions for initializing and cleaning up the "in memory" workspaces.
 
-    ...
+    KDB *K_WS[7]                  Table with pointers to the 7 KDB in memory, 1 per object type (CEILSTV)
+    void K_init_ws(int ws)        Initialises the "in mem" KDB structures and optionnaly loads the ws.* files
+    void K_end_ws(int ws)         Deletes the current workspaces defined in K_WS[] and their content after having optionnaly saved their content in ws.* files.
+
 
 ## Group "Object management"
 
@@ -185,7 +191,7 @@ Functions to manipulate IODE object files.
     int K_save_ws(KDB* kdb):                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
     int K_setname(char* from, char* to):                                             replaces KNAMEPTR(kdb) in an IODE object file.
 
-## Group "IODE ascii format reading and writing"
+## Group "IODE ascii format (reading and writing)"
 Functions to load and save files in IODE ascii format and LArray csv format.
 
 **Ascii filenames**
@@ -193,13 +199,13 @@ Functions to load and save files in IODE ascii format and LArray csv format.
  |Type             |Binary extension|Ascii extension|
  |----             |----------------|---------------|
  | comments        |.cmt            |.ac            |
- | equations       |.cmt            |.ae            |
- | identities      |.cmt            |.ai            |
- | lists           |.cmt            |.al            |
- | scalars         |.cmt            |.as            |
- | tables          |.cmt            |.at            |
- | variables       |.cmt            |.av            |
- | LArray variables|.cmt            |.csv           |
+ | equations       |.eqs            |.ae            |
+ | identities      |.idt            |.ai            |
+ | lists           |.lst            |.al            |
+ | scalars         |.scl            |.as            |
+ | tables          |.tbl            |.at            |
+ | variables       |.var            |.av            |
+ | LArray variables|.var            |.csv           |
 
 ### k_ccall.c
 Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV formats.
@@ -271,13 +277,8 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 ## Remaining source files 
 
 
-- k_ws 
-- k_cmp 
-- k_vers 
-- k_lec 
-- objs 
-- objsv  
 - k_xdr 
+
 - l_token 
 - l_cc1 
 - l_alloc 
@@ -290,6 +291,7 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 - l_newton 
 - l_debug
 - l_secant 
+
 - e_est 
 - e_step 
 - e_tests 
@@ -298,20 +300,13 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 - e_errorv 
 - e_print 
 - e_stat 
+- 
 - k_var 
 - k_val
 - k_lst 
 - k_eqs 
 - k_tbl 
 - k_est 
-- k_ccvar 
-- k_ccall
-- k_cccmt 
-- k_ccscl 
-- k_ccidt 
-- k_cclst 
-- k_cceqs
-- k_cctbl 
 - k_iprn 
 - k_imain 
 - k_iasc 
@@ -328,8 +323,10 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 - k_edif 
 - k_etsp
 - k_ewks 
+
 - c_cc 
 - c_calc 
+
 - b_base 
 - b_dir
 - b_file b_fdel b_fcopy b_fren
