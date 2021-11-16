@@ -3,14 +3,16 @@
  *
  * KDB management functions
  * ------------------------
- *     KDB *K_create(int type, int mode)                    allocates and initialises a KDB object.    
- *     int K_free_kdb(KDB* kdb)                             frees a KDB but leaves its contents untouched.
- *     int K_free(KDB* kdb)                                 frees a KDB and its contents.
- *     int K_clear(KDB* kdb)                                deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
- *     KDB *K_refer(KDB* kdb, int nb, char* names[])        creates a new kdb containing the references to the objects of the list names.
- *     KDB *K_quick_refer(KDB *kdb, char *names[])          same as K_refer() but more efficient for large databases.
- *     int K_merge(KDB* kdb1, KDB* kdb2, int replace)       merges two databases : kdb1 <- kdb1 + kdb2. 
- *     int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
+ *     KDB *K_init_kdb(int ,char *);                        // allocates and initialises a KDB struct
+ *     void K_set_kdb_name(KDB *kdb, U_ch *filename);       // changes the filename in a KDB
+ *     KDB *K_create(int type, int mode)                    // allocates and initialises a KDB object.    
+ *     int K_free_kdb(KDB* kdb)                             // frees a KDB but leaves its contents untouched.
+ *     int K_free(KDB* kdb)                                 // frees a KDB and its contents.
+ *     int K_clear(KDB* kdb)                                // deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
+ *     KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the references to the objects of the list names.
+ *     KDB *K_quick_refer(KDB *kdb, char *names[])          // same as K_refer() but more efficient for large databases.
+ *     int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
+ *     int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
  */
 
 #include "iode.h"
@@ -54,6 +56,63 @@ static void K_sort(KDB* kdb)
 
 // API 
 // ---
+
+
+/**
+ *  @brief Allocates and initialise a KDB struct.
+ *  
+ *  Object names "mode" (K_UPPER, K_LOWER or K_ASIS) is assigned according to object type. 
+ *  
+ *  @param [in] type        int     KDB object type (K_CMT...K_VAR).
+ *  @param [in] filename    char*   file where the KDB will be saved (can be changed before saving the KDB).
+ *  @return                 KDB*    allocated KDB. 
+ *  
+ */
+KDB *K_init_kdb(int type, char* filename)
+{
+    int     mode;
+    KDB     *kdb;
+
+    switch(type) {
+        case K_CMT :
+            mode = K_ASIS;
+            break;
+        case K_EQS :
+        case K_IDT :
+        case K_LST :
+        case K_TBL :
+        case K_VAR :
+            mode = K_UPPER;
+            break;
+        case K_SCL :
+            mode = K_LOWER;
+            break;
+    }
+    kdb = K_create(type, mode);
+    if(kdb == NULL) return(kdb);
+    //strcpy(KNAME(kdb), filename);
+    K_set_kdb_name(kdb, filename); // JMP 3/6/2015
+    return(kdb);
+}
+
+/**
+ *  Set the KDB filename that will be used 
+ *  
+ *  The current filename stored in the KDB is freed and space for the new filename is allocated in the KDB.
+ *  
+ *  @param [in, out]    kdb      KDB*   KDB whose name will be changed
+ *  @param [in]         filename char*  new filename
+ *  
+ *  @details More details   
+ */
+void K_set_kdb_name(KDB *kdb, U_ch *filename) 
+{
+    if(kdb) {
+        SCR_free(KNAMEPTR(kdb));
+        KNAMEPTR(kdb) = SCR_stracpy(filename);
+    }
+}
+
 
 /**
  *  Allocates and initialises a KDB object.
