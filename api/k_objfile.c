@@ -756,6 +756,43 @@ fin:
 }
 
 
+/*
+    
+    If the file is an ascii file the fn_ascii function provided
+    will interpret this file into a valid db
+*/
+
+/**
+ *  @brief Concatenates the content of a file to an existing kdb.
+ *  If ikdb is empty, the current ikdb filename is replaced by filename.
+ *  
+ *  TODO: check object types between file and ikdb.
+ *  
+ *  @param [in, out]    ikdb        KDB*    existing KDB where to copy the content of filename
+ *  @param [in]         filename    char*   file containing objects to copy to ikdb
+ *  @return                         int     -1 on error, 0 on success
+ *              
+ */
+int K_cat(KDB* ikdb, char* filename)
+{
+    KDB     *kdb;
+    int     ftype;
+
+    kdb = K_interpret(KTYPE(ikdb), filename);
+    if(kdb == NULL) return(-1);
+
+    if(KNB(ikdb) == 0) {
+        memcpy(KDESC(ikdb), KDESC(kdb), K_MAX_DESC);
+        //strcpy(KNAME(ikdb), KNAME(kdb));
+        K_set_kdb_name(ikdb, KNAMEPTR(kdb)); // JMP 3/6/2015
+    }
+    if(KTYPE(ikdb) == K_VAR) KV_merge_del(ikdb, kdb, 1);
+    else K_merge_del(ikdb, kdb, 1);
+
+    return(0);
+}
+
+
 /**
  *  Takes a backup of a file by renaming the file: filename.xxx => filename.xx$. Function called before saving 
  *  an IODE object file.
