@@ -6,10 +6,9 @@ extern "C" {
 #endif
 
 /* k_ws.c */
-extern KDB *K_init_kdb(int ,char *);
 extern void K_init_ws(int );
 extern void K_end_ws(int );
-extern int K_cat(KDB *,char *);
+
 
 /* k_pack.c */
 extern int K_vpack(char **,double *,int *);
@@ -70,11 +69,15 @@ extern void *P_alloc_get_ptr(void *, int );
 extern int K_filetype(char *,char *,int *,SAMPLE *);
 
 /* k_kdb.c */
+extern KDB *K_init_kdb(int ,char *);
+extern void K_set_kdb_name(KDB *kdb, U_ch *filename);
 extern KDB *K_create(int ,int );
 extern int K_free(KDB *);
 extern int K_clear(KDB *);
 extern int K_free_kdb(KDB *);
+extern int K_merge(KDB* kdb1, KDB* kdb2, int replace);
 extern KDB *K_quick_refer(KDB *, char **names);
+
 
 /* k_objs.c */
 extern int K_key(char *,int );
@@ -98,6 +101,7 @@ extern int K_merge_del(KDB *,KDB *,int );
 extern KDB *K_load(int ,char *,int ,char **);
 extern KDB *K_interpret(int ,char *);
 extern int K_copy(KDB *,int ,char **,int ,char **,SAMPLE *);
+extern int K_cat(KDB *,char *);
 extern int K_backup(char *);
 extern int K_save(KDB *,char *);
 extern int K_save_ws(KDB *);
