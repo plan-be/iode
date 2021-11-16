@@ -1,77 +1,49 @@
 /**
  * @header4iode
  * 
- * Functions for managing IODE workspaces and files.
+ * Variables and functions for initializing and cleaning up the "in memory" workspaces.
  *
- */
- 
-#include "iode.h"
-
-
-/** 
- *  Globals :
- *    - K_WS = table containing pointers to the 7 KDB in memory, 1 per object type (CEILSTV)
+ * Globals
+ * -------
+ *    - K_WS = table with pointers to the 7 KDB in memory, 1 per object type (CEILSTV)
  *      - K_WS[0] : C=comments 
  *      - K_WS[1] : E=equations
  *      - ...
+ *  
  *    - K_RWS = table of max 5 KDB* per object type, used for ws comparison, for printing...
  *      Only used for Vars at the moment (print vars, print tables with comparison)
  *      - K_RWS[6][0] = first WS of VARS for comparison (ws)  
  *      - K_RWS[6][1] = second WS of VARS for comparison (file 1)
  *      - ...
  *    - K_PWS =  table of "current" K_RWS number. Set to 0 and never used (yet).
+ *
+ * 
+ * Functions
+ * ---------
+ *      - void K_init_ws(int ws)        Initialises the "in mem" KDB structures and optionnaly loads the ws.* files
+ *      - void K_end_ws(int ws)         Deletes the current workspaces defined in K_WS[] and their content after having optionnaly 
+ *                                      saved their content in ws.* files.
  */
+ 
+#include "iode.h"
 
-KDB     *K_WS[7];
-KDB     *K_RWS[7][5];
-int     K_PWS[7] = { 0, 0, 0, 0, 0, 0, 0 };
+/* Gobals */
+KDB     *K_WS[7];                           // Current workspaces
+KDB     *K_RWS[7][5];                       // Current loaded workspaces (for printing and identity execution)
+int     K_PWS[7] = { 0, 0, 0, 0, 0, 0, 0 }; // 
 
-extern  int K_AUTO_WS;
+//extern  int K_AUTO_WS;
 
-/* General WS functions */
-KDB *K_init_kdb(type, filename)
-int     type;
-char    *filename;
-{
-    int     mode;
-    KDB     *kdb;
-
-    switch(type) {
-        case K_CMT :
-            mode = K_ASIS;
-            break;
-        case K_EQS :
-        case K_IDT :
-        case K_LST :
-        case K_TBL :
-        case K_VAR :
-            mode = K_UPPER;
-            break;
-        case K_SCL :
-            mode = K_LOWER;
-            break;
-    }
-    kdb = K_create(type, mode);
-    if(kdb == NULL) return(kdb);
-    //strcpy(KNAME(kdb), filename);
-    K_set_kdb_name(kdb, filename); // JMP 3/6/2015
-    return(kdb);
-}
-
-K_set_kdb_name(KDB *kdb, U_ch *filename) // JMP 3/6/2015
-{
-    if(kdb) {
-        SCR_free(KNAMEPTR(kdb));
-        KNAMEPTR(kdb) = SCR_stracpy(filename);
-    }
-    return(0);
-}
-
-/*
-    Initialises all the WS structures
-*/
-void K_init_ws(ws)
-int ws;
+/**
+ *  @brief Initialises the "in mem" KDB structures adn optionnaly loads the ws.* files. 
+ *  
+ *  If ws is no NULL, the files ws.*, if they are found in the current dir, are loaded as initial values for the in memory KDBs.
+ *  If ws is NULL, the KDB are left empty.
+ *  
+ *  @param [in] ws  int     indicates if the files ws.ac, ws.ae..., ws.av must be loaded as initial values for the KDB in memory
+ */
+ 
+void K_init_ws(int ws)
 {
     int     i;
 
@@ -81,11 +53,17 @@ int ws;
         if(ws) K_cat(K_WS[i], "ws");
     }
 }
-/*
-    Deletes all WS structures
-*/
-void K_end_ws(ws)
-int     ws;
+
+
+/**
+ *  @brief Deletes the current workspaces defined in K_WS[] and their content after having optionnaly saved their content in ws.* files.
+ *  
+ *  If ws is not null, saves first the KDBs in 7 files ws.cmt, ws.eqs...ws.var before cleaning up.
+ *  
+ *  @param [in] ws int  if 1, saves the KDB on disk in the file defined in KNAMEPTR(kdb).
+ *  
+ */
+void K_end_ws(int ws)
 {
     int i, j;
 
@@ -97,31 +75,3 @@ int     ws;
         }
     }
 }
-
-/*
-    Catenates the contents of a file to a given kdb.
-    If the file is an ascii file the fn_ascii function provided
-    will interpret this file into a valid db
-*/
-K_cat(ikdb, filename)
-KDB     *ikdb;
-char    *filename;
-{
-    KDB     *kdb;
-    int     ftype;
-
-    kdb = K_interpret(KTYPE(ikdb), filename);
-    if(kdb == NULL) return(-1);
-
-    if(KNB(ikdb) == 0) {
-        memcpy(KDESC(ikdb), KDESC(kdb), K_MAX_DESC);
-        //strcpy(KNAME(ikdb), KNAME(kdb));
-        K_set_kdb_name(ikdb, KNAMEPTR(kdb)); // JMP 3/6/2015
-    }
-    if(KTYPE(ikdb) == K_VAR) KV_merge_del(ikdb, kdb, 1);
-    else K_merge_del(ikdb, kdb, 1);
-
-    return(0);
-}
-
-
