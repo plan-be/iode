@@ -9,7 +9,7 @@
  *     int K_ren(KDB* kdb, char* name1, char* name2):               Renames the object name1 in kdb into name2.
  *     int K_add_entry(KDB* kdb, char* name):                       Adds the entry name in kdb and returns its position in the kdb. 
  *     int K_find(KDB* kdb, char* name):                            Searches the position of an object name in a KDB.
- *     int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB __without__ deleting the referenced object. 
+ *     int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB **without** deleting the referenced object. 
  *     int K_del(KDB* kdb, int pos):                                Deletes an object (and its data) from a KDB.
  *     int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. 
  *
@@ -173,7 +173,7 @@ int K_ren(KDB* kdb, char* name1, char* name2)
  *          are added to KOBJS(kdb) each time that more place is needed to store object names.
  *
  *          Names in KOBJS are stored in alphabetic order to speed up the retrieval of an object by its name. 
- *          Consequently, K-add_entry has to calculate the place where the name must be inserted. For (even) more speed when 
+ *          Consequently, K_add_entry has to calculate the place where the name must be inserted. For (even) more speed when 
  *          elements are added in alphabetic order, the function first checks that the new name must not be placed at the end or the beginning 
  *          of the table in which case, no search is required.
  * 
