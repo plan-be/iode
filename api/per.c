@@ -17,7 +17,7 @@
  *  
  * Representation functions
  * 
- *      char *PER_pertoa(per, text): creates a text representation of a PERIOD.
+ *      char *PER_pertoa((PERIOD* per, char* text): creates a text representation of a PERIOD.
  *      PERIOD *PER_atoper(char *text): translates a text in a PERIOD.
  *      char *PER_smpltoa(SAMPLE* smpl, char* text) : writes a SAMPLE in a string
  *      SAMPLE *PER_atosmpl(char* a1, char* a2): creates a SAMPLE based on two strings containing PERIODs.
