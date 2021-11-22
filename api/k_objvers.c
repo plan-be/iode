@@ -7,8 +7,8 @@
  * (not to be confused with the IODE software version (6.xx for ex.).
  *
  * These HEADERS are defined in the variables below : 
- *    K_LABEL = current version
- *    K_LABEL* =  previous versions
+ *    K_LABEL = current versionof the IODE file headers
+ *    K_LABEL{S,D,X,...} =  previous versions
  *  
  *  This way, if a new version of the objects is defined in the future, K_LABELY for example, 
  *  K_LABEL will become K_LABELY and will be associated with object version 0 (the new current version), 
@@ -64,7 +64,7 @@ char    K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version
  *  @param [in]         objnb   int     position of the object to modify in kdb
  *  @return                     void
  *  
- *  @details Called byf K_setvers() only for IODE object version 1 and 2.
+ *  @details Called by K_setvers() only for IODE object version 1 and 2.
  */
 
 static void K_repack(KDB* kdb, int objnb)
