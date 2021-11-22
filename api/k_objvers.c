@@ -7,7 +7,7 @@
  * (not to be confused with the IODE software version (6.xx for ex.).
  *
  * These HEADERS are defined in the variables below : 
- *    K_LABEL = current versionof the IODE file headers
+ *    K_LABEL = current version of the IODE file headers
  *    K_LABEL{S,D,X,...} =  previous versions
  *  
  *  This way, if a new version of the objects is defined in the future, K_LABELY for example, 
