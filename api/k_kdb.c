@@ -3,8 +3,19 @@
  *
  * KDB management functions
  * ------------------------
- *     KDB *K_init_kdb(int ,char *);                        // allocates and initialises a KDB struct
- *     void K_set_kdb_name(KDB *kdb, U_ch *filename);       // changes the filename in a KDB
+ *
+ * KDB structs contain the references to all IODE objects of the same type plus some technical information like the 
+ * filename the kdb has been read from, the processor architecture...
+ *
+ * For each IODE object type, there is one KDB (also called "workspace") in memory. 
+ * 
+ * To simplify the use of these structs, some MACRO have been defined for KDB in iode.h: for example "KV_WS" for the KDB of variables...
+ *
+ * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
+ * of the operation.
+ * 
+ *     KDB *K_init_kdb(int type, char* filename);           // allocates and initialises a KDB struct
+ *     void K_set_kdb_name(KDB* kdb, U_ch* filename);       // changes the filename in a KDB
  *     KDB *K_create(int type, int mode)                    // allocates and initialises a KDB object.    
  *     int K_free_kdb(KDB* kdb)                             // frees a KDB but leaves its contents untouched.
  *     int K_free(KDB* kdb)                                 // frees a KDB and its contents.
@@ -32,7 +43,7 @@
  *  @details Calls strcmp() for string comparison (case sensitive)
  */
 
-static int K_strcmp(const void *p1, const void *p2)
+static int K_objnamecmp(const void *p1, const void *p2)
 {
     KOBJ    *ko1 = (KOBJ *)p1, *ko2 = (KOBJ *)p2;
 
@@ -51,7 +62,7 @@ static int K_strcmp(const void *p1, const void *p2)
  
 static void K_sort(KDB* kdb)
 {
-    qsort(KOBJS(kdb), (int) KNB(kdb), sizeof(KOBJ), K_strcmp);
+    qsort(KOBJS(kdb), (int) KNB(kdb), sizeof(KOBJ), K_objnamecmp);
 }
 
 // API 
@@ -61,7 +72,7 @@ static void K_sort(KDB* kdb)
 /**
  *  @brief Allocates and initialise a KDB struct.
  *  
- *  Object names "mode" (K_UPPER, K_LOWER or K_ASIS) is assigned according to object type. 
+ *  Object "mode" (K_UPPER, K_LOWER or K_ASIS) is assigned according to object type. 
  *  
  *  @param [in] type        int     KDB object type (K_CMT...K_VAR).
  *  @param [in] filename    char*   file where the KDB will be saved (can be changed before saving the KDB).
