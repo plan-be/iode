@@ -10,6 +10,7 @@ Most filenames follow the same principle: each group of files has a specific pre
  - ... to be continued...
 
 ## TOC
+- A note on memory allocations in IODE
 - Group "Global Utilities"
 - Group "IODE Version"
 - Group "KDB management"
@@ -17,7 +18,23 @@ Most filenames follow the same principle: each group of files has a specific pre
 - Group "IODE file management"
 - Group "IODE ascii format reading and writing"
 - Group "LEC language"
-- 
+
+
+## A note of memory allocations in IODE
+IODE uses 2 distinct groups of functions for memory allocations. 
+
+The **first group** is based on the "standard" memory allocation functions malloc() and free(). 
+The main functions in this group are SW_nalloc(), SW_nrealloc() and SW_nfree(). An older group from *scr4* has the same properties: SCR_malloc(), SCR_realloc() and SCR_free()_
+
+The **second group** has been created specifically to avoid memory segmentation when possible. The main idea is to allocate large memory buffers 
+on the heap (called "segments") and to fill them with serialized objects, like "packed" equations or variables. 
+Each allocated object is represented by an identifier (a "handle") and, when it is 
+reclaim by the program, a trivial indirection translates its handle to the real pointer which is simply a shift from the beginning of its segment.
+
+The main functions in this second group are **SW_init()**, **SW_alloc()**, **SW_realloc()**, **SW_free()**, **SW_getptr()** and **SW_end()**.
+
+More information can be found at http://xon.be/scr4/libs1/libs1236.htm. 
+
 ## Group "Global Utilities"
 
 
