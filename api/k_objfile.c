@@ -9,7 +9,7 @@
  *     void K_strip(char* filename):                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
  *     KDB  *K_load(int ftype, FNAME fname, int no, char** objs):                       loads a IODE object file. 
  *     int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl):           retrieves infos on an IODE file: type, number of objects, SAMPLE
- *     KDB *K_interpret(int type, char* filename): generalisation of K_load() :         interprets the content of a file, ascii files includes, and try to load ist content into a KDB.
+ *     KDB *K_interpret(int type, char* filename): generalisation of K_load() :         interprets the content of a file, ascii files included, and try to load ist content into a KDB.
  *     int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl):   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
  *     int K_backup(char* filename):                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
  *     int K_save(KDB* kdb, FNAME fname):                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
@@ -773,6 +773,7 @@ fin:
  *  @return                         int     -1 on error, 0 on success
  *              
  */
+ 
 int K_cat(KDB* ikdb, char* filename)
 {
     KDB     *kdb;
@@ -882,6 +883,7 @@ error :
  *           - kmsg() for notifications
  *           - kerror() for error messages (TODO: check the use of ksmg on errors)
  */
+
 static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
 {
     int     i, len, clen, posnb, posname;
@@ -966,6 +968,7 @@ error:
  *                                      0 on success
  *  
  */
+
 int K_save(KDB* kdb, FNAME fname)
 {
     return(K_save_kdb(kdb, fname, 1));
@@ -982,6 +985,7 @@ int K_save(KDB* kdb, FNAME fname)
  *                                      0 on success
  *  
  */
+
 int K_save_ws(KDB* kdb)
 {
     return(K_save_kdb(kdb, "ws", 0));
@@ -995,12 +999,14 @@ int K_save_ws(KDB* kdb)
  *  
  *  Only used when renaming or copying a file.
  *  
- *  @param [in] from    char*  
- *  @param [in] to      char*
- *  @return 
+ *  @param [in] from    char*   iode file name 
+ *  @param [in] to      char*   new filename to put in the file from
+ *  @return             int     0 on success
+ *                              -1 on error (file not found, invalid IODE file)
  *  
  *  TODO: check if not obsolete.
  */
+ 
 int K_setname(char* from, char* to)
 {
     char    label[512];
