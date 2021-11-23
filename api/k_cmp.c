@@ -1,7 +1,27 @@
-﻿#include "iode.h"
+﻿/**
+ * @header4iode
+ *
+ * Function to compare 2 IODE objects.
+ * -----------------------------------
+ *
+ *      int K_cmp(char* name, KDB* kdb1, KDB* kdb2) : compare object named name in 2 kdb.
+ */ 
+ 
+#include "iode.h"
 
-K_cmplg(p1, p2, name)
-char    *p1, *p2, *name;
+/**
+ *  Compare the size (length) of 2 packed objects. 
+ *  
+ *  @note  The size of a packed object is stored in the first 4 bytes of the "pack".
+ *  
+ *  @param [in] p1      char*   pointer to the first packed object.
+ *  @param [in] p2      char*   pointer to the second packed object.
+ *  @param [in] name    char*   unused. Present to ensure the same function params as for K_cmpeqs()... See also K_cmpobjs[].
+ *  @return             int     0 if equal, 1 otherwise.
+ *  
+ */
+ 
+static int K_cmplg(char* p1, char* p2, char* name)
 {
     int l1, l2;
 
@@ -12,8 +32,25 @@ char    *p1, *p2, *name;
     else return(0);
 }
 
-K_cmpeqs(p1, p2, name)
-char    *p1, *p2, *name;
+/**
+ *  Compares 2 packed equations. 
+ *  
+ *  The function compares:
+ *      - the compiled LEC form (the text of the LEC expression may differ as long as the compiled versions are equal).
+ *      - the estimation method if present
+ *      - the estimation SAMPLE if defined
+ *      - the estimation block of simultaneous equations
+ *      - the metric instruments if any
+ *  
+ *  @param [in] p1      char*   pointer to the first packed EQ.
+ *  @param [in] p2      char*   pointer to the second packed EQ.
+ *  @param [in] name    char*   name of the equation.
+ *  @return             int     0 if all elements are equal, 1 if at least one is different.
+ *  
+ *  @note the estimation results are not compared (statistical tests).
+ */
+
+static int K_cmpeqs(char* p1, char* p2, char* name)
 {
     int     rc = 1;
     EQ      *eq1 = NULL, *eq2 = NULL;
@@ -50,8 +87,20 @@ done :
     return(rc);
 }
 
-K_cmpidt(p1, p2, name)
-char    *p1, *p2, *name;
+
+/**
+ *  Compares 2 packed identities. 
+ *  
+ *  The function compares the compiled LEC forms. The text of the LEC expression may differ as long as the compiled versions don't.
+ *  
+ *  @param [in] p1      char*   pointer to the first packed IDT.
+ *  @param [in] p2      char*   pointer to the second packed IDT
+ *  @param [in] name    char*   name of the identity.
+ *  @return             int     0 if identities are equal, 1 otherwise.
+ *  
+ */
+
+static int K_cmpidt(char* p1, char* p2, char* name)
 {
     int     rc = 1;
     char    *i1 = NULL, *i2 = NULL;
@@ -74,11 +123,22 @@ done :
     return(rc);
 }
 
-// JMP 26/3/2012 pour améliorer la comparaison (à eps près)
-
+// Threshold for VAR comparisons 
 double K_CMP_EPS = 1e-7;
 
-K_cmpvar_1(v1, v2) IODE_REAL    v1, v2;
+
+/**
+ *  Compares 2 IODE_REAL values. 
+ *  
+ *  The values are considered equal if their relative difference is less than K_CMP_EPS.
+ *  
+ *  @param [in] v1      IODE_REAL   first value
+ *  @param [in] v2      IODE_REAL   second value
+ *  @return             int         0 if |(v1 - v2)/v1| < K_CMP_EPS, 1 otherwise.
+ *  
+ */
+
+static int K_cmpvar_1(IODE_REAL v1, IODE_REAL v2)
 {
     double  diff;
     if(v1 == v2) return(0);
@@ -91,9 +151,20 @@ K_cmpvar_1(v1, v2) IODE_REAL    v1, v2;
     return(1);
 }
 
-K_cmpvar(p1, p2, name)
-char    *p1, *p2;
-char    *name;
+
+/**
+ *  Compares 2 variables on the current WS sample. 
+ *  
+ *  See also K_cmpvar_1().
+ *  
+ *  @param [in] p1      char*   pointer to the first variable (will be cast to IODE_REAL).
+ *  @param [in] p2      char*   pointer to the second variable (will be cast to IODE_REAL).
+ *  @param [in] name    char*   unused. Present to ensure the same function signature as K_cmpeqs()... See K_cmpobjs[].
+ *  @return             int     0 if the 2 variables are equal, 1 otherwise.
+ *  
+ */
+
+static int K_cmpvar(char* p1, char* p2, char* name)
 {
     IODE_REAL *r1, *r2;
     int     i, nb = KSMPL(KV_WS)->s_nb;
@@ -108,16 +179,17 @@ char    *name;
     return(0);
 }
 
-/* if p1 == p2 return 0 else 1 */
-int (*K_cmpobj[])() = {
+/**
+ *  Table of function pointers for IODE objects comparison: CMT, EQ, IDT, LST, SCL, TBL, VAR.
+ */
+static int (*K_cmpobj[])() = {
     K_cmplg,
     K_cmpeqs,
     K_cmpidt,
     K_cmplg,
     K_cmplg,
     K_cmplg,
-//    K_cmplg
-    K_cmpvar   // JMP 26/3/2012
+    K_cmpvar
 };
 
 
@@ -129,6 +201,19 @@ int (*K_cmpobj[])() = {
 	    3 ; if name in 1, in 2 and 1 = 2
 	    4 ; if name in 1, in 2 and 1 != 2
 */
+
+/**
+ *  Compares IODE objects having the same name in two KDB. 
+ *  Function used to compare an IODE file with the content of the current workspace.
+ *  
+ *  See above for more details on the comparison methods for each object type.
+ *  
+ *  @param [in] name    char*       object name
+ *  @param [in] kdb1    KDB*        first KDB
+ *  @param [in] kdb2    KDB*        second KDB
+ *  @return             int         0 if objects are equal, 1 if not.
+ *  
+ */
 
 int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 {
@@ -151,5 +236,3 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
     return(3 +
            K_cmpobj[KTYPE(kdb1)](KGOVAL(kdb1, p1), KGOVAL(kdb2, p2), name));
 }
-
-
