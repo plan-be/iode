@@ -20,6 +20,18 @@
  *  If name exists in kdb, the existing object is deleted and replaced by the new one.
  *  It returns the position of the object in the DB.
  *  
+ *  How to create IODE objects with K_add()
+ *  ---------------------------------------
+ *    - Comments    K_add(KDB* kdb, char* name, CMT cmt)
+ *    - Equations   K_add(KDB* kdb, char* name, EQ* eq, char* endo) [where endo = name]
+ *    - Identities  K_add(KDB* kdb, char* name, char* lec)
+ *    - Lists       K_add(KDB* kdb, char* name, char* list)
+ *    - Scalars     K_add(KDB* kdb, char* name, SCL* scalar)
+ *    - Tables      K_add(KDB* kdb, char* name, TBL *tbl) 
+ *    - Variables   K_add(KDB* kdb, char* name, IODE_REAL* var, int nb_obs) [nb_obs = kdb SAMPLE size]
+ *  
+ *  @note: the name of an equation MUST be the name of its endogenous variable
+ *  
  *  Example
  *  -------
  *      EQ*     eq;
