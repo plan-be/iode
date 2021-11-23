@@ -4,7 +4,7 @@
  * KDB management functions
  * ------------------------
  *
- * KDB structs contain the references to all IODE objects of the same type plus some technical information like the 
+ * KDB structs contain the handles of all IODE objects of the same type plus some technical information like the 
  * filename the kdb has been read from, the processor architecture...
  *
  * For each IODE object type, there is one KDB (also called "workspace") in memory. 
@@ -20,7 +20,7 @@
  *     int K_free_kdb(KDB* kdb)                             // frees a KDB but leaves its contents untouched.
  *     int K_free(KDB* kdb)                                 // frees a KDB and its contents.
  *     int K_clear(KDB* kdb)                                // deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws". 
- *     KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the references to the objects of the list names.
+ *     KDB *K_refer(KDB* kdb, int nb, char* names[])        // creates a new kdb containing the **handles** of the objects listed in names.
  *     KDB *K_quick_refer(KDB *kdb, char *names[])          // same as K_refer() but more efficient for large databases.
  *     int K_merge(KDB* kdb1, KDB* kdb2, int replace)       // merges two databases : kdb1 <- kdb1 + kdb2. 
  *     int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)   // merges two databases : kdb1 <- kdb1 + kdb2 then deletes kdb2. 
@@ -216,7 +216,7 @@ int K_clear(KDB* kdb)
 
 
 /**
- *  Creates a new kdb containing the references to the objects of the list names. 
+ *  Creates a new kdb containing the handles of the objects listed in names. 
  *  
  *  The data is **not** duplicated ("shallow copy") .
  *  
@@ -266,7 +266,8 @@ KDB *K_refer(KDB* kdb, int nb, char* names[])
 
 
 /**
- *  Creates a new kdb containing the references to the objects of the list names. 
+ *  Creates a new kdb containing the handles of the objects listed in names. 
+ *  
  *  Same as K_refer() but more efficient for large databases.
  *  
  *  The data is **not** duplicated ("shallow copy") .
