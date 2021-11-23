@@ -17,7 +17,7 @@
 
 #include "iode.h"
 
-int     K_WARN_DUP = 0;     // If null, adding an existing object name in a KDB does not trigger en arror (used in K_add_entry())
+int     K_WARN_DUP = 0;     // If null, adding an existing object name in a KDB does not trigger an error (used in K_add_entry())
 
 
 // Utilities 
@@ -27,7 +27,7 @@ int     K_WARN_DUP = 0;     // If null, adding an existing object name in a KDB 
  *  Compares a name with the name of an object (kobjs->o_name).
  *  
  *  @param [in] name    const void*     name to compare
- *  @param [in] kobjs   const KOBJ*     pointer to an general object (KOBJ)
+ *  @param [in] kobjs   const KOBJ*     pointer to a general object (KOBJ)
  *  @return             int             0 if name of p1 = name of p2 (the names ares equal)
  *                                      -1 if p1 is < p2 or p1 is null
  *                                      1 if p1 is > p2 or p2 is null and is not null
@@ -45,11 +45,15 @@ static int K_find_strcmp(const void *name, const void *kobjs)
 // API
 // ---
 
+// The K_SECRETSEP ('#') is used for internally created vars in reports.
 int K_SECRETSEP = '#'; // JMP 14/2/2013 pour les macros pushed A#n in reports
+
 
 /**
  *  Checks the validity of an object name and modify its "case" according to the value of mode.
  *  The name is truncated if it exceeds K_MAX_NAME characters.
+ *  
+ *  
  *  
  *  @param [in, out] name    char*   name to check
  *  @param [in]      mode    int     K_UPPER, K_LOWER of K_ASIS 
