@@ -2,29 +2,22 @@
 
 #include <QTableView>
 #include "../utils.h"
-#include "object_name_delegate.h"
+#include "abstract_delegate.h"
 
 template <class M> class AbstractTableView : public QTableView
 {
 	EnumIodeType iodeType;
-	ObjectNameDelegate* objectNameDelegate;
+	AbstractDelegate* delegate;
 
 public:
-	AbstractTableView(EnumIodeType iodeType, QWidget* parent = nullptr) : QTableView(parent), iodeType(iodeType)
-	{
-		bool uppercase = !(iodeType == SCALARS);
-		objectNameDelegate = new ObjectNameDelegate(uppercase, parent);
-	};
+	AbstractTableView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : QTableView(parent), iodeType(iodeType), delegate(delegate) {}
 
-	~AbstractTableView()
-	{
-		delete objectNameDelegate;
-	}
+	~AbstractTableView() {}
 
 	void setupModel(M* model)
 	{
 		setModel(model);
-		setItemDelegateForColumn(0, objectNameDelegate);
+		setItemDelegate(delegate);
 	}
 
 	void update()

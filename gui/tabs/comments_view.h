@@ -4,6 +4,7 @@
 
 #include "abstract_table_view.h"
 #include "comments_model.h"
+#include "text_delegate.h"
 
 
 class CommentsView : public AbstractTableView<CommentsModel>
@@ -11,5 +12,5 @@ class CommentsView : public AbstractTableView<CommentsModel>
 	Q_OBJECT
 
 public:
-	CommentsView(QWidget* parent = nullptr) : AbstractTableView(COMMENTS, parent) {};
+	CommentsView(QWidget* parent = nullptr) : AbstractTableView(COMMENTS, new TextDelegate(parent), parent) {};
 };

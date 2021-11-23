@@ -51,6 +51,9 @@
     <Filter Include="Source Files\menu\workspace">
       <UniqueIdentifier>{94f215a4-64ea-4836-9aac-86abd4d26fa8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\view\delegate">
+      <UniqueIdentifier>{2f5e557f-6b58-4507-b369-fbdbefb8b052}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -141,9 +144,6 @@
     <QtMoc Include="tabs\comments_model.h">
       <Filter>Header Files\model</Filter>
     </QtMoc>
-	<QtMoc Include="tabs\object_name_delegate.h">
-      <Filter>Header Files\view</Filter>
-    </QtMoc>
     <QtMoc Include="custom_widgets\qfilechooser.h">
       <Filter>Header Files\custom_widgets</Filter>
     </QtMoc>
@@ -158,6 +158,18 @@
     </QtMoc>
     <QtMoc Include="menu\workspace\workspace_clear.h">
       <Filter>Header Files\menu\workspace</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\abstract_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\text_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\scalars_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\variables_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -7,19 +7,14 @@
 #include <QRegularExpressionValidator>
 
 
-class ObjectNameDelegate : public QStyledItemDelegate
+class AbstractDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 
 	bool uppercase;
 
-public:
-	ObjectNameDelegate(bool uppercase, QObject* parent = nullptr) : QStyledItemDelegate(parent), uppercase(uppercase) {}
-
-	~ObjectNameDelegate() {}
-
-	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
-		const QModelIndex& index) const override
+protected:
+	QLineEdit* createNameEditor(QWidget* parent) const
 	{
 		QLineEdit* editor = new QLineEdit(parent);
 		QString acceptedLetters = uppercase ? "A-Z" : "a-z";
@@ -29,6 +24,20 @@ public:
 		editor->setValidator(validator);
 		return editor;
 	}
+
+	QLineEdit* createTextEditor(QWidget* parent) const
+	{
+		QLineEdit* editor = new QLineEdit(parent);
+		return editor;
+	}
+
+public:
+	AbstractDelegate(bool uppercase, QObject* parent = nullptr) : QStyledItemDelegate(parent), uppercase(uppercase) {}
+
+	~AbstractDelegate() {}
+
+	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+		const QModelIndex& index) const = 0;
 
 	void setEditorData(QWidget* editor, const QModelIndex& index) const override
 	{
