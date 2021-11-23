@@ -125,6 +125,7 @@ void K_strip(char* filename)
 
 /**
  *  K_LZH : indicates if a saved WS must be compressed or not. 
+ *  See also https://en.wikipedia.org/wiki/LHA_(file_format).
  */
 int     K_LZH = 0;          
 
@@ -252,7 +253,9 @@ error :
 
 
 /**
- *  Loads a IODE object file. 
+ *  Loads a IODE object file in binary format only. 
+ *  Use K_interpret() to load ascii or binary files.
+ *  
  *  If needed: 
  *      - uncompresses the file
  *      - transposes objects to 64 bits 
@@ -263,11 +266,11 @@ error :
  *  
  *  For example: "172.16.10.11:5000!c:\\usr\\data\\mydb.var".
  *  
- * @param [in]   ftype   int     file type (K_CMT -> K_VAR)
- * @param [in]   fname   FNAME   filename
- * @param [in]   no      int     0 for loading all objects, 1 for loading the list objs 
- * @param [in]   objs    char**  null or list of objects to load
- * @return               KDB*    KDB with the content of filename restricted to objs if objs is not null
+ * @param [in]   ftype      int     file type (K_CMT -> K_VAR)
+ * @param [in]   fname      FNAME   filename
+ * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
+ * @param [in]   objs       char**  null or list of objects to load
+ * @return                  KDB*    KDB with the content of filename restricted to objs if objs is not null
  *                               NULL on error
  *  
  * @note Messages are sent to the user via calls to 2 functions which must be defined 
@@ -276,7 +279,7 @@ error :
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)
  *                                   
  */
-KDB  *K_load(int ftype, FNAME fname, int no, char** objs)
+KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
 {
     int     i, j, lpos, pos, nf, vers, rc;
     char    *ptr, *cptr, *aptr, label[512], fullpath[1024];
@@ -288,7 +291,7 @@ KDB  *K_load(int ftype, FNAME fname, int no, char** objs)
     FILE    *fd;
     extern  char K_LABEL[];
 
-    if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, no, objs));
+    if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
 
     K_set_ext(file, fname, ftype);
     fd = fopen(file, "rb");
@@ -365,7 +368,7 @@ KDB  *K_load(int ftype, FNAME fname, int no, char** objs)
     }
 
     // Si aucun nom n'est donné, on charge tout
-    if(no == 0) {
+    if(load_all == 0) {
         for(i = 0; i < KNB(kdb); i++) {
             if(K_read_len(fd, vers, &len)) goto error;
 
@@ -473,7 +476,7 @@ KDB  *K_load(int ftype, FNAME fname, int no, char** objs)
 
 error:
     fclose(fd);
-    if(no == 0) {
+    if(load_all == 0) {
         if(i == 0) K_free(kdb);
         else { // JMP 31-01-00 
             KNB(kdb) = i;
@@ -490,7 +493,7 @@ error:
 
 /**
  *  Retrieves infos on an IODE file: type, number of objects and, if defined, 
- *  the file description and SAMPLE (for var files).
+ *  the file description (free info on the file contents) and SAMPLE (for var files only).
  *  
  *  @param [in]  filename   char*   file to analyze
  *  @param [out] descr      char*   NULL or pointer to copy the description of the file
