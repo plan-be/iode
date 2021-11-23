@@ -153,6 +153,9 @@ KDB *K_create(int type, int mode)
 /**
  *  Frees a KDB but leaves its contents untouched.
  *  
+ *  Usage: in the function K_refer() for example, object handles are copied (shallow copy) into a (temporary) new allocated KDB. 
+ *  When this temporary KDB in not needed anymore, the struct is deleted (freed), but not the objects.
+ *  
  *  @param [in, out] kdb    KDB* kdb to be deleted.
  *  @return                 int  0
  *  
