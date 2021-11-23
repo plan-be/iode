@@ -45,9 +45,6 @@ extern int kclmsg(int ,int );
 extern void kwrmsg(char *);
 
 /* k_cmp.c */
-extern int K_cmplg(char *,char *,char *);
-extern int K_cmpeqs(char *,char *,char *);
-extern int K_cmpidt(char *,char *,char *);
 extern int K_cmp(char *,KDB *,KDB *);
 
 /* k_lec.c */
