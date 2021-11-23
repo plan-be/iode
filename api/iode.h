@@ -1318,7 +1318,7 @@ extern  KDB   *(*K_load_asc[])();
 extern  int   (*K_save_asc[])();
 extern  int   (*K_save_csv[])();
 extern  int   (*K_pack[])();
-extern  int   (*K_cmpobj[])();
+//extern  int   (*K_cmpobj[])();
 extern  int   (*K_xdrobj[])();
 
 #ifdef SCRCPP
