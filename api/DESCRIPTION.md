@@ -20,7 +20,7 @@ Most filenames follow the same principle: each group of files has a specific pre
 - Group "LEC language"
 
 
-## A note of memory allocations in IODE
+## A note on memory allocations in IODE
 IODE uses 2 distinct groups of functions for memory allocations. 
 
 The **first group** is based on the "standard" memory allocation functions malloc() and free(). 
@@ -150,6 +150,18 @@ Function to create an IODE object and to record it in a KDB.
      int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9): adds an 
         object to a KDB. The number of arguments depends on object type.
 
+How to create IODE objects using K_add():
+ 
+    - Comments    K_add(KDB* kdb, char* name, CMT cmt)
+    - Equations   K_add(KDB* kdb, char* name, EQ* eq, char* endo) [where endo = name]
+    - Identities  K_add(KDB* kdb, char* name, char* lec)
+    - Lists       K_add(KDB* kdb, char* name, char* list)
+    - Scalars     K_add(KDB* kdb, char* name, SCL* scalar)
+    - Tables      K_add(KDB* kdb, char* name, TBL *tbl) 
+    - Variables   K_add(KDB* kdb, char* name, IODE_REAL* var, int nb_obs) [nb_obs = kdb SAMPLE size]
+ 
+ Note: the name of an equation MUST be the name of its endogenous variable
+
 ### k_objs.c
 Functions to manipulate IODE objects.
 
@@ -160,7 +172,7 @@ Functions to manipulate IODE objects.
     int K_find(KDB* kdb, char* name):                            Searches the position of an object name in a KDB.
     int K_del_entry(KDB* kdb, int pos):                          Deletes an entry in a KDB __without__ deleting the referenced object. 
     int K_del(KDB* kdb, int pos):                                Deletes an object (and its data) from a KDB.
-    int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. _
+    int K_del_by_name(KDB* kdb, char* name):                     Deletes an object identified by its name from a KDB. 
 
 ### k_objvers.c
 Functions to detect IODE object file version and to convert an object to the current IODE version._
