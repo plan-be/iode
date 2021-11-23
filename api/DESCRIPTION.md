@@ -204,6 +204,11 @@ Functions for "packing" and "unpacking" IODE objects.
      int KS_alloc_scl()
      int KV_alloc_var(int nb)
 
+### k_cmp.c
+Function to compare two IODE objects.
+
+    int K_cmp(char* name, KDB* kdb1, KDB* kdb2):            Compares IODE objects having the same name in two KDB.
+
 ## Group "IODE file management"
 
 ### k_objfile.c
@@ -223,7 +228,7 @@ Functions to manipulate IODE object files.
 ## Group "IODE ascii format (reading and writing)"
 Functions to load and save files in IODE ascii format and LArray csv format.
 
-**Ascii filenames**
+**Filename extensions**
 
  |Type             |Binary extension|Ascii extension|
  |----             |----------------|---------------|
