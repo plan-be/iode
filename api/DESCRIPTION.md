@@ -6,7 +6,8 @@ IODE objects, PER*() for manipulating PERIOD, L_* () for LEC compilation / execu
 
 Most filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
 
- - k*: core functions (the prefix "k_" is a legacy of the "Kaa" software)
+ - k_*: core functions (the prefix "k_" is a legacy of the "Kaa" software)
+ - b_*: building *B*locks for IODE reports
  - ... to be continued...
 
 ## TOC
@@ -239,7 +240,7 @@ Functions to load and save files in IODE ascii format and LArray csv format.
  | scalars         |.scl            |.as            |
  | tables          |.tbl            |.at            |
  | variables       |.var            |.av            |
- | LArray variables|.var            |.csv           |
+ | LArray variables|-               |.csv           |
 
 ### k_ccall.c
 Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV formats.
