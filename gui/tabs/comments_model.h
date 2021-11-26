@@ -26,6 +26,24 @@ private:
         }
 	}
 
+    bool setValue(const int row, const int column, const QVariant& value) override
+    { 
+		try
+		{
+			QString s_value = value.toString();
+			char* comment = new char[s_value.size() + 1];
+			strcpy(comment, s_value.toUtf8().data());
+			iodeItems.setObjectValue(row, comment);
+			delete[] comment;
+			return true;
+		}
+		catch (const std::runtime_error& e)
+		{
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+			return false;
+		}
+    }
+
 public slots:
 	void reset() { resetModel(); };
 };

@@ -91,30 +91,42 @@ const static int NB_IODE_FILES = 10;
  * ****************************** */
 
 
-// oem stands for oem 437 (see https://en.wikipedia.org/wiki/Code_page_437)
-inline char* convert_oem_to_utf8(char* oem, int codepage = CP_OEMCP)
+ // see http://www.cplusplus.com/forum/general/245426/
+inline char* convert_between_codepages(const char* s_in, const int codepage_in, const int codepage_out)
 {
-    // see http://www.cplusplus.com/forum/general/245426/
-    if (codepage > 0 && oem != NULL)
+    if (codepage_in > 0 && codepage_out > 0 && s_in != NULL)
     {
         // add 1 because strlen doesn't count the ending \0 character
-        int oem_length = static_cast<int>(strlen(oem)) + 1;
+        int s_in_length = static_cast<int>(strlen(s_in)) + 1;
         // MultiByteToWideChar: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar
-        const int u16_length = MultiByteToWideChar(codepage, 0, oem, oem_length, NULL, 0);
+        const int u16_length = MultiByteToWideChar(codepage_in, 0, s_in, s_in_length, NULL, 0);
         wchar_t* u16 = new wchar_t[u16_length];
-        MultiByteToWideChar(codepage, 0, oem, oem_length, u16, u16_length);
+        MultiByteToWideChar(codepage_in, 0, s_in, s_in_length, u16, u16_length);
 
-        int u8_length = WideCharToMultiByte(CP_UTF8, 0, u16, u16_length, NULL, 0, NULL, FALSE);
+        int s_out_length = WideCharToMultiByte(CP_UTF8, 0, u16, u16_length, NULL, 0, NULL, FALSE);
         // Warning: some special characters take 2 chars to be stored.
-        //          In other words, u8_length may be greater to oem_length.
+        //          In other words, s_out_length may be greater to s_in_length.
         //          This is why a new char array must be allocated and returned.
-        char* u8 = new char[u8_length];
+        char* s_out = new char[s_out_length];
         // WideCharToMultiByte: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte
-        WideCharToMultiByte(CP_UTF8, 0, u16, u16_length, u8, u8_length, NULL, FALSE);
+        WideCharToMultiByte(CP_UTF8, 0, u16, u16_length, s_out, s_out_length, NULL, FALSE);
         delete[] u16;
 
-        return u8;
+        return s_out;
     }
+}
+
+
+// oem stands for oem 437 (see https://en.wikipedia.org/wiki/Code_page_437)
+inline char* convert_oem_to_utf8(const char* oem)
+{
+    return convert_between_codepages(oem, CP_OEMCP, CP_UTF8);
+}
+
+
+inline char* convert_utf8_to_oem(const char* u8)
+{
+    return convert_between_codepages(u8, CP_UTF8, CP_OEMCP);
 }
 
 
@@ -164,6 +176,16 @@ protected:
         return pos;
     }
 
+    virtual int setOrAddObject(const char* name, const T* value) const = 0;
+
+private:
+    void setOrAddObjectWithException(const char* name, const T* value) const
+    {
+        int res = setOrAddObject(name, value);
+        if (res == -1) throw std::runtime_error("Iode has not been initialized");
+        if (res < -1) throw std::runtime_error("Something went wrong when trying to set or add " + type_name + " with name " + name);
+    }
+
 public:
     AbstractIODEObjects(EnumIodeType type) : type(type) 
     {
@@ -211,22 +233,25 @@ public:
     T* getObjectValueByName(const char* name) const
     {
         int pos = getPosition(name);
-        if (pos >= 0)
-        {
-            T* value = getObjectValue(pos);
-            return value;
-        }
-        else
-        {
-            return NULL;
-        }  
+        T* value = getObjectValue(pos);
+        return value; 
     }
 
-    // TODO : implement this method
-    // virtual void setObjectValue(const T* value, const int pos) const = 0;
+    void setObjectValue(const int pos, const T* value) const
+    {
+        char* name = getObjectName(pos);
+        setOrAddObjectWithException(name, value);
+    }
+
+    void setObjectValueByName(const char* name, const T* value) const
+    {
+        // call getPosition() to check that object exists
+        getPosition(name);
+        setOrAddObjectWithException(name, value);
+    }
 
     // TODO : overload subscript operator 
-    //T& operator[](cosnt char* name) { ... }
+    //T& operator[](const char* name) { ... }
 
     // TODO : overload subscript operator 
     //T& operator[](const int pos) { ... }
@@ -243,6 +268,13 @@ public:
         char* comment = convert_oem_to_utf8(oem);
         return comment;
     }
+
+protected:
+    int setOrAddObject(const char* name, const Comment* comment) const
+    {
+        char* comment_oem = convert_utf8_to_oem(comment);
+        return K_add(getKDB(), name, comment_oem);
+    }
 };
 
 
@@ -255,6 +287,12 @@ public:
     Equation* getObjectValue(const int pos) const { return NULL; }
 
     char* getLec(const int pos) const { return KELEC(getKDB(), pos); }
+
+protected:
+    int setOrAddObject(const char* name, const Equation* equation) const
+    {
+        return K_add(getKDB(), name, equation, name);
+    }
 };
 
 
@@ -266,6 +304,12 @@ public:
     Identity* getObjectValue(const int pos) const { return NULL; }
 
     char* getLec(const int pos) const { return KILEC(getKDB(), pos); }
+
+protected:
+    int setOrAddObject(const char* name, const Identity* identity) const
+    {
+        return K_add(getKDB(), name, identity->lec);
+    }
 };
 
 
@@ -275,6 +319,12 @@ public:
     Lists() : AbstractIODEObjects(LISTS) {}
 
     List* getObjectValue(const int pos) const { return K_oval0(getKDB(), pos); }
+
+protected:
+    int setOrAddObject(const char* name, const List* list) const
+    {
+        return K_add(getKDB(), name, list);
+    }
 };
 
 
@@ -284,6 +334,12 @@ public:
     Scalars() : AbstractIODEObjects(SCALARS) {};
 
     Scalar* getObjectValue(const int pos) const { return KSVAL(getKDB(), pos); }
+
+protected:
+    int setOrAddObject(const char* name, const Scalar* scalar) const
+    {
+        return K_add(getKDB(), name, scalar);
+    }
 };
 
 
@@ -302,6 +358,12 @@ public:
         char* title = convert_oem_to_utf8(title_oem);
         T_free(table);
         return title;
+    }
+
+protected:
+    int setOrAddObject(const char* name, const Table* table) const
+    {
+        return K_add(getKDB(), name, table);
     }
 };
 
@@ -328,6 +390,13 @@ public:
     void getPeriod(char* period, const int t) const
     {
         PER_pertoa(PER_addper(&(KSMPL(getKDB())->s_p1), t), period);
+    }
+
+protected:
+    int setOrAddObject(const char* name, const Variable* variable) const
+    {
+        int nb_obs = getNbPeriods();
+        return K_add(getKDB(), name, variable, nb_obs);
     }
 };
 
