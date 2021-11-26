@@ -127,7 +127,7 @@ protected:
 		}
 	}
 
-	bool setValue(const int row, const int column, const QVariant& value) { return false; }
+	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
 
 	bool setDataCell(const int row, const int column, const QVariant& value) 
 	{
