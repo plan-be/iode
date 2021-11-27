@@ -140,15 +140,8 @@ extern char *K_wrap(char *,int );
 
 /* k_xdr.c */
 extern void K_xdrPINT(unsigned char *);
+extern void K_xdrPLONG(unsigned char *);
 extern void K_xdrKDB(KDB *,KDB **);
-extern int K_cxdr(unsigned char *,unsigned char **);
-extern int K_exdr(unsigned char *,unsigned char **);
-extern int K_ixdr(unsigned char *,unsigned char **);
-extern int K_lxdr(unsigned char *,unsigned char **);
-extern int K_sxdr(unsigned char *,unsigned char **);
-extern int K_txdr(unsigned char *,unsigned char **);
-extern int K_vxdr(unsigned char *,unsigned char **);
-extern int K_oxdr(unsigned char *,unsigned char **);
 
 /* l_token.c */
 extern int L_open_all(char *,int );
