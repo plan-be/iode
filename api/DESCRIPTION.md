@@ -184,7 +184,7 @@ Functions to detect IODE object file version and to convert an object to the cur
 ###  k_pack.c
 Functions for "packing" and "unpacking" IODE objects.
 
-###### Packing functions
+###### Packing functions  
 
      int K_cpack(char **pack, char *a1)
      int K_epack(char **pack, char *a1, char *a2)
@@ -226,6 +226,16 @@ Functions to manipulate IODE object files.
     int K_save_ws(KDB* kdb):                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
     int K_setname(char* from, char* to):                                             replaces KNAMEPTR(kdb) in an IODE object file.
 
+## Group "IODE big- and little-endian conversion"
+Functions to convert big-endian data, used by processors like RISC,... into little-endian format (x86,...) and vice-versa.
+
+    void K_xdrPINT(unsigned char* a)           Converts un short int from l-e to b-e and vice-versa
+    void K_xdrPLONG(unsigned char* a)          Converts un long int from l-e to b-e and vice-versa
+    void K_xdrKDB(KDB* ikdb, KDB** okdb)       Converts a KDB t from l-e to b-e and vice-versa
+
+    int (*K_xdrobj[])()                        Table of function pointers, one function for each object type, for converting
+                                               big-endian to little-endian and vice-versa
+ 
 ## Group "IODE ascii format (reading and writing)"
 Functions to load and save files in IODE ascii format and LArray csv format.
 
