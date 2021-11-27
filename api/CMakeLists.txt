@@ -3,9 +3,10 @@
 #
 
 # Add source to this project's executable.
+set (DOCS DESCRIPTION.md)
 set (UTILS buf.c pack.c per.c yy.c)
 set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
-set (OBJS k_objs.c k_objsv.c k_pack.c k_objfile.C k_objvers.c k_kdb.c k_ws.c)
+set (OBJS k_objs.c k_objsv.c k_pack.c k_objfile.C k_xdr.c k_objvers.c k_kdb.c k_ws.c k_cmp.c)
 
 set (SOURCES 
 		${UTILS} 
@@ -20,7 +21,7 @@ set (HEADERS
 		iode.h iodebase.h iodevarg.h
 )
 
-add_library (iodeapi STATIC ${SOURCES} ${HEADERS})
+add_library (iodeapi STATIC ${SOURCES} ${HEADERS} ${DOCS})
 
 # Compiler options
 add_compile_options(-Zi -Zp1)
