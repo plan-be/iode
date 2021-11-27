@@ -388,7 +388,7 @@ extern double KV_get(KDB *,int ,int ,int );
 extern void KV_set(KDB *,int ,int ,int ,double );
 extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
 extern KDB *KV_aggregate(KDB *,int ,char *,char *);
-extern int KV_GetSmpl(SAMPLE *,char *);
+//extern int KV_GetSmpl(SAMPLE *,char *);
 
 /* k_val.c */
 extern char *K_oval(KDB *,int ,int );
