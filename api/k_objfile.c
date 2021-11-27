@@ -253,7 +253,8 @@ error :
 
 
 /**
- *  Loads a IODE object file in binary format only. 
+ *  Loads an IODE binary object file. 
+ *  
  *  Use K_interpret() to load ascii or binary files.
  *  
  *  If needed: 
