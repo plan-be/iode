@@ -137,6 +137,16 @@ Variables and functions for initializing and cleaning up the "in memory" workspa
     void K_init_ws(int ws)        Initialises the "in mem" KDB structures and optionnaly loads the ws.* files
     void K_end_ws(int ws)         Deletes the current workspaces defined in K_WS[] and their content after having optionnaly saved their content in ws.* files.
 
+### k_wsvar.c
+Functions acting on workspaces of variables.
+
+    int KV_sample(KDB *kdb, SAMPLE *nsmpl)                                  Changes the SAMPLE of a KDB of variables.
+    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
+    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
+    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
+    void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
+    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
+    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names._
 
 ## Group "Object management"
 
