@@ -29,8 +29,8 @@
 
 /* Gobals */
 KDB     *K_WS[7];                           // Current workspaces
-KDB     *K_RWS[7][5];                       // Current loaded workspaces (for printing and identity execution)
-int     K_PWS[7] = { 0, 0, 0, 0, 0, 0, 0 }; // 
+KDB     *K_RWS[7][5];                       // Currently loaded workspaces (for printing and identity execution)
+int     K_PWS[7] = { 0, 0, 0, 0, 0, 0, 0 }; // ??? TODO: check if still in use
 
 //extern  int K_AUTO_WS;
 
