@@ -146,19 +146,19 @@ extern void K_xdrKDB(KDB *,KDB **);
 /* l_token.c */
 extern int L_open_all(char *,int );
 extern void L_close(void);
-extern int L_lex(void);
-extern int L_read(void);
-extern int L_unread(void);
-extern int L_macro(void);
-extern int L_string(void);
-extern int L_read_string(void);
-extern int L_getc(void);
-extern void L_ungetc(int );
-extern void L_skip(void);
+//extern int L_lex(void);
+//extern int L_read(void);
+//extern int L_unread(void);
+//extern int L_macro(void);
+//extern int L_string(void);
+//extern int L_read_string(void);
+//extern int L_getc(void);
+//extern void L_ungetc(int );
+//extern void L_skip(void);
 extern int L_get_token(void);
-extern int L_include(char *,char *);
-extern int L_get_int(void);
-extern int L_get_period(YYFILE *,PERIOD *);
+//extern int L_include(char *,char *);
+//extern int L_get_int(void);
+//extern int L_get_period(YYFILE *,PERIOD *);
 
 /* l_cc1.c */
 extern int L_alloc_expr(int );
