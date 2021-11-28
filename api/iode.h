@@ -1175,6 +1175,9 @@ extern  int     KSIM_MAXIT, KSIM_DEBUG, KSIM_PASSES, KSIM_DEBUGNEWTON,
 	KSIM_SORT, KSIM_START;
 extern  char    **KSIM_EXO;
 
+/*-------------- MESSAGES -----------------------*/
+extern void (*B_MessageBox_impl)(unsigned char* title, unsigned char* message, unsigned char* buts[]);
+
 /*------------- IMPORT/EXPORT: Cmt --------------*/
 extern  IMPDEF  IMP_ASC_CMT;
 extern  IMPDEF  IMP_BST_CMT;
