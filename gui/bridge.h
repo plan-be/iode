@@ -261,7 +261,7 @@ public:
 
     virtual T* getObjectValue(const int pos) const = 0;
 
-    T* getObjectValueByName(const char* name) const
+    T* getObjectValue(const char* name) const
     {
         int pos = getPosition(name);
         T* value = getObjectValue(pos);
@@ -274,7 +274,7 @@ public:
         setOrAddObjectWithException(name, value);
     }
 
-    void setObjectValueByName(const char* name, const T* value) const
+    void setObjectValue(const char* name, const T* value) const
     {
         // call getPosition() to check that object exists
         getPosition(name);
