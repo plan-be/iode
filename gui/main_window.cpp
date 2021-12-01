@@ -60,36 +60,8 @@ MainWindow::~MainWindow()
     delete scalarsModel;
     delete tablesModel;
     delete variablesModel;
-}
 
-// TODO: the User Interface implementation should NOT be aware of how the base API (iode.lib) is implemented.
-//       Please provide a higher level base API.
-void MainWindow::init_iode_api()
-{
-
-    SW_MIN_MEM = 120 * 1024L;
-    SW_MIN_SEGS = 2;
-    // initializes SCR4
-    if (SW_init(1)) throw std::runtime_error("An error occured when called the internal function SW_init()");
-
-    // initializes Dynamic Data Exchange (DDE)
-    //IodeStartDde();
-    // initializes Workspace 
-    K_init_ws(0);
-}
-
-// TODO: the User Interface implementation should NOT be aware of how the base API (iode.lib) is implemented.
-//       Please provide a higher level base API.
-void MainWindow::end_iode_api()
-{
-    // free Workspace
-    K_end_ws(0);
-    // free SCR4
-    SW_end();
-    // ???
-    W_close();
-    // stops Dynamic Data Exchange (DDE)
-    //IodeEndDde();
+    end_iode_api();
 }
 
 void MainWindow::updateCurrentTab(int index)

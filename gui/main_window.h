@@ -40,8 +40,6 @@ public:
 	~MainWindow();
 
 private:
-	void init_iode_api();
-	void end_iode_api();
 	void updateCurrentTab(int index = -1);
 
 protected:
