@@ -146,7 +146,7 @@ using Variable = IODE_REAL;
 using Sample = SAMPLE;
 
 
-template <class T> class AbstractIODEObjects
+template <class T> class AbstractKDB
 {
 protected:
     EnumIodeType type;
@@ -187,7 +187,7 @@ private:
     }
 
 public:
-    AbstractIODEObjects(EnumIodeType type) : type(type) 
+    AbstractKDB(EnumIodeType type) : type(type) 
     {
         type_name = qmapIodeTypes.keys(type)[0].toStdString();
     }
@@ -258,10 +258,10 @@ public:
 };
 
 
-class Comments : public AbstractIODEObjects<Comment>
+class Comments : public AbstractKDB<Comment>
 {
 public:
-    Comments() : AbstractIODEObjects(COMMENTS) {};
+    Comments() : AbstractKDB(COMMENTS) {};
 
     Comment* getObjectValue(const int pos) const { 
         char* oem = K_oval0(getKDB(), pos);
@@ -278,10 +278,10 @@ protected:
 };
 
 
-class Equations : public AbstractIODEObjects<Equation>
+class Equations : public AbstractKDB<Equation>
 {
 public:
-    Equations() : AbstractIODEObjects(EQUATIONS) {};
+    Equations() : AbstractKDB(EQUATIONS) {};
 
     // TODO: create a Class Equation (with a destructor)
     Equation* getObjectValue(const int pos) const { return NULL; }
@@ -296,10 +296,10 @@ protected:
 };
 
 
-class Identities : public AbstractIODEObjects<Identity>
+class Identities : public AbstractKDB<Identity>
 {
 public:
-    Identities() : AbstractIODEObjects(IDENTITIES) {};
+    Identities() : AbstractKDB(IDENTITIES) {};
 
     Identity* getObjectValue(const int pos) const { return NULL; }
 
@@ -313,10 +313,10 @@ protected:
 };
 
 
-class Lists : public AbstractIODEObjects<List>
+class Lists : public AbstractKDB<List>
 {
 public:
-    Lists() : AbstractIODEObjects(LISTS) {}
+    Lists() : AbstractKDB(LISTS) {}
 
     List* getObjectValue(const int pos) const { return K_oval0(getKDB(), pos); }
 
@@ -328,10 +328,10 @@ protected:
 };
 
 
-class Scalars : public AbstractIODEObjects<Scalar>
+class Scalars : public AbstractKDB<Scalar>
 {
 public:
-    Scalars() : AbstractIODEObjects(SCALARS) {};
+    Scalars() : AbstractKDB(SCALARS) {};
 
     Scalar* getObjectValue(const int pos) const { return KSVAL(getKDB(), pos); }
 
@@ -343,10 +343,10 @@ protected:
 };
 
 
-class Tables : public AbstractIODEObjects<Table>
+class Tables : public AbstractKDB<Table>
 {
 public:
-    Tables() : AbstractIODEObjects(TABLES) {};
+    Tables() : AbstractKDB(TABLES) {};
 
     // TODO: create a Class Table (with a destructor)
     Table* getObjectValue(const int pos) const { return NULL; }
@@ -368,10 +368,10 @@ protected:
 };
 
 
-class Variables : public AbstractIODEObjects<Variable>
+class Variables : public AbstractKDB<Variable>
 {
 public:
-    Variables() : AbstractIODEObjects(VARIABLES) {};
+    Variables() : AbstractKDB(VARIABLES) {};
 
     // TODO: not tested yet
     Variable* getObjectValue(const int pos) const
