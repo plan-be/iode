@@ -253,7 +253,7 @@ public:
         {
             std::string msg = type_name + " cannot be renamed as " + new_name + ".";
             if (pos == -1) throw std::runtime_error(std::string("Name ") + old_name + " does not exist.\n" + msg);
-            else if (pos == -2) throw std::runtime_error(type_name + " with name " + new_name + " already exist.\n" + msg);
+            else if (pos == -2) throw std::runtime_error(type_name + " with name " + new_name + " already exists.\n" + msg);
             else throw std::runtime_error("Something went wrong.\n" + msg);
         }
         return pos;
