@@ -245,7 +245,7 @@ public:
     // Do not set const char* old/new_name because of K_ren definition
     int renameObject(char* old_name, char* new_name)
     {
-        if (strlen(new_name) > 20) throw std::runtime_error("Iode names cannot exceed 20 characters." + std::string(new_name) + " : " + std::to_string(strlen(new_name)));
+        if (strlen(new_name) > K_MAX_NAME) throw std::runtime_error("Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters." + std::string(new_name) + " : " + std::to_string(strlen(new_name)));
         KDB* kdb = getKDB();
         int pos = K_ren(kdb, old_name, new_name);
         // see K_ren documentation
