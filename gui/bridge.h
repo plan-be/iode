@@ -95,7 +95,35 @@ const static int NB_IODE_FILES = 10;
  * ****************************** */
 
 
- // see http://www.cplusplus.com/forum/general/245426/
+inline void init_iode_api()
+{
+
+    SW_MIN_MEM = 120 * 1024L;
+    SW_MIN_SEGS = 2;
+    // initializes SCR4
+    if (SW_init(1)) throw std::runtime_error("An error occured when called the internal function SW_init()");
+
+    // initializes Dynamic Data Exchange (DDE)
+    //IodeStartDde();
+    // initializes Workspace 
+    K_init_ws(0);
+}
+
+
+inline void end_iode_api()
+{
+    // free Workspace
+    K_end_ws(0);
+    // free SCR4
+    SW_end();
+    // ???
+    W_close();
+    // stops Dynamic Data Exchange (DDE)
+    //IodeEndDde();
+}
+
+
+// see http://www.cplusplus.com/forum/general/245426/
 inline char* convert_between_codepages(const char* s_in, const int codepage_in, const int codepage_out)
 {
     if (codepage_in > 0 && codepage_out > 0 && s_in != NULL)
@@ -157,6 +185,8 @@ protected:
     std::string type_name;
 
 protected:
+    // Cannot define a KDB *kdb member set to K_WS[type] in the constructor because the pointer contained in 
+    // K_WS[type] may change in the course of the course (when loading files for example)
     KDB* getKDB() const
     {
         KDB* kdb = K_WS[type];
@@ -191,10 +221,7 @@ private:
     }
 
 public:
-    AbstractKDB(EnumIodeType type) : type(type) 
-    {
-        type_name = iodeTypesAsString[type];
-    }
+    AbstractKDB(EnumIodeType type) : type(type), type_name(iodeTypesAsString[type]) { init_iode_api(); }
 
     int getIODEType() const { return type; }
 
