@@ -24,9 +24,6 @@
  */
 
 
-const static char NAN_REP[3] = "--";
-
-
 template <class I> class IODEAbstractTableModel : public QAbstractTableModel
 {
 protected:

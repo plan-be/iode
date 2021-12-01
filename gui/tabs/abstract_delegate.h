@@ -6,6 +6,8 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
+#include "../util/double_validator.h"
+
 
 class AbstractDelegate : public QStyledItemDelegate
 {
