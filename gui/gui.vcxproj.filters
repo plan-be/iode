@@ -54,6 +54,9 @@
     <Filter Include="Header Files\view\delegate">
       <UniqueIdentifier>{2f5e557f-6b58-4507-b369-fbdbefb8b052}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{f4268cf2-a061-4ed3-b95a-ab965eb05588}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -93,6 +96,9 @@
     </ClInclude>
     <ClInclude Include="wrapper_classes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\double_validator.h">
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

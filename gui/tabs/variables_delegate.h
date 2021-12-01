@@ -22,7 +22,7 @@ public:
 		else
 		{
 			QLineEdit* editor = new QLineEdit(parent);
-			editor->setValidator(new QDoubleValidator(editor));
+			editor->setValidator(new IODEDoubleValidator(editor));
 			return editor;
 		}
 	}

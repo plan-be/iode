@@ -23,7 +23,7 @@ public:
 			editor = createNameEditor(parent);
 			break;
 		case 1:
-			editor->setValidator(new QDoubleValidator(editor));
+			editor->setValidator(new IODEDoubleValidator(editor));
 			break;
 		case 2:
 			editor->setValidator(new QDoubleValidator(0., 1., 10, editor));

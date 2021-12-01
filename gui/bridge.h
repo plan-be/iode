@@ -36,6 +36,8 @@ const static char* APPLICATION_NAME = "IODE";
 const static char* DEFAULT_INSTALLATION_DIR = "c:/iode";               // see function HLP_filename() in dos/o_help.c
 const static char* IODE_WEBSITE = "https://iode.plan.be/doku.php";
 
+const static char NAN_REP[3] = "--";
+
 
 /* ****************************** *
  *             ENUMS              *
