@@ -99,18 +99,18 @@ inline char* convert_between_codepages(const char* s_in, const int codepage_in, 
         // add 1 because strlen doesn't count the ending \0 character
         int s_in_length = static_cast<int>(strlen(s_in)) + 1;
         // MultiByteToWideChar: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar
-        const int u16_length = MultiByteToWideChar(codepage_in, 0, s_in, s_in_length, NULL, 0);
-        wchar_t* u16 = new wchar_t[u16_length];
-        MultiByteToWideChar(codepage_in, 0, s_in, s_in_length, u16, u16_length);
+        const int wchar_length = MultiByteToWideChar(codepage_in, 0, s_in, s_in_length, NULL, 0);
+        wchar_t* wchar_array = new wchar_t[wchar_length];
+        MultiByteToWideChar(codepage_in, 0, s_in, s_in_length, wchar_array, wchar_length);
 
-        int s_out_length = WideCharToMultiByte(CP_UTF8, 0, u16, u16_length, NULL, 0, NULL, FALSE);
+        int s_out_length = WideCharToMultiByte(codepage_out, 0, wchar_array, wchar_length, NULL, 0, NULL, FALSE);
         // Warning: some special characters take 2 chars to be stored.
         //          In other words, s_out_length may be greater to s_in_length.
         //          This is why a new char array must be allocated and returned.
         char* s_out = new char[s_out_length];
         // WideCharToMultiByte: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte
-        WideCharToMultiByte(CP_UTF8, 0, u16, u16_length, s_out, s_out_length, NULL, FALSE);
-        delete[] u16;
+        WideCharToMultiByte(codepage_out, 0, wchar_array, wchar_length, s_out, s_out_length, NULL, FALSE);
+        delete[] wchar_array;
 
         return s_out;
     }
