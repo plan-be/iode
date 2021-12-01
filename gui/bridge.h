@@ -58,6 +58,8 @@ enum EnumIodeType
 
 const static int NB_IODE_TYPES = 7;
 
+const static std::vector<std::string> iodeTypesAsString = {"Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables"};
+
 
 enum EnumLang
 {
@@ -189,7 +191,7 @@ private:
 public:
     AbstractKDB(EnumIodeType type) : type(type) 
     {
-        type_name = qmapIodeTypes.keys(type)[0].toStdString();
+        type_name = iodeTypesAsString[type];
     }
 
     int getIODEType() const { return type; }
