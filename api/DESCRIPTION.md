@@ -25,12 +25,13 @@ Most filenames follow the same principle: each group of files has a specific pre
 IODE uses 2 distinct groups of functions for memory allocations. 
 
 The **first group** is based on the "standard" memory allocation functions malloc() and free(). 
+
 The main functions in this group are SW_nalloc(), SW_nrealloc() and SW_nfree(). An older group from *scr4* has the same properties: SCR_malloc(), SCR_realloc() and SCR_free()_
 
 The **second group** has been created specifically to avoid memory segmentation when possible. The main idea is to allocate large memory buffers 
 on the heap (called "segments") and to fill them with serialized objects, like "packed" equations or variables. 
 Each allocated object is represented by an identifier (a "handle") and, when it is 
-reclaim by the program, a trivial indirection translates its handle to the real pointer which is simply a shift from the beginning of its segment.
+reclaimed by the program, a trivial indirection translates its handle to the real pointer which is simply a shift from the beginning of its segment.
 
 The main functions in this second group are **SW_init()**, **SW_alloc()**, **SW_realloc()**, **SW_free()**, **SW_getptr()** and **SW_end()**.
 
@@ -237,6 +238,8 @@ Functions to manipulate IODE object files.
     int K_setname(char* from, char* to):                                             replaces KNAMEPTR(kdb) in an IODE object file.
 
 ## Group "IODE big- and little-endian conversion"
+
+### k_xdr.c
 Functions to convert big-endian data, used by processors like RISC,... into little-endian format (x86,...) and vice-versa.
 
     void K_xdrPINT(unsigned char* a)           Converts un short int from l-e to b-e and vice-versa
@@ -314,6 +317,8 @@ Functions to import and export IODE files to/from ascii and LArray-csv format.
 
 ## Group "LEC language"
 
+Voir LEC.md
+
 ### k_lec.c
 Implemention of the LEC library virtual functions for SCL and VAR references.
 
@@ -323,6 +328,8 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
     int L_findscl(KDB* kdb, char *name)
     int L_findvar(KDB* kdb, char* name)
 
+
+
 ## Estimation
 
 ## Simulation
@@ -330,22 +337,6 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 ## Reports
 
 ## Remaining source files 
-
-
-- k_xdr 
-
-- l_token 
-- l_cc1 
-- l_alloc 
-- l_err 
-- l_vars
-- l_cc2 
-- l_link 
-- l_exec 
-- l_eqs 
-- l_newton 
-- l_debug
-- l_secant 
 
 - e_est 
 - e_step 
