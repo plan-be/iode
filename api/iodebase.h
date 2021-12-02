@@ -161,20 +161,19 @@ extern int L_get_token(void);
 //extern int L_get_period(YYFILE *,PERIOD *);
 
 /* l_cc1.c */
-extern int L_alloc_expr(int );
-extern CLEC *L_cc_stream(void);
-extern CLEC *L_cc(char *);
+extern void L_alloc_expr(int );
 extern int L_cc1(int );
-extern int L_add_new_series(char *);
-extern int L_save_var(void);
-extern int L_save_op(void);
-extern int L_priority_sup(int );
-extern int L_add_stack(int );
-extern int L_clear_stack(void);
-extern int L_anal_lag(void);
+// extern int L_add_new_series(char *);
+extern void L_free_anames(void);
+//extern int L_save_var(void);
+//extern int L_save_op(void);
+//extern int L_priority_sup(int );
+//extern int L_add_stack(int );
+//extern int L_clear_stack(void);
+//extern int L_anal_lag(void);
 extern int L_sub_expr(ALEC *,int );
-extern int L_time_expr(void);
-extern int L_lag_expr(int );
+//extern int L_time_expr(void);
+//extern int L_lag_expr(int );
 
 /* ode.c */
 extern  char    *L_expand(char *);
@@ -182,7 +181,7 @@ extern  char    *L_expand(char *);
 /* l_alloc.c */
 extern char *L_malloc(int );
 //extern int L_free(char *);
-extern int L_free(void *);
+extern void L_free(void *);
 
 /* l_err.c */
 extern char *L_error(void);
@@ -191,6 +190,8 @@ extern char *L_error(void);
 extern CLEC *L_cc2(ALEC *);
 extern int L_move_arg(char *,char *,int );
 extern int L_calc_len(ALEC *,int ,int );
+extern CLEC *L_cc_stream(void);
+extern CLEC *L_cc(char *);
 
 /* l_link.c */
 extern int L_link(KDB *,KDB *,CLEC *);
