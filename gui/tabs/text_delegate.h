@@ -8,7 +8,7 @@ class TextDelegate : public AbstractDelegate
 	Q_OBJECT
 
 public:
-	TextDelegate(QObject* parent = nullptr) : AbstractDelegate(true, parent) {}
+	TextDelegate(EnumIodeCase nameCase, QObject* parent = nullptr) : AbstractDelegate(nameCase, parent) {}
 
 	~TextDelegate() {}
 

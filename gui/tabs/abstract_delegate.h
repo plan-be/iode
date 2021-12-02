@@ -6,6 +6,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
+#include "../bridge.h"
 #include "../util/double_validator.h"
 
 
@@ -13,13 +14,27 @@ class AbstractDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 
-	bool uppercase;
+	EnumIodeCase nameCase;
 
 protected:
 	QLineEdit* createNameEditor(QWidget* parent) const
 	{
 		QLineEdit* editor = new QLineEdit(parent);
-		QString acceptedLetters = uppercase ? "A-Z" : "a-z";
+		QString acceptedLetters;
+		switch (nameCase)
+		{
+		case UPPER:
+			acceptedLetters = "A-Z";
+			break;
+		case LOWER:
+			acceptedLetters = "a-z";
+			break;
+		case ASIS:
+			acceptedLetters = "A-Za-z";
+			break;
+		default:
+			break;
+		}
 		// https://doc.qt.io/qt-5/qregexp.html
 		QRegularExpression re(QString("[%1_][0-9%1_]{0,19}").arg(acceptedLetters));
 		QValidator* validator = new QRegularExpressionValidator(re, editor);
@@ -34,7 +49,7 @@ protected:
 	}
 
 public:
-	AbstractDelegate(bool uppercase, QObject* parent = nullptr) : QStyledItemDelegate(parent), uppercase(uppercase) {}
+	AbstractDelegate(EnumIodeCase nameCase, QObject* parent = nullptr) : QStyledItemDelegate(parent), nameCase(nameCase) {}
 
 	~AbstractDelegate() {}
 

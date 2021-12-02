@@ -8,7 +8,7 @@ class ScalarsDelegate : public AbstractDelegate
 	Q_OBJECT
 
 public:
-	ScalarsDelegate(QObject* parent = nullptr) : AbstractDelegate(false, parent) {}
+	ScalarsDelegate(QObject* parent = nullptr) : AbstractDelegate(LOWER, parent) {}
 
 	~ScalarsDelegate() {}
 
