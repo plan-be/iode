@@ -177,6 +177,21 @@
     <QtMoc Include="tabs\variables_delegate.h">
       <Filter>Header Files\view\delegate</Filter>
     </QtMoc>
+    <QtMoc Include="tabs\comments_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\equations_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\identities_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\lists_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\tables_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">

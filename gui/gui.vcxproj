@@ -165,6 +165,11 @@
     <QtMoc Include="tabs\text_delegate.h" />
     <QtMoc Include="tabs\scalars_delegate.h" />
     <QtMoc Include="tabs\variables_delegate.h" />
+    <QtMoc Include="tabs\comments_delegate.h" />
+    <QtMoc Include="tabs\equations_delegate.h" />
+    <QtMoc Include="tabs\identities_delegate.h" />
+    <QtMoc Include="tabs\lists_delegate.h" />
+    <QtMoc Include="tabs\tables_delegate.h" />
     <ClInclude Include="util\double_validator.h" />
     <ClInclude Include="wrapper_classes.h" />
     <QtMoc Include="custom_widgets\qfilechooser.h" />

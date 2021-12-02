@@ -90,6 +90,14 @@ enum EnumIodeFile
 const static int NB_IODE_FILES = 10;
 
 
+enum EnumIodeCase
+{ 
+    UPPER,
+    LOWER,
+    ASIS
+};
+
+
 /* ****************************** *
  *          FUNCTIONS             *
  * ****************************** */
