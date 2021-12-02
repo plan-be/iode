@@ -16,12 +16,12 @@ private:
 	QVariant dataCell(const int row, const int col) const
 	{
 		QVariant value;
-		Scalar* scalar = iodeItems.getObjectValue(row);
+		Scalar* scalar = kdb.getObjectValue(row);
 
 		switch (col)
 		{
 		case 0:
-			value = QString(iodeItems.getObjectName(row));
+			value = QString(kdb.getObjectName(row));
 			break;
 		case 1:
 			value = L_ISAN(scalar->val) ? QString::number(scalar->val, 'g', 3) : NAN_REP;

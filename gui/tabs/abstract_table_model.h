@@ -24,19 +24,19 @@
  */
 
 
-template <class I> class IODEAbstractTableModel : public QAbstractTableModel
+template <class K> class IODEAbstractTableModel : public QAbstractTableModel
 {
 protected:
-	I iodeItems;
+	K kdb;
 	QVector<QString> columnNames;
 
 public:
 	IODEAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : QAbstractTableModel(parent),
-		iodeItems(I()), columnNames(columnNames) {};
+		kdb(K()), columnNames(columnNames) {};
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return iodeItems.count();
+		return kdb.count();
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const
@@ -113,7 +113,7 @@ protected:
 		{
 			char* char_new_name = new char[new_name.size() + 1];
 			strcpy(char_new_name, new_name.toUtf8().data());
-			int pos = iodeItems.setObjectName(row, char_new_name);
+			int pos = kdb.setObjectName(row, char_new_name);
 			delete[] char_new_name;
 			return true;
 		}

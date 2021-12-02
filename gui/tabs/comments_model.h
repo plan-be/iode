@@ -18,11 +18,11 @@ private:
 	{
         if (col == 0)
         {
-            return QVariant(QString(iodeItems.getObjectName(row)));
+            return QVariant(QString(kdb.getObjectName(row)));
         }
         else
         {
-            return QVariant(QString(iodeItems.getObjectValue(row)));
+            return QVariant(QString(kdb.getObjectValue(row)));
         }
 	}
 
@@ -33,7 +33,7 @@ private:
 			QString s_value = value.toString();
 			char* comment = new char[s_value.size() + 1];
 			strcpy(comment, s_value.toUtf8().data());
-			iodeItems.setObjectValue(row, comment);
+			kdb.setObjectValue(row, comment);
 			delete[] comment;
 			return true;
 		}
