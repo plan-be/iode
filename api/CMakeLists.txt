@@ -3,11 +3,11 @@
 #
 
 # Add source to this project's executable.
-set (DOCS DESCRIPTION.md)
+set (DOCS DESCRIPTION.md LEC.md)
 set (UTILS buf.c pack.c per.c yy.c)
 set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
 set (OBJS k_objs.c k_objsv.c k_pack.c k_objfile.C k_xdr.c k_objvers.c k_kdb.c k_ws.c  k_wsvar.c k_cmp.c k_lec.c) 
-set (LEC l_err.c l_token.c) 
+set (LEC l_alloc.c l_err.c l_token.c l_cc1.c l_cc2.c l_eqs.c l_link.c l_exec.c l_newton.c l_rand.c l_secant.c) 
 
 set (SOURCES 
 		${UTILS} 
