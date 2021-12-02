@@ -295,7 +295,7 @@ public:
     Comments() : AbstractKDB(COMMENTS) {};
 
     Comment* getObjectValue(const int pos) const { 
-        char* oem = K_oval0(getKDB(), pos);
+        char* oem = KCVAL(getKDB(), pos);
         char* comment = convert_oem_to_utf8(oem);
         return comment;
     }
@@ -349,7 +349,7 @@ class Lists : public AbstractKDB<List>
 public:
     Lists() : AbstractKDB(LISTS) {}
 
-    List* getObjectValue(const int pos) const { return K_oval0(getKDB(), pos); }
+    List* getObjectValue(const int pos) const { return KLVAL(getKDB(), pos); }
 
 protected:
     int setOrAddObject(const char* name, const List* list) const
@@ -412,7 +412,7 @@ public:
     }
 
     IODE_REAL getValue(const int pos, const int t, const int mode) const 
-    { 
+    {
         return KV_get(getKDB(), pos, t, mode); 
     }
 
