@@ -462,8 +462,6 @@
 #define L_open_string(str)      L_open_all(str, YY_MEM)
 #define L_open_stdin()          L_open_all((char *)0, YY_STDIN)
 
-#define last_ls         (L_OPS[L_NB_OPS - 1])
-#define last_op         (last_ls.ls_op)
 #define is_fn(op)       ((op) >= L_FN  && (op) < L_OP)
 #define is_op(op)       ((op) >= L_OP  && (op) < L_TFN)
 #define is_tfn(op)      ((op) >= L_TFN && (op) < L_VAL)
@@ -543,7 +541,7 @@
 #define L_TIMES     L_OP + 11
 #define L_EXP       L_OP + 12
 
-/* LEC:TFN */
+/* LEC:TFN (time related functions) */
 #define L_TFN       100
 #define L_LAG       L_TFN + 0   /* l    ([n,] expr) */
 #define L_DIFF      L_TFN + 1   /* d    ([n,] expr) */
@@ -560,7 +558,7 @@
 #define L_DLAG      L_TFN + 12  /* dlag (n, coef, expr) */ /* !! not implemented */
 #define L_LASTOBS   L_TFN + 13  /* lastobs([from, [to,]] expr) */
 
-/* LEC:VALUES */
+/* LEC: CONST VALUES */
 #define L_VAL       120
 #define L_PI        L_VAL + 0
 #define L_E         L_VAL + 1
@@ -568,7 +566,7 @@
 #define L_I         L_VAL + 3
 #define L_EURO      L_VAL + 4
 
-/* LEC:MTFN */
+/* LEC:MTFN (multiple LEC sub-expr possible in argument list) */
 #define L_MTFN      140
 #define L_CORR      L_MTFN + 0  /* corr([n, [m,]] expr, expr) */ /* JMP 17-04-98 */
 #define L_COVAR     L_MTFN + 1  /* covar([n, [m,]] expr, expr) */ /* JMP 17-04-98 */
@@ -824,21 +822,32 @@ typedef struct _clec_ {
     LNAME   lnames[1];
 } CLEC;
 
-typedef IODE_REAL     *VAR;
+/**
+ *  IODE OBJECTS STRUCT
+ */
 
+// VAR = Pointer to a vector of IODE_REAL 
+typedef IODE_REAL     *VAR;  
+
+// SCL = struct containing a scalar value, and if estimated, its relaxation param and its standard error.
 typedef struct _scl_ {
-    IODE_REAL    val;
-    IODE_REAL    relax;
-    IODE_REAL    std;
+    IODE_REAL    val;       // Value of the scalar
+    IODE_REAL    relax;     // Relaxation parameter. Used only for estimation. 
+                            // If null, the parameter will not be estimated. 
+                            // If 0 < relax < 1, the convergence of the estimation will be slowed down. Esed when the estimation process diverges.
+    IODE_REAL    std;       // Standard error. Result of the estimation. 
 } SCL;
 
-typedef char    *CMT;
+// CMT = pointer to a vector of char 
+typedef char    *CMT;  
 
+// LIS = pointer to a vector of char 
 typedef char    *LIS;
 
+// IDT = struct containing le LEC formula of the identitiy and the compiled LEC
 typedef struct _idt_ {
-    char     *lec;
-    CLEC     *clec;
+    char     *lec;      // LEC expression (may ot be an equation)
+    CLEC     *clec;     // Compiled version of LEC
 } IDT;
 
 #define EQS_NBTESTS     20
@@ -1070,18 +1079,17 @@ typedef struct _expdef_ {
 typedef struct _alec {          /* LEC atomic element */
 	int     al_type;            /* type : L_VAR, L_COEF, L_CONST ... */
     union {
-	LECREAL v_real;         /* constant values IODE_REAL */
-	long    v_long;         /* constant values long int */
-	int     v_nb_args;      /* nb of args for fn */
-	struct {
-	    short   pos;        /* coef or series pos in table ?? */
-	    PERIOD  per;        /* PERIOD if any */
-	    short   lag;        /* lag if any */
-	}
-	v_var;          /* variable  */
-	short   v_coef;         /* coef number */
-	PERIOD  v_per;          /* period */
-    }   al_val;
+        LECREAL v_real;         /* constant values IODE_REAL */
+        long    v_long;         /* constant values long int */
+        int     v_nb_args;      /* nb of args for fn */
+        struct {
+            short   pos;        /* coef or series pos in table ?? */
+            PERIOD  per;        /* PERIOD if any */
+            short   lag;        /* lag if any */
+        } v_var;                /* variable  */
+	short   v_coef;             /* coef number */
+	PERIOD  v_per;              /* period */
+    } al_val;
 } ALEC;
 
 typedef struct _cvar_ {
@@ -1113,7 +1121,7 @@ typedef struct _token {
 typedef struct _lstack {        /* stack of operators used by L_analyse */
     unsigned ls_op      : 8;    /* operator */
     //unsigned ls_nb_args : 8;    /* nb of arguments */
-    unsigned ls_nb_args;    /* nb of arguments */ // Pour permettre de vérifier si plus de 255 arguments
+    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vérifier si plus de 255 arguments
 } LSTACK;
 
 
