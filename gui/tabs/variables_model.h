@@ -20,11 +20,11 @@ private:
 
 		if (col == 0) 
 		{
-			return QVariant(QString(iodeItems.getObjectName(row)));
+			return QVariant(QString(kdb.getObjectName(row)));
 		}
 		else 
 		{
-			var = iodeItems.getValue(row, col - 1, mode);
+			var = kdb.getValue(row, col - 1, mode);
 			return L_ISAN(var) ? QString::number(var, 'g', 3) : NAN_REP;
 		}
 	}
@@ -33,9 +33,9 @@ public slots:
 	void reset()
 	{
 		columnNames = QVector<QString>({ "Name" });
-		for (int t = 0; t < iodeItems.getNbPeriods(); t++) {
+		for (int t = 0; t < kdb.getNbPeriods(); t++) {
 			char period[10];
-			iodeItems.getPeriod(period, t);
+			kdb.getPeriod(period, t);
 			columnNames.append(period);
 		}
 		resetModel();
