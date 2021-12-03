@@ -48,7 +48,7 @@ extern  int     IodeSetTblFile(int ref, char *filename);
 extern  int     IodeSimulate(char *byear, char *eyear, double eps, double relax, int maxit);
 
 extern  int     IodeGetNbDec();
-extern          IodeSetNbDec(int nbdec);
+extern  int     IodeSetNbDec(int nbdec);
 
 extern  int     IodeGetMaxt();
 extern  char    *IodeGetPeriod(int t);
