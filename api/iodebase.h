@@ -190,8 +190,8 @@ extern char *L_error(void);
 
 /* l_cc2.c */
 extern CLEC *L_cc2(ALEC *);
-extern int L_move_arg(char *,char *,int );
-extern int L_calc_len(ALEC *,int ,int );
+extern void L_move_arg(char *,char *,int );
+//extern int L_calc_len(ALEC *,int ,int );
 extern CLEC *L_cc_stream(void);
 extern CLEC *L_cc(char *);
 
