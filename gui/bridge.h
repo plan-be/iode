@@ -1,6 +1,8 @@
 #pragma once
 
 #include "iode.h"
+#include "iodeapi.h"
+
 #ifdef _WIN32 // valid for both 32 and 64 bits
     #include <Windows.h>
 #elif
@@ -103,34 +105,6 @@ enum EnumIodeCase
  * ****************************** */
 
 
-inline void init_iode_api()
-{
-
-    SW_MIN_MEM = 120 * 1024L;
-    SW_MIN_SEGS = 2;
-    // initializes SCR4
-    if (SW_init(1)) throw std::runtime_error("An error occured when called the internal function SW_init()");
-
-    // initializes Dynamic Data Exchange (DDE)
-    //IodeStartDde();
-    // initializes Workspace 
-    K_init_ws(0);
-}
-
-
-inline void end_iode_api()
-{
-    // free Workspace
-    K_end_ws(0);
-    // free SCR4
-    SW_end();
-    // ???
-    W_close();
-    // stops Dynamic Data Exchange (DDE)
-    //IodeEndDde();
-}
-
-
 // see http://www.cplusplus.com/forum/general/245426/
 inline char* convert_between_codepages(const char* s_in, const int codepage_in, const int codepage_out)
 {
@@ -229,7 +203,10 @@ private:
     }
 
 public:
-    AbstractKDB(EnumIodeType type) : type(type), type_name(iodeTypesAsString[type]) { init_iode_api(); }
+    AbstractKDB(EnumIodeType type) : type(type), type_name(iodeTypesAsString[type]) 
+    {
+        if (K_WS[type] == NULL) IodeInit();
+    }
 
     int getIODEType() const { return type; }
 
