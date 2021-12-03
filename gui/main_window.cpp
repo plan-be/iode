@@ -3,8 +3,8 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    // ---- setup SCR4 ----
-    init_iode_api();
+    // ---- setup IODE ----
+    IodeInit();
 
     // ---- setup the present class ----
     setupUi(this);
@@ -61,7 +61,7 @@ MainWindow::~MainWindow()
     delete tablesModel;
     delete variablesModel;
 
-    end_iode_api();
+    IodeEnd();
 }
 
 void MainWindow::updateCurrentTab(int index)
@@ -100,7 +100,6 @@ void MainWindow::updateCurrentTab(int index)
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    end_iode_api();
     event->accept();
 }
 
