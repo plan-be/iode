@@ -194,7 +194,7 @@ protected:
 
 protected:
     // Cannot define a KDB *kdb member set to K_WS[type] in the constructor because the pointer contained in 
-    // K_WS[type] may change in the course of the course (when loading files for example)
+    // K_WS[type] may change in the course of the program (when loading files for example)
     KDB* getKDB() const
     {
         KDB* kdb = K_WS[type];
