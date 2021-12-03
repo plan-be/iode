@@ -13,7 +13,9 @@
  *  which is basically the serialization of the combination of L_EXPR and L_NAMES.
  *  
  *  Main functions
- *      - int L_cc1(int nb_names)           First step of LEC compilation.
+ *      - int L_cc1(int nb_names)           First step of LEC compilation: creates 
+ *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
+ *                                              - L_NAMES = list of names in the LEC expression
  *      - void L_alloc_expr(int nb)         Allocates or reallocates L_EXPR by blocks of 100 elements.
  *      - int L_sub_expr(ALEC* al, int i)   Computes the position of the beginning of a sub-expression
  *  
@@ -60,14 +62,14 @@ void L_alloc_expr(int nb)
 
 
 /**
- *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing th analysed LEC expression.
+ *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analysed LEC expression.
  *  
  *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. They are the input of L_cc2() which will 
  *  serialize L_EXPR into a CLEC (Compiled LEC) structure.
  *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
  *      - L_NAMES contains the names included in the lec expression
  *  
- *  @param [in] nb_names    int number of variable and scalar names already in L_NAMES. 
+ *  @param [in] nb_names    int number of variable and/or scalar names already in L_NAMES. 
  *                              Normally 0 but can be > 0 for equations
  *  
  *  @return                 int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
