@@ -815,7 +815,7 @@ typedef struct _oclec_ {
 
 typedef struct _clec_ {
     long    tot_lg,        /* JMP 20-05-00 */ /* IODE64K */
-	    exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
+	        exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
     short   nb_names;
     char    dupendo;
     char    pad;
@@ -834,11 +834,11 @@ typedef struct _scl_ {
     IODE_REAL    val;       // Value of the scalar
     IODE_REAL    relax;     // Relaxation parameter. Used only for estimation. 
                             // If null, the parameter will not be estimated. 
-                            // If 0 < relax < 1, the convergence of the estimation will be slowed down. Esed when the estimation process diverges.
+                            // If 0 < relax < 1, the convergence of the estimation will be slowed down. To use when the estimation process diverges.
     IODE_REAL    std;       // Standard error. Result of the estimation. 
 } SCL;
 
-// CMT = pointer to a vector of char 
+// CMT = pointer to a vector of char
 typedef char    *CMT;  
 
 // LIS = pointer to a vector of char 
@@ -1100,15 +1100,6 @@ typedef struct _cvar_ {
     PERIOD  per;
 } CVAR;
 
-typedef struct _slec {
-    ALEC    *sl_expr[2];
-    int     sl_lg[2];
-    int     sl_mbr;
-    int     sl_nmbr;
-    int     sl_op;
-    int     sl_nargs;
-    char    *sl_endo;
-} SLEC;
 
 typedef struct _token {
     LECREAL tk_real;
