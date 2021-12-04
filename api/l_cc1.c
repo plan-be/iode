@@ -13,6 +13,7 @@
  *  which is basically the serialization of the combination of L_EXPR and L_NAMES.
  *  
  *  Main functions
+ * 
  *      - int L_cc1(int nb_names)           First step of LEC compilation: creates 
  *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
  *                                              - L_NAMES = list of names in the LEC expression
