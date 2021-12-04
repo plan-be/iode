@@ -158,7 +158,7 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
     if(vers == 0 || vers == 3)  { // Long si vers courante (0) ou == 3
         rc = fread(&os, sizeof(OSIZE), 1, fd);
         if(rc != 1) return(-1);
-        K_xdrPLONG(&os);
+        K_xdrPLONG((unsigned char*)&os);
         kseek(fd, -1L * sizeof(OSIZE), 1);
         *len = os;
     }
