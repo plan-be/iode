@@ -20,7 +20,7 @@
  *                           - char for the nb of args in case of type "function"
  *                           - more complex (recursive) struct for types "TFN's" or "MTFN's"
  * 
- * Main functions
+ * Main functions:
  * 
  *      CLEC *L_cc2(ALEC* expr)                          Second stage of LEC compilation. Generates an "executable" LEC expression.
  *      void L_move_arg(char *s1, char *s2, int lg)      Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
@@ -163,8 +163,6 @@ void L_move_arg(char *s1, char *s2, int lg)
 
     for(i = lg - 1 ; i >= 0 ; i--)
         s1[i] = s2[i];
-
-    return(0);
 }
 
 /**
