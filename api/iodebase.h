@@ -75,8 +75,8 @@ extern int K_free(KDB *);
 extern int K_clear(KDB *);
 extern int K_free_kdb(KDB *);
 extern int K_merge(KDB* kdb1, KDB* kdb2, int replace);
+extern KDB* K_refer(KDB* kdb, int nb, char** names);
 extern KDB *K_quick_refer(KDB *, char **names);
-
 
 /* k_objs.c */
 extern int K_key(char *,int );
@@ -289,18 +289,18 @@ extern double L_interpol(unsigned char *,int ,int ,double *,int );
 extern double L_app(unsigned char *,int ,int ,double *,int );
 
 /* l_eqs.c */
-extern ALEC *L_cc1_alloc(char *,int );
-extern int L_cc1_eq(SLEC *,char *);
+// extern ALEC *L_cc1_alloc(char *,int );
+//extern int L_cc1_eq(SLEC *,char *);
 extern CLEC *L_solve(char *,char *);
-extern int L_invert(char *,char *,int *);
+//extern int L_invert(char *,char *,int *);
 extern int L_split_eq(char *);
-extern int L_count_endo(ALEC *,int ,char *);
-extern int L_split_expr(SLEC *);
-extern void L_append(SLEC *,int );
-extern void L_front(SLEC *,int );
-extern void L_append_op(int );
-extern void L_append_fn(int ,int );
-extern void L_append_const(int );
+//extern int L_count_endo(ALEC *,int ,char *);
+//extern int L_split_expr(SLEC *);
+//extern void L_append(SLEC *,int );
+//extern void L_front(SLEC *,int );
+//extern void L_append_op(int );
+//extern void L_append_fn(int ,int );
+//extern void L_append_const(int );
 
 /* l_newton.c */
 extern double L_zero(KDB *,KDB *,CLEC *,int ,int ,int );
