@@ -20,12 +20,18 @@
  *                           - char for the nb of args in case of type "function"
  *                           - more complex (recursive) struct for types "TFN's" or "MTFN's"
  * 
+ * Main functions
+ * 
+ *      CLEC *L_cc2(ALEC* expr)                          Second stage of LEC compilation. Generates an "executable" LEC expression.
+ *      void L_move_arg(char *s1, char *s2, int lg)      Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
+ *      CLEC *L_cc_stream()                              Compiles L_YY, the open YY stream containing a LEC expression.
+ *      CLEC *L_cc(char* lec)                            Compiles a LEC string. 
  */
 
 #include "iode.h"
 
 /**
- * Second stage of the compilation. Generated an executable LEC expression.
+ * Second stage of LEC compilation. Generates an "executable" LEC expression.
  * 
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
@@ -122,7 +128,7 @@ CLEC *L_cc2(ALEC* expr)
         }
     }
 
-    /* Create the compiled form :
+    /* Create the compiled form CLEC* :
         - (short) exec form lenght
         - (short) nb variables
         - (LNAME) variable names
@@ -145,7 +151,7 @@ fin:
 }
 
 /**
- * Copies lg bytes from a buffer to another in reverse order. The 2 buffers can be identical.
+ * Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
  * 
  * @param [out] s1  char*   output buffer
  * @param [in]  s2  char*   input buffer    
