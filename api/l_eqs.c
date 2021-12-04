@@ -40,8 +40,8 @@ typedef struct _slec {
     int     sl_lg[2];       // Length of each sl_expr table
     int     sl_mbr;         // member containing sl_endo (will be inverted if possible)
     int     sl_nmbr;        // member not containing sl_endo (will be left unchanged)
-    int     sl_op;          // 
-    int     sl_nargs;       //
+    int     sl_op;          // last operator|function
+    int     sl_nargs;       // number of args of the last op|fn
     char*   sl_endo;        // name of the endogenous variable
 } SLEC;
 
