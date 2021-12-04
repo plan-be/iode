@@ -197,9 +197,10 @@ extern CLEC *L_cc(char *);
 
 /* l_link.c */
 extern int L_link(KDB *,KDB *,CLEC *);
-extern int L_link1(KDB *,KDB *,CLEC *);
-extern int L_link2(KDB *,CLEC *);
-extern int L_link_sub(KDB *,char *,int );
+// extern int L_link1(KDB *,KDB *,CLEC *);
+//extern int L_link2(KDB *,CLEC *);
+//extern int L_link_sub(KDB *,char *,int );
+extern void L_link_endos(KDB* kde, CLEC* cl);
 
 /* l_exec.c */
 #ifdef VC
