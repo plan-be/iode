@@ -2,17 +2,16 @@
  * @author Jean-Marc PAUL
  * @author Geert BRYON
  *
- * Functions implementing the virtual functions of the LEC library for IODE objects.
+ * Functions implementing the interface functions between the LEC functions and the IODE KDB's.
  *  
- *      IODE_REAL *L_getvar(KDB* kdb, int pos)
- *      IODE_REAL L_getscl(KDB* kdb, int pos)
- *      SAMPLE *L_getsmpl(JDB* kdb)
- *      int L_findscl(KDB* kdb, char *name)
- *      int L_findvar(KDB* kdb, char* name)
+ *      IODE_REAL *L_getvar(KDB* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
+ *      IODE_REAL L_getscl(KDB* kdb, int pos)   Retrieves a scalar value.
+ *      SAMPLE *L_getsmpl(KDB* kdb)             Retrieves the sample of a KDB.
+ *      int L_findscl(KDB* kdb, char *name)     Retrieves a scalar position.
+ *      int L_findvar(KDB* kdb, char* name)     Retrieves a variable position.
  */
 
 #include "iode.h"
-
 
 /**
  *  Implementation of L_getvar() in the context of IODE objects. Retrieves a pointer to the first element of a VAR.
@@ -22,7 +21,7 @@
  *  @return             IODE_READ   pointer to the first value of the variable
  *  
  */
-IODE_REAL    *L_getvar(KDB* kdb, int pos)
+IODE_REAL *L_getvar(KDB* kdb, int pos)
 {
     return(KVVAL(kdb, pos, 0));
 }
