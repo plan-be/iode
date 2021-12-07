@@ -1,8 +1,6 @@
 #ifndef _IODEBASE_
 #define _IODEBASE_
 
-// TEST GIT 
-
 #ifdef SCRCPP
 extern "C" {
 #endif
@@ -261,33 +259,33 @@ extern double L_euro(void);
 extern double L_e(void);
 extern double L_time(int );
 extern double L_i(int );
-extern double L_lag(unsigned char *,int ,int ,double *,int );
-extern double L_diff(unsigned char *,int ,int ,double *,int );
-extern double L_rapp(unsigned char *,int ,int ,double *,int );
-extern double L_dln(unsigned char *,int ,int ,double *,int );
-extern double L_grt(unsigned char *,int ,int ,double *,int );
-extern double L_mavg(unsigned char *,int ,int ,double *,int );
-extern int L_tfn_args(int ,double *,int ,int *,int *);
-extern double L_vmax(unsigned char *,int ,int ,double *,int );
-extern double L_vmin(unsigned char *,int ,int ,double *,int );
-extern double L_sum(unsigned char *,int ,int ,double *,int );
-extern double L_prod(unsigned char *,int ,int ,double *,int );
-extern double L_mean(unsigned char *,int ,int ,double *,int );
-extern double L_stderr(unsigned char *,int ,int ,double *,int );
-extern double L_lastobs(unsigned char *,int ,int ,double *,int );
-extern double L_calccorr(unsigned char *,int ,unsigned char *,int ,int ,double *,int );
-extern double L_corr(unsigned char *,int ,int ,double *,int );
-extern double L_calccovar(unsigned char *,int ,unsigned char *,int ,int ,double *,int ,int );
-extern double L_covar(unsigned char *,int ,int ,double *,int );
-extern double L_covar0(unsigned char *,int ,int ,double *,int );
-extern double L_var(unsigned char *,int ,int ,double *,int );
-extern double L_stddev(unsigned char *,int ,int ,double *,int );
-extern double L_index(unsigned char *,int ,int ,double *,int );
-extern double L_acf(unsigned char *,int ,int ,double *,int );
+extern double L_lag(unsigned char *,short ,int ,double *,int );
+extern double L_diff(unsigned char *,short,int ,double *,int );
+extern double L_rapp(unsigned char *,short,int ,double *,int );
+extern double L_dln(unsigned char *,short,int ,double *,int );
+extern double L_grt(unsigned char *,short,int ,double *,int );
+extern double L_mavg(unsigned char *,short,int ,double *,int );
+extern void L_tfn_args(int ,double *,int ,int *,int *);
+extern double L_vmax(unsigned char *,short,int ,double *,int );
+extern double L_vmin(unsigned char *,short,int ,double *,int );
+extern double L_sum(unsigned char *,short,int ,double *,int );
+extern double L_prod(unsigned char *,short,int ,double *,int );
+extern double L_mean(unsigned char *,short ,int ,double *,int );
+extern double L_stderr(unsigned char *,short,int ,double *,int );
+extern double L_lastobs(unsigned char *,short,int ,double *,int );
+extern double L_calccorr(unsigned char *,short ,unsigned char *,short ,int ,double *,int );
+extern double L_corr(unsigned char *,short ,int ,double *,int );
+extern double L_calccovar(unsigned char *,short ,unsigned char *,short ,int ,double *,int ,int );
+extern double L_covar(unsigned char *,short ,int ,double *,int );
+extern double L_covar0(unsigned char *,short ,int ,double *,int );
+extern double L_var(unsigned char *,short ,int ,double *,int );
+extern double L_stddev(unsigned char *,short ,int ,double *,int );
+extern double L_index(unsigned char *,short ,int ,double *,int );
+extern double L_acf(unsigned char *,short ,int ,double *,int );
 extern int L_stackna(double **,int );
-extern int L_calcvals(unsigned char *,int ,int ,double *,int *,double *, int);
-extern double L_interpol(unsigned char *,int ,int ,double *,int );
-extern double L_app(unsigned char *,int ,int ,double *,int );
+extern int L_calcvals(unsigned char *,short ,int ,double *,int *,double *, int);
+extern double L_interpol(unsigned char *,short ,int ,double *,int );
+extern double L_app(unsigned char *,short ,int ,double *,int );
 
 /* l_eqs.c */
 // extern ALEC *L_cc1_alloc(char *,int );
