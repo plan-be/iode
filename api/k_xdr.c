@@ -30,7 +30,7 @@
 #ifdef INTEL
 //  Little-endian Architecture
 //
-// This is the defaut architecture and the architecture used to store the data on disk.
+// This is the default architecture and the architecture used to store the data on disk.
 // Therefore, most of the functions don't do anything (like K_xdrPINT) or are the same for different objects (like K_cxdr).
 // Nevertheless, these fns need to be defined because their pointers are stored in a global table K_xdrobj[] share in both architectures.
 
