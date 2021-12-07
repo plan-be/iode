@@ -166,7 +166,7 @@ void L_move_arg(char *s1, char *s2, int lg)
 }
 
 /**
- * Calcules the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
+ * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
  * adding the size reclaimed by each ALEC atomic expression.
  * 
  * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
