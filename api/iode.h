@@ -432,6 +432,7 @@
 
 #define L_ISCOEF(x) ((x)[0] >= 'a')
 
+#define L_REAL  double
 #define LECREAL float
 #define s_dbl   sizeof(LECREAL)
 #define s_ptr   sizeof(IODE_REAL *)
@@ -826,10 +827,10 @@ typedef struct _clec_ {
  *  IODE OBJECTS STRUCT
  */
 
-// VAR = Pointer to a vector of IODE_REAL 
+// VAR = Variable (pointer to a vector of IODE_REAL)
 typedef IODE_REAL     *VAR;  
 
-// SCL = struct containing a scalar value, and if estimated, its relaxation param and its standard error.
+// SCL = Scalar (struct containing a scalar value, and if estimated, its relaxation parameter and its standard error).
 typedef struct _scl_ {
     IODE_REAL    val;       // Value of the scalar
     IODE_REAL    relax;     // Relaxation parameter. Used only for estimation. 
@@ -838,13 +839,13 @@ typedef struct _scl_ {
     IODE_REAL    std;       // Standard error. Result of the estimation. 
 } SCL;
 
-// CMT = pointer to a vector of char
+// CMT = Comment (string)
 typedef char    *CMT;  
 
-// LIS = pointer to a vector of char 
+// LIS = List (string)
 typedef char    *LIS;
 
-// IDT = struct containing le LEC formula of the identitiy and the compiled LEC
+// IDT = Identity (struct with the identiy LEC formula and the compiled CLEC structure)
 typedef struct _idt_ {
     char     *lec;      // LEC expression (may ot be an equation)
     CLEC     *clec;     // Compiled version of LEC
@@ -852,27 +853,31 @@ typedef struct _idt_ {
 
 #define EQS_NBTESTS     20
 
+// EQ = Equation (struct continaing a LEC equation, its compled form (CLEC), the estimation parameter and tests...)
 typedef struct _eq_ {
-    char    *lec;
-    CLEC    *clec;
-    char    solved;
-    char    method;
-    SAMPLE  smpl;
-    char    *cmt;
-    char    *blk;
-    char    *instr;
-    long    date;
-    float   tests[EQS_NBTESTS]; /* FLOAT 12-04-98 */
+    char    *lec;       // LEC form of the equation (LHS := RHS)
+    CLEC    *clec;      // Compiled equation for the simulation
+    char    solved;     // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
+    char    method;     // Estimation method
+    SAMPLE  smpl;       // Estimation sample
+    char    *cmt;       // Free comment
+    char    *blk;       // List of equations estimated simultaneously
+    char    *instr;     // List of instruments used to modify metric in the estimation process (INSTR method)
+    long    date;       // Estimation date
+    float   tests[EQS_NBTESTS]; // Estimation tests
 } EQ;
 
-/* Table definition */
+// Table elements definition 
+
+// TCELL = Table Cell 
 typedef struct _tcell_ {
-    char    *tc_val;
-    char    tc_type;    /* TEXT, LEC */
-    char    tc_attr;    /* LEFT, CENTER, RIGHT, BOLD, ITALIC, UNDERLINE, NORMAL */
+    char    *tc_val;    // Content of the CELL (LEC or text)
+    char    tc_type;    // TEXT, LEC 
+    char    tc_attr;    // LEFT, CENTER, RIGHT, BOLD, ITALIC, UNDERLINE, NORMAL 
     char    tc_pad[2];
 } TCELL;
 
+// TLINE = Table Line
 typedef struct _tline_ {
     char    *tl_val;        /* if tl_type = title then val = ptr unsigned char else ptr to TCELL */
     char    tl_type;        /* FILES, MODE, TITLE, LINE, CELL */
@@ -882,24 +887,25 @@ typedef struct _tline_ {
     char    tl_pad[1];
 } TLINE;
 
+// TBL = Table (struct containing a table definition)
 typedef struct _tbl_ {
-    short   t_lang;
-    short   t_free;     /* = 0, first column is frozen */
-    short   t_nc;
-    short   t_nl;
-	TLINE   t_div;     /* t_nc CELLS, each CELL contains a divider, attr */
-    TLINE   *t_line;   /* t_nl TLINE of t_nc CELLS */
-	float   t_zmin;    /* FLOAT 12-04-98 */
-    float   t_zmax;    /* FLOAT 12-04-98 */
-    float   t_ymin;    /* FLOAT 12-04-98 */
-    float   t_ymax;    /* FLOAT 12-04-98 */
-    char    t_attr;    /* 0, ... 9 */
-    char    t_box;     /* 0, ... 9 */
-    char    t_shadow;  /* 0, ... 9 */
-    char    t_gridx;   /* G_NONE, G_MINOR, G_MAJOR */
-    char    t_gridy;   /* G_NONE, G_MINOR, G_MAJOR */
-    char    t_axis;    /* G_VALUES, G_LOG, G_SEMILOG, G_PERCENT */
-    char    t_align;   /* G_LEFT, G_MIDDLE, G_RIGHT */
+    short   t_lang;     // Output language
+    short   t_free;     // = 0, first column is frozen (?)
+    short   t_nc;       // Number of columns
+    short   t_nl;       // Number of lines
+	TLINE   t_div;      // t_nc CELLS, each CELL contains a divider, attr 
+    TLINE   *t_line;    // t_nl TLINE of t_nc CELLS */
+	float   t_zmin;     // Min on 2d axis -- FLOAT 12-04-98 */
+    float   t_zmax;     // Max on 2d axix -- FLOAT 12-04-98 */
+    float   t_ymin;     // Min on 1st axis -- FLOAT 12-04-98 */
+    float   t_ymax;     // Max on 1st axis -- FLOAT 12-04-98 */
+    char    t_attr;     // 0, ... 9 */
+    char    t_box;      // 0, ... 9 */
+    char    t_shadow;   // 0, ... 9 */
+    char    t_gridx;    // G_NONE, G_MINOR, G_MAJOR */
+    char    t_gridy;    // G_NONE, G_MINOR, G_MAJOR */
+    char    t_axis;     // G_VALUES, G_LOG, G_SEMILOG, G_PERCENT */
+    char    t_align;    // G_LEFT, G_MIDDLE, G_RIGHT */
     char    t_pad[13];
 } TBL;
 
