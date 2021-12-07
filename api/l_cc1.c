@@ -38,12 +38,13 @@ int     L_NB_EXPR = 0,      // Current number of elements (ALEC) in L_EXPR
         L_NB_NAMES = 0,     // Current number of names in L_NAMES
         L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
+// TODO: move LSTACK here + L_OPS... static
 
 /**
  *  Allocates or reallocates L_EXPR by blocks of 100 elements.
  *  
- *  @param [in] nb      int     number of
- *  @return 
+ *  @param [in] nb      int     if > 0: number of elements required in L_EXPR.
+ *                              if <= 0: frees L_EXPR and reset L_EXPR and L_NB_EXPR to 0.
  */
 void L_alloc_expr(int nb)
 {
@@ -150,7 +151,7 @@ again:
                 }
                 if(beg == 1) goto err;
                 if(L_PAR != 0) L_errno = L_PAR_ERR;
-                else L_clear_stack();
+                else L_empty_ops_stack();
                 goto ended;
             case L_OPENB:
                 if(beg == 1) goto err;
@@ -264,7 +265,7 @@ static int L_save_var()
 
 
 /**
- *  Adds the last read "operator" (in last_op) in L_EXPR, as well as the number of parameters (in last_ls.ls_nb_args). 
+ *  Adds the last "operator" on top of L_OPS to L_EXPR, as well as the number of parameters (in last_ls.ls_nb_args). 
  *  Checks if the number of arguments are in line with the definitions.
  *  
  *  The operator is saved in al_type. 
@@ -330,10 +331,15 @@ static int L_priority_sup(int op)
 
 
 /**
- *  Adds an operator to the stack (L_OPS). If needed, reallocates L_OPS.
- *  First, saves in L_EXPR the operator(s) of lower priority that are on the L_OPS stack.
+ *  Adds an operator on L_OPS, the stack of operators. If needed, reallocates L_OPS.
+ *  First, saves in L_EXPR the operator(s) of lower priorities that are on top of L_OPS.
  *  
- *  @param [in] op  int     group of the operator to be added (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...)
+ *  Example: if op is '+' ans last_op is '*': 
+ *              '*' if moved to L_EXPR because '+' has a lower priority.
+ *              '+' is put on the top of L_OPS
+ *  
+ *  @param [in] op  int     group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...).
+ *                          The operator itself is in L_TOKEN.
  *  @return                 0 on success
  *                          L_errno on error
  */
@@ -345,6 +351,7 @@ static int L_add_stack(int op)
         case L_OP :
             while(L_priority_sup(L_TOKEN.tk_def))
                 if(L_save_op() != 0) return(L_errno);
+            // NO BREAK!
         case L_FN :
         case L_TFN :
         case L_MTFN :
@@ -389,12 +396,12 @@ static int L_add_stack(int op)
 
 /**
  *  Empties the stack of operators L_OPS by adding all operators and the 
- *  number of their argument in L_EXPR.
+ *  number of their arguments to L_EXPR.
  *  
  *  @return     int 0 on success
  *                  L_errno on error
  */
-static int L_clear_stack()
+static int L_empty_ops_stack()
 {
     while(L_NB_OPS > 0)
         if(L_save_op() != 0) return(L_errno);
