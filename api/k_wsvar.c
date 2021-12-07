@@ -18,7 +18,7 @@
 /**
  * Changes the SAMPLE of a KDB of variables. Truncates the vars and/or add NaN values to fill the variables on the new sample.
  * 
- * @param [in, out] kdb     KDB*        pointer to a KDB
+ * @param [in, out] kdb     KDB*        pointer to a KDB of variables
  * @param [in]      nsmpl   SAMPLE*     new sample 
  * @return                  int         -1 if the kdb's sample and nsmpl don't overlap
  *                                      0 otherwise
@@ -138,7 +138,7 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 
 
 /**
- * Gets VAR[t] where VAR is the series in position pos in kdb. The value can be modified depending on mode.
+ * Gets VAR[t] where VAR is the series at position pos in kdb. The value can be modified depending on the value of mode.
  *
  * @param [in] kdb       KDB*    KDB of variables
  * @param [in] pos       int     position of the variable in the kdb
@@ -260,7 +260,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
  *  Extrapolates variables on a selected SAMPLE according to one of the available methods. These extrapolation methods are
  *  described in the function K_init_values() (see k_sim.c). 
  *  
- *  @param [in, out]    dbv    KDB*     KDB of variables on with the operation will be applied
+ *  @param [in, out]    dbv    KDB*     KDB of variables on which the operation will be applied
  *  @param [in]         method int      identification of the extrapolation method (see K_init_values())
  *  @param [in]         smpl   SAMPLE*  SAMPLE on which the operation is to be carried out
  *  @param [in]         vars   char**   if not NULL, restricted list of variables to extrapolate
@@ -305,7 +305,7 @@ done:
 /**
  *  Creates a new KDB with variables created by aggregation based on variable names.
  *    
- *  @param [in, out]    dbv         KDB*     KDB of variables on with the operation will be applied
+ *  @param [in, out]    dbv         KDB*     KDB of variables on which the operation will be applied
  *  @param [in]         method      int      identification of the extrapolation method 
  *  @param [in]         pattern     char*    pattern defining the variables to be aggregated
  *  @param [in]         filename    char*    if not null nor empty, the onput variables will be loaded from that file
