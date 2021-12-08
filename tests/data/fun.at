@@ -1,0 +1,1043 @@
+ANAKNFF {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" DECIMAL "" 
+- TITLE "D‚terminants de la croissance de K" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Croissance de K " LEFT LEC "dln KNFF" DECIMAL  LAXIS  GRLINE 
+- "Output gap " LEFT LEC "knff1*ln (QAFF_/(Q_F+Q_I))" DECIMAL  LAXIS  GRLINE 
+- "Rentabilit‚ " LEFT LEC "knf2*ln mavg(3,RENT)" DECIMAL  LAXIS  GRLINE 
+- "Croissance anticip‚e de l'output" LEFT LEC "0.416*mavg(4,dln QAFF_)+0.023" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+ANAPRIX {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Analyse des prix" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "GAP_" LEFT LEC "GAP_" DECIMAL  LAXIS  GRLINE 
+- "dln (PC/(1+ITCR))-dln AOUC" LEFT LEC "100*(dln (PC/(1+ITCR))-dln AOUC)" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_1 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "D‚terminants de l'output potentiel" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Output potentiel" LEFT LEC "Q_F+Q_I" DECIMAL  LAXIS  GRLINE 
+- "Stock de capital" LEFT LEC "KNFF[-1]" DECIMAL  LAXIS  GRLINE 
+- "Intensit‚ de capital" LEFT LEC "KLFHP" DECIMAL  LAXIS  GRLINE 
+- "Productivit‚ totale des facteurs" LEFT LEC "TFPFHP_" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_10 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Coin salarial parafiscal" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Cotisations patronales" LEFT LEC "SSFF/WBF_" DECIMAL  LAXIS  GRLINE 
+- "Cotisations personnelles" LEFT LEC "SSHFF/WBF_" DECIMAL  LAXIS  GRLINE 
+- "Total" LEFT LEC "(SSFF+SSHFF)/WBF_" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_11 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Propension moyenne … ‚pargner" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Propension" LEFT LEC "1-(VC/YDH)" DECIMAL  LAXIS  GRLINE 
+- "Taux d'int‚rˆt … long terme" LEFT LEC "RLBER" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_13 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Part de march‚ des exportations" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "en logarithmes" LEFT LEC "ln (QXAB/QWXSS)" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_14 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Part de march‚ et prix relatifs … l'export" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Part de march‚" LEFT LEC "ln((QXAB/QWXSS)/(QXAB/QWXSS)[1990Y1])" DECIMAL  LAXIS  GRLINE 
+- "Prix relatifs" LEFT LEC "mavg(2,ln((PWXAB*EX/AOUC_)/(PWXAB*EX/AOUC_)[1990Y1]))" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_2 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "D‚terminants de la productivit‚" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Productivit‚" LEFT LEC "(QAFF_/(NFY+NIY))" DECIMAL  LAXIS  GRLINE 
+- "Intensit‚ de capital" LEFT LEC "KLFHP**(-0.31)" DECIMAL  LAXIS  GRLINE 
+- "TFPFHP_" LEFT LEC "TFPFHP_" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_3 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Output gap" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Output gap (methodologie FPB)." LEFT LEC "GAP_" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_4 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "D‚terminants de la croissance du stock de capital" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Croissnce du stoc de capital" LEFT LEC "dln KNFF" DECIMAL  LAXIS  GRLINE 
+- "Rentabilit‚" LEFT LEC "0.04*ln mavg(3,RENT)" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_5 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "D‚terminants de l'emploi" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Croissance de l'emploi" LEFT LEC "dln NFYH" DECIMAL  LAXIS  GRLINE 
+- "Croissance de la valeur ajout‚e" LEFT LEC "dln QAFF" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_6 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Productivit‚ et co–t relatif des facteurs" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Productivit‚" LEFT LEC "ln PROD" DECIMAL  LAXIS  GRLINE 
+- "Co–t relatif des facteurs" LEFT LEC "ln (WCRH/PKF)" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_7 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "D‚terminants des prix" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Prix … la consommation" LEFT LEC "ln (PC/PC[1970Y1])" DECIMAL  LAXIS  GRLINE 
+- "Co–t unitaire du travail" LEFT LEC "ln((WCRH/PROD)/(WCRH/PROD)[1970Y1])" DECIMAL  LAXIS  GRLINE 
+- "Prix des importations " LEFT LEC "ln (PM/PM[1970Y1])" DECIMAL  LAXIS  GRLINE 
+- "Co–t de production" LEFT LEC "ln (AOUC_/AOUC_[1970Y1])" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_8 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Parts salariales en % de la va des entreprises" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Part des salaires co–ts" LEFT LEC "WCF_/VAF_" DECIMAL  LAXIS  GRLINE 
+- "Part des salaires nets" LEFT LEC "WNF_/VAF_" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C8_9 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Prix … la consommation et index" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Prix … la consommation" LEFT LEC "ln PC" DECIMAL  LAXIS  GRLINE 
+- "Index" LEFT LEC "ln (ZJ*(PC/ZJ)[1970Y1])" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C9_1 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Croissance et march‚s … l'exportation" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Croissance des march‚s … l'exportation" LEFT LEC "dln QWXAB" DECIMAL  LAXIS  GRLINE 
+- "Croissance de la valeur ajout‚e des entreprises" LEFT LEC "dln QAFF" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C9_2 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Comp‚titivit‚ et termes d'‚change" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Termes d'‚change" LEFT LEC "ln((PX/PM)/(PX/PM)[1990Y1])" DECIMAL  LAXIS  GRLINE 
+- "Co–t de production / Prix mondiaux" LEFT LEC "ln((AOUC_/(PWXAB*EX))/(AOUC_/(PWXAB*EX))[1990Y1])" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C9_3 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Productivit‚ totale des facteurs" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Productivit‚ totale des facteurs" LEFT LEC "dln(TFPFHP_)" DECIMAL  LAXIS  GRLINE 
+- "Intensit‚ de capital" LEFT LEC "dln(1/KLFHP)" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+C9_4 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Taux d'int‚rˆt et croissance" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Taux d'int‚rˆt r‚el … long terme" LEFT LEC "RLBER" DECIMAL  LAXIS  GRLINE 
+- "Croissance liss‚e" LEFT LEC "d(2,ln QBBP)/2" DECIMAL  LAXIS  GRLINE 
+/* END OF TABLE */
+}
+DEF {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT LEC "0.01*VBBP" DECIMAL 
+- TITLE "Soldes financiers du secteur public" BOLD CENTER 
+- TITLE "(En pourcent du PIB)" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Capacit‚ ou Besoin net de financement des administrations publiques" LEFT LEC "FLG" DECIMAL  LAXIS  GRLINE 
+- "Surplus primaire" LEFT LEC "FLG+YIDG" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+/* END OF TABLE */
+}
+DEF2 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT LEC "0.01*VBBP" DECIMAL 
+- TITLE "Equilibre financier du secteur public (Maastricht)" BOLD CENTER 
+- TITLE "(En pourcent du PIB)" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Capacit‚ de financement" LEFT LEC "FLG" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+/* END OF TABLE */
+}
+ENVI {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Principales variables exogŠnes" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Prix mondiaux … l'export, biens ($) PWXAB" LEFT LEC "PWXAB" DECIMAL  LAXIS  GRLINE 
+- "Prix mondiaux … l'import, biens ($) PWMAB" LEFT LEC "PWMAB" DECIMAL  LAXIS  GRLINE 
+- "Taux de change $/BEF EX" LEFT LEC "XEX" DECIMAL  LAXIS  GRLINE 
+- "Demande mondiale, biens QWXSS" LEFT LEC "QWXSS" DECIMAL  LAXIS  GRLINE 
+- "Prix mondiaux … l'export services ($)-PWXS" LEFT LEC "PWXS" DECIMAL  LAXIS  GRLINE 
+- "Prix mondiaux … l'import services ($)-PWMS" LEFT LEC "PWMS" DECIMAL  LAXIS  GRLINE 
+- "Demande mondiale, servicesQWXS" LEFT LEC "QWXS" DECIMAL  LAXIS  GRLINE 
+- "Prix du p‚trole ($) POIL" LEFT LEC "POIL" DECIMAL  LAXIS  GRLINE 
+- "Population active NATY" LEFT LEC "NATY" DECIMAL  LAXIS  GRLINE 
+- "Productivit‚ totale des facteurs TFPFHP_" LEFT LEC "TFPFHP_" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+GAP {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Output gap et NAWRU" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Output gap (methodologie FPB)." LEFT LEC "GAP" DECIMAL  LAXIS  GRLINE 
+- "Ecart ch“mage classique et ch“mage" LEFT LEC "-100*(LCLASS-(NATY-UY))/NATY" DECIMAL  LAXIS  GRLINE 
+- LINE 
+/* END OF TABLE */
+}
+GDP {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "PIB et PIB potentiel" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "PIB" LEFT LEC "QBBP" DECIMAL  LAXIS  GRLINE 
+- "PIB potentiel" LEFT LEC "QBBPPOT_" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- DATE 
+- MODE 
+/* END OF TABLE */
+}
+GFR {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" DECIMAL LEC "0.01*VBBP" LEFT 
+- TITLE "Tableau A-5. Compte de l'ensemble des administrations publiques " BOLD LEFT 
+- "(En pour-cent du PIB)" ITALIC LEFT ""  LAXIS  GRLINE 
+- LINE 
+- " " LEFT "#S" BOLD CENTER  LAXIS  GRLINE 
+- "Recettes courantes" BOLD LEFT LEC "GOSG+YDTG+IT+YSSG+COTRES+OCUG+RIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "       1. Exc‚dent brut d'exploitation" LEFT LEC "GOSG" DECIMAL  LAXIS  GRLINE 
+- "       2. Imp“ts directs" LEFT LEC "YDTG" DECIMAL  LAXIS  GRLINE 
+- "          particuliers" LEFT LEC "DTH" DECIMAL  LAXIS  GRLINE 
+- "          soci‚t‚s" LEFT LEC "DTF" DECIMAL  LAXIS  GRLINE 
+- "       3. Imp“ts indirects" LEFT LEC "IT" DECIMAL  LAXIS  GRLINE 
+- "       4. Cotisations de S‚curit‚ sociale" LEFT LEC "YSSG+COTRES" DECIMAL  LAXIS  GRLINE 
+- "       5. Revenus de la propri‚t‚" LEFT LEC "RIDG" DECIMAL  LAXIS  GRLINE 
+- "       6. Autres recettes nettes" LEFT LEC "OCUG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "D‚penses courantes" BOLD LEFT LEC "CGU+SUB+SBG+YIDG-SUBCEE" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "       1. Consommation publique" LEFT LEC "CGU" DECIMAL  LAXIS  GRLINE 
+- "       2. Subventions" LEFT LEC "SUB-SUBCEE" DECIMAL  LAXIS  GRLINE 
+- "       3. Transferts aux m‚nages" LEFT LEC "SBG" DECIMAL  LAXIS  GRLINE 
+- "          dont ch“mage (C.C.I.)" LEFT LEC "WLCP" DECIMAL  LAXIS  GRLINE 
+- "       4. Int‚rˆts effectifs" LEFT LEC "YIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Epargne courante" BOLD LEFT LEC "SG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Solde des op‚rations en capital" BOLD LEFT LEC "ACAG-IUG" DECIMAL  LAXIS  GRLINE 
+- "  dont: Investissements" LEFT LEC "IUG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Capacit‚ de financement" BOLD LEFT LEC "FLG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "  dont: Solde primaire" LEFT LEC "FLG+YIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Op‚rations financiŠres" BOLD LEFT LEC "OCP" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Solde net … financer" BOLD LEFT LEC "FLG-OCP" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Dette publique" BOLD LEFT LEC "DEBT" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+GFRLEVEL {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" DECIMAL LEC "40.34" DECIMAL 
+- TITLE "Tableau B-2. Compte de l'ensemble des administrations publiques " BOLD LEFT 
+- "(En milliards d'euros courants)" ITALIC LEFT ""  LAXIS  GRLINE 
+- LINE 
+- " " LEFT "#S" BOLD CENTER  LAXIS  GRLINE 
+- "Recettes courantes" BOLD LEFT LEC "GOSG+YDTG+IT+YSSG+COTRES+OCUG+RIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "       1. Exc‚dent brut d'exploitation" LEFT LEC "GOSG" DECIMAL  LAXIS  GRLINE 
+- "       2. Imp“ts directs" LEFT LEC "YDTG" DECIMAL  LAXIS  GRLINE 
+- "          particuliers" LEFT LEC "DTH" DECIMAL  LAXIS  GRLINE 
+- "          soci‚t‚s" LEFT LEC "DTF" DECIMAL  LAXIS  GRLINE 
+- "       3. Imp“ts indirects" LEFT LEC "IT" DECIMAL  LAXIS  GRLINE 
+- "       4. Cotisations de S‚curit‚ sociale" LEFT LEC "YSSG+COTRES" DECIMAL  LAXIS  GRLINE 
+- "       5. Revenus de la propri‚t‚" LEFT LEC "RIDG" DECIMAL  LAXIS  GRLINE 
+- "       6. Autres recettes nettes" LEFT LEC "OCUG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "D‚penses courantes" BOLD LEFT LEC "CGU+SUB+SBG+YIDG-SUBCEE" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "       1. Consommation publique" LEFT LEC "CGU" DECIMAL  LAXIS  GRLINE 
+- "       2. Subventions" LEFT LEC "SUB-SUBCEE" DECIMAL  LAXIS  GRLINE 
+- "       3. Transferts aux m‚nages" LEFT LEC "SBG" DECIMAL  LAXIS  GRLINE 
+- "          dont ch“mage (C.C.I)" LEFT LEC "WLCP" DECIMAL  LAXIS  GRLINE 
+- "       4. Int‚rˆts effectifs" LEFT LEC "YIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Epargne courante" BOLD LEFT LEC "SG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Solde des op‚rations en capital" BOLD LEFT LEC "ACAG-IUG" DECIMAL  LAXIS  GRLINE 
+- "  dont: Investissements" LEFT LEC "IUG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Capacit‚ de financement" BOLD LEFT LEC "FLG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "  dont: Solde primaire" LEFT LEC "FLG+YIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Op‚rations financiŠres" BOLD LEFT LEC "OCP" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Solde net … financer" BOLD LEFT LEC "FLG-OCP" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Dette publique" BOLD LEFT LEC "DEBT" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+GFRPC {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" DECIMAL LEC "PC" DECIMAL 
+- TITLE "Compte de l'ensemble des administrations publiques " BOLD LEFT 
+- "(divis‚ par les prix … la consommation)" ITALIC LEFT ""  LAXIS  GRLINE 
+- LINE 
+- " " LEFT "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Recettes courantes" BOLD LEFT LEC "GOSG+YDTG+IT+YSSG+COTRES+OCUG+RIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "       1. Exc‚dent brut d'exploitation" LEFT LEC "GOSG" DECIMAL  LAXIS  GRLINE 
+- "       2. Imp“ts directs" LEFT LEC "YDTG" DECIMAL  LAXIS  GRLINE 
+- "          particuliers" LEFT LEC "DTH" DECIMAL  LAXIS  GRLINE 
+- "          soci‚t‚s" LEFT LEC "DTF" DECIMAL  LAXIS  GRLINE 
+- "       3. Imp“ts indirects" LEFT LEC "IT" DECIMAL  LAXIS  GRLINE 
+- "       4. Cotisations de S‚curit‚ sociale" LEFT LEC "YSSG+COTRES" DECIMAL  LAXIS  GRLINE 
+- "       5. Revenus de la propri‚t‚" LEFT LEC "RIDG" DECIMAL  LAXIS  GRLINE 
+- "       6. Autres recettes nettes" LEFT LEC "OCUG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "D‚penses courantes" BOLD LEFT LEC "CGU+SUB+SBG+YIDG-SUBCEE" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "       1. Consommation publique" LEFT LEC "CGU" DECIMAL  LAXIS  GRLINE 
+- "       2. Subventions" LEFT LEC "SUB-SUBCEE" DECIMAL  LAXIS  GRLINE 
+- "       3. Transferts aux m‚nages" LEFT LEC "SBG" DECIMAL  LAXIS  GRLINE 
+- "          dont ch“mage (C.C.I.)" LEFT LEC "WLCP" DECIMAL  LAXIS  GRLINE 
+- "       4. Int‚rˆts effectifs" LEFT LEC "YIDG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "Investissements" LEFT LEC "IUG" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- LINE 
+- MODE 
+- FILES 
+- DATE 
+- LINE 
+/* END OF TABLE */
+}
+GROWTH {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Growth and employment trends in Belgium" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "1. Growth in market sector" LEFT LEC "QAFF_" DECIMAL  LAXIS  GRLINE 
+- "2. Employment" LEFT LEC "NFY+NIY" DECIMAL  LAXIS  GRLINE 
+- "3. Capital stock" LEFT LEC "KNFF" DECIMAL  LAXIS  GRLINE 
+- "4. Labour productivity (=1/2)" LEFT LEC "QAFF_/(NFY+NIY)" DECIMAL  LAXIS  GRLINE 
+- "5. Capital productivity (=1/3)" LEFT LEC "QAFF_/KNFF[-1]" DECIMAL  LAXIS  GRLINE 
+- "6. Total factor productivity" LEFT LEC "TFPFHP_" DECIMAL  LAXIS  GRLINE 
+- "7. Real wage cost" LEFT LEC "(WCRH/PAF_)" DECIMAL  LAXIS  GRLINE 
+- "8. Capital intensity (=3/2)" LEFT LEC "KNFF[-1]/(NFY+NIY)" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+INSTRUMENT {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Tableau A-2. Instruments de politique ‚conomique" BOLD LEFT 
+- LINE 
+- "" "#S" BOLD CENTER  LAXIS  GRLINE 
+- "Taux d'investissement public (% du PIB)" LEFT LEC "IUGR*100" DECIMAL  LAXIS  GRLINE 
+- "    Investissements publics" LEFT LEC "IUG/40.34" DECIMAL  LAXIS  GRLINE 
+- "Taux de TVA sur la consommation priv‚e (%en dedans)" LEFT LEC "VATPC*100" DECIMAL  LAXIS  GRLINE 
+- "    TVA sur la consommation priv‚e" LEFT LEC "ITFC/40.34" DECIMAL  LAXIS  GRLINE 
+- "Variation exogŠne des recettes d'IPP (mlds)" LEFT LEC "DTHX" DECIMAL  LAXIS  GRLINE 
+- "    I.P.P." LEFT LEC "DTH/40.34" DECIMAL  LAXIS  GRLINE 
+- "Variation exogŠne des recettes d'ISOC (mlds)" LEFT LEC "DTFX" DECIMAL  LAXIS  GRLINE 
+- "    ISOC" LEFT LEC "DTF/40.34" DECIMAL  LAXIS  GRLINE 
+- "Taux cotisations sociales patronales (%sal. brut)" LEFT LEC "SSF3PR*100" DECIMAL  LAXIS  GRLINE 
+- "    Cotisations patronales" LEFT LEC "SSF3P/40.34" DECIMAL  LAXIS  GRLINE 
+- "Taux cotisations sociales personnelles (%sal. brut)" LEFT LEC "SSH3RW*100" DECIMAL  LAXIS  GRLINE 
+- "    Cotisations personnelles" LEFT LEC "SSH3W/40.34" DECIMAL  LAXIS  GRLINE 
+- "Transferts aux m‚nages (tdc; prix constant)" LEFT LEC "SBGXR" DECIMAL  LAXIS  GRLINE 
+- "    Transferts aux m‚nages (prix courant)" LEFT LEC "SBG/40.34" DECIMAL  LAXIS  GRLINE 
+- "Correction du tdc des salaires priv‚s (%)" LEFT LEC "XW*100" DECIMAL  LAXIS  GRLINE 
+- "    Masse salariale brute" LEFT LEC "WBF/40.34" DECIMAL  LAXIS  GRLINE 
+- "    Masse salariale co–t" LEFT LEC "WCF/40.34" DECIMAL  LAXIS  GRLINE 
+- "Salaires publics:tdc indice de prog.sociale (%)" LEFT LEC "TWGR" DECIMAL  LAXIS  GRLINE 
+- "Emploi dans le secteur public (milliers)" LEFT LEC "NGY" DECIMAL  LAXIS  GRLINE 
+- "    Masse salariale des pouvoirs publics" LEFT LEC "WBGP/40.34" DECIMAL  LAXIS  GRLINE 
+- "Saut d'index (correction en %)" LEFT LEC "ZX" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+LKEYN {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Emploi et emploi keynesien th‚orique" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Emploi" LEFT LEC "NATY-UY" DECIMAL  LAXIS  GRLINE 
+- "Emploi th‚orique" LEFT LEC "LKEYN" DECIMAL  LAXIS  GRLINE 
+- LINE 
+/* END OF TABLE */
+}
+MULT1FR {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Principaux indicateurs : montants absolus" CENTER 
+- LINE 
+- " " LEFT "#s" LEFT  LAXIS  GRLINE 
+- LINE 
+- "1. Demande globale" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Consommation priv‚e" LEFT LEC "QC" DECIMAL  LAXIS  GRLINE 
+- "       Consommation publique" LEFT LEC "QG" DECIMAL  LAXIS  GRLINE 
+- "       Formation brute de capital fixe" LEFT LEC "QI" DECIMAL  LAXIS  GRLINE 
+- "            - Entreprises" LEFT LEC "QIF" DECIMAL  LAXIS  GRLINE 
+- "            - Etat" LEFT LEC "QIG" DECIMAL  LAXIS  GRLINE 
+- "            - Logements" LEFT LEC "QI5" DECIMAL  LAXIS  GRLINE 
+- "       Exportations de biens et services" LEFT LEC "QX" DECIMAL  LAXIS  GRLINE 
+- "       Importations de biens et services" LEFT LEC "QM" DECIMAL  LAXIS  GRLINE 
+- "       Produit Int‚rieur Brut" ITALIC LEFT LEC "QBBP" DECIMAL  LAXIS  GRLINE 
+- "       Produit National Brut" ITALIC LEFT LEC "QBNP" DECIMAL  LAXIS  GRLINE 
+- "2. March‚ du travail" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Emploi total" LEFT LEC "NATY-UY" DECIMAL  LAXIS  GRLINE 
+- "         Entreprises" LEFT LEC "NFY+NIY" DECIMAL  LAXIS  GRLINE 
+- "         Etat" LEFT LEC "NGY" DECIMAL  LAXIS  GRLINE 
+- "3. Prix, salaires et revenus" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Salaire co–t horaire" LEFT LEC "WCRH" DECIMAL  LAXIS  GRLINE 
+- "       Salaire co–t r‚el horaire" LEFT LEC "WCRH/PC" DECIMAL  LAXIS  GRLINE 
+- "       D‚flateur de la consommation priv‚e" LEFT LEC "PC" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (apparents)" LEFT LEC "WCRH/PROD" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (techn.)" LEFT LEC "WCRH/QL" DECIMAL  LAXIS  GRLINE 
+- "       Prix des importations" LEFT LEC "PM" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts totaux par unit‚ produite " LEFT LEC "AOUC" DECIMAL  LAXIS  GRLINE 
+- "       Prix des exportations de biens" LEFT LEC "PXAB" DECIMAL  LAXIS  GRLINE 
+- "       Termes de l'‚change (PX/PM)" LEFT LEC "PX/PM" DECIMAL  LAXIS  GRLINE 
+- "       Revenu disponible r‚el des m‚nages" LEFT LEC "YDH/PC" DECIMAL  LAXIS  GRLINE 
+- "4. Entreprises" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Valeur ajout‚e (prix constants)" LEFT LEC "QAF_" DECIMAL  LAXIS  GRLINE 
+- "       D‚flateur de la valeur ajout‚e" LEFT LEC "PAF_" DECIMAL  LAXIS  GRLINE 
+- "       Valeur ajout‚e potentielle" LEFT LEC "Q_F" DECIMAL  LAXIS  GRLINE 
+- "       Stock de capital" LEFT LEC "KNFY" DECIMAL  LAXIS  GRLINE 
+- "5. Productivit‚s du travail" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Productivit‚ horaire apparente" LEFT LEC "PROD" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ horaire technique" LEFT LEC "QL" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ par tˆte " LEFT LEC "QAF_/(NFY)" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- MODE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+MULT1RESU {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "PIB et prix" BOLD CENTER 
+- TITLE "En pourcent de la simulation de base" BOLD CENTER 
+- LINE 
+- " " LEFT "#s" LEFT  LAXIS  GRLINE 
+- LINE 
+- "1. Demande globale" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Consommation priv‚e" LEFT LEC "QC" DECIMAL  LAXIS  GRLINE 
+- "       Investissements des entreprises" LEFT LEC "QIF" DECIMAL  LAXIS  GRLINE 
+- "       Exportations de biens et services" LEFT LEC "QX" DECIMAL  LAXIS  GRLINE 
+- "       Importations de biens et services" LEFT LEC "QM" DECIMAL  LAXIS  GRLINE 
+- "       Produit Int‚rieur Brut" ITALIC LEFT LEC "QBBP" DECIMAL  LAXIS  GRLINE 
+- "2. Facteurs de production" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Stock de capital" LEFT LEC "KNFY" DECIMAL  LAXIS  GRLINE 
+- "       Emploi total" LEFT LEC "NATY-UY" DECIMAL  LAXIS  GRLINE 
+- "       Output potentiel" LEFT LEC "Q_F+Q_I" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ technique" LEFT LEC "QL" DECIMAL  LAXIS  GRLINE 
+- "3. Prix, salaires et revenus" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Salaire co–t horaire" LEFT LEC "WCRH" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ horaire" LEFT LEC "PROD" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (techn.)" LEFT LEC "WCRH/QL" DECIMAL  LAXIS  GRLINE 
+- "       Prix des importations" LEFT LEC "PM" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts totaux par unit‚ produite" LEFT LEC "AOUC" DECIMAL  LAXIS  GRLINE 
+- "       Prix … la consommation" LEFT LEC "PC" DECIMAL  LAXIS  GRLINE 
+- "       Salaire co–t r‚el horaire" LEFT LEC "WCRH/PC" DECIMAL  LAXIS  GRLINE 
+- "       Prix des exportations de biens" LEFT LEC "PXAB" DECIMAL  LAXIS  GRLINE 
+- "       Revenu disponible r‚el des m‚nages" LEFT LEC "YDH/PC" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- DATE 
+/* END OF TABLE */
+}
+MULT2FR {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Analyse de sensibilit‚: ratios et montants absolus" BOLD LEFT 
+- LINE 
+- " " LEFT "#s" LEFT  LAXIS  GRLINE 
+- LINE 
+- "Ratios importants" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "    En pour-cent du PIB" LEFT ""  LAXIS  GRLINE 
+- "        D‚ficit de l'Etat" LEFT LEC "-100*(FLG/VBBP)" DECIMAL  LAXIS  GRLINE 
+- "        Charges d'int‚rˆt sur la dette" LEFT LEC "100*YIDG/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Surplus primaire" LEFT LEC "100*(YIDG+FLG)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Dette publique totale" LEFT LEC "100*DEBT/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Exportations nettes" LEFT LEC "100*(VX-VM)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Masse salariale" LEFT LEC "100*(WBF+SSFF)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "    Taux d'‚pargne" LEFT LEC "100*SH/YDH" DECIMAL  LAXIS  GRLINE 
+- "    Taux de ch“mage" LEFT LEC "100*UY/NATY" DECIMAL  LAXIS  GRLINE 
+- "    Taux d'utilisation des capacit‚s" LEFT LEC "100*ZKF" DECIMAL  LAXIS  GRLINE 
+- "    Taux de rentabilit‚ des entreprises" LEFT LEC "100*RENT" DECIMAL  LAXIS  GRLINE 
+- "Montants absolus" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "    Taux d'int‚rˆt de long terme" LEFT LEC "RLBE" DECIMAL  LAXIS  GRLINE 
+- "    Ch“mage" LEFT LEC "UY" DECIMAL  LAXIS  GRLINE 
+- "    Emploi des entreprises" LEFT LEC "NFY" DECIMAL  LAXIS  GRLINE 
+- "    Exportation nette" LEFT LEC "VX-VM" DECIMAL  LAXIS  GRLINE 
+- "    D‚ficit de l'Etat" LEFT LEC "-(FLG)" DECIMAL  LAXIS  GRLINE 
+- "    Dette publique" LEFT LEC "DEBT" DECIMAL  LAXIS  GRLINE 
+- "    PIB" LEFT LEC "VBBP" DECIMAL  LAXIS  GRLINE 
+- "    PIB … prix constant" LEFT LEC "QBBP" DECIMAL  LAXIS  GRLINE 
+- "     Consommation priv‚e" LEFT LEC "QC" DECIMAL  LAXIS  GRLINE 
+- "     Consommation publique" LEFT LEC "QG" DECIMAL  LAXIS  GRLINE 
+- "     Formation brute de capital" LEFT LEC "QI" DECIMAL  LAXIS  GRLINE 
+- "       Entreprises" LEFT LEC "QIF" DECIMAL  LAXIS  GRLINE 
+- "       Etat" LEFT LEC "QIG" DECIMAL  LAXIS  GRLINE 
+- "       Logements" LEFT LEC "QI5" DECIMAL  LAXIS  GRLINE 
+- "     Exportations" LEFT LEC "QX" DECIMAL  LAXIS  GRLINE 
+- "     Importations" LEFT LEC "QM" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- MODE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+MULT2RESU {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Ratios " BOLD CENTER 
+- LINE 
+- " " LEFT "#s" LEFT  LAXIS  GRLINE 
+- LINE 
+- "En pourcent du PIB" LEFT ""  LAXIS  GRLINE 
+- "    D‚ficit de l'Etat" LEFT LEC "-100*(FLG/VBBP)" DECIMAL  LAXIS  GRLINE 
+- "        Charges d'int‚rˆt sur la dette" LEFT LEC "100*YIDG/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Surplus primaire" LEFT LEC "100*(YIDG+FLG)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Dette publique totale" LEFT LEC "100*DEBT/VBBP" DECIMAL  LAXIS  GRLINE 
+- "    Exportations nettes" LEFT LEC "100*(VX-VM)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "    Masse salariale" LEFT LEC "100*(WBF+SSFF)/VBBP" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- "En pourcent" LEFT ""  LAXIS  GRLINE 
+- "    Taux d'‚pargne" LEFT LEC "100*SH/YDH" DECIMAL  LAXIS  GRLINE 
+- "    Taux de ch“mage" LEFT LEC "100*UY/NATY" DECIMAL  LAXIS  GRLINE 
+- "    Output gap" LEFT LEC "100*ZKF" DECIMAL  LAXIS  GRLINE 
+- "    Taux de rentabilit‚ des entreprises" LEFT LEC "100*RENT" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- DATE 
+/* END OF TABLE */
+}
+NATY {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Population et emploi" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Emploi du secteur priv‚" LEFT LEC "NIY+NFY+NDOMY+EFXY-EFMY" DECIMAL  LAXIS  GRLINE 
+- "Emploi total" LEFT LEC "NGY+NIY+NFY+NDOMY+EFXY-EFMY" DECIMAL  LAXIS  GRLINE 
+- "Population active" LEFT LEC "NATY" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+NAWRU {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Taux de ch“mage et NAWRU" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Taux de ch“mage au sens large" LEFT LEC "UY/NATY" DECIMAL  LAXIS  GRLINE 
+- "NAWRU" LEFT LEC "NAWRU" DECIMAL  LAXIS  GRLINE 
+- LINE 
+/* END OF TABLE */
+}
+PC {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Taux de croissance des prix" BOLD CENTER 
+- TITLE "(En pourcent)" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Deflateur de la consommation priv‚e" LEFT LEC "grt PC" DECIMAL  LAXIS  GRLINE 
+- "Deflateur du PIB" LEFT LEC "grt PBBP" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+SCENARIOS {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- DATE 
+- FILES 
+- "" ""  LAXIS  GRLINE 
+- TITLE "Tableau A-1. HypothŠses du sc‚nario" BOLD LEFT 
+- LINE 
+- "    " LEFT "#S" BOLD CENTER  LAXIS  GRLINE 
+- "Demande mondiale de biens (XQWXSS)" LEFT LEC "XQWXSS" DECIMAL  LAXIS  GRLINE 
+- "Prix du p‚trole (XPOIL)" LEFT LEC "XPOIL" DECIMAL  LAXIS  GRLINE 
+- "Prix mondiaux de biens  … l'export (XPWXAB)" LEFT LEC "XPWXAB" DECIMAL  LAXIS  GRLINE 
+- "Prix mondiaux de biens … l'import (XPWMAB)" LEFT LEC "XPWMAB" DECIMAL  LAXIS  GRLINE 
+- "Taux d'int‚rˆt r‚el (XRLBER)" LEFT LEC "XRLBER" DECIMAL  LAXIS  GRLINE 
+- "Population active (XNATY)" LEFT LEC "XNATY" DECIMAL  LAXIS  GRLINE 
+- "Prod. totale des facteurs (XTFP)" LEFT LEC "XTFP" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+T1 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Tableau A-3. Croissance, prix et co–ts" BOLD LEFT 
+- "(Taux de croissance en pour-cent)" ITALIC LEFT ""  LAXIS  GRLINE 
+- LINE 
+- " " LEFT "#S" BOLD CENTER  LAXIS  GRLINE 
+- "1. Demande globale" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Consommation priv‚e" LEFT LEC "grt QC" DECIMAL  LAXIS  GRLINE 
+- "       Consommation publique" LEFT LEC "grt QG" DECIMAL  LAXIS  GRLINE 
+- "       Formation brute de capital fixe" LEFT LEC "grt QI" DECIMAL  LAXIS  GRLINE 
+- "            - Entreprises" LEFT LEC "grt QIF" DECIMAL  LAXIS  GRLINE 
+- "            - M‚nages" LEFT LEC "grt QI5" DECIMAL  LAXIS  GRLINE 
+- "            - Etat" LEFT LEC "grt QIG" DECIMAL  LAXIS  GRLINE 
+- "       Exportations de biens et services" LEFT LEC "grt QX" DECIMAL  LAXIS  GRLINE 
+- "       Importations de biens et services" LEFT LEC "grt QM" DECIMAL  LAXIS  GRLINE 
+- "       Produit Int‚rieur Brut" ITALIC LEFT LEC "grt QBBP" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "2. March‚ du travail" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Emploi total" LEFT LEC "grt(NATY-UY)" DECIMAL  LAXIS  GRLINE 
+- "            - Entreprises" LEFT LEC "grt(NFY+NIY)" DECIMAL  LAXIS  GRLINE 
+- "            - Etat" LEFT LEC "grt NGY" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "3. Prix, salaires et revenus" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Salaire co–t horaire" LEFT LEC "grt WCRH" DECIMAL  LAXIS  GRLINE 
+- "       Salaire co–t r‚el horaire" LEFT LEC "grt(WCRH/PC)" DECIMAL  LAXIS  GRLINE 
+- "       Salaire brut horaire" LEFT LEC "grt W" DECIMAL  LAXIS  GRLINE 
+- "       D‚flateur de la consommation priv‚e" LEFT LEC "grt PC" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (apparents)" LEFT LEC "grt(WCRH/PROD)" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (techn.)" LEFT LEC "grt(WCRH/QL)" DECIMAL  LAXIS  GRLINE 
+- "       Prix des importations" LEFT LEC "grt PM" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts totaux par unit‚ produite " LEFT LEC "grt AOUC" DECIMAL  LAXIS  GRLINE 
+- "       Prix des exportations de biens" LEFT LEC "grt PXAB" DECIMAL  LAXIS  GRLINE 
+- "       Termes de l'‚change" LEFT LEC "grt(PX/PM)" DECIMAL  LAXIS  GRLINE 
+- "       Revenu disponible des m‚nages (prix cst)" LEFT LEC "grt(YDH/PC)" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "4. Entreprises" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Valeur ajout‚e (prix constants)" LEFT LEC "grt QAFF" DECIMAL  LAXIS  GRLINE 
+- "       D‚flateur de la valeur ajout‚e" LEFT LEC "grt PAF_" DECIMAL  LAXIS  GRLINE 
+- "       Valeur ajout‚e potentielle" LEFT LEC "grt (Q_F+Q_I)" DECIMAL  LAXIS  GRLINE 
+- "       Stock de capital" LEFT LEC "grt KNFY" DECIMAL  LAXIS  GRLINE 
+- "       Rapport K/L" LEFT LEC "grt (1/KLFHP)" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "5. Productivit‚s du travail" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Productivit‚ horaire apparente" LEFT LEC "grt PROD" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ horaire technique" LEFT LEC "grt QL" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ par tˆte " LEFT LEC "grt(QAF_/(NFY+NIY))" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+T1NIVEAU {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Tableau B-1. PIB, prix et co–ts" BOLD LEFT 
+- "   (En niveau)" LEFT ""  LAXIS  GRLINE 
+- LINE 
+- " " LEFT "#S" BOLD CENTER  LAXIS  GRLINE 
+- "1. Demande globale (… prix constant)" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Consommation priv‚e" LEFT LEC "QC/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Consommation publique" LEFT LEC "QG/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Formation brute de capital fixe" LEFT LEC "QI/40.34" DECIMAL  LAXIS  GRLINE 
+- "            - Entreprises" LEFT LEC "QIF/40.34" DECIMAL  LAXIS  GRLINE 
+- "            - Etat" LEFT LEC "QIG/40.34" DECIMAL  LAXIS  GRLINE 
+- "            - Logements" LEFT LEC "QI5/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Exportations de biens et services" LEFT LEC "QX/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Importations de biens et services" LEFT LEC "QM/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Produit Int‚rieur Brut" ITALIC LEFT LEC "QBBP/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Produit National Brut" ITALIC LEFT LEC "QBNP/40.34" DECIMAL  LAXIS  GRLINE 
+- "     Produit Int‚rieur Brut prix courants" LEFT LEC "VBBP/40.34" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "2. March‚ du travail" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Emploi total" LEFT LEC "(NATY-UY)" DECIMAL  LAXIS  GRLINE 
+- "            - Entreprises" LEFT LEC "(NFY+NIY)" DECIMAL  LAXIS  GRLINE 
+- "            - Etat" LEFT LEC "NGY" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "3. Prix, salaires et revenus" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Salaire co–t horaire" LEFT LEC " WCRH" DECIMAL  LAXIS  GRLINE 
+- "       Salaire co–t r‚el horaire" LEFT LEC "(WCRH/PC)" DECIMAL  LAXIS  GRLINE 
+- "       D‚flateur de la consommation priv‚e" LEFT LEC " PC" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (apparents)" LEFT LEC "(WCRH/PROD)" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts salariaux unitaires (techn.)" LEFT LEC "WCRH/QL" DECIMAL  LAXIS  GRLINE 
+- "       Prix des importations" LEFT LEC " PM" DECIMAL  LAXIS  GRLINE 
+- "       Co–ts totaux par unit‚ produite " LEFT LEC " AOUC" DECIMAL  LAXIS  GRLINE 
+- "       Prix des exportations de biens" LEFT LEC " PXAB" DECIMAL  LAXIS  GRLINE 
+- "       Termes de l'‚change" LEFT LEC "PX/PM" DECIMAL  LAXIS  GRLINE 
+- "       Revenu disponible r‚el des m‚nages" LEFT LEC "YDH/(PC *40.34)" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "4. Entreprises" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Valeur ajout‚e (prix constants)" LEFT LEC " QAFF/40.34" DECIMAL  LAXIS  GRLINE 
+- "       D‚flateur de la valeur ajout‚e" LEFT LEC " PAF_" DECIMAL  LAXIS  GRLINE 
+- "       Valeur ajout‚e potentielle" LEFT LEC " (Q_F+Q_I) /40.34" DECIMAL  LAXIS  GRLINE 
+- "       Stock de capital" LEFT LEC " KNFY/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Rapport K/L" LEFT LEC "1/(KLFHP/40.34)" DECIMAL  LAXIS  GRLINE 
+- "" ""  LAXIS  GRLINE 
+- "5. Productivit‚s du travail" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "       Productivit‚ horaire apparente" LEFT LEC "PROD/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ horaire technique" LEFT LEC "QL/40.34" DECIMAL  LAXIS  GRLINE 
+- "       Productivit‚ par tˆte " LEFT LEC "(QAF_/(NFY+NIY))/40.34" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+T2 {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Tableau A-4. Indicateurs globaux: ratios et montants absolus" BOLD LEFT 
+- LINE 
+- " " LEFT "#S" BOLD CENTER  LAXIS  GRLINE 
+- "Ratios importants" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "    En pour-cent du PIB" LEFT ""  LAXIS  GRLINE 
+- "        D‚ficit de l'Etat" LEFT LEC "-100*(FLG/VBBP)" DECIMAL  LAXIS  GRLINE 
+- "        Charges d'int‚rˆt sur la dette" LEFT LEC "100*YIDG/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Surplus primaire" LEFT LEC "100*(YIDG+FLG)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Dette publique totale" LEFT LEC "100*DEBT/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Exportations nettes" LEFT LEC "100*(VX-VM)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "        Masse salariale" LEFT LEC "100*(WBF+SSFF)/VBBP" DECIMAL  LAXIS  GRLINE 
+- "    Taux d'‚pargne en % du revenu disponible" LEFT LEC "100*SH/YDH" DECIMAL  LAXIS  GRLINE 
+- "    Taux de ch“mage" LEFT LEC "100*UY/NATY" DECIMAL  LAXIS  GRLINE 
+- "    Output gap (entreprises)" LEFT LEC "100*((QAF_/QAF_[2000Y1])/(Q_F/Q_F[2000Y1])-1)" DECIMAL  LAXIS  GRLINE 
+- "    Taux de rentabilit‚ des entreprises" LEFT LEC "100*RENT" DECIMAL  LAXIS  GRLINE 
+- "Montants absolus" BOLD ITALIC LEFT ""  LAXIS  GRLINE 
+- "    PIB … prix courants" LEFT LEC "VBBP/40.34" DECIMAL  LAXIS  GRLINE 
+- "    Taux d'int‚rˆt de long terme" LEFT LEC "RLBE" DECIMAL  LAXIS  GRLINE 
+- "    Ch“mage" LEFT LEC "UY" DECIMAL  LAXIS  GRLINE 
+- "    Exportation nette" LEFT LEC "(VX-VM)/40.34" DECIMAL  LAXIS  GRLINE 
+- "    D‚ficit de l'Etat" LEFT LEC "-(FLG)/40.34" DECIMAL  LAXIS  GRLINE 
+- "Variations de l'emploi (en milliers)" LEFT ""  LAXIS  GRLINE 
+- "    Dans les entreprises" LEFT LEC "d(NFY+NIY)" DECIMAL  LAXIS  GRLINE 
+- "    Dans le secteur public" LEFT LEC "d NGY" DECIMAL  LAXIS  GRLINE 
+- "    Total" LEFT LEC "d(NFY+NIY+NGY)" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+UCLASS {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Ch“mage classique" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Ch“mage classique" LEFT LEC "NATY-LCLASS" DECIMAL  LAXIS  GRLINE 
+- "Ch“mage keynesien" LEFT LEC "LCLASS-(NATY-UY)" DECIMAL  LAXIS  GRLINE 
+- "Ch“mage effectif" LEFT LEC "UY" DECIMAL  LAXIS  GRLINE 
+- LINE 
+/* END OF TABLE */
+}
+UY {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Taux de ch“mage" BOLD CENTER 
+- TITLE "(En pourcent de la population active)" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "Ch“mage au sens large" LEFT LEC "100*UY/NATY" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+XPC {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Inflation: PC" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "D‚fl. consommation" LEFT LEC "PC" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+XQBBP {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" LEFT "" 
+- TITLE "Croissance" BOLD CENTER 
+- LINE 
+- "" "#s" CENTER  LAXIS  GRLINE 
+- LINE 
+- "PIB … prix cst" LEFT LEC "QBBP" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
+YDH {
+DIM 2
+ENGLISH 
+BOX 0 AXIS 0 XGRID 0 YGRID 0 
+ALIGN LEFT 
+DIV LEC "1" DECIMAL LEC "PC_*40.34" DECIMAL 
+- TITLE "Tableau B-3. Revenu disponible des m‚nages … prix constant" BOLD LEFT 
+- LINE 
+- "" "#S" BOLD CENTER  LAXIS  GRLINE 
+- "Revenus primaires" LEFT LEC "WBU_+YN+GOSH_+IDH" DECIMAL  LAXIS  GRLINE 
+- "   Masse salariale totale" LEFT LEC "WBU_" DECIMAL  LAXIS  GRLINE 
+- "   Revenu net du travail en provenance du Reste du monde" LEFT LEC "YN" DECIMAL  LAXIS  GRLINE 
+- "   Surplus brut d'exploitation" LEFT LEC "GOSH_" DECIMAL  LAXIS  GRLINE 
+- "   Revenu net de la propri‚t‚" LEFT LEC "IDH" DECIMAL  LAXIS  GRLINE 
+- "Cotisations sociales et imp“ts" LEFT LEC "SSF+SSH+DTH" DECIMAL  LAXIS  GRLINE 
+- "   Cotisations patronales" LEFT LEC "SSF" DECIMAL  LAXIS  GRLINE 
+- "   Cotisations personnelles" LEFT LEC "SSH" DECIMAL  LAXIS  GRLINE 
+- "IPP" LEFT LEC "DTH" DECIMAL  LAXIS  GRLINE 
+- "Prestations sociales " LEFT LEC "SBH+OCUH" DECIMAL  LAXIS  GRLINE 
+- "   S‚curit‚ sociale" LEFT LEC "SBH" DECIMAL  LAXIS  GRLINE 
+- "   Diverses prestations" LEFT LEC "OCUH" DECIMAL  LAXIS  GRLINE 
+- "Total" LEFT LEC "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)" DECIMAL  LAXIS  GRLINE 
+- LINE 
+- FILES 
+- DATE 
+/* END OF TABLE */
+}
