@@ -160,11 +160,10 @@
 #define KILEC(kdb, pos)               K_oval0(kdb, pos)
 #define KICLEC(kdb, pos)    ((CLEC *) K_oval1(kdb, pos))
 #define KSVAL(kdb, pos)     ((SCL *)  K_oval0(kdb, pos))
-//#define KCVAL(kdb, pos)     ((CMT *)  K_oval0(kdb, pos))    // TODO: Check (CMT) or (CMT *) ? 
-//#define KLVAL(kdb, pos)     ((LIS *)  K_oval0(kdb, pos))    // TODO: Check (LIS) or (LIS *) ? 
-#define KCVAL(kdb, pos)     ((CMT )   K_oval0(kdb, pos))    // TODO: Check (CMT) or (CMT *) ? 
-#define KLVAL(kdb, pos)     ((LIS )   K_oval0(kdb, pos))    // TODO: Check (LIS) or (LIS *) ? 
-
+//#define KCVAL(kdb, pos)     ((CMT *)  K_oval0(kdb, pos))    // TODO: Check (CMT) or (CMT *) => ok:CMT
+//#define KLVAL(kdb, pos)     ((LIS *)  K_oval0(kdb, pos))    // TODO: Check (LIS) or (LIS *) = >ok:LIS 
+#define KCVAL(kdb, pos)     ((CMT )   K_oval0(kdb, pos))    
+#define KLVAL(kdb, pos)     ((LIS )   K_oval0(kdb, pos))    
 
 #define KELEC(kdb, pos)                   K_oval0(kdb, pos)
 #define KECLEC(kdb, pos)    ((CLEC *)     K_oval1(kdb, pos))
@@ -180,6 +179,12 @@
 #define KEVAL(kdb, pos)     (K_eunpack(SW_getptr(kdb->k_objs[pos].o_val)) )
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
+
+#define KCPTR(name)         K_optr0(KC_WS, name)
+#define KLPTR(name)         K_optr0(KL_WS, name)
+#define KVPTR(name)         K_vptr(KV_WS, name, 0)
+#define KEPTR(name)         K_eptr(KE_WS, name)
+
 
 /*----------------------- TABLES ----------------------------*/
 #define  KT_NORMAL          0
@@ -845,7 +850,7 @@ typedef char    *CMT;
 // LIS = List (string)
 typedef char    *LIS;
 
-// IDT = Identity (struct with the identiy LEC formula and the compiled CLEC structure)
+// IDT = Identity (struct with the identity LEC formula and the compiled CLEC structure)
 typedef struct _idt_ {
     char     *lec;      // LEC expression (may ot be an equation)
     CLEC     *clec;     // Compiled version of LEC
@@ -873,7 +878,7 @@ typedef struct _eq_ {
 typedef struct _tcell_ {
     char    *tc_val;    // Content of the CELL (LEC or text)
     char    tc_type;    // TEXT, LEC 
-    char    tc_attr;    // LEFT, CENTER, RIGHT, BOLD, ITALIC, UNDERLINE, NORMAL 
+    char    tc_attr;    // KT_LEFT, KT_CENTER, KT_RIGHT, KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_NORMAL 
     char    tc_pad[2];
 } TCELL;
 
@@ -889,19 +894,19 @@ typedef struct _tline_ {
 
 // TBL = Table (struct containing a table definition)
 typedef struct _tbl_ {
-    short   t_lang;     // Output language
-    short   t_free;     // = 0, first column is frozen (?)
+    short   t_lang;     // Output language : KT_ENGLISH, KT_FRENCH, KT_DUTCH
+    short   t_free;     // = 0, first column is frozen (?) TODO: update doc for t_free
     short   t_nc;       // Number of columns
     short   t_nl;       // Number of lines
 	TLINE   t_div;      // t_nc CELLS, each CELL contains a divider, attr 
     TLINE   *t_line;    // t_nl TLINE of t_nc CELLS */
-	float   t_zmin;     // Min on 2d axis -- FLOAT 12-04-98 */
-    float   t_zmax;     // Max on 2d axix -- FLOAT 12-04-98 */
-    float   t_ymin;     // Min on 1st axis -- FLOAT 12-04-98 */
-    float   t_ymax;     // Max on 1st axis -- FLOAT 12-04-98 */
-    char    t_attr;     // 0, ... 9 */
-    char    t_box;      // 0, ... 9 */
-    char    t_shadow;   // 0, ... 9 */
+	float   t_zmin;     // Min on 2d axis (value axis on graph) */
+    float   t_zmax;     // Max on 2d axis (value axis on graph) */
+    float   t_ymin;     // Min on 1st axis (value axis on graph) */
+    float   t_ymax;     // Max on 1st axis (value axis on graph) */
+    char    t_attr;     // 0, ... 9 */ // TODO: complete doc
+    char    t_box;      // 0, ... 9 */ // TODO: complete doc
+    char    t_shadow;   // 0, ... 9 */ // TODO: complete doc
     char    t_gridx;    // G_NONE, G_MINOR, G_MAJOR */
     char    t_gridy;    // G_NONE, G_MINOR, G_MAJOR */
     char    t_axis;     // G_VALUES, G_LOG, G_SEMILOG, G_PERCENT */
