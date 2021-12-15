@@ -29,7 +29,7 @@
  *      L_MIN_MTARGS:   table of minimum number of arguments for the time functions, from L_MTFN to L_HPSTD
  *      L_MAX_MTARGS:   table of minimum number of arguments for these functions
  *  
- *      char*(*L_expand_impl)(char*): optional implementation of L_expand()
+ *      char*(*L_expand_super)(char*): alternative implementation of L_expand(): see k_lec.c
  *  
  *  Functions
  *  ---------
@@ -167,8 +167,6 @@ YYKEYS L_TABLE[] = {
 };
 
 
-char *(*L_expand_impl)(char *macroname);
-
 // --- GLOBAL VARIABLES USED BY THE COMPILER ---
 
 TOKEN   L_TOKEN;    // Global containing the last read token
@@ -270,8 +268,6 @@ static void L_unread()
  *  recorded (pushed) on the stream L_YY.
  *  
  *  On error, the global variable L_errno is set to L_MACRO_ERR and returned by the function.
- *  
- *  TODO: replace L_expand by a call to L_expand_impl() if defined
  *  
  *  @return             int     0 if the macro exists 
  *                              L_MACRO_ERR on error: the next token was not a valid macro name, or the macro does not exist.
