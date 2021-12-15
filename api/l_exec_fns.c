@@ -19,12 +19,58 @@
  *  
  *  nbargs is 3 and the arguments are *stack, *(stack-1) and *(stack-2).
  *  
+ *  
+ *  List of functions
+ *  -----------------
+ *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
+ *  
+ *             L_REAL L_logn(L_REAL v)
+ *      static L_REAL L_uminus(L_REAL* stack)
+ *      static L_REAL L_uplus (L_REAL* stack)
+ *      static L_REAL L_log(L_REAL* stack, int nargs)
+ *      static L_REAL L_ln(L_REAL* stack)
+ *      static L_REAL L_not(L_REAL* stack)
+ *      static L_REAL L_expn(L_REAL* stack, int nargs)
+ *      static L_REAL L_max(L_REAL* stack, int nargs)
+ *      static L_REAL L_min(L_REAL* stack, int nargs)
+ *      static L_REAL L_sin (L_REAL* stack)
+ *      static L_REAL L_cos (L_REAL* stack)
+ *      static L_REAL L_acos (L_REAL* stack)
+ *      static L_REAL L_asin (L_REAL* stack)
+ *      static L_REAL L_tan (L_REAL* stack)
+ *      static L_REAL L_atan (L_REAL* stack)
+ *      static L_REAL L_tanh (L_REAL* stack)
+ *      static L_REAL L_sinh (L_REAL* stack)
+ *      static L_REAL L_cosh (L_REAL* stack)
+ *      static L_REAL L_abs (L_REAL* stack)
+ *      static L_REAL L_sqrt (L_REAL* stack)
+ *      static L_REAL L_int (L_REAL* stack)
+ *      static L_REAL L_rad (L_REAL* stack)
+ *      static L_REAL L_if(L_REAL* stack, int nargs)
+ *      static L_REAL L_lsum(L_REAL* stack, int nargs)
+ *      static L_REAL L_lmean(L_REAL* stack, int nargs)
+ *      static L_REAL L_fnisan(L_REAL* stack, int nargs)
+ *      static L_REAL L_lcount(L_REAL* stack, int nargs)
+ *      static L_REAL L_lprod(L_REAL* stack, int nargs)
+ *      static L_REAL L_sign(L_REAL* stack)
+ *      static L_REAL L_lstderr(L_REAL* stack, int nargs)
+ *      static L_REAL L_random(L_REAL* stack)
+ *      static L_REAL L_floor(L_REAL* stack)
+ *      static L_REAL L_ceil (L_REAL* stack)
+ *      static L_REAL L_round(L_REAL* stack, int nargs)
+ *      static L_REAL L_urandom(L_REAL* stack)
+ *      static double randBoxMuller(double rv_mean, double rv_sd)
+ *      static L_REAL L_grandom(L_REAL* stack)
+ *      static double dgamma(double x)
+ *      static L_REAL L_gamma(L_REAL* stack)
+ *      static L_REAL L_div0(L_REAL *stack, int nargs)
+ *  
  */
 
 #include "iode.h"
 
 
-// Global functions (not static!)
+/* Global functions (not static!) */
 L_REAL L_logn(L_REAL v)
 {
     double  x;
@@ -217,7 +263,7 @@ static L_REAL L_random(L_REAL* stack)
 static L_REAL L_floor(L_REAL* stack) {return((L_REAL)floor((double)(*stack))); }
 static L_REAL L_ceil (L_REAL* stack) {return((L_REAL)(1.0 + floor((double)(*stack))));}
 
-L_REAL L_round(L_REAL* stack, int nargs)
+static L_REAL L_round(L_REAL* stack, int nargs)
 {
     double cf = 0, val = *stack;
 
@@ -245,12 +291,73 @@ static L_REAL L_urandom(L_REAL* stack)
     return(x * s);
 }
 
+/* grandom (gaussian random value) */
+//#include <math.h>
+//#include <stdlib.h>
+
+#define u_rand() ((double) rand()/(1.0+(double) RAND_MAX))
+static double  z2 =0.0;
+static int  use_z2 = 1;
+
+static double randBoxMuller(double rv_mean, double rv_sd)
+{
+    double  z1, x, y, w;
+    if(use_z2 && z2 != 0.0) {
+        z1 = z2;
+        z2 = 0.0;
+    }
+    else {
+        do {
+            /* choose x,y in uniform square (-1,-1) to (+1,+1) */
+            x = -1.0 + 2.0 * u_rand();
+            y = -1.0 + 2.0 * u_rand();
+            /* see if it is in the unit circle */
+            w = x * x + y * y;
+        }
+        while(w > 1.0 || w == 0);
+        /* Box-Muller transform */
+        w = sqrt(-2.0 * log(w)/w);
+        z2 = x * w;
+        z1 = y * w;
+    }
+    return(rv_mean + rv_sd * z1);
+}
+
 static L_REAL L_grandom(L_REAL* stack)
 {
     extern double randBoxMuller(double m, double s);
     double  s = *stack, m = *(stack - 1);
 
     return(randBoxMuller(m, s));
+}
+
+/* Gamma function in double precision */
+static double dgamma(double x)
+{
+    int k, n;
+    double w, y;
+    n = x < 1.5 ? -((int)(2.5 - x)) : (int)(x - 1.5);
+    w = x - (n + 2);
+    y = ((((((((((((-1.99542863674e-7 * w + 1.337767384067e-6) * w -
+                   2.591225267689e-6) * w - 1.7545539395205e-5) * w +
+                 1.45596568617526e-4) * w - 3.60837876648255e-4) * w -
+               8.04329819255744e-4) * w + 0.008023273027855346) * w -
+             0.017645244547851414) * w - 0.024552490005641278) * w +
+           0.19109110138763841) * w - 0.233093736421782878) * w -
+         0.422784335098466784) * w + 0.99999999999999999;
+    if(n > 0) {
+        w = x - 1;
+        for(k = 2; k <= n; k++) {
+            w *= x - k;
+        }
+    }
+    else {
+        w = 1;
+        for(k = 0; k > n; k--) {
+            y *= x - k;
+        }
+    }
+    return w / y;
 }
 
 static L_REAL L_gamma(L_REAL* stack)
