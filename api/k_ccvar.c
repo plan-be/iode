@@ -86,14 +86,14 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
     int     nb, nobs, cmpt = 0;
     ONAME   name;
     PERIOD  one, two;
-    SAMPLE  *smpl, *K_ask_smpl();
+    SAMPLE  *smpl, *kasksmpl();
 
     // Create and empty KDB for vars
     kdb = K_create(K_VAR, K_UPPER);
 
     // The keyword sample must be the first on the YY stream */
     // if not:
-    //    - if ask == 1: the user must provide the sample via a call to K_ask_smpl()
+    //    - if ask == 1: the user must provide the sample via a call to kasksmpl()
     //    - else:        the function returns NULL
     //
     if(YY_lex(yy) != KV_SMPL) {
@@ -103,7 +103,8 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
         }
         else {
             YY_unread(yy);
-            smpl = K_ask_smpl();
+            //smpl = K_ask_smpl();
+            smpl = kasksmpl();
         }
     }
     else smpl = K_read_smpl(yy);
@@ -150,7 +151,7 @@ err:
  *  @param [in] file_or_string    char* file_or_string or string to interpret
  *  @param [in] type        int   1 => file_or_string is a string containing the var definitions, 
  *                                0 => file_or_string is a file name 
- *  @param [in] ask         int   1 => if and the sample definition is not present on the YY stream, calls K_ask_smpl() to get the sample from the user.
+ *  @param [in] ask         int   1 => if and the sample definition is not present on the YY stream, calls kasksmpl() to get the sample from the user.
  *                                0 => if and the sample definition is not present on the YY stream, quit the function and returns NULL
  *  @return                 KDB*  NULL or new KDB of variables
  *  
