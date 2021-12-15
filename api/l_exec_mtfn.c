@@ -62,7 +62,7 @@ extern KDB      *L_EXEC_DBV, *L_EXEC_DBS;
  *  expr1 and expr2.
  * 
  *  General formula:
- *      corr(from, to expr1, expr2) = covar(from, to, expr1, expr2) / sqrt(var(from, to, expr1) * var(from, to, expr2))
+ *      corr(from, to, expr1, expr2) = covar(from, to, expr1, expr2) / sqrt(var(from, to, expr1) * var(from, to, expr2))
  *  
  *  @param [in] expr1   unsigned char*  first CLEC sub-expression
  *  @param [in] len1    short           length of expr1    
@@ -152,7 +152,7 @@ static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, in
  *   where:
  *          Xm is the mean of X on [from, to]
  *          Ym is the mean of Y on [from, to]
- *          n le nombre d'observations in [from, to]
+ *          n is the number of observations in [from, to]
  *  
  *  @param [in] expr1   unsigned char*  first CLEC sub-expression
  *  @param [in] len1    short           length of expr1    
@@ -248,7 +248,7 @@ static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, 
  *
  *   where:
  *          Xm is the mean of X on [from, to]
- *          n le nombre d'observations in [from, to]
+ *          n is the number of observations in [from, to]
  *
  *  
  *  @see L_corr() for the parameter definition
@@ -403,8 +403,9 @@ static L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int
 
 
 /** 
- *  Retourne dans vy et dans vt les valeurs définies les plus proches autour de expr[t].
- *  TODO: describe this
+ *  Returns in vy and vt the closest existing values (not L_NAN) defined around expr[t].
+ *
+ *  TODO: describe this better 
  *  
  *  @param [in]  expr1  unsigned char*   CLEC sub-expression (heterogeous container)
  *  @param [in]  len1   short            length of expr1 in bytes

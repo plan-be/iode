@@ -180,7 +180,7 @@
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
-#define KCPTR(name)         K_optr0(KC_WS, name)
+#define KCPTR(name)         K_optr0(KC_WS, name)            // Returns a pointer 
 #define KLPTR(name)         K_optr0(KL_WS, name)
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)
 #define KEPTR(name)         K_eptr(KE_WS, name)

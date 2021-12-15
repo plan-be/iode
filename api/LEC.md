@@ -69,7 +69,7 @@ Finally, the CLEC *struct* regroups the following data:
 
 The variables and functions for managing LEC expressions are divided into the categories below:
 
-- Variables defining the LEC syntax
+- LEC syntax: variables defining the LEC syntax
 - LEC utilities: LEC memory allocation + LEC error management
 - LEC compiler: to check the syntax of a LEC expression and to produce a precompiled structure (CLEC)
 - LEC linker: to link the CLEC structure to the variables and scalars in KDB's
@@ -178,7 +178,7 @@ Functions to evaluate a compiled and linked LEC expression.
     L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)                     Execution of a compiled and linked CLEC expression.
 
 ### l_exec_var.c
-Functions to evaluate a LEC "values":
+Functions to evaluate LEC "values":
 
     static L_REAL L_pi ()
     static L_REAL L_euro()
@@ -267,7 +267,7 @@ Functions to evaluate LEC "time functions".
 
 ### l_exec_mtfn.c
 
-Functions to evaluate LEC "time functions with possibly  multiple arguments. 
+Functions to evaluate LEC "time functions" with possibly  multiple arguments. 
 
     static L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs)
     static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)

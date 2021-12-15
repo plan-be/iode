@@ -1,7 +1,7 @@
 /**
  * @header4iode
  *
- * Functions to evaluate LEC "time functions". Time functions depends on "time" or "lag" parameters.
+ * Functions to evaluate LEC "time functions". Time functions depend on "time" or "lag" parameters.
  * 
  * Example 1: optional time parameters
  *      sum(2000Y1, 2010Y1, A) computes the sum of elements of A between 2000 and 2010.
@@ -22,7 +22,7 @@
  *      - expr points to the current position in the CLEC expression (in "sum(A + B))", expr points to "A + B")
  *      - len is the length of the (sub-) expression expr (here the length of "A+B" compiled)
  *      - t is the current execution time (index in the SAMPLE) 
- *      - stack points to the top of the stack of values
+ *      - stack points to the top of the stack 
  *      - nargs is the number of arguments of the call to the function 
  *  
  *  Example 3: the sample is 2000Y1-2030Y1 and we want to calculate "55.1+dln(A+B)" in 200Y1.
@@ -70,7 +70,7 @@
 // see L_tfn_args() definition in l_exec.c.
 extern void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to);
 
-// L_intlag() transform a lag on the stask (real value) to an integer.
+// L_intlag() transforms a lag on the stask (real value) to an integer.
 extern int  L_intlag(L_REAL);
 
 /**

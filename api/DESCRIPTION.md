@@ -49,14 +49,7 @@ More information can be found at http://xon.be/scr4/libs1/libs1236.htm.
 Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be 
 printed in the console. In the DOS-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
 
-For each of these functions, a standard implementation is provided in iodeapi.lib, generally using the stdio functions like printf.
-At the same time, an optional "super function" pointer points to a function that, if not null, 
-will replace (superseed) the original implementation.
-
-Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be 
-printed in the console. In the DOS-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
-
-For each of these functions, a standard implementation is provided in iodeapi.lib, generally using the stdio functions like printf.
+For each of these functions, a standard implementation (= virtual function) is provided in iodeapi.lib, generally using the stdio functions like printf.
 At the same time, an optional "super function" pointer may point to a alternative function. If that pointer is not null, 
 the alternative function will replace (superseed) the original implementation. In that way, each context  has possibly its own implementation
 without interfering with the others.
@@ -100,8 +93,8 @@ without interfering with the others.
 
 ## Group "Global Utilities"
 
- - buf.c        share a large allocated buffer in different parts of the application
- - pack.c       packing (serialize) and unpacking (deserialize) objects.
+ - buf.c        shares a large allocated buffer in different parts of the application
+ - pack.c       packs (serialize) and unpacks (deserialize) objects.
  - per.c        functions for manipulating PERIOD and SAMPLE in IODE.
  - yy.c         helper functions for reading and writing IODE ascii files.
  - b_iodeini.c  reading and writing parameters in the iode.ini file
