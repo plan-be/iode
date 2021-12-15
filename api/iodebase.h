@@ -44,15 +44,58 @@ extern int isyon(int ,char **);
 extern int kclmsg(int ,int );
 extern void kwrmsg(char *);
 
+/* k_errorv.c */
+
+/* k_super.c */
+extern void    (*kerror_super)(int level, char*fmt);
+extern void    (*kwarning_super)(char* msg);
+extern void    (*kmsg_super)(char*fmt);
+extern int     (*kwprintf_super)(char* msg);
+extern void    (*kpanic_super)();
+extern int     (*kconfirm_super)(char* msg);
+extern int     (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
+extern int     kmsgbox_continue;
+extern void    (*krecordkey_super)(int ch);
+extern void    (*ksettitle_super)(void);
+extern int     (*ktermvkey_super)(int vkey);
+extern int     (*khitkey_super)();
+extern int     (*kgetkey_super)();
+extern void    (*kbeep_super)(void);
+extern SAMPLE* (*kasksmpl_super)(void);
+extern int     (*kexecsystem_super)(char*);
+extern int     (*kshellexec_super )(char*);
+
+
+extern void    kerror(int level, char* fmt, ...);
+extern void    kwarning(char* fmt, ...);
+extern void    kmsg(char* fmt, ...);
+extern int     kwprintf(char* msg, ...);
+extern void    kpanic(void);
+extern int     kconfirm(char* fmt, ...);
+extern int     kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts);
+extern void    krecordkey(int ch);
+extern void    ksettitle(void);
+extern int     ktermvkey(int vkey);
+extern int     khitkey();
+extern int     kgetkey();
+extern void    kbeep();
+extern SAMPLE* kasksmpl();
+extern int     kexecsystem(char*);
+extern int     kshellexec(char*);
+
+
 /* k_cmp.c */
 extern int K_cmp(char *,KDB *,KDB *);
 
 /* k_lec.c */
+extern char *(*L_expand_super)(char* list_name);
+
 extern IODE_REAL *L_getvar(KDB *,int );
 extern IODE_REAL L_getscl(KDB *,int );
 extern SAMPLE *L_getsmpl(KDB *);
 extern int L_findscl(KDB *,char *);
 extern int L_findvar(KDB *,char *);
+extern char* L_expand(char* list_name);
 
 /* pack.c */
 extern int P_free(char *);
@@ -106,6 +149,7 @@ extern int K_setname(char *,char *);
 
 /* buf.c */
 extern char *BUF_alloc(int );
+extern void BUF_free(void);
 extern void BUF_lock(void);
 extern void BUF_unlock(void);
 extern char *BUF_memcpy(char *,int );
@@ -176,7 +220,7 @@ extern int L_sub_expr(ALEC *,int );
 //extern int L_lag_expr(int );
 
 /* ode.c */
-extern  char    *L_expand(char *);
+//extern  char    *L_expand(char *);
 
 /* l_alloc.c */
 extern char *L_malloc(int );
@@ -201,7 +245,7 @@ extern int L_link(KDB *,KDB *,CLEC *);
 extern void L_link_endos(KDB* kde, CLEC* cl);
 
 /* l_exec.c */
-#ifdef VC
+#ifdef _MSC_VER
         extern int matherr(struct _exception *);
 #else
         extern int matherr(struct exception *);
@@ -304,7 +348,7 @@ extern int L_split_eq(char *);
 /* l_newton.c */
 extern double L_zero(KDB *,KDB *,CLEC *,int ,int ,int );
 extern double L_newton(KDB *,KDB *,CLEC *,int ,int ,int );
-extern double L_newton_1(int ,KDB *,KDB *,CLEC *,int ,int ,int );
+//extern double L_newton_1(int ,KDB *,KDB *,CLEC *,int ,int ,int );
 
 /* l_secant.c */
 extern double L_fx(double ,int );
@@ -397,6 +441,11 @@ extern char *K_oval(KDB *,int ,int );
 extern char *K_oval0(KDB *,int );
 extern char *K_oval1(KDB *,int );
 extern double *K_vval(KDB *,int ,int );
+
+extern char *K_optr(KDB *,char* ,int );
+extern char *K_optr0(KDB *,char* );
+extern char *K_optr1(KDB *,char* );
+extern double *K_vptr(KDB *,char* ,int );
 
 /* k_lst.c */
 extern int K_scan(KDB *,char *,char *);
@@ -1089,7 +1138,7 @@ extern int C_WsTrend(void);
 extern int SB_WsAggregate(void);
 extern int SB_StatUnitRoot(void);
 extern int C_StatUnitRoot(void);
-extern SAMPLE *K_ask_smpl(void);
+//extern SAMPLE *K_ask_smpl(void); => kasksmpl()
 
 /* sb_prof.c */
 extern int SB_ProfileLoad(void);
