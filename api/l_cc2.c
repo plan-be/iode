@@ -31,7 +31,7 @@
 #include "iode.h"
 
 /**
- * Second stage of LEC compilation. Generates an "executable" LEC expression.
+ * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogeous container).
  * 
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
