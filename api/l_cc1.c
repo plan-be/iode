@@ -88,7 +88,7 @@ int L_cc1(int nb_names)
 
     /* LOOP ON TOKEN */
     while(1) {
-        keyw = L_get_token();
+        keyw = L_get_token(); // Group of operators, not the operator itself
         if(L_errno) goto ended;
 again:
         switch(keyw) {
@@ -331,23 +331,25 @@ static int L_priority_sup(int op)
 
 
 /**
- *  Adds an operator on L_OPS, the stack of operators. If needed, reallocates L_OPS.
- *  First, saves in L_EXPR the operator(s) of lower priorities that are on top of L_OPS.
+ *  Adds the current operator (stored in L_TOKEN.tk_def) to L_OPS, the stack of operators. If needed, reallocates L_OPS.
+ *  Note that *op_group* is not and operator but a group of operators (L_OP, L_FNS...). The last read *operator* is in L_TOKEN.tk_def.
  *  
- *  Example: if op is '+' ans last_op is '*': 
+ *  First, saves in L_EXPR the operator(s) of lower priorities that are on the top of L_OPS.
+ *  
+ *  Example: if op is '+' and last_op is '*': 
  *              '*' if moved to L_EXPR because '+' has a lower priority.
  *              '+' is put on the top of L_OPS
  *  
- *  @param [in] op  int     group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...).
- *                          The operator itself is in L_TOKEN.
- *  @return                 0 on success
- *                          L_errno on error
+ *  @param [in] op_group  int   group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...).
+ *                              The operator itself is in L_TOKEN.
+ *  @return                     0 on success
+ *                              L_errno on error
  */
-static int L_add_stack(int op)
+static int L_add_stack(int op_group)
 {
     if(L_NB_OPS >= L_MAX_STACK) return(L_errno = L_STACK_ERR);
 
-    switch(op) {
+    switch(op_group) {
         case L_OP :
             while(L_priority_sup(L_TOKEN.tk_def))
                 if(L_save_op() != 0) return(L_errno);
