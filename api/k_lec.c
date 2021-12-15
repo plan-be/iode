@@ -84,3 +84,27 @@ int L_findvar(KDB* kdb, char* name)
 {
     return(K_find(kdb, name));
 }
+
+char *(*L_expand_super)(char* list_name);
+
+/**
+ *  
+ *  
+ *  @param [in] name 
+ *  @return 
+ *  
+ */
+ 
+char* L_expand(char* list_name)
+{
+    if(L_expand_super) 
+        return((*L_expand_super)(list_name));
+    else {
+        int     pos;
+
+        pos = K_find(KL_WS, list_name);
+        //printf("pos=%d\n");
+        if (pos < 0) return(NULL);
+        return((char *)KLVAL(KL_WS, pos));
+    }    
+}
