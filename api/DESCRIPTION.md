@@ -4,7 +4,8 @@ Note on function names: as C does not allow "namespacing", we always give prefix
 an indication of the group the function belongs to. For example, P*() is the group of function for "packing" (aka serializing) 
 IODE objects, PER*() for manipulating PERIOD, L_* () for LEC compilation / execution, etc.
 
-Most filenames follow the same principle: each group of files has a specific prefix which normally gives an indication of the group they belong to.
+Most filenames follow the same principle: each group of files has a specific prefix which normally gives 
+an indication of the group they belong to.
 
  - k_*: core functions (the prefix "k_" is a legacy of the "Kaa" software)
  - b_*: building *B*locks for IODE reports
@@ -13,12 +14,17 @@ Most filenames follow the same principle: each group of files has a specific pre
 ## TOC
 - A note on memory allocations in IODE
 - Group "Global Utilities"
+- Group "Pseudo-virtual functions"
 - Group "IODE Version"
 - Group "KDB management"
 - Group "Object management"
-- Group "IODE file management"
-- Group "IODE ascii format reading and writing"
+- Group "IODE object file management"
+- Group "Iode object ascii formats"
 - Group "LEC language"
+- *Group "Model Estimation"
+- *Group "Model Simulation"
+- *Group "Iode ini file"
+- *Group "Iode Reports"
 
 
 ## A note on memory allocations in IODE
@@ -26,7 +32,8 @@ IODE uses 2 distinct groups of functions for memory allocations.
 
 The **first group** is based on the "standard" memory allocation functions malloc() and free(). 
 
-The main functions in this group are SW_nalloc(), SW_nrealloc() and SW_nfree(). An older group from *scr4* has the same properties: SCR_malloc(), SCR_realloc() and SCR_free()_
+The main functions in this group are SW_nalloc(), SW_nrealloc() and SW_nfree(). 
+An older group from *scr4* has the same properties: SCR_malloc(), SCR_realloc() and SCR_free().
 
 The **second group** has been created specifically to avoid memory segmentation when possible. The main idea is to allocate large memory buffers 
 on the heap (called "segments") and to fill them with serialized objects, like "packed" equations or variables. 
@@ -37,13 +44,67 @@ The main functions in this second group are **SW_init()**, **SW_alloc()**, **SW_
 
 More information can be found at http://xon.be/scr4/libs1/libs1236.htm. 
 
+## Group "Pseudo-virtual functions"
+
+Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be 
+printed in the console. In the DOS-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
+
+For each of these functions, a standard implementation is provided in iodeapi.lib, generally using the stdio functions like printf.
+At the same time, an optional "super function" pointer points to a function that, if not null, 
+will replace (superseed) the original implementation.
+
+Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be 
+printed in the console. In the DOS-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
+
+For each of these functions, a standard implementation is provided in iodeapi.lib, generally using the stdio functions like printf.
+At the same time, an optional "super function" pointer may point to a alternative function. If that pointer is not null, 
+the alternative function will replace (superseed) the original implementation. In that way, each context  has possibly its own implementation
+without interfering with the others.
+
+### List of functions that can be superseeded
+
+    void kerror(int level, char* fmt, ...)       Displays an error message and optionally exits the program.
+    void kpause(char* msg)                       Displays a message and then waits for the user to press ENTER.
+    void kwarning(char* fmt, ...)                Displays a message and optionally asks the user to press ENTER before continuing.
+    void kmsg(char* fmt, ...)                    Displays a message.
+    int kconfirm(char *fmt,...)                  Displays a message and optionally asks confirmation before continuing.
+    int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts) Displays a message box with optional buttons. 
+    void krecordkey(int key)                     Records a key in the keyboard buffer. 
+    int Wprintf(char* fmt, ...)                  Displays a message.
+    int SCR_panic()                              Exits the program (normally on a "memory full" event).
+    void ksettitle()                             Set the window title (GUI only).
+    int ktermvkey(int vkey)                      Defines the interval to wait between two checks on the keyboard buffer length (GUI only).
+    int khitkey()                                Checks whether the keyboard buffer is not empty (GUI only).
+    int kgetkey()                                Reads the next character in the keyboard buffer (GUI only).
+    void kbeep()                                 Plays a sound (GUI only).
+    SAMPLE *kasksmpl()                           Asks the user to give a SAMPLE (GUI only).
+
+### List of function pointers that can replace the standard implementation  
+
+     void (*kerror_super)(int level, char*msg);
+     void (*kwarning_super)(char* msg);
+     void (*kmsg_super)(char* msg);
+     int  (*kwprintf_super)(char* msg);
+     void (*kpanic_super)(void);
+     int  (*kconfirm_super)(char* msg);
+     int  (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
+     int   kmsgbox_continue = 1;
+     void (*krecordkey_super)(int ch);
+     void (*ksettitle_super)(void);
+     int  (*ktermvkey_super)(int vkey);
+     int  (*khitkey_super)();
+     int  (*kgetkey_super)();
+     void (*kbeep_super)(void);
+     SAMPLE *(*kasksmpl_super)(void);
+ 
+
 ## Group "Global Utilities"
 
-
- - buf.c : share a large allocated buffer in different parts of the application
- - pack.c : packing (serialize) and unpacking (deserialize) objects.
- - per.c : functions for manipulating PERIOD and SAMPLE in IODE.
- - yy.c : helper functions for reading and writing IODE ascii files.
+ - buf.c        share a large allocated buffer in different parts of the application
+ - pack.c       packing (serialize) and unpacking (deserialize) objects.
+ - per.c        functions for manipulating PERIOD and SAMPLE in IODE.
+ - yy.c         helper functions for reading and writing IODE ascii files.
+ - b_iodeini.c  reading and writing parameters in the iode.ini file
 
 ### buf.c
 Functions to share and reuse a large allocated buffer in different parts of the application. 
@@ -52,7 +113,7 @@ Functions to share and reuse a large allocated buffer in different parts of the 
     void BUF_free() : frees the buffer
     void BUF_lock() : reserves the buffer utilisation
     void BUF_unlock() : unlocks the buffer
-    char *BUF_memcpy(char *ptr, int lg) : copies the the first lg bytes following address ptr to the buffer
+    char *BUF_memcpy(char *ptr, int lg) : copies the the first lg bytes following address ptr to the buffer BUF_DATA
     char *BUF_strcpy(char *ptr) : copies a null terminated string to the buffer
 
     char *BUF_DATA : NULL or pointer to the allocated buffer
@@ -107,6 +168,21 @@ Helper functions for reading and writing IODE ascii files.
     int K_compare(YYKEYS* yy1, YYKEYS* yy2)
     char *K_wrap(char *in, int lg)
 
+### b_iodeini.c
+
+Functions to read and write parameters in iode.ini. 
+
+     void B_IodeIniFile(): 
+             Retrieves the path to the iode.ini file 
+     int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft): 
+             Reads a text parameter in the current iode.ini file.
+     int B_IniReadChar(char* section, char* parm, char dft): 
+             Reads a character parameter in the current iode.ini file.
+     int B_IniReadNum(char* section, char* parm, int dft): 
+             Reads a integer parameter in the current iode.ini file. 
+     int B_IniReadYN(char* section, char* parm, int dft): 
+             Reads a Y/N parameter in the current iode.ini file. 
+
 
 ## Group "IODE Version"
 ### k_vers.c
@@ -155,8 +231,11 @@ Functions acting on workspaces of variables.
 - k_objs.c: functions to manipulate IODE objects.
 - k_objvers.c: functions to detect IODE object file version and to convert an object to the current IODE version._
 - k_pack.c: functions for "packing" and "unpacking" IODE objects.
+- k_val.c: functions to retrieve object data based on their position or name in the kdb.
+- k_cmp.c: function to compare two IODE objects.
 
 ### k_objsv.c
+
 Function to create an IODE object and to record it in a KDB.
 
      int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9): adds an 
@@ -216,7 +295,27 @@ Functions for "packing" and "unpacking" IODE objects.
      int KS_alloc_scl()
      int KV_alloc_var(int nb)
 
+### k_val.c
+
+Basic functions to retrieve object data based on their position or name in the kdb.
+If the object is packed (EQ, TBL...) the position (n) of the element in the pack must be given.
+
+List of functions 
+
+    char *K_oval(KDB* kdb, int pos, int n)           ~ kdb[pos][n]
+    char* K_optr(KDB *kdb, char* name, int n)        ~ kdb[name][n]
+    char *K_oval0(KDB* kdb, int pos)                 ~ kdb[pos][0]
+    char* K_optr0(KDB *kdb, char* name)              ~ kdb[name][0]
+    char *K_oval1(KDB* kdb, int pos)                 ~ kdb[pos][1]
+    char* K_optr1(KDB *kdb, char* name)              ~ kdb[name][1]
+    IODE_REAL *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
+    IODE_REAL *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
+    EQ* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
+ 
+
+
 ### k_cmp.c
+
 Function to compare two IODE objects.
 
     int K_cmp(char* name, KDB* kdb1, KDB* kdb2):            Compares IODE objects having the same name in two KDB.
@@ -300,7 +399,7 @@ Loading and saving IODE ascii scalar files.
     int KS_save_asc(KDB* kdb, char* filename)
     int KS_save_csv(KDB *kdb, char *filename)
 
-### k_cctbl.c_
+### k_cctbl.c
 Loading and saving IODE ascii table files.
 
     KDB *KT_load_asc(char* filename)
@@ -317,7 +416,7 @@ Functions to import and export IODE files to/from ascii and LArray-csv format.
 
 ## Group "LEC language"
 
-Voir LEC.md
+See LEC.md
 
 ### k_lec.c
 Implemention of the LEC library virtual functions for SCL and VAR references.
@@ -332,12 +431,6 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 
 ## Estimation
 
-## Simulation
-
-## Reports
-
-## Remaining source files 
-
 - e_est 
 - e_step 
 - e_tests 
@@ -346,9 +439,18 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 - e_errorv 
 - e_print 
 - e_stat 
-- 
+
+## Simulation
+
+k_sim 
+
+
+## Reports
+
+## Remaining source files 
+
+ 
 - k_var 
-- k_val
 - k_lst 
 - k_eqs 
 - k_tbl 
@@ -379,7 +481,7 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 - b_rep b_rep2 b_proc b_defs b_data b_ws b_prof b_ras b_eviews
 - b_readme b_pdest b_pnogui b_model b_print b_view
 - b_idt b_est b_htol b_ltoh b_xode b_api
-- b_season b_trend k_sim 
+- b_season b_trend 
 - k_exec 
 - k_print
 - k_graph 
