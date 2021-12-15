@@ -1,7 +1,7 @@
 /**
  * @header4iode
  *
- * Functions to evaluate a LEC "values". 
+ * Functions to evaluate LEC "values". 
  * 
  * The table (*L_VAL_FN)[] contains the function pointers to evaluate L_PI to L_EURO (see iode.h).
  *
@@ -10,7 +10,15 @@
  *      L_REAL  <fnname>(int t);
  *  or
  *      L_REAL  <fnname>(void);
- * 
+ *  
+ *  List of functions
+ *  -----------------
+ *      static L_REAL L_pi ()
+ *      static L_REAL L_euro()
+ *      static L_REAL L_e ()
+ *      static L_REAL L_time(int t)
+ *      static L_REAL L_i(int t)
+ *     
  */
 
 #include "iode.h"
