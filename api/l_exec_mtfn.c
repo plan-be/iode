@@ -1,35 +1,79 @@
 /**
  * @header4iode
  *
- * Functions to evaluate LEC "time functions with possibly  multiple arguments. 
+ * Functions to evaluate LEC "time functions" with possibly **more than one expression** 
+ * in the function arguments.
  * 
- * Example 
- *      sum(2000Y1, 2010Y1, A) computes the sum of elements of A between 2000 and 2010.
- *   
+ * Example:
+ *
+ *     corr([from [,to],] X+Y, Y+Z) 
+ * 
+ * computes the correlation between the series (X+Y) and (Y+Z) on the time interval [from, to].
+ *      
  * The table (*L_TFN_FN)[] (at the end of this file) contains the pointers 
- * to the functions from L_LAG to L_LASTOBS (see iode.h).
+ * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *
- *      L_REAL <fnname>(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL <fnname>(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
  *  
  *  where:
- *      - expr points to the current position in the CLEC expression (in "X + sum(A + B))", expr points to "A + B")
- *      - len is the length of the (sub-) expression expr (here the length of "A+B" compiled)
- *      - t is the current execution time (index in the SAMPLE) 
- *      - from receives the first position for the calculation 
- *      - to receives the last position for the calculation     
+ *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
+ *      nvargs = number of variables arguments (generally not used)
+ *      t      = time of calculation
+ *      stack  = pointer to the top of the stack of intermediate values / results
+ *      nargs  = number of arguments of the calling function that determines the calculation interval.
  *  
+ *  
+ *  List of functions
+ *  -----------------
+ *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
+ *  
+ *      static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs, int orig)
+ *      static L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static int    L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, L_REAL* vy, int notnul)
+ *      static L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, int std)
+ *      static L_REAL L_hp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      static L_REAL L_hpstd(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  */
 
 #include "iode.h"
 
-/* ============ MTFN ============ */
+/* =============================== MTFN ============================== */
 
+// L_tfn_args() computes the value of from and to based on nargs, the number of arguments of the calling function.
+// see L_tfn_args() definition in l_exec.c.
 extern void     L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to);
 extern L_REAL   L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs); 
+
 extern KDB      *L_EXEC_DBV, *L_EXEC_DBS; 
 
+
+/**
+ *  Sub function of L_corr() that calculates the correlation between 2 series defined the CLEC sub-expressions 
+ *  expr1 and expr2.
+ * 
+ *  General formula:
+ *      corr(from, to expr1, expr2) = covar(from, to, expr1, expr2) / sqrt(var(from, to, expr1) * var(from, to, expr2))
+ *  
+ *  @param [in] expr1   unsigned char*  first CLEC sub-expression
+ *  @param [in] len1    short           length of expr1    
+ *  @param [in] expr2   unsigned char*  second CLEC sub-expression
+ *  @param [in] len2    short           length of expr2
+ *  @param [in] t       int             time of of the returned value
+ *  @param [in] stack   L_REAL*         pointer to the top of the stack of intermediate values / results
+ *  @param [in] nargs   int             number of arguments of the calling function that determines the calculation interval.
+ *  @return         
+ *  
+ */
 static L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs) 
 {
     L_REAL  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
@@ -56,6 +100,35 @@ static L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2,
     return(sxy / sqrt(sxx * syy));
 }
 
+
+/**
+ *  Calculates the correlation at time t between two series on a given time interval. 
+ *  Each series is the result of the evaluation of two LEC sub-expressions:
+ *      - the first sub expression starts at the position 0 in expr.
+ *      - the second sub expression starts at the position expr + length of the first sub expression.
+ *
+ *  Syntax: 
+ *      corr([from [,to],] X, Y) 
+ *      where 
+ *          - X and Y are LEC expressions
+ *          - from = period of the first data in the series, 0 by default
+ *          - to = period of the last data in the series, t by default
+ *  
+ *  Formula on [0,t]:
+ *      corr(X, Y) = covar(X, Y) / sqrt(var(X) * var(Y))
+ *  
+ *  General formula:
+ *      corr(from, to X, Y) = covar(from, to, X, Y) / sqrt(var(from, to, X) * var(from, to, Y))
+ * 
+ *  @param [in] expr   unsigned char*   CLEC sub-expression
+ *  @param [in] nvargs short            number of variables arguments (unused)
+ *  @param [in] t      int              time of calculation
+ *  @param [in] stack  L_REAL*          pointer to the top of the stack of intermediate values / results
+ *  @param [in] nargs  int              number of arguments of the calling function that determines the calculation interval.
+ *
+ *  @return            L_REAL           computed correlation 
+ *  
+ */
 static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)  /* JMP 17-04-98 */
 {
     char    *expr1, *expr2;
@@ -67,6 +140,30 @@ static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, in
                       expr + len1 + 2 * sizeof(short), len2,
                       t, stack, nargs));
 }
+
+/**
+ *  Sub function of L_covar(), L_covar0() and L_var() that calculates the correlation between 2 series 
+ *  defined the CLEC sub-expressions expr1 and expr2.
+ * 
+ *  General formula:
+ *      covar([from [,to],] X, Y)  = sum((Xi-Xm)*(Yi-Ym)) /n     
+ *      covar0([from [,to],] X, Y) = sum(Xi * Yi) / n  
+ *  
+ *   where:
+ *          Xm is the mean of X on [from, to]
+ *          Ym is the mean of Y on [from, to]
+ *          n le nombre d'observations in [from, to]
+ *  
+ *  @param [in] expr1   unsigned char*  first CLEC sub-expression
+ *  @param [in] len1    short           length of expr1    
+ *  @param [in] expr2   unsigned char*  second CLEC sub-expression
+ *  @param [in] len2    short           length of expr2
+ *  @param [in] t       int             time of of the returned value
+ *  @param [in] stack   L_REAL*         pointer to the top of the stack of intermediate values / results
+ *  @param [in] nargs   int             number of arguments of the calling function that determines the calculation interval.
+ *  @return             L_REAL          computed covariance.
+ *  
+ */
 
 static L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs, int orig) 
 {
@@ -95,6 +192,19 @@ static L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2
     return(sxy / n);
 }
 
+
+/**
+ *  Calculates the covariance at time t between two series on a given time interval. 
+ *  Each series is the result of the evaluation of two LEC sub-expressions:
+ *      - the first sub expression starts at the position 0 in expr.
+ *      - the second sub expression starts at the position expr + length of the first sub expression.
+ *  
+ *
+ *  @return            L_REAL           computed covariance
+ *
+ *  @see L_corr() for the parameter definition
+ *  @see L_calccovar() for the formulas.
+ */
 static L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) 
 {
     char    *expr1, *expr2;
@@ -107,6 +217,15 @@ static L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, i
                        t, stack, nargs, 0));
 }
 
+
+/**
+ *  Calculates the covariance at time t between two series on a given time interval.
+ *  Same function as L_covar() but with the assumption that the means of each series is null. 
+ *   
+ *  @see L_covar() for more details
+ *  @see L_calccovar() for the formulas.
+ *  
+ */
 static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) 
 {
     char    *expr1, *expr2;
@@ -119,6 +238,23 @@ static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, 
                        t, stack, nargs, 1));
 }
 
+
+/**
+ *  Calculates the variance at time t of a series on a given time interval.
+ *  Same function as L_covar() but with twice the same series.
+ *  
+ *   General formula:
+ *      var([from [,to],] X)  = sum((Xi-Xm)^2)) /n 
+ *
+ *   where:
+ *          Xm is the mean of X on [from, to]
+ *          n le nombre d'observations in [from, to]
+ *
+ *  
+ *  @see L_corr() for the parameter definition
+ *  @see L_covar() for more details.
+ *  
+ */
 static L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 {
     char    *expr1;
@@ -130,6 +266,17 @@ static L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int
                        t, stack, nargs + 1, 0));
 }
 
+
+/**
+ *  Calculates the standard deviation at time t of a series on a given time interval.
+ *  
+ *   General formula:
+ *      stddev([from [,to],] X)  = sqrt(var(X))
+ *
+ *  @see L_corr() for the parameter definition
+ *  @see L_calccovar() for the formula.
+ *  
+ */
 static L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1;
@@ -139,7 +286,36 @@ static L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, 
     else return(sqrt(v1));
 }
 
-static L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+
+/**
+ *  Calculates the position (index) of a value in a series on a given time interval.
+ *  The value is the result of a CLEC sub-expression calculation.
+ *  The series is the result of a second CLEC sub-expression calculation.
+ *
+ *  Syntax:
+ *      index([from, [to],]X, Y)
+ *      
+ *  Example: 
+ *      Let the series 
+ *          X  = {0, 1, 2, 3, 4, 5}
+ *      then 
+ *          index(2, X) = 2
+ *      or, on the full sample:
+ *          index(2, X) = {na, na, 2, 2, 2}
+ *          index(2, X) = {na, na, 2, 2, 2}
+ *
+ *  TODO: Clarify on sub intervals (index(2001Y1, 2010Y1, X, Y))
+ *  
+ *  Each series is the result of the evaluation of a LEC sub-expressions:
+ *      - the first sub expression starts at the position 0 in expr.
+ *      - the second sub expression starts at the position expr + length of the first sub expression.
+ *  
+ *  @see L_corr() for the parameter definition
+ *
+ *  @return            L_REAL           computed covariance
+ */  
+
+ static L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 {
     char    *expr1, *expr2;
     short   len1, len2;
@@ -168,6 +344,21 @@ static L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, i
     return(L_NAN);
 }
 
+
+ /**
+ *  Calculates the autocorrelation factor on a given degree of a given expression.
+ *  
+ *  Autocorrelation is the correlation of a signal with a delayed copy of itself as a function of delay. 
+ *  Informally, it is the similarity between observations as a function of the time lag between them.
+ *  (from https://en.wikipedia.org/wiki/Autocorrelationsee).
+ *   
+ *  Syntax 
+ *      acf([from,[to,]] expr1, expr2) = autocorrelation factor of expr2 of degree expr1 on the period [from, to]
+ *      
+ *  The degree (expr1) may not exceeds the number of observations ([from, to] divided by 4. Otherwise, the function returns L_NAN.
+ *  
+ *  @see L_corr() for the parameter definition
+ */
 static L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) /* JMP 17-04-98 */
 {
     char    *expr1, *expr2;
@@ -211,14 +402,26 @@ static L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int
 }
 
 
-/* Retourne dans vy et dans vt les valeurs définies les plus proches autour
-    de expr[t].
-*/
+/** 
+ *  Retourne dans vy et dans vt les valeurs définies les plus proches autour de expr[t].
+ *  TODO: describe this
+ *  
+ *  @param [in]  expr1  unsigned char*   CLEC sub-expression (heterogeous container)
+ *  @param [in]  len1   short            length of expr1 in bytes
+ *  @param [in]  t      int              time of calculation
+ *  @param [in]  stack  L_REAL*          pointer to the top of the stack of intermediate values / results
+ *  @param [out] vt     L_REAL*          
+ *  @param [out] vy     L_REAL* 
+ *  @param [in]  notnul 
+ *  @return             L_REAL           computed correlation 
+ *  
+ */
+ 
 static int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, L_REAL* vy, int notnul)
 {
     int     j, nobs;
 
-    /* 2. Calc val after t */
+    /* 1. Calc val after t */
     vy[0] = vy[1] = L_NAN;
     nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
     for(vt[1] = t + 1 ; vt[1] < nobs ; vt[1]++) {
@@ -226,7 +429,7 @@ static int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, in
         if(L_ISAN(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) break;
     }
 
-    /* 3. Calc val before t */
+    /* 2. Calc val before t */
     for(vt[0] = t - 1 ; vt[0] >= 0 ; vt[0]--) {
         vy[0] = L_exec_sub(expr1, len1, vt[0], stack);
         if(L_ISAN(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
@@ -261,6 +464,15 @@ static int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, in
     return(0);
 }
 
+/**
+ *  Computes a value for expr[t]. If expr[t] == L_NAN, returns the closer possible linear interpolation 
+ *  depending on the existing values around expr[t].
+ *  
+ *  @see L_corr() for the parameter definition
+ *  
+ *  @return     L_REAL  value of expr[t] or interpolated value
+ *  
+ */
 static L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) /* JMP 17-04-98 */
 {
     char    *expr1;
