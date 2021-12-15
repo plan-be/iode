@@ -204,10 +204,10 @@ static int L_count_endo(ALEC* al, int lg, char* endo)
 /**
  * If EXPR[MBR] is not trivial, splits EXPR[MBR] into two parts and replaces EXPR[MBR] and EXPR[NMBR] by these 2 expressions.
  * 
- * ------------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------
  * Example: 
  *
- * Expresion containing the endogenous : "EXO + ln ENDO"
+ * Expression containing the endogenous : "EXO + ln ENDO"
  * 
  * At the beginning of the function:
  * 
@@ -226,7 +226,7 @@ static int L_count_endo(ALEC* al, int lg, char* endo)
  *                | ln   |
  *     MBR = 1
  *     NMBR = 0
- * ------------------------------------------------------------------------------------------------------
+ * -------------------------------------------------------
  * 
  * @param [in, out]     sl  SLEC*   current state of the equation
  * @return                  int     0 on success, L_DUP_ERR if the sub expression cannot be determined
