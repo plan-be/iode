@@ -112,7 +112,7 @@ static int L_stackna(L_REAL** p_stack, int nargs)
  *      - according to the identifier, one or more values are read from the stack, 
  *          the function/operator is called and the result is placed on the stack
  *      
- *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression (heterogeous container)
+ *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression (heterogeneous container)
  *  @param [in] lg      int             length of the sub expression
  *  @param [in] t       int             time (index in dbv) of execution
  *  @param [in] stack   L_REAL*         execution stack

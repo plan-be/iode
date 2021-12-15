@@ -332,7 +332,8 @@ static int L_priority_sup(int op)
 
 /**
  *  Adds the current operator (stored in L_TOKEN.tk_def) to L_OPS, the stack of operators. If needed, reallocates L_OPS.
- *  Note that *op_group* is not and operator but a group of operators (L_OP, L_FNS...). The last read *operator* is in L_TOKEN.tk_def.
+ *  Note that *op_group* does represent a group of operators (L_OP, L_FNS...), not a specific operators. 
+ *  The last read *operator* is in L_TOKEN.tk_def.
  *  
  *  First, saves in L_EXPR the operator(s) of lower priorities that are on the top of L_OPS.
  *  
