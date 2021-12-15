@@ -6,8 +6,8 @@ extern "C" {
 #endif
 
 /* k_errorv.c */
-extern void kerror(int ,...);
-extern void kmsg(char *, ...);
+//extern void kerror(int level, char* msg, ...);
+//extern void kmsg(char *msg, ...);
 
 /* l_debug.c */
 extern void L_debug(char *,...);
