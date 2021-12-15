@@ -46,7 +46,7 @@ KDB     *L_EXEC_DBV,
 int     L_curt;         // current value of t
 
 // Math exceptions trap
-#ifdef VC
+#ifdef _MSC_VER
 int _matherr(struct _exception *a)
 {
     a->retval = (double)L_NAN;
@@ -103,8 +103,8 @@ static int L_stackna(L_REAL** p_stack, int nargs)
  * 
  *  The variable, scalar and sample values are retrieved by calling 3 user defined functions (see also k_lec.c):
  * 
- *      IODE_REAL*  L_getvar(dbv, pos) : returns the pointer to the variable pos of dbv.
- *      IODE_REAL   L_getscl(dbs, pos) : returns the value of the scalar nb pos in dbs.
+ *      IODE_REAL*  L_getvar(dbv, pos) : returns the pointer to the variable at position pos in dbv.
+ *      IODE_REAL   L_getscl(dbs, pos) : returns the value of the scalar at position pos in dbs.
  *      SMPL*       L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
  *
  *  The process iterates on the compiled LEC expression. 
@@ -112,7 +112,7 @@ static int L_stackna(L_REAL** p_stack, int nargs)
  *      - according to the identifier, one or more values are read from the stack, 
  *          the function/operator is called and the result is placed on the stack
  *      
- *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression
+ *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression (heterogeous container)
  *  @param [in] lg      int             length of the sub expression
  *  @param [in] t       int             time (index in dbv) of execution
  *  @param [in] stack   L_REAL*         execution stack
@@ -313,13 +313,13 @@ int L_intlag(L_REAL lag)
 }
 
 /**
- *  Utility function to retrieve an optional time value on the stack.
+ *  Utility function to retrieve one or 2 optional time values on the stack.
  *  Ex.: 
  *      vmax(1990Y1, 2000Y1, A+B):  from=1990Y1, to=2000Y1
  *      vmax(1990Y1, A+B):          from=1990Y1, to=t
  *      vmax(A+B):                  from=0,      to=t
  *  
- *  @param [in]  t      int     current value of t (in a simulation loop fir example)
+ *  @param [in]  t      int     current value of t (in a simulation loop for example)
  *  @param [in]  stack  L_REAL  top of the stack
  *  @param [in]  nargs  int     nb of args passed to the function
  *  @param [out] from   int*    position in the sample of the "from" arg
@@ -331,7 +331,7 @@ void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to)
 
     *from = 0;
     *to = t;
-    if(nargs == 1) return(0);
+    if(nargs == 1) return;
     *from = L_intlag(*stack);
     if(nargs == 3) *to = L_intlag(*(stack - 1));
 
@@ -340,6 +340,5 @@ void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to)
         *from = *to;
         *to = j;
     }
-    return(0);
 }
 
