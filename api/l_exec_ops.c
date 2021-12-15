@@ -17,6 +17,22 @@
  *  
  *  value1 is 2 and value2 is 3
  *  
+ *  List of functions
+ *  -----------------
+ *      static L_REAL L_or (L_REAL a, L_REAL b)
+ *      static L_REAL L_and (L_REAL a, L_REAL b)
+ *      static L_REAL L_ge (L_REAL a, L_REAL b)
+ *      static L_REAL L_gt (L_REAL a, L_REAL b)
+ *      static L_REAL L_le (L_REAL a, L_REAL b)
+ *      static L_REAL L_lt (L_REAL a, L_REAL b)
+ *      static L_REAL L_eq (L_REAL a, L_REAL b)
+ *      static L_REAL L_ne (L_REAL a, L_REAL b)
+ *      static L_REAL L_plus (L_REAL a, L_REAL b)
+ *      static L_REAL L_minus(L_REAL a, L_REAL b)
+ *      static L_REAL L_times(L_REAL a, L_REAL b)
+ *             L_REAL L_divide(L_REAL a, L_REAL b)
+ *             L_REAL L_exp(L_REAL a, L_REAL b)
+ *  
  */
 
 #include "iode.h"
@@ -33,7 +49,7 @@ static L_REAL L_plus (L_REAL a, L_REAL b) {return(a + b);}
 static L_REAL L_minus(L_REAL a, L_REAL b) {return(a - b);}
 static L_REAL L_times(L_REAL a, L_REAL b) {return(a * b);}
 
-//  Note: L_divide() and L_exp() are used by other functions and must therefore be global.
+/*  Note: L_divide() and L_exp() are used by other functions and must therefore be global. */
 
 L_REAL L_divide(L_REAL a, L_REAL b) 
 {
