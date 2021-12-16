@@ -39,45 +39,6 @@ enum EnumItemType
     OPTIONAL_FIELD
 };
 
-const static QMap<QString, int> qmapIodeTypes =
-{
-    {"Comments", COMMENTS},
-    {"Equations", EQUATIONS},
-    {"Identities", IDENTITIES},
-    {"Lists", LISTS},
-    {"Scalars", SCALARS},
-    {"Tables", TABLES},
-    {"Variables", VARIABLES}
-};
-
-const static QMap<QString, int> qmapLangs =
-{
-    {"English", ENGLISH},
-    {"French", FRENCH},
-    {"Dutch", DUTCH}
-};
-
-struct IodeFileExtension
-{
-    QString name;
-    QString ext;
-    QString ascii;
-};
-
-const static QMap<EnumIodeFile, IodeFileExtension> qmapIodeFileExtension =
-{
-    {COMMENTS_FILE, {"Comments", "cmt", "ac"}},
-    {EQUATIONS_FILE, {"Equations", "eqs", "ae"}},
-    {IDENTITIES_FILE, {"Identities", "idt", "ai"}},
-    {LISTS_FILE, {"Lists", "lst", "al"}},
-    {SCALARS_FILE, {"Scalars", "scl", "as"}},
-    {TABLES_FILE, {"Tables", "tbl", "at"}},
-    {VARIABLES_FILE, {"Variables", "var", "av"}},
-    {LOGS_FILE, {"Logs", "log", ""}},
-    {SETTINGS_FILE, {"Settings", "ini", ""}},
-    {ANY_FILE, {"Any", "*", ""}}
-};
-
 
 /* ****************************** *
  *          FUNCTIONS             *

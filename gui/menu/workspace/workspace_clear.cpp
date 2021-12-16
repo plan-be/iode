@@ -34,12 +34,12 @@ QIodeMenuWorkspaceClear::~QIodeMenuWorkspaceClear()
 {
 }
 
-void QIodeMenuWorkspaceClear::clear_component(const QString& type, const bool accept)
+void QIodeMenuWorkspaceClear::clear_component(const EnumIodeType e_type, const bool accept)
 {
     try
     {
-        EnumIodeType i_type = static_cast<EnumIodeType>(qmapIodeTypes.value(type));
-        CPP_WsClear(i_type, type.toStdString());
+        std::string s_type = vIodeTypes[e_type];
+        CPP_WsClear(e_type, s_type);
 
         if (accept) this->accept();
     }
@@ -51,48 +51,48 @@ void QIodeMenuWorkspaceClear::clear_component(const QString& type, const bool ac
 
 void QIodeMenuWorkspaceClear::clear_comments()
 {
-    clear_component("Comments");
+    clear_component(COMMENTS);
 }
 
 void QIodeMenuWorkspaceClear::clear_equations()
 {
-    clear_component("Equations");
+    clear_component(EQUATIONS);
 }
 
 void QIodeMenuWorkspaceClear::clear_identities()
 {
-    clear_component("Identities");
+    clear_component(IDENTITIES);
 }
 
 void QIodeMenuWorkspaceClear::clear_lists()
 {
-    clear_component("Lists");
+    clear_component(LISTS);
 }
 
 void QIodeMenuWorkspaceClear::clear_scalars()
 {
-    clear_component("Scalars");
+    clear_component(SCALARS);
 }
 
 void QIodeMenuWorkspaceClear::clear_tables()
 {
-    clear_component("Tables");
+    clear_component(TABLES);
 }
 
 void QIodeMenuWorkspaceClear::clear_variables()
 {
-    clear_component("Variables");
+    clear_component(VARIABLES);
 }
 
 void QIodeMenuWorkspaceClear::clear()
 {
-    clear_component("Comments", false);
-    clear_component("Equations", false);
-    clear_component("Identities", false);
-    clear_component("Lists", false);
-    clear_component("Scalars", false);
-    clear_component("Tables", false);
-    clear_component("Variables", false);
+    clear_component(COMMENTS, false);
+    clear_component(EQUATIONS, false);
+    clear_component(IDENTITIES, false);
+    clear_component(LISTS, false);
+    clear_component(SCALARS, false);
+    clear_component(TABLES, false);
+    clear_component(VARIABLES, false);
 
     this->accept();
 }

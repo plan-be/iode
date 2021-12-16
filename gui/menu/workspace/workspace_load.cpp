@@ -34,21 +34,22 @@ QIodeMenuWorkspaceLoad::~QIodeMenuWorkspaceLoad()
 {
 }
 
-void QIodeMenuWorkspaceLoad::load_component(const QString& type, const bool accept)
+void QIodeMenuWorkspaceLoad::load_component(const EnumIodeType e_type, const bool accept)
 {
     try
     {
-        EnumIodeType i_type = static_cast<EnumIodeType>(qmapIodeTypes.value(type));
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(type));
+        std::string s_type = vIodeTypes[e_type];
+        QString qs_type = QString::fromStdString(s_type);
+        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(qs_type));
         QString filepath = field_filepath->extractAndVerify();
         // accept = true means that the users clicked on an individual "Load XXX" button.
         // In that case and if the filepath is empty, we show warning box
         if (accept && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load %1. Filepath is empty.").arg(type));
+            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load %1. Filepath is empty.").arg(qs_type));
             return;
         }
-        CPP_WsLoad(filepath.toStdString(), i_type, type.toStdString());
+        CPP_WsLoad(filepath.toStdString(), e_type, s_type);
 
         if (accept) this->accept();
     }
@@ -60,48 +61,48 @@ void QIodeMenuWorkspaceLoad::load_component(const QString& type, const bool acce
 
 void QIodeMenuWorkspaceLoad::load_comments()
 {
-    load_component("Comments");
+    load_component(COMMENTS);
 }
 
 void QIodeMenuWorkspaceLoad::load_equations()
 {
-    load_component("Equations");
+    load_component(EQUATIONS);
 }
 
 void QIodeMenuWorkspaceLoad::load_identities()
 {
-    load_component("Identities");
+    load_component(IDENTITIES);
 }
 
 void QIodeMenuWorkspaceLoad::load_lists()
 {
-    load_component("Lists");
+    load_component(LISTS);
 }
 
 void QIodeMenuWorkspaceLoad::load_scalars()
 {
-    load_component("Scalars");
+    load_component(SCALARS);
 }
 
 void QIodeMenuWorkspaceLoad::load_tables()
 {
-    load_component("Tables");
+    load_component(TABLES);
 }
 
 void QIodeMenuWorkspaceLoad::load_variables()
 {
-    load_component("Variables");
+    load_component(VARIABLES);
 }
 
 void QIodeMenuWorkspaceLoad::load()
 {
-    load_component("Comments", false);
-    load_component("Equations", false);
-    load_component("Identities", false);
-    load_component("Lists", false);
-    load_component("Scalars", false);
-    load_component("Tables", false);
-    load_component("Variables", false);
+    load_component(COMMENTS, false);
+    load_component(EQUATIONS, false);
+    load_component(IDENTITIES, false);
+    load_component(LISTS, false);
+    load_component(SCALARS, false);
+    load_component(TABLES, false);
+    load_component(VARIABLES, false);
 
     this->accept();
 }

@@ -62,7 +62,7 @@ enum EnumIodeType
 
 const static int NB_IODE_TYPES = 7;
 
-const static std::vector<std::string> iodeTypesAsString = {"Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables"};
+const static std::array<std::string, NB_IODE_TYPES> vIodeTypes = {"Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables"};
 
 
 enum EnumLang
@@ -73,6 +73,8 @@ enum EnumLang
 };
 
 const static int NB_LANGS = 3;
+
+const static std::array<std::string, NB_LANGS> vLangs = {"English", "French", "Dutch"};
 
 
 enum EnumIodeFile
@@ -89,7 +91,29 @@ enum EnumIodeFile
     ANY_FILE
 };
 
-const static int NB_IODE_FILES = 10;
+const static int NB_FILE_EXT = 10;
+
+
+struct IodeFileExtension
+{
+    std::string name;
+    std::string ext;
+    std::string ascii;
+};
+
+const static std::array<IodeFileExtension, NB_FILE_EXT> vFileExtensions = 
+{{
+    {"Comments", "cmt", "ac"},
+    {"Equations", "eqs", "ae"},
+    {"Identities", "idt", "ai"},
+    {"Lists", "lst", "al"},
+    {"Scalars", "scl", "as"},
+    {"Tables", "tbl", "at"},
+    {"Variables", "var", "av"},
+    {"Logs", "log", ""},
+    {"Settings", "ini", ""},
+    {"Any", "*", ""}
+}};
 
 
 enum EnumIodeCase
@@ -203,7 +227,7 @@ private:
     }
 
 public:
-    AbstractKDB(EnumIodeType type) : type(type), type_name(iodeTypesAsString[type]) 
+    AbstractKDB(EnumIodeType type) : type(type), type_name(vIodeTypes[type]) 
     {
         if (K_WS[type] == NULL) IodeInit();
     }

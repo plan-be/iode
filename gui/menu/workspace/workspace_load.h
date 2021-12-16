@@ -42,7 +42,7 @@ public:
 	~QIodeMenuWorkspaceLoad();
 
 private:
-    void load_component(const QString& type, const bool accept = true);
+    void load_component(const EnumIodeType e_type, const bool accept = true);
 
 public slots:
     void load_comments();
