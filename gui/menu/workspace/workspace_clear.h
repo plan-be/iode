@@ -25,7 +25,7 @@ public:
 	~QIodeMenuWorkspaceClear();
 
 private:
-    void clear_component(const QString& type, const bool accept = true);
+    void clear_component(const EnumIodeType e_type, const bool accept = true);
 
 public slots:
     void clear_comments();

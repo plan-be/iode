@@ -25,7 +25,7 @@ public:
 	~QIodeMenuWorkspaceSave();
 
 private:
-    void save_component(const QString& type, const bool accept = true);
+    void save_component(const EnumIodeType e_type, const bool accept = true);
 
 public slots:
     void save_comments();

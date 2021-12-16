@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QString>
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QLineEdit>
@@ -40,7 +41,8 @@ private:
 
 public:
 	QIodeFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
-		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(ANY_FILE), fileMode(EXISTING_FILE), anyExt(qmapIodeFileExtension.value(ANY_FILE).ext)
+		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(ANY_FILE), fileMode(EXISTING_FILE), 
+		anyExt(QString::fromStdString(vFileExtensions[ANY_FILE].ext))
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0, 0, 0, 0);
@@ -86,17 +88,18 @@ public:
 		if (fileInfo.isDir())  throw std::runtime_error((error + QString("The filepath %1 represents a directory, not a file").arg(file)).toStdString());
 		// check if correct/must provide extension
 		QString extension = fileInfo.suffix();
-		IodeFileExtension expectedExt = qmapIodeFileExtension.value(fileType);
+		QString ext = QString::fromStdString(vFileExtensions[fileType].ext);
 		if (extension.isEmpty())
 		{
-			if (expectedExt.ext == anyExt) throw std::runtime_error(error.toStdString() + "You must provide a file extension");
-			fileInfo = QFileInfo(file + expectedExt.ext);
+			if (ext == anyExt) throw std::runtime_error(error.toStdString() + "You must provide a file extension");
+			fileInfo = QFileInfo(file + ext);
 		}
 		else
 		{
-			if (expectedExt.ext != anyExt && extension != expectedExt.ext && extension != expectedExt.ascii)
+			QString ascii = QString::fromStdString(vFileExtensions[fileType].ascii);
+			if (ext != anyExt && extension != ext && extension != ascii)
 				throw std::runtime_error((error + QString("Wrong file extension. Expected %1 or %2 but got %3")
-					.arg(expectedExt.ext).arg(expectedExt.ascii).arg(extension)).toStdString());
+					.arg(ext).arg(ascii).arg(extension)).toStdString());
 		}
 		// check if file exists
 		if (fileMode == EXISTING_FILE && !fileInfo.exists())
@@ -113,11 +116,14 @@ private slots:
 	void browse()
 	{
 		QString filename;
-		IodeFileExtension expectedExt = qmapIodeFileExtension.value(fileType);
+		IodeFileExtension expectedExt = vFileExtensions[fileType];
+		QString name = QString::fromStdString(expectedExt.name);
+		QString ext = QString::fromStdString(expectedExt.ext);
+		QString ascii = QString::fromStdString(expectedExt.ascii);
 
 		QString dir;
-		QString caption = expectedExt.name + " File";
-		QString filter = expectedExt.ext == anyExt ? QString() : expectedExt.name + " (*." + expectedExt.ext + " *." + expectedExt.ascii + ")";
+		QString caption = name + " File";
+		QString filter = ext == anyExt ? QString() : name + " (*." + ext + " *." + ascii + ")";
 		if (fileMode == EXISTING_FILE)
 		{
 			caption = "Open " + caption;

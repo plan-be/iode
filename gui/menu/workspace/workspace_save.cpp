@@ -42,21 +42,22 @@ QIodeMenuWorkspaceSave::~QIodeMenuWorkspaceSave()
 {
 }
 
-void QIodeMenuWorkspaceSave::save_component(const QString& type, const bool accept)
+void QIodeMenuWorkspaceSave::save_component(const EnumIodeType e_type, const bool accept)
 {
     try
     {
-        EnumIodeType i_type = static_cast<EnumIodeType>(qmapIodeTypes.value(type));
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(type));
+        std::string s_type = vIodeTypes[e_type];
+        QString qs_type = QString::fromStdString(s_type);
+        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(qs_type));
         QString filepath = field_filepath->extractAndVerify();
         // accept = true means that the users clicked on an individual "Load XXX" button.
         // In that case and if the filepath is empty, we show warning box
         if (accept && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save %1. Filepath is empty.").arg(type));
+            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save %1. Filepath is empty.").arg(qs_type));
             return;
         }
-        CPP_WsSave(filepath.toStdString(), i_type, type.toStdString());
+        CPP_WsSave(filepath.toStdString(), e_type, s_type);
 
         if (accept) this->accept();
     }
@@ -68,48 +69,48 @@ void QIodeMenuWorkspaceSave::save_component(const QString& type, const bool acce
 
 void QIodeMenuWorkspaceSave::save_comments()
 {
-    save_component("Comments");
+    save_component(COMMENTS);
 }
 
 void QIodeMenuWorkspaceSave::save_equations()
 {
-    save_component("Equations");
+    save_component(EQUATIONS);
 }
 
 void QIodeMenuWorkspaceSave::save_identities()
 {
-    save_component("Identities");
+    save_component(IDENTITIES);
 }
 
 void QIodeMenuWorkspaceSave::save_lists()
 {
-    save_component("Lists");
+    save_component(LISTS);
 }
 
 void QIodeMenuWorkspaceSave::save_scalars()
 {
-    save_component("Scalars");
+    save_component(SCALARS);
 }
 
 void QIodeMenuWorkspaceSave::save_tables()
 {
-    save_component("Tables");
+    save_component(TABLES);
 }
 
 void QIodeMenuWorkspaceSave::save_variables()
 {
-    save_component("Variables");
+    save_component(VARIABLES);
 }
 
 void QIodeMenuWorkspaceSave::save()
 {
-    save_component("Comments", false);
-    save_component("Equations", false);
-    save_component("Identities", false);
-    save_component("Lists", false);
-    save_component("Scalars", false);
-    save_component("Tables", false);
-    save_component("Variables", false);
+    save_component(COMMENTS, false);
+    save_component(EQUATIONS, false);
+    save_component(IDENTITIES, false);
+    save_component(LISTS, false);
+    save_component(SCALARS, false);
+    save_component(TABLES, false);
+    save_component(VARIABLES, false);
 
     this->accept();
 }
