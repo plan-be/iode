@@ -8,4 +8,5 @@ project ("iode")
 # Include sub-projects.
 add_subdirectory ("scr4")
 add_subdirectory ("api")
+add_subdirectory ("cpp_api")
 add_subdirectory ("tests")
