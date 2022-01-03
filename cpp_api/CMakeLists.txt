@@ -1,7 +1,7 @@
 ﻿
 
 
-add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" "common.h")
+add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" "common.h" "utils.h")
 
 
 # Compiler options
