@@ -1,8 +1,7 @@
 ﻿
 
 
-add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" "common.h" "utils.h")
-
+add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" "common.h" "utils.h" "KDB/kdb_abstract.h")
 
 # Compiler options
 add_compile_options(-Zi -Zp1)

@@ -4,4 +4,5 @@
 
 #include "common.h"
 #include "utils.h"
+#include "KDB/kdb_abstract.h"
 
