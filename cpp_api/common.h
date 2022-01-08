@@ -125,12 +125,4 @@ enum EnumIodeEquationMethod
 
 const static int NB_EQ_METHODS = 5;
 
-const static std::map<std::string, EnumIodeEquationMethod> mEquationMethods = 
-{ 
-    {"LSQ", E_LSQ},
-    {"ZELLNER", E_ZELLNER},
-    {"INSTRUMENTAL", E_INSTRUMENTAL},
-    {"GLS (3SLS)", E_GLS},
-    {"MAX_LIKELIHOOD", E_MAX_LIKELIHOOD}
-};
-
+const static std::array<std::string, NB_EQ_METHODS> vEquationMethods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
