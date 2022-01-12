@@ -87,6 +87,11 @@ void BUF_unlock()
  * @param ptr   char *  address of the buffer to copy
  * @param lg    int     nb of bytes to copy
  * @return      char *  pointer to the global buffer BUF_DATA
+ *
+ * @example 
+ *
+ *      BUF_memcpy("ABCD", 5);
+ *      printf("%s\n", BUF_DATA); // prints ABCD
  */
 char *BUF_memcpy(char *ptr, int lg)
 {
@@ -98,9 +103,12 @@ char *BUF_memcpy(char *ptr, int lg)
 }
 
 /**
- * @brief Copies a NULL terminated string  to the global buffer.
+ * Copies a NULL terminated string  to the global buffer. Reallocates the buffer if needed.
+ *  
  * @param ptr   char *  address of the buffer to copy
  * @return      char *  pointer to the global buffer BUF_DATA
+ *
+ *      
  */
 
 char *BUF_strcpy(char *ptr)
