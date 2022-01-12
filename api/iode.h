@@ -18,7 +18,7 @@
 #include <math.h>
 
 // values.h n'existe pas en  VCC, remplacer les defines
-#ifndef VC
+#ifndef _MSC_VER
 #include <values.h>
 #else
 #include <float.h>
