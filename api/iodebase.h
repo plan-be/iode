@@ -462,13 +462,6 @@ extern int E_split_eq(char *,char **,char **);
 extern int E_dynadj(int ,char *,char *,char *,char **);
 extern int E_DynamicAdjustment(int ,char **,char *,char *);
 
-/* k_lec.c */
-extern double *L_getvar(KDB *,int );
-extern double L_getscl(KDB *,int );
-extern SAMPLE *L_getsmpl(KDB *);
-extern int L_findscl(KDB *,char *);
-extern int L_findvar(KDB *,char *);
-
 /* k_tbl.c */
 extern TBL *T_create(int );
 extern void T_free(TBL *);
