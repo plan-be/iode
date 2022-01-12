@@ -53,7 +53,9 @@ set (IODE_GZIP
 		s_gzutil.c s_gzinfl.c s_gzinbl.c s_gzintr.c s_gzincd.c s_gzinut.c s_gzinfa.c)
 set (IODE_WSYS s_wprt.c s_wvers.c s_wsys2.c s_wgetms.c)
 
-set (SCR_IODE ${IODE_SWAP} ${IODE_LST} ${IODE_BASE} ${IODE_INI} ${IODE_STRS} ${IODE_DDE}  ${IODE_YY}  ${IODE_MAT}  ${IODE_A2M}  ${IODE_ARGS}  ${IODE_DATE}  ${IODE_INI}  ${IODE_CPP}  ${IODE_ODBC} ${IODE_GZIP} ${IODE_SYS}) 
+set (SCR_IODE 
+	${IODE_SWAP} ${IODE_LST} ${IODE_BASE} ${IODE_INI} ${IODE_STRS} ${IODE_DDE}  ${IODE_YY}  ${IODE_MAT}  
+	${IODE_A2M}  ${IODE_ARGS}  ${IODE_DATE}  ${IODE_INI}  ${IODE_CPP}  ${IODE_ODBC} ${IODE_GZIP} ${IODE_SYS} ${IODE_WSYS}) 
 
 # Add source to this project's executable.
 add_library (scr4iode STATIC ${HEADER_IODE} ${SCR_IODE})
