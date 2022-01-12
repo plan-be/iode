@@ -1,48 +1,51 @@
 /**
- * @iode_header
+ *  @header4iode
  *
+ *  Functions to manage TBL structs.
+ *  
+ *  List of functions 
+ *  -----------------
+ *      TBL *T_create(int dim)                                                                     | Creates a new TBL objects.
+ *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
+ *      void T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.
+ *      void T_free_cell(TCELL* cell)                                                              | Frees a TCELL struct.
+ *      int T_add_line(TBL* tbl)                                                                   | Extents a TBL by adding at least one line.
+ *      TCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type KT_CELL. 
+ *      TCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type KT_TITLE. 
+ *      char* T_cell_cont(TCELL* cell, int mode)                                                   | Returns the formated contents of a TCELL.
+ *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TLINE in a TBL.
+ *      int T_set_lec_cell(TCELL* cell, unsigned char* lec)                                        | Assigns a LEC expression to a TCELL. Checks the syntax.
+ *      void T_set_string_cell(TCELL* cell, unsigned char* txt)                                    | Assigns a TEXT to a TCELL.
+ *      void T_set_cell_attr(TBL* tbl, int i, int j, int attr)                                     | Assigns justification (KT_CENTER...) and typographic (KT_BOLD...) attributes to a TCELL.
+ *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
+ *      void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
+ *  
  */
 
 #include "iode.h"
 
-extern int B_GRAPHDEFAULT;
-
-B_GraphDefault(type) /*GB 10/03/2011 */
-char    *type;
-{
-    switch(type[0]) {
-        case 'l' :
-        case 'L' :
-            B_GRAPHDEFAULT = 0;
-            break;
-        case 's' :
-        case 'S' :
-            B_GRAPHDEFAULT = 1;
-            break;
-        case 'b' :
-        case 'B' :
-            B_GRAPHDEFAULT = 2;
-            break;
-        default  :
-            B_seterrn(304);
-            return(-1);
-    }
-    return(0);
-}
+int T_GRAPHDEFAULT = 0; // Replace B_GRAPHDEFAULT (JMP 12/01/2022)
 
 
-TBL *T_create(dim)
-int dim;
+/**
+ *  Creates a new TBL object.
+ *  
+ *  @param [in]  dim    int     Number of expression columns
+ *  @return             TBL*    pointer to a new allocated TBL
+ */
+TBL *T_create(int dim)
 {
     TBL     *tbl = NULL;
     TLINE   line;
     TCELL   *cell;
     int     i;
 
+
     tbl = (TBL *)SW_nalloc(sizeof(TBL));
     if(tbl == NULL) {
         kerror(0, "Allocation error");
         return(NULL);
+
     }
     T_NC(tbl)   = dim;
     T_LANG(tbl) = KT_ENGLISH;
@@ -66,23 +69,38 @@ int dim;
     return(tbl);
 }
 
-void T_free(tbl)
-TBL *tbl;
+
+/**
+ *  Frees a TBL object.
+ *  
+ *  @param [in] tbl     TBL*    pointer to the TBL
+ *  
+ */
+void T_free(TBL* tbl)
 {
     int     i;
 
     T_free_line(&(tbl->t_div), T_NC(tbl));
     for(i = 0; i < T_NL(tbl); i++) T_free_line(tbl->t_line + i, T_NC(tbl));
+
     SW_nfree(tbl->t_line);
     SW_nfree(tbl);
 }
 
-void T_free_line(line, dim)
-TLINE   *line;
-int     dim;
+
+/**
+ *  Frees a TLINE struct and all its TCELL.
+ *  
+ *  @param [in, out]    line    TLINE*     pointer to the table line to delete
+ *  @param [in]         dim     int        Number columns in the TBL which contains the TLINE.
+ *  @return             void
+ *
+ */
+void T_free_line(TLINE* line, int dim)
 {
     int     i;
     TCELL   *cell;
+
 
     cell = (TCELL *) line->tl_val;
     if(line->tl_type == KT_CELL)
@@ -90,18 +108,32 @@ int     dim;
 
     if(line->tl_type == KT_TITLE) T_free_cell(cell);
 
+
     SW_nfree(line->tl_val);
 }
 
-void T_free_cell(cell)
-TCELL   *cell;
+
+/**
+ *  Frees a TCELL struct.
+ *  
+ *  @param [in, out]    cell    TCELL*      TCELL to delete
+ *  @return             void
+ *  
+ */
+void T_free_cell(TCELL* cell)
 {
     SW_nfree(cell->tc_val);
     cell->tc_val = NULL;
 }
 
-int T_add_line(tbl)
-TBL     *tbl;
+
+/**
+ *  Extents a table by adding KT_CHUNCK lines if the current number of lines is a multiple of KT_CHUNCK.
+ *  
+ *  @param  [in] tbl    TBL*    TBL to be extended
+ *  @return             int     0 if ok, -1 if allocation is impossible
+ */
+int T_add_line(TBL* tbl)
 {
     int nl = T_NL(tbl);
 
@@ -114,15 +146,24 @@ TBL     *tbl;
     return(0);
 }
 
-TCELL   *T_create_cell(tbl, line)
-TBL     *tbl;
-TLINE   *line;
+
+/**
+ *  Initialises a TLINE of the type KT_CELL. 
+ *  
+ *  All cells are "decimal" justified except the first one which is left justified.
+ *  
+ *  @param [in] tbl     TBL*    table to which line belongs
+ *  @param [in] line    TLINE*  line to initialise
+ *  @return             TCELL*  pointer to the first TCELL of TLINE
+ *
+ */
+TCELL   *T_create_cell(TBL* tbl, TLINE* line)
 {
     int     i, nc = T_NC(tbl);
 
     line->tl_type = KT_CELL;
     line->tl_val = SW_nalloc(nc * sizeof(TCELL));
-    line->tl_graph = B_GRAPHDEFAULT; /* GB 10/03/2011 */
+    line->tl_graph = T_GRAPHDEFAULT; /* GB 10/03/2011 */
     for(i = 0; i < nc; i++) {
         ((TCELL *) line->tl_val + i)->tc_attr = (i > 0) ? KT_DECIMAL : KT_LEFT;
         /* ((TCELL *) tbl->t_div.tl_val + i)->tc_attr; /* JMP 11-11-93 */
@@ -131,9 +172,18 @@ TLINE   *line;
     return((TCELL *) line->tl_val);
 }
 
-TCELL   *T_create_title(tbl, line)
-TBL     *tbl;
-TLINE   *line;
+
+/**
+ *  Initialises a TLINE of the type KT_TITLE. 
+ *  
+ *  The first (and only) cell receives the attributes KT_CENTER and KT_BOLD.
+ *  
+ *  @param [in] tbl     TBL*    table to which line belongs
+ *  @param [in] line    TLINE*  line to initialise
+ *  @return             TCELL*  pointer to the first TCELL of TLINE
+ *
+ */
+TCELL *T_create_title(TBL* tbl, TLINE* line)
 {
     int     i;
 
@@ -144,9 +194,20 @@ TLINE   *line;
     return((TCELL *) line->tl_val);
 }
 
-char    *T_cell_cont(cell, mode)
-TCELL   *cell;
-int     mode;
+
+/**
+ *  Returns the formated contents of a TCELL: 
+ *      - lec expression or (A+B)
+ *      - text possibly between double quotes (if mode == 1 => "Line title:", if not => Line title)
+ *  
+ *  mode is set to 1 only for the TBL editor where the CELL type is deduced from the first character (" => text).
+ *  
+ *  @param [in] cell    TCELL*  cell to read
+ *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
+ *                              0 if not 
+ *  @return             char*   pointer to the big buffer (see buf.c)
+ */
+char* T_cell_cont(TCELL* cell, int mode)
 {
     char    *buf;
 
@@ -159,9 +220,18 @@ int     mode;
     return(BUF_DATA);
 }
 
-T_insert_line(tbl, nbr, type, where)
-TBL     *tbl;
-int     nbr, type, where;
+
+/**
+ *  Inserts a TLINE in a TBL.
+ *  
+ *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
+ *  @param [in]      nbr     int     reference position of the new line in TBL (see param where below)
+ *  @param [in]      type    int     TLINE type (KT_CELL, KT_TITLE...)
+ *  @param [in]      where   int     0 to insert before line nbr, 1 to insert after line nbr
+ *  @return                  int     position of the new line in TBL
+ *  
+ */
+int T_insert_line(TBL* tbl, int nbr, int type, int where)
 {
     TLINE   *oline, *nline;
 
@@ -193,9 +263,17 @@ int     nbr, type, where;
     return(nbr);
 }
 
-T_set_lec_cell(cell, lec)
-TCELL           *cell;
-unsigned char   *lec;
+
+/**
+ *  Assigns a LEC expression to a TCELL. Checks the syntax.
+ *  
+ *  @param [in, out] cell   TCELL*            Cell to modify
+ *  @param [in]      lec    unsigned char*    LEC expression
+ *  @return                 int               0 if ok, -1 if syntax error in LEC  
+ *  
+ *  In case of LEC error, kerror() is called and L_errno is set.
+ */
+int T_set_lec_cell(TCELL* cell, unsigned char* lec)
 {
     unsigned char   *ptr = 0;
 
@@ -212,9 +290,19 @@ unsigned char   *lec;
     return(0);
 }
 
-void T_set_string_cell(cell, txt)
-TCELL           *cell;
-unsigned char   *txt;
+
+/**
+ *  Assigns a TEXT to a TCELL. The alignment attributes are set to:
+ *      - KT_LEFT if previously KT_DECIMAL
+ *      - KT_CENTER if the txt contains the char '#' indicating a time period (col title).
+ *  
+ *  @param [in, out] cell   TCELL*            Cell to modify
+ *  @param [in]      lec    unsigned char*    Any text
+ *  @return                 void
+ *  
+ *  In case of LEC error, kerror() is called and L_errno is set.
+ */
+void T_set_string_cell(TCELL* cell, unsigned char* txt)
 {
     int     len, attr;
 
@@ -249,9 +337,18 @@ int i, j;
 }
 /* JMP 11-11-93 */
 
-void T_set_cell_attr(tbl, i, j, attr) /* JMP 11-11-93 */
-TBL     *tbl;
-int     i, j, attr;
+
+/**
+ *  Assigns justification (KT_CENTER...) and typographic (KT_BOLD...) attributes to a TCELL.
+ *  
+ *  @param [in, out]    tbl     TBL*    table to modify
+ *  @param [in]         i       int     line 
+ *  @param [in]         j       int     column 
+ *  @param [in]         attr    int     combination of attributes (KT_CENTER & KT_BOLD...) 
+ *  @return                     void
+ *  
+ */
+void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
 {
     TLINE   *line = tbl->t_line + i;
     TCELL   *cell;
@@ -268,10 +365,22 @@ int     i, j, attr;
     cell->tc_attr = attr;
 }
 
-T_default(tbl, titg, titls, lecs, mode, files, date)
-TBL     *tbl;
-char    *titg, **titls, **lecs;
-int     mode, files, date;
+
+/**
+ *  Fills a TBL with some basic data: a title, line titles and LEC expressions.
+ *  The TBL must exist and is normally empty.
+ *  
+ *  @param [in, out] tbl   TBL*     Table to modify
+ *  @param [in]      titg  char*    Title of the table
+ *  @param [in]      titls char**   Titles of the lines
+ *  @param [in]      lecs  char**   LEC formulas of the lines (// titls)
+ *  @param [in]      mode  int      if 1, includes a special KT_MODE line
+ *  @param [in]      files int      if 1, includes a special KT_FILES line
+ *  @param [in]      date  int      if 1, includes a special KT_DATE line
+ *  @return                int      0
+ *  
+ */
+int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)
 {
     TLINE   *nline;
     int     i, j;
@@ -308,10 +417,24 @@ int     mode, files, date;
     return(0);
 }
 
-void T_auto(tbl, def, vars, mode, files, date)
-TBL     *tbl;
-char    *def, **vars;
-int     mode, files, date;
+
+/**
+ *  Fills a TBL with a list of variables and their CMT. 
+ *  The TBL must exist and is normally empty.
+ *  
+ *    - def can be either a CMT name or a free text. If it's a CMT name, the contents of the CMT becomes the table title.
+ *    - vars is a list of VAR name. If a CMT with the same name exists, the CMT become the line title and the variable the LEC expression.
+ *  
+ *  @param [in, out] tbl   TBL*     Table to modify
+ *  @param [in]      def   char*    Table title or name of the CMT that must become the table title
+ *  @param [in]      vars  char**   NULL terminated list of variable names
+ *  @param [in]      mode  int      if 1, includes a special KT_MODE line
+ *  @param [in]      files int      if 1, includes a special KT_FILES line
+ *  @param [in]      date  int      if 1, includes a special KT_DATE line
+ *  @return                int      0
+ *  
+ */
+void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)
 {
     int     i, pos,
             nb = SCR_tbl_size(vars),
