@@ -164,6 +164,9 @@ int K_ren(KDB* kdb, char* name1, char* name2)
 
     KSOVAL(kdb, pos2) = KSOVAL(kdb, pos1);
     K_del_entry(kdb, pos1);
+    
+    pos2 = K_find(kdb, name2); // JMP 16/1/2022 suite à une erreur détectée par ALD
+    
     return(pos2);
 }
 
