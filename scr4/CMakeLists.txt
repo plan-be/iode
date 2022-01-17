@@ -38,8 +38,8 @@ set (IODE_MAT
 		s_maextr.c s_maxpx.c  s_maxxp.c  s_maxaxp.c s_maxpax.c
 		s_maprt.c s_madump.c s_maset.c s_mastat.c s_masol2.c) # s_mascrl.c 
 set (IODE_A2M 
-		s_a2mrd.c s_a2mseg.c  s_a2mhtm.c s_a2mfrm.c s_a2mfrg.c s_wemfcr.c s_wemf.c s_a2memf.c
-		s_a2mmem.c s_a2mtc2.c s_a2mtch.c s_wprts.c s_a2mswf.c 
+		s_a2mrd.c s_a2mseg.c  s_a2mhtm.c s_a2mfrm.c s_a2mfrg.c s_a2mmd.c s_wemfcr.c s_wemf.c s_a2memf.c
+		s_a2mmem.c s_a2mtc2.c s_a2mtch.c s_wprtdf.c s_a2mswf.c 
 		s_a2mcsv.c s_a2mrtf.c s_a2mgr1.c s_a2mgdi.c s_a2merr.c s_a2mgrf.c)
 set (IODE_ARGS 
 		s_ainit.c s_aerr.c s_aexec.c s_aexp.c s_aiexp.c s_acerr.c
