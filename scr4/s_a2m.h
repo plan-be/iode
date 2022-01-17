@@ -399,6 +399,9 @@ extern char   *A2M_HTML_TDCLASS; // JMP 4/10/2013
 /* Public CSV specific */
 extern int    A2M_CSV_SEP, A2M_CSV_QUOTE, A2M_CSV_NA;
 
+/* Public A2mMessage */
+extern void (*A2mMessage_super)(char* msg); // if not null, replaces the default implementation A2mMessage()
+
 /* Private */
 extern A2MPPR   *A2M_PPRS;
 extern int      A2M_NB_PPRS;
