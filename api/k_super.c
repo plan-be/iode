@@ -27,8 +27,13 @@
  *     int kgetkey()                                Reads the next character in the keyboard buffer (GUI only).
  *     void kbeep()                                 Plays a sound (GUI only).
  *     SAMPLE *kasksmpl()                           Asks the user to give a SAMPLE (GUI only).
- *     int kexecsystem()    
- *     int kshellexec()    
+ *     int kexecsystem()                            
+ *     int kshellexec()                             
+ *
+ * SCR4 superseeded functions + assign
+ * -----------------------------------
+ *     char *A_expand_super_API(char* name)         Default implementation of A_expand() in IODE API
+ *     void IODE_assign_super_API()                 Assigns default values to "super" (virtual) functions. 
  * 
  * List of function pointers that can replace the standard implementation  
  * ----------------------------------------------------------------------
@@ -54,6 +59,7 @@
 
 
 #include "iode.h"
+#include <stdarg.h>
 
 // Global variables
 void (*kerror_super)(int level, char*msg);
@@ -442,12 +448,12 @@ SAMPLE  *kasksmpl()
 
 
 /**
- *  @brief 
- *  
- *  @param [in] arg 
+ *  Calls the fonction system().
+ *  Can be superseeded by assigning kexecsystem_super.
+ *    
+ *  @param [in] arg     
  *  @return     
  *  
- *  @details 
  */
 int kexecsystem(char *arg)
 {
@@ -466,12 +472,12 @@ int kexecsystem(char *arg)
 
 
 /**
- *  @brief 
+ *  Call the Win32 function ShellExecuteEx().
+ *  If kshellexec_super is not null, it replaces the default behaviour.
  *  
  *  @param [in] arg 
  *  @return 
  *  
- *  @details 
  */
 int kshellexec(char *arg)
 {
@@ -492,4 +498,38 @@ int kshellexec(char *arg)
 
     ShellExecuteEx(&sei);
     return(0);
+}
+
+
+/**
+ *  Default implementation of A_expand() in IODE API.
+ *  Replaces "$LISTNAME" by the list "LISTNAME" contents.
+ *  
+ *  @param [in] name    char*   string to be expanded
+ *  @return             char*   expanded string  
+ *  
+ */
+char    *A_expand_super_API(char* name)
+{
+    int     pos;
+
+    pos = K_find(KL_WS, name);
+    if (pos < 0) return(NULL);
+    return((char *)KLVAL(KL_WS, pos));
+}
+
+
+/**
+ *  Assigns default values to "super" (virtual) functions. 
+ *  Specifically, implements scr4 functions that can be superseeded (2022 version only).
+ *  
+ *  In the past, some scr4 functions have been replaced in IODE but with some linker, that method
+ *  was not always acceptable. An alternative fonction is thus assigned to a fn pointer
+ *  that, if not null, will replace the original implementation.
+ *   
+ */
+void IODE_assign_super_API()
+{
+    A_expand_super = A_expand_super_API;   // Ok for other implementations (DOS, IODECOM, PYTHON, Qt)
+    // A_error_super  = A_error_super_API; //  To be implemented for DOS and Qt (IODECOM ?)
 }
