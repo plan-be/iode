@@ -10,6 +10,7 @@
  *    void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
  *    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
  *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
+ *    void KV_init_values_1(IODE_REAL* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
  */
 
@@ -257,8 +258,64 @@ void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
 
 
 /**
+ *  Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
+ *      
+ *  @param [in, out]    val     IODE_REAL*  pointer to the VAR data
+ *  @param [in]         t       int         position in val to be calculated  
+ *  @param [in]         method  int         method of extrapolation
+ *  @return                     void
+ *  
+ *  Methods:
+ *       KV_INIT_ASIS     : val[t] remains unchanged
+ *       KV_INIT_TM1      : if(val[t] == 0 or val[t] == NaN) val[t] = val[t-1] (*)
+ *       KV_INIT_TM1_NA   : if(val[t] == NaN)                val[t] = val[t-1] (*)
+ *       KV_INIT_TM1_A    :                                  val[t] = val[t-1] (*)
+ *       KV_INIT_EXTRA    : if(val[t] == 0 or val[t] == NaN) val[t] = fn(val[t-1], val[t-2]) (*)
+ *       KV_INIT_EXTRA_NA : if(val[t] <> NaN)                val[t] = fn(val[t-1], val[t-3]) (*)
+ *       KV_INIT_EXTRA_A  :                                  val[t] = fn(val[t-1], val[t-3]) (*)
+ *       
+ *       where fn(v1, v2) = 2 * v1 - v2
+ *      (*) If val[t-1] and / or val[t-2] are NaN, val[t] = 1.0
+ *
+ */
+void KV_init_values_1(IODE_REAL* val, int t, int method)
+{
+
+    switch(method) {
+        case KV_INIT_TM1 :
+            if(L_ISAN(val[t]) && !L_IS0(val[t])) return;
+            goto calc1;
+        case KV_INIT_TM1_NA :
+            if(L_ISAN(val[t])) return;
+            goto calc1;
+        case KV_INIT_TM1_A :
+calc1:
+            val[t] = 1.0;
+            if(t > 0 && L_ISAN(val[t - 1])) val[t] = val[t - 1];
+            return;
+        case KV_INIT_EXTRA :
+            if(L_ISAN(val[t]) && !L_IS0(val[t])) return;
+            goto calc2;
+        case KV_INIT_EXTRA_NA :
+            if(L_ISAN(val[t])) return;
+            goto calc2;
+        case KV_INIT_EXTRA_A :
+calc2:
+            val[t] = 1.0;
+            if(t > 0 && L_ISAN(val[t - 1])) {
+                if(t > 1 && L_ISAN(val[t - 2]))
+                    val[t] = 2 * val[t - 1] - val[t - 2];
+                else val[t] = val[t - 1];
+            }
+        case KV_INIT_ASIS :
+            return;
+    }
+}
+
+
+/**
  *  Extrapolates variables on a selected SAMPLE according to one of the available methods. These extrapolation methods are
- *  described in the function K_init_values() (see k_sim.c). 
+ *  described in the function KV_init_values(). 
  *  
  *  @param [in, out]    dbv    KDB*     KDB of variables on which the operation will be applied
  *  @param [in]         method int      identification of the extrapolation method (see K_init_values())
@@ -291,7 +348,7 @@ int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)
     for(v = 0; v < KNB(edbv); v++) {
         val = KVVAL(edbv, v, 0);
         for(i = 0, t = bt; i < smpl->s_nb; i++, t++)
-            K_init_values_1(val, t, method);
+            KV_init_values_1(val, t, method);
     }
     rc = 0;
 
