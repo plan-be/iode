@@ -100,7 +100,7 @@ extern int A2mHtmlAFrame(char *filename);
 extern int A2mHtmlReadIni(char *filename);
 
 /* s_a2mmsg.c */
-extern int A2mMessage(char *msg);
+extern void A2mMessage(char *msg);
 
 /* s_a2mcsv.c */
 extern int A2mToCsv(char *a2mfile,char *outfile);
