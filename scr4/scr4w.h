@@ -12,7 +12,7 @@
 #define NOCOMM
 #ifndef _WINDOWS
     #define _WINDOWS
-#endif 
+#endif     
 
 #define __SIMPLE_LOCALES__
 #include <windows.h>
