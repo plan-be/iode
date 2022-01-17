@@ -66,7 +66,7 @@ int     *fn();
 {
     int             nb, i;
 
-    nb = SCR_tbl_size(ss);
+    nb = SCR_tbl_size((U_ch **)ss);
     if(nb == 0) return(0);
     for(i = 0 ; ss[i] ; i++) {
 	ss[i]->ss_mode = 0;
