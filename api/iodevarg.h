@@ -17,8 +17,8 @@ extern void E_msg(char *,...);
 extern void E_error(char *,...);
 
 /* b_basev.c */
-extern void B_seterror(char *,...);
-extern void B_seterrn(int ,...);
+//extern void B_seterror(char *,...);
+//extern void B_seterrn(int ,...);
 
 
 /* w_wrtv.c  */
