@@ -65,7 +65,6 @@ extern SAMPLE* (*kasksmpl_super)(void);
 extern int     (*kexecsystem_super)(char*);
 extern int     (*kshellexec_super )(char*);
 
-
 extern void    kerror(int level, char* fmt, ...);
 extern void    kwarning(char* fmt, ...);
 extern void    kmsg(char* fmt, ...);
@@ -82,7 +81,9 @@ extern void    kbeep();
 extern SAMPLE* kasksmpl();
 extern int     kexecsystem(char*);
 extern int     kshellexec(char*);
+extern char    *A_expand_super_API(char* name);
 
+extern void    IODE_assign_super_API(void);
 
 /* k_cmp.c */
 extern int K_cmp(char *,KDB *,KDB *);
@@ -426,7 +427,7 @@ extern void E_SclToReal(char *,double *);
 extern void E_PrintDF(char *,double *,int ,int ,int );
 extern int E_GetLecName(char *,char *);
 
-/* k_var.c */
+/* k_wsvar.c */
 extern int KV_sample(KDB *,SAMPLE *);
 extern int KV_merge(KDB *,KDB *,int );
 extern void KV_merge_del(KDB *,KDB *,int );
@@ -434,6 +435,7 @@ extern double KV_get(KDB *,int ,int ,int );
 extern void KV_set(KDB *,int ,int ,int ,double );
 extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
 extern KDB *KV_aggregate(KDB *,int ,char *,char *);
+void KV_init_values_1(IODE_REAL* val, int t, int method);
 //extern int KV_GetSmpl(SAMPLE *,char *);
 
 /* k_val.c */
@@ -666,18 +668,23 @@ extern int COL_exec(TBL *,int ,COLS *);
 extern int COL_calc(COL *,CLEC *,CLEC *);
 extern int COL_link(int ,CLEC *);
 
-/* b_base.c */
+/* b_args.c */
 extern char **B_ainit_chk(char *,ADEF *,int );
 extern char **B_vtom_chk(char *,int );
 extern int B_loop(char **,int (*)(),char *);
 extern int B_ainit_loop(char *,int (*)(),char *);
+extern int B_get_arg0(char *,char *,int );
+extern int B_argpos(char *,int );
+
+/* b_errors */
+extern void B_seterror(char *,...);
+extern void B_seterrn(int , ...);
+
 extern void B_display_last_error(void);
 extern void B_print_last_error(void);
 extern void B_clear_last_error(void);
-extern void B_reset_error(void);
-extern int B_get_arg0(char *,char *,int );
+//extern void B_reset_error(void);
 extern char *B_msg(int );
-extern int B_argpos(char *,int );
 extern int B_get1int(char *);
 
 /* b_dir.c */
@@ -1146,7 +1153,6 @@ extern int SB_ProfileReset(void);
 extern int KE_simul_s(KDB *,KDB *,KDB *,SAMPLE *,char **, char **);
 extern int K_simul_1(int );
 extern int K_init_values(int );
-extern int K_init_values_1(double *,int ,int );
 extern int K_restore_XK(int );
 extern double K_calc_clec(int ,int ,int ,int);
 extern int K_prolog(int );
