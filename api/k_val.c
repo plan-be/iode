@@ -1,4 +1,6 @@
 /**
+ *  @header4iode
+ *
  *  Basic functions to retrieve object data based on their position or name in the kdb.
  *  If the object is packed (EQ, TBL...) the position (n) of the element in the pack must be given.
  *  
