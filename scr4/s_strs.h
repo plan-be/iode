@@ -144,7 +144,7 @@ extern U_ch  *SCR_fmt_long(),
 	     *SCR_dif_list(),
 	     **SCR_inter(),
 	     **SCR_union(),
-		** SCR_union_quick(),
+         **SCR_union_quick(),
 	     **SCR_dif();
 
 extern char  **PC_infos(),
