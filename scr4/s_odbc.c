@@ -15,8 +15,8 @@ char        OCharBuf[256];
 SQLSMALLINT OShortBuf;
 SQLINTEGER  OLongBuf;
 SQLUSMALLINT ORowStatusArray[2];
-extern int  ODebugDetail;
-
+//extern int  ODebugDetail;
+int     ODebugDetail = 0;   // JMP 08/12/2021 : moved from s_dbbvars.c
 
 /* ====================================================================
 Initialise une session ODBC. Cette fonction doit ˆtre appel‚e avant
