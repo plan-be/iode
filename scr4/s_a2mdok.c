@@ -568,7 +568,7 @@ int     n;
         case A2M_IMAGER:
         case A2M_IMAGEF:
         case A2M_IMAGE :
-            A2mDokuAFrame(as->as_txt);
+            A2mDokuAFrame(as->as_txt, as->as_type);
             break;
         default :
             break;
@@ -851,7 +851,7 @@ A2MGRF  *ag;
         fprintf(A2M_fdtxt, "</TD></TR><TR><TD>");
         sprintf(buf, "img%d.gif", A2M_GIF_CNT);
         A2mGIF_HTML(ag, buf);
-        A2mDokuAFrame(buf);
+        A2mDokuAFrame(buf, A2M_IMAGEFR);
         fprintf(A2M_fdtxt, "</TD></TR></TABLE>");
         A2M_GIF_CNT++;
         return(0);
@@ -878,8 +878,9 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-A2mDokuAFrame(filename)
+A2mDokuAFrame(filename, type)
 char    *filename;
+int		type;
 {
     char    buf[256], img[256];
 
@@ -889,10 +890,17 @@ char    *filename;
     else if(A2M_DOKU_GIFTOPNG && U_index(buf, ".gif") > 0)
         SCR_change_ext(buf, filename, "png");
 
-    sprintf(img, "\n\n^  Figure %d  ^\n|  {{  %s:\"%s\"", A2M_DOKU_FIGNB++, A2M_DOKU_IMGDIR, buf); // JMP 22/8/2015
-    if(A2M_DOKU_IMGWIDTH) sprintf(img+strlen(img), ":%d", A2M_DOKU_IMGWIDTH);
-    sprintf(img+strlen(img), "  }}|");
-
+	if(type == A2M_IMAGEFR || type == A2M_IMAGEF) { // JMP 27/7/2021
+		sprintf(img, "\n\n^  Figure %d  ^\n|  {{  %s:\"%s\"", A2M_DOKU_FIGNB++, A2M_DOKU_IMGDIR, buf); // JMP 22/8/2015
+		if(A2M_DOKU_IMGWIDTH) sprintf(img+strlen(img), ":%d", A2M_DOKU_IMGWIDTH);
+		sprintf(img+strlen(img), "  }}|");
+	}
+	else {
+		sprintf(img, "\n\n{{%s:\"%s\"", A2M_DOKU_IMGDIR, buf); 
+		if(A2M_DOKU_IMGWIDTH) sprintf(img+strlen(img), ":%d", A2M_DOKU_IMGWIDTH);
+		sprintf(img+strlen(img), "}}");
+	}
+		
     fprintf(A2M_fdtxt, "%s\n", img);
     return(0);
 }
