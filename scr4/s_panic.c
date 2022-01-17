@@ -34,5 +34,27 @@ int SCR_panic()
     fprintf(stderr, "\n\nMemory full. Exit(2)\n");
 #endif
     exit(2);
-    return(0);
 }
+
+
+/* Alternative pour scr4iode 
+
+
+void (*SCR_panic_impl)() = NULL;
+
+int SCR_panic()
+{
+    if(SCR_panic_impl) 
+        (*SCR_panic_impl)();
+    else 
+#ifdef SCRWIN
+    MessageBox(0, "Memory full.", "Fatal error", MB_OK | MB_ICONSTOP | MB_APPLMODAL);
+#else
+    fprintf(stderr, "\n\nMemory full. Exit(2)\n");
+#endif
+    exit(2);
+}
+
+
+*/
+
