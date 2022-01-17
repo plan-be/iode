@@ -156,9 +156,11 @@ typedef struct _swstat_ {
 
 /* ======================= VARS =============================== */
 
-#ifdef SCRCPP
+#ifdef SCRCPP 
+// JMP 12/05/2021. Pour utiliser les vars en C++, il faut des déclarer extern "C"  
 extern "C" {
-#endif
+#endif 
+
 
 extern int      SW_ACTIVE;
 extern long     SW_AGE, SW_MIN_MEM;
@@ -175,7 +177,7 @@ extern int      SW_SEG_SIZE; /* JMP 27-11-07 */
 
 #ifdef SCRCPP
 }
-#endif
+#endif 
 
 /* =================== FNS PROTOTYPES =========================== */
 
