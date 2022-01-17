@@ -1,6 +1,9 @@
 #include "scr4.h"
 #include "s_a2m.h"
 
+
+void (*A2mMessage_super)(char*); // if not null, replaces the default implementation A2mMessage()
+
 /*==================================================================
 Fonction appel‚e pour afficher les messages en cours d'impression des
 fichiers A2M provenant des fonctions A2mToMif(), etc.
@@ -16,11 +19,14 @@ Par d‚faut, la fonction de librairie vaut simplement:
 &SA A2mToMif(), A2mToRtf(), A2mToGdi(), A2mToHtml()
 =============================================================== */
 
-A2mMessage(msg)
-char    *msg;
+void A2mMessage(char *msg)
 {
-    SCR_comment(msg);
-    return(0);
+    if(A2mMessage_super)
+        (*A2mMessage_super)(msg);
+    else
+        printf("\r%s", msg);
+    
+    // SCR_comment(msg);
 }
 
 
