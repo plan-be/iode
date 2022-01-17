@@ -334,6 +334,15 @@
 #define K_DIFFY 3
 #define K_GRTY  4
 
+/*--------------- VAR_INIT defines ------------------------*/
+#define KV_INIT_TM1       0
+#define KV_INIT_TM1_A     1
+#define KV_INIT_EXTRA     2
+#define KV_INIT_EXTRA_A   3
+#define KV_INIT_ASIS      4
+#define KV_INIT_TM1_NA    5
+#define KV_INIT_EXTRA_NA  6
+
 /*----------------------- MISC --------------------------------*/
 #define K_ISFILE(filename)  (filename != 0 && filename[0] != '-' && filename[0] != 0)
 
