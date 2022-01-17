@@ -834,7 +834,16 @@ int     pos;
 	    }
 	tc = at->at_tls[at->at_nl - 1].atl_tcs + col;
 
-	tc->atc_ncells = CppReadLong(af->af_cpp);
+    ch = CppGetc(af->af_cpp);
+    
+    if(ch == ' ') {         // JMP 6/1/2022 pour accepter les tableaux | 21|... sans avoir 21 colonnes
+        tc->atc_ncells = 0; // Si le char 1 == ' ' on le skippe et on ne prend pas l'entier qui
+    }                        // suit comme le #cols à regrouper (span)
+    else {     
+        CppUngetc(af->af_cpp, ch);
+        tc->atc_ncells = CppReadLong(af->af_cpp);
+    }
+    
 	if(tc->atc_ncells == 0) {
 	    tc->atc_ncells = 1;
 	    tc->atc_center = (pos == 1) ? 0 : 1;
