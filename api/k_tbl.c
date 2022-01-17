@@ -1,7 +1,7 @@
 /**
  *  @header4iode
  *
- *  Functions to manage TBL structs.
+ *  Functions to manage TBL objects.
  *  
  *  List of functions 
  *  -----------------
