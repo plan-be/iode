@@ -7,23 +7,23 @@ unsigned char *SCR_replace_gnl2(txt, repl, by)
 unsigned char   *txt, *repl, *by;
 {
     int     lgrepl = strlen(repl),
-	    lgby = strlen(by);
+            lgby = strlen(by);
     U_ch    *txt1 = txt, *txt2 = txt;
 
     if(txt == 0) return(txt);
 
     while(1) {
-	if(memcmp(txt2, repl, lgrepl)) {
-	    *txt1 = *txt2;
-	    if(*txt1 == 0) break;
-	    txt1++;
-	    txt2++;
-	    continue;
-	    }
-	memcpy(txt1, by, lgby);
-	txt1 += lgby;
-	txt2 += lgrepl;
-	}
+        if(memcmp(txt2, repl, lgrepl)) {
+            *txt1 = *txt2;
+            if(*txt1 == 0) break;
+            txt1++;
+            txt2++;
+            continue;
+        }
+        memcpy(txt1, by, lgby);
+        txt1 += lgby;
+        txt2 += lgrepl;
+    }
     return(txt);
 }
 
@@ -32,39 +32,39 @@ unsigned char *SCR_replace_gnl(txt, repl, by, chars)
 unsigned char   *txt, *repl, *by, *chars;
 {
     int     pos, shift = 0,
-	    lgrepl = strlen(repl),
-	    lgby = strlen(by),
-	    lgtxt;
+                 lgrepl = strlen(repl),
+                 lgby = strlen(by),
+                 lgtxt;
 
     if(txt == 0) return(txt); /* JMP 13-03-03 */
 
     if(lgrepl > lgby && chars == 0)
-	return(SCR_replace_gnl2(txt, repl, by)); /* JMP 03-10-2003 */
+        return(SCR_replace_gnl2(txt, repl, by)); /* JMP 03-10-2003 */
 
     lgtxt = strlen(txt);
     while(1) {
-	pos = U_index(txt + shift, repl);
-	if(pos < 0) return(txt);
-	shift += pos;
-	if(chars) {
-	    if((shift > 0 && lettre(txt[shift - 1])) ||  /* JMP 18-05-99 */
-		lettre(txt[shift + lgrepl])) {
-		shift += lgrepl;
-		continue;
-		}
-	    }
+        pos = U_index(txt + shift, repl);
+        if(pos < 0) return(txt);
+        shift += pos;
+        if(chars) {
+            if((shift > 0 && lettre(txt[shift - 1])) ||  /* JMP 18-05-99 */
+                    lettre(txt[shift + lgrepl])) {
+                shift += lgrepl;
+                continue;
+            }
+        }
 
-	if(lgrepl >= lgby) {
-	    //strcpy(txt + shift + lgby, txt + shift + lgrepl);
-	    lgtxt -= pos + lgrepl;
-	    memcpy(txt + shift + lgby, txt + shift + lgrepl, lgtxt);
-	    txt[shift + lgtxt + lgby] = 0;
-	    }
-	else
-	    SCR_strrcpy(txt + shift + lgby, txt + shift + lgrepl);
-	memcpy(txt + shift, by, lgby);
-	shift += lgby;
-	}
+        if(lgrepl >= lgby) {
+            //strcpy(txt + shift + lgby, txt + shift + lgrepl);
+            lgtxt -= pos + lgrepl;
+            memcpy(txt + shift + lgby, txt + shift + lgrepl, lgtxt);
+            txt[shift + lgtxt + lgby] = 0;
+        }
+        else
+            SCR_strrcpy(txt + shift + lgby, txt + shift + lgrepl);
+        memcpy(txt + shift, by, lgby);
+        shift += lgby;
+    }
 }
 
 /* ====================================================================
@@ -80,21 +80,21 @@ SCR_replace_len(txt, repl, by, chars)
 unsigned char   *txt, *repl, *by, *chars;
 {
     int     pos, shift = 0, add = strlen(txt),
-	    lgrepl = strlen(repl),
-	    lgby = strlen(by);
+                 lgrepl = strlen(repl),
+                 lgby = strlen(by);
 
     while(1) {
-	pos = U_index(txt + shift, repl);
-	if(pos < 0) break;
-	shift += pos;
-	if(chars && shift > 0 &&
-	    (lettre(txt[shift - 1]) || lettre(txt[shift + lgrepl]))) {
-		shift += lgrepl;
-		continue;
-		}
-	add += lgby - lgrepl;
-	shift += lgrepl;
-	}
+        pos = U_index(txt + shift, repl);
+        if(pos < 0) break;
+        shift += pos;
+        if(chars && shift > 0 &&
+                (lettre(txt[shift - 1]) || lettre(txt[shift + lgrepl]))) {
+            shift += lgrepl;
+            continue;
+        }
+        add += lgby - lgrepl;
+        shift += lgrepl;
+    }
     return(add);
 }
 
