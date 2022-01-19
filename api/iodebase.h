@@ -332,19 +332,13 @@ extern int L_calcvals(unsigned char *,short ,int ,double *,int *,double *, int);
 extern double L_interpol(unsigned char *,short ,int ,double *,int );
 extern double L_app(unsigned char *,short ,int ,double *,int );
 
+/* l_hodrick.c */
+extern int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std);
+extern void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim);
+
 /* l_eqs.c */
-// extern ALEC *L_cc1_alloc(char *,int );
-//extern int L_cc1_eq(SLEC *,char *);
 extern CLEC *L_solve(char *,char *);
-//extern int L_invert(char *,char *,int *);
 extern int L_split_eq(char *);
-//extern int L_count_endo(ALEC *,int ,char *);
-//extern int L_split_expr(SLEC *);
-//extern void L_append(SLEC *,int );
-//extern void L_front(SLEC *,int );
-//extern void L_append_op(int );
-//extern void L_append_fn(int ,int );
-//extern void L_append_const(int );
 
 /* l_newton.c */
 extern double L_zero(KDB *,KDB *,CLEC *,int ,int ,int );
@@ -448,6 +442,8 @@ extern char *K_optr(KDB *,char* ,int );
 extern char *K_optr0(KDB *,char* );
 extern char *K_optr1(KDB *,char* );
 extern double *K_vptr(KDB *,char* ,int );
+
+extern EQ* K_eptr(KDB* kdb, char* name);
 
 /* k_lst.c */
 extern int K_scan(KDB *,char *,char *);
@@ -993,11 +989,12 @@ extern int DS_extr(double *,int ,int ,double *,double );
 
 /* b_trend.c */
 extern int B_WsTrend(char *);
-extern int HP_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *);
+extern int B_WsTrendStd(char *);
+//extern int HP_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *);
 //extern int HP_calc(double *,double *,int ,int );	
 //extern int HP_calc(double *,double *,int , IODE_REAL);     // JMP 7-3-2019
-extern int HP_calc(double *,double *,int , IODE_REAL, int);  // JMP 12-4-2019
-extern void HP_test(double *,double *,int ,int *,int *);
+//extern int HP_calc(double *,double *,int , IODE_REAL, int);  // JMP 12-4-2019
+//extern void HP_test(double *,double *,int ,int *,int *);
 
 /* w_wrt1.c */
 extern void W_print_enum(int );
