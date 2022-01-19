@@ -1,7 +1,7 @@
 /**
  * @header4iode
  *
- *  Functions to manage EQ objects.
+ *  Functions to manipulate equation expressions and objects.
  *  
  *  List of functions 
  *  -----------------
