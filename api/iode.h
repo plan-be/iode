@@ -59,13 +59,12 @@
 #define K_LOWER     1
 #define K_ASIS      2
 
-#ifndef IODE_REAL
-#ifdef REALD
+// REALD defines if not yet defined (to avoid compilation warning)
+#ifndef REALD
+    #define REALD
+#endif
+// IODE_REAL forced to double (-DREALD not needed anymore) => JMP 19/02/2022
 #define IODE_REAL    double
-#else
-#define IODE_REAL    float
-#endif
-#endif
 
 #define L_NAN       (IODE_REAL)(-2.0e37)
 #define L_ISAN(x)   ((x) >= (IODE_REAL)(-1.0e37))
