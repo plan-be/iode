@@ -35,24 +35,28 @@
       - [Unpacking functions (for TBL and EQ only ?)](#T29)
       - [Allocation functions (SCL & VAR only)](#T30)
     - [k\_val.c](#T31)
-    - [k\_tbl.c](#T32)
-    - [k\_cmp.c](#T33)
-    - [k\_grep.c](#T34)
-  - [Group "IODE file management"](#T35)
-    - [k\_objfile.c](#T36)
-  - [Group "IODE big\- and little\-endian conversion"](#T37)
-    - [k\_xdr.c](#T38)
-  - [Group "IODE object ascii formats"](#T39)
-    - [Filename extensions](#T40)
-    - [k\_ccall.c](#T41)
-    - [k\_cceqs.c](#T42)
-    - [k\_ccidt.c](#T43)
-    - [k\_cclst.c](#T44)
-    - [k\_ccscl.c](#T45)
-    - [k\_cctbl.c](#T46)
-    - [k\_ccvar.c](#T47)
-  - [Group "LEC language"](#T48)
-    - [k\_lec.c](#T49)
+    - [k\_eqs.c](#T32)
+    - [k\_tbl.c](#T33)
+    - [k\_cmp.c](#T34)
+    - [k\_grep.c](#T35)
+  - [Group "IODE file management"](#T36)
+    - [k\_objfile.c](#T37)
+  - [Group "IODE big\- and little\-endian conversion"](#T38)
+    - [k\_xdr.c](#T39)
+  - [Group "IODE object ascii formats"](#T40)
+    - [Filename extensions](#T41)
+    - [k\_ccall.c](#T42)
+    - [k\_cceqs.c](#T43)
+    - [k\_ccidt.c](#T44)
+    - [k\_cclst.c](#T45)
+    - [k\_ccscl.c](#T46)
+    - [k\_cctbl.c](#T47)
+    - [k\_ccvar.c](#T48)
+  - [Group "LEC language"](#T49)
+    - [k\_lec.c](#T50)
+  - [Group "Iode Reports"](#T51)
+    - [b\_args.c](#T52)
+    - [b\_errors.c](#T53)
 
 # IODE: functions by group {#T1}
 
@@ -67,6 +71,7 @@
 - Group "IODE big\- and little\-endian conversion"
 - Group "Iode object ascii formats" 
 - Group "LEC language" 
+- Group "Iode Reports" 
 - \*Group "Model Estimation"
 - \*Group "Model Simulation"
 - \*Group "Iode ini file"
@@ -297,6 +302,7 @@ Functions acting on workspaces of variables.
 |`void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
 |`int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)`|Extrapolates variables on a selected SAMPLE according to one of the available methods.|
 |`KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
+|`void KV_init_values_1(IODE_REAL* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 
 ## Group "Object management" {#T23}
 
@@ -305,6 +311,7 @@ Functions acting on workspaces of variables.
 - k\_objvers.c: functions to detect IODE object file version and to convert an object to the current IODE version.\_
 - k\_pack.c: functions for "packing" and "unpacking" IODE objects.
 - k\_val.c: functions to retrieve object data based on their position or name in the kdb.
+- k\_eqs.c: functions to manipulate equation expressions and objects.
 - k\_tbl.c: functions to manage TBL objects.
 - k\_cmp.c: function to compare two IODE objects.
 - k\_grep.c: functions to search strings in KDB objects.
@@ -404,26 +411,38 @@ List of functions
 |`IODE_REAL *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
 |`EQ* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
 
-### k\_tbl.c {#T32}
+### k\_eqs.c {#T32}
 
-|Syntax|Description|
+Functions to manipulate equation expressions and objects.
+
+|`void E_free(EQ* eq)`|Frees an EQ struct and all its elements|
 |:---|:---|
-|TBL \*T\_create(int dim)|Creates a new TBL objects.|
-|void T\_free(TBL\* tbl)|Frees a TBL object|
-|void T\_free\_line(TLINE\* line, int dim)|Frees a TLINE struct and all its TCELL.|
-|void T\_free\_cell(TCELL\* cell)|Frees a TCELL struct.|
-|int T\_add\_line(TBL\* tbl)|Extents a TBL by adding at least one line.|
-|TCELL \*T\_create\_cell(TBL\* tbl, TLINE\* line)|Initialises a TLINE of the type KT\_CELL.|
-|TCELL \*T\_create\_title(TBL\* tbl, TLINE\* line)|Initialises a TLINE of the type KT\_TITLE.|
-|char\* T\_cell\_cont(TCELL\* cell, int mode)|Returns the formated contents of a TCELL.|
-|int T\_insert\_line(TBL\* tbl, int nbr, int type, int where)|Inserts a TLINE in a TBL.|
-|int T\_set\_lec\_cell(TCELL\* cell, unsigned char\* lec)|Assigns a LEC expression to a TCELL. Checks the syntax.|
-|void T\_set\_string\_cell(TCELL\* cell, unsigned char\* txt)|Assigns a TEXT to a TCELL.|
-|void T\_set\_cell\_attr(TBL\* tbl, int i, int j, int attr)|Assigns justification (KT\_CENTER...) and typographic (KT\_BOLD...) attributes to a TCELL.|
-|int T\_default(TBL\* tbl, char\*titg, char\*\*titls, char\*\*lecs, int mode, int files, int date)|Fills a TBL with some basic data: a title, line titles and LEC expressions.|
-|void T\_auto(TBL\* tbl, char\* def, char\*\* vars, int mode, int files, int date)|Fills a TBL with a list of variables and their CMT.|
+|`int E_split_eq(char* lec, char** lhs, char** rhs)`|Extracts the left and right sides of a lec equation|
+|`int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)`|Transforms a LEC equation to add dynamic adjustment|
+|`E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)`|Transforms a LEC equation "in place" to add dynamic adjustment|
 
-### k\_cmp.c {#T33}
+### k\_tbl.c {#T33}
+
+Functions to manage TBL objects.
+
+|`Syntax`|Description|
+|:---|:---|
+|`TBL *T_create(int dim)`|Creates a new TBL objects.|
+|`void T_free(TBL* tbl)`|Frees a TBL object|
+|`void T_free_line(TLINE* line, int dim)`|Frees a TLINE struct and all its TCELL.|
+|`void T_free_cell(TCELL* cell)`|Frees a TCELL struct.|
+|`int T_add_line(TBL* tbl)`|Extents a TBL by adding at least one line.|
+|`TCELL *T_create_cell(TBL* tbl, TLINE* line)`|Initialises a TLINE of the type KT\_CELL.|
+|`TCELL *T_create_title(TBL* tbl, TLINE* line)`|Initialises a TLINE of the type KT\_TITLE.|
+|`char* T_cell_cont(TCELL* cell, int mode)`|Returns the formated contents of a TCELL.|
+|`int T_insert_line(TBL* tbl, int nbr, int type, int where)`|Inserts a TLINE in a TBL.|
+|`int T_set_lec_cell(TCELL* cell, unsigned char* lec)`|Assigns a LEC expression to a TCELL. Checks the syntax.|
+|`void T_set_string_cell(TCELL* cell, unsigned char* txt)`|Assigns a TEXT to a TCELL.|
+|`void T_set_cell_attr(TBL* tbl, int i, int j, int attr)`|Assigns justification (KT\_CENTER...) and typographic (KT\_BOLD...) attributes to a TCELL.|
+|`int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)`|Fills a TBL with some basic data: a title, line titles and LEC expressions.|
+|`void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)`|Fills a TBL with a list of variables and their CMT.|
+
+### k\_cmp.c {#T34}
 
 Function to compare two IODE objects.
 
@@ -431,7 +450,7 @@ Function to compare two IODE objects.
 |:---|:---|
 |`int K_cmp(char* name, KDB* kdb1, KDB* kdb2)`|Compares IODE objects having the same name in two KDB.|
 
-### k\_grep.c {#T34}
+### k\_grep.c {#T35}
 
 Functions to search strings in KDB objects.
 
@@ -441,9 +460,9 @@ Functions to search strings in KDB objects.
 |`char *K_expand(int type, char* file, char* pattern, int all)`|Retrieves all object names matching one or more patterns in a workspace or an object file.|
 |`int K_aggr(char* pattern, char* ename, char* nname) *`|Transforms a variable name based on an "aggregation" pattern.|
 
-## Group "IODE file management" {#T35}
+## Group "IODE file management" {#T36}
 
-### k\_objfile.c {#T36}
+### k\_objfile.c {#T37}
 
 Functions to manipulate IODE object files.
 
@@ -460,9 +479,9 @@ Functions to manipulate IODE object files.
 |`int K_save_ws(KDB* kdb)`|saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).|
 |`int K_setname(char* from, char* to)`|replaces KNAMEPTR(kdb) in an IODE object file.|
 
-## Group "IODE big\- and little\-endian conversion" {#T37}
+## Group "IODE big\- and little\-endian conversion" {#T38}
 
-### k\_xdr.c {#T38}
+### k\_xdr.c {#T39}
 
 Functions to convert big\-endian data, used by processors like RISC,... into little\-endian format (x86,...) and vice\-versa.
 
@@ -474,11 +493,11 @@ Functions to convert big\-endian data, used by processors like RISC,... into lit
 |                                       ||
 |`int (*K_xdrobj[])()`|Table of function pointers, one function for each object type, for converting|
 
-## Group "IODE object ascii formats" {#T39}
+## Group "IODE object ascii formats" {#T40}
 
 Functions to load and save files in IODE ascii format and LArray csv format.
 
-### Filename extensions {#T40}
+### Filename extensions {#T41}
 
 |Type|Binary extension|Ascii extension|
 |:---|:---|:---|
@@ -491,7 +510,7 @@ Functions to load and save files in IODE ascii format and LArray csv format.
 |variables|.var|.av|
 |LArray variables||.csv|
 
-### k\_ccall.c {#T41}
+### k\_ccall.c {#T42}
 
 Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV formats.
 
@@ -501,7 +520,7 @@ Tables of pointers to functions for reading and writing IODE objects in ASCII an
 |`int (*K_save_asc[])()`|
 |`int (*K_save_csv[])()`|
 
-### k\_cceqs.c {#T42}
+### k\_cceqs.c {#T43}
 
 Loading and saving IODE ascii equation files.
 
@@ -511,7 +530,7 @@ Loading and saving IODE ascii equation files.
 |`int KE_save_asc(KDB* kdb, char* filename)`|
 |`int KE_save_csv(KDB *kdb, char *filename) : not implemented`|
 
-### k\_ccidt.c {#T43}
+### k\_ccidt.c {#T44}
 
 Loading and saving IODE ascii identity files.
 
@@ -521,7 +540,7 @@ Loading and saving IODE ascii identity files.
 |`int KI_save_asc(KDB* kdb, char* filename)`|
 |`int KI_save_csv(KDB *kdb, char *filename)`|
 
-### k\_cclst.c {#T44}
+### k\_cclst.c {#T45}
 
 Loading and saving IODE ascii list files.
 
@@ -531,7 +550,7 @@ Loading and saving IODE ascii list files.
 |`int KL_save_asc(KDB* kdb, char* filename)`|
 |`int KL_save_csv(KDB *kdb, char *filename)`|
 
-### k\_ccscl.c {#T45}
+### k\_ccscl.c {#T46}
 
 Loading and saving IODE ascii scalar files.
 
@@ -541,7 +560,7 @@ Loading and saving IODE ascii scalar files.
 |`int KS_save_asc(KDB* kdb, char* filename)`|
 |`int KS_save_csv(KDB *kdb, char *filename)`|
 
-### k\_cctbl.c {#T46}
+### k\_cctbl.c {#T47}
 
 Loading and saving IODE ascii table files.
 
@@ -551,7 +570,7 @@ Loading and saving IODE ascii table files.
 |`int KT_save_asc(KDB* kdb, char* filename)`|
 |`int KT_save_csv(KDB *kdb, char *filename)`|
 
-### k\_ccvar.c {#T47}
+### k\_ccvar.c {#T48}
 
 Functions to import and export IODE files to/from ascii and LArray\-csv format.
 
@@ -561,11 +580,11 @@ Functions to import and export IODE files to/from ascii and LArray\-csv format.
 |`KV_save_asc(KDB* kdb, char* filename)`|
 |`int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)`|
 
-## Group "LEC language" {#T48}
+## Group "LEC language" {#T49}
 
-For the LEC implementation, see [lec.md](doc/lec.md).
+For the LEC implementation, see [lec.md](lec.md).
 
-### k\_lec.c {#T49}
+### k\_lec.c {#T50}
 
 Implemention of the LEC library virtual functions for SCL and VAR references.
 
@@ -576,4 +595,32 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 |`SAMPLE *L_getsmpl(KDB* kdb)`|
 |`int L_findscl(KDB* kdb, char *name)`|
 |`int L_findvar(KDB* kdb, char* name)`|
+
+## Group "Iode Reports" {#T51}
+
+### b\_args.c {#T52}
+
+Basic functions for managing function and report arguments.
+
+|Syntax|Description|
+|:---|:---|
+|`char **B_ainit_chk(char* arg, ADEF* adef, int nb)`|expands an argument by replacing @filename and $listname by their contents|
+|`char **B_vtom_chk(char* arg, int nb)`|splits a string (generally a function argument) into a table of strings.|
+|`int B_loop(char *argv[], int (*fn)(), char* client)`|executes the function fn(char\*, char\*) for each string in the table of strings argv.|
+|`int B_ainit_loop(char* arg, int (*fn)(), char* client)`|calls B\_ainit\_check() to expand arg, then calls B\_loop() on the resulting table of strings.|
+|`int B_get_arg0(char* arg0, char*arg, int lg)`|computes arg0, the first arg ('word') of max lg bytes, in the string arg.|
+|`int B_argpos(char* str, int ch)`|returns the position of a char in a string.|
+
+### b\_errors.c {#T53}
+
+Basic functions for managing error messages.
+
+|Syntax|Description|
+|:---|:---|
+|`char *B_msg(int n)`|Returns a static buffer containing the message n from file iode.msg.|
+|`void B_seterror(char* fmt, ...)`|Formats an error message and adds the text of the message to the global table of last errors.|
+|`void B_seterrn(int n, ...)`|Formats a message found in iode.msg and adds the result to the list of last errors.|
+|`void B_display_last_error()`|Displays the last recorded errors (in B\_ERROR\_MSG) using kmsgbox().|
+|`void B_print_last_error()`|Displays or prints the last recorded errors (in B\_ERROR\_MSG) using W\_printf().|
+|`void B_clear_last_error()`|Resets the list of last messages (B\_ERROR\_MSG and B\_ERROR\_NB).|
 
