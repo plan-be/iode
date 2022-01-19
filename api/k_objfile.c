@@ -262,11 +262,6 @@ error :
  *      - transposes objects to 64 bits 
  *      - converts to the current IODE object version.
  *  
- *  If filename contains the char '!', try to open it through the s4issrv server. In this case, the filename has
- *  the syntax "<server>:<port>!filename". 
- *  
- *  For example: "172.16.10.11:5000!c:\\usr\\data\\mydb.var".
- *  
  * @param [in]   ftype      int     file type (K_CMT -> K_VAR)
  * @param [in]   fname      FNAME   filename
  * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
@@ -292,7 +287,8 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
     FILE    *fd;
     extern  char K_LABEL[];
 
-    if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
+    // Next line is deleted because K_load_odbc() was implemented for a specific project
+    // if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
 
     K_set_ext(file, fname, ftype);
     fd = fopen(file, "rb");
