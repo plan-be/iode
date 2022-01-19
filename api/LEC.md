@@ -30,8 +30,9 @@
     - [l\_exec\_fns.c](#T24)
     - [l\_exec\_tfn.c](#T25)
     - [l\_exec\_mtfn.c](#T26)
-  - [LEC virtual functions](#T27)
-    - [k\_lec.c](#T28)
+    - [l\_hodrick.c](#T27)
+  - [LEC virtual functions](#T28)
+    - [k\_lec.c](#T29)
 
 # IODE: LEC implementation {#T1}
 
@@ -351,9 +352,18 @@ Functions to evaluate LEC "time functions" with possibly multiple arguments.
 |static L\_REAL L\_hp(unsigned char\* expr, short len, int t, L\_REAL\* stack, int nargs)||
 |static L\_REAL L\_hpstd(unsigned char\* expr, short len, int t, L\_REAL\* stack, int nargs)||
 
-## LEC virtual functions {#T27}
+### l\_hodrick.c {#T27}
 
-### k\_lec.c {#T28}
+Hodrick\-Prescott filter. These functions are subfunctions of L\_hp\*() defined on l\_exec\_mtfn.c.
+
+|Syntax|Description|
+|:---|:---|
+|`int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std)`|Hodrick\-Prescott filter.|
+|`void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim)`|Prepares HP\_calc()|
+
+## LEC virtual functions {#T28}
+
+### k\_lec.c {#T29}
 
 Implemention of the LEC library virtual functions for SCL and VAR references.
 
