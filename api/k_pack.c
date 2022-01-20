@@ -19,24 +19,24 @@
  * 
  * Packing functions
  * ----------------- 
- *      int K_cpack(char **pack, char *a1)
- *      int K_epack(char **pack, char *a1, char *a2)
- *      int K_ipack(char **pack, char *a1)
- *      int K_lpack(char** pack, char* a1)
- *      int K_spack(char **pack, char *a1)
- *      int K_tpack(char** pack, char* a1)
- *      int K_vpack(char **pack, IODE_REAL *a1, int *a2)
- *      int K_opack(char** pack, char* a1, int* a2)
+ *      int K_cpack(char **pack, char *a1)                  Packs an IODE CMT object 
+ *      int K_epack(char **pack, char *a1, char *a2)        Packs an IODE EQ object 
+ *      int K_ipack(char **pack, char *a1)                  Packs an IODE IDT object 
+ *      int K_lpack(char** pack, char* a1)                  Packs an IODE LST object 
+ *      int K_spack(char **pack, char *a1)                  Packs an IODE SCL object 
+ *      int K_tpack(char** pack, char* a1)                  Packs an IODE TBL object 
+ *      int K_vpack(char **pack, IODE_REAL *a1, int *a2)    Packs an IODE VAR object. 
+ *      int K_opack(char** pack, char* a1, int* a2)         Reserved for future new objects
  * 
  * Unpacking functions
  * -------------------- 
- *      TBL* K_tunpack(char *pack)
- *      EQ* K_eunpack(char *pack)
+ *      TBL* K_tunpack(char *pack)      Creates a TBL struct from a packed TBL 
+ *      EQ* K_eunpack(char *pack)       Creates a EQ struct from a packed EQ
  * 
  * Allocation functions (VAR & SCL only)
- * --------------------
- *      int KS_alloc_scl()
- *      int KV_alloc_var(int nb)
+ * -------------------------------------
+ *      int KS_alloc_scl()          Allocates space for a new SCL (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.
+ *      int KV_alloc_var(int nb)    Allocates space for a new VAR of length nb in the swap area, initialises it to L_NAN and returns the "swap" handle.
  * 
  * @note The "modern" terminology for pack and unpack is "serialize" and "deserialize".
  * @see scr4/s_swap.h (http://www.xon.be/scr4/libs1/libs1236.htm) for more details.
@@ -478,7 +478,7 @@ int K_lpack(char** pack, char* a1)
 }
 
 /**
- *  Reserved for future new object.
+ *  Reserved for future new objects.
  *  
  *  @param [out] pack  char **      placeholder for the pointer to the packed object
  *  @param [in]  a1    char*        NULL or pointer the the object.
@@ -853,7 +853,7 @@ int KS_alloc_scl()
 
 
 /**
- * Allocates memory for a VAR of length nb in the swap area, initialises it to L_NAN and returns the swap handle.
+ * Allocates space for a VAR of length nb in the swap area, initialises it to L_NAN and returns the swap handle.
  * 
  * @param nb  int length of the VAR element.
  *

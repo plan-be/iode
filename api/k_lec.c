@@ -1,4 +1,4 @@
-/*
+/**
  * @author Jean-Marc PAUL
  * @author Geert BRYON
  *
