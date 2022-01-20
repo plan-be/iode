@@ -121,7 +121,8 @@ int     lang;
 #else
 	    fd_msg = fopen(pt, "rb");  /* JMP 24-12-98 */
 #endif
-	    pos = SCR_get_app_pos(fd_msg, SCR_ERR_FILE_NB);
+	    if(fd_msg)
+            pos = SCR_get_app_pos(fd_msg, SCR_ERR_FILE_NB);
 	    }
 	}
     SCR_ERR_FILE_POS = pos;
