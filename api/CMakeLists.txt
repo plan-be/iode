@@ -10,9 +10,9 @@ set (OBJS k_vers.c k_objs.c k_objsv.c k_pack.c k_objfile.C k_xdr.c k_objvers.c k
 set (BRICKS b_args.c b_errors.c)
 set (LEC l_alloc.c l_err.c l_token.c l_cc1.c l_cc2.c l_eqs.c l_link.c l_exec.c l_exec_fns.c l_exec_ops.c l_exec_tfn.c l_exec_mtfn.c l_exec_val.c l_hodrick.c k_lec.c) 
 set (KSUPER k_super.c)
-set (WRT w_wrt.c w_wrt1.c w_wrtv.c)
-set (A2M b_a2mini.c)
-
+#set (WRT w_wrt.c w_wrt1.c w_wrtv.c)
+#set (A2M b_a2mini.c)
+ 
 set (SOURCES 
 		${UTILS} 
 		${OBJS}
