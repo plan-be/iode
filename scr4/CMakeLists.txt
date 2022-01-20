@@ -40,7 +40,8 @@ set (IODE_MAT
 set (IODE_A2M 
 		s_a2mrd.c s_a2mseg.c  s_a2mhtm.c s_a2mfrm.c s_a2mfrg.c s_a2mmd.c s_wemfcr.c s_wemf.c s_a2memf.c
 		s_a2mmem.c s_a2mtc2.c s_a2mtch.c s_wprtdf.c s_a2mswf.c 
-		s_a2mcsv.c s_a2mrtf.c s_a2mgr1.c s_a2mgdi.c s_a2merr.c s_a2mgrf.c)
+		s_a2mcsv.c s_a2mrtf.c s_a2mgr1.c s_a2mgdi.c s_a2merr.c s_a2mgrf.c
+		s_a2mmsg.c)
 set (IODE_ARGS 
 		s_ainit.c s_aerr.c s_aexec.c s_aexp.c s_aiexp.c s_acerr.c
 		s_aexps.c s_aexpsd.c s_acheck.c s_achkin.c s_achkac.c)
@@ -52,15 +53,16 @@ set (IODE_GZIP
 		s_gzadlr.c s_gzcmpr.c s_gzcrc.c s_gzio.c s_gzucmp.c s_gzdefl.c s_gztree.c s_gzip.c
 		s_gzutil.c s_gzinfl.c s_gzinbl.c s_gzintr.c s_gzincd.c s_gzinut.c s_gzinfa.c)
 set (IODE_WSYS s_wprt.c s_wvers.c s_wsys2.c s_wgetms.c)
+set (ISC s_iode.c)
 
 set (SCR_IODE 
 	${IODE_SWAP} ${IODE_LST} ${IODE_BASE} ${IODE_INI} ${IODE_STRS} ${IODE_DDE}  ${IODE_YY}  ${IODE_MAT}  
-	${IODE_A2M}  ${IODE_ARGS}  ${IODE_DATE}  ${IODE_INI}  ${IODE_CPP}  ${IODE_ODBC} ${IODE_GZIP} ${IODE_SYS} ${IODE_WSYS}) 
+	${IODE_A2M}  ${IODE_ARGS}  ${IODE_DATE}  ${IODE_INI}  ${IODE_CPP}  ${IODE_ODBC} ${IODE_GZIP} ${IODE_SYS} ${IODE_WSYS} ${ISC}) 
 
 # Add source to this project's executable.
 add_library (scr4iode STATIC ${HEADER_IODE} ${SCR_IODE})
 
 # Compiler options
 add_compile_options(-Zi -Zp1)
-add_compile_definitions(DOS VC WINDOWS_IGNORE_PACKING_MISMATCH WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS_IGNORE_PACKING_MISMATCH WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
 target_include_directories (scr4iode PUBLIC ".")
