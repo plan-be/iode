@@ -234,7 +234,7 @@ Functions to evaluate a compiled and linked LEC expression.
 
 ### l\_exec\_var.c {#T22}
 
-Functions to evaluate LEC "values":
+Functions to evaluate LEC constants:
 
 |Syntax|Description|
 |:---|:---|
@@ -369,9 +369,9 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 
 |Syntax|Description|
 |:---|:---|
-|IODE\_REAL \*L\_getvar(KDB\* kdb, int pos)||
-|IODE\_REAL L\_getscl(KDB\* kdb, int pos)||
-|SAMPLE \*L\_getsmpl(KDB\* kdb)||
-|int L\_findscl(KDB\* kdb, char \*name)||
-|int L\_findvar(KDB\* kdb, char\* name)||
+|`IODE_REAL *L_getvar(KDB* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
+|`IODE_REAL L_getscl(KDB* kdb, int pos)`|Retrieves a scalar value.|
+|`SAMPLE *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
+|`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
+|`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
 
