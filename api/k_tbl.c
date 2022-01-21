@@ -5,7 +5,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      TBL *T_create(int dim)                                                                     | Creates a new TBL objects.
+ *      TBL *T_create(int dim)                                                                     | Creates a new TBL object.
  *      void T_free(TBL* tbl)                                                                      | Frees a TBL object
  *      void T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.
  *      void T_free_cell(TCELL* cell)                                                              | Frees a TCELL struct.
@@ -423,7 +423,7 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
  *  The TBL must exist and is normally empty.
  *  
  *    - def can be either a CMT name or a free text. If it's a CMT name, the contents of the CMT becomes the table title.
- *    - vars is a list of VAR name. If a CMT with the same name exists, the CMT become the line title and the variable the LEC expression.
+ *    - vars is a list of VAR names. If a CMT with the same name exists, the CMT become the line title and the variable the LEC expression.
  *  
  *  @param [in, out] tbl   TBL*     Table to modify
  *  @param [in]      def   char*    Table title or name of the CMT that must become the table title

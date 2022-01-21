@@ -163,7 +163,7 @@ char    K_AggrChar;     // Replacement character in the aggregated names
  *  @param [in, out]    nname   char*   resulting name 
  *  @return             int
  *  
- *  @see KV_aggregate()
+ *  @see KV_aggregate() or https://iode.plan.be/doku.php?id=wsaggrsum
  */
 int K_aggr(char* pattern, char* ename, char* nname)
 {

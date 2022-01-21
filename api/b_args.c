@@ -101,10 +101,10 @@ char **B_vtom_chk(char* arg, int nb)
  *  Executes the function fn(char*, char*) for each string in the table of strings argv.
  *  Stops as soon as fn(arg) returns a non null value.
  *  
- *  Syntax of fn in client is not null:
+ *  Syntax of fn if client is not null:
  *      int fn(char* arg, char* client)
  *  
- *  Syntax of fn in client is null:
+ *  Syntax of fn if client is null:
  *      int fn(char* arg)
  *   
  *  @param [in] argv    char**                  table of strings
@@ -183,7 +183,7 @@ int B_get_arg0(char* arg0, char*arg, int lg)
 
 /**
  *  Returns the position of a char in a string. 
- *  If not found, returns 0, which is considered as the defaut position.
+ *  If not found, returns 0, which is considered as the default position.
  *  
  *  ch is translated in uppercase before searching. str must therefore be in uppercase.
  *  

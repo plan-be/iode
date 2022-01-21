@@ -121,7 +121,7 @@ done :
 
 
 /**
- *  Transforms a LEC equation "in place" to add dynamic adjustment. See E_dynadj for details.
+ *  Transforms a LEC equation "in place" to add a dynamic adjustment. See E_dynadj for details.
  *  
  *    
  *  @param [in]      int    method    type of dyn adjust (0 or 1, see above)
