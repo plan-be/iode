@@ -8,7 +8,7 @@
  *      void E_free(EQ* eq)                                                     Frees an EQ struct and all its elements
  *      int E_split_eq(char* lec, char** lhs, char** rhs)                       Extracts the left and right sides of a lec equation
  *      int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)  Transforms a LEC equation to add dynamic adjustment
- *      E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)           Transforms a LEC equation "in place" to add dynamic adjustment
+ *      E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)           Transforms a LEC equation "in place" to add a dynamic adjustment
  *
  */
 #include "iode.h"
@@ -65,7 +65,7 @@ done :
 
 
 /**
- *  Transforms a LEC equation to add dynamic adjustment.
+ *  Transforms a LEC equation to add a dynamic adjustment.
  *  
  *  For the equation LHS := RHS:
  *  
