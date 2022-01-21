@@ -71,7 +71,7 @@ char **B_ainit_chk(char* arg, ADEF* adef, int nb)
  *  Splits a string (generally a function argument) into a table of strings. 
  *  The possible string separators are the chars in B_SEPS (by default " ,\n\t").
  *  
- *  If nb if not null, checks that the number of parameters is equal to n. 
+ *  If nb is not null, checks that the number of parameters is equal to n. 
  *  
  *  On error, B_seterrn() is called and the function returns NULL.
  *  
