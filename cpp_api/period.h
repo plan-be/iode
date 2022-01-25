@@ -17,23 +17,7 @@ const static std::map<char, int> mPeriodicities =
 
 struct Period
 {
-	long year;
-	long position;	// position in the year
-	char periodicity;
-
-private:
-	/**
-     * see PER_atoper() function for details
-     */
-	void set_from_string(const std::string str_period)
-	{
-		PERIOD* new_period = PER_atoper(const_cast<char*>(str_period.c_str()));
-		if (new_period == NULL) throw std::runtime_error("Cannot create a new Period from string " + str_period);
-		year = new_period->p_y;
-		position = new_period->p_s;
-		periodicity = new_period->p_p;
-		SW_nfree(new_period);
-	}
+	PERIOD* c_period;
 
 public:
 	Period(const int year, const char periodicity, const int position)
@@ -47,30 +31,39 @@ public:
 		if (position < 1 || position > max_position) throw std::runtime_error("Invalid position " + std::to_string(position) + 
 			".\nValue of position argument must be in range [1, " + std::to_string(max_position) + "]");
 		// initialize class members
-		std::string str_period = std::to_string(year) + periodicity + std::to_string(position);
-		set_from_string(str_period);
+		c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
+		c_period->p_y = year;
+		c_period->p_p = periodicity;
+		c_period->p_s = position;
 	}
 
+	/**
+	 * same as PER_atoper() function
+	 */
 	Period(const std::string str_period)
 	{ 
-		set_from_string(str_period);
+		c_period = PER_atoper(const_cast<char*>(str_period.c_str()));
+		if (c_period == NULL) throw std::runtime_error("Cannot create a new Period from string " + str_period);
 	}
 
 	// We assume that the C period is valid (i.e. generated via the C API)
-	Period(const PERIOD* c_period) : year(c_period->p_y), position(c_period->p_s), periodicity(c_period->p_p) {};
-
-	PERIOD to_c_period() const
+	// NOTE : making a copy of the passed C structure to avoid Heap errors when the
+	//        destructor is called (the C structure may be already freed)
+	Period(PERIOD* c_period) : c_period(c_period) 
 	{
-		PERIOD period;
-		period.p_y = year;
-		period.p_s = position;
-		period.p_p = periodicity;
-		return period;
+		this->c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
+		memcpy(this->c_period, c_period, sizeof(PERIOD));
 	}
+
+	~Period()
+	{
+		SW_nfree(c_period);
+	}
+
 
 	int nb_periods_per_year() const
 	{
-		return PER_nb(periodicity);
+		return PER_nb(c_period->p_p);
 	}
 
 	/**
@@ -78,11 +71,10 @@ public:
 	 */
 	int difference(const Period& other) const
 	{
-		if (other.periodicity != periodicity) 
-			throw std::runtime_error("The two periods must share the same periodicity. Got " + std::string(1, periodicity) + " and " + std::string(1, other.periodicity));
-		PERIOD c_period = to_c_period();
-		PERIOD c_period2 = other.to_c_period();
-		return PER_diff_per(&c_period, &c_period2);
+		PERIOD* c_other = other.c_period;
+		if (c_other->p_p != c_period->p_p) 
+			throw std::runtime_error("The two periods must share the same periodicity. Got " + std::string(1, c_period->p_p) + " and " + std::string(1, c_other->p_p));
+		return PER_diff_per(c_period, c_other);
 	}
 
 	/**
@@ -90,10 +82,12 @@ public:
 	 */
 	Period shift(const int nb_periods)
 	{
-		PERIOD c_period = to_c_period();
-		// not calling SW_nfree() on new_period because PER_addper() returns a pointer to a STATIC structure
-		PERIOD* new_period = PER_addper(&c_period, nb_periods);
-		return Period(new_period);
+		// WARNING: PER_addper() returns a pointer to a STATIC structure
+		PERIOD* static_period = PER_addper(c_period, nb_periods);
+		// needed because the destructor of Period calls SW_nfree(c_period)
+		PERIOD shifted_period;
+		memcpy(&shifted_period, static_period, sizeof(PERIOD));
+		return Period(&shifted_period);
 	}
 
 	/**
@@ -101,15 +95,15 @@ public:
 	 */
 	std::string to_string() const
 	{
-		PERIOD c_period = to_c_period();
 		char ch_period[10];
-		PER_pertoa(&c_period, ch_period);
+		PER_pertoa(c_period, ch_period);
 		return std::string(ch_period);
 	}
 
 	bool operator==(const Period& other) const
 	{ 
-		return (year == other.year) && (position == other.position) && (periodicity == other.periodicity);
+		PERIOD* c_other = other.c_period;
+		return (c_period->p_y == c_other->p_y) && (c_period->p_p == c_other->p_p) && (c_period->p_s == c_other->p_s);
 	}
 
 	// TODO : implement operators > and < ?  
