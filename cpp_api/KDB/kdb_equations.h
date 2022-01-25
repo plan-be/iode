@@ -137,11 +137,11 @@ public:
         if (from.empty() || to.empty())
         {
             Sample sample = getSample(name);
-            if (from.empty()) from = sample.start_period->to_string();
-            if (to.empty())   to = sample.end_period->to_string();
+            if (from.empty()) from = sample.start_period().to_string();
+            if (to.empty())   to = sample.end_period().to_string();
         }
         Sample new_sample = Sample(from, to);
-        setEquation(name, "", "", 0, &new_sample.to_c_sample(), "", "", NULL, 0);
+        setEquation(name, "", "", 0, new_sample.c_sample, "", "", NULL, 0);
     }
 
     // -- comment --

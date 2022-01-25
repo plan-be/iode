@@ -19,16 +19,6 @@ TEST(TestPeriod, Create)
 	char buf[10] = "2020Y1";
 	PERIOD* c_period = PER_atoper(buf);
 	Period period3(c_period);
-	SW_nfree(c_period);
-}
-
-TEST(TestPeriod, To_c_period)
-{
-	Period period(2020, 'Y', 1);
-	PERIOD c_period = period.to_c_period();
-	EXPECT_EQ(c_period.p_y, 2020);
-	EXPECT_EQ(c_period.p_s, 1);
-	EXPECT_EQ(c_period.p_p, 'Y');
 }
 
 TEST(TestPeriod, NbPeriodsPerYear)
