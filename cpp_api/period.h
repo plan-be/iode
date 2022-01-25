@@ -15,25 +15,6 @@ const static std::map<char, int> mPeriodicities =
 };
 
 
-/**
- * same as PER_nb() function
- */ 
-inline int nb_periods_per_year(char periodicity)
-{
-	int nb_per;
-	periodicity = (char) toupper(periodicity);
-	try 
-	{
-		nb_per = mPeriodicities.at(periodicity);
-	}
-	catch (std::out_of_range)
-	{
-		nb_per = -1;
-	}
-	return nb_per;
-}
-
-
 struct Period
 {
 	long year;
@@ -80,7 +61,7 @@ public:
 
 	int nb_periods_per_year() const
 	{
-		return ::nb_periods_per_year(periodicity);
+		return PER_nb(periodicity);
 	}
 
 	/**
