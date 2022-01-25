@@ -8,7 +8,7 @@
 class KDBEquations : public KDBAbstract
 {
 public:
-    KDBEquations() : KDBAbstract(EQUATIONS) {};
+    KDBEquations() : KDBAbstract(I_EQUATIONS) {};
 
     // TODO: create a Class Equation (with a destructor)
     // KEVAL returns a struct with undifined elements ???
@@ -69,7 +69,7 @@ public:
     std::string getMethod(const int pos) const
     {
         int i = (int) KEMETH(getKDB(), pos);
-        if (i > NB_EQ_METHODS) i = 0;
+        if (i > I_NB_EQ_METHODS) i = 0;
         return vEquationMethods[i];
     }    
     
@@ -88,7 +88,7 @@ public:
     void setMethod(const std::string name, std::string method)
     {
         int i_method = 0;
-        for (int i = 0; i < NB_EQ_METHODS; i++) if (method == vEquationMethods[i]) i_method = i;
+        for (int i = 0; i < I_NB_EQ_METHODS; i++) if (method == vEquationMethods[i]) i_method = i;
         setEquation(name, "", "", i_method, NULL, "", "", NULL, 0);
     }
 

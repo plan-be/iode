@@ -7,7 +7,7 @@ class KDBComments : public KDBAbstract
 {
 
 public:
-    KDBComments() : KDBAbstract(COMMENTS) {};
+    KDBComments() : KDBAbstract(I_COMMENTS) {};
 
     Comment get(const int pos) const 
     {
