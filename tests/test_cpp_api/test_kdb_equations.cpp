@@ -323,11 +323,11 @@ TEST_F(KDBEquationsTest, GetTests)
 
     // by position
     tests = kdb.getTests(pos);
-    for (int i = 0; i++; i < EQS_NBTESTS) EXPECT_NEAR(tests[i], expected_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], expected_tests[i], 1.e-10);
 
     // by name
     tests = kdb.getTests(name);
-    for (int i = 0; i++; i < EQS_NBTESTS) EXPECT_NEAR(tests[i], expected_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], expected_tests[i], 1.e-10);
 }
 
 TEST_F(KDBEquationsTest, SetTests)
@@ -341,10 +341,10 @@ TEST_F(KDBEquationsTest, SetTests)
     // by position
     kdb.setTests(pos, new_tests);
     tests = kdb.getTests(pos);
-    for (int i = 0; i++; i < EQS_NBTESTS) EXPECT_NEAR(tests[i], new_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], new_tests[i], 1.e-10);
 
     // by name
     kdb.setTests(name, new_tests);
     tests = kdb.getTests(name);
-    for (int i = 0; i++; i < EQS_NBTESTS) EXPECT_NEAR(tests[i], new_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], new_tests[i], 1.e-10);
 }
