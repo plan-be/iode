@@ -5,7 +5,12 @@
 TEST(TestPeriod, Create) 
 {
 	// passing year, position in the year and periodicity
-	Period period(2020, 1, 'Y');
+	Period period(2020, 'Y', 1);
+
+	// Invalid periodicity
+	EXPECT_THROW(Period(2020, 'T', 1), std::runtime_error);
+	// Invalid position
+	EXPECT_THROW(Period(2020, 'Q', 5), std::runtime_error);
 
 	// passing a string
 	Period period2("2020Y1");
@@ -19,7 +24,7 @@ TEST(TestPeriod, Create)
 
 TEST(TestPeriod, To_c_period)
 {
-	Period period(2020, 1, 'Y');
+	Period period(2020, 'Y', 1);
 	PERIOD c_period = period.to_c_period();
 	EXPECT_EQ(c_period.p_y, 2020);
 	EXPECT_EQ(c_period.p_s, 1);
@@ -30,7 +35,7 @@ TEST(TestPeriod, NbPeriodsPerYear)
 {
 	for (auto const& [periodicity, expected_nb_periods] : mPeriodicities)
 	{
-		Period period(2020, 1, periodicity);
+		Period period(2020, periodicity, 1);
 		int nb_periods = period.nb_periods_per_year();
 		EXPECT_EQ(nb_periods, expected_nb_periods);
 	}
@@ -43,20 +48,20 @@ TEST(TestPeriod, Difference)
 	int year2 = 2020;
 
 	// periodicity = Y
-	Period periodY1(year1, 1, 'Y');
-	Period periodY2(year2, 1, 'Y');
+	Period periodY1(year1, 'Y', 1);
+	Period periodY2(year2, 'Y', 1);
 	nb_periods = periodY2.difference(periodY1);
 	EXPECT_EQ(nb_periods, 5);
 
 	// periodicity = Q
-	Period periodQ1(year1, 2, 'Q');
-	Period periodQ2(year2, 3, 'Q');
+	Period periodQ1(year1, 'Q', 2);
+	Period periodQ2(year2, 'Q', 3);
 	nb_periods = periodQ2.difference(periodQ1);
 	EXPECT_EQ(nb_periods, 21);
 
 	// periodicity = W
-	Period periodW1(year1, 10, 'W');
-	Period periodW2(year2, 50, 'W');
+	Period periodW1(year1, 'W', 10);
+	Period periodW2(year2, 'W', 50);
 	nb_periods = periodW2.difference(periodW1);
 	EXPECT_EQ(nb_periods, 300);
 }
@@ -67,20 +72,20 @@ TEST(TestPeriod, Shift)
 	int year2 = 2020;
 
 	// periodicity = Y
-	Period periodY1(year1, 1, 'Y');
-	Period periodY2(year2, 1, 'Y');
+	Period periodY1(year1, 'Y', 1);
+	Period periodY2(year2, 'Y', 1);
 	Period shifted_periodY = periodY1.shift(5);
 	EXPECT_EQ(shifted_periodY, periodY2);
 
 	// periodicity = Q
-	Period periodQ1(year1, 2, 'Q');
-	Period periodQ2(year2, 3, 'Q');
+	Period periodQ1(year1, 'Q', 2);
+	Period periodQ2(year2, 'Q', 3);
 	Period shifted_periodQ = periodQ1.shift(21);
 	EXPECT_EQ(shifted_periodQ, periodQ2);
 
 	// periodicity = W
-	Period periodW1(year1, 10, 'W');
-	Period periodW2(year2, 50, 'W');
+	Period periodW1(year1, 'W', 10);
+	Period periodW2(year2, 'W', 50);
 	Period shifted_periodW = periodW1.shift(300);
 	EXPECT_EQ(shifted_periodW, periodW2);
 }

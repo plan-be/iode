@@ -36,8 +36,17 @@ private:
 	}
 
 public:
-	Period(const int year, const int position, const char periodicity)
+	Period(const int year, const char periodicity, const int position)
 	{
+		int max_position;
+		// check periodicity
+		if (mPeriodicities.count(periodicity) == 0) throw std::runtime_error("Invalid periodicity " + std::string(1, periodicity) + 
+			".\nPossible values for the periodicity are " + std::string(L_PERIOD_CH));
+		// check position
+		max_position = mPeriodicities.at(periodicity);
+		if (position < 1 || position > max_position) throw std::runtime_error("Invalid position " + std::to_string(position) + 
+			".\nValue of position argument must be in range [1, " + std::to_string(max_position) + "]");
+		// initialize class members
 		std::string str_period = std::to_string(year) + periodicity + std::to_string(position);
 		set_from_string(str_period);
 	}
@@ -70,7 +79,7 @@ public:
 	int difference(const Period& other) const
 	{
 		if (other.periodicity != periodicity) 
-			throw std::runtime_error("The two periods must share the same periodicity. Got " + std::to_string(periodicity) + " and " + std::to_string(other.periodicity));
+			throw std::runtime_error("The two periods must share the same periodicity. Got " + std::string(1, periodicity) + " and " + std::string(1, other.periodicity));
 		PERIOD c_period = to_c_period();
 		PERIOD c_period2 = other.to_c_period();
 		return PER_diff_per(&c_period, &c_period2);
