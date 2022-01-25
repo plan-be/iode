@@ -4,7 +4,7 @@
 
 #ifdef _WIN32 // valid for both 32 and 64 bits
     #include <Windows.h>
-#elif
+#else
     #define CP_OEMCP -1
 #endif
 
