@@ -29,57 +29,57 @@ const static char NAN_REP[3] = "--";
   */
 
 
-// TODO: rename K_(...) as below in C api + group them in an enum
+// TODO: replace K by I as below in C api + group them in an enum
 enum EnumIodeType
 {
-    COMMENTS = K_CMT,
-    EQUATIONS = K_EQS,
-    IDENTITIES = K_IDT,
-    LISTS = K_LST,
-    SCALARS = K_SCL,
-    TABLES = K_TBL,
-    VARIABLES = K_VAR
+    I_COMMENTS = K_CMT,
+    I_EQUATIONS = K_EQS,
+    I_IDENTITIES = K_IDT,
+    I_LISTS = K_LST,
+    I_SCALARS = K_SCL,
+    I_TABLES = K_TBL,
+    I_VARIABLES = K_VAR
 };
 
-// TODO: rename K_NBR_OBJ as NB_IODE_TYPES in C api
-const static int NB_IODE_TYPES = K_NBR_OBJ;
+// TODO: rename K_NBR_OBJ as I_NB_TYPES in C api
+const static int I_NB_TYPES = K_NBR_OBJ;
 
-const static std::array<std::string, NB_IODE_TYPES> vIodeTypes = { "Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables" };
+const static std::array<std::string, I_NB_TYPES> vIodeTypes = { "Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables" };
 
 
-// TODO: remove K as below in C api + group them in an enum
+// TODO: replace K by I as below in C api + group them in an enum
 enum EnumLang
 {
-    T_ENGLISH = KT_ENGLISH,
-    T_DUTCH = KT_DUTCH,
-    T_FRENCH = KT_FRENCH,
+    IT_ENGLISH = KT_ENGLISH,
+    IT_DUTCH = KT_DUTCH,
+    IT_FRENCH = KT_FRENCH,
 };
 
-const static int NB_LANGS = 3;
+const static int I_NB_LANGS = 3;
 
 const static std::map<std::string, EnumLang> mLangs =
 { 
-    {"English", T_ENGLISH},
-    {"Dutch", T_DUTCH},
-    {"French", T_FRENCH}
+    {"English", IT_ENGLISH},
+    {"Dutch", IT_DUTCH},
+    {"French", IT_FRENCH}
 };
 
 
 enum EnumIodeFile
 {
-    COMMENTS_FILE,
-    EQUATIONS_FILE,
-    IDENTITIES_FILE,
-    LISTS_FILE,
-    SCALARS_FILE,
-    TABLES_FILE,
-    VARIABLES_FILE,
-    SETTINGS_FILE,
-    LOGS_FILE,
-    ANY_FILE
+    I_COMMENTS_FILE,
+    I_EQUATIONS_FILE,
+    I_IDENTITIES_FILE,
+    I_LISTS_FILE,
+    I_SCALARS_FILE,
+    I_TABLES_FILE,
+    I_VARIABLES_FILE,
+    I_SETTINGS_FILE,
+    I_LOGS_FILE,
+    I_ANY_FILE
 };
 
-const static int NB_FILE_EXT = 10;
+const static int I_NB_FILE_EXT = 10;
 
 
 struct IodeFileExtension
@@ -89,7 +89,7 @@ struct IodeFileExtension
     std::string ascii;
 };
 
-const static std::array<IodeFileExtension, NB_FILE_EXT> vFileExtensions =
+const static std::array<IodeFileExtension, I_NB_FILE_EXT> vFileExtensions =
 { {
     {"Comments", "cmt", "ac"},
     {"Equations", "eqs", "ae"},
@@ -104,25 +104,25 @@ const static std::array<IodeFileExtension, NB_FILE_EXT> vFileExtensions =
 } };
 
 
-// TODO: remove K as below in C api + group them in an enum
+// TODO: replace K by I as below in C api + group them in an enum
 enum EnumIodeCase
 {
-    UPPER = K_UPPER,
-    LOWER = K_LOWER,
-    ASIS = K_ASIS
+    I_UPPER = K_UPPER,
+    I_LOWER = K_LOWER,
+    I_ASIS = K_ASIS
 };
 
 
-// TODO: remove K as below in C api + group them in an enum
+// TODO: replace K by I as below in C api + group them in an enum
 enum EnumIodeEquationMethod
 {
-    E_LSQ = KE_LSQ,
-    E_ZELLNER = KE_ZEL,
-    E_INSTRUMENTAL = KE_INF,
-    E_GLS = KE_GLS,
-    E_MAX_LIKELIHOOD = KE_MAXLIK 
+    IE_LSQ = KE_LSQ,
+    IE_ZELLNER = KE_ZEL,
+    IE_INSTRUMENTAL = KE_INF,
+    IE_GLS = KE_GLS,
+    IE_MAX_LIKELIHOOD = KE_MAXLIK 
 };
 
-const static int NB_EQ_METHODS = 5;
+const static int I_NB_EQ_METHODS = 5;
 
-const static std::array<std::string, NB_EQ_METHODS> vEquationMethods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
+const static std::array<std::string, I_NB_EQ_METHODS> vEquationMethods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
