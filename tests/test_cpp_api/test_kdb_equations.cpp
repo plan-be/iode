@@ -260,7 +260,7 @@ TEST_F(KDBEquationsTest, SetInstruments)
 
     std::string instruments;
     // TODO : find a realistic value for new_instruments
-    std::string new_instruments = "no_idea_what_to_put_here";
+    std::string new_instruments = "random_text";
 
     // by position
     kdb.setInstruments(pos, new_instruments);
@@ -319,15 +319,15 @@ TEST_F(KDBEquationsTest, GetTests)
     std::string name = kdb.getName(pos);
 
     std::array<float, EQS_NBTESTS> tests;
-    std::array<float, EQS_NBTESTS> expected_tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.00192715, 23.5458, 32.2732, 0.821761, 0.796299, 2.32935, 83.8075};
+    std::array<float, EQS_NBTESTS> expected_tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
 
     // by position
     tests = kdb.getTests(pos);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], expected_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], expected_tests[i]);
 
     // by name
     tests = kdb.getTests(name);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], expected_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], expected_tests[i]);
 }
 
 TEST_F(KDBEquationsTest, SetTests)
@@ -336,15 +336,15 @@ TEST_F(KDBEquationsTest, SetTests)
     std::string name = kdb.getName(1);
 
     std::array<float, EQS_NBTESTS> tests;
-    std::array<float, EQS_NBTESTS> new_tests = { 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11.};
+    std::array<float, EQS_NBTESTS> new_tests = { 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11. };
 
     // by position
     kdb.setTests(pos, new_tests);
     tests = kdb.getTests(pos);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], new_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], new_tests[i]);
 
     // by name
     kdb.setTests(name, new_tests);
     tests = kdb.getTests(name);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_NEAR(tests[i], new_tests[i], 1.e-10);
+    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], new_tests[i]);
 }
