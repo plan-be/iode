@@ -221,7 +221,7 @@ public:
     {
         KDB* kdb = getKDB();
         std::array<float, EQS_NBTESTS> tests;
-        float* c_tests = (float*)K_oval(kdb, pos, 9);
+        float* c_tests = (float*) K_oval(kdb, pos, 9);
         for (int i = 0; i < EQS_NBTESTS; i++) tests[i] = c_tests[i];
         return tests;
     }
