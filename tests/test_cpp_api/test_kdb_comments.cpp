@@ -53,8 +53,6 @@ TEST_F(KDBCommentsTest, Rename)
     old_name = kdb.getName(0);
     EXPECT_EQ(old_name, "ACAF");
     new_pos = kdb.rename(old_name, "NEW_NAME");
-    // temporary fix
-    new_pos -= 1;
     EXPECT_EQ(kdb.getName(new_pos), "NEW_NAME");
 
     // expect errors 
@@ -67,11 +65,8 @@ TEST_F(KDBCommentsTest, Rename)
     new_name = kdb.getName(3);
     EXPECT_THROW(kdb.rename(old_name, new_name), std::runtime_error);
     
-    
     // set by position
     new_pos = kdb.setName(1, "NEW_POS");
-    // temporary fix
-    new_pos -= 1;
     EXPECT_EQ(kdb.getName(new_pos), "NEW_POS");
 }
 

@@ -92,8 +92,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\$(Platform)\scr4;$(SolutionDir)$(Configuration)\$(Platform)\api;$(SolutionDir)out\$(Configuration)\$(Platform)\cpp_api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>iodeapi.lib;s4iode.lib;iodecppapi.lib;ws2_32.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)out\$(Configuration)\$(Platform)\scr4;$(SolutionDir)out\$(Configuration)\$(Platform)\api;$(SolutionDir)out\$(Configuration)\$(Platform)\cpp_api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>iodeapi.lib;scr4iode.lib;iodecppapi.lib;ws2_32.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
   </ItemDefinitionGroup>
@@ -130,8 +130,8 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\$(Platform)\scr4;$(SolutionDir)$(Configuration)\$(Platform)\api;$(SolutionDir)out\$(Configuration)\$(Platform)\cpp_api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>iodeapi.lib;s4iode.lib;iodecppapi.lib;ws2_32.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)out\$(Configuration)\$(Platform)\scr4;$(SolutionDir)out\$(Configuration)\$(Platform)\api;$(SolutionDir)out\$(Configuration)\$(Platform)\cpp_api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>iodeapi.lib;scr4iode.lib;iodecppapi.lib;ws2_32.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
   </ItemDefinitionGroup>
