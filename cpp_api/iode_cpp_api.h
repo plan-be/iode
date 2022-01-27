@@ -9,3 +9,4 @@
 #include "KDB/kdb_identities.h"
 #include "KDB/kdb_lists.h"
 #include "KDB/kdb_scalars.h"
+#include "KDB/kdb_tables.h"
