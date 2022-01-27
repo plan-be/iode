@@ -5,7 +5,7 @@
 #include "abstract_table_model.h"
 
 
-class CommentsModel : public IODEAbstractTableModel<Comments>
+class CommentsModel : public IODEAbstractTableModel<KDBComments>
 {
 	Q_OBJECT
 
@@ -17,11 +17,11 @@ private:
 	{
         if (col == 0)
         {
-            return QVariant(QString(kdb.getObjectName(row)));
+            return QVariant(QString::fromStdString(kdb.getName(row)));
         }
         else
         {
-            return QVariant(QString(kdb.getObjectValue(row)));
+            return QVariant(QString::fromStdString(kdb.get(row)));
         }
 	}
 
@@ -29,11 +29,7 @@ private:
     { 
 		try
 		{
-			QString s_value = value.toString();
-			char* comment = new char[s_value.size() + 1];
-			strcpy(comment, s_value.toUtf8().data());
-			kdb.setObjectValue(row, comment);
-			delete[] comment;
+			kdb.set(row, value.toString().toStdString());
 			return true;
 		}
 		catch (const std::runtime_error& e)

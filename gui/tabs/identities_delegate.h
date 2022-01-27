@@ -8,7 +8,7 @@ class IdentitiesDelegate : public TextDelegate
 	Q_OBJECT
 
 public:
-	IdentitiesDelegate(QObject* parent = nullptr) : TextDelegate(UPPER, parent) {}
+	IdentitiesDelegate(QObject* parent = nullptr) : TextDelegate(I_UPPER, parent) {}
 
 	~IdentitiesDelegate() {}
 };

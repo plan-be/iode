@@ -12,5 +12,5 @@ class EquationsView : public AbstractTableView<EquationsModel>
 	Q_OBJECT
 
 public:
-	EquationsView(QWidget* parent = nullptr) : AbstractTableView(EQUATIONS, new EquationsDelegate(parent), parent) {};
+	EquationsView(QWidget* parent = nullptr) : AbstractTableView(I_EQUATIONS, new EquationsDelegate(parent), parent) {};
 };

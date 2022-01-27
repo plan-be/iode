@@ -8,7 +8,7 @@ class TablesDelegate : public TextDelegate
 	Q_OBJECT
 
 public:
-	TablesDelegate(QObject* parent = nullptr) : TextDelegate(UPPER, parent) {}
+	TablesDelegate(QObject* parent = nullptr) : TextDelegate(I_UPPER, parent) {}
 
 	~TablesDelegate() {}
 };

@@ -15,13 +15,13 @@ QIodeMenuWorkspaceClear::QIodeMenuWorkspaceClear(QSettings& settings, QWidget* p
 {
 	setupUi(this);
 
-    lineEdit_nb_comments->setText(QString::number(Comments().count()));
-    lineEdit_nb_equations->setText(QString::number(Equations().count()));
-    lineEdit_nb_identities->setText(QString::number(Identities().count()));
-    lineEdit_nb_lists->setText(QString::number(Lists().count()));
-    lineEdit_nb_scalars->setText(QString::number(Scalars().count()));
-    lineEdit_nb_tables->setText(QString::number(Tables().count()));
-    lineEdit_nb_variables->setText(QString::number(Variables().count()));
+    lineEdit_nb_comments->setText(QString::number(KDBComments().count()));
+    lineEdit_nb_equations->setText(QString::number(KDBEquations().count()));
+    lineEdit_nb_identities->setText(QString::number(KDBIdentities().count()));
+    lineEdit_nb_lists->setText(QString::number(KDBLists().count()));
+    lineEdit_nb_scalars->setText(QString::number(KDBScalars().count()));
+    lineEdit_nb_tables->setText(QString::number(KDBTables().count()));
+    lineEdit_nb_variables->setText(QString::number(KDBVariables().count()));
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -34,12 +34,13 @@ QIodeMenuWorkspaceClear::~QIodeMenuWorkspaceClear()
 {
 }
 
-void QIodeMenuWorkspaceClear::clear_component(const EnumIodeType e_type, const bool accept)
+void QIodeMenuWorkspaceClear::clear_component(KDBAbstract& kdb, const bool accept)
 {
     try
     {
-        std::string s_type = vIodeTypes[e_type];
-        CPP_WsClear(e_type, s_type);
+        int i_type = kdb.getIODEType();
+        std::string s_type = vIodeTypes[i_type];
+        kdb.clear();
 
         if (accept) this->accept();
     }
@@ -51,48 +52,63 @@ void QIodeMenuWorkspaceClear::clear_component(const EnumIodeType e_type, const b
 
 void QIodeMenuWorkspaceClear::clear_comments()
 {
-    clear_component(COMMENTS);
+    KDBComments kdb = KDBComments();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear_equations()
 {
-    clear_component(EQUATIONS);
+    KDBEquations kdb = KDBEquations();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear_identities()
 {
-    clear_component(IDENTITIES);
+    KDBIdentities kdb = KDBIdentities();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear_lists()
 {
-    clear_component(LISTS);
+    KDBLists kdb = KDBLists();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear_scalars()
 {
-    clear_component(SCALARS);
+    KDBScalars kdb = KDBScalars();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear_tables()
 {
-    clear_component(TABLES);
+    KDBTables kdb = KDBTables();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear_variables()
 {
-    clear_component(VARIABLES);
+    KDBVariables kdb = KDBVariables();
+    clear_component(kdb);
 }
 
 void QIodeMenuWorkspaceClear::clear()
 {
-    clear_component(COMMENTS, false);
-    clear_component(EQUATIONS, false);
-    clear_component(IDENTITIES, false);
-    clear_component(LISTS, false);
-    clear_component(SCALARS, false);
-    clear_component(TABLES, false);
-    clear_component(VARIABLES, false);
+    KDBComments kdb_comments = KDBComments();
+    KDBEquations kdb_equations = KDBEquations();
+    KDBIdentities kdb_identities = KDBIdentities();
+    KDBLists kdb_lists = KDBLists();
+    KDBScalars kdb_scalars = KDBScalars();
+    KDBTables kdb_tables = KDBTables();
+    KDBVariables kdb_variables = KDBVariables();
+
+    clear_component(kdb_comments, false);
+    clear_component(kdb_equations, false);
+    clear_component(kdb_identities, false);
+    clear_component(kdb_lists, false);
+    clear_component(kdb_scalars, false);
+    clear_component(kdb_tables, false);
+    clear_component(kdb_variables, false);
 
     this->accept();
 }

@@ -12,5 +12,5 @@ class TablesView : public AbstractTableView<TablesModel>
 	Q_OBJECT
 
 public:
-	TablesView(QWidget* parent = nullptr) : AbstractTableView(TABLES, new TablesDelegate(parent), parent) {};
+	TablesView(QWidget* parent = nullptr) : AbstractTableView(I_TABLES, new TablesDelegate(parent), parent) {};
 };

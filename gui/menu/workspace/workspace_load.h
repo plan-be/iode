@@ -5,7 +5,6 @@
 #include <QString>
 
 #include "ui_workspace_load.h"
-#include "../../bridge.h"
 #include "../../utils.h"
 #include "../../wrapper_classes.h"
 
@@ -42,7 +41,7 @@ public:
 	~QIodeMenuWorkspaceLoad();
 
 private:
-    void load_component(const EnumIodeType e_type, const bool accept = true);
+    void load_component(KDBAbstract& kdb, const bool accept = true);
 
 public slots:
     void load_comments();

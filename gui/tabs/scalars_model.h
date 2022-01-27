@@ -5,7 +5,7 @@
 #include "abstract_table_model.h"
 
 
-class ScalarsModel : public IODEAbstractTableModel<Scalars>
+class ScalarsModel : public IODEAbstractTableModel<KDBScalars>
 {
 	Q_OBJECT
 
@@ -16,12 +16,12 @@ private:
 	QVariant dataCell(const int row, const int col) const
 	{
 		QVariant value;
-		Scalar* scalar = kdb.getObjectValue(row);
+		Scalar* scalar = kdb.get(row);
 
 		switch (col)
 		{
 		case 0:
-			value = QString(kdb.getObjectName(row));
+			value = QString::fromStdString(kdb.getName(row));
 			break;
 		case 1:
 			value = L_ISAN(scalar->val) ? QString::number(scalar->val, 'g', 3) : NAN_REP;

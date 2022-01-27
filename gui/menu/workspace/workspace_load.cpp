@@ -15,13 +15,13 @@ QIodeMenuWorkspaceLoad::QIodeMenuWorkspaceLoad(QSettings& settings, QWidget* par
 {
 	setupUi(this);
 
-    mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, COMMENTS_FILE, EXISTING_FILE);
-    mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, EQUATIONS_FILE, EXISTING_FILE);
-    mapFields["Identities"] = new WrapperFileChooser(pushButton_identities->text(), *fileChooser_identities, OPTIONAL_FIELD, IDENTITIES_FILE, EXISTING_FILE);
-    mapFields["Lists"] = new WrapperFileChooser(pushButton_lists->text(), *fileChooser_lists, OPTIONAL_FIELD, LISTS_FILE, EXISTING_FILE);
-    mapFields["Scalars"] = new WrapperFileChooser(pushButton_scalars->text(), *fileChooser_scalars, OPTIONAL_FIELD, SCALARS_FILE, EXISTING_FILE);
-    mapFields["Tables"] = new WrapperFileChooser(pushButton_tables->text(), *fileChooser_tables, OPTIONAL_FIELD, TABLES_FILE, EXISTING_FILE);
-    mapFields["Variables"] = new WrapperFileChooser(pushButton_variables->text(), *fileChooser_variables, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, I_COMMENTS_FILE, EXISTING_FILE);
+    mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, I_EQUATIONS_FILE, EXISTING_FILE);
+    mapFields["Identities"] = new WrapperFileChooser(pushButton_identities->text(), *fileChooser_identities, OPTIONAL_FIELD, I_IDENTITIES_FILE, EXISTING_FILE);
+    mapFields["Lists"] = new WrapperFileChooser(pushButton_lists->text(), *fileChooser_lists, OPTIONAL_FIELD, I_LISTS_FILE, EXISTING_FILE);
+    mapFields["Scalars"] = new WrapperFileChooser(pushButton_scalars->text(), *fileChooser_scalars, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
+    mapFields["Tables"] = new WrapperFileChooser(pushButton_tables->text(), *fileChooser_tables, OPTIONAL_FIELD, I_TABLES_FILE, EXISTING_FILE);
+    mapFields["Variables"] = new WrapperFileChooser(pushButton_variables->text(), *fileChooser_variables, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -34,11 +34,12 @@ QIodeMenuWorkspaceLoad::~QIodeMenuWorkspaceLoad()
 {
 }
 
-void QIodeMenuWorkspaceLoad::load_component(const EnumIodeType e_type, const bool accept)
+void QIodeMenuWorkspaceLoad::load_component(KDBAbstract& kdb, const bool accept)
 {
     try
     {
-        std::string s_type = vIodeTypes[e_type];
+        int i_type = kdb.getIODEType();
+        std::string s_type = vIodeTypes[i_type];
         QString qs_type = QString::fromStdString(s_type);
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(qs_type));
         QString filepath = field_filepath->extractAndVerify();
@@ -49,7 +50,7 @@ void QIodeMenuWorkspaceLoad::load_component(const EnumIodeType e_type, const boo
             QMessageBox::warning(this, tr("WARNING"), QString("Cannot load %1. Filepath is empty.").arg(qs_type));
             return;
         }
-        CPP_WsLoad(filepath.toStdString(), e_type, s_type);
+        kdb.load(filepath.toStdString());
 
         if (accept) this->accept();
     }
@@ -61,48 +62,63 @@ void QIodeMenuWorkspaceLoad::load_component(const EnumIodeType e_type, const boo
 
 void QIodeMenuWorkspaceLoad::load_comments()
 {
-    load_component(COMMENTS);
+    KDBComments kdb = KDBComments();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load_equations()
 {
-    load_component(EQUATIONS);
+    KDBEquations kdb = KDBEquations();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load_identities()
 {
-    load_component(IDENTITIES);
+    KDBIdentities kdb = KDBIdentities();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load_lists()
 {
-    load_component(LISTS);
+    KDBLists kdb = KDBLists();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load_scalars()
 {
-    load_component(SCALARS);
+    KDBScalars kdb = KDBScalars();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load_tables()
 {
-    load_component(TABLES);
+    KDBTables kdb = KDBTables();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load_variables()
 {
-    load_component(VARIABLES);
+    KDBVariables kdb = KDBVariables();
+    load_component(kdb);
 }
 
 void QIodeMenuWorkspaceLoad::load()
 {
-    load_component(COMMENTS, false);
-    load_component(EQUATIONS, false);
-    load_component(IDENTITIES, false);
-    load_component(LISTS, false);
-    load_component(SCALARS, false);
-    load_component(TABLES, false);
-    load_component(VARIABLES, false);
+    KDBComments kdb_comments = KDBComments();
+    KDBEquations kdb_equations = KDBEquations();
+    KDBIdentities kdb_identities = KDBIdentities();
+    KDBLists kdb_lists = KDBLists();
+    KDBScalars kdb_scalars = KDBScalars();
+    KDBTables kdb_tables = KDBTables();
+    KDBVariables kdb_variables = KDBVariables();
+
+    load_component(kdb_comments, false);
+    load_component(kdb_equations, false);
+    load_component(kdb_identities, false);
+    load_component(kdb_lists, false);
+    load_component(kdb_scalars, false);
+    load_component(kdb_tables, false);
+    load_component(kdb_variables, false);
 
     this->accept();
 }

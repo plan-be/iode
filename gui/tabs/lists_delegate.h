@@ -8,7 +8,7 @@ class ListsDelegate : public TextDelegate
 	Q_OBJECT
 
 public:
-	ListsDelegate(QObject* parent = nullptr) : TextDelegate(UPPER, parent) {}
+	ListsDelegate(QObject* parent = nullptr) : TextDelegate(I_UPPER, parent) {}
 
 	~ListsDelegate() {}
 };

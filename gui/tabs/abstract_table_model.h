@@ -9,7 +9,6 @@
 #include <QAbstractTableModel>
 
 #include "../utils.h"
-#include "../bridge.h"
 
 
 /* NOTE FOR THE DEVELOPPERS:
@@ -113,7 +112,7 @@ protected:
 		{
 			char* char_new_name = new char[new_name.size() + 1];
 			strcpy(char_new_name, new_name.toUtf8().data());
-			int pos = kdb.setObjectName(row, char_new_name);
+			int pos = kdb.setName(row, char_new_name);
 			delete[] char_new_name;
 			return true;
 		}

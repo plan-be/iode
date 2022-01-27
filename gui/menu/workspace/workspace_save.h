@@ -3,7 +3,6 @@
 #include <QWidget>
 
 #include "ui_workspace_save.h"
-#include "../../bridge.h"
 #include "../../utils.h"
 #include "../../wrapper_classes.h"
 
@@ -25,7 +24,7 @@ public:
 	~QIodeMenuWorkspaceSave();
 
 private:
-    void save_component(const EnumIodeType e_type, const bool accept = true);
+    void save_component(KDBAbstract& kdb, const bool accept = true);
 
 public slots:
     void save_comments();

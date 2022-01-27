@@ -3,7 +3,6 @@
 #include <QWidget>
 
 #include "ui_workspace_clear.h"
-#include "../../bridge.h"
 #include "../../utils.h"
 #include "../../wrapper_classes.h"
 
@@ -25,7 +24,7 @@ public:
 	~QIodeMenuWorkspaceClear();
 
 private:
-    void clear_component(const EnumIodeType e_type, const bool accept = true);
+    void clear_component(KDBAbstract& kdb, const bool accept = true);
 
 public slots:
     void clear_comments();

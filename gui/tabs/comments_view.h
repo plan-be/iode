@@ -12,5 +12,5 @@ class CommentsView : public AbstractTableView<CommentsModel>
 	Q_OBJECT
 
 public:
-	CommentsView(QWidget* parent = nullptr) : AbstractTableView(COMMENTS, new CommentsDelegate(parent), parent) {};
+	CommentsView(QWidget* parent = nullptr) : AbstractTableView(I_COMMENTS, new CommentsDelegate(parent), parent) {};
 };
