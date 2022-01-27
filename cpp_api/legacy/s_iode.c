@@ -5,7 +5,7 @@
  * copied/pasted from the /cmd/s_iode.c directory *
  * ********************************************** */
 
-#include "../api/iode.h"
+#include "../../api/iode.h"
 #include <stdio.h>
 
 /* ==== Annulations fonction HWND ==== */
@@ -17,19 +17,7 @@ HWND WscrGetMainWnd()
     return (HWND)NULL;
 }
 
-int Wprintf(char* fmt, ...)
-{
-    return 0;
-}
-
-int SCR_panic()
-{
-    fprintf(stderr, "Memory full. exit(2)\n");
-    exit(2);
-}
-
 // s_odbc
-int ODebugDetail = 0;
 
 #ifdef IODEWIN
 
@@ -48,11 +36,6 @@ int A2mGIF_HTML()
 }
 
 /* ====  A2mMessage  ==== */
-
-int A2mMessage(char* msg)
-{
-    return fprintf(stderr, "%-79.79s\n", msg);
-}
 
 int IODE_FORCEYES = 0;
 
@@ -109,48 +92,6 @@ int PG_display_error(char* a, char* b, char* c, char* d, char* e, char* f, char*
 int SCR_beep()
 {
     return printf("Beep");
-}
-
-/* ==== Annulations fonctions ISC_* de s_rdini.c ==== */
-
-FILE* ISC_fopen(char* filename, char* mode)
-{
-    return fopen(filename, mode);
-}
-
-int ISC_fclose(FILE* fd)
-{
-    return fclose(fd);
-}
-
-int ISC_unlink(char* filename)
-{
-    return unlink(filename);
-}
-
-int ISC_rename(char* oldname, char* newname)
-{
-    return rename(oldname, newname);
-}
-
-int ISC_read_line(FILE* fd, unsigned char* buf, int lg)
-{
-    return SCR_read_line(fd, buf, lg);
-}
-
-int ISC_fwrite(char* buf, int lg, int nb, FILE* fd)
-{
-    return fwrite(buf, lg, nb, fd);
-}
-
-int ISC_getc(FILE* fd)
-{
-    return getc(fd);
-}
-
-int ISC_putc(int ch, FILE* fd)
-{
-    return putc(ch, fd);
 }
 
 /* ==== Annulations fonctions de b_dde.c ==== */
