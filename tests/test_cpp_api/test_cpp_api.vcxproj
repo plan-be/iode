@@ -46,6 +46,7 @@
     <ClCompile Include="test_kdb_identities.cpp" />
     <ClCompile Include="test_kdb_lists.cpp" />
     <ClCompile Include="test_kdb_scalars.cpp" />
+    <ClCompile Include="test_kdb_tables.cpp" />
     <ClCompile Include="test_period.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
