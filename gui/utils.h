@@ -1,8 +1,9 @@
 #pragma once
 
 #pragma once
-#include "iode.h"
-#include "bridge.h"
+#include "../cpp_api/iode_cpp_api.h"
+
+#include <string>
 
 #include <QObject>
 #include <QVariant>

@@ -15,21 +15,21 @@ QIodeMenuWorkspaceSave::QIodeMenuWorkspaceSave(QSettings& settings, QWidget* par
 {
 	setupUi(this);
 
-    mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, COMMENTS_FILE, FILE_MAY_EXIST);
-    mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, EQUATIONS_FILE, FILE_MAY_EXIST);
-    mapFields["Identities"] = new WrapperFileChooser(pushButton_identities->text(), *fileChooser_identities, OPTIONAL_FIELD, IDENTITIES_FILE, FILE_MAY_EXIST);
-    mapFields["Lists"] = new WrapperFileChooser(pushButton_lists->text(), *fileChooser_lists, OPTIONAL_FIELD, LISTS_FILE, FILE_MAY_EXIST);
-    mapFields["Scalars"] = new WrapperFileChooser(pushButton_scalars->text(), *fileChooser_scalars, OPTIONAL_FIELD, SCALARS_FILE, FILE_MAY_EXIST);
-    mapFields["Tables"] = new WrapperFileChooser(pushButton_tables->text(), *fileChooser_tables, OPTIONAL_FIELD, TABLES_FILE, FILE_MAY_EXIST);
-    mapFields["Variables"] = new WrapperFileChooser(pushButton_variables->text(), *fileChooser_variables, OPTIONAL_FIELD, VARIABLES_FILE, FILE_MAY_EXIST);
+    mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, I_COMMENTS_FILE, FILE_MAY_EXIST);
+    mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, I_EQUATIONS_FILE, FILE_MAY_EXIST);
+    mapFields["Identities"] = new WrapperFileChooser(pushButton_identities->text(), *fileChooser_identities, OPTIONAL_FIELD, I_IDENTITIES_FILE, FILE_MAY_EXIST);
+    mapFields["Lists"] = new WrapperFileChooser(pushButton_lists->text(), *fileChooser_lists, OPTIONAL_FIELD, I_LISTS_FILE, FILE_MAY_EXIST);
+    mapFields["Scalars"] = new WrapperFileChooser(pushButton_scalars->text(), *fileChooser_scalars, OPTIONAL_FIELD, I_SCALARS_FILE, FILE_MAY_EXIST);
+    mapFields["Tables"] = new WrapperFileChooser(pushButton_tables->text(), *fileChooser_tables, OPTIONAL_FIELD, I_TABLES_FILE, FILE_MAY_EXIST);
+    mapFields["Variables"] = new WrapperFileChooser(pushButton_variables->text(), *fileChooser_variables, OPTIONAL_FIELD, I_VARIABLES_FILE, FILE_MAY_EXIST);
 
-    lineEdit_nb_comments->setText(QString::number(Comments().count()));
-    lineEdit_nb_equations->setText(QString::number(Equations().count()));
-    lineEdit_nb_identities->setText(QString::number(Identities().count()));
-    lineEdit_nb_lists->setText(QString::number(Lists().count()));
-    lineEdit_nb_scalars->setText(QString::number(Scalars().count()));
-    lineEdit_nb_tables->setText(QString::number(Tables().count()));
-    lineEdit_nb_variables->setText(QString::number(Variables().count()));
+    lineEdit_nb_comments->setText(QString::number(KDBComments().count()));
+    lineEdit_nb_equations->setText(QString::number(KDBEquations().count()));
+    lineEdit_nb_identities->setText(QString::number(KDBIdentities().count()));
+    lineEdit_nb_lists->setText(QString::number(KDBLists().count()));
+    lineEdit_nb_scalars->setText(QString::number(KDBScalars().count()));
+    lineEdit_nb_tables->setText(QString::number(KDBTables().count()));
+    lineEdit_nb_variables->setText(QString::number(KDBVariables().count()));
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -42,11 +42,12 @@ QIodeMenuWorkspaceSave::~QIodeMenuWorkspaceSave()
 {
 }
 
-void QIodeMenuWorkspaceSave::save_component(const EnumIodeType e_type, const bool accept)
+void QIodeMenuWorkspaceSave::save_component(KDBAbstract& kdb, const bool accept)
 {
     try
     {
-        std::string s_type = vIodeTypes[e_type];
+        int i_type = kdb.getIODEType();
+        std::string s_type = vIodeTypes[i_type];
         QString qs_type = QString::fromStdString(s_type);
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields.value(qs_type));
         QString filepath = field_filepath->extractAndVerify();
@@ -57,7 +58,7 @@ void QIodeMenuWorkspaceSave::save_component(const EnumIodeType e_type, const boo
             QMessageBox::warning(this, tr("WARNING"), QString("Cannot save %1. Filepath is empty.").arg(qs_type));
             return;
         }
-        CPP_WsSave(filepath.toStdString(), e_type, s_type);
+        kdb.save(filepath.toStdString());
 
         if (accept) this->accept();
     }
@@ -69,48 +70,63 @@ void QIodeMenuWorkspaceSave::save_component(const EnumIodeType e_type, const boo
 
 void QIodeMenuWorkspaceSave::save_comments()
 {
-    save_component(COMMENTS);
+    KDBComments kdb = KDBComments();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save_equations()
 {
-    save_component(EQUATIONS);
+    KDBEquations kdb = KDBEquations();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save_identities()
 {
-    save_component(IDENTITIES);
+    KDBIdentities kdb = KDBIdentities();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save_lists()
 {
-    save_component(LISTS);
+    KDBLists kdb = KDBLists();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save_scalars()
 {
-    save_component(SCALARS);
+    KDBScalars kdb = KDBScalars();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save_tables()
 {
-    save_component(TABLES);
+    KDBTables kdb = KDBTables();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save_variables()
 {
-    save_component(VARIABLES);
+    KDBVariables kdb = KDBVariables();
+    save_component(kdb);
 }
 
 void QIodeMenuWorkspaceSave::save()
 {
-    save_component(COMMENTS, false);
-    save_component(EQUATIONS, false);
-    save_component(IDENTITIES, false);
-    save_component(LISTS, false);
-    save_component(SCALARS, false);
-    save_component(TABLES, false);
-    save_component(VARIABLES, false);
+    KDBComments kdb_comments = KDBComments();
+    KDBEquations kdb_equations = KDBEquations();
+    KDBIdentities kdb_identities = KDBIdentities();
+    KDBLists kdb_lists = KDBLists();
+    KDBScalars kdb_scalars = KDBScalars();
+    KDBTables kdb_tables = KDBTables();
+    KDBVariables kdb_variables = KDBVariables();
+
+    save_component(kdb_comments, false);
+    save_component(kdb_equations, false);
+    save_component(kdb_identities, false);
+    save_component(kdb_lists, false);
+    save_component(kdb_scalars, false);
+    save_component(kdb_tables, false);
+    save_component(kdb_variables, false);
 
     this->accept();
 }

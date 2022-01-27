@@ -21,9 +21,6 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
-    <Filter Include="Source Files\legacy">
-      <UniqueIdentifier>{bb9de6cb-7f36-4fd6-9c46-fc5c73485e30}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\view">
       <UniqueIdentifier>{9771b2c6-f45c-471a-a9f3-770a759121ab}</UniqueIdentifier>
     </Filter>
@@ -68,15 +65,6 @@
     <ClCompile Include="main_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="legacy\k_errorv.c">
-      <Filter>Source Files\legacy</Filter>
-    </ClCompile>
-    <ClCompile Include="legacy\s_iode.c">
-      <Filter>Source Files\legacy</Filter>
-    </ClCompile>
-    <ClCompile Include="legacy\sb_gui.c">
-      <Filter>Source Files\legacy</Filter>
-    </ClCompile>
     <ClCompile Include="menu\workspace\workspace_load.cpp">
       <Filter>Source Files\menu\workspace</Filter>
     </ClCompile>
@@ -88,9 +76,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bridge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tabs\abstract_table_view.h">
       <Filter>Header Files\view</Filter>
     </ClInclude>

@@ -5,7 +5,7 @@
 #include "abstract_table_model.h"
 
 
-class VariablesModel : public IODEAbstractTableModel<Variables>
+class VariablesModel : public IODEAbstractTableModel<KDBVariables>
 {
 	Q_OBJECT
 
@@ -20,11 +20,11 @@ private:
 
 		if (col == 0) 
 		{
-			return QVariant(QString(kdb.getObjectName(row)));
+			return QVariant(QString::fromStdString(kdb.getName(row)));
 		}
 		else 
 		{
-			var = kdb.getValue(row, col - 1, mode);
+			var = kdb.get(row, col - 1, mode);
 			return L_ISAN(var) ? QString::number(var, 'g', 3) : NAN_REP;
 		}
 	}
@@ -32,10 +32,10 @@ private:
 public slots:
 	void reset()
 	{
+		QString period;
 		columnNames = QVector<QString>({ "Name" });
 		for (int t = 0; t < kdb.getNbPeriods(); t++) {
-			char period[10];
-			kdb.getPeriod(period, t);
+			period = QString::fromStdString(kdb.getPeriod(t).to_string());
 			columnNames.append(period);
 		}
 		resetModel();

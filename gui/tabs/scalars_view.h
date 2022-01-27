@@ -12,5 +12,5 @@ class ScalarsView : public AbstractTableView<ScalarsModel>
 	Q_OBJECT
 
 public:
-	ScalarsView(QWidget* parent = nullptr) : AbstractTableView(SCALARS, new ScalarsDelegate(parent), parent) {};
+	ScalarsView(QWidget* parent = nullptr) : AbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent) {};
 };

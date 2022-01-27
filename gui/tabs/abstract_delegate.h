@@ -6,7 +6,8 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
-#include "../bridge.h"
+#include "../cpp_api/iode_cpp_api.h"
+#include "../utils.h"
 #include "../util/double_validator.h"
 
 
@@ -23,13 +24,13 @@ protected:
 		QString acceptedLetters;
 		switch (nameCase)
 		{
-		case UPPER:
+		case I_UPPER:
 			acceptedLetters = "A-Z";
 			break;
-		case LOWER:
+		case I_LOWER:
 			acceptedLetters = "a-z";
 			break;
-		case ASIS:
+		case I_ASIS:
 			acceptedLetters = "A-Za-z";
 			break;
 		default:

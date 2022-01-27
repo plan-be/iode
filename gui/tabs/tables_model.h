@@ -5,7 +5,7 @@
 #include "abstract_table_model.h"
 
 
-class TablesModel : public IODEAbstractTableModel<Tables>
+class TablesModel : public IODEAbstractTableModel<KDBTables>
 {
 	Q_OBJECT
 
@@ -16,9 +16,9 @@ private:
 	QVariant dataCell(const int row, const int col) const
 	{
 		if (col == 0)
-			return QVariant(QString(kdb.getObjectName(row)));
+			return QVariant(QString::fromStdString(kdb.getName(row)));
 		else
-			return QVariant(kdb.getTitle(row));
+			return QVariant(QString::fromStdString(kdb.getTitle(row)));
 	}
 
 public slots:

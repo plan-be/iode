@@ -72,25 +72,25 @@ void MainWindow::updateCurrentTab(int index)
     // update the corresponding model and view
     switch (index)
     {
-    case COMMENTS:
+    case I_COMMENTS:
         this->tableview_comments->update();
         break;
-    case EQUATIONS:
+    case I_EQUATIONS:
         this->tableview_equations->update();
         break;
-    case IDENTITIES:
+    case I_IDENTITIES:
         this->tableview_identities->update();
         break;
-    case LISTS:
+    case I_LISTS:
         this->tableview_lists->update();
         break;
-    case SCALARS:
+    case I_SCALARS:
         this->tableview_scalars->update();
         break;
-    case TABLES:
+    case I_TABLES:
         this->tableview_tables->update();
         break;
-    case VARIABLES:
+    case I_VARIABLES:
         this->tableview_variables->update();
         break;
     default:

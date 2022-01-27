@@ -2,8 +2,6 @@
 
 #include <QDoubleValidator>
 
-#include "../bridge.h"
-
 
 class IODEDoubleValidator : public QDoubleValidator
 {

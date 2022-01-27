@@ -41,8 +41,8 @@ private:
 
 public:
 	QIodeFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
-		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(ANY_FILE), fileMode(EXISTING_FILE), 
-		anyExt(QString::fromStdString(vFileExtensions[ANY_FILE].ext))
+		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(I_ANY_FILE), fileMode(EXISTING_FILE), 
+		anyExt(QString::fromStdString(vFileExtensions[I_ANY_FILE].ext))
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0, 0, 0, 0);
