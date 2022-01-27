@@ -6,3 +6,4 @@
 #include "utils.h"
 #include "KDB/kdb_comments.h"
 #include "KDB/kdb_equations.h"
+#include "KDB/kdb_identities.h"
