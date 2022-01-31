@@ -1,18 +1,8 @@
 #include "pch.h"
-#include "../../cpp_api/iode_cpp_api.h"
-
-#include <filesystem>
 
 
-// To get current path
-// std::filesystem::path cwd = std::filesystem::current_path();
-// std::string str_path = cwd.string();
-
-std::string input_test_dir = "../../tests/data/";
-std::string output_test_dir = "../../tests/output/";
-
-
-class KDBIdentitiesTest : public ::testing::Test {
+class KDBIdentitiesTest : public KDBTest, public ::testing::Test
+{
 protected:
     KDBIdentities kdb;
 
@@ -25,7 +15,7 @@ protected:
 };
 
 
-TEST(KDBIdentitiesTest_, Load)
+TEST_F(KDBIdentitiesTest, Load)
 {
     KDBIdentities kdb;
     kdb.load(input_test_dir + "fun.idt");

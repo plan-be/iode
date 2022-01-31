@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "../../cpp_api/iode_cpp_api.h"
-
 
 TEST(TestSample, Create) 
 {

@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "../../cpp_api/iode_cpp_api.h"
-
 
 TEST(TestUtils, Utf8_oem_convertion)
 {
