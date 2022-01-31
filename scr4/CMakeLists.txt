@@ -62,7 +62,7 @@ set (SCR_IODE
 # Add source to this project's executable.
 add_library (scr4iode STATIC ${HEADER_IODE} ${SCR_IODE})
 
-# Compiler options
-add_compile_options(-Zi -Zp1)
-add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS_IGNORE_PACKING_MISMATCH WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+# NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on scr4iode.
+#       Option -Zp1 makes compilation of the Google Test lib to fail
+target_compile_options(scr4iode PRIVATE -Zp1)
 target_include_directories (scr4iode PUBLIC ".")
