@@ -282,15 +282,21 @@ TEST_F(KDBEquationsTest, GetDate)
     std::string name = kdb.getName(pos);
 
     int date;
+    std::string s_date;
     int expected_date = 19980612;
+    std::string s_expected_date = "12-06-1998";
 
     // by position
     date = kdb.getDate(pos);
     EXPECT_EQ(date, expected_date);
+    s_date = kdb.getDateAsString(pos);
+    EXPECT_EQ(s_date, s_expected_date);
 
     // by name
     date = kdb.getDate(name);
     EXPECT_EQ(date, expected_date);
+    s_date = kdb.getDateAsString(name);
+    EXPECT_EQ(s_date, s_expected_date);
 }
 
 TEST_F(KDBEquationsTest, UpdateDate)

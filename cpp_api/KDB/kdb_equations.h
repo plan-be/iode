@@ -203,6 +203,26 @@ public:
         return getDate(pos); 
     }
 
+    std::string getDateAsString(const int pos, const std::string date_format="dd-mm-yyyy") const
+    { 
+        std::string date;
+        long l_date = KEDATE(getKDB(), pos);
+        if (l_date > 0)
+        {
+            char c_date[12];
+            char* c_date_format;
+            c_date_format = const_cast<char*>(date_format.c_str());
+            date = SCR_long_to_fdate(l_date, c_date, c_date_format);
+        }
+        return date;
+    }
+
+    std::string getDateAsString(const std::string name, const std::string date_format = "dd-mm-yyyy") const
+    {
+        int pos = getPosition(name);
+        return getDateAsString(pos, date_format);
+    }
+
     void updateDate(const int pos)
     {
         std::string name = getName(pos);
