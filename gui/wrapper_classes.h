@@ -4,6 +4,7 @@
 #include <QList>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QTextEdit>
 
 #include "./custom_widgets/qfilechooser.h"
 #include "./custom_widgets/qsampleedit.h"
@@ -91,6 +92,35 @@ public:
     QString extractAndVerify()
     {
         QString value = qfield.text();
+
+        if (type == REQUIRED_FIELD && value.isEmpty())
+            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+
+        return value;
+    }
+};
+
+
+class WrapperQTextEdit : public TemplateWrapper<QTextEdit, QString>
+{
+public:
+    WrapperQTextEdit(const QString name, QTextEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
+
+    QVariant getQValue()
+    {
+        QString value = qfield.toPlainText();
+        return QVariant(value);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        QString value = qvalue.toString();
+        qfield.setText(value);
+    }
+
+    QString extractAndVerify()
+    {
+        QString value = qfield.toPlainText();
 
         if (type == REQUIRED_FIELD && value.isEmpty())
             throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
