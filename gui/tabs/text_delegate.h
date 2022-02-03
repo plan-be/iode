@@ -12,8 +12,7 @@ public:
 
 	~TextDelegate() {}
 
-	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
-		const QModelIndex& index) const override
+	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
 	{
 		if (index.column() == 0)
 		{
@@ -21,7 +20,7 @@ public:
 		}
 		else
 		{
-			return createTextEditor(parent);
+			return createQLineEditor(parent);
 		}
 	}
 };

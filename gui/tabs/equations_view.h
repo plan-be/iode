@@ -2,15 +2,22 @@
 
 #include <QObject>
 
-#include "abstract_table_view.h"
-#include "equations_model.h"
+#include "popup_view.h"
 #include "equations_delegate.h"
+#include "equations_model.h"
+#include "./popup/edit_equation.h"
 
 
-class EquationsView : public AbstractTableView<EquationsModel>
+class EquationsView : public PopupView<EquationsModel, QIodeEditEquation>
 {
 	Q_OBJECT
 
 public:
-	EquationsView(QWidget* parent = nullptr) : AbstractTableView(I_EQUATIONS, new EquationsDelegate(parent), parent) {};
+	EquationsView(QWidget* parent = nullptr) : PopupView(I_EQUATIONS, new EquationsDelegate(parent), parent)
+	{
+		connect(this, &EquationsView::activated, this, &EquationsView::popup_edit_window);
+	}
+
+public slots:
+	void popup_edit_window(const QModelIndex& index) { open_popup_edit_window(index); }
 };

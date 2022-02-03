@@ -54,6 +54,12 @@
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{f4268cf2-a061-4ed3-b95a-ab965eb05588}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\popup">
+      <UniqueIdentifier>{d9df2df5-37ac-4613-b51b-665dea16f713}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\popup">
+      <UniqueIdentifier>{ec882ae3-f661-4965-a734-6bf451932c2c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="DOS">
       <UniqueIdentifier>{06bfc985-da89-4b37-a1c3-76b7ec13730c}</UniqueIdentifier>
     </Filter>
@@ -74,6 +80,12 @@
     <ClCompile Include="menu\workspace\workspace_clear.cpp">
       <Filter>Source Files\menu\workspace</Filter>
     </ClCompile>
+    <ClCompile Include="tabs\popup\edit_equation.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\edit_table.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tabs\abstract_table_view.h">
@@ -87,6 +99,9 @@
     </ClInclude>
     <ClInclude Include="util\double_validator.h">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="tabs\popup_view.h">
+      <Filter>Header Files\view</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +195,15 @@
     <QtMoc Include="tabs\tables_delegate.h">
       <Filter>Header Files\view\delegate</Filter>
     </QtMoc>
+    <QtMoc Include="tabs\popup\edit_equation.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\edit_table.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup_delegate.h">
+      <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -193,6 +217,9 @@
     </QtUic>
     <QtUic Include="menu\workspace\workspace_clear.ui">
       <Filter>Form Files\menu\workspace</Filter>
+    </QtUic>
+    <QtUic Include="tabs\popup\edit_equation.ui">
+      <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>

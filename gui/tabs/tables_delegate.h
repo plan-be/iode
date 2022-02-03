@@ -1,14 +1,14 @@
 #pragma once
 
-#include "text_delegate.h"
+#include "popup_delegate.h"
 
 
-class TablesDelegate : public TextDelegate
+class TablesDelegate : public PopupDelegate
 {
 	Q_OBJECT
 
 public:
-	TablesDelegate(QObject* parent = nullptr) : TextDelegate(I_UPPER, parent) {}
+	TablesDelegate(QObject* parent = nullptr) : PopupDelegate(I_UPPER, parent) {}
 
 	~TablesDelegate() {}
 };
