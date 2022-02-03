@@ -168,6 +168,8 @@
     <ClCompile Include="menu\workspace\workspace_clear.cpp" />
     <ClCompile Include="menu\workspace\workspace_load.cpp" />
     <ClCompile Include="menu\workspace\workspace_save.cpp" />
+    <ClCompile Include="tabs\popup\edit_equation.cpp" />
+    <ClCompile Include="tabs\popup\edit_table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="menu\workspace\workspace_load.h" />
@@ -181,6 +183,10 @@
     <QtMoc Include="tabs\identities_delegate.h" />
     <QtMoc Include="tabs\lists_delegate.h" />
     <QtMoc Include="tabs\tables_delegate.h" />
+    <QtMoc Include="tabs\popup\edit_equation.h" />
+    <QtMoc Include="tabs\popup\edit_table.h" />
+    <QtMoc Include="tabs\popup_delegate.h" />
+    <ClInclude Include="tabs\popup_view.h" />
     <ClInclude Include="util\double_validator.h" />
     <ClInclude Include="wrapper_classes.h" />
     <QtMoc Include="custom_widgets\qfilechooser.h" />
@@ -210,6 +216,7 @@
     <QtUic Include="menu\workspace\workspace_clear.ui" />
     <QtUic Include="menu\workspace\workspace_load.ui" />
     <QtUic Include="menu\workspace\workspace_save.ui" />
+    <QtUic Include="tabs\popup\edit_equation.ui" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="DOS\DOS_Combobox.txt" />
