@@ -21,15 +21,16 @@ public:
     }
 
     // Note: argument set to "", NULL or 0 are unchanged
-    void setEquation(std::string name, std::string lec, std::string comment, int method, SAMPLE* sample, std::string instruments, std::string block, float* tests, int date) const
+    void setEquation(std::string name, std::string lec, std::string comment, int method, Sample* sample, std::string instruments, std::string block, float* tests, int date) const
     {
         char* c_name = name.empty() ? NULL : const_cast<char*>(name.c_str());
         char* c_lec = lec.empty() ? NULL : const_cast<char*>(lec.c_str());
         char* c_comment = comment.empty() ? NULL : const_cast<char*>(comment.c_str());
         char* c_instruments = instruments.empty() ? NULL : const_cast<char*>(instruments.c_str());
         char* c_block = block.empty() ? NULL : const_cast<char*>(block.c_str());
+        SAMPLE* c_sample = sample == NULL ? NULL : sample->c_sample;
 
-        int res = B_DataUpdateEqs(c_name, c_lec, c_comment, method, sample, c_instruments, c_block, tests, date);
+        int res = B_DataUpdateEqs(c_name, c_lec, c_comment, method, c_sample, c_instruments, c_block, tests, date);
         if (res < 0) throw std::runtime_error("something went wrong when trying to update equation " + std::string(name));
     }
 
@@ -151,8 +152,8 @@ public:
             if (from.empty()) from = sample.start_period().to_string();
             if (to.empty())   to = sample.end_period().to_string();
         }
-        Sample new_sample = Sample(from, to);
-        setEquation(name, "", "", 0, new_sample.c_sample, "", "", NULL, 0);
+        Sample new_sample(from, to);
+        setEquation(name, "", "", 0, &new_sample, "", "", NULL, 0);
     }
 
     // -- comment --
