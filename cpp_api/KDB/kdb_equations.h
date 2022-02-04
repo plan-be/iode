@@ -66,12 +66,23 @@ public:
 
     // -- method --
 
+    int getMethodAsInt(const int pos) const
+    {
+        return (int) KEMETH(getKDB(), pos);
+    }
+
     std::string getMethod(const int pos) const
     {
-        int i = (int) KEMETH(getKDB(), pos);
+        int i = getMethodAsInt(pos);
         if (i > I_NB_EQ_METHODS) i = 0;
         return vEquationMethods[i];
-    }    
+    }
+
+    int getMethodAsInt(const std::string name) const
+    {
+        int pos = getPosition(name);
+        return getMethodAsInt(pos);
+    }
     
     std::string getMethod(const std::string name) const
     {
