@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QString>
-#include <QMap>
+#include <QList>
 #include <QComboBox>
 #include <QLineEdit>
 
@@ -37,20 +37,20 @@ public:
 
 class WrapperComboBox : public TemplateWrapper<QComboBox, int>
 {
-    const QMap<QString, int>& map_values;
+    const QList<QString> list_values;
 
 public:
-    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType& type, const QMap<QString, int>& map_values, bool editable = false) :
-        TemplateWrapper(name, qfield, type), map_values(map_values)
+    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType& type, const QList<QString>& list_values, bool editable = false) :
+        TemplateWrapper(name, qfield, type), list_values(list_values)
     {
+        qfield.addItems(list_values);
         qfield.setEditable(editable);
     };
 
     QVariant getQValue()
     {
-        QString text = qfield.currentText();
-        int value = map_values.value(text, -1);
-        return QVariant(value);
+        int index = qfield.currentIndex();
+        return QVariant(index);
     }
 
     void setQValue(const QVariant& qvalue)
@@ -64,8 +64,8 @@ public:
     int extractAndVerify()
     {
         QString text = qfield.currentText();
-        if (!map_values.contains(text)) throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
-        int value = map_values.value(text);
+        if (!list_values.contains(text)) throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
+        int value = qfield.currentIndex();
         return value;
     }
 };
