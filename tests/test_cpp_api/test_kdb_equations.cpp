@@ -22,6 +22,17 @@ TEST_F(KDBEquationsTest, Load)
     EXPECT_EQ(kdb.count(), 274);
 }
 
+TEST_F(KDBEquationsTest, Save)
+{
+    EXPECT_TRUE(X64);
+
+    // save in binary format
+    kdb.save(output_test_dir + "fun.eqs");
+
+    // save in ascii format
+    kdb.save(output_test_dir + "fun.ae");
+}
+
 TEST_F(KDBEquationsTest, GET)
 {
 
