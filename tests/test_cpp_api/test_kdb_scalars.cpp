@@ -22,6 +22,17 @@ TEST_F(KDBScalarsTest, Load)
     EXPECT_EQ(kdb.count(), 161);
 }
 
+TEST_F(KDBScalarsTest, Save)
+{
+    EXPECT_TRUE(X64);
+
+    // save in binary format
+    kdb.save(output_test_dir + "fun.scl");
+
+    // save in ascii format
+    kdb.save(output_test_dir + "fun.as");
+}
+
 TEST_F(KDBScalarsTest, Get)
 {
     int pos = 0;

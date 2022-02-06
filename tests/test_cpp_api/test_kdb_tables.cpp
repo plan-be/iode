@@ -22,6 +22,17 @@ TEST_F(KDBTablesTest, Load)
     EXPECT_EQ(kdb.count(), 46);
 }
 
+TEST_F(KDBTablesTest, Save)
+{
+    EXPECT_TRUE(X64);
+
+    // save in binary format
+    kdb.save(output_test_dir + "fun.tbl");
+
+    // save in ascii format
+    kdb.save(output_test_dir + "fun.at");
+}
+
 TEST_F(KDBTablesTest, GetTitle)
 {
     int pos = 0;

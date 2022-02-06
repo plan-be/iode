@@ -22,6 +22,17 @@ TEST_F(KDBIdentitiesTest, Load)
     EXPECT_EQ(kdb.count(), 48);
 }
 
+TEST_F(KDBIdentitiesTest, Save)
+{
+    EXPECT_TRUE(X64);
+
+    // save in binary format
+    kdb.save(output_test_dir + "fun.idt");
+
+    // save in ascii format
+    kdb.save(output_test_dir + "fun.ai");
+}
+
 TEST_F(KDBIdentitiesTest, GetLec)
 {
     int pos = 0;

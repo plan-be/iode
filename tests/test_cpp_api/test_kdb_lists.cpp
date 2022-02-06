@@ -22,6 +22,17 @@ TEST_F(KDBListsTest, Load)
     EXPECT_EQ(kdb.count(), 16);
 }
 
+TEST_F(KDBListsTest, Save)
+{
+    EXPECT_TRUE(X64);
+
+    // save in binary format
+    kdb.save(output_test_dir + "fun.lst");
+
+    // save in ascii format
+    kdb.save(output_test_dir + "fun.al");
+}
+
 TEST_F(KDBListsTest, Get)
 {
     int pos = 0;

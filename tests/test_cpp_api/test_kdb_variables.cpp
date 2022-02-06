@@ -26,6 +26,17 @@ TEST_F(KDBVariablesTest, Load)
     EXPECT_EQ(kdb.count(), 394);
 }
 
+TEST_F(KDBVariablesTest, Save)
+{
+    EXPECT_TRUE(X64);
+
+    // save in binary format
+    kdb.save(output_test_dir + "fun.var");
+
+    // save in ascii format
+    kdb.save(output_test_dir + "fun.av");
+}
+
 TEST_F(KDBVariablesTest, Get)
 {
     Variable variable;
