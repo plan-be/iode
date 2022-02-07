@@ -36,6 +36,8 @@ add_subdirectory ("cpp_api")
 
 # ---- executables ----
 file(INSTALL tests/data DESTINATION ${CMAKE_BINARY_DIR}/tests)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
+
 add_subdirectory ("tests")
 
 # ---- print info ----
