@@ -5,16 +5,16 @@
  *
  * IODE object file management
  * ---------------------------
- *     char *K_set_ext(char* res, char* fname, int type):                               deletes left and right spaces in a filename and changes its extension according to the given type.
- *     void K_strip(char* filename):                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
- *     KDB  *K_load(int ftype, FNAME fname, int no, char** objs):                       loads a IODE object file. 
- *     int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl):           retrieves infos on an IODE file: type, number of objects, SAMPLE
- *     KDB *K_interpret(int type, char* filename): generalisation of K_load() :         interprets the content of a file, ascii files included, and try to load ist content into a KDB.
- *     int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl):   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
- *     int K_backup(char* filename):                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
- *     int K_save(KDB* kdb, FNAME fname):                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
- *     int K_save_ws(KDB* kdb):                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
- *     int K_setname(char* from, char* to):                                             replaces KNAMEPTR(kdb) in an IODE object file.
+ *     char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
+ *     void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
+ *     KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
+ *     int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
+ *     KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
+ *     int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
+ *     int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
+ *     int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
+ *     int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
+ *     int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
  */
 
 
@@ -212,7 +212,7 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
                 memset(kdb, 0, sizeof(KDB));
                 posnb   = (char *)&kdb->k_nb      - (char *)kdb;
                 posname = (char *)&kdb->k_nameptr - (char *)kdb;
-                memcpy(&(kdb->k_nb), &(kdb32.k_nb), 1 + posname - posnb);
+                memcpy(&(kdb->k_nb), &(kdb32.k_nb), posname - posnb); // JMP 7/2/2022
             }
             else
                 kread((char *) kdb, sizeof(KDB), 1, fd);
@@ -255,7 +255,7 @@ error :
 /**
  *  Loads an IODE binary object file. 
  *  
- *  Use K_interpret() to load ascii or binary files.
+ *  @note Prefer K_interpret() to load ascii or binary files.
  *  
  *  If needed: 
  *      - uncompresses the file
@@ -491,6 +491,9 @@ error:
 /**
  *  Retrieves infos on an IODE file: type, number of objects and, if defined, 
  *  the file description (free info on the file contents) and SAMPLE (for var files only).
+ *  
+ *  @note: opens the IODE file to retrieve these informations from the file header, but does not 
+ *  read the objects themselves.
  *  
  *  @param [in]  filename   char*   file to analyze
  *  @param [out] descr      char*   NULL or pointer to copy the description of the file
@@ -920,10 +923,10 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     // Dump KDB struct
     if(X64) {
         /* convert to x64 if needed */
-        memset(&kdb32, 0, sizeof(KDB));
+        memset(&kdb32, 0, sizeof(KDB32)); // JMP 7/2/2022
         posnb   = (char *)&xdr_kdb->k_nb      - (char *)xdr_kdb;
         posname = (char *)&xdr_kdb->k_nameptr - (char *)xdr_kdb;
-        memcpy(&(kdb32.k_nb), &(xdr_kdb->k_nb), 1 + posname - posnb);
+        memcpy(&(kdb32.k_nb), &(xdr_kdb->k_nb), posname - posnb);   // JMP 7/2/2022
         kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
     }
     else  {
