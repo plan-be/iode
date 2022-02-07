@@ -13,7 +13,16 @@
 #include <stdarg.h>
 #include "iode.h"
 
-// Fonctions annulées temporairement pour passer le link
+#ifdef _MSC_VER
+    char    *IODE_DATA_DIR   = "..\\..\\..\\..\\tests\\data";
+    char    *IODE_OUTPUT_DIR = "..\\..\\..\\..\\tests\\output";
+#else
+    char    *IODE_DATA_DIR   = "..\\fun";
+    char    *IODE_OUTPUT_DIR = ".";
+#endif
+
+
+// Fonctions annulées/remplacées temporairement pour passer le link
 int W_printf(char* fmt,...)
 {
     va_list     myargs;
@@ -197,7 +206,7 @@ void Tests_LEC()
     TestLEC("LEC", "A+B",  2, A[2]+B[2]);
     TestLEC("LEC", "ln A", 2, log(A[2]));
     TestLEC("LEC", "A[2002Y1]",     2, A[2]);
-    S4ASSERT(0, "Erreur forcée");
+    //S4ASSERT(0, "Erreur forcée");
     TestLEC("LEC", "A[2002Y1][-1]", 2, A[2]);
     TestLEC("LEC", "A[-1]",         2, A[1]);
     TestLEC("LEC", "A[-1][2002Y1]", 2, A[1]);
@@ -254,6 +263,39 @@ Tests_ERRMSGS()
 }
     
     
+Tests_K_OBJFILE()
+{
+    char    in_filename[256];
+    char    out_filename[256];
+    KDB     *kdb_var;
+    int     rc;
+    
+    sprintf(in_filename,  "%s\\fun.var", IODE_DATA_DIR);
+    sprintf(out_filename, "%s\\fun_copy.var", IODE_OUTPUT_DIR);
+    
+    kdb_var = K_interpret(K_VAR, in_filename);
+    S4ASSERT(kdb_var != NULL, "K_interpret(K_VAR, \"%s\")", in_filename);
+    if(kdb_var) {
+        S4ASSERT(KNB(kdb_var) == 394, "KNB(\"%s\") == 394", in_filename);
+        rc = K_save(kdb_var, out_filename);
+        S4ASSERT(rc == 0, "K_save(kdb_var, \"%s\") == 0", out_filename);
+    }
+    
+   
+    /*
+    char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
+    void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
+    KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
+    int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
+    KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
+    int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
+    int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
+    int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
+    int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
+    int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
+    */
+}
+    
 /* ========================================================*/
 int main(int argc, char **argv)
 {
@@ -284,6 +326,7 @@ int main(int argc, char **argv)
     Tests_LEC();
     Tests_EQS();
     Tests_ARGS();
+    Tests_K_OBJFILE();
 
     
 //    B_ReportLine("$show coucou");
