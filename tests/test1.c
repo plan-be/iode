@@ -14,8 +14,8 @@
 #include "iode.h"
 
 #ifdef _MSC_VER
-    char    *IODE_DATA_DIR   = "..\\..\\..\\..\\tests\\data";
-    char    *IODE_OUTPUT_DIR = "..\\..\\..\\..\\tests\\output";
+    char    *IODE_DATA_DIR   = "data";
+    char    *IODE_OUTPUT_DIR = "output";
 #else
     char    *IODE_DATA_DIR   = "..\\fun";
     char    *IODE_OUTPUT_DIR = ".";
@@ -241,6 +241,7 @@ Tests_ARGS()
 {
     char **args;
     char *list[] = {"A1", "A2", 0};
+    char filename[256];
     
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
@@ -250,8 +251,9 @@ Tests_ARGS()
     
     // Test parameters in a file. test.args must exist in the current dir and contain the line
     // A1 A2
-    args = B_ainit_chk("@test.args", NULL, 0);
-    S4ASSERT(S4ASSERT_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"@test.args\")");
+    sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
+    args = B_ainit_chk(filename, NULL, 0);
+    S4ASSERT(S4ASSERT_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"@data\\test.args\")");
     SCR_free_tbl(args);
 }
 
