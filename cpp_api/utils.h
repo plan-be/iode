@@ -2,6 +2,11 @@
 
 #include "common.h"
 
+#include <string>
+#include <stdexcept>
+// requires C++17 
+#include <filesystem>
+
 #ifdef _WIN32 // valid for both 32 and 64 bits
     #include <Windows.h>
 #else
@@ -55,4 +60,61 @@ inline std::string convert_oem_to_utf8(const std::string str_oem)
 inline std::string convert_utf8_to_oem(const std::string str_u8)
 {
     return convert_between_codepages(str_u8, CP_UTF8, CP_OEMCP);
+}
+
+
+std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)
+{
+    std::filesystem::path p_filepath(filepath);
+    std::string error_msg = "Call to " + caller_name + "() failed. ";
+
+    // convert to absolute path
+    if (p_filepath.is_relative()) p_filepath = std::filesystem::absolute(p_filepath);
+
+    // check if parent directory exist
+    std::filesystem::path p_directory = p_filepath.parent_path();
+    if (!p_directory.empty())
+    {
+        if (!std::filesystem::exists(p_directory)) throw std::runtime_error(error_msg + "Directory " + p_directory.string()
+            + " does not exist. Could not " + caller_name + " file " + p_filepath.filename().string());
+    }
+
+    // check or add extension
+    std::filesystem::path p_filename = p_filepath.filename();
+    IodeFileExtension expected_ext = vFileExtensions[type];
+    if (p_filepath.has_extension())
+    {
+        // check extension
+        std::string ext = p_filename.extension().string();
+        if ((ext != expected_ext.ext) && (ext != expected_ext.ascii)) throw std::runtime_error(error_msg + "File " + p_filename.string()
+            + " has wrong extension " + ext + ". Expected extension is " + expected_ext.ext + " or " + expected_ext.ascii);
+
+        // check if file exist
+        if (file_must_exist && !std::filesystem::exists(p_filepath)) throw std::runtime_error(error_msg + "File " + p_filepath.string() + " does not exist");
+    }
+    else
+    {
+        // set binary format extension
+        p_filepath = p_filepath.replace_extension(expected_ext.ext);
+
+        // check if file exist
+        if (file_must_exist)
+        {
+            // check first with binary format extension
+            bool binary_file_found = std::filesystem::exists(p_filepath);
+            // switch to ascii format extension and check if file exist 
+            if (!binary_file_found)
+            {
+                p_filepath = p_filepath.replace_extension(expected_ext.ascii);
+                if (!std::filesystem::exists(p_filepath)) 
+                {
+                    std::string stem = p_filepath.stem().string();
+                    throw std::runtime_error(error_msg + "Neither " + stem + expected_ext.ext + " nor " + stem + expected_ext.ascii
+                        + " could be found in directory " + p_directory.string());
+                }
+            }
+        }
+    }
+
+    return p_filepath.string();
 }
