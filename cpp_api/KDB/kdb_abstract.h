@@ -1,11 +1,6 @@
 #pragma once
 
-
-#include "../common.h"
-
-#include <string>
-#include <stdexcept>
-
+#include "../utils.h"
 
 // using is the C++11 version of typedef
 using Comment = std::string;
@@ -96,8 +91,10 @@ public:
         return pos;
     }
 
-    void load(std::string filepath)
+    void load(std::string& filepath)
     {
+        filepath = check_filepath(filepath, type, "load", true);
+
         char* c_filepath = const_cast<char*>(filepath.c_str());
 
         int res = B_WsLoad(c_filepath, type);
@@ -105,8 +102,10 @@ public:
             throw std::runtime_error("Something went wrong when trying to import " + type_name + " from file " + filepath);
     }
 
-    void save(std::string filepath)
+    void save(std::string& filepath)
     {
+        filepath = check_filepath(filepath, type, "save", false);
+             
         char* c_filepath = const_cast<char*>(filepath.c_str());
 
         int res = B_WsSave(c_filepath, type);

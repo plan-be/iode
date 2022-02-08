@@ -91,15 +91,15 @@ struct IodeFileExtension
 
 const static std::array<IodeFileExtension, I_NB_FILE_EXT> vFileExtensions =
 { {
-    {"Comments", "cmt", "ac"},
-    {"Equations", "eqs", "ae"},
-    {"Identities", "idt", "ai"},
-    {"Lists", "lst", "al"},
-    {"Scalars", "scl", "as"},
-    {"Tables", "tbl", "at"},
-    {"Variables", "var", "av"},
-    {"Logs", "log", ""},
-    {"Settings", "ini", ""},
+    {"Comments", ".cmt", ".ac"},
+    {"Equations", ".eqs", ".ae"},
+    {"Identities", ".idt", ".ai"},
+    {"Lists", ".lst", ".al"},
+    {"Scalars", ".scl", ".as"},
+    {"Tables", ".tbl", ".at"},
+    {"Variables", ".var", ".av"},
+    {"Logs", ".log", ""},
+    {"Settings", ".ini", ""},
     {"Any", "*", ""}
 } };
 
