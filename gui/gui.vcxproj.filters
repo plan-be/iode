@@ -57,6 +57,9 @@
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{f4268cf2-a061-4ed3-b95a-ab965eb05588}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DOS">
+      <UniqueIdentifier>{06bfc985-da89-4b37-a1c3-76b7ec13730c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -206,5 +209,37 @@
     <QtUic Include="menu\workspace\workspace_clear.ui">
       <Filter>Form Files\menu\workspace</Filter>
     </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DOS\DOS_Combobox.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Menu.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_File.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Profile.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Workspace.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Data.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Compute.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Print.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_Report.txt">
+      <Filter>DOS</Filter>
+    </Text>
+    <Text Include="DOS\DOS_XODE.txt">
+      <Filter>DOS</Filter>
+    </Text>
   </ItemGroup>
 </Project>

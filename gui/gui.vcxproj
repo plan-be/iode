@@ -200,6 +200,18 @@
     <QtUic Include="menu\workspace\workspace_load.ui" />
     <QtUic Include="menu\workspace\workspace_save.ui" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="DOS\DOS_Combobox.txt" />
+    <Text Include="DOS\DOS_Compute.txt" />
+    <Text Include="DOS\DOS_Data.txt" />
+    <Text Include="DOS\DOS_Menu.txt" />
+    <Text Include="DOS\DOS_File.txt" />
+    <Text Include="DOS\DOS_Print.txt" />
+    <Text Include="DOS\DOS_Profile.txt" />
+    <Text Include="DOS\DOS_Report.txt" />
+    <Text Include="DOS\DOS_Workspace.txt" />
+    <Text Include="DOS\DOS_XODE.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />
