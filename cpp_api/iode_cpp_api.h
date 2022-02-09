@@ -4,6 +4,9 @@
 
 #include "common.h"
 #include "utils.h"
+#include "period.h"
+#include "sample.h"
+#include "table.h"
 #include "KDB/kdb_comments.h"
 #include "KDB/kdb_equations.h"
 #include "KDB/kdb_identities.h"

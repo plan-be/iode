@@ -5,8 +5,10 @@
 
 #include <string>
 #include <array>
+#include <vector>
 #include <map>
 #include <stdexcept>
+#include <iostream>
 
 
 /* ****************************** *
@@ -57,11 +59,11 @@ enum EnumLang
 
 const static int I_NB_LANGS = 3;
 
-const static std::map<std::string, EnumLang> mLangs =
+const static std::map<EnumLang, std::string> mLangs = 
 { 
-    {"English", IT_ENGLISH},
-    {"Dutch", IT_DUTCH},
-    {"French", IT_FRENCH}
+    {IT_ENGLISH, "English"},
+    {IT_DUTCH, "Dutch"},
+    {IT_FRENCH, "French"}
 };
 
 
