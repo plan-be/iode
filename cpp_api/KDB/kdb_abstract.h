@@ -8,7 +8,6 @@ using Equation = EQ;
 using Identity = IDT;
 using List = std::string;
 using Scalar = SCL;
-using Table = TBL;
 using Variable = IODE_REAL;
 
 
