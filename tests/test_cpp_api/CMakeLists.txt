@@ -1,6 +1,6 @@
 enable_testing()
 
-add_executable(test_cpp_api pch.cpp test_utils.cpp test_sample.cpp test_period.cpp 
+add_executable(test_cpp_api pch.cpp test_utils.cpp test_sample.cpp test_period.cpp test_table.cpp 
                             test_kdb_comments.cpp test_kdb_equations.cpp test_kdb_identities.cpp test_kdb_lists.cpp 
                             test_kdb_scalars.cpp test_kdb_tables.cpp test_kdb_variables.cpp)
 
