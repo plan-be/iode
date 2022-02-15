@@ -2,7 +2,7 @@
   "version": 2,
   "configurePresets": [
     {
-      "name": "default-x64",
+      "name": "x64",
       "hidden": true,
       "displayName": "Default x64 Config",
       "generator": "Ninja",
@@ -12,10 +12,19 @@
       }
     },
     {
-      "name": "linux-x64",
-      "inherits": "default-x64",
+      "name": "Win32",
       "hidden": true,
-      "displayName": "Linux x64",
+      "displayName": "Default Win32 Config",
+      "generator": "Visual Studio 16 2019",
+      "architecture": {
+        "value": "Win32",
+        "strategy": "set"
+      }
+    },
+    {
+      "name": "linux",
+      "hidden": true,
+      "displayName": "Linux",
       "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "gcc",
@@ -27,42 +36,9 @@
       }
     },
     {
-      "name": "linux-x64-debug",
-      "inherits": "linux-x64",
-      "displayName": "Linux x64 Debug",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-      }
-    },
-    {
-      "name": "test-linux-x64-debug",
-      "inherits": "linux-x64-debug",
-      "displayName": "Test Linux x64 Debug",
-      "binaryDir": "${sourceDir}/out/build/linux-x64-debug/tests/test_cpp_api"
-    },
-    {
-      "name": "linux-x64-release",
-      "inherits": "linux-x64",
-      "displayName": "Linux x64 Release",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-      }
-    },
-    {
-      "name": "test-linux-x64-release",
-      "inherits": "linux-x64-release",
-      "displayName": "Test Linux x64 Release",
-      "binaryDir": "${sourceDir}/out/build/linux-x64-release/tests/test_cpp_api"
-    },
-    {
-      "name": "windows-x64",
-      "inherits": "default-x64",
+      "name": "windows",
       "hidden": true,
-      "displayName": "Windows x64",
+      "displayName": "Windows",
       "description": "Target Windows with the Visual Studio development environment.",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
@@ -71,39 +47,141 @@
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
     },
     {
+      "name": "debug",
+      "hidden": true,
+      "displayName": "Debug Config",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "displayName": "Release Config",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-x32-debug",
+      "inherits": [ "Win32", "windows", "debug" ],
+      "displayName": "Windows x32 Debug",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "test-windows-x32-debug",
+      "inherits": [ "Win32", "windows", "debug" ],
+      "displayName": "Test Windows x32 Debug",
+      "binaryDir": "${sourceDir}/out/build/windows-x32-debug/tests/test_cpp_api",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x32-debug/tests/test_cpp_api"
+      }
+    },
+    {
+      "name": "windows-x32-release",
+      "inherits": [ "Win32", "windows", "release" ],
+      "displayName": "Windows x32 Release",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "test-windows-x32-release",
+      "inherits": [ "Win32", "windows", "release" ],
+      "displayName": "Test Windows x32 Release",
+      "binaryDir": "${sourceDir}/out/build/windows-x32-release/tests/test_cpp_api",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x32-release/tests/test_cpp_api"
+      }
+    },
+    {
+      "name": "linux-x64-debug",
+      "inherits": [ "x64", "linux", "debug" ],
+      "displayName": "Linux x64 Debug",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "test-linux-x64-debug",
+      "inherits": [ "x64", "linux", "debug" ],
+      "displayName": "Test Linux x64 Debug",
+      "binaryDir": "${sourceDir}/out/build/linux-x64-debug/tests/test_cpp_api",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-debug/tests/test_cpp_api"
+      }
+    },
+    {
+      "name": "linux-x64-release",
+      "inherits": [ "x64", "linux", "release" ],
+      "displayName": "Linux x64 Release",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      }
+    },
+    {
+      "name": "test-linux-x64-release",
+      "inherits": [ "x64", "linux", "release" ],
+      "displayName": "Test Linux x64 Release",
+      "binaryDir": "${sourceDir}/out/build/linux-x64-release/tests/test_cpp_api",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-release/tests/test_cpp_api"
+      }
+    },
+    {
       "name": "windows-x64-debug",
-      "inherits": "windows-x64",
+      "inherits": [ "x64", "windows", "debug" ],
       "displayName": "Windows x64 Debug",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       }
     },
     {
       "name": "test-windows-x64-debug",
-      "inherits": "windows-x64-debug",
+      "inherits": [ "x64", "windows", "debug" ],
       "displayName": "Test Windows x64 Debug",
-      "binaryDir": "${sourceDir}/out/build/windows-x64-debug/tests/test_cpp_api"
+      "binaryDir": "${sourceDir}/out/build/windows-x64-debug/tests/test_cpp_api",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-debug/tests/test_cpp_api"
+      }
     },
     {
       "name": "windows-x64-release",
-      "inherits": "windows-x64",
+      "inherits": [ "x64", "windows", "release" ],
       "displayName": "Windows x64 Release",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       }
     },
     {
       "name": "test-windows-x64-release",
-      "inherits": "windows-x64-release",
+      "inherits": [ "x64", "windows", "release" ],
       "displayName": "Test Windows x64 Release",
-      "binaryDir": "${sourceDir}/out/build/windows-x64-release/tests/test_cpp_api"
+      "binaryDir": "${sourceDir}/out/build/windows-x64-release/tests/test_cpp_api",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-release/tests/test_cpp_api"
+      }
     }
   ],
   "buildPresets": [
+    {
+      "name": "windows-x32-debug",
+      "configurePreset": "windows-x32-debug"
+    },
+    {
+      "name": "windows-x32-release",
+      "configurePreset": "windows-x32-release"
+    },
     {
       "name": "linux-x64-debug",
       "configurePreset": "linux-x64-debug"
@@ -132,6 +210,16 @@
       "execution": {
         "stopOnFailure": false
       }
+    },
+    {
+      "name": "windows-x32-debug",
+      "inherits": "test-default",
+      "configurePreset": "test-windows-x32-debug"
+    },
+    {
+      "name": "windows-x32-release",
+      "inherits": "test-default",
+      "configurePreset": "test-windows-x32-release"
     },
     {
       "name": "linux-x64-debug",
