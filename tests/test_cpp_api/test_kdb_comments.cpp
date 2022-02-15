@@ -25,8 +25,6 @@ TEST_F(KDBCommentsTest, Load)
 
 TEST_F(KDBCommentsTest, Save)
 {
-    EXPECT_TRUE(X64);
-
     // save in binary format
     kdb.save(output_test_dir + "fun.cmt");
 

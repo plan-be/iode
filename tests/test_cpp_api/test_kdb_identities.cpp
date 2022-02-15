@@ -24,8 +24,6 @@ TEST_F(KDBIdentitiesTest, Load)
 
 TEST_F(KDBIdentitiesTest, Save)
 {
-    EXPECT_TRUE(X64);
-
     // save in binary format
     kdb.save(output_test_dir + "fun.idt");
 

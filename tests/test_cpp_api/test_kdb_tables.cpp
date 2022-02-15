@@ -24,8 +24,6 @@ TEST_F(KDBTablesTest, Load)
 
 TEST_F(KDBTablesTest, Save)
 {
-    EXPECT_TRUE(X64);
-
     // save in binary format
     kdb.save(output_test_dir + "fun.tbl");
 

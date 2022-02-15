@@ -24,8 +24,6 @@ TEST_F(KDBListsTest, Load)
 
 TEST_F(KDBListsTest, Save)
 {
-    EXPECT_TRUE(X64);
-
     // save in binary format
     kdb.save(output_test_dir + "fun.lst");
 
