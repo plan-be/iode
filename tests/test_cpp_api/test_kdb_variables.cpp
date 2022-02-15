@@ -28,8 +28,6 @@ TEST_F(KDBVariablesTest, Load)
 
 TEST_F(KDBVariablesTest, Save)
 {
-    EXPECT_TRUE(X64);
-
     // save in binary format
     kdb.save(output_test_dir + "fun.var");
 

@@ -24,8 +24,6 @@ TEST_F(KDBScalarsTest, Load)
 
 TEST_F(KDBScalarsTest, Save)
 {
-    EXPECT_TRUE(X64);
-
     // save in binary format
     kdb.save(output_test_dir + "fun.scl");
 
