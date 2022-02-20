@@ -9,30 +9,21 @@ class KDBTables : public KDBAbstract
 public:
     KDBTables() : KDBAbstract(I_TABLES) {};
 
-    Table get(const int pos) const
-    {
-        TBL* c_table = KTVAL(getKDB(), pos);
-        return Table(c_table);
-    }
+    Table get(const int pos) const;
 
-    Table get(const std::string name) const
-    {
-        int pos = getPosition(name);
-        return get(pos);
-    }
+    Table get(const std::string name) const;
 
-    std::string getTitle(const int pos) const
-    {
-        TBL* c_table = KTVAL(getKDB(), pos);
-        std::string title_oem = std::string((char*) T_get_title(c_table));
-        std::string title = convert_oem_to_utf8(title_oem);
-        T_free(c_table);
-        return title;
-    }
+    std::string getTitle(const int pos) const;
 
-    std::string getTitle(const std::string name) const
-    {
-        int pos = getPosition(name);
-        return getTitle(pos);
-    }
+    std::string getTitle(const std::string name) const;
+
+    Table add_table(const std::string name, const int nb_columns);
+
+    Table add_table(const std::string name, const int nbColumns, const std::string def, std::vector<std::string> vars, bool mode, bool files, bool date);
+
+    Table copy(const std::string name, const std::string original_table_name);
+
+    void remove_table(const int pos);
+
+    void remove_table(const std::string name);
 };
