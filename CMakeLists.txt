@@ -3,6 +3,13 @@
 #
 cmake_minimum_required (VERSION 3.16)
 
+# List of CMAKE variables: https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
+
+# ---- user defined variables ----
+set(IS_DEBUG_BUILD (CMAKE_BUILD_TYPE STREQUAL  "Debug"))
+set(IS_GNU (CMAKE_CXX_COMPILER_ID MATCHES GNU))
+set(IS_CLANG (CMAKE_CXX_COMPILER_ID MATCHES Clang))
+
 # ---- dependencies ----
 
 # -- Google Test --
@@ -19,12 +26,83 @@ FetchContent_MakeAvailable(googletest)
 # ---- main project ----
 project ("iode")
 
-# some code in the C++ API requires C++ 17
-set(CMAKE_CXX_STANDARD 17)
+message(STATUS "======== global info ========")
+message(STATUS "IODE version: ${PROJECT_VERSION}")
+message(STATUS "OS:           ${CMAKE_SYSTEM_NAME}")
+message(STATUS "Architecture: ${CMAKE_C_COMPILER_ARCHITECTURE_ID}")
+message(STATUS "Build Config: ${CMAKE_BUILD_TYPE}")
+if(IODE_ENABLE_SANITIZER)
+  message(STATUS "Sanitize:     Yes")
+else()
+  message(STATUS "Sanitize:     No")
+endif()
+message(STATUS "C compiler:   ${CMAKE_C_COMPILER_ID}")
+message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
+if(MSVC)
+  message(STATUS "MSVC version: ${MSVC_VERSION}")
+endif()
+message(STATUS "Generator:    ${CMAKE_GENERATOR}")
+
+# ---- sanitizers ----
+# add sanitizer flags if compiled and linked with DEBUG configuration 
+# * AddressSanitizer (aka ASan) is a memory error detector for C/C++. 
+#   It finds:
+#      o Use after free (dangling pointer dereference)
+#      o Heap buffer overflow
+#      o Stack buffer overflow
+#      o Global buffer overflow
+#      o Use after return
+#      o Use after scope
+#      o Initialization order bugs
+#      o Memory leaks
+#   In order to use AddressSanitizer you will need to compile and link your program the -fsanitize=address flag. 
+#   See https://github.com/google/sanitizers/wiki/AddressSanitizer for more details
+# Note: sanitizer options are availalbe for cl, clang and gcc
+if(IS_DEBUG_BUILD AND IODE_ENABLE_SANITIZER)
+if(MSVC)
+  # Warning: many options are currently (Visual Studio 2019) NOT avaible for MSVC
+  #set(IODE_SANITIZER_FLAGS "-fsanitize=address")
+  set(IODE_SANITIZER_FLAGS "-fsanitize=address")
+else()
+  # Only for GCC and Clang:
+  # o To get a reasonable performance add -O1 or higher. 
+  # o To get nicer stack traces in error messages add -fno-omit-frame-pointer
+  # o To ignore functions, use -fsanitize-blacklist=<filename>.txt.
+  #   See https://github.com/google/sanitizers/wiki/AddressSanitizer#turning-off-instrumentation
+  # o To enable continue-after-error, compile with -fsanitize-recover=address and 
+  #   then run your code with ASAN_OPTIONS=halt_on_error=0
+  set(IODE_SANITIZER_FLAGS "-fsanitize-recover=address -O1 -fno-omit-frame-pointer")
+endif()
+
+message(STATUS "========= sanitizer =========")
+message(STATUS "Enable Sanitizer Flags: ${IODE_SANITIZER_FLAGS}")
+
+set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
+
+# Note: incompatible options when using Visual Studio:
+#         o The /RTC options are incompatible with AddressSanitizer and should be disabled.
+#         See https://docs.microsoft.com/en-us/cpp/sanitizers/asan-known-issues?view=msvc-170#incompatible-options
+if(MSVC)
+  string(REPLACE "/RTC1" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+  string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+endif()
+
+else()
+  set(IODE_SANITIZER_FLAGS "")
+endif()
+
+message(STATUS "=============================")
 
 # ---- compile options ----
 # /Zi	Generates complete debugging information
-add_compile_options(-Zi)
+if (CMAKE_BUILD_TYPE STREQUAL  "Debug")
+   add_compile_options(-Zi)
+endif()
+
+# some code in the C++ API requires C++ 17
+set(CMAKE_CXX_STANDARD 17)
 
 # ---- preprocessor ----
 add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
