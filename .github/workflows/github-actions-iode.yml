@@ -13,6 +13,7 @@ jobs:
         # config: ["debug", "release"]
         build_config: ["debug"]
         arch: ["x64"]
+        sanitize: [false, true]
 
     # The CMake configure and build commands are platform agnostic and should 'ideally' work equally well on Windows or Linux.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -45,10 +46,18 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           echo "PRESET_CONFIG=windows-${{ matrix.arch }}-${{ matrix.build_config }}" >> $env:GITHUB_ENV
+      - name: Sanitize (Windows)
+        if: runner.os == 'Windows' && matrix.sanitize
+        run: |
+          echo "PRESET_CONFIG=${{ env.PRESET_CONFIG }}-sanitize" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
           echo "PRESET_CONFIG=linux-${{ matrix.arch }}-${{ matrix.build_config }}" >> $GITHUB_ENV
+      - name: Sanitize (Linux)
+        if: runner.os == 'Linux' && matrix.sanitize
+        run: |
+          echo "PRESET_CONFIG=${{ env.PRESET_CONFIG }}-sanitize" >> GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
