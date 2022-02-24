@@ -297,8 +297,13 @@ TEST_F(KDBEquationsTest, GetDate)
     EXPECT_EQ(s_date, s_expected_date);
 }
 
+
 TEST_F(KDBEquationsTest, UpdateDate)
 {
+// disable the present test function if AddressSanitizer
+// is enabled since SCR_current_date() crashes on the
+// Windows Server 2019 VM used by Github Actions
+#if !(defined _MSC_VER && defined __SANITIZE_ADDRESS__)
     int pos = 0;
     std::string name = kdb.getName(1);
 
@@ -314,6 +319,7 @@ TEST_F(KDBEquationsTest, UpdateDate)
     kdb.updateDate(name);
     date = kdb.getDate(name);
     EXPECT_EQ(date, current_date);
+#endif
 }
 
 // -- tests --
