@@ -45,7 +45,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)out\build\windows-x64-debug\tests\test_cpp_api</OutDir>
+    <OutDir>$(SolutionDir)out\build\windows-x64-debug-sanitize\tests\test_cpp_api</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)out\build\windows-x64-release\tests\test_cpp_api</OutDir>
@@ -131,7 +131,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)out\build\windows-x64-debug\scr4;$(SolutionDir)out\build\windows-x64-debug\api;$(SolutionDir)out\build\windows-x64-debug\cpp_api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)out\build\windows-x64-debug-sanitize\scr4;$(SolutionDir)out\build\windows-x64-debug-sanitize\api;$(SolutionDir)out\build\windows-x64-debug-sanitize\cpp_api;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>iodeapi.lib;scr4iode.lib;iodecppapi.lib;ws2_32.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
