@@ -66,18 +66,20 @@ char k_ext[][4] = {
 /**
  *  Force the extension of a filename.
  *   
- *  @param [in, out]    filename    char*   source / target filename
+ *  @param [in]         filename    char*   source / target filename
  *  @param [in]         ext         char*   new extension
- *  @return                         char*   filename modified (same pointer)
+ *  @return                         char*   pointer to the big buffer (see buf.c)
  *  
- *  @example : 
+ *  @example :
+ *      char *buf;
  *      strcpy(filename, "example");
- *      K_add_ext(filename, "var");
- *      printf("'%s'\n", filename);  // 'example.var'
+ *      buf = K_add_ext(filename, "var");
+ *      printf("'%s'\n", buf);  // 'example.var'
  */
 static char *K_add_ext(char* filename, char* ext)
 {
-    return(SCR_change_ext(filename, filename, ext)); // Force the replacement extension of filename by ext (see http://xon.be/scr4/libs1/libs1172.htm)
+    STATIC_BUF[0] = 0;
+    return(SCR_change_ext(STATIC_BUF, filename, ext)); // Force the replacement extension of filename by ext (see http://xon.be/scr4/libs1/libs1172.htm)
 }
 
 
