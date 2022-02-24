@@ -312,9 +312,14 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
     if(attr & KT_DECIMAL) attr = KT_ALIGN(attr, KT_LEFT);  /* JMP 19-11-93 */
     if(U_is_in('#', txt)) attr = KT_ALIGN(attr, KT_CENTER);  /* JMP 19-11-93 */
     cell->tc_attr = attr;
-    if(txt[0] == '\"') txt++;
     len = strlen(txt);
-    if(txt[len - 1] == '\"') txt[len - 1] = 0;
+    if (len > 0) {
+        if (txt[0] == '\"') {
+            txt++;
+            len--;
+        }
+        if (len > 0 && txt[len - 1] == '\"') txt[len - 1] = 0;
+    }
     T_free_cell(cell);
     cell->tc_val = SCR_stracpy(txt);
 }
