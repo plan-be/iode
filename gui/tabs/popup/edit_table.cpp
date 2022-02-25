@@ -1,13 +1,11 @@
 #include "edit_table.h"
 
 
-QIodeEditTable::QIodeEditTable(const QString& equationName, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f) 
+QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
-}
+	setupUi(this);
 
-QIodeEditTable::~QIodeEditTable()
-{
-	for (auto& wrapper : map_items.values()) delete wrapper;
+	tableView->setupModel(tableName);
 }
 
 void QIodeEditTable::edit()
