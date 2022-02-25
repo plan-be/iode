@@ -63,6 +63,9 @@
     <Filter Include="DOS">
       <UniqueIdentifier>{06bfc985-da89-4b37-a1c3-76b7ec13730c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\popup\delegate">
+      <UniqueIdentifier>{6ec2c5ad-f9fd-46c1-93d3-900171e34daa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -83,8 +86,17 @@
     <ClCompile Include="tabs\popup\edit_equation.cpp">
       <Filter>Source Files\popup</Filter>
     </ClCompile>
+    <ClCompile Include="tabs\popup\edit_table_view.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\edit_table_model.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
     <ClCompile Include="tabs\popup\edit_table.cpp">
       <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\edit_table_delegate.cpp">
+      <Filter>Header Files\popup\delegate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -198,11 +210,20 @@
     <QtMoc Include="tabs\popup\edit_equation.h">
       <Filter>Header Files\popup</Filter>
     </QtMoc>
-    <QtMoc Include="tabs\popup\edit_table.h">
+    <QtMoc Include="tabs\popup\edit_table_view.h">
       <Filter>Header Files\popup</Filter>
     </QtMoc>
     <QtMoc Include="tabs\popup_delegate.h">
       <Filter>Header Files\view\delegate</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\edit_table_model.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\edit_table.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\edit_table_delegate.h">
+      <Filter>Header Files\popup\delegate</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +240,9 @@
       <Filter>Form Files\menu\workspace</Filter>
     </QtUic>
     <QtUic Include="tabs\popup\edit_equation.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="tabs\popup\edit_table.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

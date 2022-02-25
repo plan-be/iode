@@ -2,10 +2,10 @@
 
 #include <QWidget>
 #include <QString>
-#include <QMap>
 
 #include <string>
 
+#include "ui_edit_table.h"
 #include "../../utils.h"
 #include "../../wrapper_classes.h"
 
@@ -16,18 +16,12 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-
-class QIodeEditTable : public QDialog
+class QIodeEditTable : public QDialog, public Ui::QIodeEditTable
 {
     Q_OBJECT
 
-    KDBTables kdb;
-
-    QMap<QString, BaseWrapper*> map_items;
-
 public:
-    QIodeEditTable(const QString& equationName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-    ~QIodeEditTable();
+    QIodeEditTable(const QString& tableName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 
 public slots:
     void edit();

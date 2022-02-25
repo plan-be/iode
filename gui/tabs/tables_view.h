@@ -7,6 +7,7 @@
 #include "tables_model.h"
 #include "./popup/edit_table.h"
 
+
 class TablesView : public PopupView<TablesModel, QIodeEditTable>
 {
 	Q_OBJECT
