@@ -2,13 +2,13 @@
 #include "kdb_tables.h"
 
 
-Table KDBTables::get(const int pos) const
+Table* KDBTables::get(const int pos) const
 {
     TBL* c_table = KTVAL(getKDB(), pos);
-    return Table(c_table);
+    return new Table(c_table);
 }
 
-Table KDBTables::get(const std::string name) const
+Table* KDBTables::get(const std::string name) const
 {
     int pos = getPosition(name);
     return get(pos);
@@ -29,7 +29,7 @@ std::string KDBTables::getTitle(const std::string name) const
     return getTitle(pos);
 }
 
-Table KDBTables::add_table(const std::string name, const int nbColumns)
+Table* KDBTables::add_table(const std::string name, const int nbColumns)
 {
 	char* c_name = const_cast<char*>(name.c_str());
 	TBL* c_table = T_create(nbColumns);
@@ -37,10 +37,10 @@ Table KDBTables::add_table(const std::string name, const int nbColumns)
 	int pos = K_add(getKDB(), c_name, c_table);
 	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
 
-	return Table(c_table);
+	return new Table(c_table);
 }
 
-Table KDBTables::add_table(const std::string name, const int nbColumns, const std::string def, std::vector<std::string> vars, bool mode, bool files, bool date)
+Table* KDBTables::add_table(const std::string name, const int nbColumns, const std::string def, std::vector<std::string> vars, bool mode, bool files, bool date)
 {
 	char* c_name = const_cast<char*>(name.c_str());
 	char* c_def = const_cast<char*>(def.c_str());
@@ -59,19 +59,18 @@ Table KDBTables::add_table(const std::string name, const int nbColumns, const st
 	int pos = K_add(getKDB(), c_name, c_table);
 	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
 
-	return Table(c_table);
+	return new Table(c_table);
 }
 
-Table KDBTables::copy(const std::string name, const std::string original_table_name)
+Table* KDBTables::copy(const std::string name, const std::string original_table_name)
 {
-	Table original_table = get(original_table_name);
-	TBL* c_copy_table = create_table_deep_copy(original_table.c_table);
+	TBL* c_copy_table = create_table_deep_copy(get(original_table_name)->c_table);
 
 	char* c_name = const_cast<char*>(name.c_str());
 	int pos = K_add(getKDB(), c_name, c_copy_table);
 	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
 
-	return Table(c_copy_table);
+	return new Table(c_copy_table);
 }
 
 void KDBTables::remove_table(const int pos)
