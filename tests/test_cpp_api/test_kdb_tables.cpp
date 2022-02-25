@@ -33,13 +33,16 @@ TEST_F(KDBTablesTest, Save)
 
 TEST_F(KDBTablesTest, Get)
 {
+    Table* table;
     int pos = K_find(K_WS[I_TABLES], "GFRPC");
 
     // by position
-    Table table = kdb.get(pos);
+    table = kdb.get(pos);
+    delete table;
 
     // by name
-    Table table2 = kdb.get("GFRPC");
+    table = kdb.get("GFRPC");
+    delete table;
 }
 
 TEST_F(KDBTablesTest, GetTitle)
@@ -60,11 +63,13 @@ TEST_F(KDBTablesTest, GetTitle)
 
 TEST_F(KDBTablesTest, AddRemove)
 {
+    Table* table;
     KDBVariables kdb_var;
     kdb_var.load(input_test_dir + "fun.var");
 
     // add empty table with 2 columns
-    Table table1 = kdb.add_table("table1", 2);
+    table = kdb.add_table("table1", 2);
+    delete table;
 
     // add tables and initialize it
     std::string def = "A title";
@@ -72,7 +77,8 @@ TEST_F(KDBTablesTest, AddRemove)
     bool mode = true;
     bool files = true;
     bool date = true;
-    Table table2 = kdb.add_table("table2", 2, def, vars, mode, files, date);
+    table = kdb.add_table("table2", 2, def, vars, mode, files, date);
+    delete table;
 
     // remove added tables
     kdb.remove_table("table1");
@@ -81,8 +87,11 @@ TEST_F(KDBTablesTest, AddRemove)
 
 TEST_F(KDBTablesTest, Copy)
 {
-    Table original_table = kdb.get("GFRPC");
+    Table* original_table = kdb.get("GFRPC");
 
-    Table copy_table = kdb.copy("GFRPC_COPY", "GFRPC");
-    EXPECT_EQ(copy_table, original_table);
+    Table* copy_table = kdb.copy("GFRPC_COPY", "GFRPC");
+    EXPECT_EQ(*copy_table, *original_table);
+
+    delete original_table;
+    delete copy_table;
 }
