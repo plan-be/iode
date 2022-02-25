@@ -156,7 +156,6 @@ public:
 
     QString extractAndVerify()
     {
-        qfield.verify(name, type);
         return qfield.getFilepath();
     }
 };
