@@ -349,9 +349,14 @@ EnumCellType Table::getDividerCellType(const int column) const
 	return getCellType(0, column, true);
 }
 
-char Table::getDividerCellAttribute(const int column) const
+EnumCellAttribute Table::getDividerCellAlign(const int column) const
 {
-	return getCellAttribute(0, column, true);
+	return getCellAlign(0, column, true);
+}
+
+EnumCellAttribute Table::getDividerCellFont(const int column) const
+{
+	return getCellFont(0, column, true);
 }
 
 std::string Table::getDividerCellContent(const int column, const bool quotes) const
@@ -448,10 +453,18 @@ void Table::setCellType(const int row, const int column, const EnumCellType cell
 	cell->tc_type = cell_type;
 }
 
-char Table::getCellAttribute(const int row, const int column, const bool divider) const
+// TODO: check if it is correct
+EnumCellAttribute Table::getCellAlign(const int row, const int column, const bool divider) const
 {
 	TCELL* cell = getCell(row, column, divider);
-	return cell->tc_attr;
+	return static_cast<EnumCellAttribute>(((int) cell->tc_attr / 8) * 8);
+}
+
+// TODO: check if it is correct
+EnumCellAttribute Table::getCellFont(const int row, const int column, const bool divider) const
+{
+	TCELL* cell = getCell(row, column, divider);
+	return static_cast<EnumCellAttribute>(((int) cell->tc_attr % 8));
 }
 
 void Table::setCellAttribute(const int row, const int column, const char attr, const bool divider)
