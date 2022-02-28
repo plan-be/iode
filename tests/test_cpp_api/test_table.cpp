@@ -77,20 +77,23 @@ TEST_F(TablesTest, NotLineMethods)
 TEST_F(TablesTest, Divider)
 {
     EnumCellType expected_type = IT_LEC;
-    char expected_attribute = static_cast<char>(IT_DECIMAL);
+    EnumCellAttribute expected_align = IT_DECIMAL;
+    EnumCellAttribute expected_font = IT_NORMAL;
     std::string content;
     std::string expected_content;
 
     // first cell
     EXPECT_EQ(table->getDividerCellType(0), expected_type);
-    EXPECT_EQ(table->getDividerCellAttribute(0), expected_attribute);
+    EXPECT_EQ(table->getDividerCellAlign(0), expected_align);
+    EXPECT_EQ(table->getDividerCellFont(0), expected_font);
     expected_content = "1";
     content = table->getDividerCellContent(0, false);
     EXPECT_EQ(content, expected_content);
 
     // second cell
     EXPECT_EQ(table->getDividerCellType(1), expected_type);
-    EXPECT_EQ(table->getDividerCellAttribute(1), expected_attribute);
+    EXPECT_EQ(table->getDividerCellAlign(1), expected_align);
+    EXPECT_EQ(table->getDividerCellFont(1), expected_font);
     expected_content = "PC";
     content = table->getDividerCellContent(1, false);
     EXPECT_EQ(content, expected_content);
@@ -121,11 +124,13 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(table->isLeftAxis(1));
     // ---- column 0
     EXPECT_EQ(table->getCellType(1, 0), IT_STRING);
-    EXPECT_EQ(table->getCellAttribute(1, 0), IT_ITALIC + IT_LEFT);
+    EXPECT_EQ(table->getCellAlign(1, 0), IT_LEFT);
+    EXPECT_EQ(table->getCellFont(1, 0), IT_ITALIC);
     EXPECT_EQ(table->getCellContent(1, 0, false), u8"(divisé par les prix à la consommation)");
     // ---- column 1
     EXPECT_EQ(table->getCellType(1, 1), IT_STRING);
-    EXPECT_EQ(table->getCellAttribute(1, 1), IT_LEFT);
+    EXPECT_EQ(table->getCellAlign(1, 1), IT_LEFT);
+    EXPECT_EQ(table->getCellFont(1, 1), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(1, 1, false), "");
 
     // second cell line
@@ -134,11 +139,13 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(table->isLeftAxis(3));
     // ---- column 0
     EXPECT_EQ(table->getCellType(3, 0), IT_STRING);
-    EXPECT_EQ(table->getCellAttribute(3, 0), IT_LEFT);
+    EXPECT_EQ(table->getCellAlign(3, 0), IT_LEFT);
+    EXPECT_EQ(table->getCellFont(3, 0), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(3, 0, false), " ");
     // ---- column 1
     EXPECT_EQ(table->getCellType(3, 1), IT_STRING);
-    EXPECT_EQ(table->getCellAttribute(3, 1), IT_CENTER);
+    EXPECT_EQ(table->getCellAlign(3, 1), IT_CENTER);
+    EXPECT_EQ(table->getCellFont(3, 1), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(3, 1, false), u8"#s");
 
     // third cell line
@@ -147,11 +154,13 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(table->isLeftAxis(5));
     // ---- column 0
     EXPECT_EQ(table->getCellType(5, 0), IT_STRING);
-    EXPECT_EQ(table->getCellAttribute(5, 0), IT_BOLD + IT_LEFT);
+    EXPECT_EQ(table->getCellAlign(5, 0), IT_LEFT);
+    EXPECT_EQ(table->getCellFont(5, 0), IT_BOLD);
     EXPECT_EQ(table->getCellContent(5, 0, false), "Recettes courantes");
     // ---- column 1
     EXPECT_EQ(table->getCellType(5, 1), IT_LEC);
-    EXPECT_EQ(table->getCellAttribute(5, 1), IT_DECIMAL);
+    EXPECT_EQ(table->getCellAlign(5, 1), IT_DECIMAL);
+    EXPECT_EQ(table->getCellFont(5, 1), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(5, 1, false), "GOSG+YDTG+IT+YSSG+COTRES+OCUG+RIDG");
 
     // fifth cell line
@@ -160,11 +169,13 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(table->isLeftAxis(7));
     // ---- column 0
     EXPECT_EQ(table->getCellType(7, 0), IT_STRING);
-    EXPECT_EQ(table->getCellAttribute(7, 0), IT_LEFT);
+    EXPECT_EQ(table->getCellAlign(7, 0), IT_LEFT);
+    EXPECT_EQ(table->getCellFont(7, 0), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(7, 0, false), u8"       1. Excédent brut d'exploitation");
     // ---- column 1
     EXPECT_EQ(table->getCellType(7, 1), IT_LEC);
-    EXPECT_EQ(table->getCellAttribute(7, 1), IT_DECIMAL);
+    EXPECT_EQ(table->getCellAlign(7, 1), IT_DECIMAL);
+    EXPECT_EQ(table->getCellFont(7, 1), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(7, 1, false), "GOSG");
 }
 

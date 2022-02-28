@@ -176,7 +176,9 @@ public:
 
 	EnumCellType getDividerCellType(const int column) const;
 
-	char getDividerCellAttribute(const int column) const;
+	EnumCellAttribute getDividerCellAlign(const int column) const;
+
+	EnumCellAttribute getDividerCellFont(const int column) const;
 
 	std::string getDividerCellContent(const int column, const bool quotes) const;
 
@@ -211,7 +213,9 @@ public:
 
 	void setCellType(const int row, const int column, const EnumCellType cell_type, const bool divider = false);
 
-	char getCellAttribute(const int row, const int column, const bool divider = false) const;
+	EnumCellAttribute getCellAlign(const int row, const int column, const bool divider = false) const;
+
+	EnumCellAttribute getCellFont(const int row, const int column, const bool divider = false) const;
 
 	void setCellAttribute(const int row, const int column, const char attr, const bool divider = false);
 
