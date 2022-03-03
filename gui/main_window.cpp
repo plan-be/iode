@@ -14,33 +14,42 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // ---- Model/View components ----
 
+    QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
+
     // Comments
     commentsModel = new CommentsModel(this);
     this->tableview_comments->setupModel(commentsModel);
+    this->tableview_comments->setStyleSheet(stylesheet);
     this->tableview_comments->hide();
     // Equations
     equationsModel = new EquationsModel(this);
     this->tableview_equations->setupModel(equationsModel);
+    this->tableview_equations->setStyleSheet(stylesheet);
     this->tableview_equations->hide();
     // Identities
     identitiesModel = new IdentitiesModel(this);
     this->tableview_identities->setupModel(identitiesModel);
+    this->tableview_identities->setStyleSheet(stylesheet);
     this->tableview_identities->hide();
     // Lists
     listsModel = new ListsModel(this);
     this->tableview_lists->setupModel(listsModel);
+    this->tableview_lists->setStyleSheet(stylesheet);
     this->tableview_lists->hide();
     // Scalars
     scalarsModel = new ScalarsModel(this);
     this->tableview_scalars->setupModel(scalarsModel);
+    this->tableview_scalars->setStyleSheet(stylesheet);
     this->tableview_scalars->hide();
     // Tables
     tablesModel = new TablesModel(this);
     this->tableview_tables->setupModel(tablesModel);
+    this->tableview_tables->setStyleSheet(stylesheet);
     this->tableview_tables->hide();
     // Variables
     variablesModel = new VariablesModel(this);
     this->tableview_variables->setupModel(variablesModel);
+    this->tableview_variables->setStyleSheet(stylesheet);
     this->tableview_variables->hide();
 
     // ---- Settings ----
