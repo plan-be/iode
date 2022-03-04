@@ -1,23 +1,21 @@
 #pragma once
 
 #include "kdb_abstract.h"
+#include "kdb_abstract.cpp"
 
 
-class KDBScalars : public KDBAbstract
+class KDBScalars : public KDBAbstract<Scalar>
 {
+protected:
+
+    // CRUD (Create - Read - Update - Delete) + Copy methods
+
+    void add_or_update(const std::string& name, const Scalar& Scalar) override;
+
+    Scalar copy_obj(const Scalar& original) const override;
+
+    Scalar get_unchecked(const int pos) const override;
 
 public:
     KDBScalars() : KDBAbstract(I_SCALARS) {};
-
-    Scalar* get(const int pos) const
-    {
-        return KSVAL(getKDB(), pos);
-    }
-
-    Scalar* get(const std::string name) const
-    {
-        int pos = getPosition(name);
-        return get(pos);
-    }
-
 };

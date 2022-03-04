@@ -1,23 +1,21 @@
 #pragma once
 
 #include "kdb_abstract.h"
+#include "kdb_abstract.cpp"
 
 
-class KDBLists : public KDBAbstract
+class KDBLists : public KDBAbstract<List>
 {
+protected:
+
+    // CRUD (Create - Read - Update - Delete) + Copy methods
+
+    void add_or_update(const std::string& name, const List& list) override;
+
+    List copy_obj(const List& original) const override;
+
+    List get_unchecked(const int pos) const override;
 
 public:
     KDBLists() : KDBAbstract(I_LISTS) {};
-
-    List get(const int pos) const
-    {
-        return std::string(KLVAL(getKDB(), pos));
-    }
-
-    List get(const std::string name) const
-    {
-        int pos = getPosition(name);
-        return get(pos);
-    }
-
 };
