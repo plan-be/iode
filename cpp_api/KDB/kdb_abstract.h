@@ -1,16 +1,16 @@
 #pragma once
-
 #include "../utils.h"
+
 
 // using is the C++11 version of typedef
 using Comment = std::string;
-using Equation = EQ;
 using Identity = IDT;
 using List = std::string;
 using Scalar = SCL;
-using Variable = IODE_REAL;
+using Variable = std::vector<IODE_REAL>;
 
 
+template<class T> 
 class KDBAbstract
 {
 protected:
@@ -20,104 +20,81 @@ protected:
 protected:
     // Cannot define a KDB *kdb member set to K_WS[type] in the constructor because the pointer contained in 
     // K_WS[type] may change in the course of the program (when loading files for example)
-    KDB* getKDB() const
+    KDB* get_KDB() const
     {
         KDB* kdb = K_WS[type];
-        if (kdb == NULL) throw std::runtime_error("There is currently no " + type_name + " in memory.");
+        if (kdb == NULL) throw std::runtime_error("There is currently no " + type_name + " database in memory.");
         return kdb;
     }
 
-    KOBJ getObject(const int pos) const
+    KOBJ get_iode_object(const int pos) const
     {
-        KDB* kdb = getKDB();
-        throwPositionException(pos);
+        KDB* kdb = get_KDB();
+        int nb_objs = count();
+        if (pos < 0 || pos > nb_objs) throw std::runtime_error(type_name + " at position " + std::to_string(pos) + " does not exist.");
         return kdb->k_objs[pos];
     }
 
-    int getPosition(const std::string name) const
+    int get_position(const std::string& name) const
     {
-        KDB* kdb = getKDB();
+        KDB* kdb = get_KDB();
         int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-        throwPositionException(pos);
+        if (pos < 0) throw std::runtime_error(type_name + " with name " + name + " does not exist.");
         return pos;
     }
 
-    void throwPositionException(const int pos) const
-    {
-        int nb_objs = count();
-        if (pos < 0 || pos > nb_objs) throw std::runtime_error(type_name + " at position " + std::to_string(pos) + " does not exist.");
-    }
+    // CRUD (Create - Read - Update - Delete) + Copy methods
+
+    virtual void add_or_update(const std::string& name, const T& obj) = 0;
+
+    virtual T copy_obj(const T& original) const = 0;
+
+    virtual T get_unchecked(const int pos) const = 0;
 
 public:
-    KDBAbstract(EnumIodeType type) : type(type), type_name(vIodeTypes[type])
-    {
-        if (K_WS[type] == NULL) IodeInit();
-    }
+    KDBAbstract(EnumIodeType type);
 
-    int getIODEType() const { return type; }
+    int get_iode_type() const { return type; }
 
     int count() const { return K_WS[type] != NULL ? K_WS[type]->k_nb : 0; }
 
-    std::string getName(const int pos) const
-    {
-        KOBJ obj = getObject(pos);
-        std::string name = std::string(convert_oem_to_utf8(obj.o_name));
-        return name;
-    }
+    // object name
 
-    int setName(const int pos, const std::string new_name)
-    {
-        std::string old_name = getName(pos);
-        int new_pos = rename(old_name, new_name);
-        return new_pos;
-    }
+    std::string get_name(const int pos) const;
 
-    int rename(const std::string old_name, const std::string new_name)
-    {
-        if (new_name.size() > K_MAX_NAME) throw std::runtime_error("Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters." + new_name + " : " + std::to_string(new_name.size()));
-        KDB* kdb = getKDB();
-        char* c_old_name = const_cast<char*>(old_name.c_str());
-        char* c_new_name = const_cast<char*>(new_name.c_str());
-        int pos = K_ren(kdb, c_old_name, c_new_name);
-        // see K_ren documentation
-        if (pos < 0)
-        {
-            std::string msg = type_name + " cannot be renamed as " + new_name + ".";
-            if (pos == -1) throw std::runtime_error("Name " + old_name + " does not exist.\n" + msg);
-            else if (pos == -2) throw std::runtime_error(type_name + " with name " + new_name + " already exists.\n" + msg);
-            else throw std::runtime_error("Something went wrong.\n" + msg);
-        }
-        return pos;
-    }
+    int set_name(const int pos, const std::string& new_name);
 
-    void load(std::string& filepath)
-    {
-        filepath = check_filepath(filepath, type, "load", true);
+    int rename(const std::string& old_name, const std::string& new_name);
 
-        char* c_filepath = const_cast<char*>(filepath.c_str());
+    // CRUD (Create - Read - Update - Delete) + Copy methods
 
-        int res = B_WsLoad(c_filepath, type);
-        if (res != EXIT_SUCCESS)
-            throw std::runtime_error("Something went wrong when trying to import " + type_name + " from file " + filepath);
-    }
+    void add(const std::string& name, const T& obj);
 
-    void save(std::string& filepath)
-    {
-        filepath = check_filepath(filepath, type, "save", false);
-             
-        char* c_filepath = const_cast<char*>(filepath.c_str());
+    T copy(const int pos) const;
 
-        int res = B_WsSave(c_filepath, type);
-        if (res != EXIT_SUCCESS)
-            throw std::runtime_error("Something went wrong when trying to save " + type_name + " to file " + filepath);
-    }
+    T copy(const std::string& name) const;
 
-    void clear()
-    {
-        int res = B_WsClear("", type);
-        if (res != EXIT_SUCCESS)
-            throw std::runtime_error("Something went wrong when trying to clear objets of type " + type_name);
-    }
+    T get(const int pos) const;
+
+    T get(const std::string& name) const;
+
+    void update(const int pos, const T& obj);
+
+    void update(const std::string& name, const T& obj);
+
+    void remove(const int pos);
+
+    void remove(const std::string& name);
+
+    // Load - Save - Clear methods
+
+    void load(std::string& filepath);
+
+    void save(std::string& filepath);
+
+    void clear();
+
+    // overloaded operators
 
     // TODO : overload subscript operator 
     //T operator[](const char* name) { ... }

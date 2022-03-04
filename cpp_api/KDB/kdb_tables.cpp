@@ -2,47 +2,63 @@
 #include "kdb_tables.h"
 
 
-Table* KDBTables::get(const int pos) const
+void KDBTables::add_or_update(const std::string& name, const Table& table)
 {
-    TBL* c_table = KTVAL(getKDB(), pos);
-    return new Table(c_table);
+	char* c_name = const_cast<char*>(name.c_str());
+	int pos = K_add(get_KDB(), c_name, table.c_table);
+	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
+	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
 }
 
-Table* KDBTables::get(const std::string name) const
+Table KDBTables::copy_obj(const Table& original) const
 {
-    int pos = getPosition(name);
-    return get(pos);
+	return Table(original);
 }
 
-std::string KDBTables::getTitle(const int pos) const
+Table KDBTables::get_unchecked(const int pos) const
 {
-    TBL* c_table = KTVAL(getKDB(), pos);
+    return Table(pos);
+}
+
+std::string KDBTables::get_title(const int pos) const
+{
+	// throw exception if table with passed position is not valid
+	get_name(pos);
+    TBL* c_table = KTVAL(get_KDB(), pos);
     std::string title_oem = std::string((char*)T_get_title(c_table));
     std::string title = convert_oem_to_utf8(title_oem);
     T_free(c_table);
     return title;
 }
 
-std::string KDBTables::getTitle(const std::string name) const
+std::string KDBTables::get_title(const std::string& name) const
 {
-    int pos = getPosition(name);
-    return getTitle(pos);
+	// throw exception if table with passed name does not exist
+    int pos = get_position(name);
+    return get_title(pos);
 }
 
-Table* KDBTables::add_table(const std::string name, const int nbColumns)
+Table KDBTables::add(const std::string& name, const int nbColumns)
 {
+	// throw exception if object with passed name already exist
 	char* c_name = const_cast<char*>(name.c_str());
+	if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(type_name + " with name " + name + " already exists. Use update() method instead.");
+
 	TBL* c_table = T_create(nbColumns);
 
-	int pos = K_add(getKDB(), c_name, c_table);
+	int pos = K_add(get_KDB(), c_name, c_table);
+	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
 	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
 
-	return new Table(c_table);
+	return Table(name);
 }
 
-Table* KDBTables::add_table(const std::string name, const int nbColumns, const std::string def, std::vector<std::string> vars, bool mode, bool files, bool date)
+Table KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, std::vector<std::string>& vars, bool mode, bool files, bool date)
 {
+	// throw exception if object with passed name already exist
 	char* c_name = const_cast<char*>(name.c_str());
+	if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(type_name + " with name " + name + " already exists. Use update() method instead.");
+
 	char* c_def = const_cast<char*>(def.c_str());
 	char** c_vars = new char* [vars.size() + 1];
 	for (int i = 0; i < vars.size(); ++i) c_vars[i] = const_cast<char*>(vars[i].c_str());
@@ -56,33 +72,9 @@ Table* KDBTables::add_table(const std::string name, const int nbColumns, const s
 
 	delete[] c_vars;
 
-	int pos = K_add(getKDB(), c_name, c_table);
+	int pos = K_add(get_KDB(), c_name, c_table);
+	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
 	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
 
-	return new Table(c_table);
-}
-
-Table* KDBTables::copy(const std::string name, const std::string original_table_name)
-{
-	TBL* c_copy_table = create_table_deep_copy(get(original_table_name)->c_table);
-
-	char* c_name = const_cast<char*>(name.c_str());
-	int pos = K_add(getKDB(), c_name, c_copy_table);
-	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
-
-	return new Table(c_copy_table);
-}
-
-void KDBTables::remove_table(const int pos)
-{
-	// test if table exists in K_WS
-	getName(pos);
-	K_del(getKDB(), pos);
-}
-
-void KDBTables::remove_table(const std::string name)
-{
-	// test if table exists in K_WS
-	int pos = getPosition(name);
-	remove_table(pos);
+	return Table(name);
 }

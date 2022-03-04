@@ -1,34 +1,35 @@
 #pragma once
 
 #include "kdb_abstract.h"
+#include "kdb_abstract.cpp"
 #include "../period.h"
 
 
-class KDBVariables : public KDBAbstract
+// TODO: wrapp functions from k_wsvar.c in KDBVariables
+class KDBVariables : public KDBAbstract<Variable>
 {
+protected:
+
+    // CRUD (Create - Read - Update - Delete) + Copy methods
+
+    void add_or_update(const std::string& name, const Variable& variable) override;
+
+    Variable copy_obj(const Variable& original) const override;
+
+    Variable get_unchecked(const int pos) const override;
 
 public:
     KDBVariables() : KDBAbstract(I_VARIABLES) {};
 
-    Variable get(const int pos, const int t, const int mode) const
-    {
-        return KV_get(getKDB(), pos, t, mode);
-    }
+    IODE_REAL get_var(const int pos, const int t, const int mode) const;
 
-    Variable get(const std::string name, const int t, const int mode) const
-    {
-        int pos = getPosition(name);
-        return get(pos, t, mode);
-    }
+    IODE_REAL get_var(const std::string& name, const int t, const int mode) const;
 
-    int getNbPeriods() const 
-    { 
-        return KSMPL(getKDB())->s_nb; 
-    }
+    void set_var(const int pos, const int t, const int mode, const IODE_REAL value);
 
-    Period getPeriod(const int t) const
-    {
-        PERIOD period = KSMPL(getKDB())->s_p1;
-        return Period(&period).shift(t);
-    }
+    void set_var(const std::string& name, const int t, const int mode, const IODE_REAL value);
+
+    int get_nb_periods() const;
+
+    Period get_period(const int t) const;
 };
