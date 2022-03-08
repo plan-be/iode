@@ -87,7 +87,11 @@ struct Table
 	TBL* c_table;
 
 public:
-	Table(TBL* other_table);
+	Table(const int pos);
+
+	Table(const std::string& name);
+
+	Table(const Table& table);
 
 	~Table();
 
