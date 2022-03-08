@@ -65,6 +65,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="test_equation.cpp" />
     <ClCompile Include="test_kdb_comments.cpp" />
     <ClCompile Include="test_kdb_equations.cpp" />
     <ClCompile Include="test_kdb_identities.cpp" />
