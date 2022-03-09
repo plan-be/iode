@@ -4,7 +4,6 @@
 class TablesTest : public KDBTest, public ::testing::Test
 {
 protected:
-    TBL* c_table;
     Table* table;
     KDBTables kdb;
 
@@ -13,8 +12,7 @@ protected:
         kdb.load(input_test_dir + "fun.tbl");
 
         int pos = K_find(K_WS[I_TABLES], "GFRPC");
-        c_table = KTVAL(K_WS[I_TABLES], pos);
-        table = new Table(c_table);
+        table = new Table(pos);
     }
 
     void TearDown() override 
