@@ -31,331 +31,65 @@ TEST_F(KDBEquationsTest, Save)
     kdb.save(output_test_dir + "fun.ae");
 }
 
-TEST_F(KDBEquationsTest, GET)
-{
-
-}
-
-// -- lec --
-
 TEST_F(KDBEquationsTest, GetLec)
 {
     int pos = 0;
-    std::string name = kdb.getName(pos);
-
-    std::string lec;
+    std::string name = kdb.get_name(pos);
     std::string expected_lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
 
-    // by position
-    lec = kdb.getLec(pos);
-    EXPECT_EQ(lec, expected_lec);
+    // by pos
+    EXPECT_EQ(kdb.get_lec(pos), expected_lec);
 
     // by name
-    lec = kdb.getLec(name);
-    EXPECT_EQ(lec, expected_lec);
+    EXPECT_EQ(kdb.get_lec(name), expected_lec);
 }
 
-TEST_F(KDBEquationsTest, SetLec)
-{
-    std::string lec;
-    std::string new_lec;
-
-    // by position
-    // original lec was: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995) -> removed acaf1
-    new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    kdb.setLec(0, new_lec);
-    lec = kdb.getLec(0);
-    EXPECT_EQ(lec, new_lec);
-
-    // by name
-    // original lec was: ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008)) -> replaced 0.006 by 0.01
-    new_lec = "ACAG := ACAG[-1]+r VBBP[-1]+(0.01*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))";
-    std::string name = kdb.getName(1);
-    kdb.setLec(name, new_lec);
-    lec = kdb.getLec(name);
-    EXPECT_EQ(lec, new_lec);
-}
-
-// -- method --
-
-TEST_F(KDBEquationsTest, GetMethod)
+TEST_F(KDBEquationsTest, Get)
 {
     int pos = 0;
-    std::string name = kdb.getName(pos);
+    std::string name = kdb.get_name(pos);
 
-    std::string method;
-    std::string expected_method = vEquationMethods[0];
-
-    // by position
-    method = kdb.getMethod(pos);
-    EXPECT_EQ(method, expected_method);
+    // by pos
+    Equation eq1 = kdb.get(pos);
 
     // by name
-    method = kdb.getMethod(name);
-    EXPECT_EQ(method, expected_method);
+    Equation eq2 = kdb.get(name);
 }
 
-TEST_F(KDBEquationsTest, SetMethod)
+TEST_F(KDBEquationsTest, CreateRemove)
 {
-    int pos = 0;
-    std::string name = kdb.getName(1);
+    std::string name = "ACAF";
+    kdb.remove(name);
+    EXPECT_THROW(kdb.get(name), std::runtime_error);
 
-    std::string res_method;
+    std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    std::string method = "LSQ";
+    Sample sample("1980Y1", "1996Y1");
+    std::string comment = "Equation comment";
+    std::string block = "ACAF";
+    std::string instruments = "Equation instruments";
+    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
+    bool date = true;
 
-    // by position
-    for (const std::string& method : vEquationMethods)
-    {
-        kdb.setMethod(pos, method);
-        res_method = kdb.getMethod(pos);
-        EXPECT_EQ(res_method, method);
-    }
-
-    // by name
-    for (const std::string& method : vEquationMethods)
-    {
-        kdb.setMethod(name, method);
-        res_method = kdb.getMethod(name);
-        EXPECT_EQ(res_method, method);
-    }
+    kdb.add(name, lec, comment, method, sample, instruments, block, tests, date);
 }
 
-// -- block --
-
-TEST_F(KDBEquationsTest, GetBlock)
+TEST_F(KDBEquationsTest, Update)
 {
-    int pos = 0;
-    std::string name = kdb.getName(pos);
+    std::string name = "ACAF";
+    std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
 
-    std::string block;
-    std::string expected_block = "ACAF";
-
-    // by position
-    block = kdb.getBlock(pos);
-    EXPECT_EQ(block, expected_block);
-
-    // by name
-    block = kdb.getBlock(name);
-    EXPECT_EQ(block, expected_block);
+    Equation eq = kdb.get(name);
+    eq.set_lec(new_lec, name);
+    kdb.update(name, eq);
+    EXPECT_EQ(kdb.get_lec(name), new_lec);
 }
 
-TEST_F(KDBEquationsTest, SetBlock)
+TEST_F(KDBEquationsTest, Copy)
 {
-    int pos = 0;
-    std::string name = kdb.getName(1);
+    std::string name = "ACAF";
+    Equation eq = kdb.get(name);
 
-    std::string block;
-    std::string new_block = "ACAF;AGAF";
-
-    // by position
-    kdb.setBlock(pos, new_block);
-    block = kdb.getBlock(pos);
-    EXPECT_EQ(block, new_block);
-
-    // by name
-    kdb.setBlock(name, new_block);
-    block = kdb.getBlock(name);
-    EXPECT_EQ(block, new_block);
-}
-
-// -- sample --
-
-TEST_F(KDBEquationsTest, GetSample)
-{
-    int pos = 0;
-    std::string name = kdb.getName(pos);
-
-    Sample expected_sample("1980Y1", "1996Y1");
-
-    // by position
-    Sample sampleByPos = kdb.getSample(pos);
-    EXPECT_EQ(sampleByPos.to_string(), expected_sample.to_string());
-
-    // by name
-    Sample sampleByName = kdb.getSample(name);
-    EXPECT_EQ(sampleByName.to_string(), expected_sample.to_string());
-}
-
-TEST_F(KDBEquationsTest, SetSample)
-{
-    int pos = 0;
-    std::string name = kdb.getName(1);
-
-    std::string from = "2000Y1";
-    std::string to = "2020Y1";
-    Sample new_sample(from, to);
-
-    // by position
-    kdb.setSample(pos, from, to);
-    Sample sampleByPos = kdb.getSample(pos);
-    EXPECT_EQ(sampleByPos.to_string(), new_sample.to_string());
-
-    // by name
-    kdb.setSample(name, from, to);
-    Sample sampleByName = kdb.getSample(name);
-    EXPECT_EQ(sampleByName.to_string(), new_sample.to_string());
-}
-
-// -- comment --
-
-TEST_F(KDBEquationsTest, GetComment)
-{
-    int pos = 0;
-    std::string name = kdb.getName(pos);
-
-    std::string comment;
-    std::string expected_comment = "";
-
-    // by position
-    comment = kdb.getComment(pos);
-    EXPECT_EQ(comment, expected_comment);
-
-    // by name
-    comment = kdb.getComment(name);
-    EXPECT_EQ(comment, expected_comment);
-}
-
-TEST_F(KDBEquationsTest, SetComment)
-{
-    int pos = 0;
-    std::string name = kdb.getName(1);
-
-    std::string comment;
-    std::string new_comment = "New Comment";
-
-    // by position
-    kdb.setComment(pos, new_comment);
-    comment = kdb.getComment(pos);
-    EXPECT_EQ(comment, new_comment);
-
-    // by name
-    kdb.setComment(name, new_comment);
-    comment = kdb.getComment(name);
-    EXPECT_EQ(comment, new_comment);
-}
-
-// -- instruments --
-
-TEST_F(KDBEquationsTest, GetInstruments)
-{
-    int pos = 0;
-    std::string name = kdb.getName(pos);
-
-    std::string instruments;
-    std::string expected_instruments = "";
-
-    // by position
-    instruments = kdb.getInstruments(pos);
-    EXPECT_EQ(instruments, expected_instruments);
-
-    // by name
-    instruments = kdb.getInstruments(name);
-    EXPECT_EQ(instruments, expected_instruments);
-}
-
-TEST_F(KDBEquationsTest, SetInstruments)
-{
-    int pos = 0;
-    std::string name = kdb.getName(1);
-
-    std::string instruments;
-    // TODO : find a realistic value for new_instruments
-    std::string new_instruments = "random_text";
-
-    // by position
-    kdb.setInstruments(pos, new_instruments);
-    instruments = kdb.getInstruments(pos);
-    EXPECT_EQ(instruments, new_instruments);
-
-    // by name
-    kdb.setInstruments(name, new_instruments);
-    instruments = kdb.getInstruments(name);
-    EXPECT_EQ(instruments, new_instruments);
-}
-
-// -- date --
-
-TEST_F(KDBEquationsTest, GetDate)
-{
-    int pos = 0;
-    std::string name = kdb.getName(pos);
-
-    int date;
-    std::string s_date;
-    int expected_date = 19980612;
-    std::string s_expected_date = "12-06-1998";
-
-    // by position
-    date = kdb.getDate(pos);
-    EXPECT_EQ(date, expected_date);
-    s_date = kdb.getDateAsString(pos);
-    EXPECT_EQ(s_date, s_expected_date);
-
-    // by name
-    date = kdb.getDate(name);
-    EXPECT_EQ(date, expected_date);
-    s_date = kdb.getDateAsString(name);
-    EXPECT_EQ(s_date, s_expected_date);
-}
-
-
-TEST_F(KDBEquationsTest, UpdateDate)
-{
-// disable the present test function if AddressSanitizer
-// is enabled since SCR_current_date() crashes on the
-// Windows Server 2019 VM used by Github Actions
-#if !(defined _MSC_VER && defined __SANITIZE_ADDRESS__)
-    int pos = 0;
-    std::string name = kdb.getName(1);
-
-    int date;
-    int current_date = SCR_current_date();
-
-    // by position
-    kdb.updateDate(pos);
-    date = kdb.getDate(pos);
-    EXPECT_EQ(date, current_date);
-
-    // by name
-    kdb.updateDate(name);
-    date = kdb.getDate(name);
-    EXPECT_EQ(date, current_date);
-#endif
-}
-
-// -- tests --
-
-TEST_F(KDBEquationsTest, GetTests)
-{
-    int pos = 0;
-    std::string name = kdb.getName(pos);
-
-    std::array<float, EQS_NBTESTS> tests;
-    std::array<float, EQS_NBTESTS> expected_tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
-
-    // by position
-    tests = kdb.getTests(pos);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], expected_tests[i]);
-
-    // by name
-    tests = kdb.getTests(name);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], expected_tests[i]);
-}
-
-TEST_F(KDBEquationsTest, SetTests)
-{
-    int pos = 0;
-    std::string name = kdb.getName(1);
-
-    std::array<float, EQS_NBTESTS> tests;
-    std::array<float, EQS_NBTESTS> new_tests = { 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11. };
-
-    // by position
-    kdb.setTests(pos, new_tests);
-    tests = kdb.getTests(pos);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], new_tests[i]);
-
-    // by name
-    kdb.setTests(name, new_tests);
-    tests = kdb.getTests(name);
-    for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], new_tests[i]);
+    Equation copy_eq = kdb.copy(name);
+    EXPECT_EQ(copy_eq, eq);
 }
