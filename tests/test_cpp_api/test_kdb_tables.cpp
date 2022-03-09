@@ -33,16 +33,13 @@ TEST_F(KDBTablesTest, Save)
 
 TEST_F(KDBTablesTest, Get)
 {
-    Table* table;
     int pos = K_find(K_WS[I_TABLES], "GFRPC");
 
     // by position
-    table = kdb.get(pos);
-    delete table;
+    Table table = kdb.get(pos);
 
     // by name
-    table = kdb.get("GFRPC");
-    delete table;
+    Table table2 = kdb.get("GFRPC");
 }
 
 TEST_F(KDBTablesTest, GetTitle)
@@ -52,24 +49,22 @@ TEST_F(KDBTablesTest, GetTitle)
     std::string expected_title = u8"Déterminants de la croissance de K";
 
     // by position
-    title = kdb.getTitle(pos);
+    title = kdb.get_title(pos);
     EXPECT_EQ(expected_title, title);
 
     // by name
-    std::string name = kdb.getName(pos);
-    title = kdb.getTitle(name);
+    std::string name = kdb.get_name(pos);
+    title = kdb.get_title(name);
     EXPECT_EQ(expected_title, title);
 }
 
-TEST_F(KDBTablesTest, AddRemove)
+TEST_F(KDBTablesTest, CreateRemove)
 {
-    Table* table;
     KDBVariables kdb_var;
     kdb_var.load(input_test_dir + "fun.var");
 
     // add empty table with 2 columns
-    table = kdb.add_table("table1", 2);
-    delete table;
+    Table table1 = kdb.add("table1", 2);
 
     // add tables and initialize it
     std::string def = "A title";
@@ -77,21 +72,17 @@ TEST_F(KDBTablesTest, AddRemove)
     bool mode = true;
     bool files = true;
     bool date = true;
-    table = kdb.add_table("table2", 2, def, vars, mode, files, date);
-    delete table;
+    Table table2 = kdb.add("table2", 2, def, vars, mode, files, date);
 
     // remove added tables
-    kdb.remove_table("table1");
-    kdb.remove_table("table2");
+    kdb.remove("table1");
+    kdb.remove("table2");
 }
 
 TEST_F(KDBTablesTest, Copy)
 {
-    Table* original_table = kdb.get("GFRPC");
+    Table original_table = kdb.get("GFRPC");
 
-    Table* copy_table = kdb.copy("GFRPC_COPY", "GFRPC");
-    EXPECT_EQ(*copy_table, *original_table);
-
-    delete original_table;
-    delete copy_table;
+    Table copy_table = kdb.copy("GFRPC");
+    EXPECT_EQ(copy_table, original_table);
 }
