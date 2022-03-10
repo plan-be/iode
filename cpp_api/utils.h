@@ -63,7 +63,7 @@ inline std::string convert_utf8_to_oem(const std::string str_u8)
 }
 
 
-std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)
+inline std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
     std::string error_msg = "Call to " + caller_name + "() failed. ";
