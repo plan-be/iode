@@ -2,7 +2,7 @@
  * @author Jean-Marc PAUL
  * @author Geert BRYON
  *
- * Functions implementing the interface functions between the LEC functions and the IODE KDB's.
+ * Functions implementing the interface between the LEC functions and the IODE KDB's.
  *  
  *      IODE_REAL *L_getvar(KDB* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
  *      IODE_REAL L_getscl(KDB* kdb, int pos)   Retrieves a scalar value.
