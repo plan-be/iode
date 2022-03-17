@@ -731,6 +731,12 @@ extern  int     G_CUR_TITLE;
 #define E_GMG_SING_ERR  9
 #define E_NO_SCALARS    10
 
+
+/* SIMULATION */
+#define SORT_CONNEX    0
+#define SORT_BOTH      1
+#define SORT_NONE      2
+
 /******************************* TYPEDEFS **********************************/
 typedef char    OFNAME[OK_MAX_FILE];
 typedef char    FNAME[K_MAX_FILE];
@@ -880,46 +886,55 @@ typedef struct _eq_ {
     float   tests[EQS_NBTESTS]; // Estimation tests
 } EQ;
 
-// Table elements definition 
+// TBL (table) definition 
+// ----------------------
 
 // TCELL = Table Cell 
 typedef struct _tcell_ {
-    char    *tc_val;    // Content of the CELL (LEC or text)
-    char    tc_type;    // TEXT, LEC 
+    char    *tc_val;    // NULL or
+                        // char* if type == KT_STRING or
+                        // packed IDT (i.e. char*) if type == KT_LEC
+    char    tc_type;    // KT_STRING or KT_LEC
     char    tc_attr;    // KT_LEFT, KT_CENTER, KT_RIGHT, KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_NORMAL 
-    char    tc_pad[2];
+    char    tc_pad[2];  // Padding for struct alignment
 } TCELL;
 
 // TLINE = Table Line
 typedef struct _tline_ {
-    char    *tl_val;        /* if tl_type = title then val = ptr unsigned char else ptr to TCELL */
-    char    tl_type;        /* FILES, MODE, TITLE, LINE, CELL */
-    char    tl_graph;       /* G_LINE = 0, .... */
-    U_ch    tl_axis:1;      /* was tl_attr, Unused before? */
-    U_ch    tl_pbyte:7;     /* was tl_attr, Unused before? */
-    char    tl_pad[1];
+    char    *tl_val;    // if tl_type == KT_CELL  : tl_val is TCELL*
+                        // if tl_type == KT_TITLE : tl_val is TCELL*
+                        // if tl_type == KT_LINE  : tl_val is NULL
+                        // if tl_type == KT_MODE  : tl_val is NULL
+                        // if tl_type == KT_DATE  : tl_val is NULL
+                        // if tl_type == KT_FILES : tl_val is NULL
+    char    tl_type;    // KT_FILES, KT_MODE, KT_TITLE, KT_LINE or KT_CELL 
+    char    tl_graph;   // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
+    U_ch    tl_axis:1;  // 0 if values are relative to the left axis, 1 to the right axis
+    U_ch    tl_pbyte:7; // available free space
+    char    tl_pad[1];  // Padding for struct alignment
 } TLINE;
 
 // TBL = Table (struct containing a table definition)
 typedef struct _tbl_ {
     short   t_lang;     // Output language : KT_ENGLISH, KT_FRENCH, KT_DUTCH
-    short   t_free;     // = 0, first column is frozen (?) TODO: update doc for t_free
-    short   t_nc;       // Number of columns
+    short   t_free;     // if 0, first column is frozen -- not used
+    short   t_nc;       // Number of columns (of text and lec, not calculated values)
     short   t_nl;       // Number of lines
-	TLINE   t_div;      // t_nc CELLS, each CELL contains a divider, attr 
-    TLINE   *t_line;    // t_nl TLINE of t_nc CELLS */
-	float   t_zmin;     // Min on 2d axis (value axis on graph) */
-    float   t_zmax;     // Max on 2d axis (value axis on graph) */
-    float   t_ymin;     // Min on 1st axis (value axis on graph) */
-    float   t_ymax;     // Max on 1st axis (value axis on graph) */
-    char    t_attr;     // 0, ... 9 */ // TODO: complete doc
-    char    t_box;      // 0, ... 9 */ // TODO: complete doc
-    char    t_shadow;   // 0, ... 9 */ // TODO: complete doc
-    char    t_gridx;    // G_NONE, G_MINOR, G_MAJOR */
-    char    t_gridy;    // G_NONE, G_MINOR, G_MAJOR */
-    char    t_axis;     // G_VALUES, G_LOG, G_SEMILOG, G_PERCENT */
-    char    t_align;    // G_LEFT, G_MIDDLE, G_RIGHT */
-    char    t_pad[13];
+	TLINE   t_div;      // t_nc TCELL's, each TCELL contains a divider
+    TLINE   *t_line;    // t_nl TLINE's of t_nc TCELL's
+    float   t_zmin;     // Min on the right axis 
+    float   t_zmax;     // Max on the right axis 
+    float   t_ymin;     // Min on left axis 
+    float   t_ymax;     // Max on left axis 
+    char    t_attr;     // Combination (logical &) of attributes: KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_CENTER, 
+                        // KT_DECIMAL, KT_LEFT and KT_RIGHT
+    char    t_box;      // 1 to surround the chart by a box
+    char    t_shadow;   // 1 to place a shadow behind the chart
+    char    t_gridx;    // 0 = major grids, 1 = no grids, 2 = minor + major grids
+    char    t_gridy;    // idem
+    char    t_axis;     // 0=normal axis, 1=log, 2=semi-log, 3=percents (TODO: to be tested)
+    char    t_align;    // Text alignement: 0=left, 1=centered, 2 = right
+    char    t_pad[13];  // Padding for struct alignment
 } TBL;
 
 /******************************* X64  : TYPEDEFS  particuliers 32 bits pour import/export  **********************************/
@@ -986,7 +1001,7 @@ typedef struct _eq32_ {
     float   tests[EQS_NBTESTS]; /* FLOAT 12-04-98 */
 } EQ32;
 
-/* Table definition */
+// Table definition internal format (for 32 and 64 bits)
 typedef struct _tcell32_ {
     PTR32   tc_val;
     char    tc_type;    /* TEXT, LEC */
@@ -1024,32 +1039,37 @@ typedef struct _tbl32_ {
     char    t_pad[13];
 } TBL32;
 
-/*----------------------- COLS ---------------------------------*/
-typedef struct _col_ {
-    short   cl_opy;     /*op‚rateur sur p‚riode per1 opp per2*/
-    PERIOD  cl_per[2];  /*p‚riode 1 , p‚riode 2*/
-    short   cl_opf;     /*op‚rateur fichier  fich1 opf fich2 */
-    short   cl_fnb[2];  /*fichier1 , fichier 2 */
-    IODE_REAL    cl_val[2][2];
-    /*   {{v00, v01},{v10,v11}} avec
+/*----------------------- Table calculations ---------------------------------*/
 
-	   ³            ³
-	   ³   fich1    ³   fich2
-    ÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ
-    per1   ³    v00     ³    v01
-	   ³ cl_val[0,0]³ cl_val[0,1]    v.. = valeur
-    ÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ
-    per2   ³    v10     ³    v11
-	   ³ cl_val[1,0]³ cl_val[1,1]
-	   ³            ³
-      */
-    IODE_REAL    cl_res;   /* r‚sultat de (v00 opp v10) opf (v01 opp v11)*/
+// COL definition
+typedef struct _col_ {
+    short   cl_opy;             // operator on periods => cl_per[0] cl_opy cl_per[1]) 
+    PERIOD  cl_per[2];          // period 1 , period 2
+    short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1] 
+    short   cl_fnb[2];          // file1, file2 
+    IODE_REAL    cl_val[2][2];  // computed values: 4 possibilities see below
+    
+    /*   {{v00, v01},{v10,v11}} 
+
+	        |             |
+	        |   file1     |   file2
+    --------|-------------|------------
+    period1 |    v00      |    v01
+	        | cl_val[0,0] | cl_val[0,1]    v.. = valeur
+    --------|-------------|------------
+    period2 |    v10      |    v11
+	        | cl_val[1,0] | cl_val[1,1]
+	        |             |
+    */
+    IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
 
+// COLS : group of COL
 typedef struct _cols_ {
-    int     cl_nb;
-    COL     *cl_cols;
+    int     cl_nb;          // Number of columns
+    COL     *cl_cols;       // Pointer to the first COL struct
 } COLS;
+
 
 typedef struct _rep_ {
     short   r_nb;
@@ -1325,11 +1345,18 @@ extern MAT  *E_RHS,
        *E_DEV;
 
 /************************* SIMULATION *************************************/
-extern int      *KSIM_NITERS;                           // JMP 21/3/2012
-extern int  KSIM_MAXIT;
-extern IODE_REAL     *KSIM_NORMS;
-//extern IODE_REAL KSIM_RELAX, KSIM_EPS;
+extern int          KSIM_MAXIT;
+extern int          *KSIM_NITERS;                         
+extern IODE_REAL    *KSIM_NORMS;
 
+// EQUATION ORDERING 
+extern int  KSIM_PRE; 
+extern int  KSIM_INTER;
+extern int  KSIM_POST;
+//extern int  *KSIM_ORDER;
+//extern char *KSIM_ORDERED;
+extern int  KSIM_MAXDEPTH;
+extern int  *KSIM_POSXK;
 
 /*********************** FUNCTIONS DECLARATIONS ***************************/
 // NEW FOR IODECOM (JMP 1/23/2018)
@@ -1355,3 +1382,4 @@ extern  int   (*K_xdrobj[])();
 
 
 #endif /* _IODE_H_ */
+
