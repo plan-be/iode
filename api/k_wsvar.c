@@ -262,7 +262,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
  *      
  *  @param [in, out]    val     IODE_REAL*  pointer to the VAR data
  *  @param [in]         t       int         position in val to be calculated  
- *  @param [in]         method  int         method of extrapolation
+ *  @param [in]         method  int         extrapolation method 
  *  @return                     void
  *  
  *  Methods:
