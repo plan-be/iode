@@ -200,12 +200,14 @@ TCELL *T_create_title(TBL* tbl, TLINE* line)
  *      - lec expression or (A+B)
  *      - text possibly between double quotes (if mode == 1 => "Line title:", if not => Line title)
  *  
+ *  The returned value is the global allocated buffer BUF_DATA (see buf.c) or a pointer to a static memory "".
+ *  
  *  mode is set to 1 only for the TBL editor where the CELL type is deduced from the first character (" => text).
  *  
  *  @param [in] cell    TCELL*  cell to read
  *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
  *                              0 if not 
- *  @return             char*   pointer to the big buffer (see buf.c)
+ *  @return             char*   pointer to the big buffer (see buf.c) -- Do NOT free!
  */
 char* T_cell_cont(TCELL* cell, int mode)
 {
@@ -229,7 +231,7 @@ char* T_cell_cont(TCELL* cell, int mode)
  *  @param [in]      type    int     TLINE type (KT_CELL, KT_TITLE...)
  *  @param [in]      where   int     0 to insert before line nbr, 1 to insert after line nbr
  *  @return                  int     position of the new line in TBL
- *  
+ *  **TODO: Check where definition 
  */
 int T_insert_line(TBL* tbl, int nbr, int type, int where)
 {
