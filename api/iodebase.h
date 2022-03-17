@@ -447,7 +447,7 @@ extern EQ* K_eptr(KDB* kdb, char* name);
 
 /* k_lst.c */
 extern int K_scan(KDB *,char *,char *);
-extern void K_clecscan(KDB *,CLEC *,KDB *,KDB *);
+//extern void K_clecscan(KDB *,CLEC *,KDB *,KDB *);
 extern void KE_scan(KDB *,int ,KDB *,KDB *);
 extern void KI_scan(KDB *,int ,KDB *,KDB *);
 extern void KT_scan(KDB *,int ,KDB *,KDB *);
@@ -1146,30 +1146,41 @@ extern int SB_ProfileReset(void);
 
 /* sb_wrap.c */
 
-/* k_sim.c */
-extern int KE_simul_s(KDB *,KDB *,KDB *,SAMPLE *,char **, char **);
+/* k_sim_main.c */
+extern int K_simul(KDB *,KDB *,KDB *,SAMPLE *,char **, char **);
 extern int K_simul_1(int );
-extern int K_init_values(int );
-extern int K_restore_XK(int );
+extern void K_simul_free();
+//extern void K_init_values(int );
+//extern void K_restore_XK(int );
 extern double K_calc_clec(int ,int ,int ,int);
-extern int K_prolog(int );
-extern int K_interdep(int );
-extern int K_epilog(int );
-extern int KE_order(KDB *, char **);
-extern int KE_preorder(KDB *,int **,int **);
-extern int KE_add_post(int **,int ,int );
-extern int KE_postorder(KDB *,int **,int **);
-extern int KE_pre(KDB *,int **,int );
-extern int KE_interdep(KDB *,int **);
-extern int KE_tri(KDB *,int **,int );
-extern int KE_tri_perm1(KDB *,int ,int *);
-extern int KE_tri_begin(KDB *);
-extern int KE_tri_end(KDB *);
+//extern void K_prolog(int );
+//extern int K_interdep(int );
+//extern int K_interdep(int );
+//extern void K_epilog(int );
+extern void K_lstorder(char *,char *,char *);
+// extern int K_diverge(int ,char *,double );
+
+/* k_sim_order.c */
+extern void KE_order(KDB *, char **);
+//extern int KE_preorder(KDB *,int **,int **);
 extern int KE_poseq(int );
+//extern int KE_add_post(int **,int ,int );
+//extern int KE_postorder(KDB *,int **,int **);
+//extern int KE_pre(KDB *,int **,int );
+//extern int KE_interdep(KDB *,int **);
+extern void KE_tri(KDB *,int **,int );
+//extern int KE_tri_perm1(KDB *,int ,int *);
+//extern int KE_tri_begin(KDB *);
+//extern int KE_tri_end(KDB *);
+
+/* k_sim_exo2endo.c */
 extern int KE_exo2endo(int ,int );
-extern int KE_findpath(int ,int ,int *);
-extern int K_diverge(int ,char *,double );
-extern int K_lstorder(char *,char *,char *);
+//extern int KE_findpath(int ,int ,int *);
+
+/* k_sim_scc.c */
+extern int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post);
+//extern int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl);
+extern int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post);
 
 /* k_exec.c */
 extern KDB *KI_series_list(KDB *);
