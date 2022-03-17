@@ -3,15 +3,24 @@
  *  
  *  IODE API tests.
  *
- *  Syntax: test1 [-x[-]] [-v[-]]
- *      -x:     exits on error
- *      -x-:    continues on error (default)
- *      -v:     verbose (displays message also on success) (default)
- *      -v-:    don't display messages on success
+ *  See function Syntax() .
  */
+
 
 #include <stdarg.h>
 #include "iode.h"
+
+void Syntax() 
+{
+    printf("Syntax: test1 [-v] [-v-] [-x] [-x-] [-h]\n");
+    printf("  [-v]  : verbose (default)\n");
+    printf("  [-v-] : silent\n");
+    printf("  [-x]  : exit on error (default)\n");
+    printf("  [-x-] : continue on error\n");
+    printf("  [-h]  : display syntax\n");
+    exit(0);
+}
+
 
 #ifdef _MSC_VER
     char    *IODE_DATA_DIR   = "data";
@@ -40,17 +49,44 @@ int W_printf(char* fmt,...)
 }
 
 /**
- * Fonctions et vars de la lib S4ASSERT 
+ *  Fonctions et vars de la lib S4ASSERT 
+ *  ------------------------------------ 
+ *      int S4ASSERT_strcmp(char* str1, char* str2)  : compares 2 strings and return(1) if equal
+ *      int S4ASSERT_cmp_tbl(char** tbl1, char* vec) : Compares a table of strings to a list of strings in a semi-colon separated vector.
+ *      void S4ASSERT(int success, char* fmt, ...)   : Verifies an assertion, optionally displays a message and opt. exits on error.
+ *  
+ *      int S4ASSERT_VERBOSE            if not null, display all messages, eve, on success
+ *      int S4ASSERT_EXIT_ON_ERROR      if not null, exits on the first not satisfied assertion 
+ *
  */ 
-int S4ASSERT_VERBOSE = 1;
-int S4ASSERT_EXIT_ON_ERROR = 0;
+int S4ASSERT_VERBOSE = 1;           // if not null, display all messages, eve, on success
+int S4ASSERT_EXIT_ON_ERROR = 1;     // if not null, exits on the first not satisfied assertion 
+
+/**
+ *  Compares 2 strings. 
+ *  
+ *  Ex. 
+ *      SCR_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
+ *      SCR_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *  
+ *  @param [in] str1    char*   string  
+ *  @param [in] str2    char*   string 
+ *  @return             int     1 if the content of str1 == that of str2, 0 if not
+ *  
+ */
+int S4ASSERT_strcmp(char* str1, char* str2)
+{
+    if(str1 == NULL && str2 == NULL) return(1);
+    if(str1 == NULL || str2 == NULL) return(0);
+    return(!strcmp(str1, str2));
+}
 
 /**
  *  Compares a table of strings to a list of strings in a semi-colon separated vector.
  *  
  *  Ex. 
- *      SCR_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
- *      SCR_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *      S4ASSERT_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
+ *      S4ASSERT_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
  *  
  *  @param [in] tbl1    char**  table of strings    
  *  @param [in] vec     char*   semi-colon sep vector
@@ -77,6 +113,9 @@ fin:
     SCR_free_tbl(tbl2);
     return(rc);
 
+}
+
+void kmsg_null(char*msg) {
 }
 
 
@@ -137,7 +176,7 @@ void Tests_BUF()
  */
 void Tests_Objects()
 {
-    char*       lst, **args;
+    char*       lst;
     SAMPLE*     smpl;
     IODE_REAL   A[64], B[64];
     int         nb, i, pos;
@@ -176,7 +215,7 @@ void Tests_Objects()
 void TestLEC(char* title, char* lec, int t, IODE_REAL expected_val)
 {
     CLEC*   clec;
-    char    buf[256];
+    //char    buf[256];
     double  calc_val;
     PERIOD  *per;
     char    aper[24];
@@ -253,7 +292,7 @@ Tests_ARGS()
     // A1 A2
     sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
     args = B_ainit_chk(filename, NULL, 0);
-    S4ASSERT(S4ASSERT_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"@data\\test.args\")");
+    S4ASSERT(S4ASSERT_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
     SCR_free_tbl(args);
 }
 
@@ -298,16 +337,154 @@ Tests_K_OBJFILE()
     */
 }
     
+
+/**
+ *  Checks:
+ *      - K_interpret(): conversion 32/64 bits
+ *      - KT_save_asc()
+ *      - macro KTVAL()
+ *      - T_cell_cont()en 32 and 64 bits
+ */    
+Tests_TBL32_64()
+{
+    char    in_filename[256];
+    char    out_filename[256];
+    KDB     *kdb_tbl;
+    int     rc;
+    
+    int     pos, col;
+    TBL*    c_table;
+    TCELL*  cells;
+    char    *cell_content;
+
+    
+    sprintf(in_filename,  "%s\\fun.tbl", IODE_DATA_DIR);
+   
+    kdb_tbl = K_interpret(K_TBL, in_filename);
+    S4ASSERT(kdb_tbl != NULL, "K_interpret(K_TBL, \"%s\")", in_filename);
+    if(kdb_tbl) {
+        sprintf(out_filename, "%s\\fun_copy.at", IODE_OUTPUT_DIR);
+        rc = KT_save_asc(kdb_tbl, out_filename);
+        S4ASSERT(rc == 0, "KT_save_asc(kdb_tbl, \"%s\") == %d", out_filename, rc);
+    }
+    
+    // Plantage ALD 14/02/2022   
+    pos = K_find(kdb_tbl, "GFRPC");
+    c_table = KTVAL(kdb_tbl, pos);
+
+    // divider
+    cells = (TCELL*) c_table->t_div.tl_val;
+    printf("Address(cells) =     %0x\nAddress(cells + 1) = %0x\n", cells, cells + 1);
+    printf("Diff(cells, cells+1) = %d\n", (char*)(cells + 1) - (char*)(cells));
+    
+    for(col = 0; col < c_table->t_nc; col++) {
+        cell_content = T_cell_cont(&cells[col], 1);
+        printf("Cell %d:%s\n",col, cell_content);
+    }
+}
+
+KDB* Test_K_interpret(int type, char* filename)
+{
+    char    fullfilename[256];
+    KDB     *kdb;
+    
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
+    kdb = K_interpret(type, fullfilename);
+    //S4ASSERT(kdb != NULL, "K_interpret(%d, \"%s\")", type, fullfilename);
+    return(kdb);
+}
+
+
+Tests_Simulation()
+{
+    KDB     *kdbv, 
+            *kdbe, 
+            *kdbs;
+    SAMPLE  *smpl;
+    char    *filename = "fun";
+    int     rc;
+    LIS     lst, expected_lst;
+       
+    
+    // Loads 3 WS and check ok
+    K_WS[K_VAR] = kdbv  = Test_K_interpret(K_VAR, filename);
+    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
+    
+    K_WS[K_SCL] = kdbs  = Test_K_interpret(K_SCL, filename);
+    S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
+    
+    K_WS[K_EQS] = kdbe  = Test_K_interpret(K_EQS, filename);
+    S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
+
+    
+    // Check list is empty
+    lst = KLPTR("_DIVER");
+    S4ASSERT(S4ASSERT_strcmp(lst, NULL), "_DIVER=NULL", lst);
+    
+    // Simulation std parameters
+    smpl = PER_atosmpl("2000Y1", "2002Y1");
+    KSIM_EPS = 0.0001;
+    KSIM_MAXIT = 100;
+    KSIM_RELAX = 0.7;
+    KSIM_SORT = SORT_BOTH;
+    KSIM_PASSES = 5; 
+    KSIM_DEBUG = 1;
+
+    kmsg_super = kmsg_null; // Void itearation messages during simulation
+    
+    // Test simulation : divergence
+    KSIM_MAXIT = 2;
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    S4ASSERT(rc != 0, "K_simul() with only maxit=%d does not converge", KSIM_MAXIT);
+    
+    // Check _PRE list after simulation (prolog)
+    lst = KLPTR("_PRE");
+    expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
+    S4ASSERT(S4ASSERT_strcmp(lst, expected_lst), "_PRE=\"%s\"", lst);
+    
+    // Check _DIVER list
+    lst = KLPTR("_DIVER");
+    //printf("'%s'\n", lst);
+    expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
+    S4ASSERT(S4ASSERT_strcmp(lst, expected_lst), "_DIVER=\"%s\"", lst);
+    
+    // Test with with convergence (increase MAXIT)
+    KSIM_MAXIT = 100;
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    S4ASSERT(rc == 0, "K_simul() with maxit=%d does converge",KSIM_MAXIT);
+
+    // Test Endo-exo
+    
+
+
+    // Cleanup
+    SCR_free(smpl);
+}
+
+
+void Tests_ALIGN()
+{
+    TBL     tbl, *p_tbl = &tbl;
+    int     offset;
+    
+    offset = (char*)(p_tbl + 1) - (char*)p_tbl;
+    printf("sizeof(TBL)    = %d -- Offset = %d\n", sizeof(TBL), offset);
+    //printf("sizeof(TBL)    = %d\n", sizeof(TBL));
+    //printf("sizeof(TLINE)  = %d\n", sizeof(TLINE));
+    //printf("sizeof(TCELL)  = %d\n", sizeof(TCELL));
+    //                         
+    //printf("sizeof(TBL32)  = %d\n", sizeof(TBL32));
+    //printf("sizeof(TLINE32)= %d\n", sizeof(TLINE32));
+    //printf("sizeof(TCELL32)= %d\n", sizeof(TCELL32));
+}
+
 /* ========================================================*/
+
 int main(int argc, char **argv)
 {
-    // Initialise 7 KDB
-    KDB*        kdbv;
-    CLEC*       clec;
-    SAMPLE      *smpl;
-    IODE_REAL   A[64], B[64];
-    int         i, nb;
-
+    int i;
+    
     IODE_assign_super_API();
     strcpy(SCR_NAME_ERR, "iode.msg");
 
@@ -316,12 +493,14 @@ int main(int argc, char **argv)
         if(strcmp(argv[i], "-v")  == 0) S4ASSERT_VERBOSE = 1;
         if(strcmp(argv[i], "-x-") == 0) S4ASSERT_EXIT_ON_ERROR = 0;
         if(strcmp(argv[i], "-x") == 0)  S4ASSERT_EXIT_ON_ERROR = 1;
+        if(strcmp(argv[i], "-h") == 0)   Syntax();
     }
     
     // Initialises 7 empty WS
     K_init_ws(0);
 
     // test B_seterrn()
+    Tests_ALIGN();
     Tests_ERRMSGS();
     Tests_BUF();
     Tests_Objects();
@@ -329,7 +508,8 @@ int main(int argc, char **argv)
     Tests_EQS();
     Tests_ARGS();
     Tests_K_OBJFILE();
-
+    Tests_TBL32_64();
+    Tests_Simulation();
     
 //    B_ReportLine("$show coucou");
 }
