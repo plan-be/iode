@@ -9,6 +9,9 @@
     - [k\_sim\_order.c](#T3)
     - [k\_sim\_scc.c](#T4)
     - [k\_sim\_exo2endo.c](#T5)
+    - [Single equation solver](#T6)
+      - [l\_newton.c](#T7)
+      - [l\_secant.c](#T8)
 
 # IODE: Model Simulation {#T1}
 
@@ -52,4 +55,24 @@ Another way to view the process is to say that the model is solved with respect 
 |Syntax|Description|
 |:---|:---|
 |`int KE_exo2endo(int posendo, int posexo)`|Modify the model to solve it with respect to another set of variables|
+
+### Single equation solver {#T6}
+
+When an equation is not analytically solved during the compilation process or if it has been inverted by the endo\-exo exchange, that equation pust be solved numerically during the simulation.
+
+Two methods are used: a simple Newton\-Raphson method or a secant method in case of non convergence.
+
+#### l\_newton.c {#T7}
+
+|Syntax|Description|
+|:---|:---|
+|`double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
+|`double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
+
+#### l\_secant.c {#T8}
+
+|Syntax|Description|
+|:---|:---|
+|`static double L_fx(double x, int t)`|Computes the value of f(x) in time t|
+|`double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
 

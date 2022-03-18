@@ -6,7 +6,9 @@
  *  List of functions
  *  -----------------
  *
- *  
+ *      static double L_fx(double x, int t)                                             Computes the value of f(x) in time t
+ *      static int L_bracket(double* x1, double* x2, int t)                             Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
+ *      double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation clec by a secant method. 
  */
 
 #include "iode.h"
@@ -14,10 +16,10 @@
 #define LN_FACTOR   1.6             
 #define LN_MAXIT    20
 
-static int     LN_VARNB;            //
-static double  LN_SHIFT = 0.0;      //
-static CLEC    *LN_CLEC;            //
-static KDB     *LN_DBV, *LN_DBS;    //
+static int     LN_VARNB;            // Current position of endo in LN_DBV
+static double  LN_SHIFT = 0.0;      // Value of the endo[t] or 0 if the equation is not analytically solved (0 := lhs - rhs)
+static CLEC    *LN_CLEC;            // Current CLEC expression
+static KDB     *LN_DBV, *LN_DBS;    // Current KDB of vars and scalars
 
 
 /**
@@ -52,13 +54,15 @@ static double L_fx(double x, int t)
 
 
 /**
+ *  Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
  *  
+ *  @param [in, out]    double*     x1  left bound of the segment
+ *  @param [out]        double*     x2  right bound of the segment
+ *  @param [in]         int         t   current period of execution of L_fx()
  *  
- *  @param [in] double* x1 
- *  @param [in] double* x2 
- *  @param [in] int     t  
- *  @return 
+ *  @return             int         0 if a solution is found, -1 otherwise
  *  
+ *  TODO: replace LN_MAXIT and LN_FACTOR by global variables.
  */
 static int L_bracket(double* x1, double* x2, int t)
 {
@@ -85,18 +89,19 @@ static int L_bracket(double* x1, double* x2, int t)
     return(-1);
 }
 
+
 /**
+ *  Tries to find a solution to the equation clec by a secant method.
  *  
+ *  @param [in] KDB*    dbv     KDB of VAR with which the equation has been linked
+ *  @param [in] KDB*    dbs     KDB of SCL with which the equation has been linked
+ *  @param [in] CLEC*   clec    compiled LEC expression 
+ *  @param [in] int     t       time of calculation (index in dbv SAMPLE)
+ *  @param [in] int     varnb   position of the endogenous variable in dbv
+ *  @param [in] int     eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
  *  
- *  @param [in, out] KDB*   dbv     
- *  @param [in]      KDB*   dbs     
- *  @param [in]      CLEC*  clec    
- *  @param [in]      int    t       
- *  @param [in]      int    varnb   
- *  @param [in]      int    eqvarnb 
- *  @return 
- *  
- *  @details 
+ *  @return     double          root of the equation (varnb value that solves the equation)
+ *
  */
 double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
@@ -118,11 +123,12 @@ double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
         x1 = 0.9;
     }
 
+    // if endogenous is not changed and endo appears more than once in clec,
+    // clec is of the form 0 := lhx - rhs. Hence, shift = 0 instead of endo(t)
     if(varnb == eqvarnb || clec->dupendo) {   /* JMP 13-12-01 */
         LN_SHIFT = 0.0;
         x1 = fabs(x1);
     }
-
     else {
         LN_SHIFT = *(L_getvar(dbv, eqvarnb) + t);
         if(!L_ISAN(LN_SHIFT)) {
@@ -131,7 +137,7 @@ double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
         x1 = fabs(LN_SHIFT);
     }
 
-    if(fabs(L_fx(0.0, t)) < 1.0e-6) return(0.0);
+    if(fabs(L_fx(0.0, t)) < 1.0e-6) return(0.0);            // Solution 0.0 reached 
     if(L_bracket(&x1, &x2, t) < 0) return((double)L_NAN);
 
     fxl = L_fx(x1, t);
