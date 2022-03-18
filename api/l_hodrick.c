@@ -1,12 +1,13 @@
 /**
- * @header4iode
- *
- * Hodrick-Prescott filter.
- *
- * Functions
+ *  @header4iode
  * 
- *   int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std)     Hodrick-Prescott filter. 
- *   void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim)           Prepares HP_calc()
+ *  Hodrick-Prescott filter.
+ * 
+ *  List of functions
+ *  -----------------
+ * 
+ *      int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std)     Hodrick-Prescott filter. 
+ *      void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim)           Prepares HP_calc()
  */
 
 #include "iode.h"
@@ -100,7 +101,6 @@ err:
     for(i = 0; i < nb; i++) t_vec[i] = L_NAN; /* JMP 26-07-11 */
     return(-1);
 }
-
 
 
 /**
