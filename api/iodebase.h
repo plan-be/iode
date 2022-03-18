@@ -346,8 +346,8 @@ extern double L_newton(KDB *,KDB *,CLEC *,int ,int ,int );
 //extern double L_newton_1(int ,KDB *,KDB *,CLEC *,int ,int ,int );
 
 /* l_secant.c */
-extern double L_fx(double ,int );
-extern int L_bracket(double *,double *,int );
+//extern double L_fx(double ,int );
+//extern int L_bracket(double *,double *,int );
 extern double L_secant(KDB *,KDB *,CLEC *,int ,int ,int );
 
 /* e_est.c */

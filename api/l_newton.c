@@ -1,12 +1,15 @@
 /**
- * @header4iode
+ *  @header4iode
+ * 
+ *  Tries to find a root of a compiled LEC equation using a combination of Newton-Raphson 
+ *  and bisection (secant) method.
+ * 
+ *  List of functions
+ *  ----------------- 
  *
- * Tries to find a root of a compiled LEC equation using a combination of Newton-Raphson 
- * and bisection (secant) method.
- *
- * List of functions
- * ----------------- 
- *
+ *      double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
+ *                                                                                  If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
+ *      double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
  *  
  */
 
@@ -39,43 +42,26 @@ double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
     return(x);
 }
 
-/**
- *  @brief 
- *  
- *  @param [in] dbv     
- *  @param [in] dbs     
- *  @param [in] clec    
- *  @param [in] t       
- *  @param [in] varnb   
- *  @param [in] eqvarnb 
- *  @return 
- *  
- */
-
-double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
-{
-    double      x;
-
-    x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
-    if(!L_ISAN(x)) x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
-    return(x);
-}
-
 
 /**
- *  @brief Brief description
+ *  Tries to solve a LEC equation by the Newton-Raphson method.
  *  
- *  @param [in] algo    
- *  @param [in] dbv     
- *  @param [in] dbs     
- *  @param [in] clec    
- *  @param [in] t       
- *  @param [in] varnb   
- *  @param [in] eqvarnb 
- *  @return 
+ *  Subfunction of L_newton().
+ *  
+ *  The convergence threshold eps is set to 1e-6 by default. However, if algo is set to 1 and 
+ *  the absolute value of the endogenous variable before the first iteration is > 1.0, 
+ *  then eps is multiplied by the endogenous value. 
+ *  
+ *  TODO: Some parameters (eps, h) are hard-coded and should be "globalised".
+ *  
+ *  @param  [in]    int  algo              if not null, the convergence criteria eps is multiplied by the 
+ *                                         value of f(x) if ||f(x)|| > 1.0.
+ *  @global [in]    int  KSIM_DEBUG        if not null, calls L_debug() to save a trace of the result 
+ *  @global [in]    int  KSIM_DEBUGNEWTON  if not null, calls L_debug() to save a trace of each iteration of the solver
+ *  
+ *  See L_zero() for the description of the other parameters.
  *  
  */
-
 static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     double  oldx, x, fx, fxh, h = 1e-6, eps = 1e-6, ax, afx, dx = 0.0, ox;
@@ -161,6 +147,26 @@ err:
     d_ptr[0] = oldx;
     return((double)L_NAN);
 }
+
+
+/**
+ *  Tries to solve a LEC equation by the Newton-Raphson method. 
+ *  
+ *  Calls first L_newton_1() with the algo param fixed to 0 (convergence criterion set to 1e-6).
+ *  If no solution is found, calls L_newton_1() with algo = 1 to multiply eps by the endogenous value.
+ *  
+ *  See L_zero() for the parameter description.
+ *    
+ */
+double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+{
+    double      x;
+
+    x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
+    if(!L_ISAN(x)) x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
+    return(x);
+}
+
 
 
 /**** Tentative new version (not yet operational) ***/
