@@ -25,8 +25,8 @@ std::string KDBTables::get_title(const int pos) const
 	// throw exception if table with passed position is not valid
 	get_name(pos);
     TBL* c_table = KTVAL(get_KDB(), pos);
-    std::string title_oem = std::string((char*)T_get_title(c_table));
-    std::string title = convert_oem_to_utf8(title_oem);
+    std::string title_oem = std::string((char*) T_get_title(c_table));
+	std::string title = IodeString(title_oem, CP_OEMCP).to_utf8();
     T_free(c_table);
     return title;
 }

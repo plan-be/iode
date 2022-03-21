@@ -3,7 +3,7 @@
 
 
 // using is the C++11 version of typedef
-using Comment = std::string;
+using Comment = IodeString;
 using Identity = IDT;
 using List = std::string;
 using Scalar = SCL;

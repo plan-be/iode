@@ -33,7 +33,7 @@ inline std::string convert_between_codepages(const std::string str_in, const int
     const int wchar_length = MultiByteToWideChar(codepage_in, 0, c_in, c_in_length, NULL, 0);
     wchar_t* wchar_array = new wchar_t[wchar_length];
     MultiByteToWideChar(codepage_in, 0, c_in, c_in_length, wchar_array, wchar_length);
-        
+
     int c_out_length = WideCharToMultiByte(codepage_out, 0, wchar_array, wchar_length, NULL, 0, NULL, FALSE);
     // Warning: some special characters take 2 chars to be stored.
     //          In other words, s_out_length may be greater to s_in_length.
@@ -42,7 +42,7 @@ inline std::string convert_between_codepages(const std::string str_in, const int
     // WideCharToMultiByte: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte
     WideCharToMultiByte(codepage_out, 0, wchar_array, wchar_length, c_out, c_out_length, NULL, FALSE);
     std::string str_out(c_out);
-        
+
     delete[] wchar_array;
     delete[] c_out;
 
@@ -50,17 +50,56 @@ inline std::string convert_between_codepages(const std::string str_in, const int
 }
 
 
-// oem stands for oem 437 (see https://en.wikipedia.org/wiki/Code_page_437)
-inline std::string convert_oem_to_utf8(const std::string str_oem)
-{
-    return convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);
-}
+/* ****************************** *
+ *       UTILITY CLASSES          *
+ * ****************************** */
 
-
-inline std::string convert_utf8_to_oem(const std::string str_u8)
+class IodeString
 {
-    return convert_between_codepages(str_u8, CP_UTF8, CP_OEMCP);
-}
+    std::string utf8_string;
+
+public:
+    IodeString(std::string input, const int codepage)
+    {
+        if (codepage != CP_UTF8)
+        {
+            utf8_string = convert_between_codepages(input, codepage, CP_UTF8);
+        }
+        else
+        {
+            utf8_string = input;
+        }
+    }
+
+    std::string to_utf8() const
+    {
+        return utf8_string;
+    }
+
+    std::string to_oem() const
+    {
+        std::string oem_string = convert_between_codepages(utf8_string, CP_UTF8, CP_OEMCP);
+        return oem_string;
+    }
+
+    std::string to_codepage(const int codepage)
+    {
+        if (codepage != CP_UTF8)
+        {
+            return convert_between_codepages(utf8_string, CP_UTF8, codepage);
+        }
+        else
+        {
+            return utf8_string;
+        }
+    }
+
+    // operator ==
+    bool operator==(const IodeString& other) const
+    {
+        return utf8_string == other.to_utf8();
+    }
+};
 
 
 inline std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)
