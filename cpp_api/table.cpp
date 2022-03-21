@@ -394,10 +394,11 @@ void Table::setCellDividerLec(const int column, const std::string& lec)
 
 // -------- TITLE --------
 
+// we assume that title string is written in UTF8 format
 int Table::insertTitle(const int pos, const std::string& title, const bool after)
 {
 	int title_pos = insertLine(pos, IT_TITLE, after);
-	std::string title_oem = convert_utf8_to_oem(title);
+	std::string title_oem = IodeString(title, CP_UTF8).to_oem();
 	c_table->t_line[title_pos].tl_val = const_cast<char*>(title_oem.c_str());
 	return title_pos;
 }
@@ -415,6 +416,7 @@ std::string Table::getTitle(const int row) const
 	return title;
 }
 
+// we assume that title string is written in UTF8 format
 void Table::setTitle(const int row, const std::string title)
 {
 	TLINE* title_line = getLine(row);
@@ -439,15 +441,16 @@ std::string Table::getCellContent(const int row, const int column, const bool qu
 {
 	TCELL* cell = getCell(row, column, divider);
 	int mode = quotes ? 1 : 0;
-	std::string content = std::string(T_cell_cont(cell, mode));
-	if (cell->tc_type == IT_STRING) content = convert_oem_to_utf8(content);
+	std::string content_oem = std::string(T_cell_cont(cell, mode));
+	std::string content = (cell->tc_type == IT_STRING) ? IodeString(content_oem, CP_OEMCP).to_utf8() : content_oem;
 	return content;
 }
 
+// we assume that text string is written in UTF8 format
 void Table::setCellText(const int row, const int column, const std::string& text, const bool divider)
 {
 	TCELL* cell = getCell(row, column, divider);
-	std::string text_oem = convert_utf8_to_oem(text);
+	std::string text_oem = IodeString(text, CP_UTF8).to_oem();
 	unsigned char* c_text = reinterpret_cast<unsigned char*>(const_cast<char*>(text_oem.c_str()));
 	T_set_string_cell(cell, c_text);
 }
