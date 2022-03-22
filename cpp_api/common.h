@@ -48,6 +48,36 @@ const static int I_NB_TYPES = K_NBR_OBJ;
 
 const static std::array<std::string, I_NB_TYPES> vIodeTypes = { "Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables" };
 
+struct IodeRegexName
+{
+    std::string regex;
+    std::string type;
+};
+
+inline IodeRegexName get_regex_name(const EnumIodeType type)
+{
+    IodeRegexName nre;
+    if (type == I_COMMENTS)
+    {
+        nre.regex = "A-Za-z";
+        nre.type = "capital or lowercase";
+    }
+    else if (type == I_SCALARS)
+    {
+        nre.regex = "a-z";
+        nre.type = "lowercase";
+    }
+    else
+    {
+        nre.regex = "A-Z";
+        nre.type = "capital";
+    }
+
+    // see https://www.cplusplus.com/reference/regex/ECMAScript for regex syntax
+    nre.regex = "[" + nre.regex + "_][" + nre.regex + "0-9_]{0," + std::to_string(K_MAX_NAME - 1) + "}";
+
+    return nre;
+}
 
 // TODO: replace K by I as below in C api + group them in an enum
 enum EnumLang

@@ -33,12 +33,13 @@ int KDBAbstract<T>::set_name(const int pos, const std::string& new_name)
 template<class T>
 int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_name)
 {
-    if (new_name.size() > K_MAX_NAME) throw std::runtime_error("Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters." + new_name + " : " + std::to_string(new_name.size()));
-    // TODO : check name follow IODE standard (upper case vs lower case)
+    check_name(new_name);
+
     KDB* kdb = get_KDB();
     char* c_old_name = const_cast<char*>(old_name.c_str());
     char* c_new_name = const_cast<char*>(new_name.c_str());
     int pos = K_ren(kdb, c_old_name, c_new_name);
+    
     // see K_ren documentation
     if (pos < 0)
     {
@@ -47,6 +48,7 @@ int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_n
         else if (pos == -2) throw std::runtime_error(type_name + " with name " + new_name + " already exists.\n" + msg);
         else throw std::runtime_error("Something went wrong.\n" + msg);
     }
+    
     return pos;
 }
 
@@ -55,10 +57,13 @@ int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_n
 template<class T>
 void KDBAbstract<T>::add(const std::string& name, const T& obj)
 {
-    // TODO : check name follow IODE standard (upper case vs lower case) + name is not too long
+    check_name(name);
+    
     // throw exception if object with passed name already exist
     char* c_name = const_cast<char*>(name.c_str());
-    if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(type_name + " with name " + name + " already exists. Use update() method instead.");
+    if (K_find(get_KDB(), c_name) >= 0) 
+        throw std::runtime_error(type_name + " with name " + name + " already exists. Use update() method instead.");
+    
     add_or_update(name, obj);
 }
 
@@ -73,7 +78,8 @@ T KDBAbstract<T>::copy(const int pos) const
 template<class T>
 T KDBAbstract<T>::copy(const std::string& name) const
 {
-    // TODO : check name follow IODE standard (upper case vs lower case) + name is not too long
+    check_name(name);
+    
     // throw exception if object with passed name does not exist
     T obj = get(name);
     return copy_obj(obj);
