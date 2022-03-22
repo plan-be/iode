@@ -11,12 +11,12 @@ protected:
 };
 
 
-TEST(TestUtils, Utf8_oem_convertion)
+TEST(TestUtils, convert_between_codepages)
 {
 	std::string str_utf8 = u8"aA!@^$jndq256ιοµηθ";
 
-	std::string str_oem = convert_utf8_to_oem(str_utf8);
-	std::string str_res = convert_oem_to_utf8(str_oem);
+	std::string str_oem = convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
+	std::string str_res = convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);
 
 	EXPECT_EQ(str_res, str_utf8);
 }
