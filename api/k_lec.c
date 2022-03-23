@@ -1,6 +1,5 @@
 /**
- * @author Jean-Marc PAUL
- * @author Geert BRYON
+ * @header4iode
  *
  * Functions implementing the interface between the LEC functions and the IODE KDB's.
  *  
