@@ -75,9 +75,13 @@ jobs:
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
       - name: Build C++ IODE API
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
-      - name: Build Tests
+      - name: Build C API Tests
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target test_c_api
+      - name: Build C++ API Tests
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target test_cpp_api
       - run: echo "The workflow is now ready to test your code on the runner."
-      - name: Run Tests
-        run: ctest --preset ${{ env.PRESET_CONFIG }}
+      - name: Run C API Tests
+        run: ctest --preset c-api-${{ env.PRESET_CONFIG }}
+      - name: Run C++ API Tests
+        run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
       - run: echo "This job's status is ${{ job.status }}."
