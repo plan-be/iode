@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gui", "gui\gui.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_cpp_api", "tests\test_cpp_api\test_cpp_api.vcxproj", "{49FB5FC4-052C-4E5A-9627-6F0EA1815EBE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_c_api", "tests\test_c_api\test_c_api.vcxproj", "{E6E615D9-AACB-4A59-985A-8FE0B048F548}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,6 +31,14 @@ Global
 		{49FB5FC4-052C-4E5A-9627-6F0EA1815EBE}.Release|x64.Build.0 = Release|x64
 		{49FB5FC4-052C-4E5A-9627-6F0EA1815EBE}.Release|x86.ActiveCfg = Release|Win32
 		{49FB5FC4-052C-4E5A-9627-6F0EA1815EBE}.Release|x86.Build.0 = Release|Win32
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Debug|x64.ActiveCfg = Debug|x64
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Debug|x64.Build.0 = Debug|x64
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Debug|x86.ActiveCfg = Debug|Win32
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Debug|x86.Build.0 = Debug|Win32
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Release|x64.ActiveCfg = Release|x64
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Release|x64.Build.0 = Release|x64
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Release|x86.ActiveCfg = Release|Win32
+		{E6E615D9-AACB-4A59-985A-8FE0B048F548}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
