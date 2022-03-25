@@ -158,7 +158,7 @@ void S4ASSERT(int success, char* fmt, ...)
 
 /******** IODE TESTS ******************/
 
-void Tests_BUF()
+void UTests_BUF()
 {
     S4ASSERT(BUF_DATA == NULL,            "BUF_DATA is null");
     S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
@@ -174,7 +174,7 @@ void Tests_BUF()
  *      - KLPTR()
  *      - KV_sample()
  */
-void Tests_Objects()
+void UTests_Objects()
 {
     char*       lst;
     SAMPLE*     smpl;
@@ -235,7 +235,7 @@ void TestLEC(char* title, char* lec, int t, IODE_REAL expected_val)
 /**
  *  Tests some LEC calculations.
  */
-void Tests_LEC()
+void UTests_LEC()
 {
     IODE_REAL *A, *B;
     
@@ -261,7 +261,7 @@ void Tests_LEC()
 /**
  *  Tests Equation creation.
  */
-void Tests_EQS()
+void UTests_EQS()
 {
 //    EQ*     eq;
 //    char    lec[521];  
@@ -276,7 +276,7 @@ void Tests_EQS()
 /**
  *  Tests argument expansion
  */
-Tests_ARGS()
+void UTests_ARGS()
 {
     char **args;
     char *list[] = {"A1", "A2", 0};
@@ -296,7 +296,7 @@ Tests_ARGS()
     SCR_free_tbl(args);
 }
 
-Tests_ERRMSGS() 
+void UTests_ERRMSGS() 
 {
     B_seterrn(86, "bla bla");
     kerror(0, "Coucou de kerror %s", "Hello");
@@ -304,7 +304,7 @@ Tests_ERRMSGS()
 }
     
     
-Tests_K_OBJFILE()
+void UTests_K_OBJFILE()
 {
     char    in_filename[256];
     char    out_filename[256];
@@ -345,7 +345,7 @@ Tests_K_OBJFILE()
  *      - macro KTVAL()
  *      - T_cell_cont()en 32 and 64 bits
  */    
-Tests_TBL32_64()
+void UTests_TBL32_64()
 {
     char    in_filename[256];
     char    out_filename[256];
@@ -395,7 +395,7 @@ KDB* Test_K_interpret(int type, char* filename)
 }
 
 
-Tests_Simulation()
+void UTests_Simulation()
 {
     KDB     *kdbv, 
             *kdbe, 
@@ -463,7 +463,7 @@ Tests_Simulation()
 }
 
 
-void Tests_ALIGN()
+void UTests_ALIGN()
 {
     TBL     tbl, *p_tbl = &tbl;
     int     offset;
@@ -500,16 +500,16 @@ int main(int argc, char **argv)
     K_init_ws(0);
 
     // test B_seterrn()
-    Tests_ALIGN();
-    Tests_ERRMSGS();
-    Tests_BUF();
-    Tests_Objects();
-    Tests_LEC();
-    Tests_EQS();
-    Tests_ARGS();
-    Tests_K_OBJFILE();
-    Tests_TBL32_64();
-    Tests_Simulation();
+    UTests_ALIGN();
+    UTests_ERRMSGS();
+    UTests_BUF();
+    UTests_Objects();
+    UTests_LEC();
+    UTests_EQS();
+    UTests_ARGS();
+    UTests_K_OBJFILE();
+    UTests_TBL32_64();
+    UTests_Simulation();
     
 //    B_ReportLine("$show coucou");
 }
