@@ -51,8 +51,8 @@ int W_printf(char* fmt,...)
 /**
  *  Fonctions et vars de la lib S4ASSERT 
  *  ------------------------------------ 
- *      int S4ASSERT_strcmp(char* str1, char* str2)  : compares 2 strings and return(1) if equal
- *      int S4ASSERT_cmp_tbl(char** tbl1, char* vec) : Compares a table of strings to a list of strings in a semi-colon separated vector.
+ *      int U_cmp_str(char* str1, char* str2)  : compares 2 strings and return(1) if equal
+ *      int U_cmp_tbl(char** tbl1, char* vec) : Compares a table of strings to a list of strings in a semi-colon separated vector.
  *      void S4ASSERT(int success, char* fmt, ...)   : Verifies an assertion, optionally displays a message and opt. exits on error.
  *  
  *      int S4ASSERT_VERBOSE            if not null, display all messages, eve, on success
@@ -74,7 +74,7 @@ int S4ASSERT_EXIT_ON_ERROR = 1;     // if not null, exits on the first not satis
  *  @return             int     1 if the content of str1 == that of str2, 0 if not
  *  
  */
-int S4ASSERT_strcmp(char* str1, char* str2)
+int U_cmp_str(char* str1, char* str2)
 {
     if(str1 == NULL && str2 == NULL) return(1);
     if(str1 == NULL || str2 == NULL) return(0);
@@ -85,15 +85,15 @@ int S4ASSERT_strcmp(char* str1, char* str2)
  *  Compares a table of strings to a list of strings in a semi-colon separated vector.
  *  
  *  Ex. 
- *      S4ASSERT_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
- *      S4ASSERT_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *      U_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
+ *      U_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
  *  
  *  @param [in] tbl1    char**  table of strings    
  *  @param [in] vec     char*   semi-colon sep vector
  *  @return             int     0 if tbl1 and vec are equivalent, -1 else
  *  
  */
-int S4ASSERT_cmp_tbl(char** tbl1, char* vec)
+int U_cmp_tbl(char** tbl1, char* vec)
 {
     int     i, rc = 0;
     char**  tbl2;
@@ -284,7 +284,7 @@ void UTests_ARGS()
     
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
-    S4ASSERT(S4ASSERT_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
+    S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
     SCR_free_tbl(args);
     //args = B_ainit_chk("A*", NULL, 0);
     
@@ -292,7 +292,7 @@ void UTests_ARGS()
     // A1 A2
     sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
     args = B_ainit_chk(filename, NULL, 0);
-    S4ASSERT(S4ASSERT_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
+    S4ASSERT(U_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
     SCR_free_tbl(args);
 }
 
@@ -419,7 +419,7 @@ void UTests_Simulation()
     
     // Check list is empty
     lst = KLPTR("_DIVER");
-    S4ASSERT(S4ASSERT_strcmp(lst, NULL), "_DIVER=NULL", lst);
+    S4ASSERT(U_cmp_str(lst, NULL), "_DIVER=NULL", lst);
     
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
@@ -441,13 +441,13 @@ void UTests_Simulation()
     lst = KLPTR("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
-    S4ASSERT(S4ASSERT_strcmp(lst, expected_lst), "_PRE=\"%s\"", lst);
+    S4ASSERT(U_cmp_str(lst, expected_lst), "_PRE=\"%s\"", lst);
     
     // Check _DIVER list
     lst = KLPTR("_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    S4ASSERT(S4ASSERT_strcmp(lst, expected_lst), "_DIVER=\"%s\"", lst);
+    S4ASSERT(U_cmp_str(lst, expected_lst), "_DIVER=\"%s\"", lst);
     
     // Test with with convergence (increase MAXIT)
     KSIM_MAXIT = 100;
