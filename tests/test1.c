@@ -158,7 +158,7 @@ void S4ASSERT(int success, char* fmt, ...)
 
 /******** IODE TESTS ******************/
 
-void UTests_BUF()
+void Tests_BUF()
 {
     S4ASSERT(BUF_DATA == NULL,            "BUF_DATA is null");
     S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
@@ -174,7 +174,7 @@ void UTests_BUF()
  *      - KLPTR()
  *      - KV_sample()
  */
-void UTests_Objects()
+void Tests_Objects()
 {
     char*       lst;
     SAMPLE*     smpl;
@@ -212,7 +212,7 @@ void UTests_Objects()
  *      - L_link()
  *      - L_exec()
  */
-void TestLEC(char* title, char* lec, int t, IODE_REAL expected_val)
+void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
 {
     CLEC*   clec;
     //char    buf[256];
@@ -235,33 +235,33 @@ void TestLEC(char* title, char* lec, int t, IODE_REAL expected_val)
 /**
  *  Tests some LEC calculations.
  */
-void UTests_LEC()
+void Tests_LEC()
 {
     IODE_REAL *A, *B;
     
     A = (IODE_REAL*)KVPTR("A");
     B = (IODE_REAL*)KVPTR("B");
     // Tests LEC
-    TestLEC("LEC", "A+B",  2, A[2]+B[2]);
-    TestLEC("LEC", "ln A", 2, log(A[2]));
-    TestLEC("LEC", "A[2002Y1]",     2, A[2]);
+    U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
+    U_test_lec("LEC", "ln A", 2, log(A[2]));
+    U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
     //S4ASSERT(0, "Erreur forcée");
-    TestLEC("LEC", "A[2002Y1][-1]", 2, A[2]);
-    TestLEC("LEC", "A[-1]",         2, A[1]);
-    TestLEC("LEC", "A[-1][2002Y1]", 2, A[1]);
-    TestLEC("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
-    TestLEC("LEC", "sum(2000Y1, A)", 2, 3.0);
+    U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
+    U_test_lec("LEC", "A[-1]",         2, A[1]);
+    U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
+    U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
+    U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
     
     // Using macros in LEC 
-    TestLEC("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
-    TestLEC("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);  
+    U_test_lec("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
+    U_test_lec("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);  
 }
 
 
 /**
  *  Tests Equation creation.
  */
-void UTests_EQS()
+void Tests_EQS()
 {
 //    EQ*     eq;
 //    char    lec[521];  
@@ -276,7 +276,7 @@ void UTests_EQS()
 /**
  *  Tests argument expansion
  */
-void UTests_ARGS()
+void Tests_ARGS()
 {
     char **args;
     char *list[] = {"A1", "A2", 0};
@@ -296,7 +296,7 @@ void UTests_ARGS()
     SCR_free_tbl(args);
 }
 
-void UTests_ERRMSGS() 
+void Tests_ERRMSGS() 
 {
     B_seterrn(86, "bla bla");
     kerror(0, "Coucou de kerror %s", "Hello");
@@ -304,7 +304,7 @@ void UTests_ERRMSGS()
 }
     
     
-void UTests_K_OBJFILE()
+void Tests_K_OBJFILE()
 {
     char    in_filename[256];
     char    out_filename[256];
@@ -345,7 +345,7 @@ void UTests_K_OBJFILE()
  *      - macro KTVAL()
  *      - T_cell_cont()en 32 and 64 bits
  */    
-void UTests_TBL32_64()
+void Tests_TBL32_64()
 {
     char    in_filename[256];
     char    out_filename[256];
@@ -395,7 +395,7 @@ KDB* Test_K_interpret(int type, char* filename)
 }
 
 
-void UTests_Simulation()
+void Tests_Simulation()
 {
     KDB     *kdbv, 
             *kdbe, 
@@ -463,7 +463,7 @@ void UTests_Simulation()
 }
 
 
-void UTests_ALIGN()
+void Tests_ALIGN()
 {
     TBL     tbl, *p_tbl = &tbl;
     int     offset;
@@ -500,16 +500,16 @@ int main(int argc, char **argv)
     K_init_ws(0);
 
     // test B_seterrn()
-    UTests_ALIGN();
-    UTests_ERRMSGS();
-    UTests_BUF();
-    UTests_Objects();
-    UTests_LEC();
-    UTests_EQS();
-    UTests_ARGS();
-    UTests_K_OBJFILE();
-    UTests_TBL32_64();
-    UTests_Simulation();
+    Tests_ALIGN();
+    Tests_ERRMSGS();
+    Tests_BUF();
+    Tests_Objects();
+    Tests_LEC();
+    Tests_EQS();
+    Tests_ARGS();
+    Tests_K_OBJFILE();
+    Tests_TBL32_64();
+    Tests_Simulation();
     
 //    B_ReportLine("$show coucou");
 }
