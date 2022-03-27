@@ -52,7 +52,7 @@ int W_printf(char* fmt,...)
  *  Fonctions et vars de la lib S4ASSERT 
  *  ------------------------------------ 
  *      int U_cmp_str(char* str1, char* str2)  : compares 2 strings and return(1) if equal
- *      int U_cmp_tbl(char** tbl1, char* vec) : Compares a table of strings to a list of strings in a semi-colon separated vector.
+ *      int U_cmp_tbl(char** tbl1, char* vec)  : Compares a table of strings to a list of strings in a semi-colon separated vector.
  *      void S4ASSERT(int success, char* fmt, ...)   : Verifies an assertion, optionally displays a message and opt. exits on error.
  *  
  *      int S4ASSERT_VERBOSE            if not null, display all messages, eve, on success
@@ -66,8 +66,8 @@ int S4ASSERT_EXIT_ON_ERROR = 1;     // if not null, exits on the first not satis
  *  Compares 2 strings. 
  *  
  *  Ex. 
- *      SCR_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
- *      SCR_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *      U_cmp_str("A B C", "A;B;C") => returns 0 => NOK
+ *      U_cmp_str("A B",   "A B")   => returns 1 => OK
  *  
  *  @param [in] str1    char*   string  
  *  @param [in] str2    char*   string 
@@ -85,8 +85,8 @@ int U_cmp_str(char* str1, char* str2)
  *  Compares a table of strings to a list of strings in a semi-colon separated vector.
  *  
  *  Ex. 
- *      U_cmp_tbl(SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
- *      U_cmp_tbl(SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *      U_cmp_tbl((char**)SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
+ *      U_cmp_tbl((char**)SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
  *  
  *  @param [in] tbl1    char**  table of strings    
  *  @param [in] vec     char*   semi-colon sep vector
@@ -98,19 +98,19 @@ int U_cmp_tbl(char** tbl1, char* vec)
     int     i, rc = 0;
     char**  tbl2;
 
-    tbl2 = SCR_vtoms(vec, " ;,");
+    tbl2 = (char**)SCR_vtoms((unsigned char*)vec, " ;,");
     if(tbl1 == NULL) {
         if(tbl2 == NULL) return(-1);
         goto fin;
     }    
     if(tbl2 == NULL) return(0); 
-    if(SCR_tbl_size(tbl1) != SCR_tbl_size(tbl2)) goto fin;
+    if(SCR_tbl_size((unsigned char**)tbl1) != SCR_tbl_size((unsigned char**)tbl2)) goto fin;
     for(i = 0 ;  tbl1[i] ; i++)
         if(strcmp(tbl1[i], tbl2[i])) goto fin;
     rc = -1;
     
 fin:
-    SCR_free_tbl(tbl2);
+    SCR_free_tbl((unsigned char**)tbl2);
     return(rc);
 
 }
