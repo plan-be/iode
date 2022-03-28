@@ -383,7 +383,7 @@ void Tests_TBL32_64()
     }
 }
 
-KDB* Test_K_interpret(int type, char* filename)
+KDB* U_test_K_interpret(int type, char* filename)
 {
     char    fullfilename[256];
     KDB     *kdb;
@@ -407,13 +407,13 @@ void Tests_Simulation()
        
     
     // Loads 3 WS and check ok
-    K_WS[K_VAR] = kdbv  = Test_K_interpret(K_VAR, filename);
+    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, filename);
     S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
     
-    K_WS[K_SCL] = kdbs  = Test_K_interpret(K_SCL, filename);
+    K_WS[K_SCL] = kdbs  = U_test_K_interpret(K_SCL, filename);
     S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
     
-    K_WS[K_EQS] = kdbe  = Test_K_interpret(K_EQS, filename);
+    K_WS[K_EQS] = kdbe  = U_test_K_interpret(K_EQS, filename);
     S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
 
     
