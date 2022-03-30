@@ -98,19 +98,19 @@ int U_cmp_tbl(char** tbl1, char* vec)
     int     i, rc = 0;
     char**  tbl2;
 
-    tbl2 = (char**)SCR_vtoms((unsigned char*)vec, " ;,");
+    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char**) " ;,");
     if(tbl1 == NULL) {
         if(tbl2 == NULL) return(-1);
         goto fin;
     }    
     if(tbl2 == NULL) return(0); 
-    if(SCR_tbl_size((unsigned char**)tbl1) != SCR_tbl_size((unsigned char**)tbl2)) goto fin;
+    if(SCR_tbl_size((unsigned char**) tbl1) != SCR_tbl_size((unsigned char**) tbl2)) goto fin;
     for(i = 0 ;  tbl1[i] ; i++)
         if(strcmp(tbl1[i], tbl2[i])) goto fin;
     rc = -1;
     
 fin:
-    SCR_free_tbl((unsigned char**)tbl2);
+    SCR_free_tbl((unsigned char**) tbl2);
     return(rc);
 
 }
@@ -174,13 +174,17 @@ void Tests_BUF()
  *      - KLPTR()
  *      - KV_sample()
  */
-void Tests_Objects()
+void U_tests_Objects()
 {
     char*       lst;
     SAMPLE*     smpl;
     IODE_REAL   A[64], B[64];
     int         nb, i, pos;
+    static      done = 0;
     
+    if(done) return;
+    done = 1;
+        
     // Create lists
     pos = K_add(KL_WS, "LST1", "A;B");
     S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
@@ -239,6 +243,9 @@ void Tests_LEC()
 {
     IODE_REAL *A, *B;
     
+    // Create objects
+    U_tests_Objects();
+    
     A = (IODE_REAL*)KVPTR("A");
     B = (IODE_REAL*)KVPTR("B");
     // Tests LEC
@@ -282,10 +289,13 @@ void Tests_ARGS()
     char *list[] = {"A1", "A2", 0};
     char filename[256];
     
+    // Create objects
+    U_tests_Objects();
+    
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
     S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
     
     // Test parameters in a file. test.args must exist in the current dir and contain the line
@@ -293,8 +303,29 @@ void Tests_ARGS()
     sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
     args = B_ainit_chk(filename, NULL, 0);
     S4ASSERT(U_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
-    SCR_free_tbl(args);
+    SCR_free_tbl((unsigned char**) args);
 }
+
+///**
+// *  Tests argument expansion ALD
+// */
+//void Tests_ARGS_ALD()
+//{
+//    char **args;
+//    char *list[] = {"A1", "A2", 0};
+//    char filename[256];
+//    int  pos;
+//    
+//    
+//    // Create list
+//    pos = K_add(KL_WS, "LST1", "A,B");
+// 
+//    // A_init
+//    args = B_ainit_chk("$LST1", NULL, 0);
+//    S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
+//    SCR_free_tbl(args);
+//}
+//
 
 void Tests_ERRMSGS() 
 {
@@ -481,13 +512,22 @@ void Tests_ALIGN()
 
 /* ========================================================*/
 
+void U_test_init()
+{
+    static int  done = 0;
+    
+    if(done) return;
+    done = 1;
+    
+    IODE_assign_super_API();            // set *_super fn pointers
+    strcpy(SCR_NAME_ERR, "iode.msg");   // message file
+    K_init_ws(0);                       // Initialises 7 empty WS
+}
+
 int main(int argc, char **argv)
 {
     int i;
     
-    IODE_assign_super_API();
-    strcpy(SCR_NAME_ERR, "iode.msg");
-
     for(i = 1 ; i < argc; i++) {
         if(strcmp(argv[i], "-v-") == 0) S4ASSERT_VERBOSE = 0;
         if(strcmp(argv[i], "-v")  == 0) S4ASSERT_VERBOSE = 1;
@@ -496,14 +536,19 @@ int main(int argc, char **argv)
         if(strcmp(argv[i], "-h") == 0)   Syntax();
     }
     
-    // Initialises 7 empty WS
-    K_init_ws(0);
+    // Initialises super functions / empty WS / error messages
+    U_test_init();
+    
 
+//    // tests temporaires
+//    Tests_ARGS_ALD();   
+//    return(0);
+    
     // test B_seterrn()
     Tests_ALIGN();
     Tests_ERRMSGS();
     Tests_BUF();
-    Tests_Objects();
+    U_tests_Objects();
     Tests_LEC();
     Tests_EQS();
     Tests_ARGS();
