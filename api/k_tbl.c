@@ -13,9 +13,12 @@
  *      TCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type KT_CELL. 
  *      TCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type KT_TITLE. 
  *      char* T_cell_cont(TCELL* cell, int mode)                                                   | Returns the formated contents of a TCELL.
+ *      char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)                                | Returns the formated contents of a TCELL.
  *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TLINE in a TBL.
  *      int T_set_lec_cell(TCELL* cell, unsigned char* lec)                                        | Assigns a LEC expression to a TCELL. Checks the syntax.
+ *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TCELL. Checks the syntax.
  *      void T_set_string_cell(TCELL* cell, unsigned char* txt)                                    | Assigns a TEXT to a TCELL.
+ *      void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)                 | Assigns a TEXT to a TCELL.
  *      void T_set_cell_attr(TBL* tbl, int i, int j, int attr)                                     | Assigns justification (KT_CENTER...) and typographic (KT_BOLD...) attributes to a TCELL.
  *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
  *      void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
@@ -224,6 +227,38 @@ char* T_cell_cont(TCELL* cell, int mode)
 
 
 /**
+ *  Returns the formated contents of a TCELL:
+ *      - lec expression or (A+B)
+ *      - text possibly between double quotes (if mode == 1 => "Line title:", if not => Line title)
+ *
+ *  mode is set to 1 only for the TBL editor where the CELL type is deduced from the first character (" => text).
+ *
+ *  @param [in] tbl     TBL*    pointer to the table
+ *  @param [in] row     int     position of the line
+ *  @param [in] col     int     position of the cell
+ *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
+ *                              0 if not
+ *  @return             char*   pointer to the big buffer (see buf.c)
+ */
+char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
+{
+    TLINE line = tbl->t_line[row];
+    TCELL* cell = (TCELL*) line.tl_val;
+    switch (line.tl_type)
+    {
+    case KT_TITLE:
+        return(cell->tc_val);
+        break;
+    case KT_CELL:
+        return(T_cell_cont(cell + col, mode));
+        break;
+    default:
+        return(NULL);
+    }
+}
+
+
+/**
  *  Inserts a TLINE in a TBL.
  *  
  *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
@@ -294,6 +329,25 @@ int T_set_lec_cell(TCELL* cell, unsigned char* lec)
 
 
 /**
+ *  Assigns a LEC expression to a TCELL. Checks the syntax.
+ *
+ *  @param [in] tbl     TBL*              pointer to the table
+ *  @param [in] row     int               position of the line
+ *  @param [in] col     int               position of the cell
+ *  @param [in] lec     unsigned char*    LEC expression
+ *  @return             int               0 if ok, -1 if syntax error in LEC
+ *
+ *  In case of LEC error, kerror() is called and L_errno is set.
+ */
+int T_set_lec_cel_tbl(TBL* tbl, int row, int col, unsigned char* lec)
+{
+    TLINE line = tbl->t_line[row];
+    TCELL* cell = (TCELL*) line.tl_val;
+    return(T_set_lec_cell(cell + col, lec));
+}
+
+
+/**
  *  Assigns a TEXT to a TCELL. The alignment attributes are set to:
  *      - KT_LEFT if previously KT_DECIMAL
  *      - KT_CENTER if the txt contains the char '#' indicating a time period (col title).
@@ -324,6 +378,26 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
     }
     T_free_cell(cell);
     cell->tc_val = SCR_stracpy(txt);
+}
+
+/**
+ *  Assigns a TEXT to a TCELL. The alignment attributes are set to:
+ *      - KT_LEFT if previously KT_DECIMAL
+ *      - KT_CENTER if the txt contains the char '#' indicating a time period (col title).
+ *
+ *  @param [in] tbl     TBL*              pointer to the table
+ *  @param [in] row     int               position of the line
+ *  @param [in] col     int               position of the cell
+ *  @param [in] lec     unsigned char*    Any text
+ *  @return             void
+ *
+ *  In case of LEC error, kerror() is called and L_errno is set.
+ */
+void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)
+{
+    TLINE line = tbl->t_line[row];
+    TCELL* cell = (TCELL*) line.tl_val;
+    T_set_string_cell(cell + col, txt);
 }
 
 /*
