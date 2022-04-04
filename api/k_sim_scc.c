@@ -1,13 +1,14 @@
 /** 
  *  @header4iode
  *
- *  Alternative functions to reorder and simulate very large models. 
- * 
- *  The reordering algorithm can be CPU intensive for very large models. 
- *  It is therefore better to first reorder the model and save that order 
- *  in such a way as to be able to run several simulations with the same order later on. 
- * 
- *
+ *  Strongly Connex Components (SCC) API: alternative functions to reorder and simulate very large models.
+ *  
+ *  The reordering algorithm can be CPU intensive for very large models. (Large) Models can be split into 
+ *  Stronly Connex Components (**SCC**) and each SCC is reordered. The optimized order 
+ *  is then saved in IODE lists. 
+ *  
+ *  The simulation can later be run multiple times without having to reorder the model for each simulation.
+ *   
  *  List of functions 
  *  -----------------
  *  
