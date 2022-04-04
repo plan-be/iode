@@ -447,7 +447,7 @@ int K_simul_1(int t)
  *  @global [in]  int         KSIM_SORT       reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
  *  
  *  @note Objects in a KDB are stored in alphabetic order, which is not efficient for the Gauss-Seidel solver.
- *        When the parameter eqs is no NULL, and the gloval KSIM_SORT == SORT_NONE, 
+ *        When the parameter eqs is not NULL, and the global KSIM_SORT == SORT_NONE, 
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
