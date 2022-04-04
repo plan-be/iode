@@ -14,7 +14,7 @@
  * -----------------
  *      int KE_order(KDB* dbe, char** eqs)              Reorders a model before the simulation to optimise the execution order of the set of equations.
  *      int KE_poseq(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
- *      void KE_tri(KDB* dbe, int** tmp, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
+ *      void KE_tri(KDB* dbe, int** predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
  
 #include "iode.h"
@@ -29,85 +29,86 @@ static int     *KSIM_PERM;      // vector of permutation
 static char    *KSIM_ORDERED;   // indicates if equation i is already in a block
 
 /**
- *  Adds the successor i to the list tmpi[pos] of successors of equation pos. 
+ *  Adds the successor i to the list successors[pos] of successors of equation pos. 
  *  
  *  Let the equation eqi = A := B + C.
  *  If B is endo of equation  eqj
- *  Then KE_add_post(tmpi, eqj, eqi) adds eqi to tmpi[eqj]
+ *  Then KE_add_post(successors, eqj, eqi) adds eqi to successors[eqj]
  *
  * At the end of the process, 
- *   - tmpi contains for each equation all dependent equations 
- *   - tmp  contains for each equation all equations referring to that equation.
+ *   - successors contains for each equation all dependent equations 
+ *   - predecessors  contains for each equation all equations referring to that equation.
  *  
- *  @param [in, out]    int**   tmpi    vector of int*, one per equation containing the list of successors of eq nb i 
- *  @param [in]         int     i       successor position to add to the list tmpi[pos]
- *  @param [in]         int     pos     position of the predecessor of i
+ *  @param [in, out]    int**   successors  vector of int*, one per equation containing the list of successors of eq nb i 
+ *  @param [in]         int     i           successor position to add to the list successors[pos]
+ *  @param [in]         int     pos         position of the predecessor of i
  *  
  */
  
-static void KE_add_post(int** tmpi, int i, int pos)
+static void KE_add_post(int** successors, int i, int pos)
 {
     int     nb = 1;
 
-    if(tmpi[pos] == 0)
-        tmpi[pos] = (int *) SW_nalloc(sizeof(int) * 2);
+    if(successors[pos] == 0)
+        successors[pos] = (int *) SW_nalloc(sizeof(int) * 2);
     else {
-        nb = tmpi[pos][0] + 1;
-        tmpi[pos] = (int *) SW_nrealloc(tmpi[pos], nb * sizeof(int),(nb + 1) * sizeof(int));
+        nb = successors[pos][0] + 1;
+        successors[pos] = (int *) SW_nrealloc(successors[pos], nb * sizeof(int),(nb + 1) * sizeof(int));
     }
-    tmpi[pos][0]  = nb;
-    tmpi[pos][nb] = i;
+    successors[pos][0]  = nb;
+    successors[pos][nb] = i;
 }
 
 
 /**
  *  Free all temporary vectors allocated for the model reordering.
  *  
- *  @param [in]         KDB*    dbe     KDB of the model (equations)
- *  @param [in, out]    int**   tmp     see KE_preorder()
- *  @param [in, out]    int**   tmpi    see KE_preorder()
+ *  @param [in]         KDB*    dbe             KDB of the model (equations)
+ *  @param [in, out]    int**   predecessors    see KE_preorder()
+ *  @param [in, out]    int**   successors      see KE_preorder()
  *  
  */
  
-static void KE_postorder(KDB* dbe, int** tmp, int** tmpi)
+static void KE_postorder(KDB* dbe, int** predecessors, int** successors)
 {
     int     i;
 
     for(i = 0; i < KNB(dbe); i ++)  {
-        SW_nfree(tmp[i]);
-        SW_nfree(tmpi[i]);
+        SW_nfree(predecessors[i]);
+        SW_nfree(successors[i]);
     }
-    SW_nfree(tmp);
-    SW_nfree(tmpi);
+    SW_nfree(predecessors);
+    SW_nfree(successors);
     SW_nfree(KSIM_ORDERED);
 }
 
 
 /**
- * Prepares the model reordering by creating 2 vectors tmp et tmpi containing 
+ * Prepares the model reordering by creating 2 vectors predecessors et successors containing 
  * the predecessors and successors of each equation.
  *  
- *		tmp[i][0]    = nb of predecessors (endos) in the equation i
- *		tmp[i][1...] = positions in dbe of the predecessors found in equation i
+ *		predecessors[i][0]    = nb of predecessors (endos) in the equation i
+ *		predecessors[i][1...] = positions in dbe of the predecessors found in equation i
  
- *      tmpi[i][0]   = nb of successors of the equation i = all equations containing endo[i]
- *		tmpi[i][1...] = positions of successors of endo[i] in dbe
+ *      successors[i][0]   = nb of successors of the equation i = all equations containing endo[i]
+ *		successors[i][1...] = positions of successors of endo[i] in dbe
  *
  *  
  *  @param [in]      KDB*    dbe            equations of the model 
- *  @param [in, out] int**   tmp            vector of vectors of predecessors (1 vector for each eq (=endo))
- *  @param [in, out] int**   tmpi           vector of vectors of successors (1 vector for each endo)
+ *  @param [in, out] int**   predecessors   vector of vectors of predecessors (1 vector for each eq (=endo))
+ *  @param [in, out] int**   successors     vector of vectors of successors (1 vector for each endo)
  *
- *	@global [out]    char*   KSIM_ORDERED   allocated vector of nb chars where nb is the number of equations in dbe 
- *                                           KSIM_ORDERED is not calculated in KE_preorder()
- *                                           KSIM_ORDERED[i] = 1 if equation i has already been put in a block (PRE...)
- *	@global [out]    int*    KSIM_ORDER     allocated vector of nb int where nb is the number of equations in dbe (not calculated here)
- *                                           KSIM_ORDER is not calculated in KE_preorder()
- *                                           KSIM_ORDER = order of calculation of equations
+ *	@global [out]    char*   KSIM_ORDERED   allocated vector indicating which equations have already been placed in a block (pre, post, interdep).
+ *                                              -> Contains nb chars where nb is the number of equations in dbe. 
+ *                                              -> Note that KSIM_ORDERED is not calculated in KE_preorder(), just allocated.
+ *                                              -> KSIM_ORDERED[i] = 1 if equation i has already been put in a block (PRE...)
+ *	@global [out]    int*    KSIM_ORDER     allocated vector containing the order of execution of the equations in the model.
+ *                                              -> nb integers where nb is the number of equations in dbe (not calculated here)
+ *                                              -> Note that KSIM_ORDER is not calculated here, only allocated 
  *  
  */
  
-static void KE_preorder(KDB* dbe, int** tmp, int** tmpi)
+static void KE_preorder(KDB* dbe, int** predecessors, int** successors)
 {
     int     i, j, pos, posj, nb;
     CLEC    *clec;
@@ -118,10 +119,10 @@ static void KE_preorder(KDB* dbe, int** tmp, int** tmpi)
 
     for(i = 0; i < nb; i ++) {
         clec = KECLEC(dbe, i);
-        tmp[i] = (int *) SW_nalloc(sizeof(int) * (clec->nb_names + 1)); // alloue (nb names + 1) long
+        predecessors[i] = (int *) SW_nalloc(sizeof(int) * (clec->nb_names + 1)); // alloue (nb names + 1) long
 
         /* LOG ALL NB AND POS OF ENDO VARS */
-        tmp[i][0] = clec->nb_names; // Nbre max de noms (on pourrait améliorer en ne prenant que les vars)
+        predecessors[i][0] = clec->nb_names; // Nbre max de noms (on pourrait améliorer en ne prenant que les vars)
         for(j = 0; j < clec->nb_names; j++) {
             if(L_ISCOEF(clec->lnames[j].name)) continue;
             // Recherche l'eq dont la variable j est endo
@@ -132,8 +133,8 @@ static void KE_preorder(KDB* dbe, int** tmp, int** tmpi)
                 pos = KE_poseq(posj);
                 if(pos >= 0 && pos == i) pos = -1; // si var pos est l'endogène => -1
             }
-            tmp[i][j + 1] = pos;
-            if(pos >= 0) KE_add_post(tmpi, i, pos);
+            predecessors[i][j + 1] = pos;
+            if(pos >= 0) KE_add_post(successors, i, pos);
         }
     }
 }
@@ -150,6 +151,15 @@ static void KE_preorder(KDB* dbe, int** tmp, int** tmpi)
  *      - no reordering is performed: KSIM_PRE = KSIM_POST = 0 and KSIM_INTER = nb
  *      - KSIM_ORDER = order defined by the positions of eqs in dbe
  *  
+ *  If KSIM_SORT == SORT_CONVEX or SORT_BOTH:
+ *      - 3 blocks are created, based on predecessors and successors of each equation.
+ *      - each block is defined by its size (KSIM_PRE, KSIM_POST and KSIM_INTER)
+ *      - KSIM_ORDER contains the reordered equations: KSIM_PRE, then KSIM_INTER, then KSIM_POST
+ *  
+ *  If KSIM_SORT == SORT_BOTH:
+ *      - after decomposing in 3 blocks, a reordering is made inside the interdep block to minimize the distance 
+ *        between each equation and its explanatory variables (i.e. contained in the eq formula)
+ *  
  *  @param [in] KDB*    dbe     KDB containing the equations defining the model
  *  @param [in] char**  eqs     list of equations to simulate
  *  
@@ -163,7 +173,7 @@ static void KE_preorder(KDB* dbe, int** tmp, int** tmpi)
  
 void KE_order(KDB* dbe, char** eqs)
 {
-    int     **tmp, **tmpi, *tmp2, i, k, nb;
+    int     **predecessors, **successors, *tmp2, i, k, nb;
 
     nb = KNB(dbe);
     // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
@@ -181,13 +191,13 @@ void KE_order(KDB* dbe, char** eqs)
 
     kmsg("Sorting equations ....");
 
-    // tmp = liste de pointeur vers des vecteurs contenant la pos de toutes les vars de l'eq i
+    // predecessors = liste de pointeur vers des vecteurs contenant la pos de toutes les vars de l'eq i
     // voir preorder
-    tmp = (int **) SW_nalloc(sizeof(int *) * nb);
-    tmpi = (int **) SW_nalloc(sizeof(int *) * nb);
-    KE_preorder(dbe, tmp, tmpi);
-    KSIM_PRE = KE_pre(dbe, tmp, 0);
-    KSIM_POST = KE_pre(dbe, tmpi, KSIM_PRE);
+    predecessors = (int **) SW_nalloc(sizeof(int *) * nb);
+    successors = (int **) SW_nalloc(sizeof(int *) * nb);
+    KE_preorder(dbe, predecessors, successors);
+    KSIM_PRE = KE_pre(dbe, predecessors, 0);
+    KSIM_POST = KE_pre(dbe, successors, KSIM_PRE);
 
     /* REVERSE FOR EXECUTION PURPOSE */
     for(i = 0; i < KSIM_POST / 2; i++) {
@@ -196,7 +206,7 @@ void KE_order(KDB* dbe, char** eqs)
         KSIM_ORDER[KSIM_PRE + (KSIM_POST - 1) - i] = k;
     }
 
-    KSIM_INTER = KE_interdep(dbe, tmp);
+    KSIM_INTER = KE_interdep(dbe, predecessors);
     kmsg("#PRE %d - #INTER %d - #POST %d", KSIM_PRE, KSIM_INTER, KSIM_POST);
 
     /* A AMELIORER !! */
@@ -206,8 +216,8 @@ void KE_order(KDB* dbe, char** eqs)
     memcpy(KSIM_ORDER + KSIM_PRE + KSIM_INTER, tmp2, KSIM_POST * sizeof(int));
     SW_nfree(tmp2);
 
-    if(KSIM_SORT == SORT_BOTH) KE_tri(dbe, tmp, KSIM_PASSES);
-    KE_postorder(dbe, tmp, tmpi);
+    if(KSIM_SORT == SORT_BOTH) KE_tri(dbe, predecessors, KSIM_PASSES);
+    KE_postorder(dbe, predecessors, successors);
 }
 
 
@@ -249,8 +259,8 @@ int KE_poseq(int posendo)
  *  
  *  Method
  *  ------
- *       For each equation eq, loop on varj, the variables present in eq (stored in tmp[i]):
- *			if varj == tmp[i][j+1] or varj < 0 (exo) or KSIM_ORDERED[varj] == 1: 
+ *       For each equation eq, loop on varj, the variables present in eq (stored in predecessors[i]):
+ *			if varj == predecessors[i][j+1] or varj < 0 (exo) or KSIM_ORDERED[varj] == 1: 
  *               skip the equation
  *			else 
  *				KSIM_ORDERED[varj] = 1
@@ -260,7 +270,7 @@ int KE_poseq(int posendo)
  *       Else restart the loop on the equations
  *  
  *  @param [in]         KDB*    dbe             KDB of equations
- *  @param [in]         int**   tmp             vector of vectors containing the endogenous variables of each equation in dbe
+ *  @param [in]         int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
  *  @param [in]         int     from            first available place in KSIM_ORDER
  *  @return             int                     number of equations in the computed block
  *
@@ -269,7 +279,7 @@ int KE_poseq(int posendo)
  *  
  */
  
-static int KE_pre(KDB* dbe, int** tmp, int from)
+static int KE_pre(KDB* dbe, int** predecessors, int from)
 {
     int     i, j, pos,
             c = 1, nb = 0;
@@ -281,14 +291,14 @@ static int KE_pre(KDB* dbe, int** tmp, int from)
         c = 0;
         for(i = 0; i < KNB(dbe); i ++) {
             if(KSIM_ORDERED[i] == 1) continue; // Equation déjà classée (i.e. dans le bloc PRE)
-            if(tmp[i]) {
-                for(j = 0; j < tmp[i][0]; j++) {  	// tmp[i][0] = nb vars de l'éq i
-                    if(tmp[i][j + 1] < 0) continue; /* VAR j+1 = ENDO de l'eq courante */
-                    if(KSIM_ORDERED[tmp[i][j + 1]] == 1) continue;  /* Var j+1 = déjà classée (ORDERED) */
+            if(predecessors[i]) {
+                for(j = 0; j < predecessors[i][0]; j++) {  	// predecessors[i][0] = nb vars de l'éq i
+                    if(predecessors[i][j + 1] < 0) continue; /* VAR j+1 = ENDO de l'eq courante */
+                    if(KSIM_ORDERED[predecessors[i][j + 1]] == 1) continue;  /* Var j+1 = déjà classée (ORDERED) */
                     break; // Var j + 1 non EXO et non classée, donc eq ne peut être retenue dans le bloc
                 }
             }
-            if(tmp[i] == 0 || j == tmp[i][0]) { // Pas de var dans l'eq OU toutes exo OU classées
+            if(predecessors[i] == 0 || j == predecessors[i][0]) { // Pas de var dans l'eq OU toutes exo OU classées
                 c = KSIM_ORDERED[i] = 1;
                 KSIM_ORDER[from + nb] = i;
                 nb ++;
@@ -300,22 +310,22 @@ static int KE_pre(KDB* dbe, int** tmp, int from)
 
 
 /**
- *  Calculates the interdependent block and places the equation numbers at the end of KSIM_ORDER.
+ *  Builds the interdependent block and places the equation numbers at the end of KSIM_ORDER.
  *  The final execution order KSIM_ORDER is composed as follows:
  *  
  *      KSIM_PRE eqs
  *  	KSIM_POST eqs
  *  	KSIM_INTER eqs
  *    
- *  @param [in] KDB*    dbe     model   
- *  @param [in] int**   tmp     vector of vectors containing the endogenous variables of each equation in dbe
- *  @return     int             number of equations in the interdep block
+ *  @param [in] KDB*    dbe             model   
+ *  @param [in] int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
+ *  @return     int                     number of equations in the interdep block
  *
  *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
  *  
  */
  
-static int KE_interdep(KDB* dbe, int** tmp)
+static int KE_interdep(KDB* dbe, int** predecessors)
 {
     int     i, nb = 0;
 
@@ -415,15 +425,14 @@ static void KE_tri_perm1(KDB* dbe, int i, int* vars)
  *  Method applied "passes" times.
 
  *  
- *  @param [in]         KDB*    dbe     model
- *  @param [in]         int**   tmp     table of vectors, 1 vector per equation with the list explanatory variables  
- *  @param [in]         int     passes  how many times the heuristic algorithm must be run 
- *  @return             int             0
+ *  @param [in]         KDB*    dbe             model
+ *  @param [in]         int**   predecessors    table of vectors, 1 vector per equation with the list explanatory variables  
+ *  @param [in]         int     passes          how many times the heuristic algorithm must be run 
  *      
  *  @global [in, out]   int*    KSIM_PERM vector of equation positions after pseudo-triangulation
  *  
  */
-void KE_tri(KDB* dbe, int** tmp, int passes)
+void KE_tri(KDB* dbe, int** predecessors, int passes)
 {
     int     i, var, j;
 
@@ -432,7 +441,7 @@ void KE_tri(KDB* dbe, int** tmp, int passes)
     for(j = 0 ; j < passes ; j++) {
         for(i = 0 ; i < KSIM_INTER ; i++) {
             var = KSIM_ORDER[KSIM_PRE + i];
-            KE_tri_perm1(dbe, var, tmp[var]);
+            KE_tri_perm1(dbe, var, predecessors[var]);
         }
     }
 
