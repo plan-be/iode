@@ -642,27 +642,27 @@ extern char *K_LastVersion();
 /* c_cc.c */
 extern COLS *COL_cc(char *);
 extern int COL_free(COLS *);
-extern int COL_stripy(char *);
+//extern int COL_stripy(char *);
 extern char *COL_ctoa(COL *,int ,int ,int );
 extern char *COL_text(COL *,char *,int );
 extern COLS *COL_add(COLS *,int ,int );
-extern COLS *COL_construct(COLS *,COLS *,FILS *,REP *, int, int);
-extern int COL_apply_fil(COL *,FIL *);
-extern int COL_read_per(YYFILE *,PERIOD *);
-extern COLS *COL_read_y(YYFILE *);
-extern int COL_read_rep(YYFILE *,REP *);
-extern int COL_read_1f(YYFILE *,FIL *);
-extern FILS *COL_read_f(YYFILE *);
-extern COLS *COL_read_cols(YYFILE *);
+//extern COLS *COL_construct(COLS *,COLS *,FILS *,REP *, int, int);
+//extern int COL_apply_fil(COL *,FIL *);
+//extern int COL_read_per(YYFILE *,PERIOD *);
+//extern COLS *COL_read_y(YYFILE *);
+//extern int COL_read_rep(YYFILE *,REP *);
+//extern int COL_read_1f(YYFILE *,FIL *);
+//extern FILS *COL_read_f(YYFILE *);
+//extern COLS *COL_read_cols(YYFILE *);
 extern int COL_find_mode(COLS *,int *,int );
 
 /* c_calc.c */
 extern int COL_resize(TBL *,COLS *);
 extern void COL_clear(COLS *);
-extern CLEC *COL_cp_clec(CLEC *);
+//extern CLEC *COL_cp_clec(CLEC *);
 extern int COL_exec(TBL *,int ,COLS *);
-extern int COL_calc(COL *,CLEC *,CLEC *);
-extern int COL_link(int ,CLEC *);
+//extern int COL_calc(COL *,CLEC *,CLEC *);
+// extern int COL_link(int ,CLEC *);
 
 /* b_args.c */
 extern char **B_ainit_chk(char *,ADEF *,int );
@@ -1199,20 +1199,20 @@ extern int KI_extract(KDB *,KDB *);
 /* k_print.c */
 extern int T_prep_cls(TBL *,char *,COLS **);
 extern int T_print_tbl(TBL *,char *);
-extern int T_print_line(TBL *,int ,COLS *);
-extern int T_print_cell(TCELL *,COL *,int );
-extern int T_fmt_val(char *,double ,int ,int );
-extern int T_print_val(double );
-extern int T_print_string(COL *,char *);
-extern int T_align(int ,int ,int );
-extern int T_open_attr(int );
-extern int T_close_attr(int );
+//extern int T_print_line(TBL *,int ,COLS *);
+//extern int T_print_cell(TCELL *,COL *,int );
+extern void T_fmt_val(char *,double ,int ,int );
+extern void T_print_val(double );
+//extern void T_print_string(COL *,char *);
+extern void T_align(int ,int ,int );
+extern void T_open_attr(int );
+extern void T_close_attr(int );
 extern char **T_find_files(COLS *);
-extern int T_print_files(COLS *,int );
-extern int T_print_mode(COLS *,int );
-extern int T_print_date(int );
-extern int T_begin_tbl(int ,COLS *);
-extern int T_end_tbl(void);
+//extern void T_print_files(COLS *,int );
+//extern void T_print_mode(COLS *,int );
+//extern void T_print_date(int );
+//extern int T_begin_tbl(int ,COLS *);
+//extern void T_end_tbl(void);
 
 /* k_graph.c */
 /*
