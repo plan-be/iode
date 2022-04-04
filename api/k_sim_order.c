@@ -35,9 +35,7 @@ static char    *KSIM_ORDERED;   // indicates if equation i is already in a block
  *  If B is endo of equation  eqj
  *  Then KE_add_post(successors, eqj, eqi) adds eqi to successors[eqj]
  *
- * At the end of the process, 
- *   - successors contains for each equation all dependent equations 
- *   - predecessors  contains for each equation all equations referring to that equation.
+ * At the end of the process, successors contains for each equation all dependent equations.
  *  
  *  @param [in, out]    int**   successors  vector of int*, one per equation containing the list of successors of eq nb i 
  *  @param [in]         int     i           successor position to add to the list successors[pos]
