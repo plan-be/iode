@@ -1039,15 +1039,19 @@ typedef struct _tbl32_ {
     char    t_pad[13];
 } TBL32;
 
-/*----------------------- Table calculations ---------------------------------*/
 
-// COL definition
+/*----------------------- Table calculations on GSAMPLE's ---------------------------------*/
+
+// COL struct: contains all infos needed to compute one table CELL on one specific GSAMPLE column
+//             + cl_val = the result of the LEC formulas on each FILE / PERIOD needed (i.e. max 4 values)
+//             + cl_res = final result
+
 typedef struct _col_ {
     short   cl_opy;             // operator on periods => cl_per[0] cl_opy cl_per[1]) 
     PERIOD  cl_per[2];          // period 1 , period 2
     short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1] 
     short   cl_fnb[2];          // file1, file2 
-    IODE_REAL    cl_val[2][2];  // computed values: 4 possibilities see below
+    IODE_REAL    cl_val[2][2];  // computed values of the LEC formulas on periods / files => max 4 values see table below
     
     /*   {{v00, v01},{v10,v11}} 
 
@@ -1064,33 +1068,39 @@ typedef struct _col_ {
     IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
 
-// COLS : group of COL
+// COLS: group of COL's = result of a GSAMPLE compilation
 typedef struct _cols_ {
     int     cl_nb;          // Number of columns
     COL     *cl_cols;       // Pointer to the first COL struct
 } COLS;
 
 
+// REP: definition of the repetition of a group of periods / file 
+// GSAMPLE example.: (2000/1999):5*4
 typedef struct _rep_ {
-    short   r_nb;
-    short   r_incr;
+    short   r_nb;           // Nb of repetitions  (in example => 5)
+    short   r_incr;         // Increment          (in example => 4)  
 } REP;
 
+// FIL: files and operation used in a COL
+// GSAMPLE example: (2000:10)[2%3]
 typedef struct _fil_ {
-    short   fl_op;
-	short   fl_1;
-    short   fl_2;
+    short   fl_op;      // Operation on files (in example => %)
+	short   fl_1;       // file nb 1          (in example => 2)
+    short   fl_2;       // file nb 2          (in example => 3)
 } FIL;
 
+// FILS: group of FIL's
 typedef struct _fils_ {
     int     fl_nb;
     FIL     *fl_fils;
 } FILS;
 
-/* Reference tables for the execution of tables */
-typedef struct _fref_ {
-    CLEC    *fr_clec;
-} FREF;
+// FREF Reference tables for the execution of tables */
+//typedef struct _fref_ {
+//    CLEC    *fr_clec;
+//} FREF;
+//
 
 /*---------------- IMPORT / EXPORT ------------------ */
 typedef struct _impdef_ {
@@ -1180,8 +1190,8 @@ extern int      L_PERIOD_NB[];
 extern  char    k_magic[][LMAGIC];
 extern  char    k_ext[][4];
 
-#define K_MAX_FREF          5
-extern  FREF    fref[K_MAX_FREF + 1];
+#define K_MAX_FREF          5           // Max number of file references in GSAMPLE's
+//extern  FREF    fref[K_MAX_FREF + 1];
 
 extern char     *COL_OPERS[];
 extern char     *COL_OPERS_TEXTS[][3]; /* JMP38 01-10-92 */
