@@ -271,7 +271,9 @@ static void L_unread()
  *  
  *  @return             int     0 if the macro exists 
  *                              L_MACRO_ERR on error: the next token was not a valid macro name, or the macro does not exist.
- *  
+ *
+ *  TODO: BUG: the replacement of ; by , acts on the list itself which is an error! Must be changed in a tmp buffer 
+ *             before recording
  */
 static int L_macro()
 {
