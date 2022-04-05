@@ -96,16 +96,37 @@ endif()
 message(STATUS "=============================")
 
 # ---- compile options ----
-# /Zi	Generates complete debugging information
+# Debug info flag
+# /Zi | g:	Generates complete debugging information
+if(MSVC)
+  set(IODE_DEBUG_INFO_FLAG "-Zi")
+else()
+  set(IODE_DEBUG_INFO_FLAG "-g")
+endif()
+
+# Alignement flag
+if(MSVC)
+  set(IODE_ALIGNEMENT_FLAG "-Zp1")
+else()
+  set(IODE_ALIGNEMENT_FLAG "-fpack-struct=1")
+endif()
+
+# global flags
 if (CMAKE_BUILD_TYPE STREQUAL  "Debug")
-   add_compile_options(-Zi)
+  add_compile_options(${IODE_DEBUG_INFO_FLAG})
 endif()
 
 # some code in the C++ API requires C++ 17
 set(CMAKE_CXX_STANDARD 17)
 
 # ---- preprocessor ----
-add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+if(MSVC)
+  set(IODE_PREPROCESSOR_FLAGS "WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF")
+else()
+  set(IODE_PREPROCESSOR_FLAGS "LINUX -DUNIX -DSCOU -DREALD -DSCRPROTO -DNOEMS -DNOEMF")
+endif()
+
+add_compile_definitions(${IODE_PREPROCESSOR_FLAGS})
 
 # ---- libraries ----
 add_subdirectory ("scr4")

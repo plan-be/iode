@@ -32,6 +32,6 @@ add_library (iodeapi STATIC ${SOURCES} ${HEADERS} ${DOCS})
 
 # NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iodeapi.
 #       Option -Zp1 makes compilation of the Google Test lib to fail
-target_compile_options(iodeapi PRIVATE -Zp1)
+target_compile_options(iodeapi PRIVATE ${IODE_ALIGNEMENT_FLAG})
 target_link_libraries(iodeapi PUBLIC "scr4iode")
 target_include_directories(iodeapi PUBLIC "../scr4")
