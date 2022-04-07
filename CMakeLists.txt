@@ -112,6 +112,11 @@ else()
 endif()
 
 # global flags
+if(CMAKE_COMPILER_IS_GNUCC)
+  add_compile_options("-Wno-implicit-int")
+  add_compile_options("-Wno-implicit-function-declaration")
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL  "Debug")
   add_compile_options(${IODE_DEBUG_INFO_FLAG})
 endif()
