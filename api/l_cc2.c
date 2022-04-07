@@ -31,6 +31,102 @@
 #include "iode.h"
 
 /**
+ * Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
+ * 
+ * @param [out] s1  char*   output buffer
+ * @param [in]  s2  char*   input buffer    
+ * @param [in]  lg  int     nb of bytes to copy
+*/
+void L_move_arg(char *s1, char *s2, int lg)
+{
+    int i;
+
+    for(i = lg - 1 ; i >= 0 ; i--)
+        s1[i] = s2[i];
+}
+
+/**
+ * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
+ * adding the size reclaimed by each ALEC atomic expression.
+ * 
+ * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
+ * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
+ * @param [in] to       int     ending position in ALEC of that expression
+ * @return              int     size in bytes of the expression in CLEC form
+*/
+static int L_calc_len(ALEC* expr, int from, int to)
+{
+    int     lg = 0, i;
+    ALEC    *al;
+
+    if(expr == 0) return(0);
+    for(al = expr + from, i = from ; i < to ; al++, i++) {
+        lg ++;
+        switch(al->al_type) {
+            case L_COEF:
+            case L_VAR:
+                lg += sizeof(CVAR);
+                break;
+            case L_PERIOD:
+                lg += sizeof(PERIOD) + s_short;
+                break;
+            case L_DCONST:
+                lg += sizeof(LECREAL);
+                break; /* FLOAT 11-04-98 */
+            case L_LCONST:
+                lg += sizeof(long);
+                break;
+            case L_OPENP:
+            case L_CLOSEP:
+                lg--;
+                break;
+            default:
+                if(is_fn(al->al_type)) lg++;
+                if(is_tfn(al->al_type)) lg += 1 + sizeof(short);
+                if(is_mtfn(al->al_type))
+                    lg += 2 + (sizeof(short) *
+                               (1 + L_MIN_MTARGS[al->al_type - L_MTFN])); /* JMP 17-04-98 */
+                break;
+        }
+    }
+    return(lg);
+}
+
+/**
+ * Compiles L_YY, the open YY stream containing a LEC expression (see l_cc1.c).
+ *  
+ * @return  CLEC*  compiled and serialized LEC expression.
+ */
+CLEC *L_cc_stream()
+{
+    CLEC    *cl;
+
+    if(L_cc1(0) != 0)
+        return((CLEC *)0);
+    cl = L_cc2(L_EXPR);
+    L_alloc_expr(-1);       // Frees L_EXPR
+    return(cl);
+}
+
+
+/**
+ *  Compiles a LEC string. Returns an allocated CLEC struct pointer.
+ *  
+ *  @param [in]     lec     char*   LEC expression
+ *  @return                 CLEC*   compiled and serialized LEC expression
+ *  
+ */
+CLEC *L_cc(char* lec)
+{
+    CLEC    *clec = 0;
+
+    if(L_open_string(lec)) return(clec);
+    clec = L_cc_stream();
+    L_close();
+    return(clec);
+}
+
+/**
  * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogeous container).
  * 
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
@@ -149,100 +245,3 @@ fin:
     SW_nfree(ll);
     return(ptr);
 }
-
-/**
- * Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
- * 
- * @param [out] s1  char*   output buffer
- * @param [in]  s2  char*   input buffer    
- * @param [in]  lg  int     nb of bytes to copy
-*/
-void L_move_arg(char *s1, char *s2, int lg)
-{
-    int i;
-
-    for(i = lg - 1 ; i >= 0 ; i--)
-        s1[i] = s2[i];
-}
-
-/**
- * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
- * adding the size reclaimed by each ALEC atomic expression.
- * 
- * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
- * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
- * @param [in] to       int     ending position in ALEC of that expression
- * @return              int     size in bytes of the expression in CLEC form
-*/
-static int L_calc_len(ALEC* expr, int from, int to)
-{
-    int     lg = 0, i;
-    ALEC    *al;
-
-    if(expr == 0) return(0);
-    for(al = expr + from, i = from ; i < to ; al++, i++) {
-        lg ++;
-        switch(al->al_type) {
-            case L_COEF:
-            case L_VAR:
-                lg += sizeof(CVAR);
-                break;
-            case L_PERIOD:
-                lg += sizeof(PERIOD) + s_short;
-                break;
-            case L_DCONST:
-                lg += sizeof(LECREAL);
-                break; /* FLOAT 11-04-98 */
-            case L_LCONST:
-                lg += sizeof(long);
-                break;
-            case L_OPENP:
-            case L_CLOSEP:
-                lg--;
-                break;
-            default:
-                if(is_fn(al->al_type)) lg++;
-                if(is_tfn(al->al_type)) lg += 1 + sizeof(short);
-                if(is_mtfn(al->al_type))
-                    lg += 2 + (sizeof(short) *
-                               (1 + L_MIN_MTARGS[al->al_type - L_MTFN])); /* JMP 17-04-98 */
-                break;
-        }
-    }
-    return(lg);
-}
-
-/**
- * Compiles L_YY, the open YY stream containing a LEC expression (see l_cc1.c).
- *  
- * @return  CLEC*  compiled and serialized LEC expression.
- */
-CLEC *L_cc_stream()
-{
-    CLEC    *cl;
-
-    if(L_cc1(0) != 0)
-        return((CLEC *)0);
-    cl = L_cc2(L_EXPR);
-    L_alloc_expr(-1);       // Frees L_EXPR
-    return(cl);
-}
-
-
-/**
- *  Compiles a LEC string. Returns an allocated CLEC struct pointer.
- *  
- *  @param [in]     lec     char*   LEC expression
- *  @return                 CLEC*   compiled and serialized LEC expression
- *  
- */
-CLEC *L_cc(char* lec)
-{
-    CLEC    *clec = 0;
-
-    if(L_open_string(lec)) return(clec);
-    clec = L_cc_stream();
-    L_close();
-    return(clec);
-}
-
