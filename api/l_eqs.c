@@ -126,40 +126,6 @@ static int L_cc1_eq(SLEC* sl, char* eq)
     return(0);
 }
 
-
-/**
- * Compiles a LEC equation and tries to analytically solve the equation with respect to endo.
- * 
- * Generates a CLEC form with the result and set clec->dupendo to 1 if the
- * generated form is of the form "0 := LHS - RHS")
- * 
- * @param [in] eq       char*
- * @param [in] endo     char* 
- * @return              CLEC*
-*/
-CLEC* L_solve(char* eq, char* endo)
-{
-    CLEC    *clec = 0;
-    int     dupendo = 0;
-
-    L_invert(eq, endo, &dupendo);
-    switch(L_errno) {
-        case 0              :
-            clec = L_cc2(L_EXPR);
-            if(clec != 0) clec->dupendo = dupendo;
-            break;
-
-        case L_DUP_ERR      :
-        case L_INVERT_ERR   :
-        default             :
-            break;
-    }
-    L_alloc_expr(-1);
-    return(clec);
-}
-
-
-
 /**
  * Returns the position of ":=" in an equation or -1 if not found.
  * 
@@ -543,3 +509,33 @@ static int L_invert(char* eq, char* endo, int *dupendo)
     return(L_errno);
 }
 
+/**
+ * Compiles a LEC equation and tries to analytically solve the equation with respect to endo.
+ * 
+ * Generates a CLEC form with the result and set clec->dupendo to 1 if the
+ * generated form is of the form "0 := LHS - RHS")
+ * 
+ * @param [in] eq       char*
+ * @param [in] endo     char* 
+ * @return              CLEC*
+*/
+CLEC* L_solve(char* eq, char* endo)
+{
+    CLEC    *clec = 0;
+    int     dupendo = 0;
+
+    L_invert(eq, endo, &dupendo);
+    switch(L_errno) {
+        case 0              :
+            clec = L_cc2(L_EXPR);
+            if(clec != 0) clec->dupendo = dupendo;
+            break;
+
+        case L_DUP_ERR      :
+        case L_INVERT_ERR   :
+        default             :
+            break;
+    }
+    L_alloc_expr(-1);
+    return(clec);
+}
