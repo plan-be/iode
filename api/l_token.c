@@ -383,6 +383,50 @@ static void L_skip()
 }
 
 
+/** 
+ * Reads an integer or a PERIOD on the stream L_YY.
+ *
+ * After having read a integer on L_YY (stored in LYYLONG), tries to read a PERIOD (yyyyPppp) on the stream L_YY.
+ * If the next character is invalid for a PERIOD, unreads it and returns L_LCONST. Otherwise, reads the second part of the PERIOD and
+ * return L_PERIOD. 
+ *
+ * @return     int     L_LCONST: value in L_TOKEN.tk_long
+ *                     L_PERIOD: value in L_TOKEN.tk_period
+ *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
+ *
+ * On error L_errno is set to L_PERIOD_ERR.
+ */   
+static int L_get_int()
+{
+    int     nb_per,
+            ch;
+    long    l;
+
+    l = LYYLONG;
+    ch = L_getc();
+    nb_per = L_pos(L_PERIOD_CH, toupper(ch));
+    if(nb_per < 0) {
+        L_ungetc(ch);
+        L_TOKEN.tk_long = LYYLONG;
+        return(L_LCONST);
+    }
+
+    if(L_read() != YY_LONG || L_PERIOD_NB[nb_per] < LYYLONG || LYYLONG == 0) {
+        L_unread();
+        L_errno = L_PERIOD_ERR;
+        return(YY_ERROR);
+    }
+
+    if(l < 50) l+= 2000;
+    else if(l < 200) l+= 1900;
+    L_TOKEN.tk_period.p_y = l;
+    L_TOKEN.tk_period.p_p = toupper(ch);
+    L_TOKEN.tk_period.p_s = LYYLONG;
+
+    return(L_PERIOD);
+}
+
+
 /**
  * Main function to browse a LEC expression token by token in the stream L_YY. 
  *  - skips the spaces 
@@ -473,49 +517,6 @@ char    *a, *b;
     return(1);
 }
 */
-
-/** 
- * Reads an integer or a PERIOD on the stream L_YY.
- *
- * After having read a integer on L_YY (stored in LYYLONG), tries to read a PERIOD (yyyyPppp) on the stream L_YY.
- * If the next character is invalid for a PERIOD, unreads it and returns L_LCONST. Otherwise, reads the second part of the PERIOD and
- * return L_PERIOD. 
- *
- * @return     int     L_LCONST: value in L_TOKEN.tk_long
- *                     L_PERIOD: value in L_TOKEN.tk_period
- *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
- *
- * On error L_errno is set to L_PERIOD_ERR.
- */   
-static int L_get_int()
-{
-    int     nb_per,
-            ch;
-    long    l;
-
-    l = LYYLONG;
-    ch = L_getc();
-    nb_per = L_pos(L_PERIOD_CH, toupper(ch));
-    if(nb_per < 0) {
-        L_ungetc(ch);
-        L_TOKEN.tk_long = LYYLONG;
-        return(L_LCONST);
-    }
-
-    if(L_read() != YY_LONG || L_PERIOD_NB[nb_per] < LYYLONG || LYYLONG == 0) {
-        L_unread();
-        L_errno = L_PERIOD_ERR;
-        return(YY_ERROR);
-    }
-
-    if(l < 50) l+= 2000;
-    else if(l < 200) l+= 1900;
-    L_TOKEN.tk_period.p_y = l;
-    L_TOKEN.tk_period.p_p = toupper(ch);
-    L_TOKEN.tk_period.p_s = LYYLONG;
-
-    return(L_PERIOD);
-}
 
 
 /*
