@@ -299,6 +299,45 @@ static void K_xdrCLEC(CLEC* expr, int mode)
 
 
 /**
+ *  Translates a TFN function from little-endian to big-endian or the other way round.
+ *  
+ *  @param [in, out]    expr    char*    sub CLEC expression
+ *  @param [in]         len     short    nb of atomic elements in expr
+ *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
+ */
+static void K_xdrTFN(unsigned char* expr, short len, int mode)
+{
+    int lg = len;
+
+    K_xdrCLEC_sub(expr, lg, mode);
+}
+
+
+/**
+ *  Translates a MTFN function from little-endian to big-endian or the other way round.
+ *  
+ *  @param [in, out]    expr    char*    sub CLEC expression
+ *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
+ *  @param [in]         nvargs  int      number of args of the MTFN function
+ *  
+ */
+
+static void K_xdrMTFN(unsigned char* expr, int mode, int nvargs)
+{
+    int     i;
+    short   len1, pos = 0;
+
+    for(i = 0 ; i < nvargs ; i++) {
+        memcpy(&len1, expr + pos, sizeof(short));
+        if(mode == 0) K_xdrSHORT(&len1); /* intel read */
+        K_xdrSHORT(expr + pos);
+        K_xdrCLEC_sub(expr + pos + sizeof(short), len1, mode);
+        pos += sizeof(short) + len1;
+    }
+}
+
+
+/**
  *  Translates a sub-CLEC expression from little-endian to big-endian or the other way round.
  *  
  *  @param [in, out]    expr    char*    sub lec expressions
@@ -306,7 +345,7 @@ static void K_xdrCLEC(CLEC* expr, int mode)
  *  @param [in]         mode    int      0: if expr is in little-endian format
  */
 
-static void K_xdrCLEC_sub(char* expr, int lg, int mode)
+void K_xdrCLEC_sub(char* expr, int lg, int mode)
 {
     int     j, keyw, nvargs;
     short   len, s;
@@ -376,45 +415,6 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
                         break;
                     }
             }
-    }
-}
-
-
-/**
- *  Translates a TFN function from little-endian to big-endian or the other way round.
- *  
- *  @param [in, out]    expr    char*    sub CLEC expression
- *  @param [in]         len     short    nb of atomic elements in expr
- *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
- */
-static void K_xdrTFN(unsigned char* expr, short len, int mode)
-{
-    int lg = len;
-
-    K_xdrCLEC_sub(expr, lg, mode);
-}
-
-
-/**
- *  Translates a MTFN function from little-endian to big-endian or the other way round.
- *  
- *  @param [in, out]    expr    char*    sub CLEC expression
- *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
- *  @param [in]         nvargs  int      number of args of the MTFN function
- *  
- */
-
-static void K_xdrMTFN(unsigned char* expr, int mode, int nvargs)
-{
-    int     i;
-    short   len1, pos = 0;
-
-    for(i = 0 ; i < nvargs ; i++) {
-        memcpy(&len1, expr + pos, sizeof(short));
-        if(mode == 0) K_xdrSHORT(&len1); /* intel read */
-        K_xdrSHORT(expr + pos);
-        K_xdrCLEC_sub(expr + pos + sizeof(short), len1, mode);
-        pos += sizeof(short) + len1;
     }
 }
 
