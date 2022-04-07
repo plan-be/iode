@@ -64,116 +64,6 @@ void L_alloc_expr(int nb)
 
 
 /**
- *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analysed LEC expression.
- *  
- *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. They are the input of L_cc2() which will 
- *  serialize L_EXPR into a CLEC (Compiled LEC) structure.
- *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
- *      - L_NAMES contains the names included in the lec expression
- *  
- *  @param [in] nb_names    int number of variable and/or scalar names already in L_NAMES. 
- *                              Normally 0 but can be > 0 for equations
- *  
- *  @return                 int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
- */
-int L_cc1(int nb_names)
-{
-    int     keyw,
-            start = 1,
-            beg = 1;    /* indicate if next token is an oper or an expr */
-
-    L_NB_OPS = L_PAR = L_errno = L_NB_EXPR = L_NB_AEXPR = 0;
-    L_NB_NAMES = nb_names;
-    L_alloc_expr(1);
-
-    /* LOOP ON TOKEN */
-    while(1) {
-        keyw = L_get_token(); // Group of operators, not the operator itself
-        if(L_errno) goto ended;
-again:
-        switch(keyw) {
-            case L_PERIOD:
-            case L_LCONST :
-            case L_DCONST :
-            case L_VAR :
-            case L_VAL :
-            case L_COEF :
-                if(beg == 0) goto err;
-                if(L_save_var()) goto ended;
-                beg = 0;
-                break;
-            case L_OP :
-                if(beg != 0) {
-                    switch(L_TOKEN.tk_def) {
-                        case L_MINUS :
-                            L_TOKEN.tk_def = L_UMINUS;
-                            break;
-                        case L_PLUS  :
-                            L_TOKEN.tk_def = L_UPLUS;
-                            break;
-                        default      :
-                            goto err;
-                    }
-                    keyw = L_FN;
-                    goto again;
-                }
-                beg = 1;
-                if(L_add_stack(keyw)) goto ended;
-                break;
-            case L_FN :
-            case L_TFN:
-            case L_MTFN:
-            case L_OPENP :
-                if(beg == 0) goto err;
-                if(L_add_stack(keyw)) goto ended;
-                break;
-            case L_OCPAR :
-                if(beg == 0) goto err;
-                if(L_add_stack(keyw)) goto ended;
-                beg = 0;
-                break;
-            case L_CLOSEP :
-                if(beg == 1) goto err;
-                if(L_add_stack(keyw)) goto ended;
-                break;
-            case L_COMMA :
-                if(beg == 1) goto err;
-                if(L_add_stack(keyw)) goto ended;
-                beg = 1;
-                break;
-            case YY_EOF:
-            case L_EOE :
-                if(start) {
-                    L_alloc_expr(1);
-                    L_EXPR[0].al_type = L_EOE;
-                    L_NB_EXPR++;
-                    goto ended;
-                }
-                if(beg == 1) goto err;
-                if(L_PAR != 0) L_errno = L_PAR_ERR;
-                else L_empty_ops_stack();
-                goto ended;
-            case L_OPENB:
-                if(beg == 1) goto err;
-                if(L_anal_lag()) goto ended;
-                beg = 0;
-                break;
-            case YY_ERROR :
-                goto ended;
-            default :
-                goto err;
-        }
-        start = 0;
-    }
-
-err :
-    L_errno = L_SYNTAX_ERR;
-ended:
-    return(L_errno);
-}
-
-
-/**
  *  Adds a series or scalar name in L_NAMES.
  *  
  *  If necessary, reallocates L_NAMES by blocks of 10 elements at a time.
@@ -555,4 +445,113 @@ int L_sub_expr(ALEC* al, int i)
 err:
     L_errno = L_LAG_ERR;
     return(-1);
+}
+
+/**
+ *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analysed LEC expression.
+ *  
+ *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. They are the input of L_cc2() which will 
+ *  serialize L_EXPR into a CLEC (Compiled LEC) structure.
+ *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
+ *      - L_NAMES contains the names included in the lec expression
+ *  
+ *  @param [in] nb_names    int number of variable and/or scalar names already in L_NAMES. 
+ *                              Normally 0 but can be > 0 for equations
+ *  
+ *  @return                 int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
+ */
+int L_cc1(int nb_names)
+{
+    int     keyw,
+            start = 1,
+            beg = 1;    /* indicate if next token is an oper or an expr */
+
+    L_NB_OPS = L_PAR = L_errno = L_NB_EXPR = L_NB_AEXPR = 0;
+    L_NB_NAMES = nb_names;
+    L_alloc_expr(1);
+
+    /* LOOP ON TOKEN */
+    while(1) {
+        keyw = L_get_token(); // Group of operators, not the operator itself
+        if(L_errno) goto ended;
+again:
+        switch(keyw) {
+            case L_PERIOD:
+            case L_LCONST :
+            case L_DCONST :
+            case L_VAR :
+            case L_VAL :
+            case L_COEF :
+                if(beg == 0) goto err;
+                if(L_save_var()) goto ended;
+                beg = 0;
+                break;
+            case L_OP :
+                if(beg != 0) {
+                    switch(L_TOKEN.tk_def) {
+                        case L_MINUS :
+                            L_TOKEN.tk_def = L_UMINUS;
+                            break;
+                        case L_PLUS  :
+                            L_TOKEN.tk_def = L_UPLUS;
+                            break;
+                        default      :
+                            goto err;
+                    }
+                    keyw = L_FN;
+                    goto again;
+                }
+                beg = 1;
+                if(L_add_stack(keyw)) goto ended;
+                break;
+            case L_FN :
+            case L_TFN:
+            case L_MTFN:
+            case L_OPENP :
+                if(beg == 0) goto err;
+                if(L_add_stack(keyw)) goto ended;
+                break;
+            case L_OCPAR :
+                if(beg == 0) goto err;
+                if(L_add_stack(keyw)) goto ended;
+                beg = 0;
+                break;
+            case L_CLOSEP :
+                if(beg == 1) goto err;
+                if(L_add_stack(keyw)) goto ended;
+                break;
+            case L_COMMA :
+                if(beg == 1) goto err;
+                if(L_add_stack(keyw)) goto ended;
+                beg = 1;
+                break;
+            case YY_EOF:
+            case L_EOE :
+                if(start) {
+                    L_alloc_expr(1);
+                    L_EXPR[0].al_type = L_EOE;
+                    L_NB_EXPR++;
+                    goto ended;
+                }
+                if(beg == 1) goto err;
+                if(L_PAR != 0) L_errno = L_PAR_ERR;
+                else L_empty_ops_stack();
+                goto ended;
+            case L_OPENB:
+                if(beg == 1) goto err;
+                if(L_anal_lag()) goto ended;
+                beg = 0;
+                break;
+            case YY_ERROR :
+                goto ended;
+            default :
+                goto err;
+        }
+        start = 0;
+    }
+
+err :
+    L_errno = L_SYNTAX_ERR;
+ended:
+    return(L_errno);
 }
