@@ -1,14 +1,106 @@
-/**
+ /**
  *  @header4iode
  * 
  *  Tries to find a root of a compiled LEC equation using a combination of Newton-Raphson 
  *  and bisection (secant) method.
+ *  
+ *  
+ *  Methodology
+ *  ===========
+ *  Depending on their form, LEC equations can be solved analytically with respect to their endogenous variable-- or not.
+ *  
+ *  For example, an equation of the type
+ *   
+ *      d(Y / X) := c1 + c2 * ln(Y / Z)
+ *          
+ *  cannot be solved analytically because Y appears more than once (on the left and/or on the right member).
+ *  
+ *  Conversely, the equation 
+ *  
+ *      d Y : = c1 + c2 * X + c3 * t
+ *      
+ *  is invertible with respect to Y:
+ *  
+ *      Y : = Y[-1] + c1 + c2 * X + c3 * t
+ *  
+ *  During the Gauss-Seidel iteration, we must calculate the value of the endogenous variable for each equation. 
+ *  We have 3 possibilities.
+ *  
+ *  Case 1: the equation is analytically solved with respect to its endogenous
+ *  --------------------------------------------------------------------------
+ *  Consider the LEC equation below:
+ *  
+ *      d Y := c1 + c2 * X 
+ *      
+ *  If its endogenous variable is Y, it will be translated internally as follows:
+ *  
+ *      Y[-1] + c1 + c2 * X
+ *      
+ *  When simulating the model, this formula is calculated and the result is stored in Y.
+ *  
+ *  In the code below, this is the case where clec->dupendo is zero AND varnb == eqvarnb.
+ *  
+ *  Case 2: the equation must be numerically solved
+ *  -----------------------------------------------
+ *  The equation 
+ *  
+ *      ln Y := c1 + c2 * X / ln Y
+ *      
+ *  contains twice the variable Y and will be translated into  
+ *  
+ *      ln Y - (c1 + c2 * X / ln Y)
+ *  
+ *  Note that the result of this formula is 0, and not Y, contrary to case 1.
+ *  
+ *  When calculating the model, this equation must be solved numerically with respect to Y before storing the result in Y.
+ *  
+ *  In the code, this is the case where clec->dupendo is non-zero.
+ *  
+ *  Case 3: ENDO-EXO exchanges
+ *  -------------------------
+ *  If an equation is inverted in an endo-exo exchange (e.g. Y becomes exogenous and X becomes endogenous), 
+ *  the equation will be solved numerically as above (case 2). Obviously, one must take into account the fact 
+ *  that the translated version of the equation provides the value of Y (and not 0) 
+ *  and that Y must be subtracted from the calculation.
+ *  
+ *  Hence, we will search the value of X such that
+ *  
+ *       0 == Y[-1] + c1 + c2 * X - Y 
+ *       
+ *  In the code, this is the case where varnb != eqvarnb.
+ *  
+ *  
+ *  Newton-Raphson algorithm
+ *  ========================
+ *  
+ *  Search for x tq |f(x)| < KSIM_EPSNEWTON
+ *  
+ *  We start by calculating shift = the difference between 0 and the value obtained 
+ *  by the LEC formula of the equation (according to the vas 1, 2 or 3).
+ *  
+ *  We then loop (maximum KSIM_NEWTON_MAXIT iterations) to search for x : 
+ *      
+ *      # check convergence
+ *      if |f(x) - shift| < KSIM_NEWTON_EPS: x is a solution
+ *      
+ *      # Define derivative step h 
+ *      h = 1e-4    
+ *      if |x| < 1.0 then h *= |x|
+ *      
+ *      # Move x in the direction of the local tangent 
+ *      dx = h.f(x) /(f(x+h)-f(x))
+ *      if f(x - dx) is NaN: dx = dx / 4
+ *      x = x - dx
+ *      
+ *  The loop also stops if x or f(x) becomes NaN.
+ *  
+ *    
  * 
  *  List of functions
  *  ----------------- 
  *
  *      double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
- *                                                                                  If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
+ *                                                                                      If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
  *      double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
  *  
  */
@@ -16,7 +108,10 @@
 #include "iode.h"
 
 double  L_newton_1();
-int     KSIM_DEBUGNEWTON = 0;
+int     KSIM_NEWTON_DEBUG = 0;          //
+int     KSIM_NEWTON_MAXIT = 50;         // Max number of iterations of the Newton-Raphson sub algorithm.
+double  KSIM_NEWTON_EPS   = 1e-6;       // Newton-Raphson convergence criterion
+double  KSIM_NEWTON_STEP  = 1e-6;       // Step to calculate the local derivative (f(x+h) - f(x)) / h
 
 /**
  *  Solves numerically a LEC equation for one period of time with respect to a given variable (varnb).  
@@ -57,14 +152,14 @@ double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
  *  @param  [in]    int  algo              if not null, the convergence criteria eps is multiplied by the 
  *                                         value of f(x) if ||f(x)|| > 1.0.
  *  @global [in]    int  KSIM_DEBUG        if not null, calls L_debug() to save a trace of the result 
- *  @global [in]    int  KSIM_DEBUGNEWTON  if not null, calls L_debug() to save a trace of each iteration of the solver
+ *  @global [in]    int  KSIM_NEWTON_DEBUG if not null, calls L_debug() to save a trace of each iteration of the solver
  *  
  *  See L_zero() for the description of the other parameters.
  *  
  */
 static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
-    double  oldx, x, fx, fxh, h = 1e-6, eps = 1e-6, ax, afx, dx = 0.0, ox;
+    double  oldx, x, fx, fxh, h = KSIM_NEWTON_STEP, eps = KSIM_NEWTON_EPS, ax, afx, dx = 0.0, ox;
     int     it = 0, subit;
     IODE_REAL    *d_ptr, shift;
     extern  int KSIM_DEBUG;
@@ -76,31 +171,34 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         return((double)L_NAN);
     }
 
+    // Case 1: equation Y : = f(X) analytically solved
+    // or Case 3 (endo-exo)
     if(varnb == eqvarnb || clec->dupendo) {   /* JMP 13-12-01 */
         shift = 0.0;
         ax = fabs(x);
     }
+    // Case 2: 0 := f(X,Y) 
     else {
         shift = *(L_getvar(dbv, eqvarnb) + t);
-        if(!L_ISAN(shift)) return((double)L_NAN); // added
+        if(!L_ISAN(shift)) return((double)L_NAN); 
         ax = fabs(shift);
     }
 
-    if(KSIM_DEBUGNEWTON)
+    if(KSIM_NEWTON_DEBUG)
         L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
 
 
     if(algo && ax > 1.0) eps *= ax; /* GB 20-06-96 */
-    while(it < 50) {
+    while(it < KSIM_NEWTON_MAXIT) {
         d_ptr = L_getvar(dbv, varnb) + t;
         d_ptr[0] = x;
         ax = fabs(x);
 
         fx = L_exec(dbv, dbs, clec, t);
-        if(KSIM_DEBUGNEWTON) L_debug("   - f(%lg) = %lg\n", x, fx);
+        if(KSIM_NEWTON_DEBUG) L_debug("   - f(%lg) = %lg\n", x, fx);
 
         if(!L_ISAN(fx)) {
-            if(KSIM_DEBUGNEWTON) { // Message iniquement en cas de pb
+            if(KSIM_NEWTON_DEBUG) { // Message iniquement en cas de pb
                 L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
                 L_debug("   - f(%lg) = %lg\n", x, fx);
                 L_debug("   -> cannot compute f(%lg)\n", x);
@@ -112,7 +210,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         afx = fabs(fx);
 
         if(afx < eps) {
-            if(KSIM_DEBUGNEWTON) L_debug("   -> %lf\n", x);
+            if(KSIM_NEWTON_DEBUG) L_debug("   -> %lf\n", x);
             return(x);
         }
         if(ax > 1.0) h = 1e-4 * ax;
@@ -122,16 +220,16 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         d_ptr[0] = x + h;
         fxh = L_exec(dbv, dbs, clec, t);
         if(!L_ISAN(fxh)) {
-            if(KSIM_DEBUGNEWTON) L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
+            if(KSIM_NEWTON_DEBUG) L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
             goto err;
         }
 
         fxh -= shift;
         if(fabs(fxh - fx) < 1e-8) {
-            if(KSIM_DEBUGNEWTON) L_debug("   -> f(x)=%lf == f(x+h)=%lf", fx, fxh);
+            if(KSIM_NEWTON_DEBUG) L_debug("   -> f(x)=%lf == f(x+h)=%lf", fx, fxh);
             goto err;
         }
-        if(KSIM_DEBUGNEWTON) L_debug("     h = %lg; fx=%lg; fxh=%lg\n", h, fx, fxh);
+        if(KSIM_NEWTON_DEBUG) L_debug("     h = %lg; fx=%lg; fxh=%lg\n", h, fx, fxh);
         dx = h * fx / (fxh - fx);
         ox = x;
         x -= dx;
@@ -141,7 +239,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         it++;
     }
 
-    if(KSIM_DEBUGNEWTON) L_debug("    #it > %d\n", it);
+    if(KSIM_NEWTON_DEBUG) L_debug("    #it > %d\n", it);
 
 err:
     d_ptr[0] = oldx;
