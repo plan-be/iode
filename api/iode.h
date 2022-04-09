@@ -1206,22 +1206,31 @@ extern int      W_gdiorient;
 extern int      W_gdiduplex;
 extern char     W_gdiprinter[80];
 
-extern  KDB     *K_WS[7];
-extern  KDB     *K_RWS[7][5];
-extern  int     K_PWS[7];
-extern  int     K_WARN_DUP;
-extern  int     K_SECRETSEP;
-
-extern  int     K_SCR;
-
-extern  char    **IMP_rule;
-extern  char    **IMP_pat;
-extern  int     IMP_trace;
-
-extern  IODE_REAL    KSIM_EPS, KSIM_RELAX;
-extern  int     KSIM_MAXIT, KSIM_DEBUG, KSIM_PASSES, KSIM_DEBUGNEWTON,
-	KSIM_SORT, KSIM_START;
-extern  char    **KSIM_EXO;
+extern KDB      *K_WS[7];
+extern KDB      *K_RWS[7][5];
+extern int      K_PWS[7];
+extern int      K_WARN_DUP;
+extern int      K_SECRETSEP;
+        
+extern int      K_SCR;
+        
+extern char     **IMP_rule;
+extern char     **IMP_pat;
+extern int      IMP_trace;
+       
+extern IODE_REAL    KSIM_EPS,               // Model simulation convergence threshold
+                    KSIM_RELAX,             // Model relaxation parameter ("damping")
+                    KSIM_NEWTON_EPS,        // Newton-Raphson convergence threshold 
+                    KSIM_NEWTON_STEP;       // Newton-Raphson step to calculate the local derivative (f(x+h) - f(x)) / h
+                    
+extern int          KSIM_MAXIT,             // Simulation: max number of iterations
+                    KSIM_DEBUG,             // Simulation: if not null : save 3 list _PRE, _INTER and _POST 
+                    KSIM_PASSES,            // Simulation: number of passes for the heuristic triangulation algorithm
+                    KSIM_NEWTON_DEBUG,      // Newotn-Raphson: save a trace of the sub-iterations 
+                    KSIM_NEWTON_MAXIT,      // Newon-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
+                    KSIM_SORT,              // Simulation: reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
+                    KSIM_START;             // Simulation: endogenous initial values
+extern char         **KSIM_EXO;             
 
 /*-------------- MESSAGES -----------------------*/
 extern void (*B_MessageBox_impl)(unsigned char* title, unsigned char* message, unsigned char* buts[]);
