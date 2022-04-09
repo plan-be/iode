@@ -38,6 +38,7 @@ static KDB     *LN_DBV, *LN_DBS;    // Current KDB of vars and scalars
  *  @global  [in] CLEC*   LN_CLEC   compiled and linked LEC expression
  *  @global  [in] double  LN_SHIFT  ??
  */
+ 
 static double L_fx(double x, int t)
 {
     double  fx;
@@ -54,12 +55,23 @@ static double L_fx(double x, int t)
 
 
 /**
- *  Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
+ *  Tries to find an interval [x1, x2] where the is a root of L_fx() i.e.: (L_fx(x1) * L_fx(x2) < 0)
+ *  (assuming that L_fx() is continuous).
+ *  
+ *      Start by setting 
+ *          x1 = 0.5 * x1 
+ *          x2 = 1.5 * x1
+ *      If L_fx(x1) * L_fx(x2) < 0, then [x1, x2] meets the condition.
+ *      Else, replace x1 and x2: 
+ *          x1 = x1 + LN_FACTOR*(x1 - x2)
+ *          x2 = x2 + LN_FACTOR*(x2 - x1)
+ *      Check if [x1, x2] is now a suitable interval.
+ *      If not, try again max LN_MAXIT times.
+ *  
  *  
  *  @param [in, out]    double*     x1  left bound of the segment
  *  @param [out]        double*     x2  right bound of the segment
  *  @param [in]         int         t   current period of execution of L_fx()
- *  
  *  @return             int         0 if a solution is found, -1 otherwise
  *  
  *  TODO: replace LN_MAXIT and LN_FACTOR by global variables.
@@ -92,6 +104,17 @@ static int L_bracket(double* x1, double* x2, int t)
 
 /**
  *  Tries to find a solution to the equation clec by a secant method.
+ *
+ *  That basic secant method first requires to determine an interval [xl, xr] containing a root of 
+ *  the equation clec (xl/xr stands for x-lect/right).
+ *  In other words, the sign of f(xl) must be opposite to that of f(xr).
+ *  
+ *  Then the size of that interval is decreased until |xl - xr| becomes << eps by applying the formula below:
+ *      xr = xl + (xr - xl) * f(xl) / (f(xl) -f(xh))
+ *      If the sign of f(xr) has changed, switch xr and xl. 
+ *      Continue until |xl - xr| is << eps
+ *   
+ *      
  *  
  *  @param [in] KDB*    dbv     KDB of VAR with which the equation has been linked
  *  @param [in] KDB*    dbs     KDB of SCL with which the equation has been linked
@@ -103,6 +126,7 @@ static int L_bracket(double* x1, double* x2, int t)
  *  @return     double          root of the equation (varnb value that solves the equation)
  *
  */
+
 double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     int     it = 0;
