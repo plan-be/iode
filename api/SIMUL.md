@@ -5,17 +5,231 @@
 
 
 - [IODE: Model Simulation](#T1)
-    - [k\_sim\_main.c](#T2)
-    - [k\_sim\_order.c](#T3)
-    - [k\_sim\_scc.c](#T4)
-    - [k\_sim\_exo2endo.c](#T5)
-    - [Single equation solver](#T6)
-      - [l\_newton.c](#T7)
-      - [l\_secant.c](#T8)
+    - [The Gauss\-Seidel algorithm](#T2)
+    - [Solving a single equation](#T3)
+      - [Case 1: the equation is analytically solved with respect to its endogenous](#T4)
+      - [Case 2: the equation must be numerically solved](#T5)
+      - [Case 3: ENDO\-EXO exchanges](#T6)
+    - [The Newton\-Raphson algorithm](#T7)
+    - [The Secant algorithm](#T8)
+    - [k\_sim\_main.c](#T9)
+    - [k\_sim\_order.c](#T10)
+    - [k\_sim\_scc.c](#T11)
+    - [k\_sim\_exo2endo.c](#T12)
+    - [Single equation solver](#T13)
+      - [l\_newton.c](#T14)
+      - [l\_secant.c](#T15)
 
 # IODE: Model Simulation {#T1}
 
-### k\_sim\_main.c {#T2}
+### The Gauss\-Seidel algorithm {#T2}
+
+A macroeconomic model is a system of nonlinear equations that must be solved with respect to its endogenous variables, say \{yi\}.
+
+Most macroeconometric models are solved using the Gauss\-Seidel technique. It is a simple technique and in most cases works remarkably well. This technique is used in IODE to simulate models. The Gauss\-Seidel algorithm is based on the fixed\-point theorem (see https://en.wikipedia.org/wiki/Fixed\-point\_theorems) and is easy to describe by means of an example.
+
+Assume that the model consists of n equations:
+
+```
+f1(y1, y2, y3..., yn) = 0
+f2(y1, y2, y3..., yn) = 0
+f3(y1, y2, y3..., yn) = 0
+  ...                   
+fn(y1, y2, y3..., yn) = 0
+```
+
+The Gauss\-Seidel technique requires to rewrite the equations in such a way that each endogenous variable is placed on the left member of the equations.
+
+For example, if the equation is
+
+```
+    ln(y1 / y2) : = y3 + x1
+```
+
+then y2 can be moved to the right side of the equation:
+
+```
+    y1 = y2 * exp(y3 + x1)
+```
+
+IODE tries to do that for each equation, provided that the endogenous variable appears only once in the equation. The endogenous variable can appear either on the left or on the right.
+
+When these transformations of the equations are done, the model can be rewritten as follows :
+
+```
+    y1 = f1(y1, y2, y3..., yn)
+    y2 = f2(y1, y2, y3..., yn)
+    y3 = f3(y1, y2, y3..., yn)
+     ...                 
+    yn = f4(y1, y2, y3..., yn)
+```
+
+Note: when an equation cannot be transformed in the form yn = fn(...), a "sub\-algorithm" based on the Newton\-Raphson or secant method is used to numerically solve the equation with respect to its endogenous variable. See below for more information on that sub\-algorithm.
+
+The Gauss\-Seidel algorithm then proceeds as follows.
+
+Initial values of the endogenous variables are selected. These are either the actual values or extrapolations from the previous period according to some rules. IODE allow various strategies.
+
+Given these values the equations can be computed successively and produce a new set of values for the endogenous variables \{y1...yn\}. With this new set of values, the equations can again be calculated to get another set \{y1...yn\}, etc.
+
+Convergence is reached if, for each endogenous variable, the values of successive iterations are within some predefined tolerance level.
+
+There is no guarantee that the Gauss\-Seidel method will converge. The advantage of the technique, however, is that it can usually be made to converge (assuming an actual solution exists) with sufficient "damping", as described below.
+
+Let
+
+```
+    yi[k-1] denote the solution value of endogenous yi for iteration k-1 
+    yi[k]   denote the value computed by solving the equation on iteration k. 
+```
+
+Instead of using yi\[k\] as the new value for iteration k, one can adjust yi\[k\] by combining yi\[k\-1\] and yi\[k\]:
+
+```
+    y1[k] = y1[k-1] + lambda * (y[k] - y[k-1]) where 0 < lamda <= 1
+```
+
+If lambda == 1 is 1, there is no damping.
+
+The solution is reached when the difference between 2 iterations is under a defined threshold for each endogenous \{y1...yn\}.
+
+### Solving a single equation {#T3}
+
+Depending on their form, LEC equations can be solved analytically with respect to their endogenous variable \- or not.
+
+For example, an equation of the type
+
+```
+    d(Y / X) := c1 + c2 * ln(Y / Z)
+```
+
+cannot be solved analytically because Y appears more than once (on the left and/or on the right member).
+
+Conversely, the equation
+
+```
+    d Y : = c1 + c2 * X + c3 * t
+```
+
+is invertible with respect to Y:
+
+```
+    Y : = Y[-1] + c1 + c2 * X + c3 * t
+```
+
+During the Gauss\-Seidel iteration, we must calculate the value of the endogenous variable for each equation. We have 3 possibilities listed below.
+
+#### Case 1: the equation is analytically solved with respect to its endogenous {#T4}
+
+Consider the LEC equation
+
+```
+    d Y := c1 + c2 * X 
+```
+
+If its endogenous variable is Y, it will be translated internally by IODE as follows:
+
+```
+    Y[-1] + c1 + c2 * X
+```
+
+When simulating the model, this formula is calculated and the result is stored in Y.
+
+In the code below, this is the case where clec\->dupendo is zero AND varnb == eqvarnb (dupendo == 0 means that the equation contains exactly one occurence of Y).
+
+#### Case 2: the equation must be numerically solved {#T5}
+
+The equation
+
+```
+    ln Y := c1 + c2 * X / ln Y
+```
+
+contains twice the variable Y and will be translated into
+
+```
+    ln Y - (c1 + c2 * X / ln Y)
+```
+
+Note that the result of this formula is 0, and not Y, unlike case 1.
+
+When calculating the model, this equation must be solved numerically with respect to Y before storing the result in Y.
+
+In the code, this is the case where clec\->dupendo is non\-zero (Y appears more than once).
+
+#### Case 3: ENDO\-EXO exchanges {#T6}
+
+If an equation is inverted in an endo\-exo exchange (e.g. Y becomes exogenous and X becomes endogenous), the equation will be solved numerically as above (case 2). Obviously, one must take into account the fact that the translated version of the equation provides the value of Y (and not 0) Y must therefore be subtracted from the calculation.
+
+Indeed, the equation
+
+```
+    d Y := c1 + c2 * X
+```
+
+is transformed by IODE into
+
+```
+    Y := c1 + c2 * X - Y[-1]
+```
+
+Hence, we will search the value of X such that
+
+```
+     0 := Y[-1] + c1 + c2 * X - Y 
+```
+
+In the code, this is the case where varnb \!= eqvarnb.
+
+### The Newton\-Raphson algorithm {#T7}
+
+Search for x such as
+
+```
+|f(x)| < KSIM_EPSNEWTON
+```
+
+We start by calculating shift = the difference between 0 and the value obtained by the LEC formula of the equation (according to the case 1, 2 or 3 described above).
+
+We then loop (maximum KSIM\_NEWTON\_MAXIT iterations) to find the solution x :
+
+```
+// check convergence
+if |f(x) - shift| < KSIM_NEWTON_EPS: x is a solution
+ 
+// Define derivative step h 
+h = 1e-4    
+if |x| < 1.0 then h *= |x|
+ 
+// Move x in the direction of the local tangent 
+dx = h.f(x) /(f(x+h)-f(x))
+if f(x - dx) is NaN: dx = dx / 4
+x = x - dx
+```
+
+Obviously, the loop also stops if x or f(x) becomes NaN.
+
+### The Secant algorithm {#T8}
+
+That (basic) secant method first requires to determine an interval \[xl, xr\] containing a root of the equation (xl/xr stands for x\-lect/right). In other words, the sign of f(xl) must be opposite to that of f(xr).
+
+Then the size of that interval is decreased until
+
+```
+    |xl - xr| becomes < eps 
+```
+
+by applying the formula below:
+
+```
+    xr = xl + (xr - xl) * f(xl) / (f(xl) -f(xh))
+```
+
+If the sign of f(xr) has changed, switch xr and xl.
+
+Continue until \|xl \- xr\| is < eps
+
+### k\_sim\_main.c {#T9}
 
 Main functions for model simulations.
 
@@ -25,7 +239,7 @@ Main functions for model simulations.
 |`void K_simul_free()`|Frees all temporary allocated memory for the simulation.|
 |`IODE_REAL K_calc_clec(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
-### k\_sim\_order.c {#T3}
+### k\_sim\_order.c {#T10}
 
 Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 
@@ -35,7 +249,7 @@ Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 |`int KE_poseq(int posendo)`|Searches the equation whose endogenous is the variable posendo.|
 |`void KE_tri(KDB* dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
 
-### k\_sim\_scc.c {#T4}
+### k\_sim\_scc.c {#T11}
 
 Alternative functions to reorder and simulate very large models.
 
@@ -46,7 +260,7 @@ The reordering algorithm being CPU intensive for very large models, it is better
 |`int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
 |`int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
-### k\_sim\_exo2endo.c {#T5}
+### k\_sim\_exo2endo.c {#T12}
 
 It is possible to exchange the status of an exogenous variable with that of an endogenous variable. This allows, when the value of an endogenous variable is known in advance, for example during the first simulation period, to block this endogenous variable by letting an exogenous variable vary so that the known value of the endogenous variable is preserved.
 
@@ -56,20 +270,20 @@ Another way to view the process is to say that the model is solved with respect 
 |:---|:---|
 |`int KE_exo2endo(int posendo, int posexo)`|Modify the model to solve it with respect to another set of variables|
 
-### Single equation solver {#T6}
+### Single equation solver {#T13}
 
-When an equation is not analytically solved during the compilation process or if it has been inverted by the endo\-exo exchange, that equation pust be solved numerically during the simulation.
+When an equation is not analytically solved during the compilation process or if it has been inverted by the endo\-exo exchange, that equation must be solved numerically during the simulation.
 
 Two methods are used: a simple Newton\-Raphson method or a secant method in case of non convergence.
 
-#### l\_newton.c {#T7}
+#### l\_newton.c {#T14}
 
 |Syntax|Description|
 |:---|:---|
 |`double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
 |`double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
 
-#### l\_secant.c {#T8}
+#### l\_secant.c {#T15}
 
 |Syntax|Description|
 |:---|:---|
