@@ -74,11 +74,11 @@ done:
 
 
 /**
- *  Calculates exogenous variables and scalars found in a CLEC expression. 
+ *  Extracts exogenous variables and scalars from a CLEC expression. 
  *  Adds the result to 2 KDBs: exo for the exogenous and scal for the scalars.
  *  
  *  The KDB of EQs is needed to determine if a VAR is an endogenous (found in dbe) or an exogenous (not present in dbe). 
- *  Only the exigenous variables are saved in exo.
+ *  Only the exogenous variables are saved in exo.
  *  
  *  @param [in]      KDB*  dbe      KDB of equations used to check if a VAR is exo or endo
  *  @param [in]      CLEC* cl       compiled LEC expression or equation
