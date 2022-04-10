@@ -12,6 +12,12 @@
  *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(IODE_REAL* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
+ *    double KV_get_at_t(char*varname, int t)                                 Retrieves the value of varname[t] 
+ *    double KV_get_at_per(char*varname, PERIOD* per)                         Retrieves the value of varname[per] 
+ *    double KV_get_at_aper(char*varname, char* aper)                         Retrieves the value of varname[aper]
+ *    int KV_set_at_t(char*varname, int t, double val)                        Replaces the value of varname[t] by val.
+ *    int KV_set_at_per(char*varname, PERIOD* per, double val)                Replaces the value of varname[per] by val.
+ *    int KV_set_at_aper(char*varname, char* aper, double val)                Replaces the value of varname[aper] by val.
  */
 
 #include "iode.h"
@@ -201,6 +207,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
     return(var);
 }
 
+
 /**
  * Set VAR[t], where VAR is the series in position pos in kdb. The new value of VAR[t] depends on 
  * the parameter mode and the value new.
@@ -255,6 +262,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
             break;
     }
 }
+
 
 
 /**
@@ -444,5 +452,187 @@ done:
     SCR_free(eval);
     SCR_free(times);
     return(ndbv);
+}
+
+
+/**
+ *  Retrieves the position of a PERIOD in the current KV_WS sample.
+ *  
+ *  @param [in] PERIOD* per2    PERIOD whose position is searched
+ *  @return     int             position in the current WS sample (starting at 0)
+ *                              -1 if no WS is loaded or no sample is defined
+ */
+ 
+int KV_per_pos(PERIOD* per2)
+{
+    SAMPLE* smpl;
+    int     diff;
+    
+    if(KV_WS == NULL) return(-1);
+    smpl = KSMPL(KV_WS);
+    diff = PER_diff_per(per2, &(smpl->s_p1));
+    return(diff);
+}
+
+
+/**
+ *  Retrieves the position of a period in text format in the current KV_WS sample.
+ *  
+ *  Example : 
+ *      Let the current sample be 2000Y1 2020Y1
+ *      Then KV_aper_pos("2002Y1") = 2
+ *  
+ *  @param [in] char*   aper2 PERIOD in text format (e.g.: "2001Y1")
+ *  @return     int           position in the current WS sample (starting at 0)
+ *                            or -1 if no WS is loaded or no sample is defined
+ *  
+ */
+ 
+int KV_aper_pos(char* aper2)
+{
+    PERIOD  *per2;
+    int     pos;
+    
+    per2 = PER_atoper(aper2);
+    pos = KV_per_pos(per2);
+    SCR_free(per2);
+    return(pos);
+}
+
+
+/**
+ *  Retrieves the value of varname[t] in the current KV_WS.
+ *  
+ *  Example : 
+ *      KV_get_at_t("A", 2) => retrieves A[2]
+ *  
+ *  @param [in] char*   varname Variable name 
+ *  @param [in] int     t       position to retrieve starting at 0
+ *  
+ *  @return     double          value of varname[t]
+ *                              L_NAN on error
+ *  
+ */
+ 
+double KV_get_at_t(char*varname, int t)
+{
+    double  *var_ptr;
+    
+    var_ptr = KVPTR(varname);
+    if(var_ptr == NULL) return(L_NAN);
+    
+    if(t < 0 || KSMPL(KV_WS)->s_nb < t) return(L_NAN);
+    return(var_ptr[t]);
+}
+
+/**
+ *  Retrieves the value of varname[per] in the current KV_WS.
+ *  
+ *  Example : 
+ *      KV_get_at_aper("A", "2002Y1")
+ *  
+ *  @param [in] char*   varname Variable name 
+ *  @param [in] PERIOD* per     PERIOD to retrieve
+ *  
+ *  @return     double          value of varname[per]
+ *                              L_NAN on error
+ *  
+ */
+ 
+double KV_get_at_per(char*varname, PERIOD* per)
+{
+    int     t;
+    
+    t = KV_per_pos(per);
+    return(KV_get_at_t(varname, t));
+}
+
+
+/**
+ *  Retrieves the value of varname[aper] in the current KV_WS.
+ *  
+ *  Example : 
+ *      KV_get_at_aper("A", "2002Y1")
+ *  
+ *  @param [in] char*   varname Variable name 
+ *  @param [in] char*   aper    PERIOD in text format (e.g.: "2001Y1")
+ *  
+ *  @return     double          value of varname[aper]
+ *                              L_NAN on error
+ *  
+ */
+ 
+double KV_get_at_aper(char*varname, char* aper)
+{
+    int     t;
+    
+    t = KV_aper_pos(aper);
+    return(KV_get_at_t(varname, t));
+}
+
+
+/**
+ *  Replaces the value of varname[t] by val.
+ *  
+ *  Example : 
+ *      KV_set_at_t("A", 2, 1.0) => A[2] = 1.0 
+ *  
+ *  @param [in] char*   varname Variable name 
+ *  @param [in] int     t       position in the current WS sample
+ *  @param [in] double  val     new value of varname[t]
+ *  @return     int             0 on success, -1 on error
+ *  
+ */
+
+int KV_set_at_t(char*varname, int t, double val)
+{
+    double  *var_ptr;
+    
+    var_ptr = KVPTR(varname);
+    if(var_ptr == NULL) return(-1);
+
+    if(t < 0 || KSMPL(KV_WS)->s_nb < t) return(-1);
+    
+    var_ptr[t] = val;
+    return(0);
+}
+
+/**
+ *  Replaces the value of varname[per] by val.
+ *  
+ *  @param [in] char*   varname Variable name 
+ *  @param [in] PERIOD* per     PERIOD to modify
+ *  @param [in] double  val     new value of varname[per]
+ *  @return     int             0 on success, -1 on error
+ *  
+ */
+ 
+int KV_set_at_per(char*varname, PERIOD* per, double val)
+{
+    int     t;
+    
+    t = KV_per_pos(per);
+    return(KV_set_at_t(varname, t, val));
+}
+
+
+/**
+ *  Replaces the value of varname[aper] by val.
+ *  
+ *  Example : 
+ *      KV_set_at_aper("A", "2002Y1", 2.0) => A[2] = 2.0
+ *  
+ *  @param [in] char*   varname Variable name 
+ *  @param [in] char*   aper    PERIOD in text format (e.g.: "2001Y1")
+ *  @param [in] double  val     new value of varname[aper]
+ *  @return     int             0 on success, -1 on error  
+ */
+ 
+int KV_set_at_aper(char*varname, char* aper, double val)
+{
+    int     t;
+    
+    t = KV_aper_pos(aper);
+    return(KV_set_at_t(varname, t, val));
 }
 
