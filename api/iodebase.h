@@ -431,6 +431,13 @@ extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
 extern KDB *KV_aggregate(KDB *,int ,char *,char *);
 void KV_init_values_1(IODE_REAL* val, int t, int method);
 //extern int KV_GetSmpl(SAMPLE *,char *);
+extern double KV_get_at_t(char*varname, int t);
+extern double KV_get_at_per(char*varname, PERIOD* per);
+extern double KV_get_at_aper(char*varname, char* aper);
+extern int KV_set_at_t(char*varname, int t, double val);
+extern int KV_set_at_per(char*varname, PERIOD* per, double val);
+extern int KV_set_at_aper(char*varname, char* aper, double val);
+
 
 /* k_val.c */
 extern char *K_oval(KDB *,int ,int );
