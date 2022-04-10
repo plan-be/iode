@@ -186,11 +186,11 @@ void U_tests_Objects()
     done = 1;
         
     // Create lists
-    pos = K_add(KL_WS, "LST1", "A;B");
+    pos = K_add(KL_WS, "LST1", "A,B");
     S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
-    K_add(KL_WS, "LST2", "A,B");
+    K_add(KL_WS, "LST2", "A,B,A");
     lst = KLPTR("LST1");
-    S4ASSERT(strcmp(lst, "A;B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
+    S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
 
     // Set the sample for the variable WS
     smpl = PER_atosmpl("2000Y1", "2020Y1");
@@ -242,7 +242,7 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
 void Tests_LEC()
 {
     IODE_REAL *A, *B;
-    
+   
     // Create objects
     U_tests_Objects();
     
@@ -352,20 +352,6 @@ void Tests_K_OBJFILE()
         rc = K_save(kdb_var, out_filename);
         S4ASSERT(rc == 0, "K_save(kdb_var, \"%s\") == 0", out_filename);
     }
-    
-   
-    /*
-    char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
-    void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
-    KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
-    int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
-    KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
-    int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
-    int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
-    int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
-    int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
-    int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
-    */
 }
     
 
@@ -425,17 +411,16 @@ KDB* U_test_K_interpret(int type, char* filename)
     return(kdb);
 }
 
-
 void Tests_Simulation()
 {
-    KDB     *kdbv, 
-            *kdbe, 
-            *kdbs;
-    SAMPLE  *smpl;
-    char    *filename = "fun";
-    int     rc;
-    LIS     lst, expected_lst;
-       
+    KDB         *kdbv, 
+                *kdbe, 
+                *kdbs;
+    SAMPLE      *smpl;
+    char        *filename = "fun";
+    char**      endo_exo;
+    int         rc;
+    LIS         lst, expected_lst;
     
     // Loads 3 WS and check ok
     K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, filename);
@@ -461,7 +446,7 @@ void Tests_Simulation()
     KSIM_PASSES = 5; 
     KSIM_DEBUG = 1;
 
-    kmsg_super = kmsg_null; // Void itearation messages during simulation
+    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
     
     // Test simulation : divergence
     KSIM_MAXIT = 2;
@@ -487,12 +472,32 @@ void Tests_Simulation()
 
     // Test Endo-exo
     
+    // Version avec échange dans une seule équation
+    // endo_exo = SCR_vtoms("UY-NIY", ",; ");
+    // rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
+    // S4ASSERT(rc == 0, "Exchange UY-NIY converges on 2000Y1-2002Y1");
+    // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
+    // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
 
+    // Version avec échange dans min 2 equations
+    // Set values of endo UY
+    KV_set_at_aper("UY", "2000Y1", 650.0);
+    KV_set_at_aper("UY", "2001Y1", 670.0);
+    KV_set_at_aper("UY", "2002Y1", 680.0);
+
+    // Simulate with exchange UY - XNATY
+    endo_exo = SCR_vtoms("UY-XNATY", ",; ");
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
+    
+    // Check result
+    S4ASSERT(rc == 0, "Exchange UY-XNATY converges on 2000Y1-2002Y1");
+    S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
+    S4ASSERT(fabs(KV_get_at_aper("XNATY", "2000Y1") - 0.800) < 0.01, "Exchange UY-XNATY: XNATY[2000Y1] == 0.800");
 
     // Cleanup
+    SCR_free_tbl(endo_exo);
     SCR_free(smpl);
 }
-
 
 void Tests_ALIGN()
 {
@@ -526,7 +531,7 @@ void U_test_init()
 
 int main(int argc, char **argv)
 {
-    int i;
+    int     i;
     
     for(i = 1 ; i < argc; i++) {
         if(strcmp(argv[i], "-v-") == 0) S4ASSERT_VERBOSE = 0;
@@ -544,7 +549,6 @@ int main(int argc, char **argv)
 //    Tests_ARGS_ALD();   
 //    return(0);
     
-    // test B_seterrn()
     Tests_ALIGN();
     Tests_ERRMSGS();
     Tests_BUF();
