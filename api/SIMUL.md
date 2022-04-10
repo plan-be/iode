@@ -6,19 +6,21 @@
 
 - [IODE: Model Simulation](#T1)
     - [The Gauss\-Seidel algorithm](#T2)
-    - [Solving a single equation](#T3)
-      - [Case 1: the equation is analytically solved with respect to its endogenous](#T4)
-      - [Case 2: the equation must be numerically solved](#T5)
-      - [Case 3: ENDO\-EXO exchanges](#T6)
-    - [The Newton\-Raphson algorithm](#T7)
-    - [The Secant algorithm](#T8)
-    - [k\_sim\_main.c](#T9)
-    - [k\_sim\_order.c](#T10)
-    - [k\_sim\_scc.c](#T11)
-    - [k\_sim\_exo2endo.c](#T12)
-    - [Single equation solver](#T13)
-      - [l\_newton.c](#T14)
-      - [l\_secant.c](#T15)
+    - [Exchanges Endo\-Exo](#T3)
+    - [Solving a single equation](#T4)
+      - [Case 1: the equation is analytically solved with respect to its endogenous](#T5)
+      - [Case 2: the equation must be numerically solved](#T6)
+      - [Case 3: ENDO\-EXO exchanges](#T7)
+    - [The Newton\-Raphson algorithm](#T8)
+    - [The Secant algorithm](#T9)
+    - [Model solver](#T10)
+      - [k\_sim\_main.c](#T11)
+      - [k\_sim\_order.c](#T12)
+      - [k\_sim\_scc.c](#T13)
+      - [k\_sim\_exo2endo.c](#T14)
+    - [Single equation solver](#T15)
+      - [l\_newton.c](#T16)
+      - [l\_secant.c](#T17)
 
 # IODE: Model Simulation {#T1}
 
@@ -93,7 +95,50 @@ If lambda == 1 is 1, there is no damping.
 
 The solution is reached when the difference between 2 iterations is under a defined threshold for each endogenous \{y1...yn\}.
 
-### Solving a single equation {#T3}
+### Exchanges Endo\-Exo {#T3}
+
+It is possible to exchange the status of an exogenous variable with that of an endogenous variable. That allows, when the value of an endogenous variable is known in advance, for example during the first simulation period, to block this endogenous variable by letting an exogenous variable vary so that the known value of the endogenous variable is preserved.
+
+The method used is to find a path between the exo and the endo by scanning the equations of the model and to modify the "status" of the variables accordingly as explained below.
+
+If "exo" appears in the equation "endo", the path is trivial and we simply replace the endogeneous of that equation. Note that this requires the use of a Newton\-Raphson method to solve the equation with respect to the (new) endo (ex exo) variable during the simulation process.
+
+If exo does not appear in the equation, we analyse each other endogenous variable in the equation to see if their defining equation contains the variable "exo". If so, the status in this equation is exchanged and the path between exo and endo is found in one step. If not, we continue the process recursively until we have found a path between "endo" and "exo".
+
+The example below should clarify the process.
+
+```
+    EQ                              ENDO
+    ------------------------------------
+    y1 = f1(y2, x1)                 y1
+    y2 = f2(y3, x1)                 y2
+    y3 = f3(y1, y2, x1, x2)         y3
+```
+
+Suppose the exchange `y1-x2`.
+
+```
+x2 does not appear in f1. The only endogenous var in f1 is y2 whose equation is f2. 
+x2 does not appear in f2. The only endogenous var in f2 is y3 whose equation is f3. 
+x2 DOES appear in f3. 
+    -> x2 becomes the new endogenous of the f3. But as y3 must keep its endogenous "status", we have to change f2 as well.
+    -> y3 becomes the new endogenous of the f2. Again, y2 must keep its endogenous "status", thus it becomes endo of f1
+    -> y2 becomes the new endogenous of the f1. 
+```
+
+Finally, whe obtain the following reorganisation of the model:
+
+```
+    EQ                              ENDO
+    ------------------------------------
+    y1 = f1(y2, x1)                 y2
+    y2 = f2(y3, x1)                 y3
+    y3 = f3(y1, y2, x1, x2)         x2
+```
+
+The model is thus solve with respect to \{y2,y3,x2\} instead of \{y1,y2,y3\}. The value of y1 if therefore left unchanged.
+
+### Solving a single equation {#T4}
 
 Depending on their form, LEC equations can be solved analytically with respect to their endogenous variable \- or not.
 
@@ -119,7 +164,7 @@ is invertible with respect to Y:
 
 During the Gauss\-Seidel iteration, we must calculate the value of the endogenous variable for each equation. We have 3 possibilities listed below.
 
-#### Case 1: the equation is analytically solved with respect to its endogenous {#T4}
+#### Case 1: the equation is analytically solved with respect to its endogenous {#T5}
 
 Consider the LEC equation
 
@@ -137,7 +182,7 @@ When simulating the model, this formula is calculated and the result is stored i
 
 In the code below, this is the case where clec\->dupendo is zero AND varnb == eqvarnb (dupendo == 0 means that the equation contains exactly one occurence of Y).
 
-#### Case 2: the equation must be numerically solved {#T5}
+#### Case 2: the equation must be numerically solved {#T6}
 
 The equation
 
@@ -157,7 +202,7 @@ When calculating the model, this equation must be solved numerically with respec
 
 In the code, this is the case where clec\->dupendo is non\-zero (Y appears more than once).
 
-#### Case 3: ENDO\-EXO exchanges {#T6}
+#### Case 3: ENDO\-EXO exchanges {#T7}
 
 If an equation is inverted in an endo\-exo exchange (e.g. Y becomes exogenous and X becomes endogenous), the equation will be solved numerically as above (case 2). Obviously, one must take into account the fact that the translated version of the equation provides the value of Y (and not 0) Y must therefore be subtracted from the calculation.
 
@@ -181,7 +226,7 @@ Hence, we will search the value of X such that
 
 In the code, this is the case where varnb \!= eqvarnb.
 
-### The Newton\-Raphson algorithm {#T7}
+### The Newton\-Raphson algorithm {#T8}
 
 Search for x such as
 
@@ -209,7 +254,7 @@ x = x - dx
 
 Obviously, the loop also stops if x or f(x) becomes NaN.
 
-### The Secant algorithm {#T8}
+### The Secant algorithm {#T9}
 
 That (basic) secant method first requires to determine an interval \[xl, xr\] containing a root of the equation (xl/xr stands for x\-lect/right). In other words, the sign of f(xl) must be opposite to that of f(xr).
 
@@ -229,7 +274,9 @@ If the sign of f(xr) has changed, switch xr and xl.
 
 Continue until \|xl \- xr\| is < eps
 
-### k\_sim\_main.c {#T9}
+### Model solver {#T10}
+
+#### k\_sim\_main.c {#T11}
 
 Main functions for model simulations.
 
@@ -239,7 +286,7 @@ Main functions for model simulations.
 |`void K_simul_free()`|Frees all temporary allocated memory for the simulation.|
 |`IODE_REAL K_calc_clec(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
-### k\_sim\_order.c {#T10}
+#### k\_sim\_order.c {#T12}
 
 Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 
@@ -249,7 +296,7 @@ Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 |`int KE_poseq(int posendo)`|Searches the equation whose endogenous is the variable posendo.|
 |`void KE_tri(KDB* dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
 
-### k\_sim\_scc.c {#T11}
+#### k\_sim\_scc.c {#T13}
 
 Alternative functions to reorder and simulate very large models.
 
@@ -260,7 +307,7 @@ The reordering algorithm being CPU intensive for very large models, it is better
 |`int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
 |`int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
-### k\_sim\_exo2endo.c {#T12}
+#### k\_sim\_exo2endo.c {#T14}
 
 It is possible to exchange the status of an exogenous variable with that of an endogenous variable. This allows, when the value of an endogenous variable is known in advance, for example during the first simulation period, to block this endogenous variable by letting an exogenous variable vary so that the known value of the endogenous variable is preserved.
 
@@ -270,20 +317,20 @@ Another way to view the process is to say that the model is solved with respect 
 |:---|:---|
 |`int KE_exo2endo(int posendo, int posexo)`|Modify the model to solve it with respect to another set of variables|
 
-### Single equation solver {#T13}
+### Single equation solver {#T15}
 
 When an equation is not analytically solved during the compilation process or if it has been inverted by the endo\-exo exchange, that equation must be solved numerically during the simulation.
 
 Two methods are used: a simple Newton\-Raphson method or a secant method in case of non convergence.
 
-#### l\_newton.c {#T14}
+#### l\_newton.c {#T16}
 
 |Syntax|Description|
 |:---|:---|
 |`double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
 |`double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
 
-#### l\_secant.c {#T15}
+#### l\_secant.c {#T17}
 
 |Syntax|Description|
 |:---|:---|
