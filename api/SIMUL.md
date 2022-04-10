@@ -6,7 +6,7 @@
 
 - [IODE: Model Simulation](#T1)
     - [The Gauss\-Seidel algorithm](#T2)
-    - [Exchanges Endo\-Exo](#T3)
+    - [Endo\-Exo exchanges](#T3)
     - [Solving a single equation](#T4)
       - [Case 1: the equation is analytically solved with respect to its endogenous](#T5)
       - [Case 2: the equation must be numerically solved](#T6)
@@ -95,7 +95,7 @@ If lambda == 1 is 1, there is no damping.
 
 The solution is reached when the difference between 2 iterations is under a defined threshold for each endogenous \{y1...yn\}.
 
-### Exchanges Endo\-Exo {#T3}
+### Endo\-Exo exchanges {#T3}
 
 It is possible to exchange the status of an exogenous variable with that of an endogenous variable. That allows, when the value of an endogenous variable is known in advance, for example during the first simulation period, to block this endogenous variable by letting an exogenous variable vary so that the known value of the endogenous variable is preserved.
 
