@@ -59,6 +59,7 @@
     - [b\_args.c](#T53)
     - [b\_errors.c](#T54)
   - [Group "Model Simulation"](#T55)
+  - [Group "Table Calculation"](#T56)
 
 # IODE: functions by group {#T1}
 
@@ -76,6 +77,7 @@
 - Group "Iode Reports" 
 - \*Group "Model Estimation"
 - Group "Model Simulation" 
+- Group "Table Calculation" 
 - \*Group "Iode ini file"
 - \*Group "Iode Reports"
 
@@ -312,6 +314,12 @@ Functions acting on workspaces of variables.
 |`int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)`|Extrapolates variables on a selected SAMPLE according to one of the available methods.|
 |`KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
 |`void KV_init_values_1(IODE_REAL* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
+|`double KV_get_at_t(char*varname, int t)`|Retrieves the value of varname\[t\]|
+|`double KV_get_at_per(char*varname, PERIOD* per)`|Retrieves the value of varname\[per\]|
+|`double KV_get_at_aper(char*varname, char* aper)`|Retrieves the value of varname\[aper\]|
+|`int KV_set_at_t(char*varname, int t, double val)`|Replaces the value of varname\[t\] by val.|
+|`int KV_set_at_per(char*varname, PERIOD* per, double val)`|Replaces the value of varname\[per\] by val.|
+|`int KV_set_at_aper(char*varname, char* aper, double val)`|Replaces the value of varname\[aper\] by val.|
 
 ## Group "Object management" {#T23}
 
@@ -650,4 +658,8 @@ Basic functions for managing error messages.
 ## Group "Model Simulation" {#T55}
 
 See [SIMUL.md](simul.md).
+
+## Group "Table Calculation" {#T56}
+
+See [TBL\_CALC.md](tbl_calc.md).
 
