@@ -106,7 +106,7 @@ static int L_bracket(double* x1, double* x2, int t)
  *  Tries to find a solution to the equation clec by a secant method.
  *
  *  That basic secant method first requires to determine an interval [xl, xr] containing a root of 
- *  the equation clec (xl/xr stands for x-lect/right).
+ *  the equation clec (xl/xr stands for x-left/right).
  *  In other words, the sign of f(xl) must be opposite to that of f(xr).
  *  
  *  Then the size of that interval is decreased until |xl - xr| becomes << eps by applying the formula below:

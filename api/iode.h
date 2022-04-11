@@ -1226,8 +1226,8 @@ extern IODE_REAL    KSIM_EPS,               // Model simulation convergence thre
 extern int          KSIM_MAXIT,             // Simulation: max number of iterations
                     KSIM_DEBUG,             // Simulation: if not null : save 3 list _PRE, _INTER and _POST 
                     KSIM_PASSES,            // Simulation: number of passes for the heuristic triangulation algorithm
-                    KSIM_NEWTON_DEBUG,      // Newotn-Raphson: save a trace of the sub-iterations 
-                    KSIM_NEWTON_MAXIT,      // Newon-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
+                    KSIM_NEWTON_DEBUG,      // Newton-Raphson: save a trace of the sub-iterations 
+                    KSIM_NEWTON_MAXIT,      // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
                     KSIM_SORT,              // Simulation: reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
                     KSIM_START;             // Simulation: endogenous initial values
 extern char         **KSIM_EXO;             

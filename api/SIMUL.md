@@ -59,11 +59,11 @@ IODE tries to do that for each equation, provided that the endogenous variable a
 When these transformations of the equations are done, the model can be rewritten as follows :
 
 ```
-    y1 = f1(y1, y2, y3..., yn)
-    y2 = f2(y1, y2, y3..., yn)
-    y3 = f3(y1, y2, y3..., yn)
+    y1 = f1(y2, y3..., yn)
+    y2 = f2(y1, y3..., yn)
+    y3 = f3(y1, y2..., yn)
      ...                 
-    yn = f4(y1, y2, y3..., yn)
+    yn = fn(y1, y2..., yn-1)
 ```
 
 Note: when an equation cannot be transformed in the form yn = fn(...), a "sub\-algorithm" based on the Newton\-Raphson or secant method is used to numerically solve the equation with respect to its endogenous variable. See below for more information on that sub\-algorithm.
@@ -256,7 +256,7 @@ Obviously, the loop also stops if x or f(x) becomes NaN.
 
 ### The Secant algorithm {#T9}
 
-That (basic) secant method first requires to determine an interval \[xl, xr\] containing a root of the equation (xl/xr stands for x\-lect/right). In other words, the sign of f(xl) must be opposite to that of f(xr).
+That (basic) secant method first requires to determine an interval \[xl, xr\] containing a root of the equation (xl/xr stands for x\-lec\-ft/right). In other words, the sign of f(xl) must be opposite to that of f(xr).
 
 Then the size of that interval is decreased until
 

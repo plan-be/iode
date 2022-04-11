@@ -63,6 +63,14 @@
  *  that the translated version of the equation provides the value of Y (and not 0) 
  *  and that Y must be subtracted from the calculation.
  *  
+ *  Indeed, the equation 
+ *  
+ *     d Y := c1 + c2 * X
+ *  
+ *  is transformed by IODE into 
+ *  
+ *      Y := c1 + c2 * X - Y[-1]
+ *  
  *  Hence, we will search the value of X such that
  *  
  *       0 == Y[-1] + c1 + c2 * X - Y 
@@ -73,7 +81,7 @@
  *  Newton-Raphson algorithm
  *  ========================
  *  
- *  Search for x tq |f(x)| < KSIM_EPSNEWTON
+ *  Search for x such as |f(x)| < KSIM_EPSNEWTON
  *  
  *  We start by calculating shift = the difference between 0 and the value obtained 
  *  by the LEC formula of the equation (according to the vas 1, 2 or 3).
