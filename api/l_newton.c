@@ -84,7 +84,7 @@
  *  Search for x such as |f(x)| < KSIM_EPSNEWTON
  *  
  *  We start by calculating shift = the difference between 0 and the value obtained 
- *  by the LEC formula of the equation (according to the vas 1, 2 or 3).
+ *  by the LEC formula of the equation (according to the case 1, 2 or 3).
  *  
  *  We then loop (maximum KSIM_NEWTON_MAXIT iterations) to search for x : 
  *      
