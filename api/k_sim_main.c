@@ -116,7 +116,7 @@ KDB         *KSIM_DBE;                // KDB of equations defining the model to 
 extern int  KSIM_PRE,                 // number of equations in the "prolog" block 
             KSIM_INTER,               // number of equations in the "interdep" block
             KSIM_POST,                // number of equations in the "epilog"
-            *KSIM_ORDER;              // position in dbe of the equations (to simulate) in the execution order
+            *KSIM_ORDER;              // position in dbe of the equations (to simulate) in the execution order. See k_sim_order.c.
 
 /**
  *  Initialises the values of the interdependent endogenous variables for one period before starting 
