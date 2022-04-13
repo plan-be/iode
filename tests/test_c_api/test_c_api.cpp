@@ -1,3 +1,9 @@
+// The present source file has been generated from the source
+// file test1.c (Google Test is not available with Borland).
+// DO NOT MODIFY IT!
+// Modify test1.c instead and run convert_tests.bat/sh
+
+
 #include "pch.h"
 #include <filesystem>
 
@@ -16,6 +22,10 @@ int W_printf(char* fmt,...)
     va_end(myargs);
     printf("%s\n", buf);
     return(0);
+}
+
+void kmsg_null(char*msg)
+{
 }
 
 
@@ -76,48 +86,49 @@ public:
 
 	void U_tests_Objects()
 	{
-	    char*       lst;
-	    SAMPLE*     smpl;
+	    char* lst;
+	    SAMPLE* smpl;
 	    IODE_REAL   A[64], B[64];
 	    int         nb, i, pos;
 	    // C++ consider all passed string value of the kind "..." to C function as CONSTANT
-	    char buf1[64];
+	    char buf[64];
 	    char buf2[64];
 	
 	    static int done = 0;
 	
-	    if(done) return;
+	    if (done) return;
 	    done = 1;
 	
 	    // Create lists
-	    strcpy(buf1, "LST1");
-	    strcpy(buf2, "LST2");
-	    pos = K_add(KL_WS, buf1, "A;B");
+	    strcpy(buf, "LST1");
+	    K_add(KL_WS, buf, "A,B");
+	
+	    strcpy(buf, "LST2");
+	    pos = K_add(KL_WS, buf, "A;B");
 	    EXPECT_TRUE(pos >= 0);
-	    K_add(KL_WS, buf2, "A,B");
-	    lst = KLPTR("LST1");
+	    lst = KLPTR("LST2");
 	    EXPECT_EQ(strcmp(lst, "A;B"), 0);
 	
 	    // Set the sample for the variable WS
-	    strcpy(buf1, "2000Y1");
+	    strcpy(buf, "2000Y1");
 	    strcpy(buf2, "2020Y1");
-	    smpl = PER_atosmpl(buf1, buf2);
+	    smpl = PER_atosmpl(buf, buf2);
 	    KV_sample(KV_WS, smpl);
 	    //SW_nfree(smpl);
 	
 	    // Creates new vars
 	    nb = smpl->s_nb;
-	    for(i = 0; i < smpl->s_nb; i++) {
-	       A[i] = i;
-	       B[i] = i*2;
+	    for (i = 0; i < smpl->s_nb; i++) {
+	        A[i] = i;
+	        B[i] = i * 2;
 	    }
 	
-	    strcpy(buf1, "A");
-	    strcpy(buf2, "B");
-	    pos = K_add(KV_WS, buf1, A, &nb);
+	    strcpy(buf, "A");
+	    pos = K_add(KV_WS, buf, A, &nb);
 	    EXPECT_TRUE(K_find(KV_WS, "A") >= 0);
-	    pos = K_add(KV_WS, buf2, B, &nb);
 	
+	    strcpy(buf, "B");
+	    pos = K_add(KV_WS, buf, B, &nb);
 	}
 
 	void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
@@ -187,8 +198,8 @@ TEST_F(IodeCAPITest, Tests_LEC)
     // Create objects
     U_tests_Objects();
 
-    A = (IODE_REAL*)KVPTR("A");
-    B = (IODE_REAL*)KVPTR("B");
+    A = (IODE_REAL*) KVPTR("A");
+    B = (IODE_REAL*) KVPTR("B");
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
@@ -229,7 +240,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
     U_tests_Objects();
 
     // A_init
-    args = B_ainit_chk("$LST2", NULL, 0);
+    args = B_ainit_chk("$LST1", NULL, 0);
     EXPECT_TRUE(U_cmp_tbl(args, "A,B"));
     SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
@@ -268,20 +279,6 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
         rc = K_save(kdb_var, out_filename);
         EXPECT_EQ(rc, 0);
     }
-
-
-    /*
-    char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
-    void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
-    KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file.
-    int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
-    KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
-    int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
-    int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
-    int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
-    int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
-    int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
-    */
 }
 
 
@@ -294,6 +291,7 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
 
     int     pos, col;
     TBL*    c_table;
+    TCELL*  cells;
     char    *cell_content;
 
 
@@ -316,10 +314,109 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     printf("Title %s\n", cell_content);
 
     // get cell content
-    for(col = 0; col < c_table->t_nc; col++) {
+    for (col = 0; col < c_table->t_nc; col++) {
         cell_content = T_cell_cont_tbl(c_table, 1, col, 1);
-        printf("Cell %d:%s\n",col, cell_content);
+        printf("Cell %d:%s\n", col, cell_content);
     }
+}
+
+
+TEST_F(IodeCAPITest, Tests_Simulation)
+{
+    KDB         *kdbv,
+                *kdbe,
+                *kdbs;
+    SAMPLE      *smpl;
+    char        *filename = "fun";
+    char**      endo_exo;
+    int         rc;
+    LIS         lst, expected_lst;
+    char        buf[64];
+    char        buf2[64];
+
+    // Loads 3 WS and check ok
+    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, filename);
+    EXPECT_NE(kdbv, nullptr);
+
+    K_WS[K_SCL] = kdbs  = U_test_K_interpret(K_SCL, filename);
+    EXPECT_NE(kdbs, nullptr);
+
+    K_WS[K_EQS] = kdbe  = U_test_K_interpret(K_EQS, filename);
+    EXPECT_NE(kdbe, nullptr);
+
+
+    // Check list is empty
+    lst = KLPTR("_DIVER");
+    EXPECT_TRUE(U_cmp_str(lst, NULL));
+
+    // Simulation std parameters
+
+    strcpy(buf, "2000Y1");
+    strcpy(buf2, "2002Y1");
+    smpl = PER_atosmpl(buf, buf2);
+    KSIM_EPS = 0.0001;
+    KSIM_MAXIT = 100;
+    KSIM_RELAX = 0.7;
+    KSIM_SORT = SORT_BOTH;
+    KSIM_PASSES = 5;
+    KSIM_DEBUG = 1;
+
+    //kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
+
+
+    // Test simulation : divergence
+    KSIM_MAXIT = 2;
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    EXPECT_NE(rc, 0);
+
+
+    // Check _PRE list after simulation (prolog)
+    lst = KLPTR("_PRE");
+    expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
+    EXPECT_TRUE(U_cmp_str(lst, expected_lst));
+
+    // Check _DIVER list
+    lst = KLPTR("_DIVER");
+    //printf("'%s'\n", lst);
+    expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
+    EXPECT_TRUE(U_cmp_str(lst, expected_lst));
+
+    // Test with with convergence (increase MAXIT)
+    KSIM_MAXIT = 100;
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    EXPECT_EQ(rc, 0);
+
+
+    // Test Endo-exo
+
+    // Version avec Ã©change dans une seule Ã©quation
+    // endo_exo = SCR_vtoms("UY-NIY", ",; ");
+    // rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
+    // S4ASSERT(rc == 0, "Exchange UY-NIY converges on 2000Y1-2002Y1");
+    // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
+    // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
+
+    /*
+    // Version avec Ã©change dans min 2 equations
+    // Set values of endo UY
+    KV_set_at_aper("UY", "2000Y1", 650.0);
+    KV_set_at_aper("UY", "2001Y1", 670.0);
+    KV_set_at_aper("UY", "2002Y1", 680.0);
+
+    // Simulate with exchange UY - XNATY
+    endo_exo = (char**) SCR_vtoms((unsigned char*) "UY-XNATY", (unsigned char*) ",; ");
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
+
+    // Check result
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
+    EXPECT_TRUE(fabs(KV_get_at_aper("XNATY", "2000Y1") - 0.800) < 0.01);
+
+    // Cleanup
+    SCR_free_tbl((unsigned char**) endo_exo);
+    SCR_free(smpl);
+    */
 }
 
 
