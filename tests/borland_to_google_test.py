@@ -167,9 +167,7 @@ if __name__ == "__main__":
     file_in.close()
     print("done")
 
-    # definition of the SetUp methof of the Fixture class
-    # TODO (JMP): something to add ?
-    # TODO (JMP): write a setup function to initialize common objects in test1.c ?
+    # definition of the SetUp method of the Fixture class
     test_class_lines = """
 class IodeCAPITest : public ::testing::Test 
 {
@@ -198,7 +196,7 @@ public:
 """.split('\n')  
 
     # extra functions
-    list_func_to_export_as_it = ["int W_printf(char* fmt,...)"]
+    list_func_to_export_as_it = ["int W_printf(char* fmt,...)", "void kmsg_null(char*msg)"]
     func_to_export_lines = []
 
     # parse input source file
@@ -246,8 +244,15 @@ public:
         else:
             pass
 
+    #global remark
+    out_lines = ["// The present source file has been generated from the source", 
+                 "// file test1.c (Google Test is not available with Borland).", 
+                 "// DO NOT MODIFY IT!",
+                 "// Modify test1.c instead and run convert_tests.bat/sh", 
+                 "", ""]
+
     #include
-    out_lines = ['#include "pch.h"', "#include <filesystem>", "", ""]
+    out_lines += ['#include "pch.h"', "#include <filesystem>", "", ""]
 
     # extra funcs
     out_lines += func_to_export_lines + [""]
@@ -260,7 +265,7 @@ public:
     out_lines += function_lines
 
     # dump output
-    print(f"Writting output source file {filepath_out.name} ", end="...")
+    print(f"Writing output source file {filepath_out.name} ", end="...")
     file_out = open(filepath_out, 'w+', encoding='utf_8')
     file_out.writelines('\n'.join(out_lines) + '\n')
     file_out.close()
