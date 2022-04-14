@@ -23,18 +23,19 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* paren
 	std::string std_equation_name = equationName.toStdString();
 
 	// editable values
-	comboBoxMethod->setQValue(kdb.getMethodAsInt(std_equation_name));
-	Sample sample = kdb.getSample(std_equation_name);
+	Equation eq = kdb.get(std_equation_name);
+	comboBoxMethod->setQValue(eq.get_method_as_int());
+	Sample sample = eq.get_sample();
 	sampleFrom->setQValue(QString::fromStdString(sample.start_period().to_string()));
 	sampleTo->setQValue(QString::fromStdString(sample.end_period().to_string()));
-	lineLec->setQValue(QString::fromStdString(kdb.getLec(std_equation_name)));
-	lineComment->setQValue(QString::fromStdString(kdb.getComment(std_equation_name)));
-	lineBlock->setQValue(QString::fromStdString(kdb.getBlock(std_equation_name)));
-	lineInstruments->setQValue(QString::fromStdString(kdb.getInstruments(std_equation_name)));
+	lineLec->setQValue(QString::fromStdString(eq.get_lec()));
+	lineComment->setQValue(QString::fromStdString(eq.get_comment()));
+	lineBlock->setQValue(QString::fromStdString(eq.get_block()));
+	lineInstruments->setQValue(QString::fromStdString(eq.get_instruments()));
 
 	// read-only values
 	lineEdit_name->setText(equationName);
-	std::array<float, EQS_NBTESTS> tests = kdb.getTests(std_equation_name);
+	std::array<float, EQS_NBTESTS> tests = eq.get_tests();
 	lineEdit_tests_r2adj->setText(QString::number(tests[KE_R2ADJ - 10], 'g', 3));
 	lineEdit_tests_durbw->setText(QString::number(tests[KE_DW - 10], 'g', 3));
 	lineEdit_tests_fstat->setText(QString::number(tests[KE_FSTAT - 10], 'g', 3));
@@ -56,21 +57,32 @@ void QIodeEditEquation::edit()
 	try
 	{
 		std::string equation_name = lineEdit_name->text().toStdString();
+		Equation eq(equation_name);
 
 		// update equation
-		int method = comboBoxMethod->extractAndVerify();
-		std::string from = sampleFrom->extractAndVerify().toStdString();
-		std::string to = sampleTo->extractAndVerify().toStdString();
-		Sample sample(from, to);
 		// TODO : remove extra \n
 		std::string lec = lineLec->extractAndVerify().toStdString();
+		eq.set_lec(lec, equation_name);
+
+		int i_method = comboBoxMethod->extractAndVerify();
+		eq.set_method(vEquationMethods[i_method]);
+
+		std::string from = sampleFrom->extractAndVerify().toStdString();
+		std::string to = sampleTo->extractAndVerify().toStdString();
+		eq.set_sample(from, to);
+
 		std::string comment = lineComment->extractAndVerify().toStdString();
+		eq.set_comment(comment);
+
 		std::string block = lineBlock->extractAndVerify().toStdString();
+		eq.set_block(block);
+
 		std::string instruments = lineInstruments->extractAndVerify().toStdString();
+		eq.set_instruments(instruments);
 
 		QString equation_values("equation name: %1\nlec: %2\ncomment: %3\nmethod: %4\nsample: %5\ninstruments: %6\nblock: %7");
 
-		kdb.setEquation(equation_name, lec, comment, method, &sample, instruments, block, NULL, 0);
+		kdb.update(equation_name, eq);
 
 		this->accept();
 	}

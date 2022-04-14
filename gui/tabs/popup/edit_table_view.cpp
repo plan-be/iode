@@ -7,6 +7,7 @@ QIodeEditTableView::QIodeEditTableView(QWidget* parent): QTableView(parent)
 	//      - https://doc.qt.io/qt-5/stylesheet-examples.html
 	//      - https://doc.qt.io/qt-5/qcolor.html
 	horizontalHeader()->setStyleSheet("font: bold; border: 0.5px solid");
+	horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	verticalHeader()->setStyleSheet("border: none");
 	setStyleSheet("QHeaderView::section { background-color: lightGray }");
 }
@@ -18,10 +19,7 @@ void QIodeEditTableView::setupModel(const QString& tableName)
 
 	setItemDelegate(new EditTableDelegate());
 
-	resizeColumnsToContents();
-
 	connect(model, &QIodeEditTableModel::displayData, this, &QIodeEditTableView::updateRow);
-	connect(model, &QIodeEditTableModel::dataChanged, this, &QIodeEditTableView::resizeColumnsToContents);
 }
 
 void QIodeEditTableView::updateRow(const int row, const EnumLineType line_type, const int nb_columns)

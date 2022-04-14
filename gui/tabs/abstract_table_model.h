@@ -110,10 +110,7 @@ protected:
 	{
 		try
 		{
-			char* char_new_name = new char[new_name.size() + 1];
-			strcpy(char_new_name, new_name.toUtf8().data());
-			int pos = kdb.setName(row, char_new_name);
-			delete[] char_new_name;
+			kdb.set_name(row, new_name.toStdString());
 			return true;
 		}
 		catch (const std::runtime_error& e)

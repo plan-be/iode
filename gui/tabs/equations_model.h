@@ -16,9 +16,9 @@ private:
 	QVariant dataCell(const int row, const int col) const
 	{
 		if (col == 0)
-			return QVariant(QString::fromStdString(kdb.getName(row)));
+			return QVariant(QString::fromStdString(kdb.get_name(row)));
 		else
-			return QVariant(QString::fromStdString(kdb.getLec(row)));
+			return QVariant(QString::fromStdString(kdb.get_lec(row)));
 	}
 
 public slots:
