@@ -19,12 +19,11 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
 {
 	Q_OBJECT
 
+    bool exit;
+
 public:
 	QIodeMenuWorkspaceSave(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceSave();
-
-private:
-    void save_component(KDBAbstract& kdb, const bool accept = true);
 
 public slots:
     void save_comments();

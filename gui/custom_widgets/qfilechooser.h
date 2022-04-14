@@ -89,7 +89,7 @@ private slots:
 
 		QString dir;
 		QString caption = name + " File";
-		QString filter = ext == anyExt ? QString() : name + " (*." + ext + " *." + ascii + ")";
+		QString filter = ext == anyExt ? QString() : name + " (*" + ext + " *" + ascii + ")";
 		if (fileMode == EXISTING_FILE)
 		{
 			caption = "Open " + caption;

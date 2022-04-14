@@ -17,14 +17,13 @@
 
 class QIodeMenuWorkspaceClear : public QIodeSettings, public Ui::QIodeMenuWorkspaceClear
 {
-	Q_OBJECT
+    Q_OBJECT
+
+    bool exit;
 
 public:
 	QIodeMenuWorkspaceClear(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceClear();
-
-private:
-    void clear_component(KDBAbstract& kdb, const bool accept = true);
 
 public slots:
     void clear_comments();

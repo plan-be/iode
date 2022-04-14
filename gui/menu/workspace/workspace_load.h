@@ -33,15 +33,14 @@ class QIodeMenuWorkspaceLoad : public QIodeSettings, public Ui::QIodeMenuWorkspa
 {
 	Q_OBJECT
 
+    bool exit;
+
 private:
 
 
 public:
 	QIodeMenuWorkspaceLoad(QSettings& settings, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceLoad();
-
-private:
-    void load_component(KDBAbstract& kdb, const bool accept = true);
 
 public slots:
     void load_comments();

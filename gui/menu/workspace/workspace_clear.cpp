@@ -15,6 +15,8 @@ QIodeMenuWorkspaceClear::QIodeMenuWorkspaceClear(QSettings& settings, QWidget* p
 {
 	setupUi(this);
 
+    exit = true;
+
     lineEdit_nb_comments->setText(QString::number(KDBComments().count()));
     lineEdit_nb_equations->setText(QString::number(KDBEquations().count()));
     lineEdit_nb_identities->setText(QString::number(KDBIdentities().count()));
@@ -34,81 +36,115 @@ QIodeMenuWorkspaceClear::~QIodeMenuWorkspaceClear()
 {
 }
 
-void QIodeMenuWorkspaceClear::clear_component(KDBAbstract& kdb, const bool accept)
+void QIodeMenuWorkspaceClear::clear_comments()
 {
+    KDBComments kdb = KDBComments();
     try
     {
-        int i_type = kdb.getIODEType();
-        std::string s_type = vIodeTypes[i_type];
         kdb.clear();
-
-        if (accept) this->accept();
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-}
-
-void QIodeMenuWorkspaceClear::clear_comments()
-{
-    KDBComments kdb = KDBComments();
-    clear_component(kdb);
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_equations()
 {
     KDBEquations kdb = KDBEquations();
-    clear_component(kdb);
+    try
+    {
+        kdb.clear();
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_identities()
 {
     KDBIdentities kdb = KDBIdentities();
-    clear_component(kdb);
+    try
+    {
+        kdb.clear();
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_lists()
 {
     KDBLists kdb = KDBLists();
-    clear_component(kdb);
+    try
+    {
+        kdb.clear();
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_scalars()
 {
     KDBScalars kdb = KDBScalars();
-    clear_component(kdb);
+    try
+    {
+        kdb.clear();
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_tables()
 {
     KDBTables kdb = KDBTables();
-    clear_component(kdb);
+    try
+    {
+        kdb.clear();
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_variables()
 {
     KDBVariables kdb = KDBVariables();
-    clear_component(kdb);
+    try
+    {
+        kdb.clear();
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+    if (exit) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear()
 {
-    KDBComments kdb_comments = KDBComments();
-    KDBEquations kdb_equations = KDBEquations();
-    KDBIdentities kdb_identities = KDBIdentities();
-    KDBLists kdb_lists = KDBLists();
-    KDBScalars kdb_scalars = KDBScalars();
-    KDBTables kdb_tables = KDBTables();
-    KDBVariables kdb_variables = KDBVariables();
+    exit = false;
 
-    clear_component(kdb_comments, false);
-    clear_component(kdb_equations, false);
-    clear_component(kdb_identities, false);
-    clear_component(kdb_lists, false);
-    clear_component(kdb_scalars, false);
-    clear_component(kdb_tables, false);
-    clear_component(kdb_variables, false);
+    clear_comments();
+    clear_equations();
+    clear_identities();
+    clear_lists();
+    clear_scalars();
+    clear_tables();
+    clear_variables();
 
     this->accept();
 }

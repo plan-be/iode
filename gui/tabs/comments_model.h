@@ -17,7 +17,7 @@ private:
 	{
         if (col == 0)
         {
-            return QVariant(QString::fromStdString(kdb.getName(row)));
+            return QVariant(QString::fromStdString(kdb.get_name(row)));
         }
         else
         {
@@ -29,7 +29,7 @@ private:
     { 
 		try
 		{
-			kdb.set(row, value.toString().toStdString());
+			kdb.update(row, value.toString().toStdString());
 			return true;
 		}
 		catch (const std::runtime_error& e)

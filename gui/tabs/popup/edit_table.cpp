@@ -12,6 +12,7 @@ void QIodeEditTable::edit()
 {
 	try
 	{
+		static_cast<QIodeEditTableModel*>(tableView->model())->save();
 		this->accept();
 	}
 	catch (const std::runtime_error& e)

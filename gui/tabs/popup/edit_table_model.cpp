@@ -1,17 +1,21 @@
 #pragma once
 #include "edit_table_model.h"
 
-QIodeEditTableModel::QIodeEditTableModel(const QString& tableName, QWidget* parent) : QAbstractTableModel(parent)
+QIodeEditTableModel::QIodeEditTableModel(const QString& tableName, QWidget* parent) : QAbstractTableModel(parent), tableName(tableName)
 {
-	KDBTables kdb;
 	try
 	{
-		table = kdb.get(tableName.toStdString());
+		table = new Table(tableName.toStdString());
 	}
 	catch (const std::runtime_error& e)
 	{
 		QMessageBox::critical(static_cast<QWidget*>(parent), tr("ERROR"), tr(e.what()));
 	}
+}
+
+QIodeEditTableModel::~QIodeEditTableModel()
+{
+	delete table;
 }
 
 int QIodeEditTableModel::rowCount(const QModelIndex& parent) const
@@ -242,4 +246,10 @@ EnumLineType QIodeEditTableModel::getLineType(const int row) const
 {
 	// first row represents the diviser line
 	return row == 0 ? IT_CELL : table->getLineType(row - 1);
+}
+
+void QIodeEditTableModel::save()
+{	
+	KDBTables kdb;
+	kdb.update(tableName.toStdString(), *table);
 }
