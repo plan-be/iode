@@ -398,7 +398,7 @@ void Table::setCellDividerLec(const int column, const std::string& lec)
 int Table::insertTitle(const int pos, const std::string& title, const bool after)
 {
 	int title_pos = insertLine(pos, IT_TITLE, after);
-	std::string title_oem = IodeString(title, CP_UTF8).to_oem();
+	std::string title_oem = utf8_to_oem(title);
 	c_table->t_line[title_pos].tl_val = const_cast<char*>(title_oem.c_str());
 	return title_pos;
 }
@@ -442,7 +442,7 @@ std::string Table::getCellContent(const int row, const int column, const bool qu
 	TCELL* cell = getCell(row, column, divider);
 	int mode = quotes ? 1 : 0;
 	std::string content_oem = std::string(T_cell_cont(cell, mode));
-	std::string content = (cell->tc_type == IT_STRING) ? IodeString(content_oem, CP_OEMCP).to_utf8() : content_oem;
+	std::string content = (cell->tc_type == IT_STRING) ? oem_to_utf8(content_oem) : content_oem;
 	return content;
 }
 
@@ -450,7 +450,7 @@ std::string Table::getCellContent(const int row, const int column, const bool qu
 void Table::setCellText(const int row, const int column, const std::string& text, const bool divider)
 {
 	TCELL* cell = getCell(row, column, divider);
-	std::string text_oem = IodeString(text, CP_UTF8).to_oem();
+	std::string text_oem = utf8_to_oem(text);
 	unsigned char* c_text = reinterpret_cast<unsigned char*>(const_cast<char*>(text_oem.c_str()));
 	T_set_string_cell(cell, c_text);
 }

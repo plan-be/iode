@@ -18,7 +18,7 @@ std::string KDBAbstract<T>::get_name(const int pos) const
 {
     KOBJ obj = get_iode_object(pos);
     std::string name_oem = std::string(obj.o_name);
-    std::string name = IodeString(name_oem, CP_OEMCP).to_utf8();
+    std::string name = oem_to_utf8(name_oem);
     return name;
 }
 
