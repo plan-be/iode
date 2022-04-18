@@ -49,57 +49,15 @@ inline std::string convert_between_codepages(const std::string str_in, const int
     return str_out;
 }
 
-
-/* ****************************** *
- *       UTILITY CLASSES          *
- * ****************************** */
-
-class IodeString
+inline std::string oem_to_utf8(const std::string str_oem)
 {
-    std::string utf8_string;
+    return convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);
+}
 
-public:
-    IodeString(std::string input, const int codepage)
-    {
-        if (codepage != CP_UTF8)
-        {
-            utf8_string = convert_between_codepages(input, codepage, CP_UTF8);
-        }
-        else
-        {
-            utf8_string = input;
-        }
-    }
-
-    std::string to_utf8() const
-    {
-        return utf8_string;
-    }
-
-    std::string to_oem() const
-    {
-        std::string oem_string = convert_between_codepages(utf8_string, CP_UTF8, CP_OEMCP);
-        return oem_string;
-    }
-
-    std::string to_codepage(const int codepage)
-    {
-        if (codepage != CP_UTF8)
-        {
-            return convert_between_codepages(utf8_string, CP_UTF8, codepage);
-        }
-        else
-        {
-            return utf8_string;
-        }
-    }
-
-    // operator ==
-    bool operator==(const IodeString& other) const
-    {
-        return utf8_string == other.to_utf8();
-    }
-};
+inline std::string utf8_to_oem(const std::string str_utf8)
+{
+    return convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
+}
 
 
 inline std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)

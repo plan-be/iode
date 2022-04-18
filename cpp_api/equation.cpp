@@ -157,7 +157,7 @@ void Equation::set_sample(std::string from, std::string to)
 std::string Equation::get_comment() const
 {
     std::string comment_oem = std::string(c_equation->cmt);
-    std::string comment = IodeString(comment_oem, CP_OEMCP).to_utf8();
+    std::string comment = oem_to_utf8(comment_oem);
     return comment;
 }
 
@@ -170,7 +170,7 @@ void Equation::set_comment(const std::string& comment)
     }
     else
     {
-        std::string comment_oem = IodeString(comment, CP_UTF8).to_oem();
+        std::string comment_oem = utf8_to_oem(comment);
         char* c_comment_oem = const_cast<char*>(comment_oem.c_str());
         c_equation->cmt = (char*) SCR_stracpy((unsigned char*) c_comment_oem);
     }
