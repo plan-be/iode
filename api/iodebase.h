@@ -8,6 +8,7 @@ extern "C" {
 /* k_ws.c */
 extern void K_init_ws(int );
 extern void K_end_ws(int );
+extern int K_load_RWS(int ref, char *filename);
 
 
 /* k_pack.c */
@@ -450,7 +451,8 @@ extern char *K_optr0(KDB *,char* );
 extern char *K_optr1(KDB *,char* );
 extern double *K_vptr(KDB *,char* ,int );
 
-extern EQ* K_eptr(KDB* kdb, char* name);
+extern EQ*  K_eptr(KDB* kdb, char* name);
+extern TBL* K_tptr(KDB* kdb, char* name);
 
 /* k_lst.c */
 extern int K_scan(KDB *,char *,char *);
@@ -651,11 +653,11 @@ extern char *K_LastVersion();
 
 /* c_cc.c */
 extern COLS *COL_cc(char *);
-extern int COL_free(COLS *);
+extern int COL_free_cols(COLS *);
 //extern int COL_stripy(char *);
 extern char *COL_ctoa(COL *,int ,int ,int );
 extern char *COL_text(COL *,char *,int );
-extern COLS *COL_add(COLS *,int ,int );
+extern COLS *COL_add_col(COLS *);
 //extern COLS *COL_construct(COLS *,COLS *,FILS *,REP *, int, int);
 //extern int COL_apply_fil(COL *,FIL *);
 //extern int COL_read_per(YYFILE *,PERIOD *);
@@ -1206,7 +1208,11 @@ extern int KI_read_scls(KDB *,KDB *,int ,char **);
 extern int KI_execute(KDB *,KDB *,KDB *,int *,SAMPLE *);
 extern int KI_extract(KDB *,KDB *);
 
+/* k_lang.c */
+extern int K_LANG;      // Current language
+
 /* k_print.c */
+extern  int K_NBDEC;  
 extern int T_prep_cls(TBL *,char *,COLS **);
 extern int T_print_tbl(TBL *,char *);
 //extern int T_print_line(TBL *,int ,COLS *);
