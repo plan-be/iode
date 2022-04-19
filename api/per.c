@@ -177,24 +177,30 @@ char *PER_pertoa(PERIOD* per, char* text)
 
 
 /**
- * Translates a text (e.g. "2010M6") in a PERIOD. 
+ * Translates a text (e.g. "2010M6") into a PERIOD. 
  *  
  * If year < 50, adds 2000 (49Y1 => 2049Y1).
  * If year < 200, adds 1900 (60Y1 => 1960Y1).
  *
  *    
- *  @param [in] text    char*       text defining a period (Ex. : "1990M2")
+ *  @param [in] aper    char*       period in a string (Ex. : "1990M2")
  *  @return             PERIOD*     pointer to an allocated struct PERIOD or null on error.
  *  
  *  @details On error, call B_seterrn(86) and returns NULL.
  *  @details The resulting PERIOD being allocated, it is the programmer's responsability to free it later (SW_nfree()).
  */
-PERIOD *PER_atoper(char *text)
+ 
+PERIOD *PER_atoper(char *aper)
 {
     int     i, j, nb_per, year, sub;
     PERIOD  *per = (PERIOD *) SW_nalloc(sizeof(PERIOD));
+    char    text[64];
 
     per->p_y = per->p_p = per->p_s = 0;
+    if(aper == 0) return(per);
+    
+    // work on a local copy of aper 
+    SCR_strlcpy(text, aper, sizeof(text) -1);
 
     // Search the periodicity sign and keeps the digits
     for(i = 0 ; i < 4 ; i++)
