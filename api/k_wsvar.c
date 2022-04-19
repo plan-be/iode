@@ -12,6 +12,8 @@
  *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(IODE_REAL* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
+ *    int KV_per_pos(PERIOD* per2)                                            Retrieves the position of a PERIOD in the current KV_WS sample.
+ *    int KV_aper_pos(char* aper2)                                            Retrieves the position of a period in text format in the current KV_WS sample.  
  *    double KV_get_at_t(char*varname, int t)                                 Retrieves the value of varname[t] 
  *    double KV_get_at_per(char*varname, PERIOD* per)                         Retrieves the value of varname[per] 
  *    double KV_get_at_aper(char*varname, char* aper)                         Retrieves the value of varname[aper]
