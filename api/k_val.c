@@ -15,6 +15,7 @@
  *    IODE_REAL *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
  *    IODE_REAL *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
  *    EQ* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
+ *    TBL* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
  *  
  *  See also defines in iode.h.
  */
@@ -169,3 +170,19 @@ EQ* K_eptr(KDB* kdb, char* name)
     return(K_eunpack(SW_getptr(kdb->k_objs[pos].o_val)));
 }
 
+/**
+ *  Retrieves a TBL in a kdb based on its name. Allocates a new TBL with its content.  
+ *  
+ *  @param [in] kdb     KDB*    KDB of tables
+ *  @param [in] name    int     table object name
+ *  @return             EQ*     pointer to an allocated TBL ~ kdb[name]
+ *  
+ */
+TBL* K_tptr(KDB* kdb, char* name)
+{
+    int pos;
+    
+    pos = K_find(kdb, name);
+    if(pos < 0) return(NULL);         // name not found
+    return(K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)));
+}
