@@ -172,7 +172,7 @@ int K_ren(KDB* kdb, char* name1, char* name2)
 
 
 /**
- * Adds the new entry name in kdb and returns its position in the kdb. 
+ * Adds the new entry newname in kdb and returns its position in the kdb. 
  *
  * The kdb can be of any type but the name must comply to the naming conventions of kdb's type (UPPER, LOWER...).
  *
@@ -185,19 +185,21 @@ int K_ren(KDB* kdb, char* name1, char* name2)
  *          of the table in which case, no search is required.
  * 
  *  @param [in, out]    kdb     KDB*    KDB source and target
- *  @param [in]         name    char*   new object name 
+ *  @param [in]         newname char*   new object name 
  *  @return                     int     position of name in kdb on success
  *                                      -1 if name does not comply to the name syntax in the kdb 
  */
  
-int K_add_entry(KDB* kdb, char* name)
+int K_add_entry(KDB* kdb, char* newname)
 {
 
     int     i, lg,
             pos, maxpos, minpos, nbobjs;
     KOBJ    *ktmp;
+    ONAME   name;
 
     if(kdb == NULL) return(-1);
+    SCR_strlcpy(name, newname, K_MAX_NAME);  /* JMP 13-02-2013 */
     if(K_key(name, KMODE(kdb)) < 0) return(-1);
     pos = K_find(kdb, name);
     if(pos >= 0) {
