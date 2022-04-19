@@ -179,10 +179,12 @@
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
-#define KCPTR(name)         K_optr0(KC_WS, name)            // Returns a pointer 
-#define KLPTR(name)         K_optr0(KL_WS, name)
-#define KVPTR(name)         K_vptr(KV_WS, name, 0)
-#define KEPTR(name)         K_eptr(KE_WS, name)
+#define KCPTR(name)         K_optr0(KC_WS, name)     // Returns a pointer to the object in swap (do not free) 
+#define KLPTR(name)         K_optr0(KL_WS, name)     // id.
+#define KVPTR(name)         K_vptr(KV_WS, name, 0)   // id.
+
+#define KEPTR(name)         K_eptr(KE_WS, name)      // returns an allocated object
+#define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated object       
 
 
 /*----------------------- TABLES ----------------------------*/
@@ -1272,9 +1274,9 @@ extern  char    *KT_smpl;
 extern  char    KT_sep;
 extern  char    **B_ERROR_MSG;
 extern  char    B_SEPS[];
-extern  int     B_NBDEC;
+// extern  int     B_NBDEC;  // JMP 18-04-2022
 extern  int     B_MULTIBAR; /* GB 30/10/2007 */
-extern  int     B_LANG;     /* JMP38 26-09-92 */
+// extern  int     B_LANG;    // JMP 18/04/2022
 extern  int     KVAR_MODE, KVAR_NDEC, KVAR_START;
 extern  char    STATIC_BUF[];
 extern  int     STATIC_BUF_LG;
