@@ -299,6 +299,7 @@ Variables and functions for initializing and cleaning up the "in memory" workspa
 |`KDB *K_WS[7]`|Table with pointers to the 7 KDB in memory, 1 per object type (CEILSTV)|
 |`void K_init_ws(int ws)`|Initialises the "in mem" KDB structures and optionaly loads the ws.\* files|
 |`void K_end_ws(int ws)`|Deletes the current workspaces defined in K\_WS\[\] and their content after having optionaly saved their content in ws.\* files.|
+|`int K_load_RWS(int ref, char *filename)`|Load a VAR file for use in GSAMPLE (print tables and graphs)|
 
 ### k\_wsvar.c {#T22}
 
@@ -320,6 +321,8 @@ Functions acting on workspaces of variables.
 |`int KV_set_at_t(char*varname, int t, double val)`|Replaces the value of varname\[t\] by val.|
 |`int KV_set_at_per(char*varname, PERIOD* per, double val)`|Replaces the value of varname\[per\] by val.|
 |`int KV_set_at_aper(char*varname, char* aper, double val)`|Replaces the value of varname\[aper\] by val.|
+|`int KV_per_pos(PERIOD* per2)`|Retrieves the position of a PERIOD in the current KV\_WS sample.|
+|`int KV_aper_pos(char* aper2)`|Retrieves the position of a period in text format in the current KV\_WS sample.|
 
 ## Group "Object management" {#T23}
 
@@ -428,6 +431,7 @@ List of functions
 |`IODE_REAL *K_vval(KDB* kdb, int pos, int t)`| kdb\[pos\]\[t\]|
 |`IODE_REAL *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
 |`EQ* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
+|`TBL* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
 
 ### k\_eqs.c {#T32}
 
