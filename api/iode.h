@@ -1195,8 +1195,8 @@ extern  char    k_ext[][4];
 #define K_MAX_FREF          5           // Max number of file references in GSAMPLE's
 //extern  FREF    fref[K_MAX_FREF + 1];
 
-extern char     *COL_OPERS[];
-extern char     *COL_OPERS_TEXTS[][3]; /* JMP38 01-10-92 */
+extern char     *COL_OPERS[];           
+// extern char     *COL_OPERS_TEXTS[][3]; // unused - replaced by KLG_OPERS_TEXTS
 
 extern char     W_filename[];
 extern FILE     *W_fd;
