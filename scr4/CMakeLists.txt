@@ -28,7 +28,7 @@ set (IODE_STRS
 		s_stpsl.c s_stpst.c s_stun.c s_stinte.c s_stdiff.c s_strdfl.c 
 		s_strepl.c s_strdln.c s_strcpy.c s_stfren.c s_string.c s_stobj.c 
 		s_stpcin.c s_stpcl.c s_stpcex.c s_stprf.c s_ststr.c 
-		s_stpak1.c s_stpaka.c s_stpakx.c s_stpakl.c s_std.c s_copy.c s_stdhex.c s_sha1.c)	# s_whlp.c
+		s_stpak1.c s_stpaka.c s_stpakx.c s_stpakl.c s_std.c s_copy.c s_stdhex.c)	# s_whlp.c s_sha1.c
 set (IODE_DDE  s_wddesr.c s_wddecl.c)
 set (IODE_YY  s_ybase.c s_ydef.c s_yincl.c s_ylex.c s_yread.c s_ydebug.c s_yerror.c)
 set (IODE_MAT 
