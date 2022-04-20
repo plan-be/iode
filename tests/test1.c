@@ -501,6 +501,38 @@ void Tests_Simulation()
     */
 }
 
+
+void Tests_PrintTables()
+{
+    char    fullfilename[256];
+    KDB     *kdbv, *kdbt;
+    TBL     *tbl;
+    int     rc;
+
+    // Load the VAR workspace
+    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
+    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", "fun.var");
+
+    // Load the TBL workspace
+    K_WS[K_TBL] = kdbt  = U_test_K_interpret(K_TBL, "fun.tbl");
+    S4ASSERT(kdbt != NULL, "K_interpret(K_TBL, \"%s\")", "fun.tbl");
+
+    // Load a second VAR workspace in K_RWS[K_VAR][2]
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, "fun.var");
+    rc = K_load_RWS(2, fullfilename);
+    S4ASSERT(rc == 0, "K_load_RWS(2, \"%s\")", fullfilename);
+    
+    // Print
+    tbl = KTPTR("C8_1");
+    S4ASSERT(tbl != 0, "KTPTR(\"C8_1\") not null.");
+    rc = T_print_tbl(tbl, "2000:5[1;2]");
+    
+    // Cleanup
+    T_free(tbl);
+    K_load_RWS(2, NULL);
+}
+
+
 void Tests_ALIGN()
 {
     TBL     tbl, *p_tbl = &tbl;
@@ -561,6 +593,7 @@ int main(int argc, char **argv)
     Tests_K_OBJFILE();
     Tests_TBL32_64();
     Tests_Simulation();
+    Tests_PrintTables();
     
 //    B_ReportLine("$show coucou");
 }
