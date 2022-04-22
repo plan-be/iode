@@ -9,7 +9,7 @@
  *      int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)            Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL
  *      void T_fmt_val(char* buf, IODE_REAL val, int lg, int nd)    Formats a double value
  *      void T_print_val(IODE_REAL val)                             Prints a IODE_REAL value using W_printf()
- *      void T_align(int attr, int straddle, int type)              Prints the header of an a2m table cell
+ *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
  *      void T_print_cell(TCELL* cell, COL* cl, int straddle)       Prints a TBL cell on a specific GSAMPLE column. 
@@ -126,7 +126,7 @@ static void T_print_string(COL* cl, char* string)
  *  
  */
  
-void T_align(int attr, int straddle, int type) /* JMP 17-12-93 */
+void T_open_cell(int attr, int straddle, int type) /* JMP 17-12-93 */
 {
     char    align = 'L';
 
@@ -187,7 +187,7 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
     if(cell->tc_type == KT_LEC)
         cell->tc_attr = KT_ALIGN(cell->tc_attr, KT_DECIMAL);
 
-    T_align(cell->tc_attr, straddle, cell->tc_type);  /* JMP 17-12-93 */
+    T_open_cell(cell->tc_attr, straddle, cell->tc_type);  /* JMP 17-12-93 */
     T_open_attr(cell->tc_attr);
 
     if(cell->tc_type != 0) {
@@ -289,7 +289,7 @@ static void T_print_files(COLS* cls, int dim)
     if(KT_nbnames <= 0) return;  
 
     for(i = 0; KT_names[i]; i++) {
-        T_align(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
+        T_open_cell(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
         W_printf("%s\n", KT_names[i]);
     }
 }
@@ -312,7 +312,7 @@ static void T_print_mode(COLS* cls, int dim)
 
     for(i = 0; i < MAX_MODE; i++) {
         if(KT_mode[i] == 0) continue;
-        T_align(KT_LEFT, dim, KT_STRING);  /* JMP 17-12-93 */
+        T_open_cell(KT_LEFT, dim, KT_STRING);  /* JMP 17-12-93 */
         //W_printf("(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][B_LANG]);
         W_printf("(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]); // JMP 18-04-2022
     }
@@ -332,7 +332,7 @@ static void T_print_date(int dim)
     char    date[11];
 
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
-    T_align(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
+    T_open_cell(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
     W_printf("%s\n", date);
     return(0);
 }
