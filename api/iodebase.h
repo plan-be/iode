@@ -1220,7 +1220,7 @@ extern int T_print_tbl(TBL *,char *);
 extern void T_fmt_val(char *,double ,int ,int );
 extern void T_print_val(double );
 //extern void T_print_string(COL *,char *);
-extern void T_align(int ,int ,int );
+extern void T_open_cell(int ,int ,int );
 extern void T_open_attr(int );
 extern void T_close_attr(int );
 extern char **T_find_files(COLS *);
