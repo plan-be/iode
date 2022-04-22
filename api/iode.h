@@ -179,12 +179,12 @@
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
-#define KCPTR(name)         K_optr0(KC_WS, name)     // Returns a pointer to the object in swap (do not free) 
+#define KCPTR(name)         K_optr0(KC_WS, name)     // Returns a pointer to the CMT in swap (do not free) 
 #define KLPTR(name)         K_optr0(KL_WS, name)     // id.
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)   // id.
 
-#define KEPTR(name)         K_eptr(KE_WS, name)      // returns an allocated object
-#define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated object       
+#define KEPTR(name)         K_eptr(KE_WS, name)      // returns an allocated EQ
+#define KTPTR(name)         K_tptr(KT_WS, name)      // returns an allocated TBL
 
 
 /*----------------------- TABLES ----------------------------*/
