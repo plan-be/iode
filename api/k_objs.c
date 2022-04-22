@@ -276,7 +276,7 @@ int K_find(KDB* kdb, char* name)
 
     if(kdb == NULL || KNB(kdb) == 0) return(-1);
 
-    SCR_strlcpy(oname, name, K_MAX_NAME);  /* JMP 13-02-2013 */
+    SCR_strlcpy(oname, name, K_MAX_NAME);  
     if(K_key(oname, KMODE(kdb)) < 0) return(-1);
 
     res = (char *) bsearch(oname, KOBJS(kdb), (int) KNB(kdb),
