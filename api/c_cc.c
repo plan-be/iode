@@ -8,7 +8,26 @@
  *  
  *  See https://iode.plan.be/doku.php?id=sample_d_impression for more details.
  *  
+ *  Formal definition of a GSAMPLE (tentative)
+ *  ------------------------------------------
+ *      gsample    ::= gsample_n[';'gsample_n...]
+ *      gsample_n  ::= gsample_1[repetition['*'['-']increment]] 
+ *      repetition ::= integer
+ *      increment  ::= integer
  *  
+ *      gsample_1  ::= period_ops [file_ops]
+ *      period_ops ::= period_op | '(' period_op ';' period_op... ')'
+ *      period_op  ::= period [opp period] ['>' shift] ['<' shift]
+ *      period     ::= integer[periodicity period] | 
+ *                      'EOS' | 'BOS' | 'NOW' | 'EOS1' | 'BOS1' |'NOW1'
+ *      shift      ::= 0 | integer
+ *      opp        ::= '-' | '--' | '/' | '//' | '+' | '^' | '~' | '=' 
+ *  
+ *      file_ops   ::= '[' file_op | file_op ';' file_op ']'
+ *      file_op    ::= file [opf file] 
+ *      file       ::= integer
+ *      opf        ::= '+' | '-' | '/' | '+' | '^' 
+  *  
  *  List of functions 
  *  -----------------
  *      COLS *COL_cc(char* gsample)                         GSAMPLE compiler
@@ -80,18 +99,19 @@ YYKEYS COL_KEYWS[] = {
 
 };
 
-// Operator representations used when printing 
+// Operator representations used when printing (only valid for period operations)
+// TODO: distinguish bw operations between periods and between files ?
 char    *COL_OPERS[] = {
-    "",     // COL_DIFF,
-    "-",    // COL_MDIFF,
-    "--",   // COL_MEAN, 
+    "",     // COL_NOP
+    "-",    // COL_DIFF,
+    "--",   // COL_MDIFF, 
     "^",    // COL_MEAN, 
-    "/",    // COL_ADD,
-    "//",   // COL_BASE,
-    "+",    // COL_GRT,
-    "=",    // COL_MGRT,
-    "<",    // Faux !! Ne peut pas se produire
-    ">"     // Faux !! Idem
+    "/",    // COL_GRT,
+    "//",   // COL_MGRT,
+    "+",    // COL_ADD,
+    "="     // COL_BASE,
+//    "<",    // Faux !! Ne peut pas se produire
+//    ">"     // Faux !! Idem
 };
 
 
@@ -138,7 +158,7 @@ char    *COL_OPERS[] = {
 	Dans ce cas, l'affichage se fait a l'envers (2000:3*-1 = 2000, 1999, 1998, ...)
 
     Exemples :
-	    70, 75, 80:6  = 70:3.5, 81:5 =
+	    70, 75, 80:6  = 70:3*5, 81:5 =
 			    70, 75, 80, 81, 82, 83, 84, 85
 
 	    70/69:2       = 70/69, 71/70
@@ -156,60 +176,6 @@ char    *COL_OPERS[] = {
 */
 
 
-/**
- *  GSAMPLE compiler.
- *  
- *  @param [in]     char*   gsample text representing a GSAMPLE 
- *  @return         COLS*           group of COL struct result of the compilation of gsample
- *  
- */
- 
-COLS *COL_cc(char* gsample)
-{
-    COLS    *cls, *COL_read_cols();
-    COL     *cl;
-    YYFILE  *yy;
-    static  int sorted = 0;
-    int     i;
-
-    YY_CASE_SENSITIVE = 1;
-    if(sorted == 0) {
-        qsort(COL_KEYWS, sizeof(COL_KEYWS) / sizeof(YYKEYS), sizeof(YYKEYS), YY_strcmp);
-        sorted = 1;
-    }
-    yy = YY_open(gsample, COL_KEYWS,
-                 sizeof(COL_KEYWS) / sizeof(YYKEYS), YY_MEM);
-    if(yy == 0) return((COLS *)0);
-    cls = COL_read_cols(yy);
-    YY_close(yy);
-    if(cls != 0)
-        for(i = 0, cl = cls->cl_cols ; i < cls->cl_nb ; i++, cl++) {
-            if(cl->cl_fnb[0] != 0) continue;
-            cl->cl_fnb[0] = 1;
-            cl->cl_fnb[1] = 0;
-            cl->cl_opf = COL_NOP;
-        }
-
-    return(cls);
-
-}
-
-
-/**
- *  Frees the allocated space for a COLS structure created by COL_cc().
- *  
- *  @param [in] COLS*   cls     COLS to free
- *  @return     int             0
- *  
- */
- 
-int COL_free_cols(COLS* cls)
-{
-    if(cls == 0) return(0);
-    if(cls->cl_nb != 0) SW_nfree(cls->cl_cols);
-    SW_nfree(cls);
-    return(0);
-}
 
 
 /**
@@ -389,9 +355,10 @@ char *COL_text(COL* cl, char* str, int nbnames)
 /**
  *  Adds a new COL struct to the COLS (list of periods in a GSAMPLE).
  *  
- *  @param [in, out] COLS*  cols    current COLS (before adding a new COL) or NULL 
+ *  @param [in, out] COLS*  cls     current COLS (before adding a new COL) or NULL 
  *  @return          COLS*          if cols == NULL : newly allocated COLS structure
- *                                  else cols unchanged
+ *                                  else cols remains unchanged 
+ *                                  (but the data pointed to by cols is changed)
  *  
  */
 
@@ -414,7 +381,8 @@ COLS *COL_add_col(COLS* cls)
  *  
  *  @param [in, out] FILS*  fils    current FILS (before adding a new FIL) or NULL 
  *  @return          FILS*          if fils == NULL : newly allocated FILS structure
- *                                  else fils unchanged
+ *                                  else fils remains unchanged but the data pointed 
+ *                                  to by fils is changed
  *  
  */
  
@@ -449,96 +417,6 @@ static void COL_apply_fil(COL* cl, FIL* fl)
     cl->cl_fnb[1] = fl->fl_2;
     cl->cl_opf = fl->fl_op;
 }
-
-
-// Default FILS for COL_construct()
-static FIL     COL_FIL  = {0, 0, 0};           
-static FILS    COL_FILS = {1, &COL_FIL};
-
-
-/**
- *  Completes the construction of a GSAMPLE compiled form.
- *  
- *  Given a COLS struct cltmp (result of a partial GSAMPLE compilation, 
- *  for ex. "2000:5[1;2]" in "2000:5[1;2];2000/1999:5"), adds it to the global GSAMPLE compiles 
- *  struct cls.
- *  
- *  The cltmp is added to cols rep->r_nb times * fils->fl_nb times. In the example above,
- *  adds 5 * 2 the COLS in cltmp to the global cols.
- *  
- *  @param [in, out] COLS*  cls         resulting columns
- *  @param [in]      COLS*  cltmp       compiled GSAMPLE to be added to cls rep->r_nb times
- *  @param [in]      FILS*  fils        FILS on which to cltmp must be applied
- *  @param [in]      REP*   rep         repetition format (n * m)
- *  @param [in]      int    shiftdir    unused ? Replaced by COL_shift() ?
- *  @param [in]      int    shiftval    unused ? id.
- *  @return          COLS*              cls (same pointer but content modified)
- *  
- */
-
-static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shiftdir, int shiftval)
-{
-    int     i, nbtmp, j, nbfils, k;
-    COL     *cl, *tmp;
-    PERIOD  *per;
-
-    if(fils == 0) fils = &COL_FILS; // if no fils, use a default  value
-    nbfils = fils->fl_nb;
-
-    if(rep->r_nb == 0) {
-        rep->r_nb   = 1;
-        rep->r_incr = 1;
-    }
-
-    nbtmp = cltmp->cl_nb;
-    tmp   = cltmp->cl_cols;
-
-    // Repetitions
-    for(i = 0 ; i < rep->r_nb ; i++) {
-        for(j = 0 ; j < nbtmp ; j++) {
-            for(k = 0 ; k < nbfils ; k++) {
-                cls = COL_add_col(cls);
-                cl = cls->cl_cols + cls->cl_nb - 1;
-                memcpy(cl, tmp + j, sizeof(COL));
-                memcpy(&(cl->cl_per[0]),
-                       PER_addper(&(tmp[j].cl_per[0]), i * rep->r_incr),
-                       sizeof(PERIOD));
-                if(cl->cl_opy != COL_NOP && cl->cl_opy != COL_BASE)
-                    memcpy(&(cl->cl_per[1]),
-                           PER_addper(&(tmp[j].cl_per[1]), i * rep->r_incr),
-                           sizeof(PERIOD));
-                if(cl->cl_fnb[0] == 0)
-                    COL_apply_fil(cl, fils->fl_fils + k);
-                else
-                    break;
-            }
-        }
-    }
-
-    // Shift
-    if(shiftdir) {
-        for(i = 0; i < cls->cl_nb; i++) {
-            cl = cls->cl_cols + i;
-            if(shiftval == 0) {
-                if(shiftdir == COL_SHIFTR)
-                    cl->cl_per[0].p_s = cl->cl_per[1].p_s = PER_nb(cl->cl_per[0].p_p);
-                else
-                    cl->cl_per[0].p_s = cl->cl_per[1].p_s = 1;
-            }
-            else {
-                if(shiftdir == COL_SHIFTL) shiftval = -shiftval;
-                per = PER_addper(cl->cl_per, shiftval);
-                memcpy(cl->cl_per, per, sizeof(PERIOD));
-                if(cl->cl_opy != COL_NOP) {
-                    per = PER_addper(cl->cl_per + 1, shiftval);
-                    memcpy(cl->cl_per + 1, per, sizeof(PERIOD));
-                }
-            }
-        }
-    }
-    return(cls);
-}
-
 
 
 /**
@@ -914,12 +792,20 @@ err:
 
 
 /**
+ *  Modifies a partial GSAMPLE by shifting all periods by nb positions
+ *  to the left (COL_SHIFTL)or the right (COL_SHIFTR) according to the value of key.
  *  
+ *  Examples
+ *      2000Q3/2000Q1<2              === 2000Q1/1999Q3 
+ *      2000Q3/2000Q1>1              === 2000Q4/2000Q2
+ *      2000Q1<0 or 2000Q3<0 or ...  === 2000Q1
+ *      2000Q3>0 or 2000Q4>0 or ...  === 2000Q4
  *  
- *  @param [in] cls 
- *  @param [in] key 
- *  @param [in] nb  
- *  @return 
+ *  @param [in, out] COLS*   cls    partial compiled GSAMPLE 
+ *  @param [in]      int     key    period shift direction: COL_SHIFTL or COL_SHIFTR 
+ *  @param [in]      in      nb     if not 0: nb of period to shift 
+ *                                  if 0 and key == COL_SHIFTL: shift to the 1st period of the year
+ *                                  if 0 and key == COL_SHIFTR: shift to the last period of the year
  *  
  */
  
@@ -950,28 +836,138 @@ static void COL_shift(COLS *cls, int key, int nb)
 }
 
 
+// Default FILS for COL_construct()
+static FIL     COL_FIL  = {0, 0, 0};           
+static FILS    COL_FILS = {1, &COL_FIL};
+
+
 /**
- *  Compiles a GSAMPLE. 
- *    
+ *  Completes the construction of a GSAMPLE compiled form.
+ *  
+ *  Given a COLS struct cltmp (result of a partial GSAMPLE compilation, 
+ *  for ex. "2000:5[1;2]" in "2000:5[1;2];2000/1999:5"), adds it to the global GSAMPLE 
+ *  compiled struct cls.
+ *  
+ *  The cltmp is added to cols rep->r_nb times * fils->fl_nb times. In the example above,
+ *  adds 5 * 2 the COLS in cltmp to the global cols.
+ *  
+ *  @param [in, out] COLS*  cls         resulting columns
+ *  @param [in]      COLS*  cltmp       compiled GSAMPLE to be added to cls rep->r_nb times
+ *  @param [in]      FILS*  fils        FILS on which to cltmp must be applied
+ *  @param [in]      REP*   rep         repetition format (n * m)
+ *  @param [in]      int    shiftdir    unused ? Replaced by COL_shift() ?
+ *  @param [in]      int    shiftval    unused ? id.
+ *  @return          COLS*              cls (same pointer but content modified)
+ *  
+ */
+
+static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shiftdir, int shiftval)
+{
+    int     i, nbtmp, j, nbfils, k;
+    COL     *cl, *tmp;
+    PERIOD  *per;
+
+    if(fils == 0) fils = &COL_FILS; // if no fils, use a default  value
+    nbfils = fils->fl_nb;
+
+    if(rep->r_nb == 0) {
+        rep->r_nb   = 1;
+        rep->r_incr = 1;
+    }
+
+    nbtmp = cltmp->cl_nb;
+    tmp   = cltmp->cl_cols;
+
+    // Repetitions
+    for(i = 0 ; i < rep->r_nb ; i++) {
+        for(j = 0 ; j < nbtmp ; j++) {
+            for(k = 0 ; k < nbfils ; k++) {
+                cls = COL_add_col(cls);
+                cl = cls->cl_cols + cls->cl_nb - 1;
+                memcpy(cl, tmp + j, sizeof(COL));
+                memcpy(&(cl->cl_per[0]),
+                       PER_addper(&(tmp[j].cl_per[0]), i * rep->r_incr),
+                       sizeof(PERIOD));
+                if(cl->cl_opy != COL_NOP && cl->cl_opy != COL_BASE)
+                    memcpy(&(cl->cl_per[1]),
+                           PER_addper(&(tmp[j].cl_per[1]), i * rep->r_incr),
+                           sizeof(PERIOD));
+                if(cl->cl_fnb[0] == 0)
+                    COL_apply_fil(cl, fils->fl_fils + k);
+                else
+                    break;
+            }
+        }
+    }
+
+    // Shift
+    if(shiftdir) {
+        for(i = 0; i < cls->cl_nb; i++) {
+            cl = cls->cl_cols + i;
+            if(shiftval == 0) {
+                if(shiftdir == COL_SHIFTR)
+                    cl->cl_per[0].p_s = cl->cl_per[1].p_s = PER_nb(cl->cl_per[0].p_p);
+                else
+                    cl->cl_per[0].p_s = cl->cl_per[1].p_s = 1;
+            }
+            else {
+                if(shiftdir == COL_SHIFTL) shiftval = -shiftval;
+                per = PER_addper(cl->cl_per, shiftval);
+                memcpy(cl->cl_per, per, sizeof(PERIOD));
+                if(cl->cl_opy != COL_NOP) {
+                    per = PER_addper(cl->cl_per + 1, shiftval);
+                    memcpy(cl->cl_per + 1, per, sizeof(PERIOD));
+                }
+            }
+        }
+    }
+    return(cls);
+}
+
+
+/**
+ *  Recursive function to compile a GSAMPLE.
+ *  Returns a COLS* struct containing the column definitions.
+ *  
  *  @param [in, out] YYFILE*    yy  YY stream
  *  @return          COLS*          compiled columns
+ *
+ *  Example
+ *  -------
+ *  Compile the GSAMPLE 
+ *      "2000:5[1;2];2000/1999:2"
  *  
- *  TODO: check this formal definition of a GSAMPLE
+ *  There are 2 sub GSAMPLE's separated by a ';'
+ *      "2000:5[1;2]" 
+ *      "2000/1999:2"
  *  
- *      gsample    ::= gsample_n[';'gsample_n...]
- *      gsample_n  ::= gsample_1[repetition['*'['-']increment]] 
- *      repetition ::= integer
- *      increment  ::= integer
+ *  First, COL_read_cols() will read the string (and create cltmp) until reaching ';' 
+ *  or the end of the string, in this case "2000:5[1;2]".
+ *   
+ *  Next, fils and rep having been read, COL_construct() is called to add 
+ *  cltmp to the final COLS cls (which is still NULL a this moment). 
+ *  In this case, cltmp is repeated 5 times (rep.r_nb) x 2 (fils->fl_nb) 
+ *  and these columns are stored in cls.
  *  
- *      gsample_1  ::= period_ops [file_ops]
- *      period_ops ::= period_op | '('period_op';'period_op...')'
- *      period_op  ::= period[op period] ['>'shift] ['<'shift]
- *      period     ::= integer[periodicity period] | 
- *                      'EOS' | 'BOS' | 'NOW' | 'EOS1' | 'BOS1' |'NOW1'
- *      shift      ::= 0 | integer
- *      
- *      file_ops   ::= file_op | '['file_op';'file_op...']'
- *      file_op    ::= file[op file]
+ *  Next, the remaining string "2000/1999;5" is compiled and added to cls the same way.
+ *  This time however, there are only 2 new columns added to cltmp (1 file x 2 periods). 
+ *       
+ *  The final result contains 7 columns.
+ *  
+ *  Example 2
+ *  ---------
+ *  GSAMPLE : "(99Y1;2000Y1;2000Y1/1999Y1)[1;2]:2"
+ *  
+ *  In this case, COL_read_cols() is called recursively and the total number 
+ *  of columns will be 3 x 2 x 2 = 12.
+ *  
+ *  Example 3
+ *  ---------
+ *  GSAMPLE : "(99:3;2000/99:3)[1;2]:2"
+ *  
+ *  Again, COL_read_cols() is called recursively and the total number 
+ *  of columns will be (3 + 3) x 2 x 2 = 24.
+ *  
  */
  
 static COLS *COL_read_cols(YYFILE* yy)
@@ -1058,19 +1054,77 @@ err:
 
 
 /**
+ *  GSAMPLE compiler.
+ *  
+ *  @param [in]     char*   gsample text representing a GSAMPLE 
+ *  @return         COLS*           group of COL struct result of the compilation of gsample
+ *  
+ */
+ 
+COLS *COL_cc(char* gsample)
+{
+    COLS    *cls, *COL_read_cols();
+    COL     *cl;
+    YYFILE  *yy;
+    static  int sorted = 0;
+    int     i;
+
+    YY_CASE_SENSITIVE = 1;
+    if(sorted == 0) {
+        qsort(COL_KEYWS, sizeof(COL_KEYWS) / sizeof(YYKEYS), sizeof(YYKEYS), YY_strcmp);
+        sorted = 1;
+    }
+    yy = YY_open(gsample, COL_KEYWS,
+                 sizeof(COL_KEYWS) / sizeof(YYKEYS), YY_MEM);
+    if(yy == 0) return((COLS *)0);
+    cls = COL_read_cols(yy);
+    YY_close(yy);
+    
+    // When no file is specified in a COL, force file nb 1 (i.e. workspace) and no operation on files
+    if(cls != 0)
+        for(i = 0, cl = cls->cl_cols ; i < cls->cl_nb ; i++, cl++) {
+            if(cl->cl_fnb[0] != 0) continue;
+            cl->cl_fnb[0] = 1;
+            cl->cl_fnb[1] = 0;
+            cl->cl_opf = COL_NOP;
+        }
+
+    return(cls);
+}
+
+
+/**
+ *  Frees the allocated space for a COLS structure created by COL_cc().
+ *  
+ *  @param [in] COLS*   cls     COLS to free
+ *  @return     int             0
+ *  
+ */
+ 
+int COL_free_cols(COLS* cls)
+{
+    if(cls == 0) return(0);
+    if(cls->cl_nb != 0) SW_nfree(cls->cl_cols);
+    SW_nfree(cls);
+    return(0);
+}
+
+
+/**
  *  Analyses the COLS struct cls and set 1 in the vector mode (normally KT_mode) 
  *  for each operation found in cls. Only the operations between COL_DIFF and COL_BASE 
  *  are saved. 
  *  
- *  @note The same vector is used for the operations on periods and on files (TODO: check why)
- * 
+ *  The aim is to prepare the texts to be printed below a table in the "MODE" TLINE's.
  *  
- *  @param [in] COLS*   cls     compiled GSAMPLE
- *  @param [in] int*    mode    vector containing 
- *  @param [in] int     type    0: search in period operations, 
- *                              1: in file operations
- *                              2: in both
- *  @return     int             0 if no operation found, 1 else
+ *  @note The same vector is used for the operations on periods and on files (TODO: check why)
+ *  
+ *  @param [in]      COLS*   cls     compiled GSAMPLE
+ *  @param [in, out] int*    mode    boolean vector containing a 1 for each operation found in cls (COL_DIFF, COL_GRT...)
+ *  @param [in]      int     type    0: search in period operations, 
+ *                                   1: search in file operations
+ *                                   2: search in both
+ *  @return          int             0 if no operation found, 1 else
  *  
  */
  
