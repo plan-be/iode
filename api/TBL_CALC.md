@@ -6,7 +6,7 @@
 
 - [IODE: Table calculations](#T1)
     - [GSAMPLE](#T2)
-      - [GSAMPLE syntax](#T3)
+      - [Formal definition of a GSAMPLE](#T3)
     - [c\_cc.c](#T4)
     - [c\_calc.c](#T5)
     - [k\_print.c](#T6)
@@ -54,25 +54,28 @@ The available operations on files include :
 - differences in % (\[1/2\])
 - etc
 
-The detailed GSAMPLE syntax can be found in the IODE manual (https://iode.plan.be/doku.php?id=sample\_d\_impression).
+Examples and more details on GSAMPLE can be found in the IODE manual (https://iode.plan.be/doku.php?id=sample\_d\_impression).
 
-#### GSAMPLE syntax {#T3}
+#### Formal definition of a GSAMPLE {#T3}
 
 ```
-   gsample    ::= gsample_n[';'gsample_n...]
-   gsample_n  ::= gsample_1[repetition['*'['-']increment]] 
-   repetition ::= integer
-   increment  ::= integer
-   gsample_1  ::= period_ops [file_ops]
+     gsample    ::= gsample_n[';'gsample_n...]
+     gsample_n  ::= gsample_1[repetition['*'['-']increment]] 
+     repetition ::= integer
+     increment  ::= integer
  
-   period_ops ::= period_op | '('period_op';'period_op...')'
-   period_op  ::= period[op period] ['>'shift] ['<'shift]
-   period     ::= integer[periodicity period] | 
-                   'EOS' | 'BOS' | 'NOW' | 'EOS1' | 'BOS1' |'NOW1'
-   shift      ::= 0 | integer
-   
-   file_ops   ::= file_op | '['file_op';'file_op...']'
-   file_op    ::= file[op file]
+     gsample_1  ::= period_ops [file_ops]
+     period_ops ::= period_op | '(' period_op ';' period_op... ')'
+     period_op  ::= period [opp period] ['>' shift] ['<' shift]
+     period     ::= integer[periodicity period] | 
+                     'EOS' | 'BOS' | 'NOW' | 'EOS1' | 'BOS1' |'NOW1'
+     shift      ::= 0 | integer
+     opp        ::= '-' | '--' | '/' | '//' | '+' | '^' | '' | '=' 
+ 
+     file_ops   ::= '[' file_op | file_op ';' file_op ']'
+     file_op    ::= file [opf file] 
+     file       ::= integer
+     opf        ::= '+' | '-' | '/' | '+' | '^' 
 ```
 
 ### c\_cc.c {#T4}
@@ -106,7 +109,7 @@ Functions to generate IODE tables in A2M format based on TBL structures and GSAM
 |`int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)`|Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL|
 |`void T_fmt_val(char* buf, IODE_REAL val, int lg, int nd)`|Formats a double value|
 |`void T_print_val(IODE_REAL val)`|Prints a IODE\_REAL value using W\_printf()|
-|`void T_align(int attr, int straddle, int type)`|Prints the header of an a2m table cell|
+|`void T_open_cell(int attr, int straddle, int type)`|Prints the header of an a2m table cell|
 |`void T_open_attr(int attr)`|Opens an A2M attribute sequence.|
 |`void T_close_attr(int attr)`|Closes an A2M attribute sequence.|
 |`void T_print_cell(TCELL* cell, COL* cl, int straddle)`|Prints a TBL cell on a specific GSAMPLE column.|
