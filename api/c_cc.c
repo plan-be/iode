@@ -30,7 +30,7 @@
  *  
  *  Examples
  *  --------
- *  Various examples can be found here: https://iode.plan.be/doku.php?id=sample_d_impression.
+ *  Various examples can be found here: https://iode.plan.be/doku.php?id=sample_d_impression or in TBL_CALC.md. 
  *  
  *  
  *  List of functions 
