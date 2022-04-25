@@ -27,7 +27,12 @@
  *      file_op    ::= file [opf file] 
  *      file       ::= integer
  *      opf        ::= '+' | '-' | '/' | '+' | '^' 
-  *  
+ *  
+ *  Examples
+ *  --------
+ *  Various examples can be found here: https://iode.plan.be/doku.php?id=sample_d_impression.
+ *  
+ *  
  *  List of functions 
  *  -----------------
  *      COLS *COL_cc(char* gsample)                         GSAMPLE compiler
@@ -357,8 +362,6 @@ char *COL_text(COL* cl, char* str, int nbnames)
  *  
  *  @param [in, out] COLS*  cls     current COLS (before adding a new COL) or NULL 
  *  @return          COLS*          if cols == NULL : newly allocated COLS structure
- *                                  else cols remains unchanged 
- *                                  (but the data pointed to by cols is changed)
  *  
  */
 
@@ -381,8 +384,6 @@ COLS *COL_add_col(COLS* cls)
  *  
  *  @param [in, out] FILS*  fils    current FILS (before adding a new FIL) or NULL 
  *  @return          FILS*          if fils == NULL : newly allocated FILS structure
- *                                  else fils remains unchanged but the data pointed 
- *                                  to by fils is changed
  *  
  */
  
@@ -848,8 +849,10 @@ static FILS    COL_FILS = {1, &COL_FIL};
  *  for ex. "2000:5[1;2]" in "2000:5[1;2];2000/1999:5"), adds it to the global GSAMPLE 
  *  compiled struct cls.
  *  
- *  The cltmp is added to cols rep->r_nb times * fils->fl_nb times. In the example above,
- *  adds 5 * 2 the COLS in cltmp to the global cols.
+ *  The cltmp is added to cols rep->r_nb times * fils->fl_nb times. 
+ *  If cltmp comes from "2000:5[1;2]", adds 5 * 2 the COLS in cltmp to the global cols.
+ *  
+ *  See more examples in COL_read_cols().
  *  
  *  @param [in, out] COLS*  cls         resulting columns
  *  @param [in]      COLS*  cltmp       compiled GSAMPLE to be added to cls rep->r_nb times
@@ -932,8 +935,8 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
  *  @param [in, out] YYFILE*    yy  YY stream
  *  @return          COLS*          compiled columns
  *
- *  Example
- *  -------
+ *  Example 1
+ *  ---------
  *  Compile the GSAMPLE 
  *      "2000:5[1;2];2000/1999:2"
  *  
@@ -941,8 +944,11 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
  *      "2000:5[1;2]" 
  *      "2000/1999:2"
  *  
- *  First, COL_read_cols() will read the string (and create cltmp) until reaching ';' 
- *  or the end of the string, in this case "2000:5[1;2]".
+ *  First, COL_read_cols() will read the string until reaching ';' or the end of the string, in this case "2000:5[1;2]".
+ *  It will create during the process:
+ *      - cltmp : period(s) + operation on period
+ *      - fils  : file(s) + operation on files
+ *      - rep   : repetition factor + increment
  *   
  *  Next, fils and rep having been read, COL_construct() is called to add 
  *  cltmp to the final COLS cls (which is still NULL a this moment). 
