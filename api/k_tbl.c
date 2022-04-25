@@ -14,6 +14,7 @@
  *      TCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type KT_TITLE. 
  *      char* T_cell_cont(TCELL* cell, int mode)                                                   | Returns the formated contents of a TCELL.
  *      char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)                                | Returns the formated contents of a TCELL.
+ *      char* T_div_cont_tbl(TBL* tbl, int col, int mode)                                          | Returns the formated contents of TBL divisor column.
  *      int T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TLINE in a TBL.
  *      int T_set_lec_cell(TCELL* cell, unsigned char* lec)                                        | Assigns a LEC expression to a TCELL. Checks the syntax.
  *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TCELL. Checks the syntax.
@@ -210,7 +211,7 @@ TCELL *T_create_title(TBL* tbl, TLINE* line)
  *  @param [in] cell    TCELL*  cell to read
  *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
  *                              0 if not 
- *  @return             char*   pointer to the big buffer (see buf.c) -- Do NOT free!
+ *  @return             char*   pointer to BUF_DATA (big buffer - see buf.c) -- Do NOT free!
  */
 char* T_cell_cont(TCELL* cell, int mode)
 {
@@ -238,7 +239,7 @@ char* T_cell_cont(TCELL* cell, int mode)
  *  @param [in] col     int     position of the cell
  *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
  *                              0 if not
- *  @return             char*   pointer to the big buffer (see buf.c)
+ *  @return             char*   pointer to BUF_DATA (big buffer - see buf.c) -- Do NOT free!
  */
 char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
 {
@@ -246,16 +247,38 @@ char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
     TCELL* cell = (TCELL*) line.tl_val;
     switch (line.tl_type)
     {
-    case KT_TITLE:
-        return(cell->tc_val);
-        break;
-    case KT_CELL:
-        return(T_cell_cont(cell + col, mode));
-        break;
-    default:
-        return(NULL);
+        case KT_TITLE:
+            return(cell->tc_val);
+            break;
+        case KT_CELL:
+            return(T_cell_cont(cell + col, mode));
+            break;
+        default:
+            return(NULL);
     }
 }
+
+
+/**
+ *  Returns the formated contents of a TBL divisor.
+ *
+ *  mode is set to 1 only for the TBL editor where the CELL type is deduced from the first character (" => text).
+ *
+ *  @param [in] tbl     TBL*    pointer to the table
+ *  @param [in] col     int     position of the cell in the divisor
+ *  @param [in] mode    int     1 if the text (not the LEC) must be enclosed between ""
+ *                              0 if not
+ *  @return             char*   pointer to BUF_DATA (big buffer - see buf.c) -- Do NOT free!
+ */
+
+char* T_div_cont_tbl(TBL* tbl, int col, int mode)
+{
+    TCELL* cell = (TCELL*)tbl->t_div.tl_val;;
+    return(T_cell_cont(cell + col, mode));
+}
+
+
+
 
 
 /**
