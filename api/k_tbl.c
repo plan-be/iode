@@ -40,7 +40,6 @@ int T_GRAPHDEFAULT = 0; // Replace B_GRAPHDEFAULT (JMP 12/01/2022)
 TBL *T_create(int dim)
 {
     TBL     *tbl = NULL;
-    TLINE   line;
     TCELL   *cell;
     int     i;
 
@@ -189,8 +188,6 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
  */
 TCELL *T_create_title(TBL* tbl, TLINE* line)
 {
-    int     i;
-
     line->tl_type = KT_TITLE;
     line->tl_val = SW_nalloc(sizeof(TCELL));
     ((TCELL *) line->tl_val)->tc_attr = KT_CENTER + KT_BOLD; /* JMP 11-11-93 */
@@ -276,9 +273,6 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
     TCELL* cell = (TCELL*)tbl->t_div.tl_val;;
     return(T_cell_cont(cell + col, mode));
 }
-
-
-
 
 
 /**
