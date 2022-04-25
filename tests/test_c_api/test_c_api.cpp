@@ -421,7 +421,7 @@ TEST_F(IodeCAPITest, Tests_PrintTables)
 
     // Print
     tbl = KTPTR("C8_1");
-    EXPECT_NE(tbl, 0);
+    EXPECT_NE(tbl, nullptr);
     rc = T_print_tbl(tbl, "2000:5[1;2]");
     EXPECT_EQ(rc, 0);
 
