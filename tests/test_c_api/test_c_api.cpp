@@ -8,6 +8,11 @@
 #include <filesystem>
 
 
+extern "C"
+{
+    extern char         SCR_NAME_ERR[255 + 1];
+}
+
 int W_printf(char* fmt,...)
 {
     va_list     myargs;

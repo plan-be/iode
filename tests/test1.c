@@ -7,7 +7,8 @@
  */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C" 
+{
     extern char         SCR_NAME_ERR[255 + 1];
 }
 #endif
