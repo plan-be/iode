@@ -164,7 +164,7 @@ public:
 	    done = 1;
 	
 	    IODE_assign_super_API();            // set *_super fn pointers
-	    strcpy(SCR_NAME_ERR, "iode.msg");   // message file
+	    // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub
 	    K_init_ws(0);                       // Initialises 7 empty WS
 	}
 
