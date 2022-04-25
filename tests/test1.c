@@ -528,7 +528,7 @@ void Tests_PrintTables()
     
     // Print
     tbl = KTPTR("C8_1");
-    S4ASSERT(tbl != 0, "KTPTR(\"C8_1\") not null.");
+    S4ASSERT(tbl != NULL, "KTPTR(\"C8_1\") not null.");
     rc = T_print_tbl(tbl, "2000:5[1;2]");
     S4ASSERT(rc == 0, "T_print_tbl(tbl, \"2000:5[1;2]\")");
      
