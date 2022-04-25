@@ -6,6 +6,11 @@
  *  See function Syntax() .
  */
 
+#ifdef __cplusplus
+extern "C" {
+    extern char         SCR_NAME_ERR[255 + 1];
+}
+#endif
 
 #include <stdarg.h>
 #include "iode.h"
@@ -98,7 +103,7 @@ int U_cmp_tbl(char** tbl1, char* vec)
     int     i, rc = 0;
     char**  tbl2;
 
-    tbl2 = (char**) SCR_vtoms((unsigned char*) vec, (unsigned char*) " ;,");
+    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) " ;,");
     if(tbl1 == NULL) {
         if(tbl2 == NULL) return(-1);
         goto fin;
@@ -115,8 +120,7 @@ fin:
 
 }
 
-void kmsg_null(char*msg) 
-{
+void kmsg_null(char*msg) {
 }
 
 
@@ -177,50 +181,39 @@ void Tests_BUF()
  */
 void U_tests_Objects()
 {
-    char* lst;
-    SAMPLE* smpl;
+    char*       lst;
+    SAMPLE*     smpl;
     IODE_REAL   A[64], B[64];
     int         nb, i, pos;
-    // C++ consider all passed string value of the kind "..." to C function as CONSTANT
-    char buf[64];
-    char buf2[64];
-
-    static int done = 0;
-
-    if (done) return;
+    static      int done = 0;
+    
+    if(done) return;
     done = 1;
-
+        
     // Create lists
-    strcpy(buf, "LST1");
-    K_add(KL_WS, buf, "A,B");
-
-    strcpy(buf, "LST2");
-    pos = K_add(KL_WS, buf, "A;B");
-    S4ASSERT(pos >= 0, "K_add(\"LST2\") = %d", pos);
-    lst = KLPTR("LST2");
-    S4ASSERT(strcmp(lst, "A;B") == 0, "KLPTR(\"LST2\") = \"%s\"", lst);
+    pos = K_add(KL_WS, "LST1", "A,B");
+    S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
+    K_add(KL_WS, "LST2", "A,B,A");
+    lst = KLPTR("LST1");
+    S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
 
     // Set the sample for the variable WS
-    strcpy(buf, "2000Y1");
-    strcpy(buf2, "2020Y1");
-    smpl = PER_atosmpl(buf, buf2);
+    smpl = PER_atosmpl("2000Y1", "2020Y1");
     KV_sample(KV_WS, smpl);
     //SW_nfree(smpl);
-
+    
     // Creates new vars
     nb = smpl->s_nb;
-    for (i = 0; i < smpl->s_nb; i++) {
-        A[i] = i;
-        B[i] = i * 2;
+    for(i = 0; i < smpl->s_nb; i++) {
+       A[i] = i;
+       B[i] = i*2;
     }
+    
+    pos = K_add(KV_WS, "A", A, &nb);
+    S4ASSERT(K_find(KV_WS, "A") >= 0,  "K_add() + K_find()");
+    pos = K_add(KV_WS, "B", B, &nb);
 
-    strcpy(buf, "A");
-    pos = K_add(KV_WS, buf, A, &nb);
-    S4ASSERT(K_find(KV_WS, "A") >= 0, "K_add() + K_find()");
-
-    strcpy(buf, "B");
-    pos = K_add(KV_WS, buf, B, &nb);
-}
+}    
 
 /**
  *  Tests (some) LEC functions:
@@ -258,8 +251,8 @@ void Tests_LEC()
     // Create objects
     U_tests_Objects();
     
-    A = (IODE_REAL*) KVPTR("A");
-    B = (IODE_REAL*) KVPTR("B");
+    A = (IODE_REAL*)KVPTR("A");
+    B = (IODE_REAL*)KVPTR("B");
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
@@ -306,7 +299,7 @@ void Tests_ARGS()
     
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
-    S4ASSERT(U_cmp_tbl(args, "A,B"), "B_ainit_chk(\"$LST1\")");
+    S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
     SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
     
@@ -317,6 +310,27 @@ void Tests_ARGS()
     S4ASSERT(U_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
     SCR_free_tbl((unsigned char**) args);
 }
+
+///**
+// *  Tests argument expansion ALD
+// */
+//void Tests_ARGS_ALD()
+//{
+//    char **args;
+//    char *list[] = {"A1", "A2", 0};
+//    char filename[256];
+//    int  pos;
+//    
+//    
+//    // Create list
+//    pos = K_add(KL_WS, "LST1", "A,B");
+// 
+//    // A_init
+//    args = B_ainit_chk("$LST1", NULL, 0);
+//    S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
+//    SCR_free_tbl(args);
+//}
+//
 
 void Tests_ERRMSGS() 
 {
@@ -380,14 +394,14 @@ void Tests_TBL32_64()
     pos = K_find(kdb_tbl, "GFRPC");
     c_table = KTVAL(kdb_tbl, pos);
 
-    // get title
-    cell_content = T_cell_cont_tbl(c_table, 0, 0, 1);
-    printf("Title %s\n", cell_content);
-
-    // get cell content
-    for (col = 0; col < c_table->t_nc; col++) {
-        cell_content = T_cell_cont_tbl(c_table, 1, col, 1);
-        printf("Cell %d:%s\n", col, cell_content);
+    // divider
+    cells = (TCELL*) c_table->t_div.tl_val;
+    printf("Address(cells) =     %0x\nAddress(cells + 1) = %0x\n", cells, cells + 1);
+    printf("Diff(cells, cells+1) = %d\n", (char*)(cells + 1) - (char*)(cells));
+    
+    for(col = 0; col < c_table->t_nc; col++) {
+        cell_content = T_cell_cont(&cells[col], 1);
+        printf("Cell %d:%s\n",col, cell_content);
     }
 }
 
@@ -409,11 +423,9 @@ void Tests_Simulation()
                 *kdbs;
     SAMPLE      *smpl;
     char        *filename = "fun";
-    char**      endo_exo;
+    U_ch**      endo_exo;
     int         rc;
     LIS         lst, expected_lst;
-    char        buf[64];
-    char        buf2[64];
     
     // Loads 3 WS and check ok
     K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, filename);
@@ -431,25 +443,20 @@ void Tests_Simulation()
     S4ASSERT(U_cmp_str(lst, NULL), "_DIVER=NULL", lst);
     
     // Simulation std parameters
-
-    strcpy(buf, "2000Y1");
-    strcpy(buf2, "2002Y1");
-    smpl = PER_atosmpl(buf, buf2);
+    smpl = PER_atosmpl("2000Y1", "2002Y1");
     KSIM_EPS = 0.0001;
     KSIM_MAXIT = 100;
     KSIM_RELAX = 0.7;
     KSIM_SORT = SORT_BOTH;
     KSIM_PASSES = 5; 
     KSIM_DEBUG = 1;
-    
-    //kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
-    
+
+    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
     
     // Test simulation : divergence
     KSIM_MAXIT = 2;
     rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     S4ASSERT(rc != 0, "K_simul() with only maxit=%d does not converge", KSIM_MAXIT);
-    
     
     // Check _PRE list after simulation (prolog)
     lst = KLPTR("_PRE");
@@ -468,7 +475,6 @@ void Tests_Simulation()
     rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     S4ASSERT(rc == 0, "K_simul() with maxit=%d does converge",KSIM_MAXIT);
 
-    
     // Test Endo-exo
     
     // Version avec échange dans une seule équation
@@ -478,8 +484,6 @@ void Tests_Simulation()
     // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
     // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
 
-    // DOES NOT WORK (YET)
-    /*
     // Version avec échange dans min 2 equations
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
@@ -487,8 +491,8 @@ void Tests_Simulation()
     KV_set_at_aper("UY", "2002Y1", 680.0);
 
     // Simulate with exchange UY - XNATY
-    endo_exo = (char**) SCR_vtoms((unsigned char*) "UY-XNATY", (unsigned char*) ",; ");
-    rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
+    endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, (char**)endo_exo, NULL);
     
     // Check result
     S4ASSERT(rc == 0, "Exchange UY-XNATY converges on 2000Y1-2002Y1");
@@ -496,9 +500,8 @@ void Tests_Simulation()
     S4ASSERT(fabs(KV_get_at_aper("XNATY", "2000Y1") - 0.800) < 0.01, "Exchange UY-XNATY: XNATY[2000Y1] == 0.800");
 
     // Cleanup
-    SCR_free_tbl((unsigned char**) endo_exo);
+    SCR_free_tbl(endo_exo);
     SCR_free(smpl);
-    */
 }
 
 
@@ -526,7 +529,8 @@ void Tests_PrintTables()
     tbl = KTPTR("C8_1");
     S4ASSERT(tbl != 0, "KTPTR(\"C8_1\") not null.");
     rc = T_print_tbl(tbl, "2000:5[1;2]");
-    
+    S4ASSERT(rc == 0, "T_print_tbl(tbl, \"2000:5[1;2]\")");
+     
     // Cleanup
     T_free(tbl);
     K_load_RWS(2, NULL);
@@ -559,7 +563,7 @@ void U_test_init()
     done = 1;
     
     IODE_assign_super_API();            // set *_super fn pointers
-    //strcpy(SCR_NAME_ERR, "iode.msg");   // message file
+    strcpy(SCR_NAME_ERR, "iode.msg");   // message file
     K_init_ws(0);                       // Initialises 7 empty WS
 }
 
@@ -595,6 +599,7 @@ int main(int argc, char **argv)
     Tests_Simulation();
     Tests_PrintTables();
     
+    return(0);
 //    B_ReportLine("$show coucou");
 }
 

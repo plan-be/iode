@@ -24,10 +24,6 @@ int W_printf(char* fmt,...)
     return(0);
 }
 
-void kmsg_null(char*msg)
-{
-}
-
 
 
 class IodeCAPITest : public ::testing::Test 
@@ -67,7 +63,7 @@ public:
 	    int     i, rc = 0;
 	    char**  tbl2;
 	
-	    tbl2 = (char**) SCR_vtoms((unsigned char*) vec, (unsigned char*) " ;,");
+	    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) " ;,");
 	    if(tbl1 == NULL) {
 	        if(tbl2 == NULL) return(-1);
 	        goto fin;
@@ -86,49 +82,38 @@ public:
 
 	void U_tests_Objects()
 	{
-	    char* lst;
-	    SAMPLE* smpl;
+	    char*       lst;
+	    SAMPLE*     smpl;
 	    IODE_REAL   A[64], B[64];
 	    int         nb, i, pos;
-	    // C++ consider all passed string value of the kind "..." to C function as CONSTANT
-	    char buf[64];
-	    char buf2[64];
+	    static      int done = 0;
 	
-	    static int done = 0;
-	
-	    if (done) return;
+	    if(done) return;
 	    done = 1;
 	
 	    // Create lists
-	    strcpy(buf, "LST1");
-	    K_add(KL_WS, buf, "A,B");
-	
-	    strcpy(buf, "LST2");
-	    pos = K_add(KL_WS, buf, "A;B");
+	    pos = K_add(KL_WS, "LST1", "A,B");
 	    EXPECT_TRUE(pos >= 0);
-	    lst = KLPTR("LST2");
-	    EXPECT_EQ(strcmp(lst, "A;B"), 0);
+	    K_add(KL_WS, "LST2", "A,B,A");
+	    lst = KLPTR("LST1");
+	    EXPECT_EQ(strcmp(lst, "A,B"), 0);
 	
 	    // Set the sample for the variable WS
-	    strcpy(buf, "2000Y1");
-	    strcpy(buf2, "2020Y1");
-	    smpl = PER_atosmpl(buf, buf2);
+	    smpl = PER_atosmpl("2000Y1", "2020Y1");
 	    KV_sample(KV_WS, smpl);
 	    //SW_nfree(smpl);
 	
 	    // Creates new vars
 	    nb = smpl->s_nb;
-	    for (i = 0; i < smpl->s_nb; i++) {
-	        A[i] = i;
-	        B[i] = i * 2;
+	    for(i = 0; i < smpl->s_nb; i++) {
+	       A[i] = i;
+	       B[i] = i*2;
 	    }
 	
-	    strcpy(buf, "A");
-	    pos = K_add(KV_WS, buf, A, &nb);
+	    pos = K_add(KV_WS, "A", A, &nb);
 	    EXPECT_TRUE(K_find(KV_WS, "A") >= 0);
+	    pos = K_add(KV_WS, "B", B, &nb);
 	
-	    strcpy(buf, "B");
-	    pos = K_add(KV_WS, buf, B, &nb);
 	}
 
 	void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
@@ -170,7 +155,7 @@ public:
 	    done = 1;
 	
 	    IODE_assign_super_API();            // set *_super fn pointers
-	    //strcpy(SCR_NAME_ERR, "iode.msg");   // message file
+	    strcpy(SCR_NAME_ERR, "iode.msg");   // message file
 	    K_init_ws(0);                       // Initialises 7 empty WS
 	}
 
@@ -198,8 +183,8 @@ TEST_F(IodeCAPITest, Tests_LEC)
     // Create objects
     U_tests_Objects();
 
-    A = (IODE_REAL*) KVPTR("A");
-    B = (IODE_REAL*) KVPTR("B");
+    A = (IODE_REAL*)KVPTR("A");
+    B = (IODE_REAL*)KVPTR("B");
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
@@ -241,7 +226,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
 
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
-    EXPECT_TRUE(U_cmp_tbl(args, "A,B"));
+    EXPECT_TRUE(U_cmp_tbl(args, "A;B"));
     SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
 
@@ -309,14 +294,14 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     pos = K_find(kdb_tbl, "GFRPC");
     c_table = KTVAL(kdb_tbl, pos);
 
-    // get title
-    cell_content = T_cell_cont_tbl(c_table, 0, 0, 1);
-    printf("Title %s\n", cell_content);
+    // divider
+    cells = (TCELL*) c_table->t_div.tl_val;
+    printf("Address(cells) =     %0x\nAddress(cells + 1) = %0x\n", cells, cells + 1);
+    printf("Diff(cells, cells+1) = %d\n", (char*)(cells + 1) - (char*)(cells));
 
-    // get cell content
-    for (col = 0; col < c_table->t_nc; col++) {
-        cell_content = T_cell_cont_tbl(c_table, 1, col, 1);
-        printf("Cell %d:%s\n", col, cell_content);
+    for(col = 0; col < c_table->t_nc; col++) {
+        cell_content = T_cell_cont(&cells[col], 1);
+        printf("Cell %d:%s\n",col, cell_content);
     }
 }
 
@@ -328,11 +313,9 @@ TEST_F(IodeCAPITest, Tests_Simulation)
                 *kdbs;
     SAMPLE      *smpl;
     char        *filename = "fun";
-    char**      endo_exo;
+    U_ch**      endo_exo;
     int         rc;
     LIS         lst, expected_lst;
-    char        buf[64];
-    char        buf2[64];
 
     // Loads 3 WS and check ok
     K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, filename);
@@ -350,10 +333,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_TRUE(U_cmp_str(lst, NULL));
 
     // Simulation std parameters
-
-    strcpy(buf, "2000Y1");
-    strcpy(buf2, "2002Y1");
-    smpl = PER_atosmpl(buf, buf2);
+    smpl = PER_atosmpl("2000Y1", "2002Y1");
     KSIM_EPS = 0.0001;
     KSIM_MAXIT = 100;
     KSIM_RELAX = 0.7;
@@ -361,14 +341,12 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     KSIM_PASSES = 5;
     KSIM_DEBUG = 1;
 
-    //kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
-
+    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
 
     // Test simulation : divergence
     KSIM_MAXIT = 2;
     rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     EXPECT_NE(rc, 0);
-
 
     // Check _PRE list after simulation (prolog)
     lst = KLPTR("_PRE");
@@ -387,7 +365,6 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     EXPECT_EQ(rc, 0);
 
-
     // Test Endo-exo
 
     // Version avec Ã©change dans une seule Ã©quation
@@ -397,7 +374,6 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
     // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
 
-    /*
     // Version avec Ã©change dans min 2 equations
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
@@ -405,8 +381,8 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     KV_set_at_aper("UY", "2002Y1", 680.0);
 
     // Simulate with exchange UY - XNATY
-    endo_exo = (char**) SCR_vtoms((unsigned char*) "UY-XNATY", (unsigned char*) ",; ");
-    rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
+    endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
+    rc = K_simul(kdbe, kdbv, kdbs, smpl, (char**)endo_exo, NULL);
 
     // Check result
     EXPECT_EQ(rc, 0);
@@ -414,9 +390,40 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_TRUE(fabs(KV_get_at_aper("XNATY", "2000Y1") - 0.800) < 0.01);
 
     // Cleanup
-    SCR_free_tbl((unsigned char**) endo_exo);
+    SCR_free_tbl(endo_exo);
     SCR_free(smpl);
-    */
+}
+
+
+TEST_F(IodeCAPITest, Tests_PrintTables)
+{
+    char    fullfilename[256];
+    KDB     *kdbv, *kdbt;
+    TBL     *tbl;
+    int     rc;
+
+    // Load the VAR workspace
+    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
+    EXPECT_NE(kdbv, nullptr);
+
+    // Load the TBL workspace
+    K_WS[K_TBL] = kdbt  = U_test_K_interpret(K_TBL, "fun.tbl");
+    EXPECT_NE(kdbt, nullptr);
+
+    // Load a second VAR workspace in K_RWS[K_VAR][2]
+    sprintf(fullfilename,  "%s\\%s", input_test_dir, "fun.var");
+    rc = K_load_RWS(2, fullfilename);
+    EXPECT_EQ(rc, 0);
+
+    // Print
+    tbl = KTPTR("C8_1");
+    EXPECT_NE(tbl, 0);
+    rc = T_print_tbl(tbl, "2000:5[1;2]");
+    EXPECT_EQ(rc, 0);
+
+    // Cleanup
+    T_free(tbl);
+    K_load_RWS(2, NULL);
 }
 
 
