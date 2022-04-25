@@ -24,6 +24,10 @@ int W_printf(char* fmt,...)
     return(0);
 }
 
+void kmsg_null(char*msg)
+{
+}
+
 
 
 class IodeCAPITest : public ::testing::Test 
@@ -86,7 +90,7 @@ public:
 	    SAMPLE*     smpl;
 	    IODE_REAL   A[64], B[64];
 	    int         nb, i, pos;
-	    static      int done = 0;
+	    static int  done = 0;
 	
 	    if(done) return;
 	    done = 1;

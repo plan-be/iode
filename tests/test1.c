@@ -120,7 +120,8 @@ fin:
 
 }
 
-void kmsg_null(char*msg) {
+void kmsg_null(char*msg) 
+{
 }
 
 
@@ -185,7 +186,7 @@ void U_tests_Objects()
     SAMPLE*     smpl;
     IODE_REAL   A[64], B[64];
     int         nb, i, pos;
-    static      int done = 0;
+    static int  done = 0;
     
     if(done) return;
     done = 1;
