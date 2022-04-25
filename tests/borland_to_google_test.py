@@ -196,7 +196,7 @@ public:
 """.split('\n')  
 
     # extra functions
-    list_func_to_export_as_it = ["int W_printf(char* fmt,...)", "void kmsg_null(char*msg)"]
+    list_func_to_export_as_it = ["int W_printf(char* fmt,...)", "void kmsg_null(char*msg)", "extern \"C\""]
     func_to_export_lines = []
 
     # parse input source file
