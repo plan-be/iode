@@ -78,7 +78,7 @@ TEST_F(KDBCommentsTest, Rename)
 TEST_F(KDBCommentsTest, Get)
 {
     std::string name = kdb.get_name(0);
-    Comment expected_comment("Ondernemingen: ontvangen kapitaaloverdrachten.", CP_UTF8);
+    Comment expected_comment = "Ondernemingen: ontvangen kapitaaloverdrachten.";
 
     // get by name
     EXPECT_EQ(kdb.get(name), expected_comment);
@@ -90,7 +90,7 @@ TEST_F(KDBCommentsTest, Get)
 TEST_F(KDBCommentsTest, CreateRemove)
 {
     std::string name = "NEW_COMMENT";
-    Comment new_comment("This is a new comment", CP_UTF8);
+    Comment new_comment = "This is a new comment";
 
     kdb.add(name, new_comment);
     EXPECT_EQ(kdb.get(name), new_comment);
@@ -114,7 +114,7 @@ TEST_F(KDBCommentsTest, CreateRemove)
 TEST_F(KDBCommentsTest, Update)
 {
     std::string name = kdb.get_name(0);
-    Comment new_comment("New Comment", CP_UTF8);
+    Comment new_comment = "New Comment";
 
     // by name
     kdb.update(name, new_comment);
