@@ -66,6 +66,12 @@
     <Filter Include="Header Files\popup\delegate">
       <UniqueIdentifier>{6ec2c5ad-f9fd-46c1-93d3-900171e34daa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Form Files\popup">
+      <UniqueIdentifier>{1a4e95ca-8b57-4d7d-8b93-3185aa0fc946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\view">
+      <UniqueIdentifier>{321212ce-eb9e-40a2-a7cb-6f4023033e2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -98,6 +104,48 @@
     <ClCompile Include="tabs\popup\edit_table_delegate.cpp">
       <Filter>Header Files\popup\delegate</Filter>
     </ClCompile>
+    <ClCompile Include="tabs\popup\add_comment.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\add_equation.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\add_identity.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\add_list.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\add_scalar.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\add_table.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\popup\add_variable.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\comments_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\equations_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\identities_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\lists_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\scalars_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\tables_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\variables_view.cpp">
+      <Filter>Source Files\view</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tabs\abstract_table_view.h">
@@ -114,6 +162,15 @@
     </ClInclude>
     <ClInclude Include="tabs\popup_view.h">
       <Filter>Header Files\view</Filter>
+    </ClInclude>
+    <ClInclude Include="tabs\popup\add_equation.h">
+      <Filter>Header Files\popup</Filter>
+    </ClInclude>
+    <ClInclude Include="tabs\popup\add_scalar.h">
+      <Filter>Header Files\popup</Filter>
+    </ClInclude>
+    <ClInclude Include="tabs\popup\add_table.h">
+      <Filter>Header Files\popup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +282,18 @@
     <QtMoc Include="tabs\popup\edit_table_delegate.h">
       <Filter>Header Files\popup\delegate</Filter>
     </QtMoc>
+    <QtMoc Include="tabs\popup\add_comment.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\add_identity.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\add_list.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\add_variable.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -239,11 +308,14 @@
     <QtUic Include="menu\workspace\workspace_clear.ui">
       <Filter>Form Files\menu\workspace</Filter>
     </QtUic>
+    <QtUic Include="tabs\popup\add_object.ui">
+      <Filter>Form Files\popup</Filter>
+    </QtUic>
     <QtUic Include="tabs\popup\edit_equation.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Form Files\popup</Filter>
     </QtUic>
     <QtUic Include="tabs\popup\edit_table.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Form Files\popup</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>

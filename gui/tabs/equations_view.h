@@ -5,7 +5,8 @@
 #include "popup_view.h"
 #include "equations_delegate.h"
 #include "equations_model.h"
-#include "./popup/edit_equation.h"
+#include "popup/edit_equation.h"
+#include "popup/add_equation.h"
 
 
 class EquationsView : public PopupView<EquationsModel, QIodeEditEquation>
@@ -19,5 +20,6 @@ public:
 	}
 
 public slots:
+	void new_equation();
 	void popup_edit_window(const QModelIndex& index) { open_popup_edit_window(index); }
 };

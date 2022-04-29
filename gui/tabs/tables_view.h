@@ -5,7 +5,8 @@
 #include "popup_view.h"
 #include "tables_delegate.h"
 #include "tables_model.h"
-#include "./popup/edit_table.h"
+#include "popup/edit_table.h"
+#include "popup/add_table.h"
 
 
 class TablesView : public PopupView<TablesModel, QIodeEditTable>
@@ -19,5 +20,6 @@ public:
 	}
 
 public slots:
+	void new_table();
 	void popup_edit_window(const QModelIndex& index) { open_popup_edit_window(index); }
 };
