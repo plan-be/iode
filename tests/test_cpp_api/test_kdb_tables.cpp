@@ -64,7 +64,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     kdb_var.load(input_test_dir + "fun.var");
 
     // add empty table with 2 columns
-    Table table1 = kdb.add("table1", 2);
+    Table table1 = kdb.add("TABLE1", 2);
 
     // add tables and initialize it
     std::string def = "A title";
@@ -72,11 +72,11 @@ TEST_F(KDBTablesTest, CreateRemove)
     bool mode = true;
     bool files = true;
     bool date = true;
-    Table table2 = kdb.add("table2", 2, def, vars, mode, files, date);
+    Table table2 = kdb.add("TABLE2", 2, def, vars, mode, files, date);
 
     // remove added tables
-    kdb.remove("table1");
-    kdb.remove("table2");
+    kdb.remove("TABLE1");
+    kdb.remove("TABLE2");
 }
 
 TEST_F(KDBTablesTest, Copy)
