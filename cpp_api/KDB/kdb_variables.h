@@ -3,6 +3,7 @@
 #include "kdb_abstract.h"
 #include "kdb_abstract.cpp"
 #include "../period.h"
+#include "../sample.h"
 
 
 // TODO: wrapp functions from k_wsvar.c in KDBVariables
@@ -28,6 +29,8 @@ public:
     void set_var(const int pos, const int t, const int mode, const IODE_REAL value);
 
     void set_var(const std::string& name, const int t, const int mode, const IODE_REAL value);
+
+    Sample get_sample() const;
 
     int get_nb_periods() const;
 
