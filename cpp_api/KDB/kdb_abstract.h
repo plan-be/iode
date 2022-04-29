@@ -1,6 +1,4 @@
 #pragma once
-#include <regex>
-
 #include "../utils.h"
 
 
@@ -40,19 +38,10 @@ protected:
     int get_position(const std::string& name) const
     {
         KDB* kdb = get_KDB();
+        check_name(name, type);
         int pos = K_find(kdb, const_cast<char*>(name.c_str()));
         if (pos < 0) throw std::runtime_error(type_name + " with name " + name + " does not exist.");
         return pos;
-    }
-
-    void check_name(const std::string name) const
-    {
-        if (name.size() > K_MAX_NAME) 
-            throw std::runtime_error("Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters. " + name + " = " + std::to_string(name.size()) + " characters.");
-
-        IodeRegexName nre = get_regex_name(type);
-        if ( !regex_match(name, std::regex(nre.regex)) ) 
-            throw std::runtime_error(type_name + " name must only contains " + nre.type + " letters, digits and underscore. " + name + " is invalid.");
     }
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
