@@ -54,6 +54,13 @@ TEST_F(KDBVariablesTest, GetValue)
     EXPECT_FALSE(L_ISAN(value));
 }
 
+TEST_F(KDBVariablesTest, GetSample)
+{
+    Sample sample = kdb.get_sample();
+    Sample expected_sample("1960Y1", "2015Y1");
+    EXPECT_EQ(sample.to_string(), expected_sample.to_string());
+}
+
 TEST_F(KDBVariablesTest, GetNbPeriods)
 {
     int expected_nb_periods = 56;
