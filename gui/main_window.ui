@@ -49,27 +49,75 @@
        <attribute name="title">
         <string>Comments</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="CommentsView" name="tableview_comments">
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustIgnored</enum>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <attribute name="verticalHeaderVisible">
-           <bool>false</bool>
-          </attribute>
-          <attribute name="verticalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-         </widget>
-        </item>
-       </layout>
+       <widget class="CommentsView" name="tableview_comments">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustIgnored</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addCommentButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New Comment </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_equations">
        <attribute name="title">
@@ -78,10 +126,10 @@
        <widget class="EquationsView" name="tableview_equations">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>958</width>
-          <height>592</height>
+          <x>11</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
          </rect>
         </property>
         <property name="sizeAdjustPolicy">
@@ -99,6 +147,44 @@
         <attribute name="verticalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addEquationButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New Equation </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_identities">
@@ -108,10 +194,10 @@
        <widget class="IdentitiesView" name="tableview_identities">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>958</width>
-          <height>592</height>
+          <x>11</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
          </rect>
         </property>
         <property name="sizeAdjustPolicy">
@@ -129,6 +215,44 @@
         <attribute name="verticalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addIdentityButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New Identity </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_lists">
@@ -138,10 +262,10 @@
        <widget class="ListsView" name="tableview_lists">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>958</width>
-          <height>592</height>
+          <x>11</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
          </rect>
         </property>
         <property name="sizeAdjustPolicy">
@@ -159,6 +283,44 @@
         <attribute name="verticalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_3">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addListButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New List </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_scalars">
@@ -168,10 +330,10 @@
        <widget class="ScalarsView" name="tableview_scalars">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>958</width>
-          <height>592</height>
+          <x>11</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
          </rect>
         </property>
         <property name="sizeAdjustPolicy">
@@ -189,6 +351,44 @@
         <attribute name="verticalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_4">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addScalarButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New Scalar </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_tables">
@@ -198,10 +398,10 @@
        <widget class="TablesView" name="tableview_tables">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>958</width>
-          <height>592</height>
+          <x>11</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
          </rect>
         </property>
         <property name="sizeAdjustPolicy">
@@ -220,6 +420,44 @@
          <bool>true</bool>
         </attribute>
        </widget>
+       <widget class="QWidget" name="layoutWidget_5">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addTableButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New Table </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_variables">
        <attribute name="title">
@@ -228,10 +466,10 @@
        <widget class="VariablesView" name="tableview_variables">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>958</width>
-          <height>592</height>
+          <x>11</x>
+          <y>43</y>
+          <width>951</width>
+          <height>561</height>
          </rect>
         </property>
         <property name="sizeAdjustPolicy">
@@ -249,6 +487,44 @@
         <attribute name="verticalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_6">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>11</y>
+          <width>951</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>828</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addVariableButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string> New Variable  </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>
@@ -1023,36 +1299,57 @@
    <class>CommentsView</class>
    <extends>QTableView</extends>
    <header>./tabs/comments_view.h</header>
+   <slots>
+    <slot>new_comment()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>ListsView</class>
    <extends>QTableView</extends>
    <header>./tabs/lists_view.h</header>
+   <slots>
+    <slot>new_list()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>IdentitiesView</class>
    <extends>QTableView</extends>
    <header>./tabs/identities_view.h</header>
+   <slots>
+    <slot>new_identity()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>EquationsView</class>
    <extends>QTableView</extends>
    <header>./tabs/equations_view.h</header>
+   <slots>
+    <slot>new_equation()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>TablesView</class>
    <extends>QTableView</extends>
    <header>./tabs/tables_view.h</header>
+   <slots>
+    <slot>new_table()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>ScalarsView</class>
    <extends>QTableView</extends>
    <header>./tabs/scalars_view.h</header>
+   <slots>
+    <slot>new_scalar()</slot>
+   </slots>
   </customwidget>
   <customwidget>
    <class>VariablesView</class>
    <extends>QTableView</extends>
    <header>./tabs/variables_view.h</header>
+   <slots>
+    <slot>new_variable()</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -1774,6 +2071,118 @@
     <hint type="destinationlabel">
      <x>458</x>
      <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addCommentButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_comments</receiver>
+   <slot>new_comment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>887</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>818</x>
+     <y>117</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addVariableButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_variables</receiver>
+   <slot>new_variable()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>904</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>847</x>
+     <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addTableButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_tables</receiver>
+   <slot>new_table()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>903</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>857</x>
+     <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addScalarButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_scalars</receiver>
+   <slot>new_scalar()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>908</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>843</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addListButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_lists</receiver>
+   <slot>new_list()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>920</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>842</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addIdentityButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_identities</receiver>
+   <slot>new_identity()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>905</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>824</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addEquationButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tableview_equations</receiver>
+   <slot>new_equation()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>909</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>832</x>
+     <y>137</y>
     </hint>
    </hints>
   </connection>

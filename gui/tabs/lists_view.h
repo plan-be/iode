@@ -5,6 +5,7 @@
 #include "abstract_table_view.h"
 #include "lists_model.h"
 #include "lists_delegate.h"
+#include "popup/add_list.h"
 
 
 class ListsView : public AbstractTableView<ListsModel>
@@ -13,4 +14,7 @@ class ListsView : public AbstractTableView<ListsModel>
 
 public:
 	ListsView(QWidget* parent = nullptr) : AbstractTableView(I_LISTS, new ListsDelegate(parent), parent) {};
+
+public slots:
+	void new_list();
 };

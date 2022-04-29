@@ -168,11 +168,25 @@
     <ClCompile Include="menu\workspace\workspace_clear.cpp" />
     <ClCompile Include="menu\workspace\workspace_load.cpp" />
     <ClCompile Include="menu\workspace\workspace_save.cpp" />
+    <ClCompile Include="tabs\comments_view.cpp" />
+    <ClCompile Include="tabs\equations_view.cpp" />
+    <ClCompile Include="tabs\identities_view.cpp" />
+    <ClCompile Include="tabs\lists_view.cpp" />
+    <ClCompile Include="tabs\popup\add_comment.cpp" />
+	<ClCompile Include="tabs\popup\add_equation.cpp" />
+    <ClCompile Include="tabs\popup\add_identity.cpp" />
+    <ClCompile Include="tabs\popup\add_list.cpp" />
+    <ClCompile Include="tabs\popup\add_scalar.cpp" />
+    <ClCompile Include="tabs\popup\add_table.cpp" />
+    <ClCompile Include="tabs\popup\add_variable.cpp" />
     <ClCompile Include="tabs\popup\edit_equation.cpp" />
     <ClCompile Include="tabs\popup\edit_table.cpp" />
     <ClCompile Include="tabs\popup\edit_table_delegate.cpp" />
     <ClCompile Include="tabs\popup\edit_table_model.cpp" />
     <ClCompile Include="tabs\popup\edit_table_view.cpp" />
+    <ClCompile Include="tabs\scalars_view.cpp" />
+    <ClCompile Include="tabs\tables_view.cpp" />
+    <ClCompile Include="tabs\variables_view.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="menu\workspace\workspace_load.h" />
@@ -192,6 +206,13 @@
     <QtMoc Include="tabs\popup\edit_table_model.h" />
     <QtMoc Include="tabs\popup\edit_table.h" />
     <QtMoc Include="tabs\popup\edit_table_delegate.h" />
+    <QtMoc Include="tabs\popup\add_comment.h" />
+    <ClInclude Include="tabs\popup\add_equation.h" />
+    <QtMoc Include="tabs\popup\add_identity.h" />
+    <QtMoc Include="tabs\popup\add_list.h" />
+    <ClInclude Include="tabs\popup\add_scalar.h" />
+    <ClInclude Include="tabs\popup\add_table.h" />
+    <QtMoc Include="tabs\popup\add_variable.h" />
     <ClInclude Include="tabs\popup_view.h" />
     <ClInclude Include="util\double_validator.h" />
     <ClInclude Include="wrapper_classes.h" />
@@ -222,6 +243,7 @@
     <QtUic Include="menu\workspace\workspace_clear.ui" />
     <QtUic Include="menu\workspace\workspace_load.ui" />
     <QtUic Include="menu\workspace\workspace_save.ui" />
+    <QtUic Include="tabs\popup\add_object.ui" />
     <QtUic Include="tabs\popup\edit_equation.ui" />
     <QtUic Include="tabs\popup\edit_table.ui" />
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "abstract_table_view.h"
 #include "variables_model.h"
 #include "variables_delegate.h"
+#include "popup/add_variable.h"
 
 
 class VariablesView : public AbstractTableView<VariablesModel>
@@ -13,4 +14,7 @@ class VariablesView : public AbstractTableView<VariablesModel>
 
 public:
 	VariablesView(QWidget* parent = nullptr) : AbstractTableView(I_VARIABLES, new VariablesDelegate(parent), parent) {};
+
+public slots:
+	void new_variable();
 };
