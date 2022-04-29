@@ -57,9 +57,15 @@ void KDBVariables::set_var(const std::string& name, const int t, const int mode,
 	set_var(pos, t, mode, value);
 }
 
+Sample KDBVariables::get_sample() const
+{
+	if (KSMPL(get_KDB())) return Sample(KSMPL(get_KDB()));
+	else throw std::runtime_error("No sample has been defined.");
+}
+
 int KDBVariables::get_nb_periods() const
 {
-    return KSMPL(get_KDB())->s_nb;
+    return get_sample().nb_periods();
 }
 
 Period KDBVariables::get_period(const int t) const
