@@ -74,6 +74,15 @@ TEST_F(KDBCommentsTest, Rename)
     EXPECT_EQ(kdb.get_name(new_pos), "NEW_POS");
 }
 
+TEST_F(KDBCommentsTest, Contains)
+{
+    // name exists
+    EXPECT_TRUE(kdb.contains("ACAF"));
+
+    // name doesn't exist
+    EXPECT_FALSE(kdb.contains("UNKNOWN"));
+}
+
 
 TEST_F(KDBCommentsTest, Get)
 {
