@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include <string>
+#include <regex>
 #include <stdexcept>
 // requires C++17 
 #include <filesystem>
@@ -57,6 +58,44 @@ inline std::string oem_to_utf8(const std::string str_oem)
 inline std::string utf8_to_oem(const std::string str_utf8)
 {
     return convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
+}
+
+static IodeRegexName get_regex_name(const EnumIodeType type)
+{
+    IodeRegexName nre;
+    if (type == I_COMMENTS)
+    {
+        nre.regex = "A-Za-z";
+        nre.type = "capital or lowercase";
+    }
+    else if (type == I_SCALARS)
+    {
+        nre.regex = "a-z";
+        nre.type = "lowercase";
+    }
+    else
+    {
+        nre.regex = "A-Z";
+        nre.type = "capital";
+    }
+
+    // see https://www.cplusplus.com/reference/regex/ECMAScript for regex syntax
+    nre.regex = "[" + nre.regex + "_][" + nre.regex + "0-9_]{0," + std::to_string(K_MAX_NAME - 1) + "}";
+
+    return nre;
+}
+
+inline void check_name(const std::string name, const EnumIodeType type)
+{
+    if (name.empty())
+        throw std::runtime_error("Empty name.");
+
+    if (name.size() > K_MAX_NAME)
+        throw std::runtime_error("Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters. " + name + " = " + std::to_string(name.size()) + " characters.");
+
+    IodeRegexName nre = get_regex_name(type);
+    if (!regex_match(name, std::regex(nre.regex)))
+        throw std::runtime_error(vIodeTypes[type] + " name must only contains " + nre.type + " letters, digits and underscore. " + name + " is invalid.");
 }
 
 

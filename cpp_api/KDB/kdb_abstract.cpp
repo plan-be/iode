@@ -33,7 +33,7 @@ int KDBAbstract<T>::set_name(const int pos, const std::string& new_name)
 template<class T>
 int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_name)
 {
-    check_name(new_name);
+    check_name(new_name, type);
 
     KDB* kdb = get_KDB();
     char* c_old_name = const_cast<char*>(old_name.c_str());
@@ -57,7 +57,7 @@ int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_n
 template<class T>
 void KDBAbstract<T>::add(const std::string& name, const T& obj)
 {
-    check_name(name);
+    check_name(name, type);
     
     // throw exception if object with passed name already exist
     char* c_name = const_cast<char*>(name.c_str());
@@ -77,9 +77,7 @@ T KDBAbstract<T>::copy(const int pos) const
 
 template<class T>
 T KDBAbstract<T>::copy(const std::string& name) const
-{
-    check_name(name);
-    
+{   
     // throw exception if object with passed name does not exist
     T obj = get(name);
     return copy_obj(obj);
