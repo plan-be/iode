@@ -67,6 +67,8 @@ public:
 
     int rename(const std::string& old_name, const std::string& new_name);
 
+    bool contains(const std::string& name) { return K_find(get_KDB(), const_cast<char*>(name.c_str())) >= 0; }
+
     // CRUD (Create - Read - Update - Delete) + Copy methods
 
     void add(const std::string& name, const T& obj);
