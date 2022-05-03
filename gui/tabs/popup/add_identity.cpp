@@ -5,8 +5,11 @@ QIodeAddIdentity::QIodeAddIdentity(QWidget* parent, Qt::WindowFlags f) : QDialog
 {
 	setupUi(this);
 
-	titleLabel->setText("Add Identity");
-	definitionLabel->setText("Identity");
+	label_title->setText("Add Identity");
+	label_definition->setText("Identity");
+
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_IDENTITIES, REQUIRED_FIELD);
+	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 
 void QIodeAddIdentity::add()
@@ -14,8 +17,8 @@ void QIodeAddIdentity::add()
 	try
 	{
 		KDBIdentities kdb;
-		std::string name = nameLineEdit->text().toStdString();
-		std::string identity = definitionLineEdit->text().toStdString();
+		std::string name = lineName->extractAndVerify().toStdString();
+		std::string identity = lineDefinition->extractAndVerify().toStdString();
 		kdb.add(name, identity);
 		this->accept();
 	}
@@ -24,3 +27,10 @@ void QIodeAddIdentity::add()
 		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 	}
 }
+
+void QIodeAddIdentity::help()
+{
+	QUrl url = get_url_iode_manual();
+	QDesktopServices::openUrl(url);
+}
+

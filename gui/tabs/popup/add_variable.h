@@ -6,6 +6,7 @@
 #include <string>
 
 #include "ui_add_object.h"
+#include "edit_vars_sample.h"
 #include "../../utils.h"
 #include "../../wrapper_classes.h"
 
@@ -20,7 +21,7 @@ class QIodeAddVariable : public QDialog, public Ui::QIodeAddObject
 {
     Q_OBJECT
 
-    WrapperQLineEdit* lineName;
+    WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineDefinition;
 
 public:
@@ -28,4 +29,5 @@ public:
 
 public slots:
     void add();
+    void help();
 };

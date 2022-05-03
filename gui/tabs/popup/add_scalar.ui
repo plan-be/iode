@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeAddObject</class>
- <widget class="QDialog" name="QIodeAddObject">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
+ <class>QIodeAddScalar</class>
+ <widget class="QDialog" name="QIodeAddScalar">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>599</width>
-    <height>182</height>
+    <width>485</width>
+    <height>161</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Add IODE Object</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <property name="modal">
-   <bool>true</bool>
+  <property name="windowTitle">
+   <string>Add Scalar</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>11</x>
      <y>11</y>
-     <width>571</width>
-     <height>161</height>
+     <width>461</width>
+     <height>141</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QLabel" name="label_title">
+     <widget class="QLabel" name="titleLabel">
       <property name="palette">
        <palette>
         <active>
@@ -88,7 +88,7 @@
        <number>2</number>
       </property>
       <property name="text">
-       <string>Add Iode Object</string>
+       <string>Add Scalar</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -105,6 +105,12 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="label_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Name</string>
         </property>
@@ -121,31 +127,65 @@
        </widget>
       </item>
       <item>
-       <spacer name="spacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QLabel" name="label_value">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>318</width>
-          <height>31</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_definition">
         <property name="text">
-         <string>Definition</string>
+         <string>Value</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_definition"/>
+       <widget class="QLineEdit" name="lineEdit_value">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_relax">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Relax</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_relax">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -224,50 +264,50 @@
  <resources/>
  <connections>
   <connection>
-   <sender>cancelButton</sender>
+   <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddObject</receiver>
-   <slot>reject()</slot>
+   <receiver>QIodeAddScalar</receiver>
+   <slot>add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>369</x>
-     <y>253</y>
+     <x>98</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>179</x>
-     <y>282</y>
+     <x>28</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>okButton</sender>
+   <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddObject</receiver>
-   <slot>add()</slot>
+   <receiver>QIodeAddScalar</receiver>
+   <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
-     <y>253</y>
+     <x>244</x>
+     <y>110</y>
     </hint>
     <hint type="destinationlabel">
-     <x>96</x>
-     <y>254</y>
+     <x>182</x>
+     <y>110</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddObject</receiver>
+   <receiver>QIodeAddScalar</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>347</x>
-     <y>131</y>
+     <x>378</x>
+     <y>110</y>
     </hint>
     <hint type="destinationlabel">
-     <x>299</x>
-     <y>83</y>
+     <x>316</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>

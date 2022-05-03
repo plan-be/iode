@@ -116,9 +116,6 @@
     <ClCompile Include="tabs\popup\add_comment.cpp">
       <Filter>Source Files\popup</Filter>
     </ClCompile>
-    <ClCompile Include="tabs\popup\add_equation.cpp">
-      <Filter>Source Files\popup</Filter>
-    </ClCompile>
     <ClCompile Include="tabs\popup\add_identity.cpp">
       <Filter>Source Files\popup</Filter>
     </ClCompile>
@@ -155,6 +152,9 @@
     <ClCompile Include="tabs\variables_view.cpp">
       <Filter>Source Files\view</Filter>
     </ClCompile>
+    <ClCompile Include="tabs\popup\edit_vars_sample.cpp">
+      <Filter>Source Files\popup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tabs\abstract_table_view.h">
@@ -171,15 +171,6 @@
     </ClInclude>
     <ClInclude Include="tabs\popup_view.h">
       <Filter>Header Files\view</Filter>
-    </ClInclude>
-    <ClInclude Include="tabs\popup\add_equation.h">
-      <Filter>Header Files\popup</Filter>
-    </ClInclude>
-    <ClInclude Include="tabs\popup\add_scalar.h">
-      <Filter>Header Files\popup</Filter>
-    </ClInclude>
-    <ClInclude Include="tabs\popup\add_table.h">
-      <Filter>Header Files\popup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +294,15 @@
     <QtMoc Include="tabs\popup\add_variable.h">
       <Filter>Header Files\popup</Filter>
     </QtMoc>
+    <QtMoc Include="tabs\popup\edit_vars_sample.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\add_scalar.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="tabs\popup\add_table.h">
+      <Filter>Header Files\popup</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui">
@@ -324,6 +324,15 @@
       <Filter>Form Files\popup</Filter>
     </QtUic>
     <QtUic Include="tabs\popup\edit_table.ui">
+      <Filter>Form Files\popup</Filter>
+    </QtUic>
+    <QtUic Include="tabs\popup\edit_vars_sample.ui">
+      <Filter>Form Files\popup</Filter>
+    </QtUic>
+    <QtUic Include="tabs\popup\add_scalar.ui">
+      <Filter>Form Files\popup</Filter>
+    </QtUic>
+    <QtUic Include="tabs\popup\add_table.ui">
       <Filter>Form Files\popup</Filter>
     </QtUic>
   </ItemGroup>

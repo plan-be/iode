@@ -20,7 +20,7 @@ class QIodeAddIdentity : public QDialog, public Ui::QIodeAddObject
 {
     Q_OBJECT
 
-    WrapperQLineEdit* lineName;
+    WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineDefinition;
 
 public:
@@ -28,4 +28,5 @@ public:
 
 public slots:
     void add();
+    void help();
 };

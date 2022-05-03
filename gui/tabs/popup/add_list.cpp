@@ -5,8 +5,11 @@ QIodeAddList::QIodeAddList(QWidget* parent, Qt::WindowFlags f) : QDialog(parent,
 {
 	setupUi(this);
 
-	titleLabel->setText("Add List");
-	definitionLabel->setText("List");
+	label_title->setText("Add List");
+	label_definition->setText("List");
+
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_LISTS, REQUIRED_FIELD);
+	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 
 void QIodeAddList::add()
@@ -14,8 +17,8 @@ void QIodeAddList::add()
 	try
 	{
 		KDBLists kdb;
-		std::string name = nameLineEdit->text().toStdString();
-		std::string list = definitionLineEdit->text().toStdString();
+		std::string name = lineName->extractAndVerify().toStdString();
+		std::string list = lineDefinition->extractAndVerify().toStdString();
 		kdb.add(name, list);
 		this->accept();
 	}
@@ -23,4 +26,10 @@ void QIodeAddList::add()
 	{
 		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 	}
+}
+
+void QIodeAddList::help()
+{
+	QUrl url = get_url_iode_manual();
+	QDesktopServices::openUrl(url);
 }

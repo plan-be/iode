@@ -80,7 +80,7 @@
          <bool>true</bool>
         </attribute>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2097,8 +2097,8 @@
    <slot>new_variable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>79</y>
+     <x>121</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -2113,8 +2113,8 @@
    <slot>new_table()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>903</x>
-     <y>82</y>
+     <x>121</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>857</x>
@@ -2129,8 +2129,8 @@
    <slot>new_scalar()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>908</x>
-     <y>79</y>
+     <x>121</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>843</x>
@@ -2145,8 +2145,8 @@
    <slot>new_list()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>920</x>
-     <y>78</y>
+     <x>121</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>842</x>
@@ -2161,8 +2161,8 @@
    <slot>new_identity()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>905</x>
-     <y>80</y>
+     <x>121</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>824</x>
@@ -2177,8 +2177,8 @@
    <slot>new_equation()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>909</x>
-     <y>80</y>
+     <x>971</x>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
      <x>832</x>
