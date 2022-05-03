@@ -59,8 +59,21 @@ void KDBVariables::set_var(const std::string& name, const int t, const int mode,
 
 Sample KDBVariables::get_sample() const
 {
-	if (KSMPL(get_KDB())) return Sample(KSMPL(get_KDB()));
-	else throw std::runtime_error("No sample has been defined.");
+	return Sample(KSMPL(get_KDB()));
+}
+
+void KDBVariables::set_sample(const std::string& from, const std::string& to)
+{
+	Period period_from(from);
+	Period period_to(to);
+	set_sample(period_from, period_to);
+}
+
+void KDBVariables::set_sample(const Period& from, const Period& to)
+{
+	Sample sample(from, to);
+	int res = KV_sample(get_KDB(), sample.c_sample);
+	if (res < 0) throw std::runtime_error("Could not associate the sample " + sample.to_string() + " to the Variables.");
 }
 
 int KDBVariables::get_nb_periods() const

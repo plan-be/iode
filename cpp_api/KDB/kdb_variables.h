@@ -32,6 +32,10 @@ public:
 
     Sample get_sample() const;
 
+    void set_sample(const std::string& from, const std::string& to);
+
+    void set_sample(const Period& from, const Period& to);
+
     int get_nb_periods() const;
 
     Period get_period(const int t) const;
