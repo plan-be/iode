@@ -5,6 +5,9 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
 
 #include "./custom_widgets/qfilechooser.h"
 #include "./custom_widgets/qsampleedit.h"
@@ -28,7 +31,7 @@ protected:
     const EnumItemType type;
 
 public:
-    TemplateWrapper(const QString name, T& qfield, const EnumItemType& type) : name(name), qfield(qfield), type(type) {};
+    TemplateWrapper(const QString name, T& qfield, const EnumItemType type) : name(name), qfield(qfield), type(type) {};
 
     T& getQField() { return qfield; }
 
@@ -41,7 +44,7 @@ class WrapperComboBox : public TemplateWrapper<QComboBox, int>
     const QList<QString> list_values;
 
 public:
-    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType& type, const QList<QString>& list_values, bool editable = false) :
+    WrapperComboBox(const QString name, QComboBox& qfield, const EnumItemType type, const QList<QString>& list_values, bool editable = false) :
         TemplateWrapper(name, qfield, type), list_values(list_values)
     {
         qfield.addItems(list_values);
@@ -75,7 +78,7 @@ public:
 class WrapperQLineEdit : public TemplateWrapper<QLineEdit, QString>
 {
 public:
-    WrapperQLineEdit(const QString name, QLineEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
+    WrapperQLineEdit(const QString name, QLineEdit& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {
@@ -95,6 +98,42 @@ public:
 
         if (type == REQUIRED_FIELD && value.isEmpty())
             throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+
+        return value;
+    }
+};
+
+
+class WrapperIodeNameEdit : public TemplateWrapper<QLineEdit, QString>
+{
+private:
+    EnumIodeType iodeType;
+
+public:
+    WrapperIodeNameEdit(const QString name, QLineEdit& qfield, const EnumIodeType iodeType, const EnumItemType type) : TemplateWrapper(name, qfield, type), iodeType(iodeType) {};
+
+    QVariant getQValue()
+    {
+        QString value = qfield.text();
+        check_name(value.toStdString(), iodeType);
+        return QVariant(value);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        QString value = qvalue.toString();
+        check_name(value.toStdString(), iodeType);
+        qfield.setText(value);
+    }
+
+    QString extractAndVerify()
+    {
+        QString value = qfield.text();
+
+        if (type == REQUIRED_FIELD && value.isEmpty())
+            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+
+        check_name(value.toStdString(), iodeType);
 
         return value;
     }
@@ -104,7 +143,7 @@ public:
 class WrapperQTextEdit : public TemplateWrapper<QTextEdit, QString>
 {
 public:
-    WrapperQTextEdit(const QString name, QTextEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
+    WrapperQTextEdit(const QString name, QTextEdit& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {
@@ -130,12 +169,84 @@ public:
 };
 
 
+class WrapperSpinBox : public TemplateWrapper<QSpinBox, int>
+{
+public:
+    WrapperSpinBox(const QString name, QSpinBox& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
+
+    QVariant getQValue()
+    {
+        double value = qfield.value();
+        return QVariant(value);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        double value = qvalue.toDouble();
+        qfield.setValue(value);
+    }
+
+    int extractAndVerify()
+    {
+        return qfield.value();
+    }
+};
+
+
+class WrapperDoubleSpinBox : public TemplateWrapper<QDoubleSpinBox, double>
+{
+public:
+    WrapperDoubleSpinBox(const QString name, QDoubleSpinBox& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
+
+    QVariant getQValue()
+    {
+        double value = qfield.value();
+        return QVariant(value);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        double value = qvalue.toDouble();
+        qfield.setValue(value);
+    }
+
+    double extractAndVerify()
+    {
+        return qfield.value();
+    }
+};
+
+
+class WrapperCheckBox : public TemplateWrapper<QCheckBox, bool>
+{
+public:
+    WrapperCheckBox(const QString name, QCheckBox& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
+
+    QVariant getQValue()
+    {
+        double value = qfield.isChecked();
+        return QVariant(value);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        double value = qvalue.toBool();
+        qfield.setChecked(value);
+    }
+
+    bool extractAndVerify()
+    {
+        return qfield.isChecked();
+    }
+};
+
+
 // ---- Custom Widgets ----
 
 class WrapperFileChooser : public TemplateWrapper<QIodeFileChooser, QString>
 {
 public:
-    WrapperFileChooser(const QString name, QIodeFileChooser& qfield, const EnumItemType& type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
+    WrapperFileChooser(const QString name, QIodeFileChooser& qfield, const EnumItemType type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
         TemplateWrapper(name, qfield, type)
     {
         this->qfield.setFileType(fileType);
@@ -164,7 +275,7 @@ public:
 class WrapperSampleEdit : public TemplateWrapper<QIodeSampleEdit, QString>
 {
 public:
-    WrapperSampleEdit(const QString name, QIodeSampleEdit& qfield, const EnumItemType& type) : TemplateWrapper(name, qfield, type) {};
+    WrapperSampleEdit(const QString name, QIodeSampleEdit& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {

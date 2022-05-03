@@ -8,6 +8,7 @@
 #include <array>
 
 #include "ui_edit_equation.h"
+#include "edit_vars_sample.h"
 #include "../../utils.h"
 #include "../../wrapper_classes.h"
 
@@ -25,6 +26,7 @@ class QIodeEditEquation : public QDialog, public Ui::QIodeEditEquation
 
     KDBEquations kdb;
 
+    WrapperIodeNameEdit* lineName;
     WrapperComboBox* comboBoxMethod;
     WrapperSampleEdit* sampleFrom;
     WrapperSampleEdit* sampleTo;

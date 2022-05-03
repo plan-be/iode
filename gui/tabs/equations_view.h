@@ -6,7 +6,6 @@
 #include "equations_delegate.h"
 #include "equations_model.h"
 #include "popup/edit_equation.h"
-#include "popup/add_equation.h"
 
 
 class EquationsView : public PopupView<EquationsModel, QIodeEditEquation>
