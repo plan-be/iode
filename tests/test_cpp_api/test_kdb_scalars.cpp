@@ -56,17 +56,14 @@ TEST_F(KDBScalarsTest, Get)
 TEST_F(KDBScalarsTest, CreateRemove)
 {
     std::string name = "new_scalar";
-    Scalar scalar;
-    scalar.val = 0.012365879;
-    scalar.relax = 1.;
-    scalar.std = 0;
+    IODE_REAL value = 0.012365879;
+    IODE_REAL relax = 1.;
 
-    // TODO : force std to be 0 whan adding a new scalar ?
-    kdb.add(name, scalar);
+    kdb.add(name, value, relax);
     Scalar new_scalar = kdb.get(name);
-    EXPECT_DOUBLE_EQ(new_scalar.val, scalar.val);
-    EXPECT_DOUBLE_EQ(new_scalar.relax, scalar.relax);
-    EXPECT_DOUBLE_EQ(new_scalar.std, scalar.std);
+    EXPECT_DOUBLE_EQ(new_scalar.val, value);
+    EXPECT_DOUBLE_EQ(new_scalar.relax, relax);
+    EXPECT_TRUE(new_scalar.std < 1e-100);
 
     kdb.remove(name);
     EXPECT_THROW(kdb.get(name), std::runtime_error);
@@ -75,16 +72,14 @@ TEST_F(KDBScalarsTest, CreateRemove)
 TEST_F(KDBScalarsTest, Update)
 {
     std::string name = kdb.get_name(0);
-    Scalar scalar;
-    scalar.val = 0.0158;
-    scalar.relax = 0.98;
-    scalar.std = 0.00137;
+    IODE_REAL value = 0.0158;
+    IODE_REAL relax = 0.98;
 
-    kdb.update(name, scalar);
+    kdb.update(name, value, relax);
     Scalar updated_scalar = kdb.get(name);
-    EXPECT_DOUBLE_EQ(updated_scalar.val, scalar.val);
-    EXPECT_DOUBLE_EQ(updated_scalar.relax, scalar.relax);
-    EXPECT_DOUBLE_EQ(updated_scalar.std, scalar.std);
+    EXPECT_DOUBLE_EQ(updated_scalar.val, value);
+    EXPECT_DOUBLE_EQ(updated_scalar.relax, relax);
+    EXPECT_TRUE(updated_scalar.std < 1e-100);
 }
 
 TEST_F(KDBScalarsTest, Copy)
