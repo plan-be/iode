@@ -26,4 +26,6 @@ public:
     Table add(const std::string& name, const int nb_columns);
 
     Table add(const std::string& name, const int nbColumns, const std::string& def, std::vector<std::string>& vars, bool mode, bool files, bool date);
+
+    Table add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, bool mode, bool files, bool date);
 };
