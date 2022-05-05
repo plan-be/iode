@@ -9,6 +9,7 @@ template<class T>
 KDBAbstract<T>::KDBAbstract(EnumIodeType type) : type(type), type_name(vIodeTypes[type])
 {
     if (K_WS[type] == NULL) IodeInit();
+    IODE_assign_super_API();
 }
 
 // object name
