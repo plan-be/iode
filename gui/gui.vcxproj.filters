@@ -72,6 +72,15 @@
     <Filter Include="Source Files\view">
       <UniqueIdentifier>{321212ce-eb9e-40a2-a7cb-6f4023033e2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DOS\ODE">
+      <UniqueIdentifier>{cb19099a-4267-4af9-a59c-acd2fa9be160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DOS\SB">
+      <UniqueIdentifier>{b3c772df-b4bd-4fa8-bc18-783397284d8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DOS\O">
+      <UniqueIdentifier>{c3e9577c-2527-4e87-bc41-77343d0cc75f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -319,35 +328,110 @@
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="DOS\DOS_Combobox.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_ABORT.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Menu.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_EDIT.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_File.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_EST.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Profile.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_GR.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Workspace.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_HELP.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Data.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_MISC.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Compute.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_MISCV.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Print.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_SCR.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_Report.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_SCROLL.C">
+      <Filter>DOS\O</Filter>
     </Text>
-    <Text Include="DOS\DOS_XODE.txt">
-      <Filter>DOS</Filter>
+    <Text Include="DOS\O\DOS_O_TAB.C">
+      <Filter>DOS\O</Filter>
+    </Text>
+    <Text Include="DOS\O\DOS_O_VT.C">
+      <Filter>DOS\O</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Combobox.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Compute.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Data.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_File.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Menu.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Print.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Profile.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Report.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_Workspace.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\ODE\DOS_ODE_X.txt">
+      <Filter>DOS\ODE</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_DATA.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_EST.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_FILE.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_GLOBAL.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_GUI.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_IDT.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_MODEL.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_PDEST.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_PRINT.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_PROF.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_REP.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_VIEW.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_WS.C">
+      <Filter>DOS\SB</Filter>
+    </Text>
+    <Text Include="DOS\SB\DOS_SB_XODE.C">
+      <Filter>DOS\SB</Filter>
     </Text>
   </ItemGroup>
 </Project>
