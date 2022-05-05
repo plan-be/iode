@@ -63,20 +63,46 @@ TEST_F(KDBTablesTest, CreateRemove)
     KDBVariables kdb_var;
     kdb_var.load(input_test_dir + "fun.var");
 
+    KDBLists kdb_list;
+    kdb_list.load(input_test_dir + "fun.lst");
+
+    std::string list_name = "$ENVI";
+    // TODO JMP: is there a way to easily calculate the number of variables in a list ?
+    int nb_vars_envi = 10;
+
     // add empty table with 2 columns
     Table table1 = kdb.add("TABLE1", 2);
 
-    // add tables and initialize it
+    int nb_lines_header = 0;
+    int nb_lines_footnotes = 0;
+    int nb_lines_vars = 0;
+    EXPECT_EQ(table1.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
+    // add tables and initialize it (variables as list)
     std::string def = "A title";
-    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG" };
+    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG", list_name};
     bool mode = true;
     bool files = true;
     bool date = true;
     Table table2 = kdb.add("TABLE2", 2, def, vars, mode, files, date);
 
+    // check that list $ENVI has been expanded
+    nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
+    nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
+    nb_lines_vars = vars.size() + nb_vars_envi - 1;
+    EXPECT_EQ(table2.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
+    // add tables and initialize it (LEC cells as string)
+    std::string lecs = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG;" + list_name;
+    Table table3 = kdb.add("TABLE3", 2, def, lecs, mode, files, date);
+
+    // check that list $ENVI has been expanded
+    EXPECT_EQ(table3.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
     // remove added tables
     kdb.remove("TABLE1");
     kdb.remove("TABLE2");
+    kdb.remove("TABLE3");
 }
 
 TEST_F(KDBTablesTest, Copy)
