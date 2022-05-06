@@ -96,13 +96,22 @@ TEST_F(KDBVariablesTest, CreateRemove)
 {
     std::string new_name = "NEW_VAR";
     int nb_periods = kdb.get_nb_periods();
-    Variable new_var;
 
+    // pass a vector with values
+    Variable new_var;
     new_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++)
-        new_var.push_back(1.0);
+        new_var.push_back(10.0 + p);
 
     kdb.add(new_name, new_var);
+    EXPECT_EQ(kdb.get(new_name), new_var);
+
+    kdb.remove(new_name);
+    EXPECT_THROW(kdb.get(new_name), std::runtime_error);
+
+    // pass a LEC expression
+    std::string lec = "10 + t";
+    kdb.add(new_name, lec);
     EXPECT_EQ(kdb.get(new_name), new_var);
 
     kdb.remove(new_name);
@@ -113,17 +122,28 @@ TEST_F(KDBVariablesTest, Update)
 {
     std::string name = kdb.get_name(pos);
     int nb_periods = kdb.get_nb_periods();
+    std::string lec;
     Variable updated_var;
     updated_var.reserve(nb_periods);
 
     // by position
-    for (int p = 0; p < nb_periods; p++) updated_var.push_back(1.0);
+    // pass a vector with values
+    for (int p = 0; p < nb_periods; p++) updated_var.push_back(10.0 + p);
     kdb.update(pos, updated_var);
+    EXPECT_EQ(kdb.get(name), updated_var);
+    // pass a LEC expression
+    lec = "10 + t";
+    kdb.update(pos, lec);
     EXPECT_EQ(kdb.get(name), updated_var);
 
     // by name
-    for (int p = 0; p < nb_periods; p++) updated_var[p] = 0.0;
+    // pass a vector with values
+    for (int p = 0; p < nb_periods; p++) updated_var[p] = 20.0 + p;
     kdb.update(name, updated_var);
+    EXPECT_EQ(kdb.get(name), updated_var);
+    // pass a LEC expression
+    lec = "20 + t";
+    kdb.update(name, lec);
     EXPECT_EQ(kdb.get(name), updated_var);
 }
 
