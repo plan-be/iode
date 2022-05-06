@@ -9,6 +9,9 @@
 // TODO: wrapp functions from k_wsvar.c in KDBVariables
 class KDBVariables : public KDBAbstract<Variable>
 {
+private:
+    Variable compute_lec(const std::string& lec);
+
 protected:
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
@@ -29,6 +32,18 @@ public:
     void set_var(const int pos, const int t, const int mode, const IODE_REAL value);
 
     void set_var(const std::string& name, const int t, const int mode, const IODE_REAL value);
+
+    void add(const std::string& name, const Variable& variable);
+
+    void add(const std::string& name, const std::string& lec);
+
+    void update(const int pos, const Variable& variable);
+
+    void update(const int pos, const std::string& lec);
+
+    void update(const std::string& name, const Variable& variable);
+
+    void update(const std::string& name, const std::string& lec);
 
     Sample get_sample() const;
 
