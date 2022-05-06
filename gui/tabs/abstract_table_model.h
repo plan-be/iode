@@ -133,4 +133,27 @@ protected:
 			return setValue(row, column, value);
 		}
 	}
+
+	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override
+	{
+		beginRemoveRows(QModelIndex(), position, position + rows - 1);
+
+		std::string name;
+
+		try
+		{
+			for (int row = position; row < position + rows; ++row)
+			{
+				name = dataCell(row, 0).toString().toStdString();
+				kdb.remove(name);
+			}
+		}
+		catch (const std::runtime_error& e)
+		{
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		}
+
+		endRemoveRows();
+		return true;
+	}
 };
