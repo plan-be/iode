@@ -1,6 +1,15 @@
 #include "variables_view.h"
 
 
+void VariablesView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+	// if select variable name cell -> select the whole variable
+	QModelIndexList selection = selected.indexes();
+	if (selection.count() == 1 && selection.at(0).column() == 0) selectRow(selection.at(0).row());
+	else QTableView::selectionChanged(selected, deselected);
+}
+
+
 void VariablesView::new_variable()
 {
 	// check variables sample and ask to set it if not already defined
