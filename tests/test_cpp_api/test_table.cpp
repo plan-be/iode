@@ -175,6 +175,12 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->getCellAlign(7, 1), IT_DECIMAL);
     EXPECT_EQ(table->getCellFont(7, 1), IT_NORMAL);
     EXPECT_EQ(table->getCellContent(7, 1, false), "GOSG");
+
+    // is bold, italic, underline ?
+    table->setCellAttribute(7, 0, (char) IT_LEFT + IT_BOLD + IT_ITALIC);
+    EXPECT_TRUE(table->isCellBoldFont(7, 0));
+    EXPECT_TRUE(table->isCellItalicFont(7, 0));
+    EXPECT_FALSE(table->isCellUnderlineFont(7, 0));
 }
 
 TEST_F(TablesTest, LineSeparator)
