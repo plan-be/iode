@@ -6,13 +6,6 @@
  *  See function Syntax() .
  */
 
-#ifdef __cplusplus
-extern "C" 
-{
-    extern char         SCR_NAME_ERR[255 + 1];
-}
-#endif
-
 #include <stdarg.h>
 #include "iode.h"
 
@@ -38,22 +31,29 @@ void Syntax()
 
 
 // Fonctions annulées/remplacées temporairement pour passer le link
-int W_printf(char* fmt,...)
-{
-    va_list     myargs;
-    char        buf[512];
-    
-    va_start(myargs, fmt);
-#ifdef _MSC_VER   
-    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
-#else
-    vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
-#endif    
-    va_end(myargs);
-    printf("%s\n", buf);
-    return(0);
-}
 
+// Pour tester l'estimation
+#ifdef __cplusplus
+extern "C" 
+{
+#endif
+
+    extern char         SCR_NAME_ERR[255 + 1];
+
+    //int o_estgr(char** titles, SAMPLE *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
+    int B_A2mSetRtfTitle(U_ch* title) {return(0);}
+    int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
+    int B_PrintRtfTopic(char* x) { return(0); }
+    int A2mGIF_HTML() {return(0);}
+    int W_printf(char*fmt, ...) {return(0);}
+    void K_load_iode_ini() {}
+    void K_save_iode_ini() {}
+
+#ifdef __cplusplus
+}
+#endif
+
+ 
 /**
  *  Fonctions et vars de la lib S4ASSERT 
  *  ------------------------------------ 
@@ -86,6 +86,7 @@ int U_cmp_str(char* str1, char* str2)
     if(str1 == NULL || str2 == NULL) return(0);
     return(!strcmp(str1, str2));
 }
+
 
 /**
  *  Compares a table of strings to a list of strings in a semi-colon separated vector.
@@ -120,6 +121,9 @@ fin:
     return(rc);
 
 }
+
+
+void (*kmsg_super_ptr)(char*);
 
 void kmsg_null(char*msg) 
 {
@@ -217,6 +221,18 @@ void U_tests_Objects()
 
 }    
 
+int U_test_eq(double v1, double v2)
+{
+    double diff;
+    
+    if(fabs(v2) > 1e-8)
+        diff = fabs((v2 - v1) / v2);
+    else 
+        diff = fabs(v2 - v1);
+    return(diff < 1e-4);
+}
+
+
 /**
  *  Tests (some) LEC functions:
  *      - L_cc()
@@ -240,8 +256,22 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
     L_link(KV_WS, KS_WS, clec);
     calc_val = L_exec(KV_WS, KS_WS, clec, t);
     //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
-    S4ASSERT (expected_val == calc_val, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
+    S4ASSERT (U_test_eq(expected_val, calc_val), "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
 }
+
+/**
+ *  Calc a LEC expression in t
+ */
+double U_test_calc_lec(char* lec, int t)
+{
+    CLEC*   clec;
+
+    clec = L_cc(lec);
+    if(clec == NULL) return(L_NAN);
+    if(L_link(KV_WS, KS_WS, clec)) return(L_NAN);
+    return(L_exec(KV_WS, KS_WS, clec, t));
+}
+
 
 /**
  *  Tests some LEC calculations.
@@ -420,6 +450,20 @@ KDB* U_test_K_interpret(int type, char* filename)
     return(kdb);
 }
 
+void U_test_load_fun_esv(char* filename)
+{
+    // Frees 3 WS
+    K_free(KE_WS);
+    K_free(KS_WS);
+    K_free(KV_WS);
+    
+    // Loads 3 WS and check ok
+    KE_WS = U_test_K_interpret(K_EQS, filename);
+    KS_WS = U_test_K_interpret(K_SCL, filename);
+    KV_WS = U_test_K_interpret(K_VAR, filename);
+}
+
+
 void Tests_Simulation()
 {
     KDB         *kdbv, 
@@ -432,15 +476,15 @@ void Tests_Simulation()
     LIS         lst, expected_lst;
     
     // Loads 3 WS and check ok
-    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, filename);
-    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
-    
-    K_WS[K_SCL] = kdbs  = U_test_K_interpret(K_SCL, filename);
-    S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
-    
-    K_WS[K_EQS] = kdbe  = U_test_K_interpret(K_EQS, filename);
-    S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
+    U_test_load_fun_esv(filename);
 
+    // Check
+    kdbv = KV_WS;
+    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
+    kdbs = KS_WS;
+    S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
+    kdbe = KE_WS;
+    S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
     
     // Check list is empty
     lst = KLPTR("_DIVER");
@@ -448,6 +492,7 @@ void Tests_Simulation()
     
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
+    KSIM_START = KV_INIT_TM1;
     KSIM_EPS = 0.0001;
     KSIM_MAXIT = 100;
     KSIM_RELAX = 0.7;
@@ -455,6 +500,7 @@ void Tests_Simulation()
     KSIM_PASSES = 5; 
     KSIM_DEBUG = 1;
 
+    kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
     
     // Test simulation : divergence
@@ -501,7 +547,7 @@ void Tests_Simulation()
     // Check result
     S4ASSERT(rc == 0, "Exchange UY-XNATY converges on 2000Y1-2002Y1");
     S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
-    S4ASSERT(fabs(KV_get_at_aper("XNATY", "2000Y1") - 0.800) < 0.01, "Exchange UY-XNATY: XNATY[2000Y1] == 0.800");
+    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80071");
 
     // Cleanup
     SCR_free_tbl(endo_exo);
@@ -540,7 +586,38 @@ void Tests_PrintTables()
     K_load_RWS(2, NULL);
 }
 
+/*
+void Tests_Estimation()
+{
+    int         rc;
+    IODE_REAL   x;
 
+    kmsg_super = kmsg_super_ptr; // Reset initial output to 
+
+    // Select output destination
+    //W_dest("test1_estim.a2m", A2M_DESTA2M);
+    //W_dest("test1_estim.rtf", A2M_DESTRTF);
+    W_dest("test1_estim.htm", A2M_DESTHTML);
+    //W_dest("test.gdi", A2M_DESTGDIPRT); //=> plante
+    
+    U_test_load_fun_esv("fun");
+    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
+    S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
+
+    //x = U_test_calc_lec("_YRES[1980Y1]", 0);
+    //printf("x = %lf\n", x);
+    //x = fabs(x + 0.001150);
+    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115), "Estimation : _YRES[1980Y1] == -0.001150");
+    
+    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
+    S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
+    
+    //TODO:add some tests with other estimation methods / on blocks / with instruments
+    
+    //W_flush();
+    W_close();
+}
+*/
 void Tests_ALIGN()
 {
     TBL     tbl, *p_tbl = &tbl;
@@ -557,6 +634,8 @@ void Tests_ALIGN()
     //printf("sizeof(TCELL32)= %d\n", sizeof(TCELL32));
 }
 
+
+
 /* ========================================================*/
 
 void U_test_init()
@@ -569,6 +648,8 @@ void U_test_init()
     IODE_assign_super_API();            // set *_super fn pointers
     // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub 
     K_init_ws(0);                       // Initialises 7 empty WS
+    K_load_iode_ini();
+    
 }
 
 int main(int argc, char **argv)
@@ -602,7 +683,9 @@ int main(int argc, char **argv)
     Tests_TBL32_64();
     Tests_Simulation();
     Tests_PrintTables();
+    //Tests_Estimation();
     
+    K_save_iode_ini();
     return(0);
 //    B_ReportLine("$show coucou");
 }
