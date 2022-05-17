@@ -611,7 +611,10 @@ U_ch* A2mMDCalcStr(A2MPAR* ap, int n, A2MFNT  *fntt, int tbl, int code)
         txt = SCR_strafcat(txt, ")");
         return(txt);
     case A2M_NEWLINE : 
-        txt = SCR_strafcat(txt, "\n\n");
+        if(code)
+            txt = SCR_strafcat(txt, "\n");
+        else
+            txt = SCR_strafcat(txt, "\n\n");
         return(txt);
     case A2M_TAB :
         txt = SCR_strafcat(txt, " ");
