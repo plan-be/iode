@@ -42,17 +42,19 @@ A2MGRF  *grf;
 int     cnt;
 {
     int             i, j, maxobs = 0, paxis = 0, saxis = 0, period, type,
-			  ndivlines, labelstep, showlegend, showsecondary = 0;
-    unsigned char   *title, *stitle, *footnote;
-    double  *vals;
-    double  minx = 999999.0, maxx = -999999.0, step = SCR_NAN;
+                    ndivlines, labelstep, showlegend, showsecondary = 0;
+    unsigned char   *title, *stitle; //, *footnote;
+    double          *vals;
+    double          minx = 999999.0, maxx = -999999.0, step = SCR_NAN;
 
     if(grf->ag_gxy == NULL) return(0);
 
-    title = grf->ag_title->ap_strs[0]->as_txt;
+    if(grf->ag_title) 
+        title = grf->ag_title->ap_strs[0]->as_txt;
     if(title == 0) title = "No title";
 
-    footnote = grf->ag_footnote->ap_strs[0]->as_txt;
+    //if(grf->ag_footnote) 
+    //    footnote = grf->ag_footnote->ap_strs[0]->as_txt;
 
     stitle = 0;
     for(i=1; grf->ag_title->ap_strs[i]; i++) {
@@ -211,7 +213,7 @@ A2mSWFIni()
 
     if(IniReadTxtParm(filename, "SWF", "JSPATH", buf, 255) == 0)
 	strcpy(SWF_JSPATH, buf);
-    else strcpy(SWF_JSPATH, "/FusionCharts/JSClass/FusionCharts.js");
+    else strcpy(SWF_JSPATH, "https://www.plan.be/FusionChartsXT/FusionCharts.js");
 
     if(IniReadTxtParm(filename, "SWF", "JSEXPORTPATH", buf, 255) == 0)
 	strcpy(SWF_JSEXPORTPATH, buf);
