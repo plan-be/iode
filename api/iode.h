@@ -34,9 +34,9 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.63 - (c) 1990-2020 Planning Office - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.64 - (c) 1990-2022 Planning Office - Brussels"
 #define IODE_VERSION_MAJOR 6
-#define IODE_VERSION_MINOR 63
+#define IODE_VERSION_MINOR 64
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
@@ -160,9 +160,9 @@
 #define KICLEC(kdb, pos)    ((CLEC *) K_oval1(kdb, pos))
 #define KSVAL(kdb, pos)     ((SCL *)  K_oval0(kdb, pos))
 //#define KCVAL(kdb, pos)     ((CMT *)  K_oval0(kdb, pos))    // TODO: Check (CMT) or (CMT *) => ok:CMT
-//#define KLVAL(kdb, pos)     ((LIS *)  K_oval0(kdb, pos))    // TODO: Check (LIS) or (LIS *) = >ok:LIS 
-#define KCVAL(kdb, pos)     ((CMT )   K_oval0(kdb, pos))    
-#define KLVAL(kdb, pos)     ((LIS )   K_oval0(kdb, pos))    
+//#define KLVAL(kdb, pos)     ((LIS *)  K_oval0(kdb, pos))    // TODO: Check (LIS) or (LIS *) = >ok:LIS
+#define KCVAL(kdb, pos)     ((CMT )   K_oval0(kdb, pos))
+#define KLVAL(kdb, pos)     ((LIS )   K_oval0(kdb, pos))
 
 #define KELEC(kdb, pos)                   K_oval0(kdb, pos)
 #define KECLEC(kdb, pos)    ((CLEC *)     K_oval1(kdb, pos))
@@ -173,13 +173,25 @@
 #define KEBLK(kdb, pos)                   K_oval(kdb, pos, 6)
 #define KEINSTR(kdb, pos)                 K_oval(kdb, pos, 7)
 #define KEDATE(kdb, pos)    (* (long *)   K_oval(kdb, pos, 8))
+#define KETESTS(kdb, pos)   ((float *)    K_oval(kdb, pos, 9))
+
+//#define KE_STDEV (kdb, pos)  KETESTS(kdb, pos)[1]
+//#define KE_MEANY (kdb, pos)  KETESTS(kdb, pos)[2]
+//#define KE_SSRES (kdb, pos)  KETESTS(kdb, pos)[3]
+//#define KE_STDERR(kdb, pos)  KETESTS(kdb, pos)[4]
+//#define KE_FSTAT (kdb, pos)  KETESTS(kdb, pos)[6]
+//#define KE_R2    (kdb, pos)  KETESTS(kdb, pos)[7]
+//#define KE_R2ADJ (kdb, pos)  KETESTS(kdb, pos)[8]
+//#define KE_DW    (kdb, pos)  KETESTS(kdb, pos)[9]
+//#define KE_LOGLIK(kdb, pos)  KETESTS(kdb, pos)[10]
+
 
 #define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)) )
 #define KEVAL(kdb, pos)     (K_eunpack(SW_getptr(kdb->k_objs[pos].o_val)) )
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
-#define KCPTR(name)         K_optr0(KC_WS, name)     // Returns a pointer to the CMT in swap (do not free) 
+#define KCPTR(name)         K_optr0(KC_WS, name)     // Returns a pointer to the CMT in swap (not allocated -> do not free)
 #define KLPTR(name)         K_optr0(KL_WS, name)     // id.
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)   // id.
 
@@ -837,7 +849,7 @@ typedef struct _oclec_ {
 
 typedef struct _clec_ {
     long    tot_lg,        /* JMP 20-05-00 */ /* IODE64K */
-	        exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
+		exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
     short   nb_names;
     char    dupendo;
     char    pad;
@@ -849,19 +861,19 @@ typedef struct _clec_ {
  */
 
 // VAR = Variable (pointer to a vector of IODE_REAL)
-typedef IODE_REAL     *VAR;  
+typedef IODE_REAL     *VAR;
 
 // SCL = Scalar (struct containing a scalar value, and if estimated, its relaxation parameter and its standard error).
 typedef struct _scl_ {
     IODE_REAL    val;       // Value of the scalar
-    IODE_REAL    relax;     // Relaxation parameter. Used only for estimation. 
-                            // If null, the parameter will not be estimated. 
-                            // If 0 < relax < 1, the convergence of the estimation will be slowed down. To use when the estimation process diverges.
-    IODE_REAL    std;       // Standard error. Result of the estimation. 
+    IODE_REAL    relax;     // Relaxation parameter. Used only for estimation.
+			    // If null, the parameter will not be estimated.
+			    // If 0 < relax < 1, the convergence of the estimation will be slowed down. To use when the estimation process diverges.
+    IODE_REAL    std;       // Standard error. Result of the estimation.
 } SCL;
 
 // CMT = Comment (string)
-typedef char    *CMT;  
+typedef char    *CMT;
 
 // LIS = List (string)
 typedef char    *LIS;
@@ -888,28 +900,28 @@ typedef struct _eq_ {
     float   tests[EQS_NBTESTS]; // Estimation tests
 } EQ;
 
-// TBL (table) definition 
+// TBL (table) definition
 // ----------------------
 
-// TCELL = Table Cell 
+// TCELL = Table Cell
 typedef struct _tcell_ {
     char    *tc_val;    // NULL or
-                        // char* if type == KT_STRING or
-                        // packed IDT (i.e. char*) if type == KT_LEC
+			// char* if type == KT_STRING or
+			// packed IDT (i.e. char*) if type == KT_LEC
     char    tc_type;    // KT_STRING or KT_LEC
-    char    tc_attr;    // KT_LEFT, KT_CENTER, KT_RIGHT, KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_NORMAL 
+    char    tc_attr;    // KT_LEFT, KT_CENTER, KT_RIGHT, KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_NORMAL
     char    tc_pad[2];  // Padding for struct alignment
 } TCELL;
 
 // TLINE = Table Line
 typedef struct _tline_ {
     char    *tl_val;    // if tl_type == KT_CELL  : tl_val is TCELL*
-                        // if tl_type == KT_TITLE : tl_val is TCELL*
-                        // if tl_type == KT_LINE  : tl_val is NULL
-                        // if tl_type == KT_MODE  : tl_val is NULL
-                        // if tl_type == KT_DATE  : tl_val is NULL
-                        // if tl_type == KT_FILES : tl_val is NULL
-    char    tl_type;    // KT_FILES, KT_MODE, KT_TITLE, KT_LINE or KT_CELL 
+			// if tl_type == KT_TITLE : tl_val is TCELL*
+			// if tl_type == KT_LINE  : tl_val is NULL
+			// if tl_type == KT_MODE  : tl_val is NULL
+			// if tl_type == KT_DATE  : tl_val is NULL
+			// if tl_type == KT_FILES : tl_val is NULL
+    char    tl_type;    // KT_FILES, KT_MODE, KT_TITLE, KT_LINE or KT_CELL
     char    tl_graph;   // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
     U_ch    tl_axis:1;  // 0 if values are relative to the left axis, 1 to the right axis
     U_ch    tl_pbyte:7; // available free space
@@ -919,17 +931,17 @@ typedef struct _tline_ {
 // TBL = Table (struct containing a table definition)
 typedef struct _tbl_ {
     short   t_lang;     // Output language : KT_ENGLISH, KT_FRENCH, KT_DUTCH
-    short   t_free;     // if 0, first column is frozen -- not used
+    short   t_free;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   t_nc;       // Number of columns (of text and lec, not calculated values)
     short   t_nl;       // Number of lines
 	TLINE   t_div;      // t_nc TCELL's, each TCELL contains a divider
     TLINE   *t_line;    // t_nl TLINE's of t_nc TCELL's
-    float   t_zmin;     // Min on the right axis 
-    float   t_zmax;     // Max on the right axis 
-    float   t_ymin;     // Min on left axis 
-    float   t_ymax;     // Max on left axis 
-    char    t_attr;     // Combination (logical &) of attributes: KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_CENTER, 
-                        // KT_DECIMAL, KT_LEFT and KT_RIGHT
+    float   t_zmin;     // Min on the right axis
+    float   t_zmax;     // Max on the right axis
+    float   t_ymin;     // Min on left axis
+    float   t_ymax;     // Max on left axis
+    char    t_attr;     // Combination (logical &) of attributes: KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_CENTER,
+			// KT_DECIMAL, KT_LEFT and KT_RIGHT
     char    t_box;      // 1 to surround the chart by a box
     char    t_shadow;   // 1 to place a shadow behind the chart
     char    t_gridx;    // 0 = major grids, 1 = no grids, 2 = minor + major grids
@@ -1049,23 +1061,23 @@ typedef struct _tbl32_ {
 //             + cl_res = final result
 
 typedef struct _col_ {
-    short   cl_opy;             // operator on periods => cl_per[0] cl_opy cl_per[1]) 
+    short   cl_opy;             // operator on periods => cl_per[0] cl_opy cl_per[1])
     PERIOD  cl_per[2];          // period 1 , period 2
-    short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1] 
-    short   cl_fnb[2];          // file1, file2 
+    short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1]
+    short   cl_fnb[2];          // file1, file2
     IODE_REAL    cl_val[2][2];  // computed values of the LEC formulas on periods / files => max 4 values see table below
-    
-    /*   {{v00, v01},{v10,v11}} 
 
-	        |             |
-	        |   file1     |   file2
+    /*   {{v00, v01},{v10,v11}}
+
+		|             |
+		|   file1     |   file2
     --------|-------------|------------
     period1 |    v00      |    v01
-	        | cl_val[0,0] | cl_val[0,1]    v.. = valeur
+		| cl_val[0,0] | cl_val[0,1]    v.. = valeur
     --------|-------------|------------
     period2 |    v10      |    v11
-	        | cl_val[1,0] | cl_val[1,1]
-	        |             |
+		| cl_val[1,0] | cl_val[1,1]
+		|             |
     */
     IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
@@ -1077,11 +1089,11 @@ typedef struct _cols_ {
 } COLS;
 
 
-// REP: definition of the repetition of a group of periods / file 
+// REP: definition of the repetition of a group of periods / file
 // GSAMPLE example.: (2000/1999):5*4
 typedef struct _rep_ {
     short   r_nb;           // Nb of repetitions  (in example => 5)
-    short   r_incr;         // Increment          (in example => 4)  
+    short   r_incr;         // Increment          (in example => 4)
 } REP;
 
 // FIL: files and operation used in a COL
@@ -1130,14 +1142,14 @@ typedef struct _expdef_ {
 typedef struct _alec {          /* LEC atomic element */
 	int     al_type;            /* type : L_VAR, L_COEF, L_CONST ... */
     union {
-        LECREAL v_real;         /* constant values IODE_REAL */
-        long    v_long;         /* constant values long int */
-        int     v_nb_args;      /* nb of args for fn */
-        struct {
-            short   pos;        /* coef or series pos in table ?? */
-            PERIOD  per;        /* PERIOD if any */
-            short   lag;        /* lag if any */
-        } v_var;                /* variable  */
+	LECREAL v_real;         /* constant values IODE_REAL */
+	long    v_long;         /* constant values long int */
+	int     v_nb_args;      /* nb of args for fn */
+	struct {
+	    short   pos;        /* coef or series pos in table ?? */
+	    PERIOD  per;        /* PERIOD if any */
+	    short   lag;        /* lag if any */
+	} v_var;                /* variable  */
 	short   v_coef;             /* coef number */
 	PERIOD  v_per;              /* period */
     } al_val;
@@ -1195,7 +1207,7 @@ extern  char    k_ext[][4];
 #define K_MAX_FREF          5           // Max number of file references in GSAMPLE's
 //extern  FREF    fref[K_MAX_FREF + 1];
 
-extern char     *COL_OPERS[];           
+extern char     *COL_OPERS[];
 // extern char     *COL_OPERS_TEXTS[][3]; // unused - replaced by KLG_OPERS_TEXTS
 
 extern char     W_filename[];
@@ -1213,26 +1225,26 @@ extern KDB      *K_RWS[7][5];
 extern int      K_PWS[7];
 extern int      K_WARN_DUP;
 extern int      K_SECRETSEP;
-        
+
 extern int      K_SCR;
-        
+
 extern char     **IMP_rule;
 extern char     **IMP_pat;
 extern int      IMP_trace;
-       
+
 extern IODE_REAL    KSIM_EPS,               // Model simulation convergence threshold
-                    KSIM_RELAX,             // Model relaxation parameter ("damping")
-                    KSIM_NEWTON_EPS,        // Newton-Raphson convergence threshold 
-                    KSIM_NEWTON_STEP;       // Newton-Raphson step to calculate the local derivative (f(x+h) - f(x)) / h
-                    
+		    KSIM_RELAX,             // Model relaxation parameter ("damping")
+		    KSIM_NEWTON_EPS,        // Newton-Raphson convergence threshold
+		    KSIM_NEWTON_STEP;       // Newton-Raphson step to calculate the local derivative (f(x+h) - f(x)) / h
+
 extern int          KSIM_MAXIT,             // Simulation: max number of iterations
-                    KSIM_DEBUG,             // Simulation: if not null : save 3 list _PRE, _INTER and _POST 
-                    KSIM_PASSES,            // Simulation: number of passes for the heuristic triangulation algorithm
-                    KSIM_NEWTON_DEBUG,      // Newton-Raphson: save a trace of the sub-iterations 
-                    KSIM_NEWTON_MAXIT,      // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
-                    KSIM_SORT,              // Simulation: reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
-                    KSIM_START;             // Simulation: endogenous initial values
-extern char         **KSIM_EXO;             
+		    KSIM_DEBUG,             // Simulation: if not null : save 3 list _PRE, _INTER and _POST
+		    KSIM_PASSES,            // Simulation: number of passes for the heuristic triangulation algorithm
+		    KSIM_NEWTON_DEBUG,      // Newton-Raphson: save a trace of the sub-iterations
+		    KSIM_NEWTON_MAXIT,      // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
+		    KSIM_SORT,              // Simulation: reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
+		    KSIM_START;             // Simulation: endogenous initial values
+extern char         **KSIM_EXO;
 
 /*-------------- MESSAGES -----------------------*/
 extern void (*B_MessageBox_impl)(unsigned char* title, unsigned char* message, unsigned char* buts[]);
@@ -1367,11 +1379,11 @@ extern MAT  *E_RHS,
 
 /************************* SIMULATION *************************************/
 extern int          KSIM_MAXIT;
-extern int          *KSIM_NITERS;                         
+extern int          *KSIM_NITERS;
 extern IODE_REAL    *KSIM_NORMS;
 
-// EQUATION ORDERING 
-extern int  KSIM_PRE; 
+// EQUATION ORDERING
+extern int  KSIM_PRE;
 extern int  KSIM_INTER;
 extern int  KSIM_POST;
 //extern int  *KSIM_ORDER;
