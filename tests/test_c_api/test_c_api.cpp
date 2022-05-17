@@ -7,7 +7,7 @@
 #include "pch.h"
 #include <filesystem>
 
-
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -25,6 +25,7 @@ extern "C"
 
 #ifdef __cplusplus
 }
+#endif
 
 void kmsg_null(char*msg)
 {
