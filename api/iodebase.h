@@ -353,23 +353,23 @@ extern double L_secant(KDB *,KDB *,CLEC *,int ,int ,int );
 
 /* e_est.c */
 extern int E_est(char **,char **,KDB *,KDB *,SAMPLE *,int ,char **,int ,double );
-extern int E_gls(void);
-extern int E_residuals(void);
-extern double E_rhs_ij(int ,int );
-extern int E_c_rhs(void);
-extern int E_jacobian(void);
+//extern int E_gls(void);
+//extern int E_residuals(void);
+//extern double E_rhs_ij(int ,int );
+//extern int E_c_rhs(void);
+//extern int E_jacobian(void);
 extern int E_scl_in_eq(int ,int );
-extern int E_mod_residuals(int ,int ,double );
-extern int E_c_gmg(void);
-extern int E_c_gmu(void);
-extern int E_deltac(void);
-extern int E_testcv(void);
-extern int E_adaptcoef(void);
-extern int E_c_vcu(void);
-extern int E_c_ivcu(void);
-extern int E_c_mcu(void);
-extern int E_c_vcc(void);
-extern int E_c_ivcc(void);
+//extern int E_mod_residuals(int ,int ,double );
+//extern void E_c_gmg(void);
+//extern int E_c_gmu(void);
+//extern int E_deltac(void);
+//extern int E_testcv(void);
+//extern int E_adaptcoef(void);
+//extern int E_c_vcu(void);
+//extern int E_c_ivcu(void);
+//extern int E_c_mcu(void);
+//extern int E_c_vcc(void);
+//extern int E_c_ivcc(void);
 
 /* e_step.c */
 extern IODE_REAL C_evallec(char *,int);
@@ -377,29 +377,32 @@ extern IODE_REAL C_evallec(char *,int);
 /* e_tests.c */
 extern double M_c_line(MAT *,int ,int );
 extern double E_div_0(double ,double );
+extern double E_sqrt(double val);
 extern int E_output(void);
-extern void E_deg_freed(void);
-extern double E_c_umu(void);
-extern int E_c_loglik(void);
-extern int E_c_mcorr(void);
-extern int E_c_mcorru(void);
-extern int E_c_ttests(void);
+//extern void E_deg_freed(void);
+//extern double E_c_umu(void);
+//extern int E_c_loglik(void);
+//extern int E_c_mcorr(void);
+//extern int E_c_mcorru(void);
+//extern int E_c_ttests(void);
 
 /* e_prep.c */
 extern int E_prep(char **,char **);
-extern int E_prep_lecs(char **);
-extern int E_prep_instrs(char **);
-extern int E_prep_coefs(void);
-extern int E_get_C(void);
-extern int E_put_C(void);
-extern int E_get_SMO(void);
-extern int E_prep_alloc(void);
-extern int E_free_work(void);
-extern int E_prep_reset(void);
+//extern int E_prep_lecs(char **);
+//extern int E_prep_instrs(char **);
+//extern int E_prep_coefs(void);
+extern void E_get_C(void);
+extern void E_put_C(void);
+extern void E_get_SMO(void);
+//extern int E_prep_alloc(void);
+extern void E_free_work(void);
+//extern int E_prep_reset(void);
 
 /* e_error.c */
-extern void E_msg_n(int );
+//extern void E_msg_n(int );
 extern void E_error_n(int );
+extern void E_msg(char* fmt,...);
+extern void E_error(char* fmt,...);
 
 /* e_print.c */
 extern void E_print_enum(void);
@@ -426,6 +429,7 @@ extern int E_GetLecName(char *,char *);
 extern int KV_sample(KDB *,SAMPLE *);
 extern int KV_merge(KDB *,KDB *,int );
 extern void KV_merge_del(KDB *,KDB *,int );
+extern int KV_add(char* varname);
 extern double KV_get(KDB *,int ,int ,int );
 extern void KV_set(KDB *,int ,int ,int ,double );
 extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
@@ -454,6 +458,38 @@ extern double *K_vptr(KDB *,char* ,int );
 extern EQ*  K_eptr(KDB* kdb, char* name);
 extern TBL* K_tptr(KDB* kdb, char* name);
 
+// Estimation tests by equation name
+extern double K_etest(KDB* kdb, char*name, int test_nb);
+extern double K_e_stdev (KDB* kdb, char*name);
+extern double K_e_meany (KDB* kdb, char*name);
+extern double K_e_ssres (KDB* kdb, char*name);
+extern double K_e_stderr(KDB* kdb, char*name);
+extern double K_e_fstat (KDB* kdb, char*name);
+extern double K_e_r2    (KDB* kdb, char*name);
+extern double K_e_r2adj (KDB* kdb, char*name);
+extern double K_e_dw    (KDB* kdb, char*name);
+extern double K_e_loglik(KDB* kdb, char*name);
+
+// Values of scalars by name
+extern double K_s_get_info(KDB* kdb, char*name, int info_nb);
+extern double K_s_get_value (KDB* kdb, char*name);
+extern double K_s_get_relax (KDB* kdb, char*name);
+extern double K_s_get_stderr(KDB* kdb, char*name);
+extern double K_s_get_ttest (KDB* kdb, char*name);
+extern double K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
+extern double K_s_set_value (KDB* kdb, char*name, double val);    
+extern double K_s_set_relax (KDB* kdb, char*name, double val);
+extern double K_s_set_stderr(KDB* kdb, char*name, double val);
+
+
+
+
+
+
+
+
+
+
 /* k_lst.c */
 extern int K_scan(KDB *,char *,char *);
 //extern void K_clecscan(KDB *,CLEC *,KDB *,KDB *);
@@ -479,6 +515,7 @@ extern TCELL *T_create_cell(TBL *,TLINE *);
 extern TCELL *T_create_title(TBL *,TLINE *);
 extern char *T_cell_cont(TCELL *,int );
 extern char *T_cell_cont_tbl(TBL *,int, int, int );
+extern char *T_div_cont_tbl(TBL *, int, int );
 extern int T_insert_line(TBL *,int ,int ,int );
 extern int T_set_lec_cell(TCELL *,unsigned char *);
 extern int T_set_lec_cell_tbl(TBL *, int, int, unsigned char *);
@@ -489,10 +526,11 @@ extern int T_default(TBL *,char *,char **,char **,int ,int ,int );
 extern void T_auto(TBL *,char *,char **,int ,int ,int );
 
 /* k_est.c */
-extern int KE_est_s(KDB *,KDB *,KDB *,SAMPLE *,int ,char **);
+extern int KE_est_s(KDB *,KDB *,KDB *,SAMPLE *,char **);
 extern void E_tests2scl(EQ *,int ,int ,int );
-extern void E_savescl(double ,int ,char *);
-extern void E_savevar(char *,int ,MAT *);
+extern int KE_estim(char* veqs, char* afrom, char* ato);
+//extern void E_savescl(double ,int ,char *);
+//extern void E_savevar(char *,int ,MAT *);
 
 /* k_ccvar.c */
 extern KDB *KV_load_str(char *);
@@ -675,6 +713,36 @@ extern void COL_clear(COLS *);
 extern int COL_exec(TBL *,int ,COLS *);
 //extern int COL_calc(COL *,CLEC *,CLEC *);
 // extern int COL_link(int ,CLEC *);
+
+/* b_iodeini.c */
+extern void B_IodeIniFile();
+extern int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft);
+extern int B_IniWriteText(char* section, char* parm, char* val);
+extern int B_IniReadChar(char* section, char* parm, char dft);
+extern int B_IniWriteChar(char* section, char* parm, char val);
+extern int B_IniReadNum(char* section, char* parm, int dft);
+extern int B_IniWriteNum(char* section, char* parm, int val);
+extern int B_IniReadYN(char* section, char* parm, int dft);
+extern int B_IniWriteYN(char* section, char* parm, int val);
+
+
+/* b_a2mini.c */
+extern void B_A2mGetGnlParms()  ;
+extern void B_A2mSaveGnlParms() ;
+extern void B_A2mGetRtfParms()  ;
+extern void B_A2mSaveRtfParms() ;
+extern void B_A2mGetHtmlParms() ;
+extern void B_A2mSaveHtmlParms();
+extern void B_A2mGetGIFParms()  ;
+extern void B_A2mSaveGIFParms() ;
+extern void B_A2mGetCsvParms()  ;
+extern void B_A2mSaveCsvParms() ;
+extern void B_A2mGetMifParms()  ;
+extern void B_A2mSaveMifParms() ;
+extern void B_A2mGetGdiParms()  ;
+extern void B_A2mSaveGdiParms() ;
+extern void K_load_iode_ini()   ;
+extern void K_save_iode_ini()   ;
 
 /* b_args.c */
 extern char **B_ainit_chk(char *,ADEF *,int );
@@ -1231,21 +1299,6 @@ extern char **T_find_files(COLS *);
 //extern void T_end_tbl(void);
 
 /* k_graph.c */
-/*
-extern int T_GraphTest(TBL *);
-extern int T_GraphInit(double ,double ,int ,int ,double ,double ,double ,double ,int ,int ,int );
-extern int T_GraphEnd(void);
-extern int T_graph_tbl_1(TBL *,char *);
-extern int T_GraphTitle(char *);
-extern int T_GraphLineTitle(TLINE *,COLS *,int );
-extern int T_GraphLegend(int ,int ,char *,char *);
-extern int T_GraphLineData(int ,double *,double *);
-extern int T_GraphTimeData(SAMPLE *,double *);
-extern int T_GraphLine(TBL *,int ,COLS *,SAMPLE *,double *,double *,COLS *);
-extern int T_prep_smpl(COLS *,COLS **,SAMPLE *);
-extern int T_find_opf(COLS *,COL *);
-*/
-
 /* New auto extraction 1/10/2021 */
 extern int APIChartAlloc(int nl);
 extern int APIChartAxis(int hdl, int i);
@@ -1273,7 +1326,7 @@ extern int T_GraphTitle(char *txt);
 extern int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y);
 extern int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
 extern int T_find_opf(COLS *fcls, COL *cl);
-extern int T_graph_tbl_1(TBL *tbl, char *gsmpl);
+extern int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode);
 extern int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl);
 
 
@@ -1503,20 +1556,21 @@ extern int __cdecl B_exec_system(char *arg);
 extern int __cdecl B_shellexec(char *arg);
 
 /* w_wrt.c (MSC) */
-extern int __cdecl W_dest(char *filename,int type);
-extern int __cdecl W_InitParms();
-extern int __cdecl W_open();
-extern int __cdecl W_close();
-extern int __cdecl W_flush();
-extern int __cdecl W_putc(int ch);
-extern int __cdecl W_isempty(char *buf);
-extern int __cdecl W_record(char *str);
-extern int __cdecl W_InitDisplay();
-extern int __cdecl W_EndDisplay(char *title,int x,int y,int w,int h);
-extern int __cdecl W_SavePrinterSettings();
-extern int __cdecl W_ResetPrinterSettings();
-extern int __cdecl W_SetPrinterSettings();
-
+extern int W_dest(char *filename,int type);
+extern int W_InitParms();
+extern int W_open();
+extern int W_close();
+extern int W_flush();
+extern int W_putc(int ch);
+extern int W_isempty(char *buf);
+extern int W_record(char *str);
+extern int W_InitDisplay();
+extern int W_EndDisplay(char *title,int x,int y,int w,int h);
+extern int W_SavePrinterSettings();
+extern int W_ResetPrinterSettings();
+extern int W_SetPrinterSettings();
+extern int W_printf(char *fmt,...);
+extern int W_printfEx(int dup, char *fmt, va_list args);
 // interface
 extern U_ch  *T_mmt_edit(U_ch *, int , int , int , int );
 
