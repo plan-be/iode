@@ -17,6 +17,27 @@
  *    EQ* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
  *    TBL* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
  *  
+ *    double K_etest(KDB* kdb, char*name, int test_nb)  Retrieves a statistical test stored the equation whose endo is name.
+ *    double K_e_stdev (KDB* kdb, char*name)            Returns stdev calculated during the last estimation of equation name
+ *    double K_e_meany (KDB* kdb, char*name)            Returns meany calculated during the last estimation of equation name       
+ *    double K_e_ssres (KDB* kdb, char*name)            Returns ssres calculated during the last estimation of equation name
+ *    double K_e_stderr(KDB* kdb, char*name)            Returns stderr calculated during the last estimation of equation name
+ *    double K_e_fstat (KDB* kdb, char*name)            Returns fstat calculated during the last estimation of equation name
+ *    double K_e_r2    (KDB* kdb, char*name)            Returns r2    calculated during the last estimation of equation name
+ *    double K_e_r2adj (KDB* kdb, char*name)            Returns r2adj calculated during the last estimation of equation name
+ *    double K_e_dw    (KDB* kdb, char*name)            Returns dw    calculated during the last estimation of equation name
+ *    double K_e_loglik(KDB* kdb, char*name)            Returns loglik calculated during the last estimation of equation name
+ *
+ *    double K_s_get_info(KDB* kdb, char*name, int info_nb)                 Retrieves a SCL info
+ *    double K_s_get_value (KDB* kdb, char*name)                            Retrieves a SCL value
+ *    double K_s_get_relax (KDB* kdb, char*name)                            Retrieves a SCL relax
+ *    double K_s_get_stderr(KDB* kdb, char*name)                            Retrieves a SCL stderr
+ *    double K_s_get_ttest (KDB* kdb, char*name)                            Retrieves a SCL ttest
+ *    double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)     Sets a SCL info
+ *    double K_s_set_value (KDB* kdb, char*name)                            Sets a SCL value
+ *    double K_s_set_relax (KDB* kdb, char*name)                            Sets a SCL relax
+ *    double K_s_set_stderr(KDB* kdb, char*name)                            Sets a SCL stderr
+
  *  See also defines in iode.h.
  */
 
@@ -186,3 +207,108 @@ TBL* K_tptr(KDB* kdb, char* name)
     if(pos < 0) return(NULL);         // name not found
     return(K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)));
 }
+
+/**
+ *  Retrieves a statistical test stored the equation whose endo is name.
+ *  
+ *  @param [in] KDB*    kdb      KDB containing EQ name
+ *  @param [in] char*   name     name of the equation (=endogenous)
+ *  @param [in] int     test_nb  position of the test in eq->tests 
+ *  @return     double           test value or L_NAN if equation name not found
+ *  
+ */
+double K_etest(KDB* kdb, char*name, int test_nb)
+{
+    int     pos;
+    float   *tests;
+    
+    pos = K_find(kdb, name);
+    if(pos < 0) return(L_NAN);         // name not found
+    
+    tests = KETESTS(kdb, pos);
+    return((double) tests[test_nb]);
+}
+
+// Returns test calculated during the last estimation of equation name
+double K_e_stdev (KDB* kdb, char*name) {return(K_etest(kdb, name, 1));}
+double K_e_meany (KDB* kdb, char*name) {return(K_etest(kdb, name, 2));}
+double K_e_ssres (KDB* kdb, char*name) {return(K_etest(kdb, name, 3));}
+double K_e_stderr(KDB* kdb, char*name) {return(K_etest(kdb, name, 4));}
+double K_e_fstat (KDB* kdb, char*name) {return(K_etest(kdb, name, 6));}
+double K_e_r2    (KDB* kdb, char*name) {return(K_etest(kdb, name, 7));}
+double K_e_r2adj (KDB* kdb, char*name) {return(K_etest(kdb, name, 8));}
+double K_e_dw    (KDB* kdb, char*name) {return(K_etest(kdb, name, 9));}
+double K_e_loglik(KDB* kdb, char*name) {return(K_etest(kdb, name, 10));}
+
+
+/**
+ *  Retrieves a SCL info.
+ *  
+ *  @param [in] KDB*    kdb      KDB containing SCL name
+ *  @param [in] char*   name     name of the scalar 
+ *  @param [in] int     info_nb  0 = scalar, 1 = relax , 2 = std, 3: t-test
+ *  @return     double           value or L_NAN if scalar name not found or t-test undefined
+ *  
+ */
+double K_s_get_info(KDB* kdb, char*name, int info_nb)
+{
+    int     pos;
+    SCL     *scl;
+    double  val = L_NAN;
+    
+    pos = K_find(kdb, name);
+    if(pos < 0) return(L_NAN);         // name not found
+    
+    scl = KSVAL(kdb, pos);
+    switch(info_nb) {
+        case 1 :  val = scl->relax; break;
+        case 2 :  val = scl->std; break;
+        case 3 :  
+                if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
+                    val = scl->val / scl->std;
+                else 
+                    val = L_NAN;
+                break;    
+            
+        default: val = scl->val; break;
+    }    
+    return(val);
+}
+
+double K_s_get_value (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 0));}
+double K_s_get_relax (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 1));}
+double K_s_get_stderr(KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 2));}
+double K_s_get_ttest (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 3));}
+
+
+/**
+ *  Sets a SCL info.
+ *  
+ *  @param [in] KDB*    kdb      KDB containing SCL name
+ *  @param [in] char*   name     name of the scalar 
+ *  @param [in] int     info_nb  0 = scalar, 1 = relax , 2 = std
+ *  @param [in] double  val      value to set to info_nb
+ *  @return     int              -1 if scalar not found, -2 if info_nb illegal, 0 otherwise
+ */
+double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)
+{
+    int     pos;
+    SCL     *scl;
+    
+    pos = K_find(kdb, name);
+    if(pos < 0) return(-1);         // name not found
+    
+    scl = KSVAL(kdb, pos);
+    switch(info_nb) {
+        case 0 :  scl->val = val; break;
+        case 1 :  scl->relax = val; break;
+        case 2 :  scl->std = val; break;
+        default:  return(-2);
+    }    
+    return(0);
+}
+
+double K_s_set_value (KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 0, val));}
+double K_s_set_relax (KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 1, val));}
+double K_s_set_stderr(KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 2, val));}
+
