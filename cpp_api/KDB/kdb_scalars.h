@@ -19,7 +19,7 @@ protected:
 public:
     KDBScalars() : KDBAbstract(I_SCALARS) {};
 
-    void add(const std::string& name, const IODE_REAL value, const IODE_REAL relax);
+    void add(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std=L_NAN);
 
-    void update(const std::string& name, const IODE_REAL value, const IODE_REAL relax);
+    void update(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std = L_NAN);
 };
