@@ -7,8 +7,12 @@
 #include <array>
 #include <vector>
 #include <map>
+#include <bitset>
 #include <stdexcept>
 #include <iostream>
+
+
+using int_bitset = std::bitset<sizeof(int)>;
 
 
 /* ****************************** *
