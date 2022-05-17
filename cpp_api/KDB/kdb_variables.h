@@ -10,7 +10,7 @@
 class KDBVariables : public KDBAbstract<Variable>
 {
 private:
-    Variable compute_lec(const std::string& lec);
+    Variable new_var_from_lec(const std::string& lec);
 
 protected:
 
