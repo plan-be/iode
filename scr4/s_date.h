@@ -21,6 +21,7 @@ extern long     SCR_date_to_long();
 extern long     SCR_time_to_long();
 extern long     SCR_fdate_to_long();
 extern long     SCR_ftime_to_long();
+
 extern long     DT_date_num();
 extern long     DT_time_num();
 extern long     DT_num_date();
@@ -37,6 +38,8 @@ extern long     SCR_cvt_time(), SCR_cvt_date();
 extern long     DT_dmy_date2000();
 extern long     DT_current_sec();
 extern long     DT_secs_1180();
+extern long     DT_secs_1100();
+
 
 #else
 #include <s_prodt.h>
