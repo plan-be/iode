@@ -15,9 +15,7 @@ Dumps file filein in hexadecimal.
 &SA scr4_hex, SCR_dumphexfd()
 =================================================================== */
 
-SCR_dumphex(filein, fileout, nl)
-char    *filein, *fileout;
-int     nl;
+int SCR_dumphex(char* filein, char* fileout, int nl)
 {
     int     rc;
     FILE    *fd2;
@@ -45,10 +43,7 @@ Dumps file filein in hexadecimal in fdout.
 &SA scr4_hex, SCR_dumphex()
 =================================================================== */
 
-SCR_dumphexfd(filein, fdout, nl)
-char    *filein;
-FILE    *fdout;
-int     nl;
+int SCR_dumphexfd(char* filein, FILE* fdout, int nl)
 {
     int     c;
     FILE    *fd1;
@@ -88,7 +83,7 @@ Add quotes if addquotes <> 0.
 &EN -1 : fd == 0
 =================================================================== */
 
-SCR_fprintf_esc(FILE *fd, char *str, int addquotes)
+int SCR_fprintf_esc(FILE *fd, char *str, int addquotes)
 {
     int     i;
 	

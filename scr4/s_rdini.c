@@ -637,8 +637,7 @@ calcul‚e est retourn‚e par la fonction.
 &SA IniOpen(), IniClose(), IniReadTxtParm(), IniReadSection()
 =======================================================================*/
 
-IniReadYNParm(filename, section, parm)
-char    *filename, *section, *parm;
+int IniReadYNParm(char* filename, char* section, char* parm)
 {
     char    buf[256];
 
@@ -706,8 +705,7 @@ Remplace dans un fichier .ini la valeur d'un paramŠtre.
 &SA IniOpen(), IniClose(), IniReadTxtParm(), IniReadSection()
 =======================================================================*/
 
-IniWriteParm(filename, section, parm, val)
-char    *filename, *section, *parm, *val;
+int IniWriteParm(char* filename, char* section, char* parm, char* val)
 {
     FILE    *fd, *fdo;
     char    old[128], buf[512], bufo[512];

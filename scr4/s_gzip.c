@@ -18,9 +18,7 @@ Le string r‚sultat contient :
 &RT 0 en cas de succŠs, -4 en cas de manque de m‚moire.
 &SA GzipDecodeStr()
 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
-GzipEncodeStr(instr, inlen, outstr, outlen)
-unsigned char   *instr, **outstr;
-unsigned long   inlen, *outlen;
+int GzipEncodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen)
 {
     int             rc;
 
@@ -76,9 +74,7 @@ vers le string r‚sultat qui est allou‚ via SCR_malloc().
 &RT 0 en cas de succŠs, < 0 en cas d'erreur
 &SA GZipEncodeStr()
 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ */
-GzipDecodeStr(instr, inlen, outstr, outlen)
-unsigned char   *instr, **outstr;
-unsigned long   inlen, *outlen;
+int GzipDecodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen)
 {
     int             rc;
 

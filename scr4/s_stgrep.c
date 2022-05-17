@@ -52,9 +52,7 @@ int     ecase;
 }
 
 /*NH*/
-int SCR_grep_gnl(pattern, string, ecase, all)
-char    *pattern, *string;
-int     ecase, all;
+int SCR_grep_gnl(char* pattern, char* string, int ecase, int all)
 {
     return(SCR_grep_1(pattern, string, ecase, 0, all));
 }
