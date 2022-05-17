@@ -72,10 +72,9 @@ Table KDBTables::add(const std::string& name, const int nbColumns, const std::st
 
 	char* pattern = const_cast<char*>(lecs.c_str());
 
-	// TODO JMP: check the 2 following code lines (copy/paste from ODE_edit_tbl() in dos/o_edit.c)
-	// Note: not clear what the following line does
+	// Retrieves all variable names matching one or more patterns in KV_WS (similar to grep)
 	char* lst = K_expand(I_VARIABLES, NULL, pattern, '*');
-	// ? expand $listname by their contents ?
+	// Parses a string and replaces @filename and $listname by their contents
 	char** c_lecs = B_ainit_chk(lst, NULL, 0);
 
 	int c_mode = mode ? 1 : 0;
