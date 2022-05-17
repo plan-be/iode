@@ -1,7 +1,8 @@
 #include <time.h>
 
 #ifdef UNIX
-#include <sys/time.h>
+    // #include <sys/time.h>    // JMP 6/4/2022
+    #include <utime.h>          // JMP 6/4/2022
 #endif
 
 #include "scr4w.h"
@@ -150,7 +151,7 @@ WscrSetFileTime(char *filename, long actime, long modtime)
 #if defined(SCRW32) || defined(DOSW32)
     rc = WscrSetFileTimeWin(filename, 0, actime, modtime);
 #else // Unix...
-    struct    utimbuf   tb;
+    struct         tb;
 
     tb.actime  = actime;
     tb.modtime = modtime;
