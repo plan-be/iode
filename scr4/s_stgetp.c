@@ -45,23 +45,25 @@ long SCR_get_app_pos(fd, n)
 FILE    *fd;
 int     n;
 {
-    long    pos = 0L, opos = ftell(fd);
+    long    pos = 0L, opos;     // JMP 17/05/2022
     char    buf[5];
 
-    if(fd == 0) return(-1);
+    if(fd == 0) return(-1L);    // JMP 17/05/2022
+    opos = ftell(fd);           // JMP 17/05/2022
+
     if(n <= 0) goto fin;
     fseek(fd, -(long)(2 * sizeof(long)), 2);                /* JMP_M 4.19 08-05-95 */
     while(1) {
-	fread(&pos, sizeof(long), 1, fd);
-	fread(buf, 4, 1, fd);                               /* JMP_M 4.19 08-05-95 */
-	if(memcmp(buf, "\002\003\004\005", 4)) {
-	    fseek(fd, opos, 0);                         /* JMP 09-11-97 */
-	    return(-1);                                 /* JMP_M 4.19 08-05-95 */
-	    }
-	n--;
-	if(n <= 0) break;
-	fseek(fd, pos - (long)(2 * sizeof(long)), 0);       /* JMP_M 4.19 08-05-95 */
-	}
+        fread(&pos, sizeof(long), 1, fd);
+        fread(buf, 4, 1, fd);                               /* JMP_M 4.19 08-05-95 */
+        if(memcmp(buf, "\002\003\004\005", 4)) {
+            fseek(fd, opos, 0);                         /* JMP 09-11-97 */
+            return(-1);                                 /* JMP_M 4.19 08-05-95 */
+        }
+        n--;
+        if(n <= 0) break;
+        fseek(fd, pos - (long)(2 * sizeof(long)), 0);       /* JMP_M 4.19 08-05-95 */
+    }
 fin:
     fseek(fd, pos, 0);
     return(pos);
@@ -113,24 +115,25 @@ long SCR_get_app_size(fd, n)
 FILE    *fd;
 int     n;
 {
-    long    pos = 0L, epos = 0L, opos = ftell(fd);
+    long    pos = 0L, epos = 0L, opos;
     char    buf[5];
 
     if(fd == 0) return(-1);
+    opos = ftell(fd);           // JMP 17/05/2022
     if(n <= 0) goto fin;
     fseek(fd, -(long)(2 * sizeof(long)), 2);
     while(1) {
-	epos = ftell(fd);
-	fread(&pos, sizeof(long), 1, fd);
-	fread(buf, 4, 1, fd);
-	if(memcmp(buf, "\002\003\004\005", 4)) {
-	    fseek(fd, opos, 0);
-	    return(-1L);
-	    }
-	n--;
-	if(n <= 0) break;
-	fseek(fd, pos - (long)(2 * sizeof(long)), 0);
-	}
+        epos = ftell(fd);
+        fread(&pos, sizeof(long), 1, fd);
+        fread(buf, 4, 1, fd);
+        if(memcmp(buf, "\002\003\004\005", 4)) {
+            fseek(fd, opos, 0);
+            return(-1L);
+        }
+        n--;
+        if(n <= 0) break;
+        fseek(fd, pos - (long)(2 * sizeof(long)), 0);
+    }
 fin:
     fseek(fd, pos, 0);
     return(epos - pos);
