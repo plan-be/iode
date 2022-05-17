@@ -158,17 +158,18 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
 {
     OSIZE   os;
     U_sh    us;
-    int     rc;
+    //int     rc;
+    size_t  rc; 
 
     if(vers == 0 || vers == 3)  { // Long si vers courante (0) ou == 3
-        rc = fread(&os, sizeof(OSIZE), 1, fd);
+        rc = fread(&os, (int)sizeof(OSIZE), 1, fd);
         if(rc != 1) return(-1);
         K_xdrPLONG((unsigned char*)&os);
         kseek(fd, -1L * sizeof(OSIZE), 1);
         *len = os;
     }
     else {
-        rc = fread(&us, sizeof(U_sh), 1, fd);
+        rc = fread(&us, (int)sizeof(U_sh), 1, fd);
         if(rc != 1) return(-1);
         K_xdrPINT((char *)&us);
         kseek(fd, -1L * sizeof(U_sh), 1);
@@ -215,8 +216,8 @@ static int K_read_kdb(KDB *kdb, FILE *fd, int vers)
             if(X64) {
                 kread((char *) &kdb32, sizeof(KDB32), 1, fd);
                 memset(kdb, 0, sizeof(KDB));
-                posnb   = (char *)&kdb->k_nb      - (char *)kdb;
-                posname = (char *)&kdb->k_nameptr - (char *)kdb;
+                posnb   = (int)((char *)&kdb->k_nb      - (char *)kdb);
+                posname = (int)((char *)&kdb->k_nameptr - (char *)kdb);
                 memcpy(&(kdb->k_nb), &(kdb32.k_nb), posname - posnb); // JMP 7/2/2022
             }
             else
@@ -282,12 +283,12 @@ error :
  */
 KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
 {
-    int     i, j, lpos, pos, nf, vers, rc;
+    int     i, j, lpos, pos, nf, vers;
     char    *ptr, *cptr, *aptr, label[512], fullpath[1024];
     OSIZE   len, clen;
     KDB     *kdb = NULL, *tkdb = NULL;
-    OKDB643 *okdb643;
-    KOBJ    *kobj;
+    //OKDB643 *okdb643;
+    //KOBJ    *kobj;
     FNAME   file;
     FILE    *fd;
     extern  char K_LABEL[];
@@ -515,7 +516,7 @@ error:
 int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
 {
     FILE* fd;
-    int     i, vers;
+    int     vers;
     KDB     kdb;
     FNAME   file;
     char    label[80];
@@ -785,7 +786,7 @@ fin:
 int K_cat(KDB* ikdb, char* filename)
 {
     KDB     *kdb;
-    int     ftype;
+    //int     ftype;
 
     kdb = K_interpret(KTYPE(ikdb), filename);
     if(kdb == NULL) return(-1);
@@ -814,10 +815,10 @@ int K_backup(char* filename)
 {
     FNAME   backname;
 
-    if(access(filename, 0)) return(0);
+    if(access(filename, 0)) return(0);     
     strcpy(backname, filename);
     backname[strlen(backname) - 1] = '$';
-    unlink(backname);
+    _unlink(backname);                      // JMP 15/5/2022 => Posix
     return(SCR_rename(filename, backname));
 }
 
@@ -894,9 +895,9 @@ error :
 
 static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
 {
-    int     i, len, clen, posnb, posname;
-    char    *ptr, *cptr, *xdr_ptr = NULL;
-    KOBJ    *kobj;
+    int     i, len, posnb, posname;
+    char    *ptr, *xdr_ptr = NULL;
+    //KOBJ    *kobj;
     KDB     *xdr_kdb = NULL;
     KDB32   kdb32;
     FNAME   file;
@@ -929,8 +930,8 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     if(X64) {
         /* convert to x64 if needed */
         memset(&kdb32, 0, sizeof(KDB32)); // JMP 7/2/2022
-        posnb   = (char *)&xdr_kdb->k_nb      - (char *)xdr_kdb;
-        posname = (char *)&xdr_kdb->k_nameptr - (char *)xdr_kdb;
+        posnb   = (int)((char *)&xdr_kdb->k_nb      - (char *)xdr_kdb);
+        posname = (int)((char *)&xdr_kdb->k_nameptr - (char *)xdr_kdb);
         memcpy(&(kdb32.k_nb), &(xdr_kdb->k_nb), posname - posnb);   // JMP 7/2/2022
         kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
     }
