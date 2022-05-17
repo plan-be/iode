@@ -96,6 +96,8 @@ endif()
 message(STATUS "=============================")
 
 # ---- compile options ----
+add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
+
 # /Zi	Generates complete debugging information
 if (CMAKE_BUILD_TYPE STREQUAL  "Debug")
    add_compile_options(-Zi)
