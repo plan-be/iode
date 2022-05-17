@@ -64,54 +64,6 @@
 
 
 /**
- *  Modify the model to solve it with respect to another set of variables, 
- *  the variable posendo becoming exogenous and the variable posexo becoming endogenous.
- *  
- *  If the function succeeds, the vector KSIM_POSXK is modified to reflect the new endogenous for each equation.
- *   
- *  Note that KSIM_POSXK[i] contains for each eq of the model (defined by KSIM_DBE) 
- *  the position in KSIM_DBV of the endo variable of equation KSIM_DBE[i].
- *  
- *  
- *  @param [in] int     posendo     position of the endogenous variable in KSIM_DBV
- *  @param [in] int     posexo      position of the exogenous variable in KSIM_DBV
- *  @return     int                 0 if the exchange is possible, 
- *                                  -1 otherwise: 
- *                                      endo or exo not found in equations, 
- *                                      path between endo and exo inexistent 
- *  
- */
- 
-int KE_exo2endo(int posendo, int posexo)
-{
-    int         i, endo, exo;
-    int         depth = 0;
-    extern char *KSIM_PATH;
-    extern KDB  *KSIM_DBV;
-
-    endo = KE_poseq(posendo);
-    if(endo < 0) {
-        B_seterrn(116, KONAME(KSIM_DBV, posendo));
-        return(-1);
-    }
-
-    if(KE_poseq(posexo) >= 0) {
-        B_seterrn(119, KONAME(KSIM_DBV, posexo));
-        return(-1);
-    }
-
-    /* check if exo in equation */
-    memset(KSIM_PATH, 0, KSIM_MAXDEPTH);
-    exo = KE_findpath(posendo, posexo, &depth);
-    if(exo < 0) {
-        B_seterrn(117, KONAME(KSIM_DBV, posendo), KONAME(KSIM_DBV, posexo));
-        return(-1);
-    }
-    return(0);
-}
-
-
-/**
  *  Recursive function to search a path between posexo and posendo. 
  *  
  *  See more explanation at the top of this module.
@@ -126,7 +78,7 @@ int KE_exo2endo(int posendo, int posexo)
  */
 static int KE_findpath(int posendo, int posexo, int* depth)
 {
-    int         lg, j, poseq, posseq, rc = -1;
+    int         j, poseq, posseq, rc = -1;
     CLEC        *clec = NULL, *eclec;
     extern char *KSIM_PATH;
     extern KDB  *KSIM_DBE;
@@ -187,4 +139,53 @@ static int KE_findpath(int posendo, int posexo, int* depth)
     SW_nfree(clec);
     return(-1);
 }
+
+/**
+ *  Modify the model to solve it with respect to another set of variables, 
+ *  the variable posendo becoming exogenous and the variable posexo becoming endogenous.
+ *  
+ *  If the function succeeds, the vector KSIM_POSXK is modified to reflect the new endogenous for each equation.
+ *   
+ *  Note that KSIM_POSXK[i] contains for each eq of the model (defined by KSIM_DBE) 
+ *  the position in KSIM_DBV of the endo variable of equation KSIM_DBE[i].
+ *  
+ *  
+ *  @param [in] int     posendo     position of the endogenous variable in KSIM_DBV
+ *  @param [in] int     posexo      position of the exogenous variable in KSIM_DBV
+ *  @return     int                 0 if the exchange is possible, 
+ *                                  -1 otherwise: 
+ *                                      endo or exo not found in equations, 
+ *                                      path between endo and exo inexistent 
+ *  
+ */
+ 
+int KE_exo2endo(int posendo, int posexo)
+{
+    int         endo, exo;
+    int         depth = 0;
+    extern char *KSIM_PATH;
+    extern KDB  *KSIM_DBV;
+
+    endo = KE_poseq(posendo);
+    if(endo < 0) {
+        B_seterrn(116, KONAME(KSIM_DBV, posendo));
+        return(-1);
+    }
+
+    if(KE_poseq(posexo) >= 0) {
+        B_seterrn(119, KONAME(KSIM_DBV, posexo));
+        return(-1);
+    }
+
+    /* check if exo in equation */
+    memset(KSIM_PATH, 0, KSIM_MAXDEPTH);
+    exo = KE_findpath(posendo, posexo, &depth);
+    if(exo < 0) {
+        B_seterrn(117, KONAME(KSIM_DBV, posendo), KONAME(KSIM_DBV, posexo));
+        return(-1);
+    }
+    return(0);
+}
+
+
 

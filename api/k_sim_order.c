@@ -59,6 +59,94 @@ static void KE_add_post(int** successors, int i, int pos)
 
 
 /**
+ *  Computes the pre-recursive (prolog) or post-recursive (epilog) block of equations, i.e. the equations depending
+ *  only on previously computed equations (endogenous).
+ *  
+ *  Loops on the equations. 
+ *  If all endogenous in an equation are already in a block, then put the equation in the next available 
+ *  position in KSIM_ORDER and mark the equation as ordered (KSIM_ORDERED[i] = 1;
+ *  
+ *  Method
+ *  ------
+ *       For each equation eq, loop on varj, the variables present in eq (stored in predecessors[i]):
+ *			if varj == predecessors[i][j+1] or varj < 0 (exo) or KSIM_ORDERED[varj] == 1: 
+ *               skip the equation
+ *			else 
+ *				KSIM_ORDERED[varj] = 1
+ *				KSIM_ORDER[from + nb] = i
+ *	
+ *       If no new equation had been set in KSIM_ORDER during the loop, end of the process (the block is completed)
+ *       Else restart the loop on the equations
+ *  
+ *  @param [in]         KDB*    dbe             KDB of equations
+ *  @param [in]         int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
+ *  @param [in]         int     from            first available place in KSIM_ORDER
+ *  @return             int                     number of equations in the computed block
+ *
+ *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
+ *  @global [in, out]   int*    KSIM_ORDERED    vector with 1 for the equations already placed in KSIM_ORDER
+ *  
+ */
+ 
+static int KE_pre(KDB* dbe, int** predecessors, int from)
+{
+    int     i, j,
+            c = 1, nb = 0;
+
+    // On recommence tant qu'on a ajouté une éq dans le groupe PRE (c == 1)
+    // car on a peut être une nouvelle éq qui ne dépendait que de celles qui viennent d'être
+    // ajoutée et qui donc fait aussi partie du groupe
+    while(c == 1) {
+        c = 0;
+        for(i = 0; i < KNB(dbe); i ++) {
+            if(KSIM_ORDERED[i] == 1) continue; // Equation déjà classée (i.e. dans le bloc PRE)
+            if(predecessors[i]) {
+                for(j = 0; j < predecessors[i][0]; j++) {  	// predecessors[i][0] = nb vars de l'éq i
+                    if(predecessors[i][j + 1] < 0) continue; /* VAR j+1 = ENDO de l'eq courante */
+                    if(KSIM_ORDERED[predecessors[i][j + 1]] == 1) continue;  /* Var j+1 = déjà classée (ORDERED) */
+                    break; // Var j + 1 non EXO et non classée, donc eq ne peut être retenue dans le bloc
+                }
+            }
+            if(predecessors[i] == 0 || j == predecessors[i][0]) { // Pas de var dans l'eq OU toutes exo OU classées
+                c = KSIM_ORDERED[i] = 1;
+                KSIM_ORDER[from + nb] = i;
+                nb ++;
+            }
+        }
+    }
+    return(nb);
+}
+
+
+/**
+ *  Builds the interdependent block and places the equation numbers at the end of KSIM_ORDER.
+ *  The final execution order KSIM_ORDER is composed as follows:
+ *  
+ *      KSIM_PRE eqs
+ *  	KSIM_POST eqs
+ *  	KSIM_INTER eqs
+ *    
+ *  @param [in] KDB*    dbe             model   
+ *  @param [in] int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
+ *  @return     int                     number of equations in the interdep block
+ *
+ *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
+ *  
+ */
+ 
+static int KE_interdep(KDB* dbe, int** predecessors)
+{
+    int     i, nb = 0;
+
+    for(i = 0; i < KNB(dbe); i++) {
+        if(KSIM_ORDERED[i]) continue;
+        KSIM_ORDER[KSIM_PRE + KSIM_POST + nb] = i;
+        nb ++;
+    }
+    return(nb);
+}
+
+/**
  *  Free all temporary vectors allocated for the model reordering.
  *  
  *  @param [in]         KDB*    dbe             KDB of the model (equations)
@@ -248,95 +336,6 @@ int KE_poseq(int posendo)
 
 
 /**
- *  Computes the pre-recursive (prolog) or post-recursive (epilog) block of equations, i.e. the equations depending
- *  only on previously computed equations (endogenous).
- *  
- *  Loops on the equations. 
- *  If all endogenous in an equation are already in a block, then put the equation in the next available 
- *  position in KSIM_ORDER and mark the equation as ordered (KSIM_ORDERED[i] = 1;
- *  
- *  Method
- *  ------
- *       For each equation eq, loop on varj, the variables present in eq (stored in predecessors[i]):
- *			if varj == predecessors[i][j+1] or varj < 0 (exo) or KSIM_ORDERED[varj] == 1: 
- *               skip the equation
- *			else 
- *				KSIM_ORDERED[varj] = 1
- *				KSIM_ORDER[from + nb] = i
- *	
- *       If no new equation had been set in KSIM_ORDER during the loop, end of the process (the block is completed)
- *       Else restart the loop on the equations
- *  
- *  @param [in]         KDB*    dbe             KDB of equations
- *  @param [in]         int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
- *  @param [in]         int     from            first available place in KSIM_ORDER
- *  @return             int                     number of equations in the computed block
- *
- *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
- *  @global [in, out]   int*    KSIM_ORDERED    vector with 1 for the equations already placed in KSIM_ORDER
- *  
- */
- 
-static int KE_pre(KDB* dbe, int** predecessors, int from)
-{
-    int     i, j, pos,
-            c = 1, nb = 0;
-
-    // On recommence tant qu'on a ajouté une éq dans le groupe PRE (c == 1)
-    // car on a peut être une nouvelle éq qui ne dépendait que de celles qui viennent d'être
-    // ajoutée et qui donc fait aussi partie du groupe
-    while(c == 1) {
-        c = 0;
-        for(i = 0; i < KNB(dbe); i ++) {
-            if(KSIM_ORDERED[i] == 1) continue; // Equation déjà classée (i.e. dans le bloc PRE)
-            if(predecessors[i]) {
-                for(j = 0; j < predecessors[i][0]; j++) {  	// predecessors[i][0] = nb vars de l'éq i
-                    if(predecessors[i][j + 1] < 0) continue; /* VAR j+1 = ENDO de l'eq courante */
-                    if(KSIM_ORDERED[predecessors[i][j + 1]] == 1) continue;  /* Var j+1 = déjà classée (ORDERED) */
-                    break; // Var j + 1 non EXO et non classée, donc eq ne peut être retenue dans le bloc
-                }
-            }
-            if(predecessors[i] == 0 || j == predecessors[i][0]) { // Pas de var dans l'eq OU toutes exo OU classées
-                c = KSIM_ORDERED[i] = 1;
-                KSIM_ORDER[from + nb] = i;
-                nb ++;
-            }
-        }
-    }
-    return(nb);
-}
-
-
-/**
- *  Builds the interdependent block and places the equation numbers at the end of KSIM_ORDER.
- *  The final execution order KSIM_ORDER is composed as follows:
- *  
- *      KSIM_PRE eqs
- *  	KSIM_POST eqs
- *  	KSIM_INTER eqs
- *    
- *  @param [in] KDB*    dbe             model   
- *  @param [in] int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
- *  @return     int                     number of equations in the interdep block
- *
- *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
- *  
- */
- 
-static int KE_interdep(KDB* dbe, int** predecessors)
-{
-    int     i, nb = 0;
-
-    for(i = 0; i < KNB(dbe); i++) {
-        if(KSIM_ORDERED[i]) continue;
-        KSIM_ORDER[KSIM_PRE + KSIM_POST + nb] = i;
-        nb ++;
-    }
-    return(nb);
-}
-
-
-/**
  *  Initialise the pseudo-triangulation variables.
  *  
  *  @param [in]     KDB*    dbe         model   
@@ -394,7 +393,7 @@ static void KE_tri_end(KDB* dbe)
 
 static void KE_tri_perm1(KDB* dbe, int i, int* vars)
 {
-    int     j, jm, m = -1, posj;
+    int     j, m = -1, posj;
 
     // calcul de l'eq jm dont le numéro d'ordre de calcul est le plus grand
     for(j = 1 ; j <= vars[0] ; j++) {
@@ -403,7 +402,6 @@ static void KE_tri_perm1(KDB* dbe, int i, int* vars)
 
         if(posj > m) {
             m = posj;
-            // jm = j;
         }
     }
 

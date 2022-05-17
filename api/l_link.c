@@ -62,7 +62,7 @@ static int L_link_names(KDB* dbv, KDB* dbs, CLEC* cl)
 static void L_link_sample_expr(KDB* dbv, char* expr, short lg)
 {
     int     j, keyw;
-    short   len, ref, s;
+    short   len, s;
     CVAR    cvar;
     SAMPLE  *smpl;
     PERIOD  per;
@@ -128,7 +128,7 @@ static void L_link_sample(KDB* dbv, CLEC* cl)
 
     if (cl == 0) return;
     pos = sizeof(CLEC) + (cl->nb_names - 1) * sizeof(LNAME);
-    L_link_sample_expr(dbv, (char*)cl + pos, cl->tot_lg - pos);
+    L_link_sample_expr(dbv, (char*)cl + pos, (short)(cl->tot_lg - pos));
     return;
 }
 

@@ -94,7 +94,7 @@ int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)
     if(method == 0) {
         if(c1 == NULL || c1[0] == 0) goto done;
 
-        lg = 2 * strlen(lhs) + strlen(rhs) + 100;
+        lg = 2 * (int) strlen(lhs) + (int) strlen(rhs) + 100;
         *adjlec = SCR_malloc(lg);
         sprintf(*adjlec,
                 "d(%s) := %s * (%s -(%s)[-1])",
@@ -104,7 +104,7 @@ int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)
         if(c1 == NULL || c1[0] == 0
                 || c2 == NULL || c2[0] == 0) goto done;
 
-        lg = 2 * strlen(lhs) + 2 * strlen(rhs) + 100;
+        lg = 2 * (int)strlen(lhs) + 2 * (int)strlen(rhs) + 100;
         *adjlec = SCR_malloc(lg);
         sprintf(*adjlec,
                 "d(%s) := %s * d(%s) + %s * (%s -%s)[-1]",

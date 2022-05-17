@@ -28,7 +28,7 @@ Retourne un string alloué contenant le contenu du fichier
  */
 char *K_LastVersion()
 {
-    char *vers;
+    //char *vers;
 
     /* Annulé car le retour http ne fonctionne plus comme avant.
     vers = SCR_HttpGetFile("iode.plan.be", 80, "version.txt");

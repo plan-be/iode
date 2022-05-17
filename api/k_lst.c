@@ -26,7 +26,7 @@
  */
 int K_scan(KDB* kdb, char* l_var, char* l_scal)
 {
-    int     rc = 0, i, j;
+    int     rc = 0, i;
     char    **lst, **K_grep();
     KDB     *exo = NULL, *scal = NULL;
 

@@ -113,5 +113,5 @@ char *BUF_memcpy(char *ptr, int lg)
 
 char *BUF_strcpy(char *ptr)
 {
-    return(BUF_memcpy(ptr, strlen(ptr) + 1));
+    return(BUF_memcpy(ptr, (int)strlen(ptr) + 1));
 }

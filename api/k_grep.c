@@ -110,7 +110,8 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
  *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
  *  
- *  @return             char*   semi-colon separated string with all matching names
+ *  @return             char*   allocated semi-colon separated string with all matching names
+ *                              if no name found return allocated string of length 0 ("").
  *  
  */
 char *K_expand(int type, char* file, char* pattern, int all)
@@ -169,7 +170,7 @@ int K_aggr(char* pattern, char* ename, char* nname)
 {
     int     rc = -1, e, n, p, lg, inp = 0, inb = 0;
 
-    lg = strlen(pattern);
+    lg = (int)strlen(pattern);
     for(e = 0, n = 0, p = 0; p < lg; p++) {
         if(ename[e] == 0 && !U_is_in(pattern[p], "])"))
             goto done; /* premature end of name */

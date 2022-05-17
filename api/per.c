@@ -20,7 +20,7 @@
  *      char *PER_pertoa((PERIOD* per, char* text): creates a text representation of a PERIOD.
  *      PERIOD *PER_atoper(char *text): translates a text in a PERIOD.
  *      char *PER_smpltoa(SAMPLE* smpl, char* text) : writes a SAMPLE in a string
- *      SAMPLE *PER_atosmpl(char* a1, char* a2): creates a SAMPLE based on two strings containing PERIODs.
+ *      SAMPLE *PER_atosmpl(char* a1, char* a2): creates a new allocated SAMPLE based on two strings containing PERIODs.
  *      SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2): returns a new allocated SAMPLE build on two given PERIOD.
  * 
  * Miscellaneous functions 
@@ -196,7 +196,9 @@ PERIOD *PER_atoper(char *aper)
     PERIOD  *per = (PERIOD *) SW_nalloc(sizeof(PERIOD));
     char    text[64];
 
-    per->p_y = per->p_p = per->p_s = 0;
+    per->p_y = 0;
+    per->p_p = 0;
+    per->p_s = 0;
     if(aper == 0) return(per);
     
     // work on a local copy of aper 

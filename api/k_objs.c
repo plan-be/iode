@@ -148,8 +148,7 @@ int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2)
  
 int K_ren(KDB* kdb, char* name1, char* name2)
 {
-    int     pos1, pos2, lg;
-    char    *pack;
+    int     pos1, pos2;
 
     if(kdb == NULL) return(-1);
     pos1 = K_find(kdb, name1);
@@ -193,8 +192,7 @@ int K_ren(KDB* kdb, char* name1, char* name2)
 int K_add_entry(KDB* kdb, char* newname)
 {
 
-    int     i, lg,
-            pos, maxpos, minpos, nbobjs;
+    int     lg, pos, maxpos, minpos, nbobjs;
     KOBJ    *ktmp;
     ONAME   name;
 
@@ -250,7 +248,7 @@ done :
         //SCR_free(ktmp);
     }
 
-    lg = min(strlen(name), K_MAX_NAME);
+    lg = min((int)strlen(name), K_MAX_NAME);
     memcpy(KONAME(kdb, maxpos), name, lg + 1);
     KSOVAL(kdb, maxpos) = 0;
 
@@ -281,7 +279,7 @@ int K_find(KDB* kdb, char* name)
 
     res = (char *) bsearch(oname, KOBJS(kdb), (int) KNB(kdb),
                            sizeof(KOBJ), K_find_strcmp);
-    if(res != 0) return((res - (char *) KOBJS(kdb)) / sizeof(KOBJ));
+    if(res != 0) return((int)((res - (char *) KOBJS(kdb)) / sizeof(KOBJ)));
     else return(-1);
 }
 

@@ -85,7 +85,6 @@ KDB *KI_load_asc(char* filename)
         }
     }
 
-err:
     K_free(kdb);
     YY_close(yy);
     return((KDB *)0);

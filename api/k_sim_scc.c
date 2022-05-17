@@ -73,7 +73,6 @@ int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
     KE_order(dbe, NULL);
     K_lstorder(pre, inter, post);
 
-fin:
     SW_nfree(KSIM_POSXK);
     SW_nfree(KSIM_ORDER);
     KSIM_POSXK = KSIM_ORDER = NULL;

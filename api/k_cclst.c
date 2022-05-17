@@ -32,7 +32,7 @@
 
 static int KL_read_lst(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     i, keyw, pos;
+    int     keyw, pos;
     char    *lst;
 
     /* READ A STRING */
@@ -132,7 +132,6 @@ KDB *KL_load_asc(char* filename)
         }
     }
 
-err:
     YY_close(yy);
     K_free(kdb);
     return((KDB *)0);
@@ -151,7 +150,7 @@ err:
 int KL_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    int     i, j;
+    int     i;
     // LIS     *lst;
     LIS     lst;        // JMP 30/9/2021
 

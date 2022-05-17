@@ -306,7 +306,6 @@ static void T_print_files(COLS* cls, int dim)
 
 static void T_print_mode(COLS* cls, int dim)
 {
-    COL   *cl;
     int    i;
     extern char *KLG_OPERS_TEXTS[][3];
 
@@ -334,7 +333,6 @@ static void T_print_date(int dim)
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
     T_open_cell(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
     W_printf("%s\n", date);
-    return(0);
 }
 
 

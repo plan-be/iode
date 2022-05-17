@@ -217,8 +217,7 @@ static int (*K_cmpobj[])() = {
 
 int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
 {
-    int     p1, p2, l1, l2;
-    char    *pck1, *pck2;
+    int     p1, p2;
 
     if(KTYPE(kdb1) != KTYPE(kdb2)) return(-1);
 

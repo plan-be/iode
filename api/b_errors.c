@@ -135,7 +135,7 @@ void B_display_last_error()
  */
 void B_print_last_error()
 {
-    int     i, nb;
+    int     i;
 
     if(B_ERROR_NB == 0) return;
     SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
@@ -154,8 +154,6 @@ void B_print_last_error()
  */
 void B_clear_last_error()
 {
-    int i;
-
     if(B_ERROR_NB == 0) return;
     SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
     SCR_free_tbl(B_ERROR_MSG);
