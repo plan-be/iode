@@ -45,6 +45,28 @@
 
 #include "iode.h"
 
+// Function declarations
+static void COL_free_fils(FILS* fils);
+char *COL_ctoa(COL* cl, int ch, int n, int nbf);
+char *COL_text(COL* cl, char* str, int nbnames);
+COLS *COL_add_col(COLS* cls);
+static FILS* COL_add_fil(FILS* fils);
+static void COL_apply_fil(COL* cl, FIL* fl);
+static void COL_calc_now(PERIOD *per);
+static int COL_read_long_per(YYFILE *yy);
+static int COL_read_per(YYFILE* yy, PERIOD* per);
+static COLS *COL_read_y(YYFILE* yy);
+static int COL_calc_subper();
+static int COL_read_rep(YYFILE* yy, REP* rep);
+static int COL_read_1f(YYFILE* yy, FIL* fil);
+static FILS *COL_read_f(YYFILE* yy);
+static void COL_shift(COLS *cls, int key, int nb);
+static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shiftdir, int shiftval);
+static COLS *COL_read_cols(YYFILE* yy);
+COLS *COL_cc(char* gsample);
+int COL_free_cols(COLS* cls);
+int COL_find_mode(COLS* cls, int* mode, int type);
+
 // GSAMPLE tokens -- may be expanded
 YYKEYS COL_KEYWS[] = {
     "[",    COL_OBRACK,
@@ -318,7 +340,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
     char    *res, *txt, *tmp;
 
     if(str == NULL) return(NULL);
-    lg = strlen(str) + 40;
+    lg = (int)strlen(str) + 40;
     res = SW_nalloc(lg + 3);
 
     for(i = j = 0 ; j < lg && str[i] ; i++) {
@@ -351,7 +373,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
             if(j + strlen(txt) >= lg) break;
             strcat(res, txt);
         }
-        j = strlen(res);
+        j = (int)strlen(res);
     }
     return(res);
 }
@@ -452,6 +474,32 @@ static void COL_calc_now(PERIOD *per)
         default :
             break;
     }
+}
+
+
+// Lit un long ou P ou PER et retourne la valeur ou -1 en cas d'erreur
+
+/**
+ *  Reads "P", "PER", "S", "SUB" or a number on a YY stream and returns 
+ *  the sub period corresponding position.
+ *  
+ *      P or PER -> number of sub periods in the current periodicity
+ *      S or SUB -> sub period of the current date in the current periodicity
+ *      number   -> indicates a sub period position 
+ *  
+ *  @param [in] YYFILE*  yy     YY stream
+ *  @return     int             sub period position             
+ *  
+ */
+ 
+static int COL_read_long_per(YYFILE *yy)
+{
+    int     keyw = YY_lex(yy);
+
+    if(keyw == YY_LONG)         return(yy->yy_long);
+    else if(keyw == COL_PER)    return(PER_nb(KSMPL(KV_WS)->s_p1.p_p));
+    else if(keyw == COL_SUBPER) return(COL_calc_subper());
+    else                        return(-1);
 }
 
 
@@ -621,7 +669,7 @@ static COLS *COL_read_y(YYFILE* yy)
 static int COL_calc_subper()
 {
     PERIOD  *per;
-    int     w, p;
+    int     p;
 
     per = &(KSMPL(KV_WS)->s_p1);
 
@@ -640,31 +688,6 @@ static int COL_calc_subper()
     }
 }
 
-
-// Lit un long ou P ou PER et retourne la valeur ou -1 en cas d'erreur
-
-/**
- *  Reads "P", "PER", "S", "SUB" or a number on a YY stream and returns 
- *  the sub period corresponding position.
- *  
- *      P or PER -> number of sub periods in the current periodicity
- *      S or SUB -> sub period of the current date in the current periodicity
- *      number   -> indicates a sub period position 
- *  
- *  @param [in] YYFILE*  yy     YY stream
- *  @return     int             sub period position             
- *  
- */
- 
-static int COL_read_long_per(YYFILE *yy)
-{
-    int     keyw = YY_lex(yy);
-
-    if(keyw == YY_LONG)         return(yy->yy_long);
-    else if(keyw == COL_PER)    return(PER_nb(KSMPL(KV_WS)->s_p1.p_p));
-    else if(keyw == COL_SUBPER) return(COL_calc_subper());
-    else                        return(-1);
-}
 
 
 /**
@@ -736,7 +759,7 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
     fil->fl_2  = 0;
     if(YY_lex(yy) != YY_LONG) return(-1);
     if(yy->yy_long < 1 || yy->yy_long > 10) return(-1);
-    fil->fl_1 = yy->yy_long;
+    fil->fl_1 = (short)yy->yy_long;
     op = YY_lex(yy);
     /*GB    if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN) { */
     if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN && op != COL_BASE) {
@@ -745,7 +768,7 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
     }
     fil->fl_op = op;
     if(YY_lex(yy) != YY_LONG) return(-1);
-    fil->fl_2 = yy->yy_long;
+    fil->fl_2 = (short)yy->yy_long;
     return(0);
 }
 
@@ -771,7 +794,7 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
  
 static FILS *COL_read_f(YYFILE* yy)
 {
-    FILS    *fils = 0, fil;
+    FILS    *fils = 0;
 
     while(1) {
         fils = (FILS *)COL_add_fil(fils);

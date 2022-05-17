@@ -157,7 +157,6 @@ static void K_restore_XK(int t)
 
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)
         KSIM_VAL(KSIM_ORDER[i], t) = KSIM_XK[j];
-    return(0);
 }
 
 
@@ -219,7 +218,7 @@ static int K_interdep_1(int t)
 {
     int     i, j;
     IODE_REAL    x;
-    double  d, pd, fpd1, fpd2;
+    double  d, pd;
 
 
     KSIM_NORM = 0.0;
@@ -274,8 +273,7 @@ static int K_interdep_1(int t)
 static int K_interdep_2(int t)
 {
     int     i, j;
-    IODE_REAL    x;
-    double  d, pd, fpd1, fpd2;
+    double  d, pd;
 
     // Stage 1
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
@@ -381,11 +379,11 @@ static int K_epilog(int t)
  */
 static int K_diverge(int t, char* lst, IODE_REAL eps)
 {
-    char        buf[81];
+    //char        buf[81];
     char        *diverg = NULL;
     int         i, j, pos;
     IODE_REAL   x;
-    double      d, pd, fpd1, fpd2;
+    double      d, pd;
 
     // Delete lst 
     //if(B_DataExist(lst, K_LST) >= 0) B_DataDelete(lst, K_LST);
@@ -529,7 +527,7 @@ int K_simul_1(int t)
  */
 int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)
 {
-    int     i, t, j, k, endo_exonb, lg,
+    int     i, t, j, k, endo_exonb,
             posendo, posexo,
             rc = -1;
     char    **var = NULL;

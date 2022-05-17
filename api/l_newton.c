@@ -168,7 +168,7 @@ double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     double  oldx, x, fx, fxh, h = KSIM_NEWTON_STEP, eps = KSIM_NEWTON_EPS, ax, afx, dx = 0.0, ox;
-    int     it = 0, subit;
+    int     it = 0;
     IODE_REAL    *d_ptr, shift;
     extern  int KSIM_DEBUG;
 

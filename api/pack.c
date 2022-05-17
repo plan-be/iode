@@ -122,7 +122,7 @@ int P_free(char *ptr)
 void *P_add(void *vptr1, void *vptr2, int lg)
 {
     int     i, lg2, dif, n_p = 0;
-    OSIZE   *pos, pos1;
+    OSIZE   *pos;
     char    *ptr1 = vptr1, *ptr2 = vptr2;
 
     // lg2 = real length that will be allocated to insure alignment on P_ALIGN (4) bytes 

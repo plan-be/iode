@@ -174,6 +174,7 @@ YYFILE*  L_YY;      // LEC stream the compiler is reading from
 
 // --- FUNCTIONS ---
 
+
 /**
  *  Opens a file or a string for reading and assigns the open stream to L_YY. 
  *  
@@ -321,30 +322,6 @@ static int L_read_string()
     }
 }
 
-
-/** 
- * Reads a string and expands its contents if * is part of the string. 
- * Uses K_expand() to expand the string.
- *
- * Like in L_macro(), the semi-colons in the string are replaced by commas. 
- * The result is then recorded (pushed) on the stream L_YY.
- *  
- * @return     int     0 on success, L_MACRO_ERR if error in the expanding process.
- */
-static int L_string()
-{
-    char    *ptr, *K_expand();
-
-    L_read_string();
-    ptr = K_expand(K_VAR, NULL, LYYTEXT, '*');
-    if(ptr == 0) return(L_errno = L_MACRO_ERR);
-    SCR_replace(ptr, ";", ",");
-    YY_record(L_YY, ptr);
-    SCR_free(ptr);
-    return(0);
-}
-
-
 /**
  *  Reads the next char on L_YY.
  *  
@@ -368,6 +345,74 @@ static void L_ungetc(int ch)
     if(L_YY == 0) return;
     YY_ungetc(ch, L_YY);
 }
+
+
+/** 
+ * Reads an integer or a PERIOD on the stream L_YY.
+ *
+ * After having read a integer on L_YY (stored in LYYLONG), tries to read a PERIOD (yyyyPppp) on the stream L_YY.
+ * If the next character is invalid for a PERIOD, unreads it and returns L_LCONST. Otherwise, reads the second part of the PERIOD and
+ * return L_PERIOD. 
+ *
+ * @return     int     L_LCONST: value in L_TOKEN.tk_long
+ *                     L_PERIOD: value in L_TOKEN.tk_period
+ *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
+ *
+ * On error L_errno is set to L_PERIOD_ERR.
+ */   
+static int L_get_int()
+{
+    int     nb_per,
+            ch;
+    long    l;
+
+    l = LYYLONG;
+    ch = L_getc();
+    nb_per = L_pos(L_PERIOD_CH, toupper(ch));
+    if(nb_per < 0) {
+        L_ungetc(ch);
+        L_TOKEN.tk_long = LYYLONG;
+        return(L_LCONST);
+    }
+
+    if(L_read() != YY_LONG || L_PERIOD_NB[nb_per] < LYYLONG || LYYLONG == 0) {
+        L_unread();
+        L_errno = L_PERIOD_ERR;
+        return(YY_ERROR);
+    }
+
+    if(l < 50) l+= 2000;
+    else if(l < 200) l+= 1900;
+    L_TOKEN.tk_period.p_y = l;
+    L_TOKEN.tk_period.p_p = toupper(ch);
+    L_TOKEN.tk_period.p_s = LYYLONG;
+
+    return(L_PERIOD);
+}
+
+
+/** 
+ * Reads a string and expands its contents if * is part of the string. 
+ * Uses K_expand() to expand the string.
+ *
+ * Like in L_macro(), the semi-colons in the string are replaced by commas. 
+ * The result is then recorded (pushed) on the stream L_YY.
+ *  
+ * @return     int     0 on success, L_MACRO_ERR if error in the expanding process.
+ */
+static int L_string()
+{
+    char    *ptr, *K_expand();
+
+    L_read_string();
+    ptr = K_expand(K_VAR, NULL, LYYTEXT, '*');
+    if(ptr == 0) return(L_errno = L_MACRO_ERR);
+    SCR_replace(ptr, ";", ",");
+    YY_record(L_YY, ptr);
+    SCR_free(ptr);
+    return(0);
+}
+
 
 
 /**
@@ -421,7 +466,6 @@ int L_get_token()
             break;
     }
 
-again:
     keyw = L_lex();
 
     L_TOKEN.tk_def = keyw;
@@ -445,7 +489,7 @@ again:
             break;
         case YY_DOUBLE  :
             keyw = L_DCONST;
-            L_TOKEN.tk_real = LYYDOUBLE;
+            L_TOKEN.tk_real = (float)(LYYDOUBLE);
             break;
         default :
             L_errno = L_SYNTAX_ERR;
@@ -475,49 +519,6 @@ char    *a, *b;
     return(1);
 }
 */
-
-/** 
- * Reads an integer or a PERIOD on the stream L_YY.
- *
- * After having read a integer on L_YY (stored in LYYLONG), tries to read a PERIOD (yyyyPppp) on the stream L_YY.
- * If the next character is invalid for a PERIOD, unreads it and returns L_LCONST. Otherwise, reads the second part of the PERIOD and
- * return L_PERIOD. 
- *
- * @return     int     L_LCONST: value in L_TOKEN.tk_long
- *                     L_PERIOD: value in L_TOKEN.tk_period
- *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
- *
- * On error L_errno is set to L_PERIOD_ERR.
- */   
-static int L_get_int()
-{
-    int     nb_per,
-            ch;
-    long    l;
-
-    l = LYYLONG;
-    ch = L_getc();
-    nb_per = L_pos(L_PERIOD_CH, toupper(ch));
-    if(nb_per < 0) {
-        L_ungetc(ch);
-        L_TOKEN.tk_long = LYYLONG;
-        return(L_LCONST);
-    }
-
-    if(L_read() != YY_LONG || L_PERIOD_NB[nb_per] < LYYLONG || LYYLONG == 0) {
-        L_unread();
-        L_errno = L_PERIOD_ERR;
-        return(YY_ERROR);
-    }
-
-    if(l < 50) l+= 2000;
-    else if(l < 200) l+= 1900;
-    L_TOKEN.tk_period.p_y = l;
-    L_TOKEN.tk_period.p_p = toupper(ch);
-    L_TOKEN.tk_period.p_s = LYYLONG;
-
-    return(L_PERIOD);
-}
 
 
 /*

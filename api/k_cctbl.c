@@ -336,29 +336,29 @@ static TBL *KT_read_tbl(YYFILE* yy)
                 break;
 
             case KT_BOX     :
-                tbl->t_box = K_read_long(yy);
+                tbl->t_box = (char)K_read_long(yy);
                 break;
             case KT_AXIS     :
-                tbl->t_axis = K_read_long(yy);
+                tbl->t_axis = (char)K_read_long(yy);
                 break;
             case KT_XGRID    :
-                tbl->t_gridx = K_read_long(yy);
+                tbl->t_gridx = (char)K_read_long(yy);
                 break;
             case KT_YGRID    :
-                tbl->t_gridy = K_read_long(yy);
+                tbl->t_gridy = (char)K_read_long(yy);
                 break;
 
             case KT_YMIN     :
-                tbl->t_ymin  = K_read_real(yy);
+                tbl->t_ymin  = (float)K_read_real(yy);
                 break;
             case KT_YMAX     :
-                tbl->t_ymax  = K_read_real(yy);
+                tbl->t_ymax  = (float)K_read_real(yy);
                 break;
             case KT_ZMIN     :
-                tbl->t_zmin  = K_read_real(yy);
+                tbl->t_zmin  = (float)K_read_real(yy);
                 break;
             case KT_ZMAX     :
-                tbl->t_zmax  = K_read_real(yy);
+                tbl->t_zmax  = (float)K_read_real(yy);
                 break;
 
             case KT_ALGN:
@@ -378,7 +378,6 @@ static TBL *KT_read_tbl(YYFILE* yy)
         }
     }
 
-err :
     T_free(tbl);
     return(NULL);
 }
@@ -556,8 +555,6 @@ static void KT_print_attr(FILE* fd, int attr)
  */
 static void KT_print_cell(FILE *fd, TCELL *cell)
 {
-    U_ch 		buf[2560]; // JMP 8/4/2015
-
     if((cell->tc_val) == NULL) {
         fprintf(fd, "\"\" ");
         return;

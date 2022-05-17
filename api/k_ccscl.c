@@ -29,7 +29,7 @@
 
 static int KS_read_scl(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     i, keyw, pos;
+    int     keyw, pos;
     SCL     scl;
 
     /* READ AT MOST 3 REALS */
@@ -124,7 +124,6 @@ KDB *KS_load_asc(char* filename)
         }
     }
 
-err:
     YY_close(yy);
     K_free(kdb);
     return((KDB *)0);
@@ -163,7 +162,7 @@ static void KS_print_scl(FILE* fd, SCL* scl)
 int KS_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    int     i, j;
+    int     i;
     SCL     *scl;
 
     if(filename[0] == '-') fd = stdout;

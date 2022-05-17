@@ -225,7 +225,7 @@ int K_read_align(YYFILE* yy)
 
 void K_stracpy(char** to, char* from)
 {
-    *to = SW_nalloc(strlen(from) + 1);
+    *to = SW_nalloc((int)strlen(from) + 1);
     strcpy(*to, from);
 }
 

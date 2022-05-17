@@ -251,8 +251,6 @@ int kconfirm(char *fmt,...)
  */
 int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)
 {
-    int     i;
-    
     if(kmsgbox_super != 0) 
         return((*kmsgbox_super)(str, v, buts));
     else {
@@ -293,7 +291,7 @@ void krecordtext(unsigned char*  text)
 {
     int     i;
 
-    for(i = strlen(text) - 1 ; i >= 0 ; i--)
+    for(i = (int)strlen(text) - 1 ; i >= 0 ; i--)
         krecordkey(text[i]);
 }
 

@@ -6,6 +6,7 @@
  *    int KV_sample(KDB *kdb, SAMPLE *nsmpl)                                  Changes the SAMPLE of a KDB of variables.
  *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
  *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
+ *    int KV_add(char* varname)                                               Adds a new variable in KV_WS. Fills it with L_NAN.
  *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
  *    void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
  *    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
@@ -36,7 +37,7 @@
 int KV_sample(KDB *kdb, SAMPLE *nsmpl)
 {
     int     i, start1 = 0, start2 = 0, new_val;
-    char    *pack, *ptr;
+    char    *ptr;
     SAMPLE  *ksmpl, smpl;
 
     ksmpl = (SAMPLE *) KDATA(kdb);
@@ -79,7 +80,7 @@ int KV_sample(KDB *kdb, SAMPLE *nsmpl)
 int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 {
     int     i, start1, start2, pos, nb1;
-    int     *p_pos;
+    //int     *p_pos;
     SAMPLE  *k1smpl, *k2smpl, smpl;
 
     k1smpl = (SAMPLE *) KDATA(kdb1);
@@ -118,7 +119,7 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
  * @param [in, out] kdb1       KDB*   ws that will contain the result of the merge.
  * @param [in, out] kdb2       KDB*   ws to copy into kdb1
  * @param [in]      replace    int    indicates if kdb2 homonyms must replace kdb1
-*/
+ */
 
 void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 {
@@ -147,6 +148,35 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 
 
 /**
+ *  Adds a new variable in KV_WS. Fills it with L_NAN.
+ *  If the variable already exists, replaces all values by L_NAN.
+ *  
+ *  @param [in] char*   varname     name of the new variable
+ *  @return     int                 position of varname in the KV_WS
+ */
+int KV_add(char* varname)
+{
+    int         pos, t, nobs;
+    IODE_REAL   *vptr;
+    
+    // Create varname with NaN 
+    pos = K_find(KV_WS, varname);
+    if(pos < 0) {
+        nobs = KSMPL(KV_WS)->s_nb;
+        pos = K_add(KV_WS, varname, NULL, &nobs); // Set L_NAN if the new var
+    }
+    else { 
+        // Replaces all values by L_NAN 
+        vptr = KVPTR(varname);
+        if(vptr == NULL) return(-1);
+        for(t = 0; t < KSMPL(KV_WS)->s_nb; t++) 
+            vptr[t] = L_NAN;
+    }
+        
+    return(pos);
+}
+
+/**
  * Gets VAR[t] where VAR is the series at position pos in kdb. The value can be modified depending on the value of mode.
  *
  * @param [in] kdb       KDB*    KDB of variables
@@ -160,9 +190,7 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
  *                                    K_DIFFY : diff on one year   (x[t]-x[t-{nb sub periods}])
  *                                    K_GRT   : grt on one period  (x[t]/x[t-1] - 1)*100
  *                                    K_GRTY  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
- *                                      
  */
- 
 double KV_get(KDB *kdb, int pos, int t, int mode)
 {
     int     pernb;
@@ -382,7 +410,7 @@ done:
 
 KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 {
-    int     i, t, nb_per, added, *times, nbtimes = 500,
+    int     t, nb_per, added, *times, nbtimes = 500,
                                          epos, npos;
     ONAME   ename, nname;
     IODE_REAL    *eval = NULL, *nval;

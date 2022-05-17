@@ -77,7 +77,7 @@ extern KDB      *L_EXEC_DBV, *L_EXEC_DBS;
 static L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs) 
 {
     L_REAL  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
-    int     from, to, j, n;
+    int     from, to, j;
 
     meanx = L_mean(expr1, len1, t, stack, nargs - 1);
     if(!L_ISAN(meanx)) return(L_NAN);
@@ -131,7 +131,6 @@ static L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2,
  */
 static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)  /* JMP 17-04-98 */
 {
-    char    *expr1, *expr2;
     short   len1, len2;
 
     memcpy(&len1, expr, sizeof(short));
@@ -207,7 +206,6 @@ static L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2
  */
 static L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) 
 {
-    char    *expr1, *expr2;
     short   len1, len2;
 
     memcpy(&len1, expr, sizeof(short));
@@ -228,7 +226,6 @@ static L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, i
  */
 static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) 
 {
-    char    *expr1, *expr2;
     short   len1, len2;
 
     memcpy(&len1, expr, sizeof(short));
@@ -257,7 +254,6 @@ static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, 
  */
 static L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 {
-    char    *expr1;
     short   len1;
 
     memcpy(&len1, expr, sizeof(short));
@@ -420,7 +416,7 @@ static L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int
  
 static int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, L_REAL* vy, int notnul)
 {
-    int     j, nobs;
+    int     nobs;
 
     /* 1. Calc val after t */
     vy[0] = vy[1] = L_NAN;
@@ -478,7 +474,7 @@ static L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack
 {
     char    *expr1;
     short   len1;
-    int     j, nobs, vt[2];
+    int     nobs, vt[2];
     L_REAL  vx, vy[2], itc;
 
     memcpy(&len1, expr, sizeof(short));
@@ -505,7 +501,7 @@ static L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int
     char    *expr1, *expr2;
     short   len1, len2;
     int     j, nobs, vt[2];
-    L_REAL  vx, vy[2], itc, ayt, ay[2], delta;
+    L_REAL  vx, vy[2], ayt, ay[2], delta;
 
     memcpy(&len1, expr, sizeof(short));
     expr1 = expr + sizeof(short);
@@ -568,7 +564,7 @@ static L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, in
     char    *expr1, *expr2;
     short   len1, len2;
     int     j, nobs, vt[2];
-    L_REAL  vx, vy[2], itc, ayt, ay[2], delta;
+    L_REAL  vx, vy[2], ayt, ay[2], delta;
 
     memcpy(&len1, expr, sizeof(short));
     expr1 = expr + sizeof(short);

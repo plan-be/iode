@@ -83,9 +83,9 @@ static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
 static KDB *KV_load_yy(YYFILE* yy, int ask)
 {
     KDB     *kdb = 0;
-    int     nb, nobs, cmpt = 0;
+    int     cmpt = 0;
     ONAME   name;
-    PERIOD  one, two;
+    //PERIOD  one, two;
     SAMPLE  *smpl, *kasksmpl();
 
     // Create and empty KDB for vars

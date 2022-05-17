@@ -31,6 +31,54 @@
 #include "iode.h"
 
 /**
+ * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
+ * adding the size reclaimed by each ALEC atomic expression.
+ * 
+ * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
+ * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
+ * @param [in] to       int     ending position in ALEC of that expression
+ * @return              int     size in bytes of the expression in CLEC form
+*/
+static int L_calc_len(ALEC* expr, int from, int to)
+{
+    int     lg = 0, i;
+    ALEC    *al;
+
+    if(expr == 0) return(0);
+    for(al = expr + from, i = from ; i < to ; al++, i++) {
+        lg ++;
+        switch(al->al_type) {
+            case L_COEF:
+            case L_VAR:
+                lg += sizeof(CVAR);
+                break;
+            case L_PERIOD:
+                lg += sizeof(PERIOD) + s_short;
+                break;
+            case L_DCONST:
+                lg += sizeof(LECREAL);
+                break; /* FLOAT 11-04-98 */
+            case L_LCONST:
+                lg += sizeof(long);
+                break;
+            case L_OPENP:
+            case L_CLOSEP:
+                lg--;
+                break;
+            default:
+                if(is_fn(al->al_type)) lg++;
+                if(is_tfn(al->al_type)) lg += 1 + sizeof(short);
+                if(is_mtfn(al->al_type))
+                    lg += 2 + (sizeof(short) *
+                               (1 + L_MIN_MTARGS[al->al_type - L_MTFN])); /* JMP 17-04-98 */
+                break;
+        }
+    }
+    return(lg);
+}
+
+
+/**
  * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogeous container).
  * 
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
@@ -39,19 +87,17 @@
 CLEC *L_cc2(ALEC* expr) 
 {
 
-    unsigned char    *ll = 0, *tmp, *cexpr;
+    unsigned char    *ll = 0, *tmp;
     CLEC    *ptr = 0;
     int     lg = 0, i, pos, pos1, alg = 0, j, nvargs;
-    PERIOD  *per;
-    long    l;
-    short   lag; // GB 11/12/12
+    //PERIOD  *per;
+    //long    l;
+    //short   lag; // GB 11/12/12
     long    len, len1; // GB 11/12/12
     ALEC    *al;
     CVAR    cvar;
 
     if(expr == 0) return(ptr);
-//    cexpr = L_expr2c(expr);
-//    SCR_free(cexpr);
     for(al = expr, i = 0 ; al->al_type != L_EOE ; al++, i++) {
         if(lg + 30 >= alg) {
             ll = SW_nrealloc(ll, alg, alg + 512);
@@ -165,52 +211,6 @@ void L_move_arg(char *s1, char *s2, int lg)
         s1[i] = s2[i];
 }
 
-/**
- * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
- * adding the size reclaimed by each ALEC atomic expression.
- * 
- * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
- * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
- * @param [in] to       int     ending position in ALEC of that expression
- * @return              int     size in bytes of the expression in CLEC form
-*/
-static int L_calc_len(ALEC* expr, int from, int to)
-{
-    int     lg = 0, i;
-    ALEC    *al;
-
-    if(expr == 0) return(0);
-    for(al = expr + from, i = from ; i < to ; al++, i++) {
-        lg ++;
-        switch(al->al_type) {
-            case L_COEF:
-            case L_VAR:
-                lg += sizeof(CVAR);
-                break;
-            case L_PERIOD:
-                lg += sizeof(PERIOD) + s_short;
-                break;
-            case L_DCONST:
-                lg += sizeof(LECREAL);
-                break; /* FLOAT 11-04-98 */
-            case L_LCONST:
-                lg += sizeof(long);
-                break;
-            case L_OPENP:
-            case L_CLOSEP:
-                lg--;
-                break;
-            default:
-                if(is_fn(al->al_type)) lg++;
-                if(is_tfn(al->al_type)) lg += 1 + sizeof(short);
-                if(is_mtfn(al->al_type))
-                    lg += 2 + (sizeof(short) *
-                               (1 + L_MIN_MTARGS[al->al_type - L_MTFN])); /* JMP 17-04-98 */
-                break;
-        }
-    }
-    return(lg);
-}
 
 /**
  * Compiles L_YY, the open YY stream containing a LEC expression (see l_cc1.c).

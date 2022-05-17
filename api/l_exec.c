@@ -125,7 +125,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
     LECREAL r;
     int     j, nargs, keyw, nvargs;
     long    l;
-    short   len, len1, s;
+    short   len, s;
     CVAR    cvar;
 
     for(j = 0 ; j < lg ;) {
@@ -306,8 +306,8 @@ int L_intlag(L_REAL lag)
 {
     int intlag;
 
-    if(lag < 0) intlag = -0.5 + lag;
-    else        intlag = 0.5 + lag;
+    if(lag < 0) intlag = (int)(-0.5 + lag);
+    else        intlag = (int)(0.5 + lag);
 
     return(intlag);
 }

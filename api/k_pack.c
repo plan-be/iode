@@ -91,7 +91,7 @@ static char* K_tcell_pack(char *pack, TCELL *cell)
     if(cell->tc_type == KT_LEC)
         pack = P_add(pack, cell->tc_val, P_len(cell->tc_val));
     else
-        pack = P_add(pack, cell->tc_val, strlen(cell->tc_val) + 1);
+        pack = P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
 
     return(pack);
 }
@@ -105,7 +105,7 @@ static char* K_tcell_pack(char *pack, TCELL *cell)
  */
 static int K_pos_struct(void* base, void* element)
 {
-    return((char*)element - (char*)base);
+    return((int)((char*)element - (char*)base));
 }
 
 /**
@@ -190,7 +190,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
 static int K_tpack32(char **pack, char *a1)
 {
     TBL* tbl = (TBL*)a1;
-    TLINE* line;
+    //TLINE* line;
     TCELL* cell;
     int     i, j;
 
@@ -354,7 +354,7 @@ int K_ipack(char **pack, char *a1)
     clec = L_cc(a1);
     if(clec == 0)  return(-1);
     *pack = P_create();
-    *pack = P_add(*pack, a1, strlen(a1) + 1);
+    *pack = P_add(*pack, a1, (int)strlen(a1) + 1);
     *pack = P_add(*pack, (char*)clec, clec->tot_lg);
     SW_nfree(clec);
     return(0);
@@ -391,20 +391,20 @@ int   K_epack(char **pack, char *a1, char *endo)
     clec = L_solve(eq->lec, endo);
     if(clec == 0)  return(-1);
 
-    *pack = P_add(*pack, eq->lec, strlen(eq->lec) + 1);             /* lec */
+    *pack = P_add(*pack, eq->lec, (int)strlen(eq->lec) + 1);             /* lec */
     *pack = P_add(*pack, (char*)clec, clec->tot_lg);                /* clec */
     *pack = P_add(*pack, &(eq->solved), 1);                         /* solved */
     *pack = P_add(*pack, &(eq->method), 1);                         /* method */
     *pack = P_add(*pack, (char*)&(eq->smpl), sizeof(SAMPLE));       /* sample */
 
     if(eq->cmt == NULL) *pack = P_add(*pack, NULL, 1);
-    else *pack = P_add(*pack, (char*)eq->cmt, strlen(eq->cmt) + 1);    /* cmt */
+    else *pack = P_add(*pack, (char*)eq->cmt, (int)strlen(eq->cmt) + 1);    /* cmt */
 
     if(eq->blk == NULL) *pack = P_add(*pack, NULL, 1);
-    else *pack = P_add(*pack, (char*)eq->blk, strlen(eq->blk) + 1);    /* blk */
+    else *pack = P_add(*pack, (char*)eq->blk, (int)strlen(eq->blk) + 1);    /* blk */
 
     if(eq->instr == NULL) *pack = P_add(*pack, NULL, 1);
-    else *pack = P_add(*pack, (char*)eq->instr, strlen(eq->instr) + 1);/* instr */
+    else *pack = P_add(*pack, (char*)eq->instr, (int)strlen(eq->instr) + 1);/* instr */
 
     *pack = P_add(*pack, (char*)&(eq->date), sizeof(long));                 /* date */
     *pack = P_add(*pack, (char*)&(eq->tests), EQS_NBTESTS * sizeof(float)); /* tests*/ /* FLOAT 12-04-98 */
@@ -453,7 +453,7 @@ int K_cpack(char **pack, char *a1)
 {
     *pack = P_create();
     if(a1 == NULL) *pack = P_add(*pack, "", 1);
-    else *pack = P_add(*pack, a1, strlen(a1) + 1);
+    else *pack = P_add(*pack, a1, (int)strlen(a1) + 1);
     return(0);
 }
 
@@ -473,7 +473,7 @@ int K_lpack(char** pack, char* a1)
 {
     *pack = P_create();
     if(a1 == NULL) *pack = P_add(*pack, "", 1);
-    else *pack = P_add(*pack, a1, strlen(a1) + 1);
+    else *pack = P_add(*pack, a1, (int)strlen(a1) + 1);
     return(0);
 }
 
@@ -537,7 +537,7 @@ void K_onpack() { }
 static TBL* K_tunpack32(char *pack)
 {
     TBL* ptbl, * tbl;
-    TLINE* pline, * line;
+    //TLINE* line;
     TCELL* pcell, * cell;
     int     i, j, p, len = 0;
 
@@ -793,7 +793,7 @@ TBL* K_tunpack(char *pack)
 EQ* K_eunpack(char *pack)
 {
     EQ* eq;
-    char* ptr;
+    //char* ptr;
     int     len = 0;
 
     eq = (EQ*)SW_nalloc(sizeof(EQ));

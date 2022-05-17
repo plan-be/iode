@@ -148,7 +148,7 @@ static char *T_cell_repack(char* pack, TCELL* cell)
         SW_nfree(npack);
     }
     else
-        pack = P_add(pack, cell->tc_val, strlen(cell->tc_val) + 1);
+        pack = P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
 
     return(pack);
 }
@@ -165,7 +165,7 @@ static char *T_cell_repack(char* pack, TCELL* cell)
 
 static char *K_repack_tbl(TBL *tbl)
 {
-    TLINE   *line;
+    //TLINE   *line;
     TCELL   *cell;
     int     i, j;
     char    *pack;
@@ -221,7 +221,7 @@ void K_setvers(KDB* kdb, int i, int vers)
     char    *ptr, *optr, *pack;
     SWHDL   pos, opos;
     char    buf[512];
-    unsigned char *dptr;
+    //unsigned char *dptr;
     EQ      *eq;
     TBL     *tbl;
 

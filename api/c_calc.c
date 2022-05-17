@@ -93,7 +93,7 @@ static int COL_link(int i, CLEC* clec)
  
 static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
 {
-    int     i, j, k, t[2], tmp, per;
+    int     i, j, t[2], tmp, per;
     KDB     *kdb = NULL;
     double  vy[2], vf[2], div, mant, sign;
 

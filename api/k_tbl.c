@@ -53,10 +53,10 @@ TBL *T_create(int dim)
     T_NC(tbl)   = dim;
     T_LANG(tbl) = KT_ENGLISH;
 
-    tbl->t_zmin = L_NAN;
-    tbl->t_zmax = L_NAN;
-    tbl->t_ymin = L_NAN;
-    tbl->t_ymax = L_NAN;
+    tbl->t_zmin = (float)L_NAN;
+    tbl->t_zmax = (float)L_NAN;
+    tbl->t_ymin = (float)L_NAN;
+    tbl->t_ymax = (float)L_NAN;
 
     tbl->t_div.tl_type = KT_CELL;
     tbl->t_div.tl_val  = SW_nalloc(dim * sizeof(TCELL));
@@ -217,7 +217,7 @@ char* T_cell_cont(TCELL* cell, int mode)
     if(cell->tc_val == NULL) return(""); /* JMP 20-11-93 */
     if(cell->tc_type == KT_LEC)
         return(BUF_strcpy(P_get_ptr(cell->tc_val, 0)));
-    buf = BUF_alloc(strlen(cell->tc_val) + 3);
+    buf = BUF_alloc((int)strlen(cell->tc_val) + 3);
     if(mode) sprintf(buf, "\"%s\"", cell->tc_val);
     else BUF_strcpy(cell->tc_val);
     return(BUF_DATA);
@@ -385,7 +385,7 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
     if(attr & KT_DECIMAL) attr = KT_ALIGN(attr, KT_LEFT);  /* JMP 19-11-93 */
     if(U_is_in('#', txt)) attr = KT_ALIGN(attr, KT_CENTER);  /* JMP 19-11-93 */
     cell->tc_attr = attr;
-    len = strlen(txt);
+    len = (int)strlen(txt);
     if (len > 0) {
         if (txt[0] == '\"') {
             txt++;
@@ -480,7 +480,6 @@ void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
  */
 int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)
 {
-    TLINE   *nline;
     int     i, j;
 
     if(titg) {

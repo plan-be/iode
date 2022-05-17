@@ -26,7 +26,7 @@
  */
 static int KC_read_cmt(KDB* kdb, YYFILE* yy, char* name)
 {
-    int     i, keyw, pos;
+    int     keyw, pos;
     char    *cmt;
 
     /* READ A STRING */
@@ -122,7 +122,6 @@ KDB *KC_load_asc(char* filename)
         }
     }
 
-err:
     YY_close(yy);
     K_free(kdb);
     return((KDB *)0);
@@ -141,7 +140,7 @@ err:
 int KC_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
-    int     i, j;
+    int     i;
     //CMT     *cmt;
     CMT     cmt; // JMP 30/9/2021
 
