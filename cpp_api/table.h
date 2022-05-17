@@ -3,7 +3,6 @@
 #include "common.h"
 #include "utils.h"
 
-
 enum EnumCellType
 {
 	IT_LEC = KT_LEC,				// 114
@@ -182,7 +181,7 @@ public:
 
 	EnumCellAttribute getDividerCellAlign(const int column) const;
 
-	EnumCellAttribute getDividerCellFont(const int column) const;
+	int getDividerCellFont(const int column) const;
 
 	std::string getDividerCellContent(const int column, const bool quotes) const;
 
@@ -219,7 +218,13 @@ public:
 
 	EnumCellAttribute getCellAlign(const int row, const int column, const bool divider = false) const;
 
-	EnumCellAttribute getCellFont(const int row, const int column, const bool divider = false) const;
+	int getCellFont(const int row, const int column, const bool divider = false) const;
+
+	bool isCellBoldFont(const int row, const int column, const bool divider = false) const;
+
+	bool isCellItalicFont(const int row, const int column, const bool divider = false) const;
+
+	bool isCellUnderlineFont(const int row, const int column, const bool divider = false) const;
 
 	void setCellAttribute(const int row, const int column, const char attr, const bool divider = false);
 

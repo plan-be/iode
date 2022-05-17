@@ -372,7 +372,7 @@ EnumCellAttribute Table::getDividerCellAlign(const int column) const
 	return getCellAlign(0, column, true);
 }
 
-EnumCellAttribute Table::getDividerCellFont(const int column) const
+int Table::getDividerCellFont(const int column) const
 {
 	return getCellFont(0, column, true);
 }
@@ -481,11 +481,28 @@ EnumCellAttribute Table::getCellAlign(const int row, const int column, const boo
 	return static_cast<EnumCellAttribute>(((int) cell->tc_attr / 8) * 8);
 }
 
-// TODO: check if it is correct
-EnumCellAttribute Table::getCellFont(const int row, const int column, const bool divider) const
+int Table::getCellFont(const int row, const int column, const bool divider) const
 {
 	TCELL* cell = getCell(row, column, divider);
-	return static_cast<EnumCellAttribute>(((int) cell->tc_attr % 8));
+	return ((int) cell->tc_attr % 8);
+}
+
+bool Table::isCellBoldFont(const int row, const int column, const bool divider) const
+{
+	int font = getCellFont(row, column, divider);
+	return int_bitset(font).test(0);
+}
+
+bool Table::isCellItalicFont(const int row, const int column, const bool divider) const
+{
+	int font = getCellFont(row, column, divider);
+	return int_bitset(font).test(1);
+}
+
+bool Table::isCellUnderlineFont(const int row, const int column, const bool divider) const
+{
+	int font = getCellFont(row, column, divider);
+	return int_bitset(font).test(2);
 }
 
 void Table::setCellAttribute(const int row, const int column, const char attr, const bool divider)
