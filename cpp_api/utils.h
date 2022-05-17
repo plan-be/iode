@@ -80,7 +80,7 @@ static IodeRegexName get_regex_name(const EnumIodeType type)
     }
 
     // see https://www.cplusplus.com/reference/regex/ECMAScript for regex syntax
-    nre.regex = "[" + nre.regex + "_][" + nre.regex + "0-9_]{0," + std::to_string(K_MAX_NAME - 1) + "}";
+    nre.regex = "[" + nre.regex + "_][" + nre.regex + "0-9_#]{0," + std::to_string(K_MAX_NAME - 1) + "}";
 
     return nre;
 }
