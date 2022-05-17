@@ -49,6 +49,7 @@ int     cnt;
 
     if(grf->ag_gxy == NULL) return(0);
 
+    title = 0;
     if(grf->ag_title) 
         title = grf->ag_title->ap_strs[0]->as_txt;
     if(title == 0) title = "No title";
