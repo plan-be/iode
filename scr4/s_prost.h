@@ -55,6 +55,7 @@ extern long SCR_get_app_size(FILE *fd,int n);
 extern int SCR_grep(char *pattern,char *string,int ecase);
 extern int SCR_grep_1(char *pattern,char *string,int ecase,int nbeg,int diese);
 extern int SCR_grep_2(char *pattern,char *string,int ecase);
+extern int SCR_grep_gnl(char* pattern, char* string, int ecase, int all);
 extern unsigned char **SCR_inter(unsigned char *tbl1[],unsigned char *tbl2[]);
 extern unsigned char *SCR_inter_list(unsigned char *str1,unsigned char *str2,unsigned char *seps);
 extern int SCR_is_alpha(int ch);
@@ -153,6 +154,7 @@ extern int U_pos(int ch,unsigned char *str);
 extern int SCR_is_upper(int ch);
 extern int SCR_upper_char(int ch);
 extern unsigned char *SCR_upper(unsigned char *str);
+extern int SCR_is_space(int ch);
 extern unsigned char *U_shift_text(unsigned char *text,int n);
 extern unsigned char *U_sqz_text(unsigned char *text);
 extern unsigned char **SCR_vtoms(unsigned char *str,unsigned char *seps);
@@ -161,6 +163,10 @@ extern unsigned char **SCR_vtoms2A(unsigned char *str,unsigned char *seps, int s
 extern unsigned char **SCR_vtoms3(unsigned char *str,unsigned char *seps, int supdbl); // JMP 17/3/2017 
 extern unsigned char **SCR_vtom(unsigned char *str,int sep);
 extern unsigned char *SCR_zstrip(unsigned char *ptr,int len);
+extern int SCR_dumphex(char* filein, char* fileout, int nl);
+extern int SCR_dumphexfd(char* filein, FILE* fdout, int nl);
+extern int SCR_fprintf_esc(FILE *fd, char *str, int addquotes);
+
 
 /* s_allc.c */
 
@@ -227,6 +233,10 @@ extern unsigned char *SCR_OemToUTF8Char(int ch);
 extern unsigned char *SCR_AnsiToUTF8Char(int ch);
 extern unsigned char *SCR_OemToUTF8(unsigned char *, unsigned char *);
 extern unsigned char *SCR_AnsiToUTF8(unsigned char *, unsigned char *);
+
+/* s_gzip.c */
+extern int GzipEncodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen);
+extern int GzipDecodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen);
 
 #ifdef SCRCPP
 }
