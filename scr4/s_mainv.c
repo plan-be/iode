@@ -25,7 +25,7 @@ Le r‚sultat est stock‚ dans m2 carr‚e nl1 x nc1.
     le r‚sultat y est stock‚ et m2 est retourn‚. Les dimensions de m1 et
     m2 doivent ˆtre correctes sans quoi l'inverse calcul‚ , la variable
     M_errno est positionn‚e et la fonction retourne un pointeur nul. Si
-    la martice n'est pas inversible, la variable M_errno est positionn‚e
+    la matrice n'est pas inversible, la variable M_errno est positionn‚e
     et la fonction retourne un pointeur nul. La matrice source n'est pas
     modifi‚e.
 
@@ -39,8 +39,8 @@ Le r‚sultat est stock‚ dans m2 carr‚e nl1 x nc1.
 
 #ifdef SCRCPP
 MAT *M_inv_1(
-MAT     *m2,
-MAT     *m1
+    MAT     *m2,
+    MAT     *m1
 )
 #else
 MAT *M_inv_1(m2, m1)
@@ -53,51 +53,51 @@ MAT *m2, *m1;
 
     if ((m1 == 0) || (NL1 != NC1))
     {
-	M_errno = M_INVDIM_ERR;
-	return((MAT *) 0);
+        M_errno = M_INVDIM_ERR;
+        return((MAT *) 0);
     }
 
     if(m2 == 0)
     {
-	m2 = M_dup(m1);
-	if(m2 == 0)
-	{
-	    M_errno = M_MEM_ERR;
-	    return(m2);
-	}
-	local = 1;
+        m2 = M_dup(m1);
+        if(m2 == 0)
+        {
+            M_errno = M_MEM_ERR;
+            return(m2);
+        }
+        local = 1;
     }
     else {
-	if((NL2 != NL1) || (NC2 != NC1))
-	{
-	    M_errno = M_INVDIM_ERR;
-	    return((MAT *) 0);
-	}
-	M_copy(m2, m1);
-   }
+        if((NL2 != NL1) || (NC2 != NC1))
+        {
+            M_errno = M_INVDIM_ERR;
+            return((MAT *) 0);
+        }
+        M_copy(m2, m1);
+    }
 
     for(i = 0; i < NL2; i++)
-	MATE2(i, i) += 1.0;
+        MATE2(i, i) += 1.0;
 
     for(m = 0; m < NL2; m++)
     {
-	if((p = MATE2(m,m) - 1) == 0) goto err;
+        if((p = MATE2(m,m) - 1) == 0) goto err;
 
-	for(j = 0; j < NL2; j++)
-	    MATE2(m,j) /= p;
+        for(j = 0; j < NL2; j++)
+            MATE2(m,j) /= p;
 
-	for(i = 0; i < NL2; i++)
-	{
-	    if ( i == m) continue;
-	    q = MATE2(i, m);
+        for(i = 0; i < NL2; i++)
+        {
+            if ( i == m) continue;
+            q = MATE2(i, m);
 
-	    for(j = 0; j < NL2; j++)
-		MATE2(i,j) -= q * MATE2(m, j);
-	}
+            for(j = 0; j < NL2; j++)
+                MATE2(i,j) -= q * MATE2(m, j);
+        }
     }
 
     for(i = 0; i < NL2; i++)
-	MATE2(i, i) -= 1.0;
+        MATE2(i, i) -= 1.0;
 
     return(m2);
 
@@ -118,21 +118,21 @@ M_inv_init(dim, m2, m1)  /* inv  mat */
 int     dim;
 MAT     *m2, *m1;
 {
-  int   i;
+    int   i;
 
-  if (dim < 1) return(-1);
-  else {
-      /* allocate the inverse matrix, init all elem == 0  */
-       /* first make the inverse-to-be the identity matrix */
+    if (dim < 1) return(-1);
+    else {
+        /* allocate the inverse matrix, init all elem == 0  */
+        /* first make the inverse-to-be the identity matrix */
 
-      M_clear(m2);
-      for(i = 0; i < dim; i++) MATE2(i,i) =  1.0;
-      if (NL1 == 1)
-	if (ZERO(MATE1(i,i))) return(-1);   /* singular matrix */
-	else
-	  MATE2(0,0) = 1.0 / MATE1(0,0);
-      }
-  return(0);
+        M_clear(m2);
+        for(i = 0; i < dim; i++) MATE2(i,i) =  1.0;
+        if (NL1 == 1)
+            if (ZERO(MATE1(i,i))) return(-1);   /* singular matrix */
+            else
+                MATE2(0,0) = 1.0 / MATE1(0,0);
+    }
+    return(0);
 }
 
 
@@ -165,8 +165,8 @@ La matrice m1 n'est pas modifi‚e.
 
 #ifdef SCRCPP
 MAT *M_inv_2(
-MAT     *m2,
-MAT     *m
+    MAT     *m2,
+    MAT     *m
 )
 #else
 MAT *M_inv_2(m2, m)
@@ -176,7 +176,7 @@ MAT    *m2, *m;
 {
     MREAL   *vect;
     MREAL   *v1_r_row = 0, *v1_row = 0,
-	    *v2_r_row = 0, *v2_row = 0;
+             *v2_r_row = 0, *v2_row = 0;
     MREAL   div, mult;
     MAT     *m1 = 0;
     int     error, row, r_row, dim;
@@ -185,32 +185,31 @@ MAT    *m2, *m;
     m1 = M_dup(m);
     if(m1 == 0)
     {
-	M_errno = M_MEM_ERR;
-	return((MAT *)0);
+        M_errno = M_MEM_ERR;
+        return((MAT *)0);
     }
 
     if((NL1 != NC1))
     {
-	M_errno = M_INVDIM_ERR;
-	goto err;
+        M_errno = M_INVDIM_ERR;
+        goto err;
     }
 
     if (m2 == 0)
     {
-	m2 = (MAT *) M_alloc(NL1, NC1);
-	if(m2 == 0)
-	{
-	    M_errno = M_MEM_ERR;
-	    goto err;
-	}
-	local = 1;
+        m2 = (MAT *) M_alloc(NL1, NC1);
+        if(m2 == 0)
+        {
+            M_errno = M_MEM_ERR;
+            goto err;
+        }
+        local = 1;
     }
-    else
-	if((NL2 != NL1) || (NC2 != NC1))
-	{
-	    M_errno = M_INVDIM_ERR;
-	    goto err;
-	}
+    else if((NL2 != NL1) || (NC2 != NC1))
+    {
+        M_errno = M_INVDIM_ERR;
+        goto err;
+    }
 
     dim = NL1;
     error = M_inv_init(dim, m2, m1);
@@ -224,44 +223,44 @@ MAT    *m2, *m;
 
     if (NL1 > 1)
     {
-	/* make data matrix up triangular */
-	r_row = 0;
-	while ((error == 0) && (r_row < dim))
-	{
-	    /* check to see if the diagonal element is zero */
-	    if (ZERO(MATE1(r_row,r_row)))
-		error = M_inv_pivot(r_row, m2, m1);
-	    if (error == 0)
-	    {
-		div = MATE1(r_row,r_row);
-		vect = MATL(m1, r_row);
-		M_ero_div(dim, div, vect);
-		vect = MATL(m2, r_row);
-		M_ero_div(dim, div, vect);
+        /* make data matrix up triangular */
+        r_row = 0;
+        while ((error == 0) && (r_row < dim))
+        {
+            /* check to see if the diagonal element is zero */
+            if (ZERO(MATE1(r_row,r_row)))
+                error = M_inv_pivot(r_row, m2, m1);
+            if (error == 0)
+            {
+                div = MATE1(r_row,r_row);
+                vect = MATL(m1, r_row);
+                M_ero_div(dim, div, vect);
+                vect = MATL(m2, r_row);
+                M_ero_div(dim, div, vect);
 
-		for(row = 0; row < dim; row++)
-		   /* make the r_row element of this row zero */
-		   if (row != r_row && !ZERO(MATE1(row,r_row)))
-		   {
-			mult = -MATE1(row,r_row) / MATE1(r_row,r_row);
+                for(row = 0; row < dim; row++)
+                    /* make the r_row element of this row zero */
+                    if (row != r_row && !ZERO(MATE1(row,r_row)))
+                    {
+                        mult = -MATE1(row,r_row) / MATE1(r_row,r_row);
 
-			v1_r_row =  M_vswp_to_cnv(v1_r_row, ROW(m1, r_row), dim);
-			v1_row =    M_vswp_to_cnv(v1_row, ROW(m1, row), dim);
-			M_ero_ma(dim, mult,v1_r_row,v1_row);
-			ROW(m1, r_row) = M_vcnv_to_swp(ROW(m1,r_row), v1_r_row, dim);
-			ROW(m1, row) =   M_vcnv_to_swp(ROW(m1,row), v1_row, dim);
+                        v1_r_row =  M_vswp_to_cnv(v1_r_row, ROW(m1, r_row), dim);
+                        v1_row =    M_vswp_to_cnv(v1_row, ROW(m1, row), dim);
+                        M_ero_ma(dim, mult,v1_r_row,v1_row);
+                        ROW(m1, r_row) = M_vcnv_to_swp(ROW(m1,r_row), v1_r_row, dim);
+                        ROW(m1, row) =   M_vcnv_to_swp(ROW(m1,row), v1_row, dim);
 
-			v2_r_row =  M_vswp_to_cnv(v2_r_row, ROW(m2, r_row), dim);
-			v2_row =    M_vswp_to_cnv(v2_row, ROW(m2, row), dim);
-			M_ero_ma(dim, mult,v2_r_row,v2_row);
-			ROW(m2, r_row) = M_vcnv_to_swp(ROW(m2,r_row), v2_r_row, dim);
-			ROW(m2, row) =   M_vcnv_to_swp(ROW(m2,row), v2_row, dim);
+                        v2_r_row =  M_vswp_to_cnv(v2_r_row, ROW(m2, r_row), dim);
+                        v2_row =    M_vswp_to_cnv(v2_row, ROW(m2, row), dim);
+                        M_ero_ma(dim, mult,v2_r_row,v2_row);
+                        ROW(m2, r_row) = M_vcnv_to_swp(ROW(m2,r_row), v2_r_row, dim);
+                        ROW(m2, row) =   M_vcnv_to_swp(ROW(m2,row), v2_row, dim);
 
-		   }
-	    }
-	    r_row = r_row ++;
-	}
-	if (error != 0) goto err;
+                    }
+            }
+            r_row = r_row ++;
+        }
+        if (error != 0) goto err;
     }
     M_free(m1);
     M_free_vec(v1_r_row);
@@ -307,37 +306,37 @@ MAT     *m1, *m2;
 
     while ((error > 0) && (n_row < dim))
     {
-	if (!ZERO(MATE1(n_row,r_row)))
-	{
-	    v_r_row =  M_alloc_vec(dim);
-	    v_n_row =  M_alloc_vec(dim);;
-	    if (M_errno != 0) return(M_errno);
+        if (!ZERO(MATE1(n_row,r_row)))
+        {
+            v_r_row =  M_alloc_vec(dim);
+            v_n_row =  M_alloc_vec(dim);;
+            if (M_errno != 0) return(M_errno);
 
-	    v_r_row =  M_vswp_to_cnv(v_r_row, ROW(m1, r_row), dim);
-	    v_n_row =  M_vswp_to_cnv(v_n_row, ROW(m1, n_row), dim);
-	    M_ero_sw(m1->m_nl, v_n_row, v_r_row);
-	    ROW(m1, r_row) =   M_vcnv_to_swp(ROW(m1,r_row), v_r_row, dim);
-	    ROW(m1, n_row) =   M_vcnv_to_swp(ROW(m1,n_row), v_n_row, dim);
+            v_r_row =  M_vswp_to_cnv(v_r_row, ROW(m1, r_row), dim);
+            v_n_row =  M_vswp_to_cnv(v_n_row, ROW(m1, n_row), dim);
+            M_ero_sw(m1->m_nl, v_n_row, v_r_row);
+            ROW(m1, r_row) =   M_vcnv_to_swp(ROW(m1,r_row), v_r_row, dim);
+            ROW(m1, n_row) =   M_vcnv_to_swp(ROW(m1,n_row), v_n_row, dim);
 
-	    M_free_vec(v_r_row);
-	    M_free_vec(v_n_row);
+            M_free_vec(v_r_row);
+            M_free_vec(v_n_row);
 
-	    v_r_row =  M_alloc_vec(dim);
-	    v_n_row =  M_alloc_vec(dim);;
-	    if (M_errno != 0) return(M_errno);
+            v_r_row =  M_alloc_vec(dim);
+            v_n_row =  M_alloc_vec(dim);;
+            if (M_errno != 0) return(M_errno);
 
-	    v_n_row =  M_vswp_to_cnv(v_n_row, ROW(m2, n_row), dim);
-	    v_r_row =  M_vswp_to_cnv(v_r_row, ROW(m2, r_row), dim);
-	    M_ero_sw(m2->m_nl, v_n_row,v_r_row);
-	    ROW(m2, r_row) =   M_vcnv_to_swp(ROW(m2,r_row), v_r_row, dim);
-	    ROW(m2, n_row) =   M_vcnv_to_swp(ROW(m2,n_row), v_n_row, dim);
+            v_n_row =  M_vswp_to_cnv(v_n_row, ROW(m2, n_row), dim);
+            v_r_row =  M_vswp_to_cnv(v_r_row, ROW(m2, r_row), dim);
+            M_ero_sw(m2->m_nl, v_n_row,v_r_row);
+            ROW(m2, r_row) =   M_vcnv_to_swp(ROW(m2,r_row), v_r_row, dim);
+            ROW(m2, n_row) =   M_vcnv_to_swp(ROW(m2,n_row), v_n_row, dim);
 
-	    M_free_vec(v_r_row);
-	    M_free_vec(v_n_row);
+            M_free_vec(v_r_row);
+            M_free_vec(v_n_row);
 
-	    error = 0;
-	}
-	n_row = n_row++;
+            error = 0;
+        }
+        n_row = n_row++;
     }
     return(error);
 }

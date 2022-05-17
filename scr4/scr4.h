@@ -858,6 +858,10 @@
 
 /* ==== EXTERN VARS DECLARATIONS ================================= */
 
+//#ifdef SCRCPP
+//extern "C" {
+//#endif /* SCRCPP*/
+
 extern int          SCR_PAGE_SIZE[];
 extern int          SCR_CURRENT_COLOR;
 extern int          SCR_CURRENT_ATTR;
@@ -1119,6 +1123,10 @@ extern int  MMT_BACK,
 	    MMT_REVERSE,
 	    MMT_COMMENT,
 	    MMT_BOXES;
+
+//#ifdef SCRCPP
+//}
+//#endif /* SCRCPP*/
 
 /* ==== DEFINE FOR SCR_TBL ================================= */
 
