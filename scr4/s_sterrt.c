@@ -114,18 +114,20 @@ int     lang;
     static long pos = 0;
 
     if(fd_msg == 0) {
-	pt = SCR_search_file(SCR_NAME_ERR);
-	if(pt) {
+        pt = SCR_search_file(SCR_NAME_ERR);
+        if(pt) {
 #ifdef UNIX
-	    fd_msg = fopen(pt, "r");
+            fd_msg = fopen(pt, "r");
 #else
-	    fd_msg = fopen(pt, "rb");  /* JMP 24-12-98 */
+            fd_msg = fopen(pt, "rb");  /* JMP 24-12-98 */
 #endif
-	    if(fd_msg)
-            pos = SCR_get_app_pos(fd_msg, SCR_ERR_FILE_NB);
+            if(fd_msg)
+                pos = SCR_get_app_pos(fd_msg, SCR_ERR_FILE_NB);
 	    }
 	}
+    
     SCR_ERR_FILE_POS = pos;
+    if(pos < 0) return(NULL); // JMP 17/05/2022
     pt = SCR_get_err_txt_t_lang(fd_msg, keyw, lang);
     SCR_ERR_FILE_POS = 0L;
     return(pt);
