@@ -98,25 +98,22 @@ QVariant QIodeEditTableModel::data(const QModelIndex& index, int role) const
 
 	if (role == Qt::TextAlignmentRole)
 	{
-		EnumCellAttribute cell_align;
-		switch (line_type)
+		EnumCellAttribute cell_align = EnumCellAttribute::IT_LEFT;
+		if (line_type == IT_TITLE || line_type == IT_CELL)
 		{
-		case IT_TITLE:
-			return int(Qt::AlignCenter);
-		case IT_CELL:
 			cell_align = is_divider ? table->getDividerCellAlign(j_column) : table->getCellAlign(i_line, j_column);
-			switch (cell_align)
-			{
-			case IT_LEFT:
-				return int(Qt::AlignLeft);
-			case IT_CENTER:
-				return int(Qt::AlignCenter);
-			case IT_RIGHT:
-				return int(Qt::AlignRight);
-				break;
-			default:
-				return int(Qt::AlignLeft);
-			}
+		}
+
+		switch (cell_align)
+		{
+		case IT_LEFT:
+			return int(Qt::AlignLeft);
+		case IT_CENTER:
+			return int(Qt::AlignCenter);
+		case IT_RIGHT:
+			return int(Qt::AlignRight);
+		case IT_DECIMAL:
+			return int(Qt::AlignRight);
 		default:
 			return int(Qt::AlignLeft);
 		}
@@ -124,25 +121,14 @@ QVariant QIodeEditTableModel::data(const QModelIndex& index, int role) const
 
 	if (role == Qt::FontRole)
 	{
-		EnumCellAttribute cell_font;
-		switch (line_type)
-		{
-		case IT_TITLE:
-			return int(QFont::Bold);
-		case IT_CELL:
-			cell_font = is_divider ? table->getDividerCellFont(j_column) : table->getCellFont(i_line, j_column);
-			switch (cell_font)
-			{
-			case IT_BOLD:
-				return int(QFont::Bold);
-			case IT_ITALIC:
-				return int(QFont::StyleItalic);
-			default:
-				return int(QFont::StyleNormal);
-			}
-		default:
-			return int(QFont::StyleNormal);
-		}
+		if (is_divider) return int(QFont::StyleNormal);
+		if (!(line_type == IT_TITLE || line_type == IT_CELL)) return int(QFont::StyleNormal);
+		
+		QFont font;
+		if (table->isCellBoldFont(i_line, j_column)) font.setBold(true);
+		if (table->isCellItalicFont(i_line, j_column)) font.setItalic(true);
+		if (table->isCellUnderlineFont(i_line, j_column)) font.setUnderline(true);
+		return font;
 	}
 
 	if (role == Qt::BackgroundRole)
