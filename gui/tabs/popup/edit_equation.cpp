@@ -1,8 +1,13 @@
 #include "edit_equation.h"
 
 
-QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(parent, f)
 {
+	// TODO: if possible, find a way to initialize className inside MixingSettings
+	// NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
+	//                       since in that case this refers to MixingSettings and NOT the derived class
+	className = QString::fromStdString(typeid(this).name());
+
 	setupUi(this);
 
 	textEdit_lec->setAcceptRichText(false);
@@ -20,6 +25,10 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* paren
 	lineComment = new WrapperQLineEdit(label_comment->text(), *lineEdit_comment, OPTIONAL_FIELD);
 	lineBlock = new WrapperQLineEdit(label_block->text(), *lineEdit_block, OPTIONAL_FIELD);
 	lineInstruments = new WrapperQLineEdit(label_instruments->text(), *lineEdit_instruments, OPTIONAL_FIELD);
+
+	mapFields["Method"] = comboBoxMethod;
+	mapFields["From"] = sampleFrom;
+	mapFields["To"] = sampleTo;
 
 	std::string std_equation_name = equationName.toStdString();
 
@@ -48,22 +57,20 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* paren
 	else
 	{
 		// --- new equation ---
-		KDBVariables kdb_vars;
-		Sample sample = kdb_vars.get_sample();
-		if (sample.nb_periods() > 0)
-		{
-			sampleFrom->setQValue(QString::fromStdString(sample.start_period().to_string()));
-			sampleTo->setQValue(QString::fromStdString(sample.end_period().to_string()));
-		}
+		className = className.replace("Edit", "New");
+		lineEdit_name->setReadOnly(false);
+		loadSettings();
 	}
 }
 
 QIodeEditEquation::~QIodeEditEquation() 
 {
+	delete lineName;
 	delete comboBoxMethod;
 	delete sampleFrom;
 	delete sampleTo;
 	delete lineLec;
+	delete lineComment;
 	delete lineBlock;
 	delete lineInstruments;
 }
