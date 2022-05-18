@@ -20,7 +20,7 @@
  */
 
 
-class QIodeEditEquation : public QDialog, public Ui::QIodeEditEquation
+class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
 {
     Q_OBJECT
 
