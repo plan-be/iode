@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuWorkspaceClear::QIodeMenuWorkspaceClear(QSettings& settings, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(settings, parent, f)
+QIodeMenuWorkspaceClear::QIodeMenuWorkspaceClear(QWidget* parent, Qt::WindowFlags f) : QIodeSettings(parent, f)
 {
 	setupUi(this);
 

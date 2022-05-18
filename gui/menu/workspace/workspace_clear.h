@@ -22,7 +22,7 @@ class QIodeMenuWorkspaceClear : public QIodeSettings, public Ui::QIodeMenuWorksp
     bool exit;
 
 public:
-	QIodeMenuWorkspaceClear(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceClear(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceClear();
 
 public slots:

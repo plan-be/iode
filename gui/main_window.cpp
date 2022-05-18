@@ -51,17 +51,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->tableview_variables->setupModel(variablesModel);
     this->tableview_variables->setStyleSheet(stylesheet);
     this->tableview_variables->hide();
-
-    // ---- Settings ----
-
-    // save the settings in a specific file located in the current directory
-    settings = get_local_settings_instance();
 }
 
 MainWindow::~MainWindow()
 {
-    delete settings;
-
     delete commentsModel;
     delete equationsModel;
     delete identitiesModel;
@@ -114,20 +107,20 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::open_load_workspace_dialog()
 {
-    QIodeMenuWorkspaceLoad dialog(*settings, this);
+    QIodeMenuWorkspaceLoad dialog(this);
     dialog.exec();
     updateCurrentTab();
 }
 
 void MainWindow::open_save_workspace_dialog()
 {
-    QIodeMenuWorkspaceSave dialog(*settings, this);
+    QIodeMenuWorkspaceSave dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_clear_workspace_dialog()
 {
-    QIodeMenuWorkspaceClear dialog(*settings, this);
+    QIodeMenuWorkspaceClear dialog(this);
     dialog.exec();
     updateCurrentTab();
 }

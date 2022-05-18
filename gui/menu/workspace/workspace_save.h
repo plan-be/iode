@@ -22,7 +22,7 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
     bool exit;
 
 public:
-	QIodeMenuWorkspaceSave(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceSave(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceSave();
 
 public slots:
