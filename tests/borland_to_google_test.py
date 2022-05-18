@@ -240,6 +240,8 @@ public:
                 else:
                     raise RuntimeError(f"Unknown kind of function with signature: {function[0]}")
                 function = []
+        elif line.startswith("#ifdef") or line.startswith("#endif"):
+            func_to_export_lines += [line]
         # assume we are outside a test function
         else:
             pass

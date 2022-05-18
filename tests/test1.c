@@ -123,8 +123,6 @@ fin:
 }
 
 
-void (*kmsg_super_ptr)(char*);
-
 void kmsg_null(char*msg) 
 {
 }
@@ -474,6 +472,7 @@ void Tests_Simulation()
     U_ch**      endo_exo;
     int         rc;
     LIS         lst, expected_lst;
+    void        (*kmsg_super_ptr)(char*);
     
     // Loads 3 WS and check ok
     U_test_load_fun_esv(filename);
@@ -552,6 +551,7 @@ void Tests_Simulation()
     // Cleanup
     SCR_free_tbl(endo_exo);
     SCR_free(smpl);
+    kmsg_super = kmsg_super_ptr; // reset default value
 }
 
 
@@ -586,38 +586,38 @@ void Tests_PrintTables()
     K_load_RWS(2, NULL);
 }
 
-/*
-void Tests_Estimation()
-{
-    int         rc;
-    IODE_REAL   x;
 
-    kmsg_super = kmsg_super_ptr; // Reset initial output to 
+//void Tests_Estimation()
+//{
+//    int         rc;
+//    IODE_REAL   x;
+//
+//    kmsg_super = kmsg_super_ptr; // Reset initial output to 
+//
+//    // Select output destination
+//    //W_dest("test1_estim.a2m", A2M_DESTA2M);
+//    //W_dest("test1_estim.rtf", A2M_DESTRTF);
+//    W_dest("test1_estim.htm", A2M_DESTHTML);
+//    //W_dest("test.gdi", A2M_DESTGDIPRT); //=> plante
+//    
+//    U_test_load_fun_esv("fun");
+//    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
+//    S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
+//
+//    //x = U_test_calc_lec("_YRES[1980Y1]", 0);
+//    //printf("x = %lf\n", x);
+//    //x = fabs(x + 0.001150);
+//    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115), "Estimation : _YRES[1980Y1] == -0.001150");
+//    
+//    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
+//    S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
+//    
+//    //TODO:add some tests with other estimation methods / on blocks / with instruments
+//    
+//    //W_flush();
+//    W_close();
+//}
 
-    // Select output destination
-    //W_dest("test1_estim.a2m", A2M_DESTA2M);
-    //W_dest("test1_estim.rtf", A2M_DESTRTF);
-    W_dest("test1_estim.htm", A2M_DESTHTML);
-    //W_dest("test.gdi", A2M_DESTGDIPRT); //=> plante
-    
-    U_test_load_fun_esv("fun");
-    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
-    S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
-
-    //x = U_test_calc_lec("_YRES[1980Y1]", 0);
-    //printf("x = %lf\n", x);
-    //x = fabs(x + 0.001150);
-    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115), "Estimation : _YRES[1980Y1] == -0.001150");
-    
-    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
-    S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
-    
-    //TODO:add some tests with other estimation methods / on blocks / with instruments
-    
-    //W_flush();
-    W_close();
-}
-*/
 void Tests_ALIGN()
 {
     TBL     tbl, *p_tbl = &tbl;
