@@ -9,7 +9,8 @@ jobs:
     strategy:
       matrix:
         # os: [windows-latest, ubuntu-latest]
-        os: [windows-latest]
+        # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
+        os: [windows-2019]
         # config: ["debug", "release"]
         build_config: ["debug"]
         arch: ["x64"]
