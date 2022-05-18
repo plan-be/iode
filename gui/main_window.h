@@ -25,8 +25,6 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 	Q_OBJECT
 
 private:
-	QSettings* settings;
-
 	CommentsModel* commentsModel;
 	EquationsModel* equationsModel;
 	IdentitiesModel* identitiesModel;

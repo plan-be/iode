@@ -39,7 +39,7 @@ private:
 
 
 public:
-	QIodeMenuWorkspaceLoad(QSettings& settings, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceLoad(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceLoad();
 
 public slots:

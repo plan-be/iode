@@ -26,6 +26,12 @@
 
 
 /* ****************************** *
+ *          GLOBAL VARS           *
+ * ****************************** */
+
+QString settings_filepath = "settings.ini";
+
+/* ****************************** *
  *        ENUMS AND MAPS          *
  * ****************************** */
 
@@ -61,12 +67,6 @@ inline const QUrl get_url_iode_manual()
     return get_url_iode_helpfile("iode.chm");
 }
 
-inline QSettings* get_local_settings_instance()
-{
-    QSettings* settings = new QSettings("settings.ini", QSettings::IniFormat);
-    return settings;
-}
-
 
 /* ****************************** *
  *         BASE CLASSES           *
@@ -93,42 +93,49 @@ class QIodeSettings : public QDialog
     Q_OBJECT
 
 protected:
-    QSettings& settings;
+    QSettings* settings;
     QString className;
     QMap<QString, BaseWrapper*> mapFields;
 
 public:
-    QIodeSettings(QSettings& settings, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) :
-        QDialog(parent, f), settings(settings), className("") { }
-    ~QIodeSettings() { }
+    QIodeSettings(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) :
+        QDialog(parent, f), className("") 
+    {
+        settings = new QSettings(settings_filepath, QSettings::IniFormat);
+    }
+
+    ~QIodeSettings() 
+    {
+        delete settings;
+    }
 
 protected:
     void saveSettings()
     {
-        settings.beginGroup(className);
+        settings->beginGroup(className);
         QMap<QString, BaseWrapper*>::iterator i;
         for (i = mapFields.begin(); i != mapFields.end(); ++i)
         {
             QString name = i.key();
             BaseWrapper* field = i.value();
             QVariant value = field->getQValue();
-            settings.setValue(name, value);
+            settings->setValue(name, value);
         }
-        settings.endGroup();
+        settings->endGroup();
     }
 
     void loadSettings()
     {
-        settings.beginGroup(className);
+        settings->beginGroup(className);
         QMap<QString, BaseWrapper*>::iterator i;
         for (i = mapFields.begin(); i != mapFields.end(); ++i)
         {
             QString name = i.key();
             BaseWrapper* field = i.value();
-            QVariant value = settings.value(name).toString();
+            QVariant value = settings->value(name).toString();
             field->setQValue(value);
         }
-        settings.endGroup();
+        settings->endGroup();
     }
 
     void closeEvent(QCloseEvent* event) override
