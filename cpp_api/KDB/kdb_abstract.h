@@ -15,7 +15,6 @@ class KDBAbstract
 {
 protected:
     EnumIodeType type;
-    std::string type_name;
 
 protected:
     // Cannot define a KDB *kdb member set to K_WS[type] in the constructor because the pointer contained in 
@@ -23,7 +22,7 @@ protected:
     KDB* get_KDB() const
     {
         KDB* kdb = K_WS[type];
-        if (kdb == NULL) throw std::runtime_error("There is currently no " + type_name + " database in memory.");
+        if (kdb == NULL) throw std::runtime_error("There is currently no " + vIodeTypes[type] + " database in memory.");
         return kdb;
     }
 
@@ -31,7 +30,7 @@ protected:
     {
         KDB* kdb = get_KDB();
         int nb_objs = count();
-        if (pos < 0 || pos > nb_objs) throw std::runtime_error(type_name + " at position " + std::to_string(pos) + " does not exist.");
+        if (pos < 0 || pos > nb_objs) throw std::runtime_error(vIodeTypes[type] + " at position " + std::to_string(pos) + " does not exist.");
         return kdb->k_objs[pos];
     }
 
@@ -40,7 +39,7 @@ protected:
         KDB* kdb = get_KDB();
         check_name(name, type);
         int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-        if (pos < 0) throw std::runtime_error(type_name + " with name " + name + " does not exist.");
+        if (pos < 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " does not exist.");
         return pos;
     }
 

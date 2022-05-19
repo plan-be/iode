@@ -11,7 +11,7 @@ void KDBComments::add_or_update(const std::string& name, const Comment& comment)
     char* c_name = const_cast<char*>(name.c_str());
     int res = K_add(get_KDB(), c_name, c_comment_oem);
     if (res == -1) throw std::runtime_error("Iode has not been initialized");
-    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + type_name + " with name " + name);
+    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + vIodeTypes[type] + " with name " + name);
 }
 
 Comment KDBComments::copy_obj(const Comment& original) const

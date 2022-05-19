@@ -6,7 +6,7 @@
 
 
 template<class T>
-KDBAbstract<T>::KDBAbstract(EnumIodeType type) : type(type), type_name(vIodeTypes[type])
+KDBAbstract<T>::KDBAbstract(EnumIodeType type) : type(type)
 {
     if (K_WS[type] == NULL) IodeInit();
     IODE_assign_super_API();
@@ -44,9 +44,9 @@ int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_n
     // see K_ren documentation
     if (pos < 0)
     {
-        std::string msg = type_name + " cannot be renamed as " + new_name + ".";
+        std::string msg = vIodeTypes[type] + " cannot be renamed as " + new_name + ".";
         if (pos == -1) throw std::runtime_error("Name " + old_name + " does not exist.\n" + msg);
-        else if (pos == -2) throw std::runtime_error(type_name + " with name " + new_name + " already exists.\n" + msg);
+        else if (pos == -2) throw std::runtime_error(vIodeTypes[type] + " with name " + new_name + " already exists.\n" + msg);
         else throw std::runtime_error("Something went wrong.\n" + msg);
     }
     
@@ -63,7 +63,7 @@ void KDBAbstract<T>::add(const std::string& name, const T& obj)
     // throw exception if object with passed name already exist
     char* c_name = const_cast<char*>(name.c_str());
     if (K_find(get_KDB(), c_name) >= 0) 
-        throw std::runtime_error(type_name + " with name " + name + " already exists. Use update() method instead.");
+        throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
     
     add_or_update(name, obj);
 }
@@ -144,7 +144,7 @@ void KDBAbstract<T>::load(std::string& filepath)
 
     int res = B_WsLoad(c_filepath, type);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to import " + type_name + " from file " + filepath);
+        throw std::runtime_error("Something went wrong when trying to import " + vIodeTypes[type] + " from file " + filepath);
 }
 
 template<class T>
@@ -156,7 +156,7 @@ void KDBAbstract<T>::save(std::string& filepath)
 
     int res = B_WsSave(c_filepath, type);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to save " + type_name + " to file " + filepath);
+        throw std::runtime_error("Something went wrong when trying to save " + vIodeTypes[type] + " to file " + filepath);
 }
 
 template<class T>
@@ -164,5 +164,5 @@ void KDBAbstract<T>::clear()
 {
     int res = B_WsClear("", type);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to clear objets of type " + type_name);
+        throw std::runtime_error("Something went wrong when trying to clear objets of type " + vIodeTypes[type]);
 }
