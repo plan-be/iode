@@ -6,6 +6,8 @@
 #include "utils.h"
 #include "period.h"
 #include "sample.h"
+#include "super.h"
+#include "equation.h"
 #include "table.h"
 #include "KDB/kdb_comments.h"
 #include "KDB/kdb_equations.h"
