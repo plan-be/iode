@@ -9,7 +9,7 @@ void KDBIdentities::add_or_update(const std::string& name, const Identity& ident
     char* c_name = const_cast<char*>(name.c_str());
     int res = K_add(get_KDB(), c_name, identity.lec);
     if (res == -1) throw std::runtime_error("Iode has not been initialized");
-    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + type_name + " with name " + name);
+    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + vIodeTypes[type] + " with name " + name);
 }
 
 Identity KDBIdentities::copy_obj(const Identity& original) const
@@ -49,14 +49,14 @@ void KDBIdentities::add_or_update(const std::string& name, const std::string& le
     char* c_lec = const_cast<char*>(lec.c_str());
     int res = K_add(get_KDB(), c_name, c_lec);
     if (res == -1) throw std::runtime_error("Iode has not been initialized");
-    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + type_name + " with name " + name);
+    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + vIodeTypes[type] + " with name " + name);
 }
 
 void KDBIdentities::add(const std::string& name, const std::string& lec)
 {
     // throw exception if object with passed name already exist
     char* c_name = const_cast<char*>(name.c_str());
-    if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(type_name + " with name " + name + " already exists. Use update() method instead.");
+    if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
     add_or_update(name, lec);
 }
 
