@@ -100,22 +100,39 @@ TEST_F(KDBVariablesTest, CreateRemove)
     // pass a vector with values
     Variable new_var;
     new_var.reserve(nb_periods);
-    for (int p = 0; p < nb_periods; p++)
-        new_var.push_back(10.0 + p);
+    for (int p = 0; p < nb_periods; p++) new_var.push_back(10. + p);
 
     kdb.add(new_name, new_var);
     EXPECT_EQ(kdb.get(new_name), new_var);
+
+    // --- already existing name
+    std::fill(new_var.begin(), new_var.end(), 1);
+    EXPECT_THROW(kdb.add(new_name, new_var), std::runtime_error);
 
     kdb.remove(new_name);
     EXPECT_THROW(kdb.get(new_name), std::runtime_error);
 
     // pass a LEC expression
-    std::string lec = "10 + t";
-    kdb.add(new_name, lec);
+    for (int p = 0; p < nb_periods; p++) new_var[p] = 10. + p;
+    kdb.add(new_name, "10 + t");
     EXPECT_EQ(kdb.get(new_name), new_var);
-
     kdb.remove(new_name);
-    EXPECT_THROW(kdb.get(new_name), std::runtime_error);
+    
+    new_var[0] = L_NAN;
+    for (int p = 1; p < nb_periods; p++) new_var[p] = 1. / p;
+    kdb.add(new_name, "1 / t");
+    EXPECT_EQ(kdb.get(new_name), new_var);
+    kdb.remove(new_name);
+
+    std::fill(new_var.begin(), new_var.end(), L_NAN);
+    kdb.add(new_name, "");
+    EXPECT_EQ(kdb.get(new_name), new_var);
+    kdb.remove(new_name);
+
+    // --- using function that does not exist
+    EXPECT_THROW(kdb.add("FAILS", "func(t)"), std::runtime_error);
+    // --- using variable taht does not exist
+    EXPECT_THROW(kdb.add("FAILS", "ln Z"), std::runtime_error);
 }
 
 TEST_F(KDBVariablesTest, Update)
