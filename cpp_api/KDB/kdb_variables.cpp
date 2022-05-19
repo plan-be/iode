@@ -59,10 +59,16 @@ void KDBVariables::set_var(const std::string& name, const int t, const int mode,
 
 Variable KDBVariables::new_var_from_lec(const std::string& lec)
 {
-	if (lec.empty()) throw std::runtime_error("Cannot create or update variable. Passed LEC expression is empty.");
+	Variable var;
 
 	Sample sample = get_sample();
 	if (sample.nb_periods() == 0) throw std::runtime_error("Variables sample has not been yet defined. Cannot create a new variable.");
+
+	if (lec.empty())
+	{
+		for (int t = 0; t < sample.nb_periods(); t++) var.push_back(L_NAN);
+		return var;
+	}
 
 	// code below is an adapted copy/paste from B_DataCalcVar() (in b_data.c)
 	char* c_lec = const_cast<char*>(lec.c_str());
@@ -72,7 +78,6 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	// The CLEC object is modified (inplace) by L_link()
 	if (clec != NULL && L_link(KV_WS, KS_WS, clec) == 0)
 	{
-		Variable var;
 		for (int t = 0; t < sample.nb_periods(); t++) var.push_back(L_exec(KV_WS, KS_WS, clec, t));
 		SW_nfree(clec);
 		return var;
