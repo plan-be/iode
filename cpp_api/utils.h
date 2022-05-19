@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "super.h"
 
 #include <string>
 #include <regex>
