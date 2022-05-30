@@ -3,6 +3,7 @@
 #include <QObject>
 
 #include "abstract_table_model.h"
+#include "abstract_table_model.cpp"
 
 
 class ListsModel : public IODEAbstractTableModel<KDBLists>
@@ -13,13 +14,7 @@ public:
 	ListsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "List" }, parent) {};
 
 private:
-	QVariant dataCell(const int row, const int col) const
-	{
-		if (col == 0)
-			return QVariant(QString::fromStdString(kdb.get_name(row)));
-		else
-			return QVariant(QString::fromStdString(kdb.get(row)));
-	}
+	QVariant dataCell(const int row, const int col) const;
 
 public slots:
 	void reset() { resetModel(); };

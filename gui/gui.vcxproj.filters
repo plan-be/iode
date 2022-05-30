@@ -81,6 +81,9 @@
     <Filter Include="DOS\O">
       <UniqueIdentifier>{c3e9577c-2527-4e87-bc41-77343d0cc75f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\model">
+      <UniqueIdentifier>{a3a1e48f-d62a-4f2b-86cd-aba378c17de0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -154,6 +157,30 @@
     </ClCompile>
     <ClCompile Include="tabs\popup\edit_vars_sample.cpp">
       <Filter>Source Files\popup</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\abstract_table_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\comments_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\equations_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\identities_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\lists_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\scalars_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\tables_model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="tabs\variables_model.cpp">
+      <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
