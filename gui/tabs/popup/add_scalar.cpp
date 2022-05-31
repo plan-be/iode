@@ -1,15 +1,24 @@
 #include "add_scalar.h"
 
 
-QIodeAddScalar::QIodeAddScalar(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeAddScalar::QIodeAddScalar(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(settings_filepath, parent, f)
 {
+	// TODO: if possible, find a way to initialize className inside MixingSettings
+	// NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
+	//                       since in that case this refers to MixingSettings and NOT the derived class
+	className = QString::fromStdString(typeid(this).name());
+
 	setupUi(this);
 
 	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_SCALARS, REQUIRED_FIELD);
 	lineValue = new WrapperQLineEdit(label_value->text(), *lineEdit_value, REQUIRED_FIELD);
 	spinBoxRelax = new WrapperDoubleSpinBox(label_relax->text(), *doubleSpinBox_relax, REQUIRED_FIELD);
 
+	mapFields["Relax"] = spinBoxRelax;
+
 	lineEdit_value->setValidator(new QDoubleValidator(parent));
+
+	loadSettings();
 }
 
 QIodeAddScalar::~QIodeAddScalar()

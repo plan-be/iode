@@ -3,7 +3,7 @@
 
 void TablesView::new_table()
 {
-	QIodeAddTable dialog(this);
+	QIodeAddTable dialog(*settings_filepath, this);
 	dialog.exec();
 	update();
 }

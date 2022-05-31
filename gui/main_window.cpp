@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // ---- setup the present class ----
     setupUi(this);
 
+    // ---- settings ----
+    settings_filepath = std::make_shared<QString>("iode_gui_settings.ini");
+
     // ---- connect signals to slots  ----
     connect(this->tabWidget_IODE_objs, &QTabWidget::currentChanged, this, &MainWindow::updateCurrentTab);
 
@@ -18,37 +21,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Comments
     commentsModel = new CommentsModel(this);
-    this->tableview_comments->setupModel(commentsModel);
+    this->tableview_comments->setupView(commentsModel, settings_filepath);
     this->tableview_comments->setStyleSheet(stylesheet);
     this->tableview_comments->hide();
     // Equations
     equationsModel = new EquationsModel(this);
-    this->tableview_equations->setupModel(equationsModel);
+    this->tableview_equations->setupView(equationsModel, settings_filepath);
     this->tableview_equations->setStyleSheet(stylesheet);
     this->tableview_equations->hide();
     // Identities
     identitiesModel = new IdentitiesModel(this);
-    this->tableview_identities->setupModel(identitiesModel);
+    this->tableview_identities->setupView(identitiesModel, settings_filepath);
     this->tableview_identities->setStyleSheet(stylesheet);
     this->tableview_identities->hide();
     // Lists
     listsModel = new ListsModel(this);
-    this->tableview_lists->setupModel(listsModel);
+    this->tableview_lists->setupView(listsModel, settings_filepath);
     this->tableview_lists->setStyleSheet(stylesheet);
     this->tableview_lists->hide();
     // Scalars
     scalarsModel = new ScalarsModel(this);
-    this->tableview_scalars->setupModel(scalarsModel);
+    this->tableview_scalars->setupView(scalarsModel, settings_filepath);
     this->tableview_scalars->setStyleSheet(stylesheet);
     this->tableview_scalars->hide();
     // Tables
     tablesModel = new TablesModel(this);
-    this->tableview_tables->setupModel(tablesModel);
+    this->tableview_tables->setupView(tablesModel, settings_filepath);
     this->tableview_tables->setStyleSheet(stylesheet);
     this->tableview_tables->hide();
     // Variables
     variablesModel = new VariablesModel(this);
-    this->tableview_variables->setupModel(variablesModel);
+    this->tableview_variables->setupView(variablesModel, settings_filepath);
     this->tableview_variables->setStyleSheet(stylesheet);
     this->tableview_variables->hide();
 }
@@ -107,20 +110,20 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::open_load_workspace_dialog()
 {
-    QIodeMenuWorkspaceLoad dialog(this);
+    QIodeMenuWorkspaceLoad dialog(*settings_filepath, this);
     dialog.exec();
     updateCurrentTab();
 }
 
 void MainWindow::open_save_workspace_dialog()
 {
-    QIodeMenuWorkspaceSave dialog(this);
+    QIodeMenuWorkspaceSave dialog(*settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_clear_workspace_dialog()
 {
-    QIodeMenuWorkspaceClear dialog(this);
+    QIodeMenuWorkspaceClear dialog(*settings_filepath, this);
     dialog.exec();
     updateCurrentTab();
 }

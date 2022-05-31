@@ -10,6 +10,9 @@ template <class M> class AbstractTableView : public QTableView
 	AbstractDelegate* delegate;
 
 protected:
+	std::shared_ptr<QString> settings_filepath;
+
+protected:
 	void keyPressEvent(QKeyEvent* event) override
 	{
 		if (event->key() == Qt::Key_Delete)
@@ -49,10 +52,11 @@ public:
 
 	~AbstractTableView() {}
 
-	void setupModel(M* model)
+	void setupView(M* model, std::shared_ptr<QString>& settings_filepath)
 	{
 		setModel(model);
 		setItemDelegate(delegate);
+		this->settings_filepath = settings_filepath;
 	}
 
 	void update()

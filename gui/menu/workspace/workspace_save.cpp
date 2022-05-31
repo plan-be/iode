@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuWorkspaceSave::QIodeMenuWorkspaceSave(QWidget* parent, Qt::WindowFlags f) : QIodeSettings(parent, f)
+QIodeMenuWorkspaceSave::QIodeMenuWorkspaceSave(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(settings_filepath, parent, f)
 {
 	setupUi(this);
 

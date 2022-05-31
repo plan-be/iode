@@ -21,7 +21,7 @@ protected:
 		{
 			M* _model = static_cast<M*>(model());
 			QString name = _model->data(_model->index(index.row(), 0)).toString();
-			D dialog(name, static_cast<QWidget*>(parent()));
+			D dialog(name, *settings_filepath, static_cast<QWidget*>(parent()));
 			dialog.exec();
 			this->update();
 		}

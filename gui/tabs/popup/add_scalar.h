@@ -7,6 +7,7 @@
 
 #include "ui_add_scalar.h"
 #include "../../utils.h"
+#include "../../settings.h"
 #include "../../wrapper_classes.h"
 
 
@@ -16,7 +17,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeAddScalar : public QDialog, public Ui::QIodeAddScalar
+class QIodeAddScalar : public QIodeSettings, public Ui::QIodeAddScalar
 {
     Q_OBJECT
 
@@ -25,7 +26,7 @@ class QIodeAddScalar : public QDialog, public Ui::QIodeAddScalar
     WrapperDoubleSpinBox* spinBoxRelax;
 
 public:
-    QIodeAddScalar(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeAddScalar(const QString& settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeAddScalar();
 
 public slots:

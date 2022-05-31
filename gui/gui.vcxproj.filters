@@ -182,6 +182,9 @@
     <ClCompile Include="tabs\variables_model.cpp">
       <Filter>Source Files\model</Filter>
     </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tabs\abstract_table_view.h">
@@ -199,12 +202,12 @@
     <ClInclude Include="tabs\popup_view.h">
       <Filter>Header Files\view</Filter>
     </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="main_window.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="utils.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="tabs\tables_view.h">
@@ -329,6 +332,9 @@
     </QtMoc>
     <QtMoc Include="tabs\popup\add_table.h">
       <Filter>Header Files\popup</Filter>
+    </QtMoc>
+    <QtMoc Include="settings.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

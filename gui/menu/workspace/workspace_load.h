@@ -6,6 +6,7 @@
 
 #include "ui_workspace_load.h"
 #include "../../utils.h"
+#include "../../settings.h"
 #include "../../wrapper_classes.h"
 
 
@@ -39,7 +40,7 @@ private:
 
 
 public:
-	QIodeMenuWorkspaceLoad(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceLoad(const QString& settings_filepath, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceLoad();
 
 public slots:

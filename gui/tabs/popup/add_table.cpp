@@ -1,7 +1,12 @@
 #include "add_table.h"
 
-QIodeAddTable::QIodeAddTable(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeAddTable::QIodeAddTable(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(settings_filepath, parent, f)
 {
+    // TODO: if possible, find a way to initialize className inside MixingSettings
+    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
+    //                       since in that case this refers to MixingSettings and NOT the derived class
+    className = QString::fromStdString(typeid(this).name());
+
     setupUi(this);
 
     lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_TABLES, REQUIRED_FIELD);
@@ -11,6 +16,13 @@ QIodeAddTable::QIodeAddTable(QWidget* parent, Qt::WindowFlags f) : QDialog(paren
     checkBoxMode = new WrapperCheckBox("Mode", *checkBox_mode, REQUIRED_FIELD);
     checkBoxFiles = new WrapperCheckBox("Files", *checkBox_files, REQUIRED_FIELD);
     checkBoxDate = new WrapperCheckBox("Date", *checkBox_date, REQUIRED_FIELD);
+
+    mapFields["NbColumns"] = spinNbColumns;
+    mapFields["Mode"] = checkBoxMode;
+    mapFields["Files"] = checkBoxFiles;
+    mapFields["Date"] = checkBoxDate;
+
+    loadSettings();
 }
 
 QIodeAddTable::~QIodeAddTable()

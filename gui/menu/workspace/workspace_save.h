@@ -4,6 +4,7 @@
 
 #include "ui_workspace_save.h"
 #include "../../utils.h"
+#include "../../settings.h"
 #include "../../wrapper_classes.h"
 
 
@@ -22,7 +23,7 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
     bool exit;
 
 public:
-	QIodeMenuWorkspaceSave(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceSave(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceSave();
 
 public slots:
