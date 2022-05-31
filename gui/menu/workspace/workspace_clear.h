@@ -4,6 +4,7 @@
 
 #include "ui_workspace_clear.h"
 #include "../../utils.h"
+#include "../../settings.h"
 #include "../../wrapper_classes.h"
 
 
@@ -22,7 +23,7 @@ class QIodeMenuWorkspaceClear : public QIodeSettings, public Ui::QIodeMenuWorksp
     bool exit;
 
 public:
-	QIodeMenuWorkspaceClear(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceClear(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceClear();
 
 public slots:

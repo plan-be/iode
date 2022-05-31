@@ -3,7 +3,7 @@
 
 void EquationsView::new_equation()
 {
-	QIodeEditEquation dialog("", this);
+	QIodeEditEquation dialog("", *settings_filepath, this);
 	dialog.exec();
 	update();
 }

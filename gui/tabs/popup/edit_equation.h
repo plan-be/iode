@@ -10,6 +10,7 @@
 #include "ui_edit_equation.h"
 #include "edit_vars_sample.h"
 #include "../../utils.h"
+#include "../../settings.h"
 #include "../../wrapper_classes.h"
 
 
@@ -36,7 +37,7 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
     WrapperQLineEdit* lineInstruments;
 
 public:
-    QIodeEditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditEquation(const QString& equationName, const QString& settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeEditEquation();
 
 public slots:

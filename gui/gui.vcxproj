@@ -168,6 +168,7 @@
     <ClCompile Include="menu\workspace\workspace_clear.cpp" />
     <ClCompile Include="menu\workspace\workspace_load.cpp" />
     <ClCompile Include="menu\workspace\workspace_save.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="tabs\abstract_table_model.cpp" />
     <ClCompile Include="tabs\comments_model.cpp" />
     <ClCompile Include="tabs\comments_view.cpp" />
@@ -221,6 +222,7 @@
     <QtMoc Include="tabs\popup\add_table.h" />
     <QtMoc Include="tabs\popup\add_variable.h" />
     <QtMoc Include="tabs\popup\edit_vars_sample.h" />
+    <QtMoc Include="settings.h" />
     <ClInclude Include="tabs\popup_view.h" />
     <ClInclude Include="util\double_validator.h" />
     <ClInclude Include="wrapper_classes.h" />
@@ -244,7 +246,7 @@
     <QtMoc Include="tabs\tables_view.h" />
     <QtMoc Include="tabs\variables_view.h" />
     <QtMoc Include="main_window.h" />
-    <QtMoc Include="utils.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="main_window.ui" />

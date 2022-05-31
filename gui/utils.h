@@ -4,8 +4,10 @@
 #include "../cpp_api/iode_cpp_api.h"
 
 #include <string>
+#include <memory>   // for the smart pointers
 
 #include <QObject>
+#include <QWidget>
 #include <QVariant>
 #include <QString>
 #include <QVector>
@@ -24,12 +26,6 @@
 #include <typeinfo>      // typeid
 #include <unordered_map>
 
-
-/* ****************************** *
- *          GLOBAL VARS           *
- * ****************************** */
-
-QString settings_filepath = "settings.ini";
 
 /* ****************************** *
  *        ENUMS AND MAPS          *
@@ -84,83 +80,4 @@ struct BaseWrapper
 {
     virtual QVariant getQValue() = 0;
     virtual void setQValue(const QVariant& qvalue) = 0;
-};
-
-
-// Mixin class for handling settings in derived class. 
-class QIodeSettings : public QDialog
-{
-    Q_OBJECT
-
-protected:
-    QSettings* settings;
-    QString className;
-    QMap<QString, BaseWrapper*> mapFields;
-
-public:
-    QIodeSettings(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) :
-        QDialog(parent, f), className("") 
-    {
-        settings = new QSettings(settings_filepath, QSettings::IniFormat);
-    }
-
-    ~QIodeSettings() 
-    {
-        delete settings;
-    }
-
-protected:
-    void saveSettings()
-    {
-        settings->beginGroup(className);
-        QMap<QString, BaseWrapper*>::iterator i;
-        for (i = mapFields.begin(); i != mapFields.end(); ++i)
-        {
-            QString name = i.key();
-            BaseWrapper* field = i.value();
-            QVariant value = field->getQValue();
-            settings->setValue(name, value);
-        }
-        settings->endGroup();
-    }
-
-    void loadSettings()
-    {
-        settings->beginGroup(className);
-        QMap<QString, BaseWrapper*>::iterator i;
-        for (i = mapFields.begin(); i != mapFields.end(); ++i)
-        {
-            QString name = i.key();
-            BaseWrapper* field = i.value();
-            QVariant value = settings->value(name).toString();
-            field->setQValue(value);
-        }
-        settings->endGroup();
-    }
-
-    void closeEvent(QCloseEvent* event) override
-    {
-        saveSettings();
-        event->accept();
-    }
-
-public slots:
-    void help()
-    {
-        QUrl url = get_url_iode_manual();
-        QDesktopServices::openUrl(url);
-    }
-
-    void accept() override
-    {
-        saveSettings();
-        QDialog::accept();
-    }
-
-    void reject() override
-    {
-        saveSettings();
-        QDialog::reject();
-    }
-
 };
