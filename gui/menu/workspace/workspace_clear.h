@@ -20,7 +20,7 @@ class QIodeMenuWorkspaceClear : public QIodeSettings, public Ui::QIodeMenuWorksp
 {
     Q_OBJECT
 
-    bool exit;
+    bool clear_all;
 
 public:
 	QIodeMenuWorkspaceClear(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());

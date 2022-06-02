@@ -15,7 +15,7 @@ QIodeMenuWorkspaceClear::QIodeMenuWorkspaceClear(const QString& settings_filepat
 {
 	setupUi(this);
 
-    exit = true;
+    clear_all = false;
 
     lineEdit_nb_comments->setText(QString::number(KDBComments().count()));
     lineEdit_nb_equations->setText(QString::number(KDBEquations().count()));
@@ -38,7 +38,7 @@ QIodeMenuWorkspaceClear::~QIodeMenuWorkspaceClear()
 
 void QIodeMenuWorkspaceClear::clear_comments()
 {
-    KDBComments kdb = KDBComments();
+    KDBComments kdb;
     try
     {
         kdb.clear();
@@ -47,12 +47,12 @@ void QIodeMenuWorkspaceClear::clear_comments()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_equations()
 {
-    KDBEquations kdb = KDBEquations();
+    KDBEquations kdb;
     try
     {
         kdb.clear();
@@ -61,12 +61,12 @@ void QIodeMenuWorkspaceClear::clear_equations()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_identities()
 {
-    KDBIdentities kdb = KDBIdentities();
+    KDBIdentities kdb;
     try
     {
         kdb.clear();
@@ -75,12 +75,12 @@ void QIodeMenuWorkspaceClear::clear_identities()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_lists()
 {
-    KDBLists kdb = KDBLists();
+    KDBLists kdb;
     try
     {
         kdb.clear();
@@ -89,12 +89,12 @@ void QIodeMenuWorkspaceClear::clear_lists()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_scalars()
 {
-    KDBScalars kdb = KDBScalars();
+    KDBScalars kdb;
     try
     {
         kdb.clear();
@@ -103,12 +103,12 @@ void QIodeMenuWorkspaceClear::clear_scalars()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_tables()
 {
-    KDBTables kdb = KDBTables();
+    KDBTables kdb;
     try
     {
         kdb.clear();
@@ -117,12 +117,12 @@ void QIodeMenuWorkspaceClear::clear_tables()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear_variables()
 {
-    KDBVariables kdb = KDBVariables();
+    KDBVariables kdb;
     try
     {
         kdb.clear();
@@ -131,12 +131,12 @@ void QIodeMenuWorkspaceClear::clear_variables()
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
-    if (exit) this->accept();
+    if (!clear_all) this->accept();
 }
 
 void QIodeMenuWorkspaceClear::clear()
 {
-    exit = false;
+    clear_all = true;
 
     clear_comments();
     clear_equations();
