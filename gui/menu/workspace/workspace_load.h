@@ -34,7 +34,7 @@ class QIodeMenuWorkspaceLoad : public QIodeSettings, public Ui::QIodeMenuWorkspa
 {
 	Q_OBJECT
 
-    bool exit;
+    bool load_all;
 
 private:
 
