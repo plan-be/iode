@@ -104,6 +104,9 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
     std::filesystem::path p_filepath(filepath);
     std::string error_msg = "Call to " + caller_name + "() failed. ";
 
+    // check if empty
+    if (file_must_exist && filepath.empty()) throw std::runtime_error(error_msg + "Empty filepath (" + vIodeTypes[type] + ")");
+
     // convert to absolute path
     if (p_filepath.is_relative()) p_filepath = std::filesystem::absolute(p_filepath);
 
