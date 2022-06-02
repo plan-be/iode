@@ -15,7 +15,7 @@ QIodeMenuWorkspaceLoad::QIodeMenuWorkspaceLoad(const QString& settings_filepath,
 {
 	setupUi(this);
 
-    exit = true;
+    load_all = false;
 
     mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, I_COMMENTS_FILE, EXISTING_FILE);
     mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, I_EQUATIONS_FILE, EXISTING_FILE);
@@ -43,20 +43,17 @@ void QIodeMenuWorkspaceLoad::load_comments()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Comments"]);
         QString filepath = field_filepath->extractAndVerify();
-        // accept = true means that the users clicked on an individual "Load XXX" button.
-        // In that case and if the filepath is empty, we show warning box
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Comments. Filepath is empty."));
-            return;
-        }
+        // load_all means that the users clicked on an the "Load" button to load all files at once.
+        // In that case and if the filepath is empty, the load_xxx() method does nothing
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load_equations()
@@ -66,18 +63,15 @@ void QIodeMenuWorkspaceLoad::load_equations()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Equations"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Equations. Filepath is empty."));
-            return;
-        }
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load_identities()
@@ -87,18 +81,15 @@ void QIodeMenuWorkspaceLoad::load_identities()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Identities"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Identities. Filepath is empty."));
-            return;
-        }
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load_lists()
@@ -108,18 +99,15 @@ void QIodeMenuWorkspaceLoad::load_lists()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Lists"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Lists. Filepath is empty."));
-            return;
-        }
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load_scalars()
@@ -129,18 +117,15 @@ void QIodeMenuWorkspaceLoad::load_scalars()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Scalars"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Scalars. Filepath is empty."));
-            return;
-        }
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load_tables()
@@ -150,18 +135,15 @@ void QIodeMenuWorkspaceLoad::load_tables()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Tables"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Tables. Filepath is empty."));
-            return;
-        }
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load_variables()
@@ -171,23 +153,20 @@ void QIodeMenuWorkspaceLoad::load_variables()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Variables"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
-        {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot load Variables. Filepath is empty."));
-            return;
-        }
+        if (load_all && filepath.isEmpty()) return;
         kdb.load(filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!load_all) this->accept();
 }
 
 void QIodeMenuWorkspaceLoad::load()
 {
-    exit = false;
+    load_all = true;
 
     load_comments();
     load_equations();
