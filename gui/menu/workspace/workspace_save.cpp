@@ -15,7 +15,7 @@ QIodeMenuWorkspaceSave::QIodeMenuWorkspaceSave(const QString& settings_filepath,
 {
 	setupUi(this);
 
-    exit = true;
+    save_all = false;
 
     mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, I_COMMENTS_FILE, FILE_MAY_EXIST);
     mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, I_EQUATIONS_FILE, FILE_MAY_EXIST);
@@ -25,13 +25,21 @@ QIodeMenuWorkspaceSave::QIodeMenuWorkspaceSave(const QString& settings_filepath,
     mapFields["Tables"] = new WrapperFileChooser(pushButton_tables->text(), *fileChooser_tables, OPTIONAL_FIELD, I_TABLES_FILE, FILE_MAY_EXIST);
     mapFields["Variables"] = new WrapperFileChooser(pushButton_variables->text(), *fileChooser_variables, OPTIONAL_FIELD, I_VARIABLES_FILE, FILE_MAY_EXIST);
 
-    lineEdit_nb_comments->setText(QString::number(KDBComments().count()));
-    lineEdit_nb_equations->setText(QString::number(KDBEquations().count()));
-    lineEdit_nb_identities->setText(QString::number(KDBIdentities().count()));
-    lineEdit_nb_lists->setText(QString::number(KDBLists().count()));
-    lineEdit_nb_scalars->setText(QString::number(KDBScalars().count()));
-    lineEdit_nb_tables->setText(QString::number(KDBTables().count()));
-    lineEdit_nb_variables->setText(QString::number(KDBVariables().count()));
+    nb_comments = KDBComments().count();
+    nb_equations = KDBEquations().count();
+    nb_identities = KDBIdentities().count();
+    nb_lists = KDBLists().count();
+    nb_scalars = KDBScalars().count();
+    nb_tables = KDBTables().count();
+    nb_variables = KDBVariables().count();
+
+    lineEdit_nb_comments->setText(QString::number(nb_comments));
+    lineEdit_nb_equations->setText(QString::number(nb_equations));
+    lineEdit_nb_identities->setText(QString::number(nb_lists));
+    lineEdit_nb_lists->setText(QString::number(nb_lists));
+    lineEdit_nb_scalars->setText(QString::number(nb_scalars));
+    lineEdit_nb_tables->setText(QString::number(nb_tables));
+    lineEdit_nb_variables->setText(QString::number(nb_variables));
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -51,20 +59,23 @@ void QIodeMenuWorkspaceSave::save_comments()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Comments"]);
         QString filepath = field_filepath->extractAndVerify();
-        // accept = true means that the users clicked on an individual "Load XXX" button.
-        // In that case and if the filepath is empty, we show warning box
-        if (exit && filepath.isEmpty())
+        // save_all means that the users clicked on an the "Save" button to load all files at once.
+        // In that case and if the filepath is empty, the save_xxx() method shows a warning box
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Comments. Filepath is empty."));
-            return;
+            if (nb_comments > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Comments.\nComments will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save_equations()
@@ -74,18 +85,21 @@ void QIodeMenuWorkspaceSave::save_equations()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Equations"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Equations. Filepath is empty."));
-            return;
+            if (nb_equations > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Equations.\nEquations will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save_identities()
@@ -95,18 +109,21 @@ void QIodeMenuWorkspaceSave::save_identities()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Identities"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Identities. Filepath is empty."));
-            return;
+            if (nb_identities > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Identities.\nIdentities will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save_lists()
@@ -116,18 +133,21 @@ void QIodeMenuWorkspaceSave::save_lists()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Lists"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Lists. Filepath is empty."));
-            return;
+            if (nb_lists > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Lists.\nLists will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save_scalars()
@@ -137,18 +157,21 @@ void QIodeMenuWorkspaceSave::save_scalars()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Scalars"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Scalars. Filepath is empty."));
-            return;
+            if (nb_scalars > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Scalars.\nScalars will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save_tables()
@@ -158,18 +181,21 @@ void QIodeMenuWorkspaceSave::save_tables()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Tables"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Tables. Filepath is empty."));
-            return;
+            if (nb_tables > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Tables.\nTables will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save_variables()
@@ -179,23 +205,26 @@ void QIodeMenuWorkspaceSave::save_variables()
     {
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Variables"]);
         QString filepath = field_filepath->extractAndVerify();
-        if (exit && filepath.isEmpty())
+        if (save_all && filepath.isEmpty())
         {
-            QMessageBox::warning(this, tr("WARNING"), QString("Cannot save Variables. Filepath is empty."));
-            return;
+            if (nb_variables > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Variables.\nVariables will not be saved.");
         }
-        kdb.save(filepath.toStdString());
+        else
+        {
+            kdb.save(filepath.toStdString());
+        }
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        return;
     }
-    if (exit) this->accept();
+    if (!save_all) this->accept();
 }
 
 void QIodeMenuWorkspaceSave::save()
 {
-    exit = false;
+    save_all = true;
 
     save_comments();
     save_equations();

@@ -20,7 +20,14 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
 {
 	Q_OBJECT
 
-    bool exit;
+    bool save_all;
+    int nb_comments;
+    int nb_equations;
+    int nb_identities;
+    int nb_lists;
+    int nb_scalars;
+    int nb_tables;
+    int nb_variables;
 
 public:
 	QIodeMenuWorkspaceSave(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
