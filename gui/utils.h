@@ -47,6 +47,9 @@ enum EnumItemType
  *          FUNCTIONS             *
  * ****************************** */
 
+// defined in main_window.cpp
+QWidget* get_main_window_ptr();
+
 // equivalent to function HLP_filename() in dos/o_help.c
 inline const QUrl get_url_iode_helpfile(const QString& filename)
 {

@@ -1,5 +1,13 @@
 #include "main_window.h"
 
+QWidget* main_window_ptr = nullptr;
+
+
+QWidget* get_main_window_ptr()
+{
+    return main_window_ptr;
+}
+
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -8,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // ---- setup the present class ----
     setupUi(this);
+
+    // ---- global parameters ----
+    main_window_ptr = static_cast<QWidget*>(this);
 
     // ---- settings ----
     settings_filepath = std::make_shared<QString>("iode_gui_settings.ini");
