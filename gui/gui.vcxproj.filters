@@ -185,6 +185,9 @@
     <ClCompile Include="settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="super.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tabs\abstract_table_view.h">
@@ -203,6 +206,9 @@
       <Filter>Header Files\view</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="super.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
