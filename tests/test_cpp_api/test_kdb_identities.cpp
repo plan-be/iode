@@ -17,9 +17,8 @@ protected:
 
 TEST_F(KDBIdentitiesTest, Load)
 {
-    KDBIdentities kdb;
-    load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
-    EXPECT_EQ(kdb.count(), 48);
+    KDBIdentities kdb2;
+    EXPECT_EQ(kdb2.count(), 48);
 }
 
 TEST_F(KDBIdentitiesTest, Save)
@@ -31,6 +30,23 @@ TEST_F(KDBIdentitiesTest, Save)
     // save in ascii format
     save_global_kdb(I_IDENTITIES, output_test_dir + "fun.ai");
     kdb.dump(output_test_dir + "fun.ai");
+}
+
+TEST_F(KDBIdentitiesTest, Rename)
+{
+    int new_pos;
+    std::string old_name;
+    std::string new_name;
+
+    // rename
+    old_name = kdb.get_name(0);
+    EXPECT_EQ(old_name, "AOUC");
+    new_pos = kdb.rename(old_name, "NEW_NAME");
+    EXPECT_EQ(kdb.get_name(new_pos), "NEW_NAME");
+
+    // set by position
+    new_pos = kdb.set_name(1, "NEW_POS");
+    EXPECT_EQ(kdb.get_name(new_pos), "NEW_POS");
 }
 
 TEST_F(KDBIdentitiesTest, GetLec)
@@ -95,4 +111,60 @@ TEST_F(KDBIdentitiesTest, Copy)
     Identity identity_copy = kdb.copy(name);
 
     EXPECT_EQ(std::string(identity_copy.lec), kdb.get_lec(name));
+}
+
+TEST_F(KDBIdentitiesTest, Filter)
+{
+    std::string pattern = "A*;*_";
+    std::vector<std::string> expected_names;
+    KDBIdentities* local_kdb;
+    KDBIdentities global_kdb;
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+
+    int nb_total_comments = global_kdb.count();
+    // A*
+    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    // *_
+    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
+
+    // create local kdb
+    local_kdb = new KDBIdentities(pattern);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // modify an element of the local KDB and check if the 
+    // corresponding element of the global KDB also changes
+    std::string name = "AOUC";
+    std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
+    local_kdb->update(name, modified_lec);
+    EXPECT_EQ(local_kdb->get_lec(name), modified_lec);
+    EXPECT_EQ(global_kdb.get_lec(name), modified_lec);
+
+    // add an element to the local KDB and check if it has also 
+    // been added to the global KDB
+    std::string new_name = "NEW_IDENTITY";
+    std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
+    local_kdb->add(new_name, new_lec);
+    EXPECT_EQ(local_kdb->get_lec(new_name), new_lec);
+    EXPECT_EQ(global_kdb.get_lec(new_name), new_lec);
+
+    // rename an element in the local KDB and check if the 
+    // corresponding element has also been renamed in the global KDB
+    std::string old_name = new_name;
+    new_name = "IDENTITY_NEW";
+    local_kdb->rename(old_name, new_name);
+    EXPECT_EQ(local_kdb->get_lec(new_name), new_lec);
+    EXPECT_EQ(global_kdb.get_lec(new_name), new_lec);
+
+    // delete an element from the local KDB and check if it has also 
+    // been deleted from the global KDB
+    local_kdb->remove(new_name);
+    EXPECT_FALSE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    EXPECT_EQ(global_kdb.get_lec(name), modified_lec);
 }

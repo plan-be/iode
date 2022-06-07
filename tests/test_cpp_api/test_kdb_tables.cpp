@@ -17,9 +17,8 @@ protected:
 
 TEST_F(KDBTablesTest, Load)
 {
-    KDBTables kdb;
-    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
-    EXPECT_EQ(kdb.count(), 46);
+    KDBTables kdb2;
+    EXPECT_EQ(kdb2.count(), 46);
 }
 
 TEST_F(KDBTablesTest, Save)
@@ -62,6 +61,7 @@ TEST_F(KDBTablesTest, GetTitle)
 
 TEST_F(KDBTablesTest, CreateRemove)
 {
+    std::string name;
     load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
     load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
 
@@ -70,38 +70,47 @@ TEST_F(KDBTablesTest, CreateRemove)
     int nb_vars_envi = 10;
 
     // add empty table with 2 columns
-    Table table1 = kdb.add("TABLE1", 2);
+    name = "TABLE1";
+    kdb.add(name, 2);
 
     int nb_lines_header = 0;
     int nb_lines_footnotes = 0;
     int nb_lines_vars = 0;
+    Table table1(name);
     EXPECT_EQ(table1.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
+    // remove table
+    kdb.remove(name);
+
     // add tables and initialize it (variables as list)
+    name = "TABLE2";
     std::string def = "A title";
     std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG", list_name};
     bool mode = true;
     bool files = true;
     bool date = true;
-    Table table2 = kdb.add("TABLE2", 2, def, vars, mode, files, date);
+    kdb.add(name, 2, def, vars, mode, files, date);
 
     // check that list $ENVI has been expanded
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
-    nb_lines_vars = vars.size() + nb_vars_envi - 1;
+    nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
+    Table table2(name);
     EXPECT_EQ(table2.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
+    // remove table
+    kdb.remove(name);
+
     // add tables and initialize it (LEC cells as string)
+    name = "TABLE3";
     std::string lecs = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG;" + list_name;
-    Table table3 = kdb.add("TABLE3", 2, def, lecs, mode, files, date);
+    kdb.add(name, 2, def, lecs, mode, files, date);
 
     // check that list $ENVI has been expanded
+    Table table3(name);
     EXPECT_EQ(table3.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-
-    // remove added tables
-    kdb.remove("TABLE1");
-    kdb.remove("TABLE2");
-    kdb.remove("TABLE3");
+    // remove table
+    kdb.remove(name);
 }
 
 TEST_F(KDBTablesTest, Copy)
@@ -110,4 +119,64 @@ TEST_F(KDBTablesTest, Copy)
 
     Table copy_table = kdb.copy("GFRPC");
     EXPECT_EQ(copy_table, original_table);
+}
+
+TEST_F(KDBTablesTest, Filter)
+{
+    std::string pattern = "A*;*2";
+    std::vector<std::string> expected_names;
+    KDBTables* local_kdb;
+    KDBTables global_kdb;
+
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+
+    int nb_total_comments = global_kdb.count();
+    // A*
+    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    // *2
+    for (const std::string& name : all_names) if (name.back() == '2') expected_names.push_back(name);
+
+    // create local kdb
+    local_kdb = new KDBTables(pattern);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // add an element to the local KDB and check if it has also 
+    // been added to the global KDB
+    std::string new_name = "NEW_TABLE";
+    std::string def = "A title";
+    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG", "$ENVI" };
+    bool mode = true;
+    bool files = true;
+    bool date = true;
+    local_kdb->add(new_name, 2, def, vars, mode, files, date);
+    int nb_vars_envi = 10;
+    int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
+    int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
+    int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
+    EXPECT_EQ(local_kdb->get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(global_kdb.get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(local_kdb->get(new_name).nbLines(), global_kdb.get(new_name).nbLines());
+    EXPECT_EQ(local_kdb->get(new_name), global_kdb.get(new_name));
+
+    // rename an element in the local KDB and check if the 
+    // corresponding element has also been renamed in the global KDB
+    std::string old_name = new_name;
+    new_name = "TABLE_NEW";
+    local_kdb->rename(old_name, new_name);
+    EXPECT_EQ(local_kdb->get(new_name).nbLines(), global_kdb.get(new_name).nbLines());
+    EXPECT_EQ(local_kdb->get(new_name), global_kdb.get(new_name));
+
+    // delete an element from the local KDB and check if it has also 
+    // been deleted from the global KDB
+    local_kdb->remove(new_name);
+    EXPECT_FALSE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
 }
