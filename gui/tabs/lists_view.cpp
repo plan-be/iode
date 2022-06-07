@@ -5,5 +5,5 @@ void ListsView::new_list()
 {
 	QIodeAddList dialog(this);
 	dialog.exec();
-	update();
+	filter_and_update();
 }

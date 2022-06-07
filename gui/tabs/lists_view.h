@@ -16,5 +16,6 @@ public:
 	ListsView(QWidget* parent = nullptr) : AbstractTableView(I_LISTS, new ListsDelegate(parent), parent) {};
 
 public slots:
+	void filter() { filter_and_update(); }
 	void new_list();
 };

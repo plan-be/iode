@@ -5,5 +5,5 @@ void CommentsView::new_comment()
 {
 	QIodeAddComment dialog(this);
 	dialog.exec();
-	update();
+	filter_and_update();
 }

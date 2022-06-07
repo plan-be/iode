@@ -1,13 +1,21 @@
 #pragma once
 
 #include <QTableView>
+#include <QLineEdit>
 #include "../utils.h"
 #include "abstract_delegate.h"
+
+
+/* NOTE FOR THE DEVELOPERS:
+ * Template classes not supported by Q_OBJECT (and then Signals and Slots)
+ */
+
 
 template <class M> class AbstractTableView : public QTableView
 {
 	EnumIodeType iodeType;
 	AbstractDelegate* delegate;
+	QLineEdit* filterLineEdit;
 
 protected:
 	std::shared_ptr<QString> settings_filepath;
@@ -19,7 +27,8 @@ protected:
 		{
 			M* table_model = static_cast<M*>(model());
 			QModelIndexList selection = selectionModel()->selectedRows();
-			for (const QModelIndex& index : selection) table_model->removeRow(index.row());
+			// Note: goes in reverse order because each deleted row shift all the next rows
+			for (int i = selection.count() - 1; i >= 0; i--) table_model->removeRow(selection.at(i).row(), QModelIndex());
 			update();
 		}
 		else
@@ -28,8 +37,16 @@ protected:
 		}
 	}
 
+	void filter_and_update()
+	{
+		QString pattern = filterLineEdit->text().trimmed();
+		M* table_model = static_cast<M*>(model());
+		table_model->filter(pattern);
+		update();
+	}
+
 public:
-	AbstractTableView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : QTableView(parent), iodeType(iodeType), delegate(delegate) 
+	AbstractTableView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : QTableView(parent), iodeType(iodeType), delegate(delegate)
 	{
 		// ---- Selection ----
 		// See: - https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-in-item-views
@@ -52,10 +69,11 @@ public:
 
 	~AbstractTableView() {}
 
-	void setupView(M* model, std::shared_ptr<QString>& settings_filepath)
+	void setupView(M* model, QLineEdit* filterLineEdit, std::shared_ptr<QString>& settings_filepath)
 	{
 		setModel(model);
 		setItemDelegate(delegate);
+		this->filterLineEdit = filterLineEdit;
 		this->settings_filepath = settings_filepath;
 	}
 

@@ -16,5 +16,6 @@ public:
 	CommentsView(QWidget* parent = nullptr) : AbstractTableView(I_COMMENTS, new CommentsDelegate(parent), parent) {};
 
 public slots:
+	void filter() { filter_and_update(); }
 	void new_comment();
 };

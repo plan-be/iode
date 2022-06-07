@@ -14,7 +14,7 @@ public:
 	ListsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "List" }, parent) {};
 
 private:
-	QVariant dataCell(const int row, const int col) const;
+	QVariant dataCell(const int row, const int col) const override;
 
 public slots:
 	void reset() { resetModel(); };

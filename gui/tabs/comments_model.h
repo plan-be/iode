@@ -14,7 +14,7 @@ public:
 	CommentsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Comment" }, parent) {};
 
 private:
-	QVariant dataCell(const int row, const int col) const;
+	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;
 

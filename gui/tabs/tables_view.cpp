@@ -5,5 +5,5 @@ void TablesView::new_table()
 {
 	QIodeAddTable dialog(*settings_filepath, this);
 	dialog.exec();
-	update();
+	filter_and_update();
 }

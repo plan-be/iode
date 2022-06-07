@@ -5,7 +5,7 @@
 QVariant ListsModel::dataCell(const int row, const int col) const
 {
 	if (col == 0)
-		return QVariant(QString::fromStdString(kdb.get_name(row)));
+		return QString::fromStdString(kdb->get_name(row));
 	else
-		return QVariant(QString::fromStdString(kdb.get(row)));
+		return QVariant(QString::fromStdString(kdb->get(row)));
 }

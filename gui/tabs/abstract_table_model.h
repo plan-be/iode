@@ -7,6 +7,7 @@
 #include <QModelIndex>
 #include <QMessageBox>
 #include <QAbstractTableModel>
+#include <QDebug>
 
 #include "../utils.h"
 
@@ -26,16 +27,18 @@
 template <class K> class IODEAbstractTableModel : public QAbstractTableModel
 {
 protected:
-	K kdb;
+	K* kdb;
 	QVector<QString> columnNames;
 
 public:
 	IODEAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : QAbstractTableModel(parent),
-		kdb(K()), columnNames(columnNames) {};
+		kdb(new K()), columnNames(columnNames), filter_active(false) {}
+
+	~IODEAbstractTableModel() { delete kdb; }
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return kdb.count();
+		return kdb->count();
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const
@@ -51,6 +54,10 @@ public:
 
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
 
+	void filter(const QString& pattern);
+
+	bool is_filter_active() { return filter_active; }
+
 protected:
 	void resetModel()
 	{
@@ -60,7 +67,7 @@ protected:
 
 	virtual QVariant dataCell(const int row, const int col) const = 0;
 
-	bool setName(const int row, const QString& new_name);
+	bool rename(const QString& name, const QString& new_name);
 
 	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
 

@@ -34,8 +34,8 @@ QVariant IODEAbstractTableModel<K>::data(const QModelIndex& index, int role) con
 
 	if (role == Qt::DisplayRole || role == Qt::EditRole)
 		return dataCell(index.row(), index.column());
-	else
-		return QVariant();
+
+	return QVariant();
 }
 
 template <class K>
@@ -61,11 +61,11 @@ bool IODEAbstractTableModel<K>::setData(const QModelIndex& index, const QVariant
 }
 
 template <class K>
-bool IODEAbstractTableModel<K>::setName(const int row, const QString& new_name)
+bool IODEAbstractTableModel<K>::rename(const QString& name, const QString& new_name)
 {
 	try
 	{
-		kdb.set_name(row, new_name.toStdString());
+		kdb->rename(name.toStdString(), new_name.toStdString());
 		return true;
 	}
 	catch (const std::runtime_error& e)
@@ -80,7 +80,8 @@ bool IODEAbstractTableModel<K>::setDataCell(const int row, const int column, con
 {
 	if (column == 0)
 	{
-		return setName(row, value.toString());
+		QString name = QString::fromStdString(kdb->get_name(row));
+		return rename(name, value.toString());
 	}
 	else
 	{
@@ -89,18 +90,38 @@ bool IODEAbstractTableModel<K>::setDataCell(const int row, const int column, con
 }
 
 template <class K>
+void IODEAbstractTableModel<K>::filter(const QString& pattern)
+{
+	try
+	{
+		if (kdb != nullptr) delete kdb;
+		if (!pattern.isEmpty())
+		{
+			kdb = new K(pattern.toStdString());
+		}
+		else
+		{
+			kdb = new K();
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		QMessageBox::critical(static_cast<QWidget*>(parent()), tr("Error"), tr(e.what()));
+	}
+}
+
+template <class K>
 bool IODEAbstractTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
-	beginRemoveRows(QModelIndex(), position, position + rows - 1);
-
 	std::string name;
+	beginRemoveRows(QModelIndex(), position, position + rows - 1);
 
 	try
 	{
-		for (int row = position; row < position + rows; ++row)
+		for (int row = position; row < position + rows; row++)
 		{
 			name = dataCell(row, 0).toString().toStdString();
-			kdb.remove(name);
+			kdb->remove(row);
 		}
 	}
 	catch (const std::runtime_error& e)
