@@ -5,12 +5,12 @@
 QVariant ScalarsModel::dataCell(const int row, const int col) const
 {
 	QVariant value;
-	Scalar scalar = kdb.get(row);
+	Scalar scalar = kdb->get(row);
 
 	switch (col)
 	{
 	case 0:
-		value = QString::fromStdString(kdb.get_name(row));
+		value = QString::fromStdString(kdb->get_name(row));;
 		break;
 	case 1:
 		value = L_ISAN(scalar.val) ? QString::number(scalar.val, 'g', 3) : NAN_REP;

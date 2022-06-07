@@ -16,5 +16,6 @@ public:
 	IdentitiesView(QWidget* parent = nullptr) : AbstractTableView(I_IDENTITIES, new IdentitiesDelegate(parent), parent) {};
 
 public slots:
+	void filter() { filter_and_update(); }
 	void new_identity();
 };

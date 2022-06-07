@@ -19,6 +19,7 @@ public:
 	}
 
 public slots:
+	void filter() { filter_and_update(); }
 	void new_equation();
 	void popup_edit_window(const QModelIndex& index) { open_popup_edit_window(index); }
 };

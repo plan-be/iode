@@ -6,11 +6,11 @@ QVariant CommentsModel::dataCell(const int row, const int col) const
 {
 	if (col == 0)
 	{
-		return QVariant(QString::fromStdString(kdb.get_name(row)));
+		return QString::fromStdString(kdb->get_name(row));
 	}
 	else
 	{
-		return QVariant(QString::fromStdString(kdb.get(row)));
+		return QVariant(QString::fromStdString(kdb->get(row)));
 	}
 }
 
@@ -18,7 +18,7 @@ bool CommentsModel::setValue(const int row, const int column, const QVariant& va
 {
 	try
 	{
-		kdb.update(row, value.toString().toStdString());
+		kdb->update(row, value.toString().toStdString());
 		return true;
 	}
 	catch (const std::runtime_error& e)

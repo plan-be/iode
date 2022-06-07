@@ -16,5 +16,6 @@ public:
 	ScalarsView(QWidget* parent = nullptr) : AbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent) {};
 
 public slots:
+	void filter() { filter_and_update(); }
 	void new_scalar();
 };

@@ -40,7 +40,8 @@ public:
 	~MainWindow();
 
 private:
-	void updateCurrentTab(int index = -1);
+	void resetFilter();
+	void viewTab(int index = -1);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

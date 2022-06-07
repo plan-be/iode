@@ -31,5 +31,5 @@ void VariablesView::new_variable()
 
 	QIodeAddVariable dialog(this);
 	dialog.exec();
-	update();
+	filter_and_update();
 }

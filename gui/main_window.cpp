@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     settings_filepath = std::make_shared<QString>("iode_gui_settings.ini");
 
     // ---- connect signals to slots  ----
-    connect(this->tabWidget_IODE_objs, &QTabWidget::currentChanged, this, &MainWindow::updateCurrentTab);
+    connect(this->tabWidget_IODE_objs, &QTabWidget::currentChanged, this, &MainWindow::viewTab);
 
     // ---- Model/View components ----
 
@@ -32,37 +32,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Comments
     commentsModel = new CommentsModel(this);
-    this->tableview_comments->setupView(commentsModel, settings_filepath);
+    this->tableview_comments->setupView(commentsModel, this->lineEdit_filter_comments, settings_filepath);
     this->tableview_comments->setStyleSheet(stylesheet);
     this->tableview_comments->hide();
     // Equations
     equationsModel = new EquationsModel(this);
-    this->tableview_equations->setupView(equationsModel, settings_filepath);
+    this->tableview_equations->setupView(equationsModel, this->lineEdit_filter_equations, settings_filepath);
     this->tableview_equations->setStyleSheet(stylesheet);
     this->tableview_equations->hide();
     // Identities
     identitiesModel = new IdentitiesModel(this);
-    this->tableview_identities->setupView(identitiesModel, settings_filepath);
+    this->tableview_identities->setupView(identitiesModel, this->lineEdit_filter_identities, settings_filepath);
     this->tableview_identities->setStyleSheet(stylesheet);
     this->tableview_identities->hide();
     // Lists
     listsModel = new ListsModel(this);
-    this->tableview_lists->setupView(listsModel, settings_filepath);
+    this->tableview_lists->setupView(listsModel, this->lineEdit_filter_lists, settings_filepath);
     this->tableview_lists->setStyleSheet(stylesheet);
     this->tableview_lists->hide();
     // Scalars
     scalarsModel = new ScalarsModel(this);
-    this->tableview_scalars->setupView(scalarsModel, settings_filepath);
+    this->tableview_scalars->setupView(scalarsModel, this->lineEdit_filter_scalars, settings_filepath);
     this->tableview_scalars->setStyleSheet(stylesheet);
     this->tableview_scalars->hide();
     // Tables
     tablesModel = new TablesModel(this);
-    this->tableview_tables->setupView(tablesModel, settings_filepath);
+    this->tableview_tables->setupView(tablesModel, this->lineEdit_filter_tables, settings_filepath);
     this->tableview_tables->setStyleSheet(stylesheet);
     this->tableview_tables->hide();
     // Variables
     variablesModel = new VariablesModel(this);
-    this->tableview_variables->setupView(variablesModel, settings_filepath);
+    this->tableview_variables->setupView(variablesModel, this->lineEdit_filter_variables, settings_filepath);
     this->tableview_variables->setStyleSheet(stylesheet);
     this->tableview_variables->hide();
 }
@@ -80,7 +80,48 @@ MainWindow::~MainWindow()
     IodeEnd();
 }
 
-void MainWindow::updateCurrentTab(int index)
+void MainWindow::resetFilter()
+{
+    // get the index of the tab currently visible if not passed to the method
+    int index = this->tabWidget_IODE_objs->currentIndex();
+
+    // update the corresponding model and view
+    switch (index)
+    {
+    case I_COMMENTS:
+        this->lineEdit_filter_comments->setText("");
+        this->tableview_comments->filter();
+        break;
+    case I_EQUATIONS:
+        this->lineEdit_filter_equations->setText("");
+        this->tableview_equations->filter();
+        break;
+    case I_IDENTITIES:
+        this->lineEdit_filter_identities->setText("");
+        this->tableview_identities->filter();
+        break;
+    case I_LISTS:
+        this->lineEdit_filter_lists->setText("");
+        this->tableview_lists->filter();
+        break;
+    case I_SCALARS:
+        this->lineEdit_filter_scalars->setText("");
+        this->tableview_scalars->filter();
+        break;
+    case I_TABLES:
+        this->lineEdit_filter_tables->setText("");
+        this->tableview_tables->filter();
+        break;
+    case I_VARIABLES:
+        this->lineEdit_filter_variables->setText("");
+        this->tableview_variables->filter();
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::viewTab(int index)
 {
     // get the index of the tab currently visible if not passed to the method
     if (index < 0) index = this->tabWidget_IODE_objs->currentIndex();
@@ -123,7 +164,7 @@ void MainWindow::open_load_workspace_dialog()
 {
     QIodeMenuWorkspaceLoad dialog(*settings_filepath, this);
     dialog.exec();
-    updateCurrentTab();
+    resetFilter();
 }
 
 void MainWindow::open_save_workspace_dialog()
@@ -136,7 +177,7 @@ void MainWindow::open_clear_workspace_dialog()
 {
     QIodeMenuWorkspaceClear dialog(*settings_filepath, this);
     dialog.exec();
-    updateCurrentTab();
+    resetFilter();
 }
 
 void MainWindow::about()
