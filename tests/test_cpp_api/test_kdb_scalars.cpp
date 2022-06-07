@@ -17,9 +17,8 @@ protected:
 
 TEST_F(KDBScalarsTest, Load)
 {
-    KDBScalars kdb;
-    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-    EXPECT_EQ(kdb.count(), 161);
+    KDBScalars kdb2;
+    EXPECT_EQ(kdb2.count(), 161);
 }
 
 TEST_F(KDBScalarsTest, Save)
@@ -93,4 +92,77 @@ TEST_F(KDBScalarsTest, Copy)
     EXPECT_DOUBLE_EQ(scalar_copy.val, scalar.val);
     EXPECT_DOUBLE_EQ(scalar_copy.relax, scalar.relax);
     EXPECT_DOUBLE_EQ(scalar_copy.std, scalar.std);
+}
+
+TEST_F(KDBScalarsTest, Filter)
+{
+    std::string pattern = "a*;*_";
+    std::vector<std::string> expected_names;
+    KDBScalars* local_kdb;
+    KDBScalars global_kdb;
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+
+    int nb_total_comments = global_kdb.count();
+    // a*
+    for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
+    // *_
+    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
+
+    // create local kdb
+    local_kdb = new KDBScalars(pattern);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // modify an element of the local KDB and check if the 
+    // corresponding element of the global KDB also changes
+    Scalar updated_scalar;
+    std::string name = "acaf1";
+    IODE_REAL updated_value = 0.0158;
+    IODE_REAL updated_relax = 0.98;
+    local_kdb->update(name, updated_value, updated_relax);
+    updated_scalar = local_kdb->get(name);
+    EXPECT_DOUBLE_EQ(updated_scalar.val, updated_value);
+    EXPECT_DOUBLE_EQ(updated_scalar.relax, updated_relax);
+    updated_scalar = global_kdb.get(name);
+    EXPECT_DOUBLE_EQ(updated_scalar.val, updated_value);
+    EXPECT_DOUBLE_EQ(updated_scalar.relax, updated_relax);
+
+    // add an element to the local KDB and check if it has also 
+    // been added to the global KDB
+    std::string new_name = "new_scalar";
+    IODE_REAL value = 0.012365879;
+    IODE_REAL relax = 1.;
+    local_kdb->add(new_name, value, relax);
+    Scalar new_scalar_local = local_kdb->get(new_name);
+    EXPECT_DOUBLE_EQ(new_scalar_local.val, value);
+    EXPECT_DOUBLE_EQ(new_scalar_local.relax, relax);
+    Scalar new_scalar = global_kdb.get(new_name);
+    EXPECT_DOUBLE_EQ(new_scalar.val, value);
+    EXPECT_DOUBLE_EQ(new_scalar.relax, relax);
+
+    // rename an element in the local KDB and check if the 
+    // corresponding element has also been renamed in the global KDB
+    std::string old_name = new_name;
+    new_name = "scalar_new";
+    local_kdb->rename(old_name, new_name);
+    new_scalar_local = local_kdb->get(new_name);
+    EXPECT_DOUBLE_EQ(new_scalar_local.val, value);
+    EXPECT_DOUBLE_EQ(new_scalar_local.relax, relax);
+    new_scalar = global_kdb.get(new_name);
+    EXPECT_DOUBLE_EQ(new_scalar.val, value);
+    EXPECT_DOUBLE_EQ(new_scalar.relax, relax);
+
+    // delete an element from the local KDB and check if it has also 
+    // been deleted from the global KDB
+    local_kdb->remove(new_name);
+    EXPECT_FALSE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    updated_scalar = global_kdb.get(name);
+    EXPECT_DOUBLE_EQ(updated_scalar.val, updated_value);
+    EXPECT_DOUBLE_EQ(updated_scalar.relax, updated_relax);
 }

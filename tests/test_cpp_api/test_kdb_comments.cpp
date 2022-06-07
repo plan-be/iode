@@ -17,8 +17,8 @@ protected:
 
 TEST_F(KDBCommentsTest, Load)
 {
-    KDBComments kdb;
-    EXPECT_EQ(kdb.count(), 317);
+    KDBComments kdb2;
+    EXPECT_EQ(kdb2.count(), 317);
 }
 
 
@@ -32,7 +32,6 @@ TEST_F(KDBCommentsTest, Save)
     save_global_kdb(I_COMMENTS, output_test_dir + "fun.ac");
     kdb.dump(output_test_dir + "fun.ac");
 }
-
 
 TEST_F(KDBCommentsTest, GetName)
 {
@@ -161,4 +160,60 @@ TEST_F(KDBCommentsTest, Copy)
     // error: position does not exist
     int beyond_last_pos = kdb.count() + 10;
     EXPECT_THROW(kdb.copy(beyond_last_pos), std::runtime_error);
+}
+
+TEST_F(KDBCommentsTest, Filter)
+{
+    std::string pattern = "A*;*_";
+    std::vector<std::string> expected_names;
+    KDBComments* local_kdb;
+    KDBComments global_kdb;
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+
+    int nb_total_comments = global_kdb.count();
+    // A*
+    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    // *_
+    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
+
+    // create local kdb
+    local_kdb = new KDBComments(pattern);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // modify an element of the local KDB and check if the 
+    // corresponding element of the global KDB also changes
+    std::string name = "ACAF";
+    std::string modified_comment = "Modified Comment";
+    local_kdb->update(name, modified_comment);
+    EXPECT_EQ(local_kdb->get(name), modified_comment);
+    EXPECT_EQ(global_kdb.get(name), modified_comment);
+
+    // add an element to the local KDB and check if it has also 
+    // been added to the global KDB
+    std::string new_name = "NEW_COMMENT";
+    std::string new_comment = "New Comment";
+    local_kdb->add(new_name, new_comment);
+    EXPECT_EQ(local_kdb->get(new_name), new_comment);
+    EXPECT_EQ(global_kdb.get(new_name), new_comment);
+
+    // rename an element in the local KDB and check if the 
+    // corresponding element has also been renamed in the global KDB
+    std::string old_name = new_name;
+    new_name = "COMMENT_NEW";
+    local_kdb->rename(old_name, new_name);
+    EXPECT_EQ(local_kdb->get(new_name), new_comment);
+    EXPECT_EQ(global_kdb.get(new_name), new_comment);
+
+    // delete an element from the local KDB and check if it has also 
+    // been deleted from the global KDB
+    local_kdb->remove(new_name);
+    EXPECT_FALSE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    EXPECT_EQ(global_kdb.get(name), modified_comment);
 }

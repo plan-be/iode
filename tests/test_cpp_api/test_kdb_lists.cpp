@@ -17,9 +17,8 @@ protected:
 
 TEST_F(KDBListsTest, Load)
 {
-    KDBLists kdb;
-    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
-    EXPECT_EQ(kdb.count(), 16);
+    KDBLists kdb2;
+    EXPECT_EQ(kdb2.count(), 16);
 }
 
 TEST_F(KDBListsTest, Save)
@@ -76,4 +75,57 @@ TEST_F(KDBListsTest, Copy)
 
     std::string list_copy = kdb.copy(name);
     EXPECT_EQ(list_copy, list);
+}
+
+TEST_F(KDBListsTest, Filter)
+{
+    std::string pattern = "C*";
+    std::vector<std::string> expected_names;
+    KDBLists* local_kdb;
+    KDBLists global_kdb;
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+    for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
+
+    int nb_total_comments = global_kdb.count();
+
+    // create local kdb
+    local_kdb = new KDBLists(pattern);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // modify an element of the local KDB and check if the 
+    // corresponding element of the global KDB also changes
+    std::string name = "COPY";
+    std::string expanded_list = kdb.get("COPY0") + kdb.get("COPY1");
+    kdb.update(name, expanded_list);
+    EXPECT_EQ(local_kdb->get(name), expanded_list);
+    EXPECT_EQ(global_kdb.get(name), expanded_list);
+
+    // add an element to the local KDB and check if it has also 
+    // been added to the global KDB
+    std::string new_name = "NEW_LIST";
+    std::string new_list = "ACAF;ACAG;AOUC;AQC";
+    local_kdb->add(new_name, new_list);
+    EXPECT_EQ(local_kdb->get(new_name), new_list);
+    EXPECT_EQ(global_kdb.get(new_name), new_list);
+
+    // rename an element in the local KDB and check if the 
+    // corresponding element has also been renamed in the global KDB
+    std::string old_name = new_name;
+    new_name = "LIST_NEW";
+    local_kdb->rename(old_name, new_name);
+    EXPECT_EQ(local_kdb->get(new_name), new_list);
+    EXPECT_EQ(global_kdb.get(new_name), new_list);
+
+    // delete an element from the local KDB and check if it has also 
+    // been deleted from the global KDB
+    local_kdb->remove(new_name);
+    EXPECT_FALSE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    EXPECT_EQ(global_kdb.get(name), expanded_list);
 }
