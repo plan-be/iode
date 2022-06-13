@@ -135,28 +135,16 @@ void KDBAbstract<T>::remove(const std::string& name)
     K_del(get_KDB(), pos);
 }
 
-// Load - Save - Clear methods
+// Other methods
 
 template<class T>
-void KDBAbstract<T>::load(std::string& filepath)
-{
-    filepath = check_filepath(filepath, type, "load", true);
-
-    char* c_filepath = const_cast<char*>(filepath.c_str());
-
-    int res = B_WsLoad(c_filepath, type);
-    if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to import " + vIodeTypes[type] + " from file " + filepath);
-}
-
-template<class T>
-void KDBAbstract<T>::save(std::string& filepath)
+void KDBAbstract<T>::dump(std::string& filepath)
 {
     filepath = check_filepath(filepath, type, "save", false);
-
     char* c_filepath = const_cast<char*>(filepath.c_str());
+    if (strlen(c_filepath) >= sizeof(FNAME)) throw std::runtime_error(std::string(B_msg(256)));   /* File name too long */
 
-    int res = B_WsSave(c_filepath, type);
+    int res = B_WsDump(get_KDB(), c_filepath);
     if (res != EXIT_SUCCESS)
         throw std::runtime_error("Something went wrong when trying to save " + vIodeTypes[type] + " to file " + filepath);
 }
@@ -164,7 +152,11 @@ void KDBAbstract<T>::save(std::string& filepath)
 template<class T>
 void KDBAbstract<T>::clear()
 {
-    int res = B_WsClear("", type);
+    int res;
+    res = B_WsDescr("", type);
+    res += B_WsName("", type);
+
+    res += K_clear(get_KDB());
     if (res != EXIT_SUCCESS)
         throw std::runtime_error("Something went wrong when trying to clear objets of type " + vIodeTypes[type]);
 }
