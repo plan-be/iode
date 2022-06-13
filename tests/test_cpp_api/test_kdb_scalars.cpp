@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.scl");
+        load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
     }
 
     // void TearDown() override {}
@@ -18,17 +18,19 @@ protected:
 TEST_F(KDBScalarsTest, Load)
 {
     KDBScalars kdb;
-    kdb.load(input_test_dir + "fun.scl");
+    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
     EXPECT_EQ(kdb.count(), 161);
 }
 
 TEST_F(KDBScalarsTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.scl");
+    save_global_kdb(I_SCALARS, output_test_dir + "fun.scl");
+    kdb.dump(output_test_dir + "fun.scl");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.as");
+    save_global_kdb(I_SCALARS, output_test_dir + "fun.as");
+    kdb.dump(output_test_dir + "fun.as");
 }
 
 TEST_F(KDBScalarsTest, Get)

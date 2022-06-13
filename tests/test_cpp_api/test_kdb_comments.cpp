@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override 
     {
-        kdb.load(input_test_dir + "fun.cmt");
+        load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
     }
 
     // void TearDown() override {}
@@ -18,7 +18,6 @@ protected:
 TEST_F(KDBCommentsTest, Load)
 {
     KDBComments kdb;
-    kdb.load(input_test_dir + "fun.cmt");
     EXPECT_EQ(kdb.count(), 317);
 }
 
@@ -26,10 +25,12 @@ TEST_F(KDBCommentsTest, Load)
 TEST_F(KDBCommentsTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.cmt");
+    save_global_kdb(I_COMMENTS, output_test_dir + "fun.cmt");
+    kdb.dump(output_test_dir + "fun.cmt");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.ac");
+    save_global_kdb(I_COMMENTS, output_test_dir + "fun.ac");
+    kdb.dump(output_test_dir + "fun.ac");
 }
 
 

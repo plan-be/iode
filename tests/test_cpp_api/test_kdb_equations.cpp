@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.eqs");
+        load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
     }
 
     // void TearDown() override {}
@@ -18,17 +18,19 @@ protected:
 TEST_F(KDBEquationsTest, Load)
 {
     KDBEquations kdb;
-    kdb.load(input_test_dir + "fun.eqs");
+    load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
     EXPECT_EQ(kdb.count(), 274);
 }
 
 TEST_F(KDBEquationsTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.eqs");
+    save_global_kdb(I_EQUATIONS, output_test_dir + "fun.eqs");
+    kdb.dump(output_test_dir + "fun.eqs");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.ae");
+    save_global_kdb(I_EQUATIONS, output_test_dir + "fun.ae");
+    kdb.dump(output_test_dir + "fun.ae");
 }
 
 TEST_F(KDBEquationsTest, GetLec)

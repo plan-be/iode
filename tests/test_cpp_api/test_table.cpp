@@ -9,7 +9,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.tbl");
+        load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
 
         int pos = K_find(K_WS[I_TABLES], "GFRPC");
         table = new Table(pos);

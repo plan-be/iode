@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.tbl");
+        load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
     }
 
     // void TearDown() override {}
@@ -18,17 +18,19 @@ protected:
 TEST_F(KDBTablesTest, Load)
 {
     KDBTables kdb;
-    kdb.load(input_test_dir + "fun.tbl");
+    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
     EXPECT_EQ(kdb.count(), 46);
 }
 
 TEST_F(KDBTablesTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.tbl");
+    save_global_kdb(I_TABLES, output_test_dir + "fun.tbl");
+    kdb.dump(output_test_dir + "fun.tbl");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.at");
+    save_global_kdb(I_TABLES, output_test_dir + "fun.at");
+    kdb.dump(output_test_dir + "fun.at");
 }
 
 TEST_F(KDBTablesTest, Get)
@@ -60,11 +62,8 @@ TEST_F(KDBTablesTest, GetTitle)
 
 TEST_F(KDBTablesTest, CreateRemove)
 {
-    KDBVariables kdb_var;
-    kdb_var.load(input_test_dir + "fun.var");
-
-    KDBLists kdb_list;
-    kdb_list.load(input_test_dir + "fun.lst");
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
 
     std::string list_name = "$ENVI";
     // TODO JMP: is there a way to easily calculate the number of variables in a list ?

@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.lst");
+        load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
     }
 
     // void TearDown() override {}
@@ -18,17 +18,19 @@ protected:
 TEST_F(KDBListsTest, Load)
 {
     KDBLists kdb;
-    kdb.load(input_test_dir + "fun.lst");
+    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
     EXPECT_EQ(kdb.count(), 16);
 }
 
 TEST_F(KDBListsTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.lst");
+    save_global_kdb(I_LISTS, output_test_dir + "fun.lst");
+    kdb.dump(output_test_dir + "fun.lst");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.al");
+    save_global_kdb(I_LISTS, output_test_dir + "fun.al");
+    kdb.dump(output_test_dir + "fun.al");
 }
 
 TEST_F(KDBListsTest, Get)
