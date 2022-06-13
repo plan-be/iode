@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.idt");
+        load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
     }
 
     // void TearDown() override {}
@@ -18,17 +18,19 @@ protected:
 TEST_F(KDBIdentitiesTest, Load)
 {
     KDBIdentities kdb;
-    kdb.load(input_test_dir + "fun.idt");
+    load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
     EXPECT_EQ(kdb.count(), 48);
 }
 
 TEST_F(KDBIdentitiesTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.idt");
+    save_global_kdb(I_IDENTITIES, output_test_dir + "fun.idt");
+    kdb.dump(output_test_dir + "fun.idt");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.ai");
+    save_global_kdb(I_IDENTITIES, output_test_dir + "fun.ai");
+    kdb.dump(output_test_dir + "fun.ai");
 }
 
 TEST_F(KDBIdentitiesTest, GetLec)

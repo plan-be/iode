@@ -9,7 +9,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.eqs");
+        load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
         equation = new Equation("ACAF");
     }
 

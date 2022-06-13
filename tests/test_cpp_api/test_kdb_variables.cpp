@@ -12,7 +12,7 @@ protected:
 
     void SetUp() override
     {
-        kdb.load(input_test_dir + "fun.var");
+        load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
     }
 
     // void TearDown() override {}
@@ -22,17 +22,19 @@ protected:
 TEST_F(KDBVariablesTest, Load)
 {
     KDBVariables kdb;
-    kdb.load(input_test_dir + "fun.var");
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
     EXPECT_EQ(kdb.count(), 394);
 }
 
 TEST_F(KDBVariablesTest, Save)
 {
     // save in binary format
-    kdb.save(output_test_dir + "fun.var");
+    save_global_kdb(I_VARIABLES, output_test_dir + "fun.var");
+    kdb.dump(output_test_dir + "fun.var");
 
     // save in ascii format
-    kdb.save(output_test_dir + "fun.av");
+    save_global_kdb(I_VARIABLES, output_test_dir + "fun.av");
+    kdb.dump(output_test_dir + "fun.av");
 }
 
 TEST_F(KDBVariablesTest, GetValue)
