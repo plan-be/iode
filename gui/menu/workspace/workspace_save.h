@@ -20,7 +20,6 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
 {
 	Q_OBJECT
 
-    bool save_all;
     int nb_comments;
     int nb_equations;
     int nb_identities;
@@ -32,6 +31,9 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
 public:
 	QIodeMenuWorkspaceSave(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceSave();
+
+private:
+    void save_objs(const EnumIodeType iode_type, bool save_all);
 
 public slots:
     void save_comments();

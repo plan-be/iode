@@ -20,11 +20,12 @@ class QIodeMenuWorkspaceClear : public QIodeSettings, public Ui::QIodeMenuWorksp
 {
     Q_OBJECT
 
-    bool clear_all;
-
 public:
 	QIodeMenuWorkspaceClear(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceClear();
+
+private:
+    void clear_objs(const EnumIodeType iode_type, const bool clear_all);
 
 public slots:
     void clear_comments();

@@ -15,8 +15,6 @@ QIodeMenuWorkspaceClear::QIodeMenuWorkspaceClear(const QString& settings_filepat
 {
 	setupUi(this);
 
-    clear_all = false;
-
     lineEdit_nb_comments->setText(QString::number(KDBComments().count()));
     lineEdit_nb_equations->setText(QString::number(KDBEquations().count()));
     lineEdit_nb_identities->setText(QString::number(KDBIdentities().count()));
@@ -36,115 +34,63 @@ QIodeMenuWorkspaceClear::~QIodeMenuWorkspaceClear()
 {
 }
 
-void QIodeMenuWorkspaceClear::clear_comments()
+void QIodeMenuWorkspaceClear::clear_objs(const EnumIodeType iode_type, const bool clear_all)
 {
-    KDBComments kdb;
     try
     {
-        kdb.clear();
+        clear_global_kdb(iode_type);
     }
     catch (const std::runtime_error& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
     if (!clear_all) this->accept();
+}
+
+void QIodeMenuWorkspaceClear::clear_comments()
+{
+    clear_objs(I_COMMENTS, false);
 }
 
 void QIodeMenuWorkspaceClear::clear_equations()
 {
-    KDBEquations kdb;
-    try
-    {
-        kdb.clear();
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-    }
-    if (!clear_all) this->accept();
+    clear_objs(I_EQUATIONS, false);
 }
 
 void QIodeMenuWorkspaceClear::clear_identities()
 {
-    KDBIdentities kdb;
-    try
-    {
-        kdb.clear();
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-    }
-    if (!clear_all) this->accept();
+    clear_objs(I_IDENTITIES, false);
 }
 
 void QIodeMenuWorkspaceClear::clear_lists()
 {
-    KDBLists kdb;
-    try
-    {
-        kdb.clear();
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-    }
-    if (!clear_all) this->accept();
+    clear_objs(I_LISTS, false);
 }
 
 void QIodeMenuWorkspaceClear::clear_scalars()
 {
-    KDBScalars kdb;
-    try
-    {
-        kdb.clear();
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-    }
-    if (!clear_all) this->accept();
+    clear_objs(I_SCALARS, false);
 }
 
 void QIodeMenuWorkspaceClear::clear_tables()
 {
-    KDBTables kdb;
-    try
-    {
-        kdb.clear();
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-    }
-    if (!clear_all) this->accept();
+    clear_objs(I_TABLES, false);
 }
 
 void QIodeMenuWorkspaceClear::clear_variables()
 {
-    KDBVariables kdb;
-    try
-    {
-        kdb.clear();
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-    }
-    if (!clear_all) this->accept();
+    clear_objs(I_VARIABLES, false);
 }
 
 void QIodeMenuWorkspaceClear::clear()
 {
-    clear_all = true;
-
-    clear_comments();
-    clear_equations();
-    clear_identities();
-    clear_lists();
-    clear_scalars();
-    clear_tables();
-    clear_variables();
+    clear_objs(I_COMMENTS, true);
+    clear_objs(I_EQUATIONS, true);
+    clear_objs(I_IDENTITIES, true);
+    clear_objs(I_LISTS, true);
+    clear_objs(I_SCALARS, true);
+    clear_objs(I_TABLES, true);
+    clear_objs(I_VARIABLES, true);
 
     this->accept();
 }
