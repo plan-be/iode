@@ -88,11 +88,9 @@ public:
 
     void remove(const std::string& name);
 
-    // Load - Save - Clear methods
+    // Other methods
 
-    void load(std::string& filepath);
-
-    void save(std::string& filepath);
+    void dump(std::string& filepath);
 
     void clear();
 
