@@ -34,14 +34,15 @@ class QIodeMenuWorkspaceLoad : public QIodeSettings, public Ui::QIodeMenuWorkspa
 {
 	Q_OBJECT
 
-    bool load_all;
-
 private:
 
 
 public:
 	QIodeMenuWorkspaceLoad(const QString& settings_filepath, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceLoad();
+
+private:
+    void load_objs(const EnumIodeType iode_type, const bool load_all);
 
 public slots:
     void load_comments();

@@ -15,8 +15,6 @@ QIodeMenuWorkspaceSave::QIodeMenuWorkspaceSave(const QString& settings_filepath,
 {
 	setupUi(this);
 
-    save_all = false;
-
     mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, I_COMMENTS_FILE, FILE_MAY_EXIST);
     mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, I_EQUATIONS_FILE, FILE_MAY_EXIST);
     mapFields["Identities"] = new WrapperFileChooser(pushButton_identities->text(), *fileChooser_identities, OPTIONAL_FIELD, I_IDENTITIES_FILE, FILE_MAY_EXIST);
@@ -52,12 +50,12 @@ QIodeMenuWorkspaceSave::~QIodeMenuWorkspaceSave()
 {
 }
 
-void QIodeMenuWorkspaceSave::save_comments()
+void QIodeMenuWorkspaceSave::save_objs(const EnumIodeType iode_type, const bool save_all)
 {
-    KDBComments kdb;
     try
     {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Comments"]);
+        QString str_iode_type = QString::fromStdString(vIodeTypes[iode_type]);
+        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields[str_iode_type]);
         QString filepath = field_filepath->extractAndVerify();
         // save_all means that the users clicked on an the "Save" button to load all files at once.
         // In that case and if the filepath is empty, the save_xxx() method shows a warning box
@@ -67,7 +65,7 @@ void QIodeMenuWorkspaceSave::save_comments()
         }
         else
         {
-            kdb.save(filepath.toStdString());
+            save_global_kdb(iode_type, filepath.toStdString());
         }
     }
     catch (const std::runtime_error& e)
@@ -76,163 +74,52 @@ void QIodeMenuWorkspaceSave::save_comments()
         return;
     }
     if (!save_all) this->accept();
+}
+
+void QIodeMenuWorkspaceSave::save_comments()
+{
+    save_objs(I_COMMENTS, false);
 }
 
 void QIodeMenuWorkspaceSave::save_equations()
 {
-    KDBEquations kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Equations"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (save_all && filepath.isEmpty())
-        {
-            if (nb_equations > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Equations.\nEquations will not be saved.");
-        }
-        else
-        {
-            kdb.save(filepath.toStdString());
-        }
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!save_all) this->accept();
+    save_objs(I_EQUATIONS, false);
 }
 
 void QIodeMenuWorkspaceSave::save_identities()
 {
-    KDBIdentities kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Identities"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (save_all && filepath.isEmpty())
-        {
-            if (nb_identities > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Identities.\nIdentities will not be saved.");
-        }
-        else
-        {
-            kdb.save(filepath.toStdString());
-        }
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!save_all) this->accept();
+    save_objs(I_IDENTITIES, false);
 }
 
 void QIodeMenuWorkspaceSave::save_lists()
 {
-    KDBLists kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Lists"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (save_all && filepath.isEmpty())
-        {
-            if (nb_lists > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Lists.\nLists will not be saved.");
-        }
-        else
-        {
-            kdb.save(filepath.toStdString());
-        }
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!save_all) this->accept();
+    save_objs(I_LISTS, false);
 }
 
 void QIodeMenuWorkspaceSave::save_scalars()
 {
-    KDBScalars kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Scalars"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (save_all && filepath.isEmpty())
-        {
-            if (nb_scalars > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Scalars.\nScalars will not be saved.");
-        }
-        else
-        {
-            kdb.save(filepath.toStdString());
-        }
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!save_all) this->accept();
+    save_objs(I_SCALARS, false);
 }
 
 void QIodeMenuWorkspaceSave::save_tables()
 {
-    KDBTables kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Tables"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (save_all && filepath.isEmpty())
-        {
-            if (nb_tables > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Tables.\nTables will not be saved.");
-        }
-        else
-        {
-            kdb.save(filepath.toStdString());
-        }
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!save_all) this->accept();
+    save_objs(I_TABLES, false);
 }
 
 void QIodeMenuWorkspaceSave::save_variables()
 {
-    KDBVariables kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Variables"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (save_all && filepath.isEmpty())
-        {
-            if (nb_variables > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Variables.\nVariables will not be saved.");
-        }
-        else
-        {
-            kdb.save(filepath.toStdString());
-        }
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!save_all) this->accept();
+    save_objs(I_VARIABLES, false);
 }
 
 void QIodeMenuWorkspaceSave::save()
 {
-    save_all = true;
-
-    save_comments();
-    save_equations();
-    save_identities();
-    save_lists();
-    save_scalars();
-    save_tables();
-    save_variables();
+    save_objs(I_COMMENTS, true);
+    save_objs(I_EQUATIONS, true);
+    save_objs(I_IDENTITIES, true);
+    save_objs(I_LISTS, true);
+    save_objs(I_SCALARS, true);
+    save_objs(I_TABLES, true);
+    save_objs(I_VARIABLES, true);
 
     this->accept();
 }

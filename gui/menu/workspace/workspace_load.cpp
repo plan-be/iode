@@ -15,8 +15,6 @@ QIodeMenuWorkspaceLoad::QIodeMenuWorkspaceLoad(const QString& settings_filepath,
 {
 	setupUi(this);
 
-    load_all = false;
-
     mapFields["Comments"] = new WrapperFileChooser(pushButton_comments->text(), *fileChooser_comments, OPTIONAL_FIELD, I_COMMENTS_FILE, EXISTING_FILE);
     mapFields["Equations"] = new WrapperFileChooser(pushButton_equations->text(), *fileChooser_equations, OPTIONAL_FIELD, I_EQUATIONS_FILE, EXISTING_FILE);
     mapFields["Identities"] = new WrapperFileChooser(pushButton_identities->text(), *fileChooser_identities, OPTIONAL_FIELD, I_IDENTITIES_FILE, EXISTING_FILE);
@@ -36,17 +34,18 @@ QIodeMenuWorkspaceLoad::~QIodeMenuWorkspaceLoad()
 {
 }
 
-void QIodeMenuWorkspaceLoad::load_comments()
+void QIodeMenuWorkspaceLoad::load_objs(const EnumIodeType iode_type, const bool load_all)
 {
     KDBComments kdb;
     try
     {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Comments"]);
+        QString str_iode_type = QString::fromStdString(vIodeTypes[iode_type]);
+        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields[str_iode_type]);
         QString filepath = field_filepath->extractAndVerify();
         // load_all means that the users clicked on an the "Load" button to load all files at once.
         // In that case and if the filepath is empty, the load_xxx() method does nothing
         if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
+        load_global_kdb(iode_type, filepath.toStdString());
     }
     catch (const std::runtime_error& e)
     {
@@ -54,127 +53,52 @@ void QIodeMenuWorkspaceLoad::load_comments()
         return;
     }
     if (!load_all) this->accept();
+}
+
+void QIodeMenuWorkspaceLoad::load_comments()
+{
+    load_objs(I_COMMENTS, false);
 }
 
 void QIodeMenuWorkspaceLoad::load_equations()
 {
-    KDBEquations kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Equations"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!load_all) this->accept();
+    load_objs(I_EQUATIONS, false);
 }
 
 void QIodeMenuWorkspaceLoad::load_identities()
 {
-    KDBIdentities kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Identities"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!load_all) this->accept();
+    load_objs(I_IDENTITIES, false);
 }
 
 void QIodeMenuWorkspaceLoad::load_lists()
 {
-    KDBLists kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Lists"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!load_all) this->accept();
+    load_objs(I_LISTS, false);
 }
 
 void QIodeMenuWorkspaceLoad::load_scalars()
 {
-    KDBScalars kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Scalars"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!load_all) this->accept();
+    load_objs(I_SCALARS, false);
 }
 
 void QIodeMenuWorkspaceLoad::load_tables()
 {
-    KDBTables kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Tables"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!load_all) this->accept();
+    load_objs(I_TABLES, false);
 }
 
 void QIodeMenuWorkspaceLoad::load_variables()
 {
-    KDBVariables kdb;
-    try
-    {
-        WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields["Variables"]);
-        QString filepath = field_filepath->extractAndVerify();
-        if (load_all && filepath.isEmpty()) return;
-        kdb.load(filepath.toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-    if (!load_all) this->accept();
+    load_objs(I_VARIABLES, false);
 }
 
 void QIodeMenuWorkspaceLoad::load()
 {
-    load_all = true;
-
-    load_comments();
-    load_equations();
-    load_identities();
-    load_lists();
-    load_scalars();
-    load_tables();
-    load_variables();
+    load_objs(I_COMMENTS, true);
+    load_objs(I_EQUATIONS, true);
+    load_objs(I_IDENTITIES, true);
+    load_objs(I_LISTS, true);
+    load_objs(I_SCALARS, true);
+    load_objs(I_TABLES, true);
+    load_objs(I_VARIABLES, true);
 
     this->accept();
 }
