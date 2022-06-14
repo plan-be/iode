@@ -6,10 +6,25 @@
 
 
 template<class T>
-KDBAbstract<T>::KDBAbstract(EnumIodeType type) : type(type)
+KDBAbstract<T>::KDBAbstract(const EnumIodeType type, const std::string& pattern) : type(type)
 {
     if (K_WS[type] == NULL) IodeInit();
     cpp_assign_super_API();
+
+    if (pattern.empty()) shallow_copy_kdb = NULL;
+    else
+    {
+        char** c_names = filter_kdb_names(type, pattern);
+        shallow_copy_kdb = K_quick_refer(K_WS[type], c_names);
+        SW_nfree(c_names);
+        if (shallow_copy_kdb == NULL) throw std::runtime_error("Cannot filter " + vIodeTypes[type] + " with pattern " + pattern);
+    }
+}
+
+template<class T>
+KDBAbstract<T>::~KDBAbstract()
+{
+    if (shallow_copy_kdb != NULL) K_free_kdb(shallow_copy_kdb);
 }
 
 // object name
@@ -38,20 +53,23 @@ int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_n
 
     check_name(new_name, type);
 
-    KDB* kdb = get_KDB();
     char* c_old_name = const_cast<char*>(old_name.c_str());
     char* c_new_name = const_cast<char*>(new_name.c_str());
-    int pos = K_ren(kdb, c_old_name, c_new_name);
     
+    // first rename in global KDB
+    int pos = K_ren(K_WS[type], c_old_name, c_new_name);
     // see K_ren documentation
     if (pos < 0)
     {
-        std::string msg = vIodeTypes[type] + " cannot be renamed as " + new_name + ".";
-        if (pos == -1) throw std::runtime_error("Name " + old_name + " does not exist.\n" + msg);
-        else if (pos == -2) throw std::runtime_error(vIodeTypes[type] + " with name " + new_name + " already exists.\n" + msg);
-        else throw std::runtime_error("Something went wrong.\n" + msg);
+        std::string msg = vIodeTypes[type] + " cannot be renamed as " + new_name + ".\n";
+        if (pos == -1) throw std::runtime_error(msg + "Name " + old_name + " does not exist.");
+        else if (pos == -2) throw std::runtime_error(msg + vIodeTypes[type] + " with name " + new_name + " already exists.");
+        else throw std::runtime_error(msg + "Something went wrong.");
     }
     
+    // rename in shallow copy KDB
+    if (shallow_copy_kdb != NULL) pos = K_ren(shallow_copy_kdb, c_old_name, c_new_name);
+
     return pos;
 }
 
@@ -67,7 +85,16 @@ void KDBAbstract<T>::add(const std::string& name, const T& obj)
     if (K_find(get_KDB(), c_name) >= 0) 
         throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
     
-    add_or_update(name, obj);
+    if (shallow_copy_kdb != NULL)
+    {
+        // add new obj to global KDB if doesn't exist yet
+        int pos_global = K_find(K_WS[type], c_name);
+        if (pos_global < 0) pos_global = add_or_update(name, obj);
+        // add new entry to shallow copy KDB
+        int pos_copy = K_add_entry(shallow_copy_kdb, c_name);
+        KSOVAL(shallow_copy_kdb, pos_copy) = KSOVAL(K_WS[type], pos_global);
+    }
+    else add_or_update(name, obj);
 }
 
 template<class T>
@@ -123,16 +150,22 @@ void KDBAbstract<T>::remove(const int pos)
 {
     // throw exception if object with passed position is not valid
     std::string name = get_name(pos);
-    K_del(get_KDB(), pos);
+    remove(name);
 }
-
 
 template<class T>
 void KDBAbstract<T>::remove(const std::string& name)
 {
     // throw exception if object with passed name does not exist
     int pos = get_position(name);
-    K_del(get_KDB(), pos);
+
+    if (shallow_copy_kdb != NULL)
+    {
+        K_del_entry(shallow_copy_kdb, pos);
+        char* c_name = const_cast<char*>(name.c_str());
+        pos = K_find(K_WS[type], c_name);
+    }
+    K_del(K_WS[type], pos);
 }
 
 // Other methods

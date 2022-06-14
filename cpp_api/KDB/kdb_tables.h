@@ -10,14 +10,14 @@ protected:
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
 
-    void add_or_update(const std::string& name, const Table& table) override;
+    int add_or_update(const std::string& name, const Table& table) override;
 
     Table copy_obj(const Table& original) const override;
 
     Table get_unchecked(const int pos) const override;
 
 public:
-    KDBTables() : KDBAbstract(I_TABLES) {};
+    KDBTables(const std::string& pattern = "") : KDBAbstract(I_TABLES, pattern) {};
 
     std::string get_title(const int pos) const;
 

@@ -30,3 +30,20 @@ void clear_global_kdb(EnumIodeType iode_type)
     if (res != EXIT_SUCCESS)
         throw std::runtime_error("Something went wrong when trying to clear objets of type " + vIodeTypes[iode_type]);
 }
+
+/**
+* Warning: renturned char** array must be freed by the caller
+*/
+char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern)
+{
+    char** c_names;
+    if (pattern.empty()) return NULL;
+    else
+    {
+        char* c_pattern = const_cast<char*>(pattern.c_str());
+        // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+        char* c_lst = K_expand(iode_type, NULL, c_pattern, '*');
+        // Parses a string and replaces @filename and $listname by their contents
+        return B_ainit_chk(c_lst, NULL, 0);
+    }
+}

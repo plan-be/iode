@@ -1,5 +1,6 @@
 #pragma once
 #include "../utils.h"
+#include "kdb_global.h"
 
 
 // using is the C++11 version of typedef
@@ -14,13 +15,16 @@ template<class T>
 class KDBAbstract
 {
 protected:
+    // Note: Cannot define a KDB* global_kdb = K_WS[type] member because the pointer contained in 
+    // K_WS[type] may change in the course of the program (when loading files for example)
+
     EnumIodeType type;
+    KDB* shallow_copy_kdb;         //< local KDB returned by K_refer()
 
 protected:
-    // Cannot define a KDB *kdb member set to K_WS[type] in the constructor because the pointer contained in 
-    // K_WS[type] may change in the course of the program (when loading files for example)
     KDB* get_KDB() const
     {
+        if (shallow_copy_kdb != NULL) return shallow_copy_kdb;
         KDB* kdb = K_WS[type];
         if (kdb == NULL) throw std::runtime_error("There is currently no " + vIodeTypes[type] + " database in memory.");
         return kdb;
@@ -45,18 +49,22 @@ protected:
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
 
-    virtual void add_or_update(const std::string& name, const T& obj) = 0;
+    virtual int add_or_update(const std::string& name, const T& obj) = 0;
 
     virtual T copy_obj(const T& original) const = 0;
 
     virtual T get_unchecked(const int pos) const = 0;
 
 public:
-    KDBAbstract(EnumIodeType type);
+    KDBAbstract(EnumIodeType type, const std::string& pattern);
+
+    ~KDBAbstract();
 
     int get_iode_type() const { return type; }
 
-    int count() const { return K_WS[type] != NULL ? K_WS[type]->k_nb : 0; }
+    int count() const { return get_KDB()->k_nb; }
+
+    bool is_global_kdb() const { return shallow_copy_kdb == NULL; }
 
     // object name
 

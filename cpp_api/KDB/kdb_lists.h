@@ -10,12 +10,12 @@ protected:
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
 
-    void add_or_update(const std::string& name, const List& list) override;
+    int add_or_update(const std::string& name, const List& list) override;
 
     List copy_obj(const List& original) const override;
 
     List get_unchecked(const int pos) const override;
 
 public:
-    KDBLists() : KDBAbstract(I_LISTS) {};
+    KDBLists(const std::string& pattern = "") : KDBAbstract(I_LISTS, pattern) {};
 };

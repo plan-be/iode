@@ -4,12 +4,13 @@
 
 // CRUD (Create - Read - Update - Delete) + Copy methods
 
-void KDBIdentities::add_or_update(const std::string& name, const Identity& identity)
+int KDBIdentities::add_or_update(const std::string& name, const Identity& identity)
 {
     char* c_name = const_cast<char*>(name.c_str());
-    int res = K_add(get_KDB(), c_name, identity.lec);
-    if (res == -1) throw std::runtime_error("Iode has not been initialized");
-    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + vIodeTypes[type] + " with name " + name);
+    int pos = K_add(K_WS[I_IDENTITIES], c_name, identity.lec);
+    if (pos == -1) throw std::runtime_error("Iode has not been initialized");
+    if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
+    return pos;
 }
 
 Identity KDBIdentities::copy_obj(const Identity& original) const

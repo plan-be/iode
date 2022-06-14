@@ -4,15 +4,16 @@
 
 // CRUD (Create - Read - Update - Delete) + Copy methods
 
-void KDBVariables::add_or_update(const std::string& name, const Variable& vars)
+int KDBVariables::add_or_update(const std::string& name, const Variable& vars)
 {
 	char* c_name = const_cast<char*>(name.c_str());
 	int nb_obs = get_nb_periods();
 	if (vars.size() != nb_obs)
 		throw std::runtime_error("Wrong size of the variable vector. Excepted " + std::to_string(nb_obs) + " values but got " + std::to_string(vars.size()) + " values.");
-	int pos = K_add(get_KDB(), c_name, vars.data(), &nb_obs);
+	int pos = K_add(K_WS[I_VARIABLES], c_name, vars.data(), &nb_obs);
 	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
+	if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
+	return pos;
 }
 
 Variable KDBVariables::copy_obj(const Variable& original) const

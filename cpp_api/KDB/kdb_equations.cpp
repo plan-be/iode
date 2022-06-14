@@ -5,12 +5,13 @@
 // CRUD (Create - Read - Update - Delete) + Copy methods
 
 // Note: argument set to "", NULL or 0 are unchanged
-void KDBEquations::add_or_update(const std::string& name, const Equation& equation)
+int KDBEquations::add_or_update(const std::string& name, const Equation& equation)
 {
     char* c_name = const_cast<char*>(name.c_str());
-    int pos = K_add(get_KDB(), c_name, equation.c_equation, c_name);
+    int pos = K_add(K_WS[I_EQUATIONS], c_name, equation.c_equation, c_name);
     if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-    if (pos == -2) throw std::runtime_error("Cannot create or update equation with name " + name);
+    if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
+    return pos;
 }
 
 Equation KDBEquations::copy_obj(const Equation& original) const
