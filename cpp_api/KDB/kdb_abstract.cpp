@@ -34,6 +34,8 @@ int KDBAbstract<T>::set_name(const int pos, const std::string& new_name)
 template<class T>
 int KDBAbstract<T>::rename(const std::string& old_name, const std::string& new_name)
 {
+    if (type == I_EQUATIONS) throw std::runtime_error("Cannot rename an equation. The name of an equation is always its endogeneous variable");
+
     check_name(new_name, type);
 
     KDB* kdb = get_KDB();
