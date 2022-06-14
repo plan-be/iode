@@ -84,7 +84,6 @@ TEST_F(KDBCommentsTest, Contains)
     EXPECT_FALSE(kdb.contains("UNKNOWN"));
 }
 
-
 TEST_F(KDBCommentsTest, Get)
 {
     std::string name = kdb.get_name(0);
