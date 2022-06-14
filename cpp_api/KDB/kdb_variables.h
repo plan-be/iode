@@ -16,14 +16,14 @@ protected:
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
 
-    void add_or_update(const std::string& name, const Variable& variable) override;
+    int add_or_update(const std::string& name, const Variable& variable) override;
 
     Variable copy_obj(const Variable& original) const override;
 
     Variable get_unchecked(const int pos) const override;
 
 public:
-    KDBVariables() : KDBAbstract(I_VARIABLES) {};
+    KDBVariables(const std::string& pattern = "") : KDBAbstract(I_VARIABLES, pattern) {};
 
     IODE_REAL get_var(const int pos, const int t, const int mode) const;
 

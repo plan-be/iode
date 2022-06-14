@@ -2,12 +2,13 @@
 #include "kdb_tables.h"
 
 
-void KDBTables::add_or_update(const std::string& name, const Table& table)
+int KDBTables::add_or_update(const std::string& name, const Table& table)
 {
 	char* c_name = const_cast<char*>(name.c_str());
-	int pos = K_add(get_KDB(), c_name, table.c_table);
+	int pos = K_add(K_WS[I_TABLES], c_name, table.c_table);
 	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
+	if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
+	return pos;
 }
 
 Table KDBTables::copy_obj(const Table& original) const

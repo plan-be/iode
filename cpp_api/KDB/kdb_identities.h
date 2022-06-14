@@ -13,14 +13,14 @@ protected:
 
     // CRUD (Create - Read - Update - Delete) + Copy methods
 
-    void add_or_update(const std::string& name, const Identity& identity) override;
+    int add_or_update(const std::string& name, const Identity& identity) override;
 
     Identity copy_obj(const Identity& original) const override;
 
     Identity get_unchecked(const int pos) const override;
 
 public:
-    KDBIdentities() : KDBAbstract(I_IDENTITIES) {};
+    KDBIdentities(const std::string& pattern = "") : KDBAbstract(I_IDENTITIES, pattern) {};
 
     std::string get_lec(const int pos) const;
 
