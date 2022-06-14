@@ -68,6 +68,7 @@
     <ClCompile Include="test_equation.cpp" />
     <ClCompile Include="test_kdb_comments.cpp" />
     <ClCompile Include="test_kdb_equations.cpp" />
+    <ClCompile Include="test_kdb_global.cpp" />
     <ClCompile Include="test_kdb_identities.cpp" />
     <ClCompile Include="test_kdb_lists.cpp" />
     <ClCompile Include="test_kdb_scalars.cpp" />

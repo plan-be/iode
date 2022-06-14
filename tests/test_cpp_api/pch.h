@@ -30,3 +30,6 @@ public:
 		output_test_dir = str_path + "output\\";
 	}
 };
+
+
+std::vector<std::string> char_array_to_std_string_vector(char** char_array);
