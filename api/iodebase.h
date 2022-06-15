@@ -50,12 +50,14 @@ extern void kwrmsg(char *);
 /* k_super.c */
 extern void    (*kerror_super)(int level, char*fmt);
 extern void    (*kwarning_super)(char* msg);
+extern void    (*kpause_super)();
 extern void    (*kmsg_super)(char*fmt);
 extern int     (*kwprintf_super)(char* msg);
 extern void    (*kpanic_super)();
 extern int     (*kconfirm_super)(char* msg);
 extern int     (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
 extern int     kmsgbox_continue;
+extern int     kpause_continue;
 extern void    (*krecordkey_super)(int ch);
 extern void    (*ksettitle_super)(void);
 extern int     (*ktermvkey_super)(int vkey);
@@ -130,6 +132,9 @@ extern int K_find(KDB *,char *);
 extern int K_del(KDB *,int );
 extern int K_del_entry(KDB *,int );
 extern int K_del_by_name(KDB* kdb, char* name);
+
+/* k_objsv.c */
+extern int K_add(KDB *kdb, char* name,...);
 
 /* k_objvers.c */
 extern int K_calcvers(char *);
@@ -351,6 +356,10 @@ extern double L_newton(KDB *,KDB *,CLEC *,int ,int ,int );
 //extern int L_bracket(double *,double *,int );
 extern double L_secant(KDB *,KDB *,CLEC *,int ,int ,int );
 
+/* l_debug.c */
+extern void L_debug(char *,...);
+
+
 /* e_est.c */
 extern int E_est(char **,char **,KDB *,KDB *,SAMPLE *,int ,char **,int ,double );
 //extern int E_gls(void);
@@ -418,9 +427,9 @@ extern void E_print_eqres_2(int );
 extern void E_print_eqres(int );
 extern int E_print_results(int ,int ,int ,int ,int );
 
-/* e_stat.c */
+/* e_dftest.c */
 extern double *E_UnitRoot(char *,int ,int ,int );
-extern int E_UnitRoot_1(SAMPLE *,char *);
+//extern int E_UnitRoot_1(SAMPLE *,char *);
 extern void E_SclToReal(char *,double *);
 extern void E_PrintDF(char *,double *,int ,int ,int );
 extern int E_GetLecName(char *,char *);
