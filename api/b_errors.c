@@ -117,11 +117,12 @@ void B_display_last_error()
     SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
 
     v = SCR_mtov(B_ERROR_MSG, '\n');
-    buts[0] = "Ok";
-    buts[1] = 0;
-    kmsgbox("E R R O R", v, buts);             // JMP 10/12/2021
+    //buts[0] = "Ok";
+    //buts[1] = 0;
+    //kmsgbox("E R R O R", v, buts);             // JMP 10/12/2021
+    kerror(0, v);
+    kpause();
     SCR_free(v);
-
     B_clear_last_error();
 }
 
