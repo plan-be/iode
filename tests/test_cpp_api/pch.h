@@ -18,6 +18,9 @@ protected:
 public:
 	KDBTest()
 	{
+		IodeInit();
+		cpp_assign_super_API();
+
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
