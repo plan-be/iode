@@ -1,5 +1,3 @@
-#include "iode.h"
-
 /**
  * @header4iode
  *
@@ -17,6 +15,7 @@
  *     int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
  */
 
+#include "iode.h"
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
 // --------------------------------------------------------------
