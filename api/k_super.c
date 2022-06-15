@@ -27,8 +27,8 @@
  *     int kgetkey()                                Reads the next character in the keyboard buffer (GUI only).
  *     void kbeep()                                 Plays a sound (GUI only).
  *     SAMPLE *kasksmpl()                           Asks the user to give a SAMPLE (GUI only).
- *     int kexecsystem()                            
- *     int kshellexec()                             
+ *     int kexecsystem()                            Calls the fonction system().
+ *     int kshellexec()                             Call the Win32 function ShellExecuteEx().
  *
  * SCR4 superseeded functions + assign
  * -----------------------------------
@@ -44,7 +44,8 @@
  *      void (*kpanic_super)(void);
  *      int  (*kconfirm_super)(char* msg);
  *      int  (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
- *      int   kmsgbox_continue = 1;
+ *      int   kmsgbox_continue = 0;
+ *      int   kpause_continue = 0;
  *      void (*krecordkey_super)(int ch);
  *      void (*ksettitle_super)(void);
  *      int  (*ktermvkey_super)(int vkey);
@@ -64,12 +65,14 @@
 // Global variables
 void (*kerror_super)(int level, char*msg);
 void (*kwarning_super)(char* msg);
+void (*kpause_super)();
 void (*kmsg_super)(char* msg);
 int  (*kwprintf_super)(char* msg);
 void (*kpanic_super)(void);
 int  (*kconfirm_super)(char* msg);
 int  (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
-int   kmsgbox_continue = 1;
+int   kmsgbox_continue = 0; 
+int   kpause_continue = 0; 
 void (*krecordkey_super)(int ch);
 void (*ksettitle_super)(void);
 int  (*ktermvkey_super)(int vkey);
@@ -107,7 +110,8 @@ void kerror(int level, char* fmt, ...)
     if(kerror_super != 0) 
         (*kerror_super)(level, buf);
     else {
-        fprintf(stderr, "%s\n", buf);
+        //fprintf(stderr, "%s\n", buf);
+        printf("%s\n", buf);
         if(level == 1)  
             exit(1);
     }    
@@ -115,18 +119,26 @@ void kerror(int level, char* fmt, ...)
 
 
 /**
- *  Displays a message and then waits for the user to press ENTER.
+ *  Displays the message "Press ENTER to continue" and then waits for the user to press ENTER.
  *  Sub of kmsgbox() and kwarning().
+ *  
+ *  The default behaviour is :
+ *      - if the global int kpause_continue is not null, does not wait the user to press ENTER after having printed the message.
+ *      - if kpause_continue is null, waits for a user input.
  *    
- *  @param [in] msg     char*   message to print 
  *  
  */
-void kpause(char* msg)
+void kpause()
 {
     int     ch = 0;
 
-    printf("%s\n", msg);   
-    while(ch != '\n') ch = getchar();
+    if(kpause_continue) return;
+    if(kpause_super != 0) 
+        (*kpause_super)();
+    else {
+        printf("Press ENTER to continue\n"); 
+        while(ch != '\n') ch = getchar();
+    }    
 }
 
 
@@ -134,8 +146,7 @@ void kpause(char* msg)
  *  Displays a message and optionally asks the user to press ENTER before continuing.
  *  
  *  The default behaviour is :
- *      - if the global int kmsgbox_continue is not null, does not wait the user to press ENTER after having printed the message.
- *      - if kmsgbox_continue is null, calls kpause() (i.e. waits).
+ *     - if the global int kpause_continue is not null, does not wait the user to press ENTER after having printed the message.
  *  
  *  If the function pointer kwarning_super is not null, it is called instead.
  *  
@@ -160,11 +171,9 @@ void kwarning(char* fmt, ...)
     if(kwarning_super != 0) 
         (*kwarning_super)(buf);
     else {
-        if(kmsgbox_continue == 0) 
-            kpause(buf);
-        else 
-            printf("%s\n", buf);
-    }
+        printf("%s\n", buf);
+        kpause(buf);
+    }    
 }
 
 
@@ -254,10 +263,9 @@ int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)
     if(kmsgbox_super != 0) 
         return((*kmsgbox_super)(str, v, buts));
     else {
+        printf("%s\n", v);
         if(!kmsgbox_continue) 
-            kpause(v);
-        else 
-            printf("%s\n", v);
+            kpause();
         return(1);
     }    
 }
@@ -306,6 +314,15 @@ void krecordtext(unsigned char*  text)
  *  @param [in] fmt     char*   format of the following parameters (ex.: "%s %d...")
  *  @param [in] ...             optional list of additional parameters    
  *  @return             int     0 (for compatibility)
+ *  
+ *  @note Important: Wprintf() is used by some functions present in scr4iode.lib but is
+ *  not defined in scr4iode.lib. Therefore, the definition below is required to link test1.exe, iodecmd.exe...
+ *  
+ *  However, Wprintf() IS DEFINED in s32wo.lib (used only with iode.exe with "DOS" GUI interface). 
+ *  And consequently, we have 2 definitions at link time: iodeapi.lib and s32wo.lib. 
+ *  It works, but should be fixed. 
+ *   
+ *  
  */
 
 int Wprintf(char* fmt, ...)
