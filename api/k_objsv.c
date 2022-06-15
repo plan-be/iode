@@ -10,6 +10,7 @@
 
 #define _IODEVARG_
 #include "iode.h"
+#include <stdarg.h>
 
 /**
  *  Adds an object to a KDB. The number of arguments depends on object type. 
@@ -48,26 +49,118 @@
  *                                      on success, position of the new object in kdb 
  *  
  */
-int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9)
-{
-    char    *pack;
-    int     pos, lg;
+ 
+// OLD VERSION 
+//
+//int K_add(KDB* kdb, char* name, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6, char* a7, char* a8, char* a9)
+//{
+//    char    *pack;
+//    int     pos, lg;
+//
+//    if(kdb == NULL) return(-1);
+//    if(K_pack[KTYPE(kdb)](&pack, a1, a2, a3, a4, a5, a6, a7, a8, a9) < 0)
+//        return(-2);
+//    pos = K_add_entry(kdb, name);
+//    if(pos < 0) {
+//        B_seterror("%.80s cannot be created (syntax ?)", name);
+//        goto einde;
+//    }
+//
+//    lg = * (OSIZE *) pack;
+//    if(KSOVAL(kdb, pos) != 0) SW_free(KSOVAL(kdb, pos));
+//    KSOVAL(kdb, pos) = SW_alloc(lg);
+//    memcpy(KGOVAL(kdb, pos), pack, lg);
+//einde:
+//    SW_nfree(pack);
+//    return(pos);
+//}
 
-    if(kdb == NULL) return(-1);
-    if(K_pack[KTYPE(kdb)](&pack, a1, a2, a3, a4, a5, a6, a7, a8, a9) < 0)
-        return(-2);
+
+// NEW VERSION: K_add() prototype is correct and corresponds to the implementation
+// -------------------------------------------------------------------------------
+
+int K_add(KDB* kdb, char* name, ...)
+{
+    va_list vargs;
+    char    *pack = NULL;
+    int     pos = -1, lg, rc;
+    EQ*     eq;
+    char*   endo;
+    char*   txt;
+    char*   lec;
+    SCL*    scl;
+    TBL*    tbl;
+    IODE_REAL* var;
+    int*    lgptr;
+
+    va_start(vargs, name);
+
+    if(kdb == NULL) {
+        pos = -1;
+        goto einde;
+    }    
+
+    switch(KTYPE(kdb)) {
+      case K_CMT: 
+          txt = va_arg(vargs, char *);
+          rc = K_cpack(&pack, txt);
+          break;            
+      case K_EQS: 
+          eq = va_arg(vargs, EQ *);
+          endo = va_arg(vargs, char *);
+          rc = K_epack(&pack, eq, endo);
+          break;            
+      case K_IDT: 
+          lec = va_arg(vargs, char *);
+          rc = K_ipack(&pack, lec);
+          break;            
+      case K_LST: 
+          txt = va_arg(vargs, char *);
+          rc = K_lpack(&pack, txt);
+          break;            
+      case K_SCL: 
+          scl = va_arg(vargs, SCL *);
+          rc = K_spack(&pack, scl);
+          break;            
+      case K_TBL: 
+          tbl = va_arg(vargs, TBL *);
+          rc = K_tpack(&pack, tbl);
+          break;            
+      case K_VAR: 
+          var = va_arg(vargs, double *);  
+          lgptr = va_arg(vargs, int*);
+          rc = K_vpack(&pack, var, lgptr);
+          break;            
+      case K_OBJ: 
+          txt = va_arg(vargs, char*);     
+          lgptr = va_arg(vargs, int*);
+          rc = K_opack(&pack, txt, lgptr);
+          break;            
+     
+    } 
+    if(rc < 0) {
+        pos = -2;
+        goto einde;
+    }    
+
+
+    // Add entry (name) into kdb
     pos = K_add_entry(kdb, name);
     if(pos < 0) {
         B_seterror("%.80s cannot be created (syntax ?)", name);
         goto einde;
     }
 
+    // Copy allocated pack into kdb entry pos (SWAP memory)
     lg = * (OSIZE *) pack;
     if(KSOVAL(kdb, pos) != 0) SW_free(KSOVAL(kdb, pos));
     KSOVAL(kdb, pos) = SW_alloc(lg);
     memcpy(KGOVAL(kdb, pos), pack, lg);
+    
 einde:
+    // Frees the allocated pack in regular MEM
     SW_nfree(pack);
+    va_end(vargs);
+    
     return(pos);
 }
-
