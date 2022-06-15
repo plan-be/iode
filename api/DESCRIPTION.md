@@ -58,8 +58,9 @@
   - [Group "Iode Reports"](#T52)
     - [b\_args.c](#T53)
     - [b\_errors.c](#T54)
-  - [Group "Model Simulation"](#T55)
-  - [Group "Table Calculation"](#T56)
+  - [Group "Model Estimation"](#T55)
+  - [Group "Model Simulation"](#T56)
+  - [Group "Table Calculation"](#T57)
 
 # IODE: functions by group {#T1}
 
@@ -75,7 +76,7 @@
 - Group "Iode object ascii formats" 
 - Group "LEC language" 
 - Group "Iode Reports" 
-- \*Group "Model Estimation"
+- Group "Model Estimation" 
 - Group "Model Simulation" 
 - Group "Table Calculation" 
 - \*Group "Iode ini file"
@@ -202,6 +203,10 @@ Functions to read and write parameters in iode.ini.
 |`int B_IniReadChar(char* section, char* parm, char dft)`|Reads a character parameter in the current iode.ini file.|
 |`int B_IniReadNum(char* section, char* parm, int dft)`|Reads a integer parameter in the current iode.ini file.|
 |`int B_IniReadYN(char* section, char* parm, int dft)`|Reads a Y/N parameter in the current iode.ini file.|
+|`int B_IniWriteText(char* section, char* parm, char* val)`|Saves a text parameter in the current iode.ini file|
+|`int B_IniWriteChar(char* section, char* parm, char val)`|Saves a char parameter in the current iode.ini file|
+|`int B_IniWriteNum(char* section, char* parm, int val)`|Saves a integer parameter in the current iode.ini file|
+|`int B_IniWriteYN(char* section, char* parm, int val)`|Saves a boolean parameter in the current iode.ini file|
 
 ## Group "Pseudo\-virtual functions" {#T13}
 
@@ -220,7 +225,7 @@ Functions used in any context of IODE (GUI or not\-GUI).
 |Syntax|Description|
 |:---|:---|
 |`void kerror(int level, char* fmt, ...)`|Displays an error message and optionally exits the program.|
-|`void kpause(char* msg)`|Displays a message and then waits for the user to press ENTER.|
+|`void kpause()`|Displays the message "Press ENTER to continue" and waits for the user to press ENTER.|
 |`void kwarning(char* fmt, ...)`|Displays a message and optionally asks the user to press ENTER before continuing.|
 |`void kmsg(char* fmt, ...)`|Displays a message.|
 |`int kconfirm(char *fmt,...)`|Displays a message and optionally asks confirmation before continuing.|
@@ -239,19 +244,23 @@ Functions used only in a GUI context.
 |`int kgetkey()`|Reads the next character in the keyboard buffer (GUI only).|
 |`void kbeep()`|Plays a sound (GUI only).|
 |`SAMPLE *kasksmpl()`|Asks the user to give a SAMPLE (GUI only).|
+|`int kexecsystem()`|Calls the fonction system().|
+|`int kshellexec()`|Call the Win32 function ShellExecuteEx().|
 
 #### List of function pointers that can replace the standard implementations {#T16}
 
 |Syntax|
 |:---|
 |`void (*kerror_super)(int level, char*msg);`|
+|`void (*kpause_super)();`|
+|`int kpause_continue = 0;`|
 |`void (*kwarning_super)(char* msg);`|
 |`void (*kmsg_super)(char* msg);`|
 |`int (*kwprintf_super)(char* msg);`|
 |`void (*kpanic_super)(void);`|
 |`int (*kconfirm_super)(char* msg);`|
 |`int (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);`|
-|`int kmsgbox_continue = 1;`|
+|`int kmsgbox_continue = 0;`|
 |`void (*krecordkey_super)(int ch);`|
 |`void (*ksettitle_super)(void);`|
 |`int (*ktermvkey_super)(int vkey);`|
@@ -259,6 +268,8 @@ Functions used only in a GUI context.
 |`int (*kgetkey_super)();`|
 |`void (*kbeep_super)(void);`|
 |`SAMPLE *(*kasksmpl_super)(void);`|
+|\`cint kexecsystem\_super(char\*);|
+|\`cint kshellexec\_super(char\*);|
 
 ## Group "IODE Version" {#T17}
 
@@ -310,6 +321,7 @@ Functions acting on workspaces of variables.
 |`int KV_sample(KDB *kdb, SAMPLE *nsmpl)`|Changes the SAMPLE of a KDB of variables.|
 |`int KV_merge(KDB *kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
 |`void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
+|`int KV_add(char* varname)`|Adds a new variable in KV\_WS. Fills it with L\_NAN.|
 |`double KV_get(KDB *kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
 |`void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
 |`int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)`|Extrapolates variables on a selected SAMPLE according to one of the available methods.|
@@ -432,6 +444,27 @@ List of functions
 |`IODE_REAL *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
 |`EQ* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
 |`TBL* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
+|**Equation tests**||
+|`double K_etest(KDB* kdb, char*name, int test_nb)`|Retrieves a statistical test stored the equation whose endo is name.|
+|`double K_e_stdev (KDB* kdb, char*name)`|Returns stdev calculated during the last estimation of equation name|
+|`double K_e_meany (KDB* kdb, char*name)`|Returns meany calculated during the last estimation of equation name|
+|`double K_e_ssres (KDB* kdb, char*name)`|Returns ssres calculated during the last estimation of equation name|
+|`double K_e_stderr(KDB* kdb, char*name)`|Returns stderr calculated during the last estimation of equation name|
+|`double K_e_fstat (KDB* kdb, char*name)`|Returns fstat calculated during the last estimation of equation name|
+|`double K_e_r2 (KDB* kdb, char*name)`|Returns r2 calculated during the last estimation of equation name|
+|`double K_e_r2adj (KDB* kdb, char*name)`|Returns r2adj calculated during the last estimation of equation name|
+|`double K_e_dw (KDB* kdb, char*name)`|Returns dw calculated during the last estimation of equation name|
+|`double K_e_loglik(KDB* kdb, char*name)`|Returns loglik calculated during the last estimation of equation name|
+|**Scalar data**||
+|`double K_s_get_info(KDB* kdb, char*name, int info_nb)`|Retrieves a SCL info|
+|`double K_s_get_value (KDB* kdb, char*name)`|Retrieves a SCL value|
+|`double K_s_get_relax (KDB* kdb, char*name)`|Retrieves a SCL relax|
+|`double K_s_get_stderr(KDB* kdb, char*name)`|Retrieves a SCL stderr|
+|`double K_s_get_ttest (KDB* kdb, char*name)`|Retrieves a SCL ttest|
+|`double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)`|Sets a SCL info|
+|`double K_s_set_value (KDB* kdb, char*name)`|Sets a SCL value|
+|`double K_s_set_relax (KDB* kdb, char*name)`|Sets a SCL relax|
+|`double K_s_set_stderr(KDB* kdb, char*name)`|Sets a SCL stderr|
 
 ### k\_eqs.c {#T32}
 
@@ -659,11 +692,15 @@ Basic functions for managing error messages.
 |`void B_print_last_error()`|Displays or prints the last recorded errors (in B\_ERROR\_MSG) using W\_printf().|
 |`void B_clear_last_error()`|Resets the list of last messages (B\_ERROR\_MSG and B\_ERROR\_NB).|
 
-## Group "Model Simulation" {#T55}
+## Group "Model Estimation" {#T55}
+
+See [ESTIM.md](ESTIM.md).
+
+## Group "Model Simulation" {#T56}
 
 See [SIMUL.md](simul.md).
 
-## Group "Table Calculation" {#T56}
+## Group "Table Calculation" {#T57}
 
 See [TBL\_CALC.md](tbl_calc.md).
 
