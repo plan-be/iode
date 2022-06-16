@@ -70,6 +70,7 @@ extern int     (*kshellexec_super )(char*);
 
 extern void    kerror(int level, char* fmt, ...);
 extern void    kwarning(char* fmt, ...);
+extern void    kpause();
 extern void    kmsg(char* fmt, ...);
 extern int     kwprintf(char* msg, ...);
 extern void    kpanic(void);
@@ -85,6 +86,8 @@ extern SAMPLE* kasksmpl();
 extern int     kexecsystem(char*);
 extern int     kshellexec(char*);
 extern char    *A_expand_super_API(char* name);
+extern int     kexecsystem(char*);
+extern int     kshellexec(char*);
 
 extern void    IODE_assign_super_API(void);
 
