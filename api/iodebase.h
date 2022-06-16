@@ -86,8 +86,6 @@ extern SAMPLE* kasksmpl();
 extern int     kexecsystem(char*);
 extern int     kshellexec(char*);
 extern char    *A_expand_super_API(char* name);
-extern int     kexecsystem(char*);
-extern int     kshellexec(char*);
 
 extern void    IODE_assign_super_API(void);
 
