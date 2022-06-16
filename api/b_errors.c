@@ -109,7 +109,7 @@ void B_seterrn(int n, ...)
  */
 void B_display_last_error()
 {
-    char    *v = NULL, *buts[2];
+    char    *v = NULL;
 
     if(B_ERROR_NB == 0) return;
     
