@@ -172,7 +172,7 @@ void kwarning(char* fmt, ...)
         (*kwarning_super)(buf);
     else {
         printf("%s\n", buf);
-        kpause(buf);
+        kpause();
     }    
 }
 
@@ -336,7 +336,7 @@ int Wprintf(char* fmt, ...)
 #else
     vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
 #endif    
-
+ 
     va_end(myargs);
     if(kwprintf_super != 0) 
         (*kwprintf_super)(buf);
