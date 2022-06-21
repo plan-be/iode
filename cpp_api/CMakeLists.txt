@@ -1,6 +1,7 @@
 ﻿
 add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" 
                               "common.h" "utils.h" 
+                              "iode_exceptions.h"
                               "period.h" "sample.h"
                               "super.h" "super.cpp"
                               "equation.h" "equation.cpp"
