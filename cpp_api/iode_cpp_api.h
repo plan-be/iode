@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "utils.h"
+#include "iode_exceptions.h"
 #include "period.h"
 #include "sample.h"
 #include "super.h"

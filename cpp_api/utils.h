@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "iode_exceptions.h"
 #include "super.h"
 
 #include <string>
