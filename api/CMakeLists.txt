@@ -3,7 +3,7 @@
 #
 
 # Add source to this project's executable.
-set (DOCS DESCRIPTION.md LEC.md SIMUL.md TBL_CALC.md) # ESTIM.md)
+set (DOCS DESCRIPTION.md ESTIM.md LEC.md SIMUL.md TBL_CALC.md) # ESTIM.md)
 set (UTILS buf.c pack.c per.c yy.c)
 set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
 set (OBJS k_vers.c k_objs.c k_objsv.c k_pack.c k_objfile.C k_xdr.c k_objvers.c k_kdb.c k_ws.c k_wsvar.c k_cmp.c k_val.c k_lec.c k_grep.c k_tbl.c k_eqs.c k_lst.c) 
@@ -14,9 +14,9 @@ set (KSUPER k_super.c)
 set (KLANG k_lang.c)
 set (GSAMPLE c_cc.c c_calc.c)
 set (KPRINT k_print.c) # k_graph.c)
-#set (WRT w_wrt.c w_wrt1.c)
-#set (INI b_iodeini.c)
-#set (A2M b_a2mini.c)
+set (WRT w_wrt.c w_wrt1.c)
+set (INI b_iodeini.c)
+set (A2M b_a2mini.c)
 #set (ESTIM k_est.c e_error.c e_est.c e_prep.c e_print.c e_stat.c e_step.c e_tests.c)
  
 set (SOURCES 
@@ -30,9 +30,9 @@ set (SOURCES
 		${KLANG}
 		${GSAMPLE}
 		${KPRINT}
-#		${WRT}
-#		${INI}
-#		${A2M}
+		${WRT}
+		${INI}
+		${A2M}
 #		${ESTIM}
 )
 
