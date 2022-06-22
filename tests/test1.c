@@ -45,9 +45,9 @@ extern "C"
     int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
     int B_PrintRtfTopic(char* x) { return(0); }
     int A2mGIF_HTML() {return(0);}
-    int W_printf(char*fmt, ...) {return(0);}
-    void K_load_iode_ini() {}
-    void K_save_iode_ini() {}
+    //int W_printf(char*fmt, ...) {return(0);}
+    //void K_load_iode_ini() {}
+    //void K_save_iode_ini() {}
 
 #ifdef __cplusplus
 }
@@ -57,9 +57,11 @@ extern "C"
 /**
  *  Fonctions et vars de la lib S4ASSERT 
  *  ------------------------------------ 
- *      int U_cmp_str(char* str1, char* str2)  : compares 2 strings and return(1) if equal
- *      int U_cmp_tbl(char** tbl1, char* vec)  : Compares a table of strings to a list of strings in a semi-colon separated vector.
- *      void S4ASSERT(int success, char* fmt, ...)   : Verifies an assertion, optionally displays a message and opt. exits on error.
+ *      int U_cmp_strs(char* str1, char* str2)       : compares 2 strings and return(1) if equal
+ *      int U_cmp_tbls(char** tbl1, char* vec)       : compares a table of strings to a list of strings in a semi-colon separated vector.
+ *      int U_cmp_files(char* file1, char* file2)   : compares the content of 2 files. 
+ *  
+ *      void S4ASSERT(int success, char* fmt, ...)  : Verifies an assertion, optionally displays a message and opt. exits on error.
  *  
  *      int S4ASSERT_VERBOSE            if not null, display all messages, eve, on success
  *      int S4ASSERT_EXIT_ON_ERROR      if not null, exits on the first not satisfied assertion 
@@ -72,15 +74,15 @@ int S4ASSERT_EXIT_ON_ERROR = 1;     // if not null, exits on the first not satis
  *  Compares 2 strings. 
  *  
  *  Ex. 
- *      U_cmp_str("A B C", "A;B;C") => returns 0 => NOK
- *      U_cmp_str("A B",   "A B")   => returns 1 => OK
+ *      U_cmp_strs("A B C", "A;B;C") => returns 0 => NOK
+ *      U_cmp_strs("A B",   "A B")   => returns 1 => OK
  *  
  *  @param [in] str1    char*   string  
  *  @param [in] str2    char*   string 
  *  @return             int     1 if the content of str1 == that of str2, 0 if not
  *  
  */
-int U_cmp_str(char* str1, char* str2)
+int U_cmp_strs(char* str1, char* str2)
 {
     if(str1 == NULL && str2 == NULL) return(1);
     if(str1 == NULL || str2 == NULL) return(0);
@@ -92,15 +94,15 @@ int U_cmp_str(char* str1, char* str2)
  *  Compares a table of strings to a list of strings in a semi-colon separated vector.
  *  
  *  Ex. 
- *      U_cmp_tbl((char**)SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
- *      U_cmp_tbl((char**)SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *      U_cmp_tbls((char**)SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
+ *      U_cmp_tbls((char**)SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
  *  
  *  @param [in] tbl1    char**  table of strings    
  *  @param [in] vec     char*   semi-colon sep vector
  *  @return             int     0 if tbl1 and vec are equivalent, -1 else
  *  
  */
-int U_cmp_tbl(char** tbl1, char* vec)
+int U_cmp_tbls(char** tbl1, char* vec)
 {
     int     i, rc = 0;
     char**  tbl2;
@@ -121,6 +123,62 @@ fin:
     return(rc);
 
 }
+
+char* U_test_read_file(char*filename, long *size)
+{
+    FILE    *fd;
+    char    *content = 0;
+    
+    *size = 0;
+    fd = fopen(filename, "rb");
+    if(fd == 0) return(NULL);
+    
+    while(!feof(fd)) {
+        if(*size % 1024 == 0) 
+            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
+        content[*size] = fgetc(fd);
+        (*size)++;
+    }
+    content[*size] = 0; // Juste pour dire
+    fclose(fd);
+    return(content);
+}
+
+/**
+ *  Compares 2 files. Returns 0 if the 2 files are ==, -1 if not.
+ *  
+ *  @return int     -1 if the 2 files are ==, 
+ *                  0 if not.
+ */
+int U_cmp_files(char*file1, char*file2)
+{
+    int     rc = -1;        // ==
+    long    size1, size2;
+    char    *content1, *content2;
+    
+    content1 = U_test_read_file(file1, &size1);
+    content2 = U_test_read_file(file2, &size2);
+    
+    if(size1 != size2) {
+        rc = 0;              // !=
+        goto fin;                           
+    }
+    if(content1 == NULL && content2 == NULL) {              // ==
+        goto fin;      
+    }
+    
+    if(content1 == NULL || content2 == NULL) {
+        rc = 0;
+        goto fin;      // !=
+    }    
+    
+    rc = !memcmp(content1, content2, size1);                 
+fin:    
+    SCR_free(content1);
+    SCR_free(content2);
+    return(rc);
+}
+
 
 
 void kmsg_null(char*msg) 
@@ -329,7 +387,7 @@ void Tests_ARGS()
     
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
-    S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
+    S4ASSERT(U_cmp_tbls(args, "A;B"), "B_ainit_chk(\"$LST1\")");
     SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
     
@@ -337,7 +395,7 @@ void Tests_ARGS()
     // A1 A2
     sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
     args = B_ainit_chk(filename, NULL, 0);
-    S4ASSERT(U_cmp_tbl(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
+    S4ASSERT(U_cmp_tbls(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
     SCR_free_tbl((unsigned char**) args);
 }
 
@@ -357,7 +415,7 @@ void Tests_ARGS()
 // 
 //    // A_init
 //    args = B_ainit_chk("$LST1", NULL, 0);
-//    S4ASSERT(U_cmp_tbl(args, "A;B"), "B_ainit_chk(\"$LST1\")");
+//    S4ASSERT(U_cmp_tbls(args, "A;B"), "B_ainit_chk(\"$LST1\")");
 //    SCR_free_tbl(args);
 //}
 //
@@ -487,7 +545,7 @@ void Tests_Simulation()
     
     // Check list is empty
     lst = KLPTR("_DIVER");
-    S4ASSERT(U_cmp_str(lst, NULL), "_DIVER=NULL", lst);
+    S4ASSERT(U_cmp_strs(lst, NULL), "_DIVER=NULL", lst);
     
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
@@ -511,13 +569,13 @@ void Tests_Simulation()
     lst = KLPTR("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
-    S4ASSERT(U_cmp_str(lst, expected_lst), "_PRE=\"%s\"", lst);
+    S4ASSERT(U_cmp_strs(lst, expected_lst), "_PRE=\"%s\"", lst);
     
     // Check _DIVER list
     lst = KLPTR("_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    S4ASSERT(U_cmp_str(lst, expected_lst), "_DIVER=\"%s\"", lst);
+    S4ASSERT(U_cmp_strs(lst, expected_lst), "_DIVER=\"%s\"", lst);
     
     // Test with with convergence (increase MAXIT)
     KSIM_MAXIT = 100;
@@ -591,14 +649,17 @@ void Tests_PrintTables()
 //{
 //    int         rc;
 //    IODE_REAL   x;
+//    void        (*kmsg_super_ptr)(char*);
 //
-//    kmsg_super = kmsg_super_ptr; // Reset initial output to 
+//    kmsg_super_ptr = kmsg_super;
+//    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
 //
 //    // Select output destination
 //    //W_dest("test1_estim.a2m", A2M_DESTA2M);
 //    //W_dest("test1_estim.rtf", A2M_DESTRTF);
-//    W_dest("test1_estim.htm", A2M_DESTHTML);
-//    //W_dest("test.gdi", A2M_DESTGDIPRT); //=> plante
+//    //W_dest("test1_estim.htm", A2M_DESTHTML);
+//    //W_dest("test.gdi", A2M_DESTGDIPRT); 
+//    W_dest("test.gdi", W_A2M); 
 //    
 //    U_test_load_fun_esv("fun");
 //    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
@@ -616,6 +677,10 @@ void Tests_PrintTables()
 //    
 //    //W_flush();
 //    W_close();
+// 
+//    // Reset initial kmsg fn
+//    kmsg_super = kmsg_super_ptr; // Reset initial output to 
+//
 //}
 
 void Tests_ALIGN()
@@ -636,7 +701,120 @@ void Tests_ALIGN()
 
 
 
-/* ========================================================*/
+// W_WRT TESTS
+// -----------
+
+/**
+ *  A2M code:
+ *      - sep and esc
+ *      - page header and footer
+ *      - title
+ *      - table
+ *      - graph
+ */
+void U_test_W_printf_cmds() 
+{
+    W_printf(".sep |\n");
+    W_printf(".esc ~\n");
+    
+    W_printf(".pghead IODE\n");
+    W_printf(".pgfoot - page %%d - \n");
+    
+    W_print_tit(1);
+    W_printf("%s\n", "Mon titre");
+    
+    W_print_enum(1);
+    W_printf("This is an enum paragraph\n\n");
+    W_printf("This is a normal paragraph\n\n");
+    
+    W_printf(".tb\n");
+    W_printf(".tborder 1\n");
+    W_printf(".theader\n");
+    W_printf("| Syntax | Description\n");
+    W_printf(".tbody\n");
+    W_printf("| ~cint L_errno       | Last error number during LEC compilation\n");
+    W_printf("| ~cchar* L_error()   | Returns a static buffer containing the last LEC compilation error message.\n");
+    W_printf(".te\n");
+     
+    W_printf(".gb 16.00 10.00\n");
+    W_printf(".ggrid TMM\n");
+    W_printf(".galign L\n");
+    W_printf(".gbox 0 b 0\n");
+    W_printf(".gtitle Equation ACAF : observed and fitted values\n");
+    W_printf(".gty L \"(ACAF/VAF[-1])  : observed\" 1980Y1  0.011412042  0.016028202  0.011903394  0.012051363  0.010215556  0.010582964  0.0090882893  0.009277778  0.0082268494  0.0051589358  0.0066405193  0.0068489061  0.0075258742  0.0082727193  0.0019340143  -0.0029850522  0.0069569681 \n");
+    W_printf(".gty L \"(ACAF/VAF[-1])  : fitted\" 1980Y1  0.012562124  0.012491075  0.012526504  0.011687035  0.011060337  0.010403968  0.0095320575  0.0090522427  0.008714914  0.0076539375  0.0065561227  0.006355248  0.0064942167  0.0062763884  0.0062678674  -0.0029850522  0.0044903364 \n");
+    W_printf(".ge\n");
+    
+}
+
+
+void U_test_W_printf_1dest(int typeint, char *typeext)
+{
+    char reffilename[512];
+    char filename[512];
+
+    sprintf(filename, "%s\\test1.%s", IODE_OUTPUT_DIR, typeext);
+    sprintf(reffilename, "%s\\test1.ref.%s", IODE_OUTPUT_DIR, typeext);
+    W_dest(filename, typeint); 
+    U_test_W_printf_cmds();
+    W_close();
+    S4ASSERT(U_cmp_files(reffilename, filename), "W_printf -> %s", typeext);
+}
+
+void Tests_W_printf()
+{
+    void        (*A2mMessage_super_ptr)(char*);
+
+    A2mMessage_super_ptr = A2mMessage_super;
+    A2mMessage_super = kmsg_null; // Suppress output messages
+
+    //W_gdiask = 0;  // 1 means that a popup window will be opened to select the printer => not practical for the automated tests!
+    //W_dest("test1", W_GDI); 
+    //U_test_W_printf();
+
+    U_test_W_printf_1dest(W_A2M, "a2m");
+    U_test_W_printf_1dest(W_RTF, "rtf");
+    U_test_W_printf_1dest(W_HTML, "htm");
+    U_test_W_printf_1dest(W_CSV, "csv");
+    U_test_W_printf_1dest(W_MIF, "mif");
+    
+    
+    W_dest("", W_DUMMY); 
+    U_test_W_printf_cmds();
+    
+    //W_dest("test1", W_DISP); 
+    //U_test_W_printf();
+         
+    W_close(); // Closes the last "print" if any
+    
+    // Reset initial kmsg fn
+    A2mMessage_super = A2mMessage_super_ptr; // Reset initial output to 
+
+}
+
+// Test SWAP 
+// ---------
+
+// Tests that a second call to SW_free() does not crash (temp)
+void Tests_SWAP()
+{
+    SWHDL   item, item2;
+    
+    // test 1 : deux frees successifs
+    item = SW_alloc(20);
+    SW_free(item);
+    SW_free(item);
+    
+    // test 2 :  on réutilise l'espace freeé
+    item = SW_alloc(15);
+    SW_free(item);
+    item2 = SW_alloc(10);
+    SW_free(item);
+    SW_free(item2);
+}
+
+
+// ================================================================================================
 
 void U_test_init()
 {
@@ -672,6 +850,7 @@ int main(int argc, char **argv)
 //    Tests_ARGS_ALD();   
 //    return(0);
     
+    Tests_SWAP(); 
     Tests_ALIGN();
     Tests_ERRMSGS();
     Tests_BUF();
@@ -680,10 +859,14 @@ int main(int argc, char **argv)
     Tests_EQS();
     Tests_ARGS();
     Tests_K_OBJFILE();
+  
+    
     Tests_TBL32_64();
     Tests_Simulation();
     Tests_PrintTables();
-    //Tests_Estimation();
+//    Tests_Estimation();
+    //S4ASSERT_EXIT_ON_ERROR = 0;
+    Tests_W_printf();
     
     K_save_iode_ini();
     return(0);
