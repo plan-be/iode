@@ -725,6 +725,7 @@ extern int COL_exec(TBL *,int ,COLS *);
 // extern int COL_link(int ,CLEC *);
 
 /* b_iodeini.c */
+extern char* ODE_INIFILE;
 extern void B_IodeIniFile();
 extern int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft);
 extern int B_IniWriteText(char* section, char* parm, char* val);
@@ -1567,20 +1568,21 @@ extern int __cdecl B_shellexec(char *arg);
 
 /* w_wrt.c (MSC) */
 extern int W_dest(char *filename,int type);
-extern int W_InitParms();
-extern int W_open();
+// extern int W_InitParms();
+// extern int W_open();
 extern int W_close();
 extern int W_flush();
 extern int W_putc(int ch);
-extern int W_isempty(char *buf);
+//extern int W_isempty(char *buf);
 extern int W_record(char *str);
 extern int W_InitDisplay();
 extern int W_EndDisplay(char *title,int x,int y,int w,int h);
-extern int W_SavePrinterSettings();
-extern int W_ResetPrinterSettings();
-extern int W_SetPrinterSettings();
+// extern int W_SavePrinterSettings();
+// extern int W_ResetPrinterSettings();
+// extern int W_SetPrinterSettings();
 extern int W_printf(char *fmt,...);
 extern int W_printfEx(int dup, char *fmt, va_list args);
+
 // interface
 extern U_ch  *T_mmt_edit(U_ch *, int , int , int , int );
 
