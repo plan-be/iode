@@ -317,7 +317,8 @@ SWHDL   item;
     ptr = LST_get(SW_ITEMS, (long)item);
     if(ptr == 0) return(-1); /* JMP 24-06-98 */
     //return((int)(*(short *)ptr));
-    return((int)(*(unsigned short *)ptr)); // JMP 15/7/2013
+    //return((int)(*(unsigned short *)ptr)); // JMP 15/7/2013
+    return((int)(*(short *)ptr)); // JMP 20/06/2022
 }
 
 /*NH*/
