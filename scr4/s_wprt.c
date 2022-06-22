@@ -33,6 +33,7 @@ HDC         WprhDC = 0;
 
 int         WprFONTH, WprFONTW, WprHORZRES, WprVERTRES, WprLOGX, WprLOGY, WprOFFSETX, WprOFFSETY;
 PRINTDLG    *WprPD;
+PRINTDLGEX  *WprPDEX;
 int         WprOutType;
 int         WprCurLine, WprCurCol;
 
@@ -79,12 +80,17 @@ Les variables globales suivantes sont d‚finies par la fonction :
 
 ========================================================================= */
 
-WprPrinterInit(HWND hWndOwner, int dlg, char *docname)
+int WprPrinterInit(HWND hWndOwner, int dlg, char *docname)
 {
+    return(WprPrinterInitStd(hWndOwner, dlg, docname));
+}
+
+int WprPrinterInitStd(HWND hWndOwner, int dlg, char *docname)
+{    
 /*    DOCINFO     diInfo; */
 
     if(WprPD) return(0);
-    WprPD = (PRINTDLG *) SCR_malloc(sizeof(PRINTDLG));
+    WprPD = (PRINTDLG *) SCR_malloc(4 * sizeof(PRINTDLG));
     if(WprPD == 0) return(-1);
     memset(WprPD, 0, sizeof(PRINTDLG));
 
@@ -101,6 +107,50 @@ WprPrinterInit(HWND hWndOwner, int dlg, char *docname)
 	}
 
     WprhDC = WprPD->hDC;
+    if(docname == 0) docname = "Wscr4";
+    SCR_OemToAnsi(docname, docname);  /* JMP 13-09-98 */
+
+    {
+     // Escape(WprhDC, STARTDOC, strlen(docname), docname, NULL);
+	DOCINFO     diInfo;
+
+	memset(&diInfo, 0, sizeof(diInfo));
+	diInfo.cbSize = sizeof(DOCINFO);
+	diInfo.lpszDocName = "Wscr4";
+	diInfo.lpszOutput = NULL;
+	StartDoc(WprhDC, &diInfo);
+	StartPage(WprhDC);
+    }
+
+    SCR_AnsiToOem(docname, docname);  /* JMP 13-09-98 */
+
+    WprAllInit();
+    WprOutType = WPR_TYPE_PRT;
+    return(0);
+}
+
+WprPrinterInitEx(HWND hWndOwner, int dlg, char *docname)
+{
+/*    DOCINFO     diInfo; */
+
+    if(WprPDEX) return(0);
+    WprPDEX = (PRINTDLGEX *) SCR_malloc(4 * sizeof(PRINTDLGEX));
+    if(WprPDEX == 0) return(-1);
+    memset(WprPDEX, 0, sizeof(PRINTDLGEX));
+
+    /* Initialize the necessary PRINTDLGEX structure members. */
+    WprPDEX->lStructSize  = sizeof(PRINTDLGEX);
+    WprPDEX->hwndOwner    = hWndOwner;
+    WprPDEX->Flags        = PD_RETURNDC | PD_NOSELECTION | PD_NOPAGENUMS;
+    if(dlg == 0) WprPDEX->Flags |= PD_RETURNDEFAULT;
+
+    if(PrintDlgEx(WprPDEX) == 0) {
+        SCR_free(WprPDEX);
+        WprPDEX = 0;
+        return(-1);
+	}
+
+    WprhDC = WprPDEX->hDC;
     if(docname == 0) docname = "Wscr4";
     SCR_OemToAnsi(docname, docname);  /* JMP 13-09-98 */
 
@@ -166,7 +216,12 @@ WprEndAll()
 }
 
 /*NH*/
-WprPrinterEndFF(int ff)
+int WprPrinterEndFF(int ff)
+{
+    return(WprPrinterEndFFStd(ff));
+}   
+
+WprPrinterEndFFStd(int ff)
 {
     if(WprPD == 0) return(0);
 
@@ -179,6 +234,23 @@ WprPrinterEndFF(int ff)
     if(WprPD->hDevNames) GlobalFree(WprPD->hDevNames);
     SCR_free(WprPD);
     WprPD = 0;
+    WprEndAll();
+    return(0);
+}
+
+WprPrinterEndFFEx(int ff)
+{
+    if(WprPDEX == 0) return(0);
+
+    EndPage(WprhDC);
+    EndDoc(WprhDC);
+//    if(ff) Escape(WprhDC, NEWFRAME, 0, NULL, NULL);
+//    Escape(WprhDC, ENDDOC, 0, NULL, NULL);
+    DeleteDC(WprhDC);
+    if(WprPDEX->hDevMode)  GlobalFree(WprPDEX->hDevMode);
+    if(WprPDEX->hDevNames) GlobalFree(WprPDEX->hDevNames);
+    SCR_free(WprPDEX);
+    WprPDEX = 0;
     WprEndAll();
     return(0);
 }
@@ -332,11 +404,45 @@ int     family, pty, bold, italic, underl;
 Effectue un saut de page.
 ========================================================================= */
 
-WprFormFeed()
+int WprFormFeed()
+{
+    return(WprFormFeedStd());
+}
+
+int WprFormFeedStd()
 {
     int     i;
 
     if(WprPD == 0) return(0);
+    // Escape(WprhDC, NEWFRAME, 0, NULL, NULL);
+    EndPage(WprhDC);
+    StartPage(WprhDC);  /* JMP 09-10-00 */
+    WprCurLine = WprCurCol = 0;
+
+    i = WprCOLOR;
+    WprCOLOR = -1;
+    WprSetColor(i);
+
+    i = WprCURFONT;
+    WprCURFONT = -1;
+    WprFONT = 0;
+    WprSetCurFont(i);
+
+    i = WprCURPEN;
+    WprCURPEN = -1;
+    WprSetCurPen(i);
+
+    i = WprCURBRUSH;
+    WprCURBRUSH = -1;
+    WprSetBrush(i);
+    return(0);
+}
+
+int WprFormFeedEx()
+{
+    int     i;
+
+    if(WprPDEX == 0) return(0);
     // Escape(WprhDC, NEWFRAME, 0, NULL, NULL);
     EndPage(WprhDC);
     StartPage(WprhDC);  /* JMP 09-10-00 */
