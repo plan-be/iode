@@ -61,6 +61,7 @@
   - [Group "Model Estimation"](#T55)
   - [Group "Model Simulation"](#T56)
   - [Group "Table Calculation"](#T57)
+  - [Group "IODE Printing"](#T58)
 
 # IODE: functions by group {#T1}
 
@@ -79,7 +80,7 @@
 - Group "Model Estimation" 
 - Group "Model Simulation" 
 - Group "Table Calculation" 
-- \*Group "Iode ini file"
+- Group "Iode Printing" 
 - \*Group "Iode Reports"
 
 ## Function names in IODE {#T2}
@@ -703,4 +704,8 @@ See [SIMUL.md](simul.md).
 ## Group "Table Calculation" {#T57}
 
 See [TBL\_CALC.md](tbl_calc.md).
+
+## Group "IODE Printing" {#T58}
+
+See [PRINTING.md](PRINTING.md).
 
