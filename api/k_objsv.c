@@ -108,7 +108,7 @@ int K_add(KDB* kdb, char* name, ...)
       case K_EQS: 
           eq = va_arg(vargs, EQ *);
           endo = va_arg(vargs, char *);
-          rc = K_epack(&pack, eq, endo);
+          rc = K_epack(&pack, (char*) eq, endo);
           break;            
       case K_IDT: 
           lec = va_arg(vargs, char *);
@@ -120,11 +120,11 @@ int K_add(KDB* kdb, char* name, ...)
           break;            
       case K_SCL: 
           scl = va_arg(vargs, SCL *);
-          rc = K_spack(&pack, scl);
+          rc = K_spack(&pack, (char*) scl);
           break;            
       case K_TBL: 
           tbl = va_arg(vargs, TBL *);
-          rc = K_tpack(&pack, tbl);
+          rc = K_tpack(&pack, (char*)tbl);
           break;            
       case K_VAR: 
           var = va_arg(vargs, double *);  
