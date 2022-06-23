@@ -22,9 +22,9 @@ extern "C"
     int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
     int B_PrintRtfTopic(char* x) { return(0); }
     int A2mGIF_HTML() {return(0);}
-    int W_printf(char*fmt, ...) {return(0);}
-    void K_load_iode_ini() {}
-    void K_save_iode_ini() {}
+    //int W_printf(char*fmt, ...) {return(0);}
+    //void K_load_iode_ini() {}
+    //void K_save_iode_ini() {}
 
 #ifdef __cplusplus
 }
@@ -63,14 +63,14 @@ public:
         U_test_init();
     }
 
-	int U_cmp_str(char* str1, char* str2)
+	int U_cmp_strs(char* str1, char* str2)
 	{
 	    if(str1 == NULL && str2 == NULL) return(1);
 	    if(str1 == NULL || str2 == NULL) return(0);
 	    return(!strcmp(str1, str2));
 	}
 
-	int U_cmp_tbl(char** tbl1, char* vec)
+	int U_cmp_tbls(char** tbl1, char* vec)
 	{
 	    int     i, rc = 0;
 	    char**  tbl2;
@@ -90,6 +90,55 @@ public:
 	    SCR_free_tbl((unsigned char**) tbl2);
 	    return(rc);
 	
+	}
+
+	char* U_test_read_file(char*filename, long *size)
+	{
+	    FILE    *fd;
+	    char    *content = 0;
+	
+	    *size = 0;
+	    fd = fopen(filename, "rb");
+	    if(fd == 0) return(NULL);
+	
+	    while(!feof(fd)) {
+	        if(*size % 1024 == 0)
+	            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
+	        content[*size] = fgetc(fd);
+	        (*size)++;
+	    }
+	    content[*size] = 0; // Juste pour dire
+	    fclose(fd);
+	    return(content);
+	}
+
+	int U_cmp_files(char*file1, char*file2)
+	{
+	    int     rc = -1;        // ==
+	    long    size1, size2;
+	    char    *content1, *content2;
+	
+	    content1 = U_test_read_file(file1, &size1);
+	    content2 = U_test_read_file(file2, &size2);
+	
+	    if(size1 != size2) {
+	        rc = 0;              // !=
+	        goto fin;
+	    }
+	    if(content1 == NULL && content2 == NULL) {              // ==
+	        goto fin;
+	    }
+	
+	    if(content1 == NULL || content2 == NULL) {
+	        rc = 0;
+	        goto fin;      // !=
+	    }
+	
+	    rc = !memcmp(content1, content2, size1);
+	fin:
+	    SCR_free(content1);
+	    SCR_free(content2);
+	    return(rc);
 	}
 
 	void U_tests_Objects()
@@ -193,6 +242,54 @@ public:
 	    KV_WS = U_test_K_interpret(K_VAR, filename);
 	}
 
+	void U_test_W_printf_cmds()
+	{
+	    W_printf(".sep |\n");
+	    W_printf(".esc ~\n");
+	
+	    W_printf(".pghead IODE\n");
+	    W_printf(".pgfoot - page %%d - \n");
+	
+	    W_print_tit(1);
+	    W_printf("%s\n", "Mon titre");
+	
+	    W_print_enum(1);
+	    W_printf("This is an enum paragraph\n\n");
+	    W_printf("This is a normal paragraph\n\n");
+	
+	    W_printf(".tb\n");
+	    W_printf(".tborder 1\n");
+	    W_printf(".theader\n");
+	    W_printf("| Syntax | Description\n");
+	    W_printf(".tbody\n");
+	    W_printf("| ~cint L_errno       | Last error number during LEC compilation\n");
+	    W_printf("| ~cchar* L_error()   | Returns a static buffer containing the last LEC compilation error message.\n");
+	    W_printf(".te\n");
+	
+	    W_printf(".gb 16.00 10.00\n");
+	    W_printf(".ggrid TMM\n");
+	    W_printf(".galign L\n");
+	    W_printf(".gbox 0 b 0\n");
+	    W_printf(".gtitle Equation ACAF : observed and fitted values\n");
+	    W_printf(".gty L \"(ACAF/VAF[-1])  : observed\" 1980Y1  0.011412042  0.016028202  0.011903394  0.012051363  0.010215556  0.010582964  0.0090882893  0.009277778  0.0082268494  0.0051589358  0.0066405193  0.0068489061  0.0075258742  0.0082727193  0.0019340143  -0.0029850522  0.0069569681 \n");
+	    W_printf(".gty L \"(ACAF/VAF[-1])  : fitted\" 1980Y1  0.012562124  0.012491075  0.012526504  0.011687035  0.011060337  0.010403968  0.0095320575  0.0090522427  0.008714914  0.0076539375  0.0065561227  0.006355248  0.0064942167  0.0062763884  0.0062678674  -0.0029850522  0.0044903364 \n");
+	    W_printf(".ge\n");
+	
+	}
+
+	void U_test_W_printf_1dest(int typeint, char *typeext)
+	{
+	    char reffilename[512];
+	    char filename[512];
+	
+	    sprintf(filename, "%s\\test1.%s", output_test_dir, typeext);
+	    sprintf(reffilename, "%s\\test1.ref.%s", output_test_dir, typeext);
+	    W_dest(filename, typeint);
+	    U_test_W_printf_cmds();
+	    W_close();
+	    EXPECT_TRUE(U_cmp_files(reffilename, filename), "W_printf -> %s");
+	}
+
 	void U_test_init()
 	{
 	    static int  done = 0;
@@ -274,7 +371,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
 
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
-    EXPECT_TRUE(U_cmp_tbl(args, "A;B"));
+    EXPECT_TRUE(U_cmp_tbls(args, "A;B"));
     SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
 
@@ -282,7 +379,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
     // A1 A2
     sprintf(filename, "@%s\\test.args", input_test_dir);
     args = B_ainit_chk(filename, NULL, 0);
-    EXPECT_TRUE(U_cmp_tbl(args, "A1;A2"));
+    EXPECT_TRUE(U_cmp_tbls(args, "A1;A2"));
     SCR_free_tbl((unsigned char**) args);
 }
 
@@ -381,7 +478,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Check list is empty
     lst = KLPTR("_DIVER");
-    EXPECT_TRUE(U_cmp_str(lst, NULL));
+    EXPECT_TRUE(U_cmp_strs(lst, NULL));
 
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
@@ -405,13 +502,13 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     lst = KLPTR("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
-    EXPECT_TRUE(U_cmp_str(lst, expected_lst));
+    EXPECT_TRUE(U_cmp_strs(lst, expected_lst));
 
     // Check _DIVER list
     lst = KLPTR("_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_TRUE(U_cmp_str(lst, expected_lst));
+    EXPECT_TRUE(U_cmp_strs(lst, expected_lst));
 
     // Test with with convergence (increase MAXIT)
     KSIM_MAXIT = 100;
@@ -495,6 +592,56 @@ TEST_F(IodeCAPITest, Tests_ALIGN)
     //printf("sizeof(TBL32)  = %d\n", sizeof(TBL32));
     //printf("sizeof(TLINE32)= %d\n", sizeof(TLINE32));
     //printf("sizeof(TCELL32)= %d\n", sizeof(TCELL32));
+}
+
+
+TEST_F(IodeCAPITest, Tests_W_printf)
+{
+    void        (*A2mMessage_super_ptr)(char*);
+
+    A2mMessage_super_ptr = A2mMessage_super;
+    A2mMessage_super = kmsg_null; // Suppress output messages
+
+    //W_gdiask = 0;  // 1 means that a popup window will be opened to select the printer => not practical for the automated tests!
+    //W_dest("test1", W_GDI);
+    //U_test_W_printf();
+
+    U_test_W_printf_1dest(W_A2M, "a2m");
+    U_test_W_printf_1dest(W_RTF, "rtf");
+    U_test_W_printf_1dest(W_HTML, "htm");
+    U_test_W_printf_1dest(W_CSV, "csv");
+    U_test_W_printf_1dest(W_MIF, "mif");
+
+
+    W_dest("", W_DUMMY);
+    U_test_W_printf_cmds();
+
+    //W_dest("test1", W_DISP);
+    //U_test_W_printf();
+
+    W_close(); // Closes the last "print" if any
+
+    // Reset initial kmsg fn
+    A2mMessage_super = A2mMessage_super_ptr; // Reset initial output to
+
+}
+
+
+TEST_F(IodeCAPITest, Tests_SWAP)
+{
+    SWHDL   item, item2;
+
+    // test 1 : deux frees successifs
+    item = SW_alloc(20);
+    SW_free(item);
+    SW_free(item);
+
+    // test 2 :  on rÃ©utilise l'espace freeÃ©
+    item = SW_alloc(15);
+    SW_free(item);
+    item2 = SW_alloc(10);
+    SW_free(item);
+    SW_free(item2);
 }
 
 
