@@ -3,7 +3,7 @@
 #
 
 # Add source to this project's executable.
-set (DOCS DESCRIPTION.md ESTIM.md LEC.md SIMUL.md TBL_CALC.md) # ESTIM.md)
+set (DOCS DESCRIPTION.md LEC.md SIMUL.md TBL_CALC.md PRINTING.md)
 set (UTILS buf.c pack.c per.c yy.c)
 set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
 set (OBJS k_vers.c k_objs.c k_objsv.c k_pack.c k_objfile.C k_xdr.c k_objvers.c k_kdb.c k_ws.c k_wsvar.c k_cmp.c k_val.c k_lec.c k_grep.c k_tbl.c k_eqs.c k_lst.c) 
