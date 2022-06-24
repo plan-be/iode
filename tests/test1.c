@@ -754,7 +754,7 @@ void U_test_W_printf_1dest(int typeint, char *typeext)
     char filename[512];
 
     sprintf(filename, "%s\\test1.%s", IODE_OUTPUT_DIR, typeext);
-    sprintf(reffilename, "%s\\test1.ref.%s", IODE_OUTPUT_DIR, typeext);
+    sprintf(reffilename, "%s\\test1.ref.%s", IODE_DATA_DIR, typeext);
     W_dest(filename, typeint); 
     U_test_W_printf_cmds();
     W_close();
