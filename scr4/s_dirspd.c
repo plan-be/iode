@@ -21,13 +21,15 @@ int SCR_split_dir(dir, file)
 char    *dir, *file;
 {
     int     i;
+    char    locdir[1024 + 1];
 
-    for(i = strlen(dir) - 1; i >= 0 ; i--)
-	if(dir[i] == '\\' || dir[i] == '/' ) break;
+    strcpy(locdir, dir);
+    for(i = strlen(locdir) - 1; i >= 0 ; i--)
+	if(locdir[i] == '\\' || locdir[i] == '/' ) break;
 
-    strcpy(file, dir + i + 1);
-    dir[i + 1] = 0;
-    SCR_dir_std(dir, dir);
+    strcpy(file, locdir + i + 1);
+    locdir[i + 1] = 0;
+    SCR_dir_std(dir, locdir);
     return(0);
 }
 
