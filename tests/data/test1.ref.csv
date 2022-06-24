@@ -1,0 +1,7 @@
+"Mon titre"
+" - This is an enum paragraph"
+"This is a normal paragraph"
+"Syntax","Description",
+"int L_errno","Last error number during LEC compilation",
+"char* L_error()","Returns a static buffer containing the last LEC compilation error message.",
+"*** GRAPH ***"
