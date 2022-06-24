@@ -1,0 +1,1598 @@
+<MIFFile 3.0> # created by SCR4/AL1
+<FontCatalog
+ <Font
+  <FTag `Courier'>
+  <FFamily `Courier New'>
+  <FSize  10 pt>
+  <FWeight `Regular'>
+  <FAngle `Regular'>
+ > # end of Font
+ <Font
+  <FTag `Symbol'>
+  <FFamily `Symbol'>
+  <FSize  10 pt>
+  <FWeight `Regular'>
+  <FAngle `Regular'>
+ > # end of Font
+ <Font
+  <FTag `Figure'>
+  <FFamily `Cambria'>
+  <FWeight `Bold'>
+  <FSize  9.0 pt>
+  <FWeight `Regular'>
+  <FAngle `Regular'>
+ > # end of Font
+ <Font
+  <FTag `Graph'>
+  <FFamily `Arial'>
+  <FSize  8.0 pt>
+  <FWeight `Regular'>
+  <FAngle `Regular'>
+ > # end of Font
+ <Font
+  <FTag `GraphLegend'>
+  <FFamily `Arial'>
+  <FSize  8.0 pt>
+  <FItalic Yes>
+  <FWeight `Regular'>
+ > # end of Font
+ <Font
+  <FTag `GraphLabel'>
+  <FFamily `Arial'>
+  <FSize  8.0 pt>
+  <FWeight `Regular'>
+  <FAngle `Regular'>
+ > # end of Font
+ <Font
+  <FTag `GraphFooter'>
+  <FFamily `Arial'>
+  <FBold Yes>
+  <FSize  8.0 pt>
+  <FAngle `Regular'>
+ > # end of Font
+ <Font
+  <FTag `GraphHeader'>
+  <FFamily `Arial'>
+  <FBold Yes>
+  <FSize  8.0 pt>
+  <FAngle `Regular'>
+ > # end of Font
+>
+<ColorCatalog                            
+ <Color                                  
+  <ColorTag `Black'>                     
+  <ColorCyan  0.000000>                  
+  <ColorMagenta  0.000000>               
+  <ColorYellow  0.000000>                
+  <ColorBlack  100.000000>               
+  <ColorAttribute ColorIsBlack>          
+  <ColorAttribute ColorIsReserved>       
+ > # end of Color                        
+ <Color                                  
+  <ColorTag `White'>                     
+  <ColorCyan  0.000000>                  
+  <ColorMagenta  0.000000>               
+  <ColorYellow  0.000000>                
+  <ColorBlack  0.000000>                 
+  <ColorAttribute ColorIsWhite>          
+  <ColorAttribute ColorIsReserved>       
+ > # end of Color                        
+ <Color                                  
+  <ColorTag `Red'>                       
+  <ColorCyan  0.000000>                  
+  <ColorMagenta  100.000000>             
+  <ColorYellow  100.000000>              
+  <ColorBlack  0.000000>                 
+  <ColorAttribute ColorIsRed>            
+  <ColorAttribute ColorIsReserved>       
+ > # end of Color                        
+ <Color                                  
+  <ColorTag `Green'>                     
+  <ColorCyan  100.000000>                
+  <ColorMagenta  0.000000>               
+  <ColorYellow  100.000000>              
+  <ColorBlack  0.000000>                 
+  <ColorAttribute ColorIsGreen>          
+  <ColorAttribute ColorIsReserved>       
+ > # end of Color                        
+ <Color                                  
+  <ColorTag `Blue'>                      
+  <ColorCyan  100.000000>                
+  <ColorMagenta  100.000000>             
+  <ColorYellow  0.000000>                
+  <ColorBlack  0.000000>                 
+  <ColorAttribute ColorIsBlue>           
+  <ColorAttribute ColorIsReserved>       
+ > # end of Color                        
+ <Color                                     
+  <ColorTag `Cyan'>                         
+  <ColorCyan  100.000000>                   
+  <ColorMagenta  0.000000>                  
+  <ColorYellow  0.000000>                   
+  <ColorBlack  0.000000>                    
+  <ColorAttribute ColorIsCyan>              
+  <ColorAttribute ColorIsReserved>          
+ > # end of Color                           
+ <Color
+  <ColorTag `Magenta'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  100.000000>
+  <ColorYellow  0.000000>
+  <ColorBlack  0.000000>
+  <ColorAttribute ColorIsMagenta>
+  <ColorAttribute ColorIsReserved>
+ > # end of Color
+ <Color
+  <ColorTag `Yellow'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  0.000000>
+  <ColorYellow  100.000000>
+  <ColorBlack  0.000000>
+  <ColorAttribute ColorIsYellow>
+  <ColorAttribute ColorIsReserved>
+ > # end of Color
+ <Color
+  <ColorTag `Grid'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  0.000000>
+  <ColorYellow  0.000000>
+  <ColorBlack  15.000000>
+ > # end of Color
+ <Color
+  <ColorTag `C1'>
+  <ColorCyan  31.764709>
+  <ColorMagenta  8.627457>
+  <ColorYellow  0.000000>
+  <ColorBlack  50.588242>
+ > # end of Color
+ <Color
+  <ColorTag `C2'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  0.000000>
+  <ColorYellow  0.000000>
+  <ColorBlack  74.509811>
+ > # end of Color
+ <Color
+  <ColorTag `C3'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  45.098053>
+  <ColorYellow  83.529419>
+  <ColorBlack  3.921570>
+ > # end of Color
+ <Color
+  <ColorTag `C4'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  0.000000>
+  <ColorYellow  0.000000>
+  <ColorBlack  57.254913>
+ > # end of Color
+ <Color
+  <ColorTag `C5'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  45.098053>
+  <ColorYellow  83.529419>
+  <ColorBlack  3.921570>
+ > # end of Color
+ <Color
+  <ColorTag `C7'>
+  <ColorCyan  39.607849>
+  <ColorMagenta  5.882355>
+  <ColorYellow  0.000000>
+  <ColorBlack  17.647064>
+ > # end of Color
+ <Color
+  <ColorTag `C6'>
+  <ColorCyan  9.803925>
+  <ColorMagenta  5.098038>
+  <ColorYellow  0.000000>
+  <ColorBlack  25.490204>
+ > # end of Color
+ <Color
+  <ColorTag `C8'>
+  <ColorCyan  0.000000>
+  <ColorMagenta  21.960785>
+  <ColorYellow  76.862747>
+  <ColorBlack  0.000000>
+ > # end of Color
+ <Color
+  <ColorTag `C9'>
+  <ColorCyan  24.705887>
+  <ColorMagenta  12.156860>
+  <ColorYellow  0.000000>
+  <ColorBlack  64.705887>
+ > # end of Color
+> # end of ColorCatalog
+<AFrames
+ <Frame
+  <ID 1>
+  <Pen 15>
+  <Units Upt>  <PenWidth 0.2 pt>
+  <BRect  0 cm 0 cm 16.00 cm 10.00 cm>
+  <FrameType Below>
+  <NSOffset 0 cm>
+  <Float No >
+  <BLOffset 0.0 cm>
+  <AnchorAlign Left>
+  <Cropped Yes>
+ <PolyLine <GroupID 3> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 243.00> <Point 30.00 10.00> >
+<TextLine <GroupID 3>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Center> <TLOrigin 30.00 253.00> <String `1980'>>
+ <PolyLine <GroupID 3> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 159.00 243.00> <Point 159.00 10.00> >
+<TextLine <GroupID 3>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Center> <TLOrigin 159.00 253.00> <String `1985'>>
+ <PolyLine <GroupID 3> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 288.01 243.00> <Point 288.01 10.00> >
+<TextLine <GroupID 3>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Center> <TLOrigin 288.01 253.00> <String `1990'>>
+ <PolyLine <GroupID 3> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 417.01 243.00> <Point 417.01 10.00> >
+<TextLine <GroupID 3>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Center> <TLOrigin 417.01 253.00> <String `1995'>>
+<Group <GroupID 1> <ID 3>>
+ <PolyLine <GroupID 4> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 243.00> <Point 442.81 243.00> >
+<TextLine <GroupID 4>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Right> <TLOrigin 25.00 243.00> <String `-0.005'>>
+ <PolyLine <GroupID 4> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 196.40> <Point 442.81 196.40> >
+<TextLine <GroupID 4>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Right> <TLOrigin 25.00 196.40> <String `0.000'>>
+ <PolyLine <GroupID 4> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 149.80> <Point 442.81 149.80> >
+<TextLine <GroupID 4>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Right> <TLOrigin 25.00 149.80> <String `0.005'>>
+ <PolyLine <GroupID 4> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 103.20> <Point 442.81 103.20> >
+<TextLine <GroupID 4>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Right> <TLOrigin 25.00 103.20> <String `0.010'>>
+ <PolyLine <GroupID 4> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 56.60> <Point 442.81 56.60> >
+<TextLine <GroupID 4>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Right> <TLOrigin 25.00 56.60> <String `0.015'>>
+ <PolyLine <GroupID 4> <Pen 0> <PenWidth 0.5 pt> <ObColor `Grid'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 30.00 10.00> <Point 442.81 10.00> >
+<TextLine <GroupID 4>  <Font <FTag `Graph'> <FColor `Black'>>  <TLAlignment Right> <TLOrigin 25.00 10.00> <String `0.020'>>
+<Group <GroupID 1> <ID 4>>
+<PolyLine <GroupID 7> <Fill 15> <Pen 0><PenWidth 0.5 pt> <ObColor `Blue'> <DashedPattern <DashedStyle Solid>><NumPoints 17><Point 30.00 90.04><Point 55.80 47.02><Point 81.60 85.46><Point 107.40 84.08><Point 133.20 101.19><Point 159.00 97.77><Point 184.80 111.70><Point 210.60 109.93><Point 236.41 119.73><Point 262.21 148.32><Point 288.01 134.51><Point 313.81 132.57><Point 339.61 126.26><Point 365.41 119.30><Point 391.21 178.37><Point 417.01 224.22><Point 442.81 131.56> >
+ <PolyLine <GroupID 7> <Pen 0> <PenWidth 0.5 pt> <ObColor `Blue'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 10.00 262.00> <Point 30.00 262.00> >
+<TextLine <GroupID 7>  <Font <FTag `GraphHeader'> <FColor `Black'>>  <TLAlignment Left> <TLOrigin 40.00 265.00> <String `(ACAF/VAF[-1])  : observed'>>
+<Group <GroupID 1> <ID 7>>
+<PolyLine <GroupID 8> <Fill 15> <Pen 0><PenWidth 1.0 pt> <ObColor `Blue'> <DashedPattern <DashedStyle Solid>><NumPoints 17><Point 30.00 79.32><Point 55.80 79.98><Point 81.60 79.65><Point 107.40 87.48><Point 133.20 93.32><Point 159.00 99.44><Point 184.80 107.56><Point 210.60 112.03><Point 236.41 115.18><Point 262.21 125.07><Point 288.01 135.30><Point 313.81 137.17><Point 339.61 135.87><Point 365.41 137.90><Point 391.21 137.98><Point 417.01 224.22><Point 442.81 154.55> >
+ <PolyLine <GroupID 8> <Pen 0> <PenWidth 1.0 pt> <ObColor `Blue'> <DashedPattern <DashedStyle Solid>> <NumPoints 2> <Point 10.00 272.00> <Point 30.00 272.00> >
+<TextLine <GroupID 8>  <Font <FTag `GraphHeader'> <FColor `Black'>>  <TLAlignment Left> <TLOrigin 40.00 275.00> <String `(ACAF/VAF[-1])  : fitted'>>
+<Group <GroupID 1> <ID 8>>
+<Group <GroupID 1> <ID 8>>
+<Rectangle <GroupID 8> <Pen 0> <PenWidth 0.2 pt><DashedPattern <DashedStyle Solid>><Fill 15> <ObColor `Black'> <ShapeRect 30.00 10.00 412.81 233.00>>
+<Group <ID 1>>
+ > # end frame 1
+>
+<PgfCatalog
+ <Pgf
+  <PgfTag `Footer'>
+  <PgfAlignment Center>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  4 pt>
+  <PgfSpAfter  2 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  8 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `Header'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  4 pt>
+  <PgfSpAfter  2 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `newpage'>
+  <PgfAlignment Left>
+  <PgfPlacement PageTop>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  2 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `par_0'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `par_1'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `par_2'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `par_3'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `pare_0'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  16 pt>
+  <PgfFIndent  16 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `pare_1'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  24 pt>
+  <PgfFIndent  24 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `pare_2'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  32 pt>
+  <PgfFIndent  32 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `pare_3'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  40 pt>
+  <PgfFIndent  40 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `TableCell'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `TableHeader'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `TableFooter'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `CellJust'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `CellDecimal'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `CellRight'>
+  <PgfAlignment Right>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `CellCenter'>
+  <PgfAlignment Center>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `CellLeft'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `FooterJust'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `FooterDec'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `FooterRight'>
+  <PgfAlignment Right>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `FooterCenter'>
+  <PgfAlignment Center>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `FooterLeft'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `HeaderJust'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `HeaderDec'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `HeaderRight'>
+  <PgfAlignment Right>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `HeaderCenter'>
+  <PgfAlignment Center>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `HeaderLeft'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `TableFootnote'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  5 pt>
+  <PgfSpAfter  10 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `TableTitle'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  10 pt>
+  <PgfSpAfter  10 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `Table'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  10 pt>
+  <PgfSpAfter  10 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `GraphFootnote'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  5 pt>
+  <PgfSpAfter  10 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `GraphTitle'>
+  <PgfAlignment Center>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  10 pt>
+  <PgfSpAfter  10 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `GraphLabel'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  8 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `GraphLegend'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  8 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `GraphHeader'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  8 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `GraphFooter'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  8 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `PageNum'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  0 pt>
+  <PgfSpAfter  0 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  8 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `parb'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  12 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  12 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `parb2'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  12 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  11 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `pari'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  12 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  12 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `pari2'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  10 pt>
+  <PgfSpAfter  5 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Oblique'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `paru'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  12 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FSingle>
+   <FSize  12 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `paru2'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  12 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FSingle>
+   <FSize  11 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `note'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  6 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Red'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmd_0'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmd_1'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmd_2'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmd_3'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  0 pt>
+  <PgfFIndent  0 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmde_0'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  16 pt>
+  <PgfFIndent  16 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmde_1'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  24 pt>
+  <PgfFIndent  24 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmde_2'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  32 pt>
+  <PgfFIndent  32 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `cmde_3'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Courier New'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Green'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfAutoNum No>
+  <PgfLIndent  40 pt>
+  <PgfFIndent  40 pt>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `enum_0'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  24 pt>
+  <PgfLIndent  32 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `\xa5 \\t'>
+  <PgfNumTabs 1>
+  <TabStop
+   <TSX  32 pt>
+   <TSType Left>
+   <TSLeaderStr ` '>
+  > # end of TabStop
+ > # end of Pgf
+ <Pgf
+  <PgfTag `enum_1'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  32 pt>
+  <PgfLIndent  40 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `\xa5 \\t'>
+  <PgfNumTabs 1>
+  <TabStop
+   <TSX  40 pt>
+   <TSType Left>
+   <TSLeaderStr ` '>
+  > # end of TabStop
+ > # end of Pgf
+ <Pgf
+  <PgfTag `enum_2'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  40 pt>
+  <PgfLIndent  48 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `\xa5 \\t'>
+  <PgfNumTabs 1>
+  <TabStop
+   <TSX  48 pt>
+   <TSType Left>
+   <TSLeaderStr ` '>
+  > # end of TabStop
+ > # end of Pgf
+ <Pgf
+  <PgfTag `enum_3'>
+  <PgfAlignment LeftRight>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  2 pt>
+  <PgfSpAfter  4 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  48 pt>
+  <PgfLIndent  56 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `\xa5 \\t'>
+  <PgfNumTabs 1>
+  <TabStop
+   <TSX  56 pt>
+   <TSType Left>
+   <TSLeaderStr ` '>
+  > # end of TabStop
+ > # end of Pgf
+ <Pgf
+  <PgfTag `tit_0'>
+  <PgfAlignment Center>
+  <PgfPlacement PageTop>
+  <PgfSpBefore  18 pt>
+  <PgfSpAfter  9 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  18 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  0 pt>
+  <PgfLIndent  16 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `< \> \\t'>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `tit_1'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  14 pt>
+  <PgfSpAfter  7 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  14 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  0 pt>
+  <PgfLIndent  16 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `< \><n+\> \\t'>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `tit_2'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  12 pt>
+  <PgfSpAfter  6 pt>
+  <PgfWithNext Yes>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Bold'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  12 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  0 pt>
+  <PgfLIndent  16 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `< \><n\>.<n+\> \\t'>
+ > # end of Pgf
+ <Pgf
+  <PgfTag `tit_3'>
+  <PgfAlignment Left>
+  <PgfPlacement Anywhere>
+  <PgfSpBefore  4 pt>
+  <PgfSpAfter  2 pt>
+  <PgfWithNext No>
+  <PgfFont
+   <FFamily `Arial'>
+   <FWeight `Regular'>
+   <FAngle `Regular'>
+   <FUnderlining FNoUnderlining>
+   <FSize  10 pt>
+   <FColor `Black'>
+  > # end of PgfFont
+  <PgfLineSpacing Fixed>
+  <PgfFIndent  0 pt>
+  <PgfLIndent  16 pt>
+  <PgfAutoNum Yes>
+  <PgfNumFormat `< \><n\>.<n\>.<n+\> \\t'>
+ > # end of Pgf
+> # End of PgfCatalog
+<Tbls
+ <Tbl <TblID 1>
+ <TblTag `Format A'> <TblNumColumns 2>
+  <TblFormat
+   <TblWidth 165 mm>
+   <TblCellMargins 2pt 2pt 2pt 2pt>
+   <TblBlockSize 10>
+   <TblAlignment TblLRuling>
+ <TblColumn <TblColumnNum 0> <TblColumnWidthA 0 60 mm>>
+ <TblColumn <TblColumnNum 1> <TblColumnWidthA 0 60 mm>>
+   <TblLRuling `Thin'>
+   <TblBRuling `Thin'>
+   <TblRRuling `Thin'>
+   <TblTRuling `Thin'>
+   <TblColumnRuling `None'>
+   <TblXColumnRuling `None'>
+   <TblBodyRowRuling `None'>
+   <TblXRowRuling `None'>
+   <TblHFRowRuling `None'>
+   <TblSeparatorRuling `Thin'>
+  >
+  <TblH
+   <Row
+    <Cell 
+     <CellContent
+      <Para <Pgf <PgfTag `HeaderCenter'> > <ParaLine  <String `Syntax'>      > >
+     >
+    >
+    <Cell 
+     <CellContent
+      <Para <Pgf <PgfTag `HeaderCenter'> > <ParaLine  <String `Description'>      > >
+     >
+    >
+   >
+  >
+  <TblBody
+   <Row
+    <Cell 
+     <CellContent
+      <Para <Pgf <PgfTag `CellLeft'> > <ParaLine  <Font <FTag `Courier'>> <String `int L_errno'>      > >
+     >
+    >
+    <Cell 
+     <CellContent
+      <Para <Pgf <PgfTag `CellLeft'> > <ParaLine  <String `Last error number during LEC compilation'>      > >
+     >
+    >
+   >
+   <Row
+    <Cell 
+     <CellContent
+      <Para <Pgf <PgfTag `CellLeft'> > <ParaLine  <Font <FTag `Courier'>> <String `char* L_error()'>      > >
+     >
+    >
+    <Cell 
+     <CellContent
+      <Para <Pgf <PgfTag `CellLeft'> > <ParaLine  <String `Returns a static buffer containing the last LEC compilation error message.'>      > >
+     >
+    >
+   >
+  >
+ >
+>
+<TextFlow
+ <Para <Pgf <PgfTag `tit_1'> > <ParaLine  <String `Mon titre'> > >
+ <Para <Pgf <PgfTag `enum_1'> > <ParaLine  <String `This is an enum paragraph'> > >
+ <Para <Pgf <PgfTag `par_1'> > <ParaLine  <String `This is a normal paragraph'> > >
+ <Para <Pgf <PgfTag `Table'>>
+  <ParaLine <ATbl 1>>
+ >
+ <Para <Pgf <PgfTag `GraphTitle'> > <ParaLine  <String `Equation ACAF : observed and fitted values'> > <ParaLine <AFrame 1>>
+ >
+>
