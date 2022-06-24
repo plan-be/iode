@@ -156,8 +156,12 @@ int U_cmp_files(char*file1, char*file2)
     long    size1, size2;
     char    *content1, *content2;
     
+    printf("Comparing '%s' and '%s'\n", file1, file2);
+
     content1 = U_test_read_file(file1, &size1);
+    printf("   '%s': size=%ld\n", file1, size1);
     content2 = U_test_read_file(file2, &size2);
+    printf("   '%s': size=%ld\n", file2, size2);
     
     if(size1 != size2) {
         rc = 0;              // !=
