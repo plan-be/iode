@@ -32,8 +32,11 @@ char *SCR_change_ext(res, filename, ext)
 char    *res, *filename, *ext;
 {
     int     i;
+    char    locres[1024];   // For sanitizer
 
-    strcpy(res, filename);
+    strcpy(locres, filename);   // For sanitizer
+    strcpy(res, locres);        // For sanitizer
+    
     for(i = strlen(res) - 1 ; i >= 0 ; i--)
 	if(res[i] == ':' || res[i] == '!' ||        /* JMP 23-06-02 */
 	   res[i] == '.' || res[i] == '\\' ||
