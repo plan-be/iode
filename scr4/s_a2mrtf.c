@@ -258,33 +258,38 @@ A2MOBJ  *ao;
     A2mRtfPrintPgHeadFoot(A2M_PGHEAD, 0);
     A2mRtfPrintPgHeadFoot(A2M_PGFOOT, 1);
     A2M_PGHEAD = A2M_PGFOOT = 0;
+    
     if(ao->ao_type == A2M_PAR) {
-	A2mRtfPrintPar((A2MPAR *)ao->ao_ptr, 0);
-	A2mFreeObj(ao);
+        A2mRtfPrintPar((A2MPAR *)ao->ao_ptr, 0);
+        A2mFreeObj(ao);
+        return(0);
 	}
 
     if(ao->ao_type == A2M_TOPIC) {
-	A2mRtfPrintTopic((A2MTOP *)ao->ao_ptr);
-	A2mFreeObj(ao);
+        A2mRtfPrintTopic((A2MTOP *)ao->ao_ptr);
+        A2mFreeObj(ao);
+        return(0);
 	}
 
     if(ao->ao_type == A2M_TBL) {
-	A2mRtfPrintTbl((A2MTBL *)ao->ao_ptr);
-	A2mFreeObj(ao);
+        A2mRtfPrintTbl((A2MTBL *)ao->ao_ptr);
+        A2mFreeObj(ao);
+        return(0);
 	}
 
     if(ao->ao_type == A2M_GRF) {
-	A2mRtfPrintGrf(ao);
+        A2mRtfPrintGrf(ao);
 #if !defined(SCRW32) && !defined(DOSW32) && !defined(SCRGNOME)
-	A2mFreeObj(ao);
+        A2mFreeObj(ao);
 #endif
+        return(0);
 	}
 
     if(ao->ao_type == A2M_PAGE) {
-	A2mRtfPrintPage((A2MPAGE *)ao->ao_ptr, 0);
-	A2mFreeObj(ao);
+        A2mRtfPrintPage((A2MPAGE *)ao->ao_ptr, 0);
+        A2mFreeObj(ao);
+        return(0);
 	}
-
     return(0);
 }
 
