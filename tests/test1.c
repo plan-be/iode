@@ -25,7 +25,7 @@ void Syntax()
     char    *IODE_DATA_DIR   = "data";
     char    *IODE_OUTPUT_DIR = "output";
 #else
-    char    *IODE_DATA_DIR   = "..\\fun";
+    char    *IODE_DATA_DIR   = "data";
     char    *IODE_OUTPUT_DIR = ".";
 #endif
 
@@ -126,22 +126,24 @@ fin:
 
 char* U_test_read_file(char*filename, long *size)
 {
-    FILE    *fd;
-    char    *content = 0;
+    return(SCR_LoadRawFile(filename, size));
     
-    *size = 0;
-    fd = fopen(filename, "rb");
-    if(fd == 0) return(NULL);
-    
-    while(!feof(fd)) {
-        if(*size % 1024 == 0) 
-            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
-        content[*size] = fgetc(fd);
-        (*size)++;
-    }
-    content[*size] = 0; // Juste pour dire
-    fclose(fd);
-    return(content);
+//    FILE    *fd;
+//    char    *content = 0;
+//    
+//    *size = 0;
+//    fd = fopen(filename, "rb");
+//    if(fd == 0) return(NULL);
+//    
+//    while(!feof(fd)) {
+//        if(*size % 1024 == 0) 
+//            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
+//        content[*size] = fgetc(fd);
+//        (*size)++;
+//    }
+//    content[*size] = 0; // Juste pour dire
+//    fclose(fd);
+//    return(content);
 }
 
 /**
@@ -156,12 +158,11 @@ int U_cmp_files(char*file1, char*file2)
     long    size1, size2;
     char    *content1, *content2;
     
-    printf("Comparing '%s' and '%s'\n", file1, file2);
-
+    //printf("Comparing '%s' and '%s'\n", file1, file2);
     content1 = U_test_read_file(file1, &size1);
-    printf("   '%s': size=%ld\n", file1, size1);
+    //printf("   '%s': size=%ld\n", file1, size1);
     content2 = U_test_read_file(file2, &size2);
-    printf("   '%s': size=%ld\n", file2, size2);
+    //printf("   '%s': size=%ld\n", file2, size2);
     
     if(size1 != size2) {
         rc = 0;              // !=
