@@ -126,7 +126,7 @@ fin:
 
 char* U_test_read_file(char*filename, long *size)
 {
-    return(SCR_LoadRawFile(filename, size));
+    return((char*)SCR_LoadRawFile(filename, size));
     
 //    FILE    *fd;
 //    char    *content = 0;
