@@ -146,62 +146,6 @@ int     type;
     return(K_clear(K_WS[type]));
 }
 
-// =================== b_data.c =================== //
-
-B_DataUpdateEqs(name, lec, cmt, method, smpl, instr, blk, tests, date)
-char* name, * lec, * cmt, * instr, * blk;
-SAMPLE* smpl;
-float* tests; /* FLOAT 12-04-98 */
-int     method, date;
-{
-    int     pos, rc;
-    EQ* eq;
-
-    pos = K_find(K_WS[K_EQS], name);
-    if (pos < 0) eq = SW_nalloc(sizeof(EQ));
-    else eq = KEVAL(K_WS[K_EQS], pos);
-
-    if (lec != NULL) {
-        SW_nfree(eq->lec);
-        eq->lec = SCR_stracpy(lec);
-    }
-    if (cmt != NULL) {
-        SW_nfree(eq->cmt);
-        eq->cmt = SCR_stracpy(cmt);
-    }
-    if (instr != NULL) {
-        SW_nfree(eq->instr);
-        eq->instr = SCR_stracpy(instr);
-    }
-    if (blk != NULL) {
-        SW_nfree(eq->blk);
-        eq->blk = SCR_stracpy(blk);
-    }
-
-    if (method >= 0) eq->method = method;
-    if (date > 0) eq->date = SCR_current_date();
-    else eq->date = 0L;
-
-    if (tests != NULL)  memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
-    else memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float)); /* JMP 12-04-98 */
-
-    if (smpl != NULL) memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
-    /*    else memset(&(eq->smpl), 0, sizeof(SAMPLE)); */
-
-    rc = K_add(K_WS[K_EQS], name, eq, name);
-    if (rc < 0) {
-        rc = -1;
-        B_seterror(L_error());
-    }
-    else rc = 0;
-
-    /* GB 27/9/96
-        E_tests2scl(eq, E_T, E_NCE);
-    */
-    E_free(eq);
-    return(rc);
-}
-
 // =================== b_rep.c =================== //
 
 #define RP_STDALLOC     1

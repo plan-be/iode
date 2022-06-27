@@ -34,6 +34,75 @@ bool equation_equal(EQ* c_eq1, EQ* c_eq2)
     return true;
 }
 
+EQ* prepare_equation(const std::string& name, const bool add_obj, const std::string& lec, const std::string& comment,
+    const std::string& method, Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests,
+    const bool date)
+{
+    char* c_name = const_cast<char*>(name.c_str());
+
+    EQ* eq;
+    if (add_obj) eq = (EQ*) SW_nalloc(sizeof(EQ));
+    else
+    {
+        int pos = K_find(K_WS[I_EQUATIONS], c_name);
+        eq = KEVAL(K_WS[K_EQS], pos);
+    }
+
+    if (add_obj && lec.empty()) throw std::runtime_error("Cannot create new equation with name " + name + ".Passed lec expression is empty.");
+
+    if (!lec.empty())
+    {
+        std::string action = add_obj ? "create new" : "update";
+        char* c_lec = const_cast<char*>(lec.c_str());
+        CLEC* clec = L_solve(c_lec, c_name);
+        if (clec == NULL) throw std::runtime_error("Cannot" + action + "equation with name " + name + ". Passed lec expression is not valid:\n" + lec);
+        SW_nfree(clec);
+        SW_nfree(eq->lec);
+
+        eq->lec = (char*)SCR_stracpy((unsigned char*)c_lec);
+    }
+
+    if (!comment.empty())
+    {
+        unsigned char* c_comment = (unsigned char*) const_cast<char*>(comment.c_str());
+        SW_nfree(eq->cmt);
+        eq->cmt = (char*)SCR_stracpy(c_comment);
+    }
+    if (!instruments.empty())
+    {
+        unsigned char* c_instruments = (unsigned char*) const_cast<char*>(instruments.c_str());
+        SW_nfree(eq->instr);
+        eq->instr = (char*)SCR_stracpy(c_instruments);
+    }
+    if (!block.empty())
+    {
+        unsigned char* c_block = (unsigned char*) const_cast<char*>(block.c_str());
+        SW_nfree(eq->blk);
+        eq->blk = (char*)SCR_stracpy(c_block);
+    }
+
+    if (!method.empty())
+    {
+        int i_method = 0;
+        for (int i = 0; i < I_NB_EQ_METHODS; i++) if (method == vEquationMethods[i]) i_method = i;
+        eq->method = i_method;
+    }
+
+    if (date) eq->date = SCR_current_date();
+    else eq->date = 0L;
+
+    if (tests)
+    {
+        float* c_tests = const_cast<float*>(tests->data());
+        memcpy(&(eq->tests), c_tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
+    }
+    else memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float)); /* JMP 12-04-98 */
+
+    if (sample) memcpy(&(eq->smpl), sample->c_sample, sizeof(SAMPLE));
+
+    return eq;
+}
+
 
 Equation::Equation(const int pos, KDB* kdb)
 {

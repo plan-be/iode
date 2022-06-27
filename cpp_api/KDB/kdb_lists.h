@@ -1,21 +1,21 @@
 #pragma once
-
-#include "kdb_abstract.h"
-#include "kdb_abstract.cpp"
+#include "kdb_template.h"
 
 
-class KDBLists : public KDBAbstract<List>
+class KDBLists : public KDBTemplate<List>
 {
 protected:
-
-    // CRUD (Create - Read - Update - Delete) + Copy methods
-
-    int add_or_update(const std::string& name, const List& list) override;
 
     List copy_obj(const List& original) const override;
 
     List get_unchecked(const int pos) const override;
 
 public:
-    KDBLists(const std::string& pattern = "") : KDBAbstract(I_LISTS, pattern) {};
+    KDBLists(const std::string& pattern = "") : KDBTemplate(I_LISTS, pattern) {};
+
+    int add(const std::string& name, const List& list);
+
+    void update(const std::string& name, const List& list);
+
+    void update(const int pos, const List& list);
 };

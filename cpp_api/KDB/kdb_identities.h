@@ -1,32 +1,28 @@
 #pragma once
-
-#include "kdb_abstract.h"
-#include "kdb_abstract.cpp"
+#include "kdb_template.h"
 
 
-class KDBIdentities : public KDBAbstract<Identity>
+class KDBIdentities : public KDBTemplate<Identity>
 {
 private:
-    void add_or_update(const std::string& name, const std::string& lec);
+    int add_or_update(const std::string& name, const std::string& lec);
 
 protected:
-
-    // CRUD (Create - Read - Update - Delete) + Copy methods
-
-    int add_or_update(const std::string& name, const Identity& identity) override;
 
     Identity copy_obj(const Identity& original) const override;
 
     Identity get_unchecked(const int pos) const override;
 
 public:
-    KDBIdentities(const std::string& pattern = "") : KDBAbstract(I_IDENTITIES, pattern) {};
+    KDBIdentities(const std::string& pattern = "") : KDBTemplate(I_IDENTITIES, pattern) {};
 
     std::string get_lec(const int pos) const;
 
     std::string get_lec(const std::string& name) const;
 
-    void add(const std::string& name, const std::string& lec);
+    int add(const std::string& name, const std::string& lec);
 
     void update(const std::string& name, const std::string& lec);
+
+    void update(const int pos, const std::string& lec);
 };

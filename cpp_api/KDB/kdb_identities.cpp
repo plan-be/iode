@@ -4,15 +4,6 @@
 
 // CRUD (Create - Read - Update - Delete) + Copy methods
 
-int KDBIdentities::add_or_update(const std::string& name, const Identity& identity)
-{
-    char* c_name = const_cast<char*>(name.c_str());
-    int pos = K_add(K_WS[I_IDENTITIES], c_name, identity.lec);
-    if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-    if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
-    return pos;
-}
-
 Identity KDBIdentities::copy_obj(const Identity& original) const
 {
     Identity identity_copy;
@@ -44,26 +35,20 @@ std::string KDBIdentities::get_lec(const std::string& name) const
     return get_lec(pos);
 }
 
-void KDBIdentities::add_or_update(const std::string& name, const std::string& lec)
+int KDBIdentities::add(const std::string& name, const std::string& lec)
 {
-    char* c_name = const_cast<char*>(name.c_str());
     char* c_lec = const_cast<char*>(lec.c_str());
-    int res = K_add(get_KDB(), c_name, c_lec);
-    if (res == -1) throw std::runtime_error("Iode has not been initialized");
-    if (res < -1) throw std::runtime_error("Something went wrong when trying to set " + vIodeTypes[type] + " with name " + name);
-}
-
-void KDBIdentities::add(const std::string& name, const std::string& lec)
-{
-    // throw exception if object with passed name already exist
-    char* c_name = const_cast<char*>(name.c_str());
-    if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
-    add_or_update(name, lec);
+    return KDBTemplate::add(name, c_lec);
 }
 
 void KDBIdentities::update(const std::string& name, const std::string& lec)
 {
-    // throw exception if object with passed name does not exist
-    get_position(name);
-    add_or_update(name, lec);
+    char* c_lec = const_cast<char*>(lec.c_str());
+    KDBTemplate::update(name, c_lec);
+}
+
+void KDBIdentities::update(const int pos, const std::string& lec)
+{
+    char* c_lec = const_cast<char*>(lec.c_str());
+    KDBTemplate::update(pos, c_lec);
 }

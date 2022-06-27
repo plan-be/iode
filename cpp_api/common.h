@@ -50,7 +50,7 @@ enum EnumIodeType
 // TODO: rename K_NBR_OBJ as I_NB_TYPES in C api
 const static int I_NB_TYPES = K_NBR_OBJ;
 
-const static std::array<std::string, I_NB_TYPES> vIodeTypes = { "Comments", "Equations", "Identities", "Lists", "Scalars", "Tables", "Variables" };
+const static std::array<std::string, I_NB_TYPES> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
 
 struct IodeRegexName
 {

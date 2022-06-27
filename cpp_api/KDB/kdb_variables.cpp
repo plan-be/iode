@@ -2,20 +2,6 @@
 #include "kdb_variables.h"
 
 
-// CRUD (Create - Read - Update - Delete) + Copy methods
-
-int KDBVariables::add_or_update(const std::string& name, const Variable& vars)
-{
-	char* c_name = const_cast<char*>(name.c_str());
-	int nb_obs = get_nb_periods();
-	if (vars.size() != nb_obs)
-		throw std::runtime_error("Wrong size of the variable vector. Excepted " + std::to_string(nb_obs) + " values but got " + std::to_string(vars.size()) + " values.");
-	int pos = K_add(K_WS[I_VARIABLES], c_name, vars.data(), &nb_obs);
-	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-	if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
-	return pos;
-}
-
 Variable KDBVariables::copy_obj(const Variable& original) const
 {
 	return Variable(original);
@@ -90,37 +76,40 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	}
 }
 
-void KDBVariables::add(const std::string& name, const Variable& variable)
+int KDBVariables::add(const std::string& name, const Variable& variable)
 {
-	KDBAbstract::add(name, variable);
+	int var_size = (int) variable.size();
+	return KDBTemplate::add(name, variable.data(), &var_size);
 }
 
-void KDBVariables::add(const std::string& name, const std::string& lec)
+int KDBVariables::add(const std::string& name, const std::string& lec)
 {
 	Variable var = new_var_from_lec(lec);
-	KDBAbstract::add(name, var);
+	return add(name, var);
 }
 
 void KDBVariables::update(const int pos, const Variable& variable)
 {
-	KDBAbstract::update(pos, variable);
+	int var_size = (int) variable.size();
+	KDBTemplate::update(pos, variable.data(), &var_size);
 }
 
 void KDBVariables::update(const int pos, const std::string& lec)
 {
 	Variable var = new_var_from_lec(lec);
-	KDBAbstract::update(pos, var);
+	update(pos, var);
 }
 
 void KDBVariables::update(const std::string& name, const Variable& variable)
 {
-	KDBAbstract::update(name, variable);
+	int var_size = (int) variable.size();
+	KDBTemplate::update(name, variable.data(), &var_size);
 }
 
 void KDBVariables::update(const std::string& name, const std::string& lec)
 {
 	Variable var = new_var_from_lec(lec);
-	KDBAbstract::update(name, var);
+	update(name, var);
 }
 
 Sample KDBVariables::get_sample() const
