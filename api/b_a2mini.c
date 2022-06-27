@@ -107,6 +107,28 @@ void B_A2mSaveGnlParms()
     B_IniWriteText("A2MGNL", "TAG", A2M_CURTAG);
 }
 
+
+int B_A2mSetRtfTitle(U_ch* title)
+{
+    if(title == 0) return(0);
+    SCR_free(A2M_RTF_TITLE);
+    A2M_RTF_TITLE = SCR_stracpy(title);
+    SCR_strip(A2M_RTF_TITLE);
+    SCR_OemToAnsi(A2M_RTF_TITLE, A2M_RTF_TITLE);
+    return(0);
+}
+
+int B_A2mSetRtfCopy(U_ch* title)
+{
+    if(title == 0) return(0);
+    SCR_free(A2M_RTF_COPYRIGHT);
+    A2M_RTF_COPYRIGHT = SCR_stracpy(title);
+    SCR_strip(A2M_RTF_COPYRIGHT);
+    SCR_OemToAnsi(A2M_RTF_COPYRIGHT, A2M_RTF_COPYRIGHT);
+    return(0);
+}
+
+
 /**
  *  Reads the Section "A2MRTF" of the iode.ini file and stores the
  *  read values in A2M* variables (see code for the complete list).
