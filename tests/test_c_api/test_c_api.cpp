@@ -18,9 +18,9 @@ extern "C"
     extern char         SCR_NAME_ERR[255 + 1];
 
     //int o_estgr(char** titles, SAMPLE *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
-    int B_A2mSetRtfTitle(U_ch* title) {return(0);}
-    int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
-    int B_PrintRtfTopic(char* x) { return(0); }
+    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
+    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
+    //int B_PrintRtfTopic(char* x) { return(0); }
     int A2mGIF_HTML() {return(0);}
     //int W_printf(char*fmt, ...) {return(0);}
     //void K_load_iode_ini() {}
@@ -94,22 +94,24 @@ public:
 
 	char* U_test_read_file(char*filename, long *size)
 	{
-	    FILE    *fd;
-	    char    *content = 0;
+	    return((char*)SCR_LoadRawFile(filename, size));
 	
-	    *size = 0;
-	    fd = fopen(filename, "rb");
-	    if(fd == 0) return(NULL);
-	
-	    while(!feof(fd)) {
-	        if(*size % 1024 == 0)
-	            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
-	        content[*size] = fgetc(fd);
-	        (*size)++;
-	    }
-	    content[*size] = 0; // Juste pour dire
-	    fclose(fd);
-	    return(content);
+	//    FILE    *fd;
+	//    char    *content = 0;
+	//
+	//    *size = 0;
+	//    fd = fopen(filename, "rb");
+	//    if(fd == 0) return(NULL);
+	//
+	//    while(!feof(fd)) {
+	//        if(*size % 1024 == 0)
+	//            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
+	//        content[*size] = fgetc(fd);
+	//        (*size)++;
+	//    }
+	//    content[*size] = 0; // Juste pour dire
+	//    fclose(fd);
+	//    return(content);
 	}
 
 	int U_cmp_files(char*file1, char*file2)
@@ -118,12 +120,11 @@ public:
 	    long    size1, size2;
 	    char    *content1, *content2;
 	
-	    printf("Comparing '%s' and '%s'\n", file1, file2);
-	
+	    //printf("Comparing '%s' and '%s'\n", file1, file2);
 	    content1 = U_test_read_file(file1, &size1);
-	    printf("   '%s': size=%ld\n", file1, size1);
+	    //printf("   '%s': size=%ld\n", file1, size1);
 	    content2 = U_test_read_file(file2, &size2);
-	    printf("   '%s': size=%ld\n", file2, size2);
+	    //printf("   '%s': size=%ld\n", file2, size2);
 	
 	    if(size1 != size2) {
 	        rc = 0;              // !=
@@ -251,8 +252,10 @@ public:
 	    W_printf(".sep |\n");
 	    W_printf(".esc ~\n");
 	
-	    W_printf(".pghead IODE\n");
-	    W_printf(".pgfoot - page %%d - \n");
+	    W_print_pg_header("IODE");
+	    //W_printf(".pghead IODE\n");
+	    W_print_pg_footer("- page %d - ");
+	    //W_printf(".pgfoot - page %%d - \n");
 	
 	    W_print_tit(1);
 	    W_printf("%s\n", "Mon titre");
