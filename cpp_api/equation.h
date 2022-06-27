@@ -7,7 +7,9 @@
 
 EQ* create_equation_deep_copy(EQ* original_equation);
 bool equation_equal(EQ* c_eq1, EQ* c_eq2);
-
+EQ* prepare_equation(const std::string& name, const bool add_obj, const std::string& lec, const std::string& comment,
+    const std::string& method, Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests,
+    const bool date);
 
 struct Equation
 {

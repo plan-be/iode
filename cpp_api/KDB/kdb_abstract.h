@@ -11,7 +11,6 @@ using Scalar = SCL;
 using Variable = std::vector<IODE_REAL>;
 
 
-template<class T> 
 class KDBAbstract
 {
 protected:
@@ -24,36 +23,11 @@ protected:
 protected:
     KDB* get_KDB() const
     {
-        if (shallow_copy_kdb != NULL) return shallow_copy_kdb;
+        if (shallow_copy_kdb) return shallow_copy_kdb;
         KDB* kdb = K_WS[type];
         if (kdb == NULL) throw std::runtime_error("There is currently no " + vIodeTypes[type] + " database in memory.");
         return kdb;
     }
-
-    KOBJ get_iode_object(const int pos) const
-    {
-        KDB* kdb = get_KDB();
-        int nb_objs = count();
-        if (pos < 0 || pos > nb_objs) throw std::runtime_error(vIodeTypes[type] + " at position " + std::to_string(pos) + " does not exist.");
-        return kdb->k_objs[pos];
-    }
-
-    int get_position(const std::string& name) const
-    {
-        KDB* kdb = get_KDB();
-        check_name(name, type);
-        int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-        if (pos < 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " does not exist.");
-        return pos;
-    }
-
-    // CRUD (Create - Read - Update - Delete) + Copy methods
-
-    virtual int add_or_update(const std::string& name, const T& obj) = 0;
-
-    virtual T copy_obj(const T& original) const = 0;
-
-    virtual T get_unchecked(const int pos) const = 0;
 
 public:
     KDBAbstract(EnumIodeType type, const std::string& pattern);
@@ -64,11 +38,27 @@ public:
 
     int count() const { return get_KDB()->k_nb; }
 
-    bool is_global_kdb() const { return shallow_copy_kdb == NULL; }
+    bool is_global_kdb() const { return shallow_copy_kdb == nullptr; }
+
+    int get_position(const std::string& name) const
+    {
+        check_name(name, type);
+        KDB* kdb = get_KDB();
+        int pos = K_find(kdb, const_cast<char*>(name.c_str()));
+        if (pos < 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " does not exist.");
+        return pos;
+    }
 
     // object name
 
-    std::string get_name(const int pos) const;
+    std::string get_name(const int pos) const 
+    {
+        KDB* kdb = get_KDB();
+        if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error(vIodeTypes[type] + " at position " + std::to_string(pos) + " does not exist.");
+        std::string name_oem = std::string(kdb->k_objs[pos].o_name);
+        std::string name = oem_to_utf8(name_oem);
+        return name;
+    }
 
     int set_name(const int pos, const std::string& new_name);
 
@@ -76,21 +66,7 @@ public:
 
     bool contains(const std::string& name) { return K_find(get_KDB(), const_cast<char*>(name.c_str())) >= 0; }
 
-    // CRUD (Create - Read - Update - Delete) + Copy methods
-
-    void add(const std::string& name, const T& obj);
-
-    T copy(const int pos) const;
-
-    T copy(const std::string& name) const;
-
-    T get(const int pos) const;
-
-    T get(const std::string& name) const;
-
-    void update(const int pos, const T& obj);
-
-    void update(const std::string& name, const T& obj);
+    // delete
 
     void remove(const int pos);
 

@@ -1,10 +1,12 @@
 ﻿
-add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" "common.h" "utils.h" 
+add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" 
+                              "common.h" "utils.h" 
                               "period.h" "sample.h"
                               "super.h" "super.cpp"
                               "equation.h" "equation.cpp"
                               "table.h" "table.cpp" 
                               "KDB/kdb_global.h" "KDB/kdb_global.cpp"
+                              "KDB/kdb_template.h"
                               "KDB/kdb_abstract.h" "KDB/kdb_abstract.cpp" 
                               "KDB/kdb_comments.h" "KDB/kdb_comments.cpp" 
                               "KDB/kdb_equations.h" "KDB/kdb_equations.cpp"

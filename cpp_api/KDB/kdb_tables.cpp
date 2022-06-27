@@ -2,15 +2,6 @@
 #include "kdb_tables.h"
 
 
-int KDBTables::add_or_update(const std::string& name, const Table& table)
-{
-	char* c_name = const_cast<char*>(name.c_str());
-	int pos = K_add(K_WS[I_TABLES], c_name, table.c_table);
-	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-	if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
-	return pos;
-}
-
 Table KDBTables::copy_obj(const Table& original) const
 {
 	return Table(original);
@@ -18,7 +9,7 @@ Table KDBTables::copy_obj(const Table& original) const
 
 Table KDBTables::get_unchecked(const int pos) const
 {
-    return Table(pos);
+    return Table(pos, get_KDB());
 }
 
 std::string KDBTables::get_title(const int pos) const
@@ -39,7 +30,7 @@ std::string KDBTables::get_title(const std::string& name) const
     return get_title(pos);
 }
 
-Table KDBTables::add(const std::string& name, const int nbColumns)
+int KDBTables::add(const std::string& name, const int nbColumns)
 {
 	// throw exception if object with passed name already exist
 	char* c_name = const_cast<char*>(name.c_str());
@@ -47,14 +38,10 @@ Table KDBTables::add(const std::string& name, const int nbColumns)
 
 	TBL* c_table = T_create(nbColumns);
 
-	int pos = K_add(get_KDB(), c_name, c_table);
-	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
-
-	return Table(name);
+	return KDBTemplate::add(name, c_table);
 }
 
-Table KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, std::vector<std::string>& vars, bool mode, bool files, bool date)
+int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, std::vector<std::string>& vars, bool mode, bool files, bool date)
 {
 	std::string vars_list;
 	for (std::string& var : vars) vars_list += var + ';';
@@ -63,7 +50,7 @@ Table KDBTables::add(const std::string& name, const int nbColumns, const std::st
 	return add(name, nbColumns, def, vars_list, mode, files, date);
 }
 
-Table KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, bool mode, bool files, bool date)
+int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, bool mode, bool files, bool date)
 {
 	// throw exception if object with passed name already exist
 	char* c_name = const_cast<char*>(name.c_str());
@@ -88,9 +75,5 @@ Table KDBTables::add(const std::string& name, const int nbColumns, const std::st
 	SCR_free(lst);
 	SCR_free_tbl((unsigned char**) c_lecs);
 
-	int pos = K_add(get_KDB(), c_name, c_table);
-	if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-	if (pos == -2) throw std::runtime_error("Cannot create or update table with name " + name);
-
-	return Table(name);
+	return KDBTemplate::add(name, c_table);
 }
