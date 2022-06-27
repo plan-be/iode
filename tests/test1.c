@@ -41,9 +41,9 @@ extern "C"
     extern char         SCR_NAME_ERR[255 + 1];
 
     //int o_estgr(char** titles, SAMPLE *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
-    int B_A2mSetRtfTitle(U_ch* title) {return(0);}
-    int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
-    int B_PrintRtfTopic(char* x) { return(0); }
+    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
+    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
+    //int B_PrintRtfTopic(char* x) { return(0); }
     int A2mGIF_HTML() {return(0);}
     //int W_printf(char*fmt, ...) {return(0);}
     //void K_load_iode_ini() {}
@@ -722,8 +722,10 @@ void U_test_W_printf_cmds()
     W_printf(".sep |\n");
     W_printf(".esc ~\n");
     
-    W_printf(".pghead IODE\n");
-    W_printf(".pgfoot - page %%d - \n");
+    W_print_pg_header("IODE");
+    //W_printf(".pghead IODE\n");
+    W_print_pg_footer("- page %d - ");
+    //W_printf(".pgfoot - page %%d - \n");
     
     W_print_tit(1);
     W_printf("%s\n", "Mon titre");

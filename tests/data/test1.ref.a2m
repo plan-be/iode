@@ -1,7 +1,7 @@
 .sep |
 .esc ~
 .pghead IODE
-.pgfoot - page %d - 
+.pgfoot - page %d -
 .par1 tit_1
 Mon titre
 .par1 enum_1
