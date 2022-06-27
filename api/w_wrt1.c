@@ -5,10 +5,13 @@
  *  
  *  List of functions
  *  -----------------
- *      void W_print_enum(int n)    Starts an A2M enum paragraph (enum_*) of level n.
- *      void W_print_cmd(int n)     Sends commands to A2M to start a paragraph containing code 
- *      void W_print_par(int n)     Starts an A2M normal paragraph (par_*) of level n.
- *      void W_print_tit(int n)     Starts an A2M title paragraph (tit_*) of level n.
+ *      void W_print_enum(int n)            Starts an A2M enum paragraph (enum_*) of level n
+ *      void W_print_cmd(int n)             Sends commands to A2M to start a paragraph containing code 
+ *      void W_print_par(int n)             Starts an A2M normal paragraph (par_*) of level n
+ *      void W_print_tit(int n)             Starts an A2M title paragraph (tit_*) of level n
+ *      void W_print_pg_header(char* arg)   Sends the A2M command to change the page header
+ *      void W_print_pg_footer(char* arg)   Sends the A2M command to change the page footer
+ *      void W_print_rtf_topic(char* arg)   Sends the A2M command to set the next help topic
  */
 
 #include "iode.h"
@@ -72,3 +75,54 @@ void W_print_tit(int n)
     W_printf(".par1 tit_%d\n", n);
 }
 
+/**
+ *  Sends the A2M command to change the page header.
+ *  
+ *  Each occurence of %d in arg will be replaced by the page number.
+ *  
+ *  @param [in] char*   arg     new page header
+ */
+void W_print_pg_header(char* arg)
+{
+    SCR_free(A2M_PGHEAD);
+    A2M_PGHEAD = SCR_stracpy(arg);
+    SCR_strip(A2M_PGHEAD);
+    W_printf(".pghead %s\n", A2M_PGHEAD);
+}
+
+
+/**
+ *  Sends the A2M command to change the page footer.
+ *  
+ *  Each occurence of %d in arg will be replaced by the page number.
+ *  
+ *  @param [in] char*   arg     new page footer
+ */
+void W_print_pg_footer(char* arg)
+{
+    SCR_free(A2M_PGFOOT);
+    A2M_PGFOOT = SCR_stracpy(arg);
+    SCR_strip(A2M_PGFOOT);
+    //BGUI_PrintPageFooter();
+    W_printf(".pgfoot %s\n", A2M_PGFOOT); 
+}
+
+
+/**
+ *  Sends the A2M command to set the next help topic. 
+ *  Only used for generating an HTML Help (.chm file) or RTF Help (Windows .hlp file).
+ *   
+ *  @param [in] char*   arg     title of the topic
+ */
+
+void W_print_rtf_topic(char* arg)
+{
+    extern int KT_CUR_LEVEL, KT_CUR_TOPIC;
+    extern int W_rtfhelp, W_type;
+
+    if(arg) {
+        W_printf(".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, arg);
+        if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg);
+        // if(W_type == A2M_DESTHTML && W_htmlhelp) W_printf( ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg); /* JMP 06-01-02 */
+    }
+}
