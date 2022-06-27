@@ -1092,6 +1092,9 @@ extern void W_print_enum(int );
 extern void W_print_cmd(int );
 extern void W_print_par(int );
 extern void W_print_tit(int );
+extern void W_print_pg_header(char* arg);
+extern void W_print_pg_footer(char* arg);
+extern void W_print_rtf_topic(char* arg);
 
 /* sb_file.c */
 extern void SB_FileOpen(void);
