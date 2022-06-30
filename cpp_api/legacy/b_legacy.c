@@ -325,7 +325,6 @@ TBL* tbl;
 
 // =================== b_base.c =================== //
 
-char    B_SEPS[] = " ,\n\t";
 int     B_NBDEC = 2;
 int     B_LANG = 0;             /* JMP38 26-09-92 */
 int     B_MULTIBAR = 0;         /* GB 30/10/2007 MULTIBAR function*/
