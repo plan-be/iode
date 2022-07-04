@@ -23,9 +23,9 @@ public:
     template<class... Args> int add_or_update(const std::string& name, Args... args)
     {
         char* c_name = const_cast<char*>(name.c_str());
-        int pos = K_add(K_WS[type], c_name, args...);
+        int pos = K_add(K_WS[iode_type], c_name, args...);
         if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-        if (pos < -1) throw std::runtime_error("Cannot create or update " + vIodeTypes[type] + " with name " + name);
+        if (pos < -1) throw std::runtime_error("Cannot create or update " + iode_type_name + " with name " + name);
         return pos;
     }
 
@@ -33,21 +33,21 @@ public:
     {
         int pos;
 
-        check_name(name, type);
+        check_name(name, iode_type);
 
         // throw exception if object with passed name already exist
         char* c_name = const_cast<char*>(name.c_str());
         if (K_find(get_KDB(), c_name) >= 0)
-            throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
+            throw std::runtime_error(iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
         if (shallow_copy_kdb)
         {
             // add new obj to global KDB if doesn't exist yet
-            int pos_global = K_find(K_WS[type], c_name);
+            int pos_global = K_find(K_WS[iode_type], c_name);
             if (pos_global < 0) pos_global = add_or_update(name, args...);
             // add new entry to shallow copy KDB
             pos = K_add_entry(shallow_copy_kdb, c_name);
-            KSOVAL(shallow_copy_kdb, pos) = KSOVAL(K_WS[type], pos_global);
+            KSOVAL(shallow_copy_kdb, pos) = KSOVAL(K_WS[iode_type], pos_global);
         }
         else
         {

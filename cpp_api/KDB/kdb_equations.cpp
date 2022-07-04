@@ -26,13 +26,13 @@ std::string KDBEquations::get_lec(const std::string& name) const
 int KDBEquations::add(const std::string& name, const std::string& lec, const std::string& comment, const std::string& method,
     Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>& tests, const bool date)
 {
-    check_name(name, type);
+    check_name(name, iode_type);
 
     char* c_name = const_cast<char*>(name.c_str());
 
     // throw exception if object with passed name already exist
     if (K_find(get_KDB(), c_name) >= 0)
-        throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
+        throw std::runtime_error(iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
     bool new_sample = sample == nullptr;
     if (new_sample) sample = new Sample(KSMPL(K_WS[I_VARIABLES]));
