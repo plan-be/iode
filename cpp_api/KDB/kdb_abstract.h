@@ -17,24 +17,24 @@ protected:
     // Note: Cannot define a KDB* global_kdb = K_WS[type] member because the pointer contained in 
     // K_WS[type] may change in the course of the program (when loading files for example)
 
-    EnumIodeType type;
+    EnumIodeType iode_type;
+    std::string iode_type_name;
     KDB* shallow_copy_kdb;         //< local KDB returned by K_refer()
 
 protected:
     KDB* get_KDB() const
     {
         if (shallow_copy_kdb) return shallow_copy_kdb;
-        KDB* kdb = K_WS[type];
-        if (kdb == NULL) throw std::runtime_error("There is currently no " + vIodeTypes[type] + " database in memory.");
-        return kdb;
+        if (K_WS[iode_type] == NULL) throw std::runtime_error("There is currently no " + iode_type_name + " database in memory.");
+        return K_WS[iode_type];
     }
 
 public:
-    KDBAbstract(EnumIodeType type, const std::string& pattern);
+    KDBAbstract(EnumIodeType iode_type, const std::string& pattern);
 
     ~KDBAbstract();
 
-    int get_iode_type() const { return type; }
+    int get_iode_type() const { return iode_type; }
 
     int count() const { return get_KDB()->k_nb; }
 
@@ -42,10 +42,10 @@ public:
 
     int get_position(const std::string& name) const
     {
-        check_name(name, type);
+        check_name(name, iode_type);
         KDB* kdb = get_KDB();
         int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-        if (pos < 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " does not exist.");
+        if (pos < 0) throw std::runtime_error(iode_type_name + " with name " + name + " does not exist.");
         return pos;
     }
 
@@ -54,7 +54,7 @@ public:
     std::string get_name(const int pos) const 
     {
         KDB* kdb = get_KDB();
-        if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error(vIodeTypes[type] + " at position " + std::to_string(pos) + " does not exist.");
+        if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error(iode_type_name + " at position " + std::to_string(pos) + " does not exist.");
         std::string name_oem = std::string(kdb->k_objs[pos].o_name);
         std::string name = oem_to_utf8(name_oem);
         return name;

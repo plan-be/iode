@@ -34,7 +34,7 @@ int KDBTables::add(const std::string& name, const int nbColumns)
 {
 	// throw exception if object with passed name already exist
 	char* c_name = const_cast<char*>(name.c_str());
-	if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
+	if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
 	TBL* c_table = T_create(nbColumns);
 
@@ -54,7 +54,7 @@ int KDBTables::add(const std::string& name, const int nbColumns, const std::stri
 {
 	// throw exception if object with passed name already exist
 	char* c_name = const_cast<char*>(name.c_str());
-	if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(vIodeTypes[type] + " with name " + name + " already exists. Use update() method instead.");
+	if (K_find(get_KDB(), c_name) >= 0) throw std::runtime_error(iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
 	char* c_def = const_cast<char*>(def.c_str());
 
