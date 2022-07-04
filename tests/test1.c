@@ -59,7 +59,7 @@ extern "C"
  *  ------------------------------------ 
  *      int U_cmp_strs(char* str1, char* str2)       : compares 2 strings and return(1) if equal
  *      int U_cmp_tbls(char** tbl1, char* vec)       : compares a table of strings to a list of strings in a semi-colon separated vector.
- *      int U_cmp_files(char* file1, char* file2)   : compares the content of 2 files. 
+ *      int U_diff_files(char* file1, char* file2)   : compares the content of 2 files and prints differences
  *  
  *      void S4ASSERT(int success, char* fmt, ...)  : Verifies an assertion, optionally displays a message and opt. exits on error.
  *  
@@ -185,9 +185,116 @@ fin:
 }
 
 
+/**
+ *  Compares 2 files. Returns 0 if the 2 files are ==, -1 if not.
+ *  If files are <>, prints the differences.
+ *  
+ *  @return int     -1 if the 2 files are ==, 
+ *                  0 if not.
+ */
+int U_diff_files(char*file1, char*file2)
+{
+    int     rc = -1, i, j, nbdiffs = 0;        // ==
+    long    size1, size2;
+    char    *content1, *content2;
+    char    **tbl1, **tbl2;
+    
+    //printf("Comparing '%s' and '%s'\n", file1, file2);
+    content1 = U_test_read_file(file1, &size1);
+    //printf("   '%s': size=%ld\n", file1, size1);
+    content2 = U_test_read_file(file2, &size2);
+    //printf("   '%s': size=%ld\n", file2, size2);
+    
+    if(size1 != size2) {
+        rc = 0;              // !=
+        goto cmp;                           
+    }
+    if(content1 == NULL && content2 == NULL) {              // ==
+        goto fin;      
+    }
+    
+    if(content1 == NULL || content2 == NULL) {
+        if(content1 == NULL) printf("File %s not found\n", file1);
+        if(content2 == NULL) printf("File %s not found\n", file2);
+        rc = 0;
+        goto fin;      // !=
+    }    
+    
+    rc = !memcmp(content1, content2, size1);
+cmp:    
+    if(rc == 0) { // files are different
+        tbl1 = (char**) SCR_vtom((U_ch*)content1, '\n');
+        tbl2 = (char**) SCR_vtom((U_ch*)content2, '\n');
+        for(i = 0; tbl1[i] && tbl2[i]; i++) {
+            if(strcmp(tbl1[i], tbl2[i])) {
+                nbdiffs++;
+                // Print diff bw the 2 lines
+                printf("Line %-5d:%s\n           %s\n           ", i + 1, tbl1[i], tbl2[i]);
+                for(j = 0; tbl1[i][j] && tbl2[i][j]; j++) {
+                    if(tbl1[i][j] == tbl2[i][j]) 
+                        printf(" ");
+                    else 
+                        printf("^");
+                }
+                printf("\n");
+            }
+            if(nbdiffs >= 10) break;
+        }    
+        SCR_free_tbl((U_ch**)tbl1);
+        SCR_free_tbl((U_ch**)tbl2);
+    }
+    
+fin:    
+    SCR_free(content1);
+    SCR_free(content2);
+    return(rc);
+}
 
+// Print titles
+void U_test_print_title(char* title)
+{
+    int i;
+
+    printf("\n\n%s\n", title);
+    for (i = 0; title[i]; i++) printf("-");
+    printf("\n");
+}
+
+
+// Output messages
+
+// Function which replaces A2mMessage() when no output is  needed
 void kmsg_null(char*msg) 
 {
+}
+
+// Choose to display a2m messages or not.
+void U_test_a2m_msgs(int IsOn)
+{
+    static int  Current_IsOn = 1;
+    static void (*A2mMessage_super_ptr)(char*); 
+    
+    if(IsOn && !Current_IsOn) { 
+        A2mMessage_super = A2mMessage_super_ptr; // (Re-)install default function
+        Current_IsOn = 1;
+        return;
+    }
+    else if(!IsOn && Current_IsOn) {
+        A2mMessage_super_ptr = A2mMessage_super;  // Save default value before replacing it by kmsg_null
+        A2mMessage_super = kmsg_null;             // Suppress output messages
+        Current_IsOn = 0;
+        return;
+    }
+}
+    
+void U_test_suppress_a2m_msgs()
+{
+    U_test_a2m_msgs(0);
+}
+
+void U_test_reset_a2m_msgs()
+{
+    U_test_a2m_msgs(1);
 }
 
 
@@ -232,6 +339,7 @@ void S4ASSERT(int success, char* fmt, ...)
 
 void Tests_BUF()
 {
+    U_test_print_title("Tests BUF");
     S4ASSERT(BUF_DATA == NULL,            "BUF_DATA is null");
     S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
     S4ASSERT(BUF_alloc(100) != NULL,      "BUF_alloc(100) is not null");
@@ -256,7 +364,9 @@ void U_tests_Objects()
     
     if(done) return;
     done = 1;
-        
+    
+    U_test_print_title("Tests OBJECTS");
+
     // Create lists
     pos = K_add(KL_WS, "LST1", "A,B");
     S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
@@ -340,7 +450,9 @@ double U_test_calc_lec(char* lec, int t)
 void Tests_LEC()
 {
     IODE_REAL *A, *B;
-   
+
+    U_test_print_title("Tests LEC");
+
     // Create objects
     U_tests_Objects();
     
@@ -387,6 +499,8 @@ void Tests_ARGS()
     char *list[] = {"A1", "A2", 0};
     char filename[256];
     
+    U_test_print_title("Tests ARGS");
+
     // Create objects
     U_tests_Objects();
     
@@ -427,6 +541,8 @@ void Tests_ARGS()
 
 void Tests_ERRMSGS() 
 {
+    U_test_print_title("Tests Err Msgs");
+
     B_seterrn(86, "bla bla");
     kerror(0, "Coucou de kerror %s", "Hello");
     kmsg("Coucou de kmsg %s -- %g", "Hello", 3.2);
@@ -439,7 +555,9 @@ void Tests_K_OBJFILE()
     char    out_filename[256];
     KDB     *kdb_var;
     int     rc;
-    
+
+    U_test_print_title("Tests K_OBJFILE");
+
     sprintf(in_filename,  "%s\\fun.var", IODE_DATA_DIR);
     sprintf(out_filename, "%s\\fun_copy.var", IODE_OUTPUT_DIR);
     
@@ -467,12 +585,12 @@ void Tests_TBL32_64()
     KDB     *kdb_tbl;
     int     rc;
     
-    int     pos, col;
+    int     pos;
     TBL*    c_table;
     TCELL*  cells;
-    char    *cell_content;
+   
+    U_test_print_title("Tests conversion 32 to 64 bits");
 
-    
     sprintf(in_filename,  "%s\\fun.tbl", IODE_DATA_DIR);
    
     kdb_tbl = K_interpret(K_TBL, in_filename);
@@ -537,6 +655,8 @@ void Tests_Simulation()
     LIS         lst, expected_lst;
     void        (*kmsg_super_ptr)(char*);
     
+    U_test_print_title("Tests Simulation");
+
     // Loads 3 WS and check ok
     U_test_load_fun_esv(filename);
 
@@ -625,6 +745,10 @@ void Tests_PrintTables()
     TBL     *tbl;
     int     rc;
 
+    U_test_suppress_a2m_msgs();
+    
+    U_test_print_title("Tests Print TBL as Tables and Graphs");
+
     // Load the VAR workspace
     K_RWS[K_VAR][0] = K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
     S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", "fun.var");
@@ -644,7 +768,8 @@ void Tests_PrintTables()
     S4ASSERT(tbl != NULL, "KTPTR(\"C8_1\") not null.");
     
     // Select Print destination
-    W_dest("test1_tbl.htm", W_HTML);
+    //W_dest("test1_tbl.htm", W_HTML);
+    W_dest("test1_tbl.a2m", W_A2M);
     //W_dest("", W_GDI);
    
     // Print tbl as table
@@ -663,51 +788,58 @@ void Tests_PrintTables()
     
     // Cleanup the 2d VAR ws
     K_load_RWS(2, NULL);
+    
+    // Reset A2M messages
+    U_test_reset_a2m_msgs();
 }
 
 
-//void Tests_Estimation()
-//{
-//    int         rc;
-//    IODE_REAL   x;
-//    void        (*kmsg_super_ptr)(char*);
-//
-//    kmsg_super_ptr = kmsg_super;
-//    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
-//
-//    // Select output destination
-//    //W_dest("test1_estim.a2m", W_A2M);
-//    //W_dest("test1_estim.rtf", W_RTF);
-//    W_dest("test1_estim.htm", W_HTML);
-//    //W_dest("test.gdi",        W_GDI); 
-//        
-//    U_test_load_fun_esv("fun");
-//    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
-//    S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
-//
-//    //x = U_test_calc_lec("_YRES[1980Y1]", 0);
-//    //printf("x = %lf\n", x);
-//    //x = fabs(x + 0.001150);
-//    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115), "Estimation : _YRES[1980Y1] == -0.001150");
-//    
-//    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
-//    S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
-//    
-//    //TODO:add some tests with other estimation methods / on blocks / with instruments
-//    
-//    //W_flush();
-//    W_close();
-// 
-//    // Reset initial kmsg fn
-//    kmsg_super = kmsg_super_ptr; // Reset initial output to 
-//
-//}
+void Tests_Estimation()
+{
+    int         rc;
+    void        (*kmsg_super_ptr)(char*);
+
+    U_test_suppress_a2m_msgs();
+    U_test_print_title("Tests Estimation");
+
+    kmsg_super_ptr = kmsg_super;
+    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
+
+    // Select output destination
+    W_dest("test1_estim.a2m", W_A2M);
+    //W_dest("test1_estim.rtf", W_RTF);
+    //W_dest("test1_estim.htm", W_HTML);
+    //W_dest("test.gdi",        W_GDI); 
+        
+    U_test_load_fun_esv("fun");
+    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
+    S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
+
+    //x = U_test_calc_lec("_YRES[1980Y1]", 0);
+    //printf("x = %lf\n", x);
+    //x = fabs(x + 0.001150);
+    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115), "Estimation : _YRES[1980Y1] == -0.001150");
+    
+    //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
+    S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
+    
+    //TODO:add some tests with other estimation methods / on blocks / with instruments
+    
+    //W_flush();
+    W_close();
+ 
+    // Reset initial kmsg fn
+    kmsg_super = kmsg_super_ptr; // Reset initial output to 
+    U_test_reset_a2m_msgs();
+}
 
 void Tests_ALIGN()
 {
     TBL     tbl, *p_tbl = &tbl;
     int     offset;
     
+    U_test_print_title("Tests ALIGN");
+
     offset = (char*)(p_tbl + 1) - (char*)p_tbl;
     printf("sizeof(TBL)    = %d -- Offset = %d\n", sizeof(TBL), offset);
     //printf("sizeof(TBL)    = %d\n", sizeof(TBL));
@@ -780,15 +912,16 @@ void U_test_W_printf_1dest(int typeint, char *typeext)
     W_dest(filename, typeint); 
     U_test_W_printf_cmds();
     W_close();
-    S4ASSERT(U_cmp_files(reffilename, filename), "W_printf -> %s", typeext);
+    printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
+    //S4ASSERT(U_cmp_files(reffilename, filename), "W_printf -> %s", typeext);
+    S4ASSERT(U_diff_files(reffilename, filename), "W_printf -> %s", typeext);
 }
 
 void Tests_W_printf()
 {
-    void        (*A2mMessage_super_ptr)(char*);
+    U_test_print_title("Tests W_printf");
 
-    A2mMessage_super_ptr = A2mMessage_super;
-    A2mMessage_super = kmsg_null; // Suppress output messages
+    U_test_suppress_a2m_msgs();
 
     //W_gdiask = 0;  // 1 means that a popup window will be opened to select the printer => not practical for the automated tests!
     //W_dest("test1", W_GDI); 
@@ -810,8 +943,7 @@ void Tests_W_printf()
     W_close(); // Closes the last "print" if any
     
     // Reset initial kmsg fn
-    A2mMessage_super = A2mMessage_super_ptr; // Reset initial output to 
-
+    U_test_reset_a2m_msgs();
 }
 
 // Test SWAP 
@@ -822,6 +954,8 @@ void Tests_SWAP()
 {
     SWHDL   item, item2;
     
+    U_test_print_title("Tests SWAP");
+
     // test 1 : deux frees successifs
     item = SW_alloc(20);
     SW_free(item);
@@ -855,7 +989,10 @@ void U_test_init()
 int main(int argc, char **argv)
 {
     int     i;
-    
+
+    // Suppress output messages
+    U_test_suppress_a2m_msgs();
+        
     for(i = 1 ; i < argc; i++) {
         if(strcmp(argv[i], "-v-") == 0) S4ASSERT_VERBOSE = 0;
         if(strcmp(argv[i], "-v")  == 0) S4ASSERT_VERBOSE = 1;
@@ -881,18 +1018,18 @@ int main(int argc, char **argv)
     Tests_EQS();
     Tests_ARGS();
     Tests_K_OBJFILE();
-  
-    
     Tests_TBL32_64();
     Tests_Simulation();
     Tests_PrintTables();
-//    Tests_Estimation();
-    //S4ASSERT_EXIT_ON_ERROR = 0;
+    Tests_Estimation();
     Tests_W_printf();
+
+   
+    //K_save_iode_ini(); // Suppress that call ? Should only be called on demand, not at the end of each IODE session.
     
-    K_save_iode_ini();
+    // Reset initial kmsg fn
+    U_test_reset_a2m_msgs();
+    
     return(0);
 //    B_ReportLine("$show coucou");
 }
-
-

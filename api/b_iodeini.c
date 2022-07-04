@@ -113,7 +113,7 @@ int B_IniReadChar(char* section, char* parm, char dft)
     
     B_IodeIniFile();
 	rc =  IniReadTxtParm(ODE_INIFILE, section, parm, buf, 80);
-    return(rc <= 0 ? dft : buf[0]);
+    return(rc < 0 ? dft : buf[0]);
 }
 
 
@@ -154,7 +154,7 @@ int B_IniReadNum(char* section, char* parm, int dft)
     
     B_IodeIniFile();
 	res = IniReadNumParm(ODE_INIFILE, section, parm, &val);
-    return(res <= 0 ? dft : val);
+    return(res < 0 ? dft : val);
 }
 
 
