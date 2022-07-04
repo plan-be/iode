@@ -5,22 +5,24 @@
  *  
  *  List of functions
  *  -----------------
- *      void B_A2mGetGnlParms()         Reads the Section "A2MGNL" of the iode.ini file 
- *      void B_A2mSaveGnlParms()        Rewrites the Section "A2MGNL" of the iode.ini file with the current values of A2M* variables.
- *      void B_A2mGetRtfParms()         Reads the Section "A2MRTF" of the iode.ini file
- *      void B_A2mSaveRtfParms()        Rewrites the Section "A2MRTF" of the iode.ini file with the current values of A2M* variables.
- *      void B_A2mGetHtmlParms()        Reads the Section "A2MHTML" of the iode.ini file
- *      void B_A2mSaveHtmlParms()       Rewrites the Section "A2MHTML" of the iode.ini file with the current values of A2M* variables.
- *      void B_A2mGetGIFParms()         Reads the Section "A2MGIF" of the iode.ini file
- *      void B_A2mSaveGIFParms()        Rewrites the Section "A2MGIF" of the iode.ini file with the current values of A2M* variables.
- *      void B_A2mGetCsvParms()         Reads the Section "A2MCSV" of the iode.ini file
- *      void B_A2mSaveCsvParms()        Rewrites the Section "A2MCSV" of the iode.ini file with the current values of A2M* variables.
- *      void B_A2mGetMifParms()         Reads the Section "A2MMIF" of the iode.ini file
- *      void B_A2mSaveMifParms()        Rewrites the Section "A2MMIF" of the iode.ini file with the current values of A2M* variables.
- *      void B_A2mGetGdiParms()         Reads the Section "A2MGDI" of the iode.ini file
- *      void B_A2mSaveGdiParms()        Rewrites the Section "A2MGDI" of the iode.ini file with the current values of A2M* variables.
- *      void K_load_iode_ini()          Reads all sections of iode.in related to A2M.
- *      void K_save_iode_ini()          Rewrites all sections of iode.in related to A2M  with the current values of A2M* variables.
+ *      void B_A2mGetGnlParms()             Reads the Section "A2MGNL" of the iode.ini file 
+ *      void B_A2mSaveGnlParms()            Rewrites the Section "A2MGNL" of the iode.ini file with the current values of A2M* variables.
+ *      void B_A2mGetRtfParms()             Reads the Section "A2MRTF" of the iode.ini file
+ *      void B_A2mSetRtfTitle(U_ch* title)  Modifies the RTF title (A2M_RTF_TITLE)
+ *      void B_A2mSetRtfCopy(U_ch* title)   Modifies the RTF copyrights text (A2M_RTF_COPYRIGHT) 
+ *      void B_A2mSaveRtfParms()            Rewrites the Section "A2MRTF" of the iode.ini file with the current values of A2M* variables.
+ *      void B_A2mGetHtmlParms()            Reads the Section "A2MHTML" of the iode.ini file
+ *      void B_A2mSaveHtmlParms()           Rewrites the Section "A2MHTML" of the iode.ini file with the current values of A2M* variables.
+ *      void B_A2mGetGIFParms()             Reads the Section "A2MGIF" of the iode.ini file
+ *      void B_A2mSaveGIFParms()            Rewrites the Section "A2MGIF" of the iode.ini file with the current values of A2M* variables.
+ *      void B_A2mGetCsvParms()             Reads the Section "A2MCSV" of the iode.ini file
+ *      void B_A2mSaveCsvParms()            Rewrites the Section "A2MCSV" of the iode.ini file with the current values of A2M* variables.
+ *      void B_A2mGetMifParms()             Reads the Section "A2MMIF" of the iode.ini file
+ *      void B_A2mSaveMifParms()            Rewrites the Section "A2MMIF" of the iode.ini file with the current values of A2M* variables.
+ *      void B_A2mGetGdiParms()             Reads the Section "A2MGDI" of the iode.ini file
+ *      void B_A2mSaveGdiParms()            Rewrites the Section "A2MGDI" of the iode.ini file with the current values of A2M* variables.
+ *      void K_load_iode_ini()              Reads all sections of iode.in related to A2M.
+ *      void K_save_iode_ini()              Rewrites all sections of iode.in related to A2M  with the current values of A2M* variables.
  *  
  *  
  *  List of global variables
@@ -107,25 +109,35 @@ void B_A2mSaveGnlParms()
     B_IniWriteText("A2MGNL", "TAG", A2M_CURTAG);
 }
 
-
-int B_A2mSetRtfTitle(U_ch* title)
+/**
+ *  Modifies the RTF title (A2M_RTF_TITLE = title of the .hlp help file).
+ *  title is transformed in ANSI coding when saved in A2M_RTF_TITLE.
+ *  
+ *  @param [in] unsigned char* title    title in OEM coding
+ */
+void B_A2mSetRtfTitle(U_ch* title)
 {
-    if(title == 0) return(0);
+    if(title == 0) return;
     SCR_free(A2M_RTF_TITLE);
     A2M_RTF_TITLE = SCR_stracpy(title);
     SCR_strip(A2M_RTF_TITLE);
     SCR_OemToAnsi(A2M_RTF_TITLE, A2M_RTF_TITLE);
-    return(0);
 }
 
-int B_A2mSetRtfCopy(U_ch* title)
+
+/**
+ *  Modifies the RTF copyrights text (A2M_RTF_COPYRIGHT = copyright text of the .hlp help file).
+ *  title is transformed in ANSI coding when saved in A2M_RTF_COPYRIGHT.
+ *  
+ *  @param [in] unsigned char* title    title in OEM coding
+ */
+void B_A2mSetRtfCopy(U_ch* title)
 {
-    if(title == 0) return(0);
+    if(title == 0) return;
     SCR_free(A2M_RTF_COPYRIGHT);
     A2M_RTF_COPYRIGHT = SCR_stracpy(title);
     SCR_strip(A2M_RTF_COPYRIGHT);
     SCR_OemToAnsi(A2M_RTF_COPYRIGHT, A2M_RTF_COPYRIGHT);
-    return(0);
 }
 
 
