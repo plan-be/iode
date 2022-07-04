@@ -626,7 +626,7 @@ void Tests_PrintTables()
     int     rc;
 
     // Load the VAR workspace
-    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
+    K_RWS[K_VAR][0] = K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
     S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", "fun.var");
 
     // Load the TBL workspace
@@ -638,14 +638,30 @@ void Tests_PrintTables()
     rc = K_load_RWS(2, fullfilename);
     S4ASSERT(rc == 0, "K_load_RWS(2, \"%s\")", fullfilename);
     
-    // Print
+    
+    // Select a table
     tbl = KTPTR("C8_1");
     S4ASSERT(tbl != NULL, "KTPTR(\"C8_1\") not null.");
+    
+    // Select Print destination
+    W_dest("test1_tbl.htm", W_HTML);
+    //W_dest("", W_GDI);
+   
+    // Print tbl as table
     rc = T_print_tbl(tbl, "2000:5[1;2]");
-    S4ASSERT(rc == 0, "T_print_tbl(tbl, \"2000:5[1;2]\")");
-     
-    // Cleanup
-    T_free(tbl);
+    S4ASSERT(rc == 0, "T_print_tbl(tbl, \"2000:5[2]\")");
+    
+    // Print tbl as a graph
+    rc = T_graph_tbl_1(tbl, "2000/1999:15[1;2]", 1);
+    S4ASSERT(rc == 0, "T_graph_tbl_1(tbl, \"2000/1999:15[1;2]\", 1)");
+    
+    // Frees tbl
+    T_free(tbl);    
+
+    // Close the output file
+    W_close();
+    
+    // Cleanup the 2d VAR ws
     K_load_RWS(2, NULL);
 }
 
@@ -660,12 +676,11 @@ void Tests_PrintTables()
 //    kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
 //
 //    // Select output destination
-//    //W_dest("test1_estim.a2m", A2M_DESTA2M);
-//    //W_dest("test1_estim.rtf", A2M_DESTRTF);
-//    //W_dest("test1_estim.htm", A2M_DESTHTML);
-//    //W_dest("test.gdi", A2M_DESTGDIPRT); 
-//    W_dest("test.gdi", W_A2M); 
-//    
+//    //W_dest("test1_estim.a2m", W_A2M);
+//    //W_dest("test1_estim.rtf", W_RTF);
+//    W_dest("test1_estim.htm", W_HTML);
+//    //W_dest("test.gdi",        W_GDI); 
+//        
 //    U_test_load_fun_esv("fun");
 //    rc = KE_estim("ACAF", "1980Y1", "1996Y1");
 //    S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
