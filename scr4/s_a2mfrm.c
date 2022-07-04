@@ -203,6 +203,7 @@ char    *outfile;
     A2M_fdfrm = A2M_fdtbl = A2M_fdfrw = 0;
     A2M_TBLID = A2M_FRAMEID = 1;
     A2M_CUROBJ = 1;
+    A2MGRFOBJID = 1; // JMP 06/07/2022
 
     A2M_fdfrm = A2mFrOpenFile(outfile, 0L);
     A2M_fdtbl = A2mFrOpenFile(outfile, "frt");
