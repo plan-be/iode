@@ -10,14 +10,15 @@
     - [c\_cc.c](#T4)
     - [c\_calc.c](#T5)
     - [k\_print.c](#T6)
-    - [Translations](#T7)
-      - [k\_lang.c](#T8)
+    - [k\_graph.c](#T7)
+    - [Translations](#T8)
+      - [k\_lang.c](#T9)
 
 # IODE: Table calculations {#T1}
 
-When a table is printed, the cell values are simple texts or numbers calculated from the LEC formulas included in the table definition on a GSAMPLE.
+When a table is printed, the cell values are simple texts or numbers calculated from the LEC formulas included in the table definition on a GSAMPLE. The same is true for the line or bar charts generated from IODE TBLs.
 
-The table formulas don't give indication on the period(s), the files, nor the representation of the values (growth rates, differences...).
+Indeed, the table formulas don't give indication on the period(s), the files, nor the representation of the values (growth rates, differences...).
 
 The purpose of the GSAMPLE is to provide these informations.
 
@@ -117,18 +118,37 @@ Functions to generate IODE tables in A2M format based on TBL structures and GSAM
 |`unsigned char *T_get_title(TBL* tbl)`|Retrieves a TBL title, i.e. the contents of the first line of type KT\_TITLE|
 |`int T_print_tbl(TBL* tbl, char* smpl)`|Computes a table on a GSAMPLE and saves the result in A2M format|
 
-Global variables \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+Global variables
 
 |Variable|Default value|Description|
 |:---|:---|:---|
 |`char KT_sep`|` '&'`|Table cell separator|
 |`int K_NBDEC`|` -1`|Default nb of decimals|
 
-### Translations {#T7}
+### k\_graph.c {#T7}
+
+Functions to generate IODE graphs in A2M format based on a TBL structure and a GSAMPLE definition. Includes some A2M helper functions.
+
+|Variable|Default value|Description|
+|:---|:---|:---|
+|`int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)`|Initialises a graph by sending a2m commands to W\_printf().||
+|`int T_GraphTest(TBL *tbl)`|Displays the table tbl as a graph (in level) on the full sample of the current WS.||
+|`int T_GraphEnd()`|Ends a A2M graph definition by sending the a2m command ".ge" to W\_printf().||
+|`int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)`|Generates one graph in A2M format from a TBL struct and a GSAMPLE.||
+|`int T_GraphTitle(char *txt)`|Defines the graph title by sending a2m command ".gtitle" to W\_printf().||
+|`int T_GraphLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*time\* axis (.gty or .gtz, see a2m language) with its position, type and title.||
+|`int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*xy\* axis with its position, type and title.||
+|`int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y)`|Adds numerical data on a \*time\* graph line or bar.||
+|`int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y)`|Adds numerical data on a \*xy\* graph line or bar.||
+|`int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSAMPLE.||
+|`int T_find_opf(COLS *fcls, COL *cl)`|Tries to find the position in \*fcls of the opf (operation on files) in cl.||
+|`int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)`|Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.||
+
+### Translations {#T8}
 
 The printed/displayed version of computed tables and graphs contain texts that can be translated. Three languages are available: French, Dutch and English. The translated strings are grouped in `api/k_lang.c`.
 
-#### k\_lang.c {#T8}
+#### k\_lang.c {#T9}
 
 |Variables|Description|
 |:---|:---|
