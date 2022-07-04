@@ -17,4 +17,5 @@ add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h"
                               "KDB/kdb_variables.h" "KDB/kdb_variables.cpp"
                               "legacy/s_iode.c" "legacy/sb_gui.c" "legacy/b_legacy.c")
 
+set_source_files_properties(equation.cpp table.cpp PROPERTIES COMPILE_FLAGS -Zp1)
 target_link_libraries(iodecppapi PUBLIC iodeapi)
