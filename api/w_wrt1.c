@@ -5,13 +5,14 @@
  *  
  *  List of functions
  *  -----------------
- *      void W_print_enum(int n)            Starts an A2M enum paragraph (enum_*) of level n
- *      void W_print_cmd(int n)             Sends commands to A2M to start a paragraph containing code 
- *      void W_print_par(int n)             Starts an A2M normal paragraph (par_*) of level n
- *      void W_print_tit(int n)             Starts an A2M title paragraph (tit_*) of level n
- *      void W_print_pg_header(char* arg)   Sends the A2M command to change the page header
- *      void W_print_pg_footer(char* arg)   Sends the A2M command to change the page footer
- *      void W_print_rtf_topic(char* arg)   Sends the A2M command to set the next help topic
+ *      void W_print_enum(int n)             Starts an A2M enum paragraph (enum_*) of level n
+ *      void W_print_cmd(int n)              Sends commands to A2M to start a paragraph containing code 
+ *      void W_print_par(int n)              Starts an A2M normal paragraph (par_*) of level n
+ *      void W_print_tit(int n)              Starts an A2M title paragraph (tit_*) of level n
+ *      void W_print_pg_header(char* arg)    Sends the A2M command to change the page header
+ *      void W_print_pg_footer(char* arg)    Sends the A2M command to change the page footer
+ *      void W_print_rtf_topic(char* arg)    Sends the A2M command to set the next help topic
+ *      void W_print_tb(char* title, int nc) Starts a new table in A2M format
  */
 
 #include "iode.h"
@@ -125,4 +126,18 @@ void W_print_rtf_topic(char* arg)
         if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg);
         // if(W_type == A2M_DESTHTML && W_htmlhelp) W_printf( ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg); /* JMP 06-01-02 */
     }
+}
+
+
+/**
+ *  Starts a new table in A2M format.
+ *  
+ *  @param [in] char*   title  table title
+ *  @param [in] int     nc     number of columns
+ */
+void W_print_tb(char* title, int nc)
+{
+    W_printf(".tb %d\n", nc);
+    W_printf(".sep &\n");
+    W_printf(".ttitle %s\n", title);
 }
