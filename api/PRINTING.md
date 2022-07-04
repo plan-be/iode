@@ -173,4 +173,8 @@ Contains some shortcuts to A2M commands in the context of IODE printing.
 |`void W_print_cmd(int n)`|Sends commands to A2M to start a paragraph containing code|
 |`void W_print_par(int n)`|Starts an A2M normal paragraph (par\_\*) of level n.|
 |`void W_print_tit(int n)`|Starts an A2M title paragraph (tit\_\*) of level n.|
+|`void W_print_pg_header(char* arg)`|Sends the A2M command to change the page header|
+|`void W_print_pg_footer(char* arg)`|Sends the A2M command to change the page footer|
+|`void W_print_rtf_topic(char* arg)`|Sends the A2M command to set the next help topic|
+|`void W_print_tb(char* title, int nc)`|Starts a new table in A2M format|
 
