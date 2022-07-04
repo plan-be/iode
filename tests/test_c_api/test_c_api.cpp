@@ -561,7 +561,7 @@ TEST_F(IodeCAPITest, Tests_PrintTables)
     int     rc;
 
     // Load the VAR workspace
-    K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
+    K_RWS[K_VAR][0] = K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
     EXPECT_NE(kdbv, nullptr);
 
     // Load the TBL workspace
@@ -573,14 +573,30 @@ TEST_F(IodeCAPITest, Tests_PrintTables)
     rc = K_load_RWS(2, fullfilename);
     EXPECT_EQ(rc, 0);
 
-    // Print
+
+    // Select a table
     tbl = KTPTR("C8_1");
     EXPECT_NE(tbl, nullptr);
+
+    // Select Print destination
+    W_dest("test1_tbl.htm", W_HTML);
+    //W_dest("", W_GDI);
+
+    // Print tbl as table
     rc = T_print_tbl(tbl, "2000:5[1;2]");
     EXPECT_EQ(rc, 0);
 
-    // Cleanup
+    // Print tbl as a graph
+    rc = T_graph_tbl_1(tbl, "2000/1999:15[1;2]", 1);
+    EXPECT_EQ(rc, 0);
+
+    // Frees tbl
     T_free(tbl);
+
+    // Close the output file
+    W_close();
+
+    // Cleanup the 2d VAR ws
     K_load_RWS(2, NULL);
 }
 
