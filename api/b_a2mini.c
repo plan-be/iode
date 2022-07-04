@@ -3,6 +3,8 @@
  * 
  *  Functions to read and write A2M parameters from and into the current iode.ini file (defined in ODE_INIFILE). 
  *  
+ *  See http://www.xon.be/scr4/libs1/libs1454.htm for more details on the syntax and the global variables used by the A2M engine.
+ *  
  *  List of functions
  *  -----------------
  *      void B_A2mGetGnlParms()             Reads the Section "A2MGNL" of the iode.ini file 
@@ -58,21 +60,23 @@ int      A2M_GIF_TRCOLOR_NB;   // Number of the TR color of the gif graphs // JM
  *  for generating most of the output formats.
  *  
  *  Some other global vars are also (re-)defined here: KT_sep, W_a2mapp.
+ *  
+ *  See http://www.xon.be/scr4/libs1/libs1456.htm for more informations.
  */
 void B_A2mGetGnlParms()
 {
     extern int W_a2mapp; /* JMP 25-02-98 */
 
-    A2M_ESCCH   = B_IniReadChar("A2MGNL", "ESC", '\\');
-    A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '@');
+    A2M_ESCCH   = B_IniReadChar("A2MGNL", "ESC", '\\');     // See https://iode.plan.be/doku.php?id=caracteres_reserves
+    A2M_DEFCH   = B_IniReadChar("A2MGNL", "DEF", '&');      // Id.
+    A2M_CMDCH   = B_IniReadChar("A2MGNL", "CMD", '.');      // Id.
+    A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '@');      // id.
     KT_sep = A2M_SEPCH;                                     // JMP 1/5/2022
-    A2M_DEFCH   = B_IniReadChar("A2MGNL", "DEF", '&');
-    A2M_CMDCH   = B_IniReadChar("A2MGNL", "CMD", '.');
 
-    A2M_LFON    = B_IniReadYN("A2MGNL", "LFON",   0);
-    A2M_BLON    = B_IniReadYN("A2MGNL", "BLON",   0);
-    W_a2mapp    = B_IniReadYN("A2MGNL", "APPEND", 0);
-    A2M_GWIDTH  = 0.1 * B_IniReadNum("A2MGNL", "GW", 160);
+    A2M_LFON    = B_IniReadYN("A2MGNL", "LFON",   0);       // Keep special chars (carriage return, linefeed). See https://iode.plan.be/doku.php?id=blancs_et_sauts_de_lignes
+    A2M_BLON    = B_IniReadYN("A2MGNL", "BLON",   0);       // id.
+    W_a2mapp    = B_IniReadYN("A2MGNL", "APPEND", 0);       
+    A2M_GWIDTH  = 0.1 * B_IniReadNum("A2MGNL", "GW", 160);      
     A2M_GHEIGHT = 0.1 * B_IniReadNum("A2MGNL", "GH", 100);
 
     A2M_BACKCOLOR = B_IniReadChar("A2MGNL", "COL", 'b');
@@ -90,18 +94,18 @@ void B_A2mSaveGnlParms()
 {
     extern int W_a2mapp; /* JMP 25-02-98 */
     
-    B_IniWriteChar("A2MGNL", "ESC", A2M_ESCCH);
-    B_IniWriteChar("A2MGNL", "SEP", A2M_SEPCH);
-    B_IniWriteChar("A2MGNL", "DEF", A2M_DEFCH);
-    B_IniWriteChar("A2MGNL", "CMD", A2M_CMDCH);
+    B_IniWriteChar("A2MGNL", "ESC", A2M_ESCCH);             // See https://iode.plan.be/doku.php?id=caracteres_reserves
+    B_IniWriteChar("A2MGNL", "SEP", A2M_SEPCH);             // Id.
+    B_IniWriteChar("A2MGNL", "DEF", A2M_DEFCH);             // Id.
+    B_IniWriteChar("A2MGNL", "CMD", A2M_CMDCH);             // Id.
 
-    B_IniWriteYN("A2MGNL", "LFON",   A2M_LFON);
-    B_IniWriteYN("A2MGNL", "BLON",   A2M_BLON);
+    B_IniWriteYN("A2MGNL", "LFON",   A2M_LFON);             // See https://iode.plan.be/doku.php?id=blancs_et_sauts_de_lignes
+    B_IniWriteYN("A2MGNL", "BLON",   A2M_BLON);             // id.
     B_IniWriteYN("A2MGNL", "APPEND", W_a2mapp);
-    B_IniWriteNum("A2MGNL", "GW",    (int)(10 * A2M_GWIDTH ));
+    B_IniWriteNum("A2MGNL", "GW",    (int)(10 * A2M_GWIDTH ));  
     B_IniWriteNum("A2MGNL", "GH",    (int)(10 * A2M_GHEIGHT));
 
-    B_IniWriteChar("A2MGNL", "COL", A2M_BACKCOLOR);
+    B_IniWriteChar("A2MGNL", "COL", A2M_BACKCOLOR);         
     B_IniWriteNum ("A2MGNL", "PCT", A2M_BACKBRUSH);
     B_IniWriteNum ("A2MGNL", "BOX", A2M_BOXWIDTH );
     
@@ -147,13 +151,15 @@ void B_A2mSetRtfCopy(U_ch* title)
  *  
  *  These variables are A2M parameters used during the generation of files 
  *  in RTF format.
+ *  
+ *  See http://www.xon.be/scr4/libs1/libs1456.htm for more informations.
  */
 void B_A2mGetRtfParms()
 {
 //    B_A2mGetGnlParms();
     char title[512];
 
-    A2M_NUMBERS      = B_IniReadYN  ("A2MRTF", "PARANUM",       0);;
+    A2M_NUMBERS      = B_IniReadYN  ("A2MRTF", "PARANUM",       0);;    
     A2M_FONTSIZE     = B_IniReadNum ("A2MRTF", "FONTSIZE",      10);
     A2M_FONTFAMILY   = B_IniReadChar("A2MRTF", "FONTFAMILY",    'H');
     A2M_FONTINCR     = B_IniReadNum ("A2MRTF", "FONTINCR",      2);
@@ -183,6 +189,8 @@ void B_A2mGetRtfParms()
 
 /**
  *  Rewrites the Section "A2MRTF" of the iode.ini file  with the current values of A2M* variables.
+ *  
+ *  See http://www.xon.be/scr4/libs1/libs1456.htm for more informations.
  */
 void B_A2mSaveRtfParms()
 {
@@ -226,6 +234,8 @@ void B_A2mSaveRtfParms()
  *  
  *  These variables are A2M parameters used during the generation of files 
  *  in HTML format.
+ *  
+ *  See also http://www.xon.be/scr4/libs1/libs1460.htm.
  */
 void B_A2mGetHtmlParms()
 {
@@ -255,6 +265,8 @@ void B_A2mGetHtmlParms()
 
 /**
  *  Rewrites the Section "A2MHTML" of the iode.ini file  with the current values of A2M* variables.
+ *  
+ *  See also http://www.xon.be/scr4/libs1/libs1460.htm.
  */
 void B_A2mSaveHtmlParms()
 {
@@ -317,6 +329,8 @@ void B_A2mSaveCsvParms() {}
  *  
  *  These variables are A2M parameters used during the generation of files 
  *  in MIF (FrameMaker) format.
+ *  
+ *  See also http://www.xon.be/scr4/libs1/libs1458.htm.
  */
 void B_A2mGetMifParms()
 {
@@ -343,6 +357,8 @@ void B_A2mGetMifParms()
 
 /**
  *  Rewrites the Section "A2MMIF" of the iode.ini file  with the current values of A2M* variables.
+ *  
+ *  See also http://www.xon.be/scr4/libs1/libs1458.htm.
  */
 void B_A2mSaveMifParms()
 {
@@ -370,6 +386,8 @@ void B_A2mSaveMifParms()
  *  read values in A2M* variables (see code for the complete list).
  *  
  *  These variables are A2M parameters used to print A2M formated files.
+ *  
+ *  See also http://www.xon.be/scr4/libs1/libs1465.htm.
  */
 void B_A2mGetGdiParms()
 {
@@ -428,6 +446,8 @@ void B_A2mGetGdiParms()
 
 /**
  *  Rewrites the Section "A2MGDI" of the iode.ini file  with the current values of A2M* variables.
+ *  
+ *  See also http://www.xon.be/scr4/libs1/libs1465.htm.
  */
 void B_A2mSaveGdiParms()
 {
