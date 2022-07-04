@@ -415,17 +415,18 @@ extern void E_msg(char* fmt,...);
 extern void E_error(char* fmt,...);
 
 /* e_print.c */
-extern void E_print_enum(void);
-extern void E_BeginTbl(char *,int );
-extern void E_print_parms(void);
-extern void E_print_eqs(void);
-extern void E_print_instrs(void);
-extern void E_print_coefs(void);
-extern void E_print_mcorr(void);
-extern void E_print_mcorru(void);
-extern void E_print_eqres_1(int );
-extern void E_print_eqres_2(int );
-extern void E_print_eqres(int );
+//extern void E_print_enum(void);
+//extern void E_BeginTbl(char *,int );
+//extern void E_print_parms(void);
+//extern void E_print_eqs(void);
+//extern void E_print_instrs(void);
+//extern void E_print_coefs(void);
+//extern void E_print_mcorr(void);
+//extern void E_print_mcorru(void);
+//extern void E_print_eqres_1(int );
+//extern void E_print_eqres_2(int );
+//extern void E_print_eqres(int );
+extern int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res);
 extern int E_print_results(int ,int ,int ,int ,int );
 
 /* e_dftest.c */
@@ -486,18 +487,10 @@ extern double K_s_get_value (KDB* kdb, char*name);
 extern double K_s_get_relax (KDB* kdb, char*name);
 extern double K_s_get_stderr(KDB* kdb, char*name);
 extern double K_s_get_ttest (KDB* kdb, char*name);
-extern double K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
-extern double K_s_set_value (KDB* kdb, char*name, double val);    
-extern double K_s_set_relax (KDB* kdb, char*name, double val);
-extern double K_s_set_stderr(KDB* kdb, char*name, double val);
-
-
-
-
-
-
-
-
+extern int K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
+extern int K_s_set_value (KDB* kdb, char*name, double val);    
+extern int K_s_set_relax (KDB* kdb, char*name, double val);
+extern int K_s_set_stderr(KDB* kdb, char*name, double val);
 
 
 /* k_lst.c */
@@ -1043,7 +1036,7 @@ extern int B_IdtExecuteSclFiles(char *);
 extern int B_IdtExecuteTrace(char *);
 
 /* b_est.c */
-extern char **B_EqsSplitSmplName(char *,SAMPLE **);
+//extern char **B_EqsSplitSmplName(char *,SAMPLE **);
 extern int B_EqsEstimate(char *);
 extern int B_EqsEstimateEqs(SAMPLE *,char **);
 extern int B_EqsSetSample(char *);
@@ -1127,8 +1120,8 @@ extern int C_ReportPrompt(void);
 extern int C_PrintDestDecLang(int ,int ,int );
 extern void B_A2mGetGnlParms(void);
 extern void B_A2mGetRtfParms(void);
-extern int B_A2mSetRtfTitle(unsigned char *);
-extern int B_A2mSetRtfCopy(unsigned char *);
+extern void B_A2mSetRtfTitle(unsigned char *);
+extern void B_A2mSetRtfCopy(unsigned char *);
 extern void B_A2mGetCsvParms(void);
 extern void B_A2mGetHtmlParms(void);
 extern void B_A2mGetGdiParms(void);
@@ -1332,8 +1325,8 @@ extern int T_GraphEnd();
 extern int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
 extern int T_GraphLegend(int axis, int type, char *txt, char *fileop);
 extern int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls);
-extern int T_GraphLineData(int nb, IODE_REAL *x, IODE_REAL *y);
-extern int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
+//extern int T_GraphLineData(int nb, IODE_REAL *x, IODE_REAL *y);
+//extern int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
 extern int T_GraphTest(TBL *tbl);
 extern int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y);
 extern int T_GraphTitle(char *txt);
