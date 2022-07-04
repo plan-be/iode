@@ -28,15 +28,16 @@
  *    double K_e_dw    (KDB* kdb, char*name)            Returns dw    calculated during the last estimation of equation name
  *    double K_e_loglik(KDB* kdb, char*name)            Returns loglik calculated during the last estimation of equation name
  *
- *    double K_s_get_info(KDB* kdb, char*name, int info_nb)                 Retrieves a SCL info
- *    double K_s_get_value (KDB* kdb, char*name)                            Retrieves a SCL value
- *    double K_s_get_relax (KDB* kdb, char*name)                            Retrieves a SCL relax
- *    double K_s_get_stderr(KDB* kdb, char*name)                            Retrieves a SCL stderr
- *    double K_s_get_ttest (KDB* kdb, char*name)                            Retrieves a SCL ttest
- *    double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)     Sets a SCL info
- *    double K_s_set_value (KDB* kdb, char*name)                            Sets a SCL value
- *    double K_s_set_relax (KDB* kdb, char*name)                            Sets a SCL relax
- *    double K_s_set_stderr(KDB* kdb, char*name)                            Sets a SCL stderr
+ *    double K_s_get_info(KDB* kdb, char*name, int info_nb)             Retrieves a SCL info
+ *    double K_s_get_value (KDB* kdb, char*name)                        Retrieves a SCL value
+ *    double K_s_get_relax (KDB* kdb, char*name)                        Retrieves a SCL relax
+ *    double K_s_get_stderr(KDB* kdb, char*name)                        Retrieves a SCL stderr
+ *    double K_s_get_ttest (KDB* kdb, char*name)                        Retrieves a SCL ttest
+ *  
+ *    int K_s_set_info(KDB* kdb, char*name, int info_nb, double val)    Sets a SCL info
+ *    int K_s_set_value (KDB* kdb, char*name, double val)               Sets a SCL value
+ *    int K_s_set_relax (KDB* kdb, char*name, double val)               Sets a SCL relax
+ *    int K_s_set_stderr(KDB* kdb, char*name, double val)               Sets a SCL stderr
 
  *  See also defines in iode.h.
  */
@@ -290,7 +291,7 @@ double K_s_get_ttest (KDB* kdb, char*name) {return(K_s_get_info(kdb, name, 3));}
  *  @param [in] double  val      value to set to info_nb
  *  @return     int              -1 if scalar not found, -2 if info_nb illegal, 0 otherwise
  */
-double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)
+int K_s_set_info(KDB* kdb, char*name, int info_nb, double val)
 {
     int     pos;
     SCL     *scl;
@@ -308,7 +309,7 @@ double K_s_set_info(KDB* kdb, char*name, int info_nb, double val)
     return(0);
 }
 
-double K_s_set_value (KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 0, val));}
-double K_s_set_relax (KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 1, val));}
-double K_s_set_stderr(KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 2, val));}
+int K_s_set_value (KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 0, val));}
+int K_s_set_relax (KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 1, val));}
+int K_s_set_stderr(KDB* kdb, char*name, double val) {return(K_s_set_info(kdb, name, 2, val));}
 
