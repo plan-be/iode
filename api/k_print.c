@@ -4,6 +4,8 @@
  *  Functions to generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
  *  Includes some A2M helper functions. 
  *  
+ *  Note that the functions needed to generate graphs from tables can be found in k_graph.c.
+ *  
  *  List of functions 
  *  -----------------
  *      int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)            Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL
@@ -235,7 +237,8 @@ static int T_print_line(TBL* tbl, int i, COLS* cls)
  *  Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line KT_FILES. 
  *   
  *  @param [in] COLS*   cls     list of columns (from GSAMPLE)
- *  @return     char**          NULL or table of filenames in the form "[<file number>] <filename>"
+ *  @return     char**          NULL if one of the ref files is not loaded in K_RWS
+ *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
  *  
  */
 
