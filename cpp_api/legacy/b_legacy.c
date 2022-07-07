@@ -307,22 +307,6 @@ RP_proc_free_all()
     SCR_free(REP_PROCS);
 }
 
-// =================== b_print.c =================== //
-
-unsigned char* T_get_title(tbl)     /* JMP 13-11-93 */
-TBL* tbl;
-{
-    int     k;
-    for (k = 0; k < T_NL(tbl); k++)
-        if (tbl->t_line[k].tl_type == KT_TITLE) break;
-    if (k == T_NL(tbl) ||
-        ((TCELL*)tbl->t_line[k].tl_val)->tc_val == 0)
-        strcpy(STATIC_BUF, "No title");
-    else
-        SCR_strlcpy(STATIC_BUF, (char*)((TCELL*)tbl->t_line[k].tl_val)->tc_val, STATIC_BUF_LG);
-    return(STATIC_BUF);
-}
-
 // =================== b_base.c =================== //
 
 int     B_NBDEC = 2;
