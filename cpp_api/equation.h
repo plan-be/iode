@@ -14,9 +14,9 @@ struct Equation
     EQ* c_equation;
 
 public:
-    Equation(const int pos);
+    Equation(const int pos, KDB* kdb = nullptr);
 
-    Equation(const std::string& name);
+    Equation(const std::string& name, KDB* kdb = nullptr);
 
     Equation(const Equation& eq);
 

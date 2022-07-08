@@ -35,20 +35,21 @@ bool equation_equal(EQ* c_eq1, EQ* c_eq2)
 }
 
 
-Equation::Equation(const int pos)
+Equation::Equation(const int pos, KDB* kdb)
 {
-    int nb_objs = K_WS[I_EQUATIONS] != NULL ? K_WS[I_EQUATIONS]->k_nb : 0;
-    if (pos < 0 || pos > nb_objs) throw std::runtime_error("Equation: invalid position " + std::to_string(pos));
+    if (!kdb) kdb = K_WS[I_EQUATIONS];
+    if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error("Equation: invalid position " + std::to_string(pos));
     // Note: KEVAL allocate a new pointer EQ*
-    c_equation = KEVAL(K_WS[I_EQUATIONS], pos);
+    c_equation = KEVAL(kdb, pos);
 }
 
-Equation::Equation(const std::string& name)
+Equation::Equation(const std::string& name, KDB* kdb)
 {
-    int pos = K_find(K_WS[I_EQUATIONS], const_cast<char*>(name.c_str()));
+    if (!kdb) kdb = K_WS[I_EQUATIONS];
+    int pos = K_find(kdb, const_cast<char*>(name.c_str()));
     if (pos < 0) throw std::runtime_error("Equation with name " + name + " does not exist.");
     // Note: KEVAL allocate a new pointer EQ*
-    c_equation = KEVAL(K_WS[I_EQUATIONS], pos);
+    c_equation = KEVAL(kdb, pos);
 }
 
 Equation::Equation(const Equation& eq)
