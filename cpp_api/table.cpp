@@ -146,20 +146,21 @@ bool table_equal(TBL* c_table1, TBL* c_table2)
 }
 
 
-Table::Table(const int pos)
+Table::Table(const int pos, KDB* kdb)
 {
-	int nb_objs = K_WS[I_TABLES] != NULL ? K_WS[I_TABLES]->k_nb : 0;
-	if (pos < 0 || pos > nb_objs) throw std::runtime_error("Table: invalid position " + std::to_string(pos));
+	if (!kdb) kdb = K_WS[I_TABLES];
+	if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error("Table: invalid position " + std::to_string(pos));
 	// Note: KTVAL allocate a new pointer TBL*
-	c_table = KTVAL(K_WS[I_TABLES], pos);
+	c_table = KTVAL(kdb, pos);
 }
 
-Table::Table(const std::string& name)
+Table::Table(const std::string& name, KDB* kdb)
 {
-	int pos = K_find(K_WS[I_TABLES], const_cast<char*>(name.c_str()));
+	if (!kdb) kdb = K_WS[I_TABLES];
+	int pos = K_find(kdb, const_cast<char*>(name.c_str()));
 	if (pos < 0) throw std::runtime_error("Table with name " + name + " does not exist.");
 	// Note: KTVAL allocate a new pointer TBL*
-	c_table = KTVAL(K_WS[I_TABLES], pos);
+	c_table = KTVAL(kdb, pos);
 }
 
 Table::Table(const Table& table)

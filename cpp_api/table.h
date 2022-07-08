@@ -86,9 +86,9 @@ struct Table
 	TBL* c_table;
 
 public:
-	Table(const int pos);
+	Table(const int pos, KDB* kdb = nullptr);
 
-	Table(const std::string& name);
+	Table(const std::string& name, KDB* kdb = nullptr);
 
 	Table(const Table& table);
 
