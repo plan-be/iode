@@ -3,6 +3,10 @@
  * 
  *  Implementation of the Dickey-Fuller test.
  *  
+ *  TODO: 
+ *      1. Use API "K_" functions instead of B_DataUpdateEqs() and B_EqsEstimateEqs()
+ *      2. Implement tests
+ *  
  *  List of functions 
  *  -----------------
  *      IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)      : implementation of the Dickey-Fuller test
@@ -96,7 +100,8 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
     if(rc) return(rc);
     rc = B_EqsEstimateEqs(smpl, eqs);
 
-    B_DataDelete("_DF", K_EQS);
+    //B_DataDelete("_DF", K_EQS);
+    K_del_by_name(KE_WS, "_DF");
     SCR_free_tbl(eqs);
     return(rc);
 }
@@ -137,21 +142,25 @@ IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)
     /* Dickey Fuller */
     // Construction de l'équation à estimer, partie par partie selon les parms
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    B_DataCreate("df_", K_SCL);
-
+    //B_DataCreate("df_", K_SCL);
+    K_add(KS_WS, "df_", NULL);
+    
     if(drift) {
         sprintf(buf + strlen(buf), "+ df_d");
-        B_DataCreate("df_d", K_SCL);
+        //B_DataCreate("df_d", K_SCL);
+        K_add(KS_WS, "df_d", NULL);
     }
 
     if(trend) {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        B_DataCreate("df_t", K_SCL);
+        //B_DataCreate("df_t", K_SCL);
+        K_add(KS_WS, "df_t", NULL);
     }
 
     for(i = 1 ; i <= order ; i++) {
         sprintf(scl, "df%d", i);
-        B_DataCreate(scl, K_SCL);
+        //B_DataCreate(scl, K_SCL);
+        K_add(KS_WS, scl, NULL);
     }
 
     if(order) {
@@ -173,25 +182,29 @@ IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)
     pos = 0;
     if(res) E_SclToReal("df_", res + pos);
     pos += 3;
-    B_DataDelete("df_", K_SCL);
+    //B_DataDelete("df_", K_SCL);
+    K_del_by_name(KS_WS, "df_");
 
     if(drift) {
         if(res) E_SclToReal("df_d", res + pos);
         pos += 3;
-        B_DataDelete("df_d", K_SCL);
+        //B_DataDelete("df_d", K_SCL);
+        K_del_by_name(KS_WS, "df_d");
     }
 
     if(trend) {
         if(res) E_SclToReal("df_t", res + pos);
         pos += 3;
-        B_DataDelete("df_t", K_SCL);
+        //B_DataDelete("df_t", K_SCL);
+        K_del_by_name(KS_WS, "df_t");
     }
 
     for(i = 1 ; i <= order ; i++) {
         sprintf(buf, "df%d", i);
         if(res) E_SclToReal(buf, res + pos);
         pos += 3;
-        B_DataDelete(buf, K_SCL);
+        //B_DataDelete(buf, K_SCL);
+        K_del_by_name(KS_WS, buf);
     }
 
     return(res);
