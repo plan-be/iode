@@ -798,6 +798,8 @@ void Tests_Estimation()
 {
     int         rc;
     void        (*kmsg_super_ptr)(char*);
+    SAMPLE      *smpl;
+    IODE_REAL   r2;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation");
@@ -828,9 +830,17 @@ void Tests_Estimation()
     //W_flush();
     W_close();
  
+    
+    // E_StepWise
+    smpl = PER_atosmpl("1980Y1", "1995Y1");
+    r2 = E_StepWise(smpl, "ACAF", "", "r2");
+    S4ASSERT(U_test_eq(r2, 0.848519), "E_StepWize(\"1980Y1:1995Y1\", \"ACAF\", \"\", \"r2\") == 0.848519");
+    SCR_free(smpl);
+    
     // Reset initial kmsg fn
     kmsg_super = kmsg_super_ptr; // Reset initial output to 
     U_test_reset_a2m_msgs();
+
 }
 
 void Tests_ALIGN()
