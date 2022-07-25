@@ -1,46 +1,41 @@
 /**
  *  @header4iode
  * 
- *  TODO: éliminer les B_update et autres fonctions de huat niveau
+ *  Function to select the coefficients to be estimated in an equation: for a given equation, 
+ *  different combination of "estimated" (i.e. relax <> 0) coefficients are tested and the selected 
+ *  combination must:
+ *      - verify a given condition and
+ *      - give the best statistical test (fstat or r2) 
+ *  
+ *  The selection is done by blocking all possible combinaisons of coefficients.
+ *  
+ *  TODO: rewrite and standardize these very obscure functions.
  *  
  *  List of functions 
  *  -----------------
- *      
- *  Utilities
- *  ---------
+ *      IODE_REAL C_evallec(char* lec, int t)                                    Evaluates a LEC expression at a specific period of time.
+ *      IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
+ *                                                                                  coefficient configuration that gives 
+ *                                                                                  the best statistical result (for a chosen test).
  */
 
 #include "iode.h"
 
-/*
- IODE_REAL    C_evallec(char *lec,int t)
-{
-    CLEC    *clec;
-    IODE_REAL    x = L_NAN;
-    int k;
-
-    SCR_strip(lec);
-    if(lec[0]) {
-	clec = L_cc(lec);
-	    for(k=0;k < clec->nb_names;k++)
-		if(K_find(K_WS[K_SCL],clec->lnames[k].name)== -1)
-		    {kerror(0,"Coef %s not found",clec->lnames[k].name );
-		     return(-1);}
-	if(clec == NULL) {
-	    B_seterror("Syntax error %.80s", L_error());
-	    return(x);
-			 }
-	if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[K_SCL], clec))
-	    x = L_exec(K_WS[K_VAR], K_WS[K_SCL], clec, t);
-	SW_nfree(clec);
-		}
-
-    return(x);
-}
-/* JMP 05-10-00 */
+// Function declarations
+static int E_GetScls(CLEC* clec, char*** scl);
+static void E_SetScl(int relax, char* name);
+IODE_REAL C_evallec(char* lec, int t);
+static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test);
+IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
 
 
-/*charge le tableau scl des noms de scalaires de l'équation déinie par forme clec*/
+/**
+ *  Retrieves (in a list of char*) the names of all scalars in a CLEC structure.
+ *  
+ *  @param [in] CLEC*   clec    compiled LEC expression
+ *  @param [in] char*** scl     table of SCL names found in clec
+ *  @return     int             nb of scalars in clec
+ */
 static int E_GetScls(CLEC* clec, char*** scl)                                            
 {
     int     j, nbscl = 0;
@@ -55,8 +50,16 @@ static int E_GetScls(CLEC* clec, char*** scl)
 }
 
 
-/*Met le relax du scalaire name à relax*/
-static E_SetScl(int relax, char* name)                                             
+/**
+ *  Sets the default value of a scalar (value and relax) depending on its relax value.
+ *  
+ *  @param [in] int     relax   if 1, sets the scalar VALUE to 0.9 and its relax to 1.0
+ *                              else, sets the scalar VALUE to 0.0 and its relax to 0.0
+ *  @param [in] char*   name    name of the SCL
+ *  @return 
+ *  
+ */
+static void E_SetScl(int relax, char* name)                                             
 {
     char    buf[128];
 
@@ -75,21 +78,67 @@ static E_SetScl(int relax, char* name)
     //B_DataUpdate(buf, K_SCL);
 }
 
-/*Effectue l'estimation de l'équation eqs pour la combinaison i des nbscl scalaires 
-en tenant compte des valeurs initiales des relax*/
-static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char*test)   
+
+/**
+ *  Evaluates a LEC expression at a specific period of time.
+ *  
+ *  @param [in] char*       lec     LEC expression
+ *  @param [in] int         t       period of calculation (starts at 0 = first period of the sample)
+ *  @return     IODE_REAL           L_NAN on error, lec[t] on success
+ */
+ 
+IODE_REAL C_evallec(char* lec, int t)
 {
-    int     j, cscl, nscl;
-    char    buf[512];
-    IODE_REAL    res[3];
-    char    etest[20];
+    CLEC    *clec;
+    IODE_REAL    x = L_NAN;
+
+    SCR_strip(lec);
+    if(lec[0]) {
+        clec = L_cc(lec);
+        if(clec == NULL) {
+            B_seterror("Syntax error %.80s", L_error());
+            return(x);
+        }
+        if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[K_SCL], clec))
+            x = L_exec(K_WS[K_VAR], K_WS[K_SCL], clec, t);
+        SW_nfree(clec);
+    }
+
+    return(x);
+}
+
+
+/**
+ *  Sub function of E_StepWize(). 
+ *  Estimates an equation after having blocked or released some coefficients according to 
+ *  the current run number (see E_StepWise() for a description of the "runs").
+ *  
+ *  If a solution is reached for the combination of coefficients, returns the value of the statistical test ("r2" or "fstat") retrieved from
+ *  the generated scalar e0_<test>.
+ *  
+ *  @param [in] int         i       current run number
+ *  @param [in] int         nbscl   total number of coefficients in *eqs
+ *  @param [in] char**      scl     list of scalar names
+ *  @param [in] SAMPLE*     smpl    estimation sample
+ *  @param [in] char**      eqs     table of equation names (only eqs[0] is used)
+ *  @param [in] char*       test    name of the statistical test to optimize: "fstat" or "r2"
+ *  @return     IODE_REAL           value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
+ */
+ 
+static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test)   
+{
+    int         j, cscl, nscl, rc;
+    char        buf[512];
+    IODE_REAL   res;
+    char        etest[20];
 
     cscl = 1;
     nscl = 0;
     buf[0] = 0;
     for(j = 0; j < nbscl; j++) {     /*Fixe les relax des scalaires*/
-
-        if(i & cscl) {
+        // for the i-th run, the j-th scalar is "activated" is i & cscl
+        
+        if(i & cscl) {                  // ! binary &, not logical && !
             E_SetScl(1, scl[j]);
             strcat(buf, scl[j]);
             strcat(buf, " ");
@@ -97,27 +146,80 @@ static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char**
         }
         else
             E_SetScl(0, scl[j]);
-        cscl = cscl * 2;
+        
+        cscl = cscl * 2;               // 0001 -> 0010 -> 0100 -> 1000
     }
 
     if(nscl > 1) {                   /*Effectue l'estimation si plus d'un relax est != 0 */
-        B_EqsEstimateEqs(smpl,eqs);
+        //B_EqsEstimateEqs(smpl,eqs);
+        rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs);
         etest[0]=0;
         strcat(etest,"e0_");
         strcat(etest,test);
-        E_SclToReal(etest, res);
-        kmsg("%s: scalars : %s, fstat=%lf", eqs[0], buf, res[0]);
-        L_debug("%s: scalars : %s, fstat=%lf\n", eqs[0], buf, res[0]);
+        //E_SclToReal(etest, res);
+        res = K_s_get_value(KS_WS, etest); // JMP 09/07/2022
+        kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);        // JMP 08/07/2022
+        L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);   // JMP 08/07/2022
     }
-    else res[0] = 0.0;
-    return(res[0]);
+    else res = 0.0;
+    return(res);
 }
 
-/*Effectue toutes les estimations pour toutes les combinaisons en créant des nouveaux 
-coefficients pour toutes les combinaisons qui vérifient la condition et en retenant la combinaison qui donne 
-le meilleur fstat pour les coef de l'équation eqs
-*/
-IODE_REAL    E_StepWise(SAMPLE* smpl, char* arg,char* cond,char* test)                       
+
+/**
+ *  For a given equation, tries all combinations of coefficient "relax" parameters (0 or 0.9) and saves 
+ *  the relax configuration that gives the best statistical result (for a chosen test).
+ *  
+ *  Example:
+ *      endo1 := c1 + c2 * A + c3 * B
+ *      nbscl : 3
+ *  
+ *      RUN 1 (i = 1)  => c1
+ *                               RUN & CSCL
+ *      j=0: 001 & 001  = 001 => c1 est
+ *      j=1: 001 & 010  = 000 => c2 non est
+ *      j=2: 001 & 100  = 000 => c3 non est
+ *  
+ *      RUN 2 (i = 2) => c2
+ *      j=0: 010 & 001 = 000 => c1 non est
+ *      j=1: 010 & 010 = 010 => c2 est
+ *      j=2: 010 & 100 = 000 => c3 non est
+ *
+ *      RUN 3 (i = 3) => c1, c2
+ *      j=0: 011 & 001 = 001 => c1 est
+ *      j=1: 011 & 010 = 010 => c2 est
+ *      j=2: 011 & 100 = 000 => c3 non est
+ *
+ *      RUN 4 (i = 4) => c3 
+ *      j=0: 100 & 001 = 000 => c1 non est
+ *      j=1: 100 & 010 = 000 => c2 non est
+ *      j=2: 100 & 100 = 100 => c3 est
+ * 
+ *      RUN 5 (i = 5) => c1, c3
+ *      j=0: 101 & 001 = 001 => c1 est
+ *      j=1: 101 & 010 = 000 => c2 non est
+ *      j=2: 101 & 100 = 100 => c3 est
+ *
+ *      RUN 6 (i = 6) => c2, c3
+ *      j=0: 110 & 001 = 000 => c1 non est
+ *      j=1: 110 & 010 = 010 => c2 est
+ *      j=2: 110 & 100 = 100 => c3 est
+ *
+ *      RUN 7 (i = 7) => c1, c2, c3
+ *      j=0: 111 & 001 = 001 => c1 est
+ *      j=1: 111 & 010 = 010 => c2 est
+ *      j=2: 111 & 100 = 100 => c3 est
+
+ *
+ *  @param [in] SAMPLE* smpl    estimation SAMPLE
+ *  @param [in] char*   eqname  equation name (if more than one name, only the first is used)
+ *  @param [in] char*   cond    LEC expression that must satisfy "cond[0] == 0" to accept the estimation (?)
+ *  @param [in] char*   test    name of the test to optimize: "n", "k", "stdev", "meany", "ssres", "stderr", 
+ *                                              "fstat" , "r2"    , "r2adj" , "dw" or "loglik"
+ *  @return     int             best test "test" value
+ */
+
+IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
 {
     int         i, l=0,nbscl, nbcom;
     int         pos, lasti;
@@ -126,115 +228,34 @@ IODE_REAL    E_StepWise(SAMPLE* smpl, char* arg,char* cond,char* test)
     CLEC        *cl;
     char        **scl = NULL, **eqs = NULL;
 
-    eqs = B_ainit_chk(arg, NULL, 0);                          /*Cr‚e le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)*/
+    // Cr‚e le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
+    eqs = B_ainit_chk(eqname, NULL, 0);         
     if(eqs == NULL) return(0.0);
     pos = K_find(K_WS[K_EQS], eqs[0]);
     if(pos < 0) return(0.0);
 
-    eq = KEVAL(K_WS[K_EQS], pos);                             /*Construit le tableau de scalaire contenus dans l'équation eqs*/
+    // Construit le tableau de scalaires contenus dans l'équation eqs
+    eq = KEVAL(K_WS[K_EQS], pos);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
     E_free(eq);
 
+    // Effectue les estimations pour toutes les combi
     nbcom = (int)pow(2.0, nbscl);
     lnumtest = -999999999999.0;
     lasti = 0;
-    for(i = 1; i < nbcom; i++) {                             /* Effectue les estimations pour toutes les combi*/
-        numtest = E_StepWise_1(i, nbscl, scl, smpl, eqs,test);
-        /*print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);*/  /*Aide pour la programmation*/
-        if(lnumtest < numtest && C_evallec(cond,0)!=0 && numtest!=0) {   /*Sauve la combi qui a le meilleur fstat*/
+    for(i = 1; i < nbcom; i++) {                                                
+        numtest = E_StepWise_1(i, nbscl, scl, smpl, eqs, test);
+        /*print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);*/   /*Aide pour la programmation*/
+        if(lnumtest < numtest && C_evallec(cond,0)!=0 && numtest!=0) {          /*Sauve la combi qui a le meilleur fstat*/
             lasti = i;
             lnumtest = numtest;
         }
     }
 
-    numtest = E_StepWise_1(lasti, nbscl, scl, smpl, eqs,test);            /*Effectue l'estimation pour la meilleur combi*/
+    // Refait l'estimation pour la meilleure combi
+    numtest = E_StepWise_1(lasti, nbscl, scl, smpl, eqs,test);    
     SCR_free_tbl(eqs);
     SCR_free_tbl(scl);
     return(numtest);
 }
-
-
-static int check_scl_var(char *eqs)
-{
-    int pos,j;
-    EQ *eq;
-    CLEC *cl;
-    char buf[1024];
-
-    pos = K_find(K_WS[K_EQS], eqs);
-    eq = KEVAL(K_WS[K_EQS], pos);
-    cl = eq->clec;
-
-    for(j = 0 ; j < cl->nb_names ; j++) {
-        if(L_ISCOEF(cl->lnames[j].name)) {
-            if(K_find(K_WS[K_SCL],cl->lnames[j].name)== -1) {
-                sprintf(buf, "%s 0.9 1", cl->lnames[j].name);
-                B_DataUpdate(buf, K_SCL);
-            }
-        }
-        else {
-            if(K_find(K_WS[K_VAR],cl->lnames[j].name)== -1) {
-                kerror(0,"Var %s from %s not found",cl->lnames[j].name,eqs);
-                return(-1);
-            }
-        }
-    }
-    return(1);
-}
-
-/*Lit les arguments from, to, eqs, et cond et effectue les estimations (fonction principale)*/
-int B_EqsStepWise(char* arg)                                                 
-{
-    int     lg1, lg2,lg3,lg4,lg5;
-    char    from[16], to[16], eqs[30], cond[1024], test[20];
-    SAMPLE  *smpl;
-
-    lg1 = B_get_arg0(from, arg, 15);                              /*Lit les arguments*/
-    lg2 = B_get_arg0(to, arg + lg1, 15);
-    lg3 = B_get_arg0(eqs, arg + lg1 + lg2, 29);
-    lg4 = B_get_arg0(cond, arg + lg1 + lg2 + lg3, 1023);
-    lg5 = B_get_arg0(test, arg + lg1 + lg2 + lg3 + lg4, 19);
-
-    smpl = PER_atosmpl(from, to);                                /*Calcul le sample*/
-
-    if(smpl == NULL) {                                           /*GŠre les erreurs de sample*/
-        kerror(0,"Incorrect sample");
-        return(1);
-    }
-    if(K_find(K_WS[K_EQS],eqs)== -1) {                            /*GŠre les erreurs d'‚quation*/
-        kerror(0,"Eqs %s not found",eqs);
-        return(1);
-    }
-
-    if(C_evallec(cond,0)==-1)return(1);                          /*GŠre les erreurs de condition*/
-
-    strcpy(test,SCR_lower(test));
-    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0) {        /*GŠre les erreurs de test*/
-        kerror(0,"Incorrect test name");
-        return(1);
-    }
-    if(check_scl_var(eqs) == -1)return(1);                      /*GŠre les erreurs de pr‚sence des scalaires et variables de l'‚quation*/
-    E_StepWise(smpl,eqs,cond,test);                                   /*Effectue les estimations*/
-    return(1);
-}
-
-//print_result(double F,double R,double cond,char **tab_scl,int nb_scls,int combi,char *cond_string)  /*Imprime le r‚sultat d'un estimation*/
-//{
-//    double res[3];
-//    char *tmp;
-//    FILE *output;
-//    int j;
-//
-//    tmp=(char *)malloc(30);
-//    output=fopen("stepwise.txt","a");
-//    fprintf(output,"\nStep %d : (F_Stat = %f;R2 = %f;Condition(%s) = %f) ",combi,F,R,cond_string,cond);
-//    for(j=0; j<nb_scls; j++) {
-//        sprintf(tmp,"%s",tab_scl[j]);
-//        E_SclToReal(tmp,res);
-//        fprintf(output,"%s = %f ",tab_scl[j],res[0]);
-//    }
-//    SCR_free(tmp);
-//    fclose(output);
-//}
-

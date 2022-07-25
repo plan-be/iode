@@ -190,6 +190,12 @@ Implementation of the Dickey\-Fuller test (presence of a unit root in an autoreg
 
 ### e\_step.c {#T11}
 
+Function to select the coefficients to be estimated in an equation: for a given equation, different combination of "estimated" (i.e. relax <> 0) coefficients are tested and the selected combination must: \- verify a given condition and \- give the best statistical test (fstat or r2)
+
+The selection is done by blocking all possible combinaisons of coefficients.
+
 |Syntax|Description|
 |:---|:---|
+|`IODE_REAL C_evallec(char* lec, int t)`|Evaluates a LEC expression at a specific period of time.|
+|`IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
 
