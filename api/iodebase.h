@@ -383,6 +383,7 @@ extern int E_scl_in_eq(int ,int );
 
 /* e_step.c */
 extern IODE_REAL C_evallec(char *,int);
+extern IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
 
 /* e_tests.c */
 extern double M_c_line(MAT *,int ,int );
@@ -876,7 +877,7 @@ extern int B_DataUpdateTbl(char *,char *);
 extern int B_DataUpdate(char *,int );
 extern int B_DataSearch(char *,int );
 extern int B_DataEditCnf(char *);
-extern int my_strcmp(const void *,const void *);
+// extern int my_strcmp(const void *,const void *);
 extern int B_DataListSort(char *);
 extern int B_DataDisplayGraph(char *);
 extern int B_DataPrintGraph(char *);
@@ -1044,6 +1045,9 @@ extern int B_EqsSetMethod(char *);
 extern int B_EqsSetBloc(char *);
 extern int B_EqsSetCmt(char *);
 extern int B_EqsSetInstrs(char *);
+
+/* b_step.c */
+extern int B_EqsStepWise(char* arg);
 
 /* b_htol.c */
 extern int B_WsHtoLLast(char *);

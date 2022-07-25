@@ -42,13 +42,13 @@ extern  int     E_T, E_NCE;
  *  
  *  The created (or replaced) coefficient name is e<eqnb>_<txt>. 
  *    
- *  That method allows the use of estimation tests / results in reports.
+ *  That method is useful for using estimation tests in reports.
  *  
  *  See E_tests2scl() for a complete list of scalars.
  *
- *  @param [in] val  Description for val
- *  @param [in] eqnb Description for eqnb
- *  @param [in] txt  Description for txt
+ *  @param [in] double  val  value to put in scalar whose name suffix is txt 
+ *  @param [in] int     eqnb position of the equation in the estimated block
+ *  @param [in] char*   txt  suffix of the scalar to modify (stdev, meany...)
  *  
  */
 
