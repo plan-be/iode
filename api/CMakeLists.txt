@@ -17,7 +17,7 @@ set (KPRINT k_print.c k_graph.c)
 set (WRT w_wrt.c w_wrt1.c)
 set (INI b_iodeini.c)
 set (A2M b_a2mini.c)
-set (ESTIM k_est.c e_error.c e_est.c e_prep.c e_print.c e_step.c e_tests.c)
+set (ESTIM k_est.c e_error.c e_est.c e_prep.c e_print.c e_step.c e_tests.c e_dftest.c)
  
 set (SOURCES 
 		${UTILS} 
