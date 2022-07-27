@@ -272,6 +272,56 @@ void B_reset_error()
     B_ERROR_NB = 0;
 }
 
+// =================== b_model.c =================== //
+
+int KE_compile(KDB* dbe)
+{
+    int    i, pos, rc;
+    char  *name, *lec;
+    EQ    *eq, *eq2;
+
+    if (dbe == NULL || KNB(dbe) == 0) {
+        B_seterrn(110);
+        return(-1);
+    }
+
+    for (i = 0; i < KNB(dbe); i++) {
+        eq = KEVAL(dbe, i);
+
+        // B_DataUpdateEqs(KONAME(dbe, i), eq->lec, NULL, 0, NULL, NULL, NULL, NULL, 0);
+        // -------------
+        name = KONAME(dbe, i);
+        lec = eq->lec;
+
+        pos = K_find(K_WS[K_EQS], name);
+        if (pos < 0) eq2 = (EQ*) SW_nalloc(sizeof(EQ));
+        else eq2 = KEVAL(K_WS[K_EQS], pos);
+
+        if (lec != NULL) {
+            SW_nfree(eq2->lec);
+            eq2->lec = SCR_stracpy(lec);
+        }
+
+        eq2->method = 0;
+        eq2->date = 0L;
+        memset(&(eq2->tests), 0, EQS_NBTESTS * sizeof(float));
+
+        rc = K_add(K_WS[K_EQS], name, eq2, name);
+        if (rc < 0) {
+            rc = -1;
+            B_seterror(L_error());
+        }
+        else rc = 0;
+
+        E_free(eq2);
+        // -------------
+
+        E_free(eq);
+    }
+
+    return rc;
+}
+
 // =================== b_api.c =================== //
 
 #include "../../api/iodeapi.h"
