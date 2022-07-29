@@ -1000,7 +1000,7 @@ void Tests_SWAP()
 // ================================================================================================
 
 
-void U_test_init(int argc, char** argv)
+void U_test_init()
 {
     static int  done = 0;
     
@@ -1032,7 +1032,7 @@ int main(int argc, char **argv)
     }
     
     // Initialises super functions / empty WS / error messages
-    U_test_init(argc, argv);
+    U_test_init();
     
 
 //    // tests temporaires
