@@ -403,7 +403,9 @@ public:
 	    if(done) return;
 	    done = 1;
 	
-	    IODE_assign_super_API();            // set *_super fn pointers
+	    B_IodeMsgPath();            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
+	
+	    IODE_assign_super_API();    // set *_super fn pointers
 	    // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub
 	    K_init_ws(0);                       // Initialises 7 empty WS
 	    K_load_iode_ini();
@@ -414,6 +416,22 @@ public:
 	//void TearDown() override {}
 
 };
+
+
+TEST_F(IodeCAPITest, Tests_IODEMSG)
+{
+    char    *msg;
+
+    U_test_print_title("Tests IODEMSG");
+    msg = B_msg(16); // Sample modified
+    EXPECT_TRUE(U_cmp_strs(msg, " Sample modified"));
+
+    //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
+    //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
+    //B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
+    //B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
+    //B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
+}
 
 
 TEST_F(IodeCAPITest, Tests_BUF)
@@ -723,6 +741,8 @@ TEST_F(IodeCAPITest, Tests_Estimation)
 {
     int         rc;
     void        (*kmsg_super_ptr)(char*);
+    SAMPLE      *smpl;
+    IODE_REAL   r2;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation");
@@ -753,9 +773,20 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     //W_flush();
     W_close();
 
+
+    // E_StepWise
+    smpl = PER_atosmpl("1980Y1", "1995Y1");
+    r2 = E_StepWise(smpl, "ACAF", "", "r2");
+    EXPECT_TRUE(U_test_eq(r2, 0.848519));
+    SCR_free(smpl);
+
+    // Dickey-Fuller test (E_UnitRoot)
+    // TODO: implement a test
+
     // Reset initial kmsg fn
     kmsg_super = kmsg_super_ptr; // Reset initial output to
     U_test_reset_a2m_msgs();
+
 }
 
 
