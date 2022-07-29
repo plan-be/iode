@@ -89,12 +89,14 @@ static void E_SetScl(int relax, char* name)
  
 IODE_REAL C_evallec(char* lec, int t)
 {
-    CLEC    *clec;
-    IODE_REAL    x = L_NAN;
+    CLEC        *clec;
+    IODE_REAL   x = L_NAN;
+    char        tmplec[4096];
 
-    SCR_strip(lec);
-    if(lec[0]) {
-        clec = L_cc(lec);
+    SCR_strlcpy(tmplec, lec, 4094); // For C++ when lec is a const string (in the DATA memory segment)
+    SCR_strip(tmplec);
+    if(tmplec[0]) {
+        clec = L_cc(tmplec);
         if(clec == NULL) {
             B_seterror("Syntax error %.80s", L_error());
             return(x);
