@@ -335,7 +335,21 @@ void S4ASSERT(int success, char* fmt, ...)
 }
 
 
-/******** IODE TESTS ******************/
+void Tests_IODEMSG()
+{
+    char    *msg;
+    
+    U_test_print_title("Tests IODEMSG");
+    msg = B_msg(16); // Sample modified
+    S4ASSERT(U_cmp_strs(msg, " Sample modified"), "Message 16 = '%s', should be ' Sample modified'", msg);
+    
+    //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
+    //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
+    //B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
+    //B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
+    //B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
+}
+
 
 void Tests_BUF()
 {
@@ -837,6 +851,9 @@ void Tests_Estimation()
     S4ASSERT(U_test_eq(r2, 0.848519), "E_StepWize(\"1980Y1:1995Y1\", \"ACAF\", \"\", \"r2\") == 0.848519");
     SCR_free(smpl);
     
+    // Dickey-Fuller test (E_UnitRoot)
+    // TODO: implement a test
+    
     // Reset initial kmsg fn
     kmsg_super = kmsg_super_ptr; // Reset initial output to 
     U_test_reset_a2m_msgs();
@@ -982,14 +999,17 @@ void Tests_SWAP()
 
 // ================================================================================================
 
-void U_test_init()
+
+void U_test_init(int argc, char** argv)
 {
     static int  done = 0;
     
     if(done) return;
     done = 1;
+ 
+    B_IodeMsgPath();            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
     
-    IODE_assign_super_API();            // set *_super fn pointers
+    IODE_assign_super_API();    // set *_super fn pointers
     // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub 
     K_init_ws(0);                       // Initialises 7 empty WS
     K_load_iode_ini();
@@ -1012,13 +1032,14 @@ int main(int argc, char **argv)
     }
     
     // Initialises super functions / empty WS / error messages
-    U_test_init();
+    U_test_init(argc, argv);
     
 
 //    // tests temporaires
 //    Tests_ARGS_ALD();   
 //    return(0);
     
+    Tests_IODEMSG();
     Tests_SWAP(); 
     Tests_ALIGN();
     Tests_ERRMSGS();
