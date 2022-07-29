@@ -191,7 +191,7 @@ RP_free(char* ptr)
     return(-1);
 }
 
-RP_free_bufs()
+void RP_free_bufs()
 {
     extern char* RP_VSEPS;
     int i;
