@@ -758,6 +758,7 @@ extern int B_get_arg0(char *,char *,int );
 extern int B_argpos(char *,int );
 
 /* b_errors */
+extern void B_IodeMsgPath();
 extern void B_seterror(char *,...);
 extern void B_seterrn(int , ...);
 
@@ -769,14 +770,14 @@ extern char *B_msg(int );
 extern int B_get1int(char *);
 
 /* b_dir.c */
-extern int C_dir_edit_fn(char *,char *,SCRSTAT *);
-extern int B_FileList(char *);
-extern int B_FileList2(char *);
-extern void B_Read_Dir(char *);
-extern int B_FileListGnl(char *,int (*)());
-extern void B_path_change(char *);
-extern void B_analyse_file(SCRSTAT *,char **,int *,int *,int *,int *,int *,char *,long *,int *);
-extern int B_dir_ed_prt(char *);
+//extern int C_dir_edit_fn(char *,char *,SCRSTAT *);
+//extern int B_FileList(char *);
+//extern int B_FileList2(char *);
+//extern void B_Read_Dir(char *);
+//extern int B_FileListGnl(char *,int (*)());
+//extern void B_path_change(char *);
+//extern void B_analyse_file(SCRSTAT *,char **,int *,int *,int *,int *,int *,char *,long *,int *);
+//extern int B_dir_ed_prt(char *);
 
 /* b_file.c */
 extern int B_FilePrint(char *,int );
@@ -796,6 +797,20 @@ extern int B_SysDelete(char *);
 
 /* b_fedit.c */
 extern int B_FileEdit(char *);
+
+/* b_rep_utils.c */
+extern int RP_alloc_ptrs();
+extern char *RP_alloc(int size);
+extern int RP_find_ptr(char *ptr);
+extern int RP_free(char *ptr);
+extern void RP_free_bufs();
+extern char *RP_stracpy(char *ptr);
+extern unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps);
+extern unsigned char **RP_vtom(unsigned char* str, int sep);
+extern int RP_free_tbl(unsigned char **tbl);
+extern int RP_tbl_size(unsigned char **tbl);
+extern int RP_is_cmd(char *line);
+extern U_ch **SCR_vtomsq(char* str, char* seps, int quote);
 
 /* b_rep.c */
 extern int B_ReportLine(char *);
@@ -1053,7 +1068,7 @@ extern int B_EqsStepWise(char* arg);
 extern int B_WsHtoLLast(char *);
 extern int B_WsHtoLMean(char *);
 extern int B_WsHtoLSum(char *);
-extern int HTOL_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
+//extern int HTOL_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
 extern int B_htol(int ,char *);
 
 /* b_ltoh.c */

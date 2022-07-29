@@ -5,6 +5,7 @@
  * 
  * Main functions
  * --------------
+ *      void B_IodeMsgPath()                Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR.
  *      char *B_msg(int n)                  Returns a static buffer containing the message n from file iode.msg. 
  *      void B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
  *      void B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
@@ -19,6 +20,29 @@
 
 char**   B_ERROR_MSG;       /* Table of last recorded error messages */
 int      B_ERROR_NB;        /* Nb of last recorded error messages */
+
+
+//extern char SCR_ERR_NAME[];  // Name of the iode.msg file
+
+/**
+ *  Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR. 
+ *  The path is constructed by appending "iode.msg" to the path of the current executable.
+ *  
+ *  Don't use this function in the context of the "DOS" GUI interface where this file is appended to iode.scr file.
+ */
+void B_IodeMsgPath()
+{
+	char 	    module[1024], file[1024];
+    static  int done = 0;
+
+    // Get module directory (c:/iode p.ex)
+    if(done) return;
+    
+    GetModuleFileName(0, module, 1000);
+    SCR_split_dir(module, file);
+	sprintf(SCR_NAME_ERR, "%s\\iode.msg", module);
+    done = 1; 
+}
 
 /**
  *  Returns a static buffer containing the message n from file iode.msg. 
