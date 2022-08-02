@@ -84,7 +84,7 @@
     {
       "name": "test-c-api-windows-x32-debug",
       "inherits": [ "Win32", "windows", "debug" ],
-      "displayName": "Test Windows x32 Debug",
+      "displayName": "Test C API Windows x32 Debug",
       "binaryDir": "${sourceDir}/out/build/windows-x32-debug/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x32-debug/tests/test_c_api"
@@ -93,7 +93,7 @@
     {
       "name": "test-cpp-api-windows-x32-debug",
       "inherits": [ "Win32", "windows", "debug" ],
-      "displayName": "Test Windows x32 Debug",
+      "displayName": "Test CPP API Windows x32 Debug",
       "binaryDir": "${sourceDir}/out/build/windows-x32-debug/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x32-debug/tests/test_cpp_api"
@@ -111,7 +111,7 @@
     {
       "name": "test-c-api-windows-x32-release",
       "inherits": [ "Win32", "windows", "release" ],
-      "displayName": "Test Windows x32 Release",
+      "displayName": "Test C API Windows x32 Release",
       "binaryDir": "${sourceDir}/out/build/windows-x32-release/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x32-release/tests/test_c_api"
@@ -120,7 +120,7 @@
     {
       "name": "test-cpp-api-windows-x32-release",
       "inherits": [ "Win32", "windows", "release" ],
-      "displayName": "Test Windows x32 Release",
+      "displayName": "Test CPP API Windows x32 Release",
       "binaryDir": "${sourceDir}/out/build/windows-x32-release/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x32-release/tests/test_cpp_api"
@@ -138,7 +138,7 @@
     {
       "name": "linux-x64-debug-sanitize",
       "inherits": [ "x64", "linux", "debug", "sanitize" ],
-      "displayName": "Linux x64 Debug",
+      "displayName": "Linux x64 Debug Sanitize",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
@@ -147,7 +147,7 @@
     {
       "name": "test-c-api-linux-x64-debug",
       "inherits": [ "x64", "linux", "debug" ],
-      "displayName": "Test Linux x64 Debug",
+      "displayName": "Test C API Linux x64 Debug",
       "binaryDir": "${sourceDir}/out/build/linux-x64-debug/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-debug/tests/test_c_api"
@@ -156,7 +156,7 @@
     {
       "name": "test-cpp-api-linux-x64-debug",
       "inherits": [ "x64", "linux", "debug" ],
-      "displayName": "Test Linux x64 Debug",
+      "displayName": "Test CPP API Linux x64 Debug",
       "binaryDir": "${sourceDir}/out/build/linux-x64-debug/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-debug/tests/test_cpp_api"
@@ -165,7 +165,7 @@
     {
       "name": "test-c-api-linux-x64-debug-sanitize",
       "inherits": [ "x64", "linux", "debug", "sanitize" ],
-      "displayName": "Test Linux x64 Debug",
+      "displayName": "Test C API Linux x64 Debug Sanitize",
       "binaryDir": "${sourceDir}/out/build/linux-x64-debug-sanitize/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-debug-sanitize/tests/test_c_api"
@@ -174,7 +174,7 @@
     {
       "name": "test-cpp-api-linux-x64-debug-sanitize",
       "inherits": [ "x64", "linux", "debug", "sanitize" ],
-      "displayName": "Test Linux x64 Debug",
+      "displayName": "Test CPP API Linux x64 Debug Sanitize",
       "binaryDir": "${sourceDir}/out/build/linux-x64-debug-sanitize/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-debug-sanitize/tests/test_cpp_api"
@@ -192,7 +192,7 @@
     {
       "name": "test-c-api-linux-x64-release",
       "inherits": [ "x64", "linux", "release" ],
-      "displayName": "Test Linux x64 Release",
+      "displayName": "Test C API Linux x64 Release",
       "binaryDir": "${sourceDir}/out/build/linux-x64-release/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-release/tests/test_c_api"
@@ -201,7 +201,7 @@
     {
       "name": "test-cpp-api-linux-x64-release",
       "inherits": [ "x64", "linux", "release" ],
-      "displayName": "Test Linux x64 Release",
+      "displayName": "Test CPP API Linux x64 Release",
       "binaryDir": "${sourceDir}/out/build/linux-x64-release/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/linux-x64-release/tests/test_cpp_api"
@@ -219,7 +219,7 @@
     {
       "name": "windows-x64-debug-sanitize",
       "inherits": [ "x64", "windows", "debug", "sanitize" ],
-      "displayName": "Windows x64 Debug",
+      "displayName": "Windows x64 Debug Sanitize",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
@@ -228,7 +228,7 @@
     {
       "name": "test-c-api-windows-x64-debug",
       "inherits": [ "x64", "windows", "debug" ],
-      "displayName": "Test Windows x64 Debug",
+      "displayName": "Test C API Windows x64 Debug",
       "binaryDir": "${sourceDir}/out/build/windows-x64-debug/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-debug/tests/test_c_api"
@@ -237,7 +237,7 @@
     {
       "name": "test-cpp-api-windows-x64-debug",
       "inherits": [ "x64", "windows", "debug" ],
-      "displayName": "Test Windows x64 Debug",
+      "displayName": "Test CPP API Windows x64 Debug",
       "binaryDir": "${sourceDir}/out/build/windows-x64-debug/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-debug/tests/test_cpp_api"
@@ -246,7 +246,7 @@
     {
       "name": "test-c-api-windows-x64-debug-sanitize",
       "inherits": [ "x64", "windows", "debug", "sanitize" ],
-      "displayName": "Test Windows x64 Debug",
+      "displayName": "Test C API Windows x64 Debug Sanitize",
       "binaryDir": "${sourceDir}/out/build/windows-x64-debug-sanitize/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-debug-sanitize/tests/test_c_api"
@@ -255,7 +255,7 @@
     {
       "name": "test-cpp-api-windows-x64-debug-sanitize",
       "inherits": [ "x64", "windows", "debug", "sanitize" ],
-      "displayName": "Test Windows x64 Debug",
+      "displayName": "Test CPP API Windows x64 Debug Sanitize",
       "binaryDir": "${sourceDir}/out/build/windows-x64-debug-sanitize/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-debug-sanitize/tests/test_cpp_api"
@@ -273,7 +273,7 @@
     {
       "name": "test-c-api-windows-x64-release",
       "inherits": [ "x64", "windows", "release" ],
-      "displayName": "Test Windows x64 Release",
+      "displayName": "Test C API Windows x64 Release",
       "binaryDir": "${sourceDir}/out/build/windows-x64-release/tests/test_c_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-release/tests/test_c_api"
@@ -282,7 +282,7 @@
     {
       "name": "test-cpp-api-windows-x64-release",
       "inherits": [ "x64", "windows", "release" ],
-      "displayName": "Test Windows x64 Release",
+      "displayName": "Test CPP API Windows x64 Release",
       "binaryDir": "${sourceDir}/out/build/windows-x64-release/tests/test_cpp_api",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-x64-release/tests/test_cpp_api"
