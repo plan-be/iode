@@ -16,7 +16,8 @@
 
 #include "iode.h"
 
-char    B_SEPS[] = " ,\n\t";        /* Accepted separators for fn arguments (in report, DOS GUI..) */
+char    B_SEPS[] = " ,\n\t";        // Accepted separators for fn arguments (in report, DOS GUI..)
+                                    // !! Semi-colon not accepted !!
 
 /**
  *  Expands an argument by replacing @filename and $listname by their contents : 
