@@ -192,6 +192,7 @@
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
 #define KCPTR(name)         K_optr0(KC_WS, name)     // Returns a pointer to the CMT in swap (not allocated -> do not free)
+#define KIPTR(name)         K_optr0(KI_WS, name)     // id.
 #define KLPTR(name)         K_optr0(KL_WS, name)     // id.
 #define KVPTR(name)         K_vptr(KV_WS, name, 0)   // id.
 
@@ -1188,13 +1189,36 @@ typedef struct _repfile_ {
 			nblines;
 } REPFILE;
 
+typedef struct _repfns_ {
+    char    *keyw;          // function name to use in reports
+    int     (*fn)();        // function pointer in *non GUI* mode
+    int     (*sfn)();       // function pointer in GUI mode
+    int     type;           // suffix required after keyw (var, idt...) or not:
+                            //   0=not required 
+    						//   1=ws type required: cmt, idt, ... see k_ext => not used ?
+    						//   2=suffix required: file extensions defined in k_ext 
+    						//   3=ws type required in non GUI, no extension in GUI
+    						//   4=suffix required: file extensions defined in k_ext if non GUI, not required in GUI
+} BFNS;
 
 #ifdef SCRCPP
 extern "C" {
 #endif
 
-
 extern REPFILE *CUR_REPFILE;
+extern BFNS    B_fns[];
+extern char*   RP_RPTSTR;
+extern char*   RP_VSEPS;
+extern int     RP_RT;
+extern int     RP_PRINT;
+extern int     RP_arg0;
+extern int     RP_debug; 
+extern int     RP_indent_allowed;
+       
+extern int     RP_PRINT;       // 2 = print and display messages, 1 = print only, 0 = ignore
+extern int     RP_T;           // current value of t for LEC evaluations in reports
+extern PERIOD  RP_PER;         // current PERIOD for LEC evaluations in reports
+
 
 /******************************* VARS *************************************/
 

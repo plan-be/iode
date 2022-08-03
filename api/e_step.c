@@ -61,8 +61,6 @@ static int E_GetScls(CLEC* clec, char*** scl)
  */
 static void E_SetScl(int relax, char* name)                                             
 {
-    char    buf[128];
-
     if(relax == 1) {
         K_s_set_value(KS_WS, name, 0.9);
         K_s_set_relax (KS_WS, name, 1.0);
@@ -71,11 +69,6 @@ static void E_SetScl(int relax, char* name)
         K_s_set_value(KS_WS, name, 0.0);
         K_s_set_relax (KS_WS, name, 0.0);
     }
-    
-    //if(relax == 1)    sprintf(buf, "%s 0.9 1.0", name);
-    //else              sprintf(buf, "%s 0.0 0.0", name);
-    //
-    //B_DataUpdate(buf, K_SCL);
 }
 
 
