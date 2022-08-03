@@ -55,13 +55,14 @@
     - [k\_ccvar.c](#T49)
   - [Group "LEC language"](#T50)
     - [k\_lec.c](#T51)
-  - [Group "Iode Reports"](#T52)
+  - [Group "Basic functions"](#T52)
     - [b\_args.c](#T53)
     - [b\_errors.c](#T54)
   - [Group "Model Estimation"](#T55)
   - [Group "Model Simulation"](#T56)
   - [Group "Table Calculation"](#T57)
   - [Group "IODE Printing"](#T58)
+  - [Group "Iode Reports"](#T59)
 
 # IODE: functions by group {#T1}
 
@@ -76,12 +77,12 @@
 - Group "IODE big\- and little\-endian conversion"
 - Group "Iode object ascii formats" 
 - Group "LEC language" 
-- Group "Iode Reports" 
+- Group "Basic functions" 
 - Group "Model Estimation" 
 - Group "Model Simulation" 
 - Group "Table Calculation" 
 - Group "Iode Printing" 
-- \*Group "Iode Reports"
+- Group "Iode Reports" 
 
 ## Function names in IODE {#T2}
 
@@ -386,6 +387,8 @@ Functions to manipulate IODE objects.
 |`int K_del_entry(KDB* kdb, int pos):`|Deletes an entry in a KDB \_\_without\_\_ deleting the referenced object.|
 |`int K_del(KDB* kdb, int pos):`|Deletes an object (and its data) from a KDB.|
 |`int K_del_by_name(KDB* kdb, char* name):`|Deletes an object identified by its name from a KDB.|
+|`int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist).|
+|`int K_upd_tbl(char* name, char* arg)`|Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi\-colons.|
 
 ### k\_objvers.c {#T26}
 
@@ -665,7 +668,7 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 |`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
 |`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
 
-## Group "Iode Reports" {#T52}
+## Group "Basic functions" {#T52}
 
 ### b\_args.c {#T53}
 
@@ -708,4 +711,8 @@ See [TBL\_CALC.md](tbl_calc.md).
 ## Group "IODE Printing" {#T58}
 
 See [PRINTING.md](PRINTING.md).
+
+## Group "Iode Reports" {#T59}
+
+See [REPORTS.md](REPORTS.md).
 

@@ -133,6 +133,8 @@ extern int K_find(KDB *,char *);
 extern int K_del(KDB *,int );
 extern int K_del_entry(KDB *,int );
 extern int K_del_by_name(KDB* kdb, char* name);
+extern int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date);
+extern int K_upd_tbl(char* name, char* arg);
 
 /* k_objsv.c */
 extern int K_add(KDB *kdb, char* name,...);
@@ -880,6 +882,7 @@ extern unsigned char *RP_gfn(unsigned char *);
 extern int RP_fneval(char **,char *);
 
 /* b_data.c */
+extern int B_DataPattern(char* arg,int type);
 extern int B_DataCalcVar(char *);
 extern int B_DataCreate_1(char *,int *);
 extern int B_DataCreate(char *,int );
@@ -887,8 +890,8 @@ extern int B_DataDelete_1(char *,int *);
 extern int B_DataDelete(char *,int );
 extern int B_DataRename(char *,int );
 extern int B_DataDuplicate(char *,int );
-extern int B_DataUpdateEqs(char *,char *,char *,int ,SAMPLE *,char *,char *,float *,int );
-extern int B_DataUpdateTbl(char *,char *);
+//extern int B_DataUpdateEqs(char *,char *,char *,int ,SAMPLE *,char *,char *,float *,int );
+//extern int B_DataUpdateTbl(char *,char *);
 extern int B_DataUpdate(char *,int );
 extern int B_DataSearch(char *,int );
 extern int B_DataEditCnf(char *);

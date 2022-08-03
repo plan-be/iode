@@ -250,6 +250,49 @@ fin:
     return(rc);
 }
 
+
+/**
+ *  Verifies an assertion. 
+ *  Displays a message or not according to S4ASSERT_VERBOSE.
+ *  Exits on error if S4ASSERT_EXIT_ON_ERROR.
+ *  
+ *  @param [in] success int     1 = assertion true, 0 false
+ *  @param [in] fmt     char*   format of the message (including %s, %d...)
+ *  @param [in] ...             optional params of fmt (%s, %d...)
+ *  
+ */
+void S4ASSERT(int success, char* fmt, ...)
+{
+    char    buf[256];
+    va_list myargs;
+
+    va_start(myargs, fmt);
+#ifdef _MSC_VER   
+    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
+#else
+    vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
+#endif    
+    va_end(myargs);
+
+    if(success && !S4ASSERT_VERBOSE) return; // No output if success but non verbose
+    
+    if(success) 
+        printf("Passed: %s\n", buf);
+    else {
+        printf("Error:  %s\n", buf);
+        if(S4ASSERT_EXIT_ON_ERROR) {
+            exit(1);
+            printf("Tests stopped\n");
+        }    
+    }    
+}
+
+
+//=========================================================================
+// U_test_*() => UTILITIES FOR Tests_* functions 
+//-------------------------------------------------------------------------
+
+
 // Print titles
 void U_test_print_title(char* title)
 {
@@ -299,76 +342,12 @@ void U_test_reset_a2m_msgs()
 
 
 /**
- *  Verifies an assertion. 
- *  Displays a message or not according to S4ASSERT_VERBOSE.
- *  Exits on error if S4ASSERT_EXIT_ON_ERROR.
- *  
- *  @param [in] success int     1 = assertion true, 0 false
- *  @param [in] fmt     char*   format of the message (including %s, %d...)
- *  @param [in] ...             optional params of fmt (%s, %d...)
- *  
- */
-void S4ASSERT(int success, char* fmt, ...)
-{
-    char    buf[256];
-    va_list myargs;
-
-    va_start(myargs, fmt);
-#ifdef _MSC_VER   
-    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
-#else
-    vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
-#endif    
-    va_end(myargs);
-
-    if(success && !S4ASSERT_VERBOSE) return; // No output if success but non verbose
-    
-    if(success) 
-        printf("Passed: %s\n", buf);
-    else {
-        printf("Error:  %s\n", buf);
-        if(S4ASSERT_EXIT_ON_ERROR) {
-            exit(1);
-            printf("Tests stopped\n");
-        }    
-    }    
-}
-
-
-void Tests_IODEMSG()
-{
-    char    *msg;
-    
-    U_test_print_title("Tests IODEMSG");
-    msg = B_msg(16); // Sample modified
-    S4ASSERT(U_cmp_strs(msg, " Sample modified"), "Message 16 = '%s', should be ' Sample modified'", msg);
-    
-    //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
-    //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
-    //B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
-    //B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
-    //B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
-}
-
-
-void Tests_BUF()
-{
-    U_test_print_title("Tests BUF");
-    S4ASSERT(BUF_DATA == NULL,            "BUF_DATA is null");
-    S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
-    S4ASSERT(BUF_alloc(100) != NULL,      "BUF_alloc(100) is not null");
-    S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
-    BUF_free();
-    S4ASSERT(BUF_DATA == NULL,            "BUF_free() => BUF_DATA is null");
-}
-    
-/**
- *  Tests some object functions & macros
+ *  Create some objects for Tests_*().
  *      - k_add() : LIST, VAR
  *      - KLPTR()
  *      - KV_sample()
  */
-void U_tests_Objects()
+void U_test_CreateObjects()
 {
     char*       lst;
     SAMPLE*     smpl;
@@ -376,17 +355,17 @@ void U_tests_Objects()
     int         nb, i, pos;
     static int  done = 0;
     
-    if(done) return;
-    done = 1;
+    //if(done) return;
+    //done = 1;
     
-    U_test_print_title("Tests OBJECTS");
+    //U_test_print_title("Tests OBJECTS");
 
     // Create lists
     pos = K_add(KL_WS, "LST1", "A,B");
-    S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
+    //S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
     K_add(KL_WS, "LST2", "A,B,A");
     lst = KLPTR("LST1");
-    S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
+    //S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
 
     // Set the sample for the variable WS
     smpl = PER_atosmpl("2000Y1", "2020Y1");
@@ -401,9 +380,17 @@ void U_tests_Objects()
     }
     
     pos = K_add(KV_WS, "A", A, &nb);
-    S4ASSERT(K_find(KV_WS, "A") >= 0,  "K_add() + K_find()");
+    //S4ASSERT(K_find(KV_WS, "A") >= 0,  "K_add() + K_find()");
     pos = K_add(KV_WS, "B", B, &nb);
-
+    
+    // For B_DataPattern()
+    pos = K_add(KL_WS, "AB", "A,B");
+    pos = K_add(KL_WS, "BC", "B,C");
+    
+    pos = K_add(KV_WS, "AB", B, &nb);
+    pos = K_add(KV_WS, "AC", B, &nb);
+    pos = K_add(KV_WS, "BB", B, &nb);
+    pos = K_add(KV_WS, "BC", B, &nb);
 }    
 
 int U_test_eq(double v1, double v2)
@@ -457,6 +444,96 @@ double U_test_calc_lec(char* lec, int t)
     return(L_exec(KV_WS, KS_WS, clec, t));
 }
 
+KDB* U_test_K_interpret(int type, char* filename)
+{
+    char    fullfilename[256];
+    KDB     *kdb;
+    
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
+    kdb = K_interpret(type, fullfilename);
+    //S4ASSERT(kdb != NULL, "K_interpret(%d, \"%s\")", type, fullfilename);
+    return(kdb);
+}
+
+void U_test_load_fun_esv(char* filename)
+{
+    // Frees 3 WS
+    K_free(KE_WS);
+    K_free(KS_WS);
+    K_free(KV_WS);
+    
+    // Loads 3 WS and check ok
+    KE_WS = U_test_K_interpret(K_EQS, filename);
+    KS_WS = U_test_K_interpret(K_SCL, filename);
+    KV_WS = U_test_K_interpret(K_VAR, filename);
+}
+
+
+//======================================================================
+// Tests_<NAME> => unit tests
+// ---------------------------------------------------------------------
+
+void Tests_IODEMSG()
+{
+    char    *msg;
+    
+    U_test_print_title("Tests IODEMSG");
+    msg = B_msg(16); // Sample modified
+    S4ASSERT(U_cmp_strs(msg, " Sample modified"), "Message 16 = '%s', should be ' Sample modified'", msg);
+    
+    //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
+    //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
+    //B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
+    //B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
+    //B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
+}
+
+
+void Tests_BUF()
+{
+    U_test_print_title("Tests BUF");
+    S4ASSERT(BUF_DATA == NULL,            "BUF_DATA is null");
+    S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
+    S4ASSERT(BUF_alloc(100) != NULL,      "BUF_alloc(100) is not null");
+    S4ASSERT(BUF_strcpy("ABCD") != NULL,  "BUF_strcpy(\"ABCD\") is not null");
+    BUF_free();
+    S4ASSERT(BUF_DATA == NULL,            "BUF_free() => BUF_DATA is null");
+}
+    
+
+
+/**
+ *  Tests some object functions & macros
+ *      - k_add() : LIST, VAR
+ *      - KLPTR()
+ *      - KV_sample()
+ */
+void Tests_OBJECTS()
+{
+    char*       lst;
+    int         pos;
+    static int  done = 0;
+
+    U_test_print_title("Tests OBJECTS");
+    U_test_CreateObjects();
+
+    // Create lists
+    pos = K_find(KL_WS, "LST1");
+    S4ASSERT(pos >= 0,                    "K_add & K_find(KL_WS, \"LST1\") = %d", pos);
+    lst = KLPTR("LST1");
+    S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
+
+    
+    pos = K_find(KV_WS, "A");
+    S4ASSERT(K_find(KV_WS, "A") >= 0,  "K_add and K_find(KV_WS, \"A\") = %d", pos);
+    
+    pos = K_ren(KV_WS, "A", "AAA");
+    S4ASSERT(K_find(KV_WS, "AAA") >= 0,  "K_ren(KV_WS, \"A\", \"AAA\")) = %d", pos);
+   
+}    
+
+
+
 
 /**
  *  Tests some LEC calculations.
@@ -468,7 +545,7 @@ void Tests_LEC()
     U_test_print_title("Tests LEC");
 
     // Create objects
-    U_tests_Objects();
+    U_test_CreateObjects();
     
     A = (IODE_REAL*)KVPTR("A");
     B = (IODE_REAL*)KVPTR("B");
@@ -497,7 +574,7 @@ void Tests_EQS()
 //    EQ*     eq;
 //    char    lec[521];  
 //
-//    B_DataUpdateEqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);
+//    K_upd_eqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);
 //    eq = KEPTR("A");
 //    strcpy(lec, eq->lec);
 //    S4ASSERT(strcmp(eq->lec, "ln A := B + t") == 0, "EQ %s = %s", "A", lec);
@@ -516,7 +593,7 @@ void Tests_ARGS()
     U_test_print_title("Tests ARGS");
 
     // Create objects
-    U_tests_Objects();
+    U_test_CreateObjects();
     
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
@@ -630,30 +707,6 @@ void Tests_TBL32_64()
     //    cell_content = T_div_cont_tbl(c_table, col, 1);
     //    printf("Cell %d:%s\n",col, cell_content);
     //}
-}
-
-KDB* U_test_K_interpret(int type, char* filename)
-{
-    char    fullfilename[256];
-    KDB     *kdb;
-    
-    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
-    kdb = K_interpret(type, fullfilename);
-    //S4ASSERT(kdb != NULL, "K_interpret(%d, \"%s\")", type, fullfilename);
-    return(kdb);
-}
-
-void U_test_load_fun_esv(char* filename)
-{
-    // Frees 3 WS
-    K_free(KE_WS);
-    K_free(KS_WS);
-    K_free(KV_WS);
-    
-    // Loads 3 WS and check ok
-    KE_WS = U_test_K_interpret(K_EQS, filename);
-    KS_WS = U_test_K_interpret(K_SCL, filename);
-    KV_WS = U_test_K_interpret(K_VAR, filename);
 }
 
 
@@ -997,6 +1050,88 @@ void Tests_SWAP()
 }
 
 
+
+void Tests_B_DATA()
+{
+    char        *lst, *ptr;
+    int         rc, i;
+    IODE_REAL   *A1, val;
+    SAMPLE      *smpl;
+    
+    U_test_print_title("Tests B_DATA");
+
+    // (re-)creates vars AA...
+    U_test_CreateObjects();
+    
+    // B_DataPattern()
+    // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ça marche pas...) => A changer ? Voir B_DataListSort() 
+    B_DataPattern("RC xy $AB $BC", K_VAR); 
+    lst = KLPTR("RC");
+    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC"), "B_DataPattern(\"RC xy $AB $BC\", K_VAR) => RC = \"AB,AC,BB,BC\"");
+
+    // B_DataCalcVar()
+    rc = B_DataCalcVar("A1 2 * B");
+    A1 = KVPTR("A1");
+    S4ASSERT(
+             (rc == 0) && 
+             (K_find(KV_WS, "A1") >= 0) && 
+             (A1[1] == 4),  
+             "B_DataCalcVar(\"A1 2 * B\")"
+             );
+    
+    // B_DataCreate(char* arg, int type)
+    // B_DataDuplicate(char* arg, int type)
+    // B_DataRename(char* arg, int type)
+    // B_DataDelete(char* arg, int type)
+    for(i = 0; i < 7 ; i++) {
+        rc = B_DataCreate("XXX", i);
+        S4ASSERT((rc == 0) && (K_find(K_WS[i], "XXX") >= 0),  "B_DataCreate(\"XXX\", %d)", i);
+        
+        if(i != K_EQS) { // Equations cannot be renamed or duplicated
+            rc = B_DataDuplicate("XXX YYY", i);
+            S4ASSERT((rc == 0) && (K_find(K_WS[i], "YYY") >= 0),  "B_DataDuplicate(\"XXX YYY\", %d)", i);
+
+            rc = B_DataRename("YYY ZZZ", i);
+            S4ASSERT((rc == 0) && (K_find(K_WS[i], "ZZZ") >= 0),  "B_DataRename(\"YYY ZZZ\", %d)", i);
+        }
+        
+        rc = B_DataDelete("XXX", i);
+        S4ASSERT((rc == 0) && (K_find(K_WS[i], "XXX") < 0),  "B_DataDelete(\"XXX\", %d)", i);
+    }                 
+
+    // B_DataListSort()
+    rc = K_add(KL_WS, "LIST1", "A;C;B");
+    S4ASSERT(K_find(KL_WS, "LIST1") >= 0,  "K_add(KL_WS, \"LIST1\", \"A;C;B\")");
+    rc = B_DataListSort("LIST1 LIST2");
+    lst = KLPTR("LIST2");
+    S4ASSERT(U_cmp_strs(lst, "A;B;C"), "B_DataListSort(\"LIST1 LIST2\") = \"%s\"", lst);
+
+    // B_DataUpdate()
+    rc = B_DataUpdate("U Comment of U"       , K_CMT);
+    S4ASSERT(rc == 0 && U_cmp_strs(KCPTR("U"), "Comment of U"), "B_DataUpdate(\"U Comment of U\", K_CMT) = \"%s\"", KCPTR("U"));
+    rc = B_DataUpdate("U U := c1 + c2*Z"     , K_EQS);
+    rc = B_DataUpdate("U 2 * A"              , K_IDT); 
+    S4ASSERT(rc == 0 && U_cmp_strs(KIPTR("U"), "2 * A"), "B_DataUpdate(\"U 2 * A\", K_IDT) = \"%s\"", KIPTR("U"));
+    rc = B_DataUpdate("U A,B,C"             , K_LST);
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("U"), "A,B,C"), "B_DataUpdate(\"U A,B,C\", K_LST) = \"%s\"", KLPTR("U"));
+    rc = B_DataUpdate("U  1.2 1"             , K_SCL);  
+    val = K_s_get_value (KS_WS, "U");
+    S4ASSERT(rc == 0 && U_test_eq(1.2, val), "B_DataUpdate(\"U 1.2 1\", K_SCL) = %g", val);
+    rc = B_DataUpdate("U  Title of U;U;2*U"  , K_TBL);
+    smpl = KSMPL(KV_WS);
+    rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , K_VAR);
+    S4ASSERT(rc == 0, "B_DataUpdate(\"U L 2000Y1 2 3.1 4e2\" , K_VAR)");
+    
+    // B_DataSearch(char* arg, int type)
+    rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", K_CMT);
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("NEWLIST"), "U"), "B_DataSearch(\"of 0 0 1 0 1 NEWLIST\", K_CMT) = \"%s\"", KLPTR("NEWLIST"));
+    
+    // B_DataScan(char* arg, int type)
+     rc = B_DataScan("U", K_EQS);
+     S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_SCAL"), "c1;c2"), "B_DataScan(\"U\", K_EQS) = \"%s\"", KLPTR("_SCAL"));
+ }
+
+
 // ================================================================================================
 
 
@@ -1044,7 +1179,7 @@ int main(int argc, char **argv)
     Tests_ALIGN();
     Tests_ERRMSGS();
     Tests_BUF();
-    U_tests_Objects();
+    Tests_OBJECTS();
     Tests_LEC();
     Tests_EQS();
     Tests_ARGS();
@@ -1054,6 +1189,7 @@ int main(int argc, char **argv)
     Tests_PrintTables();
     Tests_Estimation();
     Tests_W_printf();
+    Tests_B_DATA();
 
    
     //K_save_iode_ini(); // Suppress that call ? Should only be called on demand, not at the end of each IODE session.
@@ -1064,3 +1200,253 @@ int main(int argc, char **argv)
     return(0);
 //    B_ReportLine("$show coucou");
 }
+
+
+/*
+REPORT PRIMITIVES
+-----------------
+    "label",                    RP_label,               RP_label,           0,
+    "goto",                     RP_goto,                RP_goto,            0,
+    "ask",                      RP_ask,                 RP_ask,             0,
+    "abort",                    RP_abort,               RP_abort,           0,
+    "quitode",                  RP_quitode,             RP_quitode,         0,
+    "quit",                     RP_quitode,             RP_quitode,         0,     
+    "onerror",                  RP_onerror,             RP_onerror,         0,
+    "return",                   RP_return,              RP_return,          0,
+    "show",                     RP_message,             RP_message,         0,
+    "msg",                      RP_warning,             RP_warning,         0,
+    "beep",                     RP_beep,                RP_beep,            0,
+    "system",                   RP_system,              RP_system,          0,
+    "chdir",                    RP_chdir,               RP_chdir,           0,
+    "mkdir",                    RP_mkdir,               RP_mkdir,           0,
+    "rmdir",                    RP_rmdir,               RP_rmdir,           0,
+    "settime",                  RP_settime,             RP_settime,         0,
+    "incrtime",                 RP_incrtime,            RP_incrtime,        0,
+    "shift",                    RP_shift,               RP_shift,           0,
+    "define",                   RP_define,              RP_define,          0,
+    "debug",                    RP_setdebug,            RP_setdebug,        0, 
+    "indent",                   RP_setindent,           RP_setindent,       0, 
+    "shellexec",                B_shellexec,            B_shellexec,        0, 
+    "repeat",                   RP_repeat,              RP_repeat,          0, 
+    "repeatstring",             RP_repeatstring,        RP_repeatstring,    0, 
+    "vseps",                    RP_vseps,               RP_vseps,           0, 
+    "foreach",                  RP_foreach,             RP_foreach,         0, 
+    "next",                     RP_foreach_next,        RP_foreach_next,    0, 
+    "procdef",                  RP_procdef,             RP_procdef,         0, 
+    "procexec",                 RP_procexec,            RP_procexec,        0, 
+    
+    // fonctions utilisateur 
+    "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,
+    "fileimportcmt",            B_FileImportCmt,        SB_XodeRuleImport,  0,
+    "filedelete",               B_FileDelete,           NULL,               4,
+    "filerename",               B_FileRename,           NULL,               4,
+    "filecopy",                 B_FileCopy,             NULL,               4,
+    "wssample",                 B_WsSample,             SB_WsSample,        0,
+    "wsload",                   B_WsLoad,               SB_WsLoad,          3,
+    "wscopy",                   B_WsCopy,               SB_WsCopy,          3,
+    "wssave",                   B_WsSave,               SB_WsSave,          3,
+    "wssavecmp",                B_WsSaveCmp,            SB_WsSave,          3,
+    "wsimport",                 B_WsImport,             SB_WsLoad,          3,
+    "wsexport",                 B_WsExport,             SB_WsSave,          3,
+    "wsmerge",                  B_WsMerge,              SB_WsMerge,         3,
+    "wsclear",                  B_WsClear,              SB_WsClear,         3,
+    "wsclearall",               B_WsClearAll,           NULL,               0,
+    "wsdescr",                  B_WsDescr,              SB_WsDescr,         0,
+    "wsextrapolate",            B_WsExtrapolate,        SB_WsExtrapolate,   0,
+    "wsaggrchar",               B_WsAggrChar,           NULL,               0,
+    "wsaggrsum",                B_WsAggrSum,            SB_WsAggregate,     0,
+    "wsaggrmean",               B_WsAggrMean,           SB_WsAggregate,     0,
+    "wsaggrprod",               B_WsAggrProd,           SB_WsAggregate,     0,
+    "wshtollast",               B_WsHtoLLast,           SB_WsHtoL,          0,
+    "wshtolsum",                B_WsHtoLSum,            SB_WsHtoL,          0,
+    "wshtolmean",               B_WsHtoLMean,           SB_WsHtoL,          0,
+    "wsltohflow",               B_WsLtoHFlow,           SB_WsLtoH,          0,
+    "wsltohstock",              B_WsLtoHStock,          SB_WsLtoH,          0,
+    "wsseasonadj",              B_WsSeasonAdj,          SB_WsSeasonAdj,     0,
+    "wstrend",                  B_WsTrend,              SB_WsTrend,         0,
+    "wstrendstd",               B_WsTrendStd,           SB_WsTrend,         0,
+    
+    "wsimporteviews",			B_WsImportEviews,       NULL, 		        0,
+
+-   "dataedit",                 NULL,                   SB_DataEditScroll,  1,
+X   "dataupdate",               B_DataUpdate,           NULL,               1,
+    "dataexist",                B_DataExist,            NULL,               1,
+    "dataappend",               B_DataAppend,           NULL,               1,
+X   "datacreate",               B_DataCreate,           NULL,               1,
+X   "datadelete",               B_DataDelete,           NULL,               1,
+X   "datarename",               B_DataRename,           NULL,               1,
+X   "datasearch",               B_DataSearch,           SB_DataSearch,      1,
+X   "dataduplicate",            B_DataDuplicate,        SB_DataDuplicate,   1,
+    "datalist",                 B_DataList,             SB_DataList,        1,
+    "datacompare",              B_DataCompare,          SB_DataCompare,     1,
+    "datacompareeps",           B_DataCompareEps,       SB_DataCompare,     0,
+X   "datalistsort",             B_DataListSort,         SB_DataListSort,    0,
+    "datadisplaygraph",         B_DataDisplayGraph,     SB_DataEditGraph,   0,
+    "dataprintgraph",           B_DataPrintGraph,       SB_DataEditGraph,   0,
+    "dataeditcnf",              B_DataEditCnf,          NULL/,              0,
+X   "datacalcvar",              B_DataCalcVar,          NULL,               0,
+    "datacalclst",              B_DataCalcLst,          SB_DataCalcLst,     0,
+    "datarasvar",               B_DataRasVar,           NULL,               0,
+X   "datascan",                 B_DataScan,             SB_DataScan,        1,
+X   "datapattern",              B_DataPattern,          NULL,               1,
+    
+    "excelget",                 B_ExcelGet,             NULL,               1,
+    "excellang",                B_ExcelLang,            NULL,               0,
+    "exceldecimal",             B_ExcelDecimal,         NULL,               0,
+    "excelthousand",            B_ExcelThousand,        NULL,               0,
+    "excelcurrency",            B_ExcelCurrency,        NULL,               0,
+    "excelset",                 B_ExcelSet,             NULL,               1,
+    "excelexecute",             B_ExcelExecute,         NULL,               0,
+    "excelopen",                B_ExcelOpen,            NULL,               0,
+    "excelnew",                 B_ExcelNew,             NULL,               0,
+    "excelclose",               B_ExcelClose,           NULL,               0,
+    "excelprint",               B_ExcelPrint,           NULL,               0,
+    "excelsave",                B_ExcelSave,            NULL,               0,
+    "excelsaveas",              B_ExcelSaveAs,          NULL,               0,
+    "excelwrite",               B_ExcelWrite,           NULL,               0,
+        
+    "dsimportdb",               B_DSImportDb,           NULL,               0,
+        
+    "statunitroot",             B_StatUnitRoot,         SB_StatUnitRoot,    0,
+        
+    "datawidthvar",             B_ScrollVarW,           NULL,               0,
+    "datandecvar",              B_ScrollVarN,           NULL,               0,
+    "datamodevar",              B_ScrollVarM,           NULL,               0,
+    "datastartvar",             B_ScrollVarS,           NULL,               0,
+    "datawidthtbl",             B_ScrollTblW,           NULL,               0,
+    "datawidthscl",             B_ScrollSclW,           NULL,               0,
+    "datandecscl",              B_ScrollSclN,           NULL,               0,
+    "viewwidth",                B_ScrollVTW,            NULL,               0,
+    "viewwidth0",               B_ScrollVTW0,           NULL,               0,
+    "viewndec",                 B_ScrollVTN,            NULL,               0,
+    "printobjtitle",            B_PrintObjTblTitle,     NULL,               0,
+    "printobjlec",              B_PrintObjLec,          NULL,               0,
+    "printobjinfos",            B_PrintObjEqsInfos,     NULL,               0,
+        
+    "printobjdef",              B_PrintObjDef,          SB_PrintObjDef,     1,
+    "printdest",                B_PrintDest,            NULL,               0,
+    "printdestnew",             B_PrintDestNew,         NULL,               0,
+    "printmulti",               B_PrintMulti,           NULL,               0,
+    "printnbdec",               B_PrintNbDec,           NULL,               0,
+    "printlang",                B_PrintLang,            NULL,               0,
+    "printtblfile",             B_ViewTblFile,          NULL,               0,
+    "printtbl",                 B_PrintTbl,             SB_ViewPrintTbl,    0,
+    "printvar",                 B_PrintVar,             NULL,               0,
+            
+    "viewtblfile",              B_ViewTblFile,          NULL,               0,
+    "viewtbl",                  B_ViewTbl,              SB_ViewPrintTbl,    0,
+    "viewvar",                  B_ViewVar,              NULL,               0,
+    "viewbytbl",                B_ViewByTbl,            SB_ViewByTbl,       0,
+            
+    "viewgr",                   B_ViewGr,               SB_ViewPrintGr,     0,
+
+    "graphdefault",             B_GraphDefault,         NULL,               0,
+    
+    "printgrall",               B_PrintGr,              SB_ViewPrintGr,     0,
+    "printgr",                  B_PrintGr,              SB_ViewPrintGr,     0,
+    
+    "modelsimulate",            B_ModelSimulate,        SB_ModelSimulate,   0,
+    "modelsimulateparms",       B_ModelSimulateParms,   NULL,               0,
+    "modelexchange",            B_ModelExchange,        NULL,               0,
+    "modelcompile",             B_ModelCompile, 	    SB_ModelCompile,    0,
+    
+    "modelcalcscc",             B_ModelCalcSCC,         NULL,               0,
+    "modelsimulatescc",         B_ModelSimulateSCC,     NULL,               0,
+
+    "modelsimulatesaveniters",  B_ModelSimulateSaveNIters,  NULL,           0,
+    "modelsimulatesavenorms",   B_ModelSimulateSaveNorms,   NULL,           0,
+
+
+    "idtexecute",               B_IdtExecute,           SB_IdtExecute,      0,
+    "idtexecutevarfiles",       B_IdtExecuteVarFiles,   NULL,               0,
+    "idtexecutesclfiles",       B_IdtExecuteSclFiles,   NULL,               0,
+    "idtexecutetrace",          B_IdtExecuteTrace,      NULL,               0,
+    
+    "eqsestimate",              B_EqsEstimate,          SB_EqsEstimate,     0,
+    "eqsstepwise",              B_EqsStepWise,          NULL,               0,
+    "eqssetmethod",             B_EqsSetMethod,         NULL,               0,
+    "eqssetbloc",               B_EqsSetBloc,           NULL,               0,
+    "eqssetblock",              B_EqsSetBloc,           NULL,               0,
+    "eqssetsample",             B_EqsSetSample,         NULL,               0,
+    "eqssetinstrs",             B_EqsSetInstrs,         NULL,               0,
+    "eqssetcmt",                B_EqsSetCmt,            NULL,               0,
+    
+    "reportexec",               B_ReportExec,           SB_ReportExec,      0,
+    "reportedit",               NULL,                   SB_ReportEdit,      0,
+    "prompt",                   NULL,                   SB_ReportPrompt,    0,
+    "minimize",                 B_WindowMinimize,       NULL,               0,
+    "maximize",                 B_WindowMaximize,       NULL,               0,
+    "sleep",                    B_Sleep,                NULL,               0,
+        
+    "printa2mappend",           B_PrintA2mAppend,       NULL,               0,
+    "printfont",                B_PrintFont,            NULL,               0,
+    "printtablefont",           B_PrintTFont,           NULL,               0,
+    "printtablebox",            B_PrintTBox,            NULL,               0,
+    "printtablecolor",          B_PrintTColor,          NULL,               0,
+    "printtablewidth",          B_PrintTWidth,          NULL,               0,
+    "printtablebreak",          B_PrintTBreak,          NULL,               0,
+    "printtablepage",           B_PrintTPage,           NULL,               0,
+
+    "printhtmltableclass",      B_PrintHtmlTableClass,  NULL,               0,
+    "printhtmltrclass",         B_PrintHtmlTRClass,     NULL,               0,
+    "printhtmlthclass",         B_PrintHtmlTHClass,     NULL,               0,
+    "printhtmltdclass",         B_PrintHtmlTDClass,     NULL,               0,
+
+    "printbackground",          B_PrintGColor,          NULL,               0,
+    "printgraphbox",            B_PrintGBox,            NULL,               0,
+    "printgraphbrush",          B_PrintGBrush,          NULL,               0,
+    "printgraphsize",           B_PrintGSize,           NULL,               0,
+    "printgraphpage",           B_PrintGPage,           NULL,               0,
+    "printgraphtheme",          B_PrintGTheme,          NULL,               0,
+    "printgraphband",           B_PrintGBand,           NULL,               0,
+            
+    "printrtfhelp",             B_PrintRtfHelp,         NULL,               0,
+    "printhtmlhelp",            B_PrintHtmlHelp,        NULL,               0,
+    "printrtftopic",            B_PrintRtfTopic,        NULL,               0,
+    "printrtflevel",            B_PrintRtfLevel,        NULL,               0,
+    "printrtftitle",            B_PrintRtfTitle,        NULL,               0,
+    "printrtfcopyright",        B_PrintRtfCopy,         NULL,               0,
+    "printparanum",             B_PrintParaNum,         NULL,               0,
+    "printpageheader",          B_PrintPageHeader,      NULL,               0,
+    "printpagefooter",          B_PrintPageFooter,      NULL,               0,
+    "printorientation",         B_PrintGdiOrient,       NULL,               0,
+    "printduplex",              B_PrintGdiDuplex,       NULL,               0,
+    "setprinter",               B_PrintGdiPrinter,      NULL,               0,
+    
+    "printgiftranscolor",       B_PrintGIFTransColor,   NULL,               0,
+    "printgifbackcolor",        B_PrintGIFBackColor,    NULL,               0,
+    "printgifinterlaced",       B_PrintGIFInterlaced,   NULL,               0,
+    "printgiftransparent",      B_PrintGIFTransparent,  NULL,               0,
+    "printgiffilled",           B_PrintGIFFilled,       NULL,               0,
+    "printgiffont",             B_PrintGIFFont,         NULL,               0,
+    
+    "printhtmlstrip",           B_PrintHtmlStrip,       NULL,               0,
+    "printhtmlstyle",           B_PrintHtmlStyle,       NULL,               0,
+            
+    "ddeget",                   B_DDEGet,               NULL,               0,
+    "sysmovefile",              B_SysRename,            NULL,               0,
+    "syscopyfile",              B_SysCopy,              NULL,               0,
+    "sysappendfile",            B_SysAppend,            NULL,               0,
+    "sysdeletefile",            B_SysDelete,            NULL,               0,
+    "sysansitoutf8",            B_SysAnsiToUTF8,        NULL,               0,
+    "sysoemtoutf8",             B_SysOemToUTF8,         NULL,               0,
+    "sysansitooem",             B_SysAnsiToOem,         NULL,               0,
+    "sysoemtoansi",             B_SysOemToAnsi,         NULL,               0,
+                
+    "a2mtohtml",                B_A2mToHtml,            NULL,               0,
+    "a2mtomif",                 B_A2mToMif,             NULL,               0,
+    "a2mtocsv",                 B_A2mToCsv,             NULL,               0,
+    "a2mtortf",                 B_A2mToRtf,             NULL,               0,
+    "a2mtoprinter",             B_A2mToPrinter,         NULL,               0,
+                
+    "csvsave",                  B_CsvSave,              NULL,               3,
+    "csvdigits",                B_CsvNbDec,             NULL,               0,
+    "csvsep",                   B_CsvSep,               NULL,               0,
+    "csvdec",                   B_CsvDec,               NULL,               0,
+    "csvnan",                   B_CsvNaN,               NULL,               0,
+    "csvaxes",                  B_CsvAxes,              NULL,               0,
+
+
+
+
+*/

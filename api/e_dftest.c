@@ -4,7 +4,7 @@
  *  Implementation of the Dickey-Fuller test.
  *  
  *  TODO: 
- *      1. Use API "K_" functions instead of B_DataUpdateEqs() and B_EqsEstimateEqs()
+ *      1. Use API "K_" functions instead of B_EqsEstimateEqs()
  *      2. Implement tests
  *  
  *  List of functions 
@@ -96,11 +96,10 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
     SCR_add_ptr(&eqs, &neqs, "_DF");
     SCR_add_ptr(&eqs, &neqs, NULL);
 
-    rc = B_DataUpdateEqs("_DF", buf, 0L, 0, 0L, 0L, 0L, 0L, 0);
+    rc = K_upd_eqs("_DF", buf, 0L, 0, 0L, 0L, 0L, 0L, 0);
     if(rc) return(rc);
     rc = B_EqsEstimateEqs(smpl, eqs);
 
-    //B_DataDelete("_DF", K_EQS);
     K_del_by_name(KE_WS, "_DF");
     SCR_free_tbl(eqs);
     return(rc);
