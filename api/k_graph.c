@@ -1,7 +1,10 @@
 /**
  *  @header4iode
  *  
- *  Functions to generate IODE graphs in A2M format based on a TBL structure and a GSAMPLE definition.
+ *  Functions to generate IODE graphs in A2M format.
+ *  The graphs are based on 
+ *      - TBL structures and a GSAMPLE definition, or
+ *      - VAR list(s) or combination(s) or VARS. 
  *  
  *  Includes some A2M helper functions. 
  *  
@@ -19,6 +22,7 @@
  *      int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSAMPLE. 
  *      int T_find_opf(COLS *fcls, COL *cl)                                     Tries to find the position in *fcls of the opf (operation on files) in cl.
  *      int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)                   Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.
+ *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
 
 #include "iode.h"
@@ -434,8 +438,163 @@ int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
 }
 
 
+// =====================================================================================================
+// Generation of graphs based on a list of variables.
+// -----------------------------------------------------------------------------------------------------
+
+/**
+ *  Sub function of V_graph_vars_1().
+ *  
+ *  @param [in] int     gnb         graphic number (unused)
+ *  @param [in] int     type        type of chart (0, 2 or 3 for line chart, 1 for Bar chart) TODO: check this 
+ *  @param [in] int     xgrid       type of x grids (0-2). 0=T, 1=N, 2=t (see a2m for more infos)
+ *  @param [in] int     ygrid       type of y grids (0-2). 0=MM, 1=NN, 2=mm (see a2m for more infos)
+ *  @param [in] int     axis        unused
+ *  @param [in] double  ymin        L_NAN or min value of the y axis
+ *  @param [in] double  ymax        L_NAN or max value of the y axis
+ *  @param [in] SAMPLE* smpl        printing sample
+ *  @param [in] int     dt          shift from the sample beginning of the first observation to keep for the graph
+ *  @param [in] int     nt          nb of obs to print
+ *  @param [in] KDB*    kdb         KDB containing the variables to graph
+ *  @param [in] char**  names       List of variable names or groups of names separated by + or -.
+ *                                  "A+B" means a graph with the 2 vars A and B
+ *  @param [in] int     mode        transformation of the variables (KLG_E_LEVEL, KLG_E_DIFF, KLG_E_GRT,  KLG_E_DIFFY or KLG_E_GRTY) 
+ *  @return     int                 0 on success, -1 on error    
+ *  
+ */
+static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
+           double ymin, double ymax, SAMPLE* smpl, int dt, int nt, KDB* kdb, char* names, int mode)
+{
+    char    *buf, **vars;
+    int     i, t, ng, var_nb, rc = 0;
+    IODE_REAL    *y;
+    extern char *KLG_MODES[][3];        /* JMP38 01-10-92 */
+
+    vars = (char **)SCR_vtoms(names, "+-");
+    ng = SCR_tbl_size(vars);
+    if(ng == 0) {
+        B_seterrn(68);
+        return(-1);
+    }
+
+    y = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * nt);
+
+    T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
+    /* GB 10/08/98 */
+    buf = SCR_malloc(strlen(names) + 20);
+    //sprintf(buf, "%s (%s)", names, KLG_MODES[global_VM][0]);
+    sprintf(buf, "%s (%s)", names, KLG_MODES[mode][0]);
+    T_GraphTitle(buf);
+    SCR_free(buf);
+
+    for(i = 0 ; i < ng ; i++) {
+        var_nb = K_find(kdb, vars[i]);
+        if(var_nb < 0) {
+            B_seterrn(64, vars[i]);
+            rc = -1;
+            goto fin;
+        }
+
+        for(t = 0; t < nt; t++) {
+            //y[t] = (IODE_REAL ) KV_get(kdb, var_nb, dt + t, (int)global_VM);
+            y[t] = (IODE_REAL ) KV_get(kdb, var_nb, dt + t, mode);
+        }
+        T_GraphLegend(0, "LLBL"[type], vars[i], NULL);
+        /*        T_GraphLegend(0, "LBLL"[type], vars[i], NULL); */
+        T_GraphTimeData(smpl, y);
+    }
+
+fin:
+    T_GraphEnd();
+
+    SW_nfree(y);
+    SCR_free_tbl(vars);
+    return(rc);
+}
+
+
+/**
+ *  Sub function of V_graph() but applied on any KDB of variables.
+ *  
+ *  @param [in] KDB*    kdb     KDB containing the variables in names
+ *  @return     int             0 on success, -1 on error    
+ *  
+ *  See V_graph() for the other parameter definitions.
+ */
+ 
+static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, KDB* kdb, char** names, int mode)
+{
+    int     i, dt, nt, ng;
+
+    /* GB 12/97
+        if(view == 0) {
+    	 if(B_dest == 1)
+    	     if(PG_edit_window(vkp_fprintfile) < 0) return(-1);
+
+    	 if(B_PrintDest(B_outfile) < 0) return(-1);
+        }
+    */
+    ng = SCR_tbl_size(names);
+    if(ng == 0) {
+        B_seterrn(69);
+        return(-1);
+    }
+
+    nt = smpl->s_nb;
+    dt = PER_diff_per(&(smpl->s_p1), &(KSMPL(kdb)->s_p1));
+    if(dt < 0 || dt + nt > KSMPL(kdb)->s_nb) {
+        B_seterrn(70);
+        return(-1);
+    }
+
+    for(i = 0; i < ng; i++) {
+        if(view) W_InitDisplay();
+        V_graph_vars_1(i, type, xgrid, ygrid, axis, ymin, ymax, smpl, dt, nt, kdb, names[i], mode);
+        if(view) W_EndDisplay(names[i], -ng, -i, -1, -1);
+    }
+    W_close();
+    return(0); /* JMP38 01-10-92 */
+}
+
+
+/**
+ *  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
+ *  
+ *  Example
+ *  -------
+ *      varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", ",;");
+ *      smpl = PER_atosmpl("1990Y1", "2010Y1");
+ *      rc = V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, smpl, varlist);
+ *  
+ *  @param [in] int     view    0 for printing, 1 for displaying the graphs
+ *  @param [in] int     mode    transformation of the variables (KLG_E_LEVEL, KLG_E_DIFF, KLG_E_GRT,  KLG_E_DIFFY or KLG_E_GRTY) 
+ *  @param [in] int     type    type of graph (see a2m ?)
+ *  @param [in] int     xgrid   type of x grids (0-2). 0=T, 1=N, 2=t (see a2m for more infos)
+ *  @param [in] int     ygrid   type of y grids (0-2). 0=MM, 1=NN, 2=mm (see a2m for more infos)
+ *  @param [in] int     axis    unused
+ *  @param [in] double  ymin    L_NAN or min value of the y axis
+ *  @param [in] double  ymax    L_NAN or max value of the y axis
+ *  @param [in] SAMPLE* smpl    printing sample
+ *  @param [in] char**  names   list of VARs to print
+ *  @return     int             0 on success, -1 on error
+ */
+int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)
+{
+    int     rc;
+    //int old_mode = global_VM, rc;
+
+    //global_VM = mode;
+    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, KV_WS, names, mode); // JMP 8/8//2022
+
+    //global_VM = old_mode;
+    return(rc);
+}
+
+
+
 // =============================================================================================================================
-// API CHART 
+// API CHART: used in b_api.c but what for ???
+// TODO: answer this question...
 // -----------------------------------------------------------------------------------------------------------------------------
 
 // Struct declarations
@@ -471,20 +630,6 @@ double *APIChartData(int hdl, int i);
 int APIPrepareChart(TBL *tbl, char *gsmpl);
 
 
-
-/**
- *  
- *  
- *  @param [in] int         hdl  
- *  @param [in] TBL*        tbl  
- *  @param [in] int         i    
- *  @param [in] COLS*       cls  
- *  @param [in] SAMPLE*     smpl 
- *  @param [in] IODE_REAL*  x    
- *  @param [in] IODE_REAL*  y    
- *  @param [in] COLS*       fcls 
- *  @return 
- */
 int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)
 {
     int     j, dt, k;
@@ -641,14 +786,6 @@ int APIChartEnd(APICHRT *Chrt)
     
 }
 
-
-/**
- *  
- *  
- *  @param [in] int     nl 
- *  @return 
- *  
- */
 int APIChartAlloc(int nl)
 {
     int     i;
@@ -663,13 +800,6 @@ int APIChartAlloc(int nl)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @return 
- *  
- */
 int APIChartFree(int hdl)
 {
     if(API_NBCHARTS == 0) return(-1);
@@ -680,13 +810,6 @@ int APIChartFree(int hdl)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @return 
- *  
- */
 int APIChartNl(int hdl)
 {
     APICHRT    *Chrt;
@@ -696,13 +819,6 @@ int APIChartNl(int hdl)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @return 
- *  
- */
 int APIChartNc(int hdl)
 {
     APICHRT    *Chrt;
@@ -712,14 +828,6 @@ int APIChartNc(int hdl)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @param [in] int     i
- *  @return 
- *  
- */
 int APIChartType(int hdl, int i)
 {
     APICHRT    *Chrt;
@@ -729,14 +837,6 @@ int APIChartType(int hdl, int i)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @param [in] int     i
- *  @return 
- *  
- */
 int APIChartAxis(int hdl, int i)
 {
     APICHRT    *Chrt;
@@ -746,14 +846,6 @@ int APIChartAxis(int hdl, int i)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @param [in] int     i
- *  @return 
- *  
- */
 char *APIChartTitle(int hdl, int i)
 {
     APICHRT    *Chrt;
@@ -763,14 +855,6 @@ char *APIChartTitle(int hdl, int i)
 }
 
 
-/**
- *  
- *  
- *  @param [in] int     hdl
- *  @param [in] int     i
- *  @return 
- *  
- */
 double  *APIChartData(int hdl, int i)
 {
     APICHRT    *Chrt;
@@ -780,14 +864,6 @@ double  *APIChartData(int hdl, int i)
 }
 
 
-/**
- *  
- *  
- *  @param [in] TBL*    tbl   
- *  @param [in] char*   gsmpl 
- *  @return 
- *  
- */
 int APIPrepareChart(TBL *tbl, char *gsmpl)
 {
     int     i, dim, begin = 1, w, hdl;

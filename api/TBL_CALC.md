@@ -127,7 +127,9 @@ Global variables
 
 ### k\_graph.c {#T7}
 
-Functions to generate IODE graphs in A2M format based on a TBL structure and a GSAMPLE definition. Includes some A2M helper functions.
+Functions to generate IODE graphs in A2M format based on a TBL structure and a GSAMPLE definition. Contains also V\_graph(), a function to print or display variables or combinations of variables on a (simple) SAMPLE.
+
+Includes some A2M helper functions.
 
 |Variable|Default value|Description|
 |:---|:---|:---|
@@ -143,6 +145,7 @@ Functions to generate IODE graphs in A2M format based on a TBL structure and a G
 |`int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSAMPLE.||
 |`int T_find_opf(COLS *fcls, COL *cl)`|Tries to find the position in \*fcls of the opf (operation on files) in cl.||
 |`int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)`|Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.||
+|`int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)`|Prints or displays graph(s) from variable list(s) or combination(s) or variables.||
 
 ### Translations {#T8}
 

@@ -4,7 +4,195 @@
 
 
 
-- [Group "Iode Reports"](#T1)
+- [IODE: Reports](#T1)
+  - [Report functions group 1: "internal" functions](#T2)
+  - [Report functions group 2: IODE commands](#T3)
+      - [Functions with an IODE object suffix (cmt, eqs...)](#T4)
+      - [Functions with a file extension suffix (csv, txt...)](#T5)
+      - [Other functions](#T6)
+    - [List of source files](#T7)
+    - [b\_base.c](#T8)
+      - [Functions with a suffix](#T9)
+      - [Other functions](#T10)
+      - [List of functions](#T11)
+    - [b\_ras.c](#T12)
+      - [List of functions](#T13)
+  - [Report functions group 3: report functions](#T14)
 
-# Group "Iode Reports" {#T1}
+# IODE: Reports {#T1}
+
+Three groups of functions that manage the reports can be identified:
+
+- Report functions group 1: "internal" functions which compile and execute the report commands, like $goto, $define...
+- Report functions group 2: IODE commands that act on objects, like $DataCreateVar, $FileDeleteTxt...
+- Report functions group 3: report functions that are replaced on the commmand line by their computed value, like @upper(), @time()...
+
+## Report functions group 1: "internal" functions {#T2}
+
+## Report functions group 2: IODE commands {#T3}
+
+This group contains functions acting on IODE objects that are called by the report engine (see b\_rep\_syntax.c for a complete list of functions).
+
+These functions all have a similar syntax and always integer return code, 0 indicating success, other values an error.
+
+There can be divided in 3 groups:
+
+- functions requiring as 2d arg an object type like B\_DataCreate() for the report commands $DataCreateIdt, $DataCreateVar...
+- functions requiring as 2d arg a file type like B\_FileDelete() for the report commands $FileDeleteCsv, $FileDeleteTxt...
+- functions with only one arg, like B\_DataListCount() or B\_DataCalcVar()
+
+#### Functions with an IODE object suffix (cmt, eqs...) {#T4}
+
+Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate require a suffix indicating which type of objects is their target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
+
+When called by the report engine, these functions have 2 parameters:
+
+- the argument of the function (the remaining of the report line)
+- the type of object treated (K\_CMT <= type <= K\_VAR)
+
+For these functions, the parameters and return values are as follows:
+
+```
+    @param [in] char*   arg     report line without the command 
+    @param [in] int     type    type of object whose names are to be saved in the list (bw K_CMT and K_VAR)
+    @return     int             0 on success, -1 on error 
+```
+
+For instance, the report command
+
+```
+    $DataDeleteVar A B C
+```
+
+generates the C call:
+
+```
+    B_DataDelete("A B C", K_VAR);
+    
+    where arg == "A B C" and type == K_VAR   
+```
+
+#### Functions with a file extension suffix (csv, txt...) {#T5}
+
+The principle is the same as above but for filename extensions instead of object types.
+
+When called by the report engine, these functions have 2 parameters:
+
+- the argument of the function (the remaining of the report line)
+- the type of object treated (K\_CMT <= type <= K\_CSV)
+
+The parameters and return values are the same as for the functions with an IODE object type parameter.
+
+For instance, the report command
+
+```
+    $FileDeleteCsv myfile
+```
+
+calls the C function
+
+```
+    B_FileDelete(arg, K_CSV);
+ 
+    where arg == "myfile" and type == K_VAR   
+```
+
+#### Other functions {#T6}
+
+All other functions receive only the argument on the report line. B\_DataListSort(), for example, has only one argument.
+
+For these functions, the parameters and return values are as follows:
+
+```
+ @param [in] char*   arg     report line without the command
+ @return     int             0 on success, -1 on error (not enough args)
+```
+
+### List of source files {#T7}
+
+- b\_base.c : functions acting on Data
+- b\_ras.c : implementation of a RAS algorithm.
+
+### b\_base.c {#T8}
+
+Functions acting on IODE objects called by the report engine (see b\_rep\_syntax.c) and their sub\-functions.
+
+These functions all have a similar syntax and always return an integer as return code, 0 indicating success, other values an error.
+
+There are 2 groups of functions, one where a suffix is required, one with no suffix.
+
+#### Functions with a suffix {#T9}
+
+Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate required a suffix indicating which type of objects is the target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
+
+When called by the report engine, these functions have 2 parameters: \- the argument of the function (the remaining of the report line) \- the type of object treated
+
+For these functions, the parameters and return values are as follows:
+
+```
+@param [in] char*   arg     report line  without the command 
+@param [in] int     type    type of object whose names are to be saved in the list
+@return     int             0 on success, -1 on error (not enough args)
+```
+
+For instance, the report command
+
+```
+    $DataDeleteVar A B C
+```
+
+generates the C call:
+
+```
+    B_DataDelete("A B C", K_VAR);
+    where arg == "A B C" and type == K_VAR   
+```
+
+#### Other functions {#T10}
+
+All other functions receive simply the argument on the report line. B\_DataListSort(), for example, has only one argument.
+
+For these functions, the parameters and return values are as follows:
+
+```
+@param [in] char*   arg     report line without the command
+@return     int             0 on success, -1 on error (not enough args)
+```
+
+#### List of functions {#T11}
+
+|Syntax|Description|
+|:---|:---|
+|`int B_DataPattern(char* arg,int type)`|Creates an IODE list with all existing objects of a given type having the name constructed by the combinations of 2 lists.|
+|`int B_DataRasVar(char* arg)`|RAS method implementation.|
+|`int B_DataCalcVar(char* arg)`|Computes a new variable based on a LEC expression.|
+|`int B_DataCreate(char* arg, int type)`|Creates one or more new objects.|
+|`int B_DataDelete(char* arg, int type)`|Deletes one or more objects.|
+|`int B_DataRename(char* arg, int type)`|Renames an object. Equations cannot be renamed.|
+|`int B_DataDuplicate(char* arg, int type)`|Duplicates an object. Equations cannot be duplicated.|
+|`int B_DataUpdate(char* arg, int type)`|Updates an object. The syntax can differ according to the object type.|
+|`int B_DataSearch(char* arg, int type)`|Searches all objects containing a given string in their names and/or definitions.|
+|`int B_DataListSort(char* arg)`|Sorts a list alphanumerically.|
+|`int B_DataScan(char* arg, int type)`|Analyses a KDB content and creates 2 lists \_EXO and \_SCAL with all VAR and all SCL found in the kdb objects.|
+|`int B_DataExist(char* arg, int type)`|Checks that an object exists. Returns \-1 if not, the object position in WS otherwise.|
+|`int B_DataAppend(char* arg, int type)`|Appends data (a string) to a CMT or a LST.|
+|`int B_DataList(char* arg, int type)`|Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.|
+|`int B_DataCalcLst(char* arg)`|List calculus: 4 operations between 2 lists.|
+|`int B_DataListCount(char* arg)`|Returns the number of elements in a list.|
+|`int B_DataCompareEps(char* arg)`|Defines the threshold under which the difference between 2 variables are considered equal.|
+|`int B_DataCompare(char* arg, int type)`|Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.|
+|`int B_DataDisplayGraph(char* arg)`|Shows VARs or combinations of VARS in graphical form.|
+|`int B_DataPrintGraph(char* arg)`|Prints VARs or combinations of VARS in graphical form.|
+
+### b\_ras.c {#T12}
+
+Implementation of a RAS algorithm.
+
+#### List of functions {#T13}
+
+|Syntax|Description|
+|:---|:---|
+|`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
+
+## Report functions group 3: report functions {#T14}
 

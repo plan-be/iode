@@ -90,7 +90,7 @@ static char *K_add_ext(char* filename, char* ext)
  *   
  *  @param [out]    res   char*   resulting filename
  *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     object type contained in the file
+ *  @param [in]     type  int     file type (value defined in iode.h between K_CMT and K_CSV) 
  *  @return               char*   res (same pointer)
  *  
  *  @example : 

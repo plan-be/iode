@@ -428,7 +428,7 @@ char T_SEPS[] = ";\n\t";
 /**
  *  Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi-colons.
  *  
- *  For the variables having a comment (with the same name) inb the current CMT WS, the line title is replaced by the comment.
+ *  For the variables having a comment (with the same name) in the current CMT WS, the line title is replaced by the comment.
  *  For the LEC formulas and the other variables, the line titles are the formulas / var names.
  *  
  *  @param [in] char*  name     name of the new table

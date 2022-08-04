@@ -74,6 +74,7 @@ void K_end_ws(int ws)
             K_free(K_RWS[i][j]);
             K_RWS[i][j] = 0; // JMP 9/11/2012
         }
+        // K_WS[i] = NULL;  // TODO: check this: in the previous version, K_WS[] remained untouched, is it normal ?
     }
 }
 

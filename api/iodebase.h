@@ -785,7 +785,7 @@ extern int B_get1int(char *);
 extern int B_FilePrint(char *,int );
 
 /* b_fdel.c */
-extern int B_unlink_1(char *,int *);
+//extern int B_unlink_1(char *,int *);
 extern int B_FileDelete(char *,int );
 
 /* b_fcopy.c */
@@ -897,9 +897,6 @@ extern int B_DataSearch(char *,int );
 extern int B_DataEditCnf(char *);
 // extern int my_strcmp(const void *,const void *);
 extern int B_DataListSort(char *);
-extern int B_DataDisplayGraph(char *);
-extern int B_DataPrintGraph(char *);
-extern int B_DataEditGraph(int ,char *);
 extern int B_DataScan(char *,int );
 extern int B_DataExist(char *,int );
 extern int B_DataAppend(char *,int );
@@ -907,6 +904,10 @@ extern int B_DataList(char *,int );
 extern int B_DataCalcLst(char *);
 extern int B_DataListCount(char *);
 extern int B_DataCompare(char *,int );
+//extern int B_DataEditGraph(int ,char *);
+extern int B_DataDisplayGraph(char *);
+extern int B_DataPrintGraph(char *);
+
 
 /* b_ws.c */
 extern int B_WsLoad(char *,int );
@@ -1357,7 +1358,7 @@ extern int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
 extern int T_find_opf(COLS *fcls, COL *cl);
 extern int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode);
 extern int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl);
-
+extern int V_graph(int ,int ,int ,int ,int ,int ,double ,double ,SAMPLE *,char **);
 
 /* k_grep.c */
 extern char **K_grep(KDB *,char *,int ,int ,int ,int ,int );
@@ -1520,12 +1521,12 @@ extern int ODE_blk_print_res(void);
 extern int ODE_blk_dadj_fn(char *);
 
 /* o_gr.c */
-extern int o_calc_lhs(char *,char *,char *);
-extern int o_estgr(char **,SAMPLE *,MAT *,MAT *,int ,int );
-extern int ODE_graph(int ,int ,int ,int ,int ,int ,double ,double ,SAMPLE *,char **);
-extern void T_create_wtcfl(void);
-extern int o_var_gr_1(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,int ,int ,KDB *,char *);
-extern int o_var_gr(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,KDB *,char **);
+//extern int o_calc_lhs(char *,char *,char *);
+//extern int o_estgr(char **,SAMPLE *,MAT *,MAT *,int ,int );
+//extern int ODE_graph(int ,int ,int ,int ,int ,int ,double ,double ,SAMPLE *,char **);
+//extern void T_create_wtcfl(void);
+//extern int o_var_gr_1(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,int ,int ,KDB *,char *);
+//extern int o_var_gr(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,KDB *,char **);
 
 /* o_abort.c */
 // extern int SW_abort(int ,char *);   	// JMP 10/5/2021 double de avec SCR
