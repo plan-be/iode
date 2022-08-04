@@ -1,48 +1,73 @@
 /**
  *  @header4iode
  * 
- *  Functions acting on IODE objects called by the report engine (see b_rep_syntax.c) 
- *  and their sub-functions. 
- *  
+ *  Functions acting on IODE objects called by the report engine (see b_rep_syntax.c for a complete list of functions).
+ *    
  *  These functions all have a similar syntax and always 
  *  return an integer as return code, 0 indicating success, other values an error.
  *  
- *  There are 2 groups of functions, one where a suffix is required, one with no suffix.
+ *  There are 3 groups of functions:
+ *      - functions requiring as 2d arg an object type like B_DataCreate() for the report commands $DataCreateIdt, $DataCreateVar...
+ *      - functions requiring as 2d arg a file type like B_FileDelete() for the report commands $FileDeleteCsv, $FileDeleteTxt...
+ *      - functions with only one arg, like B_DataListCount() or B_DataCalcVar()
  *  
- *  Functions with a suffix
- *  -----------------------
+ *  Functions with an IODE object suffix (cmt, eqs...)
+ *  --------------------------------------------------
  *  Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate 
- *  required a suffix indicating which type of objects is the target (one of the 7 IODE objects).
+ *  require a suffix indicating which type of objects is their target (one of the 7 IODE objects).
  *  In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
  *  
  *  When called by the report engine, these functions have 2 parameters: 
  *      - the argument of the function (the remaining of the report line)
- *      - the type of object treated
+ *      - the type of object treated (K_CMT <= type <= K_VAR)
  *  
  *  For these functions, the parameters and return values are as follows: 
  *  
- *  @param [in] char*   arg     report line  without the command 
- *  @param [in] int     type    type of object whose names are to be saved in the list
- *  @return     int             0 on success, -1 on error (not enough args)
+ *      @param [in] char*   arg     report line without the command 
+ *      @param [in] int     type    type of object whose names are to be saved in the list (bw K_CMT and K_VAR)
+ *      @return     int             0 on success, -1 on error 
  *
  *  For instance, the report command 
+ *  
  *      $DataDeleteVar A B C
  *  
  *  generates the C call: 
+ *  
  *      B_DataDelete("A B C", K_VAR);
  *
  *  where arg == "A B C" and type == K_VAR   
  *      
  *  
+ *  Functions with a file extension suffix (csv, txt...)
+ *  ----------------------------------------------------
+ *  The principle is the same as above but for filename extensions instead of object types.
+ *    
+ *  When called by the report engine, these functions have 2 parameters: 
+ *      - the argument of the function (the remaining of the report line)
+ *      - the type of object treated (K_CMT <= type <= K_CSV)
+ *  
+ *  The parameters and return values are the same as for the functions with an IODE object type parameter.
+ *
+ *  For instance, the report command 
+ *  
+ *      $FileDeleteCsv myfile
+ *  
+ *  calls the C function 
+ *  
+ *      B_FileDelete(arg, K_CSV);
+ *
+ *  where arg == "myfile" and type == K_VAR   
+ *      
+ *  
  *  Other functions
  *  ---------------
- *  All other functions receive simply the argument on the report line. 
+ *  All other functions receive only the argument on the report line. 
  *  B_DataListSort(), for example, has only one argument.
  *
  *  For these functions, the parameters and return values are as follows: 
  *  
- *  @param [in] char*   arg     report line without the command
- *  @return     int             0 on success, -1 on error (not enough args)
+ *   @param [in] char*   arg     report line without the command
+ *   @return     int             0 on success, -1 on error (not enough args)
  *  
  *  List of functions 
  *  -----------------
@@ -57,14 +82,15 @@
  *      int B_DataSearch(char* arg, int type)       Searches all objects containing a given string in their names and/or definitions.
  *      int B_DataListSort(char* arg)               Sorts a list alphanumerically. 
  *      int B_DataScan(char* arg, int type)         Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all SCL found in the kdb objects.
- *      int B_DataExist(char* arg, int type)        Checks that an object exists.
- *      int B_DataAppend(char* arg, int type)       
- *      int B_DataList(char* arg, int type)
- *      unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
- *      int B_DataCalcLst(char* arg)
- *      int B_DataListCount(char* arg)
- *      int B_DataCompareEps(char* arg)
- *      int B_DataCompare(char* arg, int type)  
+ *      int B_DataExist(char* arg, int type)        Checks that an object exists. Returns -1 if not, the object position in WS otherwise.
+ *      int B_DataAppend(char* arg, int type)       Appends data (a string) to a CMT or a LST.
+ *      int B_DataList(char* arg, int type)         Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.
+ *      int B_DataCalcLst(char* arg)                List calculus: 4 operations between 2 lists.
+ *      int B_DataListCount(char* arg)              Returns the number of elements in a list.
+ *      int B_DataCompareEps(char* arg)             Defines the threshold under which the difference between 2 variables are considered equal.
+ *      int B_DataCompare(char* arg, int type)      Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.
+ *      int B_DataDisplayGraph(char* arg)           This function allows you to view VARs or combinations of VARS in graphical form.
+ *      int B_DataPrintGraph(char* arg)             This function allows you to print VARs or combinations of VARS in graphical form.
  */
 
 #include "iode.h"
@@ -75,7 +101,7 @@
  *  by the combinations of 2 lists.
  *  
  *  Syntax:
- *      $DataPattern<type> list_name pattern X-dimention [Y-dimention]
+ *      $DataPattern<type> list_name pattern X-dimension [Y-dimension]
  *  
  *  Example:
  *      $$WsLoadVar ras.av    
@@ -180,8 +206,8 @@ int B_DataRasVar(char* arg)
  *  @see https://iode.plan.be/doku.php?id=datacalcvar for details
  *  
  *  @params See file header 
- *  #return int     0 on success, 
- *                  -1 on error: variable cannot be created, error in LEC formula, linl impossible...
+ *  @return int     0 on success, 
+ *                  -1 on error: variable cannot be created, error in LEC formula, link impossible...
  */
 int B_DataCalcVar(char* arg)
 {
@@ -272,7 +298,7 @@ static int B_DataCreate_1(char* arg, int* ptype)
  *  @see https://iode.plan.be/doku.php?id=datacalcvar for details
  *  
  *  @params See file header 
- *  #return int     0 on success, 
+ *  @return int     0 on success, 
  *                  -1 on error: variable cannot be created
  */
 
@@ -653,12 +679,8 @@ static int my_strcmp(const void *pa, const void *pb)
  *  @see https://iode.plan.be/doku.php?id=datalistsort for details
  *  
  *  @params See file header 
- *  #return int     0 on success, 
+ *  @return int     0 on success, 
  *                  -1 on error: variable cannot be created
- *
- *  TODO (DONE): accepter les listes avec ; comme séparateur. Ne fonctionne pas car utilise B_ainit_chk() 
- *  qui ne prend pas ; comme séparateur pour permettre d'avoir des listes sur une ligne de commande.
- *  
  */
 
 int B_DataListSort(char* arg)
@@ -766,7 +788,7 @@ int B_DataScan(char* arg, int type)
 
 
 /**
- *  Checks that an object exists.
+ *  Checks that an object exists. Returns -1 if not, the object position in WS otherwise.
  *  
  *  Syntax
  *  ------
@@ -787,6 +809,20 @@ int B_DataExist(char* arg, int type)
 }
 
 
+/**
+ *  Appends data (a string) to a CMT or a LST.
+ *  
+ *  Syntax
+ *  ------
+ *      $DataAppend<type> name txt 
+ *  
+ *  @see https://iode.plan.be/doku.php?id=dataappend for details
+ *  
+ *  @params See file header 
+ *  
+ *  @return int     0 on success
+ *                  -1 if type is incorrect or the object cannot be created / expanded 
+ */
 int B_DataAppend(char* arg, int type)
 {
     int     pos, lg;
@@ -831,6 +867,21 @@ int B_DataAppend(char* arg, int type)
     else return(0);
 }
 
+
+/**
+ *  Constructs a list of objects matching a given name pattern. Objects can be in WS or in a file. 
+ *  The pattern can contain * to allow any suite of characters.
+ *  
+ *  Syntax
+ *  ------
+ *      $DataList<type> listname pattern [filename]
+ *  
+ *  @see https://iode.plan.be/doku.php?id=datalistxxx for details
+ *  
+ *  @params See file header 
+ *  @return int     0 on success
+ *                  -1 if type is incorrect or the object cannot be created / expanded 
+ */
 int B_DataList(char* arg, int type)
 {
     int     rc = 0;
@@ -869,6 +920,14 @@ int B_DataList(char* arg, int type)
     return(rc);
 }
 
+
+/**
+ *  Creates a new list of strings as the product of 2 lists of strings. ["A", "B"] x ["C", "D"] => ["AB", "AC", "BC", "BD"]
+ *  
+ *  @param [in] char**  l1  first list of strings
+ *  @param [in] char**  l2  second list of strings
+ *  @return     char**      l1 x l2
+ */
 static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
 {
     int             i, inb, j, jnb, nl, ll3, ll1, ll2;
@@ -901,6 +960,24 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
     return(res);
 }
 
+
+/**
+ *  List calculus: 4 operations between 2 lists. Union (+), Intersection (*), Difference (-) and Product (x).
+ *
+ *  Syntax
+ *  ------
+ *      $DataCalcLst res lst1 op lst2
+ *            where op =  + : union
+ *                        * : intersection
+ *                        - : difference
+ *                        x : product
+ *  
+ *  @see https://iode.plan.be/doku.php?id=datacalclst for details
+ *  
+ *  @params See file header 
+ *  @return int     0 on success
+ *                  -1 on error (list non found...)
+ */
 int B_DataCalcLst(char* arg)
 {
     int             rc = 0, p1, p2;
@@ -943,7 +1020,7 @@ int B_DataCalcLst(char* arg)
         rc = -1;
         goto done;
     }
-    rc = KL_lst(res, lst, -1); /* GB 30-10-07 */
+    rc = KL_lst(res, lst, -1); 
 
 
 done :
@@ -954,6 +1031,12 @@ done :
     return(rc);
 }
 
+/**
+ *  Returns the number of elements in a list.
+ *  
+ *  @param [in] char*   arg     list_name
+ *  @return     int             nb of elements in the list or -1 if the list does not exist
+ */
 int B_DataListCount(char* arg)
 {
     int     nb = 0;
@@ -971,6 +1054,20 @@ int B_DataListCount(char* arg)
     return(nb);
 }
 
+
+/**
+ *  Defines the threshold under which the difference between 2 variables are considered equal.
+ *
+ *  Syntax
+ *  ------
+ *      $DataCompareEps eps
+ *  
+ *  @see https://iode.plan.be/doku.php?id=datacompareeps for details
+ *  
+ *  @params See file header 
+ *  @return int     0 always
+ */
+ 
 int B_DataCompareEps(char* arg)
 {
     extern double K_CMP_EPS;
@@ -983,6 +1080,25 @@ int B_DataCompareEps(char* arg)
 }
 
 
+/**
+ *  Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.
+ *    
+ *  Syntax
+ *  ------
+ *      $DataCompare<type> filename ONE TWO THREE FOR
+ *      where
+ *            ONE         in WS only
+ *            TWO         in file only
+ *            THREE       in both, equal
+ *            FOUR        in both, different
+ *  
+ *  @see https://iode.plan.be/doku.php?id=datacomparexxx for details
+ *  
+ *  @params See file header 
+ *  @return int     -1 on error (incorrect syntax, file not found...
+ *                  0 on success
+ */
+ 
 int B_DataCompare(char* arg, int type)
 {
     int     i, rc = 0,
@@ -1049,5 +1165,110 @@ int B_DataCompare(char* arg, int type)
     K_free(kdb2);
 
     return(rc);
+}
+
+
+/**
+ *  Sub function of B_DataDisplayGraph() and B_DataPrintGraph().
+ */
+static int B_DataEditGraph(int view, char* arg)
+{
+    int     rc = 0, nb_args, i, mode, type, xgrid, ygrid, axis;
+    double  ymin, ymax;
+#ifndef WATCOM
+    double  atof();
+#endif
+    char    **args = NULL;
+    SAMPLE  *smpl = 0;
+
+    args = B_ainit_chk(arg, NULL, 0);
+    nb_args = SCR_tbl_size(args);    /* JMP 16-12-93 */
+    if(nb_args < 10) {
+	B_seterrn(67);
+	rc = -1;
+	goto fin;
+    }
+
+    mode = L_pos("LDGdg", args[0][0]); /* GB 10/08/98 */
+    mode = max(0, mode);
+
+    type  = B_argpos("LSBM", args[1][0]);
+    //xgrid = B_argpos("MNJ",  args[2][0]);
+    //ygrid = B_argpos("MNJ",  args[3][0]);
+    xgrid = B_argpos("JNM",  args[2][0]); // Corr VL 4/6/2018
+    ygrid = B_argpos("JNM",  args[3][0]); // Id
+ 
+    axis  = B_argpos("LGSP", args[4][0]);
+    if(memcmp(args[5], "--", 2) == 0) ymin = L_NAN;
+    else                              ymin = atof(args[5]);
+    if(memcmp(args[6], "--", 2) == 0) ymax = L_NAN;
+    else                              ymax = atof(args[6]);
+
+    smpl = PER_atosmpl(args[7], args[8]);
+    if(smpl == 0) {
+	B_seterrn(56);
+	rc = -1;
+	goto fin;
+    }
+
+    rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
+		    smpl, args + 9);
+
+fin:
+    A_free(args);
+    SCR_free(smpl);
+    return(rc);
+}
+
+
+/**
+ *  This function allows you to view VARs or combinations of VARS in graphical form.
+ *
+ *  Syntax
+ *  ------
+ *      $DataDisplayGraph {Level | Diff | Grt | diffYoY | grtYoY}
+ *                     {Line | Scatter | Bar | Mixt}
+ *                     {NoXGrids | MinorXGrids | J(MajorXGrids)}
+ *                     {NoYGrids | MinorYGrids | J(MajorYGrids)}
+ *                     {Level | G(Log) | Semi-Log | Percent}
+ *                     {ymin | --} {ymax | --}
+ *                     perfrom perto varname1 varname2 ...
+ *  
+ *  @see https://iode.plan.be/doku.php?id=datadisplaygraph for details
+ *  
+ *  @params See file header 
+ */
+ 
+int B_DataDisplayGraph(char* arg)
+{
+    return(B_DataEditGraph(1, arg));
+}
+
+
+/**
+ *  This function allows you to print VARs or combinations of VARS in graphical form.
+ *
+ *  Syntax
+ *  ------
+ *      $DataPrintGraph   {Level | Diff | Grt | diffYoY | grtYoY}
+ *                 {Line | Scatter | Bar | Mixt}
+ *                 {NoXGrids | MinorXGrids | J(MajorXGrids)}
+ *                 {NoYGrids | MinorYGrids | J(MajorYGrids)}
+ *                 {Level | G(Log) | Semi-Log | Percent}
+ *                 {ymin | --} {ymax | --}
+ *                 perfrom perto varname1 varname2 ...
+ *  
+ *  Example
+ *  -------
+ *      $DataPrintGraph  Level Line No No Level -- -- 1980Y1 1995Y1 X1 Y1 X1+Y1 
+ *  
+ *  @see https://iode.plan.be/doku.php?id=dataprintgraph for details
+ *  
+ *  @params See file header 
+ */
+
+int B_DataPrintGraph(char* arg) 
+{
+    return(B_DataEditGraph(0, arg));
 }
 

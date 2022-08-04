@@ -1053,7 +1053,7 @@ void Tests_SWAP()
 
 void Tests_B_DATA()
 {
-    char        *lst, *ptr;
+    char        *lst, *ptr, buf[512];
     int         rc, i;
     IODE_REAL   *A1, val;
     SAMPLE      *smpl;
@@ -1067,17 +1067,12 @@ void Tests_B_DATA()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ça marche pas...) => A changer ? Voir B_DataListSort() 
     B_DataPattern("RC xy $AB $BC", K_VAR); 
     lst = KLPTR("RC");
-    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC"), "B_DataPattern(\"RC xy $AB $BC\", K_VAR) => RC = \"AB,AC,BB,BC\"");
+    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC") == 1, "B_DataPattern(\"RC xy $AB $BC\", K_VAR) = \"AB,AC,BB,BC\"");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
     A1 = KVPTR("A1");
-    S4ASSERT(
-             (rc == 0) && 
-             (K_find(KV_WS, "A1") >= 0) && 
-             (A1[1] == 4),  
-             "B_DataCalcVar(\"A1 2 * B\")"
-             );
+    S4ASSERT((rc == 0) && (K_find(KV_WS, "A1") >= 0) && (A1[1] == 4), "B_DataCalcVar(\"A1 2 * B\")");
     
     // B_DataCreate(char* arg, int type)
     // B_DataDuplicate(char* arg, int type)
@@ -1127,9 +1122,49 @@ void Tests_B_DATA()
     S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("NEWLIST"), "U"), "B_DataSearch(\"of 0 0 1 0 1 NEWLIST\", K_CMT) = \"%s\"", KLPTR("NEWLIST"));
     
     // B_DataScan(char* arg, int type)
-     rc = B_DataScan("U", K_EQS);
-     S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_SCAL"), "c1;c2"), "B_DataScan(\"U\", K_EQS) = \"%s\"", KLPTR("_SCAL"));
- }
+    rc = B_DataScan("U", K_EQS);
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_SCAL"), "c1;c2"), "B_DataScan(\"U\", K_EQS) = \"%s\"", KLPTR("_SCAL"));
+     
+    // B_DataExist(char* arg, int type)
+    rc = B_DataExist("_SCAL", K_LST);
+    S4ASSERT(rc >= 0, "B_DataExist(\"_SCAL\", K_LST) = %d", rc);
+
+    // B_DataAppend(char* arg, int type)
+    rc = B_DataAppend("_SCAL XXX,YYY", K_LST);
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY"), "B_DataAppend(\"_SCAL XXX,YYY\", K_LST) = %d", rc);
+
+    rc = B_DataAppend("U - More comment on U", K_CMT);
+    S4ASSERT(rc == 0 && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U"), "B_DataAppend(\"U - More comment on U\", K_CMT) = %d", rc);
+
+    // B_DataList(char* arg, int type)
+    rc = B_DataList("LC ac*", K_SCL);
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("LC"), "acaf1;acaf2;acaf3;acaf4"), "B_DataList(\"LC ac*\", K_SCL); = '%s'", KLPTR("LC"));
+
+    // B_DataCalcLst(char* arg)
+    B_DataUpdate("LST1 A,B,C", K_LST);
+    B_DataUpdate("LST2 C,D,E", K_LST);
+    rc = B_DataCalcLst("_RES LST1 + LST2");
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E"), "B_DataCalcLst(\"_RES LST1 + LST2\") = '%s'", KLPTR("_RES"));
+    rc = B_DataCalcLst("_RES LST1 * LST2");
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "C"), "B_DataCalcLst(\"_RES LST1 * LST2\") = '%s'", KLPTR("_RES"));
+    rc = B_DataCalcLst("_RES LST1 - LST2");
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "A;B"), "B_DataCalcLst(\"_RES LST1 - LST2\") = '%s'", KLPTR("_RES"));
+    rc = B_DataCalcLst("_RES LST1 x LST2");
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE"), "B_DataCalcLst(\"_RES LST1 x LST2\") = '%s'", KLPTR("_RES"));
+
+    // B_DataCompare(char* arg, int type)  
+    sprintf(buf,  "%s\\fun.lst WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", IODE_DATA_DIR);
+    rc = B_DataCompare(buf, K_LST);
+    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;U;ZZZ;_DIVER;_EXO;_INTER;_POST;_PRE;_RES"), "B_DataCompare()");
+    //printf("WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
+    //printf("FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
+    //printf("BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
+    //printf("BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
+    
+  
+}
+
+
 
 
 // ================================================================================================
@@ -1241,6 +1276,7 @@ REPORT PRIMITIVES
     "filedelete",               B_FileDelete,           NULL,               4,
     "filerename",               B_FileRename,           NULL,               4,
     "filecopy",                 B_FileCopy,             NULL,               4,
+    
     "wssample",                 B_WsSample,             SB_WsSample,        0,
     "wsload",                   B_WsLoad,               SB_WsLoad,          3,
     "wscopy",                   B_WsCopy,               SB_WsCopy,          3,
