@@ -428,7 +428,7 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
     L_link(KV_WS, KS_WS, clec);
     calc_val = L_exec(KV_WS, KS_WS, clec, t);
     //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
-    S4ASSERT (U_test_eq(expected_val, calc_val), "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
+    S4ASSERT(U_test_eq(expected_val, calc_val), "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
 }
 
 /**
@@ -805,9 +805,11 @@ void Tests_Simulation()
 }
 
 
-void Tests_PrintTables()
+void Tests_PrintTablesAndVars()
 {
     char    fullfilename[256];
+    char    **varlist;
+    SAMPLE  *smpl;
     KDB     *kdbv, *kdbt;
     TBL     *tbl;
     int     rc;
@@ -848,8 +850,16 @@ void Tests_PrintTables()
     S4ASSERT(rc == 0, "T_graph_tbl_1(tbl, \"2000/1999:15[1;2]\", 1)");
     
     // Frees tbl
-    T_free(tbl);    
+    T_free(tbl);   
 
+    // Print vars as graphs
+    varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", (U_ch*)",;");
+    smpl = PER_atosmpl("1990Y1", "2010Y1");
+    rc = V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, smpl, varlist);
+    S4ASSERT(rc == 0, "V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, 2000Y1:2020Y1, ACAF;ACAG)");
+    SCR_free_tbl((U_ch**)varlist);
+    SCR_free(smpl);
+    
     // Close the output file
     W_close();
     
@@ -1054,25 +1064,35 @@ void Tests_SWAP()
 void Tests_B_DATA()
 {
     char        *lst, *ptr, buf[512];
-    int         rc, i;
+    int         rc, i, cond;
     IODE_REAL   *A1, val;
     SAMPLE      *smpl;
+    char        *filename = "fun";
     
     U_test_print_title("Tests B_DATA");
 
+    // Clear WS, then loads 3 WS and check ok
+    //K_end_ws(0);
+    U_test_load_fun_esv(filename);
+    
     // (re-)creates vars AA...
+    K_clear(KC_WS);
+    K_clear(KI_WS);
+    K_clear(KL_WS);
+    K_clear(KT_WS);
     U_test_CreateObjects();
     
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ça marche pas...) => A changer ? Voir B_DataListSort() 
     B_DataPattern("RC xy $AB $BC", K_VAR); 
     lst = KLPTR("RC");
-    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC") == 1, "B_DataPattern(\"RC xy $AB $BC\", K_VAR) = \"AB,AC,BB,BC\"");
+    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC"), "B_DataPattern(\"RC xy $AB $BC\", K_VAR) = \"AB,AC,BB,BC\"");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
     A1 = KVPTR("A1");
-    S4ASSERT((rc == 0) && (K_find(KV_WS, "A1") >= 0) && (A1[1] == 4), "B_DataCalcVar(\"A1 2 * B\")");
+    cond = (rc == 0) && (K_find(KV_WS, "A1") >= 0) && (A1[1] == 4);
+    S4ASSERT(cond == 1, "B_DataCalcVar(\"A1 2 * B\")");
     
     // B_DataCreate(char* arg, int type)
     // B_DataDuplicate(char* arg, int type)
@@ -1080,18 +1100,22 @@ void Tests_B_DATA()
     // B_DataDelete(char* arg, int type)
     for(i = 0; i < 7 ; i++) {
         rc = B_DataCreate("XXX", i);
-        S4ASSERT((rc == 0) && (K_find(K_WS[i], "XXX") >= 0),  "B_DataCreate(\"XXX\", %d)", i);
+        cond = (rc == 0) && (K_find(K_WS[i], "XXX") >= 0);
+        S4ASSERT(cond == 1,  "B_DataCreate(\"XXX\", %d)", i);
         
         if(i != K_EQS) { // Equations cannot be renamed or duplicated
             rc = B_DataDuplicate("XXX YYY", i);
-            S4ASSERT((rc == 0) && (K_find(K_WS[i], "YYY") >= 0),  "B_DataDuplicate(\"XXX YYY\", %d)", i);
+            cond = (rc == 0) && (K_find(K_WS[i], "YYY") >= 0);
+            S4ASSERT(cond == 1,  "B_DataDuplicate(\"XXX YYY\", %d)", i);
 
             rc = B_DataRename("YYY ZZZ", i);
-            S4ASSERT((rc == 0) && (K_find(K_WS[i], "ZZZ") >= 0),  "B_DataRename(\"YYY ZZZ\", %d)", i);
+            cond = (rc == 0) && (K_find(K_WS[i], "ZZZ") >= 0);
+            S4ASSERT(cond == 1,  "B_DataRename(\"YYY ZZZ\", %d)", i);
         }
         
         rc = B_DataDelete("XXX", i);
-        S4ASSERT((rc == 0) && (K_find(K_WS[i], "XXX") < 0),  "B_DataDelete(\"XXX\", %d)", i);
+        cond = (rc == 0) && (K_find(K_WS[i], "XXX") < 0);
+        S4ASSERT(cond == 1,  "B_DataDelete(\"XXX\", %d)", i);
     }                 
 
     // B_DataListSort()
@@ -1103,15 +1127,24 @@ void Tests_B_DATA()
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , K_CMT);
-    S4ASSERT(rc == 0 && U_cmp_strs(KCPTR("U"), "Comment of U"), "B_DataUpdate(\"U Comment of U\", K_CMT) = \"%s\"", KCPTR("U"));
+    cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U");
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U Comment of U\", K_CMT) = \"%s\"", KCPTR("U"));
+    
     rc = B_DataUpdate("U U := c1 + c2*Z"     , K_EQS);
-    rc = B_DataUpdate("U 2 * A"              , K_IDT); 
-    S4ASSERT(rc == 0 && U_cmp_strs(KIPTR("U"), "2 * A"), "B_DataUpdate(\"U 2 * A\", K_IDT) = \"%s\"", KIPTR("U"));
+    
+    rc = B_DataUpdate("U 2 * A"              , K_IDT);
+    cond = (rc == 0) && U_cmp_strs(KIPTR("U"), "2 * A");
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U 2 * A\", K_IDT) = \"%s\"", KIPTR("U"));
+    
     rc = B_DataUpdate("U A,B,C"             , K_LST);
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("U"), "A,B,C"), "B_DataUpdate(\"U A,B,C\", K_LST) = \"%s\"", KLPTR("U"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("U"), "A,B,C");
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U A,B,C\", K_LST) = \"%s\"", KLPTR("U"));
+    
     rc = B_DataUpdate("U  1.2 1"             , K_SCL);  
     val = K_s_get_value (KS_WS, "U");
-    S4ASSERT(rc == 0 && U_test_eq(1.2, val), "B_DataUpdate(\"U 1.2 1\", K_SCL) = %g", val);
+    cond = (rc == 0) && U_test_eq(1.2, val);
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U 1.2 1\", K_SCL) = %g", val);
+    
     rc = B_DataUpdate("U  Title of U;U;2*U"  , K_TBL);
     smpl = KSMPL(KV_WS);
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , K_VAR);
@@ -1119,51 +1152,82 @@ void Tests_B_DATA()
     
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", K_CMT);
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("NEWLIST"), "U"), "B_DataSearch(\"of 0 0 1 0 1 NEWLIST\", K_CMT) = \"%s\"", KLPTR("NEWLIST"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("NEWLIST"), "U");
+    S4ASSERT(cond == 1, "B_DataSearch(\"of 0 0 1 0 1 NEWLIST\", K_CMT) = \"%s\"", KLPTR("NEWLIST"));
     
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", K_EQS);
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_SCAL"), "c1;c2"), "B_DataScan(\"U\", K_EQS) = \"%s\"", KLPTR("_SCAL"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2");
+    S4ASSERT(cond == 1, "B_DataScan(\"U\", K_EQS) = \"%s\"", KLPTR("_SCAL"));
      
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", K_LST);
-    S4ASSERT(rc >= 0, "B_DataExist(\"_SCAL\", K_LST) = %d", rc);
+    S4ASSERT((rc >= 0), "B_DataExist(\"_SCAL\", K_LST) = %d", rc);
 
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", K_LST);
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY"), "B_DataAppend(\"_SCAL XXX,YYY\", K_LST) = %d", rc);
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY");
+    S4ASSERT(cond == 1, "B_DataAppend(\"_SCAL XXX,YYY\", K_LST) = %d", rc);
 
     rc = B_DataAppend("U - More comment on U", K_CMT);
-    S4ASSERT(rc == 0 && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U"), "B_DataAppend(\"U - More comment on U\", K_CMT) = %d", rc);
+    cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U");
+    S4ASSERT(cond == 1, "B_DataAppend(\"U - More comment on U\", K_CMT) = %d", rc);
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", K_SCL);
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("LC"), "acaf1;acaf2;acaf3;acaf4"), "B_DataList(\"LC ac*\", K_SCL); = '%s'", KLPTR("LC"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("LC"), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", KLPTR("LC"));
+    S4ASSERT(cond == 1, "B_DataList(\"LC ac*\", K_SCL); = '%s'", KLPTR("LC"));
 
     // B_DataCalcLst(char* arg)
     B_DataUpdate("LST1 A,B,C", K_LST);
     B_DataUpdate("LST2 C,D,E", K_LST);
+    
     rc = B_DataCalcLst("_RES LST1 + LST2");
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E"), "B_DataCalcLst(\"_RES LST1 + LST2\") = '%s'", KLPTR("_RES"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E");
+    S4ASSERT(cond == 1, "B_DataCalcLst(\"_RES LST1 + LST2\") = '%s'", KLPTR("_RES"));
+    
     rc = B_DataCalcLst("_RES LST1 * LST2");
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "C"), "B_DataCalcLst(\"_RES LST1 * LST2\") = '%s'", KLPTR("_RES"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "C");
+    S4ASSERT(cond == 1, "B_DataCalcLst(\"_RES LST1 * LST2\") = '%s'", KLPTR("_RES"));
+    
     rc = B_DataCalcLst("_RES LST1 - LST2");
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "A;B"), "B_DataCalcLst(\"_RES LST1 - LST2\") = '%s'", KLPTR("_RES"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B");
+    S4ASSERT(cond == 1, "B_DataCalcLst(\"_RES LST1 - LST2\") = '%s'", KLPTR("_RES"));
+    
     rc = B_DataCalcLst("_RES LST1 x LST2");
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE"), "B_DataCalcLst(\"_RES LST1 x LST2\") = '%s'", KLPTR("_RES"));
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    S4ASSERT(cond == 1, "B_DataCalcLst(\"_RES LST1 x LST2\") = '%s'", KLPTR("_RES"));
 
     // B_DataCompare(char* arg, int type)  
     sprintf(buf,  "%s\\fun.lst WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", IODE_DATA_DIR);
     rc = B_DataCompare(buf, K_LST);
-    S4ASSERT(rc == 0 && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;U;ZZZ;_DIVER;_EXO;_INTER;_POST;_PRE;_RES"), "B_DataCompare()");
-    //printf("WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
-    //printf("FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
-    //printf("BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
-    //printf("BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
+    //printf("    WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
+    //printf("    FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
+    //printf("    BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
+    //printf("    BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
+
+    cond = (rc == 0) && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;U;ZZZ;_EXO;_RES");
+    S4ASSERT(cond == 1, "B_DataCompare()");
+
+    // B_DataPrintGraph()
+    //smpl = KSMPL(KV_WS);
+    //printf("%d\n", smpl->s_p1);
+    rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");  
+    S4ASSERT(rc == 0, "B_DataPrintGraph(\"Grt Line No No Level -- -- 1990Y1 2010Y1 ACAF ACAG ACAF+ACAG\")");
     
-  
+    // B_DataDisplayGraph()
+    rc = B_DataDisplayGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");  
 }
 
+
+
+
+void Tests_B_FILE()
+{
+    // B_FileDelete(char* arg, int type)
+
+}
 
 
 
@@ -1221,10 +1285,11 @@ int main(int argc, char **argv)
     Tests_K_OBJFILE();
     Tests_TBL32_64();
     Tests_Simulation();
-    Tests_PrintTables();
+    Tests_PrintTablesAndVars();
     Tests_Estimation();
     Tests_W_printf();
     Tests_B_DATA();
+    Tests_B_FILE();
 
    
     //K_save_iode_ini(); // Suppress that call ? Should only be called on demand, not at the end of each IODE session.
@@ -1251,10 +1316,6 @@ REPORT PRIMITIVES
     "show",                     RP_message,             RP_message,         0,
     "msg",                      RP_warning,             RP_warning,         0,
     "beep",                     RP_beep,                RP_beep,            0,
-    "system",                   RP_system,              RP_system,          0,
-    "chdir",                    RP_chdir,               RP_chdir,           0,
-    "mkdir",                    RP_mkdir,               RP_mkdir,           0,
-    "rmdir",                    RP_rmdir,               RP_rmdir,           0,
     "settime",                  RP_settime,             RP_settime,         0,
     "incrtime",                 RP_incrtime,            RP_incrtime,        0,
     "shift",                    RP_shift,               RP_shift,           0,
@@ -1269,6 +1330,11 @@ REPORT PRIMITIVES
     "next",                     RP_foreach_next,        RP_foreach_next,    0, 
     "procdef",                  RP_procdef,             RP_procdef,         0, 
     "procexec",                 RP_procexec,            RP_procexec,        0, 
+
+    "system",                   RP_system,              RP_system,          0,
+    "chdir",                    RP_chdir,               RP_chdir,           0,
+    "mkdir",                    RP_mkdir,               RP_mkdir,           0,
+    "rmdir",                    RP_rmdir,               RP_rmdir,           0,
     
     // fonctions utilisateur 
     "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,
@@ -1306,25 +1372,35 @@ REPORT PRIMITIVES
 
 -   "dataedit",                 NULL,                   SB_DataEditScroll,  1,
 X   "dataupdate",               B_DataUpdate,           NULL,               1,
-    "dataexist",                B_DataExist,            NULL,               1,
-    "dataappend",               B_DataAppend,           NULL,               1,
+X   "dataexist",                B_DataExist,            NULL,               1,
+X   "dataappend",               B_DataAppend,           NULL,               1,
 X   "datacreate",               B_DataCreate,           NULL,               1,
 X   "datadelete",               B_DataDelete,           NULL,               1,
 X   "datarename",               B_DataRename,           NULL,               1,
 X   "datasearch",               B_DataSearch,           SB_DataSearch,      1,
 X   "dataduplicate",            B_DataDuplicate,        SB_DataDuplicate,   1,
-    "datalist",                 B_DataList,             SB_DataList,        1,
-    "datacompare",              B_DataCompare,          SB_DataCompare,     1,
-    "datacompareeps",           B_DataCompareEps,       SB_DataCompare,     0,
+X   "datalist",                 B_DataList,             SB_DataList,        1,
+X   "datacompare",              B_DataCompare,          SB_DataCompare,     1,
+X   "datacompareeps",           B_DataCompareEps,       SB_DataCompare,     0,
 X   "datalistsort",             B_DataListSort,         SB_DataListSort,    0,
-    "datadisplaygraph",         B_DataDisplayGraph,     SB_DataEditGraph,   0,
-    "dataprintgraph",           B_DataPrintGraph,       SB_DataEditGraph,   0,
-    "dataeditcnf",              B_DataEditCnf,          NULL/,              0,
+X   "dataeditcnf",              B_DataEditCnf,          NULL/,              0,
 X   "datacalcvar",              B_DataCalcVar,          NULL,               0,
-    "datacalclst",              B_DataCalcLst,          SB_DataCalcLst,     0,
-    "datarasvar",               B_DataRasVar,           NULL,               0,
+X   "datacalclst",              B_DataCalcLst,          SB_DataCalcLst,     0,
+X   "datarasvar",               B_DataRasVar,           NULL,               0,
 X   "datascan",                 B_DataScan,             SB_DataScan,        1,
 X   "datapattern",              B_DataPattern,          NULL,               1,
+X   "datadisplaygraph",         B_DataDisplayGraph,     SB_DataEditGraph,   0,
+X   "dataprintgraph",           B_DataPrintGraph,       SB_DataEditGraph,   0,
+    
+    "eqsestimate",              B_EqsEstimate,          SB_EqsEstimate,     0,
+    "eqsstepwise",              B_EqsStepWise,          NULL,               0,
+    "eqssetmethod",             B_EqsSetMethod,         NULL,               0,
+    "eqssetbloc",               B_EqsSetBloc,           NULL,               0,
+    "eqssetblock",              B_EqsSetBloc,           NULL,               0,
+    "eqssetsample",             B_EqsSetSample,         NULL,               0,
+    "eqssetinstrs",             B_EqsSetInstrs,         NULL,               0,
+    "eqssetcmt",                B_EqsSetCmt,            NULL,               0,
+    
     
     "excelget",                 B_ExcelGet,             NULL,               1,
     "excellang",                B_ExcelLang,            NULL,               0,
@@ -1355,6 +1431,7 @@ X   "datapattern",              B_DataPattern,          NULL,               1,
     "viewwidth",                B_ScrollVTW,            NULL,               0,
     "viewwidth0",               B_ScrollVTW0,           NULL,               0,
     "viewndec",                 B_ScrollVTN,            NULL,               0,
+    
     "printobjtitle",            B_PrintObjTblTitle,     NULL,               0,
     "printobjlec",              B_PrintObjLec,          NULL,               0,
     "printobjinfos",            B_PrintObjEqsInfos,     NULL,               0,
@@ -1398,14 +1475,6 @@ X   "datapattern",              B_DataPattern,          NULL,               1,
     "idtexecutesclfiles",       B_IdtExecuteSclFiles,   NULL,               0,
     "idtexecutetrace",          B_IdtExecuteTrace,      NULL,               0,
     
-    "eqsestimate",              B_EqsEstimate,          SB_EqsEstimate,     0,
-    "eqsstepwise",              B_EqsStepWise,          NULL,               0,
-    "eqssetmethod",             B_EqsSetMethod,         NULL,               0,
-    "eqssetbloc",               B_EqsSetBloc,           NULL,               0,
-    "eqssetblock",              B_EqsSetBloc,           NULL,               0,
-    "eqssetsample",             B_EqsSetSample,         NULL,               0,
-    "eqssetinstrs",             B_EqsSetInstrs,         NULL,               0,
-    "eqssetcmt",                B_EqsSetCmt,            NULL,               0,
     
     "reportexec",               B_ReportExec,           SB_ReportExec,      0,
     "reportedit",               NULL,                   SB_ReportEdit,      0,
