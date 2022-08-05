@@ -30,12 +30,12 @@ extern "C"
 }
 
 #endif
+#ifdef _MSC_VER
+#endif
 void kmsg_null(char*msg)
 {
 }
 
-#ifdef _MSC_VER
-#endif
 
 
 class IodeCAPITest : public ::testing::Test 
@@ -241,7 +241,7 @@ public:
 	    U_test_a2m_msgs(1);
 	}
 
-	void U_tests_Objects()
+	void U_test_CreateObjects()
 	{
 	    char*       lst;
 	    SAMPLE*     smpl;
@@ -249,17 +249,17 @@ public:
 	    int         nb, i, pos;
 	    static int  done = 0;
 	
-	    if(done) return;
-	    done = 1;
+	    //if(done) return;
+	    //done = 1;
 	
-	    U_test_print_title("Tests OBJECTS");
+	    //U_test_print_title("Tests OBJECTS");
 	
 	    // Create lists
 	    pos = K_add(KL_WS, "LST1", "A,B");
-	    EXPECT_TRUE(pos >= 0);
+	    //S4ASSERT(pos >= 0,                    "K_add(\"LST1\") = %d", pos);
 	    K_add(KL_WS, "LST2", "A,B,A");
 	    lst = KLPTR("LST1");
-	    EXPECT_EQ(strcmp(lst, "A,B"), 0);
+	    //S4ASSERT(strcmp(lst, "A,B") == 0,     "KLPTR(\"LST1\") = \"%s\"", lst);
 	
 	    // Set the sample for the variable WS
 	    smpl = PER_atosmpl("2000Y1", "2020Y1");
@@ -274,9 +274,17 @@ public:
 	    }
 	
 	    pos = K_add(KV_WS, "A", A, &nb);
-	    EXPECT_TRUE(K_find(KV_WS, "A") >= 0);
+	    //S4ASSERT(K_find(KV_WS, "A") >= 0,  "K_add() + K_find()");
 	    pos = K_add(KV_WS, "B", B, &nb);
 	
+	    // For B_DataPattern()
+	    pos = K_add(KL_WS, "AB", "A,B");
+	    pos = K_add(KL_WS, "BC", "B,C");
+	
+	    pos = K_add(KV_WS, "AB", B, &nb);
+	    pos = K_add(KV_WS, "AC", B, &nb);
+	    pos = K_add(KV_WS, "BB", B, &nb);
+	    pos = K_add(KV_WS, "BC", B, &nb);
 	}
 
 	int U_test_eq(double v1, double v2)
@@ -446,6 +454,31 @@ TEST_F(IodeCAPITest, Tests_BUF)
 }
 
 
+TEST_F(IodeCAPITest, Tests_OBJECTS)
+{
+    char*       lst;
+    int         pos;
+    static int  done = 0;
+
+    U_test_print_title("Tests OBJECTS");
+    U_test_CreateObjects();
+
+    // Create lists
+    pos = K_find(KL_WS, "LST1");
+    EXPECT_TRUE(pos >= 0);
+    lst = KLPTR("LST1");
+    EXPECT_EQ(strcmp(lst, "A,B"), 0);
+
+
+    pos = K_find(KV_WS, "A");
+    EXPECT_TRUE(K_find(KV_WS, "A") >= 0);
+
+    pos = K_ren(KV_WS, "A", "AAA");
+    EXPECT_TRUE(K_find(KV_WS, "AAA") >= 0);
+
+}
+
+
 TEST_F(IodeCAPITest, Tests_LEC)
 {
     IODE_REAL *A, *B;
@@ -453,7 +486,7 @@ TEST_F(IodeCAPITest, Tests_LEC)
     U_test_print_title("Tests LEC");
 
     // Create objects
-    U_tests_Objects();
+    U_test_CreateObjects();
 
     A = (IODE_REAL*)KVPTR("A");
     B = (IODE_REAL*)KVPTR("B");
@@ -479,7 +512,7 @@ TEST_F(IodeCAPITest, Tests_EQS)
 //    EQ*     eq;
 //    char    lec[521];
 //
-//    B_DataUpdateEqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);
+//    K_upd_eqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);
 //    eq = KEPTR("A");
 //    strcpy(lec, eq->lec);
 //    S4ASSERT(strcmp(eq->lec, "ln A := B + t") == 0, "EQ %s = %s", "A", lec);
@@ -496,7 +529,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
     U_test_print_title("Tests ARGS");
 
     // Create objects
-    U_tests_Objects();
+    U_test_CreateObjects();
 
     // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
@@ -681,9 +714,11 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 }
 
 
-TEST_F(IodeCAPITest, Tests_PrintTables)
+TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 {
     char    fullfilename[256];
+    char    **varlist;
+    SAMPLE  *smpl;
     KDB     *kdbv, *kdbt;
     TBL     *tbl;
     int     rc;
@@ -725,6 +760,14 @@ TEST_F(IodeCAPITest, Tests_PrintTables)
 
     // Frees tbl
     T_free(tbl);
+
+    // Print vars as graphs
+    varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", (U_ch*)",;");
+    smpl = PER_atosmpl("1990Y1", "2010Y1");
+    rc = V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, smpl, varlist);
+    EXPECT_EQ(rc, 0);
+    SCR_free_tbl((U_ch**)varlist);
+    SCR_free(smpl);
 
     // Close the output file
     W_close();
@@ -856,6 +899,173 @@ TEST_F(IodeCAPITest, Tests_SWAP)
     item2 = SW_alloc(10);
     SW_free(item);
     SW_free(item2);
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_DATA)
+{
+    char        *lst, *ptr, buf[512];
+    int         rc, i, cond;
+    IODE_REAL   *A1, val;
+    SAMPLE      *smpl;
+    char        *filename = "fun";
+
+    U_test_print_title("Tests B_DATA");
+
+    // Clear WS, then loads 3 WS and check ok
+    //K_end_ws(0);
+    U_test_load_fun_esv(filename);
+
+    // (re-)creates vars AA...
+    K_clear(KC_WS);
+    K_clear(KI_WS);
+    K_clear(KL_WS);
+    K_clear(KT_WS);
+    U_test_CreateObjects();
+
+    // B_DataPattern()
+    // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB Ã§a marche pas...) => A changer ? Voir B_DataListSort()
+    B_DataPattern("RC xy $AB $BC", K_VAR);
+    lst = KLPTR("RC");
+    EXPECT_TRUE(U_cmp_strs(lst, "AB,AC,BB,BC"));
+
+    // B_DataCalcVar()
+    rc = B_DataCalcVar("A1 2 * B");
+    A1 = KVPTR("A1");
+    cond = (rc == 0) && (K_find(KV_WS, "A1") >= 0) && (A1[1] == 4);
+    EXPECT_EQ(cond, 1);
+
+    // B_DataCreate(char* arg, int type)
+    // B_DataDuplicate(char* arg, int type)
+    // B_DataRename(char* arg, int type)
+    // B_DataDelete(char* arg, int type)
+    for(i = 0; i < 7 ; i++) {
+        rc = B_DataCreate("XXX", i);
+        cond = (rc == 0) && (K_find(K_WS[i], "XXX") >= 0);
+        EXPECT_EQ(cond, 1);
+
+        if(i != K_EQS) { // Equations cannot be renamed or duplicated
+            rc = B_DataDuplicate("XXX YYY", i);
+            cond = (rc == 0) && (K_find(K_WS[i], "YYY") >= 0);
+            EXPECT_EQ(cond, 1);
+
+            rc = B_DataRename("YYY ZZZ", i);
+            cond = (rc == 0) && (K_find(K_WS[i], "ZZZ") >= 0);
+            EXPECT_EQ(cond, 1);
+        }
+
+        rc = B_DataDelete("XXX", i);
+        cond = (rc == 0) && (K_find(K_WS[i], "XXX") < 0);
+        EXPECT_EQ(cond, 1);
+    }
+
+    // B_DataListSort()
+    rc = K_add(KL_WS, "LIST1", "A;C;B");
+    EXPECT_TRUE(K_find(KL_WS, "LIST1") >= 0);
+    rc = B_DataListSort("LIST1 LIST2");
+    lst = KLPTR("LIST2");
+    EXPECT_TRUE(U_cmp_strs(lst, "A;B;C"));
+
+    // B_DataUpdate()
+    rc = B_DataUpdate("U Comment of U"       , K_CMT);
+    cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataUpdate("U U := c1 + c2*Z"     , K_EQS);
+
+    rc = B_DataUpdate("U 2 * A"              , K_IDT);
+    cond = (rc == 0) && U_cmp_strs(KIPTR("U"), "2 * A");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataUpdate("U A,B,C"             , K_LST);
+    cond = (rc == 0) && U_cmp_strs(KLPTR("U"), "A,B,C");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataUpdate("U  1.2 1"             , K_SCL);
+    val = K_s_get_value (KS_WS, "U");
+    cond = (rc == 0) && U_test_eq(1.2, val);
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataUpdate("U  Title of U;U;2*U"  , K_TBL);
+    smpl = KSMPL(KV_WS);
+    rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , K_VAR);
+    EXPECT_EQ(rc, 0);
+
+    // B_DataSearch(char* arg, int type)
+    rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", K_CMT);
+    cond = (rc == 0) && U_cmp_strs(KLPTR("NEWLIST"), "U");
+    EXPECT_EQ(cond, 1);
+
+    // B_DataScan(char* arg, int type)
+    rc = B_DataScan("U", K_EQS);
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2");
+    EXPECT_EQ(cond, 1);
+
+    // B_DataExist(char* arg, int type)
+    rc = B_DataExist("_SCAL", K_LST);
+    EXPECT_TRUE((rc >= 0));
+
+    // B_DataAppend(char* arg, int type)
+    rc = B_DataAppend("_SCAL XXX,YYY", K_LST);
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataAppend("U - More comment on U", K_CMT);
+    cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U");
+    EXPECT_EQ(cond, 1);
+
+    // B_DataList(char* arg, int type)
+    rc = B_DataList("LC ac*", K_SCL);
+    cond = (rc == 0) && U_cmp_strs(KLPTR("LC"), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", KLPTR("LC"));
+    EXPECT_EQ(cond, 1);
+
+    // B_DataCalcLst(char* arg)
+    B_DataUpdate("LST1 A,B,C", K_LST);
+    B_DataUpdate("LST2 C,D,E", K_LST);
+
+    rc = B_DataCalcLst("_RES LST1 + LST2");
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataCalcLst("_RES LST1 * LST2");
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "C");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataCalcLst("_RES LST1 - LST2");
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B");
+    EXPECT_EQ(cond, 1);
+
+    rc = B_DataCalcLst("_RES LST1 x LST2");
+    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(cond, 1);
+
+    // B_DataCompare(char* arg, int type)
+    sprintf(buf,  "%s\\fun.lst WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", input_test_dir);
+    rc = B_DataCompare(buf, K_LST);
+    //printf("    WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
+    //printf("    FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
+    //printf("    BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
+    //printf("    BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
+
+    cond = (rc == 0) && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;U;ZZZ;_EXO;_RES");
+    EXPECT_EQ(cond, 1);
+
+    // B_DataPrintGraph()
+    //smpl = KSMPL(KV_WS);
+    //printf("%d\n", smpl->s_p1);
+    rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");
+    EXPECT_EQ(rc, 0);
+
+    // B_DataDisplayGraph()
+    rc = B_DataDisplayGraph("Grt Line No No Level -- -- 2000Y1 2020Y1 ACAF ACAG ACAF+ACAG");
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_FILE)
+{
+    // B_FileDelete(char* arg, int type)
+
 }
 
 
