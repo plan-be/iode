@@ -22,6 +22,22 @@ TEST(TestSample, Create)
 	Sample sample4(c_sample);
 }
 
+TEST(TestSample, GetPeriodPosition)
+{
+	Period start(2015, 'M', 1);
+	Period end(2020, 'M', 6);
+	Sample sample(start, end);
+	int expected_pos = 18;
+
+	// Period object
+	Period period = sample.start_period().shift(expected_pos);
+	EXPECT_EQ(sample.get_period_position(period), expected_pos);
+
+	// string
+	std::string s_period = period.to_string();
+	EXPECT_EQ(sample.get_period_position(s_period), expected_pos);
+}
+
 TEST(TestSample, Intersection) 
 {
 	Period start1(2015, 'M', 1);
