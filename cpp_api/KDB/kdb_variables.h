@@ -19,13 +19,29 @@ protected:
 public:
     KDBVariables(const std::string& pattern = "") : KDBTemplate(I_VARIABLES, pattern) {};
 
-    IODE_REAL get_var(const int pos, const int t, const int mode) const;
+    IODE_REAL get_var(const int pos, const int t, const int mode = K_LEVEL) const;
 
-    IODE_REAL get_var(const std::string& name, const int t, const int mode) const;
+    IODE_REAL get_var(const int pos, const std::string& period, const int mode = K_LEVEL) const;
 
-    void set_var(const int pos, const int t, const int mode, const IODE_REAL value);
+    IODE_REAL get_var(const int pos, const Period& period, const int mode = K_LEVEL) const;
 
-    void set_var(const std::string& name, const int t, const int mode, const IODE_REAL value);
+    IODE_REAL get_var(const std::string& name, const int t, const int mode = K_LEVEL) const;
+
+    IODE_REAL get_var(const std::string& name, const std::string& period, const int mode = K_LEVEL) const;
+
+    IODE_REAL get_var(const std::string& name, const Period& period, const int mode = K_LEVEL) const;
+
+    void set_var(const int pos, const int t, const IODE_REAL value, const int mode = K_LEVEL);
+
+    void set_var(const int pos, const std::string& period, const IODE_REAL value, const int mode = K_LEVEL);
+
+    void set_var(const int pos, const Period& period, const IODE_REAL value, const int mode = K_LEVEL);
+
+    void set_var(const std::string& name, const int t, const IODE_REAL value, const int mode = K_LEVEL);
+
+    void set_var(const std::string& name, const std::string& period, const IODE_REAL value, const int mode = K_LEVEL);
+
+    void set_var(const std::string& name, const Period& period, const IODE_REAL value, const int mode = K_LEVEL);
 
     int add(const std::string& name, const Variable& variable);
 
