@@ -125,16 +125,16 @@ top:
  *  
  *  See https://iode.plan.be/doku.php?id=datarasvar for details.
  *  
- *  @param [in] char*   pattern     de variabelen worden gebruikt die voldoen aan de volgende criteria x wordt vervangen door alle waarden uit $X, y door die uit $Y 
- *  @param [in] char*   X_dimensie  lijst van de waarden die "x" uit het pattern kan aannemen OPGELET: laatste uit de lijst is de SOM over de x dimensie 
- *  @param [in] char*   Y_dimensie  lijst van de waarden die "y" uit het pattern kan aannemen OPGELET: laatste uit de lijst is de SOM over de y dimensie 
- *  @param [in] PERIOD* ref_jaar    referentie jaar: het jaar waarvoor alle gegevens bekend zijn 
- *  @param [in] PERIOD* h_jaar      referentie jaar: het jaar waarvoor alleen de sommen bekend zijn 
- *  @param [in] int     maxit       maximaal iteraties (default=100) 
- *  @param [in] double  eps         de drempel (default=0.001) 
- *   
+ *  @param [in] char*   pattern     the variables that meet the following criteria are used: x is replaced with all values from $X, y with those from $Y 
+ *  @param [in] char*   X_dimensie  list of the values that "x" from the pattern can take. ATTENTION: the last one in the list is the SUM over the x dimension 
+ *  @param [in] char*   Y_dimensie  list of the values that "y" from the pattern can take. ATTENTION: the last one from the list is the SUM over the y dimension 
+ *  @param [in] PERIOD* ref_jaar    reference year: the year for which all data is known 
+ *  @param [in] PERIOD* h_jaar      reference year: the year for which only the sums are known 
+ *  @param [in] int     maxit       maximum number of iterations (default=100) 
+ *  @param [in] double  eps         convergence threshold (default=0.001) 
  *  @return     int                 0 on success, -1 on error
  *  
+ *  @note Developed by gb@plan.be 
  */
 
 int RasExecute(char *pattern, char *xdim, char *ydim,
