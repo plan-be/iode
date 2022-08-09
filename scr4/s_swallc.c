@@ -371,7 +371,7 @@ unsigned int    size;
     }
 }
 
-char *SW_nalloc_doc(unsigned int size, char *file, int line) {
+char *SW_nalloc_doc(unsigned int size, const char *file, const int line) {
     char        *ptr = SW_nalloc_orig(size);
     ALLOCDOC    *ad;
 
