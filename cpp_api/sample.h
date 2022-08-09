@@ -60,6 +60,16 @@ public:
 		return c_sample->s_nb;
 	}
 
+	int get_period_position(const Period& period)
+	{
+		return period.difference(start_period());
+	}
+
+	int get_period_position(const std::string& period)
+	{
+		return get_period_position(Period(period));
+	}
+
 	/**
 	 * same as PER_common_smpl() function
 	 */
