@@ -36,23 +36,56 @@ TEST_F(KDBVariablesTest, Save)
     kdb.dump(output_test_dir + "fun.av");
 }
 
-TEST_F(KDBVariablesTest, GetValue)
+TEST_F(KDBVariablesTest, GetSetVar)
 {
     IODE_REAL value;
-    IODE_REAL expected_value = 1.2130001;
+    IODE_REAL new_value;
+    int nb_periods = kdb.get_nb_periods();
+    std::string name = kdb.get_name(pos + 1);
+    Period start = kdb.get_sample().start_period();
 
-    // by position
-    value = kdb.get_var(pos, t, mode);
-    EXPECT_DOUBLE_EQ(expected_value, value);    
-    value = kdb.get_var(pos, t_nan, mode);
-    EXPECT_FALSE(L_ISAN(value));
+    // period as int
+    value = 1.2130001;
+    EXPECT_DOUBLE_EQ(kdb.get_var(pos, t), value);
+    new_value = 10.0;
+    kdb.set_var(pos, t, new_value);
+    EXPECT_DOUBLE_EQ(kdb.get_var(pos, t), new_value);
 
-    // by name
-    std::string name = kdb.get_name(pos);
-    value = kdb.get_var(name, t, mode);
-    EXPECT_DOUBLE_EQ(expected_value, value);    
-    value = kdb.get_var(name, t_nan, mode);
-    EXPECT_FALSE(L_ISAN(value));
+    value = -11.028999;
+    EXPECT_DOUBLE_EQ(kdb.get_var(name, t), value);
+    new_value = 20.0;
+    kdb.set_var(name, t, new_value);
+    EXPECT_DOUBLE_EQ(kdb.get_var(name, t), new_value);
+
+    // period as Period object
+    Period period = start.shift(t + 1);
+
+    value = 5.2020001;
+    EXPECT_DOUBLE_EQ(kdb.get_var(pos, period), value);
+    new_value = 30.0;
+    kdb.set_var(pos, period, new_value);
+    EXPECT_DOUBLE_EQ(kdb.get_var(pos, period), new_value);
+
+    value = -15.847;
+    EXPECT_DOUBLE_EQ(kdb.get_var(name, period), value);
+    new_value = 40.0;
+    kdb.set_var(name, period, new_value);
+    EXPECT_DOUBLE_EQ(kdb.get_var(name, period), new_value);
+
+    // period as string
+    std::string s_period = start.shift(t + 2).to_string();
+
+    value = 9.184;
+    EXPECT_DOUBLE_EQ(kdb.get_var(pos, s_period), value);
+    new_value = 50.0;
+    kdb.set_var(pos, s_period, new_value);
+    EXPECT_DOUBLE_EQ(kdb.get_var(pos, s_period), new_value);
+
+    value = -19.288002;
+    EXPECT_DOUBLE_EQ(kdb.get_var(name, s_period), value);
+    new_value = 60.0;
+    kdb.set_var(name, s_period, new_value);
+    EXPECT_DOUBLE_EQ(kdb.get_var(name, s_period), new_value);
 }
 
 TEST_F(KDBVariablesTest, GetSample)
@@ -93,6 +126,7 @@ TEST_F(KDBVariablesTest, Get)
     var = kdb.get(name);
     EXPECT_EQ(var, expected_var);
 }
+
 TEST_F(KDBVariablesTest, CreateRemove)
 {
     std::string new_name = "NEW_VAR";
