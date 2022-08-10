@@ -92,26 +92,18 @@ void QIodeEditEquation::edit()
 		std::string block = lineBlock->extractAndVerify().toStdString();
 		std::string instruments = lineInstruments->extractAndVerify().toStdString();
 
+		Sample sample(from, to);
+		std::array<float, EQS_NBTESTS> tests = { 0.0 };
+
 		// update equation
 		if (kdb.contains(equation_name))
 		{
-			Equation eq(equation_name);
-
-			eq.set_lec(lec, equation_name);
-			eq.set_method(method);
-			eq.set_sample(from, to);
-			eq.set_comment(comment);
-			eq.set_block(block);
-			eq.set_instruments(instruments);
-
-			kdb.update(equation_name, eq);
+			kdb.update(equation_name, lec, comment, method, &sample, instruments, block, &tests);
 		}
 		// new equation
 		else
 		{
-			Sample sample(from, to);
-			std::array<float, EQS_NBTESTS> tests = { 0.0 };
-			kdb.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
+			kdb.add(equation_name, lec, comment, method, &sample, instruments, block, tests, true);
 		}
 		this->accept();
 	}
