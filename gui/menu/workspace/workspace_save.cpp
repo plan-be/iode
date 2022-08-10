@@ -56,16 +56,20 @@ void QIodeMenuWorkspaceSave::save_objs(const EnumIodeType iode_type, const bool 
     {
         QString str_iode_type = QString::fromStdString(vIodeTypes[iode_type]);
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields[str_iode_type]);
-        QString filepath = field_filepath->extractAndVerify();
+        QString q_filepath = field_filepath->extractAndVerify();
         // save_all means that the users clicked on an the "Save" button to load all files at once.
         // In that case and if the filepath is empty, the save_xxx() method shows a warning box
-        if (save_all && filepath.isEmpty())
+        if (save_all && q_filepath.isEmpty())
         {
             if (nb_comments > 0) QMessageBox::warning(this, tr("Warning"), "No filepath provided for Comments.\nComments will not be saved.");
         }
         else
         {
-            save_global_kdb(iode_type, filepath.toStdString());
+            // second argument of save_global_kdb() is not declared with const 
+            // -> requires intermediate variable filepath.
+            // save_global_kdb() may modify passed filepath value. 
+            std::string filepath = q_filepath.toStdString();
+            save_global_kdb(iode_type, filepath);
         }
     }
     catch (const std::runtime_error& e)
