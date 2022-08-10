@@ -12,7 +12,7 @@
 template <class M, class D> class PopupView : public AbstractTableView<M>
 {
 public:
-	PopupView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : AbstractTableView(iodeType, delegate, parent) {}
+	PopupView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : AbstractTableView<M>(iodeType, delegate, parent) {}
 
 protected:
 	void open_popup_edit_window(const QModelIndex& index)
