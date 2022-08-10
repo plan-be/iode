@@ -32,7 +32,7 @@ protected:
 
 public:
 	IODEAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : QAbstractTableModel(parent),
-		kdb(new K()), columnNames(columnNames), filter_active(false) {}
+		kdb(new K()), columnNames(columnNames) {}
 
 	~IODEAbstractTableModel() { delete kdb; }
 
@@ -55,8 +55,6 @@ public:
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
 
 	void filter(const QString& pattern);
-
-	bool is_filter_active() { return filter_active; }
 
 protected:
 	void resetModel()
