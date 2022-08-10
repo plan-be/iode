@@ -41,11 +41,15 @@ void QIodeMenuWorkspaceLoad::load_objs(const EnumIodeType iode_type, const bool 
     {
         QString str_iode_type = QString::fromStdString(vIodeTypes[iode_type]);
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields[str_iode_type]);
-        QString filepath = field_filepath->extractAndVerify();
+        QString q_filepath = field_filepath->extractAndVerify();
         // load_all means that the users clicked on an the "Load" button to load all files at once.
         // In that case and if the filepath is empty, the load_xxx() method does nothing
-        if (load_all && filepath.isEmpty()) return;
-        load_global_kdb(iode_type, filepath.toStdString());
+        if (load_all && q_filepath.isEmpty()) return;
+        // second argument of load_global_kdb() is not declared with const 
+        // -> requires intermediate variable filepath.
+        // load_global_kdb() may modify passed filepath value. 
+        std::string filepath = q_filepath.toStdString();
+        load_global_kdb(iode_type, filepath);
     }
     catch (const std::runtime_error& e)
     {
