@@ -6,7 +6,7 @@
 #include <QStyledItemDelegate>
 
 #include "../../../cpp_api/iode_cpp_api.h"
-#include "../../utils.h"
+#include "utils.h"
 #include "edit_table_model.h"
 
 

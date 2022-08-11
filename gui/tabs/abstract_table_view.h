@@ -2,7 +2,7 @@
 
 #include <QTableView>
 #include <QLineEdit>
-#include "../utils.h"
+#include "utils.h"
 #include "abstract_delegate.h"
 
 

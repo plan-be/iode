@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QAbstractTableModel>
 
-#include "../../utils.h"
+#include "utils.h"
 
 
 class QIodeEditTableModel : public QAbstractTableModel

@@ -6,9 +6,9 @@
 #include <string>
 
 #include "ui_add_scalar.h"
-#include "../../utils.h"
-#include "../../settings.h"
-#include "../../wrapper_classes.h"
+#include "utils.h"
+#include "settings.h"
+#include "wrapper_classes.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

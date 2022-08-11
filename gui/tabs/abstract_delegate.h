@@ -7,8 +7,8 @@
 #include <QRegularExpressionValidator>
 
 #include "../cpp_api/iode_cpp_api.h"
-#include "../utils.h"
-#include "../util/double_validator.h"
+#include "utils.h"
+#include "util/double_validator.h"
 
 
 class AbstractDelegate : public QStyledItemDelegate

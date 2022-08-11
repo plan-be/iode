@@ -9,7 +9,7 @@
 #include <QAbstractTableModel>
 #include <QDebug>
 
-#include "../utils.h"
+#include "utils.h"
 
 
 /* NOTE FOR THE DEVELOPPERS:
