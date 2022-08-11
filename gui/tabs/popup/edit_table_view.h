@@ -7,8 +7,8 @@
 
 #include <string>
 
-#include "../../utils.h"
-#include "../../wrapper_classes.h"
+#include "utils.h"
+#include "wrapper_classes.h"
 #include "edit_table_model.h"
 #include "edit_table_delegate.h"
 

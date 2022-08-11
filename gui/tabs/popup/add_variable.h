@@ -7,8 +7,8 @@
 
 #include "ui_add_object.h"
 #include "edit_vars_sample.h"
-#include "../../utils.h"
-#include "../../wrapper_classes.h"
+#include "utils.h"
+#include "wrapper_classes.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

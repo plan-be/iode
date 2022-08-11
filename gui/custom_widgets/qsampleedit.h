@@ -5,7 +5,7 @@
 #include <QRegularExpressionValidator>
 #include <QLineEdit>
 
-#include "../utils.h"
+#include "utils.h"
 
 
 class QIodeSampleEdit : public QLineEdit

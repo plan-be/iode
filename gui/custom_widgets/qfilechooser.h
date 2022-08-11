@@ -10,7 +10,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
-#include "../utils.h"
+#include "utils.h"
 
 
 enum EnumFileMode

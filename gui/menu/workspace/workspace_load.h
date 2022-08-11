@@ -5,9 +5,9 @@
 #include <QString>
 
 #include "ui_workspace_load.h"
-#include "../../utils.h"
-#include "../../settings.h"
-#include "../../wrapper_classes.h"
+#include "utils.h"
+#include "settings.h"
+#include "wrapper_classes.h"
 
 
 const static QMap<QString, int> mapImportFormat({
