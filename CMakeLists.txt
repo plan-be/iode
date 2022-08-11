@@ -105,6 +105,7 @@ endif()
 
 # some code in the C++ API requires C++ 17
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- preprocessor ----
 add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
@@ -118,6 +119,7 @@ add_subdirectory ("cpp_api")
 file(INSTALL tests/data DESTINATION ${CMAKE_BINARY_DIR}/tests)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
 
+add_subdirectory ("gui")
 add_subdirectory ("tests")
 
 # ---- print info ----
