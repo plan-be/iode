@@ -19,6 +19,7 @@
 #include "menu/workspace/workspace_save.h"
 #include "menu/workspace/workspace_clear.h"
 
+#include "menu/compute/compute_identities.h"
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -51,6 +52,9 @@ public slots:
 	void open_load_workspace_dialog();
 	void open_save_workspace_dialog();
 	void open_clear_workspace_dialog();
+
+	// Compute Menu
+	void open_compute_identities_dialog();
 
 	// Help Menu
 	void about();

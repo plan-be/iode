@@ -91,7 +91,11 @@ set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_clear.ui   menu/workspace/workspace_clear.h    menu/workspace/workspace_clear.cpp
 )
 
-set(GUI_MENUS ${GUI_MENU_WORKSPACE})
+set(GUI_MENU_COMPUTE
+    menu/compute/compute_identities.ui  menu/compute/compute_identities.h   menu/compute/compute_identities.cpp
+)
+
+set(GUI_MENUS ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE})
 
 set(GUI_MAIN    
     main_window.ui  main_window.h   main_window.cpp 
