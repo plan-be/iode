@@ -93,6 +93,7 @@ set(GUI_MENU_WORKSPACE
 
 set(GUI_MENU_COMPUTE
     menu/compute/compute_identities.ui  menu/compute/compute_identities.h   menu/compute/compute_identities.cpp
+    menu/compute/compute_simulation.ui  menu/compute/compute_simulation.h   menu/compute/compute_simulation.cpp
 )
 
 set(GUI_MENUS ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE})
