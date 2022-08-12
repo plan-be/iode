@@ -1,0 +1,102 @@
+#include "compute_simulation.h"
+
+
+/* NOTE FOR THE DEVELOPERS:
+ * The constructor of a Menu Dialog class deriving from QIodeSettings MUST:
+ * 2. call setupUi(this),
+ * 3. use the Wrapper classes defined in the wrapper_classes.h header file to wrap the input field items,
+ * 4. fill the mapFields member (inherited from QIodeSettings) with the wrapped field items,
+ * 5. initialize the inherited className member (using typeid(this).name())
+ * 6. call the loadSettings() method (inherited from QIodeSettings).
+ */
+
+
+QIodeMenuComputeSimulation::QIodeMenuComputeSimulation(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(settings_filepath, parent, f)
+{
+    setupUi(this);
+
+    for(const std::string& initialisation: v_simulation_initialization) qInitialisationList << QString::fromStdString(initialisation);
+    for(const std::string& sort_algo: v_simulation_sort_algorithm) qSortAlgoList << QString::fromStdString(sort_algo);
+
+    qEquationsList = new WrapperQTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
+    qExchange = new WrapperQTextEdit(label_exchange->text(), *textEdit_exchange, OPTIONAL_FIELD);
+    qFrom = new WrapperSampleEdit(label_simulation_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
+    qTo = new WrapperSampleEdit(label_simulation_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
+    qConvergence = new WrapperQLineEdit(label_convergence->text(), *lineEdit_convergence, REQUIRED_FIELD);
+    qMaxIterations = new WrapperSpinBox(label_max_iterations->text(), *spinBox_max_iterations, REQUIRED_FIELD);
+    qCheckDebug = new WrapperCheckBox(label_debug->text(), *checkBox_debug, REQUIRED_FIELD);
+    qRelaxation = new WrapperQLineEdit(label_relaxation->text(), *lineEdit_relaxation, REQUIRED_FIELD);
+    qSimInitialisation = new WrapperComboBox(label_initialisation->text(), *comboBox_initialization, REQUIRED_FIELD, qInitialisationList);
+    qSortAlgorithm = new WrapperComboBox(label_sort_algorithm->text(), *comboBox_sort_algorithm, REQUIRED_FIELD, qSortAlgoList);
+    qNbPasses = new WrapperSpinBox(label_passes->text(), *spinBox_nb_passes, REQUIRED_FIELD);
+
+    mapFields["EquationsList"] = qEquationsList;
+    mapFields["Exchange"] = qExchange;
+    mapFields["From"] = qFrom;
+    mapFields["To"] = qTo;
+    mapFields["Convergence"] = qConvergence;
+    mapFields["MaxIterations"] = qMaxIterations;
+    mapFields["CheckDebug"] = qCheckDebug;
+    mapFields["Relaxation"] = qRelaxation;
+    mapFields["SimInitialisation"] = qSimInitialisation;
+    mapFields["SortAlgorithm"] = qSortAlgorithm;
+    mapFields["NbPasses"] = qNbPasses;
+
+    // TODO: if possible, find a way to initialize className inside MixingSettings
+    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
+    //                       since in that case this refers to MixingSettings and NOT the derived class
+    className = QString::fromStdString(typeid(this).name());
+    loadSettings();
+}
+
+QIodeMenuComputeSimulation::~QIodeMenuComputeSimulation()
+{
+    delete qEquationsList;
+    delete qExchange;
+    delete qFrom;
+    delete qTo;
+    delete qConvergence;
+    delete qMaxIterations;
+    delete qCheckDebug;
+    delete qRelaxation;
+    delete qSimInitialisation;
+    delete qSortAlgorithm;
+    delete qNbPasses;
+}
+
+void QIodeMenuComputeSimulation::compute()
+{
+    try
+    {
+        std::string equations_list = qEquationsList->extractAndVerify().toStdString();
+        std::string exchange = qExchange->extractAndVerify().toStdString();
+        std::string from = qFrom->extractAndVerify().toStdString();
+        std::string to = qTo->extractAndVerify().toStdString();
+        IODE_REAL convergence = std::stod(qConvergence->extractAndVerify().toStdString());
+        int max_iterations = qMaxIterations->extractAndVerify();
+        bool debug = qCheckDebug->extractAndVerify();
+        IODE_REAL relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
+        EnumSimulationInitialization initialisation = (EnumSimulationInitialization) qSimInitialisation->extractAndVerify();
+        EnumSimulationSortAlgorithm sort_algorithm = (EnumSimulationSortAlgorithm) qSortAlgorithm->extractAndVerify();
+        int nb_passes = qNbPasses->extractAndVerify();
+
+        Simulation sim;
+        sim.set_convergence_threshold(convergence);
+        sim.set_max_nb_iterations(max_iterations);
+        sim.set_debug(debug);
+        sim.set_relax(relaxation);
+        sim.set_initialization_method(initialisation);
+        sim.set_sort(sort_algorithm);
+        sim.set_nb_passes(nb_passes);
+
+        if(!exchange.empty()) sim.model_exchange(exchange);
+        sim.model_simulate(from, to, equations_list);
+
+        this->accept();
+    }
+    catch (const std::exception& e)
+    {
+        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+    }
+}

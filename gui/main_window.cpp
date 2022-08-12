@@ -186,6 +186,12 @@ void MainWindow::open_compute_identities_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_compute_simulation_dialog()
+{
+    QIodeMenuComputeSimulation dialog(*settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::about()
 {
     // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")

@@ -20,6 +20,7 @@
 #include "menu/workspace/workspace_clear.h"
 
 #include "menu/compute/compute_identities.h"
+#include "menu/compute/compute_simulation.h"
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -55,6 +56,7 @@ public slots:
 
 	// Compute Menu
 	void open_compute_identities_dialog();
+	void open_compute_simulation_dialog();
 
 	// Help Menu
 	void about();
