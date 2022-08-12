@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QIodeMenuComputeIdentities</class>
+ <widget class="QDialog" name="QIodeMenuComputeIdentities">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>330</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>330</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>330</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>EXECUTE IDENTITIES</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>20</y>
+     <width>81</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>481</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_execute">
+      <property name="text">
+       <string>Execute</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label_from">
+      <property name="text">
+       <string>From</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
+      <property name="toolTip">
+       <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+      </property>
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="label_to">
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
+      <property name="toolTip">
+       <string>- yyyy is the year
+ -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
+ -ppp is the period of the year</string>
+      </property>
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_identities_list">
+      <property name="text">
+       <string>Identities List
+
+(empty for
+all identities)</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="5">
+     <widget class="QTextEdit" name="textEdit_identities_list"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_variables_list">
+      <property name="text">
+       <string>Input Variables
+Files</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" colspan="5">
+     <widget class="QTextEdit" name="textEdit_variables_list"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_scalars_list">
+      <property name="text">
+       <string>Input Scalars
+Files</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="5">
+     <widget class="QTextEdit" name="textEdit_scalars_list"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_trace">
+      <property name="text">
+       <string>Trace ?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QCheckBox" name="checkBox_trace">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QLabel" name="label_language">
+      <property name="text">
+       <string>Language</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3" colspan="2">
+     <widget class="QComboBox" name="comboBox_language">
+      <item>
+       <property name="text">
+        <string>English</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>French</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Dutch</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="4" column="5">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QIodeSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QIodeMenuComputeIdentities</receiver>
+   <slot>compute()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>550</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QIodeMenuComputeIdentities</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>550</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>helpRequested()</signal>
+   <receiver>QIodeMenuComputeIdentities</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>550</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>help()</slot>
+  <slot>compute()</slot>
+ </slots>
+</ui>

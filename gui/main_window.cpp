@@ -180,6 +180,12 @@ void MainWindow::open_clear_workspace_dialog()
     resetFilter();
 }
 
+void MainWindow::open_compute_identities_dialog()
+{
+    QIodeMenuComputeIdentities dialog(*settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::about()
 {
     // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")
