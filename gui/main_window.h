@@ -23,6 +23,7 @@
 #include "menu/compute/compute_simulation.h"
 #include "menu/compute/compute_model.h"
 #include "menu/compute/compute_scc_decomposition.h"
+#include "menu/compute/compute_scc_simulation.h"
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -61,6 +62,7 @@ public slots:
 	void open_compute_simulation_dialog();
 	void open_compute_model_dialog();
 	void open_compute_scc_decomposition_dialog();
+	void open_compute_scc_simulation_dialog();
 
 	// Help Menu
 	void about();
