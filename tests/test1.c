@@ -341,6 +341,37 @@ void U_test_reset_a2m_msgs()
 }
 
 
+// Choose to display kmsg messages or not.
+void U_test_kmsg_msgs(int IsOn)
+{
+    static int  Current_IsOn = 1;
+    static void (*kmsg_super_ptr)(char*); 
+    
+    
+    if(IsOn && !Current_IsOn) { 
+        kmsg_super = kmsg_super_ptr;
+        Current_IsOn = 1;
+        return;
+    }
+    else if(!IsOn && Current_IsOn) {
+        kmsg_super_ptr = kmsg_super;
+        kmsg_super = kmsg_null; 
+        Current_IsOn = 0;
+        return;
+    }
+}
+    
+void U_test_suppress_kmsg_msgs()
+{
+    U_test_kmsg_msgs(0);
+}
+
+void U_test_reset_kmsg_msgs()
+{
+    U_test_kmsg_msgs(1);
+}
+
+
 /**
  *  Create some objects for Tests_*().
  *      - k_add() : LIST, VAR
@@ -1221,6 +1252,44 @@ void Tests_B_DATA()
 }
 
 
+void Tests_B_EQS()
+{
+    int     rc, cond, pos;
+    SAMPLE  *smpl;
+    char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
+    char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
+    char    buf[256];
+    
+    U_test_print_title("Tests B_EQS");
+    U_test_suppress_kmsg_msgs();
+
+    // (Re-)loads 3 WS and check ok
+    U_test_load_fun_esv("fun");
+   
+    // B_EqsEstimate()
+    rc = B_EqsEstimate(cmd_B_EqsEstimate);
+    
+    cond = (rc == 0) && U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815);
+    S4ASSERT(cond == 1, "B_EqsEstimate(\"1980Y1 1996Y1 ACAF\") => R2 == 0.821815");
+    cond = (rc == 0) && U_test_eq(K_e_fstat(KE_WS, "ACAF"), 32.285108);
+    S4ASSERT(cond == 1, "B_EqsEstimate(\"1980Y1 1996Y1 ACAF\") => fstat == 32.285108");
+      
+    // B_EqsSetSample()    
+    rc = B_EqsSetSample(cmd_B_EqsSetSample);
+    pos = K_find(KE_WS, "ACAF");
+    smpl = &KESMPL(KE_WS, pos);
+    cond = (rc ==0) && (smpl->s_p1.p_y == 1981);
+    S4ASSERT(cond == 1, "rc = B_EqsSetSample(\"%s\")", cmd_B_EqsSetSample);
+    
+    // TODO: implement next utests with the same canevas
+        //B_EqsSetMethod(char* arg)   
+        //B_EqsSetBloc(char* arg)  
+        //B_EqsSetCmt(char* arg)   
+        //B_EqsSetInstrs(char* arg)
+          
+    U_test_reset_kmsg_msgs();
+}
+
 
 
 void Tests_B_FILE()
@@ -1289,6 +1358,7 @@ int main(int argc, char **argv)
     Tests_Estimation();
     Tests_W_printf();
     Tests_B_DATA();
+    Tests_B_EQS();
     Tests_B_FILE();
 
    
@@ -1370,6 +1440,7 @@ REPORT PRIMITIVES
     
     "wsimporteviews",			B_WsImportEviews,       NULL, 		        0,
 
+// b_data.c 
 -   "dataedit",                 NULL,                   SB_DataEditScroll,  1,
 X   "dataupdate",               B_DataUpdate,           NULL,               1,
 X   "dataexist",                B_DataExist,            NULL,               1,
@@ -1386,20 +1457,25 @@ X   "datalistsort",             B_DataListSort,         SB_DataListSort,    0,
 X   "dataeditcnf",              B_DataEditCnf,          NULL/,              0,
 X   "datacalcvar",              B_DataCalcVar,          NULL,               0,
 X   "datacalclst",              B_DataCalcLst,          SB_DataCalcLst,     0,
-X   "datarasvar",               B_DataRasVar,           NULL,               0,
-X   "datascan",                 B_DataScan,             SB_DataScan,        1,
 X   "datapattern",              B_DataPattern,          NULL,               1,
 X   "datadisplaygraph",         B_DataDisplayGraph,     SB_DataEditGraph,   0,
 X   "dataprintgraph",           B_DataPrintGraph,       SB_DataEditGraph,   0,
-    
-    "eqsestimate",              B_EqsEstimate,          SB_EqsEstimate,     0,
-    "eqsstepwise",              B_EqsStepWise,          NULL,               0,
-    "eqssetmethod",             B_EqsSetMethod,         NULL,               0,
-    "eqssetbloc",               B_EqsSetBloc,           NULL,               0,
-    "eqssetblock",              B_EqsSetBloc,           NULL,               0,
-    "eqssetsample",             B_EqsSetSample,         NULL,               0,
-    "eqssetinstrs",             B_EqsSetInstrs,         NULL,               0,
-    "eqssetcmt",                B_EqsSetCmt,            NULL,               0,
+X   "datascan",                 B_DataScan,             SB_DataScan,        1,
+
+// b_ras.c
+X   "datarasvar",               B_DataRasVar,           NULL,               0,
+
+
+ 
+// b_est.c
+X   "eqsestimate",              B_EqsEstimate,          SB_EqsEstimate,     0,
+X   "eqsstepwise",              B_EqsStepWise,          NULL,               0,
+X   "eqssetmethod",             B_EqsSetMethod,         NULL,               0,
+X   "eqssetbloc",               B_EqsSetBloc,           NULL,               0,
+X   "eqssetblock",              B_EqsSetBloc,           NULL,               0,
+X   "eqssetsample",             B_EqsSetSample,         NULL,               0,
+X   "eqssetinstrs",             B_EqsSetInstrs,         NULL,               0,
+X   "eqssetcmt",                B_EqsSetCmt,            NULL,               0,
     
     
     "excelget",                 B_ExcelGet,             NULL,               1,
