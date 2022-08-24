@@ -96,6 +96,7 @@ set(GUI_MENU_COMPUTE
     menu/compute/compute_simulation.ui          menu/compute/compute_simulation.h           menu/compute/compute_simulation.cpp
     menu/compute/compute_model.ui               menu/compute/compute_model.h                menu/compute/compute_model.cpp
     menu/compute/compute_scc_decomposition.ui   menu/compute/compute_scc_decomposition.h    menu/compute/compute_scc_decomposition.cpp
+    menu/compute/compute_scc_simulation.ui      menu/compute/compute_scc_simulation.h       menu/compute/compute_scc_simulation.cpp
 )
 
 set(GUI_MENUS ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE})
