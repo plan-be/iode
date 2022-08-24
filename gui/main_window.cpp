@@ -198,6 +198,12 @@ void MainWindow::open_compute_model_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_compute_scc_decomposition_dialog()
+{
+    QIodeMenuComputeSCCDecomposition dialog(*settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::about()
 {
     // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")
