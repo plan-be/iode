@@ -11,13 +11,19 @@
       - [Functions with a file extension suffix (csv, txt...)](#T5)
       - [Other functions](#T6)
     - [List of source files](#T7)
-    - [b\_base.c](#T8)
+    - [b\_data.c](#T8)
       - [Functions with a suffix](#T9)
       - [Other functions](#T10)
       - [List of functions](#T11)
     - [b\_ras.c](#T12)
       - [List of functions](#T13)
-  - [Report functions group 3: report functions](#T14)
+    - [b\_est.c](#T14)
+      - [List of functions](#T15)
+    - [b\_fsys.c](#T16)
+      - [List of functions](#T17)
+    - [b\_file.c](#T18)
+      - [List of functions](#T19)
+  - [Report functions group 3: report functions](#T20)
 
 # IODE: Reports {#T1}
 
@@ -33,28 +39,28 @@ Three groups of functions that manage the reports can be identified:
 
 This group contains functions acting on IODE objects that are called by the report engine (see b\_rep\_syntax.c for a complete list of functions).
 
-These functions all have a similar syntax and always integer return code, 0 indicating success, other values an error.
+These functions all have a similar syntax and always return an integer code, 0 indicating success, other values indicating an error.
 
-There can be divided in 3 groups:
+They can be divided in 3 groups:
 
-- functions requiring as 2d arg an object type like B\_DataCreate() for the report commands $DataCreateIdt, $DataCreateVar...
-- functions requiring as 2d arg a file type like B\_FileDelete() for the report commands $FileDeleteCsv, $FileDeleteTxt...
-- functions with only one arg, like B\_DataListCount() or B\_DataCalcVar()
+- functions requiring as 2d arg an **object type** like B\_DataCreate() for the report commands $DataCreateIdt, $DataCreateVar...
+- functions requiring as 2d arg a **file type** like B\_FileDelete() for the report commands $FileDeleteCsv, $FileDeleteTxt...
+- functions with **only one arg**, like B\_DataListCount() or B\_DataCalcVar()
 
 #### Functions with an IODE object suffix (cmt, eqs...) {#T4}
 
-Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate require a suffix indicating which type of objects is their target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
+Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate require a suffix indicating which type of objects is their target (one of the 7 IODE objects). In that way, only one function is needed for $DataDelete*Var*, $DataDelete*Idt*...
 
 When called by the report engine, these functions have 2 parameters:
 
-- the argument of the function (the remaining of the report line)
+- the argument of the function (the report line without the function name)
 - the type of object treated (K\_CMT <= type <= K\_VAR)
 
 For these functions, the parameters and return values are as follows:
 
 ```
-    @param [in] char*   arg     report line without the command 
-    @param [in] int     type    type of object whose names are to be saved in the list (bw K_CMT and K_VAR)
+    @param [in] char*   arg     report line without the first word 
+    @param [in] int     type    type of object to be manipulated (K_CMT <= type <= K_VAR)
     @return     int             0 on success, -1 on error 
 ```
 
@@ -74,12 +80,12 @@ generates the C call:
 
 #### Functions with a file extension suffix (csv, txt...) {#T5}
 
-The principle is the same as above but for filename extensions instead of object types.
+The principle is the same as above but for filename extension suffix (.csv, .txt...) instead of object type suffix (.cmt...).
 
-When called by the report engine, these functions have 2 parameters:
+When called by the report engine, these functions have also 2 parameters:
 
-- the argument of the function (the remaining of the report line)
-- the type of object treated (K\_CMT <= type <= K\_CSV)
+- the argument of the function (report line without function name)
+- the type of **file** treated (K\_CMT <= type <= K\_CSV)
 
 The parameters and return values are the same as for the functions with an IODE object type parameter.
 
@@ -104,16 +110,19 @@ All other functions receive only the argument on the report line. B\_DataListSor
 For these functions, the parameters and return values are as follows:
 
 ```
- @param [in] char*   arg     report line without the command
- @return     int             0 on success, -1 on error (not enough args)
+ @param [in] char*   arg     report line without the first word (i.e. the function name)
+ @return     int             0 on success, -1 on error (not enough args for example)
 ```
 
 ### List of source files {#T7}
 
-- b\_base.c : functions acting on Data
+- b\_data.c : functions acting on data (i.e.: IODE objects)
 - b\_ras.c : implementation of a RAS algorithm.
+- b\_est.c : estimation functions
+- b\_fsys.c : file manipulation \+ conversion from/to ansi\-oem\-utf8
+- b\_file.c : file manipulation
 
-### b\_base.c {#T8}
+### b\_data.c {#T8}
 
 Functions acting on IODE objects called by the report engine (see b\_rep\_syntax.c) and their sub\-functions.
 
@@ -125,7 +134,10 @@ There are 2 groups of functions, one where a suffix is required, one with no suf
 
 Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate required a suffix indicating which type of objects is the target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
 
-When called by the report engine, these functions have 2 parameters: \- the argument of the function (the remaining of the report line) \- the type of object treated
+When called by the report engine, these functions have 2 parameters:
+
+- the argument of the function (the remaining of the report line)
+- the type of object treated
 
 For these functions, the parameters and return values are as follows:
 
@@ -194,5 +206,60 @@ Implementation of a RAS algorithm.
 |:---|:---|
 |`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
 
-## Report functions group 3: report functions {#T14}
+### b\_est.c {#T14}
+
+Estimation functions called in IODE reports.
+
+Except for B\_EqsEstimateEqs(), all functions in this group share the same syntax:
+
+```
+    int fn_name(char* arg) 
+    
+    where:  
+        arg is the report line (without the command name) 
+        the return code is 0 on success, any other value indicating and error
+```
+
+#### List of functions {#T15}
+
+|Syntax|Description|
+|:---|:---|
+|`int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)`|Estimates a bloc of equations on a defined SAMPLE.|
+|`int B_EqsEstimate(char* arg)`|Implementation of the report function $EqsEstimate.|
+|`int B_EqsSetSample(char* arg)`|Implementation of the report function $EqsSetSample.|
+|`int B_EqsSetMethod(char* arg)`|Implementation of the report function $EqsSetMethod.|
+|`int B_EqsSetBloc(char* arg)`|Implementation of the report function $EqsSetBlock|
+|`int B_EqsSetCmt(char* arg)`|Implementation of the report function $EqsSetCmt.|
+|`int B_EqsSetInstrs(char* arg)`|Implementation of the report function $EqsSetInstrs.|
+
+### b\_fsys.c {#T16}
+
+File manipulation and conversion from/to ansi\-oem\-utf8.
+
+#### List of functions {#T17}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_SysRename(char* arg)`|$SysMoveFile filein fileout|
+|`int B_SysCopy(char* arg)`|$SysCopyFile filein fileout|
+|`int B_SysAppend(char* arg)`|$SysAppendFile filein fileout|
+|`int B_SysDelete(char* arg)`|$SysDeleteFile file1 file2 ...|
+|`int B_SysOemToUTF8(char *arg)`|$SysOemToUTF8 inputfile outputfile|
+|`int B_SysAnsiToUTF8(char *arg)`|$SysAnsiToUTF8 inputfile outputfile|
+|`int B_SysAnsiToOem(char *arg)`|$SysAnsiToOem inputfile outputfile|
+|`int B_SysOemToAnsi(char *arg)`|$SysOemToAnsi inputfile outputfile|
+
+### b\_file.c {#T18}
+
+Functions acting on files called by the report engine (see b\_rep\_syntax.c).
+
+#### List of functions {#T19}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_FileCopy(char* arg, int type)`|$FileCopy<type> source\_file dest\_file|
+|`int B_FileRename(char* arg, int type)`|$FileRename<type> source\_file dest\_file|
+|`int B_FileDelete(char* arg, int type)`|$FileDelete<type> file1 \[file2...\]|
+
+## Report functions group 3: report functions {#T20}
 

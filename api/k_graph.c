@@ -443,7 +443,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
 // -----------------------------------------------------------------------------------------------------
 
 /**
- *  Sub function of V_graph_vars_1().
+ *  Sub function of V_graph_vars().
  *  
  *  @param [in] int     gnb         graphic number (unused)
  *  @param [in] int     type        type of chart (0, 2 or 3 for line chart, 1 for Bar chart) TODO: check this 
@@ -526,14 +526,6 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
 {
     int     i, dt, nt, ng;
 
-    /* GB 12/97
-        if(view == 0) {
-    	 if(B_dest == 1)
-    	     if(PG_edit_window(vkp_fprintfile) < 0) return(-1);
-
-    	 if(B_PrintDest(B_outfile) < 0) return(-1);
-        }
-    */
     ng = SCR_tbl_size(names);
     if(ng == 0) {
         B_seterrn(69);
