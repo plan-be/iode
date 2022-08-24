@@ -21,6 +21,7 @@
 
 #include "menu/compute/compute_identities.h"
 #include "menu/compute/compute_simulation.h"
+#include "menu/compute/compute_model.h"
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -57,6 +58,7 @@ public slots:
 	// Compute Menu
 	void open_compute_identities_dialog();
 	void open_compute_simulation_dialog();
+	void open_compute_model_dialog();
 
 	// Help Menu
 	void about();
