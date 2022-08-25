@@ -32,10 +32,16 @@ void QIodeSettings::loadSettings()
     QMap<QString, BaseWrapper*>::iterator i;
     for (i = mapFields.begin(); i != mapFields.end(); ++i)
     {
-        QString name = i.key();
+        QString key = i.key();
         BaseWrapper* field = i.value();
-        QVariant value = settings->value(name).toString();
-        field->setQValue(value);
+        // use contains() to not override default value set in UI form file
+        // (i.e. default value used when a user uses the field for the first time)
+        if (settings->contains(key))
+        {
+            // Note: if key does not exist, a default value is infered (not from UI form file!)
+            QVariant value = settings->value(key).toString();
+            field->setQValue(value);
+        }
     }
     settings->endGroup();
 }
