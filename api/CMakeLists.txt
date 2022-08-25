@@ -18,7 +18,7 @@ set (WRT w_wrt.c w_wrt1.c)
 set (INI b_iodeini.c)
 set (A2M b_a2mini.c)
 set (ESTIM k_est.c e_error.c e_est.c e_prep.c e_print.c e_step.c e_tests.c e_dftest.c)
-set (REPORTS b_data.c b_ras.c b_est.c)
+set (REPORTS b_data.c b_ras.c b_est.c b_fsys.c b_file.c) 
  
 set (SOURCES 
 		${UTILS} 
@@ -27,7 +27,7 @@ set (SOURCES
 		${BRICKS}
 		${LEC}
 		${SIMUL}
-		${KSUPER}
+		${KSUPER} 
 		${KLANG}
 		${GSAMPLE}
 		${KPRINT}
