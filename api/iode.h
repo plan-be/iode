@@ -1118,6 +1118,8 @@ typedef struct _fils_ {
 //
 
 /*---------------- IMPORT / EXPORT ------------------ */
+
+// struct defining input file and fn pointers for one type of data format to be imported
 typedef struct _impdef_ {
     YYKEYS  *imp_keys;
     int     imp_dim;
@@ -1127,21 +1129,20 @@ typedef struct _impdef_ {
     int     (*imp_end_fn)();
 } IMPDEF;
 
+// struct defining output File descriptor and fn pointers for one type of data format to export
 typedef struct _expdef_ {
-    int     (*exp_hd_fn)();
-
-    char    *(*exp_code_fn)();
-    char    *(*exp_cmt_fn)();
-    char    *(*exp_elem_fn)();
-    int     (*exp_vec_fn)();
-
-    int     (*exp_end_fn)();
-    FILE    *exp_fd;
+    int     (*exp_hd_fn)();     // Function saving the header of the output file
+    char    *(*exp_code_fn)();  // Function translating an IODE object name to an allocated object name in the output file
+    char    *(*exp_cmt_fn)();   // Function translating the comment of an IODE object into an allocated string in the output file format
+    char    *(*exp_elem_fn)();  // Function constructing an allocated vector of Variable values
+    int     (*exp_vec_fn)();    // Function saving in the output file a variable/comment constructed by a call to the above functions
+    int     (*exp_end_fn)();    // Function saving the footer of the output file
+    FILE    *exp_fd;            // Output file descriptor (output of fopen)
 } EXPDEF;
 
 /*------------------------ LEC ----------------------- */
-typedef struct _alec {          /* LEC atomic element */
-	int     al_type;            /* type : L_VAR, L_COEF, L_CONST ... */
+typedef struct _alec {      /* LEC atomic element */
+	int     al_type;        /* type : L_VAR, L_COEF, L_CONST ... */
     union {
 	LECREAL v_real;         /* constant values IODE_REAL */
 	long    v_long;         /* constant values long int */
@@ -1151,8 +1152,8 @@ typedef struct _alec {          /* LEC atomic element */
 	    PERIOD  per;        /* PERIOD if any */
 	    short   lag;        /* lag if any */
 	} v_var;                /* variable  */
-	short   v_coef;             /* coef number */
-	PERIOD  v_per;              /* period */
+	short   v_coef;         /* coef number */
+	PERIOD  v_per;          /* period */
     } al_val;
 } ALEC;
 

@@ -58,12 +58,13 @@
   - [Group "Basic functions"](#T52)
     - [b\_args.c](#T53)
     - [b\_errors.c](#T54)
-  - [Group "Model Estimation"](#T55)
-  - [Group "Model Simulation"](#T56)
-  - [Group "Table Calculation"](#T57)
-  - [Group "IODE Printing"](#T58)
-  - [Group "IODE object conversions"](#T59)
-  - [Group "Iode Reports"](#T60)
+  - [Group "Execution of identities"](#T55)
+  - [Group "Model Estimation"](#T56)
+  - [Group "Model Simulation"](#T57)
+  - [Group "Table Calculation"](#T58)
+  - [Group "IODE Printing"](#T59)
+  - [Group "IODE object conversions"](#T60)
+  - [Group "Iode Reports"](#T61)
 
 # IODE: functions by group {#T1}
 
@@ -79,6 +80,7 @@
 - Group "Iode object ascii formats" 
 - Group "LEC language" 
 - Group "Basic functions" 
+- Group "Execution of identities" 
 - Group "Model Estimation" 
 - Group "Model Simulation" 
 - Group "Table Calculation" 
@@ -698,27 +700,31 @@ Basic functions for managing error messages.
 |`void B_print_last_error()`|Displays or prints the last recorded errors (in B\_ERROR\_MSG) using W\_printf().|
 |`void B_clear_last_error()`|Resets the list of last messages (B\_ERROR\_MSG and B\_ERROR\_NB).|
 
-## Group "Model Estimation" {#T55}
+## Group "Execution of identities" {#T55}
+
+See [IDENTITIES.md](identities.md).
+
+## Group "Model Estimation" {#T56}
 
 See [ESTIM.md](ESTIM.md).
 
-## Group "Model Simulation" {#T56}
+## Group "Model Simulation" {#T57}
 
 See [SIMUL.md](simul.md).
 
-## Group "Table Calculation" {#T57}
+## Group "Table Calculation" {#T58}
 
 See [TBL\_CALC.md](tbl_calc.md).
 
-## Group "IODE Printing" {#T58}
+## Group "IODE Printing" {#T59}
 
 See [PRINTING.md](PRINTING.md).
 
-## Group "IODE object conversions" {#T59}
+## Group "IODE object conversions" {#T60}
 
 See [CONVERSIONS.md](CONVERSIONS.md).
 
-## Group "Iode Reports" {#T60}
+## Group "Iode Reports" {#T61}
 
 See [REPORTS.md](REPORTS.md).
 

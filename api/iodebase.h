@@ -1060,7 +1060,7 @@ extern int B_ScrollVTN(char *);
 
 /* b_idt.c */
 extern int B_IdtExecute(char *);
-extern int B_IdtExecuteIdts(SAMPLE *,char **);
+//extern int B_IdtExecuteIdts(SAMPLE *,char **);
 extern int B_IdtExecuteVarFiles(char *);
 extern int B_IdtExecuteSclFiles(char *);
 extern int B_IdtExecuteTrace(char *);
@@ -1303,18 +1303,19 @@ extern int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* pos
 extern int K_simul_SCC(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** pre, char** inter, char** post);
 
 /* k_exec.c */
-extern KDB *KI_series_list(KDB *);
-extern KDB *KI_scalar_list(KDB *);
+//extern KDB *KI_series_list(KDB *);
+//extern KDB *KI_scalar_list(KDB *);
 extern KDB *KI_exec(KDB *,KDB *,int ,char **,KDB *,int ,char **,SAMPLE *);
-extern int *KI_reorder(KDB *);
-extern int KI_read_vars_db(KDB *,KDB *);
-extern int KI_read_vars_file(KDB *,char *);
-extern int KI_read_vars(KDB *,KDB *,KDB *,int ,char **);
-extern int KI_read_scls_db(KDB *,KDB *);
-extern int KI_read_scls_file(KDB *,char *);
-extern int KI_read_scls(KDB *,KDB *,int ,char **);
-extern int KI_execute(KDB *,KDB *,KDB *,int *,SAMPLE *);
-extern int KI_extract(KDB *,KDB *);
+//extern int *KI_reorder(KDB *);
+//extern int KI_read_vars_db(KDB *,KDB *);
+//extern int KI_read_vars_file(KDB *,char *);
+//extern int KI_read_vars(KDB *,KDB *,KDB *,int ,char **);
+//extern int KI_read_scls_db(KDB *,KDB *);
+//extern int KI_read_scls_file(KDB *,char *);
+//extern int KI_read_scls(KDB *,KDB *,int ,char **);
+//extern int KI_execute(KDB *,KDB *,KDB *,int *,SAMPLE *);
+//extern int KI_extract(KDB *,KDB *);
+//extern int KI_quick_extract(KDB* dbv, KDB* dbi);
 
 /* k_lang.c */
 extern int K_LANG;      // Current language
@@ -1610,6 +1611,7 @@ extern int W_EndDisplay(char *title,int x,int y,int w,int h);
 // extern int W_ResetPrinterSettings();
 // extern int W_SetPrinterSettings();
 extern int W_printf(char *fmt,...);
+extern int W_printfDbl(char* fmt, ...);
 extern int W_printfEx(int dup, char *fmt, va_list args);
 
 // interface

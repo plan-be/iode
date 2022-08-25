@@ -159,10 +159,6 @@ public:
 	    content2 = U_test_read_file(file2, &size2);
 	    //printf("   '%s': size=%ld\n", file2, size2);
 	
-	    if(size1 != size2) {
-	        rc = 0;              // !=
-	        goto cmp;
-	    }
 	    if(content1 == NULL && content2 == NULL) {              // ==
 	        goto fin;
 	    }
@@ -172,6 +168,11 @@ public:
 	        if(content2 == NULL) printf("File %s not found\n", file2);
 	        rc = 0;
 	        goto fin;      // !=
+	    }
+	
+	    if(size1 != size2) {
+	        rc = 0;              // !=
+	        goto cmp;
 	    }
 	
 	    rc = !memcmp(content1, content2, size1);
@@ -239,6 +240,35 @@ public:
 	void U_test_reset_a2m_msgs()
 	{
 	    U_test_a2m_msgs(1);
+	}
+
+	void U_test_kmsg_msgs(int IsOn)
+	{
+	    static int  Current_IsOn = 1;
+	    static void (*kmsg_super_ptr)(char*);
+	
+	
+	    if(IsOn && !Current_IsOn) {
+	        kmsg_super = kmsg_super_ptr;
+	        Current_IsOn = 1;
+	        return;
+	    }
+	    else if(!IsOn && Current_IsOn) {
+	        kmsg_super_ptr = kmsg_super;
+	        kmsg_super = kmsg_null;
+	        Current_IsOn = 0;
+	        return;
+	    }
+	}
+
+	void U_test_suppress_kmsg_msgs()
+	{
+	    U_test_kmsg_msgs(0);
+	}
+
+	void U_test_reset_kmsg_msgs()
+	{
+	    U_test_kmsg_msgs(1);
 	}
 
 	void U_test_CreateObjects()
@@ -404,6 +434,46 @@ public:
 	    EXPECT_TRUE(U_diff_files(reffilename, filename), "W_printf -> %s");
 	}
 
+	int U_test_compare_outfile_to_reffile(char* outfile, char* reffile)
+	{
+	    char reffilename[512];
+	    char filename[512];
+	
+	    sprintf(filename, "%s\\%s", output_test_dir, outfile);
+	    sprintf(reffilename, "%s\\%s", input_test_dir, reffile);
+	    printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
+	    return(U_diff_files(reffilename, filename));
+	}
+
+	void U_test_create_a_file(char* filename, int type)
+	{
+	    //  Create a file
+	    U_test_suppress_a2m_msgs();
+	    W_dest(filename, type);
+	    W_printf("This is a paragraph with accents: éàâêë\n\n"); // the current source file (test1.c) is ANSI coded
+	    W_close();
+	}
+
+	int U_test_file_exists(char* filename, char* msg )
+	{
+	    int     rc;
+	
+	    //  Check that the file exists
+	    rc = access(filename, 0);
+	    EXPECT_EQ(rc, 0);
+	    return(rc == 0);
+	}
+
+	int U_test_file_not_exists(char* filename, char* msg)
+	{
+	    int     rc;
+	
+	    //  Check that the file exists
+	    rc = access(filename, 0);
+	    EXPECT_NE(rc, 0);
+	    return(rc != 0);
+	}
+
 	void U_test_init()
 	{
 	    static int  done = 0;
@@ -494,7 +564,7 @@ TEST_F(IodeCAPITest, Tests_LEC)
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
-    //S4ASSERT(0, "Erreur forcÃ©e");
+    //S4ASSERT(0, "Erreur forcée");
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
     U_test_lec("LEC", "A[-1]",         2, A[1]);
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
@@ -685,14 +755,14 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Test Endo-exo
 
-    // Version avec Ã©change dans une seule Ã©quation
+    // Version avec échange dans une seule équation
     // endo_exo = SCR_vtoms("UY-NIY", ",; ");
     // rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
     // S4ASSERT(rc == 0, "Exchange UY-NIY converges on 2000Y1-2002Y1");
     // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
     // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
 
-    // Version avec Ã©change dans min 2 equations
+    // Version avec échange dans min 2 equations
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
     KV_set_at_aper("UY", "2001Y1", 670.0);
@@ -893,7 +963,7 @@ TEST_F(IodeCAPITest, Tests_SWAP)
     SW_free(item);
     SW_free(item);
 
-    // test 2 :  on rÃ©utilise l'espace freeÃ©
+    // test 2 :  on réutilise l'espace freeé
     item = SW_alloc(15);
     SW_free(item);
     item2 = SW_alloc(10);
@@ -904,7 +974,7 @@ TEST_F(IodeCAPITest, Tests_SWAP)
 
 TEST_F(IodeCAPITest, Tests_B_DATA)
 {
-    char        *lst, *ptr, buf[512];
+    char        *lst, buf[512];
     int         rc, i, cond;
     IODE_REAL   *A1, val;
     SAMPLE      *smpl;
@@ -924,7 +994,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     U_test_CreateObjects();
 
     // B_DataPattern()
-    // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB Ã§a marche pas...) => A changer ? Voir B_DataListSort()
+    // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ça marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", K_VAR);
     lst = KLPTR("RC");
     EXPECT_TRUE(U_cmp_strs(lst, "AB,AC,BB,BC"));
@@ -1062,10 +1132,198 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 }
 
 
+TEST_F(IodeCAPITest, Tests_B_EQS)
+{
+    int     rc, cond, pos;
+    SAMPLE  *smpl;
+    char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
+    char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
+
+    U_test_print_title("Tests B_EQS");
+    U_test_suppress_kmsg_msgs();
+
+    // (Re-)loads 3 WS and check ok
+    U_test_load_fun_esv("fun");
+
+    // B_EqsEstimate()
+    rc = B_EqsEstimate(cmd_B_EqsEstimate);
+
+    cond = (rc == 0) && U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815);
+    EXPECT_EQ(cond, 1);
+    cond = (rc == 0) && U_test_eq(K_e_fstat(KE_WS, "ACAF"), 32.285108);
+    EXPECT_EQ(cond, 1);
+
+    // B_EqsSetSample()
+    rc = B_EqsSetSample(cmd_B_EqsSetSample);
+    pos = K_find(KE_WS, "ACAF");
+    smpl = &KESMPL(KE_WS, pos);
+    cond = (rc ==0) && (smpl->s_p1.p_y == 1981);
+    EXPECT_EQ(cond, 1);
+
+    // TODO: implement next utests with the same canevas
+        //B_EqsSetMethod(char* arg)
+        //B_EqsSetBloc(char* arg)
+        //B_EqsSetCmt(char* arg)
+        //B_EqsSetInstrs(char* arg)
+
+    U_test_reset_kmsg_msgs();
+}
+
+
 TEST_F(IodeCAPITest, Tests_B_FILE)
 {
-    // B_FileDelete(char* arg, int type)
+    int     rc;
 
+    U_test_print_title("Tests B_FILE");
+
+    // Cleanup files
+    unlink("toto.a2m");
+    unlink("tata.a2m");
+    unlink("tutu.a2m");
+
+    //  Create a file
+    U_test_create_a_file("toto", W_A2M);
+
+    //  Check that the file exists
+    U_test_file_exists("toto.a2m", "File %s exists");
+
+    //  Call B_FileRename()
+    rc = B_FileRename("toto tata", K_A2M);
+    rc = U_test_file_exists("tata.a2m", "B_FileRename(\"toto tata\", K_A2M)");
+
+    //  Call B_FileCopy()
+    rc = B_FileCopy("tata tutu", K_A2M);
+    rc = U_test_file_exists("tutu.a2m", "B_FileCopy(\"tata tutu \", K_A2M)");
+
+    //  Call B_FileDelete()
+    rc = B_FileDelete("tata tutu", K_A2M);
+    rc = U_test_file_not_exists("tata.a2m", "B_FileDelete(\"tata tutu\", K_A2M)");
+
+/*
+    "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,
+    "fileimportcmt",            B_FileImportCmt,        SB_XodeRuleImport,  0,
+*/
+
+    U_test_reset_a2m_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_FSYS)
+{
+    int     rc, cond;
+
+    U_test_print_title("Tests B_FSYS");
+
+    // Cleanup files
+    unlink("toto.a2m");
+    unlink("toto.a2m.oem");
+    unlink("toto.a2m.ansi");
+    unlink("totodbl.a2m.ansi");
+    unlink("brol.a2m.ansi");
+    unlink("brol2.a2m.ansi");
+
+    //  Create toto.a2m -> ansi-coded file
+    U_test_create_a_file("toto", W_A2M); // Ansi-coded file
+
+    // B_SysAnsiToOem() : translate ansi to oem -> toto.a2m.oem
+    rc = B_SysAnsiToOem("toto.a2m toto.a2m.oem");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("toto.a2m.oem", "toto.a2m.oem.ref");
+    EXPECT_EQ(cond, 1);
+
+    // B_SysAnsiToUTF8() : translate ansi to utf8 -> toto.a2m.utf8
+    rc = B_SysAnsiToUTF8("toto.a2m toto.a2m.utf8");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
+    EXPECT_EQ(cond, 1);
+
+    // B_SysOemToAnsi() : translate oem to ansi -> toto.a2m.ansi
+    rc = B_SysOemToAnsi("toto.a2m.oem toto.a2m.ansi");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("toto.a2m.ansi", "toto.a2m.ansi.ref");
+    EXPECT_EQ(cond, 1);
+
+    // B_SysOemToUTF8() : translate ansi to utf8 -> toto.a2m.utf8
+    rc = B_SysOemToUTF8("toto.a2m.oem toto.a2m.utf8");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
+    EXPECT_EQ(cond, 1);
+
+    // B_SysRename(char* arg) : rename toto.a2m.ansi -> brol.a2m.ansi
+    rc = B_SysRename("toto.a2m.ansi brol.a2m.ansi");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("brol.a2m.ansi", "toto.a2m.ansi.ref");
+    EXPECT_EQ(cond, 1);
+
+    // B_SysCopy(char* arg) : copy brol.a2m.ansi dans totodbl.a2m.ansi
+    rc = B_SysCopy("brol.a2m.ansi totodbl.a2m.ansi");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("totodbl.a2m.ansi", "toto.a2m.ansi.ref");
+    EXPECT_EQ(cond, 1);
+
+    // B_SysAppend(char* arg) : append totodbl.a2m.ansi to brol.a2m.ansi
+    rc = B_SysAppend("brol.a2m.ansi totodbl.a2m.ansi ");
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("totodbl.a2m.ansi", "totodbl.a2m.ansi.ref");
+    EXPECT_EQ(cond, 1);
+
+
+    // B_SysDelete(char* arg) : delete totdbl.a2m.ansi and brol.a2m.ansi
+    rc = B_SysDelete("brol.a2m.ansi totodbl.a2m.ansi tutu.a2m toto.a2m toto.a2m.oem toto.a2m.utf8");
+    rc = U_test_file_not_exists("brol.a2m.ansi",  "B_SysDelete(\"brol.a2m.ansi\")");
+    rc = U_test_file_not_exists("brol2.a2m.ansi", "B_SysDelete(\"totodbl.a2m.ansi\")");
+
+    U_test_reset_a2m_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_IDT)
+{
+    char        filename[256];
+    char        idtexec[] = "2002Y1 2007Y1 C D";
+    char        idtexec2[] = "2002Y1 2007Y1 C D";
+    int         rc;
+    IODE_REAL   *C, *D;
+
+    U_test_print_title("Tests B_IDT");
+
+    // Init=> clear ws
+    K_clear(KC_WS);
+    K_clear(KI_WS);
+    K_clear(KL_WS);
+    K_clear(KT_WS);
+
+    U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
+    K_add(KI_WS, "C", "D*2+ACAF");
+    K_add(KI_WS, "D", "A+B");
+
+
+    // Trace the execution
+    W_dest("test_idt", W_HTML);
+    rc = B_IdtExecuteTrace("Yes");
+
+    // Erroneously define input filenames (WS forgotten !!)
+    sprintf(filename,  "%s\\fun", input_test_dir);
+    rc = B_IdtExecuteVarFiles(filename);
+    EXPECT_EQ(rc, 0);
+
+    // Compute the idts of a partial sample
+    rc = B_IdtExecute(idtexec);
+    EXPECT_NE(rc, 0);
+
+    // Second trial with WS in filenames
+    K_clear(KV_WS);
+    U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
+
+    sprintf(filename,  "WS %s\\fun", input_test_dir);
+    rc = B_IdtExecuteVarFiles(filename);
+    EXPECT_EQ(rc, 0);
+
+    // Compute the idts of a partial sample
+    rc = B_IdtExecute(idtexec2);
+    EXPECT_EQ(rc, 0);
+
+
+    // Check the values
+    C = (IODE_REAL*)KVPTR("C");
+    D = (IODE_REAL*)KVPTR("D");
+
+    EXPECT_TRUE(U_test_eq(D[1], L_NAN));
+    EXPECT_TRUE(U_test_eq(D[2], 2.0 + 4.0));
+    EXPECT_TRUE(U_test_eq(C[2], 6.0*2 - 0.92921251 ));
 }
 
 

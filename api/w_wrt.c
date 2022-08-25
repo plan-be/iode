@@ -64,6 +64,7 @@
  *   int W_flush()                                              Sends the objects currently recorded in memory by A2mMemRecord() to the printer or the file.
  *   int W_printfEx(int dup, char* fmt, va_list args)           Records a text in A2m memory for printing after parsing the fmt argument.
  *   int W_printf(char* fmt, ...)                               Records a text in A2m memory for printing.
+ *   int W_printfDbl(char* fmt, ...)                            Records a text in A2m memory for printing after parsing the fmt argument. Doubles the backslashes.
  *   int W_putc(int ch)                                         Records a single character in A2m memory by a call to W_printf().
  *   int W_record(char *str)                                    Records a text in A2m memory.
  *   int W_InitDisplay()                                        Defines the new output type as W_DISP (displays or creates a TeeChart graph file).
@@ -107,6 +108,7 @@ int W_close();
 int W_flush();
 int W_printfEx(int dup, char* fmt, va_list args);
 int W_printf(char* fmt, ...);
+int W_printfDbl(char* fmt, ...) ;
 int W_putc(int ch);
 static W_isempty(char *buf);
 int W_record(char *str);
@@ -421,6 +423,28 @@ int W_printf(char* fmt, ...)
 
     return(rc);
 }
+
+/**
+ *  Records a text in A2m memory for printing. Double the backslashes (for Windows filenames).
+ *  See W_printfEx().
+ *
+ *  @param [in] char*   fmt     argument (a la printf)
+ *  @param [in] va_list args    list of parameters needed by fmt
+ *  @return     int             0 on success
+ *                              -1 if W_open() fails
+ */
+int W_printfDbl(char* fmt, ...)
+{
+    va_list myargs;
+    int     rc;
+
+    va_start(myargs, fmt);
+    rc = W_printfEx(1, fmt, myargs);
+    va_end(myargs);
+
+    return(rc);
+}
+
 
 /**
  *  Records a single character in A2m memory by a call to W_printf().

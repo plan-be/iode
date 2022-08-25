@@ -134,6 +134,7 @@ Contains the main "W\_\*" functions: select, close, print, display, printer mana
 |`int W_flush()`|Sends the objects currently recorded in memory by A2mMemRecord() to the printer or the file.|
 |`int W_printfEx(int dup, char* fmt, va_list args)`|Records a text in A2m memory for printing after parsing the fmt argument.|
 |`int W_printf(char* fmt, ...)`|Records a text in A2m memory for printing.|
+|`int W_printfDbl(char* fmt, ...)`|Records a text in A2m memory for printing after parsing the fmt argument. Doubles the backslashes.|
 |`int W_putc(int ch)`|Records a single character in A2m memory by a call to W\_printf().|
 |`int W_record(char *str)`|Records a text in A2m memory.|
 |`int W_InitDisplay()`|Defines the new output type as W\_DISP (displays or creates a TeeChart graph file).|

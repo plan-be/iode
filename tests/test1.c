@@ -1444,6 +1444,65 @@ void Tests_B_FSYS()
 }
 
 
+// Test of identities calculation (b_idt.c).
+// k_exec.c is implicitly tested via the calls to b_idt.c functions.
+
+void Tests_B_IDT()
+{
+    char        filename[256];
+    char        idtexec[] = "2002Y1 2007Y1 C D";
+    char        idtexec2[] = "2002Y1 2007Y1 C D";
+    int         rc;
+    IODE_REAL   *C, *D;
+   
+    U_test_print_title("Tests B_IDT");
+
+    // Init=> clear ws
+    K_clear(KC_WS);
+    K_clear(KI_WS);
+    K_clear(KL_WS);
+    K_clear(KT_WS);
+    
+    U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
+    K_add(KI_WS, "C", "D*2+ACAF");
+    K_add(KI_WS, "D", "A+B");
+   
+       
+    // Trace the execution
+    W_dest("test_idt", W_HTML);
+    rc = B_IdtExecuteTrace("Yes");
+    
+    // Erroneously define input filenames (WS forgotten !!)
+    sprintf(filename,  "%s\\fun", IODE_DATA_DIR);
+    rc = B_IdtExecuteVarFiles(filename);
+    S4ASSERT(rc == 0, "B_IdtExecuteVarFiles(\"%s\")", filename);
+    
+    // Compute the idts of a partial sample 
+    rc = B_IdtExecute(idtexec);
+    S4ASSERT(rc != 0, "B_IdtExecute(\"%s\") != 0 without WS", idtexec);
+
+    // Second trial with WS in filenames
+    K_clear(KV_WS);
+    U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
+
+    sprintf(filename,  "WS %s\\fun", IODE_DATA_DIR);
+    rc = B_IdtExecuteVarFiles(filename);
+    S4ASSERT(rc == 0, "B_IdtExecuteVarFiles(\"%s\")", filename);
+    
+    // Compute the idts of a partial sample 
+    rc = B_IdtExecute(idtexec2);
+    S4ASSERT(rc == 0, "B_IdtExecute(\"%s\") == 0 with WS", idtexec2);
+
+
+    // Check the values
+    C = (IODE_REAL*)KVPTR("C");
+    D = (IODE_REAL*)KVPTR("D");
+    
+    S4ASSERT(U_test_eq(D[1], L_NAN), "(A+B)[1] is NaN");        // 1 == 2001Y1
+    S4ASSERT(U_test_eq(D[2], 2.0 + 4.0), "(A+B)[2] == 6.0");    // 2 == 2002Y1
+    S4ASSERT(U_test_eq(C[2], 6.0*2 - 0.92921251 ), "C[2] ==6.0*2 - 0.92921251");
+}
+
 
 // ================================================================================================
 
@@ -1502,11 +1561,12 @@ int main(int argc, char **argv)
     Tests_PrintTablesAndVars();
     Tests_Estimation();
     Tests_W_printf();
+    Tests_B_IDT();
     Tests_B_DATA();
     Tests_B_EQS();
     Tests_B_FILE();
     Tests_B_FSYS();
-
+    
    
     //K_save_iode_ini(); // Suppress that call ? Should only be called on demand, not at the end of each IODE session.
     
