@@ -641,7 +641,7 @@ extern int GEM_readsrubr(YYFILE *);
 extern int GEM_name(char *);
 
 /* k_emain.c */
-extern void EXP_set(char *,char *);
+//extern void EXP_set(char *,char *);
 extern void EXP_val(char *,double );
 extern char *EXP_addprepost(char *,char *,char *,char **);
 extern char *EXP_addsep(char *,char **);
@@ -796,6 +796,16 @@ extern int B_FileRename(char *,int );
 extern int B_SysRename(char *);
 extern int B_SysCopy(char *);
 extern int B_SysDelete(char *);
+
+/* b_fsys.c */
+extern int B_SysRename(char* arg);      
+extern int B_SysCopy(char* arg);      
+extern int B_SysAppend(char* arg);      
+extern int B_SysDelete(char* arg);      
+extern int B_SysOemToUTF8(char *arg);   
+extern int B_SysAnsiToUTF8(char *arg);  
+extern int B_SysAnsiToOem(char *arg);      
+extern int B_SysOemToAnsi(char *arg);   
 
 /* b_fedit.c */
 extern int B_FileEdit(char *);
