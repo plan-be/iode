@@ -168,3 +168,63 @@ TEST_F(KDBIdentitiesTest, Filter)
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
     EXPECT_EQ(global_kdb.get_lec(name), modified_lec);
 }
+
+// QUESTION FOR JMP: How to test with variables file, scalars file and trace ?
+TEST_F(KDBIdentitiesTest, ExecuteIdentities)
+{
+    int y_from = 1991;
+    int y_to = 2000;
+    // GAP2 "100*(QAFF_/(Q_F+Q_I))"
+    // GAP_ "100*((QAF_/Q_F)-1)"
+    std::string identities_list = "GAP2;GAP_";
+
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    KDBVariables kdb_var;
+
+    std::string period;
+    Variable expected_gap2;
+    Variable expected_gap_;
+    expected_gap2.reserve(10);
+    expected_gap_.reserve(10);
+    IODE_REAL qaff_;
+    IODE_REAL qaf_;
+    IODE_REAL q_f;
+    IODE_REAL q_i;
+    for (int y=y_from; y <= y_to; y++)
+    {
+        period = std::to_string(y) + "Y1";
+        // reset GAP2 and GAP_
+        kdb_var.set_var("GAP2", period, 0.0);
+        kdb_var.set_var("GAP_", period, 0.0);
+        // compute values of GAP2 and GAP_
+        qaff_ = kdb_var.get_var("QAFF_", period);
+        qaf_ = kdb_var.get_var("QAF_", period);
+        q_f = kdb_var.get_var("Q_F", period);
+        q_i = kdb_var.get_var("Q_I", period);
+        expected_gap2.push_back(100.0 * (qaff_ / (q_f + q_i)));
+        expected_gap_.push_back(100.0 * ((qaf_ / q_f) - 1.0));
+    }
+
+    // compute GAP2 and GAP_
+    kdb.execute_identities(std::to_string(y_from)+"Y1", std::to_string(y_to)+"Y1", identities_list);
+
+    Variable computed_gap2;
+    Variable computed_gap_;
+    computed_gap2.reserve(10);
+    computed_gap_.reserve(10);
+    for (int y=y_from; y <= y_to; y++)
+    {
+        period = std::to_string(y) + "Y1";
+        computed_gap2.push_back(kdb_var.get_var("GAP2", period));
+        computed_gap_.push_back(kdb_var.get_var("GAP_", period));
+    }
+
+    EXPECT_DOUBLE_EQ(computed_gap2[0], expected_gap2[0]);
+    EXPECT_DOUBLE_EQ(computed_gap_[0], expected_gap_[0]);
+
+    EXPECT_DOUBLE_EQ(computed_gap2[4], expected_gap2[4]);
+    EXPECT_DOUBLE_EQ(computed_gap_[4], expected_gap_[4]);
+
+    EXPECT_DOUBLE_EQ(computed_gap2[9], expected_gap2[9]);
+    EXPECT_DOUBLE_EQ(computed_gap_[9], expected_gap_[9]);
+}
