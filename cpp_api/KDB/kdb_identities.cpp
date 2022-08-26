@@ -52,3 +52,37 @@ void KDBIdentities::update(const int pos, const std::string& lec)
     char* c_lec = const_cast<char*>(lec.c_str());
     KDBTemplate::update(pos, c_lec);
 }
+
+void KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 
+        const std::string& var_files, const std::string& scalar_files, const bool trace)
+{
+    IodeExceptionInvalidArguments error("execute_identities");
+    if (identities_list.empty()) error.add_argument("identities_list empty! ", identities_list);
+    if (error.invalid_args()) throw error;
+
+    B_IdtExecuteVarFiles(const_cast<char*>(var_files.c_str()));
+    B_IdtExecuteSclFiles(const_cast<char*>(scalar_files.c_str()));
+    B_IdtExecuteTrace(trace ? "Y" : "N");
+
+    Sample sample(from, to);
+    char* c_identities_list = const_cast<char*>(identities_list.c_str());
+    char** idts = B_ainit_chk(c_identities_list, NULL, 0);
+
+    int rc = B_IdtExecuteIdts(sample.c_sample, idts);
+    SCR_free_tbl((unsigned char**) idts);
+    if (rc != 0) B_display_last_error();
+}
+
+void KDBIdentities::execute_identities(const std::string& from, const std::string& to, const std::string& identities_list, 
+        const std::string& var_files, const std::string& scalar_files, const bool trace)
+{
+    IodeExceptionInvalidArguments error("Execute Identities");
+    if (from.empty()) error.add_argument("from empty! ", from);
+    if (to.empty()) error.add_argument("to empty! ", to);
+    if (identities_list.empty()) error.add_argument("identities_list empty! ", identities_list);
+    if (error.invalid_args()) throw error;
+
+    Period period_from(from);
+    Period period_to(to);
+    execute_identities(period_from, period_to, identities_list, var_files, scalar_files, trace);
+}
