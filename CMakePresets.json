@@ -224,7 +224,7 @@
         },
         {
             "inherits": "windows-x64-debug",
-            "displayName": "TEST CPP API Windows",
+            "displayName": "TEST CPP API Windows x64",
             "name": "windows-x64-debug/tests/test_cpp_api"
         },
         {
@@ -329,7 +329,7 @@
         {
             "name": "cpp-api-windows-x64-debug",
             "inherits": "test-default",
-            "displayName": "TEST CPP API Windows",
+            "displayName": "TEST CPP API Windows x64",
             "configurePreset": "windows-x64-debug/tests/test_cpp_api"
         },
         {
