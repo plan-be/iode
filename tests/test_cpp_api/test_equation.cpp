@@ -124,3 +124,10 @@ TEST_F(EquationTest, Tests)
     tests = equation->get_tests();
     for (int i = 0; i < EQS_NBTESTS; i++) EXPECT_FLOAT_EQ(tests[i], new_tests[i]);
 }
+
+TEST_F(EquationTest, GetCoefficients)
+{
+    std::vector<std::string> expected_coefs_list = {"acaf1", "acaf2", "acaf4"};
+    std::vector<std::string> coefs_list = equation->get_coefficients_list("ACAF");
+    EXPECT_EQ(coefs_list, expected_coefs_list);
+}
