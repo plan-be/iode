@@ -64,3 +64,59 @@ void KDBEquations::update(const int pos, const std::string& lec, const std::stri
 
     KDBTemplate::update(name, eq, c_name);
 }
+
+/** 
+ * Equivalent to B_EqsEstimateEqs
+ */
+void KDBEquations::equations_estimate(const Sample& sample, const std::string& equations_list)
+{
+    IodeExceptionInvalidArguments invalid_error("(block of) equation(s)", "estimate");
+    if (equations_list.empty()) 
+    {
+        invalid_error.add_argument("(list of) equation(s) is empty! ", equations_list);
+        throw invalid_error;
+    }
+
+    char* c_equations_list = const_cast<char*>(equations_list.c_str());
+    char** eqs = B_ainit_chk(c_equations_list, NULL, 0);
+    if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) 
+    {
+        B_seterrn(40);
+        B_display_last_error();
+    }
+    else 
+    {
+        KDB* tdbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
+        if(tdbe == 0 || KNB(tdbe) == 0) 
+        {
+            invalid_error.add_argument("(list of) equation(s) invalid! ", equations_list);
+            throw invalid_error;  
+        }                                                       
+        else
+        {
+            int rc;
+            rc = KE_est_s(tdbe, KV_WS, KS_WS, sample.c_sample, eqs);    // JMP 29/04/2022
+            K_free_kdb(tdbe);
+            if (rc != 0)
+            {
+                IodeExceptionFunction func_error("(block of) equation(s)", "estimate");
+                func_error.add_argument("From: ", sample.start_period().to_string());
+                func_error.add_argument("To:   ", sample.end_period().to_string());
+                func_error.add_argument("(block of) equation(s): ", equations_list);
+                throw func_error;
+            }
+        }                                                                  
+    }
+}
+
+void KDBEquations::equations_estimate(const Period& from, const Period& to, const std::string& equations_list = "")
+{
+    Sample sample(from, to);
+    equations_estimate(sample, equations_list);
+}
+
+void KDBEquations::equations_estimate(const std::string& from, const std::string& to, const std::string& equations_list = "")
+{
+    Sample sample(from, to);
+    equations_estimate(sample, equations_list);
+}
