@@ -323,6 +323,30 @@ void Equation::set_tests(const std::array<float, EQS_NBTESTS> tests)
     for (int i = 0; i < EQS_NBTESTS; i++) c_equation->tests[i] = tests[i];
 }
 
+// -- misc --
+
+std::vector<std::string> Equation::get_coefficients_list(const std::string& enddo)
+{
+    std::vector<std::string> coefs_list;
+
+    // make sure CLEC is up to date
+    set_lec(get_lec(), enddo);
+
+    CLEC* clec = c_equation->clec;
+    for(int j = 0 ; j < clec->nb_names ; j++) 
+    {
+        char* item_name = clec->lnames[j].name;
+        if(L_ISCOEF(item_name)) 
+        {
+            // add new scalar coef to KS_WS if not exist yet
+            int pos = K_find(KS_WS, item_name);
+            if (pos < 0) K_add(KS_WS, item_name, NULL);
+            coefs_list.push_back(std::string(item_name));
+        }
+    }
+    return coefs_list;
+}
+
 bool Equation::operator==(const Equation& other) const
 {
     return equation_equal(c_equation, other.c_equation);

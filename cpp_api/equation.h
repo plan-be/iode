@@ -80,6 +80,10 @@ public:
 
     void set_tests(const std::array<float, EQS_NBTESTS> tests);
 
+    // -- misc --
+
+    std::vector<std::string> get_coefficients_list(const std::string& enddo);
+
     // -- operators --
 
     bool operator==(const Equation& other) const;
