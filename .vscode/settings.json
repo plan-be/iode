@@ -91,5 +91,6 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp"
-    }
+    },
+    "testMate.cpp.log.logpanel": true
 }
