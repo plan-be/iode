@@ -155,3 +155,19 @@ TEST_F(KDBEquationsTest, Filter)
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
     EXPECT_EQ(global_kdb.get_lec(name), lec);
 }
+
+TEST_F(KDBEquationsTest, Estimate)
+{
+    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+
+    kdb.equations_estimate("1980Y1", "1996Y1", "ACAF");
+
+    KDBVariables kdb_vars;
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES", "1980Y1")) / 1e6, -0.00115);
+
+    Equation eq = kdb.get("ACAF");
+    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_R2 - 10]) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_R2ADJ - 10]) / 1e6, 0.79636);
+    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_DW - 10]) / 1e6, 2.33007);
+}
