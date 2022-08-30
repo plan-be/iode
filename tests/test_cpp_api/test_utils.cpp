@@ -1,7 +1,7 @@
 #include "pch.h"
 
 
-class KDBUtilsTest : public KDBTest, public ::testing::Test
+class UtilsTest : public KDBTest, public ::testing::Test
 {
 protected:
 
@@ -11,9 +11,9 @@ protected:
 };
 
 
-TEST(TestUtils, convert_between_codepages)
+TEST_F(UtilsTest, convertBetweenCodepages)
 {
-	std::string str_utf8 = u8"aA!@^$jndq256éïµçè";
+	std::string str_utf8 = u8"aA!@^$jndq256ï¿½ï¿½ï¿½ï¿½";
 
 	std::string str_oem = convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
 	std::string str_res = convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);
@@ -22,7 +22,7 @@ TEST(TestUtils, convert_between_codepages)
 }
 
 
-TEST_F(KDBUtilsTest, checkFilepath)
+TEST_F(UtilsTest, checkFilepath)
 {
 	std::string filepath;
 
