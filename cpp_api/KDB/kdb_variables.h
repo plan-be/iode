@@ -17,7 +17,8 @@ protected:
     Variable get_unchecked(const int pos) const override;
 
 public:
-    KDBVariables(const std::string& pattern = "") : KDBTemplate(I_VARIABLES, pattern) {};
+    KDBVariables(const std::string& pattern = "", const bool shallow_copy=true) : 
+        KDBTemplate(I_VARIABLES, pattern, shallow_copy) {};
 
     IODE_REAL get_var(const int pos, const int t, const int mode = K_LEVEL) const;
 

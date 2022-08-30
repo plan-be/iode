@@ -4,13 +4,24 @@
 
 template<class T> class KDBTemplate: public KDBAbstract
 {
+private:
+    void check_object_already_exists(KDB* kdb, const std::string& name)
+    {
+        // throw exception if object with passed name already exist
+        char* c_name = const_cast<char*>(name.c_str());
+        if (K_find(kdb, c_name) >= 0)
+            throw IodeExceptionInitialization(iode_type_name + " with name " + name, 
+                iode_type_name + " with name " + name + " already exists. Use update() method instead.");
+    }
+
 protected:
     virtual T copy_obj(const T& original) const = 0;
 
     virtual T get_unchecked(const int pos) const = 0;
 
 public:
-    KDBTemplate(EnumIodeType type, const std::string& pattern) : KDBAbstract(type, pattern) {}
+    KDBTemplate(EnumIodeType type, const std::string& pattern, const bool shallow_copy) : 
+        KDBAbstract(type, pattern, shallow_copy) {}
 
     //  Create + Update + Get + Copy methods
 
@@ -20,10 +31,10 @@ public:
     // https://stackoverflow.com/questions/23412703/visual-studio-static-libraries-and-variadic-template-classes#comment35876150_23412703
     // https://stackoverflow.com/a/47890906
 
-    template<class... Args> int add_or_update(const std::string& name, Args... args)
+    template<class... Args> int add_or_update(KDB* kdb, const std::string& name, Args... args)
     {
         char* c_name = const_cast<char*>(name.c_str());
-        int pos = K_add(K_WS[iode_type], c_name, args...);
+        int pos = K_add(kdb, c_name, args...);
         if (pos == -1) throw IodeExceptionFunction("Cannot add or update " + iode_type_name + " with name " + name,  
             "Iode has not been initialized");
         if (pos < -1) throw IodeExceptionFunction("Cannot add or update " + iode_type_name + " with name " + name, "Unknown");
@@ -33,27 +44,33 @@ public:
     template<class... Args> int add(const std::string& name, Args... args)
     {
         int pos;
+        KDB* global_kdb = K_WS[iode_type];
 
         check_name(name, iode_type);
 
-        // throw exception if object with passed name already exist
-        char* c_name = const_cast<char*>(name.c_str());
-        if (K_find(get_KDB(), c_name) >= 0)
-            throw IodeExceptionInitialization(iode_type_name + " with name " + name, 
-                iode_type_name + " with name " + name + " already exists. Use update() method instead.");
-
-        if (shallow_copy_kdb)
+        switch (kdb_type)
         {
-            // add new obj to global KDB if doesn't exist yet
-            int pos_global = K_find(K_WS[iode_type], c_name);
-            if (pos_global < 0) pos_global = add_or_update(name, args...);
-            // add new entry to shallow copy KDB
-            pos = K_add_entry(shallow_copy_kdb, c_name);
-            KSOVAL(shallow_copy_kdb, pos) = KSOVAL(K_WS[iode_type], pos_global);
-        }
-        else
-        {
-            pos = add_or_update(name, args...);
+        case KDB_GLOBAL:
+            check_object_already_exists(global_kdb, name);
+            pos = add_or_update(global_kdb, name, args...);
+            break;
+        case KDB_LOCAL:
+            check_object_already_exists(local_kdb, name);
+            pos = add_or_update(local_kdb, name, args...);
+            break;
+        case KDB_SHALLOW_COPY:
+            {
+                // add new obj to global KDB if doesn't exist yet
+                check_object_already_exists(global_kdb, name);
+                int pos_global = add_or_update(global_kdb, name, args...);
+                // add new entry to shallow copy KDB
+                char* c_name = const_cast<char*>(name.c_str());
+                pos = K_add_entry(local_kdb, c_name);
+                KSOVAL(local_kdb, pos) = KSOVAL(global_kdb, pos_global);
+                break;
+            }
+        default:
+            break;
         }
 
         return pos;
@@ -63,14 +80,52 @@ public:
     {
         // throw exception if object with passed position is not valid
         std::string name = get_name(pos);
-        add_or_update(name, args...);
+
+        KDB* global_kdb = K_WS[iode_type];
+        switch (kdb_type)
+        {
+        case KDB_GLOBAL:
+            add_or_update(global_kdb, name, args...);
+            break;
+        case KDB_LOCAL:
+            add_or_update(local_kdb, name, args...);
+            break;
+        case KDB_SHALLOW_COPY:
+            // NOTE: in case of a shallow copy, only pointers to objects 
+            //       are duplicated, not the objects.
+            //       Modifying an object passing either the shallow copy 
+            //       or the global KDB modifies the same object.
+            add_or_update(local_kdb, name, args...);
+            break;
+        default:
+            break;
+        }
     }
 
     template<class... Args> void update(const std::string& name, Args... args)
     {
         // throw exception if object with passed name does not exist
         get_position(name);
-        add_or_update(name, args...);
+
+        KDB* global_kdb = K_WS[iode_type];
+        switch (kdb_type)
+        {
+        case KDB_GLOBAL:
+            add_or_update(global_kdb, name, args...);
+            break;
+        case KDB_LOCAL:
+            add_or_update(local_kdb, name, args...);
+            break;
+        case KDB_SHALLOW_COPY:
+            // NOTE: in case of a shallow copy, only pointers to objects 
+            //       are duplicated, not the objects.
+            //       Modifying an object passing either the shallow copy 
+            //       or the global KDB modifies the same object.
+            add_or_update(local_kdb, name, args...);
+            break;
+        default:
+            break;
+        }
     }
 
     T get(const int pos) const

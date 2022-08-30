@@ -11,7 +11,8 @@ protected:
     Scalar get_unchecked(const int pos) const override;
 
 public:
-    KDBScalars(const std::string& pattern = "") : KDBTemplate(I_SCALARS, pattern) {};
+    KDBScalars(const std::string& pattern = "", const bool shallow_copy=true) : 
+        KDBTemplate(I_SCALARS, pattern, shallow_copy) {};
 
     int add(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std=L_NAN);
 

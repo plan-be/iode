@@ -12,7 +12,8 @@ protected:
     Table get_unchecked(const int pos) const override;
 
 public:
-    KDBTables(const std::string& pattern = "") : KDBTemplate(I_TABLES, pattern) {};
+    KDBTables(const std::string& pattern = "", const bool shallow_copy=true) : 
+        KDBTemplate(I_TABLES, pattern, shallow_copy) {};
 
     std::string get_title(const int pos) const;
 

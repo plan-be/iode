@@ -2,19 +2,37 @@
 #include "kdb_abstract.h"
 
 
-KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& pattern) : 
-    iode_type(iode_type), iode_type_name(iode_type_name), shallow_copy_kdb(nullptr)
+KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& pattern, const bool shallow_copy) : 
+    iode_type(iode_type), iode_type_name(iode_type_name)
 {
     if (K_WS[iode_type] == NULL) IodeInit();
     cpp_assign_super_API();
 
-    if (pattern.empty()) shallow_copy_kdb = NULL;
+    IodeExceptionInitialization error(iode_type_name);
+    error.add_argument("IODE type name (number): ", iode_type_name + " (" + std::to_string(iode_type) + ")");
+    error.add_argument("pattern: ", pattern);
+    error.add_argument("shallow copy? : ", std::to_string(shallow_copy));
+
+    if (pattern.empty())
+    {
+        kdb_type = KDB_GLOBAL;
+        local_kdb = NULL;
+    }
     else
     {
         char** c_names = filter_kdb_names(iode_type, pattern);
-        shallow_copy_kdb = K_quick_refer(K_WS[iode_type], c_names);
+        if (shallow_copy)
+        {
+            kdb_type = KDB_SHALLOW_COPY;
+            local_kdb = K_quick_refer(K_WS[iode_type], c_names);
+        } 
+        else
+        {
+            kdb_type = KDB_LOCAL;
+            local_kdb = hard_copy_kdb(K_WS[iode_type], c_names);
+        }   
         SW_nfree(c_names);
-        if (shallow_copy_kdb == NULL)
+        if (local_kdb == NULL)
         {
             IodeExceptionInvalidArguments error("Cannot extract subset of KDB of " + iode_type_name + "s");
             error.add_argument("filter pattern", pattern);
@@ -25,7 +43,7 @@ KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& patter
 
 KDBAbstract::~KDBAbstract()
 {
-    if (shallow_copy_kdb) K_free_kdb(shallow_copy_kdb);
+    if (local_kdb) K_free_kdb(local_kdb);
 }
 
 // object name
@@ -47,8 +65,26 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
     char* c_old_name = const_cast<char*>(old_name.c_str());
     char* c_new_name = const_cast<char*>(new_name.c_str());
     
-    // first rename in global KDB
-    int pos = K_ren(K_WS[iode_type], c_old_name, c_new_name);
+    int pos;
+    switch (kdb_type)
+    {
+    case KDB_GLOBAL:
+        pos = K_ren(K_WS[iode_type], c_old_name, c_new_name);
+        break;
+    case KDB_LOCAL:
+        pos = K_ren(local_kdb, c_old_name, c_new_name);
+        break;
+    case KDB_SHALLOW_COPY:
+        // first rename in global KDB
+        pos = K_ren(K_WS[iode_type], c_old_name, c_new_name);
+        if (pos < 0) break;
+        // then rename in local KDB
+        pos = K_ren(local_kdb, c_old_name, c_new_name);
+        break;
+    default:
+        break;
+    }
+
     // see K_ren documentation
     if (pos < 0)
     {
@@ -59,9 +95,6 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
         else error.set_reason("Unknown");
         throw error;
     }
-    
-    // rename in shallow copy KDB
-    if (shallow_copy_kdb) pos = K_ren(shallow_copy_kdb, c_old_name, c_new_name);
 
     return pos;
 }
@@ -80,13 +113,28 @@ void KDBAbstract::remove(const std::string& name)
     // throw exception if object with passed name does not exist
     int pos = get_position(name);
 
-    if (shallow_copy_kdb)
+    switch (kdb_type)
     {
-        K_del_entry(shallow_copy_kdb, pos);
-        char* c_name = const_cast<char*>(name.c_str());
+    case KDB_GLOBAL:
+        K_del(K_WS[iode_type], pos);
+        break;
+    case KDB_LOCAL:
+        K_del(local_kdb, pos);
+        break;
+    case KDB_SHALLOW_COPY:
+        char* c_name;
+        // first delete in shallow copy KDB
+        K_del_entry(local_kdb, pos);
+        // then delete in global KDB
+        c_name = const_cast<char*>(name.c_str());
         pos = K_find(K_WS[iode_type], c_name);
+        K_del(K_WS[iode_type], pos);
+        break;
+    default:
+        throw IodeExceptionFunction("Cannot remove " + iode_type_name + " with name " + name, 
+            "Wrong value " + std::to_string(kdb_type) + " for class member kdb_type of KDBAbstract");
+        break;
     }
-    K_del(K_WS[iode_type], pos);
 }
 
 // Other methods
