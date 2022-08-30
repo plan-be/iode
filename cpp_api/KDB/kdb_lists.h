@@ -11,7 +11,8 @@ protected:
     List get_unchecked(const int pos) const override;
 
 public:
-    KDBLists(const std::string& pattern = "") : KDBTemplate(I_LISTS, pattern) {};
+    KDBLists(const std::string& pattern = "", const bool shallow_copy=true) : 
+        KDBTemplate(I_LISTS, pattern, shallow_copy) {};
 
     int add(const std::string& name, const List& list);
 

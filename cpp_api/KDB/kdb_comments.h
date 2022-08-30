@@ -11,7 +11,8 @@ protected:
     Comment get_unchecked(const int pos) const override;
 
 public:
-    KDBComments(const std::string& pattern = "") : KDBTemplate(I_COMMENTS, pattern) {};
+    KDBComments(const std::string& pattern = "", const bool shallow_copy=true) : 
+        KDBTemplate(I_COMMENTS, pattern, shallow_copy) {};
 
     int add(const std::string& name, const Comment& comment);
 

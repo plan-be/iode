@@ -14,7 +14,8 @@ protected:
     Identity get_unchecked(const int pos) const override;
 
 public:
-    KDBIdentities(const std::string& pattern = "") : KDBTemplate(I_IDENTITIES, pattern) {};
+    KDBIdentities(const std::string& pattern = "", const bool shallow_copy=true) : 
+        KDBTemplate(I_IDENTITIES, pattern, shallow_copy) {};
 
     std::string get_lec(const int pos) const;
 

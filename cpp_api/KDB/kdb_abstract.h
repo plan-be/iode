@@ -12,6 +12,14 @@ using Scalar = SCL;
 using Variable = std::vector<IODE_REAL>;
 
 
+enum EnumIodeKDBType
+{
+    KDB_GLOBAL,         //< K_WS[iode_type]
+    KDB_LOCAL,          //< hard copy of a global KDB (useful when working with estimation of block of eqs in the GUI)
+    KDB_SHALLOW_COPY    //< shallow copy (useful when working on subset in the GUI)
+};
+
+
 class KDBAbstract
 {
 protected:
@@ -20,19 +28,20 @@ protected:
 
     EnumIodeType iode_type;
     std::string iode_type_name;
-    KDB* shallow_copy_kdb;         //< local KDB returned by K_refer()
+    EnumIodeKDBType kdb_type;
+    KDB* local_kdb;         //< either a shallow copy (K_refer()) of a subset of a global KDB or a local kdb
 
 protected:
     KDB* get_KDB() const
     {
-        if (shallow_copy_kdb) return shallow_copy_kdb;
+        if (local_kdb) return local_kdb;
         if (K_WS[iode_type] == NULL) throw IodeExceptionFunction("Cannot get KDB of " + iode_type_name + "s",  
             "There is currently no " + iode_type_name + "s database in memory.");
         return K_WS[iode_type];
     }
 
 public:
-    KDBAbstract(EnumIodeType iode_type, const std::string& pattern);
+    KDBAbstract(EnumIodeType iode_type, const std::string& pattern, const bool shallow_copy);
 
     ~KDBAbstract();
 
@@ -40,7 +49,11 @@ public:
 
     int count() const { return get_KDB()->k_nb; }
 
-    bool is_global_kdb() const { return shallow_copy_kdb == nullptr; }
+    bool is_global_kdb() const { return local_kdb == nullptr; }
+
+    bool is_shallow_copy() const { return kdb_type == KDB_SHALLOW_COPY; }
+
+    bool is_local_kdb() const { return kdb_type == KDB_LOCAL; }
 
     int get_position(const std::string& name) const
     {
