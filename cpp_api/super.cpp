@@ -4,7 +4,7 @@
 
 void cpp_error_super(int level, char* msg)
 {
-    throw std::runtime_error(std::string(msg));
+    throw IodeException(std::string(msg));
 }
 
 void cpp_panic_super()

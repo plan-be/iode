@@ -26,8 +26,11 @@
 inline std::string convert_between_codepages(const std::string str_in, const int codepage_in, const int codepage_out)
 {
     if (str_in.empty()) return str_in;
-    if (codepage_in <= 0) throw std::runtime_error("Parameter codepage_in must be positive.");
-    if (codepage_out <= 0) throw std::runtime_error("Parameter codepage_out must be positive.");
+    IodeExceptionInvalidArguments error("Cannot convert string from codepage " + std::to_string(codepage_in) + 
+                                        " to codepage " + std::to_string(codepage_out));
+    if (codepage_in <= 0) error.add_argument("codepage_in", std::to_string(codepage_in) + " (must be positive)");
+    if (codepage_out <= 0) error.add_argument("codepage_out", std::to_string(codepage_out) + " (must be positive)");
+    if (error.invalid_args()) throw error;
 
     const char* c_in = str_in.c_str();
     // add 1 because strlen doesn't count the ending \0 character
@@ -89,25 +92,27 @@ static IodeRegexName get_regex_name(const EnumIodeType type)
 
 inline void check_name(const std::string name, const EnumIodeType type)
 {
-    if (name.empty())
-        throw std::runtime_error("Empty name.");
+    std::string msg = "name " + name + " as " + vIodeTypes[type];
 
-    if (name.size() > K_MAX_NAME)
-        throw std::runtime_error("Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters. " + name + " = " + std::to_string(name.size()) + " characters.");
+    if (name.empty()) throw IodeExceptionFunction("Cannot accept " + msg, "Empty name");
+
+    if (name.size() > K_MAX_NAME) throw IodeExceptionFunction("Cannot accept " + msg,  
+        "Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters. " + name + 
+        " = " + std::to_string(name.size()) + " characters.");
 
     IodeRegexName nre = get_regex_name(type);
-    if (!regex_match(name, std::regex(nre.regex)))
-        throw std::runtime_error(vIodeTypes[type] + " name must only contains " + nre.type + " letters, digits and underscore. " + name + " is invalid.");
+    if (!regex_match(name, std::regex(nre.regex))) throw IodeExceptionFunction("Cannot accept " + msg, 
+        vIodeTypes[type] + " name must only contains " + nre.type + " letters, digits and underscore. " + 
+        name + " is invalid.");
 }
 
 
 inline std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
-    std::string error_msg = "Call to " + caller_name + "() failed. ";
 
     // check if empty
-    if (file_must_exist && filepath.empty()) throw std::runtime_error(error_msg + "Empty filepath (" + vIodeTypes[type] + ")");
+    if (file_must_exist && filepath.empty()) throw IodeExceptionFunction("Cannot run " + caller_name, "Empty filepath");
 
     // convert to absolute path
     if (p_filepath.is_relative()) p_filepath = std::filesystem::absolute(p_filepath);
@@ -116,8 +121,8 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
     std::filesystem::path p_directory = p_filepath.parent_path();
     if (!p_directory.empty())
     {
-        if (!std::filesystem::exists(p_directory)) throw std::runtime_error(error_msg + "Directory " + p_directory.string()
-            + " does not exist. Could not " + caller_name + " file " + p_filepath.filename().string());
+        if (!std::filesystem::exists(p_directory)) throw IodeExceptionFunction("Cannot run " + caller_name, "Directory " + 
+            p_directory.string() + " in filepath " + p_filepath.filename().string() + " does not exist");
     }
 
     // check or add extension
@@ -127,11 +132,13 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
     {
         // check extension
         std::string ext = p_filename.extension().string();
-        if ((ext != expected_ext.ext) && (ext != expected_ext.ascii)) throw std::runtime_error(error_msg + "File " + p_filename.string()
-            + " has wrong extension " + ext + ". Expected extension is " + expected_ext.ext + " or " + expected_ext.ascii);
+        if ((ext != expected_ext.ext) && (ext != expected_ext.ascii)) throw IodeExceptionFunction("Cannot run " + caller_name, 
+            "File " + p_filename.string() + " has wrong extension " + ext + ". Expected extension is " + 
+            expected_ext.ext + " or " + expected_ext.ascii);
 
         // check if file exist
-        if (file_must_exist && !std::filesystem::exists(p_filepath)) throw std::runtime_error(error_msg + "File " + p_filepath.string() + " does not exist");
+        if (file_must_exist && !std::filesystem::exists(p_filepath)) throw IodeExceptionFunction("Cannot run " + caller_name, 
+            "File " + p_filepath.string() + " does not exist");
     }
     else
     {
@@ -150,8 +157,8 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
                 if (!std::filesystem::exists(p_filepath)) 
                 {
                     std::string stem = p_filepath.stem().string();
-                    throw std::runtime_error(error_msg + "Neither " + stem + expected_ext.ext + " nor " + stem + expected_ext.ascii
-                        + " could be found in directory " + p_directory.string());
+                    throw IodeExceptionFunction("Cannot run " + caller_name, "Neither " + stem + expected_ext.ext + 
+                        " nor " + stem + expected_ext.ascii + " could be found in directory " + p_directory.string());
                 }
             }
         }

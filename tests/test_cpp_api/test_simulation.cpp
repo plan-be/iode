@@ -57,7 +57,7 @@ TEST_F(SimulationTest, Simulation)
 
     // Test simulation: divergence
     KSIM_MAXIT = 2;
-    EXPECT_THROW(sim.model_simulate(from, to), IodeExceptionRuntime);
+    EXPECT_THROW(sim.model_simulate(from, to), IodeExceptionFunction);
 
     // Check _PRE list after simulation (prolog)
     std::string lst_pre = kdb_lst.get("_PRE");

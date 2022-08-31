@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include "iode_exceptions.h"
 #include <iostream>
 
 

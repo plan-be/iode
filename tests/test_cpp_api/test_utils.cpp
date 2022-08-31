@@ -28,19 +28,19 @@ TEST_F(UtilsTest, checkFilepath)
 
 	// fake directory
 	filepath = "C:\\Users\\ald\\wrong\\path\\fun.cmt";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "save", false), std::runtime_error);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "save", false), IodeExceptionFunction);
 
 	// wrong extension
 	filepath = output_test_dir + "fun.eqs";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "save", false), std::runtime_error);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "save", false), IodeExceptionFunction);
 
 	// file does not exist
 	filepath = input_test_dir + "fun2.cmt";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "load", true), std::runtime_error);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "load", true), IodeExceptionFunction);
 
 	// file does not exist (no extension given)
 	filepath = input_test_dir + "fun2";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "load", true), std::runtime_error);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "load", true), IodeExceptionFunction);
 
 	// extension added automatically
 	filepath = input_test_dir + "fun";

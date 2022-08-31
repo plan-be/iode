@@ -89,7 +89,7 @@ TEST_F(KDBIdentitiesTest, CreateRemove)
     std::string lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
 
     kdb.remove(name);
-    EXPECT_THROW(kdb.get(name), std::runtime_error);
+    EXPECT_THROW(kdb.get(name), IodeExceptionFunction);
 
     kdb.add(name, lec);
     EXPECT_EQ(kdb.get_lec(name), lec);

@@ -142,10 +142,10 @@ TEST_F(KDBVariablesTest, CreateRemove)
 
     // --- already existing name
     std::fill(new_var.begin(), new_var.end(), 1);
-    EXPECT_THROW(kdb.add(new_name, new_var), std::runtime_error);
+    EXPECT_THROW(kdb.add(new_name, new_var), IodeExceptionInitialization);
 
     kdb.remove(new_name);
-    EXPECT_THROW(kdb.get(new_name), std::runtime_error);
+    EXPECT_THROW(kdb.get(new_name), IodeExceptionFunction);
 
     // pass a LEC expression
     for (int p = 0; p < nb_periods; p++) new_var[p] = 10. + p;
@@ -165,9 +165,9 @@ TEST_F(KDBVariablesTest, CreateRemove)
     kdb.remove(new_name);
 
     // --- using function that does not exist
-    EXPECT_THROW(kdb.add("FAILS", "func(t)"), std::runtime_error);
+    EXPECT_THROW(kdb.add("FAILS", "func(t)"), IodeExceptionFunction);
     // --- using variable taht does not exist
-    EXPECT_THROW(kdb.add("FAILS", "ln Z"), std::runtime_error);
+    EXPECT_THROW(kdb.add("FAILS", "ln Z"), IodeExceptionFunction);
 }
 
 TEST_F(KDBVariablesTest, Update)

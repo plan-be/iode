@@ -17,37 +17,31 @@ public:
 };
 
 
-class IodeExceptionRuntime : public IodeException
-{
-    std::string action;
-    std::string reason;
-
-public:
-    IodeExceptionRuntime(const std::string& action, const std::string& reason) : IodeException(""), action(action), reason(reason) 
-    {
-        message = "Cannot performe " + action + ": " + reason;
-    }
-};
-
-
 class IodeExceptionFunction : public IodeException
 {
 protected:
-    std::string function_name;
+    std::string reason;
     std::string prefix_arguments;
     bool first_arg;
 
 public:
-    IodeExceptionFunction(const std::string& function_name, const std::string action = "run") : IodeException(""), function_name(function_name), first_arg(true)
+    IodeExceptionFunction(const std::string& description, const std::string& reason = "", 
+                          const std::string& prefix_arguments = "- ") : 
+        IodeException(""), prefix_arguments(prefix_arguments), first_arg(true)
     {
-        prefix_arguments = "";
-        std::string message = "Cannot " + action + " " + function_name;
+        message = description + "\n";
+        set_reason(reason);
     }
 
-    void add_argument(const std::string name, const std::string value)
+    void set_reason(const std::string& reason)
     {
-        if (first_arg) message += prefix_arguments + "Parameter Values:\n";
-        message += name + ": " + value + "\n";
+        if(!reason.empty()) message += "Reason: " + reason + "\n";
+    }
+
+    void add_argument(const std::string& name, const std::string& value)
+    {
+        if(first_arg) message += "Parameter Values:\n";
+        message += prefix_arguments + name + ": " + value + "\n";
         first_arg = false;
     }
 };
@@ -56,10 +50,9 @@ public:
 class IodeExceptionInvalidArguments : public IodeExceptionFunction
 {
 public:
-    IodeExceptionInvalidArguments(const std::string& function_name, const std::string action = "run") : IodeExceptionFunction(function_name, action)
-    {
-        prefix_arguments = "Invalid ";
-    }
+    IodeExceptionInvalidArguments(const std::string& description, 
+                                  const std::string& reason = "One or several arguments are invalid!")
+        : IodeExceptionFunction(description, reason, "- Invalid argument -> ") {}
 
     bool invalid_args() { return !first_arg; }
 };
@@ -68,5 +61,6 @@ public:
 class IodeExceptionInitialization : public IodeExceptionFunction
 {
 public:
-    IodeExceptionInitialization(const std::string& class_name) : IodeExceptionFunction(function_name, "create") {}
+    IodeExceptionInitialization(const std::string& class_name, const std::string& reason = "") 
+        : IodeExceptionFunction("Cannot create new " + class_name, reason, "- ") {}
 };

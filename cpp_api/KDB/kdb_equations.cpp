@@ -32,7 +32,8 @@ int KDBEquations::add(const std::string& name, const std::string& lec, const std
 
     // throw exception if object with passed name already exist
     if (K_find(get_KDB(), c_name) >= 0)
-        throw std::runtime_error(iode_type_name + " with name " + name + " already exists. Use update() method instead.");
+        throw IodeExceptionFunction("Cannot add " + iode_type_name + " with name " + name,  
+            iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
     bool new_sample = sample == nullptr;
     if (new_sample) sample = new Sample(KSMPL(K_WS[I_VARIABLES]));
@@ -70,10 +71,10 @@ void KDBEquations::update(const int pos, const std::string& lec, const std::stri
  */
 void KDBEquations::equations_estimate(const Sample& sample, const std::string& equations_list)
 {
-    IodeExceptionInvalidArguments invalid_error("(block of) equation(s)", "estimate");
+    IodeExceptionInvalidArguments invalid_error("Cannot estimate (block of) equation(s) " + equations_list);
     if (equations_list.empty()) 
     {
-        invalid_error.add_argument("(list of) equation(s) is empty! ", equations_list);
+        invalid_error.add_argument("(list of) equation(s)", "empty");
         throw invalid_error;
     }
 
@@ -89,7 +90,7 @@ void KDBEquations::equations_estimate(const Sample& sample, const std::string& e
         KDB* tdbe = K_refer(KE_WS, SCR_tbl_size((unsigned char**) eqs), eqs);
         if(tdbe == 0 || KNB(tdbe) == 0) 
         {
-            invalid_error.add_argument("(list of) equation(s) invalid! ", equations_list);
+            invalid_error.add_argument("(list of) equation(s)", equations_list);
             throw invalid_error;  
         }                                                       
         else
@@ -99,7 +100,7 @@ void KDBEquations::equations_estimate(const Sample& sample, const std::string& e
             K_free_kdb(tdbe);
             if (rc != 0)
             {
-                IodeExceptionFunction func_error("(block of) equation(s)", "estimate");
+                IodeExceptionFunction func_error("Cannot estimate (block of) equation(s) " + equations_list);
                 func_error.add_argument("From: ", sample.start_period().to_string());
                 func_error.add_argument("To:   ", sample.end_period().to_string());
                 func_error.add_argument("(block of) equation(s): ", equations_list);

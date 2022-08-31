@@ -10,7 +10,7 @@ void load_global_kdb(EnumIodeType iode_type, std::string& filepath)
 
     int res = B_WsLoad(c_filepath, iode_type);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to import " + vIodeTypes[iode_type] + " from file " + filepath);
+        throw IodeExceptionFunction("Cannot load " + vIodeTypes[iode_type] + "s from file " + filepath, "Unknown");
 }
 
 void save_global_kdb(EnumIodeType iode_type, std::string& filepath)
@@ -21,14 +21,14 @@ void save_global_kdb(EnumIodeType iode_type, std::string& filepath)
 
     int res = B_WsSave(c_filepath, iode_type);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to save " + vIodeTypes[iode_type] + " to file " + filepath);
+        throw IodeExceptionFunction("Cannot save " + vIodeTypes[iode_type] + "s to file " + filepath, "Unknown");
 }
 
 void clear_global_kdb(EnumIodeType iode_type)
 {
     int res = B_WsClear("", iode_type);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to clear objets of type " + vIodeTypes[iode_type]);
+        throw IodeExceptionFunction("Cannot clear " + vIodeTypes[iode_type] + "s database", "Unknown");
 }
 
 /**

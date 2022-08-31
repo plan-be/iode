@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "utils.h"
+#include "iode_exceptions.h"
 
 enum EnumCellType
 {

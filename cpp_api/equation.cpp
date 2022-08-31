@@ -48,14 +48,20 @@ EQ* prepare_equation(const std::string& name, const bool add_obj, const std::str
         eq = KEVAL(K_WS[K_EQS], pos);
     }
 
-    if (add_obj && lec.empty()) throw std::runtime_error("Cannot create new equation with name " + name + ".Passed lec expression is empty.");
+    if (add_obj && lec.empty()) 
+        throw IodeExceptionInitialization("Equation with name " + name, "Empty LEC expression");
 
     if (!lec.empty())
     {
-        std::string action = add_obj ? "create new" : "update";
         char* c_lec = const_cast<char*>(lec.c_str());
         CLEC* clec = L_solve(c_lec, c_name);
-        if (clec == NULL) throw std::runtime_error("Cannot" + action + "equation with name " + name + ". Passed lec expression is not valid:\n" + lec);
+        if (clec == NULL)
+        {
+            std::string action = add_obj ? "create new" : "update";
+            IodeExceptionInvalidArguments error("Cannot " + action + " Equation with name " + name);
+            error.add_argument("lec", lec);
+            throw error;
+        }
         SW_nfree(clec);
         SW_nfree(eq->lec);
 
@@ -107,7 +113,13 @@ EQ* prepare_equation(const std::string& name, const bool add_obj, const std::str
 Equation::Equation(const int pos, KDB* kdb)
 {
     if (!kdb) kdb = K_WS[I_EQUATIONS];
-    if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error("Equation: invalid position " + std::to_string(pos));
+    if (pos < 0 || pos > kdb->k_nb)
+    {
+        IodeExceptionInvalidArguments error("Cannot extract Equation", "Equation position must be in range [0, " + 
+            std::to_string(kdb->k_nb - 1) + "])");
+        error.add_argument("equation position", std::to_string(pos));
+        throw error;
+    }
     // Note: KEVAL allocate a new pointer EQ*
     c_equation = KEVAL(kdb, pos);
 }
@@ -116,7 +128,7 @@ Equation::Equation(const std::string& name, KDB* kdb)
 {
     if (!kdb) kdb = K_WS[I_EQUATIONS];
     int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-    if (pos < 0) throw std::runtime_error("Equation with name " + name + " does not exist.");
+    if (pos < 0) throw IodeExceptionFunction("Cannot extract Equation", "Equation with name " + name + " does not exist.");
     // Note: KEVAL allocate a new pointer EQ*
     c_equation = KEVAL(kdb, pos);
 }
@@ -150,7 +162,12 @@ void Equation::set_lec(const std::string& lec, const std::string& endo)
         char* c_endo = const_cast<char*>(endo.c_str());
         // TODO: not sure about this
         c_equation->clec = L_solve(c_lec, c_endo);
-        if (c_equation->clec == 0) throw std::runtime_error("Wrong LEC expression: " + lec);
+        if (c_equation->clec == 0) 
+        {
+            IodeExceptionInvalidArguments error("Cannot set LEC to equation named " + endo);
+            error.add_argument("lec", lec);
+            throw error;
+        }
         c_equation->lec = (char*) SCR_stracpy((unsigned char*) c_lec);
     }
 }

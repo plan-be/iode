@@ -26,7 +26,8 @@ protected:
     KDB* get_KDB() const
     {
         if (shallow_copy_kdb) return shallow_copy_kdb;
-        if (K_WS[iode_type] == NULL) throw std::runtime_error("There is currently no " + iode_type_name + " database in memory.");
+        if (K_WS[iode_type] == NULL) throw IodeExceptionFunction("Cannot get KDB of " + iode_type_name + "s",  
+            "There is currently no " + iode_type_name + "s database in memory.");
         return K_WS[iode_type];
     }
 
@@ -46,7 +47,8 @@ public:
         check_name(name, iode_type);
         KDB* kdb = get_KDB();
         int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-        if (pos < 0) throw std::runtime_error(iode_type_name + " with name " + name + " does not exist.");
+        if (pos < 0) throw IodeExceptionFunction("Cannot get position of " + iode_type_name + " named " + name,  
+            iode_type_name + " with name " + name + " does not exist.");
         return pos;
     }
 
@@ -55,7 +57,9 @@ public:
     std::string get_name(const int pos) const 
     {
         KDB* kdb = get_KDB();
-        if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error(iode_type_name + " at position " + std::to_string(pos) + " does not exist.");
+        if (pos < 0 || pos > kdb->k_nb) 
+            throw IodeExceptionFunction("Cannot get name of " + iode_type_name + " at position " + std::to_string(pos),  
+                                        iode_type_name + " at position " + std::to_string(pos) + " does not exist.");
         std::string name_oem = std::string(kdb->k_objs[pos].o_name);
         std::string name = oem_to_utf8(name_oem);
         return name;
