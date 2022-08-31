@@ -20,7 +20,13 @@ public:
 	Sample(const std::string str_start_period, std::string str_end_period)
 	{
 		c_sample = PER_atosmpl(const_cast<char*>(str_start_period.c_str()), const_cast<char*>(str_end_period.c_str()));
-		if (c_sample == NULL) throw std::runtime_error("Cannot create sample from periods " + str_start_period + " and " + str_end_period);
+		if (c_sample == NULL)
+		{
+			IodeExceptionInitialization error("Sample", "Unknown");
+			error.add_argument("start period", str_start_period);
+			error.add_argument("end   period", str_end_period);
+			throw error;
+		}
 	}
 
 	/**
@@ -75,13 +81,22 @@ public:
 	 */
 	Sample intersection(const Sample& other)
 	{
+		IodeExceptionFunction error("Cannot calculate the intersection between the samples " + 
+			to_string() + " and " + other.to_string());
+
 		SAMPLE* c_other = other.c_sample;
 		if (c_sample->s_p1.p_p != c_other->s_p1.p_p)
-			throw std::runtime_error("The periodicity of the starting period of the two samples must be same. Got " + 
-				std::to_string(c_sample->s_p1.p_p) + " vs " + std::to_string(c_other->s_p1.p_p));
+		{
+			error.set_reason("The periodicity of the starting period of the two samples must be same");
+			throw error;
+		}
 		SAMPLE c_res;
 		int res = PER_common_smpl(c_sample, c_other, &c_res);
-		if (res < 0) throw std::runtime_error("Something went wrong when trying to compute the intersection between samples " + to_string() + " and " + other.to_string());
+		if (res < 0)
+		{
+			error.set_reason("Unknown");
+			throw error;
+		}
 		return Sample(&c_res);
 	}
 

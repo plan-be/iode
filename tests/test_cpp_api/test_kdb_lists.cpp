@@ -57,7 +57,7 @@ TEST_F(KDBListsTest, CreateRemove)
     ASSERT_EQ(kdb.get(name), new_list);
 
     kdb.remove(name);
-    EXPECT_THROW(kdb.get(name), std::runtime_error);
+    EXPECT_THROW(kdb.get(name), IodeExceptionFunction);
 }
 
 TEST_F(KDBListsTest, Update)

@@ -97,7 +97,8 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	Variable var;
 
 	Sample sample = get_sample();
-	if (sample.nb_periods() == 0) throw std::runtime_error("Variables sample has not been yet defined. Cannot create a new variable.");
+	if (sample.nb_periods() == 0) throw IodeExceptionInitialization("variable", 
+		"Variables sample has not been yet defined");
 
 	if (lec.empty())
 	{
@@ -120,7 +121,9 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	else 
 	{
 		SW_nfree(clec);
-		throw std::runtime_error("Cannot create or update variable.");
+		IodeExceptionFunction error("Cannot create or update variable", "Unknown");
+		error.add_argument("lec", lec);
+		throw error;
 	}
 }
 
@@ -176,7 +179,13 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 {
 	Sample sample(from, to);
 	int res = KV_sample(get_KDB(), sample.c_sample);
-	if (res < 0) throw std::runtime_error("Could not associate the sample " + sample.to_string() + " to the Variables.");
+	if (res < 0) 
+	{
+		IodeExceptionFunction error("Cannot set sample", "Unknown");
+		error.add_argument("from", from.to_string());
+		error.add_argument("to  ", to.to_string());
+		throw error;
+	}
 }
 
 int KDBVariables::get_nb_periods() const

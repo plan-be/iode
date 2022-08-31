@@ -40,7 +40,7 @@ TEST_F(KDBCommentsTest, GetName)
     name = kdb.get_name(0);
     EXPECT_EQ(name, "ACAF");
     
-    EXPECT_THROW(kdb.get_name(400), std::runtime_error);
+    EXPECT_THROW(kdb.get_name(400), IodeExceptionFunction);
 }
 
 TEST_F(KDBCommentsTest, Rename)
@@ -58,16 +58,16 @@ TEST_F(KDBCommentsTest, Rename)
     // expect errors 
     old_name = kdb.get_name(2);
     // - too long name
-    EXPECT_THROW(kdb.rename(old_name, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), std::runtime_error);
+    EXPECT_THROW(kdb.rename(old_name, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), IodeExceptionFunction);
     // - name starting with a umber
-    EXPECT_THROW(kdb.rename(old_name, "1_NEW_NAME"), std::runtime_error);
+    EXPECT_THROW(kdb.rename(old_name, "1_NEW_NAME"), IodeExceptionFunction);
     // - name using forbidden special characters
-    EXPECT_THROW(kdb.rename(old_name, "NËW_N@ME"), std::runtime_error);
+    EXPECT_THROW(kdb.rename(old_name, "Nï¿½W_N@ME"), IodeExceptionFunction);
     // - old name does not exists
-    EXPECT_THROW(kdb.rename("EMPTY", "NEW_NAME"), std::runtime_error);
+    EXPECT_THROW(kdb.rename("EMPTY", "NEW_NAME"), IodeExceptionFunction);
     // - new name already exists
     new_name = kdb.get_name(3);
-    EXPECT_THROW(kdb.rename(old_name, new_name), std::runtime_error);
+    EXPECT_THROW(kdb.rename(old_name, new_name), IodeExceptionFunction);
     
     // set by position
     new_pos = kdb.set_name(1, "NEW_POS");
@@ -104,19 +104,19 @@ TEST_F(KDBCommentsTest, CreateRemove)
     EXPECT_EQ(kdb.get(name), new_comment);
 
     kdb.remove(name);
-    EXPECT_THROW(kdb.get(name), std::runtime_error);
+    EXPECT_THROW(kdb.get(name), IodeExceptionFunction);
 
     // expect errors 
     std::string old_name = kdb.get_name(2);
     // - too long name
-    EXPECT_THROW(kdb.add("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new_comment), std::runtime_error);
+    EXPECT_THROW(kdb.add("ABCDEFGHIJKLMNOPQRSTUVWXYZ", new_comment), IodeExceptionFunction);
     // - name starting with a umber
-    EXPECT_THROW(kdb.add("1_NEW_NAME", new_comment), std::runtime_error);
+    EXPECT_THROW(kdb.add("1_NEW_NAME", new_comment), IodeExceptionFunction);
     // - name using forbidden special characters
-    EXPECT_THROW(kdb.add("NËW_N@ME", new_comment), std::runtime_error);
+    EXPECT_THROW(kdb.add("Nï¿½W_N@ME", new_comment), IodeExceptionFunction);
     // - name already exists
     name = kdb.get_name(3);
-    EXPECT_THROW(kdb.add(name, new_comment), std::runtime_error);
+    EXPECT_THROW(kdb.add(name, new_comment), IodeExceptionInitialization);
 }
 
 TEST_F(KDBCommentsTest, Update)
@@ -129,7 +129,7 @@ TEST_F(KDBCommentsTest, Update)
     EXPECT_EQ(kdb.get(name), new_comment);
 
     // error: name does not exist
-    EXPECT_THROW(kdb.update("UNKNOWN", new_comment), std::runtime_error);
+    EXPECT_THROW(kdb.update("UNKNOWN", new_comment), IodeExceptionFunction);
 
     // by position
     kdb.update(1, new_comment);
@@ -137,7 +137,7 @@ TEST_F(KDBCommentsTest, Update)
 
     // error: position does not exist
     int beyond_last_pos = kdb.count() + 10;
-    EXPECT_THROW(kdb.update(beyond_last_pos, new_comment), std::runtime_error);
+    EXPECT_THROW(kdb.update(beyond_last_pos, new_comment), IodeExceptionFunction);
 }
 
 TEST_F(KDBCommentsTest, Copy)
@@ -155,11 +155,11 @@ TEST_F(KDBCommentsTest, Copy)
     EXPECT_EQ(copy_comment, comment);
 
     // error: name does not exist
-    EXPECT_THROW(kdb.copy("UNKNOWN"), std::runtime_error);
+    EXPECT_THROW(kdb.copy("UNKNOWN"), IodeExceptionFunction);
 
     // error: position does not exist
     int beyond_last_pos = kdb.count() + 10;
-    EXPECT_THROW(kdb.copy(beyond_last_pos), std::runtime_error);
+    EXPECT_THROW(kdb.copy(beyond_last_pos), IodeExceptionFunction);
 }
 
 TEST_F(KDBCommentsTest, Filter)

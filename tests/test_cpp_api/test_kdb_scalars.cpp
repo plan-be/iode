@@ -67,7 +67,7 @@ TEST_F(KDBScalarsTest, CreateRemove)
     EXPECT_TRUE(new_scalar.std < 1e-100);
 
     kdb.remove(name);
-    EXPECT_THROW(kdb.get(name), std::runtime_error);
+    EXPECT_THROW(kdb.get(name), IodeExceptionFunction);
 }
 
 TEST_F(KDBScalarsTest, Update)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include <stdexcept>
+#include "iode_exceptions.h"
 
 
 const static std::map<char, int> mPeriodicities =
@@ -22,14 +22,23 @@ struct Period
 public:
 	Period(const int year, const char periodicity, const int position)
 	{
+		IodeExceptionInvalidArguments error("Cannot create new Period");
 		int max_position;
 		// check periodicity
-		if (mPeriodicities.count(periodicity) == 0) throw std::runtime_error("Invalid periodicity " + std::string(1, periodicity) + 
-			".\nPossible values for the periodicity are " + std::string(L_PERIOD_CH));
+		if (mPeriodicities.count(periodicity) == 0)
+		{
+		 	error.add_argument("periodicity", std::string(1, periodicity) + 
+			                   " (possible values for the periodicity are " + std::string(L_PERIOD_CH) + ")");
+			throw error;
+		}
 		// check position
 		max_position = mPeriodicities.at(periodicity);
-		if (position < 1 || position > max_position) throw std::runtime_error("Invalid position " + std::to_string(position) + 
-			".\nValue of position argument must be in range [1, " + std::to_string(max_position) + "]");
+		if (position < 1 || position > max_position)
+		{
+			error.add_argument("position", std::to_string(position) + 
+			                   " (position argument must be in range [1, " + std::to_string(max_position) + "])");
+			throw error;
+		}
 		// initialize class members
 		c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
 		c_period->p_y = year;
@@ -43,7 +52,12 @@ public:
 	Period(const std::string str_period)
 	{ 
 		c_period = PER_atoper(const_cast<char*>(str_period.c_str()));
-		if (c_period == NULL) throw std::runtime_error("Cannot create a new Period from string " + str_period);
+		if (c_period == NULL)
+		{
+			IodeExceptionInitialization error("Period", "Unknown"); 
+			error.add_argument("period", str_period);
+			throw error;
+		} 
 	}
 
 	// We assume that the C period is valid (i.e. generated via the C API)
@@ -73,7 +87,14 @@ public:
 	{
 		PERIOD* c_other = other.c_period;
 		if (c_other->p_p != c_period->p_p) 
-			throw std::runtime_error("The two periods must share the same periodicity. Got " + std::string(1, c_period->p_p) + " and " + std::string(1, c_other->p_p));
+		{
+			IodeExceptionFunction error("Cannot calculate the difference between the periods " + 
+				to_string() + " and " + other.to_string());
+			error.set_reason("The two periods must share the same periodicity");
+			error.add_argument("left  period periodicity", std::string(1, c_period->p_p));
+			error.add_argument("right period periodicity", std::string(1, c_other->p_p));
+			throw error;
+		}
 		return PER_diff_per(c_period, c_other);
 	}
 

@@ -14,7 +14,12 @@ KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& patter
         char** c_names = filter_kdb_names(iode_type, pattern);
         shallow_copy_kdb = K_quick_refer(K_WS[iode_type], c_names);
         SW_nfree(c_names);
-        if (shallow_copy_kdb == NULL) throw std::runtime_error("Cannot filter " + iode_type_name + " with pattern " + pattern);
+        if (shallow_copy_kdb == NULL)
+        {
+            IodeExceptionInvalidArguments error("Cannot extract subset of KDB of " + iode_type_name + "s");
+            error.add_argument("filter pattern", pattern);
+            throw error;
+        }
     }
 }
 
@@ -34,7 +39,8 @@ int KDBAbstract::set_name(const int pos, const std::string& new_name)
 
 int KDBAbstract::rename(const std::string& old_name, const std::string& new_name)
 {
-    if (iode_type == I_EQUATIONS) throw std::runtime_error("Cannot rename an equation. The name of an equation is always its endogeneous variable");
+    if (iode_type == I_EQUATIONS) throw IodeExceptionFunction("Cannot rename an equation",  
+        "The name of an equation is always its endogeneous variable");
 
     check_name(new_name, iode_type);
 
@@ -46,10 +52,12 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
     // see K_ren documentation
     if (pos < 0)
     {
+        IodeExceptionFunction error("Cannot rename " + old_name + " as " + new_name);
         std::string msg = iode_type_name + " cannot be renamed as " + new_name + ".\n";
-        if (pos == -1) throw std::runtime_error(msg + "Name " + old_name + " does not exist.");
-        else if (pos == -2) throw std::runtime_error(msg + iode_type_name + " with name " + new_name + " already exists.");
-        else throw std::runtime_error(msg + "Something went wrong.");
+        if (pos == -1) error.set_reason("Name " + old_name + " does not exist.");
+        else if (pos == -2) error.set_reason(iode_type_name + " with name " + new_name + " already exists.");
+        else error.set_reason("Unknown");
+        throw error;
     }
     
     // rename in shallow copy KDB
@@ -87,11 +95,12 @@ void KDBAbstract::dump(std::string& filepath)
 {
     filepath = check_filepath(filepath, iode_type, "save", false);
     char* c_filepath = const_cast<char*>(filepath.c_str());
-    if (strlen(c_filepath) >= sizeof(FNAME)) throw std::runtime_error(std::string(B_msg(256)));   /* File name too long */
+    if (strlen(c_filepath) >= sizeof(FNAME)) throw IodeExceptionFunction("Cannot save " + iode_type_name + "s",  
+        "Filepath " + filepath + " is too long");
 
     int res = B_WsDump(get_KDB(), c_filepath);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to save " + iode_type_name + " to file " + filepath);
+        throw IodeExceptionFunction("Cannot save " + iode_type_name + "s in file " + filepath, "Unknown");
 }
 
 void KDBAbstract::clear()
@@ -101,6 +110,5 @@ void KDBAbstract::clear()
     res += B_WsName("", iode_type);
 
     res += K_clear(get_KDB());
-    if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Something went wrong when trying to clear objets of type " + iode_type_name);
+    if (res != EXIT_SUCCESS) throw IodeExceptionFunction("Cannot clear " + iode_type_name + "s", "Unknown");
 }

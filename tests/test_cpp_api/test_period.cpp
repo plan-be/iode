@@ -6,9 +6,9 @@ TEST(TestPeriod, Create)
 	Period period(2020, 'Y', 1);
 
 	// Invalid periodicity
-	EXPECT_THROW(Period(2020, 'T', 1), std::runtime_error);
+	EXPECT_THROW(Period(2020, 'T', 1), IodeExceptionInvalidArguments);
 	// Invalid position
-	EXPECT_THROW(Period(2020, 'Q', 5), std::runtime_error);
+	EXPECT_THROW(Period(2020, 'Q', 5), IodeExceptionInvalidArguments);
 
 	// passing a string
 	Period period2("2020Y1");

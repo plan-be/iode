@@ -24,8 +24,9 @@ public:
     {
         char* c_name = const_cast<char*>(name.c_str());
         int pos = K_add(K_WS[iode_type], c_name, args...);
-        if (pos == -1) throw std::runtime_error("Iode has not been initialized");
-        if (pos < -1) throw std::runtime_error("Cannot create or update " + iode_type_name + " with name " + name);
+        if (pos == -1) throw IodeExceptionFunction("Cannot add or update " + iode_type_name + " with name " + name,  
+            "Iode has not been initialized");
+        if (pos < -1) throw IodeExceptionFunction("Cannot add or update " + iode_type_name + " with name " + name, "Unknown");
         return pos;
     }
 
@@ -38,7 +39,8 @@ public:
         // throw exception if object with passed name already exist
         char* c_name = const_cast<char*>(name.c_str());
         if (K_find(get_KDB(), c_name) >= 0)
-            throw std::runtime_error(iode_type_name + " with name " + name + " already exists. Use update() method instead.");
+            throw IodeExceptionInitialization(iode_type_name + " with name " + name, 
+                iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
         if (shallow_copy_kdb)
         {

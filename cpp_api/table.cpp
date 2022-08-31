@@ -149,7 +149,13 @@ bool table_equal(TBL* c_table1, TBL* c_table2)
 Table::Table(const int pos, KDB* kdb)
 {
 	if (!kdb) kdb = K_WS[I_TABLES];
-	if (pos < 0 || pos > kdb->k_nb) throw std::runtime_error("Table: invalid position " + std::to_string(pos));
+	if (pos < 0 || pos > kdb->k_nb)
+	{
+		IodeExceptionInvalidArguments error("Cannot extract Table");
+		error.add_argument("table position", std::to_string(pos) + 
+			               " (table position must be in range [0, " + std::to_string(kdb->k_nb - 1) + "])");
+		throw error;
+	}
 	// Note: KTVAL allocate a new pointer TBL*
 	c_table = KTVAL(kdb, pos);
 }
@@ -158,7 +164,7 @@ Table::Table(const std::string& name, KDB* kdb)
 {
 	if (!kdb) kdb = K_WS[I_TABLES];
 	int pos = K_find(kdb, const_cast<char*>(name.c_str()));
-	if (pos < 0) throw std::runtime_error("Table with name " + name + " does not exist.");
+	if (pos < 0) throw IodeExceptionFunction("Cannot extract Table", "Table with name " + name + " does not exist");
 	// Note: KTVAL allocate a new pointer TBL*
 	c_table = KTVAL(kdb, pos);
 }
@@ -178,7 +184,8 @@ Table::~Table()
 void Table::extend()
 {
 	int res = T_add_line(c_table);
-	if (res < 0) throw std::runtime_error("Could not extend table " + std::string((char*)T_get_title(c_table)));
+	if (res < 0) throw IodeExceptionFunction("Cannot extend table \"" + 
+		std::string((char*)T_get_title(c_table)) + "\"", "Unknown");
 }
 
 std::string Table::getLanguage() const
@@ -412,7 +419,8 @@ int Table::addTitle(const std::string& title)
 std::string Table::getTitle(const int row) const
 {
 	TLINE* title_line = getLine(row);
-	if (title_line->tl_type != IT_TITLE) throw std::runtime_error("Line at position " + std::to_string(row) + " is not a TITLE line.");
+	if (title_line->tl_type != IT_TITLE) throw IodeExceptionFunction("Cannot get table title", 
+		"Line at position " + std::to_string(row) + " is not a TITLE line.");
 	std::string title = getCellContent(row, 0, false);
 	return title;
 }
@@ -421,7 +429,8 @@ std::string Table::getTitle(const int row) const
 void Table::setTitle(const int row, const std::string title)
 {
 	TLINE* title_line = getLine(row);
-	if (title_line->tl_type != IT_TITLE) throw std::runtime_error("Line at position " + std::to_string(row) + " is not a TITLE line.");
+	if (title_line->tl_type != IT_TITLE) throw IodeExceptionFunction("Cannot set table title", 
+		"Line at position " + std::to_string(row) + " is not a TITLE line.");
 	setCellText(row, 0, title);
 }
 
@@ -570,19 +579,28 @@ bool Table::operator==(const Table& other) const
 
 TLINE* Table::getLine(const int row) const
 {
-	if (row < 0 || row > nbLines()) throw std::runtime_error(std::string("Could not set attribute. ") +
-		"The passed value for parameter row must be in range [0, " + std::to_string(nbLines()) + "] but got " + std::to_string(row));
+	if (row < 0 || row > nbLines())
+	{
+		IodeExceptionInvalidArguments error("Cannot get table line", 
+			"Line position must be in range [0, " + std::to_string(nbLines()) + "]");
+		error.add_argument("line position", std::to_string(row));
+		throw error;
+	}	
 	return &c_table->t_line[row];
 }
 
 int Table::insertLine(const int pos, const EnumLineType line_type, const bool after)
 {
-	if (pos < 0 || pos > nbLines()) throw std::runtime_error("Could not insert line at position " + std::to_string(pos) + ". " +
-		"Value for position must be in range [0, " + std::to_string(nbLines() - 1) + "] but got " + std::to_string(pos) + ".");
+	if (pos < 0 || pos > nbLines())
+	{
+		IodeExceptionInvalidArguments error("Cannot insert table line",  
+			"New line position must be in range [0, " + std::to_string(nbLines() - 1) + "]");
+		error.add_argument("new line position", std::to_string(pos));
+		throw error;
+	}
 	int where_ = after ? 1 : 0;
 	int new_pos = T_insert_line(c_table, pos, line_type, where_);
-	if (new_pos < 0) throw std::runtime_error("Could not insert line at position " +
-		std::to_string(pos) + ". Something went wrong.");
+	if (new_pos < 0) throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
 	return new_pos;
 }
 
@@ -596,8 +614,13 @@ void Table::freeLine(const int row)
 TCELL* Table::getCell(const int row, const int column, const bool divider) const
 {
 	TLINE* line = divider ? &c_table->t_div : getLine(row);
-	if (column < 0 || column > nbColumns()) throw std::runtime_error("Could not found cell in column " + std::to_string(column) + "." +
-		"The passed value for parameter column must be in range [0, " + std::to_string(nbColumns()) + "] but got " + std::to_string(column));
+	if (column < 0 || column > nbColumns())
+	{
+		IodeExceptionInvalidArguments error("Cannot get table cell content",  
+			"Cell position must be in range [0, " + std::to_string(nbColumns()) + "]");
+		error.add_argument("cell position", std::to_string(column));
+		throw error;
+	}
 	TCELL* cell = &reinterpret_cast<TCELL*>(line->tl_val)[column];
 	return cell;
 }
