@@ -15,7 +15,7 @@
 
 // List of functions
 int B_IdtExecute(char* arg);
-static int B_IdtExecuteIdts(SAMPLE* smpl, char** idts);
+int B_IdtExecuteIdts(SAMPLE* smpl, char** idts);
 int B_IdtExecuteVarFiles(char* arg);
 int B_IdtExecuteSclFiles(char* arg);
 int B_IdtExecuteTrace(char* arg);
@@ -77,7 +77,7 @@ int B_IdtExecute(char* arg)
  *  @return int     0 on success, -1 on error (file not found,)
  */
 
-static int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
+int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
 {
     KDB     *tdbi, *tkdb;
 
