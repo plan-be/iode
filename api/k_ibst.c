@@ -163,7 +163,7 @@ int     lang;
     }
 
     if(ft) {
-        cmt = SW_nrealloc(cmt, strlen(cmt), strlen(cmt) + strlen(ft) + 5); /* JMP 07-04-98 */
+        cmt = SW_nrealloc(cmt, (int)strlen(cmt), (int)strlen(cmt) + (int)strlen(ft) + 5); /* JMP 07-04-98 */
         sprintf(cmt + strlen(cmt), " (%s) ", ft);
     }
 

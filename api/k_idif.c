@@ -130,11 +130,11 @@ int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)
 
     if(DIF_skip_to(yy, DIF_VECTORS) < 0) return(-1);
     if(DIF_cell(yy, NULL, &value) < 0) return(-1) ;
-    DIF_ny = value - 1;
+    DIF_ny = (int)value - 1;
 
     if(DIF_skip_to(yy, DIF_TUPLES) < 0) return(-1);
     if(DIF_cell(yy, NULL, &value) < 0)  return(-1) ;
-    DIF_nl = value - 1;
+    DIF_nl = (int)value - 1;
 
     if(DIF_skip_to(yy, DIF_BOT) < 0) return(-1);
 

@@ -151,7 +151,7 @@ char *EXP_addprepost(char* pre, char* post, char* src, char** tg)
 
     buf = SCR_stracpy(src);
     SCR_strip(buf);
-    *tg = SW_nalloc(strlen(buf) +
+    *tg = SW_nalloc((int)strlen(buf) +
                     (pre == NULL ? 0 : (int)strlen(pre)) +
                     (post == NULL ? 0 : (int)strlen(post)) + 1);
     if(*tg != NULL)

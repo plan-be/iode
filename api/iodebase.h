@@ -1062,7 +1062,7 @@ extern int B_ScrollVTN(char *);
 
 /* b_idt.c */
 extern int B_IdtExecute(char *);
-//extern int B_IdtExecuteIdts(SAMPLE *,char **);
+extern int B_IdtExecuteIdts(SAMPLE *,char **);
 extern int B_IdtExecuteVarFiles(char *);
 extern int B_IdtExecuteSclFiles(char *);
 extern int B_IdtExecuteTrace(char *);
