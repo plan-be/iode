@@ -195,6 +195,7 @@ extern int SCR_panic(void);
 
 /* s_copy.c */
 extern int SCR_copy_file(char *in,char *out);
+extern int SCR_append_file(char* in, char* out);
 
 /* s_infmis.c */
 extern int InfRStrip0(char *a);
@@ -233,6 +234,9 @@ extern unsigned char *SCR_OemToUTF8Char(int ch);
 extern unsigned char *SCR_AnsiToUTF8Char(int ch);
 extern unsigned char *SCR_OemToUTF8(unsigned char *, unsigned char *);
 extern unsigned char *SCR_AnsiToUTF8(unsigned char *, unsigned char *);
+extern int SCR_ConvertToUTF8(char *filein, char *fileout, int isbom, int isansi);
+extern int SCR_ConvertOemToUTF8(char *filein, char *fileout, int isbom);
+extern int SCR_ConvertAnsiToUTF8(char *filein, char *fileout, int isbom);
 
 /* s_gzip.c */
 extern int GzipEncodeStr(unsigned char* instr, unsigned long inlen, unsigned char** outstr, unsigned long* outlen);

@@ -555,7 +555,7 @@ unsigned char *SCR_AnsiToUTF8(unsigned char *str, unsigned char *res)
     return(SCR_OemAnsiToUTF8(str, res, 1));
 }
 
-SCR_ConvertToUTF8(char *filein, char *fileout, int isbom, int isansi)
+int SCR_ConvertToUTF8(char *filein, char *fileout, int isbom, int isansi)
 {
     char    *rb, *wb;
     FILE    *fd1, *fd2;
@@ -595,12 +595,12 @@ SCR_ConvertToUTF8(char *filein, char *fileout, int isbom, int isansi)
     return(0);
 }    
 
-SCR_ConvertOemToUTF8(char *filein, char *fileout, int isbom)
+int SCR_ConvertOemToUTF8(char *filein, char *fileout, int isbom)
 {
     return(SCR_ConvertToUTF8(filein, fileout, isbom, 0));
 }
 
-SCR_ConvertAnsiToUTF8(char *filein, char *fileout, int isbom)
+int SCR_ConvertAnsiToUTF8(char *filein, char *fileout, int isbom)
 {
     return(SCR_ConvertToUTF8(filein, fileout, isbom, 1));
 }

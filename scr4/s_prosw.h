@@ -17,7 +17,7 @@ extern char *SW_getptr(SWHDL);
 
 extern char *SW_nalloc_orig(unsigned int size);
 extern char *SW_nrealloc_orig(void *old_ptr,unsigned int old_count,unsigned int new_count);
-extern char *SW_nalloc_doc(unsigned int size, const char *, const int);
+extern char *SW_nalloc_doc(unsigned int size, char *, int);
 //extern char *SW_nrealloc_doc(void *old_ptr,unsigned int old_count,unsigned int new_count, char *file, int line);
 extern void *SW_nrealloc_doc(void *old_ptr,unsigned int old_count,unsigned int new_count, char *file, int line);
 
