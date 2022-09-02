@@ -47,7 +47,7 @@ TEST_F(KDBTablesTest, GetTitle)
 {
     int pos = 0;
     std::string title;
-    std::string expected_title = u8"Déterminants de la croissance de K";
+    std::string expected_title = u8"DÃ©terminants de la croissance de K";
 
     // by position
     title = kdb.get_title(pos);
@@ -140,6 +140,8 @@ TEST_F(KDBTablesTest, Filter)
     // *2
     for (const std::string& name : all_names) if (name.back() == '2') expected_names.push_back(name);
 
+    // WARNING : K_refer() does NOT remove possible duplicate entries !
+
     // create local kdb
     local_kdb = new KDBTables(pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
@@ -175,6 +177,73 @@ TEST_F(KDBTablesTest, Filter)
     local_kdb->remove(new_name);
     EXPECT_FALSE(local_kdb->contains(new_name));
     EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+}
+
+TEST_F(KDBTablesTest, HardCopy)
+{
+    std::string pattern = "A*;*2";
+    std::vector<std::string> expected_names;
+    KDBTables* local_kdb;
+    KDBTables global_kdb;
+
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+
+    int nb_total_comments = global_kdb.count();
+    // A*
+    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    // *2
+    for (const std::string& name : all_names) if (name.back() == '2') expected_names.push_back(name);
+
+    // remove duplicate entries
+    // NOTE: std::unique only removes consecutive duplicated elements, 
+    //       so the vector needst to be sorted first
+    std::sort(expected_names.begin(), expected_names.end());
+    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
+    expected_names.resize(std::distance(expected_names.begin(), it));
+
+    // create local kdb
+    local_kdb = new KDBTables(pattern, false);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // add an element to the local KDB and check if it has not 
+    // been added to the global KDB
+    std::string new_name = "NEW_TABLE";
+    std::string def = "A title";
+    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG", "$ENVI" };
+    bool mode = true;
+    bool files = true;
+    bool date = true;
+    local_kdb->add(new_name, 2, def, vars, mode, files, date);
+    int nb_vars_envi = 10;
+    int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
+    int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
+    int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
+    EXPECT_TRUE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_EQ(local_kdb->get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
+    // rename an element in the local KDB and check if the 
+    // corresponding element has not been renamed in the global KDB
+    std::string name = "DEF2";
+    new_name = "TABLE_NEW";
+    local_kdb->rename(name, new_name);
+    EXPECT_TRUE(local_kdb->contains(new_name));
+    EXPECT_FALSE(global_kdb.contains(new_name));
+
+    // delete an element from the local KDB and check if it has not 
+    // been deleted from the global KDB
+    name = "T2";
+    local_kdb->remove(name);
+    EXPECT_FALSE(local_kdb->contains(name));
+    EXPECT_TRUE(global_kdb.contains(name));
 
     // delete local kdb
     delete local_kdb;

@@ -118,6 +118,8 @@ TEST_F(KDBEquationsTest, Filter)
     // *_
     for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
 
+    // WARNING : K_refer() does NOT remove possible duplicate entries !
+
     // create local kdb
     local_kdb = new KDBEquations(pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
@@ -155,6 +157,60 @@ TEST_F(KDBEquationsTest, Filter)
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
     EXPECT_EQ(global_kdb.get_lec(name), lec);
 }
+
+TEST_F(KDBEquationsTest, HardCopy)
+{
+    std::string pattern = "A*;$ENVI;*_";
+    std::vector<std::string> expected_names;
+    KDBEquations* local_kdb;
+    KDBEquations global_kdb;
+
+    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
+
+    std::vector<std::string> all_names;
+    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+
+    int nb_total_comments = global_kdb.count();
+    // A*
+    for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
+    // $ENVI
+    unsigned char** c_expanded_list = KL_expand("$ENVI");
+    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_names.push_back((char*) c_expanded_list[i]);
+    // *_
+    for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
+
+    // remove duplicate entries
+    // NOTE: std::unique only removes consecutive duplicated elements, 
+    //       so the vector needst to be sorted first
+    std::sort(expected_names.begin(), expected_names.end());
+    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
+    expected_names.resize(std::distance(expected_names.begin(), it));
+
+    // create local kdb
+    local_kdb = new KDBEquations(pattern, false);
+    EXPECT_EQ(local_kdb->count(), expected_names.size());
+
+    // modify an element of the local KDB and check if the 
+    // corresponding element of the global KDB didn't changed
+    std::string name = "ACAF";
+    std::string lec = global_kdb.get_lec(name);
+    std::string modified_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    local_kdb->update(name, modified_lec);
+    EXPECT_EQ(local_kdb->get_lec(name), modified_lec);
+    EXPECT_EQ(global_kdb.get_lec(name), lec);
+
+    // delete an element from the local KDB and check if it has not 
+    // been deleted from the global KDB
+    name = "ACAG";
+    local_kdb->remove(name);
+    EXPECT_FALSE(local_kdb->contains(name));
+    EXPECT_TRUE(global_kdb.contains(name));
+
+    // delete local kdb
+    delete local_kdb;
+    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+}
+
 
 TEST_F(KDBEquationsTest, Estimate)
 {
