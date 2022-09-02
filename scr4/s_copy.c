@@ -226,8 +226,7 @@ Append un fichier.
 &EN -4 : Error writing output file
 ================================================ */
 
-SCR_append_file(in, out)
-char    *in, *out;
+int SCR_append_file(char* in, char* out)
 {
     return(SCR_append_file_flush(in, out, 2048));
 }
