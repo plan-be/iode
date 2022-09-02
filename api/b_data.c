@@ -853,7 +853,7 @@ int B_DataAppend(char* arg, int type)
         if(strlen(text) == 0) return(0); /* empty append */
 
         ptr = KOVAL(kdb, pos);
-        nptr = SW_nalloc(strlen(ptr) + strlen(text) + 2);
+        nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
         if(type == K_CMT)
             sprintf(nptr, "%s %s", ptr, text);
         else
@@ -940,9 +940,9 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
     nl = 0;
     ll3 = 0;
     for(i = 0; i < inb; i++) {
-        ll1 = strlen(l1[i]);
+        ll1 = (int) strlen(l1[i]);
         for(j = 0; j < jnb; j++) {
-            ll2 = strlen(l2[j]);
+            ll2 = (int)strlen(l2[j]);
 
             if(ll3 < ll1 + ll2 + 1) {
                 ll3 = ll1 + ll2 + 1;
@@ -1173,7 +1173,7 @@ int B_DataCompare(char* arg, int type)
  */
 static int B_DataEditGraph(int view, char* arg)
 {
-    int     rc = 0, nb_args, i, mode, type, xgrid, ygrid, axis;
+    int     rc = 0, nb_args, mode, type, xgrid, ygrid, axis;
     double  ymin, ymax;
 #ifndef WATCOM
     double  atof();

@@ -38,7 +38,6 @@ static char **B_EqsSplitSmplName(char* arg, SAMPLE **psmpl)
 {
     int     lg1, lg2;
     char    from[16], to[16], **eqs = 0;
-    SAMPLE  *smpl;
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);

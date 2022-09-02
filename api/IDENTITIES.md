@@ -56,9 +56,9 @@ If we provide as VAR source files `"WS filexy.var"`:
 |:---|:---|:---|
 |`A`|`B+C`|C:WS, B:calculated|
 |`B`|`C * 2 * alpha`|C:WS|
-|`E`|`X + Y`|X:WS, Y:filexy|
+|`E`|`X + Y`|**X:WS**, Y:filexy|
 
-- X and C will be read in WS,
+- **X** and C will be read in WS,
 - Y will be read in filexy
 
 On the other hand, if we provide as VAR source files `"filexy.var"` without `"WS"`, C cannot be found and the execution will stop.
@@ -69,9 +69,9 @@ Finally, if we provide as VAR source files `"filexy.var WS"`:
 |:---|:---|:---|
 |`A`|`B+C`|C:WS, B:calculated|
 |`B`|`C * 2 * alpha`|C:WS|
-|`E`|`X + Y`|X and Y: filexy|
+|`E`|`X + Y`|**X:filexy** and Y: filexy|
 
-- X and Y will be read in filexy.var
+- **X and Y** will be read in filexy.var
 - C will be read in WS,
 
 The same principle applies to scalar source files.
