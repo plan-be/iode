@@ -20,7 +20,7 @@ set (INI b_iodeini.c)
 set (A2M b_a2mini.c)
 set (ESTIM k_est.c e_error.c e_est.c e_prep.c e_print.c e_step.c e_tests.c e_dftest.c)
 set (REPORTS b_data.c b_ras.c b_est.c b_fsys.c b_file.c b_idt.c) 
- 
+set (CONVERSIONS k_rules.c k_emain.c k_ecsv.c k_edif.c k_emain.c k_etsp.c k_ewks.c k_wks.c k_imain.c k_iasc.c k_ibst.c k_idif.c k_igem.c k_imain.c k_inis.c k_iprn.c k_irasc.c k_itxt.c)  
 set (SOURCES 
 		${UTILS} 
 		${OBJS}
@@ -38,6 +38,7 @@ set (SOURCES
 		${A2M}
 		${ESTIM}
 		${REPORTS}
+		${CONVERSIONS}
 )
 
 set (HEADERS 

@@ -577,12 +577,9 @@ extern int KT_save_csv(KDB *, char *);
 /* sb_xode.c */
 extern int SB_XodeRuleImport(void);
 extern int C_XodeRuleImport(void);
-extern int X_RuleImport(int ,char *,char *,char *,char *,char *,char *,int ,int );
-extern int X_RuleImportCmt(char *,char *,char *,char *,int ,int );
-extern int X_RuleImportVar(char *,char *,char *,char *,char *,char *,int );
 extern int SB_XodeRuleExport(void);
 extern int C_XodeRuleExport(void);
-extern int X_RuleExport(char *,char *,char *,char *,char *,char *,char *,char *,char *,int );
+
 
 /* k_iprn.c */
 extern double PRN_readreal(YYFILE *);
@@ -590,12 +587,14 @@ extern int IMP_vec_prn(YYFILE *,char *,int ,double *);
 extern int IMP_hd_cprn(IMPDEF *,char *,int );
 extern int IMP_vec_cprn(char *,char **);
 
-/* k_imain.c */
+/* k_rules.c */
 extern int IMP_readrule(char *);
-extern int IMP_grep(char **,char *);
 extern int IMP_change(char **,char **,char *,char *);
+
+/* k_imain.c */
 extern KDB *IMP_InterpretVar(IMPDEF *,char *,char *,SAMPLE *);
 extern KDB *IMP_InterpretCmt(IMPDEF *,char *,char *,int );
+extern int IMP_RuleImport(int ,char *,char *,char *,char *,char *,char *,int ,int );
 
 /* k_iasc.c */
 extern int IMP_hd_asc(YYFILE *,SAMPLE *);
@@ -647,6 +646,7 @@ extern char *EXP_addprepost(char *,char *,char *,char **);
 extern char *EXP_addsep(char *,char **);
 extern int EXP_Ws(EXPDEF *,KDB *,KDB *,char *,char *,char *,char *);
 extern int EXP_Rev_Ws(EXPDEF *,KDB *,KDB *,char *,char *,char *,char *);
+extern int EXP_RuleExport(char *,char *,char *,char *,char *,char *,char *,char *,char *,int );
 
 /* k_wks.c */
 extern int wks_init(char *,int ,int );
@@ -918,6 +918,8 @@ extern int B_DataCompare(char *,int );
 extern int B_DataDisplayGraph(char *);
 extern int B_DataPrintGraph(char *);
 
+/* b_ras.c */
+extern int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps);
 
 /* b_ws.c */
 extern int B_WsLoad(char *,int );
@@ -1060,7 +1062,7 @@ extern int B_ScrollVTN(char *);
 
 /* b_idt.c */
 extern int B_IdtExecute(char *);
-extern int B_IdtExecuteIdts(SAMPLE *,char **);
+//extern int B_IdtExecuteIdts(SAMPLE *,char **);
 extern int B_IdtExecuteVarFiles(char *);
 extern int B_IdtExecuteSclFiles(char *);
 extern int B_IdtExecuteTrace(char *);
@@ -1121,6 +1123,7 @@ extern void W_print_tit(int );
 extern void W_print_pg_header(char* arg);
 extern void W_print_pg_footer(char* arg);
 extern void W_print_rtf_topic(char* arg);
+extern void W_print_tb(char* title, int nc);
 
 /* sb_file.c */
 extern void SB_FileOpen(void);
