@@ -87,9 +87,9 @@ void wks_string(char* label, int c, int r)
     short     i = c - 1, j = r - 1,
               lg;
 
-    lg = strlen(label);
+    lg = (short)strlen(label);
     if(lg + 5 > 240) label[234] = 0;
-    lg = strlen(label) + 7;
+    lg = (short)strlen(label) + 7;
     XDR_l2s_s(&lg, 1);
     memcpy(WKS_LABEL + 2, (char *) &lg, 2);
     fwrite(WKS_LABEL, sizeof(WKS_LABEL), 1, WKS_FD);
@@ -102,8 +102,7 @@ void wks_string(char* label, int c, int r)
 
 void wks_value(double value, int c, int r)
 {
-    short     i = c - 1, j = r - 1,
-              lg;
+    short     i = c - 1, j = r - 1;
 
     fwrite(WKS_DOUBLE, sizeof(WKS_DOUBLE), 1, WKS_FD);
     XDR_wshort(WKS_FD, &i, 1);
@@ -124,7 +123,7 @@ void wks_name(char* str, int c1, int r1, int c2, int r2)
     fwrite(WKS_NM, sizeof(WKS_NM), 1, WKS_FD);
     SCR_strlcpy(name, str, 17);                 /* JMP 13-02-2013 */
     name[15] = 0;
-    for(i = strlen(name); i < 16; i++) name[i] = 0;
+    for(i = (int)strlen(name); i < 16; i++) name[i] = 0;
     fwrite(name, 16, 1, WKS_FD);
     XDR_wshort(WKS_FD, &i1, 1);
     XDR_wshort(WKS_FD, &j1, 1);

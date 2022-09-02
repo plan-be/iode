@@ -481,7 +481,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
 
     T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
-    buf = SCR_malloc(strlen(names) + 20);
+    buf = SCR_malloc((int)strlen(names) + 20);
     //sprintf(buf, "%s (%s)", names, KLG_MODES[global_VM][0]);
     sprintf(buf, "%s (%s)", names, KLG_MODES[mode][0]);
     T_GraphTitle(buf);
