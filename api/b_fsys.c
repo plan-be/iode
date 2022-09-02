@@ -201,7 +201,7 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
     int     c;
     FILE    *fd1, *fd2;
     U_ch    **tbl = 0;
-    int     ntbl = 0, rc = 0, i;
+    int     ntbl = 0, rc = 0;
     
     tbl = SCR_vtom(arg, ' ');
     ntbl = SCR_tbl_size(tbl);

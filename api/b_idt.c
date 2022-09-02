@@ -15,7 +15,7 @@
 
 // List of functions
 int B_IdtExecute(char* arg);
-int B_IdtExecuteIdts(SAMPLE* smpl, char** idts);
+static int B_IdtExecuteIdts(SAMPLE* smpl, char** idts);
 int B_IdtExecuteVarFiles(char* arg);
 int B_IdtExecuteSclFiles(char* arg);
 int B_IdtExecuteTrace(char* arg);
@@ -30,6 +30,9 @@ int B_IdtExecuteTrace(char* arg);
  *  Syntax: $IdtExecute period_from period_to [idt1 idt2...]
  *  
  *  @see https://iode.plan.be/doku.php?id=idtexecute
+ *  
+ *  At the end of the function, the VarFiles and SclFiles defined by calls to B_IdtExecuteVarFiles() and
+ *  B_IdtExecuteSclFiles() are reset to NULL.
  *  
  *  @params See b_data.c for details on arg syntax
  *  
@@ -77,7 +80,7 @@ int B_IdtExecute(char* arg)
  *  @return int     0 on success, -1 on error (file not found,)
  */
 
-int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
+static int B_IdtExecuteIdts(SAMPLE* smpl, char** idts)
 {
     KDB     *tdbi, *tkdb;
 
