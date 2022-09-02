@@ -72,7 +72,7 @@ void QIodeMenuWorkspaceSave::save_objs(const EnumIodeType iode_type, const bool 
             save_global_kdb(iode_type, filepath);
         }
     }
-    catch (const std::runtime_error& e)
+    catch (const std::exception& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
         return;

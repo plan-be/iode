@@ -15,7 +15,7 @@ void QIodeEditTable::edit()
 		static_cast<QIodeEditTableModel*>(tableView->model())->save();
 		this->accept();
 	}
-	catch (const std::runtime_error& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 	}

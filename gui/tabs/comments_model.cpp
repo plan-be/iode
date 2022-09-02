@@ -21,7 +21,7 @@ bool CommentsModel::setValue(const int row, const int column, const QVariant& va
 		kdb->update(row, value.toString().toStdString());
 		return true;
 	}
-	catch (const std::runtime_error& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 		return false;

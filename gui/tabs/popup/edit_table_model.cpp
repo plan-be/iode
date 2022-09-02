@@ -7,7 +7,7 @@ QIodeEditTableModel::QIodeEditTableModel(const QString& tableName, QWidget* pare
 	{
 		table = new Table(tableName.toStdString());
 	}
-	catch (const std::runtime_error& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::critical(static_cast<QWidget*>(parent), tr("ERROR"), tr(e.what()));
 	}
@@ -217,7 +217,7 @@ bool QIodeEditTableModel::setData(const QModelIndex& index, const QVariant& valu
 			emit dataChanged(index, index, { role });
 			return true;
 		}
-		catch (const std::runtime_error& e)
+		catch (const std::exception& e)
 		{
 			QMessageBox::critical(static_cast<QWidget*>(parent()), tr("ERROR"), tr(e.what()));
 		}
