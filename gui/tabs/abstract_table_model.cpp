@@ -68,7 +68,7 @@ bool IODEAbstractTableModel<K>::rename(const QString& name, const QString& new_n
 		kdb->rename(name.toStdString(), new_name.toStdString());
 		return true;
 	}
-	catch (const std::runtime_error& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 		return false;
@@ -104,7 +104,7 @@ void IODEAbstractTableModel<K>::filter(const QString& pattern)
 			kdb = new K();
 		}
 	}
-	catch (const std::runtime_error& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::critical(static_cast<QWidget*>(parent()), tr("Error"), tr(e.what()));
 	}
@@ -124,7 +124,7 @@ bool IODEAbstractTableModel<K>::removeRows(int position, int rows, const QModelI
 			kdb->remove(row);
 		}
 	}
-	catch (const std::runtime_error& e)
+	catch (const std::exception& e)
 	{
 		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 	}

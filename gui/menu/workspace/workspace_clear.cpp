@@ -40,7 +40,7 @@ void QIodeMenuWorkspaceClear::clear_objs(const EnumIodeType iode_type, const boo
     {
         clear_global_kdb(iode_type);
     }
-    catch (const std::runtime_error& e)
+    catch (const std::exception& e)
     {
         QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
     }
