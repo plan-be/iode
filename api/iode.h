@@ -360,6 +360,23 @@
 /*----------------------- MISC --------------------------------*/
 #define K_ISFILE(filename)  (filename != 0 && filename[0] != '-' && filename[0] != 0)
 
+
+/*---------------- IMPORT/EXPORT: FORMAT DEFINES -------------------------*/
+#define EXP_CSV  0
+#define EXP_DIF  1
+#define EXP_WKS  2
+#define EXP_TSP  3
+#define EXP_RCSV 4
+
+#define IMP_FMT_ASCII     0
+#define IMP_FMT_ROT_ASCII 1
+#define IMP_FMT_DIF       2
+#define IMP_FMT_Bistel    3
+#define IMP_FMT_NIS       4
+#define IMP_FMT_GEM       5
+#define IMP_FMT_PRN       6
+#define IMP_FMT_TXT       7
+
 /*---------------- IMPORT/EXPORT: ASC -------------------------*/
 #define ASC_SMPL 1
 
@@ -369,7 +386,7 @@
 #define DIF_VECTORS 3
 #define DIF_DATA    4
 #define DIF_BOT     5
-#define DIF_COLON   6
+#define DIF_COMMA   6
 #define DIF_V       7
 #define DIF_TUPLES  8
 
@@ -1121,22 +1138,22 @@ typedef struct _fils_ {
 
 // struct defining input file and fn pointers for one type of data format to be imported
 typedef struct _impdef_ {
-    YYKEYS  *imp_keys;
-    int     imp_dim;
-    int     (*imp_hd_fn)();
-    int     (*imp_vec_fn)();
-    int     (*imp_elem_fn)();
-    int     (*imp_end_fn)();
+    YYKEYS  *imp_keys;          // Table of keywords (see YY group of functions in scr4 libs)
+    int     imp_dim;            // Nb of keys in imp_keys 
+    int     (*imp_hd_fn)();     // Pointer to the fn to open the input file and to read its header
+    int     (*imp_vec_fn)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
+    int     (*imp_elem_fn)();   // Pointer to the fn to read a single numerical value (a double)
+    int     (*imp_end_fn)();    // Pointer to the fn to close the input file
 } IMPDEF;
 
 // struct defining output File descriptor and fn pointers for one type of data format to export
 typedef struct _expdef_ {
-    int     (*exp_hd_fn)();     // Function saving the header of the output file
-    char    *(*exp_code_fn)();  // Function translating an IODE object name to an allocated object name in the output file
-    char    *(*exp_cmt_fn)();   // Function translating the comment of an IODE object into an allocated string in the output file format
-    char    *(*exp_elem_fn)();  // Function constructing an allocated vector of Variable values
-    int     (*exp_vec_fn)();    // Function saving in the output file a variable/comment constructed by a call to the above functions
-    int     (*exp_end_fn)();    // Function saving the footer of the output file
+    int     (*exp_hd_fn)();     // Pointer to the function that creates the output file and writes the header
+    char    *(*exp_code_fn)();  // Pointer to the function to create the output object name + the separator
+    char    *(*exp_cmt_fn)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file 
+    char    *(*exp_elem_fn)();  // Pointer to the function constructing an allocated string of one value + sep
+    int     (*exp_vec_fn)();    // Pointer to the function saving the VAR and CMT in the output file
+    int     (*exp_end_fn)();    // Pointer to the function that closes the output file after having written its footer
     FILE    *exp_fd;            // Output file descriptor (output of fopen)
 } EXPDEF;
 

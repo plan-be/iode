@@ -1327,3 +1327,51 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
 }
 
 
+TEST_F(IodeCAPITest, Tests_B_XODE)
+{
+    char    outfile[256];
+    char    reffile[256];
+    char    varfile[256];
+    char    cmtfile[256];
+    char    trace[] = " ";
+    int     cond, rc;
+
+    U_test_print_title("Tests XODE: Export CSV and rcsv");
+
+    U_test_suppress_kmsg_msgs();
+
+    // Export
+    // Exports VAR files into an external format.
+    // int EXP_RuleExport(" "char* trace, NULL, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
+
+    sprintf(varfile, "%s\\fun.var", input_test_dir);
+    sprintf(cmtfile, "%s\\fun.cmt", input_test_dir);
+
+    sprintf(outfile, "%s\\fun_xode.csv", output_test_dir);
+    sprintf(reffile, "%s\\fun_xode.csv.ref", input_test_dir);
+    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_CSV);
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.csv", "fun_xode.csv.ref");
+    EXPECT_EQ(cond, 1);
+
+    sprintf(outfile, "%s\\fun_xode.rcsv", output_test_dir);
+    sprintf(reffile, "%s\\fun_xode.rcsv.ref", input_test_dir);
+    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_RCSV);
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
+    EXPECT_EQ(cond, 1);
+
+    U_test_print_title("Tests XODE: Import Ascii and Rotated Ascii");
+
+
+    sprintf(reffile, "%s\\fun_xode.av.ref", input_test_dir);
+    sprintf(outfile, "%s\\fun_xode.var", output_test_dir);
+
+    rc = IMP_RuleImport(K_VAR, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
+
+    EXPECT_EQ(rc, 0);
+    KV_WS = K_interpret(K_VAR, outfile);
+    U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+    U_test_reset_kmsg_msgs();
+
+}
+
+

@@ -1503,6 +1503,53 @@ void Tests_B_IDT()
     S4ASSERT(U_test_eq(C[2], 6.0*2 - 0.92921251 ), "C[2] ==6.0*2 - 0.92921251");
 }
 
+void Tests_B_XODE()
+{
+    char    outfile[256];
+    char    reffile[256];
+    char    varfile[256];
+    char    cmtfile[256];
+    char    trace[] = " ";    
+    int     cond, rc;
+    
+    U_test_print_title("Tests XODE: Export CSV and rcsv");
+
+    U_test_suppress_kmsg_msgs();
+
+    // Export
+    // Exports VAR files into an external format. 
+    // int EXP_RuleExport(" "char* trace, NULL, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)  
+    
+    sprintf(varfile, "%s\\fun.var", IODE_DATA_DIR);
+    sprintf(cmtfile, "%s\\fun.cmt", IODE_DATA_DIR);
+    
+    sprintf(outfile, "%s\\fun_xode.csv", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%s\\fun_xode.csv.ref", IODE_DATA_DIR);
+    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_CSV);
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.csv", "fun_xode.csv.ref");
+    S4ASSERT(cond == 1, "EXP_RuleExport(\" \", NULL, \"%s\", \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", \"#N/A\", \";\", EXP_CSV)", outfile, varfile, cmtfile);
+    
+    sprintf(outfile, "%s\\fun_xode.rcsv", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%s\\fun_xode.rcsv.ref", IODE_DATA_DIR);
+    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_RCSV);
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
+    S4ASSERT(cond == 1, "EXP_RuleExport(\" \", NULL, \"%s\", \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", \"#N/A\", \";\", EXP_RCSV)", outfile, varfile, cmtfile);
+
+    U_test_print_title("Tests XODE: Import Ascii and Rotated Ascii");
+
+    
+    sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
+    
+    rc = IMP_RuleImport(K_VAR, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
+    
+    S4ASSERT(rc == 0, "IMP_RuleImport(K_VAR, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMP_FMT_ASCII, 0)", outfile, reffile);
+    KV_WS = K_interpret(K_VAR, outfile);  
+    U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+    U_test_reset_kmsg_msgs(); 
+
+}
+
 
 // ================================================================================================
 
@@ -1566,7 +1613,7 @@ int main(int argc, char **argv)
     Tests_B_EQS();
     Tests_B_FILE();
     Tests_B_FSYS();
-    
+    Tests_B_XODE();
    
     //K_save_iode_ini(); // Suppress that call ? Should only be called on demand, not at the end of each IODE session.
     
@@ -1749,10 +1796,10 @@ X   "eqssetcmt",                B_EqsSetCmt,            NULL,               0,
     "modelsimulatesavenorms",   B_ModelSimulateSaveNorms,   NULL,           0,
 
 
-    "idtexecute",               B_IdtExecute,           SB_IdtExecute,      0,
-    "idtexecutevarfiles",       B_IdtExecuteVarFiles,   NULL,               0,
-    "idtexecutesclfiles",       B_IdtExecuteSclFiles,   NULL,               0,
-    "idtexecutetrace",          B_IdtExecuteTrace,      NULL,               0,
+X   "idtexecute",               B_IdtExecute,           SB_IdtExecute,      0,
+X   "idtexecutevarfiles",       B_IdtExecuteVarFiles,   NULL,               0,
+X   "idtexecutesclfiles",       B_IdtExecuteSclFiles,   NULL,               0,
+X   "idtexecutetrace",          B_IdtExecuteTrace,      NULL,               0,
     
     
     "reportexec",               B_ReportExec,           SB_ReportExec,      0,
