@@ -13,7 +13,7 @@ protected:
 
 TEST_F(UtilsTest, convertBetweenCodepages)
 {
-	std::string str_utf8 = u8"aA!@^$jndq256����";
+	std::string str_utf8 = "aA!@^$jndq256µ&ï";
 
 	std::string str_oem = convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
 	std::string str_res = convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);

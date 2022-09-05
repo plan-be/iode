@@ -105,7 +105,7 @@ TEST_F(TablesTest, LineTitle)
     std::string title = table->getTitle(0);
     EXPECT_EQ(title, expected_title + " ");
 
-    std::string new_title = u8"New Title with special characters !@ùµ£éè";
+    std::string new_title = "New Title with special characters !@ÂµÃ¨Ã©Ã¯";
     table->setTitle(0, new_title);
     title = table->getTitle(0);
     EXPECT_EQ(title, new_title);
@@ -124,7 +124,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->getCellType(1, 0), IT_STRING);
     EXPECT_EQ(table->getCellAlign(1, 0), IT_LEFT);
     EXPECT_EQ(table->getCellFont(1, 0), IT_ITALIC);
-    EXPECT_EQ(table->getCellContent(1, 0, false), u8"(divisé par les prix à la consommation)");
+    EXPECT_EQ(table->getCellContent(1, 0, false), "(divisÃ© par les prix Ã  la consommation)");
     // ---- column 1
     EXPECT_EQ(table->getCellType(1, 1), IT_STRING);
     EXPECT_EQ(table->getCellAlign(1, 1), IT_LEFT);
@@ -144,7 +144,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->getCellType(3, 1), IT_STRING);
     EXPECT_EQ(table->getCellAlign(3, 1), IT_CENTER);
     EXPECT_EQ(table->getCellFont(3, 1), IT_NORMAL);
-    EXPECT_EQ(table->getCellContent(3, 1, false), u8"#s");
+    EXPECT_EQ(table->getCellContent(3, 1, false), "#s");
 
     // third cell line
     EXPECT_EQ(table->getLineType(5), expected_type);
@@ -169,7 +169,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->getCellType(7, 0), IT_STRING);
     EXPECT_EQ(table->getCellAlign(7, 0), IT_LEFT);
     EXPECT_EQ(table->getCellFont(7, 0), IT_NORMAL);
-    EXPECT_EQ(table->getCellContent(7, 0, false), u8"       1. Excédent brut d'exploitation");
+    EXPECT_EQ(table->getCellContent(7, 0, false), "       1. ExcÃ©dent brut d'exploitation");
     // ---- column 1
     EXPECT_EQ(table->getCellType(7, 1), IT_LEC);
     EXPECT_EQ(table->getCellAlign(7, 1), IT_DECIMAL);
