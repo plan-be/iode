@@ -47,7 +47,7 @@ TEST_F(KDBTablesTest, GetTitle)
 {
     int pos = 0;
     std::string title;
-    std::string expected_title = u8"Déterminants de la croissance de K";
+    std::string expected_title = "Déterminants de la croissance de K";
 
     // by position
     title = kdb.get_title(pos);
