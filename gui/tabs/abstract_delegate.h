@@ -6,7 +6,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
-#include "../cpp_api/iode_cpp_api.h"
+#include "cpp_api/iode_cpp_api.h"
 #include "utils.h"
 #include "util/double_validator.h"
 

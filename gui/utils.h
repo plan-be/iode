@@ -1,7 +1,5 @@
 #pragma once
-
-#pragma once
-#include "../cpp_api/iode_cpp_api.h"
+#include "cpp_api/iode_cpp_api.h"
 
 #include <string>
 #include <memory>   // for the smart pointers
