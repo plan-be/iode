@@ -7,6 +7,11 @@ set(CPP_TIME
     time/period.h time/sample.h
     )
 
+set(CPP_OBJS
+    objects/equation.h      objects/equation.cpp
+    objects/table.h         objects/table.cpp
+    )
+
 set(CPP_KDB 
     KDB/kdb_global.h        KDB/kdb_global.cpp
     KDB/kdb_abstract.h      KDB/kdb_abstract.cpp
@@ -24,16 +29,19 @@ set(CPP_LEGACY
     legacy/s_iode.c legacy/sb_gui.c legacy/b_legacy.c
    )
 
-add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" 
-                              "common.h" 
-                              "equation.h" "equation.cpp"
-                              "table.h" "table.cpp"
-                              "simulation.h" "simulation.cpp"
-                              ${CPP_UTILS}
-                              ${CPP_TIME}
-                              ${CPP_KDB}
-                              ${CPP_LEGACY})
+add_library(iodecppapi STATIC 
+            iode_cpp_api.h      iode_cpp_api.cpp 
+            common.h 
+            simulation.h        simulation.cpp
+            ${CPP_UTILS}
+            ${CPP_TIME}
+            ${CPP_OBJS}
+            ${CPP_KDB}
+            ${CPP_LEGACY}
+            )
 
-set_source_files_properties(equation.cpp table.cpp KDB/kdb_global.cpp PROPERTIES COMPILE_FLAGS -Zp1)
+set_source_files_properties(objects/equation.cpp objects/table.cpp 
+                            KDB/kdb_global.cpp 
+                            PROPERTIES COMPILE_FLAGS -Zp1)
 target_include_directories(iodecppapi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(iodecppapi PUBLIC iodeapi)
