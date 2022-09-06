@@ -2,8 +2,8 @@
 
 #include "common.h"
 #include "utils.h"
-#include "sample.h"
-#include "./KDB/kdb_lists.h"
+#include "time/sample.h"
+#include "KDB/kdb_lists.h"
 
 
 enum EnumSimulationSortAlgorithm

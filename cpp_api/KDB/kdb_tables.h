@@ -1,5 +1,5 @@
 #pragma once
-#include "cpp_api/table.h"
+#include "table.h"
 #include "kdb_template.h"
 
 
