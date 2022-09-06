@@ -18,4 +18,4 @@
 #include "KDB/kdb_scalars.h"
 #include "KDB/kdb_tables.h"
 #include "KDB/kdb_variables.h"
-#include "simulation.h"
+#include "compute/simulation.h"
