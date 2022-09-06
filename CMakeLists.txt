@@ -110,6 +110,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # ---- preprocessor ----
 add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
 
+# ---- include ----
+# CMAKE_SOURCE_DIR is the full path to the top level 
+# of the current CMake source tree
+include_directories(${CMAKE_SOURCE_DIR})
+message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
+
 # ---- libraries ----
 add_subdirectory ("scr4")
 add_subdirectory ("api")
