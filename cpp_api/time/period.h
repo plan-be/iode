@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "iode_exceptions.h"
+#include "utils/iode_exceptions.h"
 
 
 const static std::map<char, int> mPeriodicities =

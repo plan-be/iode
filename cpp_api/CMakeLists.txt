@@ -1,12 +1,16 @@
-﻿
+﻿set(CPP_UTILS
+    utils/utils.h     utils/iode_exceptions.h
+    utils/super.h     utils/super.cpp
+    )
+
 set(CPP_TIME
     time/period.h time/sample.h
     )
 
 set(CPP_KDB 
     KDB/kdb_global.h        KDB/kdb_global.cpp
-    KDB/kdb_template.h
     KDB/kdb_abstract.h      KDB/kdb_abstract.cpp
+    KDB/kdb_template.h
     KDB/kdb_comments.h      KDB/kdb_comments.cpp
     KDB/kdb_equations.h     KDB/kdb_equations.cpp
     KDB/kdb_identities.h    KDB/kdb_identities.cpp
@@ -21,12 +25,11 @@ set(CPP_LEGACY
    )
 
 add_library(iodecppapi STATIC "iode_cpp_api.cpp" "iode_cpp_api.h" 
-                              "common.h" "utils.h" 
-                              "iode_exceptions.h"
-                              "super.h" "super.cpp"
+                              "common.h" 
                               "equation.h" "equation.cpp"
                               "table.h" "table.cpp"
                               "simulation.h" "simulation.cpp"
+                              ${CPP_UTILS}
                               ${CPP_TIME}
                               ${CPP_KDB}
                               ${CPP_LEGACY})

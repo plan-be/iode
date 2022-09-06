@@ -1,8 +1,8 @@
 #pragma once
 
 #include "common.h"
-#include "utils.h"
-#include "iode_exceptions.h"
+#include "utils/utils.h"
+#include "utils/iode_exceptions.h"
 
 enum EnumCellType
 {
