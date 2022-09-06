@@ -5,7 +5,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "../../cpp_api/iode_cpp_api.h"
+#include "cpp_api/iode_cpp_api.h"
 
 #include <filesystem>
 
