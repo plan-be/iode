@@ -3,13 +3,11 @@
 #pragma once
 
 #include "common.h"
-#include "utils.h"
-#include "iode_exceptions.h"
+#include "utils/utils.h"
+#include "utils/super.h"
+#include "utils/iode_exceptions.h"
 #include "time/period.h"
 #include "time/sample.h"
-#include "super.h"
-#include "equation.h"
-#include "table.h"
 #include "KDB/kdb_global.h"
 #include "KDB/kdb_comments.h"
 #include "KDB/kdb_equations.h"
@@ -18,4 +16,6 @@
 #include "KDB/kdb_scalars.h"
 #include "KDB/kdb_tables.h"
 #include "KDB/kdb_variables.h"
+#include "equation.h"
+#include "table.h"
 #include "simulation.h"
