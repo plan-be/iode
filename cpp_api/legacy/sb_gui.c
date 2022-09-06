@@ -4,7 +4,7 @@
  * copied/pasted from the /cmd/sb_gui.c directory *
  * ********************************************** */
 
-#include "../../api/iode.h"
+#include "api/iode.h"
 #include <s_a2m.h>
 
  /* sb_pdest.c */

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../api/iode.h"
-#include "../api/iodeapi.h"
+#include "api/iode.h"
+#include "api/iodeapi.h"
 
 #include <string>
 #include <array>
