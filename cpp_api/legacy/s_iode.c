@@ -5,7 +5,7 @@
  * copied/pasted from the /cmd/s_iode.c directory *
  * ********************************************** */
 
-#include "../../api/iode.h"
+#include "api/iode.h"
 #include <stdio.h>
 
 /* ==== Annulations fonction HWND ==== */

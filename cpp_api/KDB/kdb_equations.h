@@ -1,7 +1,7 @@
 #pragma once
-#include "../period.h"
-#include "../sample.h"
-#include "../equation.h"
+#include "cpp_api/period.h"
+#include "cpp_api/sample.h"
+#include "cpp_api/equation.h"
 #include "kdb_template.h"
 
 

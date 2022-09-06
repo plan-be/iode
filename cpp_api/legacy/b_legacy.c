@@ -5,7 +5,7 @@
  * be integrated in current C API                 *
  * ********************************************** */
 
-#include "../../api/iode.h"
+#include "api/iode.h"
 
  // =================== b_ws.c =================== //
 
@@ -67,7 +67,7 @@ char* filename;
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019 
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019 
     if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(K_CSV); // Correction JMP 25/3/2019 
-    if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas très cohérent...
+    if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas trï¿½s cohï¿½rent...
 
     // Sais plus a quoi ca peut servir... => a supprimer
     for (i = 16; strcmp(k_ext[i], "xxx") != 0; i++) {
@@ -212,16 +212,16 @@ void RP_free_bufs()
 
 // =================== b_proc.c =================== //
 
-// Objet REP_PROC : contient le texte d'une procédure
+// Objet REP_PROC : contient le texte d'une procï¿½dure
 typedef struct _rp_proc_ {
-    char    proc_name[80];      // Nom de la procédure
-    char** proc_parms;       // Nom des paramètres
-    int     proc_nb_parms;      // Nombre de paramètres
+    char    proc_name[80];      // Nom de la procï¿½dure
+    char** proc_parms;       // Nom des paramï¿½tres
+    int     proc_nb_parms;      // Nombre de paramï¿½tres
 
     //char    *proc_filename;     // Fichier source
-    //int     proc_line1;         // Ligne de départ de la définition dans le fichier
+    //int     proc_line1;         // Ligne de dï¿½part de la dï¿½finition dans le fichier
 
-    REPFILE* proc_rf;           // Nombre de lignes de la procédure (avec $procdef et $procend)
+    REPFILE* proc_rf;           // Nombre de lignes de la procï¿½dure (avec $procdef et $procend)
 } REP_PROC;
 
 REP_PROC** REP_PROCS;
@@ -324,7 +324,7 @@ int KE_compile(KDB* dbe)
 
 // =================== b_api.c =================== //
 
-#include "../../api/iodeapi.h"
+#include "api/iodeapi.h"
 
 char    STATIC_BUF[512];        /* JMP 10-01-11 */
 int     STATIC_BUF_LG = 511;    /* JMP 10-01-11 */
