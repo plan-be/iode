@@ -1,6 +1,6 @@
 #pragma once
-#include "cpp_api/utils.h"
-#include "cpp_api/sample.h"
+#include "utils.h"
+#include "time/sample.h"
 #include "kdb_global.h"
 
 

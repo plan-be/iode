@@ -1,8 +1,8 @@
 #pragma once
 #include "common.h"
 #include "utils.h"
-#include "period.h"
-#include "sample.h"
+#include "time/period.h"
+#include "time/sample.h"
 
 
 EQ* create_equation_deep_copy(EQ* original_equation);
