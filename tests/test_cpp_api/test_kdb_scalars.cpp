@@ -110,7 +110,12 @@ TEST_F(KDBScalarsTest, Filter)
     // *_
     for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
 
-    // WARNING : K_refer() does NOT remove possible duplicate entries !
+    // remove duplicate entries
+    // NOTE: std::unique only removes consecutive duplicated elements, 
+    //       so the vector needst to be sorted first
+    std::sort(expected_names.begin(), expected_names.end());
+    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
+    expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
     local_kdb = new KDBScalars(pattern);

@@ -5,6 +5,7 @@
 #include "super.h"
 
 #include <string>
+#include <vector>
 #include <regex>
 #include <stdexcept>
 // requires C++17 
@@ -165,4 +166,35 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
     }
 
     return p_filepath.string();
+}
+
+inline void remove_duplicates(std::vector<std::string>& v)
+{
+    // NOTE: std::unique only removes consecutive duplicated elements, 
+    //       so the vector needst to be sorted first
+    std::sort(v.begin(), v.end());
+    std::vector<std::string>::iterator it = std::unique(v.begin(), v.end());  
+    v.resize(std::distance(v.begin(), it));
+}
+
+// QUESTION FOR JMP: is there a function in the C Iode API to remove duplicates 
+//                   from a char** ?
+inline char** remove_duplicates(char** items)
+{
+    int nb_items = SCR_tbl_size((unsigned char**) items);
+    std::vector<std::string> v_items;
+    v_items.reserve(nb_items);
+    for (int i=0; i < nb_items; i++) v_items.push_back(std::string(items[i]));
+    remove_duplicates(v_items);
+    SCR_free_tbl((unsigned char**) items);
+    
+    nb_items = v_items.size();
+    items = new char*[nb_items+1];
+    for (int i=0; i < nb_items; i++)
+    {
+        items[i] = new char[K_MAX_NAME+1];
+        strcpy(items[i], v_items[i].c_str());
+    }
+    items[nb_items] = 0;
+    return items;
 }
