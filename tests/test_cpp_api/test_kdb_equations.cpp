@@ -118,7 +118,12 @@ TEST_F(KDBEquationsTest, Filter)
     // *_
     for (const std::string& name : all_names) if (name.back() == '_') expected_names.push_back(name);
 
-    // WARNING : K_refer() does NOT remove possible duplicate entries !
+    // remove duplicate entries
+    // NOTE: std::unique only removes consecutive duplicated elements, 
+    //       so the vector needst to be sorted first
+    std::sort(expected_names.begin(), expected_names.end());
+    std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
+    expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
     local_kdb = new KDBEquations(pattern);
@@ -209,21 +214,4 @@ TEST_F(KDBEquationsTest, HardCopy)
     // delete local kdb
     delete local_kdb;
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
-}
-
-
-TEST_F(KDBEquationsTest, Estimate)
-{
-    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
-
-    kdb.equations_estimate("1980Y1", "1996Y1", "ACAF");
-
-    KDBVariables kdb_vars;
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES", "1980Y1")) / 1e6, -0.00115);
-
-    Equation eq = kdb.get("ACAF");
-    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_R2 - 10]) / 1e6, 0.821815);
-    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_R2ADJ - 10]) / 1e6, 0.79636);
-    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_DW - 10]) / 1e6, 2.33007);
 }
