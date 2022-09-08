@@ -31,15 +31,6 @@ protected:
     EnumIodeKDBType kdb_type;
     KDB* local_kdb;         //< either a shallow copy (K_refer()) of a subset of a global KDB or a local kdb
 
-protected:
-    KDB* get_KDB() const
-    {
-        if (local_kdb) return local_kdb;
-        if (K_WS[iode_type] == NULL) throw IodeExceptionFunction("Cannot get KDB of " + iode_type_name + "s",  
-            "There is currently no " + iode_type_name + "s database in memory.");
-        return K_WS[iode_type];
-    }
-
 public:
     KDBAbstract(EnumIodeType iode_type, const std::string& pattern, const bool shallow_copy);
 
@@ -48,6 +39,14 @@ public:
     int get_iode_type() const { return iode_type; }
 
     int count() const { return get_KDB()->k_nb; }
+
+    KDB* get_KDB() const
+    {
+        if (local_kdb) return local_kdb;
+        if (K_WS[iode_type] == NULL) throw IodeExceptionFunction("Cannot get KDB of " + iode_type_name + "s",  
+            "There is currently no " + iode_type_name + "s database in memory.");
+        return K_WS[iode_type];
+    }
 
     bool is_global_kdb() const { return local_kdb == nullptr; }
 
@@ -76,6 +75,22 @@ public:
         std::string name_oem = std::string(kdb->k_objs[pos].o_name);
         std::string name = oem_to_utf8(name_oem);
         return name;
+    }
+
+    std::vector<std::string> get_names() const
+    {
+        std::vector<std::string> v_names;
+        for (int i=0; i < count(); i++) v_names.push_back(get_name(i));
+        return v_names;
+    }
+
+    std::string get_names_as_string() const
+    {
+        std::string names;
+        for (int i=0; i < count(); i++) names += get_name(i) + ";";
+        // remove last ;
+        if(!names.empty()) names.pop_back();
+        return names;
     }
 
     int set_name(const int pos, const std::string& new_name);
