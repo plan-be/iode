@@ -146,6 +146,11 @@ bool table_equal(TBL* c_table1, TBL* c_table2)
 }
 
 
+Table::Table()
+{
+	c_table = nullptr;
+}
+
 Table::Table(const int pos, KDB* kdb)
 {
 	if (!kdb) kdb = K_WS[I_TABLES];
@@ -176,7 +181,7 @@ Table::Table(const Table& table)
 
 Table::~Table()
 {
-	T_free(c_table);
+	if(c_table) T_free(c_table);
 }
 
 // ================ TABLE ================

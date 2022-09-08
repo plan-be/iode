@@ -110,6 +110,11 @@ EQ* prepare_equation(const std::string& name, const bool add_obj, const std::str
 }
 
 
+Equation::Equation()
+{
+    c_equation = nullptr;
+}
+
 Equation::Equation(const int pos, KDB* kdb)
 {
     if (!kdb) kdb = K_WS[I_EQUATIONS];
@@ -140,7 +145,7 @@ Equation::Equation(const Equation& eq)
 
 Equation::~Equation()
 {
-    SW_nfree(c_equation);
+    if (c_equation) SW_nfree(c_equation);
 }
 
 // -- lec --

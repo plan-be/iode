@@ -7,6 +7,11 @@ struct Sample
 	SAMPLE* c_sample;
 
 public:
+	Sample()
+	{
+		c_sample = nullptr;
+	}
+
 	Sample(const Period& start_period, const Period& end_period)
 	{
 		c_sample = PER_pertosmpl(start_period.c_period, end_period.c_period);
