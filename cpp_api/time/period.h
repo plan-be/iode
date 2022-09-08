@@ -20,6 +20,11 @@ struct Period
 	PERIOD* c_period;
 
 public:
+	Period()
+	{
+		c_period = nullptr;
+	}
+
 	Period(const int year, const char periodicity, const int position)
 	{
 		IodeExceptionInvalidArguments error("Cannot create new Period");
