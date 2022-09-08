@@ -52,9 +52,25 @@ TEST_F(KDBEquationsTest, Get)
 
     // by pos
     Equation eq1 = kdb.get(pos);
+    EXPECT_EQ(eq1.get_lec(), "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq1.get_date_as_string(), "12-06-1998");
+    EXPECT_EQ(eq1.get_sample().to_string(), "1980Y1:1996Y1");
+    EXPECT_EQ(eq1.get_method(), "LSQ");
 
     // by name
     Equation eq2 = kdb.get(name);
+    EXPECT_EQ(eq2.get_lec(), "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq2.get_date_as_string(), "12-06-1998");
+    EXPECT_EQ(eq2.get_sample().to_string(), "1980Y1:1996Y1");
+    EXPECT_EQ(eq1.get_method(), "LSQ");
+}
+
+TEST_F(KDBEquationsTest, GetNames)
+{
+    std::vector<std::string> expected_names;
+    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
+    std::vector<std::string> names = kdb.get_names();
+    EXPECT_EQ(names, expected_names);
 }
 
 TEST_F(KDBEquationsTest, CreateRemove)

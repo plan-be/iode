@@ -54,6 +54,14 @@ TEST_F(KDBScalarsTest, Get)
     EXPECT_DOUBLE_EQ(expected_scalar.std, scalar2.std);
 }
 
+TEST_F(KDBScalarsTest, GetNames)
+{
+    std::vector<std::string> expected_names;
+    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
+    std::vector<std::string> names = kdb.get_names();
+    EXPECT_EQ(names, expected_names);
+}
+
 TEST_F(KDBScalarsTest, CreateRemove)
 {
     std::string name = "new_scalar";
