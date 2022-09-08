@@ -95,6 +95,14 @@ TEST_F(KDBCommentsTest, Get)
     EXPECT_EQ(kdb.get(0), expected_comment);
 }
 
+TEST_F(KDBCommentsTest, GetNames)
+{
+    std::vector<std::string> expected_names;
+    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
+    std::vector<std::string> names = kdb.get_names();
+    EXPECT_EQ(names, expected_names);
+}
+
 TEST_F(KDBCommentsTest, CreateRemove)
 {
     std::string name = "NEW_COMMENT";

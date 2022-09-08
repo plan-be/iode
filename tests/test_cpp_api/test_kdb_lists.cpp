@@ -48,6 +48,14 @@ TEST_F(KDBListsTest, Get)
     EXPECT_EQ(expected_list, list);
 }
 
+TEST_F(KDBListsTest, GetNames)
+{
+    std::vector<std::string> expected_names;
+    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
+    std::vector<std::string> names = kdb.get_names();
+    EXPECT_EQ(names, expected_names);
+}
+
 TEST_F(KDBListsTest, CreateRemove)
 {
     std::string name = "A_COMMENTS";

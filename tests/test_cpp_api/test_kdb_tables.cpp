@@ -38,9 +38,25 @@ TEST_F(KDBTablesTest, Get)
 
     // by position
     Table table = kdb.get(pos);
+    EXPECT_EQ(table.getTitle(0), "Compte de l'ensemble des administrations publiques ");
+    EXPECT_EQ(table.nbLines(), 31);
+    EXPECT_EQ(table.nbColumns(), 2);
+    EXPECT_EQ(table.getLineType(0), IT_TITLE);
 
     // by name
     Table table2 = kdb.get("GFRPC");
+    EXPECT_EQ(table2.getTitle(0), "Compte de l'ensemble des administrations publiques ");
+    EXPECT_EQ(table2.nbLines(), 31);
+    EXPECT_EQ(table2.nbColumns(), 2);
+    EXPECT_EQ(table2.getLineType(0), IT_TITLE);
+}
+
+TEST_F(KDBTablesTest, GetNames)
+{
+    std::vector<std::string> expected_names;
+    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
+    std::vector<std::string> names = kdb.get_names();
+    EXPECT_EQ(names, expected_names);
 }
 
 TEST_F(KDBTablesTest, GetTitle)

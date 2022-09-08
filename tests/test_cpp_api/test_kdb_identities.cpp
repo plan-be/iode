@@ -83,6 +83,14 @@ TEST_F(KDBIdentitiesTest, Get)
     EXPECT_EQ(identity_name.clec, expected_clec);
 }
 
+TEST_F(KDBIdentitiesTest, GetNames)
+{
+    std::vector<std::string> expected_names;
+    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
+    std::vector<std::string> names = kdb.get_names();
+    EXPECT_EQ(names, expected_names);
+}
+
 TEST_F(KDBIdentitiesTest, CreateRemove)
 {
     std::string name = kdb.get_name(0);
