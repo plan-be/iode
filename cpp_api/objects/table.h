@@ -97,6 +97,9 @@ public:
 
 	~Table();
 
+	// required to be used in std::map
+    Table& operator=(const Table& table);
+
 	// ================ TABLE ================
 
 	void extend();

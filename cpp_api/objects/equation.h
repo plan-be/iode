@@ -26,6 +26,9 @@ public:
 
     ~Equation();
 
+    // required to be used in std::map
+    Equation& operator=(const Equation& eq);
+
     // -- lec --
 
     std::string get_lec() const;
