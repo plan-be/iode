@@ -145,7 +145,7 @@ Equation::Equation(const Equation& eq)
 
 Equation::~Equation()
 {
-    if (c_equation) SW_nfree(c_equation);
+    if (c_equation) E_free(c_equation);
 }
 
 // -- lec --
