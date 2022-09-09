@@ -92,5 +92,6 @@
         "xtree": "cpp",
         "xutility": "cpp"
     },
-    "testMate.cpp.log.logpanel": true
+    "testMate.cpp.log.logpanel": false,
+    "testMate.cpp.discovery.loadOnStartup": true
 }
