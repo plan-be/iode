@@ -184,6 +184,13 @@ Table::~Table()
 	if(c_table) T_free(c_table);
 }
 
+// required to be used in std::map
+Table& Table::operator=(const Table& table)
+{
+    this->c_table = create_table_deep_copy(table.c_table);
+    return *this;
+}
+
 // ================ TABLE ================
 
 void Table::extend()

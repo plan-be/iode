@@ -148,6 +148,13 @@ Equation::~Equation()
     if (c_equation) E_free(c_equation);
 }
 
+// required to be used in std::map
+Equation& Equation::operator=(const Equation& eq)
+{
+    this->c_equation = create_equation_deep_copy(eq.c_equation);
+    return *this;
+}
+
 // -- lec --
 
 std::string Equation::get_lec() const
