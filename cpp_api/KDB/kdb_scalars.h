@@ -1,5 +1,6 @@
 #pragma once
 #include "kdb_template.h"
+#include "objects/scalar.h"
 
 
 class KDBScalars : public KDBTemplate<Scalar>
