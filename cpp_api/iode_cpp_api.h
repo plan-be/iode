@@ -10,6 +10,7 @@
 #include "time/sample.h"
 #include "objects/equation.h"
 #include "objects/table.h"
+#include "objects/scalar.h"
 #include "KDB/kdb_global.h"
 #include "KDB/kdb_comments.h"
 #include "KDB/kdb_equations.h"

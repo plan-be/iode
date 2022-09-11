@@ -8,7 +8,6 @@
 using Comment = std::string;
 using Identity = IDT;
 using List = std::string;
-using Scalar = SCL;
 using Variable = std::vector<IODE_REAL>;
 
 
