@@ -9,6 +9,7 @@
 #include "time/period.h"
 #include "time/sample.h"
 #include "objects/equation.h"
+#include "objects/identity.h"
 #include "objects/table.h"
 #include "objects/scalar.h"
 #include "KDB/kdb_global.h"

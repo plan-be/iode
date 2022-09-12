@@ -6,19 +6,12 @@
 
 Identity KDBIdentities::copy_obj(const Identity& original) const
 {
-    Identity identity_copy;
-    identity_copy.lec = (char*) SCR_stracpy((unsigned char*) original.lec);
-    identity_copy.clec = (CLEC*) SW_nalloc(sizeof(CLEC));
-    memcpy(identity_copy.clec, original.clec, sizeof(CLEC));
-    return identity_copy;
+    return Identity(original);
 }
 
 Identity KDBIdentities::get_unchecked(const int pos) const
 {
-    Identity identity;
-    identity.lec = KILEC(get_KDB(), pos);
-    identity.clec = KICLEC(get_KDB(), pos);
-    return identity;
+    return Identity(pos, get_KDB());
 }
 
 std::string KDBIdentities::get_lec(const int pos) const
