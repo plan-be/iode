@@ -74,13 +74,13 @@ TEST_F(KDBIdentitiesTest, Get)
 
     // by position
     Identity identity_pos = kdb.get(pos);
-    EXPECT_EQ(identity_pos.lec, expected_lec);
-    EXPECT_EQ(identity_pos.clec, expected_clec);
+    EXPECT_EQ(identity_pos.get_lec(), expected_lec);
+    EXPECT_TRUE(memcmp(identity_pos.get_clec(), expected_clec, expected_clec->tot_lg) == 0);
 
     // by name
     Identity identity_name = kdb.get(name);
-    EXPECT_EQ(identity_name.lec, expected_lec);
-    EXPECT_EQ(identity_name.clec, expected_clec);
+    EXPECT_EQ(identity_name.get_lec(), expected_lec);
+    EXPECT_TRUE(memcmp(identity_name.get_clec(), expected_clec, expected_clec->tot_lg) == 0);
 }
 
 TEST_F(KDBIdentitiesTest, GetNames)
@@ -114,11 +114,12 @@ TEST_F(KDBIdentitiesTest, Update)
 
 TEST_F(KDBIdentitiesTest, Copy)
 {
-    std::string name = kdb.get_name(0);
+    int pos = 0;
+    std::string name = kdb.get_name(pos);
 
     Identity identity_copy = kdb.copy(name);
 
-    EXPECT_EQ(std::string(identity_copy.lec), kdb.get_lec(name));
+    EXPECT_EQ(identity_copy.get_lec(), kdb.get_lec(name));
 }
 
 TEST_F(KDBIdentitiesTest, Filter)
