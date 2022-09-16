@@ -33,6 +33,25 @@ TEST_F(KDBCommentsTest, Save)
     kdb.dump(output_test_dir + "fun.ac");
 }
 
+TEST_F(KDBCommentsTest, Filename)
+{
+    std::string expected_filename = input_test_dir + "fun.cmt";
+    std::string filename = kdb.get_filename();
+    // WARNING: for a weird reason the filename is set to lower case when the present 
+    // test is runned on Github Actions virtual machine (Windows Server)
+    for(auto& c : expected_filename) c = tolower(c);
+    for(auto& c : filename) c = tolower(c);
+    EXPECT_EQ(filename, expected_filename);
+
+    std::string new_filename = output_test_dir + "fun.ac";
+    kdb.set_filename(new_filename);
+    filename = kdb.get_filename();
+    
+    for(auto& c : new_filename) c = tolower(c);
+    for(auto& c : filename) c = tolower(c);
+    EXPECT_EQ(filename, new_filename);
+}
+
 TEST_F(KDBCommentsTest, GetName)
 {
     std::string name; 
