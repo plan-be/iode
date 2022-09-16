@@ -30,9 +30,9 @@
  * 
  * Unpacking functions
  * -------------------- 
- *      TBL* K_tunpack(char *pack)      Creates a TBL struct from a packed TBL 
- *      EQ* K_eunpack(char *pack)       Creates a EQ struct from a packed EQ
- *      IDT* K_iunpack(char* pack)      Creates a IDT struct from a packed IDT
+ *      TBL* K_tunpack(char *pack)       Creates a TBL struct from a packed TBL 
+ *      EQ*  K_eunpack(char *pack)       Creates an EQ struct from a packed EQ
+ *      IDT* K_iunpack(char *pack)       Creates an IDT struct from a packed IDT
  * 
  * Allocation functions (VAR & SCL only)
  * -------------------------------------
@@ -516,16 +516,6 @@ int (*K_pack[])() = {
  * in the current archicture (32|64).
  */
 
-/*
- * Empty functions : to delete ?
- */
-/*void K_cunpack() { }
-void K_iunpack() { }
-void K_lunpack() { }
-void K_sunpack() { }
-void K_vunpack() { } 
-void K_onpack() { } 
-*/
 
 /**
  * Unpacks a packed TBL into a TBL structure in the current architecture (32|64 bits).
@@ -658,7 +648,7 @@ static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 {
     int pos_tl_type;
 
-    // Copy de tl_type � la fin
+    // Copy de tl_type à la fin
 
     pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
     memcpy((char*)&tl64->tl_type, (char*)&tl32->tl_type, sizeof(TLINE32) - pos_tl_type);
@@ -682,7 +672,7 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     pos_t_div = K_pos_struct(tbl32, &tbl32->t_div);
     memcpy((char*)tbl64, (char*)tbl32, pos_t_div);
 
-    // Copy de t_zmin � la fin
+    // Copy de t_zmin à la fin
     pos_t_zmin = K_pos_struct(tbl32, &tbl32->t_zmin);
     memcpy((char*)&tbl64->t_zmin, (char*)&tbl32->t_zmin, sizeof(TBL32) - pos_t_zmin);
 
@@ -830,24 +820,21 @@ EQ* K_eunpack(char *pack)
     return(eq);
 }
 
+
 /**
- * Unpacks a packed IDT into a IDT structure.
+ * Unpacks a packed IDT into an allocated IDT structure..
  * 
- * @param [in]      pack    char *     packed IDT
- *
- * @return IDT *     allocated IDT
+ * @param [in]  char*     pack   packed IDT
+ * @return      IDT *            allocated IDT structure 
 */
 
 IDT* K_iunpack(char* pack)
 {
     int len = 0;
-
     IDT* idt = (IDT*) SW_nalloc(sizeof(IDT));
 
     len = P_get_len(pack, 0);
-    idt->lec = SW_nalloc(len);
-    memcpy(idt->lec, P_get_ptr(pack, 0), len);
-
+    idt->lec = SCR_stracpy(P_get_ptr(pack, 0));
     len = P_get_len(pack, 1);
     idt->clec = (CLEC*) SW_nalloc(len);
     memcpy(idt->clec, P_get_ptr(pack, 1), len);

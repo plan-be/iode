@@ -451,6 +451,7 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
     double  calc_val;
     PERIOD  *per;
     char    aper[24];
+    int     rc;
     
     per = PER_addper(&(KSMPL(KV_WS)->s_p1), t);
     PER_pertoa(per, aper);
@@ -458,7 +459,8 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
     clec = L_cc(lec);
     //S4ASSERT ("L_cc", clec != 0);
     //S4ASSERT ("L_link", 0 == L_link(KV_WS, KS_WS, clec));
-    L_link(KV_WS, KS_WS, clec);
+    rc = L_link(KV_WS, KS_WS, clec);
+    S4ASSERT(rc == 0, "L_link(\"%s\") == 0", lec);
     calc_val = L_exec(KV_WS, KS_WS, clec, t);
     //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
     S4ASSERT(U_test_eq(expected_val, calc_val), "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
@@ -1503,16 +1505,18 @@ void Tests_B_IDT()
     S4ASSERT(U_test_eq(C[2], 6.0*2 - 0.92921251 ), "C[2] ==6.0*2 - 0.92921251");
 }
 
-void Tests_B_XODE()
+void Tests_IMP_EXP()
 {
     char    outfile[256];
     char    reffile[256];
     char    varfile[256];
     char    cmtfile[256];
+    char    rulefile[256];
+    char    cmd[512];
     char    trace[] = " ";    
     int     cond, rc;
     
-    U_test_print_title("Tests XODE: Export CSV and rcsv");
+    U_test_print_title("Tests EXP: Export CSV and rcsv");
 
     U_test_suppress_kmsg_msgs();
 
@@ -1535,21 +1539,154 @@ void Tests_B_XODE()
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
     S4ASSERT(cond == 1, "EXP_RuleExport(\" \", NULL, \"%s\", \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", \"#N/A\", \";\", EXP_RCSV)", outfile, varfile, cmtfile);
 
-    U_test_print_title("Tests XODE: Import Ascii and Rotated Ascii");
-
+    U_test_print_title("Tests IMP: Import Ascii");
     
     sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
-    
     rc = IMP_RuleImport(K_VAR, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
-    
     S4ASSERT(rc == 0, "IMP_RuleImport(K_VAR, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMP_FMT_ASCII, 0)", outfile, reffile);
+    
     KV_WS = K_interpret(K_VAR, outfile);  
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+    
+    
     U_test_reset_kmsg_msgs(); 
 
 }
 
+
+void Tests_B_XODE()
+{
+    char    outfile[256];
+    char    reffile[256];
+    char    cmtfile[256];
+    char    rulefile[256];
+    char    cmd[512];
+    char    trace[] = " ";
+    int     cond, rc;
+    
+    U_test_print_title("Tests XODE: Import ASCII via report function");
+    U_test_suppress_kmsg_msgs();
+
+    sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
+    sprintf(rulefile, "%s\\rules.txt", IODE_DATA_DIR);
+    sprintf(cmd, "ASCII \"%s\" %s %s 2000Y1 2010Y1", rulefile, reffile, outfile);
+
+    rc = B_FileImportVar(cmd);
+    S4ASSERT(rc == 0, "B_FileImportVar(\"%s\")", cmd);
+    
+    KV_WS = K_interpret(K_VAR, outfile);  
+    U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+    
+    U_test_reset_kmsg_msgs(); 
+
+}
+
+
+void Tests_B_LTOH()
+{
+    char    cmd[512];
+    char    varfile[256];
+    SAMPLE  *smpl;
+    int     rc;
+
+    U_test_print_title("Tests B_LTOH: convert low periodicity to high periodicity");
+    U_test_suppress_kmsg_msgs();
+
+    // Clear the vars and set the sample for the variable WS
+    K_clear(KV_WS);
+    smpl = PER_atosmpl("2010Q1", "2020Q4");
+    KV_sample(KV_WS, smpl);
+    SCR_free(smpl);
+    
+    sprintf(varfile, "%s\\fun.var", IODE_DATA_DIR);
+    
+    // Linear interpolation / stock
+    sprintf(cmd, "L %s ACAF", varfile);
+    rc = B_WsLtoHStock(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHStock(\"%s\")", cmd);
+    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -79.729132);
+    
+    // Linear interpolation / flow
+    sprintf(cmd, "L %s ACAG", varfile);
+    rc = B_WsLtoHFlow(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHFlow(\"%s\")", cmd);
+    U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.105075);
+        
+    // Cubic Splines / stock
+    sprintf(cmd, "C %s ACAF", varfile);
+    rc = B_WsLtoHStock(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHStock(\"%s\")", cmd);
+    U_test_lec("ACAF[2012Q3]", "ACAF[2012Q3]", 0, -52.805666 );
+    
+    // Cubic splines / flow
+    sprintf(cmd, "C %s ACAG", varfile);
+    rc = B_WsLtoHFlow(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHFlow(\"%s\")", cmd);
+    U_test_lec("ACAG[2012Q3]", "ACAG[2012Q3]", 0, 7.6135768);
+    
+    // Step / stock
+    sprintf(cmd, "S %s ACAF", varfile);
+    rc = B_WsLtoHStock(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHStock(\"%s\")", cmd);
+    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -83.34062);
+    
+    // Step / flow
+    sprintf(cmd, "S %s ACAG", varfile);
+    rc = B_WsLtoHFlow(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHFlow(\"%s\")", cmd);
+    U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.1050747);
+
+    U_test_reset_kmsg_msgs(); 
+}
+
+void Tests_B_HTOL()
+{
+    char    cmd[512];
+    char    varfile[256];
+    SAMPLE  *smpl;
+    int     rc;
+    //char    current_dir[256];
+    
+    //getcwd(current_dir, sizeof(current_dir));
+    //printf("%s\n", current_dir);
+
+    U_test_print_title("Tests B_HTOL: convert high periodicity to low periodicity");
+    U_test_suppress_kmsg_msgs();
+
+    // Clear the vars and set the sample for the variable WS
+    K_clear(KV_WS);
+    smpl = PER_atosmpl("2000Y1", "2020Y1");
+    KV_sample(KV_WS, smpl);
+    SCR_free(smpl);
+    
+    sprintf(varfile, "%s\\fun_q.var", IODE_DATA_DIR);
+    
+    // Last Obs
+    sprintf(cmd, "%s ACAF", varfile);
+    rc = B_WsHtoLLast(cmd);
+    S4ASSERT(rc == 0, "B_WsHtoLLast(\"%s\")", cmd);
+    U_test_lec("ACAF[2014Y1]", "ACAF[2014Y1]", 0, -83.340625);
+    
+    // Mean
+    sprintf(cmd, "%s ACAG", varfile);
+    rc = B_WsHtoLMean(cmd);
+    S4ASSERT(rc == 0, "B_WsHtoLMean1(\"%s\")", cmd);
+    U_test_lec("ACAG[2014Y1]", "ACAG[2014Y1]", 0, 8.1050747);
+        
+    // Sum
+    sprintf(cmd, "%s AOUC", varfile);
+    rc = B_WsHtoLSum(cmd);
+    S4ASSERT(rc == 0, "B_WsLtoHStock(\"%s\")", cmd);
+    U_test_lec("AOUC[2014Y1]", "AOUC[2014Y1]", 0, 1.423714 );
+    
+    U_test_reset_kmsg_msgs();   
+}
+
+void Tests_B_Model()
+{
+}
 
 // ================================================================================================
 
@@ -1613,7 +1750,13 @@ int main(int argc, char **argv)
     Tests_B_EQS();
     Tests_B_FILE();
     Tests_B_FSYS();
+    Tests_IMP_EXP();
+    
     Tests_B_XODE();
+    Tests_B_LTOH();
+    Tests_B_HTOL();
+    
+    Tests_B_Model();
    
     //K_save_iode_ini(); // Suppress that call ? Should only be called on demand, not at the end of each IODE session.
     
@@ -1659,7 +1802,7 @@ REPORT PRIMITIVES
     "rmdir",                    RP_rmdir,               RP_rmdir,           0,
     
     // fonctions utilisateur 
-    "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,
+X   "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,
     "fileimportcmt",            B_FileImportCmt,        SB_XodeRuleImport,  0,
 X   "filedelete",               B_FileDelete,           NULL,               4,
 X   "filerename",               B_FileRename,           NULL,               4,
@@ -1681,11 +1824,11 @@ X   "filecopy",                 B_FileCopy,             NULL,               4,
     "wsaggrsum",                B_WsAggrSum,            SB_WsAggregate,     0,
     "wsaggrmean",               B_WsAggrMean,           SB_WsAggregate,     0,
     "wsaggrprod",               B_WsAggrProd,           SB_WsAggregate,     0,
-    "wshtollast",               B_WsHtoLLast,           SB_WsHtoL,          0,
-    "wshtolsum",                B_WsHtoLSum,            SB_WsHtoL,          0,
-    "wshtolmean",               B_WsHtoLMean,           SB_WsHtoL,          0,
-    "wsltohflow",               B_WsLtoHFlow,           SB_WsLtoH,          0,
-    "wsltohstock",              B_WsLtoHStock,          SB_WsLtoH,          0,
+X   "wshtollast",               B_WsHtoLLast,           SB_WsHtoL,          0,
+X   "wshtolsum",                B_WsHtoLSum,            SB_WsHtoL,          0,
+X   "wshtolmean",               B_WsHtoLMean,           SB_WsHtoL,          0,
+X   "wsltohflow",               B_WsLtoHFlow,           SB_WsLtoH,          0,
+X   "wsltohstock",              B_WsLtoHStock,          SB_WsLtoH,          0,
     "wsseasonadj",              B_WsSeasonAdj,          SB_WsSeasonAdj,     0,
     "wstrend",                  B_WsTrend,              SB_WsTrend,         0,
     "wstrendstd",               B_WsTrendStd,           SB_WsTrend,         0,

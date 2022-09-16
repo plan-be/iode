@@ -11,19 +11,27 @@
       - [Functions with a file extension suffix (csv, txt...)](#T5)
       - [Other functions](#T6)
     - [List of source files](#T7)
-    - [b\_data.c](#T8)
-      - [Functions with a suffix](#T9)
-      - [Other functions](#T10)
+    - [b\_fsys.c](#T8)
+      - [List of functions](#T9)
+    - [b\_file.c](#T10)
       - [List of functions](#T11)
-    - [b\_ras.c](#T12)
+    - [b\_xode.c](#T12)
       - [List of functions](#T13)
-    - [b\_est.c](#T14)
+    - [b\_htol.c](#T14)
       - [List of functions](#T15)
-    - [b\_fsys.c](#T16)
+    - [b\_ltoh.c](#T16)
       - [List of functions](#T17)
-    - [b\_file.c](#T18)
+    - [b\_ras.c](#T18)
       - [List of functions](#T19)
-  - [Report functions group 3: report functions](#T20)
+    - [b\_data.c](#T20)
+      - [Functions with a suffix](#T21)
+      - [Other functions](#T22)
+      - [List of functions](#T23)
+    - [b\_est.c](#T24)
+      - [List of functions](#T25)
+    - [b\_model.c](#T26)
+      - [List of functions](#T27)
+  - [Report functions group 3: report functions](#T28)
 
 # IODE: Reports {#T1}
 
@@ -116,13 +124,95 @@ For these functions, the parameters and return values are as follows:
 
 ### List of source files {#T7}
 
-- b\_data.c : functions acting on data (i.e.: IODE objects)
-- b\_ras.c : implementation of a RAS algorithm.
-- b\_est.c : estimation functions
 - b\_fsys.c : file manipulation \+ conversion from/to ansi\-oem\-utf8
 - b\_file.c : file manipulation
+- b\_xode.c : import comments and variables from various non\-IODE formats
+- b\_htol.c : transformation of high periodicity to low periodicity variables.
+- b\_ltoh.c : transformation of low periodicity series to high periodicity series.
+- b\_ras.c : implementation of a RAS algorithm.
+- b\_data.c : functions acting on data (i.e.: IODE objects)
+- b\_est.c : estimation functions
+- b\_model.c : model simulation and recompilation
 
-### b\_data.c {#T8}
+### b\_fsys.c {#T8}
+
+File manipulation and conversion from/to ansi\-oem\-utf8.
+
+#### List of functions {#T9}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_SysRename(char* arg)`|$SysMoveFile filein fileout|
+|`int B_SysCopy(char* arg)`|$SysCopyFile filein fileout|
+|`int B_SysAppend(char* arg)`|$SysAppendFile filein fileout|
+|`int B_SysDelete(char* arg)`|$SysDeleteFile file1 file2 ...|
+|`int B_SysOemToUTF8(char *arg)`|$SysOemToUTF8 inputfile outputfile|
+|`int B_SysAnsiToUTF8(char *arg)`|$SysAnsiToUTF8 inputfile outputfile|
+|`int B_SysAnsiToOem(char *arg)`|$SysAnsiToOem inputfile outputfile|
+|`int B_SysOemToAnsi(char *arg)`|$SysOemToAnsi inputfile outputfile|
+
+### b\_file.c {#T10}
+
+Functions acting on files called by the report engine (see b\_rep\_syntax.c).
+
+#### List of functions {#T11}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_FileCopy(char* arg, int type)`|$FileCopy<type> source\_file dest\_file|
+|`int B_FileRename(char* arg, int type)`|$FileRename<type> source\_file dest\_file|
+|`int B_FileDelete(char* arg, int type)`|$FileDelete<type> file1 \[file2...\]|
+
+### b\_xode.c {#T12}
+
+Report functions to import comments and variables from various non\-IODE formats.
+
+#### List of functions {#T13}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_FileImportCmt(char* arg)`|$FileImportCmt format rule infile outfile language \[trace\]|
+|`int B_FileImportVar(char* arg)`|$FileImportVar format rule infile outfile from to \[trace\]$FileImportVar format rule infile outfile from to \[trace\]|
+
+### b\_htol.c {#T14}
+
+Report functions to transform high periodicity to low periodicity variables.
+
+#### List of functions {#T15}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_WsHtoLLast(char* arg)`|$WsHtoLLast Filename VarList|
+|`int B_WsHtoLMean(char* arg)`|$WsHtoLMean Filename VarList|
+|`int B_WsHtoLSum(char* arg)`|$WsHtoLSum Filename VarList|
+
+### b\_ltoh.c {#T16}
+
+Report functions to transform low periodicity series to high periodicity series (i.e. variables).
+
+Two types of series are considered: stock and flow:
+
+- in the first case, the interpolated values are of the same order of magnitude as the original values
+- in the latter case, the values of the sub\-periods are additive over a period.
+
+#### List of functions {#T17}
+
+|Syntax|Equivalent in Reports|||
+|:---|:---|:---|:---|
+|`int B_WsLtoHStock(char* arg)`|$WsLtoHStock \{L|C|S\} Filename VarList|
+|`int B_WsLtoHFlow(char* arg)`|$WsLtoHFlow \{L|C|S\} Filename VarList|
+
+### b\_ras.c {#T18}
+
+Implementation of a RAS algorithm.
+
+#### List of functions {#T19}
+
+|Syntax|Description|
+|:---|:---|
+|`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
+
+### b\_data.c {#T20}
 
 Functions acting on IODE objects called by the report engine (see b\_rep\_syntax.c) and their sub\-functions.
 
@@ -130,7 +220,7 @@ These functions all have a similar syntax and always return an integer as return
 
 There are 2 groups of functions, one where a suffix is required, one with no suffix.
 
-#### Functions with a suffix {#T9}
+#### Functions with a suffix {#T21}
 
 Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate required a suffix indicating which type of objects is the target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
 
@@ -160,7 +250,7 @@ generates the C call:
     where arg == "A B C" and type == K_VAR   
 ```
 
-#### Other functions {#T10}
+#### Other functions {#T22}
 
 All other functions receive simply the argument on the report line. B\_DataListSort(), for example, has only one argument.
 
@@ -171,7 +261,7 @@ For these functions, the parameters and return values are as follows:
 @return     int             0 on success, -1 on error (not enough args)
 ```
 
-#### List of functions {#T11}
+#### List of functions {#T23}
 
 |Syntax|Description|
 |:---|:---|
@@ -196,17 +286,7 @@ For these functions, the parameters and return values are as follows:
 |`int B_DataDisplayGraph(char* arg)`|Shows VARs or combinations of VARS in graphical form.|
 |`int B_DataPrintGraph(char* arg)`|Prints VARs or combinations of VARS in graphical form.|
 
-### b\_ras.c {#T12}
-
-Implementation of a RAS algorithm.
-
-#### List of functions {#T13}
-
-|Syntax|Description|
-|:---|:---|
-|`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
-
-### b\_est.c {#T14}
+### b\_est.c {#T24}
 
 Estimation functions called in IODE reports.
 
@@ -220,7 +300,7 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
         the return code is 0 on success, any other value indicating and error
 ```
 
-#### List of functions {#T15}
+#### List of functions {#T25}
 
 |Syntax|Description|
 |:---|:---|
@@ -232,34 +312,22 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
 |`int B_EqsSetCmt(char* arg)`|Implementation of the report function $EqsSetCmt.|
 |`int B_EqsSetInstrs(char* arg)`|Implementation of the report function $EqsSetInstrs.|
 
-### b\_fsys.c {#T16}
+### b\_model.c {#T26}
 
-File manipulation and conversion from/to ansi\-oem\-utf8.
+Report functions related to model simulations.
 
-#### List of functions {#T17}
+#### List of functions {#T27}
 
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_SysRename(char* arg)`|$SysMoveFile filein fileout|
-|`int B_SysCopy(char* arg)`|$SysCopyFile filein fileout|
-|`int B_SysAppend(char* arg)`|$SysAppendFile filein fileout|
-|`int B_SysDelete(char* arg)`|$SysDeleteFile file1 file2 ...|
-|`int B_SysOemToUTF8(char *arg)`|$SysOemToUTF8 inputfile outputfile|
-|`int B_SysAnsiToUTF8(char *arg)`|$SysAnsiToUTF8 inputfile outputfile|
-|`int B_SysAnsiToOem(char *arg)`|$SysAnsiToOem inputfile outputfile|
-|`int B_SysOemToAnsi(char *arg)`|$SysOemToAnsi inputfile outputfile|
+|Syntax|Equivalent in Reports|||||
+|:---|:---|:---|:---|:---|:---|
+|`int B_ModelSimulate(char *arg)`|$ModelSimulate per\_from per\_to equation\_list|||||
+|`int B_ModelSimulateParms(char* arg)`|$ModelSimulateParms eps relax maxit \{Connex|Triang|None \} 0 \- 4 (starting values) \{Yes|no \} \{yes|No \} nbtri|
+|`int B_ModelExchange(char* arg)`|$ModelExchange eqname1\-varname1,eqname2\-varname2,...|||||
+|`int B_ModelCompile(char* arg)`|$ModelCompile \[eqname1, eqname2, ... \]|||||
+|`int B_ModelCalcSCC(char *arg)`|$ModelCalcSCC nbtris prename intername postname \[eqs\]|||||
+|`int B_ModelSimulateSCC(char *arg)`|$ModelSimulateSCC from to pre inter post|||||
+|`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|||||
+|`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|||||
 
-### b\_file.c {#T18}
-
-Functions acting on files called by the report engine (see b\_rep\_syntax.c).
-
-#### List of functions {#T19}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_FileCopy(char* arg, int type)`|$FileCopy<type> source\_file dest\_file|
-|`int B_FileRename(char* arg, int type)`|$FileRename<type> source\_file dest\_file|
-|`int B_FileDelete(char* arg, int type)`|$FileDelete<type> file1 \[file2...\]|
-
-## Report functions group 3: report functions {#T20}
+## Report functions group 3: report functions {#T28}
 
