@@ -335,6 +335,7 @@ public:
 	    double  calc_val;
 	    PERIOD  *per;
 	    char    aper[24];
+	    int     rc;
 	
 	    per = PER_addper(&(KSMPL(KV_WS)->s_p1), t);
 	    PER_pertoa(per, aper);
@@ -342,7 +343,8 @@ public:
 	    clec = L_cc(lec);
 	    //S4ASSERT ("L_cc", clec != 0);
 	    //S4ASSERT ("L_link", 0 == L_link(KV_WS, KS_WS, clec));
-	    L_link(KV_WS, KS_WS, clec);
+	    rc = L_link(KV_WS, KS_WS, clec);
+	    EXPECT_EQ(rc, 0);
 	    calc_val = L_exec(KV_WS, KS_WS, clec, t);
 	    //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
 	    EXPECT_TRUE(U_test_eq(expected_val, calc_val));
@@ -1327,16 +1329,18 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_XODE)
+TEST_F(IodeCAPITest, Tests_IMP_EXP)
 {
     char    outfile[256];
     char    reffile[256];
     char    varfile[256];
     char    cmtfile[256];
+    char    rulefile[256];
+    char    cmd[512];
     char    trace[] = " ";
     int     cond, rc;
 
-    U_test_print_title("Tests XODE: Export CSV and rcsv");
+    U_test_print_title("Tests EXP: Export CSV and rcsv");
 
     U_test_suppress_kmsg_msgs();
 
@@ -1359,19 +1363,155 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
     EXPECT_EQ(cond, 1);
 
-    U_test_print_title("Tests XODE: Import Ascii and Rotated Ascii");
-
+    U_test_print_title("Tests IMP: Import Ascii");
 
     sprintf(reffile, "%s\\fun_xode.av.ref", input_test_dir);
     sprintf(outfile, "%s\\fun_xode.var", output_test_dir);
-
     rc = IMP_RuleImport(K_VAR, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
-
     EXPECT_EQ(rc, 0);
+
     KV_WS = K_interpret(K_VAR, outfile);
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+
+
     U_test_reset_kmsg_msgs();
 
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_XODE)
+{
+    char    outfile[256];
+    char    reffile[256];
+    char    cmtfile[256];
+    char    rulefile[256];
+    char    cmd[512];
+    char    trace[] = " ";
+    int     cond, rc;
+
+    U_test_print_title("Tests XODE: Import ASCII via report function");
+    U_test_suppress_kmsg_msgs();
+
+    sprintf(reffile, "%s\\fun_xode.av.ref", input_test_dir);
+    sprintf(outfile, "%s\\fun_xode.var", output_test_dir);
+    sprintf(rulefile, "%s\\rules.txt", input_test_dir);
+    sprintf(cmd, "ASCII \"%s\" %s %s 2000Y1 2010Y1", rulefile, reffile, outfile);
+
+    rc = B_FileImportVar(cmd);
+    EXPECT_EQ(rc, 0);
+
+    KV_WS = K_interpret(K_VAR, outfile);
+    U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+
+    U_test_reset_kmsg_msgs();
+
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_LTOH)
+{
+    char    cmd[512];
+    char    varfile[256];
+    SAMPLE  *smpl;
+    int     rc;
+
+    U_test_print_title("Tests B_LTOH: convert low periodicity to high periodicity");
+    U_test_suppress_kmsg_msgs();
+
+    // Clear the vars and set the sample for the variable WS
+    K_clear(KV_WS);
+    smpl = PER_atosmpl("2010Q1", "2020Q4");
+    KV_sample(KV_WS, smpl);
+    SCR_free(smpl);
+
+    sprintf(varfile, "%s\\fun.var", input_test_dir);
+
+    // Linear interpolation / stock
+    sprintf(cmd, "L %s ACAF", varfile);
+    rc = B_WsLtoHStock(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -79.729132);
+
+    // Linear interpolation / flow
+    sprintf(cmd, "L %s ACAG", varfile);
+    rc = B_WsLtoHFlow(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.105075);
+
+    // Cubic Splines / stock
+    sprintf(cmd, "C %s ACAF", varfile);
+    rc = B_WsLtoHStock(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAF[2012Q3]", "ACAF[2012Q3]", 0, -52.805666 );
+
+    // Cubic splines / flow
+    sprintf(cmd, "C %s ACAG", varfile);
+    rc = B_WsLtoHFlow(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAG[2012Q3]", "ACAG[2012Q3]", 0, 7.6135768);
+
+    // Step / stock
+    sprintf(cmd, "S %s ACAF", varfile);
+    rc = B_WsLtoHStock(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -83.34062);
+
+    // Step / flow
+    sprintf(cmd, "S %s ACAG", varfile);
+    rc = B_WsLtoHFlow(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.1050747);
+
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_HTOL)
+{
+    char    cmd[512];
+    char    varfile[256];
+    SAMPLE  *smpl;
+    int     rc;
+    //char    current_dir[256];
+
+    //getcwd(current_dir, sizeof(current_dir));
+    //printf("%s\n", current_dir);
+
+    U_test_print_title("Tests B_HTOL: convert high periodicity to low periodicity");
+    U_test_suppress_kmsg_msgs();
+
+    // Clear the vars and set the sample for the variable WS
+    K_clear(KV_WS);
+    smpl = PER_atosmpl("2000Y1", "2020Y1");
+    KV_sample(KV_WS, smpl);
+    SCR_free(smpl);
+
+    sprintf(varfile, "%s\\fun_q.var", input_test_dir);
+
+    // Last Obs
+    sprintf(cmd, "%s ACAF", varfile);
+    rc = B_WsHtoLLast(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAF[2014Y1]", "ACAF[2014Y1]", 0, -83.340625);
+
+    // Mean
+    sprintf(cmd, "%s ACAG", varfile);
+    rc = B_WsHtoLMean(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("ACAG[2014Y1]", "ACAG[2014Y1]", 0, 8.1050747);
+
+    // Sum
+    sprintf(cmd, "%s AOUC", varfile);
+    rc = B_WsHtoLSum(cmd);
+    EXPECT_EQ(rc, 0);
+    U_test_lec("AOUC[2014Y1]", "AOUC[2014Y1]", 0, 1.423714 );
+
+    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_Model)
+{
 }
 
 
