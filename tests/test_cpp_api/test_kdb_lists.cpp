@@ -206,3 +206,38 @@ TEST_F(KDBListsTest, HardCopy)
     delete local_kdb;
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
 }
+
+TEST_F(KDBListsTest, Merge)
+{
+    std::string pattern = "C*";
+
+    // create hard copies kdb
+    KDBLists kdb0(pattern, false);
+    KDBLists kdb1(pattern, false);
+    KDBLists kdb_to_merge(pattern, false);
+
+    // add an element to the KDB to be merged
+    std::string new_name = "NEW_LIST";
+    std::string new_list = "ACAF;ACAG;AOUC;AQC";
+    kdb_to_merge.add(new_name, new_list);
+
+    // modify an existing element of the KDB to be merge
+    std::string name = "COPY";
+    std::string unmodified_list = kdb_to_merge.get(name);
+    std::string modified_list = kdb_to_merge.get("COPY0") + kdb_to_merge.get("COPY1");
+    kdb_to_merge.update(name, modified_list);
+
+
+    // merge (overwrite)
+    kdb0.merge(kdb_to_merge, true);
+    // a) check kdb0 contains new item of KDB to be merged
+    EXPECT_TRUE(kdb0.contains(new_name));
+    EXPECT_EQ(kdb0.get(new_name), new_list);
+    // b) check already existing item has been overwritten
+    EXPECT_EQ(kdb0.get(name), modified_list); 
+
+    // merge (NOT overwrite)
+    kdb1.merge(kdb_to_merge, false);
+    // b) check already existing item has NOT been overwritten
+    EXPECT_EQ(kdb1.get(name), unmodified_list);
+}

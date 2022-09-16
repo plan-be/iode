@@ -231,3 +231,44 @@ TEST_F(KDBEquationsTest, HardCopy)
     delete local_kdb;
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
 }
+
+TEST_F(KDBEquationsTest, Merge)
+{
+    std::string pattern = "A*";
+
+    // create hard copies kdb
+    KDBEquations kdb0(pattern, false);
+    KDBEquations kdb1(pattern, false);
+    KDBEquations kdb_to_merge(pattern, false);
+
+    // add an element to the KDB to be merged
+    std::string new_name = "ACAF2";
+    std::string new_lec = "(ACAF2/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    std::string method = "LSQ";
+    Sample sample("1980Y1", "1996Y1");
+    std::string comment = "Equation comment";
+    std::string block = "ACAF";
+    std::string instruments = "Equation instruments";
+    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
+    bool date = true;
+    kdb_to_merge.add(new_name, new_lec, comment, method, &sample, instruments, block, tests, date);
+
+    // modify an existing element of the KDB to be merge
+    std::string name = "ACAF";
+    std::string unmodified_lec = kdb_to_merge.get_lec(name);
+    std::string modified_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    kdb_to_merge.update(name, modified_lec);
+
+    // merge (overwrite)
+    kdb0.merge(kdb_to_merge, true);
+    // a) check kdb0 contains new item of KDB to be merged
+    EXPECT_TRUE(kdb0.contains(new_name));
+    EXPECT_EQ(kdb0.get_lec(new_name), new_lec);
+    // b) check already existing item has been overwritten
+    EXPECT_EQ(kdb0.get_lec(name), modified_lec); 
+
+    // merge (NOT overwrite)
+    kdb1.merge(kdb_to_merge, false);
+    // b) check already existing item has NOT been overwritten
+    EXPECT_EQ(kdb1.get_lec(name), unmodified_lec);
+}

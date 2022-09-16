@@ -316,3 +316,37 @@ TEST_F(KDBCommentsTest, HardCopy)
     delete local_kdb;
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
 }
+
+TEST_F(KDBCommentsTest, Merge)
+{
+    std::string pattern = "A*";
+
+    // create hard copies kdb
+    KDBComments kdb0(pattern, false);
+    KDBComments kdb1(pattern, false);
+    KDBComments kdb_to_merge(pattern, false);
+
+    // add an element to the KDB to be merged
+    std::string new_name = "NEW_COMMENT";
+    std::string new_comment = "New Comment";
+    kdb_to_merge.add(new_name, new_comment);
+
+    // modify an existing element of the KDB to be merge
+    std::string name = "ACAF";
+    std::string unmodified_comment = kdb_to_merge.get(name);
+    std::string modified_comment = "Modified Comment";
+    kdb_to_merge.update(name, modified_comment);
+
+    // merge (overwrite)
+    kdb0.merge(kdb_to_merge, true);
+    // a) check kdb0 contains new item of KDB to be merged
+    EXPECT_TRUE(kdb0.contains(new_name));
+    EXPECT_EQ(kdb0.get(new_name), new_comment);
+    // b) check already existing item has been overwritten
+    EXPECT_EQ(kdb0.get(name), modified_comment); 
+
+    // merge (NOT overwrite)
+    kdb1.merge(kdb_to_merge, false);
+    // b) check already existing item has NOT been overwritten
+    EXPECT_EQ(kdb1.get(name), unmodified_comment);
+}

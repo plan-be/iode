@@ -270,3 +270,43 @@ TEST_F(KDBTablesTest, HardCopy)
     delete local_kdb;
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
 }
+
+TEST_F(KDBTablesTest, Merge)
+{
+    std::string pattern = "A*";
+
+    // create hard copies kdb
+    KDBTables kdb0(pattern, false);
+    KDBTables kdb1(pattern, false);
+    KDBTables kdb_to_merge(pattern, false);
+
+    // add an element to the KDB to be merged
+    std::string new_name = "NEW_TABLE";
+    std::string def = "A title";
+    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG", "$ENVI" };
+    bool mode = true;
+    bool files = true;
+    bool date = true;
+    kdb_to_merge.add(new_name, 2, def, vars, mode, files, date);
+    Table new_table(new_name, kdb_to_merge.get_KDB());
+
+    // modify an existing element of the KDB to be merge
+    std::string name = "ANAPRIX";
+    Table unmodified_table = kdb_to_merge.get(name);
+    Table modified_table = kdb_to_merge.copy(name);
+    modified_table.setTitle(0, "New Title");
+    kdb_to_merge.update(name, modified_table);
+
+    // merge (overwrite)
+    kdb0.merge(kdb_to_merge, true);
+    // a) check kdb0 contains new item of KDB to be merged
+    EXPECT_TRUE(kdb0.contains(new_name));
+    EXPECT_EQ(kdb0.get(new_name), new_table);
+    // b) check already existing item has been overwritten
+    EXPECT_EQ(kdb0.get(name), modified_table); 
+
+    // merge (NOT overwrite)
+    kdb1.merge(kdb_to_merge, false);
+    // b) check already existing item has NOT been overwritten
+    EXPECT_EQ(kdb1.get(name), unmodified_table);
+}
