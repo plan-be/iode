@@ -111,6 +111,8 @@ public:
 
     // Other methods
 
+    void merge(const KDBAbstract& other, const bool overwrite=true);
+
     void dump(std::string& filepath);
 
     void clear();

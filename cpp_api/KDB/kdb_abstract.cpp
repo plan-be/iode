@@ -142,6 +142,16 @@ void KDBAbstract::remove(const std::string& name)
 
 // Other methods
 
+void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
+{
+    KDB* kdb = get_KDB();
+    KDB* other_kdb = other.get_KDB();
+    if(kdb == NULL || other_kdb == NULL) throw IodeExceptionFunction("Cannot merge two " + 
+        iode_type_name + " databases", "At least one of the two databases is null");
+    int res = K_merge(kdb, other_kdb, overwrite ? 1 : 0);
+    if (res < 0) throw IodeExceptionFunction("Cannot merge two databases", "Unknown");
+}
+
 void KDBAbstract::dump(std::string& filepath)
 {
     filepath = check_filepath(filepath, iode_type, "save", false);
