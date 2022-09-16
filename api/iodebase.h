@@ -807,6 +807,11 @@ extern int B_SysAnsiToUTF8(char *arg);
 extern int B_SysAnsiToOem(char *arg);      
 extern int B_SysOemToAnsi(char *arg);   
 
+/* b_xode.c */
+extern int B_FileImportCmt(char* arg);
+extern int B_FileImportVar(char* arg);
+
+
 /* b_fedit.c */
 extern int B_FileEdit(char *);
 
@@ -823,6 +828,9 @@ extern int RP_free_tbl(unsigned char **tbl);
 extern int RP_tbl_size(unsigned char **tbl);
 extern int RP_is_cmd(char *line);
 extern U_ch **SCR_vtomsq(char* str, char* seps, int quote);
+
+/* b_rep_debug.c */
+extern void M_debug(char* txt, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6);
 
 /* b_rep.c */
 extern int B_ReportLine(char *);
@@ -999,11 +1007,15 @@ extern int B_A2mToCsv(char *);
 
 /* b_model.c */
 extern int B_ModelSimulate(char *);
-extern int B_ModelSimulateEqs(SAMPLE *,char **);
+//extern int B_ModelSimulateEqs(SAMPLE *,char **);
 extern int B_ModelSimulateParms(char *);
 extern int B_ModelExchange(char *);
 extern int B_ModelCompile(char *);
-extern int KE_compile(KDB *);
+//extern int KE_compile(KDB *);
+extern int B_ModelCalcSCC(char *arg);
+extern int B_ModelSimulateSCC(char *arg);
+extern int B_ModelSimulateSaveNIters(char *arg);
+extern int B_ModelSimulateSaveNorms(char *arg);
 
 /* b_print.c */
 extern int B_PrintVal(double );
@@ -1085,18 +1097,18 @@ extern int B_WsHtoLLast(char *);
 extern int B_WsHtoLMean(char *);
 extern int B_WsHtoLSum(char *);
 //extern int HTOL_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
-extern int B_htol(int ,char *);
+//extern int B_htol(int ,char *);
 
 /* b_ltoh.c */
 extern int B_WsLtoHStock(char *);
 extern int B_WsLtoHFlow(char *);
-extern int LTOH_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
-extern int B_ltoh(int ,char *);
-extern double LTOH_ylin(double *,double );
-extern int LTOH_lin(int ,double *,int ,double *,int ,int );
-extern int LTOH_y2cs(double *,int ,double *);
-extern double LTOH_ycs(double *,double *,double );
-extern int LTOH_cs(int ,double *,int ,double *,int ,int );
+//extern int LTOH_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *,int *);
+// extern int B_ltoh(int ,char *);
+//extern double LTOH_ylin(double *,double );
+//extern int LTOH_lin(int ,double *,int ,double *,int ,int );
+//extern int LTOH_y2cs(double *,int ,double *);
+//extern double LTOH_ycs(double *,double *,double );
+//extern int LTOH_cs(int ,double *,int ,double *,int ,int );
 
 /* b_season.c */
 extern int B_WsSeasonAdj(char *);

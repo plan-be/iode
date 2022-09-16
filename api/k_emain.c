@@ -20,13 +20,21 @@
  *  
  *      typedef struct _expdef_ { 
  *              int     (*exp_hd_fn)();     // Pointer to the function that creates the output file and writes the header
- *              char    *(*exp_code_fn)();  // Pointer to the function to create the output object name + the separator
+ *              char    *(*exp_code_fn)();  // Pointer to the function to create the output object name (aka code) + the separator
  *              char    *(*exp_cmt_fn)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file 
  *              char    *(*exp_elem_fn)();  // Pointer to the function constructing an allocated vector of one VAR values
  *              int     (*exp_vec_fn)();    // Pointer to the function saving the VAR and CMT in the output file
  *              int     (*exp_end_fn)();    // Pointer to the function that closes the output file after having written its footer
  *              FILE    *exp_fd;            // Output file descriptor (output of fopen)
  *      } EXPDEF
+ *  
+ *  Function pointer exp_code_fn()
+ *  ------------------------------
+ *  The term "code" is a generalisation of the term "name" used for IODE objects.
+ *  In the output file, a piece of information like a series or a comment will be identified by its "code".
+ *  The purpose of the function (pointer) exp_code_fn() is to transform the IODE name into a "code" which 
+ *  will be written in the output file.
+ *  
  *  
  *  A set of rules can also be defined to select and/or determine the name each object is given in the output file.
  *  
@@ -35,7 +43,7 @@
  *  Rules are defined in an external file and allow essentially two things :
  *  
  *      - limit the variables to be imported 
- *      - determine an object name from the information available in the Ascii format. 
+ *      - determine an object name (code) from the information available in the Ascii format. 
  *  
  *  Syntax of "Rules"
  *  -----------------
