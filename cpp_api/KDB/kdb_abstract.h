@@ -54,6 +54,10 @@ public:
 
     bool is_local_kdb() const { return kdb_type == KDB_LOCAL; }
 
+    std::string get_filename() const { return get_kdb_filename(get_KDB()); }
+
+    void set_filename(const std::string& filename) { set_kdb_filename(get_KDB(), filename); }
+
     int get_position(const std::string& name) const
     {
         check_name(name, iode_type);
