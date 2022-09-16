@@ -43,7 +43,10 @@ KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& patter
 
 KDBAbstract::~KDBAbstract()
 {
-    if (local_kdb) K_free_kdb(local_kdb);
+    // frees a KDB and its contents.
+    if (kdb_type == KDB_LOCAL) K_free(local_kdb);
+    // the KDB struct is deleted (freed) but not the objects.
+    if(kdb_type == KDB_SHALLOW_COPY) K_free_kdb(local_kdb);
 }
 
 // object name
