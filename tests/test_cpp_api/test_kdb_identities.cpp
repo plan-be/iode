@@ -309,3 +309,37 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     EXPECT_DOUBLE_EQ(computed_gap2[9], expected_gap2[9]);
     EXPECT_DOUBLE_EQ(computed_gap_[9], expected_gap_[9]);
 }
+
+TEST_F(KDBIdentitiesTest, Merge)
+{
+    std::string pattern = "A*";
+
+    // create hard copies kdb
+    KDBIdentities kdb0(pattern, false);
+    KDBIdentities kdb1(pattern, false);
+    KDBIdentities kdb_to_merge(pattern, false);
+
+    // add an element to the KDB to be merged
+    std::string new_name = "NEW_IDENTITY";
+    std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
+    kdb_to_merge.add(new_name, new_lec);
+
+    // modify an existing element of the KDB to be merge
+    std::string name = "AOUC";
+    std::string unmodified_lec = kdb_to_merge.get_lec(name);
+    std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
+    kdb_to_merge.update(name, modified_lec);
+
+    // merge (overwrite)
+    kdb0.merge(kdb_to_merge, true);
+    // a) check kdb0 contains new item of KDB to be merged
+    EXPECT_TRUE(kdb0.contains(new_name));
+    EXPECT_EQ(kdb0.get_lec(new_name), new_lec);
+    // b) check already existing item has been overwritten
+    EXPECT_EQ(kdb0.get_lec(name), modified_lec); 
+
+    // merge (NOT overwrite)
+    kdb1.merge(kdb_to_merge, false);
+    // b) check already existing item has NOT been overwritten
+    EXPECT_EQ(kdb1.get_lec(name), unmodified_lec);
+}

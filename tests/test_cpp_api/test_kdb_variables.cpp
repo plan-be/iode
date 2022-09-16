@@ -363,3 +363,44 @@ TEST_F(KDBVariablesTest, HardCopy)
     delete local_kdb;
     EXPECT_EQ(global_kdb.count(), nb_total_comments);
 }
+
+TEST_F(KDBVariablesTest, Merge)
+{
+    std::string pattern = "A*";
+
+    // create hard copies kdb
+    KDBVariables kdb0(pattern, false);
+    KDBVariables kdb1(pattern, false);
+    KDBVariables kdb_to_merge(pattern, false);
+
+    int nb_periods = kdb_to_merge.get_nb_periods();
+
+    // add an element to the KDB to be merged
+    std::string new_name = "NEW_VARIABLE";
+    Variable new_var;
+    new_var.reserve(nb_periods);
+    for (int p = 0; p < nb_periods; p++) new_var.push_back(10. + p);
+    kdb_to_merge.add(new_name, new_var);
+
+    // modify an existing element of the KDB to be merge
+    std::string name = "ACAF";
+    Variable unmodified_var = kdb_to_merge.get(name);
+    std::string lec = "10 + t";
+    Variable modified_var;
+    modified_var.reserve(nb_periods);
+    for (int p = 0; p < nb_periods; p++) modified_var.push_back(10. + p);
+    kdb_to_merge.update(name, lec);
+
+    // merge (overwrite)
+    kdb0.merge(kdb_to_merge, true);
+    // a) check kdb0 contains new item of KDB to be merged
+    EXPECT_TRUE(kdb0.contains(new_name));
+    EXPECT_EQ(kdb0.get(new_name), new_var);
+    // b) check already existing item has been overwritten
+    EXPECT_EQ(kdb0.get(name), modified_var); 
+
+    // merge (NOT overwrite)
+    kdb1.merge(kdb_to_merge, false);
+    // b) check already existing item has NOT been overwritten
+    EXPECT_EQ(kdb1.get(name), unmodified_var);
+}
