@@ -51,57 +51,6 @@ char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern
     }
 }
 
-static int copy_item_kdb(KDB* source_kdb, KDB* dest_kdb, const int pos_source_kdb, char* obj_name)
-{
-    int pos;
-    short iode_type = source_kdb->k_type;
-
-    switch (iode_type)
-    {
-    case I_COMMENTS:
-        char* comment;
-        comment = (char*) KCVAL(source_kdb, pos_source_kdb);
-        pos = K_add(dest_kdb, obj_name, comment);
-        break;
-    case I_EQUATIONS:
-        EQ* eq;
-        eq = KEVAL(source_kdb, pos_source_kdb);
-        pos = K_add(dest_kdb, obj_name, eq, obj_name);
-        break;
-    case I_IDENTITIES:
-        char* lec;
-        lec = (char*) KILEC(source_kdb, pos_source_kdb);
-        pos = K_add(dest_kdb, obj_name, lec);
-        break;
-    case I_LISTS:
-        char* list;
-        list = (char*) KLVAL(source_kdb, pos_source_kdb);
-        pos = K_add(dest_kdb, obj_name, list);
-        break;
-    case I_SCALARS:
-        SCL* scalar;
-        scalar = KSVAL(source_kdb, pos_source_kdb);
-        pos = K_add(dest_kdb, obj_name, scalar);
-        break;
-    case I_TABLES:
-        TBL* table;
-        table = KTVAL(source_kdb, pos_source_kdb);
-        pos = K_add(dest_kdb, obj_name, table);
-        break;
-    case I_VARIABLES:
-    {
-        int nb_objs = KSMPL(KV_WS)->s_nb;                  
-        IODE_REAL* var = KVVAL(source_kdb, pos_source_kdb, 0);
-        pos = K_add(dest_kdb, obj_name, var, &nb_objs);
-        break;
-    }
-    default:
-        break;
-    }
-
-    return pos;
-}
-
 // WARNING: copying content of k_nameptr requires -Zp1 compiler option 
 KDB* hard_copy_kdb(KDB* source_kdb, char** names)
 {
@@ -114,6 +63,7 @@ KDB* hard_copy_kdb(KDB* source_kdb, char** names)
     // - k_mode = second argument of K_create()
     // - k_nameptr = "ws"
     KDB* dest_kdb = K_create(iode_type, source_kdb->k_mode);
+    if (dest_kdb == NULL) return NULL;
     // copy char k_desc[K_MAX_DESC]
     strncpy(dest_kdb->k_desc, source_kdb->k_desc, K_MAX_DESC);
     // copy char k_data[K_MAX_DESC]
@@ -127,16 +77,20 @@ KDB* hard_copy_kdb(KDB* source_kdb, char** names)
     // copy k_oname[OK_MAX_FILE]  
     strncpy(dest_kdb->k_oname, source_kdb->k_oname, OK_MAX_FILE);
 
-    int pos_source_kdb;
     int pos_dest_kdb;
-    char* obj_name;
+    char* c_obj_name;
     for (int i=0; i<nb_objs; i++)
     {
-        obj_name = names[i];
-        pos_source_kdb = K_find(source_kdb, obj_name);
-        if (pos_source_kdb < 0) return NULL;
-        pos_dest_kdb = copy_item_kdb(source_kdb, dest_kdb, pos_source_kdb, obj_name);
-        if (pos_dest_kdb < 0) return NULL;
+        c_obj_name = names[i];
+        pos_dest_kdb = K_dup(source_kdb, c_obj_name, dest_kdb, c_obj_name);
+        if (pos_dest_kdb < 0)
+        {
+            std::string obj_name = std::string(c_obj_name);
+            std::string action = "Trying to copy " + vIodeTypes[iode_type] + " named " + obj_name + " in new database";
+            if (pos_dest_kdb == -1) throw IodeExceptionFunction(action, "Object with name " + 
+                std::string(obj_name) + " does not exist in the source database");
+            else throw IodeExceptionFunction(action, "Unknown");
+        }
     }
 
     return dest_kdb;
