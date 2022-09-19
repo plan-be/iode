@@ -168,7 +168,7 @@ Table::Table(const int pos, KDB* kdb)
 Table::Table(const std::string& name, KDB* kdb)
 {
 	if (!kdb) kdb = K_WS[I_TABLES];
-	int pos = K_find(kdb, const_cast<char*>(name.c_str()));
+	int pos = K_find(kdb, to_char_array(name));
 	if (pos < 0) throw IodeExceptionFunction("Cannot extract Table", "Table with name " + name + " does not exist");
 	// Note: KTVAL allocate a new pointer TBL*
 	c_table = KTVAL(kdb, pos);
@@ -419,7 +419,7 @@ int Table::insertTitle(const int pos, const std::string& title, const bool after
 {
 	int title_pos = insertLine(pos, IT_TITLE, after);
 	std::string title_oem = utf8_to_oem(title);
-	c_table->t_line[title_pos].tl_val = const_cast<char*>(title_oem.c_str());
+	c_table->t_line[title_pos].tl_val = to_char_array(title_oem);
 	return title_pos;
 }
 
@@ -473,14 +473,14 @@ void Table::setCellText(const int row, const int column, const std::string& text
 {
 	TCELL* cell = getCell(row, column, divider);
 	std::string text_oem = utf8_to_oem(text);
-	unsigned char* c_text = reinterpret_cast<unsigned char*>(const_cast<char*>(text_oem.c_str()));
+	unsigned char* c_text = reinterpret_cast<unsigned char*>(to_char_array(text_oem));
 	T_set_string_cell(cell, c_text);
 }
 
 void Table::setCellLec(const int row, const int column, const std::string& lec, const bool divider)
 {
 	TCELL* cell = getCell(row, column, divider);
-	unsigned char* c_lec = reinterpret_cast<unsigned char*>(const_cast<char*>(lec.c_str()));
+	unsigned char* c_lec = reinterpret_cast<unsigned char*>(to_char_array(lec));
 	T_set_lec_cell(cell, c_lec);
 }
 

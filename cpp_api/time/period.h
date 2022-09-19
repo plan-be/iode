@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "utils/utils.h"
 #include "utils/iode_exceptions.h"
 
 
@@ -56,7 +57,7 @@ public:
 	 */
 	Period(const std::string str_period)
 	{ 
-		c_period = PER_atoper(const_cast<char*>(str_period.c_str()));
+		c_period = PER_atoper(to_char_array(str_period));
 		if (c_period == NULL)
 		{
 			IodeExceptionInitialization error("Period", "Unknown"); 

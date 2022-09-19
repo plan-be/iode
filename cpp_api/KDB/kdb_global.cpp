@@ -6,7 +6,7 @@ void load_global_kdb(EnumIodeType iode_type, std::string& filepath)
 {
     filepath = check_filepath(filepath, iode_type, "load", true);
 
-    char* c_filepath = const_cast<char*>(filepath.c_str());
+    char* c_filepath = to_char_array(filepath);
 
     int res = B_WsLoad(c_filepath, iode_type);
     if (res != EXIT_SUCCESS)
@@ -17,7 +17,7 @@ void save_global_kdb(EnumIodeType iode_type, std::string& filepath)
 {
     filepath = check_filepath(filepath, iode_type, "save", false);
 
-    char* c_filepath = const_cast<char*>(filepath.c_str());
+    char* c_filepath = to_char_array(filepath);
 
     int res = B_WsSave(c_filepath, iode_type);
     if (res != EXIT_SUCCESS)
@@ -39,7 +39,7 @@ char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern
     if (pattern.empty()) return NULL;
     else
     {
-        char* c_pattern = const_cast<char*>(pattern.c_str());
+        char* c_pattern = to_char_array(pattern);
         // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
         char* c_lst = K_expand(iode_type, NULL, c_pattern, '*');
         // Parses a string and replaces @filename and $listname by their contents

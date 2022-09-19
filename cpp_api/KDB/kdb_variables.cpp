@@ -107,7 +107,7 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	}
 
 	// code below is an adapted copy/paste from B_DataCalcVar() (in b_data.c)
-	char* c_lec = const_cast<char*>(lec.c_str());
+	char* c_lec = to_char_array(lec);
 	// Compiles the LEC string 
 	CLEC* clec = L_cc(c_lec);
 	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.

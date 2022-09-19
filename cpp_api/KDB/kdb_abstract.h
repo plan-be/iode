@@ -60,7 +60,7 @@ public:
     {
         check_name(name, iode_type);
         KDB* kdb = get_KDB();
-        int pos = K_find(kdb, const_cast<char*>(name.c_str()));
+        int pos = K_find(kdb, to_char_array(name));
         if (pos < 0) throw IodeExceptionFunction("Cannot get position of " + iode_type_name + " named " + name,  
             iode_type_name + " with name " + name + " does not exist.");
         return pos;
@@ -99,7 +99,7 @@ public:
 
     int rename(const std::string& old_name, const std::string& new_name);
 
-    bool contains(const std::string& name) { return K_find(get_KDB(), const_cast<char*>(name.c_str())) >= 0; }
+    bool contains(const std::string& name) { return K_find(get_KDB(), to_char_array(name)) >= 0; }
 
     // delete
 

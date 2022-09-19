@@ -8,7 +8,7 @@ private:
     void check_object_already_exists(KDB* kdb, const std::string& name)
     {
         // throw exception if object with passed name already exist
-        char* c_name = const_cast<char*>(name.c_str());
+        char* c_name = to_char_array(name);
         if (K_find(kdb, c_name) >= 0)
             throw IodeExceptionInitialization(iode_type_name + " with name " + name, 
                 iode_type_name + " with name " + name + " already exists. Use update() method instead.");
@@ -33,7 +33,7 @@ public:
 
     template<class... Args> int add_or_update(KDB* kdb, const std::string& name, Args... args)
     {
-        char* c_name = const_cast<char*>(name.c_str());
+        char* c_name = to_char_array(name);
         int pos = K_add(kdb, c_name, args...);
         if (pos == -1) throw IodeExceptionFunction("Cannot add or update " + iode_type_name + " with name " + name,  
             "Iode has not been initialized");
@@ -64,7 +64,7 @@ public:
                 check_object_already_exists(global_kdb, name);
                 int pos_global = add_or_update(global_kdb, name, args...);
                 // add new entry to shallow copy KDB
-                char* c_name = const_cast<char*>(name.c_str());
+                char* c_name = to_char_array(name);
                 pos = K_add_entry(local_kdb, c_name);
                 KSOVAL(local_kdb, pos) = KSOVAL(global_kdb, pos_global);
                 break;

@@ -33,7 +33,7 @@ std::string KDBTables::get_title(const std::string& name) const
 int KDBTables::add(const std::string& name, const int nbColumns)
 {
 	// throw exception if object with passed name already exist
-	char* c_name = const_cast<char*>(name.c_str());
+	char* c_name = to_char_array(name);
 	if (K_find(get_KDB(), c_name) >= 0) throw IodeExceptionInitialization(iode_type_name + " with name " + name,  
 		iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
@@ -54,13 +54,13 @@ int KDBTables::add(const std::string& name, const int nbColumns, const std::stri
 int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, bool mode, bool files, bool date)
 {
 	// throw exception if object with passed name already exist
-	char* c_name = const_cast<char*>(name.c_str());
+	char* c_name = to_char_array(name);
 	if (K_find(get_KDB(), c_name) >= 0) throw IodeExceptionInitialization(iode_type_name + " with name " + name,  
 		iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
-	char* c_def = const_cast<char*>(def.c_str());
+	char* c_def = to_char_array(def);
 
-	char* pattern = const_cast<char*>(lecs.c_str());
+	char* pattern = to_char_array(lecs);
 
 	// Retrieves all variable names matching one or more patterns in KV_WS (similar to grep)
 	char* lst = K_expand(I_VARIABLES, NULL, pattern, '*');

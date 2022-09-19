@@ -16,17 +16,17 @@ Comment KDBComments::get_unchecked(const int pos) const
 int KDBComments::add(const std::string& name, const Comment& comment)
 {
     std::string oem_comment = utf8_to_oem(comment);
-    return KDBTemplate::add(name, const_cast<char*>(oem_comment.c_str()));
+    return KDBTemplate::add(name, to_char_array(oem_comment));
 }
 
 void KDBComments::update(const std::string& name, const Comment& comment)
 {
     std::string oem_comment = utf8_to_oem(comment);
-    KDBTemplate::update(name, const_cast<char*>(oem_comment.c_str()));
+    KDBTemplate::update(name, to_char_array(oem_comment));
 }
 
 void KDBComments::update(const int pos, const Comment& comment)
 {
     std::string oem_comment = utf8_to_oem(comment);
-    KDBTemplate::update(pos, const_cast<char*>(oem_comment.c_str()));
+    KDBTemplate::update(pos, to_char_array(oem_comment));
 }
