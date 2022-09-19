@@ -32,6 +32,7 @@
  * -------------------- 
  *      TBL* K_tunpack(char *pack)      Creates a TBL struct from a packed TBL 
  *      EQ* K_eunpack(char *pack)       Creates a EQ struct from a packed EQ
+ *      IDT* K_iunpack(char* pack)      Creates a IDT struct from a packed IDT
  * 
  * Allocation functions (VAR & SCL only)
  * -------------------------------------
@@ -123,7 +124,7 @@ static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
 {
     int pos_tc_type;
 
-    // Copy de tl_type à la fin
+    // Copy de tl_type ï¿½ la fin
     pos_tc_type = K_pos_struct(tc32, &tc32->tc_type);
     memcpy((char*)&tc32->tc_type, (char*)&tc64->tc_type, sizeof(TCELL32) - pos_tc_type);
     if(tc64->tc_val)
@@ -146,7 +147,7 @@ static void K_tline64_32(TLINE* tl64, TLINE32* tl32)
 {
     int pos_tl_type;
 
-    // Copy de tl_type à la fin
+    // Copy de tl_type ï¿½ la fin
     pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
     memcpy((char*)&tl32->tl_type, (char*)&tl64->tl_type, sizeof(TLINE32) - pos_tl_type);
 }
@@ -169,7 +170,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
     pos_t_div = K_pos_struct(tbl32, &tbl32->t_div);
     memcpy((char*)tbl32, (char*)tbl64, pos_t_div);
 
-    // Copy de t_zmin à la fin
+    // Copy de t_zmin ï¿½ la fin
     pos_t_zmin = K_pos_struct(tbl32, &tbl32->t_zmin);
     memcpy((char*)&tbl32->t_zmin, (char*)&tbl64->t_zmin, sizeof(TBL32) - pos_t_zmin);
 
@@ -636,7 +637,7 @@ static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
 {
     int pos_tc_type;
 
-    // Copy de tl_type à la fin
+    // Copy de tl_type ï¿½ la fin
 
     pos_tc_type = K_pos_struct(tc32, &tc32->tc_type);
     memcpy((char*)&tc64->tc_type, (char*)&tc32->tc_type, sizeof(TCELL32) - pos_tc_type);
@@ -657,7 +658,7 @@ static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 {
     int pos_tl_type;
 
-    // Copy de tl_type à la fin
+    // Copy de tl_type ï¿½ la fin
 
     pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
     memcpy((char*)&tl64->tl_type, (char*)&tl32->tl_type, sizeof(TLINE32) - pos_tl_type);
@@ -681,7 +682,7 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     pos_t_div = K_pos_struct(tbl32, &tbl32->t_div);
     memcpy((char*)tbl64, (char*)tbl32, pos_t_div);
 
-    // Copy de t_zmin à la fin
+    // Copy de t_zmin ï¿½ la fin
     pos_t_zmin = K_pos_struct(tbl32, &tbl32->t_zmin);
     memcpy((char*)&tbl64->t_zmin, (char*)&tbl32->t_zmin, sizeof(TBL32) - pos_t_zmin);
 
@@ -827,6 +828,31 @@ EQ* K_eunpack(char *pack)
     memcpy(&(eq->tests), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float)); /* FLOAT 12-04-98 */
 
     return(eq);
+}
+
+/**
+ * Unpacks a packed IDT into a IDT structure.
+ * 
+ * @param [in]      pack    char *     packed IDT
+ *
+ * @return IDT *     allocated IDT
+*/
+
+IDT* K_iunpack(char* pack)
+{
+    int len = 0;
+
+    IDT* idt = (IDT*) SW_nalloc(sizeof(IDT));
+
+    len = P_get_len(pack, 0);
+    idt->lec = SW_nalloc(len);
+    memcpy(idt->lec, P_get_ptr(pack, 0), len);
+
+    len = P_get_len(pack, 1);
+    idt->clec = (CLEC*) SW_nalloc(len);
+    memcpy(idt->clec, P_get_ptr(pack, 1), len);
+
+    return idt;
 }
 
 /*-- ALLOC SCALAR AND VAR --*/
