@@ -43,7 +43,7 @@ Identity::Identity(const std::string& lec)
 Identity::Identity(const Identity& idt)
 {
     c_identity = (IDT*) SW_nalloc(sizeof(IDT));
-    c_identity->lec = (char*) SCR_stracpy((unsigned char*) idt.c_identity->lec);
+    c_identity->lec = copy_char_array(idt.c_identity->lec);
     c_identity->clec = (CLEC*) SW_nalloc(sizeof(CLEC));
     memcpy(c_identity->clec, idt.c_identity->clec, sizeof(CLEC));
 }
@@ -61,7 +61,7 @@ Identity::~Identity()
 // required to be used in std::map
 Identity& Identity::operator=(const Identity& idt)
 {
-    c_identity->lec = (char*) SCR_stracpy((unsigned char*) idt.c_identity->lec);
+    c_identity->lec = copy_char_array(idt.c_identity->lec);
     c_identity->clec = L_cc(idt.c_identity->lec);
     return *this;
 }
