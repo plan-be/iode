@@ -107,8 +107,10 @@ int K_dup(KDB* kdb1, char* name1, KDB* kdb2, char* name2)
     int     pos1, pos2, lg;
     char    *pack, *ptr;
 
+    if(kdb1 == kdb2 && strcmp(name1, name2) == 0) return(-2);   // ALD 19/09/2022
+
     pos1 = K_find(kdb1, name1);
-    if(pos1 < 0 || !strcmp(name1, name2)) return(-1);
+    if(pos1 < 0) return(-1);
 
     pos2 = K_find(kdb2, name2);
     if(pos2 >= 0) {
