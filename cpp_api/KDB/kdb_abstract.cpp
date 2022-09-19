@@ -65,8 +65,8 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
 
     check_name(new_name, iode_type);
 
-    char* c_old_name = const_cast<char*>(old_name.c_str());
-    char* c_new_name = const_cast<char*>(new_name.c_str());
+    char* c_old_name = to_char_array(old_name);
+    char* c_new_name = to_char_array(new_name);
     
     int pos;
     switch (kdb_type)
@@ -129,7 +129,7 @@ void KDBAbstract::remove(const std::string& name)
         // first delete in shallow copy KDB
         K_del_entry(local_kdb, pos);
         // then delete in global KDB
-        c_name = const_cast<char*>(name.c_str());
+        c_name = to_char_array(name);
         pos = K_find(K_WS[iode_type], c_name);
         K_del(K_WS[iode_type], pos);
         break;
@@ -155,7 +155,7 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
 void KDBAbstract::dump(std::string& filepath)
 {
     filepath = check_filepath(filepath, iode_type, "save", false);
-    char* c_filepath = const_cast<char*>(filepath.c_str());
+    char* c_filepath = to_char_array(filepath);
     if (strlen(c_filepath) >= sizeof(FNAME)) throw IodeExceptionFunction("Cannot save " + iode_type_name + "s",  
         "Filepath " + filepath + " is too long");
 

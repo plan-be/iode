@@ -28,7 +28,7 @@ int KDBEquations::add(const std::string& name, const std::string& lec, const std
 {
     check_name(name, iode_type);
 
-    char* c_name = const_cast<char*>(name.c_str());
+    char* c_name = to_char_array(name);
 
     // throw exception if object with passed name already exist
     if (K_find(get_KDB(), c_name) >= 0)
@@ -48,7 +48,7 @@ int KDBEquations::add(const std::string& name, const std::string& lec, const std
 void KDBEquations::update(const std::string& name, const std::string& lec, const std::string& comment, const std::string& method,
     Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests, const bool date)
 {
-    char* c_name = const_cast<char*>(name.c_str());
+    char* c_name = to_char_array(name);
 
     EQ* eq = prepare_equation(name, "update", lec, comment, method, sample, instruments, block, tests, date);
 
@@ -59,7 +59,7 @@ void KDBEquations::update(const int pos, const std::string& lec, const std::stri
     Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests, const bool date)
 {
     std::string name = get_name(pos);
-    char* c_name = const_cast<char*>(name.c_str());
+    char* c_name = to_char_array(name);
 
     EQ* eq = prepare_equation(name, "update", lec, comment, method, sample, instruments, block, tests, date);
 
@@ -78,7 +78,7 @@ void KDBEquations::equations_estimate(const Sample& sample, const std::string& e
         throw invalid_error;
     }
 
-    char* c_equations_list = const_cast<char*>(equations_list.c_str());
+    char* c_equations_list = to_char_array(equations_list);
     char** eqs = B_ainit_chk(c_equations_list, NULL, 0);
     if(eqs == NULL || SCR_tbl_size((unsigned char**) eqs) == 0) 
     {

@@ -22,7 +22,7 @@ public:
      */
 	Sample(const std::string str_start_period, std::string str_end_period)
 	{
-		c_sample = PER_atosmpl(const_cast<char*>(str_start_period.c_str()), const_cast<char*>(str_end_period.c_str()));
+		c_sample = PER_atosmpl(to_char_array(str_start_period), to_char_array(str_end_period));
 		if (c_sample == NULL)
 		{
 			IodeExceptionInitialization error("Sample", "Unknown");
