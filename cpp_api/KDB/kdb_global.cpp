@@ -115,17 +115,17 @@ KDB* hard_copy_kdb(KDB* source_kdb, char** names)
     // - k_nameptr = "ws"
     KDB* dest_kdb = K_create(iode_type, source_kdb->k_mode);
     // copy char k_desc[K_MAX_DESC]
-    memcpy(KDESC(dest_kdb), KDESC(source_kdb), K_MAX_DESC * sizeof(char));
+    strncpy(dest_kdb->k_desc, source_kdb->k_desc, K_MAX_DESC);
     // copy char k_data[K_MAX_DESC]
-    memcpy(KDATA(dest_kdb), KDATA(source_kdb), K_MAX_DESC * sizeof(char));
-    // copy char k_compressed  
+    memcpy(dest_kdb->k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);
+    // copy char k_compressed
     dest_kdb->k_compressed = source_kdb->k_compressed;
-    // copy char* k_nameptr from global KDB
-    int nameptr_size = strlen(source_kdb->k_nameptr) + 1;
-    dest_kdb->k_nameptr = new char[nameptr_size];
-    strncpy(dest_kdb->k_nameptr, source_kdb->k_nameptr, nameptr_size);
-
-    // QUESTION FOR JMP: is it necessary to copy k_magic, k_oname and k_reserved ?    
+    // copy char* k_nameptr
+    dest_kdb->k_nameptr = copy_char_array(source_kdb->k_nameptr);
+    // copy k_magic[LMAGIC]
+    memcpy(dest_kdb->k_magic, source_kdb->k_magic, sizeof(char) * LMAGIC);
+    // copy k_oname[OK_MAX_FILE]  
+    strncpy(dest_kdb->k_oname, source_kdb->k_oname, OK_MAX_FILE);
 
     int pos_source_kdb;
     int pos_dest_kdb;
