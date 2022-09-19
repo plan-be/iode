@@ -5,15 +5,15 @@
 EQ* create_equation_deep_copy(EQ* original_equation)
 {
     EQ* copy_eq = (EQ*) SW_nalloc(sizeof(EQ));
-    copy_eq->lec = (char*) SCR_stracpy((unsigned char*) original_equation->lec);
+    copy_eq->lec = copy_char_array(original_equation->lec);
     copy_eq->clec = (CLEC*) SW_nalloc(sizeof(CLEC));
     memcpy(copy_eq->clec, original_equation->clec, sizeof(CLEC));
     copy_eq->solved = original_equation->solved;
     copy_eq->method = original_equation->method;
     memcpy(&copy_eq->smpl, &original_equation->smpl, sizeof(SAMPLE));
-    copy_eq->cmt = (char*) SCR_stracpy((unsigned char*) original_equation->cmt);
-    copy_eq->blk = (char*) SCR_stracpy((unsigned char*) original_equation->blk);
-    copy_eq->instr = (char*) SCR_stracpy((unsigned char*) original_equation->instr);
+    copy_eq->cmt = copy_char_array(original_equation->cmt);
+    copy_eq->blk = copy_char_array(original_equation->blk);
+    copy_eq->instr = copy_char_array(original_equation->instr);
     copy_eq->date = original_equation->date;
     memcpy(&(copy_eq->tests), &(original_equation->tests), EQS_NBTESTS * sizeof(float));
 
@@ -180,7 +180,7 @@ void Equation::set_lec(const std::string& lec, const std::string& endo)
             error.add_argument("lec", lec);
             throw error;
         }
-        c_equation->lec = (char*) SCR_stracpy((unsigned char*) c_lec);
+        c_equation->lec = copy_char_array(c_lec);
     }
 }
 
@@ -228,7 +228,7 @@ void Equation::set_block(const std::string& block)
     else
     {
         char* c_block = const_cast<char*>(block.c_str());
-        c_equation->blk = (char*) SCR_stracpy((unsigned char*) c_block);
+        c_equation->blk = copy_char_array(c_block);
     }
 }
 
@@ -271,7 +271,7 @@ void Equation::set_comment(const std::string& comment)
     {
         std::string comment_oem = utf8_to_oem(comment);
         char* c_comment_oem = const_cast<char*>(comment_oem.c_str());
-        c_equation->cmt = (char*) SCR_stracpy((unsigned char*) c_comment_oem);
+        c_equation->cmt = copy_char_array(c_comment_oem);
     }
 }
 
@@ -291,7 +291,7 @@ void Equation::set_instruments(const std::string& instruments)
     else
     {
         char* c_instruments = const_cast<char*>(instruments.c_str());
-        c_equation->instr = (char*) SCR_stracpy((unsigned char*) c_instruments);
+        c_equation->instr = copy_char_array(c_instruments);
     }
 }
 
