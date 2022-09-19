@@ -198,3 +198,26 @@ inline char** remove_duplicates(char** items)
     items[nb_items] = 0;
     return items;
 }
+
+inline char* copy_char_array(char* source_str)
+{
+    if(source_str == 0) return source_str;
+    size_t size = strlen(source_str) + 1;
+    char* dest_str = new char[size];
+    strncpy(dest_str, source_str, size);
+    return dest_str;
+}
+
+inline char* to_char_array(const std::string& str)
+{
+    return const_cast<char*>(str.c_str());
+}
+
+inline char* copy_string_to_char(const std::string& str)
+{
+    if(str.empty()) return NULL;
+    size_t size = str.size() + 1;
+    char* c_string = new char[size];
+    strncpy(c_string, str.c_str(), size);
+    return c_string;
+}
