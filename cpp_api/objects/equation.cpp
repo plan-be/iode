@@ -38,7 +38,7 @@ EQ* prepare_equation(const std::string& name, const bool add_obj, const std::str
     const std::string& method, Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests,
     const bool date)
 {
-    char* c_name = const_cast<char*>(name.c_str());
+    char* c_name = to_char_array(name);
 
     EQ* eq;
     if (add_obj) eq = (EQ*) SW_nalloc(sizeof(EQ));
@@ -53,38 +53,36 @@ EQ* prepare_equation(const std::string& name, const bool add_obj, const std::str
 
     if (!lec.empty())
     {
-        char* c_lec = const_cast<char*>(lec.c_str());
-        CLEC* clec = L_solve(c_lec, c_name);
+        SW_nfree(eq->lec);
+        eq->lec = copy_string_to_char(lec);
+
+        // check LEC expression is valid
+        CLEC* clec = L_solve(eq->lec, c_name);
         if (clec == NULL)
         {
+            SW_nfree(eq->lec);
             std::string action = add_obj ? "create new" : "update";
             IodeExceptionInvalidArguments error("Cannot " + action + " Equation with name " + name);
             error.add_argument("lec", lec);
             throw error;
         }
         SW_nfree(clec);
-        SW_nfree(eq->lec);
-
-        eq->lec = (char*)SCR_stracpy((unsigned char*)c_lec);
     }
 
     if (!comment.empty())
     {
-        unsigned char* c_comment = (unsigned char*) const_cast<char*>(comment.c_str());
         SW_nfree(eq->cmt);
-        eq->cmt = (char*)SCR_stracpy(c_comment);
+        eq->cmt = copy_string_to_char(comment);
     }
     if (!instruments.empty())
     {
-        unsigned char* c_instruments = (unsigned char*) const_cast<char*>(instruments.c_str());
         SW_nfree(eq->instr);
-        eq->instr = (char*)SCR_stracpy(c_instruments);
+        eq->instr = copy_string_to_char(instruments);
     }
     if (!block.empty())
     {
-        unsigned char* c_block = (unsigned char*) const_cast<char*>(block.c_str());
         SW_nfree(eq->blk);
-        eq->blk = (char*)SCR_stracpy(c_block);
+        eq->blk = copy_string_to_char(block);
     }
 
     if (!method.empty())
@@ -132,7 +130,7 @@ Equation::Equation(const int pos, KDB* kdb)
 Equation::Equation(const std::string& name, KDB* kdb)
 {
     if (!kdb) kdb = K_WS[I_EQUATIONS];
-    int pos = K_find(kdb, const_cast<char*>(name.c_str()));
+    int pos = K_find(kdb, to_char_array(name));
     if (pos < 0) throw IodeExceptionFunction("Cannot extract Equation", "Equation with name " + name + " does not exist.");
     // Note: KEVAL allocate a new pointer EQ*
     c_equation = KEVAL(kdb, pos);
@@ -170,9 +168,9 @@ void Equation::set_lec(const std::string& lec, const std::string& endo)
     }
     else
     {
-        char* c_lec = const_cast<char*>(lec.c_str());
-        char* c_endo = const_cast<char*>(endo.c_str());
-        // TODO: not sure about this
+        char* c_lec = to_char_array(lec);
+        char* c_endo = to_char_array(endo);
+        // check if LEC expression is valid
         c_equation->clec = L_solve(c_lec, c_endo);
         if (c_equation->clec == 0) 
         {
@@ -221,15 +219,9 @@ std::string Equation::get_block() const
 
 void Equation::set_block(const std::string& block)
 {
-    if (block.empty())
-    {
-        c_equation->blk = NULL;
-    }
-    else
-    {
-        char* c_block = const_cast<char*>(block.c_str());
-        c_equation->blk = copy_char_array(c_block);
-    }
+    SW_nfree(c_equation->blk);
+    if (block.empty()) c_equation->blk = NULL;
+    else c_equation->blk = copy_string_to_char(block);
 }
 
 // -- sample --
@@ -263,15 +255,12 @@ std::string Equation::get_comment() const
 // we assume that comment string is in UTF8 format
 void Equation::set_comment(const std::string& comment)
 {
-    if (comment.empty())
-    {
-        c_equation->cmt = NULL;
-    }
+    SW_nfree(c_equation->cmt);
+    if (comment.empty()) c_equation->cmt = NULL;
     else
     {
         std::string comment_oem = utf8_to_oem(comment);
-        char* c_comment_oem = const_cast<char*>(comment_oem.c_str());
-        c_equation->cmt = copy_char_array(c_comment_oem);
+        c_equation->cmt = copy_string_to_char(comment_oem);
     }
 }
 
@@ -284,15 +273,9 @@ std::string Equation::get_instruments() const
 
 void Equation::set_instruments(const std::string& instruments)
 {
-    if (instruments.empty())
-    {
-        c_equation->instr = NULL;
-    }
-    else
-    {
-        char* c_instruments = const_cast<char*>(instruments.c_str());
-        c_equation->instr = copy_char_array(c_instruments);
-    }
+    SW_nfree(c_equation->instr);
+    if (instruments.empty()) c_equation->instr = NULL;
+    else c_equation->instr = copy_string_to_char(instruments);
 }
 
 // -- date --
@@ -310,7 +293,7 @@ std::string Equation::get_date_as_string(const std::string& date_format) const
     {
         char c_date[12];
         char* c_date_format;
-        c_date_format = const_cast<char*>(date_format.c_str());
+        c_date_format = to_char_array(date_format);
         date = SCR_long_to_fdate(l_date, c_date, c_date_format);
     }
     return date;
