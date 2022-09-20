@@ -21,3 +21,4 @@
 #include "KDB/kdb_tables.h"
 #include "KDB/kdb_variables.h"
 #include "compute/simulation.h"
+#include "compute/estimation.h"
