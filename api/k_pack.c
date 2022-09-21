@@ -124,7 +124,7 @@ static void K_tcell64_32(TCELL* tc64, TCELL32* tc32)
 {
     int pos_tc_type;
 
-    // Copy de tl_type ï¿½ la fin
+    // Copy de tl_type à la fin
     pos_tc_type = K_pos_struct(tc32, &tc32->tc_type);
     memcpy((char*)&tc32->tc_type, (char*)&tc64->tc_type, sizeof(TCELL32) - pos_tc_type);
     if(tc64->tc_val)
@@ -147,7 +147,7 @@ static void K_tline64_32(TLINE* tl64, TLINE32* tl32)
 {
     int pos_tl_type;
 
-    // Copy de tl_type ï¿½ la fin
+    // Copy de tl_type à la fin
     pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
     memcpy((char*)&tl32->tl_type, (char*)&tl64->tl_type, sizeof(TLINE32) - pos_tl_type);
 }
@@ -170,7 +170,7 @@ static void K_tbl64_32(TBL* tbl64, TBL32* tbl32)
     pos_t_div = K_pos_struct(tbl32, &tbl32->t_div);
     memcpy((char*)tbl32, (char*)tbl64, pos_t_div);
 
-    // Copy de t_zmin ï¿½ la fin
+    // Copy de t_zmin à la fin
     pos_t_zmin = K_pos_struct(tbl32, &tbl32->t_zmin);
     memcpy((char*)&tbl32->t_zmin, (char*)&tbl64->t_zmin, sizeof(TBL32) - pos_t_zmin);
 
@@ -627,7 +627,7 @@ static void K_tcell32_64(TCELL32* tc32, TCELL* tc64)
 {
     int pos_tc_type;
 
-    // Copy de tl_type ï¿½ la fin
+    // Copy de tl_type à la fin
 
     pos_tc_type = K_pos_struct(tc32, &tc32->tc_type);
     memcpy((char*)&tc64->tc_type, (char*)&tc32->tc_type, sizeof(TCELL32) - pos_tc_type);
@@ -648,7 +648,7 @@ static void K_tline32_64(TLINE32* tl32, TLINE* tl64)
 {
     int pos_tl_type;
 
-    // Copy de tl_type Ã  la fin
+    // Copy de tl_type à la fin
 
     pos_tl_type = K_pos_struct(tl32, &tl32->tl_type);
     memcpy((char*)&tl64->tl_type, (char*)&tl32->tl_type, sizeof(TLINE32) - pos_tl_type);
@@ -672,7 +672,7 @@ static void K_tbl32_64(TBL32* tbl32, TBL* tbl64)
     pos_t_div = K_pos_struct(tbl32, &tbl32->t_div);
     memcpy((char*)tbl64, (char*)tbl32, pos_t_div);
 
-    // Copy de t_zmin Ã  la fin
+    // Copy de t_zmin à la fin
     pos_t_zmin = K_pos_struct(tbl32, &tbl32->t_zmin);
     memcpy((char*)&tbl64->t_zmin, (char*)&tbl32->t_zmin, sizeof(TBL32) - pos_t_zmin);
 
