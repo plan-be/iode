@@ -10,6 +10,7 @@
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
  *      int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
  *      int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
+ *      int KE_compile(KDB* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
  *      int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
  *      int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
  *      int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
@@ -164,7 +165,7 @@ int B_ModelExchange(char* arg)
  *  
  *  TODO: return -1 if K_upd_eqs() fails ?
  */
-static int KE_compile(KDB* dbe)
+int KE_compile(KDB* dbe)
 {
     int     i;
     EQ      *eq;
