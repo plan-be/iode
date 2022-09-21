@@ -6,6 +6,22 @@
 #include "kdb/kdb_scalars.h"
 
 
+enum EnumIodeAdjustmentMethod
+{
+    AM_PARTIAL_ADJUSTMENT,
+    AM_ERROR_CORRECTION_METHOD
+};
+
+const static std::array<std::string, 2> v_adjstment_method =
+{
+    "Partial Adjustment",
+    "Error Correction Model"
+};
+
+std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method, 
+    const std::string& eqs, const std::string& c1, const std::string& c2);
+
+
 class Estimation
 {
     std::string str_equations;
@@ -64,6 +80,8 @@ public:
 
     KDBEquations* get_equations() { return kdb_eqs; }
 
+    Equation current_equation() { return Equation(*current_eq); }
+
     Equation next_equation()
     {
         if(current_eq == v_equations.end()) current_eq = v_equations.begin();
@@ -77,4 +95,5 @@ public:
     void equations_estimate();
 
     void save();
+
 };
