@@ -119,8 +119,8 @@ static int B_htol(int method, char* arg)
 
     to = K_create(K_VAR, K_UPPER);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    t_vec = (IODE_REAL *) SW_nalloc(t_smpl->s_nb * sizeof(IODE_REAL));
-    f_vec = (IODE_REAL *) SW_nalloc(KSMPL(from)->s_nb * sizeof(IODE_REAL));
+    t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
+    f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(IODE_REAL));
 
     for(i = 0; i < KNB(from); i++) {
         memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(IODE_REAL));
