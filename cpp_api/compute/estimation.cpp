@@ -1,6 +1,28 @@
 #include "estimation.h"
 
 
+std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method, 
+    const std::string& eqs, const std::string& c1, const std::string& c2)
+{
+    IodeExceptionInvalidArguments invalid("Failed to proceed dynamic adjustment");
+    // TODO (future) : replace content of L_split_eq() by line below
+    std::size_t found = eqs.find(":=");
+    if(found == std::string::npos) invalid.add_argument("No := found in lec expression", eqs);
+    if(c1.empty()) invalid.add_argument("c1", "empty!");
+    if(method == AM_ERROR_CORRECTION_METHOD && c2.empty()) invalid.add_argument("c2", "empty!");
+    if(invalid.invalid_args()) throw invalid;
+
+    size_t eqs_size = eqs.size() + 1;
+    char* c_eqs = new char[eqs_size];
+    strncpy(c_eqs, eqs.c_str(), eqs_size);
+    int res = E_DynamicAdjustment(method, &c_eqs, to_char_array(c1), to_char_array(c2));
+    std::string adjusted_eqs(c_eqs);
+    delete[] c_eqs;
+    if(res < 0) throw IodeExceptionFunction("Failed to proceed dynamic adjustment of equation \"" + eqs + "\"", "Unknown");
+    return adjusted_eqs;
+}
+
+
 void Estimation::set_equations_list(const std::string& str_equations)
 {
     this->str_equations = str_equations;
