@@ -1,7 +1,7 @@
 /**
  *  @header4iode
  * 
- *  Report functions to transform high periodicity to low periodicity variables. 
+ *  Report functions to transform high periodicity to low periodicity series (variables). 
  *  
  *  See b_data.c for more details on the report function syntax and logic.
  *  
@@ -25,7 +25,7 @@
  *  Computes the target SAMPLE of a conversion of variables from a high to a low periodicity.
  *  
  *  @param [in]   SAMPLE*  f_smpl     sample of the input var file
- *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS smaple
+ *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS 
  *  @param [out]  SAMPLE** t_smpl     allocated target sample
  *  @param [out]  int*     skip       nb of periods to skip (i.e. set to L_NAN) in the **target** variable 
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
@@ -83,7 +83,7 @@ static int HTOL_smpl(SAMPLE *f_smpl, SAMPLE *ws_smpl, SAMPLE **t_smpl, int* skip
  *   - average of sub-period data: see WsHtoLMean
  *   - last sub-period value: see WsHtoLLast
  *  
- *  The source periodicity is that of the source file. The target peridicity is the current WS perriodicity.
+ *  The source periodicity is that of the source file. The target periodicity is the current WS periodicity.
  *  
  *  @param [in] int     method  aggregation method : HTOL_LAST, HTOL_MEAN or HTOL_SUM
  *  @param [in] char*   arg     parameter of the report function (see B_WsHtoLLast() for an example of the syntax)

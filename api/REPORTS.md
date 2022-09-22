@@ -126,8 +126,8 @@ For these functions, the parameters and return values are as follows:
 
 - b\_fsys.c : file manipulation \+ conversion from/to ansi\-oem\-utf8
 - b\_file.c : file manipulation
-- b\_xode.c : import comments and variables from various non\-IODE formats
-- b\_htol.c : transformation of high periodicity to low periodicity variables.
+- b\_xode.c : import comments and series (aka variables) from various non\-IODE formats
+- b\_htol.c : transformation of high periodicity to low periodicity series.
 - b\_ltoh.c : transformation of low periodicity series to high periodicity series.
 - b\_ras.c : implementation of a RAS algorithm.
 - b\_data.c : functions acting on data (i.e.: IODE objects)
@@ -176,7 +176,7 @@ Report functions to import comments and variables from various non\-IODE formats
 
 ### b\_htol.c {#T14}
 
-Report functions to transform high periodicity to low periodicity variables.
+Report functions to transform high periodicity to low periodicity series.
 
 #### List of functions {#T15}
 
