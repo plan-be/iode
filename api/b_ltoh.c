@@ -30,7 +30,7 @@
 /**
  *  Calculates the linear interpolation of y in x (~y[x])
  *  @param [in] IODE_REAL*  y   vector of double
- *  @param [in] IODE_REAL   x   x-value for which y[x]is seached 
+ *  @param [in] IODE_REAL   x   x-value for which y[x] is seached 
  *  @return     IODE_REAL       approximation of y[x] 
  */ 
 static IODE_REAL LTOH_ylin(IODE_REAL* y, IODE_REAL x)
@@ -39,8 +39,8 @@ static IODE_REAL LTOH_ylin(IODE_REAL* y, IODE_REAL x)
     IODE_REAL    res, a, b;
     int     hi, lo;
 
-    lo = floor(x);
-    hi = lo + 1.0;
+    lo = (int) floor(x);
+    hi = (int) (lo + 1.0);
 
     a = hi - x;
     b = x - lo;
@@ -55,14 +55,14 @@ static IODE_REAL LTOH_ylin(IODE_REAL* y, IODE_REAL x)
 /**
  *  Transforms a low periodicity series to high periodicity series by linear interpolation (stock or flow series). 
  *  
- *  If the series is a "flow", the result is the source value divided by the nb of sub-period. 
+ *  If the series is a "flow", the result is the source value divided by the nb of sub-periods. 
  *  If the series is a "stock", the result is a linear interpolation of the 2 surrounding source values.
  *  
  *  @param [in]  int         type   of series: LTOH_FLOW or LTOH_STOCK
  *  @param [in]  IODE_REAL*  f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
  *  @param [out] IODE_REAL*  t_vec  destination vector 
- *  @param [in]  int         t_nb   nb of values in the detination vector
+ *  @param [in]  int         t_nb   nb of values in the destination vector
  *  @param [in]  int         shift  nb of sub periods in the destination sample
  *  @return      int         0 always       
  */
@@ -108,20 +108,19 @@ static int LTOH_lin(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int 
  *  Transforms a low periodicity series to high periodicity series by using step interpolation (stock or flow series). 
  *  
  *  If the series is a "flow", the result is the source value plus a portion of the difference bw the 2 surrounding values in the source
- *  If the series is a "stock", the result has same the value as the source
+ *  If the series is a "stock", the result has the same value as the source
  *  
  *  @param [in]  int         type   of series: LTOH_FLOW or LTOH_STOCK
  *  @param [in]  IODE_REAL*  f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
  *  @param [out] IODE_REAL*  t_vec  destination vector 
- *  @param [in]  int         t_nb   nb of values in the detination vector
+ *  @param [in]  int         t_nb   nb of values in the destination vector
  *  @param [in]  int         shift  nb of sub periods in the destination sample
  *  @return      int         0 always       
  */
 static int LTOH_step(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t_nb, int shift)
 {
     int     dim, j, f, t, beg;
-    IODE_REAL    x;
 
     for(t = 0; t < t_nb; t++) t_vec[t] = L_NAN;
     beg = 0;
@@ -191,8 +190,8 @@ static IODE_REAL LTOH_ycs(IODE_REAL* y, IODE_REAL* y2, IODE_REAL x)
 
     if(x < 0) return(L_NAN);
 
-    lo = floor(x);
-    hi = lo + 1.0;
+    lo = (int) floor(x);
+    hi = (int) (lo + 1.0);
 
     a = hi - x;
     b = x - lo;
@@ -257,7 +256,7 @@ static int LTOH_cs(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t
  *  Computes the target SAMPLE of a conversion of variables from a low to a high periodicity.
  *  
  *  @param [in]   SAMPLE*  f_smpl     sample of the input var file
- *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS smaple
+ *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS 
  *  @param [out]  SAMPLE** t_smpl     allocated target sample
  *  @param [out]  int*     skip       nb of periods to skip (i.e. set to L_NAN) in the **target** variable 
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 

@@ -262,7 +262,7 @@ err:
 int B_ModelSimulateSCC(char *arg)
 {
     int     lg1, lg2, rc, prepos, interpos, postpos;
-    char    from[16], to[16], **lsts, **eqs, **eqs1, buf[256], **pre, **post, **inter;
+    char    from[16], to[16], **lsts, **eqs, **eqs1, **pre, **post, **inter;
     SAMPLE  *smpl;
     KDB     *tdbe;
 
@@ -389,7 +389,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, IODE_REAL *vec)
 }
 
 /**
- *  Saves the values of the vector of ints vec in the variable name. 
+ *  Saves into the variable "name" the values of the vector vec of integers.
  *  Creates name if it does not exist.
  *  
  *  @param [in, out] char*      name   variable name
