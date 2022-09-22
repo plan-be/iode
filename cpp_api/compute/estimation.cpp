@@ -22,6 +22,56 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
     return adjusted_eqs;
 }
 
+// Note: Same as E_SclToReal()
+static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, IODE_REAL* res, const int pos)
+{
+    kdb->add(coeff_name, res[pos], res[pos+1], (!L_IS0(res[pos+2])) ? res[pos]/res[pos+2] : L_NAN);
+}
+
+// QUESTION FOR JMP : Why E_UnitRoot does not return a new KDB of scalars ? 
+//                    In E_UnitRoot, you first create new scalars then you delete them after computation of DF test.
+//                    Then, why not working on a local KDB of scalars ?
+KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
+{
+    IODE_REAL* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
+    if(!res)
+    {
+        IodeExceptionFunction error("Cannot perform Unit Root (Dickey Fuller test)", "Unknown");
+        error.add_argument("LEC expression", lec);
+        error.add_argument("Drift:", drift ? "yes" : "no");
+        error.add_argument("Trend", trend ? "yes" : "no");
+        error.add_argument("Order", std::to_string(order));
+        throw error;
+    }
+
+    int pos = 0;
+    KDBScalars* kdb_res = new KDBScalars(KDB_LOCAL);
+    // order 0
+    add_df_test_coeff(kdb_res, "df_", res, pos);
+    pos += 3;
+    // drift
+    if(drift)
+    {
+        add_df_test_coeff(kdb_res, "df_d", res, pos);
+        pos += 3;
+    }
+    // trend
+    if(trend)
+    {
+        add_df_test_coeff(kdb_res, "df_t", res, pos);
+        pos += 3;
+    }
+    // order > 0
+    for(int i=1; i <= order; i++)
+    {
+        add_df_test_coeff(kdb_res, "df" + std::to_string(i), res, pos);
+        pos += 3;
+    }
+
+    SW_nfree(res);
+    return kdb_res;
+}
+
 
 void Estimation::set_equations_list(const std::string& str_equations)
 {

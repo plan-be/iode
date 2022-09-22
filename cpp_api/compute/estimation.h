@@ -4,6 +4,7 @@
 #include "time/sample.h"
 #include "kdb/kdb_equations.h"
 #include "kdb/kdb_scalars.h"
+#include "kdb/kdb_variables.h"
 
 
 enum EnumIodeAdjustmentMethod
@@ -21,6 +22,12 @@ const static std::array<std::string, 2> v_adjstment_method =
 std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method, 
     const std::string& eqs, const std::string& c1, const std::string& c2);
 
+/**
+ * @brief a.k.a Unit Root.
+ * 
+ * @return IODE_REAL 
+ */
+KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
 
 class Estimation
 {
@@ -88,6 +95,8 @@ public:
         else current_eq++;
         return Equation(*current_eq);
     }
+
+    MAT* get_correlation_matrix() { return E_MCORR; }
 
     /** 
      * Equivalent to B_EqsEstimateEqs
