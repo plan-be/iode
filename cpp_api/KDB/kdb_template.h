@@ -20,8 +20,8 @@ protected:
     virtual T get_unchecked(const int pos) const = 0;
 
 public:
-    KDBTemplate(EnumIodeType type, const std::string& pattern, const bool shallow_copy) : 
-        KDBAbstract(type, pattern, shallow_copy) {}
+    KDBTemplate(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
+        KDBAbstract(kdb_type, iode_type, pattern) {}
 
     //  Create + Update + Get + Copy methods
 
