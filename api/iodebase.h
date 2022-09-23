@@ -263,6 +263,7 @@ extern void L_link_endos(KDB* kde, CLEC* cl);
 extern void L_fperror(void);
 extern double L_exec(KDB *,KDB *,CLEC *,int );
 extern double L_exec_sub(unsigned char *,int ,int ,double *);
+extern L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs);
 extern int L_intlag(double );
 extern double L_uminus(double *);
 extern double L_uplus(double *);

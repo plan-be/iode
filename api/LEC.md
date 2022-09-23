@@ -242,6 +242,7 @@ Functions to evaluate a compiled and linked LEC expression.
 |:---|:---|
 |`L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)`|Execution of a CLEC sub expression.|
 |`L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)`|Execution of a compiled and linked CLEC expression.|
+|`L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
 
 ### l\_exec\_var.c {#T23}
 

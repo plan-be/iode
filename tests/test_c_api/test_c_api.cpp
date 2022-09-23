@@ -452,7 +452,7 @@ public:
 	    //  Create a file
 	    U_test_suppress_a2m_msgs();
 	    W_dest(filename, type);
-	    W_printf("This is a paragraph with accents: éàâêë\n\n"); // the current source file (test1.c) is ANSI coded
+	    W_printf("This is a paragraph with accents: éàâêë\n"); // the current source file (test1.c) is ANSI coded
 	    W_close();
 	}
 
@@ -757,14 +757,14 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Test Endo-exo
 
-    // Version avec échange dans une seule équation
+    // Version with exchange in one equation only
     // endo_exo = SCR_vtoms("UY-NIY", ",; ");
     // rc = K_simul(kdbe, kdbv, kdbs, smpl, endo_exo, NULL);
     // S4ASSERT(rc == 0, "Exchange UY-NIY converges on 2000Y1-2002Y1");
     // S4ASSERT(UY[pos2000] == 650.0, "Exchange UY-NIY: UY[2000Y1] == 650.0");
     // S4ASSERT(fabs(NIY[pos2000] - 658.423) < 0.01, "Exchange UY-NIY: NIY[2000Y1] == 658.423");
 
-    // Version avec échange dans min 2 equations
+    // Version with exchange in at least 2 equations
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
     KV_set_at_aper("UY", "2001Y1", 670.0);
@@ -857,7 +857,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     int         rc;
     void        (*kmsg_super_ptr)(char*);
     SAMPLE      *smpl;
-    IODE_REAL   r2;
+    IODE_REAL   r2, *df;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation");
@@ -896,7 +896,15 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     SCR_free(smpl);
 
     // Dickey-Fuller test (E_UnitRoot)
-    // TODO: implement a test
+    df = E_UnitRoot("ACAF+ACAG", 0, 0, 0);
+    EXPECT_TRUE(U_test_eq(df[2], -1.602170));
+    df = E_UnitRoot("ACAF+ACAG", 1, 0, 0);
+    EXPECT_TRUE(U_test_eq(df[2], -2.490054));
+    df = E_UnitRoot("ACAF+ACAG", 1, 1, 0);
+    EXPECT_TRUE(U_test_eq(df[2], -2.638717));
+    df = E_UnitRoot("ACAF+ACAG", 0, 0, 1);
+    EXPECT_TRUE(U_test_eq(df[2], -1.300049));
+
 
     // Reset initial kmsg fn
     kmsg_super = kmsg_super_ptr; // Reset initial output to
@@ -965,7 +973,7 @@ TEST_F(IodeCAPITest, Tests_SWAP)
     SW_free(item);
     SW_free(item);
 
-    // test 2 :  on réutilise l'espace freeé
+    // test 2 :  reusing freed space
     item = SW_alloc(15);
     SW_free(item);
     item2 = SW_alloc(10);
@@ -996,7 +1004,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     U_test_CreateObjects();
 
     // B_DataPattern()
-    // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ça marche pas...) => A changer ? Voir B_DataListSort()
+    // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", K_VAR);
     lst = KLPTR("RC");
     EXPECT_TRUE(U_cmp_strs(lst, "AB,AC,BB,BC"));
@@ -1387,7 +1395,7 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     char    rulefile[256];
     char    cmd[512];
     char    trace[] = " ";
-    int     cond, rc;
+    int     rc;
 
     U_test_print_title("Tests XODE: Import ASCII via report function");
     U_test_suppress_kmsg_msgs();
@@ -1510,8 +1518,170 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
 }
 
 
-TEST_F(IodeCAPITest, Tests_B_Model)
+TEST_F(IodeCAPITest, Tests_B_MODEL)
 {
+//    KDB         *kdbv,
+//                *kdbe,
+//                *kdbs;
+//    SAMPLE      *smpl;
+//    char        *filename = "fun";
+//    U_ch**      endo_exo;
+//    int         rc;
+//    LIS         lst, expected_lst;
+//
+//    // B_Model*() tests
+//    // ----------------
+//    // X int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
+//    // X int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
+//    // X int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
+//    // X int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
+//    // X int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
+//    // X int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
+//    // int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
+//    // int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
+//
+//
+//    U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
+//    U_test_suppress_kmsg_msgs();
+//
+//
+//    // Loads 3 WS and check ok
+//    U_test_load_fun_esv(filename);
+//
+//    // Check
+//    kdbv = KV_WS;
+//    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
+//    kdbs = KS_WS;
+//    S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
+//    kdbe = KE_WS;
+//    S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
+//
+//    // B_ModelSimulateParms()
+//    KSIM_START = KV_INIT_TM1;
+//    KSIM_EPS = 0.00001;
+//    KSIM_MAXIT = 1000;
+//    KSIM_RELAX = 1.0;
+//    KSIM_SORT = 0;
+//    KSIM_PASSES = 3;
+//    KSIM_DEBUG = 1;
+//    rc = B_ModelSimulateParms("0.0001 0.7 100 Both 0 no no 5");
+//    S4ASSERT(rc == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") == 0");
+//    S4ASSERT(KSIM_EPS == 0.0001, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_EPS == 0.0001");
+//    S4ASSERT(KSIM_MAXIT == 100, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_MAXIT == 100");
+//    S4ASSERT(KSIM_RELAX == 0.7, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_RELAX == 0.7");
+//    S4ASSERT(KSIM_DEBUG == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_DEBUG == 0");
+//
+//
+//    // B_ModelSimulate()
+//    rc = B_ModelSimulate("2000Y1 2002Y1");
+//    S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
+//    // TODO: check result of one ENDO
+//    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
+//
+//    // B_ModelExchange()
+//    // Set values of endo UY
+//    KV_set_at_aper("UY", "2000Y1", 650.0);
+//    KV_set_at_aper("UY", "2001Y1", 670.0);
+//    KV_set_at_aper("UY", "2002Y1", 680.0);
+//
+//    // Exchange
+//    rc = B_ModelExchange("UY-XNATY");
+//    S4ASSERT(rc == 0, "B_ModelExchange(\"UY-XNATY\") == 0");
+//
+//    // Simulate
+//    rc = B_ModelSimulate("2000Y1 2002Y1");
+//    S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
+//
+//    // Check some results
+//    S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
+//    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80071");
+//
+//    // B_ModelCompile(char* arg)
+//    rc = B_ModelCompile("");
+//    S4ASSERT(rc == 0, "B_ModelCompile(\"\") == 0");
+//
+//    // B_ModelCalcSCC(char *arg) $ModelCalcSCC nbtris prename intername postname [eqs]
+//    rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
+//    S4ASSERT(rc == 0, "B_ModelCalcSCC(\"5 _PRE2 _INTER2 _POST2\") == 0");
+//    rc = strcmp(KLPTR("_PRE2"), "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
+//    S4ASSERT(rc == 0, "_PRE2 == BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
+//
+//    // int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
+//    //  1. Annuler Exchange
+//    rc = B_ModelExchange("");
+//    S4ASSERT(rc == 0, "B_ModelExchange(\"\") == 0");
+//
+//    //  2. ReLoads 3 WS to reset EXO XNATY to its original value
+//    U_test_load_fun_esv(filename);
+//
+//    //  3. Simulate & compare
+//    rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
+//    S4ASSERT(rc == 0, "B_ModelSimulateSCC(\"2000Y1 2002Y1 _PRE2 _INTER2 _POST2\") == 0");
+//    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
+//
+//    // B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
+//
+//
+//
+//    U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_WS)
+{
+    char    fullfilename[256];
+    int     rc, cond;
+
+// int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+// int B_WsSave(char* arg, int type)                 $WsSave<type> filename
+// int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
+// int B_WsExport(char* arg, int type)               $WsExport<type> filename
+// int B_WsImport(char* arg, int type)               $WsImport<type> filename
+// int B_WsSample(char* arg)                         $WsSample period_from period_to
+// int B_WsClear(char* arg, int type)                $WsClear<type>
+// int B_WsClearAll(char* arg)                       $WsClearAll
+// int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
+// int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
+// int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
+// int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
+// int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
+// int B_WsAggrChar(char* arg)                       $WsAggrChar char
+// int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
+// int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
+// int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
+// int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
+// int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
+// int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
+// int B_CsvSep(char *sep)                           $CsvSep char
+// int B_CsvNaN(char *nan)                           $CsvNaN text
+// int B_CsvAxes(char *var)                          $CsvAxes AxisName
+// int B_CsvDec(char *dec)                           $CsvDec char
+
+//    U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
+//    U_test_suppress_kmsg_msgs();
+//
+//    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+//    sprintf(fullfilename,  "%s\\fun", input_test_dir);
+//    rc = B_WsLoad(fullfilename, K_VAR);
+//    cond = (rc == 0) && (KV_WS->k_nb == 394);
+//    S4ASSERT(cond, "B_WsLoad(\"%s\") == 0 -- nb objects=%d", fullfilename, KV_WS->k_nb);
+//
+//    // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
+//    rc = B_WsSave("fun2", K_VAR);
+//    B_WsClear("", K_VAR);
+//    rc = B_WsLoad("fun2", K_VAR);
+//    cond = (rc == 0) && (KV_WS->k_nb == 394);
+//    S4ASSERT(cond, "B_WsSave(\"fun2\") == 0 -- nb objects=%d", KV_WS->k_nb);
+//
+//    // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
+//    rc = B_WsSaveCmp("fun2cmp", K_VAR);
+//    B_WsClear("", K_VAR);
+//    rc = B_WsLoad("fun2cmp", K_VAR);
+//    cond = (rc == 0) && (KV_WS->k_nb == 394);
+//    S4ASSERT(cond, "B_WsSaveCmp(\"fun2cmp\") == 0 -- nb objects=%d", KV_WS->k_nb);
+//
+
+
 }
 
 
