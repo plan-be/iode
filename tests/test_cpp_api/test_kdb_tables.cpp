@@ -164,7 +164,7 @@ TEST_F(KDBTablesTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBTables(pattern);
+    local_kdb = new KDBTables(KDB_SHALLOW_COPY, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // add an element to the local KDB and check if it has also 
@@ -231,7 +231,7 @@ TEST_F(KDBTablesTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBTables(pattern, false);
+    local_kdb = new KDBTables(KDB_LOCAL, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // add an element to the local KDB and check if it has not 
@@ -276,9 +276,9 @@ TEST_F(KDBTablesTest, Merge)
     std::string pattern = "A*";
 
     // create hard copies kdb
-    KDBTables kdb0(pattern, false);
-    KDBTables kdb1(pattern, false);
-    KDBTables kdb_to_merge(pattern, false);
+    KDBTables kdb0(KDB_LOCAL, pattern);
+    KDBTables kdb1(KDB_LOCAL, pattern);
+    KDBTables kdb_to_merge(KDB_LOCAL, pattern);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_TABLE";

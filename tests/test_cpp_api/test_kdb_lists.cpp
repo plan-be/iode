@@ -106,7 +106,7 @@ TEST_F(KDBListsTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBLists(pattern);
+    local_kdb = new KDBLists(KDB_SHALLOW_COPY, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -166,7 +166,7 @@ TEST_F(KDBListsTest, HardCopy)
     int nb_total_comments = global_kdb.count();
 
     // create local kdb
-    local_kdb = new KDBLists(pattern, false);
+    local_kdb = new KDBLists(KDB_LOCAL, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -212,9 +212,9 @@ TEST_F(KDBListsTest, Merge)
     std::string pattern = "C*";
 
     // create hard copies kdb
-    KDBLists kdb0(pattern, false);
-    KDBLists kdb1(pattern, false);
-    KDBLists kdb_to_merge(pattern, false);
+    KDBLists kdb0(KDB_LOCAL, pattern);
+    KDBLists kdb1(KDB_LOCAL, pattern);
+    KDBLists kdb_to_merge(KDB_LOCAL, pattern);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_LIST";

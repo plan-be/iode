@@ -142,7 +142,7 @@ TEST_F(KDBEquationsTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBEquations(pattern);
+    local_kdb = new KDBEquations(KDB_SHALLOW_COPY, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -208,7 +208,7 @@ TEST_F(KDBEquationsTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBEquations(pattern, false);
+    local_kdb = new KDBEquations(KDB_LOCAL, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -237,9 +237,9 @@ TEST_F(KDBEquationsTest, Merge)
     std::string pattern = "A*";
 
     // create hard copies kdb
-    KDBEquations kdb0(pattern, false);
-    KDBEquations kdb1(pattern, false);
-    KDBEquations kdb_to_merge(pattern, false);
+    KDBEquations kdb0(KDB_LOCAL, pattern);
+    KDBEquations kdb1(KDB_LOCAL, pattern);
+    KDBEquations kdb_to_merge(KDB_LOCAL, pattern);
 
     // add an element to the KDB to be merged
     std::string new_name = "ACAF2";
