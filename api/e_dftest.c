@@ -98,7 +98,8 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
 
     rc = K_upd_eqs("_DF", buf, 0L, 0, 0L, 0L, 0L, 0L, 0);
     if(rc) return(rc);
-    rc = B_EqsEstimateEqs(smpl, eqs);
+    //rc = B_EqsEstimateEqs(smpl, eqs);
+    rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs);
 
     K_del_by_name(KE_WS, "_DF");
     SCR_free_tbl(eqs);
@@ -114,28 +115,37 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
  *  See https://en.wikipedia.org/wiki/Dickey%E2%80%93Fuller_test for more details on the DF-tests.
  *  See https://iode.plan.be/doku.php?id=statunitroot for the IODE implementation.
  *    
- *  @param [in] char*       varname name of the variable to test
+ *  @param [in] char*       lec     LEC expression to test
  *  @param [in] int         drift   0 or 1 indicating whether the formula to be estimated must incorporate a constant term (1) or not (0) 
  *  @param [in] int         trend   0 or 1 depending on whether the formula to be estimated should incorporate a trend term (1) or not (0) 
  *  @param [in] int         order   the order of the polynomial to be estimated 
  *  @return     IODE_REAL   allocated vector of the estimated scalars, 3 values for each estimated coefficient: 
  *                              (value, stderr, t-test)
+ *                          NULL on error (illegal lec, sample too short)
  */
  
-IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)
+IODE_REAL *E_UnitRoot(char* lec, int drift, int trend, int order)
 {
-    int     i, pos, rc = -1;
-    char    buf[1024], scl[11];
-    SAMPLE  smpl;
-    IODE_REAL    *res = NULL;
+    int         i, pos, rc = -1;
+    char        buf[1024], scl[11], lec_df[1024], varname[64];
+    SAMPLE      smpl;
+    IODE_REAL   *res = NULL, *vec;
 
 
+    // Computes the lec formula and stores the result in the VAR _DF
+    vec = L_cc_link_exec(lec, KV_WS, KS_WS);
+    if(vec == NULL) return(NULL);
+    strcpy(varname, "_DF");
+    K_add(KV_WS, varname, vec, &(KSMPL(KV_WS)->s_nb));
+    SW_nfree(vec);
+        
+    // Checks that the sample is large enough for the estimation 
     E_GetSmpl(&smpl, varname);
     memcpy(&(smpl.s_p1), PER_addper(&(smpl.s_p1), 1), sizeof(PERIOD));
     smpl.s_nb--;
     if(smpl.s_nb < (drift + trend + order + 1) * 2) {
-        B_seterror("Sample to small for this test");
-        return(res);
+        B_seterror("Sample too small for this test");
+        goto cleanup;
     }
 
     /* Dickey Fuller */
@@ -206,6 +216,10 @@ IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)
         K_del_by_name(KS_WS, buf);
     }
 
+cleanup:
+    // Deletes the tmp var _DF
+    K_del_by_name(KV_WS, "_DF");
+        
     return(res);
 }
 

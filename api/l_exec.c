@@ -5,6 +5,7 @@
  *  
  *   - L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)     Execution of a CLEC sub expression.
  *   - L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)                     Execution of a compiled and linked CLEC expression.
+ *   - L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)                    Compiles, links and executes a LEC expression.
  */
 
 #include "iode.h"
@@ -342,3 +343,33 @@ void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to)
     }
 }
 
+
+/**
+ *  Compiles, links and executes a LEC expression.
+ *  
+ *  @param [in] char*       lec     LEC expression 
+ *  @param [in] KDB*        dbv     KDB of variables used in lec 
+ *  @param [in] KDB*        dbs     KDB of SCL used in lec
+ *  @return     IODE_REAL*          calculated lec expression on the whole dbv sample    
+ *                                  NULL on error (error can be retrieved via a call to L_error()
+ */
+L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)
+{
+    int      t, nb;
+    CLEC     *clec = 0;
+    L_REAL   *vec = NULL;
+
+    
+    if(lec == 0 || lec[0] == 0) return(vec);
+    clec = L_cc(lec);
+    if(clec != 0 && !L_link(dbv, dbs, clec)) {
+        nb = KSMPL(dbv)->s_nb;
+        vec = (IODE_REAL*) SW_nalloc(nb * sizeof(IODE_REAL));
+        for(t = 0 ; t < nb ; t++) {
+            vec[t] = L_exec(dbv, dbs, clec, t);
+        }
+    }
+
+    SW_nfree(clec);
+    return(vec);
+}
