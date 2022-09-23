@@ -248,7 +248,7 @@ TEST_F(KDBVariablesTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBVariables(pattern);
+    local_kdb = new KDBVariables(KDB_SHALLOW_COPY, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -317,7 +317,7 @@ TEST_F(KDBVariablesTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBVariables(pattern, false);
+    local_kdb = new KDBVariables(KDB_LOCAL, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -369,9 +369,9 @@ TEST_F(KDBVariablesTest, Merge)
     std::string pattern = "A*";
 
     // create hard copies kdb
-    KDBVariables kdb0(pattern, false);
-    KDBVariables kdb1(pattern, false);
-    KDBVariables kdb_to_merge(pattern, false);
+    KDBVariables kdb0(KDB_LOCAL, pattern);
+    KDBVariables kdb1(KDB_LOCAL, pattern);
+    KDBVariables kdb_to_merge(KDB_LOCAL, pattern);
 
     int nb_periods = kdb_to_merge.get_nb_periods();
 

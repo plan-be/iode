@@ -117,7 +117,7 @@ TEST_F(KDBScalarsTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBScalars(pattern);
+    local_kdb = new KDBScalars(KDB_SHALLOW_COPY, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -194,7 +194,7 @@ TEST_F(KDBScalarsTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBScalars(pattern, false);
+    local_kdb = new KDBScalars(KDB_LOCAL, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -256,9 +256,9 @@ TEST_F(KDBScalarsTest, Merge)
     std::string pattern = "A*";
 
     // create hard copies kdb
-    KDBScalars kdb0(pattern, false);
-    KDBScalars kdb1(pattern, false);
-    KDBScalars kdb_to_merge(pattern, false);
+    KDBScalars kdb0(KDB_LOCAL, pattern);
+    KDBScalars kdb1(KDB_LOCAL, pattern);
+    KDBScalars kdb_to_merge(KDB_LOCAL, pattern);
 
     // add an element to the KDB to be merged
     std::string new_name = "new_scalar";

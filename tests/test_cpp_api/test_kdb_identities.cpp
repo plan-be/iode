@@ -146,7 +146,7 @@ TEST_F(KDBIdentitiesTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBIdentities(pattern);
+    local_kdb = new KDBIdentities(KDB_SHALLOW_COPY, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -209,7 +209,7 @@ TEST_F(KDBIdentitiesTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBIdentities(pattern, false);
+    local_kdb = new KDBIdentities(KDB_LOCAL, pattern);
     EXPECT_EQ(local_kdb->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
@@ -316,9 +316,9 @@ TEST_F(KDBIdentitiesTest, Merge)
     std::string pattern = "A*";
 
     // create hard copies kdb
-    KDBIdentities kdb0(pattern, false);
-    KDBIdentities kdb1(pattern, false);
-    KDBIdentities kdb_to_merge(pattern, false);
+    KDBIdentities kdb0(KDB_LOCAL, pattern);
+    KDBIdentities kdb1(KDB_LOCAL, pattern);
+    KDBIdentities kdb_to_merge(KDB_LOCAL, pattern);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_IDENTITY";
