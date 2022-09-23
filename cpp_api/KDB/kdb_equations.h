@@ -13,8 +13,8 @@ protected:
     Equation get_unchecked(const int pos) const override;
 
 public:
-    KDBEquations(const std::string& pattern = "", const bool shallow_copy=true) : 
-        KDBTemplate(I_EQUATIONS, pattern, shallow_copy) {};
+    KDBEquations(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
+        KDBTemplate(kdb_type, I_EQUATIONS, pattern) {};
 
     std::string get_lec(const int pos) const;
 

@@ -2,8 +2,8 @@
 #include "kdb_abstract.h"
 
 
-KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& pattern, const bool shallow_copy) : 
-    iode_type(iode_type), iode_type_name(iode_type_name)
+KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
+    kdb_type(kdb_type), iode_type(iode_type), iode_type_name(iode_type_name)
 {
     if (K_WS[iode_type] == NULL) IodeInit();
     cpp_assign_super_API();
@@ -11,24 +11,21 @@ KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& patter
     IodeExceptionInitialization error(iode_type_name);
     error.add_argument("IODE type name (number): ", iode_type_name + " (" + std::to_string(iode_type) + ")");
     error.add_argument("pattern: ", pattern);
-    error.add_argument("shallow copy? : ", std::to_string(shallow_copy));
+    error.add_argument("shallow copy? : ", kdb_type == KDB_SHALLOW_COPY ? "Yes" : "No");
 
-    if (pattern.empty())
+    if (kdb_type == KDB_GLOBAL)
     {
-        kdb_type = KDB_GLOBAL;
         local_kdb = NULL;
     }
     else
     {
         char** c_names = filter_kdb_names(iode_type, pattern);
-        if (shallow_copy)
+        if (kdb_type == KDB_SHALLOW_COPY)
         {
-            kdb_type = KDB_SHALLOW_COPY;
             local_kdb = K_quick_refer(K_WS[iode_type], c_names);
         } 
         else
         {
-            kdb_type = KDB_LOCAL;
             local_kdb = hard_copy_kdb(K_WS[iode_type], c_names);
         }   
         SW_nfree(c_names);
