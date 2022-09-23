@@ -3,10 +3,12 @@
 
 
 KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
-    kdb_type(kdb_type), iode_type(iode_type), iode_type_name(iode_type_name)
+    kdb_type(kdb_type), iode_type(iode_type)
 {
     if (K_WS[iode_type] == NULL) IodeInit();
     cpp_assign_super_API();
+
+    iode_type_name = vIodeTypes[iode_type];
 
     IodeExceptionInitialization error(iode_type_name);
     error.add_argument("IODE type name (number): ", iode_type_name + " (" + std::to_string(iode_type) + ")");
