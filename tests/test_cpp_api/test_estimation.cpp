@@ -9,6 +9,7 @@ protected:
     std::string to;
     std::string eq_name;
     KDBEquations kdb_eqs;
+    KDBScalars kdb_scl;
     KDBVariables kdb_vars;
 
     void SetUp() override
@@ -32,29 +33,58 @@ protected:
 
 TEST_F(EstimationTest, Estimate)
 {
-    est->equations_estimate();
+    kdb_scl.update("acaf1", 0., 1.);
+    kdb_scl.update("acaf2", 0., 1.);
+    kdb_scl.update("acaf4", 0., 1.);
 
+    est->equations_estimate();
+    est->save();
+
+    // coeff values
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").value()) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf2").value()) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf4").value()) / 1e6, -0.008503);
+
+    // result values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES", "1980Y1")) / 1e6, -0.00115);
 
-    // R2, R2 ajusted and DW
+    // Tests values
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stdev").value()) / 1e6, 0.00427);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_meany").value()) / 1e6, 0.008185);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_ssres").value()) / 1e6, 5.2e-05);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stderr").value()) / 1e6, 0.001927);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_sderrp").value()) / 1e6, 23.542242);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_fstat").value()) / 1e6, 32.285107);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_r2").value()) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_r2adj").value()) / 1e6, 0.79636);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_dw").value()) / 1e6, 2.33007);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_loglik").value()) / 1e6, 83.810104);
+
     Equation eq = kdb_eqs.get("ACAF");
-    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_R2 - 10]) / 1e6, 0.821815);
-    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_R2ADJ - 10]) / 1e6, 0.79636);
-    EXPECT_DOUBLE_EQ(round(1e6 * eq.get_tests()[KE_DW - 10]) / 1e6, 2.33007);
+    std::array<float, EQS_NBTESTS> tests = eq.get_tests();
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDEV]) / 1e6, 0.00427);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_MEANY]) / 1e6, 0.008185);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_SSRES]) / 1e6, 5.2e-05);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDERR]) / 1e6, 0.001927);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDERRP]) / 1e6, 23.542242);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_FSTAT]) / 1e6, 32.285107);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_R2]) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_R2ADJ]) / 1e6, 0.79636);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_DW]) / 1e6, 2.33007);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_LOGLIK]) / 1e6, 83.810104);
 
     // correlation matrix
     MAT* cm = est->get_correlation_matrix();
-    /*
     EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 2)) / 1e6, 0.200169);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 2)) / 1e6, 0.20017);
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.936111);
     EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 2)) / 1e6, -0.3);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.200169);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.3);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 2)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
     EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
-    */
 }
 
 TEST_F(EstimationTest, DynamicAdjustment)
