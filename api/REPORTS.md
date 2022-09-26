@@ -318,16 +318,16 @@ Report functions related to model simulations.
 
 #### List of functions {#T27}
 
-|Syntax|Equivalent in Reports|||||
-|:---|:---|:---|:---|:---|:---|
-|`int B_ModelSimulate(char *arg)`|$ModelSimulate per\_from per\_to equation\_list|||||
-|`int B_ModelSimulateParms(char* arg)`|$ModelSimulateParms eps relax maxit \{Connex|Triang|None \} 0 \- 4 (starting values) \{Yes|no \} \{yes|No \} nbtri|
-|`int B_ModelExchange(char* arg)`|$ModelExchange eqname1\-varname1,eqname2\-varname2,...|||||
-|`int B_ModelCompile(char* arg)`|$ModelCompile \[eqname1, eqname2, ... \]|||||
-|`int B_ModelCalcSCC(char *arg)`|$ModelCalcSCC nbtris prename intername postname \[eqs\]|||||
-|`int B_ModelSimulateSCC(char *arg)`|$ModelSimulateSCC from to pre inter post|||||
-|`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|||||
-|`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|||||
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_ModelSimulate(char *arg)`|$ModelSimulate per\_from per\_to equation\_list|
+|`int B_ModelSimulateParms(char* arg)`|$ModelSimulateParms eps relax maxit \{Connex, Triang, None \} 0 \- 4 (starting values) \{Yes, no \} \{yes, No \} nbtri|
+|`int B_ModelExchange(char* arg)`|$ModelExchange eqname1\-varname1,eqname2\-varname2,...|
+|`int B_ModelCompile(char* arg)`|$ModelCompile \[eqname1, eqname2, ... \]|
+|`int B_ModelCalcSCC(char *arg)`|$ModelCalcSCC nbtris prename intername postname \[eqs\]|
+|`int B_ModelSimulateSCC(char *arg)`|$ModelSimulateSCC from to pre inter post|
+|`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|
+|`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|
 
 ## Report functions group 3: report functions {#T28}
 
