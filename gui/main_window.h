@@ -7,13 +7,13 @@
 
 #include "utils.h"
 
-#include "tabs/comments_model.h"
-#include "tabs/equations_model.h"
-#include "tabs/identities_model.h"
-#include "tabs/lists_model.h"
-#include "tabs/scalars_model.h"
-#include "tabs/tables_model.h"
-#include "tabs/variables_model.h"
+#include "iode_objs/models/comments_model.h"
+#include "iode_objs/models/equations_model.h"
+#include "iode_objs/models/identities_model.h"
+#include "iode_objs/models/lists_model.h"
+#include "iode_objs/models/scalars_model.h"
+#include "iode_objs/models/tables_model.h"
+#include "iode_objs/models/variables_model.h"
 
 #include "menu/workspace/workspace_load.h"
 #include "menu/workspace/workspace_save.h"

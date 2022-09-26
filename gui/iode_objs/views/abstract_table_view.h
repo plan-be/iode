@@ -3,7 +3,7 @@
 #include <QTableView>
 #include <QLineEdit>
 #include "utils.h"
-#include "abstract_delegate.h"
+#include "iode_objs/delegates/abstract_delegate.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

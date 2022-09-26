@@ -29,61 +29,65 @@ set(GUI_CUSTOM_WIDGETS
     custom_widgets/qsampleedit.h
 )
 
-set(GUI_POPUP
-    tabs/popup_view.h
-
-    tabs/popup/edit_equation.ui         tabs/popup/edit_equation.h          tabs/popup/edit_equation.cpp
-                                        tabs/popup/edit_table_view.h        tabs/popup/edit_table_view.cpp
-                                        tabs/popup/edit_table_model.h       tabs/popup/edit_table_model.cpp
-    tabs/popup/edit_table.ui            tabs/popup/edit_table.h             tabs/popup/edit_table.cpp
-    tabs/popup/edit_vars_sample.ui      tabs/popup/edit_vars_sample.h       tabs/popup/edit_vars_sample.cpp
-                                        tabs/popup/edit_table_delegate.h    tabs/popup/edit_table_delegate.cpp
-
-    tabs/popup/add_object.ui 
-                                        tabs/popup/add_comment.h            tabs/popup/add_comment.cpp
-                                        tabs/popup/add_identity.h           tabs/popup/add_identity.cpp
-                                        tabs/popup/add_list.h               tabs/popup/add_list.cpp
-    tabs/popup/add_scalar.ui            tabs/popup/add_scalar.h             tabs/popup/add_scalar.cpp
-    tabs/popup/add_table.ui             tabs/popup/add_table.h              tabs/popup/add_table.cpp
-                                        tabs/popup/add_variable.h           tabs/popup/add_variable.cpp 
+set(GUI_EDIT_OBJECT
+                                        iode_objs/edit/popup_view.h
+    iode_objs/edit/edit_equation.ui     iode_objs/edit/edit_equation.h          iode_objs/edit/edit_equation.cpp
+                                        iode_objs/edit/edit_table_view.h        iode_objs/edit/edit_table_view.cpp
+                                        iode_objs/edit/edit_table_model.h       iode_objs/edit/edit_table_model.cpp
+    iode_objs/edit/edit_table.ui        iode_objs/edit/edit_table.h             iode_objs/edit/edit_table.cpp
+                                        iode_objs/edit/edit_table_delegate.h    iode_objs/edit/edit_table_delegate.cpp
+    iode_objs/edit/edit_vars_sample.ui  iode_objs/edit/edit_vars_sample.h       iode_objs/edit/edit_vars_sample.cpp
 )
 
-set(GUI_TABS_MODELS     
-    tabs/abstract_table_model.h tabs/abstract_table_model.cpp
-    tabs/comments_model.h       tabs/comments_model.cpp
-    tabs/equations_model.h      tabs/equations_model.cpp
-    tabs/identities_model.h     tabs/identities_model.cpp
-    tabs/lists_model.h          tabs/lists_model.cpp
-    tabs/scalars_model.h        tabs/scalars_model.cpp
-    tabs/tables_model.h         tabs/tables_model.cpp
-    tabs/variables_model.h      tabs/variables_model.cpp
+set(GUI_NEW_OBJECT
+    iode_objs/new/add_object.ui 
+                                    iode_objs/new/add_comment.h     iode_objs/new/add_comment.cpp
+                                    iode_objs/new/add_identity.h    iode_objs/new/add_identity.cpp
+                                    iode_objs/new/add_list.h        iode_objs/new/add_list.cpp
+    iode_objs/new/add_scalar.ui     iode_objs/new/add_scalar.h      iode_objs/new/add_scalar.cpp
+    iode_objs/new/add_table.ui      iode_objs/new/add_table.h       iode_objs/new/add_table.cpp
+                                    iode_objs/new/add_variable.h    iode_objs/new/add_variable.cpp 
 )
 
-set(GUI_TABS_DELEGATES
-    tabs/abstract_delegate.h
-    tabs/popup_delegate.h
-    tabs/text_delegate.h
-    tabs/comments_delegate.h
-    tabs/equations_delegate.h
-    tabs/identities_delegate.h
-    tabs/lists_delegate.h
-    tabs/scalars_delegate.h
-    tabs/variables_delegate.h
-    tabs/tables_delegate.h
+set(GUI_OBJS_MODELS     
+    iode_objs/models/abstract_table_model.h     iode_objs/models/abstract_table_model.cpp
+    iode_objs/models/comments_model.h           iode_objs/models/comments_model.cpp
+    iode_objs/models/equations_model.h          iode_objs/models/equations_model.cpp
+    iode_objs/models/identities_model.h         iode_objs/models/identities_model.cpp
+    iode_objs/models/lists_model.h              iode_objs/models/lists_model.cpp
+    iode_objs/models/scalars_model.h            iode_objs/models/scalars_model.cpp
+    iode_objs/models/tables_model.h             iode_objs/models/tables_model.cpp
+    iode_objs/models/variables_model.h          iode_objs/models/variables_model.cpp
 )
 
-set(GUI_TABS_VIEWS
-    tabs/abstract_table_view.h
-    tabs/comments_view.h    tabs/comments_view.cpp
-    tabs/equations_view.h   tabs/equations_view.cpp
-    tabs/identities_view.h  tabs/identities_view.cpp
-    tabs/lists_view.h       tabs/lists_view.cpp
-    tabs/scalars_view.h     tabs/scalars_view.cpp
-    tabs/tables_view.h      tabs/tables_view.cpp
-    tabs/variables_view.h   tabs/variables_view.cpp
+set(GUI_OBJS_DELEGATES
+    iode_objs/delegates/popup_delegate.h
+    iode_objs/delegates/abstract_delegate.h
+    iode_objs/delegates/text_delegate.h
+    iode_objs/delegates/comments_delegate.h
+    iode_objs/delegates/equations_delegate.h
+    iode_objs/delegates/identities_delegate.h
+    iode_objs/delegates/lists_delegate.h
+    iode_objs/delegates/scalars_delegate.h
+    iode_objs/delegates/variables_delegate.h
+    iode_objs/delegates/tables_delegate.h
 )
 
-set(GUI_TABS ${GUI_TABS_DELEGATES} ${GUI_TABS_MODELS} ${GUI_TABS_VIEWS})
+set(GUI_OBJS_VIEWS
+    iode_objs/views/abstract_table_view.h
+    iode_objs/views/comments_view.h         iode_objs/views/comments_view.cpp
+    iode_objs/views/equations_view.h        iode_objs/views/equations_view.cpp
+    iode_objs/views/identities_view.h       iode_objs/views/identities_view.cpp
+    iode_objs/views/lists_view.h            iode_objs/views/lists_view.cpp
+    iode_objs/views/scalars_view.h          iode_objs/views/scalars_view.cpp
+    iode_objs/views/tables_view.h           iode_objs/views/tables_view.cpp
+    iode_objs/views/variables_view.h        iode_objs/views/variables_view.cpp
+)
+
+set(GUI_IODE_OBJS 
+    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} 
+    ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
+)
 
 set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_load.ui    menu/workspace/workspace_load.h     menu/workspace/workspace_load.cpp
@@ -107,7 +111,7 @@ set(GUI_MAIN
 ) 
 
 set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} 
-                        ${GUI_POPUP} ${GUI_TABS} ${GUI_MENUS}
+                        ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT}  ${GUI_MENUS}
                         ${GUI_MAIN}
 )
 

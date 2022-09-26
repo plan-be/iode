@@ -2,11 +2,11 @@
 
 #include <QObject>
 
-#include "popup_view.h"
-#include "tables_delegate.h"
-#include "tables_model.h"
-#include "popup/edit_table.h"
-#include "popup/add_table.h"
+#include "iode_objs/edit/popup_view.h"
+#include "iode_objs/delegates/tables_delegate.h"
+#include "iode_objs/models/tables_model.h"
+#include "iode_objs/edit/edit_table.h"
+#include "iode_objs/new/add_table.h"
 
 
 class TablesView : public PopupView<TablesModel, QIodeEditTable>

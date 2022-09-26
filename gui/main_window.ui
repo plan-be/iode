@@ -1536,7 +1536,7 @@
   <customwidget>
    <class>CommentsView</class>
    <extends>QTableView</extends>
-   <header>./tabs/comments_view.h</header>
+   <header>iode_objs/views/comments_view.h</header>
    <slots>
     <slot>new_comment()</slot>
     <slot>filter()</slot>
@@ -1545,7 +1545,7 @@
   <customwidget>
    <class>ListsView</class>
    <extends>QTableView</extends>
-   <header>./tabs/lists_view.h</header>
+   <header>iode_objs/views/lists_view.h</header>
    <slots>
     <slot>new_list()</slot>
     <slot>filter()</slot>
@@ -1554,7 +1554,7 @@
   <customwidget>
    <class>IdentitiesView</class>
    <extends>QTableView</extends>
-   <header>./tabs/identities_view.h</header>
+   <header>iode_objs/views/identities_view.h</header>
    <slots>
     <slot>new_identity()</slot>
     <slot>filter()</slot>
@@ -1563,7 +1563,7 @@
   <customwidget>
    <class>EquationsView</class>
    <extends>QTableView</extends>
-   <header>./tabs/equations_view.h</header>
+   <header>iode_objs/views/equations_view.h</header>
    <slots>
     <slot>new_equation()</slot>
     <slot>filter()</slot>
@@ -1572,7 +1572,7 @@
   <customwidget>
    <class>TablesView</class>
    <extends>QTableView</extends>
-   <header>./tabs/tables_view.h</header>
+   <header>iode_objs/views/tables_view.h</header>
    <slots>
     <slot>new_table()</slot>
     <slot>filter()</slot>
@@ -1581,7 +1581,7 @@
   <customwidget>
    <class>ScalarsView</class>
    <extends>QTableView</extends>
-   <header>./tabs/scalars_view.h</header>
+   <header>iode_objs/views/scalars_view.h</header>
    <slots>
     <slot>new_scalar()</slot>
     <slot>filter()</slot>
@@ -1590,7 +1590,7 @@
   <customwidget>
    <class>VariablesView</class>
    <extends>QTableView</extends>
-   <header>./tabs/variables_view.h</header>
+   <header>iode_objs/views/variables_view.h</header>
    <slots>
     <slot>new_variable()</slot>
     <slot>filter()</slot>
