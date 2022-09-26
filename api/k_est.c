@@ -207,10 +207,11 @@ static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tes
  *  @param [in] KDB*    dbs     KDB of SCL
  *  @param [in] SAMPLE* smpl    estimation sample
  *  @param [in] char**  names   vector of equation (endo) names
+ *  @param [in] int     clean   whether or not to call E_free_work() after estimation
  *  @return     int             0 on success, -1 on error
  */
  
-int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names)
+int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names, int clean)
 {
     static  char met[6] = {"LZIGM"};
     int     i, j, pos, nb,
@@ -311,7 +312,7 @@ int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names)
         lecs = endos = instrs = blk = NULL;
         nbl = nbe = 0;
 
-        E_free_work();
+        if(clean) E_free_work();
 
         if(error != 0) return(-1);
     }
@@ -346,7 +347,7 @@ int KE_estim(char* veqs, char* afrom, char* ato)
     
     smpl = PER_atosmpl(afrom, ato);
     teqs =  SCR_vtoms(veqs, ",; ");     // TODO: replace hard-coded separators by a (new?) variable 
-    rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, teqs);
+    rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, teqs, 1);
     
     SCR_free_tbl(teqs);
     SCR_free(smpl);

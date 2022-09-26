@@ -533,7 +533,7 @@ extern int T_default(TBL *,char *,char **,char **,int ,int ,int );
 extern void T_auto(TBL *,char *,char **,int ,int ,int );
 
 /* k_est.c */
-extern int KE_est_s(KDB *,KDB *,KDB *,SAMPLE *,char **);
+extern int KE_est_s(KDB *,KDB *,KDB *,SAMPLE *,char **, int);
 extern void E_tests2scl(EQ *,int ,int ,int );
 extern int KE_estim(char* veqs, char* afrom, char* ato);
 //extern void E_savescl(double ,int ,char *);
