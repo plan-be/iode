@@ -99,7 +99,7 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
     rc = K_upd_eqs("_DF", buf, 0L, 0, 0L, 0L, 0L, 0L, 0);
     if(rc) return(rc);
     //rc = B_EqsEstimateEqs(smpl, eqs);
-    rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs);
+    rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs, 1);
 
     K_del_by_name(KE_WS, "_DF");
     SCR_free_tbl(eqs);

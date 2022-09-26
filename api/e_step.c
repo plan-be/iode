@@ -147,7 +147,7 @@ static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char**
 
     if(nscl > 1) {                   /*Effectue l'estimation si plus d'un relax est != 0 */
         //B_EqsEstimateEqs(smpl,eqs);
-        rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs);
+        rc = KE_est_s(KE_WS, KV_WS, KS_WS, smpl, eqs, 1);
         etest[0]=0;
         strcat(etest,"e0_");
         strcat(etest,test);
@@ -223,13 +223,13 @@ IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
     CLEC        *cl;
     char        **scl = NULL, **eqs = NULL;
 
-    // Cr‚e le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
+    // Crï¿½e le tableau d'ï¿½quations ï¿½ partir de arg (il faut qu'une seule eqs!!)
     eqs = B_ainit_chk(eqname, NULL, 0);         
     if(eqs == NULL) return(0.0);
     pos = K_find(K_WS[K_EQS], eqs[0]);
     if(pos < 0) return(0.0);
 
-    // Construit le tableau de scalaires contenus dans l'équation eqs
+    // Construit le tableau de scalaires contenus dans l'ï¿½quation eqs
     eq = KEVAL(K_WS[K_EQS], pos);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);

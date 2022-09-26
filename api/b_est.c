@@ -76,7 +76,7 @@ int B_EqsEstimateEqs(SAMPLE* smpl, char** eqs)
         if(tdbe == 0 || KNB(tdbe) == 0)                                       
             rc = -1;                                                          
         else                                                                  
-            rc = KE_est_s(tdbe, KV_WS, KS_WS, smpl, eqs);    // JMP 29/04/2022
+            rc = KE_est_s(tdbe, KV_WS, KS_WS, smpl, eqs, 1);    // JMP 29/04/2022
         K_free_kdb(tdbe);
     }
 
