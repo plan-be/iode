@@ -54,33 +54,35 @@ static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
  *  
  *  @see https://iode.plan.be/doku.php?id=modelsimulate
  */
-int B_ModelSimulate(char *arg)
+int B_ModelSimulate(char *const_arg)
 {
     int     lg1, lg2;
-    int     rc;
-    char    from[16], to[16], **eqs;
-    SAMPLE  *smpl;
+    int     rc = -1;
+    char    from[16], to[16], **eqs = 0;
+    SAMPLE  *smpl = 0;
+    char    *arg;
 
+    // Copy for C++ strings = read only (const)
+    arg = SCR_stracpy(const_arg);
+    
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
     smpl = PER_atosmpl(from, to);
 
     if(smpl == NULL) {
         B_seterror("ModelSimulate: %s %s wrong sample", from, to);
-        return(-1);
-    }
-
-    eqs = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    if(eqs == 0) {
-        rc = -1;    /* JMP 06-07-94 */
         goto err;
     }
 
+    eqs = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
+    if(eqs == 0) goto err;
+    
     rc = B_ModelSimulateEqs(smpl, eqs);
 
 err:
     SCR_free_tbl(eqs);
     SCR_free(smpl);
+    SCR_free(arg);
     return(rc);
 }
 
@@ -139,18 +141,22 @@ fin :
  *  
  *  @see https://iode.plan.be/doku.php?id=modelexchange
  */
-int B_ModelExchange(char* arg)
+int B_ModelExchange(char* const_arg)
 {
+    char    *arg;
+
+    // Copy for C++ strings = read only (const)
+    arg = SCR_stracpy(const_arg);
+    
     if(KSIM_EXO) {
         SCR_free_tbl(KSIM_EXO);
         KSIM_EXO = NULL;
     }
 
-    if(arg == NULL || (SCR_strip(arg))[0] == '\0') return(0);
-    /*
-    KSIM_EXO = (char **) SCR_vtoms(arg, B_SEPS);
-    */
-    KSIM_EXO = B_ainit_chk(arg, NULL, 0);
+    if(arg && SCR_strip(arg)[0]) 
+        KSIM_EXO = B_ainit_chk(arg, NULL, 0);
+    
+    SCR_free(arg);
     return(0);
 }
 
@@ -219,12 +225,16 @@ int B_ModelCompile(char* arg)
  *  
  *  @see https://iode.plan.be/doku.php?id=ModelCalcSCC
  */
-int B_ModelCalcSCC(char *arg)
+int B_ModelCalcSCC(char *const_arg)
 {
     char    **eqs, buf[256], pre[64], inter[64], post[64];
     int     rc = -1, lg1, tris;
     KDB		*tdbe = NULL;
+    char    *arg;
 
+    // Copy for C++ strings = read only (const)
+    arg = SCR_stracpy(const_arg);
+    
     // Tri
     lg1 = B_get_arg0(buf,    arg, 15);
     tris = atoi(buf); 
@@ -248,6 +258,7 @@ int B_ModelCalcSCC(char *arg)
     if(SCR_tbl_size(eqs) != 0) K_free_kdb(tdbe);
 err:
     SCR_free_tbl(eqs);
+    SCR_free(arg);
     return(rc);
 }
 
@@ -259,12 +270,16 @@ err:
  *  
  *  @see https://iode.plan.be/doku.php?id=ModelSimulateSCC
  */
-int B_ModelSimulateSCC(char *arg)
+int B_ModelSimulateSCC(char *const_arg)
 {
     int     lg1, lg2, rc, prepos, interpos, postpos;
-    char    from[16], to[16], **lsts, **eqs, **eqs1, **pre, **post, **inter;
+    char    from[16], to[16], **lsts = 0, **eqs, **eqs1, **pre, **post, **inter;
     SAMPLE  *smpl;
     KDB     *tdbe;
+    char    *arg;
+
+    // Copy for C++ strings = read only (const)
+    arg = SCR_stracpy(const_arg);
 
     lg1 = B_get_arg0(from, arg, 15);
     lg2 = B_get_arg0(to, arg + lg1, 15);
@@ -272,14 +287,16 @@ int B_ModelSimulateSCC(char *arg)
 
     if(smpl == NULL) {
         B_seterror("ModelSimulateSCC: %s %s wrong sample", from, to);
+        SCR_free(arg);
         return(-1);
     }
 
     // Extrait les listes restantes
     lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
     if(lsts == 0 || SCR_tbl_size(lsts) != 3) {
-        rc = -1;
         B_seterror("ModelSimulateSCC: syntax error in lists");
+        SCR_free_tbl(lsts);
+        rc = -1;
         goto err;
     }
 
@@ -316,6 +333,7 @@ int B_ModelSimulateSCC(char *arg)
 
 err:
     SCR_free(smpl);
+    SCR_free(arg);
     return(rc);
 }
 

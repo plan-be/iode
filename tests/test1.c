@@ -148,7 +148,7 @@ char* U_test_read_file(char*filename, long *size)
 }
 
 /**
- *  Compares 2 files. Returns 0 if the 2 files are ==, -1 if not.
+ *  Compares 2 files. 
  *  
  *  @return int     -1 if the 2 files are ==, 
  *                  0 if not.
@@ -1694,112 +1694,199 @@ void Tests_B_HTOL()
 
 void Tests_B_MODEL()
 {
-//    KDB         *kdbv, 
-//                *kdbe, 
-//                *kdbs;
-//    SAMPLE      *smpl;
-//    char        *filename = "fun";
-//    U_ch**      endo_exo;
-//    int         rc;
-//    LIS         lst, expected_lst;
-//
-//    // B_Model*() tests
-//    // ----------------
-//    // X int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
-//    // X int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
-//    // X int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
-//    // X int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
-//    // X int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
-//    // X int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
-//    // int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
-//    // int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
-//
-//
-//    U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
-//    U_test_suppress_kmsg_msgs();
-//    
-//    
-//    // Loads 3 WS and check ok
-//    U_test_load_fun_esv(filename);
-//
-//    // Check
-//    kdbv = KV_WS;
-//    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
-//    kdbs = KS_WS;
-//    S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
-//    kdbe = KE_WS;
-//    S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
-//    
-//    // B_ModelSimulateParms()
-//    KSIM_START = KV_INIT_TM1;
-//    KSIM_EPS = 0.00001;
-//    KSIM_MAXIT = 1000;
-//    KSIM_RELAX = 1.0;
-//    KSIM_SORT = 0;
-//    KSIM_PASSES = 3; 
-//    KSIM_DEBUG = 1;
-//    rc = B_ModelSimulateParms("0.0001 0.7 100 Both 0 no no 5");
-//    S4ASSERT(rc == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") == 0");
-//    S4ASSERT(KSIM_EPS == 0.0001, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_EPS == 0.0001");
-//    S4ASSERT(KSIM_MAXIT == 100, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_MAXIT == 100");
-//    S4ASSERT(KSIM_RELAX == 0.7, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_RELAX == 0.7");
-//    S4ASSERT(KSIM_DEBUG == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_DEBUG == 0");
-//
-//
-//    // B_ModelSimulate()
-//    rc = B_ModelSimulate("2000Y1 2002Y1");
-//    S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
-//    // TODO: check result of one ENDO
-//    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
-//    
-//    // B_ModelExchange()
-//    // Set values of endo UY
-//    KV_set_at_aper("UY", "2000Y1", 650.0);
-//    KV_set_at_aper("UY", "2001Y1", 670.0);
-//    KV_set_at_aper("UY", "2002Y1", 680.0);
-//
-//    // Exchange
-//    rc = B_ModelExchange("UY-XNATY");
-//    S4ASSERT(rc == 0, "B_ModelExchange(\"UY-XNATY\") == 0");
-//    
-//    // Simulate
-//    rc = B_ModelSimulate("2000Y1 2002Y1");
-//    S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
-//
-//    // Check some results
-//    S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
-//    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80071");
-//    
-//    // B_ModelCompile(char* arg)
-//    rc = B_ModelCompile("");
-//    S4ASSERT(rc == 0, "B_ModelCompile(\"\") == 0");
-//
-//    // B_ModelCalcSCC(char *arg) $ModelCalcSCC nbtris prename intername postname [eqs]
-//    rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
-//    S4ASSERT(rc == 0, "B_ModelCalcSCC(\"5 _PRE2 _INTER2 _POST2\") == 0");
-//    rc = strcmp(KLPTR("_PRE2"), "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
-//    S4ASSERT(rc == 0, "_PRE2 == BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
-//
-//    // int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
-//    //  1. Annuler Exchange
-//    rc = B_ModelExchange("");
-//    S4ASSERT(rc == 0, "B_ModelExchange(\"\") == 0");
-//
-//    //  2. ReLoads 3 WS to reset EXO XNATY to its original value
-//    U_test_load_fun_esv(filename);
-//    
-//    //  3. Simulate & compare
-//    rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
-//    S4ASSERT(rc == 0, "B_ModelSimulateSCC(\"2000Y1 2002Y1 _PRE2 _INTER2 _POST2\") == 0");
-//    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
-//        
-//    // B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
-//    
-//    
-//
-//    U_test_reset_kmsg_msgs();      
+    KDB         *kdbv, 
+                *kdbe, 
+                *kdbs;
+    SAMPLE      *smpl;
+    char        *filename = "fun";
+    U_ch**      endo_exo;
+    int         rc;
+    LIS         lst, expected_lst;
+    //char        simul_parms[] = "2000Y1 2002Y1";
+    //char        simulscc_parms[] = "2000Y1 2002Y1 _PRE2 _INTER2 _POST2";
+
+    // B_Model*() tests
+    // ----------------
+    // X int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
+    // X int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
+    // X int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
+    // X int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
+    // X int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
+    // X int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
+    // int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
+    // int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
+
+
+    U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
+    U_test_suppress_kmsg_msgs();
+    
+    
+    // Loads 3 WS and check ok
+    U_test_load_fun_esv(filename);
+
+    // Check
+    kdbv = KV_WS;
+    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
+    kdbs = KS_WS;
+    S4ASSERT(kdbs != NULL, "K_interpret(K_SCL, \"%s\")", filename);
+    kdbe = KE_WS;
+    S4ASSERT(kdbe != NULL, "K_interpret(K_EQS, \"%s\")", filename);
+    
+    // B_ModelSimulateParms()
+    KSIM_START = KV_INIT_TM1;
+    KSIM_EPS = 0.00001;
+    KSIM_MAXIT = 1000;
+    KSIM_RELAX = 1.0;
+    KSIM_SORT = 0;
+    KSIM_PASSES = 3; 
+    KSIM_DEBUG = 1;
+    rc = B_ModelSimulateParms("0.0001 0.7 100 Both 0 no no 5");
+    S4ASSERT(rc == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") == 0");
+    S4ASSERT(KSIM_EPS == 0.0001, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_EPS == 0.0001");
+    S4ASSERT(KSIM_MAXIT == 100, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_MAXIT == 100");
+    S4ASSERT(KSIM_RELAX == 0.7, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_RELAX == 0.7");
+    S4ASSERT(KSIM_DEBUG == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_DEBUG == 0");
+
+
+    // B_ModelSimulate()
+    rc = B_ModelSimulate("2000Y1 2002Y1");
+    S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
+    // TODO: check result of one ENDO
+    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
+    
+    // B_ModelExchange()
+    // Set values of endo UY
+    KV_set_at_aper("UY", "2000Y1", 650.0);
+    KV_set_at_aper("UY", "2001Y1", 670.0);
+    KV_set_at_aper("UY", "2002Y1", 680.0);
+
+    // Exchange
+    rc = B_ModelExchange("UY-XNATY");
+    S4ASSERT(rc == 0, "B_ModelExchange(\"UY-XNATY\") == 0");
+    
+    // Simulate
+    rc = B_ModelSimulate("2000Y1 2002Y1");
+    S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
+
+    // Check some results
+    S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
+    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80071");
+    
+    // B_ModelCompile(char* arg)
+    rc = B_ModelCompile("");
+    S4ASSERT(rc == 0, "B_ModelCompile(\"\") == 0");
+
+    // B_ModelCalcSCC(char *arg) $ModelCalcSCC nbtris prename intername postname [eqs]
+    rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
+    S4ASSERT(rc == 0, "B_ModelCalcSCC(\"5 _PRE2 _INTER2 _POST2\") == 0");
+    rc = strcmp(KLPTR("_PRE2"), "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
+    S4ASSERT(rc == 0, "_PRE2 == BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT");
+
+    // int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
+    //  1. Annuler Exchange
+    rc = B_ModelExchange("");
+    S4ASSERT(rc == 0, "B_ModelExchange(\"\") == 0");
+
+    //  2. ReLoads 3 WS to reset EXO XNATY to its original value
+    U_test_load_fun_esv(filename);
+    
+    //  3. Simulate & compare
+    rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
+    S4ASSERT(rc == 0, "B_ModelSimulateSCC(\"2000Y1 2002Y1 _PRE2 _INTER2 _POST2\") == 0");
+    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
+        
+    // B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
+    
+   
+
+    U_test_reset_kmsg_msgs();      
 }
 
+
+//// int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+//int U_test_B_WsLoad(char*filename, int type, int expected_nb_objects)
+//{
+//    char    fullfilename[256];
+//    int     rc, cond;
+//
+//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
+//    rc = B_WsLoad(fullfilename, type);
+//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+//    S4ASSERT(cond, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", fullfilename, type, expected_nb_objects);
+//    return(cond);
+//}
+//
+//
+//int U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
+//{
+//    char    fullfilename[256];
+//    int     rc, cond;
+//
+//    unlink(out_file);
+//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+//    rc = B_WsLoad(fullfilename, type);
+//    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
+//    rc = B_WsSave(out_file, type);
+//    S4ASSERT(rc == 0, "B_WsSave(\"%s\", %d) == 0", out_file, type);
+//    B_WsClear("", type);
+//    rc = B_WsLoad(out_file, type);
+//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+//    S4ASSERT(cond, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", out_file, type, expected_nb_objects);
+//    return(cond);
+//}
+//
+//
+//int U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
+//{
+//    char    fullfilename[256];
+//    int     rc, cond;
+//
+//    unlink(out_file);
+//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+//    rc = B_WsLoad(fullfilename, type);
+//    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
+//    rc = B_WsSaveCmp(out_file, type);
+//    S4ASSERT(rc == 0, "B_WsSaveCmp(\"%s\", %d) == 0", out_file, type);
+//    B_WsClear("", type);
+//    rc = B_WsLoad(out_file, type);
+//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+//    S4ASSERT(cond, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", out_file, type, expected_nb_objects);
+//    return(cond);
+//}
+//
+//
+//int U_test_B_WsExport(char* source_file, char* out_file, int type)
+//{
+//    char    fullfilename[256];
+//    int     rc, cond;
+//
+//    unlink(out_file);
+//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+//    rc = B_WsLoad(fullfilename, type);
+//    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
+//
+//    rc = B_WsExport(out_file, type);
+//    S4ASSERT(rc == 0, "B_WsExport(\"%s\", %d) == 0", out_file, type);
+//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, out_file);
+//    rc = U_cmp_files(out_file, fullfilename);
+//    S4ASSERT(rc != 0, "B_WsExport(\"%s\", %d) => %s == %s", out_file, type, out_file, fullfilename);
+//    return(rc);
+//}
+//
+//
+//int U_test_B_WsImport(char* source_file, int type, int expected_nb_objects)
+//{
+//    char    fullfilename[256];
+//    int     rc, cond;
+//
+//    B_WsClear("", type);
+//    sprintf(fullfilename, "%s\\%s", IODE_DATA_DIR, source_file);
+//    rc = B_WsImport(fullfilename, type);
+//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+//    S4ASSERT(cond, "B_WsImport(\"%s\", %d) => -- nb objects = %d", fullfilename, type, expected_nb_objects);
+//    return(rc);
+//}
+//
 
 void Tests_B_WS()
 {
@@ -1831,30 +1918,69 @@ void Tests_B_WS()
 // int B_CsvAxes(char *var)                          $CsvAxes AxisName
 // int B_CsvDec(char *dec)                           $CsvDec char
 
-//    U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
+//    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
 //    U_test_suppress_kmsg_msgs();
 //
 //    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-//    sprintf(fullfilename,  "%s\\fun", IODE_DATA_DIR);
-//    rc = B_WsLoad(fullfilename, K_VAR);
-//    cond = (rc == 0) && (KV_WS->k_nb == 394); 
-//    S4ASSERT(cond, "B_WsLoad(\"%s\") == 0 -- nb objects=%d", fullfilename, KV_WS->k_nb);
+//    U_test_print_title("B_WsLoad()");
+//    U_test_B_WsLoad("fun", K_CMT, 317);
+//    U_test_B_WsLoad("fun", K_EQS, 274);
+//    U_test_B_WsLoad("fun", K_IDT, 48);
+//    U_test_B_WsLoad("fun", K_LST, 17);
+//    U_test_B_WsLoad("fun", K_SCL, 161);
+//    U_test_B_WsLoad("fun", K_TBL, 46);
+//    U_test_B_WsLoad("fun", K_VAR, 394);
 //    
 //    // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
-//    rc = B_WsSave("fun2", K_VAR);
-//    B_WsClear("", K_VAR);
-//    rc = B_WsLoad("fun2", K_VAR);
-//    cond = (rc == 0) && (KV_WS->k_nb == 394); 
-//    S4ASSERT(cond, "B_WsSave(\"fun2\") == 0 -- nb objects=%d", KV_WS->k_nb);
-//    
+//    U_test_print_title("B_WsSave()");
+//    U_test_B_WsSave("fun", "fun2", K_CMT, 317);
+//    U_test_B_WsSave("fun", "fun2", K_EQS, 274);
+//    U_test_B_WsSave("fun", "fun2", K_IDT, 48);
+//    U_test_B_WsSave("fun", "fun2", K_LST, 17);
+//    U_test_B_WsSave("fun", "fun2", K_SCL, 161);
+//    U_test_B_WsSave("fun", "fun2", K_TBL, 46);
+//    U_test_B_WsSave("fun", "fun2", K_VAR, 394);
+//           
 //    // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
-//    rc = B_WsSaveCmp("fun2cmp", K_VAR);
-//    B_WsClear("", K_VAR);
-//    rc = B_WsLoad("fun2cmp", K_VAR);
-//    cond = (rc == 0) && (KV_WS->k_nb == 394); 
-//    S4ASSERT(cond, "B_WsSaveCmp(\"fun2cmp\") == 0 -- nb objects=%d", KV_WS->k_nb);
+//    U_test_print_title("B_WsSaveCmp()");
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_CMT, 317);
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_EQS, 274);
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_IDT, 48);
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_SCL, 161);
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
+//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
 //    
-    
+//    // int B_WsExport(char* arg, int type)               $WsExport<type> filename
+//    U_test_print_title("B_WsExport()");
+//    U_test_B_WsExport("fun", "fun2.ac", K_CMT);
+//    U_test_B_WsExport("fun", "fun2.ae", K_EQS);
+//    U_test_B_WsExport("fun", "fun2.ai", K_IDT);
+//    U_test_B_WsExport("fun", "fun2.al", K_LST);
+//    U_test_B_WsExport("fun", "fun2.as", K_SCL);
+//    U_test_B_WsExport("fun", "fun2.at", K_TBL);
+//    U_test_B_WsExport("fun", "fun2.av", K_VAR);
+//     
+//    // int B_WsImport(char* arg, int type)               $WsImport<type> filename
+//    U_test_print_title("B_WsImport()");
+//    U_test_B_WsImport("fun2.ac", K_CMT, 317);
+//    U_test_B_WsImport("fun2.ae", K_EQS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
+//    U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
+//    U_test_B_WsImport("fun2.al", K_LST, 17);
+//    U_test_B_WsImport("fun2.as", K_SCL, 161);
+//    U_test_B_WsImport("fun2.at", K_TBL, 46);
+//    U_test_B_WsImport("fun2.av", K_VAR, 394);
+//    // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
+//    
+//
+//    // int B_WsSample(char* arg)                         $WsSample period_from period_to
+//    
+//    
+//    
+//    // int B_WsClear(char* arg, int type)                $WsClear<type> 
+//    
+//    
+//    U_test_reset_kmsg_msgs();      
     
 }
 // ================================================================================================
@@ -2115,15 +2241,13 @@ X   "modelcompile",             B_ModelCompile, 	    SB_ModelCompile,    0,
 X   "modelcalcscc",             B_ModelCalcSCC,         NULL,               0,
 X   "modelsimulatescc",         B_ModelSimulateSCC,     NULL,               0,
 
-    "modelsimulatesaveniters",  B_ModelSimulateSaveNIters,  NULL,           0,
-    "modelsimulatesavenorms",   B_ModelSimulateSaveNorms,   NULL,           0,
-
+-    "modelsimulatesaveniters",  B_ModelSimulateSaveNIters,  NULL,           0,
+-    "modelsimulatesavenorms",   B_ModelSimulateSaveNorms,   NULL,           0,
 
 X   "idtexecute",               B_IdtExecute,           SB_IdtExecute,      0,
 X   "idtexecutevarfiles",       B_IdtExecuteVarFiles,   NULL,               0,
 X   "idtexecutesclfiles",       B_IdtExecuteSclFiles,   NULL,               0,
 X   "idtexecutetrace",          B_IdtExecuteTrace,      NULL,               0,
-    
     
     "reportexec",               B_ReportExec,           SB_ReportExec,      0,
     "reportedit",               NULL,                   SB_ReportEdit,      0,
