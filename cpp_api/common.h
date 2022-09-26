@@ -122,18 +122,3 @@ enum EnumIodeCase
     I_LOWER = K_LOWER,
     I_ASIS = K_ASIS
 };
-
-
-// TODO: replace K by I as below in C api + group them in an enum
-enum EnumIodeEquationMethod
-{
-    IE_LSQ = KE_LSQ,
-    IE_ZELLNER = KE_ZEL,
-    IE_INSTRUMENTAL = KE_INF,
-    IE_GLS = KE_GLS,
-    IE_MAX_LIKELIHOOD = KE_MAXLIK 
-};
-
-const static int I_NB_EQ_METHODS = 5;
-
-const static std::array<std::string, I_NB_EQ_METHODS> vEquationMethods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
