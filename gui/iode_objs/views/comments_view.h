@@ -3,9 +3,9 @@
 #include <QObject>
 
 #include "abstract_table_view.h"
-#include "comments_model.h"
-#include "comments_delegate.h"
-#include "popup/add_comment.h"
+#include "iode_objs/models/comments_model.h"
+#include "iode_objs/delegates/comments_delegate.h"
+#include "iode_objs/new/add_comment.h"
 
 
 class CommentsView : public AbstractTableView<CommentsModel>

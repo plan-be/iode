@@ -3,9 +3,9 @@
 #include <QObject>
 
 #include "abstract_table_view.h"
-#include "scalars_model.h"
-#include "scalars_delegate.h"
-#include "popup/add_scalar.h"
+#include "iode_objs/models/scalars_model.h"
+#include "iode_objs/delegates/scalars_delegate.h"
+#include "iode_objs/new/add_scalar.h"
 
 
 class ScalarsView : public AbstractTableView<ScalarsModel>

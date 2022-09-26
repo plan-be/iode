@@ -4,9 +4,9 @@
 #include <QMessageBox>
 
 #include "abstract_table_view.h"
-#include "variables_model.h"
-#include "variables_delegate.h"
-#include "popup/add_variable.h"
+#include "iode_objs/models/variables_model.h"
+#include "iode_objs/delegates/variables_delegate.h"
+#include "iode_objs/new/add_variable.h"
 
 
 class VariablesView : public AbstractTableView<VariablesModel>

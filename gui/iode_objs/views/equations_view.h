@@ -2,10 +2,10 @@
 
 #include <QObject>
 
-#include "popup_view.h"
-#include "equations_delegate.h"
-#include "equations_model.h"
-#include "popup/edit_equation.h"
+#include "iode_objs/edit/popup_view.h"
+#include "iode_objs/delegates/equations_delegate.h"
+#include "iode_objs/models/equations_model.h"
+#include "iode_objs/edit/edit_equation.h"
 
 
 class EquationsView : public PopupView<EquationsModel, QIodeEditEquation>

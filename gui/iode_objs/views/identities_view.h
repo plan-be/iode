@@ -3,9 +3,9 @@
 #include <QObject>
 
 #include "abstract_table_view.h"
-#include "identities_model.h"
-#include "identities_delegate.h"
-#include "popup/add_identity.h"
+#include "iode_objs/models/identities_model.h"
+#include "iode_objs/delegates/identities_delegate.h"
+#include "iode_objs/new/add_identity.h"
 
 
 class IdentitiesView : public AbstractTableView<IdentitiesModel>

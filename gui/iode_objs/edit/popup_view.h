@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstract_table_view.h"
-#include "abstract_delegate.h"
+#include "iode_objs/views/abstract_table_view.h"
+#include "iode_objs/delegates/abstract_delegate.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

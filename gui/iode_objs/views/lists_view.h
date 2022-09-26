@@ -3,9 +3,9 @@
 #include <QObject>
 
 #include "abstract_table_view.h"
-#include "lists_model.h"
-#include "lists_delegate.h"
-#include "popup/add_list.h"
+#include "iode_objs/models/lists_model.h"
+#include "iode_objs/delegates/lists_delegate.h"
+#include "iode_objs/new/add_list.h"
 
 
 class ListsView : public AbstractTableView<ListsModel>

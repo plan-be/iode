@@ -6,7 +6,7 @@
 #include <string>
 
 #include "ui_add_object.h"
-#include "edit_vars_sample.h"
+#include "iode_objs/edit/edit_vars_sample.h"
 #include "utils.h"
 #include "wrapper_classes.h"
 
