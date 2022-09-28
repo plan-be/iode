@@ -4,7 +4,8 @@
     )
 
 set(CPP_TIME
-    time/period.h time/sample.h
+    time/period.h   time/period.cpp
+    time/sample.h   time/sample.cpp
     )
 
 set(CPP_OBJS
