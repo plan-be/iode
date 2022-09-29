@@ -26,7 +26,7 @@ static void E_savescl(double val, int eqnb, char*txt);
 void E_tests2scl(EQ* eq, int j, int n, int k);
 static void E_savevar(char* name, int eqnb, MAT* mat);
 static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tests);
-int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names);
+int KE_est_s(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** names, int);
 int KE_estim(char* veqs, char* afrom, char* ato);
 
 // Global vars

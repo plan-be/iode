@@ -827,7 +827,7 @@ typedef struct _kdb_ {
     char        k_data[K_MAX_DESC];     /* Client Data */
     char        k_compressed;           /* IODE64K */
     char        k_reserved[59];         /* 6.44 : decreased by 4 bytes for k_nameptr */
-    char        *k_nameptr;             /* 6.44 */
+    char        *k_nameptr;             /* 6.44 */ // Alignment on 4 bytes, not 8 => pb in Google tests (not /Zp1)
 } KDB;
 
 typedef struct _period {

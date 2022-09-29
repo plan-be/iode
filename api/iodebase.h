@@ -940,6 +940,7 @@ extern int B_WsExport(char *,int );
 extern int B_WsImport(char *,int );
 extern int B_WsSample(char *);
 extern int B_WsClear(char *,int );
+extern int B_WsClearAll(char* arg);
 extern int B_WsDescr(char *,int );
 extern int B_WsName(char *,int );
 extern int B_WsCopy(char *,int );

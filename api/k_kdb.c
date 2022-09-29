@@ -164,6 +164,7 @@ KDB *K_create(int type, int mode)
 
 int K_free_kdb(KDB* kdb)
 {
+    if(kdb == NULL) return(0); // JMP 28/09/2022
     SW_nfree(KOBJS(kdb));
     SW_nfree(kdb);
     return(0);
