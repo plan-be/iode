@@ -9,12 +9,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>621</width>
-    <height>299</height>
+    <width>620</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit Equation</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -204,13 +204,13 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>520</x>
      <y>20</y>
-     <width>101</width>
-     <height>151</height>
+     <width>77</width>
+     <height>266</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -225,9 +225,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_cancel">
+     <widget class="QPushButton" name="pushButton_quit">
       <property name="text">
-       <string>Cancel</string>
+       <string>Quit</string>
       </property>
       <property name="shortcut">
        <string>Esc</string>
@@ -235,12 +235,52 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_dyn_adj">
+     <widget class="QPushButton" name="pushButton_coefs">
+      <property name="text">
+       <string>Coefs</string>
+      </property>
+      <property name="shortcut">
+       <string>F4</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_estimate">
+      <property name="text">
+       <string>Estimate</string>
+      </property>
+      <property name="shortcut">
+       <string>F5</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_next">
+      <property name="text">
+       <string>Next</string>
+      </property>
+      <property name="shortcut">
+       <string>F6</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_dynamic_adjustment">
       <property name="text">
        <string>Dyn. Adj.</string>
       </property>
       <property name="shortcut">
        <string>F7</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_results">
+      <property name="text">
+       <string>Results</string>
+      </property>
+      <property name="shortcut">
+       <string>F8</string>
       </property>
      </widget>
     </item>
@@ -284,43 +324,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>560</x>
-     <y>33</y>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
      <x>310</x>
-     <y>149</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_cancel</sender>
-   <signal>clicked()</signal>
-   <receiver>QIodeEditEquation</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>560</x>
-     <y>64</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>310</x>
-     <y>149</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_unit_root</sender>
-   <signal>clicked()</signal>
-   <receiver>QIodeEditEquation</receiver>
-   <slot>unit_root()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>560</x>
-     <y>95</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>310</x>
-     <y>149</y>
+     <y>150</y>
     </hint>
    </hints>
   </connection>
@@ -332,26 +340,122 @@
    <hints>
     <hint type="sourcelabel">
      <x>560</x>
-     <y>126</y>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
      <x>310</x>
-     <y>149</y>
+     <y>150</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_dyn_adj</sender>
+   <sender>pushButton_coefs</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>display_coefs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_estimate</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>estimate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_next</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>next()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_dynamic_adjustment</sender>
    <signal>clicked()</signal>
    <receiver>QIodeEditEquation</receiver>
    <slot>dynamic_adjustment()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>560</x>
-     <y>92</y>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
      <x>310</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_results</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>results()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_unit_root</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>unit_root()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_quit</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>558</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
      <y>149</y>
     </hint>
    </hints>
@@ -360,7 +464,11 @@
  <slots>
   <slot>help()</slot>
   <slot>edit()</slot>
+  <slot>display_coefs()</slot>
+  <slot>estimate()</slot>
+  <slot>next()</slot>
   <slot>unit_root()</slot>
+  <slot>results()</slot>
   <slot>dynamic_adjustment()</slot>
  </slots>
 </ui>

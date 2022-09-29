@@ -27,7 +27,8 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
 {
     Q_OBJECT
 
-    KDBEquations kdb;
+    KDBEquations kdb_eqs;
+    Estimation* estimation;
 
     WrapperIodeNameEdit* lineName;
     WrapperComboBox* comboBoxMethod;
@@ -41,13 +42,21 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
 protected:
 	QString project_settings_filepath;
 
+private:
+    void set_estimation();
+    void display_equation(const NamedEquation& equation);
+
 public:
     QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeEditEquation();
 
 public slots:
     void edit();
-    void help();
-    void unit_root();
+    void display_coefs();
+    void estimate();
+    void next();
     void dynamic_adjustment();
+    void results();
+    void unit_root();
+    void help();
 };
