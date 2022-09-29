@@ -92,11 +92,11 @@ int U_cmp_strs(char* str1, char* str2)
 
 
 /**
- *  Compares a table of strings to a list of strings in a semi-colon separated vector.
+ *  Compares a table of strings to a list of strings in a | separated vector.
  *  
  *  Ex. 
- *      U_cmp_tbls((char**)SCR_vtom("A B C", ' '), "A;B;C") => return(1) => OK
- *      U_cmp_tbls((char**)SCR_vtom("A B", ' '),   "A;B;C") => return(0) => NOK
+ *      U_cmp_tbls((char**)SCR_vtom("A B C", ' '), "A|B|C") => return(1) => OK
+ *      U_cmp_tbls((char**)SCR_vtom("A B", ' '),   "A|B|C") => return(0) => NOK
  *  
  *  @param [in] tbl1    char**  table of strings    
  *  @param [in] vec     char*   semi-colon sep vector
@@ -108,7 +108,7 @@ int U_cmp_tbls(char** tbl1, char* vec)
     int     i, rc = 0;
     char**  tbl2;
 
-    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) " ;,");
+    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) "|");
     if(tbl1 == NULL) {
         if(tbl2 == NULL) return(-1);
         goto fin;
@@ -462,6 +462,7 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
     rc = L_link(KV_WS, KS_WS, clec);
     S4ASSERT(rc == 0, "L_link(\"%s\") == 0", lec);
     calc_val = L_exec(KV_WS, KS_WS, clec, t);
+    SCR_free(clec);
     //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
     S4ASSERT(U_test_eq(expected_val, calc_val), "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
 }
@@ -472,11 +473,14 @@ void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
 double U_test_calc_lec(char* lec, int t)
 {
     CLEC*   clec;
+    double  res;
 
     clec = L_cc(lec);
     if(clec == NULL) return(L_NAN);
     if(L_link(KV_WS, KS_WS, clec)) return(L_NAN);
-    return(L_exec(KV_WS, KS_WS, clec, t));
+    res = L_exec(KV_WS, KS_WS, clec, t);
+    SCR_free(clec);
+    return(res);
 }
 
 KDB* U_test_K_interpret(int type, char* filename)
@@ -498,9 +502,9 @@ void U_test_load_fun_esv(char* filename)
     K_free(KV_WS);
     
     // Loads 3 WS and check ok
-    KE_WS = U_test_K_interpret(K_EQS, filename);
-    KS_WS = U_test_K_interpret(K_SCL, filename);
-    KV_WS = U_test_K_interpret(K_VAR, filename);
+    KE_RWS = KE_WS = U_test_K_interpret(K_EQS, filename);
+    KS_RWS = KS_WS = U_test_K_interpret(K_SCL, filename);
+    KV_RWS = KV_WS = U_test_K_interpret(K_VAR, filename);
 }
 
 
@@ -631,8 +635,13 @@ void Tests_ARGS()
     U_test_CreateObjects();
     
     // A_init
+    args = B_ainit_chk("A B;C,D", NULL, 0); // => "A" "B;C" "D"
+    S4ASSERT(U_cmp_tbls(args, "A|B;C|D"), "B_ainit_chk(\"A B;C,D\")");
+    SCR_free_tbl((unsigned char**) args);
+    
+    // A_init
     args = B_ainit_chk("$LST1", NULL, 0);
-    S4ASSERT(U_cmp_tbls(args, "A;B"), "B_ainit_chk(\"$LST1\")");
+    S4ASSERT(U_cmp_tbls(args, "A|B"), "B_ainit_chk(\"$LST1\")");
     SCR_free_tbl((unsigned char**) args);
     //args = B_ainit_chk("A*", NULL, 0);
     
@@ -640,7 +649,7 @@ void Tests_ARGS()
     // A1 A2
     sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
     args = B_ainit_chk(filename, NULL, 0);
-    S4ASSERT(U_cmp_tbls(args, "A1;A2"), "B_ainit_chk(\"%s\")", filename);
+    S4ASSERT(U_cmp_tbls(args, "A1|A2"), "B_ainit_chk(\"%s\")", filename);
     SCR_free_tbl((unsigned char**) args);
 }
 
@@ -858,7 +867,7 @@ void Tests_PrintTablesAndVars()
     S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", "fun.var");
 
     // Load the TBL workspace
-    K_WS[K_TBL] = kdbt  = U_test_K_interpret(K_TBL, "fun.tbl");
+    K_RWS[K_TBL][0] = K_WS[K_TBL] = kdbt  = U_test_K_interpret(K_TBL, "fun.tbl");
     S4ASSERT(kdbt != NULL, "K_interpret(K_TBL, \"%s\")", "fun.tbl");
 
     // Load a second VAR workspace in K_RWS[K_VAR][2]
@@ -1554,7 +1563,7 @@ void Tests_IMP_EXP()
     rc = IMP_RuleImport(K_VAR, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
     S4ASSERT(rc == 0, "IMP_RuleImport(K_VAR, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMP_FMT_ASCII, 0)", outfile, reffile);
     
-    KV_WS = K_interpret(K_VAR, outfile);  
+    KV_RWS = KV_WS = K_interpret(K_VAR, outfile);  
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
     
     
@@ -1584,7 +1593,7 @@ void Tests_B_XODE()
     rc = B_FileImportVar(cmd);
     S4ASSERT(rc == 0, "B_FileImportVar(\"%s\")", cmd);
     
-    KV_WS = K_interpret(K_VAR, outfile);  
+    KV_RWS = KV_WS = K_interpret(K_VAR, outfile);  
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
     
     U_test_reset_kmsg_msgs(); 
@@ -1803,184 +1812,454 @@ void Tests_B_MODEL()
 }
 
 
-//// int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-//int U_test_B_WsLoad(char*filename, int type, int expected_nb_objects)
-//{
-//    char    fullfilename[256];
-//    int     rc, cond;
-//
-//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
-//    rc = B_WsLoad(fullfilename, type);
-//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
-//    S4ASSERT(cond, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", fullfilename, type, expected_nb_objects);
-//    return(cond);
-//}
-//
-//
-//int U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
-//{
-//    char    fullfilename[256];
-//    int     rc, cond;
-//
-//    unlink(out_file);
-//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
-//    rc = B_WsLoad(fullfilename, type);
-//    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
-//    rc = B_WsSave(out_file, type);
-//    S4ASSERT(rc == 0, "B_WsSave(\"%s\", %d) == 0", out_file, type);
-//    B_WsClear("", type);
-//    rc = B_WsLoad(out_file, type);
-//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
-//    S4ASSERT(cond, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", out_file, type, expected_nb_objects);
-//    return(cond);
-//}
-//
-//
-//int U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
-//{
-//    char    fullfilename[256];
-//    int     rc, cond;
-//
-//    unlink(out_file);
-//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
-//    rc = B_WsLoad(fullfilename, type);
-//    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
-//    rc = B_WsSaveCmp(out_file, type);
-//    S4ASSERT(rc == 0, "B_WsSaveCmp(\"%s\", %d) == 0", out_file, type);
-//    B_WsClear("", type);
-//    rc = B_WsLoad(out_file, type);
-//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
-//    S4ASSERT(cond, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", out_file, type, expected_nb_objects);
-//    return(cond);
-//}
-//
-//
-//int U_test_B_WsExport(char* source_file, char* out_file, int type)
-//{
-//    char    fullfilename[256];
-//    int     rc, cond;
-//
-//    unlink(out_file);
-//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
-//    rc = B_WsLoad(fullfilename, type);
-//    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
-//
-//    rc = B_WsExport(out_file, type);
-//    S4ASSERT(rc == 0, "B_WsExport(\"%s\", %d) == 0", out_file, type);
-//    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, out_file);
-//    rc = U_cmp_files(out_file, fullfilename);
-//    S4ASSERT(rc != 0, "B_WsExport(\"%s\", %d) => %s == %s", out_file, type, out_file, fullfilename);
-//    return(rc);
-//}
-//
-//
-//int U_test_B_WsImport(char* source_file, int type, int expected_nb_objects)
-//{
-//    char    fullfilename[256];
-//    int     rc, cond;
-//
-//    B_WsClear("", type);
-//    sprintf(fullfilename, "%s\\%s", IODE_DATA_DIR, source_file);
-//    rc = B_WsImport(fullfilename, type);
-//    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
-//    S4ASSERT(cond, "B_WsImport(\"%s\", %d) => -- nb objects = %d", fullfilename, type, expected_nb_objects);
-//    return(rc);
-//}
-//
+// int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+int U_test_B_WsLoad(char*filename, int type, int expected_nb_objects)
+{
+    char    fullfilename[256];
+    int     rc, cond;
+
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
+    rc = B_WsLoad(fullfilename, type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+    S4ASSERT(cond != 0, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", fullfilename, type, expected_nb_objects);
+    return(cond);
+}
+
+
+int U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
+{
+    char    fullfilename[256];
+    int     rc, cond;
+
+    unlink(out_file);
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+    rc = B_WsLoad(fullfilename, type);
+    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
+    rc = B_WsSave(out_file, type);
+    S4ASSERT(rc == 0, "B_WsSave(\"%s\", %d) == 0", out_file, type);
+    B_WsClear("", type);
+    rc = B_WsLoad(out_file, type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+    S4ASSERT(cond != 0, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", out_file, type, expected_nb_objects);
+    return(cond);
+}
+
+
+int U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
+{
+    char    fullfilename[256];
+    int     rc, cond;
+
+    unlink(out_file);
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+    rc = B_WsLoad(fullfilename, type);
+    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
+    rc = B_WsSaveCmp(out_file, type);
+    S4ASSERT(rc == 0, "B_WsSaveCmp(\"%s\", %d) == 0", out_file, type);
+    B_WsClear("", type);
+    rc = B_WsLoad(out_file, type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+    S4ASSERT(cond != 0, "B_WsLoad(\"%s\", %d) == 0 -- nb objects=%d", out_file, type, expected_nb_objects);
+    return(cond);
+}
+
+
+int U_test_B_WsExport(char* source_file, char* out_file, int type)
+{
+    char    fullfilename[256];
+    int     rc, cond;
+
+    unlink(out_file);
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+    rc = B_WsLoad(fullfilename, type);
+    S4ASSERT(rc == 0, "B_WsLoad(\"%s\", %d) == 0", fullfilename, type);
+
+    rc = B_WsExport(out_file, type);
+    S4ASSERT(rc == 0, "B_WsExport(\"%s\", %d) == 0", out_file, type);
+    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, out_file);
+    rc = U_cmp_files(out_file, fullfilename);
+    S4ASSERT(rc != 0, "B_WsExport(\"%s\", %d) => %s == %s", out_file, type, out_file, fullfilename);
+    return(rc);
+}
+
+
+int U_test_B_WsImport(char* source_file, int type, int expected_nb_objects)
+{
+    char    fullfilename[256];
+    int     rc, cond;
+
+    B_WsClear("", type);
+    sprintf(fullfilename, "%s\\%s", IODE_DATA_DIR, source_file);
+    rc = B_WsImport(fullfilename, type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+    S4ASSERT(cond != 0, "B_WsImport(\"%s\", %d) => -- nb objects = %d", fullfilename, type, expected_nb_objects);
+    return(rc);
+}
+
+int U_test_B_WsClear(int type)
+{
+    int     rc, cond;
+
+    rc = B_WsClear("", type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == 0); 
+    S4ASSERT(cond != 0, "B_WsClear(\"%d\") == 0", type);
+    return(cond);
+}
+
+int U_test_B_WsDescr(char* descr, int type)
+{
+    int     rc, cond;
+
+    rc = B_WsDescr(descr, type);
+    cond = (rc == 0) && (strcmp(KDESC(K_WS[type]), descr) == 0); 
+    S4ASSERT(cond != 0, "B_WsDescr(\"%s\", %d) == 0", descr, type);
+    return(cond);
+}
+
+int U_test_B_WsName(char* name, int type)
+{
+    int     rc, cond;
+
+    rc = B_WsName(name, type);
+    cond = (rc == 0) && (strcmp(KNAMEPTR(K_WS[type]), name) == 0); 
+    S4ASSERT(cond != 0, "B_WsName(\"%s\", %d) == 0", name, type);
+    return(cond);
+}
+
+int U_test_B_WsCopyVar()
+{
+    char    arg[256];
+    int     rc, cond, nb, pos;
+    IODE_REAL *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
+
+    // 1. Copy full VAR file (Att: * required)
+    B_WsClearAll("");
+    sprintf(arg,  "%s\\fun.var *", IODE_DATA_DIR);
+    rc = B_WsCopy(arg, K_VAR);    
+    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
+    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+    cond =  (rc == 0) && 
+            (U_test_eq(ACAF92, 30.159000) != 0) &&
+            (U_test_eq(ACAG92, -40.286) != 0);
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", K_VAR) == 0", arg);
+
+    // 2. Copy partial WS (92-93) on an existing one
+    // 2.1 Set Sample + create ACAF
+    B_WsClearAll("");
+    B_WsSample("1990Y1 2000Y1");
+    // Create ACAF = 0 1 2...
+    nb = 11;
+    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
+    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
+    
+    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
+    sprintf(arg,  "%s\\fun.var 1992Y1 1993Y1 ACAF ACAG", IODE_DATA_DIR);
+    rc = B_WsCopy(arg, K_VAR);    
+        
+    // 2.3 Tests    
+    ACAF91 = U_test_calc_lec("ACAF[1991Y1]", 0);
+    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
+    ACAG90 = U_test_calc_lec("ACAG[1990Y1]", 0);
+    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+    cond =  (rc == 0) && 
+            (U_test_eq(ACAF91, 1.0) != 0) &&
+            (U_test_eq(ACAF92, 30.159000) != 0) &&
+            (U_test_eq(ACAG90, L_NAN) != 0) && 
+            (U_test_eq(ACAG92, -40.286) != 0);
+            
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", K_VAR) == 0", arg);
+
+    // 3. Copy partial WS on an existing one w/o specifying the sample
+    // 3.1 Set Sample 
+    B_WsClearAll("");
+    B_WsSample("1990Y1 2000Y1");
+    
+    // Copy ACAF and ACAG (does not specify a sample)
+    sprintf(arg,  "%s\\fun.var ACAF ACAG", IODE_DATA_DIR);
+    rc = B_WsCopy(arg, K_VAR);    
+    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
+    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+        
+    cond =  (rc == 0) && 
+            (U_test_eq(ACAF92, 30.159000) != 0) &&
+            (U_test_eq(ACAG92, -40.286) != 0);
+            
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", K_VAR) == 0", arg);
+    
+    return(cond);
+}
+
+int U_test_B_WsCopy(char* filename, int type, int expected_nb_objects)
+{
+    char    arg[256];
+    int     rc, cond;
+
+    // 1. Copy entire file (Att: * required)
+    B_WsClear("", type);
+    sprintf(arg,  "%s\\%s *", IODE_DATA_DIR, filename);
+    rc = B_WsCopy(arg, type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", %d) == 0 -- nb objects=%d", arg, type, expected_nb_objects);
+    
+    return(cond);
+}
+
+int U_test_B_WsMergeVar()
+{    
+    int         rc, cond, nb, pos;
+    char        arg[256];
+    IODE_REAL   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
+
+    // 1. Merge into an empty WS
+    B_WsClearAll("");
+    sprintf(arg,  "%s\\fun.var", IODE_DATA_DIR);
+    rc = B_WsMerge(arg, K_VAR);
+    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
+    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+    cond =  (rc == 0) && 
+            (U_test_eq(ACAF92, 30.159000) != 0) &&
+            (U_test_eq(ACAG92, -40.286) != 0);
+    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", K_VAR) == 0", arg);
+    
+    // 2. Merge into an existing WS inb a different SAMPLE
+    B_WsClearAll("");
+    B_WsSample("2000Y1 2020Y1");
+    // Create ACAF = 0 1 2...
+    nb = 21;
+    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
+    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
+    // Merge
+    sprintf(arg,  "%s\\fun.var", IODE_DATA_DIR);
+    rc = B_WsMerge(arg, K_VAR);
+    //Check 
+    ACAF00 = U_test_calc_lec("ACAF[2000Y1]", 0);
+    ACAF16 = U_test_calc_lec("ACAF[2016Y1]", 0);
+    ACAG00 = U_test_calc_lec("ACAG[2000Y1]", 0);
+    cond =  (rc == 0) && 
+            (U_test_eq(ACAF00, 10.046611) != 0) &&
+            (U_test_eq(ACAF16, 16.0) != 0) &&
+            (U_test_eq(ACAG00, -41.534787) != 0);
+    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", K_VAR) == 0", arg);  
+    return(cond);
+}
+
+
+int U_test_B_WsMerge(char* filename, int type, int expected_nb_objects)
+{
+    char    arg[256];
+    int     rc, cond;
+
+    // 1. Copy entire file (Att: * required)
+    B_WsClear("", type);
+    sprintf(arg,  "%s\\%s *", IODE_DATA_DIR, filename);
+    rc = B_WsMerge(arg, type);
+    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects); 
+    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", %d) == 0 -- nb objects=%d", arg, type, expected_nb_objects);
+    
+    return(cond);
+}
+
+int U_test_B_WsExtrapolate(int method, double expected_value)
+{
+    IODE_REAL   *ACAF, ACAF2002;
+    char        arg[512];
+    int         pos, rc, nb,cond;
+    
+    B_WsClearAll("");
+    B_WsSample("1995Y1 2020Y1");
+    
+    // Create ACAF = 0 1 L_NAN...
+    nb = 11;
+    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
+    ACAF[7] = L_NAN;
+    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
+
+    // $WsExtrapolate [method] from to [variable list]
+    sprintf(arg, "%d 2000Y1 2010Y1 ACAF", method);
+    rc = B_WsExtrapolate(arg);
+    ACAF2002 = U_test_calc_lec("ACAF[2002Y1]", 0);
+    cond =  (rc == 0) && (U_test_eq(ACAF2002, expected_value) != 0);
+    S4ASSERT(cond != 0, "B_WsExtrapolate(\"%s\") == 0; ACAF[2002Y1] == %lf", arg, ACAF2002);
+    return(cond);    
+}
+
 
 void Tests_B_WS()
 {
     char    fullfilename[256];
     int     rc, cond;
+    SAMPLE  *smpl;
     
-// int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-// int B_WsSave(char* arg, int type)                 $WsSave<type> filename
-// int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
-// int B_WsExport(char* arg, int type)               $WsExport<type> filename
-// int B_WsImport(char* arg, int type)               $WsImport<type> filename
-// int B_WsSample(char* arg)                         $WsSample period_from period_to
-// int B_WsClear(char* arg, int type)                $WsClear<type> 
-// int B_WsClearAll(char* arg)                       $WsClearAll
-// int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
-// int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
-// int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
-// int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
-// int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
-// int B_WsAggrChar(char* arg)                       $WsAggrChar char
-// int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
-// int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
-// int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
-// int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
-// int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
-// int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
-// int B_CsvSep(char *sep)                           $CsvSep char
-// int B_CsvNaN(char *nan)                           $CsvNaN text
-// int B_CsvAxes(char *var)                          $CsvAxes AxisName
-// int B_CsvDec(char *dec)                           $CsvDec char
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
+    // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
+    // int B_WsExport(char* arg, int type)               $WsExport<type> filename
+    // int B_WsImport(char* arg, int type)               $WsImport<type> filename
+    // int B_WsSample(char* arg)                         $WsSample period_from period_to
+    // int B_WsClear(char* arg, int type)                $WsClear<type> 
+    // int B_WsClearAll(char* arg)                       $WsClearAll
+    // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
+    // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
+    // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
+    // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
+    
+    // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
+    // int B_WsAggrChar(char* arg)                       $WsAggrChar char
+    // int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
+    // int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
+    // int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
+    // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
+    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
+    // int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
+    // int B_CsvSep(char *sep)                           $CsvSep char
+    // int B_CsvNaN(char *nan)                           $CsvNaN text
+    // int B_CsvAxes(char *var)                          $CsvAxes AxisName
+    // int B_CsvDec(char *dec)                           $CsvDec char
 
-//    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-//    U_test_suppress_kmsg_msgs();
-//
-//    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-//    U_test_print_title("B_WsLoad()");
-//    U_test_B_WsLoad("fun", K_CMT, 317);
-//    U_test_B_WsLoad("fun", K_EQS, 274);
-//    U_test_B_WsLoad("fun", K_IDT, 48);
-//    U_test_B_WsLoad("fun", K_LST, 17);
-//    U_test_B_WsLoad("fun", K_SCL, 161);
-//    U_test_B_WsLoad("fun", K_TBL, 46);
-//    U_test_B_WsLoad("fun", K_VAR, 394);
-//    
-//    // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
-//    U_test_print_title("B_WsSave()");
-//    U_test_B_WsSave("fun", "fun2", K_CMT, 317);
-//    U_test_B_WsSave("fun", "fun2", K_EQS, 274);
-//    U_test_B_WsSave("fun", "fun2", K_IDT, 48);
-//    U_test_B_WsSave("fun", "fun2", K_LST, 17);
-//    U_test_B_WsSave("fun", "fun2", K_SCL, 161);
-//    U_test_B_WsSave("fun", "fun2", K_TBL, 46);
-//    U_test_B_WsSave("fun", "fun2", K_VAR, 394);
-//           
-//    // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
-//    U_test_print_title("B_WsSaveCmp()");
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_CMT, 317);
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_EQS, 274);
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_IDT, 48);
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_SCL, 161);
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
-//    U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
-//    
-//    // int B_WsExport(char* arg, int type)               $WsExport<type> filename
-//    U_test_print_title("B_WsExport()");
-//    U_test_B_WsExport("fun", "fun2.ac", K_CMT);
-//    U_test_B_WsExport("fun", "fun2.ae", K_EQS);
-//    U_test_B_WsExport("fun", "fun2.ai", K_IDT);
-//    U_test_B_WsExport("fun", "fun2.al", K_LST);
-//    U_test_B_WsExport("fun", "fun2.as", K_SCL);
-//    U_test_B_WsExport("fun", "fun2.at", K_TBL);
-//    U_test_B_WsExport("fun", "fun2.av", K_VAR);
-//     
-//    // int B_WsImport(char* arg, int type)               $WsImport<type> filename
-//    U_test_print_title("B_WsImport()");
-//    U_test_B_WsImport("fun2.ac", K_CMT, 317);
-//    U_test_B_WsImport("fun2.ae", K_EQS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
-//    U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
-//    U_test_B_WsImport("fun2.al", K_LST, 17);
-//    U_test_B_WsImport("fun2.as", K_SCL, 161);
-//    U_test_B_WsImport("fun2.at", K_TBL, 46);
-//    U_test_B_WsImport("fun2.av", K_VAR, 394);
-//    // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
-//    
-//
-//    // int B_WsSample(char* arg)                         $WsSample period_from period_to
-//    
-//    
-//    
-//    // int B_WsClear(char* arg, int type)                $WsClear<type> 
-//    
-//    
-//    U_test_reset_kmsg_msgs();      
+    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    U_test_suppress_kmsg_msgs();
+
+    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+    U_test_print_title("B_WsLoad()");
+    U_test_B_WsLoad("fun", K_CMT, 317);
+    U_test_B_WsLoad("fun", K_EQS, 274);
+    U_test_B_WsLoad("fun", K_IDT, 48);
+    U_test_B_WsLoad("fun", K_LST, 17);
+    U_test_B_WsLoad("fun", K_SCL, 161);
+    U_test_B_WsLoad("fun", K_TBL, 46);
+    U_test_B_WsLoad("fun", K_VAR, 394);
+    
+    // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
+    U_test_print_title("B_WsSave()");
+    U_test_B_WsSave("fun", "fun2", K_CMT, 317);
+    U_test_B_WsSave("fun", "fun2", K_EQS, 274);
+    U_test_B_WsSave("fun", "fun2", K_IDT, 48);
+    U_test_B_WsSave("fun", "fun2", K_LST, 17);
+    U_test_B_WsSave("fun", "fun2", K_SCL, 161);
+    U_test_B_WsSave("fun", "fun2", K_TBL, 46);
+    U_test_B_WsSave("fun", "fun2", K_VAR, 394);
+           
+    // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
+    U_test_print_title("B_WsSaveCmp()");
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_CMT, 317);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_EQS, 274);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_IDT, 48);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_SCL, 161);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
+    
+    // int B_WsExport(char* arg, int type)               $WsExport<type> filename
+    U_test_print_title("B_WsExport()");
+    U_test_B_WsExport("fun", "fun2.ac", K_CMT);
+    U_test_B_WsExport("fun", "fun2.ae", K_EQS);
+    U_test_B_WsExport("fun", "fun2.ai", K_IDT);
+    U_test_B_WsExport("fun", "fun2.al", K_LST);
+    U_test_B_WsExport("fun", "fun2.as", K_SCL);
+    U_test_B_WsExport("fun", "fun2.at", K_TBL);
+    U_test_B_WsExport("fun", "fun2.av", K_VAR);
+
+    // int B_WsClear(char* arg, int type)                $WsClear<type> 
+    U_test_print_title("B_WsClear()");
+    U_test_B_WsClear(K_CMT);
+    U_test_B_WsClear(K_EQS);
+    U_test_B_WsClear(K_IDT);
+    U_test_B_WsClear(K_LST);
+    U_test_B_WsClear(K_SCL);
+    U_test_B_WsClear(K_TBL);
+    U_test_B_WsClear(K_VAR);
+     
+    // int B_WsImport(char* arg, int type)               $WsImport<type> filename
+    U_test_print_title("B_WsImport()");
+    U_test_B_WsImport("fun2.ac", K_CMT, 317);
+    U_test_B_WsImport("fun2.ae", K_EQS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
+    U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
+    U_test_B_WsImport("fun2.al", K_LST, 17);
+    U_test_B_WsImport("fun2.as", K_SCL, 161);
+    U_test_B_WsImport("fun2.at", K_TBL, 46);
+    U_test_B_WsImport("fun2.av", K_VAR, 394);
+    // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
+    
+    // int B_WsSample(char* arg)                         $WsSample period_from period_to
+    U_test_print_title("B_WsSample()");
+    rc = B_WsSample("1965Y1 2020Y1");
+    smpl = PER_atosmpl("1965Y1", "2020Y1");
+    cond = rc == 0 && (memcmp((char*)KSMPL(KV_WS), (char*)smpl, sizeof(SAMPLE)) == 0);
+    S4ASSERT(cond != 0, "B_WsSample(\"1965Y1 2020Y1\")");
+    SCR_free(smpl);
+    
+    // int B_WsClearAll(char* arg)                       $WsClearAll
+    U_test_print_title("B_WsClearAll()");
+    rc = B_WsClearAll("");
+    cond = (rc == 0) && 
+           (KNB(KC_WS) == 0) &&
+           (KNB(KE_WS) == 0) &&
+           (KNB(KI_WS) == 0) &&
+           (KNB(KL_WS) == 0) &&
+           (KNB(KS_WS) == 0) &&
+           (KNB(KT_WS) == 0) &&
+           (KNB(KV_WS) == 0);
+                            
+    S4ASSERT(cond != 0, "B_WsClearAll(\"\")");
+    
+    // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
+    U_test_print_title("B_WsDescr()");
+    U_test_B_WsDescr("Ws content description", K_CMT);
+    U_test_B_WsDescr("Ws content description", K_EQS);
+    U_test_B_WsDescr("Ws content description", K_IDT);
+    U_test_B_WsDescr("Ws content description", K_LST);
+    U_test_B_WsDescr("Ws content description", K_SCL);
+    U_test_B_WsDescr("Ws content description", K_TBL);
+    U_test_B_WsDescr("Ws content description", K_VAR);
+    
+    // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
+    // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes) 
+    // Should be reviewed for C++ w/o /Zp1
+    //U_test_print_title("B_WsName()");
+    //U_test_B_WsName("funtest", K_CMT);
+    //U_test_B_WsName("funtest", K_EQS);
+    //U_test_B_WsName("funtest", K_IDT);
+    //U_test_B_WsName("funtest", K_LST);
+    //U_test_B_WsName("funtest", K_SCL);
+    //U_test_B_WsName("funtest", K_TBL);
+    //U_test_B_WsName("funtest", K_VAR);
+    
+    // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
+    U_test_print_title("B_WsCopy() - K_VAR");
+    U_test_B_WsCopyVar();
+
+    U_test_print_title("B_WsCopy() - other objects");
+    U_test_B_WsCopy("fun", K_CMT, 317);
+    U_test_B_WsCopy("fun", K_EQS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
+    U_test_B_WsCopy("fun", K_IDT, 48);   // Idem in IDT NAWRU
+    U_test_B_WsCopy("fun", K_LST, 17);
+    U_test_B_WsCopy("fun", K_SCL, 161);
+    U_test_B_WsCopy("fun", K_TBL, 46);
+    
+    
+    // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
+    U_test_print_title("B_WsMerge() - K_VAR");
+    U_test_B_WsMergeVar();
+    
+    U_test_print_title("B_WsMerge() - other objects");
+    U_test_B_WsMerge("fun", K_CMT, 317);
+    U_test_B_WsMerge("fun", K_EQS, 274);  
+    U_test_B_WsMerge("fun", K_IDT, 48);   
+    U_test_B_WsMerge("fun", K_SCL, 161);
+    U_test_B_WsMerge("fun", K_TBL, 46);
+    
+    // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
+    U_test_print_title("B_WsExtrapolate");
+    U_test_B_WsExtrapolate(0, 6.0);
+    U_test_B_WsExtrapolate(1, 4.0);
+    U_test_B_WsExtrapolate(2, 7.0);
+    U_test_B_WsExtrapolate(3, 7.0);
+    U_test_B_WsExtrapolate(4, L_NAN);
+    U_test_B_WsExtrapolate(5, 6.0);
+    U_test_B_WsExtrapolate(6, 7.0);
+       
+
+    U_test_reset_kmsg_msgs();      
     
 }
 // ================================================================================================
@@ -2104,17 +2383,17 @@ X   "filedelete",               B_FileDelete,           NULL,               4,
 X   "filerename",               B_FileRename,           NULL,               4,
 X   "filecopy",                 B_FileCopy,             NULL,               4,
     
-    "wssample",                 B_WsSample,             SB_WsSample,        0,
-    "wsload",                   B_WsLoad,               SB_WsLoad,          3,
-    "wscopy",                   B_WsCopy,               SB_WsCopy,          3,
-    "wssave",                   B_WsSave,               SB_WsSave,          3,
-    "wssavecmp",                B_WsSaveCmp,            SB_WsSave,          3,
-    "wsimport",                 B_WsImport,             SB_WsLoad,          3,
-    "wsexport",                 B_WsExport,             SB_WsSave,          3,
-    "wsmerge",                  B_WsMerge,              SB_WsMerge,         3,
-    "wsclear",                  B_WsClear,              SB_WsClear,         3,
-    "wsclearall",               B_WsClearAll,           NULL,               0,
-    "wsdescr",                  B_WsDescr,              SB_WsDescr,         0,
+X    "wssample",                 B_WsSample,             SB_WsSample,        0,
+X    "wsload",                   B_WsLoad,               SB_WsLoad,          3,
+X    "wscopy",                   B_WsCopy,               SB_WsCopy,          3,
+X    "wssave",                   B_WsSave,               SB_WsSave,          3,
+X    "wssavecmp",                B_WsSaveCmp,            SB_WsSave,          3,
+X    "wsimport",                 B_WsImport,             SB_WsLoad,          3,
+X    "wsexport",                 B_WsExport,             SB_WsSave,          3,
+X    "wsmerge",                  B_WsMerge,              SB_WsMerge,         3,
+X    "wsclear",                  B_WsClear,              SB_WsClear,         3,
+X    "wsclearall",               B_WsClearAll,           NULL,               0,
+X    "wsdescr",                  B_WsDescr,              SB_WsDescr,         0,
     "wsextrapolate",            B_WsExtrapolate,        SB_WsExtrapolate,   0,
     "wsaggrchar",               B_WsAggrChar,           NULL,               0,
     "wsaggrsum",                B_WsAggrSum,            SB_WsAggregate,     0,
