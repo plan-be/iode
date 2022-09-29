@@ -96,10 +96,12 @@ KDB* hard_copy_kdb(KDB* source_kdb, char** names)
     return dest_kdb;
 }
 
-std::string get_kdb_filename(KDB* kdb)
-{
-    return std::string(kdb->k_nameptr);
-}
+// Replaced by K_get_kdb_nameptr()
+// 
+// std::string get_kdb_filename(KDB* kdb)
+// {
+//     return std::string(kdb->k_nameptr);
+// }
 
 void set_kdb_filename(KDB* kdb, const std::string& filename)
 {
