@@ -97,11 +97,11 @@ void IODEAbstractTableModel<K>::filter(const QString& pattern)
 		if (kdb != nullptr) delete kdb;
 		if (!pattern.isEmpty())
 		{
-			kdb = new K(pattern.toStdString());
+			kdb = new K(KDB_SHALLOW_COPY, pattern.toStdString());
 		}
 		else
 		{
-			kdb = new K();
+			kdb = new K(KDB_GLOBAL);
 		}
 	}
 	catch (const std::exception& e)
