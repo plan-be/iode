@@ -16,8 +16,8 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QIodeEditTableView" name="tableView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -60,18 +60,70 @@
      </attribute>
     </widget>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Save</set>
-     </property>
-     <property name="centerButtons">
-      <bool>false</bool>
-     </property>
-    </widget>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Save</string>
+       </property>
+       <property name="shortcut">
+        <string>F10</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="shortcut">
+        <string>Esc</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="helpButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Help</string>
+       </property>
+       <property name="shortcut">
+        <string>F1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -85,50 +137,50 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeEditTable</receiver>
    <slot>edit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>65</y>
+     <x>573</x>
+     <y>21</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>149</y>
+     <x>310</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeEditTable</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>65</y>
+     <x>573</x>
+     <y>51</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>149</y>
+     <x>310</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>helpRequested()</signal>
+   <sender>helpButton</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeEditTable</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>65</y>
+     <x>573</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>149</y>
+     <x>310</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
