@@ -115,6 +115,7 @@ extern int K_filetype(char *,char *,int *,SAMPLE *);
 
 /* k_kdb.c */
 extern KDB *K_init_kdb(int ,char *);
+extern char *K_get_kdb_nameptr(KDB *kdb);
 extern void K_set_kdb_name(KDB *kdb, U_ch *filename);
 extern KDB *K_create(int ,int );
 extern int K_free(KDB *);
