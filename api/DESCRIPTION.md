@@ -297,6 +297,7 @@ Function to manage KDB, i.e. IODE object groups.
 |Syntax|Description|
 |:---|:---|
 |`KDB *K_init_kdb(int ,char *)`|allocates and initialises a KDB struct|
+|`*char *K_get_kdb_nameptr(KDB *kdb)`|gets the KDB filename pointer stored in kdb\->k\_nameptr|
 |`void K_set_kdb_name(KDB *kdb, U_ch *filename);`|changes the filename in a KDB|
 |`KDB *K_create(int type, int mode)`|allocates and initialises a KDB object.|
 |`int K_free_kdb(KDB* kdb)`|frees a KDB but leaves its contents untouched.|
