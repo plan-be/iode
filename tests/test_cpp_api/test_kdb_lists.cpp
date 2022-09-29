@@ -18,7 +18,8 @@ protected:
 TEST_F(KDBListsTest, Load)
 {
     KDBLists kdb2;
-    EXPECT_EQ(kdb2.count(), 16);
+    //EXPECT_EQ(kdb2.count(), 16);
+    EXPECT_EQ(kdb2.count(), 17);
 }
 
 TEST_F(KDBListsTest, Save)

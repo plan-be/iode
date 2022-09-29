@@ -80,7 +80,7 @@ TEST_F(KDBEquationsTest, CreateRemove)
 #if !(defined _MSC_VER && defined __SANITIZE_ADDRESS__)
     std::string name = "ACAF";
     kdb.remove(name);
-    EXPECT_THROW(kdb.get(name), std::runtime_error);
+    EXPECT_THROW(kdb.get(name), IodeExceptionFunction);
 
     std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     std::string method = "LSQ";

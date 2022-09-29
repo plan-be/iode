@@ -52,7 +52,7 @@ public:
 
     bool is_local_kdb() const { return kdb_type == KDB_LOCAL; }
 
-    std::string get_filename() const { return get_kdb_filename(get_KDB()); }
+    std::string get_filename() const { return std::string(K_get_kdb_nameptr(get_KDB())); }
 
     void set_filename(const std::string& filename) { set_kdb_filename(get_KDB(), filename); }
 
