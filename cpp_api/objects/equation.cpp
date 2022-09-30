@@ -346,3 +346,11 @@ bool Equation::operator==(const Equation& other) const
 {
     return equation_equal(c_equation, other.c_equation);
 }
+
+NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
+{
+}
+
+NamedEquation::NamedEquation(const std::string& name, const Equation& eq) : name(name), eq(eq) 
+{
+}
