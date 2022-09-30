@@ -4,10 +4,11 @@
 class EstimationTest : public KDBTest, public ::testing::Test
 {
 protected:
-    Estimation* est;
     std::string from;
     std::string to;
     std::string eq_name;
+    std::string eq_name2;
+    std::string block;
     KDBEquations kdb_eqs;
     KDBScalars kdb_scl;
     KDBVariables kdb_vars;
@@ -21,13 +22,12 @@ protected:
         from = "1980Y1";
         to = "1996Y1";
         eq_name = "ACAF";
-        est = new Estimation(from, to, eq_name);
+
+        eq_name2 = "DPUH";
+        block = eq_name + ";" + eq_name2;
     }
 
-    void TearDown() override 
-    {
-        delete est;
-    }
+    // void TearDown() override {}
 };
 
 
@@ -36,6 +36,8 @@ TEST_F(EstimationTest, Estimate)
     kdb_scl.update("acaf1", 0., 1.);
     kdb_scl.update("acaf2", 0., 1.);
     kdb_scl.update("acaf4", 0., 1.);
+
+    Estimation* est = new Estimation(from, to, eq_name);
 
     est->equations_estimate();
     est->save();
@@ -85,6 +87,25 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
     EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
+
+    delete est;
+}
+
+TEST_F(EstimationTest, EstimateBlock)
+{
+    Estimation* est = new Estimation(from, to, block);
+
+    est->equations_estimate();
+
+    NamedEquation first_eq = est->current_equation();
+    EXPECT_EQ(first_eq.name, eq_name);
+    EXPECT_EQ(first_eq.eq, Equation(eq_name));
+
+    NamedEquation second_eq = est->next_equation();
+    EXPECT_EQ(second_eq.name, eq_name2);
+    EXPECT_EQ(second_eq.eq, Equation(eq_name2));
+
+    delete est;
 }
 
 TEST_F(EstimationTest, DynamicAdjustment)
