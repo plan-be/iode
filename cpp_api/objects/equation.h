@@ -140,3 +140,13 @@ public:
 
     bool operator==(const Equation& other) const;
 };
+
+
+struct NamedEquation
+{
+    std::string name;
+    Equation eq;
+
+    NamedEquation(const std::string& name);
+    NamedEquation(const std::string& name, const Equation& eq);
+};
