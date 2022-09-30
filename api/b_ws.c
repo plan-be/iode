@@ -491,9 +491,11 @@ static int B_WsAggr(int method, char* arg)
     }
     pattern = SCR_stracpy(args[0]);
     nkdb = KV_aggregate(kdb, method, pattern, args[1]);
-    KV_merge_del(kdb, nkdb, 1);
-    rc = 0;
-
+    if(nkdb) {
+        KV_merge_del(kdb, nkdb, 1);
+        rc = 0;
+    }    
+    
 done:
     SCR_free(pattern);
     SCR_free_tbl(args);
@@ -504,9 +506,10 @@ done:
 /**
  *  Syntax: $WsAggrChar char
  *  
- *  @see $WsAggrSum for an example.
+ *  @see https://iode.plan.be/doku.php?id=wsaggrchar 
  *  
- *  @see https://iode.plan.be/doku.php?id=wsaggrchar
+ *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
+ *  
  */
  
 int B_WsAggrChar(char* arg)
@@ -531,9 +534,9 @@ int B_WsAggrSum(char* arg)
 
 /**
  *  Syntax: $WsAggrProd pattern filename
- *  @see $WsAggrSum for an example.
  *  
  *  @see https://iode.plan.be/doku.php?id=wsaggrprod
+ *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
  */
 
 int B_WsAggrProd(char* arg)
@@ -545,8 +548,8 @@ int B_WsAggrProd(char* arg)
 /**
  *  Syntax: $WsAggrMean pattern filename
  *  
- *  @see $WsAggrSum for an example.
  *  @see https://iode.plan.be/doku.php?id=wsaggrmean
+ *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
  */
 
 int B_WsAggrMean(char* arg)

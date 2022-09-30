@@ -156,7 +156,8 @@ char *K_expand(int type, char* file, char* pattern, int all)
 char    K_AggrChar;     // Replacement character in the aggregated names
 
 /**
- *  Transforms a variable name based on an "aggregation" pattern. Each character between () or [] are
+ *  Transforms a variable name based on an "aggregation" pattern. 
+ *  The characters between () are kept as is whereas the chars between [] are
  *  replaced by K_AggrChar.
  *  
  *  @param [in]         pattern char*   pattern defining the aggregation

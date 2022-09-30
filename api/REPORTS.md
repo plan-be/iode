@@ -31,7 +31,9 @@
       - [List of functions](#T25)
     - [b\_model.c](#T26)
       - [List of functions](#T27)
-  - [Report functions group 3: report functions](#T28)
+    - [b\_ws.c](#T28)
+      - [List of functions](#T29)
+  - [Report functions group 3: report functions](#T30)
 
 # IODE: Reports {#T1}
 
@@ -132,7 +134,8 @@ For these functions, the parameters and return values are as follows:
 - b\_ras.c : implementation of a RAS algorithm.
 - b\_data.c : functions acting on data (i.e.: IODE objects)
 - b\_est.c : estimation functions
-- b\_model.c : model simulation and recompilation
+- b\_model.c : model simulation, decomposition and recompilation
+- b\_ws.c : functions related to WS management (clear, load, save, sample...)
 
 ### b\_fsys.c {#T8}
 
@@ -329,5 +332,41 @@ Report functions related to model simulations.
 |`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|
 |`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|
 
-## Report functions group 3: report functions {#T28}
+### b\_ws.c {#T28}
+
+Functions related to WS management (clear, load, save, sample, import...)
+
+#### List of functions {#T29}
+
+|Syntax|Equivalent in Reports|
+|:---|:---|
+|`int B_WsLoad(char* arg, int type)`|$WsLoad<type> filename|
+|`int X_findtype(char* filename)`|Returns the type of content of filename according to its extension|
+|`int B_WsDump(KDB* kdb, char* filename)`|Dumps the content of KDB in a file|
+|`int B_WsSave(char* arg, int type)`|$WsSave<type> filename|
+|`int B_WsSaveCmp(char* arg, int type)`|$WsSaveCmp<type> filename|
+|`int B_WsExport(char* arg, int type)`|$WsExport<type> filename|
+|`int B_WsImport(char* arg, int type)`|$WsImport<type> filename|
+|`int B_WsSample(char* arg)`|$WsSample period\_from period\_to|
+|`int B_WsClear(char* arg, int type)`|$WsClear<type>|
+|`int B_WsClearAll(char* arg)`|$WsClearAll|
+|`int B_WsDescr(char* arg, int type)`|$WsDescr<type> free text|
+|`int B_WsName(char* arg, int type)`|Sets the WS name. Obsolete as report function.|
+|`int B_WsCopy(char* arg, int type)`|$WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. \[from to\] obj1 obj2...|
+|`int B_WsMerge(char* arg, int type)`|$WsMerge<type> filename|
+|`int B_WsExtrapolate(char* arg)`|$WsExtrapolate \[method\] from to \[variable list\]|
+|`int B_WsAggrChar(char* arg)`|$WsAggrChar char|
+|`int B_WsAggrSum(char* arg)`|$WsAggrSum pattern filename|
+|`int B_WsAggrProd(char* arg)`|$WsAggrProd pattern filename|
+|`int B_WsAggrMean(char* arg)`|$WsAggrMean pattern filename|
+|`IODE_REAL *B_StatUnitRoot_1(char* arg, int print)`|Sub function of B\_StatUnitRoot() with an optional parameter to print the result (or not).|
+|`int B_StatUnitRoot(char* arg)`|$StatUnitRoot drift trend order expression|
+|`int B_CsvSave(char* arg, int type)`|$CsvSave<type> file name1 name2 ...|
+|`int B_CsvNbDec(char *nbdec)`|$CsvNbDec nn|
+|`int B_CsvSep(char *sep)`|$CsvSep char|
+|`int B_CsvNaN(char *nan)`|$CsvNaN text|
+|`int B_CsvAxes(char *var)`|$CsvAxes AxisName|
+|`int B_CsvDec(char *dec)`|$CsvDec char|
+
+## Report functions group 3: report functions {#T30}
 

@@ -947,7 +947,7 @@ extern int B_WsName(char *,int );
 extern int B_WsCopy(char *,int );
 extern int B_WsMerge(char *,int );
 extern int B_WsExtrapolate(char *);
-//extern int B_WsAggrChar(char *);
+extern int B_WsAggrChar(char *);
 extern int B_WsAggrSum(char *);
 extern int B_WsAggrProd(char *);
 extern int B_WsAggrMean(char *);
