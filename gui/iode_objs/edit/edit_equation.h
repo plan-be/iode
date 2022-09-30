@@ -13,6 +13,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "iode_objs/misc/unit_root.h"
+#include "iode_objs/misc/dyn_adjustment.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -38,7 +39,7 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
     WrapperQLineEdit* lineInstruments;
 
 protected:
-    QString project_settings_filepath;
+	QString project_settings_filepath;
 
 public:
     QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
@@ -48,4 +49,5 @@ public slots:
     void edit();
     void help();
     void unit_root();
+    void dynamic_adjustment();
 };

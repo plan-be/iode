@@ -210,7 +210,7 @@
      <x>510</x>
      <y>20</y>
      <width>101</width>
-     <height>121</height>
+     <height>151</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -231,6 +231,16 @@
       </property>
       <property name="shortcut">
        <string>Esc</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_dyn_adj">
+      <property name="text">
+       <string>Dyn. Adj.</string>
+      </property>
+      <property name="shortcut">
+       <string>F7</string>
       </property>
      </widget>
     </item>
@@ -330,10 +340,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_dyn_adj</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>dynamic_adjustment()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>help()</slot>
   <slot>edit()</slot>
   <slot>unit_root()</slot>
+  <slot>dynamic_adjustment()</slot>
  </slots>
 </ui>
