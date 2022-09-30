@@ -29,6 +29,7 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
  */
 KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
 
+
 class Estimation
 {
     std::string str_equations;
@@ -87,13 +88,13 @@ public:
 
     KDBEquations* get_equations() { return kdb_eqs; }
 
-    Equation current_equation() { return Equation(*current_eq); }
+    NamedEquation current_equation() { return NamedEquation(*current_eq); }
 
-    Equation next_equation()
+    NamedEquation next_equation()
     {
         if(current_eq == v_equations.end()) current_eq = v_equations.begin();
         else current_eq++;
-        return Equation(*current_eq);
+        return NamedEquation(*current_eq);
     }
 
     MAT* get_correlation_matrix() { return E_MCORR; }
