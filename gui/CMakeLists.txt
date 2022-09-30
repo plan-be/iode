@@ -103,7 +103,8 @@ set(GUI_OBJS_VIEWS
 )
 
 set(GUI_IODE_MISC
-    iode_objs/misc/unit_root.ui   iode_objs/misc/unit_root.h   iode_objs/misc/unit_root.cpp
+    iode_objs/misc/unit_root.ui         iode_objs/misc/unit_root.h          iode_objs/misc/unit_root.cpp
+    iode_objs/misc/dyn_adjustment.ui    iode_objs/misc/dyn_adjustment.h     iode_objs/misc/dyn_adjustment.cpp
 )
 
 set(GUI_IODE_OBJS 

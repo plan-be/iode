@@ -113,6 +113,14 @@ void QIodeEditEquation::edit()
 	}
 }
 
+void QIodeEditEquation::dynamic_adjustment()
+{
+	QString lec = lineLec->extractAndVerify();
+	QIodeDynAdjustment dialog(lec, project_settings_filepath, this);
+	dialog.exec();
+	lineLec->setQValue(lec);
+}
+
 void QIodeEditEquation::unit_root()
 {
 	QIodeUnitRoot dialog(project_settings_filepath, this);
