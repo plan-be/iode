@@ -100,14 +100,15 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 {
 	try
 	{
-		if (kdb != nullptr) delete kdb;
+		if(kdb_filter) delete kdb_filter;
 		if (!pattern.isEmpty())
 		{
-			kdb = new K(KDB_SHALLOW_COPY, pattern.toStdString());
+			kdb_filter = new K(KDB_SHALLOW_COPY, pattern.toStdString());
+			kdb = kdb_filter;
 		}
 		else
 		{
-			kdb = new K(KDB_GLOBAL);
+			kdb = (kdb_global != nullptr) ? kdb_global : kdb_external;
 		}
 	}
 	catch (const std::exception& e)
