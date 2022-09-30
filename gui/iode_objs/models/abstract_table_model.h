@@ -63,10 +63,28 @@ template <class K> class QIodeTemplateTableModel : public QIodeAbstractTableMode
 {
 protected:
 	K* kdb;
+	K* kdb_filter;
+	K* kdb_global;
+	K* kdb_external;
 
 public:
-	QIodeTemplateTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
-		QIodeAbstractTableModel(columnNames, parent), kdb(new K()) {}
+	QIodeTemplateTableModel(QVector<QString> columnNames, QObject* parent = nullptr, K* kdb_external = nullptr) : 
+		QIodeAbstractTableModel(columnNames, parent)
+	{
+		kdb_filter = nullptr;
+		if(kdb_external)
+		{
+			kdb_global = nullptr;
+			this->kdb_external = kdb_external;
+			kdb = kdb_external;
+		}
+		else
+		{
+			kdb_global = new K();
+			this->kdb_external = nullptr;
+			kdb = kdb_global;
+		}
+	}
 
 	~QIodeTemplateTableModel() { delete kdb; }
 
