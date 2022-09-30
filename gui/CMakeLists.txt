@@ -102,8 +102,13 @@ set(GUI_OBJS_VIEWS
     iode_objs/views/variables_view.h        iode_objs/views/variables_view.cpp
 )
 
+set(GUI_IODE_MISC
+    iode_objs/misc/unit_root.ui   iode_objs/misc/unit_root.h   iode_objs/misc/unit_root.cpp
+)
+
 set(GUI_IODE_OBJS 
-    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
+    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_WIDGET} ${GUI_IODE_MISC}
+    ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
 )
 
 set(GUI_MENU_FILE
