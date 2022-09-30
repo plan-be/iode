@@ -16,25 +16,6 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>20</y>
-     <width>75</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Save</set>
-   </property>
-   <property name="centerButtons">
-    <bool>false</bool>
-   </property>
-  </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
@@ -223,6 +204,58 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>20</y>
+     <width>101</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="pushButton_save">
+      <property name="text">
+       <string>Save</string>
+      </property>
+      <property name="shortcut">
+       <string>F10</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_cancel">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+      <property name="shortcut">
+       <string>Esc</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_unit_root">
+      <property name="text">
+       <string>Unit Root</string>
+      </property>
+      <property name="shortcut">
+       <string>F3</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_help">
+      <property name="text">
+       <string>Help</string>
+      </property>
+      <property name="shortcut">
+       <string>F1</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -234,49 +267,65 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
+   <sender>pushButton_save</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeEditEquation</receiver>
    <slot>edit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>55</y>
+     <x>560</x>
+     <y>33</y>
     </hint>
     <hint type="destinationlabel">
-     <x>298</x>
+     <x>310</x>
      <y>149</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
+   <sender>pushButton_cancel</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeEditEquation</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>55</y>
+     <x>560</x>
+     <y>64</y>
     </hint>
     <hint type="destinationlabel">
-     <x>298</x>
+     <x>310</x>
      <y>149</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>helpRequested()</signal>
+   <sender>pushButton_unit_root</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditEquation</receiver>
+   <slot>unit_root()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_help</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeEditEquation</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>55</y>
+     <x>560</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>298</x>
+     <x>310</x>
      <y>149</y>
     </hint>
    </hints>
@@ -285,5 +334,6 @@
  <slots>
   <slot>help()</slot>
   <slot>edit()</slot>
+  <slot>unit_root()</slot>
  </slots>
 </ui>

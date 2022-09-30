@@ -2,7 +2,7 @@
 
 
 QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-	QIodeSettings(project_settings_filepath, parent, f)
+	QIodeSettings(project_settings_filepath, parent, f), project_settings_filepath(project_settings_filepath)
 {
 	// TODO: if possible, find a way to initialize className inside MixingSettings
 	// NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
@@ -113,8 +113,13 @@ void QIodeEditEquation::edit()
 	}
 }
 
+void QIodeEditEquation::unit_root()
+{
+	QIodeUnitRoot dialog(project_settings_filepath, this);
+	dialog.exec();
+}
+
 void QIodeEditEquation::help()
 {
-	
 	QDesktopServices::openUrl(url_manual);
 }
