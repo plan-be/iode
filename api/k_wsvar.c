@@ -66,23 +66,25 @@ int KV_sample(KDB *kdb, SAMPLE *nsmpl)
 }
 
 /**
- * Merges two KDB of variables: kdb1 <- kdb1 + kdb2.
- * 
- * The resulting sample if the sample of kdb1.
- * If homonyms exist, vars from kbd2 replace their homonyms in kdb1 
- * if and only if replace is not 0.
- * 
- * @param [in, out]     kdb1         KDB *   KDB that will contain both kdb1 and kdb2.
- * @param [in]          kdb2         KDB *   source KDB.
- * @param [in]          replace      int     if not null, kdb2 vars replace kdb1 homonyms.
- * @return                           int -1 if there is no intersection between the 2 samples, 0 if ok.
-*/
+ *  Merges two KDB of variables: kdb1 <- kdb1 + kdb2.
+ *  
+ *  The resulting sample if the sample of kdb1.
+ *  If homonyms exist, vars from kbd2 replace their homonyms in kdb1 
+ *  if and only if replace is not 0.
+ *  
+ *  @param [in, out]     kdb1         KDB *   KDB that will contain both kdb1 and kdb2.
+ *  @param [in]          kdb2         KDB *   source KDB.
+ *  @param [in]          replace      int     if not null, kdb2 vars replace kdb1 homonyms.
+ *  @return                           int     -1 if there is no intersection between the 2 samples
+ *  TODO: what if kdb1 == NULL ?                                             0 if ok.
+ */
 int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 {
     int     i, start1, start2, pos, nb1;
     //int     *p_pos;
     SAMPLE  *k1smpl, *k2smpl, smpl;
 
+    if(kdb2 == NULL) return(0);  // JMP 30/09/2022
     k1smpl = (SAMPLE *) KDATA(kdb1);
     k2smpl = (SAMPLE *) KDATA(kdb2);
 
@@ -111,20 +113,23 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
 
 
 /**
- * Merges 2 KDB of variables, then deletes the second one.
+ *  Merges 2 KDB of variables, then deletes the second one.
  * 
- * The resulting sample is kdb1 sample if it is defined. 
- * If not, the sample of kdb2 is used.
+ *  The resulting sample is kdb1 sample if it is defined. 
+ *  If not, the sample of kdb2 is used.
  * 
- * @param [in, out] kdb1       KDB*   ws that will contain the result of the merge.
- * @param [in, out] kdb2       KDB*   ws to copy into kdb1
- * @param [in]      replace    int    indicates if kdb2 homonyms must replace kdb1
+ *  @param [in, out] kdb1       KDB*   ws that will contain the result of the merge.
+ *  @param [in, out] kdb2       KDB*   ws to copy into kdb1
+ *  @param [in]      replace    int    indicates if kdb2 homonyms must replace kdb1
+ * 
+ *  TODO: what if kdb1 == NULL ?
  */
 
 void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 {
     SAMPLE  *k1smpl, *k2smpl;
 
+    if(kdb2 == NULL) return;  // JMP 30/09/2022
     k1smpl = (SAMPLE *) KDATA(kdb1);
     k2smpl = (SAMPLE *) KDATA(kdb2);
 

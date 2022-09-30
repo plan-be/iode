@@ -1919,9 +1919,12 @@ int U_test_B_WsDescr(char* descr, int type)
 int U_test_B_WsName(char* name, int type)
 {
     int     rc, cond;
+    char    *nameptr;
 
     rc = B_WsName(name, type);
-    cond = (rc == 0) && (strcmp(KNAMEPTR(K_WS[type]), name) == 0); 
+    nameptr = K_get_kdb_nameptr(K_WS[type]);
+    //cond = (rc == 0) && (strcmp(KNAMEPTR(K_WS[type]), name) == 0); 
+    cond = (rc == 0) && (strcmp(nameptr, name) == 0); 
     S4ASSERT(cond != 0, "B_WsName(\"%s\", %d) == 0", name, type);
     return(cond);
 }
@@ -2084,9 +2087,75 @@ int U_test_B_WsExtrapolate(int method, double expected_value)
 }
 
 
+int U_test_create_var(char*name, char*lec)
+{
+    double  *A;
+    int     nb;
+    
+    if(KV_WS == NULL) return(-1);
+    nb = KSMPL(KV_WS)->s_nb;
+    A = L_cc_link_exec(lec, KV_WS, KS_WS);
+    K_add(KV_WS, name, A, &nb);
+    SCR_free(A);
+    return(0);
+}
+
+int U_test_B_WsAggregate()
+{
+    IODE_REAL   A_2000, B_2000, AC_2000;
+    char        arg[512];
+    int         pos, rc, nb,cond;
+    
+    B_WsClearAll("");
+    B_WsSample("1995Y1 2020Y1");
+       
+    // Create VARS A1, A2, B1, B2
+    U_test_create_var("A1", "t");
+    U_test_create_var("A2", "t*2");
+    U_test_create_var("B1", "t**2");
+    U_test_create_var("B2", "t**3");
+
+    //  $WsAggrChar [char]
+    rc = B_WsAggrChar("");
+    S4ASSERT(rc == 0, "B_WsAggrChar(\"\") == 0");
+ 
+    // $WsAggrSum  pattern 
+    strcpy(arg, "(?)[?]"); 
+    rc = B_WsAggrSum(arg);
+    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
+    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
+    cond = (rc  == 0) && (A_2000 == 5 + 5*2) && (B_2000 == 5 * 5 + 5 * 5 * 5);
+    S4ASSERT(cond != 0, "B_WsAggrSum(\"%s\") == 0, A[2000Y1] = %lf", arg, A_2000);
+    
+    // $WsAggrProd  pattern 
+    strcpy(arg, "(?)[?]"); 
+    rc = B_WsAggrProd(arg);
+    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
+    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
+    cond = (rc  == 0) && (A_2000 == (5) * (5*2)) && (B_2000 == (5 * 5) * (5 * 5 * 5));
+    S4ASSERT(cond != 0, "B_WsAggrProd(\"%s\") == 0, A[2000Y1] = %lf", arg, A_2000);
+
+    // $WsAggrMean  pattern 
+    strcpy(arg, "(?)[?]"); 
+    rc = B_WsAggrMean(arg);
+    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
+    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
+    cond = (rc  == 0) && (U_test_eq(A_2000, 7.5) != 0) && (U_test_eq(B_2000, 75.0) != 0);
+    S4ASSERT(cond != 0, "B_WsAggrMean(\"%s\") == 0, A[2000Y1] = %lf", arg, A_2000);
+    
+    // $WsAggrSum  pattern filename
+    sprintf(arg,  "(AC)[??] %s\\fun.var", IODE_DATA_DIR);
+    rc = B_WsAggrSum(arg);
+    AC_2000 = U_test_calc_lec("AC[2000Y1]", 0);
+    cond = (rc  == 0) && (U_test_eq(AC_2000, -31.488176) != 0);
+    S4ASSERT(cond != 0, "B_WsAggrSum(\"%s\") == 0, AC[2000Y1] = %lf", arg, AC_2000);
+    
+    return(cond);    
+}
+
+
 void Tests_B_WS()
 {
-    char    fullfilename[256];
     int     rc, cond;
     SAMPLE  *smpl;
     
@@ -2102,12 +2171,12 @@ void Tests_B_WS()
     // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
     // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
-    
     // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
     // int B_WsAggrChar(char* arg)                       $WsAggrChar char
     // int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
     // int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
     // int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
+    
     // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
     // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
     // int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
@@ -2215,14 +2284,14 @@ void Tests_B_WS()
     // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
     // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes) 
     // Should be reviewed for C++ w/o /Zp1
-    //U_test_print_title("B_WsName()");
-    //U_test_B_WsName("funtest", K_CMT);
-    //U_test_B_WsName("funtest", K_EQS);
-    //U_test_B_WsName("funtest", K_IDT);
-    //U_test_B_WsName("funtest", K_LST);
-    //U_test_B_WsName("funtest", K_SCL);
-    //U_test_B_WsName("funtest", K_TBL);
-    //U_test_B_WsName("funtest", K_VAR);
+    U_test_print_title("B_WsName()");
+    U_test_B_WsName("funtest", K_CMT);
+    U_test_B_WsName("funtest", K_EQS);
+    U_test_B_WsName("funtest", K_IDT);
+    U_test_B_WsName("funtest", K_LST);
+    U_test_B_WsName("funtest", K_SCL);
+    U_test_B_WsName("funtest", K_TBL);
+    U_test_B_WsName("funtest", K_VAR);
     
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
     U_test_print_title("B_WsCopy() - K_VAR");
@@ -2257,7 +2326,14 @@ void Tests_B_WS()
     U_test_B_WsExtrapolate(4, L_NAN);
     U_test_B_WsExtrapolate(5, 6.0);
     U_test_B_WsExtrapolate(6, 7.0);
-       
+    
+    // int B_WsAggrChar(char* arg)                       $WsAggrChar char
+    // int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
+    // int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
+    // int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename 
+    U_test_print_title("B_WsAggregate");
+    U_test_B_WsAggregate();
+        
 
     U_test_reset_kmsg_msgs();      
     
@@ -2382,23 +2458,23 @@ X   "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,
 X   "filedelete",               B_FileDelete,           NULL,               4,
 X   "filerename",               B_FileRename,           NULL,               4,
 X   "filecopy",                 B_FileCopy,             NULL,               4,
-    
-X    "wssample",                 B_WsSample,             SB_WsSample,        0,
-X    "wsload",                   B_WsLoad,               SB_WsLoad,          3,
-X    "wscopy",                   B_WsCopy,               SB_WsCopy,          3,
-X    "wssave",                   B_WsSave,               SB_WsSave,          3,
-X    "wssavecmp",                B_WsSaveCmp,            SB_WsSave,          3,
-X    "wsimport",                 B_WsImport,             SB_WsLoad,          3,
-X    "wsexport",                 B_WsExport,             SB_WsSave,          3,
-X    "wsmerge",                  B_WsMerge,              SB_WsMerge,         3,
-X    "wsclear",                  B_WsClear,              SB_WsClear,         3,
-X    "wsclearall",               B_WsClearAll,           NULL,               0,
-X    "wsdescr",                  B_WsDescr,              SB_WsDescr,         0,
-    "wsextrapolate",            B_WsExtrapolate,        SB_WsExtrapolate,   0,
-    "wsaggrchar",               B_WsAggrChar,           NULL,               0,
-    "wsaggrsum",                B_WsAggrSum,            SB_WsAggregate,     0,
-    "wsaggrmean",               B_WsAggrMean,           SB_WsAggregate,     0,
-    "wsaggrprod",               B_WsAggrProd,           SB_WsAggregate,     0,
+   
+X   "wssample",                 B_WsSample,             SB_WsSample,        0,
+X   "wsload",                   B_WsLoad,               SB_WsLoad,          3,
+X   "wscopy",                   B_WsCopy,               SB_WsCopy,          3,
+X   "wssave",                   B_WsSave,               SB_WsSave,          3,
+X   "wssavecmp",                B_WsSaveCmp,            SB_WsSave,          3,
+X   "wsimport",                 B_WsImport,             SB_WsLoad,          3,
+X   "wsexport",                 B_WsExport,             SB_WsSave,          3,
+X   "wsmerge",                  B_WsMerge,              SB_WsMerge,         3,
+X   "wsclear",                  B_WsClear,              SB_WsClear,         3,
+X   "wsclearall",               B_WsClearAll,           NULL,               0,
+X   "wsdescr",                  B_WsDescr,              SB_WsDescr,         0,
+X   "wsextrapolate",            B_WsExtrapolate,        SB_WsExtrapolate,   0,
+X   "wsaggrchar",               B_WsAggrChar,           NULL,               0,
+X   "wsaggrsum",                B_WsAggrSum,            SB_WsAggregate,     0,
+X   "wsaggrmean",               B_WsAggrMean,           SB_WsAggregate,     0,
+X   "wsaggrprod",               B_WsAggrProd,           SB_WsAggregate,     0,
 X   "wshtollast",               B_WsHtoLLast,           SB_WsHtoL,          0,
 X   "wshtolsum",                B_WsHtoLSum,            SB_WsHtoL,          0,
 X   "wshtolmean",               B_WsHtoLMean,           SB_WsHtoL,          0,
