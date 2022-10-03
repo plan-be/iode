@@ -158,12 +158,18 @@ void QIodeEditEquation::display_coefs()
 	{
 		try
 		{
-			
+			KDBScalars* kdb_scl = estimation->get_coefficients();
+			QIodeEstimationCoefs dialog(kdb_scl, this);
+			dialog.exec();
 		}
 		catch (const std::exception& e)
 		{
 			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
 		}	
+	}
+	else
+	{
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), "No estimation has been done yet");
 	}
 }
 

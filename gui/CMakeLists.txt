@@ -107,9 +107,14 @@ set(GUI_IODE_MISC
     iode_objs/misc/dyn_adjustment.ui    iode_objs/misc/dyn_adjustment.h     iode_objs/misc/dyn_adjustment.cpp
 )
 
+set(GUI_IODE_ESTIMATION
+    iode_objs/estimation/estimation_coefs.ui    iode_objs/estimation/estimation_coefs.h
+)
+
 set(GUI_IODE_OBJS 
-    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_WIDGET} ${GUI_IODE_MISC}
+    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_WIDGET}
     ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
+    ${GUI_IODE_MISC} ${GUI_IODE_ESTIMATION}
 )
 
 set(GUI_MENU_FILE
