@@ -86,7 +86,7 @@ int B_WsLoad(char* arg, int type)
  */
 int X_findtype(char* filename)
 {
-    int         i, lg = strlen(filename);
+    int         i, lg = (int)strlen(filename);
     extern char k_ext[][4];
     char        buf[5];
 
@@ -605,12 +605,15 @@ IODE_REAL *B_StatUnitRoot_1(char* arg, int print)
 
 
 /**
- *  Syntax: $StatUnitRoot drift trend order lec_expression
+ *  Syntax: $StatUnitRoot drift trend order var_name
  *  where 
  *      drift : 0 or 1 : 1 to include a constant term in the formula
  *      trend : 0 or 1 : 1 to include a trend in the formula 
  *      order : order of the estimated polynomial fn 
  *      lec_expression : LEC expression to test
+ *  
+ // *  Warning: unlike E_UnitRoot(), only a variable name can be used as lec expression
+ *  because the df test is saved in the scalar df_<var_name>.
  *  
  *  @see https://iode.plan.be/doku.php?id=statunitroot
  */
@@ -642,14 +645,14 @@ int B_StatUnitRoot(char* arg)
 int B_CsvSave(char* arg, int type)
 {
     int     lg, shift = 0, rc = 0;
-    char    file[K_MAX_FILE + 1];
+    char    file[K_MAX_FILE + 1], file_ext[K_MAX_FILE + 1];
     char    **data0, *K_expand(), *lst;
     SAMPLE  *smpl = NULL;
     char    *oldseps = A_SEPS; // JMP 27/09/2022
 
     // filename
     lg = B_get_arg0(file, arg, K_MAX_FILE);
-    K_set_ext(file, file, K_CSV);
+    K_set_ext(file_ext, file, K_CSV);
 
     // [sample] [vars]
     A_SEPS = " ;\t\n"; // JMP 27/09/2022
@@ -676,7 +679,7 @@ int B_CsvSave(char* arg, int type)
         }
     }
 
-    rc = (*K_save_csv[type])(K_WS[type], file, smpl, data0 + shift);
+    rc = (*K_save_csv[type])(K_WS[type], file_ext, smpl, data0 + shift);
     SCR_free_tbl(data0);
     SCR_free(smpl);
 

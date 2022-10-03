@@ -131,7 +131,7 @@ static int B_unlink_1(char* arg, int *type)
     /* JMP 11-11-93 */
     K_set_ext(buf, arg, *type);
     W_close();                      /* JMP 11-07-96 */
-    unlink(buf);
+    _unlink(buf);
     return(0);
 }
 
@@ -150,7 +150,5 @@ static int B_unlink_1(char* arg, int *type)
 
 int B_FileDelete(char* arg, int type)
 {
-    int     unlink();
-
     return(B_ainit_loop(arg, B_unlink_1, (char *)&type));
 }

@@ -546,6 +546,12 @@ extern KDB *KV_load_asc(char *);
 extern int KV_save_asc(KDB *,char *);
 extern int KV_save_csv(KDB *, char *, SAMPLE *, char **);
 
+extern char *KV_CSV_SEP;
+extern char *KV_CSV_DEC;
+extern char *KV_CSV_NAN;
+extern char *KV_CSV_AXES;
+extern int  KV_CSV_NBDEC;
+
 /* k_cccmt.c */
 extern KDB *KC_load_asc(char *);
 extern int KC_save_asc(KDB *,char *);
@@ -954,6 +960,13 @@ extern int B_WsAggrMean(char *);
 extern int B_WsAggr(int ,char *);
 extern double *B_StatUnitRoot_1(char *,int );
 extern int B_StatUnitRoot(char *);
+extern int B_CsvSave(char* arg, int type);
+extern int B_CsvNbDec(char *nbdec);
+extern int B_CsvSep(char *sep);
+extern int B_CsvNaN(char *nan);
+extern int B_CsvAxes(char *var);
+extern int B_CsvDec(char *dec);
+
 
 /* b_prof.c */
 extern int B_ProfileLoad(char *);

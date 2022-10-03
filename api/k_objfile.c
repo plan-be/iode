@@ -16,6 +16,7 @@
  */
 
 #include "iode.h"
+#include <io.h>
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
 // --------------------------------------------------------------
@@ -814,7 +815,7 @@ int K_backup(char* filename)
 {
     FNAME   backname;
 
-    if(access(filename, 0)) return(0);     
+    if(_access(filename, 0)) return(0);     
     strcpy(backname, filename);
     backname[strlen(backname) - 1] = '$';
     _unlink(backname);                      // JMP 15/5/2022 => Posix

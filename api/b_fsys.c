@@ -123,7 +123,7 @@ int B_SysDelete(char* arg)
         goto fin;
     }
 
-    for(i = 0 ; i < ntbl ; i++) unlink(tbl[i]);
+    for(i = 0 ; i < ntbl ; i++) _unlink(tbl[i]);
 
 fin:
     SCR_free_tbl(tbl);
