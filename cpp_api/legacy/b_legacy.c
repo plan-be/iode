@@ -7,145 +7,145 @@
 
 #include "api/iode.h"
 
- // =================== b_ws.c =================== //
-
-B_WsLoad(arg, type)
-char* arg;
-int     type;
-{
-    KDB* kdb = NULL;
-    int     pos = K_PWS[type];
-    char    buf[K_MAX_FILE + 1];
-
-    SCR_strlcpy(buf, arg, K_MAX_FILE);
-    K_strip(buf);   /* JMP 19-04-98 */
-    if (buf[0] == 0) return(0);
-
-    kdb = K_interpret(type, buf);
-    if (kdb == NULL) return(-1);
-
-    K_free(K_RWS[type][pos]);
-    K_WS[type] = K_RWS[type][pos] = kdb;
-
-    return(0);
-}
-
-/* Retourne le type de fichier
-  - 0 -> 6 = .cmt, ..., .var (binary format)
-  - 10 -> 16 = ac, ... av
-  - 26 = csv
-  - 22 = rep ???
-  - autres formats (rep, a2m, ..., csv)
-  - -1 sinon
-*/
-X_findtype(filename)
-char* filename;
-{
-    int         i, lg = strlen(filename);
-    extern char k_ext[][4];
-    char        buf[5];
-
-    // Check std extensions .cmt => .var
-    if (lg > 4) {
-        for (i = 0; i < 7; i++) {
-            if (filename[lg - 4] == '.' &&
-                SCR_cstrcmp(k_ext[i], filename + lg - 3) == 0) return(i);
-        }
-    }
-
-    // Check ascii extensions .ac => .av
-    if (lg > 3) {
-        strcpy(buf, ".ac");
-        for (i = 0; i < 7; i++) {
-            buf[2] = k_ext[i][0];
-            if (SCR_cstrcmp(filename + lg - 3, buf) == 0) return(10 + i);
-        }
-    }
-
-    // Other extensions
-    // 
-    //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019 
-    //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019 
-    if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(K_CSV); // Correction JMP 25/3/2019 
-    if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas tr�s coh�rent...
-
-    // Sais plus a quoi ca peut servir... => a supprimer
-    for (i = 16; strcmp(k_ext[i], "xxx") != 0; i++) {
-        if (lg > 4 && SCR_cstrcmp(filename + lg - 4, k_ext[i]) == 0) return(i); // Correction JMP 16/1/2019 : lg - 4 au lieu de -3 
-    }
-
-    return(-1);
-}
-
-int B_WsDump(kdb, filename)
-KDB* kdb;
-char* filename;
-{
-    int     rc = -1, ftype, type = KTYPE(kdb);
-
-    kmsg("Saving %s", filename);
-    ftype = X_findtype(filename);
-
-    if (ftype >= 10 && ftype <= 17)
-        rc = (*K_save_asc[type])(kdb, filename);
-    //else if(ftype >= 0 && ftype <= 6)
-    else if (ftype <= 6)
-        rc = K_save(kdb, filename);
-    else if (ftype == K_CSV)
-        rc = (*K_save_csv[type])(kdb, filename, NULL, NULL);
-
-    return(rc);
-}
-
-B_WsSave(arg, type)
-char* arg;
-int     type;
-{
-    char    buf[K_MAX_FILE + 1];
-
-    SCR_strip(arg);
-    if (strlen(arg) >= sizeof(FNAME)) {
-        B_seterror(B_msg(256));   /* File name too long */
-        return(-1);
-    }
-    SCR_strlcpy(buf, arg, K_MAX_FILE); /* JMP 18-04-98 */
-    SCR_strip(buf);
-    if (buf[0] == 0) return(0);
-    return(B_WsDump(K_WS[type], buf));
-}
-
-B_WsDescr(arg, type)
-char* arg;
-int     type;
-{
-    SCR_strlcpy(KDESC(K_WS[type]), arg, 50);
-    return(0);
-}
-
-B_WsName(arg, type)
-char* arg;
-int     type;
-{
-    //char	dir[K_MAX_FILE], file[K_MAX_FILE];				// JMP 3/6/2015
-
-    // Save filename only (not path) in KDB
-    //SCR_split_name(arg, dir, file)						// JMP 3/6/2015
-    //SCR_strlcpy(KNAME(K_WS[type]), file, K_MAX_FILE - 1);	// JMP 3/6/2015
-
-    // Save full name in K_WSNAME
-    K_set_kdb_name(K_WS[type], arg);  // JMP 3/6/2015
-    return(0);
-}
-
-B_WsClear(arg, type)
-char* arg;
-int     type;
-{
-    B_WsDescr("", type);
-    B_WsName("", type);
-    return(K_clear(K_WS[type]));
-}
-
+//  // =================== b_ws.c =================== //
+// 
+// B_WsLoad(arg, type)
+// char* arg;
+// int     type;
+// {
+//     KDB* kdb = NULL;
+//     int     pos = K_PWS[type];
+//     char    buf[K_MAX_FILE + 1];
+// 
+//     SCR_strlcpy(buf, arg, K_MAX_FILE);
+//     K_strip(buf);   /* JMP 19-04-98 */
+//     if (buf[0] == 0) return(0);
+// 
+//     kdb = K_interpret(type, buf);
+//     if (kdb == NULL) return(-1);
+// 
+//     K_free(K_RWS[type][pos]);
+//     K_WS[type] = K_RWS[type][pos] = kdb;
+// 
+//     return(0);
+// }
+// 
+// /* Retourne le type de fichier
+//   - 0 -> 6 = .cmt, ..., .var (binary format)
+//   - 10 -> 16 = ac, ... av
+//   - 26 = csv
+//   - 22 = rep ???
+//   - autres formats (rep, a2m, ..., csv)
+//   - -1 sinon
+// */
+// X_findtype(filename)
+// char* filename;
+// {
+//     int         i, lg = strlen(filename);
+//     extern char k_ext[][4];
+//     char        buf[5];
+// 
+//     // Check std extensions .cmt => .var
+//     if (lg > 4) {
+//         for (i = 0; i < 7; i++) {
+//             if (filename[lg - 4] == '.' &&
+//                 SCR_cstrcmp(k_ext[i], filename + lg - 3) == 0) return(i);
+//         }
+//     }
+// 
+//     // Check ascii extensions .ac => .av
+//     if (lg > 3) {
+//         strcpy(buf, ".ac");
+//         for (i = 0; i < 7; i++) {
+//             buf[2] = k_ext[i][0];
+//             if (SCR_cstrcmp(filename + lg - 3, buf) == 0) return(10 + i);
+//         }
+//     }
+// 
+//     // Other extensions
+//     // 
+//     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019 
+//     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019 
+//     if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(K_CSV); // Correction JMP 25/3/2019 
+//     if (lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas tr�s coh�rent...
+// 
+//     // Sais plus a quoi ca peut servir... => a supprimer
+//     for (i = 16; strcmp(k_ext[i], "xxx") != 0; i++) {
+//         if (lg > 4 && SCR_cstrcmp(filename + lg - 4, k_ext[i]) == 0) return(i); // Correction JMP 16/1/2019 : lg - 4 au lieu de -3 
+//     }
+// 
+//     return(-1);
+// }
+// 
+// int B_WsDump(kdb, filename)
+// KDB* kdb;
+// char* filename;
+// {
+//     int     rc = -1, ftype, type = KTYPE(kdb);
+// 
+//     kmsg("Saving %s", filename);
+//     ftype = X_findtype(filename);
+// 
+//     if (ftype >= 10 && ftype <= 17)
+//         rc = (*K_save_asc[type])(kdb, filename);
+//     //else if(ftype >= 0 && ftype <= 6)
+//     else if (ftype <= 6)
+//         rc = K_save(kdb, filename);
+//     else if (ftype == K_CSV)
+//         rc = (*K_save_csv[type])(kdb, filename, NULL, NULL);
+// 
+//     return(rc);
+// }
+// 
+// B_WsSave(arg, type)
+// char* arg;
+// int     type;
+// {
+//     char    buf[K_MAX_FILE + 1];
+// 
+//     SCR_strip(arg);
+//     if (strlen(arg) >= sizeof(FNAME)) {
+//         B_seterror(B_msg(256));   /* File name too long */
+//         return(-1);
+//     }
+//     SCR_strlcpy(buf, arg, K_MAX_FILE); /* JMP 18-04-98 */
+//     SCR_strip(buf);
+//     if (buf[0] == 0) return(0);
+//     return(B_WsDump(K_WS[type], buf));
+// }
+// 
+// B_WsDescr(arg, type)
+// char* arg;
+// int     type;
+// {
+//     SCR_strlcpy(KDESC(K_WS[type]), arg, 50);
+//     return(0);
+// }
+// 
+// B_WsName(arg, type)
+// char* arg;
+// int     type;
+// {
+//     //char	dir[K_MAX_FILE], file[K_MAX_FILE];				// JMP 3/6/2015
+// 
+//     // Save filename only (not path) in KDB
+//     //SCR_split_name(arg, dir, file)						// JMP 3/6/2015
+//     //SCR_strlcpy(KNAME(K_WS[type]), file, K_MAX_FILE - 1);	// JMP 3/6/2015
+// 
+//     // Save full name in K_WSNAME
+//     K_set_kdb_name(K_WS[type], arg);  // JMP 3/6/2015
+//     return(0);
+// }
+// 
+// B_WsClear(arg, type)
+// char* arg;
+// int     type;
+// {
+//     B_WsDescr("", type);
+//     B_WsName("", type);
+//     return(K_clear(K_WS[type]));
+// }
+// 
 // =================== b_rep.c =================== //
 
 #define RP_STDALLOC     1

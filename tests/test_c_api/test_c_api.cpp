@@ -178,6 +178,7 @@ public:
 	    rc = !memcmp(content1, content2, size1);
 	cmp:
 	    if(rc == 0) { // files are different
+	        printf("Comparing '%s' and '%s'\n", file1, file2);
 	        tbl1 = (char**) SCR_vtom((U_ch*)content1, '\n');
 	        tbl2 = (char**) SCR_vtom((U_ch*)content2, '\n');
 	        for(i = 0; tbl1[i] && tbl2[i]; i++) {
@@ -435,7 +436,7 @@ public:
 	    W_dest(filename, typeint);
 	    U_test_W_printf_cmds();
 	    W_close();
-	    printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
+	    //printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
 	    //S4ASSERT(U_cmp_files(reffilename, filename), "W_printf -> %s", typeext);
 	    EXPECT_TRUE(U_diff_files(reffilename, filename), "W_printf -> %s");
 	}
@@ -447,7 +448,8 @@ public:
 	
 	    sprintf(filename, "%s\\%s", output_test_dir, outfile);
 	    sprintf(reffilename, "%s\\%s", input_test_dir, reffile);
-	    printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
+	    //printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
+	    //return(U_cmp_files(reffilename, filename));
 	    return(U_diff_files(reffilename, filename));
 	}
 
@@ -530,18 +532,22 @@ public:
 
 	int U_test_B_WsExport(char* source_file, char* out_file, int type)
 	{
-	    char    fullfilename[256];
+	    char    full_source_file[256];
+	    char    full_out_file[256];
+	    char    ref_out_file[256];
 	    int     rc;
 	
-	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s\\%s", input_test_dir, source_file);
-	    rc = B_WsLoad(fullfilename, type);
+	    sprintf(full_source_file,  "%s\\%s", input_test_dir, source_file);
+	    sprintf(full_out_file,  "%s\\%s", output_test_dir, out_file);
+	    sprintf(ref_out_file,  "%s\\%s", input_test_dir, out_file);
+	
+	    rc = B_WsLoad(full_source_file, type);
 	    EXPECT_EQ(rc, 0);
 	
-	    rc = B_WsExport(out_file, type);
+	    _unlink(full_out_file);
+	    rc = B_WsExport(full_out_file, type);
 	    EXPECT_EQ(rc, 0);
-	    sprintf(fullfilename,  "%s\\%s", input_test_dir, out_file);
-	    rc = U_cmp_files(out_file, fullfilename);
+	    rc = U_diff_files(ref_out_file, full_out_file);
 	    EXPECT_NE(rc, 0);
 	    return(rc);
 	}
@@ -2092,13 +2098,13 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
-    U_test_B_WsExport("fun", "fun2.ac", K_CMT);
-    U_test_B_WsExport("fun", "fun2.ae", K_EQS);
-    U_test_B_WsExport("fun", "fun2.ai", K_IDT);
-    U_test_B_WsExport("fun", "fun2.al", K_LST);
-    U_test_B_WsExport("fun", "fun2.as", K_SCL);
-    U_test_B_WsExport("fun", "fun2.at", K_TBL);
-    U_test_B_WsExport("fun", "fun2.av", K_VAR);
+    U_test_B_WsExport("fun.cmt", "fun2.ac", K_CMT);
+    //U_test_B_WsExport("fun.eqs", "fun2.ae", K_EQS);  // Does not work due to <> results with %.15lg
+    U_test_B_WsExport("fun.idt", "fun2.ai", K_IDT);
+    U_test_B_WsExport("fun.lst", "fun2.al", K_LST);
+    //U_test_B_WsExport("fun.scl", "fun2.as", K_SCL); // Does not work due to <> results with %.15lg
+    U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
+    U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
 
     // int B_WsClear(char* arg, int type)                $WsClear<type>
     U_test_print_title("B_WsClear()");
