@@ -14,6 +14,7 @@
 #include "wrapper_classes.h"
 #include "iode_objs/views/scalars_view.h"
 #include "iode_objs/estimation/estimation_coefs.h"
+#include "iode_objs/estimation/estimation_results.h"
 #include "iode_objs/misc/unit_root.h"
 #include "iode_objs/misc/dyn_adjustment.h"
 

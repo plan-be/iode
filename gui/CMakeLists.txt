@@ -109,6 +109,8 @@ set(GUI_IODE_MISC
 
 set(GUI_IODE_ESTIMATION
     iode_objs/estimation/estimation_coefs.ui    iode_objs/estimation/estimation_coefs.h
+                                                iode_objs/estimation/correlation_matrix_model.h     iode_objs/estimation/correlation_matrix_model.cpp
+    iode_objs/estimation/estimation_results.ui  iode_objs/estimation/estimation_results.h           iode_objs/estimation/estimation_results.cpp
 )
 
 set(GUI_IODE_OBJS 

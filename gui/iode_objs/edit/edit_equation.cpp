@@ -212,7 +212,22 @@ void QIodeEditEquation::dynamic_adjustment()
 
 void QIodeEditEquation::results()
 {
-
+	if(estimation)
+	{
+		try
+		{
+			QIodeEstimationResults dialog(estimation, this);
+			dialog.exec();
+		}
+		catch (const std::exception& e)
+		{
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		}
+	}
+	else
+	{
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), "No estimation has been done yet");
+	}
 }
 
 void QIodeEditEquation::unit_root()
