@@ -127,7 +127,7 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
 IODE_REAL *E_UnitRoot(char* lec, int drift, int trend, int order)
 {
     int         i, pos, rc = -1;
-    char        buf[1024], scl[11], lec_df[1024], varname[64];
+    char        buf[1024], scl[11], varname[64];
     SAMPLE      smpl;
     IODE_REAL   *res = NULL, *vec;
 

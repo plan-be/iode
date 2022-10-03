@@ -47,24 +47,25 @@
   - [Group "IODE object ascii formats"](#T41)
     - [Filename extensions](#T42)
     - [k\_ccall.c](#T43)
-    - [k\_cceqs.c](#T44)
-    - [k\_ccidt.c](#T45)
-    - [k\_cclst.c](#T46)
-    - [k\_ccscl.c](#T47)
-    - [k\_cctbl.c](#T48)
-    - [k\_ccvar.c](#T49)
-  - [Group "LEC language"](#T50)
-    - [k\_lec.c](#T51)
-  - [Group "Basic functions"](#T52)
-    - [b\_args.c](#T53)
-    - [b\_errors.c](#T54)
-  - [Group "Execution of identities"](#T55)
-  - [Group "Model Estimation"](#T56)
-  - [Group "Model Simulation"](#T57)
-  - [Group "Table Calculation"](#T58)
-  - [Group "IODE Printing"](#T59)
-  - [Group "IODE object conversions"](#T60)
-  - [Group "Iode Reports"](#T61)
+    - [k\_cccmt.c](#T44)
+    - [k\_cceqs.c](#T45)
+    - [k\_ccidt.c](#T46)
+    - [k\_cclst.c](#T47)
+    - [k\_ccscl.c](#T48)
+    - [k\_cctbl.c](#T49)
+    - [k\_ccvar.c](#T50)
+  - [Group "LEC language"](#T51)
+    - [k\_lec.c](#T52)
+  - [Group "Basic functions"](#T53)
+    - [b\_args.c](#T54)
+    - [b\_errors.c](#T55)
+  - [Group "Execution of identities"](#T56)
+  - [Group "Model Estimation"](#T57)
+  - [Group "Model Simulation"](#T58)
+  - [Group "Table Calculation"](#T59)
+  - [Group "IODE Printing"](#T60)
+  - [Group "IODE object conversions"](#T61)
+  - [Group "Iode Reports"](#T62)
 
 # IODE: functions by group {#T1}
 
@@ -600,57 +601,67 @@ Tables of pointers to functions for reading and writing IODE objects in ASCII an
 |`int (*K_save_asc[])()`|
 |`int (*K_save_csv[])()`|
 
-### k\_cceqs.c {#T44}
+### k\_cccmt.c {#T44}
+
+Loading and saving IODE ascii comment files.
+
+|Syntax|Remark|
+|:---|:---|
+|`KDB *KC_load_asc(char* filename)`||
+|`int KC_save_asc(KDB* kdb, char* filename)`||
+|`int KC_save_csv(KDB *kdb, char *filename)`|Not implemented|
+
+### k\_cceqs.c {#T45}
 
 Loading and saving IODE ascii equation files.
 
-|Syntax|
-|:---|
-|`KDB *KE_load_asc(char* filename)`|
-|`int KE_save_asc(KDB* kdb, char* filename)`|
-|`int KE_save_csv(KDB *kdb, char *filename) : not implemented`|
+|Syntax|Remark|
+|:---|:---|
+|`KDB *KE_load_asc(char* filename)`||
+|`int KE_save_asc(KDB* kdb, char* filename)`||
+|`int KE_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_ccidt.c {#T45}
+### k\_ccidt.c {#T46}
 
 Loading and saving IODE ascii identity files.
 
-|Syntax|
-|:---|
-|`KDB *KI_load_asc(char* filename)`|
-|`int KI_save_asc(KDB* kdb, char* filename)`|
-|`int KI_save_csv(KDB *kdb, char *filename)`|
+|Syntax|Remark|
+|:---|:---|
+|`KDB *KI_load_asc(char* filename)`||
+|`int KI_save_asc(KDB* kdb, char* filename)`||
+|`int KI_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_cclst.c {#T46}
+### k\_cclst.c {#T47}
 
 Loading and saving IODE ascii list files.
 
-|Syntax|
-|:---|
-|`KDB *KL_load_asc(char* filename)`|
-|`int KL_save_asc(KDB* kdb, char* filename)`|
-|`int KL_save_csv(KDB *kdb, char *filename)`|
+|Syntax|Remark|
+|:---|:---|
+|`KDB *KL_load_asc(char* filename)`||
+|`int KL_save_asc(KDB* kdb, char* filename)`||
+|`int KL_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_ccscl.c {#T47}
+### k\_ccscl.c {#T48}
 
 Loading and saving IODE ascii scalar files.
 
-|Syntax|
-|:---|
-|`KDB *KS_load_asc(char* filename)`|
-|`int KS_save_asc(KDB* kdb, char* filename)`|
-|`int KS_save_csv(KDB *kdb, char *filename)`|
+|Syntax|Remark|
+|:---|:---|
+|`KDB *KS_load_asc(char* filename)`||
+|`int KS_save_asc(KDB* kdb, char* filename)`||
+|`int KS_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_cctbl.c {#T48}
+### k\_cctbl.c {#T49}
 
 Loading and saving IODE ascii table files.
 
-|Syntax|
-|:---|
-|`KDB *KT_load_asc(char* filename)`|
-|`int KT_save_asc(KDB* kdb, char* filename)`|
-|`int KT_save_csv(KDB *kdb, char *filename)`|
+|Syntax|Remark|
+|:---|:---|
+|`KDB *KT_load_asc(char* filename)`||
+|`int KT_save_asc(KDB* kdb, char* filename)`||
+|`int KT_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_ccvar.c {#T49}
+### k\_ccvar.c {#T50}
 
 Functions to import and export IODE files to/from ascii and LArray\-csv format.
 
@@ -660,11 +671,11 @@ Functions to import and export IODE files to/from ascii and LArray\-csv format.
 |`KV_save_asc(KDB* kdb, char* filename)`|
 |`int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)`|
 
-## Group "LEC language" {#T50}
+## Group "LEC language" {#T51}
 
 For the LEC implementation, see [lec.md](lec.md).
 
-### k\_lec.c {#T51}
+### k\_lec.c {#T52}
 
 Implemention of the LEC library virtual functions for SCL and VAR references.
 
@@ -676,9 +687,9 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 |`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
 |`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
 
-## Group "Basic functions" {#T52}
+## Group "Basic functions" {#T53}
 
-### b\_args.c {#T53}
+### b\_args.c {#T54}
 
 Basic functions for managing function and report arguments.
 
@@ -691,7 +702,7 @@ Basic functions for managing function and report arguments.
 |`int B_get_arg0(char* arg0, char*arg, int lg)`|computes arg0, the first arg ('word') of max lg bytes, in the string arg.|
 |`int B_argpos(char* str, int ch)`|returns the position of a char in a string.|
 
-### b\_errors.c {#T54}
+### b\_errors.c {#T55}
 
 Basic functions for managing error messages.
 
@@ -704,31 +715,31 @@ Basic functions for managing error messages.
 |`void B_print_last_error()`|Displays or prints the last recorded errors (in B\_ERROR\_MSG) using W\_printf().|
 |`void B_clear_last_error()`|Resets the list of last messages (B\_ERROR\_MSG and B\_ERROR\_NB).|
 
-## Group "Execution of identities" {#T55}
+## Group "Execution of identities" {#T56}
 
 See [IDENTITIES.md](identities.md).
 
-## Group "Model Estimation" {#T56}
+## Group "Model Estimation" {#T57}
 
 See [ESTIM.md](ESTIM.md).
 
-## Group "Model Simulation" {#T57}
+## Group "Model Simulation" {#T58}
 
 See [SIMUL.md](simul.md).
 
-## Group "Table Calculation" {#T58}
+## Group "Table Calculation" {#T59}
 
 See [TBL\_CALC.md](tbl_calc.md).
 
-## Group "IODE Printing" {#T59}
+## Group "IODE Printing" {#T60}
 
 See [PRINTING.md](PRINTING.md).
 
-## Group "IODE object conversions" {#T60}
+## Group "IODE object conversions" {#T61}
 
 See [CONVERSIONS.md](CONVERSIONS.md).
 
-## Group "Iode Reports" {#T61}
+## Group "Iode Reports" {#T62}
 
 See [REPORTS.md](REPORTS.md).
 

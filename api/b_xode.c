@@ -73,7 +73,7 @@ fin:
  */
 int B_FileImportVar(char* arg)
 {
-    int     rc = 0, nb_args, format, lang;
+    int     rc = 0, nb_args, format;
     char    **args = NULL, *trace, *rule, *from, *to,*infile, *oufile;
 
     args = B_ainit_chk(arg, NULL, 0);
