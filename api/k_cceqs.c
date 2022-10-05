@@ -311,7 +311,8 @@ err:
 
 static void KE_print_test(FILE* fd, char* txt, IODE_REAL val)
 {
-    if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %.15lg\n", txt, val); /* JMP 09-04-98 */
+    if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %.8lg\n", txt, val); /* JMP 05-09-2022 : .15 -> .8 */
+    //if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %lg\n", txt, val); /* JMP 05-09-2022 */
 }
 
 
@@ -362,15 +363,15 @@ static void KE_print_eq(FILE* fd, EQ* eq)
                );
     if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);
-    KE_print_test(fd, "STDEV",  eq->tests[1]);
-    KE_print_test(fd, "MEANY",  eq->tests[2]);
-    KE_print_test(fd, "SSRES",  eq->tests[3]);
-    KE_print_test(fd, "STDERR", eq->tests[4]);
-    KE_print_test(fd, "FSTAT",  eq->tests[6]);
-    KE_print_test(fd, "R2",     eq->tests[7]);
-    KE_print_test(fd, "R2ADJ",  eq->tests[8]);
-    KE_print_test(fd, "DW",     eq->tests[9]);
-    KE_print_test(fd, "LOGLIK", eq->tests[10]);
+        KE_print_test(fd, "STDEV",  eq->tests[1]);
+        KE_print_test(fd, "MEANY",  eq->tests[2]);
+        KE_print_test(fd, "SSRES",  eq->tests[3]);
+        KE_print_test(fd, "STDERR", eq->tests[4]);
+        KE_print_test(fd, "FSTAT",  eq->tests[6]);
+        KE_print_test(fd, "R2",     eq->tests[7]);
+        KE_print_test(fd, "R2ADJ",  eq->tests[8]);
+        KE_print_test(fd, "DW",     eq->tests[9]);
+        KE_print_test(fd, "LOGLIK", eq->tests[10]);
     fprintf(fd, "}\n");
 }
 
