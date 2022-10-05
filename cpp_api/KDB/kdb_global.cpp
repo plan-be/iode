@@ -107,3 +107,65 @@ void set_kdb_filename(KDB* kdb, const std::string& filename)
 {
     K_set_kdb_name(kdb, (unsigned char*) filename.c_str());
 }
+
+void low_to_high(const EnumIodeLtoH type, const char method, std::string& filepath, const std::string& var_list)
+{
+    int res;
+
+    check_filepath(filepath, I_VARIABLES, "low_to_high", true);
+    std::string method_name = mLowToHigh.at(method);
+
+    std::string arg = std::string(1, method) + " " + filepath + " " + var_list;
+    char* c_arg = to_char_array(arg);
+
+    if (type == LTOH_STOCK) res = B_WsLtoHStock(c_arg);
+    else res = B_WsLtoHFlow(c_arg);
+
+    if (res < 0)
+    {
+        IodeExceptionFunction error("Cannot Cannot transforms low periodicity variables into high periodicity variables");
+        error.add_argument("type", (type == LTOH_STOCK) ? "Stock" : "Flow");
+        error.add_argument("method", method_name);
+        error.add_argument("file", filepath);
+        error.add_argument("variables list", var_list);
+        throw error;
+    }
+}
+
+void high_to_low(const EnumIodeHtoL type, std::string& filepath, const std::string& var_list)
+{
+    int res;
+    std::string type_name; 
+
+    check_filepath(filepath, I_VARIABLES, "high_to_low", true);
+
+    std::string arg = filepath + " " + var_list;
+    char* c_arg = to_char_array(arg);
+
+    switch (type)
+    {
+    case HTOL_LAST:
+        res = B_WsHtoLLast(c_arg);
+        type_name = "Last";
+        break;
+    case HTOL_MEAN:
+        res = B_WsHtoLMean(c_arg);
+        type_name = "Mean";
+        break;
+    case HTOL_SUM:
+        res = B_WsHtoLSum(c_arg);
+        type_name = "Sum";
+        break;
+    default:
+        break;
+    }
+
+    if (res < 0)
+    {
+        IodeExceptionFunction error("Cannot transforms high periodicity variables into low periodicity variables");
+        error.add_argument("type", type_name);
+        error.add_argument("file", filepath);
+        error.add_argument("variables list", var_list);
+        throw error;
+    }
+}
