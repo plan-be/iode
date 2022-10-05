@@ -2282,10 +2282,10 @@ void Tests_B_WS()
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
     U_test_B_WsExport("fun.cmt", "fun2.ac", K_CMT); 
-    //U_test_B_WsExport("fun.eqs", "fun2.ae", K_EQS);  // Does not work due to <> results with %.15lg 
+    U_test_B_WsExport("fun.eqs", "fun2.ae", K_EQS);  // Does not work due to <> results with %.15lg 
     U_test_B_WsExport("fun.idt", "fun2.ai", K_IDT);
     U_test_B_WsExport("fun.lst", "fun2.al", K_LST);
-    //U_test_B_WsExport("fun.scl", "fun2.as", K_SCL); // Does not work due to <> results with %.15lg
+    U_test_B_WsExport("fun.scl", "fun2.as", K_SCL); // Does not work due to <> results with %.15lg
     U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
     U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
 
