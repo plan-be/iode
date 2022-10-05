@@ -55,3 +55,62 @@ TEST_F(KDBGlobalTest, Filter)
     remove_duplicates(expected_list_names);
     EXPECT_EQ(list_names, expected_list_names);
 }
+
+TEST_F(KDBGlobalTest, LowToHigh)
+{
+    std::string varfile = input_test_dir + "fun.var";
+
+    // Set the sample for the variable WS
+    KDBVariables kdb_vars;
+    kdb_vars.set_sample("2010Q1", "2020Q4");
+    
+    // Linear interpolation / stock
+    low_to_high(LTOH_STOCK, 'L', varfile, "ACAF");
+    EXPECT_TRUE(kdb_vars.contains("ACAF"));
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAF", "2014Q3") * 1e6) / 1e6, -79.729132);
+    
+    // Linear interpolation / flow
+    low_to_high(LTOH_FLOW, 'L', varfile, "ACAG");
+    EXPECT_TRUE(kdb_vars.contains("ACAG"));
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAG", "2014Q3") * 1e6) / 1e6, 8.105075);
+        
+    // Cubic Splines / stock
+    low_to_high(LTOH_STOCK, 'C', varfile, "ACAF");
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAF", "2012Q3") * 1e6) / 1e6, -52.805666 );
+    
+    // Cubic splines / flow
+    low_to_high(LTOH_FLOW, 'C', varfile, "ACAG");
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAG", "2012Q3") * 1e6) / 1e6, 7.613577);
+    
+    // Step / stock
+    low_to_high(LTOH_STOCK, 'S', varfile, "ACAF");
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAF", "2014Q3") * 1e6) / 1e6, -83.340625);
+    
+    // Step / flow
+    low_to_high(LTOH_FLOW, 'S', varfile, "ACAG");
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAG", "2014Q3") * 1e6) / 1e6, 8.105075);
+}
+
+TEST_F(KDBGlobalTest, HighToLow)
+{
+    std::string varfile = input_test_dir + "fun_q.var";
+
+    // Set the sample for the variable WS
+    KDBVariables kdb_vars;
+    kdb_vars.set_sample("2000Y1", "2020Y1");
+    
+    // Last Obs
+    high_to_low(HTOL_LAST, varfile, "ACAF");
+    EXPECT_TRUE(kdb_vars.contains("ACAF"));
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAF", "2014Y1") * 1e6) / 1e6, -83.340625);
+    
+    // Mean
+    high_to_low(HTOL_MEAN, varfile, "ACAG");
+    EXPECT_TRUE(kdb_vars.contains("ACAG"));
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("ACAG", "2014Y1") * 1e6) / 1e6, 8.105075);
+        
+    // Sum
+    high_to_low(HTOL_SUM, varfile, "AOUC");
+    EXPECT_TRUE(kdb_vars.contains("AOUC"));
+    EXPECT_DOUBLE_EQ(round(kdb_vars.get_var("AOUC", "2014Y1") * 1e6) / 1e6, 1.423714);
+}
