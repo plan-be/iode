@@ -326,7 +326,7 @@ static int B_ltoh(int type, char* arg)
     lg = B_get_arg0(method, arg, 80);
     U_sqz_text(method);
 
-    lg += B_get_arg0(file, arg + lg, 80);
+    lg += B_get_arg0(file, arg + lg, K_MAX_FILE);
 
     data = B_ainit_chk(arg + lg, NULL, 0);
     nb = SCR_tbl_size(data);
