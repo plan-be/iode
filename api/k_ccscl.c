@@ -139,13 +139,13 @@ KDB *KS_load_asc(char* filename)
  */
 static void KS_print_scl(FILE* fd, SCL* scl)
 {
-    if(L_ISAN(scl->val)) fprintf(fd, "%.15lg ", (double)(scl->val)); /* JMP 09-04-98 */
+    if(L_ISAN(scl->val)) fprintf(fd, "%.14lg ", (double)(scl->val)); /* JMP 06/10/2022 */ 
     else fprintf(fd, "na ");
 
-    if(L_ISAN(scl->relax)) fprintf(fd, "%.15lg ", (double)(scl->relax)); /* JMP 09-04-98 */
+    if(L_ISAN(scl->relax)) fprintf(fd, "%.14lg ", (double)(scl->relax)); /* JMP 06/10/2022 */
     else fprintf(fd, "na ");
 
-    if(L_ISAN(scl->std)) fprintf(fd, "%.15lg ", (double)(scl->std));     /* JMP 09-04-98 */
+    if(L_ISAN(scl->std)) fprintf(fd, "%.14lg ", (double)(scl->std));     /* JMP 06/10/2022 */
     else fprintf(fd, "na ");
 }
 
