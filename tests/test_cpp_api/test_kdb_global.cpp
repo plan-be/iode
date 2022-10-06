@@ -41,6 +41,8 @@ TEST_F(KDBGlobalTest, Filter)
     char* c_list = const_cast<char*>(list.c_str());
     unsigned char** c_expanded_list = KL_expand(c_list);
     for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
+    // Note: filter_kdb_names() calls remove_duplicates() which calls sort()
+    std::sort(expected_list_names.begin(), expected_list_names.end());
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
@@ -49,5 +51,7 @@ TEST_F(KDBGlobalTest, Filter)
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
     for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
+    // Note: filter_kdb_names() calls remove_duplicates() (which calls sort())
+    remove_duplicates(expected_list_names);
     EXPECT_EQ(list_names, expected_list_names);
 }
