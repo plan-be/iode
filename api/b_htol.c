@@ -100,7 +100,7 @@ static int B_htol(int method, char* arg)
     SAMPLE  *t_smpl = NULL;
 
 
-    lg = B_get_arg0(file, arg, 80);
+    lg = B_get_arg0(file, arg, K_MAX_FILE);
 
     data = B_ainit_chk(arg + lg, NULL, 0);
     nb = SCR_tbl_size(data);
