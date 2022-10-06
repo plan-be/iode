@@ -18,6 +18,8 @@
 #include "menu/workspace/workspace_load.h"
 #include "menu/workspace/workspace_save.h"
 #include "menu/workspace/workspace_clear.h"
+#include "menu/workspace/workspace_high_to_low.h"
+#include "menu/workspace/workspace_low_to_high.h"
 
 #include "menu/compute/compute_identities.h"
 #include "menu/compute/compute_simulation.h"
@@ -50,12 +52,15 @@ private:
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
+	void check_vars_sample();
 
 public slots:
 	// Workspace Menu
 	void open_load_workspace_dialog();
 	void open_save_workspace_dialog();
 	void open_clear_workspace_dialog();
+	void open_high_to_low_dialog();
+	void open_low_to_high_dialog();
 
 	// Compute Menu
 	void open_compute_identities_dialog();
