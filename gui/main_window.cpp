@@ -160,6 +160,26 @@ void MainWindow::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
+void MainWindow::check_vars_sample()
+{
+    // check variables sample and ask to set it if not already defined
+	KDBVariables kdb;
+	if (kdb.get_nb_periods() == 0)
+	{
+		QWidget* p = static_cast<QWidget*>(parent());
+		QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
+		if (reply == QMessageBox::Yes)
+		{
+			QIodeEditVarsSample dialog(this);
+			dialog.exec();
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+
 void MainWindow::open_load_workspace_dialog()
 {
     QIodeMenuWorkspaceLoad dialog(*settings_filepath, this);
@@ -176,6 +196,22 @@ void MainWindow::open_save_workspace_dialog()
 void MainWindow::open_clear_workspace_dialog()
 {
     QIodeMenuWorkspaceClear dialog(*settings_filepath, this);
+    dialog.exec();
+    resetFilter();
+}
+
+void MainWindow::open_high_to_low_dialog()
+{
+    check_vars_sample();
+    QIodeMenuWorkspaceHighToLow dialog(*settings_filepath, this);
+    dialog.exec();
+    resetFilter();
+}
+
+void MainWindow::open_low_to_high_dialog()
+{
+    check_vars_sample();
+    QIodeMenuWorkspaceLowToHigh dialog(*settings_filepath, this);
     dialog.exec();
     resetFilter();
 }

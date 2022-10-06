@@ -90,9 +90,11 @@ set(GUI_IODE_OBJS
 )
 
 set(GUI_MENU_WORKSPACE
-    menu/workspace/workspace_load.ui    menu/workspace/workspace_load.h     menu/workspace/workspace_load.cpp
-    menu/workspace/workspace_save.ui    menu/workspace/workspace_save.h     menu/workspace/workspace_save.cpp
-    menu/workspace/workspace_clear.ui   menu/workspace/workspace_clear.h    menu/workspace/workspace_clear.cpp
+    menu/workspace/workspace_load.ui            menu/workspace/workspace_load.h         menu/workspace/workspace_load.cpp
+    menu/workspace/workspace_save.ui            menu/workspace/workspace_save.h         menu/workspace/workspace_save.cpp
+    menu/workspace/workspace_clear.ui           menu/workspace/workspace_clear.h        menu/workspace/workspace_clear.cpp
+    menu/workspace/workspace_high_to_low.ui     menu/workspace/workspace_high_to_low.h  menu/workspace/workspace_high_to_low.cpp
+    menu/workspace/workspace_low_to_high.ui     menu/workspace/workspace_low_to_high.h  menu/workspace/workspace_low_to_high.cpp
 )
 
 set(GUI_MENU_COMPUTE
