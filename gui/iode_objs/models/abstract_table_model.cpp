@@ -100,9 +100,10 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 {
 	try
 	{
-		if(kdb_filter) delete kdb_filter;
+		kdb = nullptr;
 		if (!pattern.isEmpty())
 		{
+			if(kdb_filter) delete kdb_filter;
 			kdb_filter = new K(KDB_SHALLOW_COPY, pattern.toStdString());
 			kdb = kdb_filter;
 		}
