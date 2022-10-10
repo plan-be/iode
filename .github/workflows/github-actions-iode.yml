@@ -41,6 +41,18 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
+      - name: Install Qt
+        if: contains(github.head_ref, 'gui')
+        # See https://github.com/jurplel/install-qt-action
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.2.1'
+          host: 'windows'
+          target: 'desktop'
+          # TODO : adpat arch for Linux
+          arch: 'win64_msvc2019_64'
+          dir: '${{ github.workspace }}/'
+          install-deps: 'true'
       # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       # Note: use $env:GITHUB_ENV instead of $GITHUB_ENV on Windows OS
       - name: Preset config for Windows
@@ -77,6 +89,9 @@ jobs:
         run: ctest --preset c-api-${{ env.PRESET_CONFIG }}
       - name: Run C++ API Tests
         run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
+      - name: Build GUI
+        if: contains(github.head_ref, 'gui')
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
       - run: echo "This job's status is ${{ job.status }}."
 
   test_no_sanitize:
@@ -128,48 +143,3 @@ jobs:
       - name: Run C++ API Tests
         run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
       - run: echo "This job's status is ${{ job.status }}."
-
-  build_gui:
-    name: Build GUI (Qt)
-    runs-on: windows-2019
-    needs: build_and_test_api
-    # build GUI 
-    if: contains(github.head_ref, 'gui')
-    
-    steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v2
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install dependencies on windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install ninja
-          ninja --version
-          cmake --version
-      - name: Add cl.exe to PATH
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-      - name: Install Qt
-        # See https://github.com/jurplel/install-qt-action
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.2.1'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          dir: '${{ github.workspace }}/'
-          install-deps: 'true'
-      - name: Preset config for Windows
-        if: runner.os == 'Windows'
-        run: |
-          echo "PRESET_CONFIG=windows-x64-debug" >> $env:GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Configure CMake
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
-      - name: Build GUI
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
