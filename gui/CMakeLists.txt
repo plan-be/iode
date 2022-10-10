@@ -14,10 +14,11 @@ if(Qt6_FOUND)
 message(CHECK_PASS "found")
 
 set(GUI_UTILS   
-    super.h super.cpp 
+    super.h     super.cpp 
     wrapper_classes.h 
     utils.h 
     util/double_validator.h
+    util/system_item.h
 )
 
 set(GUI_SETTINGS    
@@ -27,6 +28,7 @@ set(GUI_SETTINGS
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/qfilechooser.h 
     custom_widgets/qsampleedit.h
+    custom_widgets/qiode_tab_widget.h   custom_widgets/qiode_tab_widget.cpp
 )
 
 set(GUI_EDIT_OBJECT
@@ -47,6 +49,10 @@ set(GUI_NEW_OBJECT
     iode_objs/new/add_scalar.ui     iode_objs/new/add_scalar.h      iode_objs/new/add_scalar.cpp
     iode_objs/new/add_table.ui      iode_objs/new/add_table.h       iode_objs/new/add_table.cpp
                                     iode_objs/new/add_variable.h    iode_objs/new/add_variable.cpp 
+)
+
+set(GUI_OBJS_WIDGET
+    iode_objs/widget/iode_obj_widget.h
 )
 
 set(GUI_OBJS_MODELS     
@@ -85,7 +91,7 @@ set(GUI_OBJS_VIEWS
 )
 
 set(GUI_IODE_OBJS 
-    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} 
+    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_WIDGET}
     ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
 )
 
