@@ -107,6 +107,24 @@ inline void check_name(const std::string name, const EnumIodeType type)
         name + " is invalid.");
 }
 
+inline EnumIodeFile get_iode_file_type(const std::string& filepath)
+{
+    if (filepath.empty()) return I_ANY_FILE;
+
+    std::filesystem::path p_filepath(filepath);
+    if (std::filesystem::is_directory(p_filepath)) return I_DIRECTORY;
+    if (!p_filepath.has_extension()) return I_ANY_FILE;
+
+    std::string ext = p_filepath.extension().string();
+
+    int i = 0;
+    for (const IodeFileExtension& file_ext: vFileExtensions)
+    {
+        if (ext == file_ext.ext || ext == file_ext.ascii) return (EnumIodeFile) i;
+        i++;
+    }
+    return I_ANY_FILE;
+}
 inline static std::filesystem::path check_file(const std::string& filepath, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
