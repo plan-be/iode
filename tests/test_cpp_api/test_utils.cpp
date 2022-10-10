@@ -22,6 +22,65 @@ TEST_F(UtilsTest, convertBetweenCodepages)
 }
 
 
+TEST_F(UtilsTest, getIodeFileType)
+{
+	std::string filename = "";
+	EXPECT_EQ(get_iode_file_type(filename), I_ANY_FILE);
+
+	filename = "ws";
+	EXPECT_EQ(get_iode_file_type(filename), I_ANY_FILE);
+
+	EXPECT_EQ(get_iode_file_type(input_test_dir), I_DIRECTORY);
+
+	filename = input_test_dir + "fun.cmt";
+	EXPECT_EQ(get_iode_file_type(filename), I_COMMENTS_FILE);
+	filename = input_test_dir + "fun.ac";
+	EXPECT_EQ(get_iode_file_type(filename), I_COMMENTS_FILE);
+
+	filename = input_test_dir + "fun.eqs";
+	EXPECT_EQ(get_iode_file_type(filename), I_EQUATIONS_FILE);
+	filename = input_test_dir + "fun.ae";
+	EXPECT_EQ(get_iode_file_type(filename), I_EQUATIONS_FILE);
+
+	filename = input_test_dir + "fun.idt";
+	EXPECT_EQ(get_iode_file_type(filename), I_IDENTITIES_FILE);
+	filename = input_test_dir + "fun.ai";
+	EXPECT_EQ(get_iode_file_type(filename), I_IDENTITIES_FILE);
+
+	filename = input_test_dir + "fun.lst";
+	EXPECT_EQ(get_iode_file_type(filename), I_LISTS_FILE);
+	filename = input_test_dir + "fun.al";
+	EXPECT_EQ(get_iode_file_type(filename), I_LISTS_FILE);
+
+	filename = input_test_dir + "fun.scl";
+	EXPECT_EQ(get_iode_file_type(filename), I_SCALARS_FILE);
+	filename = input_test_dir + "fun.as";
+	EXPECT_EQ(get_iode_file_type(filename), I_SCALARS_FILE);
+
+	filename = input_test_dir + "fun.tbl";
+	EXPECT_EQ(get_iode_file_type(filename), I_TABLES_FILE);
+	filename = input_test_dir + "fun.at";
+	EXPECT_EQ(get_iode_file_type(filename), I_TABLES_FILE);
+
+	filename = input_test_dir + "fun.var";
+	EXPECT_EQ(get_iode_file_type(filename), I_VARIABLES_FILE);
+	filename = input_test_dir + "fun.av";
+	EXPECT_EQ(get_iode_file_type(filename), I_VARIABLES_FILE);
+
+	filename = input_test_dir + "fun.rep";
+	EXPECT_EQ(get_iode_file_type(filename), I_REPORTS_FILE);
+
+	filename = input_test_dir + "fun.log";
+	EXPECT_EQ(get_iode_file_type(filename), I_LOGS_FILE);
+
+	filename = input_test_dir + "fun.ini";
+	EXPECT_EQ(get_iode_file_type(filename), I_SETTINGS_FILE);
+
+	filename = input_test_dir + "fun.txt";
+	EXPECT_EQ(get_iode_file_type(filename), I_ANY_FILE);
+}
+
+
 TEST_F(UtilsTest, checkFilepath)
 {
 	std::string filepath;
