@@ -11,7 +11,8 @@
  */
 
 
-QIodeMenuWorkspaceLoad::QIodeMenuWorkspaceLoad(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuWorkspaceLoad::QIodeMenuWorkspaceLoad(const QString& project_settings_filepath, QIodeTabWidget* tabWidget, 
+    QWidget* parent, Qt::WindowFlags f) : QIodeSettings(project_settings_filepath, parent, f), tabWidget(tabWidget)
 {
 	setupUi(this);
 
@@ -41,15 +42,14 @@ void QIodeMenuWorkspaceLoad::load_objs(const EnumIodeType iode_type, const bool 
     {
         QString str_iode_type = QString::fromStdString(vIodeTypes[iode_type]);
         WrapperFileChooser* field_filepath = static_cast<WrapperFileChooser*>(mapFields[str_iode_type]);
-        QString q_filepath = field_filepath->extractAndVerify();
+        QString filepath = field_filepath->extractAndVerify();
         // load_all means that the users clicked on an the "Load" button to load all files at once.
         // In that case and if the filepath is empty, the load_xxx() method does nothing
-        if (load_all && q_filepath.isEmpty()) return;
+        if (load_all && filepath.isEmpty()) return;
         // second argument of load_global_kdb() is not declared with const 
         // -> requires intermediate variable filepath.
         // load_global_kdb() may modify passed filepath value. 
-        std::string filepath = q_filepath.toStdString();
-        load_global_kdb(iode_type, filepath);
+        tabWidget->loadFile(filepath);
     }
     catch (const std::exception& e)
     {

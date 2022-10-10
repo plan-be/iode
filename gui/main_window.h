@@ -1,19 +1,14 @@
 #pragma once
 
 #include <QWidget>
+#include <QList>
+#include <QSettings>
+#include <QMessageBox>
 #include <QMainWindow>
 
 #include "ui_main_window.h"
 
 #include "utils.h"
-
-#include "iode_objs/models/comments_model.h"
-#include "iode_objs/models/equations_model.h"
-#include "iode_objs/models/identities_model.h"
-#include "iode_objs/models/lists_model.h"
-#include "iode_objs/models/scalars_model.h"
-#include "iode_objs/models/tables_model.h"
-#include "iode_objs/models/variables_model.h"
 
 #include "menu/file/file_import_comments.h"
 #include "menu/file/file_import_variables.h"
@@ -37,22 +32,11 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
 private:
 	std::shared_ptr<QString> settings_filepath;
-
-	CommentsModel* commentsModel;
-	EquationsModel* equationsModel;
-	IdentitiesModel* identitiesModel;
-	ListsModel* listsModel;
-	ScalarsModel* scalarsModel;
-	TablesModel* tablesModel;
-	VariablesModel* variablesModel;
+	QSettings* settings;
 
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	~MainWindow();
-
-private:
-	void resetFilter();
-	void viewTab(int index = -1);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

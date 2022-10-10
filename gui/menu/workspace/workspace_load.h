@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_tab_widget.h"
 
 
 const static QMap<QString, int> mapImportFormat({
@@ -35,10 +36,11 @@ class QIodeMenuWorkspaceLoad : public QIodeSettings, public Ui::QIodeMenuWorkspa
 	Q_OBJECT
 
 private:
-
+    QIodeTabWidget* tabWidget;
 
 public:
-	QIodeMenuWorkspaceLoad(const QString& project_settings_filepath, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceLoad(const QString& project_settings_filepath, QIodeTabWidget* tabWidget, 
+        QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceLoad();
 
 private:
