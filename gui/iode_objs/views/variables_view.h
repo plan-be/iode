@@ -37,5 +37,5 @@ public:
 
 public slots:
 	void filter() { filter_and_update(); }
-	void new_variable();
+	void new_obj();
 };

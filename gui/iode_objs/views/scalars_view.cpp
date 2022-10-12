@@ -1,7 +1,7 @@
 #include "scalars_view.h"
 
 
-void ScalarsView::new_scalar()
+void ScalarsView::new_obj()
 {
 	QIodeAddScalar dialog(*settings_filepath, this);
 	dialog.exec();

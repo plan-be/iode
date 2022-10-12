@@ -1,7 +1,7 @@
 #include "lists_view.h"
 
 
-void ListsView::new_list()
+void ListsView::new_obj()
 {
 	QIodeAddList dialog(this);
 	dialog.exec();

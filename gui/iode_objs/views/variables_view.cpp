@@ -10,7 +10,7 @@ void VariablesView::selectionChanged(const QItemSelection& selected, const QItem
 }
 
 
-void VariablesView::new_variable()
+void VariablesView::new_obj()
 {
 	// check variables sample and ask to set it if not already defined
 	KDBVariables kdb;

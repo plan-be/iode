@@ -1,7 +1,7 @@
 #include "comments_view.h"
 
 
-void CommentsView::new_comment()
+void CommentsView::new_obj()
 {
 	QIodeAddComment dialog(this);
 	dialog.exec();
