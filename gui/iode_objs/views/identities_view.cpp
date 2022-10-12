@@ -1,7 +1,7 @@
 #include "identities_view.h"
 
 
-void IdentitiesView::new_identity()
+void IdentitiesView::new_obj()
 {
 	QIodeAddIdentity dialog(this);
 	dialog.exec();

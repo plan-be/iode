@@ -17,5 +17,5 @@ public:
 
 public slots:
 	void filter() { filter_and_update(); }
-	void new_list();
+	void new_obj();
 };
