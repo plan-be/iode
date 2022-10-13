@@ -6,7 +6,7 @@ set(CMAKE_AUTORCC ON)
 
 message(CHECK_START "Search for Qt6 package")
 if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    set(CMAKE_PREFIX_PATH "C:\\Qt\\6.2.1\\msvc2019_64")
+    set(CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
 endif()
 find_package(Qt6 COMPONENTS Core Widgets Gui)
 
