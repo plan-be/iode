@@ -21,7 +21,7 @@ class QIodeEditTable : public QDialog, public Ui::QIodeEditTable
     Q_OBJECT
 
 public:
-    QIodeEditTable(const QString& tableName, const QString& settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditTable(const QString& tableName, const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 
 public slots:
     void edit();

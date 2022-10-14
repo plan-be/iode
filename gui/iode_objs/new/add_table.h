@@ -30,7 +30,7 @@ class QIodeAddTable : public QIodeSettings, public Ui::QIodeAddTable
     WrapperCheckBox* checkBoxDate;
 
 public:
-    QIodeAddTable(const QString& settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeAddTable(const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeAddTable();
 
 public slots:

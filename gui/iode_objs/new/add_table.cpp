@@ -1,6 +1,6 @@
 #include "add_table.h"
 
-QIodeAddTable::QIodeAddTable(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(settings_filepath, parent, f)
+QIodeAddTable::QIodeAddTable(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(project_settings_filepath, parent, f)
 {
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
