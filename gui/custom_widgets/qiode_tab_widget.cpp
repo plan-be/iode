@@ -288,33 +288,34 @@ void QIodeTabWidget::saveFile(const QString& filepath, const bool loop)
     }
 }
 
-bool QIodeTabWidget::saveAllIn(const QDir& dir)
+bool QIodeTabWidget::saveProjectAs(QDir& newProjectDir)
 {
-    bool success = false;
-    QString dirPath = dir.absolutePath();
+    QString newProjectPath = newProjectDir.absolutePath();
     QWidget* mainwin = get_main_window_ptr();
 
-    if (!dir.exists())
+    if (!newProjectDir.exists())
     {
-        QMessageBox::critical(mainwin, "Error", "Directory " + dirPath + " does not exist");
-        return success;
+        QMessageBox::critical(mainwin, "Error", "Directory " + newProjectPath + " does not exist");
+        return false;
     }
 
-    QStringList files = buildFilesList();
-    QString filename;
-    QString new_filepath;
-    for (const QString& filepath : files)
+    SystemItem currentProject(QFileInfo(projectDirPath), false);
+    return currentProject.copyTo(newProjectDir);
+}
+
+void QIodeTabWidget::fileRenamed(const QString &path, const QString &oldName, const QString &newName)
+{
+    QDir parentDir = QDir(path);
+    //build absolute path of the file before renaming it
+    QString oldFilePath = parentDir.absoluteFilePath(oldName);
+    // check if oldFilePath present in currently open tabs
+    QStringList tabs = buildFilesList();
+    int index = tabs.indexOf(oldFilePath);
+    if (index >= 0)
     {
-        filename = QFileInfo(filepath).fileName();
-        new_filepath = dir.absoluteFilePath(filename);
-        saveFile(new_filepath, true);
+        // update name and tooltip of corresponding tab
+        QString newFilePath = parentDir.absoluteFilePath(newName);
+        this->setTabText(index, newName);
+        this->setTabToolTip(index, newFilePath);
     }
-
-    // the user didn't clicked on the Discard button
-    if(!discard_all) success = true;
-
-    overwrite_all = false;
-    discard_all = false;
-
-    return success;
 }

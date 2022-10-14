@@ -7,6 +7,7 @@
 #include <QAbstractScrollArea>
 
 #include "utils.h"
+#include "util/system_item.h"
 #include "iode_objs/widget/iode_obj_widget.h"
 
 
@@ -16,6 +17,8 @@ class QIodeTabWidget: public QTabWidget
 
     QSettings* settings;
     std::shared_ptr<QString> project_settings_filepath;
+
+    QString projectDirPath;
     bool overwrite_all;
     bool discard_all;
 
@@ -57,7 +60,6 @@ private:
         return filesList;
     }
     
-
     /**
      * @brief dump list of opened files (= tabs) in settings
      * 
@@ -86,12 +88,12 @@ public:
     void saveFile(const QString& filepath, const bool loop = false);
 
     /**
-     * @brief save all opened files into a new directory
+     * @brief save current project to another (new) directory
      * 
-     * @param dir New directory to save in
+     * @param dir (New) directory to save the current project in
      * @return bool whether or not all files have been saved, i.e. the user as not clicked on the Discard button
      */
-    bool saveAllIn(const QDir& dir);
+    bool saveProjectAs(QDir& newProjectDir);
 
     int addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo);
 
@@ -101,4 +103,22 @@ public:
 
 public slots:
     void removeTab(const int index);
+    
+    /**
+     * @brief Update the path to the current project directory.
+     *        Slot method called each time the project directory is changed.
+     * 
+     * @param projectDirPath Path to the root directory of the File Explorer  
+     */
+    void updateProjectDir(const QString& projectDirPath) { this->projectDirPath = projectDirPath; }
+
+    /**
+     * @brief Method called when a user rename a file using the File Explorer.
+     *        Update the name and tooltip af tab associated with the renamed file if open.
+     * 
+     * @param path Path to the parent directory
+     * @param oldName Name of the file before renaming
+     * @param newName Name of the file after renaming
+     */
+    void fileRenamed(const QString &path, const QString &oldName, const QString &newName);
 };

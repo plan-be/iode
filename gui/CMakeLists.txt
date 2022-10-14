@@ -28,7 +28,10 @@ set(GUI_SETTINGS
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/qfilechooser.h 
     custom_widgets/qsampleedit.h
-    custom_widgets/qiode_tab_widget.h   custom_widgets/qiode_tab_widget.cpp
+    custom_widgets/file_delegate.h              custom_widgets/file_delegate.cpp
+    custom_widgets/qiode_tab_widget.h           custom_widgets/qiode_tab_widget.cpp
+    custom_widgets/qiode_file_explorer_proxy.h
+    custom_widgets/qiode_file_explorer.h        custom_widgets/qiode_file_explorer.cpp
 )
 
 set(GUI_EDIT_OBJECT
