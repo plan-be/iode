@@ -22,7 +22,7 @@ class QIodeMenuComputeModel : public QIodeSettings, public Ui::QIodeMenuComputeM
     WrapperQTextEdit* qEquationsList;
 
 public:
-	QIodeMenuComputeModel(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeModel(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuComputeModel();
 
 public slots:

@@ -29,7 +29,7 @@ class QIodeMenuWorkspaceSave : public QIodeSettings, public Ui::QIodeMenuWorkspa
     int nb_variables;
 
 public:
-	QIodeMenuWorkspaceSave(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceSave(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceSave();
 
 private:

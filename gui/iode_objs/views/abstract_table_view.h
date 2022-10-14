@@ -18,7 +18,7 @@ template <class M> class AbstractTableView : public QTableView
 	QLineEdit* filterLineEdit;
 
 protected:
-	std::shared_ptr<QString> settings_filepath;
+	std::shared_ptr<QString> project_settings_filepath;
 
 protected:
 	void keyPressEvent(QKeyEvent* event) override
@@ -69,12 +69,12 @@ public:
 
 	~AbstractTableView() {}
 
-	void setupView(M* model, QLineEdit* filterLineEdit, std::shared_ptr<QString>& settings_filepath)
+	void setupView(M* model, QLineEdit* filterLineEdit, std::shared_ptr<QString>& project_settings_filepath)
 	{
 		setModel(model);
 		setItemDelegate(delegate);
 		this->filterLineEdit = filterLineEdit;
-		this->settings_filepath = settings_filepath;
+		this->project_settings_filepath = project_settings_filepath;
 	}
 
 	void update()

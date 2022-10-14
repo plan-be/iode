@@ -38,7 +38,7 @@ private:
 
 
 public:
-	QIodeMenuWorkspaceLoad(const QString& settings_filepath, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceLoad(const QString& project_settings_filepath, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuWorkspaceLoad();
 
 private:

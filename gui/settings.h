@@ -8,7 +8,7 @@ class QIodeSettings : public QDialog
     Q_OBJECT
 
 protected:
-    QSettings* settings;
+    QSettings* project_settings;
     QString className;
     QMap<QString, BaseWrapper*> mapFields;
 

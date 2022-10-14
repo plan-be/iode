@@ -11,8 +11,8 @@
  */
 
 
-QIodeMenuComputeSCCDecomposition::QIodeMenuComputeSCCDecomposition(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuComputeSCCDecomposition::QIodeMenuComputeSCCDecomposition(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(project_settings_filepath, parent, f)
 {
     setupUi(this);
 

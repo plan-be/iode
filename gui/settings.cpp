@@ -4,31 +4,31 @@
 
 QIodeSettings::QIodeSettings(const QString& filepath, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f), className("")
 {
-    settings = new QSettings(filepath, QSettings::IniFormat);
+    project_settings = new QSettings(filepath, QSettings::IniFormat);
 }
 
 QIodeSettings::~QIodeSettings()
 {
-    delete settings;
+    delete project_settings;
 }
 
 void QIodeSettings::saveSettings()
 {
-    settings->beginGroup(className);
+    project_settings->beginGroup(className);
     QMap<QString, BaseWrapper*>::iterator i;
     for (i = mapFields.begin(); i != mapFields.end(); ++i)
     {
         QString name = i.key();
         BaseWrapper* field = i.value();
         QVariant value = field->getQValue();
-        settings->setValue(name, value);
+        project_settings->setValue(name, value);
     }
-    settings->endGroup();
+    project_settings->endGroup();
 }
 
 void QIodeSettings::loadSettings()
 {
-    settings->beginGroup(className);
+    project_settings->beginGroup(className);
     QMap<QString, BaseWrapper*>::iterator i;
     for (i = mapFields.begin(); i != mapFields.end(); ++i)
     {
@@ -36,14 +36,14 @@ void QIodeSettings::loadSettings()
         BaseWrapper* field = i.value();
         // use contains() to not override default value set in UI form file
         // (i.e. default value used when a user uses the field for the first time)
-        if (settings->contains(key))
+        if (project_settings->contains(key))
         {
             // Note: if key does not exist, a default value is infered (not from UI form file!)
-            QVariant value = settings->value(key).toString();
+            QVariant value = project_settings->value(key).toString();
             field->setQValue(value);
         }
     }
-    settings->endGroup();
+    project_settings->endGroup();
 }
 
 void QIodeSettings::closeEvent(QCloseEvent* event)

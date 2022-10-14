@@ -31,7 +31,7 @@ class QIodeMenuFileExport: public QIodeSettings, public Ui::QIodeMenuFileExport
     WrapperFileChooser*  wDebugFile;
 
 public:
-	QIodeMenuFileExport(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuFileExport(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuFileExport();
 
 public slots:

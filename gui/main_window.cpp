@@ -182,7 +182,7 @@ void MainWindow::check_vars_sample()
 
 void MainWindow::open_import_comments_dialog()
 {
-    QIodeMenuFileImportComments dialog(*settings_filepath, this);
+    QIodeMenuFileImportComments dialog(*project_settings_filepath, this);
     if (dialog.exec() == QDialog::Accepted)
     {
         this->lineEdit_filter_comments->setText("");
@@ -192,7 +192,7 @@ void MainWindow::open_import_comments_dialog()
 
 void MainWindow::open_import_variables_dialog()
 {
-    QIodeMenuFileImportVariables dialog(*settings_filepath, this);
+    QIodeMenuFileImportVariables dialog(*project_settings_filepath, this);
     if (dialog.exec() == QDialog::Accepted)
     {
         this->lineEdit_filter_variables->setText("");
@@ -202,7 +202,7 @@ void MainWindow::open_import_variables_dialog()
 
 void MainWindow::open_export_dialog()
 {
-    QIodeMenuFileExport dialog(*settings_filepath, this);
+    QIodeMenuFileExport dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 

@@ -21,12 +21,12 @@ protected:
 		{
 			// use this pointer to avoid "function declaration must be available 
 			// as none of the arguments depend on a template parameter" and 
-			// "'settings_filepath': undeclared identifier" errors.
+			// "'project_settings_filepath': undeclared identifier" errors.
 			// see https://stackoverflow.com/a/15531940
 
 			M* _model = static_cast<M*>(this->model());
 			QString name = _model->data(_model->index(index.row(), 0)).toString();
-			D dialog(name, *this->settings_filepath, static_cast<QWidget*>(this->parent()));
+			D dialog(name, *this->project_settings_filepath, static_cast<QWidget*>(this->parent()));
 			dialog.exec();
 			this->update();
 		}

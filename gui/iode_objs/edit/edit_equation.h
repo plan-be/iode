@@ -37,7 +37,7 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
     WrapperQLineEdit* lineInstruments;
 
 public:
-    QIodeEditEquation(const QString& equationName, const QString& settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeEditEquation();
 
 public slots:

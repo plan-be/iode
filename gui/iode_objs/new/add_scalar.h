@@ -26,7 +26,7 @@ class QIodeAddScalar : public QIodeSettings, public Ui::QIodeAddScalar
     WrapperDoubleSpinBox* spinBoxRelax;
 
 public:
-    QIodeAddScalar(const QString& settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeAddScalar(const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeAddScalar();
 
 public slots:

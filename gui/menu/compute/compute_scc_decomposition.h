@@ -26,7 +26,7 @@ class QIodeMenuComputeSCCDecomposition : public QIodeSettings, public Ui::QIodeM
     WrapperQLineEdit* qPostRecursiveListName;
 
 public:
-	QIodeMenuComputeSCCDecomposition(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeSCCDecomposition(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuComputeSCCDecomposition();
 
 public slots:
