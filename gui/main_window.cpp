@@ -9,7 +9,7 @@ QWidget* get_main_window_ptr()
 }
 
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(nullptr)
 {
     // ---- setup IODE ----
     IodeInit();
@@ -20,19 +20,148 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // ---- global parameters ----
     main_window_ptr = static_cast<QWidget*>(this);
 
-    // ---- settings ----
-    settings_filepath = std::make_shared<QString>("iode_gui_settings.ini");
-    settings = new QSettings(*settings_filepath, QSettings::IniFormat);
+    // ---- user settings ----
+    user_settings = new QSettings(QSettings::UserScope, this);
+    rootPath = user_settings->value("rootPath", QDir::currentPath()).toString();
+    recentProjects = user_settings->value("recentProjects", QStringList()).toStringList();
 
-    // ---- tabs ----
-    tabWidget_IODE_objs->setup(settings_filepath);
+    // ---- menus ----
+    buildRecentProjectsMenu();
+
+    // ---- file explorer ----
+    treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
+
+    // ---- load project ----
+    openDirectory(rootPath);
 }
 
 MainWindow::~MainWindow()
 {
-    delete settings;
+    user_settings->setValue("rootPath", QVariant(rootPath));
+
+    delete project_settings;
+    delete user_settings;
 
     IodeEnd();
+}
+
+void MainWindow::buildRecentProjectsMenu()
+{
+    menuRecent_Projects->clear();
+
+    QString projectPath;
+    for (int i=0; i < recentProjects.count(); i++)
+    {
+        QDir projectDir(recentProjects.at(i));
+        QAction* action = new QAction(projectDir.dirName(), this);
+        QString absolutePath = projectDir.absolutePath();
+        action->setStatusTip(absolutePath);
+        action->setToolTip(absolutePath);
+        action->setData(absolutePath);
+        action->setVisible(true);
+        connect(action, &QAction::triggered, this, &MainWindow::open_recent_project);
+        menuRecent_Projects->addAction(action);
+    }
+}
+
+void MainWindow::addProjectPathToList(const QDir& projectDir)
+{
+    QString projectPath = projectDir.absolutePath();
+    // add project directory path to list of recently opened projects (= directories)
+
+    qsizetype index = recentProjects.indexOf(projectPath);
+    if (index == -1)
+    {
+        if (recentProjects.count() == MAX_RECENT_PROJECTS) recentProjects.pop_back();
+        recentProjects.prepend(projectPath);
+    }
+    else recentProjects.move(index, 0);
+
+    // update user settings
+    user_settings->setValue("recentProjects", QVariant::fromValue(recentProjects));
+
+    // setup Menu > Recent Projects > list of recent projects
+    buildRecentProjectsMenu();
+}
+
+void MainWindow::openDirectory(const QString& dirPath)
+{
+    if(dirPath.isEmpty())
+    {
+        QMessageBox::critical(this, "Error", "Empty path for new Project");
+        return;
+    }
+
+    QDir dir(dirPath);
+    rootPath = dir.absolutePath();
+    if (!dir.exists())
+    {
+        QMessageBox::critical(this, "Error", "Directory " + rootPath + " does not exist");
+        return;
+    }
+
+    // create/update settings
+    QDir projectDir(dirPath);
+    QString qSettingsFilepath = projectDir.absoluteFilePath("iode_gui_settings.ini");
+    project_settings_filepath = std::make_shared<QString>(qSettingsFilepath);
+
+    if (project_settings) delete project_settings;
+    project_settings = new QSettings(qSettingsFilepath, QSettings::IniFormat);
+
+    // close all tabs
+    tabWidget_IODE_objs->clear();
+
+    // update file explorer view
+    treeView_file_explorer->updateProjectDir(projectDir, project_settings_filepath);
+
+    // (re)open tabs
+    tabWidget_IODE_objs->setup(project_settings_filepath);
+
+    // add directory path to list of recently opened projects (= directories)
+    addProjectPathToList(projectDir);
+}
+
+void MainWindow::open_project()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), rootPath,
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    // check if user clikced on Cancel button
+    if(dir.isEmpty()) return;
+    // update current project path + open it in the Iode GUI File Exporer
+    rootPath = dir;
+    openDirectory(rootPath);
+}
+
+void MainWindow::save_project_as()
+{
+    // QFileDialog::getExistingDirectory allows users to create a new directory while the file explorer is open
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), rootPath,
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    // check if user clikced on Cancel button
+    if(dir.isEmpty()) return;
+    // update current project path
+    rootPath = dir;
+    // save all Iode files to the (new) directory 
+    QDir projectDir = QDir(rootPath);
+    tabWidget_IODE_objs->saveProjectAs(projectDir);
+
+    openDirectory(rootPath);
+}
+
+void MainWindow::open_recent_project()
+{
+    QAction* action = static_cast<QAction*>(QObject::sender());
+    if (action)
+    {
+        QString projectPath = action->data().toString();
+        if (QDir(projectPath).exists()) openDirectory(projectPath);
+        else 
+        {
+            QMessageBox::warning(this, "Warning", "Directory " + projectPath + " seems to no longer exist");
+            recentProjects.removeAll(projectPath);
+            user_settings->setValue("recentProjects", QVariant::fromValue(recentProjects));
+        }
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -88,20 +217,20 @@ void MainWindow::open_export_dialog()
 
 void MainWindow::open_load_workspace_dialog()
 {
-    QIodeMenuWorkspaceLoad dialog(*settings_filepath, tabWidget_IODE_objs, this);
+    QIodeMenuWorkspaceLoad dialog(*project_settings_filepath, tabWidget_IODE_objs, this);
     dialog.exec();
     tabWidget_IODE_objs->resetFilters();
 }
 
 void MainWindow::open_save_workspace_dialog()
 {
-    QIodeMenuWorkspaceSave dialog(*settings_filepath, this);
+    QIodeMenuWorkspaceSave dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_clear_workspace_dialog()
 {
-    QIodeMenuWorkspaceClear dialog(*settings_filepath, this);
+    QIodeMenuWorkspaceClear dialog(*project_settings_filepath, this);
     dialog.exec();
     tabWidget_IODE_objs->resetFilters();
 }
@@ -109,44 +238,44 @@ void MainWindow::open_clear_workspace_dialog()
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
-    QIodeMenuWorkspaceHighToLow dialog(*settings_filepath, this);
+    QIodeMenuWorkspaceHighToLow dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_low_to_high_dialog()
 {
     check_vars_sample();
-    QIodeMenuWorkspaceLowToHigh dialog(*settings_filepath, this);
+    QIodeMenuWorkspaceLowToHigh dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_identities_dialog()
 {
-    QIodeMenuComputeIdentities dialog(*settings_filepath, this);
+    QIodeMenuComputeIdentities dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_simulation_dialog()
 {
-    QIodeMenuComputeSimulation dialog(*settings_filepath, this);
+    QIodeMenuComputeSimulation dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_model_dialog()
 {
-    QIodeMenuComputeModel dialog(*settings_filepath, this);
+    QIodeMenuComputeModel dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_scc_decomposition_dialog()
 {
-    QIodeMenuComputeSCCDecomposition dialog(*settings_filepath, this);
+    QIodeMenuComputeSCCDecomposition dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_scc_simulation_dialog()
 {
-    QIodeMenuComputeSCCSimulation dialog(*settings_filepath, this);
+    QIodeMenuComputeSCCSimulation dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 

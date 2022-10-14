@@ -1,9 +1,12 @@
 #pragma once
 
 #include <QWidget>
+#include <QDir>
 #include <QList>
+#include <QAction>
 #include <QSettings>
 #include <QMessageBox>
+#include <QFileIconProvider>
 #include <QMainWindow>
 
 #include "ui_main_window.h"
@@ -31,22 +34,49 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 	Q_OBJECT
 
 private:
-	std::shared_ptr<QString> settings_filepath;
-	QSettings* settings;
+	std::shared_ptr<QString> project_settings_filepath;
+	QSettings* project_settings;	///< to store per project (= directory) settings
+	QSettings* user_settings;		///< to store user preferences and recently opened projects
+
+	QString rootPath;
+	const int MAX_RECENT_PROJECTS = 30;
+	QStringList recentProjects;
 
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	~MainWindow();
 
+	void openDirectory(const QString& dirPath);
+
 protected:
 	void closeEvent(QCloseEvent* event) override;
 	void check_vars_sample();
+
+private:
+	/**
+	 * @brief prepare the list of recently opened folders in Menu > Recent Projects.
+	 * 
+	 */
+	void buildRecentProjectsMenu();
+
+	/**
+	 * @brief add the path to a project directory to the list 
+	 * of recent opened project dirs.
+	 * 
+	 * @param projectDir absolute path the project directory
+	 */
+	void addProjectPathToList(const QDir& projectDir);
 
 public slots:
 	// File Menu
 	void open_import_comments_dialog();
 	void open_import_variables_dialog();
 	void open_export_dialog();
+
+	// File Menu
+	void open_project();
+	void save_project_as();
+	void open_recent_project();
 
 	// Workspace Menu
 	void open_load_workspace_dialog();

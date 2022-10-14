@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>700</height>
+    <height>704</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -72,6 +72,15 @@
      <bool>true</bool>
     </property>
     <addaction name="actionImport_Comments"/>
+    <widget class="QMenu" name="menuRecent_Projects">
+     <property name="title">
+      <string>Recent Projects</string>
+     </property>
+    </widget>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="actionSave_Project_As"/>
+    <addaction name="menuRecent_Projects"/>
+    <addaction name="separator"/>
     <addaction name="actionImport_Variables"/>
     <addaction name="separator"/>
     <addaction name="actionExport"/>
@@ -303,6 +312,77 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget_file_explorer">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>160</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>File Explorer</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <widget class="QIodeFileExplorer" name="treeView_file_explorer">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>200</width>
+       <height>620</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>160</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="acceptDrops">
+      <bool>true</bool>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::EditKeyPressed</set>
+     </property>
+     <property name="dragEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>true</bool>
+     </property>
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::InternalMove</enum>
+     </property>
+     <property name="defaultDropAction">
+      <enum>Qt::MoveAction</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
   <action name="actionImport_Comments">
    <property name="text">
     <string>Import Comments</string>
@@ -829,13 +909,33 @@
     <string>Export Variables</string>
    </property>
   </action>
+  <action name="actionSave_Project_As">
+   <property name="text">
+    <string>Save Project As</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open/New Project</string>
+   </property>
+  </action>
+  <action name="actioncb_dnqsj">
+   <property name="text">
+    <string>cb dnqsj</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QIodeTabWidget</class>
    <extends>QTabWidget</extends>
-   <header location="global">custom_widgets/qiode_tab_widget.h</header>
+   <header>custom_widgets/qiode_tab_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QIodeFileExplorer</class>
+   <extends>QTreeView</extends>
+   <header location="global">custom_widgets/qiode_file_explorer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -1576,6 +1676,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave_Project_As</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>save_project_as()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen_Project</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_project()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1617,5 +1749,7 @@
   <slot>open_iode_manual()</slot>
   <slot>open_import_variables_dialog()</slot>
   <slot>open_export_dialog()</slot>
+  <slot>save_project_as()</slot>
+  <slot>open_project()</slot>
  </slots>
 </ui>
