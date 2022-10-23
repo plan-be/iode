@@ -68,7 +68,7 @@
  */
 
 #include "iode.h"
-
+#include <time.h>
 
 /* Global functions (not static!) */
 L_REAL L_logn(L_REAL v)

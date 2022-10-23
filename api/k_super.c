@@ -19,6 +19,7 @@
  *     int kconfirm(char *fmt,...)                  Displays a message and optionally asks confirmation before continuing.
  *     int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts) Displays a message box with optional buttons. 
  *     void krecordkey(int key)                     Records a key in the keyboard buffer. 
+ *     void krecordtext(unsigned char*  text)       Records a text in the keyboard buffer in reverse order (LIFO).
  *     int Wprintf(char* fmt, ...)                  Displays a message.
  *     int SCR_panic()                              Exits the program (normally on a "memory full" event).
  *     void ksettitle()                             Set the window title (GUI only).
@@ -29,6 +30,8 @@
  *     SAMPLE *kasksmpl()                           Asks the user to give a SAMPLE (GUI only).
  *     int kexecsystem()                            Calls the fonction system().
  *     int kshellexec()                             Call the Win32 function ShellExecuteEx().
+ *
+ *     int ODE_end()                                Ends an IODE session.
  *
  * SCR4 superseeded functions + assign
  * -----------------------------------
@@ -47,6 +50,7 @@
  *      int   kmsgbox_continue = 0;
  *      int   kpause_continue = 0;
  *      void (*krecordkey_super)(int ch);
+ *      void (*krecordtext_super)(unsigned char *text);
  *      void (*ksettitle_super)(void);
  *      int  (*ktermvkey_super)(int vkey);
  *      int  (*khitkey_super)();
@@ -55,6 +59,7 @@
  *      SAMPLE *(*kasksmpl_super)(void);
  *      int kexecsystem_super(char*);
  *      int kshellexec_super(char*);    
+ *      int ODE_end_super(int);    
  *  
  */ 
 
@@ -82,6 +87,7 @@ void (*kbeep_super)(void);
 SAMPLE *(*kasksmpl_super)(void);
 int  (*kexecsystem_super)();
 int  (*kshellexec_super)();
+int  (*ODE_end_super)(int);
 
 /**
  *  Displays an error message and optionally exits the program.
@@ -466,8 +472,8 @@ SAMPLE  *kasksmpl()
  *  Calls the fonction system().
  *  Can be superseeded by assigning kexecsystem_super.
  *    
- *  @param [in] arg     
- *  @return     
+ *  @param [in] char* arg     command to execute
+ *  @return     int           return code of system or the replacement function        
  *  
  */
 int kexecsystem(char *arg)
@@ -490,8 +496,8 @@ int kexecsystem(char *arg)
  *  Call the Win32 function ShellExecuteEx().
  *  If kshellexec_super is not null, it replaces the default behaviour.
  *  
- *  @param [in] arg 
- *  @return 
+ *  @param [in] char* arg     command to execute
+ *  @return     int           0 or return code of the "super" replacement function
  *  
  */
 int kshellexec(char *arg)
@@ -531,6 +537,24 @@ char    *A_expand_super_API(char* name)
     pos = K_find(KL_WS, name);
     if (pos < 0) return(NULL);
     return((char *)KLVAL(KL_WS, pos));
+}
+
+
+/**
+ *  Ends an IODE session. Cleans up the allocated variables.
+ *  If ODE_end_super is not null, it replaces the default behaviour.
+ *  
+ *  @param [in]  int    st  
+ *  @return 
+ *  
+ */
+int ODE_end(int st)
+{
+    if(ODE_end_super) 
+        return((*ODE_end_super)(st));
+
+    // Default implementation
+    return(IodeEnd());
 }
 
 

@@ -7,70 +7,72 @@
 - [IODE: functions by group](#T1)
   - [Function names in IODE](#T2)
   - [Memory allocations in IODE](#T3)
-  - [Group "Global Utilities"](#T4)
-    - [buf.c](#T5)
-    - [pack.c](#T6)
-    - [per.c](#T7)
-      - [Calculation functions](#T8)
-      - [Conversion functions](#T9)
-      - [Miscellaneous functions](#T10)
-    - [yy.c](#T11)
-    - [b\_iodeini.c](#T12)
-  - [Group "Pseudo\-virtual functions"](#T13)
-    - [k\_super.c](#T14)
-      - [List of functions that can be superseeded](#T15)
-      - [List of function pointers that can replace the standard implementations](#T16)
-  - [Group "IODE Version"](#T17)
-    - [k\_vers.c](#T18)
-  - [Group "KDB management"](#T19)
-    - [k\_kdb.c](#T20)
-    - [k\_ws.c](#T21)
-    - [k\_wsvar.c](#T22)
-  - [Group "Object management"](#T23)
-    - [k\_objsv.c](#T24)
-    - [k\_objs.c](#T25)
-    - [k\_objvers.c](#T26)
-    - [k\_pack.c](#T27)
-      - [Packing functions](#T28)
-      - [Unpacking functions (for TBL and EQ only ?)](#T29)
-      - [Allocation functions (SCL & VAR only)](#T30)
-    - [k\_val.c](#T31)
-    - [k\_eqs.c](#T32)
-    - [k\_lst.c](#T33)
-    - [k\_tbl.c](#T34)
-    - [k\_cmp.c](#T35)
-    - [k\_grep.c](#T36)
-  - [Group "IODE file management"](#T37)
-    - [k\_objfile.c](#T38)
-  - [Group "IODE big\- and little\-endian conversion"](#T39)
-    - [k\_xdr.c](#T40)
-  - [Group "IODE object ascii formats"](#T41)
-    - [Filename extensions](#T42)
-    - [k\_ccall.c](#T43)
-    - [k\_cccmt.c](#T44)
-    - [k\_cceqs.c](#T45)
-    - [k\_ccidt.c](#T46)
-    - [k\_cclst.c](#T47)
-    - [k\_ccscl.c](#T48)
-    - [k\_cctbl.c](#T49)
-    - [k\_ccvar.c](#T50)
-  - [Group "LEC language"](#T51)
-    - [k\_lec.c](#T52)
-  - [Group "Basic functions"](#T53)
-    - [b\_args.c](#T54)
-    - [b\_errors.c](#T55)
-  - [Group "Execution of identities"](#T56)
-  - [Group "Model Estimation"](#T57)
-  - [Group "Model Simulation"](#T58)
-  - [Group "Table Calculation"](#T59)
-  - [Group "IODE Printing"](#T60)
-  - [Group "IODE object conversions"](#T61)
-  - [Group "Iode Reports"](#T62)
+  - [SCR4 library](#T4)
+  - [Group "Global Utilities"](#T5)
+    - [buf.c](#T6)
+    - [pack.c](#T7)
+    - [per.c](#T8)
+      - [Calculation functions](#T9)
+      - [Conversion functions](#T10)
+      - [Miscellaneous functions](#T11)
+    - [yy.c](#T12)
+    - [b\_iodeini.c](#T13)
+  - [Group "Pseudo\-virtual functions"](#T14)
+    - [k\_super.c](#T15)
+      - [List of functions that can be superseeded](#T16)
+      - [List of function pointers that can replace the standard implementations](#T17)
+  - [Group "IODE Version"](#T18)
+    - [k\_vers.c](#T19)
+  - [Group "KDB management"](#T20)
+    - [k\_kdb.c](#T21)
+    - [k\_ws.c](#T22)
+    - [k\_wsvar.c](#T23)
+  - [Group "Object management"](#T24)
+    - [k\_objsv.c](#T25)
+    - [k\_objs.c](#T26)
+    - [k\_objvers.c](#T27)
+    - [k\_pack.c](#T28)
+      - [Packing functions](#T29)
+      - [Unpacking functions (for TBL and EQ only ?)](#T30)
+      - [Allocation functions (SCL & VAR only)](#T31)
+    - [k\_val.c](#T32)
+    - [k\_eqs.c](#T33)
+    - [k\_lst.c](#T34)
+    - [k\_tbl.c](#T35)
+    - [k\_cmp.c](#T36)
+    - [k\_grep.c](#T37)
+  - [Group "IODE file management"](#T38)
+    - [k\_objfile.c](#T39)
+  - [Group "IODE big\- and little\-endian conversion"](#T40)
+    - [k\_xdr.c](#T41)
+  - [Group "IODE object ascii formats"](#T42)
+    - [Filename extensions](#T43)
+    - [k\_ccall.c](#T44)
+    - [k\_cccmt.c](#T45)
+    - [k\_cceqs.c](#T46)
+    - [k\_ccidt.c](#T47)
+    - [k\_cclst.c](#T48)
+    - [k\_ccscl.c](#T49)
+    - [k\_cctbl.c](#T50)
+    - [k\_ccvar.c](#T51)
+  - [Group "LEC language"](#T52)
+    - [k\_lec.c](#T53)
+  - [Group "Basic functions"](#T54)
+    - [b\_args.c](#T55)
+    - [b\_errors.c](#T56)
+  - [Group "Execution of identities"](#T57)
+  - [Group "Model Estimation"](#T58)
+  - [Group "Model Simulation"](#T59)
+  - [Group "Table Calculation"](#T60)
+  - [Group "IODE Printing"](#T61)
+  - [Group "IODE object conversions"](#T62)
+  - [Group "Iode Reports"](#T63)
 
 # IODE: functions by group {#T1}
 
 - Function names in IODE
 - Memory allocations in IODE
+- SCR4 library
 - Group "Global Utilities" 
 - Group "Pseudo\-virtual functions" 
 - Group "IODE Version" 
@@ -112,7 +114,22 @@ The main functions in this second group are `SW_init()`, `SW_alloc()`, `SW_reall
 
 More information can be found at http://xon.be/scr4/libs1/libs1236.htm.
 
-## Group "Global Utilities" {#T4}
+## SCR4 library {#T4}
+
+Most functions in IODE massively use the SCR4 library functions which extends the standard "libc" libray for numerous topics:
+
+- memory management
+- list management
+- matrix calculus
+- ini file management
+- html, rtf, md, csv file generation
+- printing management
+- odbc interface
+- etc
+
+The web page http://www.xon.be/scr4/libs1/libs1.htm contains a list of all available functions.
+
+## Group "Global Utilities" {#T5}
 
 |Filename|Object|
 |:---|:---|
@@ -122,7 +139,7 @@ More information can be found at http://xon.be/scr4/libs1/libs1236.htm.
 |yy.c|helper functions for reading and writing IODE ascii files.|
 |b\_iodeini.c|reading and writing parameters in the iode.ini file|
 
-### buf.c {#T5}
+### buf.c {#T6}
 
 Functions to share and reuse a large allocated buffer in different parts of the application.
 
@@ -137,7 +154,7 @@ Functions to share and reuse a large allocated buffer in different parts of the 
 | ||
 |`char *BUF_DATA`|NULL or pointer to the allocated buffer|
 
-### pack.c {#T6}
+### pack.c {#T7}
 
 Packing (serialize) and unpacking (deserialize) objects.
 
@@ -151,11 +168,11 @@ Packing (serialize) and unpacking (deserialize) objects.
 |`void *P_alloc_get_ptr(void *ptr, int p)`|allocates space for the p'th element of a pack. Copies the pth element in the allocated space.|
 |`int P_nb(char *ptr)`|retrieves the number of elements in the pack pointed to by ptr.|
 
-### per.c {#T7}
+### per.c {#T8}
 
 Functions for manipulating PERIOD and SAMPLE in IODE.
 
-#### Calculation functions {#T8}
+#### Calculation functions {#T9}
 
 |Syntax|Description|
 |:---|:---|
@@ -163,7 +180,7 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 |`PERIOD *PER_addper(PERIOD *period, int shift)`|adds (sub\-)periods to period.|
 |`int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)`|calculates the intersection between 2 SAMPLEs.|
 
-#### Conversion functions {#T9}
+#### Conversion functions {#T10}
 
 |Syntax|Description|
 |:---|:---|
@@ -173,7 +190,7 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 |`SAMPLE *PER_atosmpl(char* a1, char* a2)`|creates a SAMPLE based on two strings containing PERIODs.|
 |`SAMPLE *PER_pertosmpl(PERIOD* p1, PERIOD* p2)`|returns a new allocated SAMPLE build on two given PERIOD.|
 
-#### Miscellaneous functions {#T10}
+#### Miscellaneous functions {#T11}
 
 |Syntax|Description|
 |:---|:---|
@@ -181,7 +198,7 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 |`int PER_nbper(PERIOD* period)`|retrieves the number of periods in one year in a period|
 |`IODE_REAL PER_per2real(PERIOD* from, int i)`|adds a number of sub\-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).|
 
-### yy.c {#T11}
+### yy.c {#T12}
 
 Helper functions for reading and writing IODE ascii files.
 
@@ -199,7 +216,7 @@ Helper functions for reading and writing IODE ascii files.
 |`int K_compare(YYKEYS* yy1, YYKEYS* yy2)`|helper function passed as parameter to qsort to sort a table of YYKEYS.|
 |`char *K_wrap(char *in, int lg)`|wraps a string (by inserting \\n) to limit each line to lg characters.|
 
-### b\_iodeini.c {#T12}
+### b\_iodeini.c {#T13}
 
 Functions to read and write parameters in iode.ini.
 
@@ -215,7 +232,7 @@ Functions to read and write parameters in iode.ini.
 |`int B_IniWriteNum(char* section, char* parm, int val)`|Saves a integer parameter in the current iode.ini file|
 |`int B_IniWriteYN(char* section, char* parm, int val)`|Saves a boolean parameter in the current iode.ini file|
 
-## Group "Pseudo\-virtual functions" {#T13}
+## Group "Pseudo\-virtual functions" {#T14}
 
 Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be printed in the console. In the DOS\-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
 
@@ -223,9 +240,9 @@ For each of these functions, a standard implementation (= virtual function) is p
 
 At the same time, an optional "super function" pointer may point to an alternative function. If that pointer is not null, the alternative function replaces (superseeds) the original implementation (= virtual function). In that way, each context has possibly its own implementation without interfering with the others.
 
-### k\_super.c {#T14}
+### k\_super.c {#T15}
 
-#### List of functions that can be superseeded {#T15}
+#### List of functions that can be superseeded {#T16}
 
 Functions used in any context of IODE (GUI or not\-GUI).
 
@@ -254,7 +271,7 @@ Functions used only in a GUI context.
 |`int kexecsystem()`|Calls the fonction system().|
 |`int kshellexec()`|Call the Win32 function ShellExecuteEx().|
 
-#### List of function pointers that can replace the standard implementations {#T16}
+#### List of function pointers that can replace the standard implementations {#T17}
 
 |Syntax|
 |:---|
@@ -278,9 +295,9 @@ Functions used only in a GUI context.
 |\`cint kexecsystem\_super(char\*);|
 |\`cint kshellexec\_super(char\*);|
 
-## Group "IODE Version" {#T17}
+## Group "IODE Version" {#T18}
 
-### k\_vers.c {#T18}
+### k\_vers.c {#T19}
 
 Functions to retrieve the current IODE version.
 
@@ -289,9 +306,9 @@ Functions to retrieve the current IODE version.
 |`char *K_LastVersion()`|returns in an allocated string the current version of IODE.|
 |`char *K_CurrentVersion()`|returns in an allocated string the IODE version of the current executable.|
 
-## Group "KDB management" {#T19}
+## Group "KDB management" {#T20}
 
-### k\_kdb.c {#T20}
+### k\_kdb.c {#T21}
 
 Function to manage KDB, i.e. IODE object groups.
 
@@ -309,7 +326,7 @@ Function to manage KDB, i.e. IODE object groups.
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
 |`int K_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2 then deletes kdb2.|
 
-### k\_ws.c {#T21}
+### k\_ws.c {#T22}
 
 Variables and functions for initializing and cleaning up the "in memory" workspaces.
 
@@ -320,7 +337,7 @@ Variables and functions for initializing and cleaning up the "in memory" workspa
 |`void K_end_ws(int ws)`|Deletes the current workspaces defined in K\_WS\[\] and their content after having optionaly saved their content in ws.\* files.|
 |`int K_load_RWS(int ref, char *filename)`|Load a VAR file for use in GSAMPLE (print tables and graphs)|
 
-### k\_wsvar.c {#T22}
+### k\_wsvar.c {#T23}
 
 Functions acting on workspaces of variables.
 
@@ -344,7 +361,7 @@ Functions acting on workspaces of variables.
 |`int KV_per_pos(PERIOD* per2)`|Retrieves the position of a PERIOD in the current KV\_WS sample.|
 |`int KV_aper_pos(char* aper2)`|Retrieves the position of a period in text format in the current KV\_WS sample.|
 
-## Group "Object management" {#T23}
+## Group "Object management" {#T24}
 
 - k\_objsv.c: function to create an IODE object of any type.
 - k\_objs.c: functions to manipulate IODE objects.
@@ -357,7 +374,7 @@ Functions acting on workspaces of variables.
 - k\_cmp.c: function to compare two IODE objects.
 - k\_grep.c: functions to search strings in KDB objects.
 
-### k\_objsv.c {#T24}
+### k\_objsv.c {#T25}
 
 Function to create an IODE object and to record it in a KDB.
 
@@ -379,7 +396,7 @@ How to create IODE objects using K\_add():
 
 Note: the name of an equation MUST be the name of its endogenous variable.
 
-### k\_objs.c {#T25}
+### k\_objs.c {#T26}
 
 Functions to manipulate IODE objects.
 
@@ -396,7 +413,7 @@ Functions to manipulate IODE objects.
 |`int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist.|
 |`int K_upd_tbl(char* name, char* arg)`|Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi\-colons.|
 
-### k\_objvers.c {#T26}
+### k\_objvers.c {#T27}
 
 Functions to detect IODE object file version and to convert an object to the current IODE version.\_
 
@@ -405,11 +422,11 @@ Functions to detect IODE object file version and to convert an object to the cur
 |`int K_calcvers(char* label):`|returns the current object version (0\-2) from an IODE file header.|
 |`void K_setvers(KDB* kdb, int i, int vers)`|converts an IODE object from IODE objects version 1 or 2 to the current version (0).|
 
-### k\_pack.c {#T27}
+### k\_pack.c {#T28}
 
 Functions for "packing" and "unpacking" IODE objects.
 
-#### Packing functions {#T28}
+#### Packing functions {#T29}
 
 |Syntax|Description|
 |:---|:---|
@@ -422,7 +439,7 @@ Functions for "packing" and "unpacking" IODE objects.
 |`int K_vpack(char **pack, IODE_REAL *a1, int *a2)`|Packs an IODE VAR object.|
 |`int K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
 
-#### Unpacking functions (for TBL and EQ only ?) {#T29}
+#### Unpacking functions (for TBL and EQ only ?) {#T30}
 
 |Syntax|Description|
 |:---|:---|
@@ -432,14 +449,14 @@ Functions for "packing" and "unpacking" IODE objects.
 
 s
 
-#### Allocation functions (SCL & VAR only) {#T30}
+#### Allocation functions (SCL & VAR only) {#T31}
 
 |Syntax|Description|
 |:---|:---|
 |`int KS_alloc_scl()`|Allocates space for a new SCL (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.|
 |`int KV_alloc_var(int nb)`|Allocates space for a new VAR of length nb in the swap area, initialises it to L\_NAN and returns the "swap" handle.|
 
-### k\_val.c {#T31}
+### k\_val.c {#T32}
 
 Basic functions to retrieve object data based on their position or name in the kdb. If the object is packed (EQ, TBL...) the position (n) of the element in the pack must be given.
 
@@ -479,7 +496,7 @@ List of functions
 |`double K_s_set_relax (KDB* kdb, char*name)`|Sets a SCL relax|
 |`double K_s_set_stderr(KDB* kdb, char*name)`|Sets a SCL stderr|
 
-### k\_eqs.c {#T32}
+### k\_eqs.c {#T33}
 
 Functions to manipulate equation expressions and objects.
 
@@ -489,7 +506,7 @@ Functions to manipulate equation expressions and objects.
 |`int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)`|Transforms a LEC equation to add dynamic adjustment|
 |`E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)`|Transforms a LEC equation "in place" to add dynamic adjustment|
 
-### k\_lst.c {#T33}
+### k\_lst.c {#T34}
 
 Basic functions to manipulate lists and to extract lists of VARs and SCLs from IODE objects.
 
@@ -502,7 +519,7 @@ Basic functions to manipulate lists and to extract lists of VARs and SCLs from I
 |`int KL_lst(char* name, char** lst, int chunck)`|Creates a list from a table of strings. The elements in the new list are separated by semi\-colons.|
 |`unsigned char **KL_expand(char *str)`|Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.|
 
-### k\_tbl.c {#T34}
+### k\_tbl.c {#T35}
 
 Functions to manage TBL objects.
 
@@ -523,7 +540,7 @@ Functions to manage TBL objects.
 |`int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date)`|Fills a TBL with some basic data: a title, line titles and LEC expressions.|
 |`void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)`|Fills a TBL with a list of variables and their CMT.|
 
-### k\_cmp.c {#T35}
+### k\_cmp.c {#T36}
 
 Function to compare two IODE objects.
 
@@ -531,7 +548,7 @@ Function to compare two IODE objects.
 |:---|:---|
 |`int K_cmp(char* name, KDB* kdb1, KDB* kdb2)`|Compares IODE objects having the same name in two KDB.|
 
-### k\_grep.c {#T36}
+### k\_grep.c {#T37}
 
 Functions to search strings in KDB objects.
 
@@ -541,9 +558,9 @@ Functions to search strings in KDB objects.
 |`char *K_expand(int type, char* file, char* pattern, int all)`|Retrieves all object names matching one or more patterns in a workspace or an object file.|
 |`int K_aggr(char* pattern, char* ename, char* nname) *`|Transforms a variable name based on an "aggregation" pattern.|
 
-## Group "IODE file management" {#T37}
+## Group "IODE file management" {#T38}
 
-### k\_objfile.c {#T38}
+### k\_objfile.c {#T39}
 
 Functions to manipulate IODE object files.
 
@@ -560,9 +577,9 @@ Functions to manipulate IODE object files.
 |`int K_save_ws(KDB* kdb)`|saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).|
 |`int K_setname(char* from, char* to)`|replaces KNAMEPTR(kdb) in an IODE object file.|
 
-## Group "IODE big\- and little\-endian conversion" {#T39}
+## Group "IODE big\- and little\-endian conversion" {#T40}
 
-### k\_xdr.c {#T40}
+### k\_xdr.c {#T41}
 
 Functions to convert big\-endian data, used by processors like RISC,... into little\-endian format (x86,...) and vice\-versa.
 
@@ -574,11 +591,11 @@ Functions to convert big\-endian data, used by processors like RISC,... into lit
 |                                       ||
 |`int (*K_xdrobj[])()`|Table of function pointers, one function for each object type, for converting|
 
-## Group "IODE object ascii formats" {#T41}
+## Group "IODE object ascii formats" {#T42}
 
 Functions to load and save files in IODE ascii format and LArray csv format.
 
-### Filename extensions {#T42}
+### Filename extensions {#T43}
 
 |Type|Binary extension|Ascii extension|
 |:---|:---|:---|
@@ -591,7 +608,7 @@ Functions to load and save files in IODE ascii format and LArray csv format.
 |variables|.var|.av|
 |LArray variables||.csv|
 
-### k\_ccall.c {#T43}
+### k\_ccall.c {#T44}
 
 Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV formats.
 
@@ -601,7 +618,7 @@ Tables of pointers to functions for reading and writing IODE objects in ASCII an
 |`int (*K_save_asc[])()`|
 |`int (*K_save_csv[])()`|
 
-### k\_cccmt.c {#T44}
+### k\_cccmt.c {#T45}
 
 Loading and saving IODE ascii comment files.
 
@@ -611,7 +628,7 @@ Loading and saving IODE ascii comment files.
 |`int KC_save_asc(KDB* kdb, char* filename)`||
 |`int KC_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_cceqs.c {#T45}
+### k\_cceqs.c {#T46}
 
 Loading and saving IODE ascii equation files.
 
@@ -621,7 +638,7 @@ Loading and saving IODE ascii equation files.
 |`int KE_save_asc(KDB* kdb, char* filename)`||
 |`int KE_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_ccidt.c {#T46}
+### k\_ccidt.c {#T47}
 
 Loading and saving IODE ascii identity files.
 
@@ -631,7 +648,7 @@ Loading and saving IODE ascii identity files.
 |`int KI_save_asc(KDB* kdb, char* filename)`||
 |`int KI_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_cclst.c {#T47}
+### k\_cclst.c {#T48}
 
 Loading and saving IODE ascii list files.
 
@@ -641,7 +658,7 @@ Loading and saving IODE ascii list files.
 |`int KL_save_asc(KDB* kdb, char* filename)`||
 |`int KL_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_ccscl.c {#T48}
+### k\_ccscl.c {#T49}
 
 Loading and saving IODE ascii scalar files.
 
@@ -651,7 +668,7 @@ Loading and saving IODE ascii scalar files.
 |`int KS_save_asc(KDB* kdb, char* filename)`||
 |`int KS_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_cctbl.c {#T49}
+### k\_cctbl.c {#T50}
 
 Loading and saving IODE ascii table files.
 
@@ -661,7 +678,7 @@ Loading and saving IODE ascii table files.
 |`int KT_save_asc(KDB* kdb, char* filename)`||
 |`int KT_save_csv(KDB *kdb, char *filename)`|Not implemented|
 
-### k\_ccvar.c {#T50}
+### k\_ccvar.c {#T51}
 
 Functions to import and export IODE files to/from ascii and LArray\-csv format.
 
@@ -671,11 +688,11 @@ Functions to import and export IODE files to/from ascii and LArray\-csv format.
 |`KV_save_asc(KDB* kdb, char* filename)`|
 |`int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)`|
 
-## Group "LEC language" {#T51}
+## Group "LEC language" {#T52}
 
 For the LEC implementation, see [lec.md](lec.md).
 
-### k\_lec.c {#T52}
+### k\_lec.c {#T53}
 
 Implemention of the LEC library virtual functions for SCL and VAR references.
 
@@ -687,9 +704,9 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 |`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
 |`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
 
-## Group "Basic functions" {#T53}
+## Group "Basic functions" {#T54}
 
-### b\_args.c {#T54}
+### b\_args.c {#T55}
 
 Basic functions for managing function and report arguments.
 
@@ -702,7 +719,7 @@ Basic functions for managing function and report arguments.
 |`int B_get_arg0(char* arg0, char*arg, int lg)`|computes arg0, the first arg ('word') of max lg bytes, in the string arg.|
 |`int B_argpos(char* str, int ch)`|returns the position of a char in a string.|
 
-### b\_errors.c {#T55}
+### b\_errors.c {#T56}
 
 Basic functions for managing error messages.
 
@@ -715,31 +732,31 @@ Basic functions for managing error messages.
 |`void B_print_last_error()`|Displays or prints the last recorded errors (in B\_ERROR\_MSG) using W\_printf().|
 |`void B_clear_last_error()`|Resets the list of last messages (B\_ERROR\_MSG and B\_ERROR\_NB).|
 
-## Group "Execution of identities" {#T56}
+## Group "Execution of identities" {#T57}
 
 See [IDENTITIES.md](identities.md).
 
-## Group "Model Estimation" {#T57}
+## Group "Model Estimation" {#T58}
 
 See [ESTIM.md](ESTIM.md).
 
-## Group "Model Simulation" {#T58}
+## Group "Model Simulation" {#T59}
 
 See [SIMUL.md](simul.md).
 
-## Group "Table Calculation" {#T59}
+## Group "Table Calculation" {#T60}
 
 See [TBL\_CALC.md](tbl_calc.md).
 
-## Group "IODE Printing" {#T60}
+## Group "IODE Printing" {#T61}
 
 See [PRINTING.md](PRINTING.md).
 
-## Group "IODE object conversions" {#T61}
+## Group "IODE object conversions" {#T62}
 
 See [CONVERSIONS.md](CONVERSIONS.md).
 
-## Group "Iode Reports" {#T62}
+## Group "Iode Reports" {#T63}
 
 See [REPORTS.md](REPORTS.md).
 

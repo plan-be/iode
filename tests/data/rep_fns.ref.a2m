@@ -1,0 +1,427 @@
+STRINGS
+=======
+
+@take()
+-------
+    Success
+        @take(2,ABCDE)        => "AB"
+        @take(-2,ABCDE)       => "DE"
+        @take(2, ABCDE)       => " A"
+        @take(0,ABCDE)        => ""
+        @take(2,"A,B,C,D,E")  => "A,"
+
+    Errors (#parms <> 2)
+        @take(2,A,B,C,D,E)    => "@take(2,A,B,C,D,E)"
+        @take(2,A,BCDE)       => "@take(2,A,BCDE)"
+
+@drop()
+-------
+    Success
+        @drop(2,ABCDE)        => "CDE"
+        @drop(-1,ABCDE)       => "ABCD"
+        @drop(2, ABCDE)       => "BCDE"
+        @drop(0,ABCDE)        => "ABCDE"
+        @drop(2,"A,B,C,D,E")  => "B,C,D,E"
+        @DROP(2,A)            => ""
+        @drop(3, "a bc")      => " bc""
+
+    Error (#parms <> 2)
+        @drop(2,A,B,C,D,E)    => "@drop(2,A,B,C,D,E)"
+        @drop(2,A,BCDE)       => "@drop(2,A,BCDE)"
+        @drop(n,ABCDE)        => "ABCDE"
+
+@replace()
+----------
+    Success
+        @replace(Buro du Plan,Buro,Bureau)            => Bureau du Plan
+        @replace(Buro du Buro du Plan,Buro,Bureau)    => Bureau du Bureau du Plan
+        @replace(Bureauplan,plan, du Plan)            => Bureau du Plan
+        @replace("Bureau, du Plan",",","")            => Bureau du Plan
+        @replace("Bureau, du Plan", ",", "")          => Bureau, du Plan
+
+    Error
+        @replace(Buro plan,Bureau du Plan)            => @replace(Buro plan,Bureau du Plan)
+        @replace(AB,B,C,D)                            => @replace(AB,B,C,D)
+
+@equal()
+--------
+        @equal(aa,aa)         =>  "1"
+        @equal(aa, aa)        =>  "0"
+        @equal(aa,bb)         =>  "0"
+        @equal(aa,aa,aa)      =>  "0"
+
+@upper()
+------
+        @upper(ab cd,ef)      =>  "AB CD EF"
+        @upper(AB)            =>  "AB"
+        @upper("abc", "def")  =>  "ABC  "DEF""
+        @upper("abc","def")   =>  "ABC DEF"
+
+@lower()
+------
+        @lower(ab cd,ef)      =>  "ab cd ef"
+        @lower(AB)            =>  "ab"
+        @lower("abc", "def")  =>  "abc  "def""
+        @lower("abc","def")   =>  "abc def"
+
+@sqz()
+------
+        @sqz( ab    cd )      =>  "abcd"
+        @sqz(" ab    cd ")    =>  "abcd"
+        @sqz( ab,"  cd", ef)  =>  "abcdef"
+        @sqz( ab, " cd", ef)  =>  "ab"cd"ef"
+
+@strip()
+--------
+        @strip( ab    cd )      =>  " ab    cd"
+        @strip(" ab    cd ")    =>  " ab    cd"
+        @strip( ab,"  cd", ef)  =>  " ab   cd  ef"
+        @strip( ab, " cd", ef)  =>  " ab  " cd"  ef"
+
+
+@fmt()  
+--------
+        @fmt(123456)               -> "123456"
+        @fmt(123456,99999999)      -> "  123456"
+        @fmt(123456,999)           -> "456"
+        @fmt(123.456,999999)       -> "   123"
+        @fmt(123456,00999999)      -> "00123456"
+        @fmt(123456,"ABC999,999Z") -> "ABC   ,123Z"
+        @fmt(123456,ABC999999Z)    -> "ABC   123Z"
+
+
+@ansi()        
+--------
+        @ansi(Ã Ã¢Ã¤Ã©Ã¨ÃªÃ«Ã®Ã¯Ã¶Ã´Ã¹Ã§)       -> "ÎáÎóÎñÎ¦Î¿Î¬Î½Î«Î»ÎÂÎÀÎ¹Îº"
+
+
+TIME & DATE
+-----------
+
+Tests of @date and @time were cancelled due to impossible comparison... Time flies...
+
+@date()
+-------
+        @date()               =>  "@date()"              
+        @date(dd-mm-yyyy)     =>  "@date(dd-mm-yyyy)"    
+        @date(dd-mm-yy)       =>  "@date(dd-mm-yy)"      
+        @date(d-m-y)          =>  "@date(d-m-y)"         
+        @date(yy/mm/dd)       =>  "@date(yy/mm/dd)"      
+        @date(mm/dd/yyyy)     =>  "@date(mm/dd/yyyy)"    
+        @date(mm/xxxx/zzzz)   =>  "@date(mm/xxxx/zzzz)"  
+                                                           
+@time()                                                  
+------                                                   
+        @time()               =>  "@time()"              
+        @time(hh:mm:ss)       =>  "@time(hh:mm:ss)"      
+        @time(hhhh:mm)        =>  "@time(hhhh:mm)"       
+        @time(xxx:mm/dd)      =>  "@time(xxx:mm/dd)"     
+
+@month()       
+--------
+        @month(1)             =>  "Janvier"
+        @month(1,F)           =>  "Janvier"
+        @month(1,e)           =>  "January"
+        @month(1,N)           =>  "Januari"
+        
+FILES
+-----
+
+@fdelete()     
+--------
+        @fdelete(essais.txt)  =>  ""
+
+@fappend()     
+--------
+        @fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)  =>  ""
+
+
+
+
+
+@sstderr()   
+----------
+        @sstderr(acaf1)               =>  "0.001369"
+        @sstderr(acaf1,xyz,acaf3)     =>  "0.001369 -- 0.873010"
+        @sstderr(acaf1,acaf2, acaf3)  =>  "0.001369 0.000001 0.873010"
+
+@srelax()   
+---------
+        @srelax(acaf1)                =>  "1.000000"
+        @srelax(acaf1,xyz,acaf3)      =>  "1.000000 -- 1.000000"
+        @srelax(acaf1,acaf2, acaf3)   =>  "1.000000 1.000000 1.000000"
+
+@ttitle()      
+--------
+        @ttitle(C8_1)                 =>  "D‚terminants de l'output potentiel"
+        @ttitle( c8_10)               =>  "Coin salarial parafiscal"
+        @ttitle(C8_1 c8_10)           =>  "Table C8_1 c8_10 not found"
+        @ttitle(C8_1, c8_10)          =>  "D‚terminants de l'output potentiel
+Coin salarial parafiscal"
+        @ttitle(XXX)                  =>  "Table XXX not found"
+                
+@cvalue()             
+--------      
+        @cvalue(acaf)                 =>  "Cmt acaf not found"
+        @cvalue(ACAF)                 =>  "Ondernemingen: ontvangen kapitaaloverdrachten."
+        @cvalue(ACAG)                 =>  "Totale overheid: netto ontvangen kapitaaloverdrachten."
+        @cvalue(ACAF,ACAG)            =>  "Ondernemingen: ontvangen kapitaaloverdrachten.;Totale overheid: netto ontvangen kapitaaloverdrachten."
+        
+@vvalue()             
+--------      
+        @vvalue(acaf)                 =>  "na  na  na  na  na  na  na  na  na  na  1.2130001  5.2020001  9.184  8.0790005  11.332  13.518001  15.784  16.544001  21.489  20.281  21.277  32.417999  24.446999  27.025002  24.504  27.560999  25.542  27.499001  25.353001  17.165001  23.771  26.240999  30.159  34.661999  8.1610022  -13.130997  32.171001  39.935799  29.645657  13.530404919696  10.0466107922005  2.86792273645546  -0.929212509051645  -6.09156498756888  -14.5820944628981  -26.5387895697886  -28.9872879825975  -33.3784257842954  -38.4095177823974  -37.4635096412738  -37.8274288322944  -44.5447926335432  -55.5592898172187  -68.8946543226201  -83.3406251108009  -96.4104198284833  "
+        @vvalue(ACAF)                 =>  "na  na  na  na  na  na  na  na  na  na  1.2130001  5.2020001  9.184  8.0790005  11.332  13.518001  15.784  16.544001  21.489  20.281  21.277  32.417999  24.446999  27.025002  24.504  27.560999  25.542  27.499001  25.353001  17.165001  23.771  26.240999  30.159  34.661999  8.1610022  -13.130997  32.171001  39.935799  29.645657  13.530404919696  10.0466107922005  2.86792273645546  -0.929212509051645  -6.09156498756888  -14.5820944628981  -26.5387895697886  -28.9872879825975  -33.3784257842954  -38.4095177823974  -37.4635096412738  -37.8274288322944  -44.5447926335432  -55.5592898172187  -68.8946543226201  -83.3406251108009  -96.4104198284833  "
+        @vvalue(ACAG)                 =>  "na  na  na  na  na  na  na  na  na  na  -11.028999  -15.847  -19.288002  -21.814999  -25.447002  -24.618999  -27.770998  -28.839001  -29.434998  -30.411001  -30.353001  -41.060997  -31.178001  -32.604  -30.237003  -38.061001  -31.939999  -35.59  -37.238003  -25.991001  -28.1721855713507  -30.934  -40.285999  -43.157997  -16.029003  -41.845993  -40.237  -32.93  -38.345695  -39.8581741316036  -41.534786567348  18.9398011359783  19.9808148751188  21.0205021787734  22.0664755229642  23.1079621640615  24.1296371451098  25.1609090496654  26.1921114843413  27.2299551185986  28.2539289782105  29.2846003640349  30.3239611503116  31.3701388106954  32.4202988291984  33.469601344881  "
+        @vvalue(ACAF,ACAG)            =>  "na  na  na  na  na  na  na  na  na  na  1.2130001  5.2020001  9.184  8.0790005  11.332  13.518001  15.784  16.544001  21.489  20.281  21.277  32.417999  24.446999  27.025002  24.504  27.560999  25.542  27.499001  25.353001  17.165001  23.771  26.240999  30.159  34.661999  8.1610022  -13.130997  32.171001  39.935799  29.645657  13.530404919696  10.0466107922005  2.86792273645546  -0.929212509051645  -6.09156498756888  -14.5820944628981  -26.5387895697886  -28.9872879825975  -33.3784257842954  -38.4095177823974  -37.4635096412738  -37.8274288322944  -44.5447926335432  -55.5592898172187  -68.8946543226201  -83.3406251108009  -96.4104198284833  ;na  na  na  na  na  na  na  na  na  na  -11.028999  -15.847  -19.288002  -21.814999  -25.447002  -24.618999  -27.770998  -28.839001  -29.434998  -30.411001  -30.353001  -41.060997  -31.178001  -32.604  -30.237003  -38.061001  -31.939999  -35.59  -37.238003  -25.991001  -28.1721855713507  -30.934  -40.285999  -43.157997  -16.029003  -41.845993  -40.237  -32.93  -38.345695  -39.8581741316036  -41.534786567348  18.9398011359783  19.9808148751188  21.0205021787734  22.0664755229642  23.1079621640615  24.1296371451098  25.1609090496654  26.1921114843413  27.2299551185986  28.2539289782105  29.2846003640349  30.3239611503116  31.3701388106954  32.4202988291984  33.469601344881  "
+        @vvalue(XXX)                  =>  "VAR XXX not found"
+        @vvalue()                     =>  "@vvalue()"
+
+
+@lvalue()      
+--------
+        @lvalue(endo)                 =>  "$endo0,$endo1,"
+        @lvalue(ENDO)                 =>  "$endo0,$endo1,"
+        @lvalue(_SEARCH,XENVI)        =>  "ZKF,XEX,XPWMAB,XPWMS,XPWXAB,XPWXS,XQWXAB,XQWXS,XPOIL,XNATY,XTFP"
+        @lvalue(XXX)                  =>  "List XXX not found"
+        @lvalue()                     =>  "@lvalue()"
+
+@ivalue()      
+--------
+        @ivalue(FLGR)                 =>  "FLG/VBBP"
+        @ivalue(FLGR,IUGR)            =>  "FLG/VBBP;IUG/VBBP"
+        @ivalue(flgr)                 =>  "FLG/VBBP"
+        @ivalue(XXX)                  =>  "Idt XXX not found"
+        @ivalue()                     =>  "@ivalue()"
+
+@evalue()      
+--------
+        @evalue(ACAF)                 =>  "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)"
+        @evalue(brugp)                =>  "BRUGP := 0"
+        @evalue(acaf,brugp)           =>  "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995);BRUGP := 0"
+        @evalue(XXX)                  =>  "Eqs XXX not found"
+        @evalue()                     =>  "@evalue()"
+
+@eqsample()    
+--------
+        @eqsample(ACAF)               =>  "1980Y1:1996Y1"
+        @eqsample(ACAF,ACAG)          =>  "@eqsample(ACAF,ACAG)"
+        @eqsample(XXX)                =>  "[Eqs XXX not found]"
+        @eqsample()                   =>  "@eqsample()"
+
+@eqsamplefrom()
+--------
+        @eqsamplefrom(ACAF)           =>  "1980Y1"
+        @eqsamplefrom(XXX)            =>  "[Eqs XXX not found]"
+        @eqsamplefrom()               =>  "@eqsamplefrom()"
+
+@eqsampleto()  
+--------
+        @eqsampleto(ACAF)             =>  "1996Y1"
+        @eqsampleto(XXX)              =>  "[Eqs XXX not found]"
+        @eqsampleto()                 =>  "@eqsampleto()"
+
+@eqlhs()       
+--------
+        @eqlhs(ACAF)             =>  "(ACAF/VAF[-1]) "
+        @eqlhs(ACAF,ACAG)        =>  "@eqlhs(ACAF,ACAG)"
+        @eqlhs(XXX)              =>  "[Eqs XXX not found]"
+        @eqlhs()                 =>  "@eqlhs()"
+
+@eqrhs()       
+--------
+        @eqrlhs(ACAF)             =>  "acaf1+acaf2*GOSF[-1]+
+acaf4*(TIME=1995)"
+        @eqrlhs(ACAF,ACAG)        =>  "@eqrhs(ACAF,ACAG)"
+        @eqrlhs(XXX)              =>  "[Eqs XXX not found]"
+        @eqrlhs()                 =>  "@eqrhs()"
+
+@count()       
+--------
+        @count(ACAF,ACAG)         =>  "2"
+        @count(ACAF;ACAG)         =>  "1"
+        @count()                  =>  "0"
+        
+@index()       
+--------
+        @index(0,A,B,C)           =>  ""
+        @index(2,A,B,C)           =>  "B"
+        @index(4,A,B,C)           =>  ""
+        @index(1,A;B;C)           =>  "A;B;C"
+        @index(A;B;C)             =>  ""
+        @index()                  =>  ""
+        
+
+@sample()      
+--------
+        @sample()                 =>  "1960Y1 2015Y1"
+        @sample(B)                =>  "1960Y1"
+        @sample(E)                =>  "2015Y1"
+        @sample(X)                =>  "1960Y1 2015Y1"
+
+
+
+
+@vliste()      
+--------
+        @vliste(ACAF)             =>  "ACAF;VAF;GOSF;TIME"
+        @vliste(ACAF,ACAG)        =>  "ACAF;VAF;GOSF;TIME;ACAG;VBBP"
+
+
+@sliste()      
+--------
+        @sliste(ACAF)             =>  "acaf1;acaf2;acaf4"
+        @sliste(ACAF,ACAG)        =>  "acaf1;acaf2;acaf4"
+
+@cexpand()     
+--------
+        @cexpand(AC*)           =>  "ACAF;ACAG"
+        @cexpand(*U)            =>  "DPU;DPUU;IFU;IHU;WBU"
+        @cexpand(AC*,*U)        =>  "ACAF;ACAG;DPU;DPUU;IFU;IHU;WBU"
+        @cexpand()              =>  ""
+
+
+@eexpand()     
+--------
+        @eexpand(AC*)           =>  "ACAF;ACAG"
+        @eexpand(*U)            =>  "CGU;DPU;DPUU;IFU;IHU;WBU"
+        @eexpand(AC*,*U)        =>  "ACAF;ACAG;CGU;DPU;DPUU;IFU;IHU;WBU"
+        @eexpand()              =>  ""
+
+@iexpand()     
+--------
+        @iexpand(AC*)           =>  ""
+        @iexpand(*U)            =>  "MU;NAWRU"
+        @iexpand(AC*,*U)        =>  "MU;NAWRU"
+        @iexpand()              =>  ""
+
+@lexpand()     
+--------
+        @lexpand(AC*)           =>  ""
+        @lexpand(*0)            =>  "COPY0;ENDO0;TOTAL0"
+        @lexpand(AC*,*0)        =>  "COPY0;ENDO0;TOTAL0"
+        @lexpand()              =>  ""
+
+@sexpand()     
+--------
+        @sexpand(AC*)           =>  "acaf1;acaf2;acaf3;acaf4"
+        @sexpand(ac*)           =>  "acaf1;acaf2;acaf3;acaf4"
+        @sexpand(*4)            =>  "acaf4;dtf4;gamma4;k4;kl14;nfyh4;pc4;pmab4;pxs4;qc4;qi5_4;qmab_4;qms4;qxab4;qxs4;y4"
+        @sexpand(AC*,*4)        =>  "acaf1;acaf2;acaf3;acaf4;dtf4;gamma4;k4;kl14;nfyh4;pc4;pmab4;pxs4;qc4;qi5_4;qmab_4;qms4;qxab4;qxs4;y4"
+        @sexpand()              =>  ""
+
+@texpand()     
+----------
+        @texpand(AC*)           =>  ""
+        @texpand(*U)            =>  "MULT1RESU;MULT2RESU;NAWRU;T1NIVEAU"
+        @texpand(AC*,*U)        =>  "MULT1RESU;MULT2RESU;NAWRU;T1NIVEAU"
+        @texpand()              =>  ""
+
+@vexpand()     
+----------
+        @vexpand(AC*)           =>  "ACAF;ACAG"
+        @vexpand(*U)            =>  "CGU;DPU;DPUU;IFU;IHU;MU;NAWRU;WBU"
+        @vexpand(AC*,*U)        =>  "ACAF;ACAG;CGU;DPU;DPUU;IFU;IHU;MU;NAWRU;WBU"
+        @vexpand()              =>  ""
+
+
+
+@SimMaxit()                 
+-----------                    
+        @SimMaxit()             =>  "100"
+
+@SimEps()      
+---------
+        @SimEps()               =>  "0.0001"
+
+@SimRelax()    
+-----------
+        @SimRelax()             =>  "0.700000"
+
+@SimNorm()     
+----------
+        @SimNorm(2000Y1)        =>  "7.15565e-05"
+        @SimNorm(2001Y1)        =>  "6.85269e-05"
+        @SimNorm(2002Y1)        =>  "0"
+        @SimNorm(1990Y1)        =>  "0"
+
+@SimNIter()    
+-----------
+        @SimNiter(2000Y1)       =>  "31"
+        @SimNiter(2001Y1)       =>  "37"
+        @SimNiter(2002Y1)       =>  "0"
+        @SimNiter(1990Y1)       =>  "0"
+
+                              
+@vtake()       
+--------
+        @vtake(2,A,B,C,D,E)     =>  "A;B"
+        @vtake(-1;A;B;C;D;E)    =>  "E"
+        @vtake(3 A B)           =>  "A;B"
+        @vtake(3,A,"B C")       =>  "A;B;C"
+        @vtake(A,B)             =>  ""
+        @vtake()                =>  ""
+
+
+@vdrop()       
+--------
+        @vdrop(2,A,B,C,D,E)     =>  "C;D;E"
+        @vdrop(-1;A;B;C;D;E)    =>  "A;B;C;D"
+        @vdrop(3 A B)           =>  ""
+        @vdrop(A,B)             =>  "B"
+        @vdrop()                =>  ""
+
+@vcount()      
+--------
+        @vcount(A,B,C,D,E)      =>  "5"
+        @vcount(C;D;E)          =>  "3"
+        @vcount(3 A B)          =>  "3"   
+        @vcount(3 "A B")        =>  "3"   
+        @vcount()               =>  "0"   
+
+
+@memory()      
+---------
+        @memory()                 =>  "...unstable..."
+
+@ChronoReset() 
+--------------
+        @chronoreset()            =>  ""
+
+@ChronoGet()   
+------------
+        @chronoget()              =>  "0"
+
+
+
+@getdir()      
+---------
+        @getdir()                 =>  "...unstable..."
+
+@mkdir()       
+--------
+        @mkdir(testdir)           =>  ""
+        @mkdir(testdir)           =>  ""
+        @getdir()                 =>  "...unstable..."
+        @chdir(testdir)           =>  "...unstable..."
+        @getdir()                 =>  "...unstable..."
+
+@chdir()       
+--------
+        @chdir(..)                =>  "...unstable..."
+        @getdir()                 =>  "...unstable..."
+
+@rmdir()       
+--------
+        @getdir()                 =>  "...unstable..."
+        @mkdir(testdir)           =>  ""
+        @chdir(testdir)           =>  "...unstable..."
+        @chdir(..)                =>  "...unstable..."
+        @rmdir(testdir)           =>  ""
+
+@void()        
+-------
+        @void(ABC,DEF,G)          =>  ""
+        @void(@getdir())          =>  ""
+        @void(@vexpand(*))        =>  ""
+
+

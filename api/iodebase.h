@@ -15,7 +15,7 @@ extern int K_load_RWS(int ref, char *filename);
 extern int K_vpack(char **,double *,int *);
 extern int KV_alloc_var(int );
 extern int K_ipack(char **,char *);
-//extern char *K_tcell_pack(char *,TCELL *); 
+//extern char *K_tcell_pack(char *,TCELL *);
 extern int K_tpack(char **,char *);
 extern int K_epack(char **,char *,char *);
 extern int K_spack(char **,char *);
@@ -59,6 +59,7 @@ extern int     (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned c
 extern int     kmsgbox_continue;
 extern int     kpause_continue;
 extern void    (*krecordkey_super)(int ch);
+extern void    (*krecordtext_super)(unsigned char *text);
 extern void    (*ksettitle_super)(void);
 extern int     (*ktermvkey_super)(int vkey);
 extern int     (*khitkey_super)();
@@ -67,6 +68,7 @@ extern void    (*kbeep_super)(void);
 extern SAMPLE* (*kasksmpl_super)(void);
 extern int     (*kexecsystem_super)(char*);
 extern int     (*kshellexec_super )(char*);
+extern int     (*ODE_end_super)(int);
 
 extern void    kerror(int level, char* fmt, ...);
 extern void    kwarning(char* fmt, ...);
@@ -77,6 +79,7 @@ extern void    kpanic(void);
 extern int     kconfirm(char* fmt, ...);
 extern int     kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts);
 extern void    krecordkey(int ch);
+extern void    krecordtext(unsigned char *text);
 extern void    ksettitle(void);
 extern int     ktermvkey(int vkey);
 extern int     khitkey();
@@ -86,7 +89,7 @@ extern SAMPLE* kasksmpl();
 extern int     kexecsystem(char*);
 extern int     kshellexec(char*);
 extern char    *A_expand_super_API(char* name);
-
+extern int     ODE_end(int st);
 extern void    IODE_assign_super_API(void);
 
 /* k_cmp.c */
@@ -104,7 +107,7 @@ extern char* L_expand(char* list_name);
 
 /* pack.c */
 extern int P_free(char *);
-extern void *P_create(); 
+extern void *P_create();
 extern void *P_add(void *,void *,int );
 extern void *P_get_ptr(void *,int );
 extern OSIZE P_get_len(void *,int );
@@ -493,7 +496,7 @@ extern double K_s_get_relax (KDB* kdb, char*name);
 extern double K_s_get_stderr(KDB* kdb, char*name);
 extern double K_s_get_ttest (KDB* kdb, char*name);
 extern int K_s_set_info(KDB* kdb, char*name, int info_nb, double val);
-extern int K_s_set_value (KDB* kdb, char*name, double val);    
+extern int K_s_set_value (KDB* kdb, char*name, double val);
 extern int K_s_set_relax (KDB* kdb, char*name, double val);
 extern int K_s_set_stderr(KDB* kdb, char*name, double val);
 
@@ -728,6 +731,50 @@ extern int COL_exec(TBL *,int ,COLS *);
 //extern int COL_calc(COL *,CLEC *,CLEC *);
 // extern int COL_link(int ,CLEC *);
 
+/* b_api.c */
+int IodeInit();
+int IodeEnd();
+char *IodeVersion();
+int IodeLoadVar(char *name);
+int IodeLoad(char *name, int type);
+int IodeSaveVar(char *name);
+int IodeSave(char *name, int type);
+int IodeClearWs();
+char **IodeContents(char *pattern, int type);
+char *IodeContentsStr(char *pattern, int type);
+double IodeGetVar(char *name, int t, int mode);
+double *IodeGetVector(char *name, int *lg);
+int IodeSetVector(char *name, double *value, int len);
+double *IodeGetSampleVector(int *lg);
+char *IodeGetSampleString();
+int IodeSetVar(char *name, int t, int mode, double value);
+char *IodeGetCmt(char *name);
+char *IodeGetLst(char *name);
+char *IodeGetEqs(char *name);
+double IodeGetScl(char *name);
+double *IodeGetScls(char *name);
+int IodeSetScl(char *name, double value);
+int IodeSetNbDec(int nbdec);
+int IodeGetNbDec();
+char* IodeGetTbl(char *name, char *gsmpl);
+char* IodeGetTblTitle(char *name);
+TBL* IodeGetTblDefinition(char *name);
+int IodeSetTblFile(int ref, char *filename);
+int IodeSimulate(char *byear, char *eyear, double eps, double relax, int maxit);
+int IodeGetMaxt();
+char *IodeGetPeriod(int t);
+int IodeGett(char *period);
+int IodeGetChart(char *name, char *gsmpl);
+int IodeFreeChart(int hdl);
+int IodeChartNl(int hdl);
+int IodeChartNc(int hdl);
+char IodeChartType(int hdl, int i);
+int IodeChartAxis(int hdl, int i);
+char *IodeChartTitle(int hdl, int i);
+double *IodeChartData(int hdl, int i);
+int IodeExecArgs(char *filename, char **args);
+int IodeExec(char *filename);
+
 /* b_iodeini.c */
 extern char* ODE_INIFILE;
 extern void B_IodeIniFile();
@@ -742,22 +789,25 @@ extern int B_IniWriteYN(char* section, char* parm, int val);
 
 
 /* b_a2mini.c */
-extern void B_A2mGetGnlParms()  ;
-extern void B_A2mSaveGnlParms() ;
-extern void B_A2mGetRtfParms()  ;
-extern void B_A2mSaveRtfParms() ;
-extern void B_A2mGetHtmlParms() ;
+extern void B_A2mGetGnlParms();
+extern void B_A2mSaveGnlParms();
+extern void B_A2mSetRtfTitle(U_ch* title);
+extern void B_A2mSetRtfCopy(U_ch* title);
+extern void B_A2mGetRtfParms();
+extern void B_A2mSaveRtfParms();
+extern void B_A2mGetHtmlParms();
 extern void B_A2mSaveHtmlParms();
-extern void B_A2mGetGIFParms()  ;
-extern void B_A2mSaveGIFParms() ;
-extern void B_A2mGetCsvParms()  ;
-extern void B_A2mSaveCsvParms() ;
-extern void B_A2mGetMifParms()  ;
-extern void B_A2mSaveMifParms() ;
-extern void B_A2mGetGdiParms()  ;
-extern void B_A2mSaveGdiParms() ;
-extern void K_load_iode_ini()   ;
-extern void K_save_iode_ini()   ;
+extern void B_A2mGetGIFParms();
+extern void B_A2mSaveGIFParms();
+extern void B_A2mGetCsvParms();
+extern void B_A2mSaveCsvParms();
+extern void B_A2mGetMifParms();
+extern void B_A2mSaveMifParms();
+extern void B_A2mGetGdiParms();
+extern void B_A2mSaveGdiParms();
+extern void K_load_iode_ini();
+extern void K_save_iode_ini();
+
 
 /* b_args.c */
 extern char **B_ainit_chk(char *,ADEF *,int );
@@ -806,14 +856,14 @@ extern int B_SysCopy(char *);
 extern int B_SysDelete(char *);
 
 /* b_fsys.c */
-extern int B_SysRename(char* arg);      
-extern int B_SysCopy(char* arg);      
-extern int B_SysAppend(char* arg);      
-extern int B_SysDelete(char* arg);      
-extern int B_SysOemToUTF8(char *arg);   
-extern int B_SysAnsiToUTF8(char *arg);  
-extern int B_SysAnsiToOem(char *arg);      
-extern int B_SysOemToAnsi(char *arg);   
+extern int B_SysRename(char* arg);
+extern int B_SysCopy(char* arg);
+extern int B_SysAppend(char* arg);
+extern int B_SysDelete(char* arg);
+extern int B_SysOemToUTF8(char *arg);
+extern int B_SysAnsiToUTF8(char *arg);
+extern int B_SysAnsiToOem(char *arg);
+extern int B_SysOemToAnsi(char *arg);
 
 /* b_xode.c */
 extern int B_FileImportCmt(char* arg);
@@ -822,6 +872,9 @@ extern int B_FileImportVar(char* arg);
 
 /* b_fedit.c */
 extern int B_FileEdit(char *);
+
+/* b_eviews.c */
+int B_WsImportEviews(char *arg);
 
 /* b_rep_utils.c */
 extern int RP_alloc_ptrs();
@@ -838,77 +891,289 @@ extern int RP_is_cmd(char *line);
 extern U_ch **SCR_vtomsq(char* str, char* seps, int quote);
 
 /* b_rep_debug.c */
-extern void M_debug(char* txt, char* a1, char* a2, char* a3, char* a4, char* a5, char* a6);
+extern void RP_debug(char* txt);
 
-/* b_rep.c */
-extern int B_ReportLine(char *);
-extern int B_ReportExec(char *);
-extern int B_ReportExec_1(char *);
-extern int RP_chk_ignore(char *);
-extern int RP_splitline(char *,char *,char **,int );
-extern int RP_find_fn(char *,int *,int );
-extern int RP_exec_fn(char *,char *,int );
-extern int RP_err_dump(char *,char *);
-extern int RP_onerror_1(char *);
-extern int RP_onerror(char *);
-extern int RP_label(char *);
-extern int RP_abort(char *);
-extern int RP_quitode(char *);
-extern int RP_return(char *);
-extern int RP_goto(char *);
-extern int RP_goto_label(char *, char *);
-extern int RP_ask(char *);
-extern int RP_message(char *);
-extern int RP_warning(char *);
-extern int RP_beep(void);
-extern int RP_setdebug(char *);
-extern int RP_system(char *);
-extern int RP_define(char *);
-extern int RP_shift(char *);
-//extern int RP_readline(REPFILE *,char **,int );
-extern int RP_add(char **,int *,int *,char *);
-extern int RP_expand(char **,char *);
-extern char *RP_extract(char *,int *,int );
-extern char *RP_gmacro(char *);
-extern char *RP_gcmd(char *);
-extern double RP_evallec(char *);
-extern int RP_eval(char **,char *);
-extern int RP_settime(char *);
-extern int RP_incrtime(char *);
-extern int RP_evaltime(void);
-extern int RP_fmt(char *,char *,double );
-extern unsigned char **SCR_vtomsq(char *,char *,int );
-extern int B_ReportPrompt(char *);
-extern int B_Sleep(char *);
+/* b_rep_engine.c */
+extern REPFILE *RP_create_repfile(char *filename, unsigned char **tbl);
+extern int RP_free_repfile(REPFILE *rf);
+extern unsigned char **RP_read_file(char* filename);
+extern char* RP_read_multiline(REPFILE* rf);
+extern int RP_readline(REPFILE* rf, char** line, int mode);
+extern int RP_chk_ignore(char* line);
+extern int RP_splitline(char* text, char* cmd, char** arg, int lg);
+extern int RP_find_fn(char* name, int* type, int fs);
+extern int RP_exec_fn(char* name, char* arg, int fs);
+extern int RP_err_dump(char* name, char* arg);
+extern char *RP_extract(char* buf, int* i, int ch);
+extern char *RP_gmacro(char* str);
+extern char *RP_gcmd(char* str);
+extern int RP_evaltime();
+extern IODE_REAL RP_evallec(char* lec);
+extern int RP_fmt(char* buf, char* format, IODE_REAL value);
+extern int RP_eval(char** res, char* farg);
+extern int RP_add(char** line, int* lg, int* j, char* res);
+extern int RP_expand(char** line, char* buf);
+extern int RP_ReportExec_tbl(REPFILE *rf);
+extern int RP_ReportExec_1(char* file);
+extern int B_ReportExec(char* arg);
+extern int B_ReportLine(char* line);
 
-/* b_rep2.c */
-extern unsigned char *RPF_replace(unsigned char **);
-extern unsigned char *RPF_date(unsigned char **);
-extern unsigned char *RPF_time(unsigned char **);
-extern unsigned char *RPF_upper(unsigned char **);
-extern unsigned char *RPF_lower(unsigned char **);
-extern unsigned char *RPF_fappend(unsigned char **);
-extern unsigned char *RPF_fdelete(unsigned char **);
-extern unsigned char *RPF_ttitle(unsigned char **);
-extern int RPF_vsliste1(CLEC *,unsigned char ***,int *,int );
-extern unsigned char *RPF_vsliste(unsigned char **,int );
-extern unsigned char **RPF_unique(unsigned char **);
-extern unsigned char *RPF_vliste(unsigned char **);
-extern unsigned char *RPF_sliste(unsigned char **);
-extern unsigned char *RPF_expand(unsigned char **,int );
-extern unsigned char *RPF_cexpand(unsigned char **);
-extern unsigned char *RPF_eexpand(unsigned char **);
-extern unsigned char *RPF_iexpand(unsigned char **);
-extern unsigned char *RPF_lexpand(unsigned char **);
-extern unsigned char *RPF_sexpand(unsigned char **);
-extern unsigned char *RPF_texpand(unsigned char **);
-extern unsigned char *RPF_vexpand(unsigned char **);
-extern char *RP_extractpar(char *,int *,char *);
-extern unsigned char *RP_gfn(unsigned char *);
-extern int RP_fneval(char **,char *);
+/* b_rep_defs.c */
+extern int RP_macro_createdb();
+extern int RP_macro_deletedb();
+extern int RP_define_1(char *name, char *macro);
+extern int RP_define(char* arg);
+extern char* RP_get_macro_ptr(char* macro_name);
+extern int RP_undef_1(char *name);
+extern int RP_undef(char *arg);
+extern int RP_define_calcdepth(char *name);
+extern int RP_define_save(char *name);
+extern int RP_define_restore(char *name);
+extern int RP_define_save_list(char **list);
+extern int RP_define_restore_list(char **list);
+
+/* b_rep_cmds.c */
+extern int RP_vseps(char* seps);
+extern int RP_repeatstring(char* buf);
+extern int RP_repeat(char* buf);
+extern int RP_onerror_1(char* arg);
+extern int RP_onerror(char* arg);
+extern int RP_abort(char* arg);
+extern int RP_quitode(char* arg);
+extern int RP_return(char* arg);
+extern int RP_label(char* arg);
+extern int RP_goto_label(char *command, char *parm);
+extern int RP_goto(char* arg);
+extern int RP_message(char* arg);
+extern int RP_warning(char* arg);
+extern int RP_beep();
+extern int RP_ask(char* arg);
+extern int B_ReportPrompt(char* arg);
+extern int RP_setdebug(char* arg);
+extern int RP_setindent(char* arg);
+extern int RP_setmultiline(char* arg);
+extern int RP_noparsing(char* arg);
+extern int RP_shift_args(char* arg);
+extern int RP_chdir(char* arg);
+extern int RP_rmdir(char* arg);
+extern int RP_mkdir(char* arg);
+extern int RP_settime(char* arg);
+extern int RP_incrtime(char* arg);
+extern int RP_system(char* arg);
+extern int B_shellexec(char *arg);
+extern int B_Sleep(char* arg);
+extern int B_GraphDefault(char* type);
+
+/* b_rep_fns.c */ 
+extern U_ch *RPF_take(U_ch** args);
+extern U_ch *RPF_drop(U_ch** args);
+extern U_ch *RPF_replace(U_ch** args);
+extern U_ch *RPF_equal(U_ch** args);
+extern U_ch *RPF_upper(U_ch** args);
+extern U_ch *RPF_lower(U_ch** args);
+extern U_ch *RPF_sqz(U_ch** args);
+extern U_ch *RPF_strip(U_ch** args);
+extern U_ch *RPF_fmtint(U_ch** args);
+extern U_ch *RPF_ansi(U_ch** args);
+extern U_ch *RPF_count(U_ch** args);
+extern U_ch *RPF_index(U_ch** args);
+extern U_ch *RPF_void(U_ch **args);
+extern U_ch *RPF_date(U_ch** args);
+extern U_ch *RPF_time(U_ch** args);
+extern U_ch *RPF_month(U_ch** args);
+extern U_ch *RPF_sstderr(U_ch** args);
+extern U_ch *RPF_srelax(U_ch** args);
+extern U_ch *RPF_ttitle(U_ch** args);
+extern U_ch *RPF_cvalue(U_ch** args);
+extern U_ch *RPF_vvalue(U_ch** args);
+extern U_ch *RPF_lvalue(U_ch** args);
+extern U_ch *RPF_ivalue(U_ch** args);
+extern U_ch *RPF_evalue(U_ch** args);
+extern U_ch *RPF_eqsample(U_ch** args);
+extern U_ch *RPF_eqsamplefromto(U_ch** args, int fromto);
+extern U_ch *RPF_eqsamplefrom(U_ch **args);
+extern U_ch *RPF_eqsampleto(U_ch **args);
+extern U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs);
+extern U_ch *RPF_eqlhs(U_ch **args);
+extern U_ch *RPF_eqrhs(U_ch **args);
+extern U_ch *RPF_sample(U_ch** args);
+extern int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type);
+extern U_ch *RPF_vsliste(U_ch** args, int type);
+extern U_ch **RPF_unique(U_ch** tbl);
+extern U_ch *RPF_vliste(U_ch** args);
+extern U_ch *RPF_sliste(U_ch** args);
+extern U_ch *RPF_expand(U_ch** args, int type);
+extern U_ch *RPF_cexpand(U_ch **args);
+extern U_ch *RPF_eexpand(U_ch **args);
+extern U_ch *RPF_iexpand(U_ch **args);
+extern U_ch *RPF_lexpand(U_ch **args);
+extern U_ch *RPF_sexpand(U_ch **args);
+extern U_ch *RPF_texpand(U_ch **args);
+extern U_ch *RPF_vexpand(U_ch **args);
+extern int RPF_CalcPeriod(U_ch** args);
+extern U_ch *RPF_SimNorm(U_ch** args);
+extern U_ch *RPF_SimNIter(U_ch** args);
+extern U_ch *RPF_SimMaxit();
+extern U_ch *RPF_SimEps();
+extern U_ch *RPF_SimRelax();
+extern U_ch *RPF_vtake(U_ch** args);
+extern U_ch *RPF_vdrop(U_ch** args);
+extern U_ch *RPF_vcount(U_ch** args);
+extern U_ch *RPF_memory(U_ch** args);
+extern U_ch *RPF_ChronoReset();
+extern U_ch *RPF_ChronoGet();
+extern U_ch *RPF_fappend(U_ch** args);
+extern U_ch *RPF_fdelete(U_ch** args);
+extern U_ch *RPF_getdir();
+extern U_ch *RPF_chdir(U_ch **args);
+extern U_ch *RPF_mkdir(U_ch **args);
+extern U_ch *RPF_rmdir(U_ch **args);
+
+/* b_rep_foreach.C */ 
+int RP_foreach(char* arg);
+int RP_foreach_break(char *name);
+int RP_foreach_next(char* arg);
+
+/* b_rep_proc.c */
+extern void RP_proc_free_all();
+extern int RP_procdef(char* arg);
+extern int RP_procexec(char* arg);
+
+/* b_rep_super.c - function pointer that can be superseeded */
+extern int (*SB_FileDelete_super    )();
+extern int (*SB_FileRename_super    )();
+extern int (*SB_FileCopy_super      )();
+extern int (*SB_FileEdit_super      )();
+extern int (*SB_FileList_super      )();
+extern int (*SB_FileImport_super    )();
+extern int (*SB_ReportExec_super    )();
+extern int (*SB_ReportEdit_super    )();
+extern int (*SB_ReportPrompt_super  )();
+extern int (*SB_PrintObjDef_super   )();
+extern int (*SB_PrintCnf_super      )();
+extern int (*SB_ViewPrintGr_super   )();
+extern int (*SB_ViewPrintTbl_super  )();
+extern int (*SB_ViewByTbl_super     )();
+extern int (*SB_DataEdit_super      )();
+extern int (*SB_DataEditScroll_super)();
+extern int (*SB_DataSearch_super    )();
+extern int (*SB_DataDuplicate_super )();
+extern int (*SB_DataList_super      )();
+extern int (*SB_DataCompare_super   )();
+extern int (*SB_DataCalcLst_super   )();
+extern int (*SB_DataListSort_super  )();
+extern int (*SB_DataEditGraph_super )();
+extern int (*SB_DataEditCnf_super   )();
+extern int (*SB_DataScan_super      )();
+extern int (*SB_StatUnitRoot_super  )();
+extern int (*SB_WsLoad_super        )();
+extern int (*SB_WsSave_super        )();
+extern int (*SB_WsMerge_super       )();
+extern int (*SB_WsDescr_super       )();
+extern int (*SB_WsCopy_super        )();
+extern int (*SB_WsClear_super       )();
+extern int (*SB_WsSample_super      )();
+extern int (*SB_WsExtrapolate_super )();
+extern int (*SB_WsHtoL_super        )();
+extern int (*SB_WsLtoH_super        )();
+extern int (*SB_WsSeasonAdj_super   )();
+extern int (*SB_WsTrend_super       )();
+extern int (*SB_WsAggregate_super   )();
+extern int (*SB_ModelSimulate_super )();
+extern int (*SB_ModelCompile_super  )();
+extern int (*SB_IdtExecute_super    )();
+extern int (*SB_EqsEstimate_super   )();
+extern int (*SB_Dir_super           )();
+extern int (*SB_XodeRuleImport_super)();
+
+//extern int (*B_DataDisplayGraph_super)();
+//extern int (*B_DataPrintGraph_super  )();   
+extern int (*B_WindowMinimize_super  )();   
+extern int (*B_WindowMaximize_super  )(); 
+
+extern int (*B_ScrollVarW_super)(char *arg);
+extern int (*B_ScrollVarN_super)(char *arg);
+extern int (*B_ScrollVarM_super)(char *arg);
+extern int (*B_ScrollVarS_super)(char *arg);
+extern int (*B_ScrollSclW_super)(char *arg);
+extern int (*B_ScrollSclN_super)(char *arg);
+extern int (*B_ScrollTblW_super)(char *arg);
+extern int (*B_ScrollVTW_super )(char *arg);
+extern int (*B_ScrollVTW0_super)(char *arg);
+extern int (*B_ScrollVTN_super )(char *arg);
+
+extern int (*ODE_scroll_super) (KDB *kdb, char **lst);
+extern int (*T_view_tbl_super) (TBL *tbl, char *smpl, char* name);
+
+/* b_rep_super.c - function declarations */
+extern int SB_FileDelete       ();
+extern int SB_FileRename       ();
+extern int SB_FileCopy         ();
+extern int SB_FileEdit         ();
+extern int SB_FileList         ();
+extern int SB_FileImport       ();
+extern int SB_ReportExec       ();
+extern int SB_ReportEdit       ();
+extern int SB_ReportPrompt     ();
+extern int SB_PrintObjDef      ();
+extern int SB_PrintCnf         ();
+extern int SB_ViewPrintGr      ();
+extern int SB_ViewPrintTbl     ();
+extern int SB_ViewByTbl        ();
+extern int SB_DataEdit         ();
+extern int SB_DataEditScroll   ();
+extern int SB_DataSearch       ();
+extern int SB_DataDuplicate    ();
+extern int SB_DataList         ();
+extern int SB_DataCompare      ();
+extern int SB_DataCalcLst      ();
+extern int SB_DataListSort     ();
+extern int SB_DataEditGraph    ();
+extern int SB_DataEditCnf      ();
+extern int SB_DataScan         ();
+extern int SB_StatUnitRoot     ();
+extern int SB_WsLoad           ();
+extern int SB_WsSave           ();
+extern int SB_WsMerge          ();
+extern int SB_WsDescr          ();
+extern int SB_WsCopy           ();
+extern int SB_WsClear          ();
+extern int SB_WsSample         ();
+extern int SB_WsExtrapolate    ();
+extern int SB_WsHtoL           ();
+extern int SB_WsLtoH           ();
+extern int SB_WsSeasonAdj      ();
+extern int SB_WsTrend          ();
+extern int SB_WsAggregate      ();
+extern int SB_ModelSimulate    ();
+extern int SB_ModelCompile     ();
+extern int SB_IdtExecute       ();
+extern int SB_EqsEstimate      ();
+extern int SB_Dir              ();
+extern int SB_XodeRuleImport   ();
+//extern int B_DataDisplayGraph  ();
+//extern int B_DataPrintGraph    ();  
+extern int B_WindowMinimize    ();  
+extern int B_WindowMaximize    ();
+
+extern int B_ScrollVarW(char* arg);
+extern int B_ScrollVarN(char* arg);
+extern int B_ScrollVarM(char* arg);
+extern int B_ScrollVarS(char* arg);
+extern int B_ScrollSclW(char* arg);
+extern int B_ScrollSclN(char* arg);
+extern int B_ScrollTblW(char* arg);
+extern int B_ScrollVTW (char* arg);
+extern int B_ScrollVTW0(char* arg);
+extern int B_ScrollVTN (char* arg);
+
+extern int ODE_scroll(KDB *kdb, char **lst);
+extern int T_view_tbl(TBL *tbl, char *smpl, char* name);
+
 
 /* b_data.c */
 extern int B_DataPattern(char* arg,int type);
+extern int B_DataRasVar(char* arg);
 extern int B_DataCalcVar(char *);
 extern int B_DataCreate_1(char *,int *);
 extern int B_DataCreate(char *,int );
@@ -929,6 +1194,7 @@ extern int B_DataAppend(char *,int );
 extern int B_DataList(char *,int );
 extern int B_DataCalcLst(char *);
 extern int B_DataListCount(char *);
+extern int B_DataCompareEps(char* arg);
 extern int B_DataCompare(char *,int );
 //extern int B_DataEditGraph(int ,char *);
 extern int B_DataDisplayGraph(char *);
@@ -977,50 +1243,60 @@ extern int B_ProfileReset(void);
 extern int B_ReadMe(void);
 
 /* b_pdest.c */
-extern int B_PrintDestFile(char *,int );
-extern int B_PrintDest(char *);
-extern int B_PrintDestNew(char *);
-extern int B_PrintDestExt(char *,int ,int );
-extern int B_PrintNbDec(char *);
-extern int B_PrintLang(char *);
-extern int B_PrintA2mAppend(char *);
-extern int B_PrintTBreak(char *);
-extern int B_PrintTPage(char *);
-extern int B_PrintGPage(char *);
-extern int B_PrintGTheme(char *);
-extern int B_PrintParaNum(char *);
-extern int B_PrintPageHeader(char *);
-extern int B_PrintPageFooter(char *);
-extern int B_PrintFont(char *);
-extern int B_PrintTFont(char *);
-extern int B_PrintTBox(char *);
-extern int B_PrintTColor(char *);
-extern int B_PrintTWidth(char *);
-extern int B_PrintGSize(char *);
-extern int B_PrintGBox(char *);
-extern int B_PrintGBrush(char *);
-extern int B_GetColor(char *);
-extern int B_PrintGColor(char *);
-extern int B_PrintRtfHelp(char *);
-extern int B_PrintRtfTitle(char *);
-extern int B_PrintRtfCopy(char *);
-extern int B_PrintRtfLevel(char *);
-extern int B_PrintRtfTopic(char *);
-extern int B_PrintGdiOrient(char *);
-extern int B_PrintGdiDuplex(char *);
-extern int B_PrintGdiPrinter(char *);
-extern int B_PrintGIFBackColor(char *);
-extern int B_PrintGIFTransColor(char *);
-extern int B_PrintGIFInterlaced(char *);
-extern int B_PrintGIFTransparent(char *);
-extern int B_PrintGIFFilled(char *);
-extern int B_PrintGIFFont(char *);
-extern int B_PrintHtmlStrip(char *);
-extern int B_A2mToAll(char *,int );
-extern int B_A2mToHtml(char *);
-extern int B_A2mToRtf(char *);
-extern int B_A2mToMif(char *);
-extern int B_A2mToCsv(char *);
+extern int B_PrintDestFile(char *arg, int newf);
+extern int B_PrintDest(char *file);
+extern int B_PrintDestNew(char* file);
+extern int B_PrintDestExt(char* file, int newf, int type);
+extern int B_PrintNbDec(char* nbdec);
+extern int B_PrintLang(char* lang);
+extern int B_PrintMulti(char* multi);
+extern int B_PrintA2mAppend(char* arg);
+extern int B_PrintTBreak(char* arg);
+extern int B_PrintTPage(char* arg);
+extern int B_PrintGPage(char* arg);
+extern int B_PrintParaNum(char* arg);
+extern int B_PrintPageHeader(char* arg);
+extern int B_PrintPageFooter(char* arg);
+extern int B_PrintFont(char* arg);
+extern int B_PrintTFont(char* arg);
+extern int B_PrintTBox(char* arg);
+extern int B_PrintTColor(char* arg);
+extern int B_PrintTWidth(char* arg);
+extern int B_PrintGSize(char* arg);
+extern int B_PrintGTheme(char* arg);
+extern int B_PrintGBand(char* arg);
+extern int B_PrintGBox(char* arg);
+extern int B_PrintGBrush(char* arg);
+extern int B_GetColor(char* arg);
+extern int B_PrintGColor(char* arg);
+extern int B_PrintRtfHelp(char* arg);
+extern int B_PrintHtmlHelp(char* arg);
+extern int B_PrintRtfTitle(char* arg);
+extern int B_PrintRtfCopy(char* arg);
+extern int B_PrintRtfLevel(char* arg);
+extern int B_PrintRtfTopic(char* arg);
+extern int B_PrintGdiOrient(char* arg);
+extern int B_PrintGdiDuplex(char* arg);
+extern int B_PrintGdiPrinter(char* arg);
+extern int B_PrintGIFBackColor(char* arg);
+extern int B_PrintGIFTransColor(char* arg);
+extern int B_PrintGIFInterlaced(char* arg);
+extern int B_PrintGIFTransparent(char* arg);
+extern int B_PrintGIFFilled(char* arg);
+extern int B_PrintGIFFont(char* arg);
+extern int B_PrintHtmlStrip(char* arg);
+extern int B_PrintHtmlStyle(char* arg);
+extern int B_A2mToAll(char* arg, int type);
+extern int B_A2mToPrinter(char* arg);
+extern int B_A2mToHtml(char* arg);
+extern int B_A2mToRtf(char* arg);
+extern int B_A2mToMif(char* arg);
+extern int B_A2mToCsv(char* arg);
+extern int B_A2mSetCol(int *dest, int col);
+extern int B_PrintHtmlTableClass(char *table_class);
+extern int B_PrintHtmlTRClass(char *tr_class);
+extern int B_PrintHtmlTHClass(char *th_class);
+extern int B_PrintHtmlTDClass(char *td_class);
 
 /* b_model.c */
 extern int B_ModelSimulate(char *);
@@ -1139,7 +1415,7 @@ extern int DS_extr(double *,int ,int ,double *,double );
 extern int B_WsTrend(char *);
 extern int B_WsTrendStd(char *);
 //extern int HP_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *);
-//extern int HP_calc(double *,double *,int ,int );	
+//extern int HP_calc(double *,double *,int ,int );
 //extern int HP_calc(double *,double *,int , IODE_REAL);     // JMP 7-3-2019
 //extern int HP_calc(double *,double *,int , IODE_REAL, int);  // JMP 12-4-2019
 //extern void HP_test(double *,double *,int ,int *,int *);
@@ -1178,21 +1454,11 @@ extern int C_ReportExec(void);
 extern int SB_ReportEditOutput(void);
 extern int SB_ReportLine(void);
 extern int C_ReportLine(void);
-extern int SB_ReportPrompt(char *,int );
+//extern int SB_ReportPrompt(char *,int );
 extern int C_ReportPrompt(void);
 
 /* sb_pdest.c */
 extern int C_PrintDestDecLang(int ,int ,int );
-extern void B_A2mGetGnlParms(void);
-extern void B_A2mGetRtfParms(void);
-extern void B_A2mSetRtfTitle(unsigned char *);
-extern void B_A2mSetRtfCopy(unsigned char *);
-extern void B_A2mGetCsvParms(void);
-extern void B_A2mGetHtmlParms(void);
-extern void B_A2mGetGdiParms(void);
-extern void B_A2mGetMifParms(void);
-extern void B_A2mSetCol(int *,int );
-extern void B_A2mGetGIFParms(void);
 
 /* sb_print.c */
 extern int SB_PrintObjDef(void);
@@ -1232,8 +1498,8 @@ extern int SB_DataSearch(void);
 extern void C_DataSearch(void);
 extern int SB_DataDuplicate(void);
 extern int C_DataDuplicate(void);
-extern int SB_DataEdit(char *,int );
-extern int SB_DataEditScroll(char *,int );
+//extern int SB_DataEdit(char *,int );
+//extern int SB_DataEditScroll(char *,int );
 extern int SB_DataEditObj1(char *,int );
 extern int SB_DataEditCil1(char *,int );
 extern int C_DataEditCil1(void);
@@ -1353,7 +1619,7 @@ extern KDB *KI_exec(KDB *,KDB *,int ,char **,KDB *,int ,char **,SAMPLE *);
 extern int K_LANG;      // Current language
 
 /* k_print.c */
-extern  int K_NBDEC;  
+extern  int K_NBDEC;
 extern int T_prep_cls(TBL *,char *,COLS **);
 extern int T_print_tbl(TBL *,char *);
 //extern int T_print_line(TBL *,int ,COLS *);
@@ -1575,37 +1841,51 @@ extern int ODE_blk_dadj_fn(char *);
 // extern int SW_abort(int ,char *);   	// JMP 10/5/2021 double de avec SCR
 // extern int SCR_panic(void);			// JMP 10/5/2021 double de avec SCR
 
-/* b_dde.c (MSC) */
-extern int __cdecl IodeDdeLocale(char *buf);
-extern int __cdecl IodeDdeUnLocale(char *buf);
-extern int __cdecl IodeDdeType(char *szTopic);
-extern char *__cdecl IodeDdeGetWS(char *szItem);
-extern char *__cdecl IodeDdeCreateSeries(int objnb,int bt);
-extern char *__cdecl IodeDdeCreatePer(int bt);
-extern char *__cdecl IodeDdeXlsCell(char *offset,int i,int j,int lg,int hg);
-extern char *__cdecl IodeTblCell(struct _tcell_ *cell,struct _col_ *cl, int nbdec);
-extern char *__cdecl IodeDdeCreateTbl(int objnb,char *ismpl,int *nc,int *nl,int nbdec);
-extern char *__cdecl IodeDdeCreateObj(int objnb,int type,int *nc,int *nl);
-extern char *__cdecl IodeDdeGetXObj(char *szItem,int type);
-extern char *__cdecl IodeDdeGetItem(char *szTopic,char *szItem);
-extern int __cdecl IodeDdeSetWS(char *szItem,char *szBuffer);
-extern int __cdecl IodeDdePlay(char *szItem,char *szBuffer);
-extern int __cdecl DdeTsfKey(char *key);
-extern int __cdecl IodeDdeSetItem(char *szTopic,char *szItem,char *szBuffer);
-extern char *__cdecl B_ExcelGetItem(char *arg);
-extern int __cdecl B_ExcelSetItem(char *ddeitem,char *ptr,int nc,int nl);
-extern int __cdecl B_ExcelGet(char *arg,int type);
-extern int __cdecl B_ExcelSet(char *arg,int type);
-extern int __cdecl B_ExcelExecute(char *arg);
-extern int __cdecl B_ExcelCmd(char *cmd,char *arg);
-extern int __cdecl B_ExcelOpen(char *arg);
-extern int __cdecl B_ExcelClose(char *arg);
-extern int __cdecl B_ExcelPrint(char *arg);
-extern int __cdecl B_ExcelSave(char *arg);
-extern int __cdecl B_ExcelSaveAs(char *arg);
-extern int __cdecl B_ExcelNew(char *arg);
-extern int __cdecl B_DDEGet(char *arg);
-extern int __cdecl IodeFmtVal(char *buf,double val);
+/* b_dde.c */
+extern int IodeDdeLocale(char *buf);
+extern int IodeDdeUnLocale(char *buf);
+extern int IodeDdeType(char *szTopic);
+extern char *IodeDdeGetWS(char *szItem);
+extern char *IodeDdeCreateSeries(int objnb, int bt);
+extern char *IodeDdeCreatePer(int bt);
+extern char *ToBase26(int num);
+extern char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg);
+extern char *IodeTblCell(TCELL *cell, COL *cl, int nbdec);
+extern char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec);
+extern char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl);
+extern char *IodeDdeGetReportRC(char *szItem);
+extern char *IodeDdeGetXObj(char *szItem, int type);
+extern char *IodeDdeGetItem(char *szTopic, char *szItem);
+extern int IodeDdeSetWS(char *szItem, char *szBuffer);
+extern int IodeDdePlay(char *szItem, char *szBuffer);
+extern int DdeTsfKey(char *key);
+extern int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer);
+extern char *B_ExcelGetItem(char *arg);
+extern int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl);
+extern int B_ExcelDecimal(char *arg);
+extern int B_ExcelThousand(char *arg);
+extern int B_ExcelCurrency(char *arg);
+extern int B_ExcelLang(char *arg);
+extern int B_ExcelGet(char *arg, int type);
+extern int B_ExcelSet(char *arg, int type);
+extern int B_ExcelExecute(char *arg);
+extern int B_ExcelCmd(char *cmd, char *arg);
+extern int B_DDEGet(char *arg);
+extern int B_ExcelWrite(char *ptr);
+extern int B_DDEGet(char *arg);
+extern char *B_ExcelGetItem(char *arg);
+extern int B_ExcelGet(char *arg, int type);
+extern int B_ExcelSet(char *arg, int type);
+extern int B_ExcelExecute(char *arg);
+extern int B_ExcelCmd(char *cmd, char *arg);
+extern int B_ExcelWrite(char *ptr);
+extern int B_ExcelOpen(char *arg);
+extern int B_ExcelClose(char *arg);
+extern int B_ExcelPrint(char *arg);
+extern int B_ExcelSave(char *arg);
+extern int B_ExcelSaveAs(char *arg);
+extern int B_ExcelNew(char *arg);
+extern int IodeFmtVal(char *buf, IODE_REAL val);
 
 /* b_ds.c (MSC) */
 extern char *__cdecl B_DSPeriod2Date(struct _period *per,char *date,char *freq);
@@ -1620,7 +1900,15 @@ extern int __cdecl B_DSImportDb_1(char *arg,struct _sample *smpl);
 extern int __cdecl B_DSImportDb(char *arg);
 
 /* b_sql.c */
-extern KDB  *K_load_odbc(int , char *, int , char **);
+//extern KDB  *K_load_odbc(int , char *, int , char **);
+extern U_ch *RPS_Open(U_ch** args);
+extern U_ch *RPS_Field(U_ch** args);
+extern U_ch *RPS_NbFlds(U_ch** args);
+extern U_ch *RPS_Record(U_ch** args);
+extern U_ch *RPS_Query(U_ch** args);
+extern U_ch *RPS_Sql(U_ch** args);
+extern U_ch *RPS_Next(U_ch** args);
+extern U_ch *RPS_Close(U_ch** args);
 
 /* b_win.c (MSC) */
 extern int __cdecl B_WindowMinimize();
@@ -1648,10 +1936,6 @@ extern int W_printfEx(int dup, char *fmt, va_list args);
 
 // interface
 extern U_ch  *T_mmt_edit(U_ch *, int , int , int , int );
-
-/* New files 2021 */
-
-
 
 
 #ifdef SCRCPP

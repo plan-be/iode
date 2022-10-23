@@ -5,59 +5,490 @@
 
 
 - [IODE: Reports](#T1)
-  - [Report functions group 1: "internal" functions](#T2)
-  - [Report functions group 2: IODE commands](#T3)
-      - [Functions with an IODE object suffix (cmt, eqs...)](#T4)
-      - [Functions with a file extension suffix (csv, txt...)](#T5)
-      - [Other functions](#T6)
-    - [List of source files](#T7)
-    - [b\_fsys.c](#T8)
-      - [List of functions](#T9)
-    - [b\_file.c](#T10)
-      - [List of functions](#T11)
-    - [b\_xode.c](#T12)
-      - [List of functions](#T13)
-    - [b\_htol.c](#T14)
-      - [List of functions](#T15)
-    - [b\_ltoh.c](#T16)
-      - [List of functions](#T17)
-    - [b\_ras.c](#T18)
+      - [Examples](#T2)
+  - [IODE Report engine](#T3)
+    - [More details on report structure](#T4)
+    - [Line Parsing](#T5)
+    - [List of source files](#T6)
+    - [b\_rep\_engine.c](#T7)
+      - [Hierarchy of the report engine functions](#T8)
+      - [Examples of report line parsing](#T9)
+      - [List of functions](#T10)
+    - [b\_rep\_cmds.c](#T11)
+      - [List of functions](#T12)
+    - [b\_rep\_debug.c](#T13)
+      - [List of functions](#T14)
+    - [b\_rep\_defs.c](#T15)
+      - [List of functions](#T16)
+    - [b\_rep\_foreach.c](#T17)
+      - [Example](#T18)
       - [List of functions](#T19)
-    - [b\_data.c](#T20)
-      - [Functions with a suffix](#T21)
-      - [Other functions](#T22)
-      - [List of functions](#T23)
-    - [b\_est.c](#T24)
-      - [List of functions](#T25)
-    - [b\_model.c](#T26)
-      - [List of functions](#T27)
-    - [b\_ws.c](#T28)
+    - [b\_rep\_proc.c](#T20)
+      - [Syntax of report procedures ($proc\*)](#T21)
+      - [Example](#T22)
+      - [Parameter usage](#T23)
+      - [List of functions](#T24)
+      - [List of global variables](#T25)
+    - [b\_rep\_syntax.c](#T26)
+      - [List of global variables](#T27)
+    - [b\_rep\_utils.c](#T28)
       - [List of functions](#T29)
-  - [Report functions group 3: report functions](#T30)
+  - [IODE Report commands](#T30)
+      - [Functions with an IODE object suffix (cmt, eqs...)](#T31)
+      - [Functions with a file extension suffix (csv, txt...)](#T32)
+      - [Other functions](#T33)
+    - [List of source files](#T34)
+    - [b\_fsys.c](#T35)
+      - [List of functions](#T36)
+    - [b\_file.c](#T37)
+      - [List of functions](#T38)
+    - [b\_xode.c](#T39)
+      - [List of functions](#T40)
+    - [b\_htol.c](#T41)
+      - [List of functions](#T42)
+    - [b\_ltoh.c](#T43)
+      - [List of functions](#T44)
+    - [b\_ras.c](#T45)
+      - [List of functions](#T46)
+    - [b\_data.c](#T47)
+      - [Functions with a suffix](#T48)
+      - [Other functions](#T49)
+      - [List of functions](#T50)
+    - [b\_est.c](#T51)
+      - [List of functions](#T52)
+    - [b\_model.c](#T53)
+      - [List of functions](#T54)
+    - [b\_ws.c](#T55)
+      - [List of functions](#T56)
+    - [b\_rep\_super.c](#T57)
+  - [Iode Report @\-functions](#T58)
+      - [@\-function parameters specifications](#T59)
+      - [Examples](#T60)
+      - [List of functions](#T61)
+  - [Example of report with @\-functions](#T62)
+    - [Report](#T63)
+    - [Resulting a2m file](#T64)
+  - [Example of report with $procdef and $foreach](#T65)
+    - [Report](#T66)
+    - [Resulting a2m file](#T67)
 
 # IODE: Reports {#T1}
 
-Three groups of functions that manage the reports can be identified:
+Three groups of functions that manage reports can be identified:
 
-- Report functions group 1: "internal" functions which compile and execute the report commands, like $goto, $define...
-- Report functions group 2: IODE commands that act on IODE objects, like $DataCreateVar, $FileDeleteTxt...
-- Report functions group 3: report functions that are replaced on the commmand line by their computed value, like @upper(), @time()...
+- **IODE Report Engine**: compilation and execution of report commands, like `$goto`, `$define`, `$foreach`...
+- **IODE Report Commands**: create, update, etc IODE objects, like `$DataCreateVar`, `$FileDeleteTxt`...
+- **IODE Report Functions**: calculation of @\-functions and replacement by their computed value, like `@upper()`, `@time()`...
 
-## Report functions group 1: "internal" functions {#T2}
+The available commands and functions are defined in two tables (defined in b\_rep\_syntax.c) that contain the names of the functions and commands, and a pointer to their C\-functions.
 
-## Report functions group 2: IODE commands {#T3}
+Adding a command or function can easily be done by modifying one of these tables.
 
-This group contains functions acting on IODE objects that are called by the report engine (see b\_rep\_syntax.c for a complete list of functions).
+#### Examples {#T2}
 
-These functions all have a similar syntax and always return an integer code, 0 indicating success, other values indicating an error.
+- Example of report with @\-functions
+- Example of report with $procdef and $foreach
+
+## IODE Report engine {#T3}
+
+That group of functions is responsible for parsing and executing IODE reports. They manage the **control flow** and call the IODE commands (`$command` or `#command`) and IODE functions (`@function`).
+
+Generally (but not always), a report is stored in a text file with the suffix ".rep". Before being "run" or "executed", the report file is read and stored in a REPFILE structure. That structure is then "executed" line by line.
+
+Internally, a report consists in a table of lines. Each line is first interpreted by the Report Engine (RE) and the result is sent to the current printing destination, for example a htlm file.
+
+### More details on report structure {#T4}
+
+Reports consist in a set of lines that are interpreted in sequence. There are 3 types of lines:
+
+1. lines that start with $ or \# are IODE commands that are "executed". Their result, if any, is printed (or ignored) according to the last `$PrintDest` command. The list of currently available "commands" can be found in b\_rep\_syntax.c
+
+2. lines that start with a $ or \# followed by a space are comments.
+
+3. all other lines are plain text that will be sent to the current Printing Destination after parsing
+
+### Line Parsing {#T5}
+
+*Before* the execution of the command it may contain, each line is parsed and the following character sequences are replaced by calculated values:
+
+- `%macro%`: macros (between %%), created by a $define command, are replaced by their current value
+- `{lex}`: LEC expressions (between \{\}) are calculated and replaced by their (formatted) value
+- `{$command}`: IODE commands between \{\} are executed and their result replaces the original \{\} sequence. See the variable B\_fns in b\_rep\_syntax.c for the current list of available commands.
+- `@function()`: report functions (@function()) are executed and replaced by their value. See RP\_FNS in b\_rep\_syntax.c for the current list of functions.
+- ``any expression``: strings between backquotes remain as is (are not parsed) unless otherwise specified by a `$noparsing 0` command.
+
+### List of source files {#T6}
+
+The files below interpret and execute reports and report lines.
+
+- b\_rep\_engine.c: main report engine functions
+- b\_rep\_cmds.c: functions controlling the report flow ($debug...) and some os commands ($mkdir...)
+- b\_rep\_debug.c: debugging function
+- b\_rep\_defs.c: functions to manage macros ($defines)
+- b\_rep\_foreach.c: functions to execute $foreach commands
+- b\_rep\_proc.c: compilation and execution of report procedures ($prodef, $procexec)
+- b\_rep\_syntax.c: tables of command and function names and pointers
+- b\_rep\_utils.c: utilities for report execution
+
+### b\_rep\_engine.c {#T7}
+
+Main report engine functions.
+
+#### Hierarchy of the report engine functions {#T8}
+
+B\_ReportExec and B\_ReportLine are the 2 top level functions. As shown below, some functions are recursive (RP\_expand(), RP\_gmacro(), RP\_gcmd(), RP\_gfn()).
+
+```
+B_ReportExec calls
+    RP_ReportExec_1                     Reads a report file and creates a REPFILE structure, then calls RP_ReportExec_tbl()
+B_ReportLine                            Creates a REPFILE structure from a string (possibly containing multiple lines separated by '\n') then calls RP_ReportExec_tbl()
+    RP_ReportExec_tbl                   Executes a REPFILE structure, ie a table of report lines
+        RP_readline                     Expands a report line
+            RP_read_multiline           Groups lines ended by " \" into one single line
+            RP_expand (recursive)       Replaces %macro%, {lec}, @fn()
+                RP_extract              Extracts a string bw %% or {}
+                RP_gmacro               Replaces %macro% par its value
+                    RP_expand...
+                RP_gcmd                 Calculates {macro} and put the result in the report line
+                    RP_expand...
+                RP_extractpar           Extracts an @function
+                RP_gfn                  Executes @functions and put the result in the report line
+                    RP_expand...
+                RP_add                  Util : concatenates a string to the current line and reallocates
+        RP_exec_fn()                    Executes the report command (if any)
+            RP_find_fn                  Finds the right function
+            (*B_fns[i].fn)              Executes the no-GUI function
+            (*B_fns[i].sfn)             Executes the GUI function
+ 
+```
+
+#### Examples of report line parsing {#T9}
+
+The examples below show how report lines are transformed before being executed.
+
+Note that this is not the exact result of a report execution: to keep some expression in the result, like `{1 + %C%}`, the source report had to contain more backquotes than shown below.
+
+```
+     Creation of the variable B and the 3 macros c, C and C1
+     -------------------------------------------------------
+     $WsSample 2000Y1 2010Y1
+     $DataCalcVar B t
+     $define C   1
+     $define C1  2
+     $define c   b
+ 
+     Set the current execution period
+     --------------------------------
+     $SetTime 2005Y1
+ 
+     Expressions between {...}
+     -------------------------
+     Note that {} expressions cannot be nested
+ 
+     Example 1: {lec + %define%}      : {1 + %C%}         -> {1 + 1}                      -> 2
+     Example 2: {lec + @fn()}         : {1 + @upper(b)}   -> {1 + B}                      -> 6
+     Example 3: {lec + %@fn()%}       : {1 + %@upper(c)%} -> {1 + %C%}       -> {1 + 1}  -> 2
+     Example 4: {lec + @fn(%define%)} : {1 + @upper(%c%)} -> {1 + @upper(b)} -> {1 + B}  -> 6
+ 
+     Expressions between %...%
+     -------------------------
+     Note that %defines% cannot be nested
+     Example 1: %C%               : %C%                  -> 1
+     Example 2: %@fn()%           : %@upper(c)% -> %C%  -> 1
+     Example 3: %C{lec}%          : %C{2-1}%    -> %C1% -> 2
+ 
+     Expressions @-functions()
+     -------------------------
+     Example 1: @fn()             : @date() @time()        -> 14-10-2022 01:19:44
+     Example 2: @fn(%def%)        : @upper(%c%)            -> B
+     Example 3: @fn(@fn())        : @upper(@getdir())      -> C:SRODE_SRCMD
+     Example 4: @fn({lec})        : @drop({1+1},ABCDE)     -> CDE
+     Example 5: @fn({lec})        : @drop({1+1},A BCDE)    -> BCDE
+     Example 6: @fn({lec})        : @drop({1+1},"A,BC,DE") -> BC,DE
+```
+
+#### List of functions {#T10}
+
+|Syntax|Description|
+|:---|:---|
+|`REPFILE *RP_create_repfile(char *filename, unsigned char **tbl)`|Creates and initialises a REPFILE struct.|
+|`int RP_free_repfile(REPFILE *rf)`|Frees a REPFILE struct.|
+|`unsigned char **RP_read_file(char* filename)`|Reads a report file (with no line expansion).|
+|`char* RP_read_multiline(REPFILE* rf)`|Reads the next line in a REPFILE struct. If the line ends with a " \\", joins the next line.|
+|`int RP_readline(REPFILE* rf, char** line, int mode)`|Reads the current line from the REPFILE rf.|
+|`int RP_chk_ignore(char* line)`|Indicates if errors on a report line must be ignored|
+|`int RP_splitline(char* text, char* cmd, char** arg, int lg)`|Splits a report line into the command and its arguments.|
+|`int RP_find_fn(char* name, int* type, int fs)`|Finds the position in B\_fns of the command "name" and, if there is a suffix, the corresponding object or file type.|
+|`int RP_exec_fn(char* name, char* arg, int fs)`|Retrieves a report command function pointer and executes the function with its parameters|
+|`int RP_err_dump(char* name, char* arg)`|Prints or displays the current report line if an error has occured.|
+|`char *RP_extract(char* buf, int* i, int ch)`|Extracts a string terminated by the specific character.|
+|`char *RP_gmacro(char* str)`|Calculates a macro value. The macro may contain expressions between \{\} or @\-functions|
+|`char *RP_gcmd(char* str)`|Calculates the value of an expression between curly brackets.|
+|`int RP_evaltime()`|Calculates RP\_T, the position in the current sample of the current calculation period RP\_PER.|
+|`IODE_REAL RP_evallec(char* lec)`|Evaluates a LEC expression in (the period) RP\_PER.|
+|`int RP_fmt(char* buf, char* format, IODE_REAL value)`|Formats a double.|
+|`int RP_eval(char** res, char* farg)`|Interprets strings between accolades found in a report line.|
+|`int RP_add(char** line, int* lg, int* j, char* res)`|Reallocates the string line (of length \*lg) in order to concatanate res from the position \*j.|
+|`int RP_expand(char** line, char* buf)`|Expands a report line by replacing macros, lec expressions and @\-functions par their calculated values|
+|`int RP_ReportExec_tbl(REPFILE *rf)`|Executes the report stored in the REPFILE struct rf.|
+|`int RP_ReportExec_1(char* file)`|Executes a report file.|
+
+### b\_rep\_cmds.c {#T11}
+
+Commands related to the control flow of IODE reports ($msg, $goto, $return...) and to some operating system functions ($mkdir...). Some other commands of the same group can be found in other source files: b\_rep\_defs.c, b\_rep\_foreach.c, b\_rep\_proc.c, etc.
+
+The names and C\-function pointers of these functions are defined in the table `B_fns[]`. The functions themselves are called by `RP_exec_fn()`.
+
+The syntax of each function can be found in the online manual: https://iode.plan.be/doku.php?id=les\_commandes\_d\_execution\_des\_rapports.
+
+All functions have the same syntax:
+
+```
+    int <function>(char* arg)
+ 
+    @param [in] char*   arg     parameters of the function
+    @return     int             return code: 0 on success
+```
+
+#### List of functions {#T12}
+
+|Syntax|Description|
+|:---|:---|
+|`int RP_vseps(char* seps)`|$vseps <seps>|
+|`int RP_repeatstring(char* buf)`|$repeatstring <string>|
+|`int RP_repeat(char* buf)`|$repeat <command>|
+|`int RP_onerror_1(char* arg)`|Sub function of RP\_onerror() which assigns the 2 global variables RP\_RT and RP\_PRINT.|
+|`int RP_onerror(char* arg)`|$onerror \[\{return\|abort\|quitode\}\] \[\{display\|print\|noprint\}\]|
+|`int RP_abort(char* arg)`|$abort|
+|`int RP_quitode(char* arg)`|$quitode or $quit|
+|`int RP_return(char* arg)`|$return|
+|`int RP_label(char* arg)`|$label <label>|
+|`int RP_goto_label(char *command, char *parm)`|Search in the current REPFILE (CUR\_REPFILE) the line beginning with "$command parm" or "\#command parm", where command can be "label" or "next".|
+|`int RP_goto(char* arg)`|$goto label \[value\]|
+|`int RP_message(char* arg)`|$show message|
+|`int RP_warning(char* arg)`|$msg text|
+|`int RP_beep()`|$beep|
+|`int RP_ask(char* arg)`|$ask <label> <question>|
+|`int B_ReportPrompt(char* arg)`|\#prompt <macro\_name> <question>|
+|`int RP_setdebug(char* arg)`|$debug \{0\|n\|N\|1\|2\|f\|F\}|
+|`int RP_setindent(char* arg)`|$indent \{0\|n\|N\|1\}|
+|`int RP_setmultiline(char* arg)`|$multiline \{0\|n\|N\|1\}|
+|`int RP_noparsingchar(char* arg)`|$noparsing \[0\|n\|N\|1\]|
+|`int RP_shift(char* arg)`|$shift \[n\] or $shift\_args \[n\]|
+|`int RP_chdir(char* arg)`|$chdir <dirname>|
+|`int RP_rmdir(char* arg)`|$rmdir <dirname>|
+|`int RP_mkdir(char* arg)`|$mkdir <dirname>|
+|`int RP_settime(char* arg)`|$settime <period>|
+|`int RP_incrtime(char* arg)`|$incrtime \[n\]|
+|`int RP_system(char* arg)`|$system <command>|
+|`int B_shellexec(char *arg)`|$shellexec <command>|
+|`int B_Sleep(char* arg)`|$sleep <msecs>|
+|`int B_GraphDefault(char* type)`|$graphdefault \{l\|L\|s\|S\|b\|B\}|
+
+### b\_rep\_debug.c {#T13}
+
+Function to send a message and the memory status to the file `./memdbg.txt`.
+
+#### List of functions {#T14}
+
+|Syntax|Description|
+|:---|:---|
+|`void RP_debug(char* txt)`|Appends a message to the report debug file memdbg.txt.|
+
+### b\_rep\_defs.c {#T15}
+
+Implementation of the report $defines and of the mechanism to push/pop macros in PROCDEF and FOREACH blocks.
+
+The $defines are stored in the special `KDB RP_MACRO` of type K\_ASIS.
+
+#### List of functions {#T16}
+
+|Syntax|Description|
+|:---|:---|
+|`int RP_macro_createdb()`|Creates the KDB RP\_MACRO if it does not exist.|
+|`int RP_macro_deletedb()`|Deletes the KDB RP\_MACRO and its content.|
+|`int RP_define_1(char *name, char *macro)`|Adds or replaces a macro to RP\_MACRO.|
+|`int RP_define(char* arg)`|Report function to define a new macro.|
+|`char* RP_get_macro_ptr(char* macro_name)`|Returns the pointer to a macro (aka define) value.|
+|`int RP_undef_1(char *name)`|Deletes one macro.|
+|`int RP_undef(char *arg)`|Report function to delete macros.|
+|`int RP_define_calcdepth(char *name)`|Returns the max depth of a saved (pushed) macro.|
+|`int RP_define_save(char *name)`|Saves (pushes) a macro under the name "name\#<depth\+1>".|
+|`int RP_define_restore(char *name)`|Deletes the macro "name" and restores (pops) the macro "name\#<depth>" under the name "name".|
+|`int RP_define_save_list(char **list)`|Saves (pushes) a list of macros using RP\_define\_save() for each macro.|
+|`int RP_define_restore_list(char **list)`|Restores a list of macros using RP\_define\_restore() for each macro.|
+
+### b\_rep\_foreach.c {#T17}
+
+Functions to compile and execute `$foreach` and `$next` commands.
+
+The mechanism implemented is detailed in the source file.
+
+#### Example {#T18}
+
+```
+$define A XYZ
+A is %A%
+$foreach A 1 2 3
+    A is %A%
+$next A
+A is %A%
+```
+
+prints:
+
+```
+A is XYZ
+    A is 1
+    A is 2
+    A is 3
+A is XYZ
+```
+
+#### List of functions {#T19}
+
+|Syntax|Description|
+|:---|:---|
+|`int RP_foreach(char* arg)`|Implemention of $foreach <index\_name> <list\_of\_values>|
+|`int RP_foreach_break(char *name)`|Exits the foreach block. Not implemented|
+|`int RP_foreach_next(char* arg)`|Implementation of $next <index\_name>|
+
+### b\_rep\_proc.c {#T20}
+
+Compilation and execution of report procedures (`$prodef, $procexec`).
+
+#### Syntax of report procedures ($proc\*) {#T21}
+
+```
+    $proc[def] procname [parm1] ... [parms]
+     ...
+    $procend
+     ...
+    $procexec procname parms ..
+```
+
+#### Example {#T22}
+
+*Note that when there is a whitespace between $ or \# and the command, it is considered as a comment.*
+
+```
+    $ Definition of the procedure TotalBySex
+    $ --------------------------------------
+        $procdef TotalBySex resprefix agelist arrlist
+            $foreach sex F;H
+                @chronoreset()
+                $ show %sex% - %agelist% - %arrlist%
+                $define POP 0
+                $foreach pos P01;P02;P03;P04;P05;P06;P07;P08;P09;P10;P11;P12;P13;P14;P15
+                    $foreach age @lvalue(%agelist%)
+                        $foreach arr @lvalue(%arrlist%)
+                            $define POP %POP% + %pos%_%age%_%sex%_%arr%
+                        $next arr
+                    $next age
+                $next pos
+                $DataUpdateidt %resprefix%_%sex% %POP%
+                $IdtExecute 1991Y1 2010Y1 %resprefix%_%sex%
+                $ show CPU : @chronoget() for %sex% - %agelist% - %arrlist%
+            $next sex
+        $procend
+ 
+    $ Call to the procedure TotalBySex
+    $ --------------------------------
+        $foreach agegroup 7074 7579 8084 8589 90plus
+            $procexec TotalBySex POP%agegroup%_WAL L%agegroup% WAL
+            $procexec TotalBySex POP%agegroup%_VLA L%agegroup% VLA
+            $ procexec TotalBySex POP%agegroup%_ARR L%agegroup% ARR
+            $procexec TotalBySex POP%agegroup%_BRU L%agegroup% BRU
+        $next agegroup
+```
+
+#### Parameter usage {#T23}
+
+- all parameters but the last one are words or strings enclosed in ""
+- the parameters in excess (if any) are assigned to the last formal parameter
+- parameters are used in the body of the procedure like $defines : %parm1%, ...
+- if a $define with the same name as a procedure parameter exists before executing the procedure, it is locally replaced by the actual value of the parameter, but retrieves its value at the end of the procedure execution
+- the $procdef statement is closed by the first $procend (in the same file)
+- a procedure can be redefined
+- procedures are kept in memory after the end of the report execution
+- procedures are called by the command $procexec
+- a procedure must be defined before its first use
+
+#### List of functions {#T24}
+
+|Syntax|Description|
+|:---|:---|
+|`static int RP_proc_find(char *name)`|Retrieves the position of a REP\_PROC in REP\_PROCS by its name (case sensitive\!)|
+|`static int RP_proc_is_procend(char *line)`|Checks if a line closes a PROC (i.e.: contains "$procend").|
+|`static void RP_proc_delete(int proc_nb)`|Deletes a REP\_PROC object and frees its reference in the table REP\_PROCS.|
+|`static int RP_proc_create(char *name)`|Adds a new empty PROC in REP\_PROCS.|
+|`void RP_proc_free_all()`|Frees all the defined procedures and the table REP\_PROCS.|
+|`int RP_procdef(char* arg)`|Reads and creates a new PROC.|
+|`int RP_procexec(char* arg)`|Executes a procedure (called by $procexec parms).|
+
+#### List of global variables {#T25}
+
+|Syntax|Description|
+|:---|:---|
+|`REP_PROC **REP_PROCS`|Table of pointers to existing PROCs|
+|`int REP_NB_PROCS`|Size of REP\_PROCS|
+
+### b\_rep\_syntax.c {#T26}
+
+This file contains two tables defining the commands and functions available in IODE reports.
+
+The two global tables are:
+
+- `B_fns[] ` that lists all report $commands and \#commands names and pointers.
+- `RP_FNS[]` that lists all report @functions names and pointers.
+
+To add a new $command to IODE reports, add a new line in B\_fns\[\] with the name in lowercase and the function pointer(s).
+
+To add a new @function to IODE reports, add a new line in RP\_FNS\[\] with the name in lowercase and the function pointer.
+
+#### List of global variables {#T27}
+
+|Syntax|Description|
+|:---|:---|
+|`BFNS B_fns[]`|Names of the report commands \+ GUI and non\-GUI function pointers \+ type defining the allowed suffixes.|
+|`RPFN RP_FNS[]`|Names of the report @functions and their function pointers|
+
+### b\_rep\_utils.c {#T28}
+
+This file contains utilities used inside IODE report functions.
+
+The main part of this file contains *allocation functions* that are aimed to optimize allocations during report executions. These functions superseed SCR\_malloc(), SCR\_free()...
+
+Note : WARNING: in the most recent versions of IODE, the define `RP_STDMALLOC` is set to 1. Therefore, the standard functions (SCR\_malloc()...) are used inside RP\_alloc(), RP\_free()...
+
+#### List of functions {#T29}
+
+|Syntax|Description|
+|:---|:---|
+|`char *RP_alloc(int size)`|Mimics SCR\_malloc() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
+|`int RP_free(char *ptr)`|Mimics SCR\_free() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
+|`void RP_free_bufs()`|Frees all memory buffers allocated by the RP\_ALLOCATIONS library.|
+|`char *RP_stracpy(char *ptr)`|Mimics SCR\_stracpy() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
+|`unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps)`|Mimics SCR\_vtoms() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
+|`unsigned char **RP_vtom(unsigned char* str, int sep)`|Mimics SCR\_vtom() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
+|`int RP_free_tbl(unsigned char **tbl)`|Mimics SCR\_free\_tbl() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
+|`int RP_tbl_size(unsigned char **tbl)`|Mimics SCR\_tbl\_size().|
+|`int RP_is_cmd(char *line)`|Checks that a report line is a command ($command or \#command).|
+|`U_ch **SCR_vtomsq(char* str, char* seps, int quote)`|Splits a string on one of separators. Text enclosed in quote char are not split.|
+
+## IODE Report commands {#T30}
+
+This group contains functions acting on IODE objects and/or files that are called by the report engine (see b\_rep\_syntax.c for a complete list of commands).
+
+These functions have a similar syntax and always return an integer code, 0 indicating success, other values indicating an error.
 
 They can be divided in 3 groups:
 
-- functions requiring as 2d arg an **object type** like B\_DataCreate() for the report commands $DataCreateIdt, $DataCreateVar...
-- functions requiring as 2d arg a **file type** like B\_FileDelete() for the report commands $FileDeleteCsv, $FileDeleteTxt...
-- functions with **only one arg**, like B\_DataListCount() or B\_DataCalcVar()
+- functions requiring as 2d argument an **object type** like B\_DataCreate() for the report commands $DataCreateIdt, $DataCreateVar...
+- functions requiring as 2d argument a **file type** like B\_FileDelete() for the report commands $FileDeleteCsv, $FileDeleteTxt...
+- functions with **only one argument**, like B\_DataListCount() or B\_DataCalcVar()
 
-#### Functions with an IODE object suffix (cmt, eqs...) {#T4}
+#### Functions with an IODE object suffix (cmt, eqs...) {#T31}
 
 Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate require a suffix indicating which type of objects is their target (one of the 7 IODE objects). In that way, only one function is needed for $DataDelete*Var*, $DataDelete*Idt*...
 
@@ -69,9 +500,9 @@ When called by the report engine, these functions have 2 parameters:
 For these functions, the parameters and return values are as follows:
 
 ```
-    @param [in] char*   arg     report line without the first word 
+    @param [in] char*   arg     report line without the first word
     @param [in] int     type    type of object to be manipulated (K_CMT <= type <= K_VAR)
-    @return     int             0 on success, -1 on error 
+    @return     int             0 on success, -1 on error
 ```
 
 For instance, the report command
@@ -84,11 +515,11 @@ generates the C call:
 
 ```
     B_DataDelete("A B C", K_VAR);
-    
-    where arg == "A B C" and type == K_VAR   
+ 
+    where arg == "A B C" and type == K_VAR
 ```
 
-#### Functions with a file extension suffix (csv, txt...) {#T5}
+#### Functions with a file extension suffix (csv, txt...) {#T32}
 
 The principle is the same as above but for filename extension suffix (.csv, .txt...) instead of object type suffix (.cmt...).
 
@@ -110,10 +541,10 @@ calls the C function
 ```
     B_FileDelete(arg, K_CSV);
  
-    where arg == "myfile" and type == K_VAR   
+    where arg == "myfile" and type == K_VAR
 ```
 
-#### Other functions {#T6}
+#### Other functions {#T33}
 
 All other functions receive only the argument on the report line. B\_DataListSort(), for example, has only one argument.
 
@@ -124,7 +555,7 @@ For these functions, the parameters and return values are as follows:
  @return     int             0 on success, -1 on error (not enough args for example)
 ```
 
-### List of source files {#T7}
+### List of source files {#T34}
 
 - b\_fsys.c : file manipulation \+ conversion from/to ansi\-oem\-utf8
 - b\_file.c : file manipulation
@@ -136,12 +567,13 @@ For these functions, the parameters and return values are as follows:
 - b\_est.c : estimation functions
 - b\_model.c : model simulation, decomposition and recompilation
 - b\_ws.c : functions related to WS management (clear, load, save, sample...)
+- b\_rep\_super.c: IODE report super function default implementations for non\-GUI programs
 
-### b\_fsys.c {#T8}
+### b\_fsys.c {#T35}
 
 File manipulation and conversion from/to ansi\-oem\-utf8.
 
-#### List of functions {#T9}
+#### List of functions {#T36}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -154,11 +586,11 @@ File manipulation and conversion from/to ansi\-oem\-utf8.
 |`int B_SysAnsiToOem(char *arg)`|$SysAnsiToOem inputfile outputfile|
 |`int B_SysOemToAnsi(char *arg)`|$SysOemToAnsi inputfile outputfile|
 
-### b\_file.c {#T10}
+### b\_file.c {#T37}
 
 Functions acting on files called by the report engine (see b\_rep\_syntax.c).
 
-#### List of functions {#T11}
+#### List of functions {#T38}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -166,22 +598,22 @@ Functions acting on files called by the report engine (see b\_rep\_syntax.c).
 |`int B_FileRename(char* arg, int type)`|$FileRename<type> source\_file dest\_file|
 |`int B_FileDelete(char* arg, int type)`|$FileDelete<type> file1 \[file2...\]|
 
-### b\_xode.c {#T12}
+### b\_xode.c {#T39}
 
 Report functions to import comments and variables from various non\-IODE formats.
 
-#### List of functions {#T13}
+#### List of functions {#T40}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
 |`int B_FileImportCmt(char* arg)`|$FileImportCmt format rule infile outfile language \[trace\]|
 |`int B_FileImportVar(char* arg)`|$FileImportVar format rule infile outfile from to \[trace\]$FileImportVar format rule infile outfile from to \[trace\]|
 
-### b\_htol.c {#T14}
+### b\_htol.c {#T41}
 
 Report functions to transform high periodicity to low periodicity series.
 
-#### List of functions {#T15}
+#### List of functions {#T42}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -189,7 +621,7 @@ Report functions to transform high periodicity to low periodicity series.
 |`int B_WsHtoLMean(char* arg)`|$WsHtoLMean Filename VarList|
 |`int B_WsHtoLSum(char* arg)`|$WsHtoLSum Filename VarList|
 
-### b\_ltoh.c {#T16}
+### b\_ltoh.c {#T43}
 
 Report functions to transform low periodicity series to high periodicity series (i.e. variables).
 
@@ -198,24 +630,24 @@ Two types of series are considered: stock and flow:
 - in the first case, the interpolated values are of the same order of magnitude as the original values
 - in the latter case, the values of the sub\-periods are additive over a period.
 
-#### List of functions {#T17}
+#### List of functions {#T44}
 
 |Syntax|Equivalent in Reports|||
 |:---|:---|:---|:---|
 |`int B_WsLtoHStock(char* arg)`|$WsLtoHStock \{L|C|S\} Filename VarList|
 |`int B_WsLtoHFlow(char* arg)`|$WsLtoHFlow \{L|C|S\} Filename VarList|
 
-### b\_ras.c {#T18}
+### b\_ras.c {#T45}
 
 Implementation of a RAS algorithm.
 
-#### List of functions {#T19}
+#### List of functions {#T46}
 
 |Syntax|Description|
 |:---|:---|
 |`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
 
-### b\_data.c {#T20}
+### b\_data.c {#T47}
 
 Functions acting on IODE objects called by the report engine (see b\_rep\_syntax.c) and their sub\-functions.
 
@@ -223,7 +655,7 @@ These functions all have a similar syntax and always return an integer as return
 
 There are 2 groups of functions, one where a suffix is required, one with no suffix.
 
-#### Functions with a suffix {#T21}
+#### Functions with a suffix {#T48}
 
 Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate required a suffix indicating which type of objects is the target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
 
@@ -235,7 +667,7 @@ When called by the report engine, these functions have 2 parameters:
 For these functions, the parameters and return values are as follows:
 
 ```
-@param [in] char*   arg     report line  without the command 
+@param [in] char*   arg     report line  without the command
 @param [in] int     type    type of object whose names are to be saved in the list
 @return     int             0 on success, -1 on error (not enough args)
 ```
@@ -250,10 +682,10 @@ generates the C call:
 
 ```
     B_DataDelete("A B C", K_VAR);
-    where arg == "A B C" and type == K_VAR   
+    where arg == "A B C" and type == K_VAR
 ```
 
-#### Other functions {#T22}
+#### Other functions {#T49}
 
 All other functions receive simply the argument on the report line. B\_DataListSort(), for example, has only one argument.
 
@@ -264,7 +696,7 @@ For these functions, the parameters and return values are as follows:
 @return     int             0 on success, -1 on error (not enough args)
 ```
 
-#### List of functions {#T23}
+#### List of functions {#T50}
 
 |Syntax|Description|
 |:---|:---|
@@ -289,21 +721,21 @@ For these functions, the parameters and return values are as follows:
 |`int B_DataDisplayGraph(char* arg)`|Shows VARs or combinations of VARS in graphical form.|
 |`int B_DataPrintGraph(char* arg)`|Prints VARs or combinations of VARS in graphical form.|
 
-### b\_est.c {#T24}
+### b\_est.c {#T51}
 
 Estimation functions called in IODE reports.
 
 Except for B\_EqsEstimateEqs(), all functions in this group share the same syntax:
 
 ```
-    int fn_name(char* arg) 
-    
-    where:  
-        arg is the report line (without the command name) 
+    int fn_name(char* arg)
+ 
+    where:
+        arg is the report line (without the command name)
         the return code is 0 on success, any other value indicating and error
 ```
 
-#### List of functions {#T25}
+#### List of functions {#T52}
 
 |Syntax|Description|
 |:---|:---|
@@ -315,11 +747,11 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
 |`int B_EqsSetCmt(char* arg)`|Implementation of the report function $EqsSetCmt.|
 |`int B_EqsSetInstrs(char* arg)`|Implementation of the report function $EqsSetInstrs.|
 
-### b\_model.c {#T26}
+### b\_model.c {#T53}
 
 Report functions related to model simulations.
 
-#### List of functions {#T27}
+#### List of functions {#T54}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -332,11 +764,11 @@ Report functions related to model simulations.
 |`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|
 |`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|
 
-### b\_ws.c {#T28}
+### b\_ws.c {#T55}
 
-Functions related to WS management (clear, load, save, sample, import...)
+Functions related to WS management (clear, load, save, sample, import...).
 
-#### List of functions {#T29}
+#### List of functions {#T56}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -368,5 +800,1178 @@ Functions related to WS management (clear, load, save, sample, import...)
 |`int B_CsvAxes(char *var)`|$CsvAxes AxisName|
 |`int B_CsvDec(char *dec)`|$CsvDec char|
 
-## Report functions group 3: report functions {#T30}
+### b\_rep\_super.c {#T57}
+
+Default implementation of GUI report functions (called in non\-GUI programs).
+
+In a report, the commands $WsLoadVar and \#WsLoadVar call different functions. $\-command calls a non\-GUI function, whereas the \#\-command calls a GUI function.
+
+In the table B\_fns (defined in b\_rep\_syntax.c), two different pointers are defined, one for the non GUI version ($) and one for the GUI version (\#).
+
+```
+    (*B_fns[i].fn)              Executes the no-GUI function
+    (*B_fns[i].sfn)             Executes the GUI function
+```
+
+For example, the command "\#WsLoad" calls the GUI function SB\_WsLoad() which opens the Dialog "Workspace / Load" and waits for a user action. In contrast, the command "$WsLoadVar" calls B\_WsLoad(filename, K\_VAR) which loads a WS, but without user interaction.
+
+In non\-GUI programs, a call to a GUI\-function must be replaced by a default implementation, generally a empty one.
+
+The logic is the same as the one described in k\_super.c: for each GUI\-function a default (empty) function is implemented and its pointer is set to the variable `<fn>_super`. That variable can be replaced, if needed, by assigning a new value with a GUI function.
+
+```
+int (*SB_WsLoad_super        )();
+ 
+int SB_WsLoad ()
+{
+    if(SB_WsLoad_super)
+        return(*SB_WsLoad_super         )();
+    else
+        return(0);
+}
+```
+
+In the GUI version, the function pointer SB\_WsLoad\_super should be replaced by a GUI implementation of the function.
+
+## Iode Report @\-functions {#T58}
+
+When the report engine finds a @function() in a report line, the @\-function is calculated and its result replaces "in\-place" the @function and its parameters.
+
+The available @\-functions are defined in the table `RP_FNS[]` (in b\_rep\_syntax.c), which contains the names and associated C function pointers. The functions themselves are called by RP\_fneval().
+
+#### @\-function parameters specifications {#T59}
+
+- parameters are separated by commas.
+- spaces are regular characters (and, if present, are included in the parameters)
+- parameters enclosed by double quotes "" may contain spaces or commas
+
+#### Examples {#T60}
+
+```
+      "@take(2,ABCDE)"        => "AB"
+      "@take(2, ABCDE)"       => " A"
+      "@take(3,"A,BCDE")"     => "A,B"
+```
+
+In case of error in the @function syntax, for example an illegal number of parameters, or if the @function does not exist, the text of the function remained unchanged in the report line:
+
+```
+    Correct:
+      "@take(2,ABCDE)"        => "AB"
+      "@take(2,"A,BCDE")"     => "A,"
+    Incorrect:
+      "@take(2,A,BCDE)"       => "@take(2,A,BCDE)"
+      "@takes(2,A)"           => "@takes(2,A)"
+```
+
+Each function in this group must have the same syntax:
+
+```
+    U_ch* function_name(U_ch** arg)
+ 
+    @param [in] U_ch**   arg    List of arguments of the function (sep = ',')
+    @return     U_ch*           allocated string containing the computed value of the function
+                                NULL on error
+```
+
+To add a new @function:
+
+- create the function based on an existing one. The syntax must be identical
+- add the function name / pointer to the table RP\_FNS\[\] (see at the end of the current file).
+
+More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions\_de\_rapports
+
+#### List of functions {#T61}
+
+|Syntax|
+|:---|
+|`U_ch *RPF_take(U_ch** args)`|
+|`U_ch *RPF_drop(U_ch** args)`|
+|`U_ch *RPF_replace(U_ch** args)`|
+|`U_ch *RPF_equal(U_ch** args)`|
+|`U_ch *RPF_upper(U_ch** args)`|
+|`U_ch *RPF_lower(U_ch** args)`|
+|`U_ch *RPF_sqz(U_ch** args)`|
+|`U_ch *RPF_strip(U_ch** args)`|
+|`U_ch *RPF_fmtint(U_ch** args)`|
+|`U_ch *RPF_ansi(U_ch** args)`|
+|`U_ch *RPF_count(U_ch** args)`|
+|`U_ch *RPF_index(U_ch** args)`|
+|`U_ch *RPF_void(U_ch **args)`|
+|`U_ch *RPF_date(U_ch** args)`|
+|`U_ch *RPF_time(U_ch** args)`|
+|`U_ch *RPF_month(U_ch** args)`|
+|`U_ch *RPF_sstderr(U_ch** args)`|
+|`U_ch *RPF_srelax(U_ch** args)`|
+|`U_ch *RPF_ttitle(U_ch** args)`|
+|`U_ch *RPF_cvalue(U_ch** args)`|
+|`U_ch *RPF_vvalue(U_ch** args)`|
+|`U_ch *RPF_lvalue(U_ch** args)`|
+|`U_ch *RPF_ivalue(U_ch** args)`|
+|`U_ch *RPF_evalue(U_ch** args)`|
+|`U_ch *RPF_eqsample(U_ch** args)`|
+|`U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)`|
+|`U_ch *RPF_eqsamplefrom(U_ch **args)`|
+|`U_ch *RPF_eqsampleto(U_ch **args)`|
+|`U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)`|
+|`U_ch *RPF_eqlhs(U_ch **args)`|
+|`U_ch *RPF_eqrhs(U_ch **args)`|
+|`U_ch *RPF_sample(U_ch** args)`|
+|`int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)`|
+|`U_ch *RPF_vsliste(U_ch** args, int type)`|
+|`U_ch **RPF_unique(U_ch** tbl)`|
+|`U_ch *RPF_vliste(U_ch** args)`|
+|`U_ch *RPF_sliste(U_ch** args)`|
+|`U_ch *RPF_expand(U_ch** args, int type)`|
+|`U_ch *RPF_cexpand(U_ch **args)`|
+|`U_ch *RPF_eexpand(U_ch **args)`|
+|`U_ch *RPF_iexpand(U_ch **args)`|
+|`U_ch *RPF_lexpand(U_ch **args)`|
+|`U_ch *RPF_sexpand(U_ch **args)`|
+|`U_ch *RPF_texpand(U_ch **args)`|
+|`U_ch *RPF_vexpand(U_ch **args)`|
+|`int RPF_CalcPeriod(U_ch** args)`|
+|`U_ch *RPF_SimNorm(U_ch** args)`|
+|`U_ch *RPF_SimNIter(U_ch** args)`|
+|`U_ch *RPF_SimMaxit()`|
+|`U_ch *RPF_SimEps()`|
+|`U_ch *RPF_SimRelax()`|
+|`U_ch *RPF_vtake(U_ch** args)`|
+|`U_ch *RPF_vdrop(U_ch** args)`|
+|`U_ch *RPF_vcount(U_ch** args)`|
+|`U_ch *RPF_memory(U_ch** args)`|
+|`U_ch *RPF_ChronoReset()`|
+|`U_ch *RPF_ChronoGet()`|
+|`U_ch *RPF_fappend(U_ch** args)`|
+|`U_ch *RPF_fdelete(U_ch** args)`|
+|`U_ch *RPF_getdir()`|
+|`U_ch *RPF_chdir(U_ch **args)`|
+|`U_ch *RPF_mkdir(U_ch **args)`|
+|`U_ch *RPF_rmdir(U_ch **args)`|
+
+## Example of report with @\-functions {#T62}
+
+### Report {#T63}
+
+```
+    $ `@-functions()` tests and examples
+    $ --------------------------------
+    $ Syntax: rep_fns input_dir output_dir
+    $ Example: rep_fns data output
+ 
+    $debug 1
+    $indent
+    $goto continue {%0% >= 2}
+        $show Syntax: rep_fns input_dir output_dir
+        $show Syntax error. Report aborted.
+        $return
+    $label continue
+    $define input_dir %1%
+    $define output_dir %2%
+    $label continue
+ 
+    $PrintDest %output_dir%\rep_fns.a2m A2M
+ 
+    STRINGS
+    =======
+ 
+    `@take()`
+    `-------`
+        Success
+            `@take(2,ABCDE)`        => "@take(2,ABCDE)"
+            `@take(-2,ABCDE)`       => "@take(-2,ABCDE)"
+            `@take(2, ABCDE)`       => "@take(2, ABCDE)"
+            `@take(0,ABCDE)`        => "@take(0,ABCDE)"
+            `@take(2,"A,B,C,D,E")`  => "@take(2,"A,B,C,D,E")"
+ 
+        Errors (#parms <> 2)
+            `@take(2,A,B,C,D,E)`    => "@take(2,A,B,C,D,E)"
+            `@take(2,A,BCDE)`       => "@take(2,A,BCDE)"
+ 
+    `@drop()`
+    `-------`
+        Success
+            `@drop(2,ABCDE)      `  => "@drop(2,ABCDE)"
+            `@drop(-1,ABCDE)     `  => "@drop(-1,ABCDE)"
+            `@drop(2, ABCDE)     `  => "@drop(2, ABCDE)"
+            `@drop(0,ABCDE)      `  => "@drop(0,ABCDE)"
+            `@drop(2,"A,B,C,D,E")`  => "@drop(2,"A,B,C,D,E")"
+            `@DROP(2,A)          `  => "@DROP(2,A)"
+            `@drop(3, "a bc")    `  => "@drop(3, "a bc")"
+ 
+        Error (#parms <> 2)
+            `@drop(2,A,B,C,D,E)`    => "@drop(2,A,B,C,D,E)"
+            `@drop(2,A,BCDE)`       => "@drop(2,A,BCDE)"
+            `@drop(n,ABCDE)`        => "@drop(n,ABCDE)"
+ 
+    `@replace()`
+    `----------`
+        Success
+            `@replace(Buro du Plan,Buro,Bureau)`            => @replace(Buro du Plan,Buro,Bureau)
+            `@replace(Buro du Buro du Plan,Buro,Bureau)`    => @replace(Buro du Buro du Plan,Buro,Bureau)
+            `@replace(Bureauplan,plan, du Plan)`            => @replace(Bureauplan,plan, du Plan)
+            `@replace("Bureau, du Plan",",","") `           => @replace("Bureau, du Plan",",","")
+            `@replace("Bureau, du Plan", ",", "") `         => @replace("Bureau, du Plan", ",", "")
+ 
+        Error
+            `@replace(Buro plan,Bureau du Plan)`            => @replace(Buro plan,Bureau du Plan)
+            `@replace(AB,B,C,D)`                            => @replace(AB,B,C,D)
+ 
+    `@equal()`
+    `--------`
+            `@equal(aa,aa)      `   =>  "@equal(aa,aa)"
+            `@equal(aa, aa)     `   =>  "@equal(aa, aa)"
+            `@equal(aa,bb)      `   =>  "@equal(aa,bb)"
+            `@equal(aa,aa,aa)   `   =>  "@equal(aa,aa,aa)"
+ 
+    `@upper()`
+    `-------
+            `@upper(ab cd,ef)    `  =>  "@upper(ab cd,ef)"
+            `@upper(AB)          `  =>  "@upper(AB)"
+            `@upper("abc", "def")`  =>  "@upper("abc", "def")"
+            `@upper("abc","def") `  =>  "@upper("abc","def")"
+ 
+    `@lower()`
+    `-------
+            `@lower(ab cd,ef)    `  =>  "@lower(ab cd,ef)"
+            `@lower(AB)          `  =>  "@lower(AB)"
+            `@lower("abc", "def")`  =>  "@lower("abc", "def")"
+            `@lower("abc","def") `  =>  "@lower("abc","def")"
+ 
+    `@sqz()`
+    `------`
+            `@sqz( ab    cd )`      =>  "@sqz( ab    cd )"
+            `@sqz(" ab    cd ")`    =>  "@sqz(" ab    cd ")"
+            `@sqz( ab,"  cd", ef)`  =>  "@sqz( ab,"  cd", ef)"
+            `@sqz( ab, " cd", ef)`  =>  "@sqz( ab, " cd", ef)"
+ 
+    `@strip()`
+    `--------`
+            `@strip( ab    cd )`      =>  "@strip( ab    cd )"
+            `@strip(" ab    cd ")`    =>  "@strip(" ab    cd ")"
+            `@strip( ab,"  cd", ef)`  =>  "@strip( ab,"  cd", ef)"
+            `@strip( ab, " cd", ef)`  =>  "@strip( ab, " cd", ef)"
+ 
+ 
+    `@fmt()  `
+    `--------`
+            `@fmt(123456)              ` -> "@fmt(123456)"
+            `@fmt(123456,99999999)     ` -> "@fmt(123456,99999999)"
+            `@fmt(123456,999)          ` -> "@fmt(123456,999)"
+            `@fmt(123.456,999999)      ` -> "@fmt(123.456,999999)"
+            `@fmt(123456,00999999)     ` -> "@fmt(123456,00999999)"
+            `@fmt(123456,"ABC999,999Z")` -> "@fmt(123,"ABC999,999Z")"
+            `@fmt(123456,ABC999999Z)   ` -> "@fmt(123,ABC999999Z)"
+ 
+ 
+    TIME & DATE
+    -----------
+ 
+    Tests of @date and @time were cancelled due to impossible comparison... Time flies...
+ 
+    `@date()`
+    `-------`
+            `@date()            `   =>  `"@date()"              `
+            `@date(dd-mm-yyyy)  `   =>  `"@date(dd-mm-yyyy)"    `
+            `@date(dd-mm-yy)    `   =>  `"@date(dd-mm-yy)"      `
+            `@date(d-m-y)       `   =>  `"@date(d-m-y)"         `
+            `@date(yy/mm/dd)    `   =>  `"@date(yy/mm/dd)"      `
+            `@date(mm/dd/yyyy)  `   =>  `"@date(mm/dd/yyyy)"    `
+            `@date(mm/xxxx/zzzz)`   =>  `"@date(mm/xxxx/zzzz)"  `
+ 
+    `@time()`
+    `-------
+            `@time()            `   =>  `"@time()"              `
+            `@time(hh:mm:ss)    `   =>  `"@time(hh:mm:ss)"      `
+            `@time(hhhh:mm)     `   =>  `"@time(hhhh:mm)"       `
+            `@time(xxx:mm/dd)   `   =>  `"@time(xxx:mm/dd)"     `
+ 
+    `@month()       `
+    `--------`
+            `@month(1)  `           =>  "@month(1)"
+            `@month(1,F)`           =>  "@month(1,F)"
+            `@month(1,e)`           =>  "@month(1,e)"
+            `@month(1,N)`           =>  "@month(1,N)"
+ 
+    FILES
+    -----
+ 
+    `@fdelete()     `
+    `--------`
+            `@fdelete(essais.txt)`  =>  "@fdelete(essais.txt)"
+ 
+    `@fappend()     `
+    `--------`
+            `@fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)`  =>  "@fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)"
+ 
+ 
+    # OBJECTS
+    # -------
+ 
+    $ Load objects
+    $WsLoadCmt %input_dir%\fun
+    $WsLoadEqs %input_dir%\fun
+    $WsLoadIdt %input_dir%\fun
+    $WsLoadLst %input_dir%\fun
+    $WsLoadScl %input_dir%\fun
+    $WsLoadTbl %input_dir%\fun
+    $WsLoadVar %input_dir%\fun
+ 
+ 
+    `@sstderr()   `
+    `----------`
+            `@sstderr(acaf1)`               =>  "@sstderr(acaf1)"
+            `@sstderr(acaf1,xyz,acaf3)`     =>  "@sstderr(acaf1,xyz,acaf3)"
+            `@sstderr(acaf1,acaf2, acaf3)`  =>  "@sstderr(acaf1,acaf2, acaf3)"
+ 
+    `@srelax()   `
+    `---------`
+            `@srelax(acaf1)`                =>  "@srelax(acaf1)"
+            `@srelax(acaf1,xyz,acaf3)`      =>  "@srelax(acaf1,xyz,acaf3)"
+            `@srelax(acaf1,acaf2, acaf3)`   =>  "@srelax(acaf1,acaf2, acaf3)"
+ 
+    `@ttitle()      `
+    `--------`
+            `@ttitle(C8_1)       `          =>  "@ttitle(C8_1)"
+            `@ttitle( c8_10)     `          =>  "@ttitle( c8_10)"
+            `@ttitle(C8_1 c8_10) `          =>  "@ttitle(C8_1 c8_10)"
+            `@ttitle(C8_1, c8_10)`          =>  "@ttitle(C8_1, c8_10)"
+            `@ttitle(XXX)        `          =>  "@ttitle(XXX)"
+ 
+    `@cvalue()      `
+    `--------`
+            `@cvalue(acaf)      `           =>  "@cvalue(acaf)"
+            `@cvalue(ACAF)      `           =>  "@cvalue(ACAF)"
+            `@cvalue(ACAG)      `           =>  "@cvalue(ACAG)"
+            `@cvalue(ACAF,ACAG) `           =>  "@cvalue(ACAF,ACAG)"
+ 
+    `@vvalue()      `
+    `--------`
+            `@vvalue(acaf)      `           =>  "@vvalue(acaf)"
+            `@vvalue(ACAF)      `           =>  "@vvalue(ACAF)"
+            `@vvalue(ACAG)      `           =>  "@vvalue(ACAG)"
+            `@vvalue(ACAF,ACAG) `           =>  "@vvalue(ACAF,ACAG)"
+            `@vvalue(XXX)       `           =>  "@vvalue(XXX)"
+            `@vvalue()          `           =>  "@vvalue()"
+ 
+ 
+    `@lvalue()      `
+    `--------`
+            `@lvalue(endo)         `        =>  "@lvalue(endo)"
+            `@lvalue(ENDO)         `        =>  "@lvalue(ENDO)"
+            `@lvalue(_SEARCH,XENVI)`        =>  "@lvalue(_SEARCH,XENVI)"
+            `@lvalue(XXX)          `        =>  "@lvalue(XXX)"
+            `@lvalue()             `        =>  "@lvalue()"
+ 
+    `@ivalue()      `
+    `--------`
+            `@ivalue(FLGR)          `       =>  "@ivalue(FLGR)"
+            `@ivalue(FLGR,IUGR)     `       =>  "@ivalue(FLGR,IUGR)"
+            `@ivalue(flgr)          `       =>  "@ivalue(flgr)"
+            `@ivalue(XXX)           `       =>  "@ivalue(XXX)"
+            `@ivalue()              `       =>  "@ivalue()"
+ 
+    `@evalue()      `
+    `--------`
+            `@evalue(ACAF)          `       =>  "@evalue(ACAF)"
+            `@evalue(brugp)         `       =>  "@evalue(brugp)"
+            `@evalue(acaf,brugp)    `       =>  "@evalue(acaf,brugp)"
+            `@evalue(XXX)           `       =>  "@evalue(XXX)"
+            `@evalue()              `       =>  "@evalue()"
+ 
+    `@eqsample()    `
+    `--------`
+            `@eqsample(ACAF)        `       =>  "@eqsample(ACAF)"
+            `@eqsample(ACAF,ACAG)   `       =>  "@eqsample(ACAF,ACAG)"
+            `@eqsample(XXX)         `       =>  "@eqsample(XXX)"
+            `@eqsample()            `       =>  "@eqsample()"
+ 
+    `@eqsamplefrom()`
+    `--------`
+            `@eqsamplefrom(ACAF)    `       =>  "@eqsamplefrom(ACAF)"
+            `@eqsamplefrom(XXX)     `       =>  "@eqsamplefrom(XXX)"
+            `@eqsamplefrom()        `       =>  "@eqsamplefrom()"
+ 
+    `@eqsampleto()  `
+    `--------`
+            `@eqsampleto(ACAF)      `       =>  "@eqsampleto(ACAF)"
+            `@eqsampleto(XXX)       `       =>  "@eqsampleto(XXX)"
+            `@eqsampleto()          `       =>  "@eqsampleto()"
+ 
+    `@eqlhs()       `
+    `--------`
+            `@eqlhs(ACAF)      `       =>  "@eqlhs(ACAF)"
+            `@eqlhs(ACAF,ACAG) `       =>  "@eqlhs(ACAF,ACAG)"
+            `@eqlhs(XXX)       `       =>  "@eqlhs(XXX)"
+            `@eqlhs()          `       =>  "@eqlhs()"
+ 
+    `@eqrhs()       `
+    `--------`
+            `@eqrlhs(ACAF)      `       =>  "@eqrhs(ACAF)"
+            `@eqrlhs(ACAF,ACAG) `       =>  "@eqrhs(ACAF,ACAG)"
+            `@eqrlhs(XXX)       `       =>  "@eqrhs(XXX)"
+            `@eqrlhs()          `       =>  "@eqrhs()"
+ 
+    `@count()       `
+    `--------`
+            `@count(ACAF,ACAG) `        =>  "@count(ACAF,ACAG)"
+            `@count(ACAF;ACAG) `        =>  "@count(ACAF;ACAG)"
+            `@count()          `        =>  "@count()"
+ 
+    `@index()       `
+    `--------`
+            `@index(0,A,B,C) `          =>  "@index(0,A,B,C)"
+            `@index(2,A,B,C) `          =>  "@index(2,A,B,C)"
+            `@index(4,A,B,C) `          =>  "@index(4,A,B,C)"
+            `@index(1,A;B;C) `          =>  "@index(1,A;B;C)"
+            `@index(A;B;C)   `          =>  "@index(A;B;C)"
+            `@index()        `          =>  "@index()"
+ 
+ 
+    `@sample()      `
+    `--------`
+            `@sample()  `               =>  "@sample()"
+            `@sample(B) `               =>  "@sample(B)"
+            `@sample(E) `               =>  "@sample(E)"
+            `@sample(X) `               =>  "@sample(X)"
+ 
+ 
+ 
+ 
+    `@vliste()      `
+    `--------`
+            `@vliste(ACAF) `            =>  "@vliste(ACAF)"
+            `@vliste(ACAF,ACAG) `       =>  "@vliste(ACAF,ACAG)"
+ 
+ 
+    `@sliste()      `
+    `--------`
+            `@sliste(ACAF) `            =>  "@sliste(ACAF)"
+            `@sliste(ACAF,ACAG) `       =>  "@sliste(ACAF,ACAG)"
+ 
+    `@cexpand()     `
+    `--------`
+            `@cexpand(AC*)    `       =>  "@cexpand(AC*)"
+            `@cexpand(*U)     `       =>  "@cexpand(*U)"
+            `@cexpand(AC*,*U) `       =>  "@cexpand(AC*,*U)"
+            `@cexpand()       `       =>  "@cexpand()"
+ 
+ 
+    `@eexpand()     `
+    `--------`
+            `@eexpand(AC*)    `       =>  "@eexpand(AC*)"
+            `@eexpand(*U)     `       =>  "@eexpand(*U)"
+            `@eexpand(AC*,*U) `       =>  "@eexpand(AC*,*U)"
+            `@eexpand()       `       =>  "@eexpand()"
+ 
+    `@iexpand()     `
+    `--------`
+            `@iexpand(AC*)    `       =>  "@iexpand(AC*)"
+            `@iexpand(*U)     `       =>  "@iexpand(*U)"
+            `@iexpand(AC*,*U) `       =>  "@iexpand(AC*,*U)"
+            `@iexpand()       `       =>  "@iexpand()"
+ 
+    `@lexpand()     `
+    `--------`
+            `@lexpand(AC*)    `       =>  "@lexpand(AC*)"
+            `@lexpand(*0)     `       =>  "@lexpand(*0)"
+            `@lexpand(AC*,*0) `       =>  "@lexpand(AC*,*0)"
+            `@lexpand()       `       =>  "@lexpand()"
+ 
+    `@sexpand()     `
+    `--------`
+            `@sexpand(AC*)    `       =>  "@sexpand(AC*)"
+            `@sexpand(ac*)    `       =>  "@sexpand(ac*)"
+            `@sexpand(*4)     `       =>  "@sexpand(*4)"
+            `@sexpand(AC*,*4) `       =>  "@sexpand(AC*,*4)"
+            `@sexpand()       `       =>  "@sexpand()"
+ 
+    `@texpand()     `
+    `----------`
+            `@texpand(AC*)    `       =>  "@texpand(AC*)"
+            `@texpand(*U)     `       =>  "@texpand(*U)"
+            `@texpand(AC*,*U) `       =>  "@texpand(AC*,*U)"
+            `@texpand()       `       =>  "@texpand()"
+ 
+    `@vexpand()     `
+    `----------`
+            `@vexpand(AC*)    `       =>  "@vexpand(AC*)"
+            `@vexpand(*U)     `       =>  "@vexpand(*U)"
+            `@vexpand(AC*,*U) `       =>  "@vexpand(AC*,*U)"
+            `@vexpand()       `       =>  "@vexpand()"
+ 
+    # SIMULATIONS
+    # -----------
+ 
+    $ModelSimulateParms 0.0001 0.7 100 Both 0 no no 5
+    $ModelSimulate 2000Y1 2001Y1
+ 
+    `@SimMaxit()    `
+    `-----------`
+            `@SimMaxit()   `          =>  "@SimMaxit()"
+ 
+    `@SimEps()      `
+    `---------`
+            `@SimEps()   `            =>  "@SimEps()"
+ 
+    `@SimRelax()    `
+    `-----------`
+            `@SimRelax()   `          =>  "@SimRelax()"
+ 
+    `@SimNorm()     `
+    `----------`
+            `@SimNorm(2000Y1)   `     =>  "@SimNorm(2000Y1)"
+            `@SimNorm(2001Y1)   `     =>  "@SimNorm(2001Y1)"
+            `@SimNorm(2002Y1)   `     =>  "@SimNorm(2002Y1)"
+            `@SimNorm(1990Y1)   `     =>  "@SimNorm(1990Y1)"
+ 
+    `@SimNIter()    `
+    `-----------`
+            `@SimNiter(2000Y1)   `    =>  "@SimNiter(2000Y1)"
+            `@SimNiter(2001Y1)   `    =>  "@SimNiter(2001Y1)"
+            `@SimNiter(2002Y1)   `    =>  "@SimNiter(2002Y1)"
+            `@SimNiter(1990Y1)   `    =>  "@SimNiter(1990Y1)"
+ 
+ 
+    `@vtake()       `
+    `--------`
+            `@vtake(2,A,B,C,D,E)   `  =>  "@vtake(2,A,B,C,D,E)"
+            `@vtake(-1;A;B;C;D;E)  `  =>  "@vtake(-1;A;B;C;D;E)"
+            `@vtake(3 A B)  `         =>  "@vtake(3 A B)"
+            `@vtake(3,A,"B C")  `     =>  "@vtake(3,A,"B C")"
+            `@vtake(A,B)  `           =>  "@vtake(A,B)"
+            `@vtake()  `              =>  "@vtake()"
+ 
+ 
+    `@vdrop()       `
+    `--------`
+            `@vdrop(2,A,B,C,D,E)   `  =>  "@vdrop(2,A,B,C,D,E)"
+            `@vdrop(-1;A;B;C;D;E)  `  =>  "@vdrop(-1;A;B;C;D;E)"
+            `@vdrop(3 A B)  `         =>  "@vdrop(3 A B)"
+            `@vdrop(A,B)  `           =>  "@vdrop(A,B)"
+            `@vdrop()  `              =>  "@vdrop()"
+ 
+    `@vcount()      `
+    `--------`
+            `@vcount(A,B,C,D,E)   `   =>  "@vcount(A,B,C,D,E)"
+            `@vcount(C;D;E)       `   =>  "@vcount(C;D;E)"
+            `@vcount(3 A B)       `   =>  "@vcount(3 A B)"
+            `@vcount(3 "A B")     `   =>  "@vcount(3,"A B")"
+            `@vcount()            `   =>  "@vcount()"
+ 
+    # SYSTEM
+    # ------
+ 
+    `@memory()      `
+    `---------`
+            `@memory()  `               =>  "...unstable..."
+ 
+    `@ChronoReset() `
+    `--------------`
+            `@chronoreset()`            =>  "@chronoreset()"
+ 
+    `@ChronoGet()   `
+    `------------`
+            `@chronoget()`              =>  "@chronoget()"
+ 
+ 
+ 
+    `@getdir()      `
+    `---------`
+            `@getdir()`                 =>  "...unstable..."
+ 
+    `@mkdir()       `
+    `--------`
+            `@mkdir(testdir)`           =>  "@mkdir(testdir)"
+            `@mkdir(testdir)`           =>  "@mkdir(testdir)"
+            `@getdir()      `           =>  "...unstable..."
+            `@chdir(testdir)`           =>  "...unstable..."
+            `@getdir()      `           =>  "...unstable..."
+ 
+    `@chdir()       `
+    `--------`
+            `@chdir(..)`                =>  "...unstable..."
+            `@getdir()`                 =>  "...unstable..."
+ 
+    `@rmdir()       `
+    `--------`
+            `@getdir()      `           =>  "...unstable..."
+            `@mkdir(testdir)`           =>  "@mkdir(testdir)"
+            `@chdir(testdir)`           =>  "...unstable..."
+            `@chdir(..)`                =>  "...unstable..."
+            `@rmdir(testdir)`           =>  "@rmdir(testdir)"
+ 
+    `@void()        `
+    `-------`
+            `@void(ABC,DEF,G)      `    =>  "@void(ABC,DEF,G)"
+            `@void(@getdir())      `    =>  "@void(@getdir())"
+            `@void(@vexpand(*))    `    =>  "@void(@vexpand(*))"
+ 
+    $return
+```
+
+### Resulting a2m file {#T64}
+
+```
+    STRINGS
+    =======
+ 
+    @take()
+    -------
+        Success
+            @take(2,ABCDE)        => "AB"
+            @take(-2,ABCDE)       => "DE"
+            @take(2, ABCDE)       => " A"
+            @take(0,ABCDE)        => ""
+            @take(2,"A,B,C,D,E")  => "A,"
+ 
+        Errors (#parms <> 2)
+            @take(2,A,B,C,D,E)    => "@take(2,A,B,C,D,E)"
+            @take(2,A,BCDE)       => "@take(2,A,BCDE)"
+ 
+    @drop()
+    -------
+        Success
+            @drop(2,ABCDE)        => "CDE"
+            @drop(-1,ABCDE)       => "ABCD"
+            @drop(2, ABCDE)       => "BCDE"
+            @drop(0,ABCDE)        => "ABCDE"
+            @drop(2,"A,B,C,D,E")  => "B,C,D,E"
+            @DROP(2,A)            => ""
+            @drop(3, "a bc")      => " bc""
+ 
+        Error (#parms <> 2)
+            @drop(2,A,B,C,D,E)    => "@drop(2,A,B,C,D,E)"
+            @drop(2,A,BCDE)       => "@drop(2,A,BCDE)"
+            @drop(n,ABCDE)        => "ABCDE"
+ 
+    @replace()
+    ----------
+        Success
+            @replace(Buro du Plan,Buro,Bureau)            => Bureau du Plan
+            @replace(Buro du Buro du Plan,Buro,Bureau)    => Bureau du Bureau du Plan
+            @replace(Bureauplan,plan, du Plan)            => Bureau du Plan
+            @replace("Bureau, du Plan",",","")            => Bureau du Plan
+            @replace("Bureau, du Plan", ",", "")          => Bureau, du Plan
+ 
+        Error
+            @replace(Buro plan,Bureau du Plan)            => @replace(Buro plan,Bureau du Plan)
+            @replace(AB,B,C,D)                            => @replace(AB,B,C,D)
+ 
+    @equal()
+    --------
+            @equal(aa,aa)         =>  "1"
+            @equal(aa, aa)        =>  "0"
+            @equal(aa,bb)         =>  "0"
+            @equal(aa,aa,aa)      =>  "0"
+ 
+    @upper()
+    ------
+            @upper(ab cd,ef)      =>  "AB CD EF"
+            @upper(AB)            =>  "AB"
+            @upper("abc", "def")  =>  "ABC  "DEF""
+            @upper("abc","def")   =>  "ABC DEF"
+ 
+    @lower()
+    ------
+            @lower(ab cd,ef)      =>  "ab cd ef"
+            @lower(AB)            =>  "ab"
+            @lower("abc", "def")  =>  "abc  "def""
+            @lower("abc","def")   =>  "abc def"
+ 
+    @sqz()
+    ------
+            @sqz( ab    cd )      =>  "abcd"
+            @sqz(" ab    cd ")    =>  "abcd"
+            @sqz( ab,"  cd", ef)  =>  "abcdef"
+            @sqz( ab, " cd", ef)  =>  "ab"cd"ef"
+ 
+    @strip()
+    --------
+            @strip( ab    cd )      =>  " ab    cd"
+            @strip(" ab    cd ")    =>  " ab    cd"
+            @strip( ab,"  cd", ef)  =>  " ab   cd  ef"
+            @strip( ab, " cd", ef)  =>  " ab  " cd"  ef"
+ 
+ 
+    @fmt()
+    --------
+            @fmt(123456)               -> "123456"
+            @fmt(123456,99999999)      -> "  123456"
+            @fmt(123456,999)           -> "456"
+            @fmt(123.456,999999)       -> "   123"
+            @fmt(123456,00999999)      -> "00123456"
+            @fmt(123456,"ABC999,999Z") -> "ABC   ,123Z"
+            @fmt(123456,ABC999999Z)    -> "ABC   123Z"
+ 
+ 
+    TIME and DATE
+    -------------
+ 
+    Tests of @date and @time were cancelled due to impossible comparison... Time flies...
+ 
+    @date()
+    -------
+            @date()               =>  "@date()"
+            @date(dd-mm-yyyy)     =>  "@date(dd-mm-yyyy)"
+            @date(dd-mm-yy)       =>  "@date(dd-mm-yy)"
+            @date(d-m-y)          =>  "@date(d-m-y)"
+            @date(yy/mm/dd)       =>  "@date(yy/mm/dd)"
+            @date(mm/dd/yyyy)     =>  "@date(mm/dd/yyyy)"
+            @date(mm/xxxx/zzzz)   =>  "@date(mm/xxxx/zzzz)"
+ 
+    @time()
+    ------
+            @time()               =>  "@time()"
+            @time(hh:mm:ss)       =>  "@time(hh:mm:ss)"
+            @time(hhhh:mm)        =>  "@time(hhhh:mm)"
+            @time(xxx:mm/dd)      =>  "@time(xxx:mm/dd)"
+ 
+    @month()
+    --------
+            @month(1)             =>  "Janvier"
+            @month(1,F)           =>  "Janvier"
+            @month(1,e)           =>  "January"
+            @month(1,N)           =>  "Januari"
+ 
+    FILES
+    -----
+ 
+    @fdelete()
+    --------
+            @fdelete(essais.txt)  =>  ""
+ 
+    @fappend()
+    --------
+            @fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)  =>  ""
+ 
+ 
+ 
+ 
+ 
+    @sstderr()
+    ----------
+            @sstderr(acaf1)               =>  "0.001369"
+            @sstderr(acaf1,xyz,acaf3)     =>  "0.001369 -- 0.873010"
+            @sstderr(acaf1,acaf2, acaf3)  =>  "0.001369 0.000001 0.873010"
+ 
+    @srelax()
+    ---------
+            @srelax(acaf1)                =>  "1.000000"
+            @srelax(acaf1,xyz,acaf3)      =>  "1.000000 -- 1.000000"
+            @srelax(acaf1,acaf2, acaf3)   =>  "1.000000 1.000000 1.000000"
+ 
+    @ttitle()
+    --------
+            @ttitle(C8_1)                 =>  "D  terminants de l'output potentiel"
+            @ttitle( c8_10)               =>  "Coin salarial parafiscal"
+            @ttitle(C8_1 c8_10)           =>  "Table C8_1 c8_10 not found"
+            @ttitle(C8_1, c8_10)          =>  "D  terminants de l'output potentiel
+    Coin salarial parafiscal"
+            @ttitle(XXX)                  =>  "Table XXX not found"
+ 
+    @cvalue()
+    --------
+            @cvalue(acaf)                 =>  "Cmt acaf not found"
+            @cvalue(ACAF)                 =>  "Ondernemingen: ontvangen kapitaaloverdrachten."
+            @cvalue(ACAG)                 =>  "Totale overheid: netto ontvangen kapitaaloverdrachten."
+            @cvalue(ACAF,ACAG)            =>  "Ondernemingen: ontvangen kapitaaloverdrachten.;Totale overheid: netto ontvangen kapitaaloverdrachten."
+ 
+    @vvalue()
+    --------
+            @vvalue(acaf)                 =>  "na  na  na  na  na  na  na  na  na  na  1.2130001  5.2020001  9.184  8.0790005  11.332  13.518001  15.784  16.544001  21.489  20.281  21.277  32.417999  24.446999  27.025002  24.504  27.560999  25.542  27.499001  25.353001  17.165001  23.771  26.240999  30.159  34.661999  8.1610022  -13.130997  32.171001  39.935799  29.645657  13.530404919696  10.0466107922005  2.86792273645546  -0.929212509051645  -6.09156498756888  -14.5820944628981  -26.5387895697886  -28.9872879825975  -33.3784257842954  -38.4095177823974  -37.4635096412738  -37.8274288322944  -44.5447926335432  -55.5592898172187  -68.8946543226201  -83.3406251108009  -96.4104198284833  "
+            @vvalue(ACAF)                 =>  "na  na  na  na  na  na  na  na  na  na  1.2130001  5.2020001  9.184  8.0790005  11.332  13.518001  15.784  16.544001  21.489  20.281  21.277  32.417999  24.446999  27.025002  24.504  27.560999  25.542  27.499001  25.353001  17.165001  23.771  26.240999  30.159  34.661999  8.1610022  -13.130997  32.171001  39.935799  29.645657  13.530404919696  10.0466107922005  2.86792273645546  -0.929212509051645  -6.09156498756888  -14.5820944628981  -26.5387895697886  -28.9872879825975  -33.3784257842954  -38.4095177823974  -37.4635096412738  -37.8274288322944  -44.5447926335432  -55.5592898172187  -68.8946543226201  -83.3406251108009  -96.4104198284833  "
+            @vvalue(ACAG)                 =>  "na  na  na  na  na  na  na  na  na  na  -11.028999  -15.847  -19.288002  -21.814999  -25.447002  -24.618999  -27.770998  -28.839001  -29.434998  -30.411001  -30.353001  -41.060997  -31.178001  -32.604  -30.237003  -38.061001  -31.939999  -35.59  -37.238003  -25.991001  -28.1721855713507  -30.934  -40.285999  -43.157997  -16.029003  -41.845993  -40.237  -32.93  -38.345695  -39.8581741316036  -41.534786567348  18.9398011359783  19.9808148751188  21.0205021787734  22.0664755229642  23.1079621640615  24.1296371451098  25.1609090496654  26.1921114843413  27.2299551185986  28.2539289782105  29.2846003640349  30.3239611503116  31.3701388106954  32.4202988291984  33.469601344881  "
+            @vvalue(ACAF,ACAG)            =>  "na  na  na  na  na  na  na  na  na  na  1.2130001  5.2020001  9.184  8.0790005  11.332  13.518001  15.784  16.544001  21.489  20.281  21.277  32.417999  24.446999  27.025002  24.504  27.560999  25.542  27.499001  25.353001  17.165001  23.771  26.240999  30.159  34.661999  8.1610022  -13.130997  32.171001  39.935799  29.645657  13.530404919696  10.0466107922005  2.86792273645546  -0.929212509051645  -6.09156498756888  -14.5820944628981  -26.5387895697886  -28.9872879825975  -33.3784257842954  -38.4095177823974  -37.4635096412738  -37.8274288322944  -44.5447926335432  -55.5592898172187  -68.8946543226201  -83.3406251108009  -96.4104198284833  ;na  na  na  na  na  na  na  na  na  na  -11.028999  -15.847  -19.288002  -21.814999  -25.447002  -24.618999  -27.770998  -28.839001  -29.434998  -30.411001  -30.353001  -41.060997  -31.178001  -32.604  -30.237003  -38.061001  -31.939999  -35.59  -37.238003  -25.991001  -28.1721855713507  -30.934  -40.285999  -43.157997  -16.029003  -41.845993  -40.237  -32.93  -38.345695  -39.8581741316036  -41.534786567348  18.9398011359783  19.9808148751188  21.0205021787734  22.0664755229642  23.1079621640615  24.1296371451098  25.1609090496654  26.1921114843413  27.2299551185986  28.2539289782105  29.2846003640349  30.3239611503116  31.3701388106954  32.4202988291984  33.469601344881  "
+            @vvalue(XXX)                  =>  "VAR XXX not found"
+            @vvalue()                     =>  "@vvalue()"
+ 
+ 
+    @lvalue()
+    --------
+            @lvalue(endo)                 =>  "$endo0,$endo1,"
+            @lvalue(ENDO)                 =>  "$endo0,$endo1,"
+            @lvalue(_SEARCH,XENVI)        =>  "ZKF,XEX,XPWMAB,XPWMS,XPWXAB,XPWXS,XQWXAB,XQWXS,XPOIL,XNATY,XTFP"
+            @lvalue(XXX)                  =>  "List XXX not found"
+            @lvalue()                     =>  "@lvalue()"
+ 
+    @ivalue()
+    --------
+            @ivalue(FLGR)                 =>  "FLG/VBBP"
+            @ivalue(FLGR,IUGR)            =>  "FLG/VBBP;IUG/VBBP"
+            @ivalue(flgr)                 =>  "FLG/VBBP"
+            @ivalue(XXX)                  =>  "Idt XXX not found"
+            @ivalue()                     =>  "@ivalue()"
+ 
+    @evalue()
+    --------
+            @evalue(ACAF)                 =>  "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)"
+            @evalue(brugp)                =>  "BRUGP := 0"
+            @evalue(acaf,brugp)           =>  "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995);BRUGP := 0"
+            @evalue(XXX)                  =>  "Eqs XXX not found"
+            @evalue()                     =>  "@evalue()"
+ 
+    @eqsample()
+    --------
+            @eqsample(ACAF)               =>  "1980Y1:1996Y1"
+            @eqsample(ACAF,ACAG)          =>  "@eqsample(ACAF,ACAG)"
+            @eqsample(XXX)                =>  "[Eqs XXX not found]"
+            @eqsample()                   =>  "@eqsample()"
+ 
+    @eqsamplefrom()
+    --------
+            @eqsamplefrom(ACAF)           =>  "1980Y1"
+            @eqsamplefrom(XXX)            =>  "[Eqs XXX not found]"
+            @eqsamplefrom()               =>  "@eqsamplefrom()"
+ 
+    @eqsampleto()
+    --------
+            @eqsampleto(ACAF)             =>  "1996Y1"
+            @eqsampleto(XXX)              =>  "[Eqs XXX not found]"
+            @eqsampleto()                 =>  "@eqsampleto()"
+ 
+    @eqlhs()
+    --------
+            @eqlhs(ACAF)             =>  "(ACAF/VAF[-1]) "
+            @eqlhs(ACAF,ACAG)        =>  "@eqlhs(ACAF,ACAG)"
+            @eqlhs(XXX)              =>  "[Eqs XXX not found]"
+            @eqlhs()                 =>  "@eqlhs()"
+ 
+    @eqrhs()
+    --------
+            @eqrlhs(ACAF)             =>  "acaf1+acaf2*GOSF[-1]+
+    acaf4*(TIME=1995)"
+            @eqrlhs(ACAF,ACAG)        =>  "@eqrhs(ACAF,ACAG)"
+            @eqrlhs(XXX)              =>  "[Eqs XXX not found]"
+            @eqrlhs()                 =>  "@eqrhs()"
+ 
+    @count()
+    --------
+            @count(ACAF,ACAG)         =>  "2"
+            @count(ACAF;ACAG)         =>  "1"
+            @count()                  =>  "0"
+ 
+    @index()
+    --------
+            @index(0,A,B,C)           =>  ""
+            @index(2,A,B,C)           =>  "B"
+            @index(4,A,B,C)           =>  ""
+            @index(1,A;B;C)           =>  "A;B;C"
+            @index(A;B;C)             =>  ""
+            @index()                  =>  ""
+ 
+ 
+    @sample()
+    --------
+            @sample()                 =>  "1960Y1 2015Y1"
+            @sample(B)                =>  "1960Y1"
+            @sample(E)                =>  "2015Y1"
+            @sample(X)                =>  "1960Y1 2015Y1"
+ 
+ 
+ 
+ 
+    @vliste()
+    --------
+            @vliste(ACAF)             =>  "ACAF;VAF;GOSF;TIME"
+            @vliste(ACAF,ACAG)        =>  "ACAF;VAF;GOSF;TIME;ACAG;VBBP"
+ 
+ 
+    @sliste()
+    --------
+            @sliste(ACAF)             =>  "acaf1;acaf2;acaf4"
+            @sliste(ACAF,ACAG)        =>  "acaf1;acaf2;acaf4"
+ 
+    @cexpand()
+    --------
+            @cexpand(AC*)           =>  "ACAF;ACAG"
+            @cexpand(*U)            =>  "DPU;DPUU;IFU;IHU;WBU"
+            @cexpand(AC*,*U)        =>  "ACAF;ACAG;DPU;DPUU;IFU;IHU;WBU"
+            @cexpand()              =>  ""
+ 
+ 
+    @eexpand()
+    --------
+            @eexpand(AC*)           =>  "ACAF;ACAG"
+            @eexpand(*U)            =>  "CGU;DPU;DPUU;IFU;IHU;WBU"
+            @eexpand(AC*,*U)        =>  "ACAF;ACAG;CGU;DPU;DPUU;IFU;IHU;WBU"
+            @eexpand()              =>  ""
+ 
+    @iexpand()
+    --------
+            @iexpand(AC*)           =>  ""
+            @iexpand(*U)            =>  "MU;NAWRU"
+            @iexpand(AC*,*U)        =>  "MU;NAWRU"
+            @iexpand()              =>  ""
+ 
+    @lexpand()
+    --------
+            @lexpand(AC*)           =>  ""
+            @lexpand(*0)            =>  "COPY0;ENDO0;TOTAL0"
+            @lexpand(AC*,*0)        =>  "COPY0;ENDO0;TOTAL0"
+            @lexpand()              =>  ""
+ 
+    @sexpand()
+    --------
+            @sexpand(AC*)           =>  "acaf1;acaf2;acaf3;acaf4"
+            @sexpand(ac*)           =>  "acaf1;acaf2;acaf3;acaf4"
+            @sexpand(*4)            =>  "acaf4;dtf4;gamma4;k4;kl14;nfyh4;pc4;pmab4;pxs4;qc4;qi5_4;qmab_4;qms4;qxab4;qxs4;y4"
+            @sexpand(AC*,*4)        =>  "acaf1;acaf2;acaf3;acaf4;dtf4;gamma4;k4;kl14;nfyh4;pc4;pmab4;pxs4;qc4;qi5_4;qmab_4;qms4;qxab4;qxs4;y4"
+            @sexpand()              =>  ""
+ 
+    @texpand()
+    ----------
+            @texpand(AC*)           =>  ""
+            @texpand(*U)            =>  "MULT1RESU;MULT2RESU;NAWRU;T1NIVEAU"
+            @texpand(AC*,*U)        =>  "MULT1RESU;MULT2RESU;NAWRU;T1NIVEAU"
+            @texpand()              =>  ""
+ 
+    @vexpand()
+    ----------
+            @vexpand(AC*)           =>  "ACAF;ACAG"
+            @vexpand(*U)            =>  "CGU;DPU;DPUU;IFU;IHU;MU;NAWRU;WBU"
+            @vexpand(AC*,*U)        =>  "ACAF;ACAG;CGU;DPU;DPUU;IFU;IHU;MU;NAWRU;WBU"
+            @vexpand()              =>  ""
+ 
+ 
+ 
+    @SimMaxit()
+    -----------
+            @SimMaxit()             =>  "100"
+ 
+    @SimEps()
+    ---------
+            @SimEps()               =>  "0.0001"
+ 
+    @SimRelax()
+    -----------
+            @SimRelax()             =>  "0.700000"
+ 
+    @SimNorm()
+    ----------
+            @SimNorm(2000Y1)        =>  "7.15565e-05"
+            @SimNorm(2001Y1)        =>  "6.85269e-05"
+            @SimNorm(2002Y1)        =>  "0"
+            @SimNorm(1990Y1)        =>  "0"
+ 
+    @SimNIter()
+    -----------
+            @SimNiter(2000Y1)       =>  "31"
+            @SimNiter(2001Y1)       =>  "37"
+            @SimNiter(2002Y1)       =>  "0"
+            @SimNiter(1990Y1)       =>  "0"
+ 
+ 
+    @vtake()
+    --------
+            @vtake(2,A,B,C,D,E)     =>  "A;B"
+            @vtake(-1;A;B;C;D;E)    =>  "E"
+            @vtake(3 A B)           =>  "A;B"
+            @vtake(3,A,"B C")       =>  "A;B;C"
+            @vtake(A,B)             =>  ""
+            @vtake()                =>  ""
+ 
+ 
+    @vdrop()
+    --------
+            @vdrop(2,A,B,C,D,E)     =>  "C;D;E"
+            @vdrop(-1;A;B;C;D;E)    =>  "A;B;C;D"
+            @vdrop(3 A B)           =>  ""
+            @vdrop(A,B)             =>  "B"
+            @vdrop()                =>  ""
+ 
+    @vcount()
+    --------
+            @vcount(A,B,C,D,E)      =>  "5"
+            @vcount(C;D;E)          =>  "3"
+            @vcount(3 A B)          =>  "3"
+            @vcount(3 "A B")        =>  "3"
+            @vcount()               =>  "0"
+ 
+ 
+    @memory()
+    ---------
+            @memory()                 =>  "...unstable..."
+ 
+    @ChronoReset()
+    --------------
+            @chronoreset()            =>  ""
+ 
+    @ChronoGet()
+    ------------
+            @chronoget()              =>  "0"
+ 
+ 
+ 
+    @getdir()
+    ---------
+            @getdir()                 =>  "...unstable..."
+ 
+    @mkdir()
+    --------
+            @mkdir(testdir)           =>  ""
+            @mkdir(testdir)           =>  ""
+            @getdir()                 =>  "...unstable..."
+            @chdir(testdir)           =>  "...unstable..."
+            @getdir()                 =>  "...unstable..."
+ 
+    @chdir()
+    --------
+            @chdir(..)                =>  "...unstable..."
+            @getdir()                 =>  "...unstable..."
+ 
+    @rmdir()
+    --------
+            @getdir()                 =>  "...unstable..."
+            @mkdir(testdir)           =>  ""
+            @chdir(testdir)           =>  "...unstable..."
+            @chdir(..)                =>  "...unstable..."
+            @rmdir(testdir)           =>  ""
+ 
+    @void()
+    -------
+        @void(ABC,DEF,G)          =>  ""
+        @void(@getdir())          =>  ""
+        @void(@vexpand(*))        =>  ""
+```
+
+## Example of report with $procdef and $foreach {#T65}
+
+### Report {#T66}
+
+```
+    $ Testing various procedures
+    $ --------------------------
+    $
+    $  Syntax: rep_proc input_dir output_dir
+    $
+    $  Example: rep_proc data output
+    $
+    $debug 1
+    $indent
+    $goto continue {%0% >= 2}
+        $show Syntax: rep_proc input_dir output_dir
+        $show Syntax error. Report aborted.
+        $return
+    $label continue
+ 
+    $define input_dir %1%
+    $define output_dir %2%
+    $ Define output destination
+    $ -------------------------
+    $PrintDest %output_dir%\rep_proc.a2m A2M
+ 
+    $ ----------------------------------------------------------
+    $ printtbl: prints a list of variables on a specific period
+    $procdef printtbl year vars
+        $foreach var %vars%
+            %var%[%year%] = {%var%[%year%]}
+        $next var
+    $procend
+ 
+    $ ----------------------------------------------------------
+    $ sumvars: creates a new series names %result% = sum of %vars%
+    $procdef sumvars result vars
+        $define eq 0
+        $foreach var %vars%
+            $define eq %eq% + %var%
+        $next var
+        $DataCalcVar %result% %eq%
+    $procend
+ 
+    $ ----------------------------------------------------------
+    $ sumvarsmsg: displays msg, then calls sumvars result vars
+    $procdef sumvarsmsg msg result vars
+        %msg%
+        $ During the call : result = '%result%' vars = '%vars%'
+        $procexec sumvars %result% %vars%
+        %result%[1992Y1] = {%result%[1992Y1]}
+    $procend
+ 
+    $WsSample 1990Y1 2000Y1
+    $DataCalcVar PIB_A t
+    $DataCalcVar PIB_B ln t
+    $DataCalcVar PIB_C sin(t)
+    $procexec sumvarsmsg "Hello IODE!" PIB PIB_A PIB_B
+    $procexec sumvarsmsg "Hello World" PIB3 PIB_A PIB_C
+    $procexec printtbl 1992Y1 PIB_A PIB_B PIB_C PIB PIB3
+ 
+    $ Load objects
+    $ ------------
+    $WsLoadCmt %input_dir%\fun
+    $WsLoadEqs %input_dir%\fun
+    $WsLoadIdt %input_dir%\fun
+    $WsLoadLst %input_dir%\fun
+    $WsLoadScl %input_dir%\fun
+    $WsLoadTbl %input_dir%\fun
+    $WsLoadVar %input_dir%\fun
+ 
+    $procdef print_eq eqs
+    .par1 tit_1 
+    Equations with coefficients
+    
+        $PrintObjLec 1
+        $foreach eq %eqs%
+            $PrintObjDefEqs %eq%
+        $next eq
+    $procend
+    $procexec print_eq ACAG ACAF
+```
+
+### Resulting a2m file {#T67}
+
+```
+        Hello IODE!
+ 
+ 
+ 
+ 
+ 
+ 
+        PIB[1992Y1] = 2.6931472
+ 
+        Hello World
+ 
+ 
+ 
+ 
+ 
+ 
+        PIB3[1992Y1] = 2.9092974
+ 
+ 
+ 
+ 
+            PIB_A[1992Y1] = 2
+ 
+ 
+            PIB_B[1992Y1] = 0.69314718
+ 
+ 
+            PIB_C[1992Y1] = 0.90929743
+ 
+ 
+            PIB[1992Y1] = 2.6931472
+ 
+ 
+            PIB3[1992Y1] = 2.9092974
+ 
+ 
+ 
+    .par1 tit_1 
+    Equations with coefficients
+ 
+ 
+ 
+    .par1 enum_1
+ 
+    ACAG  :=  ACAG[-1 ] + r VBBP[-1 ] + (0.006*VBBP[-1 ]*(TIME= 2001) -0.008*(TIME= 2008) )
+ 
+ 
+    .par1 enum_1
+ 
+    (ACAF/VAF[-1 ])   := 0.015768407 + -7.961502e-06*GOSF[-1 ] +
+    -0.0085051842*(TIME= 1995)
+ 
+```
 

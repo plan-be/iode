@@ -33,7 +33,7 @@ char *K_LastVersion()
     /* Annulé car le retour http ne fonctionne plus comme avant.
     vers = SCR_HttpGetFile("iode.plan.be", 80, "version.txt");
 
-    Debug("iode version => '%s'\n", vers);
+    //Debug("iode version => '%s'\n", vers);
     if(vers) {
     	if(strlen(vers) > 9) vers[9] = 0;
     	return(vers);

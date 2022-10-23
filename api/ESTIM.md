@@ -15,6 +15,12 @@
     - [e\_print.c](#T9)
     - [e\_dftest.c](#T10)
     - [e\_step.c](#T11)
+- [IODE: Equation Edition and Estimation GUI](#T12)
+      - [Local and global KDBs of equations and scalars](#T13)
+      - [Variables](#T14)
+      - [Scalars](#T15)
+      - [Equations](#T16)
+      - [Block of equations](#T17)
 
 # IODE: Estimation {#T1}
 
@@ -198,4 +204,39 @@ The selection is done by blocking all possible combinaisons of coefficients.
 |:---|:---|
 |`IODE_REAL C_evallec(char* lec, int t)`|Evaluates a LEC expression at a specific period of time.|
 |`IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
+
+# IODE: Equation Edition and Estimation GUI {#T12}
+
+In IODE, equations can be created or modified in the same window. There are two possible cases:
+
+- If the equation exists, the user enters the edition window by selecting an equation and pressing ENTER.
+- If an equation must be created, the user presses INS or clicks on the button "New".
+
+In both cases, the same definition window is opened where all the informations defining the equation may be enterd/modified:
+
+- endogenous variable
+- equation in LEC
+- optionally, estimation method and sample, equation bloc, instruments.
+
+#### Local and global KDBs of equations and scalars {#T13}
+
+During the edition of an equation, two LOCAL KDBs are maintained: one for the scalars (aka coefficients) and one for the equations. In this way, modifications to equations / scalars remain local and are only saved in the GLOBAL KDBs (KE\_WS and KS\_WS) **at the end of the editing process, and only if the user considers it relevant**.
+
+#### Variables {#T14}
+
+If the user wants to estimate the equation, the variables found in the equation are obviously required. They are searched in the GLOBAL kdb KV\_WS. There is no LOCAL KDB of variables.
+
+#### Scalars {#T15}
+
+The scalars, on the contrary, are created on the fly if they don't exist when the equation(s) they belong are estimated. The default value for a scalar is `0.9` with a relaxation parameter set to `1.0`.
+
+If they exist in the GLOBAL KS\_WS, they are copied into the local KDB and they keep their values as starting point for the estimation.
+
+#### Equations {#T16}
+
+The principle is the same as for scalars. Existing equations in the global KDB are copied into the local KDB before the edition. Unexisting ones are created with a default value of `ENDO := 0`.
+
+#### Block of equations {#T17}
+
+If a block of more than one equation is specified in the interface, the equations belonging to the block and existing in the global KDB KE\_WS are copied into the local KDB. Unexisting ones are created in the local KDB with `ENDO := 0` as LEC formula.
 

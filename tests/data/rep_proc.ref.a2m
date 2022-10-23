@@ -1,0 +1,52 @@
+    Hello IODE!
+
+
+
+
+
+
+    PIB[1992Y1] = 2.6931472
+
+    Hello World
+
+
+
+
+
+
+    PIB3[1992Y1] = 2.9092974
+
+
+
+
+        PIB_A[1992Y1] = 2
+
+
+        PIB_B[1992Y1] = 0.69314718
+
+
+        PIB_C[1992Y1] = 0.90929743
+
+
+        PIB[1992Y1] = 2.6931472
+
+
+        PIB3[1992Y1] = 2.9092974
+
+
+
+.par1 tit_1 Equations with coefficients
+
+
+
+.par1 enum_1
+
+ \bACAG\B  :=  \bACAG\B[-1 ] + r \iVBBP\I[-1 ] + (0.006*\iVBBP\I[-1 ]*(\iTIME\I= 2001) -0.008*(\iTIME\I= 2008) ) 
+
+
+.par1 enum_1
+
+ (\bACAF\B/\iVAF\I[-1 ])   := \i0.015768407\I + \i-7.961502e-06\I*\iGOSF\I[-1 ] + 
+ \i-0.0085051842\I*(\iTIME\I= 1995) 
+
+
