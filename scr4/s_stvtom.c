@@ -309,6 +309,8 @@ contiennent un s‚parateur.
 	"4 5"
 &TX
 &SA SCR_vtom(), SCR_vtoms(), SCR_vtoms2(), SCR_mtov(), SCR_free_tbl(), SCR_copy_tbl()
+
+TODO: ERREUR: à corriger pour les args entre "abc","def" => "abc",NULL,"def" 
 =======================================================================*/
 
 unsigned char **SCR_vtoms3(str, seps, supdbl)
