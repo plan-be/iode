@@ -5,7 +5,7 @@
  * be integrated in current C API                 *
  * ********************************************** */
 
-#include "api/iode.h"
+// #include "api/iode.h"
 
 //  // =================== b_ws.c =================== //
 // 
@@ -148,6 +148,7 @@
 // 
 // =================== b_rep.c =================== //
 
+/*
 #define RP_STDALLOC     1
 #define MEMBLK_BLK      100
 #define MEMBLK_MAXLOST  512
@@ -254,9 +255,9 @@ RP_proc_free_all()
 // =================== b_base.c =================== //
 
 int     B_NBDEC = 2;
-int     B_LANG = 0;             /* JMP38 26-09-92 */
-int     B_MULTIBAR = 0;         /* GB 30/10/2007 MULTIBAR function*/
-int	    B_GRAPHDEFAULT = 0;     /* GB 10/03/2011 T_auto function*/
+int     B_LANG = 0;             // JMP38 26-09-92 
+int     B_MULTIBAR = 0;         // GB 30/10/2007 MULTIBAR function
+int	    B_GRAPHDEFAULT = 0;     // GB 10/03/2011 T_auto function
 
 char** B_ERROR_MSG = NULL;
 int     B_ERROR_NB = 0;
@@ -326,8 +327,8 @@ int KE_compile(KDB* dbe)
 
 #include "api/iodeapi.h"
 
-char    STATIC_BUF[512];        /* JMP 10-01-11 */
-int     STATIC_BUF_LG = 511;    /* JMP 10-01-11 */
+char    STATIC_BUF[512];        
+int     STATIC_BUF_LG = 511;    
 
 IodeInit()
 {
@@ -349,12 +350,13 @@ IodeEnd()
 {
     SW_end();
     W_close();
-    K_end_ws(0);        /* JMP 23-08-2012 */
-    L_free_anames();    /* JMP 14-11-2012 */
-    BUF_free();         /* JMP 14-11-2012 */
-    RP_proc_free_all(); /* JMP 14-02-2013 */
-    RP_free_bufs();     /* JMP 12-12-2012 */
-    B_reset_error();    /* JMP 14-02-2013 */
+    K_end_ws(0);        // JMP 23-08-2012 
+    L_free_anames();    // JMP 14-11-2012 
+    BUF_free();         // JMP 14-11-2012 
+    RP_proc_free_all(); // JMP 14-02-2013 
+    RP_free_bufs();     // JMP 12-12-2012 
+    B_reset_error();    // JMP 14-02-2013 
 
     return(0);
 }
+*/
