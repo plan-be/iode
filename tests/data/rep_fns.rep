@@ -1,0 +1,459 @@
+$ `@-functions()` tests and examples
+$ --------------------------------
+$ Syntax: rep_fns input_dir output_dir
+$ Example: rep_fns data output
+
+$debug 1
+$indent
+$goto continue {%0% >= 2}
+    $show Syntax: rep_fns input_dir output_dir
+    $show Syntax error. Report aborted.
+    $return
+$label continue
+$define input_dir %1%
+$define output_dir %2%
+$label continue
+
+$PrintDest %output_dir%\rep_fns.a2m A2M
+
+STRINGS
+=======
+
+`@take()`
+`-------`
+    Success
+        `@take(2,ABCDE)`        => "@take(2,ABCDE)"
+        `@take(-2,ABCDE)`       => "@take(-2,ABCDE)"
+        `@take(2, ABCDE)`       => "@take(2, ABCDE)"
+        `@take(0,ABCDE)`        => "@take(0,ABCDE)"
+        `@take(2,"A,B,C,D,E")`  => "@take(2,"A,B,C,D,E")"
+
+    Errors (#parms <> 2)
+        `@take(2,A,B,C,D,E)`    => "@take(2,A,B,C,D,E)"
+        `@take(2,A,BCDE)`       => "@take(2,A,BCDE)"
+
+`@drop()`
+`-------`
+    Success
+        `@drop(2,ABCDE)      `  => "@drop(2,ABCDE)"
+        `@drop(-1,ABCDE)     `  => "@drop(-1,ABCDE)"
+        `@drop(2, ABCDE)     `  => "@drop(2, ABCDE)"
+        `@drop(0,ABCDE)      `  => "@drop(0,ABCDE)"
+        `@drop(2,"A,B,C,D,E")`  => "@drop(2,"A,B,C,D,E")"
+        `@DROP(2,A)          `  => "@DROP(2,A)"
+        `@drop(3, "a bc")    `  => "@drop(3, "a bc")"
+
+    Error (#parms <> 2)
+        `@drop(2,A,B,C,D,E)`    => "@drop(2,A,B,C,D,E)"
+        `@drop(2,A,BCDE)`       => "@drop(2,A,BCDE)"
+        `@drop(n,ABCDE)`        => "@drop(n,ABCDE)"
+
+`@replace()`
+`----------`
+    Success
+        `@replace(Buro du Plan,Buro,Bureau)`            => @replace(Buro du Plan,Buro,Bureau)
+        `@replace(Buro du Buro du Plan,Buro,Bureau)`    => @replace(Buro du Buro du Plan,Buro,Bureau)
+        `@replace(Bureauplan,plan, du Plan)`            => @replace(Bureauplan,plan, du Plan)
+        `@replace("Bureau, du Plan",",","") `           => @replace("Bureau, du Plan",",","")
+        `@replace("Bureau, du Plan", ",", "") `         => @replace("Bureau, du Plan", ",", "")
+
+    Error
+        `@replace(Buro plan,Bureau du Plan)`            => @replace(Buro plan,Bureau du Plan)
+        `@replace(AB,B,C,D)`                            => @replace(AB,B,C,D)
+
+`@equal()`
+`--------`
+        `@equal(aa,aa)      `   =>  "@equal(aa,aa)"
+        `@equal(aa, aa)     `   =>  "@equal(aa, aa)"
+        `@equal(aa,bb)      `   =>  "@equal(aa,bb)"
+        `@equal(aa,aa,aa)   `   =>  "@equal(aa,aa,aa)"
+
+`@upper()`
+`-------
+        `@upper(ab cd,ef)    `  =>  "@upper(ab cd,ef)"
+        `@upper(AB)          `  =>  "@upper(AB)"
+        `@upper("abc", "def")`  =>  "@upper("abc", "def")"
+        `@upper("abc","def") `  =>  "@upper("abc","def")"
+
+`@lower()`
+`-------
+        `@lower(ab cd,ef)    `  =>  "@lower(ab cd,ef)"
+        `@lower(AB)          `  =>  "@lower(AB)"
+        `@lower("abc", "def")`  =>  "@lower("abc", "def")"
+        `@lower("abc","def") `  =>  "@lower("abc","def")"
+
+`@sqz()`
+`------`
+        `@sqz( ab    cd )`      =>  "@sqz( ab    cd )"
+        `@sqz(" ab    cd ")`    =>  "@sqz(" ab    cd ")"
+        `@sqz( ab,"  cd", ef)`  =>  "@sqz( ab,"  cd", ef)"
+        `@sqz( ab, " cd", ef)`  =>  "@sqz( ab, " cd", ef)"
+
+`@strip()`
+`--------`
+        `@strip( ab    cd )`      =>  "@strip( ab    cd )"
+        `@strip(" ab    cd ")`    =>  "@strip(" ab    cd ")"
+        `@strip( ab,"  cd", ef)`  =>  "@strip( ab,"  cd", ef)"
+        `@strip( ab, " cd", ef)`  =>  "@strip( ab, " cd", ef)"
+
+
+`@fmt()  `
+`--------`
+        `@fmt(123456)              ` -> "@fmt(123456)"
+        `@fmt(123456,99999999)     ` -> "@fmt(123456,99999999)"
+        `@fmt(123456,999)          ` -> "@fmt(123456,999)"
+        `@fmt(123.456,999999)      ` -> "@fmt(123.456,999999)"
+        `@fmt(123456,00999999)     ` -> "@fmt(123456,00999999)"
+        `@fmt(123456,"ABC999,999Z")` -> "@fmt(123,"ABC999,999Z")"
+        `@fmt(123456,ABC999999Z)   ` -> "@fmt(123,ABC999999Z)"
+
+
+`@ansi()        `
+`--------`
+        `@ansi(àâäéèêëîïöôùç)   `    -> "@ansi(àâäéèêëîïöôùç)"
+
+
+TIME & DATE
+-----------
+
+Tests of @date and @time were cancelled due to impossible comparison... Time flies...
+
+`@date()`
+`-------`
+        `@date()            `   =>  `"@date()"              `
+        `@date(dd-mm-yyyy)  `   =>  `"@date(dd-mm-yyyy)"    `
+        `@date(dd-mm-yy)    `   =>  `"@date(dd-mm-yy)"      `
+        `@date(d-m-y)       `   =>  `"@date(d-m-y)"         `
+        `@date(yy/mm/dd)    `   =>  `"@date(yy/mm/dd)"      `
+        `@date(mm/dd/yyyy)  `   =>  `"@date(mm/dd/yyyy)"    `
+        `@date(mm/xxxx/zzzz)`   =>  `"@date(mm/xxxx/zzzz)"  `
+                                                           
+`@time()`                                                  
+`-------                                                   
+        `@time()            `   =>  `"@time()"              `
+        `@time(hh:mm:ss)    `   =>  `"@time(hh:mm:ss)"      `
+        `@time(hhhh:mm)     `   =>  `"@time(hhhh:mm)"       `
+        `@time(xxx:mm/dd)   `   =>  `"@time(xxx:mm/dd)"     `
+
+`@month()       `
+`--------`
+        `@month(1)  `           =>  "@month(1)"
+        `@month(1,F)`           =>  "@month(1,F)"
+        `@month(1,e)`           =>  "@month(1,e)"
+        `@month(1,N)`           =>  "@month(1,N)"
+        
+FILES
+-----
+
+`@fdelete()     `
+`--------`
+        `@fdelete(essais.txt)`  =>  "@fdelete(essais.txt)"
+
+`@fappend()     `
+`--------`
+        `@fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)`  =>  "@fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)"
+
+
+# OBJECTS
+# -------
+
+$ Load objects
+$WsLoadCmt %input_dir%\fun
+$WsLoadEqs %input_dir%\fun
+$WsLoadIdt %input_dir%\fun
+$WsLoadLst %input_dir%\fun
+$WsLoadScl %input_dir%\fun
+$WsLoadTbl %input_dir%\fun
+$WsLoadVar %input_dir%\fun
+
+
+`@sstderr()   `
+`----------`
+        `@sstderr(acaf1)`               =>  "@sstderr(acaf1)"
+        `@sstderr(acaf1,xyz,acaf3)`     =>  "@sstderr(acaf1,xyz,acaf3)"
+        `@sstderr(acaf1,acaf2, acaf3)`  =>  "@sstderr(acaf1,acaf2, acaf3)"
+
+`@srelax()   `
+`---------`
+        `@srelax(acaf1)`                =>  "@srelax(acaf1)"
+        `@srelax(acaf1,xyz,acaf3)`      =>  "@srelax(acaf1,xyz,acaf3)"
+        `@srelax(acaf1,acaf2, acaf3)`   =>  "@srelax(acaf1,acaf2, acaf3)"
+
+`@ttitle()      `
+`--------`
+        `@ttitle(C8_1)       `          =>  "@ttitle(C8_1)"
+        `@ttitle( c8_10)     `          =>  "@ttitle( c8_10)"
+        `@ttitle(C8_1 c8_10) `          =>  "@ttitle(C8_1 c8_10)"
+        `@ttitle(C8_1, c8_10)`          =>  "@ttitle(C8_1, c8_10)"
+        `@ttitle(XXX)        `          =>  "@ttitle(XXX)"
+                
+`@cvalue()      `       
+`--------`      
+        `@cvalue(acaf)      `           =>  "@cvalue(acaf)"
+        `@cvalue(ACAF)      `           =>  "@cvalue(ACAF)"
+        `@cvalue(ACAG)      `           =>  "@cvalue(ACAG)"
+        `@cvalue(ACAF,ACAG) `           =>  "@cvalue(ACAF,ACAG)"
+        
+`@vvalue()      `       
+`--------`      
+        `@vvalue(acaf)      `           =>  "@vvalue(acaf)"
+        `@vvalue(ACAF)      `           =>  "@vvalue(ACAF)"
+        `@vvalue(ACAG)      `           =>  "@vvalue(ACAG)"
+        `@vvalue(ACAF,ACAG) `           =>  "@vvalue(ACAF,ACAG)"
+        `@vvalue(XXX)       `           =>  "@vvalue(XXX)"
+        `@vvalue()          `           =>  "@vvalue()"
+
+
+`@lvalue()      `
+`--------`
+        `@lvalue(endo)         `        =>  "@lvalue(endo)"
+        `@lvalue(ENDO)         `        =>  "@lvalue(ENDO)"
+        `@lvalue(_SEARCH,XENVI)`        =>  "@lvalue(_SEARCH,XENVI)"
+        `@lvalue(XXX)          `        =>  "@lvalue(XXX)"
+        `@lvalue()             `        =>  "@lvalue()"
+
+`@ivalue()      `
+`--------`
+        `@ivalue(FLGR)          `       =>  "@ivalue(FLGR)"
+        `@ivalue(FLGR,IUGR)     `       =>  "@ivalue(FLGR,IUGR)"
+        `@ivalue(flgr)          `       =>  "@ivalue(flgr)"
+        `@ivalue(XXX)           `       =>  "@ivalue(XXX)"
+        `@ivalue()              `       =>  "@ivalue()"
+
+`@evalue()      `
+`--------`
+        `@evalue(ACAF)          `       =>  "@evalue(ACAF)"
+        `@evalue(brugp)         `       =>  "@evalue(brugp)"
+        `@evalue(acaf,brugp)    `       =>  "@evalue(acaf,brugp)"
+        `@evalue(XXX)           `       =>  "@evalue(XXX)"
+        `@evalue()              `       =>  "@evalue()"
+
+`@eqsample()    `
+`--------`
+        `@eqsample(ACAF)        `       =>  "@eqsample(ACAF)"
+        `@eqsample(ACAF,ACAG)   `       =>  "@eqsample(ACAF,ACAG)"
+        `@eqsample(XXX)         `       =>  "@eqsample(XXX)"
+        `@eqsample()            `       =>  "@eqsample()"
+
+`@eqsamplefrom()`
+`--------`
+        `@eqsamplefrom(ACAF)    `       =>  "@eqsamplefrom(ACAF)"
+        `@eqsamplefrom(XXX)     `       =>  "@eqsamplefrom(XXX)"
+        `@eqsamplefrom()        `       =>  "@eqsamplefrom()"
+
+`@eqsampleto()  `
+`--------`
+        `@eqsampleto(ACAF)      `       =>  "@eqsampleto(ACAF)"
+        `@eqsampleto(XXX)       `       =>  "@eqsampleto(XXX)"
+        `@eqsampleto()          `       =>  "@eqsampleto()"
+
+`@eqlhs()       `
+`--------`
+        `@eqlhs(ACAF)      `       =>  "@eqlhs(ACAF)"
+        `@eqlhs(ACAF,ACAG) `       =>  "@eqlhs(ACAF,ACAG)"
+        `@eqlhs(XXX)       `       =>  "@eqlhs(XXX)"
+        `@eqlhs()          `       =>  "@eqlhs()"
+
+`@eqrhs()       `
+`--------`
+        `@eqrlhs(ACAF)      `       =>  "@eqrhs(ACAF)"
+        `@eqrlhs(ACAF,ACAG) `       =>  "@eqrhs(ACAF,ACAG)"
+        `@eqrlhs(XXX)       `       =>  "@eqrhs(XXX)"
+        `@eqrlhs()          `       =>  "@eqrhs()"
+
+`@count()       `
+`--------`
+        `@count(ACAF,ACAG) `        =>  "@count(ACAF,ACAG)"
+        `@count(ACAF;ACAG) `        =>  "@count(ACAF;ACAG)"
+        `@count()          `        =>  "@count()"
+        
+`@index()       `
+`--------`
+        `@index(0,A,B,C) `          =>  "@index(0,A,B,C)"
+        `@index(2,A,B,C) `          =>  "@index(2,A,B,C)"
+        `@index(4,A,B,C) `          =>  "@index(4,A,B,C)"
+        `@index(1,A;B;C) `          =>  "@index(1,A;B;C)"
+        `@index(A;B;C)   `          =>  "@index(A;B;C)"
+        `@index()        `          =>  "@index()"
+        
+
+`@sample()      `
+`--------`
+        `@sample()  `               =>  "@sample()"
+        `@sample(B) `               =>  "@sample(B)"
+        `@sample(E) `               =>  "@sample(E)"
+        `@sample(X) `               =>  "@sample(X)"
+
+
+
+
+`@vliste()      `
+`--------`
+        `@vliste(ACAF) `            =>  "@vliste(ACAF)"
+        `@vliste(ACAF,ACAG) `       =>  "@vliste(ACAF,ACAG)"
+
+
+`@sliste()      `
+`--------`
+        `@sliste(ACAF) `            =>  "@sliste(ACAF)"
+        `@sliste(ACAF,ACAG) `       =>  "@sliste(ACAF,ACAG)"
+
+`@cexpand()     `
+`--------`
+        `@cexpand(AC*)    `       =>  "@cexpand(AC*)"
+        `@cexpand(*U)     `       =>  "@cexpand(*U)"
+        `@cexpand(AC*,*U) `       =>  "@cexpand(AC*,*U)"
+        `@cexpand()       `       =>  "@cexpand()"
+
+
+`@eexpand()     `
+`--------`
+        `@eexpand(AC*)    `       =>  "@eexpand(AC*)"
+        `@eexpand(*U)     `       =>  "@eexpand(*U)"
+        `@eexpand(AC*,*U) `       =>  "@eexpand(AC*,*U)"
+        `@eexpand()       `       =>  "@eexpand()"
+
+`@iexpand()     `
+`--------`
+        `@iexpand(AC*)    `       =>  "@iexpand(AC*)"
+        `@iexpand(*U)     `       =>  "@iexpand(*U)"
+        `@iexpand(AC*,*U) `       =>  "@iexpand(AC*,*U)"
+        `@iexpand()       `       =>  "@iexpand()"
+
+`@lexpand()     `
+`--------`
+        `@lexpand(AC*)    `       =>  "@lexpand(AC*)"
+        `@lexpand(*0)     `       =>  "@lexpand(*0)"
+        `@lexpand(AC*,*0) `       =>  "@lexpand(AC*,*0)"
+        `@lexpand()       `       =>  "@lexpand()"
+
+`@sexpand()     `
+`--------`
+        `@sexpand(AC*)    `       =>  "@sexpand(AC*)"
+        `@sexpand(ac*)    `       =>  "@sexpand(ac*)"
+        `@sexpand(*4)     `       =>  "@sexpand(*4)"
+        `@sexpand(AC*,*4) `       =>  "@sexpand(AC*,*4)"
+        `@sexpand()       `       =>  "@sexpand()"
+
+`@texpand()     `
+`----------`
+        `@texpand(AC*)    `       =>  "@texpand(AC*)"
+        `@texpand(*U)     `       =>  "@texpand(*U)"
+        `@texpand(AC*,*U) `       =>  "@texpand(AC*,*U)"
+        `@texpand()       `       =>  "@texpand()"
+
+`@vexpand()     `
+`----------`
+        `@vexpand(AC*)    `       =>  "@vexpand(AC*)"
+        `@vexpand(*U)     `       =>  "@vexpand(*U)"
+        `@vexpand(AC*,*U) `       =>  "@vexpand(AC*,*U)"
+        `@vexpand()       `       =>  "@vexpand()"
+
+# SIMULATIONS
+# -----------
+
+$ModelSimulateParms 0.0001 0.7 100 Both 0 no no 5
+$ModelSimulate 2000Y1 2001Y1
+
+`@SimMaxit()    `             
+`-----------`                    
+        `@SimMaxit()   `          =>  "@SimMaxit()"
+
+`@SimEps()      `
+`---------`
+        `@SimEps()   `            =>  "@SimEps()"
+
+`@SimRelax()    `
+`-----------`
+        `@SimRelax()   `          =>  "@SimRelax()"
+
+`@SimNorm()     `
+`----------`
+        `@SimNorm(2000Y1)   `     =>  "@SimNorm(2000Y1)"
+        `@SimNorm(2001Y1)   `     =>  "@SimNorm(2001Y1)"
+        `@SimNorm(2002Y1)   `     =>  "@SimNorm(2002Y1)"
+        `@SimNorm(1990Y1)   `     =>  "@SimNorm(1990Y1)"
+
+`@SimNIter()    `
+`-----------`
+        `@SimNiter(2000Y1)   `    =>  "@SimNiter(2000Y1)"
+        `@SimNiter(2001Y1)   `    =>  "@SimNiter(2001Y1)"
+        `@SimNiter(2002Y1)   `    =>  "@SimNiter(2002Y1)"
+        `@SimNiter(1990Y1)   `    =>  "@SimNiter(1990Y1)"
+
+                              
+`@vtake()       `
+`--------`
+        `@vtake(2,A,B,C,D,E)   `  =>  "@vtake(2,A,B,C,D,E)"
+        `@vtake(-1;A;B;C;D;E)  `  =>  "@vtake(-1;A;B;C;D;E)"
+        `@vtake(3 A B)  `         =>  "@vtake(3 A B)"
+        `@vtake(3,A,"B C")  `     =>  "@vtake(3,A,"B C")"
+        `@vtake(A,B)  `           =>  "@vtake(A,B)"
+        `@vtake()  `              =>  "@vtake()"
+
+
+`@vdrop()       `
+`--------`
+        `@vdrop(2,A,B,C,D,E)   `  =>  "@vdrop(2,A,B,C,D,E)"
+        `@vdrop(-1;A;B;C;D;E)  `  =>  "@vdrop(-1;A;B;C;D;E)"
+        `@vdrop(3 A B)  `         =>  "@vdrop(3 A B)"
+        `@vdrop(A,B)  `           =>  "@vdrop(A,B)"
+        `@vdrop()  `              =>  "@vdrop()"
+
+`@vcount()      `
+`--------`
+        `@vcount(A,B,C,D,E)   `   =>  "@vcount(A,B,C,D,E)"
+        `@vcount(C;D;E)       `   =>  "@vcount(C;D;E)"
+        `@vcount(3 A B)       `   =>  "@vcount(3 A B)"   
+        `@vcount(3 "A B")     `   =>  "@vcount(3,"A B")"   
+        `@vcount()            `   =>  "@vcount()"   
+
+# SYSTEM
+# ------
+
+`@memory()      `
+`---------`
+        `@memory()  `               =>  "...unstable..."
+
+`@ChronoReset() `
+`--------------`
+        `@chronoreset()`            =>  "@chronoreset()"
+
+`@ChronoGet()   `
+`------------`
+        `@chronoget()`              =>  "@chronoget()"
+
+
+
+`@getdir()      `
+`---------`
+        `@getdir()`                 =>  "...unstable..."
+
+`@mkdir()       `
+`--------`
+        `@mkdir(testdir)`           =>  "@mkdir(testdir)"
+        `@mkdir(testdir)`           =>  "@mkdir(testdir)"
+        `@getdir()      `           =>  "...unstable..."
+        `@chdir(testdir)`           =>  "...unstable..."
+        `@getdir()      `           =>  "...unstable..."
+
+`@chdir()       `
+`--------`
+        `@chdir(..)`                =>  "...unstable..."
+        `@getdir()`                 =>  "...unstable..."
+
+`@rmdir()       `
+`--------`
+        `@getdir()      `           =>  "...unstable..."
+        `@mkdir(testdir)`           =>  "@mkdir(testdir)"
+        `@chdir(testdir)`           =>  "...unstable..."
+        `@chdir(..)`                =>  "...unstable..."
+        `@rmdir(testdir)`           =>  "@rmdir(testdir)"
+
+`@void()        `
+`-------`
+        `@void(ABC,DEF,G)      `    =>  "@void(ABC,DEF,G)"
+        `@void(@getdir())      `    =>  "@void(@getdir())"
+        `@void(@vexpand(*))    `    =>  "@void(@vexpand(*))"
+
+$return

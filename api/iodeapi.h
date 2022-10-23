@@ -63,6 +63,52 @@ extern  char    *IodeChartTitle(int hdl, int i);
 extern  double  *IodeChartData(int hdl, int i);
 extern  int     IodeFreeChart(int hdl);
 
+/* Extract from b_api.c
+
+int IodeInit();
+int IodeEnd();
+char *IodeVersion();
+int IodeLoadVar(char *name);
+int IodeLoad(char *name, int type);
+int IodeSaveVar(char *name);
+int IodeSave(char *name, int type);
+int IodeClearWs();
+char **IodeContents(char *pattern, int type);
+char *IodeContentsStr(char *pattern, int type);
+double IodeGetVar(char *name, int t, int mode);
+double *IodeGetVector(char *name, int *lg);
+int IodeSetVector(char *name, double *value, int len);
+double *IodeGetSampleVector(int *lg);
+char *IodeGetSampleString();
+int IodeSetVar(char *name, int t, int mode, double value);
+char *IodeGetCmt(char *name);
+char *IodeGetLst(char *name);
+char *IodeGetEqs(char *name);
+double IodeGetScl(char *name);
+double *IodeGetScls(char *name);
+int IodeSetScl(char *name, double value);
+int IodeSetNbDec(int nbdec);
+int IodeGetNbDec();
+char* IodeGetTbl(char *name, char *gsmpl);
+char* IodeGetTblTitle(char *name);
+TBL* IodeGetTblDefinition(char *name);
+int IodeSetTblFile(int ref, char *filename);
+int IodeSimulate(char *byear, char *eyear, double eps, double relax, int maxit);
+int IodeGetMaxt();
+char *IodeGetPeriod(int t);
+int IodeGett(char *period);
+int IodeGetChart(char *name, char *gsmpl);
+int IodeFreeChart(int hdl);
+int IodeChartNl(int hdl);
+int IodeChartNc(int hdl);
+char IodeChartType(int hdl, int i);
+int IodeChartAxis(int hdl, int i);
+char *IodeChartTitle(int hdl, int i);
+double *IodeChartData(int hdl, int i);
+int IodeExecArgs(char *filename, char **args);
+int IodeExec(char *filename);
+*/
+
 #ifdef SCRCPP
 }
 #endif

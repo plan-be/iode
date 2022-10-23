@@ -12,8 +12,6 @@
 
 #include "iode.h"
 
-extern int RP_debug;
-
 static int RasSetVar(char  *name, int t, double var)
 {
     int     pos;

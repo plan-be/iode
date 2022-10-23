@@ -19,7 +19,9 @@ set (WRT w_wrt.c w_wrt1.c)
 set (INI b_iodeini.c)
 set (A2M b_a2mini.c)
 set (ESTIM k_est.c e_error.c e_est.c e_prep.c e_print.c e_step.c e_tests.c e_dftest.c)
-set (REPORTS b_data.c b_ras.c b_est.c b_fsys.c b_file.c b_idt.c b_xode.c b_ltoh.c b_htol.c b_model.c b_ws.c)	
+set (REPORT_COMMANDS b_data.c b_ras.c b_est.c b_fsys.c b_file.c b_idt.c b_xode.c b_ltoh.c b_htol.c b_model.c b_ws.c)
+set (REPORT_ENGINE b_rep_cmds.c b_rep_debug.c b_rep_defs.c b_rep_engine.c b_rep_fns.c b_rep_foreach.c b_rep_proc.c b_rep_super.c b_rep_syntax.c b_rep_utils.c)
+set (REPORT_UNDOC b_dde.c b_pdest.c b_print.c b_view.c b_step.c b_season.c b_trend.c b_eviews.c b_ds.c b_sql.c b_api.c)
 set (CONVERSIONS k_rules.c k_emain.c k_ecsv.c k_edif.c k_emain.c k_etsp.c k_ewks.c k_wks.c k_imain.c k_iasc.c k_ibst.c k_idif.c k_igem.c k_imain.c k_inis.c k_iprn.c k_irasc.c k_itxt.c)  
 set (SOURCES 
 		${UTILS} 
@@ -37,7 +39,9 @@ set (SOURCES
 		${INI}
 		${A2M}
 		${ESTIM}
-		${REPORTS}
+		${REPORT_ENGINE}
+		${REPORT_COMMANDS}
+		${REPORT_UNDOC}
 		${CONVERSIONS}
 )
 

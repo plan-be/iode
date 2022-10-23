@@ -155,7 +155,8 @@ if __name__ == "__main__":
 
     # check of output file exists
     output_directory_str = args.output_directory[0]
-    output_directory = Path.cwd() / output_directory_str if '/' not in output_directory_str else Path(output_directory_str)
+    # output_directory = Path.cwd() / output_directory_str if '/' not in output_directory_str else Path(output_directory_str)
+    output_directory = Path.cwd() if '/' not in output_directory_str else Path('.')
     if not output_directory.is_dir():
         raise ValueError(f"Output file: Destination directory {output_directory.resolve()} does not exist")
     filepath_out = output_directory / args.output_filename[0]
@@ -196,10 +197,11 @@ public:
 """.split('\n')  
 
     # extra functions
-    list_func_to_export_as_it = ["int W_printf(char* fmt,...)", "void kmsg_null(char*msg)", "extern \"C\""]
+    list_func_to_export_as_it = ["int W_printf(char* fmt,...)", "void kmsg_null(char*msg)"]
     func_to_export_lines = []
 
     # parse input source file
+    keep = False
     function_lines = []
     function = []
     func_type = ""
@@ -222,10 +224,11 @@ public:
             func_type = "EXPORT"
             function = [line]
         elif len(function):
-            if "IODE_DATA_DIR" in line:
+            '''if "IODE_DATA_DIR" in line:
                 line = line.replace("IODE_DATA_DIR", "input_test_dir")
             if "IODE_OUTPUT_DIR" in line:
                 line = line.replace("IODE_OUTPUT_DIR", "output_test_dir")
+            '''    
             function.append(line)
             # test if line = end of a test function
             if line == "}":
@@ -240,7 +243,13 @@ public:
                 else:
                     raise RuntimeError(f"Unknown kind of function with signature: {function[0]}")
                 function = []
-        elif line.startswith("#ifdef") or line.startswith("#endif"):
+        elif line.startswith("// BEGIN_KEEP"):
+            keep = True
+            func_to_export_lines += [line]
+        elif line.startswith("// END_KEEP"):
+            keep = False
+            func_to_export_lines += [line, "\n"]
+        elif keep:
             func_to_export_lines += [line]
         # assume we are outside a test function
         else:

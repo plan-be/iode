@@ -175,11 +175,12 @@ int K_ren(KDB* kdb, char* name1, char* name2)
 
 
 /**
- * Adds the new entry newname in kdb and returns its position in the kdb. 
+ *  Adds the new entry newname in kdb and returns its position in the kdb. 
+ *  If newname exists, returns its position in kdb and if K_WARN_UP is not null, displays an error message.
  *
- * The kdb can be of any type but the name must comply to the naming conventions of kdb's type (UPPER, LOWER...).
- *
- * @detail  The object names are stored in the table KOBJS(kdb). To avoid a reallocation on each new insertion, K_CHUNCK elements 
+ *  The kdb can be of any type but the name must comply to the naming conventions of kdb's type (UPPER, LOWER...).
+ *  
+ *  @detail  The object names are stored in the table KOBJS(kdb). To avoid a reallocation on each new insertion, K_CHUNCK elements 
  *          are added to KOBJS(kdb) each time that more place is needed to store object names.
  *
  *          Names in KOBJS are stored in alphabetic order to speed up the retrieval of an object by its name. 
