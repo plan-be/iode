@@ -16,7 +16,9 @@
 #endif
 
 #ifdef SCRCPP        /* JMP 12-01-98 */
-#define SCRPROTO
+    #ifndef SCRPROTO
+    #define SCRPROTO
+    #endif
 #endif
 
 #ifdef SCRW16        /* JMP 12-02-97 */
