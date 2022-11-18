@@ -320,7 +320,7 @@ Function to manage KDB, i.e. IODE object groups.
 |`KDB *K_create(int type, int mode)`|allocates and initialises a KDB object.|
 |`int K_free_kdb(KDB* kdb)`|frees a KDB but leaves its contents untouched.|
 |`int K_free(KDB* kdb)`|frees a KDB and its contents.|
-|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the SAMPLE and replaces the filename by "ws".|
+|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the SAMPLE and replaces the filename by I_DEFAULT_FILENAME.|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
 |`KDB *K_quick_refer(KDB *kdb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|

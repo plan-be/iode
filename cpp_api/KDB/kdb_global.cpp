@@ -61,7 +61,7 @@ KDB* hard_copy_kdb(KDB* source_kdb, char** names)
     // - k_arch = #define ARCH
     // - k_type = first argument of K_create()
     // - k_mode = second argument of K_create()
-    // - k_nameptr = "ws"
+    // - k_nameptr = I_DEFAULT_FILENAME
     KDB* dest_kdb = K_create(iode_type, source_kdb->k_mode);
     if (dest_kdb == NULL) return NULL;
     // copy char k_desc[K_MAX_DESC]
