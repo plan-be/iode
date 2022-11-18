@@ -45,6 +45,11 @@
 #define ARCH    "INTEL86 DOS"
 #endif
 
+// ALD 18/11/2022
+#define I_DEFAULT_FILENAME  "ws"
+
+// JMP 23/5/2019 (from b_rep.c for b_proc.c)
+#define LINELENGTH 102400
 
 #define OK_MAX_FILE  64
 #define K_MAX_FILE  512
@@ -98,7 +103,7 @@
 #define KMAGIC(kdb)  ((kdb)->k_magic)
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-//#define KNAME(kdb)   ((kdb)->k_name) Supprimé pour éviter les oublis
+//#define KNAME(kdb)   ((kdb)->k_name) Supprimï¿½ pour ï¿½viter les oublis
 #define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
 #define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
@@ -357,7 +362,6 @@
 
 /*----------------------- MISC --------------------------------*/
 #define K_ISFILE(filename)  (filename != 0 && filename[0] != '-' && filename[0] != 0)
-
 
 /*---------------- IMPORT/EXPORT: FORMAT DEFINES -------------------------*/
 #define EXP_CSV  0
@@ -1192,7 +1196,7 @@ typedef struct _token {
 typedef struct _lstack {        /* stack of operators used by L_analyse */
     unsigned ls_op      : 8;    /* operator */
     //unsigned ls_nb_args : 8;    /* nb of arguments */
-    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vérifier si plus de 255 arguments
+    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vï¿½rifier si plus de 255 arguments
 } LSTACK;
 
 

@@ -1132,7 +1132,7 @@ int K_save(KDB* kdb, FNAME fname)
 
 int K_save_ws(KDB* kdb)
 {
-    return(K_save_kdb(kdb, "ws", 0));
+    return(K_save_kdb(kdb, I_DEFAULT_FILENAME, 0));
 }
 
 
