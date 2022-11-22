@@ -83,10 +83,11 @@ enum EnumIodeFile
     I_REPORTS_FILE,
     I_LOGS_FILE,
     I_SETTINGS_FILE,
-    I_ANY_FILE
+    I_ANY_FILE,
+    I_DIRECTORY
 };
 
-const static int I_NB_FILE_EXT = 11;
+const static int I_NB_FILE_EXT = 12;
 
 
 struct IodeFileExtension
@@ -108,7 +109,8 @@ const static std::array<IodeFileExtension, I_NB_FILE_EXT> vFileExtensions =
     {"Reports", ".rep", ""},
     {"Logs", ".log", ""},
     {"Settings", ".ini", ""},
-    {"Any", "*", ""}
+    {"Any", "*", ""},
+    {"Directory", "", ""}
 } };
 
 
