@@ -108,9 +108,6 @@ void MainWindow::openDirectory(const QString& dirPath)
     if (project_settings) delete project_settings;
     project_settings = new QSettings(qSettingsFilepath, QSettings::IniFormat);
 
-    // close all tabs
-    tabWidget_IODE_objs->clear();
-
     // update file explorer view
     treeView_file_explorer->updateProjectDir(projectDir, project_settings_filepath);
 
@@ -193,20 +190,14 @@ void MainWindow::open_import_comments_dialog()
 {
     QIodeMenuFileImportComments dialog(*project_settings_filepath, this);
     if (dialog.exec() == QDialog::Accepted)
-    {
-        this->lineEdit_filter_comments->setText("");
-        this->tableview_comments->filter();
-    }
+        tabWidget_IODE_objs->resetFilter(I_COMMENTS);
 }
 
 void MainWindow::open_import_variables_dialog()
 {
     QIodeMenuFileImportVariables dialog(*project_settings_filepath, this);
     if (dialog.exec() == QDialog::Accepted)
-    {
-        this->lineEdit_filter_variables->setText("");
-        this->tableview_variables->filter();
-    }
+        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
 }
 
 void MainWindow::open_export_dialog()

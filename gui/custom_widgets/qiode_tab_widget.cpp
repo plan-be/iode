@@ -13,97 +13,275 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
     this->setSizePolicy(sizePolicy);
 
+    // prepare shortcuts
+    nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
+    previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
+
     // ---- connect signals to slots  ----
-    connect(this, &QTabWidget::currentChanged, this, &QIodeTabWidget::viewTab);
+    connect(this, &QTabWidget::currentChanged, this, &QIodeTabWidget::showTab);
     connect(this, &QTabWidget::tabCloseRequested, this, &QIodeTabWidget::removeTab);
+    connect(nextTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showNextTab);
+    connect(previousTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showPreviousTab);
+
+    // prepare widgets for tabs associated with IODE object types
+    tabComments = new QIodeCommentsWidget(project_settings_filepath, I_COMMENTS, this);
+    tabEquations = new QIodeEquationsWidget(project_settings_filepath, I_EQUATIONS, this);
+    tabIdentites = new QIodeIdentitiesWidget(project_settings_filepath, I_IDENTITIES, this);
+    tabLists = new QIodeListsWidget(project_settings_filepath, I_LISTS, this);
+    tabScalars = new QIodeScalarsWidget(project_settings_filepath, I_SCALARS, this);
+    tabTables = new QIodeTablesWidget(project_settings_filepath, I_TABLES, this);
+    tabVariables = new QIodeVariablesWidget(project_settings_filepath, I_VARIABLES, this);
+
+    // tab prefix per file type
+    // Note: If the tab's label contains an ampersand, the letter following the ampersand is used as a shortcut for the tab, 
+    //       e.g. if the label is "Bro&wse" then Alt+W becomes a shortcut which will move the focus to this tab.
+    //       See https://doc.qt.io/qt-6/qtabwidget.html#addTab 
+    tabPrefix.resize(I_NB_FILE_EXT);
+    tabPrefix[I_COMMENTS_FILE] = "(&CMT) ";
+    tabPrefix[I_EQUATIONS_FILE] = "(&EQS) ";
+    tabPrefix[I_IDENTITIES_FILE] = "(&IDT) ";
+    tabPrefix[I_LISTS_FILE] = "(&LST) ";
+    tabPrefix[I_SCALARS_FILE] = "(&SCL) ";
+    tabPrefix[I_TABLES_FILE] = "(&TBL) ";
+    tabPrefix[I_VARIABLES_FILE] = "(&VAR) ";
+    tabPrefix[I_REPORTS_FILE] = "(REP) ";
+    tabPrefix[I_LOGS_FILE] = "(LOG) ";
 }
 
 QIodeTabWidget::~QIodeTabWidget()
 {
     saveSettings();
     if(settings) delete settings;
+
+    delete tabComments;
+    delete tabEquations;
+    delete tabIdentites;
+    delete tabLists;
+    delete tabScalars;
+    delete tabTables;
+    delete tabVariables;
 }
 
 void QIodeTabWidget::loadSettings()
 {
-    // Reload previously opened files
+    // extract settings
     settings->beginGroup("Project");
     QStringList filesToLoad = settings->value("files", "").toStringList();
-    int index = settings->value("index_last_open_tab", "").toInt();
+    int index = settings->value("index_last_open_tab", "-1").toInt();
     settings->endGroup();
 
-    for (int i=0; i < filesToLoad.size(); i++) loadFile(filesToLoad.at(i));
-    viewTab(index);
-}
+    // filesToLoad is empty in the case of a new project
+    if(filesToLoad.empty())
+    {
+        for (int iodeType=0; iodeType < I_NB_TYPES; iodeType++) 
+            setTabNameTooltip(iodeType, (EnumIodeFile) iodeType, "");
 
-// TODO : call this method when opening a new/other project 
+        showTab(0);
+    }
+    else
+    {
+        // reopen all tabs (files) that were open the last time the user quitted the IODE gui
+        QString filepath;
+        for(int i=0; i < filesToLoad.size(); i++)
+        {
+            filepath = filesToLoad.at(i);
+            // tab associated with a KDB which hasn't been saved the last time the user quitted the IODE gui
+            // (i.e. no filepath associated)
+            if (isUnsavedKDB(filepath))
+            {
+                int iodeType = extractIodeTypeFromDefaultTooltip(filepath);
+                // should never happen !
+                if (iodeType < 0)
+                {
+                    QMessageBox::critical(nullptr, "Error", 
+                        "loadSettings(): Something went wrong when trying to load " + filepath);
+                    return;
+                }
+                updateObjectTab((EnumIodeType) iodeType, i);
+            }
+            else 
+                loadFile(filepath, false, true, i);
+        }
+        
+        // display the tab that was displayed the last time the user quitted the IODE gui
+        showTab(index);
+    }
+
+}
+ 
 void QIodeTabWidget::saveSettings()
 {
-    // build list of open files (= tabs)
+    // build list of open tabs
     QStringList filesList = buildFilesList();
 
-    // save list to current project settings
     settings->beginGroup("Project");
+
+    // save the list of open tabs
     QVariant files = QVariant::fromValue(filesList);
     settings->setValue("files", files);
+
+    // save index of the currently displayed tab
     QVariant index = QVariant(this->currentIndex());
     settings->setValue("index_last_open_tab", index);
+
     settings->endGroup();
 }
 
 void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath)
 {
+    // save previous settings if any before to switch from project directory
+    if (this->project_settings_filepath) saveSettings();
+
+    // close all tabs
+    this->clear();
+
+    // add a default tab for each IODE type of objects
+    this->addTab(tabComments, "");
+    this->addTab(tabEquations, "");
+    this->addTab(tabIdentites, "");
+    this->addTab(tabLists, "");
+    this->addTab(tabScalars, "");
+    this->addTab(tabTables, "");
+    this->addTab(tabVariables, "");
+
+    // remove close button for IODE objects tabs
+    for(int i = 0; i < this->count(); i++)
+    {
+        this->tabBar()->tabButton(i, QTabBar::RightSide)->deleteLater();
+        this->tabBar()->setTabButton(i, QTabBar::RightSide, nullptr);
+    }
+
     this->project_settings_filepath = project_settings_filepath;
     settings = new QSettings(*project_settings_filepath, QSettings::IniFormat);
     loadSettings();
 }
 
-int QIodeTabWidget::addObjectTab(const EnumIodeType iodeType, const QFileInfo& fileInfo)
+void QIodeTabWidget::resetFilters()
 {
-    AbstractIodeObjectWidget* objWidget;
+    tabComments->resetFilter();
+    tabEquations->resetFilter();
+    tabIdentites->resetFilter();
+    tabLists->resetFilter();
+    tabScalars->resetFilter();
+    tabTables->resetFilter();
+    tabVariables->resetFilter();
+}
+
+void QIodeTabWidget::resetFilter(const EnumIodeType iodeType)
+{
     switch (iodeType)
     {
     case I_COMMENTS:
-        objWidget = new QIodeCommentsWidget(project_settings_filepath, iodeType, this);
+        tabComments->resetFilter();
         break;
     case I_EQUATIONS:
-        objWidget = new QIodeEquationsWidget(project_settings_filepath, iodeType, this);
+        tabEquations->resetFilter();
         break;
     case I_IDENTITIES:
-        objWidget = new QIodeIdentitiesWidget(project_settings_filepath, iodeType, this);
+        tabIdentites->resetFilter();
         break;
     case I_LISTS:
-        objWidget = new QIodeListsWidget(project_settings_filepath, iodeType, this);
+        tabLists->resetFilter();
         break;
     case I_SCALARS:
-        objWidget = new QIodeScalarsWidget(project_settings_filepath, iodeType, this);
+        tabScalars->resetFilter();
         break;
     case I_TABLES:
-        objWidget = new QIodeTablesWidget(project_settings_filepath, iodeType, this);
+        tabTables->resetFilter();
         break;
     case I_VARIABLES:
-        objWidget = new QIodeVariablesWidget(project_settings_filepath, iodeType, this);
+        tabVariables->resetFilter();
         break;
     default:
         break;
     }
+}
 
-    // add Iode object widget to tabs 
-    return this->addTab(objWidget, fileInfo.fileName());
+int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType, const int moveToPosition)
+{
+    int index;
+    try
+    {
+        // get index of corresponding tab
+        switch (iodeType)
+        {
+        case I_COMMENTS:
+            index = this->indexOf(tabComments);
+            break;
+        case I_EQUATIONS:
+            index = this->indexOf(tabEquations);
+            break;
+        case I_IDENTITIES:
+            index = this->indexOf(tabIdentites);
+            break;
+        case I_LISTS:
+            index = this->indexOf(tabLists);
+            break;
+        case I_SCALARS:
+            index = this->indexOf(tabScalars);
+            break;
+        case I_TABLES:
+            index = this->indexOf(tabTables);
+            break;
+        case I_VARIABLES:
+            index = this->indexOf(tabVariables);
+            break;
+        default:
+            return -1;
+        }
+
+        // get path to the file associated with KDB of objects of type iodeType
+        std::string filepath = std::string(K_get_kdb_nameptr(K_WS[iodeType]));
+
+        // KDB not saved in any file
+        if (filepath.empty() || filepath == std::string(I_DEFAULT_FILENAME))
+            setTabNameTooltip(index, (EnumIodeFile) iodeType, "");
+        else
+        {
+            // check path and add extension if needed
+            filepath = check_filepath(filepath, (EnumIodeFile) iodeType, "tab " + vIodeTypes[iodeType], false);
+            setTabNameTooltip(index, (EnumIodeFile) iodeType, QString::fromStdString(filepath));
+        }
+    }
+    catch (const std::exception& e)
+    {
+        QWidget* mainwin = get_main_window_ptr();
+        QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
+        return -1;
+    }
+
+    if (moveToPosition >= 0)
+    {
+        this->tabBar()->moveTab(index, moveToPosition);
+        index = moveToPosition;
+    }
+
+    return index;
 }
 
 // TODO : implement this method
 int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
     QWidget* mainwin = get_main_window_ptr();
-    QMessageBox::information(mainwin, "INFORMATION", 
+    QMessageBox::information(mainwin, "INFORMATION", "Cannot load file " + fileInfo.fileName() + ".\n" +
         "Loading of files with extension .rep not (yet) implemented.");
+    return -1;
+}
+
+// TODO : implement this method
+int QIodeTabWidget::addTextTab(const QFileInfo& fileInfo)
+{
+    QWidget* mainwin = get_main_window_ptr();
+    QMessageBox::information(mainwin, "INFORMATION", "Cannot load file " + fileInfo.fileName() + ".\n" +
+        "Loading of files with extension " + fileInfo.suffix() + " not (yet) implemented.");
     return -1;
 }
 
 // TODO : - add a Save As buttons.
 int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo)
 {
+    if (fileType <= I_VARIABLES_FILE) return -1;
+
     QWidget* mainwin = get_main_window_ptr();
     QString fullPath = fileInfo.absoluteFilePath();
 
@@ -120,38 +298,24 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
     // prepare and add the new tab
     switch (fileType)
     {
-    case I_COMMENTS_FILE:
-        index = addObjectTab(I_COMMENTS, fileInfo);
-        break;
-    case I_EQUATIONS_FILE:
-        index = addObjectTab(I_EQUATIONS, fileInfo);
-        break;
-    case I_IDENTITIES_FILE:
-        index = addObjectTab(I_IDENTITIES, fileInfo);
-        break;
-    case I_LISTS_FILE:
-        index = addObjectTab(I_LISTS, fileInfo);
-        break;
-    case I_SCALARS_FILE:
-        index = addObjectTab(I_SCALARS, fileInfo);
-        break;
-    case I_TABLES_FILE:
-        index = addObjectTab(I_TABLES, fileInfo);
-        break;
-    case I_VARIABLES_FILE:
-        index = addObjectTab(I_VARIABLES, fileInfo);
-        break;
     case I_REPORTS_FILE:
         index = addReportTab(fileInfo);
         break;
+    case I_LOGS_FILE:
+        index = addTextTab(fileInfo);
+        break;
+    case I_SETTINGS_FILE:
+        index = addTextTab(fileInfo);
+        break;
     default:
-        QMessageBox::information(mainwin, "INFORMATION", 
-            "Loading of files with extension " + fileInfo.suffix() + " not (yet) implemented.");
+        if (fileInfo.suffix() == "txt") index = addTextTab(fileInfo);
+        else QMessageBox::information(mainwin, "INFORMATION", "Cannot load file " + fileInfo.fileName() + ".\n" +
+                "Loading of files with extension " + fileInfo.suffix() + " not (yet) implemented.");
     }
+    if (index < 0) return index;
 
-    // set tooltip
-    // Note: index < 0 if adding new tab has failed
-    if (index >= 0) this->setTabToolTip(index, fullPath);
+    // set text and tooltip
+    setTabNameTooltip(index, fileType, fileInfo.absoluteFilePath());
 
     return index;
 }
@@ -166,7 +330,7 @@ void QIodeTabWidget::resetFilters()
     QString filename;
     for (int index=0; index < this->count(); index++)
     {
-        filename = this->tabText(index);
+        filename = QFileInfo(this->tabToolTip(index)).fileName();
         EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
         if(fileType <= I_VARIABLES_FILE)
         {
@@ -177,7 +341,7 @@ void QIodeTabWidget::resetFilters()
 }
 
 // TODO : update this method for report and text files
-void QIodeTabWidget::viewTab(int index)
+void QIodeTabWidget::showTab(int index)
 {
     // get the index of the tab currently visible if not passed to the method
     if (index < 0) index = this->currentIndex();
@@ -189,26 +353,31 @@ void QIodeTabWidget::viewTab(int index)
     // update widget if needed
     if(fileType <= I_VARIABLES_FILE)
     {
-        AbstractIodeObjectWidget* objWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
+        AbstractTabWidget* objWidget = static_cast<AbstractTabWidget*>(this->widget(index));
         objWidget->update();
     }
 
     this->setCurrentIndex(index);
 }
 
-// TODO : - implement loading of Report (text) file
-//        - implement loading of any number of files (but only 1 per Iode type)
-void QIodeTabWidget::loadFile(const QString& filepath)
+// TODO : - implement loading of Report, log and text files
+int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, const bool forceOverwrite, const int moveToPosition)
 {
     QString filename;
     QString tooltip;
+    int index;
     QWidget* mainwin = get_main_window_ptr();
     
-    if(filepath.isEmpty()) return;
+    if(filepath.isEmpty()) 
+        return -1;
     else
     {
         QFileInfo fileInfo(filepath);
-        if (!fileInfo.exists()) QMessageBox::critical(mainwin, "Error", "File " + fileInfo.absoluteFilePath() + " has not been found!");
+        if (!fileInfo.exists())
+        {
+            QMessageBox::critical(mainwin, "Error", "File " + fileInfo.absoluteFilePath() + " has not been found!");
+            return -1;
+        }
         else
         {
             try
@@ -218,20 +387,39 @@ void QIodeTabWidget::loadFile(const QString& filepath)
                 QString filename = fileInfo.fileName();
                 EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
                 // IODE objects
-                if (fileType <= I_VARIABLES_FILE)
+                if (fileType == I_DIRECTORY)
+                { 
+                    QMessageBox::warning(mainwin, "Warning", "Cannot load " + fullPath + " as it is not a file but a directory");
+                    return index;
+                }
+                else if (fileType <= I_VARIABLES_FILE)
                 {
+                    const EnumIodeType iodeType = (EnumIodeType) fileType;
+                    // check if correponding K_WS is not empty (except if force overwrite -> loadSettings())
+                    if(!forceOverwrite && is_iode_objs_loaded(iodeType))
+                    {
+                        QString iodeTypeName = QString::fromStdString(vIodeTypes[fileType]);
+                        QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", "There are " + 
+                            iodeTypeName + " already loaded. Would like to override " + iodeTypeName + " ?", 
+                            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                        if(answer == QMessageBox::No) return index;
+                    }
                     // load Iode file
                     std::string full_path = fullPath.toStdString();
-                    load_global_kdb((EnumIodeType) fileType, full_path);
+                    load_global_kdb(iodeType, full_path);
+                    index = updateObjectTab(iodeType, moveToPosition);
                 }
-                // Prepare new tab
-                int index = addNewTab(fileType, fileInfo);
-                viewTab(index);
+                // Prepare new tab (or simply return corresponding index if file already open)
+                else
+                    index = addNewTab(fileType, fileInfo);
+
+                if (displayTab) showTab(index);
+                return index;
             }
             catch (const std::exception& e)
             {
                 QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
-                return;
+                return -1;
             }
         }
     }
@@ -288,6 +476,26 @@ void QIodeTabWidget::saveFile(const QString& filepath, const bool loop)
     }
 }
 
+bool QIodeTabWidget::saveAllTabs()
+{
+    bool success = true;
+
+    AbstractTabWidget* tabWidget;
+    QString filepath;
+    QString error_msg = "An error occured when trying to save the content of the tab ";
+    for(int index=0; index < this->count(); index++)
+    {
+        tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        filepath = tabWidget->save();
+        if (!filepath.isEmpty())
+            setTabNameTooltip(index, tabWidget->getFiletype(), filepath);
+        else
+            success = false;
+    }
+
+    return success;
+}
+
 bool QIodeTabWidget::saveProjectAs(QDir& newProjectDir)
 {
     QString newProjectPath = newProjectDir.absolutePath();
@@ -313,9 +521,11 @@ void QIodeTabWidget::fileRenamed(const QString &path, const QString &oldName, co
     int index = tabs.indexOf(oldFilePath);
     if (index >= 0)
     {
-        // update name and tooltip of corresponding tab
         QString newFilePath = parentDir.absoluteFilePath(newName);
-        this->setTabText(index, newName);
-        this->setTabToolTip(index, newFilePath);
+        EnumIodeFile filetype = get_iode_file_type(newFilePath.toStdString());
+        // update name and tooltip of corresponding tab
+        setTabNameTooltip(index, filetype, newFilePath);
+        // if file associated with KDB object -> update filename of KDB
+        if (filetype <= I_VARIABLES_FILE) set_kdb_filename(K_WS[filetype], newFilePath.toStdString());
     }
 }
