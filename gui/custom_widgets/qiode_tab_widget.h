@@ -2,15 +2,44 @@
 
 #include <QObject>
 #include <QString>
+#include <QVector>
 #include <QTabWidget>
 #include <QFileInfo>
+#include <QShortcut>
 #include <QAbstractScrollArea>
 
 #include "utils.h"
 #include "util/system_item.h"
 #include "iode_objs/widget/iode_obj_widget.h"
 
-
+/**
+ * @brief The present class represents the widget displaying tabs. 
+ *        Tabs content can represents:
+ * 
+ *          - an IODE KDB,
+ *          - an IODE report,
+ *          - a text file.
+ * 
+ *        Implemented features:
+ *   
+ *        - Tab text = prefix (CMT, EQS, ..., REP, TXT) + filename of the loaded file (if any).
+ *          If the tab represents an IODE KDB not (yet) linked to any file, 'filename' is empty.
+ *        - The tab text include an * if modifications have been made but not saved yet.
+ *        - Tab tooltip = absolute path to the loaded file (if any) or "Unsaved <IODE type> Database".
+ *        - Only one tab can be open per IODE objects type (Comment, Equation, ..., Variable).
+ *        - When switching from another project or quiting the GUI, the absolute paths to all loaded files 
+ *          (= tooltips) are saved into a project settings file (with the .ini extension).
+ *        - When switching to a previous project or starting the GUI, all previously open tabs are restored 
+ *          (by reading list of files in the proejct settings file .ini).
+ *        - Users are allowed to close tabs if they represent a report or a text files (i.e. not an IODE objects type).
+ *        - Users are allowed to move tabs.
+ *        - CTRL + S on a tab saves its content.
+ *        - CTRL + D on a KDB tab clears the corresponding KDB.
+ *        - CTRL + SHIFT + D clears the whole workspace. 
+ *        - ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab.
+ *        - Ctrl+[shift]+Tab shift to the next [previous] tab.
+ * 
+ */
 class QIodeTabWidget: public QTabWidget
 {
     Q_OBJECT
@@ -22,31 +51,28 @@ class QIodeTabWidget: public QTabWidget
     bool overwrite_all;
     bool discard_all;
 
+    QVector<QString> tabPrefix;
+
+    QShortcut* nextTabShortcut;
+    QShortcut* previousTabShortcut;
+
+    QIodeCommentsWidget* tabComments;
+    QIodeEquationsWidget* tabEquations;
+    QIodeIdentitiesWidget* tabIdentites;
+    QIodeListsWidget* tabLists;
+    QIodeScalarsWidget* tabScalars;
+    QIodeTablesWidget* tabTables;
+    QIodeVariablesWidget* tabVariables;
+
 private:
     /**
-     * @brief add tab for editing Iode objects
+     * @brief check if data for IODE objects of type iodeType has been loaded in global K_WS 
      * 
-     * @param iodeType EnumIodeType type of Iode object to edit
-     * @param filepath QFileInfo path to the Iode object file
+     * @param iodeType EnumIodeType type of Iode object.
      * 
-     * @return int Index of the new tab
+     * @return bool Wether or not K_WS corresponding to iodeType is empty.
      */
-    int addObjectTab(const EnumIodeType iodeType, const QFileInfo& fileInfo);
-
-    /**
-     * @brief add tab for editing reports
-     * 
-     * @param fileInfo QFileInfo path to the report file
-     * 
-     * @return int Index of the new tab
-     */
-    int addReportTab(const QFileInfo& fileInfo);
-
-    /**
-     * @brief reopen all tabs 
-     * 
-     */
-    void loadSettings();
+    bool is_iode_objs_loaded(const EnumIodeType iodeType) { return K_WS[iodeType] != NULL; }
 
     /**
      * @brief build list of open files (= tabs)
@@ -56,13 +82,96 @@ private:
     QStringList buildFilesList()
     {
         QStringList filesList;
-        for (int i=0; i < this->count(); i++) filesList << this->tabToolTip(i);
+        QString filepath;
+        for (int i=0; i < this->count(); i++)
+        {
+            filepath = this->tabToolTip(i).trimmed();
+            if(!filepath.isEmpty()) filesList << this->tabToolTip(i);
+        }
         return filesList;
     }
+
+    /**
+     * @brief Set the default tab name and tooltip for a tab associated with a KDB. 
+     * 
+     * @param index int index of the tab.
+     * @param iodeType EnumIodeType type of the IODE objects.
+     * @param filepath QString path to the associated file (if any).
+     */
+    void setTabNameTooltip(const int index, const EnumIodeFile filetype, const QString& filepath)
+    {
+        if (filepath.isEmpty() || filepath == QString(I_DEFAULT_FILENAME))
+        {
+            EnumIodeType iodeType = (EnumIodeType) filetype;
+            QString default_filename = QString(I_DEFAULT_FILENAME) + QString::fromStdString(vFileExtensions[filetype].ext);
+            // Note: the * is to tell that the content of the KDB has not been saved in file
+            this->setTabText(index, tabPrefix[filetype] + default_filename + "*");
+            this->setTabToolTip(index, "Unsaved " + QString::fromStdString(vIodeTypes[iodeType]) + " Database");
+        }
+        else
+        {
+            QFileInfo fileInfo(filepath);
+            this->setTabText(index, tabPrefix[filetype] + fileInfo.fileName());
+            this->setTabToolTip(index, fileInfo.absoluteFilePath());
+        }
+    }
+
+    /**
+     * @brief return whether or not the tooltip is associated with a tab representing an unsaved KDB.
+     * 
+     * @param QString tooltip of the tab. 
+     * @return bool whether or not the tooltip is associated with a tab representing an unsaved KDB.
+     */
+    bool isUnsavedKDB(const QString& tooltip)
+    {
+        return tooltip.startsWith("Unsaved");
+    }
+
+    /**
+     * @brief return the IODE type corresponding to the passed tooltip.
+     * 
+     * @param QString tooltip of the tab.
+     * @return int IODE type corresponding to the passed tooltip. -1 if undefined IODE type.
+     */
+    int extractIodeTypeFromDefaultTooltip(const QString& tooltip)
+    {
+        // See setDefaultTabNameTooltip()
+        QString iodeTypeString = tooltip.split(" ")[1];
+        return get_iode_type(iodeTypeString.toStdString());
+    }
+
+    /**
+     * @brief add tab for editing reports.
+     * 
+     * @param fileInfo QFileInfo path to the report file.
+     * 
+     * @return int index of the new tab.
+     */
+    int addReportTab(const QFileInfo& fileInfo);
+
+    /**
+     * @brief add tab for editing a text file (.log, .ini, .txt).
+     * 
+     * @param fileInfo QFileInfo path to the text file.
+     * 
+     * @return int index of the new tab.
+     */
+    int addTextTab(const QFileInfo& fileInfo);
+
+    /**
+     * @brief - reopen all tabs (files) that were open (*)
+     *        - display the tab that was displayed (*)
+     *        (*) the last time the user quitted the IODE gui.
+     */
+    void loadSettings();
     
     /**
-     * @brief dump list of opened files (= tabs) in settings
-     * 
+     * @brief dump in settings:
+     *        - the list of open tabs.
+     *        - the index of the currently displayed tab.
+     *        
+     * @note The list of open tabs is actually the list of the tooltip associated with each tab.
+     *       The tooltip is either the path to the corresponding file or a default string in case of unsaved KDB.  
      */
     void saveSettings();
 
@@ -75,34 +184,109 @@ public:
      *        - Reload previously opened files.
      * 
      * @param project_settings_filepath shared_ptr<QString> path the settings file
+     * 
+     * TODO: merge setup() method with updateProjectDir()
      */
     void setup(std::shared_ptr<QString>& project_settings_filepath);
 
 	/**
 	 * @brief load a file and set corresponding tab text (filename) and tooltip (full absolute path).
 	 * 
-	 * @param filepath QString path to the file to load
+	 * @param filepath QString path to the file to load.
+     * @param displayTab bool whether or not displaying the corresponding tab when finished to load the file 
+     *                        (used in loadSettings()).
+     * @param forceOverwrite bool whether or not forcing overwrite of corresponding KDB (use in loadSetting()).
+     * @param moveToPosition int new position of the corresponding tab (use in loadSetting()). 
+     *                           Only used if the file is associated with an IODE KDB.
+     * 
+     * @return int index of the corresponding tab. -1 if failed to load file.
 	 */
-	void loadFile(const QString& filepath);
+	int loadFile(const QString& filepath, const bool displayTab=true, const bool forceOverwrite=false, const int moveToPosition=-1);
 
+    /**
+     * @brief save IODE KDB or content of a tab (representing either .log or .ini or .txt file) to a file.
+     * 
+     * @param filepath QString path to destination file.
+     * @param loop bool whether or not the method is called from a loop.
+     */
     void saveFile(const QString& filepath, const bool loop = false);
 
     /**
-     * @brief save current project to another (new) directory
+     * @brief save all open tabs. 
+     *        Ask for a filepath if KDB not linked to any file.
      * 
-     * @param dir (New) directory to save the current project in
-     * @return bool whether or not all files have been saved, i.e. the user as not clicked on the Discard button
+     * @return bool whether or not the method has succeeded. 
+     */
+    bool saveAllTabs();
+
+    /**
+     * @brief save current project to another (new) directory.
+     * 
+     * @param dir (new) directory to save the current project in.
+     * @return bool whether or not all files have been saved, i.e. the user as not clicked on the Discard button.
      */
     bool saveProjectAs(QDir& newProjectDir);
 
+    /**
+     * @brief update tab for editing IODE objects.
+     * 
+     * @param iodeType EnumIodeType type of IODE objects to edit.
+     * @param moveToPosition int new position of the corresponding tab (optional).
+     * 
+     * @return int Index of the tab.
+     */
+    int updateObjectTab(const EnumIodeType iodeType, const int moveToPosition=-1);
+
+    /**
+     * @brief create a new tab corresponding to the newly open file.
+     *        Called by loadFile().
+     * 
+     * @param fileType EnumIodeFile type of the loaded file (KDB file, .log, .ini, .txt, other).
+     * @param fileInfo QFileInfo path to the loaded file.
+     * @return int index of the new tab
+     */
     int addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo);
 
-	void viewTab(int index = -1);
+    /**
+     * @brief show tab corresponding to passed index. 
+     *        Do nothing if index is -1.
+     * 
+     * @param index int index of the tab to show.
+     */
+	void showTab(int index = -1);
 
+    /**
+     * @brief reset all filters on IODE objects.
+     */
     void resetFilters();
+
+    /**
+     * @brief reset corresponding filter.
+     * 
+     * @param iodeType 
+     */
+    void resetFilter(const EnumIodeType iodeType);
 
 public slots:
     void removeTab(const int index);
+
+    /**
+     * @brief show next tab.
+     */
+    void showNextTab()
+    {
+        int lastIndex = this->count() - 1;
+        if(this->currentIndex() != lastIndex) this->setCurrentIndex(this->currentIndex() + 1);
+    }
+
+    /**
+     * @brief show previous tab.
+     * 
+     */
+    void showPreviousTab()
+    {
+        if(this->currentIndex() != 0) this->setCurrentIndex(this->currentIndex() - 1); 
+    }
     
     /**
      * @brief Update the path to the current project directory.
@@ -110,7 +294,19 @@ public slots:
      * 
      * @param projectDirPath Path to the root directory of the File Explorer  
      */
-    void updateProjectDir(const QString& projectDirPath) { this->projectDirPath = projectDirPath; }
+    void updateProjectDir(const QString& projectDirPath) 
+    { 
+        this->projectDirPath = projectDirPath;
+        // associate new project directory to each KDB tab + clear global KDB
+        QDir projectDir(projectDirPath);
+        tabComments->setProjectDir(projectDir);
+        tabEquations->setProjectDir(projectDir);
+        tabIdentites->setProjectDir(projectDir);
+        tabLists->setProjectDir(projectDir);
+        tabScalars->setProjectDir(projectDir);
+        tabTables->setProjectDir(projectDir);
+        tabVariables->setProjectDir(projectDir);
+    }
 
     /**
      * @brief Method called when a user rename a file using the File Explorer.
