@@ -125,6 +125,12 @@ inline EnumIodeFile get_iode_file_type(const std::string& filepath)
     }
     return I_ANY_FILE;
 }
+
+inline int get_iode_type(const std::string& iode_type_as_string)
+{
+    for(int i=0; i < I_NB_TYPES; i++) if(iode_type_as_string == vIodeTypes[i]) return i;
+    return -1;
+}
 inline static std::filesystem::path check_file(const std::string& filepath, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
