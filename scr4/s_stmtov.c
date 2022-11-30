@@ -74,18 +74,18 @@ unsigned char    **tbl,
     int     len = 0, sepslen, i, pos = 0, lg;  /* JMP 03-10-2003 */
 
     if(tbl == 0) return(res);
-    sepslen = strlen(seps);
+    sepslen = (int)strlen(seps);
 
     /* Count space */
     for(i = 0 ; tbl[i] != 0 ; i++)
-	len += sepslen + strlen(tbl[i]);
+	len += sepslen + (int)strlen(tbl[i]);
 
     /* Allocate and create output vector */
     res = (U_ch  *)SCR_malloc(len + 1);
 
     for(i = 0 ; tbl[i] != 0 ; i++)  {
 	//strcat(res, tbl[i]);      /* JMP 03-10-2003 */
-	lg = strlen(tbl[i]);
+	lg = (int)strlen(tbl[i]);
 	memcpy(res + pos, tbl[i], lg);  /* JMP 03-10-2003 */
 	pos += lg;
 	if(tbl[i + 1]) {

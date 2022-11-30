@@ -21,7 +21,7 @@ unsigned char *text;
     int     nb_bl;
     int     lg;
 
-    lg = strlen(text);
+    lg = (int)strlen(text);
     nb_bl = lg - 1;
     //while( (nb_bl >= 0) && (text[nb_bl] == ' ')) nb_bl--;
     while(nb_bl >= 0 && SCR_is_space(text[nb_bl])) nb_bl--; /* JMP 16-04-2013 */

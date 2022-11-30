@@ -52,9 +52,9 @@ int             (*fn)();
     int     i;
 
     strcpy(buf, title);
-    memset(buf, ' ', strlen(title));
+    memset(buf, ' ', (int)strlen(title));
 
-    lg -= strlen(title);
+    lg -= (int)strlen(title);
     if(lg < 1) {
 	(*fn)(title);
 	return(0);

@@ -365,7 +365,7 @@ unsigned char *SCR_OemToTextLg(U_ch *res, U_ch *oem, int lg)
 unsigned char *SCR_OemToText(unsigned char *res, unsigned char *oem)
 {
     if(res == 0) return(res);
-    return(SCR_OemToTextLg(res, oem, strlen(res)));
+    return(SCR_OemToTextLg(res, oem, (int)strlen(res)));
 }
 
 

@@ -126,9 +126,7 @@ d‚fini dans la variable globale SCR_DATE_FMT[15] qui peut ‚ventuellement
 &SA SCR_long_to_fdate(), SCR_current_date()
 =======================================================================*/
 
-char *SCR_long_to_date(val, string)
-long    val;
-char    *string ;
+char *SCR_long_to_date(long val, char* string)
 {
     return(SCR_long_to_fdate(val, string, SCR_DATE_FMT));
 }
@@ -152,9 +150,7 @@ d‚fini dans la variable globale SCR_TIME_FMT[15] qui peut ‚ventuellement
 &SA SCR_long_to_fdate(), SCR_current_date()
 =======================================================================*/
 
-char *SCR_long_to_time(val, string)
-long    val;
-char    *string ;
+char *SCR_long_to_time(long val, char* string)
 {
     return(SCR_long_to_ftime(val, string, SCR_TIME_FMT));
 }
@@ -183,12 +179,10 @@ et les D au-del… du deuxiŠme de mˆme.
 &SA SCR_long_to_date(), SCR_current_date()
 =======================================================================*/
 
-char *SCR_long_to_fdate(date, str, fmt)
-long    date;
-char    *str, *fmt;
+char *SCR_long_to_fdate(long date, char* str, char* fmt)
 {
     char    vyy[25], *yy = vyy, mm[5], dd[5];  /* JMP 13-05-96 */
-    int     i, j, nby = 0, y = 0, m = 0, d = 0;
+    int     i, nby = 0, y = 0, m = 0, d = 0;
 
 /*    if(SCR_check_date(date)) date = 0L; /* JMP38 02-10-92 */
 /*    yy = "1989"; /* JMP 13-05-96 */
@@ -247,9 +241,7 @@ Ainsi le format "hhH.mm" sur 243000 donnera "24H.30".
 &SA SCR_long_to_time(), SCR_current_time()
 =======================================================================*/
 
-char *SCR_long_to_ftime(hour, str, fmt)
-long    hour;
-char    *str, *fmt;
+char *SCR_long_to_ftime(long hour, char* str, char* fmt)
 {
     char    hh[25], mm[25], ss[25]; /* JMP 13-05-96 */
     int     i, h = 0, m = 0, s = 0;
@@ -279,8 +271,7 @@ char    *str, *fmt;
     return(str);
 }
 /*NH*/
-int SCR_fmt_dt(fmto, fmti)
-char    *fmto, *fmti;
+int SCR_fmt_dt(char* fmto, char* fmti)
 {
     int     i;
 
@@ -297,8 +288,7 @@ char    *fmto, *fmti;
 }
 
 /*NH*/
-SCR_date_upper_char(ch)
-int     ch;
+int SCR_date_upper_char(int ch)
 {
     return(SCR_upper_char(ch)); /* JMP 29-03-00 */
 /*    if(islower(ch)) ch = toupper(ch);
@@ -317,8 +307,7 @@ Retourne le nombre de secondes ‚coul‚es depuis minuit.
 &TX
 &SA DT_date_num()
 ----------------------------------------------------------------------- */
-long DT_time_num(date)
-long    date;
+long DT_time_num(long date)
 {
     long    h, m, s;
 
@@ -339,8 +328,7 @@ Retourne l'heure … partir d'un nombre de secondes.
 &TX
 &SA DT_date_num(), DT_time_num(), DT_num_date()
 ----------------------------------------------------------------------- */
-long DT_num_time(nbs)
-long    nbs;
+long DT_num_time(long nbs)
 {
     long    h, m, s;
 

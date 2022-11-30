@@ -36,9 +36,9 @@ unsigned long l;
     char    in[30];
 
     sprintf(in, "%lu", l);
-    i = strlen(fmt) - 1;
+    i = (int)strlen(fmt) - 1;
     out[i + 1] = 0;
-    j = strlen(in) - 1;
+    j = (int)strlen(in) - 1;
     for( ; i >= 0 ; i--) {
 	switch(fmt[i]) {
 	    case '9' :

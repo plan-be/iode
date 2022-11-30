@@ -26,7 +26,7 @@ char    *res, *dir;
 #if defined(DOS) && !defined(DOSW32) && !defined(SCRW32)
     SCR_lower(res);
 #endif
-    lg = strlen(res);
+    lg = (int)strlen(res);
     if(lg != 1 && U_is_in(res[lg - 1], "/\\") &&    /* \ */
        !(lg == 3 && res[1] == ':'))                 /* a:\ */
 	res[lg - 1] = 0;

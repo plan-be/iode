@@ -1,6 +1,6 @@
 #include "s_strs.h"
 #include <stdio.h>
-
+#include <io.h>
 
 #ifdef DOS
 #include <io.h>
@@ -45,10 +45,10 @@ char    *SCR_search_path(path, file)
 char    *path;
 char    *file;
 {
-    static U_ch    pt[256]; // JMP 3/2017
-    U_ch           *txt, c;
-    char    fdrv[3], pdrv[3];
-    int     i = 0;
+    static U_ch     pt[256]; // JMP 3/2017
+    U_ch            *txt;
+    char            fdrv[3];
+    int             i = 0;
 
     if(strlen(file) < 1) return((char *)0);
 
@@ -63,7 +63,7 @@ char    *file;
 #endif
     if(txt[0] == DIR_SEP || txt[0] == '.' || fdrv[0] != 0) {
 	SCR_free(txt);
-	if(access(file, 0) == 0) {
+	if(_access(file, 0) == 0) {
 	    strcpy(pt, file);
 	    return((char *)pt);
 	}
@@ -81,7 +81,7 @@ char    *file;
 	if(i == 0 || pt[i - 1] != DIR_SEP) pt[i++] = DIR_SEP; /* JMP 10-02-96 */
 	pt[i++] = 0;
 	strcat(pt, file);
-	if(access(pt, 0) == 0)
+	if(_access(pt, 0) == 0)
 	    return((char *)pt);
     }
     return((char *)0);

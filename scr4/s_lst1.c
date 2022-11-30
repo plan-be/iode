@@ -122,7 +122,6 @@ LST     *lst;
 long    after, n;
 {
     long    i;
-    char    *p1, *p2;
 
     if(after < -1 || n <= 0) return(-1);
     if(after >= lst->nb_els) return(-1);
@@ -148,7 +147,7 @@ LST     *lst;
 long    from, n;
 {
     long    i;
-    int     nb_tbls, onb_tbls;
+    int     nb_tbls;
 
     if(from + n > lst->nb_els) n = lst->nb_els - from;
     if(from < 0 || n <= 0) return(-1);

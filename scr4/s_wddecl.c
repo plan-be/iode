@@ -88,7 +88,7 @@ unsigned char* cmd;
 
     /* Execute */
     for(i = 0 ; i < WDDE_NB_TRIES ; i++) {
-	DdeClientTransaction(cmd, strlen(cmd) + 1, hConv, NULL, CF_TEXT,
+	DdeClientTransaction(cmd, (DWORD) (strlen(cmd) + 1), hConv, NULL, CF_TEXT,
 	    XTYP_EXECUTE, (i + 1) * WDDE_TIMEOUT, &dwResult);
 	if(DdeGetLastError(idInst) == DMLERR_DATAACKTIMEOUT) continue;
 	else break;
@@ -194,7 +194,7 @@ unsigned char* ptr;
     // Request notification
     hszItem = DdeCreateStringHandle (idInst, szItem, 0) ;
     for(i = 0 ; i < WDDE_NB_TRIES ; i++) {
-	DdeClientTransaction (ptr, strlen(ptr) + 1, hConv, hszItem,
+	DdeClientTransaction (ptr, (DWORD)(strlen(ptr) + 1), hConv, hszItem,
 	    CF_TEXT, XTYP_POKE, (i + 1) * WDDE_TIMEOUT, &dwResult) ;
 	if(DdeGetLastError(idInst) == DMLERR_DATAACKTIMEOUT) continue;
 	else break;
@@ -405,9 +405,6 @@ HDDEDATA CALLBACK DdeCallback (UINT iType, UINT iFmt, HCONV hConv,
 			       HSZ hsz1, HSZ hsz2, HDDEDATA hData,
 			       DWORD dwData1, DWORD dwData2)
 {
-     char szItem[10];
-     int  i ;
-
      switch (iType)
 	  {
 	  case XTYP_ADVDATA :       // hsz1  = topic

@@ -36,7 +36,7 @@ char    *res, *filename, *ext;
 
     if(res[i] == '.') return(res);
 /* JMP 04-02-96 */
-    for(i = strlen(res) - 1 ; i >= 0 ; i--)                         /* JMP 04-02-96 */
+    for(i = (int)strlen(res) - 1 ; i >= 0 ; i--)                         /* JMP 04-02-96 */
 	if(res[i] == '.' || res[i] == '\\' || res[i] == '/') break; /* JMP 04-02-96 */
     if(i >= 0 && res[i] == '.') return(res);                        /* JMP 04-02-96 */
 

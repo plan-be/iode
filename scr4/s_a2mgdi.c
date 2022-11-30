@@ -30,10 +30,7 @@ int A2M_GDI_BMARG = 12;
 
 
 /*NH*/
-A2mGdiPrinterInit(hWndOwner, Dlg, JobTitle)
-HWND    hWndOwner;
-int     Dlg;
-U_ch    *JobTitle;
+int A2mGdiPrinterInit(HWND hWndOwner, int Dlg, U_ch* JobTitle)
 {
     if(JobTitle == 0) JobTitle = "A2M";
     if(WprPrinterInit(hWndOwner, Dlg, JobTitle)) return(-1);
@@ -174,11 +171,7 @@ Ces variables sont d‚finies dans la section [GDI] du fichier .ini.
     A2mToHtml(), A2mPrintError()
 ==================================================================== */
 
-A2mToGdiPrinter(hWndOwner, Dlg, JobTitle, a2mfile)
-HWND    hWndOwner;
-int     Dlg;
-U_ch    *JobTitle;
-U_ch    *a2mfile;
+int A2mToGdiPrinter(HWND hWndOwner, int Dlg, U_ch* JobTitle, U_ch* a2mfile)
 {
     A2MFILE *af;
     A2MOBJ  *ao;
@@ -370,8 +363,7 @@ A2mGdiWriteObj(A2MOBJ *ao)
 }
 
 /*NH*/
-A2mGdiSetMargins(am)
-A2MMARGINS  *am;
+int A2mGdiSetMargins(A2MMARGINS* am)
 {
     if(am->am_left >= 0) {
 	A2M_GDI_MARGX = (am->am_left / 2.54) * WprLOGX - WprOFFSETX;
@@ -392,11 +384,11 @@ A2MMARGINS  *am;
 	    A2M_GDI_W = WprHORZRES - A2M_GDI_MARGX - A2M_GDI_MARGX2;
 	    }
 	}
+    return(0);
 }
 
 /*NH*/
-A2mGdiPrepPar1(ap)
-A2MPAR  *ap;
+int A2mGdiPrepPar1(A2MPAR* ap)
 {
     A2MPPR  *pp;
 
@@ -411,9 +403,7 @@ A2MPAR  *ap;
 }
 
 /*NH*/
-A2mGdiPrepPar2(ap, w)
-A2MPAR  *ap;
-int     w;
+int A2mGdiPrepPar2(A2MPAR* ap, int w)
 {
     if(ap == 0 || ap->ap_as2 == 0) return(0);
 
@@ -427,9 +417,7 @@ A2mPtsToPix(int pts)
 }
 
 /*NH*/
-A2mGdiWritePar(ap, x, y, w, just)
-A2MPAR  *ap;
-int     x, y, w, just;
+int A2mGdiWritePar(A2MPAR* ap, int x, int y, int w, int just)
 {
     int     i, bulw, bulh, bulm, lw, lh, pos;
 
@@ -459,11 +447,12 @@ int     x, y, w, just;
 	y += lh;
 	i++;
 	}
+    
+    return(0);
 }
 
 /*NH*/
-A2mGdiWriteLine(al)
-A2MLINE     *al;
+int A2mGdiWriteLine(A2MLINE* al)
 {
     int     type = 1;
 
@@ -516,7 +505,7 @@ A2mGdiPrintLine(A2MSTR **as, int from, int x, int y)
 }
 
 /*NH*/
-A2mGdiCalcRect(A2MPAR *ap, int marg)
+int A2mGdiCalcRect(A2MPAR *ap, int marg)
 {
     A2MSTR  **as = ap->ap_as2;
     int     i, prevsep = -1, type;
@@ -566,7 +555,7 @@ A2mGdiCalcRect(A2MPAR *ap, int marg)
 }
 
 /*NH*/
-A2mGdiCalcSubRect(A2MSTR **as, int from, int to, long *w, long *h)
+int A2mGdiCalcSubRect(A2MSTR **as, int from, int to, long *w, long *h)
 {
     int     i;
 
@@ -582,7 +571,7 @@ A2mGdiCalcSubRect(A2MSTR **as, int from, int to, long *w, long *h)
 
 
 /*NH*/
-A2mGdiSetFont(A2MFNT *fnt)
+int A2mGdiSetFont(A2MFNT *fnt)
 {
     int     size = fnt->af_size;
 
@@ -595,8 +584,7 @@ A2mGdiSetFont(A2MFNT *fnt)
 }
 
 /*NH*/
-A2mGdiCalcSizes(ap)
-A2MPAR  *ap;
+int A2mGdiCalcSizes(A2MPAR* ap)
 {
     int     i;
     long    wmin = ap->ap_lmarg, wmax = ap->ap_lmarg;
@@ -641,8 +629,7 @@ A2MPAR  *ap;
 /****************** TABLES ************************/
 
 /*NH*/
-A2mGdiPrepTbl1(at)
-A2MTBL  *at;
+int A2mGdiPrepTbl1(A2MTBL* at)
 {
     A2MTC   *tc;
     int     i, j;
@@ -678,9 +665,7 @@ A2MTBL  *at;
 
 
 /*NH*/
-A2mGdiPrepTblWs(at, w)
-A2MTBL  *at;
-int     w;
+int A2mGdiPrepTblWs(A2MTBL* at, int w)
 {
     A2MTC   *tc;
     A2MPAR  *ap;
@@ -734,8 +719,7 @@ int     w;
 }
 
 /*NH*/
-A2mGdiPrepTbl2(at)
-A2MTBL  *at;
+int A2mGdiPrepTbl2(A2MTBL *at)
 {
     A2MTC   *tc;
     int     i, j, k, w;
@@ -755,8 +739,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mGdiCalcTblH(at)
-A2MTBL  *at;
+int A2mGdiCalcTblH(A2MTBL* at)
 {
     A2MTC   *tc;
     A2MPAR  *ap;
@@ -793,8 +776,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mGdiTblTitleH(at)
-A2MTBL  *at;
+int A2mGdiTblTitleH(A2MTBL* at)
 {
     A2MPAR  *ap = at->at_title;
 
@@ -803,8 +785,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mGdiTblFootnoteH(at)
-A2MTBL  *at;
+int A2mGdiTblFootnoteH(A2MTBL* at)
 {
     A2MPAR  *ap = at->at_footnote;
 
@@ -813,9 +794,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mGdiSubTblH(at, from, nc, hbf)
-A2MTBL  *at;
-int     from, nc, hbf;
+int A2mGdiSubTblH(A2MTBL* at, int from, int nc, int hbf)
 {
     A2MPAR  *ap;
     int     i, j, h = 0, ch;
@@ -841,9 +820,7 @@ int     from, nc, hbf;
 }
 
 /*NH*/
-A2mGdiCalcTblW(at, from, nc)
-A2MTBL  *at;
-int     from, nc;
+int A2mGdiCalcTblW(A2MTBL* at, int from, int nc)
 {
     int     i, w = 0;
 
@@ -853,13 +830,9 @@ int     from, nc;
 }
 
 /*NH*/
-A2mWriteTblHBFwr(at, from, nc, hbf, i, wr)
-A2MTBL  *at;
-int     from, nc, hbf, i, wr;
+int A2mWriteTblHBFwr(A2MTBL* at, int from, int nc, int hbf, int i, int wr)
 {
-    A2MTC   *tc;
-    A2MPAR  *ap;
-    int     j, k, cx, cw, ch, w, hmin = 0, cy = A2M_GDI_CURY;
+    int     j, cx, ch, w, hmin = 0, cy = A2M_GDI_CURY;
     int     b = at->at_border;
 
     if(b < 0) b = A2M_GDI_TBORDER;
@@ -909,9 +882,7 @@ int     from, nc, hbf, i, wr;
 }
 
 /*NH*/
-A2mWriteTblHBF(at, from, nc, hbf)
-A2MTBL  *at;
-int     from, nc, hbf;
+int A2mWriteTblHBF(A2MTBL* at, int from, int nc, int hbf)
 {
     int     line1 = 0;
 
@@ -927,9 +898,7 @@ int     from, nc, hbf;
 }
 
 /*NH*/
-A2mWriteTblCellwr(at, line, from, j, nc, cx, cy, ch, wr)
-A2MTBL  *at;
-int     from, line, j, nc, *cx, cy, *ch, wr;
+int A2mWriteTblCellwr(A2MTBL* at, int line, int from, int j, int nc, int* cx, int cy, int *ch, int wr)
 {
     A2MTC   *tc = at->at_tls[line].atl_tcs + from + j;
     A2MPAR  *ap = tc->atc_par;
@@ -956,9 +925,7 @@ int     from, line, j, nc, *cx, cy, *ch, wr;
 }
 
 /*NH*/
-A2mGdiWriteSubTbl(at, from, nc, w)
-A2MTBL  *at;
-int     from, nc, w;
+int A2mGdiWriteSubTbl(A2MTBL* at, int from, int nc, int w)
 {
     A2MPAR  *ap;
     int     hmin = 0;
@@ -996,8 +963,7 @@ int     from, nc, w;
 }
 
 /*NH*/
-A2mGdiWriteTbl(at)
-A2MTBL  *at;
+int A2mGdiWriteTbl(A2MTBL* at)
 {
     int     from = 1, nc, w;
 
@@ -1022,7 +988,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mFormFeed()
+int A2mFormFeed()
 {
     if(A2M_GDI_CURX == 0 && A2M_GDI_CURY == 0) return(0);
     A2mPageHead();
@@ -1034,9 +1000,7 @@ A2mFormFeed()
 }
 
 /*NH*/
-A2mPageTitle(txt, yt, yr, just)
-U_ch    *txt;
-int     yt, yr, just;
+int A2mPageTitle(U_ch* txt, int yt, int yr, int just)
 {
     A2MPAR  *ap;
     U_ch    buf[256];
@@ -1217,7 +1181,6 @@ A2mGdiGrfLine(axis, x1, y1, x2, y2, props)
 double  x1, y1, x2, y2;
 int     axis, props;
 {
-    double  y_0;
     int     gx1, gy1, gx2, gy2;
 
 
@@ -1260,7 +1223,7 @@ double  x, y;
 char    *align, *color;
 A2MPAR  *par;
 {
-    int     gx1, gy1, al;
+    int     gx1, gy1;
 
     switch(axis) {
 	case -1 : break;

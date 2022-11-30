@@ -29,8 +29,8 @@ extern int     WSOCKS_CURRENT;
 extern int WSOCK_DEBUG;
 extern int WSOCK_BUFSIZE;
 
-/*NH*/
-WSock1Register(int cltsock)
+
+int WSock1Register(int cltsock)
 {
     int     i;
 
@@ -44,8 +44,7 @@ WSock1Register(int cltsock)
     return(i);
 }
 
-/*NH*/
-WSock1UnRegister(int cltsock)
+int WSock1UnRegister(int cltsock)
 {
     int     i;
 
@@ -59,8 +58,8 @@ WSock1UnRegister(int cltsock)
     return(i);
 }
 
-/*NH*/
-WSock1NbSocks()
+
+int WSock1NbSocks()
 {
     int     i, count = 0;
 
@@ -70,8 +69,8 @@ WSock1NbSocks()
     return(count);
 }
 
-/*NH*/
-WSock1SetCurrent(int cltsock)
+
+int WSock1SetCurrent(int cltsock)
 {
     int     i;
 
@@ -83,8 +82,8 @@ WSock1SetCurrent(int cltsock)
     return(i);
 }
 
-/*NH*/
-WSock1GetTotalR(int cltsock)
+
+int WSock1GetTotalR(int cltsock)
 {
     int     i;
 
@@ -95,8 +94,8 @@ WSock1GetTotalR(int cltsock)
     return(WSOCKS[i].wsock_totalr);
 }
 
-/*NH*/
-WSock1GetTotalW(int cltsock)
+
+int WSock1GetTotalW(int cltsock)
 {
     int     i;
 
@@ -109,9 +108,7 @@ WSock1GetTotalW(int cltsock)
 
 
 /*NH*/
-WSOCKCLT *WSockCreateWSC(WinSock, ClientSock, fn)
-int WinSock, ClientSock;
-int     (*fn)(int);
+WSOCKCLT *WSockCreateWSC(int WinSock, int ClientSock, int (*fn)(int))
 {
     WSOCKCLT    *wsc;
 
@@ -148,7 +145,7 @@ long WINAPI WSockClient(WSOCKCLT *wsc)
     free(wsc);
 }
 
-/*NH
+/*
 Fonction de lancement de process client avec la commande cmd
 */
 long WINAPI WSockClientProc(char *subcmd, int cltsock)
@@ -338,12 +335,7 @@ dans ce second cas.
 &SA WSockStartServerProc(), WSockConnect()
 ================================================================= */
 
-WSockStartServer(port, fn, subcmd, bThread, nqueue)
-int     port;
-int     (*fn)(int);
-int     nqueue;
-char    *subcmd;
-int     bThread;
+int WSockStartServer(int port, int (*fn)(int), char* subcmd, int bThread, int nqueue)
 {
     int                 rc, iId;
     SOCKET              WinSocket = -1, // Server socket
@@ -506,9 +498,7 @@ cr‚‚e. Un exemple peut ˆtre trouv‚ dans la fonction WSockStartServer()
 &SA WSockStartServer()
 ================================================================= */
 
-WSockStartServerProc(cltsock, fn)
-int     cltsock;
-int     (*fn)(int);
+int WSockStartServerProc(int cltsock, int (*fn)(int))
 {
     int         rc;
     char        ip[40], name[120];
@@ -535,10 +525,3 @@ int     (*fn)(int);
 }
 
 #endif
-
-
-
-
-
-
-

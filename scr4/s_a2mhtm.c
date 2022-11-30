@@ -155,9 +155,7 @@ int     wh;
     HEAD et BODY dans le fichier r‚sultat.
 */
 
-A2mToHtmlStrip(a2mfile, outfile, strp, wh)
-char    *a2mfile, *outfile;
-int     strp, wh;
+int A2mToHtmlStrip(char* a2mfile, char* outfile, int strp, int wh)
 {
     A2MFILE *af;
     A2MOBJ  *ao;
@@ -166,22 +164,22 @@ int     strp, wh;
     A2mReadTopics(a2mfile);  /* JMP 17-05-99 */
     af = A2mOpen(a2mfile, 0);
     if(af == 0) {
-	A2mFreeTopics();  /* JMP 24-05-99 */
-	return(-1);
+        A2mFreeTopics();  /* JMP 24-05-99 */
+        return(-1);
     }
 
     A2M_HTML_STRIP = strp;
     if(A2mHtmlInit(outfile, wh)) {
-	A2mClose(af);
-	A2M_HTML_STRIP = ostrp;
-	A2mFreeTopics();  /* JMP 24-05-99 */
-	return(-2);
+        A2mClose(af);
+        A2M_HTML_STRIP = ostrp;
+        A2mFreeTopics();  /* JMP 24-05-99 */
+        return(-2);
     }
 
     while(1) {
-	ao = A2mRead(af);
-	if(ao == 0) break;
-	A2mHtmlPrintObj(ao, 1);
+        ao = A2mRead(af);
+        if(ao == 0) break;
+        A2mHtmlPrintObj(ao, 1);
     }
 
     A2mHtmlEnd();
@@ -191,14 +189,14 @@ int     strp, wh;
     return(0);
 }
 /*NH*/
-A2mHtmlPre(fd, base)
+int A2mHtmlPre(fd, base)
 FILE    *fd;
 char    *base;
 {
-    int     i;
+    //int     i;
     extern  int A2M_SWF_NOGIF;
     extern U_ch    SWF_JSPATH[256],
-		   SWF_JSEXPORTPATH[256];
+           SWF_JSEXPORTPATH[256];
     extern int     SWF_EXPORTENABLED;
 
 
@@ -211,49 +209,49 @@ char    *base;
     fprintf(fd, "\n</TITLE>\n");
 
     if(A2M_HTML_STYLE) {
-	// fprintf(fd, "<STYLE>\n<!--\n"); /* JMP 21-10-01 */
-	fprintf(fd, "<!STARTSTYLE>\n");  /* JMP 14-03-11 */
-	SCR_dumpf_file(fd, A2M_HTML_STYLE);
-	fprintf(fd, "<!ENDSTYLE>\n");  /* JMP 14-03-11 */
-	// fprintf(fd, "\n-->\n</STYLE>\n"); /* JMP 21-10-01 */
+        // fprintf(fd, "<STYLE>\n<!--\n"); /* JMP 21-10-01 */
+        fprintf(fd, "<!STARTSTYLE>\n");  /* JMP 14-03-11 */
+        SCR_dumpf_file(fd, A2M_HTML_STYLE);
+        fprintf(fd, "<!ENDSTYLE>\n");  /* JMP 14-03-11 */
+        // fprintf(fd, "\n-->\n</STYLE>\n"); /* JMP 21-10-01 */
     }
 
     if(A2M_HTML_RELSTYLE) { /* JMP 29-01-2004 */
-	fprintf(fd, "<!STARTSTYLE>\n");  /* JMP 14-03-11 */
-	fprintf(fd, "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">\n", A2M_HTML_RELSTYLE); /* JMP 29-01-2004 */
-	fprintf(fd, "<!ENDSTYLE>\n");  /* JMP 14-03-11 */
+        fprintf(fd, "<!STARTSTYLE>\n");  /* JMP 14-03-11 */
+        fprintf(fd, "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">\n", A2M_HTML_RELSTYLE); /* JMP 29-01-2004 */
+        fprintf(fd, "<!ENDSTYLE>\n");  /* JMP 14-03-11 */
     }
     if(base) /* JMP 01-02-2004 */
-	fprintf(fd, "<base target=\"%s\">\n", base);
+        fprintf(fd, "<base target=\"%s\">\n", base);
 
     if(A2M_SWF_NOGIF) {
-	A2mSWFIni();
-	fprintf(fd, "<script language=\"JavaScript\" src=\"%s\"></script>", SWF_JSPATH);
-	if(SWF_JSEXPORTPATH[0] != 0) {
-	    fprintf(fd, "<script language=\"JavaScript\" src=\"%s\"></script>", SWF_JSEXPORTPATH);
-	    SWF_EXPORTENABLED = 1;
-	}
-	else SWF_EXPORTENABLED = 0;
+        A2mSWFIni();
+        fprintf(fd, "<script language=\"JavaScript\" src=\"%s\"></script>", SWF_JSPATH);
+        if(SWF_JSEXPORTPATH[0] != 0) {
+            fprintf(fd, "<script language=\"JavaScript\" src=\"%s\"></script>", SWF_JSEXPORTPATH);
+            SWF_EXPORTENABLED = 1;
+        }
+        else SWF_EXPORTENABLED = 0;
     }
 
     fprintf(fd, "\n<META NAME=\"GENERATOR\" CONTENT=\"SCR4_A2H\">\n");
     fprintf(fd, "</HEAD>\n");
     if(A2M_HTML_BODY)
-	fprintf(fd, "<BODY %s>\n", A2M_HTML_BODY);
+        fprintf(fd, "<BODY %s>\n", A2M_HTML_BODY);
     else {
-	if(A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0)
-	    fprintf(fd, "<BODY TEXT=\"#000000\" BGCOLOR=\"#FFFFC0\" LINK=\"#0000FF\" ALINK=\"#FF00FF\" VLINK=\"#800080\">\n"); /* JMP 27-04-99 */
-	else
-	    fprintf(fd, "<BODY>\n");
+        if(A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0)
+            fprintf(fd, "<BODY TEXT=\"#000000\" BGCOLOR=\"#FFFFC0\" LINK=\"#0000FF\" ALINK=\"#FF00FF\" VLINK=\"#800080\">\n"); /* JMP 27-04-99 */
+        else
+            fprintf(fd, "<BODY>\n");
     }
 
     fprintf(fd, "<!STARTHEADER>\n");
     fprintf(fd, "<!ENDHEADER>\n");
+    return(0);
 }
 
 /*NH*/
-A2mHtmlPost(fd)
-FILE    *fd;
+int A2mHtmlPost(FILE* fd)
 {
 //    A2mHtmlPrintFNotes();
 //    A2mFreeFNotes();
@@ -261,6 +259,7 @@ FILE    *fd;
     fprintf(fd, "<!ENDFOOTER>\n");
     fprintf(fd, "</BODY>\n");
     fprintf(fd, "</HTML>\n");
+    return(0);
 }
 
 /*NH*/
@@ -268,7 +267,6 @@ A2mHtmlInit(outfile, wh)
 char    *outfile;
 int     wh;
 {
-    int         i;
     char        buf[256];
     extern int  A2M_CUROBJ;
 
@@ -293,8 +291,8 @@ int     wh;
     SCR_change_ext(buf, outfile, "hhc");
     A2M_fdhhc = fopen(buf, "w+");
     if(A2M_fdhhc == 0) {
-	fclose(A2M_fdhtm);
-	return(-2);
+        fclose(A2M_fdhtm);
+        return(-2);
     }
     A2mHtmlPre(A2M_fdhhc, 0);
     fprintf(A2M_fdhhc, "<UL>\n");
@@ -302,9 +300,9 @@ int     wh;
     SCR_change_ext(buf, outfile, "hhk");
     A2M_fdhhk = fopen(buf, "w+");
     if(A2M_fdhhk == 0) {
-	fclose(A2M_fdhtm);
-	fclose(A2M_fdhhc);
-	return(-2);
+        fclose(A2M_fdhtm);
+        fclose(A2M_fdhhc);
+        return(-2);
     }
     A2mHtmlPre(A2M_fdhhk, 0);
     fprintf(A2M_fdhhk, "<UL>\n");
@@ -316,10 +314,10 @@ int     wh;
     SCR_change_ext(buf, outfile, "toc.htm");
     A2M_fdtoc = fopen(buf, "w+");
     if(A2M_fdtoc == 0) {
-	fclose(A2M_fdhtm);
-	fclose(A2M_fdhhc);
-	fclose(A2M_fdhhk);
-	return(-2);
+        fclose(A2M_fdhtm);
+        fclose(A2M_fdhhc);
+        fclose(A2M_fdhhk);
+        return(-2);
     }
     A2mHtmlPre(A2M_fdtoc, "contents");
     fprintf(A2M_fdtoc, "<UL>\n");
@@ -328,8 +326,7 @@ int     wh;
 }
 
 /*NH*/
-A2mHtmlHhp(outfile)
-char    *outfile;
+int A2mHtmlHhp(char* outfile)
 {
     FILE    *fd;
     char    buf[256], cnt[256], key[256];
@@ -359,7 +356,7 @@ char    *outfile;
 
     fprintf(fd, "[WINDOWS]\n");
     fprintf(fd, "xxx=,\"%s\",\"%s\",\"t0000.htm\",,,,,,0x63521,,0x380e,,0x80000,,,,,,0\n",
-	    cnt, key);
+            cnt, key);
 
     fprintf(fd, "[INFOTYPES]\n");
     fprintf(fd, "[FILES]\n");
@@ -384,20 +381,20 @@ int A2mHtmlEnd()
     A2M_fdhtm = 0;
 
     if(A2M_HTML_HELP) {
-	A2mHtmlPrintTopicCnt((A2MTOP *)0, 0);
-	A2mHtmlPost(A2M_fdhhc);
-	fclose(A2M_fdhhc);
-	A2M_fdhhc = 0;
+        A2mHtmlPrintTopicCnt((A2MTOP *)0);
+        A2mHtmlPost(A2M_fdhhc);
+        fclose(A2M_fdhhc);
+        A2M_fdhhc = 0;
 
-	fprintf(A2M_fdhhk, "</UL>\n");
-	A2mHtmlPost(A2M_fdhhk);
-	fclose(A2M_fdhhk);
-	A2M_fdhhk = 0;
+        fprintf(A2M_fdhhk, "</UL>\n");
+        A2mHtmlPost(A2M_fdhhk);
+        fclose(A2M_fdhhk);
+        A2M_fdhhk = 0;
 
-	fprintf(A2M_fdtoc, "</UL>\n");
-	A2mHtmlPost(A2M_fdtoc);
-	fclose(A2M_fdtoc);
-	A2M_fdtoc = 0;
+        fprintf(A2M_fdtoc, "</UL>\n");
+        A2mHtmlPost(A2M_fdtoc);
+        fclose(A2M_fdtoc);
+        A2M_fdtoc = 0;
     }
 
     if(A2M_HTML_TITLE && A2M_HTML_OEMTOANSI) SCR_AnsiToOem(A2M_HTML_TITLE, A2M_HTML_TITLE); /* JMP 30-04-99 */
@@ -415,28 +412,26 @@ int     del;
     sprintf(msg, "Printing Object %d", A2M_CUROBJ++);
     A2mMessage(msg);
     if(ao->ao_type == A2M_PAR)
-	A2mHtmlPrintPar((A2MPAR *)ao->ao_ptr, 0, 0);
+        A2mHtmlPrintPar((A2MPAR *)ao->ao_ptr, 0, 0);
 
     if(ao->ao_type == A2M_TOPIC)
-	A2mHtmlPrintTopic((A2MTOP *)ao->ao_ptr, 0);
+        A2mHtmlPrintTopic((A2MTOP *)ao->ao_ptr, 0);
 
     if(ao->ao_type == A2M_TOPICALIAS) /* JMP 09-09-99 */
-	A2mHtmlPrintTopic((A2MTOP *)ao->ao_ptr, 1);
+        A2mHtmlPrintTopic((A2MTOP *)ao->ao_ptr, 1);
 
     if(ao->ao_type == A2M_TBL)
-	A2mHtmlPrintTbl((A2MTBL *)ao->ao_ptr);
+        A2mHtmlPrintTbl((A2MTBL *)ao->ao_ptr);
 
     if(ao->ao_type == A2M_GRF)
-	A2mHtmlPrintGrf((A2MGRF *)ao->ao_ptr);
+        A2mHtmlPrintGrf((A2MGRF *)ao->ao_ptr);
 
     if(del) A2mFreeObj(ao);
     return(0);
 }
 
 /*NH*/
-A2mHtmlPrintTopic(atp, alias)
-A2MTOP  *atp;
-int     alias;
+int A2mHtmlPrintTopic(A2MTOP* atp, int alias)
 {
     char    buf[256];
     int     i;
@@ -447,13 +442,13 @@ int     alias;
     A2mHtmlPrintTopicKey(atp);
 
     if(A2M_fdhtm != NULL) {
-	for(i = 0 ; i < A2M_LEVEL ; i++) fprintf(A2M_fdhtm, "</UL>\n");
-	A2M_LEVEL = 0;
-	A2mHtmlPrintFNotes();
-	A2mFreeFNotes();
-	A2mHtmlPost(A2M_fdhtm);
-	fclose(A2M_fdhtm);
-	A2M_fdhtm = NULL;
+        for(i = 0 ; i < A2M_LEVEL ; i++) fprintf(A2M_fdhtm, "</UL>\n");
+        A2M_LEVEL = 0;
+        A2mHtmlPrintFNotes();
+        A2mFreeFNotes();
+        A2mHtmlPost(A2M_fdhtm);
+        fclose(A2M_fdhtm);
+        A2M_fdhtm = NULL;
     }
 
     sprintf(buf, "T%04d.htm", atp->atp_nb);
@@ -493,12 +488,12 @@ int     blc;
 
     if(blc <= 0) return(0);
     for(i = 0 ; i < A2M_NB_TABS ; i++) {
-	if(blc <= A2M_TABS[i]) break;
+        if(blc <= A2M_TABS[i]) break;
     }
 
     if(i == A2M_NB_TABS && A2M_NB_TABS <= 10) {
-	A2M_TABS[i] = blc;
-	A2M_NB_TABS++;
+        A2M_TABS[i] = blc;
+        A2M_NB_TABS++;
     }
 
     /*    for( ; i >= 0 ; i--) fprintf(A2M_fdhtm, "<UL>"); /* JMP 14-12-98 */
@@ -533,8 +528,8 @@ int     tbl, tcol;
     A2MFNT  fntd;
 
     if(ap == 0 || ap->ap_strs == 0) {
-	if(tbl) fprintf(A2M_fdhtm, "&nbsp;"); /* JMP 31-12-98 */
-	return(0);
+        if(tbl) fprintf(A2M_fdhtm, "&nbsp;"); /* JMP 31-12-98 */
+        return(0);
     }
     A2mSetParProps(ap->ap_tag, &(ap->ap_ppr));
     A2mHtmlFindTag(&(ap->ap_ppr), tag);
@@ -546,46 +541,46 @@ int     tbl, tcol;
     if(level > 6) level = 6; /* JMP 11-09-99 */
 
     if(level < A2M_LEVEL)
-	for(i = level ; i < A2M_LEVEL ; i++) fprintf(A2M_fdhtm, "</UL>\n");
+        for(i = level ; i < A2M_LEVEL ; i++) fprintf(A2M_fdhtm, "</UL>\n");
     else if(level > A2M_LEVEL)
-	for(i = A2M_LEVEL ; i < level ; i++) fprintf(A2M_fdhtm, "<UL>\n");
+        for(i = A2M_LEVEL ; i < level ; i++) fprintf(A2M_fdhtm, "<UL>\n");
 
     A2M_LEVEL = level;
 
     /* if(tbl && tcol == 0) {
-	blc = A2mHtmlCalcBlc(ap);
-	if(blc) A2mHtmlOpenTab(blc);
-	}
+    blc = A2mHtmlCalcBlc(ap);
+    if(blc) A2mHtmlOpenTab(blc);
+    }
     GB 29/04/2004 */
     switch(ap->ap_ppr.pp_just) {
     case 1 :
-	just = "CENTER";
-	break;
+        just = "CENTER";
+        break;
     case 2 :
     case 3 :
-	just = "RIGHT";
-	break;    /* JMP 12-02-99 */
+        just = "RIGHT";
+        break;    /* JMP 12-02-99 */
     case 4 :
-	just = "JUSTIFY";
-	break;  /* JMP 12-02-99 */
+        just = "JUSTIFY";
+        break;  /* JMP 12-02-99 */
     default :
-	just = 0;
-	break;
+        just = 0;
+        break;
     }
 
     if(tbl == 0 || strcmp(tag, "P") || ap->ap_tag) {
-	if(tag[0] == 'H') fprintf(A2M_fdhtm, "<A NAME=\"REF%d\"></A>", ++A2M_HTMLREF); /* JMP 30-04-00 */
-	fprintf(A2M_fdhtm, "<%s", tag);
-	if(just && A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0) /* JMP 29-01-2004 */
-	    fprintf(A2M_fdhtm, " ALIGN=%s", just);
-	if(ap->ap_tag) fprintf(A2M_fdhtm, " class=\"%s\"", ap->ap_tag);/* JMP 25-01-2004 */
-	if(tcol == 0) {
-	    blc = A2mHtmlCalcBlc(ap);
-	    if(blc && A2M_HTML_NOINLINESTYLE == 0)
-		fprintf(A2M_fdhtm, " STYLE=\"margin-left:%dpt\" ", blc*2); /* JMP 25-09-10 */
-	}
-	fprintf(A2M_fdhtm, ">"); /* JMP 17-05-99 */
-	/* if(tag[0] == 'H') fprintf(A2M_fdhtm, "</A>"); /* JMP 30-04-00 */
+        if(tag[0] == 'H') fprintf(A2M_fdhtm, "<A NAME=\"REF%d\"></A>", ++A2M_HTMLREF); /* JMP 30-04-00 */
+        fprintf(A2M_fdhtm, "<%s", tag);
+        if(just && A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0) /* JMP 29-01-2004 */
+            fprintf(A2M_fdhtm, " ALIGN=%s", just);
+        if(ap->ap_tag) fprintf(A2M_fdhtm, " class=\"%s\"", ap->ap_tag);/* JMP 25-01-2004 */
+        if(tcol == 0) {
+            blc = A2mHtmlCalcBlc(ap);
+            if(blc && A2M_HTML_NOINLINESTYLE == 0)
+                fprintf(A2M_fdhtm, " STYLE=\"margin-left:%dpt\" ", blc*2); /* JMP 25-09-10 */
+        }
+        fprintf(A2M_fdhtm, ">"); /* JMP 17-05-99 */
+        /* if(tag[0] == 'H') fprintf(A2M_fdhtm, "</A>"); /* JMP 30-04-00 */
     }
 
 //    if(tbl == 0 && just) fprintf(A2M_fdhtm, "<%s>", just); /* JMP 12-02-99 */
@@ -633,13 +628,13 @@ A2MFNT  *fnt;
     fnt->af_family = 'T';
 
     if(tag[0] == 'H') {
-	fnt->af_size = 20 - 2 * atoi(tag + 1);
-	fnt->af_bold = 1;
+        fnt->af_size = 20 - 2 * atoi(tag + 1);
+        fnt->af_bold = 1;
     }
 
     if(strcmp(tag, "PRE") == 0) {
-	fnt->af_size = 10;
-	fnt->af_family = 'C';
+        fnt->af_size = 10;
+        fnt->af_family = 'C';
     }
 
     return(0);
@@ -658,58 +653,58 @@ int     tbl;
 
     A2mHtmlPrintAttr(ap, n, fntt);
     if(A2M_NUMBERS && n == 0 && ap->ap_ppr.pp_number >= 1) {
-	A2mCalcNumbering(ap->ap_ppr.pp_number - 1, buf);
-	for(i = 0 ; buf[i] ; i++) A2mHtmlPrintChar(A2M_fdhtm, buf[i]);
+        A2mCalcNumbering(ap->ap_ppr.pp_number - 1, buf);
+        for(i = 0 ; buf[i] ; i++) A2mHtmlPrintChar(A2M_fdhtm, buf[i]);
     }
 
     switch(as->as_type) {
     case A2M_TEXT :
-	for(i = 0 ; as->as_txt[i] ; i++)
-	    A2mHtmlPrintChar(A2M_fdhtm, as->as_txt[i]);
-	return(0);
+        for(i = 0 ; as->as_txt[i] ; i++)
+            A2mHtmlPrintChar(A2M_fdhtm, as->as_txt[i]);
+        return(0);
 
     case A2M_IMAGEFR:
     case A2M_IMAGER:
     case A2M_IMAGEF:
     case A2M_IMAGE :
-	A2mHtmlAFrame(as->as_txt);
-	return(0);
+        A2mHtmlAFrame(as->as_txt);
+        return(0);
     case A2M_ANCHOR :
-	A2mHtmlAnchor(as->as_txt);
-	return(0);
+        A2mHtmlAnchor(as->as_txt);
+        return(0);
     case A2M_FNOTE :
-	A2mHtmlFNote(as->as_txt);
-	return(0);
+        A2mHtmlFNote(as->as_txt);
+        return(0);
     case A2M_BHREF:
-	fprintf(A2M_fdhtm, "<A HREF=\"%s\">", as->as_txt);
-	return(0);
+        fprintf(A2M_fdhtm, "<A HREF=\"%s\">", as->as_txt);
+        return(0);
     case A2M_EHREF:
-	fprintf(A2M_fdhtm, "</A>");
-	return(0);
+        fprintf(A2M_fdhtm, "</A>");
+        return(0);
     case A2M_NEWLINE : //if(tbl == 0) fprintf(A2M_fdhtm, "<BR>");
-	//else fprintf(A2M_fdhtm, "</P><P>");
-	fprintf(A2M_fdhtm, "<BR>");
-	return(0);
+        //else fprintf(A2M_fdhtm, "</P><P>");
+        fprintf(A2M_fdhtm, "<BR>");
+        return(0);
 
     case A2M_TAB :
-	fprintf(A2M_fdhtm, " ");
-	return(0);
+        fprintf(A2M_fdhtm, " ");
+        return(0);
     case A2M_TOPIC  :                              /* JMP 29-04-99 */
-	if(A2M_HTML_HELP) {
-	    A2M_HTML_TOPIC = atoi(as->as_txt);
-	    fprintf(A2M_fdhtm, "<A HREF=\"T%04d.htm\">", A2M_HTML_TOPIC);
-	}
-	else
-	    fprintf(A2M_fdhtm, "");
-	break;
+        if(A2M_HTML_HELP) {
+            A2M_HTML_TOPIC = atoi(as->as_txt);
+            fprintf(A2M_fdhtm, "<A HREF=\"T%04d.htm\">", A2M_HTML_TOPIC);
+        }
+        else
+            fprintf(A2M_fdhtm, "");
+        break;
     case A2M_ETOPIC :                              /* JMP 29-04-99 */
-	if(A2M_HTML_HELP) {
-	    fprintf(A2M_fdhtm, "</A>");
-	    A2M_HTML_TOPIC = -1;
-	}
-	else
-	    fprintf(A2M_fdhtm, "");
-	break;
+        if(A2M_HTML_HELP) {
+            fprintf(A2M_fdhtm, "</A>");
+            A2M_HTML_TOPIC = -1;
+        }
+        else
+            fprintf(A2M_fdhtm, "");
+        break;
     }
 
     return(0);
@@ -730,7 +725,7 @@ A2mHtmlResetFont()
     if(A2M_CURFONT.af_family)   fprintf(A2M_fdhtm, "</TT>");
 
     for(i = 0; i < A2M_CURFONT.af_color + A2M_CURFONT.af_size ; i++)
-	fprintf(A2M_fdhtm, "</FONT>");
+        fprintf(A2M_fdhtm, "</FONT>");
 
     return(0);
 }
@@ -761,128 +756,128 @@ A2MFNT  *fntt;
     /* RESET */
     if(fnt.af_family != 'C' && fntp.af_family == 'C')
     {
-	fprintf(A2M_fdhtm, "</TT>");
-	A2M_CURFONT.af_family = 0;
+        fprintf(A2M_fdhtm, "</TT>");
+        A2M_CURFONT.af_family = 0;
     }
 
     if(fnt.af_family != 'G' && fntp.af_family == 'G')
     {
-	A2M_HTML_GREEK = 0;
+        A2M_HTML_GREEK = 0;
     }
 
     if(!fnt.af_italic && fntp.af_italic)
     {
-	fprintf(A2M_fdhtm, "</I>");
-	A2M_CURFONT.af_italic = 0;
+        fprintf(A2M_fdhtm, "</I>");
+        A2M_CURFONT.af_italic = 0;
     }
 
     if(fnt.af_pos == 0 && fntp.af_pos == -1)
     {
-	fprintf(A2M_fdhtm, "</SUB>");
-	A2M_CURFONT.af_pos = 0;
+        fprintf(A2M_fdhtm, "</SUB>");
+        A2M_CURFONT.af_pos = 0;
     }
 
     if(fnt.af_pos == 0 && fntp.af_pos == 1)
     {
-	fprintf(A2M_fdhtm, "</SUP>");
-	A2M_CURFONT.af_pos = 0;
+        fprintf(A2M_fdhtm, "</SUP>");
+        A2M_CURFONT.af_pos = 0;
     }
 
     if(!fnt.af_bold && fntp.af_bold)
     {
-	fprintf(A2M_fdhtm, "</B>");
-	A2M_CURFONT.af_bold = 0;
+        fprintf(A2M_fdhtm, "</B>");
+        A2M_CURFONT.af_bold = 0;
     }
 
     if(!fnt.af_underline && fntp.af_underline)
     {
-	fprintf(A2M_fdhtm, "</U>");
-	A2M_CURFONT.af_underline = 0;
+        fprintf(A2M_fdhtm, "</U>");
+        A2M_CURFONT.af_underline = 0;
     }
 
     if(!fnt.af_strike && fntp.af_strike)
     {
-	fprintf(A2M_fdhtm, "</STRIKE>");
-	A2M_CURFONT.af_strike = 0;
+        fprintf(A2M_fdhtm, "</STRIKE>");
+        A2M_CURFONT.af_strike = 0;
     }
 
     if(A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0 && fnt.af_size != fntp.af_size) { /* JMP 29-01-2004 */
-	if(fnt.af_size <= 7)       fprintf(A2M_fdhtm, "<FONT SIZE=-2>");
-	else if(fnt.af_size <= 10) fprintf(A2M_fdhtm, "<FONT SIZE=-1>");
-	else if(fnt.af_size <= 12) fprintf(A2M_fdhtm, "<FONT SIZE=+0>");
-	else if(fnt.af_size <= 14) fprintf(A2M_fdhtm, "<FONT SIZE=+1>");
-	else if(fnt.af_size <= 16) fprintf(A2M_fdhtm, "<FONT SIZE=+2>");
-	else if(fnt.af_size <= 18) fprintf(A2M_fdhtm, "<FONT SIZE=+3>");
-	else fprintf(A2M_fdhtm, "<FONT SIZE=+4>");
-	A2M_CURFONT.af_size++;
+        if(fnt.af_size <= 7)       fprintf(A2M_fdhtm, "<FONT SIZE=-2>");
+        else if(fnt.af_size <= 10) fprintf(A2M_fdhtm, "<FONT SIZE=-1>");
+        else if(fnt.af_size <= 12) fprintf(A2M_fdhtm, "<FONT SIZE=+0>");
+        else if(fnt.af_size <= 14) fprintf(A2M_fdhtm, "<FONT SIZE=+1>");
+        else if(fnt.af_size <= 16) fprintf(A2M_fdhtm, "<FONT SIZE=+2>");
+        else if(fnt.af_size <= 18) fprintf(A2M_fdhtm, "<FONT SIZE=+3>");
+        else fprintf(A2M_fdhtm, "<FONT SIZE=+4>");
+        A2M_CURFONT.af_size++;
     }
 
     if(fnt.af_color != fntp.af_color) {
-	fprintf(A2M_fdhtm, "<FONT COLOR=\"#%s\">",
-		A2M_HTMLCOLORS[fnt.af_color]);
-	A2M_CURFONT.af_color++;
+        fprintf(A2M_fdhtm, "<FONT COLOR=\"#%s\">",
+                A2M_HTMLCOLORS[fnt.af_color]);
+        A2M_CURFONT.af_color++;
     }
 
     if(A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0 &&
-	    fnt.af_family == 'H' && fntp.af_family != 'H') /* JMP 29-01-2004 */
+            fnt.af_family == 'H' && fntp.af_family != 'H') /* JMP 29-01-2004 */
     {
-	fprintf(A2M_fdhtm, "<FONT FACE=\"Arial\">");
-	A2M_CURFONT.af_color++;
+        fprintf(A2M_fdhtm, "<FONT FACE=\"Arial\">");
+        A2M_CURFONT.af_color++;
     }
     if(A2M_HTML_STYLE == 0 && A2M_HTML_RELSTYLE == 0 &&
-	    fnt.af_family == 'V' && fntp.af_family != 'V') /* JMP 09-05-99 */
+            fnt.af_family == 'V' && fntp.af_family != 'V') /* JMP 09-05-99 */
     {
-	fprintf(A2M_fdhtm, "<FONT FACE=\"Verdana\">");
-	A2M_CURFONT.af_color++;
+        fprintf(A2M_fdhtm, "<FONT FACE=\"Verdana\">");
+        A2M_CURFONT.af_color++;
     }
 
 
     /* SET */
     if(fnt.af_strike && !fntp.af_strike)
     {
-	fprintf(A2M_fdhtm, "<STRIKE>");
-	A2M_CURFONT.af_strike = 1;
+        fprintf(A2M_fdhtm, "<STRIKE>");
+        A2M_CURFONT.af_strike = 1;
     }
 
     if(fnt.af_underline && !fntp.af_underline)
     {
-	fprintf(A2M_fdhtm, "<U>");
-	A2M_CURFONT.af_underline = 1;
+        fprintf(A2M_fdhtm, "<U>");
+        A2M_CURFONT.af_underline = 1;
     }
 
     if(fnt.af_bold && !fntp.af_bold)
     {
-	fprintf(A2M_fdhtm, "<B>");
-	A2M_CURFONT.af_bold = 1;
+        fprintf(A2M_fdhtm, "<B>");
+        A2M_CURFONT.af_bold = 1;
     }
 
     if(fnt.af_italic && !fntp.af_italic)
     {
-	fprintf(A2M_fdhtm, "<I>");
-	A2M_CURFONT.af_italic = 1;
+        fprintf(A2M_fdhtm, "<I>");
+        A2M_CURFONT.af_italic = 1;
     }
 
     if(fnt.af_pos == 1 && fntp.af_pos != 1)
     {
-	fprintf(A2M_fdhtm, "<SUP>");
-	A2M_CURFONT.af_pos = 1;
+        fprintf(A2M_fdhtm, "<SUP>");
+        A2M_CURFONT.af_pos = 1;
     }
 
     if(fnt.af_pos == -1 && fntp.af_pos != -1)
     {
-	fprintf(A2M_fdhtm, "<SUB>");
-	A2M_CURFONT.af_pos = -1;
+        fprintf(A2M_fdhtm, "<SUB>");
+        A2M_CURFONT.af_pos = -1;
     }
 
     if(fnt.af_family == 'C' && fntp.af_family != 'C')
     {
-	fprintf(A2M_fdhtm, "<TT>");
-	A2M_CURFONT.af_family = 1;
+        fprintf(A2M_fdhtm, "<TT>");
+        A2M_CURFONT.af_family = 1;
     }
 
     if(fnt.af_family == 'G' && fntp.af_family != 'G')
     {
-	A2M_HTML_GREEK = 1;
+        A2M_HTML_GREEK = 1;
     }
 
     return(0);
@@ -897,281 +892,281 @@ int     ch;
 
 
     if(A2M_HTML_GREEK) {
-	switch(ch) {
-	case 'a'    :
-	    txt = "&alpha;";
-	    break;
-	case 'A'    :
-	    txt = "&Alpha;";
-	    break;
-	case 'b'    :
-	    txt = "&beta;";
-	    break;
-	case 'B'    :
-	    txt = "&Beta;";
-	    break;
-	case 'g'    :
-	    txt = "&gamma;";
-	    break;
-	case 'G'    :
-	    txt = "&Gamma;";
-	    break;
-	case 'd'    :
-	    txt = "&delta;";
-	    break;
-	case 'D'    :
-	    txt = "&Delta;";
-	    break;
-	case 'e'    :
-	    txt = "&epsilon;";
-	    break;
-	case 'E'    :
-	    txt = "&Epsilon;";
-	    break;
-	case 'z'    :
-	    txt = "&zeta;";
-	    break;
-	case 'Z'    :
-	    txt = "&Zeta;";
-	    break;
-	case 'n'    :
-	    txt = "&eta;";
-	    break;
-	case 'N'    :
-	    txt = "&Eta;";
-	    break;
-	case 'h'    :
-	    txt = "&eta;";
-	    break;
-	case 'H'    :
-	    txt = "&Eta;";
-	    break;
-	case 'i'    :
-	    txt = "&iota;";
-	    break;
-	case 'I'    :
-	    txt = "&Iota;";
-	    break;
-	case 'k'    :
-	    txt = "&kappa;";
-	    break;
-	case 'K'    :
-	    txt = "&Kappa;";
-	    break;
-	case 'l'    :
-	    txt = "&lambda;";
-	    break;
-	case 'L'    :
-	    txt = "&Lambda;";
-	    break;
-	case 'm'    :
-	    txt = "&mu;";
-	    break;
-	case 'M'    :
-	    txt = "&Mu;";
-	    break;
-	case 'v'    :
-	    txt = "&nu;";
-	    break;
-	case 'V'    :
-	    txt = "&Nu;";
-	    break;
-	case 'o'    :
-	    txt = "&omicron;";
-	    break;
-	case 'O'    :
-	    txt = "&Omicron;";
-	    break;
-	case 'x'    :
-	    txt = "&xi;";
-	    break;
-	case 'X'    :
-	    txt = "&Xi;";
-	    break;
-	case 'p'    :
-	    txt = "&pi;";
-	    break;
-	case 'P'    :
-	    txt = "&Pi;";
-	    break;
-	case 'r'    :
-	    txt = "&rho;";
-	    break;
-	case 'R'    :
-	    txt = "&Rho;";
-	    break;
-	case 's'    :
-	    txt = "&sigma;";
-	    break;
-	case 'S'    :
-	    txt = "&Sigma;";
-	    break;
-	case 't'    :
-	    txt = "&tau;";
-	    break;
-	case 'T'    :
-	    txt = "&Tau;";
-	    break;
-	case 'u'    :
-	    txt = "&upsilon;";
-	    break;
-	case 'U'    :
-	    txt = "&Upsilon;";
-	    break;
-	case 'j'    :
-	case 'f'    :
-	    txt = "&phi;";
-	    break;
-	case 'J'    :
-	case 'F'    :
-	    txt = "&Phi;";
-	    break;
-	case 'c'    :
-	    txt = "&chi;";
-	    break;
-	case 'C'    :
-	    txt = "&Chi;";
-	    break;
-	case 'y'    :
-	    txt = "&psi;";
-	    break;
-	case 'Y'    :
-	    txt = "&Psi;";
-	    break;
-	case 'w'    :
-	    txt = "&omega;";
-	    break;
-	case 'W'    :
-	    txt = "&Omega;";
-	    break;
-	default     :
-	    fprintf(fd, "%c", ch);
-	    return(0);
-	}
+        switch(ch) {
+        case 'a'    :
+            txt = "&alpha;";
+            break;
+        case 'A'    :
+            txt = "&Alpha;";
+            break;
+        case 'b'    :
+            txt = "&beta;";
+            break;
+        case 'B'    :
+            txt = "&Beta;";
+            break;
+        case 'g'    :
+            txt = "&gamma;";
+            break;
+        case 'G'    :
+            txt = "&Gamma;";
+            break;
+        case 'd'    :
+            txt = "&delta;";
+            break;
+        case 'D'    :
+            txt = "&Delta;";
+            break;
+        case 'e'    :
+            txt = "&epsilon;";
+            break;
+        case 'E'    :
+            txt = "&Epsilon;";
+            break;
+        case 'z'    :
+            txt = "&zeta;";
+            break;
+        case 'Z'    :
+            txt = "&Zeta;";
+            break;
+        case 'n'    :
+            txt = "&eta;";
+            break;
+        case 'N'    :
+            txt = "&Eta;";
+            break;
+        case 'h'    :
+            txt = "&eta;";
+            break;
+        case 'H'    :
+            txt = "&Eta;";
+            break;
+        case 'i'    :
+            txt = "&iota;";
+            break;
+        case 'I'    :
+            txt = "&Iota;";
+            break;
+        case 'k'    :
+            txt = "&kappa;";
+            break;
+        case 'K'    :
+            txt = "&Kappa;";
+            break;
+        case 'l'    :
+            txt = "&lambda;";
+            break;
+        case 'L'    :
+            txt = "&Lambda;";
+            break;
+        case 'm'    :
+            txt = "&mu;";
+            break;
+        case 'M'    :
+            txt = "&Mu;";
+            break;
+        case 'v'    :
+            txt = "&nu;";
+            break;
+        case 'V'    :
+            txt = "&Nu;";
+            break;
+        case 'o'    :
+            txt = "&omicron;";
+            break;
+        case 'O'    :
+            txt = "&Omicron;";
+            break;
+        case 'x'    :
+            txt = "&xi;";
+            break;
+        case 'X'    :
+            txt = "&Xi;";
+            break;
+        case 'p'    :
+            txt = "&pi;";
+            break;
+        case 'P'    :
+            txt = "&Pi;";
+            break;
+        case 'r'    :
+            txt = "&rho;";
+            break;
+        case 'R'    :
+            txt = "&Rho;";
+            break;
+        case 's'    :
+            txt = "&sigma;";
+            break;
+        case 'S'    :
+            txt = "&Sigma;";
+            break;
+        case 't'    :
+            txt = "&tau;";
+            break;
+        case 'T'    :
+            txt = "&Tau;";
+            break;
+        case 'u'    :
+            txt = "&upsilon;";
+            break;
+        case 'U'    :
+            txt = "&Upsilon;";
+            break;
+        case 'j'    :
+        case 'f'    :
+            txt = "&phi;";
+            break;
+        case 'J'    :
+        case 'F'    :
+            txt = "&Phi;";
+            break;
+        case 'c'    :
+            txt = "&chi;";
+            break;
+        case 'C'    :
+            txt = "&Chi;";
+            break;
+        case 'y'    :
+            txt = "&psi;";
+            break;
+        case 'Y'    :
+            txt = "&Psi;";
+            break;
+        case 'w'    :
+            txt = "&omega;";
+            break;
+        case 'W'    :
+            txt = "&Omega;";
+            break;
+        default     :
+            fprintf(fd, "%c", ch);
+            return(0);
+        }
     }
     else {
-	/* if(A2M_HTML_OEMTOANSI) ch = SCR_OemToAnsiChar(ch); // JMP 16-08-10
-	switch(ch) {
-	  case 129    : txt = "&uuml;";   break; // u trema
-	  case 130    : txt = "&eacute;"; break; // e aigu
-	  case 131    : txt = "&acirc;";  break; // a circomflexe
-	  case 132    : txt = "&auml;";   break; // a trema
-	  case 133    : txt = "&agrave;"; break; // a grave
-	  case 135    : txt = "&#231;";   break; // c cedille
-	  case 136    : txt = "&ecirc;";  break; // e circomflexe
-	  case 137    : txt = "&euml;";   break; // e trema
-	  case 138    : txt = "&egrave;"; break; // e grave
-	  case 139    : txt = "&iuml;";   break; // i trema
-	  case 140    : txt = "&icirc;";  break; // i circomflexe
-	  case 147    : txt = "&ocirc;";  break; // o circomfl
-	  case 148    : txt = "&ouml;";   break; // o trema
-	  case 150    : txt = "&ucirc;";  break; // u circomflexe
-	  case 151    : txt = "&ugrave;"; break; // u grave
-	  case 225    : txt = "&szlig;";  break; // ss allemand
-	  case 167    : txt = "&#176;";   break; // degree
-	  case 238    : txt = "'";        break; // single quote
-	  case 239    :
-	  case 240    : txt = "\"";       break; // double quote
-	  case 248    : txt = "&#176;";   break; // degree
-	  case 'ø'    : txt = "&#176;";   break; // degree
-	  default     :
-	if(A2M_HTML_LTGT == 0 && ch == '<') txt = "&lt;";
-	else if(A2M_HTML_LTGT == 0 && ch == '>') txt = "&gt;";
-	else if(A2M_HTML_LTGT == 0 && ch == '&') txt = "&amp;";
-	else {fprintf(fd, "%c", ch); return(0);}
-	break;
-	  }
-	  */
-	if(A2M_HTML_OEMTOANSI) ch = SCR_OemToAnsiChar(ch); // JMP 16-08-10
-	switch(ch) {
-	case 0xE1 :
-	    txt = "&aacute;";
-	    break; // a grave
-	case 0xE0 :
-	    txt = "&agrave;";
-	    break; // a grave
-	case 0xE2 :
-	    txt = "&acirc;";
-	    break; // a circomflexe
-	case 0xE4 :
-	    txt = "&auml;";
-	    break; // a trema
-	case 0xC7 :
-	    txt = "&Ccedil;";
-	    break; // c cedille
-	case 0xE7 :
-	    txt = "&ccedil;";
-	    break; // c cedille
-	case 0xE9 :
-	    txt = "&eacute;";
-	    break; // e aigu
-	case 0xE8 :
-	    txt = "&egrave;";
-	    break; // e grave
-	case 0xEA :
-	    txt = "&ecirc;";
-	    break; // e circomflexe
-	case 0xEB :
-	    txt = "&euml;";
-	    break; // e trema
-	case 0xED :
-	    txt = "&iacute;";
-	    break; // i aigu
-	case 0xEC :
-	    txt = "&igrave;";
-	    break; // i grave
-	case 0xEE :
-	    txt = "&icirc;";
-	    break; // i circomflexe
-	case 0xEF :
-	    txt = "&iuml;";
-	    break; // i trema
-	case 0xF3 :
-	    txt = "&oacute;";
-	    break; // o aigu
-	case 0xF2 :
-	    txt = "&ograve;";
-	    break; // o grave
-	case 0xF4 :
-	    txt = "&ocirc;";
-	    break; // o circomfl
-	case 0xF6 :
-	    txt = "&ouml;";
-	    break; // o trema
-	case 0xFA :
-	    txt = "&uacute;";
-	    break; // u grave
-	case 0xF9 :
-	    txt = "&ugrave;";
-	    break; // u grave
-	case 0xFB :
-	    txt = "&ucirc;";
-	    break; // u circomflexe
-	case 0xFC :
-	    txt = "&uuml;";
-	    break; // u trema
-	case 0xDF :
-	    txt = "&szlig;";
-	    break; // ss allemand
-	case 0xB0 :
-	    txt = "&#176;";
-	    break; // degree
-	case '\''   :
-	    txt = "'";
-	    break; // single quote
-	case '"'    :
-	    txt = "\"";
-	    break; // double quote
-	default     :
-	    if(A2M_HTML_LTGT == 0 && ch == '<') txt = "&lt;";
-	    else if(A2M_HTML_LTGT == 0 && ch == '>') txt = "&gt;";
-	    else if(A2M_HTML_LTGT == 0 && ch == '&') txt = "&amp;";
-	    else {
-		fprintf(fd, "%c", ch);
-		return(0);
-	    }
-	    break;
-	}
+        /* if(A2M_HTML_OEMTOANSI) ch = SCR_OemToAnsiChar(ch); // JMP 16-08-10
+        switch(ch) {
+          case 129    : txt = "&uuml;";   break; // u trema
+          case 130    : txt = "&eacute;"; break; // e aigu
+          case 131    : txt = "&acirc;";  break; // a circomflexe
+          case 132    : txt = "&auml;";   break; // a trema
+          case 133    : txt = "&agrave;"; break; // a grave
+          case 135    : txt = "&#231;";   break; // c cedille
+          case 136    : txt = "&ecirc;";  break; // e circomflexe
+          case 137    : txt = "&euml;";   break; // e trema
+          case 138    : txt = "&egrave;"; break; // e grave
+          case 139    : txt = "&iuml;";   break; // i trema
+          case 140    : txt = "&icirc;";  break; // i circomflexe
+          case 147    : txt = "&ocirc;";  break; // o circomfl
+          case 148    : txt = "&ouml;";   break; // o trema
+          case 150    : txt = "&ucirc;";  break; // u circomflexe
+          case 151    : txt = "&ugrave;"; break; // u grave
+          case 225    : txt = "&szlig;";  break; // ss allemand
+          case 167    : txt = "&#176;";   break; // degree
+          case 238    : txt = "'";        break; // single quote
+          case 239    :
+          case 240    : txt = "\"";       break; // double quote
+          case 248    : txt = "&#176;";   break; // degree
+          case 'ø'    : txt = "&#176;";   break; // degree
+          default     :
+        if(A2M_HTML_LTGT == 0 && ch == '<') txt = "&lt;";
+        else if(A2M_HTML_LTGT == 0 && ch == '>') txt = "&gt;";
+        else if(A2M_HTML_LTGT == 0 && ch == '&') txt = "&amp;";
+        else {fprintf(fd, "%c", ch); return(0);}
+        break;
+          }
+          */
+        if(A2M_HTML_OEMTOANSI) ch = SCR_OemToAnsiChar(ch); // JMP 16-08-10
+        switch(ch) {
+        case 0xE1 :
+            txt = "&aacute;";
+            break; // a grave
+        case 0xE0 :
+            txt = "&agrave;";
+            break; // a grave
+        case 0xE2 :
+            txt = "&acirc;";
+            break; // a circomflexe
+        case 0xE4 :
+            txt = "&auml;";
+            break; // a trema
+        case 0xC7 :
+            txt = "&Ccedil;";
+            break; // c cedille
+        case 0xE7 :
+            txt = "&ccedil;";
+            break; // c cedille
+        case 0xE9 :
+            txt = "&eacute;";
+            break; // e aigu
+        case 0xE8 :
+            txt = "&egrave;";
+            break; // e grave
+        case 0xEA :
+            txt = "&ecirc;";
+            break; // e circomflexe
+        case 0xEB :
+            txt = "&euml;";
+            break; // e trema
+        case 0xED :
+            txt = "&iacute;";
+            break; // i aigu
+        case 0xEC :
+            txt = "&igrave;";
+            break; // i grave
+        case 0xEE :
+            txt = "&icirc;";
+            break; // i circomflexe
+        case 0xEF :
+            txt = "&iuml;";
+            break; // i trema
+        case 0xF3 :
+            txt = "&oacute;";
+            break; // o aigu
+        case 0xF2 :
+            txt = "&ograve;";
+            break; // o grave
+        case 0xF4 :
+            txt = "&ocirc;";
+            break; // o circomfl
+        case 0xF6 :
+            txt = "&ouml;";
+            break; // o trema
+        case 0xFA :
+            txt = "&uacute;";
+            break; // u grave
+        case 0xF9 :
+            txt = "&ugrave;";
+            break; // u grave
+        case 0xFB :
+            txt = "&ucirc;";
+            break; // u circomflexe
+        case 0xFC :
+            txt = "&uuml;";
+            break; // u trema
+        case 0xDF :
+            txt = "&szlig;";
+            break; // ss allemand
+        case 0xB0 :
+            txt = "&#176;";
+            break; // degree
+        case '\''   :
+            txt = "'";
+            break; // single quote
+        case '"'    :
+            txt = "\"";
+            break; // double quote
+        default     :
+            if(A2M_HTML_LTGT == 0 && ch == '<') txt = "&lt;";
+            else if(A2M_HTML_LTGT == 0 && ch == '>') txt = "&gt;";
+            else if(A2M_HTML_LTGT == 0 && ch == '&') txt = "&amp;";
+            else {
+                fprintf(fd, "%c", ch);
+                return(0);
+            }
+            break;
+        }
     }
     fprintf(fd, "%s", txt);
     return(0);
@@ -1225,96 +1220,106 @@ A2MTBL  *at;
 
     // <TABLE>
     if(A2M_HTML_TABLECLASS == 0)
-	fprintf(A2M_fdhtm, "<TABLE %s BORDER=%d cellspacing=\"0\" cellpadding=\"0\">\n", A2mHtmlClass(A2M_HTML_TABLECLASS, "A2mTable"), b);
+        fprintf(A2M_fdhtm, "<TABLE %s BORDER=%d cellspacing=\"0\" cellpadding=\"0\">\n", A2mHtmlClass(A2M_HTML_TABLECLASS, "A2mTable"), b);
     else
-	fprintf(A2M_fdhtm, "<TABLE%s>\n", A2mHtmlClass(A2M_HTML_TABLECLASS, "A2mTable")); // JMP 3/10/2013
+        fprintf(A2M_fdhtm, "<TABLE%s>\n", A2mHtmlClass(A2M_HTML_TABLECLASS, "A2mTable")); // JMP 3/10/2013
 
     // TITLE
     if(A2M_HTML_TTITLE && at->at_title && at->at_title->ap_strs) {
-	// <TR>
-	fprintf(A2M_fdhtm, " <THEAD><TR%s>\n", A2mHtmlClass(A2M_HTML_TRCLASS, "A2mTR"));
+        // <TR>
+        fprintf(A2M_fdhtm, " <THEAD><TR%s>\n", A2mHtmlClass(A2M_HTML_TRCLASS, "A2mTR"));
 
-	// TH
-	fprintf(A2M_fdhtm, "  <TH%s", A2mHtmlClass(A2M_HTML_THCLASS, "A2mTH"));
-	if(at->at_nc > 1) fprintf(A2M_fdhtm, " COLSPAN=%d", at->at_nc);
-	fprintf(A2M_fdhtm, ">\n");
-	A2mHtmlPrintPar(at->at_title, 1, 0);
-	fprintf(A2M_fdhtm, "&nbsp;</p></TH>\n </TR></THEAD>\n");
+        // TH
+        fprintf(A2M_fdhtm, "  <TH%s", A2mHtmlClass(A2M_HTML_THCLASS, "A2mTH"));
+        if(at->at_nc > 1) fprintf(A2M_fdhtm, " COLSPAN=%d", at->at_nc);
+        fprintf(A2M_fdhtm, ">\n");
+        A2mHtmlPrintPar(at->at_title, 1, 0);
+        fprintf(A2M_fdhtm, "&nbsp;</p></TH>\n </TR></THEAD>\n");
     }
 
     for(i = 0 ; i < at->at_nl ; i++) {
-	// <TD> or <TH> ? + Classe par défaut en fonction thead ou pas
-	if(at->at_tls[i].atl_hbf == 1) {
-	    tdh = "TD";
-	    baseclass = A2M_HTML_TDCLASS;
-	    if(baseclass == 0)  baseclass =  "A2mTD";
-	}
-	else {
-	    tdh = "TH";
-	    baseclass = A2M_HTML_THCLASS;
-	    if(baseclass == 0)  baseclass =  "A2mTH";
-	}
+        // <TD> or <TH> ? + Classe par défaut en fonction thead ou pas
+        if(at->at_tls[i].atl_hbf == 1) {
+            tdh = "TD";
+            baseclass = A2M_HTML_TDCLASS;
+            if(baseclass == 0)  baseclass =  "A2mTD";
+        }
+        else {
+            tdh = "TH";
+            baseclass = A2M_HTML_THCLASS;
+            if(baseclass == 0)  baseclass =  "A2mTH";
+        }
 
-	// <TR>
-	fprintf(A2M_fdhtm, " <TR%s", A2mHtmlClass(A2M_HTML_TRCLASS, "A2mTR"));
-	/* SHADING */
-	col = at->at_shadcol[at->at_tls[i].atl_hbf % 2];
+        // <TR>
+        fprintf(A2M_fdhtm, " <TR%s", A2mHtmlClass(A2M_HTML_TRCLASS, "A2mTR"));
+        /* SHADING */
+        col = at->at_shadcol[at->at_tls[i].atl_hbf % 2];
 
-	if(col && A2M_HTML_TCOLOR)
-	    fprintf(A2M_fdhtm, " BGCOLOR=\"%s\"", A2M_HTMLCOLORS[col]);
-	fprintf(A2M_fdhtm, ">\n");
+        if(col && A2M_HTML_TCOLOR)
+            fprintf(A2M_fdhtm, " BGCOLOR=\"%s\"", A2M_HTMLCOLORS[col]);
+        fprintf(A2M_fdhtm, ">\n");
 
-	// Ligne de sép dans le tableau
-	if(at->at_tls[i].atl_type) {
-	    fprintf(A2M_fdhtm, "  <%s class=\"A2mTRLine\" COLSPAN=%d><HR></%s></TR>\n", tdh, at->at_nc, tdh);
-	    continue;
-	}
+        // Ligne de sép dans le tableau
+        if(at->at_tls[i].atl_type) {
+            fprintf(A2M_fdhtm, "  <%s class=\"A2mTRLine\" COLSPAN=%d><HR></%s></TR>\n", tdh, at->at_nc, tdh);
+            continue;
+        }
 
-	// Ligne normale dans le tableau
-	// Boucle sur les cells
-	for(j = 0 ; j < at->at_nc ; j++) {
-	    tc = at->at_tls[i].atl_tcs + j;
+        // Ligne normale dans le tableau
+        // Boucle sur les cells
+        for(j = 0 ; j < at->at_nc ; j++) {
+            tc = at->at_tls[i].atl_tcs + j;
 
-	    // <TD> or <TH>
-	    fprintf(A2M_fdhtm, "  <%s", tdh);
+            // <TD> or <TH>
+            fprintf(A2M_fdhtm, "  <%s", tdh);
 
-	    // COLSPAN
-	    if(tc->atc_ncells > 1) {
-		fprintf(A2M_fdhtm, " COLSPAN=%d", tc->atc_ncells);
-		j += tc->atc_ncells - 1;
-	    }
+            // COLSPAN
+            if(tc->atc_ncells > 1) {
+                fprintf(A2M_fdhtm, " COLSPAN=%d", tc->atc_ncells);
+                j += tc->atc_ncells - 1;
+            }
 
-	    if(tc->atc_center == 5)
-		tc->atc_center = A2mHtmlGetCenter(tc->atc_par); /* JMP 24-01-2004 */
+            if(tc->atc_center == 5)
+                tc->atc_center = A2mHtmlGetCenter(tc->atc_par); /* JMP 24-01-2004 */
 
-	    // CLASS de cadrage de la cellule
-	    switch(tc->atc_center) {
-		case 0: sprintf(cellclass, "A2m%sLeft", tdh);     break;
-		case 1: sprintf(cellclass, "A2m%sCenter", tdh);   break;
-		case 2:
-		case 3: sprintf(cellclass,  "A2m%sRight", tdh);   break;
-		case 4: sprintf(cellclass,  "A2m%sJustify", tdh); break;
-		default : cellclass[0] = 0;                       break;
-	    }
-	    if(baseclass[0] || cellclass[0])
-		fprintf(A2M_fdhtm, " class=\"%s %s\"", baseclass, cellclass);
+            // CLASS de cadrage de la cellule
+            switch(tc->atc_center) {
+            case 0:
+                sprintf(cellclass, "A2m%sLeft", tdh);
+                break;
+            case 1:
+                sprintf(cellclass, "A2m%sCenter", tdh);
+                break;
+            case 2:
+            case 3:
+                sprintf(cellclass,  "A2m%sRight", tdh);
+                break;
+            case 4:
+                sprintf(cellclass,  "A2m%sJustify", tdh);
+                break;
+            default :
+                cellclass[0] = 0;
+                break;
+            }
+            if(baseclass[0] || cellclass[0])
+                fprintf(A2M_fdhtm, " class=\"%s %s\"", baseclass, cellclass);
 
-	    // NOWRAP
-	    if(tc->atc_center == 6 || A2mHtmlGetNowrap(tc->atc_par))
-		fprintf(A2M_fdhtm, " NOWRAP"); /* JMP 24-01-2004 */
+            // NOWRAP
+            if(tc->atc_center == 6 || A2mHtmlGetNowrap(tc->atc_par))
+                fprintf(A2M_fdhtm, " NOWRAP"); /* JMP 24-01-2004 */
 
-	    fprintf(A2M_fdhtm, ">");
+            fprintf(A2M_fdhtm, ">");
 
-	    A2mHtmlPrintPar(tc->atc_par, 1, j);
-	    /*            if(tc->atc_par == 0 || strncmp(tc->atc_par->ap_tag, "CellDecimal", 11))
-		fprintf(A2M_fdhtm, "&nbsp;</%s>\n", tdh);
-		else
-	    */
-	    fprintf(A2M_fdhtm, "</p>");
-	    fprintf(A2M_fdhtm, "</%s>\n", tdh);
-	}
+            A2mHtmlPrintPar(tc->atc_par, 1, j);
+            /*            if(tc->atc_par == 0 || strncmp(tc->atc_par->ap_tag, "CellDecimal", 11))
+            fprintf(A2M_fdhtm, "&nbsp;</%s>\n", tdh);
+            else
+            */
+            fprintf(A2M_fdhtm, "</p>");
+            fprintf(A2M_fdhtm, "</%s>\n", tdh);
+        }
 
-	fprintf(A2M_fdhtm, " </TR>\n");
+        fprintf(A2M_fdhtm, " </TR>\n");
     }
 
     fprintf(A2M_fdhtm, "</TABLE>\n");
@@ -1335,34 +1340,35 @@ A2MGRF  *ag;
 
     // Cas GIF
     if(A2M_HTML_IS_GIF && A2M_SWF_NOGIF == 0) {
-	fprintf(A2M_fdhtm, "<TABLE BORDER=0><TR><TD>");
-	if(prTitle) A2mHtmlPrintPar(prTitle, 1, 0);
-	else        fprintf(A2M_fdhtm, "<P>Figure %d</P>\n", A2M_GIF_CNT);
-	fprintf(A2M_fdhtm, "</TD></TR><TR><TD>");
-	sprintf(buf, "img%d.gif", A2M_GIF_CNT);
-	A2mGIF_HTML(ag, buf);
-	A2mHtmlAFrame(buf);
-	fprintf(A2M_fdhtm, "</TD></TR></TABLE>");
-	A2M_GIF_CNT++;
-	return(0);
+        fprintf(A2M_fdhtm, "<TABLE BORDER=0><TR><TD>");
+        if(prTitle) A2mHtmlPrintPar(prTitle, 1, 0);
+        else        fprintf(A2M_fdhtm, "<P>Figure %d</P>\n", A2M_GIF_CNT);
+        fprintf(A2M_fdhtm, "</TD></TR><TR><TD>");
+        sprintf(buf, "img%d.gif", A2M_GIF_CNT);
+        A2mGIF_HTML(ag, buf);
+        A2mHtmlAFrame(buf);
+        fprintf(A2M_fdhtm, "</TD></TR></TABLE>");
+        A2M_GIF_CNT++;
+        return(0);
     }
 
     // Cas FusionChart
     else {
-	/*
-	  <script type="text/javascript">
-	   var chart1 = new FusionCharts("/FusionCharts/MSLine.swf", "sampleChart", "450", "400", "0", "1");
-	   chart1.setDataURL("line3.xml");
-	   chart1.setTransparent(true);
-	   chart1.render("chart1div");
-	</script>
+        /*
+          <script type="text/javascript">
+           var chart1 = new FusionCharts("/FusionCharts/MSLine.swf", "sampleChart", "450", "400", "0", "1");
+           chart1.setDataURL("line3.xml");
+           chart1.setTransparent(true);
+           chart1.render("chart1div");
+        </script>
 
-	 */
-	w = ag->ag_size[0] * 37.79527559;
-	h = ag->ag_size[1] * 37.79527559;
+         */
+        w = (int) (ag->ag_size[0] * 37.79527559);
+        h = (int) (ag->ag_size[1] * 37.79527559);
 
-	A2mSWF_HTML(A2M_fdhtm, w, h, ag, A2M_GIF_CNT);
-	A2M_GIF_CNT++;
+        A2mSWF_HTML(A2M_fdhtm, w, h, ag, A2M_GIF_CNT);
+        A2M_GIF_CNT++;
+        return(0);
     }
 
 }
@@ -1376,9 +1382,9 @@ char    *filename;
     strcpy(buf, filename);
 
     if(A2M_HTML_GIFTOBMP && U_index(buf, ".gif") > 0)
-	SCR_change_ext(buf, filename, "bmp");
+        SCR_change_ext(buf, filename, "bmp");
     if(A2M_HTML_GIFTOPNG && U_index(buf, ".gif") > 0) /* JMP 23-08-2015 */
-	SCR_change_ext(buf, filename, "png");         /* JMP 23-08-2015 */
+        SCR_change_ext(buf, filename, "png");         /* JMP 23-08-2015 */
 
     fprintf(A2M_fdhtm, "<IMG SRC=\"%s\" ALIGN=MIDDLE ", buf);
     if(A2M_HTML_IMGWIDTH) fprintf(A2M_fdhtm, " WIDTH=%d", A2M_HTML_IMGWIDTH);
@@ -1388,27 +1394,21 @@ char    *filename;
 }
 
 /*NH*/
-A2mHtmlAnchor(ref)
-char    *ref;
+int A2mHtmlAnchor(char* ref)
 {
-    char    buf[128];
     int     aa_nb, i;
 
     aa_nb = A2mFindAnchor(ref);
     if(aa_nb < 0) return(-1);
     for(i = 0 ; i < A2M_ANCHORS[aa_nb]->aa_nb_aos ; i++)
-	A2mHtmlPrintObj(A2M_ANCHORS[aa_nb]->aa_aos[i], 0);
+        A2mHtmlPrintObj(A2M_ANCHORS[aa_nb]->aa_aos[i], 0);
 
     return(0);
 }
 
 /*NH*/
-A2mHtmlFNote(ref)
-char    *ref;
+int A2mHtmlFNote(char* ref)
 {
-    char    buf[128];
-    int     aa_nb, i;
-
     A2mAddFNote(ref);
     fprintf(A2M_fdhtm, "<A HREF=\"#FNote%d\"><SUP><U>[%d]</U></SUP></A>", A2M_NB_FNOTES, A2M_NB_FNOTES);
 
@@ -1416,16 +1416,16 @@ char    *ref;
 }
 
 /*NH*/
-A2mHtmlPrintFNotes()
+int A2mHtmlPrintFNotes()
 {
     int     i;
 
     if(A2M_NB_FNOTES == 0) return(0);
     fprintf(A2M_fdhtm, "<HR SIZE=1 color=blue width=200 ALIGN=left>\n");
     for(i = 0 ; i < A2M_NB_FNOTES ; i++) {
-	fprintf(A2M_fdhtm, "<TABLE BORDER=0>\n <TR>\n  <TD VALIGN=\"TOP\"><P><A NAME=\"FNOTE%d\"><SUP><U>[%d]</U></SUP></A></P></TD>\n\n  <TD>", i + 1, i + 1);
-	A2mHtmlAnchor(A2M_FNOTES[i]);
-	fprintf(A2M_fdhtm, "\n  </TD>\n </TR>\n</TABLE>\n", i + 1);
+        fprintf(A2M_fdhtm, "<TABLE BORDER=0>\n <TR>\n  <TD VALIGN=\"TOP\"><P><A NAME=\"FNOTE%d\"><SUP><U>[%d]</U></SUP></A></P></TD>\n\n  <TD>", i + 1, i + 1);
+        A2mHtmlAnchor(A2M_FNOTES[i]);
+        fprintf(A2M_fdhtm, "\n  </TD>\n </TR>\n</TABLE>\n");
     }
 
     return(0);
@@ -1466,11 +1466,11 @@ char    *filename;
 
     A2mReadA2mIni(filename);
     if(IniReadTxtParm(filename, "HTML", "BODY", buf, 255) == 0)
-	A2M_HTML_BODY = SCR_stracpy(buf);
+        A2M_HTML_BODY = SCR_stracpy(buf);
     if(IniReadTxtParm(filename, "HTML", "TITLE", buf, 255) == 0)
-	A2M_HTML_TITLE = SCR_stracpy(buf);
+        A2M_HTML_TITLE = SCR_stracpy(buf);
     if(IniReadTxtParm(filename, "HTML", "FONTFAMILY", buf, 255) == 0)
-	A2M_FONTFAMILY = buf[0];
+        A2M_FONTFAMILY = buf[0];
 
     IniReadNumParm(filename, "HTML", "FONTSIZE",       &A2M_FONTSIZE);
     IniReadNumParm(filename, "HTML", "FONTINCR",       &A2M_FONTINCR);
@@ -1483,31 +1483,27 @@ char    *filename;
 }
 
 /*NH*/
-A2mHtmlPrintTxt(txt)
-U_ch    *txt;
+int A2mHtmlPrintTxt(U_ch* txt)
 {
-    A2mHtmlPrintFdTxt(A2M_fdhtm, txt);
+    return(A2mHtmlPrintFdTxt(A2M_fdhtm, txt));
 }
 
 /*NH*/
-A2mHtmlPrintCntTxt(txt)
-U_ch    *txt;
+int A2mHtmlPrintCntTxt(U_ch* txt)
 {
-    A2mHtmlPrintFdTxt(A2M_fdhhc, txt);
+    return(A2mHtmlPrintFdTxt(A2M_fdhhc, txt));
 }
 
 /*NH*/
-A2mHtmlPrintTocTxt(txt)
-U_ch    *txt;
+int A2mHtmlPrintTocTxt(U_ch* txt)
 {
-    A2mHtmlPrintFdTxt(A2M_fdtoc, txt);
+    return(A2mHtmlPrintFdTxt(A2M_fdtoc, txt));
 }
 
 /*NH*/
-A2mHtmlPrintKeyTxt(txt)
-U_ch    *txt;
+int A2mHtmlPrintKeyTxt(U_ch* txt)
 {
-    A2mHtmlPrintFdTxt(A2M_fdhhk, txt);
+    return(A2mHtmlPrintFdTxt(A2M_fdhhk, txt));
 }
 
 /*NH*/
@@ -1523,70 +1519,68 @@ U_ch    *txt;
 }
 
 /*NH*/
-A2mHtmlPrintTopicCnt(atp)
-A2MTOP  *atp;
+int A2mHtmlPrintTopicCnt(A2MTOP *atp)
 {
     int     i, clevel = 0;
 
     if(atp) clevel = atp->atp_level;
 
     if(A2M_HTML_TOCLEVEL >= 0) {
-	if(clevel <= A2M_HTML_TOCLEVEL &&
-		A2M_HTML_TOCLEVEL >= A2M_HTML_TOCPLEVEL)  {
-	    fprintf(A2M_fdhhc, "<LI><OBJECT type=\"text/sitemap\">\n");
-	    fprintf(A2M_fdhhc, "    <param name=\"Name\" value=\"");
-	    fprintf(A2M_fdtoc, "<LI><DIV NOWRAP><A HREF=\"T%04d.htm\">", A2M_HTML_TOCNB); /* JMP 25-01-2004 */
-	    if(A2M_HTML_OEMTOANSI) SCR_AnsiToOem(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
-	    A2mHtmlPrintCntTxt(A2M_HTML_TOCTXT);
-	    A2mHtmlPrintTocTxt(A2M_HTML_TOCTXT);                              /* JMP 25-01-2004 */
-	    if(A2M_HTML_OEMTOANSI) SCR_OemToAnsi(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
-	    fprintf(A2M_fdhhc, "\">\n    <param name=\"Local\" value=\"");
-	    fprintf(A2M_fdhhc, "T%04d.htm", A2M_HTML_TOCNB);
-	    fprintf(A2M_fdhhc, "\">\n    <param name=\"ImageNumber\" value=\"5");
-	    fprintf(A2M_fdhhc, "\"></OBJECT>\n");
-	    fprintf(A2M_fdtoc, "</A></DIV>\n");       /* JMP 25-01-2004 */
-	}
-	else {
-	    if(A2M_HTML_TOCLEVEL < A2M_HTML_TOCPLEVEL)
-		for(i = 0; i < A2M_HTML_TOCPLEVEL - A2M_HTML_TOCLEVEL; i++) {
-		    fprintf(A2M_fdhhc, "</UL>\n");
-		    fprintf(A2M_fdtoc, "</UL>\n");
-		}
+        if(clevel <= A2M_HTML_TOCLEVEL &&
+                A2M_HTML_TOCLEVEL >= A2M_HTML_TOCPLEVEL)  {
+            fprintf(A2M_fdhhc, "<LI><OBJECT type=\"text/sitemap\">\n");
+            fprintf(A2M_fdhhc, "    <param name=\"Name\" value=\"");
+            fprintf(A2M_fdtoc, "<LI><DIV NOWRAP><A HREF=\"T%04d.htm\">", A2M_HTML_TOCNB); /* JMP 25-01-2004 */
+            if(A2M_HTML_OEMTOANSI) SCR_AnsiToOem(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
+            A2mHtmlPrintCntTxt(A2M_HTML_TOCTXT);
+            A2mHtmlPrintTocTxt(A2M_HTML_TOCTXT);                              /* JMP 25-01-2004 */
+            if(A2M_HTML_OEMTOANSI) SCR_OemToAnsi(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
+            fprintf(A2M_fdhhc, "\">\n    <param name=\"Local\" value=\"");
+            fprintf(A2M_fdhhc, "T%04d.htm", A2M_HTML_TOCNB);
+            fprintf(A2M_fdhhc, "\">\n    <param name=\"ImageNumber\" value=\"5");
+            fprintf(A2M_fdhhc, "\"></OBJECT>\n");
+            fprintf(A2M_fdtoc, "</A></DIV>\n");       /* JMP 25-01-2004 */
+        }
+        else {
+            if(A2M_HTML_TOCLEVEL < A2M_HTML_TOCPLEVEL)
+                for(i = 0; i < A2M_HTML_TOCPLEVEL - A2M_HTML_TOCLEVEL; i++) {
+                    fprintf(A2M_fdhhc, "</UL>\n");
+                    fprintf(A2M_fdtoc, "</UL>\n");
+                }
 
-	    fprintf(A2M_fdhhc, "<LI><OBJECT type=\"text/sitemap\">\n");
-	    fprintf(A2M_fdhhc, "    <param name=\"Name\" value=\"");
-	    fprintf(A2M_fdtoc, "<LI><DIV NOWRAP><A HREF=\"T%04d.htm\">", A2M_HTML_TOCNB); /* JMP 25-01-2004 */
-	    if(A2M_HTML_OEMTOANSI) SCR_AnsiToOem(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
-	    A2mHtmlPrintCntTxt(A2M_HTML_TOCTXT);
-	    A2mHtmlPrintTocTxt(A2M_HTML_TOCTXT);
-	    if(A2M_HTML_OEMTOANSI) SCR_OemToAnsi(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
-	    fprintf(A2M_fdhhc, "\">\n    <param name=\"Local\" value=\"");
-	    fprintf(A2M_fdhhc, "T%04d.htm", A2M_HTML_TOCNB);
-	    fprintf(A2M_fdhhc, "\">\n    <param name=\"ImageNumber\" value=\"5");
-	    fprintf(A2M_fdhhc, "\"></OBJECT>\n");
-	    fprintf(A2M_fdhhc, "  <UL>\n");
-	    fprintf(A2M_fdtoc, "</A></DIV>\n<UL>\n");
+            fprintf(A2M_fdhhc, "<LI><OBJECT type=\"text/sitemap\">\n");
+            fprintf(A2M_fdhhc, "    <param name=\"Name\" value=\"");
+            fprintf(A2M_fdtoc, "<LI><DIV NOWRAP><A HREF=\"T%04d.htm\">", A2M_HTML_TOCNB); /* JMP 25-01-2004 */
+            if(A2M_HTML_OEMTOANSI) SCR_AnsiToOem(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
+            A2mHtmlPrintCntTxt(A2M_HTML_TOCTXT);
+            A2mHtmlPrintTocTxt(A2M_HTML_TOCTXT);
+            if(A2M_HTML_OEMTOANSI) SCR_OemToAnsi(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
+            fprintf(A2M_fdhhc, "\">\n    <param name=\"Local\" value=\"");
+            fprintf(A2M_fdhhc, "T%04d.htm", A2M_HTML_TOCNB);
+            fprintf(A2M_fdhhc, "\">\n    <param name=\"ImageNumber\" value=\"5");
+            fprintf(A2M_fdhhc, "\"></OBJECT>\n");
+            fprintf(A2M_fdhhc, "  <UL>\n");
+            fprintf(A2M_fdtoc, "</A></DIV>\n<UL>\n");
 
-	    A2M_HTML_TOCLEVEL++;
-	}
+            A2M_HTML_TOCLEVEL++;
+        }
     }
 
     SCR_free(A2M_HTML_TOCTXT);
     A2M_HTML_TOCTXT = 0;
     if(atp) {
-	A2M_HTML_TOCTXT   = SCR_stracpy(atp->atp_keyws);
-	if(A2M_HTML_OEMTOANSI) SCR_OemToAnsi(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
-	SCR_replace(A2M_HTML_TOCTXT, "\"", "'");
-	A2M_HTML_TOCPLEVEL = A2M_HTML_TOCLEVEL;
-	A2M_HTML_TOCLEVEL = clevel;
-	A2M_HTML_TOCNB    = atp->atp_nb;
+        A2M_HTML_TOCTXT   = SCR_stracpy(atp->atp_keyws);
+        if(A2M_HTML_OEMTOANSI) SCR_OemToAnsi(A2M_HTML_TOCTXT, A2M_HTML_TOCTXT);
+        SCR_replace(A2M_HTML_TOCTXT, "\"", "'");
+        A2M_HTML_TOCPLEVEL = A2M_HTML_TOCLEVEL;
+        A2M_HTML_TOCLEVEL = clevel;
+        A2M_HTML_TOCNB    = atp->atp_nb;
     }
     return(0);
 }
 
 /*NH*/
-A2mHtmlPrintTopicKey(atp)
-A2MTOP  *atp;
+int A2mHtmlPrintTopicKey(A2MTOP* atp)
 {
     fprintf(A2M_fdhhk, "<LI><OBJECT type=\"text/sitemap\">\n");
     fprintf(A2M_fdhhk, "    <param name=\"Name\" value=\"");
@@ -1601,29 +1595,30 @@ A2MTOP  *atp;
 
 
 
-char    *A2mOemToAnsi(fd, title)
+int A2mOemToAnsi(fd, title)
 FILE    *fd;
 unsigned char   *title;
 {
     int j;
 
-    if(title == 0) return;
+    if(title == 0) return(0);
 
     for(j = 0; title[j]; j++) {
-	switch(title[j])  {
+        switch(title[j])  {
 //          case '\'': fprintf(fd, "%s", "%26apos;"); break; /* GB 07/02/2011 */
-	case '\'':
-	    fprintf(fd, "%s", "&apos;");
-	    break;
+        case '\'':
+            fprintf(fd, "%s", "&apos;");
+            break;
 //          case '"': fprintf(fd, "\""); break;
-	case '"':
-	    fprintf(fd, "&quot;");
-	    break;
-	default:
-	    fprintf(fd, "%c", SCR_OemToAnsiChar(title[j]));
-	    break;
-	}
+        case '"':
+            fprintf(fd, "&quot;");
+            break;
+        default:
+            fprintf(fd, "%c", SCR_OemToAnsiChar(title[j]));
+            break;
+        }
     }
+    return(0);
 }
 
 
@@ -1641,7 +1636,7 @@ A2mGetModulePath(char *buf)
 #else
     GetModuleFileName(NULL, buf, 256);
 #endif
-    for(i = strlen(buf); i > 0 && buf[i] != '\\' && buf[i] != '/'; i--);  // JMP 22/11/2011
+    for(i = (int)strlen(buf); i > 0 && buf[i] != '\\' && buf[i] != '/'; i--);  // JMP 22/11/2011
     buf[i] = 0;
     return(0);
 }

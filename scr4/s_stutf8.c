@@ -500,12 +500,12 @@ Calcule la longueur en bytes d'une chîne OEM traduite en UTF8.
 &RT la longueyur nécessaire pour stocker le résultat de la translation.
 =================================================================== */
 
-SCR_OemToUTF8Length(unsigned char *str)
+int SCR_OemToUTF8Length(unsigned char *str)
 {
     return(SCR_OemAnsiToUTF8Length(str, 0));
 }
 
-SCR_AnsiToUTF8Length(unsigned char *str)
+int SCR_AnsiToUTF8Length(unsigned char *str)
 {
     return(SCR_OemAnsiToUTF8Length(str, 1));
 }
@@ -517,15 +517,15 @@ Calcule la longueur en bytes d'une chîne OEM traduite en UTF8.
 &RT la longueyur nécessaire pour stocker le résultat de la translation.
 =================================================================== */
 
-SCR_OemAnsiToUTF8Length(unsigned char *str, int oemansi)
+int SCR_OemAnsiToUTF8Length(unsigned char *str, int oemansi)
 {
     int         i, lg = 0;
         
     if(str == 0) return(0);
     
     for(i = 0 ; str[i] ; i++) {
-        if(oemansi == 0) lg += strlen(SCR_OemToUTF8Char(str[i]));
-        else             lg += strlen(SCR_AnsiToUTF8Char(str[i]));
+        if(oemansi == 0) lg += (int)strlen(SCR_OemToUTF8Char(str[i]));
+        else             lg += (int)strlen(SCR_AnsiToUTF8Char(str[i]));
     }
     return(lg);
 }

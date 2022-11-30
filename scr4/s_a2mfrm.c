@@ -1,4 +1,5 @@
 #include "s_a2m.h"
+#include <io.h>
 
 extern int A2MGRFBARCURRENT;
 extern int A2MGRFBARNB;
@@ -65,9 +66,9 @@ char    *outfile;
     char    buf[256];
 
     SCR_change_ext(buf, outfile, "frt");
-    unlink(buf);
+    _unlink(buf);
     SCR_change_ext(buf, outfile, "frw");
-    unlink(buf);
+    _unlink(buf);
     return(0);
 }
 
@@ -303,7 +304,8 @@ int     dest, shift, tbl, grf, just;
 U_ch    *var;
 {
     FILE    *fd;
-    int     i, blc;
+    int     i;
+    //int     blc;
 
     if(ap == 0 || ap->ap_strs == 0) return(0);
     A2mSetParProps(ap->ap_tag, &(ap->ap_ppr));
@@ -341,7 +343,7 @@ U_ch    *var;
         }
     }
 
-    fprintf(fd, "> <ParaLine ", ap->ap_tag);
+    fprintf(fd, "> <ParaLine ");
     for(i = 0 ; ap->ap_strs[i] ; i++)
         A2mFrPrintStr(fd, ap, i);
 
@@ -672,8 +674,6 @@ int     n;
 A2mFrPrintTbl(at)
 A2MTBL  *at;
 {
-    int     i;
-
     /* 1. fdfrw */
     if(at->at_title && A2M_FRM_TTITLE == 0)
         A2mFrPrintPar(at->at_title, 0, 0, A2M_TBLID, 0, -1, 0L);
@@ -692,7 +692,7 @@ A2MTBL  *at;
     fprintf(A2M_fdtbl, " <TblNumColumns %d>\n", at->at_nc);
     A2mFrPrintTblFmt(A2M_fdtbl, at);
     if(at->at_title && A2M_FRM_TTITLE) {
-        fprintf(A2M_fdtbl, " <TblTitle\n", at->at_nc);
+        fprintf(A2M_fdtbl, " <TblTitle\n");
         fprintf(A2M_fdtbl, "    <TblTitleContent\n");
         A2mFrPrintPar(at->at_title, 1, 0, 0, 0, -1, "Table Continuation");
         fprintf(A2M_fdtbl, "    > # end of TblTitleContent\n");

@@ -23,7 +23,7 @@ unsigned char *text;
     int     beg_bl = 0;
     int     lg;
 
-    lg = strlen(text);
+    lg = (int)strlen(text);
     U_rjust_text(text);
 
     while( (beg_bl < lg) && (text[beg_bl] == ' ')) beg_bl++;

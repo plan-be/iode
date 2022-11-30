@@ -77,7 +77,7 @@ AR_readnext(fd, arl)
 FILE    *fd;
 ARLIST  *arl;
 {
-    char    name[80], trsize[10], tpsize[10], tdate[10];
+    char    trsize[10], tpsize[10], tdate[10];
     long    atol();
 
     if(fread(trsize, 8, 1, fd) < 1 ||

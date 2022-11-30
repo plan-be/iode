@@ -37,7 +37,7 @@ char    *res, *filename, *ext;
     strcpy(locres, filename);   // For sanitizer
     strcpy(res, locres);        // For sanitizer
     
-    for(i = strlen(res) - 1 ; i >= 0 ; i--)
+    for(i = (int)strlen(res) - 1 ; i >= 0 ; i--)
 	if(res[i] == ':' || res[i] == '!' ||        /* JMP 23-06-02 */
 	   res[i] == '.' || res[i] == '\\' ||
 	   res[i] == '/') break;

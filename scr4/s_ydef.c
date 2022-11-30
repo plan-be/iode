@@ -110,18 +110,15 @@ YYFILE  *yy;
 
 #ifndef GENPROTO
 
-int YY_defcmp(pyd1, pyd2)
-char    *pyd1, *pyd2;
+int YY_defcmp(const void* pyd1, const void* pyd2)
 {
     YYDEF   **yd1 = (YYDEF **)pyd1,
-	    **yd2 = (YYDEF **)pyd2;
+            **yd2 = (YYDEF **)pyd2;
 
     return(strcmp((char *)(*yd1)->yd_name, (char *)(*yd2)->yd_name));
 }
 
-int YY_defcmp1(ptr, pyd2)
-char    *ptr;
-char    *pyd2;
+int YY_defcmp1(const void* ptr, const void* pyd2)
 {
     YYDEF   **yd2 = (YYDEF **)pyd2;
 
@@ -168,12 +165,12 @@ char    *name,
 	NBDDEFS++;
 	}
 
-    lg = strlen(name);
+    lg = (int)strlen(name);
     if(lg > YY_MAX_DEF_LG) lg = YY_MAX_DEF_LG;
     memcpy(yd_new->yd_name, name, lg);
     yd_new->yd_name[lg] = 0;
 
-    lg = (!*def) ? 0:strlen(def);
+    lg = (!*def) ? 0:(int)strlen(def);
     //yd_new->yd_def = (unsigned char *)malloc(lg + 1);
     yd_new->yd_def = (unsigned char *)SCR_malloc(lg + 1); /* JMP 22-08-2012 */
     memcpy(yd_new->yd_def, def, lg + 1);
@@ -191,18 +188,7 @@ char    *name,
      txt: IN : text to be found
    ============================================================== */
 
-#ifdef SCRCPP
-YYDEF *YY_search_def(
-YYDEF   **tbl,
-int     nb,
-char    *txt
-)
-#else
-YYDEF *YY_search_def(tbl, nb, txt)
-YYDEF   **tbl;
-int     nb;
-char    *txt;
-#endif
+YYDEF *YY_search_def(YYDEF   **tbl, int nb, char *txt)
 {
     YYDEF   **yd;
 
@@ -220,7 +206,6 @@ char    *txt;
 YY_find_def(yy)
 YYFILE  *yy;
 {
-    int     ch;
     YYDEF   *yd;
 
     YY_read_word(yy);

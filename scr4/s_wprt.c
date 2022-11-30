@@ -221,7 +221,7 @@ int WprPrinterEndFF(int ff)
     return(WprPrinterEndFFStd(ff));
 }   
 
-WprPrinterEndFFStd(int ff)
+int WprPrinterEndFFStd(int ff)
 {
     if(WprPD == 0) return(0);
 
@@ -351,7 +351,7 @@ int     family, pty, bold, italic, underl;
     HDC             hDC = WprhDC;
     LOGFONT         LogFont;
     TEXTMETRIC      tm;
-    int             nby, fontnb;
+    int             nby;
     char            *ptr;   /* BP_M 15-05-2007 */
 
     if(pty <= 0) pty = 10;
@@ -487,7 +487,7 @@ WprPrintStringNoAlign(int x, int y, U_ch *txt)
 {
     if(txt == 0) return(0);
     SCR_OemToAnsi(txt, txt);
-    TextOut(WprhDC, x, y, txt, strlen(txt));
+    TextOut(WprhDC, x, y, txt, (int)strlen(txt));
     SCR_AnsiToOem(txt, txt);
     return(0);
 }
@@ -618,7 +618,7 @@ WprGetStringWidth(U_ch *txt, long *w, long *h)
 
     if(txt == 0) return(0);
     SCR_OemToAnsi(txt, txt);
-    GetTextExtentPoint32(WprhDC, txt, strlen(txt), &size);
+    GetTextExtentPoint32(WprhDC, txt, (int)strlen(txt), &size);
     SCR_AnsiToOem(txt, txt);
     if(w) *w = size.cx;
     if(h) *h = size.cy;

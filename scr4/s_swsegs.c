@@ -9,8 +9,7 @@ char    **SW_RES = 0;
 #endif
 
 /*NH*/
-char *SW_alloc_seg(size)
-SWSIZE      size;
+char *SW_alloc_seg(SWSIZE size)
 {
     long    resmem;
     int     i;
@@ -69,7 +68,7 @@ SWSIZE      size;
 
 /*NH*/
 
-SW_Debug(int size)
+void SW_Debug(int size)
 {
 //    extern int DebugActif;
 

@@ -16,8 +16,8 @@ unsigned char   *str, *sstr;
 {
     int     i = 0, lg, slg, pos;
 
-    lg  = strlen(str);
-    slg = strlen(sstr);
+    lg  = (int)strlen(str);
+    slg = (int)strlen(sstr);
 
 /*    for(i = 0 ; str[i] ; i++) {
 	if(slg + i > lg) return(-1);

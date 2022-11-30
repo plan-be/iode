@@ -206,9 +206,7 @@ U_ch    *a2mfile, *outfile;
 }
 
 /* reçoit un objet graphique et un nom de fichier output */
-A2mGIF_HTML(go, filename)
-A2MGRF  *go;
-U_ch    *filename;
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename)
 {
     int rc=0;
     GIF_out = fopen(filename, "wb");

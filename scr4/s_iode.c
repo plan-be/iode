@@ -19,7 +19,7 @@ int ISC_fclose(FILE *fd)
 
 ISC_unlink(char *filename)
 {
-    return(unlink(filename));
+    return(_unlink(filename));
 }
 ISC_rename(char *oldname, char *newname)
 {

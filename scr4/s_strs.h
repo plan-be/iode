@@ -200,6 +200,14 @@ extern U_ch  M_RING_read();
 
 extern int Debug(char *, ...);
 extern int DebugForce(char *, ...);
+extern int DebugB(char *, ...);
+extern int DebugE(char *, ...);
+extern int DebugEn(char *, ...);
+extern int DebugET(char *, ...);
+extern int DebugHexa(char *title, unsigned char *str, int lg);
+extern int DebugFile(char* filename, char* txt, char* a, char* b, char* c, char* d, char* e);
+extern int DebugFileHexa(char *filename, char *title, unsigned char *str, int lg);
+
 #include <s_prost.h>
 
 #endif /* SCRPROTO */

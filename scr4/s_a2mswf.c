@@ -21,25 +21,21 @@ char *A2mPerReal2a(rper, nbper)
 double  rper;
 int     nbper;
 {
-    int     sper, year, i;
+    int     sper, year;
     double  floor();
     static char buf[25];
 
-    year = floor(rper + 0.001);
+    year = (int)floor(rper + 0.001);
     if(nbper == 1) sprintf(buf, "%d", year);
     else {
-	sper = 1.2 + ((double) nbper) * (rper - year);
+	sper = (int) (.2 + ((double) nbper) * (rper - year));
 	sprintf(buf, "%d:%d", year, sper);
     }
     return(buf);
 }
 
 
-A2mSWF_HTML(fd, w, h, grf, cnt)
-FILE    *fd;
-int     w, h;
-A2MGRF  *grf;
-int     cnt;
+int A2mSWF_HTML(FILE* fd, int w, int h, A2MGRF* grf, int cnt)
 {
     int             i, j, maxobs = 0, paxis = 0, saxis = 0, period, type,
                     ndivlines, labelstep, showlegend, showsecondary = 0;
@@ -94,7 +90,7 @@ int     cnt;
 	fprintf(fd, "<script type=\"text/javascript\">   var myChart = new FusionCharts(\"%s/MSCombiDY2D.swf\", \"IodeChrtId%d\", \"%d\", \"%d\", \"%d\", \"0\");   myChart.setDataXML(\"", SWF_GRAPHPATH, cnt, w, h, SWF_DEBUG);
     fprintf(fd, "<chart Caption='");
     A2mOemToAnsi(fd, title);
-    fprintf(fd, "' animation='%d' useRoundEdges='%d' showValues='0' formatNumberScale='0' thousandSeparator='.' decimalSeparator=',' setAdaptiveYMin='1' legendShadow='0' ", SWF_ANIMATE, SWF_ROUNDED, SWF_ROUNDED);
+    fprintf(fd, "' animation='%d' useRoundEdges='%d' showValues='0' formatNumberScale='0' thousandSeparator='.' decimalSeparator=',' setAdaptiveYMin='1' legendShadow='0' ", SWF_ANIMATE, SWF_ROUNDED);
     if(A2M_GR_MULTIBAR == 2) fprintf(fd, " stack100Percent='1' ");
     if(stitle) {
 	fprintf(fd, "SubCaption='");
@@ -205,9 +201,9 @@ int     cnt;
 
 /****************** SWF ***************************/
 
-A2mSWFIni()
+int A2mSWFIni()
 {
-    char filename[256], buf[256], *tmp;
+    char filename[256], buf[256];
 
     A2mGetModulePath(filename);
     strcat(filename, "\\swf.ini");
@@ -249,18 +245,19 @@ A2mSWFIni()
     SWF_FONTSIZE = 10;
     IniReadNumParm(filename, "SWF", "FONTSIZE", &SWF_FONTSIZE);
     IniReadNumParm(filename, "SWF", "EXPORTENABLED", &SWF_EXPORTENABLED);
-
+    
+    return(0);
 }
 
 DrawVLine(double rper, int nbper)
 {
-    int     sper, year, i;
+    int     sper, year;
     double  floor();
 
     if(nbper == 1) return(1);
 
-    year = floor(rper + 0.001);
-    sper = 1.2 + ((double) nbper) * (rper - year);
+    year = (int)floor(rper + 0.001);
+    sper = (int)(1.2 + ((double) nbper) * (rper - year));
     if(sper == nbper) return(1);
 
     return(0);

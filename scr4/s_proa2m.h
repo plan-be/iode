@@ -3,6 +3,7 @@ extern "C" {
 #endif
 
 
+
 /* s_a2mrd.c */
 extern A2MFILE *A2mOpen(char *filename,int type);
 extern int A2mClose(A2MFILE *af);
@@ -40,6 +41,7 @@ extern int A2mReadTblLine(A2MFILE *af,A2MTBL *at,int pos);
 extern int A2mReadTblWidth(A2MFILE *af,A2MTBL *at);
 extern int A2mReadParLine(A2MFILE *af,A2MPAR **ap);
 extern A2MOBJ *A2mReadTbl(A2MFILE *af);
+extern int A2mEndTbl(A2MTBL* at);
 extern int A2mReadGrTxt(A2MFILE *af,unsigned char **txt);
 extern double A2mRead1Dbl(A2MFILE *af);
 extern int A2mReadGrGrids(A2MFILE *af,A2MGRID ***grds);
@@ -67,8 +69,15 @@ extern int A2mReadParChar(A2MFILE *af);
 extern int A2mReadParAlias(A2MFILE *af,A2MPPR *pp);
 extern int A2mReadParDef(A2MFILE *af);
 extern A2MPAR *A2mTxt2Par(char *tag,char *txt);
+extern int A2mReadTopics(char* a2mfile);
+extern int A2mFreeTopics();
 extern int A2mReadA2mIni(char *filename);
 extern int A2mAnalysePeriod(char *str,double *period,double *skip);
+extern int A2mHHReplace1(U_ch* res, U_ch* txt, U_ch* txtu, A2MTOP* atp);
+extern int A2mFreeAnchors();
+extern int A2mFindAnchor(char *ref);
+extern int A2mFreeFNotes();
+extern int A2mAddFNote(char* ref);
 
 /* s_a2mseg.c */
 extern int A2mCreateParCatalog(A2MFILE *af);
@@ -82,6 +91,7 @@ extern int A2mFrCatFile(FILE *fdout,char *outfile,char *ext);
 
 /* s_a2mhtm.c */
 extern int A2mToHtml(char *a2mfile,char *outfile, int wh);
+extern int A2mToHtmlStrip(char* a2mfile, char* outfile, int strp, int wh);
 extern int A2mHtmlInit(char *outfile,int wh);
 extern int A2mHtmlEnd(void);
 extern int A2mHtmlPrintObj(A2MOBJ *ao, int del);
@@ -98,6 +108,14 @@ extern int A2mHtmlPrintTbl(A2MTBL *at);
 extern int A2mHtmlPrintGrf(A2MGRF *ag);
 extern int A2mHtmlAFrame(char *filename);
 extern int A2mHtmlReadIni(char *filename);
+extern int A2mHtmlHhp(char* outfile);
+extern int A2mHtmlPrintFNotes();
+extern int A2mHtmlPrintTopicCnt(A2MTOP *atp);
+extern int A2mHtmlPrintTopic(A2MTOP* atp, int alias);
+extern int A2mHtmlPrintTopicKey(A2MTOP* atp);
+extern int A2mHtmlAnchor(char* ref);
+extern int A2mHtmlFNote(char* ref);
+extern int A2mReadAnchor(A2MFILE *af, int save);
 
 /* s_a2mmsg.c */
 extern void A2mMessage(char *msg);
@@ -143,6 +161,9 @@ extern int A2mRtfAFrame(char *filename,int type);
 extern int A2mRtfHeader(void);
 extern int A2mRtfStyles(void);
 extern int A2mRtfReadIni(char *filename);
+extern void A2mRtfPrintPgHeadFoot(U_ch * txt, int type);
+extern int A2mRtfPrintPage(A2MPAGE* ap, int tbl);
+
 
 /* s_a2mmem.c */
 extern A2MFILE *A2mMemBegin(int dest,unsigned char *outfile,int ask);
@@ -276,6 +297,7 @@ extern int A2mGdiGrfPolyLine(int axis,int nobs,double *vals,int props);
 extern int A2mGdiGrfPolyBar(int axis,int nobs,double *vals,double width,int props);
 extern int A2mGdiSetPen(int pen);
 extern int A2mGdiGrfPrepare(void);
+
 /* s_a2memf.c */
 extern int A2mGdiEMFInit(unsigned char *filename,int w,int h);
 extern int A2mGdiEMFEnd(void);
@@ -283,6 +305,46 @@ extern int A2mGdiWMFEnd(void);
 extern int A2mGdiWMFInit(unsigned char *filename,int w,int h);
 extern int A2mToGdiEMF(unsigned char *a2mfile,unsigned char *outfile,int w,int h);
 extern int A2mGdiEMFGrf(char *a2mfile,char *outfile);
+
+/* s_a2mswf.c */
+extern int A2mSWF_HTML(FILE* fd, int w, int h, A2MGRF* grf, int cnt);
+extern int A2mSWFIni();
+
+/* s_a2mgif.c */
+extern int A2mGIF_HTML(A2MGRF *go, U_ch* filename); 
+
+/* s_a2mmd.c */
+extern int A2mToMD(char* a2mfile, char* outfile);
+extern int A2mMDInit(char* outfile);
+extern U_ch *A2mReadFile(char *filename);
+extern int A2mMDEnd(char* outfile);
+extern int A2mMDPrintObj(A2MOBJ* ao, int del);
+extern int A2mMDPrintTopic(A2MTOP *atp, int alias);
+extern int A2mMDCalcBlc(A2MPAR* ap);
+extern U_ch* A2mMDCalcResetAttrSTATIC();
+extern U_ch* A2mMDCalcAttrSTATIC(A2MPAR* ap, int n, A2MFNT* fntt);
+extern int A2mMDPrintAttr(A2MPAR* ap, int n, A2MFNT* fntt);
+extern U_ch* A2mMDCalcCharSTATIC(int ch, int code);
+extern char* A2mMDAFrame(char* filename);
+extern char *A2mMDFNote(char* ref);
+extern int A2mMDPrintFNotes();
+extern U_ch* A2mMDCalcStr(A2MPAR* ap, int n, A2MFNT *fntt, int tbl, int code);
+extern U_ch* A2mMDCalcStrs(A2MPAR* ap, A2MFNT* fnt, int tbl, int code);
+extern U_ch *A2mMDCalcPar(A2MPAR* ap, int tbl, int tcol);
+extern int A2mMDPrintPar(A2MPAR* ap, int tbl, int tcol);
+extern int A2mMDFindTag(A2MPPR* pp, char* tag);
+extern int A2mMDCalcTagFnt(char* tag, A2MFNT* fnt);
+extern int A2mMDGetCenter(A2MPAR *ap);
+extern int A2mMDPrintTbl(A2MTBL* at);
+extern int A2mMDPrintGrf(A2MGRF* ag);
+extern int A2mMDAnchor(char* ref);
+extern char* A2mMDacatff(char* txt1, char* txt2);
+
+/* s_a2mtch.c */
+extern int A2mChrtInit();
+extern int A2mChrtPrintObj(A2MOBJ *ao);
+extern int A2mChrtEnd(int hdl);
+extern int A2mChrtPrintGrf(int hdl, A2MGRF* grf);
 
 #endif /* DOSWIN ... */
 

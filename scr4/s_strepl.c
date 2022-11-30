@@ -6,8 +6,8 @@
 unsigned char *SCR_replace_gnl2(txt, repl, by)
 unsigned char   *txt, *repl, *by;
 {
-    int     lgrepl = strlen(repl),
-            lgby = strlen(by);
+    int     lgrepl = (int)strlen(repl),
+            lgby = (int)strlen(by);
     U_ch    *txt1 = txt, *txt2 = txt;
 
     if(txt == 0) return(txt);
@@ -32,8 +32,8 @@ unsigned char *SCR_replace_gnl(txt, repl, by, chars)
 unsigned char   *txt, *repl, *by, *chars;
 {
     int     pos, shift = 0,
-                 lgrepl = strlen(repl),
-                 lgby = strlen(by),
+                 lgrepl = (int)strlen(repl),
+                 lgby = (int)strlen(by),
                  lgtxt;
 
     if(txt == 0) return(txt); /* JMP 13-03-03 */
@@ -41,7 +41,7 @@ unsigned char   *txt, *repl, *by, *chars;
     if(lgrepl > lgby && chars == 0)
         return(SCR_replace_gnl2(txt, repl, by)); /* JMP 03-10-2003 */
 
-    lgtxt = strlen(txt);
+    lgtxt = (int)strlen(txt);
     while(1) {
         pos = U_index(txt + shift, repl);
         if(pos < 0) return(txt);
@@ -79,9 +79,9 @@ occurences du string repl par le string by dans txt.
 SCR_replace_len(txt, repl, by, chars)
 unsigned char   *txt, *repl, *by, *chars;
 {
-    int     pos, shift = 0, add = strlen(txt),
-                 lgrepl = strlen(repl),
-                 lgby = strlen(by);
+    int     pos, shift = 0, add = (int)strlen(txt),
+                 lgrepl = (int)strlen(repl),
+                 lgby = (int)strlen(by);
 
     while(1) {
         pos = U_index(txt + shift, repl);
@@ -105,7 +105,7 @@ unsigned char   *txt, *repl, *by, *chars;
     int     len, lgtxt;
     U_ch    *res;
 
-    lgtxt = strlen(txt);
+    lgtxt = (int)strlen(txt);
     len = SCR_replace_len(txt, repl, by, chars);
     if(len < lgtxt) len = lgtxt;
     res = SCR_malloc(len + 1);

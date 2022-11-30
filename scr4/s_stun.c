@@ -29,7 +29,7 @@ unsigned char **SCR_union(tbl1, tbl2)
 unsigned char **tbl1;
 unsigned char **tbl2;
 {
-    int i, j, nb = 0;
+    int i, nb = 0;
     unsigned char **tbl = NULL;
 
     if(tbl1 == 0 || tbl2 == 0) return(tbl);
@@ -62,7 +62,7 @@ unsigned char **SCR_union_quick(tbl1, tbl2)
 unsigned char **tbl1;
 unsigned char **tbl2;
 {
-	int i, nb, nb1, nb2;
+	int i, nb1, nb2;
     unsigned char **tbl = NULL;
 
 	nb1 = SCR_tbl_size(tbl1);

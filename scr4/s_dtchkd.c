@@ -72,10 +72,10 @@ long SCR_fdate_to_long(str, fmt)  /* BP_M 14-07-1997 */
 char    *str;
 char    *fmt;
 {
-    long    date = 0, cdate, dt[3], atol();
+    long    date = 0, dt[3], atol();
     int     nby = 0, nbd = 0, nbm = 0,
 	    y = 1, m = 10, d = 10;
-    int     i, j, c;
+    int     i, j;
     char    bd[5], bm[5], by[10];
     extern  int     DT_DAYS[];
 
@@ -236,7 +236,6 @@ V‚rifie qu'une date est correcte. Le mois doit ˆtre compris entre 01 et
 SCR_check_date(date)
 long    date;
 {
-    int i;
     int day, month, year;
 
     year  = date / 10000L;

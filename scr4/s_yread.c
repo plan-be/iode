@@ -3,6 +3,49 @@
 int YY_NO_COMMENT2 = 0; /* JMP 03-03-2004 */
 
 /*NH*/
+/* =+====== YY_COMMENT ==========================================
+     Reads one comment
+     yy : IO : YYFILE pointer
+   ============================================================== */
+
+YY_comment(yy)
+YYFILE  *yy;
+{
+    int     ch;
+
+cmt :
+    do ch = YY_getc(yy);
+    while( (ch != YY_E_COMMENT[0]) && (ch != YY_EOF));
+    if(ch == YY_EOF) {
+	yy->yy_type = YY_EOF;
+	return(0);
+	}
+    if(YY_E_COMMENT[1] == 0) goto fin;
+    ch = YY_getc(yy);
+    if(ch != YY_E_COMMENT[1]) {
+	YY_ungetc(ch, yy);
+	goto cmt;
+	}
+fin:
+    yy->yy_type = YY_COMMENT;
+    return(0);
+}
+
+/*NH*/
+/* =+====== YY_COMMENT2 ==========================================
+     Reads one comment type //
+     yy : IO : YYFILE pointer
+   ============================================================== */
+
+YY_comment2(yy)
+YYFILE  *yy;
+{
+    YY_skip_to_eol(yy);
+    yy->yy_type = YY_COMMENT;
+    return(0);
+}
+
+/*NH*/
 YY_add_to_text(yy, pos, ch)
 YYFILE  *yy;
 int     pos, ch;
@@ -237,7 +280,7 @@ int YY_read_to_string(yy, str)
 YYFILE          *yy;
 unsigned char   *str;
 {
-    int     ch, lg = 0, str_lg = strlen(str);
+    int     ch, lg = 0, str_lg = (int)strlen(str);
 
     while(1) {
 	ch = YY_getc(yy);
@@ -352,7 +395,7 @@ again:
 
 	if(ch1 != YY_EOF) YY_ungetc(ch1, yy);
 	}
-cnt:
+//cnt:
     switch(ch) {
 	case YY_STRING_DELIMITER :
 	    YY_read_string(yy, ch);
@@ -746,50 +789,6 @@ char    *buf;
     return(res);
 }
 
-/*NH*/
-/* =+====== YY_COMMENT ==========================================
-     Reads one comment
-     yy : IO : YYFILE pointer
-   ============================================================== */
-
-YY_comment(yy)
-YYFILE  *yy;
-{
-    int     ch;
-
-cmt :
-    do ch = YY_getc(yy);
-    while( (ch != YY_E_COMMENT[0]) && (ch != YY_EOF));
-    if(ch == YY_EOF) {
-	yy->yy_type = YY_EOF;
-	return(0);
-	}
-    if(YY_E_COMMENT[1] == 0) goto fin;
-    ch = YY_getc(yy);
-    if(ch != YY_E_COMMENT[1]) {
-	YY_ungetc(ch, yy);
-	goto cmt;
-	}
-fin:
-    yy->yy_type = YY_COMMENT;
-    return(0);
-}
-
-/*NH*/
-/* =+====== YY_COMMENT2 ==========================================
-     Reads one comment type //
-     yy : IO : YYFILE pointer
-   ============================================================== */
-
-YY_comment2(yy)
-YYFILE  *yy;
-{
-    int     ch;
-
-    YY_skip_to_eol(yy);
-    yy->yy_type = YY_COMMENT;
-    return(0);
-}
 
 
 

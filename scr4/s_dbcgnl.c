@@ -436,7 +436,7 @@ S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
 &RT 0 en cas de succäs, -1 en cas d'erreur.
 
 =========================================================================== */
-ISC_rename(char *oldname, char *newname)
+int ISC_rename(char *oldname, char *newname)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(rename(oldname, newname));
@@ -530,7 +530,7 @@ S'il n'y a pas de nom de machine, l'opÇration a lieu sur la machine locale.
 &RT 0 en cas de succäs, -1 en cas d'erreur.
 ================================================================== */
 
-ISC_unlink(char *filename)
+int ISC_unlink(char *filename)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(unlink(filename));
@@ -1046,7 +1046,7 @@ ISC_fread() lit dans buf les nb blocs de lg bytes sur le flux fd ouvert par ISC_
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
 
-ISC_fread(char *buf, int lg, int nb, FILE *fd)
+int ISC_fread(char *buf, int lg, int nb, FILE *fd)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(fread(buf, lg, nb, fd));
@@ -1091,7 +1091,7 @@ ISC_fwrite() Çcrit nb blocs de lg bytes contenus dans buf sur le flux fd ouvert 
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
 
-ISC_fwrite(char *buf, int lg, int nb, FILE *fd)
+int ISC_fwrite(char *buf, int lg, int nb, FILE *fd)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(fwrite(buf, lg, nb, fd));
@@ -1126,7 +1126,7 @@ fd est un flux ouvert par ISC_fopen().
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
 
-ISC_ungetc(int ch, FILE *fd)
+int ISC_ungetc(int ch, FILE *fd)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(ungetc(ch, fd));
@@ -1154,7 +1154,7 @@ ISC_getc() lit le prochain caractäre sur le flux fd ouvert par ISC_fopen().
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
 
-ISC_getc(FILE *fd)
+int ISC_getc(FILE *fd)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(getc(fd));
@@ -1378,7 +1378,7 @@ ISC_putc() Çcrit le caractäre ch sur le flux fd ouvert par ISC_fopen().
 	ISC_getc(), ISC_putc(), ISC_ftell(), ISC_fseek()
 ================================================================== */
 
-ISC_putc(int ch, FILE *fd)
+int ISC_putc(int ch, FILE *fd)
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(putc(ch, fd));
@@ -2007,10 +2007,7 @@ par le caractäre \0.
 &SA SCR_read_line(), SCR_add_ptr()
 =======================================================================*/
 
-ISC_read_line(fd, buf, lg)
-FILE            *fd;
-unsigned char   *buf;
-int             lg;
+int ISC_read_line(FILE* fd, unsigned char* buf, int lg)
 {
     int     i = 0, ch;
 

@@ -30,7 +30,7 @@ int     lg;
 {
     int     i;
 
-    for(i = strlen(str) ; i < lg ; i++)
+    for(i = (int)strlen(str) ; i < lg ; i++)
 	str[i] = ' ';
     str[lg] = 0;
     return(str);

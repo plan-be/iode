@@ -168,13 +168,14 @@ extern int SCR_dumphexfd(char* filein, FILE* fdout, int nl);
 extern int SCR_fprintf_esc(FILE *fd, char *str, int addquotes);
 
 
-/* s_allc.c */
 
+/* s_allc.c  */
+extern int AllocDocLoop();
 extern char *SCR_malloc_chk(unsigned int lg, int panic);
 extern char *SCR_realloc_chk(void *old_ptr,unsigned int el_size,unsigned int old_count,unsigned int new_count, int panic);
 extern char *SCR_malloc_doc(unsigned int lg, char *file, int ligne);
 extern char *SCR_realloc_doc(void *old_ptr,unsigned int el_size,unsigned int old_count,unsigned int new_count, char *file, int line);
-
+ 
 extern int SCR_alloc_chunck(int nb);
 extern int SCR_free(void *ptr);
 extern char *SCR_palloca(unsigned int len,unsigned int a);
@@ -232,6 +233,9 @@ extern long SCR_free_mem(void);
 /* s_stutf8.c */
 extern unsigned char *SCR_OemToUTF8Char(int ch);
 extern unsigned char *SCR_AnsiToUTF8Char(int ch);
+int SCR_OemToUTF8Length(unsigned char *str);
+int SCR_AnsiToUTF8Length(unsigned char *str);
+int SCR_OemAnsiToUTF8Length(unsigned char *str, int oemansi);
 extern unsigned char *SCR_OemToUTF8(unsigned char *, unsigned char *);
 extern unsigned char *SCR_AnsiToUTF8(unsigned char *, unsigned char *);
 extern int SCR_ConvertToUTF8(char *filein, char *fileout, int isbom, int isansi);

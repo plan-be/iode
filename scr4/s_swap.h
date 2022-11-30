@@ -196,7 +196,7 @@ extern SWHDL    SW_find_free_item();
 extern long     SW_coreleft();
 extern SWSIZE   SW_get_pos();
 extern SWHDL    SW_get_free();
-
+extern void     SW_Debug();
 #else
 
 #include <s_prosw.h>

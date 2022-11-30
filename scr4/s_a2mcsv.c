@@ -101,7 +101,6 @@ char    *a2mfile, *outfile;
 A2mCsvInit(outfile)
 char    *outfile;
 {
-    int         i;
     extern int  A2M_CUROBJ;
 
     A2M_fdcsv = fopen(outfile, "w+");
@@ -145,9 +144,7 @@ A2mCsvPrintPar(ap, tbl, tcol)
 A2MPAR  *ap;
 int     tbl, tcol;
 {
-    int     i, level, blc;
-    char    tag[32], *just;
-    A2MFNT  fntd;
+    int     i;
 
     if(ap == 0 || ap->ap_strs == 0) return(0);
     A2mSetParProps(ap->ap_tag, &(ap->ap_ppr));
@@ -217,7 +214,7 @@ A2mCsvPrintTbl(at)
 A2MTBL  *at;
 {
     A2MTC   *tc;
-    int     i, j, col;
+    int     i, j;
 
     A2mCsvPrintPar(at->at_title, 0, 0);
 

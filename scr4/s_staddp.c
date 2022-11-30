@@ -159,7 +159,7 @@ U_ch    *txt;
 {
     int     lg;
 
-    if(txt) lg = 1 + strlen(txt);
+    if(txt) lg = 1 + (int)strlen(txt);
     else    lg = 0;
     return(SCR_add_ptr_lg_0(tbl, ntbl, txt, lg, 0));
 }

@@ -82,7 +82,7 @@ A2MFILE *af;
     CppRecord(cpp, buf);
 
     size = A2M_FONTSIZE - A2M_FONTINCR;
-    sprintf(buf, ".pardef PageNum italic=y lmargin=0 size=8 spacea=0 spaceb=0 family=Times\n", size + 2);
+    sprintf(buf, ".pardef PageNum italic=y lmargin=0 size=8 spacea=0 spaceb=0 family=Times\n");
     CppRecord(cpp, buf);
 
     sprintf(buf, ".pardef GraphFooter spaceb=0 spacea=0 lmargin=0 size=8 family=%c\n", A2M_TFONTFAMILY);
@@ -192,7 +192,6 @@ A2MPAR  *ap;
 A2MSTR  *as;
 A2MFNT  *fnt;
 {
-    A2MPPR  pp;
     A2MFNT  *asfnt;
 
     memcpy(fnt, &(ap->ap_ppr.pp_fnt), sizeof(A2MFNT));
@@ -273,7 +272,7 @@ U_ch    *txt;
 A2MFNT  *fnt;
 {
     A2MSTR  *as;
-    int     ch, i = 0;
+    int     i = 0;
 
     while(1) {
 	if(txt[i] == 0) {

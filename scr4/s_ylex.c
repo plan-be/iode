@@ -31,7 +31,7 @@ int         nbkeys;
     yk1.yk_word = yy->yy_text;
     yk = (YYKEYS *) bsearch(&yk1, yykeys, nbkeys, sizeof(YYKEYS), YY_strcmp);
     if(yk == 0) return(-1);
-    pos = yk - yykeys;
+    pos = (int)(yk - yykeys);
     if(pos == nbkeys -1 || yk[1].yk_word[0] != yy->yy_text[0])
 	return(yk->yk_def);
     YY_skip_spaces(yy);
@@ -55,7 +55,6 @@ YYKEYS      *yykeys;
 int         nbkeys;
 {
     YYKEYS  *yk, yk1;
-    int     i;
 
     yk1.yk_word = yy->yy_text;
     yk = (YYKEYS *)bsearch(&yk1, yykeys, nbkeys, sizeof(YYKEYS), YY_strcmp);
@@ -148,9 +147,3 @@ YYFILE      *yy;
 {
     return(YY_lex2(yy, yy->yy_keys, yy->yy_nb_keys));
 }
-
-
-
-
-
-

@@ -324,7 +324,7 @@ A2MFILE *af;
             A2mCsvEnd();
             break;
         case A2M_DESTTCHRT :
-            A2mChrtEnd();
+            A2mChrtEnd(-1);
             break;
         case A2M_DESTDUMMY :
         default :

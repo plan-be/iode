@@ -28,16 +28,16 @@ int     n;
     int     lg;
 
     if(n == 0) return(text);
-    lg = strlen(text);
+    lg = (int)strlen(text);
     if(n > 0)
     {
-	for(i = 0; i < lg-n; i++) text[i] = text[i+n];
-	for(i = lg - n ; i < lg ; i++) text[i] = ' ';
+        for(i = 0; i < lg-n; i++) text[i] = text[i+n];
+        for(i = lg - n ; i < lg ; i++) text[i] = ' ';
     }
     else
     {
-	for(i = lg + n - 1 ; i >= 0; i--) text[i-n] = text[i];
-	for(i = 0 ; i < (-n) ; i++) text[i] = ' ';
+        for(i = lg + n - 1 ; i >= 0; i--) text[i-n] = text[i];
+        for(i = 0 ; i < (-n) ; i++) text[i] = ' ';
     }
     return(text);
 }

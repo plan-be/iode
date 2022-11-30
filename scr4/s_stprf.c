@@ -1,5 +1,6 @@
 #define SCRSUPPROTO
 #include <stdio.h>
+#include <s_strs.h>
 
 /* ======================================================================
 Cr‚e le fichier filename et y stocke le string construit avec
