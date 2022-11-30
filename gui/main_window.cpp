@@ -84,12 +84,20 @@ void MainWindow::addProjectPathToList(const QDir& projectDir)
     buildRecentProjectsMenu();
 }
 
-void MainWindow::openDirectory(const QString& dirPath)
+QMessageBox::StandardButton MainWindow::askSaveAllTabs()
+{
+    QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", "Save content of all open tabs?", 
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
+    if (answer == QMessageBox::Yes) tabWidget_IODE_objs->saveAllTabs();
+    return answer;
+}
+
+bool MainWindow::openDirectory(const QString& dirPath)
 {
     if(dirPath.isEmpty())
     {
         QMessageBox::critical(this, "Error", "Empty path for new Project");
-        return;
+        return false;
     }
 
     QDir dir(dirPath);
@@ -97,7 +105,7 @@ void MainWindow::openDirectory(const QString& dirPath)
     if (!dir.exists())
     {
         QMessageBox::critical(this, "Error", "Directory " + rootPath + " does not exist");
-        return;
+        return false;
     }
 
     // create/update settings
@@ -116,6 +124,8 @@ void MainWindow::openDirectory(const QString& dirPath)
 
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);
+
+    return true;
 }
 
 void MainWindow::open_project()
@@ -124,6 +134,11 @@ void MainWindow::open_project()
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     // check if user clikced on Cancel button
     if(dir.isEmpty()) return;
+
+    // ask to save all current tabs content before to switch
+    QMessageBox::StandardButton answer = askSaveAllTabs();
+    if (answer == QMessageBox::Discard) return;
+
     // update current project path + open it in the Iode GUI File Exporer
     rootPath = dir;
     openDirectory(rootPath);
@@ -138,7 +153,9 @@ void MainWindow::save_project_as()
     if(dir.isEmpty()) return;
     // update current project path
     rootPath = dir;
-    // save all Iode files to the (new) directory 
+    // save all tabs content
+    tabWidget_IODE_objs->saveAllTabs();
+    // save all IODE files to the (new) directory 
     QDir projectDir = QDir(rootPath);
     tabWidget_IODE_objs->saveProjectAs(projectDir);
 
@@ -151,7 +168,13 @@ void MainWindow::open_recent_project()
     if (action)
     {
         QString projectPath = action->data().toString();
-        if (QDir(projectPath).exists()) openDirectory(projectPath);
+        if (QDir(projectPath).exists())
+        {
+            // ask to save all current tabs content before to switch
+            QMessageBox::StandardButton answer = askSaveAllTabs();
+            if (answer == QMessageBox::Discard) return;
+            openDirectory(projectPath);
+        }
         else 
         {
             QMessageBox::warning(this, "Warning", "Directory " + projectPath + " seems to no longer exist");
@@ -163,7 +186,10 @@ void MainWindow::open_recent_project()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    event->accept();
+    // ask to save all current tabs content before to switch
+    QMessageBox::StandardButton answer = askSaveAllTabs();
+    if (answer == QMessageBox::Discard) event->ignore();
+    else event->accept();
 }
 
 void MainWindow::check_vars_sample()

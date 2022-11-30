@@ -46,7 +46,17 @@ public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	~MainWindow();
 
-	void openDirectory(const QString& dirPath);
+	/**
+	 * @brief update the project path and the content of the File Explorer.
+	 *        Ask to save workspace and content of all other tabs before to switch from project directory. 
+	 *        If the new project directory contains a project settings file (.ini), reopen tabs listed in 
+	 *        the project settings file.
+	 * 
+	 * @param dirPath QString path to the directory to open as IODE project root.
+	 * 
+	 * @return bool whether or not the IODE project root has been updated.
+	 */
+	bool openDirectory(const QString& dirPath);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -60,12 +70,19 @@ private:
 	void buildRecentProjectsMenu();
 
 	/**
-	 * @brief add the path to a project directory to the list 
-	 * of recent opened project dirs.
+	 * @brief add the path to a project directory to the list of recent opened project dirs.
 	 * 
 	 * @param projectDir absolute path the project directory
 	 */
 	void addProjectPathToList(const QDir& projectDir);
+
+	/**
+	 * @brief ask the user if (s)he wants to save all tabs content 
+	 *        (before to switch from project directory or when closing the GUI).
+	 * 
+	 * @return QMessageBox::StandardButton Yes, No or Discard.
+	 */
+	QMessageBox::StandardButton askSaveAllTabs();
 
 public slots:
 	// File Menu
