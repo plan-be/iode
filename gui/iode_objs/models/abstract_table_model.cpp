@@ -111,6 +111,62 @@ void IODEAbstractTableModel<K>::filter(const QString& pattern)
 }
 
 template <class K>
+QString IODEAbstractTableModel<K>::save(const QDir& projectDir, const QString& filepath)
+{
+		if (kdb->count() == 0) return ""; 
+
+		EnumIodeType iodeType = (EnumIodeType) kdb->get_iode_type();
+		
+		// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
+		std::string std_filepath = filepath.isEmpty() ? kdb->get_filename() : filepath.toStdString();
+
+		// if KDB not linked to any file, ask the user to give/create a file to save in.
+		// Otherwise, check the filepath 
+		if (std_filepath.empty() || std_filepath == std::string(I_DEFAULT_FILENAME))
+		{
+			// open a box dialog 
+			QString filepath = askFilepath(projectDir);
+			// filepath is empty if the user clicked on the Discard button
+			if (filepath.isEmpty()) return "";
+			std_filepath = filepath.toStdString();
+		}
+		
+		std_filepath = check_filepath(std_filepath, iodeType, "tab " + vIodeTypes[iodeType], false);
+
+		QFileInfo fileInfo(QString::fromStdString(std_filepath));
+		QString fullPath = fileInfo.absoluteFilePath();
+
+		try
+		{
+			kdb->set_filename(fullPath.toStdString());
+			std::string full_path = fullPath.toStdString();
+			kdb->dump(full_path);
+		}
+		catch (const IodeException& e)
+		{
+			QWidget* mainwin = get_main_window_ptr();
+			QMessageBox::critical(mainwin, "Error", e.what());
+			return "";
+		}
+
+		return fullPath;
+}
+
+template <class K>
+QString IODEAbstractTableModel<K>::saveAs(const QDir& projectDir)
+{
+	if (kdb->count() == 0) return ""; 
+	
+	// ask user for new filepath
+	QString filepath = askFilepath(projectDir);
+	// call the save method
+	filepath = save(projectDir, filepath);
+	// update KDB filename
+	if (!filepath.isEmpty()) kdb->set_filename(filepath.toStdString());
+	return filepath;
+}
+
+template <class K>
 bool IODEAbstractTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
 	std::string name;
