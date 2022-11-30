@@ -86,6 +86,8 @@ public:
 
     virtual void resetFilter() = 0;
     virtual void update() = 0;
+    virtual bool save() = 0;
+    virtual bool saveAs() = 0;
 };
 
 
@@ -93,10 +95,11 @@ template <class M, class V> class QIodeObjectWidget: public AbstractIodeObjectWi
 {
     M* objmodel;
     V* tableview;
+    QDir projectDir;
 
 public:
-    QIodeObjectWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        AbstractIodeObjectWidget(iodeType, parent)
+    QIodeObjectWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, 
+        QWidget* parent = nullptr) : AbstractIodeObjectWidget(iodeType, parent), projectDir(QDir::homePath())
     {
         QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
 
@@ -151,6 +154,21 @@ public:
     void update()
     {
         tableview->update();
+    }
+
+    void setProjectDir(const QDir& projectDir)
+    {
+        this->projectDir = projectDir;
+    }
+
+    bool save()
+    {
+        return objmodel->save(projectDir);
+    }
+
+    bool saveAs()
+    {
+        return objmodel->saveAs(projectDir);
     }
 };
 
