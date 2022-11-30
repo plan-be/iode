@@ -58,6 +58,10 @@ public:
 		setFocusProxy(lineEdit);
 
 		connect(browseButton, SIGNAL(clicked()), this, SLOT(browse()));
+
+		// There is no QFileDialog::getSaveDirectory(). 
+		// Only QFileDialog::getExistingDirectory()
+		if (fileType == I_DIRECTORY) fileMode == EXISTING_FILE;
 	}
 
 	~QIodeFileChooser()
@@ -81,25 +85,38 @@ public slots:
 private slots:
 	void browse()
 	{
-		QString filename;
+		QString path = lineEdit->text();
 		IodeFileExtension expectedExt = vFileExtensions[fileType];
 		QString name = QString::fromStdString(expectedExt.name);
 		QString ext = QString::fromStdString(expectedExt.ext);
 		QString ascii = QString::fromStdString(expectedExt.ascii);
 
-		QString dir;
+		QString rootDir;
+		if (path.isEmpty())
+			rootDir = QDir::homePath();
+		else
+		{
+			QDir parentDir = QFileInfo(path).absoluteDir();
+			rootDir = (parentDir.exists()) ? parentDir.absolutePath() : QDir::homePath();
+		}
+
 		QString caption = name + " File";
 		QString filter = ext == anyExt ? QString() : name + " (*" + ext + " *" + ascii + ")";
 		if (fileMode == EXISTING_FILE)
 		{
-			caption = "Open " + caption;
-			filename = QFileDialog::getOpenFileName(this, caption, dir, filter);
+			if (fileType == I_DIRECTORY)
+				path = QFileDialog::getExistingDirectory(this, "Open Directory", rootDir, QFileDialog::ShowDirsOnly);
+			else
+			{
+				caption = "Open " + caption;
+				path = QFileDialog::getOpenFileName(this, caption, rootDir, filter);
+			}
 		}
 		else
 		{
 			caption = "Save " + caption;
-			filename = QFileDialog::getSaveFileName(this, caption, dir, filter);
+			path = QFileDialog::getSaveFileName(this, caption, rootDir, filter);
 		}
-		if (!filename.isEmpty()) lineEdit->setText(filename);
+		if (!path.isEmpty()) lineEdit->setText(path);
 	}
 };
