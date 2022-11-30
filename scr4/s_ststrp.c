@@ -26,7 +26,7 @@ unsigned char *str;
     int i;
 
     if(str == 0) return(str);
-    for(i = strlen(str) - 1; i >= 0 ; i--)
+    for(i = (int)strlen(str) - 1; i >= 0 ; i--)
 	if(str[i] > ' ') {
 	    if(str[i + 1] != 0) str[i + 1] = 0; /* JMP 15-03-07 pour Linux */
 	    break;

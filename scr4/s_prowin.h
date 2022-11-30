@@ -51,6 +51,7 @@ extern int MS_hide(void);
 extern int MS_show(void);
 extern int WscrBeep(void);
 extern int WscrEndPrintf(void);
+extern int SCR_sleep(int ms);
 
 /* s_wmain.c */
 extern unsigned char **WscrCreateArgv(unsigned char *CmdLine);
@@ -241,16 +242,19 @@ extern int WscrPixelsToPgDlg(PAGE *pg,int *x,int *y,int *w,int *h);
 
 /* s_wprt.c */
 extern int WprPrinterInit(HWND hWndOwner,int dlg,char *docname);
+extern int WprPrinterInitStd(HWND hWndOwner, int dlg, char *docname);
 extern int WprAllInit(void);
 extern int WprPrinterEnd(void);
 extern int WprEndAll(void);
 extern int WprPrinterEndFF(int ff);
+extern int WprPrinterEndFFStd(int ff);
 extern int WprRegisterFont(int family,int size,int bold,int italic,int underl,HANDLE hFont,int w,int h);
 extern int WprSelectFont(int family,int size,int bold,int italic,int underl);
 extern int WprSetCurFont(int i);
 extern int WprDeleteFonts(void);
 extern int WprSetFont(int family,int pty,int bold,int italic,int underl);
 extern int WprFormFeed(void);
+extern int WprFormFeedStd();
 extern int WprPrintStringNoAlign(int x,int y,unsigned char *txt);
 extern int WprPrintString(int x,int y,unsigned char *txt);
 extern int WprHCenterLeft(void);
@@ -455,6 +459,14 @@ extern int WscrRegisterSetApplData(char *ApplCode,char *ApplVar,char *VarValue);
 extern int WscrRegisterGetApplData(char *ApplCode,char *ApplVar,char *VarValue);
 extern int WscrRegisterDeleteApplData(char *ApplCode);
 extern HWND WscrGetMainWnd(void);
+
+/* s_wsys2.c */
+extern int WscrGetPid();
+extern int WscrTempFilenameInDir(char *dirname, char *filename);
+extern int WscrTempFilename(char *filename);
+extern int WscrTempPath(char *dirbuf);
+extern int WscrSetFileTime(char *filename, long actime, long modtime);
+extern int WscrSetFileTimeWin(char *filename, long cretime, long acttime, long modtime);
 
 /* s_whook.c */
 extern LRESULT __stdcall WscrKeyboardHookProc(int nCode,WPARAM wParam,LPARAM lParam);

@@ -19,7 +19,7 @@ unsigned char    *in;
     unsigned char    *ptr;
 
     if(in == 0) return((unsigned char *)0);
-    ptr = (unsigned char *) SCR_malloc(strlen(in) + 1); /* JMP 21-08-2012 */
+    ptr = (unsigned char *) SCR_malloc((int)strlen(in) + 1); /* JMP 21-08-2012 */
     if(ptr != 0) strcpy(ptr, in);
     return(ptr);
 }
@@ -64,8 +64,8 @@ unsigned char    *in, *add;
     unsigned char   *ptr = 0;
     int             lg = 0;
 
-    if(add) lg += strlen(add);
-    if(in) lg += strlen(in);
+    if(add) lg += (int)strlen(add);
+    if(in) lg += (int)strlen(in);
     if(lg == 0) return(ptr);
     ptr = (unsigned char *) SCR_malloc(lg + 1);
     if(ptr == 0) return(ptr);
@@ -95,8 +95,8 @@ unsigned char    *in, *add;
     int             lg;
 
     if(add == 0) return(in);
-    lg = strlen(add);
-    if(in) lg += strlen(in);
+    lg = (int)strlen(add);
+    if(in) lg += (int)strlen(in);
     ptr = (unsigned char *) SCR_malloc(lg + 1);
     if(ptr == 0) return(in);
     ptr[0] = 0;

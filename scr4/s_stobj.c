@@ -97,7 +97,7 @@ unsigned char   *txt;
 
     if(txt == 0) fwrite(&lg, sizeof(short), 1, fd);
     else {
-	lg = strlen(txt);
+	lg = (int)strlen(txt);
 	fwrite(&lg, sizeof(short), 1, fd);
 	if(lg) fwrite(txt, lg, 1, fd);
 	}

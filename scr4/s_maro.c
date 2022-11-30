@@ -11,7 +11,6 @@ int     dim;
 MREAL    *row1, *row2;
 {
     MREAL*     row;
-    int       j;
 
     row = M_alloc_vec(dim);
     if (row == 0)
@@ -45,7 +44,6 @@ MREAL    mult;
 MREAL    *row1, *row2;
 {
     int   j;
-    MREAL test, a, b;
 
     for(j = 0; j < dim; j ++)
     {

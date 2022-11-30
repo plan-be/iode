@@ -40,7 +40,7 @@ unsigned char **SCR_vtoms(str, seps)
 unsigned char    *str,
 		 *seps;
 {
-    U_ch    **tbl = 0, tmp;
+    U_ch    **tbl = 0;
     int     ntbl = 0, i;
 
     if(str == 0) return(tbl);
@@ -157,7 +157,7 @@ unsigned char    *str,
 		 *seps;
 int              supdbl;
 {
-    U_ch    **tbl = 0, tmp;
+    U_ch    **tbl = 0;
     int     ntbl = 0, i;
 
     if(str == 0) return(tbl);
@@ -225,7 +225,7 @@ unsigned char    *str,
 		 *seps;
 int              supdbl;
 {
-    U_ch    **tbl = 0, tmp;
+    U_ch    **tbl = 0;
     int     ntbl = 0, i, intbl = 0;
 
     if(str == 0) return(tbl);
@@ -318,7 +318,7 @@ unsigned char    *str,
 		 *seps;
 int              supdbl;
 {
-    U_ch    **tbl = 0, tmp;
+    U_ch    **tbl = 0;
     int     ntbl = 0, i;
 
     if(str == 0) return(tbl);

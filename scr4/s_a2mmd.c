@@ -104,8 +104,7 @@ Ces variables sont d‚finies dans la section [HTML] du fichier .ini.
 &SA A2mToRtf(), A2mToMif(), A2mToMif(), A2mPrintError()
 ==================================================================== */
 
-A2mToMD(a2mfile, outfile)
-char    *a2mfile, *outfile;
+int A2mToMD(char* a2mfile, char* outfile)
 {
     A2MFILE *af;
     A2MOBJ  *ao;
@@ -137,11 +136,8 @@ char    *a2mfile, *outfile;
 
 
 /*NH*/
-A2mMDInit(outfile)
-char    *outfile;
+int A2mMDInit(char* outfile)
 {
-    int         i;
-    char        buf[256];
     extern int  A2M_CUROBJ;
 
     A2M_CUROBJ = 1;
@@ -202,9 +198,7 @@ fin:
 /*NH*/
 int A2mMDEnd(char* outfile)
 {
-    int     i;
     U_ch    *toc, *str_md;
-    long    fsize;
 
     // Sauve les footnotes
     A2mMDPrintFNotes();
@@ -243,9 +237,7 @@ int A2mMDEnd(char* outfile)
 }
 
 /*NH*/
-A2mMDPrintObj(ao, del)
-A2MOBJ  *ao;
-int     del;
+int A2mMDPrintObj(A2MOBJ* ao, int del)
 {
     char        msg[80];
     extern int  A2M_CUROBJ;
@@ -272,9 +264,7 @@ int     del;
 }
 
 /*NH*/
-A2mMDPrintTopic(atp, alias)
-A2MTOP  *atp;
-int     alias;
+int A2mMDPrintTopic(A2MTOP *atp, int alias)
 {
 //    char    buf[256];
 //    int     i;
@@ -293,8 +283,7 @@ int     alias;
 }
 
 /*NH*/
-A2mMDCalcBlc(ap)
-A2MPAR  *ap;
+int A2mMDCalcBlc(A2MPAR* ap)
 {
     int     i;
     U_ch    *txt;
@@ -354,10 +343,7 @@ U_ch* A2mMDCalcResetAttrSTATIC()
 }
 
 /*NH*/
-U_ch* A2mMDCalcAttrSTATIC(ap, n, fntt)
-A2MPAR  *ap;
-int     n;
-A2MFNT  *fntt;
+U_ch* A2mMDCalcAttrSTATIC(A2MPAR* ap, int n, A2MFNT* fntt)
 {
     A2MFNT  fnt, fntp;
     static U_ch buf[80];
@@ -482,10 +468,7 @@ A2MFNT  *fntt;
 
 
 /*NH*/
-A2mMDPrintAttr(ap, n, fntt)
-A2MPAR  *ap;
-int     n;
-A2MFNT  *fntt;
+int A2mMDPrintAttr(A2MPAR* ap, int n, A2MFNT* fntt)
 {
     char*   txt;
     
@@ -503,8 +486,7 @@ A2MFNT  *fntt;
  *  @return          char*  buffer STATIC avec le resultat
  *  
  */
-U_ch* A2mMDCalcCharSTATIC(ch, code)
-int     ch, code;
+U_ch* A2mMDCalcCharSTATIC(int ch, int code)
 {
     static U_ch    buf[10];
 
@@ -642,10 +624,7 @@ U_ch* A2mMDCalcStr(A2MPAR* ap, int n, A2MFNT  *fntt, int tbl, int code)
 }
  
 
-U_ch* A2mMDCalcStrs(ap, fnt, tbl, code) 
-A2MPAR  *ap;
-A2MFNT  *fnt;
-int     tbl, code;
+U_ch* A2mMDCalcStrs(A2MPAR* ap, A2MFNT* fnt, int tbl, int code) 
 {
     int     i;
     U_ch*   txt = 0;
@@ -659,12 +638,10 @@ int     tbl, code;
 }
 
 /*NH*/
-U_ch *A2mMDCalcPar(ap, tbl, tcol)
-A2MPAR  *ap;
-int     tbl, tcol;
+U_ch *A2mMDCalcPar(A2MPAR* ap, int tbl, int tcol)
 {
-    int     i, level, blc;
-    char    tag[32], *just;
+    int     i, level;
+    char    tag[32];
     A2MFNT  fntd;
     U_ch    *txt = 0, *tit, *bullets = 0, buf[80];
 
@@ -746,9 +723,7 @@ int     tbl, tcol;
 }
 
 /*NH*/
-A2mMDPrintPar(ap, tbl, tcol)
-A2MPAR  *ap;
-int     tbl, tcol;
+int A2mMDPrintPar(A2MPAR* ap, int tbl, int tcol)
 {
     char*   txt;
     
@@ -760,9 +735,7 @@ int     tbl, tcol;
 }
 
 /*NH*/
-A2mMDFindTag(pp, tag)
-A2MPPR  *pp;
-char    *tag;
+int A2mMDFindTag(A2MPPR* pp, char* tag)
 {
     A2M_MD_GREEK = 0;
     if(pp->pp_html)                      sprintf(tag, "H%d", pp->pp_html);
@@ -776,9 +749,7 @@ char    *tag;
 
 
 /*NH*/
-A2mMDCalcTagFnt(tag, fnt)
-char    *tag;
-A2MFNT  *fnt;
+int A2mMDCalcTagFnt(char* tag, A2MFNT* fnt)
 {
     memset(fnt, 0, sizeof(A2MFNT));
 
@@ -799,7 +770,7 @@ A2MFNT  *fnt;
 }
 
 
-A2mMDGetCenter(A2MPAR *ap)
+int A2mMDGetCenter(A2MPAR *ap)
 {
     A2MPAR  tmpap;
 
@@ -809,13 +780,11 @@ A2mMDGetCenter(A2MPAR *ap)
 
 
 /*NH*/
-A2mMDPrintTbl(at)
-A2MTBL  *at;
+int A2mMDPrintTbl(A2MTBL* at)
 {
     A2MTC   *tc;
-    int     i, j, col, firstline = 1;
+    int     i, j, firstline = 1;
     int     b = at->at_border;
-    char    *tdh, *baseclass, cellclass[256];
 
     A2M_MD_LEVEL = 0;
 
@@ -869,18 +838,15 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mMDPrintGrf(ag)
-A2MGRF  *ag;
+int A2mMDPrintGrf(A2MGRF* ag)
 {
     return(0);
 }
 
 
 /*NH*/
-A2mMDAnchor(ref)
-char    *ref;
+int A2mMDAnchor(char* ref)
 {
-    char    buf[128];
     int     aa_nb, i;
 
     aa_nb = A2mFindAnchor(ref);

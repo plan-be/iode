@@ -3,9 +3,20 @@
 
 SCRSTAT **ISC_dir(char *, int , char *, char *);
 SCRSTAT **ISC_dir_ex(char *, int , char *, char *, int);
-FILE *ISC_fopen(char *, char *);
-unsigned long ISC_getcrc32(char *);
+
+FILE *ISC_fopen(char *filename, char *mode);
+int ISC_fclose(FILE *fd);
 long ISC_ftell(FILE *);
+int ISC_read_line(FILE* fd, unsigned char* buf, int lg);
+int ISC_fread(char *buf, int lg, int nb, FILE *fd);
+int ISC_fwrite(char *buf, int lg, int nb, FILE *fd);
+int ISC_getc(FILE *fd);
+int ISC_ungetc(int ch, FILE *fd);
+int ISC_putc(int ch, FILE *fd);
+
+unsigned long ISC_getcrc32(char *);
+int ISC_unlink(char *filename);
+int ISC_rename(char *oldname, char *newname);
 
 extern int          SCR_ISC_PORT;           /* JMP 06-12-99 */
 extern char         *SCR_ISC_SERVER;        /* JMP 06-12-99 */

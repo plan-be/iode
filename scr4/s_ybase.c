@@ -133,7 +133,7 @@ int     type;
 	    yy->yy_fd = fopen(filename, "r");
 	    if(yy->yy_fd == 0) return(-1);
 	    //yy->yy_name = (unsigned char *)malloc(strlen(filename) + 1);
-	    yy->yy_name = (unsigned char *)SCR_malloc(strlen(filename) + 1); /* JMP 22-08-2012 */
+	    yy->yy_name = (unsigned char *)SCR_malloc((int)strlen(filename) + 1); /* JMP 22-08-2012 */
 	    strcpy(yy->yy_name, filename);
 	    break;
 	case YY_MEM:
@@ -233,7 +233,7 @@ unsigned char *txt;
     unsigned char   *ptr;
 
     if(txt == 0) return(0); /* JMP 08-09-99 */
-    lg = strlen(txt);
+    lg = (int)strlen(txt);
     add = 100 * (1 + lg / 100);
     if(lg + yy->yy_rec_lg >= yy->yy_rec_alg) {
 	if(add + yy->yy_rec_alg >= YY_MAX_RECORD) {

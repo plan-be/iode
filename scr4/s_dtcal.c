@@ -71,7 +71,7 @@ again:
 	/* DISPLAY SCREEN */
 	SCR_set_attr(SCR_REVERSE);
 	sprintf(buf, "%s %ld", DT_MONTHS_NAMES[d[1] - 1], 1900L + d[2]);
-	SCR_write(bline + 1, bcol + 7, buf, strlen(buf));
+	SCR_write(bline + 1, bcol + 7, buf, (int)strlen(buf));
 	day = DT_day_w(date);
 	nj = DT_month_days(date);
 	line = bline + 3;

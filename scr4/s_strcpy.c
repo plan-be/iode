@@ -20,7 +20,7 @@ partie de string.
 unsigned char *SCR_strrcpy(out, in)
 unsigned char *out, *in;
 {
-    int     i, lg = strlen(in);
+    int     i, lg = (int)strlen(in);
 
     for(i = lg ; i >= 0 ; i--)
 	out[i] = in[i];

@@ -11,7 +11,8 @@
 #include <string.h>
 
 unsigned char   *LST_BUF = 0;
-unsigned int    LST_BUF_LEN = 0;
+//unsigned int    LST_BUF_LEN = 0;             // JMP 30/11/2022
+int    LST_BUF_LEN = 0;             // JMP 30/11/2022
 
 /*NH*/
 LST_set_buf(ch, pos)
@@ -53,15 +54,15 @@ unsigned char   *seps;
 
 {
     LST             *lst = 0;
-    unsigned char   *ptr;
     int             len = 0, ch, i;
-
 
 #ifdef SWAP
     SWHDL   swptr;
 
     lst = LST_create(100, sizeof(SWHDL));
 #else
+    unsigned char   *ptr;
+
     lst = LST_create(100, sizeof(char *));
 #endif
 
@@ -72,7 +73,7 @@ unsigned char   *seps;
 	if(seps[i] || ch == EOF) {
 	    LST_set_buf(0, len);
 	    SCR_strip(LST_BUF);     /* JMP 09-03-92 */
-	    len = strlen(LST_BUF);  /* JMP 09-03-92 */
+	    len = (int)strlen(LST_BUF);  /* JMP 09-03-92 */
 	    LST_add_1(lst);
 #ifdef SWAP
 	    swptr = 0;
@@ -171,7 +172,7 @@ unsigned char   *seps;
 {
     unsigned char   *ptr, *vec = 0;
     long            i;
-    int             lg = 0, seps_lg = strlen(seps), len;
+    int             lg = 0, seps_lg = (int)strlen(seps), len;
 #ifdef SWAP
     SWHDL           swptr;
 #endif
@@ -186,7 +187,7 @@ unsigned char   *seps;
 #else
 	    ptr = *(unsigned char **) LST_get(lst, (long)i);
 #endif
-	    if(ptr) lg += strlen(ptr);
+	    if(ptr) lg += (int)strlen(ptr);
 	    }
 	}
 
@@ -212,7 +213,7 @@ unsigned char   *seps;
 #endif
 	len = 0;
 	if(ptr) {
-	    len = strlen(ptr);
+	    len = (int)strlen(ptr);
 	    strcpy(vec + lg, ptr);
 	    lg += len;
 	    }
@@ -244,9 +245,11 @@ int LST_free_text(lst)
 LST     *lst;
 {
     long            i;
-    unsigned char   *ptr;
+
 #ifdef SWAP
     SWHDL           swptr;
+#else
+    unsigned char   *ptr;    
 #endif
 
     if(lst == 0) return(0);

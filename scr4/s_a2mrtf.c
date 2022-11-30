@@ -1,5 +1,6 @@
 #include "s_a2m.h"
 #include <s_ini.h>
+#include <io.h>
 
 FILE    *A2M_fdrtf, *A2M_fdcnt;
 int     A2M_RTF_INTOPIC = 0, A2M_RTF_CURFIG = 1;
@@ -236,7 +237,7 @@ char    *outfile;
     fclose(A2M_fdrtf);
     A2M_fdrtf = 0;
     SCR_change_ext(buf, outfile, "tmp");
-    unlink(buf);
+    _unlink(buf);
 
     if(A2M_RTF_HELP) {
 	A2mRtfPrintTopicCnt((A2MTOP *)0);
@@ -294,7 +295,7 @@ A2MOBJ  *ao;
 }
 
 /*NH JMP 30-08-11 */
-A2mRtfPrintPgHeadFoot(U_ch * txt, int type)
+void A2mRtfPrintPgHeadFoot(U_ch * txt, int type)
 {
     char    buf[1024];
     if(txt) {
@@ -309,8 +310,7 @@ A2mRtfPrintPgHeadFoot(U_ch * txt, int type)
 }
 
 /*NH*/
-A2mRtfHpj(outfile)
-char    *outfile;
+int A2mRtfHpj(char* outfile)
 {
     char    buf[256];
 
@@ -459,7 +459,6 @@ A2MPAR  *ap;
 int     tbl;
 {
     int     i, curimg;
-    char    *just;
 
     if(ap == 0 || ap->ap_strs == 0) return(0);
     A2mRtfSetParProps(ap, tbl);
@@ -479,13 +478,8 @@ int     tbl;
 }
 
 /*NH JMP 30-08-11 */
-A2mRtfPrintPage(ap, tbl)
-A2MPAGE  *ap;
-int      tbl;
+int A2mRtfPrintPage(A2MPAGE* ap, int tbl)
 {
-    int     i, curimg;
-    char    *just;
-
     if(!A2M_RTF_HELP) {
 	fprintf(A2M_fdrtf, "{\\page}\n");
 	}
@@ -554,7 +548,6 @@ A2MPAR  *ap;
 int     n;
 {
     A2MSTR  *as = ap->ap_strs[n];
-    int     i;
     char    buf[65];
 
     if(A2M_NUMBERS && n == 0 && ap->ap_ppr.pp_number >= 1) {
@@ -688,7 +681,7 @@ A2MTBL  *at;
 int     hbf;
 {
     A2MTC   *tc;
-    int     i, j, k, line = 0;
+    int     i, j, line = 0;
 
     for(i = 0 ; i < at->at_nl ; i++) {
 	if(at->at_tls[i].atl_hbf != hbf) continue;
@@ -730,11 +723,11 @@ int     line, hbf, hline;
     if(at->at_widths) {
 	pos = 1440.0 * at->at_widths[0] / 2.54;
 	for(k = 1 ; k < nc ; k++)
-	    pos += 1440.0 * at->at_widths[k] / 2.54;
+	    pos += (long) (1440.0 * at->at_widths[k] / 2.54);
 	}
     else {
 	pos = (14400L * (long)A2M_RTF_TCOL1) / 254L;
-	pos += ((nc - 1) * 14400L * (long)A2M_RTF_TCOLN) / 254L;
+	pos += (long) (((nc - 1) * 14400L * (long)A2M_RTF_TCOLN) / 254L);
 	}
     fl = A2mRtfCalcFirstLine(at, hbf);
     ll = A2mRtfCalcLastLine(at, hbf);
@@ -752,7 +745,7 @@ int     line, hbf, hline;
 	nc = tc->atc_ncells;
 	if(at->at_widths)
 	    for(k = 0 ; k < nc ; k++)
-		pos += 1440.0 * at->at_widths[k + i] / 2.54;
+		pos += (long) (1440.0 * at->at_widths[k + i] / 2.54);
 	else
 	    pos += (nc * 14400L * (long)A2M_RTF_TCOLN) / 254L;
 

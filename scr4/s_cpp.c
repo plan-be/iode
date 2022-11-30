@@ -228,7 +228,7 @@ U_ch    *buf;
     int     i, j, lg;
 
     cpp = CppCurrent(cpp);
-    lg = strlen(buf);
+    lg = (int)strlen(buf);
     if(CppRecordRealloc(cpp, lg)) return(0);
 
     for(j = 0, i = lg - 1 ; i >= 0 ; j++, i--)
@@ -284,7 +284,7 @@ U_ch    *buf;
     int     i, j, lg;
 
     cpp = CppCurrent(cpp);
-    lg = strlen(buf);
+    lg = (int)strlen(buf);
     if(CppRecordRealloc(cpp, lg)) return(-1);
     for(i = cpp->rec_nb - 1; i >= 0 ; i--)
 	cpp->rec[lg + i] = cpp->rec[i];
@@ -729,7 +729,7 @@ CPPFILE *cpp;
     CppSkipSpaces(cpp);
     CppReadString(cpp, filename, 255);
     if(filename[0] == '"') i = 1;
-    lg = strlen(filename);
+    lg = (int)strlen(filename);
     if(lg && filename[lg - 1] == '"') filename[lg - 1] = 0;
     CppSkipToEol(cpp);
     cpp->incl = CppOpen(filename + i, 0);

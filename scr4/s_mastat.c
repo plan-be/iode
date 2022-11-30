@@ -28,7 +28,7 @@ MAT *m1;
 int c;
 int op;
 {
-    int i, j;
+    int i;
     MREAL res = 0.0, sce = 0.0, m, x;
 
     if(m1 == NULL)
@@ -98,8 +98,8 @@ MAT *m1;
 int l;
 int op;
 {
-    int i, j;
-    MREAL res = 0.0, sce = 0, m, x;
+    int     j;
+    MREAL   res = 0.0, sce = 0, m, x;
 
     if(m1 == NULL)
     {

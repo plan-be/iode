@@ -20,7 +20,7 @@ extern char *SW_nrealloc_orig(void *old_ptr,unsigned int old_count,unsigned int 
 extern char *SW_nalloc_doc(unsigned int size, char *, int);
 //extern char *SW_nrealloc_doc(void *old_ptr,unsigned int old_count,unsigned int new_count, char *file, int line);
 extern void *SW_nrealloc_doc(void *old_ptr,unsigned int old_count,unsigned int new_count, char *file, int line);
-
+extern void SW_Debug(int size);
 
 //extern int SW_nfree(char *ptr);
 extern int SW_nfree(void *ptr);

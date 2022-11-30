@@ -116,7 +116,7 @@ m‚moire non lib‚r‚e.
 Si une allocation ne r‚f‚rence pas de fichier, le nom du fichier est remplac‚ par des ???.
 ***************************************************************************/
 
-AllocDocLoop()
+int AllocDocLoop()
 {
     ALLOCDOC        *ad = SCR_ALLOCDOC_LAST;
     unsigned long   tot = 0L, count = 0, maxprint = 1000;
@@ -184,9 +184,7 @@ La fonction malloc() est utilis‚e pour les allocations.
 &SA SCR_malloc(), SCR_realloc(), SCR_free(), SCR_palloc(), SCR_panic()
 ========================================================================*/
 
-char *SCR_malloc_chk(lg, panic)
-unsigned int    lg;
-int             panic;
+char *SCR_malloc_chk(unsigned int lg, int panic)
 {
     char    *ptr;
 
@@ -212,8 +210,7 @@ int             panic;
 }
 
 /*NH*/
-char *SCR_malloc_orig(lg)
-unsigned int    lg;
+char *SCR_malloc_orig(unsigned int lg)
 {
     return(SCR_malloc_chk(lg, 1));
 }
@@ -298,12 +295,7 @@ La fonction standard realloc() n'est pas utilis‚e.
 &SA SCR_malloc(), SCR_free(), SCR_panic()
 ========================================================================*/
 
-char *SCR_realloc_chk(old_ptr, el_size, old_count, new_count, panic)
-void            *old_ptr;
-unsigned int    el_size,
-         old_count,
-         new_count;
-int             panic;
+char *SCR_realloc_chk(void* old_ptr, unsigned int el_size, unsigned int old_count, unsigned int new_count, int panic)
 {
     char    *ptr;
 
@@ -337,13 +329,10 @@ int             panic;
 }
 
 /*NH*/
-char *SCR_realloc_orig(old_ptr, el_size, old_count, new_count)
-void            *old_ptr;
-unsigned int    el_size,
-         old_count,
-         new_count;
+char *SCR_realloc_orig(void* old_ptr, unsigned int el_size, unsigned int old_count, unsigned int new_count)
 {
-    return(SCR_realloc_orig(old_ptr, el_size, old_count, new_count));
+    //return(SCR_realloc_orig(old_ptr, el_size, old_count, new_count));
+    return(SCR_realloc_chk(old_ptr, el_size, old_count, new_count, 1)); // JMP 30/10/2022
 }
 
 /* =====================================================================
@@ -384,13 +373,7 @@ La fonction standard realloc() n'est pas utilis‚e.
 ========================================================================*/
 
 
-char *SCR_realloc_doc(old_ptr, el_size, old_count, new_count, file, line)
-void            *old_ptr;
-unsigned int    el_size,
-         old_count,
-         new_count;
-char            *file;
-int             line;
+char *SCR_realloc_doc(void* old_ptr, unsigned int el_size, unsigned int old_count, unsigned int new_count, char* file, int line)
 {
     char        *ptr = SCR_realloc_chk(old_ptr, el_size, old_count, new_count, 1);
     ALLOCDOC    *ad;
@@ -414,8 +397,7 @@ int             line;
 
 
 /*NH*/
-SCR_alloc_chunck(nb)
-int     nb;
+SCR_alloc_chunck(int nb)
 {
     int     i;
 
@@ -442,10 +424,8 @@ La fonction de librairie free() est utilis‚e pour cette fonction.
 ========================================================================*/
 
 
-int SCR_free(ptr)
-void    *ptr;
+int SCR_free(void* ptr)
 {
-    long    l;
     char    *ptr2 = ptr;
 
     if(ptr2 == 0) return(0);
@@ -502,8 +482,7 @@ SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
 
 ============================================================== */
 
-char *SCR_palloca(len, a)
-unsigned int     len, a;
+char *SCR_palloca(unsigned int len, unsigned int a)
 {
     static  char    *all = 0;
     static  int     pos = 0;
@@ -556,8 +535,7 @@ SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
 
 ============================================================== */
 
-char *SCR_palloc(len)
-unsigned int     len;
+char *SCR_palloc(unsigned int len)
 {
     return(SCR_palloca(len, 8));
 }

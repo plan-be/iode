@@ -13,7 +13,7 @@ U_sh WscrMode32ToSCRSTAT(char *filename)
 {
     DWORD   attr = GetFileAttributes(filename);
     U_sh    res = 6;
-    int     lg = strlen(filename);
+    int     lg = (int)strlen(filename);
 
 //  DebugB("WscrMode32ToSCRSTAT: file '%s' - mode = %d -> ", filename, res);
 
@@ -120,9 +120,10 @@ char        *filename;
 SCRSTAT     *ss;
 int         crc;
 {
-    struct  stat    buf;
-    int             rc = 0;
-    char            tmp[SCR_STAT_NAME_LG + 1];
+    struct  stat            buf;
+    int                     rc = 0;
+    char                    tmp[SCR_STAT_NAME_LG + 1];
+    extern unsigned long    ScrFileCrc32(char *);
 
     ss->ss_mode = 0;
     ss->ss_size = 0;
@@ -140,21 +141,21 @@ int         crc;
     if(rc >= 0) { /* JMP 31-03-98 */
 	ss->ss_size = buf.st_size;
 
-	ss->ss_mdate = SCR_cvt_date(buf.st_mtime);
-	ss->ss_mtime = SCR_cvt_time(buf.st_mtime);
-	ss->ss_adate = SCR_cvt_date(buf.st_atime);
-	ss->ss_atime = SCR_cvt_time(buf.st_atime);
-	ss->ss_cdate = SCR_cvt_date(buf.st_ctime);
-	ss->ss_ctime = SCR_cvt_time(buf.st_ctime);
+	ss->ss_mdate = SCR_cvt_date((long)buf.st_mtime);
+	ss->ss_mtime = SCR_cvt_time((long)buf.st_mtime);
+	ss->ss_adate = SCR_cvt_date((long)buf.st_atime);
+	ss->ss_atime = SCR_cvt_time((long)buf.st_atime);
+	ss->ss_cdate = SCR_cvt_date((long)buf.st_ctime);
+	ss->ss_ctime = SCR_cvt_time((long)buf.st_ctime);
 
 	ss->ss_gid = buf.st_gid;
 	ss->ss_uid = buf.st_uid;
 	ss->ss_nlink = buf.st_nlink;
 	ss->ss_mode = buf.st_mode;
 	/* STATEX */
-	ss->ssx_mtime = buf.st_mtime;
-	ss->ssx_atime = buf.st_atime;
-	ss->ssx_ctime = buf.st_ctime;
+	ss->ssx_mtime = (long)buf.st_mtime;
+	ss->ssx_atime = (long)buf.st_atime;
+	ss->ssx_ctime = (long)buf.st_ctime;
 	if(crc)
 	    ss->ssx_crc32 = ScrFileCrc32(filename);
 	}

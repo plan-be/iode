@@ -61,28 +61,28 @@ int             size, nb_dec;
     else {
 	sprintf(buf, "%%%d.%dlf", size, nb_dec);
 	sprintf(buf1, buf, d);
-	if(strlen(buf1) > size) {
+	if((int)strlen(buf1) > size) {
 	    if(nb_dec > 0) {                                      /* JMP 27-05-01 */
 		while(1) {                                        /* JMP 27-05-01 */
-		    lg = strlen(buf1);                            /* JMP 27-05-01 */
+		    lg = (int)strlen(buf1);                            /* JMP 27-05-01 */
 		    if(lg <= size || buf1[lg - 1] != '0') break;  /* JMP 27-05-01 */
 		    buf1[lg - 1] = 0;                             /* JMP 27-05-01 */
 		    }                                             /* JMP 27-05-01 */
 		}                                                 /* JMP 27-05-01 */
-	    if(strlen(buf1) > size && buf1[strlen(buf1) - 1] == '.') /* JMP 27-05-01 */
-		buf1[strlen(buf1) - 1] = 0;                       /* JMP 27-05-01 */
-	    if(strlen(buf1) > size) sprintf(buf1, "%lg", d);      /* JMP 27-05-01 */
+	    if((int)strlen(buf1) > size && buf1[(int)strlen(buf1) - 1] == '.') /* JMP 27-05-01 */
+		buf1[(int)strlen(buf1) - 1] = 0;                       /* JMP 27-05-01 */
+	    if((int)strlen(buf1) > size) sprintf(buf1, "%lg", d);      /* JMP 27-05-01 */
 	    }                                                     /* JMP 27-05-01 */
 	}
 
-    if(strlen(buf1) > size) {
+    if((int)strlen(buf1) > size) {
 	if(size >= 8) {
 	    sprintf(buf, "%%%d.%dle", size, size - 8);
 	    sprintf(buf1, buf, d);
 	    }
 	else {
 	    sprintf(buf1, "%lg", d);
-	    if(strlen(buf1) > size) {
+	    if((int)strlen(buf1) > size) {
 		memset(buf1, '*', size);
 		buf1[size] = 0;
 		}

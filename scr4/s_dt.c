@@ -87,7 +87,7 @@ long    day;
 
     d[0] = 31;
     d[1] = 12;
-    d[2] = day / 365.25;
+    d[2] = (long)(day / 365.25);
     if(DT_date_num(DT_dmy_date(d)) < day) d[2] ++;
     day -= d[2] * 365L + d[2] / 4L;
     if(day == 59 && DT_bix(1900L + d[2])) {   /* JMP 23-02-96 */
@@ -477,7 +477,6 @@ DT_month_days(date)
 long    date;
 {
     long    d[3];
-    int     i, day;
 
     DT_dmy(date, d);
     d[0] = 1;
@@ -593,13 +592,13 @@ DT_week_number(long date)
 
 /* Conneries ‚crites par BP... (en Suisse pour compter des secondes ????) */
 
-TM_3(long hr, long *h3)
+int TM_3(long hr, long *h3)
 {
     h3[2] = hr % 100;
     h3[1] = (hr % 10000L) / 100L;
     h3[0] = (hr / 10000L);
 
-    return;
+    return(0);
 }
 
 long TM_nb_secs(long hr)

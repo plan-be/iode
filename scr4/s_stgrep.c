@@ -64,7 +64,7 @@ int     ecase, nbeg, diese;
 {
     int     i = 0, lg, j = 0, rc, esc = 0, s, p;
 
-    lg = strlen(string);
+    lg = (int)strlen(string);
 
     while(1) {
 	if(esc) {

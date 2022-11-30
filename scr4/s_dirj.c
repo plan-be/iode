@@ -22,7 +22,7 @@ char    *res, *dir, *file;
     int     lg;
 
     strcpy(res, dir);
-    lg = strlen(res);
+    lg = (int) strlen(res);
     if(!U_is_in(res[lg - 1], "\\/")) strcat(res, DIR_SEPAR);
     strcat(res, file);
     return(res);

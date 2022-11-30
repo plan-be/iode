@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "s_dir.h"
 #include "s_isc.h"
+#include "s_strs.h"
+
 #ifdef LINUX
 #include <errno.h>
 #endif

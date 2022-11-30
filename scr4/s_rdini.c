@@ -151,7 +151,7 @@ en dÇbut ou en fin de lignes sont ignorÇs (SQZ).
 IniRead(inif)
 INIFILE    *inif;
 {
-    U_ch    buf[4096], **tbl;   /* BP_M 26-09-2008 11:20 */
+    U_ch    buf[4096];   /* BP_M 26-09-2008 11:20 */
 
     if(inif == 0) return(-1);
     if(inif->if_unread) {
@@ -166,7 +166,7 @@ ag:
     SCR_strip(buf);
     if(buf[0] == ';' || buf[0] == 0) goto ag;
     if(buf[0] == '[') {
-	if(buf[strlen(buf) - 1] == ']') buf[strlen(buf) - 1] = 0;
+	if(buf[(int)strlen(buf) - 1] == ']') buf[(int)strlen(buf) - 1] = 0;
 	IniSetSection(inif, buf + 1);
 	return(inif->if_type = INI_SECTION);
 	}
@@ -268,7 +268,7 @@ int     usection, uparam;
 
 {
     INIFILE *inif;
-    int     lg = strlen(section);
+    int     lg = (int)strlen(section);
 
     inif = IniOpen(filename, usection, uparam);
     if(inif == 0) return(inif);
@@ -660,9 +660,9 @@ char    *buf, *section;
     strcpy(buf2, buf);  /* JMP 14-11-2004 */
     U_ljust_text(buf2);
     SCR_strip(buf2);
-    if(buf2[0] == '[' && buf2[strlen(buf2) - 1] == ']') {
+    if(buf2[0] == '[' && buf2[(int)strlen(buf2) - 1] == ']') {
 	if(section == 0) return(1);
-	buf2[strlen(buf2) - 1] = 0;
+	buf2[(int)strlen(buf2) - 1] = 0;
 	if(SCR_cstrcmp(buf2 + 1, section) == 0) return(1);
 	}
     return(0);
@@ -728,12 +728,12 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
       next:
 	if(IniIsSection(buf, section)) {
 	    // C'est la bonne section
-	    ISC_fwrite(bufo, strlen(bufo), 1, fdo); /* JMP 11-06-02 */
+	    ISC_fwrite(bufo, (int)strlen(bufo), 1, fdo); /* JMP 11-06-02 */
 	    ISC_fwrite("\n", 1, 1, fdo);            /* JMP 11-06-02 */
 	    while(1) {
 		if(ISC_read_line(fd, buf, 510) == -1) {
 		    sprintf(buf, "%s=%s\n", parm, val);
-		    ISC_fwrite(buf, strlen(buf), 1, fdo);
+		    ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 		    ok = 0;
 		    break;
 		    }
@@ -742,7 +742,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 		    /* C'Çtait la bonne, c'est une nouvelle section qui commence : on ajoute une ligne */
 		    if(ok != 0) {
 			sprintf(buf, "%s=%s\n", parm, val);         /* JMP 03-10-02 */
-			ISC_fwrite(buf, strlen(buf), 1, fdo);       /* JMP 03-10-02 */
+			ISC_fwrite(buf, (int)strlen(buf), 1, fdo);       /* JMP 03-10-02 */
 			ok = 0;
 			}
 		    goto next;
@@ -751,7 +751,7 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 		    /* C'est le bon paramätre : on le remplace */
 		    /* ISC_fprintf(fdo, "%s=%s\n", parm, val); */
 		    sprintf(buf, "%s=%s\n", parm, val);
-		    ISC_fwrite(buf, strlen(buf), 1, fdo);
+		    ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 		    ok = 0;
 		    break;
 		    }
@@ -759,22 +759,22 @@ int IniWriteParm(char* filename, char* section, char* parm, char* val)
 		    /* C'est un autre paramätre : on continue */
 		    /* ISC_fprintf(fdo, "%s\n", bufo);       */
 		    sprintf(buf, "%s\n", bufo);
-		    ISC_fwrite(buf, strlen(buf), 1, fdo);
+		    ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 		    }
 		}
 	    }
 	else {
 	    /* ISC_fprintf(fdo, "%s\n", bufo); */
 	    sprintf(buf, "%s\n", bufo);
-	    ISC_fwrite(buf, strlen(buf), 1, fdo);
+	    ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 	    }
 	}
     if(ok == -2) {
 	/* On n'a pas trouvÇ la section /* JMP 03-10-02 */
 	sprintf(buf, "\n[%s]\n", section);
-	ISC_fwrite(buf, strlen(buf), 1, fdo);
+	ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 	sprintf(buf, "%s=%s\n", parm, val);
-	ISC_fwrite(buf, strlen(buf), 1, fdo);
+	ISC_fwrite(buf, (int)strlen(buf), 1, fdo);
 	ok = 0;
 	}
     ISC_fclose(fd);

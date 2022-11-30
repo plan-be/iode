@@ -11,7 +11,7 @@
 Retourne le process id
 ================================================================== */
 
-WscrGetPid()
+int WscrGetPid()
 {
 #ifdef DOS
 #if defined(SCRW32) || defined(DOSW32)
@@ -36,10 +36,9 @@ Limite : seulement implÇmentÇ en Windows
 RT 0 en cas de succäs, -1 en cas de probläme
 ================================================================== */
 
-WscrTempFilenameInDir(char *dirname, char *filename)
+int WscrTempFilenameInDir(char *dirname, char *filename)
 {
 #if defined(SCRW32) || defined(DOSW32)
-    char    dirbuf[256];
     filename[0] = 0;
     if(GetTempFileName(dirname, "scr4", 0, filename) == 0) return(-1);
     return(0);
@@ -72,7 +71,7 @@ Limite : seulement implÇmentÇ en Windows
 RT 0 en cas de succäs, -1 en cas de probläme
 ================================================================== */
 
-WscrTempFilename(char *filename)
+int WscrTempFilename(char *filename)
 {
 #if defined(SCRW32) || defined(DOSW32)
     char    dirbuf[256];
@@ -109,7 +108,7 @@ Fournit le nom du rÇpertoire temp
 RT 0 en cas de succäs, -1 en cas de probläme
 ================================================================== */
 
-WscrTempPath(char *dirbuf)
+int WscrTempPath(char *dirbuf)
 {
 #if defined(SCRW32) || defined(DOSW32)
     if(GetTempPath(127, dirbuf) == 0) {
@@ -144,7 +143,7 @@ RT 0 en cas de succäs, -1 en cas de probläme
 ================================================================== */
 
 
-WscrSetFileTime(char *filename, long actime, long modtime)
+int WscrSetFileTime(char *filename, long actime, long modtime)
 {
     int                 rc;
 
@@ -163,7 +162,7 @@ WscrSetFileTime(char *filename, long actime, long modtime)
 #if defined(SCRW32) || defined(DOSW32)
 
 /*NH*/
-WscrSetFileTimeWin(char *filename, long cretime, long acttime, long modtime)
+int WscrSetFileTimeWin(char *filename, long cretime, long acttime, long modtime)
 {
 	FILETIME        ftc, fta, ftm, *pftc = NULL, *pfta = NULL, *pftm = NULL;
 	HANDLE          hFile;

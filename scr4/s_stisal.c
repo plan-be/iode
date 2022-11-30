@@ -69,7 +69,7 @@ int     ch;
 /* Recherche un string f dans la liste txt */
 ScrStrIsIn(U_ch **txt, char *f)
 {
-    int     i, j;
+    int     i;
 
     if(txt == 0) return(0);
     for(i = 0 ; txt[i] ; i++)
@@ -80,7 +80,7 @@ ScrStrIsIn(U_ch **txt, char *f)
 /* Recherche un string f ce trouvant dans un des string de txt */
 ScrStrIsIn2(U_ch **txt, char *f)
 {
-    int     i, j, len_f = strlen(f);
+    int     i, len_f = (int)strlen(f);
 
     if(txt == 0) {
 	Debug("ScrStrIsIn2: pas de liste de comparaison\n");

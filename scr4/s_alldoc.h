@@ -16,9 +16,9 @@
 
 // New version (default) with a file[line] for each (alloc / realloc)
 #define SCR_malloc(abcdef__) SCR_malloc_doc((abcdef__), __FILE__, __LINE__)
-#define SCR_realloc(ptr, sizeel__, oldcount, newcount) SCR_realloc_doc(ptr, sizeel__, oldcount, newcount, __FILE__, __LINE__)
+#define SCR_realloc(ptr, sizeel__, oldcount, newcount) SCR_realloc_doc((ptr), (sizeel__), (oldcount), (newcount), (__FILE__), (__LINE__))
 #define SW_nalloc(abcdef__) SW_nalloc_doc((abcdef__), __FILE__, __LINE__)
-#define SW_nrealloc(ptr, oldcount, newcount) SW_nrealloc_doc(ptr, oldcount, newcount, __FILE__, __LINE__)
+#define SW_nrealloc(ptr, oldcount, newcount) SW_nrealloc_doc(ptr, (oldcount), (newcount), __FILE__, __LINE__)
 #endif
 
 #endif

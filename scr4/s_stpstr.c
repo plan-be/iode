@@ -23,7 +23,7 @@ unsigned char *buf,
 {
     int     i;
 
-    i = strlen(buf) - 1;
+    i = (int)strlen(buf) - 1;
     for( ; i >= 0 ; i--)
 	if(!U_is_in(buf[i], punct)) break;
 

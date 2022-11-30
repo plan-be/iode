@@ -1,9 +1,11 @@
+#include "s_date.h"
 #include <stdio.h>
+extern long WscrGetMS();    
 
 char    *DebugFilename = 0;
-
 int     DebugActif = 1;     /* BP_M 02-09-1997 */
 FILE    *DebugFd = 0;
+
 
 /*NH /* JMP 02-12-98 */
 int DebugOpen()
@@ -124,8 +126,8 @@ DebugE().
 int DebugB(txt, a, b, c, d, e)
 char    *txt, *a, *b, *c, *d, *e;
 {
-    char    dt[20], ti[20];
-
+    char        dt[20], ti[20];
+    
     DebugCPU = WscrGetMS();
     if(DebugCPUT <=0) DebugCPUT = DebugCPU;
 
@@ -348,18 +350,19 @@ int DebugFileHexa(char *filename, char *title, unsigned char *str, int lg)
 /****************** DEBUGGING GNOME ********************/
 
 
-Gdbg(text, c1, c2, c3, c4, c5, c6, c7, c8, c9, ca, cb, cc, cd)
+int Gdbg(text, c1, c2, c3, c4, c5, c6, c7, c8, c9, ca, cb, cc, cd)
 char    *text, *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8, *c9, *ca, *cb, *cc, *cd;
 {
     extern int GDEBUG;
 
 #ifdef LINUX
     if(GDEBUG)
-	fprintf(stderr, text, c1, c2, c3, c4, c5, c6, c7, c8, c9, ca, cb, cc, cd);
+        fprintf(stderr, text, c1, c2, c3, c4, c5, c6, c7, c8, c9, ca, cb, cc, cd);
 #else
     if(GDEBUG)
-	Debug(stderr, text, c1, c2, c3, c4, c5, c6, c7, c8, c9, ca, cb, cc, cd);
+        Debug(stderr, text, c1, c2, c3, c4, c5, c6, c7, c8, c9, ca, cb, cc, cd);
 #endif
+    return(0);
 }
 
 

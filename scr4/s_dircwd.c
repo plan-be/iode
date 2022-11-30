@@ -31,11 +31,10 @@ le disque courant, 1, pour A:, ...
 &SA SCR_fullpath()
 ======================================================================= */
 
-char *SCR_getcwd(drive, dir)
-int     drive;
-char    *dir;
+char *SCR_getcwd(int drive, char* dir)
 {
-    unsigned int     c_drive = drive, tot, ndrive;
+    unsigned int     c_drive = drive;
+
 
 #if defined(WINDOWS) || defined(DOSWIN)
     if(_getdcwd(drive, dir, 512) == 0) return((char *)0); /* JMP 19-04-10 */
@@ -44,6 +43,7 @@ char    *dir;
 #else
 
 #ifdef DOS
+    unsigned int     ndrive;
 #if !defined(WATCOM) && !defined(WINDOWS) && !defined(DOSWIN)
     _harderr(SCR_harderror);
 #endif
@@ -75,7 +75,7 @@ char    *dir;
 Retourne le drive courant (DOS).
  ================================================================== */
 
-SCR_dosgetdrive()
+int SCR_dosgetdrive()
 {
     int     ndrive;
 
@@ -92,8 +92,7 @@ SCR_dosgetdrive()
 Change le drive courant (DOS).
  ================================================================== */
 
-SCR_dossetdrive(ndrive)
-int ndrive;
+int SCR_dossetdrive(int ndrive)
 {
 #ifdef VC
     int     cdrive;
@@ -117,9 +116,7 @@ int ndrive;
 Retourne le drive courant (DOS).
  ================================================================== */
 
-SCR_dosgetcwd(dir, lg)
-char    *dir;
-int     lg;
+int SCR_dosgetcwd(char* dir, int lg)
 {
 #ifdef VC
     _getcwd(dir, lg);

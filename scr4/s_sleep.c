@@ -1,8 +1,10 @@
 #if defined(DOSW32) || defined(SCRW32)
 #include "scr4w.h"
-SCR_sleep(int ms)
+
+int SCR_sleep(int ms)
 {
     Sleep(ms);
+    return(0);
 }
 
 #else

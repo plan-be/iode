@@ -24,7 +24,7 @@ char    *dir, *file;
     char    locdir[1024 + 1];
 
     strcpy(locdir, dir);
-    for(i = strlen(locdir) - 1; i >= 0 ; i--)
+    for(i = (int)strlen(locdir) - 1; i >= 0 ; i--)
 	if(locdir[i] == '\\' || locdir[i] == '/' ) break;
 
     strcpy(file, locdir + i + 1);

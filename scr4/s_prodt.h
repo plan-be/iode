@@ -41,15 +41,23 @@ extern long SCR_time_to_long(char *string);
 extern long SCR_ftime_to_long(char *str,char *fmt);
 extern int SCR_check_time(long hour);
 extern int SCR_check_fmt_time(char *str,char *fmt);
+
 /* s_date.c */
-extern long SCR_current_date(void);
-extern long SCR_current_time(void);
-extern char *SCR_long_to_date(long val,char *string);
-extern char *SCR_long_to_time(long val,char *string);
-extern char *SCR_long_to_fdate(long date,char *str,char *fmt);
-extern char *SCR_long_to_ftime(long hour,char *str,char *fmt);
-extern int SCR_fmt_dt(char *fmto,char *fmti);
+extern long _SCR_current_date();
+extern long _SCR_current_time();
+extern char *SCR_long_to_date(long val, char* string);
+extern char *SCR_long_to_time(long val, char* string);
+extern char *SCR_long_to_fdate(long date, char* str, char* fmt);
+extern char *SCR_long_to_ftime(long hour, char* str, char* fmt);
+extern int SCR_fmt_dt(char* fmto, char* fmti);
 extern int SCR_date_upper_char(int ch);
+extern long DT_time_num(long date);
+extern long DT_num_time(long nbs);
+extern long DT_diff_date_time(long d2, long t2, long d1, long t1);
+
+/* s_date_.c */
+extern long SCR_current_date();
+extern long SCR_current_time();
 
 #ifdef SCRCPP
 }

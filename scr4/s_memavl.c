@@ -79,7 +79,7 @@ long SCR_free_mem()
 	mst.dwLength = sizeof(DWORD);
 	GlobalMemoryStatus(&mst);
        // return(mst.dwAvailPhys + mst.dwAvailPageFile); /* JMP 23-01-07 */
-	return(mst.dwAvailPhys); /* JMP 23-01-07 */
+	return((long)mst.dwAvailPhys); /* JMP 23-01-07 */
 /*        return(mst.dwAvailPhys + mst.dwAvailVirtual); */
 	/*return(mst.dwAvailPhys); */
     }

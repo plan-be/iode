@@ -33,8 +33,7 @@ int A2mChrtInit()
 }
 
 /*NH*/
-A2mChrtPrintObj(ao)
-A2MOBJ  *ao;
+int A2mChrtPrintObj(A2MOBJ *ao)
 {
     int     hdl;
 
@@ -49,16 +48,13 @@ A2MOBJ  *ao;
 }
 
 /*NH*/
-int A2mChrtEnd(hdl)
-int hdl;
+int A2mChrtEnd(int hdl)
 {
     return(0);
 }
 
 /*NH*/
-int A2mChrtPrintGrf(hdl, grf)
-int     hdl;
-A2MGRF  *grf;
+int A2mChrtPrintGrf(int hdl, A2MGRF* grf)
 {
     int     i;
     char    *title = 0;

@@ -37,10 +37,10 @@ int     landsc;
 	}
 
     PS_LANDSC = landsc;
-    if(margv > 0)    PS_MARGV    = margv;
-    if(margh > 0)    PS_MARGH    = margh;
-    if(size > 0)     PS_FONTSIZE = size;
-    if(spacing >= 0) PS_SPACING  = spacing;
+    if(margv > 0)    PS_MARGV    = (float)margv;
+    if(margh > 0)    PS_MARGH    = (float)margh;
+    if(size > 0)     PS_FONTSIZE = (float)size;
+    if(spacing >= 0) PS_SPACING  = (float)spacing;
 
     fi[0] = fo[0] = 0;
     if(ifl) {
@@ -122,7 +122,7 @@ int     landsc;
 /*    void    *malloc(); /* JMP 04-01-98 */
 
     if(PS_init(ifl, ofl, font, size, margv, margh, spacing, landsc)) return(-1);
-    PS_VNB = 1 + (PS_PAGE_W - PS_MARGH * 2.0) / (PS_FONTSIZE * 0.6);
+    PS_VNB = 1 + (int) ((PS_PAGE_W - PS_MARGH * 2.0) / (PS_FONTSIZE * 0.6));
     PS_VG_LG   = (int *) malloc(PS_VNB * sizeof(int));
     PS_VG_POS  = (int *) malloc(PS_VNB * sizeof(int));
     PS_VG_SIZE = (int *) malloc(PS_VNB * sizeof(int));

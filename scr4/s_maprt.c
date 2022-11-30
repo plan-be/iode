@@ -32,7 +32,7 @@ char *title;
 char **t_line;
 char **t_col;
 {
-    int i, j, rt, nc_tbl;
+    int i, j, nc_tbl;
 
     /* dump */
     nc_tbl = M_NL(m1)+1;
@@ -97,7 +97,7 @@ FILE *fd;
 MAT  *m1;
 char *title;
 {
-    int i, j, rt, nc_tbl;
+    int i, j, nc_tbl;
 
     /* dump */
     nc_tbl = M_NL(m1)+1;
