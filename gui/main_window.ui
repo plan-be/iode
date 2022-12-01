@@ -915,7 +915,7 @@
     <string>Save Project As</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
   <action name="actionOpen_Project">
