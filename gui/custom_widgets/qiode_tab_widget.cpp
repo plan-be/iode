@@ -197,6 +197,18 @@ void QIodeTabWidget::resetFilter(const EnumIodeType iodeType)
     }
 }
 
+void QIodeTabWidget::clearWorkspace()
+{
+    tabComments->clearKDB();
+    tabEquations->clearKDB();
+    tabIdentites->clearKDB();
+    tabLists->clearKDB();
+    tabScalars->clearKDB();
+    tabTables->clearKDB();
+    tabVariables->clearKDB();
+    resetFilters();
+}
+
 int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType, const int moveToPosition)
 {
     int index;
