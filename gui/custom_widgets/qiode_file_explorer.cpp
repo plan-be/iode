@@ -31,10 +31,6 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     // delegate (for renaming files and directories)
     this->setItemDelegate(new FileDelegate(&cutIndexes, parent));
 
-    // context menu = popup menu displayed when a user right clicks
-    this->setContextMenuPolicy(Qt::CustomContextMenu);
-    setupContextMenu();
-
     // selection -> see main_window.ui
     // Selection mode = ExtendedSelection which means:
     // When the user selects an item in the usual way, the selection is cleared 
@@ -55,11 +51,39 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     // - defaultDropAction = MoveAction which means the data is moved from the source to the target.
     // More details on https://doc.qt.io/qt-6/model-view-programming.html#using-drag-and-drop-with-item-views
     
+    // prepare shortcuts
+    newFileShortcut = new QShortcut(QKeySequence::New, this);
+    newDirectoryShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_N), this);
+    cutShortcut = new QShortcut(QKeySequence::Cut, this);
+    copyShortcut = new QShortcut(QKeySequence::Copy, this);
+    pasteShortcut = new QShortcut(QKeySequence::Paste, this);
+    filepathShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_C), this);
+    renameShortcut = new QShortcut(QKeySequence(Qt::Key_F2), this);
+    deleteShortcut = new QShortcut(QKeySequence::Delete, this);
+    enterShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this);
+    cancelShortcut = new QShortcut(QKeySequence::Cancel, this);
+
     // signals and slots
     connect(this, &QIodeFileExplorer::doubleClicked, this, &QIodeFileExplorer::openFile);
     connect(this, &QIodeFileExplorer::customContextMenuRequested, this, &QIodeFileExplorer::onCustomContextMenu);
 
+    connect(newFileShortcut, &QShortcut::activated, this, &QIodeFileExplorer::createFile);
+    connect(newDirectoryShortcut, &QShortcut::activated, this, &QIodeFileExplorer::createDir);
+    connect(cutShortcut, &QShortcut::activated, this, &QIodeFileExplorer::cut);
+    connect(copyShortcut, &QShortcut::activated, this, &QIodeFileExplorer::copy);
+    connect(pasteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::paste);
+    connect(filepathShortcut, &QShortcut::activated, this, &QIodeFileExplorer::absolutePath);
+    connect(renameShortcut, &QShortcut::activated, this, &QIodeFileExplorer::rename);
+    connect(deleteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::remove);
+    connect(enterShortcut, &QShortcut::activated, this, &QIodeFileExplorer::openFiles);
+    connect(cancelShortcut, &QShortcut::activated, this, &QIodeFileExplorer::cancel);
+
+    // context menu = popup menu displayed when a user right clicks
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    setupContextMenu();
+
     // misc
+    calledFromContextMenu = false;
     indexContextMenu = QModelIndex();
 }
 
@@ -69,10 +93,22 @@ QIodeFileExplorer::~QIodeFileExplorer()
     saveSettings();
 
     itemsToPast.clear();
+    cutIndexes.clear();
 
     delete contextMenuDirectory;
     delete contextMenuFile;
     delete contextMenuExplorer;
+
+    delete newFileShortcut;
+    delete newDirectoryShortcut;
+    delete cutShortcut;
+    delete copyShortcut;
+    delete pasteShortcut;
+    delete filepathShortcut;
+    delete renameShortcut;
+    delete deleteShortcut;
+    delete enterShortcut;
+    delete cancelShortcut; 
 
     delete fileSystemModel;
     delete proxyModel;
@@ -82,43 +118,83 @@ QIodeFileExplorer::~QIodeFileExplorer()
 
 void QIodeFileExplorer::setupContextMenu()
 {
+    QAction* action;
+
     // --- directory context menu
     contextMenuDirectory = new QMenu(this);
 
-    addAction("New File", "Add new file to directory", &QIodeFileExplorer::createFile, contextMenuDirectory);
-    addAction("New Folder", "Add new file to directory", &QIodeFileExplorer::createDir, contextMenuDirectory);
+    action = addAction("New File", "Add new file", contextMenuDirectory, newFileShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createFile);
+
+    action = addAction("New Folder", "Add new subdirectory", contextMenuDirectory, newDirectoryShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createDir);
+
     contextMenuDirectory->addSeparator();
-    addAction("Cut", "Cut Directory", &QIodeFileExplorer::cut, contextMenuDirectory, QKeySequence::Cut);
-    addAction("Copy", "Copy Directory", &QIodeFileExplorer::copy, contextMenuDirectory, QKeySequence::Copy);
-    pasteActionDirectory = addAction("Paste", "Paste", &QIodeFileExplorer::paste, contextMenuDirectory, QKeySequence::Paste);
+
+    action = addAction("Cut", "Cut Directory", contextMenuDirectory, cutShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::cut);
+
+    action = addAction("Copy", "Copy Directory", contextMenuDirectory, copyShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::copy);
+
+    pasteActionDirectory = addAction("Paste", "Paste", contextMenuDirectory, pasteShortcut->key());
+    connect(pasteActionDirectory, &QAction::triggered, this, &QIodeFileExplorer::paste);
+
     contextMenuDirectory->addSeparator();
-    addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", &QIodeFileExplorer::absolutePath, 
-        contextMenuDirectory, QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_C));
+
+    action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", contextMenuDirectory, 
+        filepathShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
+
     contextMenuDirectory->addSeparator();
-    addAction("Rename", "Rename Directory", &QIodeFileExplorer::rename, contextMenuDirectory, QKeySequence(Qt::Key_F2));
-    addAction("Delete", "Delete Directory", &QIodeFileExplorer::remove, contextMenuDirectory, QKeySequence::Delete);
+
+    action = addAction("Rename", "Rename Directory", contextMenuDirectory, renameShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::rename);
+
+    action = addAction("Delete", "Delete Directory", contextMenuDirectory, deleteShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::remove);
 
     // --- file context menu
     contextMenuFile = new QMenu(this);
 
-    addAction("Open", "Open File In A New Tab", &QIodeFileExplorer::openFileSlot, contextMenuFile);
+    action = addAction("Open", "Open File In A New Tab", contextMenuFile);
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::openFiles);
+
     contextMenuFile->addSeparator();
-    addAction("Cut", "Cut File", &QIodeFileExplorer::cut, contextMenuFile, QKeySequence::Cut);
-    addAction("Copy", "Copy File", &QIodeFileExplorer::copy, contextMenuFile, QKeySequence::Copy);
+
+    action = addAction("Cut", "Cut File", contextMenuFile, cutShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::cut);
+
+    action = addAction("Copy", "Copy File", contextMenuFile, copyShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::copy);
+
     contextMenuFile->addSeparator();
-    addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", &QIodeFileExplorer::absolutePath, 
-        contextMenuFile, QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_C));
+
+    action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", contextMenuFile, 
+        filepathShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
+
     contextMenuFile->addSeparator();
-    addAction("Rename", "Rename Directory", &QIodeFileExplorer::rename, contextMenuFile, QKeySequence(Qt::Key_F2));
-    addAction("Delete", "Delete Directory", &QIodeFileExplorer::remove, contextMenuFile, QKeySequence::Delete);
+
+    action = addAction("Rename", "Rename Directory", contextMenuFile, renameShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::rename);
+
+    action = addAction("Delete", "Delete Directory", contextMenuFile, deleteShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::remove);
 
     // --- file explorer menu (when a user clicks outside range of directories and files)
     contextMenuExplorer = new QMenu(this);
 
-    addAction("New Folder", "Add new file to directory", &QIodeFileExplorer::createDir, contextMenuExplorer, 
-        QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_N));
+    action = addAction("New File", "Add new file to project", contextMenuExplorer, newFileShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createFile);
+
+    action = addAction("New Folder", "Add new directory to project", contextMenuExplorer, newDirectoryShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createDir);
+
     contextMenuExplorer->addSeparator();
-    pasteActionExplorer = addAction("Paste", "Paste", &QIodeFileExplorer::paste, contextMenuExplorer, QKeySequence::Paste);
+
+    pasteActionExplorer = addAction("Paste", "Paste", contextMenuExplorer, pasteShortcut->key());
+    connect(pasteActionExplorer, &QAction::triggered, this, &QIodeFileExplorer::paste);
 
     disablePaste();
 }
@@ -191,40 +267,15 @@ void QIodeFileExplorer::updateProjectDir(const QDir& projectDir, std::shared_ptr
     // expand the (root) project directory
     this->expand(projectIndex);
 
+    // update project in the Tab widget
+    tabWidget->updateProjectDir(projectPath);
+
     loadSettings();
 
+    calledFromContextMenu = false;
     indexContextMenu = QModelIndex();
 
     this->show();
-}
-
-void QIodeFileExplorer::keyPressEvent(QKeyEvent *event)
-{
-    switch (event->key())
-    {
-    case QKeySequence::Cut :
-        cut();
-        break;
-    case QKeySequence::Copy :
-        copy();
-        break;
-    case QKeySequence::Paste :
-        paste();
-        break;
-    case Qt::Key_F2 :
-        rename();
-        break;
-    case QKeySequence::Delete :
-        remove();
-        break;
-    case QKeySequence::Cancel:
-        itemsToPast.clear();
-        cutIndexes.clear();
-        disablePaste();
-    default:
-        QTreeView::keyPressEvent(event);
-        break;
-    }
 }
 
 void QIodeFileExplorer::dragMoveEvent(QDragMoveEvent *event)
@@ -289,6 +340,8 @@ void QIodeFileExplorer::openFile(const QModelIndex &index)
  */
 void QIodeFileExplorer::onCustomContextMenu(const QPoint& point)
 {
+    QMenu* contextMenuCurrent;
+    calledFromContextMenu = true;
     const QPoint globalPoint = this->viewport()->mapToGlobal(point); 
     indexContextMenu = this->indexAt(point);
     if(indexContextMenu.isValid())
@@ -302,7 +355,7 @@ void QIodeFileExplorer::onCustomContextMenu(const QPoint& point)
 
 void QIodeFileExplorer::createFile()
 {
-    QDir parentDir = getDestinationDir(indexContextMenu);
+    QDir parentDir = getDestinationDir();
     QString newFilePath = parentDir.filePath("newfile");
     QFile newFile(newFilePath);
     if(newFile.open(QIODevice::ReadWrite))
@@ -314,12 +367,12 @@ void QIodeFileExplorer::createFile()
         // user may have pushed escape to discard creating new file
         // if (proxyModel->fileName(newFileIndex) == "newfile") proxyModel->remove(newFileIndex);
     }
-    indexContextMenu = QModelIndex();
+    cleanupSlot();
 }
 
 void QIodeFileExplorer::createDir()
 {
-    QDir parentDir = getDestinationDir(indexContextMenu);
+    QDir parentDir = getDestinationDir();
     if(parentDir.mkdir("NewFolder"))
     {
         QString newDirPath = parentDir.filePath("NewFolder");
@@ -329,7 +382,7 @@ void QIodeFileExplorer::createDir()
         // user may have pushed escape to discard creating new file
         // if (proxyModel->fileName(newDirIndex) == "NewFolder") proxyModel->remove(newDirIndex);
     }
-    indexContextMenu = QModelIndex();
+    cleanupSlot();
 }
 
 void QIodeFileExplorer::absolutePath()
@@ -338,39 +391,34 @@ void QIodeFileExplorer::absolutePath()
     QFileInfo fileInfo = proxyModel->fileInfo(indexContextMenu);
     QString absPath = fileInfo.absoluteFilePath();
     clipboard->setText(absPath);
-    indexContextMenu = QModelIndex();
+    cleanupSlot();
 }
 
 void QIodeFileExplorer::cut()
 {
     itemsToPast = extractListOfItems(true);
-    // TODO : put item in gray
-    // https://www.qtcentre.org/threads/61716-Set-the-color-of-a-row-in-a-qtreeview
     enablePaste();
-    indexContextMenu = QModelIndex();
+    cleanupSlot();
 }
 
 void QIodeFileExplorer::copy()
 {
-    itemsToPast = extractListOfItems(false);
+    itemsToPast = extractListOfItems();
     enablePaste();
-    indexContextMenu = QModelIndex();
+    cleanupSlot();
 }
 
 void QIodeFileExplorer::paste()
 {
     // get the destination directory in which the new directory will be created
-    QDir destinationDir = getDestinationDir(indexContextMenu);
+    QDir destinationDir = getDestinationDir();
     // paste directory or file
     if(!itemsToPast.isEmpty())
     {
         foreach(SystemItem item, itemsToPast) item.paste(destinationDir);
     }
-    // disable Paste option in context menus
-    disablePaste();
-    itemsToPast.clear();
-    cutIndexes.clear();
-    indexContextMenu = QModelIndex();
+    // cleanup everything
+    cancel();
 }
 
 void QIodeFileExplorer::rename()
@@ -388,18 +436,37 @@ void QIodeFileExplorer::rename()
         indexRename = selectedIndexes[selectedIndexes.count()-1];
     }
     this->edit(indexRename);
-    indexContextMenu = QModelIndex();
+
+    cleanupSlot();
 }
 
 void QIodeFileExplorer::remove()
 {
-    QList<SystemItem> itemsToDelete = extractListOfItems(false);
+    QList<SystemItem> itemsToDelete = extractListOfItems();
     foreach(SystemItem item, itemsToDelete) item.remove();
-    indexContextMenu = QModelIndex();
+    cleanupSlot();
 }
 
-void QIodeFileExplorer::openFileSlot()
+void QIodeFileExplorer::openFiles()
 {
-    openFile(indexContextMenu);
-    indexContextMenu = QModelIndex();
+    if (this->hasFocus())
+    {
+        QList<SystemItem> filesToOpen = extractListOfItems();
+        foreach(SystemItem item, filesToOpen) 
+            if (item.isFile()) tabWidget->loadFile(item.absoluteFilePath());
+        selectionModel()->clearSelection();
+        cleanupSlot();
+    }
+}
+
+void QIodeFileExplorer::cancel()
+{
+    if (this->hasFocus())
+    {
+        disablePaste();
+        itemsToPast.clear();
+        cutIndexes.clear();
+        selectionModel()->clearSelection();
+        cleanupSlot();
+    }
 }

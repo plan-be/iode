@@ -31,7 +31,7 @@
  * 
  *        Implemented features:
  * 
- *        - CTRL + N creates a new project.
+ *        - CTRL + ALT + N creates a new project.
  *        - CTRL + O opens an existing project.
  *        - CTRL + ALT + S saves current project to another directory.
  *        - CTRL + SHIFT + D clears the whole workspace. 

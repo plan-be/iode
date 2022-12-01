@@ -11,8 +11,8 @@ class SystemItem
 {
     QFileInfo sourceInfo;
     bool cut;
-    bool isDir;
-    bool isFile;
+    bool _isDir;
+    bool _isFile;
     bool overwrite_all;
 
 private:
@@ -183,8 +183,19 @@ private:
 public:
     SystemItem(const QFileInfo& sourceInfo, const bool cut = false) : sourceInfo(sourceInfo), cut(cut), overwrite_all(false)
     {
-        isDir = sourceInfo.isDir();
-        isFile = sourceInfo.isFile();
+        _isDir = sourceInfo.isDir();
+        _isFile = sourceInfo.isFile();
+    }
+
+    bool isDir() const { return _isDir; }
+
+    bool isFile() const { return _isFile; }
+
+    QFileInfo fileInfo() const { return sourceInfo; }
+
+    QString absoluteFilePath() const
+    {
+        return sourceInfo.absoluteFilePath();
     }
 
     // required for "Save Project As" option in File menu
@@ -193,8 +204,8 @@ public:
         bool success  = false;
         bool cut_save = cut;
         cut = false;
-        if (isFile) success = pasteFile(targetDir);
-        if (isDir)
+        if (_isFile) success = pasteFile(targetDir);
+        if (_isDir)
         {
             QDir currentDir(sourceInfo.absoluteFilePath());
             success = copyRecursiveDir(currentDir, targetDir);
@@ -205,16 +216,16 @@ public:
 
     bool paste(QDir& destinationDir)
     {
-        if(isFile) return pasteFile(destinationDir);
-        if(isDir) return pasteDir(destinationDir);
+        if(_isFile) return pasteFile(destinationDir);
+        if(_isDir) return pasteDir(destinationDir);
         // not a directory or a file (e.g. symbolic link, executable, ...)
         return false;
     }
 
     bool remove()
     {
-        if(isFile) return removeFile();
-        if(isDir) return removeDir();
+        if(_isFile) return removeFile();
+        if(_isDir) return removeDir();
         // not a directory or a file (e.g. symbolic link, executable, ...)
         return false;
     }

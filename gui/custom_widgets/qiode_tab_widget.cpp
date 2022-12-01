@@ -23,6 +23,7 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     // ---- connect signals to slots  ----
     connect(this, &QTabWidget::currentChanged, this, &QIodeTabWidget::showTab);
     connect(this, &QTabWidget::tabCloseRequested, this, &QIodeTabWidget::removeTab);
+
     connect(nextTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showNextTab);
     connect(previousTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showPreviousTab);
     connect(saveShortcut, &QShortcut::activated, this, &QIodeTabWidget::saveCurrentTab);
@@ -66,6 +67,12 @@ QIodeTabWidget::~QIodeTabWidget()
     delete tabScalars;
     delete tabTables;
     delete tabVariables;
+
+    delete nextTabShortcut;
+    delete previousTabShortcut;
+    delete saveShortcut;
+    delete saveAllShortcut;
+    delete clearShortcut;
 }
 
 void QIodeTabWidget::loadSettings()
@@ -78,12 +85,7 @@ void QIodeTabWidget::loadSettings()
 
     // filesToLoad is empty in the case of a new project
     if(filesToLoad.empty())
-    {
-        for (int iodeType=0; iodeType < I_NB_TYPES; iodeType++) 
-            setTabNameTooltip(iodeType, (EnumIodeFile) iodeType, "");
-
         showTab(0);
-    }
     else
     {
         // reopen all tabs (files) that were open the last time the user quitted the IODE gui
@@ -157,6 +159,11 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath)
         this->tabBar()->setTabButton(i, QTabBar::RightSide, nullptr);
     }
 
+    // make sure that all KDB tabs has a default text and tooltip
+    // (usually when starting a new project)
+    for (int iodeType=0; iodeType < I_NB_TYPES; iodeType++) 
+        setTabNameTooltip(iodeType, (EnumIodeFile) iodeType, "");
+
     this->project_settings_filepath = project_settings_filepath;
     settings = new QSettings(*project_settings_filepath, QSettings::IniFormat);
     loadSettings();
@@ -212,7 +219,7 @@ void QIodeTabWidget::clearWorkspace()
     tabScalars->clearKDB();
     tabTables->clearKDB();
     tabVariables->clearKDB();
-    resetFilters();
+    for(int i=0; i < I_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
 }
 
 int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType, const int moveToPosition)
@@ -220,29 +227,36 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType, const int moveT
     int index;
     try
     {
-        // get index of corresponding tab
+        // get index of corresponding tab + reset filter
         switch (iodeType)
         {
         case I_COMMENTS:
             index = this->indexOf(tabComments);
+            tabComments->resetFilter();
             break;
         case I_EQUATIONS:
             index = this->indexOf(tabEquations);
+            tabEquations->resetFilter();
             break;
         case I_IDENTITIES:
             index = this->indexOf(tabIdentites);
+            tabIdentites->resetFilter();
             break;
         case I_LISTS:
             index = this->indexOf(tabLists);
+            tabLists->resetFilter();
             break;
         case I_SCALARS:
             index = this->indexOf(tabScalars);
+            tabScalars->resetFilter();
             break;
         case I_TABLES:
             index = this->indexOf(tabTables);
+            tabTables->resetFilter();
             break;
         case I_VARIABLES:
             index = this->indexOf(tabVariables);
+            tabVariables->resetFilter();
             break;
         default:
             return -1;
@@ -341,21 +355,6 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
 void QIodeTabWidget::removeTab(const int index)
 {
     QTabWidget::removeTab(index);
-}
-
-void QIodeTabWidget::resetFilters()
-{
-    QString filename;
-    for (int index=0; index < this->count(); index++)
-    {
-        filename = QFileInfo(this->tabToolTip(index)).fileName();
-        EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
-        if(fileType <= I_VARIABLES_FILE)
-        {
-            AbstractIodeObjectWidget* objWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
-            objWidget->resetFilter();
-        }
-    }
 }
 
 // TODO : update this method for report and text files
@@ -531,7 +530,7 @@ void QIodeTabWidget::clearCurrentTab()
         {
             AbstractIodeObjectWidget* kdbWidget = static_cast<AbstractIodeObjectWidget*>(tabWidget);
             kdbWidget->clearKDB();
-            kdbWidget->resetFilter();
+            updateObjectTab((EnumIodeType) filetype);
         }
     }
 }
