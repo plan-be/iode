@@ -16,12 +16,18 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     // prepare shortcuts
     nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
     previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
+    saveShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_S), this);
+    saveAllShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this);
+    clearShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_D), this);
 
     // ---- connect signals to slots  ----
     connect(this, &QTabWidget::currentChanged, this, &QIodeTabWidget::showTab);
     connect(this, &QTabWidget::tabCloseRequested, this, &QIodeTabWidget::removeTab);
     connect(nextTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showNextTab);
     connect(previousTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showPreviousTab);
+    connect(saveShortcut, &QShortcut::activated, this, &QIodeTabWidget::saveCurrentTab);
+    connect(saveAllShortcut, &QShortcut::activated, this, &QIodeTabWidget::saveAllTabs);
+    connect(clearShortcut, &QShortcut::activated, this, &QIodeTabWidget::clearCurrentTab);
 
     // prepare widgets for tabs associated with IODE object types
     tabComments = new QIodeCommentsWidget(project_settings_filepath, I_COMMENTS, this);
@@ -488,24 +494,46 @@ void QIodeTabWidget::saveFile(const QString& filepath, const bool loop)
     }
 }
 
+bool QIodeTabWidget::saveTabContent(const int index)
+{
+    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+    QString filepath = tabWidget->save();
+    if (filepath.isEmpty()) return false;
+    setTabNameTooltip(index, tabWidget->getFiletype(), filepath);
+    return true;
+}
+
+bool QIodeTabWidget::saveCurrentTab()
+{
+    int index = currentIndex();
+    return saveTabContent(index);
+}
+
 bool QIodeTabWidget::saveAllTabs()
 {
     bool success = true;
-
-    AbstractTabWidget* tabWidget;
-    QString filepath;
-    QString error_msg = "An error occured when trying to save the content of the tab ";
     for(int index=0; index < this->count(); index++)
-    {
-        tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-        filepath = tabWidget->save();
-        if (!filepath.isEmpty())
-            setTabNameTooltip(index, tabWidget->getFiletype(), filepath);
-        else
-            success = false;
-    }
-
+        if(!saveTabContent(index)) success = false;
     return success;
+}
+
+void QIodeTabWidget::clearCurrentTab()
+{
+    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(currentWidget());
+    EnumIodeFile filetype = tabWidget->getFiletype();
+    if (filetype <= I_VARIABLES_FILE)
+    {
+        QWidget* mainwin = get_main_window_ptr();
+        QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", 
+            "Are you sure to clear the " + QString::fromStdString(vIodeTypes[filetype]) + " database", 
+            QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+        if (answer == QMessageBox::Yes)
+        {
+            AbstractIodeObjectWidget* kdbWidget = static_cast<AbstractIodeObjectWidget*>(tabWidget);
+            kdbWidget->clearKDB();
+            kdbWidget->resetFilter();
+        }
+    }
 }
 
 bool QIodeTabWidget::saveProjectAs(QDir& newProjectDir)
