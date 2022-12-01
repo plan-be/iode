@@ -24,7 +24,27 @@
 #include "iode_objs/views/variables_view.h"
 
 
-class AbstractIodeObjectWidget: public QWidget
+class AbstractTabWidget: public QWidget
+{
+protected:
+    EnumIodeFile fileType;
+
+public:
+    AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr) : 
+        QWidget(parent), fileType(fileType) 
+    {
+        this->setGeometry(QRect(10, 11, 951, 26));
+    }
+
+    EnumIodeFile getFiletype() const { return fileType; }
+
+    virtual void update() = 0;
+    virtual QString save() = 0;
+    virtual QString saveAs() = 0;
+};
+
+
+class AbstractIodeObjectWidget: public AbstractTabWidget
 {
 protected:
     EnumIodeType iodeType;
@@ -35,10 +55,9 @@ protected:
 
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QWidget(parent), iodeType(iodeType)
+        AbstractTabWidget((EnumIodeFile) iodeType, parent)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
-        this->setGeometry(QRect(10, 11, 951, 26));
 
         // layout
         layout = new QGridLayout(this);
@@ -84,10 +103,11 @@ public:
         delete layout;
     }
 
+    virtual void clearKDB() = 0;
     virtual void resetFilter() = 0;
     virtual void update() = 0;
-    virtual bool save() = 0;
-    virtual bool saveAs() = 0;
+    virtual QString save() = 0;
+    virtual QString saveAs() = 0;
 };
 
 
@@ -145,6 +165,11 @@ public:
         delete tableview;
     }
 
+    void clearKDB()
+    {
+        objmodel->clearKDB();
+    }
+
     void resetFilter()
     {
         lineEdit_filter->setText("");
@@ -159,14 +184,15 @@ public:
     void setProjectDir(const QDir& projectDir)
     {
         this->projectDir = projectDir;
+        clearKDB();
     }
 
-    bool save()
+    QString save()
     {
         return objmodel->save(projectDir);
     }
 
-    bool saveAs()
+    QString saveAs()
     {
         return objmodel->saveAs(projectDir);
     }
