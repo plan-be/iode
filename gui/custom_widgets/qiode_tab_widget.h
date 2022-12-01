@@ -76,7 +76,12 @@ private:
      * 
      * @return bool Wether or not K_WS corresponding to iodeType is empty.
      */
-    bool is_iode_objs_loaded(const EnumIodeType iodeType) { return K_WS[iodeType] != NULL; }
+    bool is_iode_objs_loaded(const EnumIodeType iodeType) 
+    { 
+        if (K_WS[iodeType] == NULL) return false;
+        if (K_WS[iodeType]->k_nb == 0) return false;
+        return true; 
+    }
 
     /**
      * @brief build list of open files (= tabs)
@@ -234,7 +239,11 @@ public:
     bool saveProjectAs(QDir& newProjectDir);
 
     /**
-     * @brief update tab for editing IODE objects.
+     * @brief update a tab representing a IODE KDB :
+     *        - update tab text and tooltip,
+     *        - reset the names filter.
+     * 
+     *        Called when loading a KDB file and when clearing a KDB.
      * 
      * @param iodeType EnumIodeType type of IODE objects to edit.
      * @param moveToPosition int new position of the corresponding tab (optional).
