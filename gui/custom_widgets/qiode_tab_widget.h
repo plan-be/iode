@@ -267,6 +267,12 @@ public:
      */
     void resetFilter(const EnumIodeType iodeType);
 
+    /**
+     * @brief clear all global KDBs and update all KDB tabs.
+     * 
+     */
+    void clearWorkspace();
+
 public slots:
     void removeTab(const int index);
 

@@ -102,8 +102,6 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
-    <addaction name="actionLoad_Work_Space"/>
-    <addaction name="actionSave_Work_Space"/>
     <addaction name="actionClear_Work_Space"/>
     <addaction name="separator"/>
     <addaction name="actionCopy_into_Work_Space"/>
@@ -460,10 +458,13 @@
   </action>
   <action name="actionClear_Work_Space">
    <property name="text">
-    <string>Clear Work Space</string>
+    <string>Clear All WorkSpaces</string>
    </property>
    <property name="toolTip">
     <string>Clear current work space(s)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+D</string>
    </property>
   </action>
   <action name="actionCopy_into_Work_Space">
@@ -913,10 +914,16 @@
    <property name="text">
     <string>Save Project As</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open/New Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actioncb_dnqsj">
@@ -1053,42 +1060,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionLoad_Work_Space</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_load_workspace_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSave_Work_Space</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_save_workspace_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionClear_Work_Space</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>open_clear_workspace_dialog()</slot>
+   <slot>clear_workspace()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1715,9 +1690,7 @@
   <slot>open_load_settings_dialog()</slot>
   <slot>open_save_settings_dialog()</slot>
   <slot>open_reset_settings_dialog()</slot>
-  <slot>open_load_workspace_dialog()</slot>
-  <slot>open_save_workspace_dialog()</slot>
-  <slot>open_clear_workspace_dialog()</slot>
+  <slot>clear_workspace()</slot>
   <slot>open_copy_into_workspace_dialog()</slot>
   <slot>open_merge_into_workspace_dialog()</slot>
   <slot>open_change_workspace_descriptions_dialog()</slot>

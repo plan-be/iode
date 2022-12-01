@@ -168,6 +168,7 @@ public:
     void clearKDB()
     {
         objmodel->clearKDB();
+        tableview->update();
     }
 
     void resetFilter()

@@ -17,9 +17,6 @@
 #include "menu/file/file_import_variables.h"
 #include "menu/file/file_export.h"
 
-#include "menu/workspace/workspace_load.h"
-#include "menu/workspace/workspace_save.h"
-#include "menu/workspace/workspace_clear.h"
 #include "menu/workspace/workspace_high_to_low.h"
 #include "menu/workspace/workspace_low_to_high.h"
 
@@ -96,9 +93,7 @@ public slots:
 	void open_recent_project();
 
 	// Workspace Menu
-	void open_load_workspace_dialog();
-	void open_save_workspace_dialog();
-	void open_clear_workspace_dialog();
+	void clear_workspace();
 	void open_high_to_low_dialog();
 	void open_low_to_high_dialog();
 

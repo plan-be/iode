@@ -11,9 +11,6 @@ QWidget* get_main_window_ptr()
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(nullptr)
 {
-    // ---- setup IODE ----
-    IodeInit();
-
     // ---- setup the present class ----
     setupUi(this);
 
@@ -21,28 +18,47 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     main_window_ptr = static_cast<QWidget*>(this);
 
     // ---- user settings ----
+    // location if QSettings::UserScope -> FOLDERID_RoamingAppData
+    // see https://doc.qt.io/qt-6/qsettings.html#setPath 
     user_settings = new QSettings(QSettings::UserScope, this);
-    rootPath = user_settings->value("rootPath", QDir::currentPath()).toString();
+    projectPath = user_settings->value("projectPath", "").toString();
     recentProjects = user_settings->value("recentProjects", QStringList()).toStringList();
 
     // ---- menus ----
     buildRecentProjectsMenu();
 
     // ---- file explorer ----
+    // connect the Tabs widget to the File Explorer
     treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
 
-    // ---- load project ----
-    openDirectory(rootPath);
+    // ---- load project (if any) ----
+    // first time launching the GUI -> ask the user to either start a new project 
+    // or to open an existing folder containing reports and/or KDB files as project
+    if (projectPath.isEmpty())
+    {
+        QMessageBox::information(this, "IODE interface", 
+            QString("<p align='center'>First time with the IODE interface ?<br><br>") + 
+            "Please go the File menu to either create a new project folder or to open an folder containg " + 
+            "reports and/or IODE database files.</p>" + 
+            "<p align='left'>To open file(s) from the file tree (left panel):<br>" + 
+            "- double click on a file,<br>" +
+            "- select several with CTRL and then press ENTER.</p>");
+        treeView_file_explorer->hide();
+        tabWidget_IODE_objs->hide();
+        dockWidget_file_explorer->hide();
+    }
+    else
+        openDirectory(projectPath);
 }
 
 MainWindow::~MainWindow()
 {
-    user_settings->setValue("rootPath", QVariant(rootPath));
+    user_settings->setValue("projectPath", QVariant(projectPath));
+
+    for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
 
     delete project_settings;
     delete user_settings;
-
-    IodeEnd();
 }
 
 void MainWindow::buildRecentProjectsMenu()
@@ -101,10 +117,10 @@ bool MainWindow::openDirectory(const QString& dirPath)
     }
 
     QDir dir(dirPath);
-    rootPath = dir.absolutePath();
+    projectPath = dir.absolutePath();
     if (!dir.exists())
     {
-        QMessageBox::critical(this, "Error", "Directory " + rootPath + " does not exist");
+        QMessageBox::critical(this, "Error", "Directory " + projectPath + " does not exist");
         return false;
     }
 
@@ -115,6 +131,9 @@ bool MainWindow::openDirectory(const QString& dirPath)
 
     if (project_settings) delete project_settings;
     project_settings = new QSettings(qSettingsFilepath, QSettings::IniFormat);
+
+    // show File Explorer widget (in case it was hidden)
+    dockWidget_file_explorer->show();
 
     // update file explorer view
     treeView_file_explorer->updateProjectDir(projectDir, project_settings_filepath);
@@ -128,38 +147,69 @@ bool MainWindow::openDirectory(const QString& dirPath)
     return true;
 }
 
-void MainWindow::open_project()
+void MainWindow::createNewProject()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), rootPath,
-                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    // check if user clikced on Cancel button
-    if(dir.isEmpty()) return;
+    if (!projectPath.isEmpty())
+    {
+        // ask to save all current tabs content before to switch
+        QMessageBox::StandardButton answer = askSaveAllTabs();
+        if (answer == QMessageBox::Discard) return;
+    }
 
-    // ask to save all current tabs content before to switch
-    QMessageBox::StandardButton answer = askSaveAllTabs();
-    if (answer == QMessageBox::Discard) return;
-
-    // update current project path + open it in the Iode GUI File Exporer
-    rootPath = dir;
-    openDirectory(rootPath);
+    QIodeMenuFileNewProject dialog(projectPath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString newProjectPath = dialog.getPathNewProject();
+        openDirectory(newProjectPath);
+    }
 }
 
-void MainWindow::save_project_as()
+void MainWindow::open_project()
 {
-    // QFileDialog::getExistingDirectory allows users to create a new directory while the file explorer is open
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), rootPath,
+    if (!projectPath.isEmpty())
+    {
+        // ask to save all current tabs content before to switch
+        QMessageBox::StandardButton answer = askSaveAllTabs();
+        if (answer == QMessageBox::Discard) return;
+    }
+
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), projectPath,
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     // check if user clikced on Cancel button
     if(dir.isEmpty()) return;
-    // update current project path
-    rootPath = dir;
-    // save all tabs content
-    tabWidget_IODE_objs->saveAllTabs();
-    // save all IODE files to the (new) directory 
-    QDir projectDir = QDir(rootPath);
-    tabWidget_IODE_objs->saveProjectAs(projectDir);
 
-    openDirectory(rootPath);
+    // update current project path + open it in the Iode GUI File Exporer
+    projectPath = dir;
+    openDirectory(projectPath);
+}
+
+void MainWindow::copy_project_to()
+{
+    QIodeMenuFileNewProject dialog(projectPath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString copyProjectPath = dialog.getPathNewProject();
+        // check if user clikced on Cancel button
+        if(copyProjectPath.isEmpty()) return;
+
+        // ask user before to copy all files and directories
+        QDir currentProjectDir(projectPath);
+        QString msg = "Are you sure to copy all the following files/directories:\n\n";
+        msg += currentProjectDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot).join("\n");
+        msg += "\n\ninto the new directory '" + copyProjectPath + "'";
+        QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", msg, QMessageBox::Yes | QMessageBox::No);
+        if(answer == QMessageBox::No) return;
+
+        // update current project path
+        projectPath = copyProjectPath;
+        // save all tabs content
+        tabWidget_IODE_objs->saveAllTabs();
+        // save all IODE files to the (new) directory 
+        QDir projectDir = QDir(projectPath);
+        tabWidget_IODE_objs->copyProjectTo(projectDir);
+
+        openDirectory(projectPath);
+    }
 }
 
 void MainWindow::open_recent_project()
@@ -182,6 +232,16 @@ void MainWindow::open_recent_project()
             user_settings->setValue("recentProjects", QVariant::fromValue(recentProjects));
         }
     }
+}
+
+void MainWindow::saveCurrentTab()
+{
+    tabWidget_IODE_objs->saveCurrentTab();
+}
+
+void MainWindow::saveAllTabs()
+{
+    tabWidget_IODE_objs->saveAllTabs();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -232,24 +292,11 @@ void MainWindow::open_export_dialog()
     dialog.exec();
 }
 
-void MainWindow::open_load_workspace_dialog()
+void MainWindow::clear_workspace()
 {
-    QIodeMenuWorkspaceLoad dialog(*project_settings_filepath, tabWidget_IODE_objs, this);
-    dialog.exec();
-    tabWidget_IODE_objs->resetFilters();
-}
-
-void MainWindow::open_save_workspace_dialog()
-{
-    QIodeMenuWorkspaceSave dialog(*project_settings_filepath, this);
-    dialog.exec();
-}
-
-void MainWindow::open_clear_workspace_dialog()
-{
-    QIodeMenuWorkspaceClear dialog(*project_settings_filepath, this);
-    dialog.exec();
-    tabWidget_IODE_objs->resetFilters();
+    QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", "Are you sure to clear the whole workspace?", 
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (answer == QMessageBox::Yes) tabWidget_IODE_objs->clearWorkspace();
 }
 
 void MainWindow::open_high_to_low_dialog()
