@@ -34,6 +34,7 @@
  *        - Users are allowed to close tabs if they represent a report or a text files (i.e. not an IODE objects type).
  *        - Users are allowed to move tabs.
  *        - CTRL + S on a tab saves its content.
+ *        - CTRL + SHIFT + S saves all tabs content.
  *        - CTRL + D on a KDB tab clears the corresponding KDB.
  *        - CTRL + SHIFT + D clears the whole workspace. 
  *        - ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab.
@@ -55,6 +56,9 @@ class QIodeTabWidget: public QTabWidget
 
     QShortcut* nextTabShortcut;
     QShortcut* previousTabShortcut;
+    QShortcut* saveShortcut;
+    QShortcut* saveAllShortcut;
+    QShortcut* clearShortcut;
 
     QIodeCommentsWidget* tabComments;
     QIodeEquationsWidget* tabEquations;
@@ -175,6 +179,16 @@ private:
      */
     void saveSettings();
 
+    /**
+     * @brief save the content of the tab at a given index.
+     *        Ask for a filepath if the tab represents a KDB and the KDB is not linked to any file.
+     * 
+     * @param index int index of the tab to be saved.
+     * 
+     * @return bool whether or not the method has succeeded.
+     */
+    bool saveTabContent(const int index);
+
 public:
     QIodeTabWidget(QWidget* parent = nullptr);
     ~QIodeTabWidget();
@@ -210,14 +224,6 @@ public:
      * @param loop bool whether or not the method is called from a loop.
      */
     void saveFile(const QString& filepath, const bool loop = false);
-
-    /**
-     * @brief save all open tabs. 
-     *        Ask for a filepath if KDB not linked to any file.
-     * 
-     * @return bool whether or not the method has succeeded. 
-     */
-    bool saveAllTabs();
 
     /**
      * @brief save current project to another (new) directory.
@@ -293,6 +299,28 @@ public slots:
     {
         if(this->currentIndex() != 0) this->setCurrentIndex(this->currentIndex() - 1); 
     }
+
+    /**
+     * @brief save the content of the current tab.
+     *        Ask for a filepath if the tab represents a KDB and the KDB is not linked to any file.
+     * 
+     * @return bool whether or not the method has succeeded.
+     */
+    bool saveCurrentTab();
+
+    /**
+     * @brief save all open tabs. 
+     *        Ask for a filepath if the tab represents a KDB and the KDB is not linked to any file.
+     * 
+     * @return bool whether or not the method has succeeded. 
+     */
+    bool saveAllTabs();
+
+    /**
+     * @brief clear KDB of the current open tab if the later represents a KDB.
+     * 
+     */
+    void clearCurrentTab();
     
     /**
      * @brief Update the path to the current project directory.
