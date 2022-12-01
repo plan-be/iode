@@ -153,6 +153,8 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
 
 void KDBAbstract::dump(std::string& filepath)
 {
+    if (count() == 0) return;
+
     filepath = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
     char* c_filepath = to_char_array(filepath);
     if (strlen(c_filepath) >= sizeof(FNAME)) throw IodeExceptionFunction("Cannot save " + iode_type_name + "s",  
