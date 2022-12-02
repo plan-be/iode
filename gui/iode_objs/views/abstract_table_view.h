@@ -81,6 +81,5 @@ public:
 	{
 		M* table_model = static_cast<M*>(model());
 		table_model->reset();
-		table_model->rowCount() > 0 ? show() : hide();
 	}
 };
