@@ -81,8 +81,10 @@
     <addaction name="actionSave_Project_As"/>
     <addaction name="menuRecent_Projects"/>
     <addaction name="separator"/>
-    <addaction name="actionImport_Variables"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_All"/>
     <addaction name="separator"/>
+    <addaction name="actionImport"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionPrint_Setup"/>
@@ -931,6 +933,28 @@
     <string>cb dnqsj</string>
    </property>
   </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save current tab content</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSave_All">
+   <property name="text">
+    <string>Save All Tabs</string>
+   </property>
+   <property name="toolTip">
+    <string>Save all tabs content</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1683,6 +1707,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>saveCurrentTab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave_All</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>saveAllTabs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1724,5 +1780,7 @@
   <slot>open_export_dialog()</slot>
   <slot>save_project_as()</slot>
   <slot>open_project()</slot>
+  <slot>saveCurrentTab()</slot>
+  <slot>saveAllTabs()</slot>
  </slots>
 </ui>

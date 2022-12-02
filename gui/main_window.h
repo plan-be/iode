@@ -34,6 +34,8 @@
  *        - CTRL + ALT + N creates a new project.
  *        - CTRL + O opens an existing project.
  *        - CTRL + ALT + S saves current project to another directory.
+ *        - CTRL + S saves the current tab content.
+ *        - CTRL + SHIFT + S saves all tabs content.
  *        - CTRL + SHIFT + D clears the whole workspace. 
  * 
  */
@@ -102,6 +104,8 @@ public slots:
 	void open_project();
 	void save_project_as();
 	void open_recent_project();
+	void saveCurrentTab();
+	void saveAllTabs();
 
 	// Workspace Menu
 	void clear_workspace();

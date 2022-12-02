@@ -16,8 +16,6 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     // prepare shortcuts
     nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
     previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
-    saveShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_S), this);
-    saveAllShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this);
     clearShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_D), this);
 
     // ---- connect signals to slots  ----
@@ -26,8 +24,6 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
 
     connect(nextTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showNextTab);
     connect(previousTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showPreviousTab);
-    connect(saveShortcut, &QShortcut::activated, this, &QIodeTabWidget::saveCurrentTab);
-    connect(saveAllShortcut, &QShortcut::activated, this, &QIodeTabWidget::saveAllTabs);
     connect(clearShortcut, &QShortcut::activated, this, &QIodeTabWidget::clearCurrentTab);
 
     // prepare widgets for tabs associated with IODE object types
@@ -70,8 +66,6 @@ QIodeTabWidget::~QIodeTabWidget()
 
     delete nextTabShortcut;
     delete previousTabShortcut;
-    delete saveShortcut;
-    delete saveAllShortcut;
     delete clearShortcut;
 }
 

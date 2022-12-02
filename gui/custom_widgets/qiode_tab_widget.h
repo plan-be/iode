@@ -56,8 +56,6 @@ class QIodeTabWidget: public QTabWidget
 
     QShortcut* nextTabShortcut;
     QShortcut* previousTabShortcut;
-    QShortcut* saveShortcut;
-    QShortcut* saveAllShortcut;
     QShortcut* clearShortcut;
 
     QIodeCommentsWidget* tabComments;
