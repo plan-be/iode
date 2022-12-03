@@ -126,7 +126,7 @@ char *K_get_kdb_nameptr(KDB *kdb)
 
 
 /**
- *  Sets the KDB filename that will be used 
+ *  Sets the KDB filename. 
  *  
  *  The current filename stored in the KDB is freed and space for the new filename is allocated in the KDB.
  *  
@@ -141,6 +141,25 @@ void K_set_kdb_name(KDB *kdb, U_ch *filename)
         SCR_free(KNAMEPTR(kdb));
         KNAMEPTR(kdb) = SCR_stracpy(filename);
     }
+}
+
+/**
+ *  Sets the KDB full path name. 
+ *  
+ *  The current filename stored in the KDB is freed and space for the new filename is allocated in the KDB.
+ *  
+ *  @param [in, out]    kdb      KDB*   KDB whose name will be changed
+ *  @param [in]         filename char*  new filename
+ *  
+ *  @details More details   
+ */
+void K_set_kdb_fullpath(KDB *kdb, U_ch *filename) 
+{
+    char    *ptr, fullpath[1024];
+    
+    ptr = SCR_fullpath(filename, fullpath);
+    if(ptr == 0) ptr = filename;
+    K_set_kdb_name(kdb, ptr);  
 }
 
 

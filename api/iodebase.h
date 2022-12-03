@@ -120,6 +120,7 @@ extern int K_filetype(char *,char *,int *,SAMPLE *);
 extern KDB *K_init_kdb(int ,char *);
 extern char *K_get_kdb_nameptr(KDB *kdb);
 extern void K_set_kdb_name(KDB *kdb, U_ch *filename);
+extern void K_set_kdb_fullpath(KDB *kdb, U_ch *filename);
 extern KDB *K_create(int ,int );
 extern int K_free(KDB *);
 extern int K_clear(KDB *);
@@ -148,7 +149,9 @@ extern int K_calcvers(char *);
 extern void K_setvers(KDB* kdb, int i, int vers);
 
 /* k_objfile.c */
+extern int K_has_ext(char* filename);
 extern char *K_set_ext(char *,char *,int );
+extern char *K_set_ext_asc(char *,char *,int );
 extern void K_strip(char *);
 extern int K_merge(KDB *,KDB *,int );
 extern int K_merge_del(KDB *,KDB *,int );

@@ -113,17 +113,24 @@ KDB *KL_load_asc(char* filename)
 
     /* READ FILE */
     kdb = K_create(K_LST, K_UPPER);
+    K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 28/11/2022
+    
     while(1) {
         switch(YY_lex(yy)) {
             case YY_EOF :
+                if(cmpt) {
+                    char    asc_filename[1024];
+                    K_set_ext_asc(asc_filename, filename, K_LST);
+                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                }
                 YY_close(yy);
                 return(kdb);
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, yy->yy_text);
-                KL_read_lst(kdb, yy, name);
-                kmsg("Reading object %d : %s", ++cmpt, name);
+                if(KL_read_lst(kdb, yy, name) == 0) cmpt++;
+                kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
             default :

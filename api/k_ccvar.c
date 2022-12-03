@@ -193,7 +193,8 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
 }
 
 /**
- *  Loads variables from an ASCII file into a new KDB.
+ *  Loads variables from an ASCII file into a new KDB. On success, adds extension to ".av" to 
+ *  filename in kd->k_nameptr.
  *  
  *  @param [in] filename    char* ascii file to read
  *  @return                 KDB*  NULL or new KDB of variables
@@ -201,7 +202,16 @@ KDB *KV_load_asc_type_ask(char *file_or_string, int type, int ask)
  */
 KDB *KV_load_asc(char *filename)
 {
-    return(KV_load_asc_type_ask(filename, 0, 0));
+    KDB     *kdb;
+    
+    kdb = KV_load_asc_type_ask(filename, 0, 0);
+    if(kdb && KNB(kdb) > 0) {
+        char    asc_filename[1024];
+        K_set_ext_asc(asc_filename, filename, K_VAR);
+        K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+    }
+   
+    return(kdb);
 }
 
 
