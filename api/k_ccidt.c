@@ -58,9 +58,15 @@ KDB *KI_load_asc(char* filename)
 
     /* READ FILE */
     kdb = K_create(K_IDT, K_UPPER);
+    K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 28/11/2022
     while(1) {
         switch(YY_lex(yy)) {
             case YY_EOF :
+                if(cmpt) {
+                    char    asc_filename[1024];
+                    K_set_ext_asc(asc_filename, filename, K_IDT);
+                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                }
                 YY_close(yy);
                 return(kdb);
 
@@ -73,10 +79,11 @@ KDB *KI_load_asc(char* filename)
                 }
                 lec = K_wrap(yy->yy_text, 60);
                 if(K_add(kdb, name, lec) < 0)
-                    kerror(0, "%s (%s : %s).",
-                           YY_error(yy), name, L_error());
+                    kerror(0, "%s (%s : %s).", YY_error(yy), name, L_error());
+                else 
+                    cmpt++;
                 SW_nfree(lec);
-                kmsg("Reading object %d : %s", ++cmpt, name);
+                kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
             default :

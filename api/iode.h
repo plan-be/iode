@@ -1250,11 +1250,12 @@ extern PERIOD  RP_PER;              // current PERIOD for LEC evaluations in rep
 
 /******************************* VARS *************************************/
 
-extern  char    *BUF_DATA;
-extern char     L_PERIOD_CH[];
-extern int      L_PERIOD_NB[];
-extern  char    k_magic[][LMAGIC];
-extern  char    k_ext[][4];
+extern char    *BUF_DATA;
+extern char    L_PERIOD_CH[];
+extern int     L_PERIOD_NB[];
+extern char    k_magic[][LMAGIC];
+extern char    k_ext[][4];
+extern int     K_BACKUP_ON_SAVE; // If not 0, save a .??$ file before saving a WS
 
 #define K_MAX_FREF          5           // Max number of file references in GSAMPLE's
 //extern  FREF    fref[K_MAX_FREF + 1];

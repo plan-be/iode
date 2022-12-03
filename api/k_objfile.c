@@ -3,7 +3,9 @@
  *
  * IODE object file management
  * ---------------------------
+ *     int K_has_ext(char* filename)                                                   indicates if a filename contains an extension.
  *     char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
+ *     char *K_set_ext_asc(char* res, char* fname, int type)                           trims a filename then changes its extension to the ascii extension according to the given type).
  *     void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
  *     KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
  *     int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
@@ -62,6 +64,7 @@ char k_ext[][4] = {
     "xxx"
 };
 
+int K_BACKUP_ON_SAVE = 1; // Save a .??$ file before saving a WS
 
 /**
  *  Force the extension of a filename. Filename must be large enough to include the extension.
@@ -87,6 +90,33 @@ static char *K_add_ext(char* filename, char* ext)
 
 
 /**
+ *  Indicates if a filename contains an extension.
+ *   
+ *  @param [in]    filename    char*   source / target filename
+ *  @return                    int     1 if an extension is detected, 0 otherwise
+ *  
+ *  @example : 
+ *      strcpy(filename, "example");
+ *      K_add_ext(filename, "var");
+ *      printf("'%s'\n", filename);  // 'example.var'
+ */
+
+int K_has_ext(char* filename)
+{
+    int     i;
+
+    if(filename == 0) return(0);
+    for(i = (int)strlen(filename) - 1 ; i >= 0 ; i--) {
+        if(filename[i] == ':' || filename[i] == '!' ||        /* JMP 23-06-02 */
+           filename[i] == '.' || filename[i] == '\\' ||
+           filename[i] == '/') break;
+    }
+    if(i >= 0 && filename[i] == '.') return(1);
+    else return(0);
+}
+
+
+/**
  *  Trims a filename then changes its extension according to the given type.
  *   
  *  @param [out]    res   char*   resulting filename
@@ -102,13 +132,34 @@ static char *K_add_ext(char* filename, char* ext)
  *      printf("'%s'\n", buf);  // 'example.var'
  *      K_set_ext(buf, filename, K_CSV);
  *      printf("'%s'\n", buf);  // 'example.csv'
-
  */
 char *K_set_ext(char* res, char* fname, int type)
 {
     strcpy(res, fname);
     K_strip(res); /* JMP 19-04-98 */
     return(K_add_ext(res, k_ext[type]));
+}
+
+/**
+ *  Trims a filename then changes its extension to the ascii extension (according to the given type).
+ *   
+ *  @param [out]    res   char*   resulting filename
+ *  @param [in]     fname char*   input filename
+ *  @param [in]     type  int     file type (value defined in iode.h between K_CMT and K_CSV) 
+ *  @return               char*   res (same pointer)
+ *  
+ *  @example : 
+ *      char buf[256];
+ *  
+ *      strcpy(filename, "example.xxx      ");
+ *      K_set_ext_asc(buf, filename, K_VAR);
+ *      printf("'%s'\n", buf);  // 'example.av'
+ */
+char *K_set_ext_asc(char* res, char* fname, int type)
+{
+    strcpy(res, fname);
+    K_strip(res); /* JMP 19-04-98 */
+    return(K_add_ext(res, k_ext[1 + K_OBJ + type]));
 }
 
 
@@ -535,7 +586,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
 #else
     fd = fopen(file, "rb");
 #endif
-    if (fd == 0) return(-2);
+    if (fd == 0) return(-2); // file cannot be opened
 
     fread(label, strlen(K_LABEL), 1, fd);
     vers = K_calcvers(label);
@@ -557,9 +608,12 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
 
 
 /**
- *  Given a filename and an expected type, try to retrieve the file type. If 
- *  the file cannot be open, try to open the file in which the extension is replaced
- *  by the normal iode extension for the type (filename.var). 
+ *  Given a filename and an expected type, try to retrieve the file type. 
+ *  If the file cannot be open, try to open the file in which the extension is replaced
+ *  by the standard iode extension for the object type (filename.var). 
+ *  
+ *  UPDATE 6.64: if the filename contains an extension and the file cannot be opened, the standard iode extension
+ *  is not added. 
  *  
  *  @param [in] filename    char*   file to "inspect"
  *  @param [in] type        int     type expected
@@ -578,24 +632,38 @@ static int K_findtype(char* filename, int type)
     
     if(type == K_VAR && U_is_in('!', filename)) return(type); /* Give ODBC a try */
 
-    if(ftype != -2) return(ftype); // ???
-    strcpy(buf, filename);
-    K_add_ext(buf, k_ext[type]);
-    return(K_filetype(buf, 0L, 0L, 0L));
+    if(ftype != -2) return(ftype); // -2 => file cannot be opened
+    
+    // Try the filename + std extension (e.g.: .var) 
+    if(0) { // old version before 6.64: replacement extension even if an extension is present
+        strcpy(buf, filename);
+        K_add_ext(buf, k_ext[type]);
+        return(K_filetype(buf, 0L, 0L, 0L));
+    }
+    else { // Change JMP 30/11/2022: try to add extension **only** if there is no extension in filename
+        if(K_has_ext(filename)) return(-2); // file with extension (and not found)
+        // file w/o extension => try a standard IODE extension
+        strcpy(buf, filename);
+        K_add_ext(buf, k_ext[type]);
+        return(K_filetype(buf, 0L, 0L, 0L));
+    }
+    
 }
 
 
 /**
- * Generalisation of K_load() : interprets the content of a file, ascii files included, and try to load its content into a KDB.
+ *  Generalisation of K_load() : interprets the content of a file, ascii files included, 
+ *  and tries to load its content into a KDB.
  *
- * If the file is an ascii file (.ac, .ae... or .csv), the corresponding function in (*K_load_asc[type]) is called.
+ *  If the file is an ascii file (.ac, .ae... or .csv), the corresponding function 
+ *      (*K_load_asc[type])() is called.
  *
- * @param [in]   type       int     file type (K_CMT,...K_AC,..., K_CSV)
- * @param [in]   filename   char*   file to load
- * @return                  KDB*    KDB with the content of filename on success
- *                                  NULL on error
- *  
- * @note Messages are sent to the user via calls to 2 functions which can be redefined 
+ *  @param [in]   type       int     file type (K_CMT,...K_AC,..., K_CSV)
+ *  @param [in]   filename   char*   file to load
+ *  @return                  KDB*    KDB with the content of filename on success
+ *                                   NULL on error
+ *   
+ *  @note Messages are sent to the user via calls to 2 functions which can be redefined 
  *       depending on the context (console app, window app, Qt app...): 
  *          - kmsg() for notifications
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)
@@ -909,7 +977,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     strcpy(file, fname);
     K_strip(file); /* JMP 21-04-98 */
     K_add_ext(file, k_ext[KTYPE(kdb)]);
-    K_backup(file);     /* JMP 17-12-93 */
+    if(K_BACKUP_ON_SAVE) K_backup(file);     /* JMP 02-12-2022 */
     fd = fopen(file, "wb+");
     if(fd == NULL) return(-1);
     setvbuf(fd, NULL, 0, 8192);

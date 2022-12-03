@@ -86,7 +86,7 @@ static int KC_read_cmt(KDB* kdb, YYFILE* yy, char* name)
 KDB *KC_load_asc(char* filename)
 {
     KDB     *kdb = 0;
-    int     cmpt = 0;
+    int     cmpt = 0, rc;
     YYFILE  *yy;
     ONAME   name;
 
@@ -103,17 +103,26 @@ KDB *KC_load_asc(char* filename)
 
     /* READ FILE */
     kdb = K_create(K_CMT, K_ASIS);
+    
+    //DebugForce("filename: %s", kdb->k_nameptr);
+    
     while(1) {
         switch(YY_lex(yy)) {
             case YY_EOF :
+                if(cmpt) {
+                    char    asc_filename[1024];
+                    K_set_ext_asc(asc_filename, filename, K_CMT);
+                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                }
                 YY_close(yy);
                 return(kdb);
 
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, yy->yy_text);
-                KC_read_cmt(kdb, yy, name);
-                kmsg("Reading object %d : %s", ++cmpt, name);
+                rc = KC_read_cmt(kdb, yy, name);
+                if(rc == 0) cmpt++;
+                kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
             default :

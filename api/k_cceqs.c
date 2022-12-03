@@ -258,11 +258,17 @@ KDB *KE_load_asc(char* filename)
 
     /* READ FILE */
     kdb = K_create(K_EQS, K_UPPER);
+        
     while(1) {
         switch(YY_read(yy)) {
             case YY_COMMENT :
                 break;
             case YY_EOF :
+                if(cmpt) {
+                    char    asc_filename[1024];
+                    K_set_ext_asc(asc_filename, filename, K_EQS);
+                    K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
+                }
                 YY_close(yy);
                 return(kdb);
 
@@ -281,7 +287,11 @@ KDB *KE_load_asc(char* filename)
                     kerror(0, "%s : %s", name, L_error());
                     if(pos == -1) goto err;
                 }
-                kmsg("Reading object %d : %s", ++cmpt, name);
+                else {
+                    cmpt++;
+                }
+                
+                kmsg("Reading object %d : %s", cmpt, name);
                 E_free(eq);
                 break;
 
