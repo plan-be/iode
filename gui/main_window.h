@@ -17,6 +17,8 @@
 #include "menu/file/file_import_variables.h"
 #include "menu/file/file_export.h"
 
+#include "menu/file/file_new_project.h"
+
 #include "menu/workspace/workspace_high_to_low.h"
 #include "menu/workspace/workspace_low_to_high.h"
 
@@ -48,7 +50,7 @@ private:
 	QSettings* project_settings;	///< to store per project (= directory) settings
 	QSettings* user_settings;		///< to store user preferences and recently opened projects
 
-	QString rootPath;
+	QString projectPath;
 	const int MAX_RECENT_PROJECTS = 30;
 	QStringList recentProjects;
 
@@ -96,16 +98,15 @@ private:
 
 public slots:
 	// File Menu
-	void open_import_comments_dialog();
-	void open_import_variables_dialog();
-	void open_export_dialog();
-
-	// File Menu
+	void createNewProject();
 	void open_project();
 	void save_project_as();
 	void open_recent_project();
 	void saveCurrentTab();
 	void saveAllTabs();
+	void open_import_comments_dialog();
+	void open_import_variables_dialog();
+	void open_export_dialog();
 
 	// Workspace Menu
 	void clear_workspace();

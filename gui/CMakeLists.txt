@@ -99,6 +99,7 @@ set(GUI_IODE_OBJS
 )
 
 set(GUI_MENU_FILE
+    menu/file/file_new_project.ui               menu/file/file_new_project.h            menu/file/file_new_project.cpp
     menu/file/file_import_comments.ui           menu/file/file_import_comments.h        menu/file/file_import_comments.cpp
     menu/file/file_import_variables.ui          menu/file/file_import_variables.h       menu/file/file_import_variables.cpp
     menu/file/file_export.ui                    menu/file/file_export.h                 menu/file/file_export.cpp
