@@ -3,18 +3,23 @@
  *
  * IODE object file management
  * ---------------------------
- *     int K_has_ext(char* filename)                                                   indicates if a filename contains an extension.
- *     char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
- *     char *K_set_ext_asc(char* res, char* fname, int type)                           trims a filename then changes its extension to the ascii extension according to the given type).
- *     void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
- *     KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
- *     int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
- *     KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
- *     int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
- *     int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
- *     int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
- *     int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
- *     int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
+ *      char *K_add_ext(char* filename, char* ext)                                      sets the extension of a filename.
+ *      int K_get_ext(char* filename, char* ext, int max_ext_len)                       gets a filename extension.
+ *      int K_has_ext(char* filename)                                                   indicates if a filename contains an extension.
+ *      char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
+ *      char *K_set_ext_asc(char* res, char* fname, int type)                           trims a filename then changes its extension to the ascii extension according to the given type).
+ *      void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
+ *      KDB  *K_load(int ftype, FNAME fname, int no, char** objs)                       loads a IODE object file. 
+ *      int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)           retrieves infos on an IODE file: type, number of objects, SAMPLE
+ *      KDB *K_interpret(int type, char* filename): generalisation of K_load()          interprets the content of a file, ascii files included, and try to load ist content into a KDB.
+ *      int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
+ *      int K_cat(KDB* ikdb, char* filename)                                            concatenates the content of a file to an existing kdb.
+ *      int K_set_backup_on_save(int take_backup)                                       sets the backup choice before saving a kdb. 
+ *      int K_get_backup_on_save()                                                      indicates if a backup must be taken before saving a kdb. 
+ *      int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
+ *      int K_save(KDB* kdb, FNAME fname)                                               saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).
+ *      int K_save_ws(KDB* kdb)                                                         saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).
+ *      int K_setname(char* from, char* to)                                             replaces KNAMEPTR(kdb) in an IODE object file.
  */
 
 #include "iode.h"
@@ -64,10 +69,9 @@ char k_ext[][4] = {
     "xxx"
 };
 
-int K_BACKUP_ON_SAVE = 1; // Save a .??$ file before saving a WS
 
 /**
- *  Force the extension of a filename. Filename must be large enough to include the extension.
+ *  Forces the extension of a filename. Filename must be large enough to include the extension.
  *   
  *  @param [in, out]    filename    char*   source / target filename
  *  @param [in]         ext         char*   new extension
@@ -86,6 +90,39 @@ static char *K_add_ext(char* filename, char* ext)
     SCR_change_ext(buf, filename, ext); // Force the replacement extension of filename by ext (see http://xon.be/scr4/libs1/libs1172.htm)
     strcpy(filename, buf);              
     return(filename); 
+}
+
+
+/**
+ *  Gets a filename extension.
+ *   
+ *  @param [in]    filename      char*   filename
+ *  @param [out]   ext           char*   filename extension
+ *  @param [in]    max_ext_len   int     ext max length
+ *  @return                      int     ext length (0 if no extension, -1 if filename == NULL)
+ */
+int K_get_ext(char* filename, char* ext, int max_ext_len)
+{
+    int     i, len;
+
+    if(filename == 0) return(0);
+
+    len = (int)strlen(filename);
+    for(i = len - 1 ; i >= 0 ; i--) {
+        if(filename[i] == ':' || filename[i] == '!' ||        /* JMP 23-06-02 */
+           filename[i] == '.' || filename[i] == '\\' ||
+           filename[i] == '/') break;
+    }
+
+    if(ext) ext[0] = 0;
+
+    if(i >= 0 && filename[i] == '.') {
+        if(ext && max_ext_len >= len - i)    // var.ac => len = 5, i = 3
+            strcpy(ext, filename + i + 1);
+        return(len - i - 1);
+    }
+    else 
+        return(0);
 }
 
 
@@ -159,7 +196,7 @@ char *K_set_ext_asc(char* res, char* fname, int type)
 {
     strcpy(res, fname);
     K_strip(res); /* JMP 19-04-98 */
-    return(K_add_ext(res, k_ext[1 + K_OBJ + type]));
+    return(K_add_ext(res, k_ext[K_AC + type]));
 }
 
 
@@ -673,12 +710,18 @@ KDB *K_interpret(int type, char* filename)
 {
     KDB     *kdb = NULL;
     int     ftype;
+    char    ext[10];
 
     kmsg("Loading %s", filename);
     ftype = K_findtype(filename, type);
 //    printf("type=%d, ftype=%d\n", type, ftype);
-    if(ftype == -1) kdb = (*K_load_asc[type])(filename);
-
+    if(ftype == -1) { // file exists but when opened, type not recognized => test ascii contents
+        if(type >= K_CMT && type <= K_VAR && 
+            K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + K_AC]) == 0) {
+                kdb = (*K_load_asc[type])(filename);
+            }
+    }
+    
     if(kdb == NULL && type == ftype) 
         kdb = K_load(type, filename, 0, NULL); /* GB 23/01/98*/
 
@@ -833,14 +876,10 @@ fin:
 }
 
 
-/*
-    
-    If the file is an ascii file the fn_ascii function provided
-    will interpret this file into a valid db
-*/
+
 
 /**
- *  @brief Concatenates the content of a file to an existing kdb.
+ *  Concatenates the content of a file to an existing kdb.
  *  If ikdb is empty, the current ikdb filename is replaced by filename.
  *  
  *  TODO: check object types between file and ikdb.
@@ -868,6 +907,34 @@ int K_cat(KDB* ikdb, char* filename)
     else K_merge_del(ikdb, kdb, 1);
 
     return(0);
+}
+
+
+static int K_BACKUP_ON_SAVE = 1; // Save a backup file ".??$" before saving a WS
+
+/**
+ *  Sets the backup choice before saving a kdb. 
+ *  The backup file has the form "*.??$", e.g. "test.va$" for "test.var".
+ *   
+ *  @param [in] take_backup     int     0 if a backup should NOT be taken, any other value indicates that a backup is required
+ *  @return                     int     0 for no backup, -1 for backup
+ */
+int K_set_backup_on_save(int take_backup) 
+{
+    K_BACKUP_ON_SAVE = (take_backup != 0);
+    return(K_BACKUP_ON_SAVE);
+}
+
+
+/**
+ *  Indicates if a backup must be taken before saving a kdb. 
+ *  The backup file has the form "*.??$", e.g. "test.va$" for "test.var".
+ *   
+ *  @return                     int     0 for no backup, -1 for backup
+ */
+int K_get_backup_on_save() 
+{
+    return(K_BACKUP_ON_SAVE);
 }
 
 
@@ -977,7 +1044,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     strcpy(file, fname);
     K_strip(file); /* JMP 21-04-98 */
     K_add_ext(file, k_ext[KTYPE(kdb)]);
-    if(K_BACKUP_ON_SAVE) K_backup(file);     /* JMP 02-12-2022 */
+    if(K_get_backup_on_save()) K_backup(file);     /* JMP 02-12-2022 */
     fd = fopen(file, "wb+");
     if(fd == NULL) return(-1);
     setvbuf(fd, NULL, 0, 8192);
