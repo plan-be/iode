@@ -149,6 +149,8 @@ extern int K_calcvers(char *);
 extern void K_setvers(KDB* kdb, int i, int vers);
 
 /* k_objfile.c */
+extern char *K_add_ext(char* filename, char* ext);
+extern int K_get_ext(char* filename, char* ext, int max_ext_len);
 extern int K_has_ext(char* filename);
 extern char *K_set_ext(char *,char *,int );
 extern char *K_set_ext_asc(char *,char *,int );
@@ -159,6 +161,8 @@ extern KDB *K_load(int ,char *,int ,char **);
 extern KDB *K_interpret(int ,char *);
 extern int K_copy(KDB *,int ,char **,int ,char **,SAMPLE *);
 extern int K_cat(KDB *,char *);
+extern int K_set_backup_on_save(int take_backup);
+extern int K_get_backup_on_save();
 extern int K_backup(char *);
 extern int K_save(KDB *,char *);
 extern int K_save_ws(KDB *);
