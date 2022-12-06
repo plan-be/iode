@@ -161,6 +161,8 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath)
     this->project_settings_filepath = project_settings_filepath;
     settings = new QSettings(*project_settings_filepath, QSettings::IniFormat);
     loadSettings();
+
+    this->show();
 }
 
 void QIodeTabWidget::resetFilters()
