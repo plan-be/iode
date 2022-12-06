@@ -26,8 +26,8 @@
    <string>IODE</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
+   <iconset resource="../resources/iode_resource.qrc">
+    <normaloff>:/images/iode_icon.png</normaloff>:/images/iode_icon.png</iconset>
   </property>
   <property name="statusTip">
    <string/>
@@ -978,7 +978,9 @@
    <header location="global">custom_widgets/qiode_file_explorer.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/iode_resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionExit</sender>
