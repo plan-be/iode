@@ -6,6 +6,7 @@
 #include <QTabWidget>
 #include <QFileInfo>
 #include <QShortcut>
+#include <QProgressDialog>
 #include <QAbstractScrollArea>
 
 #include "utils.h"
