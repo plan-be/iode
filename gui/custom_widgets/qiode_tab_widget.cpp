@@ -82,11 +82,24 @@ void QIodeTabWidget::loadSettings()
         showTab(0);
     else
     {
+        QString projectName = QFileInfo(projectDirPath).fileName();
+        QProgressDialog progress("", "", 0, filesToLoad.size());
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setWindowTitle("Loading project " + projectName);
+        progress.setCancelButton(nullptr);
+
         // reopen all tabs (files) that were open the last time the user quitted the IODE gui
         QString filepath;
+        QString filename;
         for(int i=0; i < filesToLoad.size(); i++)
         {
             filepath = filesToLoad.at(i);
+            filename = QFileInfo(filepath).fileName();
+
+            progress.setLabelText("Loading file " + filename + "...");
+            progress.setValue(i);
+            QCoreApplication::processEvents();
+
             // tab associated with a KDB which hasn't been saved the last time the user quitted the IODE gui
             // (i.e. no filepath associated)
             if (isUnsavedKDB(filepath))
@@ -104,6 +117,7 @@ void QIodeTabWidget::loadSettings()
             else 
                 loadFile(filepath, false, true, i);
         }
+        progress.setValue(filesToLoad.size());
         
         // display the tab that was displayed the last time the user quitted the IODE gui
         showTab(index);
