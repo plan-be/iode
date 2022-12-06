@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="images">
+    <file>iode_icon.png</file>
+    <file>iode_icon.svg</file>
+    <file>iode_splash_screen.png</file>
+    <file>iode_splash_screen.svg</file>
+  </qresource>
+</RCC>
