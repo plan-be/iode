@@ -23,13 +23,9 @@ KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode
     {
         char** c_names = filter_kdb_names(iode_type, pattern);
         if (kdb_type == KDB_SHALLOW_COPY)
-        {
             local_kdb = K_quick_refer(K_WS[iode_type], c_names);
-        } 
         else
-        {
-            local_kdb = hard_copy_kdb(K_WS[iode_type], c_names);
-        }   
+            local_kdb = hard_copy_kdb(K_WS[iode_type], c_names); 
         SW_nfree(c_names);
         if (local_kdb == NULL)
         {
@@ -61,6 +57,8 @@ int KDBAbstract::rename(const std::string& old_name, const std::string& new_name
 {
     if (iode_type == I_EQUATIONS) throw IodeExceptionFunction("Cannot rename an equation",  
         "The name of an equation is always its endogeneous variable");
+
+    if (count() == 0) return -1;
 
     check_name(new_name, iode_type);
 
@@ -114,6 +112,7 @@ void KDBAbstract::remove(const std::string& name)
 {
     // throw exception if object with passed name does not exist
     int pos = get_position(name);
+    if (pos < 0) return;
 
     switch (kdb_type)
     {
@@ -123,7 +122,7 @@ void KDBAbstract::remove(const std::string& name)
     case KDB_LOCAL:
         K_del(local_kdb, pos);
         break;
-    case KDB_SHALLOW_COPY:
+    case KDB_SHALLOW_COPY: 
         char* c_name;
         // first delete in shallow copy KDB
         K_del_entry(local_kdb, pos);
@@ -167,10 +166,13 @@ void KDBAbstract::dump(std::string& filepath)
 
 void KDBAbstract::clear()
 {
+    KDB* kdb = get_KDB();
+    if (kdb == NULL) return;
+
     int res;
     res = B_WsDescr("", iode_type);
     res += B_WsName("", iode_type);
 
-    res += K_clear(get_KDB());
+    res += K_clear(kdb);
     if (res != EXIT_SUCCESS) throw IodeExceptionFunction("Cannot clear " + iode_type_name + "s", "Unknown");
 }

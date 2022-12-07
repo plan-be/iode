@@ -36,31 +36,50 @@ public:
 
     int get_iode_type() const { return iode_type; }
 
-    int count() const { return get_KDB()->k_nb; }
+    int count() const 
+    { 
+        KDB* kdb = get_KDB();
+        if (kdb)
+            return kdb->k_nb;
+        else
+            return 0;
+    }
 
     KDB* get_KDB() const
     {
-        if (local_kdb) return local_kdb;
-        if (K_WS[iode_type] == NULL) throw IodeExceptionFunction("Cannot get KDB of " + iode_type_name + "s",  
-            "There is currently no " + iode_type_name + "s database in memory.");
-        return K_WS[iode_type];
+        if (local_kdb) 
+            return local_kdb;
+        else
+            return K_WS[iode_type];
     }
 
-    bool is_global_kdb() const { return local_kdb == nullptr; }
+    bool is_global_kdb() const { return local_kdb == NULL; }
 
     bool is_shallow_copy() const { return kdb_type == KDB_SHALLOW_COPY; }
 
     bool is_local_kdb() const { return kdb_type == KDB_LOCAL; }
 
-    std::string get_filename() const { return std::string(K_get_kdb_nameptr(get_KDB())); }
+    std::string get_filename() const 
+    {
+        KDB* kdb = get_KDB();
+        if (kdb) 
+            return std::string(K_get_kdb_nameptr(kdb)); 
+        else
+            return "";
+    }
 
-    void set_filename(const std::string& filename) { set_kdb_filename(get_KDB(), filename); }
+    void set_filename(const std::string& filename) 
+    { 
+        KDB* kdb = get_KDB();
+        if (kdb) set_kdb_filename(kdb, filename); 
+    }
 
     int get_position(const std::string& name) const
     {
         check_name(name, iode_type);
         KDB* kdb = get_KDB();
-        int pos = K_find(kdb, to_char_array(name));
+        int pos = -1;
+        if (kdb) pos = K_find(kdb, to_char_array(name));
         if (pos < 0) throw IodeExceptionFunction("Cannot get position of " + iode_type_name + " named " + name,  
             iode_type_name + " with name " + name + " does not exist.");
         return pos;
@@ -71,6 +90,7 @@ public:
     std::string get_name(const int pos) const 
     {
         KDB* kdb = get_KDB();
+        if (kdb == NULL) return "";
         if (pos < 0 || pos > kdb->k_nb) 
             throw IodeExceptionFunction("Cannot get name of " + iode_type_name + " at position " + std::to_string(pos),  
                                         iode_type_name + " at position " + std::to_string(pos) + " does not exist.");
@@ -99,7 +119,14 @@ public:
 
     int rename(const std::string& old_name, const std::string& new_name);
 
-    bool contains(const std::string& name) { return K_find(get_KDB(), to_char_array(name)) >= 0; }
+    bool contains(const std::string& name) 
+    { 
+        KDB* kdb = get_KDB();
+        if (kdb)
+            return K_find(kdb, to_char_array(name)) >= 0; 
+        else
+            return false;
+    }
 
     // delete
 
