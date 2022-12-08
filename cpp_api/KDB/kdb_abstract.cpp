@@ -150,6 +150,24 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
     if (res < 0) throw IodeExceptionFunction("Cannot merge two databases", "Unknown");
 }
 
+// TODO JMP: please provide input values to test B_WsCopy()
+void KDBAbstract::copy_into(const std::string& input_file, const std::string objects_names)
+{
+    std::string buf = input_file + " ";
+    if(kdb_type == I_VARIABLES)
+    {
+        Sample smpl = KSMPL(get_KDB());
+        std::string from = smpl.start_period().to_string();
+        std::string to = smpl.end_period().to_string();
+        buf += from + " " + to + " ";
+    }
+    buf += objects_names;
+
+    int res = B_WsCopy(const_cast<char*>(buf.c_str()), kdb_type);
+
+    if (res < 0) B_display_last_error();
+}
+
 void KDBAbstract::dump(std::string& filepath)
 {
     if (count() == 0) return;

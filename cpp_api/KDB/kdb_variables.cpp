@@ -198,3 +198,29 @@ Period KDBVariables::get_period(const int t) const
     PERIOD period = KSMPL(get_KDB())->s_p1;
     return Period(&period).shift(t);
 }
+
+void KDBVariables::copy_into(const std::string& input_file, const std::string& from, const std::string& to, 
+	const std::string objects_names)
+{
+	    std::string buf = input_file + " ";
+
+		Sample smpl = get_sample();
+		if (!from.empty()) buf += smpl.start_period().to_string() + " ";
+		if (!to.empty()) buf += smpl.end_period().to_string() + " ";
+        // thtrow error if wrong samples
+        Sample copy_sample(from, to);
+
+        buf += objects_names;
+
+        int res = B_WsCopy(const_cast<char*>(buf.c_str()), I_VARIABLES);
+
+        if (res < 0) B_display_last_error();
+}
+
+void KDBVariables::copy_into(const std::string& input_file, const Period& from, const Period& to, 
+	const std::string objects_names)
+{
+	std::string s_from = (from == nullptr) ? "" : from.to_string();
+	std::string s_to = (to == nullptr) ? "" : to.to_string();
+	copy_into(input_file, s_from, s_to, objects_names);
+}
