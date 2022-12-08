@@ -340,6 +340,16 @@ void MainWindow::clear_workspace()
     }
 }
 
+void MainWindow::open_copy_into_workspace_dialog()
+{
+    QIodeMenuWorkspaceCopyInto dialog(*project_settings_filepath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        tabWidget_IODE_objs->resetFilters();
+        completer->updateIodeOjectsListNames();
+    }
+}
+
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
