@@ -141,6 +141,16 @@ public:
 
     void copy_into(const std::string& input_file, const std::string objects_names = "");
 
+    /**
+     *  Syntax: $WsMerge<type> filename
+     *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
+     *  
+     *  @see B_WsLoad() for the syntax of that group of functions.
+     *  
+     *  @see https://iode.plan.be/doku.php?id=wsmerge
+     */
+    void merge_into(std::string& input_file);
+
     void dump(std::string& filepath);
 
     void clear();
