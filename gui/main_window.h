@@ -26,6 +26,7 @@
 #include "menu/file/file_new_project.h"
 
 #include "menu/workspace/workspace_copy_into.h"
+#include "menu/workspace/workspace_merge_into.h"
 #include "menu/workspace/workspace_high_to_low.h"
 #include "menu/workspace/workspace_low_to_high.h"
 
@@ -136,6 +137,7 @@ public slots:
 	// Workspace Menu
 	void clear_workspace();
 	void open_copy_into_workspace_dialog();
+	void open_merge_into_workspace_dialog();
 	void open_high_to_low_dialog();
 	void open_low_to_high_dialog();
 

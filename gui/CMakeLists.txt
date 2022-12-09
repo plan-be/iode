@@ -115,6 +115,7 @@ set(GUI_MENU_FILE
 
 set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_copy_into.ui       menu/workspace/workspace_copy_into.h    menu/workspace/workspace_copy_into.cpp
+    menu/workspace/workspace_merge_into.ui      menu/workspace/workspace_merge_into.h   menu/workspace/workspace_merge_into.cpp
     menu/workspace/workspace_high_to_low.ui     menu/workspace/workspace_high_to_low.h  menu/workspace/workspace_high_to_low.cpp
     menu/workspace/workspace_low_to_high.ui     menu/workspace/workspace_low_to_high.h  menu/workspace/workspace_low_to_high.cpp
 )
