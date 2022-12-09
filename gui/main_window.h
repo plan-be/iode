@@ -15,6 +15,9 @@
 #include "ui_main_window.h"
 
 #include "utils.h"
+
+#include "iode_objs/edit/edit_vars_sample.h"
+
 #include "plot/plot.h"
 
 #include "custom_widgets/qiode_completer.h"
@@ -140,6 +143,7 @@ public slots:
 	void open_copy_into_workspace_dialog();
 	void open_merge_into_workspace_dialog();
 	void open_change_workspace_descriptions_dialog();
+	void open_change_variables_sample_dialog();
 	void open_high_to_low_dialog();
 	void open_low_to_high_dialog();
 
