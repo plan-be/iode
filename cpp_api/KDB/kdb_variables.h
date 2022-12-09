@@ -71,6 +71,44 @@ public:
     
     void copy_into(const std::string& input_file, const Period& from = nullptr, const Period& to = nullptr, 
         const std::string objects_names = "");
+
+    /**
+     *  Syntax: $WsExtrapolate [method] from to [variable list]
+     *          where 
+     *              method : 0 ... 6
+     *                  0 = Y := Y[-1], if Y null or NA
+     *                  1 = Y := Y[-1], always
+     *                  2 = Y := extrapolation, if Y null or NA
+     *                  3 = Y := extrapolation, always
+     *                  4 = Y := unchanged, always
+     *                  5 = Y := Y[-1], if Y is NA
+     *                  6 = Y := extrapolation, if Y is NA
+     *              from, to := periods
+     *
+     *  
+     *  @see https://iode.plan.be/doku.php?id=wsextrapolate
+     */
+    void extrapolate(const EnumSimulationInitialization method, const std::string& from, 
+        const std::string& to, const std::string& variables_list="");
+
+    /**
+     *  Syntax: $WsExtrapolate [method] from to [variable list]
+     *          where 
+     *              method : 0 ... 6
+     *                  0 = Y := Y[-1], if Y null or NA
+     *                  1 = Y := Y[-1], always
+     *                  2 = Y := extrapolation, if Y null or NA
+     *                  3 = Y := extrapolation, always
+     *                  4 = Y := unchanged, always
+     *                  5 = Y := Y[-1], if Y is NA
+     *                  6 = Y := extrapolation, if Y is NA
+     *              from, to := periods
+     *
+     *  
+     *  @see https://iode.plan.be/doku.php?id=wsextrapolate
+     */
+    void extrapolate(const EnumSimulationInitialization method, const Period& from, 
+        const Period& to, const std::string& variables_list="");
 };
 
 /**
