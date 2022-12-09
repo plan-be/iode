@@ -224,3 +224,35 @@ void KDBVariables::copy_into(const std::string& input_file, const Period& from, 
 	std::string s_to = (to == nullptr) ? "" : to.to_string();
 	copy_into(input_file, s_from, s_to, objects_names);
 }
+
+// TODO JMP : please provide input for testing KV_extrapolate
+void KDBVariables::extrapolate(const EnumSimulationInitialization method, const std::string& from, 
+	const std::string& to, const std::string& variables_list)
+{
+	KDB* kdb = get_KDB();
+	if (kdb == NULL) return;
+
+	Sample sample(from, to);
+
+	char* c_variables_list = const_cast<char*>(variables_list.c_str());
+	char** vars = (variables_list.empty()) ? NULL : B_ainit_chk(c_variables_list, NULL, 0);
+
+	int res = KV_extrapolate(kdb, (int) method, sample.c_sample, vars);
+	SCR_free_tbl((unsigned char**) vars);
+
+	if (res < 0)
+	{
+		IodeExceptionFunction error("Cannot extrapolate variables");
+		error.add_argument("method", v_simulation_initialization[method]);
+		error.add_argument("from", from);
+		error.add_argument("to", to);
+		error.add_argument("variables_list", variables_list);
+		throw error;
+	}
+}
+
+void KDBVariables::extrapolate(const EnumSimulationInitialization method, const Period& from, 
+	const Period& to, const std::string& variables_list)
+{
+	extrapolate(method, from.to_string(), to.to_string(), variables_list);
+}
