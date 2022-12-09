@@ -31,6 +31,7 @@
 #include "menu/workspace/workspace_copy_into.h"
 #include "menu/workspace/workspace_merge_into.h"
 #include "menu/workspace/workspace_describe.h"
+#include "menu/workspace/workspace_extrapolate_variables.h"
 #include "menu/workspace/workspace_high_to_low.h"
 #include "menu/workspace/workspace_low_to_high.h"
 
@@ -144,6 +145,7 @@ public slots:
 	void open_merge_into_workspace_dialog();
 	void open_change_workspace_descriptions_dialog();
 	void open_change_variables_sample_dialog();
+	void open_extrapolate_variables_dialog();
 	void open_high_to_low_dialog();
 	void open_low_to_high_dialog();
 

@@ -184,29 +184,6 @@ const static std::array<std::string, 7> v_simulation_initialization
 };
 
 
-enum EnumSimulationInitialization
-{
-    IV_INIT_TM1 = KV_INIT_TM1,
-    IV_INIT_TM1_A = KV_INIT_TM1_A,
-    IV_INIT_EXTRA = KV_INIT_EXTRA,
-    IV_INIT_EXTRA_A = KV_INIT_EXTRA_A,
-    IV_INIT_ASIS = KV_INIT_ASIS,
-    IV_INIT_TM1_NA = KV_INIT_TM1_NA,
-    IV_INIT_EXTRA_NA = KV_INIT_EXTRA_NA
-};
-
-const static std::array<std::string, 7> v_simulation_initialization
-{
-    "Y := Y[-1], if Y null or NA",                  // TM1
-    "Y := Y[-1], always",                           // TM1_A
-    "Y := extrapolation, if Y null or NA",          // EXTRA    -> Y := fn(Y[-1], Y[-2]), 
-    "Y := extrapolation, always"                    // EXTRA_A  -> Y := fn(Y[-1], Y[-3])
-    "Y unchanged",                                  // ASIS
-    "Y := Y[-1], if Y = NA",                        // TM1_NA
-    "Y := extrapolation, if Y = NA",                // EXTRA_NA -> Y := fn(Y[-1], Y[-3])
-};
-
-
 enum EnumIodeExportFormat
 {
     I_EXP_FMT_CSV,

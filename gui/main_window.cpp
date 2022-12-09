@@ -372,6 +372,17 @@ void MainWindow::open_change_variables_sample_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_extrapolate_variables_dialog()
+{
+    QIodeMenuWorkspaceExtrapolateVariables dialog(*project_settings_filepath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
+        // update current tab if needed
+        tabWidget_IODE_objs->showTab();
+    }
+}
+
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
