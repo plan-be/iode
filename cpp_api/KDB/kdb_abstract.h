@@ -75,6 +75,32 @@ public:
         if (kdb) set_kdb_filename(kdb, filename); 
     }
 
+    std::string get_description() const 
+    { 
+        KDB* kdb = get_KDB();
+        if (kdb == NULL) return "";
+
+        return std::string(kdb->k_desc); 
+    }
+
+    /**
+     *  Syntax: $WsDescr<type> free text
+     *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
+     *  
+     *  @see B_WsLoad() for the syntax of that group of functions.
+     *  
+     *  @see https://iode.plan.be/doku.php?id=wsdescr
+     */
+    void set_description(const std::string& description)
+    {
+        KDB* kdb = get_KDB();
+        if (kdb == NULL) return ;
+
+        size_t size = description.size() + 1;
+        if (size > K_MAX_DESC) size = (size_t) K_MAX_DESC;
+        strncpy(kdb->k_desc, description.c_str(), size);
+    }
+
     int get_position(const std::string& name) const
     {
         check_name(name, iode_type);
