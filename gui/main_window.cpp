@@ -366,6 +366,12 @@ void MainWindow::open_change_workspace_descriptions_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_change_variables_sample_dialog()
+{
+    QIodeEditVarsSample dialog(this);
+    dialog.exec();
+}
+
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
