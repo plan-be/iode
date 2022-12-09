@@ -168,6 +168,19 @@ void KDBAbstract::copy_into(const std::string& input_file, const std::string obj
     if (res < 0) B_display_last_error();
 }
 
+// TODO JMP: please provide input values to test B_WsMerge()
+void KDBAbstract::merge_into(std::string& input_file)
+{
+    KDB* kdb = get_KDB();
+    if (kdb == NULL) return;
+
+    input_file = check_filepath(input_file, iode_type, "merge_into", true);
+    
+    int res = K_cat(kdb, const_cast<char*>(input_file.c_str()));
+    if (res < 0) throw IodeExceptionFunction("Cannot merge content of file " + input_file + 
+        " in the " + vIodeTypes[iode_type] + " database");
+}
+
 void KDBAbstract::dump(std::string& filepath)
 {
     if (count() == 0) return;
