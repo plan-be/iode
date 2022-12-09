@@ -360,6 +360,12 @@ void MainWindow::open_merge_into_workspace_dialog()
     }
 }
 
+void MainWindow::open_change_workspace_descriptions_dialog()
+{
+    QIodeMenuWorkspaceDescribe dialog(*project_settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
