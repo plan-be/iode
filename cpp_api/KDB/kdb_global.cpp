@@ -31,6 +31,13 @@ void clear_global_kdb(EnumIodeType iode_type)
         throw IodeExceptionFunction("Cannot clear " + vIodeTypes[iode_type] + "s database", "Unknown");
 }
 
+bool is_global_kdb_loaded(const EnumIodeType iodeType) 
+{ 
+    if (K_WS[iodeType] == NULL) return false;
+    if (K_WS[iodeType]->k_nb == 0) return false;
+    return true; 
+}
+
 /**
 * Warning: renturned char** array must be freed by the caller
 */

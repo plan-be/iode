@@ -30,6 +30,15 @@ void save_global_kdb(EnumIodeType iode_type, std::string& filepath);
 
 void clear_global_kdb(EnumIodeType iode_type);
 
+/**
+ * @brief check if data for IODE objects of type iodeType has been loaded in global K_WS 
+ * 
+ * @param iodeType EnumIodeType type of Iode object.
+ * 
+ * @return bool Wether or not K_WS corresponding to iodeType is empty.
+ */
+bool is_global_kdb_loaded(const EnumIodeType iodeType);
+
 char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern);
 
 // QUESTION FOR JMP: is there a K function that already create a hard copy of subset of a KDB ?
