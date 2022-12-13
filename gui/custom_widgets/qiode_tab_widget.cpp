@@ -395,60 +395,86 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
     int index;
     QWidget* mainwin = get_main_window_ptr();
     
-    if(filepath.isEmpty()) 
-        return -1;
-    else
+	if(filepath.isEmpty())
     {
-        QFileInfo fileInfo(filepath);
-        if (!fileInfo.exists())
+        QMessageBox::warning(mainwin, "Warning", "Cannot load file because given filepath is empty");
+        return -1;
+    }
+
+    QFileInfo fileInfo(filepath);
+    QString fullPath = fileInfo.absoluteFilePath();
+
+	if (!fileInfo.exists())
+	{
+		QMessageBox::critical(mainwin, "Error", "File " + fullPath + " has not been found!");
+		return -1;
+	}
+
+	if (fileInfo.isDir())
+	{ 
+		QMessageBox::warning(mainwin, "Warning", "Cannot load " + fullPath + " as it is not a file but a directory");
+		return -1;
+	}
+
+    std::string full_path = fullPath.toStdString();
+    EnumIodeFile fileType = get_iode_file_type(full_path);
+
+    if (fileType == I_ANY_FILE) return -1;
+
+    try
+    {
+        if (fileType <= I_VARIABLES_FILE)
         {
-            QMessageBox::critical(mainwin, "Error", "File " + fileInfo.absoluteFilePath() + " has not been found!");
-            return -1;
+        bool success;
+        switch (fileType)
+        {
+            case I_COMMENTS_FILE:
+                success = tabComments->load(fullPath, forceOverwrite);
+                if (success) tabComments->resetFilter();
+                break;
+            case I_EQUATIONS_FILE:
+                success = tabEquations->load(fullPath, forceOverwrite);
+                if (success) tabEquations->resetFilter();
+                break;
+            case I_IDENTITIES_FILE:
+                success = tabIdentites->load(fullPath, forceOverwrite);
+                if (success) tabIdentites->resetFilter();
+                break;
+            case I_LISTS_FILE:
+                success = tabLists->load(fullPath, forceOverwrite);
+                if (success) tabLists->resetFilter();
+                break;
+            case I_SCALARS_FILE:
+                success = tabScalars->load(fullPath, forceOverwrite);
+                if (success) tabScalars->resetFilter();
+                break;
+            case I_TABLES_FILE:
+                success = tabTables->load(fullPath, forceOverwrite);
+                if (success) tabTables->resetFilter();
+                break;
+            case I_VARIABLES_FILE:
+                success = tabVariables->load(fullPath, forceOverwrite);
+                if (success) tabVariables->resetFilter();
+                break;
+            default:
+                success = false;
+                break;
+            }
+            if (!success) return -1;
+
+            index = updateObjectTab((EnumIodeType) fileType, moveToPosition);
         }
         else
-        {
-            try
-            {
-                QString fullPath = fileInfo.absoluteFilePath();
-                // Guess (Iode) file type
-                QString filename = fileInfo.fileName();
-                EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
-                // IODE objects
-                if (fileType == I_DIRECTORY)
-                { 
-                    QMessageBox::warning(mainwin, "Warning", "Cannot load " + fullPath + " as it is not a file but a directory");
-                    return index;
-                }
-                else if (fileType <= I_VARIABLES_FILE)
-                {
-                    const EnumIodeType iodeType = (EnumIodeType) fileType;
-                    // check if correponding K_WS is not empty (except if force overwrite -> loadSettings())
-                    if(!forceOverwrite && is_iode_objs_loaded(iodeType))
-                    {
-                        QString iodeTypeName = QString::fromStdString(vIodeTypes[fileType]);
-                        QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", "There are " + 
-                            iodeTypeName + " already loaded. Would like to override " + iodeTypeName + " ?", 
-                            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-                        if(answer == QMessageBox::No) return index;
-                    }
-                    // load Iode file
-                    std::string full_path = fullPath.toStdString();
-                    load_global_kdb(iodeType, full_path);
-                    index = updateObjectTab(iodeType, moveToPosition);
-                }
-                // Prepare new tab (or simply return corresponding index if file already open)
-                else
-                    index = addNewTab(fileType, fileInfo);
+            index = addNewTab(fileType, fileInfo);
 
-                if (displayTab) showTab(index);
-                return index;
-            }
-            catch (const std::exception& e)
-            {
-                QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
-                return -1;
-            }
-        }
+        if (index >= 0 && displayTab) showTab(index);
+
+        return index;
+    }
+    catch (const std::exception& e)
+    {
+        QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
+        return -1;
     }
 }
 

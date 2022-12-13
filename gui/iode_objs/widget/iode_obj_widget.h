@@ -39,6 +39,7 @@ public:
     EnumIodeFile getFiletype() const { return fileType; }
 
     virtual void update() = 0;
+    virtual bool load(const QString& filepath, const bool forceOverwrite) = 0;
     virtual QString save() = 0;
     virtual QString saveAs() = 0;
 };
@@ -106,6 +107,7 @@ public:
     virtual void clearKDB() = 0;
     virtual void resetFilter() = 0;
     virtual void update() = 0;
+    virtual bool load(const QString& filepath, const bool forceOverwrite) = 0;
     virtual QString save() = 0;
     virtual QString saveAs() = 0;
 };
@@ -186,6 +188,11 @@ public:
     {
         this->projectDir = projectDir;
         clearKDB();
+    }
+
+    bool load(const QString& filepath, const bool forceOverwrite)
+    {
+        return objmodel->load(filepath, forceOverwrite);
     }
 
     QString save()

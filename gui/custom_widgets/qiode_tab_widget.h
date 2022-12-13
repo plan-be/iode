@@ -69,20 +69,6 @@ class QIodeTabWidget: public QTabWidget
 
 private:
     /**
-     * @brief check if data for IODE objects of type iodeType has been loaded in global K_WS 
-     * 
-     * @param iodeType EnumIodeType type of Iode object.
-     * 
-     * @return bool Wether or not K_WS corresponding to iodeType is empty.
-     */
-    bool is_iode_objs_loaded(const EnumIodeType iodeType) 
-    { 
-        if (K_WS[iodeType] == NULL) return false;
-        if (K_WS[iodeType]->k_nb == 0) return false;
-        return true; 
-    }
-
-    /**
      * @brief build list of open files (= tabs)
      * 
      * @return QStringList list of open files

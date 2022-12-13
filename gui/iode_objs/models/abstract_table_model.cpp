@@ -110,6 +110,40 @@ void IODEAbstractTableModel<K>::filter(const QString& pattern)
 	}
 }
 
+
+template <class K>
+bool IODEAbstractTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
+{
+	QWidget* mainwin = get_main_window_ptr();
+
+	int type_ = kdb->get_iode_type();
+	if (type_ < 0) return false;
+
+	EnumIodeType iodeType = (EnumIodeType) type_;
+	try
+	{
+		std::string s_filepath = filepath.toStdString();
+		s_filepath = check_filepath(s_filepath, (EnumIodeFile) iodeType, "load file", true);
+
+		if(!forceOverwrite && is_global_kdb_loaded(iodeType))
+		{
+			QString iodeTypeName = QString::fromStdString(vIodeTypes[iodeType]);
+			QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", "There are " + 
+				iodeTypeName + " already loaded. Would like to override " + iodeTypeName + " ?", 
+				QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+			if(answer == QMessageBox::No) return false;
+		}
+		// load Iode file
+		load_global_kdb(iodeType, s_filepath);
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
+		return false;
+	}
+}
+
 template <class K>
 QString IODEAbstractTableModel<K>::save(const QDir& projectDir, const QString& filepath)
 {
@@ -131,7 +165,7 @@ QString IODEAbstractTableModel<K>::save(const QDir& projectDir, const QString& f
 			std_filepath = filepath.toStdString();
 		}
 		
-		std_filepath = check_filepath(std_filepath, iodeType, "tab " + vIodeTypes[iodeType], false);
+		std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "tab " + vIodeTypes[iodeType], false);
 
 		QFileInfo fileInfo(QString::fromStdString(std_filepath));
 		QString fullPath = fileInfo.absoluteFilePath();
