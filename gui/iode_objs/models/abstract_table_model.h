@@ -61,6 +61,8 @@ public:
 
 	void clearKDB() { kdb->clear(); }
 
+	bool load(const QString& filepath, const bool forceOverwrite);
+
 	QString save(const QDir& projectDir, const QString& filepath="");
 
 	QString saveAs(const QDir& projectDir);
