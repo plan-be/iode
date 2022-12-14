@@ -443,7 +443,43 @@ void QIodeFileExplorer::rename()
 void QIodeFileExplorer::remove()
 {
     QList<SystemItem> itemsToDelete = extractListOfItems();
-    foreach(SystemItem item, itemsToDelete) item.remove();
+    if(itemsToDelete.count() > 0)
+    {
+        QString msg = "Are you sure to delete %1 ?";
+        QString arg;
+        QMessageBox::StandardButton answer;
+        if(itemsToDelete.count() == 1)
+        {
+            SystemItem item = itemsToDelete[0];
+            QString filename = item.fileInfo().fileName();
+            arg = item.isDir() ? "the directory '" + filename + "' and its content" : "the file '" + filename + "'";
+            answer = QMessageBox::warning(get_main_window_ptr(), "Warning", msg.arg(arg), QMessageBox::Yes | QMessageBox::No);
+            if(answer == QMessageBox::Yes) item.remove();
+        }
+        else
+        {
+            bool at_least_one_file = false;
+            bool at_least_one_directory = false;
+            QStringList filenames;
+            foreach(SystemItem item, itemsToDelete)
+            {
+                filenames << item.fileInfo().fileName();
+                if(item.isFile()) at_least_one_file = true;
+                if(item.isDir()) at_least_one_directory = true;
+            }
+            arg = "the following " + QString::number(filenames.count()) + " ";
+            if(at_least_one_file) arg+= "files";
+            if(at_least_one_file && at_least_one_directory) arg += "/";
+            if(at_least_one_directory) arg += "directories and their content";
+            arg += ":\n\n";
+            arg += filenames.join("\n");
+            arg += "\n\n";
+
+            answer = QMessageBox::warning(get_main_window_ptr(), "Warning", msg.arg(arg), QMessageBox::Yes | QMessageBox::No);
+            if(answer == QMessageBox::Yes) foreach(SystemItem item, itemsToDelete) item.remove();
+        }
+    }
+    selectionModel()->clearSelection();
     cleanupSlot();
 }
 
