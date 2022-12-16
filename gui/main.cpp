@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
     QCoreApplication::setApplicationName("IODE");
 
+    IodeInit();
     gui_assign_super_API();
 
     // For the path given in pixmap, see "The Qt Resource System"
@@ -23,8 +24,15 @@ int main(int argc, char* argv[])
     splash.show();
     app.processEvents();
 
-    MainWindow main_window;
-    main_window.show();
-    splash.finish(&main_window);
-    return app.exec();
+    MainWindow* main_window = new MainWindow();
+    main_window->show();
+    splash.finish(main_window);
+    int res = app.exec();
+
+    // WARNING: we need to call IodeEnd() AFTER the destructor of MainWindow 
+    //          to avoid heap-use-after-free error
+    delete main_window;
+    IodeEnd();
+
+    return res;
 }
