@@ -36,13 +36,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     // or to open an existing folder containing reports and/or KDB files as project
     if (projectPath.isEmpty())
     {
-        QMessageBox::infoprmation(this, "IODE interface", 
+        QMessageBox::information(this, "IODE interface", 
             QString("<p align='center'>First time with the IODE interface ?<br><br>") + 
             "Please gjec the File menu to either create a new project folder or to open an folder containg " + 
             "reports and/or IODE database files.</p>" + 
             "<p align='left'>To open file(s) from the file tree (left panel):<br>" + 
             "- double click on a file,<br>" +
-            "- select several with CTRL and then press ENTER.</p>");
+            "- select several files with CTRL and then press ENTER.</p>");
         treeView_file_explorer->hide();
         tabWidget_IODE_objs->hide();
         dockWidget_file_explorer->hide();
@@ -54,8 +54,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     {
         QMessageBox::information(this, "IODE interface", 
             QString("<p align='center'>First time with the IODE interface ?<br><br>") + 
-            "Please go the File menu to either create a new project folder or to open an existing folder containg " + 
-            "reports and/or IODE database files.</p>");
+            "Please go the File menu to either create a new project folder or to open an folder containg " + 
+            "reports and/or IODE database files.</p>" + 
+            "<p align='left'>To open file(s) from the file tree (left panel):<br>" + 
+            "- double click on a file,<br>" +
+            "- select several files with CTRL and then press ENTER.</p>");
         treeView_file_explorer->hide();
         tabWidget_IODE_objs->hide();
         dockWidget_file_explorer->hide();
