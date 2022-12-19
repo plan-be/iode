@@ -34,6 +34,7 @@
  *          (by reading list of files in the proejct settings file .ini).
  *        - Users are allowed to close tabs if they represent a report or a text files (i.e. not an IODE objects type).
  *        - Users are allowed to move tabs.
+ *        - Open files with corresponding application (.xlsx with Excel, ...)
  *        - CTRL + S on a tab saves its content.
  *        - CTRL + SHIFT + S saves all tabs content.
  *        - CTRL + D on a KDB tab clears the corresponding KDB.
