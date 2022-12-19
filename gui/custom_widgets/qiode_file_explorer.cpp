@@ -7,18 +7,6 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     fileSystemModel = new QFileSystemModel(this);
     proxyModel->setSourceModel(fileSystemModel);
 
-    // view only files with extension listed in C++ API 
-    QStringList filters;
-    IodeFileExtension file_ext;
-    for (int i=0; i <= I_REPORTS_FILE; i++)
-    {
-        file_ext = vFileExtensions[i];
-        filters << "*" + QString::fromStdString(file_ext.ext);
-        if (file_ext.ascii != "") filters << "*" + QString::fromStdString(file_ext.ascii);
-    }
-    fileSystemModel->setNameFilters(filters);
-    fileSystemModel->setNameFilterDisables(false);
-
     // set model editable
     fileSystemModel->setReadOnly(false);
 
