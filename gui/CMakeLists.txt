@@ -120,6 +120,7 @@ set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_extrapolate_variables.ui   menu/workspace/workspace_extrapolate_variables.h    menu/workspace/workspace_extrapolate_variables.cpp
     menu/workspace/workspace_high_to_low.ui             menu/workspace/workspace_high_to_low.h              menu/workspace/workspace_high_to_low.cpp
     menu/workspace/workspace_low_to_high.ui             menu/workspace/workspace_low_to_high.h              menu/workspace/workspace_low_to_high.cpp
+    menu/workspace/workspace_seasonal_adjustment.ui     menu/workspace/workspace_seasonal_adjustment.h      menu/workspace/workspace_seasonal_adjustment.cpp
 )
 
 set(GUI_MENU_COMPUTE
