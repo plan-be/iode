@@ -36,8 +36,15 @@ public:
         if(!projectIndex.isValid()) return false;
         QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
         // hide all folders at the same level of the project directory
-        if(sourceParent == projectIndex.parent()) return index == projectIndex;
-        else return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+        if(sourceParent == projectIndex.parent()) 
+            return index == projectIndex;
+        else
+        {   QFileInfo file_info = static_cast<QFileSystemModel*>(sourceModel())->fileInfo(index);
+            if (file_info.suffix() == "ini") 
+                return false;
+            else
+                return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+        }
     }
 
     QModelIndex index(const QString &path, int column = 0) const
