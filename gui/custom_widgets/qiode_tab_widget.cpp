@@ -346,9 +346,6 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
     case I_LOGS_FILE:
         index = addTextTab(fileInfo);
         break;
-    case I_SETTINGS_FILE:
-        index = addTextTab(fileInfo);
-        break;
     default:
         if (fileInfo.suffix() == "txt") index = addTextTab(fileInfo);
         else QMessageBox::information(mainwin, "INFORMATION", "Cannot load file " + fileInfo.fileName() + ".\n" +
