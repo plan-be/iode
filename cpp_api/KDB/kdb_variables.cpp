@@ -264,7 +264,7 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 
 	std::string args;
 
-	input_file = check_filepath(input_file, I_VARIABLES, "seasonal_adjustment", true);
+	input_file = check_filepath(input_file, (EnumIodeFile) I_VARIABLES, "seasonal_adjustment", true);
 	args = input_file + " "; 
 
 	if (series.empty()) 

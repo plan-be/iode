@@ -397,6 +397,12 @@ void MainWindow::open_low_to_high_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_seasonal_adjustment_dialog()
+{
+    QIodeMenuWorkspaceSeasonalAdjustment dialog(*project_settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::open_compute_identities_dialog()
 {
     QIodeMenuComputeIdentities dialog(*project_settings_filepath, this);
