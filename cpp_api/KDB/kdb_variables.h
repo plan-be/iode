@@ -109,6 +109,15 @@ public:
      */
     void extrapolate(const EnumSimulationInitialization method, const Period& from, 
         const Period& to, const std::string& variables_list="");
+
+    // TODO JMP: please provide input for unit test
+    /**
+     * @brief $WsSeasAdj Filename VarList Eps
+     * 
+     * @see https://iode.plan.be/doku.php?id=wsseasonadj and
+     *      https://iode.plan.be/doku.php?id=wsseasadj 
+     */
+    void seasonal_adjustment(std::string& input_file, const std::string& series, const double eps_test);
 };
 
 /**
