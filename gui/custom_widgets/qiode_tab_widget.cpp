@@ -347,9 +347,11 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
         index = addTextTab(fileInfo);
         break;
     default:
-        if (fileInfo.suffix() == "txt") index = addTextTab(fileInfo);
-        else QMessageBox::information(mainwin, "INFORMATION", "Cannot load file " + fileInfo.fileName() + ".\n" +
-                "Loading of files with extension " + fileInfo.suffix() + " not (yet) implemented.");
+        if (fileInfo.suffix() == "txt" || fileInfo.suffix() == "a2m") 
+            index = addTextTab(fileInfo);
+        else 
+            QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
+            index = -1;
     }
     if (index < 0) return index;
 
@@ -415,8 +417,6 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
 
     std::string full_path = fullPath.toStdString();
     EnumIodeFile fileType = get_iode_file_type(full_path);
-
-    if (fileType == I_ANY_FILE) return -1;
 
     try
     {
