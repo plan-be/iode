@@ -58,6 +58,7 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     copyShortcut = new QShortcut(QKeySequence::Copy, this);
     pasteShortcut = new QShortcut(QKeySequence::Paste, this);
     filepathShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_C), this);
+    revealExplorerShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_R), this);
     renameShortcut = new QShortcut(QKeySequence(Qt::Key_F2), this);
     deleteShortcut = new QShortcut(QKeySequence::Delete, this);
     enterShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this);
@@ -73,6 +74,7 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     connect(copyShortcut, &QShortcut::activated, this, &QIodeFileExplorer::copy);
     connect(pasteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::paste);
     connect(filepathShortcut, &QShortcut::activated, this, &QIodeFileExplorer::absolutePath);
+    connect(revealExplorerShortcut, &QShortcut::activated, this, &QIodeFileExplorer::revealInFolder);
     connect(renameShortcut, &QShortcut::activated, this, &QIodeFileExplorer::rename);
     connect(deleteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::remove);
     connect(enterShortcut, &QShortcut::activated, this, &QIodeFileExplorer::openFiles);
@@ -105,6 +107,7 @@ QIodeFileExplorer::~QIodeFileExplorer()
     delete copyShortcut;
     delete pasteShortcut;
     delete filepathShortcut;
+    delete revealExplorerShortcut;
     delete renameShortcut;
     delete deleteShortcut;
     delete enterShortcut;
@@ -146,6 +149,10 @@ void QIodeFileExplorer::setupContextMenu()
         filepathShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
 
+    action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
+        contextMenuDirectory, revealExplorerShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::revealInFolder);
+
     contextMenuDirectory->addSeparator();
 
     action = addAction("Rename", "Rename Directory", contextMenuDirectory, renameShortcut->key());
@@ -173,6 +180,10 @@ void QIodeFileExplorer::setupContextMenu()
     action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", contextMenuFile, 
         filepathShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
+    
+    action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
+        contextMenuFile, revealExplorerShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::revealInFolder);
 
     contextMenuFile->addSeparator();
 
@@ -392,6 +403,41 @@ void QIodeFileExplorer::absolutePath()
     QString absPath = fileInfo.absoluteFilePath();
     clipboard->setText(absPath);
     cleanupSlot();
+}
+
+void QIodeFileExplorer::revealInFolder()
+{
+    QList<SystemItem> selectedItems = extractListOfItems();
+    if(selectedItems.count() == 0) return;
+    SystemItem item = selectedItems.last();
+    QFileInfo info = item.fileInfo();
+    QString path = item.absoluteFilePath();
+#if defined(Q_OS_WIN)
+    QStringList args;
+    if (!info.isDir())
+        args << "/select,";
+    args << QDir::toNativeSeparators(path);
+    if (QProcess::startDetached("explorer", args)) return;
+#elif defined(Q_OS_MAC)
+    QStringList args;
+    args << "-e";
+    args << "tell application \"Finder\"";
+    args << "-e";
+    args << "activate";
+    args << "-e";
+    args << "select POSIX file \"" + path + "\"";
+    args << "-e";
+    args << "end tell";
+    args << "-e";
+    args << "return";
+    if (!QProcess::execute("/usr/bin/osascript", args)) return;
+#else
+    QDesktopServices::openUrl(QUrl::fromLocalFile(info.isDir()? path : info.path()));
+#endif
+
+    selectionModel()->clearSelection();
+    cleanupSlot();
+
 }
 
 void QIodeFileExplorer::cut()
