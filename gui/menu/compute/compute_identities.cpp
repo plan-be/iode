@@ -16,8 +16,8 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(const QString& settings_f
 {
     setupUi(this);
 
-	QList<QString> list_languages;
-	for (const auto& [_, language] : mLangs) list_languages << QString::fromStdString(language);
+	QList<QString> q_langs;
+	for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
 
 	qFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
 	qTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
@@ -25,7 +25,7 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(const QString& settings_f
     qVariablesFiles = new WrapperQTextEdit(label_variables_list->text(), *textEdit_variables_list, OPTIONAL_FIELD);
     qScalarsFiles = new WrapperQTextEdit(label_scalars_list->text(), *textEdit_scalars_list, OPTIONAL_FIELD);
     qTrace = new WrapperCheckBox(label_trace->text(), *checkBox_trace, REQUIRED_FIELD);
-    qLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, list_languages);
+    qLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
 
     mapFields["From"] = qFrom;
     mapFields["To"] = qTo;
@@ -66,7 +66,7 @@ void QIodeMenuComputeIdentities::compute()
         std::string variables_files = qVariablesFiles->extractAndVerify().toStdString();
         std::string scalars_files = qScalarsFiles->extractAndVerify().toStdString();
         bool trace = qTrace->extractAndVerify();
-        EnumLang language = (EnumLang) qLanguage->extractAndVerify();
+        EnumLang language = (EnumLang) (qLanguage->extractAndVerify() + IT_ENGLISH);
 
         kdb.execute_identities(from, to, identities_list, variables_files, scalars_files, trace);
         
