@@ -118,6 +118,20 @@ public:
      *      https://iode.plan.be/doku.php?id=wsseasadj 
      */
     void seasonal_adjustment(std::string& input_file, const std::string& series, const double eps_test);
+
+    // TODO JMP: please provide input for unit test
+    // TODO JMP: argument Lambda is not explained in the documentation ? 
+    /**
+     * @brief Compute trend series using the Hodrick-Prescott method.
+     *        
+     *        $WsTrend VarFilename Lambda series1 series2 ...
+     *        $WsTrendStd VarFilename Lambda series1 series2 ...
+     *        
+     * 
+     * @see https://iode.plan.be/doku.php?id=wstrend and
+     *      https://iode.plan.be/doku.php?id=wstrendstd 
+     */
+    void trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log);
 };
 
 /**
