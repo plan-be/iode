@@ -286,3 +286,34 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 		throw error;
 	}
 }
+
+void KDBVariables::trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log)
+{
+	KDB* kdb = get_KDB();
+	if (kdb == NULL) return;
+
+	std::string args;
+
+	input_file = check_filepath(input_file, I_VARIABLES, "trend_correction", true);
+	args = input_file + " "; 
+
+	args += std::to_string(lambda) + " ";
+
+	if (series.empty()) 
+		throw IodeExceptionFunction("Cannot run trend correction", "Passed value for the VarList argument is empty");
+	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
+    if (SCR_tbl_size((unsigned char**) c_series) == 0) 
+		throw IodeExceptionFunction("Cannot run trend correction", "Passed value \"" + series + "\" for the VarList argument is invalid");
+	args += series;
+
+	int res = (log) ? B_WsTrend(to_char_array(args)) : B_WsTrendStd(to_char_array(args));
+	if (res < 0)
+	{
+		std::string fct_name = (log) ? "B_WsTrend" : "B_WsTrendStd";
+		IodeExceptionFunction error("Cannot run trend correction (" + fct_name + ")");
+		error.add_argument("VarFilename", input_file);
+		error.add_argument("Lambda", std::to_string(lambda));
+		error.add_argument("Series", series);
+		throw error;
+	}
+}
