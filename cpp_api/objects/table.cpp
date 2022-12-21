@@ -202,7 +202,7 @@ void Table::extend()
 
 std::string Table::getLanguage() const
 {
-	return mLangs.at((EnumLang)c_table->t_lang);
+	return vLangs.at(c_table->t_lang - IT_ENGLISH);
 }
 
 void Table::setLanguage(const EnumLang lang)

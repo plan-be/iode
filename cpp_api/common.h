@@ -68,12 +68,7 @@ enum EnumLang
 
 const static int I_NB_LANGS = 3;
 
-const static std::map<EnumLang, std::string> mLangs = 
-{ 
-    {IT_ENGLISH, "English"},
-    {IT_DUTCH, "Dutch"},
-    {IT_FRENCH, "French"}
-};
+const static std::array<std::string, I_NB_LANGS> vLangs = { "English", "Dutch", "French" };
 
 
 enum EnumIodeFile
