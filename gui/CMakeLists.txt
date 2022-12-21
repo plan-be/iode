@@ -121,6 +121,7 @@ set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_high_to_low.ui             menu/workspace/workspace_high_to_low.h              menu/workspace/workspace_high_to_low.cpp
     menu/workspace/workspace_low_to_high.ui             menu/workspace/workspace_low_to_high.h              menu/workspace/workspace_low_to_high.cpp
     menu/workspace/workspace_seasonal_adjustment.ui     menu/workspace/workspace_seasonal_adjustment.h      menu/workspace/workspace_seasonal_adjustment.cpp
+    menu/workspace/workspace_trend_correction.ui        menu/workspace/workspace_trend_correction.h         menu/workspace/workspace_trend_correction.cpp
 )
 
 set(GUI_MENU_COMPUTE

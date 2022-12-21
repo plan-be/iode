@@ -403,6 +403,12 @@ void MainWindow::open_seasonal_adjustment_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_trend_correction_dialog()
+{
+    QIodeMenuWorkspaceTrendCorrection dialog(*project_settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::open_compute_identities_dialog()
 {
     QIodeMenuComputeIdentities dialog(*project_settings_filepath, this);
