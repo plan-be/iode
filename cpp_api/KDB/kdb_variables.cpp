@@ -294,7 +294,7 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 
 	std::string args;
 
-	input_file = check_filepath(input_file, I_VARIABLES, "trend_correction", true);
+	input_file = check_filepath(input_file, (EnumIodeFile) I_VARIABLES, "trend_correction", true);
 	args = input_file + " "; 
 
 	args += std::to_string(lambda) + " ";
