@@ -108,6 +108,85 @@ void set_kdb_filename(KDB* kdb, const std::string& filename)
     K_set_kdb_name(kdb, (unsigned char*) filename.c_str());
 }
 
+void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
+                const EnumLang lang, const std::string& debug_file)
+{
+    // $FileImportCmt format rule infile outfile language [trace]
+
+    std::string args = "";
+    std::string caller_name = "import comments";
+    std::string error_msg = "Cannot import comments from file " + input_file;
+
+    // format = ASCII
+    args += "0 ";
+
+    std::string rule_file_ = check_file_exists(rule_file, caller_name);
+    args += rule_file_ + " ";
+
+    std::string input_file_ = check_file_exists(input_file, caller_name);
+    args += input_file_ + " ";
+
+    std::string save_file_ = check_filepath(save_file, I_COMMENTS_FILE, caller_name, false);
+    args += save_file_ + " ";
+
+    args += std::to_string((int) lang) + " ";
+
+    if (!debug_file.empty())
+    {
+        std::string debug_file_ = check_filepath(debug_file, I_LOGS_FILE, caller_name, false);
+        args += debug_file_ + " ";
+    }
+
+    int res = B_FileImportCmt(to_char_array(args));
+    if (res < 0) throw IodeExceptionFunction(error_msg);
+}
+
+void import_var(const std::string& input_file, const std::string& save_file, const std::string& from, const std::string& to, 
+                const std::string& rule_file, const std::string& debug_file)
+{
+	// $FileImportVar format rule infile outfile from to  [trace]
+
+    std::string args = "";
+    std::string caller_name = "import variables";
+    std::string error_msg = "Cannot import variables from file " + input_file;
+
+    // fromat = ASCII
+    args += "0 ";
+
+    std::string rule_file_ = check_file_exists(rule_file, caller_name);
+    args += rule_file_ + " ";
+
+    std::string input_file_ = check_file_exists(input_file, caller_name);
+    args += input_file_ + " ";
+
+    std::string save_file_ = check_filepath(save_file, I_VARIABLES_FILE, caller_name, false);
+    args += save_file_ + " ";
+
+    // raise error if not valid
+    Period from_per(from);
+	args+= from_per.to_string() + " ";
+
+    Period to_per(to);
+	args += to_per.to_string() + " ";
+
+    if (!debug_file.empty())
+    {
+        std::string debug_file_ = check_filepath(debug_file, I_LOGS_FILE, caller_name, false);
+        args += debug_file_ + " ";
+    }
+
+    int res = B_FileImportVar(to_char_array(args));
+    if (res < 0) throw IodeExceptionFunction(error_msg);
+}
+
+void import_var(const std::string& input_file, const std::string& save_file, const Period& from, const Period& to, 
+                const std::string& rule_file, const std::string& debug_file)
+{
+    import_var(input_file, rule_file, save_file, from.to_string(), to.to_string(), debug_file);
+}
+
+
+
 void low_to_high(const EnumIodeLtoH type, const char method, std::string& filepath, const std::string& var_list)
 {
     int res;
