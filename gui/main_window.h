@@ -15,6 +15,9 @@
 #include "iode_objs/models/tables_model.h"
 #include "iode_objs/models/variables_model.h"
 
+#include "menu/file/file_import_comments.h"
+#include "menu/file/file_import_variables.h"
+
 #include "menu/workspace/workspace_load.h"
 #include "menu/workspace/workspace_save.h"
 #include "menu/workspace/workspace_clear.h"
@@ -55,6 +58,10 @@ protected:
 	void check_vars_sample();
 
 public slots:
+	// File Menu
+	void open_import_comments_dialog();
+	void open_import_variables_dialog();
+
 	// Workspace Menu
 	void open_load_workspace_dialog();
 	void open_save_workspace_dialog();
