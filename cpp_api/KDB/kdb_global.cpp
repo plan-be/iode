@@ -4,7 +4,7 @@
 
 void load_global_kdb(EnumIodeType iode_type, std::string& filepath)
 {
-    filepath = check_filepath(filepath, iode_type, "load", true);
+    filepath = check_filepath(filepath, (EnumIodeFile) iode_type, "load", true);
 
     char* c_filepath = to_char_array(filepath);
 
@@ -15,7 +15,7 @@ void load_global_kdb(EnumIodeType iode_type, std::string& filepath)
 
 void save_global_kdb(EnumIodeType iode_type, std::string& filepath)
 {
-    filepath = check_filepath(filepath, iode_type, "save", false);
+    filepath = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
 
     char* c_filepath = to_char_array(filepath);
 
@@ -112,7 +112,7 @@ void low_to_high(const EnumIodeLtoH type, const char method, std::string& filepa
 {
     int res;
 
-    check_filepath(filepath, I_VARIABLES, "low_to_high", true);
+    check_filepath(filepath, I_VARIABLES_FILE, "low_to_high", true);
     std::string method_name = mLowToHigh.at(method);
 
     std::string arg = std::string(1, method) + " " + filepath + " " + var_list;
@@ -137,7 +137,7 @@ void high_to_low(const EnumIodeHtoL type, std::string& filepath, const std::stri
     int res;
     std::string type_name; 
 
-    check_filepath(filepath, I_VARIABLES, "high_to_low", true);
+    check_filepath(filepath, I_VARIABLES_FILE, "high_to_low", true);
 
     std::string arg = filepath + " " + var_list;
     char* c_arg = to_char_array(arg);
