@@ -89,6 +89,11 @@ set(GUI_IODE_OBJS
     ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
 )
 
+set(GUI_MENU_FILE
+    menu/file/file_import_comments.ui           menu/file/file_import_comments.h        menu/file/file_import_comments.cpp
+    menu/file/file_import_variables.ui          menu/file/file_import_variables.h       menu/file/file_import_variables.cpp
+)
+
 set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_load.ui            menu/workspace/workspace_load.h         menu/workspace/workspace_load.cpp
     menu/workspace/workspace_save.ui            menu/workspace/workspace_save.h         menu/workspace/workspace_save.cpp
@@ -105,7 +110,7 @@ set(GUI_MENU_COMPUTE
     menu/compute/compute_scc_simulation.ui      menu/compute/compute_scc_simulation.h       menu/compute/compute_scc_simulation.cpp
 )
 
-set(GUI_MENUS ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE})
+set(GUI_MENUS ${GUI_MENU_FILE} ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE})
 
 set(GUI_MAIN    
     main_window.ui  main_window.h   main_window.cpp 

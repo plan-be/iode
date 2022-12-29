@@ -180,6 +180,26 @@ void MainWindow::check_vars_sample()
 	}
 }
 
+void MainWindow::open_import_comments_dialog()
+{
+    QIodeMenuFileImportComments dialog(*settings_filepath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        this->lineEdit_filter_comments->setText("");
+        this->tableview_comments->filter();
+    }
+}
+
+void MainWindow::open_import_variables_dialog()
+{
+    QIodeMenuFileImportVariables dialog(*settings_filepath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        this->lineEdit_filter_variables->setText("");
+        this->tableview_variables->filter();
+    }
+}
+
 void MainWindow::open_load_workspace_dialog()
 {
     QIodeMenuWorkspaceLoad dialog(*settings_filepath, this);

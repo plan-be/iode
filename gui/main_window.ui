@@ -785,7 +785,8 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
-    <addaction name="actionImport"/>
+    <addaction name="actionImport_Comments"/>
+    <addaction name="actionImport_Variables"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionPrint_Setup"/>
@@ -1015,9 +1016,9 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionImport">
+  <action name="actionImport_Comments">
    <property name="text">
-    <string>Import</string>
+    <string>Import Comments</string>
    </property>
    <property name="toolTip">
     <string>Import files respecting certain rules to IODE</string>
@@ -1531,6 +1532,11 @@
     <string>Display introduction screen</string>
    </property>
   </action>
+  <action name="actionImport_Variables">
+   <property name="text">
+    <string>Import Variables</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1648,10 +1654,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionImport</sender>
+   <sender>actionImport_Comments</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>open_import_file_dialog()</slot>
+   <slot>open_import_comments_dialog()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -2655,10 +2661,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionImport_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_import_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
-  <slot>open_import_file_dialog()</slot>
+  <slot>open_import_comments_dialog()</slot>
   <slot>open_export_file_dialog()</slot>
   <slot>open_load_settings_dialog()</slot>
   <slot>open_save_settings_dialog()</slot>
@@ -2695,5 +2717,6 @@
   <slot>open_release_notes()</slot>
   <slot>open_iode_home()</slot>
   <slot>open_iode_manual()</slot>
+  <slot>open_import_variables_dialog()</slot>
  </slots>
 </ui>
