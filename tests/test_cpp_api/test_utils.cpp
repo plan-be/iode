@@ -28,23 +28,23 @@ TEST_F(UtilsTest, checkFilepath)
 
 	// fake directory
 	filepath = "C:\\Users\\ald\\wrong\\path\\fun.cmt";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "save", false), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "save", false), IodeExceptionFunction);
 
 	// wrong extension
 	filepath = output_test_dir + "fun.eqs";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "save", false), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "save", false), IodeExceptionFunction);
 
 	// file does not exist
 	filepath = input_test_dir + "funxxx.cmt";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "load", true), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "load", true), IodeExceptionFunction);
 
 	// file does not exist (no extension given)
 	filepath = input_test_dir + "funxxx";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS, "load", true), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "load", true), IodeExceptionFunction);
 
 	// extension added automatically
 	filepath = input_test_dir + "fun";
-	filepath = check_filepath(filepath, I_COMMENTS, "load", true);
+	filepath = check_filepath(filepath, I_COMMENTS_FILE, "load", true);
 	EXPECT_EQ(filepath, input_test_dir + "fun.cmt");
 }
 

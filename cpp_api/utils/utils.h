@@ -107,8 +107,7 @@ inline void check_name(const std::string name, const EnumIodeType type)
         name + " is invalid.");
 }
 
-
-inline std::string check_filepath(std::string& filepath, const EnumIodeType type, const std::string& caller_name, const bool file_must_exist)
+inline static std::filesystem::path check_file(const std::string& filepath, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
 
@@ -125,6 +124,23 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
         if (!std::filesystem::exists(p_directory)) throw IodeExceptionFunction("Cannot run " + caller_name, "Directory " + 
             p_directory.string() + " in filepath " + p_filepath.filename().string() + " does not exist");
     }
+
+    return p_filepath; 
+}
+
+inline std::string check_file_exists(const std::string& filepath, const std::string& caller_name)
+{
+    std::filesystem::path p_filepath = check_file(filepath, caller_name, true);
+    // check if file exist
+    if (!std::filesystem::exists(p_filepath)) 
+        throw IodeExceptionFunction("Cannot run " + caller_name, "File " + p_filepath.string() + " does not exist");
+
+    return p_filepath.string();
+}
+
+inline std::string check_filepath(const std::string& filepath, const EnumIodeFile type, const std::string& caller_name, const bool file_must_exist)
+{
+    std::filesystem::path p_filepath = check_file(filepath, caller_name, file_must_exist);
 
     // check or add extension
     std::filesystem::path p_filename = p_filepath.filename();
@@ -157,6 +173,7 @@ inline std::string check_filepath(std::string& filepath, const EnumIodeType type
                 p_filepath = p_filepath.replace_extension(expected_ext.ascii);
                 if (!std::filesystem::exists(p_filepath)) 
                 {
+                    std::filesystem::path p_directory = p_filepath.parent_path();
                     std::string stem = p_filepath.stem().string();
                     throw IodeExceptionFunction("Cannot run " + caller_name, "Neither " + stem + expected_ext.ext + 
                         " nor " + stem + expected_ext.ascii + " could be found in directory " + p_directory.string());
