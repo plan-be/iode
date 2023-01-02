@@ -117,3 +117,18 @@ enum EnumIodeCase
     I_LOWER = K_LOWER,
     I_ASIS = K_ASIS
 };
+
+
+enum EnumIodeExportFormat
+{
+    I_EXP_FMT_CSV,
+    I_EXP_FMT_DIF,
+    I_EXP_FMT_WKS,
+    I_EXP_FMT_TSP,
+    I_EXP_FMT_RCSV
+};
+
+const static int I_NB_EXPORT_FORMATS = 5;
+
+const static std::array<std::string, I_NB_EXPORT_FORMATS> vExportFormats = 
+	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
