@@ -17,6 +17,7 @@
 
 #include "menu/file/file_import_comments.h"
 #include "menu/file/file_import_variables.h"
+#include "menu/file/file_export.h"
 
 #include "menu/workspace/workspace_load.h"
 #include "menu/workspace/workspace_save.h"
@@ -61,6 +62,7 @@ public slots:
 	// File Menu
 	void open_import_comments_dialog();
 	void open_import_variables_dialog();
+	void open_export_dialog();
 
 	// Workspace Menu
 	void open_load_workspace_dialog();
