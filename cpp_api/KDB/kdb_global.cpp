@@ -185,7 +185,104 @@ void import_var(const std::string& input_file, const std::string& save_file, con
     import_var(input_file, rule_file, save_file, from.to_string(), to.to_string(), debug_file);
 }
 
+void export_as(const std::string& var_file, const std::string cmt_file, const std::string& from, const std::string& to, 
+			   const EnumIodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
+			   const std::string& nan, const std::string& separator, const std::string& debug_file)
+{
+    std::string caller_name = "export_as";
+    std::string error_msg = "Cannot export ";
+        
+    SAMPLE* smpl;
+    if(from.empty() || to.empty()) 
+        smpl = NULL;
+    else 
+    {
+        // raise error if not valid
+        Sample sample(from, to);
+        smpl = sample.c_sample;
+    }
 
+    KDB* dbc;
+    if(!cmt_file.empty())
+    {
+        std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
+        error_msg += "Comments file " + cmt_file_;
+        dbc = K_interpret(K_CMT, to_char_array(cmt_file));
+        if(dbc == NULL)
+        {
+            IodeExceptionInvalidArguments error(error_msg);
+            error.add_argument("Comment file", cmt_file);
+            throw error;
+        }
+    } 
+
+    KDB* dbv;
+    if(!var_file.empty()) 
+    {
+        std::string var_file_ = check_file_exists(var_file, caller_name);
+        if (dbc != NULL) error_msg += "and";
+        error_msg += "Variables file " + var_file_;
+        dbv = K_interpret(K_VAR, to_char_array(var_file));
+        if(dbv == NULL)
+        {
+            IodeExceptionInvalidArguments error(error_msg);
+            error.add_argument("Variable file", var_file);
+            throw error;
+        }
+        if(smpl != NULL) KV_sample(dbv, smpl);
+    }
+
+    std::string rule_file_ = check_file_exists(rule_file, caller_name);
+
+    std::string save_file_ = check_filepath(save_file, I_COMMENTS_FILE, caller_name, false);
+
+    if(!debug_file.empty()) 
+    {
+        std::string debug_file_ = check_filepath(debug_file, I_LOGS_FILE, caller_name, false);
+        K_WARN_DUP = 0;
+        W_dest(to_char_array(debug_file_), W_A2M);
+    }
+    else 
+    {
+        K_WARN_DUP = 1;
+        IMP_trace = 0;
+    }
+
+    EXPDEF  *expdef;
+    switch(format) {
+        case I_EXP_FMT_CSV:
+            expdef = &EXPCSV;
+            break;
+        case I_EXP_FMT_DIF:
+            expdef = &EXPDIF;
+            break;
+        case I_EXP_FMT_WKS:
+            expdef = &EXPWKS;
+            break;
+        case I_EXP_FMT_TSP:
+            expdef = &EXPTSP;
+            break;
+        default:
+            expdef = &EXPRCSV;
+    }
+
+    int res;
+    if(format < I_EXP_FMT_RCSV)
+        res = EXP_Ws(expdef, dbv, dbc, to_char_array(rule_file_), to_char_array(save_file_), 
+                     to_char_array(nan), to_char_array(separator));
+    else
+        res = EXP_Rev_Ws(expdef, dbv, dbc, to_char_array(rule_file_), to_char_array(save_file_), 
+                         to_char_array(nan), to_char_array(separator));
+
+
+    if(dbv != NULL) K_free(dbv);
+    if(dbc != NULL) K_free(dbc);
+
+    K_WARN_DUP = 0;
+
+    if(res != 0) 
+        B_display_last_error();
+}
 
 void low_to_high(const EnumIodeLtoH type, const char method, std::string& filepath, const std::string& var_list)
 {

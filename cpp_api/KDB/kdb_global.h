@@ -1,5 +1,6 @@
 #pragma once
 #include "utils/utils.h"
+#include "time/sample.h"
 
 
 enum EnumIodeLtoH
@@ -97,6 +98,34 @@ void import_var(const std::string& input_file, const std::string& save_file, con
  */
 void import_var(const std::string& input_file, const std::string& save_file, const Period& from, const Period& to, 
                 const std::string& rule_file, const std::string& debug_file = "");
+
+// NOTE: The unit test Tests_IMP_EXP() in test1.c calls EXP_RuleExport() many times and 
+//       generates output files in output/fun_xode.. 
+//       These files are compared with data/fun_xode.ref..
+//       The last call to EXP_RuleExport() uses the simple rule file data/rules.txt and 
+//       creates another example of exported file.
+// NOTE: export is a C++ reserved keyword
+/**
+ * @brief export variable from file.
+ * 
+ *  Syntax: $FileExport vfile cfile from to format outfile rule nan separator [trace]
+ *  where:
+ *      vfile = variables file to export
+ *      cfile = variables file to export
+ *      from = begin of sample
+ *      to   = end of sample
+ *      format = {CSV, DIF, WKS, TSP, Reverse CSV}
+ *      outfile = exported file
+ *      rule = rulefile to use to translate names
+ *      nan = string to use for NaN values (CSV only)
+ *      separator = character used to separate value (CSV only)
+ *      trace = debug file (optional)
+ *  
+ *  @see https://iode.plan.be/doku.php?id=export
+ */
+void export_as(const std::string& var_file, const std::string cmt_file, const std::string& from, const std::string& to, 
+               const EnumIodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
+               const std::string& nan, const std::string& separator, const std::string& debug_file = "");
 
 void low_to_high(const EnumIodeLtoH type, const char method, std::string& filepath, const std::string& var_list);
 
