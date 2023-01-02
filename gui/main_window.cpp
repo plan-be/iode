@@ -200,6 +200,12 @@ void MainWindow::open_import_variables_dialog()
     }
 }
 
+void MainWindow::open_export_dialog()
+{
+    QIodeMenuFileExport dialog(*settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::open_load_workspace_dialog()
 {
     QIodeMenuWorkspaceLoad dialog(*settings_filepath, this);

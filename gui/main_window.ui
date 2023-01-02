@@ -787,6 +787,7 @@
     </property>
     <addaction name="actionImport_Comments"/>
     <addaction name="actionImport_Variables"/>
+    <addaction name="separator"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionPrint_Setup"/>
@@ -1537,6 +1538,11 @@
     <string>Import Variables</string>
    </property>
   </action>
+  <action name="actionExport_Variables">
+   <property name="text">
+    <string>Export Variables</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1641,7 +1647,7 @@
    <sender>actionExport</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>open_export_file_dialog()</slot>
+   <slot>open_export_dialog()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -2681,7 +2687,6 @@
  <slots>
   <slot>about()</slot>
   <slot>open_import_comments_dialog()</slot>
-  <slot>open_export_file_dialog()</slot>
   <slot>open_load_settings_dialog()</slot>
   <slot>open_save_settings_dialog()</slot>
   <slot>open_reset_settings_dialog()</slot>
@@ -2718,5 +2723,6 @@
   <slot>open_iode_home()</slot>
   <slot>open_iode_manual()</slot>
   <slot>open_import_variables_dialog()</slot>
+  <slot>open_export_dialog()</slot>
  </slots>
 </ui>
