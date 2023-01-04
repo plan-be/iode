@@ -180,6 +180,12 @@ void MainWindow::check_vars_sample()
 	}
 }
 
+void MainWindow::open_print_setup_dialog()
+{
+    QIodeMenuFilePrintPref dialog(*settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::open_load_workspace_dialog()
 {
     QIodeMenuWorkspaceLoad dialog(*settings_filepath, this);

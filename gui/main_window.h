@@ -15,6 +15,8 @@
 #include "iode_objs/models/tables_model.h"
 #include "iode_objs/models/variables_model.h"
 
+#include "menu/file/file_print_preferences.h"
+
 #include "menu/workspace/workspace_load.h"
 #include "menu/workspace/workspace_save.h"
 #include "menu/workspace/workspace_clear.h"
@@ -55,6 +57,9 @@ protected:
 	void check_vars_sample();
 
 public slots:
+
+	void open_print_setup_dialog();
+
 	// Workspace Menu
 	void open_load_workspace_dialog();
 	void open_save_workspace_dialog();

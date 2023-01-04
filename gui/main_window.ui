@@ -1038,6 +1038,9 @@
    <property name="toolTip">
     <string>Change Print Setup</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
+   </property>
   </action>
   <action name="actionLoad_profile">
    <property name="text">
@@ -2655,6 +2658,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPrint_Setup</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_print_setup_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -2695,5 +2714,6 @@
   <slot>open_release_notes()</slot>
   <slot>open_iode_home()</slot>
   <slot>open_iode_manual()</slot>
+  <slot>open_print_setup_dialog()</slot>
  </slots>
 </ui>
