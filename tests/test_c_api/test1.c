@@ -1574,6 +1574,7 @@ void Tests_IMP_EXP()
     char    reffile[256];
     char    varfile[256];
     char    cmtfile[256];
+    char    rulefile[256];
     char    trace[] = " ";    
     int     cond, rc;
     
@@ -1582,7 +1583,7 @@ void Tests_IMP_EXP()
     U_test_suppress_kmsg_msgs();
 
     // Export
-    // Exports VAR files into an external format. 
+    // Exports VAR files into external formats. 
     // int EXP_RuleExport(" "char* trace, NULL, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)  
     
     sprintf(varfile, "%s\\fun.var", IODE_DATA_DIR);
@@ -1599,6 +1600,15 @@ void Tests_IMP_EXP()
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_RCSV);
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
     S4ASSERT(cond == 1, "EXP_RuleExport(\" \", NULL, \"%s\", \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", \"#N/A\", \";\", EXP_RCSV)", outfile, varfile, cmtfile);
+
+    // Export with rules (partial /+ change names)
+    sprintf(outfile, "%s\\fun2.tsp", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%s\\fun2.ref.tsp", IODE_DATA_DIR);
+    sprintf(rulefile, "%s\\rules.txt", IODE_DATA_DIR);
+    rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXP_TSP);
+    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun2.tsp", "fun2.ref.tsp");
+    S4ASSERT(cond == 1, "EXP_RuleExport(\" \", \"%s\", \"%s\", \"%s\", \"%s\", \"1995Y1\", \"2005Y1\", \"#N/A\", \";\", EXP_RCSV)", rulefile, outfile, varfile, cmtfile);
+
 
     U_test_print_title("Tests IMP: Import Ascii");
     
@@ -1637,7 +1647,7 @@ void Tests_B_XODE()
     S4ASSERT(rc == 0, "B_FileImportVar(\"%s\")", cmd);
     
     KV_RWS = KV_WS = K_interpret(K_VAR, outfile);  
-    U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+    U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
     
     U_test_reset_kmsg_msgs(); 
 
