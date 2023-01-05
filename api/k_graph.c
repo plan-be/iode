@@ -585,7 +585,7 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double
 
 
 // =============================================================================================================================
-// API CHART: used in b_api.c but what for ???
+// API CHART: used in b_api.c but for what purpose ???
 // TODO: answer this question...
 // -----------------------------------------------------------------------------------------------------------------------------
 

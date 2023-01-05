@@ -312,6 +312,7 @@ err:
     return(smpl);
 }
 
+
 /**
  *  Returns a new allocated SAMPLE build on two given PERIOD.
  *  
@@ -341,9 +342,6 @@ fin:
     return(smpl);
 }
 
-/*
-    Converts the sample into a string
-*/
 
 /**
  *  Writes a SAMPLE in a string.
@@ -361,6 +359,7 @@ char *PER_smpltoa(SAMPLE* smpl, char* text)
             PER_pertoa(&(smpl->s_p2), b2));
     return(text);
 }
+
 
 /**
  *  Retrieves the number of periods in one year in a period.

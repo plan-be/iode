@@ -8,7 +8,7 @@
  *  List of functions 
  *  -----------------
  *      int B_FileImportCmt(char* arg)  $FileImportCmt format rule infile outfile language [trace]
- *      int B_FileImportVar(char* arg)  $FileImportVar format rule infile outfile from to  [trace]$FileImportVar format rule infile outfile from to  [trace]
+ *      int B_FileImportVar(char* arg)  $FileImportVar format rule infile outfile from to  [trace]
  */
 
 #include "iode.h"
