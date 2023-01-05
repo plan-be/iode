@@ -226,13 +226,13 @@ err:
  *  @param [in] char*   rule    rule file
  *  @param [in] char*   ode     output IODE file
  *  @param [in] char*   asc     input filename
- *  @param [in] int     fmt     input format: 0=ASCII_CMT, 1=-, 2=-, 3=Bistel_CMT 4=-, 5=-, 6=PRN_CMT, 7=TXT_CMT
+ *  @param [in] int     fmt     input format: 0=ASCII_CMT (=default), 1=-, 2=-, 3=Bistel_CMT 4=-, 5=-, 6=PRN_CMT, 7=TXT_CMT
  *  @param [in] int     lang    0=English, 1=French , 2=Dutch 
- *  @return     int             0 always (TODO: correct this)
+ *  @return     int             0 on success, -1 on error (IMP_InterpretCmt() ==  NULL or K_save() return code)
  */
 static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int fmt, int lang)
 {
-    int     rc = 0;
+    int     rc = -1;
     KDB     *kdb;
     IMPDEF  *impdef;
 
@@ -251,10 +251,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
         K_WARN_DUP = 1;
     }
     switch(fmt) {
-        case 0:
-            impdef = &IMP_ASC_CMT;
-            break; /* JMP 11-01-99 */
-        case 1:
+         case 1:
             impdef = NULL;
             break;
         case 2:
@@ -275,16 +272,19 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
         case 7:
             impdef = &IMP_TXT_CMT;
             break;
+        default:        // JMP 05/01/2023         
+            impdef = &IMP_ASC_CMT;
+            break; 
     }
 
     kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
     if(kdb != NULL) {
-        K_save(kdb, ode);
+        rc = K_save(kdb, ode);
         K_free(kdb);
     }
 
     if(IMP_trace) W_close();
-    return(0);
+    return(rc);
 }
 
 
@@ -298,11 +298,11 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
  *  @param [in] char*   from    starting period of the sample to be read
  *  @param [in] char*   to      ending period of the sample
  *  @param [in] int     fmt     input format: 0=ASCII, 1=ROT_ASCII, 2=DIF, 3=Bistel, 4=NIS, 5=GEM, 6=PRN, 7=TXT
- *  @return     int             0 always (TODO: correct this)
+ *  @return     int             0 on success, -1 on error (IMP_InterpretVar() ==  NULL or K_save() return code)
  */
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
-    int     rc = 0;
+    int     rc = -1;
     SAMPLE  *smpl;
     KDB     *kdb;
     IMPDEF  *impdef;
@@ -323,9 +323,6 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     }
 
     switch(fmt) {
-        case 0:
-            impdef = &IMP_ASC;
-            break;
         case 1:
             impdef = &IMP_RASC;
             break;
@@ -347,6 +344,10 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
         case 7:
             impdef = &IMP_TXT;
             break;
+        default :
+            impdef = &IMP_ASC;
+            break;
+             
     }
 
     SCR_strip(from);
@@ -358,12 +359,12 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
 
     kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb != NULL) {
-        K_save(kdb, ode);
+        rc = K_save(kdb, ode);
         K_free(kdb);
     }
 
     if(IMP_trace) W_close();
-    return(0);
+    return(rc);
 }
 
 /**
@@ -378,22 +379,24 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
  *  @param [in] char*   to      ending period of the sample
  *  @param [in] int     fmt     input format: 0=ASCII, 1=ROT_ASCII, 2=DIF, 3=Bistel, 4=NIS, 5=GEM, 6=PRN, 7=TXT
  *  @param [in] int     lang    0=English, 1=French , 2=Dutch  
- *  @return     int             0 always (TODO: correct this)
+ *  @return     int             0 on success, -1 on error
  */
 int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang)
 {
+    int     rc = -1;
+    
     switch(type) {
         case K_CMT   :
-            IMP_RuleImportCmt(trace, rule, ode, asc, fmt, lang);
+            rc = IMP_RuleImportCmt(trace, rule, ode, asc, fmt, lang);
             break;
 
         case K_VAR   :
-            IMP_RuleImportVar(trace, rule, ode, asc, from, to, fmt);
+            rc = IMP_RuleImportVar(trace, rule, ode, asc, from, to, fmt);
             break;
 
         default :
             break;
     }
     K_WARN_DUP = 0;
-    return(0);
+    return(rc);
 }

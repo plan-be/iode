@@ -1835,7 +1835,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     EXPECT_EQ(cond, 1);
 
 
-    U_test_print_title("Tests IMP: Import Ascii");
+    U_test_print_title("Tests IMP VAR: Import Ascii Variables");
 
     sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
@@ -1846,8 +1846,20 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
 
 
-    U_test_reset_kmsg_msgs();
+    U_test_print_title("Tests IMP CMT: Import Ascii Comments");
 
+    sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
+    rc = IMP_RuleImport(K_CMT, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
+    EXPECT_EQ(rc, 0);
+
+    if(rc == 0) {
+        KC_RWS = KC_WS = K_interpret(K_CMT, outfile);
+        cond = (KC_WS != NULL) && U_cmp_strs(KCPTR("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(cond, 1);
+    }
+
+    U_test_reset_kmsg_msgs();
 }
 
 

@@ -1610,7 +1610,7 @@ void Tests_IMP_EXP()
     S4ASSERT(cond == 1, "EXP_RuleExport(\" \", \"%s\", \"%s\", \"%s\", \"%s\", \"1995Y1\", \"2005Y1\", \"#N/A\", \";\", EXP_RCSV)", rulefile, outfile, varfile, cmtfile);
 
 
-    U_test_print_title("Tests IMP: Import Ascii");
+    U_test_print_title("Tests IMP VAR: Import Ascii Variables");
     
     sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
@@ -1619,10 +1619,22 @@ void Tests_IMP_EXP()
     
     KV_RWS = KV_WS = K_interpret(K_VAR, outfile);  
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+
+
+    U_test_print_title("Tests IMP CMT: Import Ascii Comments");
+   
+    sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
+    rc = IMP_RuleImport(K_CMT, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
+    S4ASSERT(rc == 0, "IMP_RuleImport(K_CMT, trace, \"%s\", \"%s\", \"%s\", NULL, NULL, IMP_FMT_ASCII, 0)", rulefile, outfile, reffile);
     
+    if(rc == 0) {
+        KC_RWS = KC_WS = K_interpret(K_CMT, outfile);  
+        cond = (KC_WS != NULL) && U_cmp_strs(KCPTR("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        S4ASSERT(cond == 1, "KK_AF == \"Ondernemingen: ontvangen kapitaaloverdrachten.\"");
+    }
     
     U_test_reset_kmsg_msgs(); 
-
 }
 
 

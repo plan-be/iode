@@ -136,7 +136,7 @@ int B_WsDump(KDB* kdb, char* filename)
 {
     int     rc = -1, ftype, type = KTYPE(kdb);
 
-    kmsg("Saving %s", filename);
+    // kmsg("Saving %s", filename); // JMP 13/12/2022 (msg already in with K_save_kdb)
     ftype = X_findtype(filename);
 
     if(ftype >= 10 && ftype <= 17)
