@@ -122,3 +122,8 @@ enum EnumIodeCase
     I_LOWER = K_LOWER,
     I_ASIS = K_ASIS
 };
+
+
+const static int I_NB_COLORS = 8;
+
+const static std::array<std::string, I_NB_COLORS> vGraphsColors = {"Blue", "Yellow", "Black", "White", "Red", "Green", "Cyan", "Magenta"};
