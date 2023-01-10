@@ -136,3 +136,46 @@ const static int I_NB_EXPORT_FORMATS = 5;
 
 const static std::array<std::string, I_NB_EXPORT_FORMATS> vExportFormats = 
 	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
+
+
+// ====== Graphs ======
+
+enum EnumIodeGraphAxisType
+{
+    I_G_LEVEL,
+    I_G_DIFF,
+    I_G_GROWTH_RATE,
+    I_G_Y0Y_DIFF,
+    I_G_Y0Y_GROWTH_RATE
+};
+
+const static int I_NB_X_AXIS_TYPES = 5;
+
+const static std::array<std::string, I_NB_X_AXIS_TYPES> vGraphsXAxisTypes = 
+    { "Level", "Differences", "Growth rates", "YoY Diffs", "YoY Grt" };
+
+
+enum EnumIodeGraphAxisThicks
+{
+    I_G_MAJOR_THICKS,
+    I_G_NO_THICKS,
+    I_G_MINOR_THICKS
+};
+
+const static int I_NB_AXIS_THICKS = 3;
+
+const static std::array<std::string, I_NB_AXIS_THICKS> vGraphsAxisThicks = 
+    { "Major thicks", "No grids", "Minor thicks" };
+
+
+enum EnumIodeGraphChart
+{
+    I_G_CHART_LINE,
+    I_G_CHART_SCATTER,
+    I_G_CHART_BAR
+};
+
+const static int I_NB_CHART_TYPES = 3;
+
+const static std::array<std::string, I_NB_CHART_TYPES> vGraphsChartTypes = 
+    { "Line chart", "Scatter chart", "Bar chart" };
