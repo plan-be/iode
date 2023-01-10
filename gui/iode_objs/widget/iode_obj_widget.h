@@ -120,8 +120,8 @@ template <class M, class V> class QIodeObjectWidget: public AbstractIodeObjectWi
     QDir projectDir;
 
 public:
-    QIodeObjectWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, 
-        QWidget* parent = nullptr) : AbstractIodeObjectWidget(iodeType, parent), projectDir(QDir::homePath())
+    QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : 
+        AbstractIodeObjectWidget(iodeType, parent), projectDir(QDir::homePath())
     {
         QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
 
@@ -133,7 +133,7 @@ public:
         tableview = new V(parent);
         tableview->setObjectName(QString::fromUtf8("tableview"));
         tableview->setGeometry(QRect(10, 43, 950, 560));
-        tableview->setupView(objmodel, lineEdit_filter, settings_filepath);
+        tableview->setupView(objmodel, lineEdit_filter);
         
         // signals - slots
         connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter);
@@ -197,7 +197,13 @@ public:
     void setProjectDir(const QDir& projectDir)
     {
         this->projectDir = projectDir;
+        
         clearKDB();
+    }
+
+    void setProjectSettingsFilepath(std::shared_ptr<QString>& settings_filepath)
+    {
+        tableview->setProjectSettingsFilepath(settings_filepath);
     }
 
     bool load(const QString& filepath, const bool forceOverwrite)
@@ -219,48 +225,41 @@ public:
 class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeCommentsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };
 
 class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeEquationsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };
 
 class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeIdentitiesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };
 
 class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeListsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };
 
 class QIodeScalarsWidget : public QIodeObjectWidget<ScalarsModel, ScalarsView>
 {
 public:
-    QIodeScalarsWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeScalarsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };
 
 class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeTablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };
 
 class QIodeVariablesWidget : public QIodeObjectWidget<VariablesModel, VariablesView>
 {
 public:
-    QIodeVariablesWidget(std::shared_ptr<QString>& settings_filepath, EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        QIodeObjectWidget(settings_filepath, iodeType, parent) {}
+    QIodeVariablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
 };

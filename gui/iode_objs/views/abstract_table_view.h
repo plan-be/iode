@@ -69,12 +69,16 @@ public:
 
 	~AbstractTableView() {}
 
-	void setupView(M* model, QLineEdit* filterLineEdit, std::shared_ptr<QString>& project_settings_filepath)
+	void setupView(M* model, QLineEdit* filterLineEdit)
 	{
 		setModel(model);
 		setItemDelegate(delegate);
 		this->filterLineEdit = filterLineEdit;
-		this->project_settings_filepath = project_settings_filepath;
+	}
+
+	void setProjectSettingsFilepath(std::shared_ptr<QString>& settings_filepath)
+	{
+		this->project_settings_filepath = settings_filepath;
 	}
 
 	void update()

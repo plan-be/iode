@@ -122,7 +122,11 @@ set(GUI_MENU_COMPUTE
     menu/compute/compute_scc_simulation.ui      menu/compute/compute_scc_simulation.h       menu/compute/compute_scc_simulation.cpp
 )
 
-set(GUI_MENUS ${GUI_MENU_FILE} ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE})
+set(GUI_MENU_PRINT_GRAPH
+    menu/print_graph/graph_variables.ui         menu/print_graph/graph_variables.h          menu/print_graph/graph_variables.cpp
+)
+
+set(GUI_MENUS ${GUI_MENU_FILE} ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE} ${GUI_MENU_PRINT_GRAPH})
 
 set(GUI_MAIN    
     main_window.ui  main_window.h   main_window.cpp 

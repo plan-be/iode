@@ -2,16 +2,25 @@
 
 #include <QObject>
 #include <QMessageBox>
+#include <QShortcut>
 
 #include "abstract_table_view.h"
 #include "iode_objs/models/variables_model.h"
 #include "iode_objs/delegates/variables_delegate.h"
 #include "iode_objs/new/add_variable.h"
+#include "plot/plot.h"
+#include "menu/print_graph/graph_variables.h"
 
 
 class VariablesView : public AbstractTableView<VariablesModel>
 {
 	Q_OBJECT
+
+	QShortcut* plotSeriesShortcut;
+	QShortcut* graphsDialogShortcut;
+
+private:
+	QList<QString> extractVariablesNamesFromTo();
 
 protected:
 	void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
@@ -33,9 +42,28 @@ public:
 		// item and the clicked item are selected or unselected, depending on the state of the clicked item.
 		// See: https://doc.qt.io/qt-5/qabstractitemview.html#SelectionMode-enum
 		setSelectionMode(QTableView::ContiguousSelection);
+
+		// keyboard shortcuts
+		plotSeriesShortcut = new QShortcut(QKeySequence(Qt::Key_F8), this);
+		graphsDialogShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F8), this);
+
+		connect(plotSeriesShortcut, &QShortcut::activated, this, &VariablesView::plot_series);
+		connect(graphsDialogShortcut, &QShortcut::activated, this, &VariablesView::open_graphs_dialog);
 	};
+
+	~VariablesView()
+	{
+		delete plotSeriesShortcut;
+		delete graphsDialogShortcut;
+	}
+
+signals:
+	void newPlot(QIodePlotDialog* plotDialog);
+	void newGraphsDialog(const QList<QString>& variableNames, const QString& from, const QString& to);
 
 public slots:
 	void filter() { filter_and_update(); }
 	void new_obj();
+	void plot_series();
+	void open_graphs_dialog();
 };
