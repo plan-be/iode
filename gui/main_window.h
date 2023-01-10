@@ -12,6 +12,7 @@
 #include "ui_main_window.h"
 
 #include "utils.h"
+#include "plot/plot.h"
 
 #include "menu/file/file_import_comments.h"
 #include "menu/file/file_import_variables.h"
@@ -27,6 +28,9 @@
 #include "menu/compute/compute_model.h"
 #include "menu/compute/compute_scc_decomposition.h"
 #include "menu/compute/compute_scc_simulation.h"
+
+#include "menu/print_graph/graph_variables.h"
+
 
 /**
  * @brief (...)
@@ -53,6 +57,8 @@ private:
 	QString projectPath;
 	const int MAX_RECENT_PROJECTS = 30;
 	QStringList recentProjects;
+
+	QVector<QIodePlotDialog*> plots;
 
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
@@ -97,6 +103,8 @@ private:
 	QMessageBox::StandardButton askSaveAllTabs();
 
 public slots:
+	void appendPlot(QIodePlotDialog* plotDialog);
+
 	// File Menu
 	void createNewProject();
 	void open_project();
@@ -118,6 +126,11 @@ public slots:
 	void open_compute_model_dialog();
 	void open_compute_scc_decomposition_dialog();
 	void open_compute_scc_simulation_dialog();
+
+	// Print/Graph Menu
+	void open_graphs_variables_dialog(); 
+	void open_graphs_variables_dialog_from_vars_view(
+		const QList<QString>& variableNames, const QString& from, const QString& to);
 
 	// Help Menu
 	void about();

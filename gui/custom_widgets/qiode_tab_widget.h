@@ -274,6 +274,11 @@ public:
      */
     void clearWorkspace();
 
+    VariablesView* getVariablesView() const
+    {
+        return tabVariables->get_view();
+    }
+
 public slots:
     void removeTab(const int index);
 

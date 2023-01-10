@@ -37,6 +37,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     // connect the Tabs widget to the File Explorer
     treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
 
+    // ---- tabs widget ----
+    VariablesView* variablesView = tabWidget_IODE_objs->getVariablesView();
+    connect(variablesView, &VariablesView::newPlot, this, &MainWindow::appendPlot);
+    connect(variablesView, &VariablesView::newGraphsDialog, this, 
+        &MainWindow::open_graphs_variables_dialog_from_vars_view);
+
     // ---- load project (if any) (if any) ----
     // first time launching the GUI -> ask the user to either start a new project 
     // or to open an existing folder containing reports and/or KDB files as project
@@ -54,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
         dockWidget_file_explorer->hide();
     }
     else
-        // first time launching the GUI -> ask the user to either start a new project 
+    // first time launching the GUI -> ask the user to either start a new project 
     // or to open an existing folder containing reports and/or KDB files as project
     if (projectPath.isEmpty())
     {
@@ -79,6 +85,9 @@ MainWindow::~MainWindow()
 
     for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
 
+    foreach(QIodePlotDialog* plotDialog, plots) plotDialog->close();
+    plots.clear();
+
     delete project_settings;
     delete user_settings;
 }
@@ -100,6 +109,12 @@ void MainWindow::buildRecentProjectsMenu()
         connect(action, &QAction::triggered, this, &MainWindow::open_recent_project);
         menuRecent_Projects->addAction(action);
     }
+}
+
+void MainWindow::appendPlot(QIodePlotDialog* plotDialog)
+{
+    plotDialog->open();
+    plots.append(plotDialog);
 }
 
 void MainWindow::addProjectPathToList(const QDir& projectDir)
@@ -336,6 +351,24 @@ void MainWindow::open_compute_scc_decomposition_dialog()
 void MainWindow::open_compute_scc_simulation_dialog()
 {
     QIodeMenuComputeSCCSimulation dialog(*project_settings_filepath, this);
+    dialog.exec();
+}
+
+void MainWindow::open_graphs_variables_dialog()
+{
+    QIodeMenuGraphVariables dialog(*project_settings_filepath, this);
+    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendPlot);
+    dialog.exec();
+}
+
+void MainWindow::open_graphs_variables_dialog_from_vars_view(
+    const QList<QString>& variableNames, const QString& from, const QString& to)
+{
+    QIodeMenuGraphVariables dialog(*project_settings_filepath, this);
+    dialog.setVariablesNames(variableNames);
+	dialog.setFrom(from);
+	dialog.setTo(to);
+    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendPlot);
     dialog.exec();
 }
 

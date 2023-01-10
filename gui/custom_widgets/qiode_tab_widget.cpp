@@ -27,13 +27,13 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     connect(clearShortcut, &QShortcut::activated, this, &QIodeTabWidget::clearCurrentTab);
 
     // prepare widgets for tabs associated with IODE object types
-    tabComments = new QIodeCommentsWidget(project_settings_filepath, I_COMMENTS, this);
-    tabEquations = new QIodeEquationsWidget(project_settings_filepath, I_EQUATIONS, this);
-    tabIdentites = new QIodeIdentitiesWidget(project_settings_filepath, I_IDENTITIES, this);
-    tabLists = new QIodeListsWidget(project_settings_filepath, I_LISTS, this);
-    tabScalars = new QIodeScalarsWidget(project_settings_filepath, I_SCALARS, this);
-    tabTables = new QIodeTablesWidget(project_settings_filepath, I_TABLES, this);
-    tabVariables = new QIodeVariablesWidget(project_settings_filepath, I_VARIABLES, this);
+    tabComments = new QIodeCommentsWidget(I_COMMENTS, this);
+    tabEquations = new QIodeEquationsWidget(I_EQUATIONS, this);
+    tabIdentites = new QIodeIdentitiesWidget(I_IDENTITIES, this);
+    tabLists = new QIodeListsWidget(I_LISTS, this);
+    tabScalars = new QIodeScalarsWidget(I_SCALARS, this);
+    tabTables = new QIodeTablesWidget(I_TABLES, this);
+    tabVariables = new QIodeVariablesWidget(I_VARIABLES, this);
 
     // tab prefix per file type
     // Note: If the tab's label contains an ampersand, the letter following the ampersand is used as a shortcut for the tab, 
@@ -150,6 +150,15 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath)
 
     // close all tabs
     this->clear();
+
+    // update settings filepath in each Iode object tab
+    tabComments->setProjectSettingsFilepath(project_settings_filepath);
+    tabEquations->setProjectSettingsFilepath(project_settings_filepath);
+    tabIdentites->setProjectSettingsFilepath(project_settings_filepath);
+    tabLists->setProjectSettingsFilepath(project_settings_filepath);
+    tabScalars->setProjectSettingsFilepath(project_settings_filepath);
+    tabTables->setProjectSettingsFilepath(project_settings_filepath);
+    tabVariables->setProjectSettingsFilepath(project_settings_filepath);
 
     // add a default tab for each IODE type of objects
     this->addTab(tabComments, "");
