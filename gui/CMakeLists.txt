@@ -8,7 +8,7 @@ message(CHECK_START "Search for Qt6 package")
 if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     set(CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
 endif()
-find_package(Qt6 COMPONENTS Core Widgets Gui)
+find_package(Qt6 COMPONENTS Core Widgets Gui Charts)
 
 if(Qt6_FOUND)
 message(CHECK_PASS "found")
@@ -131,7 +131,7 @@ set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS}
 )
 
 qt_add_executable(iode_gui ../resources/iode_resource.qrc MANUAL_FINALIZATION ${PROJECT_SOURCES})
-target_link_libraries(iode_gui PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui iodecppapi)
+target_link_libraries(iode_gui PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts iodecppapi)
 # By calling target_include_directories, we make sure that the absolute path to 
 # the gui directory is automatically added as an include path to the iode_gui target.
 # Required to use the custom widgets in UI files
