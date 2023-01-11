@@ -34,6 +34,10 @@ set(GUI_CUSTOM_WIDGETS
     custom_widgets/qiode_file_explorer.h        custom_widgets/qiode_file_explorer.cpp
 )
 
+set(GUI_PLOT
+    plot/plot.h     plot/plot.cpp
+)
+
 set(GUI_EDIT_OBJECT
                                         iode_objs/edit/popup_view.h
     iode_objs/edit/edit_equation.ui     iode_objs/edit/edit_equation.h          iode_objs/edit/edit_equation.cpp
@@ -125,7 +129,7 @@ set(GUI_MAIN
     main.cpp
 ) 
 
-set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} 
+set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} ${GUI_PLOT}
                         ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT}  ${GUI_MENUS}
                         ${GUI_MAIN}
 )
