@@ -943,9 +943,9 @@
     <addaction name="separator"/>
     <addaction name="actionDuplicate_objects"/>
    </widget>
-   <widget class="QMenu" name="menuCompute">
+   <widget class="QMenu" name="menuRun">
     <property name="title">
-     <string>&amp;Compute</string>
+     <string>&amp;Run</string>
     </property>
     <property name="toolTipsVisible">
      <bool>true</bool>
@@ -1011,7 +1011,7 @@
    <addaction name="menuFile"/>
    <addaction name="menuWorkspace"/>
    <addaction name="menuData"/>
-   <addaction name="menuCompute"/>
+   <addaction name="menuRun"/>
    <addaction name="menuPrint_Graph"/>
    <addaction name="menuReport"/>
    <addaction name="menuHelp"/>
