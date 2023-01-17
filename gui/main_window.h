@@ -100,7 +100,6 @@ public slots:
 	// File Menu
 	void createNewProject();
 	void open_project();
-	void save_project_as();
 	void open_recent_project();
 	void saveCurrentTab();
 	void saveAllTabs();

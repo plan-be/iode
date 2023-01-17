@@ -183,35 +183,6 @@ void MainWindow::open_project()
     openDirectory(projectPath);
 }
 
-void MainWindow::copy_project_to()
-{
-    QIodeMenuFileNewProject dialog(projectPath, this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        QString copyProjectPath = dialog.getPathNewProject();
-        // check if user clikced on Cancel button
-        if(copyProjectPath.isEmpty()) return;
-
-        // ask user before to copy all files and directories
-        QDir currentProjectDir(projectPath);
-        QString msg = "Are you sure to copy all the following files/directories:\n\n";
-        msg += currentProjectDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot).join("\n");
-        msg += "\n\ninto the new directory '" + copyProjectPath + "'";
-        QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", msg, QMessageBox::Yes | QMessageBox::No);
-        if(answer == QMessageBox::No) return;
-
-        // update current project path
-        projectPath = copyProjectPath;
-        // save all tabs content
-        tabWidget_IODE_objs->saveAllTabs();
-        // save all IODE files to the (new) directory 
-        QDir projectDir = QDir(projectPath);
-        tabWidget_IODE_objs->copyProjectTo(projectDir);
-
-        openDirectory(projectPath);
-    }
-}
-
 void MainWindow::open_recent_project()
 {
     QAction* action = static_cast<QAction*>(QObject::sender());

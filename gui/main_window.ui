@@ -71,7 +71,6 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
-    <addaction name="actionImport_Comments"/>
     <widget class="QMenu" name="menuRecent_Projects">
      <property name="title">
       <string>Recent Projects</string>
@@ -79,13 +78,14 @@
     </widget>
     <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Project"/>
-    <addaction name="actionSave_Project_As"/>
+    <addaction name="actionCopy_Project_To"/>
     <addaction name="menuRecent_Projects"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_All"/>
     <addaction name="separator"/>
-    <addaction name="actionImport"/>
+    <addaction name="actionImport_Comments"/>
+    <addaction name="actionImport_Variables"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionPrint_Setup"/>
@@ -1681,22 +1681,6 @@
     <hint type="destinationlabel">
      <x>499</x>
      <y>349</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSave_Project_As</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>save_project_as()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>499</x>
-     <y>351</y>
     </hint>
    </hints>
   </connection>
