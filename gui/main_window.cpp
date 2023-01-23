@@ -1,11 +1,17 @@
 #include "main_window.h"
 
 QWidget* main_window_ptr = nullptr;
+QString currentProjectPath;
 
 
 QWidget* get_main_window_ptr()
 {
     return main_window_ptr;
+}
+
+QString get_current_project_path()
+{
+    return currentProjectPath;
 }
 
 
@@ -159,6 +165,9 @@ bool MainWindow::openDirectory(const QString& dirPath)
 
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);
+
+    // set global variable currentProjectPath
+    currentProjectPath = projectDir.absolutePath();
 
     return true;
 }
