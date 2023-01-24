@@ -46,7 +46,7 @@ jobs:
         # See https://github.com/jurplel/install-qt-action
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.2.1'
+          version: '6.4.0'
           host: 'windows'
           target: 'desktop'
           # TODO : adpat arch for Linux
