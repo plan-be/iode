@@ -513,8 +513,14 @@ void MainWindow::open_compute_scc_simulation_dialog()
     QIodeMenuComputeSCCSimulation dialog(*project_settings_filepath, this);
     dialog.exec();
 }
-
 // -------- Print/Graphs Menu --------
+
+void MainWindow::open_graphs_tables_dialog()
+{
+    QIodeMenuGraphTables dialog(*project_settings_filepath, this);
+    connect(&dialog, &QIodeMenuGraphTables::newPlot, this, &MainWindow::appendPlot);
+    dialog.exec();
+}
 
 void MainWindow::open_graphs_variables_dialog()
 {

@@ -166,6 +166,7 @@ set(GUI_MENU_COMPUTE
 
 set(GUI_MENU_PRINT_GRAPH
                                             menu/print_graph/print_abstract.h           menu/print_graph/print_abstract.cpp    
+menu/print_graph/graph_tables.ui            menu/print_graph/graph_tables.h             menu/print_graph/graph_tables.cpp
 menu/print_graph/graph_variables.ui         menu/print_graph/graph_variables.h          menu/print_graph/graph_variables.cpp
 )
 

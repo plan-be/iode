@@ -52,6 +52,7 @@
 #include "menu/compute/compute_scc_decomposition.h"
 #include "menu/compute/compute_scc_simulation.h"
 
+#include "menu/print_graph/graph_tables.h"
 #include "menu/print_graph/graph_variables.h"
 
 
@@ -180,6 +181,7 @@ public slots:
 	void open_compute_scc_simulation_dialog();
 
 	// Print/Graph Menu
+	void open_graphs_tables_dialog();
 	void open_graphs_variables_dialog(); 
 	void open_graphs_variables_dialog_from_vars_view(
 		const QList<QString>& variableNames, const QString& from, const QString& to) override;
