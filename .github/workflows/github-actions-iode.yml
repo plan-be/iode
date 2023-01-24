@@ -52,6 +52,7 @@ jobs:
           # TODO : adpat arch for Linux
           arch: 'win64_msvc2019_64'
           dir: '${{ github.workspace }}/'
+          modules: 'qtcharts'
           install-deps: 'true'
       # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       # Note: use $env:GITHUB_ENV instead of $GITHUB_ENV on Windows OS
