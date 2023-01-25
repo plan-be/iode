@@ -14,6 +14,7 @@
 #include "objects/table.h"
 #include "objects/scalar.h"
 #include "KDB/kdb_global.h"
+#include "KDB/kdb_reference.h"
 #include "KDB/kdb_comments.h"
 #include "KDB/kdb_equations.h"
 #include "KDB/kdb_identities.h"
