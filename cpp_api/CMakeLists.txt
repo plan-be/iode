@@ -37,6 +37,11 @@ set(CPP_COMPUTE
     compute/estimation.h    compute/estimation.cpp
     )
 
+set(CPP_GSAMPLE
+    gsample/gsample.h           gsample/gsample.cpp
+    gsample/gsample_graph.h     gsample/gsample_graph.cpp
+    )
+
 set(CPP_LEGACY  
     legacy/s_iode.c legacy/b_legacy.c
    )
@@ -50,11 +55,13 @@ add_library(iodecppapi STATIC
             ${CPP_OBJS}
             ${CPP_KDB}
             ${CPP_COMPUTE}
+            ${CPP_GSAMPLE}
             ${CPP_LEGACY}
             )
 
 set_source_files_properties(objects/equation.cpp objects/table.cpp 
                             KDB/kdb_global.cpp 
+                            gsample/gsample.cpp
                             report/rep_list.cpp
                             PROPERTIES COMPILE_FLAGS -Zp1)
 target_include_directories(iodecppapi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

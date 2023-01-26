@@ -23,3 +23,4 @@
 #include "KDB/kdb_variables.h"
 #include "compute/simulation.h"
 #include "compute/estimation.h"
+#include "gsample/gsample_graph.h"
