@@ -106,6 +106,7 @@ set(GUI_OBJS_VIEWS
     iode_objs/views/scalars_view.h          iode_objs/views/scalars_view.cpp
     iode_objs/views/tables_view.h           iode_objs/views/tables_view.cpp
     iode_objs/views/variables_view.h        iode_objs/views/variables_view.cpp
+    iode_objs/views/gsample_table_view.h
 )
 
 set(GUI_IODE_MISC
