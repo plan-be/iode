@@ -83,6 +83,7 @@ set(GUI_OBJS_MODELS
     iode_objs/models/scalars_model.h            iode_objs/models/scalars_model.cpp
     iode_objs/models/tables_model.h             iode_objs/models/tables_model.cpp
     iode_objs/models/variables_model.h          iode_objs/models/variables_model.cpp
+    iode_objs/models/gsample_table_model.h      iode_objs/models/gsample_table_model.cpp    
 )
 
 set(GUI_OBJS_DELEGATES
