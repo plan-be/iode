@@ -20,6 +20,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     // ---- setup the present class ----
     setupUi(this);
 
+    // ---- prepare auto-completion ----
+    QString pattern = "[^\\w$#@]+";
+    completer = new QIodeCompleter(this);
+    lineEdit_iode_command->setup(textEdit_output, completer, pattern);
+
+    // ---- dock widgets ----
+    // make left dock widget to extend to bottom of the window
+    this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+
     // ---- global parameters ----
     main_window_ptr = static_cast<QWidget*>(this);
 
@@ -88,6 +97,7 @@ MainWindow::~MainWindow()
     foreach(QIodePlotDialog* plotDialog, plots) plotDialog->close();
     plots.clear();
 
+    delete completer;
     delete project_settings;
     delete user_settings;
 }
@@ -183,6 +193,9 @@ bool MainWindow::openDirectory(const QString& dirPath)
 
     // set global variable currentProjectPath
     currentProjectPath = projectDir.absolutePath();
+
+    // update auto-completion
+    completer->updateIodeOjectsListNames();
 
     return true;
 }
@@ -287,14 +300,20 @@ void MainWindow::open_import_comments_dialog()
 {
     QIodeMenuFileImportComments dialog(*project_settings_filepath, this);
     if (dialog.exec() == QDialog::Accepted)
+    {
         tabWidget_IODE_objs->resetFilter(I_COMMENTS);
+        completer->updateIodeOjectsListNames();
+    }
 }
 
 void MainWindow::open_import_variables_dialog()
 {
     QIodeMenuFileImportVariables dialog(*project_settings_filepath, this);
     if (dialog.exec() == QDialog::Accepted)
+    {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
+        completer->updateIodeOjectsListNames();
+    }
 }
 
 void MainWindow::open_export_dialog()
@@ -307,7 +326,11 @@ void MainWindow::clear_workspace()
 {
     QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", "Are you sure to clear the whole workspace?", 
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-    if (answer == QMessageBox::Yes) tabWidget_IODE_objs->clearWorkspace();
+    if (answer == QMessageBox::Yes)
+    {
+        tabWidget_IODE_objs->clearWorkspace();
+        completer->updateIodeOjectsListNames();
+    }
 }
 
 void MainWindow::open_high_to_low_dialog()
@@ -418,4 +441,12 @@ void MainWindow::open_iode_manual()
 {
     QUrl url = get_url_iode_manual();
     QDesktopServices::openUrl(url);
+}
+
+void MainWindow::update_current_tab()
+{
+    // update current tab if needed
+    tabWidget_IODE_objs->showTab();
+    // update the list of Iode object names available for auto-complemention
+    completer->updateIodeOjectsListNames();
 }
