@@ -515,6 +515,12 @@ void MainWindow::open_compute_scc_simulation_dialog()
 }
 // -------- Print/Graphs Menu --------
 
+void MainWindow::open_print_tables_dialog()
+{
+    QIodeMenuPrintTables dialog(*project_settings_filepath, this);
+    dialog.exec();
+}
+
 void MainWindow::open_print_variables_dialog()
 {
     QIodeMenuPrintVariables dialog(*project_settings_filepath, this);
