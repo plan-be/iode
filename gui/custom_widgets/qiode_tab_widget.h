@@ -250,7 +250,7 @@ public:
 
     /**
      * @brief show tab corresponding to passed index. 
-     *        Do nothing if index is -1.
+     *        Update current tab if index is -1.
      * 
      * @param index int index of the tab to show.
      */
