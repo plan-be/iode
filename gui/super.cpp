@@ -20,8 +20,8 @@ void gui_warning_super(char* msg)
 
 void gui_msg_super(char* msg)
 {
-	QMainWindow* main_window = static_cast<QMainWindow*>(get_main_window_ptr());
-	main_window->statusBar()->showMessage(QString(msg));
+	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
+	main_window->display_output(QString(msg));
 }
 
 int gui_confirm_super(char* msg)

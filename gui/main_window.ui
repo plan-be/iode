@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>704</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -37,6 +37,9 @@
     <width>24</width>
     <height>24</height>
    </size>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -78,7 +81,6 @@
     </widget>
     <addaction name="actionNew_Project"/>
     <addaction name="actionOpen_Project"/>
-    <addaction name="actionCopy_Project_To"/>
     <addaction name="menuRecent_Projects"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
@@ -281,17 +283,6 @@
     <addaction name="actionPrint_A2M_File"/>
     <addaction name="actionPrint_Report"/>
    </widget>
-   <widget class="QMenu" name="menuReport">
-    <property name="title">
-     <string>&amp;Report</string>
-    </property>
-    <property name="toolTipsVisible">
-     <bool>true</bool>
-    </property>
-    <addaction name="actionEdit_report"/>
-    <addaction name="actionExecute_report"/>
-    <addaction name="actionExecute_a_report_line"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>&amp;Help</string>
@@ -309,7 +300,6 @@
    <addaction name="menuData"/>
    <addaction name="menuRun"/>
    <addaction name="menuPrint_Graph"/>
-   <addaction name="menuReport"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -322,8 +312,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>160</width>
-     <height>40</height>
+     <width>178</width>
+     <height>113</height>
     </size>
    </property>
    <property name="floating">
@@ -342,46 +332,112 @@
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
-    <widget class="QIodeFileExplorer" name="treeView_file_explorer">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>200</width>
-       <height>620</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>160</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::EditKeyPressed</set>
-     </property>
-     <property name="dragEnabled">
-      <bool>true</bool>
-     </property>
-     <property name="dragDropOverwriteMode">
-      <bool>true</bool>
-     </property>
-     <property name="dragDropMode">
-      <enum>QAbstractItemView::InternalMove</enum>
-     </property>
-     <property name="defaultDropAction">
-      <enum>Qt::MoveAction</enum>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QIodeFileExplorer" name="treeView_file_explorer">
+       <property name="minimumSize">
+        <size>
+         <width>160</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::EditKeyPressed</set>
+       </property>
+       <property name="dragEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="dragDropOverwriteMode">
+        <bool>true</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::InternalMove</enum>
+       </property>
+       <property name="defaultDropAction">
+        <enum>Qt::MoveAction</enum>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_command">
+   <property name="minimumSize">
+    <size>
+     <width>294</width>
+     <height>143</height>
+    </size>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Command</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_iode_command">
+       <property name="text">
+        <string>Report Command</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QIodeCommandLine" name="lineEdit_iode_command"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="pushButton_run_iode_command">
+       <property name="text">
+        <string>Run</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_output">
+       <property name="text">
+        <string>Output</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QTextEdit" name="textEdit_output">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <action name="actionImport_Comments">
@@ -975,7 +1031,15 @@
   <customwidget>
    <class>QIodeFileExplorer</class>
    <extends>QTreeView</extends>
-   <header location="global">custom_widgets/qiode_file_explorer.h</header>
+   <header>custom_widgets/qiode_file_explorer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QIodeCommandLine</class>
+   <extends>QLineEdit</extends>
+   <header location="global">custom_widgets/qiode_command.h</header>
+   <slots>
+    <slot>run_command()</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -1750,6 +1814,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEdit_iode_command</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>update_current_tab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>875</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>926</x>
+     <y>529</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_run_iode_command</sender>
+   <signal>clicked()</signal>
+   <receiver>lineEdit_iode_command</receiver>
+   <slot>run_command()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>937</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>893</x>
+     <y>582</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1794,5 +1890,6 @@
   <slot>saveCurrentTab()</slot>
   <slot>saveAllTabs()</slot>
   <slot>createNewProject()</slot>
+  <slot>update_current_tab()</slot>
  </slots>
 </ui>

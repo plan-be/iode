@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include "main_window.h"
 #include <QString>
 #include <QMessageBox>
 #include <QMainWindow>

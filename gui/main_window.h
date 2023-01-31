@@ -5,6 +5,9 @@
 #include <QList>
 #include <QAction>
 #include <QSettings>
+#include <QCompleter>
+#include <QStringList>
+#include <QStringListModel>
 #include <QMessageBox>
 #include <QFileIconProvider>
 #include <QMainWindow>
@@ -13,6 +16,8 @@
 
 #include "utils.h"
 #include "plot/plot.h"
+
+#include "custom_widgets/qiode_completer.h"
 
 #include "menu/file/file_import_comments.h"
 #include "menu/file/file_import_variables.h"
@@ -60,6 +65,8 @@ private:
 
 	QVector<QIodePlotDialog*> plots;
 
+	QIodeCompleter* completer;
+
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	~MainWindow();
@@ -75,6 +82,15 @@ public:
 	 * @return bool whether or not the IODE project root has been updated.
 	 */
 	bool openDirectory(const QString& dirPath);
+
+	/**
+	 * @brief displays output
+	 * 
+	 */
+	void display_output(const QString& output)
+	{
+		textEdit_output->append(output);
+	}
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -137,4 +153,7 @@ public slots:
 	void open_release_notes();
 	void open_iode_home();
 	void open_iode_manual();
+
+	// Main Window
+	void update_current_tab();
 };
