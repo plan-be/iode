@@ -22,8 +22,8 @@ public:
 			"-ppp is the period of the year");
 #endif
 		// https://doc.qt.io/qt-5/qregexp.html
-		QRegularExpression re("\\d{4}[YQMW]\\d{1,3}");
-		QValidator* validator = new QRegularExpressionValidator(re, this);
+		QRegularExpression re("[1-9][0-9YQMW]{5,7}");
+		QRegularExpressionValidator* validator = new QRegularExpressionValidator(re, this);
 		this->setValidator(validator);
 	}
 };
