@@ -291,6 +291,11 @@ public:
 
     QString extractAndVerify()
     {
-        return qfield.text();
+        QString value = qfield.text();
+
+        // throw an error if the string is not valid for an IODE period
+        if (type == REQUIRED_FIELD && value.isEmpty()) Period per(value.toStdString());
+
+        return value;
     }
 };
