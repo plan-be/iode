@@ -51,6 +51,7 @@ enum EnumIodeType
 const static int I_NB_TYPES = K_NBR_OBJ;
 
 const static std::array<std::string, I_NB_TYPES> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
+const static std::array<std::string, I_NB_TYPES> v_types_short = { "cmt", "eqs", "idt", "lst", "scl", "tbl", "var" };
 
 struct IodeRegexName
 {
@@ -89,6 +90,14 @@ enum EnumIodeFile
 
 const static int I_NB_FILE_EXT = 12;
 
+// same as k_ext defined in k_objfile.c
+const static std::array<std::string, 25> v_ext = 
+{
+    "cmt", "eqs", "idt", "lst", "scl", "tbl", "var",
+    "ac",  "ae",  "ai",  "al",  "as",  "at",  "av",
+    "rep", "a2m", "agl", "prf", "dif", "mif", "rtf",
+    "ps",  "asc", "txt", "csv"
+};
 
 struct IodeFileExtension
 {
