@@ -167,6 +167,16 @@ public:
         delete tableview;
     }
 
+    M* get_model() const 
+    {
+        return objmodel;
+    }
+
+    V* get_view() const
+    {
+        return tableview;
+    }
+
     void clearKDB()
     {
         objmodel->clearKDB();
