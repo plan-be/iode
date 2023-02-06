@@ -101,3 +101,27 @@ TEST(TestPeriod, ToString)
 	str_res = periodW.to_string();
 	EXPECT_EQ(str_res, str_period);
 }
+
+TEST(TestPeriod, ToDouble)
+{
+	std::string str_period;
+	double res;
+
+	// periodicity = Y
+	str_period = "2020Y1";
+	Period periodY(str_period);
+	res = periodY.to_double();
+	EXPECT_DOUBLE_EQ(res, 2020.0);
+
+	// periodicity = Q
+	str_period = "2020Q2";
+	Period periodQ(str_period);
+	res = periodQ.to_double();
+	EXPECT_DOUBLE_EQ(res, 2020.0 + (1./4.));
+
+	// periodicity = W
+	str_period = "2020W10";
+	Period periodW(str_period);
+	res = periodW.to_double();
+	EXPECT_DOUBLE_EQ(res, 2020.0 + (9 * (1./52.)));
+}
