@@ -15,6 +15,16 @@ const static std::map<char, int> mPeriodicities =
 	{'D', 365}
 };
 
+const static std::map<char, double> mSteps =
+{
+	{'Y', 0.},
+	{'S', 1./2.},
+	{'Q', 1./4.},
+	{'M', 1./12.},
+	{'W', 1./52.},
+	{'D', 1./365.}
+};
+
 
 struct Period
 {
@@ -60,6 +70,30 @@ public:
 		char ch_period[10];
 		PER_pertoa(c_period, ch_period);
 		return std::string(ch_period);
+	}
+
+	/**
+	 * @brief transforms a period into a double value.
+	 *        For examples:
+	 *        2000Y1    ->    2000.0
+	 *        2000Q2    ->    2000.25
+	 *        2000M4    ->    2000.25
+	 * 
+	 * @return double 
+	 */
+	double to_double() const
+	{
+		try
+		{
+			double value = static_cast<double>(c_period->p_y);
+			if(c_period->p_p != 'Y') value += mSteps.at(c_period->p_p) * (c_period->p_s - 1);
+			return value;
+		}
+		catch(const std::exception& e)
+		{
+			throw IodeExceptionFunction("Invalid periodicity " + std::to_string(c_period->p_p) + ".\n" + 
+				"Possible values for the periodicity are " + std::string(L_PERIOD_CH) + ")");
+		}
 	}
 
 	bool operator==(const Period& other) const
