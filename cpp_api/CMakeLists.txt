@@ -8,6 +8,10 @@ set(CPP_TIME
     time/sample.h   time/sample.cpp
     )
 
+set(CPP_REPORT
+    report/rep_list.h   report/rep_list.cpp
+)
+
 set(CPP_OBJS
     objects/equation.h      objects/equation.cpp
     objects/identity.h      objects/identity.cpp
@@ -41,6 +45,7 @@ add_library(iodecppapi STATIC
             iode_cpp_api.h      iode_cpp_api.cpp 
             common.h
             ${CPP_UTILS}
+            ${CPP_REPORT}
             ${CPP_TIME}
             ${CPP_OBJS}
             ${CPP_KDB}
@@ -50,6 +55,7 @@ add_library(iodecppapi STATIC
 
 set_source_files_properties(objects/equation.cpp objects/table.cpp 
                             KDB/kdb_global.cpp 
+                            report/rep_list.cpp
                             PROPERTIES COMPILE_FLAGS -Zp1)
 target_include_directories(iodecppapi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(iodecppapi PUBLIC iodeapi)
