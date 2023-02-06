@@ -41,6 +41,12 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
+      - name: update pip
+        run: python.exe -m pip install --upgrade pip
+      - name: install aqtinstall
+        run: pip install aqtinstall
+      - name: show available Qt versions
+        run: aqt list-qt windows desktop
       - name: Install Qt
         if: contains(github.head_ref, 'gui')
         # See https://github.com/jurplel/install-qt-action
