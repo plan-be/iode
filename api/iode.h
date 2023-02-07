@@ -1215,6 +1215,7 @@ typedef struct _repfile_ {
 
 typedef struct _repfns_ {
     char    *keyw;          // function name to use in reports
+    char    *key_camel;     // function name in CamelCase
     int     (*fn)();        // function pointer in *non GUI* mode
     int     (*sfn)();       // function pointer in GUI mode
     int     type;           // suffix required after keyw (var, idt...) or not:
@@ -1223,7 +1224,10 @@ typedef struct _repfns_ {
     						//   2=suffix required: file extensions defined in k_ext 
     						//   3=ws type required in non GUI, no extension in GUI
     						//   4=suffix required: file extensions defined in k_ext if non GUI, not required in GUI
+    int     group;          // for color highlighting
 } BFNS;
+
+const static int BFNS_NB_GROUPS = 2;
 
 typedef struct _rpfn_ {
     U_ch    *name;          // name of the @function (ex "upper")
