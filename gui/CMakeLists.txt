@@ -28,6 +28,7 @@ set(GUI_SETTINGS
 set(GUI_TABS
     tabs/qiode_tab_abstract.h
     tabs/qiode_tab_database.h
+    tabs/qiode_tab_text.h           tabs/qiode_tab_text.cpp
 )
 
 set(GUI_CUSTOM_WIDGETS  
