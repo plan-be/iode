@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QSizePolicy>
 
+#include "qiode_tab_abstract.h"
+
 #include "iode_objs/models/comments_model.h"
 #include "iode_objs/models/equations_model.h"
 #include "iode_objs/models/identities_model.h"
@@ -23,32 +25,14 @@
 #include "iode_objs/views/tables_view.h"
 #include "iode_objs/views/variables_view.h"
 
-
-class AbstractTabWidget: public QWidget
-{
-protected:
-    EnumIodeFile fileType;
-
-public:
-    AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr) : 
-        QWidget(parent), fileType(fileType) 
-    {
-        this->setGeometry(QRect(10, 11, 951, 26));
-    }
-
-    EnumIodeFile getFiletype() const { return fileType; }
-
-    virtual void update() = 0;
-    virtual bool load(const QString& filepath, const bool forceOverwrite) = 0;
-    virtual QString save() = 0;
-    virtual QString saveAs() = 0;
-};
+const static QString prefixUnsavedDatabase = "Unsaved";
 
 
 class AbstractIodeObjectWidget: public AbstractTabWidget
 {
 protected:
     EnumIodeType iodeType;
+
     QGridLayout* layout;
     QLineEdit* lineEdit_filter;
     QPushButton* pushButton_filter;
@@ -56,7 +40,7 @@ protected:
 
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        AbstractTabWidget((EnumIodeFile) iodeType, parent)
+        AbstractTabWidget((EnumIodeFile) iodeType, "", parent)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
@@ -104,12 +88,50 @@ public:
         delete layout;
     }
 
+    /**
+     * @brief Return whether or not the tooltip is associated with a tab representing an unsaved KDB.
+     * 
+     * @param QString Tooltip of the tab. 
+     * @return bool
+     */
+    bool isUnsavedDatabase() const
+    {
+        return filepath.isEmpty() || filepath == QString(I_DEFAULT_FILENAME);
+    }
+
+    QString getTabText() const
+    {
+        if(isUnsavedDatabase())
+        {
+            QString ext = QString::fromStdString(vFileExtensions[fileType].ext);
+            // Note: the * is to tell that the content of the KDB has not been saved in file
+            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + ext + "*";
+        }
+        else
+            return AbstractTabWidget::getTabText();
+    }
+
+    QString getTooltip() const
+    {
+        if(isUnsavedDatabase())
+            return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[(EnumIodeType) fileType]) + " Database";
+        else
+            return AbstractTabWidget::getTooltip();
+    }
+
+    bool updateFilepath(const QString& filepath) override
+    {
+        if(AbstractTabWidget::updateFilepath(filepath))
+        {
+            set_kdb_filename(K_WS[fileType], filepath.toStdString());
+            return true;
+        }
+        else
+            return false;
+    }
+
     virtual void clearKDB() = 0;
     virtual void resetFilter() = 0;
-    virtual void update() = 0;
-    virtual bool load(const QString& filepath, const bool forceOverwrite) = 0;
-    virtual QString save() = 0;
-    virtual QString saveAs() = 0;
 };
 
 
@@ -188,7 +210,7 @@ public:
         tableview->setProjectSettingsFilepath(settings_filepath);
     }
 
-    bool load(const QString& filepath, const bool forceOverwrite)
+    bool load_(const QString& filepath, const bool forceOverwrite)
     {
         return objmodel->load(filepath, forceOverwrite);
     }
@@ -198,7 +220,7 @@ public:
         return objmodel->save(projectDir);
     }
 
-    QString saveAs()
+    QString saveAs_()
     {
         return objmodel->saveAs(projectDir);
     }

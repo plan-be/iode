@@ -25,6 +25,11 @@ set(GUI_SETTINGS
     settings.h  settings.cpp
 )
 
+set(GUI_TABS
+    tabs/qiode_tab_abstract.h
+    tabs/qiode_tab_database.h
+)
+
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/qfilechooser.h 
     custom_widgets/qsampleedit.h
@@ -57,10 +62,6 @@ set(GUI_NEW_OBJECT
     iode_objs/new/add_scalar.ui     iode_objs/new/add_scalar.h      iode_objs/new/add_scalar.cpp
     iode_objs/new/add_table.ui      iode_objs/new/add_table.h       iode_objs/new/add_table.cpp
                                     iode_objs/new/add_variable.h    iode_objs/new/add_variable.cpp 
-)
-
-set(GUI_OBJS_WIDGET
-    iode_objs/widget/iode_obj_widget.h
 )
 
 set(GUI_OBJS_MODELS     
@@ -97,8 +98,7 @@ set(GUI_OBJS_VIEWS
 )
 
 set(GUI_IODE_OBJS 
-    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_WIDGET}
-    ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
+    ${GUI_NEW_OBJECT} ${GUI_EDIT_OBJECT} ${GUI_OBJS_MODELS} ${GUI_OBJS_DELEGATES} ${GUI_OBJS_VIEWS}
 )
 
 set(GUI_MENU_FILE
@@ -133,7 +133,7 @@ set(GUI_MAIN
 ) 
 
 set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} ${GUI_PLOT}
-                        ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT}  ${GUI_MENUS}
+                        ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT} ${GUI_TABS} ${GUI_MENUS}
                         ${GUI_MAIN}
 )
 
