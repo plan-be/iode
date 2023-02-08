@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "util/system_item.h"
 #include "tabs/qiode_tab_database.h"
+#include "tabs/qiode_tab_text.h"
 
 
 /**
@@ -152,7 +153,7 @@ private:
      * 
      * @return int index of the new tab.
      */
-    int addTextTab(const QFileInfo& fileInfo);
+    int addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile);
 
     /**
      * @brief - reopen all tabs (files) that were open (*)
@@ -202,20 +203,12 @@ public:
      * @param displayTab bool whether or not displaying the corresponding tab when finished to load the file 
      *                        (used in loadSettings()).
      * @param forceOverwrite bool whether or not forcing overwrite of corresponding KDB (use in loadSetting()).
-     * @param moveToPosition int new position of the corresponding tab (use in loadSetting()). 
-     *                           Only used if the file is associated with an IODE KDB.
+     * @param moveToPosition int new position of the corresponding tab. 
+     *                           Only used when reloading tabs from a previous session.
      * 
      * @return int index of the corresponding tab. -1 if failed to load file.
 	 */
 	int loadFile(const QString& filepath, const bool displayTab=true, const bool forceOverwrite=false, const int moveToPosition=-1);
-
-    /**
-     * @brief save IODE KDB or content of a tab (representing either .log or .ini or .txt file) to a file.
-     * 
-     * @param filepath QString path to destination file.
-     * @param loop bool whether or not the method is called from a loop.
-     */
-    void saveFile(const QString& filepath, const bool loop = false);
 
     /**
      * @brief save current project to another (new) directory.
@@ -233,11 +226,10 @@ public:
      *        Called when loading a KDB file and when clearing a KDB.
      * 
      * @param iodeType EnumIodeType type of IODE objects to edit.
-     * @param moveToPosition int new position of the corresponding tab (optional).
      * 
      * @return int Index of the tab.
      */
-    int updateObjectTab(const EnumIodeType iodeType, const int moveToPosition=-1);
+    int updateObjectTab(const EnumIodeType iodeType);
 
     /**
      * @brief create a new tab corresponding to the newly open file.
