@@ -82,13 +82,14 @@ enum EnumIodeFile
     I_TABLES_FILE,
     I_VARIABLES_FILE,
     I_REPORTS_FILE,
+    I_TEXT_FILE,
     I_LOGS_FILE,
     I_SETTINGS_FILE,
     I_ANY_FILE,
     I_DIRECTORY
 };
 
-const static int I_NB_FILE_EXT = 12;
+const static int I_NB_FILE_EXT = 13;
 
 // same as k_ext defined in k_objfile.c
 const static std::array<std::string, 25> v_ext = 
@@ -116,6 +117,7 @@ const static std::array<IodeFileExtension, I_NB_FILE_EXT> vFileExtensions =
     {"Tables", ".tbl", ".at"},
     {"Variables", ".var", ".av"},
     {"Reports", ".rep", ""},
+    {"Text", ".txt", ""},
     {"Logs", ".log", ""},
     {"Settings", ".ini", ""},
     {"Any", "*", ""},
