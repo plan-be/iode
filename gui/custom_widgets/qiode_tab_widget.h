@@ -11,7 +11,8 @@
 
 #include "utils.h"
 #include "util/system_item.h"
-#include "iode_objs/widget/iode_obj_widget.h"
+#include "tabs/qiode_tab_database.h"
+
 
 /**
  * @brief The present class represents the widget displaying tabs. 
