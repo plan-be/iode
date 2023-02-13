@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QShortcut>
 #include <QProgressDialog>
+#include <QFileSystemWatcher>
 #include <QAbstractScrollArea>
 
 #include "utils.h"
@@ -37,6 +38,7 @@
  *        - Users are allowed to close tabs if they represent a report or a text files (i.e. not an IODE objects type).
  *        - Users are allowed to move tabs.
  *        - Open files with corresponding application (.xlsx with Excel, ...)
+ *        - Reload file content if modified by another program. 
  *        - CTRL + S on a tab saves its content.
  *        - CTRL + SHIFT + S saves all tabs content.
  *        - CTRL + D on a KDB tab clears the corresponding KDB.
@@ -52,11 +54,11 @@ class QIodeTabWidget: public QTabWidget
     QSettings* settings;
     std::shared_ptr<QString> project_settings_filepath;
 
+    QFileSystemWatcher* fileSystemWatcher;
+
     QString projectDirPath;
     bool overwrite_all;
     bool discard_all;
-
-    QVector<QString> tabPrefix;
 
     QShortcut* nextTabShortcut;
     QShortcut* previousTabShortcut;
@@ -69,73 +71,32 @@ class QIodeTabWidget: public QTabWidget
     QIodeScalarsWidget* tabScalars;
     QIodeTablesWidget* tabTables;
     QIodeVariablesWidget* tabVariables;
+    QVector<AbstractIodeObjectWidget*> tabIodeObjects;
 
 private:
     /**
-     * @brief build list of open files (= tabs)
+     * @brief build list of filepaths associated to tabs
      * 
      * @return QStringList list of open files
      */
     QStringList buildFilesList()
     {
         QStringList filesList;
-        QString filepath;
+        AbstractTabWidget* tabWidget;
         for (int i=0; i < this->count(); i++)
         {
-            filepath = this->tabToolTip(i).trimmed();
-            if(!filepath.isEmpty()) filesList << this->tabToolTip(i);
+            tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
+            filesList << tabWidget->getFilepath();
         }
         return filesList;
     }
 
     /**
-     * @brief Set the default tab name and tooltip for a tab associated with a KDB. 
+     * @brief update the paths (to directories and files) registered in the file system watcher.
      * 
-     * @param index int index of the tab.
-     * @param iodeType EnumIodeType type of the IODE objects.
-     * @param filepath QString path to the associated file (if any).
+     * @param projectDir QDir new project directory.      
      */
-    void setTabNameTooltip(const int index, const EnumIodeFile filetype, const QString& filepath)
-    {
-        if (filepath.isEmpty() || filepath == QString(I_DEFAULT_FILENAME))
-        {
-            EnumIodeType iodeType = (EnumIodeType) filetype;
-            QString default_filename = QString(I_DEFAULT_FILENAME) + QString::fromStdString(vFileExtensions[filetype].ext);
-            // Note: the * is to tell that the content of the KDB has not been saved in file
-            this->setTabText(index, tabPrefix[filetype] + default_filename + "*");
-            this->setTabToolTip(index, "Unsaved " + QString::fromStdString(vIodeTypes[iodeType]) + " Database");
-        }
-        else
-        {
-            QFileInfo fileInfo(filepath);
-            this->setTabText(index, tabPrefix[filetype] + fileInfo.fileName());
-            this->setTabToolTip(index, fileInfo.absoluteFilePath());
-        }
-    }
-
-    /**
-     * @brief return whether or not the tooltip is associated with a tab representing an unsaved KDB.
-     * 
-     * @param QString tooltip of the tab. 
-     * @return bool whether or not the tooltip is associated with a tab representing an unsaved KDB.
-     */
-    bool isUnsavedKDB(const QString& tooltip)
-    {
-        return tooltip.startsWith("Unsaved");
-    }
-
-    /**
-     * @brief return the IODE type corresponding to the passed tooltip.
-     * 
-     * @param QString tooltip of the tab.
-     * @return int IODE type corresponding to the passed tooltip. -1 if undefined IODE type.
-     */
-    int extractIodeTypeFromDefaultTooltip(const QString& tooltip)
-    {
-        // See setDefaultTabNameTooltip()
-        QString iodeTypeString = tooltip.split(" ")[1];
-        return get_iode_type(iodeTypeString.toStdString());
-    }
+    void updateFileSystemWatcher(const QDir& projectDir);
 
     /**
      * @brief add tab for editing reports.
@@ -209,6 +170,13 @@ public:
      * @return int index of the corresponding tab. -1 if failed to load file.
 	 */
 	int loadFile(const QString& filepath, const bool displayTab=true, const bool forceOverwrite=false, const int moveToPosition=-1);
+
+    /**
+     * @brief Reload a file if modified by an external program.
+     * 
+     * @param QString Filepath to the modified file.
+     */
+    void reloadFile(const QString& filepath);
 
     /**
      * @brief save current project to another (new) directory.
@@ -333,15 +301,31 @@ public slots:
         tabScalars->setProjectDir(projectDir);
         tabTables->setProjectDir(projectDir);
         tabVariables->setProjectDir(projectDir);
+        updateFileSystemWatcher(projectDir);
     }
 
     /**
-     * @brief Method called when a user rename a file using the File Explorer.
+     * @brief Method called when a user moves a file using the File Explorer.
+     *        Update the name and tooltip af tab associated with the renamed file if open.
+     * 
+     * @param oldFilepath Previous filepath
+     * @param newFilepath New filepath
+     */
+    void fileMoved(const QString &oldFilepath, const QString &newFilepath);
+
+    /**
+     * @brief Method called when a user renames a file using the File Explorer.
      *        Update the name and tooltip af tab associated with the renamed file if open.
      * 
      * @param path Path to the parent directory
      * @param oldName Name of the file before renaming
      * @param newName Name of the file after renaming
      */
-    void fileRenamed(const QString &path, const QString &oldName, const QString &newName);
+    void fileRenamed(const QString &path, const QString &oldName, const QString &newName)
+    {
+        QDir parentDir(path);
+        QString oldFilepath = parentDir.absoluteFilePath(oldName);
+        QString newFilepath = parentDir.absoluteFilePath(newName);
+        fileMoved(oldFilepath, newFilepath);
+    }
 };
