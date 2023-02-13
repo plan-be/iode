@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFileInfoList>
+#include <QStringList>
 
 
 class SystemItem
@@ -16,6 +17,27 @@ class SystemItem
     bool overwrite_all;
 
 private:
+    QStringList recursiveEntryList(const QDir& sourceDir)
+    {
+        QStringList entryList;
+
+        QFileInfoList fileInfoList = sourceDir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+        foreach(QFileInfo fileInfo, fileInfoList)
+        {
+            QString path = fileInfo.absoluteFilePath();
+            // if it is a directory, go deeper
+            if(fileInfo.isDir())
+            {   
+                entryList << path;
+                entryList << recursiveEntryList(QDir(path));
+            }
+            else
+                entryList << path;
+        }
+
+        return entryList;
+    }
+
     bool pasteFile(const QDir& destinationDir)
     {
         // --- build absolute source path
@@ -196,6 +218,11 @@ public:
     QString absoluteFilePath() const
     {
         return sourceInfo.absoluteFilePath();
+    }
+
+    QStringList recursiveEntryList()
+    {
+        return recursiveEntryList(QDir(sourceInfo.absoluteFilePath()));
     }
 
     // required for "Save Project As" option in File menu
