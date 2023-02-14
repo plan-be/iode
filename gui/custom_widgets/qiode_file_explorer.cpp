@@ -319,10 +319,12 @@ void QIodeFileExplorer::dropEvent(QDropEvent *event)
         QStringList itemsPathsList = mimeDataText.split("\n");
 
         // move items (files and directories)
-        foreach(const QString& itemPath, itemsPathsList)
+        foreach(const QString& sourcePath, itemsPathsList)
         {
-            SystemItem itemToDrop(QFileInfo(itemPath), true);
+            QFileInfo sourceInfo(sourcePath);
+            SystemItem itemToDrop(sourceInfo, true);
             itemToDrop.paste(dropDir);
+            emit fileMoved(itemToDrop.absoluteFilePath(), dropDir.filePath(sourceInfo.fileName()));
         }
 
         event->accept();
@@ -466,7 +468,11 @@ void QIodeFileExplorer::paste()
     // paste directory or file
     if(!itemsToPast.isEmpty())
     {
-        foreach(SystemItem item, itemsToPast) item.paste(destinationDir);
+        foreach(SystemItem item, itemsToPast)
+        {
+            item.paste(destinationDir);
+            emit fileMoved(item.absoluteFilePath(), destinationDir.filePath(item.fileInfo().fileName()));
+        }
     }
     // cleanup everything
     cancel();

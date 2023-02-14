@@ -252,8 +252,10 @@ public:
     void setIodeTabWidget(QIodeTabWidget* tabWidget)
     {
         this->tabWidget = tabWidget;
-        // to update tab name and tooltip of corresponding tab when a file is renamed
-        connect(fileSystemModel, &QFileSystemModel::fileRenamed, this->tabWidget, &QIodeTabWidget::fileRenamed);
+        // to update filepath, name and tooltip of corresponding tab when a file is moved
+        connect(this, &QIodeFileExplorer::fileMoved, tabWidget, &QIodeTabWidget::fileMoved);
+        // to update filepath, name and tooltip of corresponding tab when a file is renamed
+        connect(fileSystemModel, &QFileSystemModel::fileRenamed, tabWidget, &QIodeTabWidget::fileRenamed);
     }
 
     /**
@@ -263,6 +265,9 @@ public:
      * @param project_settings_filepath shared pointer to the project settings file (.ini)
      */
     void updateProjectDir(const QDir& projectDir, std::shared_ptr<QString>& project_settings_filepath);
+
+signals:
+    void fileMoved(const QString& oldFilepath, const QString& newFilepath);
 
 public slots:
     /**
