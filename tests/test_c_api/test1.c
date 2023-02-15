@@ -439,7 +439,11 @@ int U_test_eq(double v1, double v2)
         diff = fabs((v2 - v1) / v2);
     else 
         diff = fabs(v2 - v1);
-    return(diff < 1e-4);
+    
+    if(diff >= 1e-5 && S4ASSERT_VERBOSE) 
+        printf("%lg != %lg\n", v1, v2);
+    
+    return(diff < 1e-5); 
 }
 
 
@@ -947,7 +951,7 @@ void Tests_Estimation()
     //x = U_test_calc_lec("_YRES[1980Y1]", 0);
     //printf("x = %lf\n", x);
     //x = fabs(x + 0.001150);
-    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115), "Estimation : _YRES[1980Y1] == -0.001150");
+    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115008), "Estimation : _YRES[1980Y1] == -0.001150");
     
     //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
     S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
@@ -1820,7 +1824,7 @@ void Tests_B_MODEL()
     rc = B_ModelSimulate("2000Y1 2002Y1");
     S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
     // TODO: check result of one ENDO
-    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623), "ACAF[2002Y1] = -1.274623");
+    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388), "ACAF[2002Y1] = -1.27474");
     
     // B_ModelExchange()
     // Set values of endo UY
@@ -1838,7 +1842,7 @@ void Tests_B_MODEL()
 
     // Check some results
     S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
-    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80071");
+    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80069), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80069");
     
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");
