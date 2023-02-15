@@ -313,69 +313,70 @@ void U_test_print_title(char* title)
 
 // Output messages
 
-// Function which replaces A2mMessage() when no output is  needed
-void kmsg_null(char*msg) 
-{
-}
-
-// Choose to display a2m messages or not.
-void U_test_a2m_msgs(int IsOn)
-{
-    static int  Current_IsOn = 1;
-    static void (*A2mMessage_super_ptr)(char*); 
-    
-    if(IsOn && !Current_IsOn) { 
-        A2mMessage_super = A2mMessage_super_ptr; // (Re-)install default function
-        Current_IsOn = 1;
-        return;
-    }
-    else if(!IsOn && Current_IsOn) {
-        A2mMessage_super_ptr = A2mMessage_super;  // Save default value before replacing it by kmsg_null
-        A2mMessage_super = kmsg_null;             // Suppress output messages
-        Current_IsOn = 0;
-        return;
-    }
-}
-    
+//// Function which replaces A2mMessage() when no output is  needed
+//void kmsg_null(char*msg) 
+//{
+//}
+//
+//// Choose to display a2m messages or not.
+//void U_test_a2m_msgs(int IsOn)
+//{
+//    static int  Current_IsOn = 1;
+//    static void (*A2mMessage_super_ptr)(char*); 
+//    
+//    if(IsOn && !Current_IsOn) { 
+//        A2mMessage_super = A2mMessage_super_ptr; // (Re-)install default function
+//        Current_IsOn = 1;
+//        return;
+//    }
+//    else if(!IsOn && Current_IsOn) {
+//        A2mMessage_super_ptr = A2mMessage_super;  // Save default value before replacing it by kmsg_null
+//        A2mMessage_super = kmsg_null;             // Suppress output messages
+//        Current_IsOn = 0;
+//        return;
+//    }
+//}
+//    
 void U_test_suppress_a2m_msgs()
 {
-    U_test_a2m_msgs(0);
+    A2mMessage_toggle(0);
 }
 
 void U_test_reset_a2m_msgs()
 {
-    U_test_a2m_msgs(1);
+    A2mMessage_toggle(1);
 }
 
-
+ 
 // Choose to display kmsg messages or not.
-void U_test_kmsg_msgs(int IsOn)
-{
-    static int  Current_IsOn = 1;
-    static void (*kmsg_super_ptr)(char*); 
-    
-    
-    if(IsOn && !Current_IsOn) { 
-        kmsg_super = kmsg_super_ptr;
-        Current_IsOn = 1;
-        return;
-    }
-    else if(!IsOn && Current_IsOn) {
-        kmsg_super_ptr = kmsg_super;
-        kmsg_super = kmsg_null; 
-        Current_IsOn = 0;
-        return;
-    }
-}
+//void U_test_kmsg_msgs(int IsOn)
+//{
+//    static int  Current_IsOn = 1;
+//    static void (*kmsg_super_ptr)(char*); 
+//    
+//    
+//    if(IsOn && !Current_IsOn) { 
+//        kmsg_super = kmsg_super_ptr;
+//        Current_IsOn = 1;
+//        return;
+//    }
+//    else if(!IsOn && Current_IsOn) {
+//        kmsg_super_ptr = kmsg_super;
+//        kmsg_super = kmsg_null; 
+//        Current_IsOn = 0;
+//        return;
+//    }
+//}
+//
     
 void U_test_suppress_kmsg_msgs()
 {
-    U_test_kmsg_msgs(0);
+    kmsg_toggle(0);
 }
 
 void U_test_reset_kmsg_msgs()
 {
-    U_test_kmsg_msgs(1);
+    kmsg_toggle(1);
 }
 
 
@@ -440,8 +441,10 @@ int U_test_eq(double v1, double v2)
     else 
         diff = fabs(v2 - v1);
     
+ #ifndef __cplusplus
     if(diff >= 1e-5 && S4ASSERT_VERBOSE) 
         printf("%lg != %lg\n", v1, v2);
+#endif
     
     return(diff < 1e-5); 
 }
