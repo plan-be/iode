@@ -121,6 +121,7 @@ extern int A2mReadAnchor(A2MFILE *af, int save);
 extern void A2mMessage(char *msg);
 /* Public A2mMessage */
 extern void (*A2mMessage_super)(char* msg); // if not null, replaces the default implementation A2mMessage()
+extern void A2mMessage_toggle(int IsOn);
 
 /* s_a2mcsv.c */
 extern int A2mToCsv(char *a2mfile,char *outfile);

@@ -421,6 +421,9 @@ A2MSTR  **A2mAddParLine();
 A2MPAR  *A2mNewPar();
 U_ch    *A2mError();
 A2MPAR  *A2mTxt2Par();
+void A2mMessage(char *msg);
+void (*A2mMessage_super)(char* msg); 
+void A2mMessage_toggle(int IsOn);
 
 #else
 #include <s_proa2m.h>

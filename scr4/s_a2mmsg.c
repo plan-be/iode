@@ -30,6 +30,35 @@ void A2mMessage(char *msg)
 }
 
 
+/**
+ *  Function replacing A2mMessage() to suppress a2m messages.
+ *  
+ *  @param [in] msg char*   message text 
+ */
+void A2mMessage_null(char*msg) 
+{
+}
+
+/**
+ *  Suppress or restore default ksmg() behaviour.
+ *  
+ *  @param [in] IsOn int    0: suppress the messages, 1: restore the default function
+  */
+void A2mMessage_toggle(int IsOn)
+{
+    static int  Current_IsOn = 1;
+    static void (*A2mMessage_super_ptr)(char*); 
+    
+    if(IsOn && !Current_IsOn) { 
+        A2mMessage_super = A2mMessage_super_ptr;
+        Current_IsOn = 1;
+    }
+    else if(!IsOn && Current_IsOn) {
+        A2mMessage_super_ptr = A2mMessage_super;
+        A2mMessage_super = A2mMessage_null; 
+        Current_IsOn = 0;
+    }
+}
 
 
 
