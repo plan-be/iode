@@ -1048,7 +1048,7 @@ static int K_save_kdb(KDB* kdb, FNAME fname, int mode)
     fd = fopen(file, "wb+");
     if(fd == NULL) return(-1);
     setvbuf(fd, NULL, 0, 8192);
-    kmsg("Saving %s", file);
+    //kmsg("Saving %s", file); // JMP 11/01/2023 (msg already in calling function B_WsDump)
 
     if(mode) {
         K_set_kdb_name(kdb, file); // JMP 3/6/2015
@@ -1132,7 +1132,7 @@ int K_save(KDB* kdb, FNAME fname)
 
 int K_save_ws(KDB* kdb)
 {
-    return(K_save_kdb(kdb, I_DEFAULT_FILENAME, 0));
+    return(K_save_kdb(kdb, "ws", 0));
 }
 
 

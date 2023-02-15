@@ -34,7 +34,7 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.64 - (c) 1990-2022 Planning Office - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.64 - (c) 1990-2023 Planning Office - Brussels"
 #define IODE_VERSION_MAJOR 6
 #define IODE_VERSION_MINOR 64
 #define K_VERSION  "1.0"
@@ -103,7 +103,7 @@
 #define KMAGIC(kdb)  ((kdb)->k_magic)
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-//#define KNAME(kdb)   ((kdb)->k_name) Supprimï¿½ pour ï¿½viter les oublis
+//#define KNAME(kdb)   ((kdb)->k_name) Supprimé pour éviter les oublis
 #define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
 #define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
@@ -362,6 +362,7 @@
 
 /*----------------------- MISC --------------------------------*/
 #define K_ISFILE(filename)  (filename != 0 && filename[0] != '-' && filename[0] != 0)
+
 
 /*---------------- IMPORT/EXPORT: FORMAT DEFINES -------------------------*/
 #define EXP_CSV  0
@@ -1089,15 +1090,15 @@ typedef struct _col_ {
 
     /*   {{v00, v01},{v10,v11}}
 
-		|             |
-		|   file1     |   file2
+            |             |
+            |   file1     |   file2
     --------|-------------|------------
     period1 |    v00      |    v01
-		| cl_val[0,0] | cl_val[0,1]    v.. = valeur
+            | cl_val[0,0] | cl_val[0,1]    v.. = valeur
     --------|-------------|------------
     period2 |    v10      |    v11
-		| cl_val[1,0] | cl_val[1,1]
-		|             |
+            | cl_val[1,0] | cl_val[1,1]
+            |             |
     */
     IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
@@ -1196,7 +1197,7 @@ typedef struct _token {
 typedef struct _lstack {        /* stack of operators used by L_analyse */
     unsigned ls_op      : 8;    /* operator */
     //unsigned ls_nb_args : 8;    /* nb of arguments */
-    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vï¿½rifier si plus de 255 arguments
+    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vérifier si plus de 255 arguments
 } LSTACK;
 
 
