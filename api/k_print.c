@@ -128,7 +128,7 @@ static void T_print_string(COL* cl, char* string)
  *  
  */
  
-void T_open_cell(int attr, int straddle, int type) /* JMP 17-12-93 */
+void T_open_cell(int attr, int straddle, int type) 
 {
     char    align = 'L';
 

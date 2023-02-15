@@ -214,6 +214,37 @@ void kmsg(char* fmt, ...)
 
 
 /**
+ *  Function replacing ksmg() to suppress messages.
+ *  
+ *  @param [in] msg char*   message text 
+ */
+void kmsg_null(char*msg) 
+{
+}
+
+/**
+ *  Suppress or restore default kmsg() behaviour.
+ *  
+ *  @param [in] IsOn int    0: suppress the messages, 1: restore the default function
+  */
+void kmsg_toggle(int IsOn)
+{
+    static int  Current_IsOn = 1;
+    static void (*kmsg_super_ptr)(char*); 
+    
+    if(IsOn && !Current_IsOn) { 
+        kmsg_super = kmsg_super_ptr;
+        Current_IsOn = 1;
+    }
+    else if(!IsOn && Current_IsOn) {
+        kmsg_super_ptr = kmsg_super;
+        kmsg_super = kmsg_null; 
+        Current_IsOn = 0;
+    }
+}
+
+
+/**
  *  Displays a message and optionally asks confirmation before continuing.
  *  
  *  The default behaviour is to print the message and to return(1).
@@ -243,8 +274,9 @@ int kconfirm(char *fmt,...)
     if(kconfirm_super != 0) 
         return((*kconfirm_super)(buf));
     else {
-        printf("%s\n", buf);
-        return(1);              // TODO: gets() et traiter la réponse 
+        gets_s(buf, sizeof(buf) - 1);
+        SCR_sqz(buf);
+        return(!U_is_in(buf[0], "OoYyJj1"));
     }    
 }
 
@@ -572,3 +604,4 @@ void IODE_assign_super_API()
     A_expand_super = A_expand_super_API;   // Ok for other implementations (DOS, IODECOM, PYTHON, Qt)
     // A_error_super  = A_error_super_API; //  To be implemented for DOS and Qt (IODECOM ?)
 }
+

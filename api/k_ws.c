@@ -50,8 +50,8 @@ void K_init_ws(int ws)
 
     memset(K_RWS, 0, sizeof(K_RWS));
     for(i = 0 ; i < 7 ; i++) {
-        K_WS[i] = K_RWS[i][0] = K_init_kdb(i, I_DEFAULT_FILENAME);
-        if(ws) K_cat(K_WS[i], I_DEFAULT_FILENAME);
+        K_WS[i] = K_RWS[i][0] = K_init_kdb(i, "ws");
+        if(ws) K_cat(K_WS[i], "ws");
     }
 }
 

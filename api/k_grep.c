@@ -45,8 +45,19 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     TBL     *tbl;
     TLINE   *tline;
     TCELL   *tcell;
+    int     old_SCR_ADD_PTR_CHUNCK = SCR_ADD_PTR_CHUNCK;
+    extern int SCR_ADD_PTR_CHUNCK;
+    
+    if(names && !texts && !forms && pattern && pattern[0] == all && pattern[1] == 0) {     // JMP 19/01/2023 => speed
+        n = KNB(kdb);
+        lst = (char**) SCR_malloc((n + 1) * sizeof(char*));
+        for(i = 0; i < n ; i++) 
+            lst[i] = SCR_stracpy(KONAME(kdb, i));
+        return(lst);
+    }
 
 
+    SCR_ADD_PTR_CHUNCK = 1000;
     for(i = 0; i < KNB(kdb); i++) {
         found = 0;
         if(names) found = !SCR_grep_gnl(pattern, KONAME(kdb, i), ecase, all);
@@ -99,6 +110,8 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
     }
 
     if(lst != NULL) SCR_add_ptr(&lst, &n, NULL);
+    
+    SCR_ADD_PTR_CHUNCK = old_SCR_ADD_PTR_CHUNCK;    // JMP 19/01/2023
     return(lst);
 }
 
