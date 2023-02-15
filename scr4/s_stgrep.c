@@ -64,6 +64,8 @@ int     ecase, nbeg, diese;
 {
     int     i = 0, lg, j = 0, rc, esc = 0, s, p;
 
+    if(pattern[0] == diese && strlen(pattern) == 1) return(0);  // JMP 19/01/2023
+    
     lg = (int)strlen(string);
 
     while(1) {
