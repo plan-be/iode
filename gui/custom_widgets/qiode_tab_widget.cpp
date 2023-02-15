@@ -314,13 +314,13 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
     return index;
 }
 
-// TODO : implement this method
 int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
     QWidget* mainwin = get_main_window_ptr();
-    QMessageBox::information(mainwin, "INFORMATION", "Cannot load file " + fileInfo.fileName() + ".\n" +
-        "Loading of files with extension .rep not (yet) implemented.");
-    return -1;
+    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), this);
+    int index = this->addTab(reportWidget, reportWidget->getTabText());
+    setTabToolTip(index, reportWidget->getTooltip());
+    return index;
 }
 
 int QIodeTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile)
@@ -394,7 +394,6 @@ void QIodeTabWidget::showTab(int index)
     this->setCurrentIndex(index);
 }
 
-// TODO : - implement loading of Report
 int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, const bool forceOverwrite, const int moveToPosition)
 {
     QString filename;

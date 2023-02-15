@@ -14,6 +14,8 @@
 #include "util/system_item.h"
 #include "tabs/qiode_tab_database.h"
 #include "tabs/qiode_tab_text.h"
+#include "tabs/qiode_tab_report.h"
+
 
 
 /**
