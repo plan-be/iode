@@ -43,10 +43,6 @@ extern "C"
 // END_KEEP
 
 
-void kmsg_null(char*msg)
-{
-}
-
 
 
 class IodeCAPITest : public ::testing::Test 
@@ -230,61 +226,24 @@ public:
 	    printf("\n");
 	}
 
-	void U_test_a2m_msgs(int IsOn)
-	{
-	    static int  Current_IsOn = 1;
-	    static void (*A2mMessage_super_ptr)(char*);
-	
-	    if(IsOn && !Current_IsOn) {
-	        A2mMessage_super = A2mMessage_super_ptr; // (Re-)install default function
-	        Current_IsOn = 1;
-	        return;
-	    }
-	    else if(!IsOn && Current_IsOn) {
-	        A2mMessage_super_ptr = A2mMessage_super;  // Save default value before replacing it by kmsg_null
-	        A2mMessage_super = kmsg_null;             // Suppress output messages
-	        Current_IsOn = 0;
-	        return;
-	    }
-	}
-
 	void U_test_suppress_a2m_msgs()
 	{
-	    U_test_a2m_msgs(0);
+	    A2mMessage_toggle(0);
 	}
 
 	void U_test_reset_a2m_msgs()
 	{
-	    U_test_a2m_msgs(1);
-	}
-
-	void U_test_kmsg_msgs(int IsOn)
-	{
-	    static int  Current_IsOn = 1;
-	    static void (*kmsg_super_ptr)(char*);
-	
-	
-	    if(IsOn && !Current_IsOn) {
-	        kmsg_super = kmsg_super_ptr;
-	        Current_IsOn = 1;
-	        return;
-	    }
-	    else if(!IsOn && Current_IsOn) {
-	        kmsg_super_ptr = kmsg_super;
-	        kmsg_super = kmsg_null;
-	        Current_IsOn = 0;
-	        return;
-	    }
+	    A2mMessage_toggle(1);
 	}
 
 	void U_test_suppress_kmsg_msgs()
 	{
-	    U_test_kmsg_msgs(0);
+	    kmsg_toggle(0);
 	}
 
 	void U_test_reset_kmsg_msgs()
 	{
-	    U_test_kmsg_msgs(1);
+	    kmsg_toggle(1);
 	}
 
 	void U_test_CreateObjects()
@@ -341,7 +300,13 @@ public:
 	        diff = fabs((v2 - v1) / v2);
 	    else
 	        diff = fabs(v2 - v1);
-	    return(diff < 1e-4);
+	
+	 #ifndef __cplusplus
+	    if(diff >= 1e-5 && S4ASSERT_VERBOSE)
+	        printf("%lg != %lg\n", v1, v2);
+	#endif
+	
+	    return(diff < 1e-5);
 	}
 
 	void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
@@ -1315,7 +1280,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     //x = U_test_calc_lec("_YRES[1980Y1]", 0);
     //printf("x = %lf\n", x);
     //x = fabs(x + 0.001150);
-    EXPECT_TRUE(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115));
+    EXPECT_TRUE(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115008));
 
     //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
     EXPECT_TRUE(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815));
@@ -2047,7 +2012,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     rc = B_ModelSimulate("2000Y1 2002Y1");
     EXPECT_EQ(rc, 0);
     // TODO: check result of one ENDO
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623));
+    EXPECT_TRUE(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388));
 
     // B_ModelExchange()
     // Set values of endo UY
@@ -2065,7 +2030,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 
     // Check some results
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071));
+    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80069));
 
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");

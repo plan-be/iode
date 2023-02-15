@@ -76,6 +76,7 @@ extern void    kerror(int level, char* fmt, ...);
 extern void    kwarning(char* fmt, ...);
 extern void    kpause();
 extern void    kmsg(char* fmt, ...);
+extern void    kmsg_toggle(int IsOn);
 extern int     kwprintf(char* msg, ...);
 extern void    kpanic(void);
 extern int     kconfirm(char* fmt, ...);
