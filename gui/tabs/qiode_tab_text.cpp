@@ -26,7 +26,7 @@ void QIodeAbstractEditor::addEditorToLayout(int row)
     editor->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
 
     // -1 -> span over all rows/columns
-    layout->addWidget(editor, 0, 0, -1, -1);
+    layout->addWidget(editor, row, 0, -1, -1);
 
     if(!filepath.isEmpty()) 
         load(filepath, true);
