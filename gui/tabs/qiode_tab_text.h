@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QGridLayout>
 
+#include "custom_widgets/text_editor.h"
 #include "qiode_tab_abstract.h"
 
 
@@ -16,7 +17,7 @@ class QIodeAbstractEditor: public AbstractTabWidget
 
 protected:
     QGridLayout* layout;
-    QPlainTextEdit* editor;
+    TextEditor* editor;
 
 protected:
     void addEditorToLayout(int row);
@@ -39,7 +40,7 @@ public:
     QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr) 
         : QIodeAbstractEditor(fileType, filepath, parent) 
     {
-        editor = new QPlainTextEdit();
+        editor = new TextEditor();
         addEditorToLayout(0);
     }
 };
