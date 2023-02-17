@@ -36,6 +36,7 @@ set(GUI_CUSTOM_WIDGETS
     custom_widgets/qfilechooser.h 
     custom_widgets/qsampleedit.h
     custom_widgets/qiode_completer.h            custom_widgets/qiode_completer.cpp
+    custom_widgets/qiode_highlighter.h          custom_widgets/qiode_highlighter.cpp
     custom_widgets/qiode_command.h              custom_widgets/qiode_command.cpp 
     custom_widgets/text_editor.h                custom_widgets/text_editor.cpp
     custom_widgets/report_editor.h              custom_widgets/report_editor.cpp
