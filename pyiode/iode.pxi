@@ -78,8 +78,8 @@ cdef extern from "iode.h":
     # SAMPLE functions
     cdef int    IodeIsSampleSet()
     cdef int    IodeGetSampleLength()
-    cdef char   **IodeCreateSampleAsAxis(char* aper_from, char* aper_to) 
-    cdef char   **IodeGetSampleAsAxis();
+    cdef char   **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
+    cdef char   **IodeGetSampleAsPeriods();
     cdef char   *IodeGetSampleAsString()
     cdef double *IodeGetSampleAsDoubles(int *lg)
     cdef int    IodeSetSampleStr(char* str_from, char* str_to)

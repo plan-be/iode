@@ -37,6 +37,6 @@ def exec_lec(lec:str, t:int=-1):
         return IodeExecLecT(cstr(lec), t)   # simple value
     else:
         cvar = IodeExecLec(cstr(lec))       # vector of calculated values    
-        res = cdouble_to_list(cvar, IodeGetSampleLength())
+        res = pyfloats(cvar, IodeGetSampleLength())
         SCR_free(cvar)
         return res

@@ -101,7 +101,7 @@ def ws_sample_as_list():
     if not IodeIsSampleSet():
         return []
     else:
-        smpl = IodeGetSampleAsAxis()
+        smpl = IodeGetSampleAsPeriods()
         lst = pylist(smpl)
         SCR_free_tbl(smpl)
         return(lst)

@@ -1,59 +1,72 @@
-# IODE EXTENSION FOR PYTHON
-# =========================
+#  IODE EXTENSION FOR PYTHON
+#  =========================
+#  
+#     @header4iode
+#  
+#  PYIODE API
+#  ==========
+#  
+#  
+#  Interface IODE - Python - IODE
+#  ------------------------------
+#  During a PYIODE session, IODE data are grouped in workspaces, one by object type (variables, scalars, equations...) 
+#  and stored in memory using a proprietary memory management system (IODE-SWAP).
+#  
+#  IODE functions operate inside IODE-SWAP memory. 
+#  Exchanges between IODE objects (in IODE-SWAP) and LArray objects (python memory) are made possible via interface functions.
+#  
+#  Source files (*.pyx, *.pxi and *.c)
+#  -----------------------------------
+#  The python functions are split according to their specific topics in pyiode_*.pyx 
+#  where * can be ws, sample, objects, larray, reports...
+#  Some utility functions have also been added in the pyiode_util.pyx module.
+#  
+#  The called C-api function signatures are found in iode.pxi.
+#  These functions are declared in iode.h (mostly in the sub file iodeapi.h) 
+#  and defined (again for the most part) in b_api.c.
+# 
 #
-#    @header4iode
-# 
-# PYIODE API
-# ==========
-# 
-# 
-# Interface IODE - Python - IODE
-# ------------------------------
-# During a PYIODE session, IODE data are grouped in workspaces, one by object type (variables, scalars, equations...) 
-# and stored in memory using a proprietary memory management system (IODE-MEM).
-# 
-# IODE functions operate inside IODE-MEM. 
-# Exchanges between IODE objects (in IODE-MEM) and LArray objects (python memory) are made possible via interface functions.
-# 
-# Source files (py and c)
-# -----------------------
-# The python functions are split according to their specific topics in pyiode_*.pyx where * can be ws, sample, objects, larray, reports...
-# Some utility functions have also been added in the pyiode_util.pyx module.
-# The C-api function signatures are found in iode.pxi.
-# 
-# The C-api functions are declared in iodeapi.h and defined (for the most part) in b_api.c.
-# 
-# 
-# How to add a new Py-function based on a C-function
-# --------------------------------------------------
-# 
-# 1. In C
-#     Create the new function in one of the iodeapi C module, say int IodeMyFn(char*) in api/b_api.c
-#     Declare the new function in api/iodeapi.h
-#     Goto api/vc64 
-#     Execture set64.bat to create the environment variables for VC64 nmake
-#     Execute nmake to create 64 bits iodeapi.lib => api/vc64/nmake
-#     
-# 2. In Python (pyx files)
-#     Add the new function declaration in iode.pxi in the section "cdef extern from "iodeapi.h":":
-#         cdef int IodeMyFn(char *name)  
-#     (Note that there is no semi-colon at thenend of the line !)
-#     
-#     Create the Python equivalent to call IodeMyFn() in the appropriate module pyiode_*.pyx.
-#     Use the utility functions:
-#         - cstr() to translate python strings (utf8) to C char* (ansi code cp850)
-#         - pystr() to do the reverse
-#         
-#         def myfn(arg):
-#             return IodeMyFn(cstr(arg))
-# 
-# 3. In a DOS shell
-#     cd  c:/usr/iode_src/pyiode/vc64
-#     set64
-#     activate 
-#     makepy
-
-# cython: binding=True, language_level=3, embedsignature=True
+#  How to add a new Py-function based on a C-function
+#  --------------------------------------------------
+#  
+#  1. In C
+#      Create the new function in one of the iodeapi C module, for example in api/b_api.c:
+#           int IodeMyFn(char* name) 
+#      Declare the new function in api/iodeapi.h
+#  
+#      Non Visual Studio version:
+#        - Goto .../iode/api/vc64 
+#        - Execute set64.bat to create the environment variables for VC64 nmake
+#        - Execute nmake to create 64 bits iodeapi.lib => api/vc64/nmake
+#  
+#      Visual Studio version:
+#        - Regenerate iodeapi.lib
+#      
+#  2. In Python (*.pyx files)
+#      Add the new function declaration in iode.pxi in the section "cdef extern from "iode.h":":
+#          cdef int IodeMyFn(char* name)  
+#      (Note that there is no semi-colon at the end of the line !)
+#      
+#      Create the Python equivalent to IodeMyFn() in the appropriate module pyiode_*.pyx.
+#          def myfn(arg):
+#              return IodeMyFn(cstr(arg))
+#  
+#      If needed, use the python utility functions:
+#          - cstr() to translate python strings (utf8) to C char* (ansi code cp850)
+#          - pystr() to do the reverse
+#          - pylist(char** c_list) to convert C char** to python lists 
+#               (don't forget to free c_list afterwards, e.g. by a call to SCR_free_tbl(c_list))
+#          - pyfloats(double *cvar, int lg) to convert a vector of doubles of length lg 
+#               into a python list of doubles
+#          
+#  
+#  3. In a DOS shell
+#      c:\> cd  .../iode/pyiode
+#      c:.../iode/pyiode> set64
+#      c:.../iode/pyiode> activate 
+#      c:.../iode/pyiode> makepy
+   
+#  cython: binding=True, language_level=3, embedsignature=True
 
 # PYIODE API
 # ----------
@@ -76,6 +89,7 @@ include "pyiode_print.pyx"
 include "pyiode_reports.pyx"
 include "pyiode_objs.pyx"
 include "pyiode_larray.pyx"
+include "pyiode_wrt.pyx"
 
 
 # MAIN
