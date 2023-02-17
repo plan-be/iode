@@ -187,24 +187,24 @@ char *IodeGetSampleAsString()
  *  
  *  @return  char** allocated table of char* 
  *  
- *  TODO: call IodeCreateSampleAsAxis() 
+ *  TODO: call IodeCreateSampleAsPeriods() 
  */
 
-char **IodeGetSampleAsAxis() 
+char **IodeGetSampleAsPeriods() 
 {
     SAMPLE  *smpl = KSMPL(KV_WS);
-    char    **axis, *aper;
+    char    **periods, *aper;
     PERIOD	*per_t;
     int		t;
 
     if(smpl == NULL || smpl->s_nb == 0) return(NULL);
-    axis = (char**) SW_nalloc((1 + smpl->s_nb) * sizeof(char*));
+    periods = (char**) SW_nalloc((1 + smpl->s_nb) * sizeof(char*));
 	for(t = 0;  t < smpl->s_nb; t++) {
         per_t = PER_addper(&(smpl->s_p1), t);
-        axis[t] = (char*)SCR_stracpy(PER_pertoa(per_t, NULL));
+        periods[t] = (char*)SCR_stracpy(PER_pertoa(per_t, NULL));
 	}
 
-    return(axis);
+    return(periods);
 }
 
 
@@ -217,22 +217,22 @@ char **IodeGetSampleAsAxis()
  *  @param [in] aper_to   char*     ending period
  *  @return               char**    
  */
-char **IodeCreateSampleAsAxis(char* aper_from, char* aper_to) 
+char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
 {
     SAMPLE  *smpl;
-    char    **axis, *aper;
+    char    **periods, *aper;
     PERIOD	*per_t;
     int		t;
 
     smpl = PER_atosmpl(aper_from, aper_to);
     if(smpl == NULL || smpl->s_nb == 0) return(NULL);
-    axis = (char**) SW_nalloc((1 + smpl->s_nb) * sizeof(char*));
+    periods = (char**) SW_nalloc((1 + smpl->s_nb) * sizeof(char*));
 	for(t = 0;  t < smpl->s_nb; t++) {
         per_t = PER_addper(&(smpl->s_p1), t);
-        axis[t] = (char*)SCR_stracpy(PER_pertoa(per_t, NULL));
+        periods[t] = (char*)SCR_stracpy(PER_pertoa(per_t, NULL));
 	}
     SW_nfree(smpl);
-    return(axis);
+    return(periods);
 }
 
 
@@ -639,8 +639,8 @@ double *IodeGetVector(char *name, int *lg)
 }
 
 /**
- *  In the context of copying an LArray object into the current KV_WS, determines the positions to copy 
- *  from (in LA object), where to copy (in KV_WS) and the length of the intersection bw LA and KV_WS.
+ *  In the context of copying LArray data into the current KV_WS, determines the positions to copy 
+ *  from (LA object), where to copy to (KV_WS) and the length of the intersection bw LA and KV_WS.
  *  
  *  Schematically : 
  *      KV_WS[var, wspos + i] = LA[var, la_pos + i] for i = 0..la_lg
