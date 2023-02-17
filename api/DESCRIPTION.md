@@ -252,6 +252,7 @@ Functions used in any context of IODE (GUI or not\-GUI).
 |`void kpause()`|Displays the message "Press ENTER to continue" and waits for the user to press ENTER.|
 |`void kwarning(char* fmt, ...)`|Displays a message and optionally asks the user to press ENTER before continuing.|
 |`void kmsg(char* fmt, ...)`|Displays a message.|
+|`void kmsg_toggle(int IsOn)`|Suppression or restore the message output by replacing kmsg\_super()|
 |`int kconfirm(char *fmt,...)`|Displays a message and optionally asks confirmation before continuing.|
 |`int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)`|Displays a message box with optional buttons.|
 |`void krecordkey(int key)`|Records a key in the keyboard buffer.|
@@ -320,7 +321,7 @@ Function to manage KDB, i.e. IODE object groups.
 |`KDB *K_create(int type, int mode)`|allocates and initialises a KDB object.|
 |`int K_free_kdb(KDB* kdb)`|frees a KDB but leaves its contents untouched.|
 |`int K_free(KDB* kdb)`|frees a KDB and its contents.|
-|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the SAMPLE and replaces the filename by I_DEFAULT_FILENAME.|
+|`int K_clear(KDB* kdb)`|deletes all objects in a KDB, reset the SAMPLE and replaces the filename by I\_DEFAULT\_FILENAME (default "ws").|
 |`KDB *K_refer(KDB* kdb, int nb, char* names[])`|creates a new kdb containing the references to the objects of the list names.|
 |`KDB *K_quick_refer(KDB *kdb, char *names[])`|same as K\_refer() but more efficient for large databases.|
 |`int K_merge(KDB* kdb1, KDB* kdb2, int replace)`|merges two databases : kdb1 <\- kdb1 \+ kdb2.|
@@ -566,12 +567,18 @@ Functions to manipulate IODE object files.
 
 |Syntax|Description|
 |:---|:---|
+|`int K_get_ext(char* filename, char* ext, int max_ext_len)`|gets a filename extension.|
+|`int K_has_ext(char* filename)`|indicates if a filename contains an extension.|
 |`char *K_set_ext(char* res, char* fname, int type)`|deletes left and right spaces in a filename and changes its extension according to the given type.|
+|`char *K_set_ext_asc(char* res, char* fname, int type)`|trims a filename then changes its extension to the ascii extension according to the given type).|
 |`void K_strip(char* filename)`|deletes left and right spaces in a filename. Keeps the space inside the filename.|
 |`KDB *K_load(int ftype, FNAME fname, int no, char** objs)`|loads a IODE object file.|
 |`int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)`|retrieves infos on an IODE file: type, number of objects, SAMPLE|
 |`KDB *K_interpret(int type, char* filename): generalisation of K_load()`|interprets the content of a file, ascii files includes, and try to load ist content into a KDB.|
 |`int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, SAMPLE* smpl)`|reads a list of objects from a list of IODE object files and adds them to an existing KDB.|
+|\`cint K\_cat(KDB\* ikdb, char\* filename)|concatenates the content of a file to an existing kdb.|
+|\`cint K\_set\_backup\_on\_save(int take\_backup)|sets the backup choice before saving a kdb.|
+|\`cint K\_get\_backup\_on\_save()|indicates if a backup must be taken before saving a kdb.|
 |`int K_backup(char* filename)`|takes a backup of a file by renaming the file: filename.xxx => filename.xx$.|
 |`int K_save(KDB* kdb, FNAME fname)`|saves a KDB in an IODE object file. The extension of fname is replaced by the standard one (.cmt, .eqs...).|
 |`int K_save_ws(KDB* kdb)`|saves a KDB in an IODE object file called "ws.<ext>" where <ext> is one of (.cmt, .eqs...).|
