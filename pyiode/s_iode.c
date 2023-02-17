@@ -8,15 +8,9 @@
  *
  */
 
-#include "iode.h" 
+
 #include <stdio.h>
 #include <windows.h>
-
-// Functions called by A2M-HTML conversion. Cancelled in pyiode.
-int A2mGIF_HTML(A2MGRF *go, U_ch* filename) 
-{
-     return(0);
-} 
 
 int PyIodePrint(char* name, double *x, int lg)
 {
@@ -57,3 +51,12 @@ void ODE_assign_super_PYIODE()
    //A2mMessage_super    = A2mMessage_super_PYIODE;
    //kconfirm_super      = kconfirm_super_PYIODE;
 }
+
+
+// Function used by A2M HTML generator (does not work in 64bits)
+#include "iode.h" 
+
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename) 
+{
+    return(0);
+} 
