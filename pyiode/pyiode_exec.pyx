@@ -1,12 +1,14 @@
-# IODE EXTENSION FOR PYTHON
-# =========================
-#
-#    @header4iode
+#  IODE EXTENSION FOR PYTHON
+#  =========================
 # 
-# IODE identity execution
-# -----------------------
+#     @header4iode
+#  
+#  IODE identity execution
+#  -----------------------
 # 
-#   eqs_estimate(eq_list, sample, method, instr)
+#  TODO
+#  ---- 
+#   idt_execute(idt_list, sample, var_files, scl_files)
 
 def idt_execute(idt_list, sample):
     '''
