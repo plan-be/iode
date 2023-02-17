@@ -38,7 +38,8 @@ int     K_PWS[7] = { 0, 0, 0, 0, 0, 0, 0 }; // ??? TODO: check if still in use
 /**
  *  @brief Initialises the "in mem" KDB structures adn optionnaly loads the ws.* files. 
  *  
- *  If ws is no NULL, the files ws.*, if they are found in the current dir, are loaded as initial values for the in memory KDBs.
+ *  If ws is not NULL, the files I_DEFAULT_FILENAME.* (default "ws.*"), 
+ *      if they are found in the current dir, are loaded as initial values for the in memory KDBs.
  *  If ws is NULL, the KDB are left empty.
  *  
  *  @param [in] ws  int     indicates if the files ws.ac, ws.ae..., ws.av must be loaded as initial values for the KDB in memory
@@ -50,8 +51,8 @@ void K_init_ws(int ws)
 
     memset(K_RWS, 0, sizeof(K_RWS));
     for(i = 0 ; i < 7 ; i++) {
-        K_WS[i] = K_RWS[i][0] = K_init_kdb(i, "ws");
-        if(ws) K_cat(K_WS[i], "ws");
+        K_WS[i] = K_RWS[i][0] = K_init_kdb(i, I_DEFAULT_FILENAME);
+        if(ws) K_cat(K_WS[i], I_DEFAULT_FILENAME);
     }
 }
 
