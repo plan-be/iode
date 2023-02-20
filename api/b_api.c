@@ -639,15 +639,16 @@ double *IodeGetVector(char *name, int *lg)
 }
 
 /**
- *  In the context of copying LArray data into the current KV_WS, determines the positions to copy 
- *  from (LA object), where to copy to (KV_WS) and the length of the intersection bw LA and KV_WS.
+ *  In the context of copying data between IODE (the current KV_WS) and python (LArray, pandas, numpy...), 
+ *  determines the positions to copy from (python object), where to copy to (KV_WS) and the length 
+ *  of the intersection between the python object and KV_WS.
  *  
  *  Schematically : 
  *      KV_WS[var, wspos + i] = LA[var, la_pos + i] for i = 0..la_lg
  *  
- *  @param [in] str_la_from char*   start period in la object
- *  @param [in] str_la_to   char*   end period in la object
- *  @param [in] la_pos      int*    position in la object of the first element to copy 
+ *  @param [in] str_la_from char*   start period in the python object
+ *  @param [in] str_la_to   char*   end period in the python object
+ *  @param [in] la_pos      int*    position in the python object of the first element to copy 
  *  @param [in] ws_pos      int*    position in KV_WS of the first element 
  *  @param [in] la_lg       int*    la_lg
  *  @return                 int     
