@@ -1156,6 +1156,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     KSIM_MAXIT = 100;
     rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     EXPECT_EQ(rc, 0);
+    //S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388), "ACAF[2002Y1] = -1.27474");
 
     // Test Endo-exo
 
@@ -2000,21 +2001,26 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     KSIM_SORT = 0;
     KSIM_PASSES = 3;
     KSIM_DEBUG = 1;
-    rc = B_ModelSimulateParms("0.0001 0.7 100 Both 0 no no 5");
+    rc = B_ModelSimulateParms("0.0001 0.7 100 Triang 0 no 5 no");
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(KSIM_EPS, 0.0001);
     EXPECT_EQ(KSIM_MAXIT, 100);
     EXPECT_EQ(KSIM_RELAX, 0.7);
     EXPECT_EQ(KSIM_DEBUG, 0);
+    EXPECT_EQ(KSIM_PASSES, 5);
 
 
     // B_ModelSimulate()
     rc = B_ModelSimulate("2000Y1 2002Y1");
     EXPECT_EQ(rc, 0);
     // TODO: check result of one ENDO
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388));
+    EXPECT_TRUE(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.27462));
 
     // B_ModelExchange()
+
+    // Reloads 3 WS
+    U_test_load_fun_esv(filename);
+
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
     KV_set_at_aper("UY", "2001Y1", 670.0);
@@ -2030,7 +2036,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 
     // Check some results
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80069));
+    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.8006766));
 
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");

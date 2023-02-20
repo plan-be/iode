@@ -830,6 +830,7 @@ void Tests_Simulation()
     KSIM_MAXIT = 100;
     rc = K_simul(kdbe, kdbv, kdbs, smpl, NULL, NULL);
     S4ASSERT(rc == 0, "K_simul() with maxit=%d does converge",KSIM_MAXIT);
+    //S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388), "ACAF[2002Y1] = -1.27474");
 
     // Test Endo-exo
     
@@ -1761,7 +1762,7 @@ void Tests_B_HTOL()
     // Mean
     sprintf(cmd, "%s ACAG", varfile);
     rc = B_WsHtoLMean(cmd);
-    S4ASSERT(rc == 0, "B_WsHtoLMean1(\"%s\")", cmd);
+    S4ASSERT(rc == 0, "B_WsHtoLMean(\"%s\")", cmd);
     U_test_lec("ACAG[2014Y1]", "ACAG[2014Y1]", 0, 8.1050747);
         
     // Sum
@@ -1815,21 +1816,26 @@ void Tests_B_MODEL()
     KSIM_SORT = 0;
     KSIM_PASSES = 3; 
     KSIM_DEBUG = 1;
-    rc = B_ModelSimulateParms("0.0001 0.7 100 Both 0 no no 5");
-    S4ASSERT(rc == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") == 0");
-    S4ASSERT(KSIM_EPS == 0.0001, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_EPS == 0.0001");
-    S4ASSERT(KSIM_MAXIT == 100, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_MAXIT == 100");
-    S4ASSERT(KSIM_RELAX == 0.7, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_RELAX == 0.7");
-    S4ASSERT(KSIM_DEBUG == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no no 5\") => KSIM_DEBUG == 0");
+    rc = B_ModelSimulateParms("0.0001 0.7 100 Triang 0 no 5 no");
+    S4ASSERT(rc == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no 5 no\") == 0");
+    S4ASSERT(KSIM_EPS == 0.0001, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no 5 no\") => KSIM_EPS == 0.0001");
+    S4ASSERT(KSIM_MAXIT == 100, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no 5 no\") => KSIM_MAXIT == 100");
+    S4ASSERT(KSIM_RELAX == 0.7, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no 5 no\") => KSIM_RELAX == 0.7");
+    S4ASSERT(KSIM_DEBUG == 0, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no 5 no\") => KSIM_DEBUG == 0");
+    S4ASSERT(KSIM_PASSES == 5, "B_ModelSimulateParms(\"0.0001 0.7 100 Both 0 no 5 no\") => KSIM_PASSES == 5");
 
 
     // B_ModelSimulate()
     rc = B_ModelSimulate("2000Y1 2002Y1");
     S4ASSERT(rc == 0, "B_ModelSimulate(\"2000Y1 2002Y1\") == 0");
     // TODO: check result of one ENDO
-    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.2747388), "ACAF[2002Y1] = -1.27474");
+    S4ASSERT(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.27462), "ACAF[2002Y1] = -1.27474");
     
     // B_ModelExchange()
+    
+    // Reloads 3 WS 
+    U_test_load_fun_esv(filename);
+
     // Set values of endo UY
     KV_set_at_aper("UY", "2000Y1", 650.0);
     KV_set_at_aper("UY", "2001Y1", 670.0);
@@ -1845,7 +1851,7 @@ void Tests_B_MODEL()
 
     // Check some results
     S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
-    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80069), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80069");
+    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.8006766), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80069");
     
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");
