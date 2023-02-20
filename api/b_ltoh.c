@@ -17,14 +17,6 @@
 
 #include "iode.h"
 
-#define LTOH_STOCK  0
-#define LTOH_FLOW   1
-
-#define LTOH_LIN    'L'
-#define LTOH_CS     'C'
-#define LTOH_STEP   'S'
-
-
 // Linear Interpolation sub-functions 
 
 /**

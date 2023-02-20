@@ -360,6 +360,19 @@
 #define KV_INIT_TM1_NA    5
 #define KV_INIT_EXTRA_NA  6
 
+/*--------------- WS HTOL defines ------------------------*/
+#define HTOL_LAST   0
+#define HTOL_MEAN   1
+#define HTOL_SUM    2
+
+/*--------------- WS LTOH defines ------------------------*/
+#define LTOH_STOCK  0
+#define LTOH_FLOW   1
+
+#define LTOH_LIN    'L'
+#define LTOH_CS     'C'
+#define LTOH_STEP   'S'
+
 /*----------------------- MISC --------------------------------*/
 #define K_ISFILE(filename)  (filename != 0 && filename[0] != '-' && filename[0] != 0)
 

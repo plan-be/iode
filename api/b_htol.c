@@ -14,11 +14,6 @@
 
 #include "iode.h"
 
-#define HTOL_LAST   0
-#define HTOL_MEAN   1
-#define HTOL_SUM    2
-
-
 // Core functions
 
 /**
@@ -168,6 +163,68 @@ done:
     if(rc < 0) return(-1);
     else return(0);
 }
+
+
+// Same function but acting on kdb instead of file and KV_WS (for pyiode - larray)
+// !!! NOT TESTED !!!
+KDB* B_htol_kdb(int method, KDB* kdb_from)
+{
+    int         lg, nb, rc = 0, i, j, f, t, shift, skip;
+    IODE_REAL   *t_vec = NULL, *f_vec = NULL;
+    KDB         *kdb_to = NULL;
+    SAMPLE      *t_smpl = NULL;
+
+    if(HTOL_smpl(KSMPL(kdb_from), KSMPL(kdb_from), &t_smpl, &skip, &shift) < 0) {
+        rc = -1;
+        goto done;
+    }
+
+    kdb_to = K_create(K_VAR, K_UPPER);
+    memcpy((SAMPLE *) KDATA(kdb_to), t_smpl, sizeof(SAMPLE));
+    t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
+    f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(kdb_from)->s_nb) * sizeof(IODE_REAL));
+
+    for(i = 0; i < KNB(kdb_from); i++) {
+        memcpy(f_vec, KVVAL(kdb_from, i, 0), KSMPL(kdb_from)->s_nb * sizeof(IODE_REAL));
+        memset(t_vec, 0, t_smpl->s_nb * sizeof(IODE_REAL));
+
+        for(f = 0, t = 0; f < skip; f++) {
+            if(f != 0 && f % shift == 0) {
+                t_vec[t] = L_NAN;
+                t++;
+            }
+        }
+
+        for(; f + shift <= KSMPL(kdb_from)->s_nb; t++, f += shift) { 
+            if(method == HTOL_LAST)
+                t_vec[t] = f_vec[f + shift - 1] ;
+            else /* SUM and MEAN */
+                for(j = 0; j < shift; j++) {
+                    if(L_ISAN(f_vec[f + j])) t_vec[t] += f_vec[f + j];
+                    else {
+                        t_vec[t] = L_NAN;
+                        break;
+                    }
+                }
+
+            if(method == HTOL_MEAN && L_ISAN(t_vec[t])) t_vec[t] /= shift;
+        }
+
+        nb = t_smpl->s_nb;
+        for(; t < nb; t++) t_vec[t] = L_NAN;
+
+        K_add(kdb_to, KONAME(kdb_from, i), t_vec, &(nb));
+    }
+
+done:
+    SW_nfree(t_smpl);
+    SW_nfree(t_vec);
+    SW_nfree(f_vec);
+
+    if(rc < 0) return(NULL);
+    else return(kdb_to);
+}
+
 
 
 // Report functions
