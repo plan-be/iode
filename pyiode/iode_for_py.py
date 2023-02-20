@@ -904,7 +904,98 @@ def test_iode_wrt():
     test_iode_wrt_1(f"{IODE_OUTPUT_DIR}test_wrt.a2m", iode.W_A2M)
     test_iode_wrt_1(f"{IODE_OUTPUT_DIR}test_wrt.rtf", iode.W_RTF)
     test_iode_wrt_1(f"{IODE_OUTPUT_DIR}test_wrt.csv", iode.W_CSV)
-    iode.reset_msgs()
+    #iode.reset_msgs()
+    
+    
+@cpu
+def test_iode_htol():
+    #Read quaterly data and convert it to the current WS sample (yearly)
+   
+    # define a yearly sample
+    iode.ws_clear_var()
+    iode.ws_sample("2000Y1", "2020Y1")
+    
+    # input filename
+    filename = f"{IODE_DATA_DIR}fun_q.var"
+    
+    # Last Obs in year
+    varname = "ACAF"
+    rc = iode.ws_htol_last(filename, varname)
+    test_eq("iode.ws_htol_last", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Y1]", 0)
+    test_eq(f"{varname}[2014Y1]", -83.340625, res);
+
+    # mean of year
+    varname = "ACAG"
+    rc = iode.ws_htol_mean(filename, varname)
+    test_eq("iode.ws_htol_mean", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Y1]", 0)
+    test_eq(f"{varname}[2014Y1]", 8.1050747, res);
+
+    # sum
+    varname = "AOUC"
+    rc = iode.ws_htol_sum(filename, varname)
+    test_eq("iode.ws_htol_sum", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Y1]", 0)
+    test_eq(f"{varname}[2014Y1]", 1.423714, res);
+
+
+@cpu
+def test_iode_ltoh():
+    #Read yearly data data and convert it to the current WS sample (quaterly)
+   
+    # define a yearly sample
+    iode.ws_clear_var()
+    iode.ws_sample("2010Q1", "2020Q4")
+
+    # input filename
+    filename = f"{IODE_DATA_DIR}fun.var"
+    
+    # Linear interpolation / stock
+    varname = "ACAF"
+    rc = iode.ws_ltoh_stock(filename, varname, iode.LTOH_LIN)
+    test_eq("iode.ws_ltoh_stock Linear", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Q3]", 0)
+    test_eq(f"{varname}[2014Q3]", -79.729132, res)
+    
+    # Linear interpolation / flow
+    varname = "ACAG"
+    rc = iode.ws_ltoh_flow(filename, varname, iode.LTOH_LIN)
+    test_eq("iode.ws_ltoh_flow Linear", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Q3]", 0)
+    test_eq(f"{varname}[2014Q3]", 8.105075, res)
+
+    # Cubic splines / stock
+    varname = "ACAF"
+    rc = iode.ws_ltoh_stock(filename, varname, iode.LTOH_CS)
+    test_eq("iode.ws_ltoh_stock Cubic splines", 0, rc)
+    res = iode.exec_lec(f"{varname}[2012Q3]", 0)
+    test_eq(f"{varname}[2012Q3]", -52.805666, res)
+
+    # Cubic splines / flow
+    varname = "ACAG"
+    rc = iode.ws_ltoh_flow(filename, varname, iode.LTOH_CS)
+    test_eq("iode.ws_ltoh_stock Cubic splines", 0, rc)
+    res = iode.exec_lec(f"{varname}[2012Q3]", 0)
+    test_eq(f"{varname}[2012Q3]", 7.6135768805666, res)
+
+    # Step / stock
+    varname = "ACAF"
+    rc = iode.ws_ltoh_stock(filename, varname, iode.LTOH_STEP)
+    test_eq("iode.ws_ltoh_stock Step", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Q3]", 0)
+    test_eq(f"{varname}[2014Q3]", -83.34062, res)
+
+  
+    # Step / flow
+    varname = "ACAG"
+    rc = iode.ws_ltoh_flow(filename, varname, iode.LTOH_STEP)
+    test_eq("iode.ws_ltoh_flow Step", 0, rc)
+    res = iode.exec_lec(f"{varname}[2014Q3]", 0)
+    test_eq(f"{varname}[2014Q3]", 8.1050747, res)
+
+
+
 
 # MAIN Program: calls to test_*
 # -----------------------------
@@ -963,6 +1054,9 @@ test_iode_model_simulate_exchange()
 # write (wrt_*) functions
 test_iode_wrt()
 
+# HtoL & LtoH
+test_iode_htol()
+test_iode_ltoh()
 
 print("...Finito!")
 

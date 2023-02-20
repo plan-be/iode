@@ -58,6 +58,19 @@ W_RTF   = 4
 W_CSV   = 8
 W_DUMMY = 9
 
+# HTOL methods
+HTOL_LAST = 0
+HTOL_MEAN = 1
+HTOL_SUM  = 2
+
+# LTOH defines 
+LTOH_STOCK  = 0
+LTOH_FLOW   = 1
+LTOH_LIN    = 'L'
+LTOH_CS     = 'C'
+LTOH_STEP   = 'S'
+
+
 # Declarations of extern C functions and vars
 # -------------------------------------------
 cdef extern from "iode.h":
@@ -67,12 +80,20 @@ cdef extern from "iode.h":
     cdef int    IodeInit()
     cdef int    IodeEnd()
     
+    # KDB functions
+    cdef void   *K_create(int filetype, int mode)
+
     # WS functions
     cdef int    IodeLoad(char *filename, int filetype)
     cdef int    IodeSave(char *filename, int filetype) 
     cdef int    IodeClearWs(int filetype)
     cdef int    IodeClearAll()
     cdef char   **IodeContents(char *pattern, int objtype)
+    cdef int    B_WsHtoLLast(char *)
+    cdef int    B_WsHtoLMean(char *)
+    cdef int    B_WsHtoLSum(char *)
+    cdef int    B_WsLtoHStock(char *)
+    cdef int    B_WsLtoHFlow(char *)
 
 
     # SAMPLE functions
