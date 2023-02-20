@@ -8,7 +8,7 @@
  *  List of functions 
  *  -----------------
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
- *      int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
+ *      int B_ModelSimulateParms(char* arg)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
  *      int B_ModelExchange(char* arg)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
  *      int KE_compile(KDB* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
  *      int B_ModelCompile(char* arg)                               $ModelCompile  [eqname1, eqname2, ... ]
@@ -90,7 +90,7 @@ err:
 /**
  *  Defines simulation parameters.
  *  
- *  Syntax: $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } {yes | No } nbtri
+ *  Syntax: $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
  *          where:
  *              eps  := convergence threshold
  *              0.1 <= relax <= 1.0
@@ -116,6 +116,8 @@ int B_ModelSimulateParms(char* arg)
     KSIM_EPS   = atof(args[0]);
     KSIM_RELAX = atof(args[1]);
     KSIM_MAXIT = atoi(args[2]);
+    if(U_is_in(args[3][0], "bB")) 
+        args[3][0] = 'T'; // JMP 20/02/2023 
     KSIM_SORT  = B_argpos("CTN", args[3][0]);
     KSIM_START = args[4][0] - '0';
     KSIM_DEBUG = B_argpos("NY", args[5][0]);
