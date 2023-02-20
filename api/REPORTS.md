@@ -756,7 +756,7 @@ Report functions related to model simulations.
 |Syntax|Equivalent in Reports|
 |:---|:---|
 |`int B_ModelSimulate(char *arg)`|$ModelSimulate per\_from per\_to equation\_list|
-|`int B_ModelSimulateParms(char* arg)`|$ModelSimulateParms eps relax maxit \{Connex, Triang, None \} 0 \- 4 (starting values) \{Yes, no \} \{yes, No \} nbtri|
+|`int B_ModelSimulateParms(char* arg)`|$ModelSimulateParms eps relax maxit \{Connex, Triang, None \} 0 \- 4 (starting values) \{Yes, no \} nbtri \{yes, No \}|
 |`int B_ModelExchange(char* arg)`|$ModelExchange eqname1\-varname1,eqname2\-varname2,...|
 |`int B_ModelCompile(char* arg)`|$ModelCompile \[eqname1, eqname2, ... \]|
 |`int B_ModelCalcSCC(char *arg)`|$ModelCalcSCC nbtris prename intername postname \[eqs\]|
@@ -1303,7 +1303,7 @@ More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions
     # SIMULATIONS
     # -----------
  
-    $ModelSimulateParms 0.0001 0.7 100 Both 0 no no 5
+    $ModelSimulateParms 0.0001 0.7 100 Both 0 no 5 no
     $ModelSimulate 2000Y1 2001Y1
  
     `@SimMaxit()    `
