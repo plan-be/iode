@@ -995,6 +995,59 @@ def test_iode_ltoh():
     test_eq(f"{varname}[2014Q3]", 8.1050747, res)
 
 
+@cpu
+def test_iode_htol_la():
+    # Creates a quaterly larray and convert it to a yearly one
+   
+    # Creating a new Quaterly 3D-Array la3D 
+    vars = la.Axis("vars=AA,BB,CC")
+    sectors = la.Axis("sectors=S1,S2")
+    time = iode.ws_sample_as_axis('time', "2000Q2", "2010Q1")
+
+    la3D = la.ones([vars, sectors, time])
+
+    # Setting values in la3D for S1, S2 in 2001Q4 and 2002Q2
+    la3D["2001Q4","S1"]=[1,2,3]     # AA_S1[2001Q4] = 1;  BB_S1[2001Q4] = 2;  CC_S1[2001Q4] = 3;
+    la3D["2002Q2","S2"]=(11,22,33)  # AA_S2[2001Q4] = 11; BB_S2[2001Q4] = 22; CC_S2[2001Q4] = 33;
+
+    # Saving la3D in KV_WS, then in file testq_3D.var
+    iode.ws_clear_var()
+    iode.larray_to_ws(la3D)
+    filename = f"{IODE_OUTPUT_DIR}testq_3D"
+    iode.ws_save_var(filename)
+ 
+    # Import testq_3D in yearly WS
+    iode.ws_clear_var()                 # Clear the ws before setting a new sample 
+    iode.ws_sample("2000Y1", "2010Y1")  
+    
+    # Last Obs in year
+    varname = "BB_S1"
+    rc = iode.ws_htol_last(filename, varname)
+    test_eq("iode.ws_htol_last", 0, rc)
+    res = iode.exec_lec(f"{varname}[2001Y1]", 0)
+    test_eq(f"{varname}[2001Y1]", 2.0, res);
+
+    # mean of year
+    varname = "BB_S1"
+    rc = iode.ws_htol_mean(filename, varname)
+    test_eq("iode.ws_htol_mean", 0, rc)
+    res = iode.exec_lec(f"{varname}[2001Y1]", 0)
+    test_eq(f"{varname}[2001Y1]", 5.0/4.0, res);
+
+    # sum
+    varname = "BB_S1"
+    rc = iode.ws_htol_sum(filename, "AA_S1 BB_S1") # CC_S1 AA_S2 BB_S2 CC_S2")
+    test_eq("iode.ws_htol_sum", 0, rc)
+    res = iode.exec_lec(f"{varname}[2001Y1]", 0)
+    test_eq(f"{varname}[2001Y1]", 5.0, res);
+
+    # save the new yearly ws
+    filename = f"{IODE_OUTPUT_DIR}testy_3D"
+    iode.ws_save_var(filename)
+    
+    # read in la
+    la3Dy = iode.ws_load_var_py(filename, axis_names=["vars", "sectors"], sep="_")
+    print(la3Dy)
 
 
 # MAIN Program: calls to test_*
@@ -1057,6 +1110,7 @@ test_iode_wrt()
 # HtoL & LtoH
 test_iode_htol()
 test_iode_ltoh()
+test_iode_htol_la()
 
 print("...Finito!")
 

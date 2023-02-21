@@ -88,8 +88,8 @@ def ws_sample_as_string():
         return(smpl)
  
 
-def ws_sample_as_list():
-    '''Return the current sample definition in a list
+def ws_sample_as_list(per_from="", per_to=""):
+    '''Return the current sample definition or the sample [per_from, per_to] in a list
     e.g.: 
         ["2000Y1", "2001Y1", ..., "2010Y1"] 
         or 
@@ -98,19 +98,27 @@ def ws_sample_as_list():
 
     cdef char **smpl
     
-    if not IodeIsSampleSet():
-        return []
+    if per_from == '' or per_to == '':
+        if not IodeIsSampleSet():
+            return []
+        else:
+            smpl = IodeGetSampleAsPeriods()
+            lst = pylist(smpl)
+            SCR_free_tbl(smpl)
+            return(lst)
     else:
-        smpl = IodeGetSampleAsPeriods()
+        smpl = IodeCreateSampleAsPeriods(cstr(per_from), cstr(per_to))
         lst = pylist(smpl)
         SCR_free_tbl(smpl)
         return(lst)
+        
 
-
-def ws_sample_as_axis(axis_name='time'):
-    '''Return the current sample definition as an Axis, e.g.: Axis(["2000Y1", "2001Y1", ..., "2010Y1"], "time")'''
+def ws_sample_as_axis(axis_name='time', per_from='', per_to=''):
+    '''Return the current sample or the sample [per_from, per_to] definition as an Axis, 
+        e.g.: Axis(["2000Y1", "2001Y1", ..., "2010Y1"], "time")
+    '''
     
-    lst = ws_sample_as_list()
+    lst = ws_sample_as_list(per_from, per_to)
     ax = la.Axis(lst, axis_name)
     return(ax)
 
@@ -123,10 +131,10 @@ def ws_sample_as_list_of_doubles():
     return(vararray)
 
 
-def ws_sample_as_axis_of_doubles(axis_name='time'):
+def ws_sample_as_axis_of_doubles(axis_name='time', per_from='', per_to=''):
     '''Return the current sample definition in an Axis with float labels.
      e.g.: Axis([2000.0, 2000.25, 2000.50,2000.75,...], "time")
      '''
-    lst = ws_sample_as_list()
+    lst = ws_sample_as_list(per_from, per_to)
     ax = la.Axis(lst, axis_name)
     return(ax)
