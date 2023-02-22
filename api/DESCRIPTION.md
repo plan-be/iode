@@ -252,7 +252,7 @@ Functions used in any context of IODE (GUI or not\-GUI).
 |`void kpause()`|Displays the message "Press ENTER to continue" and waits for the user to press ENTER.|
 |`void kwarning(char* fmt, ...)`|Displays a message and optionally asks the user to press ENTER before continuing.|
 |`void kmsg(char* fmt, ...)`|Displays a message.|
-|`void kmsg_toggle(int IsOn)`|Suppression or restore the message output by replacing kmsg\_super()|
+|`void kmsg_toggle(int IsOn)`|Suppresses or restores the message output by replacing kmsg\_super()|
 |`int kconfirm(char *fmt,...)`|Displays a message and optionally asks confirmation before continuing.|
 |`int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)`|Displays a message box with optional buttons.|
 |`void krecordkey(int key)`|Records a key in the keyboard buffer.|
