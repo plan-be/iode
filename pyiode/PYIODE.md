@@ -98,7 +98,7 @@
 |`idt_to_py(name:str)`||
 |`py_to_idt(name:str, idt:str)`||
 |                                     ||
-|`Lists`||
+|**Lists**||
 |`lst_to_py(name:str)`||
 |`py_to_lst(name:str, lst)`||
 |**Scalars**||
@@ -114,11 +114,10 @@
 
 |Syntax|Description|
 |:---|:---|
-|`larray_to_ws(la_input, timeaxis:str='time', sep:str="_")`||
-|`ws_to_larray_time_as_doubles(vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names='', regex=None, sep=None)`||
-|`ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None)`||
-|`ws_load_var_py(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None)`||
-|`lasample(la_input, timeaxis = 'time')`|Return the first and last time axis labels as a list of 2 strings|
+|`larray_to_ws(la_input, timeaxis:str='time', sep:str="_")`|Copies LArray la\_input into IODE KV\_WS.|
+|`ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None, time_as_floats=False)`|Creates an LArray from the current KV\_WS content|
+|`ws_load_var_to_larray(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None)`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
+|`larray_get_sample(la_input, timeaxis = 'time')`|Return the first and last time axis labels as a list of 2 strings|
 
 ### Sample management {#T7}
 
@@ -126,44 +125,42 @@
 |:---|:---|
 |`ws_sample(per_from = None, per_to = None)`|Set or get the KV\_WS sample|
 |`ws_sample_get()`|Get the KV\_WS sample|
-|`ws_sample_length()`|Return the number of observations in the current KV\_WS.|
-|`ws_sample_as_string()`|Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"|
-|`ws_sample_as_list()`|Return the current sample definition in a list|
-|`ws_sample_as_axis(axis_name = 'time')`|Return the current sample definition as an Axis|
-|`ws_sample_as_list_of_doubles()`|Return the current sample definition in a list of float|
-|`ws_sample_as_axis_of_doubles(axis_name = 'time')`|Return the current sample definition in an Axis with float labels.|
+|`ws_sample_nb_periods()`|Return the number of observations in the current KV\_WS.|
+|`ws_sample_to_string()`|Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"|
+|`ws_sample_to_list((per_from="", per_to="", as_floats:bool=False)`|Return the current sample definition in a list|
+|`ws_sample_to_larray_axis(axis_name = 'time', as_floats:bool=False)`|Return the current sample definition as an larray axis|
 
 ### IODE LEC functions {#T8}
 
 |Syntax|Description|
 |:---|:---|
-|`exec_lec(lec:str, t:int=-1)`|Compute a LEC formula using the current WS of VARs and SCLs|
+|`exec_lec(lec:str, t:int=-1)->Union[float, List[float]]`|Compute a LEC formula using the current WS of VARs and SCLs|
 
 ### Estimation {#T9}
 
 |Syntax|Description|
 |:---|:---|
-|`eqs_estimate(eq_list, afrom:str, ato:str)`|Estimate an equation or a block of equations on the given sample.|
+|`eqs_estimate(eq_list, afrom:str, ato:str)->int`|Estimate an equation or a block of equations on the given sample.|
 
 ### Simulation {#T10}
 
 |Syntax|Description|
 |:---|:---|
-|`model_simulate(sample_from:str, sample_to:str, eqs_list=None, endo_exo_list=None, eps:float=0.0001, relax:float=1.0, maxit:int=100, init_values:int=KV_INIT_TM1, sort_algo:int=SORT_BOTH, nb_passes:int=5, debug:int=0, newton_eps:float=1e-6, newton_maxit:int=50, newton_debug:int=0)`|Simulate the model defined by eqs\_list on the period \[sample\_from, sample\_to\].|
+|`model_simulate(sample_from:str, sample_to:str, eqs_list=None, endo_exo_list=None, eps:float=0.0001, relax:float=1.0, maxit:int=100, init_values:int=KV_INIT_TM1, sort_algo:int=SORT_BOTH, nb_passes:int=5, debug:int=0, newton_eps:float=1e-6, newton_maxit:int=50, newton_debug:int=0)->int`|Simulate the model defined by eqs\_list on the period \[sample\_from, sample\_to\].|
 
 ### Reports {#T11}
 
 |Syntax|Description|
 |:---|:---|
-|`report_exec(filename_parms)`|Execute a report|
-|`reportline_exec(repline)`|Execute a report line|
-|`data_update_(obj_name:str, obj_value:str, obj_type:int)`|Create of update an IODE object (cmt, eqs, lst, idt)|
-|`data_update_cmt(obj_name:str, obj_value:str)`|Create or update an IODE comment|
-|`data_update_eqs(obj_name:str, obj_value:str)`|Create or update an IODE equation|
-|`data_update_idt(obj_name:str, obj_value:str)`|Create or update an IODE identity|
-|`data_update_lst(obj_name:str, obj_value:str)`|Create or update an IODE list|
-|`data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)`|Create or update an IODE scalar|
-|`data_update_var(varname:str, values, operation:str = "L", per_from:str = None)`|Create or update an IODE variable starting at a specified period|
+|`report_exec(filename_parms)->int`|Execute a report|
+|`reportline_exec(repline)->int`|Execute a report line|
+|`data_update_(obj_name:str, obj_value:str, obj_type:int)->int`|Create of update an IODE object (cmt, eqs, lst, idt)|
+|`data_update_cmt(obj_name:str, obj_value:str)->int`|Create or update an IODE comment|
+|`data_update_eqs(obj_name:str, obj_value:str)->int`|Create or update an IODE equation|
+|`data_update_idt(obj_name:str, obj_value:str)->int`|Create or update an IODE identity|
+|`data_update_lst(obj_name:str, obj_value:str)->int`|Create or update an IODE list|
+|`data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)->int`|Create or update an IODE scalar|
+|`data_update_var(varname:str, values, operation:str = "L", per_from:str = None)->int`|Create or update an IODE variable starting at a specified period|
 
 ### Print functions {#T12}
 
@@ -171,10 +168,10 @@
 
 |Syntax|Description|
 |:---|:---|
-|`print_obj_def_*`|imprime une d finition d'objet (cmt,...)|
-|`print_obj_title`|indique si les titres seuls sont   imprimer|
-|`print_obj_lec`|indique le type d' quation   imprimer|
-|`print_obj_infos`|indique les informations   imprimer|
+|`print_obj_def_*`|print object definitions (cmt,...)|
+|`print_obj_title`|indicates if only the object "titles" must be printed|
+|`print_obj_lec`|select the way LEC expressions are to be printed (coefficients replaced by values...)|
+|`print_obj_infos`|select informations to print|
 
 ### Write functions {#T13}
 
@@ -204,8 +201,8 @@
 
 |Syntax|Description|
 |:---|:---|
-|`pylist(char** c_list)`|Convert a C vector of char\* to a python list of strings|
-|`pyfloats(double *cvar, int lg)`|Convert a vector of doubles of length into a list of doubles'''|
+|`pylist(char** c_list)`|Convert a C vector of char\* to a python list of python str|
+|`pyfloats(double *cvar, int lg)`|Convert a C vector of lg doubles into a list of python floats|
 |`iodevar_to_ndarray(char *name, int copy = True)`|Create an numpy array from the content of an IODE variable|
 |`iodesample_to_ndarray()`|Convert the current WS sample into a numpy array of doubles|
 

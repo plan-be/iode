@@ -9,8 +9,7 @@
 #   exec_lec(lec:str, t:int=-1)     Compute a LEC formula using the current WS of VARs and SCLs
 #
 
-
-def exec_lec(lec:str, t:int=-1):
+def exec_lec(lec:str, t:int=-1)-> Union[float, List[float]]:
     '''
     Compute a LEC formula using the current WS of VARs and SCLs.
     The formula may be evaluate at a specific position in the sample (t) 

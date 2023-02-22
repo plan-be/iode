@@ -78,7 +78,6 @@ def test_iode_version():
     expected = "IODE Modeling Software 6.64 - (c) 1990-2023 Planning Office - Brussels"
     test_eq("iode.version()", expected, result)
 
-
 # WS FUNCTIONS
 # ------------
 @cpu
@@ -131,36 +130,36 @@ def test_iode_ws_sample():
 
     varfile = f"{IODE_DATA_DIR}a"
     iode.ws_load_var(varfile)
-    sample = iode.ws_sample()
-    test_eq("ws_sample()", ['1990Y1', '2020Y1'], sample)
+    sample = iode.ws_sample_get()
+    test_eq("ws_sample_get()", ['1990Y1', '2020Y1'], sample)
     print(f"Sample of {varfile} = {sample}")
 
-    sample = iode.ws_sample("1995Y1")
-    test_eq("ws_sample()", ['1995Y1', '2020Y1'], sample)
+    sample = iode.ws_sample_set("1995Y1", "")
+    test_eq("ws_sample_set()", ['1995Y1', '2020Y1'], sample)
     #print(f"New sample = {sample}")
 
-    sample = iode.ws_sample(None, "2030Y1")
-    test_eq("ws_sample()", ['1995Y1', '2030Y1'], sample)
+    sample = iode.ws_sample_set("", "2030Y1")
+    test_eq("ws_sample_set()", ['1995Y1', '2030Y1'], sample)
     #print(f"New sample = {sample}")
 
-    sample = iode.ws_sample("2000Y1", "2002Y1")
-    test_eq("ws_sample()", ['2000Y1', '2002Y1'], sample)
+    sample = iode.ws_sample_set("2000Y1", "2002Y1")
+    test_eq("ws_sample_set()", ['2000Y1', '2002Y1'], sample)
     #print(f"New sample = {sample}")
 
-    nobs = iode.ws_sample_length()
+    nobs = iode.ws_sample_nb_periods()
     test_eq("ws_samplelength()", 3, nobs)
     #print(f"Nobs = {nobs}")
 
-    str1 = iode.ws_sample_as_string()
-    test_eq("ws_sample_as_string()", "2000Y1 2002Y1", str1)
+    str1 = iode.ws_sample_to_string()
+    test_eq("ws_sample_to_string()", "2000Y1 2002Y1", str1)
     #print("string = ", repr(str1))
 
-    lst = iode.ws_sample_as_list()
-    test_eq("ws_sample_as_list()", ["2000Y1", "2001Y1", "2002Y1"], lst)
+    lst = iode.ws_sample_to_list()
+    test_eq("ws_sample_to_list()", ["2000Y1", "2001Y1", "2002Y1"], lst)
     #print("list = ", repr(lst))
 
-    ax2 = iode.ws_sample_as_axis()
-    test_eq("ws_sample_as_axis()", repr(la.Axis(["2000Y1", "2001Y1", "2002Y1"], 'time')), repr(ax2))
+    ax2 = iode.ws_sample_to_larray_axis()
+    test_eq("ws_sample_to_larray_axis()", repr(la.Axis(["2000Y1", "2001Y1", "2002Y1"], 'time')), repr(ax2))
     #print("axis = ", repr(ax2))
 
 
@@ -270,7 +269,7 @@ def test_iode_larray_to_ws_long_sample():
     iode.ws_clear_all()
 
     # Set IODE sample
-    iode.ws_sample("1990Y1", "2000Y1")
+    iode.ws_sample_set("1990Y1", "2000Y1")
 
     # Creating a new 3D-Array la3D_R
     sectors = la.Axis("sectors=S1,S2")
@@ -305,7 +304,7 @@ def test_iode_larray_to_ws_short_sample():
     iode.ws_clear_all()
 
     # Set IODE sample
-    iode.ws_sample("1992Y1", "1994Y1")
+    iode.ws_sample_set("1992Y1", "1994Y1")
 
     # Creating a new 3D-Array la3D_R
     sectors = la.Axis("sectors=S1,S2")
@@ -331,7 +330,7 @@ def test_iode_larray_to_ws_out_sample():
     iode.ws_clear_all()
 
     # Set IODE sample
-    iode.ws_sample("2000Y1", "2005Y1")
+    iode.ws_sample_set("2000Y1", "2005Y1")
 
     # Creating a new 3D-Array la3D_R
     sectors = la.Axis("sectors=S1,S2")
@@ -357,7 +356,7 @@ def test_iode_larray_to_ws_big_la():
     iode.ws_clear_all()
 
     # Set IODE sample
-    iode.ws_sample("1992Y1", "1994Y1")
+    iode.ws_sample_set("1992Y1", "1994Y1")
 
     # Creating Axes
     sectors = la.Axis("sectors=S0,S1,S2,S3,S4,S5,S6,S7,S8,S9")
@@ -632,7 +631,7 @@ def test_iode_var_to_py():
 
     varfile = f"{IODE_DATA_DIR}a"
     iode.ws_load_var(varfile)
-    iode.ws_sample("1990Y1", "1992Y1")
+    iode.ws_sample_set("1990Y1", "1992Y1")
 
     A = iode.var_to_py("A")
     B = [0.0, 1.0, 2]
@@ -913,7 +912,7 @@ def test_iode_htol():
    
     # define a yearly sample
     iode.ws_clear_var()
-    iode.ws_sample("2000Y1", "2020Y1")
+    iode.ws_sample_set("2000Y1", "2020Y1")
     
     # input filename
     filename = f"{IODE_DATA_DIR}fun_q.var"
@@ -946,7 +945,7 @@ def test_iode_ltoh():
    
     # define a yearly sample
     iode.ws_clear_var()
-    iode.ws_sample("2010Q1", "2020Q4")
+    iode.ws_sample_set("2010Q1", "2020Q4")
 
     # input filename
     filename = f"{IODE_DATA_DIR}fun.var"
@@ -1002,7 +1001,7 @@ def test_iode_htol_la():
     # Creating a new Quaterly 3D-Array la3D 
     vars = la.Axis("vars=AA,BB,CC")
     sectors = la.Axis("sectors=S1,S2")
-    time = iode.ws_sample_as_axis('time', "2000Q2", "2010Q1")
+    time = iode.ws_sample_to_larray_axis('time', "2000Q2", "2010Q1")
 
     la3D = la.ones([vars, sectors, time])
 
@@ -1018,7 +1017,7 @@ def test_iode_htol_la():
  
     # Import testq_3D in yearly WS
     iode.ws_clear_var()                 # Clear the ws before setting a new sample 
-    iode.ws_sample("2000Y1", "2010Y1")  
+    iode.ws_sample_set("2000Y1", "2010Y1")  
     
     # Last Obs in year
     varname = "BB_S1"
@@ -1046,7 +1045,7 @@ def test_iode_htol_la():
     iode.ws_save_var(filename)
     
     # read in la
-    la3Dy = iode.ws_load_var_py(filename, axis_names=["vars", "sectors"], sep="_")
+    la3Dy = iode.ws_load_var_to_larray(filename, axis_names=["vars", "sectors"], sep="_")
     print(la3Dy)
 
 
