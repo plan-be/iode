@@ -174,6 +174,16 @@ YYFILE*  L_YY;      // LEC stream the compiler is reading from
 
 // --- FUNCTIONS ---
 
+/**
+ * @brief Get total number of registred tokens.
+ * 
+ * @return int 
+ */
+int L_nb_tokens()
+{
+    return (int) (sizeof(L_TABLE) / sizeof(YYKEYS));
+}
+
 
 /**
  *  Opens a file or a string for reading and assigns the open stream to L_YY. 

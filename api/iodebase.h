@@ -209,6 +209,7 @@ extern void K_xdrPLONG(unsigned char *);
 extern void K_xdrKDB(KDB *,KDB **);
 
 /* l_token.c */
+extern int L_nb_tokens(void);
 extern int L_open_all(char *,int );
 extern void L_close(void);
 //extern int L_lex(void);
