@@ -20,6 +20,8 @@ import larray as la
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport printf
 from cpython cimport PyObject, Py_INCREF
+from typing import Union, List, Tuple
+
 #from enum import Enum
 
 

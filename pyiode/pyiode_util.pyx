@@ -20,18 +20,18 @@
 
 # Miscellaneous functions
 # -----------------------
-def version():
+def version()->str:
     "Return the Iode version."
     return pystr(IodeVersion())
 
 # Conversions python-C strings
 # ----------------------------
-def cstr(pystr):
+def cstr(pystr)->bytes:
     '''Convert a python string (UTF8) to a C null terminated string (ANSI cp1252).'''
     if pystr is None: return None
     return pystr.encode("cp1252")
 
-def pystr(cstr):
+def pystr(cstr)->str:
     '''Convert a C null terminated string (ANSI cp1252) into a python string (UTF8).'''
     if cstr is None: return None
     return cstr.decode("cp1252")
@@ -51,7 +51,7 @@ def cpu_init(txt = None):
     cpu_start_value = timeit.default_timer()
     return cpu_start_value
 
-def cpu_end_msg(txt=None, t0=None):
+def cpu_end_msg(txt=None, t0=None)->str:
     '''Return a string containing a free text + the elapsed time since the last call to cpu_init()'''
     if t0 is None:
         t0 = cpu_start_value

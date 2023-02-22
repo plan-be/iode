@@ -7,13 +7,11 @@
 # ---------------------------------------------
 #   la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, timeaxis = 'time')
 #  
-#   larray_to_ws(la_input, timeaxis:str='time', sep:str="_")
-#   ws_to_larray_time_as_doubles(vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names='', regex=None, sep=None):
-#   ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None):
-#   ws_load_var_py(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None):
-#   lasample(la_input, timeaxis = 'time')                               Return the first and last time axis labels as a list of 2 strings
+#   larray_to_ws(la_input, timeaxis:str='time', sep:str="_")   | Copies LArray la_input into IODE KV_WS.
+#   ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None, time_as_floats=False)  | Creates an LArray from the current KV_WS content
+#   ws_load_var_to_larray(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None) | Load an IODE var file into an Larray object with 2 axes (vars and time)  
+#   larray_get_sample(la_input, timeaxis = 'time')             | Return the first and last time axis labels as a list of 2 strings
     
-
 
 cdef la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, timeaxis = 'time'):
     '''
@@ -29,7 +27,8 @@ cdef la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, timeaxis = 'ti
     #print(f"la_pos:{la_pos} - ws_pos:{ws_pos} - la_lg:{la_lg} ")
 
 
- 
+
+# TODO: check return values and return an error code 
 def larray_to_ws(la_input, timeaxis:str='time', sep:str="_"):
     '''
     Copies Array la_input into IODE KV_WS.
@@ -87,8 +86,15 @@ def larray_to_ws(la_input, timeaxis:str='time', sep:str="_"):
             IodeSetVector(cstr(v), values, la_pos, ws_pos, la_lg)
 
  
-# Creates an LArray from the current KV_WS content with IODE sample
-def ws_to_larray_gnl(vars_pattern:str='*', varsaxis:str='vars', timeaxis:str='time', axis_names='', regex=None, sep=None, time_as_doubles=False):
+
+def ws_to_larray(vars_pattern:str='*', 
+                 varsaxis:str='vars', timeaxis:str='time', axis_names='', 
+                 regex=None, sep=None, 
+                 time_as_floats=False)->la.Array:
+    '''
+    Creates an LArray from the current KV_WS content with time axis labels in the IODE syntax ['2000Q2',...].
+    If time_as_doubles is True, the time-axis labels are doubles [2000.25,...]
+    '''
     cdef:
         int i
         np.ndarray[np.double_t, ndim=2] la_data
@@ -99,10 +105,7 @@ def ws_to_larray_gnl(vars_pattern:str='*', varsaxis:str='vars', timeaxis:str='ti
     
     # Define 2 original axes var and time
     axis_var = la.Axis(var_list, varsaxis)
-    if time_as_doubles:
-        axis_time = la.Axis(ws_sample_as_list_of_doubles(), timeaxis)
-    else:
-        axis_time = ws_sample_as_axis(timeaxis)
+    axis_time = ws_sample_to_larray_axis(axis_name=timeaxis, as_floats=time_as_floats)
 
     # Create LArray with 0
     la_res = la.zeros([axis_var, axis_time])
@@ -123,19 +126,20 @@ def ws_to_larray_gnl(vars_pattern:str='*', varsaxis:str='vars', timeaxis:str='ti
 
 
 # Creates an LArray from the current KV_WS content with **integer** sample (old version)
-def ws_to_larray_time_as_doubles(vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names='', regex=None, sep=None):
-
-    return ws_to_larray_gnl(vars_pattern=vars_pattern, varsaxis=varsaxis, timeaxis=timeaxis, axis_names=axis_names, regex=regex, sep=sep, time_as_doubles=True)
+#def ws_to_larray_time_as_doubles(vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names='', regex=None, sep=None):
+#
+#    return ws_to_larray_gnl(vars_pattern=vars_pattern, varsaxis=varsaxis, timeaxis=timeaxis, axis_names=axis_names, regex=regex, sep=sep, time_as_doubles=True)
  
 
-def ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None):
-
-    return ws_to_larray_gnl(vars_pattern=vars_pattern, varsaxis=varsaxis, timeaxis=timeaxis, axis_names=axis_names, regex=regex, sep=sep, time_as_doubles=False)
+#def ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None, time_as_doubles=False):
+#
+#    return ws_to_larray_gnl(vars_pattern=vars_pattern, varsaxis=varsaxis, timeaxis=timeaxis, axis_names=axis_names, regex=regex, sep=sep, time_as_doubles=time_as_doubles)
 
     
-# Load an IODE .var file 
-# Create a LA object with 2 axes (vars and time) or
-def ws_load_var_py(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None):
+def ws_load_var_to_larray(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None)->la.Array:
+    
+    '''Load an IODE .var file into an Larray object with 2 axes (vars and time) 
+    '''
 
     # Load iode var file
     rc = ws_load_var(filename)
@@ -150,7 +154,7 @@ def ws_load_var_py(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='ti
 
 
 
-def lasample(la_input, timeaxis = 'time'):
+def larray_get_sample(la_input, timeaxis = 'time')->List[Union[str,float]]:
     '''Return the first and last time axis labels as a list of 2 strings'''
     
     time = la_input.axes[timeaxis]

@@ -5,10 +5,10 @@
 #  
 #  Utilities using explicit C data types in arguments 
 #  --------------------------------------------------
-#   pylist(char** c_list)                           Convert a C vector of char* to a python list of strings
-#   pyfloats(double *cvar, int lg)                  Convert a vector of doubles of length into a list of doubles'''
+#   pylist(char** c_list)                           Convert a C vector of char* to a python list of python str
+#   pyfloats(double *cvar, int lg)                  Convert a C vector of lg doubles into a list of python floats 
 #   iodevar_to_ndarray(char *name, int copy = True) Create an numpy array from the content of an IODE variable
-#   iodesample_to_ndarray()                         Convert the current WS sample into a numpy array of doubles
+#   iodesample_to_ndarray()                         Convert the current WS sample into a numpy 1D array of doubles
 
 cdef pylist(char** c_list):
     '''
@@ -47,7 +47,7 @@ cdef pylist(char** c_list):
 
 
 cdef pyfloats(double *cvar, int lg):
-    '''Convert a vector of doubles of length lg into a list of doubles'''
+    '''Convert a C vector of lg doubles into a list of python floats'''
     if cvar == NULL:
         return []
 
@@ -103,7 +103,7 @@ cdef iodevar_to_ndarray(char * name, int copy = True):
 # Obsolete ? 
 # ----------
 cdef iodesample_to_ndarray():
-    '''Convert the current WS sample into a numpy array of doubles'''
+    '''Convert the current WS sample into a numpy 1D array of doubles'''
     
     cdef np.npy_intp shape[1]
     cdef int lg

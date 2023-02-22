@@ -13,7 +13,8 @@
 #  and stored in memory using a proprietary memory management system (IODE-SWAP).
 #  
 #  IODE functions operate inside IODE-SWAP memory. 
-#  Exchanges between IODE objects (in IODE-SWAP) and LArray objects (python memory) are made possible via interface functions.
+#  Exchanges between IODE objects (in IODE-SWAP) and python objects (larray, numpy or pandas objects in python memory) 
+#  are made possible via interface functions.
 #  
 #  Source files (*.pyx, *.pxi and *.c)
 #  -----------------------------------
@@ -30,18 +31,18 @@
 #  --------------------------------------------------
 #  
 #  1. In C
-#      Create the new function in one of the iodeapi C module, for example in api/b_api.c:
+#      Create the new function in one of the iodeapi C modules, for example in api/b_api.c:
 #           int IodeMyFn(char* name) 
 #      Declare the new function in api/iodeapi.h
 #  
-#      Non Visual Studio version:
+#      For Visual Studio (CMake) version:
+#        - Regenerate iodeapi.lib (using CMake)
+#  
+#      For non Visual Studio version (standard Microsoft nmake / cl compiler):
 #        - Goto .../iode/api/vc64 
 #        - Execute set64.bat to create the environment variables for VC64 nmake
 #        - Execute nmake to create 64 bits iodeapi.lib => api/vc64/nmake
 #  
-#      Visual Studio version:
-#        - Regenerate iodeapi.lib
-#      
 #  2. In Python (*.pyx files)
 #      Add the new function declaration in iode.pxi in the section "cdef extern from "iode.h":":
 #          cdef int IodeMyFn(char* name)  
@@ -58,13 +59,12 @@
 #               (don't forget to free c_list afterwards, e.g. by a call to SCR_free_tbl(c_list))
 #          - pyfloats(double *cvar, int lg) to convert a vector of doubles of length lg 
 #               into a python list of doubles
-#          
 #  
 #  3. In a DOS shell
-#      c:\> cd  .../iode/pyiode
-#      c:.../iode/pyiode> set64
-#      c:.../iode/pyiode> activate 
-#      c:.../iode/pyiode> makepy
+#      c:\> cd  <path_to_iode>/pyiode
+#      c:<path_to_iode>/pyiode> set64
+#      c:<path_to_iode>/pyiode> activate 
+#      c:<path_to_iode>/pyiode> makepy
    
 #  cython: binding=True, language_level=3, embedsignature=True
 
@@ -106,180 +106,162 @@ ODE_assign_super_PYIODE()
 
 
 # ------------------------------------------------------------------------------------------
-# API to be implemented (from report api)
-# ---------------------------------------
+# API to be implemented (tentative list - to be reviewed)
+# -------------------------------------------------------
 #
-# - fileimportvar",            B_FileImportVar,     
-# - fileimportcmt",            B_FileImportCmt,     
+# - file_import_var",            B_FileImportVar,     
+# - file_import_cmt",            B_FileImportCmt,     
 # 
-# x ws_content  
-# x ws_sample
-# x wsload",                   B_WsLoad,            
-# - wscopy",                   B_WsCopy,            
-# x wssave",                   B_WsSave,            
-# - wssavecmp",                B_WsSaveCmp,         
-# - wsimport",                 B_WsImport,          
-# - wsexport",                 B_WsExport,          
-# - wsmerge",                  B_WsMerge,           
-# x wsclear",                  B_WsClear,           
-# x wsclearall",               B_WsClearAll,        
-# - wsdescr",                  B_WsDescr,           
-# - wsextrapolate",            B_WsExtrapolate,     
-# - wsaggrchar",               B_WsAggrChar,        
-# - wsaggrsum",                B_WsAggrSum,         
-# - wsaggrmean",               B_WsAggrMean,        
-# - wsaggrprod",               B_WsAggrProd,        
-# - wshtollast",               B_WsHtoLLast,        
-# - wshtolsum",                B_WsHtoLSum,         
-# - wshtolmean",               B_WsHtoLMean,        
-# - wsltohflow",               B_WsLtoHFlow,        
-# - wsltohstock",              B_WsLtoHStock,       
-# - csvsave",                  B_CsvSave,           
-# - csvdigits",                B_CsvNbDec,          
-# - csvsep",                   B_CsvSep,            
-# - csvdec",                   B_CsvDec,            
-# - csvnan",                   B_CsvNaN,            
-# - csvaxes",                  B_CsvAxes,           
-# - statunitroot",             B_StatUnitRoot,      
+# x ws_content_*  
+# x ws_sample_*
+# x ws_load_*",                 B_WsLoad,            
+# - ws_copy_*",                 B_WsCopy,            
+# x ws_save_*",                 B_WsSave,            
+# - ws_savecmp_*",              B_WsSaveCmp,         
+# - ws_import_*",               B_WsImport,          
+# - ws_export_*",               B_WsExport,          
+# - ws_merge_*",                B_WsMerge,           
+# x ws_clear_*",                B_WsClear,           
+# x ws_clear_all",              B_WsClearAll,        
+# - ws_descr",                  B_WsDescr,           
+# - ws_extrapolate",            B_WsExtrapolate,     
+# - ws_aggr_char",              B_WsAggrChar,        
+# - ws_aggr_sum",               B_WsAggrSum,         
+# - ws_aggr_mean",              B_WsAggrMean,        
+# - ws_aggr_prod",              B_WsAggrProd,        
+# x ws_htol_last",              B_WsHtoLLast,        
+# x ws_htol_sum",               B_WsHtoLSum,         
+# x ws_htol_mean",              B_WsHtoLMean,        
+# x ws_ltoh_flow",              B_WsLtoHFlow,        
+# x ws_ltoh_stock",             B_WsLtoHStock,       
+# - csv_save",                  B_CsvSave,           
+# - csv_digits",                B_CsvNbDec,          
+# - csv_sep",                   B_CsvSep,            
+# - csv_dec",                   B_CsvDec,            
+# - csv_nan",                   B_CsvNaN,            
+# - csv_axes",                  B_CsvAxes,           
+# - stat_unit_root",            B_StatUnitRoot,      
 # 
-# - wsseasonadj",              B_WsSeasonAdj,       
-# - wstrend",                  B_WsTrend,           
-# - wstrendstd",               B_WsTrendStd,        
+# - ws_seasonadj",              B_WsSeasonAdj,       
+# - ws_trend",                  B_WsTrend,           
+# - ws_trendstd",               B_WsTrendStd,        
 #   
-# - wsimporteviews",			B_WsImportEviews,   
+# - ws_import_eviews",			B_WsImportEviews,   
 # 
 # 
-# 
-# 
-# 
-# From b_data.c 
-# -------------
-# x dataupdate",               B_DataUpdate,      
-# - datadelete",               B_DataDelete,      
-# - datarename",               B_DataRename,      
-# - datasearch",               B_DataSearch,      
-# - dataduplicate",            B_DataDuplicate,   
-# - datalist",                 B_DataList,        
-# - datacompare",              B_DataCompare,     
-# - datacompareeps",           B_DataCompareEps,  
-# - datalistsort",             B_DataListSort,    
-# - dataeditcnf",              B_DataEditCnf,     
-# - datacalcvar",              B_DataCalcVar,     
-# - datacalclst",              B_DataCalcLst,     
-# - datapattern",              B_DataPattern,     
-# - datadisplaygraph",         B_DataDisplayGraph,
-# - dataprintgraph",           B_DataPrintGraph,  
-# - datascan",                 B_DataScan,        
+# b_data.c 
+# --------
+# x data_update_*",             B_DataUpdate,      
+# - data_delete_*",             B_DataDelete,      
+# - data_rename_*",             B_DataRename,      
+# - data_search",               B_DataSearch,      
+# - data_duplicate_*",          B_DataDuplicate,   
+# - data_scan_*",               B_DataScan,        
+# - data_list",                 B_DataList,        
+# - data_compare_*",            B_DataCompare,     
+# - data_compare_eps",          B_DataCompareEps,  
+# - data_list_sort",            B_DataListSort,    
+# - data_calc_var",             B_DataCalcVar,     
+# - data_calc_lst",             B_DataCalcLst,     
+# - data_pattern",              B_DataPattern,     
+# - data_display_graph",        B_DataDisplayGraph,
+# - data_print_graph",          B_DataPrintGraph,  
 # 
 #  b_ras.c
 #  -------
-# -    "datarasvar",               B_DataRasVar,           NULL,               0,
+# - data_ras_var",              B_DataRasVar,           
 #  
 #  b_est.c
 #  -------
-# - eqsestimate",              B_EqsEstimate,          SB_EqsEstimate,     0,
-# - eqssetmethod",             B_EqsSetMethod,         NULL,               0,
-# - eqssetbloc",               B_EqsSetBloc,           NULL,               0,
-# - eqssetblock",              B_EqsSetBloc,           NULL,               0,
-# - eqssetsample",             B_EqsSetSample,         NULL,               0,
-# - eqssetinstrs",             B_EqsSetInstrs,         NULL,               0,
-# - eqssetcmt",                B_EqsSetCmt,            NULL,               0,
+# - eqs_estimate",              B_EqsEstimate,         
 # 
 #  b_step.c
 #  -------- 
-#  - eqsstepwise",              B_EqsStepWise,          NULL,               0,
+#  - eqsstepwise",              B_EqsStepWise,        
 #  
-#  - printobjtitle",            B_PrintObjTblTitle,     NULL,               0,
-#  - printobjlec",              B_PrintObjLec,          NULL,               0,
-#  - printobjinfos",            B_PrintObjEqsInfos,     NULL,               0,
+#  b_print.c
+#  ---------
+#  - print_objtitle",           B_PrintObjTblTitle,   
+#  - print_objlec",             B_PrintObjLec,        
+#  - print_objinfos",           B_PrintObjEqsInfos,   
 #   
-#  - printobjdef",              B_PrintObjDef,          SB_PrintObjDef,     1,
-#  - printdest",                B_PrintDest,            NULL,               0,
-#  - printdestnew",             B_PrintDestNew,         NULL,               0,
-#  - printmulti",               B_PrintMulti,           NULL,               0,
-#  - printnbdec",               B_PrintNbDec,           NULL,               0,
-#  - printlang",                B_PrintLang,            NULL,               0,
-#  - printtblfile",             B_ViewTblFile,          NULL,               0,
-#  - printtbl",                 B_PrintTbl,             SB_ViewPrintTbl,    0,
-#  - printvar",                 B_PrintVar,             NULL,               0,
+#  - print_obj_def",            B_PrintObjDef,        
+#  - printdest",                B_PrintDest,          
+#  - printdestnew",             B_PrintDestNew,       
+#  - printmulti",               B_PrintMulti,         
+#  - printnbdec",               B_PrintNbDec,         
+#  - printlang",                B_PrintLang,          
+#  - printtblfile",             B_ViewTblFile,        
+#  - printtbl",                 B_PrintTbl,           
+#  - printvar",                 B_PrintVar,           
 #   
-#  - graphdefault",             B_GraphDefault,         NULL,               0,
+#  - graphdefault",             B_GraphDefault,       
 #   
-#  - printgrall",               B_PrintGr,              SB_ViewPrintGr,     0,
-#  - printgr",                  B_PrintGr,              SB_ViewPrintGr,     0,
+#  - printgrall",               B_PrintGr,            
+#  - printgr",                  B_PrintGr,            
 #     
-#  - modelsimulate",            B_ModelSimulate,        SB_ModelSimulate,   0,
-#  - modelsimulateparms",       B_ModelSimulateParms,   NULL,               0,
-#  - modelexchange",            B_ModelExchange,        NULL,               0,
-#  - modelcompile",             B_ModelCompile, 	    SB_ModelCompile,    0,
+#  x model_simulate",           B_ModelSimulate,      
+#  - model_compile",            B_ModelCompile, 	  
 #  
-#  - modelcalcscc",             B_ModelCalcSCC,         NULL,               0,
-#  - modelsimulatescc",         B_ModelSimulateSCC,     NULL,               0,
+#  - model_calcscc",            B_ModelCalcSCC,       
+#  - model_simulate_scc",       B_ModelSimulateSCC,   
 # 
-#  - modelsimulatesaveniters",  B_ModelSimulateSaveNIters,  NULL,           0,
-#  - modelsimulatesavenorms",   B_ModelSimulateSaveNorms,   NULL,           0,
+#  - model_simulate_save_niters",  B_ModelSimulateSaveNIters,
+#  - model_simulate_save_norms",   B_ModelSimulateSaveNorms, 
 # 
-#  - idtexecute",               B_IdtExecute,           SB_IdtExecute,      0,
-#  - idtexecutevarfiles",       B_IdtExecuteVarFiles,   NULL,               0,
-#  - idtexecutesclfiles",       B_IdtExecuteSclFiles,   NULL,               0,
-#  - idtexecutetrace",          B_IdtExecuteTrace,      NULL,               0,
-#  
-#  X reportexec",               B_ReportExec,           SB_ReportExec,      0,
-#  - sleep",                    B_Sleep,                NULL,               0,
-#         
-#     "printa2mappend",           B_PrintA2mAppend,       NULL,               0,
-#     "printfont",                B_PrintFont,            NULL,               0,
-#     "printtablefont",           B_PrintTFont,           NULL,               0,
-#     "printtablebox",            B_PrintTBox,            NULL,               0,
-#     "printtablecolor",          B_PrintTColor,          NULL,               0,
-#     "printtablewidth",          B_PrintTWidth,          NULL,               0,
-#     "printtablebreak",          B_PrintTBreak,          NULL,               0,
-#     "printtablepage",           B_PrintTPage,           NULL,               0,
-# 
-#     "printhtmltableclass",      B_PrintHtmlTableClass,  NULL,               0,
-#     "printhtmltrclass",         B_PrintHtmlTRClass,     NULL,               0,
-#     "printhtmlthclass",         B_PrintHtmlTHClass,     NULL,               0,
-#     "printhtmltdclass",         B_PrintHtmlTDClass,     NULL,               0,
-# 
-#     "printbackground",          B_PrintGColor,          NULL,               0,
-#     "printgraphbox",            B_PrintGBox,            NULL,               0,
-#     "printgraphbrush",          B_PrintGBrush,          NULL,               0,
-#     "printgraphsize",           B_PrintGSize,           NULL,               0,
-#     "printgraphpage",           B_PrintGPage,           NULL,               0,
-#     "printgraphtheme",          B_PrintGTheme,          NULL,               0,
-#     "printgraphband",           B_PrintGBand,           NULL,               0,
-#             
-#     "printrtfhelp",             B_PrintRtfHelp,         NULL,               0,
-#     "printhtmlhelp",            B_PrintHtmlHelp,        NULL,               0,
-#     "printrtftopic",            B_PrintRtfTopic,        NULL,               0,
-#     "printrtflevel",            B_PrintRtfLevel,        NULL,               0,
-#     "printrtftitle",            B_PrintRtfTitle,        NULL,               0,
-#     "printrtfcopyright",        B_PrintRtfCopy,         NULL,               0,
-#     "printparanum",             B_PrintParaNum,         NULL,               0,
-#     "printpageheader",          B_PrintPageHeader,      NULL,               0,
-#     "printpagefooter",          B_PrintPageFooter,      NULL,               0,
-#     "printorientation",         B_PrintGdiOrient,       NULL,               0,
-#     "printduplex",              B_PrintGdiDuplex,       NULL,               0,
-#     "setprinter",               B_PrintGdiPrinter,      NULL,               0,
-#     
-#     "printgiftranscolor",       B_PrintGIFTransColor,   NULL,               0,
-#     "printgifbackcolor",        B_PrintGIFBackColor,    NULL,               0,
-#     "printgifinterlaced",       B_PrintGIFInterlaced,   NULL,               0,
-#     "printgiftransparent",      B_PrintGIFTransparent,  NULL,               0,
-#     "printgiffilled",           B_PrintGIFFilled,       NULL,               0,
-#     "printgiffont",             B_PrintGIFFont,         NULL,               0,
-#     
-#     "printhtmlstrip",           B_PrintHtmlStrip,       NULL,               0,
-#     "printhtmlstyle",           B_PrintHtmlStyle,       NULL,               0,
-#             
-#  - sysansitoutf8",            B_SysAnsiToUTF8,        NULL,               0,
-#  - sysoemtoutf8",             B_SysOemToUTF8,         NULL,               0,
-#  - sysansitooem",             B_SysAnsiToOem,         NULL,               0,
-#  - sysoemtoansi",             B_SysOemToAnsi,         NULL,               0,
-#                 
-#  - a2mtohtml",                B_A2mToHtml,            NULL,               0,
-#  - a2mtomif",                 B_A2mToMif,             NULL,               0,
-#  - a2mtocsv",                 B_A2mToCsv,             NULL,               0,
-#  - a2mtortf",                 B_A2mToRtf,             NULL,               0,
-#  - a2mtoprinter",             B_A2mToPrinter,         NULL,               0,
-# 
+#  - idtexecute",               B_IdtExecute,           
+#  - idtexecutevarfiles",       B_IdtExecuteVarFiles,   
+#  - idtexecutesclfiles",       B_IdtExecuteSclFiles,   
+#  - idtexecutetrace",          B_IdtExecuteTrace,      
+#                                                       
+#  X report_exec",              B_ReportExec,           
+#  X report_exec_line",         B_ReportExecLine,       
+#                                                       
+#  - print_a2mappend",          B_PrintA2mAppend,       
+#  - print_font",               B_PrintFont,            
+#  - print_table_font",         B_PrintTFont,           
+#  - print_table_box",          B_PrintTBox,            
+#  - print_table_color",        B_PrintTColor,          
+#  - print_table_width",        B_PrintTWidth,          
+#  - print_table_break",        B_PrintTBreak,          
+#  - print_table_page",         B_PrintTPage,           
+#  -                                                    
+#  - print_html_table_class",   B_PrintHtmlTableClass,  
+#  - print_html_tr_class",      B_PrintHtmlTRClass,     
+#  - print_html_th_class",      B_PrintHtmlTHClass,     
+#  - print_html_td_class",      B_PrintHtmlTDClass,     
+#  -                                                    
+#  - printbackground",          B_PrintGColor,          
+#  - printgraphbox",            B_PrintGBox,            
+#  - printgraphbrush",          B_PrintGBrush,          
+#  - printgraphsize",           B_PrintGSize,           
+#  - printgraphpage",           B_PrintGPage,           
+#  - printgraphtheme",          B_PrintGTheme,          
+#  - printgraphband",           B_PrintGBand,           
+#  -                                                    
+#  - print_rtfhelp",             B_PrintRtfHelp,         
+#  - print_htmlhelp",            B_PrintHtmlHelp,        
+#  - print_rtftopic",            B_PrintRtfTopic,        
+#  - print_rtflevel",            B_PrintRtfLevel,        
+#  - print_rtftitle",            B_PrintRtfTitle,        
+#  - print_rtfcopyright",        B_PrintRtfCopy,         
+#  - print_paranum",             B_PrintParaNum,         
+#  - print_pageheader",          B_PrintPageHeader,      
+#  - print_pagefooter",          B_PrintPageFooter,      
+#  - print_orientation",         B_PrintGdiOrient,       
+#  - print_duplex",              B_PrintGdiDuplex,       
+#  - set_printer",               B_PrintGdiPrinter,      
+#
+#  - print_html_strip",           B_PrintHtmlStrip,       
+#  - print_html_style",           B_PrintHtmlStyle,       
+#                                                       
+#  - sys_ansitoutf8",            B_SysAnsiToUTF8,        
+#  - sys_oemtoutf8",             B_SysOemToUTF8,         
+#  - sys_ansitooem",             B_SysAnsiToOem,         
+#  - sys_oemtoansi",             B_SysOemToAnsi,         
+#                                                       
+#  - a2m_to_html",                B_A2mToHtml,            
+#  - a2m_to_mif",                 B_A2mToMif,             
+#  - a2m_to_csv",                 B_A2mToCsv,             
+#  - a2m_to_rtf",                 B_A2mToRtf,             
+#  - a2m_to_printer",             B_A2mToPrinter,         

@@ -36,7 +36,7 @@
 #  data_pattern_*
 
 
-def data_update_(obj_name:str, obj_value:str, obj_type:int): 
+def data_update_(obj_name:str, obj_value:str, obj_type:int)->int: 
     r'''Update an IODE object (cmt, eqs, lst, idt) 
     
     Parameters
@@ -65,34 +65,34 @@ def data_update_(obj_name:str, obj_value:str, obj_type:int):
     cmd = obj_name + " " + obj_value
     return B_DataUpdate(cstr(cmd), obj_type)
 
-def data_update_cmt(obj_name:str, obj_value:str):
+def data_update_cmt(obj_name:str, obj_value:str)->int:
     '''Create or update a comment'''
     return data_update_(obj_name, obj_value, K_CMT)
     
-def data_update_eqs(obj_name:str, obj_value:str):
+def data_update_eqs(obj_name:str, obj_value:str)->int:
     return data_update_(obj_name, obj_value, K_EQS)
     
-def data_update_idt(obj_name:str, obj_value:str):
+def data_update_idt(obj_name:str, obj_value:str)->int:
     return data_update_(obj_name, obj_value, K_IDT)
     
-def data_update_lst(obj_name:str, obj_value:str):
+def data_update_lst(obj_name:str, obj_value:str)->int:
     return data_update_(obj_name, obj_value, K_LST)
     
-def data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None):
+def data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)->int:
     cmd = obj_name + " "
-    if value == None: cmd += "-- "
+    if value is None: cmd += "-- "
     else:             cmd += repr(value)
 
-    if relax == None: relax = 1.0
+    if relax is None: relax = 1.0
     cmd += " " + repr(relax)
 
-    if stderr == None: cmd += " -- "
+    if stderr is None: cmd += " -- "
     else:              cmd += " " + repr(stderr)
 
     return B_DataUpdate(cstr(cmd), K_SCL)
 
 
-def data_update_var(varname:str, values, operation:str = "L", per_from:str = None):
+def data_update_var(varname:str, values, operation:str = "L", per_from:str = None)->int:
     # 
     r'''Update an IODE variable starting at a specified period
     
@@ -126,7 +126,7 @@ def data_update_var(varname:str, values, operation:str = "L", per_from:str = Non
     cmd = varname + " " + operation
     
     if per_from is None:
-        smpl = ws_sample()
+        smpl = ws_sample_get()
         per_from = smpl[0]
         
     cmd = cmd + " " + per_from
