@@ -1376,6 +1376,7 @@ extern  int L_PRIOR[],
 	L_MIN_TARGS[],
 	L_MAX_MTARGS[],
 	L_MIN_MTARGS[];
+extern YYKEYS L_TABLE[];
 
 extern  TOKEN   L_TOKEN;
 extern  YYFILE  *L_YY;
