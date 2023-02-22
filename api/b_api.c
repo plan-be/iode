@@ -644,17 +644,17 @@ double *IodeGetVector(char *name, int *lg)
  *  of the intersection between the python object and KV_WS.
  *  
  *  Schematically : 
- *      KV_WS[var, wspos + i] = LA[var, la_pos + i] for i = 0..la_lg
+ *      KV_WS[var, wspos + i] = PyObject[var, py_pos + i] for i = 0..py_lg
  *  
- *  @param [in] str_la_from char*   start period in the python object
- *  @param [in] str_la_to   char*   end period in the python object
- *  @param [in] la_pos      int*    position in the python object of the first element to copy 
- *  @param [in] ws_pos      int*    position in KV_WS of the first element 
- *  @param [in] la_lg       int*    la_lg
- *  @return                 int     
+ *  @param [in] str_pyper_from  char*   start period in the python object
+ *  @param [in] str_pyper_to    char*   end period in the python object
+ *  @param [in] py_pos          int*    position in the python object of the first element to copy 
+ *  @param [in] ws_pos          int*    position in KV_WS of the first element 
+ *  @param [in] py_lg           int*    py_lg
+ *  @return                     int     
  */
  
-int IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
+int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg)
 {
     int             pos, i;
     SAMPLE          *smpl = KSMPL(KV_WS);
@@ -663,37 +663,37 @@ int IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int 
     static int      ws_lg = 0;
     
     // Compute where to copy la_values
-    // ws_var[ws_pos + i] = la_values[la_pos + i] for i=0..la_lg
-    per_la_from = PER_atoper(str_la_from);
-    per_la_to   = PER_atoper(str_la_to);
+    // ws_var[ws_pos + i] = la_values[py_pos + i] for i=0..py_lg
+    per_la_from = PER_atoper(str_pyper_from);
+    per_la_to   = PER_atoper(str_pyper_to);
     
-    // idea: copy la_lg values from la[la_pos] to ws[ws_pos] 
+    // idea: copy py_lg values from la[py_pos] to ws[ws_pos] 
     
     // Calc position and length as if ws starts before la
     *ws_pos = PER_diff_per(per_la_from, &(smpl->s_p1));
-    *la_pos = 0;                                
-    *la_lg = 1 + PER_diff_per(per_la_to, per_la_from);
+    *py_pos = 0;                                
+    *py_lg = 1 + PER_diff_per(per_la_to, per_la_from);
     
-    // if la starts before ws, start at -ws_pos and decrease la_lg
+    // if la starts before ws, start at -ws_pos and decrease py_lg
     if(*ws_pos < 0) {
-        *la_pos = -*ws_pos;
+        *py_pos = -*ws_pos;
         *ws_pos = 0;
-        *la_lg -= *la_pos;
+        *py_lg -= *py_pos;
     }    
     
-    // if la_to > ws_to, decrease la_lg
+    // if la_to > ws_to, decrease py_lg
     if(PER_diff_per(per_la_to, &(smpl->s_p2)) > 0){
-        *la_lg -= PER_diff_per(per_la_to, &(smpl->s_p2));
+        *py_lg -= PER_diff_per(per_la_to, &(smpl->s_p2));
     }
    
-    //printf("la_pos:%d - ws_pos:%d - la_lg:%d\n", *la_pos, *ws_pos, *la_lg);
-    return(*la_lg);
+    //printf("py_pos:%d - ws_pos:%d - py_lg:%d\n", *py_pos, *ws_pos, *py_lg);
+    return(*py_lg);
 }
 
 
 //int IodeSetVector_v1(char *la_name, double *la_values, int la_year_from, int la_year_to)
 //{
-//    int             pos, i, ws_pos, la_pos, la_lg;
+//    int             pos, i, ws_pos, py_pos, la_lg;
 //    SAMPLE          *smpl = KSMPL(KV_WS);
 //    static int      ws_lg = 0;
 //    static double*  ws_var = NULL;
@@ -706,7 +706,7 @@ int IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int 
 //    }
 //    
 //    // Compute where to copy la_values: 
-//    // ws_var[ws_pos + i] = la_values[la_pos + i] for i=0..la_lg
+//    // ws_var[ws_pos + i] = la_values[py_pos + i] for i=0..la_lg
 //    ws_pos = la_year_from - smpl->s_p1.p_y;    
 //    la_pos = 0;                                
 //    la_lg = 1 + la_year_to - la_year_from;
