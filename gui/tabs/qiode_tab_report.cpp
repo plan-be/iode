@@ -1,7 +1,7 @@
 #include "qiode_tab_report.h"
 
-QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent) 
-    : QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)
+QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output, std::shared_ptr<QIodeCompleter>& completer, 
+    QWidget* parent) : QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)
 {
     // spacer
     QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -18,7 +18,7 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent)
     layout->addWidget(runButton, 0, 1, Qt::AlignRight);
 
     // add report editor
-    editor = new ReportEditor();
+    editor = new ReportEditor(completer, output, parent);
     addEditorToLayout(1);
 
     // ---- Signals and Slots ----

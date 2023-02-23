@@ -56,6 +56,10 @@ class QIodeTabWidget: public QTabWidget
     QSettings* settings;
     std::shared_ptr<QString> project_settings_filepath;
 
+    std::shared_ptr<QIodeCompleter> completer;
+
+    QTextEdit* output;
+
     QFileSystemWatcher* fileSystemWatcher;
 
     QString projectDirPath;
@@ -153,11 +157,14 @@ public:
      * @brief - Initializes settings object and openedFiles list.
      *        - Reload previously opened files.
      * 
-     * @param project_settings_filepath shared_ptr<QString> path the settings file
+     * @param project_settings_filepath shared_ptr<QString> path to the settings file
+     * @param completer std::shared_ptr<QIodeCompleter> completer
+     * @param output QTextEdit* output widget to display the output from the execution of a report.
      * 
      * TODO: merge setup() method with updateProjectDir()
      */
-    void setup(std::shared_ptr<QString>& project_settings_filepath);
+    void setup(std::shared_ptr<QString>& project_settings_filepath, std::shared_ptr<QIodeCompleter>& completer, 
+        QTextEdit* output);
 
 	/**
 	 * @brief load a file and set corresponding tab text (filename) and tooltip (full absolute path).

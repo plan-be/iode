@@ -158,10 +158,17 @@ void QIodeTabWidget::saveSettings()
     settings->endGroup();
 }
 
-void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath)
+void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath, 
+    std::shared_ptr<QIodeCompleter>& completer, QTextEdit* output)
 {
     // save previous settings if any before to switch from project directory
     if (this->project_settings_filepath) saveSettings();
+
+    // set completer
+    this->completer = completer;
+
+    // set output
+    this->output = output;
 
     // close all tabs
     this->clear();
@@ -317,7 +324,7 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
 int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
     QWidget* mainwin = get_main_window_ptr();
-    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), this);
+    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), output, completer, this);
     int index = this->addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
     return index;

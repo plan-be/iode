@@ -27,7 +27,8 @@ class QIodeReportWidget : public QIodeAbstractEditor
     QShortcut* runShortcut;
 
 public:
-    QIodeReportWidget(const QString& filepath, QWidget* parent = nullptr);
+    QIodeReportWidget(const QString& filepath,  QTextEdit* output, 
+        std::shared_ptr<QIodeCompleter>& completer, QWidget* parent = nullptr);
     ~QIodeReportWidget();
 
 private slots:
