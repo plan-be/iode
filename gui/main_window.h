@@ -65,7 +65,7 @@ private:
 
 	QVector<QIodePlotDialog*> plots;
 
-	QIodeCompleter* completer;
+	std::shared_ptr<QIodeCompleter> completer;
 
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);

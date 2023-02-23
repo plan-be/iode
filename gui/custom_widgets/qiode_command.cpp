@@ -3,9 +3,13 @@
 
 void QIodeCommandLine::keyPressEvent(QKeyEvent *event)
 {
-    QString nb_commands = QString::number(executedCommandsList.size());
+    if(!c.get()) 
+    {
+        QLineEdit::keyPressEvent(event);
+        return;
+    }
 
-    if (c && c->popup()->isVisible()) 
+    if(c->popup()->isVisible()) 
     {
         // The following keys are forwarded by the completer to the widget
        switch (event->key()) 
@@ -17,6 +21,10 @@ void QIodeCommandLine::keyPressEvent(QKeyEvent *event)
        case Qt::Key_Backtab:
             event->ignore();
             return; // let the completer do default behavior
+       case Qt::Key_Space:
+            c->popup()->hide();
+            QLineEdit::keyPressEvent(event);
+            return;
        default:
            break;
        }
@@ -51,18 +59,24 @@ void QIodeCommandLine::keyPressEvent(QKeyEvent *event)
         run_command();
         break;
     default:
-        QLineEdit::keyPressEvent(event);
-
-        if(!c) return;
+        // CTRL + Space forces auto-completion
+        bool completeShortcut = event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Space;
+        if(!completeShortcut)
+            QLineEdit::keyPressEvent(event);
+        
         c->setCompletionPrefix(textUnderCursor());
-        if (c->completionPrefix().size() < 1)
-        {
+        if(completeShortcut || c->completionPrefix().size() > 0)
+            c->complete();
+        else
             c->popup()->hide();
-            return;
-        } 
-        c->complete();
-        break;
     }
+}
+
+void QIodeCommandLine::focusInEvent(QFocusEvent* event)
+{
+    if (c.get())
+        c->setWidget(this);
+    QLineEdit::focusInEvent(event);
 }
 
 void QIodeCommandLine::insertCompletion(const QString& completion)
@@ -73,20 +87,41 @@ void QIodeCommandLine::insertCompletion(const QString& completion)
     QString str = this->text();
     if(str.size() == 0) return;
 
-    int start = str.lastIndexOf(re) + 1;
-    if(start < 0)
-        this->setText(completion);
-    else
-        this->setText(str.first(start) + completion);
+    // delete completion prefix
+    for(int i=0; i < c->completionPrefix().size(); i++) backspace();
+
+    // replaces with full function or Iode object name
+    insert(completion);
 }
 
 QString QIodeCommandLine::textUnderCursor()
 {
-    QString str = this->text();
-    if(str.size() == 0) return "";
+    QString line = this->text().trimmed();
+    if(line.size() == 0) return "";
 
-    QStringList words = str.split(re);
-    return words.last();
+    int pos = cursorPosition();
+
+    // selects the "word" under cursor
+    // WARNING: cursorWordBackward(mark) selects only
+    //          alpha characters (i.e. the selection will not include 
+    //          characters such as $, # and @)
+    cursorWordBackward(true);
+
+    // NOTE: we need to add the lines below because we need to know
+    //       if there is a character $, # or @ before the "word"
+    if(cursorPosition() > 0)
+    {
+        QChar ch = line[cursorPosition()-1];
+        // cursorBackward(mark): Moves the cursor back. If mark is true 
+        // each character moved over is added to the selection
+        if(ch == '$' || ch == '#' || ch == '@') 
+            cursorBackward(true);
+    }
+
+    QString str = selectedText();
+    deselect();
+    setCursorPosition(pos);
+    return str;
 }
 
 void QIodeCommandLine::run_command()

@@ -1,6 +1,7 @@
 #include "qiode_completer.h"
 
-QIodeCompleter::QIodeCompleter(QObject *parent) : QCompleter(parent)
+QIodeCompleter::QIodeCompleter(const bool lecFunctions, QObject *parent) 
+    : QCompleter(parent), lecFunctions(lecFunctions)
 {
     iodeDatabases.push_back(new KDBComments());
     iodeDatabases.push_back(new KDBEquations());
@@ -21,13 +22,19 @@ QIodeCompleter::QIodeCompleter(QObject *parent) : QCompleter(parent)
     func_list = build_report_functions_list();
     for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
 
-    // LEC functions list
-    func_list = build_lec_functions_list();
-    for(const std::string& func_name: func_list) lecFunctionsList << QString::fromStdString(func_name);
-
     reportCommandsList.sort();
 
-    listModel = new QStringListModel(reportCommandsList + lecFunctionsList, this);
+    QStringList list = reportCommandsList;
+
+    if(lecFunctions)
+    {
+        // LEC functions list
+        func_list = build_lec_functions_list();
+        for(const std::string& func_name: func_list) lecFunctionsList << QString::fromStdString(func_name);
+        list += lecFunctionsList;
+    }
+
+    listModel = new QStringListModel(list, this);
     this->setModel(listModel);
 
     this->setCaseSensitivity(Qt::CaseInsensitive);
@@ -50,7 +57,10 @@ void QIodeCompleter::updateIodeOjectsListNames()
     objectNames.removeDuplicates();
 
     // concatenate report commands/functions and Iode object names
-    QStringList list = reportCommandsList + lecFunctionsList + objectNames;
+    QStringList list = reportCommandsList;
+    if(lecFunctions)
+        list += lecFunctionsList;
+    list += objectNames;
 
     // update completer
     listModel->setStringList(list);

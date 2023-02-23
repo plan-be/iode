@@ -4,6 +4,7 @@
 #include "custom_widgets/qiode_completer.h"
 
 #include <QObject>
+#include <QShortcut>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QCompleter>
@@ -42,46 +43,36 @@ class QIodeCommandLine: public QLineEdit
     QVector<QString> executedCommandsList;
     QVector<QString>::const_iterator it;            // const_iterator are for read-only access
 
-    QRegularExpression re;
-    QIodeCompleter* c;
+    std::shared_ptr<QIodeCompleter> c;
+
     QTextEdit* output; 
 
 public:
     QIodeCommandLine(QWidget *parent = nullptr) : QLineEdit(parent), 
-        it(executedCommandsList.end()), c(nullptr), output(nullptr) {}
+        it(executedCommandsList.end()), c(nullptr) {}
 
-    void setup(QTextEdit* output, QIodeCompleter* c, const QString& pattern) 
+    void setup(QTextEdit* output, std::shared_ptr<QIodeCompleter>& c) 
     { 
         this->output = output;
-        this->setCompleter(c);
-        re.setPattern(pattern);
-    }
-
-    QIodeCompleter* completer()
-    {
-        return c;
-    }
-
-    void setCompleter(QIodeCompleter* c)
-    {
-        if (this->c)
-            this->c->disconnect(this);
 
         this->c = c;
 
-        if (!c)
+        if (!c.get())
             return;
 
         c->setWidget(this);
         // Signal activated is overloaded in QCompleter. 
         // To connect to this signal by using the function pointer syntax, Qt provides 
         // a convenient helper for obtaining the function pointer
-        QObject::connect(c, QOverload<const QString &>::of(&QCompleter::activated),
-                        this, &QIodeCommandLine::insertCompletion);
+        connect(c.get(), QOverload<const QString &>::of(&QCompleter::activated),
+                this, &QIodeCommandLine::insertCompletion);
     }
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+
+    // event handler used to receive keyboard focus events for the widget.
+    void focusInEvent(QFocusEvent* event) override;
 
 private slots:
     void insertCompletion(const QString& completion);

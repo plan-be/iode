@@ -21,9 +21,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     setupUi(this);
 
     // ---- prepare auto-completion ----
-    QString pattern = "[^\\w$#@]+";
-    completer = new QIodeCompleter(this);
-    lineEdit_iode_command->setup(textEdit_output, completer, pattern);
+    completer = std::make_shared<QIodeCompleter>(false, this);
+    lineEdit_iode_command->setup(textEdit_output, completer);
 
     // ---- dock widgets ----
     // make left dock widget to extend to bottom of the window
@@ -97,7 +96,6 @@ MainWindow::~MainWindow()
     foreach(QIodePlotDialog* plotDialog, plots) plotDialog->close();
     plots.clear();
 
-    delete completer;
     delete project_settings;
     delete user_settings;
 }

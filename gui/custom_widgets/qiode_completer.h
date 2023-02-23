@@ -2,6 +2,7 @@
 
 #include <QCompleter>
 #include <QStringListModel>
+#include <QRegularExpression>
 
 #include "utils.h"
 
@@ -11,12 +12,15 @@ class QIodeCompleter: public QCompleter
     Q_OBJECT
 
     QStringListModel* listModel;
+
     QStringList reportCommandsList;
     QStringList lecFunctionsList;
     QVector<KDBAbstract*> iodeDatabases;
 
+    bool lecFunctions;
+
 public:
-    QIodeCompleter(QObject *parent = nullptr);
+    QIodeCompleter(const bool lecFunctions = false, QObject *parent = nullptr);
     ~QIodeCompleter();
 
 public slots:
