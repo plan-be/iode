@@ -184,7 +184,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
     treeView_file_explorer->updateProjectDir(projectDir, project_settings_filepath);
 
     // (re)open tabs
-    tabWidget_IODE_objs->setup(project_settings_filepath);
+    tabWidget_IODE_objs->setup(project_settings_filepath, completer, textEdit_output);
 
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);
