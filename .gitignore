@@ -379,3 +379,5 @@ keyboard_shortcuts.*
 # Others
 *.exp
 *.ini
+*.bak
+*.prf
