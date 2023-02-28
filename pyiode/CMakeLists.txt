@@ -8,8 +8,8 @@ set (PYX_SOURCES
 	pyiode_model.pyx pyiode_exec.pyx pyiode_print.pyx pyiode_reports.pyx pyiode_objs.pyx pyiode_larray.pyx
 )
 set (C_SOURCES iode.c s_iode.c)
-set (SCRIPTS setup.py makepy.bat)
-set (TESTS iode_for_py.py) 
+set (SCRIPTS cythonize_iode.py makepy.bat)
+set (TESTS test_iode.py) 
 set (DOCU PYIODE.md)
 
 add_executable(pyiode ${PYX_SOURCES} ${C_SOURCES} ${SCRIPTS} ${DOCU} ${TESTS})
