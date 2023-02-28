@@ -34,7 +34,7 @@
 |Syntax|Description|
 |:---|:---|
 |**Workspace content**||
-| `ws_content_(pattern, objtype)`|Return the names of objects of a given type, satisfying a pattern specification.|
+| `ws_content(pattern, objtype)`|Return the names of objects of a given type, satisfying a pattern specification.|
 | `ws_content_cmt(pattern)`|Return the list of cmt names corresponding to the given pattern|
 | `ws_content_eqs(pattern)`|Return the list of eqs names corresponding to the given pattern|
 | `ws_content_idt(pattern)`|Return the list of idt names corresponding to the given pattern|
@@ -43,7 +43,7 @@
 | `ws_content_tbl(pattern)`|Return the list of tbl names corresponding to the given pattern|
 | `ws_content_var(pattern)`|Return the list of var names corresponding to the given pattern|
 |**Clear workspaces**||
-| `ws_clear_(filetype)`|Clear a workspace of a given type|
+| `ws_clear(filetype)`|Clear a workspace of a given type|
 | `ws_clear_cmt()`|Clear the cmt workspace|
 | `ws_clear_eqs()`|Clear the eqs workspace|
 | `ws_clear_idt()`|Clear the idt workspace|
@@ -53,7 +53,7 @@
 | `ws_clear_var()`|Clear the var workspace|
 | `ws_clear_all()`|Clear all workspaces|
 |**Load workspaces**||
-| `ws_load_(filename, filetype)`|Load a workspace of a given type|
+| `ws_load(filename, filetype)`|Load a workspace of a given type|
 | `ws_load_cmt(filename)`|Load a cmt workspace|
 | `ws_load_eqs(filename)`|Load a eqs workspace|
 | `ws_load_idt(filename)`|Load a idt workspace|
@@ -62,7 +62,7 @@
 | `ws_load_tbl(filename)`|Load a tbl workspace|
 | `ws_load_var(filename)`|Load a var workspace|
 |**Save workspaces**||
-| `ws_save_(filename, filetype)`|Save a workspace of a given type|
+| `ws_save(filename, filetype)`|Save a workspace of a given type|
 | `ws_save_cmt(filename)`|Save a cmt workspace|
 | `ws_save_eqs(filename)`|Save a eqs workspace|
 | `ws_save_idt(filename)`|Save a idt workspace|
@@ -70,6 +70,13 @@
 | `ws_save_scl(filename)`|Save a scl workspace|
 | `ws_save_tbl(filename)`|Save a tbl workspace|
 | `ws_save_var(filename)`|Save a var workspace|
+|**Change of periodicites**||
+|`ws_ltoh_stock(filename, varlist)->int`||
+|`ws_ltoh_flow(filename, varlist)->int`||
+| ||
+|`ws_htol_sum(filename, varlist, method)->int`||
+|`ws_htol_mean(filename, varlist, method)->int`||
+|`ws_htol_last(filename, varlist, method)->int`||
 
 ### Object management {#T5}
 
@@ -114,10 +121,10 @@
 
 |Syntax|Description|
 |:---|:---|
-|`larray_to_ws(la_input, timeaxis:str='time', sep:str="_")`|Copies LArray la\_input into IODE KV\_WS.|
-|`ws_to_larray(vars_pattern = '*', varsaxis = 'vars', timeaxis = 'time', axis_names='', regex=None, sep=None, time_as_floats=False)`|Creates an LArray from the current KV\_WS content|
-|`ws_load_var_to_larray(filename:str, vars_pattern='*', varsaxis='vars', timeaxis='time', axis_names=None, regex=None, sep=None)`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
-|`larray_get_sample(la_input, timeaxis = 'time')`|Return the first and last time axis labels as a list of 2 strings|
+|`larray_to_ws(la_input, time_axis_name:str='time', sep:str="_")`|Copies LArray la\_input into IODE KV\_WS.|
+|`ws_to_larray(vars_pattern:str='*', vars_axis_name:str='vars', time_axis_name:str='time', split_axis_names='', regex = None, split_sep = None, time_as_floats: bool=False)-> la.Array`|Creates an LArray from the current KV\_WS content|
+|`ws_load_var_to_larray(filename:str, vars_pattern='*', vars_axis_name='vars', time_axis_name='time', split_axis_names=None, regex=None, split_sep=None)->la.Array`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
+|`larray_get_sample(la_input, time_axis_name = 'time')`|Return the first and last time axis labels as a list of 2 strings|
 
 ### Sample management {#T7}
 
@@ -154,7 +161,7 @@
 |:---|:---|
 |`report_exec(filename_parms)->int`|Execute a report|
 |`reportline_exec(repline)->int`|Execute a report line|
-|`data_update_(obj_name:str, obj_value:str, obj_type:int)->int`|Create of update an IODE object (cmt, eqs, lst, idt)|
+|`data_update(obj_name:str, obj_value:str, obj_type:int)->int`|Create of update an IODE object (cmt, eqs, lst, idt)|
 |`data_update_cmt(obj_name:str, obj_value:str)->int`|Create or update an IODE comment|
 |`data_update_eqs(obj_name:str, obj_value:str)->int`|Create or update an IODE equation|
 |`data_update_idt(obj_name:str, obj_value:str)->int`|Create or update an IODE identity|
@@ -164,7 +171,7 @@
 
 ### Print functions {#T12}
 
-\!\! Not yet ilmplemented \!\!
+\!\! Not yet implemented \!\!
 
 |Syntax|Description|
 |:---|:---|
