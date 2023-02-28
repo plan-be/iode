@@ -1,0 +1,289 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cheatsheet
+% LaTeX Template
+% Version 1.0 (12/12/15)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Michael Müller (https://github.com/cmichi/latex-template-collection) with
+% extensive modifications by Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% The MIT License (see included LICENSE file)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[fontsize=9pt]{scrartcl} % 9pt font size
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage[margin=0pt, landscape]{geometry} % Page margins and orientation
+
+\usepackage{graphicx} % Required for including images
+
+\usepackage{color} % Required for color customization
+\usepackage[table]{xcolor}
+\definecolor{lightblue}{rgb}{0.145, 0.6666, 1}
+
+\usepackage{url} % Required for the \url command to easily display URLs
+
+\usepackage[ % This block contains information used to annotate the PDF
+colorlinks=false, 
+pdftitle={IODE Keyboard Shortcuts}, 
+pdfauthor={Alix Damman}, 
+pdfsubject={IODE Keyboard Shortcuts}, 
+pdfkeywords={IODE, keyboard, shortcuts}
+]{hyperref}
+
+\setlength{\unitlength}{1mm} % Set the length that numerical units are measured in
+\setlength{\parindent}{0pt} % Stop paragraph indentation
+
+\newcommand{\sectiontitle}[1]{\paragraph{#1} \ \\ \rule{\linewidth}{0.2mm} \\} % Custom command for section titles
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\rowcolors{1}{white}{lightblue!25} % alternating colors in tables
+
+\begin{picture}(297,210) % Create a container for the page content
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+%----------------------------------------------------------------------------------------
+
+\put(10,200){ % Position on the page to put the title
+\begin{minipage}[t]{210mm} % The size and alignment of the title
+\section*{\huge IODE\newline Keyboard Shortcuts} % Title
+\end{minipage}
+}
+
+%----------------------------------------------------------------------------------------
+%	FIRST COLUMN SPECIFICATION
+%----------------------------------------------------------------------------------------
+
+\put(10,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+%----------------------------------------------------------------------------------------
+%	HEADING ONE
+%----------------------------------------------------------------------------------------
+
+\sectiontitle{Menus}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Alt + F             & File Menu \\
+ Alt + W             & Workspace Menu \\
+ Alt + R             & Run Menu \\
+ Alt + P             & Print/Graph Menu \\
+ Alt + H             & Help Menu \\
+ Ctrl + Alt + N      & New Project \\
+ Ctrl + O            & Open Project \\
+ Ctrl + S            & Save current tab \\
+ Ctrl + Shift + S    & Save All Tabs \\
+ Ctrl + Shift + D    & Clear All WorkSpaces \\
+ Shift + F8          & Graphs from Variables \\
+ Alt + X             & Exit
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING TWO
+%----------------------------------------------------------------------------------------	
+
+\sectiontitle{File Management}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Ctrl + N         & New file \\
+ Ctrl + Shift + N & New folder \\
+ Ctrl + X         & Cut \\
+ Ctrl + C         & Copy \\
+ Ctrl + V         & Paste \\
+ Alt + Shift + C  & Copy absolute path \\
+ Alt + Shift + R  & Reveal in file explorer \\
+ F2               & Rename file or directory \\
+ Delete           & Delete file or directory
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING THREE
+%----------------------------------------------------------------------------------------
+
+\sectiontitle{Tabs}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Alt + C            & Comments tab \\
+ Alt + E            & Equations tab \\
+ Alt + I            & Identities tab \\
+ Alt + L            & Lists tab \\
+ Alt + S            & Scalars tab \\
+ Alt + T            & Tables tab \\
+ Alt + V            & Variables tab \\
+ Ctrl + S           & Save current tab \\
+ Ctrl + Shift + S   & Save all tabs \\
+ Ctrl + D           & Clear workspace tab \\
+ Ctrl + Shift + D   & Clear all workspaces \\ 
+ Ctrl + Tab         & Shift to the next tab \\
+ Ctrl + Shift + Tab & Shift to the previous tab
+\end{tabular}
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the first column of text
+} % End the first division of the page
+
+%----------------------------------------------------------------------------------------
+%	SECOND COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(105,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+%----------------------------------------------------------------------------------------
+%	HEADING FOUR
+%----------------------------------------------------------------------------------------
+
+\sectiontitle{IODE Objects In Tabs}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Double click & Edit object name or object (LEC for equations and title for tables) \\
+ Insert       & Create a new object \\
+ Delete       & Delete object(s) \\
+ (Shift +) F2 & Enlarge/reduce the column with the object names \\
+ Alt + F1     & comments of the current object \\
+ Alt + F2     & equations related to the current object \\
+ Alt + F3     & identities related to the current object \\
+ Alt + F4     & lists related to the current object \\
+ Alt + F5     & scalars related to the current object \\
+ Alt + F6     & tables related to the current object \\
+ Alt + F7     & variables related to the current object 
+\end{tabular}
+\newline\newline
+
+\textbf{Equations}\\
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Alt + Enter  & Edit
+\end{tabular}
+\newline\newline
+
+\textbf{Identities}\\
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ F7 & Execute
+\end{tabular}
+\newline\newline
+
+\textbf{Scalars}\\
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+(Shift +) F4 & Increase/Decrease the number of displayed decimal
+\end{tabular}
+\newline\newline
+
+\textbf{Tables}\\
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Alt + Enter  & Edit \\
+ F7           & Compute and display \\
+ F8           & Compute and display as a graph \\
+\end{tabular}				
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the second column of text
+} % End the second division of the page
+
+%----------------------------------------------------------------------------------------
+%	THIRD COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(200,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+\textbf{Vars}\\
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ (Shift +) F4 & Increase/Decrease the number of displayed decimal \\
+ (Shift +) F3 & Enlarge/reduce the columns with values \\
+ F5           & Change the way the values are displayed (level, diff, grt, yoy diff,...) \\
+ F6           & Change the precision \\
+ F8           & Displays the selected series as a graph
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING FIVE
+%----------------------------------------------------------------------------------------
+
+\sectiontitle{Text And Report Editor}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Ctrl + Z & Undoes the last operation \\
+ Ctrl + Y & Redoes the last operation \\
+ Tab | Enter | Space & Stop auto-complete \\
+ Ctrl + Space & Force auto-complete
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING SIX
+%----------------------------------------------------------------------------------------
+
+\sectiontitle{Report Command}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+Enter                       & Execute command \\
+ $\uparrow$ / $\downarrow$  & Previous/Next command
+\end{tabular}
+
+%----------------------------------------------------------------------------------------
+%	HEADING SEVEN
+%----------------------------------------------------------------------------------------				
+					
+\sectiontitle{Graph Window}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Ctrl + S & Save As \\
+ Ctrl + C & Copy To Clipboard \\
+ Ctrl + P & Print \\
+ Ctrl + Q & Close \\
+ + & Zoom In \\
+ - & Zoom Out \\
+ Esc & Reset zoom
+\end{tabular}
+
+%----------------------------------------------------------------------------------------
+
+\vspace{\baselineskip} % Whitespace before the next section
+
+%----------------------------------------------------------------------------------------
+%	FOOTNOTE
+%----------------------------------------------------------------------------------------
+
+\vspace{\baselineskip}
+\linethickness{0.5mm} % Thickness of the footer line
+{\color{gray}\line(1,0){30}} % Print the line with a custom color
+
+\footnotesize{
+Created by Alix Damman, 2023\\ 
+\url{https://iode.plan.be/doku.php}\\
+}
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the third column of text
+} % End the third division of the page
+\end{picture} % End the container for the entire page
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
