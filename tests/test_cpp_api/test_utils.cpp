@@ -77,7 +77,7 @@ TEST_F(UtilsTest, getIodeFileType)
 	EXPECT_EQ(get_iode_file_type(filename), I_SETTINGS_FILE);
 
 	filename = input_test_dir + "fun.txt";
-	EXPECT_EQ(get_iode_file_type(filename), I_ANY_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
 }
 
 
