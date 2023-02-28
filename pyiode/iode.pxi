@@ -178,7 +178,7 @@ cdef extern from "iode.h":
 # ------------------------------
 # Note : to be improved / replaced bu C++ classes when Cython 3 becomes stable
 
-class scl:
+class Scalar:
     def __init__(self, name:str, val:float=0.9, relax:float=1.0, std:float=float("nan")):
         self.name = name
         #iodescl = iodescl_to_ndarray(cstr(name))
@@ -194,7 +194,7 @@ class scl:
         return f'iode.scl("{self.name}", {self.value}, {self.relax}, {self.std})'
 
 
-class eqs:
+class Equation:
     def __init__(self, 
                  name:str,       
                  lec:str,        
@@ -233,40 +233,73 @@ class eqs:
 
     def __str__(self):
         methods = ["LSQ", "ZELLNER", "INF", "GLS", "MAXLIK"];
-        res =  f'{self.name} {{\n'
-        res += f'   "{self.lec}"\n'
+        res =  f'''{self.name} {{
+    "{self.lec}"'''
         
+#       if self.sample_from != "":
+#             res += f'   {methods[self.method]}\n'
+#             res += f'   SAMPLE {self.sample_from}{self.sample_to}\n'
+#             res += f'   BLOCK "{self.blk}"\n'
+#             res += f'   INSTRUMENTS "{self.instr}"\n'
+#             res += f'   STDEV  {self.e_stdev }\n'
+#             res += f'   MEANY  {self.e_meany }\n'
+#             res += f'   SSRES  {self.e_ssres }\n'
+#             res += f'   STDERR {self.e_stderr}\n'
+#             res += f'   FSTAT  {self.e_fstat }\n'
+#             res += f'   R2     {self.e_r2    }\n'
+#             res += f'   R2ADJ  {self.e_r2adj }\n'
+#             res += f'   DW     {self.e_dw    }\n'
+#             res += f'   LOGLIK {self.e_loglik}\n'
+#  
+#       res += f'}}\n'
+#       return res
+
         if self.sample_from != "":
-            res += f'   {methods[self.method]}\n'
-            res += f'   SAMPLE {self.sample_from}{self.sample_to}\n'
-            res += f'   BLOCK "{self.blk}"\n'
-            res += f'   INSTRUMENTS "{self.instr}"\n'
-            res += f'   STDEV  {self.e_stdev }\n'
-            res += f'   MEANY  {self.e_meany }\n'
-            res += f'   SSRES  {self.e_ssres }\n'
-            res += f'   STDERR {self.e_stderr}\n'
-            res += f'   FSTAT  {self.e_fstat }\n'
-            res += f'   R2     {self.e_r2    }\n'
-            res += f'   R2ADJ  {self.e_r2adj }\n'
-            res += f'   DW     {self.e_dw    }\n'
-            res += f'   LOGLIK {self.e_loglik}\n'
- 
-        res += f'}}\n'
+        
+            res += f'''
+    {methods[self.method]}
+    SAMPLE {self.sample_from}{self.sample_to}
+    BLOCK "{self.blk}"
+    INSTRUMENTS "{self.instr}"
+    STDEV  {self.e_stdev }
+    MEANY  {self.e_meany }
+    SSRES  {self.e_ssres }
+    STDERR {self.e_stderr}
+    FSTAT  {self.e_fstat }
+    R2     {self.e_r2    }
+    R2ADJ  {self.e_r2adj }
+    DW     {self.e_dw    }
+    LOGLIK {self.e_loglik}'''
+    
+        res += f'}}'
         return res
     
 
     def __repr__(self):
-        res =  f'iode.eqs("{self.name}", "{self.lec}", {self.method}, '
-        res += f'"{self.sample_from}", "{self.sample_to}", "{self.blk}", "{self.instr}", '
-        res += f'{self.e_stdev }, '
-        res += f'{self.e_meany }, '
-        res += f'{self.e_ssres }, '
-        res += f'{self.e_stderr}, '
-        res += f'{self.e_fstat }, '
-        res += f'{self.e_r2    }, '
-        res += f'{self.e_r2adj }, '
-        res += f'{self.e_dw    }, '
-        res += f'{self.e_loglik})'
+#        res =  f'iode.eqs("{self.name}", "{self.lec}", {self.method}, '
+#        res += f'"{self.sample_from}", "{self.sample_to}", "{self.blk}", "{self.instr}", '
+#        res += f'{self.e_stdev }, '
+#        res += f'{self.e_meany }, '
+#        res += f'{self.e_ssres }, '
+#        res += f'{self.e_stderr}, '
+#        res += f'{self.e_fstat }, '
+#        res += f'{self.e_r2    }, '
+#        res += f'{self.e_r2adj }, '
+#        res += f'{self.e_dw    }, '
+#        res += f'{self.e_loglik})'
+#        return res
+        res =  f'''iode.eqs("{self.name}", "{self.lec}", {self.method}, 
+    "{self.sample_from}", "{self.sample_to}", "{self.blk}", "{self.instr}", '
+    {self.e_stdev }, 
+    {self.e_meany }, 
+    {self.e_ssres }, 
+    {self.e_stderr}, 
+    {self.e_fstat }, 
+    {self.e_r2    }, 
+    {self.e_r2adj }, 
+    {self.e_dw    }, 
+    {self.e_loglik})'''
+    
         return res
 
 

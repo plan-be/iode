@@ -17,6 +17,6 @@ def eqs_estimate(eq_list, afrom:str, ato:str)->int:
         eq_list = ','.join(eq_list)
 
     rc = IodeEstimate(cstr(eq_list), cstr(afrom), cstr(ato))
-    return(rc)
+    return rc
 
 

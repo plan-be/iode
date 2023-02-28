@@ -5,7 +5,7 @@
 #  
 #  IODE DATA functions (equivalent to $Data* report functions)
 #  -----------------------------------------------------------
-#  data_update_(obj_name:str, obj_value:str, obj_type:int)                                 Create of update an IODE object (cmt, eqs, lst, idt) 
+#  data_update(obj_name:str, obj_value:str, obj_type:int)                                 Create of update an IODE object (cmt, eqs, lst, idt) 
 #  data_update_cmt(obj_name:str, obj_value:str)                                            Create or update an IODE comment
 #  data_update_eqs(obj_name:str, obj_value:str)                                            Create or update an IODE equation 
 #  data_update_idt(obj_name:str, obj_value:str)                                            Create or update an IODE identity
@@ -36,7 +36,7 @@
 #  data_pattern_*
 
 
-def data_update_(obj_name:str, obj_value:str, obj_type:int)->int: 
+def data_update(obj_name:str, obj_value:str, obj_type:int)->int: 
     r'''Update an IODE object (cmt, eqs, lst, idt) 
     
     Parameters
@@ -67,16 +67,16 @@ def data_update_(obj_name:str, obj_value:str, obj_type:int)->int:
 
 def data_update_cmt(obj_name:str, obj_value:str)->int:
     '''Create or update a comment'''
-    return data_update_(obj_name, obj_value, K_CMT)
+    return data_update(obj_name, obj_value, K_CMT)
     
 def data_update_eqs(obj_name:str, obj_value:str)->int:
-    return data_update_(obj_name, obj_value, K_EQS)
+    return data_update(obj_name, obj_value, K_EQS)
     
 def data_update_idt(obj_name:str, obj_value:str)->int:
-    return data_update_(obj_name, obj_value, K_IDT)
+    return data_update(obj_name, obj_value, K_IDT)
     
 def data_update_lst(obj_name:str, obj_value:str)->int:
-    return data_update_(obj_name, obj_value, K_LST)
+    return data_update(obj_name, obj_value, K_LST)
     
 def data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)->int:
     cmd = obj_name + " "

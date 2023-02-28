@@ -12,11 +12,11 @@
 # $ExecReport filename_parms
 def report_exec(filename_parms:str):
     '''Execute a report'''
-    return(B_ReportExec(cstr(filename_parms)))
+    return B_ReportExec(cstr(filename_parms))
 
 # $ExecReportLine repline
 def reportline(repline:str):
     '''Execute a report line'''
-    return(B_ReportLine(cstr(repline)))
+    return B_ReportLine(cstr(repline))
 
 

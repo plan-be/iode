@@ -83,7 +83,7 @@ def ws_sample_to_string()->str:
     else:
         lst = ws_sample_get()
         smpl = f"{lst[0]} {lst[1]}"
-        return(smpl)
+        return smpl
  
 
 #  TODO: if as_floats is True and per_from and per_to are not empty, 
@@ -102,7 +102,7 @@ def ws_sample_to_list(per_from="", per_to="", as_floats:bool=False)->List[str]:
 
     if as_floats: 
         vararray = iodesample_to_ndarray()
-        return(vararray)
+        return vararray
     
     else:
         if per_from == '' or per_to == '':
@@ -115,7 +115,7 @@ def ws_sample_to_list(per_from="", per_to="", as_floats:bool=False)->List[str]:
     
         lst = pylist(smpl)
         SCR_free_tbl(smpl)
-        return(lst)
+        return lst 
         
 
 #  TODO: if as_floats is True and per_from and per_to are not empty, 
@@ -131,4 +131,4 @@ def ws_sample_to_larray_axis(axis_name='time', per_from='', per_to='', as_floats
     
     lst = ws_sample_to_list(per_from, per_to, as_floats)
     ax = la.Axis(lst, axis_name)
-    return(ax)
+    return ax 
