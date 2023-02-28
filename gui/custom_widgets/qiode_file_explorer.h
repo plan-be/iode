@@ -51,8 +51,8 @@
  *           -> CTRL + P pastes file(s)/directory(ies).
  *           -> SHIFT + ALT + C copies the absolute filepath.
  *           -> SHIFT + ALT + R reveals file in OS file explorer.
- *           -> CTRL + F2 puts file/directory in edit mode (rename).
- *           -> CTRL + Del deletes the selected  file(s)/directory(ies).
+ *           -> F2 puts file/directory in edit mode (rename).
+ *           -> Del deletes the selected  file(s)/directory(ies).
  *        - It is possible to move files and/or directories inside the project tree via drag and drop. 
  * 
  */
