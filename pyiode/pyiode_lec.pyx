@@ -23,11 +23,11 @@ def exec_lec(lec:str, t:int=-1)-> Union[float, List[float]]:
             if >= 0:position in the KV_WS sample of the value to be calculated
             if < 0, the full sample is returned
     
-        Returns
-        -------
-        out: float or list of floats
-            if t >= 0: return simple float
-            if t < 0: return a list of floats
+    Returns
+    -------
+        float or list of floats
+        if t >= 0: return simple float
+        if t < 0: return a list of floats
     '''
     
     cdef    double* cvar

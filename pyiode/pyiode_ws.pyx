@@ -5,7 +5,7 @@
 #
 #  IODE workspaces functions
 #  -------------------------
-#   ws_content_(pattern, objtype)->List[str]
+#   ws_content(pattern, objtype)->List[str]
 #   ws_content_cmt(pattern)->List[str]
 #   ws_content_eqs(pattern)->List[str]
 #   ws_content_idt(pattern)->List[str]
@@ -14,7 +14,7 @@
 #   ws_content_tbl(pattern)->List[str]
 #   ws_content_var(pattern)->List[str]
 #
-#   ws_clear_(filetype)->int
+#   ws_clear(filetype)->int
 #   ws_clear_cmt()->int
 #   ws_clear_eqs()->int
 #   ws_clear_idt()->int
@@ -24,7 +24,7 @@
 #   ws_clear_var()->int
 #   ws_clear_all()->int
 #
-#   ws_load_(filename, filetype)->int
+#   ws_load(filename, filetype)->int
 #   ws_load_cmt(filename)->int
 #   ws_load_eqs(filename)->int
 #   ws_load_idt(filename)->int
@@ -33,7 +33,7 @@
 #   ws_load_tbl(filename)->int
 #   ws_load_var(filename)->int
 #
-#   ws_save_(filename, filetype)->int
+#   ws_save(filename, filetype)->int
 #   ws_save_cmt(filename)->int
 #   ws_save_eqs(filename)->int
 #   ws_save_idt(filename)->int
@@ -42,17 +42,17 @@
 #   ws_save_tbl(filename)->int
 #   ws_save_var(filename)->int
 #
-#   ws_ltoh_stock(filename, varlist)->int
-#   ws_ltoh_flow(filename, varlist)->int
-#  
-#   ws_htol_sum(filename, varlist, method)->int
-#   ws_htol_mean(filename, varlist, method)->int
-#   ws_htol_last(filename, varlist, method)->int
+#   ws_ltoh_stock(filename, varlist)->int              
+#   ws_ltoh_flow(filename, varlist)->int               
+#                                                      
+#   ws_htol_sum(filename, varlist, method)->int        
+#   ws_htol_mean(filename, varlist, method)->int       
+#   ws_htol_last(filename, varlist, method)->int       
 #  
 #  
 #  TODO
 #  ----
-#   ws_copy_(filename, filetype, list)
+#   ws_copy(filename, filetype, list)
 #   ws_copy_cmt(filename, list)
 #   ws_copy_eqs(filename, list)
 #   ws_copy_idt(filename, list)
@@ -61,7 +61,7 @@
 #   ws_copy_tbl(filename, list)
 #   ws_copy_var(filename, list, sample)
 
-#   ws_merge_(filename, filetype, list)
+#   ws_merge(filename, filetype, list)
 #   ws_merge_cmt(filename, list)
 #   ws_merge_eqs(filename, list)
 #   ws_merge_idt(filename, list)
@@ -85,7 +85,7 @@
 
 # TODO: rewrite IodeContents with regex or a better algorithm because K_grep() is VERY slow for large databases
 
-def ws_content_(pattern:str = '*', objtype:int = 6)->List[str]:
+def ws_content(pattern:str = '*', objtype:int = 6)->List[str]:
     r"""Return the names of objects of a given type, satisfying a pattern specification.
 
     Parameters
@@ -134,27 +134,27 @@ def ws_content_(pattern:str = '*', objtype:int = 6)->List[str]:
 
 def ws_content_cmt(pattern:str = '*')->List[str]:
     '''Returns the list of comment names corresponding to the given pattern'''
-    return ws_content_(pattern, K_CMT)
+    return ws_content(pattern, K_CMT)
 
 def ws_content_eqs(pattern:str = '*')->List[str]:
     '''Returns the list of equation names corresponding to the given pattern'''
-    return ws_content_(pattern, K_EQS)
+    return ws_content(pattern, K_EQS)
 
 def ws_content_idt(pattern:str = '*')->List[str]:
     '''Returns the list of identity names corresponding to the given pattern'''
-    return ws_content_(pattern, K_IDT)
+    return ws_content(pattern, K_IDT)
 
 def ws_content_lst(pattern:str = '*')->List[str]:
-    return ws_content_(pattern, K_LST)
+    return ws_content(pattern, K_LST)
 
 def ws_content_scl(pattern:str = '*')->List[str]:
-    return ws_content_(pattern, K_SCL)
+    return ws_content(pattern, K_SCL)
 
 def ws_content_tbl(pattern:str = '*')->List[str]:
-    return ws_content_(pattern, K_TBL)
+    return ws_content(pattern, K_TBL)
 
 def ws_content_var(pattern:str = '*')->List[str]:
-    return ws_content_(pattern, K_VAR)
+    return ws_content(pattern, K_VAR)
 
 
 # Clear WS
@@ -163,91 +163,92 @@ def ws_clear_all()->int:
     "Clear all WS"
     return IodeClearAll()
 
-def ws_clear_(filetype)->int:
+def ws_clear(filetype)->int:
     "Clear WS of the given filetype (0..6)"
     return IodeClearWs(filetype)
 
 def ws_clear_cmt()->int:
-    return ws_clear_(K_CMT)
+    return ws_clear(K_CMT)
 
 def ws_clear_eqs()->int:
-    return ws_clear_(K_EQS)
+    return ws_clear(K_EQS)
 
 def ws_clear_idt()->int:
-    return ws_clear_(K_IDT)
+    return ws_clear(K_IDT)
 
 def ws_clear_lst()->int:
-    return ws_clear_(K_LST)
+    return ws_clear(K_LST)
 
 def ws_clear_scl()->int:
-    return ws_clear_(K_SCL)
+    return ws_clear(K_SCL)
 
 def ws_clear_tbl()->int:
-    return ws_clear_(K_TBL)
+    return ws_clear(K_TBL)
 
 def ws_clear_var()->int:
-    return ws_clear_(K_VAR)
+    return ws_clear(K_VAR)
 
 
 # Load WS
 # -------
-def ws_load_(filename, filetype)->int:
+def ws_load(filename, filetype)->int:
     "Load iode file"
     return IodeLoad(cstr(filename), filetype)
 
 def ws_load_cmt(filename)->int:
-    return ws_load_(filename, K_CMT)
+    return ws_load(filename, K_CMT)
 
 def ws_load_eqs(filename)->int:
-    return ws_load_(filename, K_EQS)
+    return ws_load(filename, K_EQS)
 
 def ws_load_idt(filename)->int:
-    return ws_load_(filename, K_IDT)
+    return ws_load(filename, K_IDT)
 
 def ws_load_lst(filename)->int:
-    return ws_load_(filename, K_LST)
+    return ws_load(filename, K_LST)
 
 def ws_load_scl(filename)->int:
-    return ws_load_(filename, K_SCL)
+    return ws_load(filename, K_SCL)
 
 def ws_load_tbl(filename)->int:
-    return ws_load_(filename, K_TBL)
+    return ws_load(filename, K_TBL)
 
 def ws_load_var(filename)->int:
-    return ws_load_(filename, K_VAR)
+    return ws_load(filename, K_VAR)
 
 
 # Save WS
 # -------
-def ws_save_(filename, filetype)->int:
+def ws_save(filename, filetype)->int:
     return IodeSave(cstr(filename), filetype)
 
 def ws_save_cmt(filename)->int:
-    return ws_save_(filename, K_CMT)
+    return ws_save(filename, K_CMT)
 
 def ws_save_eqs(filename)->int:
-    return ws_save_(filename, K_EQS)
+    return ws_save(filename, K_EQS)
 
 def ws_save_idt(filename)->int:
-    return ws_save_(filename, K_IDT)
+    return ws_save(filename, K_IDT)
 
 def ws_save_lst(filename)->int:
-    return ws_save_(filename, K_LST)
+    return ws_save(filename, K_LST)
 
 def ws_save_scl(filename)->int:
-    return ws_save_(filename, K_SCL)
+    return ws_save(filename, K_SCL)
 
 def ws_save_tbl(filename)->int:
-    return ws_save_(filename, K_TBL)
+    return ws_save(filename, K_TBL)
 
 def ws_save_var(filename)->int:
-    return ws_save_(filename, K_VAR)
+    return ws_save(filename, K_VAR)
 
 
 # High to Low
 # -----------
-def ws_htol_(filename:str, varlist, series_type)->int:
-    if type(varlist) == list:
+def ws_htol(filename:str, varlist, series_type)->int:
+    #if type(varlist) == list:
+    if isinstance(varlist, list):
         varlist = ' '.join(varlist)
 
     arg = f"{filename} {varlist}"
@@ -259,19 +260,20 @@ def ws_htol_(filename:str, varlist, series_type)->int:
         return B_WsHtoLSum(cstr(arg))
 
 def ws_htol_last(filename, varlist)->int:
-    return ws_htol_(filename, varlist, HTOL_LAST)
+    return ws_htol(filename, varlist, HTOL_LAST)
 
 def ws_htol_mean(filename, varlist)->int:
-    return ws_htol_(filename, varlist, HTOL_MEAN)
+    return ws_htol(filename, varlist, HTOL_MEAN)
 
 def ws_htol_sum(filename, varlist)->int:
-    return ws_htol_(filename, varlist, HTOL_SUM)
+    return ws_htol(filename, varlist, HTOL_SUM)
 
 
 # Low to High
 # -----------
-def ws_ltoh_(filename:str, varlist, series_type, method)->int:
-    if type(varlist) == list:
+def ws_ltoh(filename:str, varlist, series_type, method)->int:
+    #if type(varlist) == list:
+    if isinstance(varlist, list):
         varlist = ' '.join(varlist)
 
     arg = f"{method} {filename} {varlist}"
@@ -281,7 +283,7 @@ def ws_ltoh_(filename:str, varlist, series_type, method)->int:
         return B_WsLtoHStock(cstr(arg))
 
 def ws_ltoh_flow(filename, varlist, method=LTOH_CS)->int:
-    return ws_ltoh_(filename, varlist, LTOH_FLOW, method)
+    return ws_ltoh(filename, varlist, LTOH_FLOW, method)
 
 def ws_ltoh_stock(filename, varlist, method=LTOH_CS)->int:
-    return ws_ltoh_(filename, varlist, LTOH_STOCK, method)
+    return ws_ltoh(filename, varlist, LTOH_STOCK, method)

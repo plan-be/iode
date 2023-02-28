@@ -14,7 +14,7 @@
 #  
 #  The associated C functions are provided in the source file b_api.c which is part of iodeapi.lib.
 #   
-#   delete_objects(pattern:str='*', obj_type:int=K_VAR)     delete the objects whose names satisfy the given pattern
+#   delete_objects(pattern:str='*', obj_type:int=K_VAR)  |   delete the objects whose names satisfy the given pattern
 #
 #   delete_obj(name:str, obj_type:int)->int   | delete the object named name of type obj_type
 #   delete_cmt(name:str)->int                 | delete the comment named name
@@ -111,14 +111,13 @@ def delete_var(name:str)->int:
 def cmt_to_py(name:str)->str:
     '''Return the text of an IODE comment'''
     
-    cmt = IodeGetCmt(cstr(name))
-    return cmt.decode("cp850")
+    cmt850 = IodeGetCmt(cstr(name))
+    return pystr(cmt850)
 
 def py_to_cmt(name:str, cmt:str)->int:
     '''Update or create an IODE comment from a python str'''
     
-    cmt850 = cmt.encode("cp850")
-    return IodeSetCmt(cstr(name), cmt850)
+    return IodeSetCmt(cstr(name), cstr(cmt))
 
 # Equations
 # ---------
@@ -126,10 +125,10 @@ def py_to_cmt(name:str, cmt:str)->int:
 def eqs_lec_to_py(eq_name:str)->str:
     '''Return an IODE equation LEC form as a string'''
     
-    lec = IodeGetEqsLec(cstr(eq_name))
-    return pystr(lec)
+    lec850 = IodeGetEqsLec(cstr(eq_name))
+    return pystr(lec850)
 
-def eqs_to_py(eq_name:str)->eqs:
+def eqs_to_py(eq_name:str)->Equation:
     '''Return an IODE equation as an iode.eqs class instance'''
     
     cdef char   *lec, 
@@ -144,7 +143,7 @@ def eqs_to_py(eq_name:str)->eqs:
     if rc != 0:
         return None
         
-    eq_res = eqs(eq_name, pystr(lec), method, pystr(sample_from), pystr(sample_to),  
+    eq_res = Equation(eq_name, pystr(lec), method, pystr(sample_from), pystr(sample_to),  
                  pystr(blk), pystr(instr),
                  tests[1],
                  tests[2],
@@ -161,33 +160,30 @@ def eqs_to_py(eq_name:str)->eqs:
 
 # TODO: save other (optional) equation properties like tests, sample, method
 def py_to_eqs(eq_name:str, lec:str)->int:
-    lec850 = lec.encode("cp850")
-    return IodeSetEqs(cstr(eq_name), lec850)
+    return IodeSetEqs(cstr(eq_name), cstr(lec))
 
 # Identities
 # ----------
 def idt_to_py(name:str)->str:
-    str = IodeGetIdt(cstr(name))
-    return str.decode("cp850")
+    idt850 = IodeGetIdt(cstr(name))
+    return pystr(idt850)
 
 def py_to_idt(name:str, idt:str)->int:
-    idt850 = idt.encode("cp850")
-    return IodeSetIdt(cstr(name), idt850)
+    return IodeSetIdt(cstr(name), cstr(idt))
     
 # Lists
 # -----
 def lst_to_py(name:str)->str:
-    str = IodeGetLst(cstr(name))
-    return str.decode("cp850")
+    lst850 = IodeGetLst(cstr(name))
+    return pystr(lst850)
 
-def py_to_lst(name, lst)->int:
-    lst850 = lst.encode("cp850")
-    return IodeSetLst(cstr(name), lst850)
+def py_to_lst(name:str, lst:str)->int:
+    return IodeSetLst(cstr(name), cstr(lst))
 
 
 # Scalars
 # -------
-def scl_to_py(name:str)->scl:
+def scl_to_py(name:str)->Scalar:
     #vararray = iodescl_to_ndarray(cstr(name))
     #return vararray
     cdef    double cval
@@ -196,13 +192,13 @@ def scl_to_py(name:str)->scl:
     
     cdef rc = IodeGetScl(cstr(name), &cval, &crelax, &cstd)
     if rc == 0:
-        res = scl(name, cval, crelax, cstd)
+        res = Scalar(name, cval, crelax, cstd)
         return res
     else:
         return None
 
 
-def py_to_scl(py_scl:scl)->int:
+def py_to_scl(py_scl:Scalar)->int:
     
     return IodeSetScl(cstr(py_scl.name), py_scl.value, py_scl.relax, py_scl.std)
 
@@ -223,17 +219,17 @@ def py_to_scl(py_scl:scl)->int:
 # ---------
 
 # Copy an IODE var into a list
-def var_to_py(varname)->List[np.ndarray]:
+def var_to_py(varname:str)->List[np.ndarray]:
     ndarray = var_to_ndarray(varname, True)
     return list(ndarray)
 
 # Copy (or refer to) an IODE var into a ndarray
-def var_to_ndarray(varname, copy = True)->List[np.ndarray]:
+def var_to_ndarray(varname:str, copy:bool=True)->List[np.ndarray]:
     vararray = iodevar_to_ndarray(cstr(varname), copy)
-    return(vararray)
+    return vararray 
 
 # Copy a ndarray or a list into KV_WS
-def py_to_var(varname, py_values)->int:
+def py_to_var(varname:str, py_values)->int:
     cdef double  *c_values
     
     if not IodeIsSampleSet():
