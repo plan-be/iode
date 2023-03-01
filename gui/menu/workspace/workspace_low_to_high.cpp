@@ -64,6 +64,6 @@ void QIodeMenuWorkspaceLowToHigh::slot_low_to_high()
 
 void QIodeMenuWorkspaceLowToHigh::help()
 {
-	QUrl url = get_url_iode_manual();
-	QDesktopServices::openUrl(url);
+	
+	QDesktopServices::openUrl(url_manual);
 }

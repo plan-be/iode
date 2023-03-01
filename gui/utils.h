@@ -26,6 +26,13 @@
 
 
 /* ****************************** *
+ *           CONSTANTS            *
+ * ****************************** */
+
+const static QUrl url_manual = QUrl::fromLocalFile("./doc/iode.chm");
+
+
+/* ****************************** *
  *        ENUMS AND MAPS          *
  * ****************************** */
 
@@ -50,22 +57,6 @@ QWidget* get_main_window_ptr();
 
 // defined in main_window.cpp
 QString get_current_project_path();
-
-// equivalent to function HLP_filename() in dos/o_help.c
-inline const QUrl get_url_iode_helpfile(const QString& filename)
-{
-    // try to find the help file in the application directory
-    QString filepath = QDir(QCoreApplication::applicationDirPath()).filePath(filename);
-    // if doesn't exist, build a path suing the default iode installation directory 
-    if (!QFileInfo(filepath).exists()) filepath = QDir(DEFAULT_INSTALLATION_DIR).filePath(filename);
-    filepath = "file:///" + filepath;
-    return QUrl(filepath);
-}
-
-inline const QUrl get_url_iode_manual()
-{
-    return get_url_iode_helpfile("iode.chm");
-}
 
 
 /* ****************************** *

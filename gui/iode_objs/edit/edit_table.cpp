@@ -23,6 +23,6 @@ void QIodeEditTable::edit()
 
 void QIodeEditTable::help()
 {
-	QUrl url = get_url_iode_manual();
-	QDesktopServices::openUrl(url);
+	
+	QDesktopServices::openUrl(url_manual);
 }
