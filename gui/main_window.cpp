@@ -428,8 +428,7 @@ void MainWindow::about()
 
 void MainWindow::open_release_notes()
 {
-    QUrl url = get_url_iode_helpfile("readme.htm");
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(QUrl::fromLocalFile("./doc/readme.htm"));
 }
 
 void MainWindow::open_iode_home()
@@ -439,8 +438,7 @@ void MainWindow::open_iode_home()
 
 void MainWindow::open_iode_manual()
 {
-    QUrl url = get_url_iode_manual();
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(url_manual);
 }
 
 void MainWindow::update_current_tab()

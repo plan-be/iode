@@ -30,7 +30,7 @@ void QIodeAddIdentity::add()
 
 void QIodeAddIdentity::help()
 {
-	QUrl url = get_url_iode_manual();
-	QDesktopServices::openUrl(url);
+	
+	QDesktopServices::openUrl(url_manual);
 }
 

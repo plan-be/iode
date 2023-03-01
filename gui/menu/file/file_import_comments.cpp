@@ -63,6 +63,6 @@ void QIodeMenuFileImportComments::import()
 
 void QIodeMenuFileImportComments::help()
 {
-	QUrl url = get_url_iode_manual();
-	QDesktopServices::openUrl(url);
+	
+	QDesktopServices::openUrl(url_manual);
 }
