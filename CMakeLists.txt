@@ -127,6 +127,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
 
 add_subdirectory ("gui")
 add_subdirectory ("tests")
+add_subdirectory ("doc")
 
 # ---- print info ----
 message(STATUS "======== target scr4iode ========")
