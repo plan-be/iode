@@ -7,7 +7,7 @@ set (PYX_SOURCES
 	pyiode_cdef.pyx pyiode_util.pyx pyiode_lec.pyx pyiode_sample.pyx pyiode_ws.pyx pyiode_data.pyx pyiode_estim.pyx
 	pyiode_model.pyx pyiode_exec.pyx pyiode_print.pyx pyiode_reports.pyx pyiode_objs.pyx pyiode_larray.pyx
 )
-set (C_SOURCES iode.c s_iode.c)
+set (C_SOURCES s_iode.c)
 set (SCRIPTS cythonize_iode.py makepy.bat)
 set (TESTS test_iode.py) 
 set (DOCU PYIODE.md)
