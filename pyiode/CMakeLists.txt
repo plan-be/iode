@@ -12,6 +12,9 @@ set (SCRIPTS cythonize_iode.py makepy.bat)
 set (TESTS test_iode.py) 
 set (DOCU PYIODE.md)
 
-add_executable(pyiode ${PYX_SOURCES} ${C_SOURCES} ${SCRIPTS} ${DOCU} ${TESTS})
-target_include_directories(pyiode PUBLIC "../scr4" "../api")
-target_link_libraries(pyiode iodeapi scr4iode)
+# add_executable(pyiode ${PYX_SOURCES} ${C_SOURCES} ${SCRIPTS} ${DOCU} ${TESTS})
+# target_include_directories(pyiode PUBLIC "../scr4" "../api")
+# target_link_libraries(pyiode iodeapi scr4iode)
+
+
+add_custom_target(pyiode SOURCES ${PYX_SOURCES} ${C_SOURCES} ${SCRIPTS} ${DOCU} ${TESTS})
