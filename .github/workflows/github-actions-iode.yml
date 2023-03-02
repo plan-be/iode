@@ -96,6 +96,8 @@ jobs:
         run: ctest --preset c-api-${{ env.PRESET_CONFIG }}
       - name: Run C++ API Tests
         run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
+      - name: Build Doc
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target keyboard_shortcuts
       - name: Build GUI
         if: contains(github.head_ref, 'gui')
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
