@@ -293,6 +293,9 @@
     <addaction name="actionIode_Manual"/>
     <addaction name="actionIode_Home"/>
     <addaction name="actionIode_Readme"/>
+    <addaction name="separator"/>
+    <addaction name="actionKeyboard_Shortcuts"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout_Iode"/>
    </widget>
    <addaction name="menuFile"/>
@@ -1018,6 +1021,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+N</string>
+   </property>
+  </action>
+  <action name="actionKeyboard_Shortcuts">
+   <property name="text">
+    <string>Keyboard Shortcuts</string>
    </property>
   </action>
  </widget>
@@ -1846,6 +1854,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionKeyboard_Shortcuts</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>display_keyboard_shortcuts()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1891,5 +1915,6 @@
   <slot>saveAllTabs()</slot>
   <slot>createNewProject()</slot>
   <slot>update_current_tab()</slot>
+  <slot>display_keyboard_shortcuts()</slot>
  </slots>
 </ui>

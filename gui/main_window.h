@@ -153,6 +153,7 @@ public slots:
 	void open_release_notes();
 	void open_iode_home();
 	void open_iode_manual();
+	void display_keyboard_shortcuts();
 
 	// Main Window
 	void update_current_tab();
