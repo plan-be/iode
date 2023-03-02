@@ -441,6 +441,11 @@ void MainWindow::open_iode_manual()
     QDesktopServices::openUrl(url_manual);
 }
 
+void MainWindow::display_keyboard_shortcuts()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile("./doc/keyboard_shortcuts.pdf"));
+}
+
 void MainWindow::update_current_tab()
 {
     // update current tab if needed
