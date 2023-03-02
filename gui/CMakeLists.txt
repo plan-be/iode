@@ -159,6 +159,9 @@ set_target_properties(iode_gui PROPERTIES
 
 qt_finalize_executable(iode_gui)
 
+add_custom_command(TARGET iode_gui POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:iode_gui>/doc)
+
 if(WIN32)
     # If Windows: Need to copy Qt DLLs in the same directory as generated executable
     # See https://doc.qt.io/qt-6.2/windows-deployment.html
