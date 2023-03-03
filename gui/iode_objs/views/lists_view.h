@@ -8,12 +8,12 @@
 #include "iode_objs/new/add_list.h"
 
 
-class ListsView : public AbstractTableView<ListsModel>
+class ListsView : public TemplateTableView<ListsModel>
 {
 	Q_OBJECT
 
 public:
-	ListsView(QWidget* parent = nullptr) : AbstractTableView(I_LISTS, new ListsDelegate(parent), parent) {};
+	ListsView(QWidget* parent = nullptr) : TemplateTableView(I_LISTS, new ListsDelegate(parent), parent) {};
 
 public slots:
 	void filter() { filter_and_update(); }

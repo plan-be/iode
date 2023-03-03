@@ -52,6 +52,11 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     enterShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this);
     cancelShortcut = new QShortcut(QKeySequence::Cancel, this);
 
+    // NOTE: Required to avoid confusion when deleting an IODE object from the QTables
+    deleteShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    // NOTE: Required to avoid confusion when pressing Enter in the QIodeCommand (or Text/Report Editor)
+    enterShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+
     // signals and slots
     connect(this, &QIodeFileExplorer::doubleClicked, this, &QIodeFileExplorer::openFile);
     connect(this, &QIodeFileExplorer::customContextMenuRequested, this, &QIodeFileExplorer::onCustomContextMenu);

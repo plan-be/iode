@@ -12,6 +12,9 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
     QCoreApplication::setApplicationName("IODE");
 
+    // forces decimals separator to be dot 
+    QLocale::setDefault(QLocale::English);
+
     IodeInit();
     gui_assign_super_API();
 

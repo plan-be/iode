@@ -12,7 +12,7 @@
 #include "menu/print_graph/graph_variables.h"
 
 
-class VariablesView : public AbstractTableView<VariablesModel>
+class VariablesView : public TemplateTableView<VariablesModel>
 {
 	Q_OBJECT
 
@@ -22,11 +22,8 @@ class VariablesView : public AbstractTableView<VariablesModel>
 private:
 	QList<QString> extractVariablesNamesFromTo();
 
-protected:
-	void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
-
 public:
-	VariablesView(QWidget* parent = nullptr) : AbstractTableView(I_VARIABLES, new VariablesDelegate(parent), parent) 
+	VariablesView(QWidget* parent = nullptr) : TemplateTableView(I_VARIABLES, new VariablesDelegate(parent), parent) 
 	{
 		// ---- Selection ----
 		// See: - https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-in-item-views

@@ -11,7 +11,7 @@ class CommentsModel : public IODEAbstractTableModel<KDBComments>
 	Q_OBJECT
 
 public:
-	CommentsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Comment" }, parent) {};
+	CommentsModel(QObject* parent = nullptr) : IODEAbstractTableModel({"Comment" }, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const override;

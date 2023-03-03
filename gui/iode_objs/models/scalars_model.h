@@ -11,10 +11,12 @@ class ScalarsModel : public IODEAbstractTableModel<KDBScalars>
 	Q_OBJECT
 
 public:
-	ScalarsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Value", "Relax", "Std", "T-Stat" }, parent) {};
+	ScalarsModel(QObject* parent = nullptr) : IODEAbstractTableModel({"Value", "Relax", "Std", "T-Stat"}, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const override;
+
+	bool setValue(const int row, const int column, const QVariant& value) override;
 
 public slots:
 	void reset() { resetModel(); };

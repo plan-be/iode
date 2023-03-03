@@ -39,23 +39,25 @@ public:
 
 	~IODEAbstractTableModel() { delete kdb; }
 
-	int rowCount(const QModelIndex& parent = QModelIndex()) const
+	int rowCount(const QModelIndex& parent = QModelIndex()) const override
 	{
 		return kdb->count();
 	}
 
-	int columnCount(const QModelIndex& parent = QModelIndex()) const
+	int columnCount(const QModelIndex& parent = QModelIndex()) const override
 	{
 		return columnNames.size();
 	}
 
-	Qt::ItemFlags flags(const QModelIndex& index) const;
+	Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+	bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
 
-	bool setData(const QModelIndex& index, const QVariant& value, int role);
+	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
+	bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
 	void filter(const QString& pattern);
 
@@ -76,11 +78,7 @@ protected:
 
 	virtual QVariant dataCell(const int row, const int col) const = 0;
 
-	bool rename(const QString& name, const QString& new_name);
-
 	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
-
-	bool setDataCell(const int row, const int column, const QVariant& value);
 
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
 

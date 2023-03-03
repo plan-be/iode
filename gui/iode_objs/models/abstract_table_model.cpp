@@ -11,6 +11,7 @@ Qt::ItemFlags IODEAbstractTableModel<K>::flags(const QModelIndex& index) const
 	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
+// Vertical header = IODE object names
 template <class K>
 QVariant IODEAbstractTableModel<K>::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -19,8 +20,46 @@ QVariant IODEAbstractTableModel<K>::headerData(int section, Qt::Orientation orie
 
 	if (orientation == Qt::Horizontal)
 		return columnNames[section];
+	else
+	{
+		try
+		{
+			return QString::fromStdString(kdb->get_name(section));
+		}
+		catch(const std::exception& e)
+		{
+			return QVariant("  ");
+		}
+	}
 
 	return QVariant("  ");
+}
+
+template <class K>
+bool IODEAbstractTableModel<K>::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+{
+	if(orientation == Qt::Horizontal)
+		return false;
+
+	if(role != Qt::EditRole)
+		return false;
+
+	if(section >= rowCount())
+		return false;
+
+	try
+	{
+		QString old_name = headerData(section, orientation).toString();
+		QString new_name = value.toString();
+		kdb->rename(old_name.toStdString(), new_name.toStdString());
+		emit headerDataChanged(orientation, section, section);
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		return false;
+	}
 }
 
 template <class K>
@@ -43,50 +82,17 @@ bool IODEAbstractTableModel<K>::setData(const QModelIndex& index, const QVariant
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
-		bool success = setDataCell(index.row(), index.column(), value);
+		bool success = setValue(index.row(), index.column(), value);
 		if (success)
 		{
 			emit dataChanged(index, index, { role });
 			return true;
 		}
 		else
-		{
 			return false;
-		}
 	}
 	else
-	{
 		return false;
-	}
-}
-
-template <class K>
-bool IODEAbstractTableModel<K>::rename(const QString& name, const QString& new_name)
-{
-	try
-	{
-		kdb->rename(name.toStdString(), new_name.toStdString());
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
-		return false;
-	}
-}
-
-template <class K>
-bool IODEAbstractTableModel<K>::setDataCell(const int row, const int column, const QVariant& value)
-{
-	if (column == 0)
-	{
-		QString name = QString::fromStdString(kdb->get_name(row));
-		return rename(name, value.toString());
-	}
-	else
-	{
-		return setValue(row, column, value);
-	}
 }
 
 template <class K>
