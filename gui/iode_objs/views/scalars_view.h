@@ -8,12 +8,12 @@
 #include "iode_objs/new/add_scalar.h"
 
 
-class ScalarsView : public AbstractTableView<ScalarsModel>
+class ScalarsView : public TemplateTableView<ScalarsModel>
 {
 	Q_OBJECT
 
 public:
-	ScalarsView(QWidget* parent = nullptr) : AbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent) {};
+	ScalarsView(QWidget* parent = nullptr) : TemplateTableView(I_SCALARS, new ScalarsDelegate(parent), parent) {};
 
 public slots:
 	void filter() { filter_and_update(); }

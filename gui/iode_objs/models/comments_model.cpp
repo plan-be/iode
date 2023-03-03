@@ -4,13 +4,13 @@
 
 QVariant CommentsModel::dataCell(const int row, const int col) const
 {
-	if (col == 0)
-	{
-		return QString::fromStdString(kdb->get_name(row));
-	}
-	else
+	try
 	{
 		return QVariant(QString::fromStdString(kdb->get(row)));
+	}
+	catch(const std::exception& e)
+	{
+		return QVariant(" ");
 	}
 }
 

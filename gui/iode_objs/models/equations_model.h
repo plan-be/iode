@@ -11,10 +11,12 @@ class EquationsModel : public IODEAbstractTableModel<KDBEquations>
 	Q_OBJECT
 
 public:
-	EquationsModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Equation" }, parent) {};
+	EquationsModel(QObject* parent = nullptr) : IODEAbstractTableModel({"Equation"}, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const override;
+
+	bool setValue(const int row, const int column, const QVariant& value) override;
 
 public slots:
 	void reset() { resetModel(); };

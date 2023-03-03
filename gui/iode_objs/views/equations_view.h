@@ -1,25 +1,40 @@
 #pragma once
 
 #include <QObject>
+#include <QModelIndexList>
 
-#include "iode_objs/edit/popup_view.h"
+#include "abstract_table_view.h"
+#include "iode_objs/models/equations_model.h"
 #include "iode_objs/delegates/equations_delegate.h"
 #include "iode_objs/models/equations_model.h"
 #include "iode_objs/edit/edit_equation.h"
 
 
-class EquationsView : public PopupView<EquationsModel, QIodeEditEquation>
+class EquationsView : public TemplateTableView<EquationsModel>
 {
 	Q_OBJECT
 
+	QShortcut* editShortcutEnter;
+	QShortcut* editShortcutReturn;
+
 public:
-	EquationsView(QWidget* parent = nullptr) : PopupView(I_EQUATIONS, new EquationsDelegate(parent), parent)
+	EquationsView(QWidget* parent = nullptr) : TemplateTableView(I_EQUATIONS, new EquationsDelegate(parent), parent) 
 	{
-		connect(this, &EquationsView::activated, this, &EquationsView::popup_edit_window);
+		editShortcutEnter = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Enter), this);
+		connect(editShortcutEnter, &QShortcut::activated, this, &EquationsView::edit_obj);
+		
+		editShortcutReturn = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return), this);
+		connect(editShortcutReturn, &QShortcut::activated, this, &EquationsView::edit_obj);
+	}
+
+	~EquationsView()
+	{
+		delete editShortcutEnter;
+		delete editShortcutReturn;
 	}
 
 public slots:
 	void filter() { filter_and_update(); }
 	void new_obj();
-	void popup_edit_window(const QModelIndex& index) { open_popup_edit_window(index); }
+	void edit_obj();
 };

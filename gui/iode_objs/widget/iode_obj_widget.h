@@ -123,8 +123,6 @@ public:
     QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : 
         AbstractIodeObjectWidget(iodeType, parent), projectDir(QDir::homePath())
     {
-        QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
-
         // model table
         QWidget* mainwin = get_main_window_ptr();
         objmodel = new M(mainwin);
@@ -139,22 +137,6 @@ public:
         connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter);
         connect(pushButton_filter, &QPushButton::clicked, tableview, &V::filter);
         connect(add_iode_obj, &QPushButton::clicked, tableview, &V::new_obj);
-
-        // size policy
-        QSizePolicy sizePolicyTable(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicyTable.setHorizontalStretch(0);
-        sizePolicyTable.setVerticalStretch(0);
-        sizePolicyTable.setHeightForWidth(tableview->sizePolicy().hasHeightForWidth());
-        tableview->setSizePolicy(sizePolicyTable);
-        tableview->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
-        // sorting
-        tableview->setSortingEnabled(true);
-        // headers
-        tableview->horizontalHeader()->setStretchLastSection(true);
-        tableview->verticalHeader()->setVisible(false);
-        tableview->verticalHeader()->setStretchLastSection(true);
-        // stylesheet
-        tableview->setStyleSheet(stylesheet);
 
         // insert table to layout
         // -1 -> span over all rows/columns

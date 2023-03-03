@@ -11,10 +11,12 @@ class TablesModel : public IODEAbstractTableModel<KDBTables>
 	Q_OBJECT
 
 public:
-	TablesModel(QObject* parent = nullptr) : IODEAbstractTableModel({ "Name", "Table" }, parent) {};
+	TablesModel(QObject* parent = nullptr) : IODEAbstractTableModel({"Table"}, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const override;
+
+	bool setValue(const int row, const int column, const QVariant& value) override;
 
 public slots:
 	void reset() { resetModel(); };

@@ -41,7 +41,6 @@ set(GUI_PLOT
 )
 
 set(GUI_EDIT_OBJECT
-                                        iode_objs/edit/popup_view.h
     iode_objs/edit/edit_equation.ui     iode_objs/edit/edit_equation.h          iode_objs/edit/edit_equation.cpp
                                         iode_objs/edit/edit_table_view.h        iode_objs/edit/edit_table_view.cpp
                                         iode_objs/edit/edit_table_model.h       iode_objs/edit/edit_table_model.cpp
@@ -77,7 +76,6 @@ set(GUI_OBJS_MODELS
 
 set(GUI_OBJS_DELEGATES
     iode_objs/delegates/base_delegate.h
-    iode_objs/delegates/popup_delegate.h
     iode_objs/delegates/comments_delegate.h
     iode_objs/delegates/equations_delegate.h
     iode_objs/delegates/identities_delegate.h
@@ -88,7 +86,7 @@ set(GUI_OBJS_DELEGATES
 )
 
 set(GUI_OBJS_VIEWS
-    iode_objs/views/abstract_table_view.h
+    iode_objs/views/abstract_table_view.h   iode_objs/views/abstract_table_view.cpp
     iode_objs/views/comments_view.h         iode_objs/views/comments_view.cpp
     iode_objs/views/equations_view.h        iode_objs/views/equations_view.cpp
     iode_objs/views/identities_view.h       iode_objs/views/identities_view.cpp
