@@ -5,18 +5,27 @@
 # 
 #  IODE report functions
 #  ---------------------
-#   report_exec(filename_parms)     | Execute a report
-#   reportline_exec(repline)        | Execute a report line
+#   report_exec(filename_parms: str) -> int     | Execute a report
+#   reportline_exec(repline: str) -> int        | Execute a report line
 
 
 # $ExecReport filename_parms
-def report_exec(filename_parms:str):
+def report_exec(filename_parms: str) -> int:
     '''Execute a report'''
-    return B_ReportExec(cstr(filename_parms))
+    rc = B_ReportExec(cstr(filename_parms))
+    if rc != 0:
+        raise  RuntimeError(f"Execution of report {'filename_parms'} has failed. rc = {rc}")
+    else:
+        return 0
+
 
 # $ExecReportLine repline
-def reportline(repline:str):
+def reportline(repline: str) -> int:
     '''Execute a report line'''
-    return B_ReportLine(cstr(repline))
+    rc = B_ReportLine(cstr(repline))
+    if rc != 0:
+        raise  RuntimeError(f"Execution of report line '{repline}' has failed. rc = {rc}")
+    else:
+        return 0
 
 

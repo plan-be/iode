@@ -9,15 +9,15 @@
 
 # List of functions
 # -----------------
-#     ws_sample_set(per_from="", per_to="")                                 | Set KV_WS sample
-#     ws_sample_get()                                                       | Get KV_WS sample
-#     ws_sample_nb_periods()                                                | Return the number of observations in the current KV_WS.
-#     ws_sample_to_string()                                                 | Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"
-#     ws_sample_to_list(per_from="", per_to="", as_floats:bool=False)       | Return the current sample definition in a list
-#     ws_sample_to_larray_axis(axis_name = 'time', as_floats:bool=False))   | Return the current sample definition as an larray axis
+#     ws_sample_set(per_from="", per_to="") -> List[str]                                  | Set KV_WS sample
+#     ws_sample_get() -> List[str]                                                        | Get KV_WS sample
+#     ws_sample_nb_periods() -> int                                                       | Return the number of observations in the current KV_WS.
+#     ws_sample_to_string() -> srt                                                        | Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"
+#     ws_sample_to_list(per_from="", per_to="", as_floats: bool = False) -> List[str]     | Return the current sample definition in a list
+#     ws_sample_to_larray_axis(axis_name='time', as_floats: bool = False)) -> larray.Axis | Return the current sample definition as an larray axis
   
 
-def ws_sample_set(per_from:str, per_to:str):
+def ws_sample_set(per_from: str, per_to: str) -> List[str]:
     '''
     Set the KV_WS sample and return the new sample
     
@@ -49,7 +49,7 @@ def ws_sample_set(per_from:str, per_to:str):
     return ws_sample_get()
 
 
-def ws_sample_get()->List[str]:
+def ws_sample_get()->List[str]: 
     '''
     Return the current sample lower and upper bounds in a list, e.g.: ["2000Y1", "2010Y1"]
     or [None, None] if the sample is undefined.
@@ -58,7 +58,7 @@ def ws_sample_get()->List[str]:
     cdef char* c_str
 
     if not IodeIsSampleSet():
-        return [None, None]
+        return ['', '']
     else:
         c_str = IodeGetSampleAsString()
         py_lst = pystr(c_str).split(" ")
@@ -66,13 +66,13 @@ def ws_sample_get()->List[str]:
         return py_lst
 
 
-def ws_sample_nb_periods()->int:
+def ws_sample_nb_periods() -> int:
     '''Return the number of observations in the current KV_WS.'''
     
     return IodeGetSampleLength()
 
 
-def ws_sample_to_string()->str:
+def ws_sample_to_string() -> str:
     '''
     Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"
     or "" if the sample is undefined.
@@ -88,7 +88,7 @@ def ws_sample_to_string()->str:
 
 #  TODO: if as_floats is True and per_from and per_to are not empty, 
 #        return the sample per_from to per_to in floats instead of the KV_WS sample
-def ws_sample_to_list(per_from="", per_to="", as_floats:bool=False)->List[str]:
+def ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = False) -> List[str]:
     '''Return the current sample definition or the sample [per_from, per_to] in a list
     e.g.: 
         ["2000Y1", "2001Y1", ..., "2010Y1"] 
@@ -120,7 +120,9 @@ def ws_sample_to_list(per_from="", per_to="", as_floats:bool=False)->List[str]:
 
 #  TODO: if as_floats is True and per_from and per_to are not empty, 
 #        return the sample per_from to per_to in floats instead of the KV_WS sample
-def ws_sample_to_larray_axis(axis_name='time', per_from='', per_to='', as_floats:bool=False)->la.Axis:
+def ws_sample_to_larray_axis(axis_name: str = 'time', 
+                             per_from:str = '', per_to: str = '', 
+                             as_floats: bool = False) -> la.Axis:
     '''
     Return the current sample or the sample [per_from, per_to] definition as an Axis.
         e.g.: Axis(["2000Y1", "2001Y1", ..., "2010Y1"], "time")

@@ -227,7 +227,7 @@ def test_iode_larray_to_ws_2D():
     test_eq(f"iode.larray_to_ws()", expected_nbvars, nbvars)
 
     # Check values
-    AA = iode.var_to_py("AA")
+    AA = iode.get_var("AA")
     test_eq(f"iode.larray_to_ws() - 2D", 2.0, AA[1])
 
     # Saving KV_WS to la1/var
@@ -262,7 +262,7 @@ def test_iode_larray_to_ws_3D():
     test_eq(f"iode.larray_to_ws() - 3D", expected_nbvars, nbvars)
 
     # Check values
-    BB_S2 = iode.var_to_py("BB_S2")
+    BB_S2 = iode.get_var("BB_S2")
     test_eq(f"iode.larray_to_ws() - 3D", 22.0, BB_S2[1])
 
 
@@ -295,7 +295,7 @@ def test_iode_larray_to_ws_3D_R():
     test_eq(f"iode.larray_to_ws() - 3D_R", expected_nbvars, nbvars)
 
     # Check values
-    BB_S2 = iode.var_to_py("BB_S2")
+    BB_S2 = iode.get_var("BB_S2")
     test_eq(f"iode.larray_to_ws() - 3D_R", 22.0, BB_S2[1])
 
     # Save KV_WS to file
@@ -329,7 +329,7 @@ def test_iode_larray_to_ws_long_sample():
     test_eq(f"iode.larray_to_ws() - 3D_R", expected_nbvars, nbvars)
 
     # Check values
-    BB_S2 = iode.var_to_py("BB_S2")
+    BB_S2 = iode.get_var("BB_S2")
     test_eq(f"iode.larray_to_ws() - 3D_R", 88.0, BB_S2[2])
 
     # Save KV_WS to la3d.var
@@ -444,22 +444,22 @@ def test_iode_larray_to_ws_big_la():
 # IODE COMMENTS <-> PYTHON STRINGS
 # --------------------------------
 @cpu
-def test_iode_cmt_to_py():
+def test_iode_set_cmt():
 
     iode.ws_load_cmt(f"{IODE_DATA_DIR}fun.cmt")
-    c_ACAF = iode.cmt_to_py("ACAF")
-    c_EFM = iode.cmt_to_py("EFM")
-    c_XPWMAB = iode.cmt_to_py("XPWMAB")
+    c_ACAF = iode.get_cmt("ACAF")
+    c_EFM = iode.get_cmt("EFM")
+    c_XPWMAB = iode.get_cmt("XPWMAB")
     print(f"ACAF   = '{c_ACAF}'")
     print(f"EFM    = '{c_EFM}'")
     print(f"XPWMAB = '{c_XPWMAB}'")
-    test_eq("iode.cmt_to_py()", "Ondernemingen: ontvangen kapitaaloverdrachten.", c_ACAF)
-    test_eq("iode.cmt_to_py()", 'Vreemde grensarbeiders in België (30 juni).', c_EFM)
-    test_eq("iode.cmt_to_py()", 'Croissance des prix des biens importés', c_XPWMAB)
+    test_eq("iode.get_cmt()", "Ondernemingen: ontvangen kapitaaloverdrachten.", c_ACAF)
+    test_eq("iode.get_cmt()", 'Vreemde grensarbeiders in België (30 juni).', c_EFM)
+    test_eq("iode.get_cmt()", 'Croissance des prix des biens importés', c_XPWMAB)
 
 
 @cpu
-def test_iode_py_to_cmt():
+def test_iode_get_cmt():
 
     # Clear CMT before creating new comments
     iode.ws_clear_cmt()
@@ -469,52 +469,52 @@ def test_iode_py_to_cmt():
     pycmt2 = "Other comment"
 
     # Save them in KC_WS + check
-    rc = iode.py_to_cmt("MYCMT1", pycmt1)
-    #print(f"iode.py_to_cmt = {rc}")
-    rc = iode.py_to_cmt("MYCMT2", pycmt2)
-    #print(f"iode.py_to_cmt = {rc}")
+    rc = iode.set_cmt("MYCMT1", pycmt1)
+    #print(f"iode.set_cmt = {rc}")
+    rc = iode.set_cmt("MYCMT2", pycmt2)
+    #print(f"iode.set_cmt = {rc}")
     #iode.ws_save_cmt(f"{IODE_OUTPUT_DIR}funtest.cmt")
 
     ## Reload to check values
     #iode.ws_load_cmt("funtest.cmt")
-    c_MYCMT1 = iode.cmt_to_py("MYCMT1")
-    c_MYCMT2 = iode.cmt_to_py("MYCMT2")
+    c_MYCMT1 = iode.get_cmt("MYCMT1")
+    c_MYCMT2 = iode.get_cmt("MYCMT2")
     print(f"MYCMT1 = '{c_MYCMT1}'")
     print(f"orig   = '{pycmt1}'")
     print(f"MYCMT2 = '{c_MYCMT2}'")
     print(f"orig   = '{pycmt2}'")
 
-    test_eq(f"iode.py_to_cmt()", pycmt1, c_MYCMT1)
-    test_eq(f"iode.py_to_cmt()", pycmt2, c_MYCMT2)
+    test_eq(f"iode.set_cmt()", pycmt1, c_MYCMT1)
+    test_eq(f"iode.set_cmt()", pycmt2, c_MYCMT2)
 
 
 # IODE EQUATIONS <-> PYTHON STRINGS
 # ---------------------------------
 @cpu
-def test_iode_eqs_lec_to_py():
+def test_iode_get_eqs_lec():
 
     iode.ws_load_eqs(f"{IODE_DATA_DIR}fun")
-    lec_BVY = iode.eqs_lec_to_py("BVY")
+    lec_BVY = iode.get_eqs_lec("BVY")
     print(f"lec_BVY = '{lec_BVY}'")
-    test_eq(f"iode.eqs_lec_to_py()", "BVY:=YN+YK", lec_BVY)
+    test_eq(f"iode.get_eqs_lec()", "BVY:=YN+YK", lec_BVY)
 
 
 @cpu
-def test_iode_eqs_to_py():
+def test_iode_get_eqs():
 
     iode.ws_load_eqs(f"{IODE_DATA_DIR}fun")
-    e_BVY = iode.eqs_to_py("BVY")
+    e_BVY = iode.get_eqs("BVY")
     print(e_BVY)
-    test_eq(f"iode.eqs_to_py()", "BVY:=YN+YK", e_BVY.lec)
+    test_eq(f"iode.get_eqs()", "BVY:=YN+YK", e_BVY.lec)
 
-    e_ACAF = iode.eqs_to_py("ACAF")
+    e_ACAF = iode.get_eqs("ACAF")
     print(f"txt:  e_ACAF = '{e_ACAF}'")
     print(f"repr: e_ACAF = '{repr(e_ACAF)}'")
-    test_eq(f"iode.eqs_to_py('ACAF.e_r2')", 0.82176, e_ACAF.e_r2)
+    test_eq(f"iode.get_eqs('ACAF.e_r2')", 0.82176, e_ACAF.e_r2)
 
 
 @cpu
-def test_iode_py_to_eqs():
+def test_iode_set_eqs():
 
     # Clear EQS WS before creating new object
     iode.ws_clear_eqs()
@@ -523,30 +523,30 @@ def test_iode_py_to_eqs():
     py_A = "grt A := grt B"
 
     # Save py_GA as GA in KE_WS + check
-    rc = iode.py_to_eqs("A", py_A)
-    test_eq(f"iode.py_to_eqs('A', '{py_A}')", 0, rc)
-    iode_A  = iode.eqs_lec_to_py("A")
-    test_eq(f"iode.eqs_lec_to_py('A')", py_A, iode_A)
+    rc = iode.set_eqs("A", py_A)
+    test_eq(f"iode.set_eqs('A', '{py_A}')", 0, rc)
+    iode_A  = iode.get_eqs_lec("A")
+    test_eq(f"iode.get_eqs_lec('A')", py_A, iode_A)
 
     # Test error
     py_A = "(grt A"
-    rc = iode.py_to_eqs("A", py_A)
-    test_eq(f"iode.py_to_eqs('{py_A}')", -1, rc)
+    rc = iode.set_eqs("A", py_A)
+    test_eq(f"iode.set_eqs('{py_A}')", -1, rc)
 
 
 # IODE IDENTITIES <-> PYTHON STRINGS
 # ----------------------------------
 @cpu
-def test_iode_idt_to_py():
+def test_iode_get_idt():
 
     iode.ws_load_idt(f"{IODE_DATA_DIR}fun.idt")
-    i_XEX = iode.idt_to_py("XEX")
+    i_XEX = iode.get_idt("XEX")
     #print(f"XEX = '{i_XEX}'")
-    test_eq(f"iode.idt_to_py()", "grt EX", i_XEX)
+    test_eq(f"iode.get_idt()", "grt EX", i_XEX)
 
 
 @cpu
-def test_iode_py_to_idt():
+def test_iode_set_idt():
 
     # Clear IDT before creating new object
     iode.ws_clear_idt()
@@ -555,28 +555,28 @@ def test_iode_py_to_idt():
     pyxex = "1 * (grt EX)"
 
     # Save pyxex as XEX in KI_WS + check
-    rc = iode.py_to_idt("XEX", pyxex)
-    i_XEX  = iode.idt_to_py("XEX")
-    test_eq(f"iode.py_to_idt('{pyxex}')", pyxex, i_XEX)
+    rc = iode.set_idt("XEX", pyxex)
+    i_XEX  = iode.get_idt("XEX")
+    test_eq(f"iode.set_idt('{pyxex}')", pyxex, i_XEX)
 
     # Test error
     pyxex = "1 * (grt EX) - "
-    rc = iode.py_to_idt("XEX", pyxex)
-    test_eq(f"iode.py_to_idt('{pyxex}')", -1, rc)
+    rc = iode.set_idt("XEX", pyxex)
+    test_eq(f"iode.set_idt('{pyxex}')", -1, rc)
 
 # IODE LISTS <-> PYTHON STRINGS
 # -----------------------------
 @cpu
-def test_iode_lst_to_py():
+def test_iode_get_lst():
 
     iode.ws_load_lst(f"{IODE_DATA_DIR}fun")
-    i_MYLIST = iode.lst_to_py("MYLIST")
+    i_MYLIST = iode.get_lst("MYLIST")
     #print(f"XEX = '{i_XEX}'")
-    test_eq(f"iode.lst_to_py('MYLIST')", "A02_075_H_BRU A02_100_H_VLA", i_MYLIST)
+    test_eq(f"iode.get_lst('MYLIST')", "A02_075_H_BRU A02_100_H_VLA", i_MYLIST)
 
 
 @cpu
-def test_iode_py_to_lst():
+def test_iode_set_lst():
 
     # Clear LST before creating new object
     iode.ws_clear_lst()
@@ -586,26 +586,26 @@ def test_iode_py_to_lst():
     name = "LIST1"
 
     # Save py_list1 as LIST1 in KL_WS + check
-    rc = iode.py_to_lst(name, py_list1)
-    i_LIST1  = iode.lst_to_py(name)
-    test_eq(f"iode.py_to_lst('{name}', '{py_list1}')", py_list1, i_LIST1)
+    rc = iode.set_lst(name, py_list1)
+    i_LIST1  = iode.get_lst(name)
+    test_eq(f"iode.set_lst('{name}', '{py_list1}')", py_list1, i_LIST1)
 
 
 # IODE SCALARS <-> PYTHON
 # -----------------------
 @cpu
-def test_iode_scl_to_py():
+def test_iode_get_scl():
 
     iode.ws_load_scl(f"{IODE_DATA_DIR}fun")
     name = "acaf1"
-    i_acaf1 = iode.scl_to_py(name)
+    i_acaf1 = iode.get_scl(name)
     #print(f"'{name}:{i_acaf1.val}, {i_acaf1.relax}, {i_acaf1.std}'")
-    test_eq(f"iode.scl_to_py('{name}')", 0.0157684, i_acaf1.value)
+    test_eq(f"iode.get_scl('{name}')", 0.0157684, i_acaf1.value)
     #print(i_acaf1)
 
 
 @cpu
-def test_iode_py_to_scl():
+def test_iode_set_scl():
 
     # Clear SCL before creating new object
     iode.ws_clear_scl()
@@ -616,23 +616,23 @@ def test_iode_py_to_scl():
     #print(py_myscl)
 
     # Save py_scl as myscl in KS_WS + reread and check
-    rc = iode.py_to_scl(py_myscl)
-    test_eq(f"iode.py_to_scl('{name}')", 0, rc)
+    rc = iode.set_scl(py_myscl)
+    test_eq(f"iode.set_scl('{name}')", 0, rc)
 
-    i_myscl = iode.scl_to_py(name)
+    i_myscl = iode.get_scl(name)
     #print(i_myscl)
     #print(repr(py_myscl))
 
-    test_eq(f"iode.py_to_scl('{name}') = {i_myscl.value}", repr(py_myscl), repr(i_myscl))
+    test_eq(f"iode.set_scl('{name}') = {i_myscl.value}", repr(py_myscl), repr(i_myscl))
 
 
 # VARIABLES IODE <-> PYTHON LISTS AND NDARRAYS
 # --------------------------------------------
 @cpu
-def test_iode_var_to_ndarray():
+def test_iode_get_var_as_ndarray():
     '''
     Getting and setting vectors of doubles from KV_WS
-    x points to KV_WS["A"] because var_to_ndarray(..., 1)
+    x points to KV_WS["A"] because get_var_as_ndarray(..., 1)
 
     KV_WS["A"] is only modified via x[2] = ...
     '''
@@ -642,27 +642,27 @@ def test_iode_var_to_ndarray():
 
     name = "A"
 
-    # x points to KV_WS["A"] because var_to_ndarray(..., 0)
-    x = iode.var_to_ndarray(name, 0)
+    # x points to KV_WS["A"] because get_var_as_ndarray(..., 0)
+    x = iode.get_var_as_ndarray(name, 0)
     x[2] = 22222 # Modifies the variable A in KV_WS
-    A = iode.var_to_py("A")
-    test_eq(f"iode.var_to_ndarray('{name}', 0) ", 22222.0, A[2])
+    A = iode.get_var("A")
+    test_eq(f"iode.get_var_as_ndarray('{name}', 0) ", 22222.0, A[2])
 
-    # y is a deep copy of KV_WS["A"] because var_to_ndarray(..., 0) => memory leak ?
-    y = iode.var_to_ndarray(name, 1)
+    # y is a deep copy of KV_WS["A"] because get_var_as_ndarray(..., 0) => memory leak ?
+    y = iode.get_var_as_ndarray(name, 1)
     y[2] = 33333 # Does not modify the variable A in KV_WS
-    A = iode.var_to_py("A")
-    test_eq(f"iode.var_to_ndarray('{name}', 1) ", 22222.0, A[2])
+    A = iode.get_var("A")
+    test_eq(f"iode.get_var_as_ndarray('{name}', 1) ", 22222.0, A[2])
 
     # KV_WS["A"] after 2 changes
-    # z = iode.var_to_ndarray(name, 1)
+    # z = iode.get_var_as_ndarray(name, 1)
     # print(f"A = {z}")
 
     # XYY does not exist in KV_WS => new allocation ? TODO: check this + does XYY exist in KV_WS ?
-    z = iode.var_to_ndarray("XYY", 1)
+    z = iode.get_var_as_ndarray("XYY", 1)
     #z[3] = 33333
     #print("z : ", z)
-    XYY = iode.var_to_ndarray("XYY", 1)
+    XYY = iode.get_var_as_ndarray("XYY", 1)
     print("XYY : ", XYY)
 
     # Saving a copy of the modified KV_WS
@@ -670,42 +670,42 @@ def test_iode_var_to_ndarray():
 
 
 @cpu
-def test_iode_var_to_py():
+def test_iode_get_var():
 
     varfile = f"{IODE_DATA_DIR}a"
     iode.ws_load_var(varfile)
     iode.ws_sample_set("1990Y1", "1992Y1")
 
-    A = iode.var_to_py("A")
+    A = iode.get_var("A")
     B = [0.0, 1.0, 2]
-    test_eq("iode.var_to_py(A)", A, B)
+    test_eq("iode.get_var(A)", A, B)
 
 
 @cpu
-def test_iode_py_to_var():
+def test_iode_set_var():
 
     nbvars = iode.ws_load_var(f"{IODE_DATA_DIR}a")
 
     AA = [11, 22, 33]
     AB = np.array([0.0, 111.0, 112.5], np.double)
 
-    iode.py_to_var("AA", AA)
-    iode.py_to_var("AB", AB)
+    iode.set_var("AA", AA)
+    iode.set_var("AB", AB)
     iode.ws_save_var(f"{IODE_OUTPUT_DIR}a_mod2.var")
 
     iode.ws_load_var("a_mod2.var")
-    new_AA = iode.var_to_py("AA")
-    new_AB = iode.var_to_py("AB")
+    new_AA = iode.get_var("AA")
+    new_AB = iode.get_var("AB")
 
-    test_eq("py_to_var()", AA[2], new_AA[2]) # 1993Y1
-    test_eq("py_to_var()", AB[1], new_AB[1]) # 1992Y1
+    test_eq("get_var()", AA[2], new_AA[2]) # 1993Y1
+    test_eq("get_var()", AB[1], new_AB[1]) # 1992Y1
 
 
 @cpu
 def test_iode_exec_lec():
     nbvars = iode.ws_load_var("a")
 
-    v_A = iode.var_to_py("A")
+    v_A = iode.get_var("A")
 
     vec = iode.exec_lec("1+A-1")
     test_eq("exec_lec('1+A-1') == A", vec, v_A)
@@ -746,7 +746,7 @@ def test_iode_data_update_cmt():
 
     A = "Comment of A"
     iode.data_update_cmt("A", A)
-    new_A = iode.cmt_to_py("A")
+    new_A = iode.get_cmt("A")
     test_eq(f"data_update_cmt()", A, new_A)
 
 @cpu
@@ -763,7 +763,7 @@ def test_iode_data_update_eqs():
     test_eq(f"data_update_eqs('{A}')", 0, rc)
 
     # Get the lec value and compare with A
-    new_A = iode.eqs_lec_to_py("A")
+    new_A = iode.get_eqs_lec("A")
     test_eq(f"data_update_eqs('{A}')", A, new_A)
 
 @cpu
@@ -772,18 +772,19 @@ def test_iode_data_update_var():
     varfile = f"{IODE_DATA_DIR}a"
     nbvars = iode.ws_load_var(varfile)
 
-    A = iode.var_to_py("A")
+    A = iode.get_var("A")
     A[2] = 123
     B = [100, 101, 102] # 1992Y1 1993Y1 ...
     iode.data_update_var("A", A)
     iode.data_update_var("B", B, operation="L", per_from="1992Y1")
     #iode.ws_save_var(f"{IODE_OUTPUT_DIR}a_mod.var")
     #iode.ws_load_var(f"{IODE_OUTPUT_DIR}a_mod.var")  
-    new_A = iode.var_to_py("A")
-    new_B = iode.var_to_py("B")
+    new_A = iode.get_var("A")
+    new_B = iode.get_var("B")
     test_eq("data_update_var()", A[2], new_A[2]) # 1992Y1
     test_eq("data_update_var()", B[1], new_B[3]) # 1993Y1
     test_eq("data_update_var()", B[2], new_B[4]) # 1994Y1
+
 
 def test_iode_data_update():
     test_iode_data_update_cmt()
@@ -828,13 +829,13 @@ def test_iode_eqs_estimation():
 
     # Check acaf1 value after estimation
     name = "acaf1"
-    i_acaf1 = iode.scl_to_py(name)
+    i_acaf1 = iode.get_scl(name)
     #print(f"'{name}:{i_acaf1.val}, {i_acaf1.relax}, {i_acaf1.std}'")
-    test_eq(f"iode.scl_to_py('{name}')", 0.01577049, i_acaf1.value)
+    test_eq(f"iode.get_scl('{name}')", 0.01577049, i_acaf1.value)
 
     # Check _YCALC[1980Y1]
-    res = iode.exec_lec("_YRES[1980Y1]", 0)
-    test_eq(f"iode.eqs_estimate('{name}') => _YRES[1980Y1]", -0.00115008, res)
+    res = iode.exec_lec("_YRES0[1980Y1]", 0)
+    test_eq(f"iode.eqs_estimate('{name}') => _YRES0[1980Y1]", -0.00115008, res)
 
 
 
@@ -874,17 +875,17 @@ def test_iode_model_simulate_exchange():
 
     # Version with exchange in at least 2 equations
     # Set values of endo UY
-    UY = iode.var_to_py("UY")
+    UY = iode.get_var("UY")
     UY[40:43] = [650.0, 670.0, 680.0] # 2000Y1..2002Y1
-    iode.py_to_var("UY", UY)
+    iode.set_var("UY", UY)
 
     # Simulate with exchange UY - XNATY
     rc = iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
     test_eq(f"iode.model_simulate() with endo_exo", 0, rc)
 
     # Check result
-    UY = iode.var_to_py("UY")
-    XNATY = iode.var_to_py("XNATY")
+    UY = iode.get_var("UY")
+    XNATY = iode.get_var("XNATY")
     #print("UY:",UY)
     #print("XNATY:",XNATY)
     test_eq(f"UY[2000Y1]", 650.0, iode.exec_lec("UY[2000Y1]", 0))
@@ -1112,25 +1113,25 @@ test_iode_larray_to_ws_big_la()
 
 test_iode_ws_sample()
 
-test_iode_cmt_to_py()
-test_iode_py_to_cmt()
+test_iode_get_cmt()
+test_iode_set_cmt()
 
-test_iode_eqs_lec_to_py()
-test_iode_eqs_to_py()
-test_iode_py_to_eqs()
+test_iode_get_eqs_lec()
+test_iode_get_eqs()
+test_iode_set_eqs()
 
-test_iode_idt_to_py()
-test_iode_py_to_idt()
+test_iode_get_idt()
+test_iode_set_idt()
 
-test_iode_lst_to_py()
-test_iode_py_to_lst()
+test_iode_get_lst()
+test_iode_set_lst()
 
-test_iode_scl_to_py()
-test_iode_py_to_scl()
+test_iode_get_scl()
+test_iode_set_scl()
 
-test_iode_var_to_ndarray()
-test_iode_var_to_py()
-test_iode_py_to_var()
+test_iode_get_var_as_ndarray()
+test_iode_get_var()
+test_iode_set_var()
 
 test_iode_exec_lec()
 
