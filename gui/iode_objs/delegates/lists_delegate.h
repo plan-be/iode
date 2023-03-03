@@ -1,14 +1,14 @@
 #pragma once
 
-#include "text_delegate.h"
+#include "base_delegate.h"
 
 
-class ListsDelegate : public TextDelegate
+class ListsDelegate : public BaseDelegate
 {
 	Q_OBJECT
 
 public:
-	ListsDelegate(QObject* parent = nullptr) : TextDelegate(I_UPPER, parent) {}
+	ListsDelegate(QObject* parent = nullptr) : BaseDelegate(I_UPPER, parent) {}
 
 	~ListsDelegate() {}
 };

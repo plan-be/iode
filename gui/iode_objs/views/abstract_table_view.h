@@ -3,7 +3,7 @@
 #include <QTableView>
 #include <QLineEdit>
 #include "utils.h"
-#include "iode_objs/delegates/abstract_delegate.h"
+#include "iode_objs/delegates/base_delegate.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -14,7 +14,7 @@
 template <class M> class AbstractTableView : public QTableView
 {
 	EnumIodeType iodeType;
-	AbstractDelegate* delegate;
+	BaseDelegate* delegate;
 	QLineEdit* filterLineEdit;
 
 protected:
@@ -46,7 +46,7 @@ protected:
 	}
 
 public:
-	AbstractTableView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : QTableView(parent), iodeType(iodeType), delegate(delegate)
+	AbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) : QTableView(parent), iodeType(iodeType), delegate(delegate)
 	{
 		// ---- Selection ----
 		// See: - https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-in-item-views

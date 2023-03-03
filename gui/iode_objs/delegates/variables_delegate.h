@@ -1,29 +1,22 @@
 #pragma once
 
-#include "abstract_delegate.h"
+#include "base_delegate.h"
 
 
-class VariablesDelegate : public AbstractDelegate
+class VariablesDelegate : public BaseDelegate
 {
 	Q_OBJECT
 
 public:
-	VariablesDelegate(QObject* parent = nullptr) : AbstractDelegate(I_UPPER, parent) {}
+	VariablesDelegate(QObject* parent = nullptr) : BaseDelegate(I_UPPER, parent) {}
 
 	~VariablesDelegate() {}
 
 	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
 		const QModelIndex& index) const override
 	{
-		if (index.column() == 0)
-		{
-			return createNameEditor(parent);
-		}
-		else
-		{
-			QLineEdit* editor = new QLineEdit(parent);
-			editor->setValidator(new IODEDoubleValidator(editor));
-			return editor;
-		}
+		QLineEdit* editor = new QLineEdit(parent);
+		editor->setValidator(new IODEDoubleValidator(editor));
+		return editor;
 	}
 };

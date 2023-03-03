@@ -1,14 +1,14 @@
 #pragma once
 
-#include "abstract_delegate.h"
+#include "base_delegate.h"
 
 
-class ScalarsDelegate : public AbstractDelegate
+class ScalarsDelegate : public BaseDelegate
 {
 	Q_OBJECT
 
 public:
-	ScalarsDelegate(QObject* parent = nullptr) : AbstractDelegate(I_LOWER, parent) {}
+	ScalarsDelegate(QObject* parent = nullptr) : BaseDelegate(I_LOWER, parent) {}
 
 	~ScalarsDelegate() {}
 
@@ -20,12 +20,9 @@ public:
 		switch (index.column())
 		{
 		case 0:
-			editor = createNameEditor(parent);
-			break;
-		case 1:
 			editor->setValidator(new IODEDoubleValidator(editor));
 			break;
-		case 2:
+		case 1:
 			editor->setValidator(new QDoubleValidator(0., 1., 10, editor));
 			break;
 		default:
