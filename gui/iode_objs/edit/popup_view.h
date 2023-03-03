@@ -1,7 +1,7 @@
 #pragma once
 
 #include "iode_objs/views/abstract_table_view.h"
-#include "iode_objs/delegates/abstract_delegate.h"
+#include "iode_objs/delegates/base_delegate.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -12,7 +12,7 @@
 template <class M, class D> class PopupView : public AbstractTableView<M>
 {
 public:
-	PopupView(EnumIodeType iodeType, AbstractDelegate* delegate, QWidget* parent = nullptr) : AbstractTableView<M>(iodeType, delegate, parent) {}
+	PopupView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) : AbstractTableView<M>(iodeType, delegate, parent) {}
 
 protected:
 	void open_popup_edit_window(const QModelIndex& index)

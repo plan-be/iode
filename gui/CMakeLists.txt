@@ -76,9 +76,8 @@ set(GUI_OBJS_MODELS
 )
 
 set(GUI_OBJS_DELEGATES
+    iode_objs/delegates/base_delegate.h
     iode_objs/delegates/popup_delegate.h
-    iode_objs/delegates/abstract_delegate.h
-    iode_objs/delegates/text_delegate.h
     iode_objs/delegates/comments_delegate.h
     iode_objs/delegates/equations_delegate.h
     iode_objs/delegates/identities_delegate.h
