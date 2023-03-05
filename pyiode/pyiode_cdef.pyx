@@ -119,21 +119,3 @@ cdef iodesample_to_ndarray():
         vararray.fill(0)
     return vararray
 
-# Obsolete ? 
-# ----------
-# cdef iodescl_to_ndarray(char * name):
-#     cdef np.npy_intp shape[1]
-#     cdef int lg = 3
-#     cdef double *data_ptr = IodeGetScls(name)
-# 
-#     shape[0] = <np.npy_intp> lg
-# 
-#     if data_ptr != NULL:
-#         vararray = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, data_ptr)
-#         vararray = vararray.copy()
-#         vararray[vararray < -1.0e37] = np.nan
-#     else:
-#         vararray = np.ndarray(lg, dtype='double')
-#         vararray.fill(0)
-#     return vararray
-

@@ -6,10 +6,10 @@
 #  IODE LEC functions 
 #  ------------------
 # 
-#   exec_lec(lec:str, t:int=-1)     Compute a LEC formula using the current WS of VARs and SCLs
+#   exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]  | Compute a LEC formula using the current WS of VARs and SCLs
 #
 
-def exec_lec(lec:str, t:int=-1)-> Union[float, List[float]]:
+def exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]:
     '''
     Compute a LEC formula using the current WS of VARs and SCLs.
     The formula may be evaluate at a specific position in the sample (t) 
@@ -17,17 +17,17 @@ def exec_lec(lec:str, t:int=-1)-> Union[float, List[float]]:
     
     Parameters
     ----------
-        lec: str
-            LEC expression
-        t: int
-            if >= 0:position in the KV_WS sample of the value to be calculated
-            if < 0, the full sample is returned
+    lec: str
+        LEC expression
+    t: int
+        if >= 0: position in the KV_WS sample of the value to be calculated
+        if < 0, the full sample is returned
     
     Returns
     -------
-        float or list of floats
-        if t >= 0: return simple float
-        if t < 0: return a list of floats
+    float or list of floats
+    if t >= 0: return simple float
+    if t < 0: return a list of floats
     '''
     
     cdef    double* cvar

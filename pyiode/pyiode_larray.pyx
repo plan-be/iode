@@ -7,10 +7,10 @@
 # ---------------------------------------------
 #   la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name = 'time')
 #  
-#   larray_to_ws(la_input, time_axis_name: str = 'time', sep: str = "_")   | Copies LArray la_input into IODE KV_WS.      | Copies LArray la_input into IODE KV_WS.
+#   larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_")   | Copies LArray la_input into IODE KV_WS.    
 #   ws_to_larray(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', split_axis_names = '', regex = None, split_sep = None, time_as_floats: bool = False) -> la.Array | Creates an LArray from the current KV_WS content
 #   ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> la.Array | Load an IODE var file into an Larray object with 2 axes (vars and time)  
-#   larray_get_sample(la_input, time_axis_name = 'time')             | Return the first and last time axis labels as a list of 2 strings
+#   larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]             | Return the first and last time axis labels as a list of 2 strings
 
     
 
@@ -30,7 +30,7 @@ cdef la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name
 
 
 # TODO: check return values and return an error code 
-def larray_to_ws(la_input, time_axis_name: str = 'time', sep: str = "_"):
+def larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_"):
     '''
     Copies Array la_input into IODE KV_WS.
     
@@ -152,11 +152,8 @@ def ws_load_var_to_larray(filename: str,
     '''
 
     # Load iode var file
-    rc = ws_load_var(filename)
-    if rc <= 0:
-        # raise an exception ?
-        return None
-
+    ws_load_var(filename)
+    
     # Create LArray 
     la_res = ws_to_larray(vars_pattern = vars_pattern, 
                     vars_axis_name = vars_axis_name, 

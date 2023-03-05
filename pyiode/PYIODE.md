@@ -5,171 +5,173 @@
 
 
 - [IODE: python module](#T1)
-  - [C functions specific to PYIODE](#T2)
-  - [IODE API in python](#T3)
-    - [Workspace management](#T4)
-    - [Object management](#T5)
-    - [Larray \- IODE vars exchange](#T6)
-    - [Sample management](#T7)
-    - [IODE LEC functions](#T8)
-    - [Estimation](#T9)
-    - [Simulation](#T10)
-    - [Reports](#T11)
-    - [Print functions](#T12)
-    - [Write functions](#T13)
-    - [Utility functions](#T14)
-    - [Utilities using explicit C data types](#T15)
+    - [Workspace management](#T2)
+    - [Object management](#T3)
+    - [Larray / IODE conversions](#T4)
+    - [Sample management](#T5)
+    - [LEC functions](#T6)
+    - [Identities execution](#T7)
+    - [Estimation](#T8)
+    - [Simulation](#T9)
+    - [Reports](#T10)
+    - [Print functions](#T11)
+    - [Write functions](#T12)
+    - [Utilities](#T13)
+    - [Utilities using C data types](#T14)
 
 # IODE: python module {#T1}
 
-- C functions specific to PYIODE
-- IODE API in python
-
-## C functions specific to PYIODE {#T2}
-
-## IODE API in python {#T3}
-
-### Workspace management {#T4}
+### Workspace management {#T2}
 
 |Syntax|Description|
 |:---|:---|
 |**Workspace content**||
-| `ws_content(pattern, objtype)`|Return the names of objects of a given type, satisfying a pattern specification.|
-| `ws_content_cmt(pattern)`|Return the list of cmt names corresponding to the given pattern|
-| `ws_content_eqs(pattern)`|Return the list of eqs names corresponding to the given pattern|
-| `ws_content_idt(pattern)`|Return the list of idt names corresponding to the given pattern|
-| `ws_content_lst(pattern)`|Return the list of lst names corresponding to the given pattern|
-| `ws_content_scl(pattern)`|Return the list of scl names corresponding to the given pattern|
-| `ws_content_tbl(pattern)`|Return the list of tbl names corresponding to the given pattern|
-| `ws_content_var(pattern)`|Return the list of var names corresponding to the given pattern|
+|`ws_content(pattern, objtype) -> List[str]`|Return the names of all objects of a given type, satisfying a pattern specification|
+|`ws_content_cmt(pattern) -> List[str]`|Returns the list of comment names corresponding to the given pattern|
+|`ws_content_eqs(pattern) -> List[str]`|Returns the list of equation names corresponding to the given pattern|
+|`ws_content_idt(pattern) -> List[str]`|Returns the list of identity names corresponding to the given pattern|
+|`ws_content_lst(pattern) -> List[str]`|Returns the list of list names corresponding to the given pattern|
+|`ws_content_scl(pattern) -> List[str]`|Returns the list of scalar names corresponding to the given pattern|
+|`ws_content_tbl(pattern) -> List[str]`|Returns the list of table names corresponding to the given pattern|
+|`ws_content_var(pattern) -> List[str]`|Returns the list of variable names corresponding to the given pattern|
 |**Clear workspaces**||
-| `ws_clear(filetype)`|Clear a workspace of a given type|
-| `ws_clear_cmt()`|Clear the cmt workspace|
-| `ws_clear_eqs()`|Clear the eqs workspace|
-| `ws_clear_idt()`|Clear the idt workspace|
-| `ws_clear_lst()`|Clear the lst workspace|
-| `ws_clear_scl()`|Clear the scl workspace|
-| `ws_clear_tbl()`|Clear the tbl workspace|
-| `ws_clear_var()`|Clear the var workspace|
-| `ws_clear_all()`|Clear all workspaces|
+|`ws_clear(filetype: int)`|Clear WS of the given filetype (K\_CMT..K\_VAR)|
+|`ws_clear_cmt()`|Clear the comment WS|
+|`ws_clear_eqs()`|Clear the equation WS|
+|`ws_clear_idt()`|Clear the identity WS|
+|`ws_clear_lst()`|Clear the list WS|
+|`ws_clear_scl()`|Clear the scalar WS|
+|`ws_clear_tbl()`|Clear the table WS|
+|`ws_clear_var()`|Clear the varaible WS|
+|`ws_clear_all()`|Clear all WS|
 |**Load workspaces**||
-| `ws_load(filename, filetype)`|Load a workspace of a given type|
-| `ws_load_cmt(filename)`|Load a cmt workspace|
-| `ws_load_eqs(filename)`|Load a eqs workspace|
-| `ws_load_idt(filename)`|Load a idt workspace|
-| `ws_load_lst(filename)`|Load a lst workspace|
-| `ws_load_scl(filename)`|Load a scl workspace|
-| `ws_load_tbl(filename)`|Load a tbl workspace|
-| `ws_load_var(filename)`|Load a var workspace|
+|`ws_load(filename: str, filetype: int) -> int`|Load an IODE file and return the number of read objects|
+|`ws_load_cmt(filename: str) -> int`|Load a comment file and return the number of read objects|
+|`ws_load_eqs(filename: str) -> int`|Load a equation file and return the number of read objects|
+|`ws_load_idt(filename: str) -> int`|Load a identity file and return the number of read objects|
+|`ws_load_lst(filename: str) -> int`|Load a list file and return the number of read objects|
+|`ws_load_scl(filename: str) -> int`|Load a scalar file and return the number of read objects|
+|`ws_load_tbl(filename: str) -> int`|Load a table file and return the number of read objects|
+|`ws_load_var(filename: str) -> int`|Load a variable file and return the number of read objects|
 |**Save workspaces**||
-| `ws_save(filename, filetype)`|Save a workspace of a given type|
-| `ws_save_cmt(filename)`|Save a cmt workspace|
-| `ws_save_eqs(filename)`|Save a eqs workspace|
-| `ws_save_idt(filename)`|Save a idt workspace|
-| `ws_save_lst(filename)`|Save a lst workspace|
-| `ws_save_scl(filename)`|Save a scl workspace|
-| `ws_save_tbl(filename)`|Save a tbl workspace|
-| `ws_save_var(filename)`|Save a var workspace|
+|`ws_save(filename: str, filetype: int)`|Save the current IODE workspace of a given type|
+|`ws_save_cmt(filename: str)`|Save the current workspace of comments|
+|`ws_save_eqs(filename: str)`|Save the current workspace of equations|
+|`ws_save_idt(filename: str)`|Save the current workspace of identities|
+|`ws_save_lst(filename: str)`|Save the current workspace of lists|
+|`ws_save_scl(filename: str)`|Save the current workspace of scalars|
+|`ws_save_tbl(filename: str)`|Save the current workspace of tables|
+|`ws_save_var(filename: str)`|Save the current workspace of variables|
 |**Change of periodicites**||
-|`ws_ltoh_stock(filename, varlist)->int`||
-|`ws_ltoh_flow(filename, varlist)->int`||
-| ||
-|`ws_htol_sum(filename, varlist, method)->int`||
-|`ws_htol_mean(filename, varlist, method)->int`||
-|`ws_htol_last(filename, varlist, method)->int`||
+|`ws_ltoh_flow(filename: str, varlist)`||
+|`ws_ltoh_stock(filename: str, varlist, method: int = LTOH_CS)`||
+|`ws_htol_sum(filename: str, varlist, method: int)`||
+|`ws_htol_mean(filename: str, varlist, method: int)`||
+|`ws_htol_last(filename: str, varlist, method: int)`||
 
-### Object management {#T5}
+### Object management {#T3}
 
 |Syntax|Description|
 |:---|:---|
 |**Delete IODE objects**||
-|`delete_obj(name:str, obj_type:int)`|delete the object named name of type obj\_type|
-|`delete_cmt(name:str)`|delete the comment named name|
-|`delete_eqs(name:str)`|delete the equation named name|
-|`delete_idt(name:str)`|delete the identity named name|
-|`delete_lst(name:str)`|delete the list named name|
-|`delete_scl(name:str)`|delete the scalar named name|
-|`delete_tbl(name:str)`|delete the table named name|
-|`delete_var(name:str)`|delete the variable named name|
-|                                     ||
+| ||
+|`delete_objects(pattern: str = '*', obj_type: int = K_VAR)`|delete the objects whose names satisfy the given pattern|
+| ||
+|`delete_obj(name: str, obj_type: int)`|delete the object named name of type obj\_type|
+|`delete_cmt(name: str)`|delete the comment named name|
+|`delete_eqs(name: str)`|delete the equation named name|
+|`delete_idt(name: str)`|delete the identity named name|
+|`delete_lst(name: str)`|delete the list named name|
+|`delete_scl(name: str)`|delete the scalar named name|
+|`delete_tbl(name: str)`|delete the table named name|
+|`delete_var(name: str)`|delete the variable named name|
+|                                       ||
 |**Comments**||
-|`cmt_to_py(name:str)`||
-|`py_to_cmt(name:str, cmt:str)`||
-|                                     ||
+|`get_cmt(name) -> str`|return the text of an IODE comment|
+|`set_cmt(name, cmt)`|update or create an IODE comment from a python str|
+| ||
 |**Equations**||
-|`eqs_lec_to_py(eq_name:str)`||
-|`eqs_to_py(eq_name:str)`||
-|`py_to_eqs(eq_name:str, lec:str)`||
-|                                     ||
+|`get_eqs_lec(eq_name: str) -> str`|return an IODE equation LEC form as a string|
+|`get_eqs(eq_name: str) -> Equation`|return an IODE equation as an iode.Equation class instance|
+|`set_eqs(eq_name: str, lec: str)`|update an equation lec form|
+| ||
 |**Identities**||
-|`idt_to_py(name:str)`||
-|`py_to_idt(name:str, idt:str)`||
-|                                     ||
+|`get_idt(name) -> str`|return the LEC formula of an IODE identity|
+|`set_idt(name, idt)`|update or create an identity|
+| ||
 |**Lists**||
-|`lst_to_py(name:str)`||
-|`py_to_lst(name:str, lst)`||
+|`get_lst(name) -> str`|return an IODE list as a string|
+|`set_lst(name, lst)`|update or create a list fro a string|
+| ||
 |**Scalars**||
-|`scl_to_py(name:str)`||
-|`py_to_scl(py_scl:scl)`||
+|`get_scl(name: str) -> Scalar`|return an IODE scalar in a iode.Scalar class instance|
+|`set_scl(py_scl: Scalar)`|create or update an IODE scalar from an iode.Scalar class instance|
+| ||
 |**Tables**||
 |**Variables**||
-|`var_to_py(varname)`||
-|`var_to_ndarray(varname, copy = True)`||
-|`py_to_var(varname, py_values)`||
+|`get_var(varname: str) -> List[float]`|get an IODE variable in a list of floats|
+|`get_var_as_ndarray(varname: str, copy = True) -> np.ndarray`|get an IODE variable in a numpy ndarray|
+|`set_var(varname, py_values)`|create or update an IODE variable from a list of floats or a ndarray|
 
-### Larray \- IODE vars exchange {#T6}
-
-|Syntax|Description|
-|:---|:---|
-|`larray_to_ws(la_input, time_axis_name:str='time', sep:str="_")`|Copies LArray la\_input into IODE KV\_WS.|
-|`ws_to_larray(vars_pattern:str='*', vars_axis_name:str='vars', time_axis_name:str='time', split_axis_names='', regex = None, split_sep = None, time_as_floats: bool=False)-> la.Array`|Creates an LArray from the current KV\_WS content|
-|`ws_load_var_to_larray(filename:str, vars_pattern='*', vars_axis_name='vars', time_axis_name='time', split_axis_names=None, regex=None, split_sep=None)->la.Array`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
-|`larray_get_sample(la_input, time_axis_name = 'time')`|Return the first and last time axis labels as a list of 2 strings|
-
-### Sample management {#T7}
+### Larray / IODE conversions {#T4}
 
 |Syntax|Description|
 |:---|:---|
-|`ws_sample(per_from = None, per_to = None)`|Set or get the KV\_WS sample|
-|`ws_sample_get()`|Get the KV\_WS sample|
-|`ws_sample_nb_periods()`|Return the number of observations in the current KV\_WS.|
-|`ws_sample_to_string()`|Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"|
-|`ws_sample_to_list((per_from="", per_to="", as_floats:bool=False)`|Return the current sample definition in a list|
-|`ws_sample_to_larray_axis(axis_name = 'time', as_floats:bool=False)`|Return the current sample definition as an larray axis|
+|`larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_")`|Copies LArray la\_input into IODE KV\_WS.|
+|`ws_to_larray(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', split_axis_names = '', regex = None, split_sep = None, time_as_floats: bool = False) -> la.Array`|Creates an LArray from the current KV\_WS content|
+|`ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> la.Array`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
+|`larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]`|Return the first and last time axis labels as a list of 2 strings|
 
-### IODE LEC functions {#T8}
+### Sample management {#T5}
 
 |Syntax|Description|
 |:---|:---|
-|`exec_lec(lec:str, t:int=-1)->Union[float, List[float]]`|Compute a LEC formula using the current WS of VARs and SCLs|
+|`ws_sample_set(per_from="", per_to="") -> List[str]`|Set KV\_WS sample|
+|`ws_sample_get() -> List[str]`|Get KV\_WS sample|
+|`ws_sample_nb_periods() -> int`|Return the number of observations in the current KV\_WS.|
+|`ws_sample_to_string() -> str`|Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"|
+|`ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = False) -> List[str]`|Return the current sample definition in a list|
+|`ws_sample_to_larray_axis(axis_name: str = 'time', per_from:str = '', per_to: str = '', as_floats: bool = False) -> la.Axis`|Return the current sample definition as an larray axis|
 
-### Estimation {#T9}
-
-|Syntax|Description|
-|:---|:---|
-|`eqs_estimate(eq_list, afrom:str, ato:str)->int`|Estimate an equation or a block of equations on the given sample.|
-
-### Simulation {#T10}
-
-|Syntax|Description|
-|:---|:---|
-|`model_simulate(sample_from:str, sample_to:str, eqs_list=None, endo_exo_list=None, eps:float=0.0001, relax:float=1.0, maxit:int=100, init_values:int=KV_INIT_TM1, sort_algo:int=SORT_BOTH, nb_passes:int=5, debug:int=0, newton_eps:float=1e-6, newton_maxit:int=50, newton_debug:int=0)->int`|Simulate the model defined by eqs\_list on the period \[sample\_from, sample\_to\].|
-
-### Reports {#T11}
+### LEC functions {#T6}
 
 |Syntax|Description|
 |:---|:---|
-|`report_exec(filename_parms)->int`|Execute a report|
-|`reportline_exec(repline)->int`|Execute a report line|
-|`data_update(obj_name:str, obj_value:str, obj_type:int)->int`|Create of update an IODE object (cmt, eqs, lst, idt)|
-|`data_update_cmt(obj_name:str, obj_value:str)->int`|Create or update an IODE comment|
-|`data_update_eqs(obj_name:str, obj_value:str)->int`|Create or update an IODE equation|
-|`data_update_idt(obj_name:str, obj_value:str)->int`|Create or update an IODE identity|
-|`data_update_lst(obj_name:str, obj_value:str)->int`|Create or update an IODE list|
-|`data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)->int`|Create or update an IODE scalar|
-|`data_update_var(varname:str, values, operation:str = "L", per_from:str = None)->int`|Create or update an IODE variable starting at a specified period|
+|`exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]`|Compute a LEC formula using the current WS of VARs and SCLs|
 
-### Print functions {#T12}
+### Identities execution {#T7}
+
+|Syntax|Description|
+|:---|:---|
+|`idt_execute(idt_list: Union(str, List[str]), sample: Union(str, List[str]), var_files: Union(str, List[str]), scl_files: Union(str, List[str]))`|Execute a list of identities on a given sample|
+
+### Estimation {#T8}
+
+|Syntax|Description|
+|:---|:---|
+|`eqs_estimate(eq_list, afrom:str, ato:str)`|Estimate an equation or a block of equations on the given sample.|
+
+### Simulation {#T9}
+
+|Syntax|Description|
+|:---|:---|
+|`model_simulate(sample_from: str, sample_to: str, eqs_list=None, endo_exo_list=None, eps: float = 0.0001, relax: float = 1.0, maxit: int = 100, init_values: int = KV_INIT_TM1, sort_algo: int = SORT_BOTH, nb_passes: int = 5, debug: int = 0, newton_eps: float = 1e-6, newton_maxit: int = 50, newton_debug: int = 0)`|Simulate a model|
+
+### Reports {#T10}
+
+|Syntax|Description|
+|:---|:---|
+|`report_exec(filename_parms: str)`|Execute a report|
+|`reportline_exec(repline: str)`|Execute a report line|
+|`data_update(obj_name:str, obj_value:str, obj_type:int)`|Create of update an IODE object (cmt, eqs, lst, idt)|
+|`data_update_cmt(obj_name:str, obj_value:str)`|Create or update an IODE comment|
+|`data_update_eqs(obj_name:str, obj_value:str)`|Create or update an IODE equation|
+|`data_update_idt(obj_name:str, obj_value:str)`|Create or update an IODE identity|
+|`data_update_lst(obj_name:str, obj_value:str)`|Create or update an IODE list|
+|`data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)`|Create or update an IODE scalar|
+|`data_update_var(varname:str, values, operation:str = "L", per_from:str = None)`|Create or update an IODE variable starting at a specified period|
+
+### Print functions {#T11}
 
 \!\! Not yet implemented \!\!
 
@@ -180,31 +182,34 @@
 |`print_obj_lec`|select the way LEC expressions are to be printed (coefficients replaced by values...)|
 |`print_obj_infos`|select informations to print|
 
-### Write functions {#T13}
+### Write functions {#T12}
 
 |Syntax|Description|
 |:---|:---|
-|`w_dest(char *filename, int type)`|Initialise a new output session|
+|`w_dest(filename: str, dest: type = W_DUMMY)`|Initialise a new output session|
 |`w_close()`|End an output session.|
 |`w_flush()`|Flush the output session buffer.|
-|`w_print(str)`|Send a string into the output session buffer.|
+|`w_print(txt: str = '')`|Send a string into the output session buffer.|
+| ||
+|`w_print_enum(level: int = 1, text: str = "")`|Print a bulleted paragraph of the given level|
+|`w_print_cmd(level: int = 1, text: str = "")`|Start a code block of the given level or end the block if level < 0|
+|`w_print_par(level: int = 1, text: str = "")`|Print a paragraph of the given level|
+|`w_print_tit(level: int = 1, title: str = "")`|Print a title of the given level|
+|`w_print_pg_header(arg: str = "")`|Define the page header as from the current page|
+|`w_print_pg_footer(arg: str = "")`|Define the page footer as from the current page|
 
-### Utility functions {#T14}
+### Utilities {#T13}
 
 |Syntax|Description|
 |:---|:---|
-|`version()`|Return the Iode version.|
-|`cstr(pystr)`|Convert a python string (UTF8) to a C null terminated string (ANSI cp1252).|
-|`pystr(cstr)`|Convert a C null terminated string (ANSI cp1252) into a python string (UTF8).|
-|                             ||
-|`cpu_init(txt = None)`|Reinitialize a cpu session|
-|`cpu_end_msg(t0, txt = None)`|Return a string containing a free text \+ the elapsed time since the last call to cpu\_init()|
-|`cpu_end(t0, txt = None)`|Print a free text and the elapsed time since the last call to cpu\_init()|
+|`version() -> str`|Return the Iode version.|
+|`cstr(pystr) -> bytes`|Convert a python string (UTF8) to a C null terminated string (ANSI cp850).|
+|`pystr(cstr)-> str`|Convert a C null terminated string (ANSI cp850) into a python string (UTF8).|
 |                             ||
 |`suppress_msgs()`|Suppress the output during an IODE session.|
 |`reset_msgs()`|Reset the normal output mechanism during an IODE session.|
 
-### Utilities using explicit C data types {#T15}
+### Utilities using C data types {#T14}
 
 |Syntax|Description|
 |:---|:---|

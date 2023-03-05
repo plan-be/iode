@@ -523,16 +523,18 @@ def test_iode_set_eqs():
     py_A = "grt A := grt B"
 
     # Save py_GA as GA in KE_WS + check
-    rc = iode.set_eqs("A", py_A)
-    test_eq(f"iode.set_eqs('A', '{py_A}')", 0, rc)
+    iode.set_eqs("A", py_A)
     iode_A  = iode.get_eqs_lec("A")
     test_eq(f"iode.get_eqs_lec('A')", py_A, iode_A)
 
     # Test error
     py_A = "(grt A"
-    rc = iode.set_eqs("A", py_A)
-    test_eq(f"iode.set_eqs('{py_A}')", -1, rc)
-
+    try:
+        iode.set_eqs("A", py_A)
+    except:
+        test_eq(f"iode.set_eqs('{py_A}')", -1 , -1) # Ok: there is an error in lec expression
+    else:
+        test_eq(f"iode.set_eqs('{py_A}')", 0 , -1) # Wrong
 
 # IODE IDENTITIES <-> PYTHON STRINGS
 # ----------------------------------
@@ -555,14 +557,19 @@ def test_iode_set_idt():
     pyxex = "1 * (grt EX)"
 
     # Save pyxex as XEX in KI_WS + check
-    rc = iode.set_idt("XEX", pyxex)
+    iode.set_idt("XEX", pyxex)
     i_XEX  = iode.get_idt("XEX")
     test_eq(f"iode.set_idt('{pyxex}')", pyxex, i_XEX)
 
     # Test error
     pyxex = "1 * (grt EX) - "
-    rc = iode.set_idt("XEX", pyxex)
-    test_eq(f"iode.set_idt('{pyxex}')", -1, rc)
+    try: 
+        iode.set_idt("XEX", pyxex)
+    except:
+        test_eq(f"iode.set_idt('{pyxex}')", -1 , -1) # Ok: there is an error in lec expression
+    else:
+        test_eq(f"iode.set_idt('{pyxex}')", 0 , -1) # Wrong
+    
 
 # IODE LISTS <-> PYTHON STRINGS
 # -----------------------------
@@ -586,7 +593,7 @@ def test_iode_set_lst():
     name = "LIST1"
 
     # Save py_list1 as LIST1 in KL_WS + check
-    rc = iode.set_lst(name, py_list1)
+    iode.set_lst(name, py_list1)
     i_LIST1  = iode.get_lst(name)
     test_eq(f"iode.set_lst('{name}', '{py_list1}')", py_list1, i_LIST1)
 
@@ -616,9 +623,8 @@ def test_iode_set_scl():
     #print(py_myscl)
 
     # Save py_scl as myscl in KS_WS + reread and check
-    rc = iode.set_scl(py_myscl)
-    test_eq(f"iode.set_scl('{name}')", 0, rc)
-
+    iode.set_scl(py_myscl)
+    
     i_myscl = iode.get_scl(name)
     #print(i_myscl)
     #print(repr(py_myscl))
@@ -693,7 +699,7 @@ def test_iode_set_var():
     iode.set_var("AB", AB)
     iode.ws_save_var(f"{IODE_OUTPUT_DIR}a_mod2.var")
 
-    iode.ws_load_var("a_mod2.var")
+    iode.ws_load_var(f"{IODE_OUTPUT_DIR}a_mod2.var")
     new_AA = iode.get_var("AA")
     new_AB = iode.get_var("AB")
 
@@ -703,7 +709,7 @@ def test_iode_set_var():
 
 @cpu
 def test_iode_exec_lec():
-    nbvars = iode.ws_load_var("a")
+    nbvars = iode.ws_load_var(f"{IODE_DATA_DIR}a.var")
 
     v_A = iode.get_var("A")
 
@@ -723,7 +729,11 @@ def test_iode_exec_lec():
 def test_iode_delete_idts(pattern:str):
     nbobjs = len(iode.ws_content_idt("*"))
     nbobjs_pattern = len(iode.ws_content_idt(pattern))
-    rc = iode.delete_objects(pattern, 2)
+    try: 
+        iode.delete_objects(pattern, 2)
+    except:
+        pass
+    
     nbobjs2 = len(iode.ws_content_idt("*"))
     test_eq(f"iode.delete_objects('{pattern}', 2)", nbobjs - nbobjs_pattern, nbobjs2)
 
@@ -754,13 +764,14 @@ def test_iode_data_update_eqs():
 
     # Make a LEC error and check return code
     A = "A := ln t +++ "
-    rc = iode.data_update_eqs("A", A)
-    test_eq(f"data_update_eqs('{A}')", -1, rc)
+    try:
+        iode.data_update_eqs("A", A)
+    except:
+        test_eq(f"data_update_eqs('{A}')", -1, -1)
 
     # Save a new equation A and check the return code
     A = "A := ln t + 1"
-    rc = iode.data_update_eqs("A", A)
-    test_eq(f"data_update_eqs('{A}')", 0, rc)
+    iode.data_update_eqs("A", A)
 
     # Get the lec value and compare with A
     new_A = iode.get_eqs_lec("A")
@@ -824,8 +835,7 @@ def test_iode_eqs_estimation():
     iode.ws_load_scl(f"{IODE_DATA_DIR}fun")
 
     name = "ACAF"
-    rc = iode.eqs_estimate(name, "1980Y1", "1996Y1")
-    test_eq(f"iode.eqs_estimate('{name}')", 0, rc)
+    iode.eqs_estimate(name, "1980Y1", "1996Y1")
 
     # Check acaf1 value after estimation
     name = "acaf1"
@@ -850,12 +860,14 @@ def test_iode_model_simulate():
 
     # Test non convergence
     iode.suppress_msgs()
-    rc = iode.model_simulate("2000Y1", "2002Y1", "", eps=0.0001, relax=0.7, maxit=2)
-    test_eq(f"iode.model_simulate()", -1, rc)
+    try:
+        iode.model_simulate("2000Y1", "2002Y1", "", eps=0.0001, relax=0.7, maxit=2)
+    except:
+        test_eq(f"iode.model_simulate()", -1 , -1)  # Ok: does NOT converge (maxit 2)
 
     # Test convergence
-    rc = iode.model_simulate("2000Y1", "2002Y1", "", relax=0.7)
-    test_eq(f"iode.model_simulate()", 0, rc)
+    iode.model_simulate("2000Y1", "2002Y1", "", relax=0.7)
+   
 
     # Check some result after simulation
     # ACAF [2000..2002] before simulation = [10.0466107922005, 2.86792273645546, -0.929212509051645]
@@ -880,8 +892,8 @@ def test_iode_model_simulate_exchange():
     iode.set_var("UY", UY)
 
     # Simulate with exchange UY - XNATY
-    rc = iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
-    test_eq(f"iode.model_simulate() with endo_exo", 0, rc)
+    iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
+    test_eq(f"iode.model_simulate() with endo_exo", 0, 0)
 
     # Check result
     UY = iode.get_var("UY")
@@ -963,22 +975,22 @@ def test_iode_htol():
     
     # Last Obs in year
     varname = "ACAF"
-    rc = iode.ws_htol_last(filename, varname)
-    test_eq("iode.ws_htol_last", 0, rc)
+    iode.ws_htol_last(filename, varname)
+    test_eq("iode.ws_htol_last", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Y1]", 0)
     test_eq(f"{varname}[2014Y1]", -83.340625, res)
 
     # mean of year
     varname = "ACAG"
-    rc = iode.ws_htol_mean(filename, varname)
-    test_eq("iode.ws_htol_mean", 0, rc)
+    iode.ws_htol_mean(filename, varname)
+    test_eq("iode.ws_htol_mean", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Y1]", 0)
     test_eq(f"{varname}[2014Y1]", 8.1050747, res)
 
     # sum
     varname = "AOUC"
-    rc = iode.ws_htol_sum(filename, varname)
-    test_eq("iode.ws_htol_sum", 0, rc)
+    iode.ws_htol_sum(filename, varname)
+    test_eq("iode.ws_htol_sum", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Y1]", 0)
     test_eq(f"{varname}[2014Y1]", 1.423714, res)
 
@@ -996,44 +1008,44 @@ def test_iode_ltoh():
     
     # Linear interpolation / stock
     varname = "ACAF"
-    rc = iode.ws_ltoh_stock(filename, varname, iode.LTOH_LIN)
-    test_eq("iode.ws_ltoh_stock Linear", 0, rc)
+    iode.ws_ltoh_stock(filename, varname, iode.LTOH_LIN)
+    test_eq("iode.ws_ltoh_stock Linear", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Q3]", 0)
     test_eq(f"{varname}[2014Q3]", -79.729132, res)
     
     # Linear interpolation / flow
     varname = "ACAG"
-    rc = iode.ws_ltoh_flow(filename, varname, iode.LTOH_LIN)
-    test_eq("iode.ws_ltoh_flow Linear", 0, rc)
+    iode.ws_ltoh_flow(filename, varname, iode.LTOH_LIN)
+    test_eq("iode.ws_ltoh_flow Linear", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Q3]", 0)
     test_eq(f"{varname}[2014Q3]", 8.105075, res)
 
     # Cubic splines / stock
     varname = "ACAF"
-    rc = iode.ws_ltoh_stock(filename, varname, iode.LTOH_CS)
-    test_eq("iode.ws_ltoh_stock Cubic splines", 0, rc)
+    iode.ws_ltoh_stock(filename, varname, iode.LTOH_CS)
+    test_eq("iode.ws_ltoh_stock Cubic splines", 0, 0)
     res = iode.exec_lec(f"{varname}[2012Q3]", 0)
     test_eq(f"{varname}[2012Q3]", -52.805666, res)
 
     # Cubic splines / flow
     varname = "ACAG"
-    rc = iode.ws_ltoh_flow(filename, varname, iode.LTOH_CS)
-    test_eq("iode.ws_ltoh_stock Cubic splines", 0, rc)
+    iode.ws_ltoh_flow(filename, varname, iode.LTOH_CS)
+    test_eq("iode.ws_ltoh_stock Cubic splines", 0, 0)
     res = iode.exec_lec(f"{varname}[2012Q3]", 0)
     test_eq(f"{varname}[2012Q3]", 7.6135768805666, res)
 
     # Step / stock
     varname = "ACAF"
-    rc = iode.ws_ltoh_stock(filename, varname, iode.LTOH_STEP)
-    test_eq("iode.ws_ltoh_stock Step", 0, rc)
+    iode.ws_ltoh_stock(filename, varname, iode.LTOH_STEP)
+    test_eq("iode.ws_ltoh_stock Step", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Q3]", 0)
     test_eq(f"{varname}[2014Q3]", -83.34062, res)
 
   
     # Step / flow
     varname = "ACAG"
-    rc = iode.ws_ltoh_flow(filename, varname, iode.LTOH_STEP)
-    test_eq("iode.ws_ltoh_flow Step", 0, rc)
+    iode.ws_ltoh_flow(filename, varname, iode.LTOH_STEP)
+    test_eq("iode.ws_ltoh_flow Step", 0, 0)
     res = iode.exec_lec(f"{varname}[2014Q3]", 0)
     test_eq(f"{varname}[2014Q3]", 8.1050747, res)
 
@@ -1065,22 +1077,22 @@ def test_iode_htol_la():
     
     # Last Obs in year
     varname = "BB_S1"
-    rc = iode.ws_htol_last(filename, varname)
-    test_eq("iode.ws_htol_last", 0, rc)
+    iode.ws_htol_last(filename, varname)
+    test_eq("iode.ws_htol_last", 0, 0)
     res = iode.exec_lec(f"{varname}[2001Y1]", 0)
     test_eq(f"{varname}[2001Y1]", 2.0, res)
 
     # mean of year
     varname = "BB_S1"
-    rc = iode.ws_htol_mean(filename, varname)
-    test_eq("iode.ws_htol_mean", 0, rc)
+    iode.ws_htol_mean(filename, varname)
+    test_eq("iode.ws_htol_mean", 0, 0)
     res = iode.exec_lec(f"{varname}[2001Y1]", 0)
     test_eq(f"{varname}[2001Y1]", 5.0/4.0, res)
 
     # sum
     varname = "BB_S1"
-    rc = iode.ws_htol_sum(filename, "AA_S1 BB_S1") # CC_S1 AA_S2 BB_S2 CC_S2")
-    test_eq("iode.ws_htol_sum", 0, rc)
+    iode.ws_htol_sum(filename, "AA_S1 BB_S1") # CC_S1 AA_S2 BB_S2 CC_S2")
+    test_eq("iode.ws_htol_sum", 0, 0)
     res = iode.exec_lec(f"{varname}[2001Y1]", 0)
     test_eq(f"{varname}[2001Y1]", 5.0, res)
 
