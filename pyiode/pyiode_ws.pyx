@@ -5,49 +5,49 @@
 #
 #  IODE workspaces functions
 #  -------------------------
-#   ws_content(pattern, objtype)->List[str]
-#   ws_content_cmt(pattern)->List[str]
-#   ws_content_eqs(pattern)->List[str]
-#   ws_content_idt(pattern)->List[str]
-#   ws_content_lst(pattern)->List[str]
-#   ws_content_scl(pattern)->List[str]
-#   ws_content_tbl(pattern)->List[str]
-#   ws_content_var(pattern)->List[str]
+#   ws_content(pattern, objtype) -> List[str]       | Return the names of all objects of a given type, satisfying a pattern specification  
+#   ws_content_cmt(pattern) -> List[str]            | Returns the list of comment names corresponding to the given pattern
+#   ws_content_eqs(pattern) -> List[str]            | Returns the list of equation names corresponding to the given pattern
+#   ws_content_idt(pattern) -> List[str]            | Returns the list of identity names corresponding to the given pattern
+#   ws_content_lst(pattern) -> List[str]            | Returns the list of list names corresponding to the given pattern
+#   ws_content_scl(pattern) -> List[str]            | Returns the list of scalar names corresponding to the given pattern
+#   ws_content_tbl(pattern) -> List[str]            | Returns the list of table names corresponding to the given pattern
+#   ws_content_var(pattern) -> List[str]            | Returns the list of variable names corresponding to the given pattern
 #
-#   ws_clear(filetype)->int
-#   ws_clear_cmt()->int
-#   ws_clear_eqs()->int
-#   ws_clear_idt()->int
-#   ws_clear_lst()->int
-#   ws_clear_scl()->int
-#   ws_clear_tbl()->int
-#   ws_clear_var()->int
-#   ws_clear_all()->int
+#   ws_clear(filetype: int) | Clear WS of the given filetype (K_CMT..K_VAR)
+#   ws_clear_cmt()          | Clear the comment WS
+#   ws_clear_eqs()          | Clear the equation WS
+#   ws_clear_idt()          | Clear the identity WS
+#   ws_clear_lst()          | Clear the list WS
+#   ws_clear_scl()          | Clear the scalar WS
+#   ws_clear_tbl()          | Clear the table WS
+#   ws_clear_var()          | Clear the varaible WS
+#   ws_clear_all()          | Clear all WS           
 #
-#   ws_load(filename, filetype)->int
-#   ws_load_cmt(filename)->int
-#   ws_load_eqs(filename)->int
-#   ws_load_idt(filename)->int
-#   ws_load_lst(filename)->int
-#   ws_load_scl(filename)->int
-#   ws_load_tbl(filename)->int
-#   ws_load_var(filename)->int
+#   ws_load(filename: str, filetype: int) -> int | Load an IODE file and return the number of read objects
+#   ws_load_cmt(filename: str) -> int            | Load a comment file and return the number of read objects
+#   ws_load_eqs(filename: str) -> int            | Load a equation file and return the number of read objects
+#   ws_load_idt(filename: str) -> int            | Load a identity file and return the number of read objects
+#   ws_load_lst(filename: str) -> int            | Load a list file and return the number of read objects
+#   ws_load_scl(filename: str) -> int            | Load a scalar file and return the number of read objects
+#   ws_load_tbl(filename: str) -> int            | Load a table file and return the number of read objects
+#   ws_load_var(filename: str) -> int            | Load a variable file and return the number of read objects
 #
-#   ws_save(filename, filetype)->int
-#   ws_save_cmt(filename)->int
-#   ws_save_eqs(filename)->int
-#   ws_save_idt(filename)->int
-#   ws_save_lst(filename)->int
-#   ws_save_scl(filename)->int
-#   ws_save_tbl(filename)->int
-#   ws_save_var(filename)->int
+#   ws_save(filename: str, filetype: int) | Save the current IODE workspace of a given type
+#   ws_save_cmt(filename: str)            | Save the current workspace of comments
+#   ws_save_eqs(filename: str)            | Save the current workspace of equations
+#   ws_save_idt(filename: str)            | Save the current workspace of identities
+#   ws_save_lst(filename: str)            | Save the current workspace of lists
+#   ws_save_scl(filename: str)            | Save the current workspace of scalars
+#   ws_save_tbl(filename: str)            | Save the current workspace of tables
+#   ws_save_var(filename: str)            | Save the current workspace of variables
 #
-#   ws_ltoh_stock(filename, varlist)->int              
-#   ws_ltoh_flow(filename, varlist)->int               
-#                                                      
-#   ws_htol_sum(filename, varlist, method)->int        
-#   ws_htol_mean(filename, varlist, method)->int       
-#   ws_htol_last(filename, varlist, method)->int       
+
+#   ws_ltoh_flow(filename: str, varlist)                         |
+#   ws_ltoh_stock(filename: str, varlist, method: int = LTOH_CS) |
+#   ws_htol_sum(filename: str, varlist, method: int)             |
+#   ws_htol_mean(filename: str, varlist, method: int)            |
+#   ws_htol_last(filename: str, varlist, method: int)            |
 #  
 #  
 #  TODO
@@ -81,26 +81,24 @@
 #   ws_export
 
 
-
-
 # TODO: rewrite IodeContents with regex or a better algorithm because K_grep() is VERY slow for large databases
 
-def ws_content(pattern:str = '*', objtype:int = 6)->List[str]:
+def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
     r"""Return the names of objects of a given type, satisfying a pattern specification.
 
     Parameters
     ----------
-    pattern : string
+    pattern: string
         string containing wildcards characters like '*' or '?'.
         Default '*', meaning "all objects".
 
-    objtype : int
+    objtype: int
         IODE object type (0-6, 0 for comments...)
         Default 6 for
 
     Returns
     -------
-    list of strings
+    List[str]
         List of object names
 
     Examples
@@ -132,158 +130,181 @@ def ws_content(pattern:str = '*', objtype:int = 6)->List[str]:
 
     return res
 
-def ws_content_cmt(pattern:str = '*')->List[str]:
+def ws_content_cmt(pattern: str = '*') -> List[str]:
     '''Returns the list of comment names corresponding to the given pattern'''
     return ws_content(pattern, K_CMT)
 
-def ws_content_eqs(pattern:str = '*')->List[str]:
+def ws_content_eqs(pattern: str = '*') -> List[str]:
     '''Returns the list of equation names corresponding to the given pattern'''
     return ws_content(pattern, K_EQS)
 
-def ws_content_idt(pattern:str = '*')->List[str]:
+def ws_content_idt(pattern: str = '*') -> List[str]:
     '''Returns the list of identity names corresponding to the given pattern'''
     return ws_content(pattern, K_IDT)
 
-def ws_content_lst(pattern:str = '*')->List[str]:
+def ws_content_lst(pattern: str = '*') -> List[str]:
     return ws_content(pattern, K_LST)
 
-def ws_content_scl(pattern:str = '*')->List[str]:
+def ws_content_scl(pattern: str = '*') -> List[str]:
     return ws_content(pattern, K_SCL)
 
-def ws_content_tbl(pattern:str = '*')->List[str]:
+def ws_content_tbl(pattern: str = '*') -> List[str]:
     return ws_content(pattern, K_TBL)
 
-def ws_content_var(pattern:str = '*')->List[str]:
+def ws_content_var(pattern: str = '*') -> List[str]:
     return ws_content(pattern, K_VAR)
 
 
 # Clear WS
 # --------
-def ws_clear_all()->int:
-    "Clear all WS"
-    return IodeClearAll()
+def ws_clear_all():
+    '''Clear all WS'''
+    if IodeClearAll():
+        raise RuntimeError(f"Cannot clear all workspaces.")
 
-def ws_clear(filetype)->int:
-    "Clear WS of the given filetype (0..6)"
-    return IodeClearWs(filetype)
+def ws_clear(filetype: int):
+    '''Clear WS of the given filetype (K_CMT..K_VAR)'''
+    if IodeClearWs(filetype):
+        raise RuntimeError(f"Workspace of type {filetype} cannot be cleared")
 
-def ws_clear_cmt()->int:
-    return ws_clear(K_CMT)
+def ws_clear_cmt():
+    '''Clear the comment WS'''
+    ws_clear(K_CMT)
 
-def ws_clear_eqs()->int:
-    return ws_clear(K_EQS)
+def ws_clear_eqs():
+    ws_clear(K_EQS)
 
-def ws_clear_idt()->int:
-    return ws_clear(K_IDT)
+def ws_clear_idt():
+    ws_clear(K_IDT)
 
-def ws_clear_lst()->int:
-    return ws_clear(K_LST)
+def ws_clear_lst():
+    ws_clear(K_LST)
 
-def ws_clear_scl()->int:
-    return ws_clear(K_SCL)
+def ws_clear_scl():
+    ws_clear(K_SCL)
 
-def ws_clear_tbl()->int:
-    return ws_clear(K_TBL)
+def ws_clear_tbl():
+    ws_clear(K_TBL)
 
-def ws_clear_var()->int:
-    return ws_clear(K_VAR)
+def ws_clear_var():
+    ws_clear(K_VAR)
 
 
 # Load WS
 # -------
-def ws_load(filename, filetype)->int:
-    "Load iode file"
-    return IodeLoad(cstr(filename), filetype)
+def ws_load(filename: str, filetype: int) -> int:
+    '''Load an IODE file and return the number of read objects'''
+    
+    nb = IodeLoad(cstr(filename), filetype)
+    if nb < 0:
+        raise RuntimeError(f"File {filename} of type {filetype} cannot be loaded")
+    return nb    
 
-def ws_load_cmt(filename)->int:
+def ws_load_cmt(filename: str) -> int:
+    '''Load a comment file and return the number of read objects'''
+    
     return ws_load(filename, K_CMT)
 
-def ws_load_eqs(filename)->int:
+def ws_load_eqs(filename: str) -> int:
     return ws_load(filename, K_EQS)
 
-def ws_load_idt(filename)->int:
+def ws_load_idt(filename: str) -> int:
     return ws_load(filename, K_IDT)
 
-def ws_load_lst(filename)->int:
-    return ws_load(filename, K_LST)
-
-def ws_load_scl(filename)->int:
-    return ws_load(filename, K_SCL)
-
-def ws_load_tbl(filename)->int:
-    return ws_load(filename, K_TBL)
-
-def ws_load_var(filename)->int:
+def ws_load_lst(filename: str) -> int:
+    return ws_load(filename, K_LST) 
+                             
+def ws_load_scl(filename: str) -> int:
+    return ws_load(filename, K_SCL) 
+                             
+def ws_load_tbl(filename: str) -> int:
+    return ws_load(filename, K_TBL) 
+                             
+def ws_load_var(filename: str) -> int:
     return ws_load(filename, K_VAR)
 
 
 # Save WS
 # -------
-def ws_save(filename, filetype)->int:
-    return IodeSave(cstr(filename), filetype)
+def ws_save(filename: str, filetype: int):
+    '''Save the current IODE workspace of a given type'''
+    if IodeSave(cstr(filename), filetype):
+        raise RuntimeError(f"Workspace of type {filetype} cannot be saved in file {filename}.")
 
-def ws_save_cmt(filename)->int:
-    return ws_save(filename, K_CMT)
+def ws_save_cmt(filename: str):
+    '''Save the current comment workspace'''
+    ws_save(filename, K_CMT)
 
-def ws_save_eqs(filename)->int:
-    return ws_save(filename, K_EQS)
+def ws_save_eqs(filename: str):
+    '''Save the current equation workspace'''
+    ws_save(filename, K_EQS)
 
-def ws_save_idt(filename)->int:
-    return ws_save(filename, K_IDT)
+def ws_save_idt(filename: str):
+    '''Save the current identity workspace'''
+    ws_save(filename, K_IDT)
 
-def ws_save_lst(filename)->int:
-    return ws_save(filename, K_LST)
+def ws_save_lst(filename: str):
+    '''Save the current list workspace'''
+    ws_save(filename, K_LST)
 
-def ws_save_scl(filename)->int:
-    return ws_save(filename, K_SCL)
+def ws_save_scl(filename: str):
+    '''Save the current scalar workspace'''
+    ws_save(filename, K_SCL)
 
-def ws_save_tbl(filename)->int:
-    return ws_save(filename, K_TBL)
+def ws_save_tbl(filename: str):
+    '''Save the current table workspace'''
+    ws_save(filename, K_TBL)
 
-def ws_save_var(filename)->int:
-    return ws_save(filename, K_VAR)
+def ws_save_var(filename: str):
+    '''Save the current variable workspace'''
+    ws_save(filename, K_VAR)
 
 
 # High to Low
 # -----------
-def ws_htol(filename:str, varlist, series_type)->int:
+def ws_htol(filename: str, varlist, series_type: int):
     #if type(varlist) == list:
     if isinstance(varlist, list):
         varlist = ' '.join(varlist)
 
     arg = f"{filename} {varlist}"
     if series_type == HTOL_LAST:
-        return B_WsHtoLLast(cstr(arg))
+        if B_WsHtoLLast(cstr(arg)):
+            raise RuntimeError(f"ws_htol_last() on file {filename} failed.")
     elif series_type == HTOL_MEAN:
-        return B_WsHtoLMean(cstr(arg))
+        if B_WsHtoLMean(cstr(arg)):
+            raise RuntimeError(f"ws_htol_mean() on file {filename} failed.")
     else:
-        return B_WsHtoLSum(cstr(arg))
+        if B_WsHtoLSum(cstr(arg)):
+            raise RuntimeError(f"ws_htol_sum() on file {filename} failed.")
 
-def ws_htol_last(filename, varlist)->int:
-    return ws_htol(filename, varlist, HTOL_LAST)
+def ws_htol_last(filename: str, varlist):
+    ws_htol(filename, varlist, HTOL_LAST)
 
-def ws_htol_mean(filename, varlist)->int:
-    return ws_htol(filename, varlist, HTOL_MEAN)
+def ws_htol_mean(filename: str, varlist):
+    ws_htol(filename, varlist, HTOL_MEAN)
 
-def ws_htol_sum(filename, varlist)->int:
-    return ws_htol(filename, varlist, HTOL_SUM)
+def ws_htol_sum(filename: str, varlist):
+    ws_htol(filename, varlist, HTOL_SUM)
 
 
 # Low to High
 # -----------
-def ws_ltoh(filename:str, varlist, series_type, method)->int:
+def ws_ltoh(filename: str, varlist, series_type, method:int):
     #if type(varlist) == list:
     if isinstance(varlist, list):
         varlist = ' '.join(varlist)
 
     arg = f"{method} {filename} {varlist}"
     if series_type == LTOH_FLOW:
-        return B_WsLtoHFlow(cstr(arg))
+        if B_WsLtoHFlow(cstr(arg)):
+            raise RuntimeError(f"ws_ltoh_flow() on file {filename} failed.")
     else:
-        return B_WsLtoHStock(cstr(arg))
+        if B_WsLtoHStock(cstr(arg)):
+            raise RuntimeError(f"ws_ltoh_stock() on file {filename} failed.")
 
-def ws_ltoh_flow(filename, varlist, method=LTOH_CS)->int:
-    return ws_ltoh(filename, varlist, LTOH_FLOW, method)
+def ws_ltoh_flow(filename: str, varlist, method: int = LTOH_CS):
+    ws_ltoh(filename, varlist, LTOH_FLOW, method)
 
-def ws_ltoh_stock(filename, varlist, method=LTOH_CS)->int:
-    return ws_ltoh(filename, varlist, LTOH_STOCK, method)
+def ws_ltoh_stock(filename: str, varlist, method: int = LTOH_CS):
+    ws_ltoh(filename, varlist, LTOH_STOCK, method)

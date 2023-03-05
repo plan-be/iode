@@ -9,13 +9,13 @@
 
 # List of functions
 # -----------------
-#     ws_sample_set(per_from="", per_to="") -> List[str]                                  | Set KV_WS sample
-#     ws_sample_get() -> List[str]                                                        | Get KV_WS sample
-#     ws_sample_nb_periods() -> int                                                       | Return the number of observations in the current KV_WS.
-#     ws_sample_to_string() -> srt                                                        | Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"
-#     ws_sample_to_list(per_from="", per_to="", as_floats: bool = False) -> List[str]     | Return the current sample definition in a list
-#     ws_sample_to_larray_axis(axis_name='time', as_floats: bool = False)) -> larray.Axis | Return the current sample definition as an larray axis
-  
+#     ws_sample_set(per_from="", per_to="") -> List[str]                                            | Set KV_WS sample
+#     ws_sample_get() -> List[str]                                                                  | Get KV_WS sample
+#     ws_sample_nb_periods() -> int                                                                 | Return the number of observations in the current KV_WS.
+#     ws_sample_to_string() -> str                                                                  | Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"
+#     ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = False) -> List[str] | Return the current sample definition in a list
+#     ws_sample_to_larray_axis(axis_name: str = 'time', per_from:str = '', per_to: str = '', as_floats: bool = False) -> la.Axis | Return the current sample definition as an larray axis
+      
 
 def ws_sample_set(per_from: str, per_to: str) -> List[str]:
     '''
@@ -52,7 +52,7 @@ def ws_sample_set(per_from: str, per_to: str) -> List[str]:
 def ws_sample_get()->List[str]: 
     '''
     Return the current sample lower and upper bounds in a list, e.g.: ["2000Y1", "2010Y1"]
-    or [None, None] if the sample is undefined.
+    or ['', ''] if the sample is undefined.
     '''
 
     cdef char* c_str
