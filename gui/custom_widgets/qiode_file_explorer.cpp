@@ -52,10 +52,22 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     enterShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this);
     cancelShortcut = new QShortcut(QKeySequence::Cancel, this);
 
-    // NOTE: Required to avoid confusion when deleting an IODE object from the QTables
+    // NOTE: By default, shortcuts are defined at the main Window level. 
+    //       Thus, a shortcut of a (combination of) key(s) may override the expected behavior 
+    //       from another widget dealing with the same (combination of) key(s). 
+    //       'setContext(Qt::WidgetWithChildrenShortcut)' makes sure that the shortcut does 
+    //       not propagate to other widgets.
+    newFileShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    newDirectoryShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    cutShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    copyShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    pasteShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    filepathShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    revealExplorerShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    renameShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     deleteShortcut->setContext(Qt::WidgetWithChildrenShortcut);
-    // NOTE: Required to avoid confusion when pressing Enter in the QIodeCommand (or Text/Report Editor)
     enterShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    cancelShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
     // signals and slots
     connect(this, &QIodeFileExplorer::doubleClicked, this, &QIodeFileExplorer::openFile);
