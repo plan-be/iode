@@ -374,7 +374,7 @@ FodyWeavers.xsd
 # LaTeX
 keyboard_shortcuts.*
 !keyboard_shortcuts.tex
-!keyboard_shortcuts.pdf
+!build/keyboard_shortcuts.pdf
 
 # Others
 *.exp
