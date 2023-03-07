@@ -828,8 +828,10 @@ extern void B_A2mGetMifParms();
 extern void B_A2mSaveMifParms();
 extern void B_A2mGetGdiParms();
 extern void B_A2mSaveGdiParms();
-extern void K_load_iode_ini();
-extern void K_save_iode_ini();
+extern void B_A2mGetAllParms();
+extern void B_A2mSaveAllParms();
+//extern void K_load_iode_ini();
+//extern void K_save_iode_ini();
 
 
 /* b_args.c */
@@ -1207,6 +1209,7 @@ extern int B_DataDuplicate(char *,int );
 //extern int B_DataUpdateEqs(char *,char *,char *,int ,SAMPLE *,char *,char *,float *,int );
 //extern int B_DataUpdateTbl(char *,char *);
 extern int B_DataUpdate(char *,int );
+extern char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type);
 extern int B_DataSearch(char *,int );
 extern int B_DataEditCnf(char *);
 // extern int my_strcmp(const void *,const void *);
@@ -1454,18 +1457,18 @@ extern void W_print_rtf_topic(char* arg);
 extern void W_print_tb(char* title, int nc);
 
 /* sb_file.c */
-extern void SB_FileOpen(void);
-extern void C_FileOpen(void);
-extern void SB_FileNew(void);
-extern void C_FileNew(void);
-extern void SB_FileSave(void);
-extern void C_FileSave(void);
+//extern void SB_FileOpen(void);
+//extern void C_FileOpen(void);
+//extern void SB_FileNew(void);
+//extern void C_FileNew(void);
+//extern void SB_FileSave(void);
+//extern void C_FileSave(void);
 extern int SB_FilePrintSetup(void);
 extern void C_FilePrintSetup(void);
 extern void C_FilePrintFile(void);
-extern void SB_FilePreferences(void);
+//extern void SB_FilePreferences(void);
 extern void SB_PrintPreferences(void);
-extern void C_FilePreferences(void);
+//extern void C_FilePreferences(void);
 
 /* sb_rep.c */
 extern int SB_ReportEdit(void);

@@ -442,7 +442,7 @@ int B_DataRename(char* arg, int type)
  *  @params See file header 
  *  
  *  @return int     0 on success, 
- *                  -1 on error: object cannot be renamed
+ *                  -1 on error: object cannot be updated
  */
 
 int B_DataUpdate(char* arg, int type)
@@ -584,6 +584,46 @@ int B_DataUpdate(char* arg, int type)
  *  @return int     0 on success, 
  *                  -1 on error: object cannot be renamed
  */
+char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type)
+{
+    int     rc = 0;
+    char    **args = NULL, **lst, buf[81];
+    char    **K_grep();
+    KDB     *kdb = K_WS[type];
+
+    
+    if(word == 1) {
+        strcpy(buf, "*!");
+        SCR_strlcpy(buf + 2, name, 76);
+        strcat(buf, "!*");
+    }
+    else {
+        buf[0] = '*';
+        SCR_strlcpy(buf + 1, name, 76);
+        strcat(buf, "*");
+    }
+
+    return(K_grep(kdb, buf, ecase, names, forms, texts, '*'));
+}
+
+
+/**
+ *  Searches all objects containing a given string in their names and/or definitions.
+ *  
+ *  Syntax
+ *  ------
+ *      $DataSearch<type> mask word ecase in_name in_formula in_text list_result
+ *        (word, ecase, in_name, in_formula, in_text := 0 ou 1)
+ *        (mask := suite of chars or ?, *)
+ *        (list_result := name of the resulting list
+ *  
+ *  @see https://iode.plan.be/doku.php?id=datasearch for details
+ *  
+ *  @params See file header 
+ *  
+ *  @return int     0 on success, 
+ *                  -1 on error: object cannot be renamed
+ */
 int B_DataSearch(char* arg, int type)
 {
     int     rc = 0, word, ecase, names, forms, texts;
@@ -593,12 +633,14 @@ int B_DataSearch(char* arg, int type)
 
     args = B_vtom_chk(arg, 7); /* pattern list */
     if(args == NULL) return(-1);
+    
     word  = atoi(args[1]);
     ecase = atoi(args[2]);
     names = atoi(args[3]);
     forms = atoi(args[4]);
     texts = atoi(args[5]);
 
+/*
     SCR_strlcpy(buf + 1, args[0], 76);
     if(word == 1) {
         strcpy(buf, "*!");
@@ -612,6 +654,9 @@ int B_DataSearch(char* arg, int type)
     }
 
     lst = K_grep(kdb, buf, ecase, names, forms, texts, '*');
+*/
+    lst = B_DataSearchParms(args[0], word, ecase, names, forms, texts, type);
+  
     rc = KL_lst(args[6], lst, 200);
     SCR_free_tbl(lst);
 

@@ -23,8 +23,8 @@
  *      void B_A2mSaveMifParms()            Rewrites the Section "A2MMIF" of the iode.ini file with the current values of A2M* variables.
  *      void B_A2mGetGdiParms()             Reads the Section "A2MGDI" of the iode.ini file
  *      void B_A2mSaveGdiParms()            Rewrites the Section "A2MGDI" of the iode.ini file with the current values of A2M* variables.
- *      void K_load_iode_ini()              Reads all sections of iode.in related to A2M.
- *      void K_save_iode_ini()              Rewrites all sections of iode.in related to A2M  with the current values of A2M* variables.
+ *      void B_A2mGetAllParms()             Reads all sections of iode.in related to A2M.
+ *      void B_A2mSaveAllParms()            Rewrites all sections of iode.in related to A2M  with the current values of A2M* variables.
  *  
  *  
  *  List of global variables
@@ -397,6 +397,7 @@ void B_A2mGetGdiParms()
     char    buffer[512];
 
     // B_A2mGetGnlParms();
+    W_gdiask         = B_IniReadYN  ("A2MGDI", "PROMPT", 0);
     A2M_FONTSIZE     = B_IniReadNum ("A2MGDI", "FONTSIZE", 10);
     A2M_FONTFAMILY   = B_IniReadChar("A2MGDI", "FONTFAMILY", 'H');
     A2M_FONTINCR     = B_IniReadNum ("A2MGDI", "FONTINCR", 2);
@@ -456,6 +457,7 @@ void B_A2mSaveGdiParms()
                 W_gdiorient;              /* JMP 18-04-98 */
 
     // B_A2mGetGnlParms();
+    B_IniWriteYN  ("A2MGDI", "PROMPT",      W_gdiask);
     B_IniWriteNum ("A2MGDI", "FONTSIZE",    A2M_FONTSIZE   );
     B_IniWriteChar("A2MGDI", "FONTFAMILY",  A2M_FONTFAMILY );
     B_IniWriteNum ("A2MGDI", "FONTINCR",    A2M_FONTINCR   );
@@ -487,7 +489,7 @@ void B_A2mSaveGdiParms()
 /**
  *  Reads all sections of iode.in related to A2M.
  */
-void K_load_iode_ini()
+void B_A2mGetAllParms()
 {
     B_A2mGetGnlParms() ;
     B_A2mGetRtfParms() ;
@@ -503,7 +505,7 @@ void K_load_iode_ini()
 /**
  *  Rewrites all sections of iode.in related to A2M  with the current values of A2M* variables.
  */
-void K_save_iode_ini()
+void B_A2mSaveAllParms()
 {
     B_A2mSaveGnlParms() ;
     B_A2mSaveRtfParms() ;
