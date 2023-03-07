@@ -26,8 +26,11 @@ void Syntax()
     char    *IODE_DATA_DIR   = "..\\data";
     char    *IODE_OUTPUT_DIR = "..\\output";
 #else
-    char    *IODE_DATA_DIR   = "data";
-    char    *IODE_OUTPUT_DIR = "output";
+//    char    *IODE_DATA_DIR   = "..\\..\\api\\data";
+//    char    *IODE_OUTPUT_DIR = "..\\..\\api\\output";
+    char    *IODE_DATA_DIR   = "..\\data";
+    char    *IODE_OUTPUT_DIR = "..\\output";
+
 #endif
 
 // Fonctions annulées/remplacées temporairement pour passer le link
@@ -952,10 +955,10 @@ void Tests_Estimation()
     rc = KE_estim("ACAF", "1980Y1", "1996Y1");
     S4ASSERT(rc == 0, "Estimation : KE_estim(\"ACAF\", \"1980Y1\", \"1996Y1\")");
 
-    //x = U_test_calc_lec("_YRES[1980Y1]", 0);
+    //x = U_test_calc_lec("_YRES0[1980Y1]", 0);
     //printf("x = %lf\n", x);
     //x = fabs(x + 0.001150);
-    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES[1980Y1]", 0), -0.00115008), "Estimation : _YRES[1980Y1] == -0.001150");
+    S4ASSERT(U_test_eq(U_test_calc_lec("_YRES0[1980Y1]", 0), -0.00115008), "Estimation : _YRES0[1980Y1] == -0.001150");
     
     //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
     S4ASSERT(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815), "Estimation : R2 == 0.821815");
@@ -2612,7 +2615,7 @@ void U_test_init()
     IODE_assign_super_API();    // set *_super fn pointers
     // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub 
     K_init_ws(0);                       // Initialises 7 empty WS
-    K_load_iode_ini();
+    B_A2mGetAllParms();
     
 }
 
