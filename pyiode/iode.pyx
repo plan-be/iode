@@ -89,6 +89,7 @@ include "pyiode_print.pyx"
 include "pyiode_reports.pyx"
 include "pyiode_objs.pyx"
 include "pyiode_larray.pyx"
+include "pyiode_pandas.pyx"
 include "pyiode_wrt.pyx"
 
 

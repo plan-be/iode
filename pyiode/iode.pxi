@@ -16,6 +16,7 @@ import numpy as np
 cimport numpy as np
 import cython
 import larray as la
+import pandas as pd
  
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport printf

@@ -8,16 +8,17 @@
     - [Workspace management](#T2)
     - [Object management](#T3)
     - [Larray / IODE conversions](#T4)
-    - [Sample management](#T5)
-    - [LEC functions](#T6)
-    - [Identities execution](#T7)
-    - [Estimation](#T8)
-    - [Simulation](#T9)
-    - [Reports](#T10)
-    - [Print functions](#T11)
-    - [Write functions](#T12)
-    - [Utilities](#T13)
-    - [Utilities using C data types](#T14)
+    - [Pandas / IODE conversions](#T5)
+    - [Sample management](#T6)
+    - [LEC functions](#T7)
+    - [Identities execution](#T8)
+    - [Estimation](#T9)
+    - [Simulation](#T10)
+    - [Reports](#T11)
+    - [Print functions](#T12)
+    - [Write functions](#T13)
+    - [Utilities](#T14)
+    - [Utilities using C data types](#T15)
 
 # IODE: python module {#T1}
 
@@ -122,7 +123,14 @@
 |`ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> la.Array`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
 |`larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]`|Return the first and last time axis labels as a list of 2 strings|
 
-### Sample management {#T5}
+### Pandas / IODE conversions {#T5}
+
+|Syntax|Description|
+|:---|:---|
+|`df_to_ws(df_input: pd.DataFrame, time_axis_name: str = 'time')`|Copies DataFrame df\_input into IODE KV\_WS.|
+|`ws_to_df(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', time_as_floats: bool = False) -> pd.DataFrame`|Creates a DataFrame from the current KV\_WS content|
+
+### Sample management {#T6}
 
 |Syntax|Description|
 |:---|:---|
@@ -133,31 +141,31 @@
 |`ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = False) -> List[str]`|Return the current sample definition in a list|
 |`ws_sample_to_larray_axis(axis_name: str = 'time', per_from:str = '', per_to: str = '', as_floats: bool = False) -> la.Axis`|Return the current sample definition as an larray axis|
 
-### LEC functions {#T6}
+### LEC functions {#T7}
 
 |Syntax|Description|
 |:---|:---|
 |`exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]`|Compute a LEC formula using the current WS of VARs and SCLs|
 
-### Identities execution {#T7}
+### Identities execution {#T8}
 
 |Syntax|Description|
 |:---|:---|
 |`idt_execute(idt_list: Union(str, List[str]), sample: Union(str, List[str]), var_files: Union(str, List[str]), scl_files: Union(str, List[str]))`|Execute a list of identities on a given sample|
 
-### Estimation {#T8}
+### Estimation {#T9}
 
 |Syntax|Description|
 |:---|:---|
 |`eqs_estimate(eq_list, afrom:str, ato:str)`|Estimate an equation or a block of equations on the given sample.|
 
-### Simulation {#T9}
+### Simulation {#T10}
 
 |Syntax|Description|
 |:---|:---|
 |`model_simulate(sample_from: str, sample_to: str, eqs_list=None, endo_exo_list=None, eps: float = 0.0001, relax: float = 1.0, maxit: int = 100, init_values: int = KV_INIT_TM1, sort_algo: int = SORT_BOTH, nb_passes: int = 5, debug: int = 0, newton_eps: float = 1e-6, newton_maxit: int = 50, newton_debug: int = 0)`|Simulate a model|
 
-### Reports {#T10}
+### Reports {#T11}
 
 |Syntax|Description|
 |:---|:---|
@@ -171,7 +179,7 @@
 |`data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)`|Create or update an IODE scalar|
 |`data_update_var(varname:str, values, operation:str = "L", per_from:str = None)`|Create or update an IODE variable starting at a specified period|
 
-### Print functions {#T11}
+### Print functions {#T12}
 
 \!\! Not yet implemented \!\!
 
@@ -182,7 +190,7 @@
 |`print_obj_lec`|select the way LEC expressions are to be printed (coefficients replaced by values...)|
 |`print_obj_infos`|select informations to print|
 
-### Write functions {#T12}
+### Write functions {#T13}
 
 |Syntax|Description|
 |:---|:---|
@@ -198,7 +206,7 @@
 |`w_print_pg_header(arg: str = "")`|Define the page header as from the current page|
 |`w_print_pg_footer(arg: str = "")`|Define the page footer as from the current page|
 
-### Utilities {#T13}
+### Utilities {#T14}
 
 |Syntax|Description|
 |:---|:---|
@@ -209,7 +217,7 @@
 |`suppress_msgs()`|Suppress the output during an IODE session.|
 |`reset_msgs()`|Reset the normal output mechanism during an IODE session.|
 
-### Utilities using C data types {#T14}
+### Utilities using C data types {#T15}
 
 |Syntax|Description|
 |:---|:---|

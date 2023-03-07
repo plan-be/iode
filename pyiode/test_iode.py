@@ -8,6 +8,7 @@
 import iode
 import larray as la
 import numpy as np
+import pandas as pd
 
 # GLOBALS
 IODE_DATA_DIR = "../tests/data/"
@@ -114,7 +115,7 @@ def test_eq(title, expected, result):
 @cpu
 def test_iode_version():
     result = iode.version()
-    expected = "IODE Modeling Software 6.64 - (c) 1990-2023 Planning Office - Brussels"
+    expected = "IODE Modeling Software 6.64 - (c) 1990-2023 Federal Planning Bureau - Brussels"
     test_eq("iode.version()", expected, result)
 
 # WS FUNCTIONS
@@ -435,6 +436,47 @@ def test_iode_larray_to_ws_big_la():
     cpu_init()
     iode.ws_save_var(f"{IODE_OUTPUT_DIR}la3D_R5.var")
     cpu_end("Save WS" )
+
+# PANDAS FUNCTIONS
+# ----------------
+@cpu
+def test_iode_df_to_ws():
+    # Clear the WS
+    iode.ws_clear_all()
+
+    # Creating a new simple dataframe df
+    data = {"1991Y1": [0, 0.5, 1], "1992Y1": [2, 2.5, 3], "1993Y1": [4, 4.5, 5]}
+    index = ["AA", "BB", "CC"]
+    df = pd.DataFrame(data=data, index=index)
+    df.index.name = "vars"
+    df.columns.name = "time"
+
+    # Copying la1 to KV_WS
+    iode.df_to_ws(df)
+
+    # Check nb of objects
+    expected_nbvars = 3
+    nbvars = len(iode.ws_content_var("*"))
+    test_eq(f"iode.df_to_ws()", expected_nbvars, nbvars)
+
+    # Check values
+    AA = iode.get_var("AA")
+    test_eq(f"iode.df_to_ws()", 2.0, AA[1])
+
+def test_iode_ws_to_df():
+    # Clear the WS
+    iode.ws_load_var(f"{IODE_DATA_DIR}fun")
+    df = iode.ws_to_df()
+    
+    # Check nb of objects
+    expected_nbvars = 394
+    nbvars = len(df.index)
+    test_eq(f"iode.ws_to_df()", expected_nbvars, nbvars)
+
+    # Check values
+    value = df.loc["ACAF", "1990Y1"]
+    test_eq(f"iode.ws_to_df()", 23.771, value)
+
 
 
 # PYIODE_OBJECTS
@@ -1122,6 +1164,9 @@ test_iode_larray_to_ws_long_sample()
 test_iode_larray_to_ws_short_sample()
 test_iode_larray_to_ws_out_sample()
 test_iode_larray_to_ws_big_la()
+
+test_iode_df_to_ws()
+test_iode_ws_to_df()
 
 test_iode_ws_sample()
 
