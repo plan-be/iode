@@ -46,7 +46,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf4").value()) / 1e6, -0.008503);
 
     // result values
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES", "1980Y1")) / 1e6, -0.00115);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
 
     // Tests values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stdev").value()) / 1e6, 0.00427);
