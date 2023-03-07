@@ -193,7 +193,7 @@ char *IodeGetSampleAsString()
 char **IodeGetSampleAsPeriods() 
 {
     SAMPLE  *smpl = KSMPL(KV_WS);
-    char    **periods, *aper;
+    char    **periods;
     PERIOD	*per_t;
     int		t;
 
@@ -220,7 +220,7 @@ char **IodeGetSampleAsPeriods()
 char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
 {
     SAMPLE  *smpl;
-    char    **periods, *aper;
+    char    **periods;
     PERIOD	*per_t;
     int		t;
 
@@ -407,7 +407,6 @@ int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sampl
 {
     int     pos;
     SAMPLE  *smpl;
-    char    txt[80];
 
     pos = K_find(KE_WS, name);
     if(pos < 0) return(-1);
@@ -656,7 +655,6 @@ double *IodeGetVector(char *name, int *lg)
  
 int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg)
 {
-    int             pos, i;
     SAMPLE          *smpl = KSMPL(KV_WS);
     PERIOD          *per_la_from, 
                     *per_la_to;

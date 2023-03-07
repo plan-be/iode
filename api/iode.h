@@ -34,7 +34,7 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.64 - (c) 1990-2023 Planning Office - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.64 - (c) 1990-2023 Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR 6
 #define IODE_VERSION_MINOR 64
 #define K_VERSION  "1.0"

@@ -106,11 +106,11 @@ void E_tests2scl(EQ* eq, int j, int n, int k)
 /**
  *  Creates or replaces a VAR containing one result of a block estimation. 
  *  
- *  The created (or replaced) VAR name is name<eqnb>, for example 
+ *  The created (or replaced) VAR name is name<eqnb>, for example: 
  *  
  *      E_savevar("_YCALC", 2, E_RHS)
  *  
- *  creates _YCALC containing the RHS of the 2d equation in the estimated block.
+ *  creates _YCALC2 containing the RHS of equation number 2 (i.e. the third one) in the estimated block.
  *    
  *  That method allows the use of estimation results in reports.
  *   
@@ -123,10 +123,14 @@ static void E_savevar(char* name, int eqnb, MAT* mat)
 {
     int         t;
     IODE_REAL   *var; 
+    char        varname[80];
+    
+    // Varname = name{eqnb}. Ex: _YRES0, _YCALC1...
+    sprintf(varname, "%s%d", name, eqnb);              // JMP 1/3/2023
     
     // Create varname with NaN 
-    KV_add(name);
-    var = KVPTR(name);
+    KV_add(varname);
+    var = KVPTR(varname);
     if(var == NULL) return;
     
     // Copy mat to name from E_FROM to E_FROM + E_T
@@ -188,18 +192,14 @@ static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tes
  *      - equation tests : 
  *          - in the equations themselves (in eq->eq_tests)
  *          - in global scalars in the form e<eqnb>_<testname> (e.g.: e0_dw, e1_r2...)
- *      - vectors of calculated, observed and residual values in _YCALC, _YOBS and _YRES
- *      
- *  TODO: replace _YCALC by _YCALC_0, _YCALC_1... Idem for _YOBS and Y_RES. Currently, 
- *      if there is more than 1 eq in the estimation block, _YCALC, _YOBS and _YRES correspond 
- *      to the last equation of the block.
- *  
+ *      - vectors of calculated, observed and residual values in _YCALC0, _YOBS0 and _YRES0
+ *        
  *  TODO: what if no block is passed in the equation ? 
  *          There should still be a creation of scalars and vars (_YRES...).
  *  
  *  TODO: check why, if the block consists of n equations, we estimate n times
  *  the same block ? Bad programmation ? It seams like we should first create the block of equations,
- *  then the instruments from on eof the equations, then estimate and finally save the
+ *  then the instruments from one of the equations, then estimate and finally save the
  *  block, instr and methods in each equation. Only one estimation should be required.
  *  
  *  @param [in] KDB*    dbe     KDB of EQ
