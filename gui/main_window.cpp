@@ -177,6 +177,9 @@ bool MainWindow::openDirectory(const QString& dirPath)
     if (project_settings) delete project_settings;
     project_settings = new QSettings(qSettingsFilepath, QSettings::IniFormat);
 
+    // update current directory (chdir)
+    QDir::setCurrent(projectDir.absolutePath());
+
     // show File Explorer widget (in case it was hidden)
     dockWidget_file_explorer->show();
 
