@@ -64,7 +64,6 @@ protected:
 		M* table_model = static_cast<M*>(model());
 		table_model->filter(pattern);
 		update();
-		// QApplication::sendEvent(this, new QKeyEvent(QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier));
 	}
 
 public:
