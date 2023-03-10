@@ -134,7 +134,10 @@ void ReportEditor::run(const QString& filepath)
         output->setTextColor(Qt::darkBlue);
         output->append("\nRunning report " + filepath + " ...\n");
         output->setTextColor(Qt::black);
-        success = B_ReportExec(filepath.toStdString().data());
+        // We do not use B_ReportExec() because the user may have made some 
+        // modifications in the report editor which are not yet saved in the 
+        // report file
+        success = B_ReportLine(this->toPlainText().toStdString().data());
         if(success != 0)
             B_display_last_error();
     }
