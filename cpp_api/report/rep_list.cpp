@@ -11,11 +11,11 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
 {
     std::vector<std::string> func_list;
 
-    std::vector<std::string> v_types_short_upper;
-    for(std::string type_short: v_types_short)
+    std::vector<std::string> v_binary_ext_upper;
+    for(std::string type_short: v_binary_ext)
     {
         type_short[0] = toupper(type_short[0]);
-        v_types_short_upper.push_back(type_short);
+        v_binary_ext_upper.push_back(type_short);
     }
 
     std::vector<std::string> v_ext_upper;
@@ -50,7 +50,7 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
                 break;
             // ws type required: cmt, idt, ... (see k_ext.c)
             case 1:
-                for(const std::string& type_short: v_types_short_upper) func_list.push_back(func_name + type_short);
+                for(const std::string& type_short: v_binary_ext_upper) func_list.push_back(func_name + type_short);
                 break;
             // file extensions defined in k_ext.c
             case 2:
@@ -61,7 +61,7 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
                 if(gui)
                     func_list.push_back(func_name);
                 else
-                    for(const std::string& type_short: v_types_short_upper) func_list.push_back(func_name + type_short);
+                    for(const std::string& type_short: v_binary_ext_upper) func_list.push_back(func_name + type_short);
                 break;
             // file extensions defined in k_ext if non GUI, not required in GUI
             case 4:
