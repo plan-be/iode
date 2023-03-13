@@ -92,6 +92,12 @@ enum EnumIodeFile
 
 const static int I_NB_ENUM_FILE_EXT = 13;
 
+const static std::array<std::string, I_NB_ENUM_FILE_EXT> v_ext_names = 
+{ 
+    "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", 
+    "Report", "Text", "Logs", "Settings", "Any", "Directory"
+};
+
 // same as k_ext defined in k_objfile.c
 const static std::array<std::string, 26> v_ext = 
 {

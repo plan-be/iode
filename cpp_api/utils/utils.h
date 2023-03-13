@@ -107,6 +107,14 @@ inline void check_name(const std::string name, const EnumIodeType type)
         name + " is invalid.");
 }
 
+inline std::vector<std::string> get_extensions(const EnumIodeFile file_type)
+{
+    std::vector<std::string> ext;
+    for(const auto& [key, value]: mFileExtensions)
+        if(value == file_type) ext.push_back(key);
+    return ext;
+}
+
 inline EnumIodeFile get_iode_file_type(const std::string& filepath)
 {
     if (filepath.empty()) return I_ANY_FILE;
@@ -162,14 +170,12 @@ inline std::string check_file_exists(const std::string& filepath, const std::str
     return p_filepath.string();
 }
 
-inline std::string check_filepath(const std::string& filepath, const EnumIodeFile type, const std::string& caller_name, const bool file_must_exist)
+inline std::string check_filepath(const std::string& filepath, const EnumIodeFile file_type, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath = check_file(filepath, caller_name, file_must_exist);
 
     // get list of valid extensions
-    std::vector<std::string> expected_ext;
-    for(const auto& [key, value]: mFileExtensions)
-        if(value == type) expected_ext.push_back(key);
+    std::vector<std::string> expected_ext = get_extensions(file_type);
 
     // check or add extension
     std::filesystem::path p_filename = p_filepath.filename();
@@ -178,7 +184,7 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
         // check extension
         std::string ext = p_filename.extension().string();
         EnumIodeFile real_type = get_iode_file_type(filepath);
-        if (real_type != type)
+        if (real_type != file_type)
         {   
             std::string msg; 
             if(expected_ext.size() == 1)
@@ -198,12 +204,12 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
     }
     else
     {
-        if(type > I_VARIABLES_FILE) 
+        if(file_type > I_VARIABLES_FILE) 
             throw IodeExceptionFunction("Cannot run " + caller_name, 
                 "You must provide an extension for the file " + p_filepath.string());
 
         // set binary format extension
-        p_filepath = p_filepath.replace_extension(v_binary_ext[type]);
+        p_filepath = p_filepath.replace_extension(v_binary_ext[file_type]);
 
         // check if file exist
         if (file_must_exist)
@@ -213,13 +219,13 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
             // switch to ascii format extension and check if file exist 
             if (!binary_file_found)
             {
-                p_filepath = p_filepath.replace_extension(v_ascii_ext[type]);
+                p_filepath = p_filepath.replace_extension(v_ascii_ext[file_type]);
                 if (!std::filesystem::exists(p_filepath)) 
                 {
                     std::filesystem::path p_directory = p_filepath.parent_path();
                     std::string stem = p_filepath.stem().string();
                     throw IodeExceptionFunction("Cannot run " + caller_name, 
-                        "Neither " + stem + v_binary_ext[type] + " nor " + stem + v_ascii_ext[type] + 
+                        "Neither " + stem + v_binary_ext[file_type] + " nor " + stem + v_ascii_ext[file_type] + 
                         " could be found in directory " + p_directory.string());
                 }
             }
