@@ -202,12 +202,8 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
             throw IodeExceptionFunction("Cannot run " + caller_name, 
                 "You must provide an extension for the file " + p_filepath.string());
 
-        // NOTE: std::map are sorted, so ascii extensions are placed first !
-        std::string binary_ext = expected_ext[1];
-        std::string ascii_ext = expected_ext[0];
-            
         // set binary format extension
-        p_filepath = p_filepath.replace_extension(binary_ext);
+        p_filepath = p_filepath.replace_extension(v_binary_ext[type]);
 
         // check if file exist
         if (file_must_exist)
@@ -217,13 +213,13 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
             // switch to ascii format extension and check if file exist 
             if (!binary_file_found)
             {
-                p_filepath = p_filepath.replace_extension(ascii_ext);
+                p_filepath = p_filepath.replace_extension(v_ascii_ext[type]);
                 if (!std::filesystem::exists(p_filepath)) 
                 {
                     std::filesystem::path p_directory = p_filepath.parent_path();
                     std::string stem = p_filepath.stem().string();
                     throw IodeExceptionFunction("Cannot run " + caller_name, 
-                        "Neither " + stem + binary_ext + " nor " + stem + ascii_ext + 
+                        "Neither " + stem + v_binary_ext[type] + " nor " + stem + v_ascii_ext[type] + 
                         " could be found in directory " + p_directory.string());
                 }
             }
