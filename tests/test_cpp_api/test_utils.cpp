@@ -78,6 +78,30 @@ TEST_F(UtilsTest, getIodeFileType)
 
 	filename = input_test_dir + "fun.txt";
 	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.a2m";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.agl";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.prf";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.dif";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.mif";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.rtf";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.asc";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+
+	filename = input_test_dir + "fun.ref";
+	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
 }
 
 
@@ -93,6 +117,9 @@ TEST_F(UtilsTest, checkFilepath)
 	filepath = output_test_dir + "fun.eqs";
 	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "save", false), IodeExceptionFunction);
 
+	filepath = output_test_dir + "fun.docx";
+	EXPECT_THROW(check_filepath(filepath, I_TEXT_FILE, "save", false), IodeExceptionFunction);
+
 	// file does not exist
 	filepath = input_test_dir + "funxxx.cmt";
 	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "load", true), IodeExceptionFunction);
@@ -100,6 +127,10 @@ TEST_F(UtilsTest, checkFilepath)
 	// file does not exist (no extension given)
 	filepath = input_test_dir + "funxxx";
 	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "load", true), IodeExceptionFunction);
+
+	// No extension but not an IODE objects file
+	filepath = input_test_dir + "fun";
+	EXPECT_THROW(check_filepath(filepath, I_TEXT_FILE, "load", true), IodeExceptionFunction);
 
 	// extension added automatically
 	filepath = input_test_dir + "fun";
