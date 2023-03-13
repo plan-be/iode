@@ -116,14 +116,14 @@ inline EnumIodeFile get_iode_file_type(const std::string& filepath)
     if (!p_filepath.has_extension()) return I_ANY_FILE;
 
     std::string ext = p_filepath.extension().string();
-
-    int i = 0;
-    for (const IodeFileExtension& file_ext: vFileExtensions)
+    try
     {
-        if (ext == file_ext.ext || ext == file_ext.ascii) return (EnumIodeFile) i;
-        i++;
+        return mFileExtensions.at(ext);
     }
-    return I_ANY_FILE;
+    catch(const std::exception)
+    {
+        return I_ANY_FILE;
+    }
 }
 
 inline int get_iode_type(const std::string& iode_type_as_string)
@@ -166,25 +166,48 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
 {
     std::filesystem::path p_filepath = check_file(filepath, caller_name, file_must_exist);
 
+    // get list of valid extensions
+    std::vector<std::string> expected_ext;
+    for(const auto& [key, value]: mFileExtensions)
+        if(value == type) expected_ext.push_back(key);
+
     // check or add extension
     std::filesystem::path p_filename = p_filepath.filename();
-    IodeFileExtension expected_ext = vFileExtensions[type];
     if (p_filepath.has_extension())
     {
         // check extension
         std::string ext = p_filename.extension().string();
-        if ((ext != expected_ext.ext) && (ext != expected_ext.ascii)) throw IodeExceptionFunction("Cannot run " + caller_name, 
-            "File " + p_filename.string() + " has wrong extension " + ext + ". Expected extension is " + 
-            expected_ext.ext + " or " + expected_ext.ascii);
+        EnumIodeFile real_type = get_iode_file_type(filepath);
+        if (real_type != type)
+        {   
+            std::string msg; 
+            if(expected_ext.size() == 1)
+                msg = "Expected extension is " + expected_ext[0];
+            else
+            {
+                msg = "Expected extensions are: " + expected_ext[0]; 
+                for(int i=1; i < expected_ext.size(); i++) msg += ", " + expected_ext[i];
+            }
+            throw IodeExceptionFunction("Cannot run " + caller_name, 
+                "File " + p_filename.string() + " has wrong extension " + ext + "\n" + msg);
+        }
 
         // check if file exist
-        if (file_must_exist && !std::filesystem::exists(p_filepath)) throw IodeExceptionFunction("Cannot run " + caller_name, 
-            "File " + p_filepath.string() + " does not exist");
+        if (file_must_exist && !std::filesystem::exists(p_filepath)) 
+            throw IodeExceptionFunction("Cannot run " + caller_name, "File " + p_filepath.string() + " does not exist");
     }
     else
     {
+        if(type > I_VARIABLES_FILE) 
+            throw IodeExceptionFunction("Cannot run " + caller_name, 
+                "You must provide an extension for the file " + p_filepath.string());
+
+        // NOTE: std::map are sorted, so ascii extensions are placed first !
+        std::string binary_ext = expected_ext[1];
+        std::string ascii_ext = expected_ext[0];
+            
         // set binary format extension
-        p_filepath = p_filepath.replace_extension(expected_ext.ext);
+        p_filepath = p_filepath.replace_extension(binary_ext);
 
         // check if file exist
         if (file_must_exist)
@@ -194,13 +217,14 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
             // switch to ascii format extension and check if file exist 
             if (!binary_file_found)
             {
-                p_filepath = p_filepath.replace_extension(expected_ext.ascii);
+                p_filepath = p_filepath.replace_extension(ascii_ext);
                 if (!std::filesystem::exists(p_filepath)) 
                 {
                     std::filesystem::path p_directory = p_filepath.parent_path();
                     std::string stem = p_filepath.stem().string();
-                    throw IodeExceptionFunction("Cannot run " + caller_name, "Neither " + stem + expected_ext.ext + 
-                        " nor " + stem + expected_ext.ascii + " could be found in directory " + p_directory.string());
+                    throw IodeExceptionFunction("Cannot run " + caller_name, 
+                        "Neither " + stem + binary_ext + " nor " + stem + ascii_ext + 
+                        " could be found in directory " + p_directory.string());
                 }
             }
         }

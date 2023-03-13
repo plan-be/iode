@@ -89,15 +89,23 @@ enum EnumIodeFile
     I_DIRECTORY
 };
 
-const static int I_NB_FILE_EXT = 13;
+const static int I_NB_ENUM_FILE_EXT = 13;
 
 // same as k_ext defined in k_objfile.c
-const static std::array<std::string, 25> v_ext = 
+const static std::array<std::string, 26> v_ext = 
 {
     "cmt", "eqs", "idt", "lst", "scl", "tbl", "var",
     "ac",  "ae",  "ai",  "al",  "as",  "at",  "av",
     "rep", "a2m", "agl", "prf", "dif", "mif", "rtf",
-    "ps",  "asc", "txt", "csv"
+    "ref", "ps",  "asc", "txt", "csv"
+};
+
+const static int I_NB_TEXT_EXT = 9;
+
+const static std::array<std::string, I_NB_TEXT_EXT> v_text_ext = 
+{
+    "txt", "a2m", "agl", "prf", "dif", "mif", "rtf", 
+    "asc", "ref"
 };
 
 struct IodeFileExtension
@@ -107,22 +115,39 @@ struct IodeFileExtension
     std::string ascii;
 };
 
-const static std::array<IodeFileExtension, I_NB_FILE_EXT> vFileExtensions =
-{ {
-    {"Comments", ".cmt", ".ac"},
-    {"Equations", ".eqs", ".ae"},
-    {"Identities", ".idt", ".ai"},
-    {"Lists", ".lst", ".al"},
-    {"Scalars", ".scl", ".as"},
-    {"Tables", ".tbl", ".at"},
-    {"Variables", ".var", ".av"},
-    {"Reports", ".rep", ""},
-    {"Text", ".txt", ""},
-    {"Logs", ".log", ""},
-    {"Settings", ".ini", ""},
-    {"Any", "*", ""},
-    {"Directory", "", ""}
-} };
+// (iode objs) 14 + report (1) + any (1) + directory (1) = 17 
+// logs (1) + settings (1) + text (9) = 11
+const static int I_NB_FILE_EXT = 28;
+
+const static std::map<std::string, EnumIodeFile> mFileExtensions =
+{
+    {".cmt", I_COMMENTS_FILE},
+    {".ac",  I_COMMENTS_FILE},
+    {".eqs", I_EQUATIONS_FILE},
+    {".ae",  I_EQUATIONS_FILE},
+    {".idt", I_IDENTITIES_FILE},
+    {".ai",  I_IDENTITIES_FILE},
+    {".lst", I_LISTS_FILE},
+    {".al",  I_LISTS_FILE},
+    {".scl", I_SCALARS_FILE},
+    {".as",  I_SCALARS_FILE},
+    {".tbl", I_TABLES_FILE},
+    {".at",  I_TABLES_FILE},
+    {".var", I_VARIABLES_FILE},
+    {".av",  I_VARIABLES_FILE},
+    {".rep", I_REPORTS_FILE},
+    {".txt", I_TEXT_FILE},
+    {".a2m", I_TEXT_FILE},
+    {".rtf", I_TEXT_FILE},
+    {".ref", I_TEXT_FILE},
+    {".agl", I_TEXT_FILE},
+    {".prf", I_TEXT_FILE},
+    {".dif", I_TEXT_FILE},
+    {".mif", I_TEXT_FILE},
+    {".asc", I_TEXT_FILE},
+    {".log", I_LOGS_FILE},
+    {".ini", I_SETTINGS_FILE},
+};
 
 
 // TODO: replace K by I as below in C api + group them in an enum
