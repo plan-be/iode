@@ -18,6 +18,7 @@ class QIodeAbstractEditor: public AbstractTabWidget
 protected:
     QGridLayout* layout;
     TextEditor* editor;
+    QString filter;
 
 protected:
     void addEditorToLayout(int row);
@@ -36,11 +37,19 @@ public:
 
 class QIodeTextWidget : public QIodeAbstractEditor
 {
+    const static QStringList textExtensions;
+
 public:
     QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr) 
         : QIodeAbstractEditor(fileType, filepath, parent) 
     {
         editor = new TextEditor();
         addEditorToLayout(0);
+        filter = "Text files (*" + textExtensions.join(", *") + ")";
+    }
+
+    static bool isTextExtension(const QString& ext)
+    {
+        return textExtensions.contains(ext);
     }
 };
