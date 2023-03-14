@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QStringList>
 
 #include "utils.h"
 
@@ -95,12 +96,10 @@ public:
         {
             QString filename = fileInfo.fileName(); 
             QString ext = fileInfo.suffix();
+            QStringList expected_ext;
+            for(const std::string& ext_: get_extensions(fileType)) expected_ext << QString::fromStdString(ext_);
 
-            QString expected_ext = QString::fromStdString(vFileExtensions[fileType].ext);
-            if(!vFileExtensions[fileType].ascii.empty()) 
-                expected_ext += " or " + QString::fromStdString(vFileExtensions[fileType].ext);
-
-            QMessageBox::warning(nullptr, "Warning", "Expected file with extension " + expected_ext + "\n" +
+            QMessageBox::warning(nullptr, "Warning", "Expected file with extension " + expected_ext.join(" or ") + "\n" +
                 "But got file " + filename + " with extension " + ext);
             return false;
         }
