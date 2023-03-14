@@ -115,6 +115,8 @@ const static std::array<std::string, I_NB_TEXT_EXT> v_text_ext =
     "asc", "ref"
 };
 
+const static std::string report_ext = ".rep";
+
 // (iode objs) 14 + report (1) + any (1) + directory (1) = 17 
 // logs (1) + settings (1) + text (9) = 11
 const static int I_NB_FILE_EXT = 28;
