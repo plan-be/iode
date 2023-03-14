@@ -1,6 +1,17 @@
 #include "qiode_tab_text.h"
 
 
+static const QStringList initialize_text_extensions()
+{
+    QStringList textExt;
+    for(const auto& [key, value]: mFileExtensions)
+        if(value == I_TEXT_FILE) textExt << QString::fromStdString(key);
+    return textExt;
+}
+
+const QStringList QIodeTextWidget::textExtensions = initialize_text_extensions();
+
+
 QIodeAbstractEditor::QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
     : AbstractTabWidget(fileType, filepath, parent) 
 {   
@@ -72,7 +83,7 @@ QString QIodeAbstractEditor::save()
 
 QString QIodeAbstractEditor::saveAs_()
 {
-    QString newFilepath = QFileDialog::getSaveFileName(this, "Save As", nullptr, "Text files (*.txt, *.rtf, *.a2m)");
+    QString newFilepath = QFileDialog::getSaveFileName(this, "Save As", nullptr, filter);
     if(newFilepath.isEmpty()) return newFilepath;
     return save(newFilepath);
 }
