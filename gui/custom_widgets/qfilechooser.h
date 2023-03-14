@@ -37,12 +37,9 @@ private:
 	EnumIodeFile fileType;
 	EnumFileMode fileMode;
 
-	QString anyExt;
-
 public:
 	QIodeFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
-		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(I_ANY_FILE), fileMode(EXISTING_FILE), 
-		anyExt(QString::fromStdString(vFileExtensions[I_ANY_FILE].ext))
+		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(I_ANY_FILE), fileMode(EXISTING_FILE)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0, 0, 0, 0);
@@ -86,10 +83,17 @@ private slots:
 	void browse()
 	{
 		QString path = lineEdit->text();
-		IodeFileExtension expectedExt = vFileExtensions[fileType];
-		QString name = QString::fromStdString(expectedExt.name);
-		QString ext = QString::fromStdString(expectedExt.ext);
-		QString ascii = QString::fromStdString(expectedExt.ascii);
+		QString name = QString::fromStdString(v_ext_names[fileType]);
+		
+		QString filter; 
+		if(fileType != I_ANY_FILE)
+		{
+			filter = name + " (";
+			for(const std::string& ext: get_extensions(fileType))
+        		filter += "*" + QString::fromStdString(ext) + " ";
+			filter.chop(1);
+			filter += ")";
+		}
 
 		QString rootDir;
 		if (path.isEmpty())
@@ -101,7 +105,6 @@ private slots:
 		}
 
 		QString caption = name + " File";
-		QString filter = ext == anyExt ? QString() : name + " (*" + ext + " *" + ascii + ")";
 		if (fileMode == EXISTING_FILE)
 		{
 			if (fileType == I_DIRECTORY)
