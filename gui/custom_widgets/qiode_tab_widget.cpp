@@ -367,7 +367,7 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
         index = addTextTab(fileInfo, I_LOGS_FILE);
         break;
     default:
-        if (fileInfo.suffix() == "txt" || fileInfo.suffix() == "a2m") 
+        if(QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
             index = addTextTab(fileInfo, I_TEXT_FILE);
         else
         { 
@@ -375,6 +375,7 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
             index = -1;
         }
     }
+
     if (index < 0) return index;
 
     return index;
