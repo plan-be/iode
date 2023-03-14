@@ -104,7 +104,7 @@ private:
 		int iodeType = kdb->get_iode_type();
 		QString iodeTypeAsString = QString::fromStdString(vIodeTypes[iodeType]);
 
-		QString defaultFilename = QString(I_DEFAULT_FILENAME) + QString::fromStdString(vFileExtensions[iodeType].ext);
+		QString defaultFilename = QString(I_DEFAULT_FILENAME) + QString::fromStdString(v_binary_ext[iodeType]);
 		QString defaultFilepath = projectDir.absoluteFilePath(defaultFilename);
 
 		QWidget* mainwin = get_main_window_ptr();
