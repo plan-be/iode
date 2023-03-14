@@ -4,16 +4,16 @@
 #include <string>
 #include <memory>   // for the smart pointers
 
-#include <QObject>
-#include <QWidget>
-#include <QVariant>
-#include <QString>
-#include <QVector>
-#include <QList>
 #include <QMap>
 #include <QUrl>
 #include <QDir>
+#include <QList>
+#include <QObject>
+#include <QWidget>
+#include <QString>
+#include <QVector>
 #include <QDialog>
+#include <QVariant>
 #include <QSettings>
 #include <QCloseEvent>
 #include <QMessageBox>
