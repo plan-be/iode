@@ -3,6 +3,8 @@
 QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output, std::shared_ptr<QIodeCompleter>& completer, 
     QWidget* parent) : QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)
 {
+    filter = "IODE report files (*" + QString::fromStdString(report_ext) + ")";
+
     // spacer
     QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     layout->addItem(horizontalSpacer, 0, 0);
