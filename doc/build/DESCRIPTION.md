@@ -697,7 +697,7 @@ Functions to import and export IODE files to/from ascii and LArray\-csv format.
 
 ## Group "LEC language" {#T52}
 
-For the LEC implementation, see [lec.md](lec.md).
+For the LEC implementation, see [LEC.md](LEC.md).
 
 ### k\_lec.c {#T53}
 

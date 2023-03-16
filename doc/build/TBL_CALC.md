@@ -87,7 +87,7 @@ GSAMPLE compilation functions.
 |:---|:---|
 |`COLS *COL_cc(char* gsample)`|GSAMPLE compiler|
 |`int COL_free_cols(COLS* cls)`|Frees the allocated space for a COLS structure created by COL\_cc()|
-|`char *COL_text(COL* cl, char* str, int nbnames)`|Constructs a string based on a special table cell text value containing a "|
+|`char *COL_text(COL* cl, char* str, int nbnames)`|Constructs a string based on a special table cell text value containing a "\#"|
 |`COLS *COL_add_col(COLS* cls)`|Adds a new COL struct to the COLS (list of periods in a GSAMPLE)|
 |`int COL_find_mode(COLS* cls, int* mode, int type)`|Analyses a COLS struct and set 1 in the vector mode for each found operation|
 
