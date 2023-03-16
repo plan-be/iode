@@ -1,0 +1,96 @@
+====== IODE ======
+
+===== Documentation =====
+  * **Manual**
+    * [[manuel_de_l_utilisateur|Online Iode user's manual]]
+    *{{:download:iode.pdf |Iode manual in pdf format}}
+    *{{:download:iode.chm |Iode manual in chm format (Windows help)}}
+  * **PowerPoint presentations**
+    * {{:download:iode-ftb-2017.ppt|Iode for total beginners}}
+    * {{:download:iode_reports.pptx|Iode reports}}
+  * **Examples**
+    * {{:download:example_pack.zip|Fun model pack (zip file)}}
+    * {{:download:iode_2.zip|Miscalleneous examples pack (zip file)}}
+    * [[Other report examples]]
+
+===== Download =====
+Note that a **"New installation"** requires Administrator rights (file associations cannot be defined w/o Administrator privileges). An **"Upgrade"** can be installed by any user, provided that he has write access to the destination directory.
+
+  * 6.66 (16/03/2023) -> [[version_6dot_66|View log]]
+    *{{:download:iode666.exe|New installation}}
+    *{{:download:iode666upd.exe|Upgrade }}
+  * 6.65 (13/03/2023) -> [[version_6dot_65|View log]]
+    *{{:download:iode665.exe|New installation}}
+    *{{:download:iode665upd.exe|Upgrade }}
+  * 6.64 (27/02/2023) -> [[version_6dot_64|View log]]
+    *{{:download:iode664.exe|New installation}}
+    *{{:download:iode664upd.exe|Upgrade }}
+  * 6.63 (30/09/2020) -> [[version_6dot_63|View log]]
+    *{{:download:iode663.exe|New installation}}
+    *{{:download:iode663upd.exe|Upgrade }}
+  * 6.62 (29/05/2020) -> [[version_6dot_62|View log]]
+    *{{:download:iode662.exe|New installation}}
+    *{{:download:iode662upd.exe|Upgrade }}
+  * 6.61 (16/05/2019) -> [[version_6dot_61|View log]]
+    *{{:download:iode661.exe|New installation}}
+    *{{:download:iode661upd.exe|Upgrade }}
+  * 6.60 (11/04/2019) -> [[version_6dot_60|View log]]
+    *{{:download:iode660.exe|New installation}}
+    *{{:download:iode660upd.exe|Upgrade }}
+  * 6.59 (13/03/2019) -> [[version_6dot_59|View log]]
+    *{{:download:iode659.exe|New installation}}
+    *{{:download:iode659upd.exe|Upgrade }}
+  * 6.58 (20/01/2019) -> [[version_6dot_58|View log]]
+    *{{:download:iode658.exe|New installation}}
+    *{{:download:iode658upd.exe|Upgrade }}
+  * 6.57 (02/03/2018) -> [[version_6dot_57|View log]]
+    *{{:download:iode657.exe|New installation}}
+    *{{:download:iode657upd.exe|Upgrade }}
+  * 6.56 (27/01/2017) -> [[version_6dot_56|View log]]
+    *{{:download:iode656.exe|New installation}}
+    *{{:download:iode656upd.exe|Upgrade }}
+  * 6.55 (05/01/2017) -> [[version_6dot_55|View log]]
+    *{{:download:iode655.exe|New installation}}
+    *{{:download:iode655upd.exe|Upgrade }}
+  * 6.54 (22/08/2016) -> [[version_6dot_54|View log]]
+    *{{:download:iode654.exe|New installation}}
+    *{{:download:iode654upd.exe|Upgrade }}
+  * 6.53 (18/07/2016) -> [[version_6dot_53|View log]]
+    *{{:download:iode653.exe|New installation}}
+    *{{:download:iode653upd.exe|Upgrade }}
+  * 6.52 (21/06/2016) -> [[version_6dot_52|View log]]
+    *{{:download:iode652.exe|New installation}}
+    *{{:download:iode652upd.exe|Upgrade }}
+  * 6.51 (04/04/2016) -> [[version_6dot_51|View log]]
+  * 6.50 (25/01/2016) -> [[version_6dot_50|View log]]
+    *{{:download:iode650.exe|New installation}}
+    *{{:download:iode650upd.exe|Upgrade }}
+
+-> [[notes_techniques|View all logs]]
+
+===== IODE uses =====
+
+IODE is available for different usages :
+| iodecmd        | win32 software w/o interface : command line for running IODE scripts|
+| iode           | win32 software with graphic user interface |
+| PlanningCorner | restricted simulation software based on IODE objects with Windows interface|
+| iodecom        | COM object (for Excel, APL, VBA, ...)  |
+| wintramoseats  | VB.net software for seasonal adjustment  |
+
+===== IODE for python =====
+Note : these modules are only available for the latest IODE version.
+  *{{:download:py36:iode.pyd|iode.pyd for python3.6}}
+  *{{:download:py37:iode.pyd|iode.pyd for python3.7}}
+  *{{:download:py38:iode.pyd|iode.pyd for python3.8}}
+  *{{:download:py39:iode.pyd|iode.pyd for python3.9}}
+  *{{:download:py310:iode.pyd|iode.pyd for python3.10}}
+
+===== Syntax highlighter for .rep files =====
+  * {{:download:npp_iode.xml|Notepad++ : .rep files Syntax highlighter}}
+  * {{:download:ioderep.syn|TextPad : .rep files}}
+
+===== Tips & Tricks =====
+    * [[what_is_changed|What has changed]]: check what has changed after a simulation
+
+
+

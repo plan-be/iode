@@ -3,7 +3,7 @@
 #
 
 # Add source to this project's executable.
-set (DOCS DESCRIPTION.md LEC.md SIMUL.md TBL_CALC.md PRINTING.md CONVERSIONS.md ESTIM.md IDENTITIES.md REPORTS.md)
+# set (DOCS DESCRIPTION.md LEC.md SIMUL.md TBL_CALC.md PRINTING.md CONVERSIONS.md ESTIM.md IDENTITIES.md REPORTS.md)
 set (UTILS buf.c pack.c per.c yy.c)
 set (CCS k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c)
 set (OBJS k_vers.c k_objs.c k_objsv.c k_pack.c k_objfile.c k_xdr.c k_objvers.c k_kdb.c k_ws.c k_wsvar.c k_cmp.c k_val.c k_lec.c k_grep.c k_tbl.c k_eqs.c k_lst.c) 
@@ -49,7 +49,7 @@ set (HEADERS
 		iode.h iodebase.h iodeapi.h iodevarg.h
 )
 
-add_library (iodeapi STATIC ${SOURCES} ${HEADERS} ${DOCS})
+add_library (iodeapi STATIC ${SOURCES} ${HEADERS})
 
 # NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iodeapi.
 #       Option -Zp1 makes compilation of the Google Test lib to fail
