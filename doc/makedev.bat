@@ -5,6 +5,10 @@
 @echo off
 SETLOCAL
 
+:: Create ./build/dev
+if not exist build md build
+if not exist build\dev md build\dev
+
 :: Goto to src/dev dir
 cd src/dev
 
@@ -21,17 +25,17 @@ call :ConvertM_to_MD SIMUL.m
 call :ConvertM_to_MD SOURCES.m
 call :ConvertM_to_MD TBL_CALC.m
 
-move /Y CONVERSIONS.md ..\..\build
-move /Y DESCRIPTION.md ..\..\build
-move /Y ESTIM.md       ..\..\build
-move /Y IDENTITIES.md  ..\..\build
-move /Y LEC.md         ..\..\build
-move /Y MAKE_IODE.md   ..\..\build
-move /Y PRINTING.md    ..\..\build
-move /Y REPORTS.md     ..\..\build
-move /Y SIMUL.md       ..\..\build
-move /Y SOURCES.md     ..\..\build
-move /Y TBL_CALC.md    ..\..\build
+move /Y CONVERSIONS.md ..\..\build\dev
+move /Y DESCRIPTION.md ..\..\build\dev
+move /Y ESTIM.md       ..\..\build\dev
+move /Y IDENTITIES.md  ..\..\build\dev
+move /Y LEC.md         ..\..\build\dev
+move /Y MAKE_IODE.md   ..\..\build\dev
+move /Y PRINTING.md    ..\..\build\dev
+move /Y REPORTS.md     ..\..\build\dev
+move /Y SIMUL.md       ..\..\build\dev
+move /Y SOURCES.md     ..\..\build\dev
+move /Y TBL_CALC.md    ..\..\build\dev
 move /Y PYIODE.md      ..\..\..\pyiode
 
 ENDLOCAL
@@ -54,14 +58,14 @@ SETLOCAL
     echo -------------------------------------------
     copy %file_m% %file_o_m%
     :: Convert input ascii %file_m% to Code Page OEM850 (in place)
-    ..\..\bin\scr4w_a2o %file_o_m%
+    scr4w_a2o %file_o_m%
     
     :: Compile %file_o_m% and generate intermediate file "tmp.hlp" (scr4 format)
-	..\..\bin\scr4w_h -e ; -f . -wm -s -c %file_o_m% -o tmp.hlp
+	scr4w_h -e ; -f . -wm -s -c %file_o_m% -o tmp.hlp
     del %file_o_m%
     
     :: Translate tmp.hlp (scr4 help format) into tmp.a2m (scr4 a2m format)
-	..\..\bin\scr4w_hm -c ~ -e ; -it -i tmp.hlp -o tmp.a2m 
+	scr4w_hm -c ~ -e ; -it -i tmp.hlp -o tmp.a2m 
     del tmp.hlp
     
     :: Create tmp1.a2m by prepending some definitions (paragraphs...) to tmp.a2m
@@ -75,7 +79,7 @@ SETLOCAL
     ::@echo on
     
     :: Generate %file_md% from tmp1.a2m
-	..\..\bin\scr4w_amd -i tmp1.a2m -o %file_md% -toc 1 -paranum 0
+	scr4w_amd -i tmp1.a2m -o %file_md% -toc 1 -paranum 0
     del tmp1.a2m
     
     echo:

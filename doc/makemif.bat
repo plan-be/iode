@@ -18,12 +18,12 @@ set GDPI=140
 :: -----------------------------------------------------------------
 
 :: Compile iodemif1.m and generate the intermediate file "tmp.hlp" (scr4 help format)
-..\bin\scr4w_h -e ; -f . -wm -c iodewmif1.m -o tmp 
+scr4w_h -e ; -f . -wm -c iodewmif1.m -o tmp 
 
 :: Translate tmp.hlp (scr4 help format) into tmp.a2m (scr4 a2m format)
 :: Goto to src dir
 cd src
-..\bin\scr4w_hm -c ~ -i tmp -o tmp.a2m -t Manueldelutilisateur -it
+scr4w_hm -c ~ -i tmp -o tmp.a2m -t Manueldelutilisateur -it
 del tmp.hlp
 
 :: Create iodemif1.a2m by prepending some definitions (paragraphs...) to tmp.a2m
@@ -37,7 +37,7 @@ type tmp.a2m >> iodemif1.a2m
 del tmp.a2m
 @echo on
 :: Create iode1.mif from iodemif1.a2m
-..\bin\scr4w_af -gdpi %GDPI% -grect %GRECT% -gif2bmp -i iodemif1.a2m -o iode1.mif 
+scr4w_af -gdpi %GDPI% -grect %GRECT% -gif2bmp -i iodemif1.a2m -o iode1.mif 
 del iodemif1.a2m
 move /Y iode1.mif ..\build
 
@@ -46,10 +46,10 @@ move /Y iode1.mif ..\build
 :: -----------------------------------------------------------------
 
 :: Compile iodemif2.m and generate the intermediate file "tmp.hlp" (scr4 help format)
-..\bin\scr4w_h -e ; -f . -wm -c usermanmif2.m -o tmp 
+scr4w_h -e ; -f . -wm -c usermanmif2.m -o tmp 
 
 :: Translate tmp.hlp (scr4 help format) into tmp.a2m (scr4 a2m format)
-..\bin\scr4w_hm -c ~ -i tmp -o tmp.a2m -t Annexes1 -it
+scr4w_hm -c ~ -i tmp -o tmp.a2m -t Annexes1 -it
 del tmp.hlp
 
 :: Create iodemif2.a2m by prepending some definitions (paragraphs...) to tmp.a2m
@@ -64,7 +64,7 @@ del tmp.a2m
 
 :: Create iode1.mif from iodemif2.a2m
 @echo on
-..\bin\scr4w_af -gdpi %GDPI% -grect %GRECT% -gif2bmp -i iodemif2.a2m -o iode2.mif
+scr4w_af -gdpi %GDPI% -grect %GRECT% -gif2bmp -i iodemif2.a2m -o iode2.mif
 del iodemif2.a2m
 move /Y iode2.mif ..\build
 
