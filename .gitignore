@@ -378,6 +378,8 @@ keyboard_shortcuts.*
 
 # Others
 *.exp
-*.ini
+#*.ini
 *.bak
 *.prf
+*.$$$
+/tests/data/iode_gui_settings.ini
