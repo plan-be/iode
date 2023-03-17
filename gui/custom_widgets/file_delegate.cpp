@@ -39,6 +39,8 @@ void FileDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
 void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyleOptionViewItem itemOption(option);
+    // set file with modified content in blue
+    if (modifiedIndexes->contains(index)) itemOption.palette.setColor(QPalette::Text, QColor(Qt::blue));
     // set text items that have been cut in gray
     if (cutIndexes->contains(index)) itemOption.palette.setColor(QPalette::Text, QColor(Qt::gray));
     QStyledItemDelegate::paint(painter, itemOption, index);

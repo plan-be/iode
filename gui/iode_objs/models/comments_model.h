@@ -6,12 +6,12 @@
 #include "abstract_table_model.cpp"
 
 
-class CommentsModel : public IODEAbstractTableModel<KDBComments>
+class CommentsModel : public QIodeTemplateTableModel<KDBComments>
 {
 	Q_OBJECT
 
 public:
-	CommentsModel(QObject* parent = nullptr) : IODEAbstractTableModel({"Comment" }, parent) {};
+	CommentsModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Comment" }, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const override;

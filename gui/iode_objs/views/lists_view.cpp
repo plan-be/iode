@@ -4,6 +4,7 @@
 void ListsView::new_obj()
 {
 	QIodeAddList dialog(this);
-	dialog.exec();
+	if(dialog.exec() == QDialog::Accepted)
+		emit newObjectInserted();
 	filter_and_update();
 }

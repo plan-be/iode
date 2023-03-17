@@ -31,9 +31,14 @@ public:
         std::shared_ptr<QIodeCompleter>& completer, QWidget* parent = nullptr);
     ~QIodeReportWidget();
 
+signals:
+    void askComputeHash(bool);
+
 private slots:
     void run()
     {
+        emit askComputeHash(true);
         static_cast<ReportEditor*>(editor)->run(filepath);
+        emit askComputeHash(false);
     }
 };

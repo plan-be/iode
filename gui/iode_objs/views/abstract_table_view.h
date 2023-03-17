@@ -38,6 +38,9 @@ public:
 		this->project_settings_filepath = settings_filepath;
 	}
 
+signals:
+	void newObjectInserted();
+
 public slots:
 	void removeObjects();
 	void openEditorName(int section);

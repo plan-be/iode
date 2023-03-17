@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     connect(variablesView, &VariablesView::newPlot, this, &MainWindow::appendPlot);
     connect(variablesView, &VariablesView::newGraphsDialog, this, 
         &MainWindow::open_graphs_variables_dialog_from_vars_view);
+    connect(lineEdit_iode_command, &QIodeCommandLine::askComputeHash, tabWidget_IODE_objs, &QIodeTabWidget::computeHash);
 
     // ---- load project (if any) (if any) ----
     // first time launching the GUI -> ask the user to either start a new project 

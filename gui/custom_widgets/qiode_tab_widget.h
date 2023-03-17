@@ -62,6 +62,8 @@ class QIodeTabWidget: public QTabWidget
 
     QFileSystemWatcher* fileSystemWatcher;
 
+    QStringList filesList;
+
     QString projectDirPath;
     bool overwrite_all;
     bool discard_all;
@@ -79,30 +81,16 @@ class QIodeTabWidget: public QTabWidget
     QIodeVariablesWidget* tabVariables;
     QVector<AbstractIodeObjectWidget*> tabIodeObjects;
 
-private:
-    /**
-     * @brief build list of filepaths associated to tabs
-     * 
-     * @return QStringList list of open files
-     */
-    QStringList buildFilesList()
-    {
-        QStringList filesList;
-        AbstractTabWidget* tabWidget;
-        for (int i=0; i < this->count(); i++)
-        {
-            tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
-            filesList << tabWidget->getFilepath();
-        }
-        return filesList;
-    }
+signals:
+    void modificationChanged(const QString& filepath, const bool modified);
 
+private:
     /**
      * @brief update the paths (to directories and files) registered in the file system watcher.
      * 
      * @param projectDir QDir new project directory.      
      */
-    void updateFileSystemWatcher(const QDir& projectDir);
+    void resetFileSystemWatcher(const QDir& projectDir);
 
     /**
      * @brief add tab for editing reports.
@@ -148,6 +136,32 @@ private:
      * @return bool whether or not the method has succeeded.
      */
     bool saveTabContent(const int index);
+
+protected:
+    /**
+     * @brief This virtual handler is called AFTER a new tab was added or 
+     *        inserted at position index.
+     * 
+     * @param index 
+     */
+    void tabInserted(int index)
+    {
+        buildFilesList();
+        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        fileSystemWatcher->addPath(tabWidget->getFilepath());
+        QTabWidget::tabInserted(index);
+    }
+
+    /**
+     * @brief This virtual handler is called AFTER a tab was removed 
+     *        from position index
+     * 
+     * @param index 
+     */
+    void tabRemoved(int index)
+    {
+        buildFilesList();
+    }
 
 public:
     QIodeTabWidget(QWidget* parent = nullptr);
@@ -249,7 +263,59 @@ public:
         return tabVariables->get_view();
     }
 
+private slots:
+    /**
+     * @brief build the list of filepaths associated to open tabs
+     * 
+     * @return QStringList list of open files (tabs)
+     */
+    QStringList buildFilesList()
+    {
+        filesList.clear();
+        AbstractTabWidget* tabWidget;
+        for (int i=0; i < this->count(); i++)
+        {
+            tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
+            filesList << tabWidget->getFilepath();
+        }
+        return filesList;
+    }
+
 public slots:
+    /**
+     * @brief compute the hash of each database before/after executing 
+     *        a report command or an iode report.
+     *        If hash is different after report command/iode report, 
+     *        a databaseModified signal is emited.
+     * 
+     * @param before whether the hash is calculated before or after the 
+     *               execution of the report command/iode report.
+     */
+    void computeHash(const bool before=false)
+    {
+        tabComments->computeHash(before);
+        tabEquations->computeHash(before);
+        tabIdentites->computeHash(before);
+        tabLists->computeHash(before);
+        tabScalars->computeHash(before);
+        tabTables->computeHash(before);
+        tabVariables->computeHash(before);
+    }
+
+    /**
+     * @brief updates the tab name and emits the modificationChanged signal to be catched by the File Explorer.
+     * 
+     * @param filepath 
+     * @param modified 
+     */
+    void tabContentModified(const QString& filepath, const bool modified);
+
+    /**
+     * @brief Ask to save if modified then close the tab + remove path from the 
+     *        system file watcher.
+     * 
+     * @param index 
+     */
     void removeTab(const int index);
 
     /**
@@ -310,12 +376,12 @@ public slots:
         tabScalars->setProjectDir(projectDir);
         tabTables->setProjectDir(projectDir);
         tabVariables->setProjectDir(projectDir);
-        updateFileSystemWatcher(projectDir);
+        resetFileSystemWatcher(projectDir);
     }
 
     /**
      * @brief Method called when a user moves a file using the File Explorer.
-     *        Update the name and tooltip af tab associated with the renamed file if open.
+     *        Update the name and tooltip af tab associated with the file if open.
      * 
      * @param oldFilepath Previous filepath
      * @param newFilepath New filepath

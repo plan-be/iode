@@ -6,12 +6,12 @@
 #include "abstract_table_model.cpp"
 
 
-class TablesModel : public IODEAbstractTableModel<KDBTables>
+class TablesModel : public QIodeTemplateTableModel<KDBTables>
 {
 	Q_OBJECT
 
 public:
-	TablesModel(QObject* parent = nullptr) : IODEAbstractTableModel({"Table"}, parent) {};
+	TablesModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Table"}, parent) {};
 
 private:
 	QVariant dataCell(const int row, const int col) const override;
