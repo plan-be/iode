@@ -7,10 +7,10 @@ SETLOCAL
 cd src
 
 :: Compile readme.m and generate intermediate file "tmp.hlp" (scr4 format)
-..\bin\scr4w_h -e ; -f . -wm -c readme.m -o tmp.hlp
+scr4w_h -e ; -f . -wm -c readme.m -o tmp.hlp
 
 :: Translate tmp.hlp (hlp format) into tmp.a2m (a2m format)
-..\bin\scr4w_hm -c ~ -i tmp
+scr4w_hm -c ~ -i tmp
 
 :: Adds some informations (paragraph definitions...) at the top of the result file "tmp1.a2m"
 del tmp.hlp
@@ -19,11 +19,11 @@ echo .pardef pari html=3 bold=yes >> tmp1.a2m
 type tmp.a2m >> tmp1.a2m
 
 :: Generate tmp1.htm file (=tmp1.a2m in html) 
-..\bin\scr4w_ah -i tmp1.a2m -o tmp1.htm -fs 8 -title "IODE Last Updates" -style stylereadme.css -font T -strip 1
+scr4w_ah -i tmp1.a2m -o tmp1.htm -fs 8 -title "IODE Last Updates" -style stylereadme.css -font T -strip 1
 del tmp1.a2m
 
 :: Extract the TOC from tmp1.htm and save in toc.htm
-..\bin\scr4w_toc -i tmp1.htm -o toc.htm -l 1
+scr4w_toc -i tmp1.htm -o toc.htm -l 1
 
 :: Copy the template readme.ht1 into readme.htm
 copy readme.ht1 readme.htm

@@ -22,10 +22,10 @@ if not exist %WIKIDIR%\media       md %WIKIDIR%\media
 if not exist %WIKIDIR%\media\wiki   md %WIKIDIR%\media\wiki
 
 :: Compile iodew.m and generate intermediate file "tmp.hlp" (scr4 format)
-..\bin\scr4w_h -e ; -f . -wm -c iodew.m -o tmp 
+scr4w_h -e ; -f . -wm -c iodew.m -o tmp 
 
 :: Translate tmp.hlp (hlp format) into tmp.a2m (a2m format)
-..\bin\scr4w_hm -c ~ -i tmp -o tmp.a2m -t Manueldelutilisateur Notestechniques -it
+scr4w_hm -c ~ -i tmp -o tmp.a2m -t Manueldelutilisateur Notestechniques -it
 del tmp.hlp
 
 :: Adds some informations (paragraph definition...) on top of the final iode.a2m 
@@ -42,7 +42,7 @@ del tmp.a2m
 if not exist tmp md tmp
 cd tmp
 move /Y ..\iode.a2m .
-..\..\bin\scr4w_ad -gif2bmp -autolink 1 -paranum 0 -i iode.a2m  -title IODE -ini ..\doku.ini -toc 2
+scr4w_ad -gif2bmp -autolink 1 -paranum 0 -i iode.a2m  -title IODE -ini ..\doku.ini -toc 2
 del iode.a2m
 cd ..
 
