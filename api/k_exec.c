@@ -365,9 +365,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp)
     else return(-3);
 
     if(KEXEC_TRACE) {
-        // filename = KNAMEPTR(dbv_tmp);
-        //W_printfEx(1, ".par1 enum_1\nFile %s : ", KNAMEPTR(dbv_tmp)); /* JMP 19-10-99 */
-        W_printfDbl(".par1 enum_1\nFile %s : ", KNAMEPTR(dbv_tmp)); /* JMP 19-10-99 */
+        W_printfDbl(".par1 enum_1\nFile %s : ", KNAMEPTR(dbv_tmp)); 
     }    
     for(j = 0 ; j < KNB(dbv); j++) {
         if(KSOVAL(dbv, j) != 0) continue;  /* series already present */

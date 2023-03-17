@@ -70,7 +70,8 @@ void B_A2mGetGnlParms()
     A2M_ESCCH   = B_IniReadChar("A2MGNL", "ESC", '\\');     // See https://iode.plan.be/doku.php?id=caracteres_reserves
     A2M_DEFCH   = B_IniReadChar("A2MGNL", "DEF", '&');      // Id.
     A2M_CMDCH   = B_IniReadChar("A2MGNL", "CMD", '.');      // Id.
-    A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '@');      // id.
+    //A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '@');      // id.
+    A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '&');      // id.
     KT_sep = A2M_SEPCH;                                     // JMP 1/5/2022
 
     A2M_LFON    = B_IniReadYN("A2MGNL", "LFON",   0);       // Keep special chars (carriage return, linefeed). See https://iode.plan.be/doku.php?id=blancs_et_sauts_de_lignes

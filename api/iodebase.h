@@ -1958,7 +1958,8 @@ extern int W_EndDisplay(char *title,int x,int y,int w,int h);
 // extern int W_SetPrinterSettings();
 extern int W_printf(char *fmt,...);
 extern int W_printfDbl(char* fmt, ...);
-extern int W_printfEx(int dup, char *fmt, va_list args);
+extern int W_printfRepl(char* fmt, ...);
+extern int W_printfEx(int dup, int ch1, int ch2, char *fmt, va_list args);
 
 // interface
 extern U_ch  *T_mmt_edit(U_ch *, int , int , int , int );

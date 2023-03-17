@@ -138,6 +138,6 @@ void W_print_rtf_topic(char* arg)
 void W_print_tb(char* title, int nc)
 {
     W_printf(".tb %d\n", nc);
-    W_printf(".sep &\n");
+    W_printf(".sep %c\n", A2M_SEPCH);
     W_printf(".ttitle %s\n", title);
 }
