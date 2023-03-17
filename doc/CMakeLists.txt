@@ -109,4 +109,4 @@ set (BINS
     bin/scr4w_o2a.exe bin/scr4w_a2o.exe
 )
 
-add_custom_target(doc ALL SOURCES ${MAN_SOURCES} ${DEV_SOURCES} ${PNGS} ${JPEGS} ${GIFS} ${CSS} ${SCRIPTS} ${MISC} ${BINS})
+add_custom_target(doc ALL SOURCES ${MAN_SOURCES} ${DEV_SOURCES} ${PNGS} ${JPEGS} ${GIFS} ${CSS} ${SCRIPTS} ${MISC})
