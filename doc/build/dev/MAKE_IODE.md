@@ -321,11 +321,12 @@ set PYIODE_DIR=%IODE_DIR%/pyiode
 set WIKI_DIR=/apache24/htdocs/w-iode
  
 :: Ouverture et mode
-echo open ftp.cluster011.ovh.net > upload_iode_ovh.ftp
-echo ibfpbevvwp>> upload_iode_ovh.ftp
-echo dVz5Rc6VMhQH>> upload_iode_ovh.ftp
-echo binary>> upload_iode_ovh.ftp
-echo prompt>> upload_iode_ovh.ftp
+echo open ftp.cluster011.ovh.net    > upload_iode_ovh.ftp
+echo ibfpbevvwp                     >> upload_iode_ovh.ftp
+echo <ibfp password, cfr DvdW>    >> upload_iode_ovh.ftp
+echo binary                         >> upload_iode_ovh.ftp
+echo prompt                         >> upload_iode_ovh.ftp
+ 
  
 ::goto pages
  
