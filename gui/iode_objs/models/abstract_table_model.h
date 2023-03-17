@@ -13,6 +13,7 @@
 
 #include "utils.h"
 #include "custom_widgets/qfilechooser.h"
+#include <boost/functional/hash.hpp>
 
 
 /* NOTE FOR THE DEVELOPPERS:
@@ -27,26 +28,51 @@
  */
 
 
-template <class K> class IODEAbstractTableModel : public QAbstractTableModel
+class QIodeAbstractTableModel : public QAbstractTableModel
 {
+	Q_OBJECT
+
 protected:
-	K* kdb;
 	QVector<QString> columnNames;
+	size_t hashBefore;
+	size_t hashAfter;	
+
+signals:
+	void databaseModified();
 
 public:
-	IODEAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : QAbstractTableModel(parent),
-		kdb(new K()), columnNames(columnNames) {}
+	QIodeAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
+		QAbstractTableModel(parent), columnNames(columnNames) {}
 
-	~IODEAbstractTableModel() { delete kdb; }
-
-	int rowCount(const QModelIndex& parent = QModelIndex()) const override
-	{
-		return kdb->count();
-	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override
 	{
 		return columnNames.size();
+	}
+
+protected:
+	void resetModel()
+	{
+		beginResetModel();
+		endResetModel();
+	}
+};
+
+
+template <class K> class QIodeTemplateTableModel : public QIodeAbstractTableModel
+{
+protected:
+	K* kdb;
+
+public:
+	QIodeTemplateTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
+		QIodeAbstractTableModel(columnNames, parent), kdb(new K()) {}
+
+	~QIodeTemplateTableModel() { delete kdb; }
+
+	int rowCount(const QModelIndex& parent = QModelIndex()) const override
+	{
+		return kdb->count();
 	}
 
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -69,13 +95,20 @@ public:
 
 	QString saveAs(const QDir& projectDir);
 
-protected:
-	void resetModel()
+	void computeHash(const bool before=false)
 	{
-		beginResetModel();
-		endResetModel();
+		boost::hash<K> kdb_hasher;
+		if(before)
+    		hashBefore = kdb_hasher(*kdb);
+		else
+		{
+			hashAfter = kdb_hasher(*kdb);
+			if(hashAfter != hashBefore) 
+				emit databaseModified();
+		}
 	}
 
+protected:
 	virtual QVariant dataCell(const int row, const int col) const = 0;
 
 	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }

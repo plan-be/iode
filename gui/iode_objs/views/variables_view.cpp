@@ -19,7 +19,8 @@ void VariablesView::new_obj()
 	}
 
 	QIodeAddVariable dialog(this);
-	dialog.exec();
+	if(dialog.exec() == QDialog::Accepted)
+		emit newObjectInserted();
 	filter_and_update();
 }
 

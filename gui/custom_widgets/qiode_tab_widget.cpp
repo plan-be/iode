@@ -41,6 +41,14 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     tabTables = new QIodeTablesWidget(I_TABLES, this);
     tabVariables = new QIodeVariablesWidget(I_VARIABLES, this);
 
+    connect(tabComments, &QIodeCommentsWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(tabEquations, &QIodeEquationsWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(tabIdentites, &QIodeIdentitiesWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(tabLists, &QIodeListsWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(tabScalars, &QIodeScalarsWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(tabTables, &QIodeTablesWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(tabVariables, &QIodeVariablesWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+
     tabIodeObjects.append(tabComments);
     tabIodeObjects.append(tabEquations);
     tabIodeObjects.append(tabIdentites);
@@ -48,6 +56,9 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     tabIodeObjects.append(tabScalars);
     tabIodeObjects.append(tabTables);
     tabIodeObjects.append(tabVariables);
+
+    // rebuild the list of files (tabs) everytime a tab is moved
+    connect(this->tabBar(), &QTabBar::tabMoved, this, &QIodeTabWidget::buildFilesList);
 }
 
 QIodeTabWidget::~QIodeTabWidget()
@@ -216,15 +227,11 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath,
     this->show();
 }
 
-void QIodeTabWidget::updateFileSystemWatcher(const QDir& projectDir)
+void QIodeTabWidget::resetFileSystemWatcher(const QDir& projectDir)
 {
     // remove all previously registered directories and files
     fileSystemWatcher->removePaths(fileSystemWatcher->directories());
     fileSystemWatcher->removePaths(fileSystemWatcher->files());
-
-    // register sub-directories and files of the new project directory
-    QStringList paths = SystemItem(QFileInfo(projectDir.absoluteFilePath(""))).recursiveEntryList();
-    fileSystemWatcher->addPaths(paths);
 }
 
 void QIodeTabWidget::resetFilters()
@@ -327,6 +334,8 @@ int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
     QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), output, completer, this);
     int index = this->addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
+    connect(reportWidget, &QIodeReportWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
+    connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &QIodeTabWidget::computeHash);
     return index;
 }
 
@@ -336,6 +345,7 @@ int QIodeTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iod
     QIodeTextWidget* textWidget = new QIodeTextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
     int index = this->addTab(textWidget, textWidget->getTabText());
     setTabToolTip(index, textWidget->getTooltip());
+    connect(textWidget, &QIodeTextWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
     return index;
 }
 
@@ -346,10 +356,6 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
 
     QWidget* mainwin = get_main_window_ptr();
     QString fullPath = fileInfo.absoluteFilePath();
-
-    // Note: rebuild list of open files (= tabs) since users can move tabs
-    //       and then change the value returned by indexOf()
-    QStringList filesList = buildFilesList();
 
     // Note: indexOf() returns -1 if not found
     int index = filesList.indexOf(fullPath);
@@ -381,8 +387,38 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
     return index;
 }
 
+
+void QIodeTabWidget::tabContentModified(const QString& filepath, const bool modified)
+{
+    // update tab text
+    int index = filesList.indexOf(filepath);
+    if(index < 0) return;
+
+    AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
+    setTabText(index, tabWidget->getTabText());
+    emit modificationChanged(filepath, modified);
+}
+
 void QIodeTabWidget::removeTab(const int index)
 {
+    // ask to save if modified
+    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+    if(tabWidget->isModified())
+    {
+        QString filepath = tabWidget->getFilepath();
+        QString msg = "Unsaved modifications.\n";
+        msg+= "Would you like to save modifications to " + filepath + " before closing the tab?";
+        QMessageBox::StandardButton answer = QMessageBox::warning(get_main_window_ptr(), "WARNING", msg, 
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
+        if(answer == QMessageBox::Yes) tabWidget->save();
+        if(answer == QMessageBox::No) tabContentModified(filepath, false);
+        if(answer == QMessageBox::Discard) return;
+    }
+
+    // remove the path from the system file watcher
+    fileSystemWatcher->removePath(tabWidget->getFilepath());
+
+    // close the tab
     QTabWidget::removeTab(index);
 }
 
@@ -431,8 +467,7 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
 	}
 
     // check if file already loaded
-    QStringList tabs = buildFilesList();
-    if(tabs.indexOf(fullPath) >= 0)
+    if(filesList.indexOf(fullPath) >= 0)
         return -1;
 
     // load file
@@ -478,8 +513,7 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
 void QIodeTabWidget::reloadFile(const QString& filepath)
 {
 	// find index of corresponding tab
-	QStringList tabs = buildFilesList();
-	int index = tabs.indexOf(filepath);
+	int index = filesList.indexOf(filepath);
 	if(index < -1)
 		return;
 
@@ -560,16 +594,21 @@ bool QIodeTabWidget::saveProjectAs(QDir& newProjectDir)
 void QIodeTabWidget::fileMoved(const QString &oldFilepath, const QString &newFilepath)
 {
     // check if oldFilePath present in currently open tabs
-    QStringList tabs = buildFilesList();
-    int index = tabs.indexOf(oldFilepath);
+    int index = filesList.indexOf(oldFilepath);
     if (index >= 0)
     {
         AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-        // update filename in widget
+        // update filepath in widget
         if(!tabWidget->updateFilepath(newFilepath))
             return;
         // update name and tooltip of corresponding tab
         setTabText(index, tabWidget->getTabText());
         setTabToolTip(index, tabWidget->getTooltip());
+        // update list of open files (tabs)
+        filesList[index] = newFilepath;
     }
+
+    // update file system watcher
+    fileSystemWatcher->removePath(oldFilepath);
+    fileSystemWatcher->addPath(newFilepath);
 }

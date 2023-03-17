@@ -13,9 +13,11 @@
 class FileDelegate : public QStyledItemDelegate
 {
     QModelIndexList* cutIndexes;
+    QModelIndexList* modifiedIndexes;
 
 public:
-    FileDelegate(QModelIndexList* cutIndexes, QObject *parent = nullptr) : QStyledItemDelegate(parent), cutIndexes(cutIndexes) {}
+    FileDelegate(QModelIndexList* cutIndexes, QModelIndexList* modifiedIndexes, QObject *parent = nullptr) : 
+        QStyledItemDelegate(parent), cutIndexes(cutIndexes), modifiedIndexes(modifiedIndexes) {}
 
 	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index);
 

@@ -24,6 +24,8 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
     addEditorToLayout(1);
 
     // ---- Signals and Slots ----
+    connect(editor, &TextEditor::modificationChanged, this, &QIodeReportWidget::setModified);
+
     runShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_R), this);
     connect(runShortcut, &QShortcut::activated, this, &QIodeReportWidget::run);
 

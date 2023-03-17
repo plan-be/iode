@@ -132,11 +132,19 @@ public:
 
     virtual void clearKDB() = 0;
     virtual void resetFilter() = 0;
+    virtual void computeHash(const bool before=false) = 0;
+
+public slots:
+    void KDBModified()
+    {
+        setModified(true);
+    }
 };
 
 
 template <class M, class V> class QIodeObjectWidget: public AbstractIodeObjectWidget
 {
+protected:
     M* objmodel;
     V* tableview;
     QDir projectDir;
@@ -217,53 +225,121 @@ public:
 
     QString save()
     {
-        return objmodel->save(projectDir);
+        if(isUnsavedDatabase()) 
+            return saveAs();
+        else
+        {
+            QString filepath = objmodel->save(projectDir);
+            if(!filepath.isEmpty()) setModified(false);
+            return filepath;
+        }
     }
 
     QString saveAs_()
     {
         return objmodel->saveAs(projectDir);
     }
+
+    void computeHash(const bool before=false)
+    {
+        objmodel->computeHash(before);
+    }
 };
 
 class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeCommentsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::KDBModified);
+        connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::KDBModified);
+        connect(objmodel, &CommentsModel::rowsInserted, this, &QIodeCommentsWidget::KDBModified);
+        connect(objmodel, &CommentsModel::rowsRemoved, this, &QIodeCommentsWidget::KDBModified);
+        connect(objmodel, &CommentsModel::databaseModified, this, &QIodeCommentsWidget::KDBModified);
+        connect(tableview, &CommentsView::newObjectInserted, this, &QIodeCommentsWidget::KDBModified);
+    }
 };
 
 class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeEquationsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::KDBModified);
+        connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::KDBModified);
+        connect(objmodel, &EquationsModel::rowsInserted, this, &QIodeEquationsWidget::KDBModified);
+        connect(objmodel, &EquationsModel::rowsRemoved, this, &QIodeEquationsWidget::KDBModified);
+        connect(objmodel, &EquationsModel::databaseModified, this, &QIodeEquationsWidget::KDBModified);
+        connect(tableview, &EquationsView::newObjectInserted, this, &QIodeEquationsWidget::KDBModified);
+    }
 };
 
 class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeIdentitiesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::KDBModified);
+        connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::KDBModified);
+        connect(objmodel, &IdentitiesModel::rowsInserted, this, &QIodeIdentitiesWidget::KDBModified);
+        connect(objmodel, &IdentitiesModel::rowsRemoved, this, &QIodeIdentitiesWidget::KDBModified);
+        connect(objmodel, &IdentitiesModel::databaseModified, this, &QIodeIdentitiesWidget::KDBModified);
+        connect(tableview, &IdentitiesView::newObjectInserted, this, &QIodeIdentitiesWidget::KDBModified);
+    }
 };
 
 class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeListsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::KDBModified);
+        connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::KDBModified);
+        connect(objmodel, &ListsModel::rowsInserted, this, &QIodeListsWidget::KDBModified);
+        connect(objmodel, &ListsModel::rowsRemoved, this, &QIodeListsWidget::KDBModified);
+        connect(objmodel, &ListsModel::databaseModified, this, &QIodeListsWidget::KDBModified);
+        connect(tableview, &ListsView::newObjectInserted, this, &QIodeListsWidget::KDBModified);
+    }
 };
 
 class QIodeScalarsWidget : public QIodeObjectWidget<ScalarsModel, ScalarsView>
 {
 public:
-    QIodeScalarsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeScalarsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &ScalarsModel::dataChanged, this, &QIodeScalarsWidget::KDBModified);
+        connect(objmodel, &ScalarsModel::headerDataChanged, this, &QIodeScalarsWidget::KDBModified);
+        connect(objmodel, &ScalarsModel::rowsInserted, this, &QIodeScalarsWidget::KDBModified);
+        connect(objmodel, &ScalarsModel::rowsRemoved, this, &QIodeScalarsWidget::KDBModified);
+        connect(objmodel, &ScalarsModel::databaseModified, this, &QIodeScalarsWidget::KDBModified);
+        connect(tableview, &ScalarsView::newObjectInserted, this, &QIodeScalarsWidget::KDBModified);
+    }
 };
 
 class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeTablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::KDBModified);
+        connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::KDBModified);
+        connect(objmodel, &TablesModel::rowsInserted, this, &QIodeTablesWidget::KDBModified);
+        connect(objmodel, &TablesModel::rowsRemoved, this, &QIodeTablesWidget::KDBModified);
+        connect(objmodel, &TablesModel::databaseModified, this, &QIodeTablesWidget::KDBModified);
+        connect(tableview, &TablesView::newObjectInserted, this, &QIodeTablesWidget::KDBModified);
+    }
 };
 
 class QIodeVariablesWidget : public QIodeObjectWidget<VariablesModel, VariablesView>
 {
 public:
-    QIodeVariablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) {}
+    QIodeVariablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    {
+        connect(objmodel, &VariablesModel::dataChanged, this, &QIodeVariablesWidget::KDBModified);
+        connect(objmodel, &VariablesModel::headerDataChanged, this, &QIodeVariablesWidget::KDBModified);
+        connect(objmodel, &VariablesModel::rowsInserted, this, &QIodeVariablesWidget::KDBModified);
+        connect(objmodel, &VariablesModel::rowsRemoved, this, &QIodeVariablesWidget::KDBModified);
+        connect(objmodel, &VariablesModel::databaseModified, this, &QIodeVariablesWidget::KDBModified);
+        connect(tableview, &VariablesView::newObjectInserted, this, &QIodeVariablesWidget::KDBModified);
+    }
 };

@@ -17,7 +17,7 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     for (int i = 1; i < fileSystemModel->columnCount(); ++i) this->hideColumn(i);
 
     // delegate (for renaming files and directories)
-    this->setItemDelegate(new FileDelegate(&cutIndexes, parent));
+    this->setItemDelegate(new FileDelegate(&cutIndexes, &modifiedIndexes, parent));
 
     // selection -> see main_window.ui
     // Selection mode = ExtendedSelection which means:
@@ -101,6 +101,7 @@ QIodeFileExplorer::~QIodeFileExplorer()
 
     itemsToPast.clear();
     cutIndexes.clear();
+    modifiedIndexes.clear();
 
     delete contextMenuDirectory;
     delete contextMenuFile;
@@ -349,13 +350,6 @@ void QIodeFileExplorer::openFile(const QModelIndex &index)
 
 // ---- SLOTS ----
 
-/**
- * @brief See Qt documentation of onCustomContextMenu.
- *        Overrided method.
- * @note A context Menu is a menu display when the user right clicks somewhere
- * 
- * @param point Position where the user right clicked
- */
 void QIodeFileExplorer::onCustomContextMenu(const QPoint& point)
 {
     QMenu* contextMenuCurrent;
@@ -369,6 +363,19 @@ void QIodeFileExplorer::onCustomContextMenu(const QPoint& point)
     }
     else contextMenuCurrent = contextMenuExplorer;
     contextMenuCurrent->exec(globalPoint);
+}
+
+void QIodeFileExplorer::fileContentModified(const QString& filepath, const bool modified)
+{
+    QModelIndex index = proxyModel->index(filepath);
+    if(!index.isValid()) return;
+    
+    if(modified)
+        modifiedIndexes << index;
+    else
+        modifiedIndexes.removeAll(index);
+
+    this->viewport()->repaint();
 }
 
 void QIodeFileExplorer::createFile()

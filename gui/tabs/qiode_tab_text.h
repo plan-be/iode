@@ -46,6 +46,8 @@ public:
         editor = new TextEditor();
         addEditorToLayout(0);
         filter = "Text files (*" + textExtensions.join(", *") + ")";
+
+        connect(editor, &TextEditor::modificationChanged, this, &QIodeTextWidget::setModified);
     }
 
     static bool isTextExtension(const QString& ext)

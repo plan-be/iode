@@ -91,6 +91,7 @@ class QIodeFileExplorer : public QTreeView
     QModelIndex indexContextMenu;
     QModelIndex indexRename;
     QModelIndexList cutIndexes;
+    QModelIndexList modifiedIndexes;
     QList<SystemItem> itemsToPast;
 
 private:
@@ -256,6 +257,8 @@ public:
         connect(this, &QIodeFileExplorer::fileMoved, tabWidget, &QIodeTabWidget::fileMoved);
         // to update filepath, name and tooltip of corresponding tab when a file is renamed
         connect(fileSystemModel, &QFileSystemModel::fileRenamed, tabWidget, &QIodeTabWidget::fileRenamed);
+        // to set corresponding file in color when its content is modified (and not yet saved to file)
+        connect(tabWidget, &QIodeTabWidget::modificationChanged, this, &QIodeFileExplorer::fileContentModified);
     }
 
     /**
@@ -271,10 +274,24 @@ signals:
 
 public slots:
     /**
-     * @brief pops up either directory or file context menu depending on the item selected
+     * @brief pops up either directory or file context menu depending on the item selected.
      * 
+     * @note A context Menu is a menu display when the user right clicks somewhere.
+     *       See Qt documentation of onCustomContextMenu.
+     *       Overrided method.
+     * 
+     * @param point Position where the user right clicked
      */
     void onCustomContextMenu(const QPoint& point);
+
+    /**
+     * @brief set item in color when a user modifies the content of the associated database 
+     *        or text/report file in tabs.
+     * 
+     * @param filepath 
+     * @param modified
+     */
+    void fileContentModified(const QString& filepath, const bool modified);
 
     /**
      * @brief Create a new file

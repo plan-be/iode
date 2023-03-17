@@ -82,4 +82,7 @@ private:
 
 public slots:
     void run_command();
+
+signals:
+    void askComputeHash(bool);
 };

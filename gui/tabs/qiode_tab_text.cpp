@@ -55,6 +55,8 @@ bool QIodeAbstractEditor::load_(const QString& filepath, const bool forceOverwri
     QTextStream in(&file);
     editor->setPlainText(in.readAll());
 
+    editor->document()->setModified(false);
+
     return true;
 }
 
@@ -72,6 +74,9 @@ QString QIodeAbstractEditor::save(const QString& filepath)
     QTextStream out(&file);
     out << editor->toPlainText() << "\n";
     file.close();
+
+    editor->document()->setModified(false);
+    setModified(false);
 
     return filepath;
 }

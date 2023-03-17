@@ -129,6 +129,9 @@ void QIodeCommandLine::run_command()
     QString cmd = text();
     if(cmd.isEmpty()) return;
 
+    // ask to compute hash of databases
+    askComputeHash(true);
+
     // add the command to execute in the output panel
     output->append("> " + cmd);
     // reset the input command line
@@ -146,6 +149,8 @@ void QIodeCommandLine::run_command()
             it = executedCommandsList.constEnd();
             // connected to MainWindow::update_current_tab()
             emit returnPressed();
+            // check if databases have changed
+            askComputeHash(false);
         }
     }
     catch(const std::exception& e)

@@ -3,7 +3,7 @@
 
 
 template <class K>
-Qt::ItemFlags IODEAbstractTableModel<K>::flags(const QModelIndex& index) const
+Qt::ItemFlags QIodeTemplateTableModel<K>::flags(const QModelIndex& index) const
 {
 	if (!index.isValid())
 		return Qt::ItemIsEnabled;
@@ -13,7 +13,7 @@ Qt::ItemFlags IODEAbstractTableModel<K>::flags(const QModelIndex& index) const
 
 // Vertical header = IODE object names
 template <class K>
-QVariant IODEAbstractTableModel<K>::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QIodeTemplateTableModel<K>::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role != Qt::DisplayRole)
 		return QVariant();
@@ -36,7 +36,7 @@ QVariant IODEAbstractTableModel<K>::headerData(int section, Qt::Orientation orie
 }
 
 template <class K>
-bool IODEAbstractTableModel<K>::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+bool QIodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
 	if(orientation == Qt::Horizontal)
 		return false;
@@ -63,7 +63,7 @@ bool IODEAbstractTableModel<K>::setHeaderData(int section, Qt::Orientation orien
 }
 
 template <class K>
-QVariant IODEAbstractTableModel<K>::data(const QModelIndex& index, int role) const
+QVariant QIodeTemplateTableModel<K>::data(const QModelIndex& index, int role) const
 {
 	if (!index.isValid())
 		return QVariant();
@@ -78,7 +78,7 @@ QVariant IODEAbstractTableModel<K>::data(const QModelIndex& index, int role) con
 }
 
 template <class K>
-bool IODEAbstractTableModel<K>::setData(const QModelIndex& index, const QVariant& value, int role)
+bool QIodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
@@ -96,7 +96,7 @@ bool IODEAbstractTableModel<K>::setData(const QModelIndex& index, const QVariant
 }
 
 template <class K>
-void IODEAbstractTableModel<K>::filter(const QString& pattern)
+void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 {
 	try
 	{
@@ -118,7 +118,7 @@ void IODEAbstractTableModel<K>::filter(const QString& pattern)
 
 
 template <class K>
-bool IODEAbstractTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
+bool QIodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
 	QWidget* mainwin = get_main_window_ptr();
 
@@ -151,7 +151,7 @@ bool IODEAbstractTableModel<K>::load(const QString& filepath, const bool forceOv
 }
 
 template <class K>
-QString IODEAbstractTableModel<K>::save(const QDir& projectDir, const QString& filepath)
+QString QIodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& filepath)
 {
 		if (kdb->count() == 0) return ""; 
 
@@ -193,7 +193,7 @@ QString IODEAbstractTableModel<K>::save(const QDir& projectDir, const QString& f
 }
 
 template <class K>
-QString IODEAbstractTableModel<K>::saveAs(const QDir& projectDir)
+QString QIodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 {
 	if (kdb->count() == 0) return ""; 
 	
@@ -207,7 +207,7 @@ QString IODEAbstractTableModel<K>::saveAs(const QDir& projectDir)
 }
 
 template <class K>
-bool IODEAbstractTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
+bool QIodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
 	std::string name;
 	beginRemoveRows(QModelIndex(), position, position + rows - 1);

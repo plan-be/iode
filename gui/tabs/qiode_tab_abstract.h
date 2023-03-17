@@ -20,6 +20,7 @@ const static QVector<QString> tabPrefix({"(&CMT) ", "(&EQS) ", "(&IDT) ", "(&LST
 class AbstractTabWidget: public QWidget
 {
     Q_OBJECT
+    bool modified;
 
 protected:
     EnumIodeFile fileType;
@@ -29,9 +30,12 @@ protected:
     virtual bool load_(const QString& filepath, const bool forceOverwrite) = 0;
     virtual QString saveAs_() = 0;
 
+signals:
+    void modificationChanged(const QString& filepath, const bool modified);
+
 public:
     AbstractTabWidget(const EnumIodeFile fileType, const QString& filepath="", QWidget* parent = nullptr) : 
-        QWidget(parent), fileType(fileType), filepath(filepath) 
+        QWidget(parent), fileType(fileType), filepath(filepath), modified(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
     }
@@ -46,9 +50,16 @@ public:
         return filepath; 
     }
 
+    bool isModified() const
+    {
+        return modified;
+    }
+
     virtual QString getTabText() const
     {
-        return tabPrefix[fileType] + QFileInfo(filepath).fileName();
+        QString text = tabPrefix[fileType] + QFileInfo(filepath).fileName();
+        if(modified) text += "*";
+        return text;
     }
 
     virtual QString getTooltip() const
@@ -60,7 +71,10 @@ public:
     {
         bool success = load_(filepath, forceOverwrite);
         if(success)
+        {
             updateFilepath(filepath);
+            setModified(false);
+        }
         return success;
     }
 
@@ -68,7 +82,10 @@ public:
     {
         QString newFilepath = saveAs_();
         if(!newFilepath.isEmpty())
+        {
             updateFilepath(newFilepath);
+            setModified(false);
+        }
         return newFilepath;
     }
 
@@ -111,4 +128,11 @@ public:
 
     virtual void update() = 0;
     virtual QString save() = 0;
+
+public slots:
+    void setModified(bool modified)
+    {
+        this->modified = modified;
+        emit modificationChanged(getFilepath(), modified); 
+    }
 };
