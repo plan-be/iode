@@ -169,14 +169,6 @@ int B_PrintObjDef_1(char* arg, int* type)
             W_flush();
             break;
         case K_SCL :
-            /*if(BEG == 0)
-            {
-            BEG = 1;
-            W_printf(".tb 4\n.sep &\n");
-            W_printf("&1LName&1LValue&1LRelax&1LStdErr\n.tl\n");
-            }
-            */
-            /*            W_printf(".par1 par_1\nName : value (relax, stderr, t-test)\n"); */
             rc = B_PrintDefScl(kdb, pos);
             W_flush();
             break;
@@ -197,14 +189,14 @@ int B_PrintObjDef_1(char* arg, int* type)
                 }
                 smpl = (SAMPLE *) KDATA(kdb);
                 per = &(smpl->s_p1);
-                W_printf(".tb %d\n.sep &\n",smpl->s_nb + 1);
+                W_printfRepl(".tb %d\n.sep &\n", smpl->s_nb + 1);
                 PER_pertoa(&(smpl->s_p1), txt);
-                /*                W_printf("&%dLSample: %s - %s\n",smpl->s_nb + 1, txt, PER_pertoa(&(smpl->s_p2), 0L)); */
-                /*                W_printf("&1LSample&1C%s&1C%s\n", txt, PER_pertoa(&(smpl->s_p2), 0L)); */
+                /*                W_printfRepl("&%dLSample: %s - %s\n",smpl->s_nb + 1, txt, PER_pertoa(&(smpl->s_p2), 0L)); */
+                /*                W_printfRepl("&1LSample&1C%s&1C%s\n", txt, PER_pertoa(&(smpl->s_p2), 0L)); */
                 W_printf(".tl\n&1LName");
                 for(j = 0 ; j < smpl->s_nb; j++) {
                     PER_pertoa(PER_addper(per, j), txt);
-                    W_printf("&1C%s", txt);
+                    W_printfRepl("&1C%s", txt);
                 }
                 W_printf("\n.tl\n");
             }
@@ -282,8 +274,8 @@ int B_PrintDefTbl(KDB* kdb, int pos)
     }
     B_PrintRtfTopic(T_get_title(tbl));
     W_printf(".tb %d\n", T_NC(tbl));
-    W_printf(".sep &\n");
-    W_printf("&%dC\\b%s : d‚finition\\B\n", T_NC(tbl), KONAME(kdb, pos));
+    W_printfRepl(".sep &\n");
+    W_printfRepl("&%dC\\b%s : d‚finition\\B\n", T_NC(tbl), KONAME(kdb, pos));
     B_DumpTblDef(tbl);
     W_printf(".te\n");
     T_free(tbl);
@@ -298,8 +290,8 @@ int B_DumpTblDef(TBL* tbl)
     W_printf("\n.tl\n");
 
     /* lines */
-    /*    W_printf("&%dL\\bTable lines\\B\n", T_NC(tbl)); */
-    /*    W_printf("&%dL \n", T_NC(tbl)); */
+    /*    W_printfRepl("&%dL\\bTable lines\\B\n", T_NC(tbl)); */
+    /*    W_printfRepl("&%dL \n", T_NC(tbl)); */
     for(j = 0; j < T_NL(tbl); j++) {
         switch(tbl->t_line[j].tl_type) {
             case KT_CELL :
@@ -316,17 +308,17 @@ int B_DumpTblDef(TBL* tbl)
 
             case KT_LINE  :
             case KT_DLINE  :
-                /* W_printf("&%dL[LINE]\n", T_NC(tbl));*/
+                /* W_printfRepl("&%dL[LINE]\n", T_NC(tbl));*/
                 W_printf(".tl\n");
                 break;
             case KT_MODE  :
-                W_printf("&%dL[MODE]\n", T_NC(tbl));
+                W_printfRepl("&%dL[MODE]\n", T_NC(tbl));
                 break;
             case KT_DATE  :
-                W_printf("&%dL[DATE]\n", T_NC(tbl));
+                W_printfRepl("&%dL[DATE]\n", T_NC(tbl));
                 break;
             case KT_FILES :
-                W_printf("&%dL[FILES]\n", T_NC(tbl));
+                W_printfRepl("&%dL[FILES]\n", T_NC(tbl));
                 break;
 
             default       :
@@ -338,7 +330,7 @@ int B_DumpTblDef(TBL* tbl)
     for(i = 0; i < T_NC(tbl); i++)
         if(B_CellDef((TCELL *)(tbl->t_div.tl_val) + i)) break;
     if(i < T_NC(tbl)) {
-        W_printf(".tl\n&%dC\\bColumn divisors\\B\n.tl\n", T_NC(tbl)); /* JMP 14-06-96 */
+        W_printfRepl(".tl\n&%dC\\bColumn divisors\\B\n.tl\n", T_NC(tbl)); /* JMP 14-06-96 */
         for(i = 0; i < T_NC(tbl); i++)
             B_PrintTblCell((TCELL *)(tbl->t_div.tl_val) + i, 1);
     }
@@ -358,7 +350,7 @@ int B_CellDef(TCELL* cell)
 int B_PrintTblCell(TCELL* cell, int straddle)
 {
     if(B_CellDef(cell) == 0) {
-        W_printf("&%dL ", straddle);
+        W_printfRepl("&%dL ", straddle);
         return(0);
     }
 
@@ -371,7 +363,7 @@ int B_PrintTblCell(TCELL* cell, int straddle)
             break;
 
         case KT_LEC :
-            W_printf("&%dL", straddle);
+            W_printfRepl("&%dL", straddle);
             T_open_attr(cell->tc_attr);
             W_printf("%s", P_get_ptr(cell->tc_val, 0));
             break;
@@ -561,9 +553,9 @@ int B_PrintDefVar(KDB* kdb, int pos)
     smpl = (SAMPLE *) KDATA(kdb);
 
     if((val = KVVAL(kdb, pos, 0)) == NULL) return (-1);
-    W_printf("&1L%s ", KONAME(kdb, pos));
+    W_printfRepl("&1L%s ", KONAME(kdb, pos));
     for(j = 0 ; j < smpl->s_nb; j++, val++) {
-        W_printf("&1D");
+        W_printfRepl("&1D");
         B_PrintVal(*val);
     }
     W_printf("\n");

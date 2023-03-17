@@ -34,9 +34,9 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.64 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.66 - (c) 1990-2023 Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR 6
-#define IODE_VERSION_MINOR 64
+#define IODE_VERSION_MINOR 66
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
@@ -1103,15 +1103,15 @@ typedef struct _col_ {
 
     /*   {{v00, v01},{v10,v11}}
 
-            |             |
-            |   file1     |   file2
+	    |             |
+	    |   file1     |   file2
     --------|-------------|------------
     period1 |    v00      |    v01
-            | cl_val[0,0] | cl_val[0,1]    v.. = valeur
+	    | cl_val[0,0] | cl_val[0,1]    v.. = valeur
     --------|-------------|------------
     period2 |    v10      |    v11
-            | cl_val[1,0] | cl_val[1,1]
-            |             |
+	    | cl_val[1,0] | cl_val[1,1]
+	    |             |
     */
     IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
@@ -1155,7 +1155,7 @@ typedef struct _fils_ {
 // struct defining input file and fn pointers for one type of data format to be imported
 typedef struct _impdef_ {
     YYKEYS  *imp_keys;          // Table of keywords (see YY group of functions in scr4 libs)
-    int     imp_dim;            // Nb of keys in imp_keys 
+    int     imp_dim;            // Nb of keys in imp_keys
     int     (*imp_hd_fn)();     // Pointer to the fn to open the input file and to read its header
     int     (*imp_vec_fn)();    // Pointer to the fn to read full variable (i.e. a name + a series of values)
     int     (*imp_elem_fn)();   // Pointer to the fn to read a single numerical value (a double)
@@ -1166,7 +1166,7 @@ typedef struct _impdef_ {
 typedef struct _expdef_ {
     int     (*exp_hd_fn)();     // Pointer to the function that creates the output file and writes the header
     char    *(*exp_code_fn)();  // Pointer to the function to create the output object name + the separator
-    char    *(*exp_cmt_fn)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file 
+    char    *(*exp_cmt_fn)();   // Pointer to the function to create the output object comment (if it exists in KC_WS) + the separator for the output file
     char    *(*exp_elem_fn)();  // Pointer to the function constructing an allocated string of one value + sep
     int     (*exp_vec_fn)();    // Pointer to the function saving the VAR and CMT in the output file
     int     (*exp_end_fn)();    // Pointer to the function that closes the output file after having written its footer
@@ -1219,12 +1219,12 @@ typedef struct _lstack {        /* stack of operators used by L_analyse */
 #define RP_LINELENGTH 102400
 
 // REPFILE contains a report to be interpreted and the current line during interpretation
-typedef struct _repfile_ {      
-    char                *filename;      // Source file for report file (*.rep) or 
-                                        // Proc name and position for procedures (PROCDEF)
+typedef struct _repfile_ {
+    char                *filename;      // Source file for report file (*.rep) or
+					// Proc name and position for procedures (PROCDEF)
     unsigned char       **tbl;          // Lines of the report
     int                 curline,        // Current line (during execution)
-                        nblines;        // Total number of lines in the report
+			nblines;        // Total number of lines in the report
 } REPFILE;
 
 typedef struct _repfns_ {
@@ -1233,11 +1233,11 @@ typedef struct _repfns_ {
     int     (*fn)();        // function pointer in *non GUI* mode
     int     (*sfn)();       // function pointer in GUI mode
     int     type;           // suffix required after keyw (var, idt...) or not:
-                            //   0=not required 
-    						//   1=ws type required: cmt, idt, ... see k_ext => not used ?
-    						//   2=suffix required: file extensions defined in k_ext 
-    						//   3=ws type required in non GUI, no extension in GUI
-    						//   4=suffix required: file extensions defined in k_ext if non GUI, not required in GUI
+			    //   0=not required
+						//   1=ws type required: cmt, idt, ... see k_ext => not used ?
+						//   2=suffix required: file extensions defined in k_ext
+						//   3=ws type required in non GUI, no extension in GUI
+						//   4=suffix required: file extensions defined in k_ext if non GUI, not required in GUI
     int     group;          // for color highlighting
 } BFNS;
 
@@ -1257,7 +1257,7 @@ extern REPFILE *CUR_REPFILE;        // Pointer to the current REPFILE during rep
 extern BFNS    B_fns[];             // Table of report command names and function pointers
 extern RPFN    RP_FNS[];            // Table of report @functions names and function pointers
 extern char*   RP_RPTSTR;           // Repeat string used by the command $repeat. Default = '_'.
-extern char*   RP_VSEPS;            // Separators allowed in report @functions 
+extern char*   RP_VSEPS;            // Separators allowed in report @functions
 extern int     RP_RT;               // Indicates what to do on error (0-ignore, -2=return, -3=ABORT, -4=QUITODE)
 extern int     RP_ARG0;             // Position of the first argument in RP_ARGV (can be changed by a call to $shift)
 extern int     RP_DEBUG;            // Debug level: 0=no debug, 1=std debug, 2=full debug

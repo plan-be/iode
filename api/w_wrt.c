@@ -59,19 +59,20 @@
  *  
  *  List of functions
  *  -----------------
- *   int W_dest(char *filename, int type)                       Select a new printing destination in one of the available possible types
- *   int W_close()                                              Ends a printing session by sending the objects in A2m memory to the printer or the output file.
- *   int W_flush()                                              Sends the objects currently recorded in memory by A2mMemRecord() to the printer or the file.
- *   int W_printfEx(int dup, char* fmt, va_list args)           Records a text in A2m memory for printing after parsing the fmt argument.
- *   int W_printf(char* fmt, ...)                               Records a text in A2m memory for printing.
- *   int W_printfDbl(char* fmt, ...)                            Records a text in A2m memory for printing after parsing the fmt argument. Doubles the backslashes.
- *   int W_putc(int ch)                                         Records a single character in A2m memory by a call to W_printf().
- *   int W_record(char *str)                                    Records a text in A2m memory.
- *   int W_InitDisplay()                                        Defines the new output type as W_DISP (displays or creates a TeeChart graph file).
- *   int W_EndDisplay(char *title, int x, int y, int w, int h)  Closes the current printing session by sending the graphs to the screen.
- *   static int W_SavePrinterSettings()                         Saves the current default printer and some of its settings.
- *   static int W_ResetPrinterSettings()                        Restores the default printer and some of its settings.
- *   static int W_SetPrinterSettings()                          Sets the default printer (defined by global W_gdiprinter) and some of its settings.
+ *   int W_dest(char *filename, int type)                                   Select a new printing destination in one of the available possible types
+ *   int W_close()                                                          Ends a printing session by sending the objects in A2m memory to the printer or the output file.
+ *   int W_flush()                                                          Sends the objects currently recorded in memory by A2mMemRecord() to the printer or the file.
+ *   int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args)     Records a text in A2m memory for printing after parsing the fmt argument.
+ *   int W_printf(char* fmt, ...)                                           Records a text in A2m memory for printing.
+ *   int W_printfDbl(char* fmt, ...)                                        Records a text in A2m memory for printing after parsing the fmt argument. Doubles the backslashes.
+ *   int W_printfRepl(char* fmt, ...)                                       Records a text in A2m memory for printing after parsing the fmt argument. Replaces '&' by A2M_SEPCH.
+ *   int W_putc(int ch)                                                     Records a single character in A2m memory by a call to W_printf().
+ *   int W_record(char *str)                                                Records a text in A2m memory.
+ *   int W_InitDisplay()                                                    Defines the new output type as W_DISP (displays or creates a TeeChart graph file).
+ *   int W_EndDisplay(char *title, int x, int y, int w, int h)              Closes the current printing session by sending the graphs to the screen.
+ *   static int W_SavePrinterSettings()                                     Saves the current default printer and some of its settings.
+ *   static int W_ResetPrinterSettings()                                    Restores the default printer and some of its settings.
+ *   static int W_SetPrinterSettings()                                      Sets the default printer (defined by global W_gdiprinter) and some of its settings.
  *  
  *  List of global variables
  *  ------------------------
@@ -106,7 +107,7 @@ static int W_InitParms();
 static int W_open();
 int W_close();
 int W_flush();
-int W_printfEx(int dup, char* fmt, va_list args);
+int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args);
 int W_printf(char* fmt, ...);
 int W_printfDbl(char* fmt, ...) ;
 int W_putc(int ch);
@@ -370,15 +371,17 @@ int W_flush()
  *  Opens a new printing session if none is ongoing.
  *
  *  @param [in] int     dup     if not null, the backslashes (\) are doubled in the output
+ *  @param [in] int     ch1     character to be replaced
+ *  @param [in] int     ch2     replacement character
  *  @param [in] char*   fmt     argument (a la printf)
  *  @param [in] va_list args    list of parameters needed by fmt
  *  @return     int             0 on success
  *                              -1 if W_open() fails
  */
 
-int W_printfEx(int dup, char* fmt, va_list args)
+int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args)
 {
-    char    buf[12400];
+    char    buf[12400], str1[5], str2[5];
     int     rc = 0;
 
     if(W_cancel) goto fin;
@@ -396,6 +399,13 @@ int W_printfEx(int dup, char* fmt, va_list args)
 
     W_cont = 1;
     if(dup) SCR_replace(buf, "\\", "\\\\");
+    if(ch1 && ch2) {
+       str1[0] = ch1;
+       str2[0] = ch2;
+       str1[1] = str2[1] = 0;
+       SCR_replace(buf, str1, str2);
+    }   
+    
     A2mMemRecord(W_af, buf);
 
 fin:
@@ -418,7 +428,7 @@ int W_printf(char* fmt, ...)
     int     rc;
 
     va_start(myargs, fmt);
-    rc = W_printfEx(0, fmt, myargs);
+    rc = W_printfEx(0, 0, 0, fmt, myargs);
     va_end(myargs);
 
     return(rc);
@@ -439,7 +449,28 @@ int W_printfDbl(char* fmt, ...)
     int     rc;
 
     va_start(myargs, fmt);
-    rc = W_printfEx(1, fmt, myargs);
+    rc = W_printfEx(1, 0, 0, fmt, myargs);
+    va_end(myargs);
+
+    return(rc);
+}
+
+/**
+ *  Records a text in A2m memory for printing. Replaces the char '&' by A2M_SEPCH.
+ *  See W_printfEx().
+ *
+ *  @param [in] char*   fmt     argument (a la printf)
+ *  @param [in] va_list args    list of parameters needed by fmt
+ *  @return     int             0 on success
+ *                              -1 if W_open() fails
+ */
+int W_printfRepl(char* fmt, ...)
+{
+    va_list myargs;
+    int     rc;
+
+    va_start(myargs, fmt);
+    rc = W_printfEx(0, '&', A2M_SEPCH, fmt, myargs);
     va_end(myargs);
 
     return(rc);
