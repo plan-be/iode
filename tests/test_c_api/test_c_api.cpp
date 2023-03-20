@@ -9,6 +9,18 @@
 
 
 // BEGIN_KEEP
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return(0); }
+#ifdef __cplusplus
+}
+#endif
+// END_KEEP
+
+
+// BEGIN_KEEP
 #ifdef _MSC_VER
     char    *IODE_DATA_DIR   = "..\\data";
     char    *IODE_OUTPUT_DIR = "..\\output";
@@ -23,25 +35,26 @@
 // Fonctions annulées/remplacées temporairement pour passer le link
 
 // Pour tester l'estimation
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-    extern char         SCR_NAME_ERR[255 + 1];
-
-    //int o_estgr(char** titles, SAMPLE *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
-    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
-    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
-    //int B_PrintRtfTopic(char* x) { return(0); }
-    int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
-    //int W_printf(char*fmt, ...) {return(0);}
-    //void K_load_iode_ini() {}
-    //void K_save_iode_ini() {}
-
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//extern "C"
+//{
+//#endif
+//
+//    extern char    SCR_NAME_ERR[255 + 1];
+//    int     A2M_SEPCH;
+//
+//    //int o_estgr(char** titles, SAMPLE *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
+//    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
+//    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
+//    //int B_PrintRtfTopic(char* x) { return(0); }
+//    int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
+//    //int W_printf(char*fmt, ...) {return(0);}
+//    //void K_load_iode_ini() {}
+//    //void K_save_iode_ini() {}
+//
+//#ifdef __cplusplus
+//}
+//#endif
 
 // END_KEEP
 
@@ -129,8 +142,12 @@ public:
 	    int     rc = -1;        // ==
 	    long    size1, size2;
 	    char    *content1, *content2;
+	    char curdir[512];
 	
 	    //printf("Comparing '%s' and '%s'\n", file1, file2);
+	    SCR_dosgetcwd(curdir, 511);
+	    printf("Current dir   : '%s'\n", curdir);
+	
 	    content1 = U_test_read_file(file1, &size1);
 	    //printf("   '%s': size=%ld\n", file1, size1);
 	    content2 = U_test_read_file(file2, &size2);
@@ -163,11 +180,11 @@ public:
 	    char    *content1, *content2;
 	    char    **tbl1, **tbl2;
 	
-	    //printf("Comparing '%s' and '%s'\n", file1, file2);
+	    printf("Comparing '%s' and '%s'\n", file1, file2);
 	    content1 = U_test_read_file(file1, &size1);
-	    //printf("   '%s': size=%ld\n", file1, size1);
+	    printf("   '%s': size=%ld\n", file1, size1);
 	    content2 = U_test_read_file(file2, &size2);
-	    //printf("   '%s': size=%ld\n", file2, size2);
+	    printf("   '%s': size=%ld\n", file2, size2);
 	
 	    if(content1 == NULL && content2 == NULL) {              // ==
 	        rc = 0;     // JMP 23/10/2022
@@ -428,9 +445,16 @@ public:
 	{
 	    char reffilename[512];
 	    char filename[512];
+	    char curdir[512];
 	
 	    sprintf(filename, "%s\\%s", IODE_OUTPUT_DIR, outfile);
 	    sprintf(reffilename, "%s\\%s", IODE_DATA_DIR, reffile);
+	    SCR_dosgetcwd(curdir, 511);
+	    //getcwd(curdir, 500);
+	    printf("Current dir   : '%s'\n", curdir);
+	    printf("Output    file: '%s'\n", filename);
+	    printf("Reference file: '%s'\n", reffilename);
+	
 	    //printf("Comparing ref '%s' and '%s'\n", reffilename, filename);
 	    //return(U_cmp_files(reffilename, filename));
 	    return(U_diff_files(reffilename, filename));
@@ -2352,6 +2376,48 @@ TEST_F(IodeCAPITest, Tests_B_REP_PROC)
     EXPECT_NE(cond, 0);
 
     U_test_reset_kmsg_msgs();
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_PrintObjsDef)
+{
+    char reffilename[512];
+    char filename[512];
+
+    U_test_print_title("Tests B_PrintObjDef");
+    U_test_suppress_a2m_msgs();
+
+    // Define filenames
+    sprintf(filename, "%s\\test_printobj.htm", IODE_OUTPUT_DIR);
+    sprintf(reffilename, "%s\\test_printobj.ref.htm", IODE_DATA_DIR);
+
+    // Test cell separator '@'
+    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
+    A2M_SEPCH = '@';                // Change A2M_SEPCH
+    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+    W_close();                      // Close the printing session
+    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
+    EXPECT_NE(U_diff_files(reffilename, filename), 0);
+
+    // Test cell separator '|'
+    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
+    A2M_SEPCH = '|';                // Change A2M_SEPCH
+    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+    W_close();                      // Close the printing session
+    U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm");
+    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
+    EXPECT_NE(U_diff_files(reffilename, filename), 0);
+
+    // Test cell separator '&'
+    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
+    A2M_SEPCH = '&';                // Change A2M_SEPCH
+    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+    W_close();                      // Close the printing session
+    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
+    EXPECT_NE(U_diff_files(reffilename, filename), 0);
+    // Reset initial kmsg fn
+
+    U_test_reset_a2m_msgs();
 }
 
 
