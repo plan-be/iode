@@ -116,6 +116,22 @@ add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 RE
 include_directories(${CMAKE_SOURCE_DIR})
 message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
 
+# -- Boost --
+list(APPEND CMAKE_PREFIX_PATH "C:\\boost")
+set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
+set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+find_package(Boost 1.74)
+
+message(CHECK_START "Search for Boost package")
+if(Boost_FOUND)
+  message(CHECK_PASS "version ${Boost_VERSION}")
+else()
+  message(CHECK_FAIL "not found")
+endif()
+
 # ---- libraries ----
 add_subdirectory ("scr4")
 add_subdirectory ("api")
