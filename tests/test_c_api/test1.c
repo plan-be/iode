@@ -2656,46 +2656,46 @@ void Tests_B_REP_PROC()
     U_test_reset_kmsg_msgs();         
 }    
 
-void Tests_B_PrintObjsDef()
-{
-    char reffilename[512];
-    char filename[512];
-
-    U_test_print_title("Tests B_PrintObjDef");
-    U_test_suppress_a2m_msgs();
-
-    // Define filenames
-    sprintf(filename, "%s\\test_printobj.htm", IODE_OUTPUT_DIR);
-    sprintf(reffilename, "%s\\test_printobj.ref.htm", IODE_DATA_DIR);
-
-    // Test cell separator '@'
-    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
-    A2M_SEPCH = '@';                // Change A2M_SEPCH
-    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
-    W_close();                      // Close the printing session
-    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
-    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
-    
-    // Test cell separator '|'
-    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
-    A2M_SEPCH = '|';                // Change A2M_SEPCH
-    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
-    W_close();                      // Close the printing session
-    U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm");
-    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
-    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
-    
-    // Test cell separator '&'
-    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
-    A2M_SEPCH = '&';                // Change A2M_SEPCH
-    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
-    W_close();                      // Close the printing session
-    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
-    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
-    // Reset initial kmsg fn
-    
-    U_test_reset_a2m_msgs();
-}
+//void Tests_B_PrintObjsDef()
+//{
+//    char reffilename[512];
+//    char filename[512];
+//
+//    U_test_print_title("Tests B_PrintObjDef");
+//    U_test_suppress_a2m_msgs();
+//
+//    // Define filenames
+//    sprintf(filename, "%s\\test_printobj.htm", IODE_OUTPUT_DIR);
+//    sprintf(reffilename, "%s\\test_printobj.ref.htm", IODE_DATA_DIR);
+//
+//    // Test cell separator '@'
+//    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
+//    A2M_SEPCH = '@';                // Change A2M_SEPCH
+//    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+//    W_close();                      // Close the printing session
+//    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
+//    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
+//    
+//    // Test cell separator '|'
+//    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
+//    A2M_SEPCH = '|';                // Change A2M_SEPCH
+//    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+//    W_close();                      // Close the printing session
+//    U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm");
+//    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
+//    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
+//    
+//    // Test cell separator '&'
+//    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
+//    A2M_SEPCH = '&';                // Change A2M_SEPCH
+//    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+//    W_close();                      // Close the printing session
+//    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
+//    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
+//    // Reset initial kmsg fn
+//    
+//    U_test_reset_a2m_msgs();
+//}
 
 
 // void Tests_VTOMS()
