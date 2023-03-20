@@ -1357,7 +1357,7 @@ extern char     **EXEC_ARGS;
 extern  int     KT_ndec;
 extern  char    **EXEC_ARGS;
 extern  char    *KT_smpl;
-extern  char    KT_sep;
+// extern  char    KT_sep; replaced by A2M_SEPCH JMP 20/03/2023
 extern  char    **B_ERROR_MSG;
 extern  char    B_SEPS[];
 // extern  int     B_NBDEC;  // JMP 18-04-2022
