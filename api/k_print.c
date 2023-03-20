@@ -21,14 +21,14 @@
  *  
  *  Global variables
  *  ----------------
- *      char     KT_sep = '&';                                      Table cell separator
+ *      char     KT_sep = '&';                                      Table cell separator => replaced by A2M_SEPCH
  *      int      K_NBDEC = -1;                                      Default nb of decimals
  *  
  */
  
 #include "iode.h"
 
-char     KT_sep = '&';          // Table cell separator
+//char     KT_sep = '&';          // Table cell separator => replaced by A2M_SEPCH
 int      K_NBDEC = -1;          // Default nb of decimals
 
 char     **KT_names = NULL;     // Names of the files used in a GSAMPLE
@@ -124,7 +124,7 @@ static void T_print_string(COL* cl, char* string)
  *  @param  [in] int attr        alignment attribute: KT_CENTER, KT_RIGHT, KT_DECIMAL, KT_LEFT.
  *  @param  [in] int straddle    number of spanned columns
  *  @param  [in] int type        column type (KT_STRING, KT_LEC...)
- *  @global [in] int KT_sep      a2m table cell separator
+ *  @global [in] int A2M_SEPCH   a2m table cell separator
  *  
  */
  
@@ -136,7 +136,7 @@ void T_open_cell(int attr, int straddle, int type)
     if(attr & KT_RIGHT)     align = 'R';
     if(type != KT_STRING && (attr & KT_DECIMAL))   align = 'D'; /* JMP 17-12-93 */
 
-    W_printf("%c%d%c", KT_sep, straddle, align);
+    W_printf("%c%d%c", A2M_SEPCH, straddle, align);
 }
 
 
@@ -180,8 +180,9 @@ void T_close_attr(int attr)
 void T_print_cell(TCELL* cell, COL* cl, int straddle)
 {
     if(cell == 0 || cell->tc_val == 0) {                /* JMP 24-06-98 */
-        W_printf("%c1R", KT_sep);  /* JMP 24-06-98 */
-        return;                 /* JMP 24-06-98 */
+        //W_printf("%c1R", KT_sep); 
+        W_printf("%c1R", A2M_SEPCH); 
+        return;                
     }
     if(cell->tc_type == KT_STRING && U_is_in('#', cell->tc_val))
         //cell->tc_attr = KT_ALIGN(cell->tc_attr, KT_CENTER); /* JMP 05-01-02 */
@@ -357,8 +358,11 @@ static int T_begin_tbl(int dim, COLS* cls)
     COL_find_mode(cls, KT_mode, 2);
 
     W_printf(".tb %d\n", dim);
-    if(KT_sep == '\t') W_printf(".sep TAB\n");
-    else W_printf(".sep %c\n", KT_sep);
+    //if(KT_sep == '\t') W_printf(".sep TAB\n");
+    //else W_printf(".sep %c\n", KT_sep);
+    if(A2M_SEPCH == '\t') W_printf(".sep TAB\n");
+    else W_printf(".sep %c\n", A2M_SEPCH);
+    
     return(0);
 }
 

@@ -59,7 +59,7 @@ int      A2M_GIF_TRCOLOR_NB;   // Number of the TR color of the gif graphs // JM
  *  These variables are A2M data used for reading A2M files and 
  *  for generating most of the output formats.
  *  
- *  Some other global vars are also (re-)defined here: KT_sep, W_a2mapp.
+ *  Some other global vars are also (re-)defined here: W_a2mapp.
  *  
  *  See http://www.xon.be/scr4/libs1/libs1456.htm for more informations.
  */
@@ -72,7 +72,7 @@ void B_A2mGetGnlParms()
     A2M_CMDCH   = B_IniReadChar("A2MGNL", "CMD", '.');      // Id.
     //A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '@');      // id.
     A2M_SEPCH   = B_IniReadChar("A2MGNL", "SEP", '&');      // id.
-    KT_sep = A2M_SEPCH;                                     // JMP 1/5/2022
+    //KT_sep = A2M_SEPCH;                                     // JMP 1/5/2022
 
     A2M_LFON    = B_IniReadYN("A2MGNL", "LFON",   0);       // Keep special chars (carriage return, linefeed). See https://iode.plan.be/doku.php?id=blancs_et_sauts_de_lignes
     A2M_BLON    = B_IniReadYN("A2MGNL", "BLON",   0);       // id.
