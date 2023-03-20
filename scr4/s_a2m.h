@@ -313,102 +313,107 @@ typedef struct _a2mmargins_ {
 
 
 /************** VARIABLES ********************/
-
-/* Public (Modifiables par programme) */
-extern int  A2M_TFONTSIZE, A2M_FONTSIZE, A2M_FONTINCR, A2M_FONTFAMILY,
-	    A2M_TFONTFAMILY; /* JMP 26-02-98 */
-extern int  A2M_TBREAK, A2M_TPAGE, A2M_GPAGE; /* JMP 08-09-97 */
-extern U_ch A2M_CURTAG[41], *A2M_PGHEAD, *A2M_PGFOOT;
-extern int  A2M_CMDCH, A2M_ESCCH, A2M_SEPCH,
-	    A2M_DEFCH, A2M_TSHADING_COL[2], A2M_TSHADING_BRUSH[2];
-extern int  A2M_NUMBERS, A2M_LFON, A2M_BLON;
-extern A2MTOP **A2M_TOPICS;  /* JMP 17-05-99 */
-extern int  A2M_NB_TOPICS; /* JMP 17-05-99 */
-extern int  A2M_TOPS_CASE; /* JMP 21-05-99 */
-extern int  A2M_TOPS_AUTO; /* JMP 21-05-99 */
-extern int  A2M_TOPS_PARTIAL; /* JMP 21-05-99 */
-extern int  A2M_TOPS_TITLE; /* JMP 24-05-99 */
-extern int  A2M_MAXPARLEVEL;  /* JMP 03-09-11 */
-extern int  A2M_GR_MULTIBAR;  /* JMP 21-11-2011 */
-
-/* Public GDI specific */
-extern int A2M_GDI_COLOR;
-extern int A2M_GDI_TBORDER;
-extern int A2M_GDI_LMARG;
-extern int A2M_GDI_RMARG;
-extern int A2M_GDI_TMARG;
-extern int A2M_GDI_BMARG;
-extern int A2M_GDI_TWIDTH_FIXED; /* JMP 21-03-05  : Si 0 (dft), ‚largi les colonnes au min du paragraphe, si 1, reste fixe*/
-
-/* Public GIF specific */
-extern int A2M_GIF_BGCOLOR[3];
-extern int A2M_GIF_TRCOLOR[3];
-extern int A2M_GIF_INTER;
-extern int A2M_GIF_TRANS;
-extern int A2M_GIF_WIDTH;
-extern int A2M_GIF_HEIGHT;
-extern int A2M_GIF_KEEP;
-extern int A2M_GIF_RESIZE;
-extern char *A2M_GIF_FRAC;
-extern int A2M_GIF_FONT;
-extern int A2M_GIF_FILLED;
-
-/* Public RTF specific */
-extern int     A2M_RTF_TCOLOR, A2M_RTF_TBORDER, A2M_RTF_TOC;
-extern U_ch    *A2M_RTF_TITLE, *A2M_RTF_COPYRIGHT;
-extern int     A2M_RTF_TCOL1; /* mm */
-extern int     A2M_RTF_TCOLN; /* mm */
-extern int     A2M_RTF_TSPLIT, A2M_RTF_TWIDTH;
-extern int     A2M_RTF_HLINES, A2M_RTF_VLINES;
-extern int     A2M_RTF_COMPRESS;
-extern int     A2M_RTF_GIFTOBMP; /* JMP 16-12-97 */
-extern int     A2M_RTF_GIFTOPNG; /* JMP 23-08-15 */
-extern int     A2M_RTF_OEMTOANSI; /* JMP 12-04-07 */
-
-/* Public MAKER specific */
-extern int    A2M_FRM_TCOLOR;
-extern int    A2M_FRM_TCOL1; /* mm */
-extern int    A2M_FRM_TCOLN; /* mm */
-extern int    A2M_FRM_TSPLIT, A2M_FRM_TWIDTH, A2M_FRM_TBORDER;
-extern int    A2M_FRM_REF, A2M_FRM_HLINES, A2M_FRM_VLINES, A2M_FRM_TTITLE;
-
-/* Public HTML specific */
-extern int    A2M_HTML_TCOLOR, A2M_HTML_TBORDER, A2M_HTML_TOC;
-extern char   *A2M_HTML_BODY;
-extern U_ch   *A2M_HTML_TITLE;
-extern int    A2M_HTML_LTGT;
-extern int    A2M_HTML_STRIP;
-extern int    A2M_HTML_TTITLE; /* JMP 12-02-99 */
-extern int    A2M_HTML_GIFTOBMP; /* JMP 16-12-97 */
-extern int    A2M_HTML_GIFTOPNG; /* JMP 23-08-15 */
-extern char   *A2M_HTML_STYLE; /* JMP 09-05-99 */
-extern char   *A2M_HTML_RELSTYLE; /* JMP 29-01-2004 */
-extern char   *A2M_HTML_TARGET ; /* JMP 28-02-2004 */
-extern int    A2M_HTML_AUTOLINK; /* JMP 20-10-01 */
-extern int    A2M_HTML_IMGWIDTH;    /* JMP 29-06-02 */
-extern int    A2M_HTML_IMGBORDER;   /* JMP 29-06-02 */
-extern int    A2M_HTML_OEMTOANSI; /* JMP 16-08-10 */
-extern int    A2M_HTML_NOINLINESTYLE; /* JMP 25-09-10 */
-extern char   *A2M_HTML_TABLECLASS; // JMP 4/10/2013
-extern char   *A2M_HTML_TRCLASS; // JMP 4/10/2013
-extern char   *A2M_HTML_THCLASS; // JMP 4/10/2013
-extern char   *A2M_HTML_TDCLASS; // JMP 4/10/2013
-
-
-
-/* Public CSV specific */
-extern int    A2M_CSV_SEP, A2M_CSV_QUOTE, A2M_CSV_NA;
-
-/* Private */
-extern A2MPPR   *A2M_PPRS;
-extern int      A2M_NB_PPRS;
-extern A2MANCHOR **A2M_ANCHORS;
-extern int      A2M_NB_ANCHORS, A2M_NB_FNOTES;
-extern char     **A2M_FNOTES;
-
-extern int     A2M_TBLID, A2M_FRAMEID, A2MGRFID, A2M_FONTSIZE, A2MGRFOBJID;
-extern double  A2MGRFDIM[3], A2MGRF0[3], A2MGRFSCALE[3], A2MGRFORIG[3];
-extern FILE    *A2M_fdfrm, *A2M_fdtbl, *A2M_fdfrw;
+#ifdef __cplusplus 
+extern "C" {
+#endif    
+    /* Public (Modifiables par programme) */
+    extern int  A2M_TFONTSIZE, A2M_FONTSIZE, A2M_FONTINCR, A2M_FONTFAMILY,
+            A2M_TFONTFAMILY; /* JMP 26-02-98 */
+    extern int  A2M_TBREAK, A2M_TPAGE, A2M_GPAGE; /* JMP 08-09-97 */
+    extern U_ch A2M_CURTAG[41], *A2M_PGHEAD, *A2M_PGFOOT;
+    extern int  A2M_CMDCH, A2M_ESCCH, A2M_SEPCH,
+            A2M_DEFCH, A2M_TSHADING_COL[2], A2M_TSHADING_BRUSH[2];
+    extern int  A2M_NUMBERS, A2M_LFON, A2M_BLON;
+    extern A2MTOP **A2M_TOPICS;  /* JMP 17-05-99 */
+    extern int  A2M_NB_TOPICS; /* JMP 17-05-99 */
+    extern int  A2M_TOPS_CASE; /* JMP 21-05-99 */
+    extern int  A2M_TOPS_AUTO; /* JMP 21-05-99 */
+    extern int  A2M_TOPS_PARTIAL; /* JMP 21-05-99 */
+    extern int  A2M_TOPS_TITLE; /* JMP 24-05-99 */
+    extern int  A2M_MAXPARLEVEL;  /* JMP 03-09-11 */
+    extern int  A2M_GR_MULTIBAR;  /* JMP 21-11-2011 */
+    
+    /* Public GDI specific */
+    extern int A2M_GDI_COLOR;
+    extern int A2M_GDI_TBORDER;
+    extern int A2M_GDI_LMARG;
+    extern int A2M_GDI_RMARG;
+    extern int A2M_GDI_TMARG;
+    extern int A2M_GDI_BMARG;
+    extern int A2M_GDI_TWIDTH_FIXED; /* JMP 21-03-05  : Si 0 (dft), ‚largi les colonnes au min du paragraphe, si 1, reste fixe*/
+    
+    /* Public GIF specific */
+    extern int A2M_GIF_BGCOLOR[3];
+    extern int A2M_GIF_TRCOLOR[3];
+    extern int A2M_GIF_INTER;
+    extern int A2M_GIF_TRANS;
+    extern int A2M_GIF_WIDTH;
+    extern int A2M_GIF_HEIGHT;
+    extern int A2M_GIF_KEEP;
+    extern int A2M_GIF_RESIZE;
+    extern char *A2M_GIF_FRAC;
+    extern int A2M_GIF_FONT;
+    extern int A2M_GIF_FILLED;
+    
+    /* Public RTF specific */
+    extern int     A2M_RTF_TCOLOR, A2M_RTF_TBORDER, A2M_RTF_TOC;
+    extern U_ch    *A2M_RTF_TITLE, *A2M_RTF_COPYRIGHT;
+    extern int     A2M_RTF_TCOL1; /* mm */
+    extern int     A2M_RTF_TCOLN; /* mm */
+    extern int     A2M_RTF_TSPLIT, A2M_RTF_TWIDTH;
+    extern int     A2M_RTF_HLINES, A2M_RTF_VLINES;
+    extern int     A2M_RTF_COMPRESS;
+    extern int     A2M_RTF_GIFTOBMP; /* JMP 16-12-97 */
+    extern int     A2M_RTF_GIFTOPNG; /* JMP 23-08-15 */
+    extern int     A2M_RTF_OEMTOANSI; /* JMP 12-04-07 */
+    
+    /* Public MAKER specific */
+    extern int    A2M_FRM_TCOLOR;
+    extern int    A2M_FRM_TCOL1; /* mm */
+    extern int    A2M_FRM_TCOLN; /* mm */
+    extern int    A2M_FRM_TSPLIT, A2M_FRM_TWIDTH, A2M_FRM_TBORDER;
+    extern int    A2M_FRM_REF, A2M_FRM_HLINES, A2M_FRM_VLINES, A2M_FRM_TTITLE;
+    
+    /* Public HTML specific */
+    extern int    A2M_HTML_TCOLOR, A2M_HTML_TBORDER, A2M_HTML_TOC;
+    extern char   *A2M_HTML_BODY;
+    extern U_ch   *A2M_HTML_TITLE;
+    extern int    A2M_HTML_LTGT;
+    extern int    A2M_HTML_STRIP;
+    extern int    A2M_HTML_TTITLE; /* JMP 12-02-99 */
+    extern int    A2M_HTML_GIFTOBMP; /* JMP 16-12-97 */
+    extern int    A2M_HTML_GIFTOPNG; /* JMP 23-08-15 */
+    extern char   *A2M_HTML_STYLE; /* JMP 09-05-99 */
+    extern char   *A2M_HTML_RELSTYLE; /* JMP 29-01-2004 */
+    extern char   *A2M_HTML_TARGET ; /* JMP 28-02-2004 */
+    extern int    A2M_HTML_AUTOLINK; /* JMP 20-10-01 */
+    extern int    A2M_HTML_IMGWIDTH;    /* JMP 29-06-02 */
+    extern int    A2M_HTML_IMGBORDER;   /* JMP 29-06-02 */
+    extern int    A2M_HTML_OEMTOANSI; /* JMP 16-08-10 */
+    extern int    A2M_HTML_NOINLINESTYLE; /* JMP 25-09-10 */
+    extern char   *A2M_HTML_TABLECLASS; // JMP 4/10/2013
+    extern char   *A2M_HTML_TRCLASS; // JMP 4/10/2013
+    extern char   *A2M_HTML_THCLASS; // JMP 4/10/2013
+    extern char   *A2M_HTML_TDCLASS; // JMP 4/10/2013
+    
+    
+    
+    /* Public CSV specific */
+    extern int    A2M_CSV_SEP, A2M_CSV_QUOTE, A2M_CSV_NA;
+    
+    /* Private */
+    extern A2MPPR   *A2M_PPRS;
+    extern int      A2M_NB_PPRS;
+    extern A2MANCHOR **A2M_ANCHORS;
+    extern int      A2M_NB_ANCHORS, A2M_NB_FNOTES;
+    extern char     **A2M_FNOTES;
+    
+    extern int     A2M_TBLID, A2M_FRAMEID, A2MGRFID, A2M_FONTSIZE, A2MGRFOBJID;
+    extern double  A2MGRFDIM[3], A2MGRF0[3], A2MGRFSCALE[3], A2MGRFORIG[3];
+    extern FILE    *A2M_fdfrm, *A2M_fdtbl, *A2M_fdfrw;
+#ifdef __cplusplus     
+}
+#endif
 
 /************ FUNCTIONS PROTOTYPES *******************/
 
