@@ -41,6 +41,23 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
+      - name: Install Boost
+        uses: MarkusJx/install-boost@v2.4.1
+        id: install-boost
+        with:
+            # REQUIRED: Specify the required boost version
+            # A list of supported versions can be found here:
+            # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+            boost_version: 1.80.0
+            # OPTIONAL: Specify a custom install location
+            boost_install_dir: C:\
+            # OPTIONAL: Specify a platform version
+            platform_version: 2019
+            # OPTIONAL: Specify a toolset
+            toolset: msvc
+            # NOTE: If a boost version matching all requirements cannot be found,
+            # this build step will fail
+
       # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       # Note: use $env:GITHUB_ENV instead of $GITHUB_ENV on Windows OS
       - name: Preset config for Windows
@@ -116,6 +133,14 @@ jobs:
           echo "PRESET_CONFIG=linux-${{ matrix.arch }}-debug" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
+      - name: Install Boost
+        uses: MarkusJx/install-boost@v2.4.1
+        id: install-boost
+        with:
+            boost_version: 1.80.0
+            boost_install_dir: C:\
+            platform_version: 2019
+            toolset: msvc
       - name: Configure CMake
         run: cmake --preset ${{ env.PRESET_CONFIG }}
       - name: Build C API Tests
@@ -160,6 +185,14 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
+      - name: Install Boost
+        uses: MarkusJx/install-boost@v2.4.1
+        id: install-boost
+        with:
+            boost_version: 1.80.0
+            boost_install_dir: C:\
+            platform_version: 2019
+            toolset: msvc
       - name: update pip
         run: python.exe -m pip install --upgrade pip
       - name: install aqtinstall
