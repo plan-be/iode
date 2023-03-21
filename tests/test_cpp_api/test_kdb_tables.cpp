@@ -310,3 +310,34 @@ TEST_F(KDBTablesTest, Merge)
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1.get(name), unmodified_table);
 }
+
+TEST_F(KDBTablesTest, Hash)
+{
+    boost::hash<KDBTables> kdb_hasher;
+    std::size_t hash_val = kdb_hasher(kdb);
+
+    // change a name
+    kdb.rename("GFRPC", "NEW_NAME");
+    std::size_t hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(rename table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // remove an entry
+    hash_val = hash_val_modified;
+    kdb.remove("NEW_NAME");
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(delete table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // add an entry
+    hash_val = hash_val_modified;
+    std::string def = "A title";
+    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
+    bool mode = true;
+    bool files = true;
+    bool date = true;
+    kdb.add("NEW_ENTRY", 2, def, vars, mode, files, date);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);   
+    std::cout << "(new    table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+}
