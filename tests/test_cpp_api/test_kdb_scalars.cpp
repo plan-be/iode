@@ -290,3 +290,40 @@ TEST_F(KDBScalarsTest, Merge)
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1.get(name), unmodified_scalar);
 }
+
+TEST_F(KDBScalarsTest, Hash)
+{
+    boost::hash<KDBScalars> kdb_hasher;
+    std::size_t hash_val = kdb_hasher(kdb);
+
+    // change a name
+    kdb.rename("acaf1", "new_name");
+    std::size_t hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(rename scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // modify an entry
+    hash_val = hash_val_modified;
+    IODE_REAL value = 0.0158;
+    IODE_REAL relax = 0.98;
+    kdb.update("new_name", value, relax);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(modify scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // remove an entry
+    hash_val = hash_val_modified;
+    kdb.remove("new_name");
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(delete scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // add an entry
+    hash_val = hash_val_modified;
+    value = 0.012365879;
+    relax = 1.;
+    kdb.add("new_entry", value, relax);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);   
+    std::cout << "(new    scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+}

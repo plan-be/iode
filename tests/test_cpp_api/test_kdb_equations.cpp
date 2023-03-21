@@ -272,3 +272,38 @@ TEST_F(KDBEquationsTest, Merge)
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1.get_lec(name), unmodified_lec);
 }
+
+TEST_F(KDBEquationsTest, Hash)
+{
+    boost::hash<KDBEquations> kdb_hasher;
+    std::size_t hash_val = kdb_hasher(kdb);
+
+    // modify an entry
+    std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    kdb.update("ACAF", new_lec);
+    std::size_t hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(modify equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // remove an entry
+    hash_val = hash_val_modified;
+    kdb.remove("ACAF");
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(delete equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // add an entry
+    hash_val = hash_val_modified;
+    std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    std::string method = "LSQ";
+    Sample sample("1980Y1", "1996Y1");
+    std::string comment = "Equation comment";
+    std::string block = "ACAF";
+    std::string instruments = "Equation instruments";
+    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
+    bool date = true;
+    kdb.add("ACAF", lec, comment, method, &sample, instruments, block, tests, date);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);   
+    std::cout << "(new    equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+}

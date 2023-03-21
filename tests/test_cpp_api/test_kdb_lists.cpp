@@ -242,3 +242,38 @@ TEST_F(KDBListsTest, Merge)
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1.get(name), unmodified_list);
 }
+
+TEST_F(KDBListsTest, Hash)
+{
+    boost::hash<KDBLists> kdb_hasher;
+    std::size_t hash_val = kdb_hasher(kdb);
+
+    // change a name
+    kdb.rename("COPY0", "COPY_0");
+    std::size_t hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(rename list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // modify an entry
+    hash_val = hash_val_modified;
+    std::string expanded_list = kdb.get("COPY_0") + kdb.get("COPY1");
+    kdb.update("COPY", expanded_list);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(modify list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // remove an entry
+    hash_val = hash_val_modified;
+    kdb.remove("COPY");
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(delete list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // add an entry
+    hash_val = hash_val_modified;
+    std::string new_list = "ACAF;ACAG;AOUC;AQC";
+    kdb.add("NEW_ENTRY", new_list);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);   
+    std::cout << "(new    list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+}

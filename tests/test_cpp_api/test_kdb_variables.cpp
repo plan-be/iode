@@ -404,3 +404,38 @@ TEST_F(KDBVariablesTest, Merge)
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1.get(name), unmodified_var);
 }
+
+TEST_F(KDBVariablesTest, Hash)
+{
+    boost::hash<KDBVariables> kdb_hasher;
+    std::size_t hash_val = kdb_hasher(kdb);
+
+    // change a name
+    kdb.rename("ACAF", "NEW_NAME");
+    std::size_t hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(rename variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // modify an entry
+    hash_val = hash_val_modified;
+    std::string lec = "10 + t";
+    kdb.update("NEW_NAME", lec);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(modify variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // remove an entry
+    hash_val = hash_val_modified;
+    kdb.remove("NEW_NAME");
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);
+    std::cout << "(delete variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+
+    // add an entry
+    hash_val = hash_val_modified;
+    lec = "20 + t";
+    kdb.add("NEW_ENTRY", lec);
+    hash_val_modified = kdb_hasher(kdb);
+    EXPECT_NE(hash_val, hash_val_modified);   
+    std::cout << "(new    variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
+}
