@@ -89,7 +89,7 @@ public:
 			if(c_period->p_p != 'Y') value += mSteps.at(c_period->p_p) * (c_period->p_s - 1);
 			return value;
 		}
-		catch(const std::exception& e)
+		catch(const std::exception)
 		{
 			throw IodeExceptionFunction("Invalid periodicity " + std::to_string(c_period->p_p) + ".\n" + 
 				"Possible values for the periodicity are " + std::string(L_PERIOD_CH) + ")");
