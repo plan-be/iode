@@ -198,4 +198,3 @@ Period KDBVariables::get_period(const int t) const
     PERIOD period = KSMPL(get_KDB())->s_p1;
     return Period(&period).shift(t);
 }
-

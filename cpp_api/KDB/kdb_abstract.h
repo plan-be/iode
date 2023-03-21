@@ -2,6 +2,7 @@
 #include "utils/utils.h"
 #include "time/sample.h"
 #include "kdb_global.h"
+#include <boost/functional/hash.hpp>
 
 
 // using is the C++11 version of typedef
