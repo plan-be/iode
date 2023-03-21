@@ -255,7 +255,7 @@ inline char** remove_duplicates(char** items)
     remove_duplicates(v_items);
     SCR_free_tbl((unsigned char**) items);
     
-    nb_items = v_items.size();
+    nb_items = (int) v_items.size();
     items = new char*[nb_items+1];
     for (int i=0; i < nb_items; i++)
     {
