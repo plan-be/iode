@@ -151,14 +151,14 @@ TEST_F(UtilsTest, removeDuplicates)
 		"QAF_", "QAI_", "QAT_", "QBBPPOT_", "QC_", "QQMAB_", "QS_", "Q_", "TFPHP_", 
 		"VAFF_", "VAI_", "VAT_", "VC_", "VS_", "WBF_", "WBU_", "WCF_", "WCR1_", "WCR2_", 
 		"WIND_", "WNF_", "YDH_", "ZZ_" };
-	int nb_names_with_duplicate = v_expected_duplicate.size();
+	int nb_names_with_duplicate = (int) v_expected_duplicate.size();
 
 	std::vector<std::string> v_expected_unique = { "BENEF", "BENEF_", "BQY", "BVY", 
 		"GAP", "GOSF", "GOSG", "GOSH", "GOSH_", "IDH_", "PAFF_", "PC_", "PFI_", "QAFF", 
 		"QAFF_", "QAF_", "QAG", "QAH", "QAI_", "QAT", "QAT_", "QBBPPOT_", "QC_", "QQMAB_", 
 		"QS_", "Q_", "TFPHP_", "VAFF_", "VAI_", "VAT_", "VC_", "VS_", "WBF_", "WBU_", 
 		"WCF_", "WCR1_", "WCR2_", "WIND_", "WNF_", "YDH_", "ZZ_" };
-	int nb_names_unique = v_expected_unique.size();
+	int nb_names_unique = (int) v_expected_unique.size();
 
 	// Before removing duplicates
 	// Retrieves all object names matching one or more patterns in K_WS (similar to grep)
@@ -182,7 +182,7 @@ TEST_F(UtilsTest, removeDuplicates)
 	// (vector<string>) After removing duplicates
 	v_names = v_expected_duplicate;
 	remove_duplicates(v_names);
-	nb_names = v_names.size();
+	nb_names = (int) v_names.size();
 	EXPECT_EQ(nb_names, nb_names_unique);
 	EXPECT_EQ(v_names, v_expected_unique);
 }
