@@ -71,7 +71,7 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
         // throw exception if wrong parameters
         sample = new Sample(from, to);
     }
-    catch (IodeException& e)
+    catch (IodeException)
     {
         error.add_argument("Sample From -> To", from + " -> " + to);
     }
@@ -179,7 +179,7 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
         // throw exception if wrong parameters
         sample = new Sample(from, to);
     }
-    catch (IodeException& e)
+    catch (IodeException)
     {
         error.add_argument("Sample From -> To", from + " -> " + to);
     }
