@@ -18,6 +18,9 @@ QIodeHighlighter::QIodeHighlighter(QTextDocument *parent) : QSyntaxHighlighter(p
 
     // %<expression>%
     addRule(R"(%[^%]+%)", Qt::darkMagenta);
+
+    // {expression}
+    addRule(R"(\{(.*?)\})", Qt::darkGreen);
 }
 
 void QIodeHighlighter::addRuleCommands(const int group, const QColor& color)
