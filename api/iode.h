@@ -1486,7 +1486,7 @@ extern  int   (*K_xdrobj[])();
 */
 
 #include "iodebase.h"
-#include "iodevarg.h"
+//#include "iodevarg.h"
 
 
 #endif /* _IODE_H_ */
