@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QSpacerItem>
+#include <QCheckBox>
 #include <QShortcut>
+#include <QSpacerItem>
 #include <QPushButton>
 
 #include "utils.h"
@@ -40,5 +41,10 @@ private slots:
         emit askComputeHash(true);
         static_cast<ReportEditor*>(editor)->run(filepath);
         emit askComputeHash(false);
+    }
+
+    void toggleAutocomplete(int state)
+    {
+        static_cast<ReportEditor*>(editor)->enableAutocomplete(state == Qt::Checked);
     }
 };

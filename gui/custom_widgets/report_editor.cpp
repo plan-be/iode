@@ -1,22 +1,20 @@
 #include "report_editor.h"
 
 
-ReportEditor::ReportEditor(std::shared_ptr<QIodeCompleter>& c, QTextEdit* output, QWidget *parent) 
+ReportEditor::ReportEditor(std::shared_ptr<QIodeCompleter>& shared_c, QTextEdit* output, QWidget *parent) 
     : TextEditor(parent), output(output)
 {
     highlighter = new QIodeHighlighter(this->document());
 
-    this->c = c;
-
-    if (!c.get())
-        return;
-
-    c->setWidget(this);
+    this->shared_c = shared_c;
+    shared_c->setWidget(this);
     // Signal activated is overloaded in QCompleter. 
     // To connect to this signal by using the function pointer syntax, Qt provides 
     // a convenient helper for obtaining the function pointer
-    connect(c.get(), QOverload<const QString &>::of(&QCompleter::activated),
+    connect(shared_c.get(), QOverload<const QString &>::of(&QCompleter::activated),
             this, &ReportEditor::insertCompletion);
+
+    enableAutocomplete(true);
 }
 
 ReportEditor::~ReportEditor()
@@ -73,7 +71,7 @@ void ReportEditor::insertCompletion(const QString& completion)
 
 void ReportEditor::keyPressEvent(QKeyEvent* e)
 {
-    if(!c.get())
+    if(!c)
     {
         TextEditor::keyPressEvent(e);
         return;
@@ -119,7 +117,7 @@ void ReportEditor::keyPressEvent(QKeyEvent* e)
 
 void ReportEditor::focusInEvent(QFocusEvent* e)
 {
-    if (c.get())
+    if(c)
         c->setWidget(this);
     TextEditor::focusInEvent(e);
 }
