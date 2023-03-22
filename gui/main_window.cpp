@@ -37,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     user_settings = new QSettings(QSettings::UserScope, this);
     projectPath = user_settings->value("projectPath", "").toString();
     recentProjects = user_settings->value("recentProjects", QStringList()).toStringList();
+    fontFamily = user_settings->value("fontFamily", defaultFontFamily).toString();
+
+    textEdit_output->setStyleSheet("font-family: " + fontFamily);
+    lineEdit_iode_command->setStyleSheet("font-family: " + fontFamily);
 
     // ---- menus ----
     buildRecentProjectsMenu();
@@ -91,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
 MainWindow::~MainWindow()
 {
     user_settings->setValue("projectPath", QVariant(projectPath));
+    user_settings->setValue("fontFamily", QVariant(fontFamily));
 
     for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
 

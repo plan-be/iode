@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
     // forces decimals separator to be dot 
     QLocale::setDefault(QLocale::English);
 
+    // initialize IODE API
     IodeInit();
     gui_assign_super_API();
 
