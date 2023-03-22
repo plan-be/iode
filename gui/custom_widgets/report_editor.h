@@ -28,6 +28,8 @@ class ReportEditor : public TextEditor
     QIodeCompleter* c;
     QIodeHighlighter *highlighter;
 
+    QKeyCombination keyCombineComplete;
+
     QTextEdit* output; 
 
 private:
