@@ -30,6 +30,7 @@
  * ****************************** */
 
 const static QUrl url_manual = QUrl::fromLocalFile("./doc/iode.chm");
+const static QString defaultFontFamily = "Consolas, \"Courier New\", monospace";
 
 
 /* ****************************** *

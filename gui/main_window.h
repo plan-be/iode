@@ -62,6 +62,7 @@ private:
 	QString projectPath;
 	const int MAX_RECENT_PROJECTS = 30;
 	QStringList recentProjects;
+	QString fontFamily;
 
 	QVector<QIodePlotDialog*> plots;
 

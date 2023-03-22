@@ -1,9 +1,12 @@
 #pragma once
 #include <QWidget>
 #include <QPainter>
+#include <QSettings>
 #include <QTextBlock>
 #include <QFontMetricsF>
 #include <QPlainTextEdit>
+
+#include "utils.h"
 
 
 class LeftArea;

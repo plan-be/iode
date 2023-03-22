@@ -11,6 +11,11 @@ TextEditor::TextEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTabStopDistance(QFontMetricsF(this->font()).horizontalAdvance(' ') * 4);
 
     updateLeftAreaWidth(0);
+
+    // set font family
+    QSettings user_settings(QSettings::UserScope, this);
+    QString fontFamily = user_settings.value("fontFamily", defaultFontFamily).toString();
+    this->setStyleSheet("font-family: " + fontFamily);
 }
 
 void TextEditor::leftAreaPaintEvent(QPaintEvent *event)
