@@ -5,7 +5,10 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
 {
     filter = "IODE report files (*" + QString::fromStdString(report_ext) + ")";
 
+    int col = 0;
+
     // autocomplete checkbox
+    /*
     QCheckBox* autocomplete = new QCheckBox("autocomplete", this);
     autocomplete->setChecked(true);
     autocomplete->setObjectName(QString::fromUtf8("autocomplete"));
@@ -14,11 +17,14 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
     sizePolicyCompleter.setVerticalStretch(0);
     sizePolicyCompleter.setHeightForWidth(autocomplete->sizePolicy().hasHeightForWidth());
     autocomplete->setSizePolicy(sizePolicyCompleter);
-    layout->addWidget(autocomplete, 0, 0, Qt::AlignLeft);
+    layout->addWidget(autocomplete, 0, col, Qt::AlignLeft);
+    col++;
+    */
 
     // spacer
     QSpacerItem* horizontalSpacer = new QSpacerItem(720, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    layout->addItem(horizontalSpacer, 0, 1);
+    layout->addItem(horizontalSpacer, 0, col);
+    col++;
 
     // Run button
     QPushButton* runButton = new QPushButton("Run", this);
@@ -28,7 +34,8 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
     sizePolicyRun.setVerticalStretch(0);
     sizePolicyRun.setHeightForWidth(runButton->sizePolicy().hasHeightForWidth());
     runButton->setSizePolicy(sizePolicyRun);
-    layout->addWidget(runButton, 0, 2, Qt::AlignRight);
+    layout->addWidget(runButton, 0, col, Qt::AlignRight);
+    col++;
 
     // add report editor
     editor = new ReportEditor(completer, output, parent);
@@ -41,7 +48,7 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
     connect(runShortcut, &QShortcut::activated, this, &QIodeReportWidget::run);
     connect(runButton, &QPushButton::clicked, this, &QIodeReportWidget::run);
 
-    connect(autocomplete, &QCheckBox::stateChanged, this, &QIodeReportWidget::toggleAutocomplete);
+    // connect(autocomplete, &QCheckBox::stateChanged, this, &QIodeReportWidget::toggleAutocomplete);
 }
 
 QIodeReportWidget::~QIodeReportWidget()
