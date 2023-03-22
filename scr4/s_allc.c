@@ -15,9 +15,9 @@
 extern char *realloc();
 Replaced by stdlib JMP 04-01-98 */
 
-long        SCR_TOTAL_ALLOC = 0;
-int         SCR_ALLOC_DOC = 0;
-char        *SCR_ALLOC_DOC_LOGFILE = 0;
+long        SCR_TOTAL_ALLOC = 0;            // Total remaining memory allocation in bytes
+int         SCR_ALLOC_DOC = 0;              // Log the remaining allocations 
+char        *SCR_ALLOC_DOC_LOGFILE = 0;     // Log file for remaining allocations 
 
 /* =========================================================================
 ALLOC DOC : maintain information on the allocations made by

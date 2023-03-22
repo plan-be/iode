@@ -377,7 +377,7 @@ A2mDokuPrintEnumPrefx(int lmarg)
 {
     int i, level;
 
-    if(lmarg <= 0) return;
+    if(lmarg <= 0) return(0);
 
     level = (lmarg - 24) / 8;
     for(i = 0; i < level ; i++) fprintf(A2M_fdtxt, "  ");
@@ -604,7 +604,7 @@ A2MPPR  *pp;
 {
     A2MFNT  fnt, fntp;
 
-    if(A2M_DOKU_ESC == 0) return;
+    if(A2M_DOKU_ESC == 0) return(0);
 
     A2mSetFont(ap, ap->ap_strs[n], &fnt);
 
