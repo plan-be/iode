@@ -24,7 +24,8 @@ class ReportEditor : public TextEditor
 {
     Q_OBJECT
 
-    std::shared_ptr<QIodeCompleter> c;
+    std::shared_ptr<QIodeCompleter> shared_c;
+    QIodeCompleter* c;
     QIodeHighlighter *highlighter;
 
     QTextEdit* output; 
@@ -42,8 +43,19 @@ protected:
     void focusInEvent(QFocusEvent* e) override;
 
 public: 
-    ReportEditor(std::shared_ptr<QIodeCompleter>& c, QTextEdit* output, QWidget *parent = nullptr);
+    ReportEditor(std::shared_ptr<QIodeCompleter>& shared_c, QTextEdit* output, QWidget *parent = nullptr);
     ~ReportEditor();
 
     void run(const QString& filepath);
+
+    void enableAutocomplete(const bool enable)
+    {
+        if (!shared_c.get())
+            return;
+
+        if(enable)
+            c = shared_c.get();
+        else
+            c = nullptr;
+    }
 };
