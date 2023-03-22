@@ -17,6 +17,7 @@ SQLINTEGER  OLongBuf;
 SQLUSMALLINT ORowStatusArray[2];
 //extern int  ODebugDetail;
 int     ODebugDetail = 0;   // JMP 08/12/2021 : moved from s_dbbvars.c
+                            // JMP 15/03/2023 : remis dans s_dbvars.c sinon s_dbc ne le connait pas 
 
 /* ====================================================================
 Initialise une session ODBC. Cette fonction doit ˆtre appel‚e avant
@@ -733,7 +734,7 @@ OSetPtrVCol(OCSR *ocsr, int colnb, char *ptr)
 {
     if(ocsr->otbl->ncols <= colnb || /* JMP 30-03-00 */
        ocsr->otbl->cols[colnb].datalen <= 0)
-	    return;
+	    return(0);
 
     if(ocsr->otbl->cols[colnb].Cvar) {
 	SCR_free(ocsr->otbl->cols[colnb].Cvptr);

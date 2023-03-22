@@ -30,7 +30,7 @@ OPrintRowFd(FILE *fd, OCSR *ocsr)
     char    *ptr;
     char    buf[10240];
 
-    if(fd == 0) return; /* JMP 06-01-99 */
+    if(fd == 0) return(0); /* JMP 06-01-99 */
     for(i = 0 ; i < ocsr->otbl->ncols ; i++) {
 	if(i > 0) fprintf(fd, "|");
 	ptr = OGetCol(ocsr, i);
@@ -110,7 +110,7 @@ OPrintInsertRowFd(FILE *fd, OCSR *ocsr, char *tblname, int strip, int synt)
     double  dbl = 0;
     U_ch    *ptr, buf[80];
 
-    if(fd == 0) return; /* JMP 06-01-99 */
+    if(fd == 0) return(0); /* JMP 06-01-99 */
     switch(synt) {
 	case 1 : fprintf(fd, "INSERT INTO ");
 		 if(OMyDbName) fprintf(fd, "`%s`.", OMyDbName);

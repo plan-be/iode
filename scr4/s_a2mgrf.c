@@ -824,7 +824,7 @@ A2MPAR  *title;
 	int         i, line, col;
 	double      x, y, width;
 
-	if(A2mEmptyPar(title)) return; // GB 17/03/2009
+	if(A2mEmptyPar(title)) return(0); // GB 17/03/2009
 
 	line = nbr%3;
 	col = nbr/3;

@@ -247,6 +247,23 @@ char    *outfile;
 	}
     return(0);
 }
+
+/*NH JMP 30-08-11 */
+void A2mRtfPrintPgHeadFoot(U_ch * txt, int type)
+{
+    char    buf[1024];
+    if(txt) {
+	if(strlen(txt) > 512) txt[512] = 0;
+	strcpy(buf, txt);
+	SCR_replace(buf, "%d", "{\\field{\\fldinst page}}");
+
+	if(type) fprintf(A2M_fdrtf, "{\\footer{\\pard\\plain \\s1\\sb60\\sa60\\f2\\fs18\\qc %s \\par}}\n", buf);
+	else     fprintf(A2M_fdrtf, "{\\header{\\pard\\plain \\s2\\sb60\\sa60\\f2\\fs18\\qc %s \\par}}\n", buf);
+	}
+    SCR_free(txt);
+}
+
+
 /*NH*/
 A2mRtfPrintObj(ao)
 A2MOBJ  *ao;
@@ -294,20 +311,6 @@ A2MOBJ  *ao;
     return(0);
 }
 
-/*NH JMP 30-08-11 */
-void A2mRtfPrintPgHeadFoot(U_ch * txt, int type)
-{
-    char    buf[1024];
-    if(txt) {
-	if(strlen(txt) > 512) txt[512] = 0;
-	strcpy(buf, txt);
-	SCR_replace(buf, "%d", "{\\field{\\fldinst page}}");
-
-	if(type) fprintf(A2M_fdrtf, "{\\footer{\\pard\\plain \\s1\\sb60\\sa60\\f2\\fs18\\qc %s \\par}}\n", buf);
-	else     fprintf(A2M_fdrtf, "{\\header{\\pard\\plain \\s2\\sb60\\sa60\\f2\\fs18\\qc %s \\par}}\n", buf);
-	}
-    SCR_free(txt);
-}
 
 /*NH*/
 int A2mRtfHpj(char* outfile)
