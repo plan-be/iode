@@ -2,7 +2,7 @@
 
 
 ReportEditor::ReportEditor(std::shared_ptr<QIodeCompleter>& shared_c, QTextEdit* output, QWidget *parent) 
-    : TextEditor(parent), output(output)
+    : TextEditor(parent), output(output), keyCombineComplete(QKeyCombination(Qt::ControlModifier, Qt::Key_Space))
 {
     highlighter = new QIodeHighlighter(this->document());
 
@@ -46,7 +46,11 @@ QString ReportEditor::textUnderCursor() const
     // NOTE: we need to add the lines below because we need to know
     //       if there is a character $, # or @ before the "word"
     tc.movePosition(QTextCursor::StartOfWord);
-    QChar ch = block[tc.positionInBlock()];
+    pos = tc.positionInBlock();
+    QChar::Category cat_first_char = block[0].category();
+    if(!(cat_first_char == QChar::Separator_Line || cat_first_char == QChar::Separator_Paragraph) && pos > 0)
+        pos--;
+    QChar ch = block[pos];
     QString completionPrefix = (ch == '$' || ch == '#' || ch == '@') ? ch + word : word;
 
     return completionPrefix;
@@ -99,9 +103,12 @@ void ReportEditor::keyPressEvent(QKeyEvent* e)
     }
 
     // CTRL + Space forces auto-completion
-    bool completeShortcut = e->modifiers().testFlag(Qt::ControlModifier) && e->key() == Qt::Key_Space;
-    if(!completeShortcut)
-        TextEditor::keyPressEvent(e);
+    bool completeShortcut = e->keyCombination() == keyCombineComplete;
+    // see https://doc.qt.io/qt-6/qt.html#Key-enum for maximal value of letter + digit key
+    if(!completeShortcut && e->key() > 0x0ff)
+        return TextEditor::keyPressEvent(e);
+
+    TextEditor::keyPressEvent(e);
     
     c->setCompletionPrefix(textUnderCursor());
     if(completeShortcut || c->completionPrefix().size() > 0)
