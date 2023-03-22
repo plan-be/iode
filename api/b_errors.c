@@ -28,7 +28,13 @@ int      B_ERROR_NB;        /* Nb of last recorded error messages */
  *  Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR. 
  *  The path is constructed by appending "iode.msg" to the path of the current executable.
  *  
- *  Don't use this function in the context of the "DOS" GUI interface where this file is appended to iode.scr file.
+ *  To use is the context of programs calling iode API fns like iodecmd or 
+ *  tests linked with iodeapi.lib.
+ *  
+ *  Don't use this function in the context of the "DOS" GUI interface where this file is 
+ *  already appended to iode.scr file.
+ *  
+ *  
  */
 void B_IodeMsgPath()
 {

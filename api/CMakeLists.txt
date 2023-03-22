@@ -46,7 +46,7 @@ set (SOURCES
 )
 
 set (HEADERS 
-		iode.h iodebase.h iodeapi.h iodevarg.h
+		iode.h iodebase.h iodeapi.h
 )
 
 add_library (iodeapi STATIC ${SOURCES} ${HEADERS})

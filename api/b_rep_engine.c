@@ -1220,7 +1220,7 @@ done:
  *  
  *  @param [in, out] REPFILE*   rf  report to execute
  *  @return          int            0:  success or error must be ignored (the 2d char of the line is '-')
- *                                  -1: error in one of the commands
+ *                                  -1: error in one of the commands failed
  *                                  -3: expand failed or abort report(s) execution
  *                                  -4: quit iode 
  */

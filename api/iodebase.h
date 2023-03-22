@@ -744,59 +744,6 @@ extern int COL_exec(TBL *,int ,COLS *);
 
 /* b_api.c */
 #include "iodeapi.h"
-//extern int IodeInit();
-//extern int IodeEnd();
-//extern char *IodeVersion();
-//extern int IodeLoadVar(char *name);
-//extern int IodeLoad(char *name, int type);
-//extern int IodeSaveVar(char *name);
-//extern int IodeSave(char *name, int type);
-//extern int IodeClearWs();
-//extern char **IodeContents(char *pattern, int type);
-//extern char *IodeContentsStr(char *pattern, int type);
-//extern double IodeGetVar(char *name, int t, int mode);
-//extern double *IodeGetVector(char *name, int *lg);
-//extern int IodeSetVector(char *la_name, double *la_values, int la_year_from, int la_year_to);
-//extern double *IodeGetSampleVector(int *lg);
-//extern char *IodeGetSampleAsString();
-//extern int IodeSetVar(char *name, int t, int mode, double value);
-//extern char *IodeGetCmt(char *name);
-//extern char *IodeGetLst(char *name);
-//extern char *IodeGetEqsLec(char *name);
-//extern  int IodeGetEqs(char *name, char**lec, int* method, char *sample_from, char* sample_to, char**blk, char**instr, float *tests);
-//
-////extern double IodeGetScl(char *name);
-//extern int IodeGetScl(char *name, double* value, double *relax, double *std_err);
-//extern double *IodeGetScls(char *name);
-//extern int IodeSetScl(char *name, double value, double relax, double std);
-//extern int IodeSetNbDec(int nbdec);
-//extern int IodeGetNbDec();
-//extern char* IodeGetTbl(char *name, char *gsmpl);
-//extern char* IodeGetTblTitle(char *name);
-//extern TBL* IodeGetTblDefinition(char *name);
-//extern int IodeSetTblFile(int ref, char *filename);
-////extern int IodeSimulate(char *byear, char *eyear, double eps, double relax, int maxit);
-//extern int  IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list,
-//                 double eps, double relax, int maxit, 
-//                 int init_values, int sort_algo, int nb_passes, int debug, 
-//                 double newton_eps, int newton_maxit, int newton_debug);
-//extern int IodeGetSampleLength();
-//extern char *IodeGetPeriodAsString(int t);
-//extern int IodeGett(char *period);
-//extern int IodeGetChart(char *name, char *gsmpl);
-//extern int IodeFreeChart(int hdl);
-//extern int IodeChartNl(int hdl);
-//extern int IodeChartNc(int hdl);
-//extern char IodeChartType(int hdl, int i);
-//extern int IodeChartAxis(int hdl, int i);
-//extern char *IodeChartTitle(int hdl, int i);
-//extern double *IodeChartData(int hdl, int i);
-//extern int IodeExecArgs(char *filename, char **args);
-//extern int IodeExec(char *filename);
-//extern int IodeIsSampleSet();
-//extern double  *IodeExecLec(char* lec);
-//extern double  IodeExecLecT(char* lec, int t);
-
 
 /* b_iodeini.c */
 extern char* ODE_INIFILE;
