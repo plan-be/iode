@@ -112,15 +112,14 @@ void Estimation::set_equations_list(const std::string& str_equations)
     // remove duplicate coefficient names
     remove_duplicates(coefficients_list);
     // convert vector to string
-    std::string scalars_list;
-    for (const std::string& coef_name: coefficients_list) scalars_list += coef_name + ";";
+    std::string scalars_list = boost::algorithm::join(coefficients_list, ";");
 
     if(kdb_scl) delete kdb_scl;
     try
     {
         kdb_scl = new KDBScalars(KDB_LOCAL, scalars_list);
     }
-        catch(IodeException)
+    catch(IodeException)
     {
         invalid_error.add_argument("list of found coefficients", scalars_list);
         throw invalid_error;
