@@ -14,12 +14,16 @@ class EquationsView : public TemplateTableView<EquationsModel>
 {
 	Q_OBJECT
 
+	QIodeEditEquation* editEqDialog;
+
 	QShortcut* editShortcutEnter;
 	QShortcut* editShortcutReturn;
 
 public:
-	EquationsView(QWidget* parent = nullptr) : TemplateTableView(I_EQUATIONS, new EquationsDelegate(parent), parent) 
+	EquationsView(QWidget* parent = nullptr) : TemplateTableView(I_EQUATIONS, new EquationsDelegate(parent), parent)
 	{
+		editEqDialog = nullptr;
+		
 		editShortcutEnter = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Enter), this);
 		connect(editShortcutEnter, &QShortcut::activated, this, &EquationsView::edit_obj);
 		
@@ -29,6 +33,11 @@ public:
 
 	~EquationsView()
 	{
+		if(editEqDialog)
+		{
+			editEqDialog->close();
+			delete editEqDialog;
+		}
 		delete editShortcutEnter;
 		delete editShortcutReturn;
 	}
