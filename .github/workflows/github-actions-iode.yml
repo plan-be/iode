@@ -156,7 +156,7 @@ jobs:
 
   build_gui:
     name: Build Graphical User Interface
-    if: contains(github.head_ref, 'gui')
+    if: contains(github.head_ref, 'release')
     strategy:
       matrix:
         os: [windows-latest]
@@ -236,7 +236,7 @@ jobs:
 
   build_doc:
     name: Build user documentation
-    if: contains(github.head_ref, 'doc')
+    if: contains(github.head_ref, 'release')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
