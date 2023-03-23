@@ -1,5 +1,7 @@
 #pragma once
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
+
 #include "utils/utils.h"
 #include "time/sample.h"
 #include "kdb/kdb_equations.h"
