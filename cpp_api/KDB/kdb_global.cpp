@@ -62,7 +62,7 @@ char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern
 KDB* hard_copy_kdb(KDB* source_kdb, char** names)
 {
     short iode_type = source_kdb->k_type;
-    int nb_objs = SCR_tbl_size((unsigned char**) names);
+    int nb_objs = (names != NULL) ? SCR_tbl_size((unsigned char**) names) : source_kdb->k_nb;
 
     // K_create() sets:
     // - k_arch = #define ARCH
@@ -88,7 +88,7 @@ KDB* hard_copy_kdb(KDB* source_kdb, char** names)
     char* c_obj_name;
     for (int i=0; i<nb_objs; i++)
     {
-        c_obj_name = names[i];
+        c_obj_name = (names != NULL) ? names[i] : KONAME(source_kdb, i);
         pos_dest_kdb = K_dup(source_kdb, c_obj_name, dest_kdb, c_obj_name);
         if (pos_dest_kdb < 0)
         {
