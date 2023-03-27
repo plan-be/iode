@@ -24,6 +24,35 @@ TEST_F(KDBListsTest, Load)
     EXPECT_EQ(kdb3.count(), 17);
 }
 
+TEST_F(KDBListsTest, CopyConstructor)
+{
+    std::string list = kdb.get("COPY");
+    std::string new_list = "ACAF;ACAG;AOUC;AQC";
+
+    // GLOBAL KDB
+    KDBLists kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 17);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBLists local_kdb(KDB_LOCAL, "C*");
+    KDBLists local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("COPY", new_list);
+    EXPECT_EQ(local_kdb.get("COPY"), list);
+    EXPECT_EQ(local_kdb_hard_copy.get("COPY"), new_list);
+
+    // SHALLOW COPY KDB
+    KDBLists shallow_kdb(KDB_SHALLOW_COPY, "C*");
+    KDBLists shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("COPY", new_list);
+    EXPECT_EQ(shallow_kdb.get("COPY"), new_list);
+    EXPECT_EQ(shallow_kdb_copy.get("COPY"), new_list);
+}
+
 TEST_F(KDBListsTest, Save)
 {
     // save in binary format

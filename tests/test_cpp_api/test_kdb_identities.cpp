@@ -24,6 +24,35 @@ TEST_F(KDBIdentitiesTest, Load)
     EXPECT_EQ(kdb3.count(), 48);
 }
 
+TEST_F(KDBIdentitiesTest, CopyConstructor)
+{
+    std::string lec = kdb.get_lec("AOUC");
+    std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
+
+    // GLOBAL KDB
+    KDBIdentities kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 48);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBIdentities local_kdb(KDB_LOCAL, "A*");
+    KDBIdentities local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("AOUC", new_lec);
+    EXPECT_EQ(local_kdb.get_lec("AOUC"), lec);
+    EXPECT_EQ(local_kdb_hard_copy.get_lec("AOUC"), new_lec);
+
+    // SHALLOW COPY KDB
+    KDBIdentities shallow_kdb(KDB_SHALLOW_COPY, "A*");
+    KDBIdentities shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("AOUC", new_lec);
+    EXPECT_EQ(shallow_kdb.get_lec("AOUC"), new_lec);
+    EXPECT_EQ(shallow_kdb_copy.get_lec("AOUC"), new_lec);
+}
+
 TEST_F(KDBIdentitiesTest, Save)
 {
     // save in binary format

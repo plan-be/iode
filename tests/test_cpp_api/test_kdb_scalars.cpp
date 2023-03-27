@@ -24,6 +24,38 @@ TEST_F(KDBScalarsTest, Load)
     EXPECT_EQ(kdb3.count(), 161);
 }
 
+TEST_F(KDBScalarsTest, CopyConstructor)
+{
+    Scalar scalar = kdb.get("acaf1");
+    IODE_REAL value = 0.0158;
+    IODE_REAL relax = 0.98;
+    IODE_REAL std = 0.0;
+    Scalar new_scalar(value, relax, std);
+
+    // GLOBAL KDB
+    KDBScalars kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 161);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBScalars local_kdb(KDB_LOCAL, "a*");
+    KDBScalars local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("acaf1", value, relax, std);
+    EXPECT_EQ(local_kdb.get("acaf1"), scalar);
+    EXPECT_EQ(local_kdb_hard_copy.get("acaf1"), new_scalar);
+
+    // SHALLOW COPY KDB
+    KDBScalars shallow_kdb(KDB_SHALLOW_COPY, "a*");
+    KDBScalars shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("acaf1", value, relax, std);
+    EXPECT_EQ(shallow_kdb.get("acaf1"), new_scalar);
+    EXPECT_EQ(shallow_kdb_copy.get("acaf1"), new_scalar);
+}
+
 TEST_F(KDBScalarsTest, Save)
 {
     // save in binary format

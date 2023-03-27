@@ -24,6 +24,37 @@ TEST_F(KDBTablesTest, Load)
     EXPECT_EQ(kdb3.count(), 46);
 }
 
+TEST_F(KDBTablesTest, CopyConstructor)
+{
+    std::string title = kdb.get_title("C8_1");
+    std::string new_title = "modified title";
+    Table table = kdb.get("C8_1");
+    table.setTitle(0, new_title);
+
+    // GLOBAL KDB
+    KDBTables kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 46);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBTables local_kdb(KDB_LOCAL, "C*");
+    KDBTables local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("C8_1", table);
+    EXPECT_EQ(local_kdb.get_title("C8_1"), title);
+    EXPECT_EQ(local_kdb_hard_copy.get_title("C8_1"), new_title);
+
+    // SHALLOW COPY KDB
+    KDBTables shallow_kdb(KDB_SHALLOW_COPY, "C*");
+    KDBTables shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("C8_1", table);
+    EXPECT_EQ(shallow_kdb.get_title("C8_1"), new_title);
+    EXPECT_EQ(shallow_kdb_copy.get_title("C8_1"), new_title);
+}
+
 TEST_F(KDBTablesTest, Save)
 {
     // save in binary format

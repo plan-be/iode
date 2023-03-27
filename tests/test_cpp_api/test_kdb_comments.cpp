@@ -24,6 +24,34 @@ TEST_F(KDBCommentsTest, Load)
     EXPECT_EQ(kdb3.count(), 317);
 }
 
+TEST_F(KDBCommentsTest, CopyConstructor)
+{
+    std::string comment = kdb.get("ACAF");
+    std::string modified = "modified";
+
+    // GLOBAL KDB
+    KDBComments kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 317);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBComments local_kdb(KDB_LOCAL, "A*");
+    KDBComments local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("ACAF", modified);
+    EXPECT_EQ(local_kdb.get("ACAF"), comment);
+    EXPECT_EQ(local_kdb_hard_copy.get("ACAF"), modified);
+
+    // SHALLOW COPY KDB
+    KDBComments shallow_kdb(KDB_SHALLOW_COPY, "A*");
+    KDBComments shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("ACAF", modified);
+    EXPECT_EQ(shallow_kdb.get("ACAF"), modified);
+    EXPECT_EQ(shallow_kdb_copy.get("ACAF"), modified);
+}
 
 TEST_F(KDBCommentsTest, Save)
 {
