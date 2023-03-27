@@ -19,6 +19,9 @@ TEST_F(KDBEquationsTest, Load)
 {
     KDBEquations kdb2;
     EXPECT_EQ(kdb2.count(), 274);
+
+    KDBEquations kdb3(input_test_dir + "fun.eqs");
+    EXPECT_EQ(kdb3.count(), 274);
 }
 
 TEST_F(KDBEquationsTest, Save)

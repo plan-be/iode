@@ -19,6 +19,9 @@ TEST_F(KDBIdentitiesTest, Load)
 {
     KDBIdentities kdb2;
     EXPECT_EQ(kdb2.count(), 48);
+
+    KDBIdentities kdb3(input_test_dir + "fun.idt");
+    EXPECT_EQ(kdb3.count(), 48);
 }
 
 TEST_F(KDBIdentitiesTest, Save)
