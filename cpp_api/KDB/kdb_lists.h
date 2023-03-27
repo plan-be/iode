@@ -16,6 +16,8 @@ public:
     KDBLists(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_LISTS, pattern) {};
 
+    KDBLists(const KDBLists& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+
     int add(const std::string& name, const List& list);
 
     void update(const std::string& name, const List& list);

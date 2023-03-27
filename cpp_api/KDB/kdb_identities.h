@@ -19,6 +19,8 @@ public:
 
     KDBIdentities(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_IDENTITIES, pattern) {};
+    
+    KDBIdentities(const KDBIdentities& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
 
     std::string get_lec(const int pos) const;
 
