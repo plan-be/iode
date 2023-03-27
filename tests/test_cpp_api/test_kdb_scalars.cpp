@@ -19,6 +19,9 @@ TEST_F(KDBScalarsTest, Load)
 {
     KDBScalars kdb2;
     EXPECT_EQ(kdb2.count(), 161);
+
+    KDBScalars kdb3(input_test_dir + "fun.scl");
+    EXPECT_EQ(kdb3.count(), 161);
 }
 
 TEST_F(KDBScalarsTest, Save)

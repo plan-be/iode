@@ -23,6 +23,9 @@ TEST_F(KDBVariablesTest, Load)
 {
     KDBVariables kdb2;
     EXPECT_EQ(kdb2.count(), 394);
+
+    KDBVariables kdb3(input_test_dir + "fun.var");
+    EXPECT_EQ(kdb3.count(), 394);
 }
 
 TEST_F(KDBVariablesTest, Save)

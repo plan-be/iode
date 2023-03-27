@@ -19,6 +19,9 @@ TEST_F(KDBCommentsTest, Load)
 {
     KDBComments kdb2;
     EXPECT_EQ(kdb2.count(), 317);
+
+    KDBComments kdb3(input_test_dir + "fun.cmt");
+    EXPECT_EQ(kdb3.count(), 317);
 }
 
 
