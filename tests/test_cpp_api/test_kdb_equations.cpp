@@ -24,6 +24,35 @@ TEST_F(KDBEquationsTest, Load)
     EXPECT_EQ(kdb3.count(), 274);
 }
 
+TEST_F(KDBEquationsTest, CopyConstructor)
+{
+    std::string lec = kdb.get_lec("ACAF");
+    std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+
+    // GLOBAL KDB
+    KDBEquations kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 274);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBEquations local_kdb(KDB_LOCAL, "A*");
+    KDBEquations local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("ACAF", new_lec);
+    EXPECT_EQ(local_kdb.get_lec("ACAF"), lec);
+    EXPECT_EQ(local_kdb_hard_copy.get_lec("ACAF"), new_lec);
+
+    // SHALLOW COPY KDB
+    KDBEquations shallow_kdb(KDB_SHALLOW_COPY, "A*");
+    KDBEquations shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("ACAF", new_lec);
+    EXPECT_EQ(shallow_kdb.get_lec("ACAF"), new_lec);
+    EXPECT_EQ(shallow_kdb_copy.get_lec("ACAF"), new_lec);
+}
+
 TEST_F(KDBEquationsTest, Save)
 {
     // save in binary format

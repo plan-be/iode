@@ -28,6 +28,38 @@ TEST_F(KDBVariablesTest, Load)
     EXPECT_EQ(kdb3.count(), 394);
 }
 
+TEST_F(KDBVariablesTest, CopyConstructor)
+{
+    Variable var = kdb.get("ACAF");
+    std::string lec = "10 + t";
+    Variable new_var;
+    new_var.reserve(var.size());
+    for (int p = 0; p < var.size(); p++) new_var.push_back(10.0 + p);
+
+    // GLOBAL KDB
+    KDBVariables kdb_copy(kdb);
+    EXPECT_EQ(kdb_copy.count(), 394);
+    EXPECT_TRUE(kdb_copy.is_global_kdb());
+
+    // LOCAL KDB
+    KDBVariables local_kdb(KDB_LOCAL, "A*");
+    KDBVariables local_kdb_hard_copy(local_kdb);
+    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
+    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
+    local_kdb_hard_copy.update("ACAF", lec);
+    EXPECT_EQ(local_kdb.get("ACAF"), var);
+    EXPECT_EQ(local_kdb_hard_copy.get("ACAF"), new_var);
+
+    // SHALLOW COPY KDB
+    KDBVariables shallow_kdb(KDB_SHALLOW_COPY, "A*");
+    KDBVariables shallow_kdb_copy(shallow_kdb);
+    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
+    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
+    shallow_kdb_copy.update("ACAF", lec);
+    EXPECT_EQ(shallow_kdb.get("ACAF"), new_var);
+    EXPECT_EQ(shallow_kdb_copy.get("ACAF"), new_var);
+}
+
 TEST_F(KDBVariablesTest, Save)
 {
     // save in binary format
