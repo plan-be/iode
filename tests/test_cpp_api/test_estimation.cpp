@@ -40,12 +40,17 @@ TEST_F(EstimationTest, Estimate)
     Estimation* est = new Estimation(from, to, eq_name);
 
     est->equations_estimate();
+    KDBScalars* kdb_scl_res = est->get_coefficients();
     est->save();
 
     // coeff values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").value()) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf2").value()) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf4").value()) / 1e6, -0.008503);
+
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").value()) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").value()) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").value()) / 1e6, -0.008503);
 
     // result values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
