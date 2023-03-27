@@ -3,6 +3,7 @@
 #include "time/sample.h"
 #include "kdb_global.h"
 #include <boost/functional/hash.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 // using is the C++11 version of typedef
@@ -31,6 +32,8 @@ protected:
     KDB* local_kdb;         //< either a shallow copy (K_refer()) of a subset of a global KDB or a local kdb
 
 public:
+    KDBAbstract(std::string& filepath);
+
     KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern);
 
     ~KDBAbstract();
