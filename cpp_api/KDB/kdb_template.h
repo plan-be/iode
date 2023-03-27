@@ -25,6 +25,8 @@ public:
     KDBTemplate(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
         KDBAbstract(kdb_type, iode_type, pattern) {}
 
+    KDBTemplate(const KDBTemplate& kdb_to_copy) : KDBAbstract(kdb_to_copy) {}
+
     //  Create + Update + Get + Copy methods
 
     // Note: The definition of a template must be visible in the translation unit in which it is instantiated 

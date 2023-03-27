@@ -18,6 +18,8 @@ public:
     KDBEquations(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_EQUATIONS, pattern) {};
 
+    KDBEquations(const KDBEquations& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+
     std::string get_lec(const int pos) const;
 
     std::string get_lec(const std::string& name) const;

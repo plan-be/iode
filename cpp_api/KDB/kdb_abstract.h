@@ -36,6 +36,8 @@ public:
 
     KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern);
 
+    KDBAbstract(const KDBAbstract& kdb_to_copy);
+
     ~KDBAbstract();
 
     int get_iode_type() const { return iode_type; }

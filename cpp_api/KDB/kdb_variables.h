@@ -22,6 +22,8 @@ public:
     KDBVariables(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_VARIABLES, pattern) {};
 
+    KDBVariables(const KDBVariables& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+
     IODE_REAL get_var(const int pos, const int t, const int mode = K_LEVEL) const;
 
     IODE_REAL get_var(const int pos, const std::string& period, const int mode = K_LEVEL) const;

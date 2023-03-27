@@ -17,6 +17,8 @@ public:
     KDBTables(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_TABLES, pattern) {};
 
+    KDBTables(const KDBTables& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+
     std::string get_title(const int pos) const;
 
     std::string get_title(const std::string& name) const;

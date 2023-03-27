@@ -61,6 +61,33 @@ KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode
     }
 }
 
+KDBAbstract::KDBAbstract(const KDBAbstract& kdb_to_copy)
+{
+    iode_type = kdb_to_copy.iode_type;
+    iode_type_name = kdb_to_copy.iode_type_name;
+    kdb_type = kdb_to_copy.kdb_type;
+    int nb_names = kdb_to_copy.count();
+    char** c_names;
+    switch (kdb_type)
+    {
+    case KDB_GLOBAL:
+        local_kdb = nullptr;
+        break;
+    case KDB_LOCAL:
+        local_kdb = hard_copy_kdb(kdb_to_copy.local_kdb);
+        break;
+    case KDB_SHALLOW_COPY:
+        c_names = new char*[nb_names+1];
+        for(int i=0; i < nb_names; i++)
+            c_names[i] = KONAME(kdb_to_copy.local_kdb, i);
+        c_names[nb_names] = NULL;
+        local_kdb = K_quick_refer(K_WS[iode_type], c_names);
+        break;
+    default:
+        break;
+    }
+}
+
 KDBAbstract::~KDBAbstract()
 {
     // frees a KDB and its contents.
