@@ -213,9 +213,9 @@ public:
         clearKDB();
     }
 
-    void setProjectSettingsFilepath(std::shared_ptr<QString>& settings_filepath)
+    void setup(std::shared_ptr<QString>& settings_filepath)
     {
-        tableview->setProjectSettingsFilepath(settings_filepath);
+        tableview->setup(settings_filepath);
     }
 
     bool load_(const QString& filepath, const bool forceOverwrite)

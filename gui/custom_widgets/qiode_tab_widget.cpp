@@ -185,13 +185,13 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath,
     this->clear();
 
     // update settings filepath in each Iode object tab
-    tabComments->setProjectSettingsFilepath(project_settings_filepath);
-    tabEquations->setProjectSettingsFilepath(project_settings_filepath);
-    tabIdentites->setProjectSettingsFilepath(project_settings_filepath);
-    tabLists->setProjectSettingsFilepath(project_settings_filepath);
-    tabScalars->setProjectSettingsFilepath(project_settings_filepath);
-    tabTables->setProjectSettingsFilepath(project_settings_filepath);
-    tabVariables->setProjectSettingsFilepath(project_settings_filepath);
+    tabComments->setup(project_settings_filepath);
+    tabEquations->setup(project_settings_filepath);
+    tabIdentites->setup(project_settings_filepath);
+    tabLists->setup(project_settings_filepath);
+    tabScalars->setup(project_settings_filepath);
+    tabTables->setup(project_settings_filepath);
+    tabVariables->setup(project_settings_filepath);
 
     // add a default tab for each IODE type of objects
     this->addTab(tabComments, "");
