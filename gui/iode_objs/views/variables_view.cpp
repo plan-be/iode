@@ -46,8 +46,10 @@ QList<QString> VariablesView::extractVariablesNamesFromTo()
 
 	VariablesModel* varModel = static_cast<VariablesModel*>(model());
 	QList<QString> varsFromTo;
+
+	// list of variables
 	for(row = minRow; row <= maxRow; row++) 
-		varsFromTo << varModel->data(varModel->index(row, 0), Qt::DisplayRole).toString();
+		varsFromTo << varModel->headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
 
 	// from
 	varsFromTo << varModel->headerData(minColumn, Qt::Horizontal, Qt::DisplayRole).toString();
