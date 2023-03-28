@@ -15,7 +15,7 @@ QString get_current_project_path()
 }
 
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(nullptr)
+MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent), project_settings(nullptr)
 {
     // ---- setup the present class ----
     setupUi(this);
@@ -49,11 +49,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), project_settings(
     // connect the Tabs widget to the File Explorer
     treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
 
-    // ---- tabs widget ----
-    VariablesView* variablesView = tabWidget_IODE_objs->getVariablesView();
-    connect(variablesView, &VariablesView::newPlot, this, &MainWindow::appendPlot);
-    connect(variablesView, &VariablesView::newGraphsDialog, this, 
-        &MainWindow::open_graphs_variables_dialog_from_vars_view);
+    // ---- signals and slots ----
     connect(lineEdit_iode_command, &QIodeCommandLine::askComputeHash, tabWidget_IODE_objs, &QIodeTabWidget::computeHash);
 
     // ---- load project (if any) (if any) ----
@@ -99,9 +95,6 @@ MainWindow::~MainWindow()
 
     for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
 
-    foreach(QIodePlotDialog* plotDialog, plots) plotDialog->close();
-    plots.clear();
-
     delete project_settings;
     delete user_settings;
 }
@@ -123,12 +116,6 @@ void MainWindow::buildRecentProjectsMenu()
         connect(action, &QAction::triggered, this, &MainWindow::open_recent_project);
         menuRecent_Projects->addAction(action);
     }
-}
-
-void MainWindow::appendPlot(QIodePlotDialog* plotDialog)
-{
-    plotDialog->open();
-    plots.append(plotDialog);
 }
 
 void MainWindow::addProjectPathToList(const QDir& projectDir)

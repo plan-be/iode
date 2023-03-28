@@ -13,12 +13,11 @@
 #include <QMainWindow>
 
 #include "ui_main_window.h"
+#include "main_window_plot.h"
 
 #include "utils.h"
 
 #include "iode_objs/edit/edit_vars_sample.h"
-
-#include "plot/plot.h"
 
 #include "custom_widgets/qiode_completer.h"
 
@@ -59,7 +58,7 @@
  *        - CTRL + SHIFT + D clears the whole workspace. 
  * 
  */
-class MainWindow : public QMainWindow, public Ui::MainWindow
+class MainWindow : public MainWindowPlot, public Ui::MainWindow
 {
 	Q_OBJECT
 
@@ -72,8 +71,6 @@ private:
 	const int MAX_RECENT_PROJECTS = 30;
 	QStringList recentProjects;
 	QString fontFamily;
-
-	QVector<QIodePlotDialog*> plots;
 
 	std::shared_ptr<QIodeCompleter> completer;
 
@@ -129,8 +126,6 @@ private:
 	QMessageBox::StandardButton askSaveAllTabs();
 
 public slots:
-	void appendPlot(QIodePlotDialog* plotDialog);
-
 	// File Menu
 	void createNewProject();
 	void open_project();
@@ -163,7 +158,7 @@ public slots:
 	// Print/Graph Menu
 	void open_graphs_variables_dialog(); 
 	void open_graphs_variables_dialog_from_vars_view(
-		const QList<QString>& variableNames, const QString& from, const QString& to);
+		const QList<QString>& variableNames, const QString& from, const QString& to) override;
 
 	// Help Menu
 	void about();
