@@ -422,82 +422,89 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
 
     chart->removeAllSeries();
 
-    // prepare series
-    double XValue;
-    switch (seriesType)
+    try
     {
-    case QAbstractSeries::SeriesTypeLine:
-        foreach(const QString& var_name, variablesNames)
+        // prepare series
+        double XValue;
+        switch (seriesType)
         {
-            QLineSeries* series = new QLineSeries();
-            series->setName(var_name);
-            varsList << var_name;
-            XValue = minX;
-            for(int t = start_t; t <= end_t; t++)
+        case QAbstractSeries::SeriesTypeLine:
+            foreach(const QString& var_name, variablesNames)
             {
-                value = kdb.get_var(var_name.toStdString(), t, axisType);
-                if(L_ISAN(value))
+                QLineSeries* series = new QLineSeries();
+                series->setName(var_name);
+                varsList << var_name;
+                XValue = minX;
+                for(int t = start_t; t <= end_t; t++)
                 {
-                    series->append(XValue, value);
-                    values << value;
+                    value = kdb.get_var(var_name.toStdString(), t, axisType);
+                    if(L_ISAN(value))
+                    {
+                        series->append(XValue, value);
+                        values << value;
+                    }
+                    XValue += stepX;
                 }
-                XValue += stepX;
+                chart->addSeries(series);
+                list_series << series;
+                // X axis
+                QValueAxis* Xaxis = createXAxis();
+                chart->setAxisX(Xaxis);
+                foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+            }
+            break;
+        case QAbstractSeries::SeriesTypeScatter:
+            foreach(const QString& var_name, variablesNames)
+            {
+                QScatterSeries* series = new QScatterSeries();
+                series->setName(var_name);
+                varsList << var_name;
+                XValue = minX;
+                for(int t = start_t; t <= end_t; t++)
+                {
+                    value = kdb.get_var(var_name.toStdString(), t, axisType);
+                    if(L_ISAN(value))
+                    {
+                        series->append(XValue, value);
+                        values << value;
+                    }
+                    XValue += stepX;
+                }
+                chart->addSeries(series);
+                list_series << series;
+                // X axis
+                QValueAxis* Xaxis = createXAxis();
+                chart->setAxisX(Xaxis);
+                foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+            }
+            break;
+        case QAbstractSeries::SeriesTypeBar:
+            QBarSeries* series = new QBarSeries();
+            foreach(const QString& var_name, variablesNames)
+            {
+                QBarSet *set = new QBarSet(var_name);
+                varsList << var_name;
+                for(int t = start_t; t <= end_t; t++)
+                {
+                    value = kdb.get_var(var_name.toStdString(), t, axisType);
+                    if(!L_ISAN(value)) value = 0.0;
+                    values << value;
+                    set->append(value);
+                }
+                series->append(set);
             }
             chart->addSeries(series);
             list_series << series;
             // X axis
-            QValueAxis* Xaxis = createXAxis();
+            QBarCategoryAxis* Xaxis = createXBarAxis();
             chart->setAxisX(Xaxis);
             foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+            break;
         }
-        break;
-    case QAbstractSeries::SeriesTypeScatter:
-        foreach(const QString& var_name, variablesNames)
-        {
-            QScatterSeries* series = new QScatterSeries();
-            series->setName(var_name);
-            varsList << var_name;
-            XValue = minX;
-            for(int t = start_t; t <= end_t; t++)
-            {
-                value = kdb.get_var(var_name.toStdString(), t, axisType);
-                if(L_ISAN(value))
-                {
-                    series->append(XValue, value);
-                    values << value;
-                }
-                XValue += stepX;
-            }
-            chart->addSeries(series);
-            list_series << series;
-            // X axis
-            QValueAxis* Xaxis = createXAxis();
-            chart->setAxisX(Xaxis);
-            foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
-        }
-        break;
-    case QAbstractSeries::SeriesTypeBar:
-        QBarSeries* series = new QBarSeries();
-        foreach(const QString& var_name, variablesNames)
-        {
-            QBarSet *set = new QBarSet(var_name);
-            varsList << var_name;
-            for(int t = start_t; t <= end_t; t++)
-            {
-                value = kdb.get_var(var_name.toStdString(), t, axisType);
-                if(!L_ISAN(value)) value = 0.0;
-                values << value;
-                set->append(value);
-            }
-            series->append(set);
-        }
-        chart->addSeries(series);
-        list_series << series;
-        // X axis
-        QBarCategoryAxis* Xaxis = createXBarAxis();
-        chart->setAxisX(Xaxis);
-        foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
-        break;
+    }
+    catch(const std::exception& e)
+    {
+        QMessageBox::critical(nullptr, "ERROR", QString::fromStdString(e.what()));
     }
 
     if(values.size() > 0)
