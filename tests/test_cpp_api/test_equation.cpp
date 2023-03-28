@@ -31,6 +31,17 @@ TEST_F(EquationTest, Lec)
     EXPECT_EQ(equation->get_lec(), new_lec);
 }
 
+TEST_F(EquationTest, SplitEquation)
+{
+    // expected left and right hand side
+    std::string expected_lhs = "(ACAF/VAF[-1])";
+    std::string expected_rhs = "acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+
+    std::pair<std::string, std::string> lrhs = equation->split_equation();
+    EXPECT_EQ(lrhs.first, expected_lhs);
+    EXPECT_EQ(lrhs.second, expected_rhs);
+}
+
 TEST_F(EquationTest, Method)
 {
     std::string method;
