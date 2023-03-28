@@ -3,6 +3,7 @@
 #include "utils/utils.h"
 #include "time/period.h"
 #include "time/sample.h"
+#include <boost/algorithm/string.hpp>
 
 
 // TODO: replace K by I as below in C api + group them in an enum
@@ -135,6 +136,15 @@ public:
     // -- misc --
 
     std::vector<std::string> get_coefficients_list(const std::string& enddo);
+
+    /**
+     * @brief split an equation into its left and right hand sides
+     * 
+     * @return left and right hand sides
+     * 
+     * @note It is the same as o_calc_lhs() in dos/o_gr.c but rewritten in C++
+     */
+    std::pair<std::string, std::string> split_equation();
 
     // -- operators --
 
