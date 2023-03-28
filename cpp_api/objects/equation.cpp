@@ -342,6 +342,26 @@ std::vector<std::string> Equation::get_coefficients_list(const std::string& endd
     return coefs_list;
 }
 
+std::pair<std::string, std::string> Equation::split_equation()
+{
+    std::pair<std::string, std::string> lrhs;
+
+    std::string lec = get_lec();
+    // same as L_split_eq()
+    size_t pos = lec.find(":=");
+    // test if := not found -> return
+    if(pos == std::string::npos) 
+        return lrhs;
+    // left hand side
+    lrhs.first = lec.substr(0, pos);
+    boost::algorithm::trim(lrhs.first);
+    // right hand side
+    lrhs.second = lec.substr(pos+2);
+    boost::algorithm::trim(lrhs.second);
+
+    return lrhs;
+}
+
 bool Equation::operator==(const Equation& other) const
 {
     return equation_equal(c_equation, other.c_equation);
