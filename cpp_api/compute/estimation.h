@@ -111,6 +111,42 @@ public:
 
     MAT* get_correlation_matrix() { return E_MCORR; }
 
+    std::vector<IODE_REAL> get_observed_values(const std::string& name) const
+    {
+        std::vector<IODE_REAL> values;
+        auto it = find(v_equations.begin(), v_equations.end(), name);
+        if(it == v_equations.end())
+            return values;
+        
+        int i = (int) std::distance(v_equations.begin(), it);
+        for(int t = 0; t < M_NC(E_LHS); t++) values.push_back(MATE(E_LHS, i, t));
+        return values;
+    }
+
+    std::vector<IODE_REAL> get_fitted_values(const std::string& name) const
+    {
+        std::vector<IODE_REAL> values;
+        auto it = find(v_equations.begin(), v_equations.end(), name);
+        if(it == v_equations.end())
+            return values;
+        
+        int i = (int) std::distance(v_equations.begin(), it);
+        for(int t = 0; t < M_NC(E_RHS); t++) values.push_back(MATE(E_RHS, i, t));
+        return values;
+    }
+
+    std::vector<IODE_REAL> get_residual_values(const std::string& name) const
+    {
+        std::vector<IODE_REAL> values;
+        auto it = find(v_equations.begin(), v_equations.end(), name);
+        if(it == v_equations.end())
+            return values;
+        
+        int i = (int) std::distance(v_equations.begin(), it);
+        for(int t = 0; t < M_NC(E_LHS); t++) values.push_back(MATE(E_LHS, i, t) - MATE(E_RHS, i, t));
+        return values;
+    }
+
     /** 
      * Equivalent to B_EqsEstimateEqs
      */
