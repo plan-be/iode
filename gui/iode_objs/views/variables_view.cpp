@@ -66,9 +66,7 @@ void VariablesView::plot_series()
 	QString from = variableNames.takeLast();
 
 	QIodePlotDialog* plotDialog = new QIodePlotDialog();
-	plotDialog->plot(variableNames, from, to, EnumIodeGraphChart::I_G_CHART_LINE, 
-		EnumIodeGraphAxisType::I_G_LEVEL, false, EnumIodeGraphAxisThicks::I_G_MAJOR_THICKS, 
-		EnumIodeGraphAxisThicks::I_G_MAJOR_THICKS);
+	plotDialog->plot(variableNames, from, to);
 	emit newPlot(plotDialog);
 }
 

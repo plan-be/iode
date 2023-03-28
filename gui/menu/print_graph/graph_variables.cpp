@@ -101,7 +101,7 @@ void QIodeMenuGraphVariables::display()
         }
 
         QIodePlotDialog* plotDialog = new QIodePlotDialog();
-        plotDialog->plot(qVarsList, from, to, chartType, axisType, logScale, xTicks, yTicks, minY, maxY);
+        plotDialog->plot(qVarsList, from, to, "", chartType, axisType, logScale, xTicks, yTicks, minY, maxY);
         emit newPlot(plotDialog);
     }
     catch (const std::exception& e)

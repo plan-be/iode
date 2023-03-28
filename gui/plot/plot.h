@@ -40,6 +40,8 @@ class QIodePlotDialog: public QDialog
 {
     Q_OBJECT
     QStringList variablesNames;
+    KDBVariables* kdb_vars;
+    bool deleteKDB;
 
     QString projectPath;
 
@@ -68,12 +70,14 @@ class QIodePlotDialog: public QDialog
     QChartView* chartView;
 
 public:
-    QIodePlotDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodePlotDialog(KDBVariables* kdb_vars=nullptr, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodePlotDialog();
 
-    void plot(const QList<QString>& variables_names, const QString& from, const QString& to, const EnumIodeGraphChart chartType, 
-        const EnumIodeGraphAxisType axisType, const bool logScale, const EnumIodeGraphAxisThicks xTicks, 
-        const EnumIodeGraphAxisThicks yTicks, const double minY=L_NAN, const double maxY=L_NAN);
+    void plot(const QList<QString>& variables_names, const QString& from, const QString& to, 
+        const QString& title="", const EnumIodeGraphChart chartType=I_G_CHART_LINE, 
+        const EnumIodeGraphAxisType axisType=I_G_LEVEL, const bool logScale=false, 
+        const EnumIodeGraphAxisThicks xTicks=I_G_MAJOR_THICKS, 
+        const EnumIodeGraphAxisThicks yTicks=I_G_MAJOR_THICKS, const double minY=L_NAN, const double maxY=L_NAN);
 
 private:
     void setMenuBar(QMenuBar* menuBar);

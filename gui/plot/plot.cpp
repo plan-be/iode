@@ -1,8 +1,20 @@
 #include "plot.h"
 
 
-QIodePlotDialog::QIodePlotDialog(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodePlotDialog::QIodePlotDialog(KDBVariables* kdb_vars, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
+    // set KDB Variables
+    if(kdb_vars)
+    {
+        this->kdb_vars = kdb_vars;
+        deleteKDB = false;
+    }
+    else
+    {
+        this->kdb_vars = new KDBVariables();
+        deleteKDB = true;
+    }
+
     // prepare chart
     chart = new QChart();
     chart->setAnimationOptions(QChart::AllAnimations);
@@ -70,6 +82,9 @@ QIodePlotDialog::~QIodePlotDialog()
 
     delete chart;
     delete chartView;
+
+    if(deleteKDB)
+        delete kdb_vars;
 }
 
 void QIodePlotDialog::setMenuBar(QMenuBar* menuBar)
@@ -286,17 +301,17 @@ void QIodePlotDialog::updateYTicks(int index)
     }
 }
 
-void QIodePlotDialog::plot(const QStringList& variables_names, const QString& from, const QString& to, const EnumIodeGraphChart chartType, 
-    const EnumIodeGraphAxisType axisType, const bool logScale, const EnumIodeGraphAxisThicks xTicks, 
-    const EnumIodeGraphAxisThicks yTicks, const double minY, const double maxY)
+void QIodePlotDialog::plot(const QStringList& variables_names, const QString& from, const QString& to, 
+    const QString& title, const EnumIodeGraphChart chartType, const EnumIodeGraphAxisType axisType, 
+    const bool logScale, const EnumIodeGraphAxisThicks xTicks, const EnumIodeGraphAxisThicks yTicks, 
+    const double minY, const double maxY)
 {
     // reset axes and series
     chart->removeAllSeries();
     foreach(QAbstractAxis* axis, chart->axes()) chart->removeAxis(axis);
 
     // extract time range
-    KDBVariables kdb;
-    Sample full_sample = kdb.get_sample();
+    Sample full_sample = kdb_vars->get_sample();
     Period start_period(from.toStdString());
     Period end_period(to.toStdString());
     start_t = full_sample.get_period_position(start_period);
@@ -328,6 +343,18 @@ void QIodePlotDialog::plot(const QStringList& variables_names, const QString& fr
     // prepare series
     QAbstractSeries::SeriesType seriesType = iodeChartTypeToQtSeriesType(chartType);
     buildSeries(seriesType, axisType);
+
+    // title
+    QString title_;
+    if(title.isEmpty())
+    {
+        QString s_axisType = QString::fromStdString(vGraphsXAxisTypes[axisType]);
+        title_ = variables_names.join(" - ") + " (" + s_axisType + ")";
+    }
+    else
+        title_ = title;
+    
+    chart->setTitle(title_);
 
     // set to logscale
     if (logScale) enableLogScale(Qt::Checked);
@@ -416,7 +443,6 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
     QList<double> values;
     QList<QAbstractSeries*> list_series;
     QStringList varsList;
-    KDBVariables kdb;
     double minValue;
     double maxValue;
 
@@ -437,7 +463,7 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
                 XValue = minX;
                 for(int t = start_t; t <= end_t; t++)
                 {
-                    value = kdb.get_var(var_name.toStdString(), t, axisType);
+                    value = kdb_vars->get_var(var_name.toStdString(), t, axisType);
                     if(L_ISAN(value))
                     {
                         series->append(XValue, value);
@@ -462,7 +488,7 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
                 XValue = minX;
                 for(int t = start_t; t <= end_t; t++)
                 {
-                    value = kdb.get_var(var_name.toStdString(), t, axisType);
+                    value = kdb_vars->get_var(var_name.toStdString(), t, axisType);
                     if(L_ISAN(value))
                     {
                         series->append(XValue, value);
@@ -486,7 +512,7 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
                 varsList << var_name;
                 for(int t = start_t; t <= end_t; t++)
                 {
-                    value = kdb.get_var(var_name.toStdString(), t, axisType);
+                    value = kdb_vars->get_var(var_name.toStdString(), t, axisType);
                     if(!L_ISAN(value)) value = 0.0;
                     values << value;
                     set->append(value);
