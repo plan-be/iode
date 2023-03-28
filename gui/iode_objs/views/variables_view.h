@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 
+#include "main_window_plot.h"
 #include "abstract_table_view.h"
 #include "iode_objs/models/variables_model.h"
 #include "iode_objs/delegates/variables_delegate.h"
@@ -40,7 +41,7 @@ public:
 		// See: https://doc.qt.io/qt-5/qabstractitemview.html#SelectionMode-enum
 		setSelectionMode(QTableView::ContiguousSelection);
 
-		// keyboard shortcuts
+		// ---- keyboard shortcuts ----
 		plotSeriesShortcut = new QShortcut(QKeySequence(Qt::Key_F8), this);
 		graphsDialogShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F8), this);
 
@@ -52,6 +53,16 @@ public:
 	{
 		delete plotSeriesShortcut;
 		delete graphsDialogShortcut;
+	}
+
+	void setup(std::shared_ptr<QString>& settings_filepath) override
+	{
+		AbstractTableView::setup(settings_filepath);
+		
+		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+		connect(this, &VariablesView::newPlot, main_window, &MainWindowPlot::appendPlot);
+    	connect(this, &VariablesView::newGraphsDialog, main_window, 
+        	&MainWindowPlot::open_graphs_variables_dialog_from_vars_view);
 	}
 
 signals:
