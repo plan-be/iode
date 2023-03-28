@@ -50,6 +50,11 @@ public:
 
     ~Estimation();
 
+    Sample* get_sample() const
+    {
+        return sample;
+    }
+
     void set_sample(const Sample& sample)
     {
         if (this->sample) delete this->sample;
@@ -82,6 +87,11 @@ public:
             throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + str_equations, 
                 "Cannot create sample with range from " + from + " to " + to);
         }
+    }
+
+    std::vector<std::string> get_list_equations() const
+    {
+        return v_equations;
     }
 
     KDBScalars* get_coefficients() { return kdb_scl; }
