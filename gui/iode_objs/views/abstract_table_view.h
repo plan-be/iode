@@ -33,7 +33,7 @@ public:
 	AbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
 	~AbstractTableView();
 
-	void setProjectSettingsFilepath(std::shared_ptr<QString>& settings_filepath)
+	virtual void setup(std::shared_ptr<QString>& settings_filepath)
 	{
 		this->project_settings_filepath = settings_filepath;
 	}

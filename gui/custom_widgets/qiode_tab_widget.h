@@ -258,11 +258,6 @@ public:
      */
     void clearWorkspace();
 
-    VariablesView* getVariablesView() const
-    {
-        return tabVariables->get_view();
-    }
-
 private slots:
     /**
      * @brief build the list of filepaths associated to open tabs
