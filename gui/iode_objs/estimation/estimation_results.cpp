@@ -12,6 +12,14 @@ QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent,
 
     NamedEquation equation = est->current_equation();
     set_tests_tab(equation.eq);
+
+    Sample* sample = est->get_sample();
+    from = QString::fromStdString(sample->start_period().to_string());
+    to = QString::fromStdString(sample->end_period().to_string());
+    for(const std::string& name: est->get_list_equations()) variables_names << QString::fromStdString(name);
+
+	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowPlot::appendPlot);
 }
 
 void QIodeEstimationResults::set_coefficients_tab()
@@ -52,28 +60,82 @@ void QIodeEstimationResults::set_tests_tab(Equation& eq)
     }
 }
 
-// TODO : implement this SLOT
+// same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 6
 void QIodeEstimationResults::plot_yobs_yest()
 {
+    NamedEquation nEq = est->current_equation();
+    std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
+    QString lhs = QString::fromStdString(lrhs.first);
 
+    QString title = QString("Equation %1 : observed and fitted values").arg(QString::fromStdString(nEq.name));
+
+    // prepare local Variables KDB
+    Variable values;
+    QList<QString> variables_names;
+    Sample* sample = est->get_sample();
+    KDBVariables kdb_vars(KDB_LOCAL, "");
+    kdb_vars.set_sample(sample->start_period(), sample->end_period());
+
+    // observed values
+    values = est->get_observed_values(nEq.name);
+    kdb_vars.add("OBSERVED", values);
+    variables_names << "OBSERVED";
+
+    // fitted values
+    values = est->get_fitted_values(nEq.name);
+    kdb_vars.add("FITTED", values);
+    variables_names << "FITTED";
+
+    // set legend
+    QList<QString> legend;
+    legend << lhs + " : observed";
+    legend << lhs + " : fitted";
+
+    QIodePlotDialog* plotDialog = new QIodePlotDialog(&kdb_vars);
+    plotDialog->plot(variables_names, from, to, title, legend);
+    emit newPlot(plotDialog);
 }
 
-// TODO : implement this SLOT
+// same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 7
 void QIodeEstimationResults::plot_residual()
 {
+    NamedEquation nEq = est->current_equation();
+    std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
+    QString lhs = QString::fromStdString(lrhs.first);
 
+    QString title = QString("Equation %1 : residuals").arg(QString::fromStdString(nEq.name));
+
+    // prepare local Variables KDB
+    Variable values;
+    QList<QString> variables_names;
+    Sample* sample = est->get_sample();
+    KDBVariables kdb_vars(KDB_LOCAL, "");
+    kdb_vars.set_sample(sample->start_period(), sample->end_period());
+
+    // residual values
+    values = est->get_residual_values(nEq.name);
+    kdb_vars.add("RESIDUALS", values);
+    variables_names << "RESIDUALS";
+
+    // set legend
+    QList<QString> legend;
+    legend << lhs + " : residuals";
+
+    QIodePlotDialog* plotDialog = new QIodePlotDialog(&kdb_vars);
+    plotDialog->plot(variables_names, from, to, title, legend);
+    emit newPlot(plotDialog);
 }
 
 // TODO : implement this SLOT
 void QIodeEstimationResults::print_graphs()
 {
-
+    QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");
 }
 
 // TODO : implement this SLOT
 void QIodeEstimationResults::print_output()
 {
-
+    QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");
 }
 
 void QIodeEstimationResults::help()

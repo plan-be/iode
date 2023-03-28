@@ -12,6 +12,8 @@
 #include "utils.h"
 #include "wrapper_classes.h"
 #include "iode_objs/models/scalars_model.h"
+#include "plot/plot.h"
+#include "main_window_plot.h"
 
 
 class QIodeEstimationResults : public QDialog, public Ui::QIodeEstimationResults
@@ -21,6 +23,10 @@ class QIodeEstimationResults : public QDialog, public Ui::QIodeEstimationResults
     int precision;
     Estimation* est;
 
+    QString from;
+    QString to;
+    QList<QString> variables_names;
+
 private:
     void set_coefficients_tab();
     void set_correlation_matrix_tab();
@@ -29,6 +35,9 @@ private:
 public:
     QIodeEstimationResults(Estimation* est, QWidget* parent = Q_NULLPTR, 
         Qt::WindowFlags f = Qt::WindowFlags());
+
+signals:
+    void newPlot(QIodePlotDialog* plotDialog);
 
 public slots:
     void plot_yobs_yest();
