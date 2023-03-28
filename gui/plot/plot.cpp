@@ -302,9 +302,9 @@ void QIodePlotDialog::updateYTicks(int index)
 }
 
 void QIodePlotDialog::plot(const QStringList& variables_names, const QString& from, const QString& to, 
-    const QString& title, const EnumIodeGraphChart chartType, const EnumIodeGraphAxisType axisType, 
-    const bool logScale, const EnumIodeGraphAxisThicks xTicks, const EnumIodeGraphAxisThicks yTicks, 
-    const double minY, const double maxY)
+    const QString& title, const QList<QString>& legend, const EnumIodeGraphChart chartType, 
+    const EnumIodeGraphAxisType axisType, const bool logScale, const EnumIodeGraphAxisThicks xTicks, 
+    const EnumIodeGraphAxisThicks yTicks, const double minY, const double maxY)
 {
     // reset axes and series
     chart->removeAllSeries();
@@ -328,8 +328,12 @@ void QIodePlotDialog::plot(const QStringList& variables_names, const QString& fr
     this->from = from;
     this->to = to;
 
-    // set list of variables
+    // set list of variables and legend
     variablesNames = variables_names;
+    if(legend.size() > 0 && (legend.size() != variables_names.size()))
+        QMessageBox::warning(nullptr, "WARNING", "Expected legend list of the same size of the variables names list");
+    else
+        this->legend = legend;
 
     // set min and max X value
     minX = start_period.to_double();
@@ -452,13 +456,17 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
     {
         // prepare series
         double XValue;
+        QString var_name;
+        QString var_legend;
         switch (seriesType)
         {
         case QAbstractSeries::SeriesTypeLine:
-            foreach(const QString& var_name, variablesNames)
+            for(int v=0; v < variablesNames.size(); v++)
             {
+                var_name = variablesNames[v];
+                var_legend = (legend.size() > 0) ? legend[v] : var_name;
                 QLineSeries* series = new QLineSeries();
-                series->setName(var_name);
+                series->setName(var_legend);
                 varsList << var_name;
                 XValue = minX;
                 for(int t = start_t; t <= end_t; t++)
@@ -480,10 +488,12 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
             }
             break;
         case QAbstractSeries::SeriesTypeScatter:
-            foreach(const QString& var_name, variablesNames)
+            for(int v=0; v < variablesNames.size(); v++)
             {
+                var_name = variablesNames[v];
+                var_legend = (legend.size() > 0) ? legend[v] : var_name;
                 QScatterSeries* series = new QScatterSeries();
-                series->setName(var_name);
+                series->setName(var_legend);
                 varsList << var_name;
                 XValue = minX;
                 for(int t = start_t; t <= end_t; t++)
@@ -506,9 +516,11 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
             break;
         case QAbstractSeries::SeriesTypeBar:
             QBarSeries* series = new QBarSeries();
-            foreach(const QString& var_name, variablesNames)
-            {
-                QBarSet *set = new QBarSet(var_name);
+            for(int v=0; v < variablesNames.size(); v++)
+            {                
+                var_name = variablesNames[v];
+                var_legend = (legend.size() > 0) ? legend[v] : var_name;
+                QBarSet *set = new QBarSet(var_legend);
                 varsList << var_name;
                 for(int t = start_t; t <= end_t; t++)
                 {
