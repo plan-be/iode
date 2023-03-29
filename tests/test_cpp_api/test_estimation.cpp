@@ -43,7 +43,11 @@ TEST_F(EstimationTest, Estimate)
     KDBScalars* kdb_scl_res = est->get_coefficients();
     est->save();
 
-    // coeff values
+    // Sample
+    Sample* sample = est->get_sample();
+    EXPECT_EQ(sample->to_string(), "1980Y1:1996Y1");
+
+    // Coeff values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").value()) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf2").value()) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf4").value()) / 1e6, -0.008503);
@@ -52,7 +56,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").value()) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").value()) / 1e6, -0.008503);
 
-    // result values
+    // Result values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
 
     // Tests values
@@ -81,7 +85,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_DW]) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_LOGLIK]) / 1e6, 83.810104);
 
-    // correlation matrix
+    // Correlation matrix
     MAT* cm = est->get_correlation_matrix();
     EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.936111);
@@ -92,6 +96,33 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
     EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
+
+    IODE_REAL max_value;
+    IODE_REAL min_value;
+
+    // Observed values
+    Variable obs = est->get_observed_values("ACAF");
+    EXPECT_DOUBLE_EQ(round(1e6 * obs[0]) / 1e6, 0.011412);
+    max_value = *std::max_element(obs.begin(), obs.end());
+    EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.016028);
+    min_value = *std::min_element(obs.begin(), obs.end());
+    EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.002985);
+
+    // Fitted values
+    Variable fitted = est->get_fitted_values("ACAF");
+    EXPECT_DOUBLE_EQ(round(1e6 * fitted[0]) / 1e6, 0.012562);
+    max_value = *std::max_element(fitted.begin(), fitted.end());
+    EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.012562);
+    min_value = *std::min_element(fitted.begin(), fitted.end());
+    EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.002985);
+
+    // Residual values
+    Variable residuals = est->get_residual_values("ACAF");
+    EXPECT_DOUBLE_EQ(round(1e6 * residuals[0]) / 1e6, -0.00115);
+    max_value = *std::max_element(residuals.begin(), residuals.end());
+    EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.003537);
+    min_value = *std::min_element(residuals.begin(), residuals.end());
+    EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.004334);
 
     delete est;
 }
