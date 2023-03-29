@@ -19,6 +19,12 @@ int main(int argc, char* argv[])
     IodeInit();
     gui_assign_super_API();
 
+    // set executable path
+    executable_dir = QDir::currentPath();
+    url_manual = QUrl::fromLocalFile(executable_dir + "/doc/iode.chm");
+    url_readme = QUrl::fromLocalFile(executable_dir + "/doc/readme.htm");
+    url_shortcuts = QUrl::fromLocalFile(executable_dir + "/doc/keyboard_shortcuts.pdf");
+
     // For the path given in pixmap, see "The Qt Resource System"
     // https://doc.qt.io/qt-6/resources.html#qt-resource-collection-file-qrc
     QPixmap pixmap(":/images/iode_splash_screen.png");

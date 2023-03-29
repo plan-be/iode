@@ -477,7 +477,7 @@ void MainWindow::about()
 
 void MainWindow::open_release_notes()
 {
-    QDesktopServices::openUrl(QUrl::fromLocalFile("./doc/readme.htm"));
+    QDesktopServices::openUrl(url_readme);
 }
 
 void MainWindow::open_iode_home()
@@ -492,7 +492,7 @@ void MainWindow::open_iode_manual()
 
 void MainWindow::display_keyboard_shortcuts()
 {
-    QDesktopServices::openUrl(QUrl::fromLocalFile("./doc/keyboard_shortcuts.pdf"));
+    QDesktopServices::openUrl(url_shortcuts);
 }
 
 void MainWindow::update_current_tab()
