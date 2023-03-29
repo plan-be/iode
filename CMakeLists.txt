@@ -138,14 +138,23 @@ add_subdirectory ("scr4")
 add_subdirectory ("api")
 add_subdirectory ("cpp_api")
 
-# ---- executables ----
+# ---- copy files for tests and gui ----
 file(INSTALL tests/data DESTINATION ${CMAKE_BINARY_DIR}/tests)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
 
+# ---- executables ----
 add_subdirectory ("gui")
 add_subdirectory ("tests")
 add_subdirectory ("pyiode")
+
+# ---- user doc ----
 add_subdirectory ("doc")
+
+# ---- copy files for user doc ----
+file(INSTALL doc/build/iode.chm DESTINATION ${CMAKE_BINARY_DIR}/doc)
+file(INSTALL doc/build/iode.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
+file(INSTALL doc/build/readme.htm DESTINATION ${CMAKE_BINARY_DIR}/doc)
+file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
 
 # ---- print info ----
 message(STATUS "======== target scr4iode ========")
