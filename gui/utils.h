@@ -29,7 +29,10 @@
  *           CONSTANTS            *
  * ****************************** */
 
-const static QUrl url_manual = QUrl::fromLocalFile("./doc/iode.chm");
+inline QString executable_dir;
+inline QUrl url_manual;
+inline QUrl url_readme;
+inline QUrl url_shortcuts;
 const static QString defaultFontFamily = "Consolas, \"Courier New\", monospace";
 
 
