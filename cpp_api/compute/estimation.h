@@ -104,8 +104,11 @@ public:
 
     NamedEquation next_equation()
     {
-        if(current_eq == v_equations.end()) current_eq = v_equations.begin();
-        else current_eq++;
+        current_eq++;
+        
+        if(current_eq == v_equations.end()) 
+            current_eq = v_equations.begin();
+
         return NamedEquation(*current_eq);
     }
 
