@@ -16,7 +16,7 @@
   <property name="toolTip">
    <string>Create a new IODE project</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -72,6 +72,9 @@
       </property>
       <property name="text">
        <string>Create</string>
+      </property>
+      <property name="shortcut">
+       <string>F10</string>
       </property>
      </widget>
     </item>

@@ -29,22 +29,6 @@
    <iconset>
     <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>540</x>
-     <y>10</y>
-     <width>91</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Save</set>
-   </property>
-  </widget>
   <widget class="QFrame" name="frame_top">
    <property name="geometry">
     <rect>
@@ -60,7 +44,7 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -380,8 +364,86 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>10</y>
+     <width>77</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="saveButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+      <property name="shortcut">
+       <string>F10</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancelButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+      <property name="shortcut">
+       <string>Esc</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="helpButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Help</string>
+      </property>
+      <property name="shortcut">
+       <string>F1</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QIodeSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
   <customwidget>
    <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
@@ -391,59 +453,54 @@
     <slot>updateFileType(QString)</slot>
    </slots>
   </customwidget>
-  <customwidget>
-   <class>QIodeSampleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>custom_widgets/qsampleedit.h</header>
-  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeMenuFileExport</receiver>
    <slot>save()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>588</x>
+     <y>22</y>
     </hint>
     <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
+     <x>319</x>
+     <y>159</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeMenuFileExport</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>588</x>
+     <y>52</y>
     </hint>
     <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
+     <x>319</x>
+     <y>159</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>helpRequested()</signal>
+   <sender>helpButton</sender>
+   <signal>clicked()</signal>
    <receiver>QIodeMenuFileExport</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>535</x>
-     <y>65</y>
+     <x>588</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
-     <x>299</x>
-     <y>170</y>
+     <x>319</x>
+     <y>159</y>
     </hint>
    </hints>
   </connection>
