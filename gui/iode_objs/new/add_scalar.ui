@@ -215,6 +215,9 @@
         <property name="text">
          <string>Save</string>
         </property>
+        <property name="shortcut">
+         <string>F10</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -228,6 +231,9 @@
         <property name="text">
          <string>Cancel</string>
         </property>
+        <property name="shortcut">
+         <string>Esc</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -240,6 +246,9 @@
         </property>
         <property name="text">
          <string>Help</string>
+        </property>
+        <property name="shortcut">
+         <string>F1</string>
         </property>
        </widget>
       </item>
