@@ -6,6 +6,7 @@ on: pull_request
 jobs:
   build_and_test_api:
     name: Build And Test Static Libraries
+    if: ${{ !(contains(github.head_ref, 'gui') || contains(github.head_ref, 'doc')) }}
     strategy:
       matrix:
         # os: [windows-latest, ubuntu-latest]
@@ -98,7 +99,7 @@ jobs:
   test_no_sanitize:
     name: Run Tests Without Sanitize Option (Only If Tests With Sanitize Failed)
     needs: build_and_test_api
-    if: always() && needs.build_and_test_api.result == 'failure'
+    if: ${{ !(contains(github.head_ref, 'gui') || contains(github.head_ref, 'doc')) && needs.build_and_test_api.result == 'failure' }}
     strategy:
       matrix:
         # os: [windows-latest, ubuntu-latest]
@@ -154,7 +155,7 @@ jobs:
 
   build_gui:
     name: Build Graphical User Interface
-    if: contains(github.head_ref, 'release')
+    if: contains(github.head_ref, 'gui')
     strategy:
       matrix:
         os: [windows-latest]
