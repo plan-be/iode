@@ -30,6 +30,10 @@ project ("iode" VERSION 7.01 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUA
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
 set(IODE_EMAIL "ald@plan.be; gb@plan.be")
 
+# -- resources directory --
+set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
+
+# -- print global info --
 message(STATUS "======== global info ========")
 message(STATUS "IODE version: ${PROJECT_VERSION}")
 message(STATUS "HOMEPAGE URL: ${PROJECT_HOMEPAGE_URL}")
