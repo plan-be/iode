@@ -48,25 +48,40 @@
     <property name="text">
      <string>Display</string>
     </property>
+    <property name="shortcut">
+     <string>F10</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButton_apply">
     <property name="text">
      <string>Apply</string>
+    </property>
+    <property name="shortcut">
+     <string>F7</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_setup">
     <property name="text">
      <string>Setup</string>
     </property>
+    <property name="shortcut">
+     <string>F6</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButton_cancel">
     <property name="text">
      <string>Cancel</string>
     </property>
+    <property name="shortcut">
+     <string>Esc</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButton_help">
     <property name="text">
      <string>Help</string>
+    </property>
+    <property name="shortcut">
+     <string>F1</string>
     </property>
    </widget>
   </widget>
