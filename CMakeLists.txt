@@ -24,7 +24,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # ---- main project ----
-project ("iode")
+project ("iode" VERSION 7.01)
 
 message(STATUS "======== global info ========")
 message(STATUS "IODE version: ${PROJECT_VERSION}")
