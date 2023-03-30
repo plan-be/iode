@@ -33,11 +33,16 @@ protected:
 
 TEST_F(EstimationTest, Estimate)
 {
+    Equation eq(eq_name);
+    Equation eq2(eq_name2);
+
     kdb_scl.update("acaf1", 0., 1.);
     kdb_scl.update("acaf2", 0., 1.);
     kdb_scl.update("acaf4", 0., 1.);
+    kdb_scl.update("dpuh_1", 0., 1.);
+    kdb_scl.update("dpuh_2", 0., 1.);
 
-    Estimation* est = new Estimation(from, to, eq_name);
+    Estimation* est = new Estimation(from, to, block);
 
     est->equations_estimate();
     KDBScalars* kdb_scl_res = est->get_coefficients();
@@ -45,21 +50,51 @@ TEST_F(EstimationTest, Estimate)
 
     // Sample
     Sample* sample = est->get_sample();
-    EXPECT_EQ(sample->to_string(), "1980Y1:1996Y1");
+    EXPECT_EQ(sample->to_string(), from + ":" + to);
+
+    // List of equations
+    std::vector<std::string> expected_list_eqs = {eq_name, eq_name2};
+    std::vector<std::string> list_eqs = est->get_list_equations();
+    EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
+    EXPECT_EQ(list_eqs, expected_list_eqs);
+
+    // Current equation
+    NamedEquation named_eq = est->current_equation();
+    EXPECT_EQ(named_eq.name, eq_name);
+    EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
+
+    // Next equation 
+    NamedEquation next_named_eq = est->next_equation();
+    EXPECT_EQ(next_named_eq.name, eq_name2);
+    EXPECT_EQ(next_named_eq.eq.get_lec(), eq2.get_lec());
+
+    // -- go back to first eq
+    next_named_eq = est->next_equation();
+    EXPECT_EQ(named_eq.name, eq_name);
+    EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
 
     // Coeff values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").value()) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf2").value()) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf4").value()) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_1").value()) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_2").value()) / 1e6, 0.057489);
 
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").value()) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").value()) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").value()) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_1").value()) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_2").value()) / 1e6, 0.057489);
+
+    // Estimates ACAF only
+    delete est;
+    est = new Estimation(from, to, eq_name);
+    est->equations_estimate();
 
     // Result values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
 
-    // Tests values
+    // Tests values (ACAF)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stdev").value()) / 1e6, 0.00427);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_meany").value()) / 1e6, 0.008185);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_ssres").value()) / 1e6, 5.2e-05);
@@ -71,8 +106,8 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_dw").value()) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_loglik").value()) / 1e6, 83.810104);
 
-    Equation eq = kdb_eqs.get("ACAF");
-    std::array<float, EQS_NBTESTS> tests = eq.get_tests();
+    Equation eq_est = kdb_eqs.get("ACAF");
+    std::array<float, EQS_NBTESTS> tests = eq_est.get_tests();
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDEV]) / 1e6, 0.00427);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_MEANY]) / 1e6, 0.008185);
@@ -84,18 +119,6 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_R2ADJ]) / 1e6, 0.79636);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_DW]) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_LOGLIK]) / 1e6, 83.810104);
-
-    // Correlation matrix
-    MAT* cm = est->get_correlation_matrix();
-    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 2)) / 1e6, 0.20017);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 2)) / 1e6, -0.300746);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
-    EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
 
     IODE_REAL max_value;
     IODE_REAL min_value;
@@ -124,7 +147,40 @@ TEST_F(EstimationTest, Estimate)
     min_value = *std::min_element(residuals.begin(), residuals.end());
     EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.004334);
 
+    // Correlation matrix
+    // -- ACAF
+
+    MAT* cm = est->get_correlation_matrix();
+    EXPECT_EQ(M_NL(cm), 3);
+    EXPECT_EQ(M_NC(cm), 3);
+    // -- line 0
+    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 2)) / 1e6, 0.20017);
+    // -- line 1
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 2)) / 1e6, -0.300746);
+    // -- line 2
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
+
+    // -- DPUH
     delete est;
+    est = new Estimation(from, to, eq_name2);
+    est->equations_estimate();
+
+    cm = est->get_correlation_matrix();
+    EXPECT_EQ(M_NL(cm), 2);
+    EXPECT_EQ(M_NC(cm), 2);
+    // -- line 0
+    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.042291);
+    // -- line 1
+    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
+
 }
 
 TEST_F(EstimationTest, EstimateBlock)
