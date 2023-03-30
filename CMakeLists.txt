@@ -24,10 +24,11 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # ---- main project ----
-project ("iode" VERSION 7.01)
+project ("iode" VERSION 7.01 HOMEPAGE_URL "https://iode.plan.be/doku.php")
 
 message(STATUS "======== global info ========")
 message(STATUS "IODE version: ${PROJECT_VERSION}")
+message(STATUS "HOMEPAGE URL: ${PROJECT_HOMEPAGE_URL}")
 message(STATUS "OS:           ${CMAKE_SYSTEM_NAME}")
 message(STATUS "Architecture: ${CMAKE_C_COMPILER_ARCHITECTURE_ID}")
 message(STATUS "Build Config: ${CMAKE_BUILD_TYPE}")
