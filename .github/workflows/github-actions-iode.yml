@@ -198,7 +198,6 @@ jobs:
       - name: show available Qt versions
         run: aqt list-qt windows desktop
       - name: Install Qt
-        if: contains(github.head_ref, 'gui')
         # See https://github.com/jurplel/install-qt-action
         uses: jurplel/install-qt-action@v3
         with:
@@ -213,11 +212,11 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
@@ -230,6 +229,86 @@ jobs:
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
       - name: Build GUI
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
+      - run: echo "This job's status is ${{ job.status }}."
+
+  build_nsis:
+    name: Build installer using NSIS
+    if: contains(github.head_ref, 'nsis')
+    strategy:
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server"
+      - run: echo "The name of the repository is ${{ github.repository }}."
+      - run: echo "The target branch of the current pull request is ${{ github.base_ref }}."
+      - run: echo "The source branch of the current pull request is ${{ github.head_ref }}."
+      - run: echo "The workspace directory is ${{ github.workspace }}."
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Install dependencies on windows
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja
+          ninja --version
+          cmake --version
+      - name: Add cl.exe to PATH
+        if: runner.os == 'Windows'
+        # See https://github.com/marketplace/actions/enable-developer-command-prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Install Boost
+        uses: MarkusJx/install-boost@v2.4.1
+        id: install-boost
+        with:
+            boost_version: 1.80.0
+            boost_install_dir: C:\
+            platform_version: 2019
+            toolset: msvc
+      - name: update pip
+        run: python.exe -m pip install --upgrade pip
+      - name: install aqtinstall
+        run: pip install aqtinstall
+      - name: show available Qt versions
+        run: aqt list-qt windows desktop
+      - name: Install Qt
+        # See https://github.com/jurplel/install-qt-action
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.4.0'
+          host: 'windows'
+          target: 'desktop'
+          # TODO : adpat arch for Linux
+          arch: 'win64_msvc2019_64'
+          dir: '${{ github.workspace }}/'
+          modules: 'qtcharts'
+          install-deps: 'true'
+      - name: Preset config for Windows
+        if: runner.os == 'Windows'
+        run: |
+          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
+      - name: Preset config for Linux
+        if: runner.os == 'Linux'
+        run: |
+          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
+      - name: Print preset config
+        run: echo "${{ env.PRESET_CONFIG }}"
+      - name: Configure CMake
+        run: cmake --preset ${{ env.PRESET_CONFIG }}
+      - name: Build SCR4
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
+      - name: Build C IODE API
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
+      - name: Build C++ IODE API
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
+      - name: Build GUI
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
+      - name: Build Installer (NSIS)
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target nsis
       - run: echo "This job's status is ${{ job.status }}."
 
   build_doc:
