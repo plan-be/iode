@@ -3,7 +3,7 @@
 - Compiler:
   - MSVC 2019
 - To compile the C API:
-  - [CMake](https://cmake.org) (>= 3.16) (*)
+  - [CMake](https://cmake.org, https://cmake.org/download) (>= 3.25) (*)
 - To compile the C++ API:
   - [Chocolatey](https://chocolatey.org/install) (to install Boost) (*)
   - Boost (>= 1.74) (can be installed with Chocolatey: choco install boost-msvc-14.2)
