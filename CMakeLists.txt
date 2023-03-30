@@ -26,6 +26,10 @@ FetchContent_MakeAvailable(googletest)
 # ---- main project ----
 project ("iode" VERSION 7.01 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAGES C CXX)
 
+# -- global variables --
+set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
+set(IODE_EMAIL "ald@plan.be; gb@plan.be")
+
 message(STATUS "======== global info ========")
 message(STATUS "IODE version: ${PROJECT_VERSION}")
 message(STATUS "HOMEPAGE URL: ${PROJECT_HOMEPAGE_URL}")
