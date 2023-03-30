@@ -11,7 +11,6 @@ jobs:
         # os: [windows-latest, ubuntu-latest]
         # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
         os: [windows-2019]
-        arch: ["x64"]
 
     # The CMake configure and build commands are platform agnostic and should 'ideally' work equally well on Windows or Linux.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -40,7 +39,7 @@ jobs:
         # See https://github.com/marketplace/actions/enable-developer-command-prompt
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.arch }}
+           arch: x64
       - name: Install Boost
         uses: MarkusJx/install-boost@v2.4.1
         id: install-boost
@@ -63,11 +62,11 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-${{ matrix.arch }}-debug-sanitize" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-${{ matrix.arch }}-debug-sanitize" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
@@ -105,7 +104,6 @@ jobs:
         # os: [windows-latest, ubuntu-latest]
         # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
         os: [windows-2019]
-        arch: ["x64"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -122,15 +120,15 @@ jobs:
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.arch }}
+           arch: x64
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-${{ matrix.arch }}-debug" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-${{ matrix.arch }}-debug" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Install Boost
@@ -160,7 +158,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        arch: ["x64"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -184,7 +181,7 @@ jobs:
         # See https://github.com/marketplace/actions/enable-developer-command-prompt
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.arch }}
+           arch: x64
       - name: Install Boost
         uses: MarkusJx/install-boost@v2.4.1
         id: install-boost
@@ -215,11 +212,11 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-${{ matrix.arch }}-debug-sanitize" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-${{ matrix.arch }}-debug-sanitize" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
