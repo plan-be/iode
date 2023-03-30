@@ -280,5 +280,39 @@
             "displayName": "TEST CPP API Windows Sanitize",
             "configurePreset": "windows-debug-sanitize/tests/test_cpp_api"
         }
+    ],
+    "packagePresets": [
+        {
+            "name": "cpack-default",
+            "hidden": true,
+            "output": {
+                "debug": true,
+                "verbose": true
+            }
+        },
+        {
+            "name": "linux-debug",
+            "inherits": "cpack-default",
+            "displayName": "TEST CPP API LINUX x64",
+            "configurePreset": "linux-debug/tests/test_cpp_api"
+        },
+        {
+            "name": "linux-debug-sanitize",
+            "inherits": "cpack-default",
+            "displayName": "TEST CPP API LINUX Sanitize",
+            "configurePreset": "linux-debug-sanitize/tests/test_cpp_api"
+        },
+        {
+            "name": "windows-debug",
+            "inherits": "cpack-default",
+            "displayName": "TEST CPP API Windows x64",
+            "configurePreset": "windows-debug/tests/test_cpp_api"
+        },
+        {
+            "name": "windows-debug-sanitize",
+            "inherits": "cpack-default",
+            "displayName": "TEST CPP API Windows Sanitize",
+            "configurePreset": "windows-debug-sanitize/tests/test_cpp_api"
+        }
     ]
 }
