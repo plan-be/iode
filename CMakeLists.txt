@@ -178,6 +178,9 @@ add_subdirectory ("pyiode")
 # ---- user doc ----
 add_subdirectory ("doc")
 
+# -- nsis installer --
+add_subdirectory("nsis")
+
 # ---- print info ----
 message(STATUS "======== target scr4iode ========")
 get_target_property(_COMPILE_OPTIONS scr4iode COMPILE_OPTIONS)
