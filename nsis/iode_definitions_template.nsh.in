@@ -1,0 +1,6 @@
+!define EXE_NAME "@IODE_GUI_TARGET@.exe"
+!define VERSION "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
+!define VERSION_PATH "@PROJECT_VERSION_MAJOR@_@PROJECT_VERSION_MINOR@"
+;The icon for the installer
+!define MUI_ICON "@PROJECT_SOURCE_DIR@/resources/iode_icon.ico"
+!define PATCH  "0"
