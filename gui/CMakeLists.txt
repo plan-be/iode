@@ -181,8 +181,12 @@ set_target_properties(${IODE_GUI_TARGET} PROPERTIES
 
 qt_finalize_executable(${IODE_GUI_TARGET})
 
+# copy user documentation to the final build directory
 add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:${IODE_GUI_TARGET}>/doc)
+# copy iode.msg to the final build directory
+add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/iode.msg $<TARGET_FILE_DIR:${IODE_GUI_TARGET}>/iode.msg)
 
 if(WIN32)
     # If Windows: Need to copy Qt DLLs in the same directory as generated executable
