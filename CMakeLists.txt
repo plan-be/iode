@@ -164,6 +164,9 @@ file(INSTALL doc/build/iode.chm DESTINATION ${CMAKE_BINARY_DIR}/doc)
 file(INSTALL doc/build/iode.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
 file(INSTALL doc/build/readme.htm DESTINATION ${CMAKE_BINARY_DIR}/doc)
 file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
+# ---- copy syntax files ----
+file(INSTALL resources/syntax/ioderep.syn DESTINATION ${CMAKE_BINARY_DIR}/syntax)
+file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syntax)
 
 # ---- print info ----
 message(STATUS "======== target scr4iode ========")
