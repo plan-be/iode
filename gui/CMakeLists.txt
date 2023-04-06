@@ -162,31 +162,31 @@ set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} ${GUI
                         ${GUI_MAIN}
 )
 
-qt_add_executable(iode_gui ${IODE_RESOUCES_DIR}/iode_resource.qrc MANUAL_FINALIZATION ${PROJECT_SOURCES})
-target_link_libraries(iode_gui PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iodecppapi)
+qt_add_executable(${IODE_GUI_TARGET} ${IODE_RESOUCES_DIR}/iode_resource.qrc MANUAL_FINALIZATION ${PROJECT_SOURCES})
+target_link_libraries(${IODE_GUI_TARGET} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iodecppapi)
 # By calling target_include_directories, we make sure that the absolute path to 
-# the gui directory is automatically added as an include path to the iode_gui target.
+# the gui directory is automatically added as an include path to the ${IODE_GUI_TARGET} target.
 # Required to use the custom widgets in UI files
-target_include_directories(iode_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${IODE_GUI_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # disable warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(iode_gui PRIVATE /W0)
+    target_compile_options(${IODE_GUI_TARGET} PRIVATE /W0)
 endif()
 
-set_target_properties(iode_gui PROPERTIES
+set_target_properties(${IODE_GUI_TARGET} PROPERTIES
     WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
 )
 
-qt_finalize_executable(iode_gui)
+qt_finalize_executable(${IODE_GUI_TARGET})
 
-add_custom_command(TARGET iode_gui POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:iode_gui>/doc)
+add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/doc/build $<TARGET_FILE_DIR:${IODE_GUI_TARGET}>/doc)
 
 if(WIN32)
     # If Windows: Need to copy Qt DLLs in the same directory as generated executable
-    # See https://doc.qt.io/qt-6.2/windows-deployment.html
+    # See https://doc.qt.io/qt-6/windows-deployment.html
     # and https://stackoverflow.com/a/66736820
 
     # Retrieve the absolute path to qmake and then use that path to find
@@ -198,8 +198,13 @@ if(WIN32)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_BIN_DIR}")
 
     # Run windeployqt immediately after build
-    add_custom_command(TARGET iode_gui POST_BUILD
-        COMMAND "${WINDEPLOYQT_ENV_SETUP}" && "${WINDEPLOYQT_EXECUTABLE}" --list target --verbose 1 "$<TARGET_FILE:iode_gui>"
+    add_custom_command(TARGET ${IODE_GUI_TARGET} POST_BUILD
+        COMMAND "${WINDEPLOYQT_ENV_SETUP}" && "${WINDEPLOYQT_EXECUTABLE}" 
+            --list target 
+            --no-quick-import
+            --no-translations
+            --verbose 1 
+            "$<TARGET_FILE:${IODE_GUI_TARGET}>"
         COMMENT "Running windeployqt..."
     )
 endif()
