@@ -142,14 +142,32 @@ else()
   message(CHECK_FAIL "not found")
 endif()
 
+# ---- copy files to output build directory ----
+message(STATUS "\nCopying files to ${CMAKE_BINARY_DIR}..")
+
+# -- copy files for tests and gui --
+message(STATUS "\n-> test files <-")
+file(INSTALL tests/data DESTINATION ${CMAKE_BINARY_DIR}/tests)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
+# -- copy files for user doc --
+message(STATUS "\n-> user doc files <-")
+file(INSTALL doc/build/iode.chm DESTINATION ${CMAKE_BINARY_DIR}/doc)
+file(INSTALL doc/build/iode.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
+file(INSTALL doc/build/readme.htm DESTINATION ${CMAKE_BINARY_DIR}/doc)
+file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
+# -- copy syntax files --
+message(STATUS "\n-> files to highlight IODE report commands in Texpad and Notepad++ <-")
+file(INSTALL resources/syntax/ioderep.syn DESTINATION ${CMAKE_BINARY_DIR}/syntax)
+file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syntax)
+# -- copy misc files --
+message(STATUS "\n-> error messages file <-")
+file(INSTALL iode.msg DESTINATION ${CMAKE_BINARY_DIR})
+message(STATUS "DONE\n")
+
 # ---- libraries ----
 add_subdirectory ("scr4")
 add_subdirectory ("api")
 add_subdirectory ("cpp_api")
-
-# ---- copy files for tests and gui ----
-file(INSTALL tests/data DESTINATION ${CMAKE_BINARY_DIR}/tests)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
 
 # ---- executables ----
 set(IODE_GUI_TARGET iode_gui)
@@ -159,15 +177,6 @@ add_subdirectory ("pyiode")
 
 # ---- user doc ----
 add_subdirectory ("doc")
-
-# ---- copy files for user doc ----
-file(INSTALL doc/build/iode.chm DESTINATION ${CMAKE_BINARY_DIR}/doc)
-file(INSTALL doc/build/iode.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
-file(INSTALL doc/build/readme.htm DESTINATION ${CMAKE_BINARY_DIR}/doc)
-file(INSTALL doc/build/keyboard_shortcuts.pdf DESTINATION ${CMAKE_BINARY_DIR}/doc)
-# ---- copy syntax files ----
-file(INSTALL resources/syntax/ioderep.syn DESTINATION ${CMAKE_BINARY_DIR}/syntax)
-file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syntax)
 
 # ---- print info ----
 message(STATUS "======== target scr4iode ========")
