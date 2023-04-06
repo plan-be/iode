@@ -152,6 +152,7 @@ file(INSTALL tests/data DESTINATION ${CMAKE_BINARY_DIR}/tests)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output)
 
 # ---- executables ----
+set(IODE_GUI_TARGET iode_gui)
 add_subdirectory ("gui")
 add_subdirectory ("tests")
 add_subdirectory ("pyiode")
