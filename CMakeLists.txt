@@ -180,7 +180,9 @@ add_subdirectory ("pyiode")
 add_subdirectory ("doc")
 
 # -- nsis installer --
-add_subdirectory("nsis")
+if(TARGET ${IODE_GUI_TARGET})
+  add_subdirectory("nsis")
+endif()
 
 # ---- print info ----
 message(STATUS "======== target scr4iode ========")
