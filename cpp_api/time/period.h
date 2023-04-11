@@ -33,6 +33,8 @@ struct Period
 public:
 	Period();
 
+	Period(const Period& period);
+
 	Period(const int year, const char periodicity, const int position);
 
 	/**
