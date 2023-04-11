@@ -258,6 +258,15 @@ public:
      */
     void clearWorkspace();
 
+    /**
+     * @brief Get the list of names of selected objects
+     * 
+     * @param iodeType
+     * 
+     * @return QStringList 
+     */
+    QStringList getSelectedObjectsNames(const EnumIodeType iodeType) const;
+
 private slots:
     /**
      * @brief build the list of filepaths associated to open tabs

@@ -1,9 +1,13 @@
 #pragma once
 
 #include <QTableView>
-#include <QHeaderView>
 #include <QLineEdit>
 #include <QShortcut>
+#include <QStringList>
+#include <QModelIndex>
+#include <QHeaderView>
+#include <QModelIndexList>
+#include <QAbstractItemModel>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
@@ -84,5 +88,18 @@ public:
 	{
 		M* table_model = static_cast<M*>(model());
 		table_model->reset();
+	}
+
+	QStringList getSelectedObjectsNames() const
+	{
+		QStringList names;
+		QModelIndexList selection = this->selectionModel()->selectedRows();
+		if(selection.size() == 0) 
+			return names;
+
+		QAbstractItemModel* model_obj = this->model();
+		foreach(const QModelIndex& index, selection) 
+			names << model_obj->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
+		return names;
 	}
 };

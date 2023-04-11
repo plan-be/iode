@@ -275,6 +275,37 @@ void QIodeTabWidget::clearWorkspace()
     for(int i=0; i < I_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
 }
 
+QStringList QIodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType) const
+{
+        QStringList names;
+        switch (iodeType)
+        {
+        case I_COMMENTS:
+            return tabComments->getSelectedObjectsNames();
+            break;
+        case I_EQUATIONS:
+            return tabEquations->getSelectedObjectsNames();
+            break;
+        case I_IDENTITIES:
+            return tabIdentites->getSelectedObjectsNames();
+            break;
+        case I_LISTS:
+            return tabLists->getSelectedObjectsNames();
+            break;
+        case I_SCALARS:
+            return tabScalars->getSelectedObjectsNames();
+            break;
+        case I_TABLES:
+            return tabTables->getSelectedObjectsNames();
+            break;
+        case I_VARIABLES:
+            return tabVariables->getSelectedObjectsNames();
+            break;
+        default:
+            return names;
+        }
+}
+
 int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
 {
     int index;
