@@ -73,12 +73,24 @@ void QIodeEditEquation::set_estimation()
 			delete estimation;
 			estimation = nullptr;
 		}
-		
+
+		// sample
 		std::string from = sampleFrom->extractAndVerify().toStdString();
 		std::string to = sampleTo->extractAndVerify().toStdString();
+		Sample sample(from, to);
+
+		// block
 		std::string block = lineBlock->extractAndVerify().toStdString();
-		if(block.empty()) block = lineName->extractAndVerify().toStdString();
-		estimation = new Estimation(from, to, block);
+		if(block.empty()) 
+			block = lineName->extractAndVerify().toStdString();
+		
+		// check method
+		int i_method = comboBoxMethod->extractAndVerify();
+		if(i_method < 0)
+			throw IodeExceptionInvalidArguments("Cannot estimate block or equation " + block, 
+				"Please choose a method in the drop-down list");
+
+		estimation = new Estimation(sample, block);
 
 		NamedEquation equation = estimation->current_equation();
 		display_equation(equation);
@@ -180,13 +192,16 @@ void QIodeEditEquation::display_coefs()
 void QIodeEditEquation::estimate()
 {
 	set_estimation();
-	try
+	if(estimation)
 	{
-		estimation->equations_estimate();
-	}
-	catch (const std::exception& e)
-	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		try
+		{
+			estimation->equations_estimate();
+		}
+		catch (const std::exception& e)
+		{
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		}
 	}
 }
 
