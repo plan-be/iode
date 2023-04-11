@@ -61,6 +61,7 @@ void B_IodeMsgPath()
  */
 char *B_msg(int n)
 {
+    B_IodeMsgPath(); 
     return(SCR_err_txt(n + 1000)); /* JMP_M 4.21 01-09-95 */
 }
 
