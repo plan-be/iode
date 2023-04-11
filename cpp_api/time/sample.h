@@ -9,6 +9,8 @@ struct Sample
 public:
 	Sample();
 
+	Sample(const Sample& sample);
+
 	Sample(const Period& start_period, const Period& end_period);
 
 	/**

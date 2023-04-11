@@ -6,6 +6,12 @@ Sample::Sample()
     c_sample = nullptr;
 }
 
+Sample::Sample(const Sample& sample)
+{
+    this->c_sample = (SAMPLE*) SW_nalloc(sizeof(SAMPLE));
+    memcpy(this->c_sample, sample.c_sample, sizeof(SAMPLE));
+}
+
 Sample::Sample(const Period& start_period, const Period& end_period)
 {
     c_sample = PER_pertosmpl(start_period.c_period, end_period.c_period);
