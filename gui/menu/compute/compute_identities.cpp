@@ -40,6 +40,23 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(const QString& project_se
     //                       since in that case this refers to MixingSettings and NOT the derived class
     className = QString::fromStdString(typeid(this).name());
     loadSettings();
+
+    KDBVariables kdb_var;
+    Sample sample = kdb_var.get_sample();
+    if(sample.nb_periods() > 0)
+    {
+        if(qFrom->getQValue().toString().isEmpty())
+        {
+            QString start_period = QString::fromStdString(sample.start_period().to_string());
+            qFrom->setQValue(QVariant(start_period));
+        } 
+
+        if(qTo->getQValue().toString().isEmpty())
+        {
+            QString end_period = QString::fromStdString(sample.end_period().to_string());
+            qTo->setQValue(QVariant(end_period));
+        }
+    }
 }
 
 QIodeMenuComputeIdentities::~QIodeMenuComputeIdentities()
