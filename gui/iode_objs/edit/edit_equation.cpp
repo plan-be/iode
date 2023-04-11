@@ -21,10 +21,10 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString&
 	for (const std::string& method : vEquationMethods) list_methods << QString::fromStdString(method);
 
 	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_EQUATIONS, REQUIRED_FIELD);
-	comboBoxMethod = new WrapperComboBox(label_method->text(), *comboBox_method, REQUIRED_FIELD, list_methods);
-	sampleFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_from, REQUIRED_FIELD);
-	sampleTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_to, REQUIRED_FIELD);
-	lineLec = new WrapperQTextEdit(label_lec->text(), *textEdit_lec, OPTIONAL_FIELD);
+	comboBoxMethod = new WrapperComboBox(label_method->text(), *comboBox_method, OPTIONAL_FIELD, list_methods);
+	sampleFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_from, OPTIONAL_FIELD);
+	sampleTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_to, OPTIONAL_FIELD);
+	lineLec = new WrapperQTextEdit(label_lec->text(), *textEdit_lec, REQUIRED_FIELD);
 	lineComment = new WrapperQLineEdit(label_comment->text(), *lineEdit_comment, OPTIONAL_FIELD);
 	lineBlock = new WrapperQLineEdit(label_block->text(), *lineEdit_block, OPTIONAL_FIELD);
 	lineInstruments = new WrapperQLineEdit(label_instruments->text(), *lineEdit_instruments, OPTIONAL_FIELD);
@@ -121,29 +121,33 @@ void QIodeEditEquation::edit()
 		// TODO : remove extra \n
 		std::string lec = lineLec->extractAndVerify().toStdString();
 		int i_method = comboBoxMethod->extractAndVerify();
-		std::string method = vEquationMethods[i_method];
+		std::string method = (i_method > 0) ? vEquationMethods[i_method] : "";
 		std::string from = sampleFrom->extractAndVerify().toStdString();
 		std::string to = sampleTo->extractAndVerify().toStdString();
 		std::string comment = lineComment->extractAndVerify().toStdString();
 		std::string block = lineBlock->extractAndVerify().toStdString();
 		std::string instruments = lineInstruments->extractAndVerify().toStdString();
 
-		Sample sample(from, to);
+
+		Sample* sample = nullptr; 
+		if(!(from.empty() || to.empty()))
+			sample = new Sample(from, to);
+		
 		std::array<float, EQS_NBTESTS> tests = { 0.0 };
 
 		// update equation
 		if (kdb_eqs.contains(equation_name))
-		{
-			kdb_eqs.update(equation_name, lec, comment, method, &sample, instruments, block, &tests);
-		}
+			kdb_eqs.update(equation_name, lec, comment, method, sample, instruments, block, &tests);
 		// new equation
 		else
-		{
-			kdb_eqs.add(equation_name, lec, comment, method, &sample, instruments, block, tests, true);
-		}
+			kdb_eqs.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
 
-		if(estimation) estimation->save();
+		if(estimation) 
+			estimation->save();
 
+		if(sample) 
+			delete sample;
+		
 		this->accept();
 	}
 	catch (const std::exception& e)
