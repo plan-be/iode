@@ -5,7 +5,7 @@
  *  -------
  *  Console program to run IODE reports. 
  *  The aim of that version of IODE is to automate processes like (re-)estimations, 
- *  simulation, tables and graphs production, etc.
+ *  simulations, tables and graphs production, etc.
  *  
  *  List of functions 
  *  -----------------
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     //  To work around the McAfee ATP problem, an appended file was used:  
     // SCR_change_ext(SCR_NAME_ERR, argv[0], "msg");
     // SCR_ERR_FILE_NB = 1;
-    // 
+    //
     // The latest versions (> 6.65) simply used the iode.msg file located in the same directory
     // as iodecmd.exe : 
     B_IodeMsgPath();    // IODE > 6.65
