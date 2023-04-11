@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QStringList>
 
 #include "ui_compute_identities.h"
 #include "utils.h"
@@ -31,6 +32,14 @@ class QIodeMenuComputeIdentities : public QIodeSettings, public Ui::QIodeMenuCom
 public:
 	QIodeMenuComputeIdentities(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuComputeIdentities();
+
+    void setIdentitiesNames(const QStringList& identitiesNames)
+    {
+        QString inputString;
+        foreach(const QString& name, identitiesNames) 
+            inputString += name + ";";
+        qIdentitiesList->setQValue(inputString);
+    }
 
 public slots:
     void compute();
