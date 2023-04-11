@@ -6,6 +6,12 @@ Period::Period()
     c_period = nullptr;
 }
 
+Period::Period(const Period& period)
+{
+    this->c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
+    memcpy(this->c_period, period.c_period, sizeof(PERIOD));
+}
+
 Period::Period(const int year, const char periodicity, const int position)
 {
     IodeExceptionInvalidArguments error("Cannot create new Period");
