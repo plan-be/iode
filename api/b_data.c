@@ -255,7 +255,7 @@ int B_DataCalcVar(char* arg)
  *  @return         int             0 on success, -1 on error
  *  
  */
-static int B_DataCreate_1(char* arg, int* ptype)
+int B_DataCreate_1(char* arg, int* ptype)
 {
     int     nb_per;
     char    deflt[41];
@@ -317,7 +317,7 @@ int B_DataCreate(char* arg, int type)
  *  @return         int             0 on success, -1 on error
  *  
  */
-static int B_DataDelete_1(char* arg, int* ptype)
+int B_DataDelete_1(char* arg, int* ptype)
 {
     int     pos;
     KDB     *kdb = K_WS[*ptype];

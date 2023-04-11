@@ -115,7 +115,7 @@
 
 #include "iode.h"
 
-double  L_newton_1();
+static double  L_newton_1();
 int     KSIM_NEWTON_DEBUG = 0;          //
 int     KSIM_NEWTON_MAXIT = 50;         // Max number of iterations of the Newton-Raphson sub algorithm.
 double  KSIM_NEWTON_EPS   = 1e-6;       // Newton-Raphson convergence criterion

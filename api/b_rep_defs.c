@@ -182,7 +182,7 @@ int RP_undef(char *arg)
  *  @param [in] char*   name    macro name (without #<n>)
  *  @return     int             max <n> in macros name#<n>
  */
-static int RP_define_calcdepth(char *name)
+int RP_define_calcdepth(char *name)
 {
     int     i, lg, maxdepth = -1, depth, objpos = -1;
     char    buf[1024];

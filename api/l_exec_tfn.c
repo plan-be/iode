@@ -47,18 +47,18 @@
  *  -----------------
  *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
  *  
- *      static L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *             L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      static L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  */
 
@@ -88,7 +88,7 @@ extern int  L_intlag(L_REAL);
  *  
  */
 
-static L_REAL L_lag(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_lag(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     int     lag = 1;
 
@@ -104,7 +104,7 @@ static L_REAL L_lag(unsigned char* expr, short len, int t, L_REAL* stack, int na
  *  
  *  @see L_lag() for more details on parameters.
  */
-static L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1, v2;
     int     lag = 1;
@@ -124,7 +124,7 @@ static L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int n
  *  
  *  @see L_lag() for more details on parameters.
  */
-static L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1, v2;
     int     lag = 1;
@@ -145,7 +145,7 @@ static L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int n
  *  
  *  @see L_lag() for more details on parameters.
  */
-static L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     extern L_REAL L_divide();
     L_REAL  v1, v2;
@@ -166,7 +166,7 @@ static L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int na
  *  
  *  @see L_lag() for more details on parameters.
  */
-static L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1;
 
@@ -182,7 +182,7 @@ static L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int na
  *  
  *  @see L_lag() for more details on parameters.
  */
-static L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1 = 0.0, tmp;
     int     n = 1, j;
@@ -213,7 +213,7 @@ static L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int n
  *  @return             L_REAL          the maximum of expr on the period [p1, p2]
  *  
  */
-static L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1, v2;
     int     from, to, j;
@@ -235,7 +235,7 @@ static L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int n
  *  
  *  @see L_vmax() for more details.
  */
-static L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1, v2;
     int     from, to, j;
@@ -256,7 +256,7 @@ static L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int n
  *  
  *  @see L_vmax() for more details.
  */
-static L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL    v1 = 0.0, tmp;
     int     from, to, j;
@@ -276,7 +276,7 @@ static L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int na
  *  
  *  @see L_vmax() for more details.
  */
-static L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  v1 = 1.0, tmp;
     int     from, to, j;
@@ -296,7 +296,7 @@ static L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int n
  *  
  *  @see L_vmax() for more details.
  *  
- *  @note not a static function because it is also used by MTFN functions
+ *  @note not a function because it is also used by MTFN functions
  */
 
 L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
@@ -318,7 +318,7 @@ L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  @see L_vmax() for more details.
  *  
  */
-static L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  s = 0.0, s2 = 0.0, v1;
     int     from, to, j, n;
@@ -344,7 +344,7 @@ static L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int
  *  @see L_vmax() for more details.
  *  
  */
-static L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
 {
     L_REAL  tmp;
     int     from, to, j;

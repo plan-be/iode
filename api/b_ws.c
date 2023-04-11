@@ -477,7 +477,7 @@ done:
  *  @return     int             0 on success, < 0 on error
  */
  
-static int B_WsAggr(int method, char* arg)
+int B_WsAggr(int method, char* arg)
 {
     int     nb_args, rc = -1;
     char    **args, *pattern = NULL;

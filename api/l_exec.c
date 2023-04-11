@@ -84,7 +84,7 @@ void L_fperror()
  *  @return                      int         1 if L_NAN has been found and the stack is modified
  *                                           0 otherwise
  */
-static int L_stackna(L_REAL** p_stack, int nargs)
+int L_stackna(L_REAL** p_stack, int nargs)
 {
     int     i;
     L_REAL  *stack = *p_stack;

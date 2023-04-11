@@ -25,45 +25,45 @@
  *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
  *  
  *             L_REAL L_logn(L_REAL v)
- *      static L_REAL L_uminus(L_REAL* stack)
- *      static L_REAL L_uplus (L_REAL* stack)
- *      static L_REAL L_log(L_REAL* stack, int nargs)
- *      static L_REAL L_ln(L_REAL* stack)
- *      static L_REAL L_not(L_REAL* stack)
- *      static L_REAL L_expn(L_REAL* stack, int nargs)
- *      static L_REAL L_max(L_REAL* stack, int nargs)
- *      static L_REAL L_min(L_REAL* stack, int nargs)
- *      static L_REAL L_sin (L_REAL* stack)
- *      static L_REAL L_cos (L_REAL* stack)
- *      static L_REAL L_acos (L_REAL* stack)
- *      static L_REAL L_asin (L_REAL* stack)
- *      static L_REAL L_tan (L_REAL* stack)
- *      static L_REAL L_atan (L_REAL* stack)
- *      static L_REAL L_tanh (L_REAL* stack)
- *      static L_REAL L_sinh (L_REAL* stack)
- *      static L_REAL L_cosh (L_REAL* stack)
- *      static L_REAL L_abs (L_REAL* stack)
- *      static L_REAL L_sqrt (L_REAL* stack)
- *      static L_REAL L_int (L_REAL* stack)
- *      static L_REAL L_rad (L_REAL* stack)
- *      static L_REAL L_if(L_REAL* stack, int nargs)
- *      static L_REAL L_lsum(L_REAL* stack, int nargs)
- *      static L_REAL L_lmean(L_REAL* stack, int nargs)
- *      static L_REAL L_fnisan(L_REAL* stack, int nargs)
- *      static L_REAL L_lcount(L_REAL* stack, int nargs)
- *      static L_REAL L_lprod(L_REAL* stack, int nargs)
- *      static L_REAL L_sign(L_REAL* stack)
- *      static L_REAL L_lstderr(L_REAL* stack, int nargs)
- *      static L_REAL L_random(L_REAL* stack)
- *      static L_REAL L_floor(L_REAL* stack)
- *      static L_REAL L_ceil (L_REAL* stack)
- *      static L_REAL L_round(L_REAL* stack, int nargs)
- *      static L_REAL L_urandom(L_REAL* stack)
- *      static double randBoxMuller(double rv_mean, double rv_sd)
- *      static L_REAL L_grandom(L_REAL* stack)
- *      static double dgamma(double x)
- *      static L_REAL L_gamma(L_REAL* stack)
- *      static L_REAL L_div0(L_REAL *stack, int nargs)
+ *      L_REAL L_uminus(L_REAL* stack)
+ *      L_REAL L_uplus (L_REAL* stack)
+ *      L_REAL L_log(L_REAL* stack, int nargs)
+ *      L_REAL L_ln(L_REAL* stack)
+ *      L_REAL L_not(L_REAL* stack)
+ *      L_REAL L_expn(L_REAL* stack, int nargs)
+ *      L_REAL L_max(L_REAL* stack, int nargs)
+ *      L_REAL L_min(L_REAL* stack, int nargs)
+ *      L_REAL L_sin (L_REAL* stack)
+ *      L_REAL L_cos (L_REAL* stack)
+ *      L_REAL L_acos (L_REAL* stack)
+ *      L_REAL L_asin (L_REAL* stack)
+ *      L_REAL L_tan (L_REAL* stack)
+ *      L_REAL L_atan (L_REAL* stack)
+ *      L_REAL L_tanh (L_REAL* stack)
+ *      L_REAL L_sinh (L_REAL* stack)
+ *      L_REAL L_cosh (L_REAL* stack)
+ *      L_REAL L_abs (L_REAL* stack)
+ *      L_REAL L_sqrt (L_REAL* stack)
+ *      L_REAL L_int (L_REAL* stack)
+ *      L_REAL L_rad (L_REAL* stack)
+ *      L_REAL L_if(L_REAL* stack, int nargs)
+ *      L_REAL L_lsum(L_REAL* stack, int nargs)
+ *      L_REAL L_lmean(L_REAL* stack, int nargs)
+ *      L_REAL L_fnisan(L_REAL* stack, int nargs)
+ *      L_REAL L_lcount(L_REAL* stack, int nargs)
+ *      L_REAL L_lprod(L_REAL* stack, int nargs)
+ *      L_REAL L_sign(L_REAL* stack)
+ *      L_REAL L_lstderr(L_REAL* stack, int nargs)
+ *      L_REAL L_random(L_REAL* stack)
+ *      L_REAL L_floor(L_REAL* stack)
+ *      L_REAL L_ceil (L_REAL* stack)
+ *      L_REAL L_round(L_REAL* stack, int nargs)
+ *      L_REAL L_urandom(L_REAL* stack)
+ *      double randBoxMuller(double rv_mean, double rv_sd)
+ *      L_REAL L_grandom(L_REAL* stack)
+ *      double dgamma(double x)
+ *      L_REAL L_gamma(L_REAL* stack)
+ *      L_REAL L_div0(L_REAL *stack, int nargs)
  *  
  */
 
@@ -89,10 +89,10 @@ L_REAL L_logn(L_REAL v)
 
 /*------------- GROUP L_FNS_FN ---------------------*/
 
-static L_REAL L_uminus(L_REAL* stack) {return(- *stack);}
-static L_REAL L_uplus (L_REAL* stack) {return(*stack);}
+L_REAL L_uminus(L_REAL* stack) {return(- *stack);}
+L_REAL L_uplus (L_REAL* stack) {return(*stack);}
 
-static L_REAL L_log(L_REAL* stack, int nargs)
+L_REAL L_log(L_REAL* stack, int nargs)
 {
     extern L_REAL L_divide();
     
@@ -100,8 +100,8 @@ static L_REAL L_log(L_REAL* stack, int nargs)
     return(L_logn(*stack));
 }
 
-static L_REAL L_ln(L_REAL* stack)  {return(L_logn(*stack));}
-static L_REAL L_not(L_REAL* stack) {return((fabs((double)(*stack)) < 1e-15) ? 1.0: 0.0);}
+L_REAL L_ln(L_REAL* stack)  {return(L_logn(*stack));}
+L_REAL L_not(L_REAL* stack) {return((fabs((double)(*stack)) < 1e-15) ? 1.0: 0.0);}
 
 /**
  *  Computes the exponential of the value on the stack.
@@ -113,7 +113,7 @@ static L_REAL L_not(L_REAL* stack) {return((fabs((double)(*stack)) < 1e-15) ? 1.
  *  @return 
  *  
  */
-static L_REAL L_expn(L_REAL* stack, int nargs)
+L_REAL L_expn(L_REAL* stack, int nargs)
 {
     double  x, a, b;
 
@@ -137,7 +137,7 @@ static L_REAL L_expn(L_REAL* stack, int nargs)
     }
 }
 
-static L_REAL L_max(L_REAL* stack, int nargs)
+L_REAL L_max(L_REAL* stack, int nargs)
 {
     L_REAL  m;
     int     j;
@@ -148,7 +148,7 @@ static L_REAL L_max(L_REAL* stack, int nargs)
     return(m);
 }
 
-static L_REAL L_min(L_REAL* stack, int nargs)
+L_REAL L_min(L_REAL* stack, int nargs)
 {
     L_REAL  m;
     int     j;
@@ -159,21 +159,21 @@ static L_REAL L_min(L_REAL* stack, int nargs)
     return(m);
 }
 
-static L_REAL L_sin  (L_REAL* stack) {return((L_REAL)sin ((double)*stack));}
-static L_REAL L_cos  (L_REAL* stack) {return((L_REAL)cos ((double)*stack));}
-static L_REAL L_acos (L_REAL* stack) {return((L_REAL)acos((double)*stack));}
-static L_REAL L_asin (L_REAL* stack) {return((L_REAL)asin((double)*stack));}
-static L_REAL L_tan  (L_REAL* stack) {return((L_REAL)tan ((double)*stack));}
-static L_REAL L_atan (L_REAL* stack) {return((L_REAL)atan((double)*stack));}
-static L_REAL L_tanh (L_REAL* stack) {return((L_REAL)tanh((double)*stack));}
-static L_REAL L_sinh (L_REAL* stack) {return((L_REAL)sinh((double)*stack));}
-static L_REAL L_cosh (L_REAL* stack) {return((L_REAL)cosh((double)*stack));}
-static L_REAL L_abs  (L_REAL* stack) {return((L_REAL)fabs((double)*stack));}
-static L_REAL L_sqrt (L_REAL* stack) {return((*stack < 0) ? L_NAN: (L_REAL)sqrt((double)*stack));}
-static L_REAL L_int  (L_REAL* stack) {return((L_REAL)floor((double)(0.5 + *stack)));}
-static L_REAL L_rad  (L_REAL* stack) {return((L_REAL)(((double)(*stack)) * M_PI / 180.0));}
+L_REAL L_sin  (L_REAL* stack) {return((L_REAL)sin ((double)*stack));}
+L_REAL L_cos  (L_REAL* stack) {return((L_REAL)cos ((double)*stack));}
+L_REAL L_acos (L_REAL* stack) {return((L_REAL)acos((double)*stack));}
+L_REAL L_asin (L_REAL* stack) {return((L_REAL)asin((double)*stack));}
+L_REAL L_tan  (L_REAL* stack) {return((L_REAL)tan ((double)*stack));}
+L_REAL L_atan (L_REAL* stack) {return((L_REAL)atan((double)*stack));}
+L_REAL L_tanh (L_REAL* stack) {return((L_REAL)tanh((double)*stack));}
+L_REAL L_sinh (L_REAL* stack) {return((L_REAL)sinh((double)*stack));}
+L_REAL L_cosh (L_REAL* stack) {return((L_REAL)cosh((double)*stack));}
+L_REAL L_abs  (L_REAL* stack) {return((L_REAL)fabs((double)*stack));}
+L_REAL L_sqrt (L_REAL* stack) {return((*stack < 0) ? L_NAN: (L_REAL)sqrt((double)*stack));}
+L_REAL L_int  (L_REAL* stack) {return((L_REAL)floor((double)(0.5 + *stack)));}
+L_REAL L_rad  (L_REAL* stack) {return((L_REAL)(((double)(*stack)) * M_PI / 180.0));}
 
-static L_REAL L_if(L_REAL* stack, int nargs)
+L_REAL L_if(L_REAL* stack, int nargs)
 {
     double  cond = *(stack - 2);
 
@@ -181,7 +181,7 @@ static L_REAL L_if(L_REAL* stack, int nargs)
     else                                     return(*(stack - 1));
 }
 
-static L_REAL L_lsum(L_REAL* stack, int nargs)
+L_REAL L_lsum(L_REAL* stack, int nargs)
 {
     L_REAL  m;
     int     j;
@@ -192,7 +192,7 @@ static L_REAL L_lsum(L_REAL* stack, int nargs)
     return(m);
 }
 
-static L_REAL L_lmean(L_REAL* stack, int nargs)
+L_REAL L_lmean(L_REAL* stack, int nargs)
 {
     L_REAL  m = 0.0;
     int     j, no = 0;
@@ -207,10 +207,10 @@ static L_REAL L_lmean(L_REAL* stack, int nargs)
     else return(L_NAN);
 }
 
-static L_REAL L_fnisan(L_REAL* stack, int nargs) {return((L_REAL)L_ISAN(*stack));}
-static L_REAL L_lcount(L_REAL* stack, int nargs) {return((L_REAL)nargs);}
+L_REAL L_fnisan(L_REAL* stack, int nargs) {return((L_REAL)L_ISAN(*stack));}
+L_REAL L_lcount(L_REAL* stack, int nargs) {return((L_REAL)nargs);}
 
-static L_REAL L_lprod(L_REAL* stack, int nargs)
+L_REAL L_lprod(L_REAL* stack, int nargs)
 {
     L_REAL  m;
     int     j;
@@ -221,13 +221,13 @@ static L_REAL L_lprod(L_REAL* stack, int nargs)
     return(m);
 }
 
-static L_REAL L_sign(L_REAL* stack)
+L_REAL L_sign(L_REAL* stack)
 {
     if(*stack < 0) return((L_REAL)-1.0);
     else           return((L_REAL)1.0);
 }
 
-static L_REAL L_lstderr(L_REAL* stack, int nargs)
+L_REAL L_lstderr(L_REAL* stack, int nargs)
 {
     L_REAL  m = 0, x, mean;
     int     j, no = 0;
@@ -244,7 +244,7 @@ static L_REAL L_lstderr(L_REAL* stack, int nargs)
     else return(L_NAN);
 }
 
-static L_REAL L_random(L_REAL* stack)
+L_REAL L_random(L_REAL* stack)
 {
     static int init = 0;
     double  x, s = *stack;
@@ -260,10 +260,10 @@ static L_REAL L_random(L_REAL* stack)
 }
 
 
-static L_REAL L_floor(L_REAL* stack) {return((L_REAL)floor((double)(*stack))); }
-static L_REAL L_ceil (L_REAL* stack) {return((L_REAL)(1.0 + floor((double)(*stack))));}
+L_REAL L_floor(L_REAL* stack) {return((L_REAL)floor((double)(*stack))); }
+L_REAL L_ceil (L_REAL* stack) {return((L_REAL)(1.0 + floor((double)(*stack))));}
 
-static L_REAL L_round(L_REAL* stack, int nargs)
+L_REAL L_round(L_REAL* stack, int nargs)
 {
     double cf = 0, val = *stack;
 
@@ -276,7 +276,7 @@ static L_REAL L_round(L_REAL* stack, int nargs)
     return((L_REAL)(val / cf));
 }
 
-static L_REAL L_urandom(L_REAL* stack)
+L_REAL L_urandom(L_REAL* stack)
 {
     static int init = 0;
     double  x, s = *stack;
@@ -323,7 +323,7 @@ static double randBoxMuller(double rv_mean, double rv_sd)
     return(rv_mean + rv_sd * z1);
 }
 
-static L_REAL L_grandom(L_REAL* stack)
+L_REAL L_grandom(L_REAL* stack)
 {
     extern double randBoxMuller(double m, double s);
     double  s = *stack, m = *(stack - 1);
@@ -360,7 +360,7 @@ static double dgamma(double x)
     return w / y;
 }
 
-static L_REAL L_gamma(L_REAL* stack)
+L_REAL L_gamma(L_REAL* stack)
 {
     extern double dgamma(double x);
     double  s = *stack;
@@ -368,7 +368,7 @@ static L_REAL L_gamma(L_REAL* stack)
     return(dgamma(s));
 }
 
-static L_REAL L_div0(L_REAL *stack, int nargs)
+L_REAL L_div0(L_REAL *stack, int nargs)
 {
     double a = *(stack - 1);
     double b = *stack;

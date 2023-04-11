@@ -41,6 +41,7 @@ void B_IodeIniFile()
     SCR_split_dir(module, file);
 	sprintf(file, "%s\\iode.ini", module);
 	ODE_INIFILE = SCR_stracpy(file);
+    //printf("iode.ini file: %s\n", ODE_INIFILE);
 }
 
 
