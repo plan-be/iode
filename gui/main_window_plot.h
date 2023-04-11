@@ -20,4 +20,5 @@ public slots:
 	void appendPlot(QIodePlotDialog* plotDialog);
 	virtual void open_graphs_variables_dialog_from_vars_view(
 		const QList<QString>& variableNames, const QString& from, const QString& to) = 0;
+	virtual void open_compute_identities_dialog() = 0;
 };
