@@ -1,3 +1,15 @@
+/**
+ *  @header4iode
+ *  
+ *  IODEBASE.H
+ *  ----------
+ *  Contains 
+ *      - declarations of IODE functions source file by source file
+ *      - declarations of IODE pointer to "super" functions
+ *  
+ *  This file is included in iode.h.
+ */
+ 
 #ifndef _IODEBASE_
 #define _IODEBASE_
 

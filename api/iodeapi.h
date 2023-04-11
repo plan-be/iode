@@ -1,3 +1,14 @@
+/**
+ *  @header4iode
+ *  
+ *  IODEAPI.H
+ *  ----------
+ *  Contains 
+ *      - declarations of the functions defined inf b_api.c.
+ *  
+ *  This file is included in iodebase.h.
+ */
+
 #ifndef _IODEAPI_
 #define _IODEAPI_
 
