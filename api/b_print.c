@@ -1,16 +1,63 @@
+/**
+ * @header4iode
+ *
+ * Functions to print IODE object definitions.
+ *
+ *  List of functions 
+ *  -----------------
+ *    int B_PrintVal(IODE_REAL val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
+ *    IODE_REAL B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
+ *    int B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
+ *    int B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
+ *    int B_isdef(char* txt)                                           | Checks if a string contains non space charaters.
+ *    int B_dump_str(unsigned char*head, unsigned char*txt)            | Print a header and a modified text: spaces are added before and after specific characters in the text
+ *    int B_get1int(char* arg)                                         | Return the integer value of the beginning of a string.
+ *    int B_ScrollSet(char* arg, long *plong, int inf, int sup)        | Interprets the first part of a string as a integer and check that the value is between 2 boundaries.
+ *    int B_PrintObjTblTitle(char* arg)                                | $PrintObjTitle 0 or 1
+ *    int B_PrintObjLec(char* arg)                                     | $PrintObjLec {0|1|2}
+ *    int B_PrintObjEqsInfos(char* arg)                                | $PrintObjInfos {0|1|2}
+ *    int B_PrintObjDef_1(char* arg, int* type)                        | Print the definition of the object named arg of the given type
+ *    int B_PrintObjDef(char* arg, int type)                           | $PrintObjDefXxx object_list
+ *    int B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
+ *    int B_PrintDefTbl(KDB* kdb, int pos)                             | Print the table in position pos in kdb.  
+ *    int B_DumpTblDef(TBL* tbl)                                       | Print a table definition.
+ *    int B_CellDef(TCELL* cell)                                       | Checks that a TCELL is not empty (for TEXT cells) and not "1" (for LEC cells).
+ *    int B_PrintTblCell(TCELL* cell, int straddle)                    | Print a TABLE cell optionally on several columns.
+ *    int B_PrintDefCmt(KDB* kdb, int pos)                             | Print a comment.
+ *    int B_PrintDefLst(KDB* kdb, int pos)                             | Print a list.
+ *    int B_PrintDefIdt(KDB* kdb, int pos)                             | Print a identity.
+ *    int B_PrintDefEqs(KDB* kdb, int pos)                             | Print a equation.
+ *    int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs) | Print a LEC expression. Set the engogenous (name) in bold.
+ *    int B_PrintEqs(char* name, EQ* eq)                               | Print an equation and optionally its statistical tests.
+ *    int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)             | Print a scalar in an enumeration list.
+ *    int B_PrintDefScl(KDB* kdb, int pos)                             | Print the scalar kdb[pos].
+ *    int B_PrintDefVar(KDB* kdb, int pos)                             | Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
+ *
+ */
+
 #include "iode.h"
 
-/* Moved from b_base.c */
-// int     B_NBDEC = 2;  // Replaced by K_NBDEC-- JMP 18-04-2022
-// int     B_LANG = 0;   // Replaced by K_LANG -- JMP 18-04-2022
-int     B_MULTIBAR = 0;  
-/**/
+int     B_MULTIBAR = 0; // Graph parameter (see GB)
+int     B_TBL_TITLE;    // Specify how to print a TABLE 
+                        //      0 : print table full definitions
+                        //      1 : print only table titles
+int     B_EQS_INFOS;    // Information detail to print (for equations)
+                        //    0: equation only 
+                        //    1: equation + comment
+                        //    2: equation + comment + estimation results
+int     B_EQS_LEC;      // Specify how to print a LEC expression 
+                        //    0 : print the LEC form as is
+                        //    1 : replace all scalars by their values
+                        //    2 : replaced all scalars by their values + t-tests
 
-int     BEG = 0;
-int     B_TBL_TITLE, B_EQS_INFOS, B_EQS_LEC;
+/*================================= UTILITIES ===============================*/
 
-/*================================= UTIL ===============================*/
-
+/**
+ *  Print a double with the function T_print_val() and with the number of decimals set to -1.
+ *  
+ *  @param [in] val double  value to print
+ *  @return         int     0
+ */
 int B_PrintVal(IODE_REAL val)
 {
     // B_NBDEC replaced by K_NBDEC JMP 18/04/2022
@@ -22,6 +69,13 @@ int B_PrintVal(IODE_REAL val)
     return(0);
 }
 
+
+/**
+ *  Return the t-test of a scalar or L_NAN if it cannot be determined.
+ *      
+ *  @param [in] scl SCL*    given scalar 
+ *  @return         double  value / stderr 
+ */
 IODE_REAL B_calc_ttest(SCL* scl)
 {
     if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
@@ -29,6 +83,15 @@ IODE_REAL B_calc_ttest(SCL* scl)
     return(L_NAN);
 }
 
+/**
+ *  Replace \ by / in a string.
+ *  
+ *  @param [out] out    unsigned char*      output string
+ *  @param [in]  in     unsigned char*      input string
+ *  @return             int                 0
+ *  
+ *  TODO: replace by SCR_replace()
+ */
 int B_replesc(unsigned char* out, unsigned char* in)
 {
     int     i;
@@ -42,15 +105,31 @@ int B_replesc(unsigned char* out, unsigned char* in)
     return(0);
 }
 
+
+/**
+ *  Print an object name and its title in an enum_1 paragraph.
+ *          
+ *  @param [in] name    char*   object name
+ *  @param [in] text    char*   object title of definition    
+ *  @return             int     0
+ */
 int B_PrintDefGnl(char* name, char* text)
 {
     char    buf[80];
 
-    sprintf(buf, ".par1 enum_1\n\\b%s\\B : ", name);
+    //sprintf(buf, ".par1 enum_1\n\\b%s\\B : ", name);
+    sprintf(buf, ".par1 enum_1\n%cb%s%cB : ", A2M_ESCCH, name, A2M_ESCCH);  // JMP 10/04/2023
     B_dump_str(buf, text);
     return(0);
 }
 
+
+/**
+ *  Checks if a string contains non space charaters.
+ *  
+ *  @param [in] txt char*   string to check
+ *  @return         int     0 if txt is NULL or contains only spaces, 1 otherwise        
+ */
 int B_isdef(char* txt)
 {
     if(txt == NULL || txt[0] == 0) return(0);
@@ -58,6 +137,18 @@ int B_isdef(char* txt)
     return(0);
 }
 
+
+/**
+ *  Print a header and a modified text: spaces are added before and after specific characters in the text.
+ *  If the text is NULL, print only a \n.
+ *  
+ *  A space is added before each '+' ':' and ']'.
+ *  A space is added after  each '=', '+', ',', ')' '\n'.
+ *  
+ *  @param [in] head char *     header
+ *  @param [in] txt  char *     text 
+ *  @return          int        0
+ */
 int B_dump_str(unsigned char*head, unsigned char*txt)
 {
     int     i;
@@ -77,8 +168,16 @@ int B_dump_str(unsigned char*head, unsigned char*txt)
 
 /* ============================ PRINT ==================================== */
 
-
-/* retourne -100 si l'argument est faux, sa valeur num‚rique sinon */
+/**
+ *  Return the integer value of the beginning of a string.
+ *  
+ *  @param [in] arg char*   string beginning with a number
+ *  @return         int     value of the first number in the string         
+ *                          -100 if arg is empty
+ *  
+ *  TODO: rewrite this!
+ *  
+ */
 int B_get1int(char* arg)
 {
     char    **args;
@@ -92,7 +191,19 @@ int B_get1int(char* arg)
 }
 
 
-/* Déplacé de sb_global.c */
+
+/**
+ *  Interprets the first part of a string as a integer and check that the value 
+ *  is between 2 boundaries.
+ *  
+ *  @note Moved from sb_global.c
+ *  
+ *  @param [in]  arg   char*    string beginning with an integer 
+ *  @param [out] plong long*    pointer to the calculated value
+ *  @param [in]  inf   int      min value
+ *  @param [in]  sup   int      max value
+ *  @return            int      0 on success, -1 if arg is NULL
+ */
 int B_ScrollSet(char* arg, long *plong, int inf, int sup)
 {
     int     n;
@@ -105,6 +216,10 @@ int B_ScrollSet(char* arg, long *plong, int inf, int sup)
     return(0);
 }
 
+
+// $PrintObjTitle 0 or 1
+//      0 : print table full definitions
+//      1 : print only table titles
 int B_PrintObjTblTitle(char* arg)
 {
     long    l;
@@ -116,6 +231,11 @@ int B_PrintObjTblTitle(char* arg)
     return(0);
 }
 
+
+// $PrintObjLec {0|1|2}
+//     0 : print the LEC equation
+//     1 : replace all scalars by their values
+//     2 : replaced all scalars by their values + t-tests
 int B_PrintObjLec(char* arg)
 {
     long    l;
@@ -127,6 +247,11 @@ int B_PrintObjLec(char* arg)
     return(0);
 }
 
+
+// $PrintObjInfos {0|1|2}
+//    0: equation only 
+//    1: equation + comment
+//    2: equation + comment + estimation results
 int B_PrintObjEqsInfos(char* arg)
 {
     long    l;
@@ -138,7 +263,18 @@ int B_PrintObjEqsInfos(char* arg)
     return(0);
 }
 
+static int     BEG = 0;     // Nb of the current printed variable (to limit each group of variable to 47)
 
+
+/**
+ *  Print the definition of the object named arg of the given type.
+ *  
+ *  If the object does not exist or type is llegal, a message is stored in the error table via B_seterror()
+ *  
+ *  @param [in] arg     char*   object name
+ *  @param [in] type    int     object type
+ *  @return             int     0 on success, -1 on error
+ */
 int B_PrintObjDef_1(char* arg, int* type)
 {
     KDB     *kdb;
@@ -193,7 +329,7 @@ int B_PrintObjDef_1(char* arg, int* type)
                 PER_pertoa(&(smpl->s_p1), txt);
                 /*                W_printfRepl("&%dLSample: %s - %s\n",smpl->s_nb + 1, txt, PER_pertoa(&(smpl->s_p2), 0L)); */
                 /*                W_printfRepl("&1LSample&1C%s&1C%s\n", txt, PER_pertoa(&(smpl->s_p2), 0L)); */
-                W_printf(".tl\n&1LName");
+                W_printfRepl(".tl\n&1LName");
                 for(j = 0 ; j < smpl->s_nb; j++) {
                     PER_pertoa(PER_addper(per, j), txt);
                     W_printfRepl("&1C%s", txt);
@@ -216,26 +352,26 @@ err:
 }
 
 
+
+// $PrintObjDefXxx object_list
+//   where Xxx = {cmt | idt | lst | scl | tbl | var}
 int B_PrintObjDef(char* arg, int type)
 {
-    /*    B_TBL_TITLE = B_EQS_INFOS = B_EQS_LEC = 0; */
     return(B_PrintObjDefArgs(arg, type));
 }
 
+
+/**
+ *  Print a list of objects of a given type.
+ *  
+ *  @param [in] arg  char*      list of objects to print. If NULL or empty, prints all objects in the WS.
+ *  @param [in] type int        object type
+ *  @return          int        0 on success, -1 on error: return code of B_PrintObjDef_1()   
+ */
 int B_PrintObjDefArgs(char* arg, int type)
 {
     int         i, rc = 0;
-    char        buf[K_MAX_FILE];  /* JMP 03-06-2015 */
-    extern char *KLG_TYPE[][3];
 
-    B_replesc(buf, KNAMEPTR(K_WS[type]));
-    /*    W_printf(".page\n"); */
-    /*    W_printf(".par1 tit_0\n%s [%s]\n", KLG_TYPE[type][B_LANG], buf);
-        if(B_isdef(KDESC(K_WS[type]))) {
-    	B_replesc(buf, KDESC(K_WS[type]));
-    	W_printf(".par1 pari\n%s\n", buf);
-    	}
-    JMP 17-12-93 */
     if(arg == 0 || arg[0] == 0)
         for(i = 0 ; i < KNB(K_WS[type]) ; i++) {
             rc = B_PrintObjDef_1(KONAME(K_WS[type], i), &type);
@@ -256,6 +392,17 @@ int B_PrintObjDefArgs(char* arg, int type)
 
 /*============================= TBL ===============================*/
 
+/**
+ *  Print the table in position pos in kdb.  
+ *  
+ *  If B_TBL_TITLE != 0, print the table title.
+ *  If B_TBL_TITLE == 1, print the table name and its title.
+ *  If B_TBL_TITLE == 0, print the table definition.
+ *  
+ *  @param [in] kdb KDB*        KDB of tables
+ *  @param [in] pos int         position of the table in kdb
+ *  @return         int         -1 if the table cannot be found in kdb
+ */
 int B_PrintDefTbl(KDB* kdb, int pos)
 {
     TBL                     *tbl = NULL;
@@ -264,24 +411,23 @@ int B_PrintDefTbl(KDB* kdb, int pos)
 
     if((tbl = KTVAL(kdb, pos)) == NULL) return(-1);
     if(B_TBL_TITLE) {
-        //W_printf(".par enum_1\n");
-
-        if(B_TBL_TITLE == 1) W_printf("\n\\b%s\\B : %s\n", KONAME(kdb, pos), T_get_title(tbl));
+        if(B_TBL_TITLE == 1) W_printfReplEsc("\n~b%s~B : %s\n", KONAME(kdb, pos), T_get_title(tbl));
         else W_printf("\n%s\n", T_get_title(tbl));
-
         T_free(tbl);
         return(0);
     }
     B_PrintRtfTopic(T_get_title(tbl));
     W_printf(".tb %d\n", T_NC(tbl));
     W_printfRepl(".sep &\n");
-    W_printfRepl("&%dC\\b%s : d‚finition\\B\n", T_NC(tbl), KONAME(kdb, pos));
+    W_printfRepl("&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, KONAME(kdb, pos), A2M_ESCCH);
     B_DumpTblDef(tbl);
     W_printf(".te\n");
     T_free(tbl);
     return(0);
 }
 
+
+// Print a table definition.
 int B_DumpTblDef(TBL* tbl)
 {
     TCELL   *cell;
@@ -330,7 +476,7 @@ int B_DumpTblDef(TBL* tbl)
     for(i = 0; i < T_NC(tbl); i++)
         if(B_CellDef((TCELL *)(tbl->t_div.tl_val) + i)) break;
     if(i < T_NC(tbl)) {
-        W_printfRepl(".tl\n&%dC\\bColumn divisors\\B\n.tl\n", T_NC(tbl)); /* JMP 14-06-96 */
+        W_printfRepl(".tl\n&%dC%cbColumn divisors%cB\n.tl\n", T_NC(tbl), A2M_ESCCH, A2M_ESCCH); /* JMP 14-06-96 */
         for(i = 0; i < T_NC(tbl); i++)
             B_PrintTblCell((TCELL *)(tbl->t_div.tl_val) + i, 1);
     }
@@ -339,6 +485,13 @@ int B_DumpTblDef(TBL* tbl)
     return(0);
 }
 
+
+/**
+ *  Checks that a TCELL is not empty (for TEXT cells) and not "1" (for LEC cells).
+ *  
+ *  @param [in] cell    TCELL*  input TCELL
+ *  @return             int     0 if the value is NULL or == "1" for LEC cells
+ */
 int B_CellDef(TCELL* cell)
 {
     if((cell->tc_val) == NULL) return(0);
@@ -347,6 +500,13 @@ int B_CellDef(TCELL* cell)
     return(1);
 }
 
+/**
+ *  Print a TABLE cell optionally on several columns.
+ *  
+ *  @param [in] cell     TCELL*     cell to print
+ *  @param [in] straddle int        number of columns occupied by the cell
+ *  @return              int        0
+ */
 int B_PrintTblCell(TCELL* cell, int straddle)
 {
     if(B_CellDef(cell) == 0) {
@@ -375,7 +535,7 @@ int B_PrintTblCell(TCELL* cell, int straddle)
 
 /*================================= CMT ================================*/
 
-
+// Print a comment.
 int B_PrintDefCmt(KDB* kdb, int pos)
 {
     B_PrintDefGnl(KONAME(kdb, pos), KCVAL(kdb, pos));
@@ -384,7 +544,7 @@ int B_PrintDefCmt(KDB* kdb, int pos)
 
 /*================================= LST ================================*/
 
-
+// Print a list.
 int B_PrintDefLst(KDB* kdb, int pos)
 {
     B_PrintDefGnl(KONAME(kdb, pos), KLVAL(kdb, pos));
@@ -393,7 +553,7 @@ int B_PrintDefLst(KDB* kdb, int pos)
 
 /*================================= IDT ================================*/
 
-
+// Print an identity.
 int B_PrintDefIdt(KDB* kdb, int pos)
 {
     char    *name = KONAME(kdb, pos), *tmp;
@@ -408,6 +568,7 @@ int B_PrintDefIdt(KDB* kdb, int pos)
 
 /*================================= EQS ================================*/
 
+// Print an equation.
 int B_PrintDefEqs(KDB* kdb, int pos)
 {
     EQ      *eq = NULL;
@@ -418,6 +579,17 @@ int B_PrintDefEqs(KDB* kdb, int pos)
     return(0);
 }
 
+/**
+ *  Print a LEC expression. Set the engogenous (name) in bold.
+ *  
+ *  @param [in] name   char* name    endogenous name   
+ *  @param [in] eqlec  char* eqlec   LEC expression 
+ *  @param [in] eqclec CLEC* eqclec  CLEC (compiled LEC) equivalent to LEC
+ *  @param [in] coefs  int   coefs   if 1: replace scalars by their value   
+ *                                   if 2: replace scalars by their value and their t-test   
+ *  @return            int           0
+ *  
+ */
 int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
 {
     CLEC    *clec;
@@ -432,7 +604,7 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
     clec = (CLEC *) SCR_malloc(eqclec->tot_lg + 1);
     memcpy(clec, eqclec, eqclec->tot_lg);
 
-    sprintf(buf, "\\b%s\\B", name);
+    sprintf(buf, "%cb%s%cB", A2M_ESCCH, name, A2M_ESCCH);
     SCR_replace_gnl(lec, name, buf, "_\\");
     for(j = 0 ; j < clec->nb_names ; j++) {
         sname = clec->lnames[j].name;
@@ -445,11 +617,11 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
                 // T_fmt_val(ttest, B_calc_ttest(scl), 9, -1); /* JMP 27-10-08 */
                 T_fmt_val(tcoef, scl->val, 15, K_NBDEC);           // JMP 18-04-2022
                 T_fmt_val(ttest, B_calc_ttest(scl), 15, K_NBDEC);  // JMP 18-04-2022
-                if(coefs == 1) sprintf(buf, "\\i%s\\I", tcoef);
-                if(coefs == 2) sprintf(buf, "\\i%s(%s)\\I", tcoef, ttest);
+                if(coefs == 1) sprintf(buf, "%ci%s%cI", A2M_ESCCH, tcoef, A2M_ESCCH);
+                if(coefs == 2) sprintf(buf, "%ci%s(%s)%cI", A2M_ESCCH, tcoef, ttest, A2M_ESCCH);
             }
         }
-        if(buf[0] == 0) sprintf(buf, "\\i%s\\I", sname);
+        if(buf[0] == 0) sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname, A2M_ESCCH);
         SCR_replace_gnl(lec, sname, buf, "_\\");
     }
     B_dump_str(" ", lec);
@@ -459,24 +631,39 @@ int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)
     return(0);
 }
 
+
+/**
+ *  Print an equation and optionally its statistical tests.
+ *  
+ *  if B_EQS_INFOS == 0, print only the equation
+ *  if B_EQS_INFOS == 1, print the equation and its (optional) comment
+ *  if B_EQS_INFOS == 2, print the equation, its (optional) comment and the estimation 
+ *                       tests (if the equation was estimated)
+ *  
+ *  @param [in] name  char*     equation name 
+ *  @param [in] eq    EQ*       equation struct 
+ *  @return           int       0    
+ */
 int B_PrintEqs(char* name, EQ* eq)
 {
     CLEC    *clec;
-    char    from[21], to[21], *sname;
+    char    from[21], to[21], buf[256], *sname;
     int     j, pos;
 
     if(B_EQS_INFOS > 1) B_PrintRtfTopic(name);
     W_printf(".par1 enum_1\n");
     B_PrintLec(name, eq->lec, eq->clec, B_EQS_LEC);
     if(B_EQS_INFOS < 1) return(0);
-    if(B_isdef(eq->cmt))
-        B_dump_str(".par1 par_1\n\\i ", eq->cmt);
+    if(B_isdef(eq->cmt)) {
+        sprintf(buf, ".par1 par_1\n%ci ", A2M_ESCCH);
+        B_dump_str(buf, eq->cmt);
+    }    
 
     if(B_EQS_INFOS < 2) return(0);
     if(eq->method >= 0 && eq->method < 4 &&
             (eq->smpl).s_nb != 0 && eq->tests[3]) {
         /*        W_printf(".par enum_2\nEndogenous : \\i%s\\I\n\n", name); */
-        W_printf(".par enum_2\nEstimation : \\i%c\\I on %s-%s\n\n", "LZIG"[eq->method],
+        W_printf(".par enum_2\nEstimation : %ci%c%cI on %s-%s\n\n", A2M_ESCCH, "LZIG"[eq->method], A2M_ESCCH, 
                  PER_pertoa(&(eq->smpl.s_p1), from),
                  PER_pertoa(&(eq->smpl.s_p2), to));
         if(B_isdef(eq->blk))   B_dump_str("Block : ", eq->blk);
@@ -488,12 +675,12 @@ int B_PrintEqs(char* name, EQ* eq)
         W_printf("St dev of residuals         : %f\n\n", eq->tests[1]);
         W_printf("Mean of YOBS                : %f\n\n", eq->tests[2]);
         W_printf("Sum of Squares of Residuals : %f\n\n", eq->tests[3]);
-        W_printf("Standard error (%%)          : %f (\\i%f\\I)\n\n", eq->tests[4], eq->tests[5]);
+        W_printf("Standard error (%%)          : %f (%ci%f%cI)\n\n", eq->tests[4], A2M_ESCCH, eq->tests[5], A2M_ESCCH);
         W_printf("F-stat                      : %f\n\n", eq->tests[6]);
-        W_printf("R2 (R2 adjusted)            : %f (\\i%f\\I)\n\n", eq->tests[7], eq->tests[8]);
+        W_printf("R2 (R2 adjusted)            : %f (%ci%f%cI)\n\n", eq->tests[7], A2M_ESCCH, eq->tests[8], A2M_ESCCH);
         W_printf("Durbin-Watson               : %f\n\n", eq->tests[9]);
         W_printf("Log Likelihood              : %f\n\n", eq->tests[10]);
-        W_printf(".par1 enum_2\nCoefficient values \\i(relax, stderr, t-stat)\\I :\n\n");
+        W_printf(".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
         clec = (CLEC *) SW_nalloc(eq->clec->tot_lg + 1);
         memcpy(clec, eq->clec, eq->clec->tot_lg);
         for(j = 0 ; j < clec->nb_names ; j++) {
@@ -516,12 +703,20 @@ int B_PrintEqs(char* name, EQ* eq)
 
 /*================================= SCL ================================*/
 
+/**
+ *  Print a scalar.
+ *  
+ *  @param [in] scl   SCL*      scalar struct  
+ *  @param [in] name  char*     scalar name
+ *  @param [in] enum_ int       enum level 
+ *  @return           int       -1 is scl is NULL, 0 otherwise
+ */
 int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)
 {
     double  ttest;
     char    tcoef[128], trelax[128], tstd[128], tttest[128];
 
-    W_printf(".par1 enum_%d\n\\b%s\\B : ", enum_, name);
+    W_printfReplEsc(".par1 enum_%d\n~b%s~B : ", enum_, name);
     if(scl == NULL) {
         W_printf("?\n");
         return(-1);
@@ -532,11 +727,12 @@ int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)
     T_fmt_val(tstd, (double)scl->std, 15, K_NBDEC);  // JMP 18-04-2022
     ttest = B_calc_ttest(scl);
     T_fmt_val(tttest, ttest, 15, K_NBDEC);           // JMP 18-04-2022   
-    W_printf("%s \\i(%s, %s, %s)\n",  tcoef, trelax, tstd, tttest);
+    W_printfReplEsc("%s ~i(%s, %s, %s)\n",  tcoef, trelax, tstd, tttest);
 
     return(0);
 }
 
+// Print the scalar kdb[pos].
 int B_PrintDefScl(KDB* kdb, int pos)
 {
     return(B_PrintDefSclPtr(KSVAL(kdb, pos), KONAME(kdb, pos),1));
@@ -544,6 +740,7 @@ int B_PrintDefScl(KDB* kdb, int pos)
 
 /*================================= VAR ================================*/
 
+// Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
 int B_PrintDefVar(KDB* kdb, int pos)
 {
     IODE_REAL    *val;
@@ -616,12 +813,3 @@ char    *arg;
     return(rc);
 }
 */
-
-
-
-
-
-
-
-
-

@@ -1,13 +1,12 @@
 /**
  *  @header4iode
  * 
- *  TODO: éliminer les B_update et autres fonctions de haut niveau
+ *  Report function that estimates a block of equations and finds the best possible tests 
+ *  for all possible combinations of coefficients.
  *  
  *  List of functions 
  *  -----------------
- *      
- *  Utilities
- *  ---------
+ *      int B_EqsStepWise(char* arg) | $EqsStepWise from to eqname leccond {r2|fstat}
  */
 
 #include "iode.h"
@@ -22,6 +21,7 @@
  *  @param [in] char*   eqs     equation name
  *  @return     int             1 on success, -1 if some variable present in eqs does not exist in KV_WS
  *  
+ *  TODO: éliminer les B_DataUpdate et autres fonctions de haut niveau
  */
 static int check_scl_var(char *eqs)
 {
@@ -55,15 +55,16 @@ static int check_scl_var(char *eqs)
     return(1);
 }
 
-/*Lit les arguments from, to, eqs, et cond et effectue les estimations (fonction principale)*/
 
 /**
- *  Report function that calls E_StepWise().
+ *  This function estimates a block of equations and finds the best possible tests for all possible 
+ *  combinations of coefficients.
  *  
- *  @param [in] char*   arg 
- *  @return     int     -1 on error, 1 on success ? TODO: Check this, seems incorrect
+ *  $EqsStepWise from to eqname leccond {r2|fstat}
+ *       from to : estimation period
+ *       eqname  : equation to estimate
+ *       leccond : condition of eligibility
  */
-
 int B_EqsStepWise(char* arg)                                                 
 {
     int     lg1, lg2,lg3,lg4,lg5;

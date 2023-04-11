@@ -1,11 +1,90 @@
 /**
  *  @header4iode
  * 
- *  IODE API developed for iode.pyx (Cython implementation of some IODE functions).
+ *  IODE HIGH LEVEL API
+ *  -------------------
+ *  Set of high-level functions essentially developed for the creation of the Cython implementation of IODE.
+ *  Most of these functions are (almost) aliases to other API functions but with a different and more
+ *  coherent naming convention.
  *  
- *    
+ *  
  *  List of functions
  *  -----------------
+ *      int IodeInit()                                | Initialise an IODE session.
+ *      int IodeEnd()                                 | Terminate an IODE session.
+ *      char *IodeVersion()                           | Return the IODE version in a const string.
+ *  
+ *    WS related functions
+ *        
+ *      int IodeLoad(char *name, int type)            | Return the IODE version in a const string.
+ *      int IodeSave(char *name, int type)            | Load an IODE workspace file.
+ *      int IodeClearWs(int type)                     | Clear a workspace.
+ *      int IodeClearAll()                            | Clear all workspaces.
+ *      char **IodeContents(char *pattern, int type)  | Returns a table of object names corresponding to the specified pattern.
+ *  
+ *    SAMPLE Functions
+ *  
+ *      int IodeGetSampleLength()                     | Returns the current sample length (0 if undefined)
+ *      int IodeIsSampleSet()                         | Indicates if the VAR sample is defined
+ *      char *IodeGetSampleAsString()                 | Returns current sample in an ALLOCATED string in the form "per1 per2".
+ *      char **IodeGetSampleAsPeriods()               | Return all periods of the current KV_WS sample in a table of strings.
+ *      char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) | Return all periods from aper_from to aper_to in a table of strings.
+ *      double *IodeGetSampleAsDoubles(int *lg)                          | Return a sample as a list of doubles.
+ *      int IodeSetSampleStr(char* str_from, char* str_to)               | Set the WS sample from periods as strings
+ *      int IodeSetSample(int from, int to)                              | Set the WS sample from integers (yearly only).
+ *  
+ *    OBJECTS MANIPULATION FUNCTIONS
+ *  
+ *      int IodeDeleteObj(char* obj_name, int obj_type)                  | Delete the object obj_name of type obj_type.
+ *      char *IodeGetCmt(char *name)                                     | Return a pointer to the comment "name". The pointer cannot be freed.
+ *      int IodeSetCmt(char *name, char *cmt)                            | Save a the comment cmt under the name "name".
+ *      int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sample_to, char**blk, char**instr, float *tests) | Retrieve an equation and its elements.
+ *      char *IodeGetEqsLec(char *name)                                  | Retrieve the (non allocated) LEC form of the equation "name".
+ *      int IodeSetEqs(char *name, char *eqlec)                          | Change the LEC form of an equation.
+ *      char *IodeGetIdt(char *name)                                     | Return the (non allocated) pointer to an identity.
+ *      int IodeSetIdt(char *name, char *idt)                            | Set the LEC form of an identity.
+ *      char *IodeGetLst(char *name)                                     | Return the (non allocated) pointer to a list.
+ *      int IodeSetLst(char *name, char *lst)                            | Set a list value.
+ *      int IodeGetScl(char *name, double* value, double *relax, double *std_err) | Change the values of an existing scalar. Return -1 if the scalar does not exist.
+ *      int IodeSetScl(char *name, double value, double relax, double std) | Set the values of a scalar. The scalar is created if it does not exist.
+ *      char* IodeGetTbl(char *name, char *gsmpl)                        | Compute a table on the GSAMPLE gsmpl and return a string containing the result.  
+ *      char* IodeGetTblTitle(char *name)                                | Return a table (first) title in an not allocated string.
+ *      TBL* IodeGetTblDefinition(char *name)                            | Return a table struct
+ *      int IodeSetTblFile(int ref, char *filename)                      | Load the var file filename and set its reference number to ref.
+ *      double IodeGetVarT(char *name, int t, int mode)                  | Get the value of the variable name at position t where t is the position in the KV_WS SAMPLE.
+ *      int IodeSetVarT(char *name, int t, int mode, double value)       | Set the value of the variable name at position t, possibly after recalulation based on value and mode.
+ *      double *IodeGetVector(char *name, int *lg)                       | Returns a pointer to the first value of the VAR name. 
+ *      int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg) |
+ *      int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg) | Determines the position to copy from (python object), where to copy to (KV_WS) and the nb of elements to copy 
+ *  
+ *   ESTIMATION
+ *  
+ *      int IodeEstimate(char* veqs, char* afrom, char* ato)             | Estimate an equation of a given sample. 
+ *  
+ *   SIMULATION
+ *  
+ *      int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug) | Simulate of model.
+ *  
+ *   REPORTS
+ *  
+ *      int IodeExecArgs(char *filename, char **args)                    | Execute a report with optionnal parameters.
+ *      int IodeExec(char *filename)                                     | Execute a report with no parameters.
+ *  
+ *   LEC DIRECT EXECUTION
+ *  
+ *      static CLEC* IodeLinkLec(char* lec)                              | Compile and link a LEC expression with the KV_WS and KS_WS.
+ *      double IodeExecLecT(char* lec, int t)                            | Calc a LEC expression in t.
+ *      double *IodeExecLec(char* lec)                                   | Calculate a LEC expression on the full KV_WS sample.
+ *  
+ *   MESSAGES
+ *  
+ *      void IodeSuppressMsgs()                                          | Suppress all messages from the A2M interpretor and from the IODE functions.
+ *      void IodeResetMsgs()                                             | Reset the messages from the A2M interpretor and from the IODE functions.
+ *  
+ *   MISCELLANEOUS
+ *  
+ *      int IodeSetNbDec(int nbdec)                                      | Define the number of decimals in the tables and variables to be printed.
+ *      int IodeGetNbDec()                                               |  Returns the number of decimals currently set for the printing of tables and variables.
  *  
  */
  
@@ -15,26 +94,43 @@
 /**
  *  Initialise an IODE session.
  *  
- *  @return int 0 always
+ *  @return int     always 0
  */
 int IodeInit()
 {
-    RPF_ChronoReset();
+    // Initialize chrono for report functions
+    RPF_ChronoReset();      
+    
+    // Initialize scr4 SWAP memory management
     SW_MIN_MEM = 120 * 1024L;
     SW_MIN_SEGS = 2;
+    SW_SEG_SIZE = B_IniReadNum("GENERAL", "SEGSIZE", 65500);
+    if(SW_SEG_SIZE < 16384) SW_SEG_SIZE = 16384;                
     SW_init(1);
+    
+    // Create Empty WS
     K_init_ws(0);
 
+    // Default values for language, nbdec, separators
     K_LANG = 0;     
     K_NBDEC = -1;   
     A_SEPS = " ,;\n\t\r";
-    A_NO_EXPANDSTAR_DFT = 1; // JMP 12-11-2012 -> suppress default filename wildcard behavior
+        
+    // Suppress default filename wildcard behavior
+    A_NO_EXPANDSTAR_DFT = 1; // JMP 12-11-2012 
 
-    IODE_assign_super_API(); // JMP 15/2/2023 -> default fns automatically assigned
+    // Assign default "super" function pointers
+    IODE_assign_super_API(); // JMP 15/2/2023 
     
     return(0);
 }
 
+
+/**
+ *  Terminates an IODE session.
+ *  
+ *  @return int     always 0
+ */
 
 int IodeEnd()
 {
@@ -53,22 +149,28 @@ int IodeEnd()
     return(0);
 }
 
+/**
+ *  Return the IODE version in a const string.
+ *  
+ *  @return char*  IODE version
+ */
 char *IodeVersion()
 {
    return(IODE_VERSION);
 }
 
 
+// --------------------
+// WS related functions
+// --------------------
 
-// ------------
-// WS Functions
-// ------------
-
-//int  IodeLoadVar(char *name)
-//{
-//    return(IodeLoad(name, K_VAR));
-//}
-
+/**
+ *  Load an IODE workspace file.
+ *  
+ *  @param [in] name    char*   filename 
+ *  @param [in] type    int     file type (K_CMT...K_VAR)
+ *  @return             int     nb of objects read or -1 on error
+ */
 int  IodeLoad(char *name, int type)
 {
     KDB     *kdb;
@@ -80,16 +182,26 @@ int  IodeLoad(char *name, int type)
     }
 }
 
-//int  IodeSaveVar(char *name)
-//{
-//    return(IodeSave(name, K_VAR));
-//}
 
+/**
+ *  Save an IODE workspace in a binary file.
+ *  
+ *  @param [in] name    char*   filename
+ *  @param [in] type    int     object type
+ *  @return             int     return value of B_WsSave()
+ */
 int  IodeSave(char *name, int type)
 {
     return(B_WsSave(name, type));
 }
 
+
+/**
+ *  Clear a workspace.
+ *  
+ *  @param [in] type int    type of the workspace to be cleared
+ *  @return          int    always 0
+ */
 int IodeClearWs(int type)
 {
     if(type >= K_CMT && type <= K_VAR) 
@@ -97,6 +209,12 @@ int IodeClearWs(int type)
     return(0);
 }
 
+
+/**
+ *  Clear all workspaces.
+ *  
+ *  @return          int    always 0
+ */
 int IodeClearAll()
 {
     int type;
@@ -107,22 +225,18 @@ int IodeClearAll()
     return(0);
 }
 
+
+/**
+ *  Returns a table of object names corresponding to the specified pattern.
+ *  
+ *  @param [in] pattern char*   object name pattern (may include * or ?)
+ *  @param [in] type    int     workspace type to be searched
+ *  @return             char**  table of object names or NULL if no objects found
+ */
 char **IodeContents(char *pattern, int type)
 {
     return(K_grep(K_WS[type], pattern, 0, 1, 0, 0, '*'));
 }
-
-
-//char *IodeContentsStr(char *pattern, int type)
-//{
-//	char *str;
-//	char **res = K_grep(K_WS[type], pattern, 0, 1, 0, 0, '*');
-//    
-//	if(res != NULL)
-//		str = SCR_mtov(res, ',');
-//    SCR_free_tbl(res);
-//    return(str);
-//}
 
 
 // ----------------
@@ -145,18 +259,6 @@ int IodeIsSampleSet()
     return(IodeGetSampleLength() != 0);
 }
 
-
-//char *IodeGetPeriodAsString(int t)
-//{
-//    SAMPLE  *smpl;
-//    PERIOD  per;
-//
-//    if(!IodeIsSampleSet()) return(NULL);
-//    smpl = (SAMPLE *) KDATA(K_WS[K_VAR]);
-//    memcpy(&per, PER_addper(&smpl->s_p1, t), sizeof(PERIOD));;
-//    return(PER_pertoa(&per, 0));
-//}
-//
 
 /**
  *  Returns current sample in an ALLOCATED string in the form "per1 per2".
@@ -185,11 +287,10 @@ char *IodeGetSampleAsString()
 /**
  *  Return all periods of the current KV_WS sample in a table of strings.
  *  
- *  @return  char** allocated table of char* 
+ *  @return  char**     allocated table of char* 
  *  
  *  TODO: call IodeCreateSampleAsPeriods() 
  */
-
 char **IodeGetSampleAsPeriods() 
 {
     SAMPLE  *smpl = KSMPL(KV_WS);
@@ -215,7 +316,7 @@ char **IodeGetSampleAsPeriods()
  *    
  *  @param [in] aper_from char*     starting period
  *  @param [in] aper_to   char*     ending period
- *  @return               char**    
+ *  @return               char**    list of periods {"1990Y1", "1991Y1"..., NULL}
  */
 char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
 {
@@ -236,9 +337,12 @@ char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to)
 }
 
 
-// Sample for yearly series only => Obsolete ?
-
-// Returns a sample as a list of double
+/**
+ *  Returns a sample as a list of doubles.
+ *  
+ *  @param [out] lg     int*     number of periods
+ *  @return             double*  list of periods in the form {2000.0, 2000.25, 2000.5, 2000.75, 2001.0, ...}   
+ */
 double *IodeGetSampleAsDoubles(int *lg)
 {
     double  *value = NULL;
@@ -259,63 +363,6 @@ double *IodeGetSampleAsDoubles(int *lg)
 
     return(value);
 }
-
-//int IodeGetSampleFrom()
-//{
-//    SAMPLE *ksmpl = KSMPL(KV_WS);
-//    
-//    return(ksmpl->s_p1.p_y);
-//}
-//
-//int IodeGetSampleTo()
-//{
-//    SAMPLE *ksmpl = KSMPL(KV_WS);
-//    
-//    return(ksmpl->s_p2.p_y);
-//}
-//
-
-//int IodeGett(char *period)
-//{
-//    int     t;
-//    SAMPLE  *smpl;
-//    PERIOD  *per, p;
-//
-//    smpl = (SAMPLE *) KDATA(K_WS[K_VAR]);
-//    p = smpl->s_p1;
-//    per = PER_atoper(period);
-//    if(per == 0) return(-1);
-//
-//    t = PER_diff_per(per, &p);
-//    SW_nfree(per);
-//    return(t);
-//}
-    
-//int IodeGetSampleBounds(int from, int to, int *start1, int *start2)
-//{
-//        if(PER_common_smpl(ksmpl, nsmpl, &smpl) < 0) return(-1);
-//        if(smpl.s_nb > 0) {
-//            start1 = PER_diff_per(&(smpl.s_p1), &(ksmpl->s_p1));
-//            start2 = PER_diff_per(&(smpl.s_p1), &(nsmpl->s_p1));
-//        }
-//    }
-//
-//    memcpy(ksmpl, nsmpl, sizeof(SAMPLE));
-//    for(i = 0 ; i < KNB(kdb); i++) {
-//        new_val = KV_alloc_var(ksmpl->s_nb);
-//        ptr = SW_getptr(new_val);
-//        if(KSOVAL(kdb, i) != 0) {
-//            if(smpl.s_nb > 0)
-//                memcpy((IODE_REAL *)(P_get_ptr(ptr, 0)) + start2,
-//                       KVVAL(kdb, i, start1),
-//                       sizeof(IODE_REAL) * smpl.s_nb);
-//            SW_free(KSOVAL(kdb, i));
-//        }
-//        KSOVAL(kdb, i) = new_val;
-//    }
-//    return(0);
-//}    
-
 
 
 /**
@@ -371,8 +418,7 @@ int IodeSetSample(int from, int to)
 // OBJECTS MANIPULATION FUNCTIONS
 // -------------------------------
 
-
-
+// Delete the object obj_name of type obj_type.
 int IodeDeleteObj(char* obj_name, int obj_type)
 {
     return(K_del_by_name(K_WS[obj_type], obj_name));
@@ -383,12 +429,13 @@ int IodeDeleteObj(char* obj_name, int obj_type)
 // COMMENTS MANIPULATION FUNCTIONS
 // -------------------------------
 
-
+// Return a pointer to the comment "name". The pointer cannot be freed.
 char *IodeGetCmt(char *name)
 {
     return(KCPTR(name));        // Ptr to SWAP mem. Do not free!
 }
 
+// Save a the comment cmt under the name "name".
 int IodeSetCmt(char *name, char *cmt)
 {
     int     pos;
@@ -403,6 +450,19 @@ int IodeSetCmt(char *name, char *cmt)
 // EQS MANIPULATION FUNCTIONS
 // --------------------------
 
+/**
+ *  Retrieve an equation and its elements.
+ *  
+ *  @param [in]  name        char*   equation name
+ *  @param [out] lec         char**  lec form (not allocated)
+ *  @param [out] method      int*    estimation method
+ *  @param [out] sample_from char*   buffer to store estimation period "from"
+ *  @param [out] sample_to   char*   buffer to store estimation period "to"
+ *  @param [out] blk         char**  equation block (not allocated)
+ *  @param [out] instr       char**  list of instruments (not allocated)
+ *  @param [out] tests       float*  buffer to store the (10) estimation tests
+ *  @return 
+ */
 int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sample_to, char**blk, char**instr, float *tests)
 {
     int     pos;
@@ -426,6 +486,7 @@ int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sampl
     return(0);
 }
 
+// Retrieve the (non allocated) LEC form of the equation "name".
 char *IodeGetEqsLec(char *name)
 {
     int     pos;
@@ -436,7 +497,7 @@ char *IodeGetEqsLec(char *name)
     return(KELEC(K_WS[K_EQS], pos));
 }
 
-
+// Change the LEC form of an equation.
 int IodeSetEqs(char *name, char *eqlec)
 {
     int     rc;
@@ -450,11 +511,15 @@ int IodeSetEqs(char *name, char *eqlec)
 // IDT MANIPULATION FUNCTIONS
 // --------------------------
 
+
+// Return the (non allocated) pointer to an identity.
 char *IodeGetIdt(char *name)
 {
     return(KIPTR(name));        // Ptr to SWAP mem. Do not free!
 }
 
+
+// Set the LEC form of an identity.
 int IodeSetIdt(char *name, char *idt)
 {
     int     pos;
@@ -469,11 +534,14 @@ int IodeSetIdt(char *name, char *idt)
 // LST MANIPULATION FUNCTIONS
 // --------------------------
 
+// Return the (non allocated) pointer to a list.
 char *IodeGetLst(char *name)
 {
     return(KLPTR(name));        // Ptr to SWAP mem. Do not free!
 }
 
+
+// Set a list value.
 int IodeSetLst(char *name, char *lst)
 {
     int     pos;
@@ -488,7 +556,7 @@ int IodeSetLst(char *name, char *lst)
 // SCL MANIPULATION FUNCTIONS
 // --------------------------
 
-
+// Change the values of an existing scalar. Return -1 if the scalar does not exist.
 int IodeGetScl(char *name, double* value, double *relax, double *std_err)
 {
     int     pos;
@@ -504,18 +572,7 @@ int IodeGetScl(char *name, double* value, double *relax, double *std_err)
     return(0);
 }
 
-//double  *IodeGetScls(char *name)
-//{
-//    int     pos;
-//    SCL     *scl;
-//
-//    pos = K_find(K_WS[K_SCL], name);
-//    if(pos < 0) return(0);
-//
-//    scl = KSVAL(K_WS[K_SCL], pos);
-//    return((double *) scl);
-//}
-
+// Set the values of a scalar. The scalar is created if it does not exist.
 int  IodeSetScl(char *name, double value, double relax, double std)
 {
     int     pos;
@@ -534,6 +591,13 @@ int  IodeSetScl(char *name, double value, double relax, double std)
 // TBL MANIPULATION FUNCTIONS
 // --------------------------
 
+/**
+ *  Compute a table on the GSAMPLE gsmpl and return a string containing the result.
+ *  
+ *  @param [in] name  char*     table name
+ *  @param [in] gsmpl char*     GSAMPLE or null. If null, the GSAMPLE is the current WS sample.
+ *  @return           char*     allocated string in the form "c11 \t c12 \t ... \n c21 \t c22 ..."
+ */
 char* IodeGetTbl(char *name, char *gsmpl)
 {
     int     pos, nc, nl;
@@ -542,12 +606,12 @@ char* IodeGetTbl(char *name, char *gsmpl)
     pos = K_find(K_WS[K_TBL], name);
     if(pos < 0) return("Not in WS");
 
-    //ptr = IodeDdeCreateTbl(pos, gsmpl, &nc, &nl, B_NBDEC); // JMP 18-04-2022
-    ptr = IodeDdeCreateTbl(pos, gsmpl, &nc, &nl, K_NBDEC);   // JMP 18-04-2022
+    ptr = IodeDdeCreateTbl(pos, gsmpl, &nc, &nl, K_NBDEC);  
     SCR_OemToAnsi(ptr, ptr);
     return(ptr);
 }
 
+// Return a table (first) title in an not allocated string.
 char* IodeGetTblTitle(char *name)
 {
     int     pos;
@@ -558,12 +622,13 @@ char* IodeGetTblTitle(char *name)
     if(pos < 0 || (tbl = KTVAL(K_WS[K_TBL], pos)) == 0)
         return("Not in WS");
 
-    /* returns anly ptr to string, NO ALLOC is done */
+    /* returns only ptr to string, NO ALLOC is done */
     ptr = T_get_title(tbl);
     SCR_OemToAnsi(ptr, ptr);
     return(ptr);
 }
 
+// Return a table struct. 
 TBL* IodeGetTblDefinition(char *name)
 {
     int     pos;
@@ -576,19 +641,32 @@ TBL* IodeGetTblDefinition(char *name)
     else return(tbl);
 }
 
+// Load the var file filename and set its reference number to ref.
+// Used in GSAMPLE eg: 2000Y1[1;2]
 int IodeSetTblFile(int ref, char *filename)
 {
     return(K_load_RWS(ref, filename));
 }
 
 
-
-
-
 // --------------------------
 // VAR MANIPULATION FUNCTIONS
 // --------------------------
 
+/**
+ *  Get the value of the variable name at position t where t is the position in the KV_WS SAMPLE.
+ *  The returned is the result of a calculation based on the value of mode.
+ *  
+ *  @param [in] name char*  variable name
+ *  @param [in] t    int    position in the sample
+ *  @param [in] mode int    see below
+ *  @return          double  depends on the param mode (can be L_NAN if the operation is impossible):
+ *                               K_LEVEL : no modification    x[t]
+ *                               K_DIFF  : diff on one period (x[t]-x[t-1])
+ *                               K_DIFFY : diff on one year   (x[t]-x[t-{nb sub periods}])
+ *                               K_GRT   : grt on one period  (x[t]/x[t-1] - 1)*100
+ *                               K_GRTY  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
+ */
 double IodeGetVarT(char *name, int t, int mode)
 {
     int     pos;
@@ -605,6 +683,21 @@ double IodeGetVarT(char *name, int t, int mode)
     return(value);
 }
 
+
+/**
+ *  Set the value of the variable name at position t, possibly after recalulation based on value and mode.
+ *  
+ *  @param [in] name    char*   variable name
+ *  @param [in] t       int     position in the sample
+ *  @param [in] mode    int     one of the defines below. x is the new value of name[t]
+ *                                  K_LEVEL : no modification    x[t] = new
+ *                                  K_DIFF  : diff on one period x[t] = x[t-1] + new
+ *                                  K_DIFFY : diff on one year   x[t] = x[t-{nb sub periods}] + new
+ *                                  K_GRT   : grt on one period  x[t] = (1 + 0.01*new) * x[t-1]
+ *                                  K_GRTY  : grt on one year    x[t] = (1 + 0.01*new) * x[t-{nb sub periods}] 
+ *  @param [in] value   double  value on which, in combination with mode, the new value is calculated
+ *                              
+ */
 int IodeSetVarT(char *name, int t, int mode, double value)
 {
     int     pos;
@@ -621,6 +714,13 @@ int IodeSetVarT(char *name, int t, int mode, double value)
 }
 
 
+/**
+ *  Returns a pointer to the first value of the VAR name. 
+ *  
+ *  @param [in]  name   char*   variable name   
+ *  @param [out] lg     int     sample size
+ *  @return             double* pointer to the VAR name
+ */
 double *IodeGetVector(char *name, int *lg)
 {
     int     pos;
@@ -637,6 +737,7 @@ double *IodeGetVector(char *name, int *lg)
     return(value);
 }
 
+
 /**
  *  In the context of copying data between IODE (the current KV_WS) and python (LArray, pandas, numpy...), 
  *  determines the positions to copy from (python object), where to copy to (KV_WS) and the length 
@@ -652,7 +753,6 @@ double *IodeGetVector(char *name, int *lg)
  *  @param [in] py_lg           int*    py_lg
  *  @return                     int     
  */
- 
 int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg)
 {
     SAMPLE          *smpl = KSMPL(KV_WS);
@@ -689,101 +789,18 @@ int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos
 }
 
 
-//int IodeSetVector_v1(char *la_name, double *la_values, int la_year_from, int la_year_to)
-//{
-//    int             pos, i, ws_pos, py_pos, la_lg;
-//    SAMPLE          *smpl = KSMPL(KV_WS);
-//    static int      ws_lg = 0;
-//    static double*  ws_var = NULL;
-//    
-//    // Allocate static buffer if not yet done or if to small for a full series
-//    if(ws_lg < smpl->s_nb) {
-//        SW_nfree(ws_var);
-//        ws_lg = smpl->s_nb;
-//        ws_var = (double *) SW_nalloc(ws_lg * sizeof(double));
-//    }
-//    
-//    // Compute where to copy la_values: 
-//    // ws_var[ws_pos + i] = la_values[py_pos + i] for i=0..la_lg
-//    ws_pos = la_year_from - smpl->s_p1.p_y;    
-//    la_pos = 0;                                
-//    la_lg = 1 + la_year_to - la_year_from;
-//
-//    if(ws_pos < 0) {
-//        la_pos = -ws_pos;
-//        ws_pos = 0;
-//        la_lg -= la_pos;
-//    }    
-//    
-//    if(la_year_to > smpl->s_p2.p_y) {
-//        la_lg -= la_year_to - smpl->s_p2.p_y;
-//    }
-//   
-//    for(i = 0; i < ws_lg; i++) ws_var[i] = L_NAN;
-//    for(i = 0; i < la_lg; i++) ws_var[ws_pos + i] = la_values[la_pos + i];
-//    
-//    // printf("Saving %s...", la_name);
-//    pos = K_add(KV_WS, la_name, ws_var, &ws_lg);
-//    //if (pos < 0 ) {
-//    //    printf("Error\n");
-//	//}
-//    //else {
-//    //    printf("Ok.\n");
-//    //}    
-//    return(pos);
-//}
-
-    
-//int IodeSetVector_v2(char *la_name, double *la_values, char *str_from, char* str_to)
-//{
-//    int             pos, i, ws_pos, la_pos, la_lg;
-//    SAMPLE          *smpl = KSMPL(KV_WS);
-//    PERIOD          *per_from, *per_to;
-//    static int      ws_lg = 0;
-//    static double*  ws_var = NULL;
-//    
-//    // Allocate static buffer if not yet done or if to small for a full series
-//    if(ws_lg < smpl->s_nb) {
-//        SW_nfree(ws_var);
-//        ws_lg = smpl->s_nb;
-//        ws_var = (double *) SW_nalloc(ws_lg * sizeof(double));
-//    }
-//    
-//    // Compute where to copy la_values: 
-//    // ws_var[ws_pos + i] = la_values[la_pos + i] for i=0..la_lg
-//    per_from = PER_atoper(str_from);
-//    per_to   = PER_atoper(str_to);
-//    ws_pos = PER_diff_per(per_from, &(smpl->s_p1));
-//    la_pos = 0;                                
-//    la_lg = 1 + PER_diff_per(per_to, per_from);
-//
-//    if(ws_pos < 0) {
-//        la_pos = -ws_pos;
-//        ws_pos = 0;
-//        la_lg -= la_pos;
-//    }    
-//    
-//    if(PER_diff_per(per_from, &(smpl->s_p2)) > 0){
-//        la_lg -= PER_diff_per(per_to, &(smpl->s_p2));
-//    }
-//   
-//    for(i = 0; i < ws_lg; i++) ws_var[i] = L_NAN;
-//    for(i = 0; i < la_lg; i++) ws_var[ws_pos + i] = la_values[la_pos + i];
-//    
-//    // printf("Saving %s...", la_name);
-//    pos = K_add(KV_WS, la_name, ws_var, &ws_lg);
-//    //if (pos < 0 ) {
-//    //    printf("Error\n");
-//	//}
-//    //else {
-//    //    printf("Ok.\n");
-//    //}     
-//    SW_nfree(per_from);
-//    SW_nfree(per_to);
-//    return(pos);
-//}
-
-
+/**
+ *  Set the values of a subset of a variable.
+ *  
+ *    ws_var[ws_pos + i] = la_values[la_pos + i] for i=0..la_lg - 1
+ *  
+ *  @param [in] la_name     char*   name of the variable to set
+ *  @param [in] la_values   double* pointer to the first element to copy into the VAR la_name
+ *  @param [in] la_pos      int     position in la_values of the first value to copy into the variable
+ *  @param [in] ws_pos      int     position in the variable la_name where the first la_values[la_pos] must be copied
+ *  @param [in] la_lg       int     number of values to copy
+ *  @return                 int     position in KV_WS of the new variable or -1 on error
+ */
 int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)
 {
     int             i, pos;
@@ -822,16 +839,38 @@ int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int 
 // ESTIMATION FUNCTIONS
 // --------------------
 
+// Estimate an equation of a given sample. 
 // Only defined to standardize the API functions
+// TODO: add all estimation parameters
 int IodeEstimate(char* veqs, char* afrom, char* ato)
 {
     return(KE_estim(veqs, afrom, ato));
 }    
 
+
 // --------------------
 // SIMULATION FUNCTIONS
 // --------------------
 
+/**
+ *  Simulate of model.
+ *  
+ *  @param [in] per_from      char*     per_from
+ *  @param [in] per_to        char*     per_to
+ *  @param [in] eqs_list      char*     eqs_list
+ *  @param [in] endo_exo_list char*     endo_exo_list
+ *  @param [in] eps           double    eps
+ *  @param [in] relax         double    relax
+ *  @param [in] maxit         int       maxit 
+ *  @param [in] init_values   int       init_values
+ *  @param [in] sort_algo     int       sort_algo
+ *  @param [in] nb_passes     int       nb_passes
+ *  @param [in] debug         int       debug
+ *  @param [in] newton_eps    double    newton_eps
+ *  @param [in] newton_maxit  int       newton_maxit
+ *  @param [in] newton_debug  int       newton_debug      
+ *  @return                   int       0 in success, -1 on error
+ */
 int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list,
                  double eps, double relax, int maxit, 
                  int init_values, int sort_algo, int nb_passes, int debug, 
@@ -895,11 +934,17 @@ int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_e
 }
 
 
-
 // ----------------
 // REPORT FUNCTIONS
 // ----------------
 
+/**
+ *  Execute a report with optionnal parameters.
+ *  
+ *  @param [in] filename    char*   retpor filename
+ *  @param [in] args        char**  table of args or NULL
+ *  @return                 int     return code of the report execution
+ */
 int IodeExecArgs(char *filename, char **args)
 {
     int     rc;
@@ -923,19 +968,15 @@ int IodeExecArgs(char *filename, char **args)
     return(rc);
 }
 
+
+/**
+ *  Execute a report with no parameters.
+ *  
+ *  @return         int     return code of the report execution
+ */
 int IodeExec(char *filename)
 {
     return(IodeExecArgs(filename, NULL));
-    /*    int     rc;
-        char    buf[1024];
-
-        rc = B_PrintDest("dummy D");
-        SCR_strlcpy(buf, filename, 1023);
-        K_set_ext(buf, buf, K_REP);
-        rc = B_ReportExec(buf);
-        W_close();
-        return(rc);
-    */
 }
 
 
@@ -944,6 +985,12 @@ int IodeExec(char *filename)
 // LEC EXECUTION
 // -------------
 
+/**
+ *  Compile and link a LEC expression with the KV_WS and KS_WS.
+ *  
+ *  @param [in] lec     char*   lec expression
+ *  @return             CLEC*   compiled and linked lec or NULL on error.
+ */
 static CLEC* IodeLinkLec(char* lec)
 {
     CLEC*   clec;
@@ -960,7 +1007,11 @@ static CLEC* IodeLinkLec(char* lec)
 
 
 /**
- *  Calc a LEC expression in t 
+ *  Calc a LEC expression in t.
+ *  
+ *  @param [in] lec     char*   lec expression 
+ *  @param [in] t       int     position in the sample to calculate
+ *  @return             double  value of lec in t or L_NAN on error
  */
 double IodeExecLecT(char* lec, int t)
 {
@@ -975,8 +1026,12 @@ double IodeExecLecT(char* lec, int t)
 }
 
 /**
- *  Calc a LEC expression on the full sample
+ *  Calculate a LEC expression on the full KV_WS sample.
+ *  
+ *  @param [in] lec     char*       lec expression 
+ *  @return             double*     allocated vector containing the calculated values
  */
+
 double *IodeExecLec(char* lec)
 {
     CLEC*   clec;
@@ -999,7 +1054,7 @@ double *IodeExecLec(char* lec)
 
 
 // ----------------------------------------
-// GRAPH MANIPULATION FUNCTIONS (from GB ?)
+// GRAPH MANIPULATION FUNCTIONS (see GB ?)
 // ----------------------------------------
 
 int IodeGetChart(char *name, char *gsmpl)
@@ -1034,7 +1089,6 @@ char    IodeChartType(int hdl, int i)
     return(APIChartType(hdl, i));
 }
 
-
 int    IodeChartAxis(int hdl, int i)
 {
     return(APIChartAxis(hdl, i));
@@ -1055,6 +1109,7 @@ double  *IodeChartData(int hdl, int i)
 // OUTPUT MESSAGES
 // ---------------
    
+// Suppress all messages from the A2M interpretor and from the IODE functions.
 void IodeSuppressMsgs()
 {
     kmsg_toggle(0);
@@ -1062,6 +1117,7 @@ void IodeSuppressMsgs()
     //IodeSetMsgs(0);
 }
 
+// Reset the messages from the A2M interpretor and from the IODE functions.
 void IodeResetMsgs()
 {
     kmsg_toggle(1);
@@ -1072,12 +1128,22 @@ void IodeResetMsgs()
 // MISC FUNCTIONS
 // --------------
 
+/**
+ *  Define the number of decimals in the tables and variables to be printed.
+ *  
+ *  @param [in] nbdec   int   new nb of decimals
+ */
 int IodeSetNbDec(int nbdec)
 {
     K_NBDEC = nbdec; // JMP 18-04-2022
     return(0);
 }
 
+/**
+ *  Returns the number of decimals currently set for the printing of tables and variables.
+ *  
+ *  @param [in] nbdec   int   new nb of decimals
+ */
 int IodeGetNbDec()
 {
     return(K_NBDEC);    // JMP 18-04-2022

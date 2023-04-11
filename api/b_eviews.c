@@ -1,53 +1,66 @@
-/*
-Extraction of equations, scalars and identities from E-Views data
------------------------------------------------------------------
-Format of E-Views data :
-
-Forecasting Equation:
-=========================
-D(B_PQVC) = C(1)*D(PQVC) + C(2)*(D2001+D2002) + C(3)*D(B_PQVC(-3))
-
-Substituted Coefficients:
-=========================
-D(B_PQVC) = 0.894661573413*D(PQVC) - 0.0284533462569*(D2001+D2002) + 0.241546373731*D(B_PQVC(-3))
-
-@IDENTITY gro_w_produz_def  = w_produz_def  / w_produz_def(-1)  - 1
-
-XYZ = xyz(1) + xyz(2) * EXP(ABC)
-
-' Comments
---------------------------------------------------------------------
-
-The file is interpreted as described below :
-
-- The characters after a quote (') are ignored.
-- The 2 equations following the "Forecasting Equation" and "Substituted Coefficients" titles are
-extracted.
-- The first equation is translated into IODE format :
-   - D(...) is replaced by d(...)
-   - EXP(...) is replaced by exp(...)
-   - LOG(...) is replaced by ln(...)
-   - DLOG(...) is replaced by d ln(...)
-   - @TREND is replaced by t
-   - @PCH is replaced by 0.01 * grt
-   - NAME(<n>) is replaced by the name_<n>
-   - Expr(+<n>) is replaced bu Expr[+<n>]
-   - Expr(-<n>) is replaced bu Expr[-<n>]
-   - the first variable is considered as the endogenous variable
-   - the first = sign is considered as the separator between left and right members of the equation
-	 and therefore replaced by :=. This is only true if the = sign is not between ().
-
-- The coefficients values are extracted from the second equation.
-- The lines beginning with "@IDENTITY" are extracted and translated into IODE equations.
-- The other lines (not included in syntax above) are extracted and translated into IODE equations
-
-Each equation is added in the current Equations WS.
-Each coefficient (if any) is saved in the Scalars WS.
-
-Report function  :
-
-$WsImportEviews filename
-
+/**
+ *  @header4iode
+ *  
+ *  Extraction of equations, scalars and identities from E-Views data.
+ *  
+ *  Format of E-Views data
+ *  
+ *  --------------------------------------------------------------------------------------------------------
+ *  Forecasting Equation:
+ *  =========================
+ *  D(B_PQVC) = C(1)*D(PQVC) + C(2)*(D2001+D2002) + C(3)*D(B_PQVC(-3))
+ *  
+ *  Substituted Coefficients:
+ *  =========================
+ *  D(B_PQVC) = 0.894661573413*D(PQVC) - 0.0284533462569*(D2001+D2002) + 0.241546373731*D(B_PQVC(-3))
+ *  
+ *  @IDENTITY gro_w_produz_def  = w_produz_def  / w_produz_def(-1)  - 1
+ *  
+ *  XYZ = xyz(1) + xyz(2) * EXP(ABC)
+ *  
+ *  ' Comments
+ *  --------------------------------------------------------------------------------------------------------
+ *  
+ *  The file is interpreted as described below :
+ *  
+ *  - The characters after a quote (') are ignored.
+ *  - The 2 equations following the "Forecasting Equation" and "Substituted Coefficients" titles are
+ *  extracted.
+ *  - The first equation is translated into IODE format :
+ *  - D(...) is replaced by d(...)
+ *  - EXP(...) is replaced by exp(...)
+ *  - LOG(...) is replaced by ln(...)
+ *  - DLOG(...) is replaced by d ln(...)
+ *  - @TREND is replaced by t
+ *  - @PCH is replaced by 0.01 * grt
+ *  - NAME(<n>) is replaced by the name_<n>
+ *  - Expr(+<n>) is replaced bu Expr[+<n>]
+ *  - Expr(-<n>) is replaced bu Expr[-<n>]
+ *  - the first variable is considered as the endogenous variable
+ *  - the first = sign is considered as the separator between left and right members of the equation
+ *      and therefore replaced by :=. This is only true if the = sign is not between ().
+ *  
+ *  - The coefficients values are extracted from the second equation.
+ *  - The lines beginning with "@IDENTITY" are extracted and translated into IODE equations.
+ *  - The other lines (not included in syntax above) are extracted and translated into IODE equations
+ *  
+ *  Each equation is added in the current Equation WS.
+ *  Each coefficient (if any) is saved in the Scalar WS.
+ *  
+ *  Report function  :
+ *  
+ *      $WsImportEviews filename
+ *  
+ *  List of functions
+ *  -----------------
+ *      int EV_cc_eq(char *eveq, char *endo, char *lec)           | Transform an E-views equation lasteq into LEC format and returns the first encountered var name as endogenous.  
+ *      EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs) | Look for the coefficients numbers in lasteq and their respective values in lastsubeq.
+ *      EV_cc_idt(char *idt, char *endo, char *lec)               | Transform E-views identity idt into LEC format and returns the first encountered var name as endogenous.
+ *      int EV_read_line(char *buf)                               | Read a line in EV_FD and delete the optional comment as from the first ' char.
+ *      int EV_cc_file(char *filename)                            | Interpret an E-Views file and store all read objects into the current equation and scalar WS. 
+ *      int B_WsImportEviews(char *arg)                           | $WsImportEviews filename
+ */
+ 
 // 2012-05-04 : version 1
 // 2015-11-17 : version 2 : added : EXP, LOG, DLOG, NAME(n), comments, line without @IDENTITY
 // 2016-06-21 : version 3 : lines without @IDENTITY are only interpreted after :
@@ -61,12 +74,13 @@ $WsImportEviews filename
 //    - LINES "Estimation equation:" replace "Forecasting equations:"
 //    - correction for negative coefs when there is a difference (in # of spaces) bw ESTIMATION and SUBSTITUTED eqs
 
-//============================================================================================ */
+//================================================================================================================= */
 
 #include "iode.h"
-#include <s_yy.h>
 #define EV_MAXBUF 40960
 
+// Strings found in the E-Views data files
+// ---------------------------------------
 char EV_ESTCOMMAND[] = "ESTIMATION COMMAND:";
 char EV_ESTEQ[] = "ESTIMATION EQUATION:";
 char EV_ESTFOREQ[] = "FORECASTING EQUATION:";
@@ -81,15 +95,19 @@ int  EV_LINENB = 0,
      EV_INIDENTITIES = 0,
      EV_ISKEEPCOEFS = 0;
 
-/**
- * Transforme l'équation Eviews lasteq en LEC et retourne le premier nom de variable comme endogène
- * char *eveq : IN : E-Views format (coefs C(1), ...)
- * char *endo   : OUT : first var in lasteq
- * char *lec    : OUT : lec form
- * return : 0 if OK, -1 if syntax error in lasteq
- */
 
-EV_cc_eq(char *eveq, char *endo, char *lec)
+// Functions
+// ---------
+
+/**
+ *  Transform an E-views equation lasteq into LEC format and returns the first encountered var name as endogenous.
+ *
+ *  @param [in]  eveq   char *      E-Views format (coefs C(1), ...)
+ *  @param [out] endo   char *      first var in lasteq
+ *  @param [out] lec    char *      lec form
+ *  @return             int         0 if OK, -1 if syntax error in lasteq
+ */
+int EV_cc_eq(char *eveq, char *endo, char *lec)
 {
     YYFILE	*yy;
     char	scl[80], word[256];
@@ -276,14 +294,15 @@ fin:
     return(0);
 }
 
-/**
- * Recherche le numéro des coefficients dans lasteq et leurs valeurs dans lastsubeq
- * char *lasteq : IN : E-Views eq
- * char * lastsubeq : IN : E-Views eq with substituted coefs
- * double *coefs : OUT : values of coefs
- * return : -1 if error, nb of coefs if ok
- */
 
+/**
+ *  Look for the coefficients numbers in lasteq and their respective values in lastsubeq.
+ *  
+ *  @param [in]  lasteq    char*    E-Views equation text
+ *  @param [in]  lastsubeq char*    E-Views equation text with subsituted coefficients
+ *  @param [out] coefs     double*  values of the coefs
+ *  @return                int      -1 on error, nb of coefs if ok
+ */
 EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
 {
     int		idx = 0, pos1 = 0, i, csign;
@@ -349,6 +368,14 @@ EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
 }
 
 
+/**
+ *  Transform E-views identity idt into LEC format and returns the first encountered var name as endogenous.
+ *
+ *  @param [in]  eveq   char *      E-Views format 
+ *  @param [out] endo   char *      first var in lasteq
+ *  @param [out] lec    char *      lec form
+ *  @return             int         0 if OK, -1 if syntax error in lasteq
+ */
 EV_cc_idt(char *idt, char *endo, char *lec)
 {
     SCR_upper(idt);
@@ -357,6 +384,12 @@ EV_cc_idt(char *idt, char *endo, char *lec)
 }
 
 
+/**
+ *  Read a line in EV_FD and delete the optional comment as from the first ' char.
+ *  
+ *  @param [out] buf    char*      line read
+ *  @return             int        -1 if EOF, buf length otherwise
+ */
 int EV_read_line(char *buf)
 {
     int		n;
@@ -378,6 +411,13 @@ int EV_read_line(char *buf)
     return(n);
 }
 
+
+/**
+ *  Interpret an E-Views file and store all read objects into the current equation and scalar WS. 
+ *  
+ *  @param [in] filename char*  E-Views filename
+ *  @return              int    -1 on error (file not found), 0 on success
+ */
 int EV_cc_file(char *filename)
 {
     int		rc = -1, nbcoefs, i;
@@ -483,6 +523,8 @@ err:
     return(rc);
 }
 
+
+// $WsImportEviews filename
 int B_WsImportEviews(char *arg)
 {
     return(EV_cc_file(arg));

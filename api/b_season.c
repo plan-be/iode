@@ -1,15 +1,25 @@
+/**
+ *  @header4iode
+ *
+ *  Seasonal adjustment
+ *  -------------------
+ *
+ *  Functions to extract seasonal variations from variables.
+ *  
+ *  @See GB for details
+ */
+
 #include "iode.h"
 
 double  SEASON_EPS = 5.0;
 
-B_WsSeasonAdj(arg)
-char    *arg;
+// $WsSeasonAdj Filename VarList
+int B_WsSeasonAdj(char *arg)
 {
     return(B_season(arg));
 }
 
-B_season(arg)
-char    *arg;
+int B_season(char* arg)
 {
     int     nb, lg, rc = -1,
                     i, j, shift, beg, dim, nbper;
@@ -94,9 +104,7 @@ done:
 }
 
 
-int DS_test(vec, nb, beg, dim, nbper, shift)
-IODE_REAL    *vec, *shift;
-int     nb, *beg, *dim, nbper;
+int DS_test(IODE_REAL* vec, int nb, int* beg, int* dim, int nbper, IODE_REAL* shift)
 {
     int     f, nj, rc = 0, tolag;
     IODE_REAL    ti[12], maxti = 0.0, minti = 150.0;
@@ -141,9 +149,7 @@ int     nb, *beg, *dim, nbper;
     return(rc);
 }
 
-DS_vec(vec, c1, i1, season, nb, nbper, shift)
-IODE_REAL    *vec, *c1, *i1, *season, shift;
-int     nb, nbper;
+int DS_vec(IODE_REAL* vec, IODE_REAL* c1, IODE_REAL* i1, IODE_REAL* season, int nb, int nbper, IODE_REAL shift)
 {
     int     m, j, f,
             nbj = nb/nbper;
@@ -397,9 +403,7 @@ int     nb, nbper;
     return(0);
 }
 
-int DS_smpl(f_smpl, ws_smpl, t_smpl, shift)
-SAMPLE  *f_smpl, *ws_smpl, **t_smpl;
-int     *shift;
+int DS_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
 {
     int     nbper;
     PERIOD  p1, p2;
@@ -437,9 +441,7 @@ int     *shift;
 
 
 
-DS_extr(vec, dim, nbper, bi, shift)
-IODE_REAL    *vec, *bi, shift;
-int     dim, nbper;
+int DS_extr(IODE_REAL* vec, int dim, int nbper, IODE_REAL* bi, IODE_REAL shift)
 {
     int i, m;
 

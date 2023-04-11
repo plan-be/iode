@@ -1,32 +1,57 @@
 /**
  *  @header4iode
  *  
- *  Functions to generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
- *  Includes some A2M helper functions. 
+ *  Functions to display or print calculated tables and tables of variables. The same functions are used
+ *  to print and to display tables as graphs or as text.
+ *  
+ *  The functions generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
  *  
  *  List of functions 
  *  -----------------
+ *      int B_ViewVar(char* arg)                            | Display a list of variables in the form of tables of max 50 variables.
+ *      int B_PrintVar(char* arg)                           | Print a list of variables in the form of tables of max 50 variables.
+ *      int B_ViewPrintVar(char* arg, int mode)             | Print or display (according to the mode parameter) variables in the form of tables. 
+ *      int B_ViewByTbl(char* arg)                          | $ViewTbl sample table [list of tables]
+ *      int B_ViewTbl(char* arg)                            | Alias of B_ViewByTbl()
+ *      int B_PrintTbl(char* arg)                           | $PrintTbl gsample table1 [table2...]
+ *      int B_ViewGr(char* arg)                             | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
+ *      int B_PrintGr(char* arg)                            | $PrintGr gsample table1 [table2...]
+ *      int B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSAMPLE.
+ *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSAMPLE, based on TBL definition(s).
+ *      int B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE TBLs either in the form of graphs or in the form of text (SCROLLs).
+ *      int B_ViewTblFile(char* arg)                        | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
+ *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
 
 #include "iode.h"
 
-int B_viewmode;     // 0: displays the graph/table on screen, 1: print graph/table
+int B_viewmode;         // 0: displays the graph/table on screen, 1: print graph/table
 
-int     ODE_VIEW = 0;
-char    ODE_SMPL[81];
+int     ODE_VIEW = 0;   // Used in the DOS GUI to differentiate between display & print
+char    ODE_SMPL[81];   // Current GSAMPLE for printing / displaying tables and graphs
 
-/* Table */
 
+// Display a list of variables in the form of tables of max 50 variables.
 int B_ViewVar(char* arg)
 {
     return(B_ViewPrintVar(arg, 0));
 }
 
+// Print a list of variables in the form of tables of max 50 variables.
 int B_PrintVar(char* arg)
 {
     return(B_ViewPrintVar(arg, 1));
 }
 
+
+/**
+ *  Print or display (according to the mode parameter) variables in the form of tables. 
+ *  Temporary tables of maximum 50 variables are constructed then printed of displayed.
+ *  
+ *  @param [in] arg  char*  list of variables to be printed
+ *  @param [in] mode int    0 to display, 1 to print
+ *  @return          int 
+ */
 int B_ViewPrintVar(char* arg, int mode)
 {
     int     rc = 0, nb, i;
@@ -88,56 +113,50 @@ fin:
     return(rc);
 }
 
+
+// Display a list of tables
+// $ViewTbl sample table [list of tables]
 int B_ViewByTbl(char* arg)
 {
     return(B_ViewPrintTbl(arg, 0, 0));
 }
 
+// Alias of B_ViewByTbl()
 int B_ViewTbl(char* arg)
 {
     return(B_ViewPrintTbl(arg, 0, 0));
 }
 
+// Print a list of tables
+// $PrintTbl gsample table1 [table2...]
 int B_PrintTbl(char* arg)
 {
     return(B_ViewPrintTbl(arg, 0, 1));
 }
 
+
+// Display a list of tables as graphs
+// $ViewGr gsample tbl1[+tbl2] tbl3 ... 
 int B_ViewGr(char* arg)
 {
     return(B_ViewPrintTbl(arg, 1, 0));
 }
 
-/*
-B_PrintGrAll(arg)
-char    *arg;
-{
-    B_what = 0;
-    return(B_PrintGr(arg));
-}
-
-B_PrintGrData(arg)
-char    *arg;
-{
-    B_what = 1;
-    return(B_PrintGr(arg));
-}
-
-B_PrintGrWin(arg)
-char    *arg;
-{
-    B_what = 2;
-    return(B_PrintGr(arg));
-}
-/* JMP 02-12-97 */
-
+// Print a list of tables as graphs
+// $PrintGr gsample table1 [table2...]
 int B_PrintGr(char* arg)
 {
     return(B_ViewPrintTbl(arg, 1, 1));
 }
 
 
-
+/**
+ *  Calculate and display (or print, according to the value of B_viewmode) a table on a specified GSAMPLE.
+ *  
+ *  @param [in] name char*  table name
+ *  @param [in] smpl char*  GSAMPLE
+ *  @return          int    0 on success, -1 on error (table not found, illegal gsample...)
+ */
 int B_ViewPrintTbl_1(char* name, char* smpl)
 {
     int rc, pos;
@@ -161,6 +180,15 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
     return(rc);
 }
 
+
+/**
+ *  Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSAMPLE, 
+ *  based on TBL definition(s).
+ *  
+ *  @param [in] names   char*  list of table names
+ *  @param [in] smpl    char*  GSAMPLE
+ *  @return             int    0 on success, -1 on error (table not found, illegal gsample...)
+ */
 int B_ViewPrintGr_1(char* names, char* gsmpl)
 {
     //extern int KT_nb;
@@ -203,17 +231,17 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     return(rc);
 }
 
+
 /**
+ *  Calculate, then print or display (according to the mode parameter) IODE TBLs either 
+ *  in the form of graphs or in the form of text (SCROLLs).
  *  
- *  
- *  @param [in] char* arg   
+ *  @param [in] char* arg   list of tables to print  
  *  @param [in] int   type  0: print or view in table format
  *                          1: print in graph format 
  *  @param [in] int   mode  0: view
  *                          1: print
- *  @return 
- *  
- *  @details 
+ *  @return     int         0 on success-1 on error (no arg, error in execution of tables) 
  */
 int B_ViewPrintTbl(char* arg, int type, int mode)
 {
@@ -247,8 +275,8 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
         else {
             if(type == 0) ODE_VIEW = 1;
             else ODE_VIEW = 2;
-            strcpy(ODE_SMPL, smpl);
-
+            //strcpy(ODE_SMPL, smpl);
+            SCR_strlcpy(ODE_SMPL, smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
             ODE_scroll(K_WS[K_TBL], args + 1);
         }
 
@@ -263,6 +291,9 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
     return(rc);
 }
 
+
+// Report function:
+//      $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
 int B_ViewTblFile(char* arg)
 {
     int     ref, rc = 0;
@@ -305,6 +336,8 @@ err:
     return(rc);
 }
 
+
+// Close a Print tables or Print variables session.
 int B_ViewTblEnd()
 {
     int     i;
