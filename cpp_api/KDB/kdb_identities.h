@@ -32,10 +32,10 @@ public:
 
     void update(const int pos, const std::string& lec);
 
-    void execute_identities(const Period& from, const Period& to, const std::string& identities_list, 
+    void execute_identities(const Period& from, const Period& to, const std::string& identities_list ="", 
                             const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);
 
-    void execute_identities(const std::string& from, const std::string& to, const std::string& identities_list, 
+    void execute_identities(const std::string& from, const std::string& to, const std::string& identities_list = "", 
                             const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);
 };
 

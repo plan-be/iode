@@ -49,10 +49,6 @@ void KDBIdentities::update(const int pos, const std::string& lec)
 void KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 
         const std::string& var_files, const std::string& scalar_files, const bool trace)
 {
-    IodeExceptionInvalidArguments error("Cannot execute identities");
-    if (identities_list.empty()) error.add_argument("identities_list", "empty");
-    if (error.invalid_args()) throw error;
-
     B_IdtExecuteVarFiles(to_char_array(var_files));
     B_IdtExecuteSclFiles(to_char_array(scalar_files));
     B_IdtExecuteTrace(trace ? "Y" : "N");
@@ -72,7 +68,6 @@ void KDBIdentities::execute_identities(const std::string& from, const std::strin
     IodeExceptionInvalidArguments error("Cannot execute identities");
     if (from.empty()) error.add_argument("from", "empty");
     if (to.empty()) error.add_argument("to", "empty");
-    if (identities_list.empty()) error.add_argument("identities_list", "empty");
     if (error.invalid_args()) throw error;
 
     Period period_from(from);
