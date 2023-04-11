@@ -1,3 +1,19 @@
+/**
+ *  @header4iode
+ *  
+ *  IODE.H
+ *  ------
+ *  Contains 
+ *      - #includes
+ *      - #defines 
+ *      - structs and typedefs
+ *      - declarations of functions 
+ *      - declarations of variables
+ *  
+ *  This file should be included in all IODE api based C/C++ developement.
+ *  
+ */
+ 
 #ifndef _IODE_H_
 #define _IODE_H_
 
