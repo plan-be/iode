@@ -149,9 +149,9 @@ void T_open_cell(int attr, int straddle, int type)
 void T_open_attr(int attr)
 {
 
-    if(attr & KT_BOLD)      W_printf("\\b");
-    if(attr & KT_ITALIC)    W_printf("\\i");
-    if(attr & KT_UNDERLINE) W_printf("\\u");
+    if(attr & KT_BOLD)      W_printfReplEsc("~b");
+    if(attr & KT_ITALIC)    W_printfReplEsc("~i");
+    if(attr & KT_UNDERLINE) W_printfReplEsc("~u");
 }
 
 
@@ -163,9 +163,9 @@ void T_open_attr(int attr)
  */
 void T_close_attr(int attr)
 {
-    if(attr & KT_BOLD)      W_printf("\\B");
-    if(attr & KT_ITALIC)    W_printf("\\I");
-    if(attr & KT_UNDERLINE) W_printf("\\U");
+    if(attr & KT_BOLD)      W_printfReplEsc("~B");
+    if(attr & KT_ITALIC)    W_printfReplEsc("~I");
+    if(attr & KT_UNDERLINE) W_printfReplEsc("~U");
 }
 
 
