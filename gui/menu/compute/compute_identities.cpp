@@ -21,7 +21,7 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(const QString& project_se
 
 	qFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
 	qTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
-    qIdentitiesList = new WrapperQTextEdit(label_identities_list->text(), *textEdit_identities_list, REQUIRED_FIELD);
+    qIdentitiesList = new WrapperQTextEdit(label_identities_list->text(), *textEdit_identities_list, OPTIONAL_FIELD);
     qVariablesFiles = new WrapperQTextEdit(label_variables_list->text(), *textEdit_variables_list, OPTIONAL_FIELD);
     qScalarsFiles = new WrapperQTextEdit(label_scalars_list->text(), *textEdit_scalars_list, OPTIONAL_FIELD);
     qTrace = new WrapperCheckBox(label_trace->text(), *checkBox_trace, REQUIRED_FIELD);
