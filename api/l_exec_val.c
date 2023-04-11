@@ -13,11 +13,11 @@
  *  
  *  List of functions
  *  -----------------
- *      static L_REAL L_pi ()
- *      static L_REAL L_euro()
- *      static L_REAL L_e ()
- *      static L_REAL L_time(int t)
- *      static L_REAL L_i(int t)
+ *      L_REAL L_pi ()
+ *      L_REAL L_euro()
+ *      L_REAL L_e ()
+ *      L_REAL L_time(int t)
+ *      L_REAL L_i(int t)
  *     
  */
 
@@ -26,12 +26,12 @@
 
 /*---------- L_VAL_FN ---------------*/
 
-static L_REAL L_pi  ()      {return((L_REAL)M_PI);}
-static L_REAL L_euro()      {return((L_REAL)40.3399);}
-static L_REAL L_e   ()      {return((L_REAL)M_E);}
-static L_REAL L_time(int t) {return((L_REAL)t);}
+L_REAL L_pi  ()      {return((L_REAL)M_PI);}
+L_REAL L_euro()      {return((L_REAL)40.3399);}
+L_REAL L_e   ()      {return((L_REAL)M_E);}
+L_REAL L_time(int t) {return((L_REAL)t);}
 
-static L_REAL L_i(int t) {
+L_REAL L_i(int t) {
     extern int L_curt;
     return((L_REAL)t - (L_REAL)L_curt);
 }

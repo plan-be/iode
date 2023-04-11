@@ -82,7 +82,7 @@ char k_ext[][4] = {
  *      K_add_ext(filename, "var");
  *      printf("'%s'\n", filename);  // 'example.var'
  */
-static char *K_add_ext(char* filename, char* ext)
+char *K_add_ext(char* filename, char* ext)
 {
     char    buf[512];
     

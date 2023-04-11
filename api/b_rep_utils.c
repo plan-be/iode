@@ -56,7 +56,7 @@ static int     RP_NBMEMBLKS = 0;   // Nb of MEMBLKs
  *  
  *  @return int     always 0
  */
-static int RP_alloc_ptrs()
+int RP_alloc_ptrs()
 {
     if(RP_MEMBLKS == 0)
         RP_MEMBLKS = (MEMBLK *) SCR_malloc(MEMBLK_BLK * sizeof(MEMBLK)); // JMP 26/8/2012
