@@ -30,6 +30,8 @@ Sample::Sample(PERIOD* c_start_period, PERIOD* c_end_period)
 
 Sample::Sample(SAMPLE* c_sample)
 {
+    if(c_sample == NULL) 
+        throw IodeExceptionInitialization("Sample", "Sample not yet initialized");
     this->c_sample = (SAMPLE*) SW_nalloc(sizeof(SAMPLE));
     memcpy(this->c_sample, c_sample, sizeof(SAMPLE));
 }
