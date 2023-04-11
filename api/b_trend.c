@@ -1,6 +1,24 @@
-#include "iode.h"
+/**
+ *  @header4iode
+ * 
+ *  
+ *  Implementation of the **Hodrick-Prescott** method for trend series construction. 
+ *  The principle is the same as for deseasonalisation: the series read from a file are imported 
+ *  and transformed simultaneously.
+ *  
+ *  For $WsTrend, the series are log-transformed before the calculation and re-transformed into exp after the calculation. 
+ *  They must therefore be strictly positive.
+ *  
+ *  In $WsTrendStd, the series are not transformed before the calculation. The positivity constraint does therefore not apply.
+ *  
+ *  List of functions 
+ *  -----------------
+ *   int B_WsTrend(char* arg)     | $WsTrend VarFilename Lambda series1 series2 ...
+ *   int B_WsTrendStd(char* arg)  | $WsTrendStd VarFilename Lambda series1 series2 ...
+ *     
+ */
 
-/* Hodrick & Prescott Trend filter */
+#include "iode.h"
 
 static int HP_smpl(f_smpl, ws_smpl, t_smpl, shift)
 SAMPLE  *f_smpl, *ws_smpl, **t_smpl;
@@ -82,12 +100,16 @@ done:
 
 
 
-
+// $WsTrend VarFilename Lambda series1 series2 ...
 int B_WsTrend(char* arg)
 {
     return(B_WsTrendAll(arg, 0));
 }
 
+
+// $WsTrendStd VarFilename Lambda series1 series2 ...
+// Unlike the $WsTrend function, the series are not transformed before the calculation. 
+// The positivity constraint does not apply.
 int B_WsTrendStd(char* arg)
 {
     return(B_WsTrendAll(arg, 1));

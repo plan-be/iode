@@ -1,5 +1,33 @@
+/**
+ *  @header4iode
+ * 
+ *  IODE report @-functions for ODBC interface
+ *  ------------------------------------------
+ *  See b_rep_fns.c for a detailed explanation on the @-functions usage.
+ *  Each function in this group has the same syntax:
+ *  
+ *      U_ch* <function_name>(U_ch** arg)
+ *  
+ *      @param [in] U_ch**   arg    List of arguments of the function (sep = ',')
+ *      @return     U_ch*           allocated string containing the computed value of the function
+ *                                  NULL on error
+ *
+ *  List of functions
+ *  -----------------
+ *      U_ch *RPS_Open(U_ch** args)    | @SqlOpen(dsn[,user,password])
+ *      U_ch *RPS_Field(U_ch** args)   | @SqlField(field_number)
+ *      U_ch *RPS_NbFlds(U_ch** args)  | @SqlNbFlds() 
+ *      U_ch *RPS_Record(U_ch** args)  | @SqlRecord([fld_nb1[,fld_nb2]]) : all fields between fld_nb1 and fld_nb2
+ *      U_ch *RPS_Query(U_ch** args)   | @SqlQuery(sql_select)
+ *      U_ch *RPS_Next(U_ch** args)    | @SqlNext()
+ *      U_ch *RPS_Close(U_ch** args)   | @SqlClose()
+ *  
+ *  TODO: rename b_sql.c in b_rep_sql.c
+ */
+ 
 #include "iode.h"
 
+// These functions are NOT implemented (yet) under Linux or in VC64
 #if defined(UNIX) || defined(_MSC_VER) 
 // for IODE64 MSC => link with odbc32.$(L) odbccp32.$(L) 
 
@@ -51,16 +79,20 @@ U_ch    *RPS_Close(U_ch** args)
 //    return(kdb);
 //}
 
+
 #else
+// Embarcadero 32 bits
+// ------------------- 
 
 #include <s_odbc.h>
 //#include <sqltypes.h>
 #include "sql.h"
 #include "sqlext.h"
 
-ODSN    *odsn = NULL;
-OCSR    *ocsr = NULL;
+ODSN    *odsn = NULL;       // Global ODBC data set name
+OCSR    *ocsr = NULL;       // Global ODBC cursor
 
+// @SqlOpen(dsn[,user,password])
 U_ch    *RPS_Open(U_ch** args)
 {
     int     nbargs;
@@ -85,6 +117,15 @@ err:
     return(SCR_stracpy("0"));
 }
 
+/**
+ *  Copy the value of the current record (after a query) into the buffer buf according to its type.
+ *  Sub-function of RPS_Field().
+ *  
+ *  @param [out] buf     char*  output buffer
+ *  @param [in]  ptr     char*  pointer to the field in the read record
+ *  @param [in]  type    int    SQL type of the field
+ *  @return              int     0
+ */
 static int RPS_GetFld(char* buf, char* ptr, int type)
 {
     short   *sh;
@@ -136,6 +177,7 @@ static int RPS_GetFld(char* buf, char* ptr, int type)
 }
 
 
+// @SqlField(field_number)
 U_ch  *RPS_Field(U_ch** args)
 {
     int     fldnb = 0;
@@ -153,6 +195,8 @@ U_ch  *RPS_Field(U_ch** args)
     return(res);
 }
 
+
+// @SqlNbFlds() 
 U_ch  *RPS_NbFlds(U_ch** args)
 {
     int     fldnb = 0;
@@ -164,6 +208,9 @@ U_ch  *RPS_NbFlds(U_ch** args)
     return(res);
 }
 
+// @SqlRecord() : all fields 
+// @SqlRecord(fld_nb) : all fields as from fld_nb
+// @SqlRecord(fld_nb1,fld_nb2) : all fields between fld_nb1 and fld_nb2
 U_ch  *RPS_Record(U_ch** args)
 {
     char    *ptr;
@@ -196,7 +243,7 @@ U_ch  *RPS_Record(U_ch** args)
     return(res);
 }
 
-
+// @SqlQuery(sql_select)
 U_ch *RPS_Query(U_ch** args)
 {
     U_ch    *arg;
@@ -213,21 +260,23 @@ U_ch *RPS_Query(U_ch** args)
     else return(RPS_NbFlds(NULL));
 }
 
-U_ch *RPS_Sql(U_ch** args)
-{
-    int     rc;
-    U_ch    *arg;
 
-    if(odsn == NULL) return(SCR_stracpy("0"));
+// U_ch *RPS_Sql(U_ch** args)
+// {
+//     int     rc;
+//     U_ch    *arg;
+// 
+//     if(odsn == NULL) return(SCR_stracpy("0"));
+// 
+//     arg = SCR_mtov(args, ' ');
+//     rc = OSql(odsn, arg);
+//     SCR_free(arg);
+// 
+//     if(rc < 0) return(SCR_stracpy("0"));
+//     else return(SCR_stracpy("1"));
+// }
 
-    arg = SCR_mtov(args, ' ');
-    rc = OSql(odsn, arg);
-    SCR_free(arg);
-
-    if(rc < 0) return(SCR_stracpy("0"));
-    else return(SCR_stracpy("1"));
-}
-
+// @SqlNext()
 U_ch *RPS_Next(U_ch** args)
 {
     int rc;
@@ -239,6 +288,8 @@ U_ch *RPS_Next(U_ch** args)
     else return(SCR_stracpy("0"));
 }
 
+
+// @SqlClose()
 U_ch *RPS_Close(U_ch** args)
 {
     if(ocsr != NULL) OFreeOCSR(ocsr);
@@ -251,7 +302,7 @@ U_ch *RPS_Close(U_ch** args)
 }
 
 /*
-// OLD FUNCTION FOR A SPECIFIC PROJECT 
+// OLD FUNCTIONS FOR A SPECIFIC PROJECT 
 
 static int Str2Vec(IODE_REAL* vec, char* buf, int nb)
 {

@@ -1,3 +1,61 @@
+/**
+ *  @header4iode
+ * 
+ *  This file contains 2 groups of functions: 
+ *      - implementation of an IODE DDE server, allowing access to IODE functions from inside any program able to 
+ *        interact with a DDE server, like Excel or Word
+ *      - functions to access the Excel DDE server. Some of IODE report commands line $ExcelGet are implemented here.
+ *  
+ *  List of functions 
+ *  -----------------
+ *      int IodeDdeLocale(char *buf)
+ *      int IodeDdeUnLocale(char *buf)
+ *      int IodeDdeType(char *szTopic)
+ *      char *IodeDdeGetWS(char *szItem)
+ *      char *IodeDdeCreateSeries(int objnb, int bt)
+ *      char *IodeDdeCreatePer(int bt)
+ *      char *ToBase26(int num)
+ *      char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
+ *      char *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
+ *      char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
+ *      char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
+ *      char *IodeDdeGetReportRC(char *szItem)
+ *      char *IodeDdeGetXObj(char *szItem, int type)
+ *      char *IodeDdeGetItem(char *szTopic, char *szItem)
+ *      int IodeDdeSetWS(char *szItem, char *szBuffer)
+ *      int IodeDdePlay(char *szItem, char *szBuffer)
+ *      int DdeTsfKey(char *key)
+ *      int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
+ *  
+ *      char *B_ExcelGetItem(char *arg)
+ *      int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
+ *      int B_ExcelDecimal(char *arg)
+ *      int B_ExcelThousand(char *arg)
+ *      int B_ExcelCurrency(char *arg)
+ *      int B_ExcelLang(char *arg)
+ *      int B_ExcelGet(char *arg, int type)
+ *      int B_ExcelSet(char *arg, int type)
+ *      int B_ExcelExecute(char *arg)
+ *      int B_ExcelCmd(char *cmd, char *arg)
+ *      int B_DDEGet(char *arg)
+ *      int B_ExcelWrite(char *ptr)
+ *      int B_DDEGet(char *arg)
+ *      char *B_ExcelGetItem(char *arg)
+ *      int B_ExcelGet(char *arg, int type)
+ *      int B_ExcelSet(char *arg, int type)
+ *      int B_ExcelExecute(char *arg)
+ *      int B_ExcelCmd(char *cmd, char *arg)
+ *      int B_ExcelWrite(char *ptr)
+ *      int B_ExcelOpen(char *arg)
+ *      int B_ExcelClose(char *arg)
+ *      int B_ExcelPrint(char *arg)
+ *      int B_ExcelSave(char *arg)
+ *      int B_ExcelSaveAs(char *arg)
+ *      int B_ExcelNew(char *arg)
+ *      int IodeFmtVal(char *buf, IODE_REAL val)
+ */
+
+
 #include "iode.h"
 
 
@@ -216,6 +274,11 @@ char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
 
     return(buf);
 }
+
+
+/**
+ *  Compute the table objnb on the GSAMPLE ismpl and return a string containing the result.
+ */
 
 char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
 {

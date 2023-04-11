@@ -1,7 +1,26 @@
+/**
+ *  @header4iode
+ *
+ *  Implementation of the DATA stream interface.
+ * 
+ *  @see GB for details.
+ *  
+ *  List of functions 
+ *  -----------------
+ *      char *B_DSPeriod2Date(PERIOD *per, char *date, char *freq)
+ *      int B_DSLog(char *log)
+ *      int B_DSTimedOut(char *name)
+ *      long B_DSa2y(year)
+ *      int B_DSDate2Period(PERIOD *per, char *date, char freq)
+ *      int B_DSCode(char *name)
+ *      int B_DSUpdateCmt(char *name, char *val)
+ *      int B_DSUpdateVar(char *name, PERIOD *per, char *val)
+ *      int B_DSInterpret(char *code, char freq, char *contents)
+ *      int B_DSImportDb_1(char *arg, SAMPLE *smpl)
+ *      int B_DSImportDb(char *arg)
+ */ 
+  
 #include "iode.h"
-
-//#if defined(DOSW32) || defined(SCRW32)
-//#include "scr4w.h"
 
 
 char    *B_DSPeriod2Date(PERIOD *per, char *date, char *freq)
@@ -234,4 +253,3 @@ int B_DSImportDb(char *arg)
     smpl = KSMPL(K_WS[K_VAR]);
     return(B_ainit_loop(arg, B_DSImportDb_1, (char *)smpl));
 }
-//#endif
