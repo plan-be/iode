@@ -67,8 +67,12 @@ public:
 
     int extractAndVerify()
     {
-        QString text = qfield.currentText();
-        if (!list_values.contains(text)) throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
+        if(type == REQUIRED_FIELD)
+        {
+            QString text = qfield.currentText();
+            if (!list_values.contains(text)) 
+                throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
+        }
         int value = qfield.currentIndex();
         return value;
     }
