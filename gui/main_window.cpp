@@ -399,6 +399,12 @@ void MainWindow::open_trend_correction_dialog()
 void MainWindow::open_compute_identities_dialog()
 {
     QIodeMenuComputeIdentities dialog(*project_settings_filepath, this);
+
+    QString identites;
+    QStringList identitiesList = tabWidget_IODE_objs->getSelectedObjectsNames(I_IDENTITIES);
+    if(identitiesList.size() > 0)
+        dialog.setIdentitiesNames(identitiesList);
+
     dialog.exec();
 }
 
