@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSizePolicy>
+#include <QStringList>
 
 #include "qiode_tab_abstract.h"
 
@@ -132,6 +133,7 @@ public:
 
     virtual void clearKDB() = 0;
     virtual void resetFilter() = 0;
+    virtual QStringList getSelectedObjectsNames() const = 0;
     virtual void computeHash(const bool before=false) = 0;
 
 public slots:
@@ -238,6 +240,11 @@ public:
     QString saveAs_()
     {
         return objmodel->saveAs(projectDir);
+    }
+
+    QStringList getSelectedObjectsNames() const 
+    {
+        return tableview->getSelectedObjectsNames();
     }
 
     void computeHash(const bool before=false)
