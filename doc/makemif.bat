@@ -1,5 +1,5 @@
-:: Creation of iode1.mif and iode2.mif
-:: -----------------------------------
+:: Creation of iode1.mif and iode2.mif in doc/src to create iode.pdf
+:: -----------------------------------------------------------------
 ::
 SETLOCAL
 @echo off
@@ -39,7 +39,6 @@ del tmp.a2m
 :: Create iode1.mif from iodemif1.a2m
 scr4w_af -gdpi %GDPI% -grect %GRECT% -gif2bmp -i iodemif1.a2m -o iode1.mif 
 del iodemif1.a2m
-move /Y iode1.mif ..\build
 
 :: -----------------------------------------------------------------
 :: STEP 2. iode2.mif
@@ -66,6 +65,6 @@ del tmp.a2m
 @echo on
 scr4w_af -gdpi %GDPI% -grect %GRECT% -gif2bmp -i iodemif2.a2m -o iode2.mif
 del iodemif2.a2m
-move /Y iode2.mif ..\build
+
 
 ENDLOCAL
