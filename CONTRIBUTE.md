@@ -33,6 +33,7 @@
 - **cpp_api**: C++ API
 - **doc**: user + dev documentation
 - **gui**: Qt GUI
+- **nsis**: NSIS Windows installer
 - **pyiode**: Python module of IODE
 - **scr4**: utility functions required to compile the C API
 - **tests**: testing directory
@@ -50,6 +51,7 @@ and `<target>` are deduced from CMakeLists.txt:
 - iodeapi
 - iodecppapi
 - iode_gui
+- nsis
 - test_c_api
 - test_cpp_api
 - keyboard_shortcuts
