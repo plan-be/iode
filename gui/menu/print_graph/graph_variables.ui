@@ -15,7 +15,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
+    <width>120</width>
     <height>280</height>
    </size>
   </property>
@@ -32,232 +32,308 @@
    <iconset>
     <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
   </property>
-  <widget class="QSplitter" name="splitter">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>20</y>
-     <width>91</width>
-     <height>140</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-   <widget class="QPushButton" name="pushButton_display">
-    <property name="text">
-     <string>Display</string>
-    </property>
-    <property name="shortcut">
-     <string>F10</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_apply">
-    <property name="text">
-     <string>Apply</string>
-    </property>
-    <property name="shortcut">
-     <string>F7</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_setup">
-    <property name="text">
-     <string>Setup</string>
-    </property>
-    <property name="shortcut">
-     <string>F6</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_cancel">
-    <property name="text">
-     <string>Cancel</string>
-    </property>
-    <property name="shortcut">
-     <string>Esc</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_help">
-    <property name="text">
-     <string>Help</string>
-    </property>
-    <property name="shortcut">
-     <string>F1</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>461</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_variables">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_variables">
+     <property name="text">
+      <string>Variables</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="6">
+    <widget class="QIodeCompleteTextEdit" name="textEdit_variables"/>
+   </item>
+   <item row="0" column="7" rowspan="3">
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QPushButton" name="pushButton_display">
       <property name="text">
-       <string>Variables</string>
+       <string>Display</string>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="shortcut">
+       <string>F10</string>
       </property>
      </widget>
-    </item>
-    <item row="0" column="1" colspan="8">
-     <widget class="QTextEdit" name="textEdit_variables"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_x_axis_type">
+     <widget class="QPushButton" name="pushButton_apply">
       <property name="text">
-       <string>Sample</string>
+       <string>Apply</string>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="shortcut">
+       <string>F7</string>
       </property>
      </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QComboBox" name="comboBox_x_axis_type"/>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="label_sample_from">
+     <widget class="QPushButton" name="pushButton_setup">
       <property name="text">
-       <string>From</string>
+       <string>Setup</string>
+      </property>
+      <property name="shortcut">
+       <string>F6</string>
       </property>
      </widget>
-    </item>
-    <item row="1" column="6">
-     <widget class="QLabel" name="label_sample_to">
+     <widget class="QPushButton" name="pushButton_cancel">
       <property name="text">
-       <string>To</string>
+       <string>Cancel</string>
+      </property>
+      <property name="shortcut">
+       <string>Esc</string>
       </property>
      </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_chart_type">
+     <widget class="QPushButton" name="pushButton_help">
       <property name="text">
-       <string>Layout</string>
+       <string>Help</string>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="shortcut">
+       <string>F1</string>
       </property>
      </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QComboBox" name="comboBox_chart_type"/>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_X_ticks">
-      <property name="text">
-       <string>X grid</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QComboBox" name="comboBox_X_ticks"/>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_Y_ticks">
-      <property name="text">
-       <string>Y grid</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QComboBox" name="comboBox_Y_ticks"/>
-    </item>
-    <item row="4" column="2" colspan="2">
-     <widget class="QLabel" name="label_min_Y">
-      <property name="text">
-       <string>Min Y</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="4">
-     <widget class="QLineEdit" name="lineEdit_min_Y"/>
-    </item>
-    <item row="4" column="5" colspan="3">
-     <widget class="QLabel" name="label_max_Y">
-      <property name="text">
-       <string>Max Y</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="8">
-     <widget class="QLineEdit" name="lineEdit_max_Y"/>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_language">
-      <property name="text">
-       <string>Language</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QComboBox" name="comboBox_language"/>
-    </item>
-    <item row="1" column="4">
-     <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
-      <property name="toolTip">
-       <string>- yyyy is the year
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_x_axis_type">
+     <property name="text">
+      <string>Sample</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="comboBox_x_axis_type">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_sample_from">
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" colspan="2">
+    <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
+     <property name="toolTip">
+      <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
  -ppp is the period of the year</string>
-      </property>
-      <property name="inputMask">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="8">
-     <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
-      <property name="toolTip">
-       <string>- yyyy is the year
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5">
+    <widget class="QLabel" name="label_sample_to">
+     <property name="text">
+      <string>To</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="6">
+    <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
+     <property name="toolTip">
+      <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
  -ppp is the period of the year</string>
-      </property>
-      <property name="inputMask">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QCheckBox" name="checkBox_log_scale">
-      <property name="text">
-       <string>Log Scale</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_chart_type">
+     <property name="text">
+      <string>Layout</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" rowspan="2">
+    <widget class="QComboBox" name="comboBox_chart_type">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" rowspan="2" colspan="2">
+    <widget class="QCheckBox" name="checkBox_log_scale">
+     <property name="text">
+      <string>Log Scale</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4" rowspan="2" colspan="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>218</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="7" rowspan="4">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>84</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_X_ticks">
+     <property name="text">
+      <string>X grid</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QComboBox" name="comboBox_X_ticks">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="5">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>314</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_Y_ticks">
+     <property name="text">
+      <string>Y grid</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QComboBox" name="comboBox_Y_ticks">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QLabel" name="label_min_Y">
+     <property name="text">
+      <string>Min Y</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_min_Y"/>
+   </item>
+   <item row="5" column="5">
+    <widget class="QLabel" name="label_max_Y">
+     <property name="text">
+      <string>Max Y</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6">
+    <widget class="QLineEdit" name="lineEdit_max_Y"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_language">
+     <property name="text">
+      <string>Language</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QComboBox" name="comboBox_language">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2" colspan="5">
+    <spacer name="horizontalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>314</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
    <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QIodeCompleteTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>custom_widgets/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -6,6 +6,9 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(const QString& settings_filepat
 {
     setupUi(this);
 
+    completer = new QIodeCompleter(false, false, I_VARIABLES, textEdit_variables);
+    textEdit_variables->setCompleter(completer);
+
     lineEdit_min_Y->setValidator(new QDoubleValidator(lineEdit_min_Y));
     lineEdit_max_Y->setValidator(new QDoubleValidator(lineEdit_max_Y));
 
@@ -18,7 +21,7 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(const QString& settings_filepat
     QList<QString> q_langs;
     for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
 
-    wVariables = new WrapperQTextEdit(label_variables->text(), *textEdit_variables, REQUIRED_FIELD);
+    wVariables = new WrapperQPlainTextEdit(label_variables->text(), *textEdit_variables, REQUIRED_FIELD);
     wXAxisType = new WrapperComboBox(label_x_axis_type->text(), *comboBox_x_axis_type, REQUIRED_FIELD, q_axis_types);
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
@@ -62,6 +65,8 @@ QIodeMenuGraphVariables::~QIodeMenuGraphVariables()
     delete wMinY;
     delete wMaxY;
     delete wLanguage;
+
+    delete completer;
 }
 
 void QIodeMenuGraphVariables::display()
@@ -121,7 +126,7 @@ void QIodeMenuGraphVariables::apply()
 {
     try
     {
-
+        QMessageBox::warning(this, "WARNING", "Apply is not yet implemented");
     }
     catch (const std::exception& e)
     {
@@ -134,7 +139,7 @@ void QIodeMenuGraphVariables::setup()
 {
     try
     {
-
+        QMessageBox::warning(this, "WARNING", "Setup is not yet implemented");
     }
     catch (const std::exception& e)
     {
