@@ -7,6 +7,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "plot/plot.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -20,17 +21,19 @@ class QIodeMenuGraphVariables: public QIodeSettings, public Ui::QIodeMenuGraphVa
 {
     Q_OBJECT
 
-    WrapperQTextEdit*  wVariables;
-    WrapperComboBox*   wXAxisType;
-    WrapperSampleEdit* wFrom;
-    WrapperSampleEdit* wTo;
-    WrapperComboBox*   wChartType;
-    WrapperCheckBox*   wYAxisScale;
-    WrapperComboBox*   wXTicks;
-    WrapperComboBox*   wYTicks;
-    WrapperQLineEdit*  wMinY;
-    WrapperQLineEdit*  wMaxY;
-    WrapperComboBox*   wLanguage;
+    WrapperQPlainTextEdit*  wVariables;
+    WrapperComboBox*        wXAxisType;
+    WrapperSampleEdit*      wFrom;
+    WrapperSampleEdit*      wTo;
+    WrapperComboBox*        wChartType;
+    WrapperCheckBox*        wYAxisScale;
+    WrapperComboBox*        wXTicks;
+    WrapperComboBox*        wYTicks;
+    WrapperQLineEdit*       wMinY;
+    WrapperQLineEdit*       wMaxY;
+    WrapperComboBox*        wLanguage;
+
+    QIodeCompleter*         completer;
 
 public:
 	QIodeMenuGraphVariables(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
