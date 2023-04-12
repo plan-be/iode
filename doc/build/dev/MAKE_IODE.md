@@ -25,13 +25,13 @@
 
 ## STEP 1 : Changer le numéro de version {#T2}
 
-La localisation des numéros de version et des dates à modifier se trouve dans le fichier `iode_src/nsis_installer/chvers`.
+La localisation des numéros de version et des dates à modifier se trouve dans le fichier `iode_src/nsis/chvers`.
 
 On peut éditer chvers avec l'éditeur `e.bat` (`s32w_mt.exe`) qui permet d'ouvrir les fichiers concernés à la bonne ligne avec la touche `Ctrl-F4`.
 
 ```
-c:/> cd /usr/iode_src/nsis_installer
-c:/usr/iode_src/nsis_installer> e chvers
+c:/> cd /usr/iode_src/nsis
+c:/usr/iode_src/nsis> e chvers
 ```
 
 **Fichier chvers mars 2023**
@@ -169,15 +169,15 @@ Revoir cette section et y ajouter éventuellement de nouveaux chapitres (par exem
 
 Note : Note préalable : il faut vérifier que les makefiles qui créent des exécutables (iode.exe, iodecmd.exe, iodecom.exe...) soient bien *signés* avant de lancer la procédure de recompilation (on supprime en général la signature pendant les développements pour que le debugger td32 puisse fonctionner).
 
-Se placer dans `./nsis_installer` pour recontruire
+Se placer dans `./nsis` pour recontruire
 
 - les libs
 - les exécutables
 - les différentes versions des manuels (sauf pdf) :
 
 ```
-c:> cd /usr/iode_src/nsis_installer
-c:/usr/iode_src/nsis_installer> remakeiode [-objs] [-man]
+c:> cd /usr/iode_src/nsis
+c:/usr/iode_src/nsis> remakeiode [-objs] [-man]
 ```
 
 Les options \-objs et \-man permettent d'éviter la recompilation de toutes les sources et la génération des manuels, par exemple pendant une phase de mise au point.
@@ -196,8 +196,8 @@ En sortie, les fichiers suivants auront été regénérés :
 - ./pyiode/py310/iode.pyd
 - ./doc/build/readme.htm
 - ./doc/build/iode.chm
-- ./nsis\_installer/iode6xx.exe
-- ./nsis\_installer/iode6xx\_upd.exe
+- ./nsis/iode6xx.exe
+- ./nsis/iode6xx\_upd.exe
 - ./<local\_htdocs>/w\-iode/data/pages/\*
 - ./<local\_htdocs>/w\-iode/data/media/\*
 
@@ -299,7 +299,7 @@ En sortie, les fichiers suivants auront été regénérés :
     if %errorlevel% NEQ 0 goto :err
     
     :: NSIS
-    cd %iodepath%\nsis_installer
+    cd %iodepath%\nsis
     call makeinst.bat
     if %errorlevel% NEQ 0 goto :err
     
@@ -309,7 +309,7 @@ En sortie, les fichiers suivants auront été regénérés :
     
     :err
     Echo !!!! Error !!!!
-    cd %iodepath%\nsis_installer
+    cd %iodepath%\nsis
     endlocal
     :fin
     endlocal
@@ -323,10 +323,10 @@ Pour cette étape, le path local suivants est utilisé :
 
 Si nécessaire, il faut l'adapter au début du fichier copy2ovh.bat listé ci\-dessous.
 
-Dans c:/usr/iode\_src/nsis\_installer, lancer la commande :
+Dans c:/usr/iode\_src/nsis, lancer la commande :
 
 ```
-    c:/usr/iode_src/nsis_installer> copy2ovh.bat
+    c:/usr/iode_src/nsis> copy2ovh.bat
 ```
 
 **Fichier copy2ovh.bat (mars 2023)**
@@ -381,7 +381,7 @@ echo mput iode.pyd                              >> upload_iode_ovh.ftp
  
 :: Installer
 echo cd /www/w-iode/data/media/download         >> upload_iode_ovh.ftp
-echo lcd %IODE_DIR%/nsis_installer              >> upload_iode_ovh.ftp
+echo lcd %IODE_DIR%/nsis              >> upload_iode_ovh.ftp
 echo mput iode665*.exe                          >> upload_iode_ovh.ftp
  
 :: Manuals

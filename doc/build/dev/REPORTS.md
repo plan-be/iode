@@ -48,29 +48,39 @@
       - [List of functions](#T42)
     - [b\_ltoh.c](#T43)
       - [List of functions](#T44)
-    - [b\_ras.c](#T45)
+    - [b\_trend.c](#T45)
       - [List of functions](#T46)
-    - [b\_data.c](#T47)
-      - [Functions with a suffix](#T48)
-      - [Other functions](#T49)
-      - [List of functions](#T50)
-    - [b\_est.c](#T51)
+    - [b\_ras.c](#T47)
+      - [List of functions](#T48)
+    - [b\_data.c](#T49)
+      - [Functions with a suffix](#T50)
+      - [Other functions](#T51)
       - [List of functions](#T52)
-    - [b\_model.c](#T53)
+    - [b\_est.c](#T53)
       - [List of functions](#T54)
-    - [b\_ws.c](#T55)
+    - [b\_step.c](#T55)
       - [List of functions](#T56)
-    - [b\_rep\_super.c](#T57)
-  - [Iode Report @\-functions](#T58)
-      - [@\-function parameters specifications](#T59)
-      - [Examples](#T60)
-      - [List of functions](#T61)
-  - [Example of report with @\-functions](#T62)
-    - [Report](#T63)
-    - [Resulting a2m file](#T64)
-  - [Example of report with $procdef and $foreach](#T65)
-    - [Report](#T66)
-    - [Resulting a2m file](#T67)
+    - [b\_model.c](#T57)
+      - [List of functions](#T58)
+    - [b\_ws.c](#T59)
+      - [List of functions](#T60)
+    - [b\_rep\_super.c](#T61)
+    - [b\_pdest.c](#T62)
+      - [List of functions](#T63)
+    - [b\_print.c](#T64)
+      - [List of functions](#T65)
+    - [b\_view.c](#T66)
+      - [List of functions](#T67)
+  - [Iode Report @\-functions](#T68)
+      - [@\-function parameters specifications](#T69)
+      - [Examples](#T70)
+      - [List of functions](#T71)
+  - [Example of report with @\-functions](#T72)
+    - [Report](#T73)
+    - [Resulting a2m file](#T74)
+  - [Example of report with $procdef and $foreach](#T75)
+    - [Report](#T76)
+    - [Resulting a2m file](#T77)
 
 # IODE: Reports {#T1}
 
@@ -562,12 +572,17 @@ For these functions, the parameters and return values are as follows:
 - b\_xode.c : import comments and series (aka variables) from various non\-IODE formats
 - b\_htol.c : transformation of high periodicity to low periodicity series.
 - b\_ltoh.c : transformation of low periodicity series to high periodicity series.
+- b\_trend.c : Implementation of the \*\*Hodrick\-Prescott\*\* method for trend series construction.
 - b\_ras.c : implementation of a RAS algorithm.
 - b\_data.c : functions acting on data (i.e.: IODE objects)
 - b\_est.c : estimation functions
+- b\_step.c : find the best possible tests for all possible combinations of coefficients in a block of equations
 - b\_model.c : model simulation, decomposition and recompilation
 - b\_ws.c : functions related to WS management (clear, load, save, sample...)
 - b\_rep\_super.c: IODE report super function default implementations for non\-GUI programs
+- b\_pdest.c : functions to set up printing parameters and to generate outputs in various formats.
+- b\_print.c : functions to print object definitions.
+- b\_view.c : functions to display or print tables and variables as text or as graphs.
 
 ### b\_fsys.c {#T35}
 
@@ -637,17 +652,28 @@ Two types of series are considered: stock and flow:
 |`int B_WsLtoHStock(char* arg)`|$WsLtoHStock \{L|C|S\} Filename VarList|
 |`int B_WsLtoHFlow(char* arg)`|$WsLtoHFlow \{L|C|S\} Filename VarList|
 
-### b\_ras.c {#T45}
+### b\_trend.c {#T45}
 
-Implementation of a RAS algorithm.
+Implementation of the \*\*Hodrick\-Prescott\*\* method for trend series construction.
 
 #### List of functions {#T46}
 
 |Syntax|Description|
 |:---|:---|
+|`int B_WsTrend(char* arg)`|$WsTrend VarFilename Lambda series1 series2 ...|
+|`int B_WsTrendStd(char* arg)`|$WsTrendStd VarFilename Lambda series1 series2 ...|
+
+### b\_ras.c {#T47}
+
+Implementation of a RAS algorithm.
+
+#### List of functions {#T48}
+
+|Syntax|Description|
+|:---|:---|
 |`int RasExecute(char *pattern, char *xdim, char *ydim, PERIOD *rper, PERIOD *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
 
-### b\_data.c {#T47}
+### b\_data.c {#T49}
 
 Functions acting on IODE objects called by the report engine (see b\_rep\_syntax.c) and their sub\-functions.
 
@@ -655,7 +681,7 @@ These functions all have a similar syntax and always return an integer as return
 
 There are 2 groups of functions, one where a suffix is required, one with no suffix.
 
-#### Functions with a suffix {#T48}
+#### Functions with a suffix {#T50}
 
 Some functions need a suffix in the report syntax. For example $DataDelete and $DataUpdate required a suffix indicating which type of objects is the target (one of the 7 IODE objects). In that way, only one function is needed for $DataDeleteVar or $DataDeleteIdt...
 
@@ -685,7 +711,7 @@ generates the C call:
     where arg == "A B C" and type == K_VAR
 ```
 
-#### Other functions {#T49}
+#### Other functions {#T51}
 
 All other functions receive simply the argument on the report line. B\_DataListSort(), for example, has only one argument.
 
@@ -696,7 +722,7 @@ For these functions, the parameters and return values are as follows:
 @return     int             0 on success, -1 on error (not enough args)
 ```
 
-#### List of functions {#T50}
+#### List of functions {#T52}
 
 |Syntax|Description|
 |:---|:---|
@@ -721,7 +747,7 @@ For these functions, the parameters and return values are as follows:
 |`int B_DataDisplayGraph(char* arg)`|Shows VARs or combinations of VARS in graphical form.|
 |`int B_DataPrintGraph(char* arg)`|Prints VARs or combinations of VARS in graphical form.|
 
-### b\_est.c {#T51}
+### b\_est.c {#T53}
 
 Estimation functions called in IODE reports.
 
@@ -735,7 +761,7 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
         the return code is 0 on success, any other value indicating and error
 ```
 
-#### List of functions {#T52}
+#### List of functions {#T54}
 
 |Syntax|Description|
 |:---|:---|
@@ -747,11 +773,21 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
 |`int B_EqsSetCmt(char* arg)`|Implementation of the report function $EqsSetCmt.|
 |`int B_EqsSetInstrs(char* arg)`|Implementation of the report function $EqsSetInstrs.|
 
-### b\_model.c {#T53}
+### b\_step.c {#T55}
+
+Report function that estimates a block of equations and finds the best possible tests for all possible combinations of coefficients.
+
+#### List of functions {#T56}
+
+|Syntax|Description||
+|:---|:---|:---|
+|`int B_EqsStepWise(char* arg)`|$EqsStepWise from to eqname leccond \{r2|fstat\}|
+
+### b\_model.c {#T57}
 
 Report functions related to model simulations.
 
-#### List of functions {#T54}
+#### List of functions {#T58}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -764,11 +800,11 @@ Report functions related to model simulations.
 |`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|
 |`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|
 
-### b\_ws.c {#T55}
+### b\_ws.c {#T59}
 
 Functions related to WS management (clear, load, save, sample, import...).
 
-#### List of functions {#T56}
+#### List of functions {#T60}
 
 |Syntax|Equivalent in Reports|
 |:---|:---|
@@ -800,7 +836,7 @@ Functions related to WS management (clear, load, save, sample, import...).
 |`int B_CsvAxes(char *var)`|$CsvAxes AxisName|
 |`int B_CsvDec(char *dec)`|$CsvDec char|
 
-### b\_rep\_super.c {#T57}
+### b\_rep\_super.c {#T61}
 
 Default implementation of GUI report functions (called in non\-GUI programs).
 
@@ -833,19 +869,142 @@ int SB_WsLoad ()
 
 In the GUI version, the function pointer SB\_WsLoad\_super should be replaced by a GUI implementation of the function.
 
-## Iode Report @\-functions {#T58}
+### b\_pdest.c {#T62}
+
+Functions (and their subfunctions) called by the report engine to set up printing parameters and to generate outputs in various formats.
+
+#### List of functions {#T63}
+
+|Syntax|Description or equivalent in Reports||||||||
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+|`int B_PrintDestExt(char* file, int newf, int type)`|Define the printing destination.||||||||
+|`int B_PrintDestFile(char *arg, int newf)`|Define the output file for the following printouts.||||||||
+|`int B_PrintDest(char *file)`|$PrintDest \[nom\_fichier\] \[format\]||||||||
+|`int B_PrintDestNew(char* file)`|$PrintDestNew \[nom\_fichier\] \[format\]||||||||
+|`int B_PrintNbDec(char* nbdec)`|$PrintNbDec nb||||||||
+|`int B_PrintLang(char* lang)`|$PrintLang \{English|French|Dutch\}||||||
+|`int B_PrintMulti(char* multi)`|$PrintMulti STACKMODE||||||||
+|`int B_PrintA2mAppend(char* arg)`|$PrintA2mAppend \[NO|Yes\]|||||||
+|`int B_PrintTBreak(char* arg)`|$PrintTableBreak \[NO|Yes\]|||||||
+|`int B_PrintTPage(char* arg)`|$PrintTablePage \[NO|Yes\]|||||||
+|`int B_PrintGPage(char* arg)`|$PrintGraphPage \[NO|Yes\]|||||||
+|`int B_PrintParaNum(char* arg)`|$PrintParanum \[NO|Yes\]|||||||
+|`int B_PrintPageHeader(char* arg)`|$PrintPageHeader following\_pages\_title||||||||
+|`int B_PrintPageFooter(char* arg)`|$PrintPageFooter following\_pages\_footer||||||||
+|`int B_PrintFont(char* arg)`|$PrintFont Times|Helvetica|Courier|Bookman|Palatino \[size \[incr\]\]||||
+|`int B_PrintTFont(char* arg)`|$PrintTableFont Times|Helvetica|Courier|Bookman|Palatino \[size\]||||
+|`int B_PrintTBox(char* arg)`|$PrintTableBox n||||||||
+|`int B_PrintTColor(char* arg)`|$PrintTableColor \[NO|Yes\]|||||||
+|`int B_PrintTWidth(char* arg)`|$PrintTableWidth width \[col1 \[coln\]\]||||||||
+|`int B_PrintGSize(char* arg)`|$PrintGraphSize width \[height\] \[fontsize\]||||||||
+|`int B_PrintGTheme(char* arg)`|$PrintGraphTheme theme||||||||
+|`int B_PrintGBand(char* arg)`|$PrintGraphBand \[per\_from per\_to\]||||||||
+|`int B_PrintGBox(char* arg)`|$PrintGraphBox n||||||||
+|`int B_PrintGBrush(char* arg)`|$PrintGraphBrush pct|Yes|||||||
+|`int B_GetColor(char* arg)`|Sub function of B\_PrintColor() to interpret color names.||||||||
+|`int B_PrintGColor(char* arg)`|$PrintBackground Black|Blue|Magenta|Cyan|Red|Green|Yellow|White|
+|`int B_PrintRtfHelp(char* arg)`|$PrintRtfHelp \[YES|No\]|||||||
+|`int B_PrintHtmlHelp(char* arg)`|$PrintHtmlHelp \[YES|No\]|||||||
+|`int B_PrintRtfTitle(char* arg)`|$PrintRtfTitle Help title||||||||
+|`int B_PrintRtfCopy(char* arg)`|$PrintRtfCopyright copyright text||||||||
+|`int B_PrintRtfLevel(char* arg)`|$PrintRtfLevel \[\+||n\]||||||
+|`int B_PrintRtfTopic(char* arg)`|$PrintRtfTopic topic title||||||||
+|`int B_PrintGdiOrient(char* arg)`|$PrintOrientation \{Portrait|Landscape\}|||||||
+|`int B_PrintGdiDuplex(char* arg)`|$PrintDuplex \{Simplex|Duplex|VerticalDuplex\}||||||
+|`int B_PrintGdiPrinter(char* arg)`|$SetPrinter printer\_name||||||||
+|`int B_PrintGIFBackColor(char* arg)`|$PrintGIFBackColor \{Black|Blue|Magenta|Cyan|Red|Green|Yellow|White\}|
+|`int B_PrintGIFTransColor(char* arg)`|$PrintGIFTransColor \{Black|Blue|Magenta|Cyan|Red|Green|Yellow|White\}|
+|`int B_PrintGIFInterlaced(char* arg)`|$PrintGIFInterlaced \{Yes|No\}|||||||
+|`int B_PrintGIFTransparent(char* arg)`|$PrintGIFTransparent \{Yes|No\}|||||||
+|`int B_PrintGIFFilled(char* arg)`|$PrintGIFilled \{Yes|No\}|||||||
+|`int B_PrintGIFFont(char* arg)`|$PrintGIFFont FontNb (between 0 and 5)||||||||
+|`int B_PrintHtmlStrip(char* arg)`|$PrintHtmlStrip \[YES|No\]|||||||
+|`int B_PrintHtmlStyle(char* arg)`|$PrintHtmlStyle filename||||||||
+|`int B_A2mToAll(char* arg, int type)`|Convert an A2M file to another format.||||||||
+|`int B_A2mToPrinter(char* arg)`|$A2mToPrinter file.a2m||||||||
+|`int B_A2mToHtml(char* arg)`|$A2mToHtml filein fileout||||||||
+|`int B_A2mToRtf(char* arg)`|$A2mToRtf filein fileout||||||||
+|`int B_A2mToMif(char* arg)`|$A2mToMif filein fileout||||||||
+|`int B_A2mToCsv(char* arg)`|$A2mToCsv filein fileout||||||||
+|`int B_A2mSetCol(int *dest, int col)`|Extracts a color definition from B\_GIFCOLS and saves it in dest\[3\].||||||||
+|`int B_PrintHtmlTableClass(char *table_class)`|$PrintHtmlTableClass class\_name||||||||
+|`int B_PrintHtmlTRClass(char *tr_class)`|$PrintHtmlTRClass class\_name||||||||
+|`int B_PrintHtmlTHClass(char *th_class)`|$PrintHtmlTHClass class\_name||||||||
+|`int B_PrintHtmlTDClass(char *td_class)`|$PrintHtmlTDClass class\_name||||||||
+
+### b\_print.c {#T64}
+
+Functions (and their subfunctions) to print IODE object definitions.
+
+#### List of functions {#T65}
+
+|Syntax|Description or equivalent in Reports|||
+|:---|:---|:---|:---|
+|`int B_PrintVal(IODE_REAL val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
+|`IODE_REAL B_calc_ttest(SCL* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
+|`int B_replesc(unsigned char* out, unsigned char* in)`|Replace \\ by / in a string|||
+|`int B_PrintDefGnl(char* name, char* text)`|Print an object name and its title in an enum\_1 paragraph.|||
+|`int B_isdef(char* txt)`|Checks if a string contains non space charaters.|||
+|`int B_dump_str(unsigned char*head, unsigned char*txt)`|Print a header and a modified text: spaces are added before and after specific characters in the text|||
+|`int B_get1int(char* arg)`|Return the integer value of the beginning of a string.|||
+|`int B_ScrollSet(char* arg, long *plong, int inf, int sup)`|Interprets the first part of a string as a integer and check that the value is between 2 boundaries.|||
+|`int B_PrintObjTblTitle(char* arg)`|$PrintObjTitle 0 or 1|||
+|`int B_PrintObjLec(char* arg)`|$PrintObjLec \{0||\}|
+|`int B_PrintObjEqsInfos(char* arg)`|$PrintObjInfos \{0||\}|
+|`int B_PrintObjDef_1(char* arg, int* type)`|Print the definition of the object named arg of the given type|||
+|`int B_PrintObjDef(char* arg, int type)`|$PrintObjDefXxx object\_list|||
+|`int B_PrintObjDefArgs(char* arg, int type)`|Print a list of objects of a given type.|||
+|`int B_PrintDefTbl(KDB* kdb, int pos)`|Print the table in position pos in kdb.|||
+|`int B_DumpTblDef(TBL* tbl)`|Print a table definition.|||
+|`int B_CellDef(TCELL* cell)`|Checks that a TCELL is not empty (for TEXT cells) and not "1" (for LEC cells).|||
+|`int B_PrintTblCell(TCELL* cell, int straddle)`|Print a TABLE cell optionally on several columns.|||
+|`int B_PrintDefCmt(KDB* kdb, int pos)`|Print a comment.|||
+|`int B_PrintDefLst(KDB* kdb, int pos)`|Print a list.|||
+|`int B_PrintDefIdt(KDB* kdb, int pos)`|Print a identity.|||
+|`int B_PrintDefEqs(KDB* kdb, int pos)`|Print a equation.|||
+|`int B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs)`|Print a LEC expression. Set the engogenous (name) in bold.|||
+|`int B_PrintEqs(char* name, EQ* eq)`|Print an equation and optionally its statistical tests.|||
+|`int B_PrintDefSclPtr(SCL* scl, char*name, int enum_)`|Print a scalar in an enumeration list.|||
+|`int B_PrintDefScl(KDB* kdb, int pos)`|Print the scalar kdb\[pos\].|||
+|`int B_PrintDefVar(KDB* kdb, int pos)`|Print the variable kdb\[pos\] in a table. Sub\-function of B\_PrintObjDef\_1().|||
+
+### b\_view.c {#T66}
+
+Functions to display or print calculated tables and tables of variables. The same functions are used to print and to display tables as graphs or as text.
+
+The functions generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
+
+#### List of functions {#T67}
+
+|Syntax|Description or equivalent in Reports|
+|:---|:---|
+|`int B_ViewVar(char* arg)`|Display a list of variables in the form of tables of max 50 variables.|
+|`int B_PrintVar(char* arg)`|Print a list of variables in the form of tables of max 50 variables.|
+|`int B_ViewPrintVar(char* arg, int mode)`|Print or display (according to the mode parameter) variables in the form of tables.|
+|`int B_ViewByTbl(char* arg)`|$ViewTbl sample table \[list of tables\]|
+|`int B_ViewTbl(char* arg)`|Alias of B\_ViewByTbl()|
+|`int B_PrintTbl(char* arg)`|$PrintTbl gsample table1 \[table2...\]|
+|`int B_ViewGr(char* arg)`|$ViewGr gsample tbl1\[\+tbl2\] tbl3 ...|
+|`int B_PrintGr(char* arg)`|$PrintGr gsample table1 \[table2...\]|
+|`int B_ViewPrintTbl_1(char* name, char* smpl)`|Calculate and display (or print according to the value of B\_viewmode) a table on a specified GSAMPLE.|
+|`int B_ViewPrintGr_1(char* names, char* gsmpl)`|Calculate and display (or print according to the value of B\_viewmode) a graph on a specified GSAMPLE, based on TBL definition(s).|
+|`int B_ViewPrintTbl(char* arg, int type, int mode)`|Calculate, then print or display (according to the mode parameter) IODE TBLs either in the form of graphs or in the form of text (SCROLLs).|
+|`int B_ViewTblFile(char* arg)`|$PrintTblFile n varfilename (n := 2, 3, 4, 5)|
+|`int B_ViewTblEnd()`|Close a Print tables or Print variables session.|
+
+## Iode Report @\-functions {#T68}
 
 When the report engine finds a @function() in a report line, the @\-function is calculated and its result replaces "in\-place" the @function and its parameters.
 
 The available @\-functions are defined in the table `RP_FNS[]` (in b\_rep\_syntax.c), which contains the names and associated C function pointers. The functions themselves are called by RP\_fneval().
 
-#### @\-function parameters specifications {#T59}
+#### @\-function parameters specifications {#T69}
 
 - parameters are separated by commas.
 - spaces are regular characters (and, if present, are included in the parameters)
 - parameters enclosed by double quotes "" may contain spaces or commas
 
-#### Examples {#T60}
+#### Examples {#T70}
 
 ```
       "@take(2,ABCDE)"        => "AB"
@@ -881,7 +1040,7 @@ To add a new @function:
 
 More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions\_de\_rapports
 
-#### List of functions {#T61}
+#### List of functions {#T71}
 
 |Syntax|
 |:---|
@@ -949,9 +1108,9 @@ More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions
 |`U_ch *RPF_mkdir(U_ch **args)`|
 |`U_ch *RPF_rmdir(U_ch **args)`|
 
-## Example of report with @\-functions {#T62}
+## Example of report with @\-functions {#T72}
 
-### Report {#T63}
+### Report {#T73}
 
 ```
     $ `@-functions()` tests and examples
@@ -1410,7 +1569,7 @@ More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions
     $return
 ```
 
-### Resulting a2m file {#T64}
+### Resulting a2m file {#T74}
 
 ```
     STRINGS
@@ -1835,9 +1994,9 @@ More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions
         @void(@vexpand(*))        =>  ""
 ```
 
-## Example of report with $procdef and $foreach {#T65}
+## Example of report with $procdef and $foreach {#T75}
 
-### Report {#T66}
+### Report {#T76}
 
 ```
     $ Testing various procedures
@@ -1918,7 +2077,7 @@ More details can be found here : https://iode.plan.be/doku.php?id=les\_fonctions
     $procexec print_eq ACAG ACAF
 ```
 
-### Resulting a2m file {#T67}
+### Resulting a2m file {#T77}
 
 ```
         Hello IODE!

@@ -553,14 +553,22 @@ For these functions, the parameters and return values are as follows:
 
 &EN <b_htol.c> : transformation of high periodicity to low periodicity series.
 &EN <b_ltoh.c> : transformation of low periodicity series to high periodicity series.
+&EN <b_trend.c>  : Implementation of the **Hodrick-Prescott** method for trend series construction. 
 &EN <b_ras.c>  : implementation of a RAS algorithm.
 
 &EN <b_data.c> : functions acting on data (i.e.: IODE objects)
 &EN <b_est.c>  : estimation functions
+&EN <b_step.c>  : find the best possible tests for all possible combinations of coefficients in a block of equations
 
 &EN <b_model.c> : model simulation, decomposition and recompilation
 &EN <b_ws.c>    : functions related to WS management (clear, load, save, sample...)
 &EN <b_rep_super.c>: IODE report super function default implementations for non-GUI programs
+
+&EN <b_pdest.c> : functions to set up printing parameters and to generate outputs in various formats.
+&EN <b_print.c> : functions to print object definitions.
+&EN <b_view.c> : functions to display or print tables and variables as text or as graphs.
+
+
 >
 
 
@@ -682,6 +690,38 @@ Except for B_EqsEstimateEqs(), all functions in this group share the same syntax
 | ~cint B_EqsSetInstrs(char* arg)                  |  Implementation of the report function $EqsSetInstrs.
 ..te
 >
+
+<b_step.c>
+b_step.c
+¯¯¯¯¯¯¯¯¯¯
+
+Report function that estimates a block of equations and finds the best possible tests 
+for all possible combinations of coefficients.
+
+&IT List of functions 
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+..tb
+| Syntax                         | Description
+| ~cint B_EqsStepWise(char* arg) | $EqsStepWise from to eqname leccond {r2|fstat}
+..te
+>
+
+<b_trend.c>
+b_trend.c
+¯¯¯¯¯¯¯¯¯¯
+
+Implementation of the **Hodrick-Prescott** method for trend series construction. 
+
+&IT List of functions 
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+..tb
+| Syntax                         | Description
+| ~cint B_WsTrend(char* arg)     | $WsTrend VarFilename Lambda series1 series2 ...
+| ~cint B_WsTrendStd(char* arg)  | $WsTrendStd VarFilename Lambda series1 series2 ...
+..te
+>
+
+
 
 <b_fsys.c>
 b_fsys.c
@@ -989,6 +1029,143 @@ More details can be found here : https://iode.plan.be/doku.php?id=les_fonctions_
 ..te
 >
 
+<b_pdest.c>
+b_pdest.c
+¯¯¯¯¯¯¯¯¯
+Functions (and their subfunctions) called by the report engine to set up printing parameters and
+to generate outputs in various formats.
+
+
+&IT List of functions
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+..tb
+| Syntax                                               | Description or equivalent in Reports
+| ~cint B_PrintDestExt(char* file, int newf, int type) | Define the printing destination.
+| ~cint B_PrintDestFile(char *arg, int newf)           | Define the output file for the following printouts.
+| ~cint B_PrintDest(char *file)                        | $PrintDest [nom_fichier] [format]
+| ~cint B_PrintDestNew(char* file)                     | $PrintDestNew [nom_fichier] [format]
+| ~cint B_PrintNbDec(char* nbdec)                      | $PrintNbDec nb
+| ~cint B_PrintLang(char* lang)                        | $PrintLang {English | French | Dutch}
+| ~cint B_PrintMulti(char* multi)                      | $PrintMulti STACKMODE
+| ~cint B_PrintA2mAppend(char* arg)                    | $PrintA2mAppend [NO|Yes]
+| ~cint B_PrintTBreak(char* arg)                       | $PrintTableBreak [NO|Yes]
+| ~cint B_PrintTPage(char* arg)                        | $PrintTablePage  [NO|Yes]
+| ~cint B_PrintGPage(char* arg)                        | $PrintGraphPage [NO|Yes]
+| ~cint B_PrintParaNum(char* arg)                      | $PrintParanum [NO|Yes]
+| ~cint B_PrintPageHeader(char* arg)                   | $PrintPageHeader following_pages_title
+| ~cint B_PrintPageFooter(char* arg)                   | $PrintPageFooter following_pages_footer
+| ~cint B_PrintFont(char* arg)                         | $PrintFont Times|Helvetica|Courier|Bookman|Palatino [size [incr]]
+| ~cint B_PrintTFont(char* arg)                        | $PrintTableFont Times|Helvetica|Courier|Bookman|Palatino [size]
+| ~cint B_PrintTBox(char* arg)                         | $PrintTableBox n
+| ~cint B_PrintTColor(char* arg)                       | $PrintTableColor [NO|Yes]
+| ~cint B_PrintTWidth(char* arg)                       | $PrintTableWidth width [col1 [coln]]
+| ~cint B_PrintGSize(char* arg)                        | $PrintGraphSize  width [height] [fontsize]
+| ~cint B_PrintGTheme(char* arg)                       | $PrintGraphTheme theme
+| ~cint B_PrintGBand(char* arg)                        | $PrintGraphBand [per_from per_to]
+| ~cint B_PrintGBox(char* arg)                         | $PrintGraphBox n
+| ~cint B_PrintGBrush(char* arg)                       | $PrintGraphBrush pct|Yes
+| ~cint B_GetColor(char* arg)                          | Sub function of B_PrintColor() to interpret color names.
+| ~cint B_PrintGColor(char* arg)                       | $PrintBackground Black|Blue|Magenta|Cyan|Red|Green|Yellow|White
+| ~cint B_PrintRtfHelp(char* arg)                      | $PrintRtfHelp [YES|No]
+| ~cint B_PrintHtmlHelp(char* arg)                     | $PrintHtmlHelp [YES|No]
+| ~cint B_PrintRtfTitle(char* arg)                     | $PrintRtfTitle Help title
+| ~cint B_PrintRtfCopy(char* arg)                      | $PrintRtfCopyright copyright text
+| ~cint B_PrintRtfLevel(char* arg)                     | $PrintRtfLevel [+|-|n]
+| ~cint B_PrintRtfTopic(char* arg)                     | $PrintRtfTopic topic title
+| ~cint B_PrintGdiOrient(char* arg)                    | $PrintOrientation {Portrait|Landscape}
+| ~cint B_PrintGdiDuplex(char* arg)                    | $PrintDuplex {Simplex|Duplex|VerticalDuplex}
+| ~cint B_PrintGdiPrinter(char* arg)                   | $SetPrinter printer_name
+| ~cint B_PrintGIFBackColor(char* arg)                 | $PrintGIFBackColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
+| ~cint B_PrintGIFTransColor(char* arg)                | $PrintGIFTransColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
+| ~cint B_PrintGIFInterlaced(char* arg)                | $PrintGIFInterlaced {Yes|No} 
+| ~cint B_PrintGIFTransparent(char* arg)               | $PrintGIFTransparent {Yes|No}
+| ~cint B_PrintGIFFilled(char* arg)                    | $PrintGIFilled {Yes|No}
+| ~cint B_PrintGIFFont(char* arg)                      | $PrintGIFFont FontNb (between 0 and 5)
+| ~cint B_PrintHtmlStrip(char* arg)                    | $PrintHtmlStrip [YES|No]
+| ~cint B_PrintHtmlStyle(char* arg)                    | $PrintHtmlStyle filename
+| ~cint B_A2mToAll(char* arg, int type)                | Convert an A2M file to another format.
+| ~cint B_A2mToPrinter(char* arg)                      | $A2mToPrinter file.a2m
+| ~cint B_A2mToHtml(char* arg)                         | $A2mToHtml filein fileout
+| ~cint B_A2mToRtf(char* arg)                          | $A2mToRtf filein fileout
+| ~cint B_A2mToMif(char* arg)                          | $A2mToMif filein fileout
+| ~cint B_A2mToCsv(char* arg)                          | $A2mToCsv filein fileout
+| ~cint B_A2mSetCol(int *dest, int col)                | Extracts a color definition from B_GIFCOLS and saves it in dest[3].
+| ~cint B_PrintHtmlTableClass(char *table_class)       | $PrintHtmlTableClass class_name
+| ~cint B_PrintHtmlTRClass(char *tr_class)             | $PrintHtmlTRClass class_name
+| ~cint B_PrintHtmlTHClass(char *th_class)             | $PrintHtmlTHClass class_name
+| ~cint B_PrintHtmlTDClass(char *td_class)             | $PrintHtmlTDClass class_name
+..te
+>
+
+<b_print.c> 
+b_print.c
+¯¯¯¯¯¯¯¯¯¯¯¯
+Functions (and their subfunctions) to print IODE object definitions.
+
+&IT List of functions
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+..tb
+| Syntax                                               | Description or equivalent in Reports
+| ~cint B_PrintVal(IODE_REAL val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
+| ~cIODE_REAL B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
+| ~cint B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
+| ~cint B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
+| ~cint B_isdef(char* txt)                                           | Checks if a string contains non space charaters.
+| ~cint B_dump_str(unsigned char*head, unsigned char*txt)            | Print a header and a modified text: spaces are added before and after specific characters in the text
+| ~cint B_get1int(char* arg)                                         | Return the integer value of the beginning of a string.
+| ~cint B_ScrollSet(char* arg, long *plong, int inf, int sup)        | Interprets the first part of a string as a integer and check that the value is between 2 boundaries.
+| ~cint B_PrintObjTblTitle(char* arg)                                | $PrintObjTitle 0 or 1
+| ~cint B_PrintObjLec(char* arg)                                     | $PrintObjLec {0|1|2}
+| ~cint B_PrintObjEqsInfos(char* arg)                                | $PrintObjInfos {0|1|2}
+| ~cint B_PrintObjDef_1(char* arg, int* type)                        | Print the definition of the object named arg of the given type
+| ~cint B_PrintObjDef(char* arg, int type)                           | $PrintObjDefXxx object_list
+| ~cint B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
+| ~cint B_PrintDefTbl(KDB* kdb, int pos)                             | Print the table in position pos in kdb.  
+| ~cint B_DumpTblDef(TBL* tbl)                                       | Print a table definition.
+| ~cint B_CellDef(TCELL* cell)                                       | Checks that a TCELL is not empty (for TEXT cells) and not "1" (for LEC cells).
+| ~cint B_PrintTblCell(TCELL* cell, int straddle)                    | Print a TABLE cell optionally on several columns.
+| ~cint B_PrintDefCmt(KDB* kdb, int pos)                             | Print a comment.
+| ~cint B_PrintDefLst(KDB* kdb, int pos)                             | Print a list.
+| ~cint B_PrintDefIdt(KDB* kdb, int pos)                             | Print a identity.
+| ~cint B_PrintDefEqs(KDB* kdb, int pos)                             | Print a equation.
+| ~cint B_PrintLec(char* name, char* eqlec, CLEC* eqclec, int coefs) | Print a LEC expression. Set the engogenous (name) in bold.
+| ~cint B_PrintEqs(char* name, EQ* eq)                               | Print an equation and optionally its statistical tests.
+| ~cint B_PrintDefSclPtr(SCL* scl, char*name, int enum_)             | Print a scalar in an enumeration list.
+| ~cint B_PrintDefScl(KDB* kdb, int pos)                             | Print the scalar kdb[pos].
+| ~cint B_PrintDefVar(KDB* kdb, int pos)                             | Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
+..te
+
+>
+
+
+<b_view.c>
+b_view.c
+¯¯¯¯¯¯¯¯
+Functions to display or print calculated tables and tables of variables. The same functions are used
+to print and to display tables as graphs or as text.
+
+The functions generate IODE tables in A2M format based on TBL structures and GSAMPLE definition.
+
+&IT List of functions 
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+..tb
+| Syntax                                                | Description or equivalent in Reports
+| ~cint B_ViewVar(char* arg)                            | Display a list of variables in the form of tables of max 50 variables.
+| ~cint B_PrintVar(char* arg)                           | Print a list of variables in the form of tables of max 50 variables.
+| ~cint B_ViewPrintVar(char* arg, int mode)             | Print or display (according to the mode parameter) variables in the form of tables. 
+| ~cint B_ViewByTbl(char* arg)                          | $ViewTbl sample table [list of tables]
+| ~cint B_ViewTbl(char* arg)                            | Alias of B_ViewByTbl()
+| ~cint B_PrintTbl(char* arg)                           | $PrintTbl gsample table1 [table2...]
+| ~cint B_ViewGr(char* arg)                             | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
+| ~cint B_PrintGr(char* arg)                            | $PrintGr gsample table1 [table2...]
+| ~cint B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSAMPLE.
+| ~cint B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSAMPLE, based on TBL definition(s).
+| ~cint B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE TBLs either in the form of graphs or in the form of text (SCROLLs).
+| ~cint B_ViewTblFile(char* arg)                        | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
+| ~cint B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
+..te
+>
+ 
 <Example of report with @-functions>
 Example of report with @-functions
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
