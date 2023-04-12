@@ -13,7 +13,7 @@ START
     Notes techniques
     컴컴컴컴컴컴컴컴
 
-&EN <Version 6.66> (16/03/2023)
+&EN <Version 6.66> (13/04/2023)
 &EN <Version 6.65> (13/03/2023)
 &EN <Version 6.64> (27/02/2023)
 &EN <Version 6.63> (30/09/2020)

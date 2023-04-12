@@ -16,7 +16,7 @@
 ===== Download =====
 Note that a **"New installation"** requires Administrator rights (file associations cannot be defined w/o Administrator privileges). An **"Upgrade"** can be installed by any user, provided that he has write access to the destination directory.
 
-  * 6.66 (16/03/2023) -> [[version_6dot_66|View log]]
+  * 6.66 (13/04/2023) -> [[version_6dot_66|View log]]
     *{{:download:iode666.exe|New installation}}
     *{{:download:iode666upd.exe|Upgrade }}
   * 6.65 (13/03/2023) -> [[version_6dot_65|View log]]
@@ -79,9 +79,6 @@ IODE is available for different usages :
 
 ===== IODE for python =====
 Note : these modules are only available for the latest IODE version.
-  *{{:download:py36:iode.pyd|iode.pyd for python3.6}}
-  *{{:download:py37:iode.pyd|iode.pyd for python3.7}}
-  *{{:download:py38:iode.pyd|iode.pyd for python3.8}}
   *{{:download:py39:iode.pyd|iode.pyd for python3.9}}
   *{{:download:py310:iode.pyd|iode.pyd for python3.10}}
 
