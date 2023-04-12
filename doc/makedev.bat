@@ -19,11 +19,12 @@ call :ConvertM_to_MD IDENTITIES.m
 call :ConvertM_to_MD LEC.m
 call :ConvertM_to_MD MAKE_IODE.m
 call :ConvertM_to_MD PRINTING.m
-call :ConvertM_to_MD PYIODE.m
 call :ConvertM_to_MD REPORTS.m
 call :ConvertM_to_MD SIMUL.m
 call :ConvertM_to_MD SOURCES.m
 call :ConvertM_to_MD TBL_CALC.m
+call :ConvertM_to_MD IODE_TESTS.m
+call :ConvertM_to_MD PYIODE.m
 
 move /Y CONVERSIONS.md ..\..\build\dev
 move /Y DESCRIPTION.md ..\..\build\dev
@@ -36,7 +37,8 @@ move /Y REPORTS.md     ..\..\build\dev
 move /Y SIMUL.md       ..\..\build\dev
 move /Y SOURCES.md     ..\..\build\dev
 move /Y TBL_CALC.md    ..\..\build\dev
-move /Y PYIODE.md      ..\..\..\pyiode
+move /Y IODE_TESTS.md  ..\..\build\dev
+move /Y PYIODE.md      ..\..\build\dev
 
 ENDLOCAL
 
