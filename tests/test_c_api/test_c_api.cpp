@@ -9,14 +9,14 @@
 
 
 // BEGIN_KEEP
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return(0); }
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//extern "C"
+//{
+//#endif
+//    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return(0); }
+//#ifdef __cplusplus
+//}
+//#endif
 // END_KEEP
 
 
@@ -47,7 +47,7 @@ extern "C"
 //    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
 //    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
 //    //int B_PrintRtfTopic(char* x) { return(0); }
-//    int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
 //    //int W_printf(char*fmt, ...) {return(0);}
 //    //void K_load_iode_ini() {}
 //    //void K_save_iode_ini() {}
@@ -906,7 +906,7 @@ public:
 	    if(done) return;
 	    done = 1;
 	
-	    B_IodeMsgPath();            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
+	    //B_IodeMsgPath();            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
 	
 	    IODE_assign_super_API();    // set *_super fn pointers
 	    // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub
