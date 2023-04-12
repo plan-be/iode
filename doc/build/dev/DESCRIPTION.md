@@ -67,6 +67,10 @@
   - [Group "IODE Printing"](#T61)
   - [Group "IODE object conversions"](#T62)
   - [Group "Iode Reports"](#T63)
+  - [Group "Iode high\-level API"](#T64)
+    - [b\_api.c](#T65)
+  - [Group "DDE communcations"](#T66)
+    - [b\_dde.c](#T67)
 
 # IODE: functions by group {#T1}
 
@@ -90,6 +94,8 @@
 - Group "Iode Printing" 
 - Group "IODE object conversions" 
 - Group "Iode Reports" 
+- Group "Iode high\-level API" 
+- Group "DDE communcations" 
 
 ## Function names in IODE {#T2}
 
@@ -766,4 +772,125 @@ See [CONVERSIONS.md](CONVERSIONS.md).
 ## Group "Iode Reports" {#T63}
 
 See [REPORTS.md](REPORTS.md).
+
+## Group "Iode high\-level API" {#T64}
+
+### b\_api.c {#T65}
+
+Set of high\-level functions essentially developed for the creation of the Cython implementation of IODE. Most of these functions are (almost) aliases to other API functions but with a different and more coherent naming convention.
+
+|Syntax|Description|
+|:---|:---|
+|`int IodeInit()`|Initialise an IODE session.|
+|`int IodeEnd()`|Terminate an IODE session.|
+|`char *IodeVersion()`|Return the IODE version in a const string.|
+|**WS related functions**||
+|` int IodeLoad(char *name, int type)`|Return the IODE version in a const string.|
+|` int IodeSave(char *name, int type)`|Load an IODE workspace file.|
+|` int IodeClearWs(int type)`|Clear a workspace.|
+|` int IodeClearAll()`|Clear all workspaces.|
+|` char **IodeContents(char *pattern, int type)`|Returns a table of object names corresponding to the specified pattern.|
+|**SAMPLE Functions**||
+|` int IodeGetSampleLength()`|Returns the current sample length (0 if undefined)|
+|` int IodeIsSampleSet()`|Indicates if the VAR sample is defined|
+|` char *IodeGetSampleAsString()`|Returns current sample in an ALLOCATED string in the form "per1 per2".|
+|` char **IodeGetSampleAsPeriods()`|Return all periods of the current KV\_WS sample in a table of strings.|
+|` char **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to)`|Return all periods from aper\_from to aper\_to in a table of strings.|
+|` double *IodeGetSampleAsDoubles(int *lg)`|Return a sample as a list of doubles.|
+|` int IodeSetSampleStr(char* str_from, char* str_to)`|Set the WS sample from periods as strings|
+|` int IodeSetSample(int from, int to)`|Set the WS sample from integers (yearly only).|
+|**OBJECTS MANIPULATION FUNCTIONS**||
+|` int IodeDeleteObj(char* obj_name, int obj_type)`|Delete the object obj\_name of type obj\_type.|
+|` char *IodeGetCmt(char *name)`|Return a pointer to the comment "name". The pointer cannot be freed.|
+|` int IodeSetCmt(char *name, char *cmt)`|Save a the comment cmt under the name "name".|
+|` int IodeGetEqs(char *name, char**lec, int *method, char*sample_from, char* sample_to, char**blk, char**instr, float *tests)`|Retrieve an equation and its elements.|
+|` char *IodeGetEqsLec(char *name)`|Retrieve the (non allocated) LEC form of the equation "name".|
+|` int IodeSetEqs(char *name, char *eqlec)`|Change the LEC form of an equation.|
+|` char *IodeGetIdt(char *name)`|Return the (non allocated) pointer to an identity.|
+|` int IodeSetIdt(char *name, char *idt)`|Set the LEC form of an identity.|
+|` char *IodeGetLst(char *name)`|Return the (non allocated) pointer to a list.|
+|` int IodeSetLst(char *name, char *lst)`|Set a list value.|
+|` int IodeGetScl(char *name, double* value, double *relax, double *std_err)`|Change the values of an existing scalar. Return \-1 if the scalar does not exist.|
+|` int IodeSetScl(char *name, double value, double relax, double std)`|Set the values of a scalar. The scalar is created if it does not exist.|
+|` char* IodeGetTbl(char *name, char *gsmpl)`|Compute a table on the GSAMPLE gsmpl and return a string containing the result.|
+|` char* IodeGetTblTitle(char *name)`|Return a table (first) title in an not allocated string.|
+|` TBL* IodeGetTblDefinition(char *name)`|Return a table struct|
+|` int IodeSetTblFile(int ref, char *filename)`|Load the var file filename and set its reference number to ref.|
+|` double IodeGetVarT(char *name, int t, int mode)`|Get the value of the variable name at position t where t is the position in the KV\_WS SAMPLE.|
+|` int IodeSetVarT(char *name, int t, int mode, double value)`|Set the value of the variable name at position t, possibly after recalulation based on value and mode.|
+|` double *IodeGetVector(char *name, int *lg)`|Returns a pointer to the first value of the VAR name.|
+|` int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg)`||
+|` int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)`|Determines the position to copy from (python object), where to copy to (KV\_WS) and the nb of elements to copy|
+|**ESTIMATION**||
+|` int IodeEstimate(char* veqs, char* afrom, char* ato)`|Estimate an equation of a given sample.|
+|**SIMULATION**||
+|` int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug)`|Simulate of model.|
+|**REPORTS**||
+|` int IodeExecArgs(char *filename, char **args)`|Execute a report with optionnal parameters.|
+|` int IodeExec(char *filename)`|Execute a report with no parameters.|
+|**LEC DIRECT EXECUTION**||
+|` static CLEC* IodeLinkLec(char* lec)`|Compile and link a LEC expression with the KV\_WS and KS\_WS.|
+|` double IodeExecLecT(char* lec, int t)`|Calc a LEC expression in t.|
+|` double *IodeExecLec(char* lec)`|Calculate a LEC expression on the full KV\_WS sample.|
+|**MESSAGES**||
+|` void IodeSuppressMsgs()`|Suppress all messages from the A2M interpretor and from the IODE functions.|
+|` void IodeResetMsgs()`|Reset the messages from the A2M interpretor and from the IODE functions.|
+|**MISCELLANEOUS**||
+|` int IodeSetNbDec(int nbdec)`|Define the number of decimals in the tables and variables to be printed.|
+|` int IodeGetNbDec()`|Returns the number of decimals currently set for the printing of tables and variables.|
+
+## Group "DDE communcations" {#T66}
+
+### b\_dde.c {#T67}
+
+This file contains 2 groups of functions: the implementation of the IODE DDE server, allowing access to IODE functions from inside any program able to interact with a DDE server, like Excel or Word and functions to access the Excel DDE server.
+
+Some of IODE report commands line $ExcelGet are implemented here.
+
+|Syntax|Description|
+|:---|:---|
+|`int IodeDdeLocale(char *buf)`||
+|`int IodeDdeUnLocale(char *buf)`||
+|`int IodeDdeType(char *szTopic)`||
+|`char *IodeDdeGetWS(char *szItem)`||
+|`char *IodeDdeCreateSeries(int objnb, int bt)`||
+|`char *IodeDdeCreatePer(int bt)`||
+|`char *ToBase26(int num)`||
+|`char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)`||
+|`char *IodeTblCell(TCELL *cell, COL *cl, int nbdec)`||
+|`char *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)`||
+|`char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)`||
+|`char *IodeDdeGetReportRC(char *szItem)`||
+|`char *IodeDdeGetXObj(char *szItem, int type)`||
+|`char *IodeDdeGetItem(char *szTopic, char *szItem)`||
+|`int IodeDdeSetWS(char *szItem, char *szBuffer)`||
+|`int IodeDdePlay(char *szItem, char *szBuffer)`||
+|`int DdeTsfKey(char *key)`||
+|`int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)`||
+|`char *B_ExcelGetItem(char *arg)`||
+|`int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)`||
+|`int B_ExcelDecimal(char *arg)`||
+|`int B_ExcelThousand(char *arg)`||
+|`int B_ExcelCurrency(char *arg)`||
+|`int B_ExcelLang(char *arg)`||
+|`int B_ExcelGet(char *arg, int type)`||
+|`int B_ExcelSet(char *arg, int type)`||
+|`int B_ExcelExecute(char *arg)`||
+|`int B_ExcelCmd(char *cmd, char *arg)`||
+|`int B_DDEGet(char *arg)`||
+|`int B_ExcelWrite(char *ptr)`||
+|`int B_DDEGet(char *arg)`||
+|`char *B_ExcelGetItem(char *arg)`||
+|`int B_ExcelGet(char *arg, int type)`||
+|`int B_ExcelSet(char *arg, int type)`||
+|`int B_ExcelExecute(char *arg)`||
+|`int B_ExcelCmd(char *cmd, char *arg)`||
+|`int B_ExcelWrite(char *ptr)`||
+|`int B_ExcelOpen(char *arg)`||
+|`int B_ExcelClose(char *arg)`||
+|`int B_ExcelPrint(char *arg)`||
+|`int B_ExcelSave(char *arg)`||
+|`int B_ExcelSaveAs(char *arg)`||
+|`int B_ExcelNew(char *arg)`||
+|`int IodeFmtVal(char *buf, IODE_REAL val)`||
 
