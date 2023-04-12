@@ -148,6 +148,16 @@ public slots:
 	void open_seasonal_adjustment_dialog();
 	void open_trend_correction_dialog();
 
+	// Data Menu
+	void open_sort_and_calculus_dialog();
+	void open_list_calculus_dialog();
+	void open_file_contents_dialog();
+	void open_file_compare_dialog();
+	void open_search_text_dialog();
+	void open_scan_objects_dialog();
+	void open_edit_tables_variables_dialog();
+	void open_duplicate_objects_dialog();
+
 	// Compute Menu
 	void open_compute_identities_dialog();
 	void open_compute_simulation_dialog();

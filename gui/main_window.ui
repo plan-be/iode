@@ -127,117 +127,16 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
-    <widget class="QMenu" name="menuComments">
-     <property name="toolTip">
-      <string>Update, create, delete and browse current work space comments</string>
-     </property>
-     <property name="title">
-      <string>Comments</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Comments"/>
-     <addaction name="actionEdit_List_Comments"/>
-    </widget>
-    <widget class="QMenu" name="menuEquations">
-     <property name="toolTip">
-      <string>Update, create, delete, estimate and browse current work space equations</string>
-     </property>
-     <property name="title">
-      <string>Equations</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Equations"/>
-     <addaction name="actionEdit_List_Equations"/>
-    </widget>
-    <widget class="QMenu" name="menuIdentities">
-     <property name="toolTip">
-      <string>Update, create, delete and browse current work space identities</string>
-     </property>
-     <property name="title">
-      <string>Identities</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Identities"/>
-     <addaction name="actionEdit_List_Identities"/>
-    </widget>
-    <widget class="QMenu" name="menuLists">
-     <property name="toolTip">
-      <string>Update, create, delete and browse current work space lists</string>
-     </property>
-     <property name="title">
-      <string>Lists</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Lists"/>
-     <addaction name="actionEdit_List_Lists"/>
-     <addaction name="separator"/>
-     <addaction name="actionSort_and_Expand"/>
-     <addaction name="actionList_Calculus"/>
-     <addaction name="separator"/>
-     <addaction name="actionFile_Contents"/>
-     <addaction name="actionFile_Compare"/>
-     <addaction name="actionSearch_Text"/>
-     <addaction name="actionScan_Objects"/>
-    </widget>
-    <widget class="QMenu" name="menuScalars">
-     <property name="toolTip">
-      <string>Update, create, delete and browse current work space scalars</string>
-     </property>
-     <property name="title">
-      <string>Scalars</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Scalars"/>
-     <addaction name="actionEdit_List_Scalars"/>
-    </widget>
-    <widget class="QMenu" name="menuTables">
-     <property name="toolTip">
-      <string>Update, create, delete, test and browse current work space tables</string>
-     </property>
-     <property name="title">
-      <string>Tables</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Tables"/>
-     <addaction name="actionEdit_List_Tables"/>
-    </widget>
-    <widget class="QMenu" name="menuVariables">
-     <property name="toolTip">
-      <string>Update, create, delete, graph and browse current work space variables</string>
-     </property>
-     <property name="title">
-      <string>Variables</string>
-     </property>
-     <property name="toolTipsVisible">
-      <bool>true</bool>
-     </property>
-     <addaction name="actionEdit_WS_Variables"/>
-     <addaction name="actionEdit_List_Variables"/>
-     <addaction name="actionEdit_Tables_Variables"/>
-    </widget>
-    <addaction name="actionDATA_EDIT"/>
+    <addaction name="actionSort_and_Expand"/>
+    <addaction name="actionList_Calculus"/>
     <addaction name="separator"/>
-    <addaction name="menuComments"/>
-    <addaction name="menuEquations"/>
-    <addaction name="menuIdentities"/>
-    <addaction name="menuLists"/>
-    <addaction name="menuScalars"/>
-    <addaction name="menuTables"/>
-    <addaction name="menuVariables"/>
+    <addaction name="actionFile_Contents"/>
+    <addaction name="actionFile_Compare"/>
     <addaction name="separator"/>
-    <addaction name="actionMISCELLANEOUS"/>
+    <addaction name="actionSearch_Text"/>
+    <addaction name="actionScan_Objects"/>
+    <addaction name="separator"/>
+    <addaction name="actionEdit_Tables_Variables"/>
     <addaction name="separator"/>
     <addaction name="actionDuplicate_objects"/>
    </widget>
@@ -1870,6 +1769,118 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionList_Calculus</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_list_calculus_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSort_and_Expand</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_sort_and_calculus_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFile_Contents</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_file_contents_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFile_Compare</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_file_compare_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSearch_Text</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_search_text_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionScan_Objects</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_scan_objects_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_Tables_Variables</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_edit_tables_variables_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1916,5 +1927,12 @@
   <slot>createNewProject()</slot>
   <slot>update_current_tab()</slot>
   <slot>display_keyboard_shortcuts()</slot>
+  <slot>open_sort_and_calculus_dialog()</slot>
+  <slot>open_list_calculus_dialog()</slot>
+  <slot>open_file_contents_dialog()</slot>
+  <slot>open_file_compare_dialog()</slot>
+  <slot>open_search_text_dialog()</slot>
+  <slot>open_scan_objects_dialog()</slot>
+  <slot>open_edit_tables_variables_dialog()</slot>
  </slots>
 </ui>

@@ -194,6 +194,8 @@ bool MainWindow::openDirectory(const QString& dirPath)
     return true;
 }
 
+// -------- File Menu --------
+
 void MainWindow::createNewProject()
 {
     if (!projectPath.isEmpty())
@@ -316,6 +318,8 @@ void MainWindow::open_export_dialog()
     dialog.exec();
 }
 
+// -------- Workspace Menu --------
+
 void MainWindow::clear_workspace()
 {
     QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", "Are you sure to clear the whole workspace?", 
@@ -396,6 +400,50 @@ void MainWindow::open_trend_correction_dialog()
     dialog.exec();
 }
 
+// -------- Data Menu --------
+
+void MainWindow::open_sort_and_calculus_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "Sort and Calculs is not yet implemented");
+}
+
+void MainWindow::open_list_calculus_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "List Calculus is not yet implemented");
+}
+
+void MainWindow::open_file_contents_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "File Contents is not yet implemented");
+}
+
+void MainWindow::open_file_compare_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "File Compare is not yet implemented");
+}
+
+void MainWindow::open_search_text_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "Search Text is not yet implemented");
+}
+
+void MainWindow::open_scan_objects_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "Scan Objects is not yet implemented");
+}
+
+void MainWindow::open_edit_tables_variables_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "Edit Tables is not yet implemented");
+}
+
+void MainWindow::open_duplicate_objects_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "Duplicate Objects is not yet implemented");
+}
+
+// -------- Run Menu --------
+
 void MainWindow::open_compute_identities_dialog()
 {
     QIodeMenuComputeIdentities dialog(*project_settings_filepath, this);
@@ -432,6 +480,8 @@ void MainWindow::open_compute_scc_simulation_dialog()
     dialog.exec();
 }
 
+// -------- Print/Graphs Menu --------
+
 void MainWindow::open_graphs_variables_dialog()
 {
     QIodeMenuGraphVariables dialog(*project_settings_filepath, this);
@@ -449,6 +499,8 @@ void MainWindow::open_graphs_variables_dialog_from_vars_view(
     connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendPlot);
     dialog.exec();
 }
+
+// -------- Help Menu --------
 
 void MainWindow::about()
 {
@@ -500,6 +552,8 @@ void MainWindow::display_keyboard_shortcuts()
 {
     QDesktopServices::openUrl(url_shortcuts);
 }
+
+// -------- Other slots --------
 
 void MainWindow::update_current_tab()
 {
