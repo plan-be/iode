@@ -43,6 +43,15 @@ caractŠre hardcod‚ ('&'), l'impression ‚tait tronqu‚e.
 
 Ce bug est corrig‚: on peut maintenant choisir un autre caractŠre "Cell Separator" que '&'.
 
+&TI Fichier iode.msg
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Dans les versions pr‚c‚dentes, le fichier ~ciode.msg~C ‚tait int‚gr‚ dans l'ex‚cutable iode.exe.
+Les antivirus r‚cents (comme McAfee) ont tendance … bloquer ce type de construction. Par cons‚quent,
+iode est dor‚navant compos‚ de 3 fichiers :
+&EN iode.exe : le programme ex‚cutable
+&EN iode.scr : les ressources (‚crans...)
+&EN iode.msg : les messages 
+
 >
 <Version 6.65> (13/03/2023)>
     Version 6.65 (13/03/2023)
