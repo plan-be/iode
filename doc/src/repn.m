@@ -659,10 +659,11 @@ dont les noms sont pass‚s comme argument.
 &TX
 
 &EX2
-    $DataUpdateLst VarLst @vliste(@eexpand(*))
+    $DataUpdateLst VarLst @vliste(ACAF,ACAG)
 &TX
-Cr‚e la liste ~cVarLst~C contenant toutes les s‚ries utilis‚es dans les ‚quations du WS.
+Cr‚e la liste ~cVarLst~C contenant toutes les s‚ries utilis‚es dans les ‚quations ACAF et ACAG.
 &SA @sliste()
+
 >
 <@sliste>
     Fonction @sliste
