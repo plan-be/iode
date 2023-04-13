@@ -1,0 +1,82 @@
+# Procedures
+# ----------
+#
+# Syntax : 
+# $procdef procname [parm1] ... [parms]
+#  ...
+# $procend
+#  ...
+# $procexec procname parms ..
+#
+# Parameters : 
+#  - all parameters but the last are "words" or string enclosed in "" 
+#  - the last parameter is a list of all remaining parameters (if any)
+#  - parameters are used in the body of the procedure like $define : %parm1%, ...
+#  - if a $define with the same name as a procedure parameter exists before executing the procedure, it 
+#    is locally inaccessible, but retrieved its value at the end of the procedure execution
+#  - the $proc statement is closed by the first $endproc (in the same file)
+#  - a procedure can be redefined by a new definition
+#  - procedures are kept in memory after the end of the report execution
+#  - procedures are called by the command $procexec
+#  - a procedure must be defined before its first use
+
+# Note : if faudrait en plus : 
+#  $undef A 
+#  $shiftdef A --> $define A @vdrop(1,%A%)
+#  %A[1]% == @vtake(1,%A%)
+
+$define result 1 2 3
+$ show Before call 1 : result=%result% --  vars = '%vars%'
+
+$debug 1
+
+$procdef printtbl year vars
+$show --------------------
+$foreach var %vars%
+$show %var%[%year%] = {%var%[%year%]}
+$next var
+$show --------------------
+$procend
+
+$----------------------------------------------------------
+$procdef sumvars result vars
+$----------------------------------------------------------
+$define eq 0
+$foreach var %vars%
+$define eq %eq% + %var%
+$next var
+$label fin
+$DataCalcVar %result% %eq%
+$procend
+$ ----------------------------------------------------------
+
+$----------------------------------------------------------
+$procdef sumvarsmsg msg result vars
+$----------------------------------------------------------
+$show %msg%
+$show  During the call : result = '%result%' vars = '%vars%'
+$procexec sumvars %result% %vars%
+$procexec sumvars PIB2 PIB_B PIB_C 
+$procend
+$ ---------------------------------------------------------
+
+$WsSample 1990Y1 2000Y1
+$DataCalcVar PIB_A t
+$DataCalcVar PIB_B ln t
+$DataCalcVar PIB_C sin(t)
+
+$ define result ABC
+$ show Before call  2 : result=%result% --  vars = '%vars%'
+$procexec sumvarsmsg "Hello la belle" PIB PIB_A PIB_B
+
+$procexec sumvarsmsg "Hello la belle" PIB3 PIB_A PIB_C
+$procexec printtbl 1992Y1 PIB_A PIB_B PIB_C PIB PIB2 PIB3
+$return
+$show EQ='%eq%' 
+$show           1999Y1={PIB[1999Y1]} 2000Y1={PIB[2000Y1]}
+$show           1999Y1={PIB[1999Y1]} 
+$show                                2000Y1={PIB[2000Y1]}
+$show PIB2  2000Y1={PIB2[2000Y1]}
+$show PIB3  2000Y1={PIB3[2000Y1]}
+$ show  After call : result=%result% vars = '%vars%'
+

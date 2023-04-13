@@ -1,0 +1,13 @@
+#  With "$indent 1" you may indent blocks of iode commands 
+#   see http://iode.plan.be/doku.php?id=indent
+$indent 1
+
+#  Foreach syntax : $foreach index values  
+#    see http://iode.plan.be/doku.php?id=foreach
+
+$foreach GENDER H F
+  $foreach AGE A G
+	$dataupdateeqs ECGAM%GENDER%%AGE% ECGAM%GENDER%%AGE% := if (t<= 2018Y1, ECGAM%GENDER%%AGE%, EGAM%GENDER%%AGE%-ESGAM%GENDER%%AGE%)
+	$show @evalue(ECGAM%GENDER%%AGE%)
+  $next AGE
+$next GENDER  

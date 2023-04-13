@@ -1,0 +1,17 @@
+## FOREACH EXAMPLE : replace old suffixes by new ones
+#----------------------------------------------------
+# 
+# 1. WS sample definition (assuming a clear WS, a sample must be provided for the calculations)
+$WsSample 1990Y1 2010Y1
+
+# 2. Creation of 2 lists, one with the old suffixes, one with the new ones.
+# The variables will be added in the foreach loop
+$define OldSufx A;B;C;D
+$define NewSufx 1;2;3;4
+
+# 3. Foreach loop. 
+# 
+$foreach I %OldSufx%
+$show Prefx_%I% -> Prefx_@take(1,%NewSufx%)
+$define NewSufx @vdrop(1,%NewSufx%)
+$next I

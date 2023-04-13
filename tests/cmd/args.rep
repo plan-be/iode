@@ -1,0 +1,12 @@
+# Loop on args
+$define NB {0%1%}
+$show NB = %NB%
+$define i 1
+
+$show Start.
+$label next
+$show Step %i%
+$define i {%i% + 1}
+$goto next {%i% < %NB%}
+
+$show End.

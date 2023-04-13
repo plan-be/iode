@@ -1,0 +1,30 @@
+## FOREACH EXAMPLE : Test with ;, and space seps
+#------------------------------------------------
+# 
+$debug 0
+$indent 1
+
+# Foreach loops
+# 
+
+# Foreach Sep = space
+$foreach I 1 2 3
+    $show Space Sep : I => %I% 
+$next I
+
+# Foreach Sep = semi-colon
+$foreach I 1;2;3
+    $show Semi-colon Sep : I => %I% 
+$next I
+
+# Foreach Sep = comma
+$foreach I 1,2,3
+    $show Comma Sep : => %I% 
+$next I
+
+# Foreach with lists
+$DataUpdateLst AC A,B,C
+
+$foreach I @lvalue(AC)
+    $show Comma Sep : => %I% 
+$next I
