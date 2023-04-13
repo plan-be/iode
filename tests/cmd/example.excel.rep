@@ -1,0 +1,25 @@
+# Excel : exemple de copie de variables IODE en Excel 
+#  (version DDE, donc plus lente que COM)
+
+$indent 1
+$define iodefile  hh25_
+$define excelfile @getdir()\hh25_
+
+# Load fichier IODE
+$WsLoadVar %iodefile%
+
+# Ouverture Excel et titre 
+$ExcelNew  
+$ExcelWrite Sheet1!R1C1 Exemple de transfert iode - Excel
+
+# Boucle sur les variables - Placer en colonne 1 àpd ligne 2
+$define i 2
+$foreach var @vexpand(*)    
+   $show Copying %var% ...
+   $ExcelSetVar %var% Sheet1!R{%i%}C1
+   $define i {%i%+1}
+$next var
+
+# Sauver et fermer le fichier Excel
+$ExcelSaveAs %excelfile%
+$ExcelClose

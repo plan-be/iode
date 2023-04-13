@@ -1,0 +1,14 @@
+# Utilisation des commandes de gestion de dirs
+# ----------------------
+#
+# Syntax : 
+# 
+# 
+# 
+# 
+
+$debug 1
+$msg Current dir : @getdir()
+$msg Make dir    : @mkdir(subdir)
+$msg Chdir       : @chdir(subdir)
+$msg Chdir       : @chdir(..)

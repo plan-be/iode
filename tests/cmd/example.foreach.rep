@@ -1,0 +1,41 @@
+## FOREACH EXAMPLE : sum of variables
+#------------------------------------
+# This report creates n variables whose names begin with the same prefix PIB_.
+# It then creates (using $foreach statement) a lec form containing a sum of all the variables
+# having this prefix. This lec form is used to create a new variable PIB.
+# Finally, the result is printed from	 1990Y1 to 2000Y1
+#
+# 1. WS sample definition (assuming a clear WS, a sample must be provided for the calculations)
+$WsSample 1990Y1 2010Y1
+
+# 2. Creation of the input variables. Each variable name has the same prefix.
+# The variables will be added in the foreach loop
+$DataCalcVar PIB_A t
+$DataCalcVar PIB_B ln t
+$DataCalcVar PIB_C sin(t)
+
+# 3. Foreach loop.
+# At the end of the loop, the define PIB will contain a LEC expression with the sum of
+# all the PIB_* variables
+# First, a string PIB (define) is created with "0" as initial value.
+$Define PIB 0
+
+# The name following the $foreach command (I in this example) has the same
+# behaviour as a define. It will be replaced in the loop statements
+# by the different values following the name, one at a time.
+
+$foreach I @vexpand(PIB_*)
+$Define PIB %PIB% + %I%
+$ show [%I%;%PIB%]
+$next I
+
+# Finally, the PIB series is computed from the expression contained in the PIB-define
+$DataCalcVar PIB %PIB%
+
+# Check the result
+$SetTime 1990Y1
+$label next
+$show PIB[{t@T}] = {PIB_A} + {PIB_B} + {PIB_C} = {PIB}
+$IncrTime
+$goto next {t <= 2000Y1}
+

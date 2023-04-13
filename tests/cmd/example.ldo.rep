@@ -1,0 +1,21 @@
+# IODE : Macro examples
+# ---------------------
+$msg -----------------------------------------------
+$msg Undefined Macros - Normal, uppercase, lowercase
+$msg -----------------------------------------------
+
+$msg Normal text   : %bla bla bla% 
+$msg Uppercase     : %#bla bla bla%
+$msg Lowercase     : %!bla bla bla%
+
+$msg ------------------------------------------------------------
+$msg Macro modifications : normal, squeezed, uppercase, lowercase
+$msg ------------------------------------------------------------
+
+$define macro1 Variable name
+
+$msg %%macro1%%  %macro1%
+$msg %%-macro1%% %-macro1%
+$msg %%!macro1%% %!macro1%
+$msg %%#macro1%% %#macro1%
+

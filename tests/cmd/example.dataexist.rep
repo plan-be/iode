@@ -1,0 +1,26 @@
+# Exemple d'utilisation de $DataExist
+$debug 1
+
+# En cas d'erreur, le rapport doit se terminer (return)
+$OnError return
+
+# Creation d'un objet A de type CMT 
+$DataUpdateCmt A COUCOU 
+
+# Si l'objet A existe, le rapport peut continuer
+$DataExistCmt A
+A existe : l'execution continue
+
+# On détruit l'objet A et on teste : le rapport se termine (car $OnError return)
+$DataDeleteCmt A
+$ DataExistCmt A
+ ... On ne passe pas par ici ...
+
+# On peut aussi l'utiliser entre accolades
+# La ligne suivante est remplacée par $goto fin -1 (car A n'existe pas)
+$goto fin {$DataExistCmt A}
+A existe 
+$return
+
+$label fin
+A n'existe pas

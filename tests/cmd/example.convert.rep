@@ -1,0 +1,14 @@
+# Conversion de fichiers
+# ----------------------
+#
+# Syntax : 
+# $SysOemToUTF8  oemfile uft8file
+# $SysAnsiToUTF8 ansifile uft8file
+# $SysOemToAnsi  oemfile ansifile
+# $SysAnsiToOem  ansifile oemfile
+
+$debug 1
+$SysOemToUTF8  ex.oem  ex.oem.utf8
+$SysAnsiToUTF8 ex.ansi ex.ansi.utf8
+$SysAnsiToOem  ex.ansi ex.ansi.oem
+$SysOemToAnsi  ex.oem  ex.oem.ansi
