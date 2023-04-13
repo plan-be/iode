@@ -9,7 +9,5 @@ set (PYX_SOURCES
 )
 set (C_SOURCES s_iode.c)
 set (SCRIPTS cythonize_iode.py makepy.bat)
-set (TESTS test_iode.py) 
-set (DOCU PYIODE.md)
 
-add_custom_target(pyiode ALL SOURCES ${PYX_SOURCES} ${C_SOURCES} ${SCRIPTS} ${DOCU} ${TESTS})
+add_custom_target(pyiode ALL SOURCES ${PYX_SOURCES} ${C_SOURCES} ${SCRIPTS})
