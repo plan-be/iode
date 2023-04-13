@@ -1,12 +1,19 @@
 #pragma once
 #include <QWidget>
+#include <QDialog>
 #include <QPainter>
+#include <QLineEdit>
+#include <QShortcut>
 #include <QSettings>
 #include <QTextBlock>
+#include <QScrollBar> 
+#include <QPushButton>
+#include <QGridLayout>
 #include <QFontMetricsF>
 #include <QPlainTextEdit>
 
 #include "utils.h"
+#include "util/find_and_replace_dialog.h"
 
 
 class LeftArea;
@@ -17,15 +24,24 @@ class TextEditor : public QPlainTextEdit
     Q_OBJECT
 
     QWidget* leftArea;
+    FindAndReplaceDialog* findReplaceDialog;
+
+    QShortcut* findShortcut;
+    QShortcut* replaceShortcut;
+    QShortcut* duplicateShortcut;
 
 public:
     TextEditor(QWidget *parent = nullptr);
+    ~TextEditor();
 
     void leftAreaPaintEvent(QPaintEvent *event);
     int leftAreaWidth();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+
+private:
+    void popupFindReplaceBox(const bool find_only=true);
 
 private slots:
     void updateLeftAreaWidth(int newBlockCount);
@@ -39,6 +55,24 @@ private slots:
      * @param dy 
      */
     void updateLeftArea(const QRect &rect, int dy);
+
+    /**
+     * @brief open a box in the upper left of the text editor to search for a text occurences.
+     * 
+     */
+    void openFindBox();
+
+    /**
+     * @brief open a box in the upper left of the text editor to find and replace a text.
+     * 
+     */
+    void openReplaceBox();
+
+    /**
+     * @brief duplicate the current line
+     * 
+     */
+    void duplicateLine();
 };
 
 
