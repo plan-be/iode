@@ -6,7 +6,8 @@
   - [CMake](https://cmake.org, https://cmake.org/download) (>= 3.25) (*)
 - To compile the C++ API:
   - [Chocolatey](https://chocolatey.org/install) (to install Boost) (*)
-  - Boost (>= 1.74) (can be installed with Chocolatey: choco install boost-msvc-14.2)
+  - Boost (>= 1.74). Can be installed with Chocolatey. For VS2019, execute: choco install boost-msvc-14.2. 
+    For other VS versions, check on https://community.chocolatey.org/packages?q=boost
 - To compile the Qt GUI:
   - [Qt 6.4](https://www.qt.io/download) (to be installed in C:/Qt)
 - To compile the documentation:
