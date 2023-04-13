@@ -8,11 +8,14 @@
 :: Syntax : makepy [-vs]
 ::    where -vs indicates the environment where the command is executed 
 ::     
-::   If -vs is passed as arguement, the program is run in the subdir iode/pyiode of the Visual Studio directory 
-::      structure. In this case, the libraries iodeapi.lib and scr4iode.lib must have been updated **before**
-::      starting the program.
+::   If -vs is passed as arguement:
+::      - the program is run in the subdir iode/pyiode of the Visual Studio directory 
+::        structure. In this case, the libraries iodeapi.lib and **scr4iode.lib** must have been updated **before**
+::        starting the program.
+::      - the environment variable ISVS is set to -vs to indicate to cythonize.py that the environment is VS (s4iode.lib...)
+::              
 ::   
-::   If -vs is **not** present, the libs iodeapi.lib and s4iode.lib are updated before cythoning iode.pyx.
+::   If -vs is **not** present, the libs iodeapi.lib and **s4iode.lib** are updated before cythoning iode.pyx.
 ::   
 :: Note that :
 ::  - the MSVC 64 bits environment must be initialised before starting this program (set64.bat will do the trick)
@@ -27,10 +30,11 @@ SET MSSdk=1
 :: The next line sets the environment variable ISVS that will be used in setupiode.py.
 SET ISVS=%1%
 
-:: Set the environment vars for MSVC 
-::call set64.bat
-
 :: Only for the non Visual Studio version, remake the 64 bits libs iodeapi.lib and s4iode.lib
+
+:: Set the environment vars for MSVC 
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+if %errorlevel% NEQ 0 goto :EOF
 
 if "%ISVS%" == "" (
     :: Make iodeapi.lib
