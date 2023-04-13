@@ -6,9 +6,9 @@ $noparsing
 $indent
 
 $goto continue {%0% >= 2}
-    $show output_dir required. Report aborted.
+    $show Syntax: rep_expand input_dir output_dir
+    $show Syntax error. Report aborted.
     $return
-    
 $label continue
 $define input_dir %1%
 $define output_dir %2%
