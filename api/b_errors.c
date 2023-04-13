@@ -18,9 +18,9 @@
 #include "iode.h"
 #include <stdarg.h>
 
-char**   B_ERROR_MSG;       /* Table of last recorded error messages */
-int      B_ERROR_NB;        /* Nb of last recorded error messages */
-
+char**   B_ERROR_MSG; // Table of last recorded error messages 
+int      B_ERROR_NB;  // Nb of last recorded error messages 
+char     *B_ERROR_DFT_MSG = "Error message not found (check the file 'iode.msg')"; // Default message if not found in iode.msg 
 
 //extern char SCR_ERR_NAME[];  // Name of the iode.msg file
 
@@ -61,8 +61,12 @@ void B_IodeMsgPath()
  */
 char *B_msg(int n)
 {
-    B_IodeMsgPath(); 
-    return(SCR_err_txt(n + 1000)); /* JMP_M 4.21 01-09-95 */
+    char    *msg;
+    
+    B_IodeMsgPath();                        // JMP 10/04/2023
+    msg = SCR_err_txt(n + 1000);   
+    if(msg == 0) return(B_ERROR_DFT_MSG);   // JMP 13/04/2023
+    return(msg); 
 }
 
 
@@ -83,7 +87,10 @@ void B_seterror(char* fmt, ...)
     char    buf[256];
     va_list myargs;
 
+    
     va_start(myargs, fmt);
+    if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);
+    
 #ifdef _MSC_VER   
     vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
 #else

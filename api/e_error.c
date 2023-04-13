@@ -25,13 +25,18 @@ void E_msg(char* fmt,...)
 {
     va_list     myargs;
     char        buf[512];
+    extern char* B_ERROR_DFT_MSG;
     
     va_start(myargs, fmt);
+    if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);  
+    else {
 #ifdef _MSC_VER   
-    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
+        vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
 #else
-    vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
-#endif    
+        vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
+#endif  
+    }
+    
     va_end(myargs);
 
     kmsg("%s\n", buf);
@@ -60,11 +65,14 @@ void E_error(char* fmt,...)
     char        buf[512];
     
     va_start(myargs, fmt);
+    if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);
+    else {
 #ifdef _MSC_VER   
-    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
+        vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
 #else
-    vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
-#endif    
+        vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
+#endif  
+    }
     va_end(myargs);
 
     B_seterror(buf);

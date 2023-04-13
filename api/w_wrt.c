@@ -399,7 +399,7 @@ int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args)
     }
 
     W_cont = 1;
-    if(dup) SCR_replace(buf, "\\", "\\\\");
+    if(dup) SCR_replace(buf, "\\", "\\\\"); // TODO: check buf size !!!
     if(ch1 && ch2) {
        str1[0] = ch1;
        str2[0] = ch2;
