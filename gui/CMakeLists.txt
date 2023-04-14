@@ -19,6 +19,7 @@ set(GUI_UTILS
     utils.h 
     util/double_validator.h
     util/system_item.h
+    util/find_and_replace_dialog.ui     util/find_and_replace_dialog.h      util/find_and_replace_dialog.cpp
 )
 
 set(GUI_SETTINGS    
