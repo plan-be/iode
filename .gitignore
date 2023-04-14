@@ -383,3 +383,4 @@ keyboard_shortcuts.*
 *.prf
 *.$$$
 /tests/data/iode_gui_settings.ini
+/pyiode/iode.c
