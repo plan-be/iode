@@ -63,6 +63,7 @@ void E_error(char* fmt,...)
 {
     va_list     myargs;
     char        buf[512];
+    extern char* B_ERROR_DFT_MSG;
     
     va_start(myargs, fmt);
     if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);
