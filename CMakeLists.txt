@@ -174,7 +174,7 @@ add_subdirectory ("cpp_api")
 set(IODE_GUI_TARGET iode_gui)
 add_subdirectory ("gui")
 add_subdirectory ("tests")
-add_subdirectory ("pyiode")
+# add_subdirectory ("pyiode")
 add_subdirectory ("cmd")
 
 # ---- user doc ----
