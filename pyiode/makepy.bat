@@ -64,10 +64,18 @@ md %python_name%
 :: Cythonize the file iode.pyx
 python.exe cythonize_iode.py build_ext --inplace --compiler=msvc
 
-:: Copy the generated file locally and in py<nn>
+:: Rename the generated file, sign it and copy it to py<nn>
 set src=iode.cp%python_version%-win_amd64.pyd
-set dest=%python_name%\iode.pyd
-copy /y %src% %dest%
-copy /y %src% iode.pyd
+move /Y %src% iode.pyd
+
+:: Digitally sign the .pyd module
+DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" iode.pyd
+
+:: Copy in subdir py<vers>
+copy /y iode.pyd %python_name%
+
+
+:: Take a local copy of iode.pyd
+::copy /y %src% iode.pyd
 
 ENDLOCAL
