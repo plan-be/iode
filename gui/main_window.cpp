@@ -410,7 +410,8 @@ void MainWindow::open_sort_and_calculus_dialog()
 
 void MainWindow::open_list_calculus_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "List Calculus is not yet implemented");
+    QIodeMenuDataListCalculus dialog(*project_settings_filepath, this);
+    dialog.exec();
 }
 
 void MainWindow::open_file_contents_dialog()
