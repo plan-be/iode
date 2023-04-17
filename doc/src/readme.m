@@ -52,6 +52,48 @@ iode est dor‚navant compos‚ de 3 fichiers :
 &EN iode.scr : les ressources (‚crans...)
 &EN iode.msg : les messages 
 
+
+&TI Python interface
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Les modules d'interface entre IODE et python (~ciode.pyd~C) sont dor‚navant int‚gr‚s dans l'installateur de IODE.
+Dans la version IODE6.66, les modules pour python 3.9 et python 3.10 sont install‚es respectivement dans les sous-directories ~cpy39~C et ~cpy310~C 
+du directory d'installation de IODE. 
+Par d‚faut, il s'agit donc de ~cc:/iode/py39~C et ~cc:/iode/py310~C.
+
+Pour utiliser le module IODE dans l'environnement python, on peut proc‚der de deux fa‡ons.
+
+&IT M‚thode 1 : recopier iode.pyd
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Il s'agit de recopier ~ciode.pyd~C dans le directory de travail. 
+C'est la m‚thode la plus simple mais elle n‚cessite de connaitre la version de 
+python en cours d'utilisation (3.9 ou 3.10 ?). De plus il faut recopier ~ciode.pyd~C … chaque nouvelle version de IODE et/ou de python.
+ 
+&IT M‚thode 2 : ajouter le directory de iode.pyd au path
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Il s'agit simplement d'ajouter au "path" le directory o— se trouve le module iode.pyd (en fonction de la version en cours de python). 
+Ce path peut (en partie) ˆtre calcul‚ en python. Voici comment proc‚der : 
+
+&CO
+  ## Importer le module sys
+  import sys
+  
+  ## Lire la version de python en cours de fonctionnement et en d‚duire 
+  ## le directory contenant la version correspondante de iode.pyd. 
+  ## On prend ici comme hypothŠse que le directory d'installation de IODE est ~cc:/iode~C
+  iode_pyd_dir = f"c:/iode/py3{sys.version_info[1]}"
+  
+  ## Ajouter ce directory au "path" 
+  sys.path.append(iode_pyd_dir)
+
+  ## Importer le module iode
+  import iode
+&TX
+
+&TI IODE messages 
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Certains messages ‚taient replac‚s par des textes du genre "Msg##nnn". Ce bug est corrig‚.
+
 >
 <Version 6.65> (13/03/2023)>
     Version 6.65 (13/03/2023)

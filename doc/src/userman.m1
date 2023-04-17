@@ -20,6 +20,7 @@
 
 &EN <Interfaces avec Excel, APL, ODBC> : interfaces avec d'autres outils et langages
 
+&EN <Module python pour IODE><IODE: python module> : utilisation des functions et objets IODE en python
 
 &EN <Annexes                 > : syntaxes et m‚thodes
 &EN <Notes techniques>
