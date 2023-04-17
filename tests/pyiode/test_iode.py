@@ -118,7 +118,7 @@ def test_eq(title, expected, result):
 @cpu
 def test_iode_version():
     result = iode.version()
-    expected = "IODE Modeling Software 6.66 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+    expected = "IODE Modeling Software 6.67 - (c) 1990-2023 Federal Planning Bureau - Brussels"
     test_eq("iode.version()", expected, result)
 
 # WS FUNCTIONS

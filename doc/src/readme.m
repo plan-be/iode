@@ -6,42 +6,10 @@ START
 ..esc ~
 
 
-<Version 6.66> (13/04/2023)>
-    Version 6.66 (13/04/2023)
+<Version 6.67> (18/04/2023)>
+    Version 6.67 (18/04/2023)
     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..esc ~
-
-&TI Taille de la m‚moire r‚serv‚e aux objets IODE
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-La m‚moire totale maximale r‚serv‚e pour le stockage des objets IODE ‚tait, par d‚faut, de 32768 * la taille des segments allou‚s. 
-Dans les versions pr‚c‚dentes, la taille des segments pouvait ˆtre modifi‚e par le paramŠtre ~c-seg~C de ~ciode.exe~C. 
-Par exemple, pour des segments de 100000 bytes :
-&CO
-    iode -seg 100000
-&TX
-
-On peut dor‚navant fixer la taille des segments via le paramŠtre ~cGeneral / SegSize~C dans le fichier ~ciode.ini~C 
-qui se trouve dans le mˆme r‚pertoire que le programme appelant (iode.exe, iodecmd.exe).
-
-Par exemple, pour pouvoir allouer 32768 * 128000 = 4,194,304,000 bytes, on pourra indiquer dans le fichier iode.ini :
-&CO
-[General]
-Banner=0
-CheckVersion=0
-SegSize=128000
-&TX
-
-&TI Impressions d'objets (BUG)
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Certaines impressions ne fonctionnaient plus correctement, en particulier l'impression de tableaux.
-
-La raison en est que le caractŠre de s‚paration de colonnes (Cell separator)
-dans les impressions sous forme de tableaux ‚tait auparavant harcod‚. Si sa
-d‚finition dans le fichier ~ciode.ini~C ou dans l'‚cran de d‚finition des
-paramŠtres A2M ~c(File/Print Setup/Options/A2M)~C ‚tait diff‚rente du
-caractŠre hardcod‚ ('&'), l'impression ‚tait tronqu‚e.
-
-Ce bug est corrig‚: on peut maintenant choisir un autre caractŠre "Cell Separator" que '&'.
 
 &TI Fichier iode.msg
 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
@@ -95,6 +63,46 @@ Ce path peut (en partie) ˆtre calcul‚ en python. Voici comment proc‚der :
 Certains messages ‚taient replac‚s par des textes du genre "Msg##nnn". Ce bug est corrig‚.
 
 >
+
+
+<Version 6.66> (13/04/2023)>
+    Version 6.66 (13/04/2023)
+    ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+..esc ~
+
+&TI Taille de la m‚moire r‚serv‚e aux objets IODE
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+La m‚moire totale maximale r‚serv‚e pour le stockage des objets IODE ‚tait, par d‚faut, de 32768 * la taille des segments allou‚s. 
+Dans les versions pr‚c‚dentes, la taille des segments pouvait ˆtre modifi‚e par le paramŠtre ~c-seg~C de ~ciode.exe~C. 
+Par exemple, pour des segments de 100000 bytes :
+&CO
+    iode -seg 100000
+&TX
+
+On peut dor‚navant fixer la taille des segments via le paramŠtre ~cGeneral / SegSize~C dans le fichier ~ciode.ini~C 
+qui se trouve dans le mˆme r‚pertoire que le programme appelant (iode.exe, iodecmd.exe).
+
+Par exemple, pour pouvoir allouer 32768 * 128000 = 4,194,304,000 bytes, on pourra indiquer dans le fichier iode.ini :
+&CO
+[General]
+Banner=0
+CheckVersion=0
+SegSize=128000
+&TX
+
+&TI Impressions d'objets (BUG)
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Certaines impressions ne fonctionnaient plus correctement, en particulier l'impression de tableaux.
+
+La raison en est que le caractŠre de s‚paration de colonnes (Cell separator)
+dans les impressions sous forme de tableaux ‚tait auparavant harcod‚. Si sa
+d‚finition dans le fichier ~ciode.ini~C ou dans l'‚cran de d‚finition des
+paramŠtres A2M ~c(File/Print Setup/Options/A2M)~C ‚tait diff‚rente du
+caractŠre hardcod‚ ('&'), l'impression ‚tait tronqu‚e.
+
+Ce bug est corrig‚: on peut maintenant choisir un autre caractŠre "Cell Separator" que '&'.
+>
+
 <Version 6.65> (13/03/2023)>
     Version 6.65 (13/03/2023)
     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
