@@ -140,6 +140,7 @@ set(GUI_MENU_WORKSPACE
 
 set(GUI_MENU_DATA 
     menu/data/sort_expand_list.ui       menu/data/sort_expand_list.h        menu/data/sort_expand_list.cpp
+    menu/data/list_calculus.ui          menu/data/list_calculus.h           menu/data/list_calculus.cpp
 )
 
 set(GUI_MENU_COMPUTE

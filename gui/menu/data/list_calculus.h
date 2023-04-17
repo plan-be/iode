@@ -1,0 +1,37 @@
+#pragma once
+
+#include <QWidget>
+
+#include "ui_list_calculus.h"
+#include "utils.h"
+#include "settings.h"
+#include "wrapper_classes.h"
+
+
+/**
+ * @brief 
+ *        Operators:
+ *         + = union
+ *         - = difference
+ *         * = intersection
+ *         x = product: ["A", "B"] x ["C", "D"] => ["AB", "AC", "BC", "BD"]
+ * 
+ */
+class QIodeMenuDataListCalculus : public QIodeSettings, public Ui::QIodeMenuDataListCalculus
+{
+    Q_OBJECT
+
+    WrapperQLineEdit* wList1;
+    WrapperQLineEdit* wList2;
+    WrapperQLineEdit* wListRes;
+    WrapperComboBox*  wComboOperator;
+    WrapperQTextEdit* wResults;
+
+public:
+	QIodeMenuDataListCalculus(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    ~QIodeMenuDataListCalculus();
+
+public slots:
+    void calculus();
+    void help();
+};
