@@ -736,7 +736,8 @@ int B_DataListSort(char* arg)
             *old_A_SEPS;
 
     args = B_vtom_chk(arg, 2); /* in out */
-    if(args == NULL) in = out = arg;
+    //if(args == NULL) in = out = arg;
+    if(args == NULL) return(-1);
     else {
         in = args[0];
         out = args[1];

@@ -44,7 +44,7 @@ char    B_SEPS[] = " ,\n\t";        // Accepted separators for fn arguments (in 
  *  
  *  @param [in] arg     char*   argument    
  *  @param [in] adef    ADEF*   list of ADEF structures (always NULL in the IODE functions)
- *  @param [in] nb      int     0 or expected number of arguments after expansion
+ *  @param [in] nb      int     0 or expected number of arguments after expansion if adef is not NULL
  *  @return             char**  NULL on error 
  *                              list of arguments after expansion
  *  
