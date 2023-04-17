@@ -36,6 +36,8 @@
 #include "menu/workspace/workspace_seasonal_adjustment.h"
 #include "menu/workspace/workspace_trend_correction.h"
 
+#include "menu/data/sort_expand_list.h"
+
 #include "menu/compute/compute_identities.h"
 #include "menu/compute/compute_simulation.h"
 #include "menu/compute/compute_model.h"

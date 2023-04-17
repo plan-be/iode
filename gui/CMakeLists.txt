@@ -138,6 +138,10 @@ set(GUI_MENU_WORKSPACE
     menu/workspace/workspace_trend_correction.ui        menu/workspace/workspace_trend_correction.h         menu/workspace/workspace_trend_correction.cpp
 )
 
+set(GUI_MENU_DATA 
+    menu/data/sort_expand_list.ui       menu/data/sort_expand_list.h        menu/data/sort_expand_list.cpp
+)
+
 set(GUI_MENU_COMPUTE
     menu/compute/compute_identities.ui          menu/compute/compute_identities.h           menu/compute/compute_identities.cpp
     menu/compute/compute_simulation.ui          menu/compute/compute_simulation.h           menu/compute/compute_simulation.cpp
@@ -150,7 +154,7 @@ set(GUI_MENU_PRINT_GRAPH
     menu/print_graph/graph_variables.ui         menu/print_graph/graph_variables.h          menu/print_graph/graph_variables.cpp
 )
 
-set(GUI_MENUS ${GUI_MENU_FILE} ${GUI_MENU_WORKSPACE} ${GUI_MENU_COMPUTE} ${GUI_MENU_PRINT_GRAPH})
+set(GUI_MENUS ${GUI_MENU_FILE} ${GUI_MENU_WORKSPACE} ${GUI_MENU_DATA} ${GUI_MENU_COMPUTE} ${GUI_MENU_PRINT_GRAPH})
 
 set(GUI_MAIN    
                         main_window_plot.h      main_window_plot.cpp

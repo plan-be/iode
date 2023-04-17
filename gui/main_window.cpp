@@ -404,7 +404,8 @@ void MainWindow::open_trend_correction_dialog()
 
 void MainWindow::open_sort_and_calculus_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "Sort and Calculs is not yet implemented");
+    QIodeMenuDataSortExpandList dialog(*project_settings_filepath, this);
+    dialog.exec();
 }
 
 void MainWindow::open_list_calculus_dialog()
