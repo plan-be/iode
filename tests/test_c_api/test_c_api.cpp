@@ -1476,6 +1476,14 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     lst = KLPTR("LIST2");
     EXPECT_TRUE(U_cmp_strs(lst, "A;B;C"));
 
+    // B_DataListSort() Example 2
+    K_add(KL_WS, "L1", "C;B;$L2;$L3");
+    K_add(KL_WS, "L2", "X Z Y");
+    K_add(KL_WS, "L3", "A B D");
+    rc = B_DataListSort("L1 RES");
+    lst = KLPTR("RES");
+    EXPECT_TRUE(U_cmp_strs(lst, "A;B;B;C;D;X;Y;Z"));
+
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , K_CMT);
     cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U");
@@ -1558,7 +1566,8 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     //printf("    BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
     //printf("    BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
 
-    cond = (rc == 0) && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;U;ZZZ;_EXO;_RES");
+    cond = (rc == 0) && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES");
+    //printf("%s\n", KLPTR("WS_ONLY"));
     EXPECT_EQ(cond, 1);
 
     // B_DataPrintGraph()
