@@ -1,19 +1,19 @@
 /**
  *  @header4iode
- *  
+ *
  *  IODE.H
  *  ------
- *  Contains 
+ *  Contains
  *      - #includes
- *      - #defines 
+ *      - #defines
  *      - structs and typedefs
- *      - declarations of functions 
+ *      - declarations of functions
  *      - declarations of variables
- *  
+ *
  *  This file should be included in all IODE api based C/C++ developement.
- *  
+ *
  */
- 
+
 #ifndef _IODE_H_
 #define _IODE_H_
 
@@ -50,9 +50,9 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.66 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.67 - (c) 1990-2023 Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR 6
-#define IODE_VERSION_MINOR 66
+#define IODE_VERSION_MINOR 67
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
