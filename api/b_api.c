@@ -98,6 +98,9 @@
  */
 int IodeInit()
 {
+    // To define the iode.msg file BEFORE scr4 (in SCR_init())
+    B_IodeMsgPath();            
+    
     // Initialize chrono for report functions
     RPF_ChronoReset();      
     
