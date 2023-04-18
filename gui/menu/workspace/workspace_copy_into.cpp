@@ -21,6 +21,8 @@ QIodeMenuWorkspaceCopyInto::QIodeMenuWorkspaceCopyInto(const QString& settings_f
     mapFields["SampleTo"] = wSampleEditSampleTo;
     mapFields["ObjectNames"] = wTextEditObjectNames;
 
+    connect(&wComboBoxObjectType->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuWorkspaceCopyInto::updateFileChooser);
+
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
     //                       since in that case this refers to MixingSettings and NOT the derived class
