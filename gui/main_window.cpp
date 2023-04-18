@@ -422,7 +422,11 @@ void MainWindow::open_list_calculus_dialog()
 
 void MainWindow::open_file_contents_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "File Contents is not yet implemented");
+    QIodeMenuDataFileContents dialog(*project_settings_filepath, this);
+    dialog.exec();
+    completer->updateIodeOjectsListNames();
+    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
+    tabWidget_IODE_objs->showTab(index);
 }
 
 void MainWindow::open_file_compare_dialog()
