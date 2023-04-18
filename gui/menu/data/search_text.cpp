@@ -1,0 +1,94 @@
+#include "search_text.h"
+
+QIodeMenuDataSearchText::QIodeMenuDataSearchText(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f)
+    : QIodeSettings(project_settings_filepath, parent, f)
+{
+    setupUi(this);
+
+    QStringList listIodeTypes;
+    for(const std::string& iode_type : vIodeTypes) listIodeTypes << QString::fromStdString(iode_type);
+
+    wText = new WrapperQLineEdit(label_text->text(), *lineEdit_text, REQUIRED_FIELD);
+    wSaveList = new WrapperQLineEdit(label_save_list->text(), *lineEdit_save_list, REQUIRED_FIELD);
+    wComboIodeTypes = new WrapperComboBox(label_objs_to_scan->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
+    wWholeWord = new WrapperCheckBox(checkBox_whole_word->text(), *checkBox_whole_word, REQUIRED_FIELD);
+    wExactCase = new WrapperCheckBox(checkBox_exact_case->text(), *checkBox_exact_case, REQUIRED_FIELD);
+    wSearchInNames = new WrapperCheckBox(checkBox_search_names->text(), *checkBox_search_names, REQUIRED_FIELD);
+    wSearchInFormulas = new WrapperCheckBox(checkBox_search_formulas->text(), *checkBox_search_formulas, REQUIRED_FIELD);
+    wSearchInFreeText = new WrapperCheckBox(checkBox_search_free_text->text(), *checkBox_search_free_text, REQUIRED_FIELD);
+    wResults = new WrapperQTextEdit(label_result->text(), *textEdit_result, OPTIONAL_FIELD);
+
+    mapFields["Text"]      = wText;
+    mapFields["SaveList"]  = wSaveList;
+    mapFields["IodeType"]  = wComboIodeTypes;
+    mapFields["WholeWord"] = wWholeWord;
+    mapFields["ExactCase"] = wExactCase;
+    mapFields["SearchInNames"] = wSearchInNames;
+    mapFields["SearchInFormulas"] = wSearchInFormulas;
+    mapFields["SearchInFreeText"] = wSearchInFreeText;
+
+    // TODO: if possible, find a way to initialize className inside MixingSettings
+    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
+    //                       since in that case this refers to MixingSettings and NOT the derived class
+    className = QString::fromStdString(typeid(this).name());
+    loadSettings();
+}
+
+QIodeMenuDataSearchText::~QIodeMenuDataSearchText()
+{
+    delete wText;
+    delete wSaveList;
+    delete wComboIodeTypes;
+    delete wWholeWord;
+    delete wExactCase;
+    delete wSearchInNames;
+    delete wSearchInFormulas;
+    delete wSearchInFreeText;
+    delete wResults;
+}
+
+// TODO ALD: implement a search_text() method in KDBAbstract + tests
+// Test: search Kost in Comments with search_in_free_text = true;
+void QIodeMenuDataSearchText::search()
+{
+    try
+    {
+        KDBLists kdb_lst;
+
+        std::string text = wText->extractAndVerify().toStdString();
+        std::string save_list = wSaveList->extractAndVerify().toStdString();
+        int iode_type = wComboIodeTypes->extractAndVerify();
+        bool whole_word = wWholeWord->extractAndVerify();
+        bool exact_case = wExactCase->extractAndVerify();
+        bool search_in_names = wSearchInNames->extractAndVerify();
+        bool search_in_formulas = wSearchInFormulas->extractAndVerify();
+        bool search_in_free_text = wSearchInFreeText->extractAndVerify();
+
+        std::string buf = text + " ";
+        buf += whole_word ? "1 " : "0 ";
+        buf += exact_case ? "1 " : "0 ";
+        buf += search_in_names ? "1 " : "0 ";
+        buf += search_in_formulas ? "1 " : "0 ";
+        buf += search_in_free_text ? "1 " : "0 ";
+        buf += save_list;
+
+        int res = B_DataSearch(buf.data(), iode_type);
+        if(res < 0) 
+            B_display_last_error();
+        else 
+        {
+            List res = kdb_lst.get(save_list);
+            wResults->setQValue(QString::fromStdString(res));
+        }
+
+    }
+    catch(const std::exception& e)
+    {
+        QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
+    }
+}
+
+void QIodeMenuDataSearchText::help()
+{
+	QDesktopServices::openUrl(url_manual);
+}

@@ -426,7 +426,11 @@ void MainWindow::open_file_compare_dialog()
 
 void MainWindow::open_search_text_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "Search Text is not yet implemented");
+    QIodeMenuDataSearchText dialog(*project_settings_filepath, this);
+    dialog.exec();
+    completer->updateIodeOjectsListNames();
+    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
+    tabWidget_IODE_objs->showTab(index);
 }
 
 void MainWindow::open_scan_objects_dialog()
