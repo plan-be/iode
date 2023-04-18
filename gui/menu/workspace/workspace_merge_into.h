@@ -31,4 +31,8 @@ public:
 public slots:
 	void merge_into_workspace();
     void help();
+    void updateFileChooser(int fileType)
+    {
+        wFileChooserInputFile->setFileType((EnumIodeFile) fileType);
+    }
 };
