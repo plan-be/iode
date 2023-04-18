@@ -257,6 +257,11 @@ public:
         this->qfield.setFileMode(fileMode);
     }
 
+    void setFileType(const EnumIodeFile fileType)
+    {
+        this->qfield.setFileType(fileType);
+    }
+
     QVariant getQValue()
     {
         QString value = qfield.getFilepath();
