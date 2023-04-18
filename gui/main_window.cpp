@@ -406,6 +406,9 @@ void MainWindow::open_sort_and_calculus_dialog()
 {
     QIodeMenuDataSortExpandList dialog(*project_settings_filepath, this);
     dialog.exec();
+    completer->updateIodeOjectsListNames();
+    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
+    tabWidget_IODE_objs->showTab(index);
 }
 
 void MainWindow::open_list_calculus_dialog()
