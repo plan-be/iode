@@ -39,6 +39,7 @@
 #include "menu/data/sort_expand_list.h"
 #include "menu/data/list_calculus.h"
 #include "menu/data/search_text.h"
+#include "menu/data/scan_objects.h"
 
 #include "menu/compute/compute_identities.h"
 #include "menu/compute/compute_simulation.h"
