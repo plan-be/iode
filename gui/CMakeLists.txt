@@ -142,6 +142,7 @@ set(GUI_MENU_DATA
     menu/data/sort_expand_list.ui       menu/data/sort_expand_list.h        menu/data/sort_expand_list.cpp
     menu/data/list_calculus.ui          menu/data/list_calculus.h           menu/data/list_calculus.cpp
     menu/data/search_text.ui            menu/data/search_text.h             menu/data/search_text.cpp
+    menu/data/scan_objects.ui           menu/data/scan_objects.h            menu/data/scan_objects.cpp
 )
 
 set(GUI_MENU_COMPUTE

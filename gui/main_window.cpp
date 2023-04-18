@@ -435,7 +435,13 @@ void MainWindow::open_search_text_dialog()
 
 void MainWindow::open_scan_objects_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "Scan Objects is not yet implemented");
+    QIodeMenuDataScanObjects dialog(*project_settings_filepath, this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        completer->updateIodeOjectsListNames();
+        int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
+        tabWidget_IODE_objs->showTab(index);
+    }
 }
 
 void MainWindow::open_edit_tables_variables_dialog()
