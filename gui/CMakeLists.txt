@@ -143,6 +143,7 @@ set(GUI_MENU_DATA
     menu/data/list_calculus.ui          menu/data/list_calculus.h           menu/data/list_calculus.cpp
     menu/data/search_text.ui            menu/data/search_text.h             menu/data/search_text.cpp
     menu/data/scan_objects.ui           menu/data/scan_objects.h            menu/data/scan_objects.cpp
+    menu/data/file_contents.ui          menu/data/file_contents.h           menu/data/file_contents.cpp
 )
 
 set(GUI_MENU_COMPUTE
