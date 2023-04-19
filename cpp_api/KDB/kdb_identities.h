@@ -28,6 +28,8 @@ public:
 
     int add(const std::string& name, const std::string& lec);
 
+    int add(const std::string& name, const Identity& obj);
+
     void update(const std::string& name, const std::string& lec);
 
     void update(const int pos, const std::string& lec);

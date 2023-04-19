@@ -24,6 +24,8 @@ public:
 
     std::string get_lec(const std::string& name) const;
 
+    int add(const std::string& name, const Equation& obj);
+
     int add(const std::string& name, const std::string& lec, const std::string& comment = "", const std::string& method = "",
         Sample* sample = nullptr, const std::string& instruments = "", const std::string& block = "", const std::array<float, EQS_NBTESTS>& tests = {0.}, const bool date = true);
 

@@ -23,6 +23,8 @@ public:
 
     std::string get_title(const std::string& name) const;
 
+    int add(const std::string& name, const Table& obj);
+
     int add(const std::string& name, const int nb_columns);
 
     int add(const std::string& name, const int nbColumns, const std::string& def, std::vector<std::string>& vars, bool mode, bool files, bool date);
