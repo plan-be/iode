@@ -19,6 +19,8 @@ public:
 
     KDBScalars(const KDBScalars& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
 
+    int add(const std::string& name, const Scalar& obj);
+
     int add(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std=L_NAN);
 
     void update(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std = L_NAN);

@@ -30,6 +30,11 @@ std::string KDBTables::get_title(const std::string& name) const
     return get_title(pos);
 }
 
+int KDBTables::add(const std::string& name, const Table& obj)
+{
+	return KDBTemplate::add(name, obj.c_table);
+}
+
 int KDBTables::add(const std::string& name, const int nbColumns)
 {
 	// throw exception if object with passed name already exist

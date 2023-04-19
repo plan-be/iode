@@ -12,6 +12,11 @@ Scalar KDBScalars::get_unchecked(const int pos) const
 	return Scalar(pos, get_KDB());
 }
 
+int KDBScalars::add(const std::string& name, const Scalar& obj)
+{
+	return KDBTemplate::add(name, obj.c_scalar);
+}
+
 int KDBScalars::add(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std)
 {
 	Scalar scalar(value, relax, std);

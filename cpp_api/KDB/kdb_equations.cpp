@@ -23,6 +23,21 @@ std::string KDBEquations::get_lec(const std::string& name) const
     return get_lec(pos);
 }
 
+int KDBEquations::add(const std::string& name, const Equation& obj)
+{
+    check_name(name, iode_type);
+
+    char* c_name = to_char_array(name);
+
+    // throw exception if object with passed name already exist
+    if (K_find(get_KDB(), c_name) >= 0)
+        throw IodeExceptionFunction("Cannot add " + iode_type_name + " with name " + name,  
+            iode_type_name + " with name " + name + " already exists. Use update() method instead.");
+
+    int pos = KDBTemplate::add(name, obj.c_equation, c_name);
+    return pos;
+}
+
 int KDBEquations::add(const std::string& name, const std::string& lec, const std::string& comment, const std::string& method,
     Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>& tests, const bool date)
 {
