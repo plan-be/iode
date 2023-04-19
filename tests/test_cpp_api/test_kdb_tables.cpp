@@ -169,6 +169,9 @@ TEST_F(KDBTablesTest, Copy)
 
     Table copy_table = kdb.copy("GFRPC");
     EXPECT_EQ(copy_table, original_table);
+
+    // add copy
+    kdb.add("DUP_GFRPC", copy_table);
 }
 
 TEST_F(KDBTablesTest, Filter)

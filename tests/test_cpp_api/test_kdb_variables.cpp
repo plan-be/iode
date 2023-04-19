@@ -257,6 +257,9 @@ TEST_F(KDBVariablesTest, Copy)
     var = kdb.get(name);
     copy_var = kdb.copy(name);
     EXPECT_EQ(copy_var, var);
+
+    // add copy
+    kdb.add("DUP_" + name, copy_var);
 }
 
 TEST_F(KDBVariablesTest, Filter)

@@ -152,6 +152,9 @@ TEST_F(KDBIdentitiesTest, Copy)
     Identity identity_copy = kdb.copy(name);
 
     EXPECT_EQ(identity_copy.get_lec(), kdb.get_lec(name));
+
+    // add copy
+    kdb.add("DUP_" + name, identity_copy);
 }
 
 TEST_F(KDBIdentitiesTest, Filter)
