@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent), project_settin
     setupUi(this);
 
     // ---- prepare auto-completion ----
-    completer = std::make_shared<QIodeCompleter>(false, this);
+    completer = std::make_shared<QIodeCompleter>(true, false, -1, this);
     lineEdit_iode_command->setup(textEdit_output, completer);
 
     // ---- dock widgets ----
