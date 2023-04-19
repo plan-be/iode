@@ -1,18 +1,8 @@
 #pragma once
+#include "custom_widgets/complete_line_edit.h"
 
-#include "utils.h"
-#include "custom_widgets/qiode_completer.h"
-
-#include <QObject>
-#include <QShortcut>
-#include <QLineEdit>
 #include <QTextEdit>
-#include <QCompleter>
-#include <QString>
 #include <QVector>
-#include <QKeyEvent>
-#include <QRegularExpression>
-#include <QAbstractItemView>
 
 
 /**
@@ -36,49 +26,31 @@
  *        A-Z, a-z, 0-9, _, $, #, and @. 
  * 
  */
-class QIodeCommandLine: public QLineEdit
+class QIodeCommandLine: public QIodeCompleteLineEdit
 {
     Q_OBJECT
 
     QVector<QString> executedCommandsList;
     QVector<QString>::const_iterator it;            // const_iterator are for read-only access
 
-    std::shared_ptr<QIodeCompleter> c;
-
     QTextEdit* output; 
 
 public:
-    QIodeCommandLine(QWidget *parent = nullptr) : QLineEdit(parent), 
-        it(executedCommandsList.end()), c(nullptr) {}
+    QIodeCommandLine(QWidget *parent = nullptr) 
+        : QIodeCompleteLineEdit(parent), it(executedCommandsList.end()) {}
 
     void setup(QTextEdit* output, std::shared_ptr<QIodeCompleter>& c) 
     { 
         this->output = output;
-
-        this->c = c;
-
-        if (!c.get())
-            return;
-
-        c->setWidget(this);
-        // Signal activated is overloaded in QCompleter. 
-        // To connect to this signal by using the function pointer syntax, Qt provides 
-        // a convenient helper for obtaining the function pointer
-        connect(c.get(), QOverload<const QString &>::of(&QCompleter::activated),
-                this, &QIodeCommandLine::insertCompletion);
+        setCompleter(c.get());
     }
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override;
-
-    // event handler used to receive keyboard focus events for the widget.
-    void focusInEvent(QFocusEvent* event) override;
-
-private slots:
-    void insertCompletion(const QString& completion);
-
-private:
-    QString textUnderCursor();
+    /**
+     * @param event 
+     * @return bool weither or not to exit keyPressEvent() 
+     */
+    bool handleSpecialKeys(QKeyEvent *event);
 
 public slots:
     void run_command();
