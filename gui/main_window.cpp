@@ -465,7 +465,9 @@ void MainWindow::open_edit_tables_variables_dialog()
 
 void MainWindow::open_duplicate_objects_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "Duplicate Objects is not yet implemented");
+    QIodeMenuDataDuplicateObj dialog(*project_settings_filepath, this);
+    if (dialog.exec() == QDialog::Accepted)
+        update_current_tab();
 }
 
 // -------- Run Menu --------

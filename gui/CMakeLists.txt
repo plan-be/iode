@@ -146,6 +146,7 @@ set(GUI_MENU_DATA
     menu/data/scan_objects.ui           menu/data/scan_objects.h            menu/data/scan_objects.cpp
     menu/data/file_contents.ui          menu/data/file_contents.h           menu/data/file_contents.cpp
     menu/data/file_compare.ui           menu/data/file_compare.h            menu/data/file_compare.cpp
+    menu/data/duplicate.ui              menu/data/duplicate.h               menu/data/duplicate.cpp
 )
 
 set(GUI_MENU_COMPUTE
