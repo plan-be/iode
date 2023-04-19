@@ -1,17 +1,11 @@
 #include "qiode_completer.h"
 
-QIodeCompleter::QIodeCompleter(const bool lecFunctions, QObject *parent) 
-    : QCompleter(parent), lecFunctions(lecFunctions)
-{
-    iodeDatabases.push_back(new KDBComments());
-    iodeDatabases.push_back(new KDBEquations());
-    iodeDatabases.push_back(new KDBIdentities());
-    iodeDatabases.push_back(new KDBLists());
-    iodeDatabases.push_back(new KDBScalars());
-    iodeDatabases.push_back(new KDBTables());
-    iodeDatabases.push_back(new KDBVariables());
 
+QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunctions, const int iodeType, QObject *parent) 
+    : QCompleter(parent), reportCommands(reportCommands), lecFunctions(lecFunctions)
+{
     std::vector<std::string> func_list;
+
     // $-functions
     func_list = build_command_functions_list(-1);
     for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
@@ -24,19 +18,18 @@ QIodeCompleter::QIodeCompleter(const bool lecFunctions, QObject *parent)
 
     reportCommandsList.sort();
 
-    QStringList list = reportCommandsList;
+    // LEC functions list
+    func_list = build_lec_functions_list();
+    for(const std::string& func_name: func_list) lecFunctionsList << QString::fromStdString(func_name);
 
-    if(lecFunctions)
-    {
-        // LEC functions list
-        func_list = build_lec_functions_list();
-        for(const std::string& func_name: func_list) lecFunctionsList << QString::fromStdString(func_name);
-        list += lecFunctionsList;
-    }
+    lecFunctionsList = lecFunctionsList;
 
-    listModel = new QStringListModel(list, this);
+    setIodeType(iodeType, false);
+
+    listModel = new QStringListModel(this);
+    updateIodeOjectsListNames();
+    
     this->setModel(listModel);
-
     this->setCaseSensitivity(Qt::CaseInsensitive);
     this->setCompletionMode(QCompleter::PopupCompletion);
 }
@@ -49,17 +42,21 @@ QIodeCompleter::~QIodeCompleter()
 
 void QIodeCompleter::updateIodeOjectsListNames()
 {
+    QStringList list;
+
+    // concatenate report commands/functions and Iode object names
+    if(reportCommands)
+        list += reportCommandsList;
+
+    if(lecFunctions)
+        list += lecFunctionsList;
+
     // build list of all Iode objects
     QStringList objectNames;
-    for(int i=0; i < I_NB_TYPES; i++)
+    for(int i=0; i < iodeDatabases.size(); i++)
         for(const std::string& obj_name: iodeDatabases[i]->get_names()) objectNames << QString::fromStdString(obj_name);
     objectNames.sort();
     objectNames.removeDuplicates();
-
-    // concatenate report commands/functions and Iode object names
-    QStringList list = reportCommandsList;
-    if(lecFunctions)
-        list += lecFunctionsList;
     list += objectNames;
 
     // update completer
