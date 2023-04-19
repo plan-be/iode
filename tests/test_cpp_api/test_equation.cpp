@@ -142,3 +142,5 @@ TEST_F(EquationTest, GetCoefficients)
     std::vector<std::string> coefs_list = equation->get_coefficients_list("ACAF");
     EXPECT_EQ(coefs_list, expected_coefs_list);
 }
+
+

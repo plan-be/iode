@@ -115,6 +115,9 @@ TEST_F(KDBListsTest, Copy)
 
     std::string list_copy = kdb.copy(name);
     EXPECT_EQ(list_copy, list);
+
+    // add copy
+    kdb.add("DUP_" + name, list_copy);
 }
 
 TEST_F(KDBListsTest, Filter)

@@ -212,6 +212,9 @@ TEST_F(KDBCommentsTest, Copy)
     copy_comment = kdb.copy(name);
     EXPECT_EQ(copy_comment, comment);
 
+    // add copy
+    kdb.add("DUP_" + name, copy_comment);
+
     // error: name does not exist
     EXPECT_THROW(kdb.copy("UNKNOWN"), IodeExceptionFunction);
 

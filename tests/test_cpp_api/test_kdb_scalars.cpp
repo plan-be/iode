@@ -126,6 +126,9 @@ TEST_F(KDBScalarsTest, Copy)
 
     Scalar scalar_copy = kdb.copy(name);
     EXPECT_EQ(scalar_copy, scalar);
+
+    // add copy
+    kdb.add("dup_" + name, scalar_copy);
 }
 
 TEST_F(KDBScalarsTest, Filter)
