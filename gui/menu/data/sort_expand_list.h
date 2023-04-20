@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/complete_line_edit.h"
 
 
 class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDataSortExpandList
@@ -14,6 +15,8 @@ class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDa
 
     WrapperQLineEdit* wLineSort;
     WrapperQLineEdit* wLineSave;
+
+    QIodeCompleter* completer;
 
 public:
 	QIodeMenuDataSortExpandList(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());

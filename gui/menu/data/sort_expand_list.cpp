@@ -5,6 +5,9 @@ QIodeMenuDataSortExpandList::QIodeMenuDataSortExpandList(const QString& project_
 {
     setupUi(this);
 
+    completer = new QIodeCompleter(false, false, I_LISTS, this);
+    lineEdit_sort->setCompleter(completer);
+
     wLineSort = new WrapperQLineEdit(label_sort->text(), *lineEdit_sort, REQUIRED_FIELD);
     wLineSave = new WrapperQLineEdit(label_save->text(), *lineEdit_save, REQUIRED_FIELD);
 
@@ -22,6 +25,8 @@ QIodeMenuDataSortExpandList::~QIodeMenuDataSortExpandList()
 {
     delete wLineSort;
     delete wLineSave;
+
+    delete completer;
 }
 
 // TODO ALD: implement a sort() method in KDBLists
