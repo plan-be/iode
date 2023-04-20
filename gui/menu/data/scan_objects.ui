@@ -90,7 +90,7 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0" rowspan="2">
+   <item row="1" column="0">
     <widget class="QLabel" name="label_lists_to_scan">
      <property name="text">
       <string>List(s) to Scan</string>
@@ -98,7 +98,7 @@
     </widget>
    </item>
    <item row="1" column="1" rowspan="2" colspan="2">
-    <widget class="QTextEdit" name="textEdit_lists_to_scan"/>
+    <widget class="QIodeCompleteTextEdit" name="textEdit_lists_to_scan"/>
    </item>
    <item row="2" column="3" rowspan="2">
     <spacer name="verticalSpacer">
@@ -138,6 +138,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QIodeCompleteTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>custom_widgets/complete_text_edit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
