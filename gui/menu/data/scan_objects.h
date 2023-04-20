@@ -6,14 +6,17 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 class QIodeMenuDataScanObjects : public QIodeSettings, public Ui::QIodeMenuDataScanObjects
 {
     Q_OBJECT
 
-    WrapperComboBox*  wComboIodeTypes;
-    WrapperQTextEdit* wListsToScan;
+    WrapperComboBox*       wComboIodeTypes;
+    WrapperQPlainTextEdit* wListsToScan;
+
+    QIodeCompleter* completer;
 
 public:
 	QIodeMenuDataScanObjects(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
