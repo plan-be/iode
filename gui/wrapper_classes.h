@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QSpinBox>
+#include <QPlainTextEdit>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
 
@@ -159,6 +160,35 @@ public:
     {
         QString value = qvalue.toString();
         qfield.setText(value);
+    }
+
+    QString extractAndVerify()
+    {
+        QString value = qfield.toPlainText();
+
+        if (type == REQUIRED_FIELD && value.isEmpty())
+            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+
+        return value;
+    }
+};
+
+
+class WrapperQPlainTextEdit : public TemplateWrapper<QPlainTextEdit, QString>
+{
+public:
+    WrapperQPlainTextEdit(const QString name, QPlainTextEdit& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
+
+    QVariant getQValue()
+    {
+        QString value = qfield.toPlainText();
+        return QVariant(value);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        QString value = qvalue.toString();
+        qfield.setPlainText(value);
     }
 
     QString extractAndVerify()
