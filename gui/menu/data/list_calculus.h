@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/complete_line_edit.h"
 
 
 /**
@@ -26,6 +27,8 @@ class QIodeMenuDataListCalculus : public QIodeSettings, public Ui::QIodeMenuData
     WrapperQLineEdit* wListRes;
     WrapperComboBox*  wComboOperator;
     WrapperQTextEdit* wResults;
+
+    QIodeCompleter* completer;
 
 public:
 	QIodeMenuDataListCalculus(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());

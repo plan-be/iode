@@ -5,6 +5,10 @@ QIodeMenuDataListCalculus::QIodeMenuDataListCalculus(const QString& project_sett
 {
     setupUi(this);
 
+    completer = new QIodeCompleter(false, false, I_LISTS, this);
+    lineEdit_list1->setCompleter(completer);
+    lineEdit_list2->setCompleter(completer);
+
     QStringList listOperators;
     listOperators << "+" << "*" << "-" << "x";
 
@@ -32,6 +36,8 @@ QIodeMenuDataListCalculus::~QIodeMenuDataListCalculus()
     delete wListRes;
     delete wComboOperator;
     delete wResults;
+
+    delete completer;
 }
 
 // TODO ALD: implement a calculus() method in KDBLists + tests
