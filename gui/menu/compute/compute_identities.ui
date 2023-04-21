@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>330</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
-    <height>330</height>
+    <width>0</width>
+    <height>420</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>330</height>
+    <height>420</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -32,239 +32,286 @@
    <iconset>
     <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
   </property>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>491</width>
-     <height>291</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_execute">
-      <property name="text">
-       <string>Execute</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label_from">
-      <property name="text">
-       <string>From</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
-      <property name="toolTip">
-       <string>- yyyy is the year
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_execute">
+     <property name="text">
+      <string>Execute</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_from">
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
+     <property name="toolTip">
+      <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
  -ppp is the period of the year</string>
-      </property>
-      <property name="inputMask">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QLabel" name="label_to">
-      <property name="text">
-       <string>To</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="4">
-     <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
-      <property name="toolTip">
-       <string>- yyyy is the year
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QLabel" name="label_to">
+     <property name="text">
+      <string>To</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
+     <property name="toolTip">
+      <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
  -ppp is the period of the year</string>
-      </property>
-      <property name="inputMask">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_identities_list">
-      <property name="text">
-       <string>Identities List
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="6">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>74</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="7">
+    <widget class="QPushButton" name="OKButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>OK</string>
+     </property>
+     <property name="shortcut">
+      <string>F10</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QLabel" name="label_identities_list">
+     <property name="text">
+      <string>Identities List
 
 (empty for
 all identities)</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1" colspan="5">
-     <widget class="QTextEdit" name="textEdit_identities_list"/>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_variables_list">
-      <property name="text">
-       <string>Input Variables
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" rowspan="2" colspan="6">
+    <widget class="QIodeCompleteTextEdit" name="textEdit_identities_list"/>
+   </item>
+   <item row="1" column="7">
+    <widget class="QPushButton" name="cancelButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="shortcut">
+      <string>Esc</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="7">
+    <widget class="QPushButton" name="helpButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Help</string>
+     </property>
+     <property name="shortcut">
+      <string>F1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="7">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7" rowspan="10">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>280</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0" rowspan="2">
+    <widget class="QLabel" name="label_variables_list">
+     <property name="text">
+      <string>Input Variables
 Files</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1" colspan="5">
-     <widget class="QTextEdit" name="textEdit_variables_list"/>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_scalars_list">
-      <property name="text">
-       <string>Input Scalars
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="6">
+    <widget class="QIodeFileChooser" name="fileChooser_var_file1" native="true"/>
+   </item>
+   <item row="5" column="1" colspan="6">
+    <widget class="QIodeFileChooser" name="fileChooser_var_file2" native="true"/>
+   </item>
+   <item row="6" column="1" colspan="6">
+    <widget class="QIodeFileChooser" name="fileChooser_var_file3" native="true"/>
+   </item>
+   <item row="7" column="0" colspan="7">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" rowspan="2">
+    <widget class="QLabel" name="label_scalars_list">
+     <property name="text">
+      <string>Input Scalars
 Files</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1" colspan="5">
-     <widget class="QTextEdit" name="textEdit_scalars_list"/>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_trace">
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="6">
+    <widget class="QIodeFileChooser" name="fileChooser_scl_file1" native="true"/>
+   </item>
+   <item row="9" column="1" colspan="6">
+    <widget class="QIodeFileChooser" name="fileChooser_scl_file2" native="true"/>
+   </item>
+   <item row="10" column="1" colspan="6">
+    <widget class="QIodeFileChooser" name="fileChooser_scl_file3" native="true"/>
+   </item>
+   <item row="11" column="0" colspan="7">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_trace">
+     <property name="text">
+      <string>Trace ?</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QCheckBox" name="checkBox_trace">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="2">
+    <widget class="QLabel" name="label_language">
+     <property name="text">
+      <string>Language</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="3">
+    <widget class="QComboBox" name="comboBox_language">
+     <item>
       <property name="text">
-       <string>Trace ?</string>
+       <string>English</string>
       </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QCheckBox" name="checkBox_trace">
+     </item>
+     <item>
       <property name="text">
-       <string/>
+       <string>French</string>
       </property>
-     </widget>
-    </item>
-    <item row="4" column="2">
-     <widget class="QLabel" name="label_language">
+     </item>
+     <item>
       <property name="text">
-       <string>Language</string>
+       <string>Dutch</string>
       </property>
-     </widget>
-    </item>
-    <item row="4" column="3" colspan="2">
-     <widget class="QComboBox" name="comboBox_language">
-      <item>
-       <property name="text">
-        <string>English</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>French</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Dutch</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="4" column="5">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>20</y>
-     <width>77</width>
-     <height>291</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QPushButton" name="OKButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>OK</string>
-      </property>
-      <property name="shortcut">
-       <string>F10</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="cancelButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Cancel</string>
-      </property>
-      <property name="shortcut">
-       <string>Esc</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="helpButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Help</string>
-      </property>
-      <property name="shortcut">
-       <string>F1</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
+     </item>
+    </widget>
+   </item>
+   <item row="12" column="4" colspan="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>236</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QIodeFileChooser</class>
+   <extends>QWidget</extends>
+   <header>custom_widgets/qfilechooser.h</header>
+   <container>1</container>
+   <slots>
+    <slot>updateFileType(QString)</slot>
+   </slots>
+  </customwidget>
   <customwidget>
    <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
    <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QIodeCompleteTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>custom_widgets/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

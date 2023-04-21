@@ -15,23 +15,33 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(const QString& project_se
     QIodeSettings(project_settings_filepath, parent, f)
 {
     setupUi(this);
+    completer = new QIodeCompleter(false, false, I_IDENTITIES, textEdit_identities_list);
+    textEdit_identities_list->setCompleter(completer);
 
 	QList<QString> q_langs;
 	for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
 
 	qFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
 	qTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
-    qIdentitiesList = new WrapperQTextEdit(label_identities_list->text(), *textEdit_identities_list, OPTIONAL_FIELD);
-    qVariablesFiles = new WrapperQTextEdit(label_variables_list->text(), *textEdit_variables_list, OPTIONAL_FIELD);
-    qScalarsFiles = new WrapperQTextEdit(label_scalars_list->text(), *textEdit_scalars_list, OPTIONAL_FIELD);
+    qIdentitiesList = new WrapperQPlainTextEdit(label_identities_list->text(), *textEdit_identities_list, OPTIONAL_FIELD);
+    qVariablesFile1 = new WrapperFileChooser(label_variables_list->text(), *fileChooser_var_file1, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
+    qVariablesFile2 = new WrapperFileChooser(label_variables_list->text(), *fileChooser_var_file2, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
+    qVariablesFile3 = new WrapperFileChooser(label_variables_list->text(), *fileChooser_var_file3, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
+    qScalarsFile1 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file1, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
+    qScalarsFile2 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file2, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
+    qScalarsFile3 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file3, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
     qTrace = new WrapperCheckBox(label_trace->text(), *checkBox_trace, REQUIRED_FIELD);
     qLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
 
     mapFields["From"] = qFrom;
     mapFields["To"] = qTo;
     mapFields["Identities_List"] = qIdentitiesList;
-    mapFields["Variables_Files"] = qVariablesFiles;
-    mapFields["Scalars_Files"] = qScalarsFiles;
+    mapFields["Variables_File_1"] = qVariablesFile1;
+    mapFields["Variables_File_2"] = qVariablesFile2;
+    mapFields["Variables_File_3"] = qVariablesFile3;
+    mapFields["Scalars_File_1"] = qScalarsFile1;
+    mapFields["Scalars_File_2"] = qScalarsFile2;
+    mapFields["Scalars_File_3"] = qScalarsFile3;
     mapFields["Trace"] = qTrace;
     mapFields["Language"] = qLanguage;
 
@@ -64,10 +74,16 @@ QIodeMenuComputeIdentities::~QIodeMenuComputeIdentities()
     delete qFrom; 
     delete qTo;
     delete qIdentitiesList;
-    delete qVariablesFiles;
-    delete qScalarsFiles;
+    delete qVariablesFile1;
+    delete qVariablesFile2;
+    delete qVariablesFile3;
+    delete qScalarsFile1;
+    delete qScalarsFile2;
+    delete qScalarsFile3;
     delete qTrace;
     delete qLanguage;
+
+    delete completer;
 }
 
 void QIodeMenuComputeIdentities::compute()
@@ -80,8 +96,19 @@ void QIodeMenuComputeIdentities::compute()
         std::string to = qTo->extractAndVerify().toStdString();
         Sample sample(from, to);
         std::string identities_list = qIdentitiesList->extractAndVerify().toStdString();
-        std::string variables_files = qVariablesFiles->extractAndVerify().toStdString();
-        std::string scalars_files = qScalarsFiles->extractAndVerify().toStdString();
+
+        QStringList variablesFiles;
+        variablesFiles << qVariablesFile1->extractAndVerify();
+        variablesFiles << qVariablesFile2->extractAndVerify();
+        variablesFiles << qVariablesFile3->extractAndVerify();
+        std::string variables_files = variablesFiles.join(";").toStdString();
+
+        QStringList scalarsFiles;
+        scalarsFiles << qScalarsFile1->extractAndVerify();
+        scalarsFiles << qScalarsFile2->extractAndVerify();
+        scalarsFiles << qScalarsFile3->extractAndVerify();
+        std::string scalars_files = scalarsFiles.join(";").toStdString();
+
         bool trace = qTrace->extractAndVerify();
         EnumLang language = (EnumLang) (qLanguage->extractAndVerify() + IT_ENGLISH);
 
