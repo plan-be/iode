@@ -6,13 +6,16 @@ QIodeMenuWorkspaceExtrapolateVariables::QIodeMenuWorkspaceExtrapolateVariables(c
 {
     setupUi(this);
 
+    completer = new QIodeCompleter(false, false, I_VARIABLES, textEdit_variables_list);
+    textEdit_variables_list->setCompleter(completer);
+
     QList<QString> methodsList; 
     for(const std::string& method : v_simulation_initialization) methodsList << QString::fromStdString(method);
 
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
     wMethod = new WrapperComboBox(label_method->text(), *comboBox_method, REQUIRED_FIELD, methodsList);
-    wVarsList = new WrapperQTextEdit(label_variables_list->text(), *textEdit_variables_list, OPTIONAL_FIELD);
+    wVarsList = new WrapperQPlainTextEdit(label_variables_list->text(), *textEdit_variables_list, OPTIONAL_FIELD);
 
     mapFields["From"] = wFrom;
     mapFields["To"] = wTo;
@@ -32,6 +35,8 @@ QIodeMenuWorkspaceExtrapolateVariables::~QIodeMenuWorkspaceExtrapolateVariables(
     delete wTo;
     delete wMethod;
     delete wVarsList;
+
+    delete completer;
 }
 
 void QIodeMenuWorkspaceExtrapolateVariables::extrapolate_variables()
