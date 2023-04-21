@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -21,13 +22,19 @@ class QIodeMenuComputeIdentities : public QIodeSettings, public Ui::QIodeMenuCom
     Q_OBJECT
 
     
-	WrapperSampleEdit* qFrom; 
-	WrapperSampleEdit* qTo;
-    WrapperQTextEdit*  qIdentitiesList;
-    WrapperQTextEdit*  qVariablesFiles;
-    WrapperQTextEdit*  qScalarsFiles;
-    WrapperCheckBox*   qTrace;
-    WrapperComboBox*   qLanguage;
+	WrapperSampleEdit*      qFrom; 
+	WrapperSampleEdit*      qTo;
+    WrapperQPlainTextEdit*  qIdentitiesList;
+    WrapperFileChooser*     qVariablesFile1;
+    WrapperFileChooser*     qVariablesFile2;
+    WrapperFileChooser*     qVariablesFile3;
+    WrapperFileChooser*     qScalarsFile1;
+    WrapperFileChooser*     qScalarsFile2;
+    WrapperFileChooser*     qScalarsFile3;
+    WrapperCheckBox*        qTrace;
+    WrapperComboBox*        qLanguage;
+
+    QIodeCompleter*         completer;
 
 public:
 	QIodeMenuComputeIdentities(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
