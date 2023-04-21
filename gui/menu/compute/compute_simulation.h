@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -19,20 +20,22 @@ class QIodeMenuComputeSimulation : public QIodeSettings, public Ui::QIodeMenuCom
 {
     Q_OBJECT
 
-    QList<QString> qInitialisationList;
-    QList<QString> qSortAlgoList;
+    QList<QString>   qInitialisationList;
+    QList<QString>   qSortAlgoList;
+    QIodeCompleter*  completer_eqs;
+    QIodeCompleter*  completer_var;
 
-    WrapperQTextEdit* qEquationsList;
-    WrapperQTextEdit* qExchange;
-    WrapperSampleEdit* qFrom;
-    WrapperSampleEdit* qTo;
-    WrapperQLineEdit* qConvergence;
-    WrapperSpinBox* qMaxIterations;
-    WrapperCheckBox* qCheckDebug;
-    WrapperQLineEdit* qRelaxation;
-    WrapperComboBox* qSimInitialisation;
-    WrapperComboBox* qSortAlgorithm;
-    WrapperSpinBox* qNbPasses;
+    WrapperQPlainTextEdit* qEquationsList;
+    WrapperQPlainTextEdit* qExchange;
+    WrapperSampleEdit*     qFrom;
+    WrapperSampleEdit*     qTo;
+    WrapperQLineEdit*      qConvergence;
+    WrapperSpinBox*        qMaxIterations;
+    WrapperCheckBox*       qCheckDebug;
+    WrapperQLineEdit*      qRelaxation;
+    WrapperComboBox*       qSimInitialisation;
+    WrapperComboBox*       qSortAlgorithm;
+    WrapperSpinBox*        qNbPasses;
 
 public:
 	QIodeMenuComputeSimulation(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
