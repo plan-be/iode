@@ -37,9 +37,12 @@ public:
         return c;
     }
 
-    void setCompleter(QIodeCompleter* c) 
+    void setCompleter(QIodeCompleter* completer) 
     {
-        this->c = c;
+        if(c)
+            c->disconnect(this);
+
+        c = completer;
 
         if (!c)
             return;
