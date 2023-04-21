@@ -17,6 +17,7 @@
 #include "iode_objs/estimation/estimation_results.h"
 #include "iode_objs/misc/unit_root.h"
 #include "iode_objs/misc/dyn_adjustment.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -30,17 +31,18 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
 {
     Q_OBJECT
 
-    KDBEquations kdb_eqs;
-    Estimation* estimation;
+    KDBEquations    kdb_eqs;
+    Estimation*     estimation;
+    QIodeCompleter* completer;
 
-    WrapperIodeNameEdit* lineName;
-    WrapperComboBox* comboBoxMethod;
-    WrapperSampleEdit* sampleFrom;
-    WrapperSampleEdit* sampleTo;
-    WrapperQTextEdit* lineLec;
-    WrapperQLineEdit* lineComment;
-    WrapperQLineEdit* lineBlock;
-    WrapperQLineEdit* lineInstruments;
+    WrapperIodeNameEdit*    lineName;
+    WrapperComboBox*        comboBoxMethod;
+    WrapperSampleEdit*      sampleFrom;
+    WrapperSampleEdit*      sampleTo;
+    WrapperQPlainTextEdit*  lineLec;
+    WrapperQLineEdit*       lineComment;
+    WrapperQLineEdit*       lineBlock;
+    WrapperQLineEdit*       lineInstruments;
 
 protected:
 	QString project_settings_filepath;

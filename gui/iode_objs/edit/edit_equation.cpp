@@ -11,10 +11,11 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString&
 
 	setupUi(this);
 
-	estimation = nullptr;
+	completer = new QIodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
+	textEdit_lec->setCompleter(completer);
+	textEdit_lec->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
-	textEdit_lec->setAcceptRichText(false);
-	textEdit_lec->setLineWrapMode(QTextEdit::LineWrapMode::WidgetWidth);
+	estimation = nullptr;
 
 	int i = 0;
 	QList<QString> list_methods;
@@ -24,7 +25,7 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString&
 	comboBoxMethod = new WrapperComboBox(label_method->text(), *comboBox_method, OPTIONAL_FIELD, list_methods);
 	sampleFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_from, OPTIONAL_FIELD);
 	sampleTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_to, OPTIONAL_FIELD);
-	lineLec = new WrapperQTextEdit(label_lec->text(), *textEdit_lec, REQUIRED_FIELD);
+	lineLec = new WrapperQPlainTextEdit(label_lec->text(), *textEdit_lec, REQUIRED_FIELD);
 	lineComment = new WrapperQLineEdit(label_comment->text(), *lineEdit_comment, OPTIONAL_FIELD);
 	lineBlock = new WrapperQLineEdit(label_block->text(), *lineEdit_block, OPTIONAL_FIELD);
 	lineInstruments = new WrapperQLineEdit(label_instruments->text(), *lineEdit_instruments, OPTIONAL_FIELD);
@@ -60,6 +61,8 @@ QIodeEditEquation::~QIodeEditEquation()
 	delete lineComment;
 	delete lineBlock;
 	delete lineInstruments;
+
+	delete completer;
 
 	if(estimation) delete estimation;
 }
