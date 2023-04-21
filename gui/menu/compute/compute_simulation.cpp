@@ -16,11 +16,16 @@ QIodeMenuComputeSimulation::QIodeMenuComputeSimulation(const QString& project_se
 {
     setupUi(this);
 
+	completer_eqs = new QIodeCompleter(false, false, I_EQUATIONS, textEdit_equations_list);
+	textEdit_equations_list->setCompleter(completer_eqs);
+	completer_var = new QIodeCompleter(false, false, I_VARIABLES, textEdit_exchange);
+	textEdit_exchange->setCompleter(completer_var);
+
     for(const std::string& initialisation: v_simulation_initialization) qInitialisationList << QString::fromStdString(initialisation);
     for(const std::string& sort_algo: v_simulation_sort_algorithm) qSortAlgoList << QString::fromStdString(sort_algo);
 
-    qEquationsList = new WrapperQTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
-    qExchange = new WrapperQTextEdit(label_exchange->text(), *textEdit_exchange, OPTIONAL_FIELD);
+    qEquationsList = new WrapperQPlainTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
+    qExchange = new WrapperQPlainTextEdit(label_exchange->text(), *textEdit_exchange, OPTIONAL_FIELD);
     qFrom = new WrapperSampleEdit(label_simulation_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
     qTo = new WrapperSampleEdit(label_simulation_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
     qConvergence = new WrapperQLineEdit(label_convergence->text(), *lineEdit_convergence, REQUIRED_FIELD);
@@ -63,6 +68,9 @@ QIodeMenuComputeSimulation::~QIodeMenuComputeSimulation()
     delete qSimInitialisation;
     delete qSortAlgorithm;
     delete qNbPasses;
+
+    delete completer_eqs;
+    delete completer_var;
 }
 
 void QIodeMenuComputeSimulation::compute()
