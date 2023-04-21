@@ -1,6 +1,6 @@
 #include "text_editor.h"
 
-TextEditor::TextEditor(QWidget *parent) : QPlainTextEdit(parent)
+TextEditor::TextEditor(QWidget *parent) : QIodeCompleteTextEdit(parent)
 {
     leftArea = new LeftArea(this);
 

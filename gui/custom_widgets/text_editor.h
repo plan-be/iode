@@ -14,12 +14,13 @@
 
 #include "utils.h"
 #include "util/find_and_replace_dialog.h"
+#include "custom_widgets/complete_text_edit.h"
 
 
 class LeftArea;
 
 
-class TextEditor : public QPlainTextEdit
+class TextEditor : public QIodeCompleteTextEdit
 {
     Q_OBJECT
 
