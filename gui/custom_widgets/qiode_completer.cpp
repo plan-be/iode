@@ -4,34 +4,23 @@
 QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunctions, const int iodeType, QObject *parent) 
     : QCompleter(parent), reportCommands(reportCommands), lecFunctions(lecFunctions)
 {
-    std::vector<std::string> func_list;
+    buildReportCommandsList();
+    buidlLecFunctionsList();
+    setListModel();
 
-    // $-functions
-    func_list = build_command_functions_list(-1);
-    for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
-    // #-functions
-    func_list = build_command_functions_list(-1, true);
-    for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
-    // @-functions
-    func_list = build_report_functions_list();
-    for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
+    setIodeType(iodeType, true);
+}
 
-    reportCommandsList.sort();
+QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunctions, const QVector<int>& iodeTypes, QObject *parent) 
+    : QCompleter(parent), reportCommands(reportCommands), lecFunctions(lecFunctions)
+{
+    buildReportCommandsList();
+    buidlLecFunctionsList();
+    setListModel();
 
-    // LEC functions list
-    func_list = build_lec_functions_list();
-    for(const std::string& func_name: func_list) lecFunctionsList << QString::fromStdString(func_name);
-
-    lecFunctionsList = lecFunctionsList;
-
-    setIodeType(iodeType, false);
-
-    listModel = new QStringListModel(this);
+    foreach(const int iodeType, iodeTypes)
+        addIodeType(iodeType, false);
     updateIodeOjectsListNames();
-    
-    this->setModel(listModel);
-    this->setCaseSensitivity(Qt::CaseInsensitive);
-    this->setCompletionMode(QCompleter::PopupCompletion);
 }
 
 QIodeCompleter::~QIodeCompleter()
@@ -53,8 +42,9 @@ void QIodeCompleter::updateIodeOjectsListNames()
 
     // build list of all Iode objects
     QStringList objectNames;
-    for(int i=0; i < iodeDatabases.size(); i++)
-        for(const std::string& obj_name: iodeDatabases[i]->get_names()) objectNames << QString::fromStdString(obj_name);
+    foreach(KDBAbstract* kdb, iodeDatabases)
+        for(const std::string& obj_name: kdb->get_names()) 
+            objectNames << QString::fromStdString(obj_name);
     objectNames.sort();
     objectNames.removeDuplicates();
     list += objectNames;
