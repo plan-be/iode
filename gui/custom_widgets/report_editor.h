@@ -24,40 +24,12 @@ class ReportEditor : public TextEditor
 {
     Q_OBJECT
 
-    std::shared_ptr<QIodeCompleter> shared_c;
-    QIodeCompleter* c;
     QIodeHighlighter *highlighter;
-
-    QKeyCombination keyCombineComplete;
-
-    QTextEdit* output; 
-
-private:
-    QString textUnderCursor() const;
-
-private slots:
-    void insertCompletion(const QString& completion);
-
-protected:
-    void keyPressEvent(QKeyEvent* e) override;
-
-    // event handler used to receive keyboard focus events for the widget.
-    void focusInEvent(QFocusEvent* e) override;
+    QTextEdit* output;
 
 public: 
-    ReportEditor(std::shared_ptr<QIodeCompleter>& shared_c, QTextEdit* output, QWidget *parent = nullptr);
+    ReportEditor(QTextEdit* output, QWidget *parent = nullptr);
     ~ReportEditor();
 
     void run(const QString& filepath);
-
-    void enableAutocomplete(const bool enable)
-    {
-        if (!shared_c.get())
-            return;
-
-        if(enable)
-            c = shared_c.get();
-        else
-            c = nullptr;
-    }
 };

@@ -38,7 +38,8 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
     col++;
 
     // add report editor
-    editor = new ReportEditor(completer, output, parent);
+    editor = new ReportEditor(output, parent);
+    editor->setCompleter(completer.get());
     addEditorToLayout(1);
 
     // ---- Signals and Slots ----

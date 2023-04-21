@@ -42,9 +42,4 @@ private slots:
         static_cast<ReportEditor*>(editor)->run(filepath);
         emit askComputeHash(false);
     }
-
-    void toggleAutocomplete(int state)
-    {
-        static_cast<ReportEditor*>(editor)->enableAutocomplete(state == Qt::Checked);
-    }
 };
