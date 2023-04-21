@@ -16,7 +16,10 @@ QIodeMenuComputeModel::QIodeMenuComputeModel(const QString& project_settings_fil
 {
     setupUi(this);
 
-    qEquationsList = new WrapperQTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
+	completer = new QIodeCompleter(false, false, I_EQUATIONS, textEdit_equations_list);
+	textEdit_equations_list->setCompleter(completer);
+
+    qEquationsList = new WrapperQPlainTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
     mapFields["EquationsList"] = qEquationsList;
 
     // TODO: if possible, find a way to initialize className inside MixingSettings
@@ -29,6 +32,7 @@ QIodeMenuComputeModel::QIodeMenuComputeModel(const QString& project_settings_fil
 QIodeMenuComputeModel::~QIodeMenuComputeModel()
 {
     delete qEquationsList;
+    delete completer;
 }
 
 void QIodeMenuComputeModel::compute()

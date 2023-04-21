@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -19,7 +20,8 @@ class QIodeMenuComputeModel : public QIodeSettings, public Ui::QIodeMenuComputeM
 {
     Q_OBJECT
 
-    WrapperQTextEdit* qEquationsList;
+    WrapperQPlainTextEdit* qEquationsList;
+    QIodeCompleter*        completer;
 
 public:
 	QIodeMenuComputeModel(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
