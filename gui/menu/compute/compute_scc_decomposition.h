@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -19,11 +20,13 @@ class QIodeMenuComputeSCCDecomposition : public QIodeSettings, public Ui::QIodeM
 {
     Q_OBJECT
 
-    WrapperQTextEdit* qEquationsList;
-    WrapperSpinBox*   qTriangulationIterations;
-    WrapperQLineEdit* qPreRecursiveListName;
-    WrapperQLineEdit* qInterRecursiveListName;
-    WrapperQLineEdit* qPostRecursiveListName;
+    WrapperQPlainTextEdit*  qEquationsList;
+    WrapperSpinBox*         qTriangulationIterations;
+    WrapperQLineEdit*       qPreRecursiveListName;
+    WrapperQLineEdit*       qInterRecursiveListName;
+    WrapperQLineEdit*       qPostRecursiveListName;
+
+    QIodeCompleter*         completer;
 
 public:
 	QIodeMenuComputeSCCDecomposition(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());

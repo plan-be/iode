@@ -16,7 +16,10 @@ QIodeMenuComputeSCCDecomposition::QIodeMenuComputeSCCDecomposition(const QString
 {
     setupUi(this);
 
-    qEquationsList = new WrapperQTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
+	completer = new QIodeCompleter(false, false,I_EQUATIONS, textEdit_equations_list);
+	textEdit_equations_list->setCompleter(completer);
+
+    qEquationsList = new WrapperQPlainTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
     qTriangulationIterations = new WrapperSpinBox(label_triangulation_iterations->text(), *spinBox_triangulation_iterations, REQUIRED_FIELD);
     qPreRecursiveListName = new WrapperQLineEdit(label_pre_recursive->text(), *lineEdit_pre_recursive_list_name, REQUIRED_FIELD);
     qInterRecursiveListName = new WrapperQLineEdit(label_inter_recursive->text(), *lineEdit_inter_recursive_list_name, REQUIRED_FIELD);
@@ -42,6 +45,8 @@ QIodeMenuComputeSCCDecomposition::~QIodeMenuComputeSCCDecomposition()
     delete qPreRecursiveListName;
     delete qInterRecursiveListName;
     delete qPostRecursiveListName;
+
+    delete completer;
 }
 
 void QIodeMenuComputeSCCDecomposition::compute()
