@@ -12,7 +12,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>500</width>
+    <width>170</width>
     <height>250</height>
    </size>
   </property>
@@ -29,139 +29,159 @@
    <iconset>
     <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
   </property>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>371</width>
-     <height>211</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_extrapolate">
-      <property name="text">
-       <string>Extrapolate</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label_sample_from">
-      <property name="text">
-       <string>From</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
-      <property name="toolTip">
-       <string>- yyyy is the year
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_extrapolate">
+     <property name="text">
+      <string>Extrapolate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_sample_from">
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
+     <property name="toolTip">
+      <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
  -ppp is the period of the year</string>
-      </property>
-      <property name="inputMask">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QLabel" name="label_sample_to">
-      <property name="text">
-       <string>To</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="4">
-     <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
-      <property name="toolTip">
-       <string>- yyyy is the year
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="label_sample_to">
+     <property name="text">
+      <string>To</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
+     <property name="toolTip">
+      <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
  -ppp is the period of the year</string>
-      </property>
-      <property name="inputMask">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_method">
-      <property name="text">
-       <string>Method</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_variables_list">
-      <property name="text">
-       <string>Variables list
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5" rowspan="3">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_extrapolate">
+       <property name="text">
+        <string>Extrapolate</string>
+       </property>
+       <property name="shortcut">
+        <string>F10</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="shortcut">
+        <string>Esc</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_help">
+       <property name="text">
+        <string>Help</string>
+       </property>
+       <property name="shortcut">
+        <string>F1</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_method">
+     <property name="text">
+      <string>Method</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="comboBox_method">
+     <property name="minimumSize">
+      <size>
+       <width>170</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>131</width>
+       <height>18</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0" rowspan="2">
+    <widget class="QLabel" name="label_variables_list">
+     <property name="text">
+      <string>Variables list
 
 (empty=all)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1" colspan="4">
-     <widget class="QTextEdit" name="textEdit_variables_list"/>
-    </item>
-    <item row="1" column="1" colspan="4">
-     <widget class="QComboBox" name="comboBox_method"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>20</y>
-     <width>91</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QPushButton" name="pushButton_extrapolate">
-      <property name="text">
-       <string>Extrapolate</string>
-      </property>
-      <property name="shortcut">
-       <string>F10</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButton_cancel">
-      <property name="text">
-       <string>Cancel</string>
-      </property>
-      <property name="shortcut">
-       <string>Esc</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButton_help">
-      <property name="text">
-       <string>Help</string>
-      </property>
-      <property name="shortcut">
-       <string>F1</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" rowspan="2" colspan="4">
+    <widget class="QIodeCompleteTextEdit" name="textEdit_variables_list"/>
+   </item>
+   <item row="3" column="5">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>137</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
    <header>custom_widgets/qsampleedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QIodeCompleteTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>custom_widgets/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

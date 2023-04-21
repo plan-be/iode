@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "custom_widgets/qiode_completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -21,10 +22,12 @@ class QIodeMenuWorkspaceExtrapolateVariables : public QIodeSettings, public Ui::
 {
     Q_OBJECT
 
-    WrapperSampleEdit*   wFrom;
-    WrapperSampleEdit*   wTo;
-    WrapperComboBox*     wMethod;
-    WrapperQTextEdit*    wVarsList;
+    WrapperSampleEdit*      wFrom;
+    WrapperSampleEdit*      wTo;
+    WrapperComboBox*        wMethod;
+    WrapperQPlainTextEdit*  wVarsList;
+
+    QIodeCompleter*         completer;
 
 public:
     QIodeMenuWorkspaceExtrapolateVariables(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
