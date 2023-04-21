@@ -2,17 +2,15 @@
 
 QIodeAddTable::QIodeAddTable(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(project_settings_filepath, parent, f)
 {
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
-
     setupUi(this);
+
+	completer = new QIodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
+	textEdit_lec->setCompleter(completer);
 
     lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_TABLES, REQUIRED_FIELD);
     spinNbColumns = new WrapperSpinBox(label_nb_columns->text(), *spinBox_nb_columns, REQUIRED_FIELD);
     lineTitle = new WrapperQLineEdit(label_table_title->text(), *lineEdit_table_title, REQUIRED_FIELD);
-    textLEC = new WrapperQTextEdit(label_lec->text(), *textEdit_lec, REQUIRED_FIELD);
+    textLEC = new WrapperQPlainTextEdit(label_lec->text(), *textEdit_lec, REQUIRED_FIELD);
     checkBoxMode = new WrapperCheckBox("Mode", *checkBox_mode, REQUIRED_FIELD);
     checkBoxFiles = new WrapperCheckBox("Files", *checkBox_files, REQUIRED_FIELD);
     checkBoxDate = new WrapperCheckBox("Date", *checkBox_date, REQUIRED_FIELD);
@@ -22,6 +20,10 @@ QIodeAddTable::QIodeAddTable(const QString& project_settings_filepath, QWidget* 
     mapFields["Files"] = checkBoxFiles;
     mapFields["Date"] = checkBoxDate;
 
+    // TODO: if possible, find a way to initialize className inside MixingSettings
+    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
+    //                       since in that case this refers to MixingSettings and NOT the derived class
+    className = QString::fromStdString(typeid(this).name());
     loadSettings();
 }
 
@@ -34,6 +36,8 @@ QIodeAddTable::~QIodeAddTable()
     delete checkBoxMode;
     delete checkBoxFiles;
     delete checkBoxDate;
+
+    delete completer;
 }
 
 void QIodeAddTable::add()
