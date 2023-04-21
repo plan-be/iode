@@ -1,5 +1,7 @@
 #pragma once 
 
+#include <Map>
+#include <QVector>
 #include <QCompleter>
 #include <QStringListModel>
 #include <QRegularExpression>
@@ -15,58 +17,107 @@ class QIodeCompleter: public QCompleter
 
     QStringList reportCommandsList;
     QStringList lecFunctionsList;
-    QVector<KDBAbstract*> iodeDatabases;
+    QMap<EnumIodeType, KDBAbstract*> iodeDatabases;
 
-    int iodeType;
+    QVector<int> iodeTypes;
     bool reportCommands;
     bool lecFunctions;
+
+private:
+    void buildReportCommandsList()
+    {
+        std::vector<std::string> func_list;
+
+        // $-functions
+        func_list = build_command_functions_list(-1);
+        for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
+        // #-functions
+        func_list = build_command_functions_list(-1, true);
+        for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
+        // @-functions
+        func_list = build_report_functions_list();
+        for(const std::string& func_name: func_list) reportCommandsList << QString::fromStdString(func_name);
+
+        reportCommandsList.sort();
+    }
+
+    void buidlLecFunctionsList()
+    {
+        // LEC functions list
+        std::vector<std::string> func_list = build_lec_functions_list();
+        for(const std::string& func_name: func_list) lecFunctionsList << QString::fromStdString(func_name);
+
+        lecFunctionsList.sort();
+    }
+
+    void setListModel()
+    {
+        listModel = new QStringListModel(this);
+        this->setModel(listModel);
+        this->setCaseSensitivity(Qt::CaseInsensitive);
+        this->setCompletionMode(QCompleter::PopupCompletion);
+    }
 
 public:
     QIodeCompleter(const bool reportCommands = true, const bool lecFunctions = false, 
         const int iodeType = -1, QObject *parent = nullptr);
+    QIodeCompleter(const bool reportCommands = true, const bool lecFunctions = false, 
+        const QVector<int>& iodeTypes = QVector<int>(), QObject *parent = nullptr);
     ~QIodeCompleter();
 
-    void setIodeType(const int iodeType, const bool updateModel = true)
+    void addIodeType(const int iodeType, const bool updateListModel = true)
     {
-        iodeDatabases.clear();
-
         switch (iodeType)
         {
         case I_COMMENTS:
-            iodeDatabases.push_back(new KDBComments());
+            iodeDatabases.insert(I_COMMENTS, new KDBComments());
             break;
         case I_EQUATIONS:
-            iodeDatabases.push_back(new KDBEquations());
+            iodeDatabases.insert(I_EQUATIONS, new KDBEquations());
             break;
         case I_IDENTITIES:
-            iodeDatabases.push_back(new KDBIdentities());
+            iodeDatabases.insert(I_IDENTITIES, new KDBIdentities());
             break;
         case I_LISTS:
-            iodeDatabases.push_back(new KDBLists());
+            iodeDatabases.insert(I_LISTS, new KDBLists());
             break;
         case I_SCALARS:
-            iodeDatabases.push_back(new KDBScalars());
+            iodeDatabases.insert(I_SCALARS, new KDBScalars());
             break;
         case I_TABLES:
-            iodeDatabases.push_back(new KDBTables());
+            iodeDatabases.insert(I_TABLES, new KDBTables());
             break;
         case I_VARIABLES:
-            iodeDatabases.push_back(new KDBVariables());
+            iodeDatabases.insert(I_VARIABLES, new KDBVariables());
             break;
         default:
-            iodeDatabases.push_back(new KDBComments());
-            iodeDatabases.push_back(new KDBEquations());
-            iodeDatabases.push_back(new KDBIdentities());
-            iodeDatabases.push_back(new KDBLists());
-            iodeDatabases.push_back(new KDBScalars());
-            iodeDatabases.push_back(new KDBTables());
-            iodeDatabases.push_back(new KDBVariables());
             break;
         }
 
-        this->iodeType = iodeType;
+        if(updateListModel)
+            updateIodeOjectsListNames();
 
-        if(updateModel)
+        return;
+    }
+
+    void setIodeType(const int iodeType, const bool updateListModel = true)
+    {
+        iodeDatabases.clear();
+
+        if(iodeType > 0)
+            addIodeType(iodeType, false);
+        else
+        {
+            iodeDatabases.insert(I_COMMENTS, new KDBComments());
+            iodeDatabases.insert(I_EQUATIONS, new KDBEquations());
+            iodeDatabases.insert(I_IDENTITIES, new KDBIdentities());
+            iodeDatabases.insert(I_LISTS, new KDBLists());
+            iodeDatabases.insert(I_SCALARS, new KDBScalars());
+            iodeDatabases.insert(I_TABLES, new KDBTables());
+            iodeDatabases.insert(I_VARIABLES, new KDBVariables());
+        }
+
+        if(updateListModel)
             updateIodeOjectsListNames();
     }
 
