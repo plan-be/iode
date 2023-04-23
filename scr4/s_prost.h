@@ -46,6 +46,7 @@ extern char *SCR_err_txt(int val);
 extern unsigned char *SCR_fmt_dbl(double d,unsigned char *txt,int size,int nb_dec);
 extern unsigned char *SCR_fmt_long(unsigned char *out,unsigned char *fmt,unsigned long l);
 extern unsigned char *SCR_fmt_text(unsigned char *out,unsigned char *fmt,unsigned char *in);
+extern int SCR_sprintf(char* buf, int buf_size, char* fmt, ...);
 extern unsigned char *SCR_unix_filename(unsigned char *filename);
 extern unsigned char *SCR_std_filename(unsigned char *filename);
 extern int SCR_rename(char *fold,char *fnew);

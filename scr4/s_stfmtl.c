@@ -59,3 +59,36 @@ unsigned long l;
     return(out);
 }
 
+
+
+#include <stdarg.h>
+
+/**
+ *  Replacement of sprintf by a the "secure" version vsnprintf_s().
+ *  Adapted to the compiler Embarcadero / CLang / VC++.
+ *  
+ *  @param [out] buf      char*     output buffer 
+ *  @param [in]  buf_size int       max buf_size
+ *  @param [in]  fmt      char*     fmt
+ *  @param [in]  ...                optional arguments
+ *  @return               int       output buffer length
+ */
+int SCR_sprintf(char* buf, int buf_size, char* fmt, ...)
+{
+    va_list myargs;
+
+    va_start(myargs, fmt);
+    if(fmt == 0) {
+        buf[0] = 0;
+    }     
+    else {
+        #ifdef _MSC_VER   
+            vsnprintf_s(buf, buf_size - 1, _TRUNCATE, fmt, myargs);
+        #else
+            vsnprintf_s(buf, buf_size - 1, fmt, myargs);
+        #endif    
+    }    
+    va_end(myargs);
+
+    return(strlen(buf));
+}
