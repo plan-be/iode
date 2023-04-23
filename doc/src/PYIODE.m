@@ -1,24 +1,24 @@
 <IODE: python module>
 IODE: python module
-____________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..sep |
 ..esc ~
-..ignore _
+..ignore ¦¡
 
 &TI Introduction
-____________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 The python module for IODE implements part of the IODE API. 
 The aim is to implement a python layer for all IODE functionalities so that IODE can be driven directly from a python session.
 
 &TI Python version & iode.pyd
-____________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 Each version of python has its own IODE module ~ciode.pyd~C. They are stored in 
 different subdirectories of the IODE main directory (usually ~cc:\iode~C). For example: ~c.\py39, .\py310~C...
 By default, the ~ciode.pyd~C module for python 3.9 is thus ~cc:/iode/py39/iode.pyd~C. For python 3.10: ~cc:/iode/py310/python.pyd~C.
 
 
 &TI Memory management
-________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 During a python session, IODE data are grouped in workspaces, one by object type (variables, scalars, equations...) 
 and stored in IODE memory using a proprietary memory management system called IODE-SWAP. IODE functions operate ~binside~B that memory.
  
@@ -26,18 +26,18 @@ Exchanges between IODE objects (in IODE-SWAP) and python objects (larray, numpy 
 are made possible via interface functions described below like ~cget_eqs()~C, ~cset_eqs()~C or ~clarray_to_ws()~C.
 
 &TI Starting a PYIODE session
-____________________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 There are two ways to use the IODE module in the python environment.
 
 &IT Method 1: copy iode.pyd in your working directory
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 
 That method consists simply in copying ~ciode.pyd~C into the working directory. 
 This is the simplest method but it requires to know the version of 
 python in use (3.9, 3.10...?). Moreover, ~ciode.pyd~C has to be copied with each new version of IODE and/or python. 
  
 &IT Method 2: add the iode.pyd directory to the system path
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 It simply consists in adding to the system "path" the directory where the iode.pyd module is located (depending on the 
 current version of python). 
 This path can (partly) be calculated in python. Here is how to do it: 
@@ -59,7 +59,7 @@ This path can (partly) be calculated in python. Here is how to do it:
 
 
 &TI Groups of functions
-____________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 
 &EN <Workspace management        >  
 &EN <Object management           >  
@@ -81,7 +81,7 @@ ____________________
 
 <Workspace management>
 Workspace management
-____________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 &IT Workspace content
 
 ..tb
@@ -97,6 +97,7 @@ ____________________
 ..te
 
 &IT Clear workspaces                 
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~cws_clear(filetype: int)                          | Clear WS of the given filetype (K_CMT..K_VAR)
@@ -149,7 +150,7 @@ ____________________
 
 <Object management>
 Object management
-_________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 &IT Delete IODE objects                  
 
 ..tb
@@ -223,7 +224,7 @@ _________________
 
 <Larray / IODE conversions>
 Larray / IODE conversions
-__________________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~clarray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_")                                                                                                                     | Copies LArray la_input into IODE KV_WS.    
@@ -235,7 +236,7 @@ __________________________
 
 <Pandas / IODE conversions>
 Pandas / IODE conversions
-__________________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~cdf_to_ws(df_input: pd.DataFrame, time_axis_name: str = 'time')              | Copies DataFrame df_input into IODE KV_WS.    
@@ -246,7 +247,7 @@ __________________________
 
 <Sample management>
 Sample management
-_____________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~cws_sample_set(per_from="", per_to="") ->> List[str]                                            | Set KV_WS sample
@@ -270,7 +271,7 @@ _______
 
 <Identities execution>
 Identities execution
-__________________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~cidt_execute(idt_list: Union(str, List[str]), sample: Union(str, List[str]), var_files: Union(str, List[str]), scl_files: Union(str, List[str])) | Execute a list of identities on a given sample
@@ -279,7 +280,7 @@ __________________________
 
 <Estimation>
 Estimation
-______________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~ceqs_estimate(eq_list, afrom:str, ato:str) | Estimate an equation or a block of equations on the given sample.
@@ -289,7 +290,7 @@ ______________
 
 <Simulation>
 Simulation
-______________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~cmodel_simulate(sample_from: str, sample_to: str, eqs_list=None, endo_exo_list=None, eps: float = 0.0001, relax: float = 1.0, maxit: int = 100, init_values: int = KV_INIT_TM1, sort_algo: int = SORT_BOTH, nb_passes: int = 5, debug: int = 0, newton_eps: float = 1e-6, newton_maxit: int = 50, newton_debug: int = 0)  |   Simulate a model
@@ -299,7 +300,7 @@ ______________
 
 <Reports>
 Reports
-___________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~creport_exec(filename_parms: str)                                                        | Execute a report
@@ -318,7 +319,7 @@ ___________
 
 <Printing object definitions>
 Printing object definitions
-___________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 !! Not yet implemented !!
 
 ..tb
@@ -332,7 +333,7 @@ ___________________
 
 <General writing functions>
 General writing functions
-___________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | Syntax                                            | Description  
 | ~cw_dest(filename: str, dest: type = W_DUMMY)     | Initialise a new output session
@@ -352,7 +353,7 @@ ___________________
 
 <Utilities>
 Utilities
-_____________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | Syntax                        | Description  
 | ~cversion() ->> str           | Return the Iode version.    
@@ -367,7 +368,7 @@ _____________
 
 <Utilities using C data types>
 Utilities using C data types
-____________________________
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..tb
 | Syntax                                            | Description  
 | ~cpylist(char** c_list)                           | Convert a C vector of char* to a python list of python str
@@ -378,7 +379,7 @@ ____________________________
 >
 <Examples>
 Examples
-________
+
 &CO
 ## IODE EXTENSION FOR PYTHON
 ## =========================

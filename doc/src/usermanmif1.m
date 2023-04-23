@@ -1,4 +1,4 @@
-LINE 2 COL 1 NL 20 NC 78
+    LINE 2 COL 1 NL 20 NC 78
 TITLE " IODE on-line manual "
 
 START
@@ -36,4 +36,4 @@ START
 #include "sql.m"
 #include "interfaces.m"
 #include "iodecmd.m"
-
+#include "pyiode.m"
