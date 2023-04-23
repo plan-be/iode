@@ -63,7 +63,7 @@ SWSIZE     size;
     if(SW_init(1)) return(0);
     size2 = size;
     if(size2 % SW_ALIGN)                   /* JMP 23-12-91 */
-	size2 +=  SW_ALIGN - size2 % SW_ALIGN;      /* JMP 23-12-91 */
+        size2 +=  SW_ALIGN - size2 % SW_ALIGN;      /* JMP 23-12-91 */
 //    if(size2 + h_size > SW_SEG_SIZE) SW_panic(6); /* JMP 23-05-00 */
     blk  = SW_find_free_blk(size2);
     item = SW_find_free_item();
@@ -88,22 +88,21 @@ SW_find_free_blk(size)
 SWSIZE  size;
 {
     int     i, j = -1;
-    long    age = -1;
 
     size += h_size;
     for(i = 0 ; i < SW_NB_BLKS ; i++) {
-	// if(SW_SEG_SIZE >= FREESP(i) + size) break; /* JMP 23-05-00 */
-	if(BLKSIZE(i) >= FREESP(i) + size) break; /* JMP 23-05-00 */
-	if(SPACE(i) >= size) j = i;
+        // if(SW_SEG_SIZE >= FREESP(i) + size) break; /* JMP 23-05-00 */
+        if(BLKSIZE(i) >= FREESP(i) + size) break; /* JMP 23-05-00 */
+        if(SPACE(i) >= size) j = i;
     }
     if(i < SW_NB_BLKS) {
-	SW_restore(i);
-	return(i);
+        SW_restore(i);
+        return(i);
     }
     if(j >= 0) {
-	SW_restore(j);
-	SW_compress(j);
-	return(j);
+        SW_restore(j);
+        SW_compress(j);
+        return(j);
     }
     SW_create_blk(size); /* JMP 23-05-00 */
     return(i);
@@ -118,16 +117,16 @@ int     blk_nb;
 
     seg_nb = SEG(blk_nb);
     if(seg_nb < 0) {
-	seg_nb = SW_oldest_seg();
-	SW_swap_ems(seg_nb);
-	SW_swap(SW_SEGS[seg_nb].seg_ptr, REF(blk_nb));
-	SEG(SW_SEGS[seg_nb].seg_blk) = -1;
-	SEG(blk_nb)                  = seg_nb;
-	REF(SW_SEGS[seg_nb].seg_blk) = REF(blk_nb);
-	SW_SEGS[seg_nb].seg_blk      = blk_nb;
+        seg_nb = SW_oldest_seg();
+        SW_swap_ems(seg_nb);
+        SW_swap(SW_SEGS[seg_nb].seg_ptr, REF(blk_nb));
+        SEG(SW_SEGS[seg_nb].seg_blk) = -1;
+        SEG(blk_nb)                  = seg_nb;
+        REF(SW_SEGS[seg_nb].seg_blk) = REF(blk_nb);
+        SW_SEGS[seg_nb].seg_blk      = blk_nb;
     }
     else
-	SW_swap_ems(seg_nb);
+        SW_swap_ems(seg_nb);
 
     AGE(seg_nb) = SW_AGE++;
     BLKAGE(blk_nb) = SW_AGE;
@@ -144,11 +143,11 @@ SWSIZE      size;
 //      SW_BLKS = (SWBLK *) SW_nrealloc(SW_BLKS, sizeof(SWBLK) * SW_NB_BLKS,
 //                                      sizeof(SWBLK) * (SW_NB_BLKS + 10));
 
-	SW_BLKS = (SWBLK *)SW_nrealloc_doc(SW_BLKS,
-				  sizeof(SWBLK) * SW_NB_BLKS,
-				  sizeof(SWBLK) * (SW_NB_BLKS + 10),
-				  __FILE__,
-				  __LINE__);
+        SW_BLKS = (SWBLK *)SW_nrealloc_doc(SW_BLKS,
+                                           sizeof(SWBLK) * SW_NB_BLKS,
+                                           sizeof(SWBLK) * (SW_NB_BLKS + 10),
+                                           __FILE__,
+                                           __LINE__);
 
 
     if(SW_BLKS == 0) SW_panic(5);
@@ -157,15 +156,15 @@ SWSIZE      size;
 
     /* TRY TO CREATE NEW SEG */
     if(SW_create_seg(size) == 0)  /* SUCCESS */
-	seg_nb = SW_NB_SEGS - 1;
+        seg_nb = SW_NB_SEGS - 1;
 
     else { /* NO MEMORY */
-	if(SW_NB_SEGS < SW_MIN_SEGS) SW_panic(5); /* JMP 08-03-92 */
-	seg_nb = SW_oldest_seg();
-	SW_swap_ems(seg_nb);
-	SW_append_file(SW_SEGS[seg_nb].seg_ptr);
-	SEG(SW_SEGS[seg_nb].seg_blk) = -1;
-	REF(SW_SEGS[seg_nb].seg_blk) = SW_FILE_POS - 1;
+        if(SW_NB_SEGS < SW_MIN_SEGS) SW_panic(5); /* JMP 08-03-92 */
+        seg_nb = SW_oldest_seg();
+        SW_swap_ems(seg_nb);
+        SW_append_file(SW_SEGS[seg_nb].seg_ptr);
+        SEG(SW_SEGS[seg_nb].seg_blk) = -1;
+        REF(SW_SEGS[seg_nb].seg_blk) = SW_FILE_POS - 1;
     }
 
     SEG(SW_NB_BLKS) = seg_nb;
@@ -182,9 +181,9 @@ SWHDL SW_find_free_item() {
     SWHDL   n;
 
     if(SW_nb_frees() > 0) {
-	n = SW_get_free(SW_nb_frees() - 1);
-	LST_del(SW_FREES, SW_nb_frees() - 1L, 1L);
-	return(n);
+        n = SW_get_free(SW_nb_frees() - 1);
+        LST_del(SW_FREES, SW_nb_frees() - 1L, 1L);
+        return(n);
     }
     SW_add_item();
     return((SWHDL)(SW_nb_items() - 1));
@@ -219,10 +218,10 @@ SWHDL   item;
     lost = size + h_size;
     SPACE(blk) += lost;
     if(SW_get_pos(item) + size == FREESP(blk)) /* LAST ITEM OF BLOCK */
-	FREESP(blk) -= lost;
+        FREESP(blk) -= lost;
     else {
-	COMPRESS(blk) = 0;
-	*(SWHDL *)(buf + s_size) = 0xFFFFFFFF;
+        COMPRESS(blk) = 0;
+        *(SWHDL *)(buf + s_size) = 0xFFFFFFFF;
     }
     SW_add_free(item);
     SW_set_item(item, -1, (SWSIZE)0);
@@ -262,8 +261,8 @@ SWSIZE  size;
     SWHDL   hnew;
 
     if(size <= 0) {
-	SW_free(item);
-	return(0);
+        SW_free(item);
+        return(0);
     }
     if(SW_init(1)) return(0);
     buf = SW_getptr(item);
@@ -271,23 +270,23 @@ SWSIZE  size;
     if(size == osize) return(item);
     osize = min(osize, size);
     if(SW_MIN_SEGS < 2) {  /* PEUT ETRE AMELIORE */
-	// tmp = (char *)malloc(osize);
-	tmp = (char *)SCR_malloc(osize);
-	if(tmp == 0) return(item);
-	memcpy(tmp, buf, (unsigned int)osize);
-	SW_free(item);
-	allc = 1;
+        // tmp = (char *)malloc(osize);
+        tmp = (char *)SCR_malloc(osize);
+        if(tmp == 0) return(item);
+        memcpy(tmp, buf, (unsigned int)osize);
+        SW_free(item);
+        allc = 1;
     }
     hnew = SW_alloc(size);
     buf = SW_getptr(hnew);
     if(allc) {
-	memcpy(buf, tmp, (unsigned int)osize);
-	//free(tmp);
-	SCR_free(tmp);
+        memcpy(buf, tmp, (unsigned int)osize);
+        //free(tmp);
+        SCR_free(tmp);
     }
     else {
-	memcpy(buf, SW_getptr(item), (unsigned int)osize);
-	SW_free(item);
+        memcpy(buf, SW_getptr(item), (unsigned int)osize);
+        SW_free(item);
     }
     return(hnew);
 }
@@ -323,14 +322,14 @@ SWHDL   item;
     seg_nb = SEG(blk);
     if(seg_nb < 0) SW_restore(blk);
     else {
-	AGE(seg_nb) = SW_AGE++;
-	BLKAGE(blk) = SW_AGE;
+        AGE(seg_nb) = SW_AGE++;
+        BLKAGE(blk) = SW_AGE;
     }
 
 #ifndef NOEMS
     if(SW_SEGS[seg_nb].seg_type  == 0 &&
-	    SW_SEGS[seg_nb].seg_physp < 0)
-	SW_swap_ems(seg_nb);
+            SW_SEGS[seg_nb].seg_physp < 0)
+        SW_swap_ems(seg_nb);
 #endif
 
     return(PTR(blk) + SW_get_pos(item));
@@ -355,19 +354,19 @@ unsigned int    size;
 
     if(size == 0) return(ptr);
     while(1) {
-	//ptr = malloc(size);
-	ptr = SCR_malloc(size);
-	if(ptr != 0) {
-	    //memset(ptr, 0, size); /* JMP 28-08-2012 */
-	    return(ptr);
-	}
-	SW_Debug(size);
-	//Debug("nalloc\n");
-	if(SW_init(1)) return(ptr);
-	if(SW_del_seg()) {
-	    SW_panic(5);
-	    return(ptr);
-	}
+        //ptr = malloc(size);
+        ptr = SCR_malloc(size);
+        if(ptr != 0) {
+            //memset(ptr, 0, size); /* JMP 28-08-2012 */
+            return(ptr);
+        }
+        SW_Debug(size);
+        //Debug("nalloc\n");
+        if(SW_init(1)) return(ptr);
+        if(SW_del_seg()) {
+            SW_panic(5);
+            return(ptr);
+        }
     }
 }
 
@@ -383,7 +382,7 @@ char *SW_nalloc_doc(unsigned int size, char *file, int line) {
     ad->line = line;
 #ifdef ALLOCDOCNULL
     if(file == 0) {
-	printf("File 0");
+        printf("File 0");
     }
 #endif
     return(ptr);
@@ -404,28 +403,28 @@ La m‚moire suppl‚mentaire allou‚e est mise … z‚ro.
 char *SW_nrealloc_orig(old_ptr, old_count, new_count)
 void            *old_ptr;
 unsigned int    old_count,
-	 new_count;
+         new_count;
 {
     char    *ptr;
 
     if(old_count == new_count) return(old_ptr);
     if(old_ptr == 0 || old_count <= 0)
-	return(SW_nalloc_orig(new_count));
+        return(SW_nalloc_orig(new_count));
 
     while(1) {
-	//ptr = realloc(old_ptr, new_count);
-	ptr = SCR_realloc(old_ptr, 1, old_count, new_count); /* JMP 22-08-2012 */
-	if(ptr != 0) {
-	    if(old_count >= new_count) return(ptr);
-	    memset(ptr + old_count, 0, new_count - old_count);
-	    return(ptr);
-	}
-	if(SW_init(1)) return(ptr);
-	SW_Debug(new_count);
-	if(SW_del_seg()) {
-	    SW_panic(5);
-	    return(ptr);
-	}
+        //ptr = realloc(old_ptr, new_count);
+        ptr = SCR_realloc(old_ptr, 1, old_count, new_count); /* JMP 22-08-2012 */
+        if(ptr != 0) {
+            if(old_count >= new_count) return(ptr);
+            memset(ptr + old_count, 0, new_count - old_count);
+            return(ptr);
+        }
+        if(SW_init(1)) return(ptr);
+        SW_Debug(new_count);
+        if(SW_del_seg()) {
+            SW_panic(5);
+            return(ptr);
+        }
     }
 }
 
@@ -433,7 +432,7 @@ void *SW_nrealloc_doc(old_ptr, old_count, new_count, file, line)
 //char *SW_nrealloc_doc(old_ptr, old_count, new_count, file, line)
 void            *old_ptr;
 unsigned int    old_count,
-	 new_count;
+         new_count;
 char            *file;
 int             line;
 {
@@ -447,7 +446,7 @@ int             line;
     ad->line = line;
 #ifdef ALLOCDOCNULL
     if(file == 0) {
-	printf("File 0");
+        printf("File 0");
     }
 #endif
 
