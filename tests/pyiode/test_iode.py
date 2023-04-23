@@ -1155,7 +1155,8 @@ def test_iode_htol_la():
 
 # iode.suppress_msgs()
 
-test_iode_version()
+# test_iode_version() # cancelled to avoid having to modify test_iode.py for each new version 
+
 test_iode_ws_content()
 test_iode_ws_clear_var()
 test_iode_ws_load_var()
