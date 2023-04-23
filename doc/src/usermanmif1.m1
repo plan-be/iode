@@ -20,8 +20,13 @@ Le manuel de Iode est compos‚ des chapitres suivants :
 
 &EN <Le programme IODECMD    > : utilisation de IODE sans interface
 
+&EN <Module python pour IODE><IODE: python module> : utilisation des functions et objets IODE en python
+
 &EN Le programme A2M : interface de traduction des fichiers A2m
+
 &EN Interfaces avec Excel, APL, ODBC : interfaces avec d'autres outils et langages
+
+
 &EN Methods and algorithms : description des m‚thodes d'estimation et de simulation utilis‚es dans IODE
 &EN Annexes : syntaxe des programmes et des fichiers ascii support‚s par
 IODE, sample d'impression...
