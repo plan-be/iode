@@ -50,9 +50,9 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.67 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.68 - (c) 1990-2023 Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR 6
-#define IODE_VERSION_MINOR 67
+#define IODE_VERSION_MINOR 68
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
@@ -1114,7 +1114,7 @@ typedef struct _col_ {
     short   cl_opy;             // operator on periods => cl_per[0] cl_opy cl_per[1])
     PERIOD  cl_per[2];          // period 1 , period 2
     short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1]
-    short   cl_fnb[2];          // file1, file2
+    short   cl_fnb[2];          // position in K_RWS of file1 and file2 (starts at 1)
     IODE_REAL    cl_val[2][2];  // computed values of the LEC formulas on periods / files => max 4 values see table below
 
     /*   {{v00, v01},{v10,v11}}
