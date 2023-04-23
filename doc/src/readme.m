@@ -6,6 +6,34 @@ START
 ..esc ~
 
 
+<Version 6.68> (25/04/2023)>
+    Version 6.68 (25/04/2023)
+    ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+..esc ~
+
+&TI Messages d'erreur r‚p‚titifs
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Lorqu'un mˆme message d'erreur est g‚n‚r‚ successivement … plusieurs reprises, une seule version est
+conserv‚e et affich‚e.
+
+&TI Messages d'erreur lors du sauvetage des ‚quations
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Lors du sauvetage d'une ‚quation, un sample non d‚fini, par exemple dans le cas d'un ‚quation non estim‚e,
+ne g‚nŠre plus de message d'erreur.
+
+&TI Messages d'erreur de taille excessive
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Lorsque les erreurs accumul‚es sont regroup‚es avant affichage, il pouvait se produire que la taille globale du message d'erreur
+d‚passe la taille des buffers internes et que IODE se termine abruptement. Le message g‚n‚r‚ est 
+dor‚navant tronqu‚ … 10K.
+
+&TI Impressions d'objets de grande taille
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+L'impression de certains objet de taille importante pouvait g‚n‚rer un arrˆt de IODE. Le texte g‚n‚r‚ est 
+dor‚navant tronqu‚ … 10K. 
+
+>
+
 <Version 6.67> (18/04/2023)>
     Version 6.67 (18/04/2023)
     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
