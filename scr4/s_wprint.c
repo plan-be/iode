@@ -31,7 +31,7 @@ int     *line, *col;
 Wprintf(a, b, c, d, e, f, g, h, j, k, l, m, n, o)
 char    *a, *b, *c, *d, *e, *f, *g, *h, *j, *k, *l, *m, *n, *o;
 {
-    char    buf[1024];                /* JMP 02-09-98 */
+    char    buf[10240];                // JMP 21/04/2023 
     static  int line = 0, col = 0;
     U_ch    *cl;
     int     i;
@@ -44,7 +44,8 @@ char    *a, *b, *c, *d, *e, *f, *g, *h, *j, *k, *l, *m, *n, *o;
 
     cl = (U_ch  *)(SCR_SCREEN->im_cells);
 
-    sprintf(buf, a, b, c, d, e, f, g, h, j, k, l, m, n); /* JMP 02-12-99 */
+    // sprintf(buf, a, b, c, d, e, f, g, h, j, k, l, m, n); /* JMP 02-12-99 */
+    SCR_sprintf(buf, sizeof(buf) - 4, a, b, c, d, e, f, g, h, j, k, l, m, n); // JMP 21/04/2023 : secure version of sprintf
     for(i = 0 ; buf[i] ; i++) {
         if(buf[i] == '\n') {
             WprintfNl(&line, &col);
@@ -71,10 +72,12 @@ char    *a, *b, *c, *d, *e, *f, *g, *h, *j, *k, *l, *m, *n, *o;
 Werror(a, b, c, d, e, f, g, h, i, j, k, l, m, n)
 char    *a, *b, *c, *d, *e, *f, *g, *h, *i, *j, *k, *l, *m, *n;
 {
-    char    buf[1024];
+    char    buf[10240]; // JMP 21/04/2023 
     int     lg;
 
-    sprintf(buf, a, b, c, d, e, f, g, h, i, j, k, l, m, n);
+    // sprintf(buf, a, b, c, d, e, f, g, h, i, j, k, l, m, n);
+    SCR_sprintf(buf, sizeof(buf) - 4, a, b, c, d, e, f, g, h, j, k, l, m, n); // JMP 21/04/2023 : secure version of sprintf
+    
     lg = strlen(buf);
     if(lg && buf[lg - 1] == '\n') {
         buf[lg - 1] = 0;
