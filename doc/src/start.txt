@@ -16,6 +16,9 @@
 ===== Download =====
 Note that a **"New installation"** requires Administrator rights (file associations cannot be defined w/o Administrator privileges). An **"Upgrade"** can be installed by any user, provided that he has write access to the destination directory.
 
+  * 6.68 (25/04/2023) -> [[version_6dot_68|View log]]
+    *{{:download:iode668.exe|New installation}}
+    *{{:download:iode668upd.exe|Upgrade }}
   * 6.67 (18/04/2023) -> [[version_6dot_67|View log]]
     *{{:download:iode667.exe|New installation}}
     *{{:download:iode667upd.exe|Upgrade }}
