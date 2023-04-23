@@ -71,6 +71,34 @@ char *B_msg(int n)
 
 
 /**
+ *  Adds an error message to the table B_ERROR_MSG only if the same message is not yet present.
+ *  
+ *  @param [in] msg     char*   formatted message
+ *
+ *  @global [in, out]   B_ERROR_NB  int       number of records errors
+ *  @global [in, out]   B_ERROR_MSG char**    recorded error messages
+ *  
+ *  @return             void    
+ */
+void B_add_error(char* msg)
+{
+    int     i;
+    
+    if(msg == 0 || msg[0] == 0) return;
+    
+    if(B_ERROR_NB > 0) {
+        for(i = 0; i < B_ERROR_NB; i++) {
+            // If the same msg is already in the list, do not add
+            if(B_ERROR_MSG[i] && strcmp(B_ERROR_MSG[i], msg) == 0)
+                return;
+        }
+    }
+    
+    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, msg);
+}
+
+
+/**
  *  Formats an error message and adds the text of the message to the global table of last errors.
  *  
  *  @param [in] fmt     char*   format in printf style
@@ -98,8 +126,10 @@ void B_seterror(char* fmt, ...)
 #endif    
     va_end(myargs);
 
-    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, buf);
+    //SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, buf);
+    B_add_error(buf);
 }
+
 
 
 /**     
