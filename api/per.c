@@ -199,7 +199,7 @@ PERIOD *PER_atoper(char *aper)
     per->p_y = 0;
     per->p_p = 0;
     per->p_s = 0;
-    if(aper == 0) return(per);
+    if(aper == 0 || aper[0] == 0 || aper[0] == ' ') return(per); // JMP 21/04/023 to avoid unwanted messages
     
     // work on a local copy of aper 
     SCR_strlcpy(text, aper, sizeof(text) -1);
