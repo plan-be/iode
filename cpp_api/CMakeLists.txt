@@ -38,7 +38,7 @@ set(CPP_COMPUTE
     )
 
 set(CPP_LEGACY  
-    legacy/s_iode.c legacy/sb_gui.c legacy/b_legacy.c
+    legacy/s_iode.c legacy/b_legacy.c
    )
 
 add_library(iodecppapi STATIC 
