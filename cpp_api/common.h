@@ -240,3 +240,9 @@ const static int I_NB_CHART_TYPES = 3;
 
 const static std::array<std::string, I_NB_CHART_TYPES> vGraphsChartTypes = 
     { "Line chart", "Scatter chart", "Bar chart" };
+
+
+const static int I_NB_COLORS = 8;
+
+const static std::array<std::string, I_NB_COLORS> vGraphsColors = 
+    {"Blue", "Yellow", "Black", "White", "Red", "Green", "Cyan", "Magenta"};
