@@ -318,6 +318,12 @@ void MainWindow::open_export_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_print_setup()
+{
+    QIodeMenuFilePrintPref dialog(*project_settings_filepath, this);
+    dialog.exec();
+}
+
 // -------- Workspace Menu --------
 
 void MainWindow::clear_workspace()
