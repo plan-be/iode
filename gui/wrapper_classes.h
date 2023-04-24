@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QSpinBox>
+#include <QFontComboBox>
 #include <QPlainTextEdit>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
@@ -74,6 +75,34 @@ public:
             if (!list_values.contains(text)) 
                 throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
         }
+        int value = qfield.currentIndex();
+        return value;
+    }
+};
+
+
+class WrapperQFontComboBox : public TemplateWrapper<QFontComboBox, int>
+{
+public:
+    WrapperQFontComboBox(const QString name, QFontComboBox& qfield, const EnumItemType type) :
+        TemplateWrapper(name, qfield, type) {};
+
+    QVariant getQValue()
+    {
+        int index = qfield.currentIndex();
+        return QVariant(index);
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        int value = qvalue.toInt();
+        qfield.setCurrentIndex(value);
+    }
+
+    // QString getTextValue() { return qfield.currentText(); }
+
+    int extractAndVerify()
+    {
         int value = qfield.currentIndex();
         return value;
     }
