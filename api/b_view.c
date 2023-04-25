@@ -236,7 +236,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
  *  Calculate, then print or display (according to the mode parameter) IODE TBLs either 
  *  in the form of graphs or in the form of text (SCROLLs).
  *  
- *  @param [in] char* arg   list of tables to print  
+ *  @param [in] char* arg   sample + list of tables to print  
  *  @param [in] int   type  0: print or view in table format
  *                          1: print in graph format 
  *  @param [in] int   mode  0: view
