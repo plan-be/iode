@@ -246,3 +246,8 @@ const static int I_NB_COLORS = 8;
 
 const static std::array<std::string, I_NB_COLORS> vGraphsColors = 
     {"Blue", "Yellow", "Black", "White", "Red", "Green", "Cyan", "Magenta"};
+
+const static int I_NB_FONTS = 6;
+
+const static std::array<std::string, I_NB_FONTS> vIodeFonts =
+    {"Helvetica", "Times", "Courier", "Bookman", "Palatino", "Trebuchet MS"};
