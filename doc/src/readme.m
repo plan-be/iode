@@ -6,8 +6,8 @@ START
 ..esc ~
 
 
-<Version 6.68> (25/04/2023)>
-    Version 6.68 (25/04/2023)
+<Version 6.68> (27/04/2023)>
+    Version 6.68 (27/04/2023)
     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 ..esc ~
 
@@ -31,6 +31,11 @@ dor‚navant tronqu‚ … 10K.
 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 L'impression de certains objet de taille importante pouvait g‚n‚rer un arrˆt de IODE. Le texte g‚n‚r‚ est 
 dor‚navant tronqu‚ … 10K. 
+
+&TI $WsCopyVar and $CsvSave*
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Les virgules sont accept‚es comme s‚parateurs entre les noms des objets … copier ($WsCopyVar) ou … sauver ($CsvSaveVar par exemple).
+
 
 >
 
