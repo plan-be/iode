@@ -262,7 +262,7 @@ Sample management
 
 <LEC executions>
 LEC executions
-_______
+컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 ..tb
 | ~bSyntax                                 | ~bDescription  
 | ~cexec_lec(lec: str, t: int = -1) ->> Union[float, List[float]]  | Compute a LEC formula using the current WS of VARs and SCLs
