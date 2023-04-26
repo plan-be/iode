@@ -40,18 +40,17 @@ Liste des fichiers suivi du numéro de la ligne à modifier:
 
 ```
     ..\api\vers.h  1
-    ..\api\iode.H  37       
+    ..\api\iode.H  53       
 ```
 
 ```
-    ..\api\iode.H  39
+    ..\api\iode.H  55
     ..\dos\COMMON.F        4       
 ```
 
 ```
     ..\dos\COMMON.F        88        ... Version 4.44 - 01/94 
     ..\dos\COMMON.F        119          C_FN SCR_lock_screen("I.O.D.E. 4.44");
-    ..\dos\version.txt     1      IODE 6.46
     ..\iodecom\frmMain.cpp   197    mLog->Lines->Add("IodeComServer v6.64 27/02/2023");
     ..\doc\src\intro.m1 80
     iode_mui.nsi 5
@@ -127,21 +126,21 @@ Les fichiers .m et .m1 sont donc différents pour l'output mif.
 
 *Mode d'emploi*
 
-Après avoir exécuté la commande makewiki.bat:
+Après avoir exécuté la commande makemif.bat:
 
 - cd doc/src
 - Start FrameMaker
-- Open iode/doc/iodeman/iode6.book
-- open iode6.ref.fm
-- open iodecover.fm
+- Open iode/doc/src/iode6.book
+- open iode/doc/src/iode6.ref.fm
+- open iode/doc/src/iodecover.fm
 - changer la date du cover
-- Open iode1.mif et iode2.mif
+- Open iode/doc/src/iode1.mif et iode/doc/src/iode2.mif
 - Dans iode1.mif : ajustements manuels
-- revoir le chapitre "Trend Correction" : pour les graphiques formules, supprimer le cadre et diminuer la taille du frame pour ajuster à la formule
+- revoir le chapitre "Trend Correction" : pour les graphiques formules, supprimer le cadre et diminuer la taille du frame pour ajuster à la formule. Pour cela, 1/ ouvrir Graphics/Tools \+ Set Pen Pattern to "None" et 2/ View Borders
 - idem pour le chapitre "Impression de la définition d’objets"
 - Dans iode2.mif :
-- supprimer la première page avec Annexes
-- forcer un saut de page pour l'annexe 1
+- supprimer la première page avec Annexes (Delete text)
+- forcer un saut de page pour l'annexe 1 (Special / Page Break / Top of the next available Page)
 - Pour iode1.mif et iode2.mif :
 - Alt\+fio (File/Import/Formats) : choisir iode6.ref.fm comme formats de référence
 - Alt\+olm (Format/Page Layout/Master Page Usage) : Right /Left \+ Apply to All Pages
