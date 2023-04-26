@@ -4,225 +4,94 @@
 
 
 
-- [IODE: python module](#T1)
-    - [Workspace management](#T2)
-    - [Object management](#T3)
-    - [Larray / IODE conversions](#T4)
-    - [Pandas / IODE conversions](#T5)
-    - [Sample management](#T6)
-    - [LEC functions](#T7)
-    - [Identities execution](#T8)
-    - [Estimation](#T9)
-    - [Simulation](#T10)
-    - [Reports](#T11)
-    - [Print functions](#T12)
-    - [Write functions](#T13)
-    - [Utilities](#T14)
-    - [Utilities using C data types](#T15)
+- [IODE: the python module](#T1)
+    - [Memory management](#T2)
+      - [Interface IODE \- Python \- IODE](#T3)
+      - [Source files (\*.pyx, \*.pxi and \*.c)](#T4)
+    - [How to add a new Py\-function based on a C\-function](#T5)
+      - [Step 1: in C](#T6)
+      - [Step 2: In \{P\|C\}ython](#T7)
+      - [Step 3: in a DOS command prompt](#T8)
 
-# IODE: python module {#T1}
+# IODE: the python module {#T1}
 
-### Workspace management {#T2}
+### Memory management {#T2}
 
-|Syntax|Description|
-|:---|:---|
-|**Workspace content**||
-|`ws_content(pattern, objtype) -> List[str]`|Return the names of all objects of a given type, satisfying a pattern specification|
-|`ws_content_cmt(pattern) -> List[str]`|Returns the list of comment names corresponding to the given pattern|
-|`ws_content_eqs(pattern) -> List[str]`|Returns the list of equation names corresponding to the given pattern|
-|`ws_content_idt(pattern) -> List[str]`|Returns the list of identity names corresponding to the given pattern|
-|`ws_content_lst(pattern) -> List[str]`|Returns the list of list names corresponding to the given pattern|
-|`ws_content_scl(pattern) -> List[str]`|Returns the list of scalar names corresponding to the given pattern|
-|`ws_content_tbl(pattern) -> List[str]`|Returns the list of table names corresponding to the given pattern|
-|`ws_content_var(pattern) -> List[str]`|Returns the list of variable names corresponding to the given pattern|
-|**Clear workspaces**||
-|`ws_clear(filetype: int)`|Clear WS of the given filetype (K\_CMT..K\_VAR)|
-|`ws_clear_cmt()`|Clear the comment WS|
-|`ws_clear_eqs()`|Clear the equation WS|
-|`ws_clear_idt()`|Clear the identity WS|
-|`ws_clear_lst()`|Clear the list WS|
-|`ws_clear_scl()`|Clear the scalar WS|
-|`ws_clear_tbl()`|Clear the table WS|
-|`ws_clear_var()`|Clear the varaible WS|
-|`ws_clear_all()`|Clear all WS|
-|**Load workspaces**||
-|`ws_load(filename: str, filetype: int) -> int`|Load an IODE file and return the number of read objects|
-|`ws_load_cmt(filename: str) -> int`|Load a comment file and return the number of read objects|
-|`ws_load_eqs(filename: str) -> int`|Load a equation file and return the number of read objects|
-|`ws_load_idt(filename: str) -> int`|Load a identity file and return the number of read objects|
-|`ws_load_lst(filename: str) -> int`|Load a list file and return the number of read objects|
-|`ws_load_scl(filename: str) -> int`|Load a scalar file and return the number of read objects|
-|`ws_load_tbl(filename: str) -> int`|Load a table file and return the number of read objects|
-|`ws_load_var(filename: str) -> int`|Load a variable file and return the number of read objects|
-|**Save workspaces**||
-|`ws_save(filename: str, filetype: int)`|Save the current IODE workspace of a given type|
-|`ws_save_cmt(filename: str)`|Save the current workspace of comments|
-|`ws_save_eqs(filename: str)`|Save the current workspace of equations|
-|`ws_save_idt(filename: str)`|Save the current workspace of identities|
-|`ws_save_lst(filename: str)`|Save the current workspace of lists|
-|`ws_save_scl(filename: str)`|Save the current workspace of scalars|
-|`ws_save_tbl(filename: str)`|Save the current workspace of tables|
-|`ws_save_var(filename: str)`|Save the current workspace of variables|
-|**Change of periodicites**||
-|`ws_ltoh_flow(filename: str, varlist)`||
-|`ws_ltoh_stock(filename: str, varlist, method: int = LTOH_CS)`||
-|`ws_htol_sum(filename: str, varlist, method: int)`||
-|`ws_htol_mean(filename: str, varlist, method: int)`||
-|`ws_htol_last(filename: str, varlist, method: int)`||
+#### Interface IODE \- Python \- IODE {#T3}
 
-### Object management {#T3}
+During a PYIODE session, IODE data are grouped in workspaces, one by object type (variables, scalars, equations...) and stored in memory using a proprietary memory management system (IODE\-SWAP).
 
-|Syntax|Description|
-|:---|:---|
-|**Delete IODE objects**||
-| ||
-|`delete_objects(pattern: str = '*', obj_type: int = K_VAR)`|delete the objects whose names satisfy the given pattern|
-| ||
-|`delete_obj(name: str, obj_type: int)`|delete the object named name of type obj\_type|
-|`delete_cmt(name: str)`|delete the comment named name|
-|`delete_eqs(name: str)`|delete the equation named name|
-|`delete_idt(name: str)`|delete the identity named name|
-|`delete_lst(name: str)`|delete the list named name|
-|`delete_scl(name: str)`|delete the scalar named name|
-|`delete_tbl(name: str)`|delete the table named name|
-|`delete_var(name: str)`|delete the variable named name|
-|                                       ||
-|**Comments**||
-|`get_cmt(name) -> str`|return the text of an IODE comment|
-|`set_cmt(name, cmt)`|update or create an IODE comment from a python str|
-| ||
-|**Equations**||
-|`get_eqs_lec(eq_name: str) -> str`|return an IODE equation LEC form as a string|
-|`get_eqs(eq_name: str) -> Equation`|return an IODE equation as an iode.Equation class instance|
-|`set_eqs(eq_name: str, lec: str)`|update an equation lec form|
-| ||
-|**Identities**||
-|`get_idt(name) -> str`|return the LEC formula of an IODE identity|
-|`set_idt(name, idt)`|update or create an identity|
-| ||
-|**Lists**||
-|`get_lst(name) -> str`|return an IODE list as a string|
-|`set_lst(name, lst)`|update or create a list fro a string|
-| ||
-|**Scalars**||
-|`get_scl(name: str) -> Scalar`|return an IODE scalar in a iode.Scalar class instance|
-|`set_scl(py_scl: Scalar)`|create or update an IODE scalar from an iode.Scalar class instance|
-| ||
-|**Tables**||
-|**Variables**||
-|`get_var(varname: str) -> List[float]`|get an IODE variable in a list of floats|
-|`get_var_as_ndarray(varname: str, copy = True) -> np.ndarray`|get an IODE variable in a numpy ndarray|
-|`set_var(varname, py_values)`|create or update an IODE variable from a list of floats or a ndarray|
+IODE functions operate **inside** IODE\-SWAP memory. Exchanges between IODE objects (in IODE\-SWAP) and python objects (larray, numpy or pandas objects in python memory) are made possible via interface functions like `get_eqs()`, `set_eqs()` or `larray_to_ws()`.
 
-### Larray / IODE conversions {#T4}
+#### Source files (\*.pyx, \*.pxi and \*.c) {#T4}
 
-|Syntax|Description|
-|:---|:---|
-|`larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_")`|Copies LArray la\_input into IODE KV\_WS.|
-|`ws_to_larray(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', split_axis_names = '', regex = None, split_sep = None, time_as_floats: bool = False) -> la.Array`|Creates an LArray from the current KV\_WS content|
-|`ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> la.Array`|Load an IODE var file into an Larray object with 2 axes (vars and time)|
-|`larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]`|Return the first and last time axis labels as a list of 2 strings|
+The python functions are grouped, according to their specific topics, in the files `pyiode_*.pyx` where \* can be ws, sample, objects, larray, reports... Some utility functions have also been added in the `pyiode_util.pyx` source file.
 
-### Pandas / IODE conversions {#T5}
+The signatures of the C\-api functions used in the python sources can be found in `iode.pxi`. These functions are declared in iode.h (mostly in the sub file `iodeapi.h`) and defined (for the most part) in `b_api.c`.
 
-|Syntax|Description|
-|:---|:---|
-|`df_to_ws(df_input: pd.DataFrame, time_axis_name: str = 'time')`|Copies DataFrame df\_input into IODE KV\_WS.|
-|`ws_to_df(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', time_as_floats: bool = False) -> pd.DataFrame`|Creates a DataFrame from the current KV\_WS content|
+### How to add a new Py\-function based on a C\-function {#T5}
 
-### Sample management {#T6}
+#### Step 1: in C {#T6}
 
-|Syntax|Description|
-|:---|:---|
-|`ws_sample_set(per_from="", per_to="") -> List[str]`|Set KV\_WS sample|
-|`ws_sample_get() -> List[str]`|Get KV\_WS sample|
-|`ws_sample_nb_periods() -> int`|Return the number of observations in the current KV\_WS.|
-|`ws_sample_to_string() -> str`|Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"|
-|`ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = False) -> List[str]`|Return the current sample definition in a list|
-|`ws_sample_to_larray_axis(axis_name: str = 'time', per_from:str = '', per_to: str = '', as_floats: bool = False) -> la.Axis`|Return the current sample definition as an larray axis|
+Create the new function in one of the iodeapi C modules, for example in `api/b_api.c`:
 
-### LEC functions {#T7}
+```
+   
+         int IodeMyFn(char* name) {
+            source code...
+         }
+```
 
-|Syntax|Description|
-|:---|:---|
-|`exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]`|Compute a LEC formula using the current WS of VARs and SCLs|
+Declare the new function in `api/iodeapi.h`
 
-### Identities execution {#T8}
+For the Visual Studio (CMake) version:
 
-|Syntax|Description|
-|:---|:---|
-|`idt_execute(idt_list: Union(str, List[str]), sample: Union(str, List[str]), var_files: Union(str, List[str]), scl_files: Union(str, List[str]))`|Execute a list of identities on a given sample|
+- regenerate `iodeapi.lib` (using CMake)
 
-### Estimation {#T9}
+For non Visual Studio version (standard Microsoft `nmake` / cl compiler):
 
-|Syntax|Description|
-|:---|:---|
-|`eqs_estimate(eq_list, afrom:str, ato:str)`|Estimate an equation or a block of equations on the given sample.|
+- Goto `../api/vc64`
+- Call `"C:\Program Files (x86)\Microsoft Visual Studio\2019ommunity\VC\Auxiliaryuild\vcvars64.bat"` to create the environment variables for VC64 nmake
+- Execute `nmake` to create 64 bits `iodeapi.lib`
 
-### Simulation {#T10}
+For example:
 
-|Syntax|Description|
-|:---|:---|
-|`model_simulate(sample_from: str, sample_to: str, eqs_list=None, endo_exo_list=None, eps: float = 0.0001, relax: float = 1.0, maxit: int = 100, init_values: int = KV_INIT_TM1, sort_algo: int = SORT_BOTH, nb_passes: int = 5, debug: int = 0, newton_eps: float = 1e-6, newton_maxit: int = 50, newton_debug: int = 0)`|Simulate a model|
+```
+    c:> cd /usr/iode_src/api/vc64
+    c:/usr/iode_src/api/vc64> "C:\Program Files (x86)\Microsoft Visual Studio\2019ommunity\VC\Auxiliaryuild\vcvars64.bat"
+    c:/usr/iode_src/api/vc64> nmake
+```
 
-### Reports {#T11}
+#### Step 2: In \{P\|C\}ython {#T7}
 
-|Syntax|Description|
-|:---|:---|
-|`report_exec(filename_parms: str)`|Execute a report|
-|`reportline_exec(repline: str)`|Execute a report line|
-|`data_update(obj_name:str, obj_value:str, obj_type:int)`|Create of update an IODE object (cmt, eqs, lst, idt)|
-|`data_update_cmt(obj_name:str, obj_value:str)`|Create or update an IODE comment|
-|`data_update_eqs(obj_name:str, obj_value:str)`|Create or update an IODE equation|
-|`data_update_idt(obj_name:str, obj_value:str)`|Create or update an IODE identity|
-|`data_update_lst(obj_name:str, obj_value:str)`|Create or update an IODE list|
-|`data_update_scl(obj_name:str, value:float=None, relax:float=None, stderr:float=None)`|Create or update an IODE scalar|
-|`data_update_var(varname:str, values, operation:str = "L", per_from:str = None)`|Create or update an IODE variable starting at a specified period|
+Add the new function declaration in `iode.pxi` in the section `cdef extern from "iode.h"`:
 
-### Print functions {#T12}
+```
+    cdef int IodeMyFn(char* name)  
+```
 
-\!\! Not yet implemented \!\!
+(Note that there is no semi\-colon at the end of the line \!)
 
-|Syntax|Description|
-|:---|:---|
-|`print_obj_def_*`|print object definitions (cmt,...)|
-|`print_obj_title`|indicates if only the object "titles" must be printed|
-|`print_obj_lec`|select the way LEC expressions are to be printed (coefficients replaced by values...)|
-|`print_obj_infos`|select informations to print|
+Create the Python equivalent to `IodeMyFn()` in the appropriate module `pyiode_*.pyx`.
 
-### Write functions {#T13}
+```
+    def myfn(arg):
+        return IodeMyFn(cstr(arg))
+```
 
-|Syntax|Description|
-|:---|:---|
-|`w_dest(filename: str, dest: type = W_DUMMY)`|Initialise a new output session|
-|`w_close()`|End an output session.|
-|`w_flush()`|Flush the output session buffer.|
-|`w_print(txt: str = '')`|Send a string into the output session buffer.|
-| ||
-|`w_print_enum(level: int = 1, text: str = "")`|Print a bulleted paragraph of the given level|
-|`w_print_cmd(level: int = 1, text: str = "")`|Start a code block of the given level or end the block if level < 0|
-|`w_print_par(level: int = 1, text: str = "")`|Print a paragraph of the given level|
-|`w_print_tit(level: int = 1, title: str = "")`|Print a title of the given level|
-|`w_print_pg_header(arg: str = "")`|Define the page header as from the current page|
-|`w_print_pg_footer(arg: str = "")`|Define the page footer as from the current page|
+If needed, use the python utility functions:
 
-### Utilities {#T14}
+- `cstr()` to translate python strings (utf8) to C char\* (ansi code cp850)
+- `pystr()` to do the reverse
+- `pylist(char** c_list)` to convert C char\*\* to python lists (don't forget to free c\_list afterwards, e.g. by a call to SCR\_free\_tbl(c\_list))
+- `pyfloats(double *cvar, int lg)` to convert a vector of doubles of length lg into a python list of doubles
 
-|Syntax|Description|
-|:---|:---|
-|`version() -> str`|Return the Iode version.|
-|`cstr(pystr) -> bytes`|Convert a python string (UTF8) to a C null terminated string (ANSI cp850).|
-|`pystr(cstr)-> str`|Convert a C null terminated string (ANSI cp850) into a python string (UTF8).|
-|                             ||
-|`suppress_msgs()`|Suppress the output during an IODE session.|
-|`reset_msgs()`|Reset the normal output mechanism during an IODE session.|
+#### Step 3: in a DOS command prompt {#T8}
 
-### Utilities using C data types {#T15}
-
-|Syntax|Description|
-|:---|:---|
-|`pylist(char** c_list)`|Convert a C vector of char\* to a python list of python str|
-|`pyfloats(double *cvar, int lg)`|Convert a C vector of lg doubles into a list of python floats|
-|`iodevar_to_ndarray(char *name, int copy = True)`|Create an numpy array from the content of an IODE variable|
-|`iodesample_to_ndarray()`|Convert the current WS sample into a numpy array of doubles|
+```
+    c:\> cd  <path_to_iode>/pyiode
+    c:<path_to_iode>/pyiode> set64
+    c:<path_to_iode>/pyiode> activate 
+    c:<path_to_iode>/pyiode> makepy
+```
 
