@@ -770,7 +770,7 @@ U_ch *RPF_vvalue(U_ch** args)
  *  
  *  Note that:
  *      1. if there is more than 1 list, the separator is ','.
- *      2. the ',' in the result are replaced by ';'
+ *      2. the ';' in the result are replaced by ','
  *  
  *  Examples 
  *  --------

@@ -356,7 +356,8 @@ int B_WsCopy(char* arg, int type)
     files = B_ainit_chk(file, NULL, 0);
     if(files == 0) return(-1);
 
-    A_SEPS = " ;\t\n"; // JMP 27/09/2022
+    //A_SEPS = " ;\t\n"; // JMP 27/09/2022
+    A_SEPS = " ,;\t\n"; // JMP 25/04/2023
     lst = K_expand(type, files[0], arg + lg, '*');
     data0 = B_ainit_chk(lst, NULL, 0);
     SCR_free(lst);
@@ -655,7 +656,8 @@ int B_CsvSave(char* arg, int type)
     K_set_ext(file_ext, file, K_CSV);
 
     // [sample] [vars]
-    A_SEPS = " ;\t\n"; // JMP 27/09/2022
+    //A_SEPS = " ;\t\n"; // JMP 27/09/2022
+    A_SEPS = " ,;\t\n"; // JMP 25/04/2023
     lst = K_expand(type, NULL, arg + lg, '*');
     data0 = B_ainit_chk(lst, NULL, 0);
     SCR_free(lst);
