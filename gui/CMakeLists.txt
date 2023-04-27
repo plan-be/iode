@@ -127,6 +127,7 @@ set(GUI_MENU_FILE
     menu/file/file_import_comments.ui           menu/file/file_import_comments.h        menu/file/file_import_comments.cpp
     menu/file/file_import_variables.ui          menu/file/file_import_variables.h       menu/file/file_import_variables.cpp
     menu/file/file_export.ui                    menu/file/file_export.h                 menu/file/file_export.cpp
+    menu/file/file_print_setup.ui               menu/file/file_print_setup.h            menu/file/file_print_setup.cpp
     menu/file/file_print_preferences.ui         menu/file/file_print_preferences.h      menu/file/file_print_preferences.cpp
 )
 

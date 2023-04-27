@@ -320,7 +320,7 @@ void MainWindow::open_export_dialog()
 
 void MainWindow::open_print_setup()
 {
-    QIodeMenuFilePrintPref dialog(*project_settings_filepath, this);
+    QIodeMenuFilePrintSetup dialog(*project_settings_filepath, this);
     dialog.exec();
 }
 
