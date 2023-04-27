@@ -84,6 +84,15 @@ enum EnumIodeFile
     I_VARIABLES_FILE,
     I_REPORTS_FILE,
     I_TEXT_FILE,
+    I_ASCII_FILE,
+    I_A2M_FILE,
+    I_RTF_FILE,
+    I_HTML_FILE,
+    I_MIF_FILE,
+    I_CSV_FILE,
+    I_REF_FILE,
+    I_AGL_FILE,
+    I_DIF_FILE,
     I_LOGS_FILE,
     I_SETTINGS_FILE,
     I_ANY_FILE,
@@ -139,14 +148,15 @@ const static std::map<std::string, EnumIodeFile> mFileExtensions =
     {".av",  I_VARIABLES_FILE},
     {".rep", I_REPORTS_FILE},
     {".txt", I_TEXT_FILE},
-    {".a2m", I_TEXT_FILE},
-    {".rtf", I_TEXT_FILE},
-    {".ref", I_TEXT_FILE},
-    {".agl", I_TEXT_FILE},
-    {".prf", I_TEXT_FILE},
-    {".dif", I_TEXT_FILE},
-    {".mif", I_TEXT_FILE},
-    {".asc", I_TEXT_FILE},
+    {".asc", I_ASCII_FILE},
+    {".a2m", I_A2M_FILE},
+    {".rtf", I_RTF_FILE},
+    {".htm", I_HTML_FILE},
+    {".mif", I_MIF_FILE},
+    {".csv", I_CSV_FILE},
+    {".ref", I_REF_FILE},
+    {".agl", I_AGL_FILE},
+    {".dif", I_DIF_FILE},
     {".log", I_LOGS_FILE},
     {".ini", I_SETTINGS_FILE},
 };
@@ -259,3 +269,9 @@ const static std::array<std::string, I_NB_FONTS> vIodeFonts =
 const static int I_NB_PRINT_DEST = 2;
 
 const static std::array<std::string, I_NB_PRINT_DEST> vPrintDest = {"Windows printer", "File"};
+
+const static int I_NB_PRINT_FORMATS = 5;
+
+const static std::array<std::string, I_NB_PRINT_FORMATS> vPrintFormats =
+    {"A2M file (IODE ...)", "RTF file (Word, ...)", "HTML file (Internet)",
+     "MIF file (Frame Maker)", "CSV file (Excel, ....)"};
