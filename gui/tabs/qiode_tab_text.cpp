@@ -4,8 +4,8 @@
 static const QStringList initialize_text_extensions()
 {
     QStringList textExt;
-    for(const auto& [key, value]: mFileExtensions)
-        if(value == I_TEXT_FILE) textExt << QString::fromStdString(key);
+    for(const std::string ext: v_text_ext)
+        textExt << "." + QString::fromStdString(ext);
     return textExt;
 }
 
