@@ -36,6 +36,8 @@ set(GUI_TABS
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/complete_line_edit.h         custom_widgets/complete_line_edit.cpp
     custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
+    custom_widgets/print_file_dialog.ui
+    custom_widgets/print_file_dialog.h          custom_widgets/print_file_dialog.cpp
     custom_widgets/qfilechooser.h 
     custom_widgets/qsampleedit.h
     custom_widgets/qiode_completer.h            custom_widgets/qiode_completer.cpp
