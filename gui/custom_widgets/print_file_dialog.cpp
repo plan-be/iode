@@ -1,8 +1,8 @@
 #include "print_file_dialog.h"
 
 
-const QString KEY_SETTINGS_PRINT_FORMAT = "PRINT_FILE_DIALOG/Print_Format";
-const QString KEY_SETTINGS_PRINT_OUTPUT_FILE = "PRINT_FILE_DIALOG/Output_File";
+const QString QIodePrintFileDialog::KEY_SETTINGS_PRINT_FORMAT = "PRINT_FILE_DIALOG/Print_Format";
+const QString QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE = "PRINT_FILE_DIALOG/Output_File";
 
 
 QIodePrintFileDialog::QIodePrintFileDialog(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f)
