@@ -28,7 +28,7 @@ project ("iode" VERSION 7.01 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUA
 
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
-set(IODE_EMAIL "ald@plan.be; gb@plan.be")
+set(IODE_EMAIL "ald@plan.be; gb@plan.be; jmarc.paul@gmail.com")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 # -- resources directory --
