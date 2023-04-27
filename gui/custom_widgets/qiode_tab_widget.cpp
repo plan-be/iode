@@ -405,7 +405,7 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
         break;
     default:
         if(QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
-            index = addTextTab(fileInfo, I_TEXT_FILE);
+            index = addTextTab(fileInfo, fileType);
         else
         { 
             QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
