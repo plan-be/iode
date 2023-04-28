@@ -27,13 +27,18 @@ class GSampleTable
 {
 protected:
     Table*       ref_table;
+    std::string  ref_table_name;
     std::string  gsample;
     Sample*      sample;
+    COLS*        columns;
     std::vector<std::string> files;
     std::vector<std::string> column_names;
     std::vector<std::string> line_names;
     // TODO ALD: consider Boost array or Eigen 3 matrix
     std::vector<std::vector<double>> values;
+
+protected:
+    void compute_values();
 
 public:
     GSampleTable(const std::string& ref_table_name, const std::string& gsample);
