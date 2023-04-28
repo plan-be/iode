@@ -154,6 +154,7 @@ set(GUI_MENU_DATA
     menu/data/file_contents.ui          menu/data/file_contents.h           menu/data/file_contents.cpp
     menu/data/file_compare.ui           menu/data/file_compare.h            menu/data/file_compare.cpp
     menu/data/duplicate.ui              menu/data/duplicate.h               menu/data/duplicate.cpp
+    menu/data/edit_tables.ui            menu/data/edit_tables.h             menu/data/edit_tables.cpp
 )
 
 set(GUI_MENU_COMPUTE
