@@ -80,28 +80,28 @@ TEST_F(UtilsTest, getIodeFileType)
 	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
 
 	filename = input_test_dir + "fun.a2m";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_A2M_FILE);
 
 	filename = input_test_dir + "fun.agl";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_AGL_FILE);
 
 	filename = input_test_dir + "fun.prf";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_ANY_FILE);
 
 	filename = input_test_dir + "fun.dif";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_DIF_FILE);
 
 	filename = input_test_dir + "fun.mif";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_MIF_FILE);
 
 	filename = input_test_dir + "fun.rtf";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_RTF_FILE);
 
 	filename = input_test_dir + "fun.asc";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_ASCII_FILE);
 
 	filename = input_test_dir + "fun.ref";
-	EXPECT_EQ(get_iode_file_type(filename), I_TEXT_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), I_REF_FILE);
 }
 
 
