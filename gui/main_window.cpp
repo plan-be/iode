@@ -466,7 +466,8 @@ void MainWindow::open_scan_objects_dialog()
 
 void MainWindow::open_edit_tables_variables_dialog()
 {
-    QMessageBox::warning(this, "WARNING", "Edit Tables is not yet implemented");
+    QIodeMenuDataEditTables dialog(*project_settings_filepath, this);
+    dialog.exec();
 }
 
 void MainWindow::open_duplicate_objects_dialog()

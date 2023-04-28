@@ -44,6 +44,7 @@
 #include "menu/data/scan_objects.h"
 #include "menu/data/file_contents.h"
 #include "menu/data/file_compare.h"
+#include "menu/data/edit_tables.h"
 #include "menu/data/duplicate.h"
 
 #include "menu/compute/compute_identities.h"
