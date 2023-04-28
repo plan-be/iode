@@ -48,7 +48,7 @@ int B_PrintVar(char* arg)
  *  Print or display (according to the mode parameter) variables in the form of tables. 
  *  Temporary tables of maximum 50 variables are constructed then printed of displayed.
  *  
- *  @param [in] arg  char*  list of variables to be printed
+ *  @param [in] arg  char*  sample + list of variables to be printed
  *  @param [in] mode int    0 to display, 1 to print
  *  @return          int 
  */
