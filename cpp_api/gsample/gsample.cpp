@@ -1,7 +1,8 @@
 #include "gsample.h"
 
 
-GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string& gsample) : gsample(gsample)
+GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string& gsample) 
+    : ref_table_name(ref_table_name), gsample(gsample)
 {
     IodeExceptionInitialization error("GSampleOutput", "Cannot compile generalized sample " + 
                                        gsample + " according to the input table " + ref_table_name);
@@ -18,7 +19,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
      */
 
     // Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in the passed table.
-    COLS* columns = COL_cc(to_char_array(gsample));
+    columns = COL_cc(to_char_array(gsample));
     if(columns == NULL) throw error;
 
     // Returns the number of columns for the computed table + 1.
@@ -97,8 +98,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         }
     }
 
-    // For each table line, compute and store all values
-    int res;
+    // For each table line, get line name + add a NaN value for each column
     for(int row=0; row < (int) ref_table->nbLines(); row++)
     {
         // QUESTION FOR JMP: Can we always assume that 
@@ -114,8 +114,33 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         if(ref_table->getLineType(row) == EnumLineType::IT_CELL && ref_table->getCellType(row, 1) == EnumCellType::IT_LEC)
         {
             line_names.push_back(ref_table->getCellContent(row, 0, false));
-            
-            // reset the COLS structure
+
+            std::vector<double> row_values(column_names.size(), L_NAN);
+            values.push_back(row_values);
+        }
+    }
+
+    compute_values();
+}
+
+GSampleTable::~GSampleTable()
+{
+    COL_free_cols(columns);
+    
+    delete ref_table;
+    delete sample;
+}
+
+void GSampleTable::compute_values()
+{
+    // For each table line, compute and store all values
+    int res;
+    int row_val = 0;
+    for(int row=0; row < (int) ref_table->nbLines(); row++)
+    {
+        if(ref_table->getLineType(row) == EnumLineType::IT_CELL && ref_table->getCellType(row, 1) == EnumCellType::IT_LEC)
+        {   
+            // resets the values in the COLS
             COL_clear(columns);
             
             // Calculates the values of all LEC formulas in ONE table line for all columns 
@@ -126,19 +151,14 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
                 std::to_string(row) + " of table " + ref_table_name);
             
             // store all values
-            std::vector<double> line_values;
+            int col_val = 0;
             for(int col=1; col < columns->cl_nb; col+=2)
-                line_values.push_back(columns->cl_cols[col].cl_res);
+            {
+                values[row_val][col_val] = columns->cl_cols[col].cl_res;
+                col_val++;
+            }
 
-            values.push_back(line_values);
+            row_val++;
         }
     }
-
-    COL_free_cols(columns);
-}
-
-GSampleTable::~GSampleTable()
-{
-    delete ref_table;
-    delete sample;
 }
