@@ -19,7 +19,7 @@
 
 #include "iode_objs/edit/edit_vars_sample.h"
 
-#include "custom_widgets/qiode_completer.h"
+#include "custom_widgets/completer.h"
 
 #include "menu/file/file_import_comments.h"
 #include "menu/file/file_import_variables.h"

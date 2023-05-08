@@ -1,4 +1,4 @@
-#include "qiode_tab_report.h"
+#include "tab_report.h"
 
 QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output, std::shared_ptr<QIodeCompleter>& completer, 
     QWidget* parent) : QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)

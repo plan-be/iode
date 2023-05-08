@@ -1,7 +1,7 @@
 #pragma once
 
 #include "utils.h"
-#include "qiode_completer.h"
+#include "completer.h"
 
 #include <QObject>
 #include <QLineEdit>

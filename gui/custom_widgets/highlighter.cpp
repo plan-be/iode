@@ -1,4 +1,4 @@
-#include "qiode_highlighter.h"
+#include "highlighter.h"
 
 
 QIodeHighlighter::QIodeHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)

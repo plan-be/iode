@@ -1,4 +1,4 @@
-#include "qiode_completer.h"
+#include "completer.h"
 
 
 QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunctions, const int iodeType, QObject *parent) 

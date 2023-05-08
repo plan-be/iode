@@ -17,7 +17,7 @@
 #include "iode_objs/estimation/estimation_results.h"
 #include "iode_objs/misc/unit_root.h"
 #include "iode_objs/misc/dyn_adjustment.h"
-#include "custom_widgets/qiode_completer.h"
+#include "custom_widgets/completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

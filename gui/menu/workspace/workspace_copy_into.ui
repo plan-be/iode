@@ -220,12 +220,12 @@
   <customwidget>
    <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
-   <header>custom_widgets/qsampleedit.h</header>
+   <header>custom_widgets/sampleedit.h</header>
   </customwidget>
   <customwidget>
    <class>QIodeFileChooser</class>
    <extends>QWidget</extends>
-   <header location="global">custom_widgets/qfilechooser.h</header>
+   <header location="global">custom_widgets/filechooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

@@ -27,10 +27,10 @@ set(GUI_SETTINGS
 )
 
 set(GUI_TABS
-    tabs/qiode_tab_abstract.h
-    tabs/qiode_tab_database.h
-    tabs/qiode_tab_text.h           tabs/qiode_tab_text.cpp
-    tabs/qiode_tab_report.h         tabs/qiode_tab_report.cpp
+    tabs/tab_abstract.h
+    tabs/tab_database.h
+    tabs/tab_text.h           tabs/tab_text.cpp
+    tabs/tab_report.h         tabs/tab_report.cpp
 )
 
 set(GUI_CUSTOM_WIDGETS  
@@ -38,17 +38,17 @@ set(GUI_CUSTOM_WIDGETS
     custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
     custom_widgets/print_file_dialog.ui
     custom_widgets/print_file_dialog.h          custom_widgets/print_file_dialog.cpp
-    custom_widgets/qfilechooser.h 
-    custom_widgets/qsampleedit.h
-    custom_widgets/qiode_completer.h            custom_widgets/qiode_completer.cpp
-    custom_widgets/qiode_highlighter.h          custom_widgets/qiode_highlighter.cpp
-    custom_widgets/qiode_command.h              custom_widgets/qiode_command.cpp 
+    custom_widgets/filechooser.h 
+    custom_widgets/sampleedit.h
+    custom_widgets/completer.h                  custom_widgets/completer.cpp
+    custom_widgets/highlighter.h                custom_widgets/highlighter.cpp
+    custom_widgets/iode_command.h               custom_widgets/iode_command.cpp 
     custom_widgets/text_editor.h                custom_widgets/text_editor.cpp
     custom_widgets/report_editor.h              custom_widgets/report_editor.cpp
     custom_widgets/file_delegate.h              custom_widgets/file_delegate.cpp
-    custom_widgets/qiode_tab_widget.h           custom_widgets/qiode_tab_widget.cpp
-    custom_widgets/qiode_file_explorer_proxy.h
-    custom_widgets/qiode_file_explorer.h        custom_widgets/qiode_file_explorer.cpp
+    custom_widgets/tab_widget.h                 custom_widgets/tab_widget.cpp
+    custom_widgets/file_explorer_proxy.h
+    custom_widgets/file_explorer.h              custom_widgets/file_explorer.cpp
 )
 
 set(GUI_PLOT

@@ -932,18 +932,18 @@
   <customwidget>
    <class>QIodeTabWidget</class>
    <extends>QTabWidget</extends>
-   <header>custom_widgets/qiode_tab_widget.h</header>
+   <header>custom_widgets/tab_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QIodeFileExplorer</class>
    <extends>QTreeView</extends>
-   <header>custom_widgets/qiode_file_explorer.h</header>
+   <header>custom_widgets/file_explorer.h</header>
   </customwidget>
   <customwidget>
    <class>QIodeCommandLine</class>
    <extends>QLineEdit</extends>
-   <header location="global">custom_widgets/qiode_command.h</header>
+   <header location="global">custom_widgets/command.h</header>
    <slots>
     <slot>run_command()</slot>
    </slots>

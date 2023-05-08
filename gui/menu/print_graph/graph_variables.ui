@@ -328,7 +328,7 @@
   <customwidget>
    <class>QIodeSampleEdit</class>
    <extends>QLineEdit</extends>
-   <header>custom_widgets/qsampleedit.h</header>
+   <header>custom_widgets/sampleedit.h</header>
   </customwidget>
   <customwidget>
    <class>QIodeCompleteTextEdit</class>

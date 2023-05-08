@@ -25,8 +25,8 @@
 
 #include "utils.h"
 #include "util/system_item.h"
-#include "qiode_tab_widget.h"
-#include "qiode_file_explorer_proxy.h"
+#include "tab_widget.h"
+#include "file_explorer_proxy.h"
 #include "file_delegate.h"
 
 

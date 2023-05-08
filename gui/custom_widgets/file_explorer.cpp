@@ -1,4 +1,4 @@
-#include "qiode_file_explorer.h"
+#include "file_explorer.h"
 
 
 QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)

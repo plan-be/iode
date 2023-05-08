@@ -1,4 +1,4 @@
-#include "qiode_tab_widget.h"
+#include "tab_widget.h"
 
 
 QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_all(false), discard_all(false)

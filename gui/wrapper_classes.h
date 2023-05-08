@@ -11,8 +11,8 @@
 #include <QDoubleSpinBox>
 #include <QCheckBox>
 
-#include "./custom_widgets/qfilechooser.h"
-#include "./custom_widgets/qsampleedit.h"
+#include "./custom_widgets/filechooser.h"
+#include "./custom_widgets/sampleedit.h"
 #include "utils.h"
 
 

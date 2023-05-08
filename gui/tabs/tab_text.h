@@ -8,7 +8,7 @@
 #include <QGridLayout>
 
 #include "custom_widgets/text_editor.h"
-#include "qiode_tab_abstract.h"
+#include "tab_abstract.h"
 
 
 class QIodeAbstractEditor: public AbstractTabWidget

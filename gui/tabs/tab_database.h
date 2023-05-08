@@ -8,7 +8,7 @@
 #include <QSizePolicy>
 #include <QStringList>
 
-#include "qiode_tab_abstract.h"
+#include "tab_abstract.h"
 
 #include "iode_objs/models/comments_model.h"
 #include "iode_objs/models/equations_model.h"

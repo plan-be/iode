@@ -7,7 +7,7 @@
 #include <QModelIndexList>
 
 #include "util/system_item.h"
-#include "qiode_file_explorer_proxy.h"
+#include "file_explorer_proxy.h"
 
 
 class FileDelegate : public QStyledItemDelegate

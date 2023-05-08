@@ -7,7 +7,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "plot/plot.h"
-#include "custom_widgets/qiode_completer.h"
+#include "custom_widgets/completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
