@@ -7,6 +7,7 @@
 
 #include "utils.h"
 #include "tab_text.h"
+#include "ui_tab_report.h"
 #include "custom_widgets/report_editor.h"
 
 
@@ -21,20 +22,13 @@
  *          -> CTRL + R runs the report.
  * 
  */
-class QIodeReportWidget : public QIodeAbstractEditor
+class QIodeReportWidget : public QIodeAbstractEditor, public Ui::QIodeReportWidget
 {
     Q_OBJECT
-
-    QGridLayout* layout;
-    TextEditor* editor;
-    QShortcut* runShortcut;
 
 public:
     QIodeReportWidget(const QString& filepath,  QTextEdit* output, 
         std::shared_ptr<QIodeCompleter>& completer, QWidget* parent = nullptr);
-    ~QIodeReportWidget();
-    
-    void addEditorToLayout(int row);
 
     bool load_(const QString& filepath, const bool forceOverwrite)
     {
@@ -55,5 +49,10 @@ private slots:
         emit askComputeHash(true);
         static_cast<ReportEditor*>(editor)->run(filepath);
         emit askComputeHash(false);
+    }
+
+    void print()
+    {
+        QMessageBox::warning(nullptr, "WARNING", "Not implemented yet");
     }
 };

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QIodeReportWidget</class>
+ <widget class="QWidget" name="QIodeReportWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>684</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>501</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="pushButton_print">
+     <property name="text">
+      <string>Print</string>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+P</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="pushButton_run">
+     <property name="text">
+      <string>Run</string>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+R</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="ReportEditor" name="editor"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ReportEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>custom_widgets\report_editor.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_print</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeReportWidget</receiver>
+   <slot>print()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>557</x>
+     <y>11</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_run</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeReportWidget</receiver>
+   <slot>run()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>640</x>
+     <y>11</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>print()</slot>
+  <slot>run()</slot>
+ </slots>
+</ui>
