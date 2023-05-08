@@ -1,7 +1,7 @@
 #include "report_editor.h"
 
 
-ReportEditor::ReportEditor(QTextEdit* output, QWidget *parent) : TextEditor(parent), output(output)
+ReportEditor::ReportEditor(QWidget *parent) : TextEditor(parent), output(nullptr)
 {
     highlighter = new QIodeHighlighter(this->document());
 }
@@ -18,9 +18,12 @@ void ReportEditor::run(const QString& filepath)
 
     try
     {
-        output->setTextColor(Qt::darkBlue);
-        output->append("\nRunning report " + filepath + " ...\n");
-        output->setTextColor(Qt::black);
+        if(output)
+        {
+            output->setTextColor(Qt::darkBlue);
+            output->append("\nRunning report " + filepath + " ...\n");
+            output->setTextColor(Qt::black);
+        }
         // We do not use B_ReportExec() because the user may have made some 
         // modifications in the report editor which are not yet saved in the 
         // report file
@@ -34,16 +37,19 @@ void ReportEditor::run(const QString& filepath)
         QMessageBox::warning(get_main_window_ptr(), "Warning", msg + "\n");
     }
 
-    if(success == 0)
+    if(output)
     {
-        output->setTextColor(Qt::darkGreen);
-        msg = "Successful";
+        if(success == 0)
+        {
+            output->setTextColor(Qt::darkGreen);
+            msg = "Successful";
+        }
+        else
+        {
+            output->setTextColor(Qt::red);
+            msg = "Failed";
+        }
+        output->append("\nExecution of report " + filepath + ": " + msg + "\n");
+        output->setTextColor(Qt::black);
     }
-    else
-    {
-        output->setTextColor(Qt::red);
-        msg = "Failed";
-    }
-    output->append("\nExecution of report " + filepath + ": " + msg + "\n");
-    output->setTextColor(Qt::black);
 }
