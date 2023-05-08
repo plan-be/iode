@@ -5,6 +5,11 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
 {
     filter = "IODE report files (*" + QString::fromStdString(report_ext) + ")";
 
+    // layout
+    layout = new QGridLayout(this);
+    layout->setObjectName(QString::fromUtf8("layout"));
+    layout->setContentsMargins(0, 0, 0, 0);
+
     int col = 0;
 
     // autocomplete checkbox
@@ -54,5 +59,23 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
 
 QIodeReportWidget::~QIodeReportWidget()
 {
+    delete editor;
     delete runShortcut;
+}
+
+void QIodeReportWidget::addEditorToLayout(int row)
+{
+    editor->setGeometry(QRect(0, 50, 800, 500));
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(editor->sizePolicy().hasHeightForWidth());
+    editor->setSizePolicy(sizePolicy);
+    editor->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+
+    // -1 -> span over all rows/columns
+    layout->addWidget(editor, row, 0, -1, -1);
+
+    if(!filepath.isEmpty()) 
+        load(filepath, true);
 }
