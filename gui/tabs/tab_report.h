@@ -1,9 +1,11 @@
 #pragma once
 
+#include <QPrinter>
 #include <QCheckBox>
 #include <QShortcut>
 #include <QSpacerItem>
 #include <QPushButton>
+#include <QPrintPreviewDialog>
 
 #include "utils.h"
 #include "tab_text.h"
@@ -51,8 +53,23 @@ private slots:
         emit askComputeHash(false);
     }
 
+    void renderForPrinting()
+    {
+        editor->print(&printer);
+    }
+
+public slots:
     void print()
     {
-        QMessageBox::warning(nullptr, "WARNING", "Not implemented yet");
+        try
+        {
+            QPrintPreviewDialog dialog(&printer);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodeReportWidget::renderForPrinting);
+            dialog.exec(); 
+        }
+        catch(const std::exception& e)
+        {
+            QMessageBox::warning(nullptr, "Print Graph", "Could not print graph\n" + QString(e.what()));
+        }
     }
 };
