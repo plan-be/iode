@@ -4,9 +4,10 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QPlainTextEdit>
 #include <QTextStream>
 #include <QGridLayout>
+#include <QPlainTextEdit>
+#include <QPrintPreviewDialog>
 
 #include "custom_widgets/text_editor.h"
 #include "tab_abstract.h"
@@ -19,6 +20,7 @@ class QIodeAbstractEditor: public AbstractTabWidget
 
 protected:
     QString filter;
+    QPrinter printer;
 
 public:
     QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
@@ -68,9 +70,24 @@ public:
         return save_(editor, filepath);
     }
 
+private slots:
+    void renderForPrinting()
+    {
+        editor->print(&printer);
+    }
+
 public slots:
     void print()
     {
-        QMessageBox::warning(nullptr, "WARNING", "Not implemented yet");
+        try
+        {
+            QPrintPreviewDialog dialog(&printer);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodeTextWidget::renderForPrinting);
+            dialog.exec(); 
+        }
+        catch(const std::exception& e)
+        {
+            QMessageBox::warning(nullptr, "Print Graph", "Could not print graph\n" + QString(e.what()));
+        }
     }
 };
