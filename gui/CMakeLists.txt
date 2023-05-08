@@ -27,10 +27,10 @@ set(GUI_SETTINGS
 )
 
 set(GUI_TABS
-                        tabs/tab_abstract.h
-                        tabs/tab_database.h
-    tabs/tab_text.ui    tabs/tab_text.h           tabs/tab_text.cpp
-                        tabs/tab_report.h         tabs/tab_report.cpp
+                            tabs/tab_abstract.h
+                            tabs/tab_database.h
+    tabs/tab_text.ui        tabs/tab_text.h           tabs/tab_text.cpp
+    tabs/tab_report.ui      tabs/tab_report.h         tabs/tab_report.cpp
 )
 
 set(GUI_CUSTOM_WIDGETS  
