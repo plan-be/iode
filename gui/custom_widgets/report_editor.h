@@ -28,8 +28,13 @@ class ReportEditor : public TextEditor
     QTextEdit* output;
 
 public: 
-    ReportEditor(QTextEdit* output, QWidget *parent = nullptr);
+    ReportEditor(QWidget *parent = nullptr);
     ~ReportEditor();
+
+    void setOutput(QTextEdit* output)
+    {
+        this->output = output;
+    }
 
     void run(const QString& filepath);
 };
