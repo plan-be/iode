@@ -6,8 +6,8 @@
 #include <QAbstractItemView>
 
 #include "utils.h"
-#include "qiode_highlighter.h"
-#include "qiode_completer.h"
+#include "highlighter.h"
+#include "completer.h"
 #include "text_editor.h"
 
 

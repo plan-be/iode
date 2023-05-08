@@ -1,4 +1,4 @@
-#include "qiode_tab_text.h"
+#include "tab_text.h"
 
 
 static const QStringList initialize_text_extensions()

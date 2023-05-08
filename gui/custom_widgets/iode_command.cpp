@@ -1,4 +1,4 @@
-#include "qiode_command.h"
+#include "iode_command.h"
 
 
 bool QIodeCommandLine::handleSpecialKeys(QKeyEvent *event)

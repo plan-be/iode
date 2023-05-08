@@ -6,7 +6,7 @@
 #include <QPushButton>
 
 #include "utils.h"
-#include "qiode_tab_text.h"
+#include "tab_text.h"
 #include "custom_widgets/report_editor.h"
 
 

@@ -12,7 +12,7 @@
 #include <QDebug>
 
 #include "utils.h"
-#include "custom_widgets/qfilechooser.h"
+#include "custom_widgets/filechooser.h"
 #include <boost/functional/hash.hpp>
 
 
