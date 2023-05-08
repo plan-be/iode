@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QWidget>
+#include <QShortcut>
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -37,7 +38,8 @@ protected:
     QGridLayout* layout;
     QLineEdit* lineEdit_filter;
     QPushButton* pushButton_filter;
-    QPushButton* add_iode_obj;
+    QPushButton* pushButton_print;
+    QPushButton* pushButton_add;
 
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, QWidget* parent = nullptr) : 
@@ -70,22 +72,27 @@ public:
         QSpacerItem* horizontalSpacer = new QSpacerItem(828, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
         layout->addItem(horizontalSpacer, 0, 2);
 
+        // print button
+        pushButton_print = new QPushButton("Print");
+        pushButton_print->setObjectName(QString::fromUtf8("pushButton_print"));
+        layout->addWidget(pushButton_print, 0, 3, Qt::AlignLeft);
+
         // add button
-        add_iode_obj = new QPushButton("Add " + QString::fromStdString(vIodeTypes[iodeType]));
-        add_iode_obj->setObjectName(QString::fromUtf8("add_iode_obj"));
+        pushButton_add = new QPushButton("Add " + QString::fromStdString(vIodeTypes[iodeType]));
+        pushButton_add->setObjectName(QString::fromUtf8("pushButton_add"));
         QSizePolicy sizePolicyAdd(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicyAdd.setHorizontalStretch(0);
         sizePolicyAdd.setVerticalStretch(0);
-        sizePolicyAdd.setHeightForWidth(add_iode_obj->sizePolicy().hasHeightForWidth());
-        add_iode_obj->setSizePolicy(sizePolicyAdd);
-        layout->addWidget(add_iode_obj, 0, 3, Qt::AlignRight);
+        sizePolicyAdd.setHeightForWidth(pushButton_add->sizePolicy().hasHeightForWidth());
+        pushButton_add->setSizePolicy(sizePolicyAdd);
+        layout->addWidget(pushButton_add, 0, 4, Qt::AlignRight);
     }
 
     ~AbstractIodeObjectWidget()
     {
         delete lineEdit_filter;
         delete pushButton_filter;
-        delete add_iode_obj;
+        delete pushButton_add;
         delete layout;
     }
 
@@ -151,6 +158,9 @@ protected:
     V* tableview;
     QDir projectDir;
 
+    QShortcut* shortcutPrint;
+    QShortcut* shortcutAdd;
+
 public:
     QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : 
         AbstractIodeObjectWidget(iodeType, parent), projectDir(QDir::homePath())
@@ -165,10 +175,27 @@ public:
         tableview->setGeometry(QRect(10, 43, 950, 560));
         tableview->setupView(objmodel, lineEdit_filter);
         
+        // shortcuts
+        shortcutPrint = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_P), this);
+        shortcutAdd = new QShortcut(QKeySequence(Qt::Key_Insert), this);
+
+        // NOTE: By default, shortcuts are defined at the main Window level. 
+        //       Thus, a shortcut of a (combination of) key(s) may override the expected behavior 
+        //       from another widget dealing with the same (combination of) key(s). 
+        //       'setContext(Qt::WidgetWithChildrenShortcut)' makes sure that the shortcut does 
+        //       not propagate to other widgets.
+        shortcutPrint->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutAdd->setContext(Qt::WidgetWithChildrenShortcut);
+
         // signals - slots
         connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter);
         connect(pushButton_filter, &QPushButton::clicked, tableview, &V::filter);
-        connect(add_iode_obj, &QPushButton::clicked, tableview, &V::new_obj);
+
+        connect(pushButton_print, &QPushButton::clicked, tableview, &V::print);
+        connect(shortcutPrint, &QShortcut::activated, tableview, &V::print);
+
+        connect(pushButton_add, &QPushButton::clicked, tableview, &V::new_obj);
+        connect(shortcutAdd, &QShortcut::activated, tableview, &V::new_obj);
 
         // insert table to layout
         // -1 -> span over all rows/columns
@@ -179,6 +206,8 @@ public:
     {
         delete objmodel;
         delete tableview;
+        delete shortcutPrint;
+        delete shortcutAdd;
     }
 
     M* get_model() const 

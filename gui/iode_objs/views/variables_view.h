@@ -71,6 +71,7 @@ signals:
 
 public slots:
 	void filter() { filter_and_update(); }
+	void print() { QMessageBox::warning(nullptr, "WARNING", "Not yet implemented"); }
 	void new_obj();
 	void plot_series();
 	void open_graphs_dialog();
