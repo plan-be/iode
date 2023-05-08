@@ -528,6 +528,11 @@ void MainWindow::open_print_variables_dialog()
     dialog.exec();
 }
 
+void MainWindow::open_print_objects_definitions_dialog()
+{
+    QMessageBox::warning(this, "WARNING", "Object Definitions not yet impemented");
+}
+
 void MainWindow::open_graphs_tables_dialog()
 {
     QIodeMenuGraphTables dialog(*project_settings_filepath, this);

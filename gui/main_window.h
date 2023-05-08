@@ -186,6 +186,7 @@ public slots:
 	// Print/Graph Menu
 	void open_print_tables_dialog();
 	void open_print_variables_dialog();
+	void open_print_objects_definitions_dialog();
 	void open_graphs_tables_dialog();
 	void open_graphs_variables_dialog(); 
 	void open_graphs_variables_dialog_from_vars_view(
