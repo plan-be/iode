@@ -21,10 +21,7 @@ QIodeMenuDataScanObjects::QIodeMenuDataScanObjects(const QString& project_settin
 
     connect(comboBox_iode_types, &QComboBox::currentIndexChanged, textEdit_lists_to_scan, &QIodeCompleteTextEdit::setIodeType);
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "MENU_DATA_SCAN_OBJECTS";
     loadSettings();
 }
 

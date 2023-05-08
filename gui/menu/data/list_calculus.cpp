@@ -22,10 +22,7 @@ QIodeMenuDataListCalculus::QIodeMenuDataListCalculus(const QString& project_sett
     mapFields["List2"] = wList2;
     mapFields["ListRes"] = wListRes;
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "MENU_DATA_LIST_CALCULUS";
     loadSettings();
 }
 

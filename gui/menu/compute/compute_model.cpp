@@ -22,10 +22,7 @@ QIodeMenuComputeModel::QIodeMenuComputeModel(const QString& project_settings_fil
     qEquationsList = new WrapperQPlainTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);
     mapFields["EquationsList"] = qEquationsList;
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "MENU_COMPUTE_MODEL";
     loadSettings();
 }
 

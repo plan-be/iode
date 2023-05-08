@@ -20,10 +20,7 @@ QIodeAddTable::QIodeAddTable(const QString& project_settings_filepath, QWidget* 
     mapFields["Files"] = checkBoxFiles;
     mapFields["Date"] = checkBoxDate;
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "TAB_ADD_TABLE";
     loadSettings();
 }
 

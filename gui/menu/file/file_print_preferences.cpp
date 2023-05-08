@@ -201,10 +201,7 @@ QIodeMenuFilePrintPref::QIodeMenuFilePrintPref(const QString& settings_filepath,
     mapFields["MIF_Table_Verical_Lines"]    = wMIFTableVericalLines;
     mapFields["MIF_Image_Ref_In_Text"]      = wMIFImageRefInText;
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = "PRINT_PREFERENCES";
+    className = "MENU_FILE_PRINT_PREFERENCES";
     loadSettings();
 }
 

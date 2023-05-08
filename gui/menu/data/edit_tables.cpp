@@ -12,10 +12,7 @@ QIodeMenuDataEditTables::QIodeMenuDataEditTables(const QString& settings_filepat
     wTablesNames = new WrapperQPlainTextEdit(label_table_names->text(), *textEdit_table_names, REQUIRED_FIELD);
     mapFields["TablesNames"] = wTablesNames;
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "MENU_DATA_EDIT_TABLES";
     loadSettings();
 }
 

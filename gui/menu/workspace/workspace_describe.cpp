@@ -24,6 +24,9 @@ QIodeMenuWorkspaceDescribe::QIodeMenuWorkspaceDescribe(const QString& settings_f
     wScalarsDescription->setQValue(QString::fromStdString(KDBScalars().get_description()));
     wTablesDescription->setQValue(QString::fromStdString(KDBTables().get_description()));
     wVariablesDescription->setQValue(QString::fromStdString(KDBVariables().get_description()));
+
+    className = "MENU_WORKSPACE_DESCRIBE";
+    loadSettings();
 }
 
 QIodeMenuWorkspaceDescribe::~QIodeMenuWorkspaceDescribe()
