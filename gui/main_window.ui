@@ -943,7 +943,7 @@
   <customwidget>
    <class>QIodeCommandLine</class>
    <extends>QLineEdit</extends>
-   <header location="global">custom_widgets/command.h</header>
+   <header location="global">custom_widgets/iode_command.h</header>
    <slots>
     <slot>run_command()</slot>
    </slots>
