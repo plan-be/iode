@@ -176,11 +176,6 @@
     <addaction name="separator"/>
     <addaction name="actionGraphs_from_Tables"/>
     <addaction name="actionGraphs_from_Variables"/>
-    <addaction name="separator"/>
-    <addaction name="actionFILES"/>
-    <addaction name="separator"/>
-    <addaction name="actionPrint_A2M_File"/>
-    <addaction name="actionPrint_Report"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1562,38 +1557,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionPrint_A2M_File</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_print_A2M_file_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionPrint_Report</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_print_report_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionIode_Readme</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -1929,8 +1892,6 @@
   <slot>open_print_objects_definitions_dialog()</slot>
   <slot>open_graphs_tables_dialog()</slot>
   <slot>open_graphs_variables_dialog()</slot>
-  <slot>open_print_A2M_file_dialog()</slot>
-  <slot>open_print_report_dialog()</slot>
   <slot>open_release_notes()</slot>
   <slot>open_iode_home()</slot>
   <slot>open_iode_manual()</slot>
