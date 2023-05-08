@@ -15,7 +15,7 @@ QIodeMenuFilePrintSetup::QIodeMenuFilePrintSetup(const QString& settings_filepat
     mapFields["Print_Dest"] = wPrintDest;
     comboBox_print_dest->setCurrentIndex(0);
 
-    className = "PRINT_SETUP";
+    className = "MENU_FILE_PRINT_SETUP";
     loadSettings();
 }
 

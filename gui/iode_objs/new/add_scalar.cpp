@@ -3,11 +3,6 @@
 
 QIodeAddScalar::QIodeAddScalar(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(project_settings_filepath, parent, f)
 {
-	// TODO: if possible, find a way to initialize className inside MixingSettings
-	// NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-	//                       since in that case this refers to MixingSettings and NOT the derived class
-	className = QString::fromStdString(typeid(this).name());
-
 	setupUi(this);
 
 	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_SCALARS, REQUIRED_FIELD);
@@ -18,6 +13,7 @@ QIodeAddScalar::QIodeAddScalar(const QString& project_settings_filepath, QWidget
 
 	lineEdit_value->setValidator(new QDoubleValidator(parent));
 
+	className = "TAB_ADD_SCALAR";
 	loadSettings();
 }
 

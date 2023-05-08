@@ -31,10 +31,7 @@ QIodeMenuDataFileCompare::QIodeMenuDataFileCompare(const QString& project_settin
     connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuDataFileCompare::updateThreshold);
     connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuDataFileCompare::updateFileChooser);
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "MENU_DATA_FILE_COMPARE";
     loadSettings();
 }
 

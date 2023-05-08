@@ -4,11 +4,6 @@
 QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
 	QIodeSettings(project_settings_filepath, parent, f), project_settings_filepath(project_settings_filepath)
 {
-	// TODO: if possible, find a way to initialize className inside MixingSettings
-	// NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-	//                       since in that case this refers to MixingSettings and NOT the derived class
-	className = QString::fromStdString(typeid(this).name());
-
 	setupUi(this);
 
 	completer = new QIodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
@@ -38,6 +33,7 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString&
 	if(!equation_name.empty() && kdb_eqs.contains(equation_name))
 	{
 		// --- existing equation ---
+		className = "TAB_EDIT_EQUATION";
 		lineEdit_name->setReadOnly(true);
 		NamedEquation equation(equation_name);
 		display_equation(equation);
@@ -45,7 +41,7 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString&
 	else
 	{
 		// --- new equation ---
-		className = className.replace("Edit", "New");
+		className = "TAB_ADD_EQUATION";
 		lineEdit_name->setReadOnly(false);
 		loadSettings();
 	}

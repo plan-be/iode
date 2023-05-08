@@ -4,11 +4,6 @@
 QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
     QIodeSettings(settings_filepath, parent, f), lec(lec)
 {
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-	// NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-	//                       since in that case this refers to MixingSettings and NOT the derived class
-	className = QString::fromStdString(typeid(this).name());
-
 	setupUi(this);
 
     textEdit_equation->setText(lec);
@@ -23,6 +18,7 @@ QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, const QString& settings_fil
     mapFields["Coef1"] = lineCoef1;
     mapFields["Coef2"] = lineCoef2;
 
+	className = "EQUATION_DYNAMIC_ADJUSTMENT";
     loadSettings();
 }
 

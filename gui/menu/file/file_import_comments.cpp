@@ -26,7 +26,7 @@ QIodeMenuFileImportComments::QIodeMenuFileImportComments(const QString& project_
     // TODO: if possible, find a way to initialize className inside MixingSettings
     // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
     //                       since in that case this refers to MixingSettings and NOT the derived class
-    className = QString::fromStdString(typeid(this).name());
+    className = "MENU_FILE_IMPORT_COMMENTS";
     loadSettings();
 }
 
