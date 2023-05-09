@@ -1,5 +1,7 @@
 #include "print_abstract.h"
 
+const QString QIodeMenuPrintAbstract::TMP_FILENAME = "tmp.h";
+
 
 void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QString& names)
 {
@@ -13,11 +15,21 @@ void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QStr
                 return;
         }
 
-        // set output file if any
+        // set output file
+        // If not printing to a file, the table is first saved in 
+        // a temporary HTML file to be then loaded by a QTextDocument object 
+        // (see below)
         QString outputFile;
         if(printToFile)
+        {
             outputFile = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE).toString();
-        setPrintDest(outputFile);
+            setPrintDest(outputFile);
+        }
+        else
+        {
+            outputFile = TMP_FILENAME;
+            setPrintDest(outputFile, 'H');
+        }
         
         // set the number of decimals
         setNbDecimals(wNbDecimals->extractAndVerify());
@@ -65,12 +77,36 @@ void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QStr
         if(res < 0)
             B_display_last_error();
         
-        QString obj_type = isTable ? "tables" : "variables";
-        QMessageBox::information(nullptr, "SUCCESS", "succedeed to export " + obj_type + " " 
-            + args_names.join(", ") + " to the file " + outputFile);
+        if(printToFile)
+        {
+            QString obj_type = isTable ? "tables" : "variables";
+            QMessageBox::information(nullptr, "SUCCESS", "succedeed to export " + obj_type + " " 
+                + args_names.join(", ") + " to the file " + outputFile);
+        }
+        else
+        {
+            document.clear();
+            
+            // load the content of the generated HTML file and then removed the file
+            QFile file(TMP_FILENAME);
+            if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QMessageBox::critical(nullptr, "Error", file.errorString());
+                file.remove();
+                return;
+            }
+            QTextStream in(&file);
+            document.setHtml(in.readAll());
+            file.remove();
+
+            // print the document
+            QPrintPreviewDialog dialog(&printer);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodeMenuPrintAbstract::renderForPrinting);
+            dialog.exec(); 
+        }
 }
 
-void QIodeMenuPrintAbstract::setPrintDest(const QString& outputFile)
+void QIodeMenuPrintAbstract::setPrintDest(const QString& outputFile, const QChar& format)
 {
     // set output file
     // output_file = "<filepath> <format>"
@@ -80,30 +116,35 @@ void QIodeMenuPrintAbstract::setPrintDest(const QString& outputFile)
 
     if(!outputFile.isEmpty())
     {
-        int i_format = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_FORMAT).toInt();
-        char format;
-        switch(i_format) 
+        char c_format;
+        if(format.isNull())
         {
-            case 0:
-                format = 'A';
-                break;
-            case 1:  
-                format = 'R'; 
-                break;
-            case 2:  
-                format = 'H'; 
-                break;
-            case 3:  
-                format = 'M'; 
-                break;
-            case 4:  
-                format = 'C'; 
-                break;
-            default: 
-                break;
+            int i_format = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_FORMAT).toInt();
+            switch(i_format) 
+            {
+                case 0:
+                    c_format = 'A';
+                    break;
+                case 1:  
+                    c_format = 'R'; 
+                    break;
+                case 2:  
+                    c_format = 'H'; 
+                    break;
+                case 3:  
+                    c_format = 'M'; 
+                    break;
+                case 4:  
+                    c_format = 'C'; 
+                    break;
+                default: 
+                    break;
+            }
         }
+        else
+            c_format = format.toLatin1();
 
-        output_file = outputFile.toStdString() + " " + format;
+        output_file = outputFile.toStdString() + " " + c_format;
     }
 
     int res = B_PrintDest(output_file.data());

@@ -2,7 +2,10 @@
 
 #include <QWidget>
 #include <QString>
+#include <QPrinter>
 #include <QStringList>
+#include <QTextDocument>
+#include <QPrintPreviewDialog>
 
 #include "utils.h"
 #include "settings.h"
@@ -19,6 +22,12 @@
 
 class QIodeMenuPrintAbstract: public QIodeSettings
 {
+    Q_OBJECT 
+
+    QPrinter printer;
+    QTextDocument document;
+    const static QString TMP_FILENAME;
+
 protected:
     WrapperQTextEdit*        wSample;
     WrapperFileChooser*      wFile2;
@@ -49,8 +58,9 @@ protected:
      * @note see C_PrintDestDecLang() in sb_pdest.c from the old GUI
      * 
      * @param outputFile 
+     * @param format 
      */
-    void setPrintDest(const QString& outputFile);
+    void setPrintDest(const QString& outputFile, const QChar& format=QChar::Null);
 
     /**
      * @brief Set the Nb Decimals object
@@ -89,4 +99,10 @@ protected:
      * @param files 
      */
     void setTablesFiles(const QStringList& files);
+
+private slots:
+    void renderForPrinting()
+    {
+        document.print(&printer);
+    }
 };
