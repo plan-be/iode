@@ -4,17 +4,17 @@
 
 #include <QList>
 #include <QString>
+#include <QDialog>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDialog>
 #include <QMenuBar>
-#include <QGridLayout>
 #include <QtCharts>
 #include <QPrinter>
-#include <QPrintDialog>
 #include <QFileInfo>
-#include <QtCharts/QChartView>
+#include <QGridLayout>
 #include <QtCharts/QChart>
+#include <QPrintPreviewDialog>
+#include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
@@ -39,6 +39,7 @@ constexpr int MINOR_YTICKS_COUNT = 2;
 class QIodePlotDialog: public QDialog
 {
     Q_OBJECT
+
     QStringList variablesNames;
     QStringList legend;
     KDBVariables* kdb_vars;
@@ -70,6 +71,8 @@ class QIodePlotDialog: public QDialog
     QChart* chart;
     QChartView* chartView;
 
+    QPrinter printer;
+
 public:
     QIodePlotDialog(KDBVariables* kdb_vars=nullptr, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodePlotDialog();
@@ -94,6 +97,14 @@ private:
 protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
+
+private slots:
+    void renderChart()
+    {
+        QPainter painter(&printer);
+        painter.setRenderHint(QPainter::Antialiasing);
+        chartView->render(&painter);
+    }
 
 public slots:
     void saveAs();
