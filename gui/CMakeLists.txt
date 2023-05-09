@@ -17,6 +17,7 @@ set(GUI_UTILS
     super.h     super.cpp 
     wrapper_classes.h 
     utils.h 
+    util/print.h                        util/print.cpp
     util/double_validator.h
     util/system_item.h
     util/find_and_replace_dialog.ui     util/find_and_replace_dialog.h      util/find_and_replace_dialog.cpp
