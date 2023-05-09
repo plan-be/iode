@@ -1,6 +1,6 @@
 #include "file_print_setup.h"
 
-const QString QIodeMenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST = "PRINT_SETUP/Print_Dest";
+const QString QIodeMenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST = "MENU_FILE_PRINT_SETUP/Print_Dest";
 
 
 QIodeMenuFilePrintSetup::QIodeMenuFilePrintSetup(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f)
