@@ -88,19 +88,6 @@ void QIodeMenuGraphTables::freeReferenceKDBs()
     clear_all_reference_kdbs();
 }
 
-void QIodeMenuGraphTables::print()
-{
-    try
-    {
-        QMessageBox::warning(this, "WARNING", "Print is not yet implemented");
-    }
-    catch (const std::exception& e)
-    {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
-        return;
-    }
-}
-
 void QIodeMenuGraphTables::apply()
 {
     try
@@ -118,7 +105,8 @@ void QIodeMenuGraphTables::setup()
 {
     try
     {
-        QMessageBox::warning(this, "WARNING", "Setup is not yet implemented");
+        QIodeMenuFilePrintSetup dialog(project_settings->fileName(), this);
+        dialog.exec();
     }
     catch (const std::exception& e)
     {
