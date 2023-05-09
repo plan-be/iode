@@ -8,6 +8,7 @@
 #include "wrapper_classes.h"
 #include "plot/plot.h"
 #include "custom_widgets/completer.h"
+#include "menu/file/file_print_setup.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -40,7 +41,6 @@ signals:
 
 public slots:
 	void display();
-	void print();
 	void apply();
 	void setup();
     void help();

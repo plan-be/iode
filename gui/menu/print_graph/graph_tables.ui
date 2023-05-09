@@ -59,14 +59,6 @@
        <string>F10</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_print">
-      <property name="text">
-       <string>Print</string>
-      </property>
-      <property name="shortcut">
-       <string>F8</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_setup">
       <property name="text">
        <string>Setup</string>
@@ -326,22 +318,6 @@
     <hint type="sourcelabel">
      <x>534</x>
      <y>31</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>299</x>
-     <y>199</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_print</sender>
-   <signal>clicked()</signal>
-   <receiver>QIodeMenuGraphTables</receiver>
-   <slot>print()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>534</x>
-     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>299</x>
