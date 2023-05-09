@@ -136,7 +136,8 @@ void QIodeMenuGraphVariables::setup()
 {
     try
     {
-        QMessageBox::warning(this, "WARNING", "Setup is not yet implemented");
+        QIodeMenuFilePrintSetup dialog(project_settings->fileName(), this);
+        dialog.exec();
     }
     catch (const std::exception& e)
     {
