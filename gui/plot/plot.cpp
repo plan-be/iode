@@ -211,13 +211,9 @@ void QIodePlotDialog::print()
 {
     try
     {
-        QPrinter printer;
-        if (QPrintDialog(&printer).exec() == QDialog::Accepted) 
-        {
-            QPainter painter(&printer);
-            painter.setRenderHint(QPainter::Antialiasing);
-            chartView->render(&painter);
-        }
+            QPrintPreviewDialog dialog(&printer);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodePlotDialog::renderChart);
+            dialog.exec(); 
     }
     catch(const std::exception& e)
     {
