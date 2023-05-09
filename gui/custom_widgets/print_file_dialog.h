@@ -24,6 +24,36 @@ public:
     QIodePrintFileDialog(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodePrintFileDialog();
 
+    static QChar getFormat(const QSettings* project_settings)
+    {
+        QChar format;
+        int i_format = project_settings->value(KEY_SETTINGS_PRINT_FORMAT).toInt();
+
+        switch(i_format) 
+        {
+        case 0:
+            format = 'A';
+            break;
+        case 1:  
+            format = 'R'; 
+            break;
+        case 2:  
+            format = 'H'; 
+            break;
+        case 3:  
+            format = 'M'; 
+            break;
+        case 4:  
+            format = 'C'; 
+            break;
+        default: 
+            format = QChar::Null;
+            break;
+        }
+
+        return format;
+    }
+
 private slots:
     void updateOutputFileFormat(int index);
 
