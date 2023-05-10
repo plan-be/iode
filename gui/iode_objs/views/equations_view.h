@@ -44,7 +44,7 @@ public:
 
 public slots:
 	void filter() { filter_and_update(); }
-	void print() { QMessageBox::warning(nullptr, "WARNING", "Not yet implemented"); }
+	void print();
 	void new_obj();
 	void edit_obj();
 };

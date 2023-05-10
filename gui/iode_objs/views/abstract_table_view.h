@@ -1,13 +1,16 @@
 #pragma once
 
 #include <QPrinter>
-#include <QTableView>
 #include <QLineEdit>
 #include <QShortcut>
+#include <QTextTable>
+#include <QTableView>
+#include <QTextCursor>
 #include <QStringList>
 #include <QModelIndex>
 #include <QHeaderView>
 #include <QTextDocument>
+#include <QTextTableCell>
 #include <QModelIndexList>
 #include <QAbstractItemModel>
 #include <QRegularExpression>
@@ -83,6 +86,74 @@ protected:
 		M* table_model = static_cast<M*>(model());
 		table_model->filter(pattern);
 		update();
+	}
+
+	/**
+	 * @brief Dump displayed table into the document.
+	 * 
+	 * @note see https://forum.qt.io/post/460045 
+	 *       and https://gis.stackexchange.com/q/385616 
+	 * 
+	 */
+	void dumpTableInDocument()
+	{
+		document.clear();
+		M* table_model = static_cast<M*>(model());
+		int nb_rows = table_model->rowCount();
+		int nb_cols = table_model->columnCount();
+
+		QTextCursor cursor(&document);
+		QTextTable* table = cursor.insertTable(nb_rows + 1, nb_cols + 1);
+		QTextTableFormat tableFormat = table->format();
+		tableFormat.setHeaderRowCount(1);
+		tableFormat.setCellPadding(4);
+        tableFormat.setCellSpacing(0);
+        tableFormat.setBorder(0);
+		table->setFormat(tableFormat);
+
+		QTextTableCell headerCell;
+		QTextTableCell cell;
+		QString text;
+		QTextCharFormat boldFormat;
+		boldFormat.setFontWeight(QFont::Bold);
+
+		// top left cell
+		headerCell = table->cellAt(0, 0);
+		cursor = headerCell.firstCursorPosition();
+		cursor.insertText("Name", boldFormat);
+		QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+		cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+		headerCell.setFormat(cellFormat);
+
+		// columns header
+		for(int col=0; col < nb_cols; col++)
+		{
+			text = table_model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
+			headerCell = table->cellAt(0, col + 1);
+			cursor = headerCell.firstCursorPosition();
+			cursor.insertText(text, boldFormat);
+			QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+			cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+			headerCell.setFormat(cellFormat);
+		}
+		// table rows
+		for(int row=0; row < nb_rows; row++)
+		{
+			// row header
+			text = table_model->headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
+			headerCell = table->cellAt(row + 1, 0);
+			cursor = headerCell.firstCursorPosition();
+			cursor.insertText(text);
+
+			// row cells content
+			for(int col=0; col < nb_cols; col++)
+			{
+				text = table_model->dataCell(row, col).toString();
+				cell = table->cellAt(row + 1, col + 1);
+				cursor = cell.firstCursorPosition();
+				cursor.insertText(text);
+			}
+		}
 	}
 
 public:
