@@ -13,7 +13,6 @@ class CommentsModel : public QIodeTemplateTableModel<KDBComments>
 public:
 	CommentsModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Comment" }, parent) {};
 
-private:
 	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;

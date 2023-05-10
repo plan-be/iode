@@ -14,7 +14,6 @@ public:
 	ScalarsModel(QObject* parent = nullptr, KDBScalars* kdb_coefs = nullptr) : 
 		QIodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_coefs) {};
 
-private:
 	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;

@@ -13,7 +13,6 @@ class EquationsModel : public QIodeTemplateTableModel<KDBEquations>
 public:
 	EquationsModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Equation"}, parent) {};
 
-private:
 	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;

@@ -13,7 +13,6 @@ class TablesModel : public QIodeTemplateTableModel<KDBTables>
 public:
 	TablesModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Table"}, parent) {};
 
-private:
 	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;
