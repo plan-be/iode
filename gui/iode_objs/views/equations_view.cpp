@@ -1,6 +1,14 @@
 #include "equations_view.h"
 
 
+void EquationsView::print()
+{
+	QPrintPreviewDialog dialog(&printer);
+    connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &EquationsView::renderForPrinting);
+	dumpTableInDocument();
+	dialog.exec();
+}
+
 void EquationsView::new_obj()
 {
 	QIodeEditEquation dialog("", *project_settings_filepath, this);
