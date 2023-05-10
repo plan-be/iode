@@ -10,6 +10,7 @@
 #include "iode_objs/delegates/variables_delegate.h"
 #include "iode_objs/new/add_variable.h"
 #include "plot/plot.h"
+#include "custom_widgets/print_file_dialog.h"
 #include "menu/print_graph/graph_variables.h"
 
 
@@ -71,7 +72,7 @@ signals:
 
 public slots:
 	void filter() { filter_and_update(); }
-	void print() { QMessageBox::warning(nullptr, "WARNING", "Not yet implemented"); }
+	void print();
 	void new_obj();
 	void plot_series();
 	void open_graphs_dialog();
