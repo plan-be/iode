@@ -1,17 +1,20 @@
 #pragma once
 
+#include <QPrinter>
 #include <QTableView>
 #include <QLineEdit>
 #include <QShortcut>
 #include <QStringList>
 #include <QModelIndex>
 #include <QHeaderView>
+#include <QTextDocument>
 #include <QModelIndexList>
 #include <QAbstractItemModel>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
 #include "utils.h"
+#include "util/print.h"
 #include "iode_objs/delegates/base_delegate.h"
 
 
@@ -26,6 +29,9 @@ protected:
 
 	int sectionEdited;
 	QLineEdit* objectNameEdit;
+
+	QPrinter printer;
+	QTextDocument document;
 
 	QShortcut* deleteShortcut;
 	std::shared_ptr<QString> project_settings_filepath;
@@ -44,6 +50,12 @@ public:
 
 signals:
 	void newObjectInserted();
+
+protected slots:
+	void renderForPrinting() 
+	{
+		document.print(&printer);
+	}
 
 public slots:
 	void removeObjects();
