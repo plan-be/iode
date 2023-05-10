@@ -13,7 +13,6 @@ class IdentitiesModel : public QIodeTemplateTableModel<KDBIdentities>
 public:
 	IdentitiesModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Identity"}, parent) {};
 
-private:
 	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;

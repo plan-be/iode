@@ -13,7 +13,6 @@ class ListsModel : public QIodeTemplateTableModel<KDBLists>
 public:
 	ListsModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"List"}, parent) {};
 
-private:
 	QVariant dataCell(const int row, const int col) const override;
 
 	bool setValue(const int row, const int column, const QVariant& value) override;

@@ -126,11 +126,11 @@ public:
 		}
 	}
 
-protected:
 	virtual QVariant dataCell(const int row, const int col) const = 0;
 
 	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
 
+protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
 
 private:
