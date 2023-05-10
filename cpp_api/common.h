@@ -63,9 +63,9 @@ struct IodeRegexName
 // TODO: replace K by I as below in C api + group them in an enum
 enum EnumLang
 {
-    IT_ENGLISH = KT_ENGLISH,
-    IT_DUTCH = KT_DUTCH,
-    IT_FRENCH = KT_FRENCH,
+    IT_ENGLISH,
+    IT_FRENCH,
+    IT_DUTCH
 };
 
 const static int I_NB_LANGS = 3;
