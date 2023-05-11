@@ -85,7 +85,7 @@ void QIodeTabWidget::loadSettings()
 {
     // extract settings
     settings->beginGroup("Project");
-    QStringList filesToLoad = settings->value("files", "").toStringList();
+    QStringList filesToLoad = settings->value("files").toStringList();
     int index = settings->value("index_last_open_tab", "-1").toInt();
     settings->endGroup();
 
