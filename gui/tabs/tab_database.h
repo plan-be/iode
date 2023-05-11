@@ -1,10 +1,12 @@
 #pragma once
 
+#include <QLabel>
 #include <QObject>
 #include <QWidget>
+#include <QSpinBox>
 #include <QShortcut>
-#include <QGridLayout>
 #include <QLineEdit>
+#include <QGridLayout>
 #include <QPushButton>
 #include <QSizePolicy>
 #include <QStringList>
@@ -34,6 +36,7 @@ class AbstractIodeObjectWidget: public AbstractTabWidget
 {
 protected:
     EnumIodeType iodeType;
+    QDir projectDir;
 
     QGridLayout* layout;
     QLineEdit* lineEdit_filter;
@@ -43,7 +46,7 @@ protected:
 
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        AbstractTabWidget((EnumIodeFile) iodeType, "", parent)
+        AbstractTabWidget((EnumIodeFile) iodeType, "", parent), projectDir(QDir::homePath())
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
@@ -68,7 +71,7 @@ public:
         pushButton_filter->setObjectName(QString::fromUtf8("pushButton_filter"));
         layout->addWidget(pushButton_filter, 0, 1, Qt::AlignLeft);
 
-        // spacers
+        // spacer
         QSpacerItem* horizontalSpacer = new QSpacerItem(828, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
         layout->addItem(horizontalSpacer, 0, 2);
 
@@ -138,6 +141,14 @@ public:
             return false;
     }
 
+    virtual void setProjectDir(const QDir& projectDir)
+    {
+        this->projectDir = projectDir;
+        this->filepath = "";
+
+        clearKDB();
+    }
+
     virtual void clearKDB() = 0;
     virtual void resetFilter() = 0;
     virtual QStringList getSelectedObjectsNames() const = 0;
@@ -156,14 +167,12 @@ template <class M, class V> class QIodeObjectWidget: public AbstractIodeObjectWi
 protected:
     M* objmodel;
     V* tableview;
-    QDir projectDir;
 
     QShortcut* shortcutPrint;
     QShortcut* shortcutAdd;
 
 public:
-    QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : 
-        AbstractIodeObjectWidget(iodeType, parent), projectDir(QDir::homePath())
+    QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : AbstractIodeObjectWidget(iodeType, parent)
     {
         // model table
         QWidget* mainwin = get_main_window_ptr();
@@ -199,7 +208,7 @@ public:
 
         // insert table to layout
         // -1 -> span over all rows/columns
-        layout->addWidget(tableview, 1, 0, -1, -1);
+        layout->addWidget(tableview, 1, 0, 1, -1);
     }
 
     ~QIodeObjectWidget() 
@@ -235,14 +244,6 @@ public:
     void update()
     {
         tableview->update();
-    }
-
-    void setProjectDir(const QDir& projectDir)
-    {
-        this->projectDir = projectDir;
-        this->filepath = "";
-
-        clearKDB();
     }
 
     void setup(std::shared_ptr<QString>& settings_filepath)
@@ -283,10 +284,127 @@ public:
     }
 };
 
+
+/**
+ * @brief 
+ * 
+ * @tparam M 
+ * @tparam V 
+ * 
+ * @note : see https://www.modernescpp.com/index.php/surprise-included-inheritance-and-member-functions-of-class-templates
+ *         for accessing members of template base class while the derived class is also a template class
+ */
+template <class M, class V> class QIodeNumericalObjectWidget: public QIodeObjectWidget<M, V>
+{
+    QLabel* label_nbDigits;
+    QSpinBox* spinBox_nbDigits;
+
+    QShortcut* shortcutNbDecPlus;
+    QShortcut* shortcutNbDecMinus;
+
+private:
+    QString getGroupName()
+    {
+        return QString::fromStdString(vIodeTypes[this->iodeType]).toUpper();
+    }
+
+public:
+    QIodeNumericalObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) 
+        : QIodeObjectWidget<M, V>(iodeType, parent)
+    {
+        // make sure iodeType is defined before to call loadSetting() and getGroupName()
+        this->iodeType = iodeType;
+
+        QHBoxLayout* digits_layout = new QHBoxLayout();
+
+        // nb decimals spinbox
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+
+        label_nbDigits = new QLabel("Nb Significant Digits ");
+        label_nbDigits->setObjectName(QString::fromUtf8("label_nbDigits"));
+        label_nbDigits->setSizePolicy(sizePolicy);
+        digits_layout->addWidget(label_nbDigits, 0, Qt::AlignLeft);
+        //this->layout->addWidget(label_nbDigits, 2, 0, Qt::AlignLeft);
+
+        spinBox_nbDigits = new QSpinBox();
+        spinBox_nbDigits->setMinimum(1);
+        spinBox_nbDigits->setMaximum(MAX_NB_DIGITS_TABLE);
+        spinBox_nbDigits->setValue(2);
+        spinBox_nbDigits->setObjectName(QString::fromUtf8("spinBox_nbDigits"));
+        spinBox_nbDigits->setSizePolicy(sizePolicy);
+        spinBox_nbDigits->setFixedWidth(40);
+        digits_layout->addWidget(spinBox_nbDigits, 0, Qt::AlignLeft);
+        //this->layout->addWidget(spinBox_nbDigits, 2, 1, Qt::AlignLeft);
+
+        this->layout->addLayout(digits_layout, 2, 0);
+
+        // spacers
+        QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        // -1 -> span over all rows/columns
+        //this->layout->addItem(horizontalSpacer, 2, 2, 1, -1);
+        this->layout->addItem(horizontalSpacer, 2, 1, 1, -1);
+
+        // shortcuts
+        shortcutNbDecPlus = new QShortcut(QKeySequence(Qt::Key_F4), this);
+        shortcutNbDecMinus = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F4), this);
+
+        shortcutNbDecPlus->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutNbDecMinus->setContext(Qt::WidgetWithChildrenShortcut);
+
+        // connect
+        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this->objmodel, &M::set_nb_digits);
+        QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this->objmodel, &M::nb_dec_plus);
+        QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this->objmodel, &M::nb_dec_minus);
+        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &QIodeNumericalObjectWidget::saveSettings);
+
+        // reload nb decimals
+        loadSetting();
+    }
+
+    ~QIodeNumericalObjectWidget()
+    {
+        delete label_nbDigits;
+        delete spinBox_nbDigits;
+        delete shortcutNbDecPlus;
+        delete shortcutNbDecMinus;
+    }
+
+    void setProjectDir(const QDir& projectDir) override
+    {
+        QIodeObjectWidget<M, V>::setProjectDir(projectDir);
+        loadSetting();
+    }
+
+    void loadSetting()
+    {
+        QDir currentProjectDir(get_current_project_path());
+        QString settings_filepath = currentProjectDir.absoluteFilePath(SETTINGS_FILENAME);
+        QSettings project_settings(settings_filepath, QSettings::IniFormat);
+        project_settings.beginGroup(getGroupName());
+        int nb_digits = project_settings.value("nbDigits", spinBox_nbDigits->value()).toInt();
+        spinBox_nbDigits->setValue(nb_digits);
+        project_settings.endGroup();
+    }
+
+public slots:
+    void saveSettings()
+    {
+        QDir currentProjectDir(get_current_project_path());
+        QString settings_filepath = currentProjectDir.absoluteFilePath(SETTINGS_FILENAME);
+        QSettings project_settings(settings_filepath, QSettings::IniFormat);
+        project_settings.beginGroup(getGroupName());
+        project_settings.setValue("nbDigits", spinBox_nbDigits->value());
+        project_settings.endGroup();
+    }
+};
+
+
 class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeCommentsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_COMMENTS, parent) 
     {
         connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::KDBModified);
         connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::KDBModified);
@@ -300,7 +418,7 @@ public:
 class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeEquationsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_EQUATIONS, parent) 
     {
         connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::KDBModified);
         connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::KDBModified);
@@ -314,7 +432,7 @@ public:
 class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeIdentitiesWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_IDENTITIES, parent) 
     {
         connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::KDBModified);
         connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::KDBModified);
@@ -328,7 +446,7 @@ public:
 class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeListsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_LISTS, parent) 
     {
         connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::KDBModified);
         connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::KDBModified);
@@ -339,10 +457,10 @@ public:
     }
 };
 
-class QIodeScalarsWidget : public QIodeObjectWidget<ScalarsModel, ScalarsView>
+class QIodeScalarsWidget : public QIodeNumericalObjectWidget<ScalarsModel, ScalarsView>
 {
 public:
-    QIodeScalarsWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeScalarsWidget(QWidget* parent = nullptr) : QIodeNumericalObjectWidget(I_SCALARS, parent) 
     {
         connect(objmodel, &ScalarsModel::dataChanged, this, &QIodeScalarsWidget::KDBModified);
         connect(objmodel, &ScalarsModel::headerDataChanged, this, &QIodeScalarsWidget::KDBModified);
@@ -356,7 +474,7 @@ public:
 class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeTablesWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_TABLES, parent) 
     {
         connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::KDBModified);
         connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::KDBModified);
@@ -367,10 +485,10 @@ public:
     }
 };
 
-class QIodeVariablesWidget : public QIodeObjectWidget<VariablesModel, VariablesView>
+class QIodeVariablesWidget : public QIodeNumericalObjectWidget<VariablesModel, VariablesView>
 {
 public:
-    QIodeVariablesWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : QIodeObjectWidget(iodeType, parent) 
+    QIodeVariablesWidget(QWidget* parent = nullptr) : QIodeNumericalObjectWidget(I_VARIABLES, parent) 
     {
         connect(objmodel, &VariablesModel::dataChanged, this, &QIodeVariablesWidget::KDBModified);
         connect(objmodel, &VariablesModel::headerDataChanged, this, &QIodeVariablesWidget::KDBModified);
