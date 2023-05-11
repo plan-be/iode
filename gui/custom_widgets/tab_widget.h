@@ -370,6 +370,9 @@ public slots:
      */
     void updateProjectDir(const QString& projectDirPath) 
     { 
+        // save previous settings if any before to switch from project directory
+        if (this->project_settings_filepath) saveSettings();
+
         this->projectDirPath = projectDirPath;
         // associate new project directory to each KDB tab + clear global KDB
         QDir projectDir(projectDirPath);
