@@ -83,6 +83,9 @@ QIodeTabWidget::~QIodeTabWidget()
 
 void QIodeTabWidget::loadSettings()
 {
+    // reset list of open files (tabs)
+    filesList.clear();
+
     // extract settings
     settings->beginGroup("Project");
     QStringList filesToLoad = settings->value("files").toStringList();
@@ -172,9 +175,6 @@ void QIodeTabWidget::saveSettings()
 void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath, 
     std::shared_ptr<QIodeCompleter>& completer, QTextEdit* output)
 {
-    // save previous settings if any before to switch from project directory
-    if (this->project_settings_filepath) saveSettings();
-
     // set completer
     this->completer = completer;
 
