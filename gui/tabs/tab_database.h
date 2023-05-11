@@ -113,7 +113,7 @@ public:
         {
             QString ext = QString::fromStdString(v_binary_ext[fileType]);
             // Note: the * is to tell that the content of the KDB has not been saved in file
-            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + ext + "*";
+            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + "." + ext + "*";
         }
         else
             return AbstractTabWidget::getTabText();
@@ -240,7 +240,8 @@ public:
     void setProjectDir(const QDir& projectDir)
     {
         this->projectDir = projectDir;
-        
+        this->filepath = "";
+
         clearKDB();
     }
 
