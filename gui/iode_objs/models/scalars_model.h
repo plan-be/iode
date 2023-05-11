@@ -4,15 +4,16 @@
 
 #include "abstract_table_model.h"
 #include "abstract_table_model.cpp"
+#include "numerical_table_model.h"
 
 
-class ScalarsModel : public QIodeTemplateTableModel<KDBScalars>
+class ScalarsModel : public NumericalTableModel<KDBScalars>
 {
 	Q_OBJECT
 
 public:
-	ScalarsModel(QObject* parent = nullptr, KDBScalars* kdb_coefs = nullptr) : 
-		QIodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_coefs) {};
+	ScalarsModel(QObject* parent = nullptr, KDBScalars* kdb_coefs = nullptr, const int nb_digits = 2) : 
+		NumericalTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_coefs, nb_digits) {}
 
 	QVariant dataCell(const int row, const int col) const override;
 

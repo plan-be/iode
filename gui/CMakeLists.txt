@@ -77,6 +77,7 @@ set(GUI_NEW_OBJECT
 
 set(GUI_OBJS_MODELS     
     iode_objs/models/abstract_table_model.h     iode_objs/models/abstract_table_model.cpp
+    iode_objs/models/numerical_table_model.h    
     iode_objs/models/comments_model.h           iode_objs/models/comments_model.cpp
     iode_objs/models/equations_model.h          iode_objs/models/equations_model.cpp
     iode_objs/models/identities_model.h         iode_objs/models/identities_model.cpp

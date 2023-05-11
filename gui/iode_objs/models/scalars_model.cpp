@@ -13,17 +13,17 @@ QVariant ScalarsModel::dataCell(const int row, const int col) const
 		switch (col)
 		{
 		case 0:
-			value = L_ISAN(scalar.value()) ? QString::number(scalar.value(), 'g', 3) : NAN_REP;
+			value = L_ISAN(scalar.value()) ? QString::number(scalar.value(), 'g', nb_digits) : NAN_REP;
 			break;
 		case 1:
-			value = L_ISAN(scalar.relax()) ? QString::number(scalar.relax(), 'g', 3) : NAN_REP;
+			value = L_ISAN(scalar.relax()) ? QString::number(scalar.relax(), 'g', nb_digits) : NAN_REP;
 			break;
 		case 2:
-			value = L_ISAN(scalar.std()) ? QString::number(scalar.std(), 'g', 3) : NAN_REP;
+			value = L_ISAN(scalar.std()) ? QString::number(scalar.std(), 'g', nb_digits) : NAN_REP;
 			break;
 		case 3:
 			if (L_ISAN(scalar.value()) && L_ISAN(scalar.std()) && !L_IS0(scalar.std()))
-				value = QString::number(scalar.value() / scalar.std(), 'g', 3);
+				value = QString::number(scalar.value() / scalar.std(), 'g', nb_digits);
 			else
 				value = NAN_REP;
 			break;

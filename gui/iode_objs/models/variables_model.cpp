@@ -10,7 +10,7 @@ QVariant VariablesModel::dataCell(const int row, const int col) const
 	try
 	{
 		var = kdb->get_var(row, col, mode);
-		return L_ISAN(var) ? QString::number(var, 'g', 3) : NAN_REP;
+		return L_ISAN(var) ? QString::number(var, 'g', nb_digits) : NAN_REP;
 	}
 	catch(const std::exception& e)
 	{
