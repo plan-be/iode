@@ -143,23 +143,23 @@ void QIodeTabWidget::loadSettings()
 void QIodeTabWidget::saveSettings()
 {
     // build list of open tabs
-    QStringList filesList;
+    QStringList filesToSave;
     AbstractTabWidget* tabWidget;
     for (int i=0; i < this->count(); i++)
     {
         tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
         EnumIodeFile filetype = tabWidget->getFiletype();
         if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
-            filesList << prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
+            filesToSave << prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
         else
-            filesList << tabWidget->getFilepath();
+            filesToSave << tabWidget->getFilepath();
     }
 
     // start to save settings
     settings->beginGroup("Project");
 
     // save the list of open tabs
-    QVariant files = QVariant::fromValue(filesList);
+    QVariant files = QVariant::fromValue(filesToSave);
     settings->setValue("files", files);
 
     // save index of the currently displayed tab
@@ -512,10 +512,12 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
             bool success = tabWidget->load(fullPath, forceOverwrite);
             if(success)
             {
+                buildFilesList();
                 tabWidget->resetFilter();
                 index = this->indexOf(tabWidget);
                 setTabText(index, tabWidget->getTabText());
                 setTabToolTip(index, tabWidget->getTooltip());
+                filesList[index] = fullPath;
             }
             else
                 return -1;
