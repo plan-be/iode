@@ -40,13 +40,12 @@ class QIodeSettings : public QDialog
     Q_OBJECT
 
 protected:
-    QSettings* project_settings;
     QString className;
     QMap<QString, BaseWrapper*> mapFields;
 
 public:
-    QIodeSettings(const QString& filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-    ~QIodeSettings();
+    QIodeSettings(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags())
+        : QDialog(parent), className("") {}
 
 protected:
     void saveSettings();
