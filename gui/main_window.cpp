@@ -164,7 +164,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
 
     // create/update settings
     QDir projectDir(dirPath);
-    QString qSettingsFilepath = projectDir.absoluteFilePath("iode_gui_settings.ini");
+    QString qSettingsFilepath = projectDir.absoluteFilePath(SETTINGS_FILENAME);
     project_settings_filepath = std::make_shared<QString>(qSettingsFilepath);
 
     if (project_settings) delete project_settings;
