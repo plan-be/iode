@@ -1,6 +1,8 @@
 #pragma once
 #include "utils.h"
 
+const static QString SETTINGS_FILENAME = "iode_gui_settings.ini";
+
 
 // Mixin class for handling settings in derived class. 
 class QIodeSettings : public QDialog
