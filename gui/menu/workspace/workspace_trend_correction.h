@@ -26,7 +26,7 @@ class QIodeMenuWorkspaceTrendCorrection: public QIodeSettings, public Ui::QIodeM
     WrapperCheckBox*       wLog;
 
 public:
-    QIodeMenuWorkspaceTrendCorrection(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuWorkspaceTrendCorrection(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuWorkspaceTrendCorrection();
 
 public slots:

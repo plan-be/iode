@@ -60,9 +60,6 @@ class QIodeFileExplorer : public QTreeView
 {
     Q_OBJECT
 
-    std::shared_ptr<QString> project_settings_filepath;
-    QSettings* project_settings;
-
     QDir projectDir;
     QiodeFileExplorerProxyModel* proxyModel;
     QFileSystemModel* fileSystemModel;
@@ -96,18 +93,6 @@ class QIodeFileExplorer : public QTreeView
 
 private:
 	void setupContextMenu();
-
-    /**
-     * @brief load directories that were expanded when the program has been closed
-     * 
-     */
-    void loadSettings();
-
-    /**
-     * @brief save directories that are expanded before to close the program
-     * 
-     */
-    void saveSettings();
 
     QAction* addAction(const QString& name, const QString& tooltip, QMenu* contextMenu, 
         const QKeySequence& shortcut = QKeySequence())
@@ -250,6 +235,18 @@ public:
     QIodeFileExplorer(QWidget* parent = nullptr);
     ~QIodeFileExplorer();
 
+    /**
+     * @brief load directories that were expanded when the program has been closed
+     * 
+     */
+    void loadSettings();
+
+    /**
+     * @brief save directories that are expanded before to close the program
+     * 
+     */
+    void saveSettings();
+
     void setIodeTabWidget(QIodeTabWidget* tabWidget)
     {
         this->tabWidget = tabWidget;
@@ -267,7 +264,7 @@ public:
      * @param projectDir directory containing the IODE project to open. 
      * @param project_settings_filepath shared pointer to the project settings file (.ini)
      */
-    void updateProjectDir(const QDir& projectDir, std::shared_ptr<QString>& project_settings_filepath);
+    void updateProjectDir(const QDir& projectDir);
 
 signals:
     void fileMoved(const QString& oldFilepath, const QString& newFilepath);

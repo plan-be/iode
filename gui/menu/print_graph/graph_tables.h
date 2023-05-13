@@ -33,7 +33,7 @@ class QIodeMenuGraphTables: public QIodeSettings, public Ui::QIodeMenuGraphTable
     QIodeCompleter*          completer;
 
 public:
-	QIodeMenuGraphTables(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuGraphTables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuGraphTables();
 
 signals:

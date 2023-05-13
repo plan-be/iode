@@ -1,8 +1,8 @@
 #include "file_print_preferences.h"
 
 
-QIodeMenuFilePrintPref::QIodeMenuFilePrintPref(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) :
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuFilePrintPref::QIodeMenuFilePrintPref(QWidget* parent, Qt::WindowFlags f) :
+    QIodeSettings(parent, f)
 {
     setupUi(this);
 

@@ -3,8 +3,6 @@
 
 QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_all(false), discard_all(false)
 {
-    settings = nullptr;
-
     // set name
     this->setObjectName(QString::fromUtf8("tabWidget_IODE_objs"));
 
@@ -64,7 +62,6 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
 QIodeTabWidget::~QIodeTabWidget()
 {
     saveSettings();
-    if(settings) delete settings;
 
     delete tabComments;
     delete tabEquations;
@@ -83,14 +80,22 @@ QIodeTabWidget::~QIodeTabWidget()
 
 void QIodeTabWidget::loadSettings()
 {
+    // reset IODE objects tabs
+    foreach(AbstractIodeObjectWidget* tab, tabIodeObjects)
+        tab->reset();
+
     // reset list of open files (tabs)
     filesList.clear();
 
     // extract settings
-    settings->beginGroup("Project");
-    QStringList filesToLoad = settings->value("files").toStringList();
-    int index = settings->value("index_last_open_tab", "-1").toInt();
-    settings->endGroup();
+    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    if(!project_settings)
+        return;
+
+    project_settings->beginGroup("PROJECT");
+    QStringList filesToLoad = project_settings->value("files").toStringList();
+    int index = project_settings->value("index_last_open_tab", "-1").toInt();
+    project_settings->endGroup();
 
     // filesToLoad is empty in the case of a new project
     if(filesToLoad.empty())
@@ -145,6 +150,10 @@ void QIodeTabWidget::loadSettings()
  
 void QIodeTabWidget::saveSettings()
 {
+    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    if(!project_settings)
+        return;
+
     // build list of open tabs
     QStringList filesToSave;
     AbstractTabWidget* tabWidget;
@@ -159,21 +168,20 @@ void QIodeTabWidget::saveSettings()
     }
 
     // start to save settings
-    settings->beginGroup("Project");
+    project_settings->beginGroup("PROJECT");
 
     // save the list of open tabs
     QVariant files = QVariant::fromValue(filesToSave);
-    settings->setValue("files", files);
+    project_settings->setValue("files", files);
 
     // save index of the currently displayed tab
     QVariant index = QVariant(this->currentIndex());
-    settings->setValue("index_last_open_tab", index);
+    project_settings->setValue("index_last_open_tab", index);
 
-    settings->endGroup();
+    project_settings->endGroup();
 }
 
-void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath, 
-    std::shared_ptr<QIodeCompleter>& completer, QTextEdit* output)
+void QIodeTabWidget::setup(std::shared_ptr<QIodeCompleter>& completer, QTextEdit* output)
 {
     // set completer
     this->completer = completer;
@@ -185,13 +193,13 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath,
     this->clear();
 
     // update settings filepath in each Iode object tab
-    tabComments->setup(project_settings_filepath);
-    tabEquations->setup(project_settings_filepath);
-    tabIdentites->setup(project_settings_filepath);
-    tabLists->setup(project_settings_filepath);
-    tabScalars->setup(project_settings_filepath);
-    tabTables->setup(project_settings_filepath);
-    tabVariables->setup(project_settings_filepath);
+    tabComments->setup();
+    tabEquations->setup();
+    tabIdentites->setup();
+    tabLists->setup();
+    tabScalars->setup();
+    tabTables->setup();
+    tabVariables->setup();
 
     // add a default tab for each IODE type of objects
     this->addTab(tabComments, "");
@@ -218,12 +226,7 @@ void QIodeTabWidget::setup(std::shared_ptr<QString>& project_settings_filepath,
         setTabToolTip(index, tabWidget->getTooltip());
     }
 
-    this->project_settings_filepath = project_settings_filepath;
-
-    if(settings) delete settings;
-    settings = new QSettings(*project_settings_filepath, QSettings::IniFormat);
     loadSettings();
-
     this->show();
 }
 

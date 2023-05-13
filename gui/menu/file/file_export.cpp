@@ -1,8 +1,8 @@
 #include "file_export.h"
 
 
-QIodeMenuFileExport::QIodeMenuFileExport(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) :
-    QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuFileExport::QIodeMenuFileExport(QWidget* parent, Qt::WindowFlags f) :
+    QIodeSettings( parent, f)
 {
     setupUi(this);
 

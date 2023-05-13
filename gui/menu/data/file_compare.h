@@ -22,7 +22,7 @@ class QIodeMenuDataFileCompare : public QIodeSettings, public Ui::QIodeMenuDataF
     WrapperQLineEdit*   wResultBothDifferent;
 
 public:
-	QIodeMenuDataFileCompare(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataFileCompare(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuDataFileCompare();
 
 public slots:

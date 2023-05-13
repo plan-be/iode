@@ -1,7 +1,7 @@
 #include "search_text.h"
 
-QIodeMenuDataSearchText::QIodeMenuDataSearchText(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuDataSearchText::QIodeMenuDataSearchText(QWidget* parent, Qt::WindowFlags f)
+    : QIodeSettings( parent, f)
 {
     setupUi(this);
 

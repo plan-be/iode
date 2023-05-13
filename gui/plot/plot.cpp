@@ -182,7 +182,8 @@ void QIodePlotDialog::saveAs()
         painter.setRenderHint(QPainter::Antialiasing);
         chartView->render(&painter);
         painter.end();
-        QString projectPath = get_current_project_path();
+        QSettings user_settings(QSettings::UserScope, this);
+        QString projectPath = user_settings.value("projectPath", QDir::homePath()).toString();
         filePath = QFileDialog::getSaveFileName(this, "Save Graph", projectPath, 
             "Images (*.png *.bpm *.jpg *.jpeg *.xpm *.xbm)");
         pixmap.save(filePath);

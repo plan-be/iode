@@ -1,8 +1,8 @@
 #include "workspace_describe.h"
 
 
-QIodeMenuWorkspaceDescribe::QIodeMenuWorkspaceDescribe(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuWorkspaceDescribe::QIodeMenuWorkspaceDescribe(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(parent, f)
 {
     setupUi(this);
 

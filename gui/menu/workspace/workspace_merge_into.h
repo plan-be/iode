@@ -25,7 +25,7 @@ class QIodeMenuWorkspaceMergeInto : public QIodeSettings, public Ui::QIodeMenuWo
     WrapperFileChooser* wFileChooserInputFile;
 
 public:
-    QIodeMenuWorkspaceMergeInto(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuWorkspaceMergeInto(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuWorkspaceMergeInto();
 
 public slots:

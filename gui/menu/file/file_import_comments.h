@@ -26,7 +26,7 @@ class QIodeMenuFileImportComments: public QIodeSettings, public Ui::QIodeMenuFil
     WrapperFileChooser*  wDebugFile;
 
 public:
-	QIodeMenuFileImportComments(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuFileImportComments(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuFileImportComments();
 
 public slots:

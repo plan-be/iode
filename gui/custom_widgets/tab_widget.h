@@ -53,9 +53,6 @@ class QIodeTabWidget: public QTabWidget
 {
     Q_OBJECT
 
-    QSettings* settings;
-    std::shared_ptr<QString> project_settings_filepath;
-
     std::shared_ptr<QIodeCompleter> completer;
 
     QTextEdit* output;
@@ -111,23 +108,6 @@ private:
     int addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile);
 
     /**
-     * @brief - reopen all tabs (files) that were open (*)
-     *        - display the tab that was displayed (*)
-     *        (*) the last time the user quitted the IODE gui.
-     */
-    void loadSettings();
-    
-    /**
-     * @brief dump in settings:
-     *        - the list of open tabs.
-     *        - the index of the currently displayed tab.
-     *        
-     * @note The list of open tabs is actually the list of the tooltip associated with each tab.
-     *       The tooltip is either the path to the corresponding file or a default string in case of unsaved KDB.  
-     */
-    void saveSettings();
-
-    /**
      * @brief save the content of the tab at a given index.
      *        Ask for a filepath if the tab represents a KDB and the KDB is not linked to any file.
      * 
@@ -168,16 +148,32 @@ public:
     ~QIodeTabWidget();
 
     /**
+     * @brief - reopen all tabs (files) that were open (*)
+     *        - display the tab that was displayed (*)
+     *        (*) the last time the user quitted the IODE gui.
+     */
+    void loadSettings();
+    
+    /**
+     * @brief dump in settings:
+     *        - the list of open tabs.
+     *        - the index of the currently displayed tab.
+     *        
+     * @note The list of open tabs is actually the list of the tooltip associated with each tab.
+     *       The tooltip is either the path to the corresponding file or a default string in case of unsaved KDB.  
+     */
+    void saveSettings();
+
+    /**
      * @brief - Initializes settings object and openedFiles list.
      *        - Reload previously opened files.
      * 
-     * @param project_settings_filepath shared_ptr<QString> path to the settings file
      * @param completer std::shared_ptr<QIodeCompleter> completer
      * @param output QTextEdit* output widget to display the output from the execution of a report.
      * 
      * TODO: merge setup() method with updateProjectDir()
      */
-    void setup(std::shared_ptr<QString>& project_settings_filepath, std::shared_ptr<QIodeCompleter>& completer, 
+    void setup(std::shared_ptr<QIodeCompleter>& completer, 
         QTextEdit* output);
 
 	/**
@@ -369,10 +365,7 @@ public slots:
      * @param projectDirPath Path to the root directory of the File Explorer  
      */
     void updateProjectDir(const QString& projectDirPath) 
-    { 
-        // save previous settings if any before to switch from project directory
-        if (this->project_settings_filepath) saveSettings();
-
+    {
         this->projectDirPath = projectDirPath;
         // associate new project directory to each KDB tab + clear global KDB
         QDir projectDir(projectDirPath);

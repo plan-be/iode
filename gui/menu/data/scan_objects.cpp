@@ -1,8 +1,8 @@
 #include "scan_objects.h"
 
 
-QIodeMenuDataScanObjects::QIodeMenuDataScanObjects(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuDataScanObjects::QIodeMenuDataScanObjects(QWidget* parent, Qt::WindowFlags f)
+    : QIodeSettings( parent, f)
 {
     setupUi(this);
 

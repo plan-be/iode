@@ -31,7 +31,7 @@ class QIodeMenuPrintTables: public QIodeMenuPrintAbstract, public Ui::QIodeMenuP
     QIodeCompleter*          completer;
 
 public:
-	QIodeMenuPrintTables(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuPrintTables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuPrintTables();
 
 public slots:

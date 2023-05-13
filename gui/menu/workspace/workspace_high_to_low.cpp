@@ -1,8 +1,8 @@
 #include "workspace_high_to_low.h"
 
 
-QIodeMenuWorkspaceHighToLow::QIodeMenuWorkspaceHighToLow(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuWorkspaceHighToLow::QIodeMenuWorkspaceHighToLow(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings( parent, f)
 {
     setupUi(this);
 

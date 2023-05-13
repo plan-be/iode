@@ -24,10 +24,8 @@ public:
 		executeShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 	};
 
-	void setup(std::shared_ptr<QString>& settings_filepath) override
+	void setup() override
 	{
-		AbstractTableView::setup(settings_filepath);
-
 		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
 		connect(executeShortcut, &QShortcut::activated, main_window, &MainWindowPlot::open_compute_identities_dialog);
 	}

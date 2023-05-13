@@ -1,8 +1,7 @@
 #include "print_tables.h"
 
 
-QIodeMenuPrintTables::QIodeMenuPrintTables(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeMenuPrintAbstract(settings_filepath, parent, f)
+QIodeMenuPrintTables::QIodeMenuPrintTables(QWidget* parent, Qt::WindowFlags f) : QIodeMenuPrintAbstract(parent, f)
 {
     setupUi(this);
 
@@ -119,7 +118,7 @@ void QIodeMenuPrintTables::setup()
 {
     try
     {
-        QIodeMenuFilePrintSetup dialog(project_settings->fileName(), this);
+        QIodeMenuFilePrintSetup dialog(this);
         dialog.exec();
     }
     catch (const std::exception& e)

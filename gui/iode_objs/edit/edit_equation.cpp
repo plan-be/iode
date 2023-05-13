@@ -1,8 +1,8 @@
 #include "edit_equation.h"
 
 
-QIodeEditEquation::QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-	QIodeSettings(project_settings_filepath, parent, f), project_settings_filepath(project_settings_filepath)
+QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* parent, Qt::WindowFlags f) : 
+	QIodeSettings( parent, f)
 {
 	setupUi(this);
 
@@ -223,7 +223,7 @@ void QIodeEditEquation::next()
 void QIodeEditEquation::dynamic_adjustment()
 {
 	QString lec = lineLec->extractAndVerify();
-	QIodeDynAdjustment dialog(lec, project_settings_filepath, this);
+	QIodeDynAdjustment dialog(lec, this);
 	dialog.exec();
 	lineLec->setQValue(lec);
 }
@@ -250,7 +250,7 @@ void QIodeEditEquation::results()
 
 void QIodeEditEquation::unit_root()
 {
-	QIodeUnitRoot dialog(project_settings_filepath, this);
+	QIodeUnitRoot dialog(this);
 	dialog.exec();
 }
 

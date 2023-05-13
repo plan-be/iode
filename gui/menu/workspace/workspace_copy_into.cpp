@@ -1,8 +1,8 @@
 #include "workspace_copy_into.h"
 
 
-QIodeMenuWorkspaceCopyInto::QIodeMenuWorkspaceCopyInto(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuWorkspaceCopyInto::QIodeMenuWorkspaceCopyInto(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(parent, f)
 {
     setupUi(this);
 

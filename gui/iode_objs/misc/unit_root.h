@@ -32,7 +32,7 @@ private:
     QString get_tstat(Scalar& scalar);
 
 public:
-    QIodeUnitRoot(const QString& settings_filepath, QWidget* parent = Q_NULLPTR, 
+    QIodeUnitRoot(QWidget* parent = Q_NULLPTR, 
         Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeUnitRoot();
 

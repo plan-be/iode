@@ -2,8 +2,8 @@
 #include "workspace_trend_correction.h"
 
 
-QIodeMenuWorkspaceTrendCorrection::QIodeMenuWorkspaceTrendCorrection(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuWorkspaceTrendCorrection::QIodeMenuWorkspaceTrendCorrection(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(parent, f)
 {
     setupUi(this);
 

@@ -52,7 +52,7 @@ private:
     void display_equation(const NamedEquation& equation);
 
 public:
-    QIodeEditEquation(const QString& equationName, const QString& project_settings_filepath, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeEditEquation();
 
 public slots:
