@@ -80,8 +80,6 @@ class MainWindow : public MainWindowPlot, public Ui::MainWindow
     std::string outfile;
 
 private:
-	std::shared_ptr<QString> project_settings_filepath;
-	QSettings* project_settings;	///< to store per project (= directory) settings
 	QSettings* user_settings;		///< to store user preferences and recently opened projects
 
 	QString projectPath;
