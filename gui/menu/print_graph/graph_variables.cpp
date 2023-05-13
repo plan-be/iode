@@ -1,8 +1,8 @@
 #include "graph_variables.h"
 
 
-QIodeMenuGraphVariables::QIodeMenuGraphVariables(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(parent, f)
 {
     setupUi(this);
 
@@ -136,7 +136,7 @@ void QIodeMenuGraphVariables::setup()
 {
     try
     {
-        QIodeMenuFilePrintSetup dialog(project_settings->fileName(), this);
+        QIodeMenuFilePrintSetup dialog(this);
         dialog.exec();
     }
     catch (const std::exception& e)

@@ -11,7 +11,7 @@ void ScalarsView::print()
 
 void ScalarsView::new_obj()
 {
-	QIodeAddScalar dialog(*project_settings_filepath, this);
+	QIodeAddScalar dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
 	filter_and_update();

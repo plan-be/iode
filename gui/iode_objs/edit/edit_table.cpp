@@ -1,7 +1,7 @@
 #include "edit_table.h"
 
 
-QIodeEditTable::QIodeEditTable(const QString& tableName, const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
 	setupUi(this);
 

@@ -141,12 +141,17 @@ public:
             return false;
     }
 
+    void reset()
+    {
+        this->filepath = "";
+        clearKDB();
+        resetFilter();
+    }
+
     virtual void setProjectDir(const QDir& projectDir)
     {
         this->projectDir = projectDir;
-        this->filepath = "";
-
-        clearKDB();
+        reset();
     }
 
     virtual void clearKDB() = 0;
@@ -246,9 +251,9 @@ public:
         tableview->update();
     }
 
-    void setup(std::shared_ptr<QString>& settings_filepath)
+    void setup()
     {
-        tableview->setup(settings_filepath);
+        tableview->setup();
     }
 
     bool load_(const QString& filepath, const bool forceOverwrite)
@@ -379,24 +384,29 @@ public:
 
     void loadSetting()
     {
-        QDir currentProjectDir(get_current_project_path());
-        QString settings_filepath = currentProjectDir.absoluteFilePath(SETTINGS_FILENAME);
-        QSettings project_settings(settings_filepath, QSettings::IniFormat);
-        project_settings.beginGroup(getGroupName());
-        int nb_digits = project_settings.value("nbDigits", spinBox_nbDigits->value()).toInt();
+        QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+        if(!project_settings)
+        {
+            spinBox_nbDigits->setValue(2);
+            return;
+        }
+        
+        project_settings->beginGroup(getGroupName());
+        int nb_digits = project_settings->value("nbDigits", spinBox_nbDigits->value()).toInt();
         spinBox_nbDigits->setValue(nb_digits);
-        project_settings.endGroup();
+        project_settings->endGroup();
     }
 
 public slots:
     void saveSettings()
     {
-        QDir currentProjectDir(get_current_project_path());
-        QString settings_filepath = currentProjectDir.absoluteFilePath(SETTINGS_FILENAME);
-        QSettings project_settings(settings_filepath, QSettings::IniFormat);
-        project_settings.beginGroup(getGroupName());
-        project_settings.setValue("nbDigits", spinBox_nbDigits->value());
-        project_settings.endGroup();
+        QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+        if(!project_settings)
+            return;
+        
+        project_settings->beginGroup(getGroupName());
+        project_settings->setValue("nbDigits", spinBox_nbDigits->value());
+        project_settings->endGroup();
     }
 };
 

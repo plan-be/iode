@@ -11,8 +11,8 @@
  */
 
 
-QIodeMenuComputeSCCSimulation::QIodeMenuComputeSCCSimulation(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuComputeSCCSimulation::QIodeMenuComputeSCCSimulation(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings( parent, f)
 {
     setupUi(this);
 

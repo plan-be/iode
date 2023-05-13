@@ -19,7 +19,7 @@ class QIodeMenuDataFileContents : public QIodeSettings, public Ui::QIodeMenuData
     WrapperQTextEdit*   wResult;
 
 public:
-	QIodeMenuDataFileContents(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataFileContents(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuDataFileContents();
 
 public slots:

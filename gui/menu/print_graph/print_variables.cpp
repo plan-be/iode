@@ -1,8 +1,8 @@
 #include "print_variables.h"
 
 
-QIodeMenuPrintVariables::QIodeMenuPrintVariables(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeMenuPrintAbstract(settings_filepath, parent, f)
+QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeMenuPrintAbstract(parent, f)
 {
     setupUi(this);
 
@@ -112,7 +112,7 @@ void QIodeMenuPrintVariables::setup()
 {
     try
     {
-        QIodeMenuFilePrintSetup dialog(project_settings->fileName(), this);
+        QIodeMenuFilePrintSetup dialog(this);
         dialog.exec();
     }
     catch (const std::exception& e)

@@ -1,8 +1,8 @@
 #include "file_contents.h"
 
 
-QIodeMenuDataFileContents::QIodeMenuDataFileContents(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings(project_settings_filepath, parent, f)
+QIodeMenuDataFileContents::QIodeMenuDataFileContents(QWidget* parent, Qt::WindowFlags f)
+    : QIodeSettings( parent, f)
 {
     setupUi(this);
 

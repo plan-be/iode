@@ -37,7 +37,7 @@ class QIodeMenuComputeIdentities : public QIodeSettings, public Ui::QIodeMenuCom
     QIodeCompleter*         completer;
 
 public:
-	QIodeMenuComputeIdentities(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeIdentities(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuComputeIdentities();
 
     void setIdentitiesNames(const QStringList& identitiesNames)

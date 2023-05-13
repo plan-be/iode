@@ -30,7 +30,7 @@ class QIodeMenuWorkspaceDescribe : public QIodeSettings, public Ui::QIodeMenuWor
     WrapperQLineEdit*    wVariablesDescription;
 
 public:
-    QIodeMenuWorkspaceDescribe(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuWorkspaceDescribe(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuWorkspaceDescribe();
 
 public slots:

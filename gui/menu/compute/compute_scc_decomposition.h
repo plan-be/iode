@@ -29,7 +29,7 @@ class QIodeMenuComputeSCCDecomposition : public QIodeSettings, public Ui::QIodeM
     QIodeCompleter*         completer;
 
 public:
-	QIodeMenuComputeSCCDecomposition(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeSCCDecomposition(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuComputeSCCDecomposition();
 
 public slots:

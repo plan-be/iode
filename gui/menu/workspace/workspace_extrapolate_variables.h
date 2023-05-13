@@ -30,7 +30,7 @@ class QIodeMenuWorkspaceExtrapolateVariables : public QIodeSettings, public Ui::
     QIodeCompleter*         completer;
 
 public:
-    QIodeMenuWorkspaceExtrapolateVariables(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuWorkspaceExtrapolateVariables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuWorkspaceExtrapolateVariables();
 
 public slots:

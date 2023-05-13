@@ -11,7 +11,7 @@ void EquationsView::print()
 
 void EquationsView::new_obj()
 {
-	QIodeEditEquation dialog("", *project_settings_filepath, this);
+	QIodeEditEquation dialog("", this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
 	filter_and_update();
@@ -31,7 +31,7 @@ void EquationsView::edit_obj()
 		editEqDialog->close();
 		delete editEqDialog;
 	}
-	editEqDialog = new QIodeEditEquation(name, *this->project_settings_filepath, static_cast<QWidget*>(this->parent()));
+	editEqDialog = new QIodeEditEquation(name, static_cast<QWidget*>(this->parent()));
 	editEqDialog->show();
 	
 	update();

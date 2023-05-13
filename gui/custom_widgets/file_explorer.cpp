@@ -121,8 +121,6 @@ QIodeFileExplorer::~QIodeFileExplorer()
 
     delete fileSystemModel;
     delete proxyModel;
-
-    delete project_settings;
 }
 
 void QIodeFileExplorer::setupContextMenu()
@@ -218,8 +216,12 @@ void QIodeFileExplorer::setupContextMenu()
 
 void QIodeFileExplorer::loadSettings()
 {
+    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    if(!project_settings)
+        return;
+    
     // get list of expanded directories at the moment the application was closed
-    project_settings->beginGroup("File_Explorer");
+    project_settings->beginGroup("FILE_EXPLORER");
     QStringList dirsToExpand = project_settings->value("expanded_dirs", "").toStringList();
     project_settings->endGroup();
 
@@ -237,6 +239,10 @@ void QIodeFileExplorer::loadSettings()
 
 void QIodeFileExplorer::saveSettings()
 {
+    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    if(!project_settings)
+        return;
+
     // build list of expanded directories
     QFileInfoList dirsInfoList = projectDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     QStringList dirPathsList;
@@ -249,20 +255,14 @@ void QIodeFileExplorer::saveSettings()
     }
 
     // save list of expanded directories to project settings
-    project_settings->beginGroup("File_Explorer");
+    project_settings->beginGroup("FILE_EXPLORER");
     QVariant dirs = QVariant::fromValue(dirPathsList);
     project_settings->setValue("expanded_dirs", dirs);
     project_settings->endGroup();
 }
 
-void QIodeFileExplorer::updateProjectDir(const QDir& projectDir, std::shared_ptr<QString>& project_settings_filepath)
-{
-    // save previous settings if any before to switch from project directory
-    if (this->project_settings_filepath) saveSettings();
- 
-    this->project_settings_filepath = project_settings_filepath;
-    project_settings = new QSettings(*project_settings_filepath, QSettings::IniFormat);
-    
+void QIodeFileExplorer::updateProjectDir(const QDir& projectDir)
+{    
     this->projectDir = projectDir;
     
     // Notes: - see https://doc.qt.io/qt-6/qtwidgets-itemviews-dirview-example.html 

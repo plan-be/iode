@@ -1,8 +1,8 @@
 #include "dyn_adjustment.h"
 
 
-QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f), lec(lec)
+QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(parent, f), lec(lec)
 {
 	setupUi(this);
 

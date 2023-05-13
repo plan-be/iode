@@ -27,7 +27,7 @@ class QIodeMenuFileImportVariables: public QIodeSettings, public Ui::QIodeMenuFi
     WrapperFileChooser*  wDebugFile;
 
 public:
-	QIodeMenuFileImportVariables(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuFileImportVariables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 	~QIodeMenuFileImportVariables();
 
 public slots:

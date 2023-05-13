@@ -21,7 +21,7 @@ public:
     const static QString KEY_SETTINGS_PRINT_OUTPUT_FILE;
 
 public:
-    QIodePrintFileDialog(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodePrintFileDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodePrintFileDialog();
 
     static QChar getFormat(const QSettings* project_settings)

@@ -3,8 +3,8 @@
 const QString QIodeMenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST = "MENU_FILE_PRINT_SETUP/Print_Dest";
 
 
-QIodeMenuFilePrintSetup::QIodeMenuFilePrintSetup(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings(settings_filepath, parent, f)
+QIodeMenuFilePrintSetup::QIodeMenuFilePrintSetup(QWidget* parent, Qt::WindowFlags f)
+    : QIodeSettings(parent, f)
 {
     setupUi(this);
 
@@ -32,7 +32,7 @@ void QIodeMenuFilePrintSetup::apply()
 
 void QIodeMenuFilePrintSetup::set_print_options()
 {
-    QIodeMenuFilePrintPref dialog(project_settings->fileName(), static_cast<QWidget*>(parent()));
+    QIodeMenuFilePrintPref dialog(static_cast<QWidget*>(parent()));
     dialog.exec();
 }
 

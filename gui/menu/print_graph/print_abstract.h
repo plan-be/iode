@@ -38,8 +38,8 @@ protected:
     WrapperSpinBox*          wNbDecimals;
 
 public:
-    QIodeMenuPrintAbstract(const QString& settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) 
-        : QIodeSettings(settings_filepath, parent, f) {}
+    QIodeMenuPrintAbstract(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) 
+        : QIodeSettings(parent, f) {}
 
     ~QIodeMenuPrintAbstract() {}
 

@@ -3,6 +3,7 @@
 
 void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QString& names)
 {
+    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
     bool printToFile = project_settings->value(QIodeMenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST).toBool();
 
     QString outputFile;
@@ -10,7 +11,7 @@ void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QStr
     if(printToFile)
     {
         // ask the user to set the output file and format
-        QIodePrintFileDialog dialog(project_settings->fileName(), this);
+        QIodePrintFileDialog dialog(this);
         if(dialog.exec() == QDialog::Rejected)
             return;
 

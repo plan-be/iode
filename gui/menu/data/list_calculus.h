@@ -31,7 +31,7 @@ class QIodeMenuDataListCalculus : public QIodeSettings, public Ui::QIodeMenuData
     QIodeCompleter* completer;
 
 public:
-	QIodeMenuDataListCalculus(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataListCalculus(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuDataListCalculus();
 
 public slots:

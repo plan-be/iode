@@ -1,7 +1,7 @@
 #include "add_scalar.h"
 
 
-QIodeAddScalar::QIodeAddScalar(const QString& project_settings_filepath, QWidget* parent, Qt::WindowFlags f) : QIodeSettings(project_settings_filepath, parent, f)
+QIodeAddScalar::QIodeAddScalar(QWidget* parent, Qt::WindowFlags f) : QIodeSettings( parent, f)
 {
 	setupUi(this);
 

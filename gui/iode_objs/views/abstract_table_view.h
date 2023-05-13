@@ -37,7 +37,6 @@ protected:
 	QTextDocument document;
 
 	QShortcut* deleteShortcut;
-	std::shared_ptr<QString> project_settings_filepath;
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
@@ -46,10 +45,7 @@ public:
 	AbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
 	~AbstractTableView();
 
-	virtual void setup(std::shared_ptr<QString>& settings_filepath)
-	{
-		this->project_settings_filepath = settings_filepath;
-	}
+	virtual void setup() {}
 
 signals:
 	void newObjectInserted();

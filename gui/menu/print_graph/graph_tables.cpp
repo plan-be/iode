@@ -1,8 +1,8 @@
 #include "graph_tables.h"
 
 
-QIodeMenuGraphTables::QIodeMenuGraphTables(const QString& settings_filepath, QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(settings_filepath, parent, f)
+QIodeMenuGraphTables::QIodeMenuGraphTables(QWidget* parent, Qt::WindowFlags f) : 
+    QIodeSettings(parent, f)
 {
     setupUi(this);
 
@@ -105,7 +105,7 @@ void QIodeMenuGraphTables::setup()
 {
     try
     {
-        QIodeMenuFilePrintSetup dialog(project_settings->fileName(), this);
+        QIodeMenuFilePrintSetup dialog(this);
         dialog.exec();
     }
     catch (const std::exception& e)

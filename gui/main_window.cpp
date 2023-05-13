@@ -162,8 +162,10 @@ bool MainWindow::openDirectory(const QString& dirPath)
     }
 
     // create/update settings
+    treeView_file_explorer->saveSettings();
+    tabWidget_IODE_objs->saveSettings();
     QDir projectDir(dirPath);
-    QIodeProjectSettings::changeProject(projectDir);
+    QIodeProjectSettings::changeProject(projectDir, this);
 
     // update current directory (chdir)
     QDir::setCurrent(projectDir.absolutePath());
@@ -289,7 +291,7 @@ void MainWindow::check_vars_sample()
 
 void MainWindow::open_import_comments_dialog()
 {
-    QIodeMenuFileImportComments dialog(*project_settings_filepath, this);
+    QIodeMenuFileImportComments dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_COMMENTS);
@@ -299,7 +301,7 @@ void MainWindow::open_import_comments_dialog()
 
 void MainWindow::open_import_variables_dialog()
 {
-    QIodeMenuFileImportVariables dialog(*project_settings_filepath, this);
+    QIodeMenuFileImportVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
@@ -309,13 +311,13 @@ void MainWindow::open_import_variables_dialog()
 
 void MainWindow::open_export_dialog()
 {
-    QIodeMenuFileExport dialog(*project_settings_filepath, this);
+    QIodeMenuFileExport dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_print_setup()
 {
-    QIodeMenuFilePrintSetup dialog(*project_settings_filepath, this);
+    QIodeMenuFilePrintSetup dialog(this);
     dialog.exec();
 }
 
@@ -334,7 +336,7 @@ void MainWindow::clear_workspace()
 
 void MainWindow::open_copy_into_workspace_dialog()
 {
-    QIodeMenuWorkspaceCopyInto dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceCopyInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilters();
@@ -344,7 +346,7 @@ void MainWindow::open_copy_into_workspace_dialog()
 
 void MainWindow::open_merge_into_workspace_dialog()
 {
-    QIodeMenuWorkspaceMergeInto dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceMergeInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilters();
@@ -354,7 +356,7 @@ void MainWindow::open_merge_into_workspace_dialog()
 
 void MainWindow::open_change_workspace_descriptions_dialog()
 {
-    QIodeMenuWorkspaceDescribe dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceDescribe dialog(this);
     dialog.exec();
 }
 
@@ -366,7 +368,7 @@ void MainWindow::open_change_variables_sample_dialog()
 
 void MainWindow::open_extrapolate_variables_dialog()
 {
-    QIodeMenuWorkspaceExtrapolateVariables dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceExtrapolateVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
@@ -378,26 +380,26 @@ void MainWindow::open_extrapolate_variables_dialog()
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
-    QIodeMenuWorkspaceHighToLow dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceHighToLow dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_low_to_high_dialog()
 {
     check_vars_sample();
-    QIodeMenuWorkspaceLowToHigh dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceLowToHigh dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_seasonal_adjustment_dialog()
 {
-    QIodeMenuWorkspaceSeasonalAdjustment dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceSeasonalAdjustment dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_trend_correction_dialog()
 {
-    QIodeMenuWorkspaceTrendCorrection dialog(*project_settings_filepath, this);
+    QIodeMenuWorkspaceTrendCorrection dialog(this);
     dialog.exec();
 }
 
@@ -405,7 +407,7 @@ void MainWindow::open_trend_correction_dialog()
 
 void MainWindow::open_sort_and_calculus_dialog()
 {
-    QIodeMenuDataSortExpandList dialog(*project_settings_filepath, this);
+    QIodeMenuDataSortExpandList dialog(this);
     dialog.exec();
     completer->updateIodeOjectsListNames();
     int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
@@ -414,7 +416,7 @@ void MainWindow::open_sort_and_calculus_dialog()
 
 void MainWindow::open_list_calculus_dialog()
 {
-    QIodeMenuDataListCalculus dialog(*project_settings_filepath, this);
+    QIodeMenuDataListCalculus dialog(this);
     dialog.exec();
     completer->updateIodeOjectsListNames();
     int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
@@ -423,7 +425,7 @@ void MainWindow::open_list_calculus_dialog()
 
 void MainWindow::open_file_contents_dialog()
 {
-    QIodeMenuDataFileContents dialog(*project_settings_filepath, this);
+    QIodeMenuDataFileContents dialog(this);
     dialog.exec();
     completer->updateIodeOjectsListNames();
     int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
@@ -432,7 +434,7 @@ void MainWindow::open_file_contents_dialog()
 
 void MainWindow::open_file_compare_dialog()
 {
-    QIodeMenuDataFileCompare dialog(*project_settings_filepath, this);
+    QIodeMenuDataFileCompare dialog(this);
     dialog.exec();
     completer->updateIodeOjectsListNames();
     int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
@@ -441,7 +443,7 @@ void MainWindow::open_file_compare_dialog()
 
 void MainWindow::open_search_text_dialog()
 {
-    QIodeMenuDataSearchText dialog(*project_settings_filepath, this);
+    QIodeMenuDataSearchText dialog(this);
     dialog.exec();
     completer->updateIodeOjectsListNames();
     int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
@@ -450,7 +452,7 @@ void MainWindow::open_search_text_dialog()
 
 void MainWindow::open_scan_objects_dialog()
 {
-    QIodeMenuDataScanObjects dialog(*project_settings_filepath, this);
+    QIodeMenuDataScanObjects dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         completer->updateIodeOjectsListNames();
@@ -461,13 +463,13 @@ void MainWindow::open_scan_objects_dialog()
 
 void MainWindow::open_edit_tables_variables_dialog()
 {
-    QIodeMenuDataEditTables dialog(*project_settings_filepath, this);
+    QIodeMenuDataEditTables dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_duplicate_objects_dialog()
 {
-    QIodeMenuDataDuplicateObj dialog(*project_settings_filepath, this);
+    QIodeMenuDataDuplicateObj dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_current_tab();
 }
@@ -476,7 +478,7 @@ void MainWindow::open_duplicate_objects_dialog()
 
 void MainWindow::open_compute_identities_dialog()
 {
-    QIodeMenuComputeIdentities dialog(*project_settings_filepath, this);
+    QIodeMenuComputeIdentities dialog(this);
 
     QString identites;
     QStringList identitiesList = tabWidget_IODE_objs->getSelectedObjectsNames(I_IDENTITIES);
@@ -488,38 +490,38 @@ void MainWindow::open_compute_identities_dialog()
 
 void MainWindow::open_compute_simulation_dialog()
 {
-    QIodeMenuComputeSimulation dialog(*project_settings_filepath, this);
+    QIodeMenuComputeSimulation dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_model_dialog()
 {
-    QIodeMenuComputeModel dialog(*project_settings_filepath, this);
+    QIodeMenuComputeModel dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_scc_decomposition_dialog()
 {
-    QIodeMenuComputeSCCDecomposition dialog(*project_settings_filepath, this);
+    QIodeMenuComputeSCCDecomposition dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_compute_scc_simulation_dialog()
 {
-    QIodeMenuComputeSCCSimulation dialog(*project_settings_filepath, this);
+    QIodeMenuComputeSCCSimulation dialog(this);
     dialog.exec();
 }
 // -------- Print/Graphs Menu --------
 
 void MainWindow::open_print_tables_dialog()
 {
-    QIodeMenuPrintTables dialog(*project_settings_filepath, this);
+    QIodeMenuPrintTables dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_print_variables_dialog()
 {
-    QIodeMenuPrintVariables dialog(*project_settings_filepath, this);
+    QIodeMenuPrintVariables dialog(this);
     dialog.exec();
 }
 
@@ -530,14 +532,14 @@ void MainWindow::open_print_objects_definitions_dialog()
 
 void MainWindow::open_graphs_tables_dialog()
 {
-    QIodeMenuGraphTables dialog(*project_settings_filepath, this);
+    QIodeMenuGraphTables dialog(this);
     connect(&dialog, &QIodeMenuGraphTables::newPlot, this, &MainWindow::appendPlot);
     dialog.exec();
 }
 
 void MainWindow::open_graphs_variables_dialog()
 {
-    QIodeMenuGraphVariables dialog(*project_settings_filepath, this);
+    QIodeMenuGraphVariables dialog(this);
     connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendPlot);
     dialog.exec();
 }
@@ -545,7 +547,7 @@ void MainWindow::open_graphs_variables_dialog()
 void MainWindow::open_graphs_variables_dialog_from_vars_view(
     const QList<QString>& variableNames, const QString& from, const QString& to)
 {
-    QIodeMenuGraphVariables dialog(*project_settings_filepath, this);
+    QIodeMenuGraphVariables dialog(this);
     dialog.setVariablesNames(variableNames);
 	dialog.setFrom(from);
 	dialog.setTo(to);

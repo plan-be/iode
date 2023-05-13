@@ -30,8 +30,7 @@ class QIodeDynAdjustment : public QIodeSettings, public Ui::QIodeDynAdjustment
     WrapperQLineEdit* lineCoef2;
 
 public:
-    QIodeDynAdjustment(QString& lec, const QString& settings_filepath, QWidget* parent = Q_NULLPTR, 
-        Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeDynAdjustment(QString& lec, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeDynAdjustment();
 
 public slots:

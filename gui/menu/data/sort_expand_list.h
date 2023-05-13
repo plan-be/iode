@@ -19,7 +19,7 @@ class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDa
     QIodeCompleter* completer;
 
 public:
-	QIodeMenuDataSortExpandList(const QString& project_settings_filepath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataSortExpandList(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeMenuDataSortExpandList();
 
 public slots:
