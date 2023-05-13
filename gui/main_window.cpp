@@ -15,7 +15,7 @@ QString get_current_project_path()
 }
 
 
-MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent), project_settings(nullptr)
+MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent)
 {
     // ---- setup the present class ----
     setupUi(this);
@@ -95,7 +95,6 @@ MainWindow::~MainWindow()
 
     for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
 
-    delete project_settings;
     delete user_settings;
 }
 
@@ -164,11 +163,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
 
     // create/update settings
     QDir projectDir(dirPath);
-    QString qSettingsFilepath = projectDir.absoluteFilePath(SETTINGS_FILENAME);
-    project_settings_filepath = std::make_shared<QString>(qSettingsFilepath);
-
-    if (project_settings) delete project_settings;
-    project_settings = new QSettings(qSettingsFilepath, QSettings::IniFormat);
+    QIodeProjectSettings::changeProject(projectDir);
 
     // update current directory (chdir)
     QDir::setCurrent(projectDir.absolutePath());
@@ -177,10 +172,10 @@ bool MainWindow::openDirectory(const QString& dirPath)
     dockWidget_file_explorer->show();
 
     // update file explorer view
-    treeView_file_explorer->updateProjectDir(projectDir, project_settings_filepath);
+    treeView_file_explorer->updateProjectDir(projectDir);
 
     // (re)open tabs
-    tabWidget_IODE_objs->setup(project_settings_filepath, completer, textEdit_output);
+    tabWidget_IODE_objs->setup(completer, textEdit_output);
 
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);
