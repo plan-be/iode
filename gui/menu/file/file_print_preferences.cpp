@@ -469,7 +469,7 @@ void QIodeMenuFilePrintPref::set_print_preferences()
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(this, tr("Warning"), tr(e.what()));
+        QMessageBox::critical(this, tr("WARNING"), tr(e.what()));
     }
 
     this->accept();

@@ -69,7 +69,7 @@ void QIodeCommandLine::run_command()
     catch(const std::exception& e)
     {
         error_msg = QString::fromStdString(e.what());
-        QMessageBox::warning(get_main_window_ptr(), "Warning", error_msg + "\n");
+        QMessageBox::warning(nullptr, "WARNING", error_msg + "\n");
     }
 
     if(success != 0)

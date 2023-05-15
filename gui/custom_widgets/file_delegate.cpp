@@ -26,7 +26,7 @@ void FileDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
     if (fileInfo.exists())
     {
         QString type = fileInfo.isDir() ? "Directory" : "File";
-        QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "Warning", type + " " + 
+        QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", type + " " + 
             fileInfo.fileName() + " already exist!\n Overwrite it ?", 
             QMessageBox::Yes | QMessageBox::Discard, QMessageBox::Yes);
         if (answer == QMessageBox::Discard) return;

@@ -66,7 +66,7 @@ private:
         // --- check if already exist before to paste
         if(QFileInfo(destinationPath).exists())
         {
-            QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "Warning", "File " + 
+            QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "File " + 
             fileName + " already exists in directory " + destinationDir.absolutePath() + " !\n Overwrite it ?", 
             QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
             if (answer == QMessageBox::Cancel) return false;
@@ -114,7 +114,7 @@ private:
 
                 if (!overwrite_all && QFileInfo(targetFilePath).exists())
                 {
-                    QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "Warning", "File " + 
+                    QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "File " + 
                     fileInfo.fileName() + " already exist!\n Overwrite it ?", 
                     QMessageBox::Yes | QMessageBox::YesToAll | QMessageBox::Discard, QMessageBox::Yes);
                     if(answer == QMessageBox::YesToAll) overwrite_all = true;
@@ -162,7 +162,7 @@ private:
         // --- check if already exist before to paste
         if(targetDir.exists())
         {
-            QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "Warning", "Directory " + 
+            QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "Directory " + 
             targetDir.absolutePath() + " already exists!\n Overwrite it ?", 
             QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
             if (answer == QMessageBox::Cancel) return false;

@@ -59,9 +59,6 @@ enum EnumItemType
 // defined in main_window.cpp
 QWidget* get_main_window_ptr();
 
-// defined in main_window.cpp
-QString get_current_project_path();
-
 
 /* ****************************** *
  *         BASE CLASSES           *

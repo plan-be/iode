@@ -57,7 +57,7 @@ void QIodeAddTable::add()
     }
     catch (const std::exception& e)
     {
-        QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+        QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
     }
 }
 

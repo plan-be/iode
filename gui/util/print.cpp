@@ -106,7 +106,7 @@ static void printTblOrVar(const bool isTable, QPrintPreviewDialog& dialog, QText
         QFile file(TMP_FILENAME);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            QMessageBox::critical(nullptr, "Error", file.errorString());
+            QMessageBox::critical(nullptr, "ERROR", file.errorString());
             file.remove();
             return;
         }

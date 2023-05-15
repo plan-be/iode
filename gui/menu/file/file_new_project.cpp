@@ -37,21 +37,21 @@ void QIodeMenuFileNewProject::create()
     // check if the parent dir exists
     if(!parentDir.exists())
     {
-        QMessageBox::warning(this, "Warning", "The directory " + newProjectPath + " does not exist.\n" + error_msg);
+        QMessageBox::warning(this, "WARNING", "The directory " + newProjectPath + " does not exist.\n" + error_msg);
         return;
     }
 
     // check if passed path represents a path to a directory
     if (newProjectInfo.completeSuffix() != "") 
     {
-        QMessageBox::warning(this, "Warning", "The name " + newProjectDirName + " does not represent a directory.\n" + error_msg);
+        QMessageBox::warning(this, "WARNING", "The name " + newProjectDirName + " does not represent a directory.\n" + error_msg);
         return;
     }
 
     // check if new project directory already exists
     if(newProjectInfo.exists())
     {
-        QMessageBox::warning(this, "Warning", "The directory " + newProjectPath + " already exists.\n" + error_msg);
+        QMessageBox::warning(this, "WARNING", "The directory " + newProjectPath + " already exists.\n" + error_msg);
         return;
     }
 
@@ -61,7 +61,7 @@ void QIodeMenuFileNewProject::create()
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(this, "Error", error_msg + "\n" + QString(e.what()));
+        QMessageBox::warning(this, "WARNING", error_msg + "\n" + QString(e.what()));
         return;
     }
 
