@@ -22,7 +22,7 @@ bool QIodeAbstractEditor::load__(TextEditor* editor, const QString& filepath, co
     QFile file(filepath);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        QMessageBox::critical(nullptr, "Error", file.errorString());
+        QMessageBox::critical(nullptr, "ERROR", file.errorString());
         return false;
     }
 
@@ -41,7 +41,7 @@ QString QIodeAbstractEditor::save_(TextEditor* editor, const QString& filepath)
     QFile file(filepath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        QMessageBox::critical(nullptr, "Error", file.errorString());
+        QMessageBox::critical(nullptr, "ERROR", file.errorString());
         return "";
     }
 

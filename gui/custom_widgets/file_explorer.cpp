@@ -517,7 +517,7 @@ void QIodeFileExplorer::remove()
             SystemItem item = itemsToDelete[0];
             QString filename = item.fileInfo().fileName();
             arg = item.isDir() ? "the directory '" + filename + "' and its content" : "the file '" + filename + "'";
-            answer = QMessageBox::warning(get_main_window_ptr(), "Warning", msg.arg(arg), QMessageBox::Yes | QMessageBox::No);
+            answer = QMessageBox::warning(nullptr, "WARNING", msg.arg(arg), QMessageBox::Yes | QMessageBox::No);
             if(answer == QMessageBox::Yes) item.remove();
         }
         else
@@ -539,7 +539,7 @@ void QIodeFileExplorer::remove()
             arg += filenames.join("\n");
             arg += "\n\n";
 
-            answer = QMessageBox::warning(get_main_window_ptr(), "Warning", msg.arg(arg), QMessageBox::Yes | QMessageBox::No);
+            answer = QMessageBox::warning(nullptr, "WARNING", msg.arg(arg), QMessageBox::Yes | QMessageBox::No);
             if(answer == QMessageBox::Yes) foreach(SystemItem item, itemsToDelete) item.remove();
         }
     }

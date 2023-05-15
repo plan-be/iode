@@ -57,7 +57,7 @@ bool QIodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orie
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 		return false;
 	}
 }
@@ -114,7 +114,7 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::critical(static_cast<QWidget*>(parent()), tr("Error"), tr(e.what()));
+		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
 	}
 }
 
@@ -122,8 +122,6 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 template <class K>
 bool QIodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
-	QWidget* mainwin = get_main_window_ptr();
-
 	int type_ = kdb->get_iode_type();
 	if (type_ < 0) return false;
 
@@ -136,7 +134,7 @@ bool QIodeTemplateTableModel<K>::load(const QString& filepath, const bool forceO
 		if(!forceOverwrite && is_global_kdb_loaded(iodeType))
 		{
 			QString iodeTypeName = QString::fromStdString(vIodeTypes[iodeType]);
-			QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", "There are " + 
+			QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "There are " + 
 				iodeTypeName + " already loaded. Would like to override " + iodeTypeName + " ?", 
 				QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 			if(answer == QMessageBox::No) return false;
@@ -147,7 +145,7 @@ bool QIodeTemplateTableModel<K>::load(const QString& filepath, const bool forceO
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
+		QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
 		return false;
 	}
 }
@@ -186,8 +184,7 @@ QString QIodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& 
 		}
 		catch (const IodeException& e)
 		{
-			QWidget* mainwin = get_main_window_ptr();
-			QMessageBox::critical(mainwin, "Error", e.what());
+			QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 			return "";
 		}
 
@@ -224,7 +221,7 @@ bool QIodeTemplateTableModel<K>::removeRows(int position, int rows, const QModel
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 	}
 
 	endRemoveRows();

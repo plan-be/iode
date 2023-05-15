@@ -34,7 +34,7 @@ void ReportEditor::run(const QString& filepath)
     catch(const std::exception& e)
     {
         msg = QString::fromStdString(e.what());
-        QMessageBox::warning(get_main_window_ptr(), "Warning", msg + "\n");
+        QMessageBox::warning(nullptr, "WARNING", msg + "\n");
     }
 
     if(output)

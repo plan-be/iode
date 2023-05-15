@@ -104,7 +104,7 @@ public:
         // check if file exists
         if(!fileInfo.exists())
         {
-            QMessageBox::warning(nullptr, "Warning", "File " + filepath + " could not been found");
+            QMessageBox::warning(nullptr, "WARNING", "File " + filepath + " could not been found");
             return false;
         }
 
@@ -116,7 +116,7 @@ public:
             QStringList expected_ext;
             for(const std::string& ext_: get_extensions(fileType)) expected_ext << QString::fromStdString(ext_);
 
-            QMessageBox::warning(nullptr, "Warning", "Expected file with extension " + expected_ext.join(" or ") + "\n" +
+            QMessageBox::warning(nullptr, "WARNING", "Expected file with extension " + expected_ext.join(" or ") + "\n" +
                 "But got file " + filename + " with extension " + ext);
             return false;
         }

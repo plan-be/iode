@@ -130,7 +130,7 @@ void QIodeTabWidget::loadSettings()
                 // should never happen !
                 if (iodeType < 0)
                 {
-                    QMessageBox::critical(nullptr, "Error", 
+                    QMessageBox::critical(nullptr, "ERROR", 
                         "loadSettings(): Something went wrong when trying to load " + filepath);
                     return;
                 }
@@ -354,8 +354,7 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
     }
     catch (const std::exception& e)
     {
-        QWidget* mainwin = get_main_window_ptr();
-        QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
+        QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
         return -1;
     }
 
@@ -364,7 +363,6 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
 
 int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
-    QWidget* mainwin = get_main_window_ptr();
     QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), output, completer, this);
     int index = this->addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
@@ -375,7 +373,6 @@ int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
 
 int QIodeTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile)
 {
-    QWidget* mainwin = get_main_window_ptr();
     QIodeTextWidget* textWidget = new QIodeTextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
     int index = this->addTab(textWidget, textWidget->getTabText());
     setTabToolTip(index, textWidget->getTooltip());
@@ -388,7 +385,6 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
 {
     if (fileType <= I_VARIABLES_FILE) return -1;
 
-    QWidget* mainwin = get_main_window_ptr();
     QString fullPath = fileInfo.absoluteFilePath();
 
     // Note: indexOf() returns -1 if not found
@@ -442,7 +438,7 @@ void QIodeTabWidget::removeTab(const int index)
         QString filepath = tabWidget->getFilepath();
         QString msg = "Unsaved modifications.\n";
         msg+= "Would you like to save modifications to " + filepath + " before closing the tab?";
-        QMessageBox::StandardButton answer = QMessageBox::warning(get_main_window_ptr(), "WARNING", msg, 
+        QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", msg, 
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
         if(answer == QMessageBox::Yes) tabWidget->save();
         if(answer == QMessageBox::No) tabContentModified(filepath, false);
@@ -477,11 +473,10 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
     QString filename;
     QString tooltip;
     int index;
-    QWidget* mainwin = get_main_window_ptr();
     
 	if(filepath.isEmpty())
     {
-        QMessageBox::warning(mainwin, "Warning", "Cannot load file because given filepath is empty");
+        QMessageBox::warning(nullptr, "WARNING", "Cannot load file because given filepath is empty");
         return -1;
     }
 
@@ -490,13 +485,13 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
 
 	if (!fileInfo.exists())
 	{
-		QMessageBox::critical(mainwin, "Error", "File " + fullPath + " has not been found!");
+		QMessageBox::warning(nullptr, "WARNING", "File " + fullPath + " has not been found!");
 		return -1;
 	}
 
 	if (fileInfo.isDir())
 	{ 
-		QMessageBox::warning(mainwin, "Warning", "Cannot load " + fullPath + " as it is not a file but a directory");
+		QMessageBox::warning(nullptr, "WARNING", "Cannot load " + fullPath + " as it is not a file but a directory");
 		return -1;
 	}
 
@@ -541,7 +536,7 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(mainwin, tr("ERROR"), tr(e.what()));
+        QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
         return -1;
     }
 }
@@ -574,7 +569,7 @@ bool QIodeTabWidget::saveTabContent(const int index)
     }
     catch(const std::exception& e)
     {
-        QMessageBox::warning(get_main_window_ptr(), "Warning", "Couldn't save the content of " + tabText(index));
+        QMessageBox::warning(nullptr, "WARNING", "Couldn't save the content of " + tabText(index));
         return false;
     }
 }
@@ -599,8 +594,7 @@ void QIodeTabWidget::clearCurrentTab()
     EnumIodeFile filetype = tabWidget->getFiletype();
     if (filetype <= I_VARIABLES_FILE)
     {
-        QWidget* mainwin = get_main_window_ptr();
-        QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", 
+        QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", 
             "Are you sure to clear the " + QString::fromStdString(vIodeTypes[filetype]) + " database", 
             QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
         if (answer == QMessageBox::Yes)
@@ -615,11 +609,10 @@ void QIodeTabWidget::clearCurrentTab()
 bool QIodeTabWidget::saveProjectAs(QDir& newProjectDir)
 {
     QString newProjectPath = newProjectDir.absolutePath();
-    QWidget* mainwin = get_main_window_ptr();
 
     if (!newProjectDir.exists())
     {
-        QMessageBox::critical(mainwin, "Error", "Directory " + newProjectPath + " does not exist");
+        QMessageBox::warning(nullptr, "WARNING", "Directory " + newProjectPath + " does not exist");
         return false;
     }
 

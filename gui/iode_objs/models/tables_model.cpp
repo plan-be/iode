@@ -26,7 +26,7 @@ bool TablesModel::setValue(const int row, const int column, const QVariant& valu
 	}
 	catch(const std::exception& e)
 	{
-		QMessageBox::warning(nullptr, "Warning", QString::fromStdString(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString::fromStdString(e.what()));
 	}
 	return false;
 }

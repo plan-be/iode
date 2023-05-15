@@ -1,17 +1,11 @@
 #include "main_window.h"
 
 QWidget* main_window_ptr = nullptr;
-QString currentProjectPath;
 
 
 QWidget* get_main_window_ptr()
 {
     return main_window_ptr;
-}
-
-QString get_current_project_path()
-{
-    return currentProjectPath;
 }
 
 
@@ -139,7 +133,7 @@ void MainWindow::addProjectPathToList(const QDir& projectDir)
 
 QMessageBox::StandardButton MainWindow::askSaveAllTabs()
 {
-    QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", "Save content of all open tabs?", 
+    QMessageBox::StandardButton answer = QMessageBox::warning(this, "WARNING", "Save content of all open tabs?", 
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
     if (answer == QMessageBox::Yes) tabWidget_IODE_objs->saveAllTabs();
     return answer;
@@ -149,7 +143,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
 {
     if(dirPath.isEmpty())
     {
-        QMessageBox::critical(this, "Error", "Empty path for new Project");
+        QMessageBox::warning(this, "WARNING", "Empty path for new Project");
         return false;
     }
 
@@ -157,7 +151,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
     projectPath = dir.absolutePath();
     if (!dir.exists())
     {
-        QMessageBox::critical(this, "Error", "Directory " + projectPath + " does not exist");
+        QMessageBox::warning(this, "WARNING", "Directory " + projectPath + " does not exist");
         return false;
     }
 
@@ -182,8 +176,8 @@ bool MainWindow::openDirectory(const QString& dirPath)
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);
 
-    // set global variable currentProjectPath
-    currentProjectPath = projectDir.absolutePath();
+    // set currentProjectPath global settings
+    user_settings->setValue("projectPath", QVariant(projectPath));
 
     // update auto-completion
     completer->updateIodeOjectsListNames();
@@ -244,7 +238,7 @@ void MainWindow::open_recent_project()
         }
         else 
         {
-            QMessageBox::warning(this, "Warning", "Directory " + projectPath + " seems to no longer exist");
+            QMessageBox::warning(this, "WARNING", "Directory " + projectPath + " seems to no longer exist");
             recentProjects.removeAll(projectPath);
             user_settings->setValue("recentProjects", QVariant::fromValue(recentProjects));
         }
@@ -325,7 +319,7 @@ void MainWindow::open_print_setup()
 
 void MainWindow::clear_workspace()
 {
-    QMessageBox::StandardButton answer = QMessageBox::warning(this, "Warning", "Are you sure to clear the whole workspace?", 
+    QMessageBox::StandardButton answer = QMessageBox::warning(this, "WARNING", "Are you sure to clear the whole workspace?", 
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer == QMessageBox::Yes)
     {

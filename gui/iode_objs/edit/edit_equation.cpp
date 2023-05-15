@@ -96,7 +96,7 @@ void QIodeEditEquation::set_estimation()
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 	}
 }
 
@@ -163,7 +163,7 @@ void QIodeEditEquation::edit()
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 	}
 }
 
@@ -179,12 +179,12 @@ void QIodeEditEquation::display_coefs()
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 		}	
 	}
 	else
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), "No estimation has been done yet");
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), "No estimation has been done yet");
 	}
 }
 
@@ -199,7 +199,7 @@ void QIodeEditEquation::estimate()
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 		}
 	}
 }
@@ -215,7 +215,7 @@ void QIodeEditEquation::next()
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 		}
 	}
 }
@@ -239,12 +239,12 @@ void QIodeEditEquation::results()
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), tr(e.what()));
+			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
 		}
 	}
 	else
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("Warning"), "No estimation has been done yet");
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), "No estimation has been done yet");
 	}
 }
 

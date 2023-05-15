@@ -552,7 +552,7 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
     }
     else
     {
-        QMessageBox::warning(this, "Warning", QString("Couldn't find any valid value for the Y axis ") +
+        QMessageBox::warning(this, "WARNING", QString("Couldn't find any valid value for the Y axis ") +
             "for the sample from " + from + " to " + to);
     }
 

@@ -140,8 +140,7 @@ private:
 		QFileInfo fileInfo(filepath);
 		if (fileInfo.exists())
 		{
-			QWidget* mainwin = get_main_window_ptr();
-			QMessageBox::StandardButton answer = QMessageBox::warning(mainwin, "Warning", "The file " + 
+			QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "The file " + 
 				fileInfo.fileName() + " already exists. Override it?", 
 				QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
 			if (answer == QMessageBox::No) askFilepath(projectDir);
