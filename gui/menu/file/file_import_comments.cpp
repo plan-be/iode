@@ -23,9 +23,6 @@ QIodeMenuFileImportComments::QIodeMenuFileImportComments(QWidget* parent, Qt::Wi
     mapFields["Language"]    = wLanguage;
     mapFields["DebugFile"]   = wDebugFile;
 
-    // TODO: if possible, find a way to initialize className inside MixingSettings
-    // NOTE FOR DEVELOPPERS: we cannot simply call the line below from the constructor of MixingSettings 
-    //                       since in that case this refers to MixingSettings and NOT the derived class
     className = "MENU_FILE_IMPORT_COMMENTS";
     loadSettings();
 }
