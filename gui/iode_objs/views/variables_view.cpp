@@ -8,8 +8,6 @@ void VariablesView::print()
 		QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
 		bool printToFile = project_settings->value(QIodeMenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST).toBool();
 
-		QString outputFile;
-		QChar format;
 		if(printToFile)
 		{
 			// ask the user to set the output file and format
@@ -18,39 +16,37 @@ void VariablesView::print()
 				return;
 
 			// extract the output file
-			outputFile = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE).toString();
+			QString outputFile = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE).toString();
 		
 			// extract the format of the output file
-			format = QIodePrintFileDialog::getFormat(project_settings);
-		}
+			QChar format = QIodePrintFileDialog::getFormat(project_settings);
 
-		// set the number of decimals
-		int NbDecimals = 2;
+			// set the number of decimals
+			int NbDecimals = 2;
 
-		// set the language
-		EnumLang lang = EnumLang::IT_ENGLISH;
+			// set the language
+			EnumLang lang = EnumLang::IT_ENGLISH;
 
-		// build the generalized sample
-		KDBVariables kdb_var;
-		Sample smpl = kdb_var.get_sample();
-		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+			// build the generalized sample
+			KDBVariables kdb_var;
+			Sample smpl = kdb_var.get_sample();
+			QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
-		// list of names = filter pattern or * if pattern is empty
-		QString pattern = filterLineEdit->text().trimmed();
-		QString names = pattern.isEmpty() ? "*" : pattern;
+			// list of names = filter pattern or * if pattern is empty
+			QString pattern = filterLineEdit->text().trimmed();
+			QString names = pattern.isEmpty() ? "*" : pattern;
 
-		// empty files list
-		QStringList files;
+			// empty files list
+			QStringList files;
 
-		if(printToFile)
-		{
 			printVariableToFile(outputFile, format, names, gsample, files, NbDecimals, lang);
 		}
 		else
 		{
 			QPrintPreviewDialog dialog(&printer);
 			connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &VariablesView::renderForPrinting);
-			printVariable(dialog, document, names, gsample, files, NbDecimals, lang);
+			dumpTableInDocument();
+			dialog.exec();
 		}
 	}
 	catch(const std::exception& e)
