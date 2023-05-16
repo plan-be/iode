@@ -228,6 +228,94 @@ bool QIodeEditTableModel::setData(const QModelIndex& index, const QVariant& valu
 	}
 }
 
+int QIodeEditTableModel::appendLine(EnumLineType lineType)
+{
+	int position = -1;
+
+	switch(lineType)
+	{
+	case EnumLineType::IT_CELL:
+		position = table->addLineWithCells();
+		for(int col=0; col < table->nbColumns(); col++)
+			table->setCellType(position, col, table->getDividerCellType(col));
+		break;
+	case EnumLineType::IT_TITLE:
+		position = table->addTitle("");
+		break;
+	case EnumLineType::IT_LINE:
+		position = table->addLineSeparator();
+		break;
+	case EnumLineType::IT_FILES:
+		position = table->addLineFiles();
+		break;
+	case EnumLineType::IT_DATE:
+		position = table->addLineDate();
+		break;
+	case EnumLineType::IT_MODE:
+		position = table->addLineMode();
+		break;
+	default:
+		break;
+	}
+
+	resetModel();
+	return position;
+}
+
+int QIodeEditTableModel::insertLine(EnumLineType lineType, const int position, const bool after)
+{
+	int new_position = -1;
+
+	switch(lineType)
+	{
+	case EnumLineType::IT_CELL:
+		new_position = table->insertLineWithCells(position, after);
+		for(int col=0; col < table->nbColumns(); col++)
+			table->setCellType(new_position, col, table->getDividerCellType(col));
+		break;
+	case EnumLineType::IT_TITLE:
+		new_position = table->insertTitle(position, "", after);
+		break;
+	case EnumLineType::IT_LINE:
+		new_position = table->insertLineSeparator(position, after);
+		break;
+	case EnumLineType::IT_FILES:
+		new_position = table->insertLineFiles(position, after);
+		break;
+	case EnumLineType::IT_DATE:
+		new_position = table->insertLineDate(position, after);
+		break;
+	case EnumLineType::IT_MODE:
+		new_position = table->insertLineMode(position, after);
+		break;
+	default:
+		break;
+	}
+
+	resetModel();
+	return new_position;
+}
+
+bool QIodeEditTableModel::removeRows(int position, int rows, const QModelIndex& index)
+{
+	beginRemoveRows(QModelIndex(), position, position + rows - 1);
+
+	try
+	{
+		// diviser line doesn't count -> real table row = gui table row - 1
+		for(int row = position; row < position + rows; row++)
+			table->deleteLine(row - 1);
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		return false;
+	}
+
+	endRemoveRows();
+	return true;
+}
+
 EnumLineType QIodeEditTableModel::getLineType(const int row) const
 {
 	// first row represents the diviser line
