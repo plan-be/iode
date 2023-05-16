@@ -94,61 +94,81 @@ protected:
 	void dumpTableInDocument()
 	{
 		document.clear();
+		const int max_nb_columns = 10;
+
 		M* table_model = static_cast<M*>(model());
 		int nb_rows = table_model->rowCount();
-		int nb_cols = table_model->columnCount();
+		int nb_cols_total = table_model->columnCount();
+
+		int nb_tables =  nb_cols_total / max_nb_columns;
+		if(nb_cols_total % max_nb_columns > 0)
+			nb_tables++;
 
 		QTextCursor cursor(&document);
-		QTextTable* table = cursor.insertTable(nb_rows + 1, nb_cols + 1);
-		QTextTableFormat tableFormat = table->format();
-		tableFormat.setHeaderRowCount(1);
-		tableFormat.setCellPadding(4);
-        tableFormat.setCellSpacing(0);
-        tableFormat.setBorder(0);
-		table->setFormat(tableFormat);
 
-		QTextTableCell headerCell;
-		QTextTableCell cell;
-		QString text;
-		QTextCharFormat boldFormat;
-		boldFormat.setFontWeight(QFont::Bold);
-
-		// top left cell
-		headerCell = table->cellAt(0, 0);
-		cursor = headerCell.firstCursorPosition();
-		cursor.insertText("Name", boldFormat);
-		QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
-		cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
-		headerCell.setFormat(cellFormat);
-
-		// columns header
-		for(int col=0; col < nb_cols; col++)
+		int data_col;
+		int nb_cols;
+		for(int i_table=0; i_table < nb_tables; i_table++)
 		{
-			text = table_model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
-			headerCell = table->cellAt(0, col + 1);
+			nb_cols = (i_table < nb_tables - 1) ? max_nb_columns : nb_cols_total % max_nb_columns;
+			QTextTable* table = cursor.insertTable(nb_rows + 1, nb_cols + 1);
+			QTextTableFormat tableFormat = table->format();
+			tableFormat.setHeaderRowCount(1);
+			tableFormat.setCellPadding(4);
+			tableFormat.setCellSpacing(0);
+			tableFormat.setBorder(0);
+			//if(i_table < nb_tables - 1)
+			//	tableFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
+			table->setFormat(tableFormat);
+
+			QTextTableCell headerCell;
+			QTextTableCell cell;
+			QString text;
+			QTextCharFormat boldFormat;
+			boldFormat.setFontWeight(QFont::Bold);
+
+			// top left cell
+			headerCell = table->cellAt(0, 0);
 			cursor = headerCell.firstCursorPosition();
-			cursor.insertText(text, boldFormat);
+			cursor.insertText("Name", boldFormat);
 			QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
 			cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 			headerCell.setFormat(cellFormat);
-		}
-		// table rows
-		for(int row=0; row < nb_rows; row++)
-		{
-			// row header
-			text = table_model->headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
-			headerCell = table->cellAt(row + 1, 0);
-			cursor = headerCell.firstCursorPosition();
-			cursor.insertText(text);
 
-			// row cells content
+			// columns header
 			for(int col=0; col < nb_cols; col++)
 			{
-				text = table_model->dataCell(row, col).toString();
-				cell = table->cellAt(row + 1, col + 1);
-				cursor = cell.firstCursorPosition();
-				cursor.insertText(text);
+				data_col = (i_table * max_nb_columns) + col;
+				text = table_model->headerData(data_col, Qt::Horizontal, Qt::DisplayRole).toString();
+				headerCell = table->cellAt(0, col + 1);
+				cursor = headerCell.firstCursorPosition();
+				cursor.insertText(text, boldFormat);
+				QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+				cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+				headerCell.setFormat(cellFormat);
 			}
+			// table rows
+			for(int row=0; row < nb_rows; row++)
+			{
+				// row header
+				text = table_model->headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
+				headerCell = table->cellAt(row + 1, 0);
+				cursor = headerCell.firstCursorPosition();
+				cursor.insertText(text);
+
+				// row cells content
+				for(int col=0; col < nb_cols; col++)
+				{
+					data_col = (i_table * max_nb_columns) + col;
+					text = table_model->dataCell(row, data_col).toString();
+					cell = table->cellAt(row + 1, col + 1);
+					cursor = cell.firstCursorPosition();
+					cursor.insertText(text);
+				}
+			}
+			cursor.movePosition(QTextCursor::End);
+			if(i_table < nb_tables - 1)
+				cursor.insertText("\n\n");
 		}
 	}
 
