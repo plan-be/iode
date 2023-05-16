@@ -33,15 +33,22 @@ enum EnumLineType
 	IT_DATE = KT_DATE				// 116
 };
 
-const static std::map<EnumLineType, std::string> mLineType =
+const static std::map<std::string, EnumLineType> mLineType =
 {
-	{IT_TITLE, "Title"},
-	{IT_CELL, "Cells"},
-	{IT_LINE, "Line"},
-	{IT_FILES, "Files"},
-	{IT_MODE, "Mode"},
-	{IT_DATE, "Date"}
+	{"Cells", IT_CELL},
+	{"Line",  IT_LINE},
+	{"Title", IT_TITLE},
+	{"Files", IT_FILES},
+	{"Mode",  IT_MODE},
+	{"Date",  IT_DATE}
 };
+
+inline std::string get_line_type(EnumLineType line_type)
+{
+	for(const auto& [key, value]: mLineType)
+		if(line_type == value) return key;
+	return "";
+}
 
 enum EnumGraphType
 {
