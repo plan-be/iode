@@ -53,11 +53,15 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent)
     {
         QMessageBox::information(this, "IODE interface", 
             QString("<p align='center'>First time with the IODE interface ?<br><br>") + 
-            "Please gjec the File menu to either create a new project folder or to open an folder containg " + 
+            "Please go to the File menu to either create a new project folder or to open an folder containg " + 
             "reports and/or IODE database files.</p>" + 
             "<p align='left'>To open file(s) from the file tree (left panel):<br>" + 
             "- double click on a file,<br>" +
-            "- select several files with CTRL and then press ENTER.</p>");
+            "- select several files with CTRL and then press ENTER.</p> " + 
+            "<p align='left'>To edit/estimate an equation or a table:<br>"
+            "- click on the equation or table you want to edit/estimate,<br>" +
+            "- press CTRL + ENTER.</p> "
+            );
         treeView_file_explorer->hide();
         tabWidget_IODE_objs->hide();
         dockWidget_file_explorer->hide();
