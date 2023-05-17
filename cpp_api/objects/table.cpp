@@ -431,8 +431,10 @@ int Table::addTitle(const std::string& title)
 std::string Table::getTitle(const int row) const
 {
 	TLINE* title_line = getLine(row);
-	if (title_line->tl_type != IT_TITLE) throw IodeExceptionFunction("Cannot get table title", 
-		"Line at position " + std::to_string(row) + " is not a TITLE line.");
+	EnumLineType line_type = (EnumLineType) title_line->tl_type;
+	if (line_type != IT_TITLE) throw IodeExceptionFunction("Cannot get table title.", 
+		"Line at position " + std::to_string(row) + " is not a Title line but of type " + 
+		get_line_type(line_type) + ".");
 	std::string title = getCellContent(row, 0, false);
 	return title;
 }
