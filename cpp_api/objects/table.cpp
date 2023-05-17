@@ -597,7 +597,8 @@ TLINE* Table::getLine(const int row) const
 			"Line position must be in range [0, " + std::to_string(nbLines()) + "]");
 		error.add_argument("line position", std::to_string(row));
 		throw error;
-	}	
+	}
+
 	return &c_table->t_line[row];
 }
 
@@ -610,6 +611,7 @@ int Table::insertLine(const int pos, const EnumLineType line_type, const bool af
 		error.add_argument("new line position", std::to_string(pos));
 		throw error;
 	}
+
 	int where_ = after ? 1 : 0;
 	int new_pos = T_insert_line(c_table, pos, line_type, where_);
 	if (new_pos < 0) throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
@@ -626,13 +628,34 @@ void Table::freeLine(const int row)
 TCELL* Table::getCell(const int row, const int column, const bool divider) const
 {
 	TLINE* line = divider ? &c_table->t_div : getLine(row);
+
 	if (column < 0 || column > nbColumns())
 	{
-		IodeExceptionInvalidArguments error("Cannot get table cell content",  
-			"Cell position must be in range [0, " + std::to_string(nbColumns()) + "]");
-		error.add_argument("cell position", std::to_string(column));
+		IodeExceptionInvalidArguments error("Cannot get table cell at position (" +
+			std::to_string(row), + ", " + std::to_string(column) + ").\n" +   
+			"Cell column must be in range [0, " + std::to_string(nbColumns()) + "]");
+		error.add_argument("cell position", std::to_string(row) + ", " + std::to_string(column));
 		throw error;
 	}
+
+	EnumLineType line_type = (EnumLineType) line->tl_type;
+	if(line_type != IT_CELL && line_type != IT_TITLE)
+	{
+		IodeExceptionInvalidArguments error("Cannot get table cell or title at position (" +
+			std::to_string(row), + ", " + std::to_string(column) + ").\n" + 
+			"Expected line of type Cell or Title but got line of type " + get_line_type(line_type) + ".");
+		error.add_argument("cell position", std::to_string(row) + ", " + std::to_string(column));
+		throw error;
+	}
+
+	if(line_type == IT_TITLE && column > 0)
+	{
+		IodeExceptionInvalidArguments error("Line at position " + std::to_string(row) + 
+			" is of type Title.\nDid you expect line of type Cell?");
+		error.add_argument("cell position", std::to_string(row) + ", " + std::to_string(column));
+		throw error;
+	}
+
 	TCELL* cell = &reinterpret_cast<TCELL*>(line->tl_val)[column];
 	return cell;
 }
