@@ -418,8 +418,7 @@ void Table::setCellDividerLec(const int column, const std::string& lec)
 int Table::insertTitle(const int pos, const std::string& title, const bool after)
 {
 	int title_pos = insertLine(pos, IT_TITLE, after);
-	std::string title_oem = utf8_to_oem(title);
-	c_table->t_line[title_pos].tl_val = to_char_array(title_oem);
+	setTitle(title_pos, title);
 	return title_pos;
 }
 
