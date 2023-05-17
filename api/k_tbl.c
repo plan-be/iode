@@ -281,7 +281,7 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
  *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
  *  @param [in]      nbr     int     reference position of the new line in TBL (see param where below)
  *  @param [in]      type    int     TLINE type (KT_CELL, KT_TITLE...)
- *  @param [in]      where   int     0 to insert before line nbr, 1 to insert after line nbr
+ *  @param [in]      where   int     1 to insert before line nbr, 0 to insert after line nbr
  *  @return                  int     position of the new line in TBL
  *  **TODO: Check where definition 
  */
