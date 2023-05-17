@@ -594,8 +594,9 @@ TLINE* Table::getLine(const int row) const
 {
 	if (row < 0 || row > nbLines())
 	{
-		IodeExceptionInvalidArguments error("Cannot get table line", 
-			"Line position must be in range [0, " + std::to_string(nbLines()) + "]");
+		IodeExceptionInvalidArguments error("Cannot get table line at position " + 
+			std::to_string(row) + ".\nLine position must be in range [0, " + 
+			std::to_string(nbLines()) + "]");
 		error.add_argument("line position", std::to_string(row));
 		throw error;
 	}
@@ -619,9 +620,58 @@ int Table::insertLine(const int pos, const EnumLineType line_type, const bool af
 	return new_pos;
 }
 
+void Table::deleteLine(const int row)
+{
+	if(row >= nbLines())
+	{
+		IodeExceptionInvalidArguments error("Cannot delete row at position " + std::to_string(row));
+		error.add_argument("position of the row to delete: ", std::to_string(row));
+		error.add_argument("number of rows: ", std::to_string(nbLines()));
+		throw error;
+	}
+
+	// pointer to all lines of the table
+    TLINE* lines = c_table->t_line;
+
+    /* free line at position row */
+    TLINE* line = getLine(row);
+	EnumLineType line_type = getLineType(row);
+	std::string content;
+	if(line_type == IT_CELL)
+		content = getCellContent(row, 0, false);
+    T_free_line(line, nbColumns());
+
+    /* shift all lines after position row + 1 */
+	if(row < nbLines() - 1)
+    	memcpy(lines + row, lines + row + 1, (c_table->t_nl - row - 1) * sizeof(TLINE));
+
+	// update the total number of lines
+    c_table->t_nl--;
+
+    if(c_table->t_nl > 0) 
+	{
+		// set the last line of the table to 0 
+		memset(lines + c_table->t_nl, 0, sizeof(TLINE));
+		// reserve memory if needed
+		if(c_table->t_nl % KT_CHUNCK == 0)
+			c_table->t_line = (TLINE *) SW_nrealloc(lines, 
+				sizeof(TLINE) * (c_table->t_nl + KT_CHUNCK), sizeof(TLINE) * c_table->t_nl);
+	}
+    else 
+	{
+		SW_nfree(c_table->t_line);
+		c_table->t_line = NULL;
+	}
+}
+
 void Table::freeLine(const int row)
 {
 	T_free_line(getLine(row), nbColumns());
+}
+
+void Table::freeCell(const int row, const int column)
+{
+	T_free_cell(getCell(row, column));
 }
 
 // ================ CELLS (PRIVATE) ================
@@ -659,9 +709,4 @@ TCELL* Table::getCell(const int row, const int column, const bool divider) const
 
 	TCELL* cell = &reinterpret_cast<TCELL*>(line->tl_val)[column];
 	return cell;
-}
-
-void Table::freeCell(const int row, const int column)
-{
-	T_free_cell(getCell(row, column));
 }

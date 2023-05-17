@@ -267,6 +267,15 @@ public:
 
 	// -------- FREE --------
 
+	/**
+	 * @brief 
+	 * 
+	 * @param row 
+	 * 
+	 * @note see T_del_line() function from the source file o_tab.c from the old GUI.
+	 */
+	void deleteLine(const int row);
+
 	void freeLine(const int row);
 
 	void freeCell(const int row, const int column);
