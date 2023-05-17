@@ -99,15 +99,38 @@ TEST_F(TablesTest, Divider)
 
 TEST_F(TablesTest, LineTitle)
 {
+    int new_pos;
     std::string expected_title = "Compte de l'ensemble des administrations publiques";
 
+    // get
     EXPECT_EQ(table->getLineType(0), IT_TITLE);
     std::string title = table->getTitle(0);
     EXPECT_EQ(title, expected_title + " ");
 
+    // set
     std::string new_title = "New Title with special characters !@µèéï";
     table->setTitle(0, new_title);
     title = table->getTitle(0);
+    EXPECT_EQ(title, new_title);
+
+    // add
+    int nb_lines = table->nbLines();
+    new_title = "New title";
+    new_pos = table->addTitle(new_title);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, table->nbLines() - 1);
+    title = table->getTitle(new_pos);
+    EXPECT_EQ(title, new_title);
+
+    // delete
+    table->deleteLine(new_pos);
+    EXPECT_EQ(table->nbLines(), nb_lines);
+
+    // insert 
+    new_pos = table->insertTitle(25, new_title, true);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, 26);
+    title = table->getTitle(new_pos);
     EXPECT_EQ(title, new_title);
 }
 
@@ -181,26 +204,137 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(table->isCellBoldFont(7, 0));
     EXPECT_TRUE(table->isCellItalicFont(7, 0));
     EXPECT_FALSE(table->isCellUnderlineFont(7, 0));
+
+    // add - delete - insert
+    int new_pos;
+    std::string cell1_content = table->getCellContent(5, 0, false);
+    std::string cell2_content = table->getCellContent(5, 1, false);
+
+    // ---- add
+    int nb_lines = table->nbLines();
+    new_pos = table->addLineWithCells();
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, table->nbLines() - 1);
+
+    table->setCellText(new_pos, 0, cell1_content);
+    EXPECT_EQ(table->getCellType(new_pos, 0), IT_STRING);
+    EXPECT_EQ(table->getCellContent(new_pos, 0, false), cell1_content);
+
+    table->setCellLec(new_pos, 1, cell2_content);
+    EXPECT_EQ(table->getCellType(new_pos, 1), IT_LEC);
+    EXPECT_EQ(table->getCellContent(new_pos, 1, false), cell2_content);
+
+    // ---- delete
+    table->deleteLine(new_pos);
+    EXPECT_EQ(table->nbLines(), nb_lines);
+
+    // ---- insert 
+    new_pos = table->insertLineWithCells(25, true);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, 26);
+
+    table->setCellText(new_pos, 0, cell1_content);
+    EXPECT_EQ(table->getCellType(new_pos, 0), IT_STRING);
+    EXPECT_EQ(table->getCellContent(new_pos, 0, false), cell1_content);
+
+    table->setCellLec(new_pos, 1, cell2_content);
+    EXPECT_EQ(table->getCellType(new_pos, 1), IT_LEC);
+    EXPECT_EQ(table->getCellContent(new_pos, 1, false), cell2_content);
 }
 
 TEST_F(TablesTest, LineSeparator)
 {
+    int new_pos;
     std::vector<int> line_positions = {2, 4, 26, 30};
 
     for (const int row: line_positions) EXPECT_EQ(table->getLineType(row), IT_LINE);
+
+    // add
+    int nb_lines = table->nbLines();
+    new_pos = table->addLineSeparator();
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, table->nbLines() - 1);
+    EXPECT_EQ(table->getLineType(new_pos), IT_LINE);
+
+    // delete
+    table->deleteLine(new_pos);
+    EXPECT_EQ(table->nbLines(), nb_lines);
+
+    // insert 
+    new_pos = table->insertLineSeparator(25, true);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, 26);
+    EXPECT_EQ(table->getLineType(new_pos), IT_LINE);
 }
 
 TEST_F(TablesTest, LineMode)
 {
+    int new_pos;
+
     EXPECT_EQ(table->getLineType(27), IT_MODE);
+
+    // add
+    int nb_lines = table->nbLines();
+    new_pos = table->addLineMode();
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, table->nbLines() - 1);
+    EXPECT_EQ(table->getLineType(new_pos), IT_MODE);
+
+    // delete
+    table->deleteLine(new_pos);
+    EXPECT_EQ(table->nbLines(), nb_lines);
+
+    // insert 
+    new_pos = table->insertLineMode(25, true);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, 26);
+    EXPECT_EQ(table->getLineType(new_pos), IT_MODE);
 }
 
 TEST_F(TablesTest, LineFiles)
 {
+    int new_pos;
+
     EXPECT_EQ(table->getLineType(28), IT_FILES);
+
+    // add
+    int nb_lines = table->nbLines();
+    new_pos = table->addLineFiles();
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, table->nbLines() - 1);
+    EXPECT_EQ(table->getLineType(new_pos), IT_FILES);
+
+    // delete
+    table->deleteLine(new_pos);
+    EXPECT_EQ(table->nbLines(), nb_lines);
+
+    // insert 
+    new_pos = table->insertLineFiles(25, true);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, 26);
+    EXPECT_EQ(table->getLineType(new_pos), IT_FILES);
 }
 
 TEST_F(TablesTest, LineDate)
 {
+    int new_pos;
+
     EXPECT_EQ(table->getLineType(29), IT_DATE);
+
+    // add
+    int nb_lines = table->nbLines();
+    new_pos = table->addLineDate();
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, table->nbLines() - 1);
+    EXPECT_EQ(table->getLineType(new_pos), IT_DATE);
+
+    // delete
+    table->deleteLine(new_pos);
+    EXPECT_EQ(table->nbLines(), nb_lines);
+
+    // insert 
+    new_pos = table->insertLineDate(25, true);
+    EXPECT_EQ(table->nbLines(), nb_lines + 1);
+    EXPECT_EQ(new_pos, 26);
+    EXPECT_EQ(table->getLineType(new_pos), IT_DATE);
 }
