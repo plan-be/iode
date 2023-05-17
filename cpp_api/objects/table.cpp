@@ -614,7 +614,7 @@ int Table::insertLine(const int pos, const EnumLineType line_type, const bool af
 		throw error;
 	}
 
-	int where_ = after ? 1 : 0;
+	int where_ = after ? 0 : 1;
 	int new_pos = T_insert_line(c_table, pos, line_type, where_);
 	if (new_pos < 0) throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
 	return new_pos;
