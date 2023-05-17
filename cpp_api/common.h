@@ -64,8 +64,8 @@ struct IodeRegexName
 enum EnumLang
 {
     IT_ENGLISH,
-    IT_FRENCH,
-    IT_DUTCH
+    IT_DUTCH,
+    IT_FRENCH
 };
 
 const static int I_NB_LANGS = 3;
