@@ -79,6 +79,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_graph">
+       <property name="text">
+        <string>Graph</string>
+       </property>
+       <property name="shortcut">
+        <string>F8</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="cancelButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -263,10 +273,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_graph</sender>
+   <signal>clicked()</signal>
+   <receiver>QIodeEditTable</receiver>
+   <slot>plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>573</x>
+     <y>51</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>310</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>edit()</slot>
   <slot>help()</slot>
   <slot>insert_line()</slot>
+  <slot>plot()</slot>
  </slots>
 </ui>
