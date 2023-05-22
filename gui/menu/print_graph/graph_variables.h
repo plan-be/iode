@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
-#include "plot/plot.h"
+#include "plot/plot_vars.h"
 #include "custom_widgets/completer.h"
 #include "menu/file/file_print_setup.h"
 

@@ -115,20 +115,41 @@ QList<QString> VariablesView::extractVariablesNamesFromTo()
 
 void VariablesView::plot_series()
 {
-	QList<QString> variableNames = extractVariablesNamesFromTo();
-	QString to = variableNames.takeLast();
-	QString from = variableNames.takeLast();
+	try
+	{
+		QList<QString> variableNames = extractVariablesNamesFromTo();
+		QString to = variableNames.takeLast();
+		QString from = variableNames.takeLast();
 
-	QIodePlotDialog* plotDialog = new QIodePlotDialog();
-	plotDialog->plot(variableNames, from, to);
-	emit newPlot(plotDialog);
+		QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog();
+
+		KDBVariables kdb_var;
+		plotDialog->setPeriods(kdb_var.get_sample(), from, to);
+
+		foreach(const QString& variable, variableNames)
+			plotDialog->addSeries(variable);
+
+		plotDialog->plot();
+		emit newPlot(plotDialog);
+	}
+	catch(const std::exception& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
+	}
 }
 
 void VariablesView::open_graphs_dialog()
 {
-	QList<QString> variableNames = extractVariablesNamesFromTo();
-	QString to = variableNames.takeLast();
-	QString from = variableNames.takeLast();
+	try
+	{
+		QList<QString> variableNames = extractVariablesNamesFromTo();
+		QString to = variableNames.takeLast();
+		QString from = variableNames.takeLast();
 
-	emit newGraphsDialog(variableNames, from, to);
+		emit newGraphsDialog(variableNames, from, to);
+	}
+	catch(const std::exception& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
+	}
 }
