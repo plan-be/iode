@@ -55,6 +55,7 @@ set(GUI_CUSTOM_WIDGETS
 set(GUI_PLOT
     plot/plot.h         plot/plot.cpp
     plot/plot_vars.h    plot/plot_vars.cpp
+    plot/plot_table.h   plot/plot_table.cpp
 )
 
 set(GUI_EDIT_OBJECT
