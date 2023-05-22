@@ -2,7 +2,7 @@
 
 
 QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::WindowFlags f) 
-	: QIodeSettings(parent, f)
+	: QIodeSettings(parent, f), tableName(tableName)
 {
 	setupUi(this);
 
@@ -21,6 +21,9 @@ QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::Wi
 	shortcutDelete->setContext(Qt::WidgetWithChildrenShortcut);
 
 	connect(shortcutDelete, &QShortcut::activated, this, &QIodeEditTable::delete_line);
+
+	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowPlot::appendPlot);
 
 	loadSettings();
 }
@@ -46,6 +49,26 @@ void QIodeEditTable::edit()
 	}
 }
 
+void QIodeEditTable::plot()
+{
+	try
+	{
+        KDBVariables kdb_var;
+        Sample smpl = kdb_var.get_sample();
+        QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+ 
+        GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample.toStdString());
+
+        QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
+        plotDialog->plot();
+        emit newPlot(plotDialog);
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+	}
+}
+
 void QIodeEditTable::insert_line()
 {
 	try
@@ -60,20 +83,21 @@ void QIodeEditTable::insert_line()
 
 		int insertWhere = wInsertWhere->extractAndVerify();
 
+		int new_pos;
 		switch(insertWhere)
 		{
 		case INSERT_AT_THE_END:
-			tables_model->appendLine(lineType);
+			new_pos = tables_model->appendLine(lineType);
 			break;
 		case INSERT_AFTER_CURRENT:
 			if(position < 0)
 				return;
-			tables_model->insertLine(lineType, position, true);
+			new_pos = tables_model->insertLine(lineType, position, true);
 			break;
 		case INSERT_BEFORE_CURRENT:
 			if(position < 0)
 				return;
-			tables_model->insertLine(lineType, position, false);
+			new_pos = tables_model->insertLine(lineType, position, false);
 			break;
 		default:
 			break;

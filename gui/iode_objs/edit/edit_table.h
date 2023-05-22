@@ -12,6 +12,10 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 
+#include "plot/plot_table.h"
+#include "main_window_plot.h"
+#include "iode_objs/models/gsample_table_model.h"
+
 
 enum EnumInsertWhere
 {
@@ -33,6 +37,8 @@ class QIodeEditTable : public QIodeSettings, public Ui::QIodeEditTable
 {
     Q_OBJECT
 
+    QString tableName;
+
     QShortcut* shortcutDelete;
 
     WrapperComboBox* wInsertLineType;
@@ -44,8 +50,12 @@ public:
     QIodeEditTable(const QString& tableName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeEditTable();
 
+signals:
+    void newPlot(QIodePlotDialog* plotDialog);
+
 public slots:
     void edit();
+    void plot();
     void insert_line();
     void delete_line();
     void help();
