@@ -1,20 +1,10 @@
 #include "plot.h"
 
 
-QIodePlotDialog::QIodePlotDialog(KDBVariables* kdb_vars, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodePlotDialog::QIodePlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIodeGraphAxisThicks xTicks, 
+    EnumIodeGraphAxisThicks yTicks, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f), chartType(chartType), 
+    logScale(logScale), xTicks(xTicks), yTicks(yTicks), fixedMinY(NAN), fixedMaxY(NAN)
 {
-    // set KDB Variables
-    if(kdb_vars)
-    {
-        this->kdb_vars = kdb_vars;
-        deleteKDB = false;
-    }
-    else
-    {
-        this->kdb_vars = new KDBVariables();
-        deleteKDB = true;
-    }
-
     // prepare chart
     chart = new QChart();
     chart->setAnimationOptions(QChart::AllAnimations);
@@ -26,7 +16,7 @@ QIodePlotDialog::QIodePlotDialog(KDBVariables* kdb_vars, QWidget* parent, Qt::Wi
     chartView->setRubberBand(QChartView::RectangleRubberBand);
 
     // layout
-    QGridLayout* layout = new QGridLayout();
+    layout = new QGridLayout();
 
     QMenuBar* menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
@@ -39,12 +29,8 @@ QIodePlotDialog::QIodePlotDialog(KDBVariables* kdb_vars, QWidget* parent, Qt::Wi
     connect(comboChartType, &QComboBox::currentIndexChanged, this, &QIodePlotDialog::updateChartType);
     layout->addWidget(comboChartType, 1, 0);
 
-    comboXAxisType = new QComboBox();
-    QStringList q_axis_types;
-    for(const std::string& axis_type: vGraphsXAxisTypes) q_axis_types << QString::fromStdString(axis_type);
-    comboXAxisType->addItems(q_axis_types);
-    connect(comboXAxisType, &QComboBox::currentIndexChanged, this, &QIodePlotDialog::updateXAxisType);
-    layout->addWidget(comboXAxisType, 1, 1, Qt::AlignCenter);
+    QSpacerItem* horizontalSpacer = new QSpacerItem(0, 20);
+    layout->addItem(horizontalSpacer, 0, 1);
 
     checkYScale = new QCheckBox("Log Scale");
     connect(checkYScale, &QCheckBox::stateChanged, this, &QIodePlotDialog::enableLogScale);
@@ -75,16 +61,12 @@ QIodePlotDialog::QIodePlotDialog(KDBVariables* kdb_vars, QWidget* parent, Qt::Wi
 QIodePlotDialog::~QIodePlotDialog()
 {
     delete comboChartType;
-    delete comboXAxisType;
     delete checkYScale;
     delete comboXTicks;
     delete comboYTicks;
 
     delete chart;
     delete chartView;
-
-    if(deleteKDB)
-        delete kdb_vars;
 }
 
 void QIodePlotDialog::setMenuBar(QMenuBar* menuBar)
@@ -114,29 +96,6 @@ void QIodePlotDialog::setMenuBar(QMenuBar* menuBar)
     closeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q));
     connect(closeAction, &QAction::triggered, this, &QIodePlotDialog::close);
     menuFile->addAction(closeAction);
-}
-
-QAbstractSeries::SeriesType QIodePlotDialog::iodeChartTypeToQtSeriesType(const EnumIodeGraphChart chartType)
-{
-    QAbstractSeries::SeriesType seriesType;
-
-    switch (chartType)
-    {
-    case I_G_CHART_LINE:
-        seriesType = QAbstractSeries::SeriesTypeLine;
-        break;
-    case I_G_CHART_SCATTER:
-        seriesType = QAbstractSeries::SeriesTypeScatter;
-        break;
-    case I_G_CHART_BAR:
-        seriesType = QAbstractSeries::SeriesTypeBar;
-        break;
-    default:
-        seriesType = QAbstractSeries::SeriesTypeLine;
-        break;
-    }
-
-    return seriesType;
 }
 
 // Note: see https://doc.qt.io/qt-6/qtcharts-zoomlinechart-example.html
@@ -224,15 +183,11 @@ void QIodePlotDialog::print()
 
 void QIodePlotDialog::updateChartType(int index)
 {
-    EnumIodeGraphAxisType axisType = (EnumIodeGraphAxisType) comboXAxisType->currentIndex();
-    QAbstractSeries::SeriesType seriesType = iodeChartTypeToQtSeriesType((EnumIodeGraphChart) index);
-    buildSeries(seriesType, axisType);
-}
+    if(index < 0 || index >= I_NB_CHART_TYPES)
+        return;
 
-void QIodePlotDialog::updateXAxisType(int XAxisType)
-{
-    QAbstractSeries::SeriesType seriesType = chart->series()[0]->type();
-    buildSeries(seriesType, (EnumIodeGraphAxisType) XAxisType);
+    chartType = (EnumIodeGraphChart) index;
+    buildSeries();
 }
 
 void QIodePlotDialog::enableLogScale(int state)
@@ -243,9 +198,15 @@ void QIodePlotDialog::enableLogScale(int state)
         chart->removeAxis(Yaxis);
 
         if (state == Qt::Checked)
+        {
+            logScale = true;
             Yaxis = createYLogAxis();
+        }
         else
+        {
+            logScale = false;
             Yaxis = createYAxis();
+        }
 
         chart->setAxisY(Yaxis);
         foreach(QAbstractSeries* series, chart->series()) series->attachAxis(Yaxis);
@@ -254,6 +215,10 @@ void QIodePlotDialog::enableLogScale(int state)
 
 void QIodePlotDialog::updateXTicks(int index)
 {
+    if(index < 0 || index >= I_NB_AXIS_THICKS)
+        return;
+
+    xTicks = (EnumIodeGraphAxisThicks) index;
     QAbstractAxis* Xaxis = chart->axisX();
 
     switch (index)
@@ -277,6 +242,10 @@ void QIodePlotDialog::updateXTicks(int index)
 
 void QIodePlotDialog::updateYTicks(int index)
 {
+    if(index < 0 || index >= I_NB_AXIS_THICKS)
+        return;
+
+    yTicks = (EnumIodeGraphAxisThicks) index;
     QAbstractAxis* Yaxis = chart->axisY();
 
     switch (index)
@@ -298,21 +267,38 @@ void QIodePlotDialog::updateYTicks(int index)
     }
 }
 
-void QIodePlotDialog::plot(const QStringList& variables_names, const QString& from, const QString& to, 
-    const QString& title, const QList<QString>& legend, const EnumIodeGraphChart chartType, 
-    const EnumIodeGraphAxisType axisType, const bool logScale, const EnumIodeGraphAxisThicks xTicks, 
-    const EnumIodeGraphAxisThicks yTicks, const double minY, const double maxY)
+void QIodePlotDialog::setPeriods(const Sample& sample, const QString& from, const QString& to)
 {
-    // reset axes and series
-    chart->removeAllSeries();
-    foreach(QAbstractAxis* axis, chart->axes()) chart->removeAxis(axis);
+    if(from.isEmpty())
+    {
+        Period start_period = sample.start_period();
+        this->from = QString::fromStdString(start_period.to_string());
+        start_t = 0;
+        minX = start_period.to_double();
+    }
+    else
+    {
+        Period start_period(from.toStdString());
+        this->from = from;
+        start_t = sample.get_period_position(start_period);
+        minX = start_period.to_double();
+    }
 
-    // extract time range
-    Sample full_sample = kdb_vars->get_sample();
-    Period start_period(from.toStdString());
-    Period end_period(to.toStdString());
-    start_t = full_sample.get_period_position(start_period);
-    end_t = full_sample.get_period_position(end_period);
+    if(to.isEmpty())
+    {
+        Period end_period = sample.end_period();
+        this->to = QString::fromStdString(end_period.to_string());
+        end_t = sample.get_period_position(end_period);
+        maxX = end_period.to_double();
+    }
+    else
+    {
+        Period end_period(to.toStdString());
+        this->to = to;
+        end_t = sample.get_period_position(end_period);
+        maxX = end_period.to_double();
+    }
+    
     if(start_t >= end_t)
     {
         std::string msg = "Cannot create a plot since the starting period " + from.toStdString() + " is ";
@@ -320,45 +306,19 @@ void QIodePlotDialog::plot(const QStringList& variables_names, const QString& fr
         msg += "the ending period " + to.toStdString();
         throw IodeExceptionFunction(msg);
     }
+
     nb_periods = end_t - start_t + 1;
+    stepX = 1. / sample.start_period().nb_periods_per_year();
+}
 
-    this->from = from;
-    this->to = to;
-
-    // set list of variables and legend
-    variablesNames = variables_names;
-    if(legend.size() > 0 && (legend.size() != variables_names.size()))
-        QMessageBox::warning(nullptr, "WARNING", "Expected legend list of the same size of the variables names list");
-    else
-        this->legend = legend;
-
-    // set min and max X value
-    minX = start_period.to_double();
-    maxX = end_period.to_double();
-    stepX = 1. / start_period.nb_periods_per_year();
-
-    // set min and max Y value
-    fixedMinY = minY;
-    fixedMaxY = maxY;
-
+void QIodePlotDialog::plot()
+{
     // prepare series
-    QAbstractSeries::SeriesType seriesType = iodeChartTypeToQtSeriesType(chartType);
-    buildSeries(seriesType, axisType);
+    buildSeries();
 
     // title
-    QString title_;
-    if(title.isEmpty())
-    {
-        QString s_axisType = QString::fromStdString(vGraphsXAxisTypes[axisType]);
-        title_ = variables_names.join(" - ") + " (" + s_axisType + ")";
-    }
-    else
-        title_ = title;
-    
+    QString title_ = (title.isEmpty()) ? defaultTitle() : title;
     chart->setTitle(title_);
-
-    // set to logscale
-    if (logScale) enableLogScale(Qt::Checked);
 }
 
 QValueAxis* QIodePlotDialog::createXAxis()
@@ -438,37 +398,35 @@ QLogValueAxis* QIodePlotDialog::createYLogAxis()
     return YLogAxis;
 }
 
-void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, const EnumIodeGraphAxisType axisType)
+void QIodePlotDialog::buildSeries()
 {
-    double value;
-    QList<double> values;
+    QVector<double> values;
     QList<QAbstractSeries*> list_series;
-    QStringList varsList;
     double minValue;
     double maxValue;
+    QString legend;
+    QAbstractAxis* Xaxis;
 
     chart->removeAllSeries();
+    foreach(QAbstractAxis* axis, chart->axes()) chart->removeAxis(axis);
 
     try
     {
+        QMap<QString, QVector<double>>::const_iterator it = chart_series.constBegin();
+
         // prepare series
         double XValue;
-        QString var_name;
-        QString var_legend;
-        switch (seriesType)
+        switch (chartType)
         {
-        case QAbstractSeries::SeriesTypeLine:
-            for(int v=0; v < variablesNames.size(); v++)
+        case EnumIodeGraphChart::I_G_CHART_LINE :
+            while (it != chart_series.constEnd())
             {
-                var_name = variablesNames[v];
-                var_legend = (legend.size() > 0) ? legend[v] : var_name;
                 QLineSeries* series = new QLineSeries();
-                series->setName(var_legend);
-                varsList << var_name;
+                legend = legend_series[it.key()];
+                series->setName(legend);
                 XValue = minX;
-                for(int t = start_t; t <= end_t; t++)
+                foreach(const double value, it.value())
                 {
-                    value = kdb_vars->get_var(var_name.toStdString(), t, axisType);
                     if(L_ISAN(value))
                     {
                         series->append(XValue, value);
@@ -478,24 +436,19 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
                 }
                 chart->addSeries(series);
                 list_series << series;
-                // X axis
-                QValueAxis* Xaxis = createXAxis();
-                chart->setAxisX(Xaxis);
-                foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+                ++it;
             }
+            Xaxis = createXAxis();
             break;
-        case QAbstractSeries::SeriesTypeScatter:
-            for(int v=0; v < variablesNames.size(); v++)
+        case EnumIodeGraphChart::I_G_CHART_SCATTER :
+            while (it != chart_series.constEnd())
             {
-                var_name = variablesNames[v];
-                var_legend = (legend.size() > 0) ? legend[v] : var_name;
                 QScatterSeries* series = new QScatterSeries();
-                series->setName(var_legend);
-                varsList << var_name;
+                legend = legend_series[it.key()];
+                series->setName(legend);
                 XValue = minX;
-                for(int t = start_t; t <= end_t; t++)
+                foreach(const double value, it.value())
                 {
-                    value = kdb_vars->get_var(var_name.toStdString(), t, axisType);
                     if(L_ISAN(value))
                     {
                         series->append(XValue, value);
@@ -505,35 +458,30 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
                 }
                 chart->addSeries(series);
                 list_series << series;
-                // X axis
-                QValueAxis* Xaxis = createXAxis();
-                chart->setAxisX(Xaxis);
-                foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+                ++it;
             }
+            Xaxis = createXAxis();
             break;
-        case QAbstractSeries::SeriesTypeBar:
+        case EnumIodeGraphChart::I_G_CHART_BAR :
             QBarSeries* series = new QBarSeries();
-            for(int v=0; v < variablesNames.size(); v++)
-            {                
-                var_name = variablesNames[v];
-                var_legend = (legend.size() > 0) ? legend[v] : var_name;
-                QBarSet *set = new QBarSet(var_legend);
-                varsList << var_name;
-                for(int t = start_t; t <= end_t; t++)
-                {
-                    value = kdb_vars->get_var(var_name.toStdString(), t, axisType);
-                    if(!L_ISAN(value)) value = 0.0;
-                    values << value;
+            while (it != chart_series.constEnd())
+            {
+                legend = legend_series[it.key()];                
+                QBarSet *set = new QBarSet(legend);
+                foreach(const double value, it.value())
+                { 
+                    if(!L_ISAN(value)) 
+                        values << 0.0;
+                    else
+                        values << value;
                     set->append(value);
                 }
                 series->append(set);
+                ++it;
             }
             chart->addSeries(series);
             list_series << series;
-            // X axis
-            QBarCategoryAxis* Xaxis = createXBarAxis();
-            chart->setAxisX(Xaxis);
-            foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+            Xaxis = createXBarAxis();
             break;
         }
     }
@@ -542,9 +490,13 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
         QMessageBox::critical(nullptr, "ERROR", QString::fromStdString(e.what()));
     }
 
+    // X axis
+    chart->setAxisX(Xaxis);
+    foreach(QAbstractSeries* series, list_series) series->attachAxis(Xaxis);
+
+    // Y axis
     if(values.size() > 0)
     {
-        // Y axis
         computeMinMaxIntervalYAxis(values);
         QValueAxis* Yaxis = createYAxis();
         chart->setAxisY(Yaxis);
@@ -555,8 +507,4 @@ void QIodePlotDialog::buildSeries(const QAbstractSeries::SeriesType seriesType, 
         QMessageBox::warning(this, "WARNING", QString("Couldn't find any valid value for the Y axis ") +
             "for the sample from " + from + " to " + to);
     }
-
-    // title
-    QString s_axisType = QString::fromStdString(vGraphsXAxisTypes[axisType]);
-    chart->setTitle(varsList.join(" - ") + " (" + s_axisType + ")");
 }

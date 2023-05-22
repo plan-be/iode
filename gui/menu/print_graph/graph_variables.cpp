@@ -70,44 +70,44 @@ void QIodeMenuGraphVariables::display()
 {
     try
     {
-        std::string vars_names = wVariables->extractAndVerify().toStdString();
-        char** list_vars_names = filter_kdb_names(I_VARIABLES, vars_names);
-        int nb_vars = SCR_tbl_size((unsigned char**) list_vars_names);
-        QList<QString> qVarsList;
-        for(int i=0; i<nb_vars; i++) qVarsList << QString::fromStdString(std::string(list_vars_names[i]));
-
-        EnumIodeGraphAxisType axisType = (EnumIodeGraphAxisType) wXAxisType->extractAndVerify();
-        QString from = wFrom->extractAndVerify();
-        QString to = wTo->extractAndVerify();
         EnumIodeGraphChart chartType = (EnumIodeGraphChart) wChartType->extractAndVerify();
+        EnumIodeGraphAxisType axisType = (EnumIodeGraphAxisType) wXAxisType->extractAndVerify();
         bool logScale = wYAxisScale->extractAndVerify();
         EnumIodeGraphAxisThicks xTicks = (EnumIodeGraphAxisThicks) wXTicks->extractAndVerify();
         EnumIodeGraphAxisThicks yTicks = (EnumIodeGraphAxisThicks) wYTicks->extractAndVerify();
+
+        QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(nullptr, chartType, axisType, logScale, xTicks, yTicks);
+
+        // periods for the plot
+        QString from = wFrom->extractAndVerify();
+        QString to = wTo->extractAndVerify();
+        KDBVariables kdb_var;
+        plotDialog->setPeriods(kdb_var.get_sample(), from, to);
+
+        // set min and max Y
         QString qMinY = wMinY->extractAndVerify();
-        double minY = qMinY.isEmpty() ? NAN : qMinY.toDouble();
+        if(!qMinY.isEmpty())
+            plotDialog->setMinValue(qMinY.toDouble());
+
         QString qMaxY = wMaxY->extractAndVerify();
-        double maxY = qMaxY.isEmpty() ? NAN : qMaxY.toDouble();
+        if(!qMaxY.isEmpty())
+            plotDialog->setMaxValue(qMaxY.toDouble());
+
+        // add plot series
+        std::string vars_names = wVariables->extractAndVerify().toStdString();
+        char** list_vars_names = filter_kdb_names(I_VARIABLES, vars_names);
+        int nb_vars = SCR_tbl_size((unsigned char**) list_vars_names);
+        for(int i=0; i<nb_vars; i++)
+        {
+            QString variable = QString::fromStdString(std::string(list_vars_names[i]));
+            plotDialog->addSeries(variable);
+        }
+        
+        // not used
         EnumLang lang = (EnumLang) wLanguage->extractAndVerify();
 
-        // check that the ending period is after the starting period
-        Period start_period(from.toStdString());
-        Period end_period(to.toStdString());
-        int diff_periods = end_period.difference(start_period);
-        if(diff_periods <= 0)
-        {
-            QString msg = "Cannot create a plot since the starting period " + from + " is ";
-            msg += (diff_periods == 0) ? " equal to " : "after ";
-            msg += "the ending period " + to;
-            QMessageBox::critical(this, tr("ERROR"), msg);
-            return;
-        }
-
-        QString title;
-        QList<QString> legend;
-
-        QIodePlotDialog* plotDialog = new QIodePlotDialog();
-        plotDialog->plot(qVarsList, from, to, title, legend, chartType, axisType, logScale, 
-            xTicks, yTicks, minY, maxY);
+        // build the plot
+        plotDialog->plot();
         emit newPlot(plotDialog);
     }
     catch (const std::exception& e)

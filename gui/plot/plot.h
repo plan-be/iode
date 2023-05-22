@@ -2,7 +2,8 @@
 #include "utils.h"
 #include <math.h>
 
-#include <QList>
+#include <QMap>
+#include <QVector>
 #include <QString>
 #include <QDialog>
 #include <QCheckBox>
@@ -40,17 +41,16 @@ class QIodePlotDialog: public QDialog
 {
     Q_OBJECT
 
-    QStringList variablesNames;
-    QStringList legend;
-    KDBVariables* kdb_vars;
-    bool deleteKDB;
-
     QString projectPath;
+
+    QString title;
+    EnumIodeGraphChart chartType;
+    bool logScale;
+    EnumIodeGraphAxisThicks xTicks;
+    EnumIodeGraphAxisThicks yTicks;
 
     QString from;
     QString to;
-    int start_t;
-    int end_t;
     int nb_periods;
 
     double minX;
@@ -63,7 +63,6 @@ class QIodePlotDialog: public QDialog
     double YTickInterval;
 
     QComboBox* comboChartType;
-    QComboBox* comboXAxisType;
     QCheckBox* checkYScale;
     QComboBox* comboXTicks;
     QComboBox* comboYTicks;
@@ -73,30 +72,57 @@ class QIodePlotDialog: public QDialog
 
     QPrinter printer;
 
+protected:
+    QGridLayout* layout;
+
+    QMap<QString, QVector<double>> chart_series;
+    QMap<QString, QString> legend_series;
+    
+    int start_t;
+    int end_t;
+
 public:
-    QIodePlotDialog(KDBVariables* kdb_vars=nullptr, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodePlotDialog(EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
+        EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, 
+        QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodePlotDialog();
 
-    void plot(const QList<QString>& variables_names, const QString& from, const QString& to, const QString& title="", 
-        const QList<QString>& legend=QList<QString>(), const EnumIodeGraphChart chartType=I_G_CHART_LINE, 
-        const EnumIodeGraphAxisType axisType=I_G_LEVEL, const bool logScale=false, 
-        const EnumIodeGraphAxisThicks xTicks=I_G_MAJOR_THICKS, const EnumIodeGraphAxisThicks yTicks=I_G_MAJOR_THICKS, 
-        const double minY=L_NAN, const double maxY=L_NAN);
+    void plot();
+
+    void setTitle(const QString& title)
+    {
+        this->title = title;
+    }
+
+    void setMinValue(const double min)
+    {
+        fixedMinY = min;
+    }
+
+    void setMaxValue(const double max)
+    {
+        fixedMaxY = max;
+    }
+
+    void setPeriods(const Sample& sample, const QString& from = "", const QString& to = "");
 
 private:
     void setMenuBar(QMenuBar* menuBar);
-    QAbstractSeries::SeriesType iodeChartTypeToQtSeriesType(const EnumIodeGraphChart chartType);
     void computeMinMaxIntervalYAxis(const QList<double>& values);
     QValueAxis* createXAxis();
     QBarCategoryAxis* createXBarAxis();
     QValueAxis* createYAxis();
     QLogValueAxis* createYLogAxis();
 
-    void buildSeries(const QAbstractSeries::SeriesType seriesType, const EnumIodeGraphAxisType axisType);
-
 protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
+
+    void buildSeries();
+
+    virtual void buildValues() {}
+
+    virtual QString defaultTitle() = 0;
 
 private slots:
     void renderChart()
@@ -111,7 +137,6 @@ public slots:
     void copyToClipboard();
     void print();
 	void updateChartType(int index);
-    void updateXAxisType(int XAxisType);
     void enableLogScale(int state);
     void updateXTicks(int index);
     void updateYTicks(int index);

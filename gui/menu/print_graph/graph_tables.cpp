@@ -71,7 +71,7 @@ void QIodeMenuGraphTables::display()
 
         QMessageBox::warning(this, "WARNING", "Display is not yet implemented");
 
-        //QIodePlotDialog* plotDialog = new QIodePlotDialog();
+        //QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog();
         //connect(plotDialog, &QIodePlotDialog::finished, this, QIodeMenuGraphTables::freeReferenceKDBs);
         //plotDialog->plot(qVarsList, from, to, chartType, axisType, logScale, xTicks, yTicks, minY, maxY);
         //emit newPlot(plotDialog);

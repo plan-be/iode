@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "wrapper_classes.h"
 #include "iode_objs/models/scalars_model.h"
-#include "plot/plot.h"
+#include "plot/plot_vars.h"
 #include "main_window_plot.h"
 
 

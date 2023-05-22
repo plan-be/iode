@@ -67,32 +67,33 @@ void QIodeEstimationResults::plot_yobs_yest()
     std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
 
-    QString title = QString("Equation %1 : observed and fitted values").arg(QString::fromStdString(nEq.name));
-
     // prepare local Variables KDB
     Variable values;
-    QList<QString> variables_names;
     Sample* sample = est->get_sample();
-    KDBVariables kdb_vars(KDB_LOCAL, "");
-    kdb_vars.set_sample(sample->start_period(), sample->end_period());
+    KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
+    kdb_vars->set_sample(sample->start_period(), sample->end_period());
+
+    QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(kdb_vars);
+
+    // set title
+    QString title = QString("Equation %1 : observed and fitted values").arg(QString::fromStdString(nEq.name));
+    plotDialog->setTitle(title);
+
+    // set the periods for the plot
+    plotDialog->setPeriods(*sample);
 
     // observed values
     values = est->get_observed_values(nEq.name);
-    kdb_vars.add("OBSERVED", values);
-    variables_names << "OBSERVED";
+    kdb_vars->add("OBSERVED", values);
+    plotDialog->addSeries("OBSERVED", lhs + " : observed");
 
     // fitted values
     values = est->get_fitted_values(nEq.name);
-    kdb_vars.add("FITTED", values);
-    variables_names << "FITTED";
+    kdb_vars->add("FITTED", values);
+    plotDialog->addSeries("FITTED", lhs + " : fitted");
 
     // set legend
-    QList<QString> legend;
-    legend << lhs + " : observed";
-    legend << lhs + " : fitted";
-
-    QIodePlotDialog* plotDialog = new QIodePlotDialog(&kdb_vars);
-    plotDialog->plot(variables_names, from, to, title, legend);
+    plotDialog->plot();
     emit newPlot(plotDialog);
 }
 
@@ -103,26 +104,26 @@ void QIodeEstimationResults::plot_residual()
     std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
 
-    QString title = QString("Equation %1 : residuals").arg(QString::fromStdString(nEq.name));
-
     // prepare local Variables KDB
-    Variable values;
-    QList<QString> variables_names;
     Sample* sample = est->get_sample();
-    KDBVariables kdb_vars(KDB_LOCAL, "");
-    kdb_vars.set_sample(sample->start_period(), sample->end_period());
+    KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
+    kdb_vars->set_sample(sample->start_period(), sample->end_period());
+
+    QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(kdb_vars);
+
+    // set title
+    QString title = QString("Equation %1 : residuals").arg(QString::fromStdString(nEq.name));
+    plotDialog->setTitle(title);
+
+    // set the periods for the plot
+    plotDialog->setPeriods(*sample);
 
     // residual values
-    values = est->get_residual_values(nEq.name);
-    kdb_vars.add("RESIDUALS", values);
-    variables_names << "RESIDUALS";
+    Variable values = est->get_residual_values(nEq.name);
+    kdb_vars->add("RESIDUALS", values);
+    plotDialog->addSeries("RESIDUALS", lhs + " : residuals");
 
-    // set legend
-    QList<QString> legend;
-    legend << lhs + " : residuals";
-
-    QIodePlotDialog* plotDialog = new QIodePlotDialog(&kdb_vars);
-    plotDialog->plot(variables_names, from, to, title, legend);
+    plotDialog->plot();
     emit newPlot(plotDialog);
 }
 
