@@ -69,12 +69,12 @@ public:
         return files;
     }
 
-    std::string get_title()
+    std::string get_title() const
     {
         return ref_table->getTitle(0);
     }
 
-    std::string get_line_name(const int line)
+    std::string get_line_name(const int line) const
     {
         if(line >= line_names.size()) 
             throw IodeExceptionFunction("Cannot access line " + std::to_string(line) + 
@@ -82,7 +82,7 @@ public:
         return line_names.at(line);
     }
 
-    std::string get_column_name(const int col)
+    std::string get_column_name(const int col) const
     {
         if(col >= column_names.size()) 
             throw IodeExceptionFunction("Cannot access column " + std::to_string(col) + 
@@ -90,7 +90,7 @@ public:
         return column_names.at(col);
     }
 
-    double get_value(const int line, const int col, const int nb_decimals=2)
+    double get_value(const int line, const int col, const int nb_decimals=2) const
     {
         if(line >= line_names.size()) 
             throw IodeExceptionFunction("Cannot access line " + std::to_string(line) + 
