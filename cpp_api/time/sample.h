@@ -40,17 +40,17 @@ public:
 		return Period(&c_sample->s_p2);
 	}
 
-	int nb_periods()
+	int nb_periods() const
 	{
 		return c_sample->s_nb;
 	}
 
-	int get_period_position(const Period& period)
+	int get_period_position(const Period& period) const
 	{
 		return period.difference(start_period());
 	}
 
-	int get_period_position(const std::string& period)
+	int get_period_position(const std::string& period) const
 	{
 		return get_period_position(Period(period));
 	}
