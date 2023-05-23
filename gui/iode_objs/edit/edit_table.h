@@ -52,6 +52,7 @@ public:
 
 signals:
     void newPlot(QIodePlotDialog* plotDialog);
+    void tableModified();
 
 public slots:
     void edit();

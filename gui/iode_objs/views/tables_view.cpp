@@ -27,6 +27,10 @@ void TablesView::edit_obj()
 	QString name = model()->headerData(section, Qt::Vertical).toString();
 	
 	QIodeEditTable dialog(name, static_cast<QWidget*>(this->parent()));
+
+	// propagate signal
+	connect(&dialog, &QIodeEditTable::tableModified, this, &TablesView::tableModified);
+	
 	dialog.exec();
 	
 	update();
