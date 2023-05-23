@@ -29,7 +29,7 @@ class QIodeEditTableModel : public QAbstractTableModel
 	size_t hashAfter;	
 
 signals:
-	void databaseModified();
+	void tableModified();
 
 public:
     QIodeEditTableModel(const QString& tableName, QWidget* parent = Q_NULLPTR);
@@ -61,7 +61,7 @@ public:
 		{
 			hashAfter = table_hasher(*table->c_table);
 			if(hashAfter != hashBefore) 
-				emit databaseModified();
+				emit tableModified();
 		}
 	}
 

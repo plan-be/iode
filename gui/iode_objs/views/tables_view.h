@@ -33,6 +33,9 @@ public:
 		delete editShortcutReturn;
 	}
 
+signals:
+    void tableModified();
+
 public slots:
 	void filter() { filter_and_update(); }
 	void print();

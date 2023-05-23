@@ -492,6 +492,7 @@ public:
         connect(objmodel, &TablesModel::rowsRemoved, this, &QIodeTablesWidget::KDBModified);
         connect(objmodel, &TablesModel::databaseModified, this, &QIodeTablesWidget::KDBModified);
         connect(tableview, &TablesView::newObjectInserted, this, &QIodeTablesWidget::KDBModified);
+        connect(tableview, &TablesView::tableModified, this, &QIodeTablesWidget::KDBModified);
     }
 };
 

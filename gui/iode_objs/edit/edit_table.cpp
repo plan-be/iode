@@ -25,7 +25,13 @@ QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::Wi
 	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
 	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowPlot::appendPlot);
 
+	// propagate signal
+	QIodeEditTableModel* table_model = static_cast<QIodeEditTableModel*>(tableView->model());
+	connect(table_model, &QIodeEditTableModel::tableModified, this, &QIodeEditTable::tableModified);
+
 	loadSettings();
+
+	table_model->computeHash(true);
 }
 
 QIodeEditTable::~QIodeEditTable()
@@ -40,7 +46,10 @@ void QIodeEditTable::edit()
 {
 	try
 	{
-		static_cast<QIodeEditTableModel*>(tableView->model())->save();
+		QIodeEditTableModel* table_model = static_cast<QIodeEditTableModel*>(tableView->model());
+		table_model->save();
+		table_model->computeHash();
+
 		this->accept();
 	}
 	catch (const std::exception& e)
