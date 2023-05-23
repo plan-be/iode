@@ -338,3 +338,9 @@ TEST_F(TablesTest, LineDate)
     EXPECT_EQ(new_pos, 26);
     EXPECT_EQ(table->getLineType(new_pos), IT_DATE);
 }
+
+TEST_F(TablesTest, Hash)
+{
+    boost::hash<TBL> table_hasher;
+    std::size_t hash = table_hasher(*table->c_table);
+}
