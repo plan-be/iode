@@ -3,6 +3,8 @@
 #include "common.h"
 #include "utils/utils.h"
 #include "utils/iode_exceptions.h"
+#include <boost/functional/hash.hpp>
+
 
 enum EnumCellType
 {
@@ -87,6 +89,26 @@ TBL* create_table_deep_copy(TBL* original_table);
 bool cell_equal(TCELL* c_cell1, TCELL* c_cell2);
 bool line_equal(int nb_columns, TLINE* c_line1, TLINE* c_line2);
 bool table_equal(TBL* c_table1, TBL* c_table2);
+
+/**
+ * @brief compute a hash value for a table line.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(TLINE const& c_line);
+
+/**
+ * @brief compute a hash value for a table.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(TBL const& c_table);
 
 
 struct Table
