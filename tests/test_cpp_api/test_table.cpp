@@ -342,5 +342,31 @@ TEST_F(TablesTest, LineDate)
 TEST_F(TablesTest, Hash)
 {
     boost::hash<TBL> table_hasher;
-    std::size_t hash = table_hasher(*table->c_table);
+    std::size_t hash_before;
+    std::size_t hash_after;
+
+    hash_before = table_hasher(*table->c_table);
+
+    // same table
+    Table* same_table = new Table("GFRPC");
+    EXPECT_EQ(*table, *same_table);
+    hash_after = table_hasher(*same_table->c_table);
+    EXPECT_EQ(hash_before, hash_after);
+
+    // different title
+    std::string new_title = "New Title";
+    table->setTitle(0, new_title);
+    hash_after = table_hasher(*table->c_table);
+    EXPECT_NE(hash_before, hash_after);
+
+    // different cell
+    hash_before = hash_after;
+    table->setCellText(5, 0, "Nouvelles recettes");
+    hash_after = table_hasher(*table->c_table);
+    EXPECT_NE(hash_before, hash_after);
+
+    hash_before = hash_after;
+    table->setCellLec(5, 1, "GOSG+YDTG+IT+YSSG+COTRES+OCUG");
+    hash_after = table_hasher(*table->c_table);
+    EXPECT_NE(hash_before, hash_after);
 }
