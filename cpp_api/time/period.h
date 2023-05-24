@@ -3,6 +3,7 @@
 #include "common.h"
 #include "utils/utils.h"
 #include "utils/iode_exceptions.h"
+#include <boost/functional/hash.hpp>
 
 
 const static std::map<char, int> mPeriodicities =
@@ -106,3 +107,13 @@ public:
 
 	// TODO : implement operators > and < ?  
 };
+
+/**
+ * @brief compute a hash value for a period.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(PERIOD const& c_period);
