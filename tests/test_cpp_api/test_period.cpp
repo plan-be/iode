@@ -125,3 +125,24 @@ TEST(TestPeriod, ToDouble)
 	res = periodW.to_double();
 	EXPECT_DOUBLE_EQ(res, 2020.0 + (9 * (1./52.)));
 }
+
+TEST(TestPeriod, Hash)
+{
+	std::size_t hash_before;
+	std::size_t hash_after;
+
+	Period period(2020, 'Y', 1);
+
+	boost::hash<PERIOD> period_hasher;
+    hash_before = period_hasher(*period.c_period);
+
+	// modify
+	Period shifted_period = period.shift(1);
+	hash_after = period_hasher(*shifted_period.c_period);
+	EXPECT_NE(hash_before, hash_after);
+
+	// return to original value
+	Period same_period = shifted_period.shift(-1);
+	hash_after = period_hasher(*same_period.c_period);
+	EXPECT_EQ(hash_before, hash_after);
+}
