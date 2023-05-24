@@ -46,7 +46,7 @@ inline std::size_t hash_value(KDBScalars const& cpp_kdb)
     for(int pos=0; pos < kdb->k_nb; pos++)
     {
         boost::hash_combine(seed, kdb->k_objs[pos].o_name);
-        boost::hash_combine(seed, KSVAL(kdb, pos));
+        boost::hash_combine(seed, *KSVAL(kdb, pos));
     }
     return seed;
 }

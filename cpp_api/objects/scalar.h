@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "utils/utils.h"
+#include <boost/functional/hash.hpp>
 
 
 struct Scalar
@@ -32,3 +33,14 @@ public:
 
     IODE_REAL& std() { return c_scalar->std; }
 };
+
+
+/**
+ * @brief compute a hash value for a scalar.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(SCL const& c_scalar);
