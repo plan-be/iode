@@ -71,3 +71,14 @@ bool Scalar::operator==(const Scalar& other) const
     eq &= c_scalar->std == other.c_scalar->std;
     return eq;
 }
+
+std::size_t hash_value(SCL const& c_scalar)
+{
+	std::size_t seed = 0;
+
+	boost::hash_combine(seed, c_scalar.val);
+	boost::hash_combine(seed, c_scalar.relax);
+	boost::hash_combine(seed, c_scalar.std);
+
+    return seed;
+}
