@@ -1,5 +1,6 @@
 #pragma once
 #include "period.h"
+#include <boost/functional/hash.hpp>
 
 
 struct Sample
@@ -73,3 +74,13 @@ public:
 		return (start_period() == other.start_period()) && (end_period() == other.end_period()) && (c_sample->s_nb == c_other->s_nb);
 	}
 };
+
+/**
+ * @brief compute a hash value for a sample.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(SAMPLE const& c_sample);
