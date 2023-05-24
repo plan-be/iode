@@ -143,4 +143,60 @@ TEST_F(EquationTest, GetCoefficients)
     EXPECT_EQ(coefs_list, expected_coefs_list);
 }
 
+TEST_F(EquationTest, Hash)
+{
+    boost::hash<EQ> equation_hasher;
+    std::size_t hash_before;
+    std::size_t hash_after;
 
+    hash_before = equation_hasher(*equation->c_equation);
+
+    // same equation
+    Equation* same_equation = new Equation("ACAF");
+    EXPECT_EQ(*equation, *same_equation);
+    hash_after = equation_hasher(*same_equation->c_equation);
+    EXPECT_EQ(hash_before, hash_after);
+    delete same_equation;
+
+    // different lec
+    std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
+    equation->set_lec(new_lec, "ACAF"); 
+    hash_after = equation_hasher(*equation->c_equation);
+    EXPECT_NE(hash_before, hash_after);
+
+    // different method
+    hash_before = hash_after;
+    std::string new_method = vEquationMethods[1];
+    equation->set_method(new_method); 
+    hash_after = equation_hasher(*equation->c_equation);
+    EXPECT_NE(hash_before, hash_after);
+
+    // different sample
+    hash_before = hash_after;
+    std::string from = "2000Y1";
+    std::string to = "2020Y1";
+    equation->set_sample(from, to); 
+    hash_after = equation_hasher(*equation->c_equation);
+    EXPECT_NE(hash_before, hash_after);
+
+    // different comment
+    hash_before = hash_after;
+    std::string new_comment = "New Comment";
+    equation->set_comment(new_comment); 
+    hash_after = equation_hasher(*equation->c_equation);
+    EXPECT_NE(hash_before, hash_after);
+
+    // different block
+    hash_before = hash_after;
+    std::string new_block = "ACAF;AGAF";
+    equation->set_block(new_block); 
+    hash_after = equation_hasher(*equation->c_equation);
+    EXPECT_NE(hash_before, hash_after);
+
+    // different instrument
+    hash_before = hash_after;
+    std::string new_instruments = "random_text";
+    equation->set_instruments(new_instruments); 
+    hash_after = equation_hasher(*equation->c_equation);
+    EXPECT_NE(hash_before, hash_after);
+}
