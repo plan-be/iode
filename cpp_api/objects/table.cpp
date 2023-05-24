@@ -145,6 +145,7 @@ bool table_equal(TBL* c_table1, TBL* c_table2)
 	return true;
 }
 
+static int _nb_columns_;
 
 std::size_t hash_value(TLINE const& c_line)
 {
@@ -154,12 +155,28 @@ std::size_t hash_value(TLINE const& c_line)
 	boost::hash_combine(seed, c_line.tl_axis);
 	boost::hash_combine(seed, c_line.tl_graph);
 
-	if(c_line.tl_type == IT_TITLE || c_line.tl_type == IT_CELL)
+	TCELL* cells;
+	TCELL* cell;
+	switch(c_line.tl_type)
 	{
-		TCELL* cells = (TCELL*) c_line.tl_val;
+	case IT_TITLE:
+		cells = (TCELL*) c_line.tl_val;
 		boost::hash_combine(seed, cells->tc_type);
 		boost::hash_combine(seed, cells->tc_attr);
-		boost::hash_combine(seed, cells->tc_val);
+		boost::hash_combine(seed, std::string(cells->tc_val));
+		break;
+	case IT_CELL:
+		cells = (TCELL*) c_line.tl_val;
+		for(int col = 0; col < _nb_columns_; col++)
+		{
+			cell = &cells[col];
+			boost::hash_combine(seed, cell->tc_type);
+			boost::hash_combine(seed, cell->tc_attr);
+			boost::hash_combine(seed, std::string(T_cell_cont(cell, 0)));
+		}
+		break;
+	default:
+		break;
 	}
 
 	return seed;
@@ -174,6 +191,7 @@ std::size_t hash_value(TBL const& c_table)
 	boost::hash_combine(seed, c_table.t_nl);
 	boost::hash_combine(seed, c_table.t_nc);
 
+	_nb_columns_ = c_table.t_nc;
 	boost::hash_combine(seed, c_table.t_div);
 	for (int i = 0; i < c_table.t_nl; i++)
 		boost::hash_combine(seed, c_table.t_line[i]);
