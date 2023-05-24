@@ -84,3 +84,14 @@ Period Period::shift(const int nb_periods)
     memcpy(&shifted_period, static_period, sizeof(PERIOD));
     return Period(&shifted_period);
 }
+
+std::size_t hash_value(PERIOD const& c_period)
+{
+    std::size_t seed = 0;
+
+    boost::hash_combine(seed, c_period.p_y);
+    boost::hash_combine(seed, c_period.p_s);
+    boost::hash_combine(seed, c_period.p_p);
+
+    return seed;
+}
