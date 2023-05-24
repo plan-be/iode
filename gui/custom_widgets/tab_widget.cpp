@@ -394,22 +394,14 @@ int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& file
     if (index >= 0) return index;
 
     // prepare and add the new tab
-    switch (fileType)
-    {
-    case I_REPORTS_FILE:
+    if(fileType == I_REPORTS_FILE)
         index = addReportTab(fileInfo);
-        break;
-    case I_LOGS_FILE:
-        index = addTextTab(fileInfo, I_LOGS_FILE);
-        break;
-    default:
-        if(QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
+    else if(QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
             index = addTextTab(fileInfo, fileType);
-        else
-        { 
-            QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
-            index = -1;
-        }
+    else
+    { 
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
+        index = -1;
     }
 
     if (index < 0) return index;
