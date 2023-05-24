@@ -15,7 +15,10 @@
 //       See https://doc.qt.io/qt-6/qtabwidget.html#addTab 
 const static QVector<QString> tabPrefix({"(&CMT) ", "(&EQS) ", "(&IDT) ", "(&LST) ", 
                                          "(&SCL) ", "(&TBL) ", "(&VAR) ", 
-                                         "(REP) ", "(TXT) ", "(LOG) ", "(SET) "});
+                                         "(REP) ", "(TXT) ", "(ASCII) ", "(A2M) ", 
+                                         "(RTF) ", "(HTML) ", "(MIF) ", "(CSV) ",
+                                         "(REF) ", "(AGL) ", "(DIF) ", "(LOG) ", 
+                                         "(SET) "});
 
 class AbstractTabWidget: public QWidget
 {
