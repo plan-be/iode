@@ -54,7 +54,7 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
     for(int pos=0; pos < kdb->k_nb; pos++)
     {
         boost::hash_combine(seed, kdb->k_objs[pos].o_name);
-        boost::hash_combine(seed, KEVAL(kdb, pos));
+        boost::hash_combine(seed, *KEVAL(kdb, pos));
     }
     return seed;
 }

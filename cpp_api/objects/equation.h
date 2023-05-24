@@ -3,6 +3,7 @@
 #include "utils/utils.h"
 #include "time/period.h"
 #include "time/sample.h"
+#include <boost/functional/hash.hpp>
 #include <boost/algorithm/string.hpp>
 
 
@@ -58,6 +59,16 @@ bool equation_equal(EQ* c_eq1, EQ* c_eq2);
 EQ* prepare_equation(const std::string& name, const bool add_obj, const std::string& lec, const std::string& comment,
     const std::string& method, Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests,
     const bool date);
+
+/**
+ * @brief compute a hash value for an equation.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(EQ const& c_eq);
 
 struct Equation
 {

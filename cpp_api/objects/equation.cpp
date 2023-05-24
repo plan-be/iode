@@ -107,6 +107,23 @@ EQ* prepare_equation(const std::string& name, const bool add_obj, const std::str
     return eq;
 }
 
+std::size_t hash_value(EQ const& c_eq)
+{
+    std::size_t seed = 0;
+
+    // need to wrapp with std::string() because hash_value() and
+    // hash_combine() only compare pointer addresses when applied 
+    // on char* arrays
+    boost::hash_combine(seed, std::string(c_eq.lec));
+    boost::hash_combine(seed, c_eq.method);
+    boost::hash_combine(seed, c_eq.smpl);
+    boost::hash_combine(seed, std::string(c_eq.cmt));
+    boost::hash_combine(seed, std::string(c_eq.blk));
+    boost::hash_combine(seed, std::string(c_eq.instr));
+
+    return seed;
+}
+
 
 Equation::Equation()
 {
