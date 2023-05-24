@@ -67,3 +67,14 @@ Sample Sample::intersection(const Sample& other)
     }
     return Sample(&c_res);
 }
+
+std::size_t hash_value(SAMPLE const& c_sample)
+{
+    std::size_t seed = 0;
+
+    boost::hash_combine(seed, c_sample.s_p1);
+    boost::hash_combine(seed, c_sample.s_p2);
+    boost::hash_combine(seed, c_sample.s_nb);
+
+    return seed;
+}
