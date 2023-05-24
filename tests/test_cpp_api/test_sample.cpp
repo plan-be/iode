@@ -68,3 +68,35 @@ TEST(TestSample, ToString)
 	std::string str_sample = sample.to_string();
 	EXPECT_EQ(str_sample, start.to_string() + ':' + end.to_string());
 }
+
+TEST(TestSample, Hash)
+{
+	std::size_t hash_before;
+	std::size_t hash_after;
+
+	Period start(2015, 'Y', 1);
+	Period end(2020, 'Y', 1);
+	Sample sample(start, end);
+
+	boost::hash<SAMPLE> sample_hasher;
+    hash_before = sample_hasher(*sample.c_sample);
+
+	// different starting year
+	Period earlier_start(2014, 'Y', 1);
+	Sample earlier_start_sample(earlier_start, end);
+	hash_after = sample_hasher(*earlier_start_sample.c_sample);
+	EXPECT_NE(hash_before, hash_after);
+
+	// different periodicity
+	Period month_start(2015, 'M', 1);
+	Period month_end(2020, 'M', 1);
+	Sample month_sample(month_start, month_end);
+	hash_after = sample_hasher(*month_sample.c_sample);
+	EXPECT_NE(hash_before, hash_after);
+
+	// different position
+	Period later_month_start(2015, 'M', 3);
+	Sample later_start_sample(later_month_start, month_end);
+	hash_after = sample_hasher(*later_start_sample.c_sample);
+	EXPECT_NE(hash_before, hash_after);
+}
