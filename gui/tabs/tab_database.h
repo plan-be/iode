@@ -436,6 +436,7 @@ public:
         connect(objmodel, &EquationsModel::rowsRemoved, this, &QIodeEquationsWidget::KDBModified);
         connect(objmodel, &EquationsModel::databaseModified, this, &QIodeEquationsWidget::KDBModified);
         connect(tableview, &EquationsView::newObjectInserted, this, &QIodeEquationsWidget::KDBModified);
+        connect(tableview, &EquationsView::equationModified, this, &QIodeEquationsWidget::KDBModified);
     }
 };
 

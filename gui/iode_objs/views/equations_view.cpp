@@ -32,6 +32,10 @@ void EquationsView::edit_obj()
 		delete editEqDialog;
 	}
 	editEqDialog = new QIodeEditEquation(name, static_cast<QWidget*>(this->parent()));
+
+	// propagate signal
+	connect(editEqDialog, &QIodeEditEquation::equationModified, this, &EquationsView::equationModified);
+
 	editEqDialog->show();
 	
 	update();

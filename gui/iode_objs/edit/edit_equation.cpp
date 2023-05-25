@@ -2,7 +2,7 @@
 
 
 QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* parent, Qt::WindowFlags f) : 
-	QIodeSettings( parent, f)
+	QIodeSettings(parent, f)
 {
 	setupUi(this);
 
@@ -148,10 +148,21 @@ void QIodeEditEquation::edit()
 
 		// update equation
 		if (kdb_eqs.contains(equation_name))
+		{
+			Equation eq = kdb_eqs.get(equation_name);
+			computeHash(eq, true);
+
 			kdb_eqs.update(equation_name, lec, comment, method, sample, instruments, block, &tests);
+		
+			Equation updated_eq = kdb_eqs.get(equation_name);
+			computeHash(updated_eq);
+		}
 		// new equation
 		else
+		{
 			kdb_eqs.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
+			emit equationModified();
+		}
 
 		if(estimation) 
 			estimation->save();

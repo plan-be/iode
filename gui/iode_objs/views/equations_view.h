@@ -42,6 +42,9 @@ public:
 		delete editShortcutReturn;
 	}
 
+signals:
+	void equationModified();
+
 public slots:
 	void filter() { filter_and_update(); }
 	void print();
