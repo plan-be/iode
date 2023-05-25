@@ -82,6 +82,9 @@ bool QIodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVarian
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
+		if(data(index, Qt::DisplayRole) == value) 
+			return false;
+		
 		bool success = setValue(index.row(), index.column(), value);
 		if (success)
 		{
