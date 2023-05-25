@@ -31,8 +31,12 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
 {
     Q_OBJECT
 
-    KDBEquations    kdb_eqs;
-    Estimation*     estimation;
+    KDBEquations kdb_eqs;
+    Estimation*  estimation;
+    
+    size_t hashBefore;
+	size_t hashAfter;	
+
     QIodeCompleter* completer;
 
     WrapperIodeNameEdit*    lineName;
@@ -51,9 +55,25 @@ private:
     void set_estimation();
     void display_equation(const NamedEquation& equation);
 
+	void computeHash(Equation& eq, const bool before=false)
+	{
+		boost::hash<EQ> eq_hasher;
+		if(before)
+    		hashBefore = eq_hasher(*eq.c_equation);
+		else
+		{
+			hashAfter = eq_hasher(*eq.c_equation);
+			if(hashAfter != hashBefore) 
+				emit equationModified();
+		}
+	}
+
 public:
     QIodeEditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~QIodeEditEquation();
+
+signals:
+    void equationModified();
 
 public slots:
     void edit();
