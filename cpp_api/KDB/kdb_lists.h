@@ -42,7 +42,10 @@ inline std::size_t hash_value(KDBLists const& cpp_kdb)
     for(int pos=0; pos < kdb->k_nb; pos++)
     {
         boost::hash_combine(seed, kdb->k_objs[pos].o_name);
-        boost::hash_combine(seed, KLVAL(kdb, pos));
+        // need to wrapp with std::string() because hash_value() and
+        // hash_combine() only compare pointer addresses when applied 
+        // on char* arrays
+        boost::hash_combine(seed, std::string(KLVAL(kdb, pos)));
     }
     return seed;
 }
