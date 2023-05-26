@@ -9,9 +9,9 @@ add_subdirectory(utils)
 add_subdirectory(ascii)
 add_subdirectory(objs)
 add_subdirectory(lec)
+add_subdirectory(simulation)
 
 target_sources(iodeapi PRIVATE b_args.c b_errors.c) # BRICKS
-target_sources(iodeapi PRIVATE k_sim_main.c k_sim_order.c k_sim_exo2endo.c k_sim_scc.c) # SIMUL
 target_sources(iodeapi PRIVATE k_exec.c) # IDT
 target_sources(iodeapi PRIVATE k_super.c) # KSUPER
 target_sources(iodeapi PRIVATE k_lang.c) # KLANG
