@@ -8,9 +8,9 @@ add_library(iodeapi STATIC "")
 add_subdirectory(utils)
 add_subdirectory(ascii)
 add_subdirectory(objs)
+add_subdirectory(lec)
 
 target_sources(iodeapi PRIVATE b_args.c b_errors.c) # BRICKS
-target_sources(iodeapi PRIVATE l_alloc.c l_err.c l_token.c l_cc1.c l_cc2.c l_eqs.c l_link.c l_exec.c l_exec_fns.c l_exec_ops.c l_exec_tfn.c l_exec_mtfn.c l_exec_val.c l_hodrick.c l_debug.c l_newton.c l_secant.c)  # LEC
 target_sources(iodeapi PRIVATE k_sim_main.c k_sim_order.c k_sim_exo2endo.c k_sim_scc.c) # SIMUL
 target_sources(iodeapi PRIVATE k_exec.c) # IDT
 target_sources(iodeapi PRIVATE k_super.c) # KSUPER
