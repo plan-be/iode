@@ -9,6 +9,7 @@ add_subdirectory(utils)
 add_subdirectory(ascii)
 add_subdirectory(objs)
 add_subdirectory(lec)
+add_subdirectory(gsample)
 add_subdirectory(simulation)
 add_subdirectory(estimation)
 add_subdirectory(conversion)
@@ -18,7 +19,6 @@ target_sources(iodeapi PRIVATE b_args.c b_errors.c) # BRICKS
 target_sources(iodeapi PRIVATE k_exec.c) # IDT
 target_sources(iodeapi PRIVATE k_super.c) # KSUPER
 target_sources(iodeapi PRIVATE k_lang.c) # KLANG
-target_sources(iodeapi PRIVATE c_cc.c c_calc.c) # GSAMPLE
 target_sources(iodeapi PRIVATE k_print.c k_graph.c) # KPRINT
 target_sources(iodeapi PRIVATE w_wrt.c w_wrt1.c) # WRT
 target_sources(iodeapi PRIVATE b_iodeini.c) # INI
