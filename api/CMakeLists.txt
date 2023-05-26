@@ -17,7 +17,7 @@ add_subdirectory(estimation)
 add_subdirectory(conversion)
 add_subdirectory(report)
 
-target_sources(iodeapi PRIVATE b_args.c b_errors.c) # BRICKS
+target_sources(iodeapi PRIVATE b_args.c b_errors.c) # MISC
 target_sources(iodeapi PRIVATE k_exec.c) # IDT
 target_sources(iodeapi PRIVATE k_super.c) # KSUPER
 target_sources(iodeapi PRIVATE k_lang.c) # KLANG
@@ -25,8 +25,6 @@ target_sources(iodeapi PRIVATE b_iodeini.c) # INI
 target_sources(iodeapi PRIVATE b_a2mini.c) # A2M
 
 target_sources(iodeapi PUBLIC iode.h iodebase.h iodeapi.h)
-
-#add_library (iodeapi STATIC ${SOURCES} ${HEADERS})
 
 # NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iodeapi.
 #       Option -Zp1 makes compilation of the Google Test lib to fail
