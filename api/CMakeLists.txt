@@ -6,8 +6,8 @@ add_library(iodeapi STATIC "")
 
 # Add source to this project's library.
 add_subdirectory(utils)
+add_subdirectory(ascii)
 
-target_sources(iodeapi PRIVATE k_ccall.c k_cccmt.c k_cceqs.c  k_ccidt.c k_cclst.c k_ccscl.c k_cctbl.c k_ccvar.c) # CCS
 target_sources(iodeapi PRIVATE k_vers.c k_objs.c k_objsv.c k_pack.c k_objfile.c k_xdr.c k_objvers.c k_kdb.c k_ws.c k_wsvar.c k_cmp.c k_val.c k_lec.c k_grep.c k_tbl.c k_eqs.c k_lst.c)  # OBJS
 target_sources(iodeapi PRIVATE b_args.c b_errors.c) # BRICKS
 target_sources(iodeapi PRIVATE l_alloc.c l_err.c l_token.c l_cc1.c l_cc2.c l_eqs.c l_link.c l_exec.c l_exec_fns.c l_exec_ops.c l_exec_tfn.c l_exec_mtfn.c l_exec_val.c l_hodrick.c l_debug.c l_newton.c l_secant.c)  # LEC
