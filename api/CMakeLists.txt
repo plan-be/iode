@@ -23,7 +23,6 @@ target_sources(iodeapi PRIVATE k_print.c k_graph.c) # KPRINT
 target_sources(iodeapi PRIVATE w_wrt.c w_wrt1.c) # WRT
 target_sources(iodeapi PRIVATE b_iodeini.c) # INI
 target_sources(iodeapi PRIVATE b_a2mini.c) # A2M
-target_sources(iodeapi PRIVATE b_rep_cmds.c b_rep_debug.c b_rep_defs.c b_rep_engine.c b_rep_fns.c b_rep_foreach.c b_rep_proc.c b_rep_super.c b_rep_syntax.c b_rep_utils.c) # REPORT_ENGINE
 target_sources(iodeapi PRIVATE b_dde.c b_pdest.c b_print.c b_view.c b_step.c b_season.c b_trend.c b_eviews.c b_ds.c b_sql.c b_api.c) # REPORT_UNDOC
 
 target_sources(iodeapi PUBLIC iode.h iodebase.h iodeapi.h)
