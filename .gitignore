@@ -384,6 +384,7 @@ keyboard_shortcuts.*
 *.$$$
 /tests/data/iode_gui_settings.ini
 /pyiode/iode.c
+/pyiode/cythonize_iode.py
 /tests/output
 /doc/src/iode1.mif
 /doc/src/iode2.mif
