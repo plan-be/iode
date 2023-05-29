@@ -11,16 +11,11 @@ SETLOCAL
 
 : call mk.bat
 
-:: Set the path according to the current compilation env
-set exepath=..\..
-if exist ..\exedir.txt set /P exepath=<..\exedir.txt
-set exepath=%exepath:/=\%\tests\test_c_api
-
-@echo %exepath%\test1.exe
-%exepath%\test1.exe
+@echo test1.exe
+.\test1.exe
 if %errorlevel% NEQ 0 goto :err
 
-%exepath%\test1cpp.exe
+.\test1cpp.exe
 if %errorlevel% NEQ 0 goto :err
 
 :: Delete generated files
