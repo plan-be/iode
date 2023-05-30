@@ -527,8 +527,8 @@ voici la liste :
     s‚rie expr2 comme s‚rie apparent‚e par une m‚thode g‚om‚trique
 &EN dapp(expr1, expr2) : fournit par diff‚rences une valeur … expr1 en t en
     utilisant la s‚rie expr2 comme s‚rie apparent‚e
-&EN hp([[from,]to],expr)        : filtre Hodrick-Prescott avec passage au ~clog~C de ~cexpr~C
-&EN hpstd([[from,]to],expr)     : calcul sans passage au ~clog~C de ~cexpr~C
+&EN hp([ [from,]to],expr)        : filtre Hodrick-Prescott avec passage au ~clog~C de ~cexpr~C
+&EN hpstd([ [from,]to],expr)     : calcul sans passage au ~clog~C de ~cexpr~C
 &EN appdif(expr1, expr2) : alias de dapp()
 
 
@@ -998,8 +998,8 @@ m‚thode d'Hodrick-Prescot d‚crite ici : <Hodrick-Prescott Filter>.
 
 
 &CO
-    hp([[from,]to],expr)     : calcul sur base du logarithme de ~cexpr~C
-    hpstd([[from,]to],expr)  : calcul sans passage au logarithme de ~cexpr~C
+    hp([ [from,]to],expr)     : calcul sur base du logarithme de ~cexpr~C
+    hpstd([ [from,]to],expr)  : calcul sans passage au logarithme de ~cexpr~C
 &TX
 Les paramŠtres sont :
 &EN from : p‚riode de d‚part du calcul, premiŠre ann‚e par d‚faut

@@ -49,51 +49,30 @@ Note that a **"New installation"** requires Administrator rights (file associati
   * 6.58 (20/01/2019) -> [[version_6dot_58|View log]]
     *{{:download:iode658.exe|New installation}}
     *{{:download:iode658upd.exe|Upgrade }}
-  * 6.57 (02/03/2018) -> [[version_6dot_57|View log]]
-    *{{:download:iode657.exe|New installation}}
-    *{{:download:iode657upd.exe|Upgrade }}
-  * 6.56 (27/01/2017) -> [[version_6dot_56|View log]]
-    *{{:download:iode656.exe|New installation}}
-    *{{:download:iode656upd.exe|Upgrade }}
-  * 6.55 (05/01/2017) -> [[version_6dot_55|View log]]
-    *{{:download:iode655.exe|New installation}}
-    *{{:download:iode655upd.exe|Upgrade }}
-  * 6.54 (22/08/2016) -> [[version_6dot_54|View log]]
-    *{{:download:iode654.exe|New installation}}
-    *{{:download:iode654upd.exe|Upgrade }}
-  * 6.53 (18/07/2016) -> [[version_6dot_53|View log]]
-    *{{:download:iode653.exe|New installation}}
-    *{{:download:iode653upd.exe|Upgrade }}
-  * 6.52 (21/06/2016) -> [[version_6dot_52|View log]]
-    *{{:download:iode652.exe|New installation}}
-    *{{:download:iode652upd.exe|Upgrade }}
-  * 6.51 (04/04/2016) -> [[version_6dot_51|View log]]
-  * 6.50 (25/01/2016) -> [[version_6dot_50|View log]]
-    *{{:download:iode650.exe|New installation}}
-    *{{:download:iode650upd.exe|Upgrade }}
 
 -> [[notes_techniques|View all logs]]
 
-===== IODE uses =====
+===== IODE implementations =====
 
-IODE is available for different usages :
-| iodecmd        | win32 software w/o interface : command line for running IODE scripts|
-| iode           | win32 software with graphic user interface |
-| PlanningCorner | restricted simulation software based on IODE objects with Windows interface|
-| iodecom        | COM object (for Excel, APL, VBA, ...)  |
-| wintramoseats  | VB.net software for seasonal adjustment  |
+IODE is available for different environments :
+| iode.exe       | win32 software with graphic user interface |
+| iodecmd.exe    | win32 software w/o interface : command line for running IODE scripts|
+| iodecmd64.exe  | win64 version of iodecmd |
+| iodecom.exe    | COM object (for Excel, APL, VBA, ...)  |
+| iode.pyd       | Python module to manipulate IODE objects and execute IODE commands |
 
 ===== IODE for python =====
 Note : these modules are only available for the latest IODE version.
   *{{:download:py39:iode.pyd|iode.pyd for python3.9}}
   *{{:download:py310:iode.pyd|iode.pyd for python3.10}}
 
+===== IODE 64 bits =====
+Compiled with the latest IODE version.
+  *{{:download:iodecmd64.exe|iodecmd64.exe = 64 bit version of iodecmd }}
+  
 ===== Syntax highlighter for .rep files =====
   * {{:download:npp_iode.xml|Notepad++ : .rep files Syntax highlighter}}
   * {{:download:ioderep.syn|TextPad : .rep files}}
 
 ===== Tips & Tricks =====
     * [[what_is_changed|What has changed]]: check what has changed after a simulation
-
-
-
