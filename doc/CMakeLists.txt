@@ -4,6 +4,7 @@
 
 cmake_minimum_required (VERSION 3.16)
 
+message(STATUS "\n---- DOC ----\n")
 add_subdirectory(keyboard_shortcuts)
 
 ## Add source to this project's executable.
