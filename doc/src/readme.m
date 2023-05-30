@@ -32,9 +32,9 @@ dor‚navant tronqu‚ … 10K.
 L'impression de certains objet de taille importante pouvait g‚n‚rer un arrˆt de IODE. Le texte g‚n‚r‚ est 
 dor‚navant tronqu‚ … 10K. 
 
-&TI $WsCopyVar and $CsvSave*
+&TI WsCopyVar and CsvSave*
 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-Les virgules sont accept‚es comme s‚parateurs entre les noms des objets … copier ($WsCopyVar) ou … sauver ($CsvSaveVar par exemple).
+Les virgules sont accept‚es comme s‚parateurs entre les noms des objets … copier (WsCopyVar) ou … sauver (CsvSaveVar par exemple).
 
 
 >
@@ -528,7 +528,7 @@ est plus en ligne avec les r‚sultats obtenus avec les logiciels standard comme s
 &IT Nouvel op‚rateur LEC
 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 &CO
-    hpstd([[from,]to],expr)  : calcul sans passage au logarithme de ~cexpr~C
+    hpstd([ [from,]to],expr)  : calcul sans passage au logarithme de ~cexpr~C
 &TX
 
 Les paramŠtres sont :
@@ -3920,7 +3920,7 @@ plantait...
 ÄÄÄ
     Deux nouvelles fonctions dans le langage LEC :
 &CO
-	hp([[from,]to],expr) : filtre Hodrick-Prescott
+	hp([ [from,]to],expr) : filtre Hodrick-Prescott
 	appdif(expr1, expr2) : complŠte la s‚rie expr1 sur base de la s‚rie
 			       apparent‚e expr2 en tenant compte des
 			       diff‚rences au lieu des taux de croissance
@@ -5323,12 +5323,12 @@ Exemples :
 	- lsum(expr1, expr2, ...) : calcule la somme d'une liste
 	  de s‚ries
 
-	- index([[from,] to,] valeur, expr) : retourne la premiŠre p‚riode
+	- index([ [from,] to,] valeur, expr) : retourne la premiŠre p‚riode
 	  o— valeur apparaŒt dans la s‚rie expr entre les p‚riodes
 	  from et to. Si la valeur n'apparaŒt pas dans expr, -- est
 	  retourn‚.
 
-	- acf([[from,] to,] valeur, expr) : retourne la fonction
+	- acf([ [from,] to,] valeur, expr) : retourne la fonction
 	  d'auto-correlation de degr‚ valeur de l'expression expr
 	  sur le sample from … to.
 
