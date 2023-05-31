@@ -35,6 +35,16 @@
 - **scr4**: Utility functions required to compile the C API
 - **tests**: Testing directory
 
+# Preparing Python IODE Build
+
+To prepare the building of Python IODE, please create the following conda environments:
+```bash
+> conda config --add channels larray-project
+> conda create --name py39 python=3.9 numpy pandas larray cython
+> conda create --name py310 python=3.10 numpy pandas larray cython
+> conda create --name py311 python=3.11 numpy pandas larray cython
+```
+
 # Building Project
 
 The different targets (libraries and executables) of the project are build using the tool CMake.
@@ -58,7 +68,14 @@ where `<target>` is one the item in the list below:
 - `iodeapi`      -> Core API of IODE (in pure C).
 - `iodecppapi`   -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`     -> Graphical user interface (GUI) based on Qt.
+- `pyiode`       -> Builds Python binding for IODE (base on Cython).
 - `nsis`         -> Builds a Windows Installer for the users.
 - `test_c_api`   -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api` -> Builds the tests for the C++ classes (based on Google Test).
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
+
+To build Python IODE, please run the Batch script makepy.bat in the subdirectory pydiode 
+and provide a conda environment as argument:
+```bash
+pyiode> makepy.bat py39 
+```
