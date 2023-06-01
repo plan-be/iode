@@ -25,15 +25,15 @@
 
 # Repository Structure
 
-- **.github\workflows**: script for Github Actions (Tests + Build GUI + Build LaTeX doc)
+- **.github\workflows**: Script for Github Actions (Tests + Build GUI + Build LaTeX doc)
 - **api**: C API
 - **cpp_api**: C++ API
-- **doc**: user + dev documentation
+- **doc**: User documentation
 - **gui**: Qt GUI
 - **nsis**: NSIS Windows installer
 - **pyiode**: Python module of IODE
-- **scr4**: utility functions required to compile the C API
-- **tests**: testing directory
+- **scr4**: Utility functions required to compile the C API
+- **tests**: Testing directory
 
 # Building Project
 
