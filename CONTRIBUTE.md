@@ -1,28 +1,25 @@
 # Requirements
 
-- Compiler:
-  - MSVC 2019
-- To compile the C API:
-  - [CMake](https://cmake.org, https://cmake.org/download) (>= 3.25) (*)
-- To compile the C++ API:
-  - [Chocolatey](https://chocolatey.org/install) (to install Boost) (*)
-  - Boost (>= 1.74). Can be installed with Chocolatey. For VS2019, execute: choco install boost-msvc-14.2. 
-    For other VS versions, check on https://community.chocolatey.org/packages?q=boost
-- To compile the Qt GUI:
-  - [Qt 6.4](https://www.qt.io/download) (to be installed in C:/Qt)
-- To compile the documentation:
-  - SCR4 executables -> ask maintainers
-  - LaTeX ([Tex Live](https://www.tug.org/texlive))
-- To compile pyiode:
-  - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (for managing Python) (*)
-  - Python 3.9+
-  - cython conda package
-  - larray conda package
-- To create an installer:
-  - [NSIS](https://nsis.sourceforge.io/Download) (*)
-- To compile the old GUI (DOS):
-  - [Embarcadero C++ Compiler](https://www.embarcadero.com/free-tools/ccompiler)
-  - SCR4 executables + lib -> ask maintainers
+- Required tools:
+  - Compiler MSVC 2019 or 2022.
+  - [Chocolatey](https://chocolatey.org/install) (*) -> C/C++ package manager.
+  - [CMake](https://cmake.org/download) (>= 3.25) (*) -> controls the software compilation process.
+  - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
+  <br> Can be installed using choco:
+    > choco install ninja
+  - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
+  - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
+  - [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
+  - SCR4 executables -> used to build the user documentation. 
+  <br> Ask maintainers to get access.
+
+- C++ libraries:
+  - Boost (>= 1.74). 
+  <br> Can be installed with Chocolatey. 
+  <br> Install the package corresponding to your VS version by checking [here](https://community.chocolatey.org/packages?q=boost):
+    > choco install boost-msvc-14.X
+  - [Qt 6.4](https://www.qt.io/download)
+  <br> Please install Qt in C:/Qt.
 
 (*) already installed on the Github Actions host-runner [windows-xxx](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
 
