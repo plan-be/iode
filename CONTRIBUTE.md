@@ -37,18 +37,28 @@
 
 # Building Project
 
-Either find the IDE Extension which is right for you or:
+The different targets (libraries and executables) of the project are build using the tool CMake.
+
+Before to build any target, make sure your CMake cache is up to date.
+To rebuild the CMake cache, execute:
 ```bash
 > cmake --preset <preset_config>
+```
+where the list of `<preset_config>` can be found in CMakePresets.json (buildPresets section):
+- `windows-debug`
+- `windows-debug-sanitize`
+- `windows-release`
+
+To build a specific target, you need to run
+```bash
 > cmake --build --preset <preset_config> --target <target>
 ```
-where the list of `<preset_config>` can be found in CMakePresets.json (buildPresets section) 
-and `<target>` are deduced from CMakeLists.txt:
-- scr4iode
-- iodeapi
-- iodecppapi
-- iode_gui
-- nsis
-- test_c_api
-- test_cpp_api
-- keyboard_shortcuts
+where `<target>` is one the item in the list below:
+- `scr4iode`     -> C library providing many of the utility functions used in the C API.
+- `iodeapi`      -> Core API of IODE (in pure C).
+- `iodecppapi`   -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
+- `iode_gui`     -> Graphical user interface (GUI) based on Qt.
+- `nsis`         -> Builds a Windows Installer for the users.
+- `test_c_api`   -> Builds the tests for the C API (based on Google Test).
+- `test_cpp_api` -> Builds the tests for the C++ classes (based on Google Test).
+- `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
