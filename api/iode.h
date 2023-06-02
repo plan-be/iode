@@ -883,7 +883,7 @@ typedef struct _olname_ {
 } OLNAME;
 
 typedef struct _lname_ {
-    ONAME   name;
+    ONAME   name;       // scalar or variable name
 	char    pad[3];
     long    pos; /* SWHDL */ /* IODE64K */
 } LNAME;
@@ -900,10 +900,10 @@ typedef struct _oclec_ {
 typedef struct _clec_ {
     long    tot_lg,        /* JMP 20-05-00 */ /* IODE64K */
 		exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
-    short   nb_names;
+    short   nb_names;   // number of scalar and variables names
     char    dupendo;
     char    pad;
-    LNAME   lnames[1];
+    LNAME   lnames[1];  // list of of scalar and variable names
 } CLEC;
 
 /**
