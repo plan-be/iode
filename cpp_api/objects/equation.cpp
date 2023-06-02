@@ -342,26 +342,58 @@ void Equation::set_tests(const std::array<float, EQS_NBTESTS> tests)
 
 // -- misc --
 
-std::vector<std::string> Equation::get_coefficients_list(const std::string& enddo)
+std::vector<std::string> Equation::get_coefficients_list(const bool create_if_not_exit)
 {
-    std::vector<std::string> coefs_list;
-
     // make sure CLEC is up to date
-    set_lec(get_lec(), enddo);
+    set_lec(get_lec());
 
-    CLEC* clec = c_equation->clec;
-    for(int j = 0 ; j < clec->nb_names ; j++) 
+    std::vector<std::string> coeffs = get_scalars_from_clec(c_equation->clec);
+
+    // create scalars not yet present in the Scalars Database
+    if(create_if_not_exit)
     {
-        char* item_name = clec->lnames[j].name;
-        if(L_ISCOEF(item_name)) 
+        char* c_name;
+        for(const std::string& coeff_name: coeffs)
         {
-            // add new scalar coef to KS_WS if not exist yet
-            int pos = K_find(KS_WS, item_name);
-            if (pos < 0) K_add(KS_WS, item_name, NULL);
-            coefs_list.push_back(std::string(item_name));
+            c_name = const_cast<char*>(coeff_name.data());
+            // adds a new scalar with values { 0.9, 1.0, L_NAN } to the Scalars Database
+            // see K_add() and K_spack()
+            if (K_find(K_WS[I_SCALARS], c_name) < 0) 
+                K_add(K_WS[I_SCALARS], c_name, NULL);
         }
     }
-    return coefs_list;
+
+    return coeffs;
+}
+
+std::vector<std::string> Equation::get_variables_list(const bool create_if_not_exit)
+{
+    // make sure CLEC is up to date
+    set_lec(get_lec());
+
+    std::vector<std::string> vars = get_variables_from_clec(c_equation->clec);
+
+    // create variables not yet present in the Variables Database
+    if(create_if_not_exit)
+    {
+        SAMPLE* sample = KSMPL(K_WS[I_VARIABLES]);
+        if(sample == NULL || sample->s_nb == 0)
+            throw IodeException("Cannot return the list of variables associated with the equation " + endo +"\n" + 
+                                "The global sample is not yet defined");
+
+        char* c_name;
+        int nb_obs = sample->s_nb;
+        for(const std::string& var_name: vars)
+        {
+            c_name = const_cast<char*>(var_name.data());
+            // adds a new variable with nb_obs L_NAN values to the Variables Database
+            // see K_add() and K_vpack()
+            if (K_find(K_WS[I_VARIABLES], c_name) < 0) 
+                K_add(K_WS[I_VARIABLES], c_name, NULL, &nb_obs);
+        }
+    }
+
+    return vars;
 }
 
 std::pair<std::string, std::string> Equation::split_equation()

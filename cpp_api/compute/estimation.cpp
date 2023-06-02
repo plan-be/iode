@@ -106,7 +106,7 @@ void Estimation::set_equations_list(const std::string& str_equations)
     {
         eq_name = kdb_eqs->get_name(i);
         Equation eq = kdb_eqs->get(i);
-        tmp_coefs_list = eq.get_coefficients_list(eq_name);
+        tmp_coefs_list = eq.get_coefficients_list();
         std::move(tmp_coefs_list.begin(), tmp_coefs_list.end(), std::back_inserter(coefficients_list));
     }
     // remove duplicate coefficient names
