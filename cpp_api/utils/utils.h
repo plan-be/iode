@@ -139,6 +139,7 @@ inline int get_iode_type(const std::string& iode_type_as_string)
     for(int i=0; i < I_NB_TYPES; i++) if(iode_type_as_string == vIodeTypes[i]) return i;
     return -1;
 }
+
 inline static std::filesystem::path check_file(const std::string& filepath, const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
@@ -287,4 +288,40 @@ inline char* copy_string_to_char(const std::string& str)
     char* c_string = new char[size];
     strncpy(c_string, str.c_str(), size);
     return c_string;
+}
+
+inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
+{
+    std::vector<std::string> list;
+
+    if(clec == NULL)
+        throw IodeException("Cannot get list of scalars.\nClec structure not defined.");
+    
+    char* item_name;
+    for(int i = 0; i < clec->nb_names; i++)
+    { 
+        item_name = clec->lnames[i].name;
+        if(L_ISCOEF(item_name))
+            list.push_back(std::string(item_name));
+    }
+
+    return list;
+}
+
+inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
+{
+    std::vector<std::string> list;
+
+    if(clec == NULL)
+        throw IodeException("Cannot get list of variables.\nClec structure not defined.");
+    
+    char* item_name;
+    for(int i = 0; i < clec->nb_names; i++)
+    {
+        item_name = clec->lnames[i].name;
+        if(!L_ISCOEF(item_name))
+            list.push_back(std::string(item_name));
+    }
+
+    return list;
 }
