@@ -147,7 +147,9 @@ public:
 
     // -- misc --
 
-    std::vector<std::string> get_coefficients_list(const std::string& enddo);
+    std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true);
+
+    std::vector<std::string> get_variables_list(const bool create_if_not_exit=true);
 
     /**
      * @brief split an equation into its left and right hand sides
