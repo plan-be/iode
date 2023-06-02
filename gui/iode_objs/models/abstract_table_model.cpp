@@ -103,7 +103,6 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 {
 	try
 	{
-		kdb = nullptr;
 		if (!pattern.isEmpty())
 		{
 			if(kdb_filter) delete kdb_filter;
@@ -111,9 +110,7 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 			kdb = kdb_filter;
 		}
 		else
-		{
 			kdb = (kdb_global != nullptr) ? kdb_global : kdb_external;
-		}
 	}
 	catch (const std::exception& e)
 	{
