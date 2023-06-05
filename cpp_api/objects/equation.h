@@ -73,6 +73,7 @@ std::size_t hash_value(EQ const& c_eq);
 struct Equation
 {
     EQ* c_equation;
+    std::string endo;
 
 public:
     Equation();
@@ -92,7 +93,7 @@ public:
 
     std::string get_lec() const;
 
-    void set_lec(const std::string& lec, const std::string& endo);
+    void set_lec(const std::string& lec);
 
     // -- solved --
 
