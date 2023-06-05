@@ -27,7 +27,7 @@ TEST_F(EquationTest, Lec)
 
     // set
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    equation->set_lec(new_lec, "ACAF");
+    equation->set_lec(new_lec);
     EXPECT_EQ(equation->get_lec(), new_lec);
 }
 
@@ -160,7 +160,7 @@ TEST_F(EquationTest, Hash)
 
     // different lec
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    equation->set_lec(new_lec, "ACAF"); 
+    equation->set_lec(new_lec); 
     hash_after = equation_hasher(*equation->c_equation);
     EXPECT_NE(hash_before, hash_after);
 
