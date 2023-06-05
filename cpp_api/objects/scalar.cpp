@@ -14,7 +14,7 @@ Scalar::Scalar(const int pos, KDB* kdb)
     {
         IodeExceptionInvalidArguments error("Cannot extract Scalar", "Scalar position must be in range [0, " + 
             std::to_string(kdb->k_nb - 1) + "])");
-        error.add_argument("equation position", std::to_string(pos));
+        error.add_argument("scalar position", std::to_string(pos));
         throw error;
     }
     // Note: KSVAL does not allocate a new pointer SCL*
