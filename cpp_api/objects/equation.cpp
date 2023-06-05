@@ -128,6 +128,7 @@ std::size_t hash_value(EQ const& c_eq)
 Equation::Equation()
 {
     c_equation = nullptr;
+    endo = "";
 }
 
 Equation::Equation(const int pos, KDB* kdb)
@@ -142,6 +143,7 @@ Equation::Equation(const int pos, KDB* kdb)
     }
     // Note: KEVAL allocate a new pointer EQ*
     c_equation = KEVAL(kdb, pos);
+    endo = std::string(KONAME(kdb, pos));
 }
 
 Equation::Equation(const std::string& name, KDB* kdb)
@@ -151,11 +153,13 @@ Equation::Equation(const std::string& name, KDB* kdb)
     if (pos < 0) throw IodeExceptionFunction("Cannot extract Equation", "Equation with name " + name + " does not exist.");
     // Note: KEVAL allocate a new pointer EQ*
     c_equation = KEVAL(kdb, pos);
+    endo = name;
 }
 
 Equation::Equation(const Equation& eq)
 {
     c_equation = create_equation_deep_copy(eq.c_equation);
+    endo = eq.endo;
 }
 
 Equation::~Equation()
@@ -167,6 +171,7 @@ Equation::~Equation()
 Equation& Equation::operator=(const Equation& eq)
 {
     this->c_equation = create_equation_deep_copy(eq.c_equation);
+    this->endo = eq.endo;
     return *this;
 }
 
@@ -177,7 +182,7 @@ std::string Equation::get_lec() const
     return std::string(c_equation->lec);
 }
 
-void Equation::set_lec(const std::string& lec, const std::string& endo)
+void Equation::set_lec(const std::string& lec)
 {
     if (lec.empty() || endo.empty())
     {
@@ -381,7 +386,7 @@ std::pair<std::string, std::string> Equation::split_equation()
 
 bool Equation::operator==(const Equation& other) const
 {
-    return equation_equal(c_equation, other.c_equation);
+    return equation_equal(c_equation, other.c_equation) && endo == other.endo;
 }
 
 NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
