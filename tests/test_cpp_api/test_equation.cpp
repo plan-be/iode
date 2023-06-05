@@ -6,11 +6,12 @@ class EquationTest : public KDBTest, public ::testing::Test
 protected:
     Equation* equation;
     KDBEquations kdb;
+    std::string name = "ACAF";
 
     void SetUp() override
     {
         load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-        equation = new Equation("ACAF");
+        equation = new Equation(name);
     }
 
     void TearDown() override
@@ -61,7 +62,7 @@ TEST_F(EquationTest, Method)
 TEST_F(EquationTest, Block)
 {
     // get
-    EXPECT_EQ(equation->get_block(), "ACAF");
+    EXPECT_EQ(equation->get_block(), name);
 
     // set
     std::string new_block = "ACAF;AGAF";
@@ -139,8 +140,33 @@ TEST_F(EquationTest, Tests)
 TEST_F(EquationTest, GetCoefficients)
 {
     std::vector<std::string> expected_coefs_list = {"acaf1", "acaf2", "acaf4"};
-    std::vector<std::string> coefs_list = equation->get_coefficients_list("ACAF");
+    std::vector<std::string> coefs_list = equation->get_coefficients_list();
     EXPECT_EQ(coefs_list, expected_coefs_list);
+
+    // check that coeffs have been created
+    KDBScalars kdb_scl;
+    EXPECT_EQ(kdb_scl.count(), coefs_list.size());
+    EXPECT_TRUE(kdb_scl.contains("acaf1"));
+    EXPECT_TRUE(kdb_scl.contains("acaf2"));
+    EXPECT_TRUE(kdb_scl.contains("acaf4"));
+}
+
+TEST_F(EquationTest, GetVariables)
+{
+    Sample eq_sample = equation->get_sample();
+    KDBVariables kdb_var;
+    kdb_var.set_sample(eq_sample.start_period(), eq_sample.end_period());
+
+    std::vector<std::string> expected_vars_list = {name, "VAF", "GOSF", "TIME"};
+    std::vector<std::string> vars_list = equation->get_variables_list();
+    EXPECT_EQ(vars_list, expected_vars_list);
+
+    // check that variables have been created
+    EXPECT_EQ(kdb_var.count(), vars_list.size());
+    EXPECT_TRUE(kdb_var.contains(name));
+    EXPECT_TRUE(kdb_var.contains("GOSF"));
+    EXPECT_TRUE(kdb_var.contains("TIME"));
+    EXPECT_TRUE(kdb_var.contains("VAF"));
 }
 
 TEST_F(EquationTest, Hash)
@@ -152,7 +178,7 @@ TEST_F(EquationTest, Hash)
     hash_before = equation_hasher(*equation->c_equation);
 
     // same equation
-    Equation* same_equation = new Equation("ACAF");
+    Equation* same_equation = new Equation(name);
     EXPECT_EQ(*equation, *same_equation);
     hash_after = equation_hasher(*same_equation->c_equation);
     EXPECT_EQ(hash_before, hash_after);
