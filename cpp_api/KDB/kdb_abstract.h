@@ -182,6 +182,8 @@ public:
      */
     void merge_into(std::string& input_file);
 
+    std::vector<std::string> get_associated_objects_list(const std::string& name, const EnumIodeType other_type);
+
     void dump(std::string& filepath);
 
     void clear();
