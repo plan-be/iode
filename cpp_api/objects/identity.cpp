@@ -13,12 +13,12 @@ Identity::Identity()
 
 Identity::Identity(const int pos, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_SCALARS];
+    if (!kdb) kdb = K_WS[I_IDENTITIES];
     if (pos < 0 || pos > kdb->k_nb)
     {
         IodeExceptionInvalidArguments error("Cannot extract Identity", "Identity position must be in range [0, " + 
             std::to_string(kdb->k_nb - 1) + "])");
-        error.add_argument("equation position", std::to_string(pos));
+        error.add_argument("identity position", std::to_string(pos));
         throw error;
     }
     c_identity = extract_identity(kdb, pos);
@@ -26,7 +26,7 @@ Identity::Identity(const int pos, KDB* kdb)
 
 Identity::Identity(const std::string& name, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_SCALARS];
+    if (!kdb) kdb = K_WS[I_IDENTITIES];
     int pos = K_find(kdb, to_char_array(name));
     if (pos < 0) 
         throw IodeExceptionFunction("Cannot extract Identity", "Identity with name " + name + " does not exist.");
