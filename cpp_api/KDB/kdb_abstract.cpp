@@ -233,6 +233,21 @@ void KDBAbstract::merge_into(std::string& input_file)
         " in the " + vIodeTypes[iode_type] + " database");
 }
 
+// TODO ald: rewrite B_DataSearchParms() in C++
+std::vector<std::string> KDBAbstract::get_associated_objects_list(const std::string& name, 
+    const EnumIodeType other_type)
+{
+    char** c_list = B_DataSearchParms(to_char_array(name), 1, 1, 1, 1, 1, (int) other_type);
+
+    std::vector<std::string> objs_list;
+    if(c_list == NULL || SCR_tbl_size((unsigned char**) c_list) == 0)
+        return objs_list;
+    
+    for(int i=0; i < SCR_tbl_size((unsigned char**) c_list); i++)
+        objs_list.push_back(std::string(c_list[i]));
+    return objs_list;
+}
+
 void KDBAbstract::dump(std::string& filepath)
 {
     if (count() == 0) return;
