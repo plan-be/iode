@@ -305,6 +305,45 @@ TEST_F(KDBEquationsTest, Merge)
     EXPECT_EQ(kdb1.get_lec(name), unmodified_lec);
 }
 
+TEST_F(KDBEquationsTest, AssociatedObjs)
+{
+    std::string name = "ACAG";
+    std::vector<std::string> objs_list;
+
+    load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
+    load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
+    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
+    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
+    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+
+    std::vector<std::string> expected_cmts = { name };
+    objs_list = kdb.get_associated_objects_list(name, I_COMMENTS);
+    EXPECT_EQ(objs_list, expected_cmts);
+
+    std::vector<std::string> expected_eqs = { name, "FLG" };
+    objs_list = kdb.get_associated_objects_list(name, I_EQUATIONS);
+    EXPECT_EQ(objs_list, expected_eqs);
+
+    objs_list = kdb.get_associated_objects_list(name, I_IDENTITIES);
+    EXPECT_EQ(objs_list.size(), 0);
+
+    std::vector<std::string> expected_lts = { "COPY0", "ENDO0", "TOTAL0" };
+    objs_list = kdb.get_associated_objects_list(name, I_LISTS);
+    EXPECT_EQ(objs_list, expected_lts);
+
+    objs_list = kdb.get_associated_objects_list(name, I_SCALARS);
+    EXPECT_EQ(objs_list.size(), 0);
+
+    std::vector<std::string> expected_tbl = { "GFR", "GFRLEVEL" };
+    objs_list = kdb.get_associated_objects_list(name, I_TABLES);
+    EXPECT_EQ(objs_list, expected_tbl);
+
+    std::vector<std::string> expected_vars = { name };
+    objs_list = kdb.get_associated_objects_list(name, I_VARIABLES);
+    EXPECT_EQ(objs_list, expected_vars);
+}
+
 TEST_F(KDBEquationsTest, Hash)
 {
     boost::hash<KDBEquations> kdb_hasher;
