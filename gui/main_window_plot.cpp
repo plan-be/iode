@@ -3,12 +3,12 @@
 
 MainWindowPlot::~MainWindowPlot()
 {
-    foreach(QIodePlotDialog* plotDialog, plots) plotDialog->close();
-    plots.clear();
+    foreach(QDialog* dialog, dialogs) dialog->close();
+    dialogs.clear();
 }
 
-void MainWindowPlot::appendPlot(QIodePlotDialog* plotDialog)
+void MainWindowPlot::appendModalDialog(QDialog* dialog)
 {
-    plotDialog->open();
-    plots.append(plotDialog);
+    dialog->open();
+    dialogs.append(dialog);
 }

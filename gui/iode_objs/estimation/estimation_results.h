@@ -37,7 +37,7 @@ public:
         Qt::WindowFlags f = Qt::WindowFlags());
 
 signals:
-    void newPlot(QIodePlotDialog* plotDialog);
+    void newPlot(QDialog* plotDialog);
 
 public slots:
     void plot_yobs_yest();
