@@ -10,11 +10,11 @@ class MainWindowPlot: public QMainWindow
 {
 	Q_OBJECT
 
+protected:
 	QVector<QDialog*> dialogs;
 
 public:
     MainWindowPlot(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
-    ~MainWindowPlot();
 
 public slots:
 	void appendModalDialog(QDialog* dialog);
