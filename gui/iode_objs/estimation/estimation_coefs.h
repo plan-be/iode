@@ -22,9 +22,7 @@ public:
         QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
         tableView_coefs->setStyleSheet(stylesheet);
 
-        // Warning: need to create a copy of kdb_coefs because passed kdb is deleted in 
-        //          the QIodeTemplateTableModel destructor
-        ScalarsModel* scalarsModel = new ScalarsModel(this, new KDBScalars(*kdb_coefs));
+        ScalarsModel* scalarsModel = new ScalarsModel(this, kdb_coefs);
         tableView_coefs->setModel(scalarsModel);
     }
 };
