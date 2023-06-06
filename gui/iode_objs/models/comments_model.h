@@ -11,7 +11,8 @@ class CommentsModel : public QIodeTemplateTableModel<KDBComments>
 	Q_OBJECT
 
 public:
-	CommentsModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Comment" }, parent) {};
+	CommentsModel(QObject* parent = nullptr, KDBComments* kdb_external = nullptr) 
+		: QIodeTemplateTableModel({"Comment" }, parent, kdb_external) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 

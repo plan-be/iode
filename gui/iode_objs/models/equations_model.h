@@ -11,7 +11,8 @@ class EquationsModel : public QIodeTemplateTableModel<KDBEquations>
 	Q_OBJECT
 
 public:
-	EquationsModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Equation"}, parent) {};
+	EquationsModel(QObject* parent = nullptr, KDBEquations* kdb_external = nullptr) 
+		: QIodeTemplateTableModel({"Equation"}, parent, kdb_external) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 

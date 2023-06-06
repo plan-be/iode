@@ -11,7 +11,8 @@ class IdentitiesModel : public QIodeTemplateTableModel<KDBIdentities>
 	Q_OBJECT
 
 public:
-	IdentitiesModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Identity"}, parent) {};
+	IdentitiesModel(QObject* parent = nullptr, KDBIdentities* kdb_external = nullptr) 
+		: QIodeTemplateTableModel({"Identity"}, parent, kdb_external) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 
