@@ -58,7 +58,7 @@ public:
     }
 
 signals:
-    void newPlot(QIodePlotDialog* plotDialog);
+    void newPlot(QDialog* plotDialog);
 
 public slots:
 	void display();

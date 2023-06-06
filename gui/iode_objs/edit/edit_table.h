@@ -51,7 +51,7 @@ public:
     ~QIodeEditTable();
 
 signals:
-    void newPlot(QIodePlotDialog* plotDialog);
+    void newPlot(QDialog* plotDialog);
     void tableModified();
 
 public slots:

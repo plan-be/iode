@@ -59,13 +59,13 @@ public:
 	void setup() override
 	{	
 		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-		connect(this, &VariablesView::newPlot, main_window, &MainWindowPlot::appendPlot);
+		connect(this, &VariablesView::newPlot, main_window, &MainWindowPlot::appendModalDialog);
     	connect(this, &VariablesView::newGraphsDialog, main_window, 
         	&MainWindowPlot::open_graphs_variables_dialog_from_vars_view);
 	}
 
 signals:
-	void newPlot(QIodePlotDialog* plotDialog);
+	void newPlot(QDialog* plotDialog);
 	void newGraphsDialog(const QList<QString>& variableNames, const QString& from, const QString& to);
 
 public slots:
