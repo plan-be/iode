@@ -263,8 +263,15 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
     // ask to save all current tabs content before to switch
     QMessageBox::StandardButton answer = askSaveAllTabs();
-    if (answer == QMessageBox::Discard) event->ignore();
-    else event->accept();
+    if (answer == QMessageBox::Discard) 
+        event->ignore();
+    else
+    {
+        foreach(QDialog* dialog, dialogs) dialog->close();
+        dialogs.clear();
+        
+        event->accept();
+    }
 }
 
 void MainWindow::check_vars_sample()
