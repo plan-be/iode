@@ -12,8 +12,8 @@ class ScalarsModel : public NumericalTableModel<KDBScalars>
 	Q_OBJECT
 
 public:
-	ScalarsModel(QObject* parent = nullptr, KDBScalars* kdb_coefs = nullptr, const int nb_digits = 2) : 
-		NumericalTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_coefs, nb_digits) {}
+	ScalarsModel(QObject* parent = nullptr, KDBScalars* kdb_external = nullptr, const int nb_digits = 2) : 
+		NumericalTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_external, nb_digits) {}
 
 	QVariant dataCell(const int row, const int col) const override;
 

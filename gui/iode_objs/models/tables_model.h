@@ -11,7 +11,8 @@ class TablesModel : public QIodeTemplateTableModel<KDBTables>
 	Q_OBJECT
 
 public:
-	TablesModel(QObject* parent = nullptr) : QIodeTemplateTableModel({"Table"}, parent) {};
+	TablesModel(QObject* parent = nullptr, KDBTables* kdb_external = nullptr) 
+		: QIodeTemplateTableModel({"Table"}, parent, kdb_external) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 
