@@ -42,6 +42,11 @@ AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delega
     // See: https://doc.qt.io/qt-5/qabstractitemview.html#SelectionMode-enum
     setSelectionMode(QTableView::ExtendedSelection);
 
+    // ---- Edit Trigger ----
+    // the user must double click to edit a cell
+    setEditTriggers(QAbstractItemView::EditTrigger::DoubleClicked); 
+
+    // ---- Signals & Slots ----
     deleteShortcut = new QShortcut(QKeySequence::Delete, this);
     // NOTE: Required to avoid confusion when deleting a file/directory from the File Explorer
     deleteShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
