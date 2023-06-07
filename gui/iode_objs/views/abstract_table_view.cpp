@@ -80,11 +80,35 @@ AbstractTableView::~AbstractTableView()
 
 void AbstractTableView::keyPressEvent(QKeyEvent* event)
 {
+    // hides the QLineEdit to edit the name of an IODE object if the user pressed ESCAPE
     if(objectNameEdit->isVisible() && event->key() == Qt::Key_Escape)
     {
         objectNameEdit->setHidden(true);
         objectNameEdit->setText("");
     }
+
+    // scrolls to the first row in which the IODE object name starts with the pressed key
+    if(!objectNameEdit->isVisible() && !event->text().isEmpty())
+    {   
+        QChar c = event->text()[0];
+        if((c.isLetter() && event->count() == 1) || c == '_')
+        {
+            int row = 0;
+            while(row < verticalHeader()->count())
+            {
+                QString name = model()->headerData(row, Qt::Vertical).toString();
+                if(name.startsWith(c, Qt::CaseInsensitive))
+                {
+                    scrollTo(model()->index(row, 0));
+                    selectRow(row);
+                    break;
+                }
+                row++;
+            }
+            return;
+        }
+    }
+
     QTableView::keyPressEvent(event);
 }
 
