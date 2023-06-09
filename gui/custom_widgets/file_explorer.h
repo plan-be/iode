@@ -255,7 +255,7 @@ public:
         // to update filepath, name and tooltip of corresponding tab when a file is renamed
         connect(fileSystemModel, &QFileSystemModel::fileRenamed, tabWidget, &QIodeTabWidget::fileRenamed);
         // to set corresponding file in color when its content is modified (and not yet saved to file)
-        connect(tabWidget, &QIodeTabWidget::modificationChanged, this, &QIodeFileExplorer::fileContentModified);
+        connect(tabWidget, &QIodeTabWidget::fileContentModified, this, &QIodeFileExplorer::fileContentModified);
     }
 
     /**
