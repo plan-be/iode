@@ -1,35 +1,8 @@
 #include "tab_widget.h"
 
 
-QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_all(false), discard_all(false)
+QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
 {
-    // set name
-    this->setObjectName(QString::fromUtf8("tabWidget_IODE_objs"));
-
-    // set policy
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
-    this->setSizePolicy(sizePolicy);
-
-    // prepare shortcuts
-    nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
-    previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
-    clearShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_D), this);
-
-    // ---- file system watcher ----
-    fileSystemWatcher = new QFileSystemWatcher(this);
-    connect(fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &QIodeTabWidget::reloadFile);
-
-    // ---- connect signals to slots  ----
-    connect(this, &QTabWidget::currentChanged, this, &QIodeTabWidget::showTab);
-    connect(this, &QTabWidget::tabCloseRequested, this, &QIodeTabWidget::removeTab);
-
-    connect(nextTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showNextTab);
-    connect(previousTabShortcut, &QShortcut::activated, this, &QIodeTabWidget::showPreviousTab);
-    connect(clearShortcut, &QShortcut::activated, this, &QIodeTabWidget::clearCurrentTab);
-
     // prepare widgets for tabs associated with IODE object types
     tabComments = new QIodeCommentsWidget(this);
     tabEquations = new QIodeEquationsWidget(this);
@@ -54,9 +27,6 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QTabWidget(parent), overwrite_
     tabIodeObjects.append(tabScalars);
     tabIodeObjects.append(tabTables);
     tabIodeObjects.append(tabVariables);
-
-    // rebuild the list of files (tabs) everytime a tab is moved
-    connect(this->tabBar(), &QTabBar::tabMoved, this, &QIodeTabWidget::buildFilesList);
 }
 
 QIodeTabWidget::~QIodeTabWidget()
@@ -70,12 +40,6 @@ QIodeTabWidget::~QIodeTabWidget()
     delete tabScalars;
     delete tabTables;
     delete tabVariables;
-
-    delete nextTabShortcut;
-    delete previousTabShortcut;
-    delete clearShortcut;
-
-    delete fileSystemWatcher;
 }
 
 void QIodeTabWidget::loadSettings()
@@ -230,13 +194,6 @@ void QIodeTabWidget::setup(std::shared_ptr<QIodeCompleter>& completer, QTextEdit
     this->show();
 }
 
-void QIodeTabWidget::resetFileSystemWatcher(const QDir& projectDir)
-{
-    // remove all previously registered directories and files
-    fileSystemWatcher->removePaths(fileSystemWatcher->directories());
-    fileSystemWatcher->removePaths(fileSystemWatcher->files());
-}
-
 void QIodeTabWidget::resetFilters()
 {
     foreach(AbstractIodeObjectWidget* tabWidget, tabIodeObjects) tabWidget->resetFilter();
@@ -244,32 +201,9 @@ void QIodeTabWidget::resetFilters()
 
 void QIodeTabWidget::resetFilter(const EnumIodeType iodeType)
 {
-    switch (iodeType)
-    {
-    case I_COMMENTS:
-        tabComments->resetFilter();
-        break;
-    case I_EQUATIONS:
-        tabEquations->resetFilter();
-        break;
-    case I_IDENTITIES:
-        tabIdentites->resetFilter();
-        break;
-    case I_LISTS:
-        tabLists->resetFilter();
-        break;
-    case I_SCALARS:
-        tabScalars->resetFilter();
-        break;
-    case I_TABLES:
-        tabTables->resetFilter();
-        break;
-    case I_VARIABLES:
-        tabVariables->resetFilter();
-        break;
-    default:
-        break;
-    }
+    AbstractIodeObjectWidget* tabWidget = getIodeObjTab(iodeType);
+    if(tabWidget)
+        tabWidget->resetFilter();
 }
 
 void QIodeTabWidget::clearWorkspace()
@@ -278,35 +212,13 @@ void QIodeTabWidget::clearWorkspace()
     for(int i=0; i < I_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
 }
 
-QStringList QIodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType) const
+QStringList QIodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)
 {
-        QStringList names;
-        switch (iodeType)
-        {
-        case I_COMMENTS:
-            return tabComments->getSelectedObjectsNames();
-            break;
-        case I_EQUATIONS:
-            return tabEquations->getSelectedObjectsNames();
-            break;
-        case I_IDENTITIES:
-            return tabIdentites->getSelectedObjectsNames();
-            break;
-        case I_LISTS:
-            return tabLists->getSelectedObjectsNames();
-            break;
-        case I_SCALARS:
-            return tabScalars->getSelectedObjectsNames();
-            break;
-        case I_TABLES:
-            return tabTables->getSelectedObjectsNames();
-            break;
-        case I_VARIABLES:
-            return tabVariables->getSelectedObjectsNames();
-            break;
-        default:
-            return names;
-        }
+        AbstractIodeObjectWidget* tabWidget = getIodeObjTab(iodeType);
+        if(tabWidget)
+            return tabWidget->getSelectedObjectsNames();
+        else
+            return QStringList();
 }
 
 int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
@@ -314,33 +226,9 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
     int index;
     try
     {
-        // get index of corresponding tab + reset filter
-        switch (iodeType)
-        {
-        case I_COMMENTS:
-            index = this->indexOf(tabComments);
-            break;
-        case I_EQUATIONS:
-            index = this->indexOf(tabEquations);
-            break;
-        case I_IDENTITIES:
-            index = this->indexOf(tabIdentites);
-            break;
-        case I_LISTS:
-            index = this->indexOf(tabLists);
-            break;
-        case I_SCALARS:
-            index = this->indexOf(tabScalars);
-            break;
-        case I_TABLES:
-            index = this->indexOf(tabTables);
-            break;
-        case I_VARIABLES:
-            index = this->indexOf(tabVariables);
-            break;
-        default:
-            return -1;
-        }
+        index = getIodeObjTabIndex(iodeType);
+        if(index < 0)
+            return index;
 
         // extract corresponding tab widget
         AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
@@ -361,106 +249,8 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
     return index;
 }
 
-int QIodeTabWidget::addReportTab(const QFileInfo& fileInfo)
-{
-    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), output, completer, this);
-    int index = this->addTab(reportWidget, reportWidget->getTabText());
-    setTabToolTip(index, reportWidget->getTooltip());
-    connect(reportWidget, &QIodeReportWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
-    connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &QIodeTabWidget::computeHash);
-    return index;
-}
-
-int QIodeTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile)
-{
-    QIodeTextWidget* textWidget = new QIodeTextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
-    int index = this->addTab(textWidget, textWidget->getTabText());
-    setTabToolTip(index, textWidget->getTooltip());
-    connect(textWidget, &QIodeTextWidget::modificationChanged, this, &QIodeTabWidget::tabContentModified);
-    return index;
-}
-
-// TODO : - add a Save As buttons.
-int QIodeTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo)
-{
-    if (fileType <= I_VARIABLES_FILE) return -1;
-
-    QString fullPath = fileInfo.absoluteFilePath();
-
-    // Note: indexOf() returns -1 if not found
-    int index = filesList.indexOf(fullPath);
-
-    // check if file already opened
-    if (index >= 0) return index;
-
-    // prepare and add the new tab
-    if(fileType == I_REPORTS_FILE)
-        index = addReportTab(fileInfo);
-    else if(QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
-            index = addTextTab(fileInfo, fileType);
-    else
-    { 
-        QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
-        index = -1;
-    }
-
-    if (index < 0) return index;
-
-    return index;
-}
-
-
-void QIodeTabWidget::tabContentModified(const QString& filepath, const bool modified)
-{
-    // update tab text
-    int index = filesList.indexOf(filepath);
-    if(index < 0) return;
-
-    AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
-    setTabText(index, tabWidget->getTabText());
-    emit modificationChanged(filepath, modified);
-}
-
-void QIodeTabWidget::removeTab(const int index)
-{
-    // ask to save if modified
-    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-    if(tabWidget->isModified())
-    {
-        QString filepath = tabWidget->getFilepath();
-        QString msg = "Unsaved modifications.\n";
-        msg+= "Would you like to save modifications to " + filepath + " before closing the tab?";
-        QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", msg, 
-            QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
-        if(answer == QMessageBox::Yes) tabWidget->save();
-        if(answer == QMessageBox::No) tabContentModified(filepath, false);
-        if(answer == QMessageBox::Discard) return;
-    }
-
-    // remove the path from the system file watcher
-    fileSystemWatcher->removePath(tabWidget->getFilepath());
-
-    // close the tab
-    QTabWidget::removeTab(index);
-}
-
-void QIodeTabWidget::showTab(int index)
-{
-    // get the index of the tab currently visible if not passed to the method
-    if (index < 0) index = this->currentIndex();
-
-    // get type of file
-    QString filename = this->tabText(index);
-    EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
-
-    // update widget if needed
-    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-    if(tabWidget) tabWidget->update();
-
-    this->setCurrentIndex(index);
-}
-
-int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, const bool forceOverwrite, const int moveToPosition)
+int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, 
+    const bool forceOverwrite, const int moveToPosition)
 {
     QString filename;
     QString tooltip;
@@ -533,53 +323,6 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, con
     }
 }
 
-void QIodeTabWidget::reloadFile(const QString& filepath)
-{
-	// find index of corresponding tab
-	int index = filesList.indexOf(filepath);
-	if(index < -1)
-		return;
-
-	// reload file
-	QString filename = QFileInfo(filepath).fileName();    
-	AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-	tabWidget->load(filepath, true);
-}
-
-bool QIodeTabWidget::saveTabContent(const int index)
-{
-    try
-    {
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-        QString filepath = tabWidget->save();
-        if (filepath.isEmpty()) 
-            return false;
-        
-        setTabText(index, tabWidget->getTabText());
-        setTabToolTip(index, tabWidget->getTooltip());
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        QMessageBox::warning(nullptr, "WARNING", "Couldn't save the content of " + tabText(index));
-        return false;
-    }
-}
-
-bool QIodeTabWidget::saveCurrentTab()
-{
-    int index = currentIndex();
-    return saveTabContent(index);
-}
-
-bool QIodeTabWidget::saveAllTabs()
-{
-    bool success = true;
-    for(int index=0; index < this->count(); index++)
-        if(!saveTabContent(index)) success = false;
-    return success;
-}
-
 void QIodeTabWidget::clearCurrentTab()
 {
     AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(currentWidget());
@@ -596,40 +339,4 @@ void QIodeTabWidget::clearCurrentTab()
             updateObjectTab((EnumIodeType) filetype);
         }
     }
-}
-
-bool QIodeTabWidget::saveProjectAs(QDir& newProjectDir)
-{
-    QString newProjectPath = newProjectDir.absolutePath();
-
-    if (!newProjectDir.exists())
-    {
-        QMessageBox::warning(nullptr, "WARNING", "Directory " + newProjectPath + " does not exist");
-        return false;
-    }
-
-    SystemItem currentProject(QFileInfo(projectDirPath), false);
-    return currentProject.copyTo(newProjectDir);
-}
-
-void QIodeTabWidget::fileMoved(const QString &oldFilepath, const QString &newFilepath)
-{
-    // check if oldFilePath present in currently open tabs
-    int index = filesList.indexOf(oldFilepath);
-    if (index >= 0)
-    {
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-        // update filepath in widget
-        if(!tabWidget->updateFilepath(newFilepath))
-            return;
-        // update name and tooltip of corresponding tab
-        setTabText(index, tabWidget->getTabText());
-        setTabToolTip(index, tabWidget->getTooltip());
-        // update list of open files (tabs)
-        filesList[index] = newFilepath;
-    }
-
-    // update file system watcher
-    fileSystemWatcher->removePath(oldFilepath);
-    fileSystemWatcher->addPath(newFilepath);
 }
