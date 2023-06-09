@@ -174,12 +174,13 @@ protected:
 
 public:
 	TemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) 
-		: AbstractTableView(iodeType, delegate, parent) {}
-
-	void setupView(M* model, QLineEdit* filterLineEdit)
+		: AbstractTableView(iodeType, delegate, parent) 
 	{
-		setModel(model);
 		setItemDelegate(delegate);
+	}
+
+	void setFilterLineEdit(QLineEdit* filterLineEdit)
+	{
 		this->filterLineEdit = filterLineEdit;
 	}
 

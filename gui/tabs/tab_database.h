@@ -187,7 +187,9 @@ public:
         tableview = new V(parent);
         tableview->setObjectName(QString::fromUtf8("tableview"));
         tableview->setGeometry(QRect(10, 43, 950, 560));
-        tableview->setupView(objmodel, lineEdit_filter);
+
+        tableview->setModel(objmodel);
+        tableview->setFilterLineEdit(lineEdit_filter);
         
         // shortcuts
         shortcutPrint = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_P), this);
