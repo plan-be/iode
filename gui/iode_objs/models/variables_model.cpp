@@ -41,5 +41,6 @@ void VariablesModel::reset()
 		period = QString::fromStdString(kdb->get_period(t).to_string());
 		columnNames.append(period);
 	}
-	resetModel();
+
+	QIodeAbstractTableModel::reset();
 }

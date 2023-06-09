@@ -20,5 +20,5 @@ public:
 	bool setValue(const int row, const int column, const QVariant& value) override;
 
 public slots:
-	void reset();
+	void reset() override;
 };
