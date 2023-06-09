@@ -1,5 +1,13 @@
 #include "tab_widget.h"
 
+QWidget* tabs_widget_ptr = nullptr;
+
+
+QWidget* get_tabs_widget_ptr()
+{
+    return tabs_widget_ptr;
+}
+
 
 QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
 {
@@ -27,6 +35,9 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
     tabIodeObjects.append(tabScalars);
     tabIodeObjects.append(tabTables);
     tabIodeObjects.append(tabVariables);
+
+    // ---- global parameters ----
+    tabs_widget_ptr = static_cast<QWidget*>(this);
 }
 
 QIodeTabWidget::~QIodeTabWidget()

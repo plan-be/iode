@@ -59,6 +59,9 @@ enum EnumItemType
 // defined in main_window.cpp
 QWidget* get_main_window_ptr();
 
+// defined in tab_widget.cpp
+QWidget* get_tabs_widget_ptr();
+
 
 /* ****************************** *
  *         BASE CLASSES           *
