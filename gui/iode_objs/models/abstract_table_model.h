@@ -56,6 +56,12 @@ protected:
 		beginResetModel();
 		endResetModel();
 	}
+
+public slots:
+	virtual void reset() 
+	{ 
+		resetModel(); 
+	}
 };
 
 
