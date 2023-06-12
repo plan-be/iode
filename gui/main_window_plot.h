@@ -17,7 +17,7 @@ public:
     MainWindowPlot(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
 
 public slots:
-	void appendModalDialog(QDialog* dialog);
+	void appendDialog(QDialog* dialog);
 	virtual void open_graphs_variables_dialog_from_vars_view(
 		const QList<QString>& variableNames, const QString& from, const QString& to) = 0;
 	virtual void open_compute_identities_dialog() = 0;

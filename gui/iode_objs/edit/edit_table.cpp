@@ -23,7 +23,7 @@ QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::Wi
 	connect(shortcutDelete, &QShortcut::activated, this, &QIodeEditTable::delete_line);
 
 	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowPlot::appendModalDialog);
+	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowPlot::appendDialog);
 
 	// propagate signal
 	QIodeEditTableModel* table_model = static_cast<QIodeEditTableModel*>(tableView->model());
