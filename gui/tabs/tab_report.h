@@ -1,14 +1,6 @@
 #pragma once
 
-#include <QPrinter>
-#include <QCheckBox>
-#include <QShortcut>
-#include <QSpacerItem>
-#include <QPushButton>
-#include <QPrintPreviewDialog>
-
-#include "utils.h"
-#include "tab_text.h"
+#include "tab_text_abstract.h"
 #include "ui_tab_report.h"
 #include "custom_widgets/report_editor.h"
 
