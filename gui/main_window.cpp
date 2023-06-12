@@ -538,14 +538,14 @@ void MainWindow::open_print_objects_definitions_dialog()
 void MainWindow::open_graphs_tables_dialog()
 {
     QIodeMenuGraphTables dialog(this);
-    connect(&dialog, &QIodeMenuGraphTables::newPlot, this, &MainWindow::appendModalDialog);
+    connect(&dialog, &QIodeMenuGraphTables::newPlot, this, &MainWindow::appendDialog);
     dialog.exec();
 }
 
 void MainWindow::open_graphs_variables_dialog()
 {
     QIodeMenuGraphVariables dialog(this);
-    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendModalDialog);
+    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendDialog);
     dialog.exec();
 }
 
@@ -556,7 +556,7 @@ void MainWindow::open_graphs_variables_dialog_from_vars_view(
     dialog.setVariablesNames(variableNames);
 	dialog.setFrom(from);
 	dialog.setTo(to);
-    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendModalDialog);
+    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendDialog);
     dialog.exec();
 }
 

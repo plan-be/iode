@@ -19,7 +19,7 @@ QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent,
     for(const std::string& name: est->get_list_equations()) variables_names << QString::fromStdString(name);
 
 	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowPlot::appendModalDialog);
+	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowPlot::appendDialog);
 }
 
 void QIodeEstimationResults::set_coefficients_tab()
