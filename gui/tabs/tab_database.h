@@ -160,9 +160,10 @@ public:
     virtual void computeHash(const bool before=false) = 0;
 
 public slots:
-    void KDBModified()
+    void databaseModified()
     {
-        setModified(true);
+        modified = true;
+        emit modificationChanged(filepath, true);
     }
 };
 
@@ -418,12 +419,12 @@ class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView
 public:
     QIodeCommentsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_COMMENTS, parent) 
     {
-        connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::KDBModified);
-        connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::KDBModified);
-        connect(objmodel, &CommentsModel::rowsInserted, this, &QIodeCommentsWidget::KDBModified);
-        connect(objmodel, &CommentsModel::rowsRemoved, this, &QIodeCommentsWidget::KDBModified);
-        connect(objmodel, &CommentsModel::databaseModified, this, &QIodeCommentsWidget::KDBModified);
-        connect(tableview, &CommentsView::newObjectInserted, this, &QIodeCommentsWidget::KDBModified);
+        connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::rowsInserted, this, &QIodeCommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::rowsRemoved, this, &QIodeCommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::databaseModified, this, &QIodeCommentsWidget::databaseModified);
+        connect(tableview, &CommentsView::newObjectInserted, this, &QIodeCommentsWidget::databaseModified);
     }
 };
 
@@ -432,13 +433,13 @@ class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsV
 public:
     QIodeEquationsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_EQUATIONS, parent) 
     {
-        connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::KDBModified);
-        connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::KDBModified);
-        connect(objmodel, &EquationsModel::rowsInserted, this, &QIodeEquationsWidget::KDBModified);
-        connect(objmodel, &EquationsModel::rowsRemoved, this, &QIodeEquationsWidget::KDBModified);
-        connect(objmodel, &EquationsModel::databaseModified, this, &QIodeEquationsWidget::KDBModified);
-        connect(tableview, &EquationsView::newObjectInserted, this, &QIodeEquationsWidget::KDBModified);
-        connect(tableview, &EquationsView::equationModified, this, &QIodeEquationsWidget::KDBModified);
+        connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::rowsInserted, this, &QIodeEquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::rowsRemoved, this, &QIodeEquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::databaseModified, this, &QIodeEquationsWidget::databaseModified);
+        connect(tableview, &EquationsView::newObjectInserted, this, &QIodeEquationsWidget::databaseModified);
+        connect(tableview, &EquationsView::equationModified, this, &QIodeEquationsWidget::databaseModified);
     }
 };
 
@@ -447,12 +448,12 @@ class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, Identiti
 public:
     QIodeIdentitiesWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_IDENTITIES, parent) 
     {
-        connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::KDBModified);
-        connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::KDBModified);
-        connect(objmodel, &IdentitiesModel::rowsInserted, this, &QIodeIdentitiesWidget::KDBModified);
-        connect(objmodel, &IdentitiesModel::rowsRemoved, this, &QIodeIdentitiesWidget::KDBModified);
-        connect(objmodel, &IdentitiesModel::databaseModified, this, &QIodeIdentitiesWidget::KDBModified);
-        connect(tableview, &IdentitiesView::newObjectInserted, this, &QIodeIdentitiesWidget::KDBModified);
+        connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::rowsInserted, this, &QIodeIdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::rowsRemoved, this, &QIodeIdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::databaseModified, this, &QIodeIdentitiesWidget::databaseModified);
+        connect(tableview, &IdentitiesView::newObjectInserted, this, &QIodeIdentitiesWidget::databaseModified);
     }
 };
 
@@ -461,12 +462,12 @@ class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
 public:
     QIodeListsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_LISTS, parent) 
     {
-        connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::KDBModified);
-        connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::KDBModified);
-        connect(objmodel, &ListsModel::rowsInserted, this, &QIodeListsWidget::KDBModified);
-        connect(objmodel, &ListsModel::rowsRemoved, this, &QIodeListsWidget::KDBModified);
-        connect(objmodel, &ListsModel::databaseModified, this, &QIodeListsWidget::KDBModified);
-        connect(tableview, &ListsView::newObjectInserted, this, &QIodeListsWidget::KDBModified);
+        connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::rowsInserted, this, &QIodeListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::rowsRemoved, this, &QIodeListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::databaseModified, this, &QIodeListsWidget::databaseModified);
+        connect(tableview, &ListsView::newObjectInserted, this, &QIodeListsWidget::databaseModified);
     }
 };
 
@@ -475,12 +476,12 @@ class QIodeScalarsWidget : public QIodeNumericalObjectWidget<ScalarsModel, Scala
 public:
     QIodeScalarsWidget(QWidget* parent = nullptr) : QIodeNumericalObjectWidget(I_SCALARS, parent) 
     {
-        connect(objmodel, &ScalarsModel::dataChanged, this, &QIodeScalarsWidget::KDBModified);
-        connect(objmodel, &ScalarsModel::headerDataChanged, this, &QIodeScalarsWidget::KDBModified);
-        connect(objmodel, &ScalarsModel::rowsInserted, this, &QIodeScalarsWidget::KDBModified);
-        connect(objmodel, &ScalarsModel::rowsRemoved, this, &QIodeScalarsWidget::KDBModified);
-        connect(objmodel, &ScalarsModel::databaseModified, this, &QIodeScalarsWidget::KDBModified);
-        connect(tableview, &ScalarsView::newObjectInserted, this, &QIodeScalarsWidget::KDBModified);
+        connect(objmodel, &ScalarsModel::dataChanged, this, &QIodeScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::headerDataChanged, this, &QIodeScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::rowsInserted, this, &QIodeScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::rowsRemoved, this, &QIodeScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::databaseModified, this, &QIodeScalarsWidget::databaseModified);
+        connect(tableview, &ScalarsView::newObjectInserted, this, &QIodeScalarsWidget::databaseModified);
     }
 };
 
@@ -489,13 +490,13 @@ class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
 public:
     QIodeTablesWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_TABLES, parent) 
     {
-        connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::KDBModified);
-        connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::KDBModified);
-        connect(objmodel, &TablesModel::rowsInserted, this, &QIodeTablesWidget::KDBModified);
-        connect(objmodel, &TablesModel::rowsRemoved, this, &QIodeTablesWidget::KDBModified);
-        connect(objmodel, &TablesModel::databaseModified, this, &QIodeTablesWidget::KDBModified);
-        connect(tableview, &TablesView::newObjectInserted, this, &QIodeTablesWidget::KDBModified);
-        connect(tableview, &TablesView::tableModified, this, &QIodeTablesWidget::KDBModified);
+        connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::rowsInserted, this, &QIodeTablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::rowsRemoved, this, &QIodeTablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::databaseModified, this, &QIodeTablesWidget::databaseModified);
+        connect(tableview, &TablesView::newObjectInserted, this, &QIodeTablesWidget::databaseModified);
+        connect(tableview, &TablesView::tableModified, this, &QIodeTablesWidget::databaseModified);
     }
 };
 
@@ -504,11 +505,11 @@ class QIodeVariablesWidget : public QIodeNumericalObjectWidget<VariablesModel, V
 public:
     QIodeVariablesWidget(QWidget* parent = nullptr) : QIodeNumericalObjectWidget(I_VARIABLES, parent) 
     {
-        connect(objmodel, &VariablesModel::dataChanged, this, &QIodeVariablesWidget::KDBModified);
-        connect(objmodel, &VariablesModel::headerDataChanged, this, &QIodeVariablesWidget::KDBModified);
-        connect(objmodel, &VariablesModel::rowsInserted, this, &QIodeVariablesWidget::KDBModified);
-        connect(objmodel, &VariablesModel::rowsRemoved, this, &QIodeVariablesWidget::KDBModified);
-        connect(objmodel, &VariablesModel::databaseModified, this, &QIodeVariablesWidget::KDBModified);
-        connect(tableview, &VariablesView::newObjectInserted, this, &QIodeVariablesWidget::KDBModified);
+        connect(objmodel, &VariablesModel::dataChanged, this, &QIodeVariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::headerDataChanged, this, &QIodeVariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::rowsInserted, this, &QIodeVariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::rowsRemoved, this, &QIodeVariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::databaseModified, this, &QIodeVariablesWidget::databaseModified);
+        connect(tableview, &VariablesView::newObjectInserted, this, &QIodeVariablesWidget::databaseModified);
     }
 };
