@@ -23,11 +23,11 @@ const static QVector<QString> tabPrefix({"(&CMT) ", "(&EQS) ", "(&IDT) ", "(&LST
 class AbstractTabWidget: public QWidget
 {
     Q_OBJECT
-    bool modified;
 
 protected:
     EnumIodeFile fileType;
     QString filepath;
+    bool modified;
 
 protected:
     virtual bool load_(const QString& filepath, const bool forceOverwrite) = 0;
