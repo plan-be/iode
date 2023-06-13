@@ -376,6 +376,15 @@ keyboard_shortcuts.*
 !keyboard_shortcuts.tex
 !build/keyboard_shortcuts.pdf
 
+# IODE temporary files
+*.cm$
+*.eq$
+*.id$
+*.ls$
+*.sc$
+*.tb$
+*.va$
+
 # Others
 *.exp
 #*.ini
