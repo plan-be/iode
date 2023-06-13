@@ -12,6 +12,7 @@
 #include <QStringList>
 
 #include "tab_abstract.h"
+#include "custom_widgets/tab_widget_abstract.h"
 
 #include "iode_objs/models/comments_model.h"
 #include "iode_objs/models/equations_model.h"
@@ -45,7 +46,7 @@ protected:
     QPushButton* pushButton_add;
 
 public:
-    AbstractIodeObjectWidget(const EnumIodeType iodeType, QWidget* parent = nullptr) : 
+    AbstractIodeObjectWidget(const EnumIodeType iodeType, QIodeAbstractTabWidget* parent) : 
         AbstractTabWidget((EnumIodeFile) iodeType, "", parent), projectDir(QDir::homePath())
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
@@ -178,7 +179,8 @@ protected:
     QShortcut* shortcutAdd;
 
 public:
-    QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : AbstractIodeObjectWidget(iodeType, parent)
+    QIodeObjectWidget(EnumIodeType iodeType, QIodeAbstractTabWidget* parent) 
+        : AbstractIodeObjectWidget(iodeType, parent)
     {
         // view table
         tableview = new V(parent);
@@ -213,6 +215,8 @@ public:
 
         connect(pushButton_add, &QPushButton::clicked, tableview, &V::new_obj);
         connect(shortcutAdd, &QShortcut::activated, tableview, &V::new_obj);
+
+        connect(tableview, &AbstractTableView::showObjsRequest, parent, &QIodeAbstractTabWidget::showObjectsList);
 
         // insert table to layout
         // -1 -> span over all rows/columns
@@ -317,7 +321,7 @@ private:
     }
 
 public:
-    QIodeNumericalObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) 
+    QIodeNumericalObjectWidget(EnumIodeType iodeType, QIodeAbstractTabWidget* parent) 
         : QIodeObjectWidget<M, V>(iodeType, parent)
     {
         // make sure iodeType is defined before to call loadSetting() and getGroupName()
@@ -417,7 +421,7 @@ public slots:
 class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_COMMENTS, parent) 
+    QIodeCommentsWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_COMMENTS, parent) 
     {
         connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::databaseModified);
@@ -431,7 +435,7 @@ public:
 class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_EQUATIONS, parent) 
+    QIodeEquationsWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_EQUATIONS, parent) 
     {
         connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::databaseModified);
@@ -446,7 +450,7 @@ public:
 class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_IDENTITIES, parent) 
+    QIodeIdentitiesWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_IDENTITIES, parent) 
     {
         connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::databaseModified);
@@ -460,7 +464,7 @@ public:
 class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_LISTS, parent) 
+    QIodeListsWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_LISTS, parent) 
     {
         connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::databaseModified);
         connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::databaseModified);
@@ -474,7 +478,7 @@ public:
 class QIodeScalarsWidget : public QIodeNumericalObjectWidget<ScalarsModel, ScalarsView>
 {
 public:
-    QIodeScalarsWidget(QWidget* parent = nullptr) : QIodeNumericalObjectWidget(I_SCALARS, parent) 
+    QIodeScalarsWidget(QIodeAbstractTabWidget* parent) : QIodeNumericalObjectWidget(I_SCALARS, parent) 
     {
         connect(objmodel, &ScalarsModel::dataChanged, this, &QIodeScalarsWidget::databaseModified);
         connect(objmodel, &ScalarsModel::headerDataChanged, this, &QIodeScalarsWidget::databaseModified);
@@ -488,7 +492,7 @@ public:
 class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(QWidget* parent = nullptr) : QIodeObjectWidget(I_TABLES, parent) 
+    QIodeTablesWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_TABLES, parent) 
     {
         connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::databaseModified);
         connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::databaseModified);
@@ -503,7 +507,7 @@ public:
 class QIodeVariablesWidget : public QIodeNumericalObjectWidget<VariablesModel, VariablesView>
 {
 public:
-    QIodeVariablesWidget(QWidget* parent = nullptr) : QIodeNumericalObjectWidget(I_VARIABLES, parent) 
+    QIodeVariablesWidget(QIodeAbstractTabWidget* parent) : QIodeNumericalObjectWidget(I_VARIABLES, parent) 
     {
         connect(objmodel, &VariablesModel::dataChanged, this, &QIodeVariablesWidget::databaseModified);
         connect(objmodel, &VariablesModel::headerDataChanged, this, &QIodeVariablesWidget::databaseModified);

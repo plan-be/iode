@@ -227,3 +227,92 @@ bool QIodeTemplateTableModel<K>::removeRows(int position, int rows, const QModel
 	endRemoveRows();
 	return true;
 }
+
+template <class K>
+QStringList QIodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type)
+{
+	QStringList list;
+
+	std::string std_name = name.toStdString();
+	int this_type = kdb->get_iode_type();
+	bool listedInClec = other_type == I_SCALARS || other_type == I_VARIABLES;
+
+	if(this_type == I_EQUATIONS && listedInClec)
+	{
+		Equation eq(std_name);
+
+		std::vector<std::string> std_list;
+		if(other_type == I_SCALARS)
+			std_list =  eq.get_coefficients_list();
+		else
+			std_list = eq.get_variables_list();
+
+		if(std_list.size() == 0)
+			return list;
+
+		for(const std::string& obj_name : std_list)
+			list << QString::fromStdString(obj_name);
+	}
+	else if(this_type == I_IDENTITIES && listedInClec)
+	{
+		Identity idt(std_name, nullptr);
+
+		std::vector<std::string> std_list;
+		if(other_type == I_SCALARS)
+			std_list =  idt.get_coefficients_list();
+		else
+			std_list = idt.get_variables_list();
+
+		if(std_list.size() == 0)
+			return list;
+
+		for(const std::string& obj_name : std_list)
+			list << QString::fromStdString(obj_name);
+	}
+	else
+	{
+		KDBComments kdb_cmt;
+		KDBEquations kdb_eqs;
+		KDBIdentities kdb_idt;
+		KDBLists kdb_lst;
+		KDBScalars kdb_scl;
+		KDBTables kdb_tbl;
+		KDBVariables kdb_var;
+
+		switch (other_type)
+		{
+		case I_COMMENTS:
+			if(kdb_cmt.contains(std_name))
+				list << name;
+			break;
+		case I_EQUATIONS:
+			if(kdb_eqs.contains(std_name))
+				list << name;
+			break;
+		case I_IDENTITIES:
+			if(kdb_idt.contains(std_name))
+				list << name;
+			break;
+		case I_LISTS:
+			if(kdb_lst.contains(std_name))
+				list << name;
+			break;
+		case I_SCALARS:
+			if(kdb_scl.contains(std_name))
+				list << name;
+			break;
+		case I_TABLES:
+			if(kdb_tbl.contains(std_name))
+				list << name;
+			break;
+		case I_VARIABLES:
+			if(kdb_var.contains(std_name))
+				list << name;
+			break;
+		default:
+			break;
+		}
+	}
+
+	return list;
+}

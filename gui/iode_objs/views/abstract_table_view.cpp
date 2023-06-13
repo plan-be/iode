@@ -70,12 +70,46 @@ AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delega
     connect(this->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, &AbstractTableView::openEditorName);
     connect(objectNameEdit, &QLineEdit::returnPressed, this, &AbstractTableView::editName);
     connect(objectNameEdit, &QLineEdit::editingFinished, this, &AbstractTableView::closeNameEditor);
+
+    // gets objects of the same name or listed in the clec structure
+ 	sameCmtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F1), this);
+	sameEqShortcut  = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F2), this);
+	sameIdtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F3), this);
+	sameLstShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F4), this);
+	sameTblShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F6), this);
+	varsFromClecShortcut     = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F7), this);
+	scalarsFromClecShortcut  = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F5), this);
+
+    sameCmtShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
+    sameEqShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
+    sameIdtShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
+    sameLstShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
+    sameTblShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
+    varsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    scalarsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
+
+    connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_COMMENTS); });
+    connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_EQUATIONS); });
+    connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_IDENTITIES); });
+    connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_LISTS); });
+    connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_TABLES); });
+    connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_VARIABLES); });
+    connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_SCALARS); });
 }
 
 AbstractTableView::~AbstractTableView()
 {
-    delete deleteShortcut;
     delete objectNameEdit;
+
+    delete deleteShortcut;
+
+	delete sameCmtShortcut;
+	delete sameEqShortcut;
+	delete sameIdtShortcut;
+	delete sameLstShortcut;
+	delete scalarsFromClecShortcut;
+	delete sameTblShortcut;
+	delete varsFromClecShortcut;
 }
 
 void AbstractTableView::keyPressEvent(QKeyEvent* event)

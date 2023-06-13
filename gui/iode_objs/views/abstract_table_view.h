@@ -38,6 +38,14 @@ protected:
 
 	QShortcut* deleteShortcut;
 
+	QShortcut* sameCmtShortcut;
+	QShortcut* sameEqShortcut;
+	QShortcut* sameIdtShortcut;
+	QShortcut* sameLstShortcut;
+	QShortcut* sameTblShortcut;
+	QShortcut* varsFromClecShortcut;
+	QShortcut* scalarsFromClecShortcut;
+
 protected:
 	void keyPressEvent(QKeyEvent* event);
 
@@ -47,8 +55,26 @@ public:
 
 	virtual void setup() {}
 
+	virtual void update() {}
+
+	int preferredHeight()
+	{
+		int height = horizontalHeader()->height();
+		for(int i = 0; i < model()->rowCount(); i++)
+			height += rowHeight(i);
+		if(iodeType == I_VARIABLES)
+			height += 20;
+		return height;
+	}
+
+	void enableDeleteShortcut(bool enable)
+	{
+		deleteShortcut->setEnabled(enable);
+	}
+
 signals:
 	void newObjectInserted();
+	void showObjsRequest(EnumIodeType other_type, const QStringList& objNames);
 
 protected slots:
 	void renderForPrinting() 
@@ -65,6 +91,14 @@ public slots:
 		objectNameEdit->setHidden(true);
 		objectNameEdit->setText("");
 	}
+
+	/**
+	 * @brief shows scalars or variables listed in the clec structure or 
+	 *        the object of the same name.
+	 * 
+	 * @param iode_type 
+	 */
+	virtual void showSameObjOrObjsFromClec(const EnumIodeType iode_type) = 0;
 };
 
 
@@ -184,7 +218,7 @@ public:
 		this->filterLineEdit = filterLineEdit;
 	}
 
-	void update()
+	void update() override
 	{
 		M* table_model = static_cast<M*>(model());
 		table_model->reset();
@@ -201,5 +235,23 @@ public:
 		foreach(const QModelIndex& index, selection) 
 			names << model_obj->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
 		return names;
+	}
+
+	void showSameObjOrObjsFromClec(const EnumIodeType other_type)
+	{
+		// get the selected object
+		QModelIndexList selection = this->selectionModel()->selectedRows();
+		if(selection.size() == 0) 
+			return;
+		QModelIndex index = selection[0];
+
+		// get name of the selected object
+		M* table_model = static_cast<M*>(model());		
+		QString name = table_model->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
+
+		// get the list of other objects og type other_type of the same name or present in the CLEC structure
+		QStringList list = table_model->getSameObjOrObjsFromClec(name, other_type);
+
+		emit showObjsRequest(other_type, list);
 	}
 };
