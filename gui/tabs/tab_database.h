@@ -180,16 +180,16 @@ protected:
 public:
     QIodeObjectWidget(EnumIodeType iodeType, QWidget* parent = nullptr) : AbstractIodeObjectWidget(iodeType, parent)
     {
-        // model table
-        QWidget* mainwin = get_main_window_ptr();
-        objmodel = new M(mainwin);
-
         // view table
         tableview = new V(parent);
         tableview->setObjectName(QString::fromUtf8("tableview"));
         tableview->setGeometry(QRect(10, 43, 950, 560));
 
+        // model table
+        objmodel = new M(tableview);
         tableview->setModel(objmodel);
+
+        // IODE objects names filter
         tableview->setFilterLineEdit(lineEdit_filter);
         
         // shortcuts
