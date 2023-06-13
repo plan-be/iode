@@ -163,7 +163,7 @@ public slots:
     void databaseModified()
     {
         modified = true;
-        emit modificationChanged(filepath, true);
+        emit tabContentModified(filepath, true);
     }
 };
 

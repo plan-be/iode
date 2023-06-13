@@ -57,7 +57,7 @@ int QIodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
     int index = this->addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
 
-    connect(reportWidget, &QIodeReportWidget::modificationChanged, this, &QIodeAbstractTabWidget::tabContentModified);
+    connect(reportWidget, &QIodeReportWidget::tabContentModified, this, &QIodeAbstractTabWidget::tabContentModified);
     connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &QIodeAbstractTabWidget::computeHash);
     
     return index;
@@ -69,7 +69,7 @@ int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIode
     int index = this->addTab(textWidget, textWidget->getTabText());
     setTabToolTip(index, textWidget->getTooltip());
     
-    connect(textWidget, &QIodeTextWidget::modificationChanged, this, &QIodeAbstractTabWidget::tabContentModified);
+    connect(textWidget, &QIodeTextWidget::tabContentModified, this, &QIodeAbstractTabWidget::tabContentModified);
     
     return index;
 }
