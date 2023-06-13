@@ -163,8 +163,7 @@ private:
 		QString defaultFilename = QString(I_DEFAULT_FILENAME) + "." + QString::fromStdString(v_binary_ext[iodeType]);
 		QString defaultFilepath = projectDir.absoluteFilePath(defaultFilename);
 
-		QWidget* mainwin = get_main_window_ptr();
-		QDialog dialog(mainwin);
+		QDialog dialog;
 		dialog.setObjectName(QString::fromUtf8("ask_save_to_dialog"));
 		dialog.setMinimumWidth(380);
 		dialog.setMinimumHeight(100);
