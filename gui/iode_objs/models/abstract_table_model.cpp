@@ -316,3 +316,17 @@ QStringList QIodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& 
 
 	return list;
 }
+
+template <class K>
+QStringList QIodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const EnumIodeType other_type)
+{
+	QStringList list;
+	
+	std::vector<std::string> std_list = kdb->get_associated_objects_list(name.toStdString(), other_type);
+	if(std_list.size() == 0)
+		return list;
+
+	for(const std::string& obj_name: std_list)
+		list << QString::fromStdString(obj_name);
+	return list;
+}

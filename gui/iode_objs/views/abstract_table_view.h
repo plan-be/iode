@@ -46,6 +46,14 @@ protected:
 	QShortcut* varsFromClecShortcut;
 	QShortcut* scalarsFromClecShortcut;
 
+	QShortcut* relatedCmtShortcut;
+	QShortcut* relatedEqShortcut;
+	QShortcut* relatedIdtShortcut;
+	QShortcut* relatedLstShortcut;
+	QShortcut* relatedSclShortcut;
+	QShortcut* relatedTblShortcut;
+	QShortcut* relatedVarShortcut;
+
 protected:
 	void keyPressEvent(QKeyEvent* event);
 
@@ -99,6 +107,13 @@ public slots:
 	 * @param iode_type 
 	 */
 	virtual void showSameObjOrObjsFromClec(const EnumIodeType iode_type) = 0;
+
+	/**
+	 * @brief shows all related objects.
+	 * 
+	 * @param iode_type 
+	 */
+	virtual void showRelatedObjs(const EnumIodeType iode_type) = 0;
 };
 
 
@@ -251,6 +266,24 @@ public:
 
 		// get the list of other objects og type other_type of the same name or present in the CLEC structure
 		QStringList list = table_model->getSameObjOrObjsFromClec(name, other_type);
+
+		emit showObjsRequest(other_type, list);
+	}
+
+	void showRelatedObjs(const EnumIodeType other_type)
+	{
+		// get the selected object
+		QModelIndexList selection = this->selectedIndexes();
+		if(selection.size() == 0) 
+			return;
+		QModelIndex index = selection[0];
+
+		// get name of the selected object
+		M* table_model = static_cast<M*>(model());		
+		QString name = table_model->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
+
+		// get the list of all related other objects of type other_type
+		QStringList list = table_model->getRelatedObjs(name, other_type);
 
 		emit showObjsRequest(other_type, list);
 	}

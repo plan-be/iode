@@ -145,6 +145,14 @@ public:
 	 */
 	QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type);
 
+	/**
+	 * @brief get the list of all related objects of type other_type.
+	 *  
+	 * @param name 
+	 * @param other_type 
+	 */
+	QStringList getRelatedObjs(const QString& name, const EnumIodeType other_type);
+
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
 
