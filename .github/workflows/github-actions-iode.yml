@@ -6,7 +6,7 @@ on: pull_request
 jobs:
   build_and_test_api:
     name: Build And Test Static Libraries
-    if: ${{ !(contains(github.head_ref, 'gui') || contains(github.head_ref, 'doc') || contains(github.head_ref, 'cython') || contains(github.head_ref, 'nsis')) }}
+    if: ${{ !contains(github.head_ref, 'doc') }}
     strategy:
       matrix:
         # os: [windows-latest, ubuntu-latest]
