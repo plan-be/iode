@@ -34,7 +34,7 @@ protected:
     virtual QString saveAs_() = 0;
 
 signals:
-    void modificationChanged(const QString& filepath, const bool modified);
+    void tabContentModified(const QString& filepath, const bool modified);
 
 public:
     AbstractTabWidget(const EnumIodeFile fileType, const QString& filepath="", QWidget* parent = nullptr) : 
@@ -136,6 +136,6 @@ public slots:
     void setModified(bool modified)
     {
         this->modified = modified;
-        emit modificationChanged(filepath, modified); 
+        emit tabContentModified(filepath, modified); 
     }
 };
