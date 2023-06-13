@@ -95,6 +95,31 @@ AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delega
     connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_TABLES); });
     connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_VARIABLES); });
     connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_SCALARS); });
+
+    // get list of related objects
+	relatedCmtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F1), this);
+	relatedEqShortcut  = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F2), this);
+	relatedIdtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F3), this);
+	relatedLstShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4), this);
+	relatedSclShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F5), this);
+	relatedTblShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F6), this);
+	relatedVarShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F7), this);
+
+    relatedCmtShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    relatedEqShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    relatedIdtShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    relatedLstShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    relatedSclShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    relatedTblShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    relatedVarShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+
+    connect(relatedCmtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_COMMENTS); });
+    connect(relatedEqShortcut , &QShortcut::activated, this, [this]{ showRelatedObjs(I_EQUATIONS); });
+    connect(relatedIdtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_IDENTITIES); });
+    connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_LISTS); });
+    connect(relatedSclShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_SCALARS); });
+    connect(relatedTblShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_TABLES); });
+    connect(relatedVarShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_VARIABLES); });
 }
 
 AbstractTableView::~AbstractTableView()
@@ -110,6 +135,14 @@ AbstractTableView::~AbstractTableView()
 	delete scalarsFromClecShortcut;
 	delete sameTblShortcut;
 	delete varsFromClecShortcut;
+
+    delete relatedCmtShortcut;
+    delete relatedEqShortcut;
+    delete relatedIdtShortcut;
+    delete relatedLstShortcut;
+    delete relatedSclShortcut;
+    delete relatedTblShortcut;
+    delete relatedVarShortcut;
 }
 
 void AbstractTableView::keyPressEvent(QKeyEvent* event)
