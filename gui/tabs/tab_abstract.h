@@ -136,6 +136,6 @@ public slots:
     void setModified(bool modified)
     {
         this->modified = modified;
-        emit modificationChanged(getFilepath(), modified); 
+        emit modificationChanged(filepath, modified); 
     }
 };
