@@ -136,6 +136,15 @@ public:
 
 	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
 
+	/**
+	 * @brief gets the list of scalars or variables listed in the clec structure or 
+	 *        the object of the same name.
+	 * 
+	 * @param name 
+	 * @param other_type 
+	 */
+	QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type);
+
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
 
