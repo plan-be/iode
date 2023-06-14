@@ -50,9 +50,9 @@
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.68 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+#define IODE_VERSION "IODE Modeling Software 6.69 - (c) 1990-2023 Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR 6
-#define IODE_VERSION_MINOR 68
+#define IODE_VERSION_MINOR 69
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
@@ -119,7 +119,7 @@
 #define KMAGIC(kdb)  ((kdb)->k_magic)
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-//#define KNAME(kdb)   ((kdb)->k_name) Supprimï¿½ pour ï¿½viter les oublis
+//#define KNAME(kdb)   ((kdb)->k_name) Supprimé pour éviter les oublis
 #define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
 #define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
@@ -883,7 +883,7 @@ typedef struct _olname_ {
 } OLNAME;
 
 typedef struct _lname_ {
-    ONAME   name;       // scalar or variable name
+    ONAME   name;
 	char    pad[3];
     long    pos; /* SWHDL */ /* IODE64K */
 } LNAME;
@@ -900,10 +900,10 @@ typedef struct _oclec_ {
 typedef struct _clec_ {
     long    tot_lg,        /* JMP 20-05-00 */ /* IODE64K */
 		exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
-    short   nb_names;   // number of scalar and variables names
+    short   nb_names;
     char    dupendo;
     char    pad;
-    LNAME   lnames[1];  // list of of scalar and variable names
+    LNAME   lnames[1];
 } CLEC;
 
 /**
@@ -1119,15 +1119,15 @@ typedef struct _col_ {
 
     /*   {{v00, v01},{v10,v11}}
 
-		    |             |
-		    |   file1     |   file2
+	    |             |
+	    |   file1     |   file2
     --------|-------------|------------
     period1 |    v00      |    v01
-		    | cl_val[0,0] | cl_val[0,1]    v.. = valeur
+	    | cl_val[0,0] | cl_val[0,1]    v.. = valeur
     --------|-------------|------------
     period2 |    v10      |    v11
-		    | cl_val[1,0] | cl_val[1,1]
-		    |             |
+	    | cl_val[1,0] | cl_val[1,1]
+	    |             |
     */
     IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
@@ -1226,7 +1226,7 @@ typedef struct _token {
 typedef struct _lstack {        /* stack of operators used by L_analyse */
     unsigned ls_op      : 8;    /* operator */
     //unsigned ls_nb_args : 8;    /* nb of arguments */
-    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vï¿½rifier si plus de 255 arguments
+    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de vérifier si plus de 255 arguments
 } LSTACK;
 
 
