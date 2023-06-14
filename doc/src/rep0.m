@@ -181,6 +181,7 @@ Ces commandes (mots cl굎) sont les suivantes:
 &EN <$mkdir>    : cr괻 un nouveau directory
 &EN <$multiline>: permet ou non l'괹riture d'une commande sur plusieurs lignes
 &EN <$msg>      : affichage d'un message et attente d'un touche
+&EN <$silent>   : supprime ou r괶ctive l'affichage des messages g굈굍굎 
 &EN <$next>     : fin de boucle
 &EN <$noparsing>: active ou d굎active le parsing des textes entre backquotes
 &EN <$procdef>  : d괽inition d'une proc괺ure
@@ -968,6 +969,23 @@ fonction $show qui affiche dans le bas de l'괹ran mais ne stoppe pas.
     $Msg message
     message := texte quelconque
 &TX
+>
+
+<$silent>   
+    Commande $silent
+    컴컴컴컴컴컴
+
+Cette commande permet de supprimer ou de r괶ctiver l'affichage des messages g굈굍굎 par
+le programme, par exemple pendant une simulation, ou produits via la commande de rapports
+ ~c$show~C. Par d괽aut (sans argument), les messages sont d굎activ굎, ce qui 
+굌uivaut ~c$silent 1~C.
+
+Pour r괶ctiver les message, il suffit de lancer la commande ~c$silent 0~C.
+
+&SY2
+    $silent [{0|N|n|1|Y|y}] 
+&TX
+
 >
 
 <$debug>

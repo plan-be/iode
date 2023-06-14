@@ -6,6 +6,64 @@ START
 ..esc ~
 
 
+<Version 6.69> (12/06/2023)>
+    Version 6.69 (12/06/2023)
+    ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+..esc ~
+
+&TI Nouvelle fonction de rapport $silent
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Cette commande permet de supprimer ou de r‚activer l'affichage des messages g‚n‚r‚s par
+le programme, par exemple pendant une simulation, ou produits via la commande de rapports
+ ~c$show~C. Par d‚faut (sans argument), les messages sont d‚sactiv‚s, ce qui 
+‚quivaut ~c$silent 1~C.
+
+Pour r‚activer les messages, il suffit de lancer la commande ~c$silent 0~C.
+
+&SY2
+    $silent [{0|N|n|1|Y|y}] 
+&TX
+
+&TI Nouveau programme iodecmd64 
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Une version 64 bits du programme ~ciodecmd~C, nomm‚e ~ciodecmd64~C, est dor‚navant disponible. 
+Cette version est syntaxiquement identique au programme ~ciodecmd~C. 
+
+Un gain de vitesse de l'ordre de 30% … 50% par rapport … la version 32 bits 
+a pu ˆtre observ‚ pour les fonctions de simulation et de tri des modŠles (de grande taille).
+
+&IT Exploitation de la m‚moire
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Comme tout programme 64 bits, ~ciodecmd64~C dispose d'un espace 
+d'adressage plus ‚tendu que ~ciodecmd~C (32 bits), tout en restant limit‚ … la m‚moire disponible. 
+
+Le (nouveau) paramŠtre ~c-seg~C de ~ciodecmd64~C permet d'augmenter la m‚moire 
+que peut utiliser ~ciodecmd64~C au cours d'une session.
+
+
+&TI Nouveau paramŠtre -seg de iodecmd et iodecmd64
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Les programmes ~ciodecmd~C et ~ciodecmd64~C, versions sans interface de IODE, acceptent
+un nouveau paramŠtre ~c-seg~C qui permet de changer la taille des segments m‚moire o— 
+sont stock‚s les objets d'IODE pendant une session. 
+
+Pour rappel, ces segments ont les caract‚ristiques suivantes :
+&EN leur taille est d‚termin‚e soit dans le fichier ~ciode.ini~C, 
+soit, … partir de cette version, via le paramŠtre ~c-seg~C des programmes ~ciodecmd~C ou ~ciodecmd64~C. 
+&EN leur nombre ne peut d‚passer 32767.
+
+Par cons‚quent, la taille maximum pour des segments standards de 65500 bytes est de l'ordre de 2GB.
+Si on veut accroŒtre cet espace, il faut donc changer la taille des segments, 
+par exemple en lan‡ant ~ciodecmd64~C comme suit :
+
+&CO
+    iodecmd64 -seg 100000 myreport.rep
+&TX
+
+Dans ce cas, la taille globale disponible peut atteindre 3,2 GB.
+
+>
+
 <Version 6.68> (27/04/2023)>
     Version 6.68 (27/04/2023)
     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
