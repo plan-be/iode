@@ -50,6 +50,8 @@ BFNS B_fns[] = {
     "onerror",                "onerror",                  RP_onerror,             RP_onerror,         0,        0,
     "return",                 "return",                   RP_return,              RP_return,          0,        0,
     "show",                   "show",                     RP_message,             RP_message,         0,        0,
+    "silent",                 "silent",                   RP_silent,              RP_silent,          0,        0,
+    //"showoff",                "showoff",                  RP_message_off,         RP_message_off,     0,        0,
     "msg",                    "msg",                      RP_warning,             RP_warning,         0,        0,
     "beep",                   "beep",                     RP_beep,                RP_beep,            0,        0,
     "system",                 "system",                   RP_system,              RP_system,          0,        0,
