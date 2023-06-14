@@ -22,14 +22,24 @@
 ;--------------------------------
 ;Include definitions
 
+  ;defines EXE_NAME, VERSION, VERSION_PATH, 
+  ;        MUI_ICON, PATCH
   !include "iode_definitions.nsh"
+
+;--------------------------------
+;Include others
+
+!include "file_association.nsh"
 
 ;--------------------------------
 ;General
 
-  ;Name and file
+  ; The name of the installer
   Name "IODE ${VERSION} Installer"
+
+  ; The executable file to create
   OutFile "iode_${VERSION_PATH}_setup.exe"
+
   Unicode True
   
   ; Set compression.
@@ -39,7 +49,9 @@
   InstallDir $PROFILE\IODE
 
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\IODE" "Install Directory"
+  ;Note : - HKLM is HKEY_LOCAL_MACHINE (need admin privileges)
+  ;       - HKCU is HKEY_CURRENT_USER 
+  InstallDirRegKey HKCU "Software\IODE" "Install_Dir"
 
   ;Request application privileges
   RequestExecutionLevel user
@@ -53,16 +65,20 @@
 ;Pages
 
   ; Installer pages
-  !define MUI_WELCOMEPAGE_TITLE "IODE ${VERSION}"
+  !define MUI_WELCOMEPAGE_TITLE "IODE ${VERSION} Installer"
   !insertmacro MUI_PAGE_WELCOME
 
-  !define MUI_COMPONENTSPAGE_TEXT_TOP "IODE ${VERSION}"
+  !define MUI_LICENSEPAGE_TEXT_TOP "IODE ${VERSION} Installer."
+  !define MUI_LICENSEPAGE_RADIOBUTTONS
+  !insertmacro MUI_PAGE_LICENSE "iode_license.rtf"
+
+  !define MUI_COMPONENTSPAGE_TEXT_TOP "IODE ${VERSION} Installer"
   !insertmacro MUI_PAGE_COMPONENTS
 
-  !define MUI_DIRECTORYPAGE_TEXT_TOP "IODE ${VERSION}"
+  !define MUI_DIRECTORYPAGE_TEXT_TOP "IODE ${VERSION} Installer" 
   !insertmacro MUI_PAGE_DIRECTORY
 
-  !define MUI_STARTMENUPAGE_TEXT_TOP "IODE ${VERSION}"
+  !define MUI_STARTMENUPAGE_TEXT_TOP "IODE ${VERSION} Installer"
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
   !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\IODE" 
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
@@ -76,10 +92,10 @@
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
-  
+
 ;--------------------------------
-;Languages
- 
+;Language
+
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
@@ -102,6 +118,8 @@ Section "IODE ${VERSION} executable" SecInstall
   ;Set output path to the installation directory.
   SetOutPath $INSTDIR
   
+  ;-- List of files to install --
+
   ;GUI executable file
   File "<QT DIR>\${EXE_NAME}"
   ;Qt DLL
@@ -122,10 +140,10 @@ Section "IODE ${VERSION} executable" SecInstall
   
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  
-  !insertmacro MUI_STARTMENU_WRITE_BEGIN "IODE${VERSION}"
 
   ;Create shortcuts
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN "IODE${VERSION}"
+
   ;Parameters: link.lnk target.file [parameters [icon.file [icon_index_number 
   ;            [start_options [keyboard_shortcut [description]]]]]]
   ; CreateShortcut "$SMPROGRAMS\My Company\My Program.lnk" "$INSTDIR\My Program.exe" \
@@ -139,6 +157,58 @@ Section "IODE ${VERSION} executable" SecInstall
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
+  ;Register extensions
+
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".cmt" "IODE Comments"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".eqs" "IODE Equations"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".idt" "IODE Identities"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".lst" "IODE Lists"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".scl" "IODE Scalars"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".tbl" "IODE Tables"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".var" "IODE Ascii Variables"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".ac" "IODE Ascii Comments"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".ae" "IODE Ascii Equations"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".ai" "IODE Ascii Identities"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".al" "IODE Ascii Lists"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".as" "IODE Ascii Scalars"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".at" "IODE Ascii Tables"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".av" "IODE Ascii Variables"
+  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".rep" "IODE Reports"
+
+
+SectionEnd
+
+;--------------------------------
+; Python (disabled by default)
+Section /o "IODE-Python 3.9"  SecPython39
+
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR\python_3_9
+
+  ; Put file there
+  File "<PYTHON 3.9 DIR>\iode.pyd"
+SectionEnd
+
+;--------------------------------
+; Python (disabled by default)
+Section /o "IODE-Python 3.10"  SecPython310
+
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR\python_3_10
+
+  ; Put file there
+  File "<PYTHON 3.10 DIR>\iode.pyd"
+SectionEnd
+
+;--------------------------------
+; Python (disabled by default)
+Section /o "IODE-Python 3.11"  SecPython311
+
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR\python_3_11
+
+  ; Put file there
+  File "<PYTHON 3.11 DIR>\iode.pyd"
 SectionEnd
 
 ;--------------------------------
@@ -160,14 +230,14 @@ Section /o "IODE Example Model"  SecExample
 
   !verbose pop
 
-  ;CreateDirectory "$SMPROGRAMS\$StartMenuFolder\example"
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\comment.lnk" "$INSTDIR\example\fun.cmt" "" "$INSTDIR\example\fun.cmt" 0
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\equation.lnk" "$INSTDIR\example\fun.eqs" "" "$INSTDIR\example\fun.eqs" 0
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\identity.lnk" "$INSTDIR\example\fun.idt" "" "$INSTDIR\example\fun.idt" 0
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\list.lnk" "$INSTDIR\example\fun.lst" "" "$INSTDIR\example\fun.lst" 0
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\scalar.lnk" "$INSTDIR\example\fun.scl" "" "$INSTDIR\example\fun.scl" 0
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\table.lnk" "$INSTDIR\example\fun.tbl" "" "$INSTDIR\example\fun.tbl" 0
-  ;CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\variable.lnk" "$INSTDIR\example\fun.var" "" "$INSTDIR\example\fun.var" 0
+  CreateDirectory "$SMPROGRAMS\$StartMenuFolder\example"
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\comment.lnk" "$INSTDIR\example\fun.cmt" "" "$INSTDIR\example\fun.cmt" 0
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\equation.lnk" "$INSTDIR\example\fun.eqs" "" "$INSTDIR\example\fun.eqs" 0
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\identity.lnk" "$INSTDIR\example\fun.idt" "" "$INSTDIR\example\fun.idt" 0
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\list.lnk" "$INSTDIR\example\fun.lst" "" "$INSTDIR\example\fun.lst" 0
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\scalar.lnk" "$INSTDIR\example\fun.scl" "" "$INSTDIR\example\fun.scl" 0
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\table.lnk" "$INSTDIR\example\fun.tbl" "" "$INSTDIR\example\fun.tbl" 0
+  CreateShortCut "$SMPROGRAMS\$StartMenuFolder\example\variable.lnk" "$INSTDIR\example\fun.var" "" "$INSTDIR\example\fun.var" 0
 
 SectionEnd ; end the section
 
@@ -227,14 +297,38 @@ Section "Uninstall" SecUninstall
     Delete "$DESKTOP\IODE ${VERSION}.lnk"
   DesktopIconPass:
 
+  ;Python 3.9
+  IfFileExists "$INSTDIR\python_3_9" Py39Exists Py39Pass
+  Py39Exists:
+    DetailPrint "Removing IODE-PYTHON 3.9"
+    Delete "$INSTDIR\python_3_9\*.*"
+    RMDir "$INSTDIR\python_3_9"
+  Py39Pass:
+
+  ;Python 3.10
+  IfFileExists "$INSTDIR\python_3_10" Py310Exists Py310Pass
+  Py310Exists:
+    DetailPrint "Removing IODE-PYTHON 3.10"
+    Delete "$INSTDIR\python_3_10\*.*"
+    RMDir "$INSTDIR\python_3_10"
+  Py310Pass:
+
+  ;Python 3.11
+  IfFileExists "$INSTDIR\python_3_11" Py311Exists Py311Pass
+  Py311Exists:
+    DetailPrint "Removing IODE-PYTHON 3.11"
+    Delete "$INSTDIR\python_3_11\*.*"
+    RMDir "$INSTDIR\python_3_11"
+  Py311Pass:
+
   ;Example
   IfFileExists "$INSTDIR\example\fun.var" FunExists FunPass
   FunExists:
     DetailPrint "Removing Examples"
     Delete "$INSTDIR\example\*.*"
     RMDir "$INSTDIR\example"
-    ;Delete "$SMPROGRAMS\$StartMenuFolder\example\*.*"
-    ;RMDir $SMPROGRAMS\$StartMenuFolder\example
+    Delete "$SMPROGRAMS\$StartMenuFolder\example\*.*"
+    RMDir $SMPROGRAMS\$StartMenuFolder\example
   FunPass:
 
   ;Syntax
@@ -250,6 +344,23 @@ Section "Uninstall" SecUninstall
 
   Delete "$INSTDIR\Uninstall.exe"
 
+  ;${unregisterExtension} ".cmt" "IODE Comments"
+  ;${unregisterExtension} ".eqs" "IODE Equations"
+  ;${unregisterExtension} ".idt" "IODE Identities"
+  ;${unregisterExtension} ".lst" "IODE Lists"
+  ;${unregisterExtension} ".scl" "IODE Scalars"
+  ;${unregisterExtension} ".tbl" "IODE Tables"
+  ;${unregisterExtension} ".var" "IODE Variables"
+  ;${unregisterExtension} ".ac" "IODE Ascii Comments"
+  ;${unregisterExtension} ".ae" "IODE Ascii Equations"
+  ;${unregisterExtension} ".ai" "IODE Ascii Identities"
+  ;${unregisterExtension} ".al" "IODE Ascii Lists"
+  ;${unregisterExtension} ".as" "IODE Ascii Scalars"
+  ;${unregisterExtension} ".at" "IODE Ascii Tables"
+  ;${unregisterExtension} ".av" "IODE Ascii Variables"
+  ;${unregisterExtension} ".rep" "IODE Reports"
+
+
   !verbose pop
   
   DeleteRegKey /ifempty HKCU "Software\IODE"
@@ -260,13 +371,19 @@ SectionEnd
 ;Descriptions
 LangString DESC_SecInstall ${LANG_ENGLISH} "Iode Executable and manuals"
 LangString DESC_DesktopIcon ${LANG_ENGLISH} "Desktop icon for IODE."
+LangString DESC_SecPython39 ${LANG_ENGLISH} "IODE-Python 3.9"
+LangString DESC_SecPython310 ${LANG_ENGLISH} "IODE-Python 3.10"
+LangString DESC_SecPython311 ${LANG_ENGLISH} "IODE-Python 3.11"
 LangString DESC_SecExample ${LANG_ENGLISH} "IODE example model (FUN)"
-LangString DESC_SecSyntax ${LANG_ENGLISH} "Textpad and Notepad++ syntax file for IODE reports"
+LangString DESC_SecSyntax ${LANG_ENGLISH} "Textpad and Notepad++ syntax files for IODE reports"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecInstall} $(DESC_SecInstall)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDesktopIcon} $(DESC_DesktopIcon)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecPython39} $(DESC_SecPython39)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecPython310} $(DESC_SecPython310)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecPython311} $(DESC_SecPython311)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExample} $(DESC_SecExample)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSyntax} $(DESC_SecSyntax)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
