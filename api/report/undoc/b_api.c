@@ -98,17 +98,24 @@
  */
 int IodeInit()
 {
+    extern int      SW_ACTIVE;      // JMP 07/06/2023
+
     // To define the iode.msg file BEFORE scr4 (in SCR_init())
     B_IodeMsgPath();            
     
     // Initialize chrono for report functions
     RPF_ChronoReset();      
     
-    // Initialize scr4 SWAP memory management
-    SW_MIN_MEM = 120 * 1024L;
-    SW_MIN_SEGS = 2;
-    SW_SEG_SIZE = B_IniReadNum("GENERAL", "SEGSIZE", 65500);
-    if(SW_SEG_SIZE < 16384) SW_SEG_SIZE = 16384;                
+    // Initialize scr4 SWAP memory management if not yet done // JMP 07/06/2023
+    if(SW_ACTIVE == 0) {            // JMP 08/06/2023
+        SW_MIN_MEM = 120 * 1024L;
+        SW_MIN_SEGS = 2;
+        SW_SEG_SIZE = B_IniReadNum("GENERAL", "SEGSIZE", 65500);
+        if(SW_SEG_SIZE < 16384) SW_SEG_SIZE = 16384;            
+    }
+    
+//printf("SW_SEG_SIZE=%d\n", SW_SEG_SIZE);
+
     SW_init(1);
     
     // Create Empty WS
