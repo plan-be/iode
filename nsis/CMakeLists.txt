@@ -1,6 +1,6 @@
 message(STATUS "\n---- NSIS ----\n")
 
-message(STATUS "Generating the NSIS definitions file ${CMAKE_CURRENT_BINARY_DIR}/iode_definitions.nsh")
+message(STATUS "Generating the NSIS definitions file ${PROJECT_SOURCE_DIR}/nsis/iode_definitions.nsh")
 message(STATUS "from the template file ${PROJECT_SOURCE_DIR}/nsis/iode_definitions_template.nsh.in")
 # ---- GENERATE NSH SCRIPT FROM TEMPLATE ----
 # Copies an "iode_definitions_template.nsh.in" file to an "iode_definitions_template.nsh" file 
@@ -9,17 +9,18 @@ message(STATUS "from the template file ${PROJECT_SOURCE_DIR}/nsis/iode_definitio
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(
   ${PROJECT_SOURCE_DIR}/nsis/iode_definitions_template.nsh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/iode_definitions.nsh
+  ${PROJECT_SOURCE_DIR}/nsis/iode_definitions.nsh
 )
 message(STATUS "DONE\n")
 
 set(IODE_NSIS_SCRIPT "iode.nsi")
+set(IODE_NSIS_SCRIPT_PATH "${PROJECT_SOURCE_DIR}/nsis/${IODE_NSIS_SCRIPT}")
 
-message(STATUS "Generating the NSIS script ${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}")
+message(STATUS "Generating the NSIS script ${IODE_NSIS_SCRIPT_PATH}")
 message(STATUS "from template file ${PROJECT_SOURCE_DIR}/nsis/iode_template.nsi")
 
 file(READ "${PROJECT_SOURCE_DIR}/nsis/iode_template.nsi" FILE_CONTENTS)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
 
 # see https://cmake.org/cmake/help/latest/command/cmake_path.html#relative-path 
 set(RELATIVE_DIR ${CMAKE_BINARY_DIR})
@@ -30,9 +31,11 @@ message(STATUS "GUI executable file:")
 message(STATUS "\t${RELATIVE_DIR}\\gui\\${IODE_GUI_TARGET}.exe")
 
 set(QT_DIR "${RELATIVE_DIR}\\gui")
-file(READ "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
+file(READ "${IODE_NSIS_SCRIPT_PATH}" FILE_CONTENTS)
 string(REPLACE "<QT DIR>" ${QT_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
+
+set(GUI_EXE_FILE "${CMAKE_BINARY_DIR}/gui/${IODE_GUI_TARGET}.exe")
 
 # user documentation
 message(STATUS "User doc:")
@@ -42,9 +45,9 @@ foreach(DOC_FILE ${DOC_FILES})
 endforeach()
 
 set(DOC_DIR "${RELATIVE_DIR}\\doc")
-file(READ "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
+file(READ "${IODE_NSIS_SCRIPT_PATH}" FILE_CONTENTS)
 string(REPLACE "<DOC DIR>" ${DOC_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
 
 # misc
 message(STATUS "error messages:")
@@ -52,10 +55,24 @@ message(STATUS "\t${RELATIVE_DIR}\\iode.msg")
 set(FILES_TO_INSTALL "File ${RELATIVE_DIR}\\iode.msg")
 set(FILES_TO_DELETE "Delete $INSTDIR\\iode.msg")
 
-file(READ "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
+file(READ "${IODE_NSIS_SCRIPT_PATH}" FILE_CONTENTS)
 string(REPLACE "<MISC INSTALL>" ${FILES_TO_INSTALL} FILE_CONTENTS "${FILE_CONTENTS}")
 string(REPLACE "<MISC DELETE>" ${FILES_TO_DELETE} FILE_CONTENTS "${FILE_CONTENTS}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
+
+# Python
+set(PYTHON_FILES "")
+
+foreach(PYTHON_VERSION RANGE 9 11)
+  message(STATUS "Python 3.${PYTHON_VERSION}:")
+  message(STATUS "\t${RELATIVE_DIR}\\pyiode\\py3${PYTHON_VERSION}\\iode.pyd")
+
+  set(PYTHON_DIR "${RELATIVE_DIR}\\pyiode\\py3${PYTHON_VERSION}")
+  
+  file(READ "${IODE_NSIS_SCRIPT_PATH}" FILE_CONTENTS)
+  string(REPLACE "<PYTHON 3.${PYTHON_VERSION} DIR>" ${PYTHON_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
+  file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
+endforeach()
 
 # example files
 message(STATUS "Example files:")
@@ -65,9 +82,9 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 endforeach()
 
 set(EXAMPLE_PATH "${RELATIVE_DIR}\\tests\\data\\fun.*")
-file(READ "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
+file(READ "${IODE_NSIS_SCRIPT_PATH}" FILE_CONTENTS)
 string(REPLACE "<EXAMPLE PATH>" ${EXAMPLE_PATH} FILE_CONTENTS "${FILE_CONTENTS}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
 
 # syntax files
 message(STATUS "Syntax files:")
@@ -77,9 +94,15 @@ foreach(SYNTAX_FILE ${SYNTAX_FILES})
 endforeach()
 
 set(SYNTAX_PATH "${RELATIVE_DIR}\\syntax")
-file(READ "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
+file(READ "${IODE_NSIS_SCRIPT_PATH}" FILE_CONTENTS)
 string(REPLACE "<SYNTAX PATH>" ${SYNTAX_PATH} FILE_CONTENTS "${FILE_CONTENTS}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_PATH}" "${FILE_CONTENTS}")
+
+# copy NSIS script + required other files to current binary directory
+file(INSTALL ${IODE_NSIS_SCRIPT} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(INSTALL iode_license.rtf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(INSTALL iode_definitions.nsh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(INSTALL file_association.nsh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 message(STATUS "DONE\n")
 
@@ -87,7 +110,7 @@ message(STATUS "DONE\n")
 ADD_CUSTOM_TARGET(nsis_windows_installer
   COMMAND makensis.exe ${IODE_NSIS_SCRIPT}
   COMMENT "NSIS: Creating Windows installer"
-  DEPENDS ${IODE_NSIS_SCRIPT} "${CMAKE_BINARY_DIR}/gui/${IODE_GUI_TARGET}.exe")
+  DEPENDS ${IODE_NSIS_SCRIPT} ${GUI_EXE_FILE} ${PYTHON_FILES})
 
 ADD_CUSTOM_TARGET(nsis ALL) # Entry point of execution.
 ADD_DEPENDENCIES(nsis ${IODE_GUI_TARGET})
