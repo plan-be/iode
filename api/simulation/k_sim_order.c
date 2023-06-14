@@ -393,7 +393,7 @@ static void KE_tri_end(KDB* dbe)
 
 static void KE_tri_perm1(KDB* dbe, int i, int* vars)
 {
-    int     j, m = -1, posj;
+    int     j, m = -1, posj, nbe = KNB(dbe), ksim_permi = KSIM_PERM[i];
 
     // calcul de l'eq jm dont le numéro d'ordre de calcul est le plus grand
     for(j = 1 ; j <= vars[0] ; j++) {
@@ -406,10 +406,10 @@ static void KE_tri_perm1(KDB* dbe, int i, int* vars)
     }
 
     // Si le numéro d'ordre max des eq dont dépend la courante est < numéro d'ordre de la courante : ok
-    if(m < KSIM_PERM[i]) return;
+    if(m < ksim_permi) return;
 
-    for(j = 0 ; j < KNB(dbe) ; j++)
-        if(KSIM_PERM[j] > KSIM_PERM[i] && KSIM_PERM[j] <= m)
+    for(j = 0 ; j < nbe ; j++)
+        if(KSIM_PERM[j] > ksim_permi && KSIM_PERM[j] <= m)
             KSIM_PERM[j]--;
 
     KSIM_PERM[i] = m;
