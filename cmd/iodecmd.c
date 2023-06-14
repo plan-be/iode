@@ -130,6 +130,7 @@ void IodeCmdSyntax()
     printf("IODECMD v. %d.%d (%s)\n", IODE_VERSION_MAJOR, IODE_VERSION_MINOR, __DATE__);
     printf("Syntax: iodecmd [-nbrun n] [-alloclog filename] [-v] [-y] [-h] reportfile [arg1 arg2 ...]\n");
     printf("    where:\n"); 
+    printf("       -seg segment_size: size of the blocks containing objects (SWAP). Default 65500.\n");
     printf("       -nbrun n: how many times the report must be executed.\n");
     printf("       -alloclog filename: log allocations not freed at the end of the report execution \n");
     printf("       -v or --verbose: give more detailed messages\n");
@@ -153,6 +154,7 @@ int main(int argc, char **argv)
     int     i, nbrun = 1, rc;
     char    *reportname = NULL, **reportargs = NULL;
     int     IODE_VERBOSE = 0;
+    long    segsize = 0; // JMP 7/6/2023
 
     ODE_assign_super_CMD();
     SCR_ALLOC_DOC = 0;
@@ -174,7 +176,11 @@ int main(int argc, char **argv)
     B_IodeMsgPath();    // IODE > 6.65
 
     for(i = 1 ; i < argc ; i++) {
-        if(strcmp(argv[i], "-nbrun") == 0) {
+        if(strcmp(argv[i], "-seg") == 0) {
+            segsize = atol(argv[i + 1]);
+            i++;
+        }
+        else if(strcmp(argv[i], "-nbrun") == 0) {
             nbrun = atol(argv[i + 1]);
             i++;
         }
@@ -206,15 +212,25 @@ int main(int argc, char **argv)
             break;
         }
     }
-
-
+    
     if(nbrun < 1 || reportname == NULL) {
         printf("%s\n", IODE_VERSION); // JMP 17-11-2015
         printf("Iodecmd : nothing to do ...\n");
         exit(1);
     }
 
+    // Initialise SWAP memory before IodeInit() to modify segment size (-seg segsize) (JMP 07/06/2023  )
+    if(segsize > 0) segsize = max(16384, segsize);
+    else            segsize = 65500;
+
+    SW_MIN_MEM = 120 * 1024L;
+    SW_MIN_SEGS = 2;
+    SW_SEG_SIZE = segsize;
+    SW_init(1);
+
+    // Display Iode version
     if(IODE_VERBOSE) printf("%s\n", IODE_VERSION);
+
     IodeInit();
 
 //    printf("Before 1st run : %d bytes allocated\n", SCR_TOTAL_ALLOC);
