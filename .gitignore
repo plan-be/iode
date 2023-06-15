@@ -385,6 +385,13 @@ keyboard_shortcuts.*
 *.tb$
 *.va$
 
+# NSIS
+/nsis/*.nsh
+!/nsis/*template*.nsh
+
+/nsis/*.nsi
+!/nsis/*template*.nsi
+
 # Others
 *.exp
 #*.ini
