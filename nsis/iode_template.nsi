@@ -110,8 +110,13 @@
 ;--------------------------------
 ;Installer Sections
 
+; GUI + manuals (forced)
 Section "IODE ${VERSION} executable" SecInstall
 
+  ;If you specify RO as a parameter, then the section will be read-only, 
+  ; meaning the user won't be able to change its state.
+  SectionInstType RO
+  
   !verbose push
   !verbose 4
 
