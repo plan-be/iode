@@ -63,11 +63,11 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
@@ -96,10 +96,9 @@ jobs:
         run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
       - run: echo "This job's status is ${{ job.status }}."
 
-  test_no_sanitize:
-    name: Run Tests Without Sanitize Option (Only If Tests With Sanitize Failed)
-    needs: build_and_test_api
-    if: ${{ needs.build_and_test_api.result == 'failure' }}
+  test_sanitize:
+    name: Run Tests With Sanitize Option
+    if: ${{ !(contains(github.head_ref, 'gui') || contains(github.head_ref, 'doc')) }}
     strategy:
       matrix:
         # os: [windows-latest, ubuntu-latest]
@@ -125,11 +124,11 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Install Boost
