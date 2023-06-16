@@ -307,6 +307,28 @@ jobs:
         run: |
           cmake --build --preset ${{ env.PRESET_CONFIG }} --target pyiode 
 
+  build_doc:
+    name: Build user documentation
+    if: contains(github.head_ref, 'release')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Install ninja
+        run: sudo apt-get install -y ninja-build
+      - name: Install Tex Live
+        run: sudo apt-get install -y texlive
+      - name: Preset config
+        run: |
+          echo "PRESET_CONFIG=linux-x64-debug" >> $GITHUB_ENV
+      - name: Print preset config
+        run: echo "${{ env.PRESET_CONFIG }}"
+      - name: Configure CMake
+        run: cmake --preset ${{ env.PRESET_CONFIG }}
+      - name: Build Keyboard Shortcuts PDF
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target keyboard_shortcuts
+
   build_nsis:
     name: Build installer using NSIS
     if: contains(github.head_ref, 'nsis')
@@ -386,26 +408,3 @@ jobs:
       - name: Build Installer (NSIS)
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target nsis
       - run: echo "This job's status is ${{ job.status }}."
-
-  build_doc:
-    name: Build user documentation
-    if: contains(github.head_ref, 'release')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v2
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install ninja
-        run: sudo apt-get install -y ninja-build
-      - name: Install Tex Live
-        run: sudo apt-get install -y texlive
-      - name: Preset config
-        run: |
-          echo "PRESET_CONFIG=linux-x64-debug" >> $GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Configure CMake
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build Keyboard Shortcuts PDF
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target keyboard_shortcuts
-
