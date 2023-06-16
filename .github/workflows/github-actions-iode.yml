@@ -64,12 +64,16 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
+          echo "CMAKE_BINARY_DIR=out/build/${{ env.PRESET_CONFIG }} >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
           echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
+          echo "CMAKE_BINARY_DIR=out/build/${{ env.PRESET_CONFIG }} >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
+      - name: Print CMAKE_BINARY_DIR
+        run: ecjo "${{ env.CMAKE_BINARY_DIR }}"
       - name: Configure CMake
         # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
         # see CMakePresets.json file
@@ -95,11 +99,20 @@ jobs:
       - name: Run C++ API Tests
         run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
       - run: echo "This job's status is ${{ job.status }}."
+      - name: Upload build files for the C and C++ API
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iode-api
+          path: |
+            ${{ env.CMAKE_BINARY_DIR }}/scr4/
+            ${{ env.CMAKE_BINARY_DIR }}/api/
+            ${{ env.CMAKE_BINARY_DIR }}/cpp_api/
 
   test_no_sanitize:
     name: Run Tests Without Sanitize Option (Only If Tests With Sanitize Failed)
     needs: build_and_test_api
-    if: ${{ !(contains(github.head_ref, 'gui') || contains(github.head_ref, 'doc')) && needs.build_and_test_api.result == 'failure' }}
+    if: ${{ needs.build_and_test_api.result == 'failure' }}
     strategy:
       matrix:
         # os: [windows-latest, ubuntu-latest]
@@ -155,7 +168,8 @@ jobs:
 
   build_gui:
     name: Build Graphical User Interface
-    if: contains(github.head_ref, 'gui')
+    needs: build_and_test_api
+    if: ${{ contains(github.head_ref, 'gui') && needs.build_and_test_api.result == 'success' }}
     strategy:
       matrix:
         os: [windows-latest]
@@ -183,14 +197,10 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
            arch: x64
-      - name: Install Boost
-        uses: MarkusJx/install-boost@v2.4.1
-        id: install-boost
+      - name: Restore compiled SCR4, C and C++ API libs
+        uses: actions/download-artifact@v3
         with:
-            boost_version: 1.80.0
-            boost_install_dir: C:\
-            platform_version: 2019
-            toolset: msvc
+          name: iode-api
       - name: update pip
         run: python.exe -m pip install --upgrade pip
       - name: install aqtinstall
@@ -212,32 +222,43 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
+          echo "CMAKE_BINARY_DIR=out/build/${{ env.PRESET_CONFIG }} >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
+          echo "CMAKE_BINARY_DIR=out/build/${{ env.PRESET_CONFIG }} >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
         run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build SCR4
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
-      - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
-      - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
       - name: Build GUI
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
       - run: echo "This job's status is ${{ job.status }}."
+      - name: Upload GUI compiled files
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iode-gui
+          path: |
+            ${{ env.CMAKE_BINARY_DIR }}/gui/
 
-  build_cython:
+  build_pyiode:
     name: Build Python API for IODE
-    if: contains(github.head_ref, 'cython')
+    needs: build_and_test_api
+    if: ${{ contains(github.head_ref, 'pyiode') && needs.build_and_test_api.result == 'success' }}
     strategy:
       matrix:
         os: [windows-latest]
         python-version: ["3.9", "3.10", "3.11"]
+        include:
+          - python-version: "3.9"
+            python-dir: py39
+          - python-version: "3.10"
+            python-dir: py310
+          - python-version: "3.11"
+            python-dir: py311
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -262,6 +283,10 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
             arch: x64
+      - name: Restore compiled SCR4, C and C++ API libs
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-api
       - uses: conda-incubator/setup-miniconda@v2
         with:
           # channels: conda-forge, defaults
@@ -282,11 +307,13 @@ jobs:
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
+          echo "CMAKE_BINARY_DIR=out/build/${{ env.PRESET_CONFIG }} >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
+          echo "CMAKE_BINARY_DIR=out/build/${{ env.PRESET_CONFIG }} >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
@@ -297,19 +324,52 @@ jobs:
         #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
         run: cmake --preset ${{ env.PRESET_CONFIG }}
       - name: Build SCR4
+        shell: bash -el {0}
         # cmake --build --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
         # see CMakePresets.json file
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
-      - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
-      - name: Build Python IODE
-        shell: bash -el {0}
         run: |
           cmake --build --preset ${{ env.PRESET_CONFIG }} --target pyiode 
+      - name: Upload PyIode compiled files
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iode-pyiode
+          path: |
+            ${{ env.CMAKE_BINARY_DIR }}/pyiode/${{ matrix.python-dir }}/
+
+  build_doc:
+    name: Build user documentation
+    if: contains(github.head_ref, 'doc')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Install ninja
+        run: sudo apt-get install -y ninja-build
+      - name: Install Tex Live
+        run: sudo apt-get install -y texlive
+      - name: Preset config
+        run: |
+          echo "PRESET_CONFIG=linux-x64-debug" >> $GITHUB_ENV
+      - name: Print preset config
+        run: echo "${{ env.PRESET_CONFIG }}"
+      - name: Configure CMake
+        run: cmake --preset ${{ env.PRESET_CONFIG }}
+      - name: Build Keyboard Shortcuts PDF
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target keyboard_shortcuts
+      - name: Upload documentation
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iode-doc
+          path: |
+            ${{ env.CMAKE_BINARY_DIR }}/doc/
 
   build_nsis:
     name: Build installer using NSIS
-    if: contains(github.head_ref, 'nsis')
+    needs: [build_and_test_api, build_gui, build_pyiode, build_doc]
+    if: ${{ contains(github.head_ref, 'nsis') && needs.build_and_test_api.result == 'success' }}
     strategy:
       matrix:
         os: [windows-latest]
@@ -337,75 +397,20 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-      - name: Install Boost
-        uses: MarkusJx/install-boost@v2.4.1
-        id: install-boost
-        with:
-            boost_version: 1.80.0
-            boost_install_dir: C:\
-            platform_version: 2019
-            toolset: msvc
-      - name: update pip
-        run: python.exe -m pip install --upgrade pip
-      - name: install aqtinstall
-        run: pip install aqtinstall
-      - name: show available Qt versions
-        run: aqt list-qt windows desktop
-      - name: Install Qt
-        # See https://github.com/jurplel/install-qt-action
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.4.0'
-          host: 'windows'
-          target: 'desktop'
-          # TODO : adpat arch for Linux
-          arch: 'win64_msvc2019_64'
-          dir: '${{ github.workspace }}/'
-          modules: 'qtcharts'
-          install-deps: 'true'
+      - name: Restore all artifacts (C and C++ API, GUI, PyIode and Doc)
+        uses: actions/download-artifact@v3
       - name: Preset config for Windows
         if: runner.os == 'Windows'
         run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
+          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
       - name: Preset config for Linux
         if: runner.os == 'Linux'
         run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
+          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
       - name: Print preset config
         run: echo "${{ env.PRESET_CONFIG }}"
       - name: Configure CMake
         run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build SCR4
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
-      - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
-      - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
-      - name: Build GUI
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
       - name: Build Installer (NSIS)
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target nsis
       - run: echo "This job's status is ${{ job.status }}."
-
-  build_doc:
-    name: Build user documentation
-    if: contains(github.head_ref, 'release')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v2
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install ninja
-        run: sudo apt-get install -y ninja-build
-      - name: Install Tex Live
-        run: sudo apt-get install -y texlive
-      - name: Preset config
-        run: |
-          echo "PRESET_CONFIG=linux-x64-debug" >> $GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Configure CMake
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build Keyboard Shortcuts PDF
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target keyboard_shortcuts
-
