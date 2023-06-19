@@ -1,0 +1,26 @@
+# Composite Action
+# See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action 
+# and https://stackoverflow.com/a/75279262 
+
+name: test_api
+description: 'Test the C and C++ API'
+inputs:
+  cmake-config:
+    description: 'CMake build config'
+    required: true
+    default: 'windows-debug'
+runs:
+  using: 'composite'
+  steps:
+    - name: Build C Tests
+      shell: bash
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target test_c_api 
+    - name: Run C API Tests
+      shell: bash
+      run: ctest --preset c-api-${{ inputs.cmake-config }}
+    - name: Build C++ Tests
+      shell: bash
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target test_cpp_api 
+    - name: Run C++ API Tests
+      shell: bash
+      run: ctest --preset cpp-api-${{ inputs.cmake-config }}
