@@ -169,7 +169,7 @@ jobs:
           
   build_doc:
     name: Build user documentation
-    if: contains(github.head_ref, 'release')
+    if: contains(github.head_ref, 'doc')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
