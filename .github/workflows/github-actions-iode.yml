@@ -158,6 +158,13 @@ jobs:
       - name: Build Python IODE
         shell: bash -el {0}
         run: cmake --build --preset ${{ matrix.build-config }} --target pyiode 
+      - name: Upload PyIode compiled files
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iode-pyiode
+          path: "${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py3${{ matrix.python-minor-version }}/"
+          if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
 
           
   build_doc:
