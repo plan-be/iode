@@ -48,52 +48,22 @@ jobs:
         # os: [windows-latest, ubuntu-latest]
         # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
         os: [windows-2019]
+        build-config: [windows-debug-sanitize]
+
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install dependencies on windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install ninja
-          ninja --version
-          cmake --version
-      - name: Add cl.exe to PATH
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
         with:
-           arch: x64
-      - name: Preset config for Windows
-        if: runner.os == 'Windows'
-        run: |
-          echo "PRESET_CONFIG=windows-debug-sanitize" >> $env:GITHUB_ENV
-      - name: Preset config for Linux
-        if: runner.os == 'Linux'
-        run: |
-          echo "PRESET_CONFIG=linux-debug-sanitize" >> $GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Install Boost
-        uses: MarkusJx/install-boost@v2.4.1
-        id: install-boost
+          cmake-config: ${{ matrix.build-config }}
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
         with:
-            boost_version: 1.80.0
-            boost_install_dir: C:\
-            platform_version: 2019
-            toolset: msvc
-      - name: Configure CMake
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build C API Tests
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target test_c_api
-      - name: Build C++ API Tests
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target test_cpp_api
-      - run: echo "The workflow is now ready to test your code on the runner."
-      - name: Run C API Tests
-        run: ctest --preset c-api-${{ env.PRESET_CONFIG }}
-      - name: Run C++ API Tests
-        run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
+          cmake-config: ${{ matrix.build-config }}
       - run: echo "This job's status is ${{ job.status }}."
 
   build_gui:
