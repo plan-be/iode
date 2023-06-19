@@ -12,6 +12,7 @@ jobs:
         # os: [windows-latest, ubuntu-latest]
         # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
         os: [windows-2019]
+        build-config: [windows-debug]
 
     # The CMake configure and build commands are platform agnostic and should 'ideally' work equally well on Windows or Linux.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -29,71 +30,14 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install dependencies on windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install ninja
-          ninja --version
-          cmake --version
-      - name: Add cl.exe to PATH
-        if: runner.os == 'Windows'
-        # See https://github.com/marketplace/actions/enable-developer-command-prompt
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
         with:
-           arch: x64
-      - name: Install Boost
-        uses: MarkusJx/install-boost@v2.4.1
-        id: install-boost
+          cmake-config: ${{ matrix.build-config }}
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
         with:
-            # REQUIRED: Specify the required boost version
-            # A list of supported versions can be found here:
-            # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-            boost_version: 1.80.0
-            # OPTIONAL: Specify a custom install location
-            boost_install_dir: C:\
-            # OPTIONAL: Specify a platform version
-            platform_version: 2019
-            # OPTIONAL: Specify a toolset
-            toolset: msvc
-            # NOTE: If a boost version matching all requirements cannot be found,
-            # this build step will fail
-
-      # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-      # Note: use $env:GITHUB_ENV instead of $GITHUB_ENV on Windows OS
-      - name: Preset config for Windows
-        if: runner.os == 'Windows'
-        run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
-      - name: Preset config for Linux
-        if: runner.os == 'Linux'
-        run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Configure CMake
-        # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
-        # see CMakePresets.json file
-        # for more details about cmake preset:
-        #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
-        #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build SCR4
-        # cmake --build --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
-        # see CMakePresets.json file
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
-      - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
-      - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
-      - name: Build C API Tests
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target test_c_api
-      - name: Build C++ API Tests
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target test_cpp_api
-      - run: echo "The workflow is now ready to test your code on the runner."
-      - name: Run C API Tests
-        run: ctest --preset c-api-${{ env.PRESET_CONFIG }}
-      - name: Run C++ API Tests
-        run: ctest --preset cpp-api-${{ env.PRESET_CONFIG }}
+          cmake-config: ${{ matrix.build-config }}
       - run: echo "This job's status is ${{ job.status }}."
 
   test_sanitize:
