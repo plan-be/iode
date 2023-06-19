@@ -1,0 +1,65 @@
+# Composite Action
+# See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action 
+# and https://stackoverflow.com/a/75279262 
+
+name: build_api
+description: 'Build SCR4 lib and the C and C++ API'
+inputs:
+  cmake-config:
+    description: 'CMake build config'
+    required: true
+    default: 'windows-debug'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install dependencies on windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        choco install ninja
+        ninja --version
+        cmake --version
+    - name: Add cl.exe to PATH
+      if: runner.os == 'Windows'
+      # See https://github.com/marketplace/actions/enable-developer-command-prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+    - name: Install Boost
+      uses: MarkusJx/install-boost@v2.4.1
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here:
+        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+        boost_version: 1.80.0
+        # OPTIONAL: Specify a custom install location
+        boost_install_dir: C:\
+        # OPTIONAL: Specify a platform version
+        platform_version: 2019
+        # OPTIONAL: Specify a toolset
+        toolset: msvc
+        # NOTE: If a boost version matching all requirements cannot be found,
+        # this build step will fail
+    - name: Print preset config
+      shell: bash
+      run: echo "${{ inputs.cmake-config }}"
+    - name: Configure CMake
+      shell: bash
+      # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
+      # see CMakePresets.json file
+      # for more details about cmake preset:
+      #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
+      #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
+      run: cmake --preset ${{ inputs.cmake-config }}
+    - name: Build SCR4
+      shell: bash
+      # cmake --build --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
+      # see CMakePresets.json file
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target scr4iode 
+    - name: Build C IODE API
+      shell: bash
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target iodeapi 
+    - name: Build C++ IODE API
+      shell: bash
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target iodecppapi 
