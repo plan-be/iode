@@ -102,6 +102,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
+        build-config: [windows-debug]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -114,26 +115,14 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install dependencies on windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install ninja
-          ninja --version
-          cmake --version
-      - name: Add cl.exe to PATH
-        if: runner.os == 'Windows'
-        # See https://github.com/marketplace/actions/enable-developer-command-prompt
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
         with:
-           arch: x64
-      - name: Install Boost
-        uses: MarkusJx/install-boost@v2.4.1
-        id: install-boost
+          cmake-config: ${{ matrix.build-config }}
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
         with:
-            boost_version: 1.80.0
-            boost_install_dir: C:\
-            platform_version: 2019
-            toolset: msvc
+          cmake-config: ${{ matrix.build-config }}
       - name: update pip
         run: python.exe -m pip install --upgrade pip
       - name: install aqtinstall
@@ -152,26 +141,8 @@ jobs:
           dir: '${{ github.workspace }}/'
           modules: 'qtcharts'
           install-deps: 'true'
-      - name: Preset config for Windows
-        if: runner.os == 'Windows'
-        run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
-      - name: Preset config for Linux
-        if: runner.os == 'Linux'
-        run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Configure CMake
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build SCR4
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
-      - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
-      - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
       - name: Build GUI
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
+        run: cmake --build --preset ${{ matrix.build-config }} --target iode_gui
       - run: echo "This job's status is ${{ job.status }}."
 
   build_cython:
