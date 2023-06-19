@@ -188,7 +188,15 @@ jobs:
         run: cmake --preset ${{ env.PRESET_CONFIG }}
       - name: Build Keyboard Shortcuts PDF
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target keyboard_shortcuts
+      - name: Upload documentation files
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iode-doc
+          path: "${{ github.workspace }}/out/build/${{ env.PRESET_CONFIG }}/doc/build/"
+          if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
 
+  
   build_nsis:
     name: Build installer using NSIS
     if: contains(github.head_ref, 'nsis')
