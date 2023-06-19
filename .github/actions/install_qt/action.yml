@@ -1,0 +1,30 @@
+# Composite Action
+# See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action 
+# and https://stackoverflow.com/a/75279262 
+
+name: install_qt
+description: 'Install Qt'
+runs:
+  using: 'composite'
+  steps:
+    - name: update pip
+      shell: bash
+      run: python.exe -m pip install --upgrade pip
+    - name: install aqtinstall
+      shell: bash
+      run: pip install aqtinstall
+    - name: show available Qt versions
+      shell: bash
+      run: aqt list-qt windows desktop
+    - name: Install Qt
+      # See https://github.com/jurplel/install-qt-action
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.4.0'
+        host: 'windows'
+        target: 'desktop'
+        # TODO : adpat arch for Linux
+        arch: 'win64_msvc2019_64'
+        dir: '${{ github.workspace }}/'
+        modules: 'qtcharts'
+        install-deps: 'true'
