@@ -195,7 +195,7 @@ set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} ${GUI
 set(APP_ICON_WINDOWS "${IODE_RESOUCES_DIR}/iode.rc")
 
 qt_add_executable(${IODE_GUI_TARGET} ${IODE_RESOUCES_DIR}/iode_resource.qrc ${APP_ICON_WINDOWS} MANUAL_FINALIZATION ${PROJECT_SOURCES})
-target_link_libraries(${IODE_GUI_TARGET} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iodecppapi)
+target_link_libraries(${IODE_GUI_TARGET} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Charts Qt6::PrintSupport iode_cpp_api)
 # By calling target_include_directories, we make sure that the absolute path to 
 # the gui directory is automatically added as an include path to the ${IODE_GUI_TARGET} target.
 # Required to use the custom widgets in UI files

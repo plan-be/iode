@@ -62,4 +62,4 @@ runs:
       run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_c_api 
     - name: Build C++ IODE API
       shell: bash
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target iodecppapi 
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_cpp_api 
