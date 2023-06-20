@@ -68,7 +68,7 @@ where `<target>` is one the item in the list below:
 - `iode_c_api`      -> Core API of IODE (in pure C).
 - `iodecppapi`   -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`     -> Graphical user interface (GUI) based on Qt.
-- `pyiode`       -> Builds Python binding for IODE (base on Cython).
+- `iode_python`       -> Builds Python binding for IODE (base on Cython).
 - `nsis`         -> Builds a Windows Installer for the users.
 - `test_c_api`   -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api` -> Builds the tests for the C++ classes (based on Google Test).

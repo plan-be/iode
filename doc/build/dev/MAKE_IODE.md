@@ -184,7 +184,7 @@ Les options \-objs et \-man permettent d'�viter la recompilation de toutes les
 - `-man` : ne g�n�re par les manuels (readme.htm, iode.chm, pages du site wiki)
 - `-objs` : ne force pas la recompilation des sources .c et .cpp
 
-Le programme g�n�re d'abord les librairies n�cessaires en 32 et 64 bits (64 bits uniquement pour pyiode).
+Le programme g�n�re d'abord les librairies n�cessaires en 32 et 64 bits (64 bits uniquement pour iode_python).
 
 En sortie, les fichiers suivants auront �t� reg�n�r�s :
 

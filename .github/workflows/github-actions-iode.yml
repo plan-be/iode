@@ -157,7 +157,7 @@ jobs:
         run: cmake --preset ${{ matrix.build-config }}
       - name: Build Python IODE
         shell: bash -el {0}
-        run: cmake --build --preset ${{ matrix.build-config }} --target pyiode 
+        run: cmake --build --preset ${{ matrix.build-config }} --target iode_python 
       - name: Upload PyIode compiled files
         if: ${{ success() }}
         uses: actions/upload-artifact@v3
