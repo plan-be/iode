@@ -79,3 +79,21 @@ and provide a conda environment as argument:
 ```bash
 pyiode> makepy.bat py39 
 ```
+
+# Github Actions
+
+The Github Actions workflow for IODE is defined in the YAML file ./.github/workflows/github-actions-iode.yml
+
+The sub-directory ./.github/actions contains user defined actions that are used in the jobs defined in 
+the YAML file github-actions-iode.yml
+
+The jobs declared in ./.github/workflows/github-actions-iode.yml are triggered according to keywords present 
+in the name of the pushed branch:
+- `build_and_test_api`  -> NOT triggered if the branch name contains either the word `doc` or `nsis`
+- `test_sanitize`       -> NOT triggered if the branch name contains the word `gui`, `cython`, `doc` or `nsis`
+- `build_cli`           -> triggered if the branch name contains the word `cmd`, `command` or `cli`
+- `build_gui`           -> triggered if the branch name contains the word `gui`
+- `build_cython`        -> triggered if the branch name contains either the word `cython` or `nsis`
+- `build_doc`           -> triggered if the branch name contains either the word `doc` or `nsis`
+- `build_nsis`          -> triggered if the branch name contains the word `nsis`
+
