@@ -37,6 +37,17 @@ cmake_path(RELATIVE_PATH RELATIVE_DIR BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 
 message(STATUS "List of files to be installed:\n")
 
+# CLI executable file
+message(STATUS "CLI executable file:")
+message(STATUS "\t${RELATIVE_DIR}\\cmd\\${IODE_CLI_TARGET}.exe")
+
+set(CLI_DIR "${RELATIVE_DIR}\\cmd")
+file(READ "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" FILE_CONTENTS)
+string(REPLACE "<CLI DIR>" ${CLI_DIR} FILE_CONTENTS "${FILE_CONTENTS}")
+file(WRITE "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_SCRIPT}" "${FILE_CONTENTS}")
+
+set(CLI_EXE_FILE "${CMAKE_BINARY_DIR}/cmd/${IODE_CLI_TARGET}.exe")
+
 # GUI executable file
 message(STATUS "GUI executable file:")
 message(STATUS "\t${RELATIVE_DIR}\\gui\\${IODE_GUI_TARGET}.exe")
@@ -135,12 +146,12 @@ message(STATUS "\nDONE\n")
 ADD_CUSTOM_TARGET(nsis_windows_installer
   COMMAND makensis.exe ${IODE_NSIS_SCRIPT}
   COMMENT "NSIS: Creating Windows installer"
-  DEPENDS ${IODE_NSIS_SCRIPT} ${GUI_EXE_FILE} ${PYTHON_FILES})
+  DEPENDS ${IODE_NSIS_SCRIPT} ${CLI_EXE_FILE} ${GUI_EXE_FILE} ${PYTHON_FILES})
 
 ADD_CUSTOM_TARGET(nsis_windows_updater
   COMMAND makensis.exe ${IODE_NSIS_UPDATE_SCRIPT}
   COMMENT "NSIS: Creating Windows updater"
-  DEPENDS ${IODE_NSIS_UPDATE_SCRIPT} ${GUI_EXE_FILE} ${PYTHON_FILES})
+  DEPENDS ${IODE_NSIS_UPDATE_SCRIPT} ${CLI_EXE_FILE} ${GUI_EXE_FILE} ${PYTHON_FILES})
 
 ADD_CUSTOM_TARGET(nsis ALL) # Entry point of execution.
 ADD_DEPENDENCIES(nsis ${IODE_GUI_TARGET})

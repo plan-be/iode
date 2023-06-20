@@ -22,7 +22,7 @@
 ;--------------------------------
 ;Include definitions
 
-  ;defines EXE_NAME, VERSION, VERSION_PATH, 
+  ;defines EXE_GUI, VERSION, VERSION_PATH, 
   ;        MUI_ICON, PATCH
   !include "iode_definitions.nsh"
 
@@ -125,8 +125,10 @@ Section "IODE ${VERSION} executable" SecInstall
   
   ;-- List of files to install --
 
+  ;CLI executable
+  File "<CLI DIR>\${EXE_CLI}" 
   ;GUI executable file
-  File "<QT DIR>\${EXE_NAME}"
+  File "<QT DIR>\${EXE_GUI}"
   ;Qt DLL
   File /r "<QT DIR>\*.dll"
   ;User doc
@@ -156,7 +158,7 @@ Section "IODE ${VERSION} executable" SecInstall
   ; ALT|CONTROL|SHIFT|F5 "a description"
   CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
   CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\IODE ${VERSION}.lnk" "$INSTDIR\${EXE_NAME}" "" "$INSTDIR\${EXE_NAME}" 0
+  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\IODE ${VERSION}.lnk" "$INSTDIR\${EXE_GUI}" "" "$INSTDIR\${EXE_GUI}" 0
   CreateShortcut "$SMPROGRAMS\$StartMenuFolder\IODE Help.lnk" "$INSTDIR\doc\iode.chm" "" "$INSTDIR\doc\iode.chm" 0
   CreateShortcut "$SMPROGRAMS\$StartMenuFolder\IODE Manual.lnk" "$INSTDIR\doc\iode.pdf" "" "$INSTDIR\doc\iode.pdf" 0
 
@@ -164,21 +166,21 @@ Section "IODE ${VERSION} executable" SecInstall
 
   ;Register extensions
 
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".cmt" "IODE Comments"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".eqs" "IODE Equations"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".idt" "IODE Identities"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".lst" "IODE Lists"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".scl" "IODE Scalars"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".tbl" "IODE Tables"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".var" "IODE Ascii Variables"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".ac" "IODE Ascii Comments"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".ae" "IODE Ascii Equations"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".ai" "IODE Ascii Identities"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".al" "IODE Ascii Lists"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".as" "IODE Ascii Scalars"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".at" "IODE Ascii Tables"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".av" "IODE Ascii Variables"
-  ;${registerExtension} "$INSTDIR\${EXE_NAME}" ".rep" "IODE Reports"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".cmt" "IODE Comments"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".eqs" "IODE Equations"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".idt" "IODE Identities"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".lst" "IODE Lists"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".scl" "IODE Scalars"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".tbl" "IODE Tables"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".var" "IODE Ascii Variables"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".ac" "IODE Ascii Comments"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".ae" "IODE Ascii Equations"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".ai" "IODE Ascii Identities"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".al" "IODE Ascii Lists"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".as" "IODE Ascii Scalars"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".at" "IODE Ascii Tables"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".av" "IODE Ascii Variables"
+  ;${registerExtension} "$INSTDIR\${EXE_GUI}" ".rep" "IODE Reports"
 
 
 SectionEnd
@@ -219,7 +221,7 @@ SectionEnd
 ;--------------------------------
 ; Desktop Icon (disabled by default)
 Section /o "Desktop Icon" SecDesktopIcon
-  CreateShortCut "$DESKTOP\IODE ${VERSION}.lnk" "$INSTDIR\${EXE_NAME}" "" "$INSTDIR\${EXE_NAME}" 0
+  CreateShortCut "$DESKTOP\IODE ${VERSION}.lnk" "$INSTDIR\${EXE_GUI}" "" "$INSTDIR\${EXE_GUI}" 0
 SectionEnd
 
 ;--------------------------------
@@ -274,8 +276,10 @@ Section "Uninstall" SecUninstall
   !verbose push
   !verbose 4
 
+  ;CLI executable file
+  Delete "$INSTDIR\${EXE_CLI}"
   ;GUI executable file
-  Delete "$INSTDIR\${EXE_NAME}"
+  Delete "$INSTDIR\${EXE_GUI}"
   ;Qt DLL
   Delete $INSTDIR\*.dll
   FindFirst $0 $1 "$INSTDIR\*.*"
