@@ -270,7 +270,7 @@ jobs:
       - name: Build C IODE API
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_c_api 
       - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_cpp_api 
       - name: Build GUI
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
       - name: Build Installer (NSIS)

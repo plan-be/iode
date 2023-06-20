@@ -72,7 +72,7 @@ GitHub repository: `https://github.com/plan-be/iode`
 |`./tests/test_c_api`|test1\[cpp\].exe, test\_c\_api.exe|test1 sources, convert\_tests.bat, borland\_to\_google\_test.py|
 |`./tests/data`||data for test1.exe and test1cpp.exe|
 |`./tests/output`||results of test1.exe and test1cpp.exe|
-|`./cpp_api`|iodecppapi.lib (64 bits MSVC)|api sources|
+|`./cpp_api`|iode_cpp_api.lib (64 bits MSVC)|api sources|
 |`./cmd`|iodecmd.exe|iodecmd sources|
 |`./pyiode`|py\{vers\}/iode.pyd|\*.pxi, \*.pyx \+ makepy.bat \+ cythonize\_iode.py \+ test\_iode.py|
 |`./gui`|iode\_gui.exe|Qt sources|

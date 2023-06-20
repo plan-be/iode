@@ -47,7 +47,7 @@ set(CPP_LEGACY
     legacy/s_iode.c legacy/b_legacy.c
    )
 
-add_library(iodecppapi STATIC 
+add_library(iode_cpp_api STATIC 
             iode_cpp_api.h      iode_cpp_api.cpp 
             common.h
             ${CPP_UTILS}
@@ -65,5 +65,5 @@ set_source_files_properties(objects/equation.cpp objects/table.cpp
                             gsample/gsample.cpp
                             report/rep_list.cpp
                             PROPERTIES COMPILE_FLAGS -Zp1)
-target_include_directories(iodecppapi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(iodecppapi PUBLIC iode_c_api)
+target_include_directories(iode_cpp_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(iode_cpp_api PUBLIC iode_c_api)

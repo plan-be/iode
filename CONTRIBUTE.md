@@ -66,7 +66,7 @@ To build a specific target, you need to run
 where `<target>` is one the item in the list below:
 - `iode_scr4`     -> C library providing many of the utility functions used in the C API.
 - `iode_c_api`      -> Core API of IODE (in pure C).
-- `iodecppapi`   -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
+- `iode_cpp_api`   -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`     -> Graphical user interface (GUI) based on Qt.
 - `iode_python`       -> Builds Python binding for IODE (base on Cython).
 - `nsis`         -> Builds a Windows Installer for the users.
