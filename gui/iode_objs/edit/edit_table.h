@@ -44,10 +44,12 @@ class QIodeEditTable : public QIodeSettings, public Ui::QIodeEditTable
     WrapperComboBox* wInsertLineType;
     WrapperComboBox* wInsertWhere;
 
+	QShortcut* fullScreenShortcut;
+
     QList<QString> list_insert_types;
 
 public:
-    QIodeEditTable(const QString& tableName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditTable(const QString& tableName, QWidget* parent = Q_NULLPTR);
     ~QIodeEditTable();
 
 signals:

@@ -1,8 +1,8 @@
 #include "estimation_results.h"
 
 
-QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent, Qt::WindowFlags f) :
-    QDialog(parent, f), precision(6), est(est)
+QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent) :
+    QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), precision(6), est(est)
 {
     setupUi(this);
 
@@ -20,6 +20,16 @@ QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent,
 
 	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
 	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowPlot::appendDialog);
+
+    fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
+    fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    
+    connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEstimationResults::showMaximized);
+}
+
+QIodeEstimationResults::~QIodeEstimationResults()
+{
+    delete fullScreenShortcut;
 }
 
 void QIodeEstimationResults::set_coefficients_tab()

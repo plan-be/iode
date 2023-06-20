@@ -1,8 +1,8 @@
 #include "edit_table.h"
 
 
-QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::WindowFlags f) 
-	: QIodeSettings(parent, f), tableName(tableName)
+QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent) 
+	: QIodeSettings(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), tableName(tableName)
 {
 	setupUi(this);
 
@@ -18,9 +18,13 @@ QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent, Qt::Wi
 	mapFields["InsertWhere"]     = wInsertWhere;
 
 	shortcutDelete = new QShortcut(QKeySequence(Qt::Key_Delete), this);
+    fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
+
 	shortcutDelete->setContext(Qt::WidgetWithChildrenShortcut);
+    fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
 	connect(shortcutDelete, &QShortcut::activated, this, &QIodeEditTable::delete_line);
+    connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEditTable::showMaximized);
 
 	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
 	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowPlot::appendDialog);
@@ -40,6 +44,7 @@ QIodeEditTable::~QIodeEditTable()
 	delete wInsertWhere;
 
 	delete shortcutDelete;
+	delete fullScreenShortcut;
 }
 
 void QIodeEditTable::edit()

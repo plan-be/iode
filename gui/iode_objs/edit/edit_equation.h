@@ -48,6 +48,8 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
     WrapperQLineEdit*       lineBlock;
     WrapperQLineEdit*       lineInstruments;
 
+	QShortcut* fullScreenShortcut;
+
 protected:
 	QString project_settings_filepath;
 
@@ -69,7 +71,7 @@ private:
 	}
 
 public:
-    QIodeEditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR);
     ~QIodeEditEquation();
 
 signals:
