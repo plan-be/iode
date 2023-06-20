@@ -1,14 +1,19 @@
 #include "edit_equation.h"
 
 
-QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* parent, Qt::WindowFlags f) : 
-	QIodeSettings(parent, f)
+QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* parent) : 
+	QIodeSettings(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
 	setupUi(this);
 
 	completer = new QIodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 	textEdit_lec->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
+
+    fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
+    fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+
+    connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEditEquation::showMaximized);
 
 	estimation = nullptr;
 
@@ -59,6 +64,8 @@ QIodeEditEquation::~QIodeEditEquation()
 	delete lineInstruments;
 
 	delete completer;
+
+	delete fullScreenShortcut;
 
 	if(estimation) delete estimation;
 }

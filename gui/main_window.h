@@ -5,6 +5,7 @@
 #include <QList>
 #include <QAction>
 #include <QSettings>
+#include <QShortcut>
 #include <QCompleter>
 #include <QStringList>
 #include <QStringListModel>
@@ -86,6 +87,8 @@ private:
 	const int MAX_RECENT_PROJECTS = 30;
 	QStringList recentProjects;
 	QString fontFamily;
+
+	QShortcut* fullScreenShortcut;
 
 	std::shared_ptr<QIodeCompleter> completer;
 

@@ -158,6 +158,9 @@
      <property name="text">
       <string>Insert</string>
      </property>
+     <property name="shortcut">
+      <string>Ins</string>
+     </property>
     </widget>
    </item>
    <item row="1" column="1">

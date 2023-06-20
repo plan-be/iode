@@ -27,14 +27,16 @@ class QIodeEstimationResults : public QDialog, public Ui::QIodeEstimationResults
     QString to;
     QList<QString> variables_names;
 
+	QShortcut* fullScreenShortcut;
+
 private:
     void set_coefficients_tab();
     void set_correlation_matrix_tab();
     void set_tests_tab(Equation& eq);
 
 public:
-    QIodeEstimationResults(Estimation* est, QWidget* parent = Q_NULLPTR, 
-        Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEstimationResults(Estimation* est, QWidget* parent = Q_NULLPTR);
+    ~QIodeEstimationResults();
 
 signals:
     void newPlot(QDialog* plotDialog);

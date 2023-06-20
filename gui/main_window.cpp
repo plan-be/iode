@@ -43,8 +43,14 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent)
     // connect the Tabs widget to the File Explorer
     treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
 
+    // ---- shortcuts ----
+    fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
+    fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+
     // ---- signals and slots ----
     connect(lineEdit_iode_command, &QIodeCommandLine::askComputeHash, tabWidget_IODE_objs, &QIodeTabWidget::computeHash);
+
+    connect(fullScreenShortcut, &QShortcut::activated, this, &MainWindow::showMaximized);
 
     // ---- load project (if any) (if any) ----
     // first time launching the GUI -> ask the user to either start a new project 
@@ -94,6 +100,8 @@ MainWindow::~MainWindow()
     for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
 
     delete user_settings;
+
+    delete fullScreenShortcut;
 }
 
 void MainWindow::buildRecentProjectsMenu()
