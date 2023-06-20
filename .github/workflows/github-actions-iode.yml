@@ -230,21 +230,31 @@ jobs:
           cmake-config: ${{ matrix.build-config }}
       - name: Build the GUI
         run: cmake --build --preset ${{ matrix.build-config }} --target iode_gui
+        
       - name: Restore Python 3.9 binding files for IODE
         uses: actions/download-artifact@v3
         with:
           name: iode-python-39
-          path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py39
+          path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py39    
+      - name: check for Python 3.9 binding file  
+        run: dir ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py39
+
       - name: Restore Python 3.10 binding files for IODE
         uses: actions/download-artifact@v3
         with:
           name: iode-python-310
           path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py310
+      - name: check for Python 3.10 binding file  
+        run: dir ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py310
+
       - name: Restore Python 3.11 binding files for IODE
         uses: actions/download-artifact@v3
         with:
           name: iode-python-311
           path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py311
+      - name: check for Python 3.11 binding file  
+        run: dir ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py311
+
       - name: Restore Documentation Files
         uses: actions/download-artifact@v3
         with:
@@ -252,6 +262,7 @@ jobs:
           path: ${{ github.workspace }}/doc/build
       - name: check for documentation files
         run: dir ${{ github.workspace }}/doc/build
+
       - name: Build Installer (NSIS)
         run: cmake --build --preset ${{ matrix.build-config }} --target nsis
       - run: echo "This job's status is ${{ job.status }}."
