@@ -47,30 +47,26 @@ if(Python_FOUND)
 
   if(MSVC)
     set(COMPILER msvc)
-  elseif(IS_GNU)
-    break()
-  elseif(IS_CLANG)
-    break()
+
+    set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
+    set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
+
+    add_custom_target(iode_python
+                      COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
+                      # COMMAND DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" ./py${Python_VERSION_}/iode.pyd
+                      DEPENDS cythonize_iode.py
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                      COMMENT "Building iode.pyd for Python version ${Python_VERSION}"
+                      )
+    add_dependencies(iode_python iode_c_api)
+
+    add_custom_command(TARGET iode_python POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        COMMENT "Moving iode.pyd file to ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_} directory"
+                        )
   endif()
 
-  set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
-  set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
-
-  add_custom_target(iode_python
-                    COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
-                    # COMMAND DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" ./py${Python_VERSION_}/iode.pyd
-                    DEPENDS cythonize_iode.py
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                    COMMENT "Building iode.pyd for Python version ${Python_VERSION}"
-                    )
-  add_dependencies(iode_python iode_c_api)
-
-  add_custom_command(TARGET iode_python POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                      COMMENT "Moving iode.pyd file to ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_} directory"
-                      )
-    
   if(TARGET iode_python)
     message(STATUS "New target iode_python enabled\n")
   else()
