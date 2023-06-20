@@ -94,7 +94,7 @@ Group "Pseudo-virtual functions"
 Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be 
 printed in the console. In the DOS-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
 
-For each of these functions, a standard implementation (= virtual function) is provided in ~ciodeapi.lib~C, generally using the stdio functions like ~cprintf~C. 
+For each of these functions, a standard implementation (= virtual function) is provided in ~ciode_c_api.lib~C, generally using the stdio functions like ~cprintf~C. 
 These functions are grouped in k_super.c.
 
 At the same time, an optional "super function" pointer may point to an alternative function. If that pointer is not null, 

@@ -32,7 +32,7 @@ and defined (for the most part) in ~cb_api.c~C.
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 &IT Step 1: in C
 ¯¯¯¯¯¯¯¯¯¯
-Create the new function in one of the iodeapi C modules, for example in ~capi/b_api.c~C:
+Create the new function in one of the iode_c_api C modules, for example in ~capi/b_api.c~C:
 &CO    
          int IodeMyFn(char* name) {
             source code...
@@ -41,13 +41,13 @@ Create the new function in one of the iodeapi C modules, for example in ~capi/b_
 Declare the new function in ~capi/iodeapi.h~C
 
 For the Visual Studio (CMake) version:
-&EN regenerate ~ciodeapi.lib~C (using CMake)
+&EN regenerate ~ciode_c_api.lib~C (using CMake)
 
 For non Visual Studio version (standard Microsoft ~cnmake~C / cl compiler):
 &EN Goto ~c../api/vc64~C
 &EN Call ~c"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"~C
 to create the environment variables for VC64 nmake
-&EN Execute ~cnmake~C to create 64 bits ~ciodeapi.lib~C
+&EN Execute ~cnmake~C to create 64 bits ~ciode_c_api.lib~C
 
 For example:
 &CO

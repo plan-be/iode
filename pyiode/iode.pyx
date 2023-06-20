@@ -31,17 +31,17 @@
 #  --------------------------------------------------
 #  
 #  1. In C
-#      Create the new function in one of the iodeapi C modules, for example in api/b_api.c:
+#      Create the new function in one of the iode_c_api C modules, for example in api/b_api.c:
 #           int IodeMyFn(char* name) 
 #      Declare the new function in api/iodeapi.h
 #  
 #      For Visual Studio (CMake) version:
-#        - Regenerate iodeapi.lib (using CMake)
+#        - Regenerate iode_c_api.lib (using CMake)
 #  
 #      For non Visual Studio version (standard Microsoft nmake / cl compiler):
 #        - Goto .../iode/api/vc64 
 #        - Execute set64.bat to create the environment variables for VC64 nmake
-#        - Execute nmake to create 64 bits iodeapi.lib => api/vc64/nmake
+#        - Execute nmake to create 64 bits iode_c_api.lib => api/vc64/nmake
 #  
 #  2. In Python (*.pyx files)
 #      Add the new function declaration in iode.pxi in the section "cdef extern from "iode.h":":

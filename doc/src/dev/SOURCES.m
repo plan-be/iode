@@ -26,7 +26,7 @@ Two versions:
 
 ..tb
 | Directory                | Target                            | Contents 
-| ~c./api                  | iodeapi.lib (32 bits)             | api sources
+| ~c./api                  | iode_c_api.lib (32 bits)             | api sources
 | ~c./tests/test_c_api     | test1[cpp].exe                    | test1 sources + makefile
 | ~c./tests/data           |                                   | data for test1.exe and test1cpp.exe 
 | ~c./tests/output         |                                   | results of test1.exe and test1cpp.exe 
@@ -51,7 +51,7 @@ Location: ~cc:/usr/iode_src~C
 ..tb
 | Directory          | Target                        | Contents 
 | ~c./pyiode         | py{vers}/iode.pyd             | makepy.bat, cythonize_iode.py, test_iode.py, .pyx and .pxi sources
-| ~c./api/vc64       | iodeapi.lib (64 bits MSVC)    | 64 bits objects + VC makefile
+| ~c./api/vc64       | iode_c_api.lib (64 bits MSVC)    | 64 bits objects + VC makefile
 | ~cscr4_src/vc64    | s4iode.lib (64 bits MSVC)     | 64 bits objects + VC makefile
 ..te
 >
@@ -71,7 +71,7 @@ GitHub repository: ~chttps://github.com/plan-be/iode~C
 
 ..tb
 | Directory                | Target                            | Contents 
-| ~c./api                  | iodeapi.lib (64 bits MSVC)        | api sources 
+| ~c./api                  | iode_c_api.lib (64 bits MSVC)        | api sources 
 | ~c./tests/test_c_api     | test1[cpp].exe, test_c_api.exe    | test1 sources, convert_tests.bat, borland_to_google_test.py
 | ~c./tests/data           |                                   | data for test1.exe and test1cpp.exe 
 | ~c./tests/output         |                                   | results of test1.exe and test1cpp.exe 

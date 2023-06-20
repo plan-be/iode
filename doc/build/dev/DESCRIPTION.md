@@ -242,7 +242,7 @@ Functions to read and write parameters in iode.ini.
 
 Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be printed in the console. In the DOS\-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
 
-For each of these functions, a standard implementation (= virtual function) is provided in `iodeapi.lib`, generally using the stdio functions like `printf`. These functions are grouped in k\_super.c.
+For each of these functions, a standard implementation (= virtual function) is provided in `iode_c_api.lib`, generally using the stdio functions like `printf`. These functions are grouped in k\_super.c.
 
 At the same time, an optional "super function" pointer may point to an alternative function. If that pointer is not null, the alternative function replaces (superseeds) the original implementation (= virtual function). In that way, each context has possibly its own implementation without interfering with the others.
 

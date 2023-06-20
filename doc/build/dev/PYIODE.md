@@ -33,7 +33,7 @@ The signatures of the C\-api functions used in the python sources can be found i
 
 #### Step 1: in C {#T6}
 
-Create the new function in one of the iodeapi C modules, for example in `api/b_api.c`:
+Create the new function in one of the iode_c_api C modules, for example in `api/b_api.c`:
 
 ```
    
@@ -46,13 +46,13 @@ Declare the new function in `api/iodeapi.h`
 
 For the Visual Studio (CMake) version:
 
-- regenerate `iodeapi.lib` (using CMake)
+- regenerate `iode_c_api.lib` (using CMake)
 
 For non Visual Studio version (standard Microsoft `nmake` / cl compiler):
 
 - Goto `../api/vc64`
 - Call `"C:\Program Files (x86)\Microsoft Visual Studio\2019ommunity\VC\Auxiliaryuild\vcvars64.bat"` to create the environment variables for VC64 nmake
-- Execute `nmake` to create 64 bits `iodeapi.lib`
+- Execute `nmake` to create 64 bits `iode_c_api.lib`
 
 For example:
 

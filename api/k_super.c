@@ -4,7 +4,7 @@
  * Some IODE functions may differ according to the context. For example, in the context of a console app, error messages will be 
  * printed in the console. In the DOS-Win32 context, error messages are displayed in the status bar, in the Qt context in a different way...
  * 
- * For each of these functions, a standard implementation is provided in iodeapi.lib, generally using the stdio functions like printf.
+ * For each of these functions, a standard implementation is provided in iode_c_api.lib, generally using the stdio functions like printf.
  * At the same time, an optional "super function" pointer may point to a alternative function. If that pointer is not null, 
  * the alternative function will replace (superseed) the original implementation. In that way, each context  has possibly its own implementation
  * without interfering with the others.
@@ -357,7 +357,7 @@ void krecordtext(unsigned char*  text)
  *  not defined in scr4iode.lib. Therefore, the definition below is required to link test1.exe, iodecmd.exe...
  *  
  *  However, Wprintf() IS DEFINED in s32wo.lib (used only with iode.exe with "DOS" GUI interface). 
- *  And consequently, we have 2 definitions at link time: iodeapi.lib and s32wo.lib. 
+ *  And consequently, we have 2 definitions at link time: iode_c_api.lib and s32wo.lib. 
  *  It works, but should be fixed. 
  *   
  *  

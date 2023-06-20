@@ -1,27 +1,27 @@
 
 <IODE: rebuilding IODE installer>
 IODE: rebuilding IODE installer
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..sep |
 ..esc ~
-..ignore ¯
+..ignore ï¿½
 
-&EN <STEP 1 : Changer le numéro de version> 
-&EN <STEP 2 : Mise à niveau des sources des manuels>
-&EN <STEP 3 : Génération du manuel en pdf (optionnel)>
-&EN <STEP 4 : préparer les pages start.txt et sidebar.txt pour site web de IODE>
+&EN <STEP 1 : Changer le numï¿½ro de version> 
+&EN <STEP 2 : Mise ï¿½ niveau des sources des manuels>
+&EN <STEP 3 : Gï¿½nï¿½ration du manuel en pdf (optionnel)>
+&EN <STEP 4 : prï¿½parer les pages start.txt et sidebar.txt pour site web de IODE>
 &EN <STEP 5 : rebuild iode, manuals et installateurs>
-&EN <STEP 6 : transférer la nouvelle version sur le site web de IODE>
+&EN <STEP 6 : transfï¿½rer la nouvelle version sur le site web de IODE>
 >
 
-<STEP 1 : Changer le numéro de version>
-STEP 1 : Changer le numéro de version
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-La localisation des numéros de version et des dates à modifier se trouve 
+<STEP 1 : Changer le numï¿½ro de version>
+STEP 1 : Changer le numï¿½ro de version
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La localisation des numï¿½ros de version et des dates ï¿½ modifier se trouve 
 dans le fichier ~ciode_src/nsis/chvers~C.
 
-On peut éditer chvers avec l'éditeur ~ce.bat~C (~cs32w_mt.exe~C) qui permet 
-d'ouvrir les fichiers concernés à la bonne ligne avec la touche ~cCtrl-F4~C. 
+On peut ï¿½diter chvers avec l'ï¿½diteur ~ce.bat~C (~cs32w_mt.exe~C) qui permet 
+d'ouvrir les fichiers concernï¿½s ï¿½ la bonne ligne avec la touche ~cCtrl-F4~C. 
 
 &CO
 c:/>> cd /usr/iode_src/nsis
@@ -29,8 +29,8 @@ c:/usr/iode_src/nsis>> e chvers
 &TX
 
 ~bFichier chvers mars 2023~B
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-Liste des fichiers suivi du numéro de la ligne à modifier:
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Liste des fichiers suivi du numï¿½ro de la ligne ï¿½ modifier:
 
 &CO
     ..\\api\\vers.h  1
@@ -57,62 +57,62 @@ Liste des fichiers suivi du numéro de la ligne à modifier:
 >
 
 
-<STEP 2 : Mise à niveau des sources des manuels>
-STEP 2 : Mise à niveau des sources des manuels
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+<STEP 2 : Mise ï¿½ niveau des sources des manuels>
+STEP 2 : Mise ï¿½ niveau des sources des manuels
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Aller dans le dir iode_src/doc :
 
 &CO
 c:/>> cd /usr/iode_src/doc
 &TX
 
-Mise à niveau des fichiers sources du manuel dans ~cdoc/src/*.m~C et ~c*.m1~C:
+Mise ï¿½ niveau des fichiers sources du manuel dans ~cdoc/src/*.m~C et ~c*.m1~C:
 
-&EN adapter ~creadme.m~C : ajouter les commentaires de la version + reporter dans le manuel si nécessaire
-Recopier par exemple une version précédente pour démarrer la section de la nouvelle version.
-&EN adapter ~ciodew.m~C : au début du fichier, ajouter une entrée avec la nouvelle version) comme pour les versions précédentes.
-&EN si le manuel en pdf va être reconstruit, adapter la date de publication dans intro.m1 (voir aussi chvers plus haut)
-&EN si des fonctions ont été ajoutées piu modifiées, les décrire dans les fichiers sources (.m) correspondants.
-Eventuellement ajoutéer
-&EN si certains écrans ont été ajoutés / modifiés, faire les screen captures (en png) et les inclure dans les sources du manuel (.m)
+&EN adapter ~creadme.m~C : ajouter les commentaires de la version + reporter dans le manuel si nï¿½cessaire
+Recopier par exemple une version prï¿½cï¿½dente pour dï¿½marrer la section de la nouvelle version.
+&EN adapter ~ciodew.m~C : au dï¿½but du fichier, ajouter une entrï¿½e avec la nouvelle version) comme pour les versions prï¿½cï¿½dentes.
+&EN si le manuel en pdf va ï¿½tre reconstruit, adapter la date de publication dans intro.m1 (voir aussi chvers plus haut)
+&EN si des fonctions ont ï¿½tï¿½ ajoutï¿½es piu modifiï¿½es, les dï¿½crire dans les fichiers sources (.m) correspondants.
+Eventuellement ajoutï¿½er
+&EN si certains ï¿½crans ont ï¿½tï¿½ ajoutï¿½s / modifiï¿½s, faire les screen captures (en png) et les inclure dans les sources du manuel (.m)
 >
 
-<STEP 3 : génération du manuel en pdf (optionnel)>
-STEP 3 : génération du manuel en pdf (optionnel)
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-Cette étape nécessite le programme Adobe/Framemaker.
+<STEP 3 : gï¿½nï¿½ration du manuel en pdf (optionnel)>
+STEP 3 : gï¿½nï¿½ration du manuel en pdf (optionnel)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Cette ï¿½tape nï¿½cessite le programme Adobe/Framemaker.
 
-En résumé :
-&EN créer les fichiers mif dans ~cdoc/src~C
-&EN éditer en FrameMaker
-&EN sauver en PDF (si distiller installé) ou imprimer en PDF
+En rï¿½sumï¿½ :
+&EN crï¿½er les fichiers mif dans ~cdoc/src~C
+&EN ï¿½diter en FrameMaker
+&EN sauver en PDF (si distiller installï¿½) ou imprimer en PDF
 &EN recopier iode6.pdf dans doc\\build\\iode.pdf
 
-&TI 1. Créer le fichier mif (maker interchange format) dans ~cdoc/src~C
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+&TI 1. Crï¿½er le fichier mif (maker interchange format) dans ~cdoc/src~C
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Dans iode_src/doc, lancer la commande :
 &CO
  c:/usr/iode_src/doc>> makemif.bat
 &TX
 
-Cette commande va créer deux parties du manuel en format mif : iode1.mif et iode2.mif.
-Ces deux fichiers seront créés dans doc/src.
+Cette commande va crï¿½er deux parties du manuel en format mif : iode1.mif et iode2.mif.
+Ces deux fichiers seront crï¿½ï¿½s dans doc/src.
 
-&TI 2. Créer iode6.pdf
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-&NO Note préalable
+&TI 2. Crï¿½er iode6.pdf
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&NO Note prï¿½alable
 
-La découpe du manuel en pdf est un peu différente de celle des fichiers iode.chm et du site wiki :
-&EN on a un chapitre 8 supplémentaire qui contient les algorithmes utilisés. 
-&EN une partie "fixe" contient tout ce qui est écrans et graphiques (a2m, excel, apl, algo).
-&EN la syntaxe des a2m est déplacée dans les annexes
+La dï¿½coupe du manuel en pdf est un peu diffï¿½rente de celle des fichiers iode.chm et du site wiki :
+&EN on a un chapitre 8 supplï¿½mentaire qui contient les algorithmes utilisï¿½s. 
+&EN une partie "fixe" contient tout ce qui est ï¿½crans et graphiques (a2m, excel, apl, algo).
+&EN la syntaxe des a2m est dï¿½placï¿½e dans les annexes
 
-Les fichiers .m et .m1 sont donc différents pour l'output mif.
+Les fichiers .m et .m1 sont donc diffï¿½rents pour l'output mif.
 
-~uListe des fichiers nécessaires à la génération du manuel IODE~U
+~uListe des fichiers nï¿½cessaires ï¿½ la gï¿½nï¿½ration du manuel IODE~U
 
 &EN *.bmp files added (for Frame)
-&EN iode-1.fm and iode2-.fn: most recent version of these chapters in Frame format (fm)µ
+&EN iode-1.fm and iode2-.fn: most recent version of these chapters in Frame format (fm)ï¿½
 &EN iode6.book: Frame book file
 &EN iode6.ref.fm: catalog of paragraphs, fonts, pages...
 &EN iode6Chapt10.fm: fixed chapter 10 (not generated)
@@ -122,7 +122,7 @@ Les fichiers .m et .m1 sont donc différents pour l'output mif.
 
 ~uMode d'emploi~U
 
-Après avoir exécuté la commande makemif.bat:
+Aprï¿½s avoir exï¿½cutï¿½ la commande makemif.bat:
 &EN cd doc/src
 &EN Start FrameMaker
 &EN Open iode/doc/src/iode6.book
@@ -132,65 +132,65 @@ Après avoir exécuté la commande makemif.bat:
 &EN Open iode/doc/src/iode1.mif et iode/doc/src/iode2.mif
 &EN Dans iode1.mif : ajustements manuels
 &EN2 revoir le chapitre "Trend Correction" : pour les graphiques formules, 
-    supprimer le cadre et diminuer la taille du frame pour ajuster à la formule.
+    supprimer le cadre et diminuer la taille du frame pour ajuster ï¿½ la formule.
     Pour cela, 1/ ouvrir Graphics/Tools + Set Pen Pattern to "None" et 2/ View Borders 
     
-&EN2 idem pour le chapitre "Impression de la définition d’objets"    
+&EN2 idem pour le chapitre "Impression de la dï¿½finition dï¿½objets"    
 &EN Dans iode2.mif :
-&EN2 supprimer la première page avec Annexes (Delete text)
+&EN2 supprimer la premiï¿½re page avec Annexes (Delete text)
 &EN2 forcer un saut de page pour l'annexe 1 (Special / Page Break / Top of the next available Page)
 &EN Pour iode1.mif et iode2.mif :
-&EN2 Alt+fio (File/Import/Formats) : choisir iode6.ref.fm comme formats de référence
+&EN2 Alt+fio (File/Import/Formats) : choisir iode6.ref.fm comme formats de rï¿½fï¿½rence
 &EN2 Alt+olm (Format/Page Layout/Master Page Usage) : Right /Left + Apply to All Pages
 &EN Alt+fa (Save As) iode1.mif en iode6-1.fm et iode2.mif en iode6-2.fm
 &EN Pour iode6.book : Alt+eb (book?Edit/Update) : appliquer les modifs dans toc
 &EN sauver book, iodecover.fm, iode6toc.fm, iode6-1.fm, iode6-2.fm
-&EN si distiller installé : save book as pdf (niveaux tit_1 à tit_4) ->> lent !
+&EN si distiller installï¿½ : save book as pdf (niveaux tit_1 ï¿½ tit_4) ->> lent !
 &EN sinon: print vers pdf file (dans ce cas, pas de TOC dans les lecteurs PDF)
 &EN copier le pdf dans le directory des builds ~ccopy iode6.pdf ../build/iode.pdf~C
 >
 
-<STEP 4 : préparer les pages start.txt et sidebar.txt pour site web de IODE>
-STEP 4 : préparer les pages start.txt et sidebar.txt pour site web de IODE
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-Avant de transférer sur le site, il faut adapter manuellement les fichiers suivants.
+<STEP 4 : prï¿½parer les pages start.txt et sidebar.txt pour site web de IODE>
+STEP 4 : prï¿½parer les pages start.txt et sidebar.txt pour site web de IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Avant de transfï¿½rer sur le site, il faut adapter manuellement les fichiers suivants.
 
 ~bdoc/src/start.txt~B
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN Ajouter les liens vers les nouveaux installateurs dans la section "Download"
 &EN Si d'application, ajouter dans la section "IODE for python" la version iode.pyd pour une nouvelle version de python
  
 ~bdoc/src/sidebar.txt~B
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-Revoir cette section et y ajouter éventuellement de nouveaux chapitres (par exemple pour le manuel de iode.pyd).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Revoir cette section et y ajouter ï¿½ventuellement de nouveaux chapitres (par exemple pour le manuel de iode.pyd).
 >
 
 <STEP 5 : rebuild iode, manuals et installateurs>
 STEP 5 : rebuild iode, manuals et installateurs
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-&NO Note préalable : il faut vérifier que les makefiles qui créent des exécutables (iode.exe, iodecmd.exe, iodecom.exe...)
-soient bien ~usignés~U avant de lancer la procédure de recompilation (on supprime en général la signature pendant les développements pour 
+&NO Note prï¿½alable : il faut vï¿½rifier que les makefiles qui crï¿½ent des exï¿½cutables (iode.exe, iodecmd.exe, iodecom.exe...)
+soient bien ~usignï¿½s~U avant de lancer la procï¿½dure de recompilation (on supprime en gï¿½nï¿½ral la signature pendant les dï¿½veloppements pour 
 que le debugger td32 puisse fonctionner).
 
 Se placer dans ~c./nsis~C pour recontruire 
 &EN les libs 
-&EN les exécutables 
-&EN les différentes versions des manuels (sauf pdf) :
+&EN les exï¿½cutables 
+&EN les diffï¿½rentes versions des manuels (sauf pdf) :
 
 &CO
 c:>> cd /usr/iode_src/nsis
 c:/usr/iode_src/nsis>> remakeiode [-objs] [-man]
 &TX
 
-Les options -objs et -man permettent d'éviter la recompilation de toutes les sources et la génération des manuels, 
+Les options -objs et -man permettent d'ï¿½viter la recompilation de toutes les sources et la gï¿½nï¿½ration des manuels, 
 par exemple pendant une phase de mise au point.
-&EN ~c-man~C : ne génére par les manuels (readme.htm, iode.chm, pages du site wiki)
+&EN ~c-man~C : ne gï¿½nï¿½re par les manuels (readme.htm, iode.chm, pages du site wiki)
 &EN ~c-objs~C : ne force pas la recompilation des sources .c et .cpp
 
-Le programme génère d'abord les librairies nécessaires en 32 et 64 bits (64 bits uniquement pour pyiode). 
+Le programme gï¿½nï¿½re d'abord les librairies nï¿½cessaires en 32 et 64 bits (64 bits uniquement pour pyiode). 
 
-En sortie, les fichiers suivants auront été regénérés :
+En sortie, les fichiers suivants auront ï¿½tï¿½ regï¿½nï¿½rï¿½s :
 
 &EN  ./cmd/iodecmd.exe
 &EN  ./dos/iode.exe
@@ -205,7 +205,7 @@ En sortie, les fichiers suivants auront été regénérés :
 &EN  ./<<local_htdocs>>/w-iode/data/media/* 
 
 ~bFichier remakeiode.bat (mars 2023)~B
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
     :: Rebuild IODE and create installation programs
     :: 
@@ -284,7 +284,7 @@ En sortie, les fichiers suivants auront été regénérés :
     :: 2: iodelibs VC64
     cd %iodepath%\\api\\vc64
     if [%objs%] == [1] del *.obj
-    call nmake iodeapi.lib
+    call nmake iode_c_api.lib
     if %errorlevel% NEQ 0 goto :err
     
     :: 3. iode.pyd
@@ -320,13 +320,13 @@ En sortie, les fichiers suivants auront été regénérés :
 >
 
 
-<STEP 6 : transférer la nouvelle version sur le site web de IODE>
-STEP 6 : transférer la nouvelle version sur le site web de IODE
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-Pour cette étape, le path local suivants est utilisé :
-&EN WIKI_DIR=/apache24/htdocs/w-iode = localisation des fichiers générés par ./doc/makewiki.bat.
+<STEP 6 : transfï¿½rer la nouvelle version sur le site web de IODE>
+STEP 6 : transfï¿½rer la nouvelle version sur le site web de IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Pour cette ï¿½tape, le path local suivants est utilisï¿½ :
+&EN WIKI_DIR=/apache24/htdocs/w-iode = localisation des fichiers gï¿½nï¿½rï¿½s par ./doc/makewiki.bat.
 
-Si nécessaire, il faut l'adapter au début du fichier copy2ovh.bat listé ci-dessous.
+Si nï¿½cessaire, il faut l'adapter au dï¿½but du fichier copy2ovh.bat listï¿½ ci-dessous.
 
 Dans c:/usr/iode_src/nsis, lancer la commande :
 &CO
@@ -334,7 +334,7 @@ Dans c:/usr/iode_src/nsis, lancer la commande :
 &TX
 
 ~bFichier copy2ovh.bat (mars 2023)~B
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 @echo off
 SETLOCAL

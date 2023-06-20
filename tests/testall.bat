@@ -14,7 +14,7 @@ if exist %logfile% del %logfile%
 @echo ---------- >> %logfile%
 @echo.           >> %logfile%
 
-@echo Rebuild iodeapi, iodecmd and iode.exe.           >> %logfile%
+@echo Rebuild iode_c_api, iodecmd and iode.exe.           >> %logfile%
 
 :: tests/cmd
 cd cmd

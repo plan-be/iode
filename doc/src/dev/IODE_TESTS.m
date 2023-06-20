@@ -32,11 +32,11 @@ The log file ~c./testall.log~C is generated during the process.
         ./tests/testall.bat: run all tests
         
         ./tests/cmd : iodecmd tests
-            ./tests/cmd/mk.bat: rebuild iodeapi.lib and iodecmd.exe
+            ./tests/cmd/mk.bat: rebuild iode_c_api.lib and iodecmd.exe
             ./tests/cmd/unittests.bat: run the tests on iodecmd
         
-        ./tests/test_c_api: iodeapi.lib tests
-            ./tests/test_c_api/mk.bat: rebuild iodeapi.lib, test1.exe and test1cpp.exe
+        ./tests/test_c_api: iode_c_api.lib tests
+            ./tests/test_c_api/mk.bat: rebuild iode_c_api.lib, test1.exe and test1cpp.exe
             ./tests/test_c_api/unittests.bat: run the tests on iode api            
             
         ./tests/pyiode: pyiode tests

@@ -66,4 +66,4 @@ set_source_files_properties(objects/equation.cpp objects/table.cpp
                             report/rep_list.cpp
                             PROPERTIES COMPILE_FLAGS -Zp1)
 target_include_directories(iodecppapi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(iodecppapi PUBLIC iodeapi)
+target_link_libraries(iodecppapi PUBLIC iode_c_api)
