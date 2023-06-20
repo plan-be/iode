@@ -101,7 +101,7 @@ jobs:
 
   build_cython:
     name: Build Python API for IODE
-    if: contains(github.head_ref, 'cython')
+    if: ${{ contains(github.head_ref, 'cython') || contains(github.head_ref, 'nsis') }}
     strategy:
       matrix:
         os: [windows-latest]
@@ -169,7 +169,7 @@ jobs:
           
   build_doc:
     name: Build user documentation
-    if: contains(github.head_ref, 'doc')
+    if: ${{ contains(github.head_ref, 'doc') || contains(github.head_ref, 'nsis') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
