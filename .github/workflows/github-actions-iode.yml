@@ -162,7 +162,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v3
         with:
-          name: iode-pyiode
+          name: iode-python-3${{ matrix.python-minor-version }}
           path: "${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py3${{ matrix.python-minor-version }}/"
           if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
 
@@ -199,10 +199,14 @@ jobs:
   
   build_nsis:
     name: Build installer using NSIS
-    if: contains(github.head_ref, 'nsis')
+    # run build_cython and build_doc jobs before
+    needs: [build_cython, build_doc]
+    if: ${{ contains(github.head_ref, 'nsis') }}
     strategy:
       matrix:
         os: [windows-latest]
+        build-config: [windows-debug]
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -215,64 +219,46 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Install dependencies on windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install ninja
-          ninja --version
-          cmake --version
-      - name: Add cl.exe to PATH
-        if: runner.os == 'Windows'
-        # See https://github.com/marketplace/actions/enable-developer-command-prompt
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-      - name: Install Boost
-        uses: MarkusJx/install-boost@v2.4.1
-        id: install-boost
-        with:
-            boost_version: 1.80.0
-            boost_install_dir: C:\
-            platform_version: 2019
-            toolset: msvc
-      - name: update pip
-        run: python.exe -m pip install --upgrade pip
-      - name: install aqtinstall
-        run: pip install aqtinstall
-      - name: show available Qt versions
-        run: aqt list-qt windows desktop
       - name: Install Qt
-        # See https://github.com/jurplel/install-qt-action
-        uses: jurplel/install-qt-action@v3
+        uses: ./.github/actions/install_qt
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
         with:
-          version: '6.4.0'
-          host: 'windows'
-          target: 'desktop'
-          # TODO : adpat arch for Linux
-          arch: 'win64_msvc2019_64'
-          dir: '${{ github.workspace }}/'
-          modules: 'qtcharts'
-          install-deps: 'true'
-      - name: Preset config for Windows
-        if: runner.os == 'Windows'
+          cmake-config: ${{ matrix.build-config }}
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
+        with:
+          cmake-config: ${{ matrix.build-config }}
+      - name: Build the GUI
+        run: cmake --build --preset ${{ matrix.build-config }} --target iode_gui
+      - name: Restore Python 3.9 binding files for IODE
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-python-39
+          path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py39
+      - name: Restore Python 3.10 binding files for IODE
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-python-310
+          path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py310
+      - name: Restore Python 3.11 binding files for IODE
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-python-311
+          path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py311
+      - name: check for Python binding files
         run: |
-          echo "PRESET_CONFIG=windows-debug" >> $env:GITHUB_ENV
-      - name: Preset config for Linux
-        if: runner.os == 'Linux'
-        run: |
-          echo "PRESET_CONFIG=linux-debug" >> $GITHUB_ENV
-      - name: Print preset config
-        run: echo "${{ env.PRESET_CONFIG }}"
-      - name: Configure CMake
-        run: cmake --preset ${{ env.PRESET_CONFIG }}
-      - name: Build SCR4
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_scr4 
-      - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_c_api 
-      - name: Build C++ IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_cpp_api 
-      - name: Build GUI
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_gui
+          for python_minor in $(seq 9 11)
+          do
+            dir ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py3$python_minor
+          done
+      - name: Restore Documentation Files
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-doc
+          path: ${{ github.workspace }}/doc/build
+      - name: check for documentation files
+        run: dir ${{ github.workspace }}/doc/build
       - name: Build Installer (NSIS)
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target nsis
+        run: cmake --build --preset ${{ matrix.build-config }} --target nsis
       - run: echo "This job's status is ${{ job.status }}."
