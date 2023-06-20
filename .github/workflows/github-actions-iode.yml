@@ -66,6 +66,36 @@ jobs:
           cmake-config: ${{ matrix.build-config }}
       - run: echo "This job's status is ${{ job.status }}."
 
+
+  build_cli:
+    name: Build IODE CLI
+    if: ${{ (contains(github.head_ref, 'cmd') || contains(github.head_ref, 'command') || contains(github.head_ref, 'cli')) }}
+    strategy:
+      matrix:
+        # os: [windows-latest, ubuntu-latest]
+        # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
+        os: [windows-2019]
+        build-config: [windows-debug]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
+        with:
+          cmake-config: ${{ matrix.build-config }}
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
+        with:
+          cmake-config: ${{ matrix.build-config }}
+      - name: Build CLI
+        run: cmake --build --preset ${{ matrix.build-config }} --target iodecmd 
+      - run: echo "This job's status is ${{ job.status }}."
+
+
   build_gui:
     name: Build Graphical User Interface
     if: contains(github.head_ref, 'gui')
@@ -230,7 +260,7 @@ jobs:
           cmake-config: ${{ matrix.build-config }}
       - name: Build the GUI
         run: cmake --build --preset ${{ matrix.build-config }} --target iode_gui
-        
+
       - name: Restore Python 3.9 binding files for IODE
         uses: actions/download-artifact@v3
         with:
