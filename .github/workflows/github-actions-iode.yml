@@ -250,6 +250,7 @@ jobs:
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
       - name: Install Qt
         uses: ./.github/actions/install_qt
+
       - name: Build the SCR4, C and C++ API libs
         uses: ./.github/actions/build_api
         with:
@@ -258,6 +259,10 @@ jobs:
         uses: ./.github/actions/test_api
         with:
           cmake-config: ${{ matrix.build-config }}
+
+      - name: Build CLI
+        run: cmake --build --preset ${{ matrix.build-config }} --target iodecmd
+        
       - name: Build the GUI
         run: cmake --build --preset ${{ matrix.build-config }} --target iode_gui
 
