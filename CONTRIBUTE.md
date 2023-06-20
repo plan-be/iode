@@ -64,11 +64,11 @@ To build a specific target, you need to run
 > cmake --build --preset <preset_config> --target <target>
 ```
 where `<target>` is one the item in the list below:
-- `iode_scr4`     -> C library providing many of the utility functions used in the C API.
-- `iode_c_api`      -> Core API of IODE (in pure C).
-- `iode_cpp_api`   -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
+- `iode_scr4`    -> C library providing many of the utility functions used in the C API.
+- `iode_c_api`   -> Core API of IODE (in pure C).
+- `iode_cpp_api` -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`     -> Graphical user interface (GUI) based on Qt.
-- `iode_python`       -> Builds Python binding for IODE (base on Cython).
+- `iode_python`  -> Builds Python binding for IODE (base on Cython).
 - `nsis`         -> Builds a Windows Installer for the users.
 - `test_c_api`   -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api` -> Builds the tests for the C++ classes (based on Google Test).
