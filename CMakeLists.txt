@@ -177,6 +177,7 @@ add_subdirectory ("api")
 add_subdirectory ("cpp_api")
 
 # ---- executables ----
+set(IODE_CLI_TARGET iodecmd)
 add_subdirectory ("cmd")
 set(IODE_GUI_TARGET iode_gui)
 add_subdirectory ("gui")
