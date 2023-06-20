@@ -44,7 +44,7 @@ Two versions:
 |`./fun`||example model|
 |`./nsis_installer`|iode\{vers\}.exe, iodeupd\{vers\}.exe|sources (\*.nsi) \+ remakeiode.bat to regenerate the whole project|
 |**External sources**|||
-|`../scr4_src`|scr4iode.lib, s32wo.lib|scr4 sources files \+ makefile|
+|`../scr4_src`|iode_scr4.lib, s32wo.lib|scr4 sources files \+ makefile|
 
 #### Iode for python (MSVC 64 bits) {#T4}
 
@@ -76,7 +76,7 @@ GitHub repository: `https://github.com/plan-be/iode`
 |`./cmd`|iodecmd.exe|iodecmd sources|
 |`./pyiode`|py\{vers\}/iode.pyd|\*.pxi, \*.pyx \+ makepy.bat \+ cythonize\_iode.py \+ test\_iode.py|
 |`./gui`|iode\_gui.exe|Qt sources|
-|`./scr4`|scr4iode.lib|scr4 sources files for iode|
+|`./scr4`|iode_scr4.lib|scr4 sources files for iode|
 |`./man`|iode.chm, iode.plan.be, readme.htm, iode.pdf|makechm.bat, makewiki.bat, makereadme.bat, makemif.bat, makedev.bat, makeall.bat|
 |`./man/src`||manual sources (.m, .m1, .png, .jpg, .gif...)|
 |`./man/src/dev`|DESCRIPTION.md, LEC.md, etc|developper's manual sources (\*.m)|

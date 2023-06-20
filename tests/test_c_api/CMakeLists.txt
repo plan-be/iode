@@ -2,12 +2,12 @@
 file(INSTALL ${PROJECT_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(test1 "test1.c")
-target_link_libraries(test1 iode_c_api scr4iode)
+target_link_libraries(test1 iode_c_api iode_scr4)
 target_include_directories(test1 PUBLIC "../../scr4" "../../api")
 target_compile_options(test1 PRIVATE -Zp1)
 
 add_executable(test1cpp "test1cpp.cpp")
-target_link_libraries(test1cpp iode_c_api scr4iode)
+target_link_libraries(test1cpp iode_c_api iode_scr4)
 target_include_directories(test1cpp PUBLIC "../../scr4" "../../api")
 target_compile_options(test1cpp PRIVATE -Zp1)
 

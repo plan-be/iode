@@ -56,7 +56,7 @@ runs:
       shell: bash
       # cmake --build --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
       # see CMakePresets.json file
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target scr4iode 
+      run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_scr4 
     - name: Build C IODE API
       shell: bash
       run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_c_api 

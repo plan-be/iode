@@ -60,9 +60,9 @@ set (SCR_IODE
 	${IODE_A2M}  ${IODE_ARGS}  ${IODE_DATE}  ${IODE_INI}  ${IODE_CPP}  ${IODE_ODBC} ${IODE_GZIP} ${IODE_SYS} ${IODE_WSYS} ${ISC}) 
 
 # Add source to this project's executable.
-add_library (scr4iode STATIC ${HEADER_IODE} ${SCR_IODE})
+add_library (iode_scr4 STATIC ${HEADER_IODE} ${SCR_IODE})
 
-# NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on scr4iode.
+# NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iode_scr4.
 #       Option -Zp1 makes compilation of the Google Test lib to fail
-target_compile_options(scr4iode PRIVATE -Zp1)
-target_include_directories (scr4iode PUBLIC ".")
+target_compile_options(iode_scr4 PRIVATE -Zp1)
+target_include_directories (iode_scr4 PUBLIC ".")

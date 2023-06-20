@@ -40,7 +40,7 @@ Two versions:
 | ~c./fun                  |                                   | example model 
 | ~c./nsis_installer       | iode{vers}.exe, iodeupd{vers}.exe | sources (*.nsi) + remakeiode.bat to regenerate the whole project
 | ~bExternal sources
-| ~c../scr4_src            | scr4iode.lib, s32wo.lib           | scr4 sources files + makefile
+| ~c../scr4_src            | iode_scr4.lib, s32wo.lib           | scr4 sources files + makefile
 ..te
 
 
@@ -79,7 +79,7 @@ GitHub repository: ~chttps://github.com/plan-be/iode~C
 | ~c./cmd                  | iodecmd.exe                       | iodecmd sources
 | ~c./pyiode               | py{vers}/iode.pyd                 | *.pxi, *.pyx + makepy.bat + cythonize_iode.py + test_iode.py
 | ~c./gui                  | iode_gui.exe                      | Qt sources
-| ~c./scr4                 | scr4iode.lib                      | scr4 sources files for iode 
+| ~c./scr4                 | iode_scr4.lib                      | scr4 sources files for iode 
 | ~c./man                  | iode.chm, iode.plan.be, readme.htm, iode.pdf  | makechm.bat, makewiki.bat, makereadme.bat, makemif.bat, makedev.bat, makeall.bat
 | ~c./man/src              |                                   | manual sources (.m, .m1, .png, .jpg, .gif...)
 | ~c./man/src/dev          | DESCRIPTION.md, LEC.md, etc       | developper's manual sources (*.m) 

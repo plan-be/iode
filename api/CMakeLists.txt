@@ -29,5 +29,5 @@ target_sources(iode_c_api PUBLIC iode.h iodebase.h iodeapi.h)
 # NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iode_c_api.
 #       Option -Zp1 makes compilation of the Google Test lib to fail
 target_compile_options(iode_c_api PRIVATE -Zp1)
-target_link_libraries(iode_c_api PUBLIC "scr4iode")
+target_link_libraries(iode_c_api PUBLIC "iode_scr4")
 target_include_directories(iode_c_api PRIVATE "../scr4" ${CMAKE_CURRENT_SOURCE_DIR})

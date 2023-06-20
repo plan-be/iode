@@ -11,13 +11,13 @@
 #endif
 
 /*==================================================================
-Fonction appel‚e en cas d'erreur de SCR_malloc() ou SCR_realloc().
+Fonction appelï¿½e en cas d'erreur de SCR_malloc() ou SCR_realloc().
 
-Cette fonction peut ˆtre replac‚e par une fonction utilisateur,
+Cette fonction peut ï¿½tre replacï¿½e par une fonction utilisateur,
 permettant par exemple de sauver le travail en cours avant de
-quitter le systŠme.
+quitter le systï¿½me.
 
-La fonction de librairie effectue les op‚rations suivantes :
+La fonction de librairie effectue les opï¿½rations suivantes :
 
 &CO
     fprintf(stderr, "\n\nMemory full. Exit(2)\n");
@@ -37,7 +37,7 @@ int SCR_panic()
 }
 
 
-/* Alternative pour scr4iode 
+/* Alternative pour iode_scr4 
 
 
 void (*SCR_panic_impl)() = NULL;
