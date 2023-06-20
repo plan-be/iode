@@ -12,7 +12,7 @@
 #  
 #  where <object_type> is one of {cmt, eq, idt, lst, scl, tbl, var}.
 #  
-#  The associated C functions are provided in the source file b_api.c which is part of iodeapi.lib.
+#  The associated C functions are provided in the source file b_api.c which is part of iode_c_api.lib.
 #   
 #  List of functions
 #  -----------------

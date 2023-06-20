@@ -29,7 +29,7 @@ char     *B_ERROR_DFT_MSG = "Error message not found (check the file 'iode.msg')
  *  The path is constructed by appending "iode.msg" to the path of the current executable.
  *  
  *  To use is the context of programs calling iode API fns like iodecmd or 
- *  tests linked with iodeapi.lib.
+ *  tests linked with iode_c_api.lib.
  *  
  *  Don't use this function in the context of the "DOS" GUI interface where this file is 
  *  already appended to iode.scr file.

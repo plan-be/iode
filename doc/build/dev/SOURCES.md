@@ -30,7 +30,7 @@ Two versions:
 
 |Directory|Target|Contents|
 |:---|:---|:---|
-|`./api`|iodeapi.lib (32 bits)|api sources|
+|`./api`|iode_c_api.lib (32 bits)|api sources|
 |`./tests/test_c_api`|test1\[cpp\].exe|test1 sources \+ makefile|
 |`./tests/data`||data for test1.exe and test1cpp.exe|
 |`./tests/output`||results of test1.exe and test1cpp.exe|
@@ -53,7 +53,7 @@ Location: `c:/usr/iode_src`
 |Directory|Target|Contents|
 |:---|:---|:---|
 |`./pyiode`|py\{vers\}/iode.pyd|makepy.bat, cythonize\_iode.py, test\_iode.py, .pyx and .pxi sources|
-|`./api/vc64`|iodeapi.lib (64 bits MSVC)|64 bits objects \+ VC makefile|
+|`./api/vc64`|iode_c_api.lib (64 bits MSVC)|64 bits objects \+ VC makefile|
 |`scr4_src/vc64`|s4iode.lib (64 bits MSVC)|64 bits objects \+ VC makefile|
 
 ## 64 bits IODE version {#T5}
@@ -68,7 +68,7 @@ GitHub repository: `https://github.com/plan-be/iode`
 
 |Directory|Target|Contents|
 |:---|:---|:---|
-|`./api`|iodeapi.lib (64 bits MSVC)|api sources|
+|`./api`|iode_c_api.lib (64 bits MSVC)|api sources|
 |`./tests/test_c_api`|test1\[cpp\].exe, test\_c\_api.exe|test1 sources, convert\_tests.bat, borland\_to\_google\_test.py|
 |`./tests/data`||data for test1.exe and test1cpp.exe|
 |`./tests/output`||results of test1.exe and test1cpp.exe|

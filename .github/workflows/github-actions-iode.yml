@@ -268,7 +268,7 @@ jobs:
       - name: Build SCR4
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target scr4iode 
       - name: Build C IODE API
-        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodeapi 
+        run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iode_c_api 
       - name: Build C++ IODE API
         run: cmake --build --preset ${{ env.PRESET_CONFIG }} --target iodecppapi 
       - name: Build GUI

@@ -60,7 +60,7 @@ if(Python_FOUND)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                     COMMENT "Building iode.pyd for Python version ${Python_VERSION}"
                     )
-  add_dependencies(pyiode iodeapi)
+  add_dependencies(pyiode iode_c_api)
 
   set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
   set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")

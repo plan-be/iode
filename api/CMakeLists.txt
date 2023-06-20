@@ -2,7 +2,7 @@
 # project specific logic here.
 #
 
-add_library(iodeapi STATIC "")
+add_library(iode_c_api STATIC "")
 
 # Add source to this project's library.
 add_subdirectory(utils)
@@ -17,17 +17,17 @@ add_subdirectory(estimation)
 add_subdirectory(conversion)
 add_subdirectory(report)
 
-target_sources(iodeapi PRIVATE b_args.c b_errors.c) # MISC
-target_sources(iodeapi PRIVATE k_exec.c) # IDT
-target_sources(iodeapi PRIVATE k_super.c) # KSUPER
-target_sources(iodeapi PRIVATE k_lang.c) # KLANG
-target_sources(iodeapi PRIVATE b_iodeini.c) # INI
-target_sources(iodeapi PRIVATE b_a2mini.c) # A2M
+target_sources(iode_c_api PRIVATE b_args.c b_errors.c) # MISC
+target_sources(iode_c_api PRIVATE k_exec.c) # IDT
+target_sources(iode_c_api PRIVATE k_super.c) # KSUPER
+target_sources(iode_c_api PRIVATE k_lang.c) # KLANG
+target_sources(iode_c_api PRIVATE b_iodeini.c) # INI
+target_sources(iode_c_api PRIVATE b_a2mini.c) # A2M
 
-target_sources(iodeapi PUBLIC iode.h iodebase.h iodeapi.h)
+target_sources(iode_c_api PUBLIC iode.h iodebase.h iodeapi.h)
 
-# NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iodeapi.
+# NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iode_c_api.
 #       Option -Zp1 makes compilation of the Google Test lib to fail
-target_compile_options(iodeapi PRIVATE -Zp1)
-target_link_libraries(iodeapi PUBLIC "scr4iode")
-target_include_directories(iodeapi PRIVATE "../scr4" ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(iode_c_api PRIVATE -Zp1)
+target_link_libraries(iode_c_api PUBLIC "scr4iode")
+target_include_directories(iode_c_api PRIVATE "../scr4" ${CMAKE_CURRENT_SOURCE_DIR})

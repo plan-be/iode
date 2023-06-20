@@ -13,7 +13,7 @@ build_dir = '${CMAKE_BINARY_DIR}'
 iode_incl_dir = '${CMAKE_SOURCE_DIR}/api'
 scr4_incl_dir = '${CMAKE_SOURCE_DIR}/scr4'
 iode_lib_dir = f'{build_dir}/api'
-iode_obj_dir = f'{build_dir}/api/CMakeFiles/iodeapi.dir'
+iode_obj_dir = f'{build_dir}/api/CMakeFiles/iode_c_api.dir'
 scr4_lib_dir = f'{build_dir}/scr4'
 scr4_obj_dir = f'{build_dir}/scr4/CMakeFiles/scr4iode.dir'
 #extra_link_args_ = '-debug'
@@ -22,7 +22,7 @@ scr4_obj_dir = f'{build_dir}/scr4/CMakeFiles/scr4iode.dir'
 iodemodule = Extension('iode',
     include_dirs = [np.get_include(), iode_incl_dir, scr4_incl_dir],
     library_dirs = [scr4_lib_dir, scr4_obj_dir, iode_lib_dir, iode_obj_dir],
-    libraries = ['iodeapi', 'scr4iode', 'odbc32', 'odbccp32', 'ws2_32', 'gdi32', 
+    libraries = ['iode_c_api', 'scr4iode', 'odbc32', 'odbccp32', 'ws2_32', 'gdi32', 
                  'user32', 'advapi32', 'shell32', 'comdlg32', 'comctl32', 'Winspool', 
                  'legacy_stdio_definitions'],
 	extra_compile_args=["-Zi", "/Od", "/DVC", "/DSCRPROTO", "/DREALD"],				
