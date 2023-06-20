@@ -144,5 +144,6 @@ ADD_CUSTOM_TARGET(nsis_windows_updater
 
 ADD_CUSTOM_TARGET(nsis ALL) # Entry point of execution.
 ADD_DEPENDENCIES(nsis ${IODE_GUI_TARGET})
+ADD_DEPENDENCIES(nsis iodecmd)
 ADD_DEPENDENCIES(nsis nsis_windows_installer)
 ADD_DEPENDENCIES(nsis nsis_windows_updater)
