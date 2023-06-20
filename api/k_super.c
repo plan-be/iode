@@ -353,8 +353,8 @@ void krecordtext(unsigned char*  text)
  *  @param [in] ...             optional list of additional parameters    
  *  @return             int     0 (for compatibility)
  *  
- *  @note Important: Wprintf() is used by some functions present in scr4iode.lib but is
- *  not defined in scr4iode.lib. Therefore, the definition below is required to link test1.exe, iodecmd.exe...
+ *  @note Important: Wprintf() is used by some functions present in iode_scr4.lib but is
+ *  not defined in iode_scr4.lib. Therefore, the definition below is required to link test1.exe, iodecmd.exe...
  *  
  *  However, Wprintf() IS DEFINED in s32wo.lib (used only with iode.exe with "DOS" GUI interface). 
  *  And consequently, we have 2 definitions at link time: iode_c_api.lib and s32wo.lib. 

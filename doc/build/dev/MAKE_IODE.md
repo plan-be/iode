@@ -224,7 +224,7 @@ En sortie, les fichiers suivants auront �t� reg�n�r�s :
     if [%objs%] == [1] (
         del *.io
         del *.w32
-        make -DCodeGear scr4iode s32wo
+        make -DCodeGear iode_scr4 s32wo
         if %errorlevel% NEQ 0 goto :err
         )
     

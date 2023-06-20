@@ -12,7 +12,7 @@
  * Objects saved in memory (in "swap segments") are also packed / unpacked via these functions.
  *
  * Requires 
- *    scr4iode.lib for the swap functions (sw_*).
+ *    iode_scr4.lib for the swap functions (sw_*).
  *    BUF_alloc()
  * 
  * Type (size)=> |long (4)            |long (4)  |long (4)|...|long (4)|blob (el1_size bytes)|pad           |...|blob (eln_size bytes)|
