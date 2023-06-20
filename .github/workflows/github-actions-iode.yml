@@ -192,7 +192,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: iode-doc
-          path: "${{ github.workspace }}/out/build/${{ env.build-config }}/doc/build/"
+          path: "${{ github.workspace }}/doc/build/"
           if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
 
   
@@ -245,12 +245,6 @@ jobs:
         with:
           name: iode-python-311
           path: ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py311
-      - name: check for Python binding files
-        run: |
-          for python_minor in $(seq 9 11)
-          do
-            dir ${{ github.workspace }}/out/build/${{ matrix.build-config }}/pyiode/py3$python_minor
-          done
       - name: Restore Documentation Files
         uses: actions/download-artifact@v3
         with:
