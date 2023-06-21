@@ -293,8 +293,13 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
 	}
 
     // check if file already loaded
-    if(filesList.indexOf(fullPath) >= 0)
+    index = filesList.indexOf(fullPath);
+    if(index >= 0)
+    {
+        // if file is open in a tab, shows the tab
+        this->setCurrentIndex(index);
         return -1;
+    }
 
     // load file
     try
