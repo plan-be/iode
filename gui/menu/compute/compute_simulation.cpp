@@ -11,8 +11,8 @@
  */
 
 
-QIodeMenuComputeSimulation::QIodeMenuComputeSimulation(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings( parent, f)
+QIodeMenuComputeSimulation::QIodeMenuComputeSimulation(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

@@ -38,7 +38,7 @@ class QIodeMenuComputeSimulation : public QIodeSettings, public Ui::QIodeMenuCom
     WrapperSpinBox*        qNbPasses;
 
 public:
-	QIodeMenuComputeSimulation(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeSimulation(QWidget* parent = nullptr);
     ~QIodeMenuComputeSimulation();
 
 public slots:

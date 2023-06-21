@@ -26,7 +26,7 @@ class QIodeMenuWorkspaceHighToLow : public QIodeSettings, public Ui::QIodeMenuWo
     WrapperQTextEdit*   wSum;
 
 public:
-	QIodeMenuWorkspaceHighToLow(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuWorkspaceHighToLow(QWidget* parent = nullptr);
 	~QIodeMenuWorkspaceHighToLow();
 
 public slots:

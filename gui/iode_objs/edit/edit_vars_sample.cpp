@@ -1,6 +1,6 @@
 #include "edit_vars_sample.h"
 
-QIodeEditVarsSample::QIodeEditVarsSample(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeEditVarsSample::QIodeEditVarsSample(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 

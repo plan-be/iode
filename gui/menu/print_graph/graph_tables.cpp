@@ -1,8 +1,8 @@
 #include "graph_tables.h"
 
 
-QIodeMenuGraphTables::QIodeMenuGraphTables(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(parent, f)
+QIodeMenuGraphTables::QIodeMenuGraphTables(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

@@ -1,8 +1,8 @@
 #include "workspace_merge_into.h"
 
 
-QIodeMenuWorkspaceMergeInto::QIodeMenuWorkspaceMergeInto(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(parent, f)
+QIodeMenuWorkspaceMergeInto::QIodeMenuWorkspaceMergeInto(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

@@ -16,7 +16,7 @@ class QIodeGSampleTableView : public QDialog
 
 public:
     QIodeGSampleTableView(const QString& refTable, const QString& gsample, const int nbDecimals, 
-        const QString& variables, QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags()) : QDialog(parent, f)
+        const QString& variables, QWidget* parent = Q_NULLPTR) : QDialog(parent)
     {
         QTableView* tableview = new QTableView(this);
         GSampleTableModel* model = new GSampleTableModel(refTable, gsample, nbDecimals, variables);

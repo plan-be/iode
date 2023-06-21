@@ -1,8 +1,8 @@
 #include "graph_variables.h"
 
 
-QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(parent, f)
+QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

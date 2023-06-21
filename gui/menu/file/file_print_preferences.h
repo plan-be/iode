@@ -100,7 +100,7 @@ class QIodeMenuFilePrintPref : public QIodeSettings, public Ui::QIodeMenuFilePri
     WrapperCheckBox*  wMIFImageRefInText;
 
 public:
-	QIodeMenuFilePrintPref(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuFilePrintPref(QWidget* parent = nullptr);
 	~QIodeMenuFilePrintPref();
 
 private:

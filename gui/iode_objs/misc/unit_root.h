@@ -32,8 +32,7 @@ private:
     QString get_tstat(Scalar& scalar);
 
 public:
-    QIodeUnitRoot(QWidget* parent = Q_NULLPTR, 
-        Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeUnitRoot(QWidget* parent = Q_NULLPTR);
     ~QIodeUnitRoot();
 
 public slots:

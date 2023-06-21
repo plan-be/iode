@@ -34,7 +34,7 @@ class QIodeMenuPrintVariables: public QIodeMenuPrintAbstract, public Ui::QIodeMe
     QIodeCompleter*          completer;
 
 public:
-	QIodeMenuPrintVariables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuPrintVariables(QWidget* parent = nullptr);
 	~QIodeMenuPrintVariables();
 
 public slots:

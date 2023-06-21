@@ -24,7 +24,7 @@ class QIodeMenuFileNewProject : public QDialog, public Ui::QIodeMenuFileNewProje
     WrapperFileChooser* wDirPath;
 
 public:
-    QIodeMenuFileNewProject(const QString& currentProjectPath, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuFileNewProject(const QString& currentProjectPath, QWidget* parent = nullptr);
     ~QIodeMenuFileNewProject();
 
     QString getPathNewProject() const { return wDirPath->getQValue().toString(); }

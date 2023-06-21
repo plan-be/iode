@@ -1,7 +1,7 @@
 #include "print_tables.h"
 
 
-QIodeMenuPrintTables::QIodeMenuPrintTables(QWidget* parent, Qt::WindowFlags f) : QIodeMenuPrintAbstract(parent, f)
+QIodeMenuPrintTables::QIodeMenuPrintTables(QWidget* parent) : QIodeMenuPrintAbstract(parent)
 {
     setupUi(this);
 

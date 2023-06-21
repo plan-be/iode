@@ -28,7 +28,7 @@ class QIodeMenuWorkspaceCopyInto : public QIodeSettings, public Ui::QIodeMenuWor
     WrapperQTextEdit*   wTextEditObjectNames;
 
 public:
-    QIodeMenuWorkspaceCopyInto(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuWorkspaceCopyInto(QWidget* parent = nullptr);
     ~QIodeMenuWorkspaceCopyInto();
 
 public slots:

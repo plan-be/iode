@@ -1,8 +1,7 @@
 #include "print_variables.h"
 
 
-QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeMenuPrintAbstract(parent, f)
+QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent) : QIodeMenuPrintAbstract(parent)
 {
     setupUi(this);
 

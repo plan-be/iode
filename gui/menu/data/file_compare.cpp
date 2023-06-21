@@ -1,8 +1,8 @@
 #include "file_compare.h"
 
 
-QIodeMenuDataFileCompare::QIodeMenuDataFileCompare(QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings( parent, f)
+QIodeMenuDataFileCompare::QIodeMenuDataFileCompare(QWidget* parent)
+    : QIodeSettings(parent)
 {
     setupUi(this);
 

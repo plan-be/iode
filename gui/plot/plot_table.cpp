@@ -2,8 +2,8 @@
 
 
 QIodePlotTableDialog::QIodePlotTableDialog(const GSampleTable* table, EnumIodeGraphChart chartType, const bool logScale, 
-    EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, QWidget* parent, Qt::WindowFlags f)
-    : QIodePlotDialog(chartType, logScale, xTicks, yTicks, parent, f), table(table)
+    EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, QWidget* parent)
+    : QIodePlotDialog(chartType, logScale, xTicks, yTicks, parent), table(table)
 {
     QString key;
 

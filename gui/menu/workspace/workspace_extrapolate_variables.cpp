@@ -1,8 +1,8 @@
 #include "workspace_extrapolate_variables.h"
 
 
-QIodeMenuWorkspaceExtrapolateVariables::QIodeMenuWorkspaceExtrapolateVariables(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(parent, f)
+QIodeMenuWorkspaceExtrapolateVariables::QIodeMenuWorkspaceExtrapolateVariables(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

@@ -1,6 +1,6 @@
 #include "add_table.h"
 
-QIodeAddTable::QIodeAddTable(QWidget* parent, Qt::WindowFlags f) : QIodeSettings( parent, f)
+QIodeAddTable::QIodeAddTable(QWidget* parent) : QIodeSettings(parent)
 {
     setupUi(this);
 

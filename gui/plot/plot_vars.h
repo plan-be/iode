@@ -14,7 +14,7 @@ class QIodePlotVariablesDialog : public QIodePlotDialog
 public:
     QIodePlotVariablesDialog(KDBVariables* kdb_vars = nullptr, EnumIodeGraphChart chartType = I_G_CHART_LINE, 
         EnumIodeGraphAxisType axisType = I_G_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
-        EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+        EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, QWidget* parent = nullptr);
     ~QIodePlotVariablesDialog();
 
     void addSeries(const QString& variable, const QString& legend_name = "");

@@ -27,7 +27,7 @@ class QIodeMenuWorkspaceSeasonalAdjustment : public QIodeSettings, public Ui::QI
     WrapperDoubleSpinBox* wEPSTest;
 
 public:
-    QIodeMenuWorkspaceSeasonalAdjustment(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuWorkspaceSeasonalAdjustment(QWidget* parent = nullptr);
     ~QIodeMenuWorkspaceSeasonalAdjustment();
 
 public slots:

@@ -2,8 +2,8 @@
 #include "workspace_seasonal_adjustment.h"
 
 
-QIodeMenuWorkspaceSeasonalAdjustment::QIodeMenuWorkspaceSeasonalAdjustment(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings(parent, f)
+QIodeMenuWorkspaceSeasonalAdjustment::QIodeMenuWorkspaceSeasonalAdjustment(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

@@ -44,8 +44,8 @@ protected:
     QMap<QString, BaseWrapper*> mapFields;
 
 public:
-    QIodeSettings(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags())
-        : QDialog(parent), className("") {}
+    QIodeSettings(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint)
+        : QDialog(parent, f), className("") {}
 
 protected:
     void saveSettings();

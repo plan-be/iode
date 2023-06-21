@@ -24,7 +24,7 @@ class QIodeAddComment : public QDialog, public Ui::QIodeAddObject
     WrapperQLineEdit* lineDefinition;
 
 public:
-    QIodeAddComment(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeAddComment(QWidget* parent = Q_NULLPTR);
 
 public slots:
     void add();

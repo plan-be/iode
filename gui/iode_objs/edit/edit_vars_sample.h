@@ -25,7 +25,7 @@ class QIodeEditVarsSample : public QDialog, public Ui::QIodeEditVarsSample
     WrapperSampleEdit* sampleTo;
 
 public:
-    QIodeEditVarsSample(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeEditVarsSample(QWidget* parent = Q_NULLPTR);
     ~QIodeEditVarsSample();
 
 public slots:

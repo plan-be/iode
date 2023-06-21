@@ -1,8 +1,8 @@
 #include "file_new_project.h"
 
 
-QIodeMenuFileNewProject::QIodeMenuFileNewProject(const QString& currentProjectPath, QWidget* parent, Qt::WindowFlags f) : 
-    QDialog(parent, f)
+QIodeMenuFileNewProject::QIodeMenuFileNewProject(const QString& currentProjectPath, QWidget* parent) : 
+    QDialog(parent)
 {
     setupUi(this);
 

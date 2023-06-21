@@ -1,7 +1,7 @@
 #include "add_variable.h"
 
 
-QIodeAddVariable::QIodeAddVariable(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeAddVariable::QIodeAddVariable(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 

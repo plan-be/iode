@@ -15,7 +15,7 @@ class QIodePlotTableDialog : public QIodePlotDialog
 public:
     QIodePlotTableDialog(const GSampleTable* table, EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
         EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, 
-        QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+        QWidget* parent = nullptr);
     ~QIodePlotTableDialog();
 
 protected:
