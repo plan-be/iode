@@ -1,7 +1,7 @@
 #include "add_list.h"
 
 
-QIodeAddList::QIodeAddList(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeAddList::QIodeAddList(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 

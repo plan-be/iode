@@ -34,8 +34,8 @@ class FindAndReplaceDialog: public QDialog, public Ui::FindAndReplaceDialog
     int nbOccurences;
 
 public:
-    FindAndReplaceDialog(QPlainTextEdit* editor, QWidget *parent=nullptr, Qt::WindowFlags f = Qt::WindowFlags()) 
-        : QDialog(parent, f), editor(editor), nbPrevious(0), nbOccurences(0)
+    FindAndReplaceDialog(QPlainTextEdit* editor, QWidget *parent=nullptr) 
+        : QDialog(parent, Qt::WindowStaysOnTopHint), editor(editor), nbPrevious(0), nbOccurences(0)
     {
         setupUi(this);
 

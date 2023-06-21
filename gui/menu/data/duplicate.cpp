@@ -1,8 +1,8 @@
 #include "duplicate.h"
 
 
-QIodeMenuDataDuplicateObj::QIodeMenuDataDuplicateObj(QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings( parent, f)
+QIodeMenuDataDuplicateObj::QIodeMenuDataDuplicateObj(QWidget* parent)
+    : QIodeSettings(parent)
 {
     setupUi(this);
 

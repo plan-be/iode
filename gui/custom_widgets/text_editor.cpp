@@ -18,7 +18,7 @@ TextEditor::TextEditor(QWidget *parent) : QIodeCompleteTextEdit(parent)
     this->setStyleSheet("font-family: " + fontFamily);
 
     // prepare the find and replace dialog.
-    findReplaceDialog = new FindAndReplaceDialog(static_cast<QPlainTextEdit*>(this), parent, Qt::WindowStaysOnTopHint);
+    findReplaceDialog = new FindAndReplaceDialog(static_cast<QPlainTextEdit*>(this), parent);
 
     // create and connect shortcuts
     findShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F), this);

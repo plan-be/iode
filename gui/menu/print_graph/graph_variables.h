@@ -37,7 +37,7 @@ class QIodeMenuGraphVariables: public QIodeSettings, public Ui::QIodeMenuGraphVa
     QIodeCompleter*         completer;
 
 public:
-	QIodeMenuGraphVariables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuGraphVariables(QWidget* parent = nullptr);
 	~QIodeMenuGraphVariables();
 
     void setVariablesNames(const QList<QString>& VariablesNames)

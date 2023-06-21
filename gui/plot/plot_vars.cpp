@@ -2,7 +2,7 @@
 
 QIodePlotVariablesDialog::QIodePlotVariablesDialog(KDBVariables* kdb_vars, EnumIodeGraphChart chartType, 
     EnumIodeGraphAxisType axisType, const bool logScale, EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, 
-    QWidget* parent, Qt::WindowFlags f) : QIodePlotDialog(chartType, logScale, xTicks, yTicks, parent, f), axisType(axisType)
+    QWidget* parent) : QIodePlotDialog(chartType, logScale, xTicks, yTicks, parent), axisType(axisType)
 {
     if(kdb_vars)
         this->kdb_vars = kdb_vars;

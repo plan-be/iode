@@ -38,7 +38,7 @@ private:
 	EnumFileMode fileMode;
 
 public:
-	QIodeFileChooser(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()) : QWidget(parent, f),
+	QIodeFileChooser(QWidget* parent = nullptr) : QWidget(parent),
 		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(I_ANY_FILE), fileMode(EXISTING_FILE)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);

@@ -3,8 +3,8 @@
 const QString QIodeMenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST = "MENU_FILE_PRINT_SETUP/Print_Dest";
 
 
-QIodeMenuFilePrintSetup::QIodeMenuFilePrintSetup(QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings(parent, f)
+QIodeMenuFilePrintSetup::QIodeMenuFilePrintSetup(QWidget* parent)
+    : QIodeSettings(parent)
 {
     setupUi(this);
 

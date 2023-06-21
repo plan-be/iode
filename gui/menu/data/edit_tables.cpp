@@ -1,8 +1,8 @@
 #include "edit_tables.h"
 
 
-QIodeMenuDataEditTables::QIodeMenuDataEditTables(QWidget* parent, Qt::WindowFlags f)
-    : QIodeSettings(parent, f)
+QIodeMenuDataEditTables::QIodeMenuDataEditTables(QWidget* parent)
+    : QIodeSettings(parent)
 {
     setupUi(this);
 

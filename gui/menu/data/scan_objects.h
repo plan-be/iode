@@ -19,7 +19,7 @@ class QIodeMenuDataScanObjects : public QIodeSettings, public Ui::QIodeMenuDataS
     QIodeCompleter* completer;
 
 public:
-	QIodeMenuDataScanObjects(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataScanObjects(QWidget* parent = nullptr);
     ~QIodeMenuDataScanObjects();
 
 public slots:

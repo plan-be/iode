@@ -5,7 +5,7 @@ const QString QIodePrintFileDialog::KEY_SETTINGS_PRINT_FORMAT = "PRINT_FILE_DIAL
 const QString QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE = "PRINT_FILE_DIALOG/Output_File";
 
 
-QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent, Qt::WindowFlags f) : QIodeSettings(parent, f)
+QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent) : QIodeSettings(parent)
 {
     setupUi(this);
 

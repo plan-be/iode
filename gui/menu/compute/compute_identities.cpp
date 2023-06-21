@@ -11,8 +11,8 @@
  */
 
 
-QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings( parent, f)
+QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
     completer = new QIodeCompleter(false, false, I_IDENTITIES, textEdit_identities_list);

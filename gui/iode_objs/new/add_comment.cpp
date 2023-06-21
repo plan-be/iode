@@ -1,7 +1,7 @@
 #include "add_comment.h"
 
 
-QIodeAddComment::QIodeAddComment(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeAddComment::QIodeAddComment(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 

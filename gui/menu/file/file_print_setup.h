@@ -20,7 +20,7 @@ public:
     const static QString KEY_SETTINGS_PRINT_DEST;
 
 public:
-    QIodeMenuFilePrintSetup(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeMenuFilePrintSetup(QWidget* parent = nullptr);
     ~QIodeMenuFilePrintSetup();
 
 public slots:

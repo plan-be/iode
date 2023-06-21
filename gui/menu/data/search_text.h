@@ -23,7 +23,7 @@ class QIodeMenuDataSearchText : public QIodeSettings, public Ui::QIodeMenuDataSe
     WrapperQTextEdit* wResults;
 
 public:
-	QIodeMenuDataSearchText(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataSearchText(QWidget* parent = nullptr);
     ~QIodeMenuDataSearchText();
 
 public slots:

@@ -1,8 +1,8 @@
 #include "file_import_variables.h"
 
 
-QIodeMenuFileImportVariables::QIodeMenuFileImportVariables(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings( parent, f)
+QIodeMenuFileImportVariables::QIodeMenuFileImportVariables(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

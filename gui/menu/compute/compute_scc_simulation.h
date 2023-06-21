@@ -33,7 +33,7 @@ class QIodeMenuComputeSCCSimulation : public QIodeSettings, public Ui::QIodeMenu
     WrapperQLineEdit* qPostRecursiveListName;
 
 public:
-	QIodeMenuComputeSCCSimulation(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeSCCSimulation(QWidget* parent = nullptr);
     ~QIodeMenuComputeSCCSimulation();
 
 public slots:

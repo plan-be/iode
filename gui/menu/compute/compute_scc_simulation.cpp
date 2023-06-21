@@ -11,8 +11,8 @@
  */
 
 
-QIodeMenuComputeSCCSimulation::QIodeMenuComputeSCCSimulation(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings( parent, f)
+QIodeMenuComputeSCCSimulation::QIodeMenuComputeSCCSimulation(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

@@ -24,7 +24,7 @@ class QIodeMenuComputeModel : public QIodeSettings, public Ui::QIodeMenuComputeM
     QIodeCompleter*        completer;
 
 public:
-	QIodeMenuComputeModel(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuComputeModel(QWidget* parent = nullptr);
     ~QIodeMenuComputeModel();
 
 public slots:

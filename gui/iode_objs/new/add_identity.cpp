@@ -1,7 +1,7 @@
 #include "add_identity.h"
 
 
-QIodeAddIdentity::QIodeAddIdentity(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f)
+QIodeAddIdentity::QIodeAddIdentity(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 

@@ -1,8 +1,8 @@
 #include "file_import_comments.h"
 
 
-QIodeMenuFileImportComments::QIodeMenuFileImportComments(QWidget* parent, Qt::WindowFlags f) : 
-    QIodeSettings( parent, f)
+QIodeMenuFileImportComments::QIodeMenuFileImportComments(QWidget* parent) : 
+    QIodeSettings(parent)
 {
     setupUi(this);
 

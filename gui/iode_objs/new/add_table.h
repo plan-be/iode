@@ -33,7 +33,7 @@ class QIodeAddTable : public QIodeSettings, public Ui::QIodeAddTable
     QIodeCompleter* completer;
 
 public:
-    QIodeAddTable(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeAddTable(QWidget* parent = Q_NULLPTR);
     ~QIodeAddTable();
 
 public slots:

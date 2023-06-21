@@ -20,7 +20,7 @@ class QIodeMenuDataDuplicateObj : public QIodeSettings, public Ui::QIodeMenuData
     QIodeCompleter* completer;
     
 public:
-	QIodeMenuDataDuplicateObj(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataDuplicateObj(QWidget* parent = nullptr);
     ~QIodeMenuDataDuplicateObj();
 
 public slots:

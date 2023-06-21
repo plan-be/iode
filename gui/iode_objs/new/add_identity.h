@@ -24,7 +24,7 @@ class QIodeAddIdentity : public QDialog, public Ui::QIodeAddObject
     WrapperQLineEdit* lineDefinition;
 
 public:
-    QIodeAddIdentity(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    QIodeAddIdentity(QWidget* parent = Q_NULLPTR);
 
 public slots:
     void add();

@@ -30,7 +30,7 @@ class QIodeMenuDataEditTables: public QIodeSettings, public Ui::QIodeMenuDataEdi
     QIodeCompleter*          completer;
 
 public:
-	QIodeMenuDataEditTables(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+	QIodeMenuDataEditTables(QWidget* parent = nullptr);
 	~QIodeMenuDataEditTables();
 
 public slots:

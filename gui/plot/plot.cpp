@@ -2,8 +2,8 @@
 
 
 QIodePlotDialog::QIodePlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIodeGraphAxisThicks xTicks, 
-    EnumIodeGraphAxisThicks yTicks, QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f), chartType(chartType), 
-    logScale(logScale), xTicks(xTicks), yTicks(yTicks), fixedMinY(NAN), fixedMaxY(NAN)
+    EnumIodeGraphAxisThicks yTicks, QWidget* parent) : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
+    chartType(chartType), logScale(logScale), xTicks(xTicks), yTicks(yTicks), fixedMinY(NAN), fixedMaxY(NAN)
 {
     // prepare chart
     chart = new QChart();
