@@ -259,6 +259,21 @@ int gui_XodeRuleImport_super()
 	return 0;
 }
 
+int gui_view_tbl(char* name, char *smpl, char** vars_names)
+{
+	QString tableName = QString(name);
+	QString gsample = QString(smpl);
+	int nb_decimals = 6;
+	
+	QString variables;
+	for(int i = 0; i < SCR_tbl_size((unsigned char**) vars_names); i++)
+		variables += QString(vars_names[i]) + ";";
+
+	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
+	QIodeGSampleTableView view(tableName, gsample, nb_decimals, variables, main_window);
+	return view.exec();
+}
+
 // ============================================================================== //
 
 void gui_assign_super_API()
@@ -300,4 +315,6 @@ void gui_assign_super_API()
 	SB_IdtExecute_super     = gui_IdtExecute_super;
 	SB_EqsEstimate_super    = gui_EqsEstimate_super;
 	SB_XodeRuleImport_super = gui_XodeRuleImport_super;
+
+	T_view_tbl_super        = gui_view_tbl;
 }

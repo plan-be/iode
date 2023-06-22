@@ -1,6 +1,6 @@
 // copied/pasted from the /cmd directory
 
-/************ Fonctions annulées ou a remplacees ************************/
+/************ Fonctions annulï¿½es ou a remplacees ************************/
 #include "iode.h"
 #include <s_a2m.h>
 
@@ -174,7 +174,7 @@ extern B_WindowMaximize() { return(0); }
 
 /* b_view.c */
 ODE_scroll(KDB* kdb, char** lst) { return(0); }
-int T_view_tbl(TBL* tbl, char* smpl, char* name) { return(0); }
+int T_view_tbl(char* name, char *smpl, char** vars_names); { return(0); }
 
 /* b_global.c */
 // B_ScrollSet -> b_base
