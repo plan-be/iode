@@ -24,13 +24,7 @@ class QIodeMenuPrintVariables: public QIodeMenuPrintAbstract, public Ui::QIodeMe
 {
     Q_OBJECT
 
-    int counter;
-    QString prefixTableName;
-
-    QVector<QIodeGSampleTableView*> tableViews;
-
     WrapperQPlainTextEdit*   wVariablesNames;
-
     QIodeCompleter*          completer;
 
 public:

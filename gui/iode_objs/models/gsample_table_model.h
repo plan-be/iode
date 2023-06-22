@@ -34,7 +34,8 @@ class GSampleTableModel : public QAbstractTableModel
 
 public:
 
-    GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, const QString& variables);
+    GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
+		const QString& variables, QObject *parent);
     ~GSampleTableModel();
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override
