@@ -11,15 +11,12 @@ class QIodeGSampleTableView : public QDialog
 {
     Q_OBJECT
 
-    QTableView* tableview;
-    GSampleTableModel* model;
-
 public:
     QIodeGSampleTableView(const QString& refTable, const QString& gsample, const int nbDecimals, 
         const QString& variables, QWidget* parent = Q_NULLPTR) : QDialog(parent)
     {
         QTableView* tableview = new QTableView(this);
-        GSampleTableModel* model = new GSampleTableModel(refTable, gsample, nbDecimals, variables);
+        GSampleTableModel* model = new GSampleTableModel(refTable, gsample, nbDecimals, variables, tableview);
         tableview->setModel(model);
 
         tableview->setGeometry(QRect(10, 50, 700, 250));
@@ -39,7 +36,7 @@ public:
         if(variables.isEmpty())
             this->setWindowTitle(refTable);
         else
-            this->setWindowTitle("Table of variables");
+            this->setWindowTitle("Table of series");
     }
 
     // Note: the members model and tableview are already deleted when entering the destructor

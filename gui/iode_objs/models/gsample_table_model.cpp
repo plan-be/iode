@@ -1,8 +1,9 @@
 #include "gsample_table_model.h"
 
 
-GSampleTableModel::GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, const QString& variables) 
-    : refTable(refTable), nbDecimals(nbDecimals)
+GSampleTableModel::GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
+    const QString& variables, QObject *parent) : QAbstractTableModel(parent), refTable(refTable), 
+    nbDecimals(nbDecimals), variables(variables)
 {
     if(!variables.isEmpty())
     {

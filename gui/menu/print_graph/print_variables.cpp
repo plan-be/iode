@@ -5,9 +5,6 @@ QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent) : QIodeMenuPri
 {
     setupUi(this);
 
-    counter = -1;
-    prefixTableName = "_GSAMPLE_";
-
     completer = new QIodeCompleter(false, false, I_VARIABLES, textEdit_variable_names);
     textEdit_variable_names->setCompleter(completer);
 
@@ -39,8 +36,6 @@ QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent) : QIodeMenuPri
 QIodeMenuPrintVariables::~QIodeMenuPrintVariables()
 {
     clear_all_reference_kdbs();
-    foreach(QIodeGSampleTableView* view, tableViews) view->close();
-    tableViews.clear();
 
     delete wVariablesNames;
     delete wSample;
@@ -58,11 +53,10 @@ void QIodeMenuPrintVariables::display()
 {
     try
     {
-        counter++;
         clear_all_reference_kdbs();
 
         // build new gsample table name
-        QString tableName = prefixTableName + QString::number(counter) + "_";
+        QString tableName = "_VARS_TBL_";
 
         QString variables = wVariablesNames->extractAndVerify();
 
@@ -82,9 +76,8 @@ void QIodeMenuPrintVariables::display()
         if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
         if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
 
-        QIodeGSampleTableView* view = new QIodeGSampleTableView(tableName, gsample, nb_decimals, variables, this);
-        tableViews.append(view);
-        view->open();
+        QIodeGSampleTableView view(tableName, gsample, nb_decimals, variables, this);
+        view.exec();
     }
     catch (const std::exception& e)
     {
