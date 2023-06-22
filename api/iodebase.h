@@ -1087,7 +1087,7 @@ extern int (*B_ScrollVTW0_super)(char *arg);
 extern int (*B_ScrollVTN_super )(char *arg);
 
 extern int (*ODE_scroll_super) (KDB *kdb, char **lst);
-extern int (*T_view_tbl_super) (TBL *tbl, char *smpl, char* name);
+extern int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names);
 
 /* b_rep_super.c - function declarations */
 extern int SB_FileDelete       ();
@@ -1152,7 +1152,7 @@ extern int B_ScrollVTW0(char* arg);
 extern int B_ScrollVTN (char* arg);
 
 extern int ODE_scroll(KDB *kdb, char **lst);
-extern int T_view_tbl(TBL *tbl, char *smpl, char* name);
+extern int T_view_tbl(char* name, char *smpl, char** vars_names);
 
 
 /* b_data.c */
@@ -1784,7 +1784,7 @@ extern int T_alloc_val(TBL *,char *);
 extern int T_free_val(TBL *);
 extern int T_name_inline(TCELL *,int ,char *);
 extern int T_calc_val(TBL *,char *);
-extern int T_view_tbl(TBL *,char *,char *);
+extern int T_view_tbl(char *,char *, char **);
 extern int T_calc_line(TBL *,int ,COLS *,int *);
 extern int VT_files(void);
 
