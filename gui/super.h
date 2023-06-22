@@ -81,6 +81,9 @@ int gui_EqsEstimate_super();
 
 int gui_XodeRuleImport_super();
 
+// Note: argument name is the name of the table
+int gui_view_tbl(char* name, char *smpl, char** vars_names);
+
 // ========================================= //
 
 void gui_assign_super_API();
