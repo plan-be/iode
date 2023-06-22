@@ -17,4 +17,70 @@ int gui_confirm_super(char* msg);
 
 void gui_panic_super();
 
+// ========================================================================= //
+// See C API -> report/engine/b_rep_super.c and report/engine/b_rep_syntax.c //
+// ========================================================================= //
+
+int gui_PrintObjDef_super();
+
+int gui_ViewPrintGr_super();
+
+int gui_ViewPrintTbl_super();
+
+int gui_ViewByTbl_super();
+
+int gui_DataSearch_super();
+
+int gui_DataDuplicate_super();
+
+int gui_DataList_super();
+
+int gui_DataCompare_super();
+
+int gui_DataCalcLst_super();
+
+int gui_DataListSort_super();
+
+int gui_DataEditGraph_super();
+
+int gui_DataScan_super();
+
+int gui_StatUnitRoot_super();
+
+int gui_WsLoad_super();
+
+int gui_WsSave_super();
+
+int gui_WsMerge_super();
+
+int gui_WsDescr_super();
+
+int gui_WsCopy_super();
+
+int gui_WsClear_super();
+
+int gui_WsSample_super();
+
+int gui_WsExtrapolate_super();
+
+int gui_WsHtoL_super();
+
+int gui_WsLtoH_super();
+
+int gui_WsSeasonAdj_super();
+
+int gui_WsTrend_super();
+
+int gui_ModelSimulate_super();
+
+int gui_ModelCompile_super();
+
+int gui_IdtExecute_super();
+
+int gui_EqsEstimate_super();
+
+int gui_XodeRuleImport_super();
+
+// ========================================= //
+
 void gui_assign_super_API();
