@@ -47,8 +47,15 @@ void printVariable(QPrintPreviewDialog& dialog, QTextDocument& document,
 
 /**
  * @brief Set the Print Dest object
+ *        Argument format must be in the list:
+ *        - 'H' (HTML file)
+ *        - 'M' (MIF file)
+ *        - 'R' (RTF file)
+ *        - 'C' (CSV file)
+ *        - 'D' (DUMMY file)
  * 
- * @note see C_PrintDestDecLang() in sb_pdest.c from the old GUI
+ * @note See C_PrintDestDecLang() in sb_pdest.c from the old GUI
+ *       See B_PrintDestFile() for the available formats
  * 
  * @param outputFile 
  * @param format 
