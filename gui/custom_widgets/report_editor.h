@@ -9,6 +9,7 @@
 #include "highlighter.h"
 #include "completer.h"
 #include "text_editor.h"
+#include "util/print.h"
 
 
 /**
@@ -36,5 +37,15 @@ public:
         this->output = output;
     }
 
-    void run(const QString& filepath);
+    /**
+     * @brief executes an IODE report.
+     * 
+     * Note: See function C_ReportExec() from the file sb_rep.c from the old GUI. 
+     * 
+     * @param filepath 
+     * @param parameters 
+     * @param nbDecimals
+     * @param language
+     */
+    void run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language);
 };

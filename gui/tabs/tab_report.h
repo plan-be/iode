@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils.h"
+#include "wrapper_classes.h"
 #include "tab_text_abstract.h"
 #include "ui_tab_report.h"
 #include "custom_widgets/report_editor.h"
@@ -41,7 +43,12 @@ private slots:
     void run()
     {
         emit askComputeHash(true);
-        static_cast<ReportEditor*>(editor)->run(filepath);
+
+        QString parameters = lineEdit_parameters->text();
+        EnumLang language = (EnumLang) comboBox_language->currentIndex();
+        int nbDecimals = spinBox_nbDecimals->value();
+        static_cast<ReportEditor*>(editor)->run(filepath, parameters, nbDecimals, language);
+
         emit askComputeHash(false);
     }
 

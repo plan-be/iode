@@ -6,6 +6,12 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
 {
     setupUi(this);
 
+    QList<QString> q_langs;
+    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+
+    comboBox_language->addItems(q_langs);
+    comboBox_language->setEditable(false);
+
     filter = "IODE report files (*" + QString::fromStdString(report_ext) + ")";
 
     // autocomplete checkbox
