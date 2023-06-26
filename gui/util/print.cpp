@@ -62,7 +62,7 @@ static void printTblOrVar(const bool isTable, QPrintPreviewDialog& dialog, QText
         // set output file
         // Note: here the table is first saved in a temporary HTML file to be then 
         // loaded by a QTextDocument object (see below)
-        QString outputFile = TMP_FILENAME;
+        QString outputFile = TMP_FILENAME + ".htm";
         setPrintDest(outputFile, 'H');
         
         // set the number of decimals
@@ -103,7 +103,7 @@ static void printTblOrVar(const bool isTable, QPrintPreviewDialog& dialog, QText
         document.clear();
         
         // load the content of the generated HTML file and then removed the file
-        QFile file(TMP_FILENAME);
+        QFile file(TMP_FILENAME + ".htm");
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             QMessageBox::critical(nullptr, "ERROR", file.errorString());

@@ -8,7 +8,7 @@
 
 #include "utils.h"
 
-const static QString TMP_FILENAME = "tmp.h";
+const static QString TMP_FILENAME = "~dummy";
 
 
 /**
