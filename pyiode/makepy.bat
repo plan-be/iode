@@ -28,10 +28,10 @@ echo conda environment %1
 call conda activate %1
 
 :: configure CMake 
-call cmake --preset windows-debug
+call cmake --preset windows-release
 
 :: Create iode.pyd
-call cmake --build --preset windows-debug --target iode_python 
+call cmake --build --preset windows-release --target iode_python 
 
 :: Digitally sign the .pyd module
 :: DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" iode.pyd
