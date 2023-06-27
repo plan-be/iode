@@ -16,7 +16,11 @@ bool QIodeAbstractEditor::load__(TextEditor* editor, const QString& filepath, co
     }
 
     QTextStream in(&file);
-    editor->setPlainText(in.readAll());
+    QString fileContent = in.readAll();
+    if(editor->toPlainText() == fileContent)
+        return false;
+     
+    editor->setPlainText(fileContent);
 
     // updates modified status -> automatically calls setModified()
     editor->document()->setModified(false);
@@ -26,7 +30,8 @@ bool QIodeAbstractEditor::load__(TextEditor* editor, const QString& filepath, co
 
 QString QIodeAbstractEditor::save_(TextEditor* editor, const QString& filepath)
 {
-    if (filepath.isEmpty()) return filepath;
+    if (filepath.isEmpty()) 
+        return filepath;
 
     QFile file(filepath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
