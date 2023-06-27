@@ -398,7 +398,7 @@ keyboard_shortcuts.*
 *.bak
 *.prf
 *.$$$
-/tests/data/iode_gui_settings.ini
+/tests/**/*.ini
 /pyiode/iode.c
 /pyiode/cythonize_iode.py
 /tests/output
