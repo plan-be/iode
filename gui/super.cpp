@@ -16,7 +16,7 @@ void gui_error_super(int level, char* msg)
 
 void gui_warning_super(char* msg)
 {
-	QMessageBox::warning(nullptr, "WARNING", QString(msg));
+	QMessageBox::information(nullptr, "INFORMATION", QString(msg));
 }
 
 void gui_msg_super(char* msg)
