@@ -2,7 +2,7 @@
 
 
 QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent) 
-    : QTabWidget(parent), overwrite_all(false), discard_all(false)
+    : QTabWidget(parent), overwrite_all(false), discard_all(false), saving_file(false)
 {
     // set name
     this->setObjectName(QString::fromUtf8("tabWidget_IODE_objs"));
@@ -143,6 +143,15 @@ void QIodeAbstractTabWidget::showTab(int index)
 
 void QIodeAbstractTabWidget::reloadFile(const QString& filepath)
 {
+    // The fileChanged signal is sent when the content of the corresponding tab is saved.
+    // reloadFile reset the cursor to the beginning and reset the stack of undos and redos.
+    // We don't want that when saving the content of the tab to the corresponding file
+    if(saving_file)
+    {
+        saving_file = false;
+        return;
+    }
+
 	// find index of corresponding tab
 	int index = filesList.indexOf(filepath);
 	if(index < -1)
@@ -158,6 +167,13 @@ bool QIodeAbstractTabWidget::saveTabContent(const int index)
 {
     try
     {
+        // The fileChanged signal is sent when the content of the corresponding tab is saved.
+        // reloadFile reset the cursor to the beginning and reset the stack of undos and redos.
+        // I couldn't find when/where the signal is exactly emitted, so all my attempts to 
+        // to first disconnect and then reconnect have failed.
+        // I ended up with a saving_file flags which not 
+        saving_file = true;
+
         AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
         QString filepath = tabWidget->save();
         if (filepath.isEmpty()) 
@@ -165,10 +181,12 @@ bool QIodeAbstractTabWidget::saveTabContent(const int index)
         
         setTabText(index, tabWidget->getTabText());
         setTabToolTip(index, tabWidget->getTooltip());
+
         return true;
     }
     catch(const std::exception& e)
     {
+        saving_file = false;
         QMessageBox::warning(nullptr, "WARNING", "Couldn't save the content of " + tabText(index));
         return false;
     }
