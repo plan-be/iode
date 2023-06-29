@@ -18,7 +18,7 @@ const static QVector<QString> tabPrefix({"(&CMT) ", "(&EQS) ", "(&IDT) ", "(&LST
                                          "(REP) ", "(TXT) ", "(ASCII) ", "(A2M) ", 
                                          "(RTF) ", "(HTML) ", "(MIF) ", "(CSV) ",
                                          "(REF) ", "(AGL) ", "(DIF) ", "(LOG) ", 
-                                         "(SET) "});
+                                         "(SET) ", "(TXT) "});
 
 class AbstractTabWidget: public QWidget
 {
