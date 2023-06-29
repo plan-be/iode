@@ -44,6 +44,10 @@ private slots:
     {
         emit askComputeHash(true);
 
+        // Save the current content of the report tab because the user may have 
+        // made some modifications in the report editor which are not saved yet.
+        save(filepath);
+
         QString parameters = lineEdit_parameters->text();
         EnumLang language = (EnumLang) comboBox_language->currentIndex();
         int nbDecimals = spinBox_nbDecimals->value();
