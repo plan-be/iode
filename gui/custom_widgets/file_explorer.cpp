@@ -82,7 +82,7 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     connect(revealExplorerShortcut, &QShortcut::activated, this, &QIodeFileExplorer::revealInFolder);
     connect(renameShortcut, &QShortcut::activated, this, &QIodeFileExplorer::rename);
     connect(deleteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::remove);
-    connect(enterShortcut, &QShortcut::activated, this, &QIodeFileExplorer::openFiles);
+    connect(enterShortcut, &QShortcut::activated, this, [this](){ openFiles(false); });
     connect(cancelShortcut, &QShortcut::activated, this, &QIodeFileExplorer::cancel);
 
     // context menu = popup menu displayed when a user right clicks
@@ -170,6 +170,9 @@ void QIodeFileExplorer::setupContextMenu()
 
     action = addAction("Open", "Open File In A New Tab", contextMenuFile);
     connect(action, &QAction::triggered, this, &QIodeFileExplorer::openFiles);
+
+    action = addAction("Open As Text", "Open File As Text In A New Tab", contextMenuFile);
+    connect(action, &QAction::triggered, this, [this](){ openFiles(true); });
 
     contextMenuFile->addSeparator();
 
@@ -547,13 +550,13 @@ void QIodeFileExplorer::remove()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::openFiles()
+void QIodeFileExplorer::openFiles(const bool forceAsText)
 {
     if (this->hasFocus())
     {
         QList<SystemItem> filesToOpen = extractListOfItems();
         foreach(SystemItem item, filesToOpen) 
-            if (item.isFile()) tabWidget->loadFile(item.absoluteFilePath());
+            if (item.isFile()) tabWidget->loadFile(item.absoluteFilePath(), true, false, -1, forceAsText);
         selectionModel()->clearSelection();
         cleanupSlot();
     }

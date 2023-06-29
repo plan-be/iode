@@ -54,7 +54,7 @@ void QIodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
 int QIodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
     QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), output, completer, this);
-    int index = this->addTab(reportWidget, reportWidget->getTabText());
+    int index = addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
 
     connect(reportWidget, &QIodeReportWidget::tabContentModified, this, &QIodeAbstractTabWidget::tabContentModified);
@@ -63,18 +63,21 @@ int QIodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
     return index;
 }
 
-int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile)
+int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced)
 {
     QIodeTextWidget* textWidget = new QIodeTextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
-    int index = this->addTab(textWidget, textWidget->getTabText());
+    int index = addTab(textWidget, textWidget->getTabText());
     setTabToolTip(index, textWidget->getTooltip());
+
+    if(forced)
+        textWidget->setForcedAsText(true);
     
     connect(textWidget, &QIodeTextWidget::tabContentModified, this, &QIodeAbstractTabWidget::tabContentModified);
     
     return index;
 }
 
-int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo)
+int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText)
 {
     if (fileType <= I_VARIABLES_FILE) return -1;
 
@@ -89,8 +92,8 @@ int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileIn
     // prepare and add the new tab
     if(fileType == I_REPORTS_FILE)
         index = addReportTab(fileInfo);
-    else if(QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
-            index = addTextTab(fileInfo, fileType);
+    else if(forceAsText || QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
+            index = addTextTab(fileInfo, fileType, forceAsText);
     else
     { 
         QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));

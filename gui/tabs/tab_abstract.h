@@ -27,6 +27,7 @@ class AbstractTabWidget: public QWidget
 protected:
     EnumIodeFile fileType;
     QString filepath;
+    bool forcedAsText_;
     bool modified;
 
 protected:
@@ -38,7 +39,7 @@ signals:
 
 public:
     AbstractTabWidget(const EnumIodeFile fileType, const QString& filepath="", QWidget* parent = nullptr) : 
-        QWidget(parent), fileType(fileType), filepath(filepath), modified(false)
+        QWidget(parent), fileType(fileType), filepath(filepath), modified(false), forcedAsText_(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
     }
@@ -56,6 +57,16 @@ public:
     bool isModified() const
     {
         return modified;
+    }
+
+    bool forcedAsText() const
+    {
+        return forcedAsText_;
+    }
+
+    void setForcedAsText(const bool value)
+    {
+        forcedAsText_ = value;
     }
 
     virtual QString getTabText() const

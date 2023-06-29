@@ -77,6 +77,7 @@ protected:
     bool overwrite_all;
     bool discard_all;
     bool saving_file;
+    QStringList listOpenAsText;
 
     QShortcut* nextTabShortcut;
     QShortcut* previousTabShortcut;
@@ -127,11 +128,13 @@ public:
      * @param forceOverwrite bool whether or not forcing overwrite of corresponding KDB (use in loadSetting()).
      * @param moveToPosition int new position of the corresponding tab. 
      *                           Only used when reloading tabs from a previous session.
+     * @param forceAsText bool whether or not to force to open the corresponding file as text (if not an IODE 
+     *                         database or report file)
      * 
      * @return int index of the corresponding tab. -1 if failed to load file.
 	 */
 	virtual int loadFile(const QString& filepath, const bool displayTab=true, const bool forceOverwrite=false, 
-        const int moveToPosition=-1) = 0;
+        const int moveToPosition=-1, const bool forceAsText=false) = 0;
 
     /**
      * @brief Reload a file if modified by an external program.
@@ -154,9 +157,11 @@ public:
      * 
      * @param fileType EnumIodeFile type of the loaded file (KDB file, .log, .ini, .txt, other).
      * @param fileInfo QFileInfo path to the loaded file.
+     * @param forceAsText bool whether or not to force to open the corresponding file as text 
+     *                         (if not an IODE database or report file)
      * @return int index of the new tab
      */
-    int addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo);
+    int addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText=false);
 
     /**
      * @brief show tab corresponding to passed index. 
@@ -190,10 +195,11 @@ private:
      * @brief add tab for editing a text file (.log, .ini, .txt).
      * 
      * @param fileInfo QFileInfo path to the text file.
+     * @param forced bool whether the file has been forced to be opened as text tab
      * 
      * @return int index of the new tab.
      */
-    int addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile);
+    int addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced = false);
 
     /**
      * @brief save the content of the tab at a given index.
