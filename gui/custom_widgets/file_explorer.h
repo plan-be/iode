@@ -348,12 +348,12 @@ public slots:
     /**
      * @brief function called when the user double clicked on a item in the tree (= file explorer) view
      * 
-     * @param index index (row and column) of the item selected 
+     * @param forceAsText bool forces non IODE database or report files to be open as text tabs
      */
-    void openFiles();
+    void openFiles(const bool forceAsText=false);
 
     /**
-     * @brief deselected all items + clear Clipboard.
+     * @brief deselectes all items + clear Clipboard.
      *  
      */
     void cancel();

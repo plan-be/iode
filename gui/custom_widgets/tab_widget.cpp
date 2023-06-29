@@ -69,6 +69,7 @@ void QIodeTabWidget::loadSettings()
 
     project_settings->beginGroup("PROJECT");
     QStringList filesToLoad = project_settings->value("files").toStringList();
+    listOpenAsText = project_settings->value("filesAsText").toStringList();
     int index = project_settings->value("index_last_open_tab", "-1").toInt();
     project_settings->endGroup();
 
@@ -113,7 +114,10 @@ void QIodeTabWidget::loadSettings()
                 if(index != i) this->tabBar()->moveTab(index, i);
             }
             else 
-                loadFile(filepath, false, true, i);
+            {
+                bool forceAsText = listOpenAsText.contains(filepath);
+                loadFile(filepath, false, true, i, forceAsText);
+            }
         }
         progress.setValue(filesToLoad.size());
         
@@ -129,6 +133,8 @@ void QIodeTabWidget::saveSettings()
     if(!project_settings)
         return;
 
+    listOpenAsText.clear();
+
     // build list of open tabs
     QStringList filesToSave;
     AbstractTabWidget* tabWidget;
@@ -139,7 +145,11 @@ void QIodeTabWidget::saveSettings()
         if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
             filesToSave << prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
         else
+        {
             filesToSave << tabWidget->getFilepath();
+            if(tabWidget->forcedAsText())
+                listOpenAsText << tabWidget->getFilepath();
+        }
     }
 
     // start to save settings
@@ -148,6 +158,10 @@ void QIodeTabWidget::saveSettings()
     // save the list of open tabs
     QVariant files = QVariant::fromValue(filesToSave);
     project_settings->setValue("files", files);
+
+    // save the list of files to be opened as text tabs
+    files = QVariant::fromValue(listOpenAsText);
+    project_settings->setValue("filesAsText", files);
 
     // save index of the currently displayed tab
     QVariant index = QVariant(this->currentIndex());
@@ -265,7 +279,7 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
 }
 
 int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, 
-    const bool forceOverwrite, const int moveToPosition)
+    const bool forceOverwrite, const int moveToPosition, const bool forceAsText)
 {
     QString filename;
     QString tooltip;
@@ -324,7 +338,7 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
         }
         // load non-KDB file and create a new tab
         else
-            index = addNewTab(filetype, fileInfo);
+            index = addNewTab(filetype, fileInfo, forceAsText);
 
         if (moveToPosition >= 0)
         {
