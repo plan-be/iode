@@ -1,0 +1,60 @@
+$ Main report tests
+$ -----------------
+$ Syntax: 
+$debug 1
+$noparsing 
+$indent
+
+$goto continue {%0% >= 2}
+    $show Syntax: rep_expand input_dir output_dir
+    $show Syntax error. Report aborted.
+    $return
+$label continue
+$define input_dir %1%
+$define output_dir %2%
+$PrintDest %output_dir%\rep_expand.a2m A2M
+
+# PARSING and NON PARSING DEMO
+$WsSample 2000Y1 2010Y1
+$DataCalcVar B t
+$SetTime 2005Y1
+$define C  1
+$define C1  2
+$define c  b
+
+-------------------------------
+LEC expressions between `{...}` 
+-------------------------------
+Example 1: `{lec + %define%}`      : `{1 + %C%}`            -> {1 + %C%}
+Example 2: `{lec + @fn()}`         : `{1 + @upper(b)}`      -> {1 + @upper(b)}
+Example 3: `{lec + %@fn()%}`       : `{1 + %@upper(c)%}`    -> {1 + %@upper(c)%}
+Example 4: `{lec + @fn(%define%)}` : `{1 + @upper(%c%)}`    -> {1 + @upper(%c%)}
+Example 5: `{lec + @format}`       : `{1234.567@00999.9}`   -> {1234.567@00999.9}
+Example 6: `{lec + @format}`       : `{123456.789@99.99}`   -> {123456.789@99.99}
+Example 7: `{lec + @T}`            : `{3@T}`                -> {3@T}
+Example 8: `{lec + @fn + @T}`      : `{@upper(b)+1@T}`      -> {@upper(b)+1@T}
+
+------------------------
+Commands between `{...}` 
+------------------------
+Example 1: normal command             `{Command parms}`   `{$WsLoadVar data\fun.av}`  -> {$WsLoadVar %input_dir%\fun.av}
+Example 2: error (tot does not exist) `{Command parms}`   `{$WsLoadVar data\toto}`    -> {$WsLoadVar %input_dir%\toto}
+Example 3: error + inverting result   `{!Command parms}`  `{$!WsLoadVar data\toto}`   -> {$!WsLoadVar %input_dir%\toto}
+
+---------------------------
+Expressions between `%...%`
+---------------------------
+Example 1: `%C%`               : `%C%`         -> %C%
+Example 2: `%@fn()%`           : `%@upper(c)%` -> %@upper(c)%
+Example 3: `%C{lec}%`          : `%C{2-1}%`    -> %C{2-1}%
+
+--------------------------------
+Expressions with `@-functions()`
+--------------------------------
+Example 1: `@fn()`             : `@equal("abc","abc")`    -> @equal("abc","abc")
+Example 2: `@fn(%def%)`        : `@upper(%c%)`            -> @upper(%c%)
+Example 3: `@fn(@fn())`        : `@upper(@month(2,N))`    -> @upper(@month(2,N))
+Example 4: `@@fn()`           :  `@@upper(abc)`           -> @@upper(abc)
+Example 5: `@fn({lec})`        : `@drop({1+1},ABCDE)`     -> @drop({1+1},ABCDE)
+Example 6: `@fn({lec})`        : `@drop({1+1},A BCDE)`    -> @drop({1+1},A BCDE)  
+Example 7: `@fn({lec})`        : `@drop({1+1},"A,BC,DE")` -> @drop({1+1},"A,BC,DE")
