@@ -26,6 +26,36 @@ public:
     QIodeReportWidget(const QString& filepath,  QTextEdit* output, 
         std::shared_ptr<QIodeCompleter>& completer, QWidget* parent = nullptr);
 
+    QString getParameters() const
+    {
+        return lineEdit_parameters->text();
+    }
+
+    void setParameters(const QString& parameters)
+    {
+        lineEdit_parameters->setText(parameters);
+    }
+
+    int getLanguage() const
+    {
+        return comboBox_language->currentIndex();
+    }
+
+    void setLanguage(const int language)
+    {
+        comboBox_language->setCurrentIndex(language);
+    }
+
+    int getNbDecimals() const
+    {
+        return spinBox_nbDecimals->value();
+    }
+
+    void setNbDecimals(const int nbDecimals)
+    {
+        spinBox_nbDecimals->setValue(nbDecimals);
+    }
+
     bool load_(const QString& filepath, const bool forceOverwrite)
     {
         return load__(editor, filepath, forceOverwrite);
