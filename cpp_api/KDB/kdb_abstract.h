@@ -123,7 +123,7 @@ public:
     {
         KDB* kdb = get_KDB();
         if (kdb == NULL) return "";
-        if (pos < 0 || pos > kdb->k_nb) 
+        if (pos < 0 || pos >= kdb->k_nb) 
             throw IodeExceptionFunction("Cannot get name of " + iode_type_name + " at position " + std::to_string(pos),  
                                         iode_type_name + " at position " + std::to_string(pos) + " does not exist.");
         std::string name_oem = std::string(kdb->k_objs[pos].o_name);
