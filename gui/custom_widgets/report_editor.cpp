@@ -40,7 +40,7 @@ void ReportEditor::run(const QString& filepath, const QString& parameters, const
         QDir::setCurrent(QFileInfo(filepath).absolutePath());
 
         // executes IODE report
-        QString args = filepath + " " + parameters;
+        QString args = "\"" + filepath + "\" " + parameters;
         success = B_ReportExec(args.toStdString().data());
 
         W_close();
