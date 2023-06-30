@@ -2,7 +2,7 @@
 
 
 QIodeAbstractEditor::QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
-    : AbstractTabWidget(fileType, filepath, parent) 
+    : AbstractTabWidget(fileType, parent), filepath(filepath)
 { 
 }
 
