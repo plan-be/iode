@@ -76,7 +76,6 @@ protected:
     QString projectDirPath;
     bool overwrite_all;
     bool discard_all;
-    bool saving_file;
     QStringList listOpenAsText;
 
     QShortcut* nextTabShortcut;
