@@ -27,8 +27,10 @@ class AbstractTabWidget: public QWidget
 protected:
     EnumIodeFile fileType;
     QString filepath;
-    bool forcedAsText_;
+
     bool modified;
+    bool forcedAsText_;         ///< Whether or not the corresponding file has been forced to open as a text tab
+    bool savingFile;            ///< See save() and load() implementation of QIodeAbstractEditor 
 
 protected:
     virtual bool load_(const QString& filepath, const bool forceOverwrite) = 0;
@@ -39,7 +41,7 @@ signals:
 
 public:
     AbstractTabWidget(const EnumIodeFile fileType, const QString& filepath="", QWidget* parent = nullptr) : 
-        QWidget(parent), fileType(fileType), filepath(filepath), modified(false), forcedAsText_(false)
+        QWidget(parent), fileType(fileType), filepath(filepath), modified(false), forcedAsText_(false), savingFile(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
     }
