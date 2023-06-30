@@ -47,7 +47,7 @@ protected:
 
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, QIodeAbstractTabWidget* parent) : 
-        AbstractTabWidget((EnumIodeFile) iodeType, "", parent), projectDir(QDir::homePath())
+        AbstractTabWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath())
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
@@ -108,6 +108,7 @@ public:
      */
     bool isUnsavedDatabase() const
     {
+        QString filepath = getFilepath();
         return filepath.isEmpty() || filepath == QString(I_DEFAULT_FILENAME);
     }
 
@@ -133,7 +134,7 @@ public:
 
     bool updateFilepath(const QString& filepath) override
     {
-        if(AbstractTabWidget::updateFilepath(filepath))
+        if(checkNewFilepath(filepath))
         {
             set_kdb_filename(K_WS[fileType], filepath.toStdString());
             return true;
@@ -144,7 +145,6 @@ public:
 
     void reset()
     {
-        this->filepath = "";
         clearKDB();
         resetFilter();
     }
@@ -164,7 +164,7 @@ public slots:
     void databaseModified()
     {
         modified = true;
-        emit tabContentModified(filepath, true);
+        emit tabContentModified(getFilepath(), true);
     }
 };
 
@@ -239,6 +239,11 @@ public:
     V* get_view() const
     {
         return tableview;
+    }
+
+    QString getFilepath() const
+    {
+        return objmodel->getFilepath();
     }
 
     void clearKDB()

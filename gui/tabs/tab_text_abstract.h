@@ -17,11 +17,28 @@ class QIodeAbstractEditor: public AbstractTabWidget
     Q_OBJECT
 
 protected:
+    QString filepath;
     QString filter;
     QPrinter printer;
 
 public:
     QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
+
+    QString getFilepath() const override
+    { 
+        return filepath; 
+    }
+
+    bool updateFilepath(const QString& filepath) override
+    {
+        if(checkNewFilepath(filepath))
+        {
+            this->filepath = filepath;
+            return true;
+        }
+        else
+            return false;
+    }
 
     void update() {}
     bool load__(TextEditor* editor, const QString& filepath, const bool forceOverwrite);

@@ -50,6 +50,8 @@ public:
 		return columnNames.size();
 	}
 
+	virtual QString getFilepath() const = 0;
+
 protected:
 	void resetModel()
 	{
@@ -97,6 +99,11 @@ public:
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override
 	{
 		return kdb->count();
+	}
+
+	QString getFilepath() const
+	{
+		return QString::fromStdString(kdb->get_filename());
 	}
 
 	Qt::ItemFlags flags(const QModelIndex& index) const override;

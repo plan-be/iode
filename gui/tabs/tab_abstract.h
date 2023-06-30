@@ -26,7 +26,6 @@ class AbstractTabWidget: public QWidget
 
 protected:
     EnumIodeFile fileType;
-    QString filepath;
 
     bool modified;
     bool forcedAsText_;         ///< Whether or not the corresponding file has been forced to open as a text tab
@@ -36,12 +35,39 @@ protected:
     virtual bool load_(const QString& filepath, const bool forceOverwrite) = 0;
     virtual QString saveAs_() = 0;
 
+    bool checkNewFilepath(const QString& filepath)
+    {
+        QFileInfo fileInfo(filepath);
+
+        // check if file exists
+        if(!fileInfo.exists())
+        {
+            QMessageBox::warning(nullptr, "WARNING", "File " + filepath + " could not been found");
+            return false;
+        }
+
+        // check if correct extension
+        if(get_iode_file_type(filepath.toStdString()) != fileType)
+        {
+            QString filename = fileInfo.fileName(); 
+            QString ext = fileInfo.suffix();
+            QStringList expected_ext;
+            for(const std::string& ext_: get_extensions(fileType)) expected_ext << QString::fromStdString(ext_);
+
+            QMessageBox::warning(nullptr, "WARNING", "Expected file with extension " + expected_ext.join(" or ") + "\n" +
+                "But got file " + filename + " with extension " + ext);
+            return false;
+        }
+
+        return true;
+    }
+
 signals:
     void tabContentModified(const QString& filepath, const bool modified);
 
 public:
-    AbstractTabWidget(const EnumIodeFile fileType, const QString& filepath="", QWidget* parent = nullptr) : 
-        QWidget(parent), fileType(fileType), filepath(filepath), modified(false), forcedAsText_(false), savingFile(false)
+    AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr) : 
+        QWidget(parent), fileType(fileType), modified(false), forcedAsText_(false), savingFile(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
     }
@@ -51,10 +77,7 @@ public:
         return fileType; 
     }
 
-    QString getFilepath() const 
-    { 
-        return filepath; 
-    }
+    virtual QString getFilepath() const = 0;
 
     bool isModified() const
     {
@@ -73,6 +96,7 @@ public:
 
     virtual QString getTabText() const
     {
+        QString filepath = getFilepath();
         QString text = tabPrefix[fileType] + QFileInfo(filepath).fileName();
         if(modified) text += "*";
         return text;
@@ -80,6 +104,7 @@ public:
 
     virtual QString getTooltip() const
     {
+        QString filepath = getFilepath();
         return QFileInfo(filepath).absoluteFilePath();
     }
     
@@ -113,34 +138,7 @@ public:
      * 
      * @note Need to be called each time a file is moved or renamed.
      */
-    virtual bool updateFilepath(const QString& filepath)
-    {
-        QFileInfo fileInfo(filepath);
-
-        // check if file exists
-        if(!fileInfo.exists())
-        {
-            QMessageBox::warning(nullptr, "WARNING", "File " + filepath + " could not been found");
-            return false;
-        }
-
-        // check if correct extension
-        if(get_iode_file_type(filepath.toStdString()) != fileType)
-        {
-            QString filename = fileInfo.fileName(); 
-            QString ext = fileInfo.suffix();
-            QStringList expected_ext;
-            for(const std::string& ext_: get_extensions(fileType)) expected_ext << QString::fromStdString(ext_);
-
-            QMessageBox::warning(nullptr, "WARNING", "Expected file with extension " + expected_ext.join(" or ") + "\n" +
-                "But got file " + filename + " with extension " + ext);
-            return false;
-        }
-
-        // update filepath
-        this->filepath = filepath;
-        return true;
-    }
+    virtual bool updateFilepath(const QString& filepath) = 0;
 
     virtual void update() = 0;
     virtual QString save() = 0;
@@ -149,6 +147,6 @@ public slots:
     void setModified(bool modified)
     {
         this->modified = modified;
-        emit tabContentModified(filepath, modified); 
+        emit tabContentModified(getFilepath(), modified); 
     }
 };

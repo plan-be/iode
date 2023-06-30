@@ -97,8 +97,6 @@ MainWindow::~MainWindow()
     user_settings->setValue("projectPath", QVariant(projectPath));
     user_settings->setValue("fontFamily", QVariant(fontFamily));
 
-    for(int i=0; i<I_NB_TYPES; i++) clear_global_kdb((EnumIodeType) i);
-
     delete user_settings;
 
     delete fullScreenShortcut;

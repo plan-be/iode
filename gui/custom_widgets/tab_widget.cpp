@@ -53,6 +53,9 @@ QIodeTabWidget::~QIodeTabWidget()
 {
     saveSettings();
 
+    for(int i=0; i<I_NB_TYPES; i++) 
+        clear_global_kdb((EnumIodeType) i);
+
     delete tabComments;
     delete tabEquations;
     delete tabIdentites;
@@ -175,6 +178,7 @@ void QIodeTabWidget::saveSettings()
     {
         tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
         EnumIodeFile filetype = tabWidget->getFiletype();
+        QString filepath = tabWidget->getFilepath();
 
         if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
             filesToSave << prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
