@@ -9,6 +9,15 @@ QWidget* get_tabs_widget_ptr()
 }
 
 
+struct ReportParams
+{
+    QString filepath;
+    QString parameters;
+    int language;
+    int nbDecimals;
+};
+
+
 QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
 {
     // prepare widgets for tabs associated with IODE object types
@@ -68,10 +77,10 @@ void QIodeTabWidget::loadSettings()
         return;
 
     project_settings->beginGroup("PROJECT");
+    
     QStringList filesToLoad = project_settings->value("files").toStringList();
     listOpenAsText = project_settings->value("filesAsText").toStringList();
     int index = project_settings->value("index_last_open_tab", "-1").toInt();
-    project_settings->endGroup();
 
     // filesToLoad is empty in the case of a new project
     if(filesToLoad.empty())
@@ -120,6 +129,29 @@ void QIodeTabWidget::loadSettings()
             }
         }
         progress.setValue(filesToLoad.size());
+
+        buildFilesList();
+
+        // reload values for the fields parameters, language and nbDecimals for each report tab
+        int size = project_settings->beginReadArray("reportsParams");
+        for (int i = 0; i < size; i++) 
+        {
+            project_settings->setArrayIndex(i);
+
+            filepath = project_settings->value("filepath").toString();
+
+            int index = filesList.indexOf(filepath);
+            if(index < 0) 
+                continue;
+
+            QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(this->widget(index));
+            reportWidget->setParameters(project_settings->value("parameters").toString());
+            reportWidget->setLanguage(project_settings->value("language").toInt());
+            reportWidget->setNbDecimals(project_settings->value("nbDecimals").toInt());
+        }
+        project_settings->endArray();
+
+        project_settings->endGroup();
         
         // display the tab that was displayed the last time the user quitted the IODE gui
         showTab(index);
@@ -137,18 +169,33 @@ void QIodeTabWidget::saveSettings()
 
     // build list of open tabs
     QStringList filesToSave;
+    QList<ReportParams> reportsParams;
     AbstractTabWidget* tabWidget;
     for (int i=0; i < this->count(); i++)
     {
         tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
         EnumIodeFile filetype = tabWidget->getFiletype();
+
         if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
             filesToSave << prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
         else
         {
             filesToSave << tabWidget->getFilepath();
+
             if(tabWidget->forcedAsText())
                 listOpenAsText << tabWidget->getFilepath();
+        }
+
+        if(filetype == I_REPORTS_FILE)
+        {
+            ReportParams rp;
+            QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(tabWidget);
+
+            rp.filepath = reportWidget->getFilepath();
+            rp.parameters = reportWidget->getParameters();
+            rp.language = reportWidget->getLanguage();
+            rp.nbDecimals = reportWidget->getNbDecimals();
+            reportsParams.append(rp);
         }
     }
 
@@ -162,6 +209,19 @@ void QIodeTabWidget::saveSettings()
     // save the list of files to be opened as text tabs
     files = QVariant::fromValue(listOpenAsText);
     project_settings->setValue("filesAsText", files);
+
+    // save the parameters, language and nbDecimals values for each report tab
+    project_settings->beginWriteArray("reportsParams");
+    for (qsizetype i = 0; i < reportsParams.size(); i++)
+    {
+        ReportParams rp = reportsParams[i];
+        project_settings->setArrayIndex(i);
+        project_settings->setValue("filepath", rp.filepath);
+        project_settings->setValue("parameters", rp.parameters);
+        project_settings->setValue("language", rp.language);
+        project_settings->setValue("nbDecimals", rp.nbDecimals);
+    }
+    project_settings->endArray();
 
     // save index of the currently displayed tab
     QVariant index = QVariant(this->currentIndex());
