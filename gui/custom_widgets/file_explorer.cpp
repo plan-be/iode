@@ -153,6 +153,9 @@ void QIodeFileExplorer::setupContextMenu()
         filepathShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
 
+    action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard", contextMenuDirectory);
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::relativePath);
+
     action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
         contextMenuDirectory, revealExplorerShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeFileExplorer::revealInFolder);
@@ -187,6 +190,9 @@ void QIodeFileExplorer::setupContextMenu()
     action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", contextMenuFile, 
         filepathShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
+    
+    action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard", contextMenuFile);
+    connect(action, &QAction::triggered, this, &QIodeFileExplorer::relativePath);
     
     action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
         contextMenuFile, revealExplorerShortcut->key());
@@ -419,6 +425,15 @@ void QIodeFileExplorer::absolutePath()
     QFileInfo fileInfo = proxyModel->fileInfo(indexContextMenu);
     QString absPath = fileInfo.absoluteFilePath();
     clipboard->setText(absPath);
+    cleanupSlot();
+}
+
+void QIodeFileExplorer::relativePath()
+{
+    QClipboard* clipboard = QApplication::clipboard();
+    QFileInfo fileInfo = proxyModel->fileInfo(indexContextMenu);
+    QString relPath = projectDir.relativeFilePath(fileInfo.absoluteFilePath());
+    clipboard->setText(relPath);
     cleanupSlot();
 }
 
