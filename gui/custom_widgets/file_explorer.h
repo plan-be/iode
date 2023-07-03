@@ -303,10 +303,16 @@ public slots:
     void createDir();
 
     /**
-     * @brief copy the absolute path of the selected path to the 
+     * @brief copy the absolute path of the selected path to the selected file
      * 
      */
     void absolutePath();
+
+    /**
+     * @brief copy the relative path of the selected path to the selected file
+     * 
+     */
+    void relativePath();
 
     /**
      * @brief open an OS file explorer and highlight the selected file.
