@@ -29,13 +29,13 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
     tabTables = new QIodeTablesWidget(this);
     tabVariables = new QIodeVariablesWidget(this);
 
-    connect(tabComments, &QIodeCommentsWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
-    connect(tabEquations, &QIodeEquationsWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
-    connect(tabIdentites, &QIodeIdentitiesWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
-    connect(tabLists, &QIodeListsWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
-    connect(tabScalars, &QIodeScalarsWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
-    connect(tabTables, &QIodeTablesWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
-    connect(tabVariables, &QIodeVariablesWidget::tabContentModified, this, &QIodeTabWidget::tabContentModified);
+    connect(tabComments, &QIodeCommentsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabEquations, &QIodeEquationsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabIdentites, &QIodeIdentitiesWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabLists, &QIodeListsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabScalars, &QIodeScalarsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabTables, &QIodeTablesWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabVariables, &QIodeVariablesWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
 
     tabIodeObjects.append(tabComments);
     tabIodeObjects.append(tabEquations);

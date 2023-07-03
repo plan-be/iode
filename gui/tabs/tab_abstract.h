@@ -62,9 +62,6 @@ protected:
         return true;
     }
 
-signals:
-    void tabContentModified(const QString& filepath, const bool modified);
-
 public:
     AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr) : 
         QWidget(parent), fileType(fileType), modified(false), forcedAsText_(false), savingFile(false)
@@ -112,22 +109,19 @@ public:
     {
         bool success = load_(filepath, forceOverwrite);
         if(success)
-        {
-            updateFilepath(filepath);
-            setModified(false);
-        }
+            success = updateFilepath(filepath);
         return success;
     }
 
     QString saveAs()
     {
         QString newFilepath = saveAs_();
-        if(!newFilepath.isEmpty())
-        {
-            updateFilepath(newFilepath);
-            setModified(false);
-        }
-        return newFilepath;
+
+        if(newFilepath.isEmpty())
+            return "";
+        
+        bool success = updateFilepath(newFilepath);
+        return success ? newFilepath : "";
     }
 
     /**
@@ -144,9 +138,5 @@ public:
     virtual QString save() = 0;
 
 public slots:
-    void setModified(bool modified)
-    {
-        this->modified = modified;
-        emit tabContentModified(getFilepath(), modified); 
-    }
+    virtual void setModified(bool modified) = 0;
 };

@@ -57,7 +57,7 @@ int QIodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
     int index = addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
 
-    connect(reportWidget, &QIodeReportWidget::tabContentModified, this, &QIodeAbstractTabWidget::tabContentModified);
+    connect(reportWidget, &QIodeReportWidget::tabTextModified, this, &QIodeAbstractTabWidget::tabTextModified);
     connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &QIodeAbstractTabWidget::computeHash);
     
     return index;
@@ -72,7 +72,7 @@ int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIode
     if(forced)
         textWidget->setForcedAsText(true);
     
-    connect(textWidget, &QIodeTextWidget::tabContentModified, this, &QIodeAbstractTabWidget::tabContentModified);
+    connect(textWidget, &QIodeTextWidget::tabTextModified, this, &QIodeAbstractTabWidget::tabTextModified);
     
     return index;
 }
@@ -119,7 +119,7 @@ void QIodeAbstractTabWidget::removeTab(const int index)
         QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", msg, 
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
         if(answer == QMessageBox::Yes) tabWidget->save();
-        if(answer == QMessageBox::No) tabContentModified(filepath, false);
+        if(answer == QMessageBox::No) tabTextModified(filepath, false);
         if(answer == QMessageBox::Discard) return;
     }
 

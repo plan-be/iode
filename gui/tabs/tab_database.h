@@ -35,6 +35,8 @@ const static QString prefixUnsavedDatabase = "Unsaved";
 
 class AbstractIodeObjectWidget: public AbstractTabWidget
 {
+    Q_OBJECT
+
 protected:
     EnumIodeType iodeType;
     QDir projectDir;
@@ -45,9 +47,12 @@ protected:
     QPushButton* pushButton_print;
     QPushButton* pushButton_add;
 
+signals:
+    void tabDatabaseModified(const EnumIodeType iodeType, const bool modified);
+
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, QIodeAbstractTabWidget* parent) : 
-        AbstractTabWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath())
+        AbstractTabWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
@@ -127,7 +132,7 @@ public:
     QString getTooltip() const
     {
         if(isUnsavedDatabase())
-            return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[(EnumIodeType) fileType]) + " Database";
+            return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database";
         else
             return AbstractTabWidget::getTooltip();
     }
@@ -137,6 +142,8 @@ public:
         if(checkNewFilepath(filepath))
         {
             set_kdb_filename(K_WS[fileType], filepath.toStdString());
+            modified = false;
+            emit tabDatabaseModified(iodeType, false);
             return true;
         }
         else
@@ -161,10 +168,15 @@ public:
     virtual void computeHash(const bool before=false) = 0;
 
 public slots:
+    void setModified(bool modified) override
+    {
+        this->modified = modified;
+        emit tabDatabaseModified(iodeType, modified); 
+    }
+
     void databaseModified()
     {
-        modified = true;
-        emit tabContentModified(getFilepath(), true);
+        setModified(true);
     }
 };
 
@@ -329,9 +341,6 @@ public:
     QIodeNumericalObjectWidget(EnumIodeType iodeType, QIodeAbstractTabWidget* parent) 
         : QIodeObjectWidget<M, V>(iodeType, parent)
     {
-        // make sure iodeType is defined before to call loadSetting() and getGroupName()
-        this->iodeType = iodeType;
-
         QHBoxLayout* digits_layout = new QHBoxLayout();
 
         // nb decimals spinbox
@@ -409,7 +418,6 @@ public:
         project_settings->endGroup();
     }
 
-public slots:
     void saveSettings()
     {
         QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
