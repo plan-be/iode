@@ -21,6 +21,9 @@ protected:
     QString filter;
     QPrinter printer;
 
+signals:
+    void tabTextModified(const QString& filepath, const bool modified);
+
 public:
     QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
 
@@ -34,6 +37,7 @@ public:
         if(checkNewFilepath(filepath))
         {
             this->filepath = filepath;
+            setModified(false);
             return true;
         }
         else
@@ -47,4 +51,11 @@ public:
     virtual QString save(const QString& filepath) = 0;
     QString save();
     QString saveAs_();
+
+public slots:
+    void setModified(bool modified) override
+    {
+        this->modified = modified;
+        emit tabTextModified(filepath, modified); 
+    }
 };

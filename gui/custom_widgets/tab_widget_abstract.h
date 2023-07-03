@@ -212,35 +212,22 @@ private:
 
 public slots:
     /**
-     * @brief updates the tab name and sends the fileContentModified signal to be 
+     * @brief updates the tab name and tooltip and sends the fileContentModified signal to be 
      *        catched by the File Explorer.
      * 
      * @param filepath 
      * @param modified 
      */
-    void tabContentModified(const QString& filepath, const bool modified)
-    {
-        try
-        {
-            // get index
-            int index = filesList.indexOf(filepath);
-            if(index < 0) 
-                return;
+    virtual void tabTextModified(const QString& filepath, const bool modified) = 0;
 
-            // get the tab widget at the given index
-            AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
-
-            // updates the text of the tab
-            setTabText(index, tabWidget->getTabText());
-
-            // sends a signal to the File Explorer widget
-            emit fileContentModified(tabWidget->getFilepath(), modified);
-        }
-        catch(const std::exception& e)
-        {
-            QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
-        }
-    }
+    /**
+     * @brief updates the tab name and tooltip and sends the fileContentModified signal to be 
+     *        catched by the File Explorer.
+     * 
+     * @param iodeType 
+     * @param modified 
+     */
+    virtual void tabDatabaseModified(const EnumIodeType iodeType, const bool modified) = 0;
 
     /**
      * @brief popup a new dialog box containing the list of passed objects.

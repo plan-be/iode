@@ -113,6 +113,56 @@ public:
     QStringList getSelectedObjectsNames(const EnumIodeType iodeType);
 
 public slots:
+    void tabTextModified(const QString& filepath, const bool modified)
+    {
+        try
+        {
+            // get index
+            int index = filesList.indexOf(filepath);
+            if(index < 0) 
+                return;
+
+            // get the tab widget at the given index
+            QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+
+            // updates the text and tootip of the tab
+            setTabText(index, tabWidget->getTabText());
+            setTabToolTip(index, tabWidget->getTooltip());
+
+            // sends a signal to the File Explorer widget
+            emit fileContentModified(tabWidget->getFilepath(), modified);
+        }
+        catch(const std::exception& e)
+        {
+            QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
+        }
+    }
+
+    void tabDatabaseModified(const EnumIodeType iodeType, const bool modified)
+    {
+        try
+        {
+            // get index
+            int index = getIodeObjTabIndex(iodeType);
+            if(index < 0) 
+                return;
+
+            // get the tab widget at the given index
+            AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
+
+            // updates the text and tooltip of the tab
+            setTabText(index, tabWidget->getTabText());
+            setTabToolTip(index, tabWidget->getTooltip());
+
+            // sends a signal to the File Explorer widget
+            emit fileContentModified(tabWidget->getFilepath(), modified);
+        }
+        catch(const std::exception& e)
+        {
+            QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
+        }
+    }
+
     void computeHash(const bool before=false) override
     {
         tabComments->computeHash(before);
