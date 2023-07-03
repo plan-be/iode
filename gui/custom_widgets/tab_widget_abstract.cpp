@@ -79,7 +79,8 @@ int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIode
 
 int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText)
 {
-    if (fileType <= I_VARIABLES_FILE) return -1;
+    if (fileType <= I_VARIABLES_FILE) 
+        return -1;
 
     QString fullPath = fileInfo.absoluteFilePath();
 
@@ -87,7 +88,8 @@ int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileIn
     int index = filesList.indexOf(fullPath);
 
     // check if file already opened
-    if (index >= 0) return index;
+    if (index >= 0) 
+        return index;
 
     // prepare and add the new tab
     if(fileType == I_REPORTS_FILE)

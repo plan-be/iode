@@ -343,11 +343,10 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
 }
 
 int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, 
-    const bool forceOverwrite, const int moveToPosition, const bool forceAsText)
+    bool forceOverwrite, const int moveToPosition, const bool forceAsText)
 {
     QString filename;
     QString tooltip;
-    int index;
     
 	if(filepath.isEmpty())
     {
@@ -370,19 +369,34 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
 		return -1;
 	}
 
-    // check if file already loaded
-    index = filesList.indexOf(fullPath);
+    EnumIodeFile filetype = get_iode_file_type(fullPath.toStdString());
+
+    // checks if the file has been already loaded
+    // Note: indexOf() returns -1 if not found
+    buildFilesList();
+    int index = filesList.indexOf(fullPath);
     if(index >= 0)
     {
-        // if file is open in a tab, shows the tab
-        this->setCurrentIndex(index);
-        return -1;
+        QMessageBox::StandardButton reloadFile = QMessageBox::No;
+        if(filetype <= I_VARIABLES_FILE)
+        {
+            reloadFile = QMessageBox::question(nullptr, "WARNING", "The IODE database " + fileInfo.fileName() + 
+                " is already open.\nWould you like to reload it?");
+        }
+
+        if(reloadFile == QMessageBox::Yes)
+            forceOverwrite = true;
+        else
+        {
+            // if file is open in a tab, shows the tab
+            this->setCurrentIndex(index);
+            return index;
+        }
     }
 
     // load file
     try
     {
-        EnumIodeFile filetype = get_iode_file_type(fullPath.toStdString());
         // load KDB file
         if(filetype <= I_VARIABLES_FILE)
         {
@@ -390,7 +404,6 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
             bool success = tabWidget->load(fullPath, forceOverwrite);
             if(success)
             {
-                buildFilesList();
                 tabWidget->resetFilter();
                 index = this->indexOf(tabWidget);
                 setTabText(index, tabWidget->getTabText());

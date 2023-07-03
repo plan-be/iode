@@ -82,7 +82,7 @@ public:
 
     int updateObjectTab(const EnumIodeType iodeType);
 
-    int loadFile(const QString& filepath, const bool displayTab=true, const bool forceOverwrite=false, 
+    int loadFile(const QString& filepath, const bool displayTab=true, bool forceOverwrite=false, 
         const int moveToPosition=-1, const bool forceAsText=false) override;
 
     /**
