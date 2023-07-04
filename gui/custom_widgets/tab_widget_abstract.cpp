@@ -150,7 +150,7 @@ void QIodeAbstractTabWidget::reloadFile(const QString& filepath)
 {
 	// find index of corresponding tab
 	int index = filesList.indexOf(filepath);
-	if(index < -1)
+	if(index < 0)
 		return;
 
 	// reload file
