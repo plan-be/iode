@@ -8,7 +8,7 @@ class IdentitiesDelegate : public BaseDelegate
 	Q_OBJECT
 
 public:
-	IdentitiesDelegate(QObject* parent = nullptr) : BaseDelegate(I_UPPER, parent) {}
+	IdentitiesDelegate(QObject* parent = nullptr) : BaseDelegate(I_IDENTITIES, parent) {}
 
 	~IdentitiesDelegate() {}
 };

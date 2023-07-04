@@ -9,6 +9,8 @@ Miscellaneous Improvements
 Fixes
 ^^^^^
 
+* (GUI) fixed multi-line edition of comments, equations LEC, identities, lists and table titles (closes :issue:`272`)
+
 * (GUI) fixed IODE database tabs not updated when calling $WsLoad<...> from an IODE report or using the IODE command line (closes :issue:`276`).
 
 * (GUI) fixed IODE database tabs not updated when calling $WsClear<...> from an IODE report or using the IODE command line (closes :issue:`277`).
