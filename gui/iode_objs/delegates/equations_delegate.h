@@ -8,7 +8,7 @@ class EquationsDelegate : public BaseDelegate
 	Q_OBJECT
 
 public:
-	EquationsDelegate(QObject* parent = nullptr) : BaseDelegate(I_UPPER, parent) {}
+	EquationsDelegate(QObject* parent = nullptr) : BaseDelegate(I_EQUATIONS, parent) {}
 
 	~EquationsDelegate() {}
 };

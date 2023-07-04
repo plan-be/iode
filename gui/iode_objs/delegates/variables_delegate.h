@@ -8,7 +8,7 @@ class VariablesDelegate : public BaseDelegate
 	Q_OBJECT
 
 public:
-	VariablesDelegate(QObject* parent = nullptr) : BaseDelegate(I_UPPER, parent) {}
+	VariablesDelegate(QObject* parent = nullptr) : BaseDelegate(I_VARIABLES, parent) {}
 
 	~VariablesDelegate() {}
 
