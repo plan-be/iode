@@ -1,0 +1,70 @@
+name: Build and test the C and C++ API
+
+on: 
+  # line below makes jobs defined in this script (workflow) reusable
+  # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+  workflow_call:
+    inputs:
+      build-config:
+        default: 'windows-debug'
+        required: true
+        type: string
+
+jobs:
+  build_and_test_api:
+    name: Build And Test Static Libraries
+    strategy:
+      matrix:
+        # os: [windows-latest, ubuntu-latest]
+        # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
+        os: [windows-2019]
+
+    # The CMake configure and build commands are platform agnostic and should 'ideally' work equally well on Windows or Linux.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    # List of softwares installed on windows-latest: https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server"
+      - run: echo "The name of the repository is ${{ github.repository }}."
+      - run: echo "The target branch of the current pull request is ${{ github.base_ref }}."
+      - run: echo "The source branch of the current pull request is ${{ github.head_ref }}."
+      - run: echo "The workspace directory is ${{ github.workspace }}."
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
+        with:
+          cmake-config: ${{ inputs.build-config }}
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
+        with:
+          cmake-config: ${{ inputs.build-config }}
+      - run: echo "This job's status is ${{ job.status }}."
+
+  test_sanitize:
+    name: Run Tests With Sanitize Option
+    strategy:
+      matrix:
+        # os: [windows-latest, ubuntu-latest]
+        # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
+        os: [windows-2019]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Build the SCR4, C and C++ API libs
+        uses: ./.github/actions/build_api
+        with:
+          cmake-config: windows-debug-sanitize
+      - name: Test the C and C++ APIs
+        uses: ./.github/actions/test_api
+        with:
+          cmake-config: windows-debug-sanitize
+      - run: echo "This job's status is ${{ job.status }}."
