@@ -1,0 +1,39 @@
+name: Build documentation
+
+on: 
+  # line below makes jobs defined in this script (workflow) reusable
+  # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+  workflow_call:
+    inputs:
+      build-config:
+        default: 'windows-debug'
+        required: true
+        type: string
+
+jobs:
+    build_doc:
+        name: Build user documentation
+        runs-on: ubuntu-latest
+        env:
+          build-config: linux-debug
+        steps:
+          - name: Checkout repository code
+            uses: actions/checkout@v2
+          - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+          - name: Install ninja
+            run: sudo apt-get install -y ninja-build
+          - name: Install Tex Live
+            run: sudo apt-get install -y texlive
+          - name: Print preset config
+            run: echo "${{ env.build-config }}"
+          - name: Configure CMake
+            run: cmake --preset ${{ env.build-config }}
+          - name: Build Keyboard Shortcuts PDF
+            run: cmake --build --preset ${{ env.build-config }} --target keyboard_shortcuts
+          - name: Upload documentation files
+            if: ${{ success() }}
+            uses: actions/upload-artifact@v3
+            with:
+              name: iode-doc
+              path: "${{ github.workspace }}/doc/build/"
+              if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
