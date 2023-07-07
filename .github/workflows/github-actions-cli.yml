@@ -1,0 +1,38 @@
+name: Build CLI executable
+
+on: 
+  # line below makes jobs defined in this script (workflow) reusable
+  # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+  workflow_call:
+    inputs:
+      build-config:
+        default: 'windows-debug'
+        required: true
+        type: string
+
+jobs:
+    build_cli:
+        name: Build IODE CLI
+        strategy:
+          matrix:
+            # os: [windows-latest, ubuntu-latest]
+            # Note (18/05/2022): GTest failes to compile on Windows Server 2022 (windows-latest)
+            os: [windows-2019]
+    
+        runs-on: ${{ matrix.os }}
+    
+        steps:
+          - name: Checkout repository code
+            uses: actions/checkout@v2
+          - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+          - name: Build the SCR4, C and C++ API libs
+            uses: ./.github/actions/build_api
+            with:
+              cmake-config: ${{ inputs.build-config }}
+          - name: Test the C and C++ APIs
+            uses: ./.github/actions/test_api
+            with:
+              cmake-config: ${{ inputs.build-config }}
+          - name: Build CLI
+            run: cmake --build --preset ${{ inputs.build-config }} --target iodecmd 
+          - run: echo "This job's status is ${{ job.status }}."
