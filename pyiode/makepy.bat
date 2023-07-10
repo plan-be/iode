@@ -33,6 +33,9 @@ call cmake --preset windows-release
 :: Create iode.pyd
 call cmake --build --preset windows-release --target iode_python 
 
+:: Test iode.pyd (using pytest -> see tests/test_python/test_iode.py)
+call cmake --build --preset windows-release --target test_python
+
 :: Digitally sign the .pyd module
 :: DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" iode.pyd
 
