@@ -83,6 +83,8 @@ pyiode> makepy.bat py39
 
 # Testing Project
 
+## C And C++ API
+
 To test the C and C++ API, you first have to build them as explain above:
 ```bash
 > cmake --build --preset <preset_config> --target iode_c_api
@@ -99,6 +101,18 @@ The final and third step is to ask CMake to run the tests:
 ```bash
 > ctest --preset c-api-<preset_config>
 > ctest --preset cpp-api-<preset_config>
+```
+
+## Python API
+
+To test the Python API, you first have to build it using:
+```bash
+> cmake --build --preset <preset_config> --target iode_python
+```
+
+Then, run the Python tests by calling the `test_python` target:
+```bash
+cmake --build --preset <preset_config> --target test_python
 ```
 
 # Working On An Issue
