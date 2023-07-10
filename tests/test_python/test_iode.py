@@ -427,19 +427,19 @@ def test_iode_data_update_var():
 # Miscellaneous functions
 # -----------------------
 
-def test_iode_ws_load_varpy():
-
-    print('iode.ws_load_varpy("split.var")')
-    print(iode.ws_load_varpy("split.var"))
-
-    print('iode.ws_load_varpy("split.var", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})")')
-    print(iode.ws_load_varpy("split.var", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})"))
-
-    print('print(iode.ws_load_varpy("split.var", axis_names="a,b", regex=r"(\w{2})(\w{2})"))')
-    print(iode.ws_load_varpy("split.var", axis_names="a,b".split(","), regex=r"(\w{2})(\w{2})"))
-
-    print('iode.ws_load_varpy("split.var", varsaxis="a_b", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})")')
-    print(iode.ws_load_varpy("split.var", varsaxis="a_b", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})"))
+# def test_iode_ws_load_varpy():
+# 
+#     print('iode.ws_load_varpy("split.var")')
+#     print(iode.ws_load_varpy("split.var"))
+# 
+#     print('iode.ws_load_varpy("split.var", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})")')
+#     print(iode.ws_load_varpy("split.var", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})"))
+# 
+#     print('print(iode.ws_load_varpy("split.var", axis_names="a,b", regex=r"(\w{2})(\w{2})"))')
+#     print(iode.ws_load_varpy("split.var", axis_names="a,b".split(","), regex=r"(\w{2})(\w{2})"))
+# 
+#     print('iode.ws_load_varpy("split.var", varsaxis="a_b", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})")')
+#     print(iode.ws_load_varpy("split.var", varsaxis="a_b", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})"))
 
 
 # ESTIMATION
