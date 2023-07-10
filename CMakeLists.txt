@@ -181,8 +181,10 @@ set(IODE_CLI_TARGET iodecmd)
 add_subdirectory ("cmd")
 set(IODE_GUI_TARGET iode_gui)
 add_subdirectory ("gui")
-add_subdirectory ("tests")
 add_subdirectory ("pyiode")
+
+# ---- tests ----
+add_subdirectory ("tests")
 
 # ---- user doc ----
 add_subdirectory ("doc")
