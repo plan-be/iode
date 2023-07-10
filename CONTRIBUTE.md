@@ -80,20 +80,53 @@ and provide a conda environment as argument:
 pyiode> makepy.bat py39 
 ```
 
+# Testing Project
+
+To test the C and C++ API, you first have to build them as explain above:
+```bash
+> cmake --build --preset <preset_config> --target iode_c_api
+> cmake --build --preset <preset_config> --target iode_cpp_api
+```
+
+The second step is to build the tests:
+```bash
+> cmake --build --preset <preset_config> --target test_c_api
+> cmake --build --preset <preset_config> --target test_cpp_api
+```
+
+The final and third step is to ask CMake to run the tests:
+```bash
+> ctest --preset c-api-<preset_config>
+> ctest --preset cpp-api-<preset_config>
+```
+
+# Working On An Issue
+
+To work on (an) issue(s), create a new local branch from the remote origin/master branch.
+The name of the branch must follow the template: \<your initials\>\_\<keyword\>\_\<rest\> 
+where `keyword` is:
+- `cli` or `cmd` when working on the IODE CLI (cmd)
+- `gui` when working on the graphical user interface
+- `cython` when working on the Python binding for IODE
+- `doc` when working on the user of dev documentation
+- `nsis` when working on the Windows Installer and Updater
+- `release` when preparing a new release 
+
+Each keyword triggers a specific job in the defined Github Actions workflows (see below).
+If none of the keywords above is used, the C and C++ API will be built and tested.
+
 # Github Actions
 
-The Github Actions workflow for IODE is defined in the YAML file ./.github/workflows/github-actions-iode.yml
+The Github Actions workflows for IODE are defined in the directory ./.github/workflows.
 
-The sub-directory ./.github/actions contains user defined actions that are used in the jobs defined in 
-the YAML file github-actions-iode.yml
+The sub-directory ./.github/actions contains the local actions (used in workflows).
 
-The jobs declared in ./.github/workflows/github-actions-iode.yml are triggered according to keywords present 
+The jobs declared in ./.github/workflows/github-actions-debug.yml are triggered according to keywords present 
 in the name of the pushed branch:
-- `build_and_test_api`  -> NOT triggered if the branch name contains either the word `doc` or `nsis`
-- `test_sanitize`       -> NOT triggered if the branch name contains the word `gui`, `cython`, `doc` or `nsis`
-- `build_cli`           -> triggered if the branch name contains the word `cmd`, `command` or `cli`
+- `build_and_test_api`  -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `cython`, `doc` or `nsis`
+- `test_sanitize`       -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `cython`, `doc` or `nsis`
+- `build_cli`           -> triggered if the branch name contains the word `cmd` or `cli`
 - `build_gui`           -> triggered if the branch name contains the word `gui`
 - `build_cython`        -> triggered if the branch name contains either the word `cython` or `nsis`
 - `build_doc`           -> triggered if the branch name contains either the word `doc` or `nsis`
-- `build_nsis`          -> triggered if the branch name contains the word `nsis`
-
+- `build_nsis`          -> triggered if the branch name contains either the word `nsis` or `release`
