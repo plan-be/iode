@@ -28,6 +28,7 @@
 - **.github\workflows**: Script for Github Actions (Tests + Build GUI + Build LaTeX doc)
 - **api**: C API
 - **cpp_api**: C++ API
+- **cmd**: IODE CLI (Command Line Interface)
 - **doc**: User documentation
 - **gui**: Qt GUI
 - **nsis**: NSIS Windows installer
