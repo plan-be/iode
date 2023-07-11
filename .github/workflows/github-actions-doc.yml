@@ -20,6 +20,8 @@ jobs:
           - name: Checkout repository code
             uses: actions/checkout@v2
           - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+          - name: update packages
+            run: sudo apt-get update
           - name: Install ninja
             run: sudo apt-get install -y ninja-build
           - name: Install Tex Live
