@@ -3,12 +3,7 @@ name: Build documentation
 on: 
   # line below makes jobs defined in this script (workflow) reusable
   # https://docs.github.com/en/actions/using-workflows/reusing-workflows
-  workflow_call:
-    inputs:
-      build-config:
-        default: 'windows-debug'
-        required: true
-        type: string
+  workflow_call
 
 jobs:
     build_doc:
