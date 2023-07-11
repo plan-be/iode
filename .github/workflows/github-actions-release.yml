@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  pull_request
+
+
+jobs:
+  # see https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow 
+  build_nsis_release:
+    if: contains(github.head_ref, 'release')
+    uses: ./.github/workflows/github-actions-nsis.yml 
+    with:
+      build-config: windows-release
+
+  build_and_release:
+    runs-on: ubuntu-latest
+    if: contains(github.head_ref, 'release')
+    needs: build_nsis_release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create assets dir
+        run: mkdir assets
+
+      - name: Restore CLI
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-cli
+          path: ${{ github.workspace }}/assets
+
+      - name: Restore Python binding files
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-python
+          path: ${{ github.workspace }}/assets
+
+      - name: Restore Windows Installer and Updater
+        uses: actions/download-artifact@v3
+        with:
+          name: iode-nsis
+          path: ${{ github.workspace }}/assets
+  
+      - name: Check Assets
+        run: ls ${{ github.workspace }}/assets
+
+      # see https://github.com/softprops/action-gh-release/tree/v1 
+      - name: Create new release on Github
+        uses: softprops/action-gh-release@v1
+        with:
+            fail_on_unmatched_files: true
+            generate_release_notes: false
+            prerelease: true
+            body_path: ${{ github.workspace }}/doc/changelog/versions/${{github.ref_name}}.rst.inc
+            files: |
+                ${{ github.workspace }}/assets/*
