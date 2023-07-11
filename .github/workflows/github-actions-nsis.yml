@@ -18,9 +18,7 @@ jobs:
         build-config: ${{ inputs.build-config }}
 
     build_doc:
-      uses: ./.github/workflows/github-actions-doc.yml 
-      with:
-        build-config: ${{ inputs.build-config }}
+      uses: ./.github/workflows/github-actions-doc.yml
 
     build_nsis:
         name: Build installer using NSIS

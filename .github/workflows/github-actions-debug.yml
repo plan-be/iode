@@ -37,9 +37,7 @@ jobs:
 
   build_doc:
       if: contains(github.head_ref, 'doc')
-      uses: ./.github/workflows/github-actions-doc.yml 
-      with:
-          build-config: windows-debug
+      uses: ./.github/workflows/github-actions-doc.yml
   
   build_nsis:
     if: contains(github.head_ref, 'nsis')
