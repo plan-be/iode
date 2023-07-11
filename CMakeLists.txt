@@ -125,6 +125,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- preprocessor ----
 add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 
 # ---- include ----
 # CMAKE_SOURCE_DIR is the full path to the top level 
