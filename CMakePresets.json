@@ -159,9 +159,19 @@
             "name": "linux-debug/tests/test_c_api"
         },
         {
+            "inherits": "linux-release",
+            "displayName": "TEST C API LINUX x64",
+            "name": "linux-release/tests/test_c_api"
+        },
+        {
             "inherits": "linux-debug",
             "displayName": "TEST CPP API LINUX x64",
             "name": "linux-debug/tests/test_cpp_api"
+        },
+        {
+            "inherits": "linux-release",
+            "displayName": "TEST CPP API LINUX x64",
+            "name": "linux-release/tests/test_cpp_api"
         },
         {
             "inherits": "linux-debug-sanitize",
@@ -179,9 +189,19 @@
             "name": "windows-debug/tests/test_c_api"
         },
         {
+            "inherits": "windows-release",
+            "displayName": "TEST C API Windows x64",
+            "name": "windows-release/tests/test_c_api"
+        },
+        {
             "inherits": "windows-debug",
             "displayName": "TEST CPP API Windows x64",
             "name": "windows-debug/tests/test_cpp_api"
+        },
+        {
+            "inherits": "windows-release",
+            "displayName": "TEST CPP API Windows x64",
+            "name": "windows-release/tests/test_cpp_api"
         },
         {
             "inherits": "windows-debug-sanitize",
@@ -239,10 +259,22 @@
             "configurePreset": "linux-debug/tests/test_c_api"
         },
         {
+            "name": "c-api-linux-release",
+            "inherits": "test-default",
+            "displayName": "TEST C API LINUX x64",
+            "configurePreset": "linux-release/tests/test_c_api"
+        },
+        {
             "name": "cpp-api-linux-debug",
             "inherits": "test-default",
             "displayName": "TEST CPP API LINUX x64",
             "configurePreset": "linux-debug/tests/test_cpp_api"
+        },
+        {
+            "name": "cpp-api-linux-release",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API LINUX x64",
+            "configurePreset": "linux-release/tests/test_cpp_api"
         },
         {
             "name": "c-api-linux-debug-sanitize",
@@ -263,10 +295,22 @@
             "configurePreset": "windows-debug/tests/test_c_api"
         },
         {
+            "name": "c-api-windows-release",
+            "inherits": "test-default",
+            "displayName": "TEST C API Windows x64",
+            "configurePreset": "windows-release/tests/test_c_api"
+        },
+        {
             "name": "cpp-api-windows-debug",
             "inherits": "test-default",
             "displayName": "TEST CPP API Windows x64",
             "configurePreset": "windows-debug/tests/test_cpp_api"
+        },
+        {
+            "name": "cpp-api-windows-release",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows x64",
+            "configurePreset": "windows-release/tests/test_cpp_api"
         },
         {
             "name": "c-api-windows-debug-sanitize",
