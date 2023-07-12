@@ -137,9 +137,9 @@ The change log files for each version are located in the directory doc/changes.
 
 ## Before the release
 
-1. Replace "In development" in the last change log file (directory doc/changes) by "Release on <current date>".
+1. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Release on <current date>".
 2. Commit your changes.
-3. Create an annotated tag on the new commit. The name of the tag is the name of the last change log file in doc/changes. The annotation should be something like "release <current date>".
+3. Create an annotated tag on the new commit. The name of the tag is the name of the last change log file in doc/changelog/versions. The annotation should be something like "release <current date>".
 
 ## Push The New Tag To Github
 
@@ -149,9 +149,10 @@ The change log files for each version are located in the directory doc/changes.
 
 ## After the release
 
-1. In the directory doc/changes, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
-2. Commit the new change log file.
-3. Create a Pull Request and push to master.
+1. In the directory doc/changelog/versions, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
+2. Add the line `.. include:: ./changes/<next_version_tag>.rst.inc` to the changes.rst file in the directory doc/changelog.
+3. Commit the changes.
+4. Create a Pull Request and push to master.
 
 # Github Actions
 
