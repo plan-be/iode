@@ -130,6 +130,9 @@ where `keyword` is:
 Each keyword triggers a specific job in the defined Github Actions workflows (see below).
 If none of the keywords above is used, the C and C++ API will be built and tested.
 
+**IMPORTANT**: Do not forget to update the change log file of the current version. 
+The change log files for each version are located in the directory doc/changes.
+
 # Github Actions
 
 The Github Actions workflows for IODE are defined in the directory ./.github/workflows.
