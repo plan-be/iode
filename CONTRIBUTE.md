@@ -133,6 +133,26 @@ If none of the keywords above is used, the C and C++ API will be built and teste
 **IMPORTANT**: Do not forget to update the change log file of the current version. 
 The change log files for each version are located in the directory doc/changes.
 
+# Create A Release
+
+## Before the release
+
+1. Replace "In development" in the last change log file (directory doc/changes) by "Release on <current date>".
+2. Commit your changes.
+3. Create an annotated tag on the new commit. The name of the tag is the name of the last change log file in doc/changes. The annotation should be something like "release <current date>".
+
+## Push The New Tag To Github
+
+1. Push the tag to Github: git push origin <tag_name>.
+2. Check that the pushed tag has triggered the Workflow `github-actions-release.yml` in the Github Actions. Wait until the end of the `build_and_release` job. 
+3. Check on Github if the new release has been created.
+
+## After the release
+
+1. In the directory doc/changes, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
+2. Commit the new change log file.
+3. Create a Pull Request and push to master.
+
 # Github Actions
 
 The Github Actions workflows for IODE are defined in the directory ./.github/workflows.
