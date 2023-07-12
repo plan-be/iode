@@ -1,7 +1,7 @@
 ﻿Version 7.01-beta.2
 ===================
 
-In development
+Released on 12/07/2023.
 
 Improvements ✨
 ---------------
