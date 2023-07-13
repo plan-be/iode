@@ -24,7 +24,7 @@ IODE_VERBOSE = 1
 
 def test_iode_version():
     result = iode.version()
-    assert result == "IODE Modeling Software 6.68 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+    assert result == "IODE Modeling Software 7.0 - (c) 1990-2023 Federal Planning Bureau - Brussels"
 
 # WS FUNCTIONS
 # ------------
