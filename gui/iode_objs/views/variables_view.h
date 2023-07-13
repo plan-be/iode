@@ -5,7 +5,7 @@
 #include <QShortcut>
 
 #include "main_window_plot.h"
-#include "abstract_table_view.h"
+#include "numerical_view.h"
 #include "iode_objs/models/variables_model.h"
 #include "iode_objs/delegates/variables_delegate.h"
 #include "iode_objs/new/add_variable.h"
@@ -14,18 +14,16 @@
 #include "menu/print_graph/graph_variables.h"
 
 
-class VariablesView : public TemplateTableView<VariablesModel>
+class VariablesView : public TemplateNumericalTableView<VariablesModel>
 {
 	Q_OBJECT
 
 	QShortcut* plotSeriesShortcut;
 	QShortcut* graphsDialogShortcut;
 
-private:
-	QList<QString> extractVariablesNamesFromTo();
-
 public:
-	VariablesView(QWidget* parent = nullptr) : TemplateTableView(I_VARIABLES, new VariablesDelegate(parent), parent) 
+	VariablesView(QWidget* parent = nullptr) 
+		: TemplateNumericalTableView(I_VARIABLES, new VariablesDelegate(parent), parent) 
 	{
 		// ---- Selection ----
 		// See: - https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-in-item-views
@@ -48,6 +46,8 @@ public:
 
 		connect(plotSeriesShortcut, &QShortcut::activated, this, &VariablesView::plot_series);
 		connect(graphsDialogShortcut, &QShortcut::activated, this, &VariablesView::open_graphs_dialog);
+
+		setupContextMenu();
 	};
 
 	~VariablesView()
@@ -62,6 +62,17 @@ public:
 		connect(this, &VariablesView::newPlot, main_window, &MainWindowPlot::appendDialog);
     	connect(this, &VariablesView::newGraphsDialog, main_window, 
         	&MainWindowPlot::open_graphs_variables_dialog_from_vars_view);
+	}
+
+	void setupContextMenu()
+    {
+        QAction* action;
+
+        action = addAction("Plot", "Plot selected variables", plotSeriesShortcut->key());
+        QObject::connect(action, &QAction::triggered, this, &VariablesView::plot_series);
+
+        action = addAction("Plot dialog", "Open the plot dialog", graphsDialogShortcut->key());
+        QObject::connect(action, &QAction::triggered, this, &VariablesView::open_graphs_dialog);
 	}
 
 signals:

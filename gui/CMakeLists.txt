@@ -105,6 +105,7 @@ set(GUI_OBJS_DELEGATES
 
 set(GUI_OBJS_VIEWS
     iode_objs/views/abstract_table_view.h   iode_objs/views/abstract_table_view.cpp
+    iode_objs/views/numerical_view.h
     iode_objs/views/comments_view.h         iode_objs/views/comments_view.cpp
     iode_objs/views/equations_view.h        iode_objs/views/equations_view.cpp
     iode_objs/views/identities_view.h       iode_objs/views/identities_view.cpp
