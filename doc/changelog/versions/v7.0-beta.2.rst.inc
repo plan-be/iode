@@ -1,4 +1,4 @@
-﻿Version 7.01-beta.2
+﻿Version 7.0-beta.2
 ===================
 
 Released on 12/07/2023.
