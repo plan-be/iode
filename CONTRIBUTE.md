@@ -152,7 +152,9 @@ The change log files for each version are located in the directory doc/changes.
 1. In the directory doc/changelog/versions, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
 2. Add the line `.. include:: ./changes/<next_version_tag>.rst.inc` to the changes.rst file in the directory doc/changelog.
 3. Commit the changes.
-4. Create a Pull Request and push to master.
+4. Update all references MAJOR_VERSION.MINOR_VERSION everywhere in the project (in iode.h, documentation, ...)
+5. Commit the changes.
+6. Create a Pull Request and push to master.
 
 # Github Actions
 
