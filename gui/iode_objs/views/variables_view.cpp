@@ -78,48 +78,14 @@ void VariablesView::new_obj()
 	filter_and_update();
 }
 
-QList<QString> VariablesView::extractVariablesNamesFromTo()
-{
-	QModelIndexList selection = this->selectedIndexes();
-
-	int row;
-	int minRow = model()->rowCount();
-	int maxRow = 0;
-	int col;
-	int minColumn = model()->columnCount();
-	int maxColumn = 0;
-	foreach(const QModelIndex& index, selection)
-	{
-		row = index.row();
-		if(row < minRow) minRow = row;
-		if(row > maxRow) maxRow = row;
-		col = index.column();
-		if(col < minColumn) minColumn = col;
-		if(col > maxColumn) maxColumn = col;
-	}
-
-	VariablesModel* varModel = static_cast<VariablesModel*>(model());
-	QList<QString> varsFromTo;
-
-	// list of variables
-	for(row = minRow; row <= maxRow; row++) 
-		varsFromTo << varModel->headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
-
-	// from
-	varsFromTo << varModel->headerData(minColumn, Qt::Horizontal, Qt::DisplayRole).toString();
-	// to
-	varsFromTo << varModel->headerData(maxColumn, Qt::Horizontal, Qt::DisplayRole).toString();
-
-	return varsFromTo;
-}
-
 void VariablesView::plot_series()
 {
 	try
 	{
-		QList<QString> variableNames = extractVariablesNamesFromTo();
-		QString to = variableNames.takeLast();
-		QString from = variableNames.takeLast();
+		QStringList variableNames = extractObjectsNames();
+		QStringList sample = extractSample();
+		QString from = sample.first();
+		QString to = sample.last();
 
 		QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog();
 
@@ -142,9 +108,10 @@ void VariablesView::open_graphs_dialog()
 {
 	try
 	{
-		QList<QString> variableNames = extractVariablesNamesFromTo();
-		QString to = variableNames.takeLast();
-		QString from = variableNames.takeLast();
+		QStringList variableNames = extractObjectsNames();
+		QStringList sample = extractSample();
+		QString from = sample.first();
+		QString to = sample.last();
 
 		emit newGraphsDialog(variableNames, from, to);
 	}

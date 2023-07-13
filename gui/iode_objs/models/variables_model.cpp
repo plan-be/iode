@@ -22,7 +22,7 @@ bool VariablesModel::setValue(const int row, const int column, const QVariant& v
 {
 	try
 	{
-		double val = (value == "--") ? L_NAN : value.toDouble();
+		double val = (value == NAN_REP || value == "") ? L_NAN : value.toDouble();
 		kdb->set_var(row, column, val);
 		return true;
 	}
