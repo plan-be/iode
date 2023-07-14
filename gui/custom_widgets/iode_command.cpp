@@ -60,10 +60,8 @@ void QIodeCommandLine::run_command()
         {
             if(!executedCommandsList.contains(cmd)) executedCommandsList.append(cmd);
             it = executedCommandsList.constEnd();
-            // connected to MainWindow::update_current_tab()
+            // connected to MainWindow::update_tab_and_completer()
             emit returnPressed();
-            // check if databases have changed
-            askComputeHash(false);
         }
     }
     catch(const std::exception& e)

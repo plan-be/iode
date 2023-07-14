@@ -1688,7 +1688,7 @@
    <sender>lineEdit_iode_command</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>update_current_tab()</slot>
+   <slot>update_tab_and_completer()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>875</x>
@@ -1902,7 +1902,7 @@
   <slot>saveCurrentTab()</slot>
   <slot>saveAllTabs()</slot>
   <slot>createNewProject()</slot>
-  <slot>update_current_tab()</slot>
+  <slot>update_tab_and_completer()</slot>
   <slot>display_keyboard_shortcuts()</slot>
   <slot>open_sort_and_calculus_dialog()</slot>
   <slot>open_list_calculus_dialog()</slot>

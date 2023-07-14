@@ -201,5 +201,5 @@ public slots:
 	void display_keyboard_shortcuts();
 
 	// Main Window
-	void update_current_tab();
+	void update_tab_and_completer(const int iodeType = -1);
 };
