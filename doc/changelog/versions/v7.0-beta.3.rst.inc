@@ -15,6 +15,7 @@ Improvements ✨
 Fixed Bugs 🛠️
 -------------
 
+* (GUI) Fixed windows representing Generalized Sample tables not being able to be displayed in fullscreen (#290)
 
 Miscellaneous 🤷‍♀️
 ----------------

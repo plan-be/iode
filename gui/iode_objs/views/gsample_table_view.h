@@ -13,24 +13,22 @@ class QIodeGSampleTableView : public QDialog
 
 public:
     QIodeGSampleTableView(const QString& refTable, const QString& gsample, const int nbDecimals, 
-        const QString& variables, QWidget* parent = Q_NULLPTR) : QDialog(parent)
+        const QString& variables, QWidget* parent = Q_NULLPTR) : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
     {
+        this->setGeometry(QRect(10, 50, 700, 250));
+
+        QGridLayout* gridLayout = new QGridLayout(this);
+        gridLayout->setObjectName("gridLayoutGSampleTable");
+
         QTableView* tableview = new QTableView(this);
         GSampleTableModel* model = new GSampleTableModel(refTable, gsample, nbDecimals, variables, tableview);
         tableview->setModel(model);
-
-        tableview->setGeometry(QRect(10, 50, 700, 250));
-
-        QSizePolicy sizePolicyTable(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicyTable.setHorizontalStretch(0);
-        sizePolicyTable.setVerticalStretch(0);
-        sizePolicyTable.setHeightForWidth(tableview->sizePolicy().hasHeightForWidth());
-        tableview->setSizePolicy(sizePolicyTable);
-        tableview->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         tableview->horizontalHeader()->setStretchLastSection(true);
 
         QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
         tableview->setStyleSheet(stylesheet);
+
+        gridLayout->addWidget(tableview, 0, 0, 1, 1);
 
         this->setModal(true);
         if(variables.isEmpty())
