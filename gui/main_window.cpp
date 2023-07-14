@@ -290,33 +290,37 @@ void MainWindow::check_vars_sample()
 		QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
 		if (reply == QMessageBox::Yes)
 		{
+            tabWidget_IODE_objs->computeHash(true);
+
 			QIodeEditVarsSample dialog(this);
 			dialog.exec();
-		}
-		else
-		{
-			return;
+
+            update_tab_and_completer(I_VARIABLES);
 		}
 	}
 }
 
 void MainWindow::open_import_comments_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuFileImportComments dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_COMMENTS);
-        completer->updateIodeOjectsListNames();
+        update_tab_and_completer(I_COMMENTS);
     }
 }
 
 void MainWindow::open_import_variables_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuFileImportVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
-        completer->updateIodeOjectsListNames();
+        update_tab_and_completer(I_VARIABLES);
     }
 }
 
@@ -340,28 +344,31 @@ void MainWindow::clear_workspace()
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer == QMessageBox::Yes)
     {
+        tabWidget_IODE_objs->computeHash(true);
         tabWidget_IODE_objs->clearWorkspace();
-        completer->updateIodeOjectsListNames();
+        update_tab_and_completer();
     }
 }
 
 void MainWindow::open_copy_into_workspace_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
     QIodeMenuWorkspaceCopyInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilters();
-        completer->updateIodeOjectsListNames();
+        update_tab_and_completer();
     }
 }
 
 void MainWindow::open_merge_into_workspace_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
     QIodeMenuWorkspaceMergeInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilters();
-        completer->updateIodeOjectsListNames();
+        update_tab_and_completer();
     }
 }
 
@@ -373,122 +380,149 @@ void MainWindow::open_change_workspace_descriptions_dialog()
 
 void MainWindow::open_change_variables_sample_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeEditVarsSample dialog(this);
     dialog.exec();
+
+    update_tab_and_completer(I_VARIABLES);
 }
 
 void MainWindow::open_extrapolate_variables_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuWorkspaceExtrapolateVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
-        // update current tab if needed
-        tabWidget_IODE_objs->showTab();
+        update_tab_and_completer(I_VARIABLES);
     }
 }
 
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuWorkspaceHighToLow dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
+        update_tab_and_completer(I_VARIABLES);
+    }
 }
 
 void MainWindow::open_low_to_high_dialog()
 {
     check_vars_sample();
+    tabWidget_IODE_objs->computeHash(true);
+    
     QIodeMenuWorkspaceLowToHigh dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
+        update_tab_and_completer(I_VARIABLES);
+    }
 }
 
 void MainWindow::open_seasonal_adjustment_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuWorkspaceSeasonalAdjustment dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 
 void MainWindow::open_trend_correction_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuWorkspaceTrendCorrection dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 
 // -------- Data Menu --------
 
 void MainWindow::open_sort_and_calculus_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataSortExpandList dialog(this);
-    dialog.exec();
-    completer->updateIodeOjectsListNames();
-    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
-    tabWidget_IODE_objs->showTab(index);
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer(I_LISTS);
 }
 
 void MainWindow::open_list_calculus_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataListCalculus dialog(this);
-    dialog.exec();
-    completer->updateIodeOjectsListNames();
-    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
-    tabWidget_IODE_objs->showTab(index);
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer(I_LISTS);
 }
 
 void MainWindow::open_file_contents_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataFileContents dialog(this);
-    dialog.exec();
-    completer->updateIodeOjectsListNames();
-    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
-    tabWidget_IODE_objs->showTab(index);
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer(I_LISTS);
 }
 
 void MainWindow::open_file_compare_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataFileCompare dialog(this);
-    dialog.exec();
-    completer->updateIodeOjectsListNames();
-    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
-    tabWidget_IODE_objs->showTab(index);
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer(I_LISTS);
 }
 
 void MainWindow::open_search_text_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataSearchText dialog(this);
-    dialog.exec();
-    completer->updateIodeOjectsListNames();
-    int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
-    tabWidget_IODE_objs->showTab(index);
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer(I_LISTS);
 }
 
 void MainWindow::open_scan_objects_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataScanObjects dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-    {
-        completer->updateIodeOjectsListNames();
-        int index = tabWidget_IODE_objs->updateObjectTab(I_LISTS);
-        tabWidget_IODE_objs->showTab(index);
-    }
+        update_tab_and_completer(I_LISTS);
 }
 
 void MainWindow::open_edit_tables_variables_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataEditTables dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_duplicate_objects_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuDataDuplicateObj dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_current_tab();
+        update_tab_and_completer();
 }
 
 // -------- Run Menu --------
 
 void MainWindow::open_compute_identities_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuComputeIdentities dialog(this);
 
     QString identites;
@@ -496,31 +530,44 @@ void MainWindow::open_compute_identities_dialog()
     if(identitiesList.size() > 0)
         dialog.setIdentitiesNames(identitiesList);
 
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 
 void MainWindow::open_compute_simulation_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuComputeSimulation dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 
 void MainWindow::open_compute_model_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuComputeModel dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 
 void MainWindow::open_compute_scc_decomposition_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuComputeSCCDecomposition dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 
 void MainWindow::open_compute_scc_simulation_dialog()
 {
+    tabWidget_IODE_objs->computeHash(true);
+
     QIodeMenuComputeSCCSimulation dialog(this);
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted)
+        update_tab_and_completer();
 }
 // -------- Print/Graphs Menu --------
 
@@ -621,10 +668,19 @@ void MainWindow::display_keyboard_shortcuts()
 
 // -------- Other slots --------
 
-void MainWindow::update_current_tab()
+void MainWindow::update_tab_and_completer(const int iodeType)
 {
-    // update current tab if needed
-    tabWidget_IODE_objs->showTab();
-    // update the list of Iode object names available for auto-complemention
-    completer->updateIodeOjectsListNames();
+    int index = -1;
+
+    // compute hash + update tab(s)
+    if(iodeType > 0)
+        index = tabWidget_IODE_objs->updateObjectTab((EnumIodeType) iodeType);
+    else
+        for(int i = 0; i < I_NB_TYPES; i++)
+            tabWidget_IODE_objs->updateObjectTab((EnumIodeType) i);
+
+        // update the list of Iode object names available for auto-complemention
+        completer->updateIodeOjectsListNames();
+        // show corresponding tab
+        tabWidget_IODE_objs->showTab(index);
 }
