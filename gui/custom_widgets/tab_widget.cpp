@@ -326,6 +326,9 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
         // extract corresponding tab widget
         AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
 
+        // compute hash
+        tabWidget->computeHash();
+
         // reset filter
         tabWidget->resetFilter();
 
