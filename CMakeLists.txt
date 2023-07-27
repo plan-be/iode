@@ -112,11 +112,33 @@ endif()
 message(STATUS "=============================")
 
 # ---- compile options ----
-add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
+# Debug info flag
+if(MSVC)
+  add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
+endif()
 
-# /Zi	Generates complete debugging information
+# /Zi | g:	Generates complete debugging information
+if(MSVC)
+  set(IODE_DEBUG_INFO_FLAG "-Zi")
+else()
+  set(IODE_DEBUG_INFO_FLAG "-g")
+endif()
+
+# Alignement flag
+if(MSVC)
+  set(IODE_ALIGNEMENT_FLAG "-Zp1")
+else()
+  set(IODE_ALIGNEMENT_FLAG "-fpack-struct=1")
+endif()
+
+# global flags
+if(CMAKE_COMPILER_IS_GNUCC)
+  add_compile_options("-Wno-implicit-int")
+  add_compile_options("-Wno-implicit-function-declaration")
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL  "Debug")
-   add_compile_options(-Zi)
+  add_compile_options(${IODE_DEBUG_INFO_FLAG})
 endif()
 
 # some code in the C++ API requires C++ 17
@@ -124,7 +146,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- preprocessor ----
-add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+if(MSVC)
+  add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+else()
+  add_compile_definitions(LINUX -DUNIX -DSCOU -DREALD -DSCRPROTO -DNOEMS -DNOEMF)
+endif()
 add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 
 # ---- include ----

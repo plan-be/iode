@@ -63,6 +63,6 @@ set (SCR_IODE
 add_library (iode_scr4 STATIC ${HEADER_IODE} ${SCR_IODE})
 
 # NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iode_scr4.
-#       Option -Zp1 makes compilation of the Google Test lib to fail
-target_compile_options(iode_scr4 PRIVATE -Zp1)
+#       Option ${IODE_ALIGNEMENT_FLAG} makes compilation of the Google Test lib to fail
+target_compile_options(iode_scr4 PRIVATE ${IODE_ALIGNEMENT_FLAG})
 target_include_directories (iode_scr4 PUBLIC ".")
