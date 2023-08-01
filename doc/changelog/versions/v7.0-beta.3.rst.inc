@@ -25,6 +25,8 @@ Fixed Bugs 🛠️
 
 * (GUI) Fixed shortcut F8 to compute and display the values of a table as a graph (#307)
 
+* (GUI) Enabled the menu Print/Graphs > Graphs from Tables (#309)
+
 Miscellaneous 🤷‍♀️
 ----------------
 
