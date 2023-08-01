@@ -26,6 +26,12 @@ public:
         return nb_digits;
     }
 
+protected:
+    QString valueToString(const double value) const
+    {
+        return L_ISAN(value) ? QString::number(value, 'g', nb_digits) : NAN_REP;
+    }
+
 public slots:
     void set_nb_digits(int nb_digits)
     {

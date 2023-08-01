@@ -4,7 +4,7 @@
 
 QVariant ScalarsModel::dataCell(const int row, const int col) const
 {
-	QVariant value;
+	QString value;
 
 	try
 	{
@@ -13,17 +13,17 @@ QVariant ScalarsModel::dataCell(const int row, const int col) const
 		switch (col)
 		{
 		case 0:
-			value = L_ISAN(scalar.value()) ? QString::number(scalar.value(), 'g', nb_digits) : NAN_REP;
+			value = valueToString(scalar.value());
 			break;
 		case 1:
-			value = L_ISAN(scalar.relax()) ? QString::number(scalar.relax(), 'g', nb_digits) : NAN_REP;
+			value = valueToString(scalar.relax());
 			break;
 		case 2:
-			value = L_ISAN(scalar.std()) ? QString::number(scalar.std(), 'g', nb_digits) : NAN_REP;
+			value = valueToString(scalar.std());
 			break;
 		case 3:
 			if (L_ISAN(scalar.value()) && L_ISAN(scalar.std()) && !L_IS0(scalar.std()))
-				value = QString::number(scalar.value() / scalar.std(), 'g', nb_digits);
+				value = valueToString(scalar.value() / scalar.std());
 			else
 				value = NAN_REP;
 			break;
