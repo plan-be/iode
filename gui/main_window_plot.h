@@ -16,6 +16,10 @@ protected:
 public:
     MainWindowPlot(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
 
+	virtual void computeHash(const bool value) = 0;
+
+	virtual void update_tab_and_completer(const int iodeType = -1) = 0;
+
 public slots:
 	void appendDialog(QDialog* dialog);
 	virtual void open_graphs_variables_dialog_from_vars_view(
