@@ -290,7 +290,7 @@ void MainWindow::check_vars_sample()
 		QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
 		if (reply == QMessageBox::Yes)
 		{
-            tabWidget_IODE_objs->computeHash(true);
+            computeHash(true);
 
 			QIodeEditVarsSample dialog(this);
 			dialog.exec();
@@ -302,7 +302,7 @@ void MainWindow::check_vars_sample()
 
 void MainWindow::open_import_comments_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuFileImportComments dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -314,7 +314,7 @@ void MainWindow::open_import_comments_dialog()
 
 void MainWindow::open_import_variables_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuFileImportVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -344,7 +344,7 @@ void MainWindow::clear_workspace()
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer == QMessageBox::Yes)
     {
-        tabWidget_IODE_objs->computeHash(true);
+        computeHash(true);
         tabWidget_IODE_objs->clearWorkspace();
         update_tab_and_completer();
     }
@@ -352,7 +352,7 @@ void MainWindow::clear_workspace()
 
 void MainWindow::open_copy_into_workspace_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
     QIodeMenuWorkspaceCopyInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
@@ -363,7 +363,7 @@ void MainWindow::open_copy_into_workspace_dialog()
 
 void MainWindow::open_merge_into_workspace_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
     QIodeMenuWorkspaceMergeInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
@@ -380,7 +380,7 @@ void MainWindow::open_change_workspace_descriptions_dialog()
 
 void MainWindow::open_change_variables_sample_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeEditVarsSample dialog(this);
     dialog.exec();
@@ -390,7 +390,7 @@ void MainWindow::open_change_variables_sample_dialog()
 
 void MainWindow::open_extrapolate_variables_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuWorkspaceExtrapolateVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -403,7 +403,7 @@ void MainWindow::open_extrapolate_variables_dialog()
 void MainWindow::open_high_to_low_dialog()
 {
     check_vars_sample();
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuWorkspaceHighToLow dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -416,7 +416,7 @@ void MainWindow::open_high_to_low_dialog()
 void MainWindow::open_low_to_high_dialog()
 {
     check_vars_sample();
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
     
     QIodeMenuWorkspaceLowToHigh dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -428,7 +428,7 @@ void MainWindow::open_low_to_high_dialog()
 
 void MainWindow::open_seasonal_adjustment_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuWorkspaceSeasonalAdjustment dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -437,7 +437,7 @@ void MainWindow::open_seasonal_adjustment_dialog()
 
 void MainWindow::open_trend_correction_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuWorkspaceTrendCorrection dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -448,7 +448,7 @@ void MainWindow::open_trend_correction_dialog()
 
 void MainWindow::open_sort_and_calculus_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataSortExpandList dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -457,7 +457,7 @@ void MainWindow::open_sort_and_calculus_dialog()
 
 void MainWindow::open_list_calculus_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataListCalculus dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -466,7 +466,7 @@ void MainWindow::open_list_calculus_dialog()
 
 void MainWindow::open_file_contents_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataFileContents dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -475,7 +475,7 @@ void MainWindow::open_file_contents_dialog()
 
 void MainWindow::open_file_compare_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataFileCompare dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -484,7 +484,7 @@ void MainWindow::open_file_compare_dialog()
 
 void MainWindow::open_search_text_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataSearchText dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -493,7 +493,7 @@ void MainWindow::open_search_text_dialog()
 
 void MainWindow::open_scan_objects_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataScanObjects dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -502,7 +502,7 @@ void MainWindow::open_scan_objects_dialog()
 
 void MainWindow::open_edit_tables_variables_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataEditTables dialog(this);
     dialog.exec();
@@ -510,7 +510,7 @@ void MainWindow::open_edit_tables_variables_dialog()
 
 void MainWindow::open_duplicate_objects_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuDataDuplicateObj dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -521,7 +521,7 @@ void MainWindow::open_duplicate_objects_dialog()
 
 void MainWindow::open_compute_identities_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuComputeIdentities dialog(this);
 
@@ -536,7 +536,7 @@ void MainWindow::open_compute_identities_dialog()
 
 void MainWindow::open_compute_simulation_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuComputeSimulation dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -545,7 +545,7 @@ void MainWindow::open_compute_simulation_dialog()
 
 void MainWindow::open_compute_model_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuComputeModel dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -554,7 +554,7 @@ void MainWindow::open_compute_model_dialog()
 
 void MainWindow::open_compute_scc_decomposition_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuComputeSCCDecomposition dialog(this);
     if (dialog.exec() == QDialog::Accepted)
@@ -563,7 +563,7 @@ void MainWindow::open_compute_scc_decomposition_dialog()
 
 void MainWindow::open_compute_scc_simulation_dialog()
 {
-    tabWidget_IODE_objs->computeHash(true);
+    computeHash(true);
 
     QIodeMenuComputeSCCSimulation dialog(this);
     if (dialog.exec() == QDialog::Accepted)

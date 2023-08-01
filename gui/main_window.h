@@ -201,5 +201,10 @@ public slots:
 	void display_keyboard_shortcuts();
 
 	// Main Window
-	void update_tab_and_completer(const int iodeType = -1);
+	void computeHash(const bool value) override
+	{
+		tabWidget_IODE_objs->computeHash(value);
+	}
+
+	void update_tab_and_completer(const int iodeType = -1) override;
 };
