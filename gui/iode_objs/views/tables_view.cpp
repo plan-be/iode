@@ -35,3 +35,70 @@ void TablesView::edit_obj()
 	
 	update();
 }
+
+void TablesView::display()
+{
+	// get the selected object
+	QModelIndexList selection = this->selectionModel()->selectedRows();
+	if(selection.size() == 0) 
+		return;
+	QModelIndex index = selection[0];
+
+	QString tableName = model()->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
+
+	try
+	{
+		// check if global sample is defined
+		if(!checkGlobalSample())
+			return;
+
+		// generates the GSample representing the whole global sample
+		KDBVariables kdb_var;
+		Sample smpl = kdb_var.get_sample();
+		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+
+		// computes and display the selected table
+		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+		QIodeGSampleTableView* view = new QIodeGSampleTableView(tableName, gsample, 2, "", this);
+		main_window->appendDialog(view);
+	}
+    catch (const std::exception& e)
+    {
+        QMessageBox::warning(this, "WARNING", "Could not compute table " + tableName + ":\n" + QString::fromStdString(e.what()));
+        return;
+    }
+}
+
+void TablesView::plot()
+{
+	// get the selected object
+	QModelIndexList selection = this->selectionModel()->selectedRows();
+	if(selection.size() == 0) 
+		return;
+	QModelIndex index = selection[0];
+
+	QString tableName = model()->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
+
+	try
+	{
+		// check if global sample is defined
+		if(!checkGlobalSample())
+			return;
+
+		// generates the GSample representing the whole global sample
+		KDBVariables kdb_var;
+		Sample smpl = kdb_var.get_sample();
+		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+
+		// computes the tables and generates the associated graph
+		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+		GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample.toStdString());
+		QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
+		main_window->appendPlot(plotDialog);
+	}
+    catch (const std::exception& e)
+    {
+        QMessageBox::warning(this, "WARNING", "Could not compute table " + tableName + ":\n" + QString::fromStdString(e.what()));
+        return;
+    }
+}
