@@ -52,10 +52,10 @@ void QIodeMenuGraphTables::display()
         std::string tables_names = wTableNames->extractAndVerify().toStdString();
         char** list_tables_names = filter_kdb_names(I_TABLES, tables_names);
         int nb_tables = SCR_tbl_size((unsigned char**) list_tables_names);
-        QList<QString> qTablesList;
+        QStringList qTablesList;
         for(int i=0; i<nb_tables; i++) qTablesList << QString::fromStdString(std::string(list_tables_names[i]));
 
-        std::string sample = wSample->extractAndVerify().toStdString();
+        std::string gsample = wSample->extractAndVerify().toStdString();
 
         std::string file_2 = wFile2->extractAndVerify().toStdString();
         std::string file_3 = wFile3->extractAndVerify().toStdString();
@@ -69,16 +69,17 @@ void QIodeMenuGraphTables::display()
         if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
         if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
 
-        QMessageBox::warning(this, "WARNING", "Display is not yet implemented");
-
-        //QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog();
-        //connect(plotDialog, &QIodePlotDialog::finished, this, QIodeMenuGraphTables::freeReferenceKDBs);
-        //plotDialog->plot(qVarsList, from, to, chartType, axisType, logScale, xTicks, yTicks, minY, maxY);
-        //emit newPlot(plotDialog);
+        MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+        foreach(const QString& tableName, qTablesList)
+        {
+            GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample);
+            QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
+            main_window->appendPlot(plotDialog);
+        }
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        QMessageBox::warning(this, "WARNING", "" + QString::fromStdString(e.what()));
         return;
     }
 }
