@@ -27,3 +27,21 @@ bool IdentitiesModel::setValue(const int row, const int column, const QVariant& 
 		return false;
 	}
 }
+
+void IdentitiesModel::executeIdentity(const int row)
+{
+	QString name = headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
+
+	try
+	{
+		KDBVariables kdb_vars;
+		Sample sample = kdb_vars.get_sample();
+		kdb->execute_identities(sample.start_period(), sample.end_period(), name.toStdString());
+		QMessageBox::information(nullptr, "INFO", "Identity " + name + " successfully executed");
+	}
+	catch(const std::exception& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", 
+			"Could not execute identity " + name + ":\n\n" + QString::fromStdString(e.what()));
+	}
+}
