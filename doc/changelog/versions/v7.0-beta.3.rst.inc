@@ -19,6 +19,8 @@ Fixed Bugs 🛠️
 
 * (GUI) Fixed IODE objects tabs not being updated when running any item from the menus of the main window (#295)
 
+* (GUI) Fixed shortcut F7 (Shift + F7) to execute selected identity (identities) (#306)
+
 Miscellaneous 🤷‍♀️
 ----------------
 
