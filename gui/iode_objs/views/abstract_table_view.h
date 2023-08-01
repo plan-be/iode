@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "util/print.h"
 #include "iode_objs/delegates/base_delegate.h"
+#include "iode_objs/edit/edit_vars_sample.h"
 
 
 class AbstractTableView : public QTableView
@@ -78,6 +79,24 @@ public:
 	void enableDeleteShortcut(bool enable)
 	{
 		deleteShortcut->setEnabled(enable);
+	}
+
+	bool checkGlobalSample()
+	{
+		// check global sample and ask to set it if not already defined
+		KDBVariables kdb;
+		if (kdb.get_nb_periods() == 0)
+		{
+			QWidget* p = static_cast<QWidget*>(parent());
+			QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
+			if (reply == QMessageBox::Yes)
+			{
+				QIodeEditVarsSample dialog(this);
+				return dialog.exec() == QDialog::Accepted;
+			}
+			else
+				return false;
+		}
 	}
 
 signals:
