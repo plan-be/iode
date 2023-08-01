@@ -57,20 +57,8 @@ void VariablesView::print()
 
 void VariablesView::new_obj()
 {
-	// check variables sample and ask to set it if not already defined
-	KDBVariables kdb;
-	if (kdb.get_nb_periods() == 0)
-	{
-		QWidget* p = static_cast<QWidget*>(parent());
-		QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
-		if (reply == QMessageBox::Yes)
-		{
-			QIodeEditVarsSample dialog(this);
-			dialog.exec();
-		}
-		else
-			return;
-	}
+	if(!checkGlobalSample())
+		return;
 
 	QIodeAddVariable dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
