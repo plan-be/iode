@@ -21,6 +21,10 @@ Fixed Bugs 🛠️
 
 * (GUI) Fixed shortcut F7 (Shift + F7) to execute selected identity (identities) (#306)
 
+* (GUI) Fixed shortcut F7 to compute and display the values of a table (#307)
+
+* (GUI) Fixed shortcut F8 to compute and display the values of a table as a graph (#307)
+
 Miscellaneous 🤷‍♀️
 ----------------
 
