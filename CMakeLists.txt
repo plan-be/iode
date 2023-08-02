@@ -5,11 +5,6 @@ cmake_minimum_required (VERSION 3.25)
 
 # List of CMAKE variables: https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 
-# ---- user defined variables ----
-set(IS_DEBUG_BUILD (CMAKE_BUILD_TYPE STREQUAL  "Debug"))
-set(IS_GNU (CMAKE_CXX_COMPILER_ID MATCHES GNU))
-set(IS_CLANG (CMAKE_CXX_COMPILER_ID MATCHES Clang))
-
 # ---- dependencies ----
 
 # -- Google Test --
@@ -74,7 +69,7 @@ message(STATUS "Generator:          ${CMAKE_GENERATOR}")
 #   In order to use AddressSanitizer you will need to compile and link your program the -fsanitize=address flag. 
 #   See https://github.com/google/sanitizers/wiki/AddressSanitizer for more details
 # Note: sanitizer options are availalbe for cl, clang and gcc
-if(IS_DEBUG_BUILD AND IODE_ENABLE_SANITIZER)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND IODE_ENABLE_SANITIZER)
 if(MSVC)
   # Warning: many options are currently (Visual Studio 2019) NOT avaible for MSVC
   #set(IODE_SANITIZER_FLAGS "-fsanitize=address")
@@ -132,12 +127,12 @@ else()
 endif()
 
 # global flags
-if(CMAKE_COMPILER_IS_GNUCC)
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
   add_compile_options("-Wno-implicit-int")
   add_compile_options("-Wno-implicit-function-declaration")
 endif()
 
-if (CMAKE_BUILD_TYPE STREQUAL  "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_compile_options(${IODE_DEBUG_INFO_FLAG})
 endif()
 
