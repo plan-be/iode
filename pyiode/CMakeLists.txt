@@ -2,6 +2,24 @@
 
 message(STATUS "\n---- CYTHON ----\n")
 
+if(MSVC)
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(IODE_CYTHON_FLAGS "\"${IODE_DEBUG_INFO_FLAG}\", \"/Od\"")
+  else()
+    set(IODE_CYTHON_FLAGS "\"/O2\"")
+  endif()
+  set(IODE_CYTHON_FLAGS "${IODE_CYTHON_FLAGS}, \"/DVC\", \"/DSCRPROTO\", \"/DREALD\"")
+else()
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(IODE_CYTHON_FLAGS "\"${IODE_DEBUG_INFO_FLAG}\", \"-Og\"")
+  else()
+  set(IODE_CYTHON_FLAGS "\"-Ofast\"")
+  endif()
+endif()
+set(IODE_CYTHON_FLAGS "[${IODE_CYTHON_FLAGS}]")
+
+message(STATUS "Compile options for Cython: ${IODE_CYTHON_FLAGS}\n")
+
 message(STATUS "Generating the Python script ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py")
 message(STATUS "from the template file ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py.in")
 
