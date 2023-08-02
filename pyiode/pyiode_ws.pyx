@@ -290,7 +290,7 @@ def ws_htol_sum(filename: str, varlist):
 
 # Low to High
 # -----------
-def ws_ltoh(filename: str, varlist, series_type, method:int):
+def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
     #if type(varlist) == list:
     if isinstance(varlist, list):
         varlist = ' '.join(varlist)
@@ -303,8 +303,8 @@ def ws_ltoh(filename: str, varlist, series_type, method:int):
         if B_WsLtoHStock(cstr(arg)):
             raise RuntimeError(f"ws_ltoh_stock() on file {filename} failed.")
 
-def ws_ltoh_flow(filename: str, varlist, method: int = LTOH_CS):
+def ws_ltoh_flow(filename: str, varlist, method: Union[int, str] = LTOH_CS):
     ws_ltoh(filename, varlist, LTOH_FLOW, method)
 
-def ws_ltoh_stock(filename: str, varlist, method: int = LTOH_CS):
+def ws_ltoh_stock(filename: str, varlist, method: Union[int, str] = LTOH_CS):
     ws_ltoh(filename, varlist, LTOH_STOCK, method)
