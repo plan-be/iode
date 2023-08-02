@@ -15,6 +15,8 @@ Improvements ✨
 Fixed Bugs 🛠️
 -------------
 
+* (PYTHON) Fixed Iode Python module only compiled with the Debug configuration (#313) 
+
 * (GUI) Fixed windows representing Generalized Sample tables not being able to be displayed in fullscreen (#290)
 
 * (GUI) Fixed IODE objects tabs not being updated when running any item from the menus of the main window (#295)
