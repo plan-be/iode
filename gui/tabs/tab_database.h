@@ -381,8 +381,8 @@ public:
 
         // connect
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this->objmodel, &M::set_nb_digits);
-        QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this->objmodel, &M::nb_dec_plus);
-        QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this->objmodel, &M::nb_dec_minus);
+        QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
+        QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &QIodeNumericalObjectWidget::saveSettings);
 
         // reload nb decimals
