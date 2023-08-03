@@ -322,7 +322,7 @@ int RP_warning(char* arg)
     if(arg == NULL || arg[0] == 0) return(0); /* JMP 11-07-96 */
 
     if(strlen(arg) > 512) arg[512] = 0;
-    kwarning(arg);
+    kwarning("%s", arg);
     return(0);
 }
 
