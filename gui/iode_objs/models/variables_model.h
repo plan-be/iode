@@ -7,13 +7,15 @@
 #include "numerical_table_model.h"
 
 
-class VariablesModel : public NumericalTableModel<KDBVariables>
+class VariablesModel : public QIodeTemplateTableModel<KDBVariables>, public NumericalTableModel
 {
 	Q_OBJECT
 
 public:
-	VariablesModel(QObject* parent = nullptr, KDBVariables* kdb_external = nullptr, 
-		const int nb_digits = 2) : NumericalTableModel({}, parent, kdb_external, nb_digits) {}
+	VariablesModel(QObject* parent = nullptr, KDBVariables* kdb_external = nullptr, const int nb_digits = 2): 
+		QIodeTemplateTableModel({}, parent, kdb_external), 
+		NumericalTableModel(nb_digits)
+	{}
 
 	QVariant dataCell(const int row, const int col) const override;
 

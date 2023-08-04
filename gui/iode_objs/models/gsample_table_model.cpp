@@ -2,8 +2,9 @@
 
 
 GSampleTableModel::GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
-    const QString& variables, QObject *parent) : QAbstractTableModel(parent), refTable(refTable), 
-    nbDecimals(nbDecimals), variables(variables)
+    const QString& variables, QObject *parent): 
+    QAbstractTableModel(parent), NumericalTableModel(nbDecimals),
+    refTable(refTable), nbDecimals(nbDecimals), variables(variables)
 {
     if(!variables.isEmpty())
     {

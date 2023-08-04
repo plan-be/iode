@@ -380,7 +380,7 @@ public:
         shortcutNbDecMinus->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
-        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this->objmodel, &M::set_nb_digits);
+        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &QIodeNumericalObjectWidget::setNbDigits);
         QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &QIodeNumericalObjectWidget::saveSettings);
@@ -395,6 +395,12 @@ public:
         delete spinBox_nbDigits;
         delete shortcutNbDecPlus;
         delete shortcutNbDecMinus;
+    }
+
+    void setNbDigits(const int value)
+    {
+        this->objmodel->set_nb_digits(value);
+        this->objmodel->reset();
     }
 
     void setProjectDir(const QDir& projectDir) override
