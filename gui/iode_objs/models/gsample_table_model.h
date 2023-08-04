@@ -13,6 +13,7 @@
 
 #include "utils.h"
 #include "custom_widgets/filechooser.h"
+#include "numerical_table_model.h"
 
 
 /* NOTE FOR THE DEVELOPPERS:
@@ -24,7 +25,7 @@
  * 
  */
 
-class GSampleTableModel : public QAbstractTableModel
+class GSampleTableModel : public QAbstractTableModel, NumericalTableModel
 {
     QString refTable;
     QString variables;
@@ -53,4 +54,11 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
+public slots:
+	void reset()
+	{
+		beginResetModel();
+		endResetModel();
+	}
 };
