@@ -5,13 +5,15 @@
 #include <QShortcut>
 
 #include "main_window_plot.h"
-#include "numerical_view.h"
 #include "iode_objs/models/variables_model.h"
 #include "iode_objs/delegates/variables_delegate.h"
 #include "iode_objs/new/add_variable.h"
 #include "plot/plot_vars.h"
 #include "custom_widgets/print_file_dialog.h"
 #include "menu/print_graph/graph_variables.h"
+#ifndef TEMPLATE_NUMERICAL_VIEW_HEADER
+#include "numerical_view.h"
+#endif
 
 
 class VariablesView : public TemplateNumericalTableView<VariablesModel>

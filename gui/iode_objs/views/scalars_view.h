@@ -2,10 +2,12 @@
 
 #include <QObject>
 
-#include "numerical_view.h"
 #include "iode_objs/models/scalars_model.h"
 #include "iode_objs/delegates/scalars_delegate.h"
 #include "iode_objs/new/add_scalar.h"
+#ifndef TEMPLATE_NUMERICAL_VIEW_HEADER
+#include "numerical_view.h"
+#endif
 
 
 class ScalarsView : public TemplateNumericalTableView<ScalarsModel>
