@@ -25,7 +25,7 @@
  * 
  */
 
-class GSampleTableModel : public QAbstractTableModel, NumericalTableModel
+class GSampleTableModel : public QAbstractTableModel, public NumericalTableModel
 {
     QString refTable;
     QString variables;
