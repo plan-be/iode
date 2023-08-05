@@ -29,6 +29,8 @@ Fixed Bugs 🛠️
 
 * (GUI) Enabled the menu Print/Graphs > Graphs from Tables (#309)
 
+* (GUI) Display NaN values correctly in GSample tables (using -- instead of -2e37) (#311)
+
 Miscellaneous 🤷‍♀️
 ----------------
 
