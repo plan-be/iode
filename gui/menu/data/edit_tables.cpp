@@ -43,7 +43,7 @@ void QIodeMenuDataEditTables::display()
         for(int i=0; i < nb_names; i++)
         {
             QString tableName(c_table_names[i]); 
-            QIodeGSampleTableView* view = new QIodeGSampleTableView(tableName, gsample, 3, "", this);
+            QIodeGSampleTableView* view = new QIodeGSampleTableView(tableName, gsample, 4, "", this);
             tableViews.append(view);
             view->open();
         }
