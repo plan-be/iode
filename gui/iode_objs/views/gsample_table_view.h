@@ -5,6 +5,11 @@
 #include <QHeaderView>
 
 #include "iode_objs/models/gsample_table_model.h"
+#ifndef GSAMPLE_NUMERICAL_VIEW_HEADER
+#define _GSAMPLE_
+#include "numerical_view.h"
+#undef _GSAMPLE_
+#endif
 
 
 class QIodeGSampleTableView : public QDialog
@@ -20,7 +25,7 @@ public:
         QGridLayout* gridLayout = new QGridLayout(this);
         gridLayout->setObjectName("gridLayoutGSampleTable");
 
-        QTableView* tableview = new QTableView(this);
+        GSampleNumericalTableView* tableview = new GSampleNumericalTableView(this);
         GSampleTableModel* model = new GSampleTableModel(refTable, gsample, nbDecimals, variables, tableview);
         tableview->setModel(model);
         tableview->horizontalHeader()->setStretchLastSection(true);

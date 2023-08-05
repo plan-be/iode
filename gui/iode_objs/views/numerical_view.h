@@ -1,4 +1,17 @@
-#pragma once
+/* NOTE FOR THE DEVELOPPERS:
+ * 1. We do not use the preprocessor directive #pragma once so that two 
+ *    different versions of the class _NUMERICAL_VIEW_CLASS_NAME_ below can be built.
+ *    Depending on if _GSAMPLE_ is defined or not.
+ * 
+ * 2. Multiple Inheritance Requires QObject to Be First
+ *    If you are using multiple inheritance, moc assumes that the first inherited class
+ *    is a subclass of QObject. Also, be sure that only the first inherited class is a QObject.
+ *    https://doc.qt.io/qt-6/moc.html#multiple-inheritance-requires-qobject-to-be-first
+ *    --> That's why we to play with preprocessor directives to inherit from either 
+ *        QTableView or TemplateTableView.
+ * 
+ * 3. Do NOT forget to add safeguards when including the present hearder!
+ */
 
 #include <QList>
 #include <QMenu>
@@ -6,14 +19,28 @@
 #include <QString>
 #include <QShortcut>
 #include <QClipboard>
+#include <QTableView>
 #include <QMessageBox>
+
+#ifdef _GSAMPLE_
+#define GSAMPLE_NUMERICAL_VIEW_HEADER
+
+#include "utils.h"
+
+#define _NUMERICAL_VIEW_CLASS_NAME_ GSampleNumericalTableView
+
+class _NUMERICAL_VIEW_CLASS_NAME_ : public QTableView
+#else
+#define TEMPLATE_NUMERICAL_VIEW_HEADER
 
 #include "abstract_table_view.h"
 #include "iode_objs/delegates/base_delegate.h"
 #include "iode_objs/models/abstract_table_model.h"
 
+#define _NUMERICAL_VIEW_CLASS_NAME_ TemplateNumericalTableView
 
-template <class M> class TemplateNumericalTableView : public TemplateTableView<M>
+template <class M> class _NUMERICAL_VIEW_CLASS_NAME_ : public TemplateTableView<M>
+#endif
 {
     QShortcut* shortcutCopy;
     QShortcut* shortcutCopyIncludingHeaders;
@@ -46,42 +73,52 @@ private:
         contextMenu = new QMenu(this);
 
         action = addAction("Copy", "Copy selected values to the clipboard", shortcutCopy->key());
-        QObject::connect(action, &QAction::triggered, this, &TemplateNumericalTableView::copy);
+        QObject::connect(action, &QAction::triggered, this, &_NUMERICAL_VIEW_CLASS_NAME_::copy);
 
         action = addAction("Copy Including Headers", "Copy selected values and headers to the clipboard", shortcutCopyIncludingHeaders->key());
-        QObject::connect(action, &QAction::triggered, this, &TemplateNumericalTableView::copyIncludingHeaders);
+        QObject::connect(action, &QAction::triggered, this, &_NUMERICAL_VIEW_CLASS_NAME_::copyIncludingHeaders);
 
+#ifndef _GSAMPLE_
         action = addAction("Paste", "Paste values contained in the clipboard", shortcutPast->key());
-        QObject::connect(action, &QAction::triggered, this, &TemplateNumericalTableView::paste);
+        QObject::connect(action, &QAction::triggered, this, &_NUMERICAL_VIEW_CLASS_NAME_::paste);
+#endif
     }
 
 public:
-    TemplateNumericalTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr):
+#ifdef _GSAMPLE_
+    _NUMERICAL_VIEW_CLASS_NAME_(QWidget* parent = nullptr): QTableView(parent)
+#else
+    _NUMERICAL_VIEW_CLASS_NAME_(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr):
         TemplateTableView<M>(iodeType, delegate, parent) 
+#endif
     {
         shortcutCopy = new QShortcut(QKeySequence::Copy, this);
-        shortcutCopyIncludingHeaders = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C), this);
-        shortcutPast = new QShortcut(QKeySequence::Paste, this);
-
         shortcutCopy->setContext(Qt::WidgetWithChildrenShortcut);
+        QObject::connect(shortcutCopy, &QShortcut::activated, this, &_NUMERICAL_VIEW_CLASS_NAME_::copy);
+        
+        shortcutCopyIncludingHeaders = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C), this);
         shortcutCopyIncludingHeaders->setContext(Qt::WidgetWithChildrenShortcut);
+        QObject::connect(shortcutCopyIncludingHeaders, &QShortcut::activated, this, &_NUMERICAL_VIEW_CLASS_NAME_::copyIncludingHeaders);
+        
+#ifndef _GSAMPLE_
+        shortcutPast = new QShortcut(QKeySequence::Paste, this);
         shortcutPast->setContext(Qt::WidgetWithChildrenShortcut);
-
-        QObject::connect(shortcutCopy, &QShortcut::activated, this, &TemplateNumericalTableView::copy);
-        QObject::connect(shortcutCopyIncludingHeaders, &QShortcut::activated, this, &TemplateNumericalTableView::copyIncludingHeaders);
-        QObject::connect(shortcutPast, &QShortcut::activated, this, &TemplateNumericalTableView::paste);
+        QObject::connect(shortcutPast, &QShortcut::activated, this, &_NUMERICAL_VIEW_CLASS_NAME_::paste);
+#endif
 
         // context menu = popup menu displayed when a user right clicks
         setupContextMenu();
     }
 
-    ~TemplateNumericalTableView()
+    ~_NUMERICAL_VIEW_CLASS_NAME_()
     {
         delete contextMenu;
 
         delete shortcutCopy;
         delete shortcutCopyIncludingHeaders;
+#ifndef _GSAMPLE_
         delete shortcutPast;
+#endif
     }
 
     void copy()
@@ -124,16 +161,16 @@ public:
         }
     }
 
+#ifndef _GSAMPLE_
     void paste()
     {
         try
         {
             QModelIndex start = this->selectionModel()->selectedIndexes().first();
+            QAbstractItemModel* model_ = this->model();
 
             QClipboard* clipboard = QApplication::clipboard();
             QString text = clipboard->text();
-
-            M* model_ = static_cast<M*>(AbstractTableView::model());
 
             // If the text from clipboard ends with the new-line character (which is the case when we copy 
             // from Excel), the QString::split() function returns a list ending by an empty element. 
@@ -160,13 +197,13 @@ public:
             QMessageBox::warning(nullptr, "WARNING", "Can't paste values\n\n" + QString::fromStdString(e.what()));
         }
     }
+#endif
 
 protected:
     QStringList extractObjectsNames()
     {
         QItemSelectionRange selection_range =  this->selectionModel()->selection().first();
-
-        M* model_ = static_cast<M*>(AbstractTableView::model());
+        QAbstractItemModel* model_ = this->model();
 
         QStringList objectNames;
         for(int row = selection_range.top(); row <= selection_range.bottom(); row++)
@@ -178,8 +215,7 @@ protected:
     QStringList extractSample()
     {
         QItemSelectionRange selection_range =  this->selectionModel()->selection().first();
-
-        M* model_ = static_cast<M*>(AbstractTableView::model());
+        QAbstractItemModel* model_ = this->model();
 
         QStringList sample;
         for(int column = selection_range.left(); column <= selection_range.right(); column++)
@@ -192,8 +228,7 @@ protected:
     {
 
         QItemSelectionRange selection_range =  this->selectionModel()->selection().first();
-
-        M* model_ = static_cast<M*>(AbstractTableView::model());
+        QAbstractItemModel* model_ = this->model();
 
         QString value;
         QList<QStringList> values;
@@ -202,7 +237,7 @@ protected:
             QStringList rowValues;
             for(int column = selection_range.left(); column <= selection_range.right(); column++)
             {
-                value = model_->dataCell(row, column).toString();
+                value = model_->data(model_->index(row, column), Qt::DisplayRole).toString();
                 rowValues << ((value == NAN_REP) ? "" : value);
             }
             values.push_back(rowValues);
