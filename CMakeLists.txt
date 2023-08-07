@@ -19,7 +19,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # ---- main project ----
-project ("iode" VERSION 7.01 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAGES C CXX)
+project ("iode" VERSION 7.0 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAGES C CXX)
 
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
