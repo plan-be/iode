@@ -3,8 +3,7 @@
 
 GSampleTableModel::GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
     const QString& variables, QObject *parent): 
-    QAbstractTableModel(parent), NumericalTableModel(nbDecimals),
-    refTable(refTable), nbDecimals(nbDecimals), variables(variables)
+    GSampleNumericalTableModel(nbDecimals, parent), refTable(refTable), variables(variables)
 {
     if(!variables.isEmpty())
     {
@@ -53,7 +52,7 @@ QVariant GSampleTableModel::data(const QModelIndex& index, int role) const
 		return int(Qt::AlignLeft);
 
 	if (role == Qt::DisplayRole || role == Qt::EditRole)
-		return valueToString(table->get_value(index.row(), index.column(), nbDecimals));
+		return valueToString(table->get_value(index.row(), index.column(), get_nb_digits()));
 
 	return QVariant();
 }
