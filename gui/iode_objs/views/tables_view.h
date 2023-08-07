@@ -5,11 +5,16 @@
 
 #include "abstract_table_view.h"
 #include "iode_objs/delegates/tables_delegate.h"
-#include "iode_objs/views/gsample_table_view.h"
 #include "iode_objs/models/tables_model.h"
 #include "iode_objs/edit/edit_table.h"
 #include "iode_objs/new/add_table.h"
 #include "plot/plot_table.h"
+
+#ifndef GSAMPLE_NUMERICAL_WIDGET_HEADER
+#define _GSAMPLE_
+#include "tabs/tab_numerical_values.h"
+#undef _GSAMPLE_
+#endif
 
 
 class TablesView : public TemplateTableView<TablesModel>

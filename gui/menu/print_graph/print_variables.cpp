@@ -76,7 +76,7 @@ void QIodeMenuPrintVariables::display()
         if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
         if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
 
-        QIodeGSampleTableView view(tableName, gsample, nb_decimals, variables, this);
+        GSampleNumericalDialog view(tableName, gsample, nb_decimals, variables, this);
         view.exec();
     }
     catch (const std::exception& e)

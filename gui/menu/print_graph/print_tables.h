@@ -9,8 +9,13 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "print_abstract.h"
-#include "iode_objs/views/gsample_table_view.h"
 #include "custom_widgets/completer.h"
+
+#ifndef GSAMPLE_NUMERICAL_WIDGET_HEADER
+#define _GSAMPLE_
+#include "tabs/tab_numerical_values.h"
+#undef _GSAMPLE_
+#endif
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -24,7 +29,7 @@ class QIodeMenuPrintTables: public QIodeMenuPrintAbstract, public Ui::QIodeMenuP
 {
     Q_OBJECT
     
-    QVector<QIodeGSampleTableView*> tableViews;
+    QVector<GSampleNumericalDialog*> tableViews;
 
     WrapperQPlainTextEdit*   wTablesNames;
 

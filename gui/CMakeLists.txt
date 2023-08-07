@@ -30,6 +30,7 @@ set(GUI_SETTINGS
 set(GUI_TABS
                             tabs/tab_abstract.h
                             tabs/tab_database_abstract.h
+                            tabs/tab_numerical_values.h
                             tabs/tab_database.h
                             tabs/tab_text_abstract.h        tabs/tab_text_abstract.cpp
     tabs/tab_text.ui        tabs/tab_text.h                 tabs/tab_text.cpp
@@ -114,7 +115,6 @@ set(GUI_OBJS_VIEWS
     iode_objs/views/scalars_view.h          iode_objs/views/scalars_view.cpp
     iode_objs/views/tables_view.h           iode_objs/views/tables_view.cpp
     iode_objs/views/variables_view.h        iode_objs/views/variables_view.cpp
-    iode_objs/views/gsample_table_view.h
 )
 
 set(GUI_IODE_MISC
