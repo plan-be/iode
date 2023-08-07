@@ -137,7 +137,7 @@ The change log files for each version are located in the directory doc/changes.
 
 ## Before the release
 
-1. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Release on <current date>".
+1. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on <current date>".
 2. Commit your changes.
 3. Create an annotated tag on the new commit. The name of the tag is the name of the last change log file in doc/changelog/versions. The annotation should be something like "release <current date>".
 
