@@ -270,7 +270,7 @@ int gui_view_tbl(char* name, char *smpl, char** vars_names)
 		variables += QString(vars_names[i]) + ";";
 
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	QIodeGSampleTableView view(tableName, gsample, nb_decimals, variables, main_window);
+	GSampleNumericalDialog view(tableName, gsample, nb_decimals, variables, main_window);
 	return view.exec();
 }
 

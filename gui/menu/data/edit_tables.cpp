@@ -19,7 +19,7 @@ QIodeMenuDataEditTables::QIodeMenuDataEditTables(QWidget* parent)
 QIodeMenuDataEditTables::~QIodeMenuDataEditTables()
 {
     clear_all_reference_kdbs();
-    foreach(QIodeGSampleTableView* view, tableViews) view->close();
+    foreach(GSampleNumericalDialog* view, tableViews) view->close();
     tableViews.clear();
 
     delete wTablesNames;
@@ -43,7 +43,7 @@ void QIodeMenuDataEditTables::display()
         for(int i=0; i < nb_names; i++)
         {
             QString tableName(c_table_names[i]); 
-            QIodeGSampleTableView* view = new QIodeGSampleTableView(tableName, gsample, 4, "", this);
+            GSampleNumericalDialog* view = new GSampleNumericalDialog(tableName, gsample, 4, "", this);
             tableViews.append(view);
             view->open();
         }

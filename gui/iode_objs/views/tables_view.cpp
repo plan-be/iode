@@ -59,7 +59,7 @@ void TablesView::display()
 
 		// computes and display the selected table
 		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-		QIodeGSampleTableView* view = new QIodeGSampleTableView(tableName, gsample, 4, "", this);
+		GSampleNumericalDialog* view = new GSampleNumericalDialog(tableName, gsample, 4, "", this);
 		main_window->appendDialog(view);
 	}
     catch (const std::exception& e)
