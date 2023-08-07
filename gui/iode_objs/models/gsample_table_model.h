@@ -13,7 +13,11 @@
 
 #include "utils.h"
 #include "custom_widgets/filechooser.h"
+#ifndef GSAMPLE_NUMERICAL_MODEL_HEADER
+#define _GSAMPLE_
 #include "numerical_table_model.h"
+#undef _GSAMPLE_
+#endif
 
 
 /* NOTE FOR THE DEVELOPPERS:
@@ -25,11 +29,10 @@
  * 
  */
 
-class GSampleTableModel : public QAbstractTableModel, public NumericalTableModel
+class GSampleTableModel : public GSampleNumericalTableModel
 {
     QString refTable;
     QString variables;
-    int nbDecimals;
 
     GSampleTable *table;
 

@@ -34,6 +34,7 @@ inline QUrl url_manual;
 inline QUrl url_readme;
 inline QUrl url_shortcuts;
 const static QString defaultFontFamily = "Consolas, \"Courier New\", monospace";
+const static int MAX_NB_DIGITS_TABLE = 10;
 
 
 /* ****************************** *
