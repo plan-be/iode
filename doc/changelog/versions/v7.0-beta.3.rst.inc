@@ -1,11 +1,7 @@
 Version 7.0-beta.3
 ===================
 
-In development
-
-New Features 🎉
----------------
-
+Released on 07/08/2023.
 
 Improvements ✨
 ---------------
@@ -32,7 +28,3 @@ Fixed Bugs 🛠️
 * (GUI) Display NaN values correctly in GSample tables (using -- instead of -2e37) (#311)
 
 * (GUI) Enabled the possibility for users to choose the number of digits to display in GSample tables (#312)
-
-Miscellaneous 🤷‍♀️
-----------------
-
