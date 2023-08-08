@@ -18,8 +18,8 @@ QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent)
     to = QString::fromStdString(sample->end_period().to_string());
     for(const std::string& name: est->get_list_equations()) variables_names << QString::fromStdString(name);
 
-	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowPlot::appendDialog);
+	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowAbstract::appendDialog);
 
     fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
     fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);

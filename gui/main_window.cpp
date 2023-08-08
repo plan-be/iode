@@ -9,7 +9,7 @@ QWidget* get_main_window_ptr()
 }
 
 
-MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent)
+MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
 {
     // ---- setup the present class ----
     setupUi(this);

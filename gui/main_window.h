@@ -73,7 +73,7 @@
  *        - CTRL + SHIFT + D clears the whole workspace. 
  * 
  */
-class MainWindow : public MainWindowPlot, public Ui::MainWindow
+class MainWindow : public MainWindowAbstract, public Ui::MainWindow
 {
 	Q_OBJECT
 

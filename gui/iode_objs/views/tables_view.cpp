@@ -58,7 +58,7 @@ void TablesView::display()
 		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 		// computes and display the selected table
-		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 		GSampleNumericalDialog* view = new GSampleNumericalDialog(tableName, gsample, 4, "", this);
 		main_window->appendDialog(view);
 	}
@@ -91,7 +91,7 @@ void TablesView::plot()
 		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 		// computes the tables and generates the associated graph
-		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 		GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample.toStdString());
 		QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
 		main_window->appendPlot(plotDialog);
