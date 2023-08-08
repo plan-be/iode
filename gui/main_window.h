@@ -90,8 +90,6 @@ private:
 
 	QShortcut* fullScreenShortcut;
 
-	QIodeCompleter* completer;
-
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	~MainWindow();

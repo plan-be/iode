@@ -4,6 +4,7 @@
 
 #include "utils.h"
 #include "plot/plot.h"
+#include "custom_widgets/completer.h"
 
 
 class MainWindowAbstract: public QMainWindow
@@ -11,10 +12,17 @@ class MainWindowAbstract: public QMainWindow
 	Q_OBJECT
 
 protected:
+	QIodeCompleter* completer;
+
 	QVector<QDialog*> dialogs;
 
 public:
     MainWindowAbstract(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
+
+	QIodeCompleter* getCompleter()
+	{
+		return completer;
+	}
 
 	virtual void computeHash(const bool value) = 0;
 

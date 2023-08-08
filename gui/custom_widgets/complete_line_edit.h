@@ -27,8 +27,7 @@ protected:
     QIodeCompleter* c;
 
 public:
-    QIodeCompleteLineEdit(QWidget *parent = nullptr, QIodeCompleter* c=nullptr) 
-        : QLineEdit(parent), c(c) {}
+    QIodeCompleteLineEdit(QWidget *parent = nullptr): QLineEdit(parent), c(nullptr) {}
 
     QIodeCompleter* getCompleter() const
     {
