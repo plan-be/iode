@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QShortcut>
 
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 #include "abstract_table_view.h"
 #include "iode_objs/models/identities_model.h"
 #include "iode_objs/delegates/identities_delegate.h"

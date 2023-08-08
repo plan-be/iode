@@ -4,7 +4,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 #include "iode_objs/models/variables_model.h"
 #include "iode_objs/delegates/variables_delegate.h"
 #include "iode_objs/new/add_variable.h"

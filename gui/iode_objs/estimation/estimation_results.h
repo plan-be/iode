@@ -13,7 +13,7 @@
 #include "wrapper_classes.h"
 #include "iode_objs/models/scalars_model.h"
 #include "plot/plot_vars.h"
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 
 
 class QIodeEstimationResults : public QDialog, public Ui::QIodeEstimationResults

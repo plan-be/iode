@@ -14,7 +14,7 @@
 #include <QMainWindow>
 
 #include "ui_main_window.h"
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 
 #include "utils.h"
 
