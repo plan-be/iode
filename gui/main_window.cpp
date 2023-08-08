@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowPlot(parent)
     setupUi(this);
 
     // ---- prepare auto-completion ----
-    completer = std::make_shared<QIodeCompleter>(true, false, -1, this);
+    completer = new QIodeCompleter(true, false, -1, this);
     lineEdit_iode_command->setup(textEdit_output, completer);
 
     // ---- dock widgets ----
@@ -98,6 +98,8 @@ MainWindow::~MainWindow()
     user_settings->setValue("fontFamily", QVariant(fontFamily));
 
     delete user_settings;
+
+    delete completer;
 
     delete fullScreenShortcut;
 }

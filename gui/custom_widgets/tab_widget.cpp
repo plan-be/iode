@@ -234,7 +234,7 @@ void QIodeTabWidget::saveSettings()
     project_settings->endGroup();
 }
 
-void QIodeTabWidget::setup(std::shared_ptr<QIodeCompleter>& completer, QTextEdit* output)
+void QIodeTabWidget::setup(QIodeCompleter* completer, QTextEdit* output)
 {
     // set completer
     this->completer = completer;

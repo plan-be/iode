@@ -39,10 +39,10 @@ public:
     QIodeCommandLine(QWidget *parent = nullptr) 
         : QIodeCompleteLineEdit(parent), it(executedCommandsList.end()) {}
 
-    void setup(QTextEdit* output, std::shared_ptr<QIodeCompleter>& c) 
+    void setup(QTextEdit* output, QIodeCompleter* c) 
     { 
         this->output = output;
-        setCompleter(c.get());
+        setCompleter(c);
     }
 
 protected:
