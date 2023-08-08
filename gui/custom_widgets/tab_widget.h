@@ -78,7 +78,7 @@ public:
     
     void saveSettings() override;
 
-    void setup(std::shared_ptr<QIodeCompleter>& completer, QTextEdit* output) override;
+    void setup(QIodeCompleter* completer, QTextEdit* output) override;
 
     int updateObjectTab(const EnumIodeType iodeType);
 

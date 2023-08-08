@@ -90,7 +90,7 @@ private:
 
 	QShortcut* fullScreenShortcut;
 
-	std::shared_ptr<QIodeCompleter> completer;
+	QIodeCompleter* completer;
 
 public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
