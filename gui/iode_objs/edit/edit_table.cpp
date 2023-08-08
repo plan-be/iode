@@ -26,8 +26,8 @@ QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent)
 	connect(shortcutDelete, &QShortcut::activated, this, &QIodeEditTable::delete_line);
     connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEditTable::showMaximized);
 
-	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowPlot::appendDialog);
+	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowAbstract::appendDialog);
 
 	// propagate signal
 	QIodeEditTableModel* table_model = static_cast<QIodeEditTableModel*>(tableView->model());

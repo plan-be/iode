@@ -30,7 +30,7 @@ void IdentitiesView::executeCurrentIdentity()
 		return;
 
 	// computes the selected identity + updates other IODE objects tabs is necessary
-	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 	main_window->computeHash(true);
 	static_cast<IdentitiesModel*>(model())->executeIdentity(index.row());	
 	main_window->update_tab_and_completer();	

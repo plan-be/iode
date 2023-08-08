@@ -243,8 +243,8 @@ void QIodeTabWidget::setup(QIodeCompleter* completer, QTextEdit* output)
     this->output = output;
 
     // connects to appendDialog() slot
-	MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-	connect(this, &QIodeTabWidget::newObjsListDialog, main_window, &MainWindowPlot::appendDialog);
+	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+	connect(this, &QIodeTabWidget::newObjsListDialog, main_window, &MainWindowAbstract::appendDialog);
 
     // close all tabs
     this->clear();

@@ -69,7 +69,7 @@ void QIodeMenuGraphTables::display()
         if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
         if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
 
-        MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
+        MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
         foreach(const QString& tableName, qTablesList)
         {
             GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample);

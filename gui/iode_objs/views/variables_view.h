@@ -60,10 +60,10 @@ public:
 
 	void setup() override
 	{	
-		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-		connect(this, &VariablesView::newPlot, main_window, &MainWindowPlot::appendDialog);
+		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+		connect(this, &VariablesView::newPlot, main_window, &MainWindowAbstract::appendDialog);
     	connect(this, &VariablesView::newGraphsDialog, main_window, 
-        	&MainWindowPlot::open_graphs_variables_dialog_from_vars_view);
+        	&MainWindowAbstract::open_graphs_variables_dialog_from_vars_view);
 	}
 
 	void setupContextMenu()

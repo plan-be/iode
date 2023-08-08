@@ -6,7 +6,7 @@
 #include "plot/plot.h"
 
 
-class MainWindowPlot: public QMainWindow
+class MainWindowAbstract: public QMainWindow
 {
 	Q_OBJECT
 
@@ -14,7 +14,7 @@ protected:
 	QVector<QDialog*> dialogs;
 
 public:
-    MainWindowPlot(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
+    MainWindowAbstract(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
 
 	virtual void computeHash(const bool value) = 0;
 

@@ -38,8 +38,8 @@ public:
 	{
 		connect(shortcutExecuteCurrentIdt, &QShortcut::activated, this, &IdentitiesView::executeCurrentIdentity);
 
-		MainWindowPlot* main_window = static_cast<MainWindowPlot*>(get_main_window_ptr());
-		connect(shortcutExecuteIdts, &QShortcut::activated, main_window, &MainWindowPlot::open_compute_identities_dialog);
+		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+		connect(shortcutExecuteIdts, &QShortcut::activated, main_window, &MainWindowAbstract::open_compute_identities_dialog);
 	}
 
 public slots:
