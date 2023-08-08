@@ -184,9 +184,9 @@ menu/print_graph/graph_variables.ui         menu/print_graph/graph_variables.h  
 set(GUI_MENUS ${GUI_MENU_FILE} ${GUI_MENU_WORKSPACE} ${GUI_MENU_DATA} ${GUI_MENU_COMPUTE} ${GUI_MENU_PRINT_GRAPH})
 
 set(GUI_MAIN    
-                        main_window_plot.h      main_window_plot.cpp
-    main_window.ui      main_window.h           main_window.cpp 
-                                                main.cpp
+                        main_window_abstract.h      main_window_abstract.cpp
+    main_window.ui      main_window.h               main_window.cpp 
+                                                    main.cpp
 ) 
 
 set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} ${GUI_PLOT}

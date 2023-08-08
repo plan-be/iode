@@ -7,7 +7,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "plot/plot_table.h"
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 #include "custom_widgets/completer.h"
 #include "menu/file/file_print_setup.h"
 

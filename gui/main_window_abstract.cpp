@@ -1,4 +1,4 @@
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 
 
 void MainWindowPlot::appendDialog(QDialog* dialog)

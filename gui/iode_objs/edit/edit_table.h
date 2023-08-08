@@ -13,7 +13,7 @@
 #include "wrapper_classes.h"
 
 #include "plot/plot_table.h"
-#include "main_window_plot.h"
+#include "main_window_abstract.h"
 #include "iode_objs/models/gsample_table_model.h"
 
 
