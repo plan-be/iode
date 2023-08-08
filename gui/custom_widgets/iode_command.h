@@ -1,4 +1,5 @@
 #pragma once
+#include "main_window_abstract.h"
 #include "custom_widgets/complete_line_edit.h"
 
 #include <QTextEdit>
@@ -39,10 +40,11 @@ public:
     QIodeCommandLine(QWidget *parent = nullptr) 
         : QIodeCompleteLineEdit(parent), it(executedCommandsList.end()) {}
 
-    void setup(QTextEdit* output, QIodeCompleter* c) 
+    void setup(QTextEdit* output) 
     { 
         this->output = output;
-        setCompleter(c);
+        MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+        setCompleter(main_window->getCompleter());
     }
 
 protected:

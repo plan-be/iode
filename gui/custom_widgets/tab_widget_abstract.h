@@ -111,12 +111,11 @@ public:
      * @brief - Initializes settings object and openedFiles list.
      *        - Reload previously opened files.
      * 
-     * @param completer QIodeCompleter* completer
      * @param output QTextEdit* output widget to display the output from the execution of a report.
      * 
      * TODO: merge setup() method with updateProjectDir()
      */
-    virtual void setup(QIodeCompleter* completer, QTextEdit* output) = 0;
+    virtual void setup(QTextEdit* output) = 0;
 
 	/**
 	 * @brief load a file and set corresponding tab text (filename) and tooltip (full absolute path).

@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
 
     // ---- prepare auto-completion ----
     completer = new QIodeCompleter(true, false, -1, this);
-    lineEdit_iode_command->setup(textEdit_output, completer);
+    lineEdit_iode_command->setup(textEdit_output);
 
     // ---- dock widgets ----
     // make left dock widget to extend to bottom of the window
@@ -183,7 +183,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
     treeView_file_explorer->updateProjectDir(projectDir);
 
     // (re)open tabs
-    tabWidget_IODE_objs->setup(completer, textEdit_output);
+    tabWidget_IODE_objs->setup(textEdit_output);
 
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);
