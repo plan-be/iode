@@ -15,9 +15,24 @@ QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent)
     this->setSizePolicy(sizePolicy);
 
     // prepare shortcuts
+    filepathShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_C), this);
+    revealExplorerShortcut = new QShortcut(QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_R), this);
     nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
     previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
     clearShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_D), this);
+    closeShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4), this);
+
+    // NOTE: By default, shortcuts are defined at the main Window level. 
+    //       Thus, a shortcut of a (combination of) key(s) may override the expected behavior 
+    //       from another widget dealing with the same (combination of) key(s). 
+    //       'setContext(Qt::WidgetWithChildrenShortcut)' makes sure that the shortcut does 
+    //       not propagate to other widgets.
+    filepathShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    revealExplorerShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    nextTabShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    previousTabShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    clearShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    closeShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
     // ---- file system watcher ----
     fileSystemWatcher = new QFileSystemWatcher(this);
@@ -27,21 +42,80 @@ QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent)
     connect(this, &QTabWidget::currentChanged, this, &QIodeAbstractTabWidget::showTab);
     connect(this, &QTabWidget::tabCloseRequested, this, &QIodeAbstractTabWidget::removeTab);
 
+    connect(filepathShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::absolutePath);
+    connect(revealExplorerShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::revealInFolder);
     connect(nextTabShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::showNextTab);
     connect(previousTabShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::showPreviousTab);
     connect(clearShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::clearCurrentTab);
+    connect(closeShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::closeCurrentTab);
 
     // rebuild the list of files (tabs) everytime a tab is moved
     connect(this->tabBar(), &QTabBar::tabMoved, this, &QIodeAbstractTabWidget::buildFilesList);
+
+    // popups a context menu when the user right clicks on a tab
+    this->tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->tabBar(), &QTabBar::customContextMenuRequested, this, &QIodeAbstractTabWidget::onCustomContextMenu);
+
+    // setup context menu
+    setupContextMenu();
 }
 
 QIodeAbstractTabWidget::~QIodeAbstractTabWidget()
 {
     if(fileSystemWatcher) delete fileSystemWatcher;
 
+    delete contextMenuDatabaseTab;
+    delete contextMenuTextTab;
+
+    delete filepathShortcut;
+    delete revealExplorerShortcut;
     delete nextTabShortcut;
     delete previousTabShortcut;
     delete clearShortcut;
+    delete closeShortcut;
+}
+
+void QIodeAbstractTabWidget::setupContextMenu()
+{
+    QAction* action;
+
+    // --- directory context menu
+    contextMenuTextTab = new QMenu(this);
+    contextMenuDatabaseTab = new QMenu(this);
+
+    // close tab
+    action = addAction("Close", "Close the tab", closeShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::closeCurrentTab);
+    contextMenuTextTab->addAction(action);
+
+    // save tab
+    action = addAction("Save", "Save the tab", QKeySequence(Qt::CTRL | Qt::Key_S));
+    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::saveCurrentTab);
+    contextMenuTextTab->addAction(action);
+    contextMenuDatabaseTab->addAction(action);
+
+    // separator 
+    contextMenuTextTab->addSeparator();
+    contextMenuDatabaseTab->addSeparator();
+
+    // absolute path
+    action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", filepathShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::absolutePath);
+    contextMenuTextTab->addAction(action);
+    contextMenuDatabaseTab->addAction(action);
+
+    // relative path
+    action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard");
+    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::relativePath);
+    contextMenuTextTab->addAction(action);
+    contextMenuDatabaseTab->addAction(action);
+
+    // reveal in explorer
+    action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
+        revealExplorerShortcut->key());
+    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::revealInFolder);
+    contextMenuTextTab->addAction(action);
+    contextMenuDatabaseTab->addAction(action);
 }
 
 void QIodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
@@ -228,4 +302,70 @@ void QIodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString
     // update file system watcher
     fileSystemWatcher->removePath(oldFilepath);
     fileSystemWatcher->addPath(newFilepath);
+}
+
+void QIodeAbstractTabWidget::closeCurrentTab()
+{
+    int index = currentIndex();
+    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    EnumIodeFile fileType = tabWidget->getFiletype();
+
+    // Tabs representing an IODE database file cannot be closed.
+    // This is by design.
+    if(fileType <= I_VARIABLES_FILE)
+        return;
+
+    removeTab(index);
+}
+
+void QIodeAbstractTabWidget::absolutePath()
+{
+    int index = currentIndex();
+    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    QString filepath = tabWidget->getFilepath();
+
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setText(filepath);
+}
+
+void QIodeAbstractTabWidget::relativePath()
+{
+    int index = currentIndex();
+    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    QString filepath = tabWidget->getFilepath();
+    QDir projectDir(projectDirPath); 
+    QString relativePath = projectDir.relativeFilePath(filepath);
+
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setText(relativePath);
+}
+
+void QIodeAbstractTabWidget::revealInFolder()
+{
+    int index = currentIndex();
+    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    QString filepath = tabWidget->getFilepath();
+    QFileInfo info(filepath);
+
+#if defined(Q_OS_WIN)
+    QStringList args;
+    args << "/select,";
+    args << QDir::toNativeSeparators(filepath);
+    if (QProcess::startDetached("explorer", args)) return;
+#elif defined(Q_OS_MAC)
+    QStringList args;
+    args << "-e";
+    args << "tell application \"Finder\"";
+    args << "-e";
+    args << "activate";
+    args << "-e";
+    args << "select POSIX file \"" + filepath + "\"";
+    args << "-e";
+    args << "end tell";
+    args << "-e";
+    args << "return";
+    if (!QProcess::execute("/usr/bin/osascript", args)) return;
+#else
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+#endif
 }

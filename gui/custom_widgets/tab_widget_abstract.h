@@ -53,12 +53,15 @@
  *        - Users are allowed to move tabs.
  *        - Open files with corresponding application (.xlsx with Excel, ...)
  *        - Reload file content if modified by another program. 
- *        - CTRL + S on a tab saves its content.
- *        - CTRL + SHIFT + S saves all tabs content.
- *        - CTRL + D on a KDB tab clears the corresponding KDB.
- *        - CTRL + SHIFT + D clears the whole workspace. 
- *        - ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab.
- *        - Ctrl+[shift]+Tab shift to the next [previous] tab.
+ *           -> CTRL + S on a tab saves its content.
+ *           -> CTRL + F4 on a tab closes it if the tab does not represent an IODE database.
+ *           -> SHIFT + ALT + C copies the absolute filepath.
+ *           -> SHIFT + ALT + R reveals file in OS file explorer.
+ *           -> CTRL + SHIFT + S saves all tabs content.
+ *           -> CTRL + D on a KDB tab clears the corresponding KDB.
+ *           -> CTRL + SHIFT + D clears the whole workspace. 
+ *           -> ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab.
+ *           -> CTRL + [SHIFT] + TAB shift to the next [previous] tab.
  * 
  */
 class QIodeAbstractTabWidget: public QTabWidget
@@ -78,9 +81,15 @@ protected:
     bool discard_all;
     QStringList listOpenAsText;
 
+	QMenu* contextMenuDatabaseTab;
+	QMenu* contextMenuTextTab;
+
+    QShortcut* filepathShortcut;
+    QShortcut* revealExplorerShortcut;
     QShortcut* nextTabShortcut;
     QShortcut* previousTabShortcut;
     QShortcut* clearShortcut;
+    QShortcut* closeShortcut;
 
 signals:
     void fileContentModified(const QString& filepath, const bool modified);
@@ -178,6 +187,29 @@ protected:
     void resetFileSystemWatcher(const QDir& projectDir);
 
 private:
+    /**
+     * @brief Create a context menu for the tab bar.
+     * 
+     */
+    void setupContextMenu();
+
+    /**
+     * @brief Add an action to the context menu.
+     * 
+     * @param name Name of the action displayed in the context menu
+     * @param tooltip 
+     * @param shortcut 
+     * @return QAction* 
+     */
+    QAction* addAction(const QString& name, const QString& tooltip, const QKeySequence& shortcut = QKeySequence())
+    {
+        QAction* action = new QAction(name, this);
+        action->setToolTip(tooltip);
+        action->setVisible(true);
+        if(!shortcut.isEmpty()) action->setShortcut(shortcut);
+        return action;
+    }
+
     /**
      * @brief add tab for editing reports.
      * 
@@ -435,6 +467,25 @@ protected slots:
     }
 
     /**
+     * @brief popups a context menu
+     * 
+     */
+    void onCustomContextMenu(const QPoint& point)
+    {
+        if (point.isNull())
+            return;
+     
+        int index = this->tabBar()->tabAt(point);
+        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        const QPoint globalPoint = this->tabBar()->mapToGlobal(point);
+        
+        if(tabWidget->getFiletype() <= I_VARIABLES_FILE)
+            contextMenuDatabaseTab->exec(globalPoint);
+        else
+            contextMenuTextTab->exec(globalPoint);
+    }
+
+    /**
      * @brief This virtual handler is called AFTER a new tab was added or 
      *        inserted at position index.
      * 
@@ -458,4 +509,29 @@ protected slots:
     {
         buildFilesList();
     }
+
+    /**
+     * @brief Closes the current tab
+     */
+    void closeCurrentTab();
+
+    /**
+     * @brief copy the absolute path of the selected path to the selected file
+     * 
+     */
+    void absolutePath();
+
+    /**
+     * @brief copy the relative path of the selected path to the selected file
+     * 
+     */
+    void relativePath();
+
+    /**
+     * @brief open an OS file explorer and highlight the selected file.
+     *        If several files selected, reveal only the last one (as in Visual Studio Code).
+     * 
+     */
+    void revealInFolder();
+
 };
