@@ -78,7 +78,7 @@ public:
     
     void saveSettings() override;
 
-    void setup(QTextEdit* output) override;
+    void setup() override;
 
     int updateObjectTab(const EnumIodeType iodeType);
 

@@ -115,6 +115,11 @@ public:
 		textEdit_output->append(output);
 	}
 
+	QTextEdit* getOutput() override
+	{
+		return textEdit_output;
+	}
+
 protected:
 	void closeEvent(QCloseEvent* event) override;
 	void check_vars_sample();

@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
 
     // ---- prepare auto-completion ----
     completer = new QIodeCompleter(true, false, -1, this);
-    lineEdit_iode_command->setup(textEdit_output);
 
     // ---- dock widgets ----
     // make left dock widget to extend to bottom of the window
@@ -42,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
     // ---- file explorer ----
     // connect the Tabs widget to the File Explorer
     treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
+
+    // ---- iode commands line ----
+    // setup the line widget to execute IODE commands
+    lineEdit_iode_command->setup();
 
     // ---- shortcuts ----
     fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
@@ -183,7 +186,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
     treeView_file_explorer->updateProjectDir(projectDir);
 
     // (re)open tabs
-    tabWidget_IODE_objs->setup(textEdit_output);
+    tabWidget_IODE_objs->setup();
 
     // add directory path to list of recently opened projects (= directories)
     addProjectPathToList(projectDir);

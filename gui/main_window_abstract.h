@@ -24,6 +24,8 @@ public:
 		return completer;
 	}
 
+	virtual QTextEdit* getOutput() = 0;
+
 	virtual void computeHash(const bool value) = 0;
 
 	virtual void update_tab_and_completer(const int iodeType = -1) = 0;

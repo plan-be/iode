@@ -40,10 +40,10 @@ public:
     QIodeCommandLine(QWidget *parent = nullptr) 
         : QIodeCompleteLineEdit(parent), it(executedCommandsList.end()) {}
 
-    void setup(QTextEdit* output) 
+    void setup() 
     { 
-        this->output = output;
         MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+        this->output = main_window->getOutput();
         setCompleter(main_window->getCompleter());
     }
 

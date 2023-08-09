@@ -24,7 +24,7 @@ class QIodeReportWidget : public QIodeAbstractEditor, public Ui::QIodeReportWidg
     Q_OBJECT
 
 public:
-    QIodeReportWidget(const QString& filepath,  QTextEdit* output, QWidget* parent = nullptr);
+    QIodeReportWidget(const QString& filepath, QWidget* parent = nullptr);
 
     QString getParameters() const
     {
