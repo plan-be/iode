@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QAction>
 #include <QShortcut>
 #include <QTabWidget>
 #include <QFileSystemWatcher>
@@ -53,15 +54,17 @@
  *        - Users are allowed to move tabs.
  *        - Open files with corresponding application (.xlsx with Excel, ...)
  *        - Reload file content if modified by another program. 
- *           -> CTRL + S on a tab saves its content.
- *           -> CTRL + F4 on a tab closes it if the tab does not represent an IODE database.
- *           -> SHIFT + ALT + C copies the absolute filepath.
- *           -> SHIFT + ALT + R reveals file in OS file explorer.
- *           -> CTRL + SHIFT + S saves all tabs content.
- *           -> CTRL + D on a KDB tab clears the corresponding KDB.
- *           -> CTRL + SHIFT + D clears the whole workspace. 
- *           -> ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab.
- *           -> CTRL + [SHIFT] + TAB shift to the next [previous] tab.
+ *           -> CTRL + S on a tab saves its content (*)
+ *           -> CTRL + F4 on a tab closes it if the tab does not represent an IODE database
+ *           -> SHIFT + ALT + C copies the absolute filepath
+ *           -> SHIFT + ALT + R reveals file in OS file explorer
+ *           -> CTRL + SHIFT + S saves all tabs content (*)
+ *           -> CTRL + D on a KDB tab clears the corresponding KDB
+ *           -> CTRL + SHIFT + D clears the whole workspace (*) 
+ *           -> ALT + [C|E|I|L|S|T|V] open the [Comments | Equations | Identities | Lists | Scalars | Tables | Variables] tab
+ *           -> CTRL + [SHIFT] + TAB shift to the next [previous] tab
+ * 
+ *        (*) defined in main_window.ui
  * 
  */
 class QIodeAbstractTabWidget: public QTabWidget
@@ -81,8 +84,10 @@ protected:
     bool discard_all;
     QStringList listOpenAsText;
 
-	QMenu* contextMenuDatabaseTab;
-	QMenu* contextMenuTextTab;
+    int indexContextMenu;
+	QMenu* contextMenu;
+    QAction* actionClose;
+    QAction* actionClear;
 
     QShortcut* filepathShortcut;
     QShortcut* revealExplorerShortcut;
@@ -394,12 +399,13 @@ public slots:
     }
 
     /**
-     * @brief save the content of the current tab.
-     *        Ask for a filepath if the tab represents a KDB and the KDB is not linked to any file.
+     * @brief Saves the content of the tab at position index where index is:
+     *        - current tab index if method called using a shortcut
+     *        - index defined by the context menu if called from a context menu
      * 
-     * @return bool whether or not the method has succeeded.
+     * @param index
      */
-    bool saveCurrentTab();
+    void saveTab();
 
     /**
      * @brief save all open tabs. 
@@ -408,12 +414,6 @@ public slots:
      * @return bool whether or not the method has succeeded. 
      */
     bool saveAllTabs();
-
-    /**
-     * @brief clear KDB of the current open tab if the later represents a KDB.
-     * 
-     */
-    virtual void clearCurrentTab() = 0;
     
     /**
      * @brief Update the path to the current project directory.
@@ -475,14 +475,25 @@ protected slots:
         if (point.isNull())
             return;
      
-        int index = this->tabBar()->tabAt(point);
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        indexContextMenu = this->tabBar()->tabAt(point);
+        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(indexContextMenu));
         const QPoint globalPoint = this->tabBar()->mapToGlobal(point);
         
+        // REMINDER: By design 
+        //           - there is only ONE tab per type of IODE database
+        //           - the tabs representing an IODE database CANNOT be closed
         if(tabWidget->getFiletype() <= I_VARIABLES_FILE)
-            contextMenuDatabaseTab->exec(globalPoint);
+        {
+            actionClose->setVisible(false);
+            actionClear->setVisible(true);
+        }
         else
-            contextMenuTextTab->exec(globalPoint);
+        {
+            actionClose->setVisible(true);
+            actionClear->setVisible(false);
+        }
+
+        contextMenu->exec(globalPoint);
     }
 
     /**
@@ -511,9 +522,22 @@ protected slots:
     }
 
     /**
-     * @brief Closes the current tab
+     * @brief Closes the tab at position index where index is:
+     *        - current tab index if method called using a shortcut
+     *        - index defined by the context menu if called from a context menu
+     * 
+     * @param index
      */
-    void closeCurrentTab();
+    void closeTab();
+
+    /**
+     * @brief Clears the IODE database displayed in the tab at position index where index is:
+     *        - current tab index if method called using a shortcut
+     *        - index defined by the context menu if called from a context menu
+     * 
+     * @param index
+     */
+    virtual void clearTab() = 0;
 
     /**
      * @brief copy the absolute path of the selected path to the selected file
@@ -533,5 +557,4 @@ protected slots:
      * 
      */
     void revealInFolder();
-
 };

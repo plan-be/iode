@@ -262,7 +262,7 @@ void MainWindow::open_recent_project()
 
 void MainWindow::saveCurrentTab()
 {
-    tabWidget_IODE_objs->saveCurrentTab();
+    tabWidget_IODE_objs->saveTab();
 }
 
 void MainWindow::saveAllTabs()

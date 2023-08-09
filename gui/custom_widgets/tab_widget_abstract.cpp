@@ -2,7 +2,7 @@
 
 
 QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent) 
-    : QTabWidget(parent), overwrite_all(false), discard_all(false)
+    : QTabWidget(parent), overwrite_all(false), discard_all(false), indexContextMenu(-1)
 {
     // set name
     this->setObjectName(QString::fromUtf8("tabWidget_IODE_objs"));
@@ -46,8 +46,8 @@ QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent)
     connect(revealExplorerShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::revealInFolder);
     connect(nextTabShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::showNextTab);
     connect(previousTabShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::showPreviousTab);
-    connect(clearShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::clearCurrentTab);
-    connect(closeShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::closeCurrentTab);
+    connect(clearShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::clearTab);
+    connect(closeShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::closeTab);
 
     // rebuild the list of files (tabs) everytime a tab is moved
     connect(this->tabBar(), &QTabBar::tabMoved, this, &QIodeAbstractTabWidget::buildFilesList);
@@ -64,8 +64,9 @@ QIodeAbstractTabWidget::~QIodeAbstractTabWidget()
 {
     if(fileSystemWatcher) delete fileSystemWatcher;
 
-    delete contextMenuDatabaseTab;
-    delete contextMenuTextTab;
+    delete actionClose;
+    delete actionClear;
+    delete contextMenu;
 
     delete filepathShortcut;
     delete revealExplorerShortcut;
@@ -80,42 +81,41 @@ void QIodeAbstractTabWidget::setupContextMenu()
     QAction* action;
 
     // --- directory context menu
-    contextMenuTextTab = new QMenu(this);
-    contextMenuDatabaseTab = new QMenu(this);
+    contextMenu = new QMenu(this);
 
-    // close tab
-    action = addAction("Close", "Close the tab", closeShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::closeCurrentTab);
-    contextMenuTextTab->addAction(action);
+    // close tab (MUST BE DISABLE FOR TABS REPRESENTING AN IODE DATABASE)
+    actionClose = addAction("Close", "Close the tab", closeShortcut->key());
+    connect(actionClose, &QAction::triggered, this, &QIodeAbstractTabWidget::closeTab);
+    contextMenu->addAction(actionClose);
 
     // save tab
     action = addAction("Save", "Save the tab", QKeySequence(Qt::CTRL | Qt::Key_S));
-    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::saveCurrentTab);
-    contextMenuTextTab->addAction(action);
-    contextMenuDatabaseTab->addAction(action);
+    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::saveTab);
+    contextMenu->addAction(action);
+
+    // clear tab (ONLY FOR TABS REPRESENTING AN IODE DATABASE)
+    actionClear = addAction("Clear", "Clear the correspondig IODE database", clearShortcut->key());
+    connect(actionClear, &QAction::triggered, this, &QIodeAbstractTabWidget::clearTab);
+    contextMenu->addAction(actionClear);
 
     // separator 
-    contextMenuTextTab->addSeparator();
-    contextMenuDatabaseTab->addSeparator();
+    contextMenu->addSeparator();
 
     // absolute path
     action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", filepathShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::absolutePath);
-    contextMenuTextTab->addAction(action);
-    contextMenuDatabaseTab->addAction(action);
+    contextMenu->addAction(action);
 
     // relative path
     action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard");
     connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::relativePath);
-    contextMenuTextTab->addAction(action);
-    contextMenuDatabaseTab->addAction(action);
+    contextMenu->addAction(action);
 
     // reveal in explorer
     action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
         revealExplorerShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::revealInFolder);
-    contextMenuTextTab->addAction(action);
-    contextMenuDatabaseTab->addAction(action);
+    contextMenu->addAction(action);
 }
 
 void QIodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
@@ -254,12 +254,6 @@ bool QIodeAbstractTabWidget::saveTabContent(const int index)
     }
 }
 
-bool QIodeAbstractTabWidget::saveCurrentTab()
-{
-    int index = currentIndex();
-    return saveTabContent(index);
-}
-
 bool QIodeAbstractTabWidget::saveAllTabs()
 {
     bool success = true;
@@ -304,9 +298,9 @@ void QIodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString
     fileSystemWatcher->addPath(newFilepath);
 }
 
-void QIodeAbstractTabWidget::closeCurrentTab()
+void QIodeAbstractTabWidget::closeTab()
 {
-    int index = currentIndex();
+    int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
     QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
     EnumIodeFile fileType = tabWidget->getFiletype();
 
@@ -316,6 +310,16 @@ void QIodeAbstractTabWidget::closeCurrentTab()
         return;
 
     removeTab(index);
+
+    indexContextMenu = -1;
+}
+
+void QIodeAbstractTabWidget::saveTab()
+{
+    int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
+    saveTabContent(index);
+
+    indexContextMenu = -1;
 }
 
 void QIodeAbstractTabWidget::absolutePath()
@@ -326,6 +330,8 @@ void QIodeAbstractTabWidget::absolutePath()
 
     QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(filepath);
+
+    indexContextMenu = -1;
 }
 
 void QIodeAbstractTabWidget::relativePath()
@@ -338,6 +344,8 @@ void QIodeAbstractTabWidget::relativePath()
 
     QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(relativePath);
+
+    indexContextMenu = -1;
 }
 
 void QIodeAbstractTabWidget::revealInFolder()
@@ -368,4 +376,6 @@ void QIodeAbstractTabWidget::revealInFolder()
 #else
     QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
 #endif
+
+    indexContextMenu = -1;
 }

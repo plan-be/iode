@@ -189,5 +189,5 @@ public slots:
         resetFileSystemWatcher(projectDir);
     }
 
-    void clearCurrentTab() override;
+    void clearTab() override;
 };
