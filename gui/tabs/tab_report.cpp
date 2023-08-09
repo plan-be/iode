@@ -1,7 +1,7 @@
 #include "tab_report.h"
 
 
-QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output, QWidget* parent): 
+QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent): 
     QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)
 {
     setupUi(this);
@@ -20,10 +20,8 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QTextEdit* output,
     autocomplete->setChecked(true);
     */
 
-    // set report editor
-    editor->setOutput(output);
-    MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-    editor->setCompleter(main_window->getCompleter());
+    // setup editor
+    editor->setup();
 
     // ---- Signals and Slots ----
     connect(editor, &TextEditor::modificationChanged, this, &QIodeReportWidget::setModified);

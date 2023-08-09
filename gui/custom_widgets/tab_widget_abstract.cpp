@@ -53,7 +53,7 @@ void QIodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
 
 int QIodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
-    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), output, this);
+    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), this);
     int index = addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
 

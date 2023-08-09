@@ -234,7 +234,7 @@ void QIodeTabWidget::saveSettings()
     project_settings->endGroup();
 }
 
-void QIodeTabWidget::setup(QTextEdit* output)
+void QIodeTabWidget::setup()
 {
     MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
     
@@ -242,7 +242,7 @@ void QIodeTabWidget::setup(QTextEdit* output)
     this->completer = main_window->getCompleter();
 
     // set output
-    this->output = output;
+    this->output = main_window->getOutput();
 
     // connects to appendDialog() slot
 	connect(this, &QIodeTabWidget::newObjsListDialog, main_window, &MainWindowAbstract::appendDialog);

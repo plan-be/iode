@@ -10,6 +10,7 @@
 #include "completer.h"
 #include "text_editor.h"
 #include "util/print.h"
+#include "main_window_abstract.h"
 
 
 /**
@@ -32,9 +33,11 @@ public:
     ReportEditor(QWidget *parent = nullptr);
     ~ReportEditor();
 
-    void setOutput(QTextEdit* output)
+    void setup()
     {
-        this->output = output;
+        MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+        this->output = main_window->getOutput();
+        setCompleter(main_window->getCompleter());
     }
 
     /**
