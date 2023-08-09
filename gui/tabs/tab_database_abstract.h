@@ -175,6 +175,9 @@ template <class M, class V> class QIodeObjectWidget: public AbstractIodeObjectWi
 protected:
     M* objmodel;
     V* tableview;
+    V* tableview_2;
+
+    QSplitter* splitter;
 
     QShortcut* shortcutPrint;
     QShortcut* shortcutAdd;
@@ -183,17 +186,28 @@ public:
     QIodeObjectWidget(EnumIodeType iodeType, QIodeAbstractTabWidget* parent) 
         : AbstractIodeObjectWidget(iodeType, parent)
     {
+        // prepare splitter
+        splitter = new QSplitter(parent);
+        splitter->setObjectName("splitter");
+        splitter->setGeometry(QRect(10, 43, 950, 560));
+        splitter->setOrientation(Qt::Horizontal);
+        splitter_ = splitter;
+
         // view table
-        tableview = new V(parent);
+        tableview = new V(splitter);
         tableview->setObjectName(QString::fromUtf8("tableview"));
-        tableview->setGeometry(QRect(10, 43, 950, 560));
+        
+        tableview_2 = new V(splitter);
+        tableview_2->setObjectName(QString::fromUtf8("tableview_2"));
 
         // model table
         objmodel = new M(tableview);
         tableview->setModel(objmodel);
+        tableview_2->setModel(objmodel);
 
         // IODE objects names filter
         tableview->setFilterLineEdit(lineEdit_filter);
+        tableview_2->setFilterLineEdit(lineEdit_filter);
         
         // shortcuts
         shortcutPrint = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_P), this);
@@ -209,7 +223,9 @@ public:
 
         // signals - slots
         connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter);
+        connect(lineEdit_filter, &QLineEdit::returnPressed, tableview_2, &V::filter);
         connect(pushButton_filter, &QPushButton::clicked, tableview, &V::filter);
+        connect(pushButton_filter, &QPushButton::clicked, tableview_2, &V::filter);
 
         connect(pushButton_print, &QPushButton::clicked, tableview, &V::print);
         connect(shortcutPrint, &QShortcut::activated, tableview, &V::print);
@@ -218,10 +234,15 @@ public:
         connect(shortcutAdd, &QShortcut::activated, tableview, &V::new_obj);
 
         connect(tableview, &AbstractTableView::showObjsRequest, parent, &QIodeAbstractTabWidget::showObjectsList);
+        connect(tableview_2, &AbstractTableView::showObjsRequest, parent, &QIodeAbstractTabWidget::showObjectsList);
+
+        splitter->addWidget(tableview);
+        splitter->addWidget(tableview_2);
+        tableview_2->hide();
 
         // insert table to layout
         // -1 -> span over all rows/columns
-        gridLayout->addWidget(tableview, row, 0, 1, -1);
+        gridLayout->addWidget(splitter, row, 0, 1, -1);
         row++;
     }
 
@@ -268,6 +289,7 @@ public:
     void setup()
     {
         tableview->setup();
+        tableview_2->setup();
     }
 
     bool load_(const QString& filepath, const bool forceOverwrite)
@@ -294,11 +316,36 @@ public:
 
     QStringList getSelectedObjectsNames() const 
     {
-        return tableview->getSelectedObjectsNames();
+        QStringList list;
+        list = tableview->getSelectedObjectsNames();
+        if(tableview_2->isVisible())
+            list += tableview_2->getSelectedObjectsNames();
+        return list;
     }
 
     void computeHash(const bool before=false)
     {
         objmodel->computeHash(before);
+    }
+
+    void split(const Qt::Orientation orientation) override
+    {
+        if(splitted_)
+            return;
+
+        if(splitter->orientation() != orientation)
+            splitter->setOrientation(orientation);
+
+        tableview_2->show();
+        splitted_ = true;
+    }
+
+    void unsplit() override
+    {
+        if(!splitted_)
+            return;
+
+        tableview_2->hide();
+        splitted_ = false;
     }
 };

@@ -55,6 +55,9 @@ public:
     QString save();
     QString saveAs_();
 
+    void split(const Qt::Orientation orientation) override;
+    void unsplit() override;
+
 public slots:
     void setModified(bool modified) override
     {
