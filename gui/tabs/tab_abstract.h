@@ -158,6 +158,9 @@ public:
     virtual void update() = 0;
     virtual QString save() = 0;
 
+    virtual void split(const Qt::Orientation orientation) = 0;
+    virtual void unsplit() = 0;
+
 public slots:
     virtual void setModified(bool modified) = 0;
 };

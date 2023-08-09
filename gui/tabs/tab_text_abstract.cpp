@@ -96,3 +96,27 @@ QString QIodeAbstractEditor::saveAs_()
 
     return save(newFilepath);
 }
+
+void QIodeAbstractEditor::split(const Qt::Orientation orientation)
+{
+    QMessageBox::information(nullptr, "INFO", "filepath: " + this->getFilepath() + ".\n" + 
+        "Orientation: " + ((orientation == Qt::Horizontal) ? "Horizontal" : "Vertical"));
+
+    if(splitted_)
+        return;
+
+    if(splitter_->orientation() != orientation)
+        splitter_->setOrientation(orientation);
+
+    editor_2_->show();
+    splitted_ = true;
+}
+
+void QIodeAbstractEditor::unsplit()
+{
+    if(!splitted_)
+        return;
+
+    editor_2_->hide();
+    splitted_ = false;
+}
