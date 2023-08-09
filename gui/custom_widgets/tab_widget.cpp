@@ -438,10 +438,12 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
     }
 }
 
-void QIodeTabWidget::clearCurrentTab()
+void QIodeTabWidget::clearTab()
 {
-    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(currentWidget());
+    int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
+    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
     EnumIodeFile filetype = tabWidget->getFiletype();
+    
     if (filetype <= I_VARIABLES_FILE)
     {
         QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", 
@@ -454,4 +456,6 @@ void QIodeTabWidget::clearCurrentTab()
             updateObjectTab((EnumIodeType) filetype);
         }
     }
+
+    indexContextMenu = -1;
 }
