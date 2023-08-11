@@ -80,6 +80,8 @@ void QIodeTabWidget::loadSettings()
     QString filepath;
     EnumIodeFile filetype;
     bool forcedAsText;
+    bool splitted;
+    Qt::Orientation splitOrientation;
 
     int size = project_settings->beginReadArray("tabs");
     if(size == 0)
@@ -100,6 +102,8 @@ void QIodeTabWidget::loadSettings()
             filepath = project_settings->value("filepath").toString();
             filetype = (EnumIodeFile) project_settings->value("filetype").toInt();
             forcedAsText = project_settings->value("forcedAsText").toBool();
+            splitted = project_settings->value("splitted").toBool();
+            splitOrientation = (Qt::Orientation) project_settings->value("splitOrientation").toInt();
             
             filename = QFileInfo(filepath).fileName();
 
@@ -129,6 +133,10 @@ void QIodeTabWidget::loadSettings()
             // Tab associated with a file
             else 
                 index = loadFile(filepath, false, true, i, forcedAsText);
+
+            // split tab if necessary
+            if(splitted && index >= 0)
+                splitTab(index, splitOrientation); 
 
             // reload values for the fields parameters, language and nbDecimals if Report tab
             if(filetype == I_REPORTS_FILE)
@@ -185,6 +193,8 @@ void QIodeTabWidget::saveSettings()
         project_settings->setValue("filepath", filepath);
         project_settings->setValue("filetype", filetype);
         project_settings->setValue("forcedAsText", tabWidget->forcedAsText());
+        project_settings->setValue("splitted", tabWidget->splitted());
+        project_settings->setValue("splitOrientation", tabWidget->getSplitOrientation());
 
         // save the parameters, language and nbDecimals values if Report tabs
         if(filetype == I_REPORTS_FILE)
