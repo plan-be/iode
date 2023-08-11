@@ -8,7 +8,6 @@ ReportEditor::ReportEditor(QWidget *parent) : TextEditor(parent), output(nullptr
 
 ReportEditor::~ReportEditor()
 {
-    delete highlighter;
 }
 
 void ReportEditor::run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language)
