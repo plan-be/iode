@@ -9,15 +9,6 @@ QWidget* get_tabs_widget_ptr()
 }
 
 
-struct ReportParams
-{
-    QString filepath;
-    QString parameters;
-    int language;
-    int nbDecimals;
-};
-
-
 QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
 {
     // prepare widgets for tabs associated with IODE object types
@@ -78,88 +69,89 @@ void QIodeTabWidget::loadSettings()
     QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
     if(!project_settings)
         return;
-
-    project_settings->beginGroup("PROJECT");
     
-    QStringList filesToLoad = project_settings->value("files").toStringList();
-    listOpenAsText = project_settings->value("filesAsText").toStringList();
-    int index = project_settings->value("index_last_open_tab", "-1").toInt();
+    // get project name (which is the name of the root directory of the project)
+    QString projectName = QFileInfo(projectDirPath).fileName();
 
-    // filesToLoad is empty in the case of a new project
-    if(filesToLoad.empty())
+    // ---- LOAD SETTINGS ----
+    project_settings->beginGroup("PROJECT");
+
+    int index = -1;
+    QString filepath;
+    EnumIodeFile filetype;
+    bool forcedAsText;
+
+    int size = project_settings->beginReadArray("tabs");
+    if(size == 0)
         showTab(0);
     else
     {
-        QString projectName = QFileInfo(projectDirPath).fileName();
-        QProgressDialog progress("", "", 0, filesToLoad.size());
+        QProgressDialog progress("", "", 0, size);
         progress.setWindowModality(Qt::WindowModal);
         progress.setWindowTitle("Loading project " + projectName);
         progress.setCancelButton(nullptr);
 
-        // reopen all tabs (files) that were open the last time the user quitted the IODE gui
-        QString filepath;
         QString filename;
-        for(int i=0; i < filesToLoad.size(); i++)
+        // reopen all tabs (files) that were open the last time the user quitted the IODE gui
+        for (int i = 0; i < size; i++) 
         {
-            filepath = filesToLoad.at(i);
+            project_settings->setArrayIndex(i);
+
+            filepath = project_settings->value("filepath").toString();
+            filetype = (EnumIodeFile) project_settings->value("filetype").toInt();
+            forcedAsText = project_settings->value("forcedAsText").toBool();
+            
             filename = QFileInfo(filepath).fileName();
 
             progress.setLabelText("Loading file " + filename + "...");
             progress.setValue(i);
             QCoreApplication::processEvents();
 
-            // tab associated with a KDB which hasn't been saved the last time the user quitted the IODE gui
-            // (i.e. no filepath associated)
-            int index;
+            // Tab associated with an IODE Database which hasn't been saved the last time 
+            // the user quitted the IODE GUI (i.e. no filepath associated)
             if (filepath.startsWith(prefixUnsavedDatabase))
             {
-                QString iodeTypeString = filepath.split(" ")[1];
-                int iodeType = get_iode_type(iodeTypeString.toStdString());
-                // should never happen !
-                if (iodeType < 0)
+                // should never happen
+                if(filetype > I_VARIABLES_FILE)
                 {
-                    QMessageBox::critical(nullptr, "ERROR", 
-                        "loadSettings(): Something went wrong when trying to load " + filepath);
-                    return;
+                    QMessageBox::warning(nullptr, "WARNING", QString("Cannot create a tab related to a ") + 
+                        "previously unsaved IODE database.\nGot filetype " + QString::number(filetype) + 
+                        " which is higher than " + QString::number(I_VARIABLES_FILE) + ".");
+                    index = -1;
                 }
-                index = updateObjectTab((EnumIodeType) iodeType);
-                if(index != i) this->tabBar()->moveTab(index, i);
+                else
+                {
+                    index = updateObjectTab((EnumIodeType) filetype);
+                    if(index != i) 
+                        this->tabBar()->moveTab(index, i);
+                }
             }
+            // Tab associated with a file
             else 
+                index = loadFile(filepath, false, true, i, forcedAsText);
+
+            // reload values for the fields parameters, language and nbDecimals if Report tab
+            if(filetype == I_REPORTS_FILE)
             {
-                bool forceAsText = listOpenAsText.contains(filepath);
-                loadFile(filepath, false, true, i, forceAsText);
+                QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(this->widget(index));
+                reportWidget->setParameters(project_settings->value("report_parameters").toString());
+                reportWidget->setLanguage(project_settings->value("report_language").toInt());
+                reportWidget->setNbDecimals(project_settings->value("report_nbDecimals").toInt());
             }
         }
-        progress.setValue(filesToLoad.size());
-
-        buildFilesList();
-
-        // reload values for the fields parameters, language and nbDecimals for each report tab
-        int size = project_settings->beginReadArray("reportsParams");
-        for (int i = 0; i < size; i++) 
-        {
-            project_settings->setArrayIndex(i);
-
-            filepath = project_settings->value("filepath").toString();
-
-            int index = filesList.indexOf(filepath);
-            if(index < 0) 
-                continue;
-
-            QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(this->widget(index));
-            reportWidget->setParameters(project_settings->value("parameters").toString());
-            reportWidget->setLanguage(project_settings->value("language").toInt());
-            reportWidget->setNbDecimals(project_settings->value("nbDecimals").toInt());
-        }
-        project_settings->endArray();
-
-        project_settings->endGroup();
-        
-        // display the tab that was displayed the last time the user quitted the IODE gui
-        showTab(index);
+        progress.setValue(size);
     }
+    project_settings->endArray();
 
+    buildFilesList();
+
+    // get the position of the tab displayed the last time the user quitted the IODE GUI
+    index = project_settings->value("index_last_open_tab", "-1").toInt();
+    
+    project_settings->endGroup();
+    
+    // display the tab that was displayed the last time the user quitted the IODE GUI
+    showTab(index);
 }
  
 void QIodeTabWidget::saveSettings()
@@ -168,62 +160,41 @@ void QIodeTabWidget::saveSettings()
     if(!project_settings)
         return;
 
-    listOpenAsText.clear();
+    // ---- SAVE SETTINGS ----
 
-    // build list of open tabs
-    QStringList filesToSave;
-    QList<ReportParams> reportsParams;
+    QString filepath;
+    EnumIodeFile filetype;
     AbstractTabWidget* tabWidget;
-    for (int i=0; i < this->count(); i++)
-    {
-        tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
-        EnumIodeFile filetype = tabWidget->getFiletype();
-        QString filepath = tabWidget->getFilepath();
+    QIodeReportWidget* reportWidget;
 
-        if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
-            filesToSave << prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
-        else
-        {
-            filesToSave << tabWidget->getFilepath();
-
-            if(tabWidget->forcedAsText())
-                listOpenAsText << tabWidget->getFilepath();
-        }
-
-        if(filetype == I_REPORTS_FILE)
-        {
-            ReportParams rp;
-            QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(tabWidget);
-
-            rp.filepath = reportWidget->getFilepath();
-            rp.parameters = reportWidget->getParameters();
-            rp.language = reportWidget->getLanguage();
-            rp.nbDecimals = reportWidget->getNbDecimals();
-            reportsParams.append(rp);
-        }
-    }
-
-    // start to save settings
     project_settings->beginGroup("PROJECT");
 
     // save the list of open tabs
-    QVariant files = QVariant::fromValue(filesToSave);
-    project_settings->setValue("files", files);
-
-    // save the list of files to be opened as text tabs
-    files = QVariant::fromValue(listOpenAsText);
-    project_settings->setValue("filesAsText", files);
-
-    // save the parameters, language and nbDecimals values for each report tab
-    project_settings->beginWriteArray("reportsParams");
-    for (qsizetype i = 0; i < reportsParams.size(); i++)
+    project_settings->beginWriteArray("tabs");
+    for (int i=0; i < this->count(); i++)
     {
-        ReportParams rp = reportsParams[i];
         project_settings->setArrayIndex(i);
-        project_settings->setValue("filepath", rp.filepath);
-        project_settings->setValue("parameters", rp.parameters);
-        project_settings->setValue("language", rp.language);
-        project_settings->setValue("nbDecimals", rp.nbDecimals);
+        tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
+
+        filetype = tabWidget->getFiletype();
+        if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
+            filepath = prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
+        else
+            filepath = tabWidget->getFilepath();
+
+        project_settings->setValue("filepath", filepath);
+        project_settings->setValue("filetype", filetype);
+        project_settings->setValue("forcedAsText", tabWidget->forcedAsText());
+
+        // save the parameters, language and nbDecimals values if Report tabs
+        if(filetype == I_REPORTS_FILE)
+        {
+            QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(tabWidget);
+
+            project_settings->setValue("report_parameters", reportWidget->getParameters());
+            project_settings->setValue("report_language", reportWidget->getLanguage());
+            project_settings->setValue("report_nbDecimals", reportWidget->getNbDecimals());
+        }
     }
     project_settings->endArray();
 

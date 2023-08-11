@@ -82,7 +82,6 @@ protected:
     QString projectDirPath;
     bool overwrite_all;
     bool discard_all;
-    QStringList listOpenAsText;
 
     int indexContextMenu;
 	QMenu* contextMenu;
