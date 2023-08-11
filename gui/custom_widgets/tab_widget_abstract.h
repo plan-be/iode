@@ -88,6 +88,10 @@ protected:
     QAction* actionClose;
     QAction* actionClear;
 
+    QAction* actionSplitH;
+    QAction* actionSplitV;
+    QAction* actionUnsplit;
+
     QShortcut* filepathShortcut;
     QShortcut* revealExplorerShortcut;
     QShortcut* nextTabShortcut;
@@ -189,6 +193,30 @@ protected:
      * @param projectDir QDir new project directory.      
      */
     void resetFileSystemWatcher(const QDir& projectDir);
+
+    /**
+     * @brief splits the content of the tab at position index into two views.
+     * 
+     * @param index 
+     * @param orientation
+     */
+    void splitTab(const int index, Qt::Orientation orientation)
+    {
+        QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+        tabWidget->split(orientation);
+    }
+
+    /**
+     * @brief unsplits the tab at position index.
+     * 
+     * @param index 
+     * @param orientation
+     */
+    void unsplitTab(const int index)
+    {
+        QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+        tabWidget->unsplit();
+    }
 
 private:
     /**
@@ -492,6 +520,20 @@ protected slots:
             actionClear->setVisible(false);
         }
 
+        // Display option Split or Unsplit depending of the tab is already splitted or not
+        if(tabWidget->splitted())
+        {
+            actionSplitH->setVisible(false);
+            actionSplitV->setVisible(false);
+            actionUnsplit->setVisible(true);
+        }
+        else
+        {
+            actionSplitH->setVisible(true);
+            actionSplitV->setVisible(true);
+            actionUnsplit->setVisible(false);
+        }
+
         contextMenu->exec(globalPoint);
     }
 
@@ -556,4 +598,22 @@ protected slots:
      * 
      */
     void revealInFolder();
+
+    void splitTabHorizontally()
+    {
+        splitTab(indexContextMenu, Qt::Orientation::Horizontal);
+        indexContextMenu = -1;
+    }
+
+    void splitTabVertically()
+    {
+        splitTab(indexContextMenu, Qt::Orientation::Vertical);
+        indexContextMenu = -1;
+    }
+
+    void unsplit()
+    {
+        unsplitTab(indexContextMenu);
+        indexContextMenu = -1;
+    }
 };
