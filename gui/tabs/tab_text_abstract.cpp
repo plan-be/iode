@@ -99,9 +99,6 @@ QString QIodeAbstractEditor::saveAs_()
 
 void QIodeAbstractEditor::split(const Qt::Orientation orientation)
 {
-    QMessageBox::information(nullptr, "INFO", "filepath: " + this->getFilepath() + ".\n" + 
-        "Orientation: " + ((orientation == Qt::Horizontal) ? "Horizontal" : "Vertical"));
-
     if(splitted_)
         return;
 

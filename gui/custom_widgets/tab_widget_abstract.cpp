@@ -74,6 +74,10 @@ QIodeAbstractTabWidget::~QIodeAbstractTabWidget()
     delete previousTabShortcut;
     delete clearShortcut;
     delete closeShortcut;
+
+    delete actionSplitH;
+    delete actionSplitV;
+    delete actionUnsplit;
 }
 
 void QIodeAbstractTabWidget::setupContextMenu()
@@ -116,6 +120,23 @@ void QIodeAbstractTabWidget::setupContextMenu()
         revealExplorerShortcut->key());
     connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::revealInFolder);
     contextMenu->addAction(action);
+
+    // separator 
+    contextMenu->addSeparator();
+
+    // split vertically
+    actionSplitV = addAction("Split Right", "Split the tab vertically");
+    connect(actionSplitV, &QAction::triggered, this, &QIodeAbstractTabWidget::splitTabHorizontally);
+    contextMenu->addAction(actionSplitV);
+
+    // split horizontally
+    actionSplitH = addAction("Split Down", "Split the tab horizontally");
+    connect(actionSplitH, &QAction::triggered, this, &QIodeAbstractTabWidget::splitTabVertically);
+    contextMenu->addAction(actionSplitH);
+
+    actionUnsplit = addAction("Unsplit", "unsplit the tab content");
+    connect(actionUnsplit, &QAction::triggered, this, &QIodeAbstractTabWidget::unsplit);
+    contextMenu->addAction(actionUnsplit);
 }
 
 void QIodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
