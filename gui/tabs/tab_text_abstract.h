@@ -21,6 +21,9 @@ protected:
     QString filter;
     QPrinter printer;
 
+    QPlainTextEdit* editor_;
+    QPlainTextEdit* editor_2_;
+
 signals:
     void tabTextModified(const QString& filepath, const bool modified);
 

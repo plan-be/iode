@@ -2,8 +2,8 @@
 
 
 QIodeAbstractEditor::QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
-    : AbstractTabWidget(fileType, parent), filepath(filepath)
-{ 
+    : AbstractTabWidget(fileType, parent), filepath(filepath), editor_(nullptr), editor_2_(nullptr)
+{
 }
 
 bool QIodeAbstractEditor::load__(TextEditor* editor, const QString& filepath, const bool forceOverwrite)
