@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QFileInfo>
+#include <QSplitter>
 #include <QMessageBox>
 #include <QStringList>
 
@@ -30,6 +31,9 @@ protected:
     bool modified;
     bool forcedAsText_;         ///< Whether or not the corresponding file has been forced to open as a text tab
     bool savingFile;            ///< See save() and load() implementation of QIodeAbstractEditor 
+    bool splitted_;
+
+    QSplitter* splitter_;
 
 protected:
     virtual bool load_(const QString& filepath, const bool forceOverwrite) = 0;
@@ -63,8 +67,8 @@ protected:
     }
 
 public:
-    AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr) : 
-        QWidget(parent), fileType(fileType), modified(false), forcedAsText_(false), savingFile(false)
+    AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr): QWidget(parent), 
+        fileType(fileType), modified(false), forcedAsText_(false), savingFile(false), splitted_(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
     }
@@ -89,6 +93,23 @@ public:
     void setForcedAsText(const bool value)
     {
         forcedAsText_ = value;
+    }
+
+    // NOTE:
+    // splitted() must not call the isVisible() method on the second widget of the 
+    // QSplitter object to check if the tab has been splitted.
+    // As the documentation of QWidget::visible() says: 
+    // "If an ancestor is not visible, the widget won't become visible until all its ancestors are shown."
+    // In other words, isVisible() will always return false if the splitted() is called on a tab 
+    // which is not the current open tab.
+    bool splitted() const
+    {
+        return splitted_;
+    }
+
+    Qt::Orientation getSplitOrientation() const
+    {
+        return splitter_->orientation();
     }
 
     virtual QString getTabText() const
