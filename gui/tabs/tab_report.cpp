@@ -5,6 +5,17 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent):
     QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)
 {
     setupUi(this);
+    splitter_ = splitter;
+    editor_ = editor;
+    editor_2_ = editor_2;
+    // synchronizes the content of the two Report editors
+    editor_2->setDocument(editor->document());
+
+    // setup the editors
+    editor->setup();
+    editor_2->setup();
+
+    editor_2->hide();
 
     QList<QString> q_langs;
     for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
@@ -19,9 +30,6 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent):
     QCheckBox* autocomplete = new QCheckBox("autocomplete", this);
     autocomplete->setChecked(true);
     */
-
-    // setup editor
-    editor->setup();
 
     // ---- Signals and Slots ----
     connect(editor, &TextEditor::modificationChanged, this, &QIodeReportWidget::setModified);
