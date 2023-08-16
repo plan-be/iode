@@ -116,12 +116,11 @@ const static std::array<std::string, 26> v_ext =
     "ref", "ps",  "asc", "txt", "csv"
 };
 
-const static int I_NB_TEXT_EXT = 9;
+const static int I_NB_TEXT_EXT = 6;
 
 const static std::array<std::string, I_NB_TEXT_EXT> v_text_ext = 
 {
-    "txt", "a2m", "agl", "prf", "dif", "mif", "rtf", 
-    "asc", "ref"
+    "txt", "a2m", "prf", "dif", "asc", "ref"
 };
 
 const static std::string report_ext = ".rep";
