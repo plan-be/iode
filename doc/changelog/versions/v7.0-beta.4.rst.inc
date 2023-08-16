@@ -15,6 +15,7 @@ Improvements ✨
 Fixed Bugs 🛠️
 -------------
 
+  * (GUI) Opens .rtf files with Microsoft Word by default instead of displaying their content in a new text tab (#291)
 
 Miscellaneous 🤷‍♀️
 ----------------
