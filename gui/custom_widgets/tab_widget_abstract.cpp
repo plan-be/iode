@@ -189,7 +189,7 @@ int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileIn
     // prepare and add the new tab
     if(fileType == I_REPORTS_FILE)
         index = addReportTab(fileInfo);
-    else if(forceAsText || QIodeTextWidget::isTextExtension("." + fileInfo.suffix())) 
+    else if(forceAsText || showInTextTabExtensionsList.contains(fileInfo.suffix())) 
             index = addTextTab(fileInfo, fileType, forceAsText);
     else
     { 

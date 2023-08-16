@@ -1,12 +1,22 @@
 #include "tab_text.h"
 
 
-static const QStringList initialize_text_extensions()
+QIodeTextWidget::QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent): 
+    QIodeAbstractEditor(fileType, filepath, parent) 
 {
-    QStringList textExt;
-    for(const std::string ext: v_text_ext)
-        textExt << "." + QString::fromStdString(ext);
-    return textExt;
-}
+    setupUi(this);
+    splitter_ = splitter;
+    editor_ = editor;
+    editor_2_ = editor_2;
+    // synchronizes the content of the two text editors
+    editor_2->setDocument(editor->document());
+    
+    editor_2->hide();
 
-const QStringList QIodeTextWidget::textExtensions = initialize_text_extensions();
+    filter = "Text files (*" + showInTextTabExtensionsList.join(", *") + ")";
+
+    connect(editor, &TextEditor::modificationChanged, this, &QIodeTextWidget::setModified);
+
+    if(!filepath.isEmpty()) 
+        load(filepath, true);
+}

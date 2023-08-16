@@ -8,33 +8,8 @@ class QIodeTextWidget : public QIodeAbstractEditor, public Ui::QIodeTextWidget
 {
     Q_OBJECT
 
-    const static QStringList textExtensions;
-
 public:
-    QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr) 
-        : QIodeAbstractEditor(fileType, filepath, parent) 
-    {
-        setupUi(this);
-        splitter_ = splitter;
-        editor_ = editor;
-        editor_2_ = editor_2;
-        // synchronizes the content of the two text editors
-        editor_2->setDocument(editor->document());
-        
-        editor_2->hide();
-
-        filter = "Text files (*" + textExtensions.join(", *") + ")";
-
-        connect(editor, &TextEditor::modificationChanged, this, &QIodeTextWidget::setModified);
-
-        if(!filepath.isEmpty()) 
-            load(filepath, true);
-    }
-
-    static bool isTextExtension(const QString& ext)
-    {
-        return textExtensions.contains(ext);
-    }
+    QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
 
     bool load_(const QString& filepath, const bool forceOverwrite)
     {
