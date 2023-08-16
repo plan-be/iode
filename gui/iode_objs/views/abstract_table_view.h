@@ -58,6 +58,17 @@ protected:
 protected:
 	void keyPressEvent(QKeyEvent* event);
 
+	virtual void filter_and_update() = 0;
+
+	/**
+	 * @brief Dump displayed table into the document.
+	 * 
+	 * @note see https://forum.qt.io/post/460045 
+	 *       and https://gis.stackexchange.com/q/385616 
+	 * 
+	 */
+	virtual void dumpTableInDocument() = 0;
+
 public:
 	AbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
 	~AbstractTableView();
@@ -119,6 +130,13 @@ public slots:
 		objectNameEdit->setText("");
 	}
 
+	void filter() 
+	{ 
+		filter_and_update(); 
+	}
+
+	virtual void print();
+
 	/**
 	 * @brief shows scalars or variables listed in the clec structure or 
 	 *        the object of the same name.
@@ -144,7 +162,7 @@ public slots:
 template <class M> class TemplateTableView : public AbstractTableView
 {
 protected:
-	void filter_and_update()
+	void filter_and_update() override
 	{
 		QString pattern = filterLineEdit->text().trimmed();
 		M* table_model = static_cast<M*>(model());
@@ -152,14 +170,7 @@ protected:
 		update();
 	}
 
-	/**
-	 * @brief Dump displayed table into the document.
-	 * 
-	 * @note see https://forum.qt.io/post/460045 
-	 *       and https://gis.stackexchange.com/q/385616 
-	 * 
-	 */
-	void dumpTableInDocument()
+	void dumpTableInDocument() override
 	{
 		document.clear();
 		const int max_nb_columns = 10;

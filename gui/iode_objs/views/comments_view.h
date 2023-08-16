@@ -16,7 +16,5 @@ public:
 	CommentsView(QWidget* parent = nullptr) : TemplateTableView(I_COMMENTS, new CommentsDelegate(parent), parent) {};
 
 public slots:
-	void filter() { filter_and_update(); }
-	void print();
 	void new_obj();
 };

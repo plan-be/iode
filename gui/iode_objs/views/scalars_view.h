@@ -19,7 +19,5 @@ public:
 		: TemplateNumericalTableView(I_SCALARS, new ScalarsDelegate(parent), parent) {};
 
 public slots:
-	void filter() { filter_and_update(); }
-	void print();
 	void new_obj();
 };
