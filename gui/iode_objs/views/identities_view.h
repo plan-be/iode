@@ -43,8 +43,6 @@ public:
 	}
 
 public slots:
-	void filter() { filter_and_update(); }
-	void print();
 	void new_obj();
 	void executeCurrentIdentity();
 };

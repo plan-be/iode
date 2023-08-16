@@ -16,7 +16,5 @@ public:
 	ListsView(QWidget* parent = nullptr) : TemplateTableView(I_LISTS, new ListsDelegate(parent), parent) {};
 
 public slots:
-	void filter() { filter_and_update(); }
-	void print();
 	void new_obj();
 };

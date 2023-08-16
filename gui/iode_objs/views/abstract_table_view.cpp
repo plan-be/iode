@@ -219,3 +219,11 @@ void AbstractTableView::editName()
     //objectNameEdit->blockSignals(true);
     this->setFocus();
 }
+
+void AbstractTableView::print()
+{
+	QPrintPreviewDialog dialog(&printer);
+    connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &AbstractTableView::renderForPrinting);
+	dumpTableInDocument();
+	dialog.exec();
+}

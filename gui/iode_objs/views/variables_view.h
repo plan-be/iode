@@ -82,8 +82,7 @@ signals:
 	void newGraphsDialog(const QList<QString>& variableNames, const QString& from, const QString& to);
 
 public slots:
-	void filter() { filter_and_update(); }
-	void print();
+	void print() override;
 	void new_obj();
 	void plot_series();
 	void open_graphs_dialog();

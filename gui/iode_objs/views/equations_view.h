@@ -46,8 +46,6 @@ signals:
 	void equationModified();
 
 public slots:
-	void filter() { filter_and_update(); }
-	void print();
 	void new_obj();
 	void edit_obj();
 };

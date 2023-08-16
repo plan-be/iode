@@ -1,14 +1,6 @@
 #include "tables_view.h"
 
 
-void TablesView::print()
-{
-	QPrintPreviewDialog dialog(&printer);
-    connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &TablesView::renderForPrinting);
-	dumpTableInDocument();
-	dialog.exec();
-}
-
 void TablesView::new_obj()
 {
 	QIodeAddTable dialog(this);
