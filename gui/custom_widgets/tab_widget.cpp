@@ -177,6 +177,9 @@ void QIodeTabWidget::saveSettings()
 
     project_settings->beginGroup("PROJECT");
 
+    // clear the "tabs" entry
+    project_settings->remove("tabs");
+
     // save the list of open tabs
     project_settings->beginWriteArray("tabs");
     for (int i=0; i < this->count(); i++)
