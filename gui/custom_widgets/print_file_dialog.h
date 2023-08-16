@@ -17,17 +17,13 @@ class QIodePrintFileDialog : public QIodeSettings, public Ui::QIodePrintFileDial
     WrapperFileChooser* wOutputFile;
 
 public:
-    const static QString KEY_SETTINGS_PRINT_FORMAT;
-    const static QString KEY_SETTINGS_PRINT_OUTPUT_FILE;
-
-public:
-    QIodePrintFileDialog(QWidget* parent = nullptr);
+    QIodePrintFileDialog(QWidget* parent = nullptr, const QString& outputFile = "", const QChar& format = QChar::Null);
     ~QIodePrintFileDialog();
 
-    static QChar getFormat(const QSettings* project_settings)
+    QChar getFormat() const
     {
         QChar format;
-        int i_format = project_settings->value(KEY_SETTINGS_PRINT_FORMAT).toInt();
+        int i_format = wPrintFormat->extractAndVerify();
 
         switch(i_format) 
         {
@@ -52,6 +48,41 @@ public:
         }
 
         return format;
+    }
+
+    void setFormat(const QChar& format)
+    {
+        char c_format = format.toLatin1();
+        switch(c_format) 
+        {
+        case 'A':
+            wPrintFormat->setQValue(0);
+            break;
+        case 'R':  
+            wPrintFormat->setQValue(1);
+            break;
+        case 'H':  
+            wPrintFormat->setQValue(2);
+            break;
+        case 'M':  
+            wPrintFormat->setQValue(3);
+            break;
+        case 'C':  
+            wPrintFormat->setQValue(4); 
+            break;
+        default: 
+            break;
+        }
+    }
+
+    QString getOutputFile() const
+    {
+        return wOutputFile->extractAndVerify();
+    }
+
+    void setOutputFile(const QString& outputFile)
+    {
+        wOutputFile->setQValue(outputFile);
     }
 
 private slots:

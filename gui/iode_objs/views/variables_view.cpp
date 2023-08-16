@@ -10,19 +10,28 @@ void VariablesView::print()
 
 		if(printToFile)
 		{
+			VariablesModel* model_ = static_cast<VariablesModel*>(model());
+
+			// set the output file to the filepath associated with the Variable objects 
+			// without the extension
+			QString filepath = model_->getFilepath();
+			QFileInfo fileInfo(filepath);
+			QString outputFile = fileInfo.absoluteDir().filePath(fileInfo.completeBaseName());
+
+			QChar format;
+
 			// ask the user to set the output file and format
-			QIodePrintFileDialog dialog(this);
-			if(dialog.exec() == QDialog::Rejected)
+			QIodePrintFileDialog dialog(this, outputFile);
+			if(dialog.exec() == QDialog::Accepted)
+			{
+				outputFile = dialog.getOutputFile();
+				format = dialog.getFormat();
+			}
+			else
 				return;
 
-			// extract the output file
-			QString outputFile = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE).toString();
-		
-			// extract the format of the output file
-			QChar format = QIodePrintFileDialog::getFormat(project_settings);
-
 			// set the number of decimals
-			int NbDecimals = 2;
+			int NbDecimals = model_->get_nb_digits();
 
 			// set the language
 			EnumLang lang = EnumLang::IT_ENGLISH;

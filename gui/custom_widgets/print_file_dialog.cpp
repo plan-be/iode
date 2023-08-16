@@ -1,11 +1,8 @@
 #include "print_file_dialog.h"
 
 
-const QString QIodePrintFileDialog::KEY_SETTINGS_PRINT_FORMAT = "PRINT_FILE_DIALOG/Print_Format";
-const QString QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE = "PRINT_FILE_DIALOG/Output_File";
-
-
-QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent) : QIodeSettings(parent)
+QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent, const QString& outputFile, const QChar& format): 
+    QIodeSettings(parent)
 {
     setupUi(this);
 
@@ -20,10 +17,15 @@ QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent) : QIodeSettings(pare
     connect(comboBox_print_format, &QComboBox::currentIndexChanged, this, &QIodePrintFileDialog::updateOutputFileFormat);
     
     mapFields["Print_Format"] = wPrintFormat;
-    mapFields["Output_File"] = wOutputFile;
 
     className = "PRINT_FILE_DIALOG";
     loadSettings();
+
+    if(!outputFile.isEmpty())
+        setOutputFile(outputFile);
+
+    if(!format.isNull())
+        setFormat(format);
 }
 
 QIodePrintFileDialog::~QIodePrintFileDialog()
