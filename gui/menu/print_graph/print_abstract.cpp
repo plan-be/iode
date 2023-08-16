@@ -12,14 +12,13 @@ void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QStr
     {
         // ask the user to set the output file and format
         QIodePrintFileDialog dialog(this);
-        if(dialog.exec() == QDialog::Rejected)
+        if(dialog.exec() == QDialog::Accepted)
+        {
+            outputFile = dialog.getOutputFile();
+            format = dialog.getFormat();
+        }
+        else
             return;
-
-        // extract the output file
-        outputFile = project_settings->value(QIodePrintFileDialog::KEY_SETTINGS_PRINT_OUTPUT_FILE).toString();
-    
-        // extract the format of the output file
-        format = QIodePrintFileDialog::getFormat(project_settings);
     }
 
     // extract the number of decimals
