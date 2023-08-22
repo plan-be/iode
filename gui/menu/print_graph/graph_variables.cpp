@@ -12,8 +12,8 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) :
     lineEdit_min_Y->setValidator(new QDoubleValidator(lineEdit_min_Y));
     lineEdit_max_Y->setValidator(new QDoubleValidator(lineEdit_max_Y));
 
-    QList<QString> q_axis_types;
-    for(const std::string& axis_type: vGraphsXAxisTypes) q_axis_types << QString::fromStdString(axis_type);
+    QList<QString> q_var_modes;
+    for(const std::string& var_mode: v_var_modes) q_var_modes << QString::fromStdString(var_mode);
     QList<QString> q_chart_types;
     for(const std::string& chart_type: vGraphsChartTypes) q_chart_types << QString::fromStdString(chart_type);
     QList<QString> q_axis_ticks;
@@ -22,7 +22,7 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) :
     for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
 
     wVariables = new WrapperQPlainTextEdit(label_variables->text(), *textEdit_variables, REQUIRED_FIELD);
-    wXAxisType = new WrapperComboBox(label_x_axis_type->text(), *comboBox_x_axis_type, REQUIRED_FIELD, q_axis_types);
+    wVarMode = new WrapperComboBox(label_x_axis_type->text(), *comboBox_x_axis_type, REQUIRED_FIELD, q_var_modes);
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
     wChartType = new WrapperComboBox(label_chart_type->text(), *comboBox_chart_type, REQUIRED_FIELD, q_chart_types);
@@ -33,17 +33,17 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) :
     wMaxY = new WrapperQLineEdit(label_max_Y->text(), *lineEdit_max_Y, OPTIONAL_FIELD);
     wLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
     
-    mapFields["Variables"] = wVariables;
-    mapFields["XAxisType"] = wXAxisType;
-    mapFields["From"]      = wFrom;
-    mapFields["To"]        = wTo;
-    mapFields["ChartType"] = wChartType;
+    mapFields["Variables"]  = wVariables;
+    mapFields["VarMode"]    = wVarMode;
+    mapFields["From"]       = wFrom;
+    mapFields["To"]         = wTo;
+    mapFields["ChartType"]  = wChartType;
     mapFields["YAxisScale"] = wYAxisScale;
-    mapFields["XTicks"]   = wXTicks;
-    mapFields["YTicks"]   = wYTicks;
-    mapFields["MinY"]      = wMinY;
-    mapFields["MaxY"]      = wMaxY;
-    mapFields["Language"]  = wLanguage;
+    mapFields["XTicks"]     = wXTicks;
+    mapFields["YTicks"]     = wYTicks;
+    mapFields["MinY"]       = wMinY;
+    mapFields["MaxY"]       = wMaxY;
+    mapFields["Language"]   = wLanguage;
 
     className = "MENU_GRAPH_VARIABLES";
     loadSettings();
@@ -52,7 +52,7 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) :
 QIodeMenuGraphVariables::~QIodeMenuGraphVariables()
 {
     delete wVariables;
-    delete wXAxisType;
+    delete wVarMode;
     delete wFrom;
     delete wTo;
     delete wChartType;
@@ -71,12 +71,12 @@ void QIodeMenuGraphVariables::display()
     try
     {
         EnumIodeGraphChart chartType = (EnumIodeGraphChart) wChartType->extractAndVerify();
-        EnumIodeGraphAxisType axisType = (EnumIodeGraphAxisType) wXAxisType->extractAndVerify();
+        EnumIodeVarMode varMode = (EnumIodeVarMode) wVarMode->extractAndVerify();
         bool logScale = wYAxisScale->extractAndVerify();
         EnumIodeGraphAxisThicks xTicks = (EnumIodeGraphAxisThicks) wXTicks->extractAndVerify();
         EnumIodeGraphAxisThicks yTicks = (EnumIodeGraphAxisThicks) wYTicks->extractAndVerify();
 
-        QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(nullptr, chartType, axisType, logScale, xTicks, yTicks);
+        QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(nullptr, chartType, varMode, logScale, xTicks, yTicks);
 
         // periods for the plot
         QString from = wFrom->extractAndVerify();

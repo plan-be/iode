@@ -7,13 +7,13 @@ class QIodePlotVariablesDialog : public QIodePlotDialog
     Q_OBJECT
 
     KDBVariables* kdb_vars;
-    EnumIodeGraphAxisType axisType;
+    EnumIodeVarMode varMode;
 
-    QComboBox* comboXAxisType;
+    QComboBox* comboVarMode;
 
 public:
     QIodePlotVariablesDialog(KDBVariables* kdb_vars = nullptr, EnumIodeGraphChart chartType = I_G_CHART_LINE, 
-        EnumIodeGraphAxisType axisType = I_G_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
+        EnumIodeVarMode varMode = I_VAR_MODE_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
         EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, QWidget* parent = nullptr);
     ~QIodePlotVariablesDialog();
 
@@ -22,11 +22,11 @@ public:
 protected:
     QString defaultTitle()
     {
-        QString s_axisType = QString::fromStdString(vGraphsXAxisTypes[axisType]);
-        return chart_series.keys().join(" - ") + " (" + s_axisType + ")";
+        QString s_varMode = QString::fromStdString(v_var_modes[varMode]);
+        return chart_series.keys().join(" - ") + " (" + s_varMode + ")";
     }
 
 public slots:
-    void updateXAxisType(int index);
+    void updateVarMode(int index);
 
 };

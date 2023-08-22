@@ -23,7 +23,7 @@ class QIodeMenuGraphVariables: public QIodeSettings, public Ui::QIodeMenuGraphVa
     Q_OBJECT
 
     WrapperQPlainTextEdit*  wVariables;
-    WrapperComboBox*        wXAxisType;
+    WrapperComboBox*        wVarMode;
     WrapperSampleEdit*      wFrom;
     WrapperSampleEdit*      wTo;
     WrapperComboBox*        wChartType;
