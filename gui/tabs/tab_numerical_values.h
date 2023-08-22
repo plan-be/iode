@@ -73,7 +73,10 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public QIodeOb
     QShortcut* shortcutNbDecPlus;
     QShortcut* shortcutNbDecMinus;
 
-private:
+protected:
+    QHBoxLayout* bottomLayout;
+
+protected:
     QString getGroupName()
     {
 #ifdef _GSAMPLE_
@@ -121,7 +124,7 @@ public:
          * I don't know why.
          * But using an horizontal layout solved the problem.
          */
-        QHBoxLayout* bottomLayout = new QHBoxLayout(this);
+        bottomLayout = new QHBoxLayout(this);
         bottomLayout->setObjectName(QString::fromUtf8("bottom_layout"));
 
         // nb decimals spinbox
@@ -151,12 +154,9 @@ public:
         spinBox_nbDigits->setMinimumSize(QSize(40, 0));
         bottomLayout->addWidget(spinBox_nbDigits, Qt::AlignLeft);
 
-        // spacers
-        QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-        // -1 -> span over all rows/columns
-        bottomLayout->addItem(horizontalSpacer);
 
 #ifdef _GSAMPLE_
+        addHorizontalSpacer();
         gridLayout->addLayout(bottomLayout, row, 0);
 #else
         this->gridLayout->addLayout(bottomLayout, this->row, 0);
@@ -197,6 +197,13 @@ public:
         delete objmodel;
         delete tableview;
 #endif
+    }
+
+    void addHorizontalSpacer() 
+    {
+        QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        // -1 -> span over all rows/columns
+        bottomLayout->addItem(horizontalSpacer);
     }
 
     void setNbDigits(const int value)
