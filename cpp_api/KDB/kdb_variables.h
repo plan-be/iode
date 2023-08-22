@@ -4,6 +4,22 @@
 #include "kdb_template.h"
 
 
+// TODO: replace KVAR_MODE section in iode.h by the enum below
+enum EnumIodeVarMode
+{
+    I_VAR_MODE_LEVEL,              //< no modification             x[t]
+    I_VAR_MODE_DIFF,               //< difference on one period    (x[t]-x[t-1])
+    I_VAR_MODE_GROWTH_RATE,        //< growth rate on one period   (x[t]/x[t-1] - 1)*100
+    I_VAR_MODE_Y0Y_DIFF,           //< difference on one year      (x[t]-x[t-{nb sub periods}])
+    I_VAR_MODE_Y0Y_GROWTH_RATE     //< growth rate on one year     (x[t]/x[t-{nb sub periods}] - 1) * 100
+};
+
+const static int I_VAR_NB_MODES = 5;
+
+const static std::array<std::string, I_VAR_NB_MODES> v_var_modes = 
+    { "Level", "Differences", "Growth rates", "YoY Diffs", "YoY Grt" };
+
+
 // TODO: wrapp functions from k_wsvar.c in KDBVariables
 class KDBVariables : public KDBTemplate<Variable>
 {
@@ -24,29 +40,29 @@ public:
 
     KDBVariables(const KDBVariables& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
 
-    IODE_REAL get_var(const int pos, const int t, const int mode = K_LEVEL) const;
+    IODE_REAL get_var(const int pos, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const int pos, const std::string& period, const int mode = K_LEVEL) const;
+    IODE_REAL get_var(const int pos, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const int pos, const Period& period, const int mode = K_LEVEL) const;
+    IODE_REAL get_var(const int pos, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const std::string& name, const int t, const int mode = K_LEVEL) const;
+    IODE_REAL get_var(const std::string& name, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const std::string& name, const std::string& period, const int mode = K_LEVEL) const;
+    IODE_REAL get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const std::string& name, const Period& period, const int mode = K_LEVEL) const;
+    IODE_REAL get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    void set_var(const int pos, const int t, const IODE_REAL value, const int mode = K_LEVEL);
+    void set_var(const int pos, const int t, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const int pos, const std::string& period, const IODE_REAL value, const int mode = K_LEVEL);
+    void set_var(const int pos, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const int pos, const Period& period, const IODE_REAL value, const int mode = K_LEVEL);
+    void set_var(const int pos, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const int t, const IODE_REAL value, const int mode = K_LEVEL);
+    void set_var(const std::string& name, const int t, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const std::string& period, const IODE_REAL value, const int mode = K_LEVEL);
+    void set_var(const std::string& name, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const Period& period, const IODE_REAL value, const int mode = K_LEVEL);
+    void set_var(const std::string& name, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
     int add(const std::string& name, const Variable& variable);
 
