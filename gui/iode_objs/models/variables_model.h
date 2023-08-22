@@ -13,9 +13,12 @@ class VariablesModel : public TemplateNumericalTableModel<KDBVariables>
 {
 	Q_OBJECT
 
+	EnumIodeVarMode mode;
+
 public:
-	VariablesModel(QObject* parent = nullptr, KDBVariables* kdb_external = nullptr, const int nb_digits = 2): 
-		TemplateNumericalTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, nb_digits, kdb_external)
+	VariablesModel(QObject* parent = nullptr, KDBVariables* kdb_external = nullptr, const int nb_digits = 2, 
+		const EnumIodeVarMode mode = I_VAR_MODE_LEVEL): TemplateNumericalTableModel({"Value", "Relax", "Std", "T-Stat"}, 
+		parent, nb_digits, kdb_external), mode(mode)
 	{}
 
 	QVariant dataCell(const int row, const int col) const override;
@@ -24,4 +27,9 @@ public:
 
 public slots:
 	void reset() override;
+	void setMode(const EnumIodeVarMode mode)
+	{
+		this->mode = mode;
+		this->reset();
+	}
 };
