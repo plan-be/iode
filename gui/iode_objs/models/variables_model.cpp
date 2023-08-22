@@ -4,7 +4,7 @@
 
 QVariant VariablesModel::dataCell(const int row, const int col) const
 {
-	int mode = 0;
+	EnumIodeVarMode mode = I_VAR_MODE_LEVEL;
 	IODE_REAL var;
 
 	try
