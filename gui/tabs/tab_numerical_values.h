@@ -97,7 +97,7 @@ public:
 
         this->setGeometry(QRect(10, 50, 700, 250));
 
-        QGridLayout* gridLayout = new QGridLayout(this);
+        gridLayout = new QGridLayout(this);
         gridLayout->setObjectName("gridLayoutGSampleTable");
 
         tableview = new GSampleNumericalTableView(this);
