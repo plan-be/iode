@@ -19,6 +19,7 @@
 #include <QShortcut>
 #include <QSpacerItem>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QHeaderView>
 
 #ifdef _GSAMPLE_
@@ -98,6 +99,7 @@ public:
         this->setGeometry(QRect(10, 50, 700, 250));
 
         gridLayout = new QGridLayout(this);
+        gridLayout->setContentsMargins(0, 0, 0, 0);
         gridLayout->setObjectName("gridLayoutGSampleTable");
 
         tableview = new GSampleNumericalTableView(this);
@@ -111,21 +113,26 @@ public:
         // -1 -> span over all rows/columns
         gridLayout->addWidget(tableview, row, 0, 1, -1);
         row++;
-
-#define _GRIDLAYOUT_ gridLayout
-#else
-#define _GRIDLAYOUT_ this->gridLayout
 #endif
+        /* NOTE FOR THE DEVELOPPERS:
+         * I tried to simply add the widgets below to the current grid layout 
+         * but the widgets were misaligned in the tabs (but not when instanciating  
+         * a GSampleNumericalDialog box dialog). 
+         * I don't know why.
+         * But using an horizontal layout solved the problem.
+         */
+        QHBoxLayout* bottomLayout = new QHBoxLayout(this);
+        bottomLayout->setObjectName(QString::fromUtf8("bottom_layout"));
 
         // nb decimals spinbox
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-
         label_nbDigits = new QLabel("Nb Significant Digits ");
         label_nbDigits->setObjectName(QString::fromUtf8("label_nbDigits"));
-        label_nbDigits->setSizePolicy(sizePolicy);
-        _GRIDLAYOUT_->addWidget(label_nbDigits, this->row, 0, Qt::AlignLeft);
+        QSizePolicy sizePolicyLabel(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicyLabel.setHorizontalStretch(0);
+        sizePolicyLabel.setVerticalStretch(0);
+        sizePolicyLabel.setHeightForWidth(label_nbDigits->sizePolicy().hasHeightForWidth());
+        label_nbDigits->setSizePolicy(sizePolicyLabel);
+        bottomLayout->addWidget(label_nbDigits, Qt::AlignLeft);
 
         spinBox_nbDigits = new QSpinBox();
         spinBox_nbDigits->setMinimum(1);
@@ -136,16 +143,24 @@ public:
         spinBox_nbDigits->setValue(4);
 #endif
         spinBox_nbDigits->setObjectName(QString::fromUtf8("spinBox_nbDigits"));
-        spinBox_nbDigits->setSizePolicy(sizePolicy);
-        spinBox_nbDigits->setFixedWidth(40);
-        _GRIDLAYOUT_->addWidget(spinBox_nbDigits, this->row, 1, Qt::AlignLeft);
+        QSizePolicy sizePolicySpinbox(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicySpinbox.setHorizontalStretch(0);
+        sizePolicySpinbox.setVerticalStretch(0);
+        sizePolicySpinbox.setHeightForWidth(spinBox_nbDigits->sizePolicy().hasHeightForWidth());
+        spinBox_nbDigits->setSizePolicy(sizePolicySpinbox);
+        spinBox_nbDigits->setMinimumSize(QSize(40, 0));
+        bottomLayout->addWidget(spinBox_nbDigits, Qt::AlignLeft);
 
         // spacers
-        QSpacerItem* horizontalSpacer = new QSpacerItem(600, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
         // -1 -> span over all rows/columns
-        _GRIDLAYOUT_->addItem(horizontalSpacer, this->row, 2, 1, -1);
+        bottomLayout->addItem(horizontalSpacer);
 
-#undef _GRIDLAYOUT_
+#ifdef _GSAMPLE_
+        gridLayout->addLayout(bottomLayout, row, 0);
+#else
+        this->gridLayout->addLayout(bottomLayout, this->row, 0);
+#endif
 
         // shortcuts
         shortcutNbDecPlus = new QShortcut(QKeySequence(Qt::Key_F4), this);
