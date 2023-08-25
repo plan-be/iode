@@ -5,7 +5,7 @@ class KDBVariablesTest : public KDBTest, public ::testing::Test
 {
 protected:
     KDBVariables kdb;
-    int mode = 0;
+    EnumIodeVarMode mode = I_VAR_MODE_LEVEL;
     int pos = 0;
     int t = 10;
     int t_nan = 5;
