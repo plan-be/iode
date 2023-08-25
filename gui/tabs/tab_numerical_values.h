@@ -158,10 +158,10 @@ public:
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::setNbDigits);
         QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
-        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::saveSettings);
+        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::saveNbDigitsToSettings);
 
         // reload nb decimals
-        loadSetting();
+        loadNbDigitsFromSettings();
 
 #ifdef _GSAMPLE_
         this->setModal(true);
@@ -194,11 +194,11 @@ public:
     void setProjectDir(const QDir& projectDir) override
     {
         QIodeObjectWidget<M, V>::setProjectDir(projectDir);
-        loadSetting();
+        loadNbDigitsFromSettings();
     }
 #endif
 
-    void loadSetting()
+    void loadNbDigitsFromSettings()
     {
         QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
         if(!project_settings)
@@ -213,7 +213,7 @@ public:
         project_settings->endGroup();
     }
 
-    void saveSettings()
+    void saveNbDigitsToSettings()
     {
         QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
         if(!project_settings)
