@@ -9,7 +9,7 @@
 #include "text_edit/completer.h"
 
 
-class QIodeMenuDataScanObjects : public QIodeSettings, public Ui::QIodeMenuDataScanObjects
+class MenuDataScanObjects : public QIodeSettings, public Ui::MenuDataScanObjects
 {
     Q_OBJECT
 
@@ -19,8 +19,8 @@ class QIodeMenuDataScanObjects : public QIodeSettings, public Ui::QIodeMenuDataS
     IodeCompleter* completer;
 
 public:
-	QIodeMenuDataScanObjects(QWidget* parent = nullptr);
-    ~QIodeMenuDataScanObjects();
+	MenuDataScanObjects(QWidget* parent = nullptr);
+    ~MenuDataScanObjects();
 
 public slots:
     void scan();

@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuComputeSCCDecomposition::QIodeMenuComputeSCCDecomposition(QWidget* parent) : 
+MenuComputeSCCDecomposition::MenuComputeSCCDecomposition(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -35,7 +35,7 @@ QIodeMenuComputeSCCDecomposition::QIodeMenuComputeSCCDecomposition(QWidget* pare
     loadSettings();
 }
 
-QIodeMenuComputeSCCDecomposition::~QIodeMenuComputeSCCDecomposition()
+MenuComputeSCCDecomposition::~MenuComputeSCCDecomposition()
 {
     delete qEquationsList;
     delete qTriangulationIterations;
@@ -46,7 +46,7 @@ QIodeMenuComputeSCCDecomposition::~QIodeMenuComputeSCCDecomposition()
     delete completer;
 }
 
-void QIodeMenuComputeSCCDecomposition::compute()
+void MenuComputeSCCDecomposition::compute()
 {
     try
     {

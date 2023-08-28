@@ -1,7 +1,7 @@
 #include "print_variables.h"
 
 
-QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent) : QIodeMenuPrintAbstract(parent)
+MenuPrintVariables::MenuPrintVariables(QWidget* parent) : MenuPrintAbstract(parent)
 {
     setupUi(this);
 
@@ -33,7 +33,7 @@ QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent) : QIodeMenuPri
     loadSettings();
 }
 
-QIodeMenuPrintVariables::~QIodeMenuPrintVariables()
+MenuPrintVariables::~MenuPrintVariables()
 {
     clear_all_reference_kdbs();
 
@@ -49,7 +49,7 @@ QIodeMenuPrintVariables::~QIodeMenuPrintVariables()
     delete completer;
 }
 
-void QIodeMenuPrintVariables::display()
+void MenuPrintVariables::display()
 {
     try
     {
@@ -86,7 +86,7 @@ void QIodeMenuPrintVariables::display()
     }
 }
 
-void QIodeMenuPrintVariables::print()
+void MenuPrintVariables::print()
 {
     try
     {
@@ -100,7 +100,7 @@ void QIodeMenuPrintVariables::print()
     }
 }
 
-void QIodeMenuPrintVariables::setup()
+void MenuPrintVariables::setup()
 {
     try
     {
@@ -114,7 +114,7 @@ void QIodeMenuPrintVariables::setup()
     }
 }
 
-void QIodeMenuPrintVariables::help()
+void MenuPrintVariables::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

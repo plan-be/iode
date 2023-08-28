@@ -1,7 +1,7 @@
 #include "print_tables.h"
 
 
-QIodeMenuPrintTables::QIodeMenuPrintTables(QWidget* parent) : QIodeMenuPrintAbstract(parent)
+MenuPrintTables::MenuPrintTables(QWidget* parent) : MenuPrintAbstract(parent)
 {
     setupUi(this);
 
@@ -33,7 +33,7 @@ QIodeMenuPrintTables::QIodeMenuPrintTables(QWidget* parent) : QIodeMenuPrintAbst
     loadSettings();
 }
 
-QIodeMenuPrintTables::~QIodeMenuPrintTables()
+MenuPrintTables::~MenuPrintTables()
 {
     clear_all_reference_kdbs();
     foreach(GSampleNumericalDialog* view, tableViews) view->close();
@@ -51,7 +51,7 @@ QIodeMenuPrintTables::~QIodeMenuPrintTables()
     delete completer;
 }
 
-void QIodeMenuPrintTables::display()
+void MenuPrintTables::display()
 {
     try
     {
@@ -100,7 +100,7 @@ void QIodeMenuPrintTables::display()
  * @note see C_ViewPrintGrTblVar() in sb_view.c from the old GUI
  * 
  */
-void QIodeMenuPrintTables::print()
+void MenuPrintTables::print()
 {
     try
     {
@@ -114,7 +114,7 @@ void QIodeMenuPrintTables::print()
     }
 }
 
-void QIodeMenuPrintTables::setup()
+void MenuPrintTables::setup()
 {
     try
     {
@@ -128,7 +128,7 @@ void QIodeMenuPrintTables::setup()
     }
 }
 
-void QIodeMenuPrintTables::help()
+void MenuPrintTables::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

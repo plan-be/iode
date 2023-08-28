@@ -1,6 +1,6 @@
 #include "list_calculus.h"
 
-QIodeMenuDataListCalculus::QIodeMenuDataListCalculus(QWidget* parent)
+MenuDataListCalculus::MenuDataListCalculus(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -26,7 +26,7 @@ QIodeMenuDataListCalculus::QIodeMenuDataListCalculus(QWidget* parent)
     loadSettings();
 }
 
-QIodeMenuDataListCalculus::~QIodeMenuDataListCalculus()
+MenuDataListCalculus::~MenuDataListCalculus()
 {
     delete wList1;
     delete wList2;
@@ -56,7 +56,7 @@ QIodeMenuDataListCalculus::~QIodeMenuDataListCalculus()
 //    rc = B_DataCalcLst("_RES LST1 x LST2");
 //    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 //    S4ASSERT(cond == 1, "B_DataCalcLst(\"_RES LST1 x LST2\") = '%s'", KLPTR("_RES"));
-void QIodeMenuDataListCalculus::calculus()
+void MenuDataListCalculus::calculus()
 {
     try
     {
@@ -87,7 +87,7 @@ void QIodeMenuDataListCalculus::calculus()
     }
 }
 
-void QIodeMenuDataListCalculus::help()
+void MenuDataListCalculus::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

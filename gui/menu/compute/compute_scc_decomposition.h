@@ -16,7 +16,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuComputeSCCDecomposition : public QIodeSettings, public Ui::QIodeMenuComputeSCCDecomposition
+class MenuComputeSCCDecomposition : public QIodeSettings, public Ui::MenuComputeSCCDecomposition
 {
     Q_OBJECT
 
@@ -29,8 +29,8 @@ class QIodeMenuComputeSCCDecomposition : public QIodeSettings, public Ui::QIodeM
     IodeCompleter*         completer;
 
 public:
-	QIodeMenuComputeSCCDecomposition(QWidget* parent = nullptr);
-    ~QIodeMenuComputeSCCDecomposition();
+	MenuComputeSCCDecomposition(QWidget* parent = nullptr);
+    ~MenuComputeSCCDecomposition();
 
 public slots:
     void compute();

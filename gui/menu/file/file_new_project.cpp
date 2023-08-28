@@ -1,7 +1,7 @@
 #include "file_new_project.h"
 
 
-QIodeMenuFileNewProject::QIodeMenuFileNewProject(const QString& currentProjectPath, QWidget* parent) : 
+MenuFileNewProject::MenuFileNewProject(const QString& currentProjectPath, QWidget* parent) : 
     QDialog(parent)
 {
     setupUi(this);
@@ -20,12 +20,12 @@ QIodeMenuFileNewProject::QIodeMenuFileNewProject(const QString& currentProjectPa
     wDirPath->setQValue(parentPath);
 }
 
-QIodeMenuFileNewProject::~QIodeMenuFileNewProject()
+MenuFileNewProject::~MenuFileNewProject()
 {
     delete wDirPath;
 }
 
-void QIodeMenuFileNewProject::create()
+void MenuFileNewProject::create()
 {
     QString newProjectPath = wDirPath->getQValue().toString();
     QFileInfo newProjectInfo(newProjectPath);

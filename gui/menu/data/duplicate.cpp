@@ -1,7 +1,7 @@
 #include "duplicate.h"
 
 
-QIodeMenuDataDuplicateObj::QIodeMenuDataDuplicateObj(QWidget* parent)
+MenuDataDuplicateObj::MenuDataDuplicateObj(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -27,7 +27,7 @@ QIodeMenuDataDuplicateObj::QIodeMenuDataDuplicateObj(QWidget* parent)
     loadSettings();
 }
 
-QIodeMenuDataDuplicateObj::~QIodeMenuDataDuplicateObj()
+MenuDataDuplicateObj::~MenuDataDuplicateObj()
 {
     delete wComboIodeTypes;
     delete wObjName;
@@ -36,7 +36,7 @@ QIodeMenuDataDuplicateObj::~QIodeMenuDataDuplicateObj()
     delete completer;
 }
 
-void QIodeMenuDataDuplicateObj::duplicate()
+void MenuDataDuplicateObj::duplicate()
 {
     try
     {
@@ -87,7 +87,7 @@ void QIodeMenuDataDuplicateObj::duplicate()
     }
 }
 
-void QIodeMenuDataDuplicateObj::help()
+void MenuDataDuplicateObj::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

@@ -2,7 +2,7 @@
 #include "workspace_trend_correction.h"
 
 
-QIodeMenuWorkspaceTrendCorrection::QIodeMenuWorkspaceTrendCorrection(QWidget* parent) : 
+MenuWorkspaceTrendCorrection::MenuWorkspaceTrendCorrection(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -22,7 +22,7 @@ QIodeMenuWorkspaceTrendCorrection::QIodeMenuWorkspaceTrendCorrection(QWidget* pa
     loadSettings();
 }
 
-QIodeMenuWorkspaceTrendCorrection::~QIodeMenuWorkspaceTrendCorrection()
+MenuWorkspaceTrendCorrection::~MenuWorkspaceTrendCorrection()
 {
     delete wInputFile;
     delete wLambda;
@@ -30,7 +30,7 @@ QIodeMenuWorkspaceTrendCorrection::~QIodeMenuWorkspaceTrendCorrection()
     delete wLog;
 }
 
-void QIodeMenuWorkspaceTrendCorrection::trend_correction()
+void MenuWorkspaceTrendCorrection::trend_correction()
 {
     try
     {
@@ -51,7 +51,7 @@ void QIodeMenuWorkspaceTrendCorrection::trend_correction()
     this->accept();
 }
 
-void QIodeMenuWorkspaceTrendCorrection::help()
+void MenuWorkspaceTrendCorrection::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

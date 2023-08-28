@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuFileImportComments</class>
- <widget class="QDialog" name="QIodeMenuFileImportComments">
+ <class>MenuFileImportComments</class>
+ <widget class="QDialog" name="MenuFileImportComments">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -305,7 +305,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileImportComments</receiver>
+   <receiver>MenuFileImportComments</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -321,7 +321,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileImportComments</receiver>
+   <receiver>MenuFileImportComments</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -337,7 +337,7 @@
   <connection>
    <sender>openButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileImportComments</receiver>
+   <receiver>MenuFileImportComments</receiver>
    <slot>import()</slot>
    <hints>
     <hint type="sourcelabel">

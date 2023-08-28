@@ -8,7 +8,7 @@
 #include "wrapper_classes.h"
 
 
-class QIodeMenuDataFileContents : public QIodeSettings, public Ui::QIodeMenuDataFileContents
+class MenuDataFileContents : public QIodeSettings, public Ui::MenuDataFileContents
 {
     Q_OBJECT
 
@@ -19,8 +19,8 @@ class QIodeMenuDataFileContents : public QIodeSettings, public Ui::QIodeMenuData
     WrapperQTextEdit*   wResult;
 
 public:
-	QIodeMenuDataFileContents(QWidget* parent = nullptr);
-    ~QIodeMenuDataFileContents();
+	MenuDataFileContents(QWidget* parent = nullptr);
+    ~MenuDataFileContents();
 
 public slots:
     void search();

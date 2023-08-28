@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuComputeModel</class>
- <widget class="QDialog" name="QIodeMenuComputeModel">
+ <class>MenuComputeModel</class>
+ <widget class="QDialog" name="MenuComputeModel">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -149,7 +149,7 @@ all equations)</string>
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeModel</receiver>
+   <receiver>MenuComputeModel</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -165,7 +165,7 @@ all equations)</string>
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeModel</receiver>
+   <receiver>MenuComputeModel</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -181,7 +181,7 @@ all equations)</string>
   <connection>
    <sender>OKButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeModel</receiver>
+   <receiver>MenuComputeModel</receiver>
    <slot>compute()</slot>
    <hints>
     <hint type="sourcelabel">

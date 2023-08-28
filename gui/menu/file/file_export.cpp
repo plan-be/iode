@@ -1,7 +1,7 @@
 #include "file_export.h"
 
 
-QIodeMenuFileExport::QIodeMenuFileExport(QWidget* parent) :
+MenuFileExport::MenuFileExport(QWidget* parent) :
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -36,7 +36,7 @@ QIodeMenuFileExport::QIodeMenuFileExport(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuFileExport::~QIodeMenuFileExport()
+MenuFileExport::~MenuFileExport()
 {
     delete wVarFile;
     delete wCmtFile;
@@ -50,7 +50,7 @@ QIodeMenuFileExport::~QIodeMenuFileExport()
     delete wDebugFile;
 }
 
-void QIodeMenuFileExport::save()
+void MenuFileExport::save()
 {
     try
     {
@@ -78,7 +78,7 @@ void QIodeMenuFileExport::save()
     this->accept();
 }
 
-void QIodeMenuFileExport::help()
+void MenuFileExport::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

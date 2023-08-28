@@ -18,7 +18,7 @@
  */
 
 
-class QIodeMenuWorkspaceLowToHigh : public QIodeSettings, public Ui::QIodeMenuWorkspaceLowToHigh
+class MenuWorkspaceLowToHigh : public QIodeSettings, public Ui::MenuWorkspaceLowToHigh
 {
     Q_OBJECT
 
@@ -28,8 +28,8 @@ class QIodeMenuWorkspaceLowToHigh : public QIodeSettings, public Ui::QIodeMenuWo
     WrapperQTextEdit* wFlowSeries;
 
 public:
-	QIodeMenuWorkspaceLowToHigh(QWidget* parent = nullptr);
-	~QIodeMenuWorkspaceLowToHigh();
+	MenuWorkspaceLowToHigh(QWidget* parent = nullptr);
+	~MenuWorkspaceLowToHigh();
 
 public slots:
     void slot_low_to_high();

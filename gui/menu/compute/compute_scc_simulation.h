@@ -15,7 +15,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuComputeSCCSimulation : public QIodeSettings, public Ui::QIodeMenuComputeSCCSimulation
+class MenuComputeSCCSimulation : public QIodeSettings, public Ui::MenuComputeSCCSimulation
 {
     Q_OBJECT
 
@@ -33,8 +33,8 @@ class QIodeMenuComputeSCCSimulation : public QIodeSettings, public Ui::QIodeMenu
     WrapperQLineEdit* qPostRecursiveListName;
 
 public:
-	QIodeMenuComputeSCCSimulation(QWidget* parent = nullptr);
-    ~QIodeMenuComputeSCCSimulation();
+	MenuComputeSCCSimulation(QWidget* parent = nullptr);
+    ~MenuComputeSCCSimulation();
 
 public slots:
     void compute();

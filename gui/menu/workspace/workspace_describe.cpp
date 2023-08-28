@@ -1,7 +1,7 @@
 #include "workspace_describe.h"
 
 
-QIodeMenuWorkspaceDescribe::QIodeMenuWorkspaceDescribe(QWidget* parent) : 
+MenuWorkspaceDescribe::MenuWorkspaceDescribe(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -29,7 +29,7 @@ QIodeMenuWorkspaceDescribe::QIodeMenuWorkspaceDescribe(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuWorkspaceDescribe::~QIodeMenuWorkspaceDescribe()
+MenuWorkspaceDescribe::~MenuWorkspaceDescribe()
 {
     delete wCommentsDescription;
     delete wEquationsDescription;
@@ -40,7 +40,7 @@ QIodeMenuWorkspaceDescribe::~QIodeMenuWorkspaceDescribe()
     delete wVariablesDescription;
 }
 
-void QIodeMenuWorkspaceDescribe::update_descriptions()
+void MenuWorkspaceDescribe::update_descriptions()
 {
     try
     {
@@ -103,7 +103,7 @@ void QIodeMenuWorkspaceDescribe::update_descriptions()
     this->accept();
 }
 
-void QIodeMenuWorkspaceDescribe::help()
+void MenuWorkspaceDescribe::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

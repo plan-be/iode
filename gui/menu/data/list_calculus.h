@@ -18,7 +18,7 @@
  *         x = product: ["A", "B"] x ["C", "D"] => ["AB", "AC", "BC", "BD"]
  * 
  */
-class QIodeMenuDataListCalculus : public QIodeSettings, public Ui::QIodeMenuDataListCalculus
+class MenuDataListCalculus : public QIodeSettings, public Ui::MenuDataListCalculus
 {
     Q_OBJECT
 
@@ -31,8 +31,8 @@ class QIodeMenuDataListCalculus : public QIodeSettings, public Ui::QIodeMenuData
     IodeCompleter* completer;
 
 public:
-	QIodeMenuDataListCalculus(QWidget* parent = nullptr);
-    ~QIodeMenuDataListCalculus();
+	MenuDataListCalculus(QWidget* parent = nullptr);
+    ~MenuDataListCalculus();
 
 public slots:
     void calculus();

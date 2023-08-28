@@ -1,7 +1,7 @@
 #include "scan_objects.h"
 
 
-QIodeMenuDataScanObjects::QIodeMenuDataScanObjects(QWidget* parent)
+MenuDataScanObjects::MenuDataScanObjects(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -25,7 +25,7 @@ QIodeMenuDataScanObjects::QIodeMenuDataScanObjects(QWidget* parent)
     loadSettings();
 }
 
-QIodeMenuDataScanObjects::~QIodeMenuDataScanObjects()
+MenuDataScanObjects::~MenuDataScanObjects()
 {
     delete wComboIodeTypes;
     delete wListsToScan;
@@ -35,7 +35,7 @@ QIodeMenuDataScanObjects::~QIodeMenuDataScanObjects()
 
 // TODO ALD: implement a scan_objects() method in KDBAbstract + tests
 // Tests: iode type = I_EQUATIONS, list to scan = ???
-void QIodeMenuDataScanObjects::scan()
+void MenuDataScanObjects::scan()
 {
     try
     {
@@ -54,7 +54,7 @@ void QIodeMenuDataScanObjects::scan()
     }
 }
 
-void QIodeMenuDataScanObjects::help()
+void MenuDataScanObjects::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

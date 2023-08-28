@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuComputeModel::QIodeMenuComputeModel(QWidget* parent) : 
+MenuComputeModel::MenuComputeModel(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -26,13 +26,13 @@ QIodeMenuComputeModel::QIodeMenuComputeModel(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuComputeModel::~QIodeMenuComputeModel()
+MenuComputeModel::~MenuComputeModel()
 {
     delete qEquationsList;
     delete completer;
 }
 
-void QIodeMenuComputeModel::compute()
+void MenuComputeModel::compute()
 {
     try
     {

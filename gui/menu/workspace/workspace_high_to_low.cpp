@@ -1,7 +1,7 @@
 #include "workspace_high_to_low.h"
 
 
-QIodeMenuWorkspaceHighToLow::QIodeMenuWorkspaceHighToLow(QWidget* parent) : 
+MenuWorkspaceHighToLow::MenuWorkspaceHighToLow(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -21,7 +21,7 @@ QIodeMenuWorkspaceHighToLow::QIodeMenuWorkspaceHighToLow(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuWorkspaceHighToLow::~QIodeMenuWorkspaceHighToLow()
+MenuWorkspaceHighToLow::~MenuWorkspaceHighToLow()
 {
     delete wInputFile;
     delete wLastObs;
@@ -29,7 +29,7 @@ QIodeMenuWorkspaceHighToLow::~QIodeMenuWorkspaceHighToLow()
     delete wSum;
 }
 
-void QIodeMenuWorkspaceHighToLow::slot_high_to_low()
+void MenuWorkspaceHighToLow::slot_high_to_low()
 {
     try
     {
@@ -55,7 +55,7 @@ void QIodeMenuWorkspaceHighToLow::slot_high_to_low()
     this->accept();
 }
 
-void QIodeMenuWorkspaceHighToLow::help()
+void MenuWorkspaceHighToLow::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

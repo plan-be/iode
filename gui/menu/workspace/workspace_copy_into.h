@@ -17,7 +17,7 @@
  */
 
 
-class QIodeMenuWorkspaceCopyInto : public QIodeSettings, public Ui::QIodeMenuWorkspaceCopyInto
+class MenuWorkspaceCopyInto : public QIodeSettings, public Ui::MenuWorkspaceCopyInto
 {
     Q_OBJECT
 
@@ -28,8 +28,8 @@ class QIodeMenuWorkspaceCopyInto : public QIodeSettings, public Ui::QIodeMenuWor
     WrapperQTextEdit*   wTextEditObjectNames;
 
 public:
-    QIodeMenuWorkspaceCopyInto(QWidget* parent = nullptr);
-    ~QIodeMenuWorkspaceCopyInto();
+    MenuWorkspaceCopyInto(QWidget* parent = nullptr);
+    ~MenuWorkspaceCopyInto();
 
 public slots:
 	void copy_into_workspace();

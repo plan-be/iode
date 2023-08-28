@@ -1,7 +1,7 @@
 #include "workspace_merge_into.h"
 
 
-QIodeMenuWorkspaceMergeInto::QIodeMenuWorkspaceMergeInto(QWidget* parent) : 
+MenuWorkspaceMergeInto::MenuWorkspaceMergeInto(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -15,19 +15,19 @@ QIodeMenuWorkspaceMergeInto::QIodeMenuWorkspaceMergeInto(QWidget* parent) :
     mapFields["ObjectType"] = wComboBoxObjectType;
     mapFields["InputFile"] = wFileChooserInputFile;
 
-    connect(&wComboBoxObjectType->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuWorkspaceMergeInto::updateFileChooser);
+    connect(&wComboBoxObjectType->getQField(), &QComboBox::currentIndexChanged, this, &MenuWorkspaceMergeInto::updateFileChooser);
 
     className = "MENU_WORKSPACE_MERGE_INTO";
     loadSettings();
 }
 
-QIodeMenuWorkspaceMergeInto::~QIodeMenuWorkspaceMergeInto()
+MenuWorkspaceMergeInto::~MenuWorkspaceMergeInto()
 {
     delete wComboBoxObjectType;
     delete wFileChooserInputFile;
 }
 
-void QIodeMenuWorkspaceMergeInto::merge_into_workspace()
+void MenuWorkspaceMergeInto::merge_into_workspace()
 {
     try
     {
@@ -77,7 +77,7 @@ void QIodeMenuWorkspaceMergeInto::merge_into_workspace()
     this->accept();
 }
 
-void QIodeMenuWorkspaceMergeInto::help()
+void MenuWorkspaceMergeInto::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

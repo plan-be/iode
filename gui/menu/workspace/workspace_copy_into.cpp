@@ -1,7 +1,7 @@
 #include "workspace_copy_into.h"
 
 
-QIodeMenuWorkspaceCopyInto::QIodeMenuWorkspaceCopyInto(QWidget* parent) : 
+MenuWorkspaceCopyInto::MenuWorkspaceCopyInto(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -21,13 +21,13 @@ QIodeMenuWorkspaceCopyInto::QIodeMenuWorkspaceCopyInto(QWidget* parent) :
     mapFields["SampleTo"] = wSampleEditSampleTo;
     mapFields["ObjectNames"] = wTextEditObjectNames;
 
-    connect(&wComboBoxObjectType->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuWorkspaceCopyInto::updateFileChooser);
+    connect(&wComboBoxObjectType->getQField(), &QComboBox::currentIndexChanged, this, &MenuWorkspaceCopyInto::updateFileChooser);
 
     className = "MENU_WORKSPACE_COPY_INTO";
     loadSettings();
 }
 
-QIodeMenuWorkspaceCopyInto::~QIodeMenuWorkspaceCopyInto()
+MenuWorkspaceCopyInto::~MenuWorkspaceCopyInto()
 {
     delete wComboBoxObjectType;
     delete wFileChooserInputFile;
@@ -36,7 +36,7 @@ QIodeMenuWorkspaceCopyInto::~QIodeMenuWorkspaceCopyInto()
     delete wTextEditObjectNames;
 }
 
-void QIodeMenuWorkspaceCopyInto::copy_into_workspace()
+void MenuWorkspaceCopyInto::copy_into_workspace()
 {
     try
     {
@@ -89,7 +89,7 @@ void QIodeMenuWorkspaceCopyInto::copy_into_workspace()
     this->accept();
 }
 
-void QIodeMenuWorkspaceCopyInto::help()
+void MenuWorkspaceCopyInto::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

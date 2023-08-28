@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuDataSearchText</class>
- <widget class="QDialog" name="QIodeMenuDataSearchText">
+ <class>MenuDataSearchText</class>
+ <widget class="QDialog" name="MenuDataSearchText">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -278,7 +278,7 @@
   <connection>
    <sender>pushButton_search</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataSearchText</receiver>
+   <receiver>MenuDataSearchText</receiver>
    <slot>search()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -294,7 +294,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataSearchText</receiver>
+   <receiver>MenuDataSearchText</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -310,7 +310,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataSearchText</receiver>
+   <receiver>MenuDataSearchText</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

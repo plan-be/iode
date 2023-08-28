@@ -8,7 +8,7 @@
 #include "wrapper_classes.h"
 
 
-class QIodeMenuDataSearchText : public QIodeSettings, public Ui::QIodeMenuDataSearchText
+class MenuDataSearchText : public QIodeSettings, public Ui::MenuDataSearchText
 {
     Q_OBJECT
 
@@ -23,8 +23,8 @@ class QIodeMenuDataSearchText : public QIodeSettings, public Ui::QIodeMenuDataSe
     WrapperQTextEdit* wResults;
 
 public:
-	QIodeMenuDataSearchText(QWidget* parent = nullptr);
-    ~QIodeMenuDataSearchText();
+	MenuDataSearchText(QWidget* parent = nullptr);
+    ~MenuDataSearchText();
 
 public slots:
     void search();

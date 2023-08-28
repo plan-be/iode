@@ -9,7 +9,7 @@
 #include "text_edit/complete_line_edit.h"
 
 
-class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDataSortExpandList
+class MenuDataSortExpandList : public QIodeSettings, public Ui::MenuDataSortExpandList
 {
     Q_OBJECT
 
@@ -19,8 +19,8 @@ class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDa
     IodeCompleter* completer;
 
 public:
-	QIodeMenuDataSortExpandList(QWidget* parent = nullptr);
-    ~QIodeMenuDataSortExpandList();
+	MenuDataSortExpandList(QWidget* parent = nullptr);
+    ~MenuDataSortExpandList();
 
 public slots:
     void sort();

@@ -211,7 +211,7 @@ void MainWindow::createNewProject()
         if (answer == QMessageBox::Discard) return;
     }
 
-    QIodeMenuFileNewProject dialog(projectPath, this);
+    MenuFileNewProject dialog(projectPath, this);
     if (dialog.exec() == QDialog::Accepted)
     {
         QString newProjectPath = dialog.getPathNewProject();
@@ -309,7 +309,7 @@ void MainWindow::open_import_comments_dialog()
 {
     computeHash(true);
 
-    QIodeMenuFileImportComments dialog(this);
+    MenuFileImportComments dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_COMMENTS);
@@ -321,7 +321,7 @@ void MainWindow::open_import_variables_dialog()
 {
     computeHash(true);
 
-    QIodeMenuFileImportVariables dialog(this);
+    MenuFileImportVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
@@ -331,7 +331,7 @@ void MainWindow::open_import_variables_dialog()
 
 void MainWindow::open_export_dialog()
 {
-    QIodeMenuFileExport dialog(this);
+    MenuFileExport dialog(this);
     dialog.exec();
 }
 
@@ -358,7 +358,7 @@ void MainWindow::clear_workspace()
 void MainWindow::open_copy_into_workspace_dialog()
 {
     computeHash(true);
-    QIodeMenuWorkspaceCopyInto dialog(this);
+    MenuWorkspaceCopyInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilters();
@@ -369,7 +369,7 @@ void MainWindow::open_copy_into_workspace_dialog()
 void MainWindow::open_merge_into_workspace_dialog()
 {
     computeHash(true);
-    QIodeMenuWorkspaceMergeInto dialog(this);
+    MenuWorkspaceMergeInto dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilters();
@@ -379,7 +379,7 @@ void MainWindow::open_merge_into_workspace_dialog()
 
 void MainWindow::open_change_workspace_descriptions_dialog()
 {
-    QIodeMenuWorkspaceDescribe dialog(this);
+    MenuWorkspaceDescribe dialog(this);
     dialog.exec();
 }
 
@@ -397,7 +397,7 @@ void MainWindow::open_extrapolate_variables_dialog()
 {
     computeHash(true);
 
-    QIodeMenuWorkspaceExtrapolateVariables dialog(this);
+    MenuWorkspaceExtrapolateVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
@@ -410,7 +410,7 @@ void MainWindow::open_high_to_low_dialog()
     check_vars_sample();
     computeHash(true);
 
-    QIodeMenuWorkspaceHighToLow dialog(this);
+    MenuWorkspaceHighToLow dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
@@ -423,7 +423,7 @@ void MainWindow::open_low_to_high_dialog()
     check_vars_sample();
     computeHash(true);
     
-    QIodeMenuWorkspaceLowToHigh dialog(this);
+    MenuWorkspaceLowToHigh dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
         tabWidget_IODE_objs->resetFilter(I_VARIABLES);
@@ -435,7 +435,7 @@ void MainWindow::open_seasonal_adjustment_dialog()
 {
     computeHash(true);
 
-    QIodeMenuWorkspaceSeasonalAdjustment dialog(this);
+    MenuWorkspaceSeasonalAdjustment dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -444,7 +444,7 @@ void MainWindow::open_trend_correction_dialog()
 {
     computeHash(true);
 
-    QIodeMenuWorkspaceTrendCorrection dialog(this);
+    MenuWorkspaceTrendCorrection dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -455,7 +455,7 @@ void MainWindow::open_sort_and_calculus_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataSortExpandList dialog(this);
+    MenuDataSortExpandList dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer(I_LISTS);
 }
@@ -464,7 +464,7 @@ void MainWindow::open_list_calculus_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataListCalculus dialog(this);
+    MenuDataListCalculus dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer(I_LISTS);
 }
@@ -473,7 +473,7 @@ void MainWindow::open_file_contents_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataFileContents dialog(this);
+    MenuDataFileContents dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer(I_LISTS);
 }
@@ -482,7 +482,7 @@ void MainWindow::open_file_compare_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataFileCompare dialog(this);
+    MenuDataFileCompare dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer(I_LISTS);
 }
@@ -491,7 +491,7 @@ void MainWindow::open_search_text_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataSearchText dialog(this);
+    MenuDataSearchText dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer(I_LISTS);
 }
@@ -500,7 +500,7 @@ void MainWindow::open_scan_objects_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataScanObjects dialog(this);
+    MenuDataScanObjects dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer(I_LISTS);
 }
@@ -509,7 +509,7 @@ void MainWindow::open_edit_tables_variables_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataEditTables dialog(this);
+    MenuDataEditTables dialog(this);
     dialog.exec();
 }
 
@@ -517,7 +517,7 @@ void MainWindow::open_duplicate_objects_dialog()
 {
     computeHash(true);
 
-    QIodeMenuDataDuplicateObj dialog(this);
+    MenuDataDuplicateObj dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -528,7 +528,7 @@ void MainWindow::open_compute_identities_dialog()
 {
     computeHash(true);
 
-    QIodeMenuComputeIdentities dialog(this);
+    MenuComputeIdentities dialog(this);
 
     QString identites;
     QStringList identitiesList = tabWidget_IODE_objs->getSelectedObjectsNames(I_IDENTITIES);
@@ -543,7 +543,7 @@ void MainWindow::open_compute_simulation_dialog()
 {
     computeHash(true);
 
-    QIodeMenuComputeSimulation dialog(this);
+    MenuComputeSimulation dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -552,7 +552,7 @@ void MainWindow::open_compute_model_dialog()
 {
     computeHash(true);
 
-    QIodeMenuComputeModel dialog(this);
+    MenuComputeModel dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -561,7 +561,7 @@ void MainWindow::open_compute_scc_decomposition_dialog()
 {
     computeHash(true);
 
-    QIodeMenuComputeSCCDecomposition dialog(this);
+    MenuComputeSCCDecomposition dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -570,7 +570,7 @@ void MainWindow::open_compute_scc_simulation_dialog()
 {
     computeHash(true);
 
-    QIodeMenuComputeSCCSimulation dialog(this);
+    MenuComputeSCCSimulation dialog(this);
     if (dialog.exec() == QDialog::Accepted)
         update_tab_and_completer();
 }
@@ -578,13 +578,13 @@ void MainWindow::open_compute_scc_simulation_dialog()
 
 void MainWindow::open_print_tables_dialog()
 {
-    QIodeMenuPrintTables dialog(this);
+    MenuPrintTables dialog(this);
     dialog.exec();
 }
 
 void MainWindow::open_print_variables_dialog()
 {
-    QIodeMenuPrintVariables dialog(this);
+    MenuPrintVariables dialog(this);
     dialog.exec();
 }
 
@@ -595,26 +595,26 @@ void MainWindow::open_print_objects_definitions_dialog()
 
 void MainWindow::open_graphs_tables_dialog()
 {
-    QIodeMenuGraphTables dialog(this);
-    connect(&dialog, &QIodeMenuGraphTables::newPlot, this, &MainWindow::appendDialog);
+    MenuGraphTables dialog(this);
+    connect(&dialog, &MenuGraphTables::newPlot, this, &MainWindow::appendDialog);
     dialog.exec();
 }
 
 void MainWindow::open_graphs_variables_dialog()
 {
-    QIodeMenuGraphVariables dialog(this);
-    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendDialog);
+    MenuGraphVariables dialog(this);
+    connect(&dialog, &MenuGraphVariables::newPlot, this, &MainWindow::appendDialog);
     dialog.exec();
 }
 
 void MainWindow::open_graphs_variables_dialog_from_vars_view(
     const QList<QString>& variableNames, const QString& from, const QString& to)
 {
-    QIodeMenuGraphVariables dialog(this);
+    MenuGraphVariables dialog(this);
     dialog.setVariablesNames(variableNames);
 	dialog.setFrom(from);
 	dialog.setTo(to);
-    connect(&dialog, &QIodeMenuGraphVariables::newPlot, this, &MainWindow::appendDialog);
+    connect(&dialog, &MenuGraphVariables::newPlot, this, &MainWindow::appendDialog);
     dialog.exec();
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuComputeIdentities</class>
- <widget class="QDialog" name="QIodeMenuComputeIdentities">
+ <class>MenuComputeIdentities</class>
+ <widget class="QDialog" name="MenuComputeIdentities">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -319,7 +319,7 @@ Files</string>
   <connection>
    <sender>OKButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeIdentities</receiver>
+   <receiver>MenuComputeIdentities</receiver>
    <slot>compute()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -335,7 +335,7 @@ Files</string>
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeIdentities</receiver>
+   <receiver>MenuComputeIdentities</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -351,7 +351,7 @@ Files</string>
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeIdentities</receiver>
+   <receiver>MenuComputeIdentities</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

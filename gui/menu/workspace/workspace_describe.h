@@ -17,7 +17,7 @@
  */
 
 
-class QIodeMenuWorkspaceDescribe : public QIodeSettings, public Ui::QIodeMenuWorkspaceDescribe
+class MenuWorkspaceDescribe : public QIodeSettings, public Ui::MenuWorkspaceDescribe
 {
     Q_OBJECT
 
@@ -30,8 +30,8 @@ class QIodeMenuWorkspaceDescribe : public QIodeSettings, public Ui::QIodeMenuWor
     WrapperQLineEdit*    wVariablesDescription;
 
 public:
-    QIodeMenuWorkspaceDescribe(QWidget* parent = nullptr);
-    ~QIodeMenuWorkspaceDescribe();
+    MenuWorkspaceDescribe(QWidget* parent = nullptr);
+    ~MenuWorkspaceDescribe();
 
 public slots:
 	void update_descriptions();

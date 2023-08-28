@@ -1,7 +1,7 @@
 #include "print_abstract.h"
 
 
-void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QString& names)
+void MenuPrintAbstract::printTableOrVariable(const bool isTable, const QString& names)
 {
     QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
     bool printToFile = project_settings->value(MenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST).toBool();
@@ -57,7 +57,7 @@ void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QStr
     else
     {
         QPrintPreviewDialog dialog(&printer);
-        connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodeMenuPrintAbstract::renderForPrinting);
+        connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &MenuPrintAbstract::renderForPrinting);
 
         if(isTable)
             printTable(dialog, document, names, gsample, files, NbDecimals, lang);

@@ -17,7 +17,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuComputeIdentities : public QIodeSettings, public Ui::QIodeMenuComputeIdentities
+class MenuComputeIdentities : public QIodeSettings, public Ui::MenuComputeIdentities
 {
     Q_OBJECT
 
@@ -37,8 +37,8 @@ class QIodeMenuComputeIdentities : public QIodeSettings, public Ui::QIodeMenuCom
     IodeCompleter*         completer;
 
 public:
-	QIodeMenuComputeIdentities(QWidget* parent = nullptr);
-    ~QIodeMenuComputeIdentities();
+	MenuComputeIdentities(QWidget* parent = nullptr);
+    ~MenuComputeIdentities();
 
     void setIdentitiesNames(const QStringList& identitiesNames)
     {

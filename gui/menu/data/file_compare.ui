@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuDataFileCompare</class>
- <widget class="QDialog" name="QIodeMenuDataFileCompare">
+ <class>MenuDataFileCompare</class>
+ <widget class="QDialog" name="MenuDataFileCompare">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -311,7 +311,7 @@
   <connection>
    <sender>pushButton_compare</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataFileCompare</receiver>
+   <receiver>MenuDataFileCompare</receiver>
    <slot>compare()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -327,7 +327,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataFileCompare</receiver>
+   <receiver>MenuDataFileCompare</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -343,7 +343,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataFileCompare</receiver>
+   <receiver>MenuDataFileCompare</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

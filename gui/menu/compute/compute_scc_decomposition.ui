@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuComputeSCCDecomposition</class>
- <widget class="QDialog" name="QIodeMenuComputeSCCDecomposition">
+ <class>MenuComputeSCCDecomposition</class>
+ <widget class="QDialog" name="MenuComputeSCCDecomposition">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -301,7 +301,7 @@ all equations)</string>
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeSCCDecomposition</receiver>
+   <receiver>MenuComputeSCCDecomposition</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -317,7 +317,7 @@ all equations)</string>
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeSCCDecomposition</receiver>
+   <receiver>MenuComputeSCCDecomposition</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -333,7 +333,7 @@ all equations)</string>
   <connection>
    <sender>OKButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeSCCDecomposition</receiver>
+   <receiver>MenuComputeSCCDecomposition</receiver>
    <slot>compute()</slot>
    <hints>
     <hint type="sourcelabel">

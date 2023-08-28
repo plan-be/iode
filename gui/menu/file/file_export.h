@@ -15,7 +15,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuFileExport: public QIodeSettings, public Ui::QIodeMenuFileExport
+class MenuFileExport: public QIodeSettings, public Ui::MenuFileExport
 {
     Q_OBJECT
 
@@ -31,8 +31,8 @@ class QIodeMenuFileExport: public QIodeSettings, public Ui::QIodeMenuFileExport
     WrapperFileChooser*  wDebugFile;
 
 public:
-	QIodeMenuFileExport(QWidget* parent = nullptr);
-	~QIodeMenuFileExport();
+	MenuFileExport(QWidget* parent = nullptr);
+	~MenuFileExport();
 
 public slots:
 	void save();

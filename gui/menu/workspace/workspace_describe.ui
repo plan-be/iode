@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuWorkspaceDescribe</class>
- <widget class="QDialog" name="QIodeMenuWorkspaceDescribe">
+ <class>MenuWorkspaceDescribe</class>
+ <widget class="QDialog" name="MenuWorkspaceDescribe">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -159,7 +159,7 @@
   <connection>
    <sender>pushButton_describe</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceDescribe</receiver>
+   <receiver>MenuWorkspaceDescribe</receiver>
    <slot>update_descriptions()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -175,7 +175,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceDescribe</receiver>
+   <receiver>MenuWorkspaceDescribe</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -191,7 +191,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceDescribe</receiver>
+   <receiver>MenuWorkspaceDescribe</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

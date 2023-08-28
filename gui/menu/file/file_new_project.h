@@ -17,15 +17,15 @@
  */
 
 
-class QIodeMenuFileNewProject : public QDialog, public Ui::QIodeMenuFileNewProject
+class MenuFileNewProject : public QDialog, public Ui::MenuFileNewProject
 {
     Q_OBJECT
 
     WrapperFileChooser* wDirPath;
 
 public:
-    QIodeMenuFileNewProject(const QString& currentProjectPath, QWidget* parent = nullptr);
-    ~QIodeMenuFileNewProject();
+    MenuFileNewProject(const QString& currentProjectPath, QWidget* parent = nullptr);
+    ~MenuFileNewProject();
 
     QString getPathNewProject() const { return wDirPath->getQValue().toString(); }
 

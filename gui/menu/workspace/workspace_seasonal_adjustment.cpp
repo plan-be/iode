@@ -2,7 +2,7 @@
 #include "workspace_seasonal_adjustment.h"
 
 
-QIodeMenuWorkspaceSeasonalAdjustment::QIodeMenuWorkspaceSeasonalAdjustment(QWidget* parent) : 
+MenuWorkspaceSeasonalAdjustment::MenuWorkspaceSeasonalAdjustment(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -20,14 +20,14 @@ QIodeMenuWorkspaceSeasonalAdjustment::QIodeMenuWorkspaceSeasonalAdjustment(QWidg
     loadSettings();
 }
 
-QIodeMenuWorkspaceSeasonalAdjustment::~QIodeMenuWorkspaceSeasonalAdjustment()
+MenuWorkspaceSeasonalAdjustment::~MenuWorkspaceSeasonalAdjustment()
 {
     delete wInputFile;
     delete wSeries;
     delete wEPSTest;
 }
 
-void QIodeMenuWorkspaceSeasonalAdjustment::seasonal_adjustment()
+void MenuWorkspaceSeasonalAdjustment::seasonal_adjustment()
 {
     try
     {
@@ -47,7 +47,7 @@ void QIodeMenuWorkspaceSeasonalAdjustment::seasonal_adjustment()
     this->accept();
 }
 
-void QIodeMenuWorkspaceSeasonalAdjustment::help()
+void MenuWorkspaceSeasonalAdjustment::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

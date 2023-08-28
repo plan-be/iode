@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuComputeSCCSimulation::QIodeMenuComputeSCCSimulation(QWidget* parent) : 
+MenuComputeSCCSimulation::MenuComputeSCCSimulation(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -44,7 +44,7 @@ QIodeMenuComputeSCCSimulation::QIodeMenuComputeSCCSimulation(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuComputeSCCSimulation::~QIodeMenuComputeSCCSimulation()
+MenuComputeSCCSimulation::~MenuComputeSCCSimulation()
 {
     delete qFrom;
     delete qTo;
@@ -58,7 +58,7 @@ QIodeMenuComputeSCCSimulation::~QIodeMenuComputeSCCSimulation()
     delete qPostRecursiveListName;
 }
 
-void QIodeMenuComputeSCCSimulation::compute()
+void MenuComputeSCCSimulation::compute()
 {
     try
     {

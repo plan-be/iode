@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuWorkspaceLowToHigh</class>
- <widget class="QDialog" name="QIodeMenuWorkspaceLowToHigh">
+ <class>MenuWorkspaceLowToHigh</class>
+ <widget class="QDialog" name="MenuWorkspaceLowToHigh">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -150,7 +150,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceLowToHigh</receiver>
+   <receiver>MenuWorkspaceLowToHigh</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -166,7 +166,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceLowToHigh</receiver>
+   <receiver>MenuWorkspaceLowToHigh</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -182,7 +182,7 @@
   <connection>
    <sender>pushButton_ltoh</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceLowToHigh</receiver>
+   <receiver>MenuWorkspaceLowToHigh</receiver>
    <slot>slot_low_to_high()</slot>
    <hints>
     <hint type="sourcelabel">
