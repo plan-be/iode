@@ -106,7 +106,7 @@ void QIodeMenuGraphTables::setup()
 {
     try
     {
-        QIodeMenuFilePrintSetup dialog(this);
+        MenuFilePrintSetup dialog(this);
         dialog.exec();
     }
     catch (const std::exception& e)
