@@ -21,7 +21,7 @@ QIodeMenuDataDuplicateObj::QIodeMenuDataDuplicateObj(QWidget* parent)
     mapFields["ObjName"]    = wObjName;
     mapFields["DupObjName"] = wDupObjName;
 
-    connect(comboBox_iode_types, &QComboBox::currentIndexChanged, lineEdit_obj_name, &QIodeCompleteLineEdit::setIodeType);
+    connect(comboBox_iode_types, &QComboBox::currentIndexChanged, lineEdit_obj_name, &IodeAutoCompleteLineEdit::setIodeType);
 
     className = "MENU_DATA_DUPLICATE_OBJ";
     loadSettings();

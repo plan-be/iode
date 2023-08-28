@@ -113,7 +113,7 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="2">
-    <widget class="QIodeCompleteLineEdit" name="lineEdit_obj_name"/>
+    <widget class="IodeAutoCompleteLineEdit" name="lineEdit_obj_name"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_dup_obj_name">
@@ -129,7 +129,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeCompleteLineEdit</class>
+   <class>IodeAutoCompleteLineEdit</class>
    <extends>QLineEdit</extends>
    <header>text_edit/complete_line_edit.h</header>
   </customwidget>

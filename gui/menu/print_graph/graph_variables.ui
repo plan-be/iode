@@ -44,7 +44,7 @@
     </widget>
    </item>
    <item row="0" column="1" colspan="6">
-    <widget class="QIodeCompleteTextEdit" name="textEdit_variables"/>
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_variables"/>
    </item>
    <item row="0" column="7" rowspan="3">
     <widget class="QSplitter" name="splitter">
@@ -331,7 +331,7 @@
    <header>util/widgets/sample_edit.h</header>
   </customwidget>
   <customwidget>
-   <class>QIodeCompleteTextEdit</class>
+   <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>text_edit/complete_text_edit.h</header>
   </customwidget>
