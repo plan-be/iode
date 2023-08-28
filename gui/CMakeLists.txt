@@ -29,7 +29,8 @@ set(GUI_SETTINGS
 )
 
 set(GUI_PRINT 
-    print/print.h           print/print.cpp
+                                    print/print.h                   print/print.cpp
+    print/print_file_dialog.ui      print/print_file_dialog.h       print/print_file_dialog.cpp
 )
 
 set(GUI_TABS
@@ -45,8 +46,6 @@ set(GUI_TABS
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/complete_line_edit.h         custom_widgets/complete_line_edit.cpp
     custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
-    custom_widgets/print_file_dialog.ui
-    custom_widgets/print_file_dialog.h          custom_widgets/print_file_dialog.cpp
     custom_widgets/completer.h                  custom_widgets/completer.cpp
     custom_widgets/highlighter.h                custom_widgets/highlighter.cpp
     custom_widgets/iode_command.h               custom_widgets/iode_command.cpp 
