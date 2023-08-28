@@ -21,7 +21,6 @@ set(GUI_UTILS
     util/widgets/sample_edit.h
     util/double_validator.h
     util/system_item.h
-    util/find_and_replace_dialog.ui     util/find_and_replace_dialog.h      util/find_and_replace_dialog.cpp
 )
 
 set(GUI_SETTINGS    
@@ -35,12 +34,13 @@ set(GUI_PRINT
 )
 
 set(GUI_TEXT_EDIT 
-    text_edit/completer.h                  text_edit/completer.cpp
-    text_edit/highlighter.h                text_edit/highlighter.cpp
-    text_edit/complete_line_edit.h         text_edit/complete_line_edit.cpp
-    text_edit/complete_text_edit.h         text_edit/complete_text_edit.cpp
-    text_edit/text_editor.h                text_edit/text_editor.cpp
-    text_edit/report_editor.h              text_edit/report_editor.cpp
+                                            text_edit/completer.h                   text_edit/completer.cpp
+                                            text_edit/highlighter.h                 text_edit/highlighter.cpp
+                                            text_edit/complete_line_edit.h          text_edit/complete_line_edit.cpp
+                                            text_edit/complete_text_edit.h          text_edit/complete_text_edit.cpp
+                                            text_edit/text_editor.h                 text_edit/text_editor.cpp
+                                            text_edit/report_editor.h               text_edit/report_editor.cpp
+    text_edit/find_and_replace_dialog.ui    text_edit/find_and_replace_dialog.h     text_edit/find_and_replace_dialog.cpp
 )
 
 set(GUI_TABS
