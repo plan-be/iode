@@ -21,7 +21,7 @@ void VariablesView::print()
 			QChar format;
 
 			// ask the user to set the output file and format
-			QIodePrintFileDialog dialog(this, outputFile);
+			PrintFileDialog dialog(this, outputFile);
 			if(dialog.exec() == QDialog::Accepted)
 			{
 				outputFile = dialog.getOutputFile();

@@ -11,7 +11,7 @@ void QIodeMenuPrintAbstract::printTableOrVariable(const bool isTable, const QStr
     if(printToFile)
     {
         // ask the user to set the output file and format
-        QIodePrintFileDialog dialog(this);
+        PrintFileDialog dialog(this);
         if(dialog.exec() == QDialog::Accepted)
         {
             outputFile = dialog.getOutputFile();
