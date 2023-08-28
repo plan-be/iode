@@ -22,7 +22,7 @@
  * @note For syntax highlight, see example https://doc.qt.io/qt-6/qtwidgets-richtext-syntaxhighlighter-example.html 
  *       For auto-completion, see example https://doc.qt.io/qt-6/qtwidgets-tools-customcompleter-example.html 
  */
-class ReportEditor : public TextEditor
+class ReportEditor : public IodeTextEditor
 {
     Q_OBJECT
 

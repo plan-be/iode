@@ -1,11 +1,11 @@
 #include "text_editor.h"
 
-TextEditor::TextEditor(QWidget *parent) : IodeAutoCompleteTextEdit(parent)
+IodeTextEditor::IodeTextEditor(QWidget *parent) : IodeAutoCompleteTextEdit(parent)
 {
     leftArea = new LeftArea(this);
 
-    connect(this, &TextEditor::blockCountChanged, this, &TextEditor::updateLeftAreaWidth);
-    connect(this, &TextEditor::updateRequest, this, &TextEditor::updateLeftArea);
+    connect(this, &IodeTextEditor::blockCountChanged, this, &IodeTextEditor::updateLeftAreaWidth);
+    connect(this, &IodeTextEditor::updateRequest, this, &IodeTextEditor::updateLeftArea);
 
     // set tab = 4 whitspaces
     setTabStopDistance(QFontMetricsF(this->font()).horizontalAdvance(' ') * 4);
@@ -29,12 +29,12 @@ TextEditor::TextEditor(QWidget *parent) : IodeAutoCompleteTextEdit(parent)
     replaceShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
     duplicateShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
-    connect(findShortcut, &QShortcut::activated, this, &TextEditor::openFindBox);
-    connect(replaceShortcut, &QShortcut::activated, this, &TextEditor::openReplaceBox);
-    connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::duplicateLine);
+    connect(findShortcut, &QShortcut::activated, this, &IodeTextEditor::openFindBox);
+    connect(replaceShortcut, &QShortcut::activated, this, &IodeTextEditor::openReplaceBox);
+    connect(duplicateShortcut, &QShortcut::activated, this, &IodeTextEditor::duplicateLine);
 }
 
-TextEditor::~TextEditor()
+IodeTextEditor::~IodeTextEditor()
 {
     delete findShortcut;
     delete replaceShortcut;
@@ -43,7 +43,7 @@ TextEditor::~TextEditor()
     delete findReplaceDialog;
 }
 
-void TextEditor::leftAreaPaintEvent(QPaintEvent *event)
+void IodeTextEditor::leftAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(leftArea);
     painter.fillRect(event->rect(), Qt::lightGray);
@@ -69,7 +69,7 @@ void TextEditor::leftAreaPaintEvent(QPaintEvent *event)
     }
 }
 
-int TextEditor::leftAreaWidth()
+int IodeTextEditor::leftAreaWidth()
 {
     int digits = 1;
     int max = qMax(1, blockCount());
@@ -84,7 +84,7 @@ int TextEditor::leftAreaWidth()
     return space;
 }
 
-void TextEditor::resizeEvent(QResizeEvent* event)
+void IodeTextEditor::resizeEvent(QResizeEvent* event)
 {
     QPlainTextEdit::resizeEvent(event);
 
@@ -92,12 +92,12 @@ void TextEditor::resizeEvent(QResizeEvent* event)
     leftArea->setGeometry(QRect(cr.left(), cr.top(), leftAreaWidth(), cr.height()));
 }
 
-void TextEditor::updateLeftAreaWidth(int newBlockCount)
+void IodeTextEditor::updateLeftAreaWidth(int newBlockCount)
 {
     setViewportMargins(leftAreaWidth(), 0, 0, 0);
 }
 
-void TextEditor::updateLeftArea(const QRect &rect, int dy)
+void IodeTextEditor::updateLeftArea(const QRect &rect, int dy)
 {
     // scroll vertically
     if (dy)
@@ -110,7 +110,7 @@ void TextEditor::updateLeftArea(const QRect &rect, int dy)
         updateLeftAreaWidth(0);
 }
 
-void TextEditor::popupFindReplaceBox(const bool find_only)
+void IodeTextEditor::popupFindReplaceBox(const bool find_only)
 {
     if(!findReplaceDialog->isVisible())
     {
@@ -129,17 +129,17 @@ void TextEditor::popupFindReplaceBox(const bool find_only)
     findReplaceDialog->setVisible(true);
 }
 
-void TextEditor::openFindBox()
+void IodeTextEditor::openFindBox()
 {
     popupFindReplaceBox(true);
 }
 
-void TextEditor::openReplaceBox()
+void IodeTextEditor::openReplaceBox()
 {
     popupFindReplaceBox(false);
 }
 
-void TextEditor::duplicateLine()
+void IodeTextEditor::duplicateLine()
 {
     QTextCursor cursor = textCursor();
     int pos = cursor.position();

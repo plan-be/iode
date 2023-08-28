@@ -15,7 +15,7 @@ QIodeTextWidget::QIodeTextWidget(const EnumIodeFile fileType, const QString& fil
 
     filter = "Text files (*" + showInTextTabExtensionsList.join(", *") + ")";
 
-    connect(editor, &TextEditor::modificationChanged, this, &QIodeTextWidget::setModified);
+    connect(editor, &IodeTextEditor::modificationChanged, this, &QIodeTextWidget::setModified);
 
     if(!filepath.isEmpty()) 
         load(filepath, true);
