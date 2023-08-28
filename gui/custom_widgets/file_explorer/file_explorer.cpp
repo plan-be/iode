@@ -1,7 +1,7 @@
 #include "file_explorer.h"
 
 
-QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
+IodeFileExplorer::IodeFileExplorer(QWidget* parent): QTreeView(parent)
 {
     proxyModel = new QiodeFileExplorerProxyModel(this);
     fileSystemModel = new QFileSystemModel(this);
@@ -70,20 +70,20 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
     cancelShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
     // signals and slots
-    connect(this, &QIodeFileExplorer::doubleClicked, this, &QIodeFileExplorer::openFile);
-    connect(this, &QIodeFileExplorer::customContextMenuRequested, this, &QIodeFileExplorer::onCustomContextMenu);
+    connect(this, &IodeFileExplorer::doubleClicked, this, &IodeFileExplorer::openFile);
+    connect(this, &IodeFileExplorer::customContextMenuRequested, this, &IodeFileExplorer::onCustomContextMenu);
 
-    connect(newFileShortcut, &QShortcut::activated, this, &QIodeFileExplorer::createFile);
-    connect(newDirectoryShortcut, &QShortcut::activated, this, &QIodeFileExplorer::createDir);
-    connect(cutShortcut, &QShortcut::activated, this, &QIodeFileExplorer::cut);
-    connect(copyShortcut, &QShortcut::activated, this, &QIodeFileExplorer::copy);
-    connect(pasteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::paste);
-    connect(filepathShortcut, &QShortcut::activated, this, &QIodeFileExplorer::absolutePath);
-    connect(revealExplorerShortcut, &QShortcut::activated, this, &QIodeFileExplorer::revealInFolder);
-    connect(renameShortcut, &QShortcut::activated, this, &QIodeFileExplorer::rename);
-    connect(deleteShortcut, &QShortcut::activated, this, &QIodeFileExplorer::remove);
+    connect(newFileShortcut, &QShortcut::activated, this, &IodeFileExplorer::createFile);
+    connect(newDirectoryShortcut, &QShortcut::activated, this, &IodeFileExplorer::createDir);
+    connect(cutShortcut, &QShortcut::activated, this, &IodeFileExplorer::cut);
+    connect(copyShortcut, &QShortcut::activated, this, &IodeFileExplorer::copy);
+    connect(pasteShortcut, &QShortcut::activated, this, &IodeFileExplorer::paste);
+    connect(filepathShortcut, &QShortcut::activated, this, &IodeFileExplorer::absolutePath);
+    connect(revealExplorerShortcut, &QShortcut::activated, this, &IodeFileExplorer::revealInFolder);
+    connect(renameShortcut, &QShortcut::activated, this, &IodeFileExplorer::rename);
+    connect(deleteShortcut, &QShortcut::activated, this, &IodeFileExplorer::remove);
     connect(enterShortcut, &QShortcut::activated, this, [this](){ openFiles(false); });
-    connect(cancelShortcut, &QShortcut::activated, this, &QIodeFileExplorer::cancel);
+    connect(cancelShortcut, &QShortcut::activated, this, &IodeFileExplorer::cancel);
 
     // context menu = popup menu displayed when a user right clicks
     this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -95,7 +95,7 @@ QIodeFileExplorer::QIodeFileExplorer(QWidget* parent): QTreeView(parent)
 }
 
 // Note: do NOT delete tabWidget since it will be destroyed by MainWindow class
-QIodeFileExplorer::~QIodeFileExplorer()
+IodeFileExplorer::~IodeFileExplorer()
 {
     saveSettings();
 
@@ -123,7 +123,7 @@ QIodeFileExplorer::~QIodeFileExplorer()
     delete proxyModel;
 }
 
-void QIodeFileExplorer::setupContextMenu()
+void IodeFileExplorer::setupContextMenu()
 {
     QAction* action;
 
@@ -131,48 +131,48 @@ void QIodeFileExplorer::setupContextMenu()
     contextMenuDirectory = new QMenu(this);
 
     action = addAction("New File", "Add new file", contextMenuDirectory, newFileShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createFile);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::createFile);
 
     action = addAction("New Folder", "Add new subdirectory", contextMenuDirectory, newDirectoryShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createDir);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::createDir);
 
     contextMenuDirectory->addSeparator();
 
     action = addAction("Cut", "Cut Directory", contextMenuDirectory, cutShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::cut);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::cut);
 
     action = addAction("Copy", "Copy Directory", contextMenuDirectory, copyShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::copy);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::copy);
 
     pasteActionDirectory = addAction("Paste", "Paste", contextMenuDirectory, pasteShortcut->key());
-    connect(pasteActionDirectory, &QAction::triggered, this, &QIodeFileExplorer::paste);
+    connect(pasteActionDirectory, &QAction::triggered, this, &IodeFileExplorer::paste);
 
     contextMenuDirectory->addSeparator();
 
     action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", contextMenuDirectory, 
         filepathShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::absolutePath);
 
     action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard", contextMenuDirectory);
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::relativePath);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::relativePath);
 
     action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
         contextMenuDirectory, revealExplorerShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::revealInFolder);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::revealInFolder);
 
     contextMenuDirectory->addSeparator();
 
     action = addAction("Rename", "Rename Directory", contextMenuDirectory, renameShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::rename);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::rename);
 
     action = addAction("Delete", "Delete Directory", contextMenuDirectory, deleteShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::remove);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::remove);
 
     // --- file context menu
     contextMenuFile = new QMenu(this);
 
     action = addAction("Open", "Open File In A New Tab", contextMenuFile);
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::openFiles);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::openFiles);
 
     action = addAction("Open As Text", "Open File As Text In A New Tab", contextMenuFile);
     connect(action, &QAction::triggered, this, [this](){ openFiles(true); });
@@ -180,50 +180,50 @@ void QIodeFileExplorer::setupContextMenu()
     contextMenuFile->addSeparator();
 
     action = addAction("Cut", "Cut File", contextMenuFile, cutShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::cut);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::cut);
 
     action = addAction("Copy", "Copy File", contextMenuFile, copyShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::copy);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::copy);
 
     contextMenuFile->addSeparator();
 
     action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", contextMenuFile, 
         filepathShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::absolutePath);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::absolutePath);
     
     action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard", contextMenuFile);
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::relativePath);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::relativePath);
     
     action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
         contextMenuFile, revealExplorerShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::revealInFolder);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::revealInFolder);
 
     contextMenuFile->addSeparator();
 
     action = addAction("Rename", "Rename Directory", contextMenuFile, renameShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::rename);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::rename);
 
     action = addAction("Delete", "Delete Directory", contextMenuFile, deleteShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::remove);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::remove);
 
     // --- file explorer menu (when a user clicks outside range of directories and files)
     contextMenuExplorer = new QMenu(this);
 
     action = addAction("New File", "Add new file to project", contextMenuExplorer, newFileShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createFile);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::createFile);
 
     action = addAction("New Folder", "Add new directory to project", contextMenuExplorer, newDirectoryShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeFileExplorer::createDir);
+    connect(action, &QAction::triggered, this, &IodeFileExplorer::createDir);
 
     contextMenuExplorer->addSeparator();
 
     pasteActionExplorer = addAction("Paste", "Paste", contextMenuExplorer, pasteShortcut->key());
-    connect(pasteActionExplorer, &QAction::triggered, this, &QIodeFileExplorer::paste);
+    connect(pasteActionExplorer, &QAction::triggered, this, &IodeFileExplorer::paste);
 
     disablePaste();
 }
 
-void QIodeFileExplorer::loadSettings()
+void IodeFileExplorer::loadSettings()
 {
     QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
     if(!project_settings)
@@ -246,7 +246,7 @@ void QIodeFileExplorer::loadSettings()
     }
 }
 
-void QIodeFileExplorer::saveSettings()
+void IodeFileExplorer::saveSettings()
 {
     QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
     if(!project_settings)
@@ -270,7 +270,7 @@ void QIodeFileExplorer::saveSettings()
     project_settings->endGroup();
 }
 
-void QIodeFileExplorer::updateProjectDir(const QDir& projectDir)
+void IodeFileExplorer::updateProjectDir(const QDir& projectDir)
 {    
     this->projectDir = projectDir;
     
@@ -304,7 +304,7 @@ void QIodeFileExplorer::updateProjectDir(const QDir& projectDir)
     this->show();
 }
 
-void QIodeFileExplorer::dragMoveEvent(QDragMoveEvent *event)
+void IodeFileExplorer::dragMoveEvent(QDragMoveEvent *event)
 {
     if (event->mimeData()->hasText() && this->geometry().contains(event->pos()))
     {
@@ -315,7 +315,7 @@ void QIodeFileExplorer::dragMoveEvent(QDragMoveEvent *event)
     else event->ignore();
 }
 
-void QIodeFileExplorer::dropEvent(QDropEvent *event)
+void IodeFileExplorer::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasText())
     {
@@ -345,7 +345,7 @@ void QIodeFileExplorer::dropEvent(QDropEvent *event)
     }
 }
 
-void QIodeFileExplorer::openFile(const QModelIndex &index)
+void IodeFileExplorer::openFile(const QModelIndex &index)
 {
     // do nothing if user double clicked on a folder
     if (proxyModel->isDir(index)) return;
@@ -359,7 +359,7 @@ void QIodeFileExplorer::openFile(const QModelIndex &index)
 
 // ---- SLOTS ----
 
-void QIodeFileExplorer::onCustomContextMenu(const QPoint& point)
+void IodeFileExplorer::onCustomContextMenu(const QPoint& point)
 {
     QMenu* contextMenuCurrent;
     calledFromContextMenu = true;
@@ -374,7 +374,7 @@ void QIodeFileExplorer::onCustomContextMenu(const QPoint& point)
     contextMenuCurrent->exec(globalPoint);
 }
 
-void QIodeFileExplorer::fileContentModified(const QString& filepath, const bool modified)
+void IodeFileExplorer::fileContentModified(const QString& filepath, const bool modified)
 {
     QModelIndex index = proxyModel->index(filepath);
     if(!index.isValid()) return;
@@ -387,7 +387,7 @@ void QIodeFileExplorer::fileContentModified(const QString& filepath, const bool 
     this->viewport()->repaint();
 }
 
-void QIodeFileExplorer::createFile()
+void IodeFileExplorer::createFile()
 {
     QDir parentDir = getDestinationDir();
     QString newFilePath = parentDir.filePath("newfile");
@@ -404,7 +404,7 @@ void QIodeFileExplorer::createFile()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::createDir()
+void IodeFileExplorer::createDir()
 {
     QDir parentDir = getDestinationDir();
     if(parentDir.mkdir("NewFolder"))
@@ -419,7 +419,7 @@ void QIodeFileExplorer::createDir()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::absolutePath()
+void IodeFileExplorer::absolutePath()
 {
     QClipboard* clipboard = QApplication::clipboard();
     QFileInfo fileInfo = proxyModel->fileInfo(indexContextMenu);
@@ -428,7 +428,7 @@ void QIodeFileExplorer::absolutePath()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::relativePath()
+void IodeFileExplorer::relativePath()
 {
     QClipboard* clipboard = QApplication::clipboard();
     QFileInfo fileInfo = proxyModel->fileInfo(indexContextMenu);
@@ -437,7 +437,7 @@ void QIodeFileExplorer::relativePath()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::revealInFolder()
+void IodeFileExplorer::revealInFolder()
 {
     QList<SystemItem> selectedItems = extractListOfItems();
     if(selectedItems.count() == 0) return;
@@ -472,21 +472,21 @@ void QIodeFileExplorer::revealInFolder()
 
 }
 
-void QIodeFileExplorer::cut()
+void IodeFileExplorer::cut()
 {
     itemsToPast = extractListOfItems(true);
     enablePaste();
     cleanupSlot();
 }
 
-void QIodeFileExplorer::copy()
+void IodeFileExplorer::copy()
 {
     itemsToPast = extractListOfItems();
     enablePaste();
     cleanupSlot();
 }
 
-void QIodeFileExplorer::paste()
+void IodeFileExplorer::paste()
 {
     // get the destination directory in which the new directory will be created
     QDir destinationDir = getDestinationDir();
@@ -503,7 +503,7 @@ void QIodeFileExplorer::paste()
     cancel();
 }
 
-void QIodeFileExplorer::rename()
+void IodeFileExplorer::rename()
 {
     QModelIndex index;
     // rename activated via context menu
@@ -522,7 +522,7 @@ void QIodeFileExplorer::rename()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::remove()
+void IodeFileExplorer::remove()
 {
     QList<SystemItem> itemsToDelete = extractListOfItems();
     if(itemsToDelete.count() > 0)
@@ -565,7 +565,7 @@ void QIodeFileExplorer::remove()
     cleanupSlot();
 }
 
-void QIodeFileExplorer::openFiles(const bool forceAsText)
+void IodeFileExplorer::openFiles(const bool forceAsText)
 {
     if (this->hasFocus())
     {
@@ -577,7 +577,7 @@ void QIodeFileExplorer::openFiles(const bool forceAsText)
     }
 }
 
-void QIodeFileExplorer::cancel()
+void IodeFileExplorer::cancel()
 {
     if (this->hasFocus())
     {

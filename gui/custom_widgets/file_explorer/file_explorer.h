@@ -56,7 +56,7 @@
  *        - It is possible to move files and/or directories inside the project tree via drag and drop. 
  * 
  */
-class QIodeFileExplorer : public QTreeView
+class IodeFileExplorer : public QTreeView
 {
     Q_OBJECT
 
@@ -232,8 +232,8 @@ protected:
     void dropEvent(QDropEvent *event);
 
 public: 
-    QIodeFileExplorer(QWidget* parent = nullptr);
-    ~QIodeFileExplorer();
+    IodeFileExplorer(QWidget* parent = nullptr);
+    ~IodeFileExplorer();
 
     /**
      * @brief load directories that were expanded when the program has been closed
@@ -251,11 +251,11 @@ public:
     {
         this->tabWidget = tabWidget;
         // to update filepath, name and tooltip of corresponding tab when a file is moved
-        connect(this, &QIodeFileExplorer::fileMoved, tabWidget, &QIodeTabWidget::fileMoved);
+        connect(this, &IodeFileExplorer::fileMoved, tabWidget, &QIodeTabWidget::fileMoved);
         // to update filepath, name and tooltip of corresponding tab when a file is renamed
         connect(fileSystemModel, &QFileSystemModel::fileRenamed, tabWidget, &QIodeTabWidget::fileRenamed);
         // to set corresponding file in color when its content is modified (and not yet saved to file)
-        connect(tabWidget, &QIodeTabWidget::fileContentModified, this, &QIodeFileExplorer::fileContentModified);
+        connect(tabWidget, &QIodeTabWidget::fileContentModified, this, &IodeFileExplorer::fileContentModified);
     }
 
     /**
