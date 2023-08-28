@@ -927,18 +927,18 @@
   <customwidget>
    <class>IodeTabWidget</class>
    <extends>QTabWidget</extends>
-   <header>custom_widgets/tab_widget/tab_widget.h</header>
+   <header>main_widgets/tab_widget/tab_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>IodeFileExplorer</class>
    <extends>QTreeView</extends>
-   <header>custom_widgets/file_explorer/file_explorer.h</header>
+   <header>main_widgets/file_explorer/file_explorer.h</header>
   </customwidget>
   <customwidget>
    <class>QIodeCommandLine</class>
    <extends>QLineEdit</extends>
-   <header location="global">custom_widgets/iode_command.h</header>
+   <header location="global">main_widgets/iode_command.h</header>
    <slots>
     <slot>run_command()</slot>
    </slots>
