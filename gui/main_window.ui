@@ -231,7 +231,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QIodeFileExplorer" name="treeView_file_explorer">
+      <widget class="IodeFileExplorer" name="treeView_file_explorer">
        <property name="minimumSize">
         <size>
          <width>160</width>
@@ -931,7 +931,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QIodeFileExplorer</class>
+   <class>IodeFileExplorer</class>
    <extends>QTreeView</extends>
    <header>custom_widgets/file_explorer/file_explorer.h</header>
   </customwidget>
