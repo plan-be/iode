@@ -3,7 +3,7 @@
 
 void EquationsView::new_obj()
 {
-	QIodeEditEquation dialog("", this);
+	EditEquation dialog("", this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
 	filter_and_update();
@@ -23,10 +23,10 @@ void EquationsView::edit_obj()
 		editEqDialog->close();
 		delete editEqDialog;
 	}
-	editEqDialog = new QIodeEditEquation(name, static_cast<QWidget*>(this->parent()));
+	editEqDialog = new EditEquation(name, static_cast<QWidget*>(this->parent()));
 
 	// propagate signal
-	connect(editEqDialog, &QIodeEditEquation::equationModified, this, &EquationsView::equationModified);
+	connect(editEqDialog, &EditEquation::equationModified, this, &EquationsView::equationModified);
 
 	editEqDialog->show();
 	

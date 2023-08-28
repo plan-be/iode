@@ -1,7 +1,7 @@
 #include "edit_table_view.h"
 
 
-QIodeEditTableView::QIodeEditTableView(QWidget* parent): QTableView(parent) 
+EditTableView::EditTableView(QWidget* parent): QTableView(parent) 
 {
 	// see: - https://doc.qt.io/qt-5/stylesheet-reference.html
 	//      - https://doc.qt.io/qt-5/stylesheet-examples.html
@@ -12,17 +12,17 @@ QIodeEditTableView::QIodeEditTableView(QWidget* parent): QTableView(parent)
 	setStyleSheet("QHeaderView::section { background-color: lightGray }");
 }
 
-void QIodeEditTableView::setupModel(const QString& tableName)
+void EditTableView::setupModel(const QString& tableName)
 {
-	QIodeEditTableModel* model = new QIodeEditTableModel(tableName, static_cast<QWidget*>(parent()));
+	EditTableModel* model = new EditTableModel(tableName, static_cast<QWidget*>(parent()));
 	setModel(model);
 
 	setItemDelegate(new EditTableDelegate());
 
-	connect(model, &QIodeEditTableModel::displayData, this, &QIodeEditTableView::updateRow);
+	connect(model, &EditTableModel::displayData, this, &EditTableView::updateRow);
 }
 
-void QIodeEditTableView::updateRow(const int row, const EnumLineType line_type, const int nb_columns)
+void EditTableView::updateRow(const int row, const EnumLineType line_type, const int nb_columns)
 {
 	if (line_type != IT_CELL) setSpan(row, 0, 1, nb_columns);
 	if (line_type == IT_LINE) setRowHeight(row, 3);

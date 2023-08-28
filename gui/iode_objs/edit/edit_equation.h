@@ -27,7 +27,7 @@
  */
 
 
-class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
+class EditEquation : public QIodeSettings, public Ui::EditEquation
 {
     Q_OBJECT
 
@@ -71,8 +71,8 @@ private:
 	}
 
 public:
-    QIodeEditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR);
-    ~QIodeEditEquation();
+    EditEquation(const QString& equationName, QWidget* parent = Q_NULLPTR);
+    ~EditEquation();
 
 signals:
     void equationModified();

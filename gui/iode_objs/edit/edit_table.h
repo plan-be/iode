@@ -33,7 +33,7 @@ const static QList<QString> list_insert_where = {"At the end", "After current", 
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeEditTable : public QIodeSettings, public Ui::QIodeEditTable
+class EditTable : public QIodeSettings, public Ui::EditTable
 {
     Q_OBJECT
 
@@ -49,8 +49,8 @@ class QIodeEditTable : public QIodeSettings, public Ui::QIodeEditTable
     QList<QString> list_insert_types;
 
 public:
-    QIodeEditTable(const QString& tableName, QWidget* parent = Q_NULLPTR);
-    ~QIodeEditTable();
+    EditTable(const QString& tableName, QWidget* parent = Q_NULLPTR);
+    ~EditTable();
 
 signals:
     void newPlot(QDialog* plotDialog);

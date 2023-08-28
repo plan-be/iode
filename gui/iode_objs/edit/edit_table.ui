@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeEditTable</class>
- <widget class="QDialog" name="QIodeEditTable">
+ <class>EditTable</class>
+ <widget class="QDialog" name="EditTable">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -18,7 +18,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="4">
-    <widget class="QIodeEditTableView" name="tableView">
+    <widget class="EditTableView" name="tableView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -205,7 +205,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeEditTableView</class>
+   <class>EditTableView</class>
    <extends>QTableView</extends>
    <header>edit_table_view.h</header>
   </customwidget>
@@ -215,7 +215,7 @@
   <connection>
    <sender>saveButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditTable</receiver>
+   <receiver>EditTable</receiver>
    <slot>edit()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -231,7 +231,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditTable</receiver>
+   <receiver>EditTable</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -247,7 +247,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditTable</receiver>
+   <receiver>EditTable</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -263,7 +263,7 @@
   <connection>
    <sender>pushButton_insert</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditTable</receiver>
+   <receiver>EditTable</receiver>
    <slot>insert_line()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -279,7 +279,7 @@
   <connection>
    <sender>pushButton_graph</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditTable</receiver>
+   <receiver>EditTable</receiver>
    <slot>plot()</slot>
    <hints>
     <hint type="sourcelabel">

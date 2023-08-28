@@ -1,7 +1,7 @@
 #pragma once
 #include "edit_table_model.h"
 
-QIodeEditTableModel::QIodeEditTableModel(const QString& tableName, QWidget* parent) : QAbstractTableModel(parent), tableName(tableName)
+EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbstractTableModel(parent), tableName(tableName)
 {
 	try
 	{
@@ -13,23 +13,23 @@ QIodeEditTableModel::QIodeEditTableModel(const QString& tableName, QWidget* pare
 	}
 }
 
-QIodeEditTableModel::~QIodeEditTableModel()
+EditTableModel::~EditTableModel()
 {
 	delete table;
 }
 
-int QIodeEditTableModel::rowCount(const QModelIndex& parent) const
+int EditTableModel::rowCount(const QModelIndex& parent) const
 {
 	// + 1 for the divider line
 	return table->nbLines() + 1;
 }
 
-int QIodeEditTableModel::columnCount(const QModelIndex& parent) const
+int EditTableModel::columnCount(const QModelIndex& parent) const
 {
 	return table->nbColumns();
 }
 
-Qt::ItemFlags QIodeEditTableModel::flags(const QModelIndex& index) const
+Qt::ItemFlags EditTableModel::flags(const QModelIndex& index) const
 {
 	if (!index.isValid())
 		return Qt::ItemIsEnabled;
@@ -37,7 +37,7 @@ Qt::ItemFlags QIodeEditTableModel::flags(const QModelIndex& index) const
 	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
-QVariant QIodeEditTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant EditTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	QString h_data;
 
@@ -84,7 +84,7 @@ QVariant QIodeEditTableModel::headerData(int section, Qt::Orientation orientatio
 	return QVariant(h_data);
 }
 
-QVariant QIodeEditTableModel::data(const QModelIndex& index, int role) const
+QVariant EditTableModel::data(const QModelIndex& index, int role) const
 {
 	QString s_data;
 
@@ -178,7 +178,7 @@ QVariant QIodeEditTableModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
-bool QIodeEditTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool EditTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
@@ -228,7 +228,7 @@ bool QIodeEditTableModel::setData(const QModelIndex& index, const QVariant& valu
 	}
 }
 
-int QIodeEditTableModel::appendLine(EnumLineType lineType)
+int EditTableModel::appendLine(EnumLineType lineType)
 {
 	int position = -1;
 
@@ -262,7 +262,7 @@ int QIodeEditTableModel::appendLine(EnumLineType lineType)
 	return position;
 }
 
-int QIodeEditTableModel::insertLine(EnumLineType lineType, const int position, const bool after)
+int EditTableModel::insertLine(EnumLineType lineType, const int position, const bool after)
 {
 	int new_position = -1;
 
@@ -296,7 +296,7 @@ int QIodeEditTableModel::insertLine(EnumLineType lineType, const int position, c
 	return new_position;
 }
 
-bool QIodeEditTableModel::removeRows(int position, int rows, const QModelIndex& index)
+bool EditTableModel::removeRows(int position, int rows, const QModelIndex& index)
 {
 	beginRemoveRows(QModelIndex(), position, position + rows - 1);
 
@@ -316,13 +316,13 @@ bool QIodeEditTableModel::removeRows(int position, int rows, const QModelIndex& 
 	return true;
 }
 
-EnumLineType QIodeEditTableModel::getLineType(const int row) const
+EnumLineType EditTableModel::getLineType(const int row) const
 {
 	// first row represents the diviser line
 	return row == 0 ? IT_CELL : table->getLineType(row - 1);
 }
 
-void QIodeEditTableModel::save()
+void EditTableModel::save()
 {	
 	KDBTables kdb;
 	kdb.update(tableName.toStdString(), *table);

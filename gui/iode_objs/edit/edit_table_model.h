@@ -19,7 +19,7 @@
  * 
  */
 
-class QIodeEditTableModel : public QAbstractTableModel
+class EditTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
@@ -32,9 +32,9 @@ signals:
 	void tableModified();
 
 public:
-    QIodeEditTableModel(const QString& tableName, QWidget* parent = Q_NULLPTR);
+    EditTableModel(const QString& tableName, QWidget* parent = Q_NULLPTR);
 
-	~QIodeEditTableModel();
+	~EditTableModel();
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
