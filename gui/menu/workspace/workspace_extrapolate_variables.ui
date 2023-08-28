@@ -45,7 +45,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
+    <widget class="IodeSampleEdit" name="sampleEdit_sample_from">
      <property name="toolTip">
       <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
@@ -67,7 +67,7 @@
     </widget>
    </item>
    <item row="0" column="4">
-    <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
+    <widget class="IodeSampleEdit" name="sampleEdit_sample_to">
      <property name="toolTip">
       <string>- yyyy is the year
  -P is the periodicity (Y=yearly, Q=quaterly, M=monthly, W=weekly)
@@ -174,9 +174,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeSampleEdit</class>
+   <class>IodeSampleEdit</class>
    <extends>QLineEdit</extends>
-   <header>custom_widgets/sampleedit.h</header>
+   <header>util/widgets/sample_edit.h</header>
   </customwidget>
   <customwidget>
    <class>QIodeCompleteTextEdit</class>
