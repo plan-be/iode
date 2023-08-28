@@ -19,7 +19,6 @@ set(GUI_UTILS
     utils.h 
     util/widgets/file_chooser.h
     util/widgets/sample_edit.h
-    util/print.h                        util/print.cpp
     util/double_validator.h
     util/system_item.h
     util/find_and_replace_dialog.ui     util/find_and_replace_dialog.h      util/find_and_replace_dialog.cpp
@@ -27,6 +26,10 @@ set(GUI_UTILS
 
 set(GUI_SETTINGS    
     settings.h  settings.cpp
+)
+
+set(GUI_PRINT 
+    print/print.h           print/print.cpp
 )
 
 set(GUI_TABS
@@ -189,9 +192,9 @@ set(GUI_MAIN
                                                     main.cpp
 ) 
 
-set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_CUSTOM_WIDGETS} ${GUI_PLOT}
-                        ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT} ${GUI_TABS} ${GUI_MENUS}
-                        ${GUI_MAIN}
+set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_PRINT} ${GUI_CUSTOM_WIDGETS} 
+                        ${GUI_PLOT} ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT} ${GUI_TABS} 
+                        ${GUI_MENUS} ${GUI_MAIN}
 )
 
 set(APP_ICON_WINDOWS "${IODE_RESOUCES_DIR}/iode.rc")
