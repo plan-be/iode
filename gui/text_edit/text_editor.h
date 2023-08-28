@@ -13,7 +13,7 @@
 #include <QPlainTextEdit>
 
 #include "utils.h"
-#include "util/find_and_replace_dialog.h"
+#include "find_and_replace_dialog.h"
 #include "complete_text_edit.h"
 
 
