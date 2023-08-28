@@ -39,6 +39,8 @@ set(GUI_TEXT_EDIT
     text_edit/highlighter.h                text_edit/highlighter.cpp
     text_edit/complete_line_edit.h         text_edit/complete_line_edit.cpp
     text_edit/complete_text_edit.h         text_edit/complete_text_edit.cpp
+    text_edit/text_editor.h                text_edit/text_editor.cpp
+    text_edit/report_editor.h              text_edit/report_editor.cpp
 )
 
 set(GUI_TABS
@@ -53,8 +55,6 @@ set(GUI_TABS
 
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/iode_command.h               custom_widgets/iode_command.cpp 
-    custom_widgets/text_editor.h                custom_widgets/text_editor.cpp
-    custom_widgets/report_editor.h              custom_widgets/report_editor.cpp
     custom_widgets/file_delegate.h              custom_widgets/file_delegate.cpp
     custom_widgets/tab_widget_abstract.h        custom_widgets/tab_widget_abstract.cpp
     custom_widgets/tab_widget.h                 custom_widgets/tab_widget.cpp

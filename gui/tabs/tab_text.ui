@@ -68,7 +68,7 @@
   <customwidget>
    <class>TextEditor</class>
    <extends>QPlainTextEdit</extends>
-   <header>custom_widgets\text_editor.h</header>
+   <header>text_edit\text_editor.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

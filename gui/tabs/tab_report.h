@@ -5,7 +5,7 @@
 #include "tab_text_abstract.h"
 #include "ui_tab_report.h"
 #include "main_window_abstract.h"
-#include "custom_widgets/report_editor.h"
+#include "text_edit/report_editor.h"
 
 
 /**

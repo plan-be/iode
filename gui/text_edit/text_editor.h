@@ -14,7 +14,7 @@
 
 #include "utils.h"
 #include "util/find_and_replace_dialog.h"
-#include "text_edit/complete_text_edit.h"
+#include "complete_text_edit.h"
 
 
 class LeftArea;

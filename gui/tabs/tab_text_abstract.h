@@ -9,7 +9,7 @@
 #include <QPrintPreviewDialog>
 
 #include "tab_abstract.h"
-#include "custom_widgets/text_editor.h"
+#include "text_edit/text_editor.h"
 
 
 class QIodeAbstractEditor: public AbstractTabWidget
