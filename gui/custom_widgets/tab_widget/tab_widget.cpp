@@ -9,7 +9,7 @@ QWidget* get_tabs_widget_ptr()
 }
 
 
-QIodeTabWidget::QIodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
+IodeTabWidget::IodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
 {
     // prepare widgets for tabs associated with IODE object types
     tabComments = new QIodeCommentsWidget(this);
@@ -20,13 +20,13 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
     tabTables = new QIodeTablesWidget(this);
     tabVariables = new QIodeVariablesWidget(this);
 
-    connect(tabComments, &QIodeCommentsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
-    connect(tabEquations, &QIodeEquationsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
-    connect(tabIdentites, &QIodeIdentitiesWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
-    connect(tabLists, &QIodeListsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
-    connect(tabScalars, &QIodeScalarsWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
-    connect(tabTables, &QIodeTablesWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
-    connect(tabVariables, &QIodeVariablesWidget::tabDatabaseModified, this, &QIodeTabWidget::tabDatabaseModified);
+    connect(tabComments, &QIodeCommentsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabEquations, &QIodeEquationsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabIdentites, &QIodeIdentitiesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabLists, &QIodeListsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabScalars, &QIodeScalarsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabTables, &QIodeTablesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabVariables, &QIodeVariablesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
 
     tabIodeObjects.append(tabComments);
     tabIodeObjects.append(tabEquations);
@@ -40,7 +40,7 @@ QIodeTabWidget::QIodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
     tabs_widget_ptr = static_cast<QWidget*>(this);
 }
 
-QIodeTabWidget::~QIodeTabWidget()
+IodeTabWidget::~IodeTabWidget()
 {
     saveSettings();
 
@@ -56,7 +56,7 @@ QIodeTabWidget::~QIodeTabWidget()
     delete tabVariables;
 }
 
-void QIodeTabWidget::loadSettings()
+void IodeTabWidget::loadSettings()
 {
     // reset IODE objects tabs
     foreach(AbstractIodeObjectWidget* tab, tabIodeObjects)
@@ -162,7 +162,7 @@ void QIodeTabWidget::loadSettings()
     showTab(index);
 }
  
-void QIodeTabWidget::saveSettings()
+void IodeTabWidget::saveSettings()
 {
     QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
     if(!project_settings)
@@ -218,7 +218,7 @@ void QIodeTabWidget::saveSettings()
     project_settings->endGroup();
 }
 
-void QIodeTabWidget::setup()
+void IodeTabWidget::setup()
 {
     MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
     
@@ -229,7 +229,7 @@ void QIodeTabWidget::setup()
     this->output = main_window->getOutput();
 
     // connects to appendDialog() slot
-	connect(this, &QIodeTabWidget::newObjsListDialog, main_window, &MainWindowAbstract::appendDialog);
+	connect(this, &IodeTabWidget::newObjsListDialog, main_window, &MainWindowAbstract::appendDialog);
 
     // close all tabs
     this->clear();
@@ -272,25 +272,25 @@ void QIodeTabWidget::setup()
     this->show();
 }
 
-void QIodeTabWidget::resetFilters()
+void IodeTabWidget::resetFilters()
 {
     foreach(AbstractIodeObjectWidget* tabWidget, tabIodeObjects) tabWidget->resetFilter();
 }
 
-void QIodeTabWidget::resetFilter(const EnumIodeType iodeType)
+void IodeTabWidget::resetFilter(const EnumIodeType iodeType)
 {
     AbstractIodeObjectWidget* tabWidget = getIodeObjTab(iodeType);
     if(tabWidget)
         tabWidget->resetFilter();
 }
 
-void QIodeTabWidget::clearWorkspace()
+void IodeTabWidget::clearWorkspace()
 {
     foreach(AbstractIodeObjectWidget* tabWidget, tabIodeObjects) tabWidget->clearKDB();
     for(int i=0; i < I_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
 }
 
-QStringList QIodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)
+QStringList IodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)
 {
         AbstractIodeObjectWidget* tabWidget = getIodeObjTab(iodeType);
         if(tabWidget)
@@ -299,7 +299,7 @@ QStringList QIodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)
             return QStringList();
 }
 
-int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
+int IodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
 {
     int index;
     try
@@ -330,7 +330,7 @@ int QIodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
     return index;
 }
 
-int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab, 
+int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab, 
     bool forceOverwrite, const int moveToPosition, const bool forceAsText)
 {
     QString filename;
@@ -422,7 +422,7 @@ int QIodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
     }
 }
 
-void QIodeTabWidget::clearTab()
+void IodeTabWidget::clearTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
     AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));

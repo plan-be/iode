@@ -64,7 +64,7 @@ class IodeFileExplorer : public QTreeView
     QiodeFileExplorerProxyModel* proxyModel;
     QFileSystemModel* fileSystemModel;
 
-    QIodeTabWidget* tabWidget;
+    IodeTabWidget* tabWidget;
 
     QShortcut* newFileShortcut;
     QShortcut* newDirectoryShortcut;
@@ -247,15 +247,15 @@ public:
      */
     void saveSettings();
 
-    void setIodeTabWidget(QIodeTabWidget* tabWidget)
+    void setIodeTabWidget(IodeTabWidget* tabWidget)
     {
         this->tabWidget = tabWidget;
         // to update filepath, name and tooltip of corresponding tab when a file is moved
-        connect(this, &IodeFileExplorer::fileMoved, tabWidget, &QIodeTabWidget::fileMoved);
+        connect(this, &IodeFileExplorer::fileMoved, tabWidget, &IodeTabWidget::fileMoved);
         // to update filepath, name and tooltip of corresponding tab when a file is renamed
-        connect(fileSystemModel, &QFileSystemModel::fileRenamed, tabWidget, &QIodeTabWidget::fileRenamed);
+        connect(fileSystemModel, &QFileSystemModel::fileRenamed, tabWidget, &IodeTabWidget::fileRenamed);
         // to set corresponding file in color when its content is modified (and not yet saved to file)
-        connect(tabWidget, &QIodeTabWidget::fileContentModified, this, &IodeFileExplorer::fileContentModified);
+        connect(tabWidget, &IodeTabWidget::fileContentModified, this, &IodeFileExplorer::fileContentModified);
     }
 
     /**

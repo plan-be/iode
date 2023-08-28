@@ -44,7 +44,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QIodeTabWidget" name="tabWidget_IODE_objs">
+     <widget class="IodeTabWidget" name="tabWidget_IODE_objs">
       <property name="currentIndex">
        <number>-1</number>
       </property>
@@ -925,7 +925,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeTabWidget</class>
+   <class>IodeTabWidget</class>
    <extends>QTabWidget</extends>
    <header>custom_widgets/tab_widget/tab_widget.h</header>
    <container>1</container>
