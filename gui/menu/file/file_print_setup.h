@@ -10,7 +10,7 @@
 #include "file_print_preferences.h"
 
 
-class QIodeMenuFilePrintSetup : public QIodeSettings, public Ui::QIodeMenuFilePrintSetup
+class MenuFilePrintSetup : public QIodeSettings, public Ui::MenuFilePrintSetup
 {
     Q_OBJECT
 
@@ -20,8 +20,8 @@ public:
     const static QString KEY_SETTINGS_PRINT_DEST;
 
 public:
-    QIodeMenuFilePrintSetup(QWidget* parent = nullptr);
-    ~QIodeMenuFilePrintSetup();
+    MenuFilePrintSetup(QWidget* parent = nullptr);
+    ~MenuFilePrintSetup();
 
 public slots:
     void apply();

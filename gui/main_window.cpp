@@ -337,7 +337,7 @@ void MainWindow::open_export_dialog()
 
 void MainWindow::open_print_setup()
 {
-    QIodeMenuFilePrintSetup dialog(this);
+    MenuFilePrintSetup dialog(this);
     dialog.exec();
 }
 
