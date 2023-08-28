@@ -22,11 +22,12 @@
 
 #include "custom_widgets/completer.h"
 
+#include "print/file_print_preferences.h"
+
 #include "menu/file/file_import_comments.h"
 #include "menu/file/file_import_variables.h"
 #include "menu/file/file_export.h"
 #include "menu/file/file_print_setup.h"
-#include "menu/file/file_print_preferences.h"
 
 #include "menu/file/file_new_project.h"
 
