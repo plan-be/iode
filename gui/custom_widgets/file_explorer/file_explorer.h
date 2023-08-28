@@ -25,7 +25,7 @@
 
 #include "utils.h"
 #include "util/system_item.h"
-#include "tab_widget.h"
+#include "custom_widgets/tab_widget.h"
 #include "file_explorer_proxy.h"
 #include "file_delegate.h"
 
