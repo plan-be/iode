@@ -12,7 +12,7 @@
 #include <QStringList>
 
 #include "tab_abstract.h"
-#include "custom_widgets/tab_widget_abstract.h"
+#include "custom_widgets/tab_widget/tab_widget_abstract.h"
 
 
 const static QString prefixUnsavedDatabase = "Unsaved";
