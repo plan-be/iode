@@ -12,7 +12,7 @@
 #include "tabs/tab_database.h"
 
 
-class QIodeTabWidget: public IodeAbstractTabWidget
+class IodeTabWidget: public IodeAbstractTabWidget
 {
     Q_OBJECT
 
@@ -71,8 +71,8 @@ protected:
     }
 
 public:
-    QIodeTabWidget(QWidget* parent = nullptr);
-    ~QIodeTabWidget();
+    IodeTabWidget(QWidget* parent = nullptr);
+    ~IodeTabWidget();
 
     void loadSettings() override;
     
