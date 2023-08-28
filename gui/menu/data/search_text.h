@@ -8,7 +8,7 @@
 #include "wrapper_classes.h"
 
 
-class MenuDataSearchText : public QIodeSettings, public Ui::MenuDataSearchText
+class MenuDataSearchText : public IodeSettingsDialog, public Ui::MenuDataSearchText
 {
     Q_OBJECT
 

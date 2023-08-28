@@ -9,7 +9,7 @@
 #include "wrapper_classes.h"
 
 
-class FilePrintPreferences : public QIodeSettings, public Ui::FilePrintPreferences
+class FilePrintPreferences : public IodeSettingsDialog, public Ui::FilePrintPreferences
 {
     Q_OBJECT
 

@@ -27,7 +27,7 @@
  */
 
 
-class EditEquation : public QIodeSettings, public Ui::EditEquation
+class EditEquation : public IodeSettingsDialog, public Ui::EditEquation
 {
     Q_OBJECT
 

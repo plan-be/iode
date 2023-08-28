@@ -14,12 +14,12 @@
 
 /* NOTE FOR THE DEVELOPERS:
  * All Menu Dialog classes MUST
- * 1. inherit from QIodeSettings,
+ * 1. inherit from IodeSettingsDialog,
  * 2. use the extractAndVerify() method to extract input data from fields,
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class MenuGraphTables: public QIodeSettings, public Ui::MenuGraphTables
+class MenuGraphTables: public IodeSettingsDialog, public Ui::MenuGraphTables
 {
     Q_OBJECT
 

@@ -1,6 +1,6 @@
 #include "add_table.h"
 
-QIodeAddTable::QIodeAddTable(QWidget* parent) : QIodeSettings(parent)
+QIodeAddTable::QIodeAddTable(QWidget* parent) : IodeSettingsDialog(parent)
 {
     setupUi(this);
 

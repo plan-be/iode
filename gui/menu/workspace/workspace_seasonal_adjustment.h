@@ -18,7 +18,7 @@
  */
 
 
-class MenuWorkspaceSeasonalAdjustment : public QIodeSettings, public Ui::MenuWorkspaceSeasonalAdjustment
+class MenuWorkspaceSeasonalAdjustment : public IodeSettingsDialog, public Ui::MenuWorkspaceSeasonalAdjustment
 {
     Q_OBJECT
 

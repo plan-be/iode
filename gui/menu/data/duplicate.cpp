@@ -2,7 +2,7 @@
 
 
 MenuDataDuplicateObj::MenuDataDuplicateObj(QWidget* parent)
-    : QIodeSettings(parent)
+    : IodeSettingsDialog(parent)
 {
     setupUi(this);
 

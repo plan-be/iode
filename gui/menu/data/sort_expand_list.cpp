@@ -1,7 +1,7 @@
 #include "sort_expand_list.h"
 
 MenuDataSortExpandList::MenuDataSortExpandList(QWidget* parent)
-    : QIodeSettings(parent)
+    : IodeSettingsDialog(parent)
 {
     setupUi(this);
 

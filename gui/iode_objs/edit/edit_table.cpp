@@ -2,7 +2,7 @@
 
 
 EditTable::EditTable(const QString& tableName, QWidget* parent) 
-	: QIodeSettings(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), tableName(tableName)
+	: IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), tableName(tableName)
 {
 	setupUi(this);
 

@@ -8,7 +8,7 @@
 #include "wrapper_classes.h"
 
 
-class MenuDataFileContents : public QIodeSettings, public Ui::MenuDataFileContents
+class MenuDataFileContents : public IodeSettingsDialog, public Ui::MenuDataFileContents
 {
     Q_OBJECT
 

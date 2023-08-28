@@ -9,7 +9,7 @@
 #include "file_print_preferences.h"
 
 
-class PrintFileDialog : public QIodeSettings, public Ui::PrintFileDialog
+class PrintFileDialog : public IodeSettingsDialog, public Ui::PrintFileDialog
 {
     Q_OBJECT
 

@@ -9,7 +9,7 @@
 #include "text_edit/complete_line_edit.h"
 
 
-class MenuDataDuplicateObj : public QIodeSettings, public Ui::MenuDataDuplicateObj
+class MenuDataDuplicateObj : public IodeSettingsDialog, public Ui::MenuDataDuplicateObj
 {
     Q_OBJECT
 

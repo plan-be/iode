@@ -1,7 +1,7 @@
 #include "search_text.h"
 
 MenuDataSearchText::MenuDataSearchText(QWidget* parent)
-    : QIodeSettings(parent)
+    : IodeSettingsDialog(parent)
 {
     setupUi(this);
 

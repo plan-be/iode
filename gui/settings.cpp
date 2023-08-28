@@ -2,7 +2,7 @@
 #include "settings.h"
 
 
-void QIodeSettings::saveSettings()
+void IodeSettingsDialog::saveSettings()
 {
     QSettings* project_settings = ProjectSettings::getProjectSettings();
     project_settings->beginGroup(className);
@@ -17,7 +17,7 @@ void QIodeSettings::saveSettings()
     project_settings->endGroup();
 }
 
-void QIodeSettings::loadSettings()
+void IodeSettingsDialog::loadSettings()
 {
     QSettings* project_settings = ProjectSettings::getProjectSettings();
     project_settings->beginGroup(className);
@@ -38,25 +38,25 @@ void QIodeSettings::loadSettings()
     project_settings->endGroup();
 }
 
-void QIodeSettings::closeEvent(QCloseEvent* event)
+void IodeSettingsDialog::closeEvent(QCloseEvent* event)
 {
     saveSettings();
     event->accept();
 }
 
-void QIodeSettings::help()
+void IodeSettingsDialog::help()
 {
     
     QDesktopServices::openUrl(url_manual);
 }
 
-void QIodeSettings::accept()
+void IodeSettingsDialog::accept()
 {
     saveSettings();
     QDialog::accept();
 }
 
-void QIodeSettings::reject()
+void IodeSettingsDialog::reject()
 {
     saveSettings();
     QDialog::reject();

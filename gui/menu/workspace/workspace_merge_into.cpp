@@ -2,7 +2,7 @@
 
 
 MenuWorkspaceMergeInto::MenuWorkspaceMergeInto(QWidget* parent) : 
-    QIodeSettings(parent)
+    IodeSettingsDialog(parent)
 {
     setupUi(this);
 

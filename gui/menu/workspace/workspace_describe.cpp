@@ -2,7 +2,7 @@
 
 
 MenuWorkspaceDescribe::MenuWorkspaceDescribe(QWidget* parent) : 
-    QIodeSettings(parent)
+    IodeSettingsDialog(parent)
 {
     setupUi(this);
 

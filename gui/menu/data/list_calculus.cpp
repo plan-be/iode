@@ -1,7 +1,7 @@
 #include "list_calculus.h"
 
 MenuDataListCalculus::MenuDataListCalculus(QWidget* parent)
-    : QIodeSettings(parent)
+    : IodeSettingsDialog(parent)
 {
     setupUi(this);
 

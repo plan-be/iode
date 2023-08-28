@@ -2,7 +2,7 @@
 
 
 QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, QWidget* parent) : 
-    QIodeSettings(parent), lec(lec)
+    IodeSettingsDialog(parent), lec(lec)
 {
 	setupUi(this);
 

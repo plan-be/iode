@@ -17,7 +17,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeAddScalar : public QIodeSettings, public Ui::QIodeAddScalar
+class QIodeAddScalar : public IodeSettingsDialog, public Ui::QIodeAddScalar
 {
     Q_OBJECT
 

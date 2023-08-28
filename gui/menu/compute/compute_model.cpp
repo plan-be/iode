@@ -2,17 +2,17 @@
 
 
 /* NOTE FOR THE DEVELOPERS:
- * The constructor of a Menu Dialog class deriving from QIodeSettings MUST:
+ * The constructor of a Menu Dialog class deriving from IodeSettingsDialog MUST:
  * 2. call setupUi(this),
  * 3. use the Wrapper classes defined in the wrapper_classes.h header file to wrap the input field items,
- * 4. fill the mapFields member (inherited from QIodeSettings) with the wrapped field items,
+ * 4. fill the mapFields member (inherited from IodeSettingsDialog) with the wrapped field items,
  * 5. initialize the inherited className member
- * 6. call the loadSettings() method (inherited from QIodeSettings).
+ * 6. call the loadSettings() method (inherited from IodeSettingsDialog).
  */
 
 
 MenuComputeModel::MenuComputeModel(QWidget* parent) : 
-    QIodeSettings(parent)
+    IodeSettingsDialog(parent)
 {
     setupUi(this);
 
