@@ -1,7 +1,7 @@
 #include "iode_command.h"
 
 
-bool QIodeCommandLine::handleSpecialKeys(QKeyEvent *event)
+bool IodeCommandLine::handleSpecialKeys(QKeyEvent *event)
 {
     switch (event->key())
     {
@@ -37,7 +37,7 @@ bool QIodeCommandLine::handleSpecialKeys(QKeyEvent *event)
     return false;
 }
 
-void QIodeCommandLine::run_command()
+void IodeCommandLine::run_command()
 {
     QString cmd = text();
     if(cmd.isEmpty()) return;
