@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
-#include "custom_widgets/completer.h"
+#include "text_edit/completer.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

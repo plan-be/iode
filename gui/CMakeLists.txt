@@ -35,6 +35,10 @@ set(GUI_PRINT
 
 )
 
+set(GUI_TEXT_EDIT 
+    text_edit/completer.h                  text_edit/completer.cpp
+)
+
 set(GUI_TABS
                             tabs/tab_abstract.h
                             tabs/tab_database_abstract.h
@@ -48,7 +52,6 @@ set(GUI_TABS
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/complete_line_edit.h         custom_widgets/complete_line_edit.cpp
     custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
-    custom_widgets/completer.h                  custom_widgets/completer.cpp
     custom_widgets/highlighter.h                custom_widgets/highlighter.cpp
     custom_widgets/iode_command.h               custom_widgets/iode_command.cpp 
     custom_widgets/text_editor.h                custom_widgets/text_editor.cpp
@@ -192,9 +195,9 @@ set(GUI_MAIN
                                                     main.cpp
 ) 
 
-set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_PRINT} ${GUI_CUSTOM_WIDGETS} 
+set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_PRINT} ${GUI_TEXT_EDIT} 
                         ${GUI_PLOT} ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT} ${GUI_TABS} 
-                        ${GUI_MENUS} ${GUI_MAIN}
+                        ${GUI_CUSTOM_WIDGETS} ${GUI_MENUS} ${GUI_MAIN}
 )
 
 set(APP_ICON_WINDOWS "${IODE_RESOUCES_DIR}/iode.rc")

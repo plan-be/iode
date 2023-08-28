@@ -20,7 +20,7 @@
 
 #include "iode_objs/edit/edit_vars_sample.h"
 
-#include "custom_widgets/completer.h"
+#include "text_edit/completer.h"
 
 #include "print/file_print_preferences.h"
 

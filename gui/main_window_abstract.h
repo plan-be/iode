@@ -4,7 +4,7 @@
 
 #include "utils.h"
 #include "plot/plot.h"
-#include "custom_widgets/completer.h"
+#include "text_edit/completer.h"
 
 
 class MainWindowAbstract: public QMainWindow
