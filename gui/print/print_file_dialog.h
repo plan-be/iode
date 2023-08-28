@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
-#include "menu/file/file_print_preferences.h"
+#include "file_print_preferences.h"
 
 
 class PrintFileDialog : public QIodeSettings, public Ui::PrintFileDialog

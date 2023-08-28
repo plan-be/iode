@@ -29,8 +29,10 @@ set(GUI_SETTINGS
 )
 
 set(GUI_PRINT 
-                                    print/print.h                   print/print.cpp
-    print/print_file_dialog.ui      print/print_file_dialog.h       print/print_file_dialog.cpp
+                                        print/print.h                       print/print.cpp
+    print/print_file_dialog.ui          print/print_file_dialog.h           print/print_file_dialog.cpp
+    print/file_print_preferences.ui     print/file_print_preferences.h      print/file_print_preferences.cpp
+
 )
 
 set(GUI_TABS
@@ -142,7 +144,6 @@ set(GUI_MENU_FILE
     menu/file/file_import_variables.ui          menu/file/file_import_variables.h       menu/file/file_import_variables.cpp
     menu/file/file_export.ui                    menu/file/file_export.h                 menu/file/file_export.cpp
     menu/file/file_print_setup.ui               menu/file/file_print_setup.h            menu/file/file_print_setup.cpp
-    menu/file/file_print_preferences.ui         menu/file/file_print_preferences.h      menu/file/file_print_preferences.cpp
 )
 
 set(GUI_MENU_WORKSPACE

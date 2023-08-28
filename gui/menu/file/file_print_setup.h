@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
-#include "file_print_preferences.h"
+#include "print/file_print_preferences.h"
 
 
 class MenuFilePrintSetup : public QIodeSettings, public Ui::MenuFilePrintSetup
