@@ -12,7 +12,7 @@
 #include "wrapper_classes.h"
 #include "print/print.h"
 #include "menu/file/file_print_setup.h"
-#include "custom_widgets/print_file_dialog.h"
+#include "print/print_file_dialog.h"
 
 /* NOTE FOR THE DEVELOPERS:
  * All Menu Dialog classes MUST
