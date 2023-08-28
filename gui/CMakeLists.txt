@@ -54,12 +54,12 @@ set(GUI_TABS
 )
 
 set(GUI_CUSTOM_WIDGETS  
-    custom_widgets/file_explorer/file_delegate.h            custom_widgets/file_explorer/file_delegate.cpp
-    custom_widgets/file_explorer/file_explorer_proxy.h
-    custom_widgets/file_explorer/file_explorer.h            custom_widgets/file_explorer/file_explorer.cpp
-    custom_widgets/tab_widget/tab_widget_abstract.h         custom_widgets/tab_widget/tab_widget_abstract.cpp
-    custom_widgets/tab_widget/tab_widget.h                  custom_widgets/tab_widget/tab_widget.cpp
-    custom_widgets/iode_command.h                           custom_widgets/iode_command.cpp 
+    main_widgets/file_explorer/file_delegate.h            main_widgets/file_explorer/file_delegate.cpp
+    main_widgets/file_explorer/file_explorer_proxy.h
+    main_widgets/file_explorer/file_explorer.h            main_widgets/file_explorer/file_explorer.cpp
+    main_widgets/tab_widget/tab_widget_abstract.h         main_widgets/tab_widget/tab_widget_abstract.cpp
+    main_widgets/tab_widget/tab_widget.h                  main_widgets/tab_widget/tab_widget.cpp
+    main_widgets/iode_command.h                           main_widgets/iode_command.cpp 
 )
 
 set(GUI_PLOT
