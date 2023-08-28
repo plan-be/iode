@@ -17,7 +17,7 @@
 #include <QRegularExpressionValidator>
 
 #include "utils.h"
-#include "util/print.h"
+#include "print/print.h"
 #include "iode_objs/delegates/base_delegate.h"
 #include "iode_objs/edit/edit_vars_sample.h"
 

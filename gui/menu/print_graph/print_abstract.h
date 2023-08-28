@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
-#include "util/print.h"
+#include "print/print.h"
 #include "menu/file/file_print_setup.h"
 #include "custom_widgets/print_file_dialog.h"
 
