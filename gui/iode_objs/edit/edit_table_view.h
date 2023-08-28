@@ -13,12 +13,12 @@
 #include "edit_table_delegate.h"
 
 
-class QIodeEditTableView : public QTableView
+class EditTableView : public QTableView
 {
     Q_OBJECT
 
 public:
-    QIodeEditTableView(QWidget* parent = Q_NULLPTR);
+    EditTableView(QWidget* parent = Q_NULLPTR);
 
     void setupModel(const QString& tableName);
 

@@ -248,7 +248,7 @@ int gui_IdtExecute_super()
 int gui_EqsEstimate_super()
 {
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	QIodeEditEquation dialog("", main_window);
+	EditEquation dialog("", main_window);
 	return dialog.exec();
 }
 

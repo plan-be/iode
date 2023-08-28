@@ -1,7 +1,7 @@
 #include "edit_table.h"
 
 
-QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent) 
+EditTable::EditTable(const QString& tableName, QWidget* parent) 
 	: QIodeSettings(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), tableName(tableName)
 {
 	setupUi(this);
@@ -23,22 +23,22 @@ QIodeEditTable::QIodeEditTable(const QString& tableName, QWidget* parent)
 	shortcutDelete->setContext(Qt::WidgetWithChildrenShortcut);
     fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
-	connect(shortcutDelete, &QShortcut::activated, this, &QIodeEditTable::delete_line);
-    connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEditTable::showMaximized);
+	connect(shortcutDelete, &QShortcut::activated, this, &EditTable::delete_line);
+    connect(fullScreenShortcut, &QShortcut::activated, this, &EditTable::showMaximized);
 
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-	connect(this, &QIodeEditTable::newPlot, main_window, &MainWindowAbstract::appendDialog);
+	connect(this, &EditTable::newPlot, main_window, &MainWindowAbstract::appendDialog);
 
 	// propagate signal
-	QIodeEditTableModel* table_model = static_cast<QIodeEditTableModel*>(tableView->model());
-	connect(table_model, &QIodeEditTableModel::tableModified, this, &QIodeEditTable::tableModified);
+	EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
+	connect(table_model, &EditTableModel::tableModified, this, &EditTable::tableModified);
 
 	loadSettings();
 
 	table_model->computeHash(true);
 }
 
-QIodeEditTable::~QIodeEditTable()
+EditTable::~EditTable()
 {
 	delete wInsertLineType;
 	delete wInsertWhere;
@@ -47,11 +47,11 @@ QIodeEditTable::~QIodeEditTable()
 	delete fullScreenShortcut;
 }
 
-void QIodeEditTable::edit()
+void EditTable::edit()
 {
 	try
 	{
-		QIodeEditTableModel* table_model = static_cast<QIodeEditTableModel*>(tableView->model());
+		EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
 		table_model->save();
 		table_model->computeHash();
 
@@ -63,7 +63,7 @@ void QIodeEditTable::edit()
 	}
 }
 
-void QIodeEditTable::plot()
+void EditTable::plot()
 {
 	try
 	{
@@ -83,11 +83,11 @@ void QIodeEditTable::plot()
 	}
 }
 
-void QIodeEditTable::insert_line()
+void EditTable::insert_line()
 {
 	try
 	{
-		QIodeEditTableModel* tables_model = static_cast<QIodeEditTableModel*>(tableView->model());
+		EditTableModel* tables_model = static_cast<EditTableModel*>(tableView->model());
 		QModelIndexList selection = tableView->selectionModel()->selectedRows();
 		int position = (selection.count() > 0) ? selection[0].row() : -1;
 
@@ -123,11 +123,11 @@ void QIodeEditTable::insert_line()
 	}
 }
 
-void QIodeEditTable::delete_line()
+void EditTable::delete_line()
 {
 	try
 	{
-		QIodeEditTableModel* tables_model = static_cast<QIodeEditTableModel*>(tableView->model());
+		EditTableModel* tables_model = static_cast<EditTableModel*>(tableView->model());
 		QModelIndexList selection = tableView->selectionModel()->selectedRows();
 		if(selection.count() == 0)
 			return;
@@ -146,7 +146,7 @@ void QIodeEditTable::delete_line()
 	}
 }
 
-void QIodeEditTable::help()
+void EditTable::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }
