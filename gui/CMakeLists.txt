@@ -32,12 +32,13 @@ set(GUI_PRINT
                                         print/print.h                       print/print.cpp
     print/print_file_dialog.ui          print/print_file_dialog.h           print/print_file_dialog.cpp
     print/file_print_preferences.ui     print/file_print_preferences.h      print/file_print_preferences.cpp
-
 )
 
 set(GUI_TEXT_EDIT 
     text_edit/completer.h                  text_edit/completer.cpp
     text_edit/highlighter.h                text_edit/highlighter.cpp
+    text_edit/complete_line_edit.h         text_edit/complete_line_edit.cpp
+    text_edit/complete_text_edit.h         text_edit/complete_text_edit.cpp
 )
 
 set(GUI_TABS
@@ -51,8 +52,6 @@ set(GUI_TABS
 )
 
 set(GUI_CUSTOM_WIDGETS  
-    custom_widgets/complete_line_edit.h         custom_widgets/complete_line_edit.cpp
-    custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
     custom_widgets/iode_command.h               custom_widgets/iode_command.cpp 
     custom_widgets/text_editor.h                custom_widgets/text_editor.cpp
     custom_widgets/report_editor.h              custom_widgets/report_editor.cpp

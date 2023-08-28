@@ -1,7 +1,7 @@
 #pragma once
 
 #include "utils.h"
-#include "text_edit/completer.h"
+#include "completer.h"
 
 #include <QObject>
 #include <QString>

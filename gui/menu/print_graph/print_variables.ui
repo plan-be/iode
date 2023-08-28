@@ -322,7 +322,7 @@ LEC Forms</string>
   <customwidget>
    <class>QIodeCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header>custom_widgets/complete_text_edit.h</header>
+   <header>text_edit/complete_text_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,6 +1,6 @@
 #pragma once
 #include "main_window_abstract.h"
-#include "custom_widgets/complete_line_edit.h"
+#include "text_edit/complete_line_edit.h"
 
 #include <QTextEdit>
 #include <QVector>
