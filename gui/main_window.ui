@@ -927,7 +927,7 @@
   <customwidget>
    <class>QIodeTabWidget</class>
    <extends>QTabWidget</extends>
-   <header>custom_widgets/tab_widget.h</header>
+   <header>custom_widgets/tab_widget/tab_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
