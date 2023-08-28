@@ -9,7 +9,7 @@
 #include "menu/file/file_print_preferences.h"
 
 
-class QIodePrintFileDialog : public QIodeSettings, public Ui::QIodePrintFileDialog
+class PrintFileDialog : public QIodeSettings, public Ui::PrintFileDialog
 {
     Q_OBJECT
 
@@ -17,8 +17,8 @@ class QIodePrintFileDialog : public QIodeSettings, public Ui::QIodePrintFileDial
     WrapperFileChooser* wOutputFile;
 
 public:
-    QIodePrintFileDialog(QWidget* parent = nullptr, const QString& outputFile = "", const QChar& format = QChar::Null);
-    ~QIodePrintFileDialog();
+    PrintFileDialog(QWidget* parent = nullptr, const QString& outputFile = "", const QChar& format = QChar::Null);
+    ~PrintFileDialog();
 
     QChar getFormat() const
     {

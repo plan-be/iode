@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodePrintFileDialog</class>
- <widget class="QDialog" name="QIodePrintFileDialog">
+ <class>PrintFileDialog</class>
+ <widget class="QDialog" name="PrintFileDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -241,7 +241,7 @@
   <connection>
    <sender>pushButton_apply</sender>
    <signal>clicked()</signal>
-   <receiver>QIodePrintFileDialog</receiver>
+   <receiver>PrintFileDialog</receiver>
    <slot>apply()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -257,7 +257,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodePrintFileDialog</receiver>
+   <receiver>PrintFileDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -273,7 +273,7 @@
   <connection>
    <sender>pushButton_options</sender>
    <signal>clicked()</signal>
-   <receiver>QIodePrintFileDialog</receiver>
+   <receiver>PrintFileDialog</receiver>
    <slot>set_print_options()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -289,7 +289,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodePrintFileDialog</receiver>
+   <receiver>PrintFileDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

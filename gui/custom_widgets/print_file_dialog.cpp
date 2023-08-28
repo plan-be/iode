@@ -1,7 +1,7 @@
 #include "print_file_dialog.h"
 
 
-QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent, const QString& outputFile, const QChar& format): 
+PrintFileDialog::PrintFileDialog(QWidget* parent, const QString& outputFile, const QChar& format): 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -14,7 +14,7 @@ QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent, const QString& outpu
         EnumIodeFile::I_A2M_FILE, EnumFileMode::FILE_MAY_EXIST);
 
     comboBox_print_format->setCurrentIndex(0);
-    connect(comboBox_print_format, &QComboBox::currentIndexChanged, this, &QIodePrintFileDialog::updateOutputFileFormat);
+    connect(comboBox_print_format, &QComboBox::currentIndexChanged, this, &PrintFileDialog::updateOutputFileFormat);
     
     mapFields["Print_Format"] = wPrintFormat;
 
@@ -28,30 +28,30 @@ QIodePrintFileDialog::QIodePrintFileDialog(QWidget* parent, const QString& outpu
         setFormat(format);
 }
 
-QIodePrintFileDialog::~QIodePrintFileDialog()
+PrintFileDialog::~PrintFileDialog()
 {
     delete wPrintFormat;
     delete wOutputFile;
 }
 
-void QIodePrintFileDialog::updateOutputFileFormat(int index)
+void PrintFileDialog::updateOutputFileFormat(int index)
 {
     fileChooser_output_file->setFileType(static_cast<EnumIodeFile>(I_A2M_FILE + index));
 }
 
 // Will automatically save to settings -> see QIodeSettings::closeEvent()
-void QIodePrintFileDialog::apply()
+void PrintFileDialog::apply()
 {
     this->accept();
 }
 
-void QIodePrintFileDialog::set_print_options()
+void PrintFileDialog::set_print_options()
 {
     QIodeMenuFilePrintPref dialog(static_cast<QWidget*>(parent()));
     dialog.exec();
 }
 
-void QIodePrintFileDialog::help()
+void PrintFileDialog::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }
