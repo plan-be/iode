@@ -47,7 +47,7 @@ void PrintFileDialog::apply()
 
 void PrintFileDialog::set_print_options()
 {
-    QIodeMenuFilePrintPref dialog(static_cast<QWidget*>(parent()));
+    FilePrintPreferences dialog(static_cast<QWidget*>(parent()));
     dialog.exec();
 }
 

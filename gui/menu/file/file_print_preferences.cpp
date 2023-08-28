@@ -1,7 +1,7 @@
 #include "file_print_preferences.h"
 
 
-QIodeMenuFilePrintPref::QIodeMenuFilePrintPref(QWidget* parent) :
+FilePrintPreferences::FilePrintPreferences(QWidget* parent) :
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -205,7 +205,7 @@ QIodeMenuFilePrintPref::QIodeMenuFilePrintPref(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuFilePrintPref::~QIodeMenuFilePrintPref()
+FilePrintPreferences::~FilePrintPreferences()
 {
     // PRINTER
     delete wPrinterFontSize;
@@ -299,7 +299,7 @@ QIodeMenuFilePrintPref::~QIodeMenuFilePrintPref()
  * 
  * @note see B_A2mGetGdiParms() from DOS_SB_PDEST.C (old GUI)
  */
-void QIodeMenuFilePrintPref::set_printer_preferences()
+void FilePrintPreferences::set_printer_preferences()
 {
     extern  int W_gdiask; /* GB 23/03/98 */
     extern  int W_gdiduplex, W_gdiorient; /* JMP 18-04-98 */
@@ -350,7 +350,7 @@ void QIodeMenuFilePrintPref::set_printer_preferences()
  * 
  * @note see B_A2mGetGnlParms() from DOS_SB_PDEST.C (old GUI)
  */
-void QIodeMenuFilePrintPref::set_A2M_preferences()
+void FilePrintPreferences::set_A2M_preferences()
 {
     extern int W_a2mapp;
 
@@ -382,7 +382,7 @@ void QIodeMenuFilePrintPref::set_A2M_preferences()
  * @note see B_A2mGetMifParms() from DOS_SB_PDEST.C (old GUI)
  * 
  */
-void QIodeMenuFilePrintPref::set_MIF_preferences()
+void FilePrintPreferences::set_MIF_preferences()
 {
     A2M_FONTSIZE     = wMIFFontSize->extractAndVerify();
     A2M_FONTINCR     = wMIFFontIncr->extractAndVerify();
@@ -406,7 +406,7 @@ void QIodeMenuFilePrintPref::set_MIF_preferences()
  * @note see B_A2mGetRtfParms() from DOS_SB_PDEST.C (old GUI)
  * 
  */
-void QIodeMenuFilePrintPref::set_RTF_preferences()
+void FilePrintPreferences::set_RTF_preferences()
 {
     A2M_FONTSIZE     = wRTFFontSize->extractAndVerify();
     A2M_FONTFAMILY  = "HTCBP"[wRTFFontFamily->extractAndVerify()];
@@ -436,7 +436,7 @@ void QIodeMenuFilePrintPref::set_RTF_preferences()
  * @note see B_A2mGetHtmlParms() from DOS_SB_PDEST.C (old GUI) 
  * 
  */
-void QIodeMenuFilePrintPref::set_HTML_preferences()
+void FilePrintPreferences::set_HTML_preferences()
 {
     SCR_free(A2M_HTML_BODY);
     SCR_free(A2M_HTML_TITLE);
@@ -457,7 +457,7 @@ void QIodeMenuFilePrintPref::set_HTML_preferences()
     SCR_strip((unsigned char *) A2M_HTML_TITLE);
 }
 
-void QIodeMenuFilePrintPref::set_print_preferences()
+void FilePrintPreferences::set_print_preferences()
 {
     try
     {
@@ -475,7 +475,7 @@ void QIodeMenuFilePrintPref::set_print_preferences()
     this->accept();
 }
 
-void QIodeMenuFilePrintPref::help()
+void FilePrintPreferences::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

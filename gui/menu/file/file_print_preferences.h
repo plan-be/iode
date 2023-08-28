@@ -9,7 +9,7 @@
 #include "wrapper_classes.h"
 
 
-class QIodeMenuFilePrintPref : public QIodeSettings, public Ui::QIodeMenuFilePrintPref
+class FilePrintPreferences : public QIodeSettings, public Ui::FilePrintPreferences
 {
     Q_OBJECT
 
@@ -100,8 +100,8 @@ class QIodeMenuFilePrintPref : public QIodeSettings, public Ui::QIodeMenuFilePri
     WrapperCheckBox*  wMIFImageRefInText;
 
 public:
-	QIodeMenuFilePrintPref(QWidget* parent = nullptr);
-	~QIodeMenuFilePrintPref();
+	FilePrintPreferences(QWidget* parent = nullptr);
+	~FilePrintPreferences();
 
 private:
     void set_printer_preferences();

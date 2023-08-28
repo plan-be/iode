@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuFilePrintPref</class>
- <widget class="QDialog" name="QIodeMenuFilePrintPref">
+ <class>FilePrintPreferences</class>
+ <widget class="QDialog" name="FilePrintPreferences">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -2385,7 +2385,7 @@
   <connection>
    <sender>pushButton_OK</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFilePrintPref</receiver>
+   <receiver>FilePrintPreferences</receiver>
    <slot>set_print_preferences()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2401,7 +2401,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFilePrintPref</receiver>
+   <receiver>FilePrintPreferences</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2417,7 +2417,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFilePrintPref</receiver>
+   <receiver>FilePrintPreferences</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
