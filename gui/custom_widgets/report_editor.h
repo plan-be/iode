@@ -6,7 +6,7 @@
 #include <QAbstractItemView>
 
 #include "utils.h"
-#include "highlighter.h"
+#include "text_edit/highlighter.h"
 #include "text_edit/completer.h"
 #include "text_editor.h"
 #include "print/print.h"
