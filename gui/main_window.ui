@@ -933,7 +933,7 @@
   <customwidget>
    <class>QIodeFileExplorer</class>
    <extends>QTreeView</extends>
-   <header>custom_widgets/file_explorer.h</header>
+   <header>custom_widgets/file_explorer/file_explorer.h</header>
   </customwidget>
   <customwidget>
    <class>QIodeCommandLine</class>
