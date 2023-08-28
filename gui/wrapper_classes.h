@@ -12,7 +12,7 @@
 #include <QCheckBox>
 
 #include "./util/widgets/file_chooser.h"
-#include "./custom_widgets/sampleedit.h"
+#include "./util/widgets/sample_edit.h"
 #include "utils.h"
 
 
@@ -340,10 +340,10 @@ public:
 };
 
 
-class WrapperSampleEdit : public TemplateWrapper<QIodeSampleEdit, QString>
+class WrapperSampleEdit : public TemplateWrapper<IodeSampleEdit, QString>
 {
 public:
-    WrapperSampleEdit(const QString name, QIodeSampleEdit& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
+    WrapperSampleEdit(const QString name, IodeSampleEdit& qfield, const EnumItemType type) : TemplateWrapper(name, qfield, type) {};
 
     QVariant getQValue()
     {

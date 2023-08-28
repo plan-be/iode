@@ -148,7 +148,7 @@
       </widget>
      </item>
      <item row="0" column="3" colspan="2">
-      <widget class="QIodeSampleEdit" name="sampleEdit_sample_from">
+      <widget class="IodeSampleEdit" name="sampleEdit_sample_from">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -188,7 +188,7 @@
       </widget>
      </item>
      <item row="0" column="6">
-      <widget class="QIodeSampleEdit" name="sampleEdit_sample_to">
+      <widget class="IodeSampleEdit" name="sampleEdit_sample_to">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -440,9 +440,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeSampleEdit</class>
+   <class>IodeSampleEdit</class>
    <extends>QLineEdit</extends>
-   <header>custom_widgets/sampleedit.h</header>
+   <header>util/widgets/sample_edit.h</header>
   </customwidget>
   <customwidget>
    <class>IodeFileChooser</class>
