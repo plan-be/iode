@@ -12,7 +12,7 @@
 #include <QDebug>
 
 #include "utils.h"
-#include "custom_widgets/filechooser.h"
+#include "util/widgets/file_chooser.h"
 #include <boost/functional/hash.hpp>
 
 
@@ -200,7 +200,7 @@ private:
 		QLabel label("Please provide the path to the file where " + iodeTypeAsString + " will be stored");
 		layout->addWidget(&label, 0, Qt::AlignLeft);
 		// line edit + browse button
-		QIodeFileChooser fileChooser(static_cast<QWidget*>(&dialog));
+		IodeFileChooser fileChooser(static_cast<QWidget*>(&dialog));
 		fileChooser.setMinimumWidth(360);
 		fileChooser.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		fileChooser.setFileType((EnumIodeFile) iodeType);

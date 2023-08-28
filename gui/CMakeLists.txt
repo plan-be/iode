@@ -17,6 +17,7 @@ set(GUI_UTILS
     super.h     super.cpp 
     wrapper_classes.h 
     utils.h 
+    util/widgets/file_chooser.h
     util/print.h                        util/print.cpp
     util/double_validator.h
     util/system_item.h
@@ -42,7 +43,6 @@ set(GUI_CUSTOM_WIDGETS
     custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
     custom_widgets/print_file_dialog.ui
     custom_widgets/print_file_dialog.h          custom_widgets/print_file_dialog.cpp
-    custom_widgets/filechooser.h 
     custom_widgets/sampleedit.h
     custom_widgets/completer.h                  custom_widgets/completer.cpp
     custom_widgets/highlighter.h                custom_widgets/highlighter.cpp

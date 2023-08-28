@@ -145,7 +145,7 @@
      </widget>
     </item>
     <item row="1" column="1" colspan="4">
-     <widget class="QIodeFileChooser" name="fileChooser_input_file" native="true"/>
+     <widget class="IodeFileChooser" name="fileChooser_input_file" native="true"/>
     </item>
     <item row="2" column="0" colspan="2">
      <spacer name="horizontalSpacer">
@@ -212,9 +212,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeFileChooser</class>
+   <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header location="global">custom_widgets/filechooser.h</header>
+   <header location="global">util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

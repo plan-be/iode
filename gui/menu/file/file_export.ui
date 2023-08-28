@@ -62,7 +62,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QIodeFileChooser" name="fileChooser_variable_file" native="true">
+      <widget class="IodeFileChooser" name="fileChooser_variable_file" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -79,7 +79,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QIodeFileChooser" name="fileChooser_comment_file" native="true">
+      <widget class="IodeFileChooser" name="fileChooser_comment_file" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -96,7 +96,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QIodeFileChooser" name="fileChooser_rule_file" native="true">
+      <widget class="IodeFileChooser" name="fileChooser_rule_file" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -257,7 +257,7 @@
       </widget>
      </item>
      <item row="1" column="2" colspan="8">
-      <widget class="QIodeFileChooser" name="fileChooser_save_file" native="true">
+      <widget class="IodeFileChooser" name="fileChooser_save_file" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -346,7 +346,7 @@
       </widget>
      </item>
      <item row="3" column="2" colspan="8">
-      <widget class="QIodeFileChooser" name="fileChooser_debug_file" native="true">
+      <widget class="IodeFileChooser" name="fileChooser_debug_file" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -445,9 +445,9 @@
    <header>custom_widgets/sampleedit.h</header>
   </customwidget>
   <customwidget>
-   <class>QIodeFileChooser</class>
+   <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/filechooser.h</header>
+   <header>util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

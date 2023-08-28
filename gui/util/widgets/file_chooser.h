@@ -21,7 +21,7 @@ enum EnumFileMode
 };
 
 
-class QIodeFileChooser : public QWidget
+class IodeFileChooser : public QWidget
 {
 	Q_OBJECT
 
@@ -38,7 +38,7 @@ private:
 	EnumFileMode fileMode;
 
 public:
-	QIodeFileChooser(QWidget* parent = nullptr) : QWidget(parent),
+	IodeFileChooser(QWidget* parent = nullptr) : QWidget(parent),
 		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(I_ANY_FILE), fileMode(EXISTING_FILE)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
@@ -61,7 +61,7 @@ public:
 		if (fileType == I_DIRECTORY) fileMode == EXISTING_FILE;
 	}
 
-	~QIodeFileChooser()
+	~IodeFileChooser()
 	{
 		delete lineEdit;
 		delete browseButton;
