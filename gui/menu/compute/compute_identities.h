@@ -34,7 +34,7 @@ class QIodeMenuComputeIdentities : public QIodeSettings, public Ui::QIodeMenuCom
     WrapperCheckBox*        qTrace;
     WrapperComboBox*        qLanguage;
 
-    QIodeCompleter*         completer;
+    IodeCompleter*         completer;
 
 public:
 	QIodeMenuComputeIdentities(QWidget* parent = nullptr);

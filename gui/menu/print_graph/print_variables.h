@@ -30,7 +30,7 @@ class QIodeMenuPrintVariables: public QIodeMenuPrintAbstract, public Ui::QIodeMe
     Q_OBJECT
 
     WrapperQPlainTextEdit*   wVariablesNames;
-    QIodeCompleter*          completer;
+    IodeCompleter*          completer;
 
 public:
 	QIodeMenuPrintVariables(QWidget* parent = nullptr);

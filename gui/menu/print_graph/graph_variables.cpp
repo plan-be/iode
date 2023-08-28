@@ -6,7 +6,7 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) :
 {
     setupUi(this);
 
-    completer = new QIodeCompleter(false, false, I_VARIABLES, textEdit_variables);
+    completer = new IodeCompleter(false, false, I_VARIABLES, textEdit_variables);
     textEdit_variables->setCompleter(completer);
 
     lineEdit_min_Y->setValidator(new QDoubleValidator(lineEdit_min_Y));

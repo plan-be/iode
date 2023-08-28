@@ -75,7 +75,7 @@ protected:
     QStringList filesList;
     QFileSystemWatcher* fileSystemWatcher;
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
 
     QTextEdit* output;
 

@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
     setupUi(this);
 
     // ---- prepare auto-completion ----
-    completer = new QIodeCompleter(true, false, -1, this);
+    completer = new IodeCompleter(true, false, -1, this);
 
     // ---- dock widgets ----
     // make left dock widget to extend to bottom of the window

@@ -4,7 +4,7 @@ QIodeAddTable::QIodeAddTable(QWidget* parent) : QIodeSettings(parent)
 {
     setupUi(this);
 
-	completer = new QIodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
+	completer = new IodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 
     lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_TABLES, REQUIRED_FIELD);

@@ -26,7 +26,7 @@ class QIodeMenuComputeSCCDecomposition : public QIodeSettings, public Ui::QIodeM
     WrapperQLineEdit*       qInterRecursiveListName;
     WrapperQLineEdit*       qPostRecursiveListName;
 
-    QIodeCompleter*         completer;
+    IodeCompleter*         completer;
 
 public:
 	QIodeMenuComputeSCCDecomposition(QWidget* parent = nullptr);

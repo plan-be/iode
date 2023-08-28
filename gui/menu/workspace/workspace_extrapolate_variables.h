@@ -27,7 +27,7 @@ class QIodeMenuWorkspaceExtrapolateVariables : public QIodeSettings, public Ui::
     WrapperComboBox*        wMethod;
     WrapperQPlainTextEdit*  wVarsList;
 
-    QIodeCompleter*         completer;
+    IodeCompleter*         completer;
 
 public:
     QIodeMenuWorkspaceExtrapolateVariables(QWidget* parent = nullptr);

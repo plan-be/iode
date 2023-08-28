@@ -5,7 +5,7 @@ QIodeMenuDataListCalculus::QIodeMenuDataListCalculus(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new QIodeCompleter(false, false, I_LISTS, this);
+    completer = new IodeCompleter(false, false, I_LISTS, this);
     lineEdit_list1->setCompleter(completer);
     lineEdit_list2->setCompleter(completer);
 

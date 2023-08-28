@@ -5,7 +5,7 @@ QIodeMenuPrintVariables::QIodeMenuPrintVariables(QWidget* parent) : QIodeMenuPri
 {
     setupUi(this);
 
-    completer = new QIodeCompleter(false, false, I_VARIABLES, textEdit_variable_names);
+    completer = new IodeCompleter(false, false, I_VARIABLES, textEdit_variable_names);
     textEdit_variable_names->setCompleter(completer);
 
     QList<QString> q_langs;

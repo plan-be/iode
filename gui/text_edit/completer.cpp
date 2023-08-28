@@ -1,7 +1,7 @@
 #include "completer.h"
 
 
-QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunctions, const int iodeType, QObject *parent) 
+IodeCompleter::IodeCompleter(const bool reportCommands, const bool lecFunctions, const int iodeType, QObject *parent) 
     : QCompleter(parent), reportCommands(reportCommands), lecFunctions(lecFunctions)
 {
     buildReportCommandsList();
@@ -11,7 +11,7 @@ QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunction
     setIodeType(iodeType, true);
 }
 
-QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunctions, const QVector<int>& iodeTypes, QObject *parent) 
+IodeCompleter::IodeCompleter(const bool reportCommands, const bool lecFunctions, const QVector<int>& iodeTypes, QObject *parent) 
     : QCompleter(parent), reportCommands(reportCommands), lecFunctions(lecFunctions)
 {
     buildReportCommandsList();
@@ -23,13 +23,13 @@ QIodeCompleter::QIodeCompleter(const bool reportCommands, const bool lecFunction
     updateIodeOjectsListNames();
 }
 
-QIodeCompleter::~QIodeCompleter()
+IodeCompleter::~IodeCompleter()
 {
     delete listModel;
     iodeDatabases.clear();
 }
 
-void QIodeCompleter::updateIodeOjectsListNames()
+void IodeCompleter::updateIodeOjectsListNames()
 {
     QStringList list;
 

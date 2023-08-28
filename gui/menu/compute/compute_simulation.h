@@ -22,8 +22,8 @@ class QIodeMenuComputeSimulation : public QIodeSettings, public Ui::QIodeMenuCom
 
     QList<QString>   qInitialisationList;
     QList<QString>   qSortAlgoList;
-    QIodeCompleter*  completer_eqs;
-    QIodeCompleter*  completer_var;
+    IodeCompleter*  completer_eqs;
+    IodeCompleter*  completer_var;
 
     WrapperQPlainTextEdit* qEquationsList;
     WrapperQPlainTextEdit* qExchange;

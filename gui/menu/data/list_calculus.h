@@ -28,7 +28,7 @@ class QIodeMenuDataListCalculus : public QIodeSettings, public Ui::QIodeMenuData
     WrapperComboBox*  wComboOperator;
     WrapperQTextEdit* wResults;
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
 
 public:
 	QIodeMenuDataListCalculus(QWidget* parent = nullptr);

@@ -15,7 +15,7 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(QWidget* parent) :
     QIodeSettings(parent)
 {
     setupUi(this);
-    completer = new QIodeCompleter(false, false, I_IDENTITIES, textEdit_identities_list);
+    completer = new IodeCompleter(false, false, I_IDENTITIES, textEdit_identities_list);
     textEdit_identities_list->setCompleter(completer);
 
 	QList<QString> q_langs;
