@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
-#include "custom_widgets/complete_line_edit.h"
+#include "text_edit/complete_line_edit.h"
 
 
 class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDataSortExpandList
