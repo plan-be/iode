@@ -1,7 +1,7 @@
 #include "report_editor.h"
 
 
-ReportEditor::ReportEditor(QWidget *parent) : TextEditor(parent), output(nullptr)
+ReportEditor::ReportEditor(QWidget *parent) : IodeTextEditor(parent), output(nullptr)
 {
     highlighter = new IodeHighlighter(this->document());
 }

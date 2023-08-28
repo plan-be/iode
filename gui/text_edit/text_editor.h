@@ -20,7 +20,7 @@
 class LeftArea;
 
 
-class TextEditor : public IodeAutoCompleteTextEdit
+class IodeTextEditor : public IodeAutoCompleteTextEdit
 {
     Q_OBJECT
 
@@ -32,8 +32,8 @@ class TextEditor : public IodeAutoCompleteTextEdit
     QShortcut* duplicateShortcut;
 
 public:
-    TextEditor(QWidget *parent = nullptr);
-    ~TextEditor();
+    IodeTextEditor(QWidget *parent = nullptr);
+    ~IodeTextEditor();
 
     void leftAreaPaintEvent(QPaintEvent *event);
     int leftAreaWidth();
@@ -78,7 +78,7 @@ private slots:
 
 
 /**
- * @brief Class dedicated to be used with the TextEditor in order to display:
+ * @brief Class dedicated to be used with the IodeTextEditor in order to display:
  *        - line numbers
  *        - breakpoints
  * 
@@ -87,10 +87,10 @@ private slots:
  */
 class LeftArea : public QWidget
 {
-    TextEditor* editor;
+    IodeTextEditor* editor;
 
 public:
-    LeftArea(TextEditor* editor) : QWidget(editor), editor(editor)
+    LeftArea(IodeTextEditor* editor) : QWidget(editor), editor(editor)
     {}
 
     QSize sizeHint() const override

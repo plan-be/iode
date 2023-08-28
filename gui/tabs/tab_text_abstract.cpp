@@ -6,7 +6,7 @@ QIodeAbstractEditor::QIodeAbstractEditor(const EnumIodeFile fileType, const QStr
 {
 }
 
-bool QIodeAbstractEditor::load__(TextEditor* editor, const QString& filepath, const bool forceOverwrite)
+bool QIodeAbstractEditor::load__(IodeTextEditor* editor, const QString& filepath, const bool forceOverwrite)
 {
     // The fileChanged signal from the QFileSystemWatcher member of the QIodeAbstractTabWidget class 
     // is sent when the content of a tab is saved to file. The reloadFile() method of the same class 
@@ -46,7 +46,7 @@ bool QIodeAbstractEditor::load__(TextEditor* editor, const QString& filepath, co
     }
 }
 
-QString QIodeAbstractEditor::save_(TextEditor* editor, const QString& filepath)
+QString QIodeAbstractEditor::save_(IodeTextEditor* editor, const QString& filepath)
 {
     if (filepath.isEmpty()) 
         return filepath;

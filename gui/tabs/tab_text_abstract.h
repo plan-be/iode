@@ -48,9 +48,9 @@ public:
     }
 
     void update() {}
-    bool load__(TextEditor* editor, const QString& filepath, const bool forceOverwrite);
+    bool load__(IodeTextEditor* editor, const QString& filepath, const bool forceOverwrite);
     virtual bool load_(const QString& filepath, const bool forceOverwrite) = 0;
-    QString save_(TextEditor* editor, const QString& filepath);
+    QString save_(IodeTextEditor* editor, const QString& filepath);
     virtual QString save(const QString& filepath) = 0;
     QString save();
     QString saveAs_();

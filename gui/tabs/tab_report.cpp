@@ -32,7 +32,7 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent):
     */
 
     // ---- Signals and Slots ----
-    connect(editor, &TextEditor::modificationChanged, this, &QIodeReportWidget::setModified);
+    connect(editor, &IodeTextEditor::modificationChanged, this, &QIodeReportWidget::setModified);
 
     // connect(autocomplete, &QCheckBox::stateChanged, this, &QIodeReportWidget::toggleAutocomplete);
 
