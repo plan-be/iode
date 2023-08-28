@@ -1,7 +1,7 @@
 #include "highlighter.h"
 
 
-QIodeHighlighter::QIodeHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
+IodeHighlighter::IodeHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     // report command -> $ or # (group 0 -> Report internal fns)
     addRuleCommands(0, Qt::red);
@@ -23,7 +23,7 @@ QIodeHighlighter::QIodeHighlighter(QTextDocument *parent) : QSyntaxHighlighter(p
     addRule(R"(\{(.*?)\})", Qt::darkGreen);
 }
 
-void QIodeHighlighter::addRuleCommands(const int group, const QColor& color)
+void IodeHighlighter::addRuleCommands(const int group, const QColor& color)
 {
     QString q_func;
 
@@ -42,7 +42,7 @@ void QIodeHighlighter::addRuleCommands(const int group, const QColor& color)
     }
 }
 
-void QIodeHighlighter::highlightBlock(const QString &text)
+void IodeHighlighter::highlightBlock(const QString &text)
 {
     foreach(const HighlightingRule& rule, highlightingRules) 
     {

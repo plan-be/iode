@@ -14,7 +14,7 @@
  * 
  * @note see https://doc.qt.io/qt-6/qtwidgets-richtext-syntaxhighlighter-example.html 
  */
-class QIodeHighlighter : public QSyntaxHighlighter
+class IodeHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 
@@ -45,5 +45,5 @@ protected:
     void highlightBlock(const QString &text) override;
 
 public:
-    QIodeHighlighter(QTextDocument *parent = nullptr);
+    IodeHighlighter(QTextDocument *parent = nullptr);
 };

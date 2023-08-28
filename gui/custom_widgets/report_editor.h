@@ -26,7 +26,7 @@ class ReportEditor : public TextEditor
 {
     Q_OBJECT
 
-    QIodeHighlighter *highlighter;
+    IodeHighlighter *highlighter;
     QTextEdit* output;
 
 public: 

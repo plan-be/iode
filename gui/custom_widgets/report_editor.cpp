@@ -3,7 +3,7 @@
 
 ReportEditor::ReportEditor(QWidget *parent) : TextEditor(parent), output(nullptr)
 {
-    highlighter = new QIodeHighlighter(this->document());
+    highlighter = new IodeHighlighter(this->document());
 }
 
 ReportEditor::~ReportEditor()
