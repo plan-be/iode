@@ -4,7 +4,7 @@
 
 void QIodeSettings::saveSettings()
 {
-    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
     project_settings->beginGroup(className);
     QMap<QString, BaseWrapper*>::iterator i;
     for (i = mapFields.begin(); i != mapFields.end(); ++i)
@@ -19,7 +19,7 @@ void QIodeSettings::saveSettings()
 
 void QIodeSettings::loadSettings()
 {
-    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
     project_settings->beginGroup(className);
     QMap<QString, BaseWrapper*>::iterator i;
     for (i = mapFields.begin(); i != mapFields.end(); ++i)

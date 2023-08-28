@@ -174,7 +174,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
     treeView_file_explorer->saveSettings();
     tabWidget_IODE_objs->saveSettings();
     QDir projectDir(dirPath);
-    QIodeProjectSettings::changeProject(projectDir, this);
+    ProjectSettings::changeProject(projectDir, this);
 
     // update current directory (chdir)
     QDir::setCurrent(projectDir.absolutePath());

@@ -66,7 +66,7 @@ void IodeTabWidget::loadSettings()
     filesList.clear();
 
     // extract settings
-    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
     if(!project_settings)
         return;
     
@@ -164,7 +164,7 @@ void IodeTabWidget::loadSettings()
  
 void IodeTabWidget::saveSettings()
 {
-    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
     if(!project_settings)
         return;
 
