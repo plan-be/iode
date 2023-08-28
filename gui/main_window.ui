@@ -302,7 +302,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QIodeCommandLine" name="lineEdit_iode_command"/>
+      <widget class="IodeCommandLine" name="lineEdit_iode_command"/>
      </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="pushButton_run_iode_command">
@@ -936,7 +936,7 @@
    <header>main_widgets/file_explorer/file_explorer.h</header>
   </customwidget>
   <customwidget>
-   <class>QIodeCommandLine</class>
+   <class>IodeCommandLine</class>
    <extends>QLineEdit</extends>
    <header location="global">main_widgets/iode_command.h</header>
    <slots>

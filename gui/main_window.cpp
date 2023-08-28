@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
     fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
     // ---- signals and slots ----
-    connect(lineEdit_iode_command, &QIodeCommandLine::askComputeHash, tabWidget_IODE_objs, &IodeTabWidget::computeHash);
+    connect(lineEdit_iode_command, &IodeCommandLine::askComputeHash, tabWidget_IODE_objs, &IodeTabWidget::computeHash);
 
     connect(fullScreenShortcut, &QShortcut::activated, this, &MainWindow::showMaximized);
 
