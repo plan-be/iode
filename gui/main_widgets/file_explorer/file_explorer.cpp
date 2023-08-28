@@ -225,7 +225,7 @@ void IodeFileExplorer::setupContextMenu()
 
 void IodeFileExplorer::loadSettings()
 {
-    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
     if(!project_settings)
         return;
     
@@ -248,7 +248,7 @@ void IodeFileExplorer::loadSettings()
 
 void IodeFileExplorer::saveSettings()
 {
-    QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
     if(!project_settings)
         return;
 

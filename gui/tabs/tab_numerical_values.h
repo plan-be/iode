@@ -222,7 +222,7 @@ public:
 
     void loadNbDigitsFromSettings()
     {
-        QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
         {
             spinBox_nbDigits->setValue(4);
@@ -237,7 +237,7 @@ public:
 
     void saveNbDigitsToSettings()
     {
-        QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
             return;
         

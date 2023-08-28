@@ -179,7 +179,7 @@ public:
 
     void loadModeFromSettings()
     {
-        QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
         {
             comboMode->setCurrentIndex(0);
@@ -194,7 +194,7 @@ public:
 
     void saveModeToSettings()
     {
-        QSettings* project_settings = QIodeProjectSettings::getProjectSettings();
+        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
             return;
         

@@ -11,7 +11,7 @@ const static QString SETTINGS_FILENAME = "iode_gui_settings.ini";
  * @brief alternative to avoid non-constant global
  * 
  */
-class QIodeProjectSettings
+class ProjectSettings
 {
   private:
     inline static QSettings* project_settings{nullptr};
