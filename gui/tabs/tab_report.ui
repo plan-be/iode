@@ -145,15 +145,15 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="ReportEditor" name="editor"/>
-     <widget class="ReportEditor" name="editor_2"/>
+     <widget class="IodeReportEditor" name="editor"/>
+     <widget class="IodeReportEditor" name="editor_2"/>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ReportEditor</class>
+   <class>IodeReportEditor</class>
    <extends>QPlainTextEdit</extends>
    <header>text_edit\report_editor.h</header>
   </customwidget>
