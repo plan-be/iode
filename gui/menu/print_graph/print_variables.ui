@@ -158,7 +158,7 @@ LEC Forms</string>
     </widget>
    </item>
    <item row="4" column="1" colspan="4">
-    <widget class="QIodeFileChooser" name="fileChooser_file_2" native="true">
+    <widget class="IodeFileChooser" name="fileChooser_file_2" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -184,7 +184,7 @@ LEC Forms</string>
     </widget>
    </item>
    <item row="5" column="1" colspan="4">
-    <widget class="QIodeFileChooser" name="fileChooser_file_3" native="true">
+    <widget class="IodeFileChooser" name="fileChooser_file_3" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -210,7 +210,7 @@ LEC Forms</string>
     </widget>
    </item>
    <item row="6" column="1" colspan="4">
-    <widget class="QIodeFileChooser" name="fileChooser_file_4" native="true">
+    <widget class="IodeFileChooser" name="fileChooser_file_4" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -236,7 +236,7 @@ LEC Forms</string>
     </widget>
    </item>
    <item row="7" column="1" colspan="4">
-    <widget class="QIodeFileChooser" name="fileChooser_file_5" native="true">
+    <widget class="IodeFileChooser" name="fileChooser_file_5" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -311,9 +311,9 @@ LEC Forms</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeFileChooser</class>
+   <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/filechooser.h</header>
+   <header>util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

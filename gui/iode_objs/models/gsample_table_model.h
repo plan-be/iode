@@ -12,7 +12,7 @@
 #include <QDebug>
 
 #include "utils.h"
-#include "custom_widgets/filechooser.h"
+#include "util/widgets/file_chooser.h"
 #ifndef GSAMPLE_NUMERICAL_MODEL_HEADER
 #define _GSAMPLE_
 #include "numerical_table_model.h"

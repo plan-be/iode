@@ -193,13 +193,13 @@ Files</string>
     </widget>
    </item>
    <item row="4" column="1" colspan="6">
-    <widget class="QIodeFileChooser" name="fileChooser_var_file1" native="true"/>
+    <widget class="IodeFileChooser" name="fileChooser_var_file1" native="true"/>
    </item>
    <item row="5" column="1" colspan="6">
-    <widget class="QIodeFileChooser" name="fileChooser_var_file2" native="true"/>
+    <widget class="IodeFileChooser" name="fileChooser_var_file2" native="true"/>
    </item>
    <item row="6" column="1" colspan="6">
-    <widget class="QIodeFileChooser" name="fileChooser_var_file3" native="true"/>
+    <widget class="IodeFileChooser" name="fileChooser_var_file3" native="true"/>
    </item>
    <item row="7" column="0" colspan="7">
     <widget class="Line" name="line_2">
@@ -220,13 +220,13 @@ Files</string>
     </widget>
    </item>
    <item row="8" column="1" colspan="6">
-    <widget class="QIodeFileChooser" name="fileChooser_scl_file1" native="true"/>
+    <widget class="IodeFileChooser" name="fileChooser_scl_file1" native="true"/>
    </item>
    <item row="9" column="1" colspan="6">
-    <widget class="QIodeFileChooser" name="fileChooser_scl_file2" native="true"/>
+    <widget class="IodeFileChooser" name="fileChooser_scl_file2" native="true"/>
    </item>
    <item row="10" column="1" colspan="6">
-    <widget class="QIodeFileChooser" name="fileChooser_scl_file3" native="true"/>
+    <widget class="IodeFileChooser" name="fileChooser_scl_file3" native="true"/>
    </item>
    <item row="11" column="0" colspan="7">
     <widget class="Line" name="line_3">
@@ -295,9 +295,9 @@ Files</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeFileChooser</class>
+   <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/filechooser.h</header>
+   <header>util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

@@ -11,7 +11,7 @@
 #include <QDoubleSpinBox>
 #include <QCheckBox>
 
-#include "./custom_widgets/filechooser.h"
+#include "./util/widgets/file_chooser.h"
 #include "./custom_widgets/sampleedit.h"
 #include "utils.h"
 
@@ -306,10 +306,10 @@ public:
 
 // ---- Custom Widgets ----
 
-class WrapperFileChooser : public TemplateWrapper<QIodeFileChooser, QString>
+class WrapperFileChooser : public TemplateWrapper<IodeFileChooser, QString>
 {
 public:
-    WrapperFileChooser(const QString name, QIodeFileChooser& qfield, const EnumItemType type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
+    WrapperFileChooser(const QString name, IodeFileChooser& qfield, const EnumItemType type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
         TemplateWrapper(name, qfield, type)
     {
         this->qfield.setFileType(fileType);
