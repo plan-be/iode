@@ -20,7 +20,7 @@
 class LeftArea;
 
 
-class TextEditor : public QIodeCompleteTextEdit
+class TextEditor : public IodeAutoCompleteTextEdit
 {
     Q_OBJECT
 

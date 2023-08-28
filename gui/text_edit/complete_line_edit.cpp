@@ -1,7 +1,7 @@
 #include "complete_line_edit.h"
 
 
-void QIodeCompleteLineEdit::keyPressEvent(QKeyEvent *event)
+void IodeAutoCompleteLineEdit::keyPressEvent(QKeyEvent *event)
 {
     if(!c) 
     {
@@ -46,14 +46,14 @@ void QIodeCompleteLineEdit::keyPressEvent(QKeyEvent *event)
         c->popup()->hide();
 }
 
-void QIodeCompleteLineEdit::focusInEvent(QFocusEvent* event)
+void IodeAutoCompleteLineEdit::focusInEvent(QFocusEvent* event)
 {
     if(c)
         c->setWidget(this);
     QLineEdit::focusInEvent(event);
 }
 
-void QIodeCompleteLineEdit::insertCompletion(const QString& completion)
+void IodeAutoCompleteLineEdit::insertCompletion(const QString& completion)
 {
     if (c->widget() != this)
         return;
@@ -68,7 +68,7 @@ void QIodeCompleteLineEdit::insertCompletion(const QString& completion)
     insert(completion);
 }
 
-QString QIodeCompleteLineEdit::textUnderCursor()
+QString IodeAutoCompleteLineEdit::textUnderCursor()
 {
     QString line = this->text().trimmed();
     if(line.size() == 0) return "";

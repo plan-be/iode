@@ -19,7 +19,7 @@
  *        A-Z, a-z, 0-9, _, $, #, and @. 
  * 
  */
-class QIodeCompleteLineEdit: public QLineEdit
+class IodeAutoCompleteLineEdit: public QLineEdit
 {
     Q_OBJECT
 
@@ -27,7 +27,7 @@ protected:
     IodeCompleter* c;
 
 public:
-    QIodeCompleteLineEdit(QWidget *parent = nullptr): QLineEdit(parent), c(nullptr) {}
+    IodeAutoCompleteLineEdit(QWidget *parent = nullptr): QLineEdit(parent), c(nullptr) {}
 
     IodeCompleter* getCompleter() const
     {
@@ -46,7 +46,7 @@ public:
         // To connect to this signal by using the function pointer syntax, Qt provides 
         // a convenient helper for obtaining the function pointer
         connect(c, QOverload<const QString &>::of(&QCompleter::activated),
-                this, &QIodeCompleteLineEdit::insertCompletion);
+                this, &IodeAutoCompleteLineEdit::insertCompletion);
     }
 
 protected:

@@ -224,7 +224,7 @@
     </widget>
    </item>
    <item row="6" column="4" rowspan="2" colspan="7">
-    <widget class="QIodeCompleteTextEdit" name="textEdit_lec">
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_lec">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;LEC formulas separated by sem-colons ';'&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -442,7 +442,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeCompleteTextEdit</class>
+   <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>text_edit/complete_text_edit.h</header>
   </customwidget>

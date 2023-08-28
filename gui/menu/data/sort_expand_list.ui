@@ -34,7 +34,7 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QIodeCompleteLineEdit" name="lineEdit_sort"/>
+    <widget class="IodeAutoCompleteLineEdit" name="lineEdit_sort"/>
    </item>
    <item row="0" column="2" rowspan="3">
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -116,7 +116,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeCompleteLineEdit</class>
+   <class>IodeAutoCompleteLineEdit</class>
    <extends>QLineEdit</extends>
    <header>text_edit/complete_line_edit.h</header>
   </customwidget>

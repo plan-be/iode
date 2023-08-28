@@ -19,7 +19,7 @@ QIodeMenuDataScanObjects::QIodeMenuDataScanObjects(QWidget* parent)
     mapFields["IodeType"]    = wComboIodeTypes;
     mapFields["ListsToScan"] = wListsToScan;
 
-    connect(comboBox_iode_types, &QComboBox::currentIndexChanged, textEdit_lists_to_scan, &QIodeCompleteTextEdit::setIodeType);
+    connect(comboBox_iode_types, &QComboBox::currentIndexChanged, textEdit_lists_to_scan, &IodeAutoCompleteTextEdit::setIodeType);
 
     className = "MENU_DATA_SCAN_OBJECTS";
     loadSettings();

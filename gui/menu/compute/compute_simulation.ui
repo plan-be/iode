@@ -44,7 +44,7 @@ all equations)</string>
     </widget>
    </item>
    <item row="0" column="1" rowspan="4" colspan="6">
-    <widget class="QIodeCompleteTextEdit" name="textEdit_equations_list"/>
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_equations_list"/>
    </item>
    <item row="0" column="7">
     <widget class="QPushButton" name="OKButton">
@@ -118,7 +118,7 @@ all equations)</string>
     </widget>
    </item>
    <item row="4" column="1" colspan="6">
-    <widget class="QIodeCompleteTextEdit" name="textEdit_exchange"/>
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_exchange"/>
    </item>
    <item row="5" column="0">
     <widget class="QLabel" name="label_simulation">
@@ -303,7 +303,7 @@ all equations)</string>
    <header>util/widgets/sample_edit.h</header>
   </customwidget>
   <customwidget>
-   <class>QIodeCompleteTextEdit</class>
+   <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>text_edit/complete_text_edit.h</header>
   </customwidget>

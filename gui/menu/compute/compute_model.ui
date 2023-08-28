@@ -120,7 +120,7 @@ all equations)</string>
     </widget>
    </item>
    <item row="3" column="1" rowspan="2">
-    <widget class="QIodeCompleteTextEdit" name="textEdit_equations_list"/>
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_equations_list"/>
    </item>
    <item row="4" column="2">
     <spacer name="verticalSpacer">
@@ -139,7 +139,7 @@ all equations)</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QIodeCompleteTextEdit</class>
+   <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>text_edit/complete_text_edit.h</header>
   </customwidget>

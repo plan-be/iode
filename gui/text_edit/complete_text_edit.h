@@ -13,14 +13,14 @@
 
 
 /**
- * @brief Special line field which tries to auto-complete user input.
+ * @brief Special multiline field which tries to auto-complete user input.
  * 
  *        Auto-completion starts at the beginning of the line 
  *        or after a whitespace or any characters which is not 
  *        A-Z, a-z, 0-9, _, $, #, and @. 
  * 
  */
-class QIodeCompleteTextEdit: public QPlainTextEdit
+class IodeAutoCompleteTextEdit: public QPlainTextEdit
 {
     Q_OBJECT
 
@@ -29,7 +29,7 @@ protected:
     QKeyCombination keyCombineComplete;
 
 public:
-    QIodeCompleteTextEdit(QWidget *parent = nullptr) 
+    IodeAutoCompleteTextEdit(QWidget *parent = nullptr) 
         : QPlainTextEdit(parent), c(nullptr), keyCombineComplete(QKeyCombination(Qt::ControlModifier, Qt::Key_Space)) {}
 
     IodeCompleter* getCompleter() const
@@ -52,7 +52,7 @@ public:
         // To connect to this signal by using the function pointer syntax, Qt provides 
         // a convenient helper for obtaining the function pointer
         connect(c, QOverload<const QString &>::of(&QCompleter::activated),
-                this, &QIodeCompleteTextEdit::insertCompletion);
+                this, &IodeAutoCompleteTextEdit::insertCompletion);
     }
 
 protected:

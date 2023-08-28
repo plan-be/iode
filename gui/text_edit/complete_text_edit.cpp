@@ -1,7 +1,7 @@
 #include "complete_text_edit.h"
 
 
-void QIodeCompleteTextEdit::keyPressEvent(QKeyEvent *event)
+void IodeAutoCompleteTextEdit::keyPressEvent(QKeyEvent *event)
 {
     if(!c)
     {
@@ -50,14 +50,14 @@ void QIodeCompleteTextEdit::keyPressEvent(QKeyEvent *event)
         c->popup()->hide();
 }
 
-void QIodeCompleteTextEdit::focusInEvent(QFocusEvent* event)
+void IodeAutoCompleteTextEdit::focusInEvent(QFocusEvent* event)
 {
     if(c)
         c->setWidget(this);
     QPlainTextEdit::focusInEvent(event);
 }
 
-void QIodeCompleteTextEdit::insertCompletion(const QString& completion)
+void IodeAutoCompleteTextEdit::insertCompletion(const QString& completion)
 {
     if (c->widget() != this)
         return;
@@ -74,7 +74,7 @@ void QIodeCompleteTextEdit::insertCompletion(const QString& completion)
     setTextCursor(tc);
 }
 
-QString QIodeCompleteTextEdit::textUnderCursor()
+QString IodeAutoCompleteTextEdit::textUnderCursor()
 {
     QTextCursor tc = textCursor();
     int pos = tc.position();

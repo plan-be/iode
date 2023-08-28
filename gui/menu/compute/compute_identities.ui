@@ -127,7 +127,7 @@ all identities)</string>
     </widget>
    </item>
    <item row="1" column="1" rowspan="2" colspan="6">
-    <widget class="QIodeCompleteTextEdit" name="textEdit_identities_list"/>
+    <widget class="IodeAutoCompleteTextEdit" name="textEdit_identities_list"/>
    </item>
    <item row="1" column="7">
     <widget class="QPushButton" name="cancelButton">
@@ -309,7 +309,7 @@ Files</string>
    <header>util/widgets/sample_edit.h</header>
   </customwidget>
   <customwidget>
-   <class>QIodeCompleteTextEdit</class>
+   <class>IodeAutoCompleteTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header>text_edit/complete_text_edit.h</header>
   </customwidget>

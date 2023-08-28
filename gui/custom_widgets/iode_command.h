@@ -27,7 +27,7 @@
  *        A-Z, a-z, 0-9, _, $, #, and @. 
  * 
  */
-class QIodeCommandLine: public QIodeCompleteLineEdit
+class QIodeCommandLine: public IodeAutoCompleteLineEdit
 {
     Q_OBJECT
 
@@ -38,7 +38,7 @@ class QIodeCommandLine: public QIodeCompleteLineEdit
 
 public:
     QIodeCommandLine(QWidget *parent = nullptr) 
-        : QIodeCompleteLineEdit(parent), it(executedCommandsList.end()) {}
+        : IodeAutoCompleteLineEdit(parent), it(executedCommandsList.end()) {}
 
     void setup() 
     { 
