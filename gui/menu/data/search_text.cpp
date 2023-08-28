@@ -1,6 +1,6 @@
 #include "search_text.h"
 
-QIodeMenuDataSearchText::QIodeMenuDataSearchText(QWidget* parent)
+MenuDataSearchText::MenuDataSearchText(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -31,7 +31,7 @@ QIodeMenuDataSearchText::QIodeMenuDataSearchText(QWidget* parent)
     loadSettings();
 }
 
-QIodeMenuDataSearchText::~QIodeMenuDataSearchText()
+MenuDataSearchText::~MenuDataSearchText()
 {
     delete wText;
     delete wSaveList;
@@ -46,7 +46,7 @@ QIodeMenuDataSearchText::~QIodeMenuDataSearchText()
 
 // TODO ALD: implement a search_text() method in KDBAbstract + tests
 // Test: search Kost in Comments with search_in_free_text = true;
-void QIodeMenuDataSearchText::search()
+void MenuDataSearchText::search()
 {
     try
     {
@@ -85,7 +85,7 @@ void QIodeMenuDataSearchText::search()
     }
 }
 
-void QIodeMenuDataSearchText::help()
+void MenuDataSearchText::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

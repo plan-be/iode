@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuDataEditTables</class>
- <widget class="QDialog" name="QIodeMenuDataEditTables">
+ <class>MenuDataEditTables</class>
+ <widget class="QDialog" name="MenuDataEditTables">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -84,7 +84,7 @@
   <connection>
    <sender>pushButton_display</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataEditTables</receiver>
+   <receiver>MenuDataEditTables</receiver>
    <slot>display()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -100,7 +100,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataEditTables</receiver>
+   <receiver>MenuDataEditTables</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -116,7 +116,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataEditTables</receiver>
+   <receiver>MenuDataEditTables</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

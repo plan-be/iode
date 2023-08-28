@@ -18,7 +18,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuGraphVariables: public QIodeSettings, public Ui::QIodeMenuGraphVariables
+class MenuGraphVariables: public QIodeSettings, public Ui::MenuGraphVariables
 {
     Q_OBJECT
 
@@ -37,8 +37,8 @@ class QIodeMenuGraphVariables: public QIodeSettings, public Ui::QIodeMenuGraphVa
     IodeCompleter*         completer;
 
 public:
-	QIodeMenuGraphVariables(QWidget* parent = nullptr);
-	~QIodeMenuGraphVariables();
+	MenuGraphVariables(QWidget* parent = nullptr);
+	~MenuGraphVariables();
 
     void setVariablesNames(const QList<QString>& VariablesNames)
     {

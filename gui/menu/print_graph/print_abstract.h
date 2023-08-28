@@ -21,7 +21,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuPrintAbstract: public QIodeSettings
+class MenuPrintAbstract: public QIodeSettings
 {
     Q_OBJECT 
 
@@ -38,10 +38,10 @@ protected:
     WrapperSpinBox*          wNbDecimals;
 
 public:
-    QIodeMenuPrintAbstract(QWidget* parent = nullptr) 
+    MenuPrintAbstract(QWidget* parent = nullptr) 
         : QIodeSettings(parent) {}
 
-    ~QIodeMenuPrintAbstract() {}
+    ~MenuPrintAbstract() {}
 
 protected:
     void printTableOrVariable(const bool isTable, const QString& names);

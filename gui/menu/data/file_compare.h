@@ -9,7 +9,7 @@
 #include "wrapper_classes.h"
 
 
-class QIodeMenuDataFileCompare : public QIodeSettings, public Ui::QIodeMenuDataFileCompare
+class MenuDataFileCompare : public QIodeSettings, public Ui::MenuDataFileCompare
 {
     Q_OBJECT
 
@@ -22,8 +22,8 @@ class QIodeMenuDataFileCompare : public QIodeSettings, public Ui::QIodeMenuDataF
     WrapperQLineEdit*   wResultBothDifferent;
 
 public:
-	QIodeMenuDataFileCompare(QWidget* parent = nullptr);
-    ~QIodeMenuDataFileCompare();
+	MenuDataFileCompare(QWidget* parent = nullptr);
+    ~MenuDataFileCompare();
 
 public slots:
     void compare();

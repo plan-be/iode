@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuDataDuplicateObj</class>
- <widget class="QDialog" name="QIodeMenuDataDuplicateObj">
+ <class>MenuDataDuplicateObj</class>
+ <widget class="QDialog" name="MenuDataDuplicateObj">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -139,7 +139,7 @@
   <connection>
    <sender>pushButton_duplicate</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataDuplicateObj</receiver>
+   <receiver>MenuDataDuplicateObj</receiver>
    <slot>duplicate()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -155,7 +155,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataDuplicateObj</receiver>
+   <receiver>MenuDataDuplicateObj</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -171,7 +171,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataDuplicateObj</receiver>
+   <receiver>MenuDataDuplicateObj</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

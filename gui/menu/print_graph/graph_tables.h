@@ -19,7 +19,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuGraphTables: public QIodeSettings, public Ui::QIodeMenuGraphTables
+class MenuGraphTables: public QIodeSettings, public Ui::MenuGraphTables
 {
     Q_OBJECT
 
@@ -34,8 +34,8 @@ class QIodeMenuGraphTables: public QIodeSettings, public Ui::QIodeMenuGraphTable
     IodeCompleter*          completer;
 
 public:
-	QIodeMenuGraphTables(QWidget* parent = nullptr);
-	~QIodeMenuGraphTables();
+	MenuGraphTables(QWidget* parent = nullptr);
+	~MenuGraphTables();
 
 signals:
     void newPlot(QDialog* plotDialog);

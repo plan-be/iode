@@ -1,7 +1,7 @@
 #include "edit_tables.h"
 
 
-QIodeMenuDataEditTables::QIodeMenuDataEditTables(QWidget* parent)
+MenuDataEditTables::MenuDataEditTables(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -16,7 +16,7 @@ QIodeMenuDataEditTables::QIodeMenuDataEditTables(QWidget* parent)
     loadSettings();
 }
 
-QIodeMenuDataEditTables::~QIodeMenuDataEditTables()
+MenuDataEditTables::~MenuDataEditTables()
 {
     clear_all_reference_kdbs();
     foreach(GSampleNumericalDialog* view, tableViews) view->close();
@@ -27,7 +27,7 @@ QIodeMenuDataEditTables::~QIodeMenuDataEditTables()
 }
 
 
-void QIodeMenuDataEditTables::display()
+void MenuDataEditTables::display()
 {
     try
     {
@@ -55,7 +55,7 @@ void QIodeMenuDataEditTables::display()
     }
 }
 
-void QIodeMenuDataEditTables::help()
+void MenuDataEditTables::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

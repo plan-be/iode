@@ -1,7 +1,7 @@
 #include "file_contents.h"
 
 
-QIodeMenuDataFileContents::QIodeMenuDataFileContents(QWidget* parent)
+MenuDataFileContents::MenuDataFileContents(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -20,13 +20,13 @@ QIodeMenuDataFileContents::QIodeMenuDataFileContents(QWidget* parent)
     mapFields["InputFile"] = wInputFile;
     mapFields["SaveList"]  = wSaveList;
 
-    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuDataFileContents::updateFileChooser);
+    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileContents::updateFileChooser);
 
     className = "MENU_DATA_FILE_CONTENTS";
     loadSettings();
 }
 
-QIodeMenuDataFileContents::~QIodeMenuDataFileContents()
+MenuDataFileContents::~MenuDataFileContents()
 {
     delete wSearch;
     delete wComboIodeTypes;
@@ -38,7 +38,7 @@ QIodeMenuDataFileContents::~QIodeMenuDataFileContents()
 // TODO ALD: implement a file_contents() method in KDBAbstract + tests
 // Tests: search = A*, iode type = COMMENTS, file = empty
 //        search = A*, iode type = COMMENTS, file = fun2.ac
-void QIodeMenuDataFileContents::search()
+void MenuDataFileContents::search()
 {
     try
     {
@@ -65,7 +65,7 @@ void QIodeMenuDataFileContents::search()
     }
 }
 
-void QIodeMenuDataFileContents::help()
+void MenuDataFileContents::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

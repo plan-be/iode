@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuGraphTables</class>
- <widget class="QDialog" name="QIodeMenuGraphTables">
+ <class>MenuGraphTables</class>
+ <widget class="QDialog" name="MenuGraphTables">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -312,7 +312,7 @@
   <connection>
    <sender>pushButton_display</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuGraphTables</receiver>
+   <receiver>MenuGraphTables</receiver>
    <slot>display()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -328,7 +328,7 @@
   <connection>
    <sender>pushButton_setup</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuGraphTables</receiver>
+   <receiver>MenuGraphTables</receiver>
    <slot>setup()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -344,7 +344,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuGraphTables</receiver>
+   <receiver>MenuGraphTables</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -360,7 +360,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuGraphTables</receiver>
+   <receiver>MenuGraphTables</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

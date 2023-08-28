@@ -1,7 +1,7 @@
 #include "workspace_extrapolate_variables.h"
 
 
-QIodeMenuWorkspaceExtrapolateVariables::QIodeMenuWorkspaceExtrapolateVariables(QWidget* parent) : 
+MenuWorkspaceExtrapolateVariables::MenuWorkspaceExtrapolateVariables(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -26,7 +26,7 @@ QIodeMenuWorkspaceExtrapolateVariables::QIodeMenuWorkspaceExtrapolateVariables(Q
     loadSettings();
 }
 
-QIodeMenuWorkspaceExtrapolateVariables::~QIodeMenuWorkspaceExtrapolateVariables()
+MenuWorkspaceExtrapolateVariables::~MenuWorkspaceExtrapolateVariables()
 {
     delete wFrom;
     delete wTo;
@@ -36,7 +36,7 @@ QIodeMenuWorkspaceExtrapolateVariables::~QIodeMenuWorkspaceExtrapolateVariables(
     delete completer;
 }
 
-void QIodeMenuWorkspaceExtrapolateVariables::extrapolate_variables()
+void MenuWorkspaceExtrapolateVariables::extrapolate_variables()
 {
     try
     {
@@ -57,7 +57,7 @@ void QIodeMenuWorkspaceExtrapolateVariables::extrapolate_variables()
     this->accept();
 }
 
-void QIodeMenuWorkspaceExtrapolateVariables::help()
+void MenuWorkspaceExtrapolateVariables::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

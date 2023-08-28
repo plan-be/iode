@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuFileExport</class>
- <widget class="QDialog" name="QIodeMenuFileExport">
+ <class>MenuFileExport</class>
+ <widget class="QDialog" name="MenuFileExport">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -459,7 +459,7 @@
   <connection>
    <sender>saveButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileExport</receiver>
+   <receiver>MenuFileExport</receiver>
    <slot>save()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -475,7 +475,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileExport</receiver>
+   <receiver>MenuFileExport</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -491,7 +491,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileExport</receiver>
+   <receiver>MenuFileExport</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

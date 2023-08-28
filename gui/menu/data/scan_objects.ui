@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuDataScanObjects</class>
- <widget class="QDialog" name="QIodeMenuDataScanObjects">
+ <class>MenuDataScanObjects</class>
+ <widget class="QDialog" name="MenuDataScanObjects">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -150,7 +150,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <connection>
    <sender>pushButton_scan</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataScanObjects</receiver>
+   <receiver>MenuDataScanObjects</receiver>
    <slot>scan()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -166,7 +166,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataScanObjects</receiver>
+   <receiver>MenuDataScanObjects</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -182,7 +182,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataScanObjects</receiver>
+   <receiver>MenuDataScanObjects</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

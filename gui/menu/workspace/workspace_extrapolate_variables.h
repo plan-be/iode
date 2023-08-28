@@ -18,7 +18,7 @@
  */
 
 
-class QIodeMenuWorkspaceExtrapolateVariables : public QIodeSettings, public Ui::QIodeMenuWorkspaceExtrapolateVariables
+class MenuWorkspaceExtrapolateVariables : public QIodeSettings, public Ui::MenuWorkspaceExtrapolateVariables
 {
     Q_OBJECT
 
@@ -30,8 +30,8 @@ class QIodeMenuWorkspaceExtrapolateVariables : public QIodeSettings, public Ui::
     IodeCompleter*         completer;
 
 public:
-    QIodeMenuWorkspaceExtrapolateVariables(QWidget* parent = nullptr);
-    ~QIodeMenuWorkspaceExtrapolateVariables();
+    MenuWorkspaceExtrapolateVariables(QWidget* parent = nullptr);
+    ~MenuWorkspaceExtrapolateVariables();
 
 public slots:
 	void extrapolate_variables();

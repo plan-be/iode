@@ -9,7 +9,7 @@
 #include "text_edit/complete_line_edit.h"
 
 
-class QIodeMenuDataDuplicateObj : public QIodeSettings, public Ui::QIodeMenuDataDuplicateObj
+class MenuDataDuplicateObj : public QIodeSettings, public Ui::MenuDataDuplicateObj
 {
     Q_OBJECT
 
@@ -20,8 +20,8 @@ class QIodeMenuDataDuplicateObj : public QIodeSettings, public Ui::QIodeMenuData
     IodeCompleter* completer;
     
 public:
-	QIodeMenuDataDuplicateObj(QWidget* parent = nullptr);
-    ~QIodeMenuDataDuplicateObj();
+	MenuDataDuplicateObj(QWidget* parent = nullptr);
+    ~MenuDataDuplicateObj();
 
 public slots:
     void duplicate();

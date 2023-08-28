@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuFileNewProject</class>
- <widget class="QDialog" name="QIodeMenuFileNewProject">
+ <class>MenuFileNewProject</class>
+ <widget class="QDialog" name="MenuFileNewProject">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -97,7 +97,7 @@
   <connection>
    <sender>create_button</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileNewProject</receiver>
+   <receiver>MenuFileNewProject</receiver>
    <slot>create()</slot>
    <hints>
     <hint type="sourcelabel">

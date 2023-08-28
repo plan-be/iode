@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuDataSortExpandList</class>
- <widget class="QDialog" name="QIodeMenuDataSortExpandList">
+ <class>MenuDataSortExpandList</class>
+ <widget class="QDialog" name="MenuDataSortExpandList">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -126,7 +126,7 @@
   <connection>
    <sender>pushButton_sort</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataSortExpandList</receiver>
+   <receiver>MenuDataSortExpandList</receiver>
    <slot>sort()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -142,7 +142,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataSortExpandList</receiver>
+   <receiver>MenuDataSortExpandList</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -158,7 +158,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuDataSortExpandList</receiver>
+   <receiver>MenuDataSortExpandList</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

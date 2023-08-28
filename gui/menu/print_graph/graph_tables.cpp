@@ -1,7 +1,7 @@
 #include "graph_tables.h"
 
 
-QIodeMenuGraphTables::QIodeMenuGraphTables(QWidget* parent) : 
+MenuGraphTables::MenuGraphTables(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -32,7 +32,7 @@ QIodeMenuGraphTables::QIodeMenuGraphTables(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuGraphTables::~QIodeMenuGraphTables()
+MenuGraphTables::~MenuGraphTables()
 {
     delete wTableNames;
     delete wSample;
@@ -45,7 +45,7 @@ QIodeMenuGraphTables::~QIodeMenuGraphTables()
     delete completer;
 }
 
-void QIodeMenuGraphTables::display()
+void MenuGraphTables::display()
 {
     try
     {
@@ -84,12 +84,12 @@ void QIodeMenuGraphTables::display()
     }
 }
 
-void QIodeMenuGraphTables::freeReferenceKDBs()
+void MenuGraphTables::freeReferenceKDBs()
 {
     clear_all_reference_kdbs();
 }
 
-void QIodeMenuGraphTables::apply()
+void MenuGraphTables::apply()
 {
     try
     {
@@ -102,7 +102,7 @@ void QIodeMenuGraphTables::apply()
     }
 }
 
-void QIodeMenuGraphTables::setup()
+void MenuGraphTables::setup()
 {
     try
     {
@@ -116,7 +116,7 @@ void QIodeMenuGraphTables::setup()
     }
 }
 
-void QIodeMenuGraphTables::help()
+void MenuGraphTables::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

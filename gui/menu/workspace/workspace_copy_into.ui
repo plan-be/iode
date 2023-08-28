@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuWorkspaceCopyInto</class>
- <widget class="QDialog" name="QIodeMenuWorkspaceCopyInto">
+ <class>MenuWorkspaceCopyInto</class>
+ <widget class="QDialog" name="MenuWorkspaceCopyInto">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -237,7 +237,7 @@
   <connection>
    <sender>pushButton_copy</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceCopyInto</receiver>
+   <receiver>MenuWorkspaceCopyInto</receiver>
    <slot>copy_into_workspace()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -253,7 +253,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceCopyInto</receiver>
+   <receiver>MenuWorkspaceCopyInto</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -269,7 +269,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceCopyInto</receiver>
+   <receiver>MenuWorkspaceCopyInto</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -16,7 +16,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuComputeSimulation : public QIodeSettings, public Ui::QIodeMenuComputeSimulation
+class MenuComputeSimulation : public QIodeSettings, public Ui::MenuComputeSimulation
 {
     Q_OBJECT
 
@@ -38,8 +38,8 @@ class QIodeMenuComputeSimulation : public QIodeSettings, public Ui::QIodeMenuCom
     WrapperSpinBox*        qNbPasses;
 
 public:
-	QIodeMenuComputeSimulation(QWidget* parent = nullptr);
-    ~QIodeMenuComputeSimulation();
+	MenuComputeSimulation(QWidget* parent = nullptr);
+    ~MenuComputeSimulation();
 
 public slots:
     void compute();

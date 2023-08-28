@@ -1,7 +1,7 @@
 #include "graph_variables.h"
 
 
-QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) : 
+MenuGraphVariables::MenuGraphVariables(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -49,7 +49,7 @@ QIodeMenuGraphVariables::QIodeMenuGraphVariables(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuGraphVariables::~QIodeMenuGraphVariables()
+MenuGraphVariables::~MenuGraphVariables()
 {
     delete wVariables;
     delete wVarMode;
@@ -66,7 +66,7 @@ QIodeMenuGraphVariables::~QIodeMenuGraphVariables()
     delete completer;
 }
 
-void QIodeMenuGraphVariables::display()
+void MenuGraphVariables::display()
 {
     try
     {
@@ -119,7 +119,7 @@ void QIodeMenuGraphVariables::display()
     this->accept();
 }
 
-void QIodeMenuGraphVariables::apply()
+void MenuGraphVariables::apply()
 {
     try
     {
@@ -132,7 +132,7 @@ void QIodeMenuGraphVariables::apply()
     }
 }
 
-void QIodeMenuGraphVariables::setup()
+void MenuGraphVariables::setup()
 {
     try
     {
@@ -146,7 +146,7 @@ void QIodeMenuGraphVariables::setup()
     }
 }
 
-void QIodeMenuGraphVariables::help()
+void MenuGraphVariables::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

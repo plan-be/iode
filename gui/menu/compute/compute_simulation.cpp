@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuComputeSimulation::QIodeMenuComputeSimulation(QWidget* parent) : 
+MenuComputeSimulation::MenuComputeSimulation(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -52,7 +52,7 @@ QIodeMenuComputeSimulation::QIodeMenuComputeSimulation(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuComputeSimulation::~QIodeMenuComputeSimulation()
+MenuComputeSimulation::~MenuComputeSimulation()
 {
     delete qEquationsList;
     delete qExchange;
@@ -70,7 +70,7 @@ QIodeMenuComputeSimulation::~QIodeMenuComputeSimulation()
     delete completer_var;
 }
 
-void QIodeMenuComputeSimulation::compute()
+void MenuComputeSimulation::compute()
 {
     try
     {

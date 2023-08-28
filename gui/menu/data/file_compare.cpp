@@ -1,7 +1,7 @@
 #include "file_compare.h"
 
 
-QIodeMenuDataFileCompare::QIodeMenuDataFileCompare(QWidget* parent)
+MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -28,14 +28,14 @@ QIodeMenuDataFileCompare::QIodeMenuDataFileCompare(QWidget* parent)
     wThreshold->getQField().setValidator(new QDoubleValidator(&wThreshold->getQField()));
     updateThreshold(I_COMMENTS);
 
-    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuDataFileCompare::updateThreshold);
-    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &QIodeMenuDataFileCompare::updateFileChooser);
+    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateThreshold);
+    connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateFileChooser);
 
     className = "MENU_DATA_FILE_COMPARE";
     loadSettings();
 }
 
-QIodeMenuDataFileCompare::~QIodeMenuDataFileCompare()
+MenuDataFileCompare::~MenuDataFileCompare()
 {
     delete wComboIodeTypes;
     delete wThreshold;
@@ -49,7 +49,7 @@ QIodeMenuDataFileCompare::~QIodeMenuDataFileCompare()
 // TODO ALD: implement a file_compare() method in KDBAbstract + tests
 // Tests: iode type = COMMENTS, file = fun2.ac
 //                  = VARIABLES, threshold = 1e-07, file = fun2.av
-void QIodeMenuDataFileCompare::compare()
+void MenuDataFileCompare::compare()
 {
     try
     {
@@ -88,7 +88,7 @@ void QIodeMenuDataFileCompare::compare()
     }
 }
 
-void QIodeMenuDataFileCompare::help()
+void MenuDataFileCompare::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

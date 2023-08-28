@@ -15,7 +15,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuFileImportComments: public QIodeSettings, public Ui::QIodeMenuFileImportComments
+class MenuFileImportComments: public QIodeSettings, public Ui::MenuFileImportComments
 {
     Q_OBJECT
 
@@ -26,8 +26,8 @@ class QIodeMenuFileImportComments: public QIodeSettings, public Ui::QIodeMenuFil
     WrapperFileChooser*  wDebugFile;
 
 public:
-	QIodeMenuFileImportComments(QWidget* parent = nullptr);
-	~QIodeMenuFileImportComments();
+	MenuFileImportComments(QWidget* parent = nullptr);
+	~MenuFileImportComments();
 
 public slots:
 	void import();

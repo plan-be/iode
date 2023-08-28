@@ -1,6 +1,6 @@
 #include "sort_expand_list.h"
 
-QIodeMenuDataSortExpandList::QIodeMenuDataSortExpandList(QWidget* parent)
+MenuDataSortExpandList::MenuDataSortExpandList(QWidget* parent)
     : QIodeSettings(parent)
 {
     setupUi(this);
@@ -18,7 +18,7 @@ QIodeMenuDataSortExpandList::QIodeMenuDataSortExpandList(QWidget* parent)
     loadSettings();
 }
 
-QIodeMenuDataSortExpandList::~QIodeMenuDataSortExpandList()
+MenuDataSortExpandList::~MenuDataSortExpandList()
 {
     delete wLineSort;
     delete wLineSave;
@@ -33,7 +33,7 @@ QIodeMenuDataSortExpandList::~QIodeMenuDataSortExpandList()
 //    rc = B_DataListSort("LIST1 LIST2");
 //    lst = KLPTR("LIST2");
 //    S4ASSERT(U_cmp_strs(lst, "A;B;C"), "B_DataListSort(\"LIST1 LIST2\") = \"%s\"", lst);
-void QIodeMenuDataSortExpandList::sort()
+void MenuDataSortExpandList::sort()
 {
     try
     {
@@ -53,7 +53,7 @@ void QIodeMenuDataSortExpandList::sort()
     }
 }
 
-void QIodeMenuDataSortExpandList::help()
+void MenuDataSortExpandList::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

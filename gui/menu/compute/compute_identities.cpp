@@ -11,7 +11,7 @@
  */
 
 
-QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(QWidget* parent) : 
+MenuComputeIdentities::MenuComputeIdentities(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -66,7 +66,7 @@ QIodeMenuComputeIdentities::QIodeMenuComputeIdentities(QWidget* parent) :
     }
 }
 
-QIodeMenuComputeIdentities::~QIodeMenuComputeIdentities()
+MenuComputeIdentities::~MenuComputeIdentities()
 {
     delete qFrom; 
     delete qTo;
@@ -83,7 +83,7 @@ QIodeMenuComputeIdentities::~QIodeMenuComputeIdentities()
     delete completer;
 }
 
-void QIodeMenuComputeIdentities::compute()
+void MenuComputeIdentities::compute()
 {
     try
     {

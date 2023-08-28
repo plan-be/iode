@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuComputeSCCSimulation</class>
- <widget class="QDialog" name="QIodeMenuComputeSCCSimulation">
+ <class>MenuComputeSCCSimulation</class>
+ <widget class="QDialog" name="MenuComputeSCCSimulation">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -320,7 +320,7 @@
   <connection>
    <sender>OKButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeSCCSimulation</receiver>
+   <receiver>MenuComputeSCCSimulation</receiver>
    <slot>compute()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -336,7 +336,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeSCCSimulation</receiver>
+   <receiver>MenuComputeSCCSimulation</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -352,7 +352,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuComputeSCCSimulation</receiver>
+   <receiver>MenuComputeSCCSimulation</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

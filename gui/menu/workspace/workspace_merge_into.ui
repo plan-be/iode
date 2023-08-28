@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuWorkspaceMergeInto</class>
- <widget class="QDialog" name="QIodeMenuWorkspaceMergeInto">
+ <class>MenuWorkspaceMergeInto</class>
+ <widget class="QDialog" name="MenuWorkspaceMergeInto">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -226,7 +226,7 @@
   <connection>
    <sender>pushButton_merge</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceMergeInto</receiver>
+   <receiver>MenuWorkspaceMergeInto</receiver>
    <slot>merge_into_workspace()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -242,7 +242,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceMergeInto</receiver>
+   <receiver>MenuWorkspaceMergeInto</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -258,7 +258,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceMergeInto</receiver>
+   <receiver>MenuWorkspaceMergeInto</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

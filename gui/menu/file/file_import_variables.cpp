@@ -1,7 +1,7 @@
 #include "file_import_variables.h"
 
 
-QIodeMenuFileImportVariables::QIodeMenuFileImportVariables(QWidget* parent) : 
+MenuFileImportVariables::MenuFileImportVariables(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -29,7 +29,7 @@ QIodeMenuFileImportVariables::QIodeMenuFileImportVariables(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuFileImportVariables::~QIodeMenuFileImportVariables()
+MenuFileImportVariables::~MenuFileImportVariables()
 {
     delete wInputFile;
     delete wRuleFile;
@@ -39,7 +39,7 @@ QIodeMenuFileImportVariables::~QIodeMenuFileImportVariables()
     delete wDebugFile;
 }
 
-void QIodeMenuFileImportVariables::import()
+void MenuFileImportVariables::import()
 {
     try
     {
@@ -62,7 +62,7 @@ void QIodeMenuFileImportVariables::import()
     this->accept();
 }
 
-void QIodeMenuFileImportVariables::help()
+void MenuFileImportVariables::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

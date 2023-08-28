@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuPrintTables</class>
- <widget class="QDialog" name="QIodeMenuPrintTables">
+ <class>MenuPrintTables</class>
+ <widget class="QDialog" name="MenuPrintTables">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -328,7 +328,7 @@
   <connection>
    <sender>pushButton_display</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuPrintTables</receiver>
+   <receiver>MenuPrintTables</receiver>
    <slot>display()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -344,7 +344,7 @@
   <connection>
    <sender>pushButton_print</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuPrintTables</receiver>
+   <receiver>MenuPrintTables</receiver>
    <slot>print()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -360,7 +360,7 @@
   <connection>
    <sender>pushButton_setup</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuPrintTables</receiver>
+   <receiver>MenuPrintTables</receiver>
    <slot>setup()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -376,7 +376,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuPrintTables</receiver>
+   <receiver>MenuPrintTables</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -392,7 +392,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuPrintTables</receiver>
+   <receiver>MenuPrintTables</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuWorkspaceTrendCorrection</class>
- <widget class="QDialog" name="QIodeMenuWorkspaceTrendCorrection">
+ <class>MenuWorkspaceTrendCorrection</class>
+ <widget class="QDialog" name="MenuWorkspaceTrendCorrection">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -165,7 +165,7 @@
   <connection>
    <sender>pushButton_go</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceTrendCorrection</receiver>
+   <receiver>MenuWorkspaceTrendCorrection</receiver>
    <slot>trend_correction()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -181,7 +181,7 @@
   <connection>
    <sender>pushButton_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceTrendCorrection</receiver>
+   <receiver>MenuWorkspaceTrendCorrection</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -197,7 +197,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuWorkspaceTrendCorrection</receiver>
+   <receiver>MenuWorkspaceTrendCorrection</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -25,7 +25,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuPrintTables: public QIodeMenuPrintAbstract, public Ui::QIodeMenuPrintTables
+class MenuPrintTables: public MenuPrintAbstract, public Ui::MenuPrintTables
 {
     Q_OBJECT
     
@@ -36,8 +36,8 @@ class QIodeMenuPrintTables: public QIodeMenuPrintAbstract, public Ui::QIodeMenuP
     IodeCompleter*          completer;
 
 public:
-	QIodeMenuPrintTables(QWidget* parent = nullptr);
-	~QIodeMenuPrintTables();
+	MenuPrintTables(QWidget* parent = nullptr);
+	~MenuPrintTables();
 
 public slots:
 	void display();

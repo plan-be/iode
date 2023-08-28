@@ -24,7 +24,7 @@
  * 3. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeMenuDataEditTables: public QIodeSettings, public Ui::QIodeMenuDataEditTables
+class MenuDataEditTables: public QIodeSettings, public Ui::MenuDataEditTables
 {
     Q_OBJECT
     
@@ -35,8 +35,8 @@ class QIodeMenuDataEditTables: public QIodeSettings, public Ui::QIodeMenuDataEdi
     IodeCompleter*          completer;
 
 public:
-	QIodeMenuDataEditTables(QWidget* parent = nullptr);
-	~QIodeMenuDataEditTables();
+	MenuDataEditTables(QWidget* parent = nullptr);
+	~MenuDataEditTables();
 
 public slots:
 	void display();

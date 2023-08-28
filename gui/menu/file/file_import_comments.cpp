@@ -1,7 +1,7 @@
 #include "file_import_comments.h"
 
 
-QIodeMenuFileImportComments::QIodeMenuFileImportComments(QWidget* parent) : 
+MenuFileImportComments::MenuFileImportComments(QWidget* parent) : 
     QIodeSettings(parent)
 {
     setupUi(this);
@@ -27,7 +27,7 @@ QIodeMenuFileImportComments::QIodeMenuFileImportComments(QWidget* parent) :
     loadSettings();
 }
 
-QIodeMenuFileImportComments::~QIodeMenuFileImportComments()
+MenuFileImportComments::~MenuFileImportComments()
 {
     delete wInputFile;
     delete wRuleFile;
@@ -36,7 +36,7 @@ QIodeMenuFileImportComments::~QIodeMenuFileImportComments()
     delete wDebugFile;
 }
 
-void QIodeMenuFileImportComments::import()
+void MenuFileImportComments::import()
 {
     try
     {
@@ -58,7 +58,7 @@ void QIodeMenuFileImportComments::import()
     this->accept();
 }
 
-void QIodeMenuFileImportComments::help()
+void MenuFileImportComments::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

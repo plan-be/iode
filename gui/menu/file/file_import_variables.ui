@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeMenuFileImportVariables</class>
- <widget class="QDialog" name="QIodeMenuFileImportVariables">
+ <class>MenuFileImportVariables</class>
+ <widget class="QDialog" name="MenuFileImportVariables">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -347,7 +347,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileImportVariables</receiver>
+   <receiver>MenuFileImportVariables</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -363,7 +363,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileImportVariables</receiver>
+   <receiver>MenuFileImportVariables</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -379,7 +379,7 @@
   <connection>
    <sender>openButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeMenuFileImportVariables</receiver>
+   <receiver>MenuFileImportVariables</receiver>
    <slot>import()</slot>
    <hints>
     <hint type="sourcelabel">
