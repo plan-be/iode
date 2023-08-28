@@ -1,16 +1,16 @@
 #include "report_editor.h"
 
 
-ReportEditor::ReportEditor(QWidget *parent) : IodeTextEditor(parent), output(nullptr)
+IodeReportEditor::IodeReportEditor(QWidget *parent) : IodeTextEditor(parent), output(nullptr)
 {
     highlighter = new IodeHighlighter(this->document());
 }
 
-ReportEditor::~ReportEditor()
+IodeReportEditor::~IodeReportEditor()
 {
 }
 
-void ReportEditor::run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language)
+void IodeReportEditor::run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language)
 {
     QString msg;
     int success = -1;
