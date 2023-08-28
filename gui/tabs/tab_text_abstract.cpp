@@ -8,7 +8,7 @@ QIodeAbstractEditor::QIodeAbstractEditor(const EnumIodeFile fileType, const QStr
 
 bool QIodeAbstractEditor::load__(IodeTextEditor* editor, const QString& filepath, const bool forceOverwrite)
 {
-    // The fileChanged signal from the QFileSystemWatcher member of the QIodeAbstractTabWidget class 
+    // The fileChanged signal from the QFileSystemWatcher member of the IodeAbstractTabWidget class 
     // is sent when the content of a tab is saved to file. The reloadFile() method of the same class 
     // resets the cursor to the beginning and resets the stack of undos and redos.
     // We don't want that when saving the content of the tab to the corresponding file.
@@ -51,7 +51,7 @@ QString QIodeAbstractEditor::save_(IodeTextEditor* editor, const QString& filepa
     if (filepath.isEmpty()) 
         return filepath;
 
-    // The fileChanged signal from the QFileSystemWatcher member of the QIodeAbstractTabWidget class 
+    // The fileChanged signal from the QFileSystemWatcher member of the IodeAbstractTabWidget class 
     // is sent when the content of a tab is saved to file. The reloadFile() method of the same class 
     // resets the cursor to the beginning and resets the stack of undos and redos.
     savingFile = true;

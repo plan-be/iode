@@ -92,7 +92,7 @@ public:
         const QString& variables, QWidget* parent = nullptr): 
         QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 #else
-    _NUMERICAL_WIDGET_CLASS_NAME_(EnumIodeType iodeType, QIodeAbstractTabWidget* parent) 
+    _NUMERICAL_WIDGET_CLASS_NAME_(EnumIodeType iodeType, IodeAbstractTabWidget* parent) 
         : QIodeObjectWidget<M, V>(iodeType, parent)
 #endif
     {
