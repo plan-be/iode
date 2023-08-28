@@ -19,7 +19,7 @@
  */
 
 
-class QIodeUnitRoot : public QIodeSettings, public Ui::QIodeUnitRoot
+class QIodeUnitRoot : public IodeSettingsDialog, public Ui::QIodeUnitRoot
 {
     Q_OBJECT
 

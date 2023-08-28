@@ -18,7 +18,7 @@
  *         x = product: ["A", "B"] x ["C", "D"] => ["AB", "AC", "BC", "BD"]
  * 
  */
-class MenuDataListCalculus : public QIodeSettings, public Ui::MenuDataListCalculus
+class MenuDataListCalculus : public IodeSettingsDialog, public Ui::MenuDataListCalculus
 {
     Q_OBJECT
 

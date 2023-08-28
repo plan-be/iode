@@ -19,7 +19,7 @@
  */
 
 
-class QIodeDynAdjustment : public QIodeSettings, public Ui::QIodeDynAdjustment
+class QIodeDynAdjustment : public IodeSettingsDialog, public Ui::QIodeDynAdjustment
 {
     Q_OBJECT
 

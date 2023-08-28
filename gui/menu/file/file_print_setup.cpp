@@ -4,7 +4,7 @@ const QString MenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST = "MENU_FILE_PRINT_SET
 
 
 MenuFilePrintSetup::MenuFilePrintSetup(QWidget* parent)
-    : QIodeSettings(parent)
+    : IodeSettingsDialog(parent)
 {
     setupUi(this);
 

@@ -1,7 +1,7 @@
 #include "unit_root.h"
 
 
-QIodeUnitRoot::QIodeUnitRoot(QWidget* parent) : QIodeSettings(parent), precision(6)
+QIodeUnitRoot::QIodeUnitRoot(QWidget* parent) : IodeSettingsDialog(parent), precision(6)
 {
 	setupUi(this);
 

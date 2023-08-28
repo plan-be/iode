@@ -9,7 +9,7 @@
 #include "text_edit/completer.h"
 
 
-class MenuDataScanObjects : public QIodeSettings, public Ui::MenuDataScanObjects
+class MenuDataScanObjects : public IodeSettingsDialog, public Ui::MenuDataScanObjects
 {
     Q_OBJECT
 

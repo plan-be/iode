@@ -2,7 +2,7 @@
 
 
 MenuFileImportComments::MenuFileImportComments(QWidget* parent) : 
-    QIodeSettings(parent)
+    IodeSettingsDialog(parent)
 {
     setupUi(this);
 

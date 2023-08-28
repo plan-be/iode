@@ -2,7 +2,7 @@
 
 
 MenuFileExport::MenuFileExport(QWidget* parent) :
-    QIodeSettings(parent)
+    IodeSettingsDialog(parent)
 {
     setupUi(this);
 

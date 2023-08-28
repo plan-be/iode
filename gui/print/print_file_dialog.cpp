@@ -2,7 +2,7 @@
 
 
 PrintFileDialog::PrintFileDialog(QWidget* parent, const QString& outputFile, const QChar& format): 
-    QIodeSettings(parent)
+    IodeSettingsDialog(parent)
 {
     setupUi(this);
 
@@ -39,7 +39,7 @@ void PrintFileDialog::updateOutputFileFormat(int index)
     fileChooser_output_file->setFileType(static_cast<EnumIodeFile>(I_A2M_FILE + index));
 }
 
-// Will automatically save to settings -> see QIodeSettings::closeEvent()
+// Will automatically save to settings -> see IodeSettingsDialog::closeEvent()
 void PrintFileDialog::apply()
 {
     this->accept();

@@ -10,7 +10,7 @@
 #include "print/file_print_preferences.h"
 
 
-class MenuFilePrintSetup : public QIodeSettings, public Ui::MenuFilePrintSetup
+class MenuFilePrintSetup : public IodeSettingsDialog, public Ui::MenuFilePrintSetup
 {
     Q_OBJECT
 

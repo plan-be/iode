@@ -9,7 +9,7 @@
 #include "wrapper_classes.h"
 
 
-class MenuDataFileCompare : public QIodeSettings, public Ui::MenuDataFileCompare
+class MenuDataFileCompare : public IodeSettingsDialog, public Ui::MenuDataFileCompare
 {
     Q_OBJECT
 

@@ -35,7 +35,7 @@ class ProjectSettings
 
 
 // Mixin class for handling settings in derived class. 
-class QIodeSettings : public QDialog
+class IodeSettingsDialog : public QDialog
 {
     Q_OBJECT
 
@@ -44,7 +44,7 @@ protected:
     QMap<QString, BaseWrapper*> mapFields;
 
 public:
-    QIodeSettings(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint)
+    IodeSettingsDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint)
         : QDialog(parent, f), className("") {}
 
 protected:

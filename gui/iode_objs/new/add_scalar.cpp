@@ -1,7 +1,7 @@
 #include "add_scalar.h"
 
 
-QIodeAddScalar::QIodeAddScalar(QWidget* parent) : QIodeSettings(parent)
+QIodeAddScalar::QIodeAddScalar(QWidget* parent) : IodeSettingsDialog(parent)
 {
 	setupUi(this);
 

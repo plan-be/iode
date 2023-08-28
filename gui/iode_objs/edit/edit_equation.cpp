@@ -2,7 +2,7 @@
 
 
 EditEquation::EditEquation(const QString& equationName, QWidget* parent) : 
-	QIodeSettings(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
+	IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
 	setupUi(this);
 

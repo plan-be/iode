@@ -9,7 +9,7 @@
 #include "text_edit/complete_line_edit.h"
 
 
-class MenuDataSortExpandList : public QIodeSettings, public Ui::MenuDataSortExpandList
+class MenuDataSortExpandList : public IodeSettingsDialog, public Ui::MenuDataSortExpandList
 {
     Q_OBJECT
 
