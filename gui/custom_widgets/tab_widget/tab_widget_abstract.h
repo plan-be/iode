@@ -67,7 +67,7 @@
  *        (*) defined in main_window.ui
  * 
  */
-class QIodeAbstractTabWidget: public QTabWidget
+class IodeAbstractTabWidget: public QTabWidget
 {
     Q_OBJECT
 
@@ -104,8 +104,8 @@ signals:
     void newObjsListDialog(QDialog* dialog);
 
 public:
-    QIodeAbstractTabWidget(QWidget* parent = nullptr);
-    ~QIodeAbstractTabWidget();
+    IodeAbstractTabWidget(QWidget* parent = nullptr);
+    ~IodeAbstractTabWidget();
 
     /**
      * @brief - reopen all tabs (files) that were open (*)

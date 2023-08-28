@@ -1,7 +1,7 @@
 #include "tab_widget_abstract.h"
 
 
-QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent) 
+IodeAbstractTabWidget::IodeAbstractTabWidget(QWidget* parent) 
     : QTabWidget(parent), overwrite_all(false), discard_all(false), indexContextMenu(-1)
 {
     // set name
@@ -36,31 +36,31 @@ QIodeAbstractTabWidget::QIodeAbstractTabWidget(QWidget* parent)
 
     // ---- file system watcher ----
     fileSystemWatcher = new QFileSystemWatcher(this);
-    connect(fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &QIodeAbstractTabWidget::reloadFile);
+    connect(fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &IodeAbstractTabWidget::reloadFile);
 
     // ---- connect signals to slots  ----
-    connect(this, &QTabWidget::currentChanged, this, &QIodeAbstractTabWidget::showTab);
-    connect(this, &QTabWidget::tabCloseRequested, this, &QIodeAbstractTabWidget::removeTab);
+    connect(this, &QTabWidget::currentChanged, this, &IodeAbstractTabWidget::showTab);
+    connect(this, &QTabWidget::tabCloseRequested, this, &IodeAbstractTabWidget::removeTab);
 
-    connect(filepathShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::absolutePath);
-    connect(revealExplorerShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::revealInFolder);
-    connect(nextTabShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::showNextTab);
-    connect(previousTabShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::showPreviousTab);
-    connect(clearShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::clearTab);
-    connect(closeShortcut, &QShortcut::activated, this, &QIodeAbstractTabWidget::closeTab);
+    connect(filepathShortcut, &QShortcut::activated, this, &IodeAbstractTabWidget::absolutePath);
+    connect(revealExplorerShortcut, &QShortcut::activated, this, &IodeAbstractTabWidget::revealInFolder);
+    connect(nextTabShortcut, &QShortcut::activated, this, &IodeAbstractTabWidget::showNextTab);
+    connect(previousTabShortcut, &QShortcut::activated, this, &IodeAbstractTabWidget::showPreviousTab);
+    connect(clearShortcut, &QShortcut::activated, this, &IodeAbstractTabWidget::clearTab);
+    connect(closeShortcut, &QShortcut::activated, this, &IodeAbstractTabWidget::closeTab);
 
     // rebuild the list of files (tabs) everytime a tab is moved
-    connect(this->tabBar(), &QTabBar::tabMoved, this, &QIodeAbstractTabWidget::buildFilesList);
+    connect(this->tabBar(), &QTabBar::tabMoved, this, &IodeAbstractTabWidget::buildFilesList);
 
     // popups a context menu when the user right clicks on a tab
     this->tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this->tabBar(), &QTabBar::customContextMenuRequested, this, &QIodeAbstractTabWidget::onCustomContextMenu);
+    connect(this->tabBar(), &QTabBar::customContextMenuRequested, this, &IodeAbstractTabWidget::onCustomContextMenu);
 
     // setup context menu
     setupContextMenu();
 }
 
-QIodeAbstractTabWidget::~QIodeAbstractTabWidget()
+IodeAbstractTabWidget::~IodeAbstractTabWidget()
 {
     if(fileSystemWatcher) delete fileSystemWatcher;
 
@@ -80,7 +80,7 @@ QIodeAbstractTabWidget::~QIodeAbstractTabWidget()
     delete actionUnsplit;
 }
 
-void QIodeAbstractTabWidget::setupContextMenu()
+void IodeAbstractTabWidget::setupContextMenu()
 {
     QAction* action;
 
@@ -89,17 +89,17 @@ void QIodeAbstractTabWidget::setupContextMenu()
 
     // close tab (MUST BE DISABLE FOR TABS REPRESENTING AN IODE DATABASE)
     actionClose = addAction("Close", "Close the tab", closeShortcut->key());
-    connect(actionClose, &QAction::triggered, this, &QIodeAbstractTabWidget::closeTab);
+    connect(actionClose, &QAction::triggered, this, &IodeAbstractTabWidget::closeTab);
     contextMenu->addAction(actionClose);
 
     // save tab
     action = addAction("Save", "Save the tab", QKeySequence(Qt::CTRL | Qt::Key_S));
-    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::saveTab);
+    connect(action, &QAction::triggered, this, &IodeAbstractTabWidget::saveTab);
     contextMenu->addAction(action);
 
     // clear tab (ONLY FOR TABS REPRESENTING AN IODE DATABASE)
     actionClear = addAction("Clear", "Clear the correspondig IODE database", clearShortcut->key());
-    connect(actionClear, &QAction::triggered, this, &QIodeAbstractTabWidget::clearTab);
+    connect(actionClear, &QAction::triggered, this, &IodeAbstractTabWidget::clearTab);
     contextMenu->addAction(actionClear);
 
     // separator 
@@ -107,18 +107,18 @@ void QIodeAbstractTabWidget::setupContextMenu()
 
     // absolute path
     action = addAction("Copy Absolute Path", "Copy Absolute Path To The Clipboard", filepathShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::absolutePath);
+    connect(action, &QAction::triggered, this, &IodeAbstractTabWidget::absolutePath);
     contextMenu->addAction(action);
 
     // relative path
     action = addAction("Copy Relative Path", "Copy Relative Path To The Clipboard");
-    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::relativePath);
+    connect(action, &QAction::triggered, this, &IodeAbstractTabWidget::relativePath);
     contextMenu->addAction(action);
 
     // reveal in explorer
     action = addAction("Reveal in File Explorer", "open an OS file explorer and highlights the selected file", 
         revealExplorerShortcut->key());
-    connect(action, &QAction::triggered, this, &QIodeAbstractTabWidget::revealInFolder);
+    connect(action, &QAction::triggered, this, &IodeAbstractTabWidget::revealInFolder);
     contextMenu->addAction(action);
 
     // separator 
@@ -126,39 +126,39 @@ void QIodeAbstractTabWidget::setupContextMenu()
 
     // split vertically
     actionSplitV = addAction("Split Right", "Split the tab vertically");
-    connect(actionSplitV, &QAction::triggered, this, &QIodeAbstractTabWidget::splitTabHorizontally);
+    connect(actionSplitV, &QAction::triggered, this, &IodeAbstractTabWidget::splitTabHorizontally);
     contextMenu->addAction(actionSplitV);
 
     // split horizontally
     actionSplitH = addAction("Split Down", "Split the tab horizontally");
-    connect(actionSplitH, &QAction::triggered, this, &QIodeAbstractTabWidget::splitTabVertically);
+    connect(actionSplitH, &QAction::triggered, this, &IodeAbstractTabWidget::splitTabVertically);
     contextMenu->addAction(actionSplitH);
 
     actionUnsplit = addAction("Unsplit", "unsplit the tab content");
-    connect(actionUnsplit, &QAction::triggered, this, &QIodeAbstractTabWidget::unsplit);
+    connect(actionUnsplit, &QAction::triggered, this, &IodeAbstractTabWidget::unsplit);
     contextMenu->addAction(actionUnsplit);
 }
 
-void QIodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
+void IodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
 {
     // remove all previously registered directories and files
     fileSystemWatcher->removePaths(fileSystemWatcher->directories());
     fileSystemWatcher->removePaths(fileSystemWatcher->files());
 }
 
-int QIodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
+int IodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
     QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), this);
     int index = addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
 
-    connect(reportWidget, &QIodeReportWidget::tabTextModified, this, &QIodeAbstractTabWidget::tabTextModified);
-    connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &QIodeAbstractTabWidget::computeHash);
+    connect(reportWidget, &QIodeReportWidget::tabTextModified, this, &IodeAbstractTabWidget::tabTextModified);
+    connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &IodeAbstractTabWidget::computeHash);
     
     return index;
 }
 
-int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced)
+int IodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced)
 {
     QIodeTextWidget* textWidget = new QIodeTextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
     int index = addTab(textWidget, textWidget->getTabText());
@@ -167,12 +167,12 @@ int QIodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIode
     if(forced)
         textWidget->setForcedAsText(true);
     
-    connect(textWidget, &QIodeTextWidget::tabTextModified, this, &QIodeAbstractTabWidget::tabTextModified);
+    connect(textWidget, &QIodeTextWidget::tabTextModified, this, &IodeAbstractTabWidget::tabTextModified);
     
     return index;
 }
 
-int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText)
+int IodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText)
 {
     if (fileType <= I_VARIABLES_FILE) 
         return -1;
@@ -202,7 +202,7 @@ int QIodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileIn
     return index;
 }
 
-void QIodeAbstractTabWidget::removeTab(const int index)
+void IodeAbstractTabWidget::removeTab(const int index)
 {
     // ask to save if modified
     AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
@@ -225,7 +225,7 @@ void QIodeAbstractTabWidget::removeTab(const int index)
     QTabWidget::removeTab(index);
 }
 
-void QIodeAbstractTabWidget::showTab(int index)
+void IodeAbstractTabWidget::showTab(int index)
 {
     // get the index of the tab currently visible if not passed to the method
     if (index < 0) index = this->currentIndex();
@@ -241,7 +241,7 @@ void QIodeAbstractTabWidget::showTab(int index)
     this->setCurrentIndex(index);
 }
 
-void QIodeAbstractTabWidget::reloadFile(const QString& filepath)
+void IodeAbstractTabWidget::reloadFile(const QString& filepath)
 {
 	// find index of corresponding tab
 	int index = filesList.indexOf(filepath);
@@ -254,7 +254,7 @@ void QIodeAbstractTabWidget::reloadFile(const QString& filepath)
 	tabWidget->load(filepath, true);
 }
 
-bool QIodeAbstractTabWidget::saveTabContent(const int index)
+bool IodeAbstractTabWidget::saveTabContent(const int index)
 {
     try
     {
@@ -275,7 +275,7 @@ bool QIodeAbstractTabWidget::saveTabContent(const int index)
     }
 }
 
-bool QIodeAbstractTabWidget::saveAllTabs()
+bool IodeAbstractTabWidget::saveAllTabs()
 {
     bool success = true;
     for(int index=0; index < this->count(); index++)
@@ -283,7 +283,7 @@ bool QIodeAbstractTabWidget::saveAllTabs()
     return success;
 }
 
-bool QIodeAbstractTabWidget::saveProjectAs(QDir& newProjectDir)
+bool IodeAbstractTabWidget::saveProjectAs(QDir& newProjectDir)
 {
     QString newProjectPath = newProjectDir.absolutePath();
 
@@ -297,7 +297,7 @@ bool QIodeAbstractTabWidget::saveProjectAs(QDir& newProjectDir)
     return currentProject.copyTo(newProjectDir);
 }
 
-void QIodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString &newFilepath)
+void IodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString &newFilepath)
 {
     // check if oldFilePath present in currently open tabs
     int index = filesList.indexOf(oldFilepath);
@@ -319,7 +319,7 @@ void QIodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString
     fileSystemWatcher->addPath(newFilepath);
 }
 
-void QIodeAbstractTabWidget::closeTab()
+void IodeAbstractTabWidget::closeTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
     QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
@@ -335,7 +335,7 @@ void QIodeAbstractTabWidget::closeTab()
     indexContextMenu = -1;
 }
 
-void QIodeAbstractTabWidget::saveTab()
+void IodeAbstractTabWidget::saveTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
     saveTabContent(index);
@@ -343,7 +343,7 @@ void QIodeAbstractTabWidget::saveTab()
     indexContextMenu = -1;
 }
 
-void QIodeAbstractTabWidget::absolutePath()
+void IodeAbstractTabWidget::absolutePath()
 {
     int index = currentIndex();
     QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
@@ -355,7 +355,7 @@ void QIodeAbstractTabWidget::absolutePath()
     indexContextMenu = -1;
 }
 
-void QIodeAbstractTabWidget::relativePath()
+void IodeAbstractTabWidget::relativePath()
 {
     int index = currentIndex();
     QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
@@ -369,7 +369,7 @@ void QIodeAbstractTabWidget::relativePath()
     indexContextMenu = -1;
 }
 
-void QIodeAbstractTabWidget::revealInFolder()
+void IodeAbstractTabWidget::revealInFolder()
 {
     int index = currentIndex();
     QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));

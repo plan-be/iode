@@ -37,7 +37,7 @@ signals:
     void tabDatabaseModified(const EnumIodeType iodeType, const bool modified);
 
 public:
-    AbstractIodeObjectWidget(const EnumIodeType iodeType, QIodeAbstractTabWidget* parent) : 
+    AbstractIodeObjectWidget(const EnumIodeType iodeType, IodeAbstractTabWidget* parent) : 
         AbstractTabWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
@@ -183,7 +183,7 @@ protected:
     QShortcut* shortcutAdd;
 
 public:
-    QIodeObjectWidget(EnumIodeType iodeType, QIodeAbstractTabWidget* parent) 
+    QIodeObjectWidget(EnumIodeType iodeType, IodeAbstractTabWidget* parent) 
         : AbstractIodeObjectWidget(iodeType, parent)
     {
         // prepare splitter
@@ -233,8 +233,8 @@ public:
         connect(pushButton_add, &QPushButton::clicked, tableview, &V::new_obj);
         connect(shortcutAdd, &QShortcut::activated, tableview, &V::new_obj);
 
-        connect(tableview, &AbstractTableView::showObjsRequest, parent, &QIodeAbstractTabWidget::showObjectsList);
-        connect(tableview_2, &AbstractTableView::showObjsRequest, parent, &QIodeAbstractTabWidget::showObjectsList);
+        connect(tableview, &AbstractTableView::showObjsRequest, parent, &IodeAbstractTabWidget::showObjectsList);
+        connect(tableview_2, &AbstractTableView::showObjsRequest, parent, &IodeAbstractTabWidget::showObjectsList);
 
         splitter->addWidget(tableview);
         splitter->addWidget(tableview_2);

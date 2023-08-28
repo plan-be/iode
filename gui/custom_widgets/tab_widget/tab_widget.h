@@ -12,7 +12,7 @@
 #include "tabs/tab_database.h"
 
 
-class QIodeTabWidget: public QIodeAbstractTabWidget
+class QIodeTabWidget: public IodeAbstractTabWidget
 {
     Q_OBJECT
 

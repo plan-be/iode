@@ -26,7 +26,7 @@
 class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_COMMENTS, parent) 
+    QIodeCommentsWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_COMMENTS, parent) 
     {
         connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::databaseModified);
@@ -40,7 +40,7 @@ public:
 class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_EQUATIONS, parent) 
+    QIodeEquationsWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_EQUATIONS, parent) 
     {
         connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::databaseModified);
@@ -55,7 +55,7 @@ public:
 class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_IDENTITIES, parent) 
+    QIodeIdentitiesWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_IDENTITIES, parent) 
     {
         connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::databaseModified);
@@ -69,7 +69,7 @@ public:
 class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_LISTS, parent) 
+    QIodeListsWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_LISTS, parent) 
     {
         connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::databaseModified);
         connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::databaseModified);
@@ -83,7 +83,7 @@ public:
 class QIodeScalarsWidget : public TemplateNumericalWidget<ScalarsModel, ScalarsView>
 {
 public:
-    QIodeScalarsWidget(QIodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_SCALARS, parent) 
+    QIodeScalarsWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_SCALARS, parent) 
     {
         addHorizontalSpacer();
 
@@ -99,7 +99,7 @@ public:
 class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(QIodeAbstractTabWidget* parent) : QIodeObjectWidget(I_TABLES, parent) 
+    QIodeTablesWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_TABLES, parent) 
     {
         connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::databaseModified);
         connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::databaseModified);
@@ -120,7 +120,7 @@ class QIodeVariablesWidget : public TemplateNumericalWidget<VariablesModel, Vari
     QShortcut* shortcutModeMinus;
 
 public:
-    QIodeVariablesWidget(QIodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_VARIABLES, parent) 
+    QIodeVariablesWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_VARIABLES, parent) 
     {
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);

@@ -9,7 +9,7 @@ QWidget* get_tabs_widget_ptr()
 }
 
 
-QIodeTabWidget::QIodeTabWidget(QWidget* parent) : QIodeAbstractTabWidget(parent)
+QIodeTabWidget::QIodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
 {
     // prepare widgets for tabs associated with IODE object types
     tabComments = new QIodeCommentsWidget(this);
