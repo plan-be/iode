@@ -9,7 +9,7 @@
 #include "utils.h"
 
 
-class QIodeCompleter: public QCompleter
+class IodeCompleter: public QCompleter
 {
     Q_OBJECT
 
@@ -59,11 +59,11 @@ private:
     }
 
 public:
-    QIodeCompleter(const bool reportCommands = true, const bool lecFunctions = false, 
+    IodeCompleter(const bool reportCommands = true, const bool lecFunctions = false, 
         const int iodeType = -1, QObject *parent = nullptr);
-    QIodeCompleter(const bool reportCommands = true, const bool lecFunctions = false, 
+    IodeCompleter(const bool reportCommands = true, const bool lecFunctions = false, 
         const QVector<int>& iodeTypes = QVector<int>(), QObject *parent = nullptr);
-    ~QIodeCompleter();
+    ~IodeCompleter();
 
     void addIodeType(const int iodeType, const bool updateListModel = true)
     {

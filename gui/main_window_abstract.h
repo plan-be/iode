@@ -12,14 +12,14 @@ class MainWindowAbstract: public QMainWindow
 	Q_OBJECT
 
 protected:
-	QIodeCompleter* completer;
+	IodeCompleter* completer;
 
 	QVector<QDialog*> dialogs;
 
 public:
     MainWindowAbstract(QWidget *parent = Q_NULLPTR) : QMainWindow(parent) {}
 
-	QIodeCompleter* getCompleter()
+	IodeCompleter* getCompleter()
 	{
 		return completer;
 	}

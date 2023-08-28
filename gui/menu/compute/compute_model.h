@@ -21,7 +21,7 @@ class QIodeMenuComputeModel : public QIodeSettings, public Ui::QIodeMenuComputeM
     Q_OBJECT
 
     WrapperQPlainTextEdit* qEquationsList;
-    QIodeCompleter*        completer;
+    IodeCompleter*        completer;
 
 public:
 	QIodeMenuComputeModel(QWidget* parent = nullptr);

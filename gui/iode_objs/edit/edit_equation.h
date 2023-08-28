@@ -37,7 +37,7 @@ class QIodeEditEquation : public QIodeSettings, public Ui::QIodeEditEquation
     size_t hashBefore;
 	size_t hashAfter;	
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
 
     WrapperIodeNameEdit*    lineName;
     WrapperComboBox*        comboBoxMethod;

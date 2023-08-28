@@ -16,7 +16,7 @@ QIodeMenuComputeModel::QIodeMenuComputeModel(QWidget* parent) :
 {
     setupUi(this);
 
-	completer = new QIodeCompleter(false, false, I_EQUATIONS, textEdit_equations_list);
+	completer = new IodeCompleter(false, false, I_EQUATIONS, textEdit_equations_list);
 	textEdit_equations_list->setCompleter(completer);
 
     qEquationsList = new WrapperQPlainTextEdit(label_equations_list->text(), *textEdit_equations_list, OPTIONAL_FIELD);

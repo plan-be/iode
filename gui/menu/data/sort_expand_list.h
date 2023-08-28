@@ -16,7 +16,7 @@ class QIodeMenuDataSortExpandList : public QIodeSettings, public Ui::QIodeMenuDa
     WrapperQLineEdit* wLineSort;
     WrapperQLineEdit* wLineSave;
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
 
 public:
 	QIodeMenuDataSortExpandList(QWidget* parent = nullptr);

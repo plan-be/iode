@@ -32,7 +32,7 @@ class QIodeMenuDataEditTables: public QIodeSettings, public Ui::QIodeMenuDataEdi
 
     WrapperQPlainTextEdit*   wTablesNames;
 
-    QIodeCompleter*          completer;
+    IodeCompleter*          completer;
 
 public:
 	QIodeMenuDataEditTables(QWidget* parent = nullptr);

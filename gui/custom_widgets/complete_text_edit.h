@@ -25,19 +25,19 @@ class QIodeCompleteTextEdit: public QPlainTextEdit
     Q_OBJECT
 
 protected:
-    QIodeCompleter* c;
+    IodeCompleter* c;
     QKeyCombination keyCombineComplete;
 
 public:
     QIodeCompleteTextEdit(QWidget *parent = nullptr) 
         : QPlainTextEdit(parent), c(nullptr), keyCombineComplete(QKeyCombination(Qt::ControlModifier, Qt::Key_Space)) {}
 
-    QIodeCompleter* getCompleter() const
+    IodeCompleter* getCompleter() const
     {
         return c;
     }
 
-    void setCompleter(QIodeCompleter* completer) 
+    void setCompleter(IodeCompleter* completer) 
     {
         if(c)
             c->disconnect(this);

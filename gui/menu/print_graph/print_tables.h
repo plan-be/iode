@@ -33,7 +33,7 @@ class QIodeMenuPrintTables: public QIodeMenuPrintAbstract, public Ui::QIodeMenuP
 
     WrapperQPlainTextEdit*   wTablesNames;
 
-    QIodeCompleter*          completer;
+    IodeCompleter*          completer;
 
 public:
 	QIodeMenuPrintTables(QWidget* parent = nullptr);

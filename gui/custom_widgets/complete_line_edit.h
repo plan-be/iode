@@ -24,17 +24,17 @@ class QIodeCompleteLineEdit: public QLineEdit
     Q_OBJECT
 
 protected:
-    QIodeCompleter* c;
+    IodeCompleter* c;
 
 public:
     QIodeCompleteLineEdit(QWidget *parent = nullptr): QLineEdit(parent), c(nullptr) {}
 
-    QIodeCompleter* getCompleter() const
+    IodeCompleter* getCompleter() const
     {
         return c;
     }
 
-    void setCompleter(QIodeCompleter* c) 
+    void setCompleter(IodeCompleter* c) 
     {
         this->c = c;
 

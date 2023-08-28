@@ -31,7 +31,7 @@ class QIodeMenuGraphTables: public QIodeSettings, public Ui::QIodeMenuGraphTable
     WrapperFileChooser*      wFile5;
     WrapperComboBox*         wLanguage;
 
-    QIodeCompleter*          completer;
+    IodeCompleter*          completer;
 
 public:
 	QIodeMenuGraphTables(QWidget* parent = nullptr);

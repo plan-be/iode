@@ -17,7 +17,7 @@ class QIodeMenuDataDuplicateObj : public QIodeSettings, public Ui::QIodeMenuData
     WrapperQLineEdit*   wObjName;
     WrapperQLineEdit*   wDupObjName;
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
     
 public:
 	QIodeMenuDataDuplicateObj(QWidget* parent = nullptr);

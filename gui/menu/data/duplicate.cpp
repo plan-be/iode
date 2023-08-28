@@ -6,7 +6,7 @@ QIodeMenuDataDuplicateObj::QIodeMenuDataDuplicateObj(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new QIodeCompleter(false, false, I_COMMENTS, this);
+    completer = new IodeCompleter(false, false, I_COMMENTS, this);
     lineEdit_obj_name->setCompleter(completer);
     comboBox_iode_types->setCurrentIndex(0);
 

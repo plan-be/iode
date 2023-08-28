@@ -6,7 +6,7 @@ QIodeEditEquation::QIodeEditEquation(const QString& equationName, QWidget* paren
 {
 	setupUi(this);
 
-	completer = new QIodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
+	completer = new IodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 	textEdit_lec->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 

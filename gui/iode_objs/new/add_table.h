@@ -30,7 +30,7 @@ class QIodeAddTable : public QIodeSettings, public Ui::QIodeAddTable
     WrapperCheckBox*       checkBoxFiles;
     WrapperCheckBox*       checkBoxDate;
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
 
 public:
     QIodeAddTable(QWidget* parent = Q_NULLPTR);

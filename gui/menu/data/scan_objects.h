@@ -16,7 +16,7 @@ class QIodeMenuDataScanObjects : public QIodeSettings, public Ui::QIodeMenuDataS
     WrapperComboBox*       wComboIodeTypes;
     WrapperQPlainTextEdit* wListsToScan;
 
-    QIodeCompleter* completer;
+    IodeCompleter* completer;
 
 public:
 	QIodeMenuDataScanObjects(QWidget* parent = nullptr);

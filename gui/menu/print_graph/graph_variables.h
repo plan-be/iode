@@ -34,7 +34,7 @@ class QIodeMenuGraphVariables: public QIodeSettings, public Ui::QIodeMenuGraphVa
     WrapperQLineEdit*       wMaxY;
     WrapperComboBox*        wLanguage;
 
-    QIodeCompleter*         completer;
+    IodeCompleter*         completer;
 
 public:
 	QIodeMenuGraphVariables(QWidget* parent = nullptr);
