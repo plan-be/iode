@@ -37,6 +37,7 @@ set(GUI_PRINT
 
 set(GUI_TEXT_EDIT 
     text_edit/completer.h                  text_edit/completer.cpp
+    text_edit/highlighter.h                text_edit/highlighter.cpp
 )
 
 set(GUI_TABS
@@ -52,7 +53,6 @@ set(GUI_TABS
 set(GUI_CUSTOM_WIDGETS  
     custom_widgets/complete_line_edit.h         custom_widgets/complete_line_edit.cpp
     custom_widgets/complete_text_edit.h         custom_widgets/complete_text_edit.cpp
-    custom_widgets/highlighter.h                custom_widgets/highlighter.cpp
     custom_widgets/iode_command.h               custom_widgets/iode_command.cpp 
     custom_widgets/text_editor.h                custom_widgets/text_editor.cpp
     custom_widgets/report_editor.h              custom_widgets/report_editor.cpp
