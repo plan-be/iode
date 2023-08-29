@@ -8,7 +8,7 @@
  *    is a subclass of QObject. Also, be sure that only the first inherited class is a QObject.
  *    https://doc.qt.io/qt-6/moc.html#multiple-inheritance-requires-qobject-to-be-first
  *    --> That's why we to play with preprocessor directives to inherit from either 
- *        QWidget or QIodeObjectWidget.
+ *        QWidget or TemplateIodeObjectWidget.
  * 
  * 3. Do NOT forget to add safeguards when including the present hearder!
  */
@@ -56,7 +56,7 @@ class _NUMERICAL_WIDGET_CLASS_NAME_ : public QDialog
  *        and a QSpinBox indicating the number of significant 
  *        digits to display.
  */
-template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public QIodeObjectWidget<M, V>
+template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public TemplateIodeObjectWidget<M, V>
 #endif
 {
 #ifdef _GSAMPLE_
@@ -93,7 +93,7 @@ public:
         QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 #else
     _NUMERICAL_WIDGET_CLASS_NAME_(EnumIodeType iodeType, IodeAbstractTabWidget* parent) 
-        : QIodeObjectWidget<M, V>(iodeType, parent)
+        : TemplateIodeObjectWidget<M, V>(iodeType, parent)
 #endif
     {
 #ifdef _GSAMPLE_
@@ -215,7 +215,7 @@ public:
 #ifndef _GSAMPLE_
     void setProjectDir(const QDir& projectDir) override
     {
-        QIodeObjectWidget<M, V>::setProjectDir(projectDir);
+        TemplateIodeObjectWidget<M, V>::setProjectDir(projectDir);
         loadNbDigitsFromSettings();
     }
 #endif
