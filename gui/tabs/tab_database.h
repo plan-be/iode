@@ -23,95 +23,95 @@
 #include "iode_objs/views/variables_view.h"
 
 
-class QIodeCommentsWidget : public TemplateIodeObjectWidget<CommentsModel, CommentsView>
+class CommentsWidget : public TemplateIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_COMMENTS, parent) 
+    CommentsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_COMMENTS, parent) 
     {
-        connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::databaseModified);
-        connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::databaseModified);
-        connect(objmodel, &CommentsModel::rowsInserted, this, &QIodeCommentsWidget::databaseModified);
-        connect(objmodel, &CommentsModel::rowsRemoved, this, &QIodeCommentsWidget::databaseModified);
-        connect(objmodel, &CommentsModel::databaseModified, this, &QIodeCommentsWidget::databaseModified);
-        connect(tableview, &CommentsView::newObjectInserted, this, &QIodeCommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::dataChanged, this, &CommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::headerDataChanged, this, &CommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::rowsInserted, this, &CommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::rowsRemoved, this, &CommentsWidget::databaseModified);
+        connect(objmodel, &CommentsModel::databaseModified, this, &CommentsWidget::databaseModified);
+        connect(tableview, &CommentsView::newObjectInserted, this, &CommentsWidget::databaseModified);
     }
 };
 
-class QIodeEquationsWidget : public TemplateIodeObjectWidget<EquationsModel, EquationsView>
+class EquationsWidget : public TemplateIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_EQUATIONS, parent) 
+    EquationsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_EQUATIONS, parent) 
     {
-        connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::databaseModified);
-        connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::databaseModified);
-        connect(objmodel, &EquationsModel::rowsInserted, this, &QIodeEquationsWidget::databaseModified);
-        connect(objmodel, &EquationsModel::rowsRemoved, this, &QIodeEquationsWidget::databaseModified);
-        connect(objmodel, &EquationsModel::databaseModified, this, &QIodeEquationsWidget::databaseModified);
-        connect(tableview, &EquationsView::newObjectInserted, this, &QIodeEquationsWidget::databaseModified);
-        connect(tableview, &EquationsView::equationModified, this, &QIodeEquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::dataChanged, this, &EquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::headerDataChanged, this, &EquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::rowsInserted, this, &EquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::rowsRemoved, this, &EquationsWidget::databaseModified);
+        connect(objmodel, &EquationsModel::databaseModified, this, &EquationsWidget::databaseModified);
+        connect(tableview, &EquationsView::newObjectInserted, this, &EquationsWidget::databaseModified);
+        connect(tableview, &EquationsView::equationModified, this, &EquationsWidget::databaseModified);
     }
 };
 
-class QIodeIdentitiesWidget : public TemplateIodeObjectWidget<IdentitiesModel, IdentitiesView>
+class IdentitiesWidget : public TemplateIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_IDENTITIES, parent) 
+    IdentitiesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_IDENTITIES, parent) 
     {
-        connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::databaseModified);
-        connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::databaseModified);
-        connect(objmodel, &IdentitiesModel::rowsInserted, this, &QIodeIdentitiesWidget::databaseModified);
-        connect(objmodel, &IdentitiesModel::rowsRemoved, this, &QIodeIdentitiesWidget::databaseModified);
-        connect(objmodel, &IdentitiesModel::databaseModified, this, &QIodeIdentitiesWidget::databaseModified);
-        connect(tableview, &IdentitiesView::newObjectInserted, this, &QIodeIdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::dataChanged, this, &IdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::headerDataChanged, this, &IdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::rowsInserted, this, &IdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::rowsRemoved, this, &IdentitiesWidget::databaseModified);
+        connect(objmodel, &IdentitiesModel::databaseModified, this, &IdentitiesWidget::databaseModified);
+        connect(tableview, &IdentitiesView::newObjectInserted, this, &IdentitiesWidget::databaseModified);
     }
 };
 
-class QIodeListsWidget : public TemplateIodeObjectWidget<ListsModel, ListsView>
+class ListsWidget : public TemplateIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_LISTS, parent) 
+    ListsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_LISTS, parent) 
     {
-        connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::databaseModified);
-        connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::databaseModified);
-        connect(objmodel, &ListsModel::rowsInserted, this, &QIodeListsWidget::databaseModified);
-        connect(objmodel, &ListsModel::rowsRemoved, this, &QIodeListsWidget::databaseModified);
-        connect(objmodel, &ListsModel::databaseModified, this, &QIodeListsWidget::databaseModified);
-        connect(tableview, &ListsView::newObjectInserted, this, &QIodeListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::dataChanged, this, &ListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::headerDataChanged, this, &ListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::rowsInserted, this, &ListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::rowsRemoved, this, &ListsWidget::databaseModified);
+        connect(objmodel, &ListsModel::databaseModified, this, &ListsWidget::databaseModified);
+        connect(tableview, &ListsView::newObjectInserted, this, &ListsWidget::databaseModified);
     }
 };
 
-class QIodeScalarsWidget : public TemplateNumericalWidget<ScalarsModel, ScalarsView>
+class ScalarsWidget : public TemplateNumericalWidget<ScalarsModel, ScalarsView>
 {
 public:
-    QIodeScalarsWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_SCALARS, parent) 
+    ScalarsWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_SCALARS, parent) 
     {
         addHorizontalSpacer();
 
-        connect(objmodel, &ScalarsModel::dataChanged, this, &QIodeScalarsWidget::databaseModified);
-        connect(objmodel, &ScalarsModel::headerDataChanged, this, &QIodeScalarsWidget::databaseModified);
-        connect(objmodel, &ScalarsModel::rowsInserted, this, &QIodeScalarsWidget::databaseModified);
-        connect(objmodel, &ScalarsModel::rowsRemoved, this, &QIodeScalarsWidget::databaseModified);
-        connect(objmodel, &ScalarsModel::databaseModified, this, &QIodeScalarsWidget::databaseModified);
-        connect(tableview, &ScalarsView::newObjectInserted, this, &QIodeScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::dataChanged, this, &ScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::headerDataChanged, this, &ScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::rowsInserted, this, &ScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::rowsRemoved, this, &ScalarsWidget::databaseModified);
+        connect(objmodel, &ScalarsModel::databaseModified, this, &ScalarsWidget::databaseModified);
+        connect(tableview, &ScalarsView::newObjectInserted, this, &ScalarsWidget::databaseModified);
     }
 };
 
-class QIodeTablesWidget : public TemplateIodeObjectWidget<TablesModel, TablesView>
+class TablesWidget : public TemplateIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_TABLES, parent) 
+    TablesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_TABLES, parent) 
     {
-        connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::databaseModified);
-        connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::databaseModified);
-        connect(objmodel, &TablesModel::rowsInserted, this, &QIodeTablesWidget::databaseModified);
-        connect(objmodel, &TablesModel::rowsRemoved, this, &QIodeTablesWidget::databaseModified);
-        connect(objmodel, &TablesModel::databaseModified, this, &QIodeTablesWidget::databaseModified);
-        connect(tableview, &TablesView::newObjectInserted, this, &QIodeTablesWidget::databaseModified);
-        connect(tableview, &TablesView::tableModified, this, &QIodeTablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::dataChanged, this, &TablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::headerDataChanged, this, &TablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::rowsInserted, this, &TablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::rowsRemoved, this, &TablesWidget::databaseModified);
+        connect(objmodel, &TablesModel::databaseModified, this, &TablesWidget::databaseModified);
+        connect(tableview, &TablesView::newObjectInserted, this, &TablesWidget::databaseModified);
+        connect(tableview, &TablesView::tableModified, this, &TablesWidget::databaseModified);
     }
 };
 
-class QIodeVariablesWidget : public TemplateNumericalWidget<VariablesModel, VariablesView>
+class VariablesWidget : public TemplateNumericalWidget<VariablesModel, VariablesView>
 {
     Q_OBJECT
 
@@ -120,7 +120,7 @@ class QIodeVariablesWidget : public TemplateNumericalWidget<VariablesModel, Vari
     QShortcut* shortcutModeMinus;
 
 public:
-    QIodeVariablesWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_VARIABLES, parent) 
+    VariablesWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_VARIABLES, parent) 
     {
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -150,22 +150,22 @@ public:
         shortcutModeMinus->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
-        connect(comboMode, &QComboBox::currentIndexChanged, this, &QIodeVariablesWidget::changeMode);
-        connect(shortcutModePlus, &QShortcut::activated, this, &QIodeVariablesWidget::nextMode);
-        connect(shortcutModeMinus, &QShortcut::activated, this, &QIodeVariablesWidget::previousMode);
+        connect(comboMode, &QComboBox::currentIndexChanged, this, &VariablesWidget::changeMode);
+        connect(shortcutModePlus, &QShortcut::activated, this, &VariablesWidget::nextMode);
+        connect(shortcutModeMinus, &QShortcut::activated, this, &VariablesWidget::previousMode);
 
-        connect(objmodel, &VariablesModel::dataChanged, this, &QIodeVariablesWidget::databaseModified);
-        connect(objmodel, &VariablesModel::headerDataChanged, this, &QIodeVariablesWidget::databaseModified);
-        connect(objmodel, &VariablesModel::rowsInserted, this, &QIodeVariablesWidget::databaseModified);
-        connect(objmodel, &VariablesModel::rowsRemoved, this, &QIodeVariablesWidget::databaseModified);
-        connect(objmodel, &VariablesModel::databaseModified, this, &QIodeVariablesWidget::databaseModified);
-        connect(tableview, &VariablesView::newObjectInserted, this, &QIodeVariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::dataChanged, this, &VariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::headerDataChanged, this, &VariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::rowsInserted, this, &VariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::rowsRemoved, this, &VariablesWidget::databaseModified);
+        connect(objmodel, &VariablesModel::databaseModified, this, &VariablesWidget::databaseModified);
+        connect(tableview, &VariablesView::newObjectInserted, this, &VariablesWidget::databaseModified);
     
         // reload mode
         loadModeFromSettings();
     }
 
-    ~QIodeVariablesWidget()
+    ~VariablesWidget()
     {
         delete shortcutModePlus;
         delete shortcutModeMinus;
