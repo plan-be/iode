@@ -18,7 +18,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeAddTable : public IodeSettingsDialog, public Ui::QIodeAddTable
+class AddTableDialog : public IodeSettingsDialog, public Ui::AddTableDialog
 {
     Q_OBJECT
 
@@ -33,8 +33,8 @@ class QIodeAddTable : public IodeSettingsDialog, public Ui::QIodeAddTable
     IodeCompleter* completer;
 
 public:
-    QIodeAddTable(QWidget* parent = Q_NULLPTR);
-    ~QIodeAddTable();
+    AddTableDialog(QWidget* parent = Q_NULLPTR);
+    ~AddTableDialog();
 
 public slots:
     void add();

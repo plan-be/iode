@@ -16,7 +16,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeAddIdentity : public QDialog, public Ui::QIodeAddObject
+class AddIdentityDialog : public QDialog, public Ui::AddObjectDialog
 {
     Q_OBJECT
 
@@ -24,7 +24,7 @@ class QIodeAddIdentity : public QDialog, public Ui::QIodeAddObject
     WrapperQLineEdit* lineDefinition;
 
 public:
-    QIodeAddIdentity(QWidget* parent = Q_NULLPTR);
+    AddIdentityDialog(QWidget* parent = Q_NULLPTR);
 
 public slots:
     void add();

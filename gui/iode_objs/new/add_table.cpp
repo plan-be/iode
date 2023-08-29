@@ -1,6 +1,6 @@
 #include "add_table.h"
 
-QIodeAddTable::QIodeAddTable(QWidget* parent) : IodeSettingsDialog(parent)
+AddTableDialog::AddTableDialog(QWidget* parent) : IodeSettingsDialog(parent)
 {
     setupUi(this);
 
@@ -24,7 +24,7 @@ QIodeAddTable::QIodeAddTable(QWidget* parent) : IodeSettingsDialog(parent)
     loadSettings();
 }
 
-QIodeAddTable::~QIodeAddTable()
+AddTableDialog::~AddTableDialog()
 {
     delete lineName;
     delete spinNbColumns;
@@ -37,7 +37,7 @@ QIodeAddTable::~QIodeAddTable()
     delete completer;
 }
 
-void QIodeAddTable::add()
+void AddTableDialog::add()
 {
     try
     {
@@ -61,7 +61,7 @@ void QIodeAddTable::add()
     }
 }
 
-void QIodeAddTable::help()
+void AddTableDialog::help()
 {
     
     QDesktopServices::openUrl(url_manual);

@@ -1,7 +1,7 @@
 #include "add_identity.h"
 
 
-QIodeAddIdentity::QIodeAddIdentity(QWidget* parent) : QDialog(parent)
+AddIdentityDialog::AddIdentityDialog(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 
@@ -12,7 +12,7 @@ QIodeAddIdentity::QIodeAddIdentity(QWidget* parent) : QDialog(parent)
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 
-void QIodeAddIdentity::add()
+void AddIdentityDialog::add()
 {
 	try
 	{
@@ -28,7 +28,7 @@ void QIodeAddIdentity::add()
 	}
 }
 
-void QIodeAddIdentity::help()
+void AddIdentityDialog::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

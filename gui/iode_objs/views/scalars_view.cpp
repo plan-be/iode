@@ -3,7 +3,7 @@
 
 void ScalarsView::new_obj()
 {
-	QIodeAddScalar dialog(this);
+	AddScalarDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
 	filter_and_update();

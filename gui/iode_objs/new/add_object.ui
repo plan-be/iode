@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeAddObject</class>
- <widget class="QDialog" name="QIodeAddObject">
+ <class>AddObjectDialog</class>
+ <widget class="QDialog" name="AddObjectDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -235,7 +235,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddObject</receiver>
+   <receiver>AddObjectDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -251,7 +251,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddObject</receiver>
+   <receiver>AddObjectDialog</receiver>
    <slot>add()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -267,7 +267,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddObject</receiver>
+   <receiver>AddObjectDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -17,7 +17,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeAddScalar : public IodeSettingsDialog, public Ui::QIodeAddScalar
+class AddScalarDialog : public IodeSettingsDialog, public Ui::AddScalarDialog
 {
     Q_OBJECT
 
@@ -26,8 +26,8 @@ class QIodeAddScalar : public IodeSettingsDialog, public Ui::QIodeAddScalar
     WrapperDoubleSpinBox* spinBoxRelax;
 
 public:
-    QIodeAddScalar(QWidget* parent = Q_NULLPTR);
-    ~QIodeAddScalar();
+    AddScalarDialog(QWidget* parent = Q_NULLPTR);
+    ~AddScalarDialog();
 
 public slots:
     void add();

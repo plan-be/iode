@@ -3,7 +3,7 @@
 
 void IdentitiesView::new_obj()
 {
-	QIodeAddIdentity dialog(this);
+	AddIdentityDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
 	filter_and_update();

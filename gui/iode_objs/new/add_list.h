@@ -16,7 +16,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeAddList : public QDialog, public Ui::QIodeAddObject
+class AddListDialog : public QDialog, public Ui::AddObjectDialog
 {
     Q_OBJECT
 
@@ -24,7 +24,7 @@ class QIodeAddList : public QDialog, public Ui::QIodeAddObject
     WrapperQLineEdit* lineDefinition;
 
 public:
-    QIodeAddList(QWidget* parent = Q_NULLPTR);
+    AddListDialog(QWidget* parent = Q_NULLPTR);
 
 public slots:
     void add();
