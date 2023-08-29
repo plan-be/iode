@@ -8,12 +8,12 @@
 #include "iode_objs/new/add_list.h"
 
 
-class ListsView : public TemplateTableView<ListsModel>
+class ListsView : public IodeTemplateTableView<ListsModel>
 {
 	Q_OBJECT
 
 public:
-	ListsView(QWidget* parent = nullptr) : TemplateTableView(I_LISTS, new ListsDelegate(parent), parent) {};
+	ListsView(QWidget* parent = nullptr) : IodeTemplateTableView(I_LISTS, new ListsDelegate(parent), parent) {};
 
 public slots:
 	void new_obj();

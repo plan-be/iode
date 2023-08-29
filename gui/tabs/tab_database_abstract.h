@@ -233,8 +233,8 @@ public:
         connect(pushButton_add, &QPushButton::clicked, tableview, &V::new_obj);
         connect(shortcutAdd, &QShortcut::activated, tableview, &V::new_obj);
 
-        connect(tableview, &AbstractTableView::showObjsRequest, parent, &IodeAbstractTabWidget::showObjectsList);
-        connect(tableview_2, &AbstractTableView::showObjsRequest, parent, &IodeAbstractTabWidget::showObjectsList);
+        connect(tableview, &IodeAbstractTableView::showObjsRequest, parent, &IodeAbstractTabWidget::showObjectsList);
+        connect(tableview_2, &IodeAbstractTableView::showObjsRequest, parent, &IodeAbstractTabWidget::showObjectsList);
 
         splitter->addWidget(tableview);
         splitter->addWidget(tableview_2);
