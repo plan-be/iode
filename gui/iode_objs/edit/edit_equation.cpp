@@ -192,7 +192,7 @@ void EditEquationDialog::display_coefs()
 		try
 		{
 			KDBScalars* kdb_scl = estimation->get_coefficients();
-			QIodeEstimationCoefs dialog(kdb_scl, this);
+			EstimationCoefsDialog dialog(kdb_scl, this);
 			dialog.exec();
 		}
 		catch (const std::exception& e)
