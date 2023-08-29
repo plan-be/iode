@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeEditVarsSample</class>
- <widget class="QDialog" name="QIodeEditVarsSample">
+ <class>EditIodeSampleDialog</class>
+ <widget class="QDialog" name="EditIodeSampleDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -173,7 +173,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditVarsSample</receiver>
+   <receiver>EditIodeSampleDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -189,7 +189,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditVarsSample</receiver>
+   <receiver>EditIodeSampleDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -205,7 +205,7 @@
   <connection>
    <sender>saveButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEditVarsSample</receiver>
+   <receiver>EditIodeSampleDialog</receiver>
    <slot>edit()</slot>
    <hints>
     <hint type="sourcelabel">
