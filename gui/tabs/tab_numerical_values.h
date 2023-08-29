@@ -170,7 +170,7 @@ public:
         shortcutNbDecMinus->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
-        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::setNbDigits);
+        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updateNbDigits);
         QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::saveNbDigitsToSettings);
@@ -206,7 +206,7 @@ public:
         bottomLayout->addItem(horizontalSpacer);
     }
 
-    void setNbDigits(const int value)
+    void updateNbDigits(const int value)
     {
         this->objmodel->set_nb_digits(value);
         this->objmodel->reset();
