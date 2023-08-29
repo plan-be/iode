@@ -9,14 +9,14 @@
 #include "iode_objs/models/scalars_model.h"
 
 
-class QIodeEstimationCoefs : public QDialog, public Ui::QIodeEstimationCoefs
+class EstimationCoefsDialog : public QDialog, public Ui::EstimationCoefsDialog
 {
     Q_OBJECT
 
 	QShortcut* fullScreenShortcut;
 
 public:
-    QIodeEstimationCoefs(KDBScalars* kdb_coefs, QWidget* parent = Q_NULLPTR) :
+    EstimationCoefsDialog(KDBScalars* kdb_coefs, QWidget* parent = Q_NULLPTR) :
         QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
     {
         setupUi(this);
@@ -30,10 +30,10 @@ public:
         fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
         fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
         
-        connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEstimationCoefs::showMaximized);
+        connect(fullScreenShortcut, &QShortcut::activated, this, &EstimationCoefsDialog::showMaximized);
     }
 
-    ~QIodeEstimationCoefs()
+    ~EstimationCoefsDialog()
     {
         delete fullScreenShortcut;
     }
