@@ -22,7 +22,7 @@
 #include "iode_objs/edit/edit_vars_sample.h"
 
 
-class AbstractTableView : public QTableView
+class IodeAbstractTableView : public QTableView
 {
 	Q_OBJECT
 
@@ -70,8 +70,8 @@ protected:
 	virtual void dumpTableInDocument() = 0;
 
 public:
-	AbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
-	~AbstractTableView();
+	IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
+	~IodeAbstractTableView();
 
 	virtual void setup() {}
 
@@ -159,7 +159,7 @@ public slots:
  */
 
 
-template <class M> class TemplateTableView : public AbstractTableView
+template <class M> class IodeTemplateTableView : public IodeAbstractTableView
 {
 protected:
 	void filter_and_update() override
@@ -252,8 +252,8 @@ protected:
 	}
 
 public:
-	TemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) 
-		: AbstractTableView(iodeType, delegate, parent) 
+	IodeTemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) 
+		: IodeAbstractTableView(iodeType, delegate, parent) 
 	{
 		setItemDelegate(delegate);
 	}

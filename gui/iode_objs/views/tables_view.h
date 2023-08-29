@@ -17,7 +17,7 @@
 #endif
 
 
-class TablesView : public TemplateTableView<TablesModel>
+class TablesView : public IodeTemplateTableView<TablesModel>
 {
 	Q_OBJECT
 
@@ -27,7 +27,7 @@ class TablesView : public TemplateTableView<TablesModel>
 	QShortcut* shortcutPlot;
 
 public:
-	TablesView(QWidget* parent = nullptr) : TemplateTableView(I_TABLES, new TablesDelegate(parent), parent)
+	TablesView(QWidget* parent = nullptr) : IodeTemplateTableView(I_TABLES, new TablesDelegate(parent), parent)
 	{
 		shortcutEditEnter = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Enter), this);
 		connect(shortcutEditEnter, &QShortcut::activated, this, &TablesView::edit_obj);

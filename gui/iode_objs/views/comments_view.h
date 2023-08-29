@@ -8,12 +8,12 @@
 #include "iode_objs/new/add_comment.h"
 
 
-class CommentsView : public TemplateTableView<CommentsModel>
+class CommentsView : public IodeTemplateTableView<CommentsModel>
 {
 	Q_OBJECT
 
 public:
-	CommentsView(QWidget* parent = nullptr) : TemplateTableView(I_COMMENTS, new CommentsDelegate(parent), parent) {};
+	CommentsView(QWidget* parent = nullptr) : IodeTemplateTableView(I_COMMENTS, new CommentsDelegate(parent), parent) {};
 
 public slots:
 	void new_obj();

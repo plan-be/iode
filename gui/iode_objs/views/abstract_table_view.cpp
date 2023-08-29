@@ -1,7 +1,7 @@
 #include "abstract_table_view.h"
 
 
-AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent) 
+IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent) 
 	: QTableView(parent), iodeType(iodeType), delegate(delegate) 
 {
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
@@ -51,7 +51,7 @@ AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delega
     // NOTE: Required to avoid confusion when deleting a file/directory from the File Explorer
     deleteShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
 
-    connect(deleteShortcut, &QShortcut::activated, this, &AbstractTableView::removeObjects);
+    connect(deleteShortcut, &QShortcut::activated, this, &IodeAbstractTableView::removeObjects);
 
     // for editing IODE object names
     objectNameEdit = new QLineEdit(this);
@@ -67,9 +67,9 @@ AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delega
 	objectNameEdit->setValidator(validator);
     objectNameEdit->setHidden(true);
 
-    connect(this->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, &AbstractTableView::openEditorName);
-    connect(objectNameEdit, &QLineEdit::returnPressed, this, &AbstractTableView::editName);
-    connect(objectNameEdit, &QLineEdit::editingFinished, this, &AbstractTableView::closeNameEditor);
+    connect(this->verticalHeader(), &QHeaderView::sectionDoubleClicked, this, &IodeAbstractTableView::openEditorName);
+    connect(objectNameEdit, &QLineEdit::returnPressed, this, &IodeAbstractTableView::editName);
+    connect(objectNameEdit, &QLineEdit::editingFinished, this, &IodeAbstractTableView::closeNameEditor);
 
     // gets objects of the same name or listed in the clec structure
  	sameCmtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F1), this);
@@ -122,7 +122,7 @@ AbstractTableView::AbstractTableView(EnumIodeType iodeType, BaseDelegate* delega
     connect(relatedVarShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_VARIABLES); });
 }
 
-AbstractTableView::~AbstractTableView()
+IodeAbstractTableView::~IodeAbstractTableView()
 {
     delete objectNameEdit;
 
@@ -145,7 +145,7 @@ AbstractTableView::~AbstractTableView()
     delete relatedVarShortcut;
 }
 
-void AbstractTableView::keyPressEvent(QKeyEvent* event)
+void IodeAbstractTableView::keyPressEvent(QKeyEvent* event)
 {
     // hides the QLineEdit to edit the name of an IODE object if the user pressed ESCAPE
     if(objectNameEdit->isVisible() && event->key() == Qt::Key_Escape)
@@ -179,7 +179,7 @@ void AbstractTableView::keyPressEvent(QKeyEvent* event)
     QTableView::keyPressEvent(event);
 }
 
-void AbstractTableView::removeObjects()
+void IodeAbstractTableView::removeObjects()
 {
     QModelIndexList selection = selectionModel()->selectedRows();
     // Note: goes in reverse order because each deleted row shift all the next rows
@@ -188,7 +188,7 @@ void AbstractTableView::removeObjects()
 }
 
 // adapted from https://www.qtcentre.org/threads/42388-Make-QHeaderView-Editable?p=224375#post224375 
-void AbstractTableView::openEditorName(int section)
+void IodeAbstractTableView::openEditorName(int section)
 {
     // This block sets up the geometry for the line edit
     QHeaderView* vheader = verticalHeader();
@@ -207,7 +207,7 @@ void AbstractTableView::openEditorName(int section)
 }
 
 // adapted from https://www.qtcentre.org/threads/42388-Make-QHeaderView-Editable?p=224375#post224375
-void AbstractTableView::editName()
+void IodeAbstractTableView::editName()
 {
     QString oldName = model()->headerData(sectionEdited, Qt::Vertical).toString();
     QString newName = objectNameEdit->text();
@@ -220,10 +220,10 @@ void AbstractTableView::editName()
     this->setFocus();
 }
 
-void AbstractTableView::print()
+void IodeAbstractTableView::print()
 {
 	QPrintPreviewDialog dialog(&printer);
-    connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &AbstractTableView::renderForPrinting);
+    connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &IodeAbstractTableView::renderForPrinting);
 	dumpTableInDocument();
 	dialog.exec();
 }

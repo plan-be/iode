@@ -10,7 +10,7 @@
 #include "iode_objs/edit/edit_equation.h"
 
 
-class EquationsView : public TemplateTableView<EquationsModel>
+class EquationsView : public IodeTemplateTableView<EquationsModel>
 {
 	Q_OBJECT
 
@@ -20,7 +20,7 @@ class EquationsView : public TemplateTableView<EquationsModel>
 	QShortcut* editShortcutReturn;
 
 public:
-	EquationsView(QWidget* parent = nullptr) : TemplateTableView(I_EQUATIONS, new EquationsDelegate(parent), parent)
+	EquationsView(QWidget* parent = nullptr) : IodeTemplateTableView(I_EQUATIONS, new EquationsDelegate(parent), parent)
 	{
 		editEqDialog = nullptr;
 		

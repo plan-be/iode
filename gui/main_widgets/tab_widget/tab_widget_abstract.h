@@ -309,7 +309,7 @@ public slots:
             QGridLayout* gridLayout = new QGridLayout(dialog);
             gridLayout->setObjectName("gridLayout");
 
-            AbstractTableView* tableView;
+            IodeAbstractTableView* tableView;
             std::string pattern = objNames.join(";").toStdString();
             switch (iodeType)
             {
