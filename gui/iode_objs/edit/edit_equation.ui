@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EditEquation</class>
- <widget class="QDialog" name="EditEquation">
+ <class>EditEquationDialog</class>
+ <widget class="QDialog" name="EditEquationDialog">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -371,7 +371,7 @@
   <connection>
    <sender>pushButton_save</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>edit()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -387,7 +387,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -403,7 +403,7 @@
   <connection>
    <sender>pushButton_coefs</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>display_coefs()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -419,7 +419,7 @@
   <connection>
    <sender>pushButton_estimate</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>estimate()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -435,7 +435,7 @@
   <connection>
    <sender>pushButton_next</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>next()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -451,7 +451,7 @@
   <connection>
    <sender>pushButton_dynamic_adjustment</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>dynamic_adjustment()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -467,7 +467,7 @@
   <connection>
    <sender>pushButton_results</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>results()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -483,7 +483,7 @@
   <connection>
    <sender>pushButton_unit_root</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>unit_root()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -499,7 +499,7 @@
   <connection>
    <sender>pushButton_quit</sender>
    <signal>clicked()</signal>
-   <receiver>EditEquation</receiver>
+   <receiver>EditEquationDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

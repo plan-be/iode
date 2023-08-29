@@ -1,7 +1,7 @@
 #include "edit_equation.h"
 
 
-EditEquation::EditEquation(const QString& equationName, QWidget* parent) : 
+EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* parent) : 
 	IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
 	setupUi(this);
@@ -13,7 +13,7 @@ EditEquation::EditEquation(const QString& equationName, QWidget* parent) :
     fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
     fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
-    connect(fullScreenShortcut, &QShortcut::activated, this, &EditEquation::showMaximized);
+    connect(fullScreenShortcut, &QShortcut::activated, this, &EditEquationDialog::showMaximized);
 
 	estimation = nullptr;
 
@@ -52,7 +52,7 @@ EditEquation::EditEquation(const QString& equationName, QWidget* parent) :
 	}
 }
 
-EditEquation::~EditEquation() 
+EditEquationDialog::~EditEquationDialog() 
 {
 	delete lineName;
 	delete comboBoxMethod;
@@ -70,7 +70,7 @@ EditEquation::~EditEquation()
 	if(estimation) delete estimation;
 }
 
-void EditEquation::set_estimation()
+void EditEquationDialog::set_estimation()
 {
 	try
 	{
@@ -107,7 +107,7 @@ void EditEquation::set_estimation()
 	}
 }
 
-void EditEquation::display_equation(const NamedEquation& equation)
+void EditEquationDialog::display_equation(const NamedEquation& equation)
 {
 	lineName->setQValue(QString::fromStdString(equation.name));
 	Equation eq = equation.eq;
@@ -130,7 +130,7 @@ void EditEquation::display_equation(const NamedEquation& equation)
 	lineEdit_tests_loglk->setText(QString::number(tests[IE_LOGLIK], 'g', 3));
 }
 
-void EditEquation::edit()
+void EditEquationDialog::edit()
 {
 	try
 	{
@@ -185,7 +185,7 @@ void EditEquation::edit()
 	}
 }
 
-void EditEquation::display_coefs()
+void EditEquationDialog::display_coefs()
 {
 	if(estimation)
 	{
@@ -206,7 +206,7 @@ void EditEquation::display_coefs()
 	}
 }
 
-void EditEquation::estimate()
+void EditEquationDialog::estimate()
 {
 	set_estimation();
 	if(estimation)
@@ -222,7 +222,7 @@ void EditEquation::estimate()
 	}
 }
 
-void EditEquation::next()
+void EditEquationDialog::next()
 {
 	if(estimation)
 	{
@@ -238,7 +238,7 @@ void EditEquation::next()
 	}
 }
 
-void EditEquation::dynamic_adjustment()
+void EditEquationDialog::dynamic_adjustment()
 {
 	QString lec = lineLec->extractAndVerify();
 	QIodeDynAdjustment dialog(lec, this);
@@ -246,7 +246,7 @@ void EditEquation::dynamic_adjustment()
 	lineLec->setQValue(lec);
 }
 
-void EditEquation::results()
+void EditEquationDialog::results()
 {
 	if(estimation)
 	{
@@ -266,13 +266,13 @@ void EditEquation::results()
 	}
 }
 
-void EditEquation::unit_root()
+void EditEquationDialog::unit_root()
 {
 	QIodeUnitRoot dialog(this);
 	dialog.exec();
 }
 
-void EditEquation::help()
+void EditEquationDialog::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }
