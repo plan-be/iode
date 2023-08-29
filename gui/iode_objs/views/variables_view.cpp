@@ -84,7 +84,7 @@ void VariablesView::plot_series()
 		QString from = sample.first();
 		QString to = sample.last();
 
-		QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog();
+		PlotVariablesDialog* plotDialog = new PlotVariablesDialog();
 
 		KDBVariables kdb_var;
 		plotDialog->setPeriods(kdb_var.get_sample(), from, to);

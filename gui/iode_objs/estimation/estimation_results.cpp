@@ -83,7 +83,7 @@ void EstimationResultsDialog::plot_yobs_yest()
     KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
     kdb_vars->set_sample(sample->start_period(), sample->end_period());
 
-    QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(kdb_vars);
+    PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
     // set title
     QString title = QString("Equation %1 : observed and fitted values").arg(QString::fromStdString(nEq.name));
@@ -119,7 +119,7 @@ void EstimationResultsDialog::plot_residual()
     KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
     kdb_vars->set_sample(sample->start_period(), sample->end_period());
 
-    QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(kdb_vars);
+    PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
     // set title
     QString title = QString("Equation %1 : residuals").arg(QString::fromStdString(nEq.name));

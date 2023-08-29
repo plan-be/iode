@@ -76,7 +76,7 @@ void MenuGraphVariables::display()
         EnumIodeGraphAxisThicks xTicks = (EnumIodeGraphAxisThicks) wXTicks->extractAndVerify();
         EnumIodeGraphAxisThicks yTicks = (EnumIodeGraphAxisThicks) wYTicks->extractAndVerify();
 
-        QIodePlotVariablesDialog* plotDialog = new QIodePlotVariablesDialog(nullptr, chartType, varMode, logScale, xTicks, yTicks);
+        PlotVariablesDialog* plotDialog = new PlotVariablesDialog(nullptr, chartType, varMode, logScale, xTicks, yTicks);
 
         // periods for the plot
         QString from = wFrom->extractAndVerify();

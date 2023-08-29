@@ -7,7 +7,7 @@ void MainWindowAbstract::appendDialog(QDialog* dialog)
     dialogs.append(dialog);
 }
 
-void MainWindowAbstract::appendPlot(QIodePlotDialog* dialog)
+void MainWindowAbstract::appendPlot(PlotDialog* dialog)
 {
     dialog->plot();
     appendDialog(dialog);

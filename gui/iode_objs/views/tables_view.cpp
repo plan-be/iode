@@ -85,7 +85,7 @@ void TablesView::plot()
 		// computes the tables and generates the associated graph
 		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 		GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample.toStdString());
-		QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
+		PlotTableDialog* plotDialog = new PlotTableDialog(gSampleTable);
 		main_window->appendPlot(plotDialog);
 	}
     catch (const std::exception& e)

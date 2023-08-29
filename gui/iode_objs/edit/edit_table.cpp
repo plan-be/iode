@@ -73,7 +73,7 @@ void EditTableDialog::plot()
  
         GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample.toStdString());
 
-        QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
+        PlotTableDialog* plotDialog = new PlotTableDialog(gSampleTable);
         plotDialog->plot();
         emit newPlot(plotDialog);
 	}
