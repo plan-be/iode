@@ -359,7 +359,7 @@ public slots:
                     + "Database of objects of type " + type_ + " not found");
             }
             AbstractTabWidget* tab = static_cast<AbstractTabWidget*>(this->widget(index));
-            QIodeAbstractTableModel* model_ = static_cast<QIodeAbstractTableModel*>(tableView->model());
+            IodeAbstractTableModel* model_ = static_cast<IodeAbstractTableModel*>(tableView->model());
             connect(model_, &CommentsModel::dataChanged, tab, [tab]{ tab->setModified(true); });
             connect(model_, &CommentsModel::headerDataChanged, tab, [tab]{ tab->setModified(true); });
 

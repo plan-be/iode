@@ -41,5 +41,5 @@ void VariablesModel::reset()
 		columnNames.append(period);
 	}
 
-	QIodeAbstractTableModel::reset();
+	IodeAbstractTableModel::reset();
 }

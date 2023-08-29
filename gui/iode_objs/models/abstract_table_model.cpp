@@ -3,7 +3,7 @@
 
 
 template <class K>
-Qt::ItemFlags QIodeTemplateTableModel<K>::flags(const QModelIndex& index) const
+Qt::ItemFlags IodeTemplateTableModel<K>::flags(const QModelIndex& index) const
 {
 	if (!index.isValid())
 		return Qt::ItemIsEnabled;
@@ -13,7 +13,7 @@ Qt::ItemFlags QIodeTemplateTableModel<K>::flags(const QModelIndex& index) const
 
 // Vertical header = IODE object names
 template <class K>
-QVariant QIodeTemplateTableModel<K>::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant IodeTemplateTableModel<K>::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role != Qt::DisplayRole)
 		return QVariant();
@@ -36,7 +36,7 @@ QVariant QIodeTemplateTableModel<K>::headerData(int section, Qt::Orientation ori
 }
 
 template <class K>
-bool QIodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+bool IodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
 	if(orientation == Qt::Horizontal)
 		return false;
@@ -63,7 +63,7 @@ bool QIodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orie
 }
 
 template <class K>
-QVariant QIodeTemplateTableModel<K>::data(const QModelIndex& index, int role) const
+QVariant IodeTemplateTableModel<K>::data(const QModelIndex& index, int role) const
 {
 	if (!index.isValid())
 		return QVariant();
@@ -78,7 +78,7 @@ QVariant QIodeTemplateTableModel<K>::data(const QModelIndex& index, int role) co
 }
 
 template <class K>
-bool QIodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant& value, int role)
+bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
@@ -99,7 +99,7 @@ bool QIodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVarian
 }
 
 template <class K>
-void QIodeTemplateTableModel<K>::filter(const QString& pattern)
+void IodeTemplateTableModel<K>::filter(const QString& pattern)
 {
 	try
 	{
@@ -120,7 +120,7 @@ void QIodeTemplateTableModel<K>::filter(const QString& pattern)
 
 
 template <class K>
-bool QIodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
+bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
 	int type_ = kdb->get_iode_type();
 	if (type_ < 0) return false;
@@ -151,7 +151,7 @@ bool QIodeTemplateTableModel<K>::load(const QString& filepath, const bool forceO
 }
 
 template <class K>
-QString QIodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& filepath)
+QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& filepath)
 {
 		if (kdb->count() == 0) return ""; 
 
@@ -192,7 +192,7 @@ QString QIodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& 
 }
 
 template <class K>
-QString QIodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
+QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 {
 	if (kdb->count() == 0) return ""; 
 	
@@ -206,7 +206,7 @@ QString QIodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 }
 
 template <class K>
-bool QIodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
+bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
 	std::string name;
 	beginRemoveRows(QModelIndex(), position, position + rows - 1);
@@ -229,7 +229,7 @@ bool QIodeTemplateTableModel<K>::removeRows(int position, int rows, const QModel
 }
 
 template <class K>
-QStringList QIodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type)
+QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type)
 {
 	QStringList list;
 
@@ -318,7 +318,7 @@ QStringList QIodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& 
 }
 
 template <class K>
-QStringList QIodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const EnumIodeType other_type)
+QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const EnumIodeType other_type)
 {
 	QStringList list;
 	

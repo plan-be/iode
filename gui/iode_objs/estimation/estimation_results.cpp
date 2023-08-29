@@ -39,7 +39,7 @@ void EstimationResultsDialog::set_coefficients_tab()
 
     KDBScalars* kdb_coefs = est->get_coefficients();
     // Warning: need to create a copy of kdb_coefs because passed kdb is deleted in 
-    //          the QIodeTemplateTableModel destructor
+    //          the IodeTemplateTableModel destructor
     ScalarsModel* scalarsModel = new ScalarsModel(this, new KDBScalars(*kdb_coefs));
     tableView_coefs->setModel(scalarsModel);
 }

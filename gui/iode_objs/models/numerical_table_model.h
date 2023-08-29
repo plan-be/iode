@@ -8,7 +8,7 @@
  *    is a subclass of QObject. Also, be sure that only the first inherited class is a QObject.
  *    https://doc.qt.io/qt-6/moc.html#multiple-inheritance-requires-qobject-to-be-first
  *    --> That's why we to play with preprocessor directives to inherit from either 
- *        QAbstractTableModel or QIodeTemplateTableModel.
+ *        QAbstractTableModel or IodeTemplateTableModel.
  * 
  * 3. Do NOT forget to add safeguards when including the present hearder!
  */
@@ -38,7 +38,7 @@ class _NUMERICAL_MODEL_CLASS_NAME_ : public QAbstractTableModel
  * 
  * @tparam K 
  */
-template <class K> class _NUMERICAL_MODEL_CLASS_NAME_ : public QIodeTemplateTableModel<K>
+template <class K> class _NUMERICAL_MODEL_CLASS_NAME_ : public IodeTemplateTableModel<K>
 #endif
 {
     int nb_digits;
@@ -51,7 +51,7 @@ public:
 #else
     _NUMERICAL_MODEL_CLASS_NAME_(QVector<QString> columnNames, QObject* parent = nullptr, 
         const int nb_digits = 2, K* kdb_external = nullptr): 
-        QIodeTemplateTableModel<K>(columnNames, parent, kdb_external), nb_digits(nb_digits) 
+        IodeTemplateTableModel<K>(columnNames, parent, kdb_external), nb_digits(nb_digits) 
     {}
 #endif
 
