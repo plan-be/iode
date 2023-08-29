@@ -18,7 +18,7 @@
 const static QString prefixUnsavedDatabase = "Unsaved";
 
 
-class AbstractIodeObjectWidget: public AbstractTabWidget
+class AbstractIodeObjectWidget: public IodeAbstractWidget
 {
     Q_OBJECT
 
@@ -38,7 +38,7 @@ signals:
 
 public:
     AbstractIodeObjectWidget(const EnumIodeType iodeType, IodeAbstractTabWidget* parent) : 
-        AbstractTabWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
+        IodeAbstractWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
@@ -115,7 +115,7 @@ public:
             return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + "." + ext + "*";
         }
         else
-            return AbstractTabWidget::getTabText();
+            return IodeAbstractWidget::getTabText();
     }
 
     QString getTooltip() const
@@ -123,7 +123,7 @@ public:
         if(isUnsavedDatabase())
             return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database";
         else
-            return AbstractTabWidget::getTooltip();
+            return IodeAbstractWidget::getTooltip();
     }
 
     bool updateFilepath(const QString& filepath) override

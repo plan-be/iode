@@ -2,7 +2,7 @@
 
 
 AbstractTextWidget::AbstractTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
-    : AbstractTabWidget(fileType, parent), filepath(filepath), editor_(nullptr), editor_2_(nullptr)
+    : IodeAbstractWidget(fileType, parent), filepath(filepath), editor_(nullptr), editor_2_(nullptr)
 {
 }
 

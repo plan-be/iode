@@ -12,7 +12,7 @@
 #include "text_edit/text_editor.h"
 
 
-class AbstractTextWidget: public AbstractTabWidget
+class AbstractTextWidget: public IodeAbstractWidget
 {
     Q_OBJECT
 

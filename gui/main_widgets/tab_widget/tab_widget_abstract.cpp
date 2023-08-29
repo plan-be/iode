@@ -205,7 +205,7 @@ int IodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInf
 void IodeAbstractTabWidget::removeTab(const int index)
 {
     // ask to save if modified
-    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+    IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
     if(tabWidget->isModified())
     {
         QString filepath = tabWidget->getFilepath();
@@ -235,7 +235,7 @@ void IodeAbstractTabWidget::showTab(int index)
     EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
 
     // update widget if needed
-    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+    IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
     if(tabWidget) tabWidget->update();
 
     this->setCurrentIndex(index);
@@ -250,7 +250,7 @@ void IodeAbstractTabWidget::reloadFile(const QString& filepath)
 
 	// reload file
 	QString filename = QFileInfo(filepath).fileName();    
-	AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+	IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
 	tabWidget->load(filepath, true);
 }
 
@@ -258,7 +258,7 @@ bool IodeAbstractTabWidget::saveTabContent(const int index)
 {
     try
     {
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
         QString filepath = tabWidget->save();
         if (filepath.isEmpty()) 
             return false;
@@ -303,7 +303,7 @@ void IodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString 
     int index = filesList.indexOf(oldFilepath);
     if (index >= 0)
     {
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
         // update filepath in widget
         if(!tabWidget->updateFilepath(newFilepath))
             return;
