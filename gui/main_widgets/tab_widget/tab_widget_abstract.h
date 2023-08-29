@@ -202,7 +202,7 @@ protected:
      */
     void splitTab(const int index, Qt::Orientation orientation)
     {
-        QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+        AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
         tabWidget->split(orientation);
     }
 
@@ -214,7 +214,7 @@ protected:
      */
     void unsplitTab(const int index)
     {
-        QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+        AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
         tabWidget->unsplit();
     }
 

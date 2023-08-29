@@ -4,12 +4,12 @@
 #include "ui_tab_text.h"
 
 
-class QIodeTextWidget : public QIodeAbstractEditor, public Ui::QIodeTextWidget
+class TextWidget : public AbstractTextWidget, public Ui::TextWidget
 {
     Q_OBJECT
 
 public:
-    QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
+    TextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
 
     bool load_(const QString& filepath, const bool forceOverwrite)
     {
@@ -33,7 +33,7 @@ public slots:
         try
         {
             QPrintPreviewDialog dialog(&printer);
-            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodeTextWidget::renderForPrinting);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &TextWidget::renderForPrinting);
             dialog.exec(); 
         }
         catch(const std::exception& e)

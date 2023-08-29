@@ -148,26 +148,26 @@ void IodeAbstractTabWidget::resetFileSystemWatcher(const QDir& projectDir)
 
 int IodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
 {
-    QIodeReportWidget* reportWidget = new QIodeReportWidget(fileInfo.absoluteFilePath(), this);
+    ReportWidget* reportWidget = new ReportWidget(fileInfo.absoluteFilePath(), this);
     int index = addTab(reportWidget, reportWidget->getTabText());
     setTabToolTip(index, reportWidget->getTooltip());
 
-    connect(reportWidget, &QIodeReportWidget::tabTextModified, this, &IodeAbstractTabWidget::tabTextModified);
-    connect(reportWidget, &QIodeReportWidget::askComputeHash, this, &IodeAbstractTabWidget::computeHash);
+    connect(reportWidget, &ReportWidget::tabTextModified, this, &IodeAbstractTabWidget::tabTextModified);
+    connect(reportWidget, &ReportWidget::askComputeHash, this, &IodeAbstractTabWidget::computeHash);
     
     return index;
 }
 
 int IodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced)
 {
-    QIodeTextWidget* textWidget = new QIodeTextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
+    TextWidget* textWidget = new TextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
     int index = addTab(textWidget, textWidget->getTabText());
     setTabToolTip(index, textWidget->getTooltip());
 
     if(forced)
         textWidget->setForcedAsText(true);
     
-    connect(textWidget, &QIodeTextWidget::tabTextModified, this, &IodeAbstractTabWidget::tabTextModified);
+    connect(textWidget, &TextWidget::tabTextModified, this, &IodeAbstractTabWidget::tabTextModified);
     
     return index;
 }
@@ -322,7 +322,7 @@ void IodeAbstractTabWidget::fileMoved(const QString &oldFilepath, const QString 
 void IodeAbstractTabWidget::closeTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
-    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
     EnumIodeFile fileType = tabWidget->getFiletype();
 
     // Tabs representing an IODE database file cannot be closed.
@@ -346,7 +346,7 @@ void IodeAbstractTabWidget::saveTab()
 void IodeAbstractTabWidget::absolutePath()
 {
     int index = currentIndex();
-    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
     QString filepath = tabWidget->getFilepath();
 
     QClipboard* clipboard = QApplication::clipboard();
@@ -358,7 +358,7 @@ void IodeAbstractTabWidget::absolutePath()
 void IodeAbstractTabWidget::relativePath()
 {
     int index = currentIndex();
-    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
     QString filepath = tabWidget->getFilepath();
     QDir projectDir(projectDirPath); 
     QString relativePath = projectDir.relativeFilePath(filepath);
@@ -372,7 +372,7 @@ void IodeAbstractTabWidget::relativePath()
 void IodeAbstractTabWidget::revealInFolder()
 {
     int index = currentIndex();
-    QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+    AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
     QString filepath = tabWidget->getFilepath();
     QFileInfo info(filepath);
 

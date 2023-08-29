@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeReportWidget</class>
- <widget class="QWidget" name="QIodeReportWidget">
+ <class>ReportWidget</class>
+ <widget class="QWidget" name="ReportWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -163,7 +163,7 @@
   <connection>
    <sender>pushButton_print</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeReportWidget</receiver>
+   <receiver>ReportWidget</receiver>
    <slot>print()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -179,7 +179,7 @@
   <connection>
    <sender>pushButton_run</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeReportWidget</receiver>
+   <receiver>ReportWidget</receiver>
    <slot>run()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -195,7 +195,7 @@
   <connection>
    <sender>lineEdit_parameters</sender>
    <signal>returnPressed()</signal>
-   <receiver>QIodeReportWidget</receiver>
+   <receiver>ReportWidget</receiver>
    <slot>run()</slot>
    <hints>
     <hint type="sourcelabel">

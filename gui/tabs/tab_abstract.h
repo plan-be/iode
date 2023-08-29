@@ -30,7 +30,7 @@ protected:
 
     bool modified;
     bool forcedAsText_;         ///< Whether or not the corresponding file has been forced to open as a text tab
-    bool savingFile;            ///< See save() and load() implementation of QIodeAbstractEditor 
+    bool savingFile;            ///< See save() and load() implementation of AbstractTextWidget 
     bool splitted_;
 
     QSplitter* splitter_;

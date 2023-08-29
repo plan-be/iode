@@ -1,12 +1,12 @@
 #include "tab_text_abstract.h"
 
 
-QIodeAbstractEditor::QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
+AbstractTextWidget::AbstractTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
     : AbstractTabWidget(fileType, parent), filepath(filepath), editor_(nullptr), editor_2_(nullptr)
 {
 }
 
-bool QIodeAbstractEditor::load__(IodeTextEditor* editor, const QString& filepath, const bool forceOverwrite)
+bool AbstractTextWidget::load__(IodeTextEditor* editor, const QString& filepath, const bool forceOverwrite)
 {
     // The fileChanged signal from the QFileSystemWatcher member of the IodeAbstractTabWidget class 
     // is sent when the content of a tab is saved to file. The reloadFile() method of the same class 
@@ -46,7 +46,7 @@ bool QIodeAbstractEditor::load__(IodeTextEditor* editor, const QString& filepath
     }
 }
 
-QString QIodeAbstractEditor::save_(IodeTextEditor* editor, const QString& filepath)
+QString AbstractTextWidget::save_(IodeTextEditor* editor, const QString& filepath)
 {
     if (filepath.isEmpty()) 
         return filepath;
@@ -83,12 +83,12 @@ QString QIodeAbstractEditor::save_(IodeTextEditor* editor, const QString& filepa
     }
 }
 
-QString QIodeAbstractEditor::save()
+QString AbstractTextWidget::save()
 {
     return save(filepath);
 }
 
-QString QIodeAbstractEditor::saveAs_()
+QString AbstractTextWidget::saveAs_()
 {
     QString newFilepath = QFileDialog::getSaveFileName(this, "Save As", nullptr, filter);
     if(newFilepath.isEmpty()) 
@@ -97,7 +97,7 @@ QString QIodeAbstractEditor::saveAs_()
     return save(newFilepath);
 }
 
-void QIodeAbstractEditor::split(const Qt::Orientation orientation)
+void AbstractTextWidget::split(const Qt::Orientation orientation)
 {
     if(splitted_)
         return;
@@ -109,7 +109,7 @@ void QIodeAbstractEditor::split(const Qt::Orientation orientation)
     splitted_ = true;
 }
 
-void QIodeAbstractEditor::unsplit()
+void AbstractTextWidget::unsplit()
 {
     if(!splitted_)
         return;

@@ -1,8 +1,8 @@
 #include "tab_report.h"
 
 
-QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent): 
-    QIodeAbstractEditor(I_REPORTS_FILE, filepath, parent)
+ReportWidget::ReportWidget(const QString& filepath, QWidget* parent): 
+    AbstractTextWidget(I_REPORTS_FILE, filepath, parent)
 {
     setupUi(this);
     splitter_ = splitter;
@@ -32,9 +32,9 @@ QIodeReportWidget::QIodeReportWidget(const QString& filepath, QWidget* parent):
     */
 
     // ---- Signals and Slots ----
-    connect(editor, &IodeTextEditor::modificationChanged, this, &QIodeReportWidget::setModified);
+    connect(editor, &IodeTextEditor::modificationChanged, this, &ReportWidget::setModified);
 
-    // connect(autocomplete, &QCheckBox::stateChanged, this, &QIodeReportWidget::toggleAutocomplete);
+    // connect(autocomplete, &QCheckBox::stateChanged, this, &ReportWidget::toggleAutocomplete);
 
     if(!filepath.isEmpty()) 
         load(filepath, true);

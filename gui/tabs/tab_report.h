@@ -19,12 +19,12 @@
  *          -> CTRL + R runs the report.
  * 
  */
-class QIodeReportWidget : public QIodeAbstractEditor, public Ui::QIodeReportWidget
+class ReportWidget : public AbstractTextWidget, public Ui::ReportWidget
 {
     Q_OBJECT
 
 public:
-    QIodeReportWidget(const QString& filepath, QWidget* parent = nullptr);
+    ReportWidget(const QString& filepath, QWidget* parent = nullptr);
 
     QString getParameters() const
     {
@@ -97,7 +97,7 @@ public slots:
         try
         {
             QPrintPreviewDialog dialog(&printer);
-            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodeReportWidget::renderForPrinting);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &ReportWidget::renderForPrinting);
             dialog.exec(); 
         }
         catch(const std::exception& e)
