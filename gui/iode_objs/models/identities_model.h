@@ -6,13 +6,13 @@
 #include "abstract_table_model.cpp"
 
 
-class IdentitiesModel : public QIodeTemplateTableModel<KDBIdentities>
+class IdentitiesModel : public IodeTemplateTableModel<KDBIdentities>
 {
 	Q_OBJECT
 
 public:
 	IdentitiesModel(QObject* parent = nullptr, KDBIdentities* kdb_external = nullptr) 
-		: QIodeTemplateTableModel({"Identity"}, parent, kdb_external) {};
+		: IodeTemplateTableModel({"Identity"}, parent, kdb_external) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 

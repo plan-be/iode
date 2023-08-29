@@ -28,7 +28,7 @@
  */
 
 
-class QIodeAbstractTableModel : public QAbstractTableModel
+class IodeAbstractTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
@@ -41,7 +41,7 @@ signals:
 	void databaseModified();
 
 public:
-	QIodeAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
+	IodeAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
 		QAbstractTableModel(parent), columnNames(columnNames) {}
 
 
@@ -67,7 +67,7 @@ public slots:
 };
 
 
-template <class K> class QIodeTemplateTableModel : public QIodeAbstractTableModel
+template <class K> class IodeTemplateTableModel : public IodeAbstractTableModel
 {
 protected:
 	K* kdb;
@@ -76,8 +76,8 @@ protected:
 	K* kdb_external;
 
 public:
-	QIodeTemplateTableModel(QVector<QString> columnNames, QObject* parent = nullptr, K* kdb_external = nullptr) : 
-		QIodeAbstractTableModel(columnNames, parent)
+	IodeTemplateTableModel(QVector<QString> columnNames, QObject* parent = nullptr, K* kdb_external = nullptr) : 
+		IodeAbstractTableModel(columnNames, parent)
 	{
 		kdb_filter = nullptr;
 		if(kdb_external)
@@ -94,7 +94,7 @@ public:
 		}
 	}
 
-	~QIodeTemplateTableModel() { delete kdb; }
+	~IodeTemplateTableModel() { delete kdb; }
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override
 	{
