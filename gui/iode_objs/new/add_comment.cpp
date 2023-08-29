@@ -1,7 +1,7 @@
 #include "add_comment.h"
 
 
-QIodeAddComment::QIodeAddComment(QWidget* parent) : QDialog(parent)
+AddCommentDialog::AddCommentDialog(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 
@@ -12,7 +12,7 @@ QIodeAddComment::QIodeAddComment(QWidget* parent) : QDialog(parent)
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 
-void QIodeAddComment::add()
+void AddCommentDialog::add()
 {
 	try
 	{
@@ -28,7 +28,7 @@ void QIodeAddComment::add()
 	}
 }
 
-void QIodeAddComment::help()
+void AddCommentDialog::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

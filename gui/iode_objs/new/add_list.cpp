@@ -1,7 +1,7 @@
 #include "add_list.h"
 
 
-QIodeAddList::QIodeAddList(QWidget* parent) : QDialog(parent)
+AddListDialog::AddListDialog(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 
@@ -12,7 +12,7 @@ QIodeAddList::QIodeAddList(QWidget* parent) : QDialog(parent)
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 
-void QIodeAddList::add()
+void AddListDialog::add()
 {
 	try
 	{
@@ -28,7 +28,7 @@ void QIodeAddList::add()
 	}
 }
 
-void QIodeAddList::help()
+void AddListDialog::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

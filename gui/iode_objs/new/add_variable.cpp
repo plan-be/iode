@@ -1,7 +1,7 @@
 #include "add_variable.h"
 
 
-QIodeAddVariable::QIodeAddVariable(QWidget* parent) : QDialog(parent)
+AddVariableDialog::AddVariableDialog(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 
@@ -12,7 +12,7 @@ QIodeAddVariable::QIodeAddVariable(QWidget* parent) : QDialog(parent)
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 
-void QIodeAddVariable::add()
+void AddVariableDialog::add()
 {
 	try
 	{
@@ -28,7 +28,7 @@ void QIodeAddVariable::add()
 	}
 }
 
-void QIodeAddVariable::help()
+void AddVariableDialog::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

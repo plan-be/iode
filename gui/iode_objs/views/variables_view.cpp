@@ -69,7 +69,7 @@ void VariablesView::new_obj()
 	if(!checkGlobalSample())
 		return;
 
-	QIodeAddVariable dialog(this);
+	AddVariableDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
 	filter_and_update();

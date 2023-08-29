@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeAddScalar</class>
- <widget class="QDialog" name="QIodeAddScalar">
+ <class>AddScalarDialog</class>
+ <widget class="QDialog" name="AddScalarDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -275,7 +275,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddScalar</receiver>
+   <receiver>AddScalarDialog</receiver>
    <slot>add()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -291,7 +291,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddScalar</receiver>
+   <receiver>AddScalarDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -307,7 +307,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeAddScalar</receiver>
+   <receiver>AddScalarDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

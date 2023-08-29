@@ -1,7 +1,7 @@
 #include "add_scalar.h"
 
 
-QIodeAddScalar::QIodeAddScalar(QWidget* parent) : IodeSettingsDialog(parent)
+AddScalarDialog::AddScalarDialog(QWidget* parent) : IodeSettingsDialog(parent)
 {
 	setupUi(this);
 
@@ -17,14 +17,14 @@ QIodeAddScalar::QIodeAddScalar(QWidget* parent) : IodeSettingsDialog(parent)
 	loadSettings();
 }
 
-QIodeAddScalar::~QIodeAddScalar()
+AddScalarDialog::~AddScalarDialog()
 {
 	delete lineName;
 	delete lineValue;
 	delete spinBoxRelax;
 }
 
-void QIodeAddScalar::add()
+void AddScalarDialog::add()
 {
 	try
 	{
@@ -41,7 +41,7 @@ void QIodeAddScalar::add()
 	}
 }
 
-void QIodeAddScalar::help()
+void AddScalarDialog::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);
