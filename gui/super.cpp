@@ -135,7 +135,7 @@ int gui_DataScan_super()
 int gui_StatUnitRoot_super()
 {
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	QIodeUnitRoot dialog(main_window);
+	UnitRootDialog dialog(main_window);
 	return dialog.exec();
 }
 
