@@ -241,7 +241,7 @@ void EditEquationDialog::next()
 void EditEquationDialog::dynamic_adjustment()
 {
 	QString lec = lineLec->extractAndVerify();
-	QIodeDynAdjustment dialog(lec, this);
+	DynAdjustmentDialog dialog(lec, this);
 	dialog.exec();
 	lineLec->setQValue(lec);
 }

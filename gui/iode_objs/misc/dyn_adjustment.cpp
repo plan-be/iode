@@ -1,7 +1,7 @@
 #include "dyn_adjustment.h"
 
 
-QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, QWidget* parent) : 
+DynAdjustmentDialog::DynAdjustmentDialog(QString& lec, QWidget* parent) : 
     IodeSettingsDialog(parent), lec(lec)
 {
 	setupUi(this);
@@ -22,14 +22,14 @@ QIodeDynAdjustment::QIodeDynAdjustment(QString& lec, QWidget* parent) :
     loadSettings();
 }
 
-QIodeDynAdjustment::~QIodeDynAdjustment()
+DynAdjustmentDialog::~DynAdjustmentDialog()
 {
     delete comboMethod;
     delete lineCoef1;
     delete lineCoef2;
 }
 
-void QIodeDynAdjustment::adjust()
+void DynAdjustmentDialog::adjust()
 {
     try
     {
@@ -49,7 +49,7 @@ void QIodeDynAdjustment::adjust()
     }
 }
 
-void QIodeDynAdjustment::help()
+void DynAdjustmentDialog::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

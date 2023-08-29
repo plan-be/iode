@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeDynAdjustment</class>
- <widget class="QDialog" name="QIodeDynAdjustment">
+ <class>DynAdjustmentDialog</class>
+ <widget class="QDialog" name="DynAdjustmentDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -130,7 +130,7 @@
   <connection>
    <sender>pushButton_adjust</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeDynAdjustment</receiver>
+   <receiver>DynAdjustmentDialog</receiver>
    <slot>adjust()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -146,7 +146,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeDynAdjustment</receiver>
+   <receiver>DynAdjustmentDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -162,7 +162,7 @@
   <connection>
    <sender>pushButton_quit</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeDynAdjustment</receiver>
+   <receiver>DynAdjustmentDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

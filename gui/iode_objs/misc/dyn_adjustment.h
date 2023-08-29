@@ -19,7 +19,7 @@
  */
 
 
-class QIodeDynAdjustment : public IodeSettingsDialog, public Ui::QIodeDynAdjustment
+class DynAdjustmentDialog : public IodeSettingsDialog, public Ui::DynAdjustmentDialog
 {
     Q_OBJECT
 
@@ -30,8 +30,8 @@ class QIodeDynAdjustment : public IodeSettingsDialog, public Ui::QIodeDynAdjustm
     WrapperQLineEdit* lineCoef2;
 
 public:
-    QIodeDynAdjustment(QString& lec, QWidget* parent = Q_NULLPTR);
-    ~QIodeDynAdjustment();
+    DynAdjustmentDialog(QString& lec, QWidget* parent = Q_NULLPTR);
+    ~DynAdjustmentDialog();
 
 public slots:
     void adjust();

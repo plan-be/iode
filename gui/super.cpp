@@ -213,7 +213,7 @@ int gui_WsSeasonAdj_super()
 {
 	QString lec = "";
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	QIodeDynAdjustment dialog(lec, main_window);
+	DynAdjustmentDialog dialog(lec, main_window);
 	return dialog.exec();
 }
 
