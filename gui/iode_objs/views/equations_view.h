@@ -14,7 +14,7 @@ class EquationsView : public TemplateTableView<EquationsModel>
 {
 	Q_OBJECT
 
-	EditEquation* editEqDialog;
+	EditEquationDialog* editEqDialog;
 
 	QShortcut* editShortcutEnter;
 	QShortcut* editShortcutReturn;
