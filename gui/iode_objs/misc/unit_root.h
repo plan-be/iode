@@ -19,7 +19,7 @@
  */
 
 
-class QIodeUnitRoot : public IodeSettingsDialog, public Ui::QIodeUnitRoot
+class UnitRootDialog : public IodeSettingsDialog, public Ui::UnitRootDialog
 {
     Q_OBJECT
 
@@ -32,8 +32,8 @@ private:
     QString get_tstat(Scalar& scalar);
 
 public:
-    QIodeUnitRoot(QWidget* parent = Q_NULLPTR);
-    ~QIodeUnitRoot();
+    UnitRootDialog(QWidget* parent = Q_NULLPTR);
+    ~UnitRootDialog();
 
 public slots:
     void analyse();

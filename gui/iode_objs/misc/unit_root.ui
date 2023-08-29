@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeUnitRoot</class>
- <widget class="QDialog" name="QIodeUnitRoot">
+ <class>UnitRootDialog</class>
+ <widget class="QDialog" name="UnitRootDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -135,7 +135,7 @@
   <connection>
    <sender>pushButton_analyse</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeUnitRoot</receiver>
+   <receiver>UnitRootDialog</receiver>
    <slot>analyse()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -151,7 +151,7 @@
   <connection>
    <sender>pushButton_quit</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeUnitRoot</receiver>
+   <receiver>UnitRootDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -167,7 +167,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeUnitRoot</receiver>
+   <receiver>UnitRootDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">

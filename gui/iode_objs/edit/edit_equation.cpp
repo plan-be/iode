@@ -268,7 +268,7 @@ void EditEquationDialog::results()
 
 void EditEquationDialog::unit_root()
 {
-	QIodeUnitRoot dialog(this);
+	UnitRootDialog dialog(this);
 	dialog.exec();
 }
 

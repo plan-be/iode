@@ -1,7 +1,7 @@
 #include "unit_root.h"
 
 
-QIodeUnitRoot::QIodeUnitRoot(QWidget* parent) : IodeSettingsDialog(parent), precision(6)
+UnitRootDialog::UnitRootDialog(QWidget* parent) : IodeSettingsDialog(parent), precision(6)
 {
 	setupUi(this);
 
@@ -15,13 +15,13 @@ QIodeUnitRoot::QIodeUnitRoot(QWidget* parent) : IodeSettingsDialog(parent), prec
     loadSettings();
 }
 
-QIodeUnitRoot::~QIodeUnitRoot()
+UnitRootDialog::~UnitRootDialog()
 {
     delete lineSeries;
     delete spinBoxOrder;
 }
 
-QString QIodeUnitRoot::get_tstat(Scalar& scalar)
+QString UnitRootDialog::get_tstat(Scalar& scalar)
 {
     if (L_ISAN(scalar.value()) && L_ISAN(scalar.std()) && !L_IS0(scalar.std()))
         return QString::number(scalar.value() / scalar.std(), 'g', precision);
@@ -30,7 +30,7 @@ QString QIodeUnitRoot::get_tstat(Scalar& scalar)
 }
 
 // QUESTION FOR JMP : what means ADF in results of Unit Root ?
-void QIodeUnitRoot::analyse()
+void UnitRootDialog::analyse()
 {
     KDBScalars* kdb_scl;
     QString res;
@@ -135,7 +135,7 @@ void QIodeUnitRoot::analyse()
     }
 }
 
-void QIodeUnitRoot::help()
+void UnitRootDialog::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }
