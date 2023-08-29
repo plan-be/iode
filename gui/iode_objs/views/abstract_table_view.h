@@ -102,7 +102,7 @@ public:
 			QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
 			if (reply == QMessageBox::Yes)
 			{
-				QIodeEditVarsSample dialog(this);
+				EditIodeSampleDialog dialog(this);
 				return dialog.exec() == QDialog::Accepted;
 			}
 			else

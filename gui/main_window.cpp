@@ -297,7 +297,7 @@ void MainWindow::check_vars_sample()
 		{
             computeHash(true);
 
-			QIodeEditVarsSample dialog(this);
+			EditIodeSampleDialog dialog(this);
 			dialog.exec();
 
             update_tab_and_completer(I_VARIABLES);
@@ -387,7 +387,7 @@ void MainWindow::open_change_variables_sample_dialog()
 {
     computeHash(true);
 
-    QIodeEditVarsSample dialog(this);
+    EditIodeSampleDialog dialog(this);
     dialog.exec();
 
     update_tab_and_completer(I_VARIABLES);

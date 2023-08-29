@@ -1,6 +1,6 @@
 #include "edit_vars_sample.h"
 
-QIodeEditVarsSample::QIodeEditVarsSample(QWidget* parent) : QDialog(parent)
+EditIodeSampleDialog::EditIodeSampleDialog(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
 
@@ -22,13 +22,13 @@ QIodeEditVarsSample::QIodeEditVarsSample(QWidget* parent) : QDialog(parent)
 	}
 }
 
-QIodeEditVarsSample::~QIodeEditVarsSample()
+EditIodeSampleDialog::~EditIodeSampleDialog()
 {
 	delete sampleFrom;
 	delete sampleTo;
 }
 
-void QIodeEditVarsSample::edit()
+void EditIodeSampleDialog::edit()
 {
 	try
 	{
@@ -45,7 +45,7 @@ void QIodeEditVarsSample::edit()
 	}
 }
 
-void QIodeEditVarsSample::help()
+void EditIodeSampleDialog::help()
 {
 	
 	QDesktopServices::openUrl(url_manual);

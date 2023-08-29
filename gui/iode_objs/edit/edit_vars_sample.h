@@ -16,7 +16,7 @@
  * 2. call the Q_OBJECT macro at the beginning of the class to allow slots and signals (see documentation of Qt).
  */
 
-class QIodeEditVarsSample : public QDialog, public Ui::QIodeEditVarsSample
+class EditIodeSampleDialog : public QDialog, public Ui::EditIodeSampleDialog
 {
     Q_OBJECT
 
@@ -25,8 +25,8 @@ class QIodeEditVarsSample : public QDialog, public Ui::QIodeEditVarsSample
     WrapperSampleEdit* sampleTo;
 
 public:
-    QIodeEditVarsSample(QWidget* parent = Q_NULLPTR);
-    ~QIodeEditVarsSample();
+    EditIodeSampleDialog(QWidget* parent = Q_NULLPTR);
+    ~EditIodeSampleDialog();
 
 public slots:
     void edit();
