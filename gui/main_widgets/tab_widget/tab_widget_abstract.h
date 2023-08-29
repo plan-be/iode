@@ -358,7 +358,7 @@ public slots:
                 throw IodeException("Cannot show IODE objects of type " + type_ + "\n" +
                     + "Database of objects of type " + type_ + " not found");
             }
-            AbstractTabWidget* tab = static_cast<AbstractTabWidget*>(this->widget(index));
+            IodeAbstractWidget* tab = static_cast<IodeAbstractWidget*>(this->widget(index));
             IodeAbstractTableModel* model_ = static_cast<IodeAbstractTableModel*>(tableView->model());
             connect(model_, &CommentsModel::dataChanged, tab, [tab]{ tab->setModified(true); });
             connect(model_, &CommentsModel::headerDataChanged, tab, [tab]{ tab->setModified(true); });
@@ -484,10 +484,10 @@ protected slots:
     QStringList buildFilesList()
     {
         filesList.clear();
-        AbstractTabWidget* tabWidget;
+        IodeAbstractWidget* tabWidget;
         for (int i=0; i < this->count(); i++)
         {
-            tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
+            tabWidget = static_cast<IodeAbstractWidget*>(this->widget(i));
             filesList << tabWidget->getFilepath();
         }
         return filesList;
@@ -503,7 +503,7 @@ protected slots:
             return;
      
         indexContextMenu = this->tabBar()->tabAt(point);
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(indexContextMenu));
+        IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(indexContextMenu));
         const QPoint globalPoint = this->tabBar()->mapToGlobal(point);
         
         // REMINDER: By design 
@@ -546,7 +546,7 @@ protected slots:
     void tabInserted(int index)
     {
         buildFilesList();
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
         fileSystemWatcher->addPath(tabWidget->getFilepath());
         QTabWidget::tabInserted(index);
     }

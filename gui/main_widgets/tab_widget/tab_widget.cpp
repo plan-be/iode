@@ -172,7 +172,7 @@ void IodeTabWidget::saveSettings()
 
     QString filepath;
     EnumIodeFile filetype;
-    AbstractTabWidget* tabWidget;
+    IodeAbstractWidget* tabWidget;
     ReportWidget* reportWidget;
 
     project_settings->beginGroup("PROJECT");
@@ -185,7 +185,7 @@ void IodeTabWidget::saveSettings()
     for (int i=0; i < this->count(); i++)
     {
         project_settings->setArrayIndex(i);
-        tabWidget = static_cast<AbstractTabWidget*>(this->widget(i));
+        tabWidget = static_cast<IodeAbstractWidget*>(this->widget(i));
 
         filetype = tabWidget->getFiletype();
         if(filetype <= I_VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
@@ -263,7 +263,7 @@ void IodeTabWidget::setup()
     // (usually when starting a new project)
     for (int index=0; index < this->count(); index++)
     {
-        AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+        IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
         setTabText(index, tabWidget->getTabText());
         setTabToolTip(index, tabWidget->getTooltip());
     }
@@ -425,7 +425,7 @@ int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
 void IodeTabWidget::clearTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
-    AbstractTabWidget* tabWidget = static_cast<AbstractTabWidget*>(this->widget(index));
+    IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
     EnumIodeFile filetype = tabWidget->getFiletype();
     
     if (filetype <= I_VARIABLES_FILE)

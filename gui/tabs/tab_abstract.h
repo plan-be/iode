@@ -21,7 +21,7 @@ const static QVector<QString> tabPrefix({"(&CMT) ", "(&EQS) ", "(&IDT) ", "(&LST
                                          "(REF) ", "(AGL) ", "(DIF) ", "(LOG) ", 
                                          "(SET) ", "(TXT) "});
 
-class AbstractTabWidget: public QWidget
+class IodeAbstractWidget: public QWidget
 {
     Q_OBJECT
 
@@ -67,7 +67,7 @@ protected:
     }
 
 public:
-    AbstractTabWidget(const EnumIodeFile fileType, QWidget* parent = nullptr): QWidget(parent), 
+    IodeAbstractWidget(const EnumIodeFile fileType, QWidget* parent = nullptr): QWidget(parent), 
         fileType(fileType), modified(false), forcedAsText_(false), savingFile(false), splitted_(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
