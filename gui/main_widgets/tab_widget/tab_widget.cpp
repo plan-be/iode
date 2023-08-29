@@ -12,21 +12,21 @@ QWidget* get_tabs_widget_ptr()
 IodeTabWidget::IodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
 {
     // prepare widgets for tabs associated with IODE object types
-    tabComments = new QIodeCommentsWidget(this);
-    tabEquations = new QIodeEquationsWidget(this);
-    tabIdentites = new QIodeIdentitiesWidget(this);
-    tabLists = new QIodeListsWidget(this);
-    tabScalars = new QIodeScalarsWidget(this);
-    tabTables = new QIodeTablesWidget(this);
-    tabVariables = new QIodeVariablesWidget(this);
+    tabComments = new CommentsWidget(this);
+    tabEquations = new EquationsWidget(this);
+    tabIdentites = new IdentitiesWidget(this);
+    tabLists = new ListsWidget(this);
+    tabScalars = new ScalarsWidget(this);
+    tabTables = new TablesWidget(this);
+    tabVariables = new VariablesWidget(this);
 
-    connect(tabComments, &QIodeCommentsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
-    connect(tabEquations, &QIodeEquationsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
-    connect(tabIdentites, &QIodeIdentitiesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
-    connect(tabLists, &QIodeListsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
-    connect(tabScalars, &QIodeScalarsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
-    connect(tabTables, &QIodeTablesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
-    connect(tabVariables, &QIodeVariablesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabComments, &CommentsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabEquations, &EquationsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabIdentites, &IdentitiesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabLists, &ListsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabScalars, &ScalarsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabTables, &TablesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
+    connect(tabVariables, &VariablesWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
 
     tabIodeObjects.append(tabComments);
     tabIodeObjects.append(tabEquations);

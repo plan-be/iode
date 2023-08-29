@@ -16,13 +16,13 @@ class IodeTabWidget: public IodeAbstractTabWidget
 {
     Q_OBJECT
 
-    QIodeCommentsWidget* tabComments;
-    QIodeEquationsWidget* tabEquations;
-    QIodeIdentitiesWidget* tabIdentites;
-    QIodeListsWidget* tabLists;
-    QIodeScalarsWidget* tabScalars;
-    QIodeTablesWidget* tabTables;
-    QIodeVariablesWidget* tabVariables;
+    CommentsWidget* tabComments;
+    EquationsWidget* tabEquations;
+    IdentitiesWidget* tabIdentites;
+    ListsWidget* tabLists;
+    ScalarsWidget* tabScalars;
+    TablesWidget* tabTables;
+    VariablesWidget* tabVariables;
     QVector<AbstractIodeObjectWidget*> tabIodeObjects;
 
 protected:
