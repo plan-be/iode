@@ -150,7 +150,7 @@ public:
         shortcutModeMinus->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
-        connect(comboMode, &QComboBox::currentIndexChanged, this, &VariablesWidget::changeMode);
+        connect(comboMode, &QComboBox::currentIndexChanged, this, &VariablesWidget::updateMode);
         connect(shortcutModePlus, &QShortcut::activated, this, &VariablesWidget::nextMode);
         connect(shortcutModeMinus, &QShortcut::activated, this, &VariablesWidget::previousMode);
 
@@ -204,7 +204,7 @@ public:
     }
 
 public slots:
-    void changeMode(const int index)
+    void updateMode(const int index)
     {
         objmodel->setMode((EnumIodeVarMode) index);
         saveModeToSettings();
