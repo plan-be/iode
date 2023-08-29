@@ -16,7 +16,7 @@
 #include "main_window_abstract.h"
 
 
-class QIodeEstimationResults : public QDialog, public Ui::QIodeEstimationResults
+class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDialog
 {
     Q_OBJECT
 
@@ -35,8 +35,8 @@ private:
     void set_tests_tab(Equation& eq);
 
 public:
-    QIodeEstimationResults(Estimation* est, QWidget* parent = Q_NULLPTR);
-    ~QIodeEstimationResults();
+    EstimationResultsDialog(Estimation* est, QWidget* parent = Q_NULLPTR);
+    ~EstimationResultsDialog();
 
 signals:
     void newPlot(QDialog* plotDialog);

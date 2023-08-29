@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QIodeEstimationResults</class>
- <widget class="QDialog" name="QIodeEstimationResults">
+ <class>EstimationResultsDialog</class>
+ <widget class="QDialog" name="EstimationResultsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -131,7 +131,7 @@
   <connection>
    <sender>pushButton_graph_YOBS</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEstimationResults</receiver>
+   <receiver>EstimationResultsDialog</receiver>
    <slot>plot_yobs_yest()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -147,7 +147,7 @@
   <connection>
    <sender>pushButton_graph_residuals</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEstimationResults</receiver>
+   <receiver>EstimationResultsDialog</receiver>
    <slot>plot_residual()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -163,7 +163,7 @@
   <connection>
    <sender>pushButton_print_graphs</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEstimationResults</receiver>
+   <receiver>EstimationResultsDialog</receiver>
    <slot>print_graphs()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -179,7 +179,7 @@
   <connection>
    <sender>pushButton_print_output</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEstimationResults</receiver>
+   <receiver>EstimationResultsDialog</receiver>
    <slot>print_output()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -195,7 +195,7 @@
   <connection>
    <sender>pushButton_help</sender>
    <signal>clicked()</signal>
-   <receiver>QIodeEstimationResults</receiver>
+   <receiver>EstimationResultsDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
