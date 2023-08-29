@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EditTable</class>
- <widget class="QDialog" name="EditTable">
+ <class>EditTableDialog</class>
+ <widget class="QDialog" name="EditTableDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -215,7 +215,7 @@
   <connection>
    <sender>saveButton</sender>
    <signal>clicked()</signal>
-   <receiver>EditTable</receiver>
+   <receiver>EditTableDialog</receiver>
    <slot>edit()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -231,7 +231,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>EditTable</receiver>
+   <receiver>EditTableDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -247,7 +247,7 @@
   <connection>
    <sender>helpButton</sender>
    <signal>clicked()</signal>
-   <receiver>EditTable</receiver>
+   <receiver>EditTableDialog</receiver>
    <slot>help()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -263,7 +263,7 @@
   <connection>
    <sender>pushButton_insert</sender>
    <signal>clicked()</signal>
-   <receiver>EditTable</receiver>
+   <receiver>EditTableDialog</receiver>
    <slot>insert_line()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -279,7 +279,7 @@
   <connection>
    <sender>pushButton_graph</sender>
    <signal>clicked()</signal>
-   <receiver>EditTable</receiver>
+   <receiver>EditTableDialog</receiver>
    <slot>plot()</slot>
    <hints>
     <hint type="sourcelabel">

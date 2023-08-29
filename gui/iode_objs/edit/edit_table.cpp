@@ -1,7 +1,7 @@
 #include "edit_table.h"
 
 
-EditTable::EditTable(const QString& tableName, QWidget* parent) 
+EditTableDialog::EditTableDialog(const QString& tableName, QWidget* parent) 
 	: IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), tableName(tableName)
 {
 	setupUi(this);
@@ -23,22 +23,22 @@ EditTable::EditTable(const QString& tableName, QWidget* parent)
 	shortcutDelete->setContext(Qt::WidgetWithChildrenShortcut);
     fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
-	connect(shortcutDelete, &QShortcut::activated, this, &EditTable::delete_line);
-    connect(fullScreenShortcut, &QShortcut::activated, this, &EditTable::showMaximized);
+	connect(shortcutDelete, &QShortcut::activated, this, &EditTableDialog::delete_line);
+    connect(fullScreenShortcut, &QShortcut::activated, this, &EditTableDialog::showMaximized);
 
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-	connect(this, &EditTable::newPlot, main_window, &MainWindowAbstract::appendDialog);
+	connect(this, &EditTableDialog::newPlot, main_window, &MainWindowAbstract::appendDialog);
 
 	// propagate signal
 	EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
-	connect(table_model, &EditTableModel::tableModified, this, &EditTable::tableModified);
+	connect(table_model, &EditTableModel::tableModified, this, &EditTableDialog::tableModified);
 
 	loadSettings();
 
 	table_model->computeHash(true);
 }
 
-EditTable::~EditTable()
+EditTableDialog::~EditTableDialog()
 {
 	delete wInsertLineType;
 	delete wInsertWhere;
@@ -47,7 +47,7 @@ EditTable::~EditTable()
 	delete fullScreenShortcut;
 }
 
-void EditTable::edit()
+void EditTableDialog::edit()
 {
 	try
 	{
@@ -63,7 +63,7 @@ void EditTable::edit()
 	}
 }
 
-void EditTable::plot()
+void EditTableDialog::plot()
 {
 	try
 	{
@@ -83,7 +83,7 @@ void EditTable::plot()
 	}
 }
 
-void EditTable::insert_line()
+void EditTableDialog::insert_line()
 {
 	try
 	{
@@ -123,7 +123,7 @@ void EditTable::insert_line()
 	}
 }
 
-void EditTable::delete_line()
+void EditTableDialog::delete_line()
 {
 	try
 	{
@@ -146,7 +146,7 @@ void EditTable::delete_line()
 	}
 }
 
-void EditTable::help()
+void EditTableDialog::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }
