@@ -1,8 +1,8 @@
 #include "tab_text.h"
 
 
-QIodeTextWidget::QIodeTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent): 
-    QIodeAbstractEditor(fileType, filepath, parent) 
+TextWidget::TextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent): 
+    AbstractTextWidget(fileType, filepath, parent) 
 {
     setupUi(this);
     splitter_ = splitter;
@@ -15,7 +15,7 @@ QIodeTextWidget::QIodeTextWidget(const EnumIodeFile fileType, const QString& fil
 
     filter = "Text files (*" + showInTextTabExtensionsList.join(", *") + ")";
 
-    connect(editor, &IodeTextEditor::modificationChanged, this, &QIodeTextWidget::setModified);
+    connect(editor, &IodeTextEditor::modificationChanged, this, &TextWidget::setModified);
 
     if(!filepath.isEmpty()) 
         load(filepath, true);

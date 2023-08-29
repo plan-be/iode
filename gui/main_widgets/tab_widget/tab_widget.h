@@ -123,7 +123,7 @@ public slots:
                 return;
 
             // get the tab widget at the given index
-            QIodeAbstractEditor* tabWidget = static_cast<QIodeAbstractEditor*>(this->widget(index));
+            AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
 
             // updates the text and tootip of the tab
             setTabText(index, tabWidget->getTabText());

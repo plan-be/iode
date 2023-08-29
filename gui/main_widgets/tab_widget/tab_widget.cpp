@@ -141,7 +141,7 @@ void IodeTabWidget::loadSettings()
             // reload values for the fields parameters, language and nbDecimals if Report tab
             if(filetype == I_REPORTS_FILE)
             {
-                QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(this->widget(index));
+                ReportWidget* reportWidget = static_cast<ReportWidget*>(this->widget(index));
                 reportWidget->setParameters(project_settings->value("report_parameters").toString());
                 reportWidget->setLanguage(project_settings->value("report_language").toInt());
                 reportWidget->setNbDecimals(project_settings->value("report_nbDecimals").toInt());
@@ -173,7 +173,7 @@ void IodeTabWidget::saveSettings()
     QString filepath;
     EnumIodeFile filetype;
     AbstractTabWidget* tabWidget;
-    QIodeReportWidget* reportWidget;
+    ReportWidget* reportWidget;
 
     project_settings->beginGroup("PROJECT");
 
@@ -202,7 +202,7 @@ void IodeTabWidget::saveSettings()
         // save the parameters, language and nbDecimals values if Report tabs
         if(filetype == I_REPORTS_FILE)
         {
-            QIodeReportWidget* reportWidget = static_cast<QIodeReportWidget*>(tabWidget);
+            ReportWidget* reportWidget = static_cast<ReportWidget*>(tabWidget);
 
             project_settings->setValue("report_parameters", reportWidget->getParameters());
             project_settings->setValue("report_language", reportWidget->getLanguage());

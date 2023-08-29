@@ -12,7 +12,7 @@
 #include "text_edit/text_editor.h"
 
 
-class QIodeAbstractEditor: public AbstractTabWidget
+class AbstractTextWidget: public AbstractTabWidget
 {
     Q_OBJECT
 
@@ -28,7 +28,7 @@ signals:
     void tabTextModified(const QString& filepath, const bool modified);
 
 public:
-    QIodeAbstractEditor(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
+    AbstractTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
 
     QString getFilepath() const override
     { 
