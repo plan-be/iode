@@ -53,7 +53,7 @@ set(GUI_TABS
     tabs/tab_report.ui      tabs/tab_report.h               tabs/tab_report.cpp
 )
 
-set(GUI_CUSTOM_WIDGETS  
+set(GUI_MAIN_WIDGETS  
     main_widgets/file_explorer/file_delegate.h            main_widgets/file_explorer/file_delegate.cpp
     main_widgets/file_explorer/file_explorer_proxy.h
     main_widgets/file_explorer/file_explorer.h            main_widgets/file_explorer/file_explorer.cpp
@@ -196,7 +196,7 @@ set(GUI_MAIN
 
 set(PROJECT_SOURCES     ${GUI_UTILS} ${GUI_SETTINGS} ${GUI_PRINT} ${GUI_TEXT_EDIT} 
                         ${GUI_PLOT} ${GUI_IODE_OBJS} ${GUI_EDIT_OBJECT} ${GUI_TABS} 
-                        ${GUI_CUSTOM_WIDGETS} ${GUI_MENUS} ${GUI_MAIN}
+                        ${GUI_MAIN_WIDGETS} ${GUI_MENUS} ${GUI_MAIN}
 )
 
 set(APP_ICON_WINDOWS "${IODE_RESOUCES_DIR}/iode.rc")
