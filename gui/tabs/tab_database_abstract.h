@@ -170,7 +170,7 @@ public slots:
 };
 
 
-template <class M, class V> class QIodeObjectWidget: public AbstractIodeObjectWidget
+template <class M, class V> class TemplateIodeObjectWidget: public AbstractIodeObjectWidget
 {
 protected:
     M* objmodel;
@@ -183,7 +183,7 @@ protected:
     QShortcut* shortcutAdd;
 
 public:
-    QIodeObjectWidget(EnumIodeType iodeType, IodeAbstractTabWidget* parent) 
+    TemplateIodeObjectWidget(EnumIodeType iodeType, IodeAbstractTabWidget* parent) 
         : AbstractIodeObjectWidget(iodeType, parent)
     {
         // prepare splitter
@@ -246,7 +246,7 @@ public:
         row++;
     }
 
-    ~QIodeObjectWidget() 
+    ~TemplateIodeObjectWidget() 
     {
         delete objmodel;
         delete tableview;

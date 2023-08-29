@@ -23,10 +23,10 @@
 #include "iode_objs/views/variables_view.h"
 
 
-class QIodeCommentsWidget : public QIodeObjectWidget<CommentsModel, CommentsView>
+class QIodeCommentsWidget : public TemplateIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    QIodeCommentsWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_COMMENTS, parent) 
+    QIodeCommentsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_COMMENTS, parent) 
     {
         connect(objmodel, &CommentsModel::dataChanged, this, &QIodeCommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::headerDataChanged, this, &QIodeCommentsWidget::databaseModified);
@@ -37,10 +37,10 @@ public:
     }
 };
 
-class QIodeEquationsWidget : public QIodeObjectWidget<EquationsModel, EquationsView>
+class QIodeEquationsWidget : public TemplateIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    QIodeEquationsWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_EQUATIONS, parent) 
+    QIodeEquationsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_EQUATIONS, parent) 
     {
         connect(objmodel, &EquationsModel::dataChanged, this, &QIodeEquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::headerDataChanged, this, &QIodeEquationsWidget::databaseModified);
@@ -52,10 +52,10 @@ public:
     }
 };
 
-class QIodeIdentitiesWidget : public QIodeObjectWidget<IdentitiesModel, IdentitiesView>
+class QIodeIdentitiesWidget : public TemplateIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    QIodeIdentitiesWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_IDENTITIES, parent) 
+    QIodeIdentitiesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_IDENTITIES, parent) 
     {
         connect(objmodel, &IdentitiesModel::dataChanged, this, &QIodeIdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::headerDataChanged, this, &QIodeIdentitiesWidget::databaseModified);
@@ -66,10 +66,10 @@ public:
     }
 };
 
-class QIodeListsWidget : public QIodeObjectWidget<ListsModel, ListsView>
+class QIodeListsWidget : public TemplateIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    QIodeListsWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_LISTS, parent) 
+    QIodeListsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_LISTS, parent) 
     {
         connect(objmodel, &ListsModel::dataChanged, this, &QIodeListsWidget::databaseModified);
         connect(objmodel, &ListsModel::headerDataChanged, this, &QIodeListsWidget::databaseModified);
@@ -96,10 +96,10 @@ public:
     }
 };
 
-class QIodeTablesWidget : public QIodeObjectWidget<TablesModel, TablesView>
+class QIodeTablesWidget : public TemplateIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    QIodeTablesWidget(IodeAbstractTabWidget* parent) : QIodeObjectWidget(I_TABLES, parent) 
+    QIodeTablesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_TABLES, parent) 
     {
         connect(objmodel, &TablesModel::dataChanged, this, &QIodeTablesWidget::databaseModified);
         connect(objmodel, &TablesModel::headerDataChanged, this, &QIodeTablesWidget::databaseModified);
