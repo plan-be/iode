@@ -1,7 +1,7 @@
 #include "estimation_results.h"
 
 
-QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent) :
+EstimationResultsDialog::EstimationResultsDialog(Estimation* est, QWidget* parent) :
     QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), precision(6), est(est)
 {
     setupUi(this);
@@ -19,20 +19,20 @@ QIodeEstimationResults::QIodeEstimationResults(Estimation* est, QWidget* parent)
     for(const std::string& name: est->get_list_equations()) variables_names << QString::fromStdString(name);
 
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-	connect(this, &QIodeEstimationResults::newPlot, main_window, &MainWindowAbstract::appendDialog);
+	connect(this, &EstimationResultsDialog::newPlot, main_window, &MainWindowAbstract::appendDialog);
 
     fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
     fullScreenShortcut->setContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
     
-    connect(fullScreenShortcut, &QShortcut::activated, this, &QIodeEstimationResults::showMaximized);
+    connect(fullScreenShortcut, &QShortcut::activated, this, &EstimationResultsDialog::showMaximized);
 }
 
-QIodeEstimationResults::~QIodeEstimationResults()
+EstimationResultsDialog::~EstimationResultsDialog()
 {
     delete fullScreenShortcut;
 }
 
-void QIodeEstimationResults::set_coefficients_tab()
+void EstimationResultsDialog::set_coefficients_tab()
 {
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
     tableView_coefs->setStyleSheet(stylesheet);
@@ -44,7 +44,7 @@ void QIodeEstimationResults::set_coefficients_tab()
     tableView_coefs->setModel(scalarsModel);
 }
 
-void QIodeEstimationResults::set_correlation_matrix_tab()
+void EstimationResultsDialog::set_correlation_matrix_tab()
 {
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
     tableView_corr_matrix->setStyleSheet(stylesheet);
@@ -56,7 +56,7 @@ void QIodeEstimationResults::set_correlation_matrix_tab()
     tableView_corr_matrix->setModel(model);
 }
 
-void QIodeEstimationResults::set_tests_tab(Equation& eq)
+void EstimationResultsDialog::set_tests_tab(Equation& eq)
 {
     QGridLayout* layout = new QGridLayout(tab_tests);
     std::array<float, EQS_NBTESTS> tests = eq.get_tests();
@@ -71,7 +71,7 @@ void QIodeEstimationResults::set_tests_tab(Equation& eq)
 }
 
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 6
-void QIodeEstimationResults::plot_yobs_yest()
+void EstimationResultsDialog::plot_yobs_yest()
 {
     NamedEquation nEq = est->current_equation();
     std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
@@ -108,7 +108,7 @@ void QIodeEstimationResults::plot_yobs_yest()
 }
 
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 7
-void QIodeEstimationResults::plot_residual()
+void EstimationResultsDialog::plot_residual()
 {
     NamedEquation nEq = est->current_equation();
     std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
@@ -138,18 +138,18 @@ void QIodeEstimationResults::plot_residual()
 }
 
 // TODO : implement this SLOT
-void QIodeEstimationResults::print_graphs()
+void EstimationResultsDialog::print_graphs()
 {
     QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");
 }
 
 // TODO : implement this SLOT
-void QIodeEstimationResults::print_output()
+void EstimationResultsDialog::print_output()
 {
     QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");
 }
 
-void QIodeEstimationResults::help()
+void EstimationResultsDialog::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

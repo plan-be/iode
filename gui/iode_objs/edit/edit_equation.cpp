@@ -252,7 +252,7 @@ void EditEquationDialog::results()
 	{
 		try
 		{
-			QIodeEstimationResults dialog(estimation, this);
+			EstimationResultsDialog dialog(estimation, this);
 			dialog.exec();
 		}
 		catch (const std::exception& e)
