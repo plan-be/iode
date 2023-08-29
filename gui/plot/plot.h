@@ -37,7 +37,7 @@ constexpr int MINOR_YTICKS_COUNT = 2;
  * 
  * It is possible to zoom in and zoom out using the wheel on the mouse.
  */
-class QIodePlotDialog: public QDialog
+class PlotDialog: public QDialog
 {
     Q_OBJECT
 
@@ -82,10 +82,10 @@ protected:
     int end_t;
 
 public:
-    QIodePlotDialog(EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
+    PlotDialog(EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
         EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, 
         QWidget* parent = nullptr);
-    ~QIodePlotDialog();
+    ~PlotDialog();
 
     void plot();
 

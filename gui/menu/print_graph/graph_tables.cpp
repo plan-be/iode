@@ -73,7 +73,7 @@ void MenuGraphTables::display()
         foreach(const QString& tableName, qTablesList)
         {
             GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample);
-            QIodePlotTableDialog* plotDialog = new QIodePlotTableDialog(gSampleTable);
+            PlotTableDialog* plotDialog = new PlotTableDialog(gSampleTable);
             main_window->appendPlot(plotDialog);
         }
     }

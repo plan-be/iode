@@ -1,7 +1,7 @@
 #include "plot.h"
 
 
-QIodePlotDialog::QIodePlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIodeGraphAxisThicks xTicks, 
+PlotDialog::PlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIodeGraphAxisThicks xTicks, 
     EnumIodeGraphAxisThicks yTicks, QWidget* parent) : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
     chartType(chartType), logScale(logScale), xTicks(xTicks), yTicks(yTicks), fixedMinY(NAN), fixedMaxY(NAN)
 {
@@ -26,28 +26,28 @@ QIodePlotDialog::QIodePlotDialog(EnumIodeGraphChart chartType, const bool logSca
     QStringList q_chart_types;
     for(const std::string& chart_type: vGraphsChartTypes) q_chart_types << QString::fromStdString(chart_type);
     comboChartType->addItems(q_chart_types);
-    connect(comboChartType, &QComboBox::currentIndexChanged, this, &QIodePlotDialog::updateChartType);
+    connect(comboChartType, &QComboBox::currentIndexChanged, this, &PlotDialog::updateChartType);
     layout->addWidget(comboChartType, 1, 0);
 
     QSpacerItem* horizontalSpacer = new QSpacerItem(0, 20);
     layout->addItem(horizontalSpacer, 0, 1);
 
     checkYScale = new QCheckBox("Log Scale");
-    connect(checkYScale, &QCheckBox::stateChanged, this, &QIodePlotDialog::enableLogScale);
+    connect(checkYScale, &QCheckBox::stateChanged, this, &PlotDialog::enableLogScale);
     layout->addWidget(checkYScale, 1, 2, Qt::AlignCenter);
 
     comboXTicks = new QComboBox();
     QStringList q_x_axis_ticks;
     for(const std::string& axis_ticks: vGraphsAxisThicks) q_x_axis_ticks << "X " + QString::fromStdString(axis_ticks);
     comboXTicks->addItems(q_x_axis_ticks);
-    connect(comboXTicks, &QComboBox::currentIndexChanged, this, &QIodePlotDialog::updateXTicks);
+    connect(comboXTicks, &QComboBox::currentIndexChanged, this, &PlotDialog::updateXTicks);
     layout->addWidget(comboXTicks, 1, 3, Qt::AlignCenter);
 
     comboYTicks = new QComboBox();
     QStringList q_y_axis_ticks;
     for(const std::string& axis_ticks: vGraphsAxisThicks) q_y_axis_ticks << "Y " + QString::fromStdString(axis_ticks);
     comboYTicks->addItems(q_y_axis_ticks);
-    connect(comboYTicks, &QComboBox::currentIndexChanged, this, &QIodePlotDialog::updateYTicks);
+    connect(comboYTicks, &QComboBox::currentIndexChanged, this, &PlotDialog::updateYTicks);
     layout->addWidget(comboYTicks, 1, 4, Qt::AlignCenter);
 
     // span = -1 -> takes the whole reaming rows/columns
@@ -58,7 +58,7 @@ QIodePlotDialog::QIodePlotDialog(EnumIodeGraphChart chartType, const bool logSca
     this->setModal(false);
 }
 
-QIodePlotDialog::~QIodePlotDialog()
+PlotDialog::~PlotDialog()
 {
     delete comboChartType;
     delete checkYScale;
@@ -69,37 +69,37 @@ QIodePlotDialog::~QIodePlotDialog()
     delete chartView;
 }
 
-void QIodePlotDialog::setMenuBar(QMenuBar* menuBar)
+void PlotDialog::setMenuBar(QMenuBar* menuBar)
 {
     QMenu* menuFile = menuBar->addMenu("File");
 
     QAction* saveAsAction = new QAction("Save As", this);
     saveAsAction->setVisible(true);
     saveAsAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
-    connect(saveAsAction, &QAction::triggered, this, &QIodePlotDialog::saveAs);
+    connect(saveAsAction, &QAction::triggered, this, &PlotDialog::saveAs);
     menuFile->addAction(saveAsAction);
 
     QAction* copyAction = new QAction("Copy To Clipboard", this);
     copyAction->setVisible(true);
     copyAction->setShortcut(QKeySequence::Copy);
-    connect(copyAction, &QAction::triggered, this, &QIodePlotDialog::copyToClipboard);
+    connect(copyAction, &QAction::triggered, this, &PlotDialog::copyToClipboard);
     menuFile->addAction(copyAction);
 
     QAction* printAction = new QAction("Print", this);
     printAction->setVisible(true);
     printAction->setShortcut(QKeySequence::Print);
-    connect(printAction, &QAction::triggered, this, &QIodePlotDialog::print);
+    connect(printAction, &QAction::triggered, this, &PlotDialog::print);
     menuFile->addAction(printAction);
 
     QAction* closeAction = new QAction("Close", this);
     closeAction->setVisible(true);
     closeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q));
-    connect(closeAction, &QAction::triggered, this, &QIodePlotDialog::close);
+    connect(closeAction, &QAction::triggered, this, &PlotDialog::close);
     menuFile->addAction(closeAction);
 }
 
 // Note: see https://doc.qt.io/qt-6/qtcharts-zoomlinechart-example.html
-void QIodePlotDialog::keyPressEvent(QKeyEvent *event)
+void PlotDialog::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) 
     {
@@ -119,7 +119,7 @@ void QIodePlotDialog::keyPressEvent(QKeyEvent *event)
 }
 
 // Note: see https://stackoverflow.com/a/48626725 
-void QIodePlotDialog::wheelEvent(QWheelEvent *event)
+void PlotDialog::wheelEvent(QWheelEvent *event)
 {
     // QChart::zoom() documentation: A factor over 1.0 zooms into the view 
     //                               and a factor between 0.0 and 1.0 zooms out of it.
@@ -131,7 +131,7 @@ void QIodePlotDialog::wheelEvent(QWheelEvent *event)
 
 // see https://doc.qt.io/qt-6/graphicsview.html#printing
 // and https://doc.qt.io/qt-6/qpixmap.html#reading-and-writing-image-files for supported formats
-void QIodePlotDialog::saveAs()
+void PlotDialog::saveAs()
 {
     QString filePath;
     try
@@ -154,7 +154,7 @@ void QIodePlotDialog::saveAs()
     }
 }
 
-void QIodePlotDialog::copyToClipboard()
+void PlotDialog::copyToClipboard()
 {
     QClipboard* clipboard = QApplication::clipboard();
     QPixmap pixmap(chartView->size());
@@ -167,12 +167,12 @@ void QIodePlotDialog::copyToClipboard()
 
 // see https://doc.qt.io/qt-6/graphicsview.html#printing 
 // see https://doc.qt.io/qt-6/qtprintsupport-index.html for Qt Print Support
-void QIodePlotDialog::print()
+void PlotDialog::print()
 {
     try
     {
             QPrintPreviewDialog dialog(&printer);
-            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &QIodePlotDialog::renderChart);
+            connect(&dialog, &QPrintPreviewDialog::paintRequested, this, &PlotDialog::renderChart);
             dialog.exec(); 
     }
     catch(const std::exception& e)
@@ -181,7 +181,7 @@ void QIodePlotDialog::print()
     }
 }
 
-void QIodePlotDialog::updateChartType(int index)
+void PlotDialog::updateChartType(int index)
 {
     if(index < 0 || index >= I_NB_CHART_TYPES)
         return;
@@ -190,7 +190,7 @@ void QIodePlotDialog::updateChartType(int index)
     buildSeries();
 }
 
-void QIodePlotDialog::enableLogScale(int state)
+void PlotDialog::enableLogScale(int state)
 {
     QAbstractAxis* Yaxis = chart->axisY();
     if (Yaxis)
@@ -213,7 +213,7 @@ void QIodePlotDialog::enableLogScale(int state)
     }
 }
 
-void QIodePlotDialog::updateXTicks(int index)
+void PlotDialog::updateXTicks(int index)
 {
     if(index < 0 || index >= I_NB_AXIS_THICKS)
         return;
@@ -240,7 +240,7 @@ void QIodePlotDialog::updateXTicks(int index)
     }
 }
 
-void QIodePlotDialog::updateYTicks(int index)
+void PlotDialog::updateYTicks(int index)
 {
     if(index < 0 || index >= I_NB_AXIS_THICKS)
         return;
@@ -267,7 +267,7 @@ void QIodePlotDialog::updateYTicks(int index)
     }
 }
 
-void QIodePlotDialog::setPeriods(const Sample& sample, const QString& from, const QString& to)
+void PlotDialog::setPeriods(const Sample& sample, const QString& from, const QString& to)
 {
     if(from.isEmpty())
     {
@@ -311,7 +311,7 @@ void QIodePlotDialog::setPeriods(const Sample& sample, const QString& from, cons
     stepX = 1. / sample.start_period().nb_periods_per_year();
 }
 
-void QIodePlotDialog::plot()
+void PlotDialog::plot()
 {
     // prepare series
     buildSeries();
@@ -321,7 +321,7 @@ void QIodePlotDialog::plot()
     chart->setTitle(title_);
 }
 
-QValueAxis* QIodePlotDialog::createXAxis()
+QValueAxis* PlotDialog::createXAxis()
 {
     // prepare X axis
     QValueAxis* Xaxis = new QValueAxis();
@@ -335,7 +335,7 @@ QValueAxis* QIodePlotDialog::createXAxis()
     return Xaxis;
 }
 
-QBarCategoryAxis* QIodePlotDialog::createXBarAxis()
+QBarCategoryAxis* PlotDialog::createXBarAxis()
 {
     QBarCategoryAxis* Xaxis = new QBarCategoryAxis();
     Xaxis->setTitleText("Time");
@@ -350,7 +350,7 @@ QBarCategoryAxis* QIodePlotDialog::createXBarAxis()
     return Xaxis;
 }
 
-void QIodePlotDialog::computeMinMaxIntervalYAxis(const QList<double>& values)
+void PlotDialog::computeMinMaxIntervalYAxis(const QList<double>& values)
 {
     // minimum value on the Y axis
     if (L_ISAN(fixedMinY))
@@ -374,7 +374,7 @@ void QIodePlotDialog::computeMinMaxIntervalYAxis(const QList<double>& values)
     YTickInterval = pow(10, order);
 }
 
-QValueAxis* QIodePlotDialog::createYAxis()
+QValueAxis* PlotDialog::createYAxis()
 {
     QValueAxis* YValueAxis = new QValueAxis();
     YValueAxis->setTitleText("Values");
@@ -386,7 +386,7 @@ QValueAxis* QIodePlotDialog::createYAxis()
     return YValueAxis;
 }
 
-QLogValueAxis* QIodePlotDialog::createYLogAxis()
+QLogValueAxis* PlotDialog::createYLogAxis()
 {
     QLogValueAxis* YLogAxis = new QLogValueAxis();
     YLogAxis->setTitleText("Values");
@@ -398,7 +398,7 @@ QLogValueAxis* QIodePlotDialog::createYLogAxis()
     return YLogAxis;
 }
 
-void QIodePlotDialog::buildSeries()
+void PlotDialog::buildSeries()
 {
     QVector<double> values;
     QList<QAbstractSeries*> list_series;

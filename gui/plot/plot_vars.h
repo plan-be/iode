@@ -2,7 +2,7 @@
 #include "plot.h"
 
 
-class QIodePlotVariablesDialog : public QIodePlotDialog
+class PlotVariablesDialog : public PlotDialog
 {
     Q_OBJECT
 
@@ -12,10 +12,10 @@ class QIodePlotVariablesDialog : public QIodePlotDialog
     QComboBox* comboVarMode;
 
 public:
-    QIodePlotVariablesDialog(KDBVariables* kdb_vars = nullptr, EnumIodeGraphChart chartType = I_G_CHART_LINE, 
+    PlotVariablesDialog(KDBVariables* kdb_vars = nullptr, EnumIodeGraphChart chartType = I_G_CHART_LINE, 
         EnumIodeVarMode varMode = I_VAR_MODE_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
         EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, QWidget* parent = nullptr);
-    ~QIodePlotVariablesDialog();
+    ~PlotVariablesDialog();
 
     void addSeries(const QString& variable, const QString& legend_name = "");
 

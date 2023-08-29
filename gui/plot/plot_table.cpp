@@ -1,9 +1,9 @@
 #include "plot_table.h"
 
 
-QIodePlotTableDialog::QIodePlotTableDialog(const GSampleTable* table, EnumIodeGraphChart chartType, const bool logScale, 
+PlotTableDialog::PlotTableDialog(const GSampleTable* table, EnumIodeGraphChart chartType, const bool logScale, 
     EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, QWidget* parent)
-    : QIodePlotDialog(chartType, logScale, xTicks, yTicks, parent), table(table)
+    : PlotDialog(chartType, logScale, xTicks, yTicks, parent), table(table)
 {
     QString key;
 
@@ -23,6 +23,6 @@ QIodePlotTableDialog::QIodePlotTableDialog(const GSampleTable* table, EnumIodeGr
     }
 }
 
-QIodePlotTableDialog::~QIodePlotTableDialog()
+PlotTableDialog::~PlotTableDialog()
 {
 }

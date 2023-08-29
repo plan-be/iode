@@ -32,7 +32,7 @@ public:
 
 public slots:
 	void appendDialog(QDialog* dialog);
-	void appendPlot(QIodePlotDialog* dialog);
+	void appendPlot(PlotDialog* dialog);
 	virtual void open_graphs_variables_dialog_from_vars_view(
 		const QList<QString>& variableNames, const QString& from, const QString& to) = 0;
 	virtual void open_compute_identities_dialog() = 0;
