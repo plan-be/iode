@@ -9,7 +9,7 @@
 
 #include "utils.h"
 #include "tab_widget_abstract.h"
-#include "tabs/tab_database.h"
+#include "tabs/iode_objs/tab_database.h"
 
 
 class IodeTabWidget: public IodeAbstractTabWidget

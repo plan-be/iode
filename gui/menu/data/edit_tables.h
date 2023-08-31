@@ -12,7 +12,7 @@
 
 #ifndef GSAMPLE_NUMERICAL_WIDGET_HEADER
 #define _GSAMPLE_
-#include "tabs/tab_numerical_values.h"
+#include "tabs/iode_objs/tab_numerical_values.h"
 #undef _GSAMPLE_
 #endif
 
