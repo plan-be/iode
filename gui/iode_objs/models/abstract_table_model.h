@@ -64,6 +64,25 @@ public slots:
 	{ 
 		resetModel(); 
 	}
+
+	virtual void filter(const QString& pattern) = 0;
+
+	/**
+	 * @brief gets the list of scalars or variables listed in the clec structure or 
+	 *        the object of the same name.
+	 * 
+	 * @param name 
+	 * @param other_type 
+	 */
+	virtual QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type) = 0;
+
+	/**
+	 * @brief get the list of all related objects of type other_type.
+	 *  
+	 * @param name 
+	 * @param other_type 
+	 */
+	virtual QStringList getRelatedObjs(const QString& name, const EnumIodeType other_type) = 0;
 };
 
 
@@ -116,7 +135,7 @@ public:
 
 	bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
-	void filter(const QString& pattern);
+	void filter(const QString& pattern) override;
 
 	void clearKDB() { kdb->clear(); }
 
@@ -143,22 +162,9 @@ public:
 
 	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
 
-	/**
-	 * @brief gets the list of scalars or variables listed in the clec structure or 
-	 *        the object of the same name.
-	 * 
-	 * @param name 
-	 * @param other_type 
-	 */
-	QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type);
+	QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type) override;
 
-	/**
-	 * @brief get the list of all related objects of type other_type.
-	 *  
-	 * @param name 
-	 * @param other_type 
-	 */
-	QStringList getRelatedObjs(const QString& name, const EnumIodeType other_type);
+	QStringList getRelatedObjs(const QString& name, const EnumIodeType other_type) override;
 
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
