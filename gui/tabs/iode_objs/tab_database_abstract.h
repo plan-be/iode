@@ -11,7 +11,7 @@
 #include <QSizePolicy>
 #include <QStringList>
 
-#include "tab_abstract.h"
+#include "tabs/tab_abstract.h"
 #include "main_widgets/tab_widget/tab_widget_abstract.h"
 
 
