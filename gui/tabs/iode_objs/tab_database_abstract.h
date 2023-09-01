@@ -6,7 +6,8 @@
 #include <QSpinBox>
 #include <QShortcut>
 #include <QLineEdit>
-#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QPushButton>
 #include <QSizePolicy>
 #include <QStringList>
@@ -26,8 +27,7 @@ protected:
     EnumIodeType iodeType;
     QDir projectDir;
 
-    int row;
-    QGridLayout* gridLayout;
+    QVBoxLayout* vLayout;
     QLineEdit* lineEdit_filter;
     QPushButton* pushButton_filter;
     QPushButton* pushButton_print;
@@ -42,11 +42,19 @@ public:
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
+        /* NOTE FOR THE DEVELOPPERS:
+         * I first tried to use a QGridLayout but some widgets were misaligned in the tabs. 
+         * I could,'t find out why.
+         * So I finally decided to mix QVBoxLayout and QHBoxLayout which solved the problem.
+         */
+
         // layout
-        row = 0;
-        gridLayout = new QGridLayout(this);
-        gridLayout->setObjectName(QString::fromUtf8("layout"));
-        gridLayout->setContentsMargins(0, 0, 0, 0);
+        vLayout = new QVBoxLayout(this);
+        vLayout->setObjectName(QString::fromUtf8("vTabLayout"));
+        vLayout->setContentsMargins(0, 0, 0, 0);
+
+        // top horizontal layout
+        QHBoxLayout* topHLayout = new QHBoxLayout(this);
 
         // filter 
         lineEdit_filter = new QLineEdit();
@@ -58,20 +66,20 @@ public:
         sizePolicyFilter.setHeightForWidth(lineEdit_filter->sizePolicy().hasHeightForWidth());
         lineEdit_filter->setSizePolicy(sizePolicyFilter);
         lineEdit_filter->setMinimumSize(QSize(200, 0));
-        gridLayout->addWidget(lineEdit_filter, row, 0, Qt::AlignLeft);
+        topHLayout->addWidget(lineEdit_filter, Qt::AlignLeft);
 
         pushButton_filter = new QPushButton("Filter");
         pushButton_filter->setObjectName(QString::fromUtf8("pushButton_filter"));
-        gridLayout->addWidget(pushButton_filter, row, 1, Qt::AlignLeft);
+        topHLayout->addWidget(pushButton_filter, Qt::AlignLeft);
 
         // spacer
         QSpacerItem* horizontalSpacer = new QSpacerItem(828, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-        gridLayout->addItem(horizontalSpacer, row, 2);
+        topHLayout->addSpacerItem(horizontalSpacer);
 
         // print button
         pushButton_print = new QPushButton("Print");
         pushButton_print->setObjectName(QString::fromUtf8("pushButton_print"));
-        gridLayout->addWidget(pushButton_print, row, 3, Qt::AlignLeft);
+        topHLayout->addWidget(pushButton_print, Qt::AlignLeft);
 
         // add button
         pushButton_add = new QPushButton("Add " + QString::fromStdString(vIodeTypes[iodeType]));
@@ -81,9 +89,9 @@ public:
         sizePolicyAdd.setVerticalStretch(0);
         sizePolicyAdd.setHeightForWidth(pushButton_add->sizePolicy().hasHeightForWidth());
         pushButton_add->setSizePolicy(sizePolicyAdd);
-        gridLayout->addWidget(pushButton_add, row, 4, Qt::AlignRight);
+        topHLayout->addWidget(pushButton_add, Qt::AlignRight);
 
-        row++;
+        vLayout->addLayout(topHLayout);
     }
 
     ~AbstractIodeObjectWidget()
@@ -91,7 +99,7 @@ public:
         delete lineEdit_filter;
         delete pushButton_filter;
         delete pushButton_add;
-        if(gridLayout) delete gridLayout;
+        if(vLayout) delete vLayout;
     }
 
     /**
@@ -242,8 +250,7 @@ public:
 
         // insert table to layout
         // -1 -> span over all rows/columns
-        gridLayout->addWidget(splitter, row, 0, 1, -1);
-        row++;
+        vLayout->addWidget(splitter);
     }
 
     ~TemplateIodeObjectWidget() 
