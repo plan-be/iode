@@ -22,13 +22,41 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     columns = COL_cc(to_char_array(gsample));
     if(columns == NULL) throw error;
 
+    // Compute 
+    // - minimum sample containing all periods present in the columns.
+    // - the list of unique file_1 (op) file_2 combinations
+    // Note: - equivalent to T_prep_smpl()
+    COL column = columns->cl_cols[0];
+    Period start_per(column.cl_per);
+    Period end_per(column.cl_per);
+    int pos;
+    for(int col=0; col < columns->cl_nb; col++)
+    {
+        column = columns->cl_cols[col];
+        pos = find_file_op(column);
+        if(pos < 0)
+            files_ops.push_back(column);
+
+        Period per(columns->cl_cols[col].cl_per);
+        if(per.difference(start_per) < 0)
+        {
+            start_per.c_period->p_y = per.c_period->p_y;
+            start_per.c_period->p_s = per.c_period->p_s;
+        }
+        if(per.difference(end_per) > 0)
+        {
+            end_per.c_period->p_y = per.c_period->p_y;
+            end_per.c_period->p_s = per.c_period->p_s;
+        }
+    }
+    sample = new Sample(start_per, end_per);
+
     // Returns the number of columns for the computed table + 1.
     int dim = COL_resize(ref_table->c_table, columns);
     if(dim == 0) throw error;
 
     // Get filepath of each reference file
     // Note: - equivalent to T_find_files()
-    COL column;
     std::bitset<K_MAX_FREF + 1> files_usage;
     for(int col=0; col < columns->cl_nb; col++) 
     {
@@ -49,27 +77,6 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         }
     }
 
-    // Compute minimum sample containing all periods present in the columns.
-    // Note: - equivalent to T_prep_smpl()
-    column = columns->cl_cols[0];
-    Period start_per(column.cl_per);
-    Period end_per(column.cl_per);
-    for(int col=0; col < columns->cl_nb; col++)
-    {
-        Period per(columns->cl_cols[col].cl_per);
-        if(per.difference(start_per) < 0)
-        {
-            start_per.c_period->p_y = per.c_period->p_y;
-            start_per.c_period->p_s = per.c_period->p_s;
-        }
-        if(per.difference(end_per) > 0)
-        {
-            end_per.c_period->p_y = per.c_period->p_y;
-            end_per.c_period->p_s = per.c_period->p_s;
-        }
-    }
-    sample = new Sample(start_per, end_per);
-
     // Get column names
     // QUESTION FOR JMP: Would it be possible to have a table with several cells containing the '#' character ?
     //                   How the GSAMPLE is build in that case ? -> What would be the column names ?
@@ -88,7 +95,8 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
                 std::string column_name;
                 char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
-                for(int col=1; col < columns->cl_nb; col+=2)
+                int step = ref_table->nbColumns();          // to skip first column of the reference table containing text 
+                for(int col=1; col < columns->cl_nb; col+=step)
                 {
                     column_name = std::string(COL_text(&columns->cl_cols[col], c_content, nb_files));
                     column_names.push_back(column_name); 
@@ -102,8 +110,8 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     for(int row=0; row < (int) ref_table->nbLines(); row++)
     {
         // QUESTION FOR JMP: Can we always assume that 
-        //                   - the first cell will contain the name of the line 
-        //                   - the second cell will contain either the '#' character or a LEC expression
+        //                   - the first cell will contain the name of the line ?
+        //                   - the second cell will contain either the '#' character or a LEC expression ?
         // In k_graph.c, in function T_graph_tbl_1() lines 181 to 185, the code is:
         //    case KT_CELL  :
         //        if(cell[1].tc_type != KT_LEC) break;
@@ -131,6 +139,24 @@ GSampleTable::~GSampleTable()
     delete sample;
 }
 
+int GSampleTable::find_file_op(const COL& col)
+{
+    if(files_ops.size() == 0)
+        return -1;
+
+    COL fileop;
+    for(int i = 0; i < files_ops.size(); i++)
+    {
+        fileop = files_ops[i];
+        if(col.cl_opf    == fileop.cl_opf &&
+            col.cl_fnb[0] == fileop.cl_fnb[0] &&
+            col.cl_fnb[1] == fileop.cl_fnb[1])
+            return i;
+    }
+
+    return -1;
+}
+
 void GSampleTable::compute_values()
 {
     // For each table line, compute and store all values
@@ -152,7 +178,8 @@ void GSampleTable::compute_values()
             
             // store all values
             int col_val = 0;
-            for(int col=1; col < columns->cl_nb; col+=2)
+            int step = ref_table->nbColumns();          // to skip first column of the reference table containing text 
+            for(int col=1; col < columns->cl_nb; col+=step)
             {
                 values[row_val][col_val] = columns->cl_cols[col].cl_res;
                 col_val++;
