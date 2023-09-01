@@ -22,6 +22,20 @@
  * @brief The present class represents the output table resulting from the compilation 
  *        of a generalized sample given a reference table.
  * 
+ * Given a GSample table defined by 
+ * - M lines,
+ * - N observations (nb periods of the sample)
+ * - 2 combinations file_1 (op) file_2      -> fop0 and fop1
+ * - 2 combinations period_1 (op) period_2  -> pop0 and pop1 
+ * the computed GSample table is structured as follow:
+ * 
+ *          |           obs0             |  ...  |           obsN             |
+ *          |    pop 0    |     pop1     |  ...  |    pop 0    |     pop1     |
+ *          | fop0 | fop1 | fop 0 | fop1 |  ...  | fop0 | fop1 | fop 0 | fop1 |
+ * ---------------------------------------------------------------------------|
+ * line 0   |      |      |       |      |  ...  |      |      |       |      |
+ * line ... |      |      |       |      |  ...  |      |      |       |      |
+ * line M   |      |      |       |      |  ...  |      |      |       |      |
  */
 class GSampleTable
 {
@@ -31,6 +45,7 @@ protected:
     std::string  gsample;
     Sample*      sample;
     COLS*        columns;
+    std::vector<COL>         files_ops;
     std::vector<std::string> files;
     std::vector<std::string> column_names;
     std::vector<std::string> line_names;
@@ -39,6 +54,18 @@ protected:
 
 protected:
     void compute_values();
+
+    /**
+     * @brief Tries to find the position in files_ops vector of the 
+     *        operation on files contained in the passed COL struct.
+     * 
+     * @param col input COL struct
+     * @return int position in the files_ops vector if operation on files 
+     *             has been found, -1 otherwise
+     * 
+     * @note equivalent of the funtion T_find_opf() (k_graph.c)
+     */
+    int find_file_op(const COL& col);
 
 public:
     GSampleTable(const std::string& ref_table_name, const std::string& gsample);
@@ -57,6 +84,16 @@ public:
     int get_nb_files() const
     {
         return (int) files.size();
+    }
+
+    int get_nb_periods() const
+    {
+        return sample->nb_periods();
+    }
+
+    int get_nb_files_ops() const
+    {
+        return (int) files_ops.size();
     }
 
     Sample* get_sample() const
@@ -106,5 +143,4 @@ public:
         }
         return value;
     }
-
 };
