@@ -6,5 +6,5 @@ void CommentsView::new_obj()
 	AddCommentDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
-	filter_and_update();
+	filter();
 }

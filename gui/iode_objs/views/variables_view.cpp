@@ -72,7 +72,7 @@ void VariablesView::new_obj()
 	AddVariableDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
-	filter_and_update();
+	filter();
 }
 
 void VariablesView::plot_series()

@@ -18,6 +18,7 @@
 
 #include "utils.h"
 #include "print/print.h"
+#include "iode_objs/models/abstract_table_model.h"
 #include "iode_objs/delegates/base_delegate.h"
 #include "iode_objs/edit/edit_vars_sample.h"
 
@@ -55,19 +56,9 @@ protected:
 	QShortcut* relatedTblShortcut;
 	QShortcut* relatedVarShortcut;
 
-protected:
-	void keyPressEvent(QKeyEvent* event);
-
-	virtual void filter_and_update() = 0;
-
-	/**
-	 * @brief Dump displayed table into the document.
-	 * 
-	 * @note see https://forum.qt.io/post/460045 
-	 *       and https://gis.stackexchange.com/q/385616 
-	 * 
-	 */
-	virtual void dumpTableInDocument() = 0;
+signals:
+	void newObjectInserted();
+	void showObjsRequest(EnumIodeType other_type, const QStringList& objNames);
 
 public:
 	IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr);
@@ -75,7 +66,16 @@ public:
 
 	virtual void setup() {}
 
-	virtual void update() {}
+	virtual void update()
+	{
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
+		table_model->reset();
+	}
+
+	void setFilterLineEdit(QLineEdit* filterLineEdit)
+	{
+		this->filterLineEdit = filterLineEdit;
+	}
 
 	int preferredHeight()
 	{
@@ -110,72 +110,35 @@ public:
 		}
 	}
 
-signals:
-	void newObjectInserted();
-	void showObjsRequest(EnumIodeType other_type, const QStringList& objNames);
-
-protected slots:
-	void renderForPrinting() 
+	QStringList getSelectedObjectsNames() const
 	{
-		document.print(&printer);
+		QStringList names;
+		QModelIndexList selection = this->selectionModel()->selectedRows();
+		if(selection.size() == 0) 
+			return names;
+
+		QAbstractItemModel* model_obj = this->model();
+		foreach(const QModelIndex& index, selection) 
+			names << model_obj->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
+		return names;
 	}
 
-public slots:
-	void removeObjects();
-	void openEditorName(int section);
-	virtual void editName();
-	void closeNameEditor()
-	{
-		objectNameEdit->setHidden(true);
-		objectNameEdit->setText("");
-	}
-
-	void filter() 
-	{ 
-		filter_and_update(); 
-	}
-
-	virtual void print();
-
-	/**
-	 * @brief shows scalars or variables listed in the clec structure or 
-	 *        the object of the same name.
-	 * 
-	 * @param iode_type 
-	 */
-	virtual void showSameObjOrObjsFromClec(const EnumIodeType iode_type) = 0;
-
-	/**
-	 * @brief shows all related objects.
-	 * 
-	 * @param iode_type 
-	 */
-	virtual void showRelatedObjs(const EnumIodeType iode_type) = 0;
-};
-
-
-/* NOTE FOR THE DEVELOPERS:
- * Template classes not supported by Q_OBJECT (and then Signals and Slots)
- */
-
-
-template <class M> class IodeTemplateTableView : public IodeAbstractTableView
-{
 protected:
-	void filter_and_update() override
-	{
-		QString pattern = filterLineEdit->text().trimmed();
-		M* table_model = static_cast<M*>(model());
-		table_model->filter(pattern);
-		update();
-	}
+	void keyPressEvent(QKeyEvent* event);
 
-	void dumpTableInDocument() override
+	/**
+	 * @brief Dump displayed table into the document.
+	 * 
+	 * @note see https://forum.qt.io/post/460045 
+	 *       and https://gis.stackexchange.com/q/385616 
+	 * 
+	 */
+	void dumpTableInDocument()
 	{
 		document.clear();
 		const int max_nb_columns = 10;
 
-		M* table_model = static_cast<M*>(model());
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
 		int nb_rows = table_model->rowCount();
 		int nb_cols_total = table_model->columnCount();
 
@@ -239,7 +202,7 @@ protected:
 				for(int col=0; col < nb_cols; col++)
 				{
 					data_col = (i_table * max_nb_columns) + col;
-					text = table_model->dataCell(row, data_col).toString();
+					text = table_model->data(table_model->index(row, data_col), Qt::DisplayRole).toString();
 					cell = table->cellAt(row + 1, col + 1);
 					cursor = cell.firstCursorPosition();
 					cursor.insertText(text);
@@ -251,37 +214,38 @@ protected:
 		}
 	}
 
-public:
-	IodeTemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) 
-		: IodeAbstractTableView(iodeType, delegate, parent) 
+protected slots:
+	void renderForPrinting() 
 	{
-		setItemDelegate(delegate);
+		document.print(&printer);
 	}
 
-	void setFilterLineEdit(QLineEdit* filterLineEdit)
+public slots:
+	void removeObjects();
+	void openEditorName(int section);
+	virtual void editName();
+	void closeNameEditor()
 	{
-		this->filterLineEdit = filterLineEdit;
+		objectNameEdit->setHidden(true);
+		objectNameEdit->setText("");
 	}
 
-	void update() override
-	{
-		M* table_model = static_cast<M*>(model());
-		table_model->reset();
+	void filter() 
+	{ 
+		QString pattern = filterLineEdit->text().trimmed();
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
+		table_model->filter(pattern);
+		update();
 	}
 
-	QStringList getSelectedObjectsNames() const
-	{
-		QStringList names;
-		QModelIndexList selection = this->selectionModel()->selectedRows();
-		if(selection.size() == 0) 
-			return names;
+	virtual void print();
 
-		QAbstractItemModel* model_obj = this->model();
-		foreach(const QModelIndex& index, selection) 
-			names << model_obj->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
-		return names;
-	}
-
+	/**
+	 * @brief shows scalars or variables listed in the clec structure or 
+	 *        the object of the same name.
+	 * 
+	 * @param iode_type 
+	 */
 	void showSameObjOrObjsFromClec(const EnumIodeType other_type)
 	{
 		// get the selected object
@@ -291,7 +255,7 @@ public:
 		QModelIndex index = selection[0];
 
 		// get name of the selected object
-		M* table_model = static_cast<M*>(model());		
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());		
 		QString name = table_model->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
 
 		// get the list of other objects og type other_type of the same name or present in the CLEC structure
@@ -300,6 +264,11 @@ public:
 		emit showObjsRequest(other_type, list);
 	}
 
+	/**
+	 * @brief shows all related objects.
+	 * 
+	 * @param iode_type 
+	 */
 	void showRelatedObjs(const EnumIodeType other_type)
 	{
 		// get the selected object
@@ -309,7 +278,7 @@ public:
 		QModelIndex index = selection[0];
 
 		// get name of the selected object
-		M* table_model = static_cast<M*>(model());		
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());		
 		QString name = table_model->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
 
 		// get the list of all related other objects of type other_type
@@ -317,4 +286,17 @@ public:
 
 		emit showObjsRequest(other_type, list);
 	}
+};
+
+
+/* NOTE FOR THE DEVELOPERS:
+ * Template classes not supported by Q_OBJECT (and then Signals and Slots)
+ */
+
+
+template <class M> class IodeTemplateTableView : public IodeAbstractTableView
+{
+public:
+	IodeTemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) 
+		: IodeAbstractTableView(iodeType, delegate, parent) {}
 };

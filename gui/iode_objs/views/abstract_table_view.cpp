@@ -24,6 +24,9 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     // stylesheet
     setStyleSheet(stylesheet);
 
+    // delegate
+	setItemDelegate(delegate);
+
     // ---- Selection ----
     // See: - https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-in-item-views
     //      - https://doc.qt.io/qt-5/model-view-programming.html#selections

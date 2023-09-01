@@ -6,7 +6,7 @@ void TablesView::new_obj()
 	AddTableDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
-	filter_and_update();
+	filter();
 }
 
 void TablesView::edit_obj()
