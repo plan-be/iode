@@ -6,7 +6,7 @@ void EquationsView::new_obj()
 	EditEquationDialog dialog("", this);
 	if(dialog.exec() == QDialog::Accepted)
 		emit newObjectInserted();
-	filter_and_update();
+	filter();
 }
 
 void EquationsView::edit_obj() 
