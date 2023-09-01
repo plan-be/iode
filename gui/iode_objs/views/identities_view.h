@@ -10,7 +10,7 @@
 #include "iode_objs/new/add_identity.h"
 
 
-class IdentitiesView : public IodeTemplateTableView<IdentitiesModel>
+class IdentitiesView : public IodeAbstractTableView
 {
 	Q_OBJECT
 
@@ -18,7 +18,7 @@ class IdentitiesView : public IodeTemplateTableView<IdentitiesModel>
 	QShortcut* shortcutExecuteIdts;
 
 public:
-	IdentitiesView(QWidget* parent = nullptr) : IodeTemplateTableView(I_IDENTITIES, new IdentitiesDelegate(parent), parent) 
+	IdentitiesView(QWidget* parent = nullptr) : IodeAbstractTableView(I_IDENTITIES, new IdentitiesDelegate(parent), parent) 
 	{
 		// ---- keyboard shortcuts ----
 		shortcutExecuteCurrentIdt = new QShortcut(QKeySequence(Qt::Key_F7), this);

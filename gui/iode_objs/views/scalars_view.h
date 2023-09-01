@@ -10,7 +10,7 @@
 #endif
 
 
-class ScalarsView : public TemplateNumericalTableView<ScalarsModel>
+class ScalarsView : public TemplateNumericalTableView
 {
 	Q_OBJECT
 

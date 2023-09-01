@@ -287,16 +287,3 @@ public slots:
 		emit showObjsRequest(other_type, list);
 	}
 };
-
-
-/* NOTE FOR THE DEVELOPERS:
- * Template classes not supported by Q_OBJECT (and then Signals and Slots)
- */
-
-
-template <class M> class IodeTemplateTableView : public IodeAbstractTableView
-{
-public:
-	IodeTemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr) 
-		: IodeAbstractTableView(iodeType, delegate, parent) {}
-};

@@ -16,7 +16,7 @@
 #endif
 
 
-class VariablesView : public TemplateNumericalTableView<VariablesModel>
+class VariablesView : public TemplateNumericalTableView
 {
 	Q_OBJECT
 

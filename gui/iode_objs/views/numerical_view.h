@@ -8,7 +8,7 @@
  *    is a subclass of QObject. Also, be sure that only the first inherited class is a QObject.
  *    https://doc.qt.io/qt-6/moc.html#multiple-inheritance-requires-qobject-to-be-first
  *    --> That's why we to play with preprocessor directives to inherit from either 
- *        QTableView or IodeTemplateTableView.
+ *        QTableView or IodeAbstractTableView.
  * 
  * 3. Do NOT forget to add safeguards when including the present hearder!
  */
@@ -39,7 +39,7 @@ class _NUMERICAL_VIEW_CLASS_NAME_ : public QTableView
 
 #define _NUMERICAL_VIEW_CLASS_NAME_ TemplateNumericalTableView
 
-template <class M> class _NUMERICAL_VIEW_CLASS_NAME_ : public IodeTemplateTableView<M>
+class _NUMERICAL_VIEW_CLASS_NAME_ : public IodeAbstractTableView
 #endif
 {
     QShortcut* shortcutCopy;
@@ -89,7 +89,7 @@ public:
     _NUMERICAL_VIEW_CLASS_NAME_(QWidget* parent = nullptr): QTableView(parent)
 #else
     _NUMERICAL_VIEW_CLASS_NAME_(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr):
-        IodeTemplateTableView<M>(iodeType, delegate, parent) 
+        IodeAbstractTableView(iodeType, delegate, parent) 
 #endif
     {
         shortcutCopy = new QShortcut(QKeySequence::Copy, this);
