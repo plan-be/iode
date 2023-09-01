@@ -2,49 +2,109 @@
 
 
 GSampleGraph::GSampleGraph(const std::string& ref_table_name, const std::string& gsample) :
-    GSampleTable(ref_table_name, gsample)
+    GSampleTable(ref_table_name, gsample), nb_decimals(8)
 {
 }
 
-std::string GSampleGraph::get_series_name(const int row)
+std::vector<Period> GSampleGraph::get_series_periods()
 {
-    return ref_table->getCellContent(row, 0, false);
+    std::vector<Period> x;
+    x.reserve(get_nb_periods());
+
+    Period start = sample->start_period();
+    x.push_back(start);
+    
+    for(int i=1; i < get_nb_periods(); i++)
+        x.push_back(start.shift(i));
+
+    return x;
 }
 
-double GSampleGraph::get_series_value(const int row, const int column)
+/**
+ * @brief Get the name of the corresponding series 
+ * 
+ * @param row 
+ * @param fileop 
+ * @return std::string 
+ * 
+ * @note see function APIGraphLineTitle() (k_graph.c)
+ */
+std::string GSampleGraph::get_series_name(const int row, const int fileop)
 {
-    return 0.0;
+    std::string name = line_names[row];
+    if(files_ops.size() > 1 || files_ops[fileop].cl_opf != COL_NOP)
+        name += " " + std::string(COL_ctoa(&files_ops[fileop], 'f', 0, 2));
+    return name;
 }
 
-std::vector<double> GSampleGraph::get_series_values(const int row)
+// TODO JMP : please check that the comment below and the method implementation are correct.
+/**
+ * @note 
+ * Given a GSample table defined by 
+ * - M lines,
+ * - N observations (nb periods of the sample)
+ * - 2 combinations file_1 (op) file_2      -> fop0 and fop1
+ * - 2 combinations period_1 (op) period_2  -> pop0 and pop1 
+ * the computed GSample table is structured as follow:
+ * 
+ *          |           obs0             |  ...  |           obsN             |
+ *          |    pop 0    |     pop1     |  ...  |    pop 0    |     pop1     |
+ *          | fop0 | fop1 | fop 0 | fop1 |  ...  | fop0 | fop1 | fop 0 | fop1 |
+ * ---------------------------------------------------------------------------|
+ * line 0   |      |      |       |      |  ...  |      |      |       |      |
+ * line ... |      |      |       |      |  ...  |      |      |       |      |
+ * line M   |      |      |       |      |  ...  |      |      |       |      |
+ * 
+ * See function T_GraphLine() (k_graph.c)
+ */
+std::vector<double> GSampleGraph::get_series_values(const int row, const int fileop)
 {
-    std::vector<double> values;
-    return values;
-}
+    int nb_periods = get_nb_periods();
+    int nb_files_ops = get_nb_files_ops();
 
-std::map<std::string, std::vector<double>> GSampleGraph::extract_series()
-{
-    std::map<std::string, std::vector<double>> series;
-    /*
-    COL_clear(columns);
-    int row = v_table_values_pos[line_pos];
+    std::vector<double> y(nb_periods, L_NAN);
 
-    if(COL_exec(ref_table.c_table, row, columns) < 0)
-        thow IodeExceptionFunction("Cannot get value of generalized table for line " + )
-
-    for(k = 0 ; k < fcls->cl_nb ; k++) {
-        T_GraphLineTitle(line, fcls, k);
-
-        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = L_NAN;
-        for(j = 1; j < cls->cl_nb; j += 2) {
-            cl = cls->cl_cols + j;
-            if(T_find_opf(fcls, cl) != k) continue;
-            dt = PER_diff_per(cl->cl_per, &(smpl->s_p1));
-            y[dt] = cl->cl_res;
+    COL column;
+    int pos;
+    int period_pos;
+    int col_val = 0;
+    int step = ref_table->nbColumns();          // to skip first column of the reference table containing text 
+    for(int col=1; col < columns->cl_nb; col+=step)
+    {
+        column = columns->cl_cols[col];
+        pos = find_file_op(column);
+        if(pos == fileop)
+        {
+            period_pos = Period(&column.cl_per[0]).difference(sample->start_period());
+            y[period_pos] = get_value(row, col_val, nb_decimals);
         }
-
-        T_GraphTimeData(smpl, y);
+        col_val++;
     }
-    */
-   return series;
+
+    return y;
+}
+
+std::map<std::string, std::vector<double>> GSampleGraph::get_series(const int fileop)
+{
+    if(fileop < 0 || fileop >= files_ops.size())
+    {
+        std::string msg = "Out of range value for the argument 'fileop':\n";
+        msg += "Valid range of possible is [0, " + std::to_string(files_ops.size() - 1) + "].\n";
+        msg += "Got value " + std::to_string(fileop) + ".";
+        throw IodeExceptionFunction(msg);
+    }
+
+    std::string name;
+    std::map<std::string, std::vector<double>> series;
+
+    // recompute all values (in case Variables values have changed)
+    compute_values();
+
+    // prepare series
+    for(int row = 0; row < get_nb_lines(); row++)
+    {
+        name = get_series_name(row, fileop);
+        series[name] = get_series_values(row, fileop);
+    }
+    return series;
 }
