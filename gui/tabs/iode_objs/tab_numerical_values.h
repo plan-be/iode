@@ -18,8 +18,8 @@
 #include <QSpinBox>
 #include <QShortcut>
 #include <QSpacerItem>
-#include <QGridLayout>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QHeaderView>
 
 #ifdef _GSAMPLE_
@@ -60,8 +60,7 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public Templat
 #endif
 {
 #ifdef _GSAMPLE_
-    int row;
-    QGridLayout* gridLayout;
+    QVBoxLayout* vLayout;
 
     GSampleNumericalTableView* tableview;
     GSampleTableModel* objmodel;
@@ -97,13 +96,11 @@ public:
 #endif
     {
 #ifdef _GSAMPLE_
-        row = 0;
-
         this->setGeometry(QRect(10, 50, 700, 250));
 
-        gridLayout = new QGridLayout(this);
-        gridLayout->setContentsMargins(0, 0, 0, 0);
-        gridLayout->setObjectName("gridLayoutGSampleTable");
+        vLayout = new QVBoxLayout(this);
+        vLayout->setContentsMargins(0, 0, 0, 0);
+        vLayout->setObjectName("vTabLayout");
 
         tableview = new GSampleNumericalTableView(this);
         objmodel = new GSampleTableModel(refTable, gsample, nbDecimals, variables, tableview);
@@ -114,16 +111,8 @@ public:
         tableview->setStyleSheet(stylesheet);
 
         // -1 -> span over all rows/columns
-        gridLayout->addWidget(tableview, row, 0, 1, -1);
-        row++;
+        vLayout->addWidget(tableview);
 #endif
-        /* NOTE FOR THE DEVELOPPERS:
-         * I tried to simply add the widgets below to the current grid layout 
-         * but the widgets were misaligned in the tabs (but not when instanciating  
-         * a GSampleNumericalDialog box dialog). 
-         * I don't know why.
-         * But using an horizontal layout solved the problem.
-         */
         bottomLayout = new QHBoxLayout(this);
         bottomLayout->setObjectName(QString::fromUtf8("bottom_layout"));
 
@@ -157,9 +146,9 @@ public:
 
 #ifdef _GSAMPLE_
         addHorizontalSpacer();
-        gridLayout->addLayout(bottomLayout, row, 0);
+        vLayout->addLayout(bottomLayout);
 #else
-        this->gridLayout->addLayout(bottomLayout, this->row, 0);
+        this->vLayout->addLayout(bottomLayout);
 #endif
 
         // shortcuts
@@ -203,7 +192,7 @@ public:
     {
         QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
         // -1 -> span over all rows/columns
-        bottomLayout->addItem(horizontalSpacer);
+        bottomLayout->addSpacerItem(horizontalSpacer);
     }
 
     void updateNbDigits(const int value)
