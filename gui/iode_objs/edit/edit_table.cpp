@@ -71,9 +71,9 @@ void EditTableDialog::plot()
         Sample smpl = kdb_var.get_sample();
         QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
  
-        GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample.toStdString());
+        GSampleGraph* gSampleGraph = new GSampleGraph(tableName.toStdString(), gsample.toStdString());
 
-        PlotTableDialog* plotDialog = new PlotTableDialog(gSampleTable);
+        PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
         plotDialog->plot();
         emit newPlot(plotDialog);
 	}

@@ -1,25 +1,19 @@
 #include "plot_table.h"
 
 
-PlotTableDialog::PlotTableDialog(const GSampleTable* table, EnumIodeGraphChart chartType, const bool logScale, 
+PlotTableDialog::PlotTableDialog(GSampleGraph* gsample_graph, EnumIodeGraphChart chartType, const bool logScale, 
     EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, QWidget* parent)
-    : PlotDialog(chartType, logScale, xTicks, yTicks, parent), table(table)
+    : PlotDialog(chartType, logScale, xTicks, yTicks, parent), gsample_graph(gsample_graph)
 {
-    QString key;
-
-    Sample* sample = table->get_sample();
+    Sample* sample = gsample_graph->get_sample();
     setPeriods(*sample);
 
-    for(int row = 0; row < table->get_nb_lines(); row++)
+    QString name;
+    for(const auto& [key, y] : gsample_graph->get_series())
     {
-        key = "line_" + QString::number(row);
-
-        legend_series[key] = QString::fromStdString(table->get_line_name(row));
-
-        QVector<double> values;
-        for(int col = 0; col < table->get_nb_columns(); col++)
-            values.append(table->get_value(row, col, 8));
-        chart_series[key] = values;
+        name = QString::fromStdString(key);
+        legend_series[name] = name;
+        chart_series[name] = QVector<double>(y.begin(), y.end());
     }
 }
 

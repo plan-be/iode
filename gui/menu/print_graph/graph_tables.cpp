@@ -72,8 +72,8 @@ void MenuGraphTables::display()
         MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
         foreach(const QString& tableName, qTablesList)
         {
-            GSampleTable* gSampleTable = new GSampleTable(tableName.toStdString(), gsample);
-            PlotTableDialog* plotDialog = new PlotTableDialog(gSampleTable);
+            GSampleGraph* gSampleGraph = new GSampleGraph(tableName.toStdString(), gsample);
+            PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
             main_window->appendPlot(plotDialog);
         }
     }
