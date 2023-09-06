@@ -9,11 +9,20 @@ PlotTableDialog::PlotTableDialog(GSampleGraph* gsample_graph, EnumIodeGraphChart
     setPeriods(*sample);
 
     QString name;
-    for(const auto& [key, y] : gsample_graph->get_series())
+    QColor color;
+    for(int fileop = 0; fileop < gsample_graph->get_nb_files_ops(); fileop++)
     {
-        name = QString::fromStdString(key);
-        legend_series[name] = name;
-        chart_series[name] = QVector<double>(y.begin(), y.end());
+        Qt::PenStyle lineStyle = LINE_STYLES[fileop % LINE_STYLES.size()];
+
+        int i = 0;
+        for(const auto& [key, y] : gsample_graph->get_series(fileop))
+        {
+            name = QString::fromStdString(key);
+            QVector<double> y_(y.begin(), y.end());
+            color = LINE_COLORS[i % LINE_COLORS.size()];
+            chart_series.append(PlotSeries(name, y_, color, lineStyle));
+            i++;
+        }
     }
 }
 

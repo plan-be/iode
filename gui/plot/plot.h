@@ -24,6 +24,31 @@
 
 constexpr int MAX_NB_XTICKS = 8;
 constexpr int MINOR_YTICKS_COUNT = 2;
+// list of predefined colors
+// see https://doc.qt.io/qt-6/qcolorconstants.html 
+const static QVector<QColor> LINE_COLORS = 
+    {QColorConstants::Svg::black, QColorConstants::Svg::orange, 
+     QColorConstants::Svg::royalblue, QColorConstants::Svg::green, 
+     QColorConstants::Svg::sienna, QColorConstants::Svg::purple};
+// list of QPen for the lines style
+// see https://doc.qt.io/qt-6/qcolorconstants.html 
+const static QVector<Qt::PenStyle> LINE_STYLES = 
+    {Qt::SolidLine, Qt::DashLine, Qt::DotLine, Qt::DashDotLine, 
+     Qt::DashDotDotLine };
+
+
+struct PlotSeries
+{
+    QString name;
+    QVector<double> y;
+    QColor color;
+    Qt::PenStyle lineStyle;
+
+    PlotSeries(const QString& name, const QVector<double>& y, const QColor& color, 
+        Qt::PenStyle lineStyle = Qt::SolidLine): name(name), y(y), color(color), lineStyle(lineStyle)
+    {}
+};
+
 
 /**
  * @brief Shortcuts:
@@ -75,8 +100,7 @@ class PlotDialog: public QDialog
 protected:
     QGridLayout* layout;
 
-    QMap<QString, QVector<double>> chart_series;
-    QMap<QString, QString> legend_series;
+    QVector<PlotSeries> chart_series;
     
     int start_t;
     int end_t;
