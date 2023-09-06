@@ -27,13 +27,17 @@ PlotVariablesDialog::~PlotVariablesDialog()
 void PlotVariablesDialog::addSeries(const QString& variable, const QString& legend_name)
 {
     std::string var_name = variable.toStdString();
+    QString series_name = (legend_name.isEmpty()) ? variable : legend_name;
 
-    QVector<double> values;
+    QVector<double> y;
     for(int t = start_t; t <= end_t; t++)
-        values.append(kdb_vars->get_var(var_name, t, varMode));
-    chart_series[variable] = values;
+        y.append(kdb_vars->get_var(var_name, t, varMode));
 
-    legend_series[variable] = (legend_name.isEmpty()) ? variable : legend_name;
+    int series_pos = chart_series.size();
+    QColor color = LINE_COLORS[series_pos % LINE_COLORS.size()];
+    Qt::PenStyle style = LINE_STYLES[series_pos / LINE_COLORS.size()];
+
+    chart_series.append(PlotSeries(series_name, y, color, style));
 }
 
 void PlotVariablesDialog::updateVarMode(int index)
@@ -43,14 +47,12 @@ void PlotVariablesDialog::updateVarMode(int index)
     
     varMode = (EnumIodeVarMode) index;
 
-    QMap<QString, QVector<double>>::iterator it = chart_series.begin();
-    while (it != chart_series.end())
+    for(PlotSeries& series: chart_series)
     {
-        std::string var_name = it.key().toStdString();
-        int i=0;
+        std::string var_name = series.name.toStdString();
+
         for(int t = start_t; t <= end_t; t++)
-            it.value()[i++] = kdb_vars->get_var(var_name, t, varMode);
-        ++it;
+            series.y[t - start_t] = kdb_vars->get_var(var_name, t, varMode);
     }
 
     buildSeries();

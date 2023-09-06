@@ -22,8 +22,13 @@ public:
 protected:
     QString defaultTitle()
     {
-        QString s_varMode = QString::fromStdString(v_var_modes[varMode]);
-        return chart_series.keys().join(" - ") + " (" + s_varMode + ")";
+        QString title = chart_series[0].name;
+
+        for(int i = 1; i < chart_series.size(); i++)
+            title += " - " + chart_series[i].name;
+        
+        title += " (" + QString::fromStdString(v_var_modes[varMode]) + ")";
+        return title;
     }
 
 public slots:

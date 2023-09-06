@@ -404,7 +404,6 @@ void PlotDialog::buildSeries()
     QList<QAbstractSeries*> list_series;
     double minValue;
     double maxValue;
-    QString legend;
     QAbstractAxis* Xaxis;
 
     chart->removeAllSeries();
@@ -412,63 +411,62 @@ void PlotDialog::buildSeries()
 
     try
     {
-        QMap<QString, QVector<double>>::const_iterator it = chart_series.constBegin();
-
         // prepare series
         double XValue;
         switch (chartType)
         {
         case EnumIodeGraphChart::I_G_CHART_LINE :
-            while (it != chart_series.constEnd())
+            for(PlotSeries& series: chart_series)
             {
-                QLineSeries* series = new QLineSeries();
-                legend = legend_series[it.key()];
-                series->setName(legend);
+                QLineSeries* line_series = new QLineSeries();
+                line_series->setName(series.name);
                 XValue = minX;
-                foreach(const double value, it.value())
+                foreach(const double value, series.y)
                 {
                     if(L_ISAN(value))
                     {
-                        series->append(XValue, value);
+                        line_series->append(XValue, value);
                         values << value;
                     }
                     XValue += stepX;
                 }
-                chart->addSeries(series);
-                list_series << series;
-                ++it;
+                QPen pen(series.color);
+                pen.setStyle(series.lineStyle);
+                line_series->setPen(pen);
+
+                chart->addSeries(line_series);
+                list_series << line_series;
             }
             Xaxis = createXAxis();
             break;
         case EnumIodeGraphChart::I_G_CHART_SCATTER :
-            while (it != chart_series.constEnd())
+            for(PlotSeries& series: chart_series)
             {
-                QScatterSeries* series = new QScatterSeries();
-                legend = legend_series[it.key()];
-                series->setName(legend);
+                QScatterSeries* scatter_series = new QScatterSeries();
+                scatter_series->setName(series.name);
                 XValue = minX;
-                foreach(const double value, it.value())
+                foreach(const double value, series.y)
                 {
                     if(L_ISAN(value))
                     {
-                        series->append(XValue, value);
+                        scatter_series->append(XValue, value);
                         values << value;
                     }
                     XValue += stepX;
                 }
-                chart->addSeries(series);
-                list_series << series;
-                ++it;
+                scatter_series->setColor(series.color);
+
+                chart->addSeries(scatter_series);
+                list_series << scatter_series;
             }
             Xaxis = createXAxis();
             break;
         case EnumIodeGraphChart::I_G_CHART_BAR :
-            QBarSeries* series = new QBarSeries();
-            while (it != chart_series.constEnd())
+            QBarSeries* bar_series = new QBarSeries();
+            for(PlotSeries& series: chart_series)
             {
-                legend = legend_series[it.key()];                
-                QBarSet *set = new QBarSet(legend);
-                foreach(const double value, it.value())
+                QBarSet *set = new QBarSet(series.name);
+                foreach(const double value, series.y)
                 { 
                     if(!L_ISAN(value)) 
                         values << 0.0;
@@ -476,11 +474,11 @@ void PlotDialog::buildSeries()
                         values << value;
                     set->append(value);
                 }
-                series->append(set);
-                ++it;
+                set->setColor(series.color);
+                bar_series->append(set);
             }
-            chart->addSeries(series);
-            list_series << series;
+            chart->addSeries(bar_series);
+            list_series << bar_series;
             Xaxis = createXBarAxis();
             break;
         }
