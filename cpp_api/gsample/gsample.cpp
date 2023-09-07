@@ -100,6 +100,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
                 {
                     column_name = std::string(COL_text(&columns->cl_cols[col], c_content, nb_files));
                     column_names.push_back(column_name); 
+                    v_pos_in_columns_struct.push_back(col);
                 }
                 break;
             }
@@ -122,6 +123,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         if(ref_table->getLineType(row) == EnumLineType::IT_CELL && ref_table->getCellType(row, 1) == EnumCellType::IT_LEC)
         {
             line_names.push_back(ref_table->getCellContent(row, 0, false));
+            v_line_pos_in_ref_table.push_back(row);
 
             std::vector<double> row_values(column_names.size(), L_NAN);
             values.push_back(row_values);
@@ -159,33 +161,29 @@ int GSampleTable::find_file_op(const COL& col)
 
 void GSampleTable::compute_values()
 {
-    // For each table line, compute and store all values
+    // For each ref_table line containing a LEC cell, compute and store all values using 
+    // the generalized sample
     int res;
-    int row_val = 0;
-    for(int row=0; row < (int) ref_table->nbLines(); row++)
+    int line;
+    int pos;
+    for(int row = 0; row < v_line_pos_in_ref_table.size(); row++)
     {
-        if(ref_table->getLineType(row) == EnumLineType::IT_CELL && ref_table->getCellType(row, 1) == EnumCellType::IT_LEC)
-        {   
-            // resets the values in the COLS
-            COL_clear(columns);
-            
-            // Calculates the values of all LEC formulas in ONE table line for all columns 
-            // of a GSAMPLE (precompiled into a COLS structure). 
-            // Stores each column calculated values in cls[i]->cl_res.
-            res = COL_exec(ref_table->c_table, row, columns);
-            if(res < 0) throw IodeExceptionInitialization("GSampleOutput", "Cannot compute value corresponding to row " + 
-                std::to_string(row) + " of table " + ref_table_name);
-            
-            // store all values
-            int col_val = 0;
-            int step = ref_table->nbColumns();          // to skip first column of the reference table containing text 
-            for(int col=1; col < columns->cl_nb; col+=step)
-            {
-                values[row_val][col_val] = columns->cl_cols[col].cl_res;
-                col_val++;
-            }
-
-            row_val++;
+        // resets the values in the COLS
+        COL_clear(columns);
+        
+        // Calculates the values of all LEC formulas in ONE table line for all columns 
+        // of a GSAMPLE (precompiled into a COLS structure). 
+        // Stores each column calculated values in cls[i]->cl_res.
+        line = v_line_pos_in_ref_table[row];
+        res = COL_exec(ref_table->c_table, line, columns);
+        if(res < 0) throw IodeExceptionInitialization("GSampleOutput", "Cannot compute value corresponding to row " + 
+            std::to_string(line) + " of table " + ref_table_name);
+        
+        // store all values
+        for(int col = 0; col < v_pos_in_columns_struct.size(); col++)
+        {
+            pos = v_pos_in_columns_struct[col];
+            values[row][col] = columns->cl_cols[pos].cl_res;
         }
     }
 }

@@ -6,6 +6,7 @@
 #include "time/sample.h"
 #include "objects/table.h"
 
+
 // NOTE: the class below aims to add C++ taste to the C version of gsample
 //       see c_calc.c and c_cc.c from the C API
 
@@ -47,8 +48,10 @@ protected:
     COLS*        columns;
     std::vector<COL>         files_ops;
     std::vector<std::string> files;
-    std::vector<std::string> column_names;
     std::vector<std::string> line_names;
+    std::vector<std::string> column_names;
+    std::vector<int>         v_line_pos_in_ref_table;
+    std::vector<int>         v_pos_in_columns_struct;
     // TODO ALD: consider Boost array or Eigen 3 matrix
     std::vector<std::vector<double>> values;
 
