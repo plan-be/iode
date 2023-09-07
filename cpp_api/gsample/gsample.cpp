@@ -187,3 +187,126 @@ void GSampleTable::compute_values()
         }
     }
 }
+
+bool GSampleTable::is_editable(const int line, const int col)
+{
+    // RULE 1: A cell cannot be updated if the corresponding column (COL object)
+    //         - contains on operation on periods or files
+    //         - does not refer to the current workspace
+    int col_pos = v_pos_in_columns_struct[col];
+    COL column = columns->cl_cols[col_pos];
+    if(column.cl_opy != COL_NOP || column.cl_opf != COL_NOP) 
+        return false;
+    if(column.cl_fnb[0] != 1) 
+        return false;
+
+    // RULE 2: A cell cannot be updated if the corresponding LEC expression from the 
+    //         reference table starts with 0+
+    int line_ref = v_line_pos_in_ref_table.at(line);
+    std::string lec = ref_table->getCellContent(line_ref, 1, false);
+    if(lec.substr(0, 2) == "0+")
+        return false;
+
+    // RULE 3: A cell cannot be updated if the corresponding LEC expression from the 
+    //         reference table does not refer to at least one variable
+    std::vector<std::string> variables = ref_table->getVariablesFromLecCell(line_ref, 1);
+    if(variables.size() == 0)
+        return false;
+
+    return true;
+}
+
+// TODO : use a KDBVariable object instead of K_find and KV_set.
+//        For the moment, there is a memory problem when the function ends and
+//        thus when the KDBVariable object is destroyed. 
+//        -> problem linked to the compiler option /Zp1
+bool GSampleTable::propagate_new_value(const std::string& lec, const std::string& div_lec, 
+        const std::string& var_name, const double value, const int period_pos)
+{
+    double res;
+
+    std::string formula = lec + " := " + std::format("{:20.8f}", value) + " * " + div_lec;
+    CLEC* clec = L_solve(to_char_array(formula), to_char_array(var_name));
+
+    int var_pos = K_find(KV_WS, to_char_array(var_name));
+    
+    // if the formula is not inversible regarding to the variable var_name, 
+    // the Newton-Raphson method is used
+    if(clec == NULL || clec->dupendo)
+    {
+        if(clec != NULL && clec->dupendo) 
+            SW_nfree(clec);
+        
+        formula = lec + " := " + std::format("{:.15f}", value) + " * " + div_lec;
+        clec = L_cc(to_char_array(formula));
+        if(clec == NULL)
+            return false;
+
+        L_link(KV_WS, KS_WS, clec);
+        // Newton-Raphson method
+        res = L_zero(KV_WS, KS_WS, clec, period_pos, var_pos, var_pos);
+    }
+    else
+    {
+        // inverse formula
+        L_link(KV_WS, KS_WS, clec);
+        res = L_exec(KV_WS, KS_WS, clec, period_pos);
+    }
+
+    SW_nfree(clec);
+
+    if(!L_ISAN(res))
+        return false;
+
+    // update the variable var_name in the database
+    KV_set(KV_WS, var_pos, period_pos, 0, res);
+
+    return true;
+}
+
+// TODO : use a KDBVariable object instead of KSMPL(KV_WS).
+//        For the moment, there is a memory problem when the function ends and
+//        thus when the KDBVariable object is destroyed. 
+//        -> problem linked to the compiler option /Zp1
+void GSampleTable::set_value(const int line, const int col, const double value, bool check_if_editable)
+{
+    // Reject NaN value
+    if(!L_ISAN(value))
+        throw IodeException("A NaN value is not accepted to edit a cell of a computed table");
+
+    if(check_if_editable)
+        if(!is_editable(line, col))
+            throw IodeException("The cell corresponding to the line\n" + line_names[line] + "\n" +
+                                "and column\n" + column_names[col] + "\ncannot be edited");
+
+    int line_ref = v_line_pos_in_ref_table.at(line);
+    int col_pos = v_pos_in_columns_struct[col];
+
+    // RULE 4: Only the first variable found in the LEC expression is updated
+    // see https://iode.plan.be/doku.php?id=edit_tables for the rules
+    std::string var_to_update = ref_table->getVariablesFromLecCell(line_ref, 1).at(0);
+
+    // get period position 
+    COL column = columns->cl_cols[col_pos];
+    Sample var_sample(KSMPL(KV_WS));
+    int period_pos = Period(&column.cl_per[0]).difference(var_sample.start_period());
+
+    // get lec
+    std::string lec = ref_table->getCellContent(line_ref, 1, false);
+
+    // get divider
+    std::string div_lec = ref_table->getDividerCellContent(1, false);
+    if(div_lec.empty())
+        div_lec = "1";
+
+    // same as VT_calc() from o_vt.c from the old GUI
+    bool success = propagate_new_value(lec, div_lec, var_to_update, value, period_pos);
+    if(!success)
+        throw IodeException("The cell corresponding to the line\n" + line_names[line] + "\n" +
+                            "and column\n" + column_names[col] + "\ncannot be edited.\n\n" + 
+                            "Cannot calculate the new value for the variable " + var_to_update + "\n" + 
+                            "LEC expression: " + lec);
+
+   // recompute all values of the GSample table
+   compute_values();
+}

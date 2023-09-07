@@ -1,10 +1,14 @@
 #pragma once
 
+// requires C++ 20
+#include <format>
+
 #include "common.h"
 #include "utils/utils.h"
 #include "utils/iode_exceptions.h"
 #include "time/sample.h"
 #include "objects/table.h"
+#include "KDB/kdb_variables.h"
 
 
 // NOTE: the class below aims to add C++ taste to the C version of gsample
@@ -69,6 +73,24 @@ protected:
      * @note equivalent of the funtion T_find_opf() (k_graph.c)
      */
     int find_file_op(const COL& col);
+
+private:
+    /**
+     * @brief 
+     * 
+     * @param lec 
+     * @param div_lec 
+     * @param var_name 
+     * @param value 
+     * @param var_pos 
+     * @param period_pos 
+     * @return true 
+     * @return false 
+     * 
+     * @note same as VT_calc() function from o_vt.c from the old GUI
+     */
+    bool propagate_new_value(const std::string& lec, const std::string& div_lec, 
+            const std::string& var_name, const double value, const int period_pos);
 
 public:
     GSampleTable(const std::string& ref_table_name, const std::string& gsample);
@@ -146,4 +168,28 @@ public:
         }
         return value;
     }
+
+    /**
+     * @brief Check if a cell is editable
+     * 
+     * @param line 
+     * @param col 
+     * @return true 
+     * @return false 
+     * 
+     * @note see https://iode.plan.be/doku.php?id=edit_tables for the rules 
+     *       and the function VT_edit() from o_vt.c from the old GUI
+     */
+    bool is_editable(const int line, const int col);
+
+    /**
+     * @brief Update the value of a given cell
+     * 
+     * @param line 
+     * @param col 
+     * @param value 
+     * 
+     * @note see the VT_edit() function from o_vt.c from the old GUI
+     */
+    void set_value(const int line, const int col, const double value, bool check_if_editable = true);
 };
