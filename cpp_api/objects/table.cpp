@@ -535,6 +535,12 @@ std::string Table::getCellContent(const int row, const int column, const bool qu
 	return content;
 }
 
+std::vector<std::string> Table::getVariablesFromLecCell(const int row, const int column)
+{
+	CLEC* clec = getCellCompiledLec(row, column);
+	return get_variables_from_clec(clec);
+}
+
 // we assume that text string is written in UTF8 format
 void Table::setCellText(const int row, const int column, const std::string& text, const bool divider)
 {
@@ -775,4 +781,29 @@ TCELL* Table::getCell(const int row, const int column, const bool divider) const
 
 	TCELL* cell = &reinterpret_cast<TCELL*>(line->tl_val)[column];
 	return cell;
+}
+
+// The table cell contains a "packed" IDT object (lec + clec) 
+// -> see T_set_lec_cell from k_tbl.c
+CLEC* Table::getCellCompiledLec(const int row, const int column)
+{
+	TCELL* cell = getCell(row, column, false);
+
+	if(cell->tc_type != IT_LEC)
+	{
+		std::string msg = "The table cell at position ";
+		msg += "(" + std::to_string(row) + ", " + std::to_string(column) + ") ";
+		msg += "does not contain a LEC expression";
+		throw IodeException(msg);
+	}
+
+	if(cell->tc_val == NULL)
+	{
+		std::string msg = "Cannot extract content of the table cell at position ";
+		msg += "(" + std::to_string(row) + ", " + std::to_string(column) + ")";
+		throw IodeException(msg);
+	}
+
+	// see VT_edit() from o_vt.c from the old GUI
+	return (CLEC*) P_get_ptr(cell->tc_val, 1);
 }

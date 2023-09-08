@@ -243,6 +243,8 @@ public:
 
 	std::string getCellContent(const int row, const int column, const bool quotes, const bool divider = false) const;
 
+	std::vector<std::string> getVariablesFromLecCell(const int row, const int column);
+
 	void setCellText(const int row, const int column, const std::string& text, const bool divider = false);
 
 	void setCellLec(const int row, const int column, const std::string& lec, const bool divider = false);
@@ -317,4 +319,5 @@ private:
 
 	TCELL* getCell(const int row, const int column, const bool divider = false) const;
 
+	CLEC* getCellCompiledLec(const int row, const int column);
 };
