@@ -136,8 +136,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_compile_options(${IODE_DEBUG_INFO_FLAG})
 endif()
 
-# some code in the C++ API requires C++ 17
-set(CMAKE_CXX_STANDARD 17)
+# some code in the C++ API requires C++ 20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- preprocessor ----
