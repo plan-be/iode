@@ -24,9 +24,9 @@ const std::map<char, std::string> mLowToHigh =
 };
 
 
-void load_global_kdb(EnumIodeType iode_type, std::string& filepath);
+void load_global_kdb(EnumIodeType iode_type, const std::string& filepath);
 
-void save_global_kdb(EnumIodeType iode_type, std::string& filepath);
+void save_global_kdb(EnumIodeType iode_type, const std::string& filepath);
 
 void clear_global_kdb(EnumIodeType iode_type);
 

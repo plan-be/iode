@@ -2,22 +2,22 @@
 #include "kdb_global.h"
 
 
-void load_global_kdb(EnumIodeType iode_type, std::string& filepath)
+void load_global_kdb(EnumIodeType iode_type, const std::string& filepath)
 {
-    filepath = check_filepath(filepath, (EnumIodeFile) iode_type, "load", true);
+    std::string filepath_ = check_filepath(filepath, (EnumIodeFile) iode_type, "load", true);
 
-    char* c_filepath = to_char_array(filepath);
+    char* c_filepath = to_char_array(filepath_);
 
     int res = B_WsLoad(c_filepath, iode_type);
     if (res != EXIT_SUCCESS)
         throw IodeExceptionFunction("Cannot load " + vIodeTypes[iode_type] + "s from file " + filepath, "Unknown");
 }
 
-void save_global_kdb(EnumIodeType iode_type, std::string& filepath)
+void save_global_kdb(EnumIodeType iode_type, const std::string& filepath)
 {
-    filepath = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
+    std::string filepath_ = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
 
-    char* c_filepath = to_char_array(filepath);
+    char* c_filepath = to_char_array(filepath_);
 
     int res = B_WsSave(c_filepath, iode_type);
     if (res != EXIT_SUCCESS)
