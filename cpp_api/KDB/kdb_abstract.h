@@ -180,11 +180,11 @@ public:
      *  
      *  @see https://iode.plan.be/doku.php?id=wsmerge
      */
-    void merge_into(std::string& input_file);
+    void merge_into(const std::string& input_file);
 
     std::vector<std::string> get_associated_objects_list(const std::string& name, const EnumIodeType other_type);
 
-    void dump(std::string& filepath);
+    void dump(const std::string& filepath);
 
     void clear();
 
