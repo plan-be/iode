@@ -221,15 +221,15 @@ void KDBAbstract::copy_into(const std::string& input_file, const std::string obj
 }
 
 // TODO JMP: please provide input values to test B_WsMerge()
-void KDBAbstract::merge_into(std::string& input_file)
+void KDBAbstract::merge_into(const std::string& input_file)
 {
     KDB* kdb = get_KDB();
     if (kdb == NULL) return;
 
-    input_file = check_filepath(input_file, (EnumIodeFile) iode_type, "merge_into", true);
+    std::string input_file_ = check_filepath(input_file, (EnumIodeFile) iode_type, "merge_into", true);
     
-    int res = K_cat(kdb, const_cast<char*>(input_file.c_str()));
-    if (res < 0) throw IodeExceptionFunction("Cannot merge content of file " + input_file + 
+    int res = K_cat(kdb, to_char_array(input_file));
+    if (res < 0) throw IodeExceptionFunction("Cannot merge content of file " + input_file_ + 
         " in the " + vIodeTypes[iode_type] + " database");
 }
 
@@ -248,14 +248,14 @@ std::vector<std::string> KDBAbstract::get_associated_objects_list(const std::str
     return objs_list;
 }
 
-void KDBAbstract::dump(std::string& filepath)
+void KDBAbstract::dump(const std::string& filepath)
 {
     if (count() == 0) return;
 
-    filepath = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
-    char* c_filepath = to_char_array(filepath);
+    std::string filepath_ = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
+    char* c_filepath = to_char_array(filepath_);
     if (strlen(c_filepath) >= sizeof(FNAME)) throw IodeExceptionFunction("Cannot save " + iode_type_name + "s",  
-        "Filepath " + filepath + " is too long");
+        "Filepath " + filepath_ + " is too long");
 
     int res = B_WsDump(get_KDB(), c_filepath);
     if (res != EXIT_SUCCESS)
