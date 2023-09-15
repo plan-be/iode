@@ -126,6 +126,15 @@ else()
   set(IODE_ALIGNEMENT_FLAG "-fpack-struct=1")
 endif()
 
+# C++20 (required for the module std format) makes the compiler MSVC 
+# much more strict by default when passing a string literal 
+# "string" value for a char* argument of a C function.
+# The option /Zc:strictStrings with the minus at the end deactivates 
+# this behavior of the MSVC compiler
+if(MSVC)
+  add_compile_options("/Zc:strictStrings-")
+endif()
+
 # global flags
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
   add_compile_options("-Wno-implicit-int")
