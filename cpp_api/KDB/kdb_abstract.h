@@ -32,7 +32,7 @@ protected:
     KDB* local_kdb;         //< either a shallow copy (K_refer()) of a subset of a global KDB or a local kdb
 
 public:
-    KDBAbstract(std::string& filepath);
+    KDBAbstract(const std::string& filepath);
 
     KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern);
 

@@ -33,7 +33,7 @@ protected:
     Variable get_unchecked(const int pos) const override;
 
 public:
-    KDBVariables(std::string& filepath) : KDBTemplate(filepath) {}
+    KDBVariables(const std::string& filepath) : KDBTemplate(filepath) {}
 
     KDBVariables(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_VARIABLES, pattern) {};

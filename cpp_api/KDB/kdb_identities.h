@@ -15,7 +15,7 @@ protected:
     Identity get_unchecked(const int pos) const override;
 
 public:
-    KDBIdentities(std::string& filepath) : KDBTemplate(filepath) {}
+    KDBIdentities(const std::string& filepath) : KDBTemplate(filepath) {}
 
     KDBIdentities(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_IDENTITIES, pattern) {};

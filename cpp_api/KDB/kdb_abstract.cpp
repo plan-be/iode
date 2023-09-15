@@ -2,7 +2,7 @@
 #include "kdb_abstract.h"
 
 
-KDBAbstract::KDBAbstract(std::string& filepath) : kdb_type(KDB_GLOBAL)
+KDBAbstract::KDBAbstract(const std::string& filepath) : kdb_type(KDB_GLOBAL)
 {
     EnumIodeFile file_type = get_iode_file_type(filepath);
     if(file_type > I_VARIABLES_FILE)

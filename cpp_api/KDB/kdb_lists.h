@@ -11,7 +11,7 @@ protected:
     List get_unchecked(const int pos) const override;
 
 public:
-    KDBLists(std::string& filepath) : KDBTemplate(filepath) {}
+    KDBLists(const std::string& filepath) : KDBTemplate(filepath) {}
 
     KDBLists(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_LISTS, pattern) {};
