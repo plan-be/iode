@@ -58,6 +58,8 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+	bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+
 public slots:
 	void reset()
 	{
