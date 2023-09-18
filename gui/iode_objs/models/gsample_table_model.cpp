@@ -26,10 +26,12 @@ GSampleTableModel::~GSampleTableModel()
 
 Qt::ItemFlags GSampleTableModel::flags(const QModelIndex& index) const
 {
-    if (!index.isValid())
-        return Qt::NoItemFlags;
+	if (!index.isValid())
+		return Qt::ItemIsEnabled;
 
-    return QAbstractItemModel::flags(index);
+    Qt::ItemFlags flag = (table->is_editable(index.row(), index.column())) ? Qt::ItemIsEditable : Qt::NoItemFlags;
+
+	return QAbstractItemModel::flags(index) | flag;
 }
 
 QVariant GSampleTableModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -55,4 +57,30 @@ QVariant GSampleTableModel::data(const QModelIndex& index, int role) const
 		return valueToString(table->get_value(index.row(), index.column(), get_nb_digits()));
 
 	return QVariant();
+}
+
+bool GSampleTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+	if (index.isValid() && role == Qt::EditRole)
+	{
+		if(data(index, Qt::DisplayRole) == value) 
+			return false;
+		
+        if(value.toString() == NAN_REP)
+            return false;
+
+        try
+        {
+            table->set_value(index.row(), index.column(), value.toDouble(), false);
+			emit dataChanged(index, index, { role });
+			return true;
+        }
+        catch(const std::exception& e)
+        {
+            QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
+		    return false;
+        }
+	}
+	else
+		return false;
 }
