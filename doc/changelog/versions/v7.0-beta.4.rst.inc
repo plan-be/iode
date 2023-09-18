@@ -19,6 +19,8 @@ Fixed Bugs 🛠️
   * (GUI) Pressing (SHIFT+)F5 when displaying the variables will move to the (previous) next mode 
           (level, difference, growth rate) (#320)
   * (GUI) Computed tables (from the menu Data > Edit Tables or Print/Graph > Print/View Tables) can now be edited (#210)
+  * (GUI) Fixed graphs generated from the menu Print/Graphs > Graphs from Tables 
+          when data other than the current workspace are loaded from other files (file [2..5]) (#328)
 
 Miscellaneous 🤷‍♀️
 ----------------
