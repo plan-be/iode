@@ -4,7 +4,8 @@
 class GSampleTest : public KDBTest, public ::testing::Test
 {
 protected:
-    KDBTables kdb;
+    KDBTables kdb_tbl;
+    KDBVariables kdb_var;
     std::string var_file;
     std::string ref_file;
 
@@ -171,7 +172,7 @@ TEST_F(GSampleTest, BuildFromVariables)
     std::string sample;
     std::vector<double> values;
 
-    kdb.add(table_name, 2, "", variables_list, false, false, false);
+    kdb_tbl.add(table_name, 2, "", variables_list, false, false, false);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -284,5 +285,201 @@ TEST_F(GSampleTest, BuildFromVariables)
     values = graph_2_files.get_series_values(3, 1);
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 11502.05);
 
-    kdb.remove(table_name);
+    kdb_tbl.remove(table_name);
+}
+
+TEST_F(GSampleTest, EditTable)
+{
+    double value;
+    std::string sample;
+    std::string gsample;
+    std::string table_name = "TEST_EDIT";
+
+    // new table (to be edited)
+    std::string lec = "Q_F;";   // row 0
+    lec += "Q_I;";              // row 1
+    lec += "Q_F/Q_I;";          // row 2
+    lec += "ln(Q_I+Q_F);";      // row 3
+    lec += "KNFF;";             // row 4
+    lec += "KNFF[-1];";         // row 5
+    lec += "3+ln(10);";         // row 6
+    lec += "0+KNFF";            // row 7
+
+    kdb_tbl.add(table_name, 2, "Test table to be edited", lec, false, false, false);
+
+    // ---- prepare tables ----
+
+    // simple time series (current workspace) - 10 observations
+    gsample = "2000:10";
+    sample = "2000Y1:2009Y1";
+    GSampleTable table_simple(table_name, gsample);
+    EXPECT_EQ(table_simple.get_nb_columns(), 10);
+
+    // two time series (current workspace) - 5 observations
+    gsample = "(2010;2010/2009):5";
+    sample = "2010Y1:2014Y1";
+    GSampleTable table_grt(table_name, gsample);
+    EXPECT_EQ(table_grt.get_nb_columns(), 5 * 2);
+
+    // simple time series (one extra file) - 5 observations
+    gsample = "2010[1;2]:5";
+    sample = "2010Y1:2014Y1";
+    GSampleTable table_2_files(table_name, gsample);
+    EXPECT_EQ(table_2_files.get_nb_columns(), 5 * 2);
+
+    // one time series - 10 observations - values only from external file
+    gsample = "2000[2]:10";
+    sample = "2000Y1:2009Y1";
+    GSampleTable table_file_2(table_name, gsample);
+    EXPECT_EQ(table_file_2.get_nb_columns(), 5 * 2);
+
+    // ---- check if editable ----
+
+    // RULE 1: A cell cannot be updated if the corresponding column (COL object)
+    //         - contains on operation on periods or files
+    //         - does not refer to the current workspace
+
+    // 1) two time series (current workspace) - 5 observations
+    EXPECT_FALSE(table_grt.is_editable(0, 5));    // "Q_F"
+    EXPECT_FALSE(table_grt.is_editable(1, 5));    // "Q_I"
+    EXPECT_FALSE(table_grt.is_editable(2, 5));    // "Q_F/Q_I"
+    EXPECT_FALSE(table_grt.is_editable(3, 5));    // "ln(Q_I+Q_F)"
+    EXPECT_FALSE(table_grt.is_editable(4, 5));    // "KNFF"
+    EXPECT_FALSE(table_grt.is_editable(5, 5));    // "KNFF[-1]"
+
+    // 2) simple time series (one extra file) - 5 observations
+    EXPECT_FALSE(table_2_files.is_editable(0, 5));    // "Q_F"
+    EXPECT_FALSE(table_2_files.is_editable(1, 5));    // "Q_I"
+    EXPECT_FALSE(table_2_files.is_editable(2, 5));    // "Q_F/Q_I"
+    EXPECT_FALSE(table_2_files.is_editable(3, 5));    // "ln(Q_I+Q_F)"
+    EXPECT_FALSE(table_2_files.is_editable(4, 5));    // "KNFF"
+    EXPECT_FALSE(table_2_files.is_editable(5, 5));    // "KNFF[-1]"
+
+    // 3) one time series - 10 observations - values only from external file
+    EXPECT_FALSE(table_file_2.is_editable(0, 5));    // "Q_F"
+    EXPECT_FALSE(table_file_2.is_editable(1, 5));    // "Q_I"
+    EXPECT_FALSE(table_file_2.is_editable(2, 5));    // "Q_F/Q_I"
+    EXPECT_FALSE(table_file_2.is_editable(3, 5));    // "ln(Q_I+Q_F)"
+    EXPECT_FALSE(table_file_2.is_editable(4, 5));    // "KNFF"
+    EXPECT_FALSE(table_file_2.is_editable(5, 5));    // "KNFF[-1]"
+
+    // RULE 2: A cell cannot be updated if the corresponding LEC expression from the 
+    //         reference table starts with 0+
+    // -> simple time series (current workspace) - 10 observations
+    EXPECT_FALSE(table_simple.is_editable(7, 5));    // "0+KNFF"
+
+    // RULE 3: A cell cannot be updated if the corresponding LEC expression from the 
+    //         reference table does not refer to at least one variable
+    // -> simple time series (current workspace) - 10 observations
+    EXPECT_FALSE(table_simple.is_editable(6, 5));    // "3+ln(10)"
+
+    // OK to edit
+    // -> simple time series (current workspace) - 10 observations
+    EXPECT_TRUE(table_simple.is_editable(0, 5));    // "Q_F"
+    EXPECT_TRUE(table_simple.is_editable(1, 5));    // "Q_I"
+    EXPECT_TRUE(table_simple.is_editable(2, 5));    // "Q_F/Q_I"
+    EXPECT_TRUE(table_simple.is_editable(3, 5));    // "ln(Q_I+Q_F)"
+    EXPECT_TRUE(table_simple.is_editable(4, 5));    // "KNFF"
+    EXPECT_TRUE(table_simple.is_editable(5, 5));    // "KNFF[-1]"
+
+    // ---- check values ----
+
+    // -> simple time series (current workspace) - 10 observations
+    //    gsample = "2000:10";
+    //    sample = "2000Y1:2009Y1";
+    double Q_F = kdb_var.get_var("Q_F", "2005Y1");
+    double Q_I = kdb_var.get_var("Q_I", "2005Y1");
+    double KNFF = kdb_var.get_var("KNFF", "2005Y1");
+    double KNFF_1 = kdb_var.get_var("KNFF", "2004Y1");
+
+    EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(2, 5), round((Q_F/Q_I) * 100.) / 100.);         // "Q_F/Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), round(log(Q_I + Q_F) * 100.) /100.);     // "ln(Q_I+Q_F)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(4, 5), round(KNFF * 100.) / 100.);              // "KNFF"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(5, 5), round(KNFF_1 * 100.) / 100.);            // "KNFF[-1]"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(6, 5), round((3.0 + log(10)) * 100.) / 100.);   // "3+ln(10)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(7, 5), round(KNFF * 100.) / 100.);              // "0+KNFF"
+
+    // ---- modify values ----
+
+    // A) modify Q_F
+    table_simple.set_value(0, 5, Q_F * 0.9);
+
+    // propagate
+    Q_F *= 0.9;
+    value = round(kdb_var.get_var("Q_F", "2005Y1") * 1e4) / 1e4;
+    EXPECT_DOUBLE_EQ(value, round(Q_F * 1e4) / 1e4);
+
+    EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(2, 5), round((Q_F/Q_I) * 100.) / 100.);         // "Q_F/Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), round(log(Q_I + Q_F) * 100.) /100.);     // "ln(Q_I+Q_F)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(4, 5), round(KNFF * 100.) / 100.);              // "KNFF"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(5, 5), round(KNFF_1 * 100.) / 100.);            // "KNFF[-1]"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(6, 5), round((3.0 + log(10)) * 100.) / 100.);   // "3+ln(10)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(7, 5), round(KNFF * 100.) / 100.);              // "0+KNFF"
+
+    // 2) modify KNFF
+    table_simple.set_value(4, 5, KNFF * 0.9);
+
+    // propagate
+    KNFF *= 0.9;
+    value = round(kdb_var.get_var("KNFF", "2005Y1") * 1e4) / 1e4;
+    EXPECT_DOUBLE_EQ(value, round(KNFF * 1e4) / 1e4);
+
+    EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(2, 5), round((Q_F/Q_I) * 100.) / 100.);         // "Q_F/Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), round(log(Q_I + Q_F) * 100.) /100.);     // "ln(Q_I+Q_F)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(4, 5), round(KNFF * 100.) / 100.);              // "KNFF"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(5, 5), round(KNFF_1 * 100.) / 100.);            // "KNFF[-1]"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(6, 5), round((3.0 + log(10)) * 100.) / 100.);   // "3+ln(10)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(7, 5), round(KNFF * 100.) / 100.);              // "0+KNFF"
+
+    // 3) modify Q_F/Q_I -> remember: only the value of the first variable is modified
+    value = (Q_F/Q_I) * 0.9;
+    table_simple.set_value(2, 5, value);
+
+    // propagate
+    // Q_F/Q_I = new_value 
+    // Q_F = new_value * Q_I 
+    Q_F = value * Q_I;
+
+    EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(2, 5), round((Q_F/Q_I) * 100.) / 100.);         // "Q_F/Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), round(log(Q_I + Q_F) * 100.) /100.);     // "ln(Q_I+Q_F)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(4, 5), round(KNFF * 100.) / 100.);              // "KNFF"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(5, 5), round(KNFF_1 * 100.) / 100.);            // "KNFF[-1]"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(6, 5), round((3.0 + log(10)) * 100.) / 100.);   // "3+ln(10)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(7, 5), round(KNFF * 100.) / 100.);              // "0+KNFF"
+
+    // 4) modify ln(Q_I + Q_F) -> remember: only the value of the first variable is modified
+    value = log(Q_I + Q_F) * 1.1;
+    table_simple.set_value(3, 5, value);
+
+    // propagate
+    // ln(Q_I + Q_F) = new_value 
+    // Q_I + Q_F = exp(new_value) 
+    // Q_I = exp(new_value) - Q_F
+    Q_I = exp(value) - Q_F;
+
+    EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(2, 5), round((Q_F/Q_I) * 100.) / 100.);         // "Q_F/Q_I"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), round(log(Q_I + Q_F) * 100.) /100.);     // "ln(Q_I+Q_F)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(4, 5), round(KNFF * 100.) / 100.);              // "KNFF"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(5, 5), round(KNFF_1 * 100.) / 100.);            // "KNFF[-1]"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(6, 5), round((3.0 + log(10)) * 100.) / 100.);   // "3+ln(10)"
+    EXPECT_DOUBLE_EQ(table_simple.get_value(7, 5), round(KNFF * 100.) / 100.);              // "0+KNFF"
+
+    // 5) trying to modify a cell value for which there is no reference of any variable
+    EXPECT_THROW(table_simple.set_value(6, 5, 4.0 + log(10)), IodeException);
+
+    // 6) trying to modify a cell value for which the corresponding formula starts with "0+"
+    EXPECT_THROW(table_simple.set_value(7, 5, KNFF * 0.9), IodeException);
+
+    // 7) trying to modify a cell value by passing a NaN value
+    EXPECT_THROW(table_simple.set_value(1, 5, L_NAN), IodeException);
 }

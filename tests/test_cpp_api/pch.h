@@ -8,6 +8,7 @@
 #include "cpp_api/iode_cpp_api.h"
 
 #include <filesystem>
+#include <cmath>
 
 class KDBTest
 {
