@@ -21,6 +21,7 @@ Fixed Bugs 🛠️
   * (GUI) Computed tables (from the menu Data > Edit Tables or Print/Graph > Print/View Tables) can now be edited (#210)
   * (GUI) Fixed graphs generated from the menu Print/Graphs > Graphs from Tables 
           when data other than the current workspace are loaded from other files (file [2..5]) (#328)
+  * (GUI) Fixed the user interface crashing when clicking twice on the Coefs button after estimating an equation (#340) 
 
 Miscellaneous 🤷‍♀️
 ----------------
