@@ -22,6 +22,8 @@ Fixed Bugs 🛠️
   * (GUI) Fixed graphs generated from the menu Print/Graphs > Graphs from Tables 
           when data other than the current workspace are loaded from other files (file [2..5]) (#328)
   * (GUI) Fixed the user interface crashing when clicking twice on the Coefs button after estimating an equation (#340) 
+  * (GUI) Allowed to print the results of an estimation, i.e. to print the coefficients, 
+          correlation matrix and the tests output (#226)
 
 Miscellaneous 🤷‍♀️
 ----------------
