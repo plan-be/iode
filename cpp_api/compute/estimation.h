@@ -96,9 +96,9 @@ public:
         return v_equations;
     }
 
-    KDBScalars* get_coefficients() { return kdb_scl; }
+    const KDBScalars* get_coefficients() { return kdb_scl; }
 
-    KDBEquations* get_equations() { return kdb_eqs; }
+    const KDBEquations* get_equations() { return kdb_eqs; }
 
     NamedEquation current_equation() { return NamedEquation(*current_eq); }
 
