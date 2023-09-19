@@ -13,10 +13,11 @@ EstimationResultsDialog::EstimationResultsDialog(Estimation* est, QWidget* paren
     NamedEquation equation = est->current_equation();
     set_tests_tab(equation.eq);
 
-    Sample* sample = est->get_sample();
-    from = QString::fromStdString(sample->start_period().to_string());
-    to = QString::fromStdString(sample->end_period().to_string());
-    for(const std::string& name: est->get_list_equations()) variables_names << QString::fromStdString(name);
+    Sample sample = est->get_sample();
+    from = QString::fromStdString(sample.start_period().to_string());
+    to = QString::fromStdString(sample.end_period().to_string());
+    for(const std::string& name: est->get_list_equations()) 
+        variables_names << QString::fromStdString(name);
 
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 	connect(this, &EstimationResultsDialog::newPlot, main_window, &MainWindowAbstract::appendDialog);
@@ -37,8 +38,8 @@ void EstimationResultsDialog::set_coefficients_tab()
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
     tableView_coefs->setStyleSheet(stylesheet);
 
-    KDBScalars* kdb_coefs = est->get_coefficients();
-    // Warning: need to create a copy of kdb_coefs because passed kdb is deleted in 
+    const KDBScalars* kdb_coefs = est->get_coefficients();
+    // Warning: we need to create a copy of kdb_coefs because the passed kdb is deleted in 
     //          the IodeTemplateTableModel destructor
     ScalarsModel* scalarsModel = new ScalarsModel(this, new KDBScalars(*kdb_coefs));
     tableView_coefs->setModel(scalarsModel);
@@ -50,8 +51,10 @@ void EstimationResultsDialog::set_correlation_matrix_tab()
     tableView_corr_matrix->setStyleSheet(stylesheet);
 
     QVector<QString> q_coefs_names;
-    KDBScalars* kdb_coefs = est->get_coefficients();
-    for(const std::string& name : kdb_coefs->get_names()) q_coefs_names << QString::fromStdString(name);
+    const KDBScalars* kdb_coefs = est->get_coefficients();
+    for(const std::string& name : kdb_coefs->get_names()) 
+        q_coefs_names << QString::fromStdString(name);
+
     CorrelationMatrixModel* model = new CorrelationMatrixModel(q_coefs_names, est->get_correlation_matrix(), this);
     tableView_corr_matrix->setModel(model);
 }
@@ -79,9 +82,9 @@ void EstimationResultsDialog::plot_yobs_yest()
 
     // prepare local Variables KDB
     Variable values;
-    Sample* sample = est->get_sample();
+    Sample sample = est->get_sample();
     KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
-    kdb_vars->set_sample(sample->start_period(), sample->end_period());
+    kdb_vars->set_sample(sample.start_period(), sample.end_period());
 
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
@@ -90,7 +93,7 @@ void EstimationResultsDialog::plot_yobs_yest()
     plotDialog->setTitle(title);
 
     // set the periods for the plot
-    plotDialog->setPeriods(*sample);
+    plotDialog->setPeriods(sample);
 
     // observed values
     values = est->get_observed_values(nEq.name);
@@ -115,9 +118,9 @@ void EstimationResultsDialog::plot_residual()
     QString lhs = QString::fromStdString(lrhs.first);
 
     // prepare local Variables KDB
-    Sample* sample = est->get_sample();
+    Sample sample = est->get_sample();
     KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
-    kdb_vars->set_sample(sample->start_period(), sample->end_period());
+    kdb_vars->set_sample(sample.start_period(), sample.end_period());
 
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
@@ -126,7 +129,7 @@ void EstimationResultsDialog::plot_residual()
     plotDialog->setTitle(title);
 
     // set the periods for the plot
-    plotDialog->setPeriods(*sample);
+    plotDialog->setPeriods(sample);
 
     // residual values
     Variable values = est->get_residual_values(nEq.name);

@@ -191,8 +191,7 @@ void EditEquationDialog::display_coefs()
 	{
 		try
 		{
-			KDBScalars* kdb_scl = estimation->get_coefficients();
-			EstimationCoefsDialog dialog(kdb_scl, this);
+			EstimationCoefsDialog dialog(estimation, this);
 			dialog.exec();
 		}
 		catch (const std::exception& e)
