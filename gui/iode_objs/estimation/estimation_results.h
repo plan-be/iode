@@ -33,6 +33,7 @@ private:
     void set_coefficients_tab();
     void set_correlation_matrix_tab();
     void set_tests_tab(Equation& eq);
+    void dump_table(const QAbstractTableModel* table_model, QTextCursor& cursor);
 
 public:
     EstimationResultsDialog(Estimation* est, QWidget* parent = Q_NULLPTR);

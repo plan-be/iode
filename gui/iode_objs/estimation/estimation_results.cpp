@@ -140,10 +140,146 @@ void EstimationResultsDialog::plot_residual()
     emit newPlot(plotDialog);
 }
 
-// TODO : implement this SLOT
+void EstimationResultsDialog::dump_table(const QAbstractTableModel* table_model, QTextCursor& cursor)
+{
+	QTextTableCell headerCell;
+	QTextTableCell cell;
+	QString text;
+	QTextCharFormat boldFormat;
+	boldFormat.setFontWeight(QFont::Bold);
+
+    QTextTable* table = cursor.insertTable(table_model->rowCount() + 1, table_model->columnCount() + 1);
+	QTextTableFormat tableFormat = table->format();
+	tableFormat.setHeaderRowCount(1);
+	tableFormat.setCellPadding(4);
+	tableFormat.setCellSpacing(0);
+	table->setFormat(tableFormat);
+
+	// top left cell
+	headerCell = table->cellAt(0, 0);
+	QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+    cellFormat.setRightBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+	cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+	headerCell.setFormat(cellFormat);
+
+    // columns header
+    for(int col=0; col < table_model->columnCount(); col++)
+    {
+        text = table_model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
+        headerCell = table->cellAt(0, col + 1);
+        cursor = headerCell.firstCursorPosition();
+        cursor.insertText(text, boldFormat);
+        QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+        cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+        headerCell.setFormat(cellFormat);
+    }
+
+    // table rows
+    for(int row=0; row < table_model->rowCount(); row++)
+    {
+        // row header
+        text = table_model->headerData(row, Qt::Vertical, Qt::DisplayRole).toString();
+        headerCell = table->cellAt(row + 1, 0);
+        cursor = headerCell.firstCursorPosition();
+        cursor.insertText(text, boldFormat);
+        QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+        cellFormat.setRightBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+        headerCell.setFormat(cellFormat);
+
+        // row cells content
+        for(int col=0; col < table_model->columnCount(); col++)
+        {
+            text = table_model->data(table_model->index(row, col), Qt::DisplayRole).toString();
+            cell = table->cellAt(row + 1, col + 1);
+            cursor = cell.firstCursorPosition();
+            cursor.insertText(text);
+        }
+    }
+
+    cursor.movePosition(QTextCursor::End);
+}
+
 void EstimationResultsDialog::print_output()
 {
-    QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");
+    QTextDocument document;
+    QTextCursor cursor(&document);
+
+    // ---- dump the coefficients matrix ----
+
+    cursor.insertHtml("<h3>Coefficients</h3>");
+    cursor.insertText("\n\n");
+
+    QAbstractTableModel* scalars_model = static_cast<QAbstractTableModel*>(tableView_coefs->model());
+    dump_table(scalars_model, cursor);
+    cursor.insertText("\n\n");
+
+    // ---- dump the correlation matrix ----
+
+    cursor.insertHtml("<h3>Correlation Matrix</h3>");
+    cursor.insertText("\n\n");
+
+    QAbstractTableModel* coeffs_model = static_cast<QAbstractTableModel*>(tableView_corr_matrix->model());
+    dump_table(coeffs_model, cursor);
+    cursor.insertText("\n\n");
+
+    // ---- dump the test results ----
+
+    cursor.insertHtml("<h3>Tests By Equation</h3>");
+    cursor.insertText("\n\n");
+
+    Equation eq = est->current_equation().eq;
+    std::array<float, EQS_NBTESTS> tests = eq.get_tests();
+
+    QTextTable* table = cursor.insertTable(vEquationTests.size() + 1, 2);
+	QTextTableFormat tableFormat = table->format();
+	tableFormat.setHeaderRowCount(1);
+	tableFormat.setCellPadding(4);
+	tableFormat.setCellSpacing(0);
+	table->setFormat(tableFormat);
+
+	// columns header
+	QTextTableCell headerCell = table->cellAt(0, 0);
+	QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+    QTextCharFormat boldFormat;
+	boldFormat.setFontWeight(QFont::Bold);
+    cursor = headerCell.firstCursorPosition();
+    cursor.insertText("Test Name", boldFormat);
+	cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+	headerCell.setFormat(cellFormat);
+
+    // columns header
+    QStringList header_names = {"Test Name", "Value"};
+    for(int col=0; col < header_names.size(); col++)
+    {
+        headerCell = table->cellAt(0, col);
+        cursor = headerCell.firstCursorPosition();
+        cursor.insertText(header_names[col], boldFormat);
+        QTextTableCellFormat cellFormat = headerCell.format().toTableCellFormat();
+        cellFormat.setBottomBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+        headerCell.setFormat(cellFormat);
+    }
+
+    // rows
+    QTextTableCell cell;
+    for(int row=0; row < vEquationTests.size(); row++)
+    {
+        cell = table->cellAt(row + 1, 0);
+        cursor = cell.firstCursorPosition();
+        cursor.insertText(QString::fromStdString(vEquationTests[row]));
+
+        cell = table->cellAt(row + 1, 1);
+        cursor = cell.firstCursorPosition();
+        cursor.insertText(QString::number(tests[row], 'g', 8));
+    }
+
+    cursor.movePosition(QTextCursor::End);
+
+    // ---- print ----
+
+    QPrinter printer;
+    QPrintPreviewDialog dialog(&printer);
+    connect(&dialog, &QPrintPreviewDialog::paintRequested, this, [&](){ document.print(&printer); });
+    dialog.exec();
 }
 
 void EstimationResultsDialog::help()
