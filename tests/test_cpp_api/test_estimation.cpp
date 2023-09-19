@@ -49,8 +49,8 @@ TEST_F(EstimationTest, Estimate)
     est->save();
 
     // Sample
-    Sample* sample = est->get_sample();
-    EXPECT_EQ(sample->to_string(), from + ":" + to);
+    Sample sample = est->get_sample();
+    EXPECT_EQ(sample.to_string(), from + ":" + to);
 
     // List of equations
     std::vector<std::string> expected_list_eqs = {eq_name, eq_name2};
