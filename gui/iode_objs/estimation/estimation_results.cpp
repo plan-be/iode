@@ -141,12 +141,6 @@ void EstimationResultsDialog::plot_residual()
 }
 
 // TODO : implement this SLOT
-void EstimationResultsDialog::print_graphs()
-{
-    QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");
-}
-
-// TODO : implement this SLOT
 void EstimationResultsDialog::print_output()
 {
     QMessageBox::warning(nullptr, "WARNING", "Not yet implemented");

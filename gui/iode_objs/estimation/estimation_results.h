@@ -44,7 +44,6 @@ signals:
 public slots:
     void plot_yobs_yest();
     void plot_residual();
-    void print_graphs();
     void print_output();
     void help();
 };

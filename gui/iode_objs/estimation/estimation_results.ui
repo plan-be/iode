@@ -85,13 +85,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_print_graphs">
-        <property name="text">
-         <string>Print Graphs</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="pushButton_print_output">
         <property name="text">
          <string>Print Output</string>
@@ -153,22 +146,6 @@
     <hint type="sourcelabel">
      <x>690</x>
      <y>59</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>379</x>
-     <y>189</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_print_graphs</sender>
-   <signal>clicked()</signal>
-   <receiver>EstimationResultsDialog</receiver>
-   <slot>print_graphs()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>690</x>
-     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>379</x>
