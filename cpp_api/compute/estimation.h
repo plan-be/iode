@@ -52,9 +52,9 @@ public:
 
     ~Estimation();
 
-    Sample* get_sample() const
+    Sample get_sample() const
     {
-        return sample;
+        return Sample(*sample);
     }
 
     void set_sample(const Sample& sample)
