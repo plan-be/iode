@@ -45,7 +45,7 @@ TEST_F(EstimationTest, Estimate)
     Estimation* est = new Estimation(from, to, block);
 
     est->equations_estimate();
-    KDBScalars* kdb_scl_res = est->get_coefficients();
+    const KDBScalars* kdb_scl_res = est->get_coefficients();
     est->save();
 
     // Sample
