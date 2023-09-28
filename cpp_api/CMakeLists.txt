@@ -60,11 +60,5 @@ add_library(iode_cpp_api STATIC
             ${CPP_LEGACY}
             )
 
-set_source_files_properties(objects/equation.cpp objects/table.cpp 
-                            KDB/kdb_global.cpp 
-                            gsample/gsample.cpp
-                            gsample/gsample_graph.cpp
-                            report/rep_list.cpp
-                            PROPERTIES COMPILE_FLAGS ${IODE_ALIGNEMENT_FLAG})
 target_include_directories(iode_cpp_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(iode_cpp_api PUBLIC iode_c_api)

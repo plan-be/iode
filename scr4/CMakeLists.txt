@@ -62,7 +62,4 @@ set (SCR_IODE
 # Add source to this project's executable.
 add_library (iode_scr4 STATIC ${HEADER_IODE} ${SCR_IODE})
 
-# NOTE: use PRIVATE to NOT propagate compile options to other lib/executable depending on iode_scr4.
-#       Option ${IODE_ALIGNEMENT_FLAG} makes compilation of the Google Test lib to fail
-target_compile_options(iode_scr4 PRIVATE ${IODE_ALIGNEMENT_FLAG})
 target_include_directories (iode_scr4 PUBLIC ".")
