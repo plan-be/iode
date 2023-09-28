@@ -23,6 +23,7 @@
  */
 
 #include "iode.h"
+#include "old_structs.h"
 #include <io.h>
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
