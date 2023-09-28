@@ -804,47 +804,14 @@ extern  int     G_CUR_TITLE;
 /******************************* TYPEDEFS **********************************/
 typedef char    OFNAME[OK_MAX_FILE];
 typedef char    FNAME[K_MAX_FILE];
-typedef char    OONAME[OK_MAX_NAME + 1];
 typedef char    ONAME[K_MAX_NAME + 1];
 typedef long    OSIZE;   /* JMP 23-05-00 */
-
-typedef struct  _okobj_ {
-    short       o_val;
-	OONAME      o_name;
-    char        o_pad[3];
-} OKOBJ;
 
 typedef struct  _kobj_ {
     SWHDL       o_val;      /* SWHDL=long */ /* IODE64K */
     ONAME       o_name;
     char        o_pad[3];
 } KOBJ;
-
-typedef struct _okdb_ {
-    KOBJ        *k_objs;
-    long        k_nb;
-    short       k_type;
-    short       k_mode;
-    char        k_arch[LMAGIC];
-    char        k_magic[LMAGIC];
-    OFNAME       k_name;
-    char        k_desc[K_MAX_DESC];
-    char        k_data[K_MAX_DESC];     /* Client Data */
-} OKDB;
-
-typedef struct _okdb643_ {
-    KOBJ        *k_objs;
-    long        k_nb;
-    short       k_type;
-    short       k_mode;
-    char        k_arch[LMAGIC];
-    char        k_magic[LMAGIC];
-    OFNAME       k_name;
-    char        k_desc[K_MAX_DESC];
-    char        k_data[K_MAX_DESC];     /* Client Data */
-    char        k_compressed;           /* IODE64K */
-    char        k_reserved[63];         /* IODE64K */
-} OKDB643;
 
 typedef struct _kdb_ {
     KOBJ        *k_objs;
@@ -876,26 +843,11 @@ typedef struct _sample {
     char    s_pad[2];
 } SAMPLE;
 
-typedef struct _olname_ {
-    OONAME   name;
-    char    pad[3];
-    short   pos;
-} OLNAME;
-
 typedef struct _lname_ {
     ONAME   name;       // scalar or variable name
 	char    pad[3];
     long    pos; /* SWHDL */ /* IODE64K */
 } LNAME;
-
-typedef struct _oclec_ {
-    short   tot_lg,         /* SWHDL */
-	    exec_lg,
-	    nb_names;
-    char    dupendo;
-    char    pad;
-    OLNAME  lnames[1];
-} OCLEC;
 
 typedef struct _clec_ {
     long    tot_lg,        /* JMP 20-05-00 */ /* IODE64K */
