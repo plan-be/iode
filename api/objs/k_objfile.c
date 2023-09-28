@@ -24,6 +24,8 @@
 
 #include "iode.h"
 #include "old_structs.h"
+#include "structs_32.h"
+
 #include <io.h>
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
