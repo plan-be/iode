@@ -28,3 +28,4 @@ Fixed Bugs 🛠️
 Miscellaneous 🤷‍♀️
 ----------------
 
+  * Compile the C API using the default alignment for the C structs (#350)
