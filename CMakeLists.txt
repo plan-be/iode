@@ -119,13 +119,6 @@ else()
   set(IODE_DEBUG_INFO_FLAG "-g")
 endif()
 
-# Alignement flag
-if(MSVC)
-  set(IODE_ALIGNEMENT_FLAG "-Zp1")
-else()
-  set(IODE_ALIGNEMENT_FLAG "-fpack-struct=1")
-endif()
-
 # C++20 (required for the module std format) makes the compiler MSVC 
 # much more strict by default when passing a string literal 
 # "string" value for a char* argument of a C function.

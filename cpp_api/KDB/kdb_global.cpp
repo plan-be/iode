@@ -58,7 +58,6 @@ char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern
     }
 }
 
-// WARNING: copying content of k_nameptr requires ${IODE_ALIGNEMENT_FLAG} compiler option 
 KDB* hard_copy_kdb(KDB* source_kdb, char** names)
 {
     short iode_type = source_kdb->k_type;
