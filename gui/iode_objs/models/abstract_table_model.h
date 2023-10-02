@@ -90,9 +90,9 @@ template <class K> class IodeTemplateTableModel : public IodeAbstractTableModel
 {
 protected:
 	K* kdb;
-	K* kdb_filter;
-	K* kdb_global;
-	K* kdb_external;
+	K* kdb_filter;		///< to be deleted
+	K* kdb_global;		///< to be deleted
+	K* kdb_external;	///< must NOT be deleted (external owner)
 
 public:
 	IodeTemplateTableModel(QVector<QString> columnNames, QObject* parent = nullptr, K* kdb_external = nullptr) : 
@@ -113,16 +113,25 @@ public:
 		}
 	}
 
-	~IodeTemplateTableModel() { delete kdb; }
+	~IodeTemplateTableModel() 
+	{ 
+		if(kdb_global)
+			delete kdb_global;
+
+		if(kdb_filter)
+			delete kdb_filter;
+
+		kdb = nullptr; 
+	}
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override
 	{
-		return kdb->count();
+		return kdb ? kdb->count() : 0;
 	}
 
 	QString getFilepath() const
 	{
-		return QString::fromStdString(kdb->get_filename());
+		return kdb ? QString::fromStdString(kdb->get_filename()) : "";
 	}
 
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -160,7 +169,10 @@ public:
 
 	virtual QVariant dataCell(const int row, const int col) const = 0;
 
-	virtual bool setValue(const int row, const int column, const QVariant& value) { return false; }
+	virtual bool setValue(const int row, const int column, const QVariant& value) 
+	{ 
+		return false; 
+	}
 
 	QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type) override;
 
@@ -173,20 +185,29 @@ private:
 	QString askFilepath(const QDir& projectDir)
 	{
 		QString filepath = askFilepathDialog(projectDir);
+		if(filepath.isEmpty())
+			return "";
+		
 		QFileInfo fileInfo(filepath);
 		if (fileInfo.exists())
 		{
 			QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "The file " + 
 				fileInfo.fileName() + " already exists. Override it?", 
 				QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
-			if (answer == QMessageBox::No) askFilepath(projectDir);
-			if (answer == QMessageBox::Discard) filepath = "";
+			if (answer == QMessageBox::No) 
+				askFilepath(projectDir);
+			if (answer == QMessageBox::Discard) 
+				filepath = "";
 		}
+
 		return filepath;
 	}
 
 	QString askFilepathDialog(const QDir& projectDir)
 	{
+		if(!kdb)
+			return "";
+		
 		int iodeType = kdb->get_iode_type();
 		QString iodeTypeAsString = QString::fromStdString(vIodeTypes[iodeType]);
 
