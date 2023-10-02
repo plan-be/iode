@@ -24,6 +24,7 @@ Fixed Bugs 🛠️
   * (GUI) Fixed the user interface crashing when clicking twice on the Coefs button after estimating an equation (#340) 
   * (GUI) Allowed to print the results of an estimation, i.e. to print the coefficients, 
           correlation matrix and the tests output (#226)
+  * (GUI) Fixed user interface crashing when entering a wrong pattern to filter the elements of a database (#293)
 
 Miscellaneous 🤷‍♀️
 ----------------
