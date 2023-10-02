@@ -22,17 +22,20 @@ QVariant IodeTemplateTableModel<K>::headerData(int section, Qt::Orientation orie
 		return columnNames[section];
 	else
 	{
+		if(!kdb)
+			return QVariant(" ");
+		
 		try
-		{
+		{			
 			return QString::fromStdString(kdb->get_name(section));
 		}
 		catch(const std::exception& e)
 		{
-			return QVariant("  ");
+			return QVariant(" ");
 		}
 	}
 
-	return QVariant("  ");
+	return QVariant(" ");
 }
 
 template <class K>
@@ -45,6 +48,9 @@ bool IodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orien
 		return false;
 
 	if(section >= rowCount())
+		return false;
+
+	if(!kdb)
 		return false;
 
 	try
@@ -71,7 +77,7 @@ QVariant IodeTemplateTableModel<K>::data(const QModelIndex& index, int role) con
 	if (role == Qt::TextAlignmentRole)
 		return int(Qt::AlignLeft);
 
-	if (role == Qt::DisplayRole || role == Qt::EditRole)
+	if ((role == Qt::DisplayRole || role == Qt::EditRole) && kdb)
 		return dataCell(index.row(), index.column());
 
 	return QVariant();
@@ -82,6 +88,9 @@ bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
+		if(!kdb)
+			return false;
+		
 		if(data(index, Qt::DisplayRole) == value) 
 			return false;
 		
@@ -101,34 +110,39 @@ bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant
 template <class K>
 void IodeTemplateTableModel<K>::filter(const QString& pattern)
 {
-	try
+	if (!pattern.isEmpty())
 	{
-		if (!pattern.isEmpty())
+		try
 		{
-			if(kdb_filter) delete kdb_filter;
+			if(kdb_filter) 
+				delete kdb_filter;
 			kdb_filter = new K(KDB_SHALLOW_COPY, pattern.toStdString());
 			kdb = kdb_filter;
 		}
-		else
-			kdb = (kdb_global != nullptr) ? kdb_global : kdb_external;
+		catch (const std::exception& e)
+		{
+			kdb_filter = nullptr;
+			kdb = kdb_global ? kdb_global : kdb_external;
+			QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+		}
 	}
-	catch (const std::exception& e)
-	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
-	}
+	else
+		kdb = kdb_global ? kdb_global : kdb_external;
 }
-
 
 template <class K>
 bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
-	int type_ = kdb->get_iode_type();
-	if (type_ < 0) return false;
+	std::string s_filepath = filepath.toStdString();
+	int type_ = kdb ? kdb->get_iode_type() : get_iode_file_type(s_filepath);
+
+	if (type_ < 0 || type_ > I_VARIABLES) 
+		return false;
 
 	EnumIodeType iodeType = (EnumIodeType) type_;
+
 	try
 	{
-		std::string s_filepath = filepath.toStdString();
 		s_filepath = check_filepath(s_filepath, (EnumIodeFile) iodeType, "load file", true);
 
 		if(!forceOverwrite && is_global_kdb_loaded(iodeType))
@@ -153,48 +167,56 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 template <class K>
 QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& filepath)
 {
-		if (kdb->count() == 0) return ""; 
+	if(!kdb)
+		return "";
 
-		EnumIodeType iodeType = (EnumIodeType) kdb->get_iode_type();
-		
-		// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
-		std::string std_filepath = filepath.isEmpty() ? kdb->get_filename() : filepath.toStdString();
+	if (kdb->count() == 0) 
+		return ""; 
 
-		// if KDB not linked to any file, ask the user to give/create a file to save in.
-		// Otherwise, check the filepath 
-		if (std_filepath.empty() || std_filepath == std::string(I_DEFAULT_FILENAME))
-		{
-			// open a box dialog 
-			QString filepath = askFilepath(projectDir);
-			// filepath is empty if the user clicked on the Discard button
-			if (filepath.isEmpty()) return "";
-			std_filepath = filepath.toStdString();
-		}
-		
-		std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "tab " + vIodeTypes[iodeType], false);
+	EnumIodeType iodeType = (EnumIodeType) kdb->get_iode_type();
+	
+	// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
+	std::string std_filepath = filepath.isEmpty() ? kdb->get_filename() : filepath.toStdString();
 
-		QFileInfo fileInfo(QString::fromStdString(std_filepath));
-		QString fullPath = fileInfo.absoluteFilePath();
+	// if KDB not linked to any file, ask the user to give/create a file to save in.
+	// Otherwise, check the filepath 
+	if (std_filepath.empty() || std_filepath == std::string(I_DEFAULT_FILENAME))
+	{
+		// open a box dialog 
+		QString filepath = askFilepath(projectDir);
+		// filepath is empty if the user clicked on the Discard button
+		if (filepath.isEmpty()) return "";
+		std_filepath = filepath.toStdString();
+	}
+	
+	std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "tab " + vIodeTypes[iodeType], false);
 
-		try
-		{
-			kdb->set_filename(fullPath.toStdString());
-			std::string full_path = fullPath.toStdString();
-			kdb->dump(full_path);
-		}
-		catch (const IodeException& e)
-		{
-			QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
-			return "";
-		}
+	QFileInfo fileInfo(QString::fromStdString(std_filepath));
+	QString fullPath = fileInfo.absoluteFilePath();
 
-		return fullPath;
+	try
+	{
+		kdb->set_filename(fullPath.toStdString());
+		std::string full_path = fullPath.toStdString();
+		kdb->dump(full_path);
+	}
+	catch (const IodeException& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
+		return "";
+	}
+
+	return fullPath;
 }
 
 template <class K>
 QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 {
-	if (kdb->count() == 0) return ""; 
+	if(!kdb)
+		return "";
+
+	if (kdb->count() == 0) 
+		return ""; 
 	
 	// ask user for new filepath
 	QString filepath = askFilepath(projectDir);
@@ -208,6 +230,9 @@ QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 template <class K>
 bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
+	if(!kdb)
+		return false;
+
 	std::string name;
 	beginRemoveRows(QModelIndex(), position, position + rows - 1);
 
@@ -232,6 +257,9 @@ template <class K>
 QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type)
 {
 	QStringList list;
+
+	if(!kdb)
+		return list;
 
 	std::string std_name = name.toStdString();
 	int this_type = kdb->get_iode_type();
@@ -321,6 +349,9 @@ template <class K>
 QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const EnumIodeType other_type)
 {
 	QStringList list;
+
+	if(!kdb)
+		return list;
 	
 	std::vector<std::string> std_list = kdb->get_associated_objects_list(name.toStdString(), other_type);
 	if(std_list.size() == 0)
