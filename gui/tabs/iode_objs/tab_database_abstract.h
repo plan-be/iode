@@ -230,10 +230,10 @@ public:
         shortcutAdd->setContext(Qt::WidgetWithChildrenShortcut);
 
         // signals - slots
+        // NOTE: no need to connect lineEdit_filter and pushButton_filter to tableview_2 since 
+        //       both views share the same model
         connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter);
-        connect(lineEdit_filter, &QLineEdit::returnPressed, tableview_2, &V::filter);
         connect(pushButton_filter, &QPushButton::clicked, tableview, &V::filter);
-        connect(pushButton_filter, &QPushButton::clicked, tableview_2, &V::filter);
 
         connect(pushButton_print, &QPushButton::clicked, tableview, &V::print);
         connect(shortcutPrint, &QShortcut::activated, tableview, &V::print);
