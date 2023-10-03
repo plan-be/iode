@@ -83,7 +83,8 @@ private slots:
         int nbDecimals = spinBox_nbDecimals->value();
         static_cast<IodeReportEditor*>(editor)->run(filepath, parameters, nbDecimals, language);
 
-        emit askComputeHash(false);
+        MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+        main_window->update_tab_and_completer();
     }
 
     void renderForPrinting()
