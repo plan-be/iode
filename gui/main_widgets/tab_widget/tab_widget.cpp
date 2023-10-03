@@ -314,8 +314,8 @@ int IodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
         // compute hash
         tabWidget->computeHash();
 
-        // reset filter
-        tabWidget->resetFilter();
+        // try to rerun filter (with silent = true)
+        tabWidget->filter(true);
 
         // update tab text and tooltip
         setTabText(index, tabWidget->getTabText());
