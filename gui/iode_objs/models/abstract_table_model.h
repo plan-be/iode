@@ -65,7 +65,7 @@ public slots:
 		resetModel(); 
 	}
 
-	virtual void filter(const QString& pattern) = 0;
+	virtual void filter(const QString& pattern, const bool silent = false) = 0;
 
 	/**
 	 * @brief gets the list of scalars or variables listed in the clec structure or 
@@ -144,7 +144,7 @@ public:
 
 	bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
-	void filter(const QString& pattern) override;
+	void filter(const QString& pattern, const bool silent = false) override;
 
 	void clearKDB() { kdb->clear(); }
 

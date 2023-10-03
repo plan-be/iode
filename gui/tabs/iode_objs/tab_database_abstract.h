@@ -160,6 +160,7 @@ public:
     }
 
     virtual void clearKDB() = 0;
+    virtual void filter(const bool siltent = false) = 0;
     virtual void resetFilter() = 0;
     virtual QStringList getSelectedObjectsNames() const = 0;
     virtual void computeHash(const bool before=false) = 0;
@@ -232,8 +233,8 @@ public:
         // signals - slots
         // NOTE: no need to connect lineEdit_filter and pushButton_filter to tableview_2 since 
         //       both views share the same model
-        connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter);
-        connect(pushButton_filter, &QPushButton::clicked, tableview, &V::filter);
+        connect(lineEdit_filter, &QLineEdit::returnPressed, tableview, &V::filter_slot);
+        connect(pushButton_filter, &QPushButton::clicked, tableview, &V::filter_slot);
 
         connect(pushButton_print, &QPushButton::clicked, tableview, &V::print);
         connect(shortcutPrint, &QShortcut::activated, tableview, &V::print);
@@ -280,6 +281,11 @@ public:
     {
         objmodel->clearKDB();
         tableview->update();
+    }
+
+    void filter(const bool silent = false)
+    {
+        tableview->filter(silent);
     }
 
     void resetFilter()
