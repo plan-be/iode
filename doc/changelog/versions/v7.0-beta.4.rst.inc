@@ -1,7 +1,7 @@
 Version 7.0-beta.4
 ==================
 
-In development
+Released on 03/10/2023
 
 New Features 🎉
 ---------------
