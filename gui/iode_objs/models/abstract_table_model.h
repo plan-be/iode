@@ -156,12 +156,20 @@ public:
 
 	void computeHash(const bool before=false)
 	{
+		// NOTE: computing the hash value of 'kdb_filter' makes no sense.
+		//       So we can't simply pass the 'kdb' class member to kdb_hasher 
+		//       because 'kdb' may point to 'kdb_filter' if filtering is activated.
+		K* kdb_ = kdb_global ? kdb_global : kdb_external;
+		if(!kdb_)
+			return;
+		
 		boost::hash<K> kdb_hasher;
+
 		if(before)
-    		hashBefore = kdb_hasher(*kdb);
+    		hashBefore = kdb_hasher(*kdb_);
 		else
 		{
-			hashAfter = kdb_hasher(*kdb);
+			hashAfter = kdb_hasher(*kdb_);
 			if(hashAfter != hashBefore) 
 				emit databaseModified();
 		}
