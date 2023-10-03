@@ -110,6 +110,14 @@ public:
 		}
 	}
 
+	void filter(const bool silent = false) 
+	{ 
+		QString pattern = filterLineEdit->text().trimmed();
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
+		table_model->filter(pattern, silent);
+		update();
+	}
+
 	QStringList getSelectedObjectsNames() const
 	{
 		QStringList names;
@@ -230,12 +238,9 @@ public slots:
 		objectNameEdit->setText("");
 	}
 
-	void filter() 
+	void filter_slot() 
 	{ 
-		QString pattern = filterLineEdit->text().trimmed();
-		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
-		table_model->filter(pattern);
-		update();
+		filter();
 	}
 
 	virtual void print();

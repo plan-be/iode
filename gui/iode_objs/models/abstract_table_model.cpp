@@ -108,7 +108,7 @@ bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant
 }
 
 template <class K>
-void IodeTemplateTableModel<K>::filter(const QString& pattern)
+void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent)
 {
 	if (!pattern.isEmpty())
 	{
@@ -123,7 +123,8 @@ void IodeTemplateTableModel<K>::filter(const QString& pattern)
 		{
 			kdb_filter = nullptr;
 			kdb = kdb_global ? kdb_global : kdb_external;
-			QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+			if(!silent)
+				QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
 		}
 	}
 	else
