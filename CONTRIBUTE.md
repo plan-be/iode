@@ -138,9 +138,9 @@ The change log files for each version are located in the directory doc/changes.
 ## Before the release
 
 1. Create a local branch based on `origin master` with the name containing the keyword `release`.
-2. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on <current date>".
+2. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on `<current date>`".
 3. Commit your changes.
-4. Create an annotated tag on the new commit. The name of the tag is the name of the last change log file in doc/changelog/versions. The annotation should be something like "release <current date>".
+4. Create an annotated tag on the new commit. The name of the tag is the name of the last change log file in doc/changelog/versions (`v<major>.<minor>.<patch>`). The annotation should be something like "release <current date>".
 
 ## Push The New Tag To Github
 
