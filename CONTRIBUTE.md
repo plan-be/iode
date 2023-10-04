@@ -122,7 +122,7 @@ The name of the branch must follow the template: \<your initials\>\_\<keyword\>\
 where `keyword` is:
 - `cli` or `cmd` when working on the IODE CLI (cmd)
 - `gui` when working on the graphical user interface
-- `cython` when working on the Python binding for IODE
+- `python` when working on the Python binding for IODE
 - `doc` when working on the user of dev documentation
 - `nsis` when working on the Windows Installer and Updater
 - `release` when preparing a new release 
@@ -165,10 +165,10 @@ The sub-directory ./.github/actions contains the local actions (used in workflow
 
 The jobs declared in ./.github/workflows/github-actions-debug.yml are triggered according to keywords present 
 in the name of the pushed branch:
-- `build_and_test_api`  -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `cython`, `doc` or `nsis`
-- `test_sanitize`       -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `cython`, `doc` or `nsis`
+- `build_and_test_api`  -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `python`, `doc` or `nsis`
+- `test_sanitize`       -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `python`, `doc` or `nsis`
 - `build_cli`           -> triggered if the branch name contains the word `cmd` or `cli`
 - `build_gui`           -> triggered if the branch name contains the word `gui`
-- `build_cython`        -> triggered if the branch name contains either the word `cython` or `nsis`
+- `build_python`        -> triggered if the branch name contains either the word `python` or `nsis`
 - `build_doc`           -> triggered if the branch name contains either the word `doc` or `nsis`
 - `build_nsis`          -> triggered if the branch name contains either the word `nsis` or `release`
