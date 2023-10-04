@@ -11,7 +11,7 @@ on:
         type: string
 
 jobs:
-    build_cython:
+    build_python:
         name: Build Python API for IODE
         strategy:
           matrix:
