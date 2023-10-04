@@ -10,7 +10,7 @@ jobs:
   build_and_test:
     if: |
       !contains(github.head_ref, 'doc') && !contains(github.head_ref, 'cmd') &&
-      !contains(github.head_ref, 'cli') && !contains(github.head_ref, 'cython') &&
+      !contains(github.head_ref, 'cli') && !contains(github.head_ref, 'python') &&
       !contains(github.head_ref, 'gui') && !contains(github.head_ref, 'nsis') &&
       !contains(github.head_ref, 'release')
     uses: ./.github/workflows/github-actions-build-and-test.yml 
@@ -29,8 +29,8 @@ jobs:
     with:
       build-config: windows-debug
 
-  build_cython:
-      if: contains(github.head_ref, 'cython')
+  build_python:
+      if: contains(github.head_ref, 'python')
       uses: ./.github/workflows/github-actions-python.yml 
       with:
           build-config: windows-debug
