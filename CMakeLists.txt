@@ -34,7 +34,8 @@ set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
 # SET(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /Oi /Ot")
 
 # -- print global info --
-message(STATUS "======== global info ========")
+message(STATUS " ")
+message(STATUS "======== global info ========\n")
 message(STATUS "IODE version:       ${PROJECT_VERSION}")
 message(STATUS "HOMEPAGE URL:       ${PROJECT_HOMEPAGE_URL}")
 message(STATUS "OS:                 ${CMAKE_SYSTEM_NAME}")
@@ -85,7 +86,8 @@ else()
   set(IODE_SANITIZER_FLAGS "-fsanitize-recover=address -O1 -fno-omit-frame-pointer")
 endif()
 
-message(STATUS "========= sanitizer =========")
+message(STATUS " ")
+message(STATUS "========= sanitizer =========\n")
 message(STATUS "Enable Sanitizer Flags: ${IODE_SANITIZER_FLAGS}")
 
 set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
@@ -104,6 +106,7 @@ else()
   set(IODE_SANITIZER_FLAGS "")
 endif()
 
+message(STATUS " ")
 message(STATUS "=============================")
 
 # ---- compile options ----
@@ -154,10 +157,13 @@ add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 # CMAKE_SOURCE_DIR is the full path to the top level 
 # of the current CMake source tree
 include_directories(${CMAKE_SOURCE_DIR})
+message(STATUS " ")
 message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
-message(STATUS "=============================")
+
 
 # ---- search for librairies and packages ----
+message(STATUS " ")
+message(STATUS "=============================")
 message(STATUS "SEARCH FOR PACKAGES:\n")
 
 # -- find Boost --
@@ -203,6 +209,7 @@ else()
   message(CHECK_FAIL "not found")
 endif()
 
+message(STATUS " ")
 message(STATUS "=============================")
 
 # ---- copy files to output build directory ----
@@ -225,8 +232,9 @@ file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syn
 # -- copy misc files --
 message(STATUS "\n-> error messages file <-")
 file(INSTALL iode.msg DESTINATION ${CMAKE_BINARY_DIR})
-message(STATUS "DONE\n")
+message(STATUS "DONE")
 
+message(STATUS " ")
 message(STATUS "=============================")
 message(STATUS "CREATE TARGETS:\n")
 
@@ -253,6 +261,7 @@ if(TARGET ${IODE_GUI_TARGET})
   add_subdirectory("nsis")
 endif()
 
+message(STATUS " ")
 message(STATUS "=============================\n")
 
 # ---- print info ----
