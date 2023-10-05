@@ -50,8 +50,6 @@ void MenuDataSearchText::search()
 {
     try
     {
-        KDBLists kdb_lst;
-
         std::string text = wText->extractAndVerify().toStdString();
         std::string save_list = wSaveList->extractAndVerify().toStdString();
         int iode_type = wComboIodeTypes->extractAndVerify();
@@ -74,7 +72,7 @@ void MenuDataSearchText::search()
             B_display_last_error();
         else 
         {
-            List res = kdb_lst.get(save_list);
+            List res = Lists.get(save_list);
             wResults->setQValue(QString::fromStdString(res));
         }
 

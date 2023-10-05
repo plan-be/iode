@@ -35,7 +35,7 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* par
 	mapFields["To"] = sampleTo;
 
 	std::string equation_name = equationName.toStdString();
-	if(!equation_name.empty() && kdb_eqs.contains(equation_name))
+	if(!equation_name.empty() && Equations.contains(equation_name))
 	{
 		// --- existing equation ---
 		className = "TAB_EDIT_EQUATION";
@@ -154,20 +154,20 @@ void EditEquationDialog::edit()
 		std::array<float, EQS_NBTESTS> tests = { 0.0 };
 
 		// update equation
-		if (kdb_eqs.contains(equation_name))
+		if (Equations.contains(equation_name))
 		{
-			Equation eq = kdb_eqs.get(equation_name);
+			Equation eq = Equations.get(equation_name);
 			computeHash(eq, true);
 
-			kdb_eqs.update(equation_name, lec, comment, method, sample, instruments, block, &tests);
+			Equations.update(equation_name, lec, comment, method, sample, instruments, block, &tests);
 		
-			Equation updated_eq = kdb_eqs.get(equation_name);
+			Equation updated_eq = Equations.get(equation_name);
 			computeHash(updated_eq);
 		}
 		// new equation
 		else
 		{
-			kdb_eqs.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
+			Equations.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
 			emit equationModified();
 		}
 

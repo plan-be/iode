@@ -53,8 +53,6 @@ void MenuDataFileCompare::compare()
 {
     try
     {
-        KDBLists kdb_lst;
-
         int iode_type = wComboIodeTypes->extractAndVerify();
         std::string threshold = wThreshold->extractAndVerify().toStdString();
         std::string input_file = wInputFile->extractAndVerify().toStdString();

@@ -44,36 +44,28 @@ void MenuDataDuplicateObj::duplicate()
         std::string obj_name = wObjName->extractAndVerify().toStdString();
         std::string dup_obj_name = wDupObjName->extractAndVerify().toStdString();
 
-        KDBComments kdb_cmt;
-        KDBEquations kdb_eqs;
-        KDBIdentities kdb_idt;
-        KDBLists kdb_lst;
-        KDBScalars kdb_scl;
-        KDBTables kdb_tbl;
-        KDBVariables kdb_var;
-
         switch (iode_type)
         {
         case I_COMMENTS:
-            kdb_cmt.add(dup_obj_name, kdb_cmt.copy(obj_name));
+            Comments.add(dup_obj_name, Comments.copy(obj_name));
             break;
         case I_EQUATIONS:
             throw IodeException("Cannot duplicate an equation");
             break;     
         case I_IDENTITIES:
-            kdb_idt.add(dup_obj_name, kdb_idt.copy(obj_name));
+            Identities.add(dup_obj_name, Identities.copy(obj_name));
             break; 
         case I_LISTS:
-            kdb_lst.add(dup_obj_name, kdb_lst.copy(obj_name));
+            Lists.add(dup_obj_name, Lists.copy(obj_name));
             break; 
         case I_SCALARS:
-            kdb_scl.add(dup_obj_name, kdb_scl.copy(obj_name));
+            Scalars.add(dup_obj_name, Scalars.copy(obj_name));
             break; 
         case I_TABLES:
-            kdb_tbl.add(dup_obj_name, kdb_tbl.copy(obj_name));
+            Tables.add(dup_obj_name, Tables.copy(obj_name));
             break; 
         case I_VARIABLES:
-            kdb_var.add(dup_obj_name, kdb_var.copy(obj_name));
+            Variables.add(dup_obj_name, Variables.copy(obj_name));
             break; 
         default:
             break;

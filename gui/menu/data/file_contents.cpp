@@ -42,8 +42,6 @@ void MenuDataFileContents::search()
 {
     try
     {
-        KDBLists kdb_lst;
-
         std::string pattern = wSearch->extractAndVerify().toStdString();
         int iode_type = wComboIodeTypes->extractAndVerify();
         std::string input_file = wInputFile->extractAndVerify().toStdString();
@@ -54,7 +52,7 @@ void MenuDataFileContents::search()
         if(res < 0)
             B_display_last_error();
 
-        List list = kdb_lst.get(save_list);
+        List list = Lists.get(save_list);
         wResult->setQValue(QString::fromStdString(list));
         int nb_elements = B_DataListCount(save_list.data());
         label_nb_elements->setText(QString::number(nb_elements) + " Elements");

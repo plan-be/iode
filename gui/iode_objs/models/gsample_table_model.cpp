@@ -6,10 +6,7 @@ GSampleTableModel::GSampleTableModel(const QString& refTable, const QString& gsa
     GSampleNumericalTableModel(nbDecimals, parent), refTable(refTable), variables(variables)
 {
     if(!variables.isEmpty())
-    {
-        KDBTables kdb_tables;
-        kdb_tables.add(refTable.toStdString(), 2, "", variables.toStdString(), false, false, false);
-    }
+        Tables.add(refTable.toStdString(), 2, "", variables.toStdString(), false, false, false);
 
     table = new GSampleTable(refTable.toStdString(), gsample.toStdString());
 }
@@ -18,10 +15,7 @@ GSampleTableModel::~GSampleTableModel()
 {
     delete table;
     if(!variables.isEmpty())
-    {
-        KDBTables kdb_tables;
-        kdb_tables.remove(refTable.toStdString());
-    }
+        Tables.remove(refTable.toStdString());
 }
 
 Qt::ItemFlags GSampleTableModel::flags(const QModelIndex& index) const

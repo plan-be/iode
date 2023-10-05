@@ -16,10 +16,9 @@ void AddCommentDialog::add()
 {
 	try
 	{
-		KDBComments kdb;
 		std::string name = lineName->extractAndVerify().toStdString();
 		std::string comment = lineDefinition->extractAndVerify().toStdString();
-		kdb.add(name, comment);
+		Comments.add(name, comment);
 		this->accept();
 	}
 	catch (const std::exception& e)

@@ -31,7 +31,6 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
 {
     Q_OBJECT
 
-    KDBEquations kdb_eqs;
     Estimation*  estimation;
     
     size_t hashBefore;

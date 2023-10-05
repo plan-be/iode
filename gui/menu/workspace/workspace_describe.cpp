@@ -17,13 +17,13 @@ MenuWorkspaceDescribe::MenuWorkspaceDescribe(QWidget* parent) :
     wTablesDescription = new WrapperQLineEdit(label_tables->text(), *lineEdit_tables, OPTIONAL_FIELD);
     wVariablesDescription = new WrapperQLineEdit(label_variables->text(), *lineEdit_variables, OPTIONAL_FIELD);
 
-    wCommentsDescription->setQValue(QString::fromStdString(KDBComments().get_description()));
-    wEquationsDescription->setQValue(QString::fromStdString(KDBEquations().get_description()));
-    wIdentitiesDescription->setQValue(QString::fromStdString(KDBIdentities().get_description()));
-    wListsDescription->setQValue(QString::fromStdString(KDBLists().get_description()));
-    wScalarsDescription->setQValue(QString::fromStdString(KDBScalars().get_description()));
-    wTablesDescription->setQValue(QString::fromStdString(KDBTables().get_description()));
-    wVariablesDescription->setQValue(QString::fromStdString(KDBVariables().get_description()));
+    wCommentsDescription->setQValue(QString::fromStdString(Comments.get_description()));
+    wEquationsDescription->setQValue(QString::fromStdString(Equations.get_description()));
+    wIdentitiesDescription->setQValue(QString::fromStdString(Identities.get_description()));
+    wListsDescription->setQValue(QString::fromStdString(Lists.get_description()));
+    wScalarsDescription->setQValue(QString::fromStdString(Scalars.get_description()));
+    wTablesDescription->setQValue(QString::fromStdString(Tables.get_description()));
+    wVariablesDescription->setQValue(QString::fromStdString(Variables.get_description()));
 
     className = "MENU_WORKSPACE_DESCRIBE";
     loadSettings();
@@ -53,46 +53,25 @@ void MenuWorkspaceDescribe::update_descriptions()
         std::string variables_description = wVariablesDescription->extractAndVerify().toStdString();
 
         if (!comments_description.empty())
-        {
-            KDBComments kdb;
-            kdb.set_description(comments_description);
-        }
+            Comments.set_description(comments_description);
 
         if (!equations_description.empty())
-        {
-            KDBEquations kdb;
-            kdb.set_description(equations_description);
-        }
+            Equations.set_description(equations_description);
 
         if (!identites_description.empty())
-        {
-            KDBIdentities kdb;
-            kdb.set_description(identites_description);
-        }
+            Identities.set_description(identites_description);
 
         if (!lists_description.empty())
-        {
-            KDBLists kdb;
-            kdb.set_description(lists_description);
-        }
+            Lists.set_description(lists_description);
 
         if (!scalars_description.empty())
-        {
-            KDBScalars kdb;
-            kdb.set_description(scalars_description);
-        }
+            Scalars.set_description(scalars_description);
 
         if (!tables_description.empty())
-        {
-            KDBTables kdb;
-            kdb.set_description(tables_description);
-        }
+            Tables.set_description(tables_description);
 
         if (!variables_description.empty())
-        {
-            KDBVariables kdb;
-            kdb.set_description(variables_description);
-        }
+            Variables.set_description(variables_description);
     }
     catch (const std::exception& e)
     {

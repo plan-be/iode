@@ -16,10 +16,9 @@ void AddListDialog::add()
 {
 	try
 	{
-		KDBLists kdb;
 		std::string name = lineName->extractAndVerify().toStdString();
 		std::string list = lineDefinition->extractAndVerify().toStdString();
-		kdb.add(name, list);
+		Lists.add(name, list);
 		this->accept();
 	}
 	catch (const std::exception& e)

@@ -28,11 +28,10 @@ void AddScalarDialog::add()
 {
 	try
 	{
-		KDBScalars kdb;
 		std::string name = lineName->extractAndVerify().toStdString();
 		IODE_REAL value = (IODE_REAL) lineValue->extractAndVerify().toDouble();
 		IODE_REAL relax = (IODE_REAL) spinBoxRelax->extractAndVerify();
-		kdb.add(name, value, relax);
+		Scalars.add(name, value, relax);
 		this->accept();
 	}
 	catch (const std::exception& e)
