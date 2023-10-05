@@ -155,6 +155,7 @@ add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 # of the current CMake source tree
 include_directories(${CMAKE_SOURCE_DIR})
 message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
+message(STATUS "=============================")
 
 # -- Boost --
 list(APPEND CMAKE_PREFIX_PATH "C:\\boost")
@@ -172,9 +173,23 @@ if(Boost_FOUND)
 else()
   message(CHECK_FAIL "not found")
 endif()
+message(STATUS " ")
+
+# ---- find Python ----
+message(CHECK_START "Search for Python")
+find_package(Python 3.9 COMPONENTS Interpreter Development REQUIRED)
+if(Python_FOUND)
+  message(CHECK_PASS "found")
+  message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
+  set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
+else()
+  message(CHECK_FAIL "not found")
+endif()
+
+message(STATUS "=============================")
 
 # ---- copy files to output build directory ----
-message(STATUS "\nCopying files to ${CMAKE_BINARY_DIR}..")
+message(STATUS "Copying files to ${CMAKE_BINARY_DIR} ...")
 
 # -- copy files for tests and gui --
 message(STATUS "\n-> test files <-")

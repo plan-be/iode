@@ -56,17 +56,11 @@ message(STATUS "DONE\n")
 #        which I regard as cleaner engineering."
 #        See https://discourse.cmake.org/t/create-and-activate-python-conda-environment-with-cmake/5777/2 
 
-message(CHECK_START "Search for Python")
-find_package(Python COMPONENTS Interpreter Development)
 
 if(Python_FOUND)
-  message(CHECK_PASS "found")
-  message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
-
   if(MSVC)
     set(COMPILER msvc)
 
-    set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
     set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
 
     add_custom_target(iode_python
@@ -91,5 +85,5 @@ if(Python_FOUND)
     message(WARNING "Could not create the target iode_python\n")
   endif()
 else()
-  message(CHECK_FAIL "not found")
+  message(WARNING "Python not found")
 endif()
