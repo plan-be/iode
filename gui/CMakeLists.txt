@@ -1,3 +1,6 @@
+
+message(STATUS "\n---- GUI (QT) ----\n")
+
 # https://doc.qt.io/qt-6.2/cmake-get-started.html
 
 set(CMAKE_AUTOUIC ON)
