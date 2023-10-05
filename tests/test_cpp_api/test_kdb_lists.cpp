@@ -4,8 +4,6 @@
 class KDBListsTest : public KDBTest, public ::testing::Test
 {
 protected:
-    KDBLists kdb;
-
     void SetUp() override
     {
         load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
@@ -26,11 +24,11 @@ TEST_F(KDBListsTest, Load)
 
 TEST_F(KDBListsTest, CopyConstructor)
 {
-    std::string list = kdb.get("COPY");
+    std::string list = Lists.get("COPY");
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
 
     // GLOBAL KDB
-    KDBLists kdb_copy(kdb);
+    KDBLists kdb_copy(Lists);
     EXPECT_EQ(kdb_copy.count(), 17);
     EXPECT_TRUE(kdb_copy.is_global_kdb());
 
@@ -57,11 +55,11 @@ TEST_F(KDBListsTest, Save)
 {
     // save in binary format
     save_global_kdb(I_LISTS, output_test_dir + "fun.lst");
-    kdb.dump(output_test_dir + "fun.lst");
+    Lists.dump(output_test_dir + "fun.lst");
 
     // save in ascii format
     save_global_kdb(I_LISTS, output_test_dir + "fun.al");
-    kdb.dump(output_test_dir + "fun.al");
+    Lists.dump(output_test_dir + "fun.al");
 }
 
 TEST_F(KDBListsTest, Get)
@@ -71,20 +69,20 @@ TEST_F(KDBListsTest, Get)
     std::string expected_list = "$COPY0;$COPY1;";
 
     // by position
-    list = kdb.get(pos);
+    list = Lists.get(pos);
     EXPECT_EQ(expected_list, list);
 
     // by name
-    std::string name = kdb.get_name(pos);
-    list = kdb.get(name);
+    std::string name = Lists.get_name(pos);
+    list = Lists.get(name);
     EXPECT_EQ(expected_list, list);
 }
 
 TEST_F(KDBListsTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
-    std::vector<std::string> names = kdb.get_names();
+    for (int i=0; i < Lists.count(); i++) expected_names.push_back(Lists.get_name(i));
+    std::vector<std::string> names = Lists.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -93,31 +91,31 @@ TEST_F(KDBListsTest, CreateRemove)
     std::string name = "A_COMMENTS";
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
 
-    kdb.add(name, new_list);
-    ASSERT_EQ(kdb.get(name), new_list);
+    Lists.add(name, new_list);
+    ASSERT_EQ(Lists.get(name), new_list);
 
-    kdb.remove(name);
-    EXPECT_THROW(kdb.get(name), IodeExceptionFunction);
+    Lists.remove(name);
+    EXPECT_THROW(Lists.get(name), IodeExceptionFunction);
 }
 
 TEST_F(KDBListsTest, Update)
 {
-    std::string expanded_list = kdb.get("COPY0") + kdb.get("COPY1");
+    std::string expanded_list = Lists.get("COPY0") + Lists.get("COPY1");
 
-    kdb.update("COPY", expanded_list);
-    EXPECT_EQ(kdb.get("COPY"), expanded_list);
+    Lists.update("COPY", expanded_list);
+    EXPECT_EQ(Lists.get("COPY"), expanded_list);
 }
 
 TEST_F(KDBListsTest, Copy)
 {
     std::string name = "COPY";
-    std::string list = kdb.get(name);
+    std::string list = Lists.get(name);
 
-    std::string list_copy = kdb.copy(name);
+    std::string list_copy = Lists.copy(name);
     EXPECT_EQ(list_copy, list);
 
     // add copy
-    kdb.add("DUP_" + name, list_copy);
+    Lists.add("DUP_" + name, list_copy);
 }
 
 TEST_F(KDBListsTest, Filter)
@@ -125,13 +123,12 @@ TEST_F(KDBListsTest, Filter)
     std::string pattern = "C*";
     std::vector<std::string> expected_names;
     KDBLists* local_kdb;
-    KDBLists global_kdb;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+    for (int p = 0; p < Lists.count(); p++) all_names.push_back(Lists.get_name(p));
     for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
 
-    int nb_total_comments = global_kdb.count();
+    int nb_total_comments = Lists.count();
 
     // remove duplicate entries
     // NOTE: std::unique only removes consecutive duplicated elements, 
@@ -147,10 +144,10 @@ TEST_F(KDBListsTest, Filter)
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
     std::string name = "COPY";
-    std::string expanded_list = kdb.get("COPY0") + kdb.get("COPY1");
+    std::string expanded_list = Lists.get("COPY0") + Lists.get("COPY1");
     local_kdb->update(name, expanded_list);
     EXPECT_EQ(local_kdb->get(name), expanded_list);
-    EXPECT_EQ(global_kdb.get(name), expanded_list);
+    EXPECT_EQ(Lists.get(name), expanded_list);
 
     // add an element to the local KDB and check if it has also 
     // been added to the global KDB
@@ -158,7 +155,7 @@ TEST_F(KDBListsTest, Filter)
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
     local_kdb->add(new_name, new_list);
     EXPECT_EQ(local_kdb->get(new_name), new_list);
-    EXPECT_EQ(global_kdb.get(new_name), new_list);
+    EXPECT_EQ(Lists.get(new_name), new_list);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
@@ -166,18 +163,18 @@ TEST_F(KDBListsTest, Filter)
     new_name = "LIST_NEW";
     local_kdb->rename(old_name, new_name);
     EXPECT_EQ(local_kdb->get(new_name), new_list);
-    EXPECT_EQ(global_kdb.get(new_name), new_list);
+    EXPECT_EQ(Lists.get(new_name), new_list);
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
     local_kdb->remove(new_name);
     EXPECT_FALSE(local_kdb->contains(new_name));
-    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_FALSE(Lists.contains(new_name));
 
     // delete local kdb
     delete local_kdb;
-    EXPECT_EQ(global_kdb.count(), nb_total_comments);
-    EXPECT_EQ(global_kdb.get(name), expanded_list);
+    EXPECT_EQ(Lists.count(), nb_total_comments);
+    EXPECT_EQ(Lists.get(name), expanded_list);
 }
 
 TEST_F(KDBListsTest, HardCopy)
@@ -185,10 +182,9 @@ TEST_F(KDBListsTest, HardCopy)
     std::string pattern = "C*";
     std::vector<std::string> expected_names;
     KDBLists* local_kdb;
-    KDBLists global_kdb;
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+    for (int p = 0; p < Lists.count(); p++) all_names.push_back(Lists.get_name(p));
     for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
 
     // remove duplicate entries
@@ -198,7 +194,7 @@ TEST_F(KDBListsTest, HardCopy)
     std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
     expected_names.resize(std::distance(expected_names.begin(), it));
 
-    int nb_total_comments = global_kdb.count();
+    int nb_total_comments = Lists.count();
 
     // create local kdb
     local_kdb = new KDBLists(KDB_LOCAL, pattern);
@@ -207,11 +203,11 @@ TEST_F(KDBListsTest, HardCopy)
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "COPY";
-    std::string list = global_kdb.get(name);
-    std::string expanded_list = kdb.get("COPY0") + kdb.get("COPY1");
+    std::string list = Lists.get(name);
+    std::string expanded_list = Lists.get("COPY0") + Lists.get("COPY1");
     local_kdb->update(name, expanded_list);
     EXPECT_EQ(local_kdb->get(name), expanded_list);
-    EXPECT_EQ(global_kdb.get(name), list);
+    EXPECT_EQ(Lists.get(name), list);
 
     // add an element to the local KDB and check if it has not 
     // been added to the global KDB
@@ -220,7 +216,7 @@ TEST_F(KDBListsTest, HardCopy)
     local_kdb->add(new_name, new_list);
     EXPECT_TRUE(local_kdb->contains(new_name));
     EXPECT_EQ(local_kdb->get(new_name), new_list);
-    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_FALSE(Lists.contains(new_name));
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
@@ -228,18 +224,18 @@ TEST_F(KDBListsTest, HardCopy)
     new_name = "LIST_NEW";
     local_kdb->rename(name, new_name);
     EXPECT_TRUE(local_kdb->contains(new_name));
-    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_FALSE(Lists.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
     // been deleted from the global KDB
     name = "COPY1";
     local_kdb->remove(name);
     EXPECT_FALSE(local_kdb->contains(name));
-    EXPECT_TRUE(global_kdb.contains(name));
+    EXPECT_TRUE(Lists.contains(name));
 
     // delete local kdb
     delete local_kdb;
-    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    EXPECT_EQ(Lists.count(), nb_total_comments);
 }
 
 TEST_F(KDBListsTest, Merge)
@@ -289,60 +285,60 @@ TEST_F(KDBListsTest, AssociatedObjs)
     load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
     load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
 
-    objs_list = kdb.get_associated_objects_list(name, I_COMMENTS);
+    objs_list = Lists.get_associated_objects_list(name, I_COMMENTS);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = kdb.get_associated_objects_list(name, I_EQUATIONS);
+    objs_list = Lists.get_associated_objects_list(name, I_EQUATIONS);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = kdb.get_associated_objects_list(name, I_IDENTITIES);
+    objs_list = Lists.get_associated_objects_list(name, I_IDENTITIES);
     EXPECT_EQ(objs_list.size(), 0);
 
     std::vector<std::string> expected_lts = { "COPY", "COPY0" };
-    objs_list = kdb.get_associated_objects_list(name, I_LISTS);
+    objs_list = Lists.get_associated_objects_list(name, I_LISTS);
     EXPECT_EQ(objs_list, expected_lts);
 
-    objs_list = kdb.get_associated_objects_list(name, I_SCALARS);
+    objs_list = Lists.get_associated_objects_list(name, I_SCALARS);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = kdb.get_associated_objects_list(name, I_TABLES);
+    objs_list = Lists.get_associated_objects_list(name, I_TABLES);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = kdb.get_associated_objects_list(name, I_VARIABLES);
+    objs_list = Lists.get_associated_objects_list(name, I_VARIABLES);
     EXPECT_EQ(objs_list.size(), 0);
 }
 
 TEST_F(KDBListsTest, Hash)
 {
     boost::hash<KDBLists> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(kdb);
+    std::size_t hash_val = kdb_hasher(Lists);
 
     // change a name
-    kdb.rename("COPY0", "COPY_0");
-    std::size_t hash_val_modified = kdb_hasher(kdb);
+    Lists.rename("COPY0", "COPY_0");
+    std::size_t hash_val_modified = kdb_hasher(Lists);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // modify an entry
     hash_val = hash_val_modified;
-    std::string expanded_list = kdb.get("COPY_0") + kdb.get("COPY1");
-    kdb.update("COPY", expanded_list);
-    hash_val_modified = kdb_hasher(kdb);
+    std::string expanded_list = Lists.get("COPY_0") + Lists.get("COPY1");
+    Lists.update("COPY", expanded_list);
+    hash_val_modified = kdb_hasher(Lists);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(modify list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
-    kdb.remove("COPY");
-    hash_val_modified = kdb_hasher(kdb);
+    Lists.remove("COPY");
+    hash_val_modified = kdb_hasher(Lists);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // add an entry
     hash_val = hash_val_modified;
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
-    kdb.add("NEW_ENTRY", new_list);
-    hash_val_modified = kdb_hasher(kdb);
+    Lists.add("NEW_ENTRY", new_list);
+    hash_val_modified = kdb_hasher(Lists);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

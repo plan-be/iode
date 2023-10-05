@@ -4,8 +4,6 @@
 class KDBTablesTest : public KDBTest, public ::testing::Test
 {
 protected:
-    KDBTables kdb;
-
     void SetUp() override
     {
         load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
@@ -26,13 +24,13 @@ TEST_F(KDBTablesTest, Load)
 
 TEST_F(KDBTablesTest, CopyConstructor)
 {
-    std::string title = kdb.get_title("C8_1");
+    std::string title = Tables.get_title("C8_1");
     std::string new_title = "modified title";
-    Table table = kdb.get("C8_1");
+    Table table = Tables.get("C8_1");
     table.setTitle(0, new_title);
 
     // GLOBAL KDB
-    KDBTables kdb_copy(kdb);
+    KDBTables kdb_copy(Tables);
     EXPECT_EQ(kdb_copy.count(), 46);
     EXPECT_TRUE(kdb_copy.is_global_kdb());
 
@@ -59,11 +57,11 @@ TEST_F(KDBTablesTest, Save)
 {
     // save in binary format
     save_global_kdb(I_TABLES, output_test_dir + "fun.tbl");
-    kdb.dump(output_test_dir + "fun.tbl");
+    Tables.dump(output_test_dir + "fun.tbl");
 
     // save in ascii format
     save_global_kdb(I_TABLES, output_test_dir + "fun.at");
-    kdb.dump(output_test_dir + "fun.at");
+    Tables.dump(output_test_dir + "fun.at");
 }
 
 TEST_F(KDBTablesTest, Get)
@@ -71,14 +69,14 @@ TEST_F(KDBTablesTest, Get)
     int pos = K_find(K_WS[I_TABLES], "GFRPC");
 
     // by position
-    Table table = kdb.get(pos);
+    Table table = Tables.get(pos);
     EXPECT_EQ(table.getTitle(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table.nbLines(), 31);
     EXPECT_EQ(table.nbColumns(), 2);
     EXPECT_EQ(table.getLineType(0), IT_TITLE);
 
     // by name
-    Table table2 = kdb.get("GFRPC");
+    Table table2 = Tables.get("GFRPC");
     EXPECT_EQ(table2.getTitle(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table2.nbLines(), 31);
     EXPECT_EQ(table2.nbColumns(), 2);
@@ -88,8 +86,8 @@ TEST_F(KDBTablesTest, Get)
 TEST_F(KDBTablesTest, GetNames)
 {
     std::vector<std::string> expected_names;
-    for (int i=0; i < kdb.count(); i++) expected_names.push_back(kdb.get_name(i));
-    std::vector<std::string> names = kdb.get_names();
+    for (int i=0; i < Tables.count(); i++) expected_names.push_back(Tables.get_name(i));
+    std::vector<std::string> names = Tables.get_names();
     EXPECT_EQ(names, expected_names);
 }
 
@@ -100,12 +98,12 @@ TEST_F(KDBTablesTest, GetTitle)
     std::string expected_title = "Déterminants de la croissance de K";
 
     // by position
-    title = kdb.get_title(pos);
+    title = Tables.get_title(pos);
     EXPECT_EQ(expected_title, title);
 
     // by name
-    std::string name = kdb.get_name(pos);
-    title = kdb.get_title(name);
+    std::string name = Tables.get_name(pos);
+    title = Tables.get_title(name);
     EXPECT_EQ(expected_title, title);
 }
 
@@ -121,7 +119,7 @@ TEST_F(KDBTablesTest, CreateRemove)
 
     // add empty table with 2 columns
     name = "TABLE1";
-    kdb.add(name, 2);
+    Tables.add(name, 2);
 
     int nb_lines_header = 0;
     int nb_lines_footnotes = 0;
@@ -130,7 +128,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     EXPECT_EQ(table1.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // remove table
-    kdb.remove(name);
+    Tables.remove(name);
 
     // add tables and initialize it (variables as list)
     name = "TABLE2";
@@ -139,7 +137,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     bool mode = true;
     bool files = true;
     bool date = true;
-    kdb.add(name, 2, def, vars, mode, files, date);
+    Tables.add(name, 2, def, vars, mode, files, date);
 
     // check that list $ENVI has been expanded
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
@@ -149,29 +147,29 @@ TEST_F(KDBTablesTest, CreateRemove)
     EXPECT_EQ(table2.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // remove table
-    kdb.remove(name);
+    Tables.remove(name);
 
     // add tables and initialize it (LEC cells as string)
     name = "TABLE3";
     std::string lecs = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG;" + list_name;
-    kdb.add(name, 2, def, lecs, mode, files, date);
+    Tables.add(name, 2, def, lecs, mode, files, date);
 
     // check that list $ENVI has been expanded
     Table table3(name);
     EXPECT_EQ(table3.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
     // remove table
-    kdb.remove(name);
+    Tables.remove(name);
 }
 
 TEST_F(KDBTablesTest, Copy)
 {
-    Table original_table = kdb.get("GFRPC");
+    Table original_table = Tables.get("GFRPC");
 
-    Table copy_table = kdb.copy("GFRPC");
+    Table copy_table = Tables.copy("GFRPC");
     EXPECT_EQ(copy_table, original_table);
 
     // add copy
-    kdb.add("DUP_GFRPC", copy_table);
+    Tables.add("DUP_GFRPC", copy_table);
 }
 
 TEST_F(KDBTablesTest, Filter)
@@ -179,15 +177,14 @@ TEST_F(KDBTablesTest, Filter)
     std::string pattern = "A*;*2";
     std::vector<std::string> expected_names;
     KDBTables* local_kdb;
-    KDBTables global_kdb;
 
     load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
     load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+    for (int p = 0; p < Tables.count(); p++) all_names.push_back(Tables.get_name(p));
 
-    int nb_total_comments = global_kdb.count();
+    int nb_total_comments = Tables.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *2
@@ -218,27 +215,27 @@ TEST_F(KDBTablesTest, Filter)
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
     EXPECT_EQ(local_kdb->get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(global_kdb.get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(local_kdb->get(new_name).nbLines(), global_kdb.get(new_name).nbLines());
-    EXPECT_EQ(local_kdb->get(new_name), global_kdb.get(new_name));
+    EXPECT_EQ(Tables.get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(local_kdb->get(new_name).nbLines(), Tables.get(new_name).nbLines());
+    EXPECT_EQ(local_kdb->get(new_name), Tables.get(new_name));
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "TABLE_NEW";
     local_kdb->rename(old_name, new_name);
-    EXPECT_EQ(local_kdb->get(new_name).nbLines(), global_kdb.get(new_name).nbLines());
-    EXPECT_EQ(local_kdb->get(new_name), global_kdb.get(new_name));
+    EXPECT_EQ(local_kdb->get(new_name).nbLines(), Tables.get(new_name).nbLines());
+    EXPECT_EQ(local_kdb->get(new_name), Tables.get(new_name));
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
     local_kdb->remove(new_name);
     EXPECT_FALSE(local_kdb->contains(new_name));
-    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_FALSE(Tables.contains(new_name));
 
     // delete local kdb
     delete local_kdb;
-    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    EXPECT_EQ(Tables.count(), nb_total_comments);
 }
 
 TEST_F(KDBTablesTest, HardCopy)
@@ -246,15 +243,14 @@ TEST_F(KDBTablesTest, HardCopy)
     std::string pattern = "A*;*2";
     std::vector<std::string> expected_names;
     KDBTables* local_kdb;
-    KDBTables global_kdb;
 
     load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
     load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
 
     std::vector<std::string> all_names;
-    for (int p = 0; p < global_kdb.count(); p++) all_names.push_back(global_kdb.get_name(p));
+    for (int p = 0; p < Tables.count(); p++) all_names.push_back(Tables.get_name(p));
 
-    int nb_total_comments = global_kdb.count();
+    int nb_total_comments = Tables.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *2
@@ -285,7 +281,7 @@ TEST_F(KDBTablesTest, HardCopy)
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
     EXPECT_TRUE(local_kdb->contains(new_name));
-    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_FALSE(Tables.contains(new_name));
     EXPECT_EQ(local_kdb->get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // rename an element in the local KDB and check if the 
@@ -294,18 +290,18 @@ TEST_F(KDBTablesTest, HardCopy)
     new_name = "TABLE_NEW";
     local_kdb->rename(name, new_name);
     EXPECT_TRUE(local_kdb->contains(new_name));
-    EXPECT_FALSE(global_kdb.contains(new_name));
+    EXPECT_FALSE(Tables.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
     // been deleted from the global KDB
     name = "T2";
     local_kdb->remove(name);
     EXPECT_FALSE(local_kdb->contains(name));
-    EXPECT_TRUE(global_kdb.contains(name));
+    EXPECT_TRUE(Tables.contains(name));
 
     // delete local kdb
     delete local_kdb;
-    EXPECT_EQ(global_kdb.count(), nb_total_comments);
+    EXPECT_EQ(Tables.count(), nb_total_comments);
 }
 
 TEST_F(KDBTablesTest, Merge)
@@ -360,45 +356,45 @@ TEST_F(KDBTablesTest, AssociatedObjs)
     load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
     load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
 
-    objs_list = kdb.get_associated_objects_list(name, I_COMMENTS);
+    objs_list = Tables.get_associated_objects_list(name, I_COMMENTS);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = kdb.get_associated_objects_list(name, I_EQUATIONS);
+    objs_list = Tables.get_associated_objects_list(name, I_EQUATIONS);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = kdb.get_associated_objects_list(name, I_IDENTITIES);
+    objs_list = Tables.get_associated_objects_list(name, I_IDENTITIES);
     EXPECT_EQ(objs_list.size(), 0);
 
     std::vector<std::string> expected_lst = { name };
-    objs_list = kdb.get_associated_objects_list(name, I_LISTS);
+    objs_list = Tables.get_associated_objects_list(name, I_LISTS);
     EXPECT_EQ(objs_list, expected_lst);
 
-    objs_list = kdb.get_associated_objects_list(name, I_SCALARS);
+    objs_list = Tables.get_associated_objects_list(name, I_SCALARS);
     EXPECT_EQ(objs_list.size(), 0);
 
     std::vector<std::string> expected_tbl = { name };
-    objs_list = kdb.get_associated_objects_list(name, I_TABLES);
+    objs_list = Tables.get_associated_objects_list(name, I_TABLES);
     EXPECT_EQ(objs_list, expected_tbl);
 
-    objs_list = kdb.get_associated_objects_list(name, I_VARIABLES);
+    objs_list = Tables.get_associated_objects_list(name, I_VARIABLES);
     EXPECT_EQ(objs_list.size(), 0);
 }
 
 TEST_F(KDBTablesTest, Hash)
 {
     boost::hash<KDBTables> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(kdb);
+    std::size_t hash_val = kdb_hasher(Tables);
 
     // change a name
-    kdb.rename("GFRPC", "NEW_NAME");
-    std::size_t hash_val_modified = kdb_hasher(kdb);
+    Tables.rename("GFRPC", "NEW_NAME");
+    std::size_t hash_val_modified = kdb_hasher(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
-    kdb.remove("NEW_NAME");
-    hash_val_modified = kdb_hasher(kdb);
+    Tables.remove("NEW_NAME");
+    hash_val_modified = kdb_hasher(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -409,8 +405,8 @@ TEST_F(KDBTablesTest, Hash)
     bool mode = true;
     bool files = true;
     bool date = true;
-    kdb.add("NEW_ENTRY", 2, def, vars, mode, files, date);
-    hash_val_modified = kdb_hasher(kdb);
+    Tables.add("NEW_ENTRY", 2, def, vars, mode, files, date);
+    hash_val_modified = kdb_hasher(Tables);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }
