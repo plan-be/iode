@@ -4,15 +4,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-message(CHECK_START "Search for Qt6 package")
-if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    list(APPEND CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
-endif()
-find_package(Qt6 COMPONENTS Core Widgets Gui Charts PrintSupport)
-
 if(Qt6_FOUND)
-message(CHECK_PASS "found")
-
 set(GUI_UTILS   
     super.h     super.cpp 
     wrapper_classes.h 
@@ -250,10 +242,13 @@ if(WIN32)
             "$<TARGET_FILE:${IODE_GUI_TARGET}>"
         COMMENT "Running windeployqt..."
     )
+
+message(STATUS "New target ${IODE_GUI_TARGET} enabled")
+
 endif()
 
 else()
 
-message(CHECK_FAIL "not found")
+message(WARNING "Qt not found")
 
 endif()

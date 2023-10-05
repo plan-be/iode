@@ -157,7 +157,10 @@ include_directories(${CMAKE_SOURCE_DIR})
 message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
 message(STATUS "=============================")
 
-# -- Boost --
+# ---- search for librairies and packages ----
+message(STATUS "SEARCH FOR PACKAGES:\n")
+
+# -- find Boost --
 list(APPEND CMAKE_PREFIX_PATH "C:\\boost")
 set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
 set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
@@ -175,7 +178,21 @@ else()
 endif()
 message(STATUS " ")
 
-# ---- find Python ----
+# -- find Qt --
+message(CHECK_START "Search for Qt6 package")
+if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    list(APPEND CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
+endif()
+find_package(Qt6 COMPONENTS Core Widgets Gui Charts PrintSupport)
+
+if(Qt6_FOUND)
+  message(CHECK_PASS "found")
+else()
+  message(CHECK_FAIL "not found")
+endif()
+message(STATUS " ")
+
+# -- find Python --
 message(CHECK_START "Search for Python")
 find_package(Python 3.9 COMPONENTS Interpreter Development REQUIRED)
 if(Python_FOUND)
@@ -189,7 +206,7 @@ endif()
 message(STATUS "=============================")
 
 # ---- copy files to output build directory ----
-message(STATUS "Copying files to ${CMAKE_BINARY_DIR} ...")
+message(STATUS "COPY FILES TO ${CMAKE_BINARY_DIR} ...\n")
 
 # -- copy files for tests and gui --
 message(STATUS "\n-> test files <-")
@@ -209,6 +226,9 @@ file(INSTALL resources/syntax/npp_syntax.xml DESTINATION ${CMAKE_BINARY_DIR}/syn
 message(STATUS "\n-> error messages file <-")
 file(INSTALL iode.msg DESTINATION ${CMAKE_BINARY_DIR})
 message(STATUS "DONE\n")
+
+message(STATUS "=============================")
+message(STATUS "CREATE TARGETS:\n")
 
 # ---- libraries ----
 add_subdirectory ("scr4")
@@ -232,6 +252,8 @@ add_subdirectory ("doc")
 if(TARGET ${IODE_GUI_TARGET})
   add_subdirectory("nsis")
 endif()
+
+message(STATUS "=============================\n")
 
 # ---- print info ----
 message(STATUS "======== target iode_scr4 ========")
