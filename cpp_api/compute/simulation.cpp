@@ -121,7 +121,6 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     IodeExceptionInvalidArguments error("Cannot calculate SCC");
 
     // result list names
-    KDBLists kdb_list;
     if (pre_name.empty())   error.add_argument("Pre-recursive list name", "empty");
     if (inter_name.empty()) error.add_argument("Recursive list name", "empty");
     if (post_name.empty())  error.add_argument("Post-recursive list name", "empty");
@@ -185,10 +184,9 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     }
 
     // result list names
-    KDBLists kdb_list;
-    if (!kdb_list.contains(pre_name))   error.add_argument("Pre-recursive list not found! ", pre_name);
-    if (!kdb_list.contains(inter_name)) error.add_argument("Recursive list not found! ", inter_name);
-    if (!kdb_list.contains(post_name))  error.add_argument("Post-recursive list not found! ", post_name);
+    if (!Lists.contains(pre_name))   error.add_argument("Pre-recursive list not found! ", pre_name);
+    if (!Lists.contains(inter_name)) error.add_argument("Recursive list not found! ", inter_name);
+    if (!Lists.contains(post_name))  error.add_argument("Post-recursive list not found! ", post_name);
 
     if (error.invalid_args())
     {
@@ -196,13 +194,13 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
         throw error;
     }
 
-    std::string list_pre = kdb_list.get(pre_name);
+    std::string list_pre = Lists.get(pre_name);
     char** c_pre = (char**) KL_expand(to_char_array(list_pre));
     if (!(list_pre.back() == ';')) list_pre += ";";
-    std::string list_inter = kdb_list.get(inter_name);
+    std::string list_inter = Lists.get(inter_name);
     char** c_inter = (char**) KL_expand(to_char_array(list_inter));
     if (!(list_inter.back() == ';')) list_inter += ";";
-    std::string list_post = kdb_list.get(post_name);
+    std::string list_post = Lists.get(post_name);
     char** c_post = (char**) KL_expand(to_char_array(list_post));
     std::string list_eqs = list_pre + list_inter + list_post;
     char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
