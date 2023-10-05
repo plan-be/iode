@@ -58,3 +58,5 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
     }
     return seed;
 }
+
+inline KDBEquations Equations;

@@ -49,3 +49,5 @@ inline std::size_t hash_value(KDBLists const& cpp_kdb)
     }
     return seed;
 }
+
+inline KDBLists Lists;

@@ -66,3 +66,5 @@ inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
     }
     return seed;
 }
+
+inline KDBIdentities Identities;

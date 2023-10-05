@@ -182,3 +182,5 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     }
     return seed;
 }
+
+inline KDBVariables Variables;
