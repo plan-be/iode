@@ -65,7 +65,6 @@ if(Python_FOUND)
 
     add_custom_target(iode_python
                       COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
-                      # COMMAND DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" ./py${Python_VERSION_}/iode.pyd
                       DEPENDS cythonize_iode.py
                       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                       COMMENT "Building iode.pyd for Python version ${Python_VERSION}"
