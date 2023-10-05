@@ -2,6 +2,8 @@
 # project specific logic here.
 #
 
+message(STATUS "\n---- SCR4 ----\n")
+
 # Header files
 set (HEADER_IODE 
 		s_a2m.h s_alldoc.h s_args.h s_calc.h  s_cpp.h s_date.h s_dir.h s_file.h s_html.h s_ini.h s_isc.h
@@ -63,3 +65,9 @@ set (SCR_IODE
 add_library (iode_scr4 STATIC ${HEADER_IODE} ${SCR_IODE})
 
 target_include_directories (iode_scr4 PUBLIC ".")
+
+if(TARGET iode_scr4)
+	message(STATUS "New target iode_scr4 enabled\n")
+else()
+	message(WARNING "Could not create the target iode_scr4\n")
+endif()
