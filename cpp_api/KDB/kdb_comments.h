@@ -50,3 +50,5 @@ inline std::size_t hash_value(KDBComments const& cpp_kdb)
     }
     return seed;
 }
+
+inline KDBComments Comments;

@@ -54,3 +54,5 @@ inline std::size_t hash_value(KDBTables const& cpp_kdb)
     }
     return seed;
 }
+
+inline KDBTables Tables;
