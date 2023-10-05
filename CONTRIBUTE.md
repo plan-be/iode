@@ -41,9 +41,10 @@
 To prepare the building of Python IODE, please create the following conda environments:
 ```bash
 > conda config --add channels larray-project
-> conda create --name py39 python=3.9 numpy pandas larray cython pytest
-> conda create --name py310 python=3.10 numpy pandas larray cython pytest
-> conda create --name py311 python=3.11 numpy pandas larray cython pytest
+> conda config --add channels conda-forge
+> conda create --name py39 python=3.9 numpy pandas larray cython nanobind pytest
+> conda create --name py310 python=3.10 numpy pandas larray cython nanobind pytest
+> conda create --name py311 python=3.11 numpy pandas larray cython nanobind pytest
 ```
 
 # Building Project
