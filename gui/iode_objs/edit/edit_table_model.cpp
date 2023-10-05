@@ -324,6 +324,5 @@ EnumLineType EditTableModel::getLineType(const int row) const
 
 void EditTableModel::save()
 {	
-	KDBTables kdb;
-	kdb.update(tableName.toStdString(), *table);
+	Tables.update(tableName.toStdString(), *table);
 }

@@ -300,42 +300,34 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 	}
 	else
 	{
-		KDBComments kdb_cmt;
-		KDBEquations kdb_eqs;
-		KDBIdentities kdb_idt;
-		KDBLists kdb_lst;
-		KDBScalars kdb_scl;
-		KDBTables kdb_tbl;
-		KDBVariables kdb_var;
-
 		switch (other_type)
 		{
 		case I_COMMENTS:
-			if(kdb_cmt.contains(std_name))
+			if(Comments.contains(std_name))
 				list << name;
 			break;
 		case I_EQUATIONS:
-			if(kdb_eqs.contains(std_name))
+			if(Equations.contains(std_name))
 				list << name;
 			break;
 		case I_IDENTITIES:
-			if(kdb_idt.contains(std_name))
+			if(Identities.contains(std_name))
 				list << name;
 			break;
 		case I_LISTS:
-			if(kdb_lst.contains(std_name))
+			if(Lists.contains(std_name))
 				list << name;
 			break;
 		case I_SCALARS:
-			if(kdb_scl.contains(std_name))
+			if(Scalars.contains(std_name))
 				list << name;
 			break;
 		case I_TABLES:
-			if(kdb_tbl.contains(std_name))
+			if(Tables.contains(std_name))
 				list << name;
 			break;
 		case I_VARIABLES:
-			if(kdb_var.contains(std_name))
+			if(Variables.contains(std_name))
 				list << name;
 			break;
 		default:

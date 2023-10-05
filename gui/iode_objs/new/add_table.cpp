@@ -41,8 +41,6 @@ void AddTableDialog::add()
 {
     try
     {
-        KDBTables kdb;
-
         std::string name = lineName->extractAndVerify().toStdString();
         int nb_columns = spinNbColumns->extractAndVerify();
         std::string title = lineTitle->extractAndVerify().toStdString();
@@ -51,7 +49,7 @@ void AddTableDialog::add()
         bool files = checkBoxFiles->extractAndVerify();
         bool date = checkBoxDate->extractAndVerify();
 
-        kdb.add(name, nb_columns, title, lecs, mode, files, date);
+        Tables.add(name, nb_columns, title, lecs, mode, files, date);
 
         this->accept();
     }

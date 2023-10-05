@@ -46,35 +46,28 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
         std::string to = wSampleEditSampleTo->extractAndVerify().toStdString();
         std::string object_names = wTextEditObjectNames->extractAndVerify().toStdString();
 
-        KDBComments kdb_comments;
-        KDBEquations kdb_equations;
-        KDBIdentities kdb_identities;
-        KDBLists kdb_lists;
-        KDBScalars kdb_scalars;
-        KDBTables kdb_tables;
-        KDBVariables kdb_variables;
         switch (iodeType)
         {
         case I_COMMENTS:
-            kdb_comments.copy_into(input_file, object_names);
+            Comments.copy_into(input_file, object_names);
             break;
         case I_EQUATIONS:
-            kdb_equations.copy_into(input_file, object_names);
+            Equations.copy_into(input_file, object_names);
             break;
         case I_IDENTITIES:
-            kdb_identities.copy_into(input_file, object_names);
+            Identities.copy_into(input_file, object_names);
             break;
         case I_LISTS:
-            kdb_lists.copy_into(input_file, object_names);
+            Lists.copy_into(input_file, object_names);
             break;
         case I_SCALARS:
-            kdb_scalars.copy_into(input_file, object_names);
+            Scalars.copy_into(input_file, object_names);
             break;
         case I_TABLES:
-            kdb_tables.copy_into(input_file, object_names);
+            Tables.copy_into(input_file, object_names);
             break;
         case I_VARIABLES:
-            kdb_variables.copy_into(input_file, from, to, object_names);
+            Variables.copy_into(input_file, from, to, object_names);
             break;
         default:
             break;

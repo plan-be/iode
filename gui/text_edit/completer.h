@@ -70,25 +70,25 @@ public:
         switch (iodeType)
         {
         case I_COMMENTS:
-            iodeDatabases.insert(I_COMMENTS, new KDBComments());
+            iodeDatabases.insert(I_COMMENTS, &Comments);
             break;
         case I_EQUATIONS:
-            iodeDatabases.insert(I_EQUATIONS, new KDBEquations());
+            iodeDatabases.insert(I_EQUATIONS, &Equations);
             break;
         case I_IDENTITIES:
-            iodeDatabases.insert(I_IDENTITIES, new KDBIdentities());
+            iodeDatabases.insert(I_IDENTITIES, &Identities);
             break;
         case I_LISTS:
-            iodeDatabases.insert(I_LISTS, new KDBLists());
+            iodeDatabases.insert(I_LISTS, &Lists);
             break;
         case I_SCALARS:
-            iodeDatabases.insert(I_SCALARS, new KDBScalars());
+            iodeDatabases.insert(I_SCALARS, &Scalars);
             break;
         case I_TABLES:
-            iodeDatabases.insert(I_TABLES, new KDBTables());
+            iodeDatabases.insert(I_TABLES, &Tables);
             break;
         case I_VARIABLES:
-            iodeDatabases.insert(I_VARIABLES, new KDBVariables());
+            iodeDatabases.insert(I_VARIABLES, &Variables);
             break;
         default:
             break;
@@ -108,13 +108,13 @@ public:
             addIodeType(iodeType, false);
         else
         {
-            iodeDatabases.insert(I_COMMENTS, new KDBComments());
-            iodeDatabases.insert(I_EQUATIONS, new KDBEquations());
-            iodeDatabases.insert(I_IDENTITIES, new KDBIdentities());
-            iodeDatabases.insert(I_LISTS, new KDBLists());
-            iodeDatabases.insert(I_SCALARS, new KDBScalars());
-            iodeDatabases.insert(I_TABLES, new KDBTables());
-            iodeDatabases.insert(I_VARIABLES, new KDBVariables());
+            iodeDatabases.insert(I_COMMENTS, &Comments);
+            iodeDatabases.insert(I_EQUATIONS, &Equations);
+            iodeDatabases.insert(I_IDENTITIES, &Identities);
+            iodeDatabases.insert(I_LISTS, &Lists);
+            iodeDatabases.insert(I_SCALARS, &Scalars);
+            iodeDatabases.insert(I_TABLES, &Tables);
+            iodeDatabases.insert(I_VARIABLES, &Variables);
         }
 
         if(updateListModel)

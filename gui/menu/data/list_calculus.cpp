@@ -60,8 +60,6 @@ void MenuDataListCalculus::calculus()
 {
     try
     {
-        KDBLists kdb_lst;
-
         std::string list1 = wList1->extractAndVerify().toStdString();
         std::string list2 = wList2->extractAndVerify().toStdString();
         std::string list_res = wListRes->extractAndVerify().toStdString();
@@ -74,7 +72,7 @@ void MenuDataListCalculus::calculus()
             B_display_last_error();
         else 
         {
-            List res = kdb_lst.get(list_res);
+            List res = Lists.get(list_res);
             wResults->setQValue(QString::fromStdString(res));
 
             int count = B_DataListCount(list_res.data());

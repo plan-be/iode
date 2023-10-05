@@ -87,8 +87,6 @@ void MenuComputeIdentities::compute()
 {
     try
     {
-        KDBIdentities kdb;
-
         std::string from = qFrom->extractAndVerify().toStdString();
         std::string to = qTo->extractAndVerify().toStdString();
         Sample sample(from, to);
@@ -109,7 +107,7 @@ void MenuComputeIdentities::compute()
         bool trace = qTrace->extractAndVerify();
         EnumLang language = (EnumLang) (qLanguage->extractAndVerify() + IT_ENGLISH);
 
-        kdb.execute_identities(from, to, identities_list, variables_files, scalars_files, trace);
+        Identities.execute_identities(from, to, identities_list, variables_files, scalars_files, trace);
         
         this->accept();
     }

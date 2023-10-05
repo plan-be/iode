@@ -16,10 +16,9 @@ void AddIdentityDialog::add()
 {
 	try
 	{
-		KDBIdentities kdb;
 		std::string name = lineName->extractAndVerify().toStdString();
 		std::string identity = lineDefinition->extractAndVerify().toStdString();
-		kdb.add(name, identity);
+		Identities.add(name, identity);
 		this->accept();
 	}
 	catch (const std::exception& e)
