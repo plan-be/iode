@@ -178,6 +178,5 @@ void Estimation::equations_estimate()
 
 void Estimation::save()
 {
-    KDBScalars scalars_global;
-    scalars_global.merge(*kdb_scl);
+    Scalars.merge(*kdb_scl);
 }
