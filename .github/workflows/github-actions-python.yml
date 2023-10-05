@@ -54,11 +54,12 @@ jobs:
           - name: Check conda
             shell: bash -el {0}
             run: conda info
-          - name: Install Python libraires - numpy, pandas, larray cython and pytest
+          - name: Install Python libraires - numpy, pandas, larray cython nanobind and pytest
             shell: bash -el {0}
             run: |
+              conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install numpy pandas larray cython pytest
+              conda install numpy pandas larray cython nanobind pytest
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
