@@ -30,7 +30,7 @@ protected:
                 kdb_ref.set_var(name, t, value);
             }
         }
-        kdb_ref.dump(ref_file);
+        kdb_ref.save(ref_file);
 
         // C: -> c:
         ref_file[0] = tolower(ref_file[0]);

@@ -63,11 +63,11 @@ TEST_F(KDBVariablesTest, Save)
 {
     // save in binary format
     save_global_kdb(I_VARIABLES, output_test_dir + "fun.var");
-    Variables.dump(output_test_dir + "fun.var");
+    Variables.save(output_test_dir + "fun.var");
 
     // save in ascii format
     save_global_kdb(I_VARIABLES, output_test_dir + "fun.av");
-    Variables.dump(output_test_dir + "fun.av");
+    Variables.save(output_test_dir + "fun.av");
 }
 
 TEST_F(KDBVariablesTest, GetSetVar)

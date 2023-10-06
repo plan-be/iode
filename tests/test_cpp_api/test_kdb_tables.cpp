@@ -57,11 +57,11 @@ TEST_F(KDBTablesTest, Save)
 {
     // save in binary format
     save_global_kdb(I_TABLES, output_test_dir + "fun.tbl");
-    Tables.dump(output_test_dir + "fun.tbl");
+    Tables.save(output_test_dir + "fun.tbl");
 
     // save in ascii format
     save_global_kdb(I_TABLES, output_test_dir + "fun.at");
-    Tables.dump(output_test_dir + "fun.at");
+    Tables.save(output_test_dir + "fun.at");
 }
 
 TEST_F(KDBTablesTest, Get)

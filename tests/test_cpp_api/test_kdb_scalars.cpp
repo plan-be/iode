@@ -58,11 +58,11 @@ TEST_F(KDBScalarsTest, Save)
 {
     // save in binary format
     save_global_kdb(I_SCALARS, output_test_dir + "fun.scl");
-    Scalars.dump(output_test_dir + "fun.scl");
+    Scalars.save(output_test_dir + "fun.scl");
 
     // save in ascii format
     save_global_kdb(I_SCALARS, output_test_dir + "fun.as");
-    Scalars.dump(output_test_dir + "fun.as");
+    Scalars.save(output_test_dir + "fun.as");
 }
 
 TEST_F(KDBScalarsTest, Get)
