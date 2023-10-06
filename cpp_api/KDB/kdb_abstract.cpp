@@ -248,7 +248,7 @@ std::vector<std::string> KDBAbstract::get_associated_objects_list(const std::str
     return objs_list;
 }
 
-void KDBAbstract::dump(const std::string& filepath)
+void KDBAbstract::save(const std::string& filepath)
 {
     if (count() == 0) return;
 
