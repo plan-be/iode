@@ -20,8 +20,6 @@ protected:
     virtual T get_unchecked(const int pos) const = 0;
 
 public:
-    KDBTemplate(const std::string& filepath) : KDBAbstract(filepath) {}
-
     KDBTemplate(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
         KDBAbstract(kdb_type, iode_type, pattern) {}
 

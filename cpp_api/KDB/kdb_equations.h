@@ -13,8 +13,6 @@ protected:
     Equation get_unchecked(const int pos) const override;
 
 public:
-    KDBEquations(const std::string& filepath) : KDBTemplate(filepath) {}
-
     KDBEquations(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_EQUATIONS, pattern) {};
 

@@ -12,8 +12,6 @@ protected:
     Table get_unchecked(const int pos) const override;
 
 public:
-    KDBTables(const std::string& filepath) : KDBTemplate(filepath) {}
-
     KDBTables(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_TABLES, pattern) {};
 
