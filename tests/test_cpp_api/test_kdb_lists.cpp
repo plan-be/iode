@@ -55,11 +55,11 @@ TEST_F(KDBListsTest, Save)
 {
     // save in binary format
     save_global_kdb(I_LISTS, output_test_dir + "fun.lst");
-    Lists.dump(output_test_dir + "fun.lst");
+    Lists.save(output_test_dir + "fun.lst");
 
     // save in ascii format
     save_global_kdb(I_LISTS, output_test_dir + "fun.al");
-    Lists.dump(output_test_dir + "fun.al");
+    Lists.save(output_test_dir + "fun.al");
 }
 
 TEST_F(KDBListsTest, Get)

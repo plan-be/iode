@@ -55,11 +55,11 @@ TEST_F(KDBEquationsTest, Save)
 {
     // save in binary format
     save_global_kdb(I_EQUATIONS, output_test_dir + "fun.eqs");
-    Equations.dump(output_test_dir + "fun.eqs");
+    Equations.save(output_test_dir + "fun.eqs");
 
     // save in ascii format
     save_global_kdb(I_EQUATIONS, output_test_dir + "fun.ae");
-    Equations.dump(output_test_dir + "fun.ae");
+    Equations.save(output_test_dir + "fun.ae");
 }
 
 TEST_F(KDBEquationsTest, GetLec)

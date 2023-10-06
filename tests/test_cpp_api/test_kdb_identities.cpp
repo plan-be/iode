@@ -55,11 +55,11 @@ TEST_F(KDBIdentitiesTest, Save)
 {
     // save in binary format
     save_global_kdb(I_IDENTITIES, output_test_dir + "fun.idt");
-    Identities.dump(output_test_dir + "fun.idt");
+    Identities.save(output_test_dir + "fun.idt");
 
     // save in ascii format
     save_global_kdb(I_IDENTITIES, output_test_dir + "fun.ai");
-    Identities.dump(output_test_dir + "fun.ai");
+    Identities.save(output_test_dir + "fun.ai");
 }
 
 TEST_F(KDBIdentitiesTest, Rename)

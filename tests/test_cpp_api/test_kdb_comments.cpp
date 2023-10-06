@@ -55,11 +55,11 @@ TEST_F(KDBCommentsTest, Save)
 {
     // save in binary format
     save_global_kdb(I_COMMENTS, output_test_dir + "fun.cmt");
-    Comments.dump(output_test_dir + "fun.cmt");
+    Comments.save(output_test_dir + "fun.cmt");
 
     // save in ascii format
     save_global_kdb(I_COMMENTS, output_test_dir + "fun.ac");
-    Comments.dump(output_test_dir + "fun.ac");
+    Comments.save(output_test_dir + "fun.ac");
 }
 
 TEST_F(KDBCommentsTest, Filename)
