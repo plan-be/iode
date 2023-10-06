@@ -15,11 +15,8 @@ protected:
 
 TEST_F(KDBTablesTest, Load)
 {
-    KDBTables kdb2;
-    EXPECT_EQ(kdb2.count(), 46);
-
-    KDBTables kdb3(input_test_dir + "fun.tbl");
-    EXPECT_EQ(kdb3.count(), 46);
+    Tables.load(input_test_dir + "fun.tbl");
+    EXPECT_EQ(Tables.count(), 46);
 }
 
 TEST_F(KDBTablesTest, CopyConstructor)

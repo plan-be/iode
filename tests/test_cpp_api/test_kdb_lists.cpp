@@ -15,11 +15,8 @@ protected:
 
 TEST_F(KDBListsTest, Load)
 {
-    KDBLists kdb2;
-    EXPECT_EQ(kdb2.count(), 17);
-
-    KDBLists kdb3(input_test_dir + "fun.lst");
-    EXPECT_EQ(kdb3.count(), 17);
+    Lists.load(input_test_dir + "fun.lst");
+    EXPECT_EQ(Lists.count(), 17);
 }
 
 TEST_F(KDBListsTest, CopyConstructor)
