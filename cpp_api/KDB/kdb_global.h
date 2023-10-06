@@ -134,6 +134,6 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
                const EnumIodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
                const std::string& nan, const std::string& separator, const std::string& debug_file = "");
 
-void low_to_high(const EnumIodeLtoH type, const char method, std::string& filepath, const std::string& var_list);
+void low_to_high(const EnumIodeLtoH type, const char method, const std::string& filepath, const std::string& var_list);
 
-void high_to_low(const EnumIodeHtoL type, std::string& filepath, const std::string& var_list);
+void high_to_low(const EnumIodeHtoL type, const std::string& filepath, const std::string& var_list);
