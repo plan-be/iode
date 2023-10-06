@@ -184,6 +184,10 @@ public:
 
     std::vector<std::string> get_associated_objects_list(const std::string& name, const EnumIodeType other_type);
 
+    // load - save - clear
+
+    void load(const std::string& filepath);
+
     void save(const std::string& filepath);
 
     void clear();

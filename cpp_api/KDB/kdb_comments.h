@@ -11,8 +11,6 @@ protected:
     Comment get_unchecked(const int pos) const override;
 
 public:
-    KDBComments(const std::string& filepath) : KDBTemplate(filepath) {}
-
     KDBComments(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
         KDBTemplate(kdb_type, I_COMMENTS, pattern) {};
 

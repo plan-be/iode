@@ -2,31 +2,6 @@
 #include "kdb_abstract.h"
 
 
-KDBAbstract::KDBAbstract(const std::string& filepath) : kdb_type(KDB_GLOBAL)
-{
-    EnumIodeFile file_type = get_iode_file_type(filepath);
-    if(file_type > I_VARIABLES_FILE)
-    {
-        std::filesystem::path p_filepath(filepath);
-        std::string ext = p_filepath.extension().string();
-        std::string msg = "Expected file with extension ";
-        msg += boost::algorithm::join(v_binary_ext, ", ");
-        msg += boost::algorithm::join(v_ascii_ext, ", ");
-        msg += "\nBut got file with extension " + ext;
-        throw IodeExceptionInitialization("IODE database", msg);
-    } 
-
-    iode_type = (EnumIodeType) file_type;
-    iode_type_name = vIodeTypes[iode_type];
-
-    if (K_WS[iode_type] == NULL) IodeInit();
-    cpp_assign_super_API();
-
-    local_kdb = NULL;
-    load_global_kdb(iode_type, filepath);
-}
-
-
 KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
     kdb_type(kdb_type), iode_type(iode_type)
 {
@@ -246,6 +221,32 @@ std::vector<std::string> KDBAbstract::get_associated_objects_list(const std::str
     for(int i=0; i < SCR_tbl_size((unsigned char**) c_list); i++)
         objs_list.push_back(std::string(c_list[i]));
     return objs_list;
+}
+
+void KDBAbstract::load(const std::string& filepath)
+{
+    if(kdb_type != KDB_GLOBAL)
+    {
+        std::string msg = "The load method can only be called if the ";
+        msg += "Database object represents the global " + iode_type_name + " workspace";
+        kwarning(to_char_array(msg));
+        return;
+    }
+
+    EnumIodeFile file_type = get_iode_file_type(filepath);
+    if(file_type > I_VARIABLES_FILE)
+    {
+        std::filesystem::path p_filepath(filepath);
+        std::string ext = p_filepath.extension().string();
+
+        std::string msg = "Expected file with extension ";
+        msg += boost::algorithm::join(v_binary_ext, ", ");
+        msg += boost::algorithm::join(v_ascii_ext, ", ");
+        msg += "\nBut got file with extension " + ext;
+        throw std::invalid_argument(msg);
+    } 
+
+    load_global_kdb(iode_type, filepath);
 }
 
 void KDBAbstract::save(const std::string& filepath)
