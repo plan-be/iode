@@ -98,17 +98,24 @@
  */
 int IodeInit()
 {
+    extern int      SW_ACTIVE;      // JMP 07/06/2023
+
     // To define the iode.msg file BEFORE scr4 (in SCR_init())
     B_IodeMsgPath();            
     
     // Initialize chrono for report functions
     RPF_ChronoReset();      
     
-    // Initialize scr4 SWAP memory management
-    SW_MIN_MEM = 120 * 1024L;
-    SW_MIN_SEGS = 2;
-    SW_SEG_SIZE = B_IniReadNum("GENERAL", "SEGSIZE", 65500);
-    if(SW_SEG_SIZE < 16384) SW_SEG_SIZE = 16384;                
+    // Initialize scr4 SWAP memory management if not yet done // JMP 07/06/2023
+    if(SW_ACTIVE == 0) {            // JMP 08/06/2023
+        SW_MIN_MEM = 120 * 1024L;
+        SW_MIN_SEGS = 2;
+        SW_SEG_SIZE = B_IniReadNum("GENERAL", "SEGSIZE", 65500);
+        if(SW_SEG_SIZE < 16384) SW_SEG_SIZE = 16384;            
+    }
+    
+//printf("SW_SEG_SIZE=%d\n", SW_SEG_SIZE);
+
     SW_init(1);
     
     // Create Empty WS
@@ -856,24 +863,88 @@ int IodeEstimate(char* veqs, char* afrom, char* ato)
 // --------------------
 
 /**
- *  Simulate of model.
+ *  Decompose a model in its Connex Components. Each component is stored in a 
+ *  list of endo names. 
+ *  Optionnaly reorder the recursive component by applying nbtris times a heuristic method
+ *  that puts the endogenous variables as close as possible to the incidence matrix diagonal.
  *  
- *  @param [in] per_from      char*     per_from
- *  @param [in] per_to        char*     per_to
- *  @param [in] eqs_list      char*     eqs_list
- *  @param [in] endo_exo_list char*     endo_exo_list
- *  @param [in] eps           double    eps
- *  @param [in] relax         double    relax
- *  @param [in] maxit         int       maxit 
- *  @param [in] init_values   int       init_values
- *  @param [in] sort_algo     int       sort_algo
- *  @param [in] nb_passes     int       nb_passes
- *  @param [in] debug         int       debug
- *  @param [in] newton_eps    double    newton_eps
- *  @param [in] newton_maxit  int       newton_maxit
- *  @param [in] newton_debug  int       newton_debug      
- *  @return                   int       0 in success, -1 on error
+ *  @param [in] nbtris         int number of passes of the pseudo-triangulation method
+ *  @param [in] pre_listname   char*  name of the list to store the pre-recursive equation names
+ *  @param [in] inter_listname char*  name of the list to store the recursive equation names
+ *  @param [in] post_listname  char*  name of the list to store the post-recursive equation names
+ *  @param [in] eqs_list       char*  model equations names (opt.)
+ *  @return                    int    0 on success, -1 on error   
  */
+int IodeModelCalcSCC(int nbtris, char* pre_listname, char* inter_listname, char* post_listname, char *eqs_list)
+{
+    int     rc = -1;
+    KDB		*tdbe = NULL;
+    char    **eqs = NULL;
+
+    if(eqs_list && eqs_list[0] != 0) {
+        eqs = (char**) SCR_vtoms(eqs_list, ",; ");
+    }    
+
+    if(SCR_tbl_size(eqs) == 0)
+        tdbe = K_WS[K_EQS];
+    else
+        tdbe = K_quick_refer(K_WS[K_EQS], eqs);
+
+    rc = KE_ModelCalcSCC(tdbe, nbtris, pre_listname, inter_listname, post_listname);
+
+    if(SCR_tbl_size(eqs) != 0) K_free_kdb(tdbe);
+
+    SCR_free_tbl(eqs);
+    return(rc);
+}
+
+int IodeModelSimulateSCC(char *per_from, char *per_to, 
+                         char *pre_eqlist, char *inter_eqlist, char* post_eqlist,
+                         double eps, double relax, int maxit, 
+                         int init_values, int debug, 
+                         double newton_eps, int newton_maxit, int newton_debug)
+{
+    char    arg[1024];
+    int     rc;
+    double  ksim_eps            = KSIM_EPS         ;
+    double  ksim_relax          = KSIM_RELAX       ;
+    int     ksim_maxit          = KSIM_MAXIT       ;
+    int     ksim_start          = KSIM_START       ;
+    int     ksim_debug          = KSIM_DEBUG       ;
+    double  ksim_newton_eps     = KSIM_NEWTON_EPS  ;
+    int     ksim_newton_maxit   = KSIM_NEWTON_MAXIT;
+    int     ksim_newton_debug   = KSIM_NEWTON_DEBUG;
+
+    KSIM_EPS   = eps;
+    KSIM_RELAX = relax;
+    KSIM_MAXIT = maxit;
+    KSIM_START = init_values;
+    KSIM_DEBUG = debug;
+    KSIM_NEWTON_EPS = newton_eps;
+    KSIM_NEWTON_MAXIT = newton_maxit;
+    KSIM_NEWTON_DEBUG = newton_debug;
+
+
+    if(per_from == 0 || per_to == 0) return(-1); // TODO: add error message
+    if(pre_eqlist == 0 || inter_eqlist == 0 || post_eqlist == 0) return(-1); // TODO: add error message
+    sprintf(arg, "%s %s %s %s %s", per_from, per_to, pre_eqlist, inter_eqlist, post_eqlist);
+    rc = B_ModelSimulateSCC(arg);
+
+    // Restore old values
+    KSIM_EPS           = ksim_eps         ;
+    KSIM_RELAX         = ksim_relax       ;
+    KSIM_MAXIT         = ksim_maxit       ;
+    KSIM_START         = ksim_start       ;
+    KSIM_DEBUG         = ksim_debug       ;
+    KSIM_NEWTON_EPS    = ksim_newton_eps  ;
+    KSIM_NEWTON_MAXIT  = ksim_newton_maxit;
+    KSIM_NEWTON_DEBUG  = ksim_newton_debug;
+
+    return(rc);
+}
+
+
+
 int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list,
                  double eps, double relax, int maxit, 
                  int init_values, int sort_algo, int nb_passes, int debug, 
@@ -935,6 +1006,36 @@ int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_e
 
     return(rc);
 }
+
+
+double IodeModelSimNorm(char* period)
+{
+    U_ch *args[2];
+    
+    args[0] = period;
+    args[1] = 0;
+    
+    return(RPF_SimNormReal(args));
+}
+
+int IodeModelSimNIter(char* period)
+{
+    U_ch *args[2];
+    
+    args[0] = period;
+    args[1] = 0;
+    return(RPF_SimNIterInt(args));
+}
+    
+int IodeModelSimCpu(char* period)
+{
+    U_ch *args[2];
+    
+    args[0] = period;
+    args[1] = 0;
+    return(RPF_SimCpuInt(args));
+}
+
 
 
 // ----------------
