@@ -41,6 +41,7 @@
  *      int RP_goto(char* arg)                           $goto label [value]
  *      int RP_message(char* arg)                        $show message
  *      int RP_warning(char* arg)                        $msg text
+ *      int RP_silent(char* arg)                         $silent {0|1|N|n|Y|y]
  *      int RP_beep()                                    $beep
  *      int RP_ask(char* arg)                            $ask <label> <question>
  *      int B_ReportPrompt(char* arg)                    #prompt <macro_name> <question>
@@ -316,18 +317,39 @@ int RP_message(char* arg)
     return(0);
 }
 
+
 // $msg text
 int RP_warning(char* arg)            
 {
     if(arg == NULL || arg[0] == 0) return(0); /* JMP 11-07-96 */
 
     if(strlen(arg) > 512) arg[512] = 0;
-    kwarning("%s", arg);
+    kwarning("%s", arg); 
+    return(0);
+}
+
+// $silent {0|1|n|N|Y|y}
+int RP_silent(char* arg)   
+{  
+     int     ch;
+    
+    ch = SCR_upper_char(arg[0]);
+    switch(ch) {
+        case '0' :
+        case 'n':
+        case 'N':
+            kmsg_toggle(1);
+            break;
+
+        default :
+            kmsg_toggle(0);
+            break;
+    }
     return(0);
 }
 
 // $beep
-int RP_beep()
+int RP_beep(char* arg)
 {
     kbeep();
     return(0);
