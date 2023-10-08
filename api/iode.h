@@ -119,7 +119,6 @@
 #define KMAGIC(kdb)  ((kdb)->k_magic)
 #define KTYPE(kdb)   ((kdb)->k_type)
 #define KMODE(kdb)   ((kdb)->k_mode)
-//#define KNAME(kdb)   ((kdb)->k_name) Supprim� pour �viter les oublis
 #define KNAMEPTR(kdb)((kdb)->k_nameptr) // 6.44
 #define KDESC(kdb)   ((kdb)->k_desc)
 #define KDATA(kdb)   ((kdb)->k_data)
@@ -844,14 +843,14 @@ typedef struct _sample {
 } SAMPLE;
 
 typedef struct _lname_ {
-    ONAME   name;       // scalar or variable name
+    ONAME   name;   // scalar or variable name
 	char    pad[3];
-    long    pos; /* SWHDL */ /* IODE64K */
+    long    pos;    // SWHDL 
 } LNAME;
 
 typedef struct _clec_ {
-    long    tot_lg,        /* JMP 20-05-00 */ /* IODE64K */
-		exec_lg;       /* JMP 20-05-00 */ /* IODE64K */
+    long    tot_lg,      
+		exec_lg;       
     short   nb_names;   // number of scalar and variables names
     char    dupendo;
     char    pad;
@@ -973,15 +972,15 @@ typedef struct _col_ {
 
     /*   {{v00, v01},{v10,v11}}
 
-		    |             |
-		    |   file1     |   file2
+            |             |
+            |   file1     |   file2
     --------|-------------|------------
     period1 |    v00      |    v01
-		    | cl_val[0,0] | cl_val[0,1]    v.. = valeur
+            | cl_val[0,0] | cl_val[0,1]    v.. = valeur
     --------|-------------|------------
     period2 |    v10      |    v11
-		    | cl_val[1,0] | cl_val[1,1]
-		    |             |
+            | cl_val[1,0] | cl_val[1,1]
+            |             |
     */
     IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
@@ -1079,8 +1078,8 @@ typedef struct _token {
 
 typedef struct _lstack {        /* stack of operators used by L_analyse */
     unsigned ls_op      : 8;    /* operator */
-    //unsigned ls_nb_args : 8;    /* nb of arguments */
-    unsigned ls_nb_args;        /* nb of arguments */ // 16 bits pour permettre de v�rifier si plus de 255 arguments
+    //unsigned ls_nb_args : 8;  /* nb of arguments */
+    unsigned ls_nb_args;        /* nb of arguments : 16 bits instead of 8 to allow checking max 255 args
 } LSTACK;
 
 
@@ -1188,6 +1187,9 @@ extern int          KSIM_MAXIT,             // Simulation: max number of iterati
 		    KSIM_NEWTON_MAXIT,      // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
 		    KSIM_SORT,              // Simulation: reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
 		    KSIM_START;             // Simulation: endogenous initial values
+
+
+
 extern char         **KSIM_EXO;
 
 /*-------------- MESSAGES -----------------------*/
@@ -1323,18 +1325,23 @@ extern MAT  *E_RHS,
        *E_DEV;
 
 /************************* SIMULATION *************************************/
-extern int          KSIM_MAXIT;
-extern int          *KSIM_NITERS;
-extern IODE_REAL    *KSIM_NORMS;
+extern int          KSIM_MAXIT;     // Maximum number of iteration to reach a solution
+extern int          *KSIM_NITERS;   // Numbers of iterations needed for each simulation period
+extern long         *KSIM_CPUS;     // Elapsed time for each simulation period
+extern IODE_REAL    *KSIM_NORMS;    // Convergence threshold reached at the end of each simulation period
+
+extern int          KSIM_CPU_SCC;   // Elapsed time to compute SCC
+extern int          KSIM_CPU_SORT;  // Elapsed time to sort interdep block
 
 // EQUATION ORDERING
-extern int  KSIM_PRE;
-extern int  KSIM_INTER;
-extern int  KSIM_POST;
+extern int  KSIM_PRE;               // number of equations in the "prolog" block
+extern int  KSIM_INTER;             // number of equations in the "interdep" block
+extern int  KSIM_POST;              // number of equations in the "epilog"
 //extern int  *KSIM_ORDER;
 //extern char *KSIM_ORDERED;
-extern int  KSIM_MAXDEPTH;
-extern int  *KSIM_POSXK;
+extern int  KSIM_MAXDEPTH;          // Number of equations in the model
+extern int  *KSIM_POSXK;            // Position in KSIM_DBV of the endo variable of equation "KSIM_DBE[i]"
+extern int  *KSIM_POSXK_REV;        // Position in KSIM_DBE of the equation whose endo is "KSIM_DBV[i]" (reverse of KSIM_POSXK)
 
 /*********************** FUNCTIONS DECLARATIONS ***************************/
 // NEW FOR IODECOM (JMP 1/23/2018)
