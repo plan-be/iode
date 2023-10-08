@@ -40,6 +40,7 @@
  *  
  *  List of functions
  *  -----------------
+ *      U_ch *RPF_iode_version()
  *      U_ch *RPF_take(U_ch** args)
  *      U_ch *RPF_drop(U_ch** args)
  *      U_ch *RPF_replace(U_ch** args)
@@ -88,9 +89,15 @@
  *      int RPF_CalcPeriod(U_ch** args)
  *      U_ch *RPF_SimNorm(U_ch** args)
  *      U_ch *RPF_SimNIter(U_ch** args)
+ *      U_ch *RPF_SimCpu(U_ch** args)
  *      U_ch *RPF_SimMaxit()
  *      U_ch *RPF_SimEps()
  *      U_ch *RPF_SimRelax()
+ *      U_ch *RPF_SimSortNbPasses()
+ *      U_ch *RPF_SimSortAlgo()
+ *      U_ch *RPF_SimInitValues()
+ *      U_ch *RPF_SimCpuSCC()
+ *      U_ch *RPF_SimCpuSort()
  *      U_ch *RPF_vtake(U_ch** args)
  *      U_ch *RPF_vdrop(U_ch** args)
  *      U_ch *RPF_vcount(U_ch** args)
@@ -110,6 +117,7 @@
 #include "iode.h"
 #include <direct.h>
 #include <time.h>
+
 
 /*--------------------------- STRING MANIPULATIONS -------------------------------*/
 
@@ -1374,60 +1382,6 @@ int RPF_CalcPeriod(U_ch** args)
 
 
 /**
- *  Syntax: @SimNorm(period)
- *  
- *  Examples
- *  --------
- *      @SimNorm(2000Y1)        =>  "0.000850147"
- *      @SimNorm(2001Y1)        =>  "0.000798655"
- *      @SimNorm(2002Y1)        =>  "0"
- *      @SimNorm(1990Y1)        =>  "0"
- */
-U_ch *RPF_SimNorm(U_ch** args)
-{
-    int		t;
-    char	buf[128];
-
-    t = RPF_CalcPeriod(args);
-    if(t < 0) return(SCR_malloc(1));
-
-    // Check si déjà simulation
-    if(KSIM_NORMS == 0) return(SCR_stracpy("0")); // Pas encore de simulation
-
-    // Return norme t
-    sprintf(buf, "%lg", KSIM_NORMS[t]);
-    return(SCR_stracpy(buf));
-}
-
-
-/**
- *  Syntax: @SimNIter(period)
- *  
- *  Examples
- *  --------
- *      @SimNiter(2000Y1)       =>  "31"
- *      @SimNiter(2001Y1)       =>  "24"
- *      @SimNiter(2002Y1)       =>  "0"
- *      @SimNiter(1990Y1)       =>  "0"
- */
-U_ch *RPF_SimNIter(U_ch** args)
-{
-    int		t;
-    char	buf[128];
-
-    t = RPF_CalcPeriod(args);
-    if(t < 0) return(SCR_malloc(1));
-
-    // Check si déjà simulation
-    if(KSIM_NITERS == 0) return(SCR_stracpy("0")); // Pas encore de simulation
-
-    // Return norme t
-    sprintf(buf, "%d", KSIM_NITERS[t]);
-    return(SCR_stracpy(buf));
-}
-
-
-/**
  *  Syntax: @SimMaxit()
  *  
  *  Examples
@@ -1458,6 +1412,7 @@ U_ch *RPF_SimEps()
     return(SCR_stracpy(buf));
 }
 
+
 /**
  *  Syntax: @SimRelax()
  *  
@@ -1472,6 +1427,223 @@ U_ch *RPF_SimRelax()
     sprintf(buf, "%lf", KSIM_RELAX);
     return(SCR_stracpy(buf));
 }
+
+
+/**
+ *  Syntax: @SimSortNbPasses()
+ *  
+ *  Examples
+ *  --------
+ *        @SimSortNbPasses()        =>  "5"
+ */
+U_ch *RPF_SimSortNbPasses()
+{
+    U_ch    buf[128];
+
+    sprintf(buf, "%d", KSIM_PASSES);
+    return(SCR_stracpy(buf));
+}
+
+/**
+ *  Syntax: @SimSortAlgo()
+ *  
+ *  Examples
+ *  --------
+ *        @SimSortAlgo()        =>  "Triangulation"
+ */
+U_ch *RPF_SimSortAlgo()
+{
+    char *algos[] = {"Connex", "Triangulation", "None"};
+    
+    int     isort;
+
+    isort = KSIM_SORT;
+    if(isort < 0 || isort > 2)
+        isort = 1; // Default value
+        
+    return(SCR_stracpy(algos[isort]));
+}
+
+
+/**
+ *  Syntax: @SimInitValues()
+ *  
+ *  Examples
+ *  --------
+ *        @SimInitValues()        =>  "1"
+ */
+U_ch *RPF_SimInitValues()
+{
+    U_ch    buf[128];
+
+    sprintf(buf, "%d", KSIM_START);
+    return(SCR_stracpy(buf));
+}
+
+
+/**
+ *  Sub-fn of RPF_SimNorm().
+ *  
+ *  @param [in] args U_ch*  period from which norm has to be to retrieved
+ *  @return          double convergence criteria of the period arg or -1.0 if no simulation       
+ */
+IODE_REAL RPF_SimNormReal(U_ch** args)
+{
+    int		t;
+
+    t = RPF_CalcPeriod(args);
+    if(t < 0) return(-1.0);
+
+    // Check si déjà simulation
+    if(KSIM_NORMS == 0) return(-1.0); // Pas encore de simulation
+
+    // Return norme t
+    return(KSIM_NORMS[t]);
+}
+
+/**
+ *  Syntax: @SimNorm(period)
+ *  
+ *  Examples
+ *  --------
+ *      @SimNorm(2000Y1)        =>  "0.000850147"
+ *      @SimNorm(2001Y1)        =>  "0.000798655"
+ *      @SimNorm(2002Y1)        =>  "0"
+ *      @SimNorm(1990Y1)        =>  "0"
+ */
+U_ch *RPF_SimNorm(U_ch** args)
+{
+    char	buf[128];
+    double  value;
+
+    value = RPF_SimNormReal(args);
+    if(value < 0) return(SCR_malloc(1));
+    sprintf(buf, "%lg", value);
+    return(SCR_stracpy(buf));
+}
+
+/**
+ *  Subfunction of RPF_SimNIter().
+ *  
+ *  @param [in] args    char**  period  (eg: args[0] => "2001Y1")
+ *  @return             int     nb of iterations to converge in the last simulation for period arg[0]
+ */
+int RPF_SimNIterInt(U_ch** args)
+{
+    int		t;
+
+    t = RPF_CalcPeriod(args);
+    if(t < 0) return(-1);
+
+    // Check si déjà simulation
+    if(KSIM_NITERS == 0) return(-1); // Pas encore de simulation
+
+    // Return norme t
+    return(KSIM_NITERS[t]);
+}
+
+/**
+ *  Syntax: @SimNIter(period)
+ *  
+ *  Examples
+ *  --------
+ *      @SimNiter(2000Y1)       =>  "31"
+ *      @SimNiter(2001Y1)       =>  "24"
+ *      @SimNiter(2002Y1)       =>  "0"
+ *      @SimNiter(1990Y1)       =>  "0"
+ */
+U_ch *RPF_SimNIter(U_ch** args)
+{
+    int		niter;
+    char	buf[128];
+
+    niter = RPF_SimNIterInt(args);
+    if(niter < 0) return(SCR_malloc(1));
+
+    // Return niter in t
+    sprintf(buf, "%d", niter);
+    return(SCR_stracpy(buf));
+}
+
+
+/**
+ *  Subfunction of RPF_SimCpu().
+ *  
+ *  @param [in] args    char**  period  (eg: args[0] => "2001Y1")
+ *  @return             int     time (in ms) elapsed to reach convergence in the last simulation for period arg[0]
+ */
+int RPF_SimCpuInt(U_ch** args)
+{
+    int		t;
+
+    t = RPF_CalcPeriod(args);
+    if(t < 0) return(-1);
+
+    // Check si déjà simulation
+    if(KSIM_CPUS == 0) return(-1); // Pas encore de simulation
+
+    // Return norme t
+    return(KSIM_CPUS[t]);
+}
+
+
+/**
+ *  Syntax: @SimCpu(period)
+ *  
+ *  Returns the time (in ms) elapsed during last simulation of the specidied period.
+ *  
+ *  Examples
+ *  --------
+ *      @SimCpu(2000Y1)       =>  "31"
+ *      @SimCpu(2001Y1)       =>  "24"
+ *      @SimCpu(2002Y1)       =>  "0"
+ *      @SimCpu(1990Y1)       =>  "0"
+ */
+U_ch *RPF_SimCpu(U_ch** args)
+{
+    int		cpu;
+    char	buf[128];
+
+    cpu = RPF_SimCpuInt(args);
+    if(cpu < 0) return(SCR_malloc(1));
+
+    sprintf(buf, "%d", cpu);
+    return(SCR_stracpy(buf));
+}
+
+
+
+/**
+ *  Syntax: @SimCpuSCC()
+ *  
+ *  Examples
+ *  --------
+ *        @SimCpuSCC()        =>  "31343"
+ */
+U_ch *RPF_SimCpuSCC()
+{
+    U_ch    buf[128];
+
+    sprintf(buf, "%d", KSIM_CPU_SCC);
+    return(SCR_stracpy(buf));
+}
+
+/**
+ *  Syntax: @SimCpuReorder()
+ *  
+ *  Examples
+ *  --------
+ *        @SimCpuReorder()        =>  "1234"
+ */
+U_ch *RPF_SimCpuSort()
+{
+    U_ch    buf[128];
+
+    sprintf(buf, "%d", KSIM_CPU_SORT);
+    return(SCR_stracpy(buf));
+}
+
+
 
 /*=================== VTake, ... ==============================*/
 
@@ -1603,6 +1775,24 @@ U_ch *RPF_vcount(U_ch** args)
 
 
 /*---------------------- SYSTEM --------------------------------*/
+
+/**
+ *  Syntax: @Version()
+ *  
+ *  Examples
+ *  --------
+ *        @IodeVersion()             =>  "6.69"
+ */
+U_ch *RPF_IodeVersion()
+{
+    U_ch    buf[128];
+
+    sprintf(buf, "%d.%d", IODE_VERSION_MAJOR, IODE_VERSION_MINOR);
+    return(SCR_stracpy(buf));
+}
+
+
+
 
 /**
  *  Syntax: @memory()
