@@ -20,10 +20,12 @@
 #include "iode.h"
 
 /* EQUATION ORDERING */
-int     KSIM_PRE,       // number of equations in the "prolog" block 
-        KSIM_INTER,     // number of equations in the "interdep" block
-        KSIM_POST,      // number of equations in the "epilog"
-        *KSIM_ORDER;    // position in dbe of the equations (to simulate) in the execution order
+int     KSIM_PRE;       // number of equations in the "prolog" block 
+int     KSIM_INTER;     // number of equations in the "interdep" block
+int     KSIM_POST;      // number of equations in the "epilog"
+int     *KSIM_ORDER;    // position in dbe of the equations (to simulate) in the execution order
+int     KSIM_CPU_SCC;   // Elapsed time to compute SCC
+int     KSIM_CPU_SORT;  // Elapsed time to sort interdep block
 
 static int     *KSIM_PERM;      // vector of permutation 
 static char    *KSIM_ORDERED;   // indicates if equation i is already in a block
@@ -170,7 +172,7 @@ static void KE_postorder(KDB* dbe, int** predecessors, int** successors)
 
 
 /**
- * Prepares the model reordering by creating 2 vectors predecessors et successors containing 
+ * Prepares the model reordering by creating 2 vectors (predecessors and successors) containing 
  * the predecessors and successors of each equation.
  *  
  *		predecessors[i][0]    = nb of predecessors (endos) in the equation i
@@ -213,6 +215,7 @@ static void KE_preorder(KDB* dbe, int** predecessors, int** successors)
             if(L_ISCOEF(clec->lnames[j].name)) continue;
             // Recherche l'eq dont la variable j est endo
             posj = (clec->lnames[j]).pos;
+            
             if(KSIM_POSXK[i] == posj)  // améliore les performances JMP 11/3/2012 -- CHECK!
                 pos = -1; // Endo de l'eq courante
             else {
@@ -260,8 +263,13 @@ static void KE_preorder(KDB* dbe, int** predecessors, int** successors)
 void KE_order(KDB* dbe, char** eqs)
 {
     int     **predecessors, **successors, *tmp2, i, k, nb;
+    long    cpu_order = 0; 
 
+    KSIM_CPU_SORT = 0;
+    KSIM_CPU_SCC = 0;
+    
     nb = KNB(dbe);
+    
     // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
     if(KSIM_SORT == SORT_NONE) {
         KSIM_PRE = KSIM_POST = 0;
@@ -275,7 +283,9 @@ void KE_order(KDB* dbe, char** eqs)
         return;
     }
 
-    kmsg("Sorting equations ....");
+    //kmsg("Sorting equations ....");
+    cpu_order = WscrGetMS();
+    kmsg("Calculating SCC...");
 
     // predecessors = liste de pointeur vers des vecteurs contenant la pos de toutes les vars de l'eq i
     // voir preorder
@@ -284,7 +294,7 @@ void KE_order(KDB* dbe, char** eqs)
     KE_preorder(dbe, predecessors, successors);
     KSIM_PRE = KE_pre(dbe, predecessors, 0);
     KSIM_POST = KE_pre(dbe, successors, KSIM_PRE);
-
+    
     /* REVERSE FOR EXECUTION PURPOSE */
     for(i = 0; i < KSIM_POST / 2; i++) {
         k = KSIM_ORDER[KSIM_PRE + i];
@@ -293,7 +303,12 @@ void KE_order(KDB* dbe, char** eqs)
     }
 
     KSIM_INTER = KE_interdep(dbe, predecessors);
-    kmsg("#PRE %d - #INTER %d - #POST %d", KSIM_PRE, KSIM_INTER, KSIM_POST);
+    KSIM_CPU_SCC = WscrGetMS() - cpu_order;
+    kmsg("Calculating SCC... %ld ms -> #PRE %d - #INTER %d - #POST %d", 
+            KSIM_CPU_SCC, 
+            KSIM_PRE, 
+            KSIM_INTER, 
+            KSIM_POST);
 
     /* A AMELIORER !! */
     tmp2 = (int *) SW_nalloc(sizeof(int) * (KSIM_INTER + KSIM_POST));
@@ -302,7 +317,12 @@ void KE_order(KDB* dbe, char** eqs)
     memcpy(KSIM_ORDER + KSIM_PRE + KSIM_INTER, tmp2, KSIM_POST * sizeof(int));
     SW_nfree(tmp2);
 
-    if(KSIM_SORT == SORT_BOTH) KE_tri(dbe, predecessors, KSIM_PASSES);
+    if(KSIM_SORT == SORT_BOTH) {
+        kmsg("Reordering interdependent block...");
+        KE_tri(dbe, predecessors, KSIM_PASSES);
+        kmsg("Reordering interdependent block... %ld ms", KSIM_CPU_SORT);
+    }
+    
     KE_postorder(dbe, predecessors, successors);
 }
 
@@ -323,15 +343,12 @@ void KE_order(KDB* dbe, char** eqs)
  
 int KE_poseq(int posendo)
 {
-    int     i;
-
+    if(posendo < 0) return(-1);
     if(posendo < KSIM_MAXDEPTH && KSIM_POSXK[posendo] == posendo) return(posendo);
 
     // Recherche l'eq avec pour endogène posendo ie i tq posendo = KSIM_POSXK[i]
-    for(i = 0; i < KSIM_MAXDEPTH; i++)
-        if(KSIM_POSXK[i] == posendo) return(i);
+    return(KSIM_POSXK_REV[posendo]); 
 
-    return(-1);
 }
 
 
@@ -393,7 +410,7 @@ static void KE_tri_end(KDB* dbe)
 
 static void KE_tri_perm1(KDB* dbe, int i, int* vars)
 {
-    int     j, m = -1, posj;
+    int     j, m = -1, posj, nbe = KNB(dbe), ksim_permi = KSIM_PERM[i];
 
     // calcul de l'eq jm dont le numéro d'ordre de calcul est le plus grand
     for(j = 1 ; j <= vars[0] ; j++) {
@@ -406,10 +423,10 @@ static void KE_tri_perm1(KDB* dbe, int i, int* vars)
     }
 
     // Si le numéro d'ordre max des eq dont dépend la courante est < numéro d'ordre de la courante : ok
-    if(m < KSIM_PERM[i]) return;
+    if(m < ksim_permi) return;
 
-    for(j = 0 ; j < KNB(dbe) ; j++)
-        if(KSIM_PERM[j] > KSIM_PERM[i] && KSIM_PERM[j] <= m)
+    for(j = 0 ; j < nbe ; j++)
+        if(KSIM_PERM[j] > ksim_permi && KSIM_PERM[j] <= m)
             KSIM_PERM[j]--;
 
     KSIM_PERM[i] = m;
@@ -431,7 +448,9 @@ static void KE_tri_perm1(KDB* dbe, int i, int* vars)
 void KE_tri(KDB* dbe, int** predecessors, int passes)
 {
     int     i, var, j;
-
+    int     cpu_sort;
+    
+    cpu_sort = WscrGetMS();
     KE_tri_begin(dbe);
 
     for(j = 0 ; j < passes ; j++) {
@@ -442,4 +461,6 @@ void KE_tri(KDB* dbe, int** predecessors, int passes)
     }
 
     KE_tri_end(dbe);
+    
+    KSIM_CPU_SORT = WscrGetMS() - cpu_sort;
 }

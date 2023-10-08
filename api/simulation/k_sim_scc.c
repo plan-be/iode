@@ -60,12 +60,18 @@ int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
     else         KSIM_SORT = SORT_CONNEX;
 
     // KSIM_POSXK[i] = num dans dbv de la var endogène de l'équation i
+    // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
     KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * KNB(dbe)));
-
+    KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * KNB(dbe)));
+    for(i = 0 ; i < KNB(dbe); i++) {
+        KSIM_POSXK_REV[i] = -1;  
+    }
+    
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     kmsg("Pseudo-linking equations ....");
     for(i = 0 ; i < KNB(dbe); i++) {
         KSIM_POSXK[i] = i;
+        KSIM_POSXK_REV[i] = i;
         L_link_endos(dbe, KECLEC(dbe, i));
     }
 
@@ -74,8 +80,9 @@ int KE_ModelCalcSCC(KDB* dbe, int tris, char* pre, char* inter, char* post)
     K_lstorder(pre, inter, post);
 
     SW_nfree(KSIM_POSXK);
+    SW_nfree(KSIM_POSXK_REV);
     SW_nfree(KSIM_ORDER);
-    KSIM_POSXK = KSIM_ORDER = NULL;
+    KSIM_POSXK = KSIM_POSXK_REV = KSIM_ORDER = NULL;
     KSIM_PASSES = opasses;
     KSIM_SORT = osort;
     return(0);
@@ -136,7 +143,7 @@ static int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
             rc = -1;
             goto fin;
         }
-
+        
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
         if(rc) {
             B_seterrn(113, KONAME(dbe, i));
