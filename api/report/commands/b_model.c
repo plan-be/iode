@@ -424,7 +424,10 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
     // Create var and get Ptr
     B_CreateEmptyVar(name);
     x = B_GetVarPtr(name);
-    if(x == 0) return(-1);
+    if(x == 0) {
+        B_seterror("B_CreateVarFromVecOfInts %s failed", name);
+        return(-1);
+    }
 
     // Copy values
     if(vec) {
