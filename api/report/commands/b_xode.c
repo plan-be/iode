@@ -29,8 +29,9 @@
 int B_FileImportCmt(char* arg)
 {
     int     rc = 0, nb_args, format, lang;
-    char    **args = NULL, *trace, *rule, *infile, *oufile;
+    char    **args = NULL, *trace, *rule, *infile, *oufile, empty_buf[1];
 
+    empty_buf[0] = 0;
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size(args);
     if(nb_args < 5) {
@@ -46,10 +47,10 @@ int B_FileImportCmt(char* arg)
     lang   = B_argpos("EFD", args[4][0]);
 
     if(nb_args == 6) trace = args[5];
-    else             trace = "";
+    else             trace = empty_buf;
 
     rc = IMP_RuleImport(K_CMT, trace, rule, oufile, infile,
-                      "", "", format, lang);
+                      empty_buf, empty_buf, format, lang);
 
 fin:
     A_free(args);
@@ -74,8 +75,9 @@ fin:
 int B_FileImportVar(char* arg)
 {
     int     rc = 0, nb_args, format;
-    char    **args = NULL, *trace, *rule, *from, *to,*infile, *oufile;
+    char    **args = NULL, *trace, *rule, *from, *to,*infile, *oufile, empty_buf[1];
 
+    empty_buf[0] = 0;
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size(args);    /* JMP 16-12-93 */
     if(nb_args < 6) {
@@ -92,7 +94,7 @@ int B_FileImportVar(char* arg)
     to     = args[5];
 
     if(nb_args == 7) trace = args[6];
-    else             trace = "";
+    else             trace = empty_buf;
 
     rc = IMP_RuleImport(K_VAR, trace, rule, oufile, infile,
                       from, to, format, 0);
