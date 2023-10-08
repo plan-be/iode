@@ -78,7 +78,7 @@
  */
 static int KE_findpath(int posendo, int posexo, int* depth)
 {
-    int         j, poseq, posseq, rc = -1;
+    int         j, poseq, posseq, posvar, rc = -1;
     CLEC        *clec = NULL, *eclec;
     extern char *KSIM_PATH;
     extern KDB  *KSIM_DBE;
@@ -93,6 +93,7 @@ static int KE_findpath(int posendo, int posexo, int* depth)
         if(L_ISCOEF(clec->lnames[j].name)) continue;
         if((clec->lnames[j]).pos == posexo) {
             KSIM_POSXK[poseq] = posexo;
+            KSIM_POSXK_REV[posexo] = poseq;
             return(0);
         }
     }
@@ -125,8 +126,10 @@ static int KE_findpath(int posendo, int posexo, int* depth)
         /*      fprintf(stdout, "%s <- ", clec->lnames[j].name); */
         // Path found
         // Replace the endo of the KSIM_POSXK[poseq] by the j'd varname in current clec
-        KSIM_POSXK[poseq] = (clec->lnames[j]).pos;
-
+        posvar = (clec->lnames[j]).pos;
+        KSIM_POSXK[poseq] = posvar;
+        KSIM_POSXK_REV[posvar] = poseq;
+        
         // decrease the depth by 1
         (*depth) --;
         

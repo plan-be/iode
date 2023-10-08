@@ -96,6 +96,7 @@
 IODE_REAL   *KSIM_NORMS = 0;	      // Convergence threshold reached at the end of each simulation period 
 IODE_REAL   KSIM_NORM;                // Error measure: maximum difference between 2 iterations 
 int         *KSIM_NITERS = 0; 	      // Numbers of iterations needed for each simulation period
+long        *KSIM_CPUS = 0; 	      // Elapsed time for each simulation period
 IODE_REAL   KSIM_EPS = 0.001;         // Required max convergence threshold
 IODE_REAL   KSIM_RELAX = 1.0;         // Relaxation parameter
 IODE_REAL   *KSIM_XK;                 // Values of the endogenous variables (in the interdep block) at the end of the previous iteration 
@@ -104,6 +105,7 @@ int         KSIM_MAXIT= 100;          // Maximum number of iteration to reach a 
 int         KSIM_DEBUG = 0;           // Debug level: 0 = no debugging output
 int         KSIM_MAXDEPTH;            // Number of equations in the model
 int         *KSIM_POSXK;              // Position in KSIM_DBV of the endo variable of equation "KSIM_DBE[i]"
+int         *KSIM_POSXK_REV;          // Position in KSIM_DBE of the equation whose endo is "KSIM_DBV[i]" reverse of KSIM_POSXK
 int         KSIM_PASSES = 5;          // Number of passes for the heuristic triangulation algorithm
 int         KSIM_SORT = SORT_BOTH;    // Reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
 int         KSIM_START = KV_INIT_TM1; // Endogenous initial values: @see KV_init_values_1() for available options
@@ -168,11 +170,12 @@ void K_simul_free()
     SW_nfree(KSIM_XK);
     SW_nfree(KSIM_XK1);
     SW_nfree(KSIM_POSXK);
+    SW_nfree(KSIM_POSXK_REV);
     SW_nfree(KSIM_ORDER);
     SW_nfree(KSIM_PATH);
     KSIM_PATH = NULL;
     KSIM_XK = KSIM_XK1 = NULL;
-    KSIM_POSXK = KSIM_ORDER = NULL;
+    KSIM_POSXK = KSIM_POSXK_REV = KSIM_ORDER = NULL;
 }
 
 /**
@@ -428,8 +431,8 @@ static int K_diverge(int t, char* lst, IODE_REAL eps)
  *  
  *  The initial values of the endogenous variables are set before starting the process.
  *  
- *  At the end of the function, the KSIM_NITERS[t] and KSIM_NORMS[t] are set to
- *  memorize the number of iterations and the level of convergence reached. These values can be
+ *  At the end of the function, the KSIM_NITERS[t], KSIM_NORMS[t], ... are set to
+ *  memorize the number of iterations, the level of convergence reached... These values can be
  *  saved via the report functions $ModelSimulateSaveNiters and $ModelSimulateSaveNorms.
  *  
  *  The super-functions ktermvkey(), khitkey() and kconfirm() are called to allow user interruptions.
@@ -446,14 +449,17 @@ int K_simul_1(int t)
     extern  int SCR_vtime;
     int     it = 0, rc, conv = 0, ovtime = SCR_vtime; /* JMP 27-09-96 */
     char    buf[10], msg[80];
+    long    ms_iter;
 
     K_init_values(t);
     KSIM_NITERS[t] = 0; 
     KSIM_NORMS[t] = 0;  
+    KSIM_CPUS[t] = 0;  
     if(K_prolog(t)) return(-1);
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
     while(conv == 0 && it++ < KSIM_MAXIT) {
+        ms_iter = WscrGetMS();
         rc = K_interdep(t);
         KSIM_NITERS[t]++; 			
         KSIM_NORMS[t] = KSIM_NORM;	
@@ -462,7 +468,8 @@ int K_simul_1(int t)
             return(-1);
         }
         PER_pertoa(PER_addper(&(KSMPL(KSIM_DBV)->s_p1), t), buf);
-        sprintf(msg, "%s %d iterations ; error = %8.4lg", buf, it, KSIM_NORM);
+        sprintf(msg, "%s: %d iters - error = %8.4lg - cpu=%ldms", 
+                      buf, it, KSIM_NORM, WscrGetMS() - ms_iter);
         kmsg("%.80s", msg);
         conv = (KSIM_NORM <= KSIM_EPS) ? 1 : 0;
         if(khitkey() != 0) {                    // Checks the keyboard for a buffered key 
@@ -514,6 +521,7 @@ int K_simul_1(int t)
  *  
  *  @global [out] IODE_REAL   *KSIM_NORMS     convergence threshold reached at the end of each simulation period
  *  @global [out] int		  *KSIM_NITERS    Numbers of iterations needed for each simulation period
+ *  @global [out] int		  *KSIM_CPUS      CPU needed for each simulation period
  *  @global [in]  IODE_REAL   KSIM_EPS        Required max convergence threshold
  *  @global [in]  IODE_REAL   KSIM_RELAX      Relaxation parameter
  *  @global [in]  int         KSIM_MAXIT      Maximum number of iteration to reach a solution   
@@ -528,8 +536,9 @@ int K_simul_1(int t)
 int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)
 {
     int     i, t, j, k, endo_exonb,
-            posendo, posexo,
-            rc = -1;
+            posendo, posexo, posvar,
+            rc = -1,
+            cpu_iter;
     char    **var = NULL;
     IODE_REAL    *x;
 
@@ -553,24 +562,34 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
     }
 
     // KSIM_POSXK[i] = pos in KSIM_DBV of the endo of equation i (endo var = eq name)
+    // KSIM_POSXK_REV[i] = pos in KSIM_DBE of the eq whose endo is var[i] 
     KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * KNB(dbe)));
+    KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * KNB(dbv)));
+    for(i = 0 ; i < KNB(dbv); i++) {
+        KSIM_POSXK_REV[i] = -1;  
+    }
 
     // Initialize KSIM_NORMS and KSIM_NITERS (see definitions above) 
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
+    SCR_free(KSIM_CPUS);
     KSIM_NORMS = (IODE_REAL *) SCR_malloc(sizeof(IODE_REAL) * KSMPL(dbv)->s_nb);
     KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->s_nb);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->s_nb);
 
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
-    for(i = 0 ; i < KNB(dbe); i++) {
-        KSIM_POSXK[i] = K_find(dbv, KONAME(dbe,i));
-        if(KSIM_POSXK[i] < 0) {
+    
+    for(i = 0 ; i < KNB(dbe); i++) {        
+        posvar = K_find(dbv, KONAME(dbe,i));
+        KSIM_POSXK[i] = posvar;
+        if(posvar < 0) {
             B_seterrn(112, KONAME(dbe, i));
             rc = -1;
             goto fin;
         }
-
+        KSIM_POSXK_REV[posvar] = i; // Position of equation with endo nb posvar = i
+        
         rc = L_link(dbv, dbs, KECLEC(dbe, i));
         if(rc) {
             B_seterrn(113, KONAME(dbe, i));
@@ -593,7 +612,18 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
             }
 
             posendo = K_find(KSIM_DBV, var[0]); // Position of the endogenous var in dbv
+            if(posendo < 0) {
+                B_seterrn(116, var[0]);
+                rc = -1;
+                goto fin;
+            }
             posexo = K_find(KSIM_DBV, var[1]);  // Position of the exogenous var in dbv
+            if(posexo < 0) {
+                B_seterrn(112, var[1]);
+                rc = -1;
+                goto fin;
+            }
+            
             //         fprintf(stdout, "\n====Exchanging %s %s\n====", var[0], var[1]);
             if(KE_exo2endo(posendo, posexo) < 0) {
                 rc = -1;
@@ -616,8 +646,9 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
     KSIM_XK1 = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * KSIM_INTER);
 
     for(i = 0; i < smpl->s_nb; i++, t++) {
+        cpu_iter = WscrGetMS();
         if(rc = K_simul_1(t)) goto fin;
-        
+        KSIM_CPUS[t] = WscrGetMS() - cpu_iter;
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
         if(endo_exo != NULL) {
             for(k = 0; k < endo_exonb; k ++) {
