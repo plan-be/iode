@@ -62,7 +62,16 @@ extern int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_po
 extern int IodeEstimate(char* veqs, char* afrom, char* ato);
 
 extern int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug);
-
+extern int IodeModelCalcSCC(int nbtris, char* pre_listname, char* inter_listname, char* post_listname, char *eqs_list);
+extern int IodeModelSimulateSCC(char *per_from, char *per_to, 
+                         char *pre_eqlist, char *inter_eqlist, char* post_eqlist,
+                         double eps, double relax, int maxit, 
+                         int init_values, int debug, 
+                         double newton_eps, int newton_maxit, int newton_debug);
+extern double IodeModelSimNorm(char* period);
+extern int IodeModelSimNIter(char* period);
+extern int IodeModelSimCpu(char* period);                         
+                         
 extern int IodeExecArgs(char *filename, char **args);
 extern int IodeExec(char *filename);
 
