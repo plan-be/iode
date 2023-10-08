@@ -168,12 +168,12 @@ static void L_link1_endos(KDB* dbe, CLEC* cl)
 
     for (i = 0; i < cl->nb_names; i++) {
         if (L_ISCOEF(cl->lnames[i].name))
-            cl->lnames[i].pos = 0; // On s'en tape pour le calcul des SCC
+            cl->lnames[i].pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
         else
             cl->lnames[i].pos = K_find(dbe, cl->lnames[i].name);
 
-        if (cl->lnames[i].pos < 0) // Non trouvé -> exo
-            cl->lnames[i].pos = KNB(dbe); // exo : on s'en tape aussi
+        if (cl->lnames[i].pos < 0)  // Not found => exogenous var
+            cl->lnames[i].pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
     }
 }
 
