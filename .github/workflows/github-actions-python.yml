@@ -68,12 +68,18 @@ jobs:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ inputs.build-config }}
-          - name: Build Python IODE
+          - name: Build Python IODE (Cython)
             shell: bash -el {0}
             run: cmake --build --preset ${{ inputs.build-config }} --target iode_python 
-          - name: Test Python IODE
+          - name: Test Python IODE (Cython)
             shell: bash -el {0}
             run: cmake --build --preset ${{ inputs.build-config }} --target test_python 
+          - name: Build Python IODE (nanobind)
+            shell: bash -el {0}
+            run: cmake --build --preset ${{ inputs.build-config }} --target iode 
+          - name: Test Python IODE (nanobind)
+            shell: bash -el {0}
+            run: cmake --build --preset ${{ inputs.build-config }} --target test_nanobind 
           - name: Upload PyIode compiled files
             if: ${{ success() }}
             uses: actions/upload-artifact@v3
