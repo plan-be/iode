@@ -87,6 +87,35 @@ jobs:
           - name: Install Qt
             uses: ./.github/actions/install_qt
     
+          - name: Install dependencies on windows
+            if: runner.os == 'Windows'
+            shell: bash
+            run: |
+              choco install ninja
+              ninja --version
+              cmake --version
+          - name: Add cl.exe to PATH
+            if: runner.os == 'Windows'
+            # See https://github.com/marketplace/actions/enable-developer-command-prompt
+            uses: ilammy/msvc-dev-cmd@v1
+            with:
+              arch: x64
+
+          - name: Install C++ Boost lib
+            uses: ./.github/actions/install_boost
+
+          - name: Print preset config
+            shell: bash
+            run: echo "${{ inputs.build-config }}"
+          - name: Configure CMake
+            shell: bash
+            # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
+            # see CMakePresets.json file
+            # for more details about cmake preset:
+            #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
+            #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
+            run: cmake --preset ${{ inputs.build-config }}
+
           - name: Build the SCR4, C and C++ API libs
             uses: ./.github/actions/build_api
             with:
