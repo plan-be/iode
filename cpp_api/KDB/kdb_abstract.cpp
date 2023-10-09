@@ -233,19 +233,6 @@ void KDBAbstract::load(const std::string& filepath)
         return;
     }
 
-    EnumIodeFile file_type = get_iode_file_type(filepath);
-    if(file_type > I_VARIABLES_FILE)
-    {
-        std::filesystem::path p_filepath(filepath);
-        std::string ext = p_filepath.extension().string();
-
-        std::string msg = "Expected file with extension ";
-        msg += boost::algorithm::join(v_binary_ext, ", ");
-        msg += boost::algorithm::join(v_ascii_ext, ", ");
-        msg += "\nBut got file with extension " + ext;
-        throw std::invalid_argument(msg);
-    } 
-
     load_global_kdb(iode_type, filepath);
 }
 
