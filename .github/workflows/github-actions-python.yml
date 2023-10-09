@@ -43,6 +43,8 @@ jobs:
             uses: ilammy/msvc-dev-cmd@v1
             with:
               arch: x64
+          - name: Install C++ Boost lib
+            uses: ./.github/actions/install_boost
           - name: Configure Conda
             uses: conda-incubator/setup-miniconda@v2
             with:
@@ -68,6 +70,9 @@ jobs:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ inputs.build-config }}
+          - name: Build SCR4, C and C++ API
+            shell: bash -el {0}
+            run: cmake --build --preset ${{ inputs.build-config }} --target iode_cpp_api              
           - name: Build Python IODE (Cython)
             shell: bash -el {0}
             run: cmake --build --preset ${{ inputs.build-config }} --target iode_python 
