@@ -61,6 +61,7 @@ protected:
 
 signals:
 	void newObjectInserted();
+	void databaseModified();
 	void showObjsRequest(EnumIodeType other_type, const QStringList& objNames);
 
 public:
@@ -295,5 +296,49 @@ public slots:
 		QStringList list = table_model->getRelatedObjs(name, other_type);
 
 		emit showObjsRequest(other_type, list);
+	}
+};
+
+
+template <class D> class IodeTemplateTableView : public IodeAbstractTableView
+{
+	D* editDialog;
+
+public:
+	IodeTemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr):
+		IodeAbstractTableView(iodeType, delegate, parent), editDialog(nullptr) { }
+
+	~IodeTemplateTableView()
+	{
+		if(editDialog)
+		{
+			editDialog->close();
+			delete editDialog;
+		}
+	}
+
+	void openEditDialog()
+	{
+		QModelIndexList selection = selectionModel()->selectedRows();
+		if (selection.count() == 0) 
+			return;
+
+		int section = selection[0].row();
+		QString name = model()->headerData(section, Qt::Vertical).toString();
+		
+		if(editDialog)
+		{
+			editDialog->close();
+			delete editDialog;
+		}
+
+		editDialog = new D(name, static_cast<QWidget*>(this->parent()));
+
+		// propagate signal
+		connect(editDialog, &D::databaseModified, this, &IodeAbstractTableView::databaseModified);
+
+		editDialog->show();
+		
+		update();
 	}
 };

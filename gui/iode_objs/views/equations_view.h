@@ -10,31 +10,14 @@
 #include "iode_objs/edit/edit_equation.h"
 
 
-class EquationsView : public IodeAbstractTableView
+class EquationsView : public IodeTemplateTableView<EditEquationDialog>
 {
 	Q_OBJECT
 
-	EditEquationDialog* editEqDialog;
-
 public:
-	EquationsView(QWidget* parent = nullptr) : IodeAbstractTableView(I_EQUATIONS, new EquationsDelegate(parent), parent)
-	{
-		editEqDialog = nullptr;
-	}
-
-	~EquationsView()
-	{
-		if(editEqDialog)
-		{
-			editEqDialog->close();
-			delete editEqDialog;
-		}
-	}
-
-signals:
-	void databaseModified();
+	EquationsView(QWidget* parent = nullptr) : IodeTemplateTableView(I_EQUATIONS, new EquationsDelegate(parent), parent) {}
 
 public slots:
 	void new_obj();
-	void edit_obj() override;
+	void edit_obj() { openEditDialog(); }
 };

@@ -17,7 +17,7 @@
 #endif
 
 
-class TablesView : public IodeAbstractTableView
+class TablesView : public IodeTemplateTableView<EditTableDialog>
 {
 	Q_OBJECT
 
@@ -25,7 +25,7 @@ class TablesView : public IodeAbstractTableView
 	QShortcut* shortcutPlot;
 
 public:
-	TablesView(QWidget* parent = nullptr) : IodeAbstractTableView(I_TABLES, new TablesDelegate(parent), parent)
+	TablesView(QWidget* parent = nullptr) : IodeTemplateTableView(I_TABLES, new TablesDelegate(parent), parent)
 	{
 		shortcutDisplay = new QShortcut(QKeySequence(Qt::Key_F7), this);
 		shortcutDisplay->setContext(Qt::WidgetWithChildrenShortcut);
@@ -42,12 +42,9 @@ public:
 		delete shortcutPlot;
 	}
 
-signals:
-    void databaseModified();
-
 public slots:
 	void new_obj();
-	void edit_obj() override;
+	void edit_obj() { openEditDialog(); }
 	void display();
 	void plot();
 };
