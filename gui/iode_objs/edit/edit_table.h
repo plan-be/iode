@@ -54,7 +54,7 @@ public:
 
 signals:
     void newPlot(QDialog* plotDialog);
-    void tableModified();
+    void databaseModified();
 
 public slots:
     void edit();

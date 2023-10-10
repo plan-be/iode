@@ -43,7 +43,7 @@ public:
 	}
 
 signals:
-    void tableModified();
+    void databaseModified();
 
 public slots:
 	void new_obj();

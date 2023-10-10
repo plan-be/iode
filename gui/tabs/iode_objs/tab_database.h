@@ -107,7 +107,7 @@ public:
         connect(objmodel, &TablesModel::rowsRemoved, this, &TablesWidget::databaseModified);
         connect(objmodel, &TablesModel::databaseModified, this, &TablesWidget::databaseModified);
         connect(tableview, &TablesView::newObjectInserted, this, &TablesWidget::databaseModified);
-        connect(tableview, &TablesView::tableModified, this, &TablesWidget::databaseModified);
+        connect(tableview, &TablesView::databaseModified, this, &TablesWidget::databaseModified);
     }
 };
 
