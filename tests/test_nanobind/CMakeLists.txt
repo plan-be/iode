@@ -3,7 +3,7 @@ message(STATUS "\n---- TESTS PYTHON (NANOBIND) ----\n")
 message(CHECK_START "Search for Python")
 find_package(Python COMPONENTS Interpreter Development)
 
-if(Python_FOUND AND TARGET iode_python)
+if(Python_FOUND AND TARGET iode)
   message(CHECK_PASS "found")
   message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
 
