@@ -21,20 +21,12 @@ class TablesView : public IodeAbstractTableView
 {
 	Q_OBJECT
 
-	QShortcut* shortcutEditEnter;
-	QShortcut* shortcutEditReturn;
 	QShortcut* shortcutDisplay;
 	QShortcut* shortcutPlot;
 
 public:
 	TablesView(QWidget* parent = nullptr) : IodeAbstractTableView(I_TABLES, new TablesDelegate(parent), parent)
 	{
-		shortcutEditEnter = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Enter), this);
-		connect(shortcutEditEnter, &QShortcut::activated, this, &TablesView::edit_obj);
-		
-		shortcutEditReturn = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return), this);
-		connect(shortcutEditReturn, &QShortcut::activated, this, &TablesView::edit_obj);
-
 		shortcutDisplay = new QShortcut(QKeySequence(Qt::Key_F7), this);
 		shortcutDisplay->setContext(Qt::WidgetWithChildrenShortcut);
 		connect(shortcutDisplay, &QShortcut::activated, this, &TablesView::display);
@@ -46,8 +38,6 @@ public:
 
 	~TablesView()
 	{
-		delete shortcutEditEnter;
-		delete shortcutEditReturn;
 		delete shortcutDisplay;
 		delete shortcutPlot;
 	}
@@ -57,7 +47,7 @@ signals:
 
 public slots:
 	void new_obj();
-	void edit_obj();
+	void edit_obj() override;
 	void display();
 	void plot();
 };

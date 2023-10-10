@@ -74,6 +74,13 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(objectNameEdit, &QLineEdit::returnPressed, this, &IodeAbstractTableView::editName);
     connect(objectNameEdit, &QLineEdit::editingFinished, this, &IodeAbstractTableView::closeNameEditor);
 
+    // to popup an editing dialog box
+    shortcutEditEnter = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Enter), this);
+    connect(shortcutEditEnter, &QShortcut::activated, this, &IodeAbstractTableView::edit_obj);
+    
+    shortcutEditReturn = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return), this);
+    connect(shortcutEditReturn, &QShortcut::activated, this, &IodeAbstractTableView::edit_obj);
+
     // gets objects of the same name or listed in the clec structure
  	sameCmtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F1), this);
 	sameEqShortcut  = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F2), this);
@@ -128,6 +135,8 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
 IodeAbstractTableView::~IodeAbstractTableView()
 {
     delete objectNameEdit;
+	delete shortcutEditEnter;
+	delete shortcutEditReturn;
 
     delete deleteShortcut;
 
