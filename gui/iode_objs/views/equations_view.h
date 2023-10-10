@@ -32,7 +32,7 @@ public:
 	}
 
 signals:
-	void equationModified();
+	void databaseModified();
 
 public slots:
 	void new_obj();
