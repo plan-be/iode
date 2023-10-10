@@ -17,15 +17,19 @@ class BaseDelegate : public QStyledItemDelegate
 	Q_OBJECT
 
 	EnumIodeType iodeType;
+	bool lineEdit;
 
 public:
-	BaseDelegate(EnumIodeType iodeType, QObject* parent = nullptr) : QStyledItemDelegate(parent), iodeType(iodeType) {}
+	BaseDelegate(EnumIodeType iodeType, QObject* parent = nullptr) : QStyledItemDelegate(parent), iodeType(iodeType) 
+	{
+		lineEdit = iodeType == I_SCALARS || iodeType == I_VARIABLES;
+	}
 
 	~BaseDelegate() {}
 
 	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 	{
-		if(iodeType == I_SCALARS || iodeType == I_VARIABLES)
+		if(lineEdit)
 		{
 			QLineEdit* editor = new QLineEdit(parent);
 			return editor;
@@ -40,7 +44,7 @@ public:
 	void setEditorData(QWidget* editor, const QModelIndex& index) const override
 	{
 		QString value = index.model()->data(index, Qt::EditRole).toString();
-		if(iodeType == I_SCALARS || iodeType == I_VARIABLES)
+		if(lineEdit)
 		{
 			QLineEdit* textEdit = static_cast<QLineEdit*>(editor);
 			textEdit->setText(value);
@@ -55,7 +59,7 @@ public:
 	void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
 	{
 		QString value;
-		if(iodeType == I_SCALARS || iodeType == I_VARIABLES)
+		if(lineEdit)
 		{
 			QLineEdit* textEdit = static_cast<QLineEdit*>(editor);
 			value = textEdit->text();
@@ -71,7 +75,8 @@ public:
 protected:
 	/**
 	 * @brief Reimplement QStyledItemDelegate::eventFilter(). 
-	 *        Consider the combination CTRL + ENTER as signal to commit changes and close the editor.    
+	 *        Pressing ENTER is the signal to commit changes and close the editor. 
+	 *        Users must press (ALT or SHIFT) + ENTER to create a new line.   
 	 *  
 	 * @note see https://doc.qt.io/qt-6/qstyleditemdelegate.html#eventFilter
 	 * 
@@ -85,11 +90,21 @@ protected:
 		if (event->type() == QEvent::KeyPress)
 		{
 			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-			if(keyEvent->modifiers() == Qt::ControlModifier && (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return))
+			if(keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
 			{
-				commitData(static_cast<QWidget*>(editor));
-				closeEditor(static_cast<QWidget*>(editor));
-				return true;
+				// commit changes and close editor
+				if(keyEvent->modifiers() == Qt::NoModifier)
+				{
+					commitData(static_cast<QWidget*>(editor));
+					closeEditor(static_cast<QWidget*>(editor));
+					return true;
+				}
+				// ALT + (ENTER or RETURN) -> starts a new line in the editor
+				if(!lineEdit && keyEvent->modifiers() == Qt::AltModifier)
+				{
+					static_cast<QPlainTextEdit*>(editor)->insertPlainText("\n");
+					return true;
+				}
 			}
 		}
 		return QStyledItemDelegate::eventFilter(editor, event);
