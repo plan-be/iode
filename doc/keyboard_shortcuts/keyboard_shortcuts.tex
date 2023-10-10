@@ -155,42 +155,29 @@ pdfkeywords={IODE, keyboard, shortcuts}
 \sectiontitle{IODE Objects In Tabs}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Double click       & Edit object name or object (LEC for equations and title for tables) \\
- Ctrl + Enter       & Finish editing comment, LEC eq, identity, list or table title \\
- Ctrl + Enter       & Edit an equation or a table \\
- Insert             & Create a new object \\
- Delete             & Delete object(s) \\
- Ctrl + P           & Print list of objects \\
- Ctrl + F1          & shows comments related to the current object \\
- Ctrl + F2          & shows equations related to the current object \\
- Ctrl + F3          & shows identities related to the current object \\
- Ctrl + F4          & shows lists related to the current object \\
- Ctrl + F5          & shows scalars related to the current object \\
- Ctrl + F6          & shows tables related to the current object \\
- Ctrl + F7          & shows variables related to the current object \\
- Ctrl + Alt + F1    & shows comments of the same name \\
- Ctrl + Alt + F2    & shows equations of the same name \\
- Ctrl + Alt + F3    & shows identities of the same name \\
- Ctrl + Alt + F4    & shows lists of the same name \\
- Ctrl + Alt + F5    & shows scalars present in the current equation \\
- Ctrl + Alt + F6    & shows tables of the same name \\
- Ctrl + Alt + F7    & shows variables present in the current equation
+ Double click        & Edit object name or object (LEC for equations and title for tables) \\
+ Enter               & Finish editing comment, LEC eq, identity, list or table title (table cell) \\
+ Alt / Shift + Enter & Add a new line (table cell) \\
+ Ctrl + Enter        & Edit an equation or a table \\
+ Insert              & Create a new object \\
+ Delete              & Delete object(s) \\
+ Ctrl + P            & Print list of objects \\
+ Ctrl + F1           & shows comments related to the current object \\
+ Ctrl + F2           & shows equations related to the current object \\
+ Ctrl + F3           & shows identities related to the current object \\
+ Ctrl + F4           & shows lists related to the current object \\
+ Ctrl + F5           & shows scalars related to the current object \\
+ Ctrl + F6           & shows tables related to the current object \\
+ Ctrl + F7           & shows variables related to the current object \\
+ Ctrl + Alt + F1     & shows comments of the same name \\
+ Ctrl + Alt + F2     & shows equations of the same name \\
+ Ctrl + Alt + F3     & shows identities of the same name \\
+ Ctrl + Alt + F4     & shows lists of the same name \\
+ Ctrl + Alt + F5     & shows scalars present in the current equation \\
+ Ctrl + Alt + F6     & shows tables of the same name \\
+ Ctrl + Alt + F7     & shows variables present in the current equation
 \end{tabular}
 \newline\newline
-
-\sectiontitle{Equations Tab}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Ctrl + Enter  & Edit/Estimate
-\end{tabular}
-\newline\newline
-
-\sectiontitle{Identities Tab}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- F7         & Execute the selected identity \\
- Shift + F7 & Execute the selected identities 
-\end{tabular}
 
 %----------------------------------------------------------------------------------------
 
@@ -203,6 +190,21 @@ pdfkeywords={IODE, keyboard, shortcuts}
 
 \put(200,180){ % Divide the page
 \begin{minipage}[t]{85mm} % Create a box to house text
+
+\sectiontitle{Equations Tab}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+Ctrl + Enter  & Edit/Estimate
+\end{tabular}
+\newline\newline
+
+\sectiontitle{Identities Tab}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+F7         & Execute the selected identity \\
+Shift + F7 & Execute the selected identities 
+\end{tabular}
+\newline\newline
 
 \sectiontitle{Scalars Tab}
 
@@ -217,9 +219,9 @@ Ctrl + P         & Paste values
 \sectiontitle{Tables Tab}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-    Ctrl + Enter  & Edit \\
-    F7            & Compute and display values \\
-    F8            & Compute and plot values as a graph \\
+Ctrl + Enter  & Edit \\
+F7            & Compute and display values \\
+F8            & Compute and plot values as a graph \\
 \end{tabular}
 \newline\newline
 
@@ -235,27 +237,6 @@ Ctrl + P         & Paste values
  Ctrl + Shift + C & Copy values including var names and sample range to clipboard \\
  Ctrl + P         & Paste values 
 \end{tabular}
-\newline\newline
-
-%----------------------------------------------------------------------------------------
-%	HEADING FIVE
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Edit Equation + Estimation}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- F10 & Save equation and estimated coefficients \\
- Esc & Cancel \\
- F1  & Open IODE help \\
- F3  & Open unit root \\
- F4  & Show estimated coefficients \\
- F5  & Run estimation \\
- F6  & Next equation in block \\
- F7  & Open dynamic adjustment \\
- F8  & Show estimation results \\
- Ctrl + X  & full screen
-\end{tabular}
-\newline\newline
 
 %----------------------------------------------------------------------------------------
 
@@ -278,6 +259,26 @@ Ctrl + P         & Paste values
 %	HEADING ONE
 %----------------------------------------------------------------------------------------
 
+\sectiontitle{Edit Equation + Estimation}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ F10 & Save equation and estimated coefficients \\
+ Esc & Cancel \\
+ F1  & Open IODE help \\
+ F3  & Open unit root \\
+ F4  & Show estimated coefficients \\
+ F5  & Run estimation \\
+ F6  & Next equation in block \\
+ F7  & Open dynamic adjustment \\
+ F8  & Show estimation results \\
+ Ctrl + X  & full screen
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING Two
+%----------------------------------------------------------------------------------------
+
 \sectiontitle{Edit Table}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
@@ -292,8 +293,8 @@ Ctrl + X   & full screen
 \newline\newline
 
 %----------------------------------------------------------------------------------------
-%	HEADING Two
-%----------------------------------------------------------------------------------------				
+%	HEADING THREE
+%----------------------------------------------------------------------------------------		
 
 \sectiontitle{Text And Report Editor}
 
@@ -310,31 +311,6 @@ Ctrl + X   & full screen
 \newline\newline
 
 %----------------------------------------------------------------------------------------
-%	HEADING THREE
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Find And Replace Dialog}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Shift + Enter & Finds previous occurrence \\
- Enter & Finds next occurrence \\
- Enter & Replaces current occurence \\
- Ctrl + Alt + Enter & Replace all occurrences
-\end{tabular}
-\newline\newline
-
-%----------------------------------------------------------------------------------------
-%	HEADING FOUR
-%----------------------------------------------------------------------------------------				
-
-\sectiontitle{Report Command}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-Enter                       & Execute command \\
- $\uparrow$ / $\downarrow$  & Previous/Next command
-\end{tabular}
-
-%----------------------------------------------------------------------------------------
 
 \end{minipage} % End the first column of text
 } % End the first division of the page
@@ -348,6 +324,32 @@ Enter                       & Execute command \\
 
 %----------------------------------------------------------------------------------------
 %	HEADING ONE
+%----------------------------------------------------------------------------------------
+
+\sectiontitle{Find And Replace Dialog}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ Shift + Enter & Finds previous occurrence \\
+ Enter & Finds next occurrence \\
+ Enter & Replaces current occurence \\
+ Ctrl + Alt + Enter & Replace all occurrences
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING TWO
+%----------------------------------------------------------------------------------------				
+
+\sectiontitle{Report Command}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+Enter                       & Execute command \\
+ $\uparrow$ / $\downarrow$  & Previous/Next command
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	HEADING THREE
 %----------------------------------------------------------------------------------------
 
 \sectiontitle{Graph Window}
