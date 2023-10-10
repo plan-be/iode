@@ -98,7 +98,8 @@ int (*B_ScrollVTN_super )(char *arg);
 
 /* b_view.c */
 int (*ODE_scroll_super) (KDB *kdb, char **lst);
-int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names);
+int (*T_view_tbl_super) (TBL *tbl, char *smpl, char* name);
+// int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names); // TEMP version for IODE-QT
 
 // Default implementation 
 int SB_FileDelete       () {if(SB_FileDelete_super) return((*SB_FileDelete_super)()); return(0);}   
@@ -164,4 +165,5 @@ int B_ScrollVTW0(char* arg) {if(B_ScrollVTW0_super       ) return(*B_ScrollVTW0_
 int B_ScrollVTN (char* arg) {if(B_ScrollVTN_super        ) return(*B_ScrollVTN_super       )(arg); else return(0);}
 
 int ODE_scroll  (KDB *kdb, char **lst)             {if(ODE_scroll_super         ) return(*ODE_scroll_super        )(kdb, lst);         else return(0);}
-int T_view_tbl  (char* name, char *smpl, char** vars_names) {if(T_view_tbl_super         ) return(*T_view_tbl_super        )(name, smpl, vars_names);  else return(0);}
+int T_view_tbl  (TBL *tbl, char *smpl, char* name) {if(T_view_tbl_super         ) return(*T_view_tbl_super        )(tbl, smpl, name);  else return(0);}
+// int T_view_tbl  (char* name, char *smpl, char** vars_names) {if(T_view_tbl_super         ) return(*T_view_tbl_super        )(name, smpl, vars_names);  else return(0);} // TEMP version for IODE-QT

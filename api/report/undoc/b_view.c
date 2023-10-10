@@ -55,7 +55,7 @@ int B_PrintVar(char* arg)
 int B_ViewPrintVar(char* arg, int mode)
 {
     int     rc = 0, nb, i;
-    char    *smpl, *ptr, *name;
+    char    *smpl, *ptr;
     U_ch    **args;
     TBL     *tbl;
     char    *oldseps = A_SEPS, *lst;  /* JMP 14-07-96 */
@@ -89,16 +89,16 @@ int B_ViewPrintVar(char* arg, int mode)
             ptr = args[i + 50];
             args[i + 50] = 0;
         }
+        tbl = T_create(2);
         if(mode == 0) {
-            name = "_TMP_TBL_";
-            rc = T_view_tbl(name, smpl, args + i);
+            T_default(tbl, 0L, args + i, args + i, 0, 0, 0);
+            rc = T_view_tbl(tbl, smpl, "of series");
         }
         else {
-            tbl = T_create(2);
             T_default(tbl, 0L, args + i, args + i, 1, 1, 1);
             rc = T_print_tbl(tbl, smpl);
-            T_free(tbl);
         }
+        T_free(tbl);
         if(i + 50 < nb) args[i + 50] = ptr;
         if(rc) break;
     }
@@ -168,15 +168,15 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
         return(-1);
     }
 
+    tbl = KTVAL(K_WS[K_TBL], pos);
     if(B_viewmode == 0)
-        rc = T_view_tbl(name, smpl, NULL);
-    else {
-        tbl = KTVAL(K_WS[K_TBL], pos);
+        rc = T_view_tbl(tbl, smpl, name);
+    else
         rc = T_print_tbl(tbl, smpl);
-        T_free(tbl);
-    }
 
     if(rc < 0) B_seterrn(81, name);
+
+    T_free(tbl);
     return(rc);
 }
 
