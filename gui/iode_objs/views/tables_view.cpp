@@ -9,25 +9,6 @@ void TablesView::new_obj()
 	filter();
 }
 
-void TablesView::edit_obj()
-{
-	QModelIndexList selection = selectionModel()->selectedRows();
-	if (selection.count() == 0) 
-		return;
-
-	int section = selection[0].row();
-	QString name = model()->headerData(section, Qt::Vertical).toString();
-	
-	EditTableDialog dialog(name, static_cast<QWidget*>(this->parent()));
-
-	// propagate signal
-	connect(&dialog, &EditTableDialog::databaseModified, this, &TablesView::databaseModified);
-	
-	dialog.exec();
-	
-	update();
-}
-
 void TablesView::display()
 {
 	// get the selected object

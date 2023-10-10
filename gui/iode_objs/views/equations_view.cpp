@@ -9,26 +9,3 @@ void EquationsView::new_obj()
 	filter();
 }
 
-void EquationsView::edit_obj() 
-{  
-	QModelIndexList selection = selectionModel()->selectedRows();
-	if (selection.count() == 0) 
-		return;
-
-	int section = selection[0].row();
-	QString name = model()->headerData(section, Qt::Vertical).toString();
-	
-	if(editEqDialog)
-	{
-		editEqDialog->close();
-		delete editEqDialog;
-	}
-	editEqDialog = new EditEquationDialog(name, static_cast<QWidget*>(this->parent()));
-
-	// propagate signal
-	connect(editEqDialog, &EditEquationDialog::databaseModified, this, &EquationsView::databaseModified);
-
-	editEqDialog->show();
-	
-	update();
-}
