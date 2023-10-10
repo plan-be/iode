@@ -16,19 +16,10 @@ class EquationsView : public IodeAbstractTableView
 
 	EditEquationDialog* editEqDialog;
 
-	QShortcut* editShortcutEnter;
-	QShortcut* editShortcutReturn;
-
 public:
 	EquationsView(QWidget* parent = nullptr) : IodeAbstractTableView(I_EQUATIONS, new EquationsDelegate(parent), parent)
 	{
 		editEqDialog = nullptr;
-		
-		editShortcutEnter = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Enter), this);
-		connect(editShortcutEnter, &QShortcut::activated, this, &EquationsView::edit_obj);
-		
-		editShortcutReturn = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return), this);
-		connect(editShortcutReturn, &QShortcut::activated, this, &EquationsView::edit_obj);
 	}
 
 	~EquationsView()
@@ -38,8 +29,6 @@ public:
 			editEqDialog->close();
 			delete editEqDialog;
 		}
-		delete editShortcutEnter;
-		delete editShortcutReturn;
 	}
 
 signals:
@@ -47,5 +36,5 @@ signals:
 
 public slots:
 	void new_obj();
-	void edit_obj();
+	void edit_obj() override;
 };

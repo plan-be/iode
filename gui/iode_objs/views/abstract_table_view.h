@@ -40,6 +40,9 @@ protected:
 
 	QShortcut* deleteShortcut;
 
+	QShortcut* shortcutEditEnter;
+	QShortcut* shortcutEditReturn;
+
 	QShortcut* sameCmtShortcut;
 	QShortcut* sameEqShortcut;
 	QShortcut* sameIdtShortcut;
@@ -237,6 +240,8 @@ public slots:
 		objectNameEdit->setHidden(true);
 		objectNameEdit->setText("");
 	}
+
+	virtual void edit_obj() {}
 
 	void filter_slot() 
 	{ 
