@@ -45,14 +45,14 @@
 #define MAXFLOAT  FLT_MAX
 #define MINFLOAT  FLT_MIN
 #endif
-
+ 
 
 //#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
-#define IODE_VERSION "IODE Modeling Software 6.70 - (c) 1990-2023 Federal Planning Bureau - Brussels"
-#define IODE_VERSION_MAJOR 6
-#define IODE_VERSION_MINOR 70
+#define IODE_VERSION "IODE Modeling Software 7.0 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+#define IODE_VERSION_MAJOR 7
+#define IODE_VERSION_MINOR 0
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
