@@ -1865,11 +1865,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 }
 
 
-#if defined(DEBUG)
-TEST_F(IodeCAPITest, DISABLED_Tests_B_XODE)
-#else
 TEST_F(IodeCAPITest, Tests_B_XODE)
-#endif
 {
     char    outfile[256];
     char    reffile[256];
