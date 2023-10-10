@@ -930,7 +930,8 @@ extern int RP_goto_label(char *command, char *parm);
 extern int RP_goto(char* arg);
 extern int RP_message(char* arg);
 extern int RP_warning(char* arg);
-extern int RP_beep();
+extern int RP_silent(char* arg);
+extern int RP_beep(char* arg);
 extern int RP_ask(char* arg);
 extern int B_ReportPrompt(char* arg);
 extern int RP_setdebug(char* arg);
@@ -949,6 +950,7 @@ extern int B_Sleep(char* arg);
 extern int B_GraphDefault(char* type);
 
 /* b_rep_fns.c */ 
+extern U_ch *RPF_IodeVersion();
 extern U_ch *RPF_take(U_ch** args);
 extern U_ch *RPF_drop(U_ch** args);
 extern U_ch *RPF_replace(U_ch** args);
@@ -994,12 +996,27 @@ extern U_ch *RPF_lexpand(U_ch **args);
 extern U_ch *RPF_sexpand(U_ch **args);
 extern U_ch *RPF_texpand(U_ch **args);
 extern U_ch *RPF_vexpand(U_ch **args);
+
 extern int RPF_CalcPeriod(U_ch** args);
-extern U_ch *RPF_SimNorm(U_ch** args);
-extern U_ch *RPF_SimNIter(U_ch** args);
 extern U_ch *RPF_SimMaxit();
 extern U_ch *RPF_SimEps();
 extern U_ch *RPF_SimRelax();
+extern U_ch* RPF_SimSortNbPasses();
+extern U_ch* RPF_SimSortAlgo();
+extern U_ch* RPF_SimInitValues();
+
+extern IODE_REAL RPF_SimNormReal(U_ch** args);
+extern U_ch *RPF_SimNorm(U_ch** args);
+
+extern int RPF_SimNIterInt(U_ch** args);
+extern U_ch *RPF_SimNIter(U_ch** args);
+
+extern int RPF_SimCpuInt(U_ch** args);
+extern U_ch* RPF_SimCpu(U_ch** args);
+
+extern U_ch* RPF_SimCpuSCC();
+extern U_ch* RPF_SimCpuSort();
+
 extern U_ch *RPF_vtake(U_ch** args);
 extern U_ch *RPF_vdrop(U_ch** args);
 extern U_ch *RPF_vcount(U_ch** args);
@@ -1087,7 +1104,8 @@ extern int (*B_ScrollVTW0_super)(char *arg);
 extern int (*B_ScrollVTN_super )(char *arg);
 
 extern int (*ODE_scroll_super) (KDB *kdb, char **lst);
-extern int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names);
+extern int (*T_view_tbl_super) (TBL *tbl, char *smpl, char* name);
+// extern int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names); // TEMP version for IODE-QT
 
 /* b_rep_super.c - function declarations */
 extern int SB_FileDelete       ();
@@ -1152,7 +1170,8 @@ extern int B_ScrollVTW0(char* arg);
 extern int B_ScrollVTN (char* arg);
 
 extern int ODE_scroll(KDB *kdb, char **lst);
-extern int T_view_tbl(char* name, char *smpl, char** vars_names);
+extern int T_view_tbl(TBL *tbl, char *smpl, char* name);
+// extern int T_view_tbl(char* name, char *smpl, char** vars_names); // Temp version for IODE-QT
 
 
 /* b_data.c */
@@ -1784,7 +1803,6 @@ extern int T_alloc_val(TBL *,char *);
 extern int T_free_val(TBL *);
 extern int T_name_inline(TCELL *,int ,char *);
 extern int T_calc_val(TBL *,char *);
-extern int T_view_tbl(char *,char *, char **);
 extern int T_calc_line(TBL *,int ,COLS *,int *);
 extern int VT_files(void);
 
@@ -1918,6 +1936,7 @@ extern int W_EndDisplay(char *title,int x,int y,int w,int h);
 extern int W_printf(char *fmt,...);
 extern int W_printfDbl(char* fmt, ...);
 extern int W_printfRepl(char* fmt, ...);
+extern int W_printfReplEsc(char* fmt, ...);
 extern int W_printfEx(int dup, int ch1, int ch2, char *fmt, va_list args);
 
 // interface
