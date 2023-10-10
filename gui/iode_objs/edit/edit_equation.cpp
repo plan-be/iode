@@ -168,7 +168,7 @@ void EditEquationDialog::edit()
 		else
 		{
 			Equations.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
-			emit equationModified();
+			emit databaseModified();
 		}
 
 		if(estimation) 

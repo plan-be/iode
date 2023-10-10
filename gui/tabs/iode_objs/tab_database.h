@@ -48,7 +48,7 @@ public:
         connect(objmodel, &EquationsModel::rowsRemoved, this, &EquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::databaseModified, this, &EquationsWidget::databaseModified);
         connect(tableview, &EquationsView::newObjectInserted, this, &EquationsWidget::databaseModified);
-        connect(tableview, &EquationsView::equationModified, this, &EquationsWidget::databaseModified);
+        connect(tableview, &EquationsView::databaseModified, this, &EquationsWidget::databaseModified);
     }
 };
 

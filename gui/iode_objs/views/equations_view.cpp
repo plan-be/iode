@@ -26,7 +26,7 @@ void EquationsView::edit_obj()
 	editEqDialog = new EditEquationDialog(name, static_cast<QWidget*>(this->parent()));
 
 	// propagate signal
-	connect(editEqDialog, &EditEquationDialog::equationModified, this, &EquationsView::equationModified);
+	connect(editEqDialog, &EditEquationDialog::databaseModified, this, &EquationsView::databaseModified);
 
 	editEqDialog->show();
 	

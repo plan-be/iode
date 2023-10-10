@@ -65,7 +65,7 @@ private:
 		{
 			hashAfter = eq_hasher(*eq.c_equation);
 			if(hashAfter != hashBefore) 
-				emit equationModified();
+				emit databaseModified();
 		}
 	}
 
@@ -74,7 +74,7 @@ public:
     ~EditEquationDialog();
 
 signals:
-    void equationModified();
+    void databaseModified();
 
 public slots:
     void edit();
