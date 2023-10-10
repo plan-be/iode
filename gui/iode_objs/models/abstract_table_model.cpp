@@ -199,7 +199,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 	{
 		kdb->set_filename(fullPath.toStdString());
 		std::string full_path = fullPath.toStdString();
-		kdb->dump(full_path);
+		kdb->save(full_path);
 	}
 	catch (const IodeException& e)
 	{
