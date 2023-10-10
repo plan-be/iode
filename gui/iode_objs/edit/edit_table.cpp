@@ -31,7 +31,7 @@ EditTableDialog::EditTableDialog(const QString& tableName, QWidget* parent)
 
 	// propagate signal
 	EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
-	connect(table_model, &EditTableModel::tableModified, this, &EditTableDialog::tableModified);
+	connect(table_model, &EditTableModel::databaseModified, this, &EditTableDialog::databaseModified);
 
 	loadSettings();
 

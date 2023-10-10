@@ -21,7 +21,7 @@ void TablesView::edit_obj()
 	EditTableDialog dialog(name, static_cast<QWidget*>(this->parent()));
 
 	// propagate signal
-	connect(&dialog, &EditTableDialog::tableModified, this, &TablesView::tableModified);
+	connect(&dialog, &EditTableDialog::databaseModified, this, &TablesView::databaseModified);
 	
 	dialog.exec();
 	

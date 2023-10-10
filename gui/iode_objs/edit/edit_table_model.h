@@ -29,7 +29,7 @@ class EditTableModel : public QAbstractTableModel
 	size_t hashAfter;	
 
 signals:
-	void tableModified();
+	void databaseModified();
 
 public:
     EditTableModel(const QString& tableName, QWidget* parent = Q_NULLPTR);
@@ -61,7 +61,7 @@ public:
 		{
 			hashAfter = table_hasher(*table->c_table);
 			if(hashAfter != hashBefore) 
-				emit tableModified();
+				emit databaseModified();
 		}
 	}
 
