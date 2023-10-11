@@ -541,7 +541,17 @@ std::vector<std::string> Table::getVariablesFromLecCell(const int row, const int
 	return get_variables_from_clec(clec);
 }
 
-// we assume that text string is written in UTF8 format
+// 
+/**
+ * @brief 
+ * 
+ * @param row 
+ * @param column 
+ * @param text text to be written in the cell. Note that leading and trailing double quotes are removed.
+ * @param divider 
+ * 
+ * @note: The string argument `text` passed to this C++ method is assumed to be written with the UTF8 format
+ */
 void Table::setCellText(const int row, const int column, const std::string& text, const bool divider)
 {
 	TCELL* cell = getCell(row, column, divider);
@@ -555,6 +565,29 @@ void Table::setCellLec(const int row, const int column, const std::string& lec, 
 	TCELL* cell = getCell(row, column, divider);
 	unsigned char* c_lec = reinterpret_cast<unsigned char*>(to_char_array(lec));
 	T_set_lec_cell(cell, c_lec);
+}
+
+/**
+ * @brief Set the content of a cell.
+ *        Rule: If the content starts with a double quotes, we assume it is a string cell. 
+ *        Otherwise, it is a LEC cell.
+ *        Note that the leading and trailing double quotes are removed when the text is written 
+ *        in a string table cell.
+ * 
+ * @param row 
+ * @param column 
+ * @param content 
+ * @param divider
+ * 
+ * @note When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+ *       See function `T_create_cell()` in file `k_tbl.c` from the C API 
+ */
+void Table::setCellContent(const int row, const int column, const std::string& content, const bool divider)
+{
+	if(content.starts_with('\"'))
+		setCellText(row, column, content, divider);
+	else
+		setCellLec(row, column, content, divider);
 }
 
 EnumCellType Table::getCellType(const int row, const int column, const bool divider) const
@@ -687,6 +720,7 @@ int Table::insertLine(const int pos, const EnumLineType line_type, const bool af
 	}
 
 	int where_ = after ? 0 : 1;
+	// WARNING: When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
 	int new_pos = T_insert_line(c_table, pos, line_type, where_);
 	if (new_pos < 0) throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
 	return new_pos;

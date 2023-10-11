@@ -249,6 +249,8 @@ public:
 
 	void setCellLec(const int row, const int column, const std::string& lec, const bool divider = false);
 
+	void setCellContent(const int row, const int column, const std::string& content, const bool divider = false);
+
 	EnumCellType getCellType(const int row, const int column, const bool divider = false) const;
 
 	void setCellType(const int row, const int column, const EnumCellType cell_type, const bool divider = false);
