@@ -64,6 +64,7 @@ set(GUI_PLOT
 )
 
 set(GUI_EDIT_OBJECT
+    iode_objs/edit/edit_iode_obj.ui     iode_objs/edit/edit_iode_obj.h          iode_objs/edit/edit_iode_obj.cpp
     iode_objs/edit/edit_equation.ui     iode_objs/edit/edit_equation.h          iode_objs/edit/edit_equation.cpp
                                         iode_objs/edit/edit_table_view.h        iode_objs/edit/edit_table_view.cpp
                                         iode_objs/edit/edit_table_model.h       iode_objs/edit/edit_table_model.cpp

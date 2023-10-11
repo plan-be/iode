@@ -8,9 +8,10 @@
 #include "iode_objs/models/identities_model.h"
 #include "iode_objs/delegates/identities_delegate.h"
 #include "iode_objs/new/add_identity.h"
+#include "iode_objs/edit/edit_iode_obj.h"
 
 
-class IdentitiesView : public IodeAbstractTableView
+class IdentitiesView : public IodeTemplateTableView<EditIdentityDialog>
 {
 	Q_OBJECT
 
@@ -18,7 +19,7 @@ class IdentitiesView : public IodeAbstractTableView
 	QShortcut* shortcutExecuteIdts;
 
 public:
-	IdentitiesView(QWidget* parent = nullptr) : IodeAbstractTableView(I_IDENTITIES, new IdentitiesDelegate(parent), parent) 
+	IdentitiesView(QWidget* parent = nullptr) : IodeTemplateTableView(I_IDENTITIES, new IdentitiesDelegate(parent), parent) 
 	{
 		// ---- keyboard shortcuts ----
 		shortcutExecuteCurrentIdt = new QShortcut(QKeySequence(Qt::Key_F7), this);
@@ -44,5 +45,6 @@ public:
 
 public slots:
 	void new_obj();
+	void edit_obj() { openEditDialog(); }
 	void executeCurrentIdentity();
 };

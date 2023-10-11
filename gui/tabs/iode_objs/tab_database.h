@@ -34,6 +34,7 @@ public:
         connect(objmodel, &CommentsModel::rowsRemoved, this, &CommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::databaseModified, this, &CommentsWidget::databaseModified);
         connect(tableview, &CommentsView::newObjectInserted, this, &CommentsWidget::databaseModified);
+        connect(tableview, &CommentsView::databaseModified, this, &CommentsWidget::databaseModified);
     }
 };
 
@@ -63,6 +64,7 @@ public:
         connect(objmodel, &IdentitiesModel::rowsRemoved, this, &IdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::databaseModified, this, &IdentitiesWidget::databaseModified);
         connect(tableview, &IdentitiesView::newObjectInserted, this, &IdentitiesWidget::databaseModified);
+        connect(tableview, &IdentitiesView::databaseModified, this, &IdentitiesWidget::databaseModified);
     }
 };
 
@@ -77,6 +79,7 @@ public:
         connect(objmodel, &ListsModel::rowsRemoved, this, &ListsWidget::databaseModified);
         connect(objmodel, &ListsModel::databaseModified, this, &ListsWidget::databaseModified);
         connect(tableview, &ListsView::newObjectInserted, this, &ListsWidget::databaseModified);
+        connect(tableview, &ListsView::databaseModified, this, &ListsWidget::databaseModified);
     }
 };
 
