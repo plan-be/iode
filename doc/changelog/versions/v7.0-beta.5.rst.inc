@@ -10,6 +10,8 @@ New Features 🎉
 Improvements ✨
 ---------------
 
+  * (GUI) Enabled editing Comments, Identities and Lists in box dialogs (shortcut: CTRL + ENTER / RETURN) (#364) 
+
 
 Fixed Bugs 🛠️
 -------------
