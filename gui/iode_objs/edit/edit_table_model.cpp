@@ -159,13 +159,15 @@ QVariant EditTableModel::data(const QModelIndex& index, int role) const
 		}
 		else
 		{
+			bool display_quotes; 
 			switch (line_type)
 			{
 			case IT_TITLE:
 				s_data = QString::fromStdString(table->getTitle(i_line));
 				break;
 			case IT_CELL:
-				s_data = QString::fromStdString(table->getCellContent(i_line, j_column, false));
+				display_quotes = table->getCellType(i_line, j_column) == IT_STRING;
+				s_data = QString::fromStdString(table->getCellContent(i_line, j_column, display_quotes));
 				break;
 			default:
 				break;
@@ -205,10 +207,10 @@ bool EditTableModel::setData(const QModelIndex& index, const QVariant& value, in
 					table->setTitle(i_line, std_value);
 					break;
 				case IT_CELL:
-					if (table->getCellType(i_line, j_column) == IT_STRING)
-						table->setCellText(i_line, j_column, std_value);
-					else
-						table->setCellLec(i_line, j_column, std_value);
+					// When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+					// Rule: If the content starts with a double quotes -> we assume it is a string cell. 
+					//       Otherwise, it is a LEC cell.
+					table->setCellContent(i_line, j_column, std_value);
 					break;
 				default:
 					break;
@@ -269,9 +271,8 @@ int EditTableModel::insertLine(EnumLineType lineType, const int position, const 
 	switch(lineType)
 	{
 	case EnumLineType::IT_CELL:
+		// When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
 		new_position = table->insertLineWithCells(position, after);
-		for(int col=0; col < table->nbColumns(); col++)
-			table->setCellType(new_position, col, table->getDividerCellType(col));
 		break;
 	case EnumLineType::IT_TITLE:
 		new_position = table->insertTitle(position, "", after);
