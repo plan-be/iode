@@ -148,6 +148,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->getCellAlign(1, 0), IT_LEFT);
     EXPECT_EQ(table->getCellFont(1, 0), IT_ITALIC);
     EXPECT_EQ(table->getCellContent(1, 0, false), "(divisé par les prix à la consommation)");
+    EXPECT_EQ(table->getCellContent(1, 0, true), "\"(divisé par les prix à la consommation)\"");
     // ---- column 1
     EXPECT_EQ(table->getCellType(1, 1), IT_STRING);
     EXPECT_EQ(table->getCellAlign(1, 1), IT_LEFT);
@@ -207,8 +208,8 @@ TEST_F(TablesTest, LineCells)
 
     // add - delete - insert
     int new_pos;
-    std::string cell1_content = table->getCellContent(5, 0, false);
-    std::string cell2_content = table->getCellContent(5, 1, false);
+    std::string cell1_content = table->getCellContent(5, 0, false);      // string cell
+    std::string cell2_content = table->getCellContent(5, 1, false);     // LEC cell
 
     // ---- add
     int nb_lines = table->nbLines();
@@ -218,7 +219,7 @@ TEST_F(TablesTest, LineCells)
 
     table->setCellText(new_pos, 0, cell1_content);
     EXPECT_EQ(table->getCellType(new_pos, 0), IT_STRING);
-    EXPECT_EQ(table->getCellContent(new_pos, 0, false), cell1_content);
+    EXPECT_EQ(table->getCellContent(new_pos, 0, true), "\"" + cell1_content + "\"");
 
     table->setCellLec(new_pos, 1, cell2_content);
     EXPECT_EQ(table->getCellType(new_pos, 1), IT_LEC);
@@ -229,14 +230,26 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(table->nbLines(), nb_lines);
 
     // ---- insert 
+    // WARNING: When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+    //          See function `T_create_cell()` in file `k_tbl.c` from the C API 
     new_pos = table->insertLineWithCells(25, true);
     EXPECT_EQ(table->nbLines(), nb_lines + 1);
     EXPECT_EQ(new_pos, 26);
 
+    // Rule: If the content starts with a double quotes, we assume it is a string cell. 
+    //       Otherwise, it is a LEC cell.
+    table->setCellContent(new_pos, 0, "\"" + cell1_content + "\"");
+    EXPECT_EQ(table->getCellType(new_pos, 0), IT_STRING);
+    EXPECT_EQ(table->getCellContent(new_pos, 0, true), "\"" + cell1_content + "\"");
+
+    table->setCellType(new_pos, 0, IT_LEC);
+    // setCellText() forces the cell to become a string cell
     table->setCellText(new_pos, 0, cell1_content);
     EXPECT_EQ(table->getCellType(new_pos, 0), IT_STRING);
-    EXPECT_EQ(table->getCellContent(new_pos, 0, false), cell1_content);
+    EXPECT_EQ(table->getCellContent(new_pos, 0, false),  cell1_content);
 
+    // setCellLec forces the cell to become a LEC cell
+    table->setCellType(new_pos, 0, IT_STRING);
     table->setCellLec(new_pos, 1, cell2_content);
     EXPECT_EQ(table->getCellType(new_pos, 1), IT_LEC);
     EXPECT_EQ(table->getCellContent(new_pos, 1, false), cell2_content);
