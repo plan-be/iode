@@ -102,7 +102,7 @@ jobs:
         uses: ./.github/actions/install_boost
       - name: Print preset config
         shell: bash
-        run: echo "${{ inputs.build-config }}"
+        run: echo "windows-debug-sanitize"
       - name: Configure CMake
         shell: bash
         # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -110,7 +110,7 @@ jobs:
         # for more details about cmake preset:
         #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
         #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-        run: cmake --preset ${{ inputs.build-config }}
+        run: cmake --preset windows-debug-sanitize
       - name: Build the SCR4, C and C++ API libs
         uses: ./.github/actions/build_api
         with:
