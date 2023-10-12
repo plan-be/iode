@@ -114,26 +114,6 @@ public:
         return filepath.isEmpty() || filepath == QString(I_DEFAULT_FILENAME);
     }
 
-    QString getTabText() const
-    {
-        if(isUnsavedDatabase())
-        {
-            QString ext = QString::fromStdString(v_binary_ext[fileType]);
-            // Note: the * is to tell that the content of the KDB has not been saved in file
-            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + "." + ext + "*";
-        }
-        else
-            return IodeAbstractWidget::getTabText();
-    }
-
-    QString getTooltip() const
-    {
-        if(isUnsavedDatabase())
-            return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database";
-        else
-            return IodeAbstractWidget::getTooltip();
-    }
-
     bool updateFilepath(const QString& filepath) override
     {
         if(checkNewFilepath(filepath))
@@ -260,6 +240,26 @@ public:
         delete tableview;
         delete shortcutPrint;
         delete shortcutAdd;
+    }
+
+    QString getTabText() const
+    {
+        if(isUnsavedDatabase())
+        {
+            QString ext = QString::fromStdString(v_binary_ext[fileType]);
+            // Note: the * is to tell that the content of the KDB has not been saved in file
+            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + "." + ext + " [0]*";
+        }
+        else
+            return IodeAbstractWidget::getTabText() + " [" + QString::number(objmodel->rowCount()) + "]";
+    }
+
+    QString getTooltip() const
+    {
+        if(isUnsavedDatabase())
+            return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database [0]";
+        else
+            return IodeAbstractWidget::getTooltip() + " [" + QString::number(objmodel->rowCount()) + "]";
     }
 
     M* get_model() const 
