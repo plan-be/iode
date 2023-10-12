@@ -259,21 +259,6 @@
        <height>0</height>
       </size>
      </property>
-     <item>
-      <property name="text">
-       <string>English</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>French</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Dutch</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="8" column="2">
@@ -295,7 +280,7 @@
   <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header>util/widgets/file_chooser.h</header>
+   <header location="global">util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>
