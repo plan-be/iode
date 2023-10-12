@@ -11,6 +11,7 @@ Improvements ✨
 ---------------
 
   * (GUI) Enabled editing Comments, Identities and Lists in box dialogs (shortcut: CTRL + ENTER / RETURN) (#364) 
+  * (GUI) Print the number of IODE objects present in the Workspace in the title of the corresponding tab (#371)
 
 
 Fixed Bugs 🛠️
