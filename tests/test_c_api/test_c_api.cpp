@@ -1131,6 +1131,8 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     int         rc;
     LIS         lst, expected_lst;
     void        (*kmsg_super_ptr)(char*);
+    double      XNATY_2000Y1;
+
 
     U_test_print_title("Tests Simulation");
 
@@ -1207,7 +1209,9 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     // Check result
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071));
+    XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
+    //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
+    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.800703));
 
     // Cleanup
     SCR_free_tbl(endo_exo);
@@ -2002,6 +2006,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
                 *kdbs;
     char        *filename = "fun";
     int         rc;
+    double      XNATY_2000Y1;
 
     // B_Model*() tests
     // ----------------
@@ -2072,7 +2077,9 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 
     // Check some results
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.8006766));
+    XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
+    //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
+    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.800673));
 
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");

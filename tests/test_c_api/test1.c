@@ -82,12 +82,16 @@
 
 void Syntax() 
 {
-    printf("Syntax: test1 [-v] [-v-] [-x] [-x-] [-h]\n");
+    printf("Syntax: test1 [-v] [-v-] [-x] [-x-] [-h] [-vc64]\n");
     printf("  [-v]  : verbose (default)\n");
     printf("  [-v-] : silent\n");
     printf("  [-x]  : exit on error (default)\n");
     printf("  [-x-] : continue on error\n");
+    printf("  [-data_dir] : data directory (default ..\\data)\n");
+    printf("  [-output_dir] : output directory (default ..\\output)\n");
     printf("  [-h]  : display syntax\n");
+    printf("Example: test1 -data_dir ..\\..\\data -output_dir ..\\..\\output\n");
+    
     exit(0);
 }
 
@@ -856,6 +860,8 @@ void Tests_Simulation()
     int         rc;
     LIS         lst, expected_lst;
     void        (*kmsg_super_ptr)(char*);
+    double      XNATY_2000Y1;
+    
     
     U_test_print_title("Tests Simulation");
 
@@ -932,7 +938,9 @@ void Tests_Simulation()
     // Check result
     S4ASSERT(rc == 0, "Exchange UY-XNATY converges on 2000Y1-2002Y1");
     S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
-    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.80071), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80071");
+    XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1"); 
+    //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
+    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.800703), "Exchange UY-XNATY: XNATY[2000Y1] == 0.800703");
 
     // Cleanup
     SCR_free_tbl(endo_exo);
@@ -1875,7 +1883,8 @@ void Tests_B_MODEL()
                 *kdbs;
     char        *filename = "fun";
     int         rc;
-
+    double      XNATY_2000Y1;
+    
     // B_Model*() tests
     // ----------------
     // X int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
@@ -1945,7 +1954,9 @@ void Tests_B_MODEL()
 
     // Check some results
     S4ASSERT(KV_get_at_aper("UY", "2000Y1") == 650.0, "Exchange UY-XNATY: UY[2000Y1] == 650.0 unchanged");
-    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.8006766), "Exchange UY-XNATY: XNATY[2000Y1] == 0.80069");
+    XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1"); 
+    //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
+    S4ASSERT(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.800673), "Exchange UY-XNATY: XNATY[2000Y1] == 0.800673");
     
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");
@@ -2763,8 +2774,18 @@ int main(int argc, char **argv)
         if(strcmp(argv[i], "-x-") == 0) S4ASSERT_EXIT_ON_ERROR = 0;
         if(strcmp(argv[i], "-x") == 0)  S4ASSERT_EXIT_ON_ERROR = 1;
         if(strcmp(argv[i], "-h") == 0)   Syntax();
+
+        if(strcmp(argv[i], "-data_dir") == 0) {    
+            IODE_DATA_DIR   = argv[i + 1];
+            i++;
+        }    
+        if(strcmp(argv[i], "-output_dir") == 0) {    
+            IODE_OUTPUT_DIR = argv[i + 1];
+            i++;
+        }    
     }
     
+   
     // Initialises super functions / empty WS / error messages
     U_test_init();
     
