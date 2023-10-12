@@ -29,7 +29,7 @@
    <iconset>
     <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -75,41 +75,6 @@
       <property name="maxCount">
        <number>10</number>
       </property>
-      <item>
-       <property name="text">
-        <string>Comments</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Equations</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Identities</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Lists</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Scalars</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Tables</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Variables</string>
-       </property>
-      </item>
      </widget>
     </item>
     <item row="0" column="3" colspan="2">

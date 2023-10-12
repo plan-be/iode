@@ -63,41 +63,6 @@
       <property name="maxCount">
        <number>10</number>
       </property>
-      <item>
-       <property name="text">
-        <string>Comments</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Equations</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Identities</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Lists</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Scalars</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Tables</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Variables</string>
-       </property>
-      </item>
      </widget>
     </item>
     <item row="1" column="0">
@@ -218,11 +183,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>IodeSampleEdit</class>
-   <extends>QLineEdit</extends>
-   <header>util/widgets/sample_edit.h</header>
-  </customwidget>
-  <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
    <header location="global">util/widgets/file_chooser.h</header>
@@ -230,6 +190,11 @@
    <slots>
     <slot>updateFileType(QString)</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>IodeSampleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>util/widgets/sample_edit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -6,9 +6,6 @@ MenuWorkspaceDescribe::MenuWorkspaceDescribe(QWidget* parent) :
 {
     setupUi(this);
 
-    QList<QString> qIodeTypes;
-    for(const std::string& iode_type: vIodeTypes) qIodeTypes << QString::fromStdString(iode_type);
-
     wCommentsDescription = new WrapperQLineEdit(label_comments->text(), *lineEdit_comments, OPTIONAL_FIELD);
     wEquationsDescription = new WrapperQLineEdit(label_equations->text(), *lineEdit_equations, OPTIONAL_FIELD);
     wIdentitiesDescription = new WrapperQLineEdit(label_identities->text(), *lineEdit_identities, OPTIONAL_FIELD);
