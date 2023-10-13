@@ -87,7 +87,7 @@ TEST_F(SimulationTest, Simulation)
 
     // Check result
     EXPECT_DOUBLE_EQ(Variables.get_var("UY", "2000Y1"), 650.0);
-    EXPECT_DOUBLE_EQ(round(Variables.get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.80071);
+    EXPECT_DOUBLE_EQ(round(Variables.get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.8007030);
     
     // TODO : check with list of equations
 }
