@@ -72,6 +72,17 @@ message(STATUS "Generator:          ${CMAKE_GENERATOR}")
 # Note: sanitizer options are availalbe for cl, clang and gcc
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND IODE_ENABLE_SANITIZER)
 if(MSVC)
+  # Note: incompatible options when using Visual Studio:
+  #         o The /RTC options are incompatible with AddressSanitizer and should be disabled.
+  #         See https://docs.microsoft.com/en-us/cpp/sanitizers/asan-known-issues?view=msvc-170#incompatible-options
+  string(REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+  string(REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+  # see https://learn.microsoft.com/en-us/cpp/sanitizers/error-container-overflow?view=msvc-170 
+  # and https://learn.microsoft.com/en-us/cpp/sanitizers/asan-known-issues?view=msvc-170#standard-library-support 
+  # and https://stackoverflow.com/q/74186326
+  # When annotations are disabled or in versions without support, AddressSanitizer exceptions raised in 
+  # STL code do still identify true bugs. However, they aren't as precise as they could be.
+  add_compile_definitions(_DISABLE_STRING_ANNOTATION=1 _DISABLE_VECTOR_ANNOTATION=1)
   # Warning: many options are currently (Visual Studio 2019) NOT avaible for MSVC
   #set(IODE_SANITIZER_FLAGS "-fsanitize=address")
   set(IODE_SANITIZER_FLAGS "-fsanitize=address")
@@ -94,12 +105,7 @@ set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} ${IODE_SANITIZER_FLAGS}")
 
-# Note: incompatible options when using Visual Studio:
-#         o The /RTC options are incompatible with AddressSanitizer and should be disabled.
-#         See https://docs.microsoft.com/en-us/cpp/sanitizers/asan-known-issues?view=msvc-170#incompatible-options
 if(MSVC)
-  string(REPLACE "/RTC1" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-  string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 endif()
 
 else()
