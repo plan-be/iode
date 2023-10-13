@@ -26,7 +26,7 @@ jobs:
           - name: Configure CMake
             run: cmake --preset ${{ env.build-config }}
           - name: Build Keyboard Shortcuts PDF
-            run: cmake --build --preset ${{ env.build-config }} --target keyboard_shortcuts
+            run: cmake --build --verbose --preset ${{ env.build-config }} --target keyboard_shortcuts
           - name: Upload documentation files
             if: ${{ success() }}
             uses: actions/upload-artifact@v3

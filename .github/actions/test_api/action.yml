@@ -14,13 +14,13 @@ runs:
   steps:
     - name: Build C Tests
       shell: bash
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target test_c_api 
+      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target test_c_api 
     - name: Run C API Tests
       shell: bash
       run: ctest --preset c-api-${{ inputs.cmake-config }}
     - name: Build C++ Tests
       shell: bash
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target test_cpp_api 
+      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target test_cpp_api 
     - name: Run C++ API Tests
       shell: bash
       run: ctest --preset cpp-api-${{ inputs.cmake-config }}

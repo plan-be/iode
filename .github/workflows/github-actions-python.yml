@@ -72,19 +72,19 @@ jobs:
             run: cmake --preset ${{ inputs.build-config }}
           - name: Build SCR4, C and C++ API
             shell: bash -el {0}
-            run: cmake --build --preset ${{ inputs.build-config }} --target iode_cpp_api              
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_cpp_api              
           - name: Build Python IODE (Cython)
             shell: bash -el {0}
-            run: cmake --build --preset ${{ inputs.build-config }} --target iode_python 
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_python 
           - name: Test Python IODE (Cython)
             shell: bash -el {0}
-            run: cmake --build --preset ${{ inputs.build-config }} --target test_python 
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_python 
           - name: Build Python IODE (nanobind)
             shell: bash -el {0}
-            run: cmake --build --preset ${{ inputs.build-config }} --target iode 
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode 
           - name: Test Python IODE (nanobind)
             shell: bash -el {0}
-            run: cmake --build --preset ${{ inputs.build-config }} --target test_nanobind 
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_nanobind 
           - name: Upload PyIode compiled files
             if: ${{ success() }}
             uses: actions/upload-artifact@v3

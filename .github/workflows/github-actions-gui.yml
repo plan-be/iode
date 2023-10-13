@@ -66,5 +66,5 @@ jobs:
               with:
                 cmake-config: ${{ inputs.build-config }}
             - name: Build GUI
-              run: cmake --build --preset ${{ inputs.build-config }} --target iode_gui
+              run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_gui
             - run: echo "This job's status is ${{ job.status }}."
