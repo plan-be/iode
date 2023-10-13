@@ -57,5 +57,5 @@ jobs:
             with:
               cmake-config: ${{ inputs.build-config }}
           - name: Build CLI
-            run: cmake --build --preset ${{ inputs.build-config }} --target iodecmd 
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iodecmd 
           - run: echo "This job's status is ${{ job.status }}."

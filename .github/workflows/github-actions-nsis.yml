@@ -127,7 +127,7 @@ jobs:
               cmake-config: ${{ inputs.build-config }}
     
           - name: Build CLI
-            run: cmake --build --preset ${{ inputs.build-config }} --target iodecmd
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iodecmd
 
           - name: Upload CLI
             if: ${{ success() }}
@@ -138,10 +138,10 @@ jobs:
               if-no-files-found: error 
             
           - name: Build the GUI
-            run: cmake --build --preset ${{ inputs.build-config }} --target iode_gui 
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_gui 
     
           - name: Build Windows Installer and Updater (NSIS)
-            run: cmake --build --preset ${{ inputs.build-config }} --target nsis
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target nsis
 
           - name: Upload Windows Installer and Updater
             if: ${{ success() }}

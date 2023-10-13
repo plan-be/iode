@@ -14,12 +14,12 @@ runs:
   steps:
     - name: Build SCR4
       shell: bash
-      # cmake --build --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
+      # cmake --build --verbose --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
       # see CMakePresets.json file
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_scr4 
+      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target iode_scr4 
     - name: Build C IODE API
       shell: bash
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_c_api 
+      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target iode_c_api 
     - name: Build C++ IODE API
       shell: bash
-      run: cmake --build --preset ${{ inputs.cmake-config }} --target iode_cpp_api 
+      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target iode_cpp_api 
