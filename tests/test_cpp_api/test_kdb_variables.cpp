@@ -17,6 +17,10 @@ protected:
     // void TearDown() override {}
 };
 
+class KDBVariablesEmptyTest : public KDBTest, public ::testing::Test
+{
+};
+
 
 TEST_F(KDBVariablesTest, Load)
 {
@@ -119,11 +123,41 @@ TEST_F(KDBVariablesTest, GetSetVar)
     EXPECT_DOUBLE_EQ(Variables.get_var(name, s_period), new_value);
 }
 
-TEST_F(KDBVariablesTest, GetSample)
+TEST_F(KDBVariablesEmptyTest, Sample)
+{
+    Sample sample_undef = Variables.get_sample();
+    EXPECT_EQ(sample_undef.nb_periods(), 0);
+    EXPECT_EQ(sample_undef.to_string(), ":");
+
+    EXPECT_THROW(Variables.set_sample("", "2015Y1"), std::invalid_argument);
+    EXPECT_THROW(Variables.set_sample("1960Y1", ""), std::invalid_argument);
+
+    // set sample
+    Variables.set_sample("1960Y1", "2015Y1");
+    EXPECT_EQ(Variables.get_sample().to_string(), "1960Y1:2015Y1");
+}
+
+TEST_F(KDBVariablesTest, Sample)
 {
     Sample sample = Variables.get_sample();
     Sample expected_sample("1960Y1", "2015Y1");
     EXPECT_EQ(sample.to_string(), expected_sample.to_string());
+
+    // does nothing
+    Variables.set_sample("", "");
+    EXPECT_EQ(sample.to_string(), expected_sample.to_string());
+
+    // update 'to'
+    Variables.set_sample("", "2016Y1");
+    EXPECT_EQ(Variables.get_sample().to_string(), "1960Y1:2016Y1");
+
+    // update 'from'
+    Variables.set_sample("1959Y1", "");
+    EXPECT_EQ(Variables.get_sample().to_string(), "1959Y1:2016Y1");
+
+    // update sample
+    Variables.set_sample("1950Y1", "2020Y1");
+    EXPECT_EQ(Variables.get_sample().to_string(), "1950Y1:2020Y1");
 }
 
 TEST_F(KDBVariablesTest, GetNbPeriods)
