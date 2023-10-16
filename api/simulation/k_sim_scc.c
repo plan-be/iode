@@ -131,8 +131,10 @@ static int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     // NE PAS FREEER KSIM_NORMS ni KSIM_NITERS CAR UTILISES POUR LE REPORTING A POSTERIORI !!
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
+    SCR_free(KSIM_CPUS);
     KSIM_NORMS = (IODE_REAL *) SCR_malloc(sizeof(IODE_REAL) * KSMPL(dbv)->s_nb);
     KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->s_nb);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->s_nb);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     kmsg("Linking equations ....");
