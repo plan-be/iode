@@ -1,6 +1,11 @@
 ﻿# CMakeList.txt : Top-level CMake project file, do global configuration
 # and include sub-projects here.
 #
+
+# VISUAL STUDIO 2019 => CMake 3.20
+#cmake_minimum_required (VERSION 3.20)
+
+# VISUAL STUDIO > 2019 => CMake 3.24
 cmake_minimum_required (VERSION 3.24)
 
 # List of CMAKE variables: https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
@@ -128,14 +133,38 @@ else()
   set(IODE_DEBUG_INFO_FLAG "-g")
 endif()
 
+# VISUAL STUDIO 2019 vs 2022 
+# --------------------------
+# Some code in the C++ API requires C++ 20.
 # C++20 (required for the module std format) makes the compiler MSVC 
 # much more strict by default when passing a string literal 
-# "string" value for a char* argument of a C function.
+# "string" value for a char* argument of a C function: the string "string" 
+# is considered as "const char*" and cannot be converted to "char*").
+#
 # The option /Zc:strictStrings with the minus at the end deactivates 
-# this behavior of the MSVC compiler
+# this behavior of the MSVC compiler.
+
+# In VStudio 2019, set(CMAKE_CXX_STANDARD 20) generates a compiler parameter "-std:c++latest" which
+# takes precedence on "/Zc:strictStrings-". 
+# The equivalent in VStudio 2019 is "/std:c++latest" (note the / instead of a -).
+# Therefore, in Visual Studio 2019, the first block below must be commented out and the next block uncommented.
+
+# VISUAL STUDIO > 2019
+# --------------------
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# VISUAL STUDIO <= 2019 
+# ---------------------
+#if(MSVC)
+#  add_compile_options("/std:c++latest")
+#endif()
+
+# All versions of VS
 if(MSVC)
   add_compile_options("/Zc:strictStrings-")
 endif()
+
 
 # global flags
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
@@ -147,9 +176,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_compile_options(${IODE_DEBUG_INFO_FLAG})
 endif()
 
-# some code in the C++ API requires C++ 20
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- preprocessor ----
 if(MSVC)
