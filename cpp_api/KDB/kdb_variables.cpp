@@ -170,8 +170,21 @@ Sample KDBVariables::get_sample() const
 
 void KDBVariables::set_sample(const std::string& from, const std::string& to)
 {
-	Period period_from(from);
-	Period period_to(to);
+	if(from.empty() && to.empty())
+		return;
+	
+	Sample sample = get_sample();
+    if (sample.nb_periods() == 0 && (from.empty() || to.empty()))
+	{
+        throw std::invalid_argument(std::string("Current sample is empty.\n") + 
+			"Please provide a value for both 'from' and 'to' arguments"); 
+	}
+
+	std::string from_ = from.empty() ? sample.start_period().to_string() : from;
+	std::string to_ = to.empty() ? sample.end_period().to_string() : to;
+
+	Period period_from(from_);
+	Period period_to(to_);
 	set_sample(period_from, period_to);
 }
 
