@@ -2,6 +2,7 @@
 #include "time/period.h"
 #include "time/sample.h"
 #include "kdb_template.h"
+#include <stdexcept>
 
 
 // TODO: replace KVAR_MODE section in iode.h by the enum below
