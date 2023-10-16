@@ -114,7 +114,7 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
 }
 
 /**
- * Same as B_ModelCalcSCC()
+ * Same as IodeModelCalcSCC() (defined in b_api.c)
  */
 void Simulation::model_calculate_SCC(const int nb_iterations, const std::string& pre_name, const std::string& inter_name, const std::string& post_name, const std::string& list_eqs)
 {
@@ -166,7 +166,11 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
 }
 
 /**
- * Same as B_ModelSimulateSCC()
+ * Mostly same function as IodeModelSimulateSCC() (defined in b_api.c).
+ * Unlike in IodeModelSimulateSCC(), the following global parameters are not passed to this function: 
+ *    eps, relax, maxit,  init_values, debug, newton_eps, newton_maxit, newton_debug.
+ * 
+ * TODO: add these parameters as optional arguments
  */
 void Simulation::model_simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name, const std::string& inter_name, const std::string& post_name)
 {
