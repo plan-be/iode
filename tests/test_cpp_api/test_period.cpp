@@ -102,7 +102,7 @@ TEST(TestPeriod, ToString)
 	EXPECT_EQ(str_res, str_period);
 }
 
-TEST(TestPeriod, ToDouble)
+TEST(TestPeriod, ToFloat)
 {
 	std::string str_period;
 	double res;
@@ -110,20 +110,20 @@ TEST(TestPeriod, ToDouble)
 	// periodicity = Y
 	str_period = "2020Y1";
 	Period periodY(str_period);
-	res = periodY.to_double();
-	EXPECT_DOUBLE_EQ(res, 2020.0);
+	res = periodY.to_float();
+	EXPECT_FLOAT_EQ(res, 2020.0f);
 
 	// periodicity = Q
 	str_period = "2020Q2";
 	Period periodQ(str_period);
-	res = periodQ.to_double();
-	EXPECT_DOUBLE_EQ(res, 2020.0 + (1./4.));
+	res = periodQ.to_float();
+	EXPECT_FLOAT_EQ(res, 2020.0f + (1.f/4));
 
 	// periodicity = W
 	str_period = "2020W10";
 	Period periodW(str_period);
-	res = periodW.to_double();
-	EXPECT_DOUBLE_EQ(res, 2020.0 + (9 * (1./52.)));
+	res = periodW.to_float();
+	EXPECT_FLOAT_EQ(res, 2020.0f + (9 * (1.f/52)));
 }
 
 TEST(TestPeriod, Hash)
