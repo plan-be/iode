@@ -274,14 +274,14 @@ void PlotDialog::setPeriods(const Sample& sample, const QString& from, const QSt
         Period start_period = sample.start_period();
         this->from = QString::fromStdString(start_period.to_string());
         start_t = 0;
-        minX = start_period.to_double();
+        minX = start_period.to_float();
     }
     else
     {
         Period start_period(from.toStdString());
         this->from = from;
         start_t = sample.get_period_position(start_period);
-        minX = start_period.to_double();
+        minX = start_period.to_float();
     }
 
     if(to.isEmpty())
@@ -289,14 +289,14 @@ void PlotDialog::setPeriods(const Sample& sample, const QString& from, const QSt
         Period end_period = sample.end_period();
         this->to = QString::fromStdString(end_period.to_string());
         end_t = sample.get_period_position(end_period);
-        maxX = end_period.to_double();
+        maxX = end_period.to_float();
     }
     else
     {
         Period end_period(to.toStdString());
         this->to = to;
         end_t = sample.get_period_position(end_period);
-        maxX = end_period.to_double();
+        maxX = end_period.to_float();
     }
     
     if(start_t >= end_t)
