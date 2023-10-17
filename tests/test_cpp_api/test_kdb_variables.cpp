@@ -168,8 +168,59 @@ TEST_F(KDBVariablesTest, GetNbPeriods)
 
 TEST_F(KDBVariablesTest, GetPeriod)
 {
-    Period expected_period(1970, 'Y', 1);
+    std::string expected_period = "1970Y1";
     EXPECT_EQ(Variables.get_period(t), expected_period);
+
+    float expected_fperiod = 1970.0;
+    EXPECT_FLOAT_EQ(Variables.get_period_as_float(t), expected_fperiod);
+}
+
+TEST_F(KDBVariablesTest, GetPeriodList)
+{
+    int first_year = 1960;
+    int last_year = 2015;
+    std::vector<std::string> expected_periods;
+    std::vector<float> expected_fperiods;
+
+    // all periods
+    int start = first_year;
+    int end = last_year;
+    // as string
+    for(int y = start; y <= end; y++)
+        expected_periods.push_back(std::to_string(y) + "Y1");
+    EXPECT_EQ(Variables.get_list_periods(), expected_periods);
+    // as float
+    for(int y = start; y <= end; y++)
+        expected_fperiods.push_back((float) y);
+    EXPECT_EQ(Variables.get_list_periods_as_float(), expected_fperiods);
+
+    // subset of periods (from)
+    start = 1970;
+    end = last_year;
+    // as string
+    expected_periods.clear();
+    for(int y = start; y <= end; y++)
+        expected_periods.push_back(std::to_string(y) + "Y1");
+    EXPECT_EQ(Variables.get_list_periods("1970Y1"), expected_periods);
+    // as float
+    expected_fperiods.clear();
+    for(int y = start; y <= end; y++)
+        expected_fperiods.push_back((float) y);
+    EXPECT_EQ(Variables.get_list_periods_as_float("1970Y1"), expected_fperiods);
+
+    // subset of periods (to)
+    start = first_year;
+    end = 2010;
+    // as string
+    expected_periods.clear();
+    for(int y = start; y <= end; y++)
+        expected_periods.push_back(std::to_string(y) + "Y1");
+    EXPECT_EQ(Variables.get_list_periods("", "2010Y1"), expected_periods);
+    // as float
+    expected_fperiods.clear();
+    for(int y = start; y <= end; y++)
+        expected_fperiods.push_back((float) y);
+    EXPECT_EQ(Variables.get_list_periods_as_float("", "2010Y1"), expected_fperiods);
 }
 
 TEST_F(KDBVariablesTest, Get)
