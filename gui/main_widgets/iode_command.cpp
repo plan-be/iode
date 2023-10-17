@@ -51,18 +51,12 @@ void IodeCommandLine::run_command()
     setText("");
 
     // try to execute the command
-    int success = -1;
+    bool success;
     QString error_msg;
     try
     {
-        success = B_ReportLine(cmd.toStdString().data());
-        if(success == 0)
-        {
-            if(!executedCommandsList.contains(cmd)) executedCommandsList.append(cmd);
-            it = executedCommandsList.constEnd();
-            // connected to MainWindow::update_tab_and_completer()
-            emit returnPressed();
-        }
+        execute_report_line(cmd.toStdString());
+        success = true;
     }
     catch(const std::exception& e)
     {
@@ -70,7 +64,14 @@ void IodeCommandLine::run_command()
         QMessageBox::warning(nullptr, "WARNING", error_msg + "\n");
     }
 
-    if(success != 0)
+    if(success)
+    {
+        if(!executedCommandsList.contains(cmd)) executedCommandsList.append(cmd);
+        it = executedCommandsList.constEnd();
+        // connected to MainWindow::update_tab_and_completer()
+        emit returnPressed();
+    }
+    else
     {
         output->append("Failed to execute " + cmd);
         if(!error_msg.isEmpty()) output->append(error_msg);
