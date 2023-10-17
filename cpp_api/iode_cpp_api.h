@@ -6,6 +6,7 @@
 #include "utils/utils.h"
 #include "utils/super.h"
 #include "utils/iode_exceptions.h"
+#include "report/report.h"
 #include "report/rep_list.h"
 #include "time/period.h"
 #include "time/sample.h"
