@@ -12,6 +12,7 @@ set(CPP_TIME
     )
 
 set(CPP_REPORT
+    report/report.h     report/report.cpp
     report/rep_list.h   report/rep_list.cpp
 )
 
