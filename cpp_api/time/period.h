@@ -16,14 +16,14 @@ const static std::map<char, int> mPeriodicities =
 	{'D', 365}
 };
 
-const static std::map<char, double> mSteps =
+const static std::map<char, float> mSteps =
 {
-	{'Y', 0.},
-	{'S', 1./2.},
-	{'Q', 1./4.},
-	{'M', 1./12.},
-	{'W', 1./52.},
-	{'D', 1./365.}
+	{'Y', 0.f},
+	{'S', 1.f/2},
+	{'Q', 1.f/4},
+	{'M', 1.f/12},
+	{'W', 1.f/52},
+	{'D', 1.f/365}
 };
 
 
@@ -76,19 +76,19 @@ public:
 	}
 
 	/**
-	 * @brief transforms a period into a double value.
+	 * @brief transforms a period into a float value.
 	 *        For examples:
 	 *        2000Y1    ->    2000.0
 	 *        2000Q2    ->    2000.25
 	 *        2000M4    ->    2000.25
 	 * 
-	 * @return double 
+	 * @return float 
 	 */
-	double to_double() const
+	float to_float() const
 	{
 		try
 		{
-			double value = static_cast<double>(c_period->p_y);
+			float value = static_cast<float>(c_period->p_y);
 			if(c_period->p_p != 'Y') value += mSteps.at(c_period->p_p) * (c_period->p_s - 1);
 			return value;
 		}
