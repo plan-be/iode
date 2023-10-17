@@ -179,4 +179,15 @@ NB_MODULE(iode, m)
       doc += "e.g.: [2000.0, 2001.0, ..., 2010.0] or [] if the sample is undefined";
       m.def("ws_sample_to_float_list", [](const std::string& from = "", const std::string& to = "") { return Variables.get_list_periods_as_float(from, to); }, 
             nb::arg("from") = "", nb::arg("to") = "", doc.c_str());
+
+      // Report
+
+      m.def("report_exec", nb::overload_cast<const std::string&, const std::string&>(&execute_report), 
+            nb::arg("filepath"), nb::arg("parameters") = "");
+      m.def("report_exec", nb::overload_cast<const std::string&, const std::vector<std::string>&>(&execute_report),
+            nb::arg("filepath"), nb::arg("parameters") = std::vector<std::string>());
+      m.def("reportline_exec", nb::overload_cast<const std::string&>(&execute_report_line), 
+            nb::arg("commands"));
+      m.def("reportline_exec", nb::overload_cast<const std::vector<std::string>&>(&execute_report_line), 
+            nb::arg("commands"));
 }
