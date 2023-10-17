@@ -7,8 +7,10 @@
 #include "gtest/gtest.h"
 #include "cpp_api/iode_cpp_api.h"
 
-#include <filesystem>
 #include <cmath>
+#include <fstream>
+#include <stdexcept>
+#include <filesystem>
 
 class KDBTest
 {
@@ -29,6 +31,80 @@ public:
 		std::string str_path = cwd.parent_path().string() + "\\";
 		input_test_dir = str_path + "data\\";
 		output_test_dir = str_path + "output\\";
+	}
+
+protected:
+	void compare_files(const std::string& filepath1, const std::string& filepath2)
+	{	
+		// check if files exist
+		if(!std::filesystem::exists(filepath1))
+			throw std::runtime_error("The file " + filepath1 + " does not exist");
+
+		if(!std::filesystem::exists(filepath2))
+			throw std::runtime_error("The file " + filepath2 + " does not exist");
+
+		// open the files
+	    std::ifstream file1(filepath1);
+		if(!file1.is_open())
+			throw std::runtime_error("Could not open the file " + filepath1);
+
+	    std::ifstream file2(filepath2);
+		if(!file2.is_open())
+			throw std::runtime_error("Could not open the file " + filepath2);
+
+		// count number of lines
+		std::string line;
+		int nb_lines_file1 = 0;
+		while (std::getline(file1, line))
+			nb_lines_file1++;
+		
+		int nb_lines_file2 = 0;
+		while (std::getline(file2, line))
+			nb_lines_file2++;
+
+		std::ifstream longest_file;
+		std::ifstream smallest_file;
+
+		std::string filepath_longest_file;
+		std::string filepath_smallest_file;
+
+		if(nb_lines_file1 >= nb_lines_file2)
+		{
+			longest_file.open(filepath1);
+			filepath_longest_file = filepath1;
+
+			smallest_file.open(filepath2);
+			filepath_smallest_file = filepath2;
+		}
+		else
+		{
+			longest_file.open(filepath2);
+			filepath_longest_file = filepath2;
+
+			smallest_file.open(filepath1);
+			filepath_smallest_file = filepath1;
+		}
+
+		// compare line by line
+		int pos = 0;
+		std::string line2;
+		std::string error_msg;
+		while (std::getline(smallest_file, line))
+		{
+			std::getline(longest_file, line2);
+			if(line != line2)
+			{
+				error_msg = "Line at position " + std::to_string(pos) + " are different:\n";
+				error_msg += "file " + filepath_smallest_file + " -> " + line;
+				error_msg += "file " + filepath_longest_file + " -> " + line2;
+				FAIL() << error_msg;
+			} 
+			pos++;
+		}
+
+		error_msg = "The file " + filepath1 + " has " + std::to_string(nb_lines_file1) + " lines";
+		error_msg += "while the file " + filepath2 + " has " + std::to_string(nb_lines_file2) + " lines";
+		EXPECT_EQ(nb_lines_file1, nb_lines_file2) << error_msg;
 	}
 };
 
