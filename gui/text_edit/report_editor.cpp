@@ -13,7 +13,7 @@ IodeReportEditor::~IodeReportEditor()
 void IodeReportEditor::run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language)
 {
     QString msg;
-    int success = -1;
+    bool success;
 
     QString currentProjectDir = QDir::currentPath();
 
@@ -26,9 +26,6 @@ void IodeReportEditor::run(const QString& filepath, const QString& parameters, c
             output->setTextColor(Qt::black);
         }
 
-        // see function C_ReportExec() from the file sb_rep.c from the old GUI. 
-        setPrintDest(filepath, 'D');
-        
         // set the number of decimals
         setNbDecimals(nbDecimals);
 
@@ -39,22 +36,19 @@ void IodeReportEditor::run(const QString& filepath, const QString& parameters, c
         QDir::setCurrent(QFileInfo(filepath).absolutePath());
 
         // executes IODE report
-        QString args = "\"" + filepath + "\" " + parameters;
-        success = B_ReportExec(args.toStdString().data());
-
-        W_close();
+        execute_report(filepath.toStdString(), parameters.toStdString());
 
         // reset current directory execution to project directory (chdir)
         QDir::setCurrent(currentProjectDir);
 
-        // display error if any
-        if(success != 0)
-            B_display_last_error();
+        success = true;
     }
     catch(const std::exception& e)
     {        
         // reset current directory execution to project directory (chdir)
         QDir::setCurrent(currentProjectDir);
+
+        success = false;
 
         msg = QString::fromStdString(e.what());
         QMessageBox::warning(nullptr, "WARNING", msg + "\n");
@@ -62,7 +56,7 @@ void IodeReportEditor::run(const QString& filepath, const QString& parameters, c
 
     if(output)
     {
-        if(success == 0)
+        if(success)
         {
             output->setTextColor(Qt::darkGreen);
             msg = "Successful";
