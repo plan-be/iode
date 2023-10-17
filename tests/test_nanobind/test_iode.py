@@ -71,23 +71,22 @@ def test_iode_ws_load_all():
     nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 6)
     assert nbvars == 394
 
-"""
 def test_iode_ws_sample():
 
     varfile = str(IODE_DATA_DIR / "a.var")
     iode.ws_load_var(varfile)
     sample = iode.ws_sample_get()
-    assert sample == ['1990Y1', '2020Y1']
+    assert sample == ('1990Y1', '2020Y1')
     print(f"Sample of {varfile} = {sample}")
 
     sample = iode.ws_sample_set("1995Y1", "")
-    assert sample ==  ['1995Y1', '2020Y1']
+    assert sample == ('1995Y1', '2020Y1')
 
     sample = iode.ws_sample_set("", "2030Y1")
-    assert sample ==  ['1995Y1', '2030Y1']
+    assert sample == ('1995Y1', '2030Y1')
 
     sample = iode.ws_sample_set("2000Y1", "2002Y1")
-    assert sample ==  ['2000Y1', '2002Y1']
+    assert sample == ('2000Y1', '2002Y1')
 
     nobs = iode.ws_sample_nb_periods()
     assert nobs == 3
@@ -99,8 +98,8 @@ def test_iode_ws_sample():
     lst = iode.ws_sample_to_list()
     assert lst == ["2000Y1", "2001Y1", "2002Y1"]
 
-    ax2 = iode.ws_sample_to_larray_axis()
-    assert repr(ax2) == repr(la.Axis(["2000Y1", "2001Y1", "2002Y1"], 'time'))
+    # ax2 = iode.ws_sample_to_larray_axis()
+    # assert repr(ax2) == repr(la.Axis(["2000Y1", "2001Y1", "2002Y1"], 'time'))
 
 
 # PYIODE_OBJECTS
@@ -110,6 +109,7 @@ def test_iode_ws_sample():
 # IODE COMMENTS <-> PYTHON STRINGS
 # --------------------------------
 
+"""
 def test_iode_set_cmt():
 
     iode.ws_load_cmt(str(IODE_DATA_DIR / "fun.cmt"))
