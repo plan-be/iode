@@ -34,12 +34,9 @@ bool VariablesModel::setValue(const int row, const int column, const QVariant& v
 
 void VariablesModel::reset()
 {
-	QString period;
 	columnNames = QVector<QString>();
-	for (int t = 0; t < kdb->get_nb_periods(); t++) {
-		period = QString::fromStdString(kdb->get_period(t).to_string());
-		columnNames.append(period);
-	}
+	for (const std::string& period: Variables.get_list_periods()) 
+		columnNames.append(QString::fromStdString(period));
 
 	IodeAbstractTableModel::reset();
 }
