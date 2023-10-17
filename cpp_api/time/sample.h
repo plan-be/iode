@@ -56,6 +56,26 @@ public:
 		return get_period_position(Period(period));
 	}
 
+	std::vector<std::string> get_list_periods() const
+	{
+		std::vector<std::string> periods;
+		periods.reserve(nb_periods());
+		Period period = start_period();
+		for(int t = 0; t < nb_periods(); t++)
+			periods.push_back(period.shift(t).to_string());
+		return periods;
+	}
+
+	std::vector<float> get_list_periods_as_float() const
+	{
+		std::vector<float> periods;
+		periods.reserve(nb_periods());
+		Period period = start_period();
+		for(int t = 0; t < nb_periods(); t++)
+			periods.push_back(period.shift(t).to_float());
+		return periods;
+	}
+
 	/**
 	 * same as PER_common_smpl() function
 	 */
