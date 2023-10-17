@@ -206,10 +206,42 @@ int KDBVariables::get_nb_periods() const
     return get_sample().nb_periods();
 }
 
-Period KDBVariables::get_period(const int t) const
+std::string KDBVariables::get_period(const int t) const
 {
     PERIOD period = KSMPL(get_KDB())->s_p1;
-    return Period(&period).shift(t);
+    return Period(&period).shift(t).to_string();
+}
+
+float KDBVariables::get_period_as_float(const int t) const
+{
+    PERIOD period = KSMPL(get_KDB())->s_p1;
+    return Period(&period).shift(t).to_float();
+}
+
+std::vector<std::string> KDBVariables::get_list_periods(const std::string& from, const std::string& to) const
+{
+	Sample sample = get_sample();
+	if(from.empty() && to.empty())
+		return sample.get_list_periods();
+	else
+	{
+		std::string from_ = from.empty() ? sample.start_period().to_string() : from;
+		std::string to_ = to.empty() ? sample.end_period().to_string() : to;
+		return Sample(from_, to_).get_list_periods();
+	}
+}
+
+std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& from, const std::string& to) const
+{
+	Sample sample = get_sample();
+	if(from.empty() && to.empty())
+		return sample.get_list_periods_as_float();
+	else
+	{
+		std::string from_ = from.empty() ? sample.start_period().to_string() : from;
+		std::string to_ = to.empty() ? sample.end_period().to_string() : to;
+		return Sample(from_, to_).get_list_periods_as_float();
+	}
 }
 
 void KDBVariables::copy_into(const std::string& input_file, const std::string& from, const std::string& to, 

@@ -83,7 +83,13 @@ public:
 
     int get_nb_periods() const;
 
-    Period get_period(const int t) const;
+    std::string get_period(const int t) const;
+
+    float get_period_as_float(const int t) const;
+
+    std::vector<std::string> get_list_periods(const std::string& from = "", const std::string& to = "") const;
+
+    std::vector<float> get_list_periods_as_float(const std::string& from = "", const std::string& to = "") const;
 
     void copy_into(const std::string& input_file, const std::string& from = "", const std::string& to = "", 
         const std::string objects_names = "");
