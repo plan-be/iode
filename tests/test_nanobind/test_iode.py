@@ -102,6 +102,16 @@ def test_iode_ws_sample():
     # assert repr(ax2) == repr(la.Axis(["2000Y1", "2001Y1", "2002Y1"], 'time'))
 
 
+# REPORTS AND COMMANDS
+# --------------------
+
+def test_iode_commands():
+    var_filepath = str(IODE_DATA_DIR / "fun.var")
+    commands = ["$WsClearVar", "$WsLoadVar " + var_filepath]
+    iode.reportline_exec(commands)
+    var_names = iode.ws_content_var("*")
+    assert len(var_names) == 394
+
 # PYIODE_OBJECTS
 # --------------
 
