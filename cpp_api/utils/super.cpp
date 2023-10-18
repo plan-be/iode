@@ -2,11 +2,6 @@
 #include "super.h"
 
 
-void cpp_error_super(int level, char* msg)
-{
-    throw IodeException(std::string(msg));
-}
-
 void cpp_panic_super()
 {
 	char* error_msg = "Swap Panic!";
@@ -22,6 +17,5 @@ void cpp_panic_super()
 void cpp_assign_super_API()
 {
     IODE_assign_super_API();
-    kerror_super = cpp_error_super;
     kpanic_super = cpp_panic_super;
 }
