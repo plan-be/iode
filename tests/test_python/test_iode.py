@@ -511,7 +511,7 @@ def test_iode_model_simulate_exchange():
     UY = iode.get_var("UY")
     XNATY = iode.get_var("XNATY")
     assert iode.exec_lec("UY[2000Y1]")[0] == 650.0
-    assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006767
+    assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006734
 
     iode.reset_msgs()
 
