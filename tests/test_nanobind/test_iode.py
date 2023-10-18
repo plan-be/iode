@@ -12,10 +12,11 @@ import numpy as np
 import pandas as pd
 
 from pathlib import Path
+import difflib
 
 # GLOBALS
-IODE_DATA_DIR = Path("../data")
-IODE_OUTPUT_DIR = Path("../output")
+IODE_DATA_DIR = Path("../data").absolute()
+IODE_OUTPUT_DIR = Path("../output").absolute()
 IODE_VERBOSE = 1
 
 
@@ -25,6 +26,14 @@ IODE_VERBOSE = 1
 # def test_iode_version():
 #     result = iode.version()
 #     assert result == "IODE Modeling Software 7.0 - (c) 1990-2023 Federal Planning Bureau - Brussels"
+
+def compare_files(filepath1: Path, filepath2: Path):
+    assert filepath1.exists()
+    assert filepath2.exists()
+    content1 = filepath1.read_text().split('\n')
+    content2 = filepath2.read_text().split('\n')
+    diff = list(difflib.context_diff(content1, content2))
+    assert len(diff) == 0
 
 # WS FUNCTIONS
 # ------------
@@ -111,6 +120,32 @@ def test_iode_commands():
     iode.reportline_exec(commands)
     var_names = iode.ws_content_var("*")
     assert len(var_names) == 394
+
+@pytest.fixture
+def parameters():
+    return [str(IODE_DATA_DIR), str(IODE_DATA_DIR), str(IODE_OUTPUT_DIR)]
+
+def test_iode_report_engine(parameters):
+    filepath = str(IODE_DATA_DIR / "rep_expand.rep")
+    # Calls to B_ReportExec(reportfile)
+    # Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
+    print(f"execute report '{filepath}'")
+    iode.report_exec(filepath, parameters)
+    compare_files(IODE_DATA_DIR / "rep_expand.a2m", IODE_DATA_DIR / "rep_expand.ref.a2m")
+
+def test_iode_report_funcs(parameters):
+    filepath = str(IODE_DATA_DIR / "rep_fns.rep")
+    # Execution of the report rep_fns.rep
+    print(f"execute report '{filepath}'")
+    iode.report_exec(filepath, parameters)
+    compare_files(IODE_DATA_DIR / "rep_fns.a2m", IODE_DATA_DIR / "rep_fns.ref.a2m")
+
+def test_iode_report_proc(parameters):
+    filepath = str(IODE_DATA_DIR / "rep_proc.rep")
+    print(f"execute report '{filepath}'")
+    iode.report_exec(filepath, parameters)
+    compare_files(IODE_DATA_DIR / "rep_proc.a2m", IODE_DATA_DIR / "rep_proc.ref.a2m")
+
 
 # PYIODE_OBJECTS
 # --------------
@@ -250,7 +285,7 @@ def test_iode_set_lst():
     iode.ws_clear_lst()
 
     # Create list as py strings
-    py_list1 = "A;B;C"
+    py_list1 = "ABC"
     name = "LIST1"
 
     # Save py_list1 as LIST1 in KL_WS + check
@@ -668,8 +703,8 @@ def test_iode_htol_la():
     la3D = la.ones([vars, sectors, time])
 
     # Setting values in la3D for S1, S2 in 2001Q4 and 2002Q2
-    la3D["2001Q4","S1"] = [1, 2, 3]     # AA_S1[2001Q4] = 1;  BB_S1[2001Q4] = 2;  CC_S1[2001Q4] = 3;
-    la3D["2002Q2","S2"] = [11, 22, 33]  # AA_S2[2001Q4] = 11; BB_S2[2001Q4] = 22; CC_S2[2001Q4] = 33;
+    la3D["2001Q4","S1"] = [1, 2, 3]     # AA_S1[2001Q4] = 1  BB_S1[2001Q4] = 2  CC_S1[2001Q4] = 3
+    la3D["2002Q2","S2"] = [11, 22, 33]  # AA_S2[2001Q4] = 11 BB_S2[2001Q4] = 22 CC_S2[2001Q4] = 33
 
     # Saving la3D in KV_WS, then in file testq_3D.var
     iode.ws_clear_var()
