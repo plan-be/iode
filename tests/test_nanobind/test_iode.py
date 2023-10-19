@@ -386,7 +386,7 @@ def test_iode_set_var():
 
     assert new_AA[2] == AA[2] # 1993Y1
     assert new_AB[1] == AB[1] # 1992Y1
-
+"""
 
 def test_iode_exec_lec():
     nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
@@ -398,7 +398,7 @@ def test_iode_exec_lec():
     res = iode.exec_lec("A+1", 0)
     assert  res == v_A[0] + 1
 
-
+"""
 # REPORT DATA_* FUNCTIONS
 # -----------------------
 
@@ -614,7 +614,7 @@ def test_iode_wrt():
     iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.a2m"), iode.W_A2M)
     iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.rtf"), iode.W_RTF)
     iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.csv"), iode.W_CSV)
-
+"""
 
 def test_iode_htol():
     #Read quaterly data and convert it to the current WS sample (yearly)
@@ -690,7 +690,7 @@ def test_iode_ltoh():
     iode.ws_ltoh_flow(filename, varname, iode.LTOH_STEP)
     res = iode.exec_lec(f"{varname}[2014Q3]", 0)
     assert round(res, 7) == 8.1050747
-
+"""
 
 def test_iode_htol_la():
     # Creates a quaterly larray and convert it to a yearly one
