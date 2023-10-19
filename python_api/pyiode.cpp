@@ -123,6 +123,11 @@ NB_MODULE(iode, m)
       m.def("ws_save_var", [](const std::string& filename){ Variables.save(filename); },  nb::arg("filename"), 
             "Save the current variables workspace");
 
+      // LEC
+      m.def("exec_lec", nb::overload_cast<const std::string&, const int>(&execute_lec), nb::arg("lec"), nb::arg("t"));
+      m.def("exec_lec", nb::overload_cast<const std::string&, const std::string&>(&execute_lec), nb::arg("lec"), nb::arg("period"));
+      m.def("exec_lec", nb::overload_cast<const std::string&>(&execute_lec), nb::arg("lec"));
+
       // High To Low functions
 
       m.def("ws_htol", nb::overload_cast<const std::string&, const std::string&, const int>(&ws_htol), 
