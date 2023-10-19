@@ -123,6 +123,17 @@ NB_MODULE(iode, m)
       m.def("ws_save_var", [](const std::string& filename){ Variables.save(filename); },  nb::arg("filename"), 
             "Save the current variables workspace");
 
+      // IODE objects getters and setters
+
+      m.def("get_cmt", [](const std::string& name) { return Comments.get(name); }, nb::arg("name"),          "get an IODE comment");
+      // m.def("get_eqs", [](const std::string& name) { return Equations.get(name); }, nb::arg("name"),      "get an IODE equation");
+      m.def("get_eqs_lec", [](const std::string& name) { return Equations.get_lec(name); }, nb::arg("name"), "get LEC of an equation");
+      m.def("get_idt", [](const std::string& name) { return Identities.get_lec(name); }, nb::arg("name"),        "get an IODE identity");
+      m.def("get_lst", [](const std::string& name) { return Lists.get(name); }, nb::arg("name"),             "get an IODE list");
+      // m.def("get_scl", [](const std::string& name) { return Scalars.get(name); }, nb::arg("name"),        "get an IODE scalar");
+      // m.def("get_tbl", [](const std::string& name) { return Tables.get(name); }, nb::arg("name"),         "get an IODE table");
+      m.def("get_var", [](const std::string& name) { return Variables.get(name); }, nb::arg("name"),         "get an IODE variable");
+
       // LEC
       m.def("exec_lec", nb::overload_cast<const std::string&, const int>(&execute_lec), nb::arg("lec"), nb::arg("t"));
       m.def("exec_lec", nb::overload_cast<const std::string&, const std::string&>(&execute_lec), nb::arg("lec"), nb::arg("period"));
