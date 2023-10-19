@@ -134,6 +134,16 @@ NB_MODULE(iode, m)
       // m.def("get_tbl", [](const std::string& name) { return Tables.get(name); }, nb::arg("name"),         "get an IODE table");
       m.def("get_var", [](const std::string& name) { return Variables.get(name); }, nb::arg("name"),         "get an IODE variable");
 
+      // IODE objects delete
+
+      m.def("delete_cmt", [](const std::string& name) { Comments.remove(name); },   nb::arg("name"), "delete the comment named `name`");
+      m.def("delete_eqs", [](const std::string& name) { Equations.remove(name); },  nb::arg("name"), "delete the equation named `name`");
+      m.def("delete_idt", [](const std::string& name) { Identities.remove(name); }, nb::arg("name"), "delete the identity named `name`");
+      m.def("delete_lst", [](const std::string& name) { Lists.remove(name); },      nb::arg("name"), "delete the list named `name`");
+      m.def("delete_scl", [](const std::string& name) { Scalars.remove(name); },    nb::arg("name"), "delete the scalar named `name`");
+      m.def("delete_tbl", [](const std::string& name) { Tables.remove(name); },     nb::arg("name"), "delete the table named `name`");
+      m.def("delete_var", [](const std::string& name) { Variables.remove(name); },  nb::arg("name"), "delete the variable named `name`");
+
       // LEC
       m.def("exec_lec", nb::overload_cast<const std::string&, const int>(&execute_lec), nb::arg("lec"), nb::arg("t"));
       m.def("exec_lec", nb::overload_cast<const std::string&, const std::string&>(&execute_lec), nb::arg("lec"), nb::arg("period"));
