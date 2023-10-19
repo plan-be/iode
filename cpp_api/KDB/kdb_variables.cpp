@@ -11,8 +11,11 @@ Variable KDBVariables::get_unchecked(const int pos) const
 {
 	Variable vars;
 	int nb_obs = get_nb_periods();
+
+	KDB* kdb = get_KDB();
 	vars.reserve(nb_obs);
-	for (int i=0; i < nb_obs; i++) vars.push_back(KV_get(get_KDB(), pos, i, 0));
+	for (int i=0; i < nb_obs; i++) 
+		vars.push_back(KV_get(kdb, pos, i, 0));
 	return vars;
 }
 
