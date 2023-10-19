@@ -42,6 +42,10 @@ set(CPP_COMPUTE
     compute/estimation.h    compute/estimation.cpp
     )
 
+set(CPP_LEC 
+    lec/lec.h               lec/lec.cpp
+    )
+
 set(CPP_GSAMPLE
     gsample/gsample.h           gsample/gsample.cpp
     gsample/gsample_graph.h     gsample/gsample_graph.cpp
@@ -60,6 +64,7 @@ add_library(iode_cpp_api STATIC
             ${CPP_OBJS}
             ${CPP_KDB}
             ${CPP_COMPUTE}
+            ${CPP_LEC}
             ${CPP_GSAMPLE}
             ${CPP_LEGACY}
             )
