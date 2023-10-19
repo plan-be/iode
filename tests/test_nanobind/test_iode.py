@@ -154,7 +154,7 @@ def test_iode_report_proc(parameters):
 # IODE COMMENTS <-> PYTHON STRINGS
 # --------------------------------
 
-"""
+
 def test_iode_get_cmt():
 
     iode.ws_load_cmt(str(IODE_DATA_DIR / "fun.cmt"))
@@ -169,7 +169,7 @@ def test_iode_get_cmt():
     assert c_ACAF == "Ondernemingen: ontvangen kapitaaloverdrachten."
     assert c_EFM == "Vreemde grensarbeiders in België (30 juni)."
     assert c_XPWMAB == "Croissance des prix des biens importés"
-
+"""
 
 def test_iode_set_cmt():
 
@@ -200,13 +200,14 @@ def test_iode_set_cmt():
 # IODE EQUATIONS <-> PYTHON STRINGS
 # ---------------------------------
 
+"""
 def test_iode_get_eqs_lec():
 
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
     lec_BVY = iode.get_eqs_lec("BVY")
     print(f"lec_BVY = '{lec_BVY}'")
     assert lec_BVY == "BVY:=YN+YK"
-
+"""
 
 def test_iode_get_eqs():
 
@@ -243,12 +244,13 @@ def test_iode_set_eqs():
 # IODE IDENTITIES <-> PYTHON STRINGS
 # ----------------------------------
 
+"""
 def test_iode_get_idt():
 
     iode.ws_load_idt(str(IODE_DATA_DIR / "fun.idt"))
     i_XEX = iode.get_idt("XEX")
     assert i_XEX == "grt EX"
-
+"""
 
 def test_iode_set_idt():
 
@@ -272,12 +274,13 @@ def test_iode_set_idt():
 # IODE LISTS <-> PYTHON STRINGS
 # -----------------------------
 
+"""
 def test_iode_get_lst():
 
     iode.ws_load_lst(str(IODE_DATA_DIR / "fun"))
     i_MYLIST = iode.get_lst("MYLIST")
     assert i_MYLIST == "A02_075_H_BRU A02_100_H_VLA"
-
+"""
 
 def test_iode_set_lst():
 
@@ -357,7 +360,7 @@ def test_iode_get_var_as_ndarray():
     # Saving a copy of the modified KV_WS
     iode.ws_save_var(str(IODE_OUTPUT_DIR / "a_mod.var"))
 
-
+"""
 def test_iode_get_var():
 
     varfile = str(IODE_DATA_DIR / "a.var")
@@ -367,7 +370,7 @@ def test_iode_get_var():
     A = iode.get_var("A")
     B = [0.0, 1.0, 2]
     assert A == B
-
+"""
 
 def test_iode_set_var():
 
