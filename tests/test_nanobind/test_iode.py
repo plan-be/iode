@@ -391,12 +391,21 @@ def test_iode_set_var():
 def test_iode_exec_lec():
     nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
 
-    v_A = iode.get_var("A")
-    vec = iode.exec_lec("1+A-1")
-    assert vec == v_A
+    var_A = iode.get_var("A")
+    sample = iode.ws_sample_to_list()
 
-    res = iode.exec_lec("A+1", 0)
-    assert  res == v_A[0] + 1
+    t = 10
+    res = iode.exec_lec("A + 1", t)
+    assert  res == var_A[t] + 1
+
+    period = "2002Y1"
+    res = iode.exec_lec("A - 1", period)
+    t = sample.index(period)
+    assert res == var_A[t] - 1
+
+    vec = iode.exec_lec("1+A-1")
+    assert vec == var_A
+
 
 """
 # REPORT DATA_* FUNCTIONS
