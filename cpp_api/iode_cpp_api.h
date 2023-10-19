@@ -23,6 +23,7 @@
 #include "KDB/kdb_scalars.h"
 #include "KDB/kdb_tables.h"
 #include "KDB/kdb_variables.h"
+#include "lec/lec.h"
 #include "compute/simulation.h"
 #include "compute/estimation.h"
 #include "gsample/gsample_graph.h"
