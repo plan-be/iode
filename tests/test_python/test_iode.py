@@ -109,7 +109,7 @@ def test_iode_ws_sample():
 # IODE COMMENTS <-> PYTHON STRINGS
 # --------------------------------
 
-def test_iode_set_cmt():
+def test_iode_get_cmt():
 
     iode.ws_load_cmt(str(IODE_DATA_DIR / "fun.cmt"))
     c_ACAF = iode.get_cmt("ACAF")
@@ -125,7 +125,7 @@ def test_iode_set_cmt():
     assert c_XPWMAB == "Croissance des prix des biens importés"
 
 
-def test_iode_get_cmt():
+def test_iode_set_cmt():
 
     # Clear CMT before creating new comments
     iode.ws_clear_cmt()
