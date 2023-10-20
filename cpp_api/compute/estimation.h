@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <stdexcept>
 #include <boost/algorithm/string.hpp>
 
 #include "utils/utils.h"
@@ -158,3 +159,31 @@ public:
     void save();
 
 };
+
+
+// TODO: add all estimation parameters
+/**
+ * @brief Estimate an equation of a given sample. 
+ *        The estimation method and the instruments must be specified 
+ *        in the equation before the estimation.
+ *        Only defined to standardize the Python API functions.
+ * 
+ * @param eqs   comma separated list of equation names (=endo  names)
+ * @param from  first period of the estimation sample
+ * @param to    last period of the estimation sample
+ * 
+ * @note equivalent to function IodeEstimate() from b_api.c
+ */
+void eqs_estimate(const std::string& eqs, const std::string& from = "", const std::string& to = "");
+
+/**
+ * @brief Estimate an equation of a given sample. 
+ *        The estimation method and the instruments must be specified 
+ *        in the equation before the estimation.
+ *        Only defined to standardize the Python API functions.
+ * 
+ * @param eqs   list of equation names (=endo  names)
+ * @param from  first period of the estimation sample
+ * @param to    last period of the estimation sample
+ */
+void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from = "", const std::string& to = "");
