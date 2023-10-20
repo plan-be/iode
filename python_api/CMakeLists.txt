@@ -22,7 +22,7 @@ if(Python_FOUND)
     if(nanobind_FOUND)
         message(CHECK_PASS "found")
         
-        nanobind_add_module(iode py_sample.h py_ws.h pyiode.cpp)
+        nanobind_add_module(iode py_sample.h py_ws.h py_numpy.h pyiode.cpp)
 
         target_link_libraries(iode PRIVATE iode_cpp_api)
 
