@@ -38,6 +38,17 @@ IODE_REAL KDBVariables::get_var(const int pos, const Period& period, const EnumI
 	return get_var(pos, t, mode);
 }
 
+IODE_REAL* KDBVariables::get_var_ptr(const int pos)
+{
+	if(get_nb_periods() == 0)
+		return NULL;
+
+	// throw exception if object with passed position is not valid
+	get_name(pos);
+
+	return KVVAL(get_KDB(), pos, 0);
+}
+
 IODE_REAL KDBVariables::get_var(const std::string& name, const int t, const EnumIodeVarMode mode) const
 {
 	// throw exception if object with passed name does not exist
@@ -55,6 +66,13 @@ IODE_REAL KDBVariables::get_var(const std::string& name, const Period& period, c
 {
 	int t = get_sample().get_period_position(period);
 	return get_var(name, t, mode);
+}
+
+IODE_REAL* KDBVariables::get_var_ptr(const std::string& name)
+{
+	// throw exception if object with passed name does not exist
+	int pos = get_position(name);
+	return get_var_ptr(pos);
 }
 
 void KDBVariables::set_var(const int pos, const int t, const IODE_REAL value, const EnumIodeVarMode mode)
