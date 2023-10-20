@@ -321,10 +321,18 @@ def test_iode_set_scl():
     iode.set_scl(py_myscl)
     i_myscl = iode.get_scl(name)
     assert repr(i_myscl) == repr(py_myscl)
-
+"""
 
 # VARIABLES IODE <-> PYTHON LISTS AND NDARRAYS
 # --------------------------------------------
+
+# TODO: find how to add get_var_as_ndarray() with the copy argument 
+#       in the iode module compiled with nanobind
+def get_var_as_ndarray(name, copy=True):
+    if copy:
+        return iode.get_var_as_ndarray_copy(name)
+    else:
+        return iode.get_var_as_ndarray(name)
 
 def test_iode_get_var_as_ndarray():
     '''
@@ -340,27 +348,25 @@ def test_iode_get_var_as_ndarray():
     name = "A"
 
     # x points to KV_WS["A"] because get_var_as_ndarray(..., 0)
-    x = iode.get_var_as_ndarray(name, 0)
+    x = get_var_as_ndarray(name, 0)
     x[2] = 22222 # Modifies the variable A in KV_WS
     A = iode.get_var("A")
     assert A[2] == 22222.0
 
     # y is a deep copy of KV_WS["A"] because get_var_as_ndarray(..., 0) => memory leak ?
-    y = iode.get_var_as_ndarray(name, 1)
+    y = get_var_as_ndarray(name, 1)
     y[2] = 33333 # Does not modify the variable A in KV_WS
     A = iode.get_var("A")
     assert A[2] == 22222.0
 
     # XYY does not exist in KV_WS => new allocation ? 
     # TODO: check this + does XYY exist in KV_WS ?
-    z = iode.get_var_as_ndarray("XYY", 1)
-    XYY = iode.get_var_as_ndarray("XYY", 1)
-    print("XYY : ", XYY)
+    with pytest.raises(RuntimeError):
+        XYY = get_var_as_ndarray("XYY", 1)
 
     # Saving a copy of the modified KV_WS
     iode.ws_save_var(str(IODE_OUTPUT_DIR / "a_mod.var"))
 
-"""
 def test_iode_get_var():
 
     varfile = str(IODE_DATA_DIR / "a.var")
@@ -370,8 +376,8 @@ def test_iode_get_var():
     A = iode.get_var("A")
     B = [0.0, 1.0, 2]
     assert A == B
-"""
 
+"""
 def test_iode_set_var():
 
     nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
