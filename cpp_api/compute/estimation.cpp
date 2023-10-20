@@ -180,3 +180,24 @@ void Estimation::save()
 {
     Scalars.merge(*kdb_scl);
 }
+
+void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)
+{
+    std::string error_msg = "Could not estimate equations " + eqs + "\n";
+
+    Sample sample = Variables.get_sample();
+    if(sample.nb_periods() == 0)
+        throw std::runtime_error(error_msg + "No sample is defined");
+    std::string from_ = (from.empty()) ? sample.start_period().to_string() : from;
+    std::string to_ = (to.empty()) ? sample.end_period().to_string() : to;
+
+    int res = KE_estim(to_char_array(eqs), to_char_array(from_), to_char_array(to_));
+    if(res != 0)
+        throw std::runtime_error(error_msg + "from: " + from + " to " + to);
+}
+
+void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from, const std::string& to)
+{
+    std::string s_eqs = boost::algorithm::join(eqs, ",");
+    eqs_estimate(s_eqs, from, to);
+}
