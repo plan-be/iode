@@ -8,6 +8,7 @@ namespace nb = nanobind;
 #include "cpp_api/iode_cpp_api.h"
 #include "py_ws.h"
 #include "py_sample.h"
+#include "py_numpy.h"
 
 
 NB_MODULE(iode, m) 
@@ -133,6 +134,11 @@ NB_MODULE(iode, m)
       // m.def("get_scl", [](const std::string& name) { return Scalars.get(name); }, nb::arg("name"),        "get an IODE scalar");
       // m.def("get_tbl", [](const std::string& name) { return Tables.get(name); }, nb::arg("name"),         "get an IODE table");
       m.def("get_var", [](const std::string& name) { return Variables.get(name); }, nb::arg("name"),         "get an IODE variable");
+
+      m.def("get_var_as_ndarray", &get_var_as_ndarray, nb::rv_policy::reference, nb::arg("name"), 
+            "Get an IODE variable in a numpy ndarray");
+      m.def("get_var_as_ndarray_copy", &get_var_as_ndarray, nb::rv_policy::copy, nb::arg("name"), 
+            "Get a copy of an IODE variable in a numpy ndarray");
 
       // IODE objects delete
 
