@@ -14,8 +14,8 @@ import pandas as pd
 from pathlib import Path
 
 # GLOBALS
-IODE_DATA_DIR = Path("../data")
-IODE_OUTPUT_DIR = Path("../output")
+IODE_DATA_DIR = Path("../data").absolute()
+IODE_OUTPUT_DIR = Path("../output").absolute()
 IODE_VERBOSE = 1
 
 
