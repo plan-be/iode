@@ -3,13 +3,16 @@
 
 Scalar::Scalar()
 {
-    c_scalar = nullptr;
-    allocated = false;
+    this->val = 0.0;
+    this->relax = 1.0;
+    this->std = L_NAN;
 }
 
 Scalar::Scalar(const int pos, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_SCALARS];
+    if (!kdb) 
+        kdb = K_WS[I_SCALARS];
+
     if (pos < 0 || pos > kdb->k_nb)
     {
         IodeExceptionInvalidArguments error("Cannot extract Scalar", "Scalar position must be in range [0, " + 
@@ -17,68 +20,79 @@ Scalar::Scalar(const int pos, KDB* kdb)
         error.add_argument("scalar position", std::to_string(pos));
         throw error;
     }
+
     // Note: KSVAL does not allocate a new pointer SCL*
-    c_scalar = KSVAL(kdb, pos);
-    allocated = false;
+    SCL* c_scalar = KSVAL(kdb, pos);
+    this->val = c_scalar->val;
+    this->relax = c_scalar->relax;
+    this->std = c_scalar->std;
 }
 
 Scalar::Scalar(const std::string& name, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_SCALARS];
+    if (!kdb) 
+        kdb = K_WS[I_SCALARS];
+
     int pos = K_find(kdb, to_char_array(name));
-    if (pos < 0) throw IodeExceptionFunction("Cannot extract Scalar", "Scalar with name " + name + " does not exist.");
+    if (pos < 0) 
+        throw IodeExceptionFunction("Cannot extract Scalar", "Scalar with name " + name + " does not exist.");
+    
     // Note: KSVAL does not allocate a new pointer SCL*
-    c_scalar = KSVAL(kdb, pos);
-    allocated = false;
+    SCL* c_scalar = KSVAL(kdb, pos);
+    this->val = c_scalar->val;
+    this->relax = c_scalar->relax;
+    this->std = c_scalar->std;
 }
 
 Scalar::Scalar(const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std)
 {
-    c_scalar = (SCL*) SW_nalloc(sizeof(SCL));
-    c_scalar->val = value;
-    c_scalar->relax = relax;
-    c_scalar->std = std;
-    allocated = true;
+    this->val = value;
+    this->relax = relax;
+    this->std = std;
 }
 
-Scalar::Scalar(const Scalar& scl)
+Scalar::Scalar(const Scalar& scalar)
 {
-    c_scalar = (SCL*) SW_nalloc(sizeof(SCL));
-    c_scalar->val = scl.c_scalar->val;
-    c_scalar->relax = scl.c_scalar->relax;
-    c_scalar->std = scl.c_scalar->std;
-    allocated = true;
-}
-
-Scalar::~Scalar()
-{
-    if (allocated) SW_nfree(c_scalar);
+    this->val = scalar.val;
+    this->relax = scalar.relax;
+    this->std = scalar.std;
 }
 
 // required to be used in std::map
-Scalar& Scalar::operator=(const Scalar& scl)
+Scalar& Scalar::operator=(const Scalar& scalar)
 {
-    c_scalar->val = scl.c_scalar->val;
-    c_scalar->relax = scl.c_scalar->relax;
-    c_scalar->std = scl.c_scalar->std;
+    val = scalar.val;
+    relax = scalar.relax;
+    std = scalar.std;
     return *this;
 }
 
 bool Scalar::operator==(const Scalar& other) const
 {
-    bool eq = c_scalar->val == other.c_scalar->val;
-    eq &= c_scalar->relax == other.c_scalar->relax;
-    eq &= c_scalar->std == other.c_scalar->std;
+    bool eq = val == other.val;
+    eq &= relax == other.relax;
+    eq &= std == other.std;
     return eq;
 }
 
-std::size_t hash_value(SCL const& c_scalar)
+std::size_t hash_value(Scalar const& scalar)
 {
 	std::size_t seed = 0;
 
-	boost::hash_combine(seed, c_scalar.val);
-	boost::hash_combine(seed, c_scalar.relax);
-	boost::hash_combine(seed, c_scalar.std);
+	boost::hash_combine(seed, scalar.val);
+	boost::hash_combine(seed, scalar.relax);
+	boost::hash_combine(seed, scalar.std);
+
+    return seed;
+}
+
+std::size_t hash_value(SCL const& scl)
+{
+	std::size_t seed = 0;
+
+	boost::hash_combine(seed, scl.val);
+	boost::hash_combine(seed, scl.relax);
+	boost::hash_combine(seed, scl.std);
 
     return seed;
 }

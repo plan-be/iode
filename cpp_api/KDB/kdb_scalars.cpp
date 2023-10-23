@@ -14,23 +14,24 @@ Scalar KDBScalars::get_unchecked(const int pos) const
 
 int KDBScalars::add(const std::string& name, const Scalar& obj)
 {
-	return KDBTemplate::add(name, obj.c_scalar);
+	Scalar scalar(obj);
+	return KDBTemplate::add(name, static_cast<SCL*>(&scalar));
 }
 
 int KDBScalars::add(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std)
 {
 	Scalar scalar(value, relax, std);
-	return KDBTemplate::add(name, scalar.c_scalar);
+	return KDBTemplate::add(name, static_cast<SCL*>(&scalar));
 }
 
 void KDBScalars::update(const std::string& name, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std)
 {
 	Scalar scalar(value, relax, std);
-	KDBTemplate::update(name, scalar.c_scalar);
+	KDBTemplate::update(name, static_cast<SCL*>(&scalar));
 }
 
 void KDBScalars::update(const int pos, const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std)
 {
 	Scalar scalar(value, relax, std);
-	KDBTemplate::update(pos, scalar.c_scalar);
+	KDBTemplate::update(pos, static_cast<SCL*>(&scalar));
 }
