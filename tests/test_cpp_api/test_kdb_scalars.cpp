@@ -93,9 +93,9 @@ TEST_F(KDBScalarsTest, CreateRemove)
 
     Scalars.add(name, value, relax);
     Scalar new_scalar = Scalars.get(name);
-    EXPECT_DOUBLE_EQ(new_scalar.value(), value);
-    EXPECT_DOUBLE_EQ(new_scalar.relax(), relax);
-    EXPECT_TRUE(new_scalar.std() < 1e-100);
+    EXPECT_DOUBLE_EQ(new_scalar.val, value);
+    EXPECT_DOUBLE_EQ(new_scalar.relax, relax);
+    EXPECT_TRUE(new_scalar.std < 1e-100);
 
     Scalars.remove(name);
     EXPECT_THROW(Scalars.get(name), IodeExceptionFunction);
@@ -109,9 +109,9 @@ TEST_F(KDBScalarsTest, Update)
 
     Scalars.update(name, value, relax);
     Scalar updated_scalar = Scalars.get(name);
-    EXPECT_DOUBLE_EQ(updated_scalar.value(), value);
-    EXPECT_DOUBLE_EQ(updated_scalar.relax(), relax);
-    EXPECT_TRUE(updated_scalar.std() < 1e-100);
+    EXPECT_DOUBLE_EQ(updated_scalar.val, value);
+    EXPECT_DOUBLE_EQ(updated_scalar.relax, relax);
+    EXPECT_TRUE(updated_scalar.std < 1e-100);
 }
 
 TEST_F(KDBScalarsTest, Copy)
@@ -232,9 +232,9 @@ TEST_F(KDBScalarsTest, HardCopy)
     // corresponding element of the global KDB didn't changed
     std::string name = "acaf1";
     Scalar scalar = Scalars.get(name);
-    IODE_REAL value = scalar.value();
-    IODE_REAL relax = scalar.relax();
-    IODE_REAL std = scalar.std();
+    IODE_REAL value = scalar.val;
+    IODE_REAL relax = scalar.relax;
+    IODE_REAL std = scalar.std;
     Scalar expected_scalar(value, relax, std);
     IODE_REAL updated_value = 0.0158;
     IODE_REAL updated_relax = 0.98;
