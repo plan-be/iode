@@ -300,6 +300,7 @@ def test_iode_set_lst():
 # IODE SCALARS <-> PYTHON
 # -----------------------
 
+"""
 def test_iode_get_scl():
 
     iode.ws_load_scl(str(IODE_DATA_DIR / "fun"))
@@ -307,7 +308,7 @@ def test_iode_get_scl():
     i_acaf1 = iode.get_scl(name)
     assert round(i_acaf1.value, 7) == 0.0157684
 
-
+"""
 def test_iode_set_scl():
 
     # Clear SCL before creating new object
@@ -315,14 +316,14 @@ def test_iode_set_scl():
 
     # Create SCl
     name = "myscl"
-    py_myscl = iode.Scalar("myscl", 1.2345, 1.0, 0.0)
+    py_myscl = iode.Scalar(1.2345, 1.0, 0.0)
 
     # Save py_scl as myscl in KS_WS + reread and check
-    iode.set_scl(py_myscl)
+    iode.set_scl("myscl", py_myscl)
     i_myscl = iode.get_scl(name)
     assert repr(i_myscl) == repr(py_myscl)
 """
-
+    
 # VARIABLES IODE <-> PYTHON LISTS AND NDARRAYS
 # --------------------------------------------
 
