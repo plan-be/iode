@@ -62,6 +62,10 @@ NB_MODULE(iode, m)
       m.attr("LTOH_CS")     = WS_LTOH_CS;
       m.attr("LTOH_STEP")   = WS_LTOH_STEP;
 
+      // NAN value
+
+      m.attr("nan") = L_NAN;
+
       // Workspace functions
 
       m.def("ws_content", &ws_content, nb::arg("pattern"), nb::arg("iode_type") = (int) I_VARIABLES, 
@@ -129,7 +133,7 @@ NB_MODULE(iode, m)
 
       // Read https://nanobind.readthedocs.io/en/latest/classes.html#classes 
       // to see how to export C++ classes to Python
-      
+
       nb::class_<Scalar>(m, "Scalar")
             .def_rw("value", &Scalar::val)
             .def_rw("relax", &Scalar::relax)
