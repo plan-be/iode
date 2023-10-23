@@ -307,6 +307,8 @@ def test_iode_get_scl():
     name = "acaf1"
     i_acaf1 = iode.get_scl(name)
     assert round(i_acaf1.value, 7) == 0.0157684
+    assert round(i_acaf1.relax, 7) == 1.0
+    assert round(i_acaf1.std, 7) == 0.0013687
 
 """
 def test_iode_set_scl():
