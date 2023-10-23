@@ -1,4 +1,5 @@
 #include <nanobind/nanobind.h>
+#include <nanobind/operators.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/pair.h>
@@ -124,6 +125,20 @@ NB_MODULE(iode, m)
       m.def("ws_save_var", [](const std::string& filename){ Variables.save(filename); },  nb::arg("filename"), 
             "Save the current variables workspace");
 
+      // IODE object classes
+
+      // Read https://nanobind.readthedocs.io/en/latest/classes.html#classes 
+      // to see how to export C++ classes to Python
+      
+      nb::class_<Scalar>(m, "Scalar")
+            .def_rw("value", &Scalar::val)
+            .def_rw("relax", &Scalar::relax)
+            .def_ro("std", &Scalar::std)
+            .def(nb::init<const std::string&>())
+            .def(nb::init<const IODE_REAL, const IODE_REAL, const IODE_REAL>())
+            .def(nb::self == nb::self)
+            .def("__repr__", &Scalar::to_string);
+
       // IODE objects getters and setters
 
       m.def("get_cmt", [](const std::string& name) { return Comments.get(name); }, nb::arg("name"),          "get an IODE comment");
@@ -131,7 +146,7 @@ NB_MODULE(iode, m)
       m.def("get_eqs_lec", [](const std::string& name) { return Equations.get_lec(name); }, nb::arg("name"), "get LEC of an equation");
       m.def("get_idt", [](const std::string& name) { return Identities.get_lec(name); }, nb::arg("name"),        "get an IODE identity");
       m.def("get_lst", [](const std::string& name) { return Lists.get(name); }, nb::arg("name"),             "get an IODE list");
-      // m.def("get_scl", [](const std::string& name) { return Scalars.get(name); }, nb::arg("name"),        "get an IODE scalar");
+      m.def("get_scl", [](const std::string& name) { return Scalars.get(name); }, nb::arg("name"),        "get an IODE scalar");
       // m.def("get_tbl", [](const std::string& name) { return Tables.get(name); }, nb::arg("name"),         "get an IODE table");
       m.def("get_var", [](const std::string& name) { return Variables.get(name); }, nb::arg("name"),         "get an IODE variable");
 
