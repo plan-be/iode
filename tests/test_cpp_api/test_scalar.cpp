@@ -14,6 +14,40 @@ protected:
 };
 
 
+TEST_F(ScalarTest, Equivalence_C_CPP)
+{
+    IODE_REAL val = 1.25;
+    IODE_REAL relax = 0.9;
+    IODE_REAL std = 6.5;
+    char* name = "cpp_scalar";
+
+    // test if a Scalar object can be added to the Scalars KDB via K_add()
+    Scalar scalar(val, relax, std);
+    K_add(KS_WS, name, static_cast<SCL*>(&scalar));
+    int pos = K_find(KS_WS, name);
+    ASSERT_GT(pos, -1);
+
+    SCL* scl = KSVAL(KS_WS, pos);
+    ASSERT_EQ(scl->val, val);
+    ASSERT_EQ(scl->relax, relax);
+    ASSERT_EQ(scl->std, std);
+
+    // test memcpy between a Scalar object and a SCL object
+    scalar.val = 3.6;
+    scalar.relax = 0.96;
+    scalar.std = 12.3;
+    memcpy(scl, &scalar, sizeof(SCL));
+    ASSERT_EQ(scl->val, scalar.val);
+    ASSERT_EQ(scl->relax, scalar.relax);
+    ASSERT_EQ(scl->std, scalar.std);
+
+    // test if a Scalar object can be passed to the hash function for the objects of type SCL.
+    boost::hash<SCL> scl_hasher;
+    std::size_t c_hash = scl_hasher(*scl);
+    std::size_t cpp_hash = scl_hasher(static_cast<SCL>(scalar));
+    ASSERT_EQ(c_hash, cpp_hash);
+}
+
 TEST_F(ScalarTest, Hash)
 {
     boost::hash<Scalar> scalar_hasher;
