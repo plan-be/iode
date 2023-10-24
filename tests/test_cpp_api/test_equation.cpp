@@ -21,6 +21,56 @@ protected:
 };
 
 
+TEST_F(EquationTest, Equivalence_C_CPP)
+{
+    char* c_name = const_cast<char*>(name.c_str());
+    std::string lec = equation->get_lec();
+    std::string method = equation->get_method();
+    Sample sample = equation->get_sample();
+    std::string from = sample.start_period().to_string();
+    std::string to = sample.end_period().to_string();
+    std::string comment = equation->get_comment();
+    std::string instruments = equation->get_instruments();
+    std::string block = equation->get_block();
+
+    kdb.remove(name);
+
+    // test if a Equation object can be added to the Equations KDB via K_add()
+    Equation eq(name, lec, method, from, to, comment, instruments, block, true);
+    // NOTE: for equations --> K_add(KDB* kdb, char* name, EQ* eq, char* endo) [where endo = name]
+    K_add(KE_WS, c_name, static_cast<EQ*>(&eq), c_name);
+    int pos = K_find(KE_WS, c_name);
+    ASSERT_GT(pos, -1);
+
+    EQ* c_eq = KEVAL(KE_WS, pos);
+    ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
+    ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
+    ASSERT_EQ(Sample(&c_eq->smpl), eq.get_sample());
+    ASSERT_EQ(std::string(c_eq->cmt), eq.get_comment());
+    ASSERT_EQ(std::string(c_eq->instr), eq.get_instruments());
+    ASSERT_EQ(std::string(c_eq->blk), eq.get_block());
+    ASSERT_EQ(c_eq->date, eq.get_date());
+
+    // test memcpy between a Equation object and a EQ object
+    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)", "ACAF");
+    eq.set_sample("2000Y1", "2020Y1");
+    eq.set_method("MAX_LIKELIHOOD");
+    memcpy(c_eq, &eq, sizeof(EQ));
+    ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
+    ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
+    ASSERT_EQ(Sample(&c_eq->smpl), eq.get_sample());
+    ASSERT_EQ(std::string(c_eq->cmt), eq.get_comment());
+    ASSERT_EQ(std::string(c_eq->instr), eq.get_instruments());
+    ASSERT_EQ(std::string(c_eq->blk), eq.get_block());
+    ASSERT_EQ(c_eq->date, eq.get_date());
+
+    // test if a Equation object can be passed to the hash function for the objects of type EQ.
+    boost::hash<EQ> eq_hasher;
+    std::size_t c_hash = eq_hasher(*c_eq);
+    std::size_t cpp_hash = eq_hasher(static_cast<EQ>(eq));
+    ASSERT_EQ(c_hash, cpp_hash);
+}
+
 TEST_F(EquationTest, Lec)
 {
     // get
