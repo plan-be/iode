@@ -4,6 +4,9 @@
 class KDBEquationsTest : public KDBTest, public ::testing::Test
 {
 protected:
+    std::array<float, EQS_NBTESTS> tests = { 1.0f, 0.0042699f, 0.00818467f, 5.19945e-05f, 0.0019271461f, 
+        23.545813f, 32.2732f, 0.82176137f, 0.79629868f, 2.3293459f, 83.8075f };
+
     void SetUp() override
     {
         load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
@@ -111,14 +114,14 @@ TEST_F(KDBEquationsTest, CreateRemove)
 
     std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     std::string method = "LSQ";
-    Sample sample("1980Y1", "1996Y1");
+    std::string from = "1980Y1";
+    std::string to = "1996Y1";
     std::string comment = "Equation comment";
     std::string block = "ACAF";
     std::string instruments = "Equation instruments";
-    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
     bool date = true;
 
-    Equations.add(name, lec, comment, method, &sample, instruments, block, tests, date);
+    Equations.add(name, lec, method, from, to, comment, instruments, block, date);
 #endif
 }
 
@@ -189,13 +192,13 @@ TEST_F(KDBEquationsTest, Filter)
     // been added to the global KDB
     std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     std::string method = "LSQ";
-    Sample sample("1980Y1", "1996Y1");
+    std::string from = "1980Y1";
+    std::string to = "1996Y1";
     std::string comment = "Equation comment";
     std::string block = "ACAF";
     std::string instruments = "Equation instruments";
-    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
     bool date = true;
-    local_kdb->add(name, lec, comment, method, &sample, instruments, block, tests, date);
+    local_kdb->add(name, lec, method, from, to, comment, instruments, block, date);
     EXPECT_EQ(local_kdb->get_lec(name), lec);
     EXPECT_EQ(Equations.get_lec(name), lec);
 
@@ -270,13 +273,13 @@ TEST_F(KDBEquationsTest, Merge)
     std::string new_name = "ACAF2";
     std::string new_lec = "(ACAF2/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     std::string method = "LSQ";
-    Sample sample("1980Y1", "1996Y1");
+    std::string from = "1980Y1";
+    std::string to = "1996Y1";
     std::string comment = "Equation comment";
     std::string block = "ACAF";
     std::string instruments = "Equation instruments";
-    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
     bool date = true;
-    kdb_to_merge.add(new_name, new_lec, comment, method, &sample, instruments, block, tests, date);
+    kdb_to_merge.add(new_name, new_lec, method, from, to, comment, instruments, block, date);
 
     // modify an existing element of the KDB to be merge
     std::string name = "ACAF";
@@ -360,13 +363,13 @@ TEST_F(KDBEquationsTest, Hash)
     hash_val = hash_val_modified;
     std::string lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     std::string method = "LSQ";
-    Sample sample("1980Y1", "1996Y1");
+    std::string from = "1980Y1";
+    std::string to = "1996Y1";
     std::string comment = "Equation comment";
     std::string block = "ACAF";
     std::string instruments = "Equation instruments";
-    std::array<float, EQS_NBTESTS> tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
     bool date = true;
-    Equations.add("ACAF", lec, comment, method, &sample, instruments, block, tests, date);
+    Equations.add("ACAF", lec, method, from, to, comment, instruments, block, date);
     hash_val_modified = kdb_hasher(Equations);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
