@@ -1,12 +1,14 @@
 #pragma once
+#include <stdexcept>
+#include <algorithm>
+#include <boost/functional/hash.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "common.h"
 #include "utils/utils.h"
 #include "time/period.h"
 #include "time/sample.h"
 #include "lec/lec.h"
-
-#include <boost/functional/hash.hpp>
-#include <boost/algorithm/string.hpp>
 
 
 // TODO: replace K by I as below in C api + group them in an enum
@@ -56,46 +58,34 @@ const static std::array<std::string, I_NB_EQ_TESTS> vEquationTests = {
 };
 
 
-EQ* create_equation_deep_copy(EQ* original_equation);
-bool equation_equal(EQ* c_eq1, EQ* c_eq2);
-EQ* prepare_equation(const std::string& name, const bool add_obj, const std::string& lec, const std::string& comment,
-    const std::string& method, Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests,
-    const bool date);
-
-/**
- * @brief compute a hash value for an equation.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(EQ const& c_eq);
-
-struct Equation
+struct Equation : public EQ
 {
-    EQ* c_equation;
-    std::string endo;
+private:
+    void copy_from_EQ_obj(const EQ* obj);
 
 public:
-    Equation();
-
     Equation(const int pos, KDB* kdb = nullptr);
 
     Equation(const std::string& name, KDB* kdb = nullptr);
 
-    Equation(const Equation& eq);
+    Equation(const std::string& name, const std::string& lec, const int method = 0, const std::string& from = "", const std::string& to = "", 
+        const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
+    
+    Equation(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
+        const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
+
+    Equation(const Equation& other);
 
     ~Equation();
 
     // required to be used in std::map
-    Equation& operator=(const Equation& eq);
+    Equation& operator=(const Equation& other);
 
     // -- lec --
 
     std::string get_lec() const;
 
-    void set_lec(const std::string& lec);
+    void set_lec(const std::string& lec, const std::string& endo);
 
     // -- solved --
 
@@ -105,6 +95,8 @@ public:
 
     int get_method_as_int() const;
 
+    void set_method(const int method);
+    
     std::string get_method() const;
 
     void set_method(const std::string& method);
@@ -176,3 +168,24 @@ struct NamedEquation
     NamedEquation(const std::string& name);
     NamedEquation(const std::string& name, const Equation& eq);
 };
+
+
+/**
+ * @brief compute a hash value for an object of type EQ (C API).
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(EQ const& c_eq);
+
+/**
+ * @brief compute a hash value for an equation.
+ * 
+ * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
+ *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
+ * 
+ * @return std::size_t 
+ */
+std::size_t hash_value(Equation const& eq);
