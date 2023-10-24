@@ -17,7 +17,7 @@ public:
 
     Scalar(const Scalar& scalar);
 
-    std::string to_string();
+    std::string to_string() const;
 
     // required to be used in std::map
     Scalar& operator=(const Scalar& scalar);

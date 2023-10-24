@@ -58,7 +58,7 @@ Scalar::Scalar(const Scalar& scalar)
     this->std = scalar.std;
 }
 
-std::string Scalar::to_string()
+std::string Scalar::to_string() const
 {
     return "Scalar(" + std::to_string(val) + ", " + std::to_string(relax) + ", " + std::to_string(std) + ")";
 }
