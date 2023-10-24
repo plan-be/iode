@@ -157,6 +157,10 @@ public:
     // -- operators --
 
     bool operator==(const Equation& other) const;
+
+    // -- to_string --
+
+    std::string to_string() const;
 };
 
 

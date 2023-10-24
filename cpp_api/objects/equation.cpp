@@ -405,6 +405,18 @@ bool Equation::operator==(const Equation& other) const
     return true;
 }
 
+std::string Equation::to_string() const
+{
+    std::string s_tests = "[" + std::to_string(this->tests[0]);
+    for(int i=1; i < EQS_NBTESTS; i++)
+        s_tests += ", " + std::to_string(this->tests[i]);
+    s_tests += "]";
+
+    return "Equation(" + get_lec() + ", " + get_method() + ", " + get_sample().to_string() + ", " + 
+        get_comment() + ", " + get_block() + ", " + get_instruments() + ", " + s_tests + ", " +
+        get_date_as_string() + ")";
+}
+
 NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
 {
 }
