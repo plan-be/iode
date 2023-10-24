@@ -2,141 +2,29 @@
 #include "equation.h"
 
 
-EQ* create_equation_deep_copy(EQ* original_equation)
+void Equation::copy_from_EQ_obj(const EQ* obj)
 {
-    EQ* copy_eq = (EQ*) SW_nalloc(sizeof(EQ));
+    this->lec = copy_char_array(obj->lec);
     // NOTE : we do not use memcpy() because memcpy() actually makes  
     //        a shallow copy of a struct instead of a deep copy
-    copy_eq->clec = clec_deep_copy(original_equation->clec);
-    copy_eq->lec = copy_char_array(original_equation->lec);
-    copy_eq->solved = original_equation->solved;
-    copy_eq->method = original_equation->method;
+    this->clec = clec_deep_copy(obj->clec);
+    this->solved = obj->solved;
+    this->method = obj->method;
     // NOTE : we can use memcpy() on SAMPLE because SAMPLE does 
     //        not contain attributes which are pointers
-    memcpy(&copy_eq->smpl, &original_equation->smpl, sizeof(SAMPLE));
-    copy_eq->cmt = copy_char_array(original_equation->cmt);
-    copy_eq->blk = copy_char_array(original_equation->blk);
-    copy_eq->instr = copy_char_array(original_equation->instr);
-    copy_eq->date = original_equation->date;
-    memcpy(&(copy_eq->tests), &(original_equation->tests), EQS_NBTESTS * sizeof(float));
-
-    return copy_eq;
-}
-
-bool equation_equal(EQ* c_eq1, EQ* c_eq2)
-{
-    if (c_eq1 == NULL || c_eq2 == NULL) return false;
-
-    if (strcmp(c_eq1->lec, c_eq2->lec) != 0) return false;
-    if (c_eq1->method != c_eq2->method) return false;
-    if (memcmp(&(c_eq1->smpl), &(c_eq2->smpl), sizeof(SAMPLE)) != 0) return false;
-    if (strcmp(c_eq1->cmt, c_eq2->cmt) != 0) return false;
-    if (strcmp(c_eq1->blk, c_eq2->blk) != 0) return false;
-    if (strcmp(c_eq1->instr, c_eq2->instr) != 0) return false;
-
-    return true;
-}
-
-EQ* prepare_equation(const std::string& name, const bool add_obj, const std::string& lec, const std::string& comment,
-    const std::string& method, Sample* sample, const std::string& instruments, const std::string& block, const std::array<float, EQS_NBTESTS>* tests,
-    const bool date)
-{
-    char* c_name = to_char_array(name);
-
-    EQ* eq;
-    if (add_obj) eq = (EQ*) SW_nalloc(sizeof(EQ));
-    else
-    {
-        int pos = K_find(K_WS[I_EQUATIONS], c_name);
-        eq = KEVAL(K_WS[K_EQS], pos);
-    }
-
-    if (add_obj && lec.empty()) 
-        throw IodeExceptionInitialization("Equation with name " + name, "Empty LEC expression");
-
-    if (!lec.empty())
-    {
-        SW_nfree(eq->lec);
-        eq->lec = copy_string_to_char(lec);
-
-        // check LEC expression is valid
-        CLEC* clec = L_solve(eq->lec, c_name);
-        if (clec == NULL)
-        {
-            SW_nfree(eq->lec);
-            std::string action = add_obj ? "create new" : "update";
-            IodeExceptionInvalidArguments error("Cannot " + action + " Equation with name " + name);
-            error.add_argument("lec", lec);
-            throw error;
-        }
-        SW_nfree(clec);
-    }
-
-    if (!comment.empty())
-    {
-        SW_nfree(eq->cmt);
-        eq->cmt = copy_string_to_char(comment);
-    }
-    if (!instruments.empty())
-    {
-        SW_nfree(eq->instr);
-        eq->instr = copy_string_to_char(instruments);
-    }
-    if (!block.empty())
-    {
-        SW_nfree(eq->blk);
-        eq->blk = copy_string_to_char(block);
-    }
-
-    if (!method.empty())
-    {
-        int i_method = 0;
-        for (int i = 0; i < I_NB_EQ_METHODS; i++) if (method == vEquationMethods[i]) i_method = i;
-        eq->method = i_method;
-    }
-
-    if (date) eq->date = SCR_current_date();
-    else eq->date = 0L;
-
-    if (tests)
-    {
-        float* c_tests = const_cast<float*>(tests->data());
-        memcpy(&(eq->tests), c_tests, EQS_NBTESTS * sizeof(float));   /* FLOAT 12-04-98 */
-    }
-    else memset(&(eq->tests), 0, EQS_NBTESTS * sizeof(float)); /* JMP 12-04-98 */
-
-    if (sample) memcpy(&(eq->smpl), sample->c_sample, sizeof(SAMPLE));
-
-    return eq;
-}
-
-std::size_t hash_value(EQ const& c_eq)
-{
-    std::size_t seed = 0;
-
-    // need to wrapp with std::string() because hash_value() and
-    // hash_combine() only compare pointer addresses when applied 
-    // on char* arrays
-    boost::hash_combine(seed, std::string(c_eq.lec));
-    boost::hash_combine(seed, c_eq.method);
-    boost::hash_combine(seed, c_eq.smpl);
-    boost::hash_combine(seed, std::string(c_eq.cmt));
-    boost::hash_combine(seed, std::string(c_eq.blk));
-    boost::hash_combine(seed, std::string(c_eq.instr));
-
-    return seed;
-}
-
-
-Equation::Equation()
-{
-    c_equation = nullptr;
-    endo = "";
+    memcpy(&this->smpl, &obj->smpl, sizeof(SAMPLE));
+    this->cmt = copy_char_array(obj->cmt);
+    this->blk = copy_char_array(obj->blk);
+    this->instr = copy_char_array(obj->instr);
+    this->date = obj->date;
+    memcpy(&(this->tests), &(obj->tests), EQS_NBTESTS * sizeof(float));
 }
 
 Equation::Equation(const int pos, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_EQUATIONS];
+    if (!kdb) 
+        kdb = K_WS[I_EQUATIONS];
+
     if (pos < 0 || pos > kdb->k_nb)
     {
         IodeExceptionInvalidArguments error("Cannot extract Equation", "Equation position must be in range [0, " + 
@@ -144,37 +32,96 @@ Equation::Equation(const int pos, KDB* kdb)
         error.add_argument("equation position", std::to_string(pos));
         throw error;
     }
+
     // Note: KEVAL allocate a new pointer EQ*
-    c_equation = KEVAL(kdb, pos);
-    endo = std::string(KONAME(kdb, pos));
+    EQ* c_eq = KEVAL(kdb, pos);
+    copy_from_EQ_obj(c_eq);
+    E_free(c_eq);
+    // re-compute CLEC
+    char* name = KONAME(kdb, pos);
+    this->clec = L_solve(this->lec, name);
 }
 
 Equation::Equation(const std::string& name, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_EQUATIONS];
+    if (!kdb) 
+        kdb = K_WS[I_EQUATIONS];
+
     int pos = K_find(kdb, to_char_array(name));
-    if (pos < 0) throw IodeExceptionFunction("Cannot extract Equation", "Equation with name " + name + " does not exist.");
+    if (pos < 0) 
+        throw IodeExceptionFunction("Cannot extract Equation", "Equation with name " + name + " does not exist.");
+    
     // Note: KEVAL allocate a new pointer EQ*
-    c_equation = KEVAL(kdb, pos);
-    endo = name;
+    EQ* c_eq = KEVAL(kdb, pos);
+    copy_from_EQ_obj(c_eq);
+    E_free(c_eq);
+    // re-compute CLEC
+    this->clec = L_solve(this->lec, to_char_array(name));
 }
 
-Equation::Equation(const Equation& eq)
+Equation::Equation(const std::string& name, const std::string& lec, const int method, const std::string& from, const std::string& to, 
+    const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
-    c_equation = create_equation_deep_copy(eq.c_equation);
-    endo = eq.endo;
+    this->lec = NULL, 
+    this->clec = NULL, 
+    this->cmt = NULL, 
+    this->instr = NULL, 
+    this->blk = NULL;
+    this->date = 0L;
+    this->solved = '\0';
+
+    set_lec(lec, name);
+    set_method(method);
+    set_sample(from, to);
+    set_comment(comment);
+    set_instruments(instruments);
+    set_block(block);
+    set_tests({ 0.0f });
+    if(date)
+        update_date();
+}
+
+Equation::Equation(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, const std::string& to, 
+    const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
+{
+    this->lec = NULL, 
+    this->clec = NULL, 
+    this->cmt = NULL, 
+    this->instr = NULL, 
+    this->blk = NULL;
+    this->date = 0L;
+    this->solved = '\0';
+
+    set_lec(lec, name);
+    set_method(method);
+    set_sample(from, to);
+    set_comment(comment);
+    set_instruments(instruments);
+    set_block(block);
+    set_tests({ 0.0f });
+    if(date)
+        update_date();
+}
+
+
+Equation::Equation(const Equation& other)
+{
+    copy_from_EQ_obj(static_cast<const EQ*>(&other));
 }
 
 Equation::~Equation()
 {
-    if (c_equation) E_free(c_equation);
+    SW_nfree(this->lec);
+    SW_nfree(this->clec);
+    SW_nfree(this->cmt);
+    SW_nfree(this->blk);
+    SW_nfree(this->instr);
 }
 
 // required to be used in std::map
-Equation& Equation::operator=(const Equation& eq)
+Equation& Equation::operator=(const Equation& other)
 {
-    this->c_equation = create_equation_deep_copy(eq.c_equation);
-    this->endo = eq.endo;
+    copy_from_EQ_obj(static_cast<const EQ*>(&other));
     return *this;
 }
 
@@ -182,97 +129,121 @@ Equation& Equation::operator=(const Equation& eq)
 
 std::string Equation::get_lec() const
 { 
-    return std::string(c_equation->lec);
+    return std::string(this->lec);
 }
 
-void Equation::set_lec(const std::string& lec)
+void Equation::set_lec(const std::string& lec, const std::string& endo)
 {
-    if (lec.empty() || endo.empty())
-    {
-        c_equation->lec = NULL;
-    }
-    else
-    {
-        char* c_lec = to_char_array(lec);
-        char* c_endo = to_char_array(endo);
-        // check if LEC expression is valid
-        c_equation->clec = L_solve(c_lec, c_endo);
-        if (c_equation->clec == 0) 
-        {
-            IodeExceptionInvalidArguments error("Cannot set LEC to equation named " + endo);
-            error.add_argument("lec", lec);
-            throw error;
-        }
-        c_equation->lec = copy_char_array(c_lec);
-    }
+    if(lec.empty())
+        throw std::invalid_argument("Passed LEC expression is empty");
+
+    if(endo.empty())
+        throw std::invalid_argument("Passed value for endo (equation name) is empty");
+
+    if(this->lec != NULL)
+        SW_nfree(this->lec);
+
+    char* c_lec = to_char_array(lec);
+    char* c_endo = to_char_array(endo);
+    
+    // check if LEC expression is valid
+    this->clec = L_solve(c_lec, c_endo);
+    if(this->clec == NULL) 
+        throw std::invalid_argument("Cannot set LEC '" + lec + "' to the equation named '" + endo + "'");
+    
+    this->lec = copy_char_array(c_lec);
 }
 
 // -- solved --
 
 char Equation::get_solved() const
 {
-    return c_equation->solved;
+    return this->solved;
 }
 
 // -- method --
 
 int Equation::get_method_as_int() const
 {
-    return (int) c_equation->method;
+    return (int) this->method;
+}
+
+void Equation::set_method(const int method)
+{
+    if(method >= I_NB_EQ_METHODS)
+        throw std::invalid_argument("Invalid value " + std::to_string(method) + " for the equation method. " + 
+            "The passed value must be in the range [0, " + std::to_string(I_NB_EQ_METHODS - 1) + "]");
+
+    this->method = (char) method;
 }
 
 std::string Equation::get_method() const
 {
-    int m = get_method_as_int();
-    if (m > I_NB_EQ_METHODS) m = 0;
+    int m = (int) this->method;
     return vEquationMethods[m];
 }
 
 void Equation::set_method(const std::string& method)
 {
-    int m = 0;
-    for (int i = 0; i < I_NB_EQ_METHODS; i++) if (method == vEquationMethods[i]) m = i;
-    c_equation->method = (char) m;
+    int m = -1;
+    for(int i = 0; i < I_NB_EQ_METHODS; i++) 
+        if(method == vEquationMethods[i]) m = i;
+
+    if(m < 0)
+        throw std::invalid_argument("The equation method '" + method + "' is not valid.\n" + 
+            "Accepted methods are: " + boost::algorithm::join(vEquationMethods, ", "));
+
+    this->method = (char) m;
 }
 
 // -- block --
 
 std::string Equation::get_block() const
 {
-    return std::string(c_equation->blk);
+    return std::string(this->blk);
 }
 
 void Equation::set_block(const std::string& block)
 {
-    SW_nfree(c_equation->blk);
-    if (block.empty()) c_equation->blk = NULL;
-    else c_equation->blk = copy_string_to_char(block);
+    if(this->blk != NULL)
+        SW_nfree(this->blk);
+
+    if (block.empty()) 
+        this->blk = copy_char_array("");
+    else 
+        this->blk = copy_string_to_char(block);
 }
 
 // -- sample --
 
 Sample Equation::get_sample() const
 {
-    return Sample(&c_equation->smpl);
+    SAMPLE* smpl = const_cast<SAMPLE*>(&this->smpl);
+    return Sample(smpl);
 }
 
 void Equation::set_sample(std::string from, std::string to)
 {
     if (from.empty() || to.empty())
     {
-        Sample sample = get_sample();
-        if (from.empty()) from = sample.start_period().to_string();
-        if (to.empty())   to = sample.end_period().to_string();
+        Sample sample(KSMPL(KV_WS));
+
+        if(from.empty()) 
+            from = sample.start_period().to_string();
+
+        if(to.empty())   
+            to = sample.end_period().to_string();
     }
+
     Sample new_sample(from, to);
-    memcpy(&(c_equation->smpl), new_sample.c_sample, sizeof(SAMPLE));
+    memcpy(&(this->smpl), new_sample.c_sample, sizeof(SAMPLE));
 }
 
 // -- comment --
 
 std::string Equation::get_comment() const
 {
-    std::string comment_oem = std::string(c_equation->cmt);
+    std::string comment_oem = std::string(this->cmt);
     std::string comment = oem_to_utf8(comment_oem);
     return comment;
 }
@@ -280,12 +251,15 @@ std::string Equation::get_comment() const
 // we assume that comment string is in UTF8 format
 void Equation::set_comment(const std::string& comment)
 {
-    SW_nfree(c_equation->cmt);
-    if (comment.empty()) c_equation->cmt = NULL;
+    if(this->cmt != NULL)
+        SW_nfree(this->cmt);
+
+    if(comment.empty()) 
+        this->cmt = copy_char_array("");
     else
     {
         std::string comment_oem = utf8_to_oem(comment);
-        c_equation->cmt = copy_string_to_char(comment_oem);
+        this->cmt = copy_string_to_char(comment_oem);
     }
 }
 
@@ -293,40 +267,45 @@ void Equation::set_comment(const std::string& comment)
 
 std::string Equation::get_instruments() const
 {
-    return std::string(c_equation->instr);
+    return std::string(this->instr);
 }
 
 void Equation::set_instruments(const std::string& instruments)
 {
-    SW_nfree(c_equation->instr);
-    if (instruments.empty()) c_equation->instr = NULL;
-    else c_equation->instr = copy_string_to_char(instruments);
+    if(this->instr != NULL)
+        SW_nfree(this->instr);
+
+    if(instruments.empty()) 
+        this->instr = copy_char_array("");
+    else 
+        this->instr = copy_string_to_char(instruments);
 }
 
 // -- date --
 
 long Equation::get_date() const
 {
-    return c_equation->date;
+    return this->date;
 }
 
 std::string Equation::get_date_as_string(const std::string& date_format) const
 {
     std::string date;
-    long l_date = c_equation->date;
-    if (l_date > 0)
+    long l_date = this->date;
+    if(l_date > 0)
     {
         char c_date[12];
         char* c_date_format;
         c_date_format = to_char_array(date_format);
         date = SCR_long_to_fdate(l_date, c_date, c_date_format);
     }
+
     return date;
 }
 
 void Equation::update_date()
 {
-    c_equation->date = SCR_current_date();
+    this->date = SCR_current_date();
 }
 
 // -- tests --
@@ -334,23 +313,22 @@ void Equation::update_date()
 std::array<float, EQS_NBTESTS> Equation::get_tests() const
 {
     std::array<float, EQS_NBTESTS> tests;
-    for (int i = 0; i < EQS_NBTESTS; i++) tests[i] = c_equation->tests[i];
+    for(int i = 0; i < EQS_NBTESTS; i++) 
+        tests[i] = this->tests[i];
     return tests;
 }
 
 void Equation::set_tests(const std::array<float, EQS_NBTESTS> tests)
 {
-    for (int i = 0; i < EQS_NBTESTS; i++) c_equation->tests[i] = tests[i];
+    for(int i = 0; i < EQS_NBTESTS; i++) 
+        this->tests[i] = tests[i];
 }
 
 // -- misc --
 
 std::vector<std::string> Equation::get_coefficients_list(const bool create_if_not_exit)
 {
-    // make sure CLEC is up to date
-    set_lec(get_lec());
-
-    std::vector<std::string> coeffs = get_scalars_from_clec(c_equation->clec);
+    std::vector<std::string> coeffs = get_scalars_from_clec(this->clec);
 
     // create scalars not yet present in the Scalars Database
     if(create_if_not_exit)
@@ -371,18 +349,14 @@ std::vector<std::string> Equation::get_coefficients_list(const bool create_if_no
 
 std::vector<std::string> Equation::get_variables_list(const bool create_if_not_exit)
 {
-    // make sure CLEC is up to date
-    set_lec(get_lec());
-
-    std::vector<std::string> vars = get_variables_from_clec(c_equation->clec);
+    std::vector<std::string> vars = get_variables_from_clec(this->clec);
 
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
     {
         SAMPLE* sample = KSMPL(K_WS[I_VARIABLES]);
         if(sample == NULL || sample->s_nb == 0)
-            throw IodeException("Cannot return the list of variables associated with the equation " + endo +"\n" + 
-                                "The global sample is not yet defined");
+            throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 
         char* c_name;
         int nb_obs = sample->s_nb;
@@ -421,7 +395,14 @@ std::pair<std::string, std::string> Equation::split_equation()
 
 bool Equation::operator==(const Equation& other) const
 {
-    return equation_equal(c_equation, other.c_equation) && endo == other.endo;
+    if (strcmp(this->lec, other.lec) != 0) return false;
+    if (this->method != other.method) return false;
+    if (memcmp(&(this->smpl), &(other.smpl), sizeof(SAMPLE)) != 0) return false;
+    if (strcmp(this->cmt, other.cmt) != 0) return false;
+    if (strcmp(this->blk, other.blk) != 0) return false;
+    if (strcmp(this->instr, other.instr) != 0) return false;
+
+    return true;
 }
 
 NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
@@ -430,4 +411,38 @@ NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(
 
 NamedEquation::NamedEquation(const std::string& name, const Equation& eq) : name(name), eq(eq) 
 {
+}
+
+std::size_t hash_value(EQ const& c_eq)
+{
+    std::size_t seed = 0;
+
+    // need to wrapp with std::string() because hash_value() and
+    // hash_combine() only compare pointer addresses when applied 
+    // on char* arrays
+    boost::hash_combine(seed, std::string(c_eq.lec));
+    boost::hash_combine(seed, c_eq.method);
+    boost::hash_combine(seed, c_eq.smpl);
+    boost::hash_combine(seed, std::string(c_eq.cmt));
+    boost::hash_combine(seed, std::string(c_eq.blk));
+    boost::hash_combine(seed, std::string(c_eq.instr));
+
+    return seed;
+}
+
+std::size_t hash_value(Equation const& eq)
+{
+    std::size_t seed = 0;
+
+    // need to wrapp with std::string() because hash_value() and
+    // hash_combine() only compare pointer addresses when applied 
+    // on char* arrays
+    boost::hash_combine(seed, std::string(eq.lec));
+    boost::hash_combine(seed, eq.method);
+    boost::hash_combine(seed, eq.smpl);
+    boost::hash_combine(seed, std::string(eq.cmt));
+    boost::hash_combine(seed, std::string(eq.blk));
+    boost::hash_combine(seed, std::string(eq.instr));
+
+    return seed;
 }
