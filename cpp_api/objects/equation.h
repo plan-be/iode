@@ -3,6 +3,8 @@
 #include "utils/utils.h"
 #include "time/period.h"
 #include "time/sample.h"
+#include "lec/lec.h"
+
 #include <boost/functional/hash.hpp>
 #include <boost/algorithm/string.hpp>
 

@@ -5,11 +5,14 @@
 EQ* create_equation_deep_copy(EQ* original_equation)
 {
     EQ* copy_eq = (EQ*) SW_nalloc(sizeof(EQ));
+    // NOTE : we do not use memcpy() because memcpy() actually makes  
+    //        a shallow copy of a struct instead of a deep copy
+    copy_eq->clec = clec_deep_copy(original_equation->clec);
     copy_eq->lec = copy_char_array(original_equation->lec);
-    copy_eq->clec = (CLEC*) SW_nalloc(sizeof(CLEC));
-    memcpy(copy_eq->clec, original_equation->clec, sizeof(CLEC));
     copy_eq->solved = original_equation->solved;
     copy_eq->method = original_equation->method;
+    // NOTE : we can use memcpy() on SAMPLE because SAMPLE does 
+    //        not contain attributes which are pointers
     memcpy(&copy_eq->smpl, &original_equation->smpl, sizeof(SAMPLE));
     copy_eq->cmt = copy_char_array(original_equation->cmt);
     copy_eq->blk = copy_char_array(original_equation->blk);
