@@ -70,8 +70,8 @@ TEST_F(EstimationTest, Estimate)
 
     // -- go back to first eq
     next_named_eq = est->next_equation();
-    EXPECT_EQ(named_eq.name, eq_name);
-    EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
+    EXPECT_EQ(next_named_eq.name, eq_name);
+    EXPECT_EQ(next_named_eq.eq.get_lec(), eq.get_lec());
 
     // Coeff values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").val) / 1e6, 0.01577);
@@ -181,6 +181,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.042291);
     EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
 
+    delete est;
 }
 
 TEST_F(EstimationTest, EstimateBlock)
