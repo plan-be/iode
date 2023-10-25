@@ -8,6 +8,15 @@
 #include "time/period.h"
 #include "KDB/kdb_variables.h"
 
+/**
+ * @brief 
+ * 
+ * @param other 
+ * @return CLEC* 
+ * 
+ * @note 
+ */
+CLEC* clec_deep_copy(const CLEC* other);
 
 /**
  *  Evaluate the LEC expression for a specific period t.

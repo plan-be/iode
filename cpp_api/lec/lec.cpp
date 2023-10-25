@@ -1,6 +1,26 @@
 #include "lec.h"
 
 
+CLEC* clec_deep_copy(const CLEC* other)
+{
+    // NOTE : see end of function L_cc2() from l_cc2.c to calculate tot_lg (= len)
+    CLEC* copy = (CLEC*) SW_nalloc(other->tot_lg);
+
+    copy->tot_lg = other->tot_lg,      
+	copy->exec_lg = other->exec_lg;       
+    copy->nb_names = other->nb_names;
+    copy->dupendo = other->dupendo;
+    copy->pad = '\0';
+    for(int i = 0; i < other->nb_names; i++)
+    {
+        strncpy(copy->lnames[i].name, other->lnames[i].name, sizeof(ONAME) / sizeof(char));
+        memset(copy->lnames[i].pad, '\0', sizeof(LNAME::pad) / sizeof(char));
+        copy->lnames[i].pos = other->lnames[i].pos;
+    }
+
+    return copy;
+}
+
 /**
  *  Compile and link the LEC expression with the current Scalars and Variables workspaces.
  *  
