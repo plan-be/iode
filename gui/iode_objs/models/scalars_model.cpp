@@ -13,17 +13,17 @@ QVariant ScalarsModel::dataCell(const int row, const int col) const
 		switch (col)
 		{
 		case 0:
-			value = valueToString(scalar.value());
+			value = valueToString(scalar.val);
 			break;
 		case 1:
-			value = valueToString(scalar.relax());
+			value = valueToString(scalar.relax);
 			break;
 		case 2:
-			value = valueToString(scalar.std());
+			value = valueToString(scalar.std);
 			break;
 		case 3:
-			if (L_ISAN(scalar.value()) && L_ISAN(scalar.std()) && !L_IS0(scalar.std()))
-				value = valueToString(scalar.value() / scalar.std());
+			if (L_ISAN(scalar.val) && L_ISAN(scalar.std) && !L_IS0(scalar.std))
+				value = valueToString(scalar.val / scalar.std);
 			else
 				value = NAN_REP;
 			break;
@@ -49,10 +49,10 @@ bool ScalarsModel::setValue(const int row, const int column, const QVariant& val
 		switch (column)
 		{
 		case 0:
-			kdb->update(row, val, scalar.relax());
+			kdb->update(row, val, scalar.relax);
 			break;
 		case 1:
-			kdb->update(row, scalar.value(), val);
+			kdb->update(row, scalar.val, val);
 			break;
 		default:
 			break;
