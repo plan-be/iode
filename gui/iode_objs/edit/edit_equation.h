@@ -58,12 +58,12 @@ private:
 
 	void computeHash(Equation& eq, const bool before=false)
 	{
-		boost::hash<EQ> eq_hasher;
+		boost::hash<Equation> eq_hasher;
 		if(before)
-    		hashBefore = eq_hasher(*eq.c_equation);
+    		hashBefore = eq_hasher(eq);
 		else
 		{
-			hashAfter = eq_hasher(*eq.c_equation);
+			hashAfter = eq_hasher(eq);
 			if(hashAfter != hashBefore) 
 				emit databaseModified();
 		}

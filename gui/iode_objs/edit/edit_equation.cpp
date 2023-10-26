@@ -145,11 +145,6 @@ void EditEquationDialog::edit()
 		std::string comment = lineComment->extractAndVerify().toStdString();
 		std::string block = lineBlock->extractAndVerify().toStdString();
 		std::string instruments = lineInstruments->extractAndVerify().toStdString();
-
-
-		Sample* sample = nullptr; 
-		if(!(from.empty() || to.empty()))
-			sample = new Sample(from, to);
 		
 		std::array<float, EQS_NBTESTS> tests = { 0.0 };
 
@@ -159,7 +154,7 @@ void EditEquationDialog::edit()
 			Equation eq = Equations.get(equation_name);
 			computeHash(eq, true);
 
-			Equations.update(equation_name, lec, comment, method, sample, instruments, block, &tests);
+			Equations.update(equation_name, lec, method, from, to, comment, instruments, block);
 		
 			Equation updated_eq = Equations.get(equation_name);
 			computeHash(updated_eq);
@@ -167,15 +162,12 @@ void EditEquationDialog::edit()
 		// new equation
 		else
 		{
-			Equations.add(equation_name, lec, comment, method, sample, instruments, block, tests, true);
+			Equations.add(equation_name, lec, method, from, to, comment, instruments, block);
 			emit databaseModified();
 		}
 
 		if(estimation) 
 			estimation->save();
-
-		if(sample) 
-			delete sample;
 		
 		this->accept();
 	}
