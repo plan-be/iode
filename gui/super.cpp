@@ -259,19 +259,38 @@ int gui_XodeRuleImport_super()
 	return 0;
 }
 
-int gui_view_tbl(char* name, char *smpl, char** vars_names)
+int gui_view_tbl(TBL* tbl, char* smpl, char* name)
 {
+	int pos = K_find(KT_WS, name);
+	bool table_found = pos >= 0;
+
 	QString tableName = QString(name);
 	QString gsample = QString(smpl);
 	int nb_decimals = 6;
-	
-	QString variables;
-	for(int i = 0; i < SCR_tbl_size((unsigned char**) vars_names); i++)
-		variables += QString(vars_names[i]) + ";";
+
+	if(!table_found)
+	{
+		// temporary add the passed IODE table to the global database of tables
+		pos = K_add(KT_WS, name, tbl);
+		if(pos < 0)
+		{
+			QMessageBox::warning(nullptr, "WARNING", "Could not compute table '" + QString(name) + 
+				"' with sample '" + gsample + "'");
+			return QDialog::Rejected;
+		}
+	}
 
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	GSampleNumericalDialog view(tableName, gsample, nb_decimals, variables, main_window);
-	return view.exec();
+	GSampleNumericalDialog view(tableName, gsample, nb_decimals, QString(""), main_window);
+	int res = view.exec();
+
+	if(!table_found)
+	{
+		// remove the temporary added IODE table from the global database
+		K_del(KT_WS, pos);
+	}
+
+	return res;
 }
 
 // ============================================================================== //
