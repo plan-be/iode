@@ -170,7 +170,7 @@ public:
 #ifdef _GSAMPLE_
         this->setModal(true);
         if(variables.isEmpty())
-            this->setWindowTitle(refTable);
+            this->setWindowTitle("Table " + refTable);
         else
             this->setWindowTitle("Table of series");
 #endif
