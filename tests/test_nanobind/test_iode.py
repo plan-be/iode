@@ -169,7 +169,6 @@ def test_iode_get_cmt():
     assert c_ACAF == "Ondernemingen: ontvangen kapitaaloverdrachten."
     assert c_EFM == "Vreemde grensarbeiders in België (30 juni)."
     assert c_XPWMAB == "Croissance des prix des biens importés"
-"""
 
 def test_iode_set_cmt():
 
@@ -200,15 +199,14 @@ def test_iode_set_cmt():
 # IODE EQUATIONS <-> PYTHON STRINGS
 # ---------------------------------
 
-"""
 def test_iode_get_eqs_lec():
 
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
     lec_BVY = iode.get_eqs_lec("BVY")
     print(f"lec_BVY = '{lec_BVY}'")
     assert lec_BVY == "BVY:=YN+YK"
-"""
 
+"""
 def test_iode_get_eqs():
 
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
@@ -239,18 +237,16 @@ def test_iode_set_eqs():
     py_A = "(grt A"
     with pytest.raises(RuntimeError):
         iode.set_eqs("A", py_A)
-
+"""
 
 # IODE IDENTITIES <-> PYTHON STRINGS
 # ----------------------------------
 
-"""
 def test_iode_get_idt():
 
     iode.ws_load_idt(str(IODE_DATA_DIR / "fun.idt"))
     i_XEX = iode.get_idt("XEX")
     assert i_XEX == "grt EX"
-"""
 
 def test_iode_set_idt():
 
@@ -274,13 +270,11 @@ def test_iode_set_idt():
 # IODE LISTS <-> PYTHON STRINGS
 # -----------------------------
 
-"""
 def test_iode_get_lst():
 
     iode.ws_load_lst(str(IODE_DATA_DIR / "fun"))
     i_MYLIST = iode.get_lst("MYLIST")
     assert i_MYLIST == "A02_075_H_BRU A02_100_H_VLA"
-"""
 
 def test_iode_set_lst():
 
@@ -300,7 +294,6 @@ def test_iode_set_lst():
 # IODE SCALARS <-> PYTHON
 # -----------------------
 
-"""
 def test_iode_get_scl():
 
     iode.ws_load_scl(str(IODE_DATA_DIR / "fun"))
@@ -310,7 +303,6 @@ def test_iode_get_scl():
     assert round(i_acaf1.relax, 7) == 1.0
     assert round(i_acaf1.std, 7) == 0.0013687
 
-"""
 def test_iode_set_scl():
 
     # Clear SCL before creating new object
@@ -324,8 +316,8 @@ def test_iode_set_scl():
     iode.set_scl("myscl", py_myscl)
     i_myscl = iode.get_scl(name)
     assert repr(i_myscl) == repr(py_myscl)
-"""
     
+
 # VARIABLES IODE <-> PYTHON LISTS AND NDARRAYS
 # --------------------------------------------
 
@@ -380,7 +372,6 @@ def test_iode_get_var():
     B = [0.0, 1.0, 2]
     assert A == B
 
-"""
 def test_iode_set_var():
 
     nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
@@ -398,7 +389,6 @@ def test_iode_set_var():
 
     assert new_AA[2] == AA[2] # 1993Y1
     assert new_AB[1] == AB[1] # 1992Y1
-"""
 
 def test_iode_exec_lec():
     nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
@@ -419,14 +409,13 @@ def test_iode_exec_lec():
     assert vec == var_A
 
 
-"""
 # REPORT DATA_* FUNCTIONS
 # -----------------------
 
 # DATA_DELETE
 # -----------
 
-
+"""
 def test_iode_delete_objects():    
     # Load IDT ws and delete group of idts based on name pattern
     iode.ws_load_idt(str(IODE_DATA_DIR / "fun.idt"))
