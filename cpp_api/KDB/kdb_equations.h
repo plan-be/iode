@@ -27,6 +27,8 @@ public:
     int add(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
         const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
 
+    void update(const std::string& name, const Equation& obj);
+
     void update(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
         const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = false);
 
