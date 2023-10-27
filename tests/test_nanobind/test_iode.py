@@ -206,7 +206,6 @@ def test_iode_get_eqs_lec():
     print(f"lec_BVY = '{lec_BVY}'")
     assert lec_BVY == "BVY:=YN+YK"
 
-"""
 def test_iode_get_eqs():
 
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
@@ -237,7 +236,6 @@ def test_iode_set_eqs():
     py_A = "(grt A"
     with pytest.raises(RuntimeError):
         iode.set_eqs("A", py_A)
-"""
 
 # IODE IDENTITIES <-> PYTHON STRINGS
 # ----------------------------------
