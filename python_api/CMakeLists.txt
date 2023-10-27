@@ -23,7 +23,7 @@ if(Python_FOUND)
         message(CHECK_PASS "found")
         
         nanobind_add_module(iode py_constants.h     py_constants.cpp 
-                                 py_sample.h 
+                                 py_sample.h        py_sample.cpp 
                                  py_ws.h            py_ws.cpp
                                  py_numpy.h 
                                                     pyiode.cpp)

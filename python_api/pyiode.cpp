@@ -8,10 +8,10 @@ namespace nb = nanobind;
 
 #include "cpp_api/iode_cpp_api.h"
 
-#include "py_constants.h"
 #include "py_numpy.h"
-#include "py_ws.h"
+#include "py_constants.h"
 #include "py_sample.h"
+#include "py_ws.h"
 
 
 // To see how to split build of a large Python module, read the link below:
@@ -19,9 +19,8 @@ namespace nb = nanobind;
 
 NB_MODULE(iode, m) 
 {
-      std::string doc;
-
       init_constants(m);
+      init_sample(m);
       init_ws(m);
 
       // IODE object classes
@@ -104,23 +103,6 @@ NB_MODULE(iode, m)
       m.def("exec_lec", nb::overload_cast<const std::string&, const std::string&>(&execute_lec), nb::arg("lec"), nb::arg("period"));
       m.def("exec_lec", nb::overload_cast<const std::string&>(&execute_lec), nb::arg("lec"));
 
-      // Sample
-
-      m.def("ws_sample_set", &ws_sample_set, nb::arg("from") = "", nb::arg("to") = "", "Set a new IODE sample and return it");
-      m.def("ws_sample_get", &ws_sample_get, 
-            "Return the current sample lower and upper bounds, e.g.: ('2000Y1', '2010Y1') or ('', '') if the sample is undefined.");
-      m.def("ws_sample_nb_periods", []() { return Variables.get_nb_periods(); }, 
-            "Return the number of periods in the current sample");
-      m.def("ws_sample_to_string", &ws_sample_to_string, 
-            "Return the current sample definition in a string: 'from to', e.g.: '2000Y1 2020Y1' or '' if the sample is undefined.");
-      m.def("ws_sample_to_list", [](const std::string& from = "", const std::string& to = "") { return Variables.get_list_periods(from, to); }, 
-            nb::arg("from") = "", nb::arg("to") = "",
-            "Return the current sample definition as a list of periods.\ne.g.: ['2000Y1', '2001Y1', ..., '2010Y1'] or [] if the sample is undefined");
-      doc = "Return the current sample definition as a list of periods converted to float.\n";
-      doc += "e.g.: [2000.0, 2001.0, ..., 2010.0] or [] if the sample is undefined";
-      m.def("ws_sample_to_float_list", [](const std::string& from = "", const std::string& to = "") { return Variables.get_list_periods_as_float(from, to); }, 
-            nb::arg("from") = "", nb::arg("to") = "", doc.c_str());
-
       // Report
 
       m.def("report_exec", nb::overload_cast<const std::string&, const std::string&>(&execute_report), 
@@ -133,7 +115,7 @@ NB_MODULE(iode, m)
             nb::arg("commands"));
 
       // Estimation
-      doc = "Estimate an equation or a block of equations on the given sample.\n";
+      std::string doc = "Estimate an equation or a block of equations on the given sample.\n";
       doc += "The estimation method and the instruments must be specified in the equation before the estimation.";
       m.def("eqs_estimate", nb::overload_cast<const std::string&, const std::string&, const std::string&>(&eqs_estimate), 
             nb::arg("eqs"), nb::arg("from") = "", nb::arg("to") = "", doc.c_str());
