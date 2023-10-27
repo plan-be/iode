@@ -18,6 +18,13 @@ void init_constants(nb::module_ &m)
       m.attr("I_TBL") = (int) I_TABLES;
       m.attr("I_VAR") = (int) I_VARIABLES;
 
+      // Methods to estimation equations
+      m.attr("E_LSQ")            = (int) IE_LSQ;
+      m.attr("E_ZELLNER")        = (int) IE_ZELLNER;
+      m.attr("E_INSTRUMENTAL")   = (int) IE_INSTRUMENTAL;
+      m.attr("E_GLS")            = (int) IE_GLS;
+      m.attr("E_MAX_LIKELIHOOD") = (int) IE_MAX_LIKELIHOOD;
+
       // Simulation parameters
       m.attr("SORT_CONNEX") = (int) SORT_CONNEX;
       m.attr("SORT_BOTH")   = (int) SORT_BOTH;
