@@ -15,6 +15,7 @@ void init_iode_objs(nb::module_ &m)
         .def(nb::init<const std::string&>())
         .def(nb::init<const IODE_REAL, const IODE_REAL, const IODE_REAL>())
         .def(nb::self == nb::self)
+        .def("__str__", &Scalar::to_string)
         .def("__repr__", &Scalar::to_string);
 
     // IODE objects getters
