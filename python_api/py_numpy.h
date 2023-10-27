@@ -1,7 +1,13 @@
 #pragma once
 
 #include "cpp_api/iode_cpp_api.h"
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
 #include <nanobind/ndarray.h>
+
+namespace nb = nanobind;
+
 
 /*
  * nanobind supports zero-copy exchange using two protocols:
@@ -18,7 +24,7 @@ using numpy_var = nb::ndarray<nb::numpy, IODE_REAL, nb::ndim<1>>;
  *     https://nanobind.readthedocs.io/en/latest/ndarray.html#constraint-types 
  *     https://nanobind.readthedocs.io/en/latest/api_extra.html#array-annotations 
  */
-numpy_var get_var_as_ndarray(const std::string& name)
+inline numpy_var get_var_as_ndarray(const std::string& name)
 {
     size_t nb_obs = (size_t) Variables.get_nb_periods();
     if(nb_obs == 0)
