@@ -234,7 +234,7 @@ def test_iode_set_eqs():
 
     # Test error
     py_A = "(grt A"
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         iode.set_eqs("A", py_A)
 
 # IODE IDENTITIES <-> PYTHON STRINGS
