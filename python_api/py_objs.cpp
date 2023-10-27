@@ -8,6 +8,39 @@ void init_iode_objs(nb::module_ &m)
     // Read https://nanobind.readthedocs.io/en/latest/classes.html#classes 
     // to see how to export C++ classes to Python
 
+    // NOTE: attributes 'solved', 'date' and 'tests' have been set as read-only in Python
+    nb::class_<Equation>(m, "Equation")
+    .def_prop_rw("lec", &Equation::get_lec, &Equation::set_lec)
+    .def_prop_ro("solved", &Equation::get_solved)
+    .def_prop_rw("method", &Equation::get_method, nb::overload_cast<const int>(&Equation::set_method))
+    .def_prop_rw("block", &Equation::get_block, &Equation::set_block)
+    .def_prop_rw("sample", &Equation::get_sample, &Equation::set_sample)
+    .def_prop_rw("comment", &Equation::get_comment, &Equation::set_comment)
+    .def_prop_rw("instruments", &Equation::get_instruments, &Equation::set_instruments)
+    .def_prop_ro("date", &Equation::get_date_as_string)
+    .def("update_date", &Equation::update_date)
+    .def_prop_ro("tests", &Equation::get_tests)
+    .def_prop_ro("e_stdev",  &Equation::get_test_stdev)
+    .def_prop_ro("e_meany",  &Equation::get_test_meany)
+    .def_prop_ro("e_ssres",  &Equation::get_test_ssres)
+    .def_prop_ro("e_stderr", &Equation::get_test_stderr)
+    .def_prop_ro("e_fstat",  &Equation::get_test_fstat)
+    .def_prop_ro("e_r2",     &Equation::get_test_r2)
+    .def_prop_ro("e_r2adj",  &Equation::get_test_r2adj)
+    .def_prop_ro("e_dw",     &Equation::get_test_dw)
+    .def_prop_ro("e_loglik", &Equation::get_test_loglik)
+    .def(nb::init<const std::string&>())
+    .def(nb::init<const std::string&, const std::string&, const int, const std::string&, const std::string&, 
+                    const std::string&, const std::string&, const std::string&, const bool>())
+    .def(nb::init<const std::string&, const std::string&, const std::string&, const std::string&, const std::string&, 
+                    const std::string&, const std::string&, const std::string&, const bool>())
+    .def("get_coefficients_list", &Equation::get_coefficients_list, nb::arg("create_if_not_exit") = true)
+    .def("get_variables_list", &Equation::get_variables_list, nb::arg("create_if_not_exit") = true)
+    .def("split_equation", &Equation::split_equation)
+    .def(nb::self == nb::self)
+    .def("__str__", &Equation::to_string)
+    .def("__repr__", &Equation::to_string);
+
     nb::class_<Scalar>(m, "Scalar")
         .def_rw("value", &Scalar::val)
         .def_rw("relax", &Scalar::relax)
