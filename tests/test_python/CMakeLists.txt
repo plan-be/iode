@@ -11,7 +11,7 @@ if(Python_FOUND AND TARGET iode_python)
 
   add_custom_target(test_python
                     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/pyiode/py${Python_VERSION_}/iode.pyd" "iode.pyd" 
-                    COMMAND pytest --durations=0
+                    COMMAND pytest --durations=0 -vv
                     DEPENDS test_iode.py
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Running tests for Python IODE")
