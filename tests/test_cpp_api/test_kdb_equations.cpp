@@ -92,7 +92,13 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq2.get_lec(), "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq2.get_date_as_string(), "12-06-1998");
     EXPECT_EQ(eq2.get_sample().to_string(), "1980Y1:1996Y1");
-    EXPECT_EQ(eq1.get_method(), "LSQ");
+    EXPECT_EQ(eq2.get_method(), "LSQ");
+
+    Equation eq3 = Equations.get("BVY");
+    EXPECT_EQ(eq3.get_lec(), "BVY:=YN+YK");
+    EXPECT_EQ(eq3.get_date_as_string(), "");
+    EXPECT_EQ(eq3.get_sample().to_string(), ":");
+    EXPECT_EQ(eq3.get_method(), "");
 }
 
 TEST_F(KDBEquationsTest, GetNames)
