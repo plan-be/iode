@@ -180,7 +180,12 @@ void Equation::set_method(const int method)
 std::string Equation::get_method() const
 {
     int m = (int) this->method;
-    return vEquationMethods[m];
+
+    if(m >= 0 && m < I_NB_EQ_METHODS)
+        return vEquationMethods[m];
+    else
+        // invalid value
+        return "";
 }
 
 void Equation::set_method(const std::string& method)
