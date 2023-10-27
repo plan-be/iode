@@ -54,7 +54,7 @@ void init_iode_objs(nb::module_ &m)
     // IODE objects getters
 
     m.def("get_cmt", [](const std::string& name) { return Comments.get(name); }, nb::arg("name"), "Get an IODE comment");
-    // m.def("get_eqs", [](const std::string& name) { return Equations.get(name); }, nb::arg("name"), "Get an IODE equation");
+    m.def("get_eqs", [](const std::string& name) { return Equations.get(name); }, nb::arg("name"), "Get an IODE equation");
     m.def("get_idt", [](const std::string& name) { return Identities.get_lec(name); }, nb::arg("name"),"Get an IODE identity");
     m.def("get_lst", [](const std::string& name) { return Lists.get(name); }, nb::arg("name"), "Get an IODE list");
     m.def("get_scl", [](const std::string& name) { return Scalars.get(name); }, nb::arg("name"), "Get an IODE scalar");
@@ -67,10 +67,14 @@ void init_iode_objs(nb::module_ &m)
                 if(!Comments.contains(name)) Comments.add(name, cmt); 
                 else Comments.update(name, cmt); 
         }, nb::arg("name"), nb::arg("cmt"), "Add or create an IODE comment");
-    // m.def("set_eqs", [](const std::string& name, const Equation& eq) { 
-    //            if(!Equations.contains(name)) Equations.add(name, eq); 
-    //            else Equations.update(name, eq); 
-    //      }, nb::arg("name"), nb::arg("eq"), "Get an IODE equation");
+    m.def("set_eqs", [](const std::string& name, const std::string& lec) { 
+               if(!Equations.contains(name)) Equations.add(name, lec); 
+               else Equations.update(name, lec); 
+         }, nb::arg("name"), nb::arg("lec"), "Add or create an IODE equation");
+    m.def("set_eqs", [](const std::string& name, const Equation& eq) { 
+               if(!Equations.contains(name)) Equations.add(name, eq); 
+               else Equations.update(name, eq); 
+         }, nb::arg("name"), nb::arg("eq"), "Add or create an IODE equation");
     m.def("set_idt", [](const std::string& name, const std::string& idt) { 
                 if(!Identities.contains(name)) Identities.add(name, idt); 
                 else Identities.update(name, idt); 
