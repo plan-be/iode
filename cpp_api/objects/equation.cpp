@@ -323,6 +323,14 @@ std::array<float, EQS_NBTESTS> Equation::get_tests() const
     return tests;
 }
 
+float Equation::get_test(const EnumIodeEquationTest t) const
+{
+    if(t < 0 || t >= EQS_NBTESTS)
+        throw std::invalid_argument("get_test: the passed value must be in range [0, " + 
+            std::to_string(EQS_NBTESTS-1) + "]");
+    return this->tests[t];
+}
+
 void Equation::set_tests(const std::array<float, EQS_NBTESTS> tests)
 {
     for(int i = 0; i < EQS_NBTESTS; i++) 
