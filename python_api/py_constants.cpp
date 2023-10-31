@@ -25,6 +25,19 @@ void init_constants(nb::module_ &m)
       m.attr("E_GLS")            = (int) IE_GLS;
       m.attr("E_MAX_LIKELIHOOD") = (int) IE_MAX_LIKELIHOOD;
 
+      // test values
+      m.attr("IE_CORR")    = (int) IE_CORR;
+      m.attr("IE_STDEV")   = (int) IE_STDEV;
+      m.attr("IE_MEANY")   = (int) IE_MEANY; 
+      m.attr("IE_SSRES")   = (int) IE_SSRES; 
+      m.attr("IE_STDERR")  = (int) IE_STDERR;
+      m.attr("IE_STDERRP") = (int) IE_STDERRP;
+      m.attr("IE_FSTAT")   = (int) IE_FSTAT; 
+      m.attr("IE_R2")      = (int) IE_R2;
+      m.attr("IE_R2ADJ")   = (int) IE_R2ADJ; 
+      m.attr("IE_DW")      = (int) IE_DW;
+      m.attr("IE_LOGLIK")  = (int) IE_LOGLIK;
+
       // Simulation parameters
       m.attr("SORT_CONNEX") = (int) SORT_CONNEX;
       m.attr("SORT_BOTH")   = (int) SORT_BOTH;
