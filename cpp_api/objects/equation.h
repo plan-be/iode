@@ -137,6 +137,8 @@ public:
 
     std::array<float, EQS_NBTESTS> get_tests() const;
 
+    float get_test(const EnumIodeEquationTest t) const;
+
     void set_tests(const std::array<float, EQS_NBTESTS> tests);
 
     // -- misc --
