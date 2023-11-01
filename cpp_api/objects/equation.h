@@ -139,6 +139,16 @@ public:
 
     float get_test(const EnumIodeEquationTest t) const;
 
+    float get_test_stdev() const { return this->tests[IE_STDEV]; }
+    float get_test_meany() const { return this->tests[IE_MEANY]; }
+    float get_test_ssres() const { return this->tests[IE_SSRES]; }
+    float get_test_stderr() const { return this->tests[IE_STDERR]; }
+    float get_test_fstat() const { return this->tests[IE_FSTAT]; }
+    float get_test_r2() const { return this->tests[IE_R2]; }
+    float get_test_r2adj() const { return this->tests[IE_R2ADJ]; }
+    float get_test_dw() const { return this->tests[IE_DW]; }
+    float get_test_loglik() const { return this->tests[IE_LOGLIK]; }
+
     void set_tests(const std::array<float, EQS_NBTESTS> tests);
 
     // -- misc --
