@@ -7,14 +7,14 @@ EditIodeSampleDialog::EditIodeSampleDialog(QWidget* parent) : QDialog(parent)
 	sampleFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_from, REQUIRED_FIELD);
 	sampleTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_to, REQUIRED_FIELD);
 
-	Sample sample = kdb_vars.get_sample();
+	Sample sample = Variables.get_sample();
 	if (sample.nb_periods() == 0)
 	{
 		labelTitle->setText("New Variables Sample");
 	}
 	else
 	{
-		labelTitle->setText("Edit Variables Sample");
+		labelTitle->setText("Variables Sample");
 		QString from = QString::fromStdString(sample.start_period().to_string());
 		QString to = QString::fromStdString(sample.end_period().to_string());
 		sampleFrom->setQValue(from);
@@ -32,21 +32,22 @@ void EditIodeSampleDialog::edit()
 {
 	try
 	{
-		std::string from = sampleFrom->extractAndVerify().toStdString();
-		std::string to = sampleTo->extractAndVerify().toStdString();
+		// raises an error if 'from' or 'to' has a wrong value 
+		QString from = sampleFrom->extractAndVerify();
+		QString to = sampleTo->extractAndVerify();
 
-		kdb_vars.set_sample(from, to);
+		// try to create a sample -> raises an error if something went wrong
+		Sample sample(from.toStdString(), to.toStdString());
 
 		this->accept();
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		QMessageBox::warning(nullptr, tr("WARNING"), tr(e.what()));
 	}
 }
 
 void EditIodeSampleDialog::help()
 {
-	
 	QDesktopServices::openUrl(url_manual);
 }

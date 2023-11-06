@@ -99,15 +99,27 @@ public:
 	bool checkGlobalSample()
 	{
 		// check global sample and ask to set it if not already defined
-		KDBVariables kdb;
-		if (kdb.get_nb_periods() == 0)
+		if (Variables.get_nb_periods() == 0)
 		{
-			QWidget* p = static_cast<QWidget*>(parent());
-			QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
+			QMessageBox::StandardButton reply = QMessageBox::question(nullptr, "Sample", "Sample undefined. Set it?");
 			if (reply == QMessageBox::Yes)
 			{
-				EditIodeSampleDialog dialog(this);
-				return dialog.exec() == QDialog::Accepted;
+				try
+				{
+					EditIodeSampleDialog dialog(this);
+					if (dialog.exec() == QDialog::Accepted)
+					{
+						std::string from = dialog.get_from().toStdString();
+						std::string to = dialog.get_to().toStdString();
+						Variables.set_sample(from, to);
+					}
+					return true;
+				}
+				catch(const std::exception& e)
+				{
+					QMessageBox::warning(nullptr, tr("WARNING"), tr(e.what()));
+					return false;
+				}
 			}
 			else
 				return false;
