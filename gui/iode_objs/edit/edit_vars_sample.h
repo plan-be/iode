@@ -20,13 +20,22 @@ class EditIodeSampleDialog : public QDialog, public Ui::EditIodeSampleDialog
 {
     Q_OBJECT
 
-    KDBVariables kdb_vars;
     WrapperSampleEdit* sampleFrom;
     WrapperSampleEdit* sampleTo;
 
 public:
     EditIodeSampleDialog(QWidget* parent = Q_NULLPTR);
     ~EditIodeSampleDialog();
+
+    QString get_from() const
+    {
+        return sampleFrom->extractAndVerify();
+    }
+
+    QString get_to() const
+    {
+        return sampleTo->extractAndVerify();
+    }
 
 public slots:
     void edit();

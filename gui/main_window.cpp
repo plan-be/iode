@@ -288,19 +288,29 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::check_vars_sample()
 {
     // check variables sample and ask to set it if not already defined
-	KDBVariables kdb;
-	if (kdb.get_nb_periods() == 0)
+	if (Variables.get_nb_periods() == 0)
 	{
-		QWidget* p = static_cast<QWidget*>(parent());
-		QMessageBox::StandardButton reply = QMessageBox::question(p, "Sample", "Sample undefined. Set it?");
+		QMessageBox::StandardButton reply = QMessageBox::question(nullptr, "Sample", "Sample undefined. Set it?");
 		if (reply == QMessageBox::Yes)
 		{
             computeHash(true);
 
-			EditIodeSampleDialog dialog(this);
-			dialog.exec();
-
-            update_tab_and_completer(I_VARIABLES);
+            try
+            {
+                EditIodeSampleDialog dialog(this);
+                if (dialog.exec() == QDialog::Accepted)
+                {
+                    std::string from = dialog.get_from().toStdString();
+                    std::string to = dialog.get_to().toStdString();
+                    Variables.set_sample(from, to);
+                }
+                
+                update_tab_and_completer(I_VARIABLES);
+            }
+            catch(const std::exception& e)
+            {
+                QMessageBox::warning(nullptr, tr("WARNING"), tr(e.what()));
+            }
 		}
 	}
 }
@@ -387,10 +397,22 @@ void MainWindow::open_change_variables_sample_dialog()
 {
     computeHash(true);
 
-    EditIodeSampleDialog dialog(this);
-    dialog.exec();
-
-    update_tab_and_completer(I_VARIABLES);
+    try
+    {
+        EditIodeSampleDialog dialog(this);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            std::string from = dialog.get_from().toStdString();
+            std::string to = dialog.get_to().toStdString();
+            Variables.set_sample(from, to);
+        }
+        
+        update_tab_and_completer(I_VARIABLES);
+    }
+    catch(const std::exception& e)
+    {
+        QMessageBox::warning(nullptr, tr("WARNING"), tr(e.what()));
+    }
 }
 
 void MainWindow::open_extrapolate_variables_dialog()
