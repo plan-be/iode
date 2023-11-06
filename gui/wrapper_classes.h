@@ -361,8 +361,14 @@ public:
     {
         QString value = qfield.text();
 
-        // throw an error if the string is not valid for an IODE period
-        if (type == REQUIRED_FIELD && value.isEmpty()) Period per(value.toStdString());
+        if (type == REQUIRED_FIELD)
+        {
+            if(value.isEmpty())
+                throw std::invalid_argument(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+            
+            // throw an error if the string is not valid for an IODE period
+            Period per(value.toStdString());
+        }
 
         return value;
     }
