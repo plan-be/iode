@@ -73,7 +73,7 @@ public:
         {
             QString text = qfield.currentText();
             if (!list_values.contains(text)) 
-                throw std::runtime_error("Value " + text.toStdString() + " not allowed in " + name.toStdString());
+                throw std::invalid_argument("Value " + text.toStdString() + " not allowed in " + name.toStdString());
         }
         int value = qfield.currentIndex();
         return value;
@@ -131,7 +131,7 @@ public:
         QString value = qfield.text();
 
         if (type == REQUIRED_FIELD && value.isEmpty())
-            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+            throw std::invalid_argument(QString("ERROR in field %1: Empty !").arg(name).toStdString());
 
         return value;
     }
@@ -165,7 +165,7 @@ public:
         QString value = qfield.text();
 
         if (type == REQUIRED_FIELD && value.isEmpty())
-            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+            throw std::invalid_argument(QString("ERROR in field %1: Empty !").arg(name).toStdString());
 
         check_name(value.toStdString(), iodeType);
 
@@ -196,7 +196,7 @@ public:
         QString value = qfield.toPlainText();
 
         if (type == REQUIRED_FIELD && value.isEmpty())
-            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+            throw std::invalid_argument(QString("ERROR in field %1: Empty !").arg(name).toStdString());
 
         return value;
     }
@@ -225,7 +225,7 @@ public:
         QString value = qfield.toPlainText();
 
         if (type == REQUIRED_FIELD && value.isEmpty())
-            throw std::runtime_error(QString("ERROR in field %1: Empty !").arg(name).toStdString());
+            throw std::invalid_argument(QString("ERROR in field %1: Empty !").arg(name).toStdString());
 
         return value;
     }
