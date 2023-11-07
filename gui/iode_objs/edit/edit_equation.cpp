@@ -139,7 +139,7 @@ void EditEquationDialog::edit()
 		// TODO : remove extra \n
 		std::string lec = lineLec->extractAndVerify().toStdString();
 		int i_method = comboBoxMethod->extractAndVerify();
-		std::string method = (i_method > 0) ? vEquationMethods[i_method] : "";
+		std::string method = (i_method >= 0) ? vEquationMethods[i_method] : "";
 		std::string from = sampleFrom->extractAndVerify().toStdString();
 		std::string to = sampleTo->extractAndVerify().toStdString();
 		std::string comment = lineComment->extractAndVerify().toStdString();
