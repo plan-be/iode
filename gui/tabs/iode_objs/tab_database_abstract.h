@@ -251,7 +251,7 @@ public:
             return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + "." + ext + " [0]*";
         }
         else
-            return IodeAbstractWidget::getTabText() + " [" + QString::number(objmodel->rowCount()) + "]";
+            return IodeAbstractWidget::getTabText() + " [" + QString::number(objmodel->getNbObjects()) + "]";
     }
 
     QString getTooltip() const
@@ -259,7 +259,7 @@ public:
         if(isUnsavedDatabase())
             return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database [0]";
         else
-            return IodeAbstractWidget::getTooltip() + " [" + QString::number(objmodel->rowCount()) + "]";
+            return IodeAbstractWidget::getTooltip() + " [" + QString::number(objmodel->getNbObjects()) + "]";
     }
 
     M* get_model() const 

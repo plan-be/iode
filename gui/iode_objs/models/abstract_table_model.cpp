@@ -134,8 +134,10 @@ void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent
 template <class K>
 bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
+	K* kdb_ = kdb_global ? kdb_global : kdb_external;
+
 	std::string s_filepath = filepath.toLocal8Bit().toStdString();
-	int type_ = kdb ? kdb->get_iode_type() : get_iode_file_type(s_filepath);
+	int type_ = kdb_ ? kdb_->get_iode_type() : get_iode_file_type(s_filepath);
 
 	if (type_ < 0 || type_ > I_VARIABLES) 
 		return false;
@@ -168,16 +170,19 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 template <class K>
 QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& filepath)
 {
-	if(!kdb)
+	// NOTE: we don't simply use kdb since it may point to kdb_filter
+	K* kdb_ = kdb_global ? kdb_global : kdb_external;
+
+	if(!kdb_)
 		return "";
 
-	if (kdb->count() == 0) 
+	if (kdb_->count() == 0) 
 		return ""; 
 
-	EnumIodeType iodeType = (EnumIodeType) kdb->get_iode_type();
+	EnumIodeType iodeType = (EnumIodeType) kdb_->get_iode_type();
 	
 	// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
-	std::string std_filepath = filepath.isEmpty() ? kdb->get_filename() : filepath.toLocal8Bit().toStdString();
+	std::string std_filepath = filepath.isEmpty() ? kdb_->get_filename() : filepath.toLocal8Bit().toStdString();
 
 	// if KDB not linked to any file, ask the user to give/create a file to save in.
 	// Otherwise, check the filepath 
@@ -197,9 +202,9 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 
 	try
 	{
-		kdb->set_filename(fullPath.toStdString());
+		kdb_->set_filename(fullPath.toStdString());
 		std::string full_path = fullPath.toStdString();
-		kdb->save(full_path);
+		kdb_->save(full_path);
 	}
 	catch (const IodeException& e)
 	{
@@ -213,10 +218,13 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 template <class K>
 QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 {
-	if(!kdb)
+	// NOTE: we don't simply use kdb since it may point to kdb_filter
+	K* kdb_ = kdb_global ? kdb_global : kdb_external;
+
+	if(!kdb_)
 		return "";
 
-	if (kdb->count() == 0) 
+	if (kdb_->count() == 0) 
 		return ""; 
 	
 	// ask user for new filepath
@@ -224,7 +232,7 @@ QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 	// call the save method
 	filepath = save(projectDir, filepath);
 	// update KDB filename
-	if (!filepath.isEmpty()) kdb->set_filename(filepath.toStdString());
+	if (!filepath.isEmpty()) kdb_->set_filename(filepath.toStdString());
 	return filepath;
 }
 
