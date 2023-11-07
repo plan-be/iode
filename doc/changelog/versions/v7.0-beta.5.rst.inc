@@ -23,6 +23,7 @@ Fixed Bugs 🛠️
           Otherwise, it is of type LEC (#363)
   * (GUI) Fixed combobox `Object type` not working when opening the box dialog from the menu 
           Workspace > Copy / Merge Into Workspace (#362)
+  * (GUI) Fixed opening an IODE data file when the path to that file contains special characters (#382) 
 
 
 Miscellaneous 🤷‍♀️
