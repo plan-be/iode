@@ -50,6 +50,8 @@ public:
 		return columnNames.size();
 	}
 
+	virtual int getNbObjects() const = 0;
+
 	virtual QString getFilepath() const = 0;
 
 protected:
@@ -129,9 +131,18 @@ public:
 		return kdb ? kdb->count() : 0;
 	}
 
+	int getNbObjects() const override
+	{
+		// NOTE: we don't simply use kdb since it may point to kdb_filter
+		K* kdb_ = kdb_global ? kdb_global : kdb_external;
+		return kdb_ ? kdb_->count() : 0;
+	}
+
 	QString getFilepath() const
 	{
-		return kdb ? QString::fromStdString(kdb->get_filename()) : "";
+		// NOTE: we don't simply use kdb since it may point to kdb_filter
+		K* kdb_ = kdb_global ? kdb_global : kdb_external;
+		return kdb_ ? QString::fromStdString(kdb_->get_filename()) : "";
 	}
 
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -146,7 +157,13 @@ public:
 
 	void filter(const QString& pattern, const bool silent = false) override;
 
-	void clearKDB() { kdb->clear(); }
+	void clearKDB() 
+	{
+		// NOTE: we don't simply use kdb since it may point to kdb_filter
+		K* kdb_ = kdb_global ? kdb_global : kdb_external;
+		if(kdb_)
+			kdb_->clear();
+	}
 
 	bool load(const QString& filepath, const bool forceOverwrite);
 
@@ -213,10 +230,13 @@ private:
 
 	QString askFilepathDialog(const QDir& projectDir)
 	{
-		if(!kdb)
+		// NOTE: we don't simply use kdb since it may point to kdb_filter
+		K* kdb_ = kdb_global ? kdb_global : kdb_external;
+
+		if(!kdb_)
 			return "";
 		
-		int iodeType = kdb->get_iode_type();
+		int iodeType = kdb_->get_iode_type();
 		QString iodeTypeAsString = QString::fromStdString(vIodeTypes[iodeType]);
 
 		QString defaultFilename = QString(I_DEFAULT_FILENAME) + "." + QString::fromStdString(v_binary_ext[iodeType]);
