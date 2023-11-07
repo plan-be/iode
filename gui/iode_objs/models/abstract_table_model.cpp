@@ -134,7 +134,7 @@ void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent
 template <class K>
 bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
-	std::string s_filepath = filepath.toStdString();
+	std::string s_filepath = filepath.toLocal8Bit().toStdString();
 	int type_ = kdb ? kdb->get_iode_type() : get_iode_file_type(s_filepath);
 
 	if (type_ < 0 || type_ > I_VARIABLES) 
@@ -177,7 +177,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 	EnumIodeType iodeType = (EnumIodeType) kdb->get_iode_type();
 	
 	// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
-	std::string std_filepath = filepath.isEmpty() ? kdb->get_filename() : filepath.toStdString();
+	std::string std_filepath = filepath.isEmpty() ? kdb->get_filename() : filepath.toLocal8Bit().toStdString();
 
 	// if KDB not linked to any file, ask the user to give/create a file to save in.
 	// Otherwise, check the filepath 
