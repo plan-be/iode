@@ -24,6 +24,8 @@ Fixed Bugs 🛠️
   * (GUI) Fixed combobox `Object type` not working when opening the box dialog from the menu 
           Workspace > Copy / Merge Into Workspace (#362)
   * (GUI) Fixed opening an IODE data file when the path to that file contains special characters (#382) 
+  * (GUI) Fixed interface crashing at launch when the path to a file previously opened in a tab 
+          has been modified when the interface was closed (#397)
 
 
 Miscellaneous 🤷‍♀️
