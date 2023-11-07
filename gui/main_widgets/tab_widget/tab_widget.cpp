@@ -134,17 +134,26 @@ void IodeTabWidget::loadSettings()
             else 
                 index = loadFile(filepath, false, true, i, forcedAsText);
 
+            if(index < 0)
+                continue;
+
             // split tab if necessary
-            if(splitted && index >= 0)
+            if(splitted)
                 splitTab(index, splitOrientation); 
 
             // reload values for the fields parameters, language and nbDecimals if Report tab
             if(filetype == I_REPORTS_FILE)
             {
                 ReportWidget* reportWidget = static_cast<ReportWidget*>(this->widget(index));
-                reportWidget->setParameters(project_settings->value("report_parameters").toString());
-                reportWidget->setLanguage(project_settings->value("report_language").toInt());
-                reportWidget->setNbDecimals(project_settings->value("report_nbDecimals").toInt());
+                if(reportWidget)
+                {
+                    reportWidget->setParameters(project_settings->value("report_parameters").toString());
+                    reportWidget->setLanguage(project_settings->value("report_language").toInt());
+                    reportWidget->setNbDecimals(project_settings->value("report_nbDecimals").toInt());
+                }
+                else
+                    QMessageBox::warning(nullptr, "WARNING", QString("Could not reload parameters, language ") + 
+                        "and nbDecimals for the report " + filepath);
             }
         }
         progress.setValue(size);
