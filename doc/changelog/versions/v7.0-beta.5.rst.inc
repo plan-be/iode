@@ -26,6 +26,8 @@ Fixed Bugs 🛠️
   * (GUI) Fixed opening an IODE data file when the path to that file contains special characters (#382) 
   * (GUI) Fixed interface crashing at launch when the path to a file previously opened in a tab 
           has been modified when the interface was closed (#397)
+  * (GUI) Fixed IODE objects tabs displaying the wrong filename when the filter is used (#398)
+  * (GUI) Fixed interface crashing when the user tries to clear a KDB while the filter is used (#404) 
 
 
 Miscellaneous 🤷‍♀️
