@@ -21,6 +21,22 @@ CLEC* clec_deep_copy(const CLEC* other)
     return copy;
 }
 
+bool clec_equal(const CLEC* clec_1, const CLEC* clec_2)
+{
+    if(clec_1->tot_lg != clec_2->tot_lg) return false;
+    if(clec_1->exec_lg != clec_2->exec_lg) return false;
+    if(clec_1->nb_names != clec_2->nb_names) return false;
+    if(clec_1->dupendo != clec_2->dupendo) return false;
+    if(clec_1->pad != clec_2->pad) return false;
+    for(int i = 0; i < clec_1->nb_names; i++)
+    {
+        if(strcmp(clec_1->lnames[i].name, clec_2->lnames[i].name)) return false;
+        if(strcmp(clec_1->lnames[i].pad, clec_2->lnames[i].pad)) return false;
+        if(clec_1->lnames[i].pos, clec_2->lnames[i].pos) return false;
+    }
+    return true;
+}
+
 /**
  *  Compile and link the LEC expression with the current Scalars and Variables workspaces.
  *  

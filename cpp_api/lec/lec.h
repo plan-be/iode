@@ -19,6 +19,16 @@
 CLEC* clec_deep_copy(const CLEC* other);
 
 /**
+ * @brief 
+ * 
+ * @param clec_1 
+ * @param clec_2 
+ * @return true 
+ * @return false 
+ */
+bool clec_equal(const CLEC* clec_1, const CLEC* clec_2);
+
+/**
  *  Evaluate the LEC expression for a specific period t.
  *  
  *  @param   lec  std::string   LEC expression to evaluate
