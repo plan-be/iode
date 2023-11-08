@@ -1,15 +1,15 @@
 #pragma once
 #include "common.h"
 #include "utils/utils.h"
+#include "lec/lec.h"
 
 
-struct Identity
+struct Identity: public IDT
 {
-    IDT* c_identity;
+private:
+    void copy_from_IDT_obj(const IDT* obj);
 
 public:
-    Identity();
-
     Identity(const int pos, KDB* kdb = nullptr);
 
     Identity(const std::string& name, KDB* kdb = nullptr);
@@ -21,18 +21,15 @@ public:
     ~Identity();
 
     // required to be used in std::map
-    Identity& operator=(const Identity& idt);
+    Identity& operator=(const Identity& other);
 
     bool operator==(const Identity& other) const;
 
-    std::string get_lec() const { return std::string(c_identity->lec); }
+    std::string get_lec() const;
 
-    void set_lec(const std::string& lec) 
-    {
-        c_identity->lec = copy_string_to_char(lec);
-    }
+    void set_lec(const std::string& lec);
 
-    CLEC* get_clec() const { return c_identity->clec; }
+    CLEC* get_clec() const;
 
     std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true);
 
