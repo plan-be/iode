@@ -96,18 +96,41 @@ TEST_F(KDBIdentitiesTest, Get)
 {
     int pos = 0;
     std::string name = Identities.get_name(pos);
+    CLEC* clec = NULL;
     CLEC* expected_clec = KICLEC(K_WS[I_IDENTITIES], pos);
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
 
     // by position
     Identity identity_pos = Identities.get(pos);
     EXPECT_EQ(identity_pos.get_lec(), expected_lec);
-    EXPECT_TRUE(memcmp(identity_pos.get_clec(), expected_clec, expected_clec->tot_lg) == 0);
+    clec = identity_pos.get_clec();
+    EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
+    EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
+    EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
+    EXPECT_EQ(clec->dupendo, expected_clec->dupendo);
+    for(int i = 0; i < expected_clec->nb_names; i++)
+    {
+        EXPECT_EQ(std::string(clec->lnames[i].name), std::string(expected_clec->lnames[i].name));
+        EXPECT_EQ(std::string(clec->lnames[i].pad), std::string(expected_clec->lnames[i].pad));
+        EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
+    }
+    EXPECT_TRUE(clec_equal(clec, expected_clec));
 
     // by name
     Identity identity_name = Identities.get(name);
     EXPECT_EQ(identity_name.get_lec(), expected_lec);
-    EXPECT_TRUE(memcmp(identity_name.get_clec(), expected_clec, expected_clec->tot_lg) == 0);
+    clec = identity_name.get_clec();
+    EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
+    EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
+    EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
+    EXPECT_EQ(clec->dupendo, expected_clec->dupendo);
+    for(int i = 0; i < expected_clec->nb_names; i++)
+    {
+        EXPECT_EQ(std::string(clec->lnames[i].name), std::string(expected_clec->lnames[i].name));
+        EXPECT_EQ(std::string(clec->lnames[i].pad), std::string(expected_clec->lnames[i].pad));
+        EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
+    }
+    EXPECT_TRUE(clec_equal(clec, expected_clec));
 }
 
 TEST_F(KDBIdentitiesTest, GetNames)
@@ -143,10 +166,25 @@ TEST_F(KDBIdentitiesTest, Copy)
 {
     int pos = 0;
     std::string name = Identities.get_name(pos);
+    Identity identity = Identities.get(name);
 
     Identity identity_copy = Identities.copy(name);
 
-    EXPECT_EQ(identity_copy.get_lec(), Identities.get_lec(name));
+    EXPECT_EQ(identity_copy.get_lec(), identity.get_lec());
+
+    CLEC* clec = identity.get_clec();
+    CLEC* clec_copy = identity_copy.get_clec();
+    EXPECT_EQ(clec->tot_lg, clec_copy->tot_lg);
+    EXPECT_EQ(clec->exec_lg, clec_copy->exec_lg);
+    EXPECT_EQ(clec->nb_names, clec_copy->nb_names);
+    EXPECT_EQ(clec->dupendo, clec_copy->dupendo);
+    for(int i = 0; i < clec_copy->nb_names; i++)
+    {
+        EXPECT_EQ(std::string(clec->lnames[i].name), std::string(clec_copy->lnames[i].name));
+        EXPECT_EQ(std::string(clec->lnames[i].pad), std::string(clec_copy->lnames[i].pad));
+        EXPECT_EQ(clec->lnames[i].pos, clec_copy->lnames[i].pos);
+    }
+    EXPECT_TRUE(clec_equal(clec, clec_copy));
 
     // add copy
     Identities.add("DUP_" + name, identity_copy);
