@@ -1,19 +1,19 @@
 #include "identity.h"
 
-static IDT* extract_identity(KDB* kdb, const int pos)
-{
-    return K_iunpack(SW_getptr(kdb->k_objs[pos].o_val));
-}
 
-
-Identity::Identity()
+void Identity::copy_from_IDT_obj(const IDT* obj)
 {
-    c_identity = nullptr;
+    this->lec = copy_char_array(obj->lec);
+    // NOTE : we do not use memcpy() because memcpy() actually makes  
+    //        a shallow copy of a struct instead of a deep copy
+    this->clec = clec_deep_copy(obj->clec);
 }
 
 Identity::Identity(const int pos, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_IDENTITIES];
+    if (!kdb) 
+        kdb = K_WS[I_IDENTITIES];
+
     if (pos < 0 || pos > kdb->k_nb)
     {
         IodeExceptionInvalidArguments error("Cannot extract Identity", "Identity position must be in range [0, " + 
@@ -21,50 +21,78 @@ Identity::Identity(const int pos, KDB* kdb)
         error.add_argument("identity position", std::to_string(pos));
         throw error;
     }
-    c_identity = extract_identity(kdb, pos);
+    
+    this->lec  = copy_char_array(KILEC(kdb, pos));
+    this->clec = clec_deep_copy(KICLEC(kdb, pos));
 }
 
 Identity::Identity(const std::string& name, KDB* kdb)
 {
-    if (!kdb) kdb = K_WS[I_IDENTITIES];
+    if (!kdb) 
+        kdb = K_WS[I_IDENTITIES];
+
     int pos = K_find(kdb, to_char_array(name));
     if (pos < 0) 
         throw IodeExceptionFunction("Cannot extract Identity", "Identity with name " + name + " does not exist.");
-    c_identity = extract_identity(kdb, pos);
+    
+    this->lec  = copy_char_array(KILEC(kdb, pos));
+    this->clec = clec_deep_copy(KICLEC(kdb, pos));
 }
 
 Identity::Identity(const std::string& lec)
 {
-    // QUESTION FOR JMP: Should I allocate c_identity->clec by default ?
-    c_identity = (IDT*) SW_nalloc(sizeof(IDT));
-    c_identity->lec = copy_string_to_char(lec);
-    c_identity->clec = L_cc(to_char_array(lec));
+    set_lec(lec);
 }
 
-Identity::Identity(const Identity& idt)
+Identity::Identity(const Identity& other)
 {
-    c_identity = (IDT*) SW_nalloc(sizeof(IDT));
-    c_identity->lec = copy_char_array(idt.c_identity->lec);
-    c_identity->clec = (CLEC*) SW_nalloc(sizeof(CLEC));
-    memcpy(c_identity->clec, idt.c_identity->clec, sizeof(CLEC));
+    copy_from_IDT_obj(static_cast<const IDT*>(&other));
 }
 
 Identity::~Identity()
 {
-    if(c_identity)
-    {
-        SW_nfree(c_identity->lec);
-        SW_nfree(c_identity->clec);
-        SW_nfree(c_identity);
-    }
+    if(this->lec)
+        SW_nfree(this->lec);
+
+    if(this->clec)
+        SW_nfree(this->clec);
+}
+
+std::string Identity::get_lec() const 
+{ 
+    return std::string(this->lec); 
+}
+
+void Identity::set_lec(const std::string& lec) 
+{
+    this->lec = copy_string_to_char(lec);
+    // L_cc returns an allocated CLEC struct pointer.
+    this->clec = L_cc(to_char_array(lec));
+}
+
+CLEC* Identity::get_clec() const 
+{ 
+    return this->clec; 
+}
+
+// required to be used in std::map
+Identity& Identity::operator=(const Identity& other)
+{
+    copy_from_IDT_obj(static_cast<const IDT*>(&other));
+    return *this;
+}
+
+bool Identity::operator==(const Identity& other) const
+{
+    return this->get_lec() == other.get_lec();
 }
 
 std::vector<std::string> Identity::get_coefficients_list(const bool create_if_not_exit)
 {
-    if(c_identity->clec == NULL)
-        throw IodeException("Please compute the identity " + std::string(c_identity->lec) + " first");
+    if(this->clec == NULL)
+        throw IodeException("Please compute the identity " + std::string(this->lec) + " first");
 
-    std::vector<std::string> coeffs = get_scalars_from_clec(c_identity->clec);
+    std::vector<std::string> coeffs = get_scalars_from_clec(this->clec);
 
     // create scalars not yet present in the Scalars Database
     if(create_if_not_exit)
@@ -85,10 +113,10 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
 
 std::vector<std::string> Identity::get_variables_list(const bool create_if_not_exit)
 {
-    if(c_identity->clec == NULL)
-        throw IodeException("Please compute the identity " + std::string(c_identity->lec) + " first");
+    if(this->clec == NULL)
+        throw IodeException("Please compute the identity " + std::string(this->lec) + " first");
 
-    std::vector<std::string> vars = get_variables_from_clec(c_identity->clec);
+    std::vector<std::string> vars = get_variables_from_clec(this->clec);
 
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
@@ -96,7 +124,7 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
         SAMPLE* sample = KSMPL(K_WS[I_VARIABLES]);
         if(sample == NULL || sample->s_nb == 0)
             throw IodeException("Cannot return the list of variables associated with the identity " + 
-                                std::string(c_identity->lec) +"\nThe global sample is not yet defined");
+                                std::string(this->lec) +"\nThe global sample is not yet defined");
 
         char* c_name;
         int nb_obs = sample->s_nb;
@@ -111,17 +139,4 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     }
 
     return vars;
-}
-
-// required to be used in std::map
-Identity& Identity::operator=(const Identity& idt)
-{
-    c_identity->lec = copy_char_array(idt.c_identity->lec);
-    c_identity->clec = L_cc(idt.c_identity->lec);
-    return *this;
-}
-
-bool Identity::operator==(const Identity& other) const
-{
-    return this->get_lec() == other.get_lec();
 }

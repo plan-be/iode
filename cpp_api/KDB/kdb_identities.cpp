@@ -36,8 +36,7 @@ int KDBIdentities::add(const std::string& name, const std::string& lec)
 
 int KDBIdentities::add(const std::string& name, const Identity& obj)
 {
-    char* c_lec = obj.c_identity->lec;
-    return KDBTemplate::add(name, c_lec);
+    return KDBTemplate::add(name, obj.lec);
 }
 
 void KDBIdentities::update(const std::string& name, const std::string& lec)
