@@ -13,6 +13,20 @@ protected:
 };
 
 
+TEST_F(LecTest, Copy)
+{
+    std::string lec = "A + 1";
+    CLEC* clec = NULL;
+    
+    clec = L_cc(to_char_array(lec));
+    SW_nfree(clec);
+
+    clec = L_cc(to_char_array(lec));
+    CLEC* copy_clec = clec_deep_copy(clec);
+    SW_nfree(clec);
+    SW_nfree(copy_clec);
+}
+
 TEST_F(LecTest, LEC)
 {
     Variable var_A = Variables.get("A");
