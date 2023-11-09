@@ -32,25 +32,26 @@ std::string KDBTables::get_title(const std::string& name) const
 
 int KDBTables::add(const std::string& name, const Table& obj)
 {
-	return KDBTemplate::add(name, obj.c_table);
+	Table table(obj);
+	return KDBTemplate::add(name, static_cast<TBL*>(&table));
 }
 
 int KDBTables::add(const std::string& name, const int nbColumns)
 {
 	// throw exception if object with passed name already exist
-	char* c_name = to_char_array(name);
-	if (K_find(get_KDB(), c_name) >= 0) throw IodeExceptionInitialization(iode_type_name + " with name " + name,  
-		iode_type_name + " with name " + name + " already exists. Use update() method instead.");
+	if (K_find(get_KDB(), to_char_array(name)) >= 0) 
+		throw IodeExceptionInitialization(iode_type_name + " with name " + name,  
+			iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
-	TBL* c_table = T_create(nbColumns);
+	Table table(nbColumns);
 
-	return KDBTemplate::add(name, c_table);
+	return KDBTemplate::add(name, static_cast<TBL*>(&table));
 }
 
-int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, std::vector<std::string>& vars, bool mode, bool files, bool date)
+int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, const std::vector<std::string>& vars, bool mode, bool files, bool date)
 {
 	std::string vars_list;
-	for (std::string& var : vars) vars_list += var + ';';
+	for (const std::string& var : vars) vars_list += var + ';';
 	vars_list += '\n';
 
 	return add(name, nbColumns, def, vars_list, mode, files, date);
@@ -59,28 +60,11 @@ int KDBTables::add(const std::string& name, const int nbColumns, const std::stri
 int KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, const std::string& lecs, bool mode, bool files, bool date)
 {
 	// throw exception if object with passed name already exist
-	char* c_name = to_char_array(name);
-	if (K_find(get_KDB(), c_name) >= 0) throw IodeExceptionInitialization(iode_type_name + " with name " + name,  
-		iode_type_name + " with name " + name + " already exists. Use update() method instead.");
+	if (K_find(get_KDB(), to_char_array(name)) >= 0) 
+		throw IodeExceptionInitialization(iode_type_name + " with name " + name,  
+			iode_type_name + " with name " + name + " already exists. Use update() method instead.");
 
-	char* c_def = to_char_array(def);
+	Table table(nbColumns, def, lecs, mode, files, date);
 
-	char* pattern = to_char_array(lecs);
-
-	// Retrieves all variable names matching one or more patterns in KV_WS (similar to grep)
-	char* lst = K_expand(I_VARIABLES, NULL, pattern, '*');
-	// Parses a string and replaces @filename and $listname by their contents
-	char** c_lecs = B_ainit_chk(lst, NULL, 0);
-
-	int c_mode = mode ? 1 : 0;
-	int c_files = files ? 1 : 0;
-	int c_date = date ? 1 : 0;
-
-	TBL* c_table = T_create(nbColumns);
-	T_auto(c_table, c_def, c_lecs, c_mode, c_files, c_date);
-
-	SCR_free(lst);
-	SCR_free_tbl((unsigned char**) c_lecs);
-
-	return KDBTemplate::add(name, c_table);
+	return KDBTemplate::add(name, static_cast<TBL*>(&table));
 }

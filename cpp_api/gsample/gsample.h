@@ -133,7 +133,7 @@ public:
 
     std::string get_title() const
     {
-        return ref_table->getTitle(0);
+        return ref_table->get_title(0);
     }
 
     std::string get_line_name(const int line) const
