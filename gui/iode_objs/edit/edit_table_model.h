@@ -48,7 +48,7 @@ public:
 
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
 
-	EnumLineType getLineType(const int row) const;
+	EnumLineType get_line_type(const int row) const;
 
 	void save();
 
@@ -56,10 +56,10 @@ public:
 	{
 		boost::hash<TBL> table_hasher;
 		if(before)
-    		hashBefore = table_hasher(*table->c_table);
+    		hashBefore = table_hasher(*table);
 		else
 		{
-			hashAfter = table_hasher(*table->c_table);
+			hashAfter = table_hasher(*table);
 			if(hashAfter != hashBefore) 
 				emit databaseModified();
 		}
@@ -67,7 +67,7 @@ public:
 
 	int appendLine(EnumLineType lineType);
 
-	int insertLine(EnumLineType lineType, const int position, const bool after);
+	int insert_line(EnumLineType lineType, const int position, const bool after);
 
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;

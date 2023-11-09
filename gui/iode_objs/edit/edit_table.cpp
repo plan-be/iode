@@ -90,8 +90,8 @@ void EditTableDialog::insert_line()
 		QModelIndexList selection = tableView->selectionModel()->selectedRows();
 		int position = (selection.count() > 0) ? selection[0].row() : -1;
 
-		int insertLineType = wInsertLineType->extractAndVerify();
-		std::string s_lineType = list_insert_types[insertLineType].toStdString();
+		int insert_lineType = wInsertLineType->extractAndVerify();
+		std::string s_lineType = list_insert_types[insert_lineType].toStdString();
 		EnumLineType lineType = mLineType.at(s_lineType);
 
 		int insertWhere = wInsertWhere->extractAndVerify();
@@ -105,12 +105,12 @@ void EditTableDialog::insert_line()
 		case INSERT_AFTER_CURRENT:
 			if(position < 0)
 				return;
-			new_pos = tables_model->insertLine(lineType, position, true);
+			new_pos = tables_model->insert_line(lineType, position, true);
 			break;
 		case INSERT_BEFORE_CURRENT:
 			if(position < 0)
 				return;
-			new_pos = tables_model->insertLine(lineType, position, false);
+			new_pos = tables_model->insert_line(lineType, position, false);
 			break;
 		default:
 			break;

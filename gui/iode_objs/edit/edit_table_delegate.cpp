@@ -5,7 +5,7 @@
 bool EditTableDelegate::is_editable(const QModelIndex& index) const
 {
 	const EditTableModel* table_model = static_cast<const EditTableModel*>(index.model());
-	EnumLineType line_type = table_model->getLineType(index.row());
+	EnumLineType line_type = table_model->get_line_type(index.row());
 	return (line_type == IT_TITLE) || (line_type == IT_CELL);
 }
 

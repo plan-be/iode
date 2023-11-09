@@ -20,7 +20,7 @@ bool TablesModel::setValue(const int row, const int column, const QVariant& valu
 	{
 		QString title = value.toString();
 		Table table = kdb->get(row);
-		table.setTitle(0, title.toStdString());
+		table.set_title(0, title.toStdString());
 		kdb->update(row, table);
 		return true;
 	}
