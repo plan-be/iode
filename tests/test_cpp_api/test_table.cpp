@@ -21,6 +21,43 @@ protected:
     }
 };
 
+
+TEST_F(TablesTest, Equivalence_C_CPP)
+{
+    TCELL* div_cells;
+    TLINE* line;
+    TCELL* cell;
+
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+
+    char* c_name = "cpp_table";
+    int nb_columns = 2;
+    std::string def = "A title";
+    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
+    bool mode = true;
+    bool files = true;
+    bool date = true;
+
+    // test if a Table object can be added to the Tables KDB via K_add()
+    Table table(nb_columns, def, vars, mode, files, date);
+    div_cells = (TCELL*) table.t_div.tl_val;
+    ASSERT_EQ(div_cells[0].tc_type, IT_LEC);
+    ASSERT_EQ(div_cells[1].tc_type, IT_LEC);
+
+    K_add(KT_WS, c_name, static_cast<TBL*>(&table));
+    int pos = K_find(KT_WS, c_name);
+    ASSERT_GT(pos, -1);
+
+    TBL* tbl = KTVAL(KT_WS, pos);    
+    ASSERT_TRUE(table_equal(table, *tbl));
+
+    // test if a Table object can be passed to the hash function for the objects of type TBL.
+    boost::hash<TBL> tbl_hasher;
+    std::size_t c_hash = tbl_hasher(*tbl);
+    std::size_t cpp_hash = tbl_hasher(static_cast<TBL>(table));
+    ASSERT_EQ(c_hash, cpp_hash);
+}
+
 TEST_F(TablesTest, Dimension)
 {
     EXPECT_EQ(table->nb_lines(), 31);
