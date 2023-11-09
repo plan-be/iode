@@ -7,7 +7,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     IodeExceptionInitialization error("GSampleOutput", "Cannot compile generalized sample " + 
                                        gsample + " according to the input table " + ref_table_name);
 
-    ref_table = new Table(ref_table_name);
+    ref_table = new Table(ref_table_name, nullptr);
 
     /* ---- see c_calc.c ----
      *      1. call COL_cc(smpl) to compile the GSAMPLE in a COLS struct, say cls.
@@ -52,7 +52,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     sample = new Sample(start_per, end_per);
 
     // Returns the number of columns for the computed table + 1.
-    int dim = COL_resize(ref_table->c_table, columns);
+    int dim = COL_resize(ref_table, columns);
     if(dim == 0) throw error;
 
     // Get filepath of each reference file
@@ -83,19 +83,19 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     // TODO JMP: please check the code to get column names below carefully.
     //           For instance, when there is only 1 file involved (current workspace), the returned column name 
     //           does not ends with '[1]' while it is the case in the old GUI. 
-    for(int row=0; row < (int) ref_table->nbLines(); row++)
+    for(int row=0; row < (int) ref_table->nb_lines(); row++)
     {
-        if(ref_table->getLineType(row) != EnumLineType::IT_CELL) continue;
+        if(ref_table->get_line_type(row) != EnumLineType::IT_CELL) continue;
         // QUESTION FOR JMP: Can we assume that the cell containing the '#' character will always be the second ?
-        if(ref_table->getCellType(row, 1) == EnumCellType::IT_STRING)
+        if(ref_table->get_cell_type(row, 1) == EnumCellType::IT_STRING)
         {
-            std::string content = ref_table->getCellContent(row, 1, false);
+            std::string content = ref_table->get_cell_content(row, 1, false);
             if(content.find('#') != std::string::npos)
             {
                 std::string column_name;
                 char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
-                int step = ref_table->nbColumns();          // to skip first column of the reference table containing text 
+                int step = ref_table->nb_columns();          // to skip first column of the reference table containing text 
                 for(int col=1; col < columns->cl_nb; col+=step)
                 {
                     column_name = std::string(COL_text(&columns->cl_cols[col], c_content, nb_files));
@@ -108,7 +108,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     }
 
     // For each table line, get line name + add a NaN value for each column
-    for(int row=0; row < (int) ref_table->nbLines(); row++)
+    for(int row=0; row < (int) ref_table->nb_lines(); row++)
     {
         // QUESTION FOR JMP: Can we always assume that 
         //                   - the first cell will contain the name of the line ?
@@ -120,9 +120,9 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         //        if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
         //        break;
         // from which I understand that you assume that the LEC expression WILL be in the second cell
-        if(ref_table->getLineType(row) == EnumLineType::IT_CELL && ref_table->getCellType(row, 1) == EnumCellType::IT_LEC)
+        if(ref_table->get_line_type(row) == EnumLineType::IT_CELL && ref_table->get_cell_type(row, 1) == EnumCellType::IT_LEC)
         {
-            line_names.push_back(ref_table->getCellContent(row, 0, false));
+            line_names.push_back(ref_table->get_cell_content(row, 0, false));
             v_line_pos_in_ref_table.push_back(row);
 
             std::vector<double> row_values(column_names.size(), L_NAN);
@@ -175,7 +175,7 @@ void GSampleTable::compute_values()
         // of a GSAMPLE (precompiled into a COLS structure). 
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
-        res = COL_exec(ref_table->c_table, line, columns);
+        res = COL_exec(ref_table, line, columns);
         if(res < 0) throw IodeExceptionInitialization("GSampleOutput", "Cannot compute value corresponding to row " + 
             std::to_string(line) + " of table " + ref_table_name);
         
@@ -203,13 +203,13 @@ bool GSampleTable::is_editable(const int line, const int col)
     // RULE 2: A cell cannot be updated if the corresponding LEC expression from the 
     //         reference table starts with 0+
     int line_ref = v_line_pos_in_ref_table.at(line);
-    std::string lec = ref_table->getCellContent(line_ref, 1, false);
+    std::string lec = ref_table->get_cell_content(line_ref, 1, false);
     if(lec.substr(0, 2) == "0+")
         return false;
 
     // RULE 3: A cell cannot be updated if the corresponding LEC expression from the 
     //         reference table does not refer to at least one variable
-    std::vector<std::string> variables = ref_table->getVariablesFromLecCell(line_ref, 1);
+    std::vector<std::string> variables = ref_table->get_variables_from_lec_cell(line_ref, 1);
     if(variables.size() == 0)
         return false;
 
@@ -284,7 +284,7 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
 
     // RULE 4: Only the first variable found in the LEC expression is updated
     // see https://iode.plan.be/doku.php?id=edit_tables for the rules
-    std::string var_to_update = ref_table->getVariablesFromLecCell(line_ref, 1).at(0);
+    std::string var_to_update = ref_table->get_variables_from_lec_cell(line_ref, 1).at(0);
 
     // get period position 
     COL column = columns->cl_cols[col_pos];
@@ -292,10 +292,10 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period());
 
     // get lec
-    std::string lec = ref_table->getCellContent(line_ref, 1, false);
+    std::string lec = ref_table->get_cell_content(line_ref, 1, false);
 
     // get divider
-    std::string div_lec = ref_table->getDividerCellContent(1, false);
+    std::string div_lec = ref_table->get_divider_cell_content(1, false);
     if(div_lec.empty())
         div_lec = "1";
 

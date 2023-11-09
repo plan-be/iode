@@ -68,7 +68,7 @@ std::vector<double> GSampleGraph::get_series_values(const int row, const int fil
     int pos;
     int period_pos;
     int col_val = 0;
-    int step = ref_table->nbColumns();          // to skip first column of the reference table containing text 
+    int step = ref_table->nb_columns();          // to skip first column of the reference table containing text 
     for(int col=1; col < columns->cl_nb; col+=step)
     {
         column = columns->cl_cols[col];

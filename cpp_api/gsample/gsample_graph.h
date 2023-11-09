@@ -34,56 +34,56 @@ public:
 
     std::string get_graph_title() const
     {
-        return ref_table->getTitle(0);
+        return ref_table->get_title(0);
     }
 
     EnumGraphGrid get_grid_xaxis() const
     {
-        return ref_table->getGridX();
+        return ref_table->get_gridx();
     }
 
     EnumGraphGrid get_grid_yaxis() const
     {
-        return ref_table->getGridY();
+        return ref_table->get_gridy();
     }
 
     double get_ymin() const
     {
-        return (double) ref_table->getYMin();
+        return (double) ref_table->t_ymin;
     }
 
     double get_ymax() const
     {
-        return (double) ref_table->getYMax();
+        return (double) ref_table->t_ymax;
     }
 
     double get_zmin() const
     {
-        return (double) ref_table->getZMin();
+        return (double) ref_table->t_zmin;
     } 
 
     double get_zmax() const
     {
-        return (double) ref_table->getZMax();
+        return (double) ref_table->t_zmax;
     }
 
     bool logScale() const
     {
-        return ref_table->getGraphAxis() == EnumGraphAxis::IG_LOG;
+        return ref_table->get_graph_axis() == EnumGraphAxis::IG_LOG;
     }
 
     EnumGraphAlign get_alignement() const
     {
-        return ref_table->getGraphAlignement();
+        return ref_table->get_graph_alignment();
     }
 
     short get_graph_box() const
     {
-        return (short) ref_table->getGraphBox();
+        return (short) ref_table->t_box;
     }
 
     short get_graph_shadow() const
     {
-        return (short) ref_table->getGraphShadow();
+        return (short) ref_table->t_shadow;
     }
 };
