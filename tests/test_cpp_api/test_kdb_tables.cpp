@@ -24,7 +24,7 @@ TEST_F(KDBTablesTest, CopyConstructor)
     std::string title = Tables.get_title("C8_1");
     std::string new_title = "modified title";
     Table table = Tables.get("C8_1");
-    table.setTitle(0, new_title);
+    table.set_title(0, new_title);
 
     // GLOBAL KDB
     KDBTables kdb_copy(Tables);
@@ -67,17 +67,17 @@ TEST_F(KDBTablesTest, Get)
 
     // by position
     Table table = Tables.get(pos);
-    EXPECT_EQ(table.getTitle(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table.nbLines(), 31);
-    EXPECT_EQ(table.nbColumns(), 2);
-    EXPECT_EQ(table.getLineType(0), IT_TITLE);
+    EXPECT_EQ(table.get_title(0), "Compte de l'ensemble des administrations publiques ");
+    EXPECT_EQ(table.nb_lines(), 31);
+    EXPECT_EQ(table.nb_columns(), 2);
+    EXPECT_EQ(table.get_line_type(0), IT_TITLE);
 
     // by name
     Table table2 = Tables.get("GFRPC");
-    EXPECT_EQ(table2.getTitle(0), "Compte de l'ensemble des administrations publiques ");
-    EXPECT_EQ(table2.nbLines(), 31);
-    EXPECT_EQ(table2.nbColumns(), 2);
-    EXPECT_EQ(table2.getLineType(0), IT_TITLE);
+    EXPECT_EQ(table2.get_title(0), "Compte de l'ensemble des administrations publiques ");
+    EXPECT_EQ(table2.nb_lines(), 31);
+    EXPECT_EQ(table2.nb_columns(), 2);
+    EXPECT_EQ(table2.get_line_type(0), IT_TITLE);
 }
 
 TEST_F(KDBTablesTest, GetNames)
@@ -121,8 +121,8 @@ TEST_F(KDBTablesTest, CreateRemove)
     int nb_lines_header = 0;
     int nb_lines_footnotes = 0;
     int nb_lines_vars = 0;
-    Table table1(name);
-    EXPECT_EQ(table1.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    Table table1(name, nullptr);
+    EXPECT_EQ(table1.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // remove table
     Tables.remove(name);
@@ -140,8 +140,8 @@ TEST_F(KDBTablesTest, CreateRemove)
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
-    Table table2(name);
-    EXPECT_EQ(table2.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    Table table2(name, nullptr);
+    EXPECT_EQ(table2.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // remove table
     Tables.remove(name);
@@ -152,8 +152,8 @@ TEST_F(KDBTablesTest, CreateRemove)
     Tables.add(name, 2, def, lecs, mode, files, date);
 
     // check that list $ENVI has been expanded
-    Table table3(name);
-    EXPECT_EQ(table3.nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    Table table3(name, nullptr);
+    EXPECT_EQ(table3.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
     // remove table
     Tables.remove(name);
 }
@@ -211,9 +211,9 @@ TEST_F(KDBTablesTest, Filter)
     int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
-    EXPECT_EQ(local_kdb->get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(Tables.get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(local_kdb->get(new_name).nbLines(), Tables.get(new_name).nbLines());
+    EXPECT_EQ(local_kdb->get(new_name).nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(Tables.get(new_name).nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(local_kdb->get(new_name).nb_lines(), Tables.get(new_name).nb_lines());
     EXPECT_EQ(local_kdb->get(new_name), Tables.get(new_name));
 
     // rename an element in the local KDB and check if the 
@@ -221,7 +221,7 @@ TEST_F(KDBTablesTest, Filter)
     std::string old_name = new_name;
     new_name = "TABLE_NEW";
     local_kdb->rename(old_name, new_name);
-    EXPECT_EQ(local_kdb->get(new_name).nbLines(), Tables.get(new_name).nbLines());
+    EXPECT_EQ(local_kdb->get(new_name).nb_lines(), Tables.get(new_name).nb_lines());
     EXPECT_EQ(local_kdb->get(new_name), Tables.get(new_name));
 
     // delete an element from the local KDB and check if it has also 
@@ -279,7 +279,7 @@ TEST_F(KDBTablesTest, HardCopy)
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
     EXPECT_TRUE(local_kdb->contains(new_name));
     EXPECT_FALSE(Tables.contains(new_name));
-    EXPECT_EQ(local_kdb->get(new_name).nbLines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(local_kdb->get(new_name).nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
@@ -324,7 +324,7 @@ TEST_F(KDBTablesTest, Merge)
     std::string name = "ANAPRIX";
     Table unmodified_table = kdb_to_merge.get(name);
     Table modified_table = kdb_to_merge.copy(name);
-    modified_table.setTitle(0, "New Title");
+    modified_table.set_title(0, "New Title");
     kdb_to_merge.update(name, modified_table);
 
     // merge (overwrite)
