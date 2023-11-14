@@ -22,6 +22,121 @@ protected:
 };
 
 
+// Test that a TBL* 'tbl' object added to KT_WS using K_add() and a TBL* 'extracted_tbl' object 
+// extracted using KTVAL() are exactly the same
+TEST_F(TablesTest, AddGetTBL)
+{
+    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
+    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+
+    // --- create a C struct TBL
+    int nb_columns = 2;
+    char* def = "A title";
+    char* vars = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG";
+    char** lecs = B_ainit_chk(vars, NULL, 0);
+    int mode = 1;
+    int files = 1;
+    int date = 1;
+
+    TBL* tbl = T_create(nb_columns);
+	T_auto(tbl, def, lecs, mode, files, date);
+	SCR_free_tbl((unsigned char**) lecs);
+
+    // --- add the table to the Tables KDB
+    char* name = "c_table";
+    K_add(KT_WS, name, tbl);
+
+    // --- extract the table from the Table KDB
+    int pos = K_find(KT_WS, name);
+    TBL* extracted_tbl = KTVAL(KT_WS, pos);
+
+    // --- check that both table are exactly the same
+    // ----- check all attributes that are not of type TLINE 
+    ASSERT_EQ(tbl->t_lang, extracted_tbl->t_lang);
+    ASSERT_EQ(tbl->t_free, extracted_tbl->t_free);
+    ASSERT_EQ(tbl->t_nc, extracted_tbl->t_nc);
+    ASSERT_EQ(tbl->t_nl, extracted_tbl->t_nl);
+    ASSERT_EQ(tbl->t_zmin, extracted_tbl->t_zmin);
+    ASSERT_EQ(tbl->t_zmax, extracted_tbl->t_zmax);
+    ASSERT_EQ(tbl->t_ymin, extracted_tbl->t_ymin);
+    ASSERT_EQ(tbl->t_ymax, extracted_tbl->t_ymax);
+    ASSERT_EQ(tbl->t_attr, extracted_tbl->t_attr);
+    ASSERT_EQ(tbl->t_box, extracted_tbl->t_box);
+    ASSERT_EQ(tbl->t_shadow, extracted_tbl->t_shadow);
+    ASSERT_EQ(tbl->t_gridx, extracted_tbl->t_gridx);
+    ASSERT_EQ(tbl->t_gridy, extracted_tbl->t_gridy);
+    ASSERT_EQ(tbl->t_axis, extracted_tbl->t_axis);
+    ASSERT_EQ(tbl->t_align, extracted_tbl->t_align);
+
+    // ----- check div line 
+    TCELL* cells_0;
+    TCELL* cells_1;
+    ASSERT_EQ(tbl->t_div.tl_type, extracted_tbl->t_div.tl_type);
+    ASSERT_EQ(tbl->t_div.tl_graph, extracted_tbl->t_div.tl_graph);
+    ASSERT_EQ(tbl->t_div.tl_axis, extracted_tbl->t_div.tl_axis);
+    ASSERT_EQ(tbl->t_div.tl_pbyte, extracted_tbl->t_div.tl_pbyte);
+    cells_0 = (TCELL*) tbl->t_div.tl_val;
+    cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
+    for(int j = 0; j < tbl->t_nc; j++)
+    {
+        ASSERT_EQ(cells_0[j].tc_type, IT_LEC);
+        ASSERT_EQ(cells_1[j].tc_type, IT_LEC);
+        ASSERT_EQ(cells_1[0].tc_type, IT_LEC);
+        ASSERT_EQ(cells_1[1].tc_type, IT_LEC);
+        ASSERT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+        ASSERT_EQ(cells_0[j].tc_attr, KT_LEFT);
+        ASSERT_EQ(cells_1[0].tc_attr, KT_LEFT);
+        ASSERT_EQ(cells_1[1].tc_attr, KT_LEFT);
+        ASSERT_EQ(std::string(T_cell_cont(cells_0, j)), std::string(T_cell_cont(cells_1, j)));
+    }
+
+    // ----- check all lines 
+    TLINE* line_0;
+    TLINE* line_1;
+    for(int i = 0; i < tbl->t_nl; i++)
+    {
+        line_0 = tbl->t_line + i;
+        line_1 = extracted_tbl->t_line + i;
+
+        ASSERT_EQ(line_0->tl_type, line_1->tl_type);
+        ASSERT_EQ(line_0->tl_graph, line_1->tl_graph);
+        ASSERT_EQ(line_0->tl_axis, line_1->tl_axis);
+        ASSERT_EQ(line_0->tl_pbyte, line_1->tl_pbyte);
+
+        cells_0 = (TCELL*) line_0->tl_val;
+        cells_1 = (TCELL*) line_1->tl_val;
+        switch (line_0->tl_type)
+        {
+        case EnumLineType::IT_TITLE:
+            ASSERT_EQ(std::string(T_cell_cont(cells_0, 0)), std::string(T_cell_cont(cells_1, 0)));
+            break;
+        case EnumLineType::IT_CELL:
+            for(int j = 0; j < tbl->t_nc; j++)
+            {
+                ASSERT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);
+                ASSERT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+                if(i == 2 && j == 0)
+                {
+                    ASSERT_EQ(cells_0[j].tc_attr, KT_LEFT);
+                    ASSERT_EQ(cells_1[j].tc_attr, KT_LEFT);
+                }
+                else
+                    ASSERT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+                ASSERT_EQ(std::string(T_cell_cont(cells_0, j)), std::string(T_cell_cont(cells_1, j)));
+            }
+            break;
+        default:
+            ASSERT_TRUE(cells_0 == NULL);
+            ASSERT_TRUE(cells_1 == NULL);
+            break;
+        }
+    }
+
+    // --- free memory
+    T_free(tbl);
+    T_free(extracted_tbl);
+}
+
 TEST_F(TablesTest, Equivalence_C_CPP)
 {
     TCELL* div_cells;
