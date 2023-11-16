@@ -51,6 +51,55 @@ void init_iode_objs(nb::module_ &m)
         .def("__str__", &Scalar::to_string)
         .def("__repr__", &Scalar::to_string);
 
+    nb::class_<Table>(m, "Table")
+        .def_prop_ro("nb_columns", &Table::nb_columns)
+        .def_prop_ro("nb_lines", &Table::nb_lines)
+        .def_prop_rw("language", &Table::get_language, &Table::set_language)
+        .def_prop_rw("gridx", &Table::get_gridx, &Table::set_gridx)
+        .def_prop_rw("gridy", &Table::get_gridy, &Table::set_gridy)
+        .def_prop_rw("graph_axis", &Table::get_graph_axis, &Table::set_graph_axis)
+        .def_prop_rw("graph_alignment", &Table::get_graph_alignment, &Table::set_graph_alignment)
+        .def("get_line_type", &Table::get_line_type, nb::arg("row"))
+        // DIVIDER line
+        .def("divider_cell_content", &Table::get_divider_cell_content, nb::arg("column"), nb::arg("quotes"))
+        .def("set_cell_divider_text", &Table::set_cell_divider_text, nb::arg("column"), nb::arg("text"))
+        .def("set_cell_divider_lec", &Table::set_cell_divider_lec, nb::arg("column"), nb::arg("lec"))
+        // TITLE lines
+        .def("add_title", &Table::add_title, nb::arg("title"))
+        .def("insert_title", &Table::insert_title, nb::arg("pos"), nb::arg("title"), nb::arg("after") = true)
+        .def("get_title", &Table::get_title, nb::arg("row"))
+        .def("set_title", &Table::set_title, nb::arg("row"), nb::arg("title"))
+        // CELLS lines
+        .def("add_line_with_cells", &Table::add_line_with_cells)
+        .def("insert_line_with_cells", &Table::insert_line_with_cells, nb::arg("pos"), nb::arg("after") = true)
+        .def("get_cell_type", nb::overload_cast<const int, const int>(&Table::get_cell_type, nb::const_), 
+            nb::arg("row"), nb::arg("column"))
+        .def("get_cell_align", nb::overload_cast<const int, const int>(&Table::get_cell_align, nb::const_), 
+            nb::arg("row"), nb::arg("column"))
+        .def("get_cell_font", nb::overload_cast<const int, const int>(&Table::get_cell_font, nb::const_), 
+            nb::arg("row"), nb::arg("column"))
+        .def("get_cell_content", nb::overload_cast<const int, const int, const bool>(&Table::get_cell_content, nb::const_), 
+            nb::arg("row"), nb::arg("column"), nb::arg("quotes") = false)
+        .def("set_cell_content", nb::overload_cast<const int, const int, const std::string&>(&Table::set_cell_content), 
+            nb::arg("row"), nb::arg("column"), nb::arg("content"))
+        .def("get_variables_from_lec_cell", &Table::get_variables_from_lec_cell, nb::arg("row"), nb::arg("column"))
+    	// SEPARATOR lines
+        .def("insert_line_separator", &Table::insert_line_separator , nb::arg("pos"), nb::arg("after") = true)
+        .def("add_line_separator", &Table::add_line_separator)
+        // MODE line
+        .def("insert_line_mode", &Table::insert_line_mode, nb::arg("pos"), nb::arg("after") = true)
+        .def("add_line_mode", &Table::add_line_mode)
+        // FILES line
+        .def("insert_line_files", &Table::insert_line_files, nb::arg("pos"), nb::arg("after") = true)
+        .def("add_line_files", &Table::add_line_files)
+        // DATE line
+        .def("insert_line_date", &Table::insert_line_date, nb::arg("pos"), nb::arg("after") = true)
+        .def("add_line_date", &Table::add_line_date)
+        // other methods
+        .def(nb::self == nb::self);
+        // .def("__str__", &Table::to_string)
+        // .def("__repr__", &Table::to_string);
+
     // IODE objects getters
 
     m.def("get_cmt", [](const std::string& name) { return Comments.get(name); }, nb::arg("name"), "Get an IODE comment");
