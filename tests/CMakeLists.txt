@@ -2,8 +2,14 @@
 # project specific logic here.
 #
 
-add_subdirectory(test_c_api)
-add_subdirectory(test_cpp_api)
+if(NOT SKBUILD)
+    add_subdirectory(test_c_api)
+    add_subdirectory(test_cpp_api)
+endif()
+
 add_subdirectory(test_python)
 add_subdirectory(test_nanobind)
-add_subdirectory(sandbox)
+
+if(NOT SKBUILD)
+    add_subdirectory(sandbox)
+endif()
