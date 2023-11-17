@@ -31,6 +31,9 @@ if(Python_FOUND)
 
         target_link_libraries(iode_python_api PRIVATE iode_cpp_api)
 
+        # Install directive for scikit-build-core
+        install(TARGETS iode_python_api LIBRARY DESTINATION iode)
+
         message(STATUS "New target iode_python_api enabled\n")
     else()
         message(CHECK_FAIL "not found")
