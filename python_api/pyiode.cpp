@@ -17,7 +17,7 @@ namespace nb = nanobind;
 // To see how to split build of a large Python module, read the link below:
 // https://nanobind.readthedocs.io/en/latest/faq.html#how-can-i-reduce-build-time 
 
-NB_MODULE(iode, m) 
+NB_MODULE(iode_python_api, m) 
 {
       init_constants(m);
       init_sample(m);
