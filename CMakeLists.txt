@@ -13,15 +13,17 @@ cmake_minimum_required (VERSION 3.24)
 # ---- dependencies ----
 
 # -- Google Test --
-# lines below declares a dependency on GoogleTest which is downloaded from GitHub and installed
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+if(NOT SKBUILD)
+  # lines below declares a dependency on GoogleTest which is downloaded from GitHub and installed
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+  )
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+endif()
 
 # ---- main project ----
 project ("iode" VERSION 7.0 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAGES C CXX)
@@ -30,6 +32,8 @@ project ("iode" VERSION 7.0 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAG
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
 set(IODE_EMAIL "ald@plan.be; gb@plan.be; jmarc.paul@gmail.com")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
+
+set(CMAKE_INSTALL_MESSAGE ALWAYS)
 
 # -- resources directory --
 set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
@@ -53,6 +57,7 @@ message(STATUS "C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 if(MSVC)
   message(STATUS "MSVC version:       ${MSVC_VERSION}")
 endif()
+message(STATUS "install prefix:     ${CMAKE_INSTALL_PREFIX}")
 if(IODE_ENABLE_SANITIZER)
   message(STATUS "Sanitize:           Yes")
 else()
@@ -217,18 +222,20 @@ endif()
 message(STATUS " ")
 
 # -- find Qt --
-message(CHECK_START "Search for Qt6 package")
-if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    list(APPEND CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
-endif()
-find_package(Qt6 COMPONENTS Core Widgets Gui Charts PrintSupport)
+if(NOT SKBUILD)
+  message(CHECK_START "Search for Qt6 package")
+  if (CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+      list(APPEND CMAKE_PREFIX_PATH "C:\\Qt\\6.4.0\\msvc2019_64;C:\\Qt\\6.4.2\\msvc2019_64")
+  endif()
+  find_package(Qt6 COMPONENTS Core Widgets Gui Charts PrintSupport)
 
-if(Qt6_FOUND)
-  message(CHECK_PASS "found")
-else()
-  message(CHECK_FAIL "not found")
+  if(Qt6_FOUND)
+    message(CHECK_PASS "found")
+  else()
+    message(CHECK_FAIL "not found")
+  endif()
+  message(STATUS " ")
 endif()
-message(STATUS " ")
 
 # -- find Python --
 message(CHECK_START "Search for Python")
@@ -277,18 +284,22 @@ add_subdirectory ("api")
 add_subdirectory ("cpp_api")
 
 # ---- executables ----
-set(IODE_CLI_TARGET iodecmd)
-add_subdirectory ("cmd")
-set(IODE_GUI_TARGET iode_gui)
-add_subdirectory ("gui")
-add_subdirectory ("pyiode")
+if(NOT SKBUILD)
+  set(IODE_CLI_TARGET iodecmd)
+  add_subdirectory ("cmd")
+  set(IODE_GUI_TARGET iode_gui)
+  add_subdirectory ("gui")
+  add_subdirectory ("pyiode")
+  endif()
 add_subdirectory ("python_api")
 
 # ---- tests ----
 add_subdirectory ("tests")
 
 # ---- user doc ----
-add_subdirectory ("doc")
+if(NOT SKBUILD)
+  add_subdirectory ("doc")
+endif()
 
 # -- nsis installer --
 if(TARGET ${IODE_GUI_TARGET})
