@@ -232,7 +232,8 @@ message(STATUS " ")
 
 # -- find Python --
 message(CHECK_START "Search for Python")
-find_package(Python 3.9 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module 
+                    OPTIONAL_COMPONENTS Development.SABIModule)
 if(Python_FOUND)
   message(CHECK_PASS "found")
   message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")

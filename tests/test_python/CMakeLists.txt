@@ -1,10 +1,6 @@
 message(STATUS "\n---- TESTS PYTHON ----\n")
 
-message(CHECK_START "Search for Python")
-find_package(Python COMPONENTS Interpreter Development)
-
 if(Python_FOUND AND TARGET iode_python)
-  message(CHECK_PASS "found")
   message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
 
   set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
@@ -23,5 +19,5 @@ if(Python_FOUND AND TARGET iode_python)
        FILES_MATCHING PATTERN "*.py")
 
   else()
-  message(CHECK_FAIL "not found")
+  message(STATUS "Python not found")
 endif()
