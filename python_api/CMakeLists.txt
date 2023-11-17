@@ -22,19 +22,19 @@ if(Python_FOUND)
     if(nanobind_FOUND)
         message(CHECK_PASS "found")
         
-        nanobind_add_module(iode py_numpy.h 
-                                 py_constants.h     py_constants.cpp 
-                                 py_sample.h        py_sample.cpp 
-                                 py_ws.h            py_ws.cpp
-                                 py_objs.h          py_objs.cpp 
-                                                    pyiode.cpp)
+        nanobind_add_module(iode_python_api py_numpy.h 
+                                            py_constants.h     py_constants.cpp 
+                                            py_sample.h        py_sample.cpp 
+                                            py_ws.h            py_ws.cpp
+                                            py_objs.h          py_objs.cpp 
+                                                               pyiode.cpp)
 
-        target_link_libraries(iode PRIVATE iode_cpp_api)
+        target_link_libraries(iode_python_api PRIVATE iode_cpp_api)
 
-        message(STATUS "New target iode enabled\n")
+        message(STATUS "New target iode_python_api enabled\n")
     else()
         message(CHECK_FAIL "not found")
-        message(WARNING "Could not create the target iode\n")
+        message(WARNING "Could not create the target iode_python_api\n")
     endif()
 else()
     message(WARNING "Python not found")
