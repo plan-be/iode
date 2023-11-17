@@ -325,6 +325,8 @@ paket-files/
 __pycache__/
 *.pyc
 *.pyd
+pyproject.toml
+**/*.whl
 
 # Cake - Uncomment if you are using it
 # tools/**
