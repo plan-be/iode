@@ -36,7 +36,7 @@ void IodeReportEditor::run(const QString& filepath, const QString& parameters, c
         QDir::setCurrent(QFileInfo(filepath).absolutePath());
 
         // executes IODE report
-        execute_report(filepath.toStdString(), parameters.toStdString());
+        execute_report(filepath.toLocal8Bit().toStdString(), parameters.toStdString());
 
         // reset current directory execution to project directory (chdir)
         QDir::setCurrent(currentProjectDir);
