@@ -186,39 +186,6 @@ Section "IODE ${VERSION} executable" SecInstall
 SectionEnd
 
 ;--------------------------------
-; Python (disabled by default)
-Section /o "IODE-Python 3.9"  SecPython39
-
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR\python_3_9
-
-  ; Put file there
-  File "<PYTHON 3.9 DIR>\iode.pyd"
-SectionEnd
-
-;--------------------------------
-; Python (disabled by default)
-Section /o "IODE-Python 3.10"  SecPython310
-
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR\python_3_10
-
-  ; Put file there
-  File "<PYTHON 3.10 DIR>\iode.pyd"
-SectionEnd
-
-;--------------------------------
-; Python (disabled by default)
-Section /o "IODE-Python 3.11"  SecPython311
-
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR\python_3_11
-
-  ; Put file there
-  File "<PYTHON 3.11 DIR>\iode.pyd"
-SectionEnd
-
-;--------------------------------
 ; Desktop Icon (disabled by default)
 Section /o "Desktop Icon" SecDesktopIcon
   CreateShortCut "$DESKTOP\IODE ${VERSION}.lnk" "$INSTDIR\${EXE_GUI}" "" "$INSTDIR\${EXE_GUI}" 0
@@ -306,30 +273,6 @@ Section "Uninstall" SecUninstall
     Delete "$DESKTOP\IODE ${VERSION}.lnk"
   DesktopIconPass:
 
-  ;Python 3.9
-  IfFileExists "$INSTDIR\python_3_9" Py39Exists Py39Pass
-  Py39Exists:
-    DetailPrint "Removing IODE-PYTHON 3.9"
-    Delete "$INSTDIR\python_3_9\*.*"
-    RMDir "$INSTDIR\python_3_9"
-  Py39Pass:
-
-  ;Python 3.10
-  IfFileExists "$INSTDIR\python_3_10" Py310Exists Py310Pass
-  Py310Exists:
-    DetailPrint "Removing IODE-PYTHON 3.10"
-    Delete "$INSTDIR\python_3_10\*.*"
-    RMDir "$INSTDIR\python_3_10"
-  Py310Pass:
-
-  ;Python 3.11
-  IfFileExists "$INSTDIR\python_3_11" Py311Exists Py311Pass
-  Py311Exists:
-    DetailPrint "Removing IODE-PYTHON 3.11"
-    Delete "$INSTDIR\python_3_11\*.*"
-    RMDir "$INSTDIR\python_3_11"
-  Py311Pass:
-
   ;Example
   IfFileExists "$INSTDIR\example\fun.var" FunExists FunPass
   FunExists:
@@ -380,9 +323,6 @@ SectionEnd
 ;Descriptions
 LangString DESC_SecInstall ${LANG_ENGLISH} "Iode Executable and manuals"
 LangString DESC_DesktopIcon ${LANG_ENGLISH} "Desktop icon for IODE."
-LangString DESC_SecPython39 ${LANG_ENGLISH} "IODE-Python 3.9"
-LangString DESC_SecPython310 ${LANG_ENGLISH} "IODE-Python 3.10"
-LangString DESC_SecPython311 ${LANG_ENGLISH} "IODE-Python 3.11"
 LangString DESC_SecExample ${LANG_ENGLISH} "IODE example model (FUN)"
 LangString DESC_SecSyntax ${LANG_ENGLISH} "Textpad and Notepad++ syntax files for IODE reports"
 
@@ -390,9 +330,6 @@ LangString DESC_SecSyntax ${LANG_ENGLISH} "Textpad and Notepad++ syntax files fo
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecInstall} $(DESC_SecInstall)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDesktopIcon} $(DESC_DesktopIcon)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecPython39} $(DESC_SecPython39)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecPython310} $(DESC_SecPython310)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecPython311} $(DESC_SecPython311)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExample} $(DESC_SecExample)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSyntax} $(DESC_SecSyntax)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
