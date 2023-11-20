@@ -136,8 +136,8 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 {
 	K* kdb_ = kdb_global ? kdb_global : kdb_external;
 
-	std::string s_filepath = filepath.toLocal8Bit().toStdString();
-	int type_ = kdb_ ? kdb_->get_iode_type() : get_iode_file_type(s_filepath);
+	std::string std_filepath = filepath.toLocal8Bit().toStdString();
+	int type_ = kdb_ ? kdb_->get_iode_type() : get_iode_file_type(std_filepath);
 
 	if (type_ < 0 || type_ > I_VARIABLES) 
 		return false;
@@ -146,7 +146,8 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 
 	try
 	{
-		s_filepath = check_filepath(s_filepath, (EnumIodeFile) iodeType, "load file", true);
+		// NOTE: check_filepath() converts to absolute path
+		std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "load file", true);
 
 		if(!forceOverwrite && is_global_kdb_loaded(iodeType))
 		{
@@ -157,7 +158,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 			if(answer == QMessageBox::No) return false;
 		}
 		// load Iode file
-		load_global_kdb(iodeType, s_filepath);
+		load_global_kdb(iodeType, std_filepath);
 		return true;
 	}
 	catch (const std::exception& e)
@@ -192,19 +193,16 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 		QString filepath = askFilepath(projectDir);
 		// filepath is empty if the user clicked on the Discard button
 		if (filepath.isEmpty()) return "";
-		std_filepath = filepath.toStdString();
+		std_filepath = filepath.toLocal8Bit().toStdString();
 	}
 	
+	// NOTE: check_filepath() converts to absolute path
 	std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "tab " + vIodeTypes[iodeType], false);
-
-	QFileInfo fileInfo(QString::fromStdString(std_filepath));
-	QString fullPath = fileInfo.absoluteFilePath();
 
 	try
 	{
-		kdb_->set_filename(fullPath.toStdString());
-		std::string full_path = fullPath.toStdString();
-		kdb_->save(full_path);
+		kdb_->set_filename(std_filepath);
+		kdb_->save(std_filepath);
 	}
 	catch (const IodeException& e)
 	{
@@ -212,6 +210,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 		return "";
 	}
 
+	QString fullPath = QString::fromLocal8Bit(QByteArray(std_filepath.c_str())); 
 	return fullPath;
 }
 
@@ -232,7 +231,7 @@ QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 	// call the save method
 	filepath = save(projectDir, filepath);
 	// update KDB filename
-	if (!filepath.isEmpty()) kdb_->set_filename(filepath.toStdString());
+	if (!filepath.isEmpty()) kdb_->set_filename(filepath.toLocal8Bit().toStdString());
 	return filepath;
 }
 

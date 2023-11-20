@@ -51,7 +51,7 @@ protected:
         }
 
         // check if correct extension
-        if(get_iode_file_type(filepath.toStdString()) != fileType)
+        if(get_iode_file_type(filepath.toLocal8Bit().toStdString()) != fileType)
         {
             QString filename = fileInfo.fileName(); 
             QString ext = fileInfo.suffix();

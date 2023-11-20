@@ -118,7 +118,7 @@ public:
     {
         if(checkNewFilepath(filepath))
         {
-            set_kdb_filename(K_WS[fileType], filepath.toStdString());
+            set_kdb_filename(K_WS[fileType], filepath.toLocal8Bit().toStdString());
             modified = false;
             emit tabDatabaseModified(iodeType, false);
             return true;

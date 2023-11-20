@@ -142,7 +142,10 @@ public:
 	{
 		// NOTE: we don't simply use kdb since it may point to kdb_filter
 		K* kdb_ = kdb_global ? kdb_global : kdb_external;
-		return kdb_ ? QString::fromStdString(kdb_->get_filename()) : "";
+		if(!kdb)
+			return "";
+		QString filepath = QString::fromLocal8Bit(QByteArray(kdb_->get_filename().c_str())); 
+		return filepath;
 	}
 
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
