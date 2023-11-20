@@ -261,13 +261,14 @@ public:
 
             int row=0; 
             int column=0;
+            QString var_name;
             foreach(const QString& line, lines)
             {
                 QList<QString> cells = line.split("\t");
 
-                std::string var_name = cells.takeFirst().toStdString();
+                var_name = cells.takeFirst().trimmed();
                 // raises an error if the the variable name is not found
-                row = Variables.get_position(var_name);
+                row = Variables.get_position(var_name.toStdString());
 
                 column = start_column;
                 foreach(const QString& value, cells)
