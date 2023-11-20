@@ -22,12 +22,27 @@ if(Python_FOUND)
     if(nanobind_FOUND)
         message(CHECK_PASS "found")
         
-        nanobind_add_module(iode_python_api py_numpy.h 
-                                            py_constants.h     py_constants.cpp 
-                                            py_sample.h        py_sample.cpp 
-                                            py_ws.h            py_ws.cpp
-                                            py_objs.h          py_objs.cpp 
-                                                               pyiode.cpp)
+        nanobind_add_module(iode_python_api 
+        
+                            # Target the stable ABI for Python 3.12+, which reduces
+                            # the number of binary wheels that must be built. This
+                            # does nothing on older Python versions
+                            STABLE_ABI
+
+                            # Build libnanobind statically and merge it into the
+                            # extension (which itself remains a shared library)
+                            #
+                            # If your project builds multiple extensions, you can
+                            # replace this flag by NB_SHARED to conserve space by
+                            # reusing a shared libnanobind across libraries
+                            NB_STATIC
+        
+                            py_numpy.h 
+                            py_constants.h     py_constants.cpp 
+                            py_sample.h        py_sample.cpp 
+                            py_ws.h            py_ws.cpp
+                            py_objs.h          py_objs.cpp 
+                                               pyiode.cpp)
 
         target_link_libraries(iode_python_api PRIVATE iode_cpp_api)
 
