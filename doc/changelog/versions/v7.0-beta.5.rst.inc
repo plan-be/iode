@@ -30,6 +30,7 @@ Fixed Bugs 🛠️
   * (GUI) Fixed interface crashing when the user tries to clear a KDB while the filter is used (#404) 
   * (GUI) Fixed copy/paste variables from Excel returning an error when the variable's name contains 
           leading and/or trailing spaces (#414)
+  * (GUI) Fixed running an IODE report when the path or the filename contains special characters (#415)
 
 
 Miscellaneous 🤷‍♀️
