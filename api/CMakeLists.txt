@@ -4,6 +4,9 @@
 
 message(STATUS "\n---- C API ----\n")
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
+
+
 add_library(iode_c_api STATIC "")
 
 # Add source to this project's library.
