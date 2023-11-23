@@ -30,6 +30,9 @@ if(Python_FOUND)
         file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.tbl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
         file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.var DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
         
+        # set __version__ for the iode package
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode/_version.py)
+
         nanobind_add_module(iode_python_api 
         
                             # Target the stable ABI for Python 3.12+, which reduces
