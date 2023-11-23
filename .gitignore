@@ -405,6 +405,7 @@ keyboard_shortcuts.*
 *.bak
 *.prf
 *.$$$
+/api/version.h
 /tests/**/*.ini
 /pyiode/iode.c
 /pyiode/cythonize_iode.py
