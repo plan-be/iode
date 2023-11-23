@@ -14,12 +14,13 @@
   <br> Ask maintainers to get access.
 
 - C++ libraries:
-  - Boost (>= 1.74). 
+  - Boost (>= 1.74).
+  <br> Please install it in C:/boost.
   <br> Can be installed with Chocolatey. 
   <br> Install the package corresponding to your VS version by checking [here](https://community.chocolatey.org/packages?q=boost):
-    > choco install boost-msvc-14.X
+    > choco install boost-msvc-14.X --install-directory 'C:\boost'
   - [Qt 6.4](https://www.qt.io/download)
-  <br> Please install Qt in C:/Qt.
+  <br> Please install it in C:/Qt.
 
  - Python libraries:
    - cython
