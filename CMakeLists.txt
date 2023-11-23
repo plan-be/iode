@@ -26,7 +26,7 @@ if(NOT SKBUILD)
 endif()
 
 # ---- main project ----
-project ("iode" VERSION 7.0 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAGES C CXX)
+project ("iode" VERSION 7.0.0 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGUAGES C CXX)
 
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
