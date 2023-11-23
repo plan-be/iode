@@ -18,6 +18,14 @@ IODE_DATA_DIR = Path("../data").absolute()
 IODE_OUTPUT_DIR = Path("../output").absolute()
 IODE_VERBOSE = 1
 
+nanobind = False
+try:
+    from iode import TEST_DATA_DIR
+    IODE_DATA_DIR = TEST_DATA_DIR
+    nanobind = True
+except:
+    pass
+
 
 # MISC FUNCTIONS
 # --------------
