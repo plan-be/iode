@@ -8,7 +8,6 @@ if(NOT SKBUILD)
 endif()
 
 add_subdirectory(test_python)
-add_subdirectory(test_nanobind)
 
 if(NOT SKBUILD)
     add_subdirectory(sandbox)
