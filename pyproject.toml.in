@@ -45,7 +45,11 @@ cmake.targets = ["iode_python_api"]
 # The final path element is the package.
 wheel.packages = ["python_api/iode"]
 
-sdist.include = ["data"]
+# Scikit-build-core defaults to using your .gitignore to select what to exclude from 
+# the source distribution. However, sdist.include and sdist.exclude can be used to 
+# override this behavior
+sdist.include = ["_version.py", "data"]
+sdist.exclude = ["_version.py.in"]
 
 # The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are
 # possible options.
