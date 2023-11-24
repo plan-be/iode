@@ -1,5 +1,6 @@
 #pragma once
 #include "period.h"
+#include <stdexcept>
 #include <boost/functional/hash.hpp>
 
 
@@ -48,7 +49,11 @@ public:
 
 	int get_period_position(const Period& period) const
 	{
-		return period.difference(start_period());
+		int t = period.difference(start_period());
+		if(t < 0 || t >= nb_periods())
+			throw std::out_of_range("The period " + period.to_string() + 
+				" is not in the sample " + to_string());
+		return t;
 	}
 
 	int get_period_position(const std::string& period) const
