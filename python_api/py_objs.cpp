@@ -105,6 +105,16 @@ void init_iode_objs(nb::module_ &m)
 
     m.def("get_var_as_ndarray", &get_var_as_ndarray, nb::rv_policy::reference, nb::arg("name"),     "Get an IODE variable in a numpy ndarray");
     m.def("get_var_as_ndarray_copy", &get_var_as_ndarray, nb::rv_policy::copy, nb::arg("name"),     "Get a copy of an IODE variable in a numpy ndarray");
+    
+    m.def("__set_var_from_ndarray", &__set_var_from_ndarray, nb::arg("name"), nb::arg("first_period"), 
+          nb::arg("last_period"), nb::arg("array"));
+    m.def("__set_var_from_ndarray_contiguous", &__set_var_from_ndarray_contiguous, nb::arg("name"), 
+          nb::arg("first_period"), nb::arg("last_period"), nb::arg("array"));
+
+    m.def("__set_vars_from_ndarray", &__set_vars_from_ndarray, nb::arg("names"), nb::arg("first_period"), 
+          nb::arg("last_period"), nb::arg("array"));
+    m.def("__set_vars_from_ndarray_contiguous", &__set_vars_from_ndarray_contiguous, nb::arg("names"), 
+          nb::arg("first_period"), nb::arg("last_period"), nb::arg("array"));
 
     // IODE objects delete
 
