@@ -31,13 +31,19 @@ Sample::Sample(const std::string str_start_period, std::string str_end_period)
 
 Sample::Sample(PERIOD* c_start_period, PERIOD* c_end_period)
 {
+    if(c_start_period == NULL)
+        throw std::invalid_argument("Cannot set sample. Passed start period is empty");
+    if(c_end_period == NULL)
+        throw std::invalid_argument("Cannot set sample. Passed end period is empty");
+
     c_sample = PER_pertosmpl(c_start_period, c_end_period);
 }
 
 Sample::Sample(SAMPLE* c_sample)
 {
     if(c_sample == NULL) 
-        throw IodeExceptionInitialization("Sample", "Sample not yet initialized");
+        throw std::invalid_argument("Cannot set sample. The passed pointer is NULL");
+    
     this->c_sample = (SAMPLE*) SW_nalloc(sizeof(SAMPLE));
     memcpy(this->c_sample, c_sample, sizeof(SAMPLE));
 }
