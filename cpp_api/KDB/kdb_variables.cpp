@@ -152,6 +152,11 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 
 int KDBVariables::add(const std::string& name, const Variable& variable)
 {
+	if(get_nb_periods() == 0)
+		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
+
+	check_var_size("add", name, variable);
+
 	int var_size = (int) variable.size();
 	return KDBTemplate::add(name, variable.data(), &var_size);
 }
@@ -164,20 +169,62 @@ int KDBVariables::add(const std::string& name, const std::string& lec)
 
 void KDBVariables::update(const int pos, const Variable& variable)
 {
-	int var_size = (int) variable.size();
-	KDBTemplate::update(pos, variable.data(), &var_size);
+	std::string name = get_name(pos);
+	update(name, variable);
+}
+
+void KDBVariables::update(const int pos, const int t, const Variable& values)
+{
+	std::string name = get_name(pos);
+	update(name, t, values);
+}
+
+void KDBVariables::update(const int pos, const std::string& period, const Variable& values)
+{
+	std::string name = get_name(pos);
+	update(name, period, values);
 }
 
 void KDBVariables::update(const int pos, const std::string& lec)
 {
-	Variable var = new_var_from_lec(lec);
-	update(pos, var);
+	std::string name = get_name(pos);
+	update(name, lec);
 }
 
 void KDBVariables::update(const std::string& name, const Variable& variable)
 {
 	int var_size = (int) variable.size();
+	check_var_size("update", name, variable);
 	KDBTemplate::update(name, variable.data(), &var_size);
+}
+
+void KDBVariables::update(const std::string& name, const int t, const Variable& values)
+{
+	int nb_periods = get_nb_periods();
+
+	// check if vector of values too long
+	// position of the last period of the sample is (sample_size - 1)
+	if((t + values.size() - 1) > (nb_periods - 1))
+	{
+		std::string period = get_period(t);
+		throw std::range_error("Cannot update " + std::to_string(values.size()) + " values " + 
+				"of the Variable '" + name + "' starting from period " + period + ".\n" + 
+				"Too much values to copy");
+	}
+
+	// prepare new Variable vector	
+	Variable variable = get(name);
+	for(int i=0; i < values.size(); i++)
+		variable[t + i] = values[i];
+
+	// update the variable
+	update(name, variable);
+}
+
+void KDBVariables::update(const std::string& name, const std::string& period, const Variable& values)
+{
+	int t = get_sample().get_period_position(period);
+	update(name, t, values);
 }
 
 void KDBVariables::update(const std::string& name, const std::string& lec)
