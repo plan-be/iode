@@ -121,6 +121,8 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	if (sample.nb_periods() == 0) throw IodeExceptionInitialization("variable", 
 		"Variables sample has not been yet defined");
 
+	var.reserve(sample.nb_periods());
+
 	if (lec.empty())
 	{
 		for (int t = 0; t < sample.nb_periods(); t++) var.push_back(L_NAN);
