@@ -27,6 +27,15 @@ class KDBVariables : public KDBTemplate<Variable>
 private:
     Variable new_var_from_lec(const std::string& lec);
 
+    void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
+    {
+        int nb_periods = get_nb_periods();
+	    if(variable.size() != nb_periods)
+		throw std::length_error("Cannot " + action + " Variable '" + name + "'.\nThe size of the passed " +
+			    "vector for values is " + std::to_string(variable.size()) + " while the number of " + 
+			    "periods is " + std::to_string(nb_periods));
+    }
+
 protected:
 
     Variable copy_obj(const Variable& original) const override;
@@ -85,9 +94,17 @@ public:
 
     void update(const int pos, const Variable& variable);
 
+    void update(const int pos, const int t, const Variable& values);
+
+    void update(const int pos, const std::string& period, const Variable& values);
+
     void update(const int pos, const std::string& lec);
 
     void update(const std::string& name, const Variable& variable);
+
+    void update(const std::string& name, const int t, const Variable& values);
+
+    void update(const std::string& name, const std::string& period, const Variable& values);
 
     void update(const std::string& name, const std::string& lec);
 
