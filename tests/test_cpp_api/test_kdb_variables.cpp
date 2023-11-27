@@ -259,7 +259,8 @@ TEST_F(KDBVariablesTest, CreateRemove)
     // pass a vector with values
     Variable new_var;
     new_var.reserve(nb_periods);
-    for (int p = 0; p < nb_periods; p++) new_var.push_back(10. + p);
+    for (int p = 0; p < nb_periods; p++) 
+        new_var.push_back(10. + p);
 
     Variables.add(new_name, new_var);
     EXPECT_EQ(Variables.get(new_name), new_var);
@@ -271,14 +272,21 @@ TEST_F(KDBVariablesTest, CreateRemove)
     Variables.remove(new_name);
     EXPECT_THROW(Variables.get(new_name), IodeExceptionFunction);
 
+    // --- wrong vector size
+    new_var.pop_back();
+    EXPECT_THROW(Variables.add(new_name, new_var), std::length_error);
+
     // pass a LEC expression
-    for (int p = 0; p < nb_periods; p++) new_var[p] = 10. + p;
+    new_var.clear();
+    for (int p = 0; p < nb_periods; p++) 
+        new_var.push_back(10. + p);
     Variables.add(new_name, "10 + t");
     EXPECT_EQ(Variables.get(new_name), new_var);
     Variables.remove(new_name);
     
     new_var[0] = L_NAN;
-    for (int p = 1; p < nb_periods; p++) new_var[p] = 1. / p;
+    for (int p = 1; p < nb_periods; p++) 
+        new_var[p] = 1. / p;
     Variables.add(new_name, "1 / t");
     EXPECT_EQ(Variables.get(new_name), new_var);
     Variables.remove(new_name);
@@ -290,7 +298,7 @@ TEST_F(KDBVariablesTest, CreateRemove)
 
     // --- using function that does not exist
     EXPECT_THROW(Variables.add("FAILS", "func(t)"), IodeExceptionFunction);
-    // --- using variable taht does not exist
+    // --- using variable that does not exist
     EXPECT_THROW(Variables.add("FAILS", "ln Z"), IodeExceptionFunction);
 }
 
