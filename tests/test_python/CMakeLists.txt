@@ -13,9 +13,9 @@ if(Python_FOUND AND TARGET iode_python)
                     COMMENT "Running tests for Python IODE")
 
   add_custom_target(test_nanobind
-                    COMMAND pytest --durations=0 -vv
+                    COMMAND pytest
                     DEPENDS test_iode.py
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/test_nanobind
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                     COMMENT "Running tests for Python IODE")
 
   add_dependencies(test_python iode_python)
