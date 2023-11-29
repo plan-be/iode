@@ -10,6 +10,7 @@ import pytest
 import larray as la
 import numpy as np
 import pandas as pd
+import logging
 
 from pathlib import Path
 
@@ -731,6 +732,55 @@ def test_iode_df_to_ws():
     # Check values
     AA = iode.get_var("AA")
     assert AA[1] ==  2.0
+
+
+def test_iode_df_to_ws_timeit():
+    import timeit
+
+    # Clear the WS
+    iode.ws_clear_all()
+
+    # Creating a new simple dataframe df
+    data = {"1991Y1": [0, 0.5, 1], "1992Y1": [2, 2.5, 3], "1993Y1": [4, 4.5, 5]}
+    index = ["AA", "BB", "CC"]
+    df = pd.DataFrame(data=data, index=index)
+    df.index.name = "vars"
+    df.columns.name = "time"
+
+    stmt = "iode.df_to_ws(df)"
+    t = timeit.timeit(stmt, globals={"iode": iode, "df": df}, number=10000)
+    logging.info(f"{stmt}: {t}")
+
+    if nanobind:
+        var_names = df.index.to_list()
+        periods = df.columns.to_list()
+
+        stmt = "df.to_numpy(dtype=float, copy=False, na_value=iode.nan)"
+        t = timeit.timeit(stmt, globals={"iode": iode, "df": df}, number=10000)
+        logging.info(f"{stmt}: {t}")
+
+        # na_value=nan converts Numpy NaN to IODE NaN values
+        data = df.to_numpy(dtype=float, copy=False, na_value=iode.nan)
+
+        import iode.iode_python_api as cpp_api
+
+        assert data.flags['F_CONTIGUOUS']
+        stmt = "cpp_api.__set_vars_from_ndarray(var_names, periods[0], periods[-1], data)"
+        t = timeit.timeit(stmt, globals={"cpp_api": cpp_api, "var_names": var_names, "periods": periods, "data": data}, number=10000)
+        logging.info(f"{stmt} [F CONTIGUOUS]: {t}")
+
+        stmt = "np.ascontiguousarray(data)"
+        t = timeit.timeit(stmt, globals={"data": data, "np": np}, number=10000)
+        logging.info(f"{stmt}: {t}")
+
+        data = np.ascontiguousarray(data)
+
+        assert data.flags['C_CONTIGUOUS']
+        stmt = "cpp_api.__set_vars_from_ndarray_contiguous(var_names, periods[0], periods[-1], data)"
+        t = timeit.timeit(stmt, globals={"cpp_api": cpp_api, "var_names": var_names, "periods": periods, "data": data}, number=10000)
+        logging.info(f"{stmt} [C CONTIGUOUS]: {t}")
+
+        cpp_api.__set_vars_from_ndarray_contiguous(var_names, periods[0], periods[-1], data)
 
 
 def test_iode_ws_to_df():
