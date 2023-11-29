@@ -76,5 +76,5 @@ log_cli_level = "INFO"
 build-verbosity = 1
 
 # Run pytest to ensure that the package was correctly built
-test-command = "pytest {project}/tests"
+test-command = "pytest"
 test-requires = "pytest"
