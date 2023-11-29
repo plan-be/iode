@@ -61,6 +61,16 @@ build-dir = "./out/build/python/{wheel_tag}"
 # Build stable ABI wheels for CPython 3.12+
 wheel.py-api = "cp312"
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--doctest-modules --doctest-continue-on-failure --durations=0 --verbose"
+# paths for nanobind
+# testpaths = ["python_api/iode", "tests/test_python"]
+# paths for cython
+testpaths = ["${CMAKE_BINARY_DIR}/tests/test_python"]
+log_cli = "True"
+log_cli_level = "INFO"
+
 [tool.cibuildwheel]
 # Necessary to see build output from the actual compilation
 build-verbosity = 1
