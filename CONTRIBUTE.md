@@ -24,8 +24,8 @@
 
  - Python libraries:
    - cython
-   - nanobind
-   - scikit-build-core
+   - *(nanobind)*
+   - *(scikit-build-core)*
    - pytest
    - numpy
    - pandas
@@ -42,7 +42,8 @@
 - **doc**: User documentation
 - **gui**: Qt GUI
 - **nsis**: NSIS Windows installer
-- **pyiode**: Python module of IODE
+- **pyiode**: Python module of IODE (Cython)
+- **python_api**: *Python module of IODE (nanobind)*
 - **scr4**: Utility functions required to compile the C API
 - **tests**: Testing directory
 
@@ -52,9 +53,9 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py39 python=3.9 numpy pandas larray cython nanobind scikit-build-core pytest
-> conda create --name py310 python=3.10 numpy pandas larray cython nanobind scikit-build-core pytest
-> conda create --name py311 python=3.11 numpy pandas larray cython nanobind scikit-build-core pytest
+> conda create --name py39 python=3.9 numpy pandas larray cython pytest (nanobind scikit-build-core)
+> conda create --name py310 python=3.10 numpy pandas larray cython pytest (nanobind scikit-build-core)
+> conda create --name py311 python=3.11 numpy pandas larray cython pytest (nanobind scikit-build-core)
 ```
 
 # Building Project
@@ -80,14 +81,14 @@ where `<target>` is one the item in the list below:
 - `iode_c_api`       -> Core API of IODE (in pure C).
 - `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`         -> Graphical user interface (GUI) based on Qt.
-- `iode_python`      -> Builds Python binding for IODE (base on Cython).
-- `iode_python_api`  -> Builds Python binding for IODE (base on nanobind).
+- `iode_python`      -> Builds Python binding for IODE (based on Cython).
+- *(`iode_python_api`  -> Builds Python binding for IODE (based on nanobind))*
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
-To build Python IODE, please run the Batch script makepy.bat in the subdirectory pydiode 
+To build Python IODE (Cython), please run the Batch script makepy.bat in the subdirectory pydiode 
 and provide a conda environment as argument:
 ```bash
 pyiode> makepy.bat py39 
@@ -116,15 +117,16 @@ The final and third step is to ask CMake to run the tests:
 ```
 
 ## Python API
+To test the Python API:
 
-To test the Python API, you first have to build it and install it locally.
-In a console, go to root directory of your local `iode` project.
-Then type:
+*(nanobind): You first have to build it and install it locally.*
+*In a console, go to root directory of your local `iode` project.*
+*Then type:*
 ```bash
 > pip install .
 ```
 
-Finally, run the Python tests by calling the `test_python` target:
+(cython + nanobind): Run the Python tests by calling the `test_python` target:
 ```bash
 cmake --build --preset <preset_config> --target test_python
 ```
