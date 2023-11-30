@@ -56,12 +56,13 @@ jobs:
           - name: Check conda
             shell: bash -el {0}
             run: conda info
-          - name: Install Python libraires - numpy, pandas, larray, nanobind, scikit-build-core and pytest
+          - name: Install Python libraires - numpy, pandas, larray, cython and pytest     # nanobind, scikit-build-core
             shell: bash -el {0}
             run: |
               conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install numpy pandas larray nanobind scikit-build-core pytest
+              conda install numpy pandas larray cython pytest
+            # conda install nanobind, scikit-build-core
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -70,11 +71,11 @@ jobs:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ inputs.build-config }}
-          - name: Build Python IODE (nanobind)
-            shell: bash -el {0}
-            run: pip install .
-          - name: Test Python IODE (nanobind)
-            shell: bash -el {0}
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_nanobind 
+          # - name: Build Python IODE (nanobind)
+          #   shell: bash -el {0}
+          #   run: pip install .
+          # - name: Test Python IODE (nanobind)
+          #   shell: bash -el {0}
+          #   run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_nanobind 
 
     
