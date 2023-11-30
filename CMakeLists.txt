@@ -303,8 +303,9 @@ if(NOT SKBUILD)
   set(IODE_GUI_TARGET iode_gui)
   add_subdirectory ("gui")
   add_subdirectory ("pyiode")
-  endif()
-add_subdirectory ("python_api")
+endif()
+
+# add_subdirectory ("python_api")
 
 # ---- tests ----
 add_subdirectory ("tests")
