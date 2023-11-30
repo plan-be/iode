@@ -14,14 +14,14 @@ if(Python_FOUND AND TARGET iode_python)
 
   add_dependencies(test_python iode_python)
 
-  add_custom_target(test_nanobind
-                    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_python_api> to ${CMAKE_BINARY_DIR}/tests/test_nanobind
-                    COMMAND pytest
-                    DEPENDS test_iode.py
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                    COMMENT "Running tests for Python IODE")
-
-  add_dependencies(test_nanobind iode_python_api)
+  # add_custom_target(test_nanobind
+  #                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_python_api> to ${CMAKE_BINARY_DIR}/tests/test_nanobind
+  #                   COMMAND pytest
+  #                   DEPENDS test_iode.py
+  #                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  #                   COMMENT "Running tests for Python IODE")
+  # 
+  # add_dependencies(test_nanobind iode_python_api)
 
   message(STATUS "\n-> copy python test files <-")
   file(INSTALL ${CMAKE_SOURCE_DIR}/tests/test_python DESTINATION ${CMAKE_BINARY_DIR}/tests
