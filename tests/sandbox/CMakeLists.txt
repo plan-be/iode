@@ -22,10 +22,10 @@ target_compile_options(testalign_Z1 PRIVATE ${IODE_ALIGNEMENT_FLAG})
 # target_link_libraries(sandbox_Z1 PUBLIC iode_c_api)
 # target_link_libraries(sandbox_exe PUBLIC iode_c_api)
 
-target_include_directories(sanbox_Z1 PRIVATE "../../scr4" ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(sanbox_exe PRIVATE "../../scr4" ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(sanbox_Z1 PRIVATE "${CMAKE_SOURCE_DIR}\\scr4" ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(sanbox_exe PRIVATE "${CMAKE_SOURCE_DIR}\\scr4" ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_include_directories(testalign_Z1 PRIVATE "../../scr4" "../../api")
-target_include_directories(testalign PRIVATE "../../scr4" "../../api")
+target_include_directories(testalign_Z1 PRIVATE "${CMAKE_SOURCE_DIR}\\scr4" "${CMAKE_SOURCE_DIR}\\api")
+target_include_directories(testalign PRIVATE "${CMAKE_SOURCE_DIR}\\scr4" "${CMAKE_SOURCE_DIR}\\api")
 
 file(INSTALL ${PROJECT_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

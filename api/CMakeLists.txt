@@ -32,7 +32,7 @@ target_sources(iode_c_api PRIVATE b_a2mini.c) # A2M
 target_sources(iode_c_api PUBLIC iode.h iodebase.h iodeapi.h)
 
 target_link_libraries(iode_c_api PUBLIC "iode_scr4")
-target_include_directories(iode_c_api PRIVATE "../scr4" ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(iode_c_api PRIVATE "${CMAKE_SOURCE_DIR}\\scr4" ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(TARGET iode_c_api)
 	message(STATUS "New target iode_c_api enabled\n")
