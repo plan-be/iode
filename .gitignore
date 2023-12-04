@@ -327,6 +327,7 @@ __pycache__/
 *.pyd
 pyproject.toml
 **/*.whl
+pyiode/_version.py
 python_api/iode/tests/data
 python_api/iode/_version.py
 

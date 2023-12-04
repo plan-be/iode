@@ -63,6 +63,9 @@ if(Python_FOUND)
 
     set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
 
+    # set __version__ for the iode package
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/_version.py)
+
     add_custom_target(iode_python
                       COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
                       DEPENDS cythonize_iode.py
