@@ -56,13 +56,13 @@ jobs:
           - name: Check conda
             shell: bash -el {0}
             run: conda info
-          - name: Install Python libraires - numpy, pandas, larray, cython and pytest     # nanobind, scikit-build-core
+          - name: Install Python libraires - numpy, pandas, larray, cython, scikit-build-core and pytest     # nanobind
             shell: bash -el {0}
             run: |
               conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install numpy pandas larray cython pytest
-            # conda install nanobind, scikit-build-core
+              conda install numpy pandas larray cython scikit-build-core pytest
+            # conda install nanobind
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -71,22 +71,22 @@ jobs:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ inputs.build-config }}
-          - name: Build SCR4, C and C++ API
+          - name: Build iode wheel file
             shell: bash -el {0}
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_cpp_api              
-          - name: Build Python IODE (Cython)
+            run: pip wheel .
+          - name: Install iode package
             shell: bash -el {0}
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_python 
-          - name: Test Python IODE (Cython)
+            run: | 
+              filename=$(ls iode*.whl) 
+              echo $filename 
+              pip install $filename
+          - name: Test iode Python
             shell: bash -el {0}
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_python 
-          - name: Upload PyIode compiled files
+            run: pytest
+          - name: Upload wheel file
             if: ${{ success() }}
             uses: actions/upload-artifact@v3
             with:
-              name: iode-python-3${{ matrix.python-minor-version }}
-              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/"
+              name: iode-python
+              path: "${{ github.workspace }}/iode*.whl"
               if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
-
-
-    
