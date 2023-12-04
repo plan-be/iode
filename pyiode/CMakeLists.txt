@@ -66,6 +66,14 @@ if(Python_FOUND)
     # set __version__ for the iode package
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/_version.py)
 
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.cmt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.eqs DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.idt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.lst DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.scl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.tbl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.var DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+
     add_custom_target(iode_python
                       COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
                       DEPENDS cythonize_iode.py
