@@ -8,6 +8,8 @@
 # VISUAL STUDIO > 2019 => CMake 3.24
 cmake_minimum_required (VERSION 3.24)
 
+include(CMakePrintHelpers)
+
 # List of CMAKE variables: https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 
 # ---- dependencies ----
@@ -239,11 +241,14 @@ endif()
 
 # -- find Python --
 message(CHECK_START "Search for Python")
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module 
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy
                     OPTIONAL_COMPONENTS Development.SABIModule)
 if(Python_FOUND)
   message(CHECK_PASS "found")
-  message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
+  cmake_print_variables(Python_VERSION)
+  cmake_print_variables(Python_EXECUTABLE)
+  cmake_print_variables(Python_INCLUDE_DIRS)
+  cmake_print_variables(Python_NumPy_INCLUDE_DIRS)
   set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
 else()
   message(CHECK_FAIL "not found")
