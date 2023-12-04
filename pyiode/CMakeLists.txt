@@ -2,95 +2,55 @@
 
 message(STATUS "\n---- CYTHON ----\n")
 
-if(MSVC)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(IODE_CYTHON_FLAGS "\"${IODE_DEBUG_INFO_FLAG}\", \"/Od\"")
-  else()
-    set(IODE_CYTHON_FLAGS "\"/O2\"")
-  endif()
-  set(IODE_CYTHON_FLAGS "${IODE_CYTHON_FLAGS}, \"/DVC\", \"/DSCRPROTO\", \"/DREALD\"")
-else()
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(IODE_CYTHON_FLAGS "\"${IODE_DEBUG_INFO_FLAG}\", \"-Og\"")
-  else()
-  set(IODE_CYTHON_FLAGS "\"-Ofast\"")
-  endif()
-endif()
-set(IODE_CYTHON_FLAGS "[${IODE_CYTHON_FLAGS}]")
-
-message(STATUS "Compile options for Cython: ${IODE_CYTHON_FLAGS}\n")
-
-message(STATUS "Generating the Python script ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py")
-message(STATUS "from the template file ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py.in")
-
-# ---- GENERATE FILE FROM TEMPLATE ----
-# configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
-# Each variable reference will be replaced with the current value of the variable, or the empty string 
-# if the variable is not defined.
-# see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py
-)
-
-message(STATUS "DONE\n")
-
-# NOTES: I tried to activate and deactivate conda environments through the present CMakeLists.txt 
-#        but failed miserably. After some research on Google, it appears I was doing the wrong way.
-#        quotes:
-#        1. "Generally, this CMake script does not seem like a good approach. 
-#        Tight-coupling the compilation of code to the existence of a particularly-named Conda 
-#        environment at the user level seems to go against the spirit of CMake, which aims to automate 
-#        the discovery of software dependencies so that users don't need commonly hardcoded locations.
-#        Perhaps it might be worth reassessing what is trying to be accomplished and the strategy to 
-#        get there."
-#        See https://stackoverflow.com/a/72479869
-#        2. "conda activate won’t work in CMake because it modifies the caller’s environment through 
-#        either being sourced (if conda is a shell function) or by launching a new command 
-#        (which also can’t affect CMake).
-#        Environments like that need to be set up outside of CMake whether it be HomeBrew, Nix, 
-#        vcpkg, spack, or conda.
-#        For example, on Conda Forge, lots of packages compile with CMake, but there CMake is executed 
-#        in the context of an already activated environment and itself knows nothing about Conda. 
-#        This makes it so the CMake code is completely agnostic to how its dependencies are provided, 
-#        which I regard as cleaner engineering."
-#        See https://discourse.cmake.org/t/create-and-activate-python-conda-environment-with-cmake/5777/2 
-
-
 if(Python_FOUND)
-  if(MSVC)
-    set(COMPILER msvc)
+  message(CHECK_START "Search for Cython")
+  find_program(CYTHON "cython")
+  if(CYTHON)
+    message(CHECK_PASS "found")
+    message(STATUS "\nSet up target for iode Python package\n")
+    cmake_print_variables(CYTHON)
 
-    set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
+    if(MSVC)
+      # set __version__ for the iode package
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/_version.py)
 
-    # set __version__ for the iode package
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/_version.py)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.cmt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.eqs DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.idt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.lst DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.scl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.tbl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.var DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
 
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.cmt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.eqs DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.idt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.lst DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.scl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.tbl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-    file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.var DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/s_iode.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+      file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode DESTINATION ${CMAKE_CURRENT_BINARY_DIR} FILES_MATCHING PATTERN "*.py")
 
-    add_custom_target(iode_python
-                      COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
-                      DEPENDS cythonize_iode.py
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                      COMMENT "Building iode.pyd for Python version ${Python_VERSION}"
-                      )
-    add_dependencies(iode_python iode_c_api)
+      # See https://scikit-build-core.readthedocs.io/en/latest/getting_started.html#cmake-file 
+      # WARNING: Apparently, the name of the compiled *.pyx must be the same as the target
+      add_custom_command(OUTPUT iode_python.c
+                        DEPENDS iode_python.pyx s_iode.c iode_python.pxi pyiode_cdef.pyx pyiode_data.pyx pyiode_estim.pyx
+                                 pyiode_exec.pyx pyiode_larray.pyx pyiode_lec.pyx pyiode_model.pyx pyiode_objs.pyx 
+                                 pyiode_print.pyx pyiode_reports.pyx pyiode_sample.pyx pyiode_util.pyx pyiode_ws.pyx
+                        VERBATIM
+                        COMMAND "${CYTHON}" "${CMAKE_CURRENT_SOURCE_DIR}/iode_python.pyx" --output-file "${CMAKE_CURRENT_BINARY_DIR}/iode_python.c")
 
-    add_custom_command(TARGET iode_python POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        COMMENT "Moving iode.pyd file to ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_} directory"
-                        )
+      python_add_library(iode_python MODULE "${CMAKE_CURRENT_BINARY_DIR}/iode_python.c" 
+                                            "${CMAKE_CURRENT_BINARY_DIR}/s_iode.c" WITH_SOABI)
+
+      target_link_libraries(iode_python PRIVATE iode_c_api Python::NumPy)
+      target_include_directories(iode_python PRIVATE "${CMAKE_SOURCE_DIR}/scr4" "${CMAKE_SOURCE_DIR}/api")
+      target_compile_definitions(iode_python PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
+
+      add_custom_command(TARGET iode_python PRE_BUILD COMMAND "${CYTHON}" "--version")
+
+      install(TARGETS iode_python LIBRARY DESTINATION iode)
+    endif()
+  else()
+    message(CHECK_FAIL "Cython not found")
   endif()
 
   if(TARGET iode_python)
-    message(STATUS "New target iode_python enabled\n")
+    message(STATUS "\nNew target iode_python enabled\n")
   else()
     message(WARNING "Could not create the target iode_python\n")
   endif()
