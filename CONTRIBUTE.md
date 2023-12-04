@@ -25,7 +25,7 @@
  - Python libraries:
    - cython
    - *(nanobind)*
-   - *(scikit-build-core)*
+   - scikit-build-core
    - pytest
    - numpy
    - pandas
@@ -67,9 +67,9 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py39 python=3.9 numpy pandas larray cython pytest (nanobind scikit-build-core)
-> conda create --name py310 python=3.10 numpy pandas larray cython pytest (nanobind scikit-build-core)
-> conda create --name py311 python=3.11 numpy pandas larray cython pytest (nanobind scikit-build-core)
+> conda create --name py39 python=3.9 numpy pandas larray cython pytest scikit-build-core (nanobind)
+> conda create --name py310 python=3.10 numpy pandas larray cython pytest scikit-build-core (nanobind)
+> conda create --name py311 python=3.11 numpy pandas larray cython pytest scikit-build-core (nanobind)
 ```
 
 # Building Project
@@ -95,7 +95,6 @@ where `<target>` is one the item in the list below:
 - `iode_c_api`       -> Core API of IODE (in pure C).
 - `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_gui`         -> Graphical user interface (GUI) based on Qt.
-- `iode_python`      -> Builds Python binding for IODE (based on Cython).
 - *(`iode_python_api`  -> Builds Python binding for IODE (based on nanobind))*
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
@@ -103,10 +102,16 @@ where `<target>` is one the item in the list below:
 - `iode_doc`         -> Builds the user documentation (using Python Sphinx)
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
-To build Python IODE (Cython), please run the Batch script makepy.bat in the subdirectory pydiode 
-and provide a conda environment as argument:
+To build the Python module for IODE (Cython), please:
+1. open a Developer Command Prompt (Windows)
+2. go to the root of the project
+2. activate the conda environment with the Python version for which you want to create an iode package 
 ```bash
-pyiode> makepy.bat py39 
+(...)iode> conda activate py312
+```
+4. run the Batch script makepy.bat
+```bash
+(py312) (...)iode> makepy.bat
 ```
 
 # Testing Project
@@ -134,16 +139,17 @@ The final and third step is to ask CMake to run the tests:
 ## Python API
 To test the Python API:
 
-*(nanobind): You first have to build it and install it locally.*
-*In a console, go to root directory of your local `iode` project.*
-*Then type:*
+You first have to build it and install it locally.
+In a console, go to root directory of your local `iode` project.
+Then type:
 ```bash
-> pip install .
+root_dir_iode> pip install .
 ```
+Note: you must have cython, numpy, pandas, larray, scikit-build-core and pytest installed.
 
-(cython + nanobind): Run the Python tests by calling the `test_python` target:
+Finally, type `pytest` () :
 ```bash
-cmake --build --preset <preset_config> --target test_python
+root_dir_iode> pytest
 ```
 
 # Working On An Issue
