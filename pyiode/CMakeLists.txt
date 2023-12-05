@@ -12,15 +12,15 @@ if(Python_FOUND)
 
     if(MSVC)
       # set __version__ for the iode package
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/_version.py)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode/_version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode/_version.py)
 
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.cmt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.eqs DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.idt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.lst DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.scl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.tbl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
-      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.var DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.cmt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.eqs DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.idt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.lst DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.scl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.tbl DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
+      file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data/fun.var DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests/data)
 
       file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/s_iode.c DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
       file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode DESTINATION ${CMAKE_CURRENT_BINARY_DIR} FILES_MATCHING PATTERN "*.py")
