@@ -1,3 +1,7 @@
+from pathlib import Path
+
+TEST_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
+
 from ._version import __version__
 from .iode_python import (# ------ constants ------
                           K_CMT, K_EQS, K_IDT, K_LST, K_SCL, K_TBL, K_VAR,  
