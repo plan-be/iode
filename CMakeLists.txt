@@ -66,6 +66,11 @@ else()
   message(STATUS "Sanitize:           No")
 endif()
 message(STATUS "Generator:          ${CMAKE_GENERATOR}")
+if(SKBUILD)
+  message(STATUS "Scikit-Build-Core:  Yes")
+else()
+  message(STATUS "Scikit-Build-Core:  No")
+endif()
 
 # ---- sanitizers ----
 # add sanitizer flags if compiled and linked with DEBUG configuration 
@@ -302,20 +307,23 @@ add_subdirectory ("api")
 add_subdirectory ("cpp_api")
 
 # ---- executables ----
-if(NOT SKBUILD)
-  set(IODE_CLI_TARGET iodecmd)
-  add_subdirectory ("cmd")
-  set(IODE_GUI_TARGET iode_gui)
-  add_subdirectory ("gui")
-  add_subdirectory ("pyiode")
-endif()
 
+set(IODE_CLI_TARGET iodecmd)
+add_subdirectory ("cmd")
+set(IODE_GUI_TARGET iode_gui)
+add_subdirectory ("gui")
+
+# ---- python ----
+
+add_subdirectory ("pyiode")
 # add_subdirectory ("python_api")
 
 # ---- tests ----
+
 add_subdirectory ("tests")
 
 # ---- user doc ----
+
 if(NOT SKBUILD)
   add_subdirectory ("doc")
 endif()
