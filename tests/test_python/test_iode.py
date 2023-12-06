@@ -15,8 +15,8 @@ import logging
 from pathlib import Path
 
 # GLOBALS
-IODE_DATA_DIR = Path("../data").absolute()
-IODE_OUTPUT_DIR = Path("../output").absolute()
+IODE_DATA_DIR = (Path(__file__).parent.parent / "data").absolute()
+IODE_OUTPUT_DIR = (Path(__file__).parent.parent / "output").absolute()
 IODE_VERBOSE = 1
 
 
