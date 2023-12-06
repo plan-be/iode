@@ -30,11 +30,18 @@ call conda activate %1
 :: configure CMake 
 call cmake --preset windows-release
 
-:: Create iode.pyd
-call cmake --build --verbose --preset windows-release --target iode_python 
+:: Create a wheel file
+call pip wheel .
+
+:: install iode package from the wheel file
+for %f in (iode*.whl) do ( 
+    set filename=%f 
+    echo %filename% 
+    call pip install %filename% 
+)
 
 :: Test iode.pyd (using pytest -> see tests/test_python/test_iode.py)
-call cmake --build --verbose --preset windows-release --target test_python
+call pytest
 
 :: Digitally sign the .pyd module
 :: DigiCertUtil.exe sign /noinput /sha1 "307c80ca0c69098522a09f40a1299e7c9c32ec85" iode.pyd
