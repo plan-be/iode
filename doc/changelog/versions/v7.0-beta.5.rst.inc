@@ -14,6 +14,7 @@ Improvements ✨
   * (GUI) Print the number of IODE objects present in the Workspace in the title of the corresponding tab (#371)
   * (GUI) Enabled to copy/paste variables from Excel to Iode by selecting variable names + values and 
           optionally periods (shortcut: CTRL + SHIFT + V) (#381) 
+  * (GUI) Enabled to (de)increase the size of the columns of numerical tables by pressing (SHIFT-)F3 (#418) 
 
 
 Fixed Bugs 🛠️
@@ -35,4 +36,3 @@ Fixed Bugs 🛠️
 
 Miscellaneous 🤷‍♀️
 ----------------
-
