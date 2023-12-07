@@ -66,11 +66,15 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public Templat
     GSampleTableModel* objmodel;
 #endif
 
+    static const int COLUMN_SIZE_STEP = 10;
+
     QLabel* label_nbDigits;
     QSpinBox* spinBox_nbDigits;
 
     QShortcut* shortcutNbDecPlus;
     QShortcut* shortcutNbDecMinus;
+    QShortcut* shortcutIncreaseColumnSize;
+    QShortcut* shortcutDecreaseColumnSize;
 
 protected:
     QHBoxLayout* bottomLayout;
@@ -158,14 +162,20 @@ public:
         // shortcuts
         shortcutNbDecPlus = new QShortcut(QKeySequence(Qt::Key_F4), this);
         shortcutNbDecMinus = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F4), this);
+        shortcutIncreaseColumnSize = new QShortcut(QKeySequence(Qt::Key_F3), this);
+        shortcutDecreaseColumnSize = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F3), this);
 
         shortcutNbDecPlus->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutNbDecMinus->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutIncreaseColumnSize->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutDecreaseColumnSize->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updateNbDigits);
         QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
+        QObject::connect(shortcutIncreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::increaseColumnSize);
+        QObject::connect(shortcutDecreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::decreaseColumnSize);
 
 #ifdef _GSAMPLE_
         loadSettings();
@@ -184,6 +194,8 @@ public:
         delete spinBox_nbDigits;
         delete shortcutNbDecPlus;
         delete shortcutNbDecMinus;
+        delete shortcutIncreaseColumnSize;
+        delete shortcutDecreaseColumnSize;
 #ifdef _GSAMPLE_
         delete objmodel;
         delete tableview;
@@ -195,6 +207,22 @@ public:
         QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
         // -1 -> span over all rows/columns
         bottomLayout->addSpacerItem(horizontalSpacer);
+    }
+
+    void increaseColumnSize()
+    {
+        QHeaderView* columns = this->tableview->horizontalHeader();
+        const int max_size = columns->maximumSectionSize();
+        for(int j=0; j < columns->count(); j++)
+            columns->resizeSection(j, qMin(columns->sectionSize(j) + COLUMN_SIZE_STEP, max_size));
+    }
+
+    void decreaseColumnSize()
+    {
+        QHeaderView* columns = this->tableview->horizontalHeader();
+        const int min_size = columns->minimumSectionSize();
+        for(int j=0; j < columns->count(); j++)
+            columns->resizeSection(j, qMax(columns->sectionSize(j) - COLUMN_SIZE_STEP, min_size));
     }
 
     void updateNbDigits(const int value)
