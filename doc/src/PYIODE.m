@@ -7,54 +7,33 @@ IODE: python module
 
 &TI Introduction
 �����������������
-The python module for IODE implements part of the IODE API. 
-The aim is to implement a python layer for all IODE functionalities so that IODE can be driven directly from a python session.
+The python package for IODE implements part of the IODE API. 
+The aim is to implement a python layer for all IODE functionalities so that 
+IODE can be driven directly from a Python console or script.
 
-&TI Python version & iode.pyd
+
+&TI Installation
 �����������������
-Each version of python has its own IODE module ~ciode.pyd~C. They are stored in 
-different subdirectories of the IODE main directory (usually ~cc:\iode~C). For example: ~c.\py39, .\py310~C...
-By default, the ~ciode.pyd~C module for python 3.9 is thus ~cc:/iode/py39/iode.pyd~C. For python 3.10: ~cc:/iode/py310/python.pyd~C.
+You must first download an installation file with the extension whl (called a Python wheel file).
+Download the file corresponding to your current Python version (for example ~ciode-6.69.0-cp39-cp39-win_amd64.whl~C).
+Then, in a console (a ~cconda~C console if you are using ~cminiconda~C or ~canaconda~C 
+to manage your Python packages), go to the directory where the file c~ciode-6.69.0-cp39-cp39-win_amd64.whl~C 
+is located and type:
+&CO
+  pip install iode-6.69.0-cp39-cp39-win_amd64.whl
+&TX
 
-
-&TI Memory management
-�����������������
-During a python session, IODE data are grouped in workspaces, one by object type (variables, scalars, equations...) 
-and stored in IODE memory using a proprietary memory management system called IODE-SWAP. IODE functions operate ~binside~B that memory.
- 
-Exchanges between IODE objects (in IODE-SWAP) and python objects (larray, numpy or pandas objects in python memory) 
-are made possible via interface functions described below like ~cget_eqs()~C, ~cset_eqs()~C or ~clarray_to_ws()~C.
 
 &TI Starting a PYIODE session
 ����������������������������������
-There are two ways to use the IODE module in the python environment.
-
-&IT Method 1: copy iode.pyd in your working directory
-����������������������������������
-
-That method consists simply in copying ~ciode.pyd~C into the working directory. 
-This is the simplest method but it requires to know the version of 
-python in use (3.9, 3.10...?). Moreover, ~ciode.pyd~C has to be copied with each new version of IODE and/or python. 
- 
-&IT Method 2: add the iode.pyd directory to the system path
-����������������������������������
-It simply consists in adding to the system "path" the directory where the iode.pyd module is located (depending on the 
-current version of python). 
-This path can (partly) be calculated in python. Here is how to do it: 
+To use the Python functions of IODE, you simply have to import the iode module at the beginning 
+of your Python code:
 
 &CO
-  ## Import the sys module
-  import sys
-  
-  ## Get the current python version and determine the directory of iode.pyd. 
-  ## It is assumed here that the IODE installation directory is ~cc:/iode~C
-  iode_pyd_dir = f"c:/iode/py3{sys.version_info[1]}"
-  
-  ## Add the directory to the system "path" 
-  sys.path.append(iode_pyd_dir)
-
   ## Import iode module
   import iode
+  
+  iode.ws_load_cmt("path_to_cmt_file.cmt")
 &TX
 
 
