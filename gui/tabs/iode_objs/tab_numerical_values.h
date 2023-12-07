@@ -75,6 +75,7 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public Templat
     QShortcut* shortcutNbDecMinus;
     QShortcut* shortcutIncreaseColumnSize;
     QShortcut* shortcutDecreaseColumnSize;
+    QShortcut* shortcutResizeToContents;
 
 protected:
     QHBoxLayout* bottomLayout;
@@ -164,11 +165,13 @@ public:
         shortcutNbDecMinus = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F4), this);
         shortcutIncreaseColumnSize = new QShortcut(QKeySequence(Qt::Key_F3), this);
         shortcutDecreaseColumnSize = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F3), this);
+        shortcutResizeToContents = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F3), this);
 
         shortcutNbDecPlus->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutNbDecMinus->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutIncreaseColumnSize->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutDecreaseColumnSize->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutResizeToContents->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updateNbDigits);
@@ -176,6 +179,7 @@ public:
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
         QObject::connect(shortcutIncreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::increaseColumnSize);
         QObject::connect(shortcutDecreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::decreaseColumnSize);
+        QObject::connect(shortcutResizeToContents, &QShortcut::activated, this, [this](){ this->tableview->resizeColumnsToContents(); });
 
 #ifdef _GSAMPLE_
         loadSettings();
@@ -196,6 +200,7 @@ public:
         delete shortcutNbDecMinus;
         delete shortcutIncreaseColumnSize;
         delete shortcutDecreaseColumnSize;
+        delete shortcutResizeToContents;
 #ifdef _GSAMPLE_
         delete objmodel;
         delete tableview;
