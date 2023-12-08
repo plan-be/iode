@@ -145,6 +145,9 @@ public:
         return success ? newFilepath : "";
     }
 
+    virtual void loadSettings(const QSettings* project_settings) {}
+    virtual void saveSettings(QSettings* project_settings) {}
+
     /**
      * @brief Update the filepath associated with the current tab.
      * 
