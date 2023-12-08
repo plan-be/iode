@@ -136,6 +136,8 @@ public:
     virtual void setProjectDir(const QDir& projectDir)
     {
         this->projectDir = projectDir;
+        QSettings* project_settings = ProjectSettings::getProjectSettings();
+        loadSettings(project_settings);
         reset();
     }
 
