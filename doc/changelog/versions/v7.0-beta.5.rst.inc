@@ -15,6 +15,7 @@ Improvements ✨
   * (GUI) Enabled to copy/paste variables from Excel to Iode by selecting variable names + values and 
           optionally periods (shortcut: CTRL + SHIFT + V) (#381) 
   * (GUI) Enabled to (de)increase the size of the columns of numerical tables by pressing (SHIFT-)F3 (#418) 
+  * (GUI) Allow users to (dis)enable the scientific format for numbers (#417)
 
 
 Fixed Bugs 🛠️
