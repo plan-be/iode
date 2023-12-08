@@ -141,20 +141,9 @@ void IodeTabWidget::loadSettings()
             if(splitted)
                 splitTab(index, splitOrientation); 
 
-            // reload values for the fields parameters, language and nbDecimals if Report tab
-            if(filetype == I_REPORTS_FILE)
-            {
-                ReportWidget* reportWidget = static_cast<ReportWidget*>(this->widget(index));
-                if(reportWidget)
-                {
-                    reportWidget->setParameters(project_settings->value("report_parameters").toString());
-                    reportWidget->setLanguage(project_settings->value("report_language").toInt());
-                    reportWidget->setNbDecimals(project_settings->value("report_nbDecimals").toInt());
-                }
-                else
-                    QMessageBox::warning(nullptr, "WARNING", QString("Could not reload parameters, language ") + 
-                        "and nbDecimals for the report " + filepath);
-            }
+            IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
+            if(tabWidget)
+                tabWidget->loadSettings(project_settings);
         }
         progress.setValue(size);
     }
@@ -208,15 +197,8 @@ void IodeTabWidget::saveSettings()
         project_settings->setValue("splitted", tabWidget->splitted());
         project_settings->setValue("splitOrientation", tabWidget->getSplitOrientation());
 
-        // save the parameters, language and nbDecimals values if Report tabs
-        if(filetype == I_REPORTS_FILE)
-        {
-            ReportWidget* reportWidget = static_cast<ReportWidget*>(tabWidget);
-
-            project_settings->setValue("report_parameters", reportWidget->getParameters());
-            project_settings->setValue("report_language", reportWidget->getLanguage());
-            project_settings->setValue("report_nbDecimals", reportWidget->getNbDecimals());
-        }
+        if(tabWidget)
+            tabWidget->saveSettings(project_settings);
     }
     project_settings->endArray();
 
