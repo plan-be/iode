@@ -41,41 +41,47 @@ class _NUMERICAL_MODEL_CLASS_NAME_ : public QAbstractTableModel
 template <class K> class _NUMERICAL_MODEL_CLASS_NAME_ : public IodeTemplateTableModel<K>
 #endif
 {
-    int nb_digits;
+    int precision;
+    int min_precision;      // 0 if format = 'f', 1 if format = 'g' or 'e'
     char format;
 
 public:
 #ifdef _GSAMPLE_
-    _NUMERICAL_MODEL_CLASS_NAME_(const int nb_digits = 2, QObject* parent = nullptr): 
-        QAbstractTableModel(parent), nb_digits(nb_digits), format('f')
+    _NUMERICAL_MODEL_CLASS_NAME_(const int precision = 2, QObject* parent = nullptr): 
+        QAbstractTableModel(parent), precision(precision), format('f')
     {}
 #else
     _NUMERICAL_MODEL_CLASS_NAME_(QVector<QString> columnNames, QObject* parent = nullptr, 
-        const int nb_digits = 2, K* kdb_external = nullptr): 
-        IodeTemplateTableModel<K>(columnNames, parent, kdb_external), nb_digits(nb_digits) 
+        const int precision = 2, K* kdb_external = nullptr): 
+        IodeTemplateTableModel<K>(columnNames, parent, kdb_external), precision(precision) 
     {}
 #endif
 
     QString valueToString(const double value) const
     {
-        return L_ISAN(value) ? QString::number(value, format, nb_digits) : NAN_REP;
+        return L_ISAN(value) ? QString::number(value, format, precision) : NAN_REP;
     }
 
-    int get_nb_digits() const
+    int get_precision() const
     {
-        return nb_digits;
+        return precision;
     }
 
-    void set_nb_digits(int nb_digits)
+    void set_precision(const int precision)
     {
-        if(nb_digits < 1)
-            return;
+        if(precision < min_precision)
+            this->precision = min_precision;
+        else if(precision > MAX_PRECISION_NUMBERS)
+            this->precision = MAX_PRECISION_NUMBERS;
+        else
+            this->precision = precision;
 
-        if(nb_digits > MAX_NB_DIGITS_TABLE)
-            nb_digits = MAX_NB_DIGITS_TABLE;
-
-        this->nb_digits = nb_digits;
         this->reset();
+    }
+
+    int get_min_precision() const
+    {
+        return min_precision;
     }
 
     char get_format() const
@@ -86,22 +92,23 @@ public:
     void set_format(const char format)
     {
         this->format = format;
+        min_precision = (format == 'f') ? 0 : 1;
     }
 
-    void nb_dec_plus()
+    void precision_plus()
     {
-        if(nb_digits < MAX_NB_DIGITS_TABLE)
+        if(precision < MAX_PRECISION_NUMBERS)
         {
-            nb_digits++;
+            precision++;
             this->reset();
         }
     }
 
-    void nb_dec_minus()
+    void precision_minus()
     {
-        if(nb_digits > 1)
+        if(precision > min_precision)
         {
-            nb_digits--;
+            precision--;
             this->reset();
         }
     }
