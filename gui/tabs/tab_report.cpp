@@ -39,3 +39,31 @@ ReportWidget::ReportWidget(const QString& filepath, QWidget* parent):
     if(!filepath.isEmpty()) 
         load(filepath, true);
 }
+
+void ReportWidget::loadSettings(const QSettings* project_settings)
+{
+    if(!project_settings)
+        return;
+
+    QString parameters = project_settings->value("report_parameters", "").toString();
+    int languageIndex = project_settings->value("report_language", 0).toInt();
+    int nbDecimals = project_settings->value("report_nbDecimals", 2).toInt();
+
+    lineEdit_parameters->setText(parameters);
+    comboBox_language->setCurrentIndex(languageIndex);
+    spinBox_nbDecimals->setValue(nbDecimals);
+}
+
+void ReportWidget::saveSettings(QSettings* project_settings)
+{
+    if(!project_settings)
+        return;
+
+    QString parameters = lineEdit_parameters->text();
+    int languageIndex = comboBox_language->currentIndex();
+    int nbDecimals = spinBox_nbDecimals->value();
+
+    project_settings->setValue("report_parameters", parameters);
+    project_settings->setValue("report_language", languageIndex);
+    project_settings->setValue("report_nbDecimals", nbDecimals);
+}
