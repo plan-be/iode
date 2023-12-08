@@ -42,11 +42,12 @@ template <class K> class _NUMERICAL_MODEL_CLASS_NAME_ : public IodeTemplateTable
 #endif
 {
     int nb_digits;
+    char format;
 
 public:
 #ifdef _GSAMPLE_
     _NUMERICAL_MODEL_CLASS_NAME_(const int nb_digits = 2, QObject* parent = nullptr): 
-        QAbstractTableModel(parent), nb_digits(nb_digits) 
+        QAbstractTableModel(parent), nb_digits(nb_digits), format('f')
     {}
 #else
     _NUMERICAL_MODEL_CLASS_NAME_(QVector<QString> columnNames, QObject* parent = nullptr, 
@@ -57,7 +58,7 @@ public:
 
     QString valueToString(const double value) const
     {
-        return L_ISAN(value) ? QString::number(value, 'g', nb_digits) : NAN_REP;
+        return L_ISAN(value) ? QString::number(value, format, nb_digits) : NAN_REP;
     }
 
     int get_nb_digits() const
@@ -75,6 +76,16 @@ public:
 
         this->nb_digits = nb_digits;
         this->reset();
+    }
+
+    char get_format() const
+    {
+        return format;
+    }
+
+    void set_format(const char format)
+    {
+        this->format = format;
     }
 
     void nb_dec_plus()

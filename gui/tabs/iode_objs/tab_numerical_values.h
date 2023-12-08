@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QDialog>
 #include <QSpinBox>
+#include <QCheckBox>
 #include <QShortcut>
 #include <QSpacerItem>
 #include <QHBoxLayout>
@@ -70,6 +71,8 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public Templat
 
     QLabel* label_nbDigits;
     QSpinBox* spinBox_nbDigits;
+
+    QCheckBox* checkbox_scientific;
 
     QShortcut* shortcutNbDecPlus;
     QShortcut* shortcutNbDecMinus;
@@ -152,6 +155,10 @@ public:
         spinBox_nbDigits->setMinimumSize(QSize(40, 0));
         bottomLayout->addWidget(spinBox_nbDigits, Qt::AlignLeft);
 
+        // scientific notation checkbox
+        checkbox_scientific = new QCheckBox("Scientific", this);
+        checkbox_scientific->setChecked(false);
+        bottomLayout->addWidget(checkbox_scientific, Qt::AlignLeft);
 
 #ifdef _GSAMPLE_
         addHorizontalSpacer();
@@ -175,6 +182,7 @@ public:
 
         // connect
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updateNbDigits);
+        QObject::connect(checkbox_scientific, &QCheckBox::stateChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::formatNumber);
         QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
         QObject::connect(shortcutIncreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::increaseColumnSize);
@@ -196,6 +204,7 @@ public:
     {
         delete label_nbDigits;
         delete spinBox_nbDigits;
+        delete checkbox_scientific;
         delete shortcutNbDecPlus;
         delete shortcutNbDecMinus;
         delete shortcutIncreaseColumnSize;
@@ -236,6 +245,13 @@ public:
         this->objmodel->reset();
     }
 
+    void formatNumber(int state)
+    {
+        char format = (state == Qt::Checked) ? 'e' : 'f'; 
+        this->objmodel->set_format(format);
+        this->objmodel->reset();
+    }
+
     void loadNumericSettings(const QSettings* project_settings)
     {
         if(!project_settings)
@@ -243,6 +259,8 @@ public:
         
         int nb_digits = project_settings->value("nbDigits", spinBox_nbDigits->value()).toInt();
         spinBox_nbDigits->setValue(nb_digits);
+        bool checked = project_settings->value("scientific", false).toBool();
+        checkbox_scientific->setChecked(checked);
     }
 
     void saveNumericSettings(QSettings* project_settings)
@@ -251,6 +269,7 @@ public:
             return;
         
         project_settings->setValue("nbDigits", spinBox_nbDigits->value());
+        project_settings->setValue("scientific", checkbox_scientific->isChecked());
     }
 
 #ifdef _GSAMPLE_
