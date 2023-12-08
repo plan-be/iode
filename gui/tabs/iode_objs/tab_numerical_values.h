@@ -76,14 +76,18 @@ protected:
     QHBoxLayout* bottomLayout;
 
 protected:
+#ifdef _GSAMPLE_
     QString getGroupName()
     {
-#ifdef _GSAMPLE_
-        return "GSampleTable";
-#else
-        return QString::fromStdString(vIodeTypes[this->iodeType]).toUpper();
-#endif
+        return "GSAMPLE_TABLE";
     }
+
+    void closeEvent(QCloseEvent* event) override
+    {
+        saveSettings();
+        event->accept();
+    }
+#endif
 
 public:
 #ifdef _GSAMPLE_
@@ -162,12 +166,10 @@ public:
         QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updateNbDigits);
         QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
         QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
-        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::saveNbDigitsToSettings);
-
-        // reload nb decimals
-        loadNbDigitsFromSettings();
 
 #ifdef _GSAMPLE_
+        loadSettings();
+
         this->setModal(true);
         if(variables.isEmpty())
             this->setWindowTitle("Table " + refTable);
@@ -201,37 +203,45 @@ public:
         this->objmodel->reset();
     }
 
-#ifndef _GSAMPLE_
-    void setProjectDir(const QDir& projectDir) override
+    void loadNumericSettings(const QSettings* project_settings)
     {
-        TemplateIodeObjectWidget<M, V>::setProjectDir(projectDir);
-        loadNbDigitsFromSettings();
-    }
-#endif
-
-    void loadNbDigitsFromSettings()
-    {
-        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
-        {
-            spinBox_nbDigits->setValue(4);
             return;
-        }
         
-        project_settings->beginGroup(getGroupName());
         int nb_digits = project_settings->value("nbDigits", spinBox_nbDigits->value()).toInt();
         spinBox_nbDigits->setValue(nb_digits);
-        project_settings->endGroup();
     }
 
-    void saveNbDigitsToSettings()
+    void saveNumericSettings(QSettings* project_settings)
+    {
+        if(!project_settings)
+            return;
+        
+        project_settings->setValue("nbDigits", spinBox_nbDigits->value());
+    }
+
+#ifdef _GSAMPLE_
+public slots:
+    void loadSettings()
     {
         QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
             return;
-        
+
         project_settings->beginGroup(getGroupName());
-        project_settings->setValue("nbDigits", spinBox_nbDigits->value());
+        loadNumericSettings(project_settings);
         project_settings->endGroup();
     }
+
+    void saveSettings()
+    {
+        QSettings* project_settings = ProjectSettings::getProjectSettings();
+        if(!project_settings)
+            return;
+
+        project_settings->beginGroup(getGroupName());
+        saveNumericSettings(project_settings);
+        project_settings->endGroup();
+    }
+#endif
 };

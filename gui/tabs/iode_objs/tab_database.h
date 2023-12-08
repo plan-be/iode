@@ -97,6 +97,16 @@ public:
         connect(objmodel, &ScalarsModel::databaseModified, this, &ScalarsWidget::databaseModified);
         connect(tableview, &ScalarsView::newObjectInserted, this, &ScalarsWidget::databaseModified);
     }
+
+    void loadSettings(const QSettings* project_settings) override
+    {
+        loadNumericSettings(project_settings);
+    }
+
+    void saveSettings(QSettings* project_settings) override
+    {
+        saveNumericSettings(project_settings);
+    }
 };
 
 class TablesWidget : public TemplateIodeObjectWidget<TablesModel, TablesView>
@@ -141,6 +151,7 @@ public:
         comboMode->setObjectName("combobox_mode");
         comboMode->addItems(q_var_modes);
         comboMode->setSizePolicy(sizePolicy);
+        comboMode->setCurrentIndex(0);
         bottomLayout->addWidget(comboMode, Qt::AlignLeft);
 
         addHorizontalSpacer();
@@ -163,9 +174,6 @@ public:
         connect(objmodel, &VariablesModel::rowsRemoved, this, &VariablesWidget::databaseModified);
         connect(objmodel, &VariablesModel::databaseModified, this, &VariablesWidget::databaseModified);
         connect(tableview, &VariablesView::newObjectInserted, this, &VariablesWidget::databaseModified);
-    
-        // reload mode
-        loadModeFromSettings();
     }
 
     ~VariablesWidget()
@@ -174,43 +182,29 @@ public:
         delete shortcutModeMinus;
     }
 
-    void setProjectDir(const QDir& projectDir) override
+    void loadSettings(const QSettings* project_settings) override
     {
-        TemplateNumericalWidget::setProjectDir(projectDir);
-        loadModeFromSettings();
-    }
-
-    void loadModeFromSettings()
-    {
-        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
-        {
-            comboMode->setCurrentIndex(0);
             return;
-        }
-        
-        project_settings->beginGroup(getGroupName());
+
+        loadNumericSettings(project_settings);
         int mode = project_settings->value("Mode", 0).toInt();
         comboMode->setCurrentIndex(mode);
-        project_settings->endGroup();
     }
 
-    void saveModeToSettings()
+    void saveSettings(QSettings* project_settings) override
     {
-        QSettings* project_settings = ProjectSettings::getProjectSettings();
         if(!project_settings)
             return;
         
-        project_settings->beginGroup(getGroupName());
+        saveNumericSettings(project_settings);
         project_settings->setValue("Mode", comboMode->currentIndex());
-        project_settings->endGroup();
     }
 
 public slots:
     void updateMode(const int index)
     {
         objmodel->setMode((EnumIodeVarMode) index);
-        saveModeToSettings();
     }
 
     void nextMode()
