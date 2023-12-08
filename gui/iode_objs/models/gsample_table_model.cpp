@@ -48,7 +48,7 @@ QVariant GSampleTableModel::data(const QModelIndex& index, int role) const
 		return int(Qt::AlignLeft);
 
 	if (role == Qt::DisplayRole || role == Qt::EditRole)
-		return valueToString(table->get_value(index.row(), index.column(), get_nb_digits()));
+		return valueToString(table->get_value(index.row(), index.column(), get_precision()));
 
 	return QVariant();
 }

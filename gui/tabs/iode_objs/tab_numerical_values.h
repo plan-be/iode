@@ -69,13 +69,13 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public Templat
 
     static const int COLUMN_SIZE_STEP = 10;
 
-    QLabel* label_nbDigits;
-    QSpinBox* spinBox_nbDigits;
+    QLabel* label_precision;
+    QSpinBox* spinBox_precision;
 
     QCheckBox* checkbox_scientific;
 
-    QShortcut* shortcutNbDecPlus;
-    QShortcut* shortcutNbDecMinus;
+    QShortcut* shortcutPrecisionPlus;
+    QShortcut* shortcutPrecisionMinus;
     QShortcut* shortcutIncreaseColumnSize;
     QShortcut* shortcutDecreaseColumnSize;
     QShortcut* shortcutResizeToContents;
@@ -129,31 +129,31 @@ public:
         bottomLayout->setObjectName(QString::fromUtf8("bottom_layout"));
 
         // nb decimals spinbox
-        label_nbDigits = new QLabel("Nb Significant Digits ");
-        label_nbDigits->setObjectName(QString::fromUtf8("label_nbDigits"));
+        label_precision = new QLabel("Precision");
+        label_precision->setObjectName(QString::fromUtf8("label_precision"));
         QSizePolicy sizePolicyLabel(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicyLabel.setHorizontalStretch(0);
         sizePolicyLabel.setVerticalStretch(0);
-        sizePolicyLabel.setHeightForWidth(label_nbDigits->sizePolicy().hasHeightForWidth());
-        label_nbDigits->setSizePolicy(sizePolicyLabel);
-        bottomLayout->addWidget(label_nbDigits, Qt::AlignLeft);
+        sizePolicyLabel.setHeightForWidth(label_precision->sizePolicy().hasHeightForWidth());
+        label_precision->setSizePolicy(sizePolicyLabel);
+        bottomLayout->addWidget(label_precision, Qt::AlignLeft);
 
-        spinBox_nbDigits = new QSpinBox();
-        spinBox_nbDigits->setMinimum(1);
-        spinBox_nbDigits->setMaximum(MAX_NB_DIGITS_TABLE);
+        spinBox_precision = new QSpinBox();
+        spinBox_precision->setMinimum(1);
+        spinBox_precision->setMaximum(MAX_PRECISION_NUMBERS);
 #ifdef _GSAMPLE_
-        spinBox_nbDigits->setValue(nbDecimals);
+        spinBox_precision->setValue(nbDecimals);
 #else
-        spinBox_nbDigits->setValue(4);
+        spinBox_precision->setValue(4);
 #endif
-        spinBox_nbDigits->setObjectName(QString::fromUtf8("spinBox_nbDigits"));
+        spinBox_precision->setObjectName(QString::fromUtf8("spinBox_precision"));
         QSizePolicy sizePolicySpinbox(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicySpinbox.setHorizontalStretch(0);
         sizePolicySpinbox.setVerticalStretch(0);
-        sizePolicySpinbox.setHeightForWidth(spinBox_nbDigits->sizePolicy().hasHeightForWidth());
-        spinBox_nbDigits->setSizePolicy(sizePolicySpinbox);
-        spinBox_nbDigits->setMinimumSize(QSize(40, 0));
-        bottomLayout->addWidget(spinBox_nbDigits, Qt::AlignLeft);
+        sizePolicySpinbox.setHeightForWidth(spinBox_precision->sizePolicy().hasHeightForWidth());
+        spinBox_precision->setSizePolicy(sizePolicySpinbox);
+        spinBox_precision->setMinimumSize(QSize(40, 0));
+        bottomLayout->addWidget(spinBox_precision, Qt::AlignLeft);
 
         // scientific notation checkbox
         checkbox_scientific = new QCheckBox("Scientific", this);
@@ -168,23 +168,23 @@ public:
 #endif
 
         // shortcuts
-        shortcutNbDecPlus = new QShortcut(QKeySequence(Qt::Key_F4), this);
-        shortcutNbDecMinus = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F4), this);
+        shortcutPrecisionPlus = new QShortcut(QKeySequence(Qt::Key_F4), this);
+        shortcutPrecisionMinus = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F4), this);
         shortcutIncreaseColumnSize = new QShortcut(QKeySequence(Qt::Key_F3), this);
         shortcutDecreaseColumnSize = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F3), this);
         shortcutResizeToContents = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F3), this);
 
-        shortcutNbDecPlus->setContext(Qt::WidgetWithChildrenShortcut);
-        shortcutNbDecMinus->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutPrecisionPlus->setContext(Qt::WidgetWithChildrenShortcut);
+        shortcutPrecisionMinus->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutIncreaseColumnSize->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutDecreaseColumnSize->setContext(Qt::WidgetWithChildrenShortcut);
         shortcutResizeToContents->setContext(Qt::WidgetWithChildrenShortcut);
 
         // connect
-        QObject::connect(spinBox_nbDigits, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updateNbDigits);
+        QObject::connect(spinBox_precision, &QSpinBox::valueChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::updatePrecision);
         QObject::connect(checkbox_scientific, &QCheckBox::stateChanged, this, &_NUMERICAL_WIDGET_CLASS_NAME_::formatNumber);
-        QObject::connect(shortcutNbDecPlus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepUp(); });
-        QObject::connect(shortcutNbDecMinus, &QShortcut::activated, this, [this](){ this->spinBox_nbDigits->stepDown(); });
+        QObject::connect(shortcutPrecisionPlus, &QShortcut::activated, this, [this](){ this->spinBox_precision->stepUp(); });
+        QObject::connect(shortcutPrecisionMinus, &QShortcut::activated, this, [this](){ this->spinBox_precision->stepDown(); });
         QObject::connect(shortcutIncreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::increaseColumnSize);
         QObject::connect(shortcutDecreaseColumnSize, &QShortcut::activated, this, &_NUMERICAL_WIDGET_CLASS_NAME_::decreaseColumnSize);
         QObject::connect(shortcutResizeToContents, &QShortcut::activated, this, [this](){ this->tableview->resizeColumnsToContents(); });
@@ -202,11 +202,11 @@ public:
 
     ~_NUMERICAL_WIDGET_CLASS_NAME_()
     {
-        delete label_nbDigits;
-        delete spinBox_nbDigits;
+        delete label_precision;
+        delete spinBox_precision;
         delete checkbox_scientific;
-        delete shortcutNbDecPlus;
-        delete shortcutNbDecMinus;
+        delete shortcutPrecisionPlus;
+        delete shortcutPrecisionMinus;
         delete shortcutIncreaseColumnSize;
         delete shortcutDecreaseColumnSize;
         delete shortcutResizeToContents;
@@ -239,9 +239,9 @@ public:
             columns->resizeSection(j, qMax(columns->sectionSize(j) - COLUMN_SIZE_STEP, min_size));
     }
 
-    void updateNbDigits(const int value)
+    void updatePrecision(const int value)
     {
-        this->objmodel->set_nb_digits(value);
+        this->objmodel->set_precision(value);
         this->objmodel->reset();
     }
 
@@ -249,6 +249,7 @@ public:
     {
         char format = (state == Qt::Checked) ? 'e' : 'f'; 
         this->objmodel->set_format(format);
+        spinBox_precision->setMinimum(this->objmodel->get_min_precision());
         this->objmodel->reset();
     }
 
@@ -257,10 +258,11 @@ public:
         if(!project_settings)
             return;
         
-        int nb_digits = project_settings->value("nbDigits", spinBox_nbDigits->value()).toInt();
-        spinBox_nbDigits->setValue(nb_digits);
         bool checked = project_settings->value("scientific", false).toBool();
         checkbox_scientific->setChecked(checked);
+        formatNumber(checkbox_scientific->checkState());
+        int nb_digits = project_settings->value("precision", spinBox_precision->value()).toInt();
+        spinBox_precision->setValue(nb_digits);
     }
 
     void saveNumericSettings(QSettings* project_settings)
@@ -268,7 +270,7 @@ public:
         if(!project_settings)
             return;
         
-        project_settings->setValue("nbDigits", spinBox_nbDigits->value());
+        project_settings->setValue("precision", spinBox_precision->value());
         project_settings->setValue("scientific", checkbox_scientific->isChecked());
     }
 

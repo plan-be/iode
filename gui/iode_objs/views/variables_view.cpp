@@ -31,7 +31,7 @@ void VariablesView::print()
 				return;
 
 			// set the number of decimals
-			int NbDecimals = model_->get_nb_digits();
+			int NbDecimals = model_->get_precision();
 
 			// set the language
 			EnumLang lang = EnumLang::IT_ENGLISH;
