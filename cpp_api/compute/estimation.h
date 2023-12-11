@@ -33,91 +33,39 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
 KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
 
 
-class Estimation
+// NOTE: When exporting to Python, only get methods should be exposed (public).
+//       NOT the constructor!
+class EstimationResults
 {
-    std::string str_equations;
-    std::vector<std::string> v_equations;
-    std::vector<std::string>::iterator current_eq;
-
+    std::string eqs_list;
     KDBEquations* kdb_eqs;
     KDBScalars* kdb_scl;
     Sample* sample;
 
-private:
-    void set_equations_list(const std::string& str_equations);
-
 public:
-    Estimation(const Sample& sample, const std::string& str_equations);
-    Estimation(const Period& from, const Period& to, const std::string& str_equations);
-    Estimation(const std::string& from, const std::string& to, const std::string& str_equations);
+    // NOTE: Do not exposed a public constructor to the Python API
+    EstimationResults(const std::string& eqs_list, const std::string& from, const std::string& to);
 
-    ~Estimation();
-
-    Sample get_sample() const
-    {
-        return Sample(*sample);
-    }
-
-    void set_sample(const Sample& sample)
-    {
-        if (this->sample) delete this->sample;
-        this->sample = new Sample(sample);
-    }
-    
-    void set_sample(const Period& from, const Period& to)
-    {
-        if (sample) delete sample;
-        try
-        {
-            sample = new Sample(from, to);
-        }
-        catch(IodeException)
-        {
-            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + str_equations, 
-                "Cannot create sample with range from " + from.to_string() + " to " + to.to_string());
-        }
-    }
-    
-    void set_sample(const std::string& from, const std::string& to)
-    {
-        if (sample) delete sample;
-        try
-        {
-            sample = new Sample(from, to);
-        }
-        catch(IodeException)
-        {
-            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + str_equations, 
-                "Cannot create sample with range from " + from + " to " + to);
-        }
-    }
+    ~EstimationResults();
 
     std::vector<std::string> get_list_equations() const
     {
-        return v_equations;
+        return kdb_eqs->get_names();
     }
 
-    const KDBScalars* get_coefficients() { return kdb_scl; }
+    Sample& get_sample() const { return *sample; }
 
-    const KDBEquations* get_equations() { return kdb_eqs; }
+    KDBScalars& get_coefficients() const { return *kdb_scl; }
 
-    NamedEquation current_equation() { return NamedEquation(*current_eq); }
-
-    NamedEquation next_equation()
-    {
-        current_eq++;
-        
-        if(current_eq == v_equations.end()) 
-            current_eq = v_equations.begin();
-
-        return NamedEquation(*current_eq);
-    }
+    KDBEquations& get_equations() const { return *kdb_eqs; }
 
     MAT* get_correlation_matrix() { return E_MCORR; }
 
     std::vector<IODE_REAL> get_observed_values(const std::string& name) const
     {
         std::vector<IODE_REAL> values;
+
+        std::vector<std::string> v_equations = kdb_eqs->get_names();
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
             return values;
@@ -130,6 +78,8 @@ public:
     std::vector<IODE_REAL> get_fitted_values(const std::string& name) const
     {
         std::vector<IODE_REAL> values;
+
+        std::vector<std::string> v_equations = kdb_eqs->get_names();
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
             return values;
@@ -142,6 +92,8 @@ public:
     std::vector<IODE_REAL> get_residual_values(const std::string& name) const
     {
         std::vector<IODE_REAL> values;
+
+        std::vector<std::string> v_equations = kdb_eqs->get_names();
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
             return values;
@@ -151,13 +103,7 @@ public:
         return values;
     }
 
-    /** 
-     * Equivalent to B_EqsEstimateEqs
-     */
-    void equations_estimate();
-
     void save();
-
 };
 
 
@@ -168,13 +114,14 @@ public:
  *        in the equation before the estimation.
  *        Only defined to standardize the Python API functions.
  * 
- * @param eqs   comma separated list of equation names (=endo  names)
- * @param from  first period of the estimation sample
- * @param to    last period of the estimation sample
+ * @param eqs_list   comma separated list of equation names (=endo  names)
+ * @param from       first period of the estimation sample
+ * @param to         last period of the estimation sample
+ * @return EstimationResults 
  * 
- * @note equivalent to function IodeEstimate() from b_api.c
+ * @note equivalent to function B_EqsEstimateEqs() from b_est.c
  */
-void eqs_estimate(const std::string& eqs, const std::string& from = "", const std::string& to = "");
+EstimationResults* equations_estimate(const std::string& eqs_list, const std::string& from = "", const std::string& to = "");
 
 /**
  * @brief Estimate an equation of a given sample. 
@@ -182,8 +129,9 @@ void eqs_estimate(const std::string& eqs, const std::string& from = "", const st
  *        in the equation before the estimation.
  *        Only defined to standardize the Python API functions.
  * 
- * @param eqs   list of equation names (=endo  names)
- * @param from  first period of the estimation sample
- * @param to    last period of the estimation sample
+ * @param eqs_vector   list of equation names (=endo  names)
+ * @param from         first period of the estimation sample
+ * @param to           last period of the estimation sample
+ * @return EstimationResults
  */
-void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from = "", const std::string& to = "");
+EstimationResults* equations_estimate(const std::vector<std::string>& eqs_vector, const std::string& from = "", const std::string& to = "");

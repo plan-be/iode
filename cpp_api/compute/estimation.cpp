@@ -73,30 +73,33 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
 }
 
 
-void Estimation::set_equations_list(const std::string& str_equations)
+EstimationResults::EstimationResults(const std::string& eqs_list, const std::string& from, const std::string& to) 
+    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
 {
-    this->str_equations = str_equations;
+    std::string error_msg = "Cannot estimate (block of) equation(s): " + eqs_list + "\n";
 
-    IodeExceptionInvalidArguments invalid_error("Cannot estimate (block of) equation(s) " + str_equations);
-    if (str_equations.empty()) 
-    {
-        invalid_error.add_argument("(list of) equation(s)", "empty");
-        throw invalid_error;
-    }
+    if (eqs_list.empty()) 
+        throw std::invalid_argument(error_msg + "list of equations empty");
 
-    if (kdb_eqs) delete kdb_eqs;
+    this->eqs_list = eqs_list;
+
     try
     {
-        kdb_eqs = new KDBEquations(KDB_LOCAL, str_equations);
+        sample = new Sample(from, to);
     }
-    catch(IodeException)
+    catch(const std::exception& e)
     {
-        invalid_error.add_argument("(list of) equation(s)", str_equations);
-        throw invalid_error;
+        throw std::invalid_argument(error_msg + std::string(e.what()));
     }
 
-    v_equations = kdb_eqs->get_names();
-    current_eq = v_equations.begin();
+    try
+    {
+        kdb_eqs = new KDBEquations(KDB_LOCAL, eqs_list);
+    }
+    catch(const std::exception& e)
+    {
+        throw std::invalid_argument(error_msg + std::string(e.what()));
+    }
 
     // concatenate list of coefficients of each equations of the block
     std::vector<std::string> coefficients_list;
@@ -114,90 +117,69 @@ void Estimation::set_equations_list(const std::string& str_equations)
     // convert vector to string
     std::string scalars_list = boost::algorithm::join(coefficients_list, ";");
 
-    if(kdb_scl) delete kdb_scl;
     try
     {
         kdb_scl = new KDBScalars(KDB_LOCAL, scalars_list);
     }
-    catch(IodeException)
+    catch(const std::exception& e)
     {
-        invalid_error.add_argument("list of found coefficients", scalars_list);
-        throw invalid_error;
+        throw std::invalid_argument(error_msg + "list of estimated scalars: " + 
+                                    scalars_list + "\n" + std::string(e.what()));
     }
 }
 
-Estimation::Estimation(const Sample& sample, const std::string& str_equations) 
-    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
-{
-    set_sample(sample);
-    set_equations_list(str_equations);
-}
-
-Estimation::Estimation(const Period& from, const Period& to, const std::string& str_equations)
-    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
-{
-    set_sample(from, to);
-    set_equations_list(str_equations);
-}
-
-Estimation::Estimation(const std::string& from, const std::string& to, const std::string& str_equations)
-    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
-{
-    set_sample(from, to);
-    set_equations_list(str_equations);
-}
-
-Estimation::~Estimation()
-{
-    // frees all allocated variables for the last estimation
-    E_free_work();
-    delete sample;
-    delete kdb_eqs;
-    delete kdb_scl;
-}
-
-/**
- * Equivalent to B_EqsEstimateEqs
- */
-void Estimation::equations_estimate()
+EstimationResults::~EstimationResults()
 {
     // frees all allocated variables for the last estimation
     E_free_work();
 
-    char** c_eqs = filter_kdb_names(I_EQUATIONS, str_equations);
-    int rc = KE_est_s(kdb_eqs->get_KDB(), KV_WS, kdb_scl->get_KDB(), sample->c_sample, c_eqs, 0);
+    if(sample) 
+        delete sample;
+    if(kdb_eqs)
+        delete kdb_eqs;
+    if(kdb_scl)
+        delete kdb_scl;
+}
+
+void EstimationResults::save()
+{
+    if(kdb_scl)
+        Scalars.merge(*kdb_scl);
+}
+
+EstimationResults* equations_estimate(const std::string& eqs_list, const std::string& from, const std::string& to)
+{
+    // frees all allocated variables for the last estimation
+    E_free_work();
+
+    Sample vars_sample = Variables.get_sample();
+    std::string from_ = from.empty() ? vars_sample.start_period().to_string() : from;
+    std::string to_ = to.empty() ? vars_sample.end_period().to_string() : to;
+
+    EstimationResults* est_results = new EstimationResults(eqs_list, from, to);
+
+    char** c_eqs = vector_to_double_char(est_results->get_list_equations());
+    KDB* kdb_eqs = est_results->get_equations().get_KDB();
+    KDB* kdb_scl = est_results->get_coefficients().get_KDB();
+    SAMPLE* smpl = est_results->get_sample().c_sample;
+
+    int rc = KE_est_s(kdb_eqs, KV_WS, kdb_scl, smpl, c_eqs, 0);
+    
+    SCR_free_tbl((unsigned char**) c_eqs);
     if (rc != 0)
     {
-        IodeExceptionFunction func_error("Cannot estimate (block of) equation(s) " + str_equations);
-        func_error.add_argument("From: ", sample->start_period().to_string());
-        func_error.add_argument("To:   ", sample->end_period().to_string());
-        func_error.add_argument("(block of) equation(s): ", str_equations);
-        throw func_error;
+        std::string error_msg = "Cannot estimate (block of) equation(s) " + eqs_list + "\n";
+        error_msg += "Equations: ", eqs_list + "\n";
+        error_msg += "From:      ", from + "\n";
+        error_msg += "To:        ", to + "\n";
+        throw std::runtime_error(error_msg);
     }
+
+    return est_results;
 }
 
-void Estimation::save()
+EstimationResults* equations_estimate(const std::vector<std::string>& eqs_vector, const std::string& from, const std::string& to)
 {
-    Scalars.merge(*kdb_scl);
-}
-
-void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)
-{
-    std::string error_msg = "Could not estimate equations " + eqs + "\n";
-
-    Sample sample = Variables.get_sample();
-    if(sample.nb_periods() == 0)
-        throw std::runtime_error(error_msg + "No sample is defined");
-    std::string from_ = (from.empty()) ? sample.start_period().to_string() : from;
-    std::string to_ = (to.empty()) ? sample.end_period().to_string() : to;
-
-    int res = KE_estim(to_char_array(eqs), to_char_array(from_), to_char_array(to_));
-    if(res != 0)
-        throw std::runtime_error(error_msg + "from: " + from + " to " + to);
-}
-
-void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from, const std::string& to)
-{
-    std::string s_eqs = boost::algorithm::join(eqs, ",");
-    eqs_estimate(s_eqs, from, to);
+    std::string eqs_list = boost::algorithm::join(eqs_vector, ",");
+    return equations_estimate(eqs_list, from, to);
 }
