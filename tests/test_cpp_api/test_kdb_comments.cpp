@@ -142,10 +142,40 @@ TEST_F(KDBCommentsTest, Get)
 
 TEST_F(KDBCommentsTest, GetNames)
 {
+    std::string list_names;
+    std::string expected_list_names;
+    std::vector<std::string> names;
     std::vector<std::string> expected_names;
-    for (int i=0; i < Comments.count(); i++) expected_names.push_back(Comments.get_name(i));
-    std::vector<std::string> names = Comments.get_names();
+
+    // no pattern
+    for (int i=0; i < Comments.count(); i++)
+    {
+        expected_names.push_back(Comments.get_name(i));
+        expected_list_names += expected_names.back() + ";";
+    }
+    expected_list_names.pop_back();     // remove trailing ';'
+
+    names = Comments.get_names();
     EXPECT_EQ(names, expected_names);
+    list_names = Comments.get_names_as_string();
+    EXPECT_EQ(list_names, expected_list_names);
+
+    // pattern
+    std::string pattern = "A*;*_";
+    expected_names.clear();
+    expected_list_names = "";
+    for(const std::string& name : names) 
+        if(name.front() == 'A' || name.back() == '_')
+        {
+            expected_names.push_back(name);
+            expected_list_names += name + ";";
+        }
+    expected_list_names.pop_back();     // remove trailing ';'
+
+    names = Comments.get_names(pattern);
+    EXPECT_EQ(names, expected_names);
+    list_names = Comments.get_names_as_string(pattern);
+    EXPECT_EQ(list_names, expected_list_names);
 }
 
 TEST_F(KDBCommentsTest, CreateRemove)
