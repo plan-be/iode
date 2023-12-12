@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QMap>
 #include <QString>
+#include <QList>
 
 #include <string>
 #include <array>
@@ -31,7 +32,9 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
 {
     Q_OBJECT
 
-    Estimation*  estimation;
+    EstimationResults*  est_results;
+    QStringList         eqs_list;
+    QString             next_block;
     
     size_t hashBefore;
 	size_t hashAfter;	
@@ -53,8 +56,7 @@ protected:
 	QString project_settings_filepath;
 
 private:
-    void set_estimation();
-    void display_equation(const NamedEquation& equation);
+    void display_equation(const QString& equationName, const bool update_block_from_equation=false);
 
 	void computeHash(Equation& eq, const bool before=false)
 	{

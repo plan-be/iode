@@ -7,6 +7,8 @@
 #include <QModelIndex>
 #include <QAbstractTableModel>
 
+#include <stdexcept>
+
 #include "utils.h"
 
 
@@ -35,12 +37,12 @@ public:
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return coefs_names.size();
+		return corr_matrix ? corr_matrix->m_nl : 0;
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return coefs_names.size();
+		return corr_matrix ? corr_matrix->m_nc : 0;
 	}
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;

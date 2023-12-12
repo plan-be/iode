@@ -7,6 +7,8 @@
 #include <QVector>
 #include <QGridLayout>
 
+#include <stdexcept>
+
 #include "ui_estimation_results.h"
 #include "correlation_matrix_model.h"
 #include "utils.h"
@@ -21,7 +23,9 @@ class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDial
     Q_OBJECT
 
     int precision;
-    Estimation* est;
+    EstimationResults* est_results;
+    Equation* equation;
+    QString equation_name;
 
     QString from;
     QString to;
@@ -32,11 +36,11 @@ class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDial
 private:
     void set_coefficients_tab();
     void set_correlation_matrix_tab();
-    void set_tests_tab(Equation& eq);
+    void set_tests_tab();
     void dump_table(const QAbstractTableModel* table_model, QTextCursor& cursor);
 
 public:
-    EstimationResultsDialog(Estimation* est, QWidget* parent = Q_NULLPTR);
+    EstimationResultsDialog(EstimationResults* est_results, const QString& equation_name, QWidget* parent = Q_NULLPTR);
     ~EstimationResultsDialog();
 
 signals:
