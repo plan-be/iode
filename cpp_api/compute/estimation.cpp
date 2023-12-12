@@ -164,7 +164,7 @@ void Estimation::equations_estimate()
     // frees all allocated variables for the last estimation
     E_free_work();
 
-    char** c_eqs = filter_kdb_names(I_EQUATIONS, str_equations);
+    char** c_eqs = filter_kdb_names_char_table(I_EQUATIONS, str_equations);
     int rc = KE_est_s(kdb_eqs->get_KDB(), KV_WS, kdb_scl->get_KDB(), sample->c_sample, c_eqs, 0);
     if (rc != 0)
     {

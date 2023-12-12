@@ -21,7 +21,7 @@ KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode
     }
     else
     {
-        char** c_names = filter_kdb_names(iode_type, pattern);
+        char** c_names = filter_kdb_names_char_table(iode_type, pattern);
         if (kdb_type == KDB_SHALLOW_COPY)
             local_kdb = K_quick_refer(K_WS[iode_type], c_names);
         else

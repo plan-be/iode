@@ -39,11 +39,12 @@ bool is_global_kdb_loaded(const EnumIodeType iodeType)
 }
 
 /**
-* Warning: renturned char** array must be freed by the caller
+* Warning: returned char** array must be freed by the caller
 */
-char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern)
+char** filter_kdb_names_char_table(const EnumIodeType iode_type, const std::string& pattern)
 {
-    if (pattern.empty()) return NULL;
+    if (pattern.empty()) 
+        return NULL;
     else
     {
         char* c_pattern = to_char_array(pattern);
@@ -56,6 +57,23 @@ char** filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern
         // return names
         return c_names; 
     }
+}
+
+std::vector<std::string> filter_kdb_names(const EnumIodeType iode_type, const std::string& pattern)
+{
+    std::vector<std::string> v_names;
+    
+    char** c_names = filter_kdb_names_char_table(iode_type, pattern);
+    if(c_names == NULL)
+        return v_names;
+
+    int nb_names = SCR_tbl_size((unsigned char **) c_names);
+    for(int i=0; i < nb_names; i++)
+        v_names.push_back(std::string(c_names[i]));
+
+    SCR_free_tbl((unsigned char **) c_names);
+
+    return v_names;
 }
 
 KDB* hard_copy_kdb(KDB* source_kdb, char** names)
