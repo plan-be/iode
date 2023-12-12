@@ -23,19 +23,19 @@ TEST_F(KDBGlobalTest, Filter)
     for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
 
     // simple patterns
-    list_names = char_array_to_std_string_vector(filter_kdb_names(I_EQUATIONS, "A*"));
+    list_names = filter_kdb_names(I_EQUATIONS, "A*");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     EXPECT_EQ(list_names, expected_list_names);
 
-    list_names = char_array_to_std_string_vector(filter_kdb_names(I_EQUATIONS, "*_"));
+    list_names = filter_kdb_names(I_EQUATIONS, "*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     // list
     std::string list = "$ENVI";
-    list_names = char_array_to_std_string_vector(filter_kdb_names(I_EQUATIONS, list));
+    list_names = filter_kdb_names(I_EQUATIONS, list);
     expected_list_names.clear();
     char* c_list = const_cast<char*>(list.c_str());
     unsigned char** c_expanded_list = KL_expand(c_list);
@@ -45,7 +45,7 @@ TEST_F(KDBGlobalTest, Filter)
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
-    list_names = char_array_to_std_string_vector(filter_kdb_names(I_EQUATIONS, "A*;" + list + ";*_"));
+    list_names = filter_kdb_names(I_EQUATIONS, "A*;" + list + ";*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
