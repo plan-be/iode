@@ -131,19 +131,38 @@ public:
         return name;
     }
 
-    std::vector<std::string> get_names() const
+    std::vector<std::string> get_names(const std::string& pattern = "") const
     {
-        std::vector<std::string> v_names;
-        for (int i=0; i < count(); i++) v_names.push_back(get_name(i));
-        return v_names;
+        if(pattern.empty())
+        {
+            std::vector<std::string> v_names;
+            for (int i=0; i < count(); i++) 
+                v_names.push_back(get_name(i));
+            return v_names;
+        }
+        else
+            return filter_kdb_names(this->iode_type, pattern);
     }
 
-    std::string get_names_as_string() const
+    std::string get_names_as_string(const std::string& pattern = "") const
     {
         std::string names;
-        for (int i=0; i < count(); i++) names += get_name(i) + ";";
+        if(pattern.empty())
+        {
+            for(int i=0; i < count(); i++) 
+                names += get_name(i) + ";";
+        }
+        else
+        {
+            std::vector<std::string> v_names = filter_kdb_names(this->iode_type, pattern);
+            for(const std::string& name: v_names)
+                names += std::string(name) + ";";
+        }
+
         // remove last ;
-        if(!names.empty()) names.pop_back();
+        if(!names.empty()) 
+            names.pop_back();
+
         return names;
     }
 
