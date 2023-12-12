@@ -95,11 +95,10 @@ void MenuGraphVariables::display()
 
         // add plot series
         std::string vars_names = wVariables->extractAndVerify().toStdString();
-        char** list_vars_names = filter_kdb_names(I_VARIABLES, vars_names);
-        int nb_vars = SCR_tbl_size((unsigned char**) list_vars_names);
-        for(int i=0; i<nb_vars; i++)
+        std::vector<std::string> list_vars_names = filter_kdb_names(I_VARIABLES, vars_names);
+        for(const std::string var_name: list_vars_names)
         {
-            QString variable = QString::fromStdString(std::string(list_vars_names[i]));
+            QString variable = QString::fromStdString(var_name);
             plotDialog->addSeries(variable);
         }
         

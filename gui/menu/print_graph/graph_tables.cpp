@@ -50,10 +50,10 @@ void MenuGraphTables::display()
     try
     {
         std::string tables_names = wTableNames->extractAndVerify().toStdString();
-        char** list_tables_names = filter_kdb_names(I_TABLES, tables_names);
-        int nb_tables = SCR_tbl_size((unsigned char**) list_tables_names);
+        std::vector<std::string> list_names = filter_kdb_names(I_TABLES, tables_names);
         QStringList qTablesList;
-        for(int i=0; i<nb_tables; i++) qTablesList << QString::fromStdString(std::string(list_tables_names[i]));
+        for(const std::string& name : list_names) 
+            qTablesList << QString::fromStdString(name);
 
         std::string gsample = wSample->extractAndVerify().toStdString();
 
