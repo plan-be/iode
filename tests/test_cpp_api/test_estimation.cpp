@@ -6,9 +6,6 @@ class EstimationResultsTest : public KDBTest, public ::testing::Test
 protected:
     std::string from;
     std::string to;
-    std::string eq_name;
-    std::string eq_name2;
-    std::string block;
 
     void SetUp() override
     {
@@ -18,10 +15,6 @@ protected:
 
         from = "1980Y1";
         to = "1996Y1";
-        eq_name = "ACAF";
-
-        eq_name2 = "DPUH";
-        block = eq_name + ";" + eq_name2;
     }
 
     // void TearDown() override {}
@@ -30,8 +23,8 @@ protected:
 
 TEST_F(EstimationResultsTest, Estimate)
 {
-    Equation eq(eq_name);
-    Equation eq2(eq_name2);
+    Equation eq("ACAF");
+    Equation eq2("DPUH");
 
     Scalars.update("acaf1", 0., 1.);
     Scalars.update("acaf2", 0., 1.);
@@ -39,7 +32,7 @@ TEST_F(EstimationResultsTest, Estimate)
     Scalars.update("dpuh_1", 0., 1.);
     Scalars.update("dpuh_2", 0., 1.);
 
-    EstimationResults* est_results = equations_estimate(block, from, to);
+    EstimationResults* est_results = equations_estimate("ACAF;DPUH", from, to);
 
     KDBScalars kdb_scl = est_results->get_coefficients();
     est_results->save();
@@ -49,19 +42,19 @@ TEST_F(EstimationResultsTest, Estimate)
     EXPECT_EQ(sample.to_string(), from + ":" + to);
 
     // List of equations
-    std::vector<std::string> expected_list_eqs = {eq_name, eq_name2};
+    std::vector<std::string> expected_list_eqs = {"ACAF", "DPUH"};
     std::vector<std::string> list_eqs = est_results->get_list_equations();
     EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
     EXPECT_EQ(list_eqs, expected_list_eqs);
 
     // first equation
     NamedEquation named_eq(list_eqs[0]);
-    EXPECT_EQ(named_eq.name, eq_name);
+    EXPECT_EQ(named_eq.name, "ACAF");
     EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
 
     // second equation 
     NamedEquation named_eq2(list_eqs[1]);
-    EXPECT_EQ(named_eq2.name, eq_name2);
+    EXPECT_EQ(named_eq2.name, "DPUH");
     EXPECT_EQ(named_eq2.eq.get_lec(), eq2.get_lec());
 
     // Coeff values
@@ -79,7 +72,7 @@ TEST_F(EstimationResultsTest, Estimate)
 
     // Estimates ACAF only
     delete est_results;
-    est_results = equations_estimate(eq_name, from, to);
+    est_results = equations_estimate("ACAF", from, to);
 
     // Result values
     EXPECT_DOUBLE_EQ(round(1e6 * Variables.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
@@ -159,7 +152,7 @@ TEST_F(EstimationResultsTest, Estimate)
 
     // -- DPUH
     delete est_results;
-    est_results = equations_estimate(eq_name2, from, to);
+    est_results = equations_estimate("DPUH", from, to);
 
     cm = est_results->get_correlation_matrix();
     ASSERT_FALSE(cm == NULL);
@@ -177,23 +170,23 @@ TEST_F(EstimationResultsTest, Estimate)
 
 TEST_F(EstimationResultsTest, EstimateBlock)
 {
-    EstimationResults* est_results = equations_estimate(block, from, to);
+    EstimationResults* est_results = equations_estimate("ACAF;DPUH", from, to);
 
     // List of equations
-    std::vector<std::string> expected_list_eqs = {eq_name, eq_name2};
+    std::vector<std::string> expected_list_eqs = {"ACAF", "DPUH"};
     std::vector<std::string> list_eqs = est_results->get_list_equations();
     EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
     EXPECT_EQ(list_eqs, expected_list_eqs);
 
     // first equation
-    NamedEquation first_eq(eq_name);
-    EXPECT_EQ(first_eq.name, eq_name);
-    EXPECT_EQ(first_eq.eq, Equation(eq_name));
+    NamedEquation first_eq("ACAF");
+    EXPECT_EQ(first_eq.name, "ACAF");
+    EXPECT_EQ(first_eq.eq, Equation("ACAF"));
 
     // second equation
-    NamedEquation second_eq(eq_name2);
-    EXPECT_EQ(second_eq.name, eq_name2);
-    EXPECT_EQ(second_eq.eq, Equation(eq_name2));
+    NamedEquation second_eq("DPUH");
+    EXPECT_EQ(second_eq.name, "DPUH");
+    EXPECT_EQ(second_eq.eq, Equation("DPUH"));
 }
 
 TEST_F(EstimationResultsTest, DynamicAdjustment)
