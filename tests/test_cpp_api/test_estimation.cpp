@@ -133,37 +133,33 @@ TEST_F(EstimationResultsTest, Estimate)
     // Correlation matrix
     // -- ACAF
 
-    MAT* cm = est_results->get_correlation_matrix();
-    ASSERT_FALSE(cm == NULL);
-    EXPECT_EQ(M_NL(cm), 3);
-    EXPECT_EQ(M_NC(cm), 3);
+    CorrelationMatrix m_corr = est_results->get_correlation_matrix();
+    EXPECT_EQ(m_corr.nb_coeffs, 3);
     // -- line 0
-    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 2)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 1)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 2)) / 1e6, 0.20017);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 2)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 0)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 2)) / 1e6, -0.300746);
     // -- line 2
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
-    EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 0)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 1)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
 
     // -- DPUH
     delete est_results;
     est_results = equations_estimate("DPUH", from, to);
 
-    cm = est_results->get_correlation_matrix();
-    ASSERT_FALSE(cm == NULL);
-    EXPECT_EQ(M_NL(cm), 2);
-    EXPECT_EQ(M_NC(cm), 2);
+    CorrelationMatrix m_corr2 = est_results->get_correlation_matrix();
+    EXPECT_EQ(m_corr2.nb_coeffs, 2);
     // -- line 0
-    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(0, 1)) / 1e6, -0.042291);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.042291);
-    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(1, 0)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(1, 1), 1.);
 
     delete est_results;
 }
