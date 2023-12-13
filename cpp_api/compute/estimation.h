@@ -33,6 +33,55 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
 KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
 
 
+class CorrelationMatrix
+{
+    const std::vector<std::string> coeffs;
+    const MAT* corr_matrix;
+
+public:
+    const int nb_coeffs;
+
+public:
+    CorrelationMatrix(const std::vector<std::string>& coeffs, const MAT* corr_matrix):
+        nb_coeffs((int) coeffs.size()), coeffs(coeffs), corr_matrix(corr_matrix)
+    {
+        if(corr_matrix->m_nl != corr_matrix->m_nc)
+            throw std::runtime_error("Cannot initialize the correlation matrix.\nNumber of lines " + 
+                std::to_string(corr_matrix->m_nl) + " is different from the number of columns " + 
+                std::to_string(corr_matrix->m_nc));
+        
+        if(corr_matrix->m_nl != nb_coeffs)
+            throw std::runtime_error(std::string("Cannot initialize the correlation matrix.\n") + 
+            "The list of coefficients contains " + std::to_string(nb_coeffs) + " names while the " + 
+            "found correlation matrix is of shape " + std::to_string(corr_matrix->m_nl) + " x " + 
+            std::to_string(corr_matrix->m_nc));
+    }
+
+    ~CorrelationMatrix() {} 
+
+    std::string get_name(const int i) const
+    {
+        check_index(i, "Coefficient");
+        return coeffs[i];
+    }
+
+    IODE_REAL get_value(const int row, const int col) const
+    {
+        check_index(row, "Row");
+        check_index(col, "Column");
+        return MATE(corr_matrix, row, col);
+    }
+
+private:
+    void check_index(const int index, const std::string& index_name) const
+    {
+        if(index < 0 || index >= nb_coeffs)
+            throw std::invalid_argument(index_name + " index " + std::to_string(index) + 
+                " is out of the range [0, " + std::to_string(nb_coeffs) + "]");
+    }
+};
+
+
 class Estimation
 {
     std::string str_equations;
@@ -113,7 +162,11 @@ public:
         return NamedEquation(*current_eq);
     }
 
-    MAT* get_correlation_matrix() { return E_MCORR; }
+    CorrelationMatrix get_correlation_matrix() 
+    { 
+        std::vector<std::string> v_coeffs = kdb_scl->get_names();
+        return CorrelationMatrix(v_coeffs, E_MCORR); 
+    }
 
     std::vector<IODE_REAL> get_observed_values(const std::string& name) const
     {
