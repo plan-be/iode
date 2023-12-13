@@ -82,6 +82,12 @@ TEST_F(EstimationTest, Estimate)
     est = new Estimation(from, to, "ACAF");
     est->equations_estimate();
 
+    // number of coefficients 
+    EXPECT_EQ(E_NCE, 3);
+
+    // number of equations
+    EXPECT_EQ(E_NEQ, 1);
+
     // Result values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
 
@@ -141,36 +147,40 @@ TEST_F(EstimationTest, Estimate)
     // Correlation matrix
     // -- ACAF
 
-    MAT* cm = est->get_correlation_matrix();
-    EXPECT_EQ(M_NL(cm), 3);
-    EXPECT_EQ(M_NC(cm), 3);
+    CorrelationMatrix m_corr = est->get_correlation_matrix();
+    EXPECT_EQ(m_corr.nb_coeffs, E_NCE);
     // -- line 0
-    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 2)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 1)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 2)) / 1e6, 0.20017);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 2)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 0)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 2)) / 1e6, -0.300746);
     // -- line 2
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 0)) / 1e6, 0.20017);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 2, 1)) / 1e6, -0.300746);
-    EXPECT_DOUBLE_EQ(MATE(cm, 2, 2), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 0)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 1)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
 
     // -- DPUH
     delete est;
     est = new Estimation(from, to, "DPUH");
     est->equations_estimate();
 
-    cm = est->get_correlation_matrix();
-    EXPECT_EQ(M_NL(cm), 2);
-    EXPECT_EQ(M_NC(cm), 2);
+    // number of coefficients 
+    EXPECT_EQ(E_NCE, 2);
+
+    // number of equations
+    EXPECT_EQ(E_NEQ, 1);
+
+    CorrelationMatrix m_corr2 = est->get_correlation_matrix();
+    EXPECT_EQ(m_corr2.nb_coeffs, E_NCE);
     // -- line 0
-    EXPECT_DOUBLE_EQ(MATE(cm, 0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 0, 1)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(0, 1)) / 1e6, -0.042291);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * MATE(cm, 1, 0)) / 1e6, -0.042291);
-    EXPECT_DOUBLE_EQ(MATE(cm, 1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(1, 0)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(1, 1), 1.);
 
     delete est;
 }
