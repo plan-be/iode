@@ -22,6 +22,11 @@ const static std::array<std::string, 2> v_adjstment_method =
     "Error Correction Model"
 };
 
+// see k_est.c
+constexpr IODE_REAL EST_EPS = 0.00001;
+constexpr int       EST_MAXIT = 100;
+
+
 std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method, 
     const std::string& eqs, const std::string& c1, const std::string& c2);
 
@@ -156,35 +161,58 @@ public:
         return values;
     }
 
+    // Note: DO NOT make it public in Python API
+    void copy_results_after_estimation();
+
     void save();
 };
 
 
-// TODO: add all estimation parameters
 /**
- * @brief Estimate an equation of a given sample. 
+ * @brief Estimate an equation or a block of equations for a given sample. 
+ * 
+ * @param eqs_list      comma separated list of equation names (=endo  names)
+ * @param from          first period of the estimation sample
+ * @param to            last period of the estimation sample
+ * @param method        estimation method 
+ * @param instruments   list of instruments (LEC formulas)   
+ * @param maxit         maximum number of iterations
+ * @param eps           convergence criterion (threshold)
+ * @return EstimationResults 
+ * 
+ * @note equivalent to function ODE_blk_instr() from o_est.c from old GUI
+ */
+EstimationResults* estimate_equations(const std::string& eqs_list, const std::string& from = "", const std::string& to = "", 
+    const EnumIodeEquationMethod method = EnumIodeEquationMethod::IE_LSQ, const std::string& instruments = "", 
+    const int maxit = EST_MAXIT, const double eps = EST_EPS);
+
+/**
+ * @brief Estimate an equation or a block of equations for a given sample. 
+ * 
+ * @param eqs_vector    list of equation names (=endo  names)
+ * @param from          first period of the estimation sample
+ * @param to            last period of the estimation sample
+ * @param method        estimation method 
+ * @param instruments   list of instruments (LEC formulas)   
+ * @param maxit         maximum number of iterations
+ * @param eps           convergence criterion (threshold)
+ * @return EstimationResults
+ */
+EstimationResults* estimate_equations(const std::vector<std::string>& eqs_vector, const std::string& from = "", const std::string& to = "",
+    const EnumIodeEquationMethod method = EnumIodeEquationMethod::IE_LSQ, const std::string& instruments = "", 
+    const int maxit = EST_MAXIT, const double eps = EST_EPS);
+
+/**
+ * @brief Estimate an equation for a given sample. 
  *        The estimation method and the instruments must be specified 
  *        in the equation before the estimation.
  *        Only defined to standardize the Python API functions.
  * 
- * @param eqs_list   comma separated list of equation names (=endo  names)
+ * @param eq_name    name of the equation to estimate
  * @param from       first period of the estimation sample
  * @param to         last period of the estimation sample
  * @return EstimationResults 
  * 
- * @note equivalent to function B_EqsEstimateEqs() from b_est.c
+ * @note equivalent to function ODE_blk_instr() from o_est.c from old GUI
  */
-EstimationResults* equations_estimate(const std::string& eqs_list, const std::string& from = "", const std::string& to = "");
-
-/**
- * @brief Estimate an equation of a given sample. 
- *        The estimation method and the instruments must be specified 
- *        in the equation before the estimation.
- *        Only defined to standardize the Python API functions.
- * 
- * @param eqs_vector   list of equation names (=endo  names)
- * @param from         first period of the estimation sample
- * @param to           last period of the estimation sample
- * @return EstimationResults
- */
-EstimationResults* equations_estimate(const std::vector<std::string>& eqs_vector, const std::string& from = "", const std::string& to = "");
+EstimationResults* estimate_equation(const std::string& eq_name, const std::string& from = "", const std::string& to = "");

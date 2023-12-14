@@ -130,9 +130,6 @@ EstimationResults::EstimationResults(const std::string& eqs_list, const std::str
 
 EstimationResults::~EstimationResults()
 {
-    // frees all allocated variables for the last estimation
-    E_free_work();
-
     if(sample) 
         delete sample;
     if(kdb_eqs)
@@ -141,13 +138,40 @@ EstimationResults::~EstimationResults()
         delete kdb_scl;
 }
 
+// NOTE: same as ODE_blk_cur_atests() from o_est.c from old GUI
+void EstimationResults::copy_results_after_estimation()
+{
+    std::string name;
+    std::array<float, EQS_NBTESTS> tests{0.0};
+    for(int i = 0; i < kdb_eqs->count(); i++) 
+    {
+        tests[IE_CORR]    = MATE(E_MCORRU,      0, i);
+        tests[IE_STDEV]   = MATE(E_STDEV,       0, i);
+        tests[IE_MEANY]   = MATE(E_MEAN_Y,      0, i);
+        tests[IE_SSRES]   = MATE(E_SSRES,       0, i);
+        tests[IE_STDERR]  = MATE(E_STDERR,      0, i);
+        tests[IE_STDERRP] = MATE(E_STD_PCT,     0, i);
+        tests[IE_FSTAT]   = MATE(E_FSTAT,       0, i);
+        tests[IE_R2]      = MATE(E_RSQUARE,     0, i);
+        tests[IE_R2ADJ]   = MATE(E_RSQUARE_ADJ, 0, i);
+        tests[IE_DW]      = MATE(E_DW,          0, i);
+        tests[IE_LOGLIK]  = MATE(E_LOGLIK,      0, i);
+
+        name = kdb_eqs.get_name(i);
+        Equation eq = kdb_eqs->get(i);
+        eq.set_tests(tests);
+        kdb_eqs.update(i, eq);
+    }
+}
+
 void EstimationResults::save()
 {
     if(kdb_scl)
         Scalars.merge(*kdb_scl);
 }
 
-EstimationResults* equations_estimate(const std::string& eqs_list, const std::string& from, const std::string& to)
+EstimationResults* estimate_equations(const std::string& eqs_list, const std::string& from, const std::string& to, 
+    const EnumIodeEquationMethod method, const std::string& instruments, const int maxit, const double eps)
 {
     // frees all allocated variables for the last estimation
     E_free_work();
@@ -158,16 +182,24 @@ EstimationResults* equations_estimate(const std::string& eqs_list, const std::st
 
     EstimationResults* est_results = new EstimationResults(eqs_list, from, to);
 
-    char** c_eqs = vector_to_double_char(est_results->get_list_equations());
-    KDB* kdb_eqs = est_results->get_equations().get_KDB();
+    KDBEquations kdb_eqs = est_results->get_equations();
+    std::vector<std::string> v_names = kdb_eqs.get_names();
+    std::vector<std::string> v_lecs;
+    for(const std::string& name: v_names)
+        v_lecs.push_back(kdb_eqs.get_lec(name));
+    char** c_endos = vector_to_double_char(v_names);
+    char** c_lecs = vector_to_double_char(v_lecs);
     KDB* kdb_scl = est_results->get_coefficients().get_KDB();
     SAMPLE* smpl = est_results->get_sample().c_sample;
 
-    int rc = KE_est_s(kdb_eqs, KV_WS, kdb_scl, smpl, c_eqs, 0);
-    
-    SCR_free_tbl((unsigned char**) c_eqs);
+    char** c_instrs = (char**) SCR_vtoms((unsigned char*) instruments.c_str(), (unsigned char*) ",;");
+
+    int rc = E_est(c_endos, c_lecs, KV_WS, kdb_scl, smpl, (int) method, c_instrs, maxit, eps);
     if (rc != 0)
     {
+        // frees all allocated variables for the last estimation
+        E_free_work();
+
         std::string error_msg = "Cannot estimate (block of) equation(s) " + eqs_list + "\n";
         error_msg += "Equations: ", eqs_list + "\n";
         error_msg += "From:      ", from + "\n";
@@ -175,11 +207,28 @@ EstimationResults* equations_estimate(const std::string& eqs_list, const std::st
         throw std::runtime_error(error_msg);
     }
 
+    EstimationResults->copy_results_after_estimation();
+
+    ODE_blk_cur_tests();
+
+    // frees all allocated variables for the last estimation
+    // NOTE: c_endos, c_lecs and c_instrs are freed via E_free_work() 
+    //       -> DO NOT call SCR_free_tbl() them
+    E_free_work();
+
     return est_results;
 }
 
-EstimationResults* equations_estimate(const std::vector<std::string>& eqs_vector, const std::string& from, const std::string& to)
+EstimationResults* estimate_equations(const std::vector<std::string>& eqs_vector, const std::string& from, const std::string& to)
 {
-    std::string eqs_list = boost::algorithm::join(eqs_vector, ",");
-    return equations_estimate(eqs_list, from, to);
+    std::string eqs_list = boost::algorithm::join(eqs_vector, ";");
+    return estimate_equations(eqs_list, from, to);
+}
+
+EstimationResults* estimate_equation(const std::string& eq_name, const std::string& from, const std::string& to)
+{
+    Equation equation = Equations.get(eq_name);
+    EnumIodeEquationMethod method = (EnumIodeEquationMethod) equation.get_method_as_int();
+    std::string instruments = equation.get_instruments();
+    return estimate_equations(eq_name, from, to, method, instruments);
 }
