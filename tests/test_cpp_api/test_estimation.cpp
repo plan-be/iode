@@ -4,11 +4,6 @@
 class EstimationTest : public KDBTest, public ::testing::Test
 {
 protected:
-    std::string from;
-    std::string to;
-    std::string eq_name;
-    std::string eq_name2;
-    std::string block;
     KDBEquations kdb_eqs;
     KDBScalars kdb_scl;
     KDBVariables kdb_vars;
@@ -18,13 +13,6 @@ protected:
         load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
         load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
         load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
-
-        from = "1980Y1";
-        to = "1996Y1";
-        eq_name = "ACAF";
-
-        eq_name2 = "DPUH";
-        block = eq_name + ";" + eq_name2;
     }
 
     // void TearDown() override {}
@@ -33,8 +21,11 @@ protected:
 
 TEST_F(EstimationTest, Estimate)
 {
-    Equation eq(eq_name);
-    Equation eq2(eq_name2);
+    std::string from = "1980Y1";
+    std::string to = "1996Y1";
+
+    Equation eq("ACAF");
+    Equation eq2("DPUH");
 
     kdb_scl.update("acaf1", 0., 1.);
     kdb_scl.update("acaf2", 0., 1.);
@@ -42,7 +33,7 @@ TEST_F(EstimationTest, Estimate)
     kdb_scl.update("dpuh_1", 0., 1.);
     kdb_scl.update("dpuh_2", 0., 1.);
 
-    Estimation* est = new Estimation(from, to, block);
+    Estimation* est = new Estimation(from, to, "ACAF;DPUH");
 
     est->equations_estimate();
     const KDBScalars* kdb_scl_res = est->get_coefficients();
@@ -53,24 +44,24 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(sample.to_string(), from + ":" + to);
 
     // List of equations
-    std::vector<std::string> expected_list_eqs = {eq_name, eq_name2};
+    std::vector<std::string> expected_list_eqs = {"ACAF", "DPUH"};
     std::vector<std::string> list_eqs = est->get_list_equations();
     EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
     EXPECT_EQ(list_eqs, expected_list_eqs);
 
     // Current equation
     NamedEquation named_eq = est->current_equation();
-    EXPECT_EQ(named_eq.name, eq_name);
+    EXPECT_EQ(named_eq.name, "ACAF");
     EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
 
     // Next equation 
     NamedEquation next_named_eq = est->next_equation();
-    EXPECT_EQ(next_named_eq.name, eq_name2);
+    EXPECT_EQ(next_named_eq.name, "DPUH");
     EXPECT_EQ(next_named_eq.eq.get_lec(), eq2.get_lec());
 
     // -- go back to first eq
     next_named_eq = est->next_equation();
-    EXPECT_EQ(next_named_eq.name, eq_name);
+    EXPECT_EQ(next_named_eq.name, "ACAF");
     EXPECT_EQ(next_named_eq.eq.get_lec(), eq.get_lec());
 
     // Coeff values
@@ -88,7 +79,7 @@ TEST_F(EstimationTest, Estimate)
 
     // Estimates ACAF only
     delete est;
-    est = new Estimation(from, to, eq_name);
+    est = new Estimation(from, to, "ACAF");
     est->equations_estimate();
 
     // Result values
@@ -168,7 +159,7 @@ TEST_F(EstimationTest, Estimate)
 
     // -- DPUH
     delete est;
-    est = new Estimation(from, to, eq_name2);
+    est = new Estimation(from, to, "DPUH");
     est->equations_estimate();
 
     cm = est->get_correlation_matrix();
@@ -186,17 +177,17 @@ TEST_F(EstimationTest, Estimate)
 
 TEST_F(EstimationTest, EstimateBlock)
 {
-    Estimation* est = new Estimation(from, to, block);
+    Estimation* est = new Estimation("1980Y1", "1996Y1", "ACAF;DPUH");
 
     est->equations_estimate();
 
     NamedEquation first_eq = est->current_equation();
-    EXPECT_EQ(first_eq.name, eq_name);
-    EXPECT_EQ(first_eq.eq, Equation(eq_name));
+    EXPECT_EQ(first_eq.name, "ACAF");
+    EXPECT_EQ(first_eq.eq, Equation("ACAF"));
 
     NamedEquation second_eq = est->next_equation();
-    EXPECT_EQ(second_eq.name, eq_name2);
-    EXPECT_EQ(second_eq.eq, Equation(eq_name2));
+    EXPECT_EQ(second_eq.name, "DPUH");
+    EXPECT_EQ(second_eq.eq, Equation("DPUH"));
 
     delete est;
 }
