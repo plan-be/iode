@@ -21,12 +21,12 @@ KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode
     }
     else
     {
-        char** c_names = filter_kdb_names_char_table(iode_type, pattern);
+        char** c_names = filter_names_from_global_db(pattern);
         if (kdb_type == KDB_SHALLOW_COPY)
             local_kdb = K_quick_refer(K_WS[iode_type], c_names);
         else
             local_kdb = hard_copy_kdb(K_WS[iode_type], c_names); 
-        SW_nfree(c_names);
+        SCR_free_tbl((unsigned char**) c_names);
         if (local_kdb == NULL)
         {
             IodeExceptionInvalidArguments error("Cannot extract subset of KDB of " + iode_type_name + "s");
@@ -69,6 +69,26 @@ KDBAbstract::~KDBAbstract()
     if (kdb_type == KDB_LOCAL) K_free(local_kdb);
     // the KDB struct is deleted (freed) but not the objects.
     if(kdb_type == KDB_SHALLOW_COPY) K_free_kdb(local_kdb);
+}
+
+// private methods
+
+char** KDBAbstract::filter_names_from_global_db(const std::string& pattern) const
+{
+    if (pattern.empty()) 
+        return NULL;
+    else
+    {
+        char* c_pattern = to_char_array(pattern);
+        // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+        char* c_lst = K_expand(this->iode_type, NULL, c_pattern, '*');
+        // Parses a string and replaces @filename and $listname by their contents
+        char** c_names = B_ainit_chk(c_lst, NULL, 0);
+        // remove duplicates
+        c_names = remove_duplicates(c_names);
+        // return names
+        return c_names; 
+    }
 }
 
 // object name
