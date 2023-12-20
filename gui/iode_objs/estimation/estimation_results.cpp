@@ -50,13 +50,15 @@ void EstimationResultsDialog::set_correlation_matrix_tab()
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
     tableView_corr_matrix->setStyleSheet(stylesheet);
 
-    QVector<QString> q_coefs_names;
-    const KDBScalars* kdb_coefs = est->get_coefficients();
-    for(const std::string& name : kdb_coefs->get_names()) 
-        q_coefs_names << QString::fromStdString(name);
-
-    CorrelationMatrixModel* model = new CorrelationMatrixModel(q_coefs_names, est->get_correlation_matrix(), this);
-    tableView_corr_matrix->setModel(model);
+    try
+    {
+        CorrelationMatrixModel* model = new CorrelationMatrixModel(est->get_correlation_matrix(), this);
+        tableView_corr_matrix->setModel(model);
+    }
+    catch(const std::exception& e)
+    {
+        QMessageBox::warning(nullptr, "WARNING", "Cannot display the correlation matrix.\n" + QString(e.what()));
+    } 
 }
 
 void EstimationResultsDialog::set_tests_tab(Equation& eq)
