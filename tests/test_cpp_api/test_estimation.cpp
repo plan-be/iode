@@ -35,6 +35,15 @@ TEST_F(EstimationTest, Estimate)
 
     Estimation* est = new Estimation(from, to, "ACAF;DPUH");
 
+    // see issue https://github.com/plan-be/iode/issues/433
+    /*
+    // number of coefficients 
+    EXPECT_EQ(E_NCE, 5);
+
+    // number of equations
+    EXPECT_EQ(E_NEQ, 2);
+    */
+
     est->equations_estimate();
     const KDBScalars* kdb_scl_res = est->get_coefficients();
     est->save();
@@ -48,6 +57,45 @@ TEST_F(EstimationTest, Estimate)
     std::vector<std::string> list_eqs = est->get_list_equations();
     EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
     EXPECT_EQ(list_eqs, expected_list_eqs);
+
+    // see issue https://github.com/plan-be/iode/issues/433
+    /*
+    // Correlation matrix
+    // -- ACAF;DPUH
+
+    CorrelationMatrix m_corr = est->get_correlation_matrix();
+    EXPECT_EQ(m_corr.nb_coeffs, E_NCE);
+    // -- line 0
+    EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 1)) / 1e6, -0.935);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 2)) / 1e6, 0.20016739);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 3)) / 1e6, 0.0448);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 4)) / 1e6, -0.0373);
+    // -- line 1
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 0)) / 1e6, -0.935);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 2)) / 1e6, -0.301);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 3)) / 1e6, -0.00166);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 4)) / 1e6, 0.0396);
+    // -- line 2
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 0)) / 1e6, 0.20016739);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 1)) / 1e6, -0.301);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 3)) / 1e6, 0.000375);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 4)) / 1e6, -0.00893);
+    // -- line 3
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 0)) / 1e6, 0.0448);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 1)) / 1e6, -0.00166);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 2)) / 1e6, 0.000375);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(3, 3), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 4)) / 1e6, -0.0420);
+    // -- line 3
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 0)) / 1e6, -0.0373);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 1)) / 1e6, 0.0396);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 2)) / 1e6, -0.00893);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 3)) / 1e6, -0.00420);
+    EXPECT_DOUBLE_EQ(m_corr.get_value(4, 4), 1.);
+    */
 
     // Current equation
     NamedEquation named_eq = est->current_equation();
