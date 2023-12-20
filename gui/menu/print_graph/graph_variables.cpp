@@ -94,8 +94,8 @@ void MenuGraphVariables::display()
             plotDialog->setMaxValue(qMaxY.toDouble());
 
         // add plot series
-        std::string vars_names = wVariables->extractAndVerify().toStdString();
-        std::vector<std::string> list_vars_names = filter_kdb_names(I_VARIABLES, vars_names);
+        std::string pattern = wVariables->extractAndVerify().toStdString();
+        std::vector<std::string> list_vars_names = Variables.get_names(pattern);
         for(const std::string var_name: list_vars_names)
         {
             QString variable = QString::fromStdString(var_name);
