@@ -49,8 +49,8 @@ void MenuGraphTables::display()
 {
     try
     {
-        std::string tables_names = wTableNames->extractAndVerify().toStdString();
-        std::vector<std::string> list_names = filter_kdb_names(I_TABLES, tables_names);
+        std::string pattern = wTableNames->extractAndVerify().toStdString();
+        std::vector<std::string> list_names = Tables.get_names(pattern);
         QStringList qTablesList;
         for(const std::string& name : list_names) 
             qTablesList << QString::fromStdString(name);
