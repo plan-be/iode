@@ -24,23 +24,22 @@
 
 class CorrelationMatrixModel : public QAbstractTableModel
 {
-    MAT* corr_matrix;
-    QVector<QString> coefs_names;
+    CorrelationMatrix corr_matrix;
 
 public:
-    CorrelationMatrixModel(const QVector<QString>& coefs_names, MAT* corr_matrix, QObject* parent = nullptr) : 
-        QAbstractTableModel(parent), coefs_names(coefs_names), corr_matrix(corr_matrix) {}
+    CorrelationMatrixModel(CorrelationMatrix corr_matrix, QObject* parent = nullptr) : 
+        QAbstractTableModel(parent), corr_matrix(corr_matrix) {}
 
     ~CorrelationMatrixModel() {}
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return coefs_names.size();
+		return corr_matrix.nb_coeffs;
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return coefs_names.size();
+		return corr_matrix.nb_coeffs;
 	}
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
