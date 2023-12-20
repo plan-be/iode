@@ -23,34 +23,34 @@ TEST_F(KDBGlobalTest, Filter)
     for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
 
     // simple patterns
-    list_names = filter_kdb_names(I_EQUATIONS, "A*");
+    list_names = Equations.get_names("A*");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     EXPECT_EQ(list_names, expected_list_names);
 
-    list_names = filter_kdb_names(I_EQUATIONS, "*_");
+    list_names = Equations.get_names("*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
     EXPECT_EQ(list_names, expected_list_names);
 
     // list
     std::string list = "$ENVI";
-    list_names = filter_kdb_names(I_EQUATIONS, list);
+    list_names = Equations.get_names(list);
     expected_list_names.clear();
     char* c_list = const_cast<char*>(list.c_str());
     unsigned char** c_expanded_list = KL_expand(c_list);
     for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
-    // Note: filter_kdb_names() calls remove_duplicates() which calls sort()
+    // Note: get_names() calls remove_duplicates() which calls sort()
     std::sort(expected_list_names.begin(), expected_list_names.end());
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
-    list_names = filter_kdb_names(I_EQUATIONS, "A*;" + list + ";*_");
+    list_names = Equations.get_names("A*;" + list + ";*_");
     expected_list_names.clear();
     for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
     for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) expected_list_names.push_back((char*) c_expanded_list[i]);
     for (const std::string& name : all_names) if (name.back() == '_') expected_list_names.push_back(name);
-    // Note: filter_kdb_names() calls remove_duplicates() (which calls sort())
+    // Note: get_names() calls remove_duplicates() (which calls sort())
     remove_duplicates(expected_list_names);
     EXPECT_EQ(list_names, expected_list_names);
 }
