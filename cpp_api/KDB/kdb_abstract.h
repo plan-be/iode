@@ -31,6 +31,17 @@ protected:
     EnumIodeKDBType kdb_type;
     KDB* local_kdb;         //< either a shallow copy (K_refer()) of a subset of a global KDB or a local kdb
 
+private:
+    /**
+     * @brief Create a table of IODE object names extracted from the corresponding global database given a pattern.
+     * 
+     * @param pattern 
+     * @return char**
+     * 
+     * @warning the returned char** table must be freed using the SCR_free_tbl() function
+     */
+    char** filter_names_from_global_db(const std::string& pattern) const;
+
 public:
     KDBAbstract(const std::string& filepath);
 
@@ -133,15 +144,27 @@ public:
 
     std::vector<std::string> get_names(const std::string& pattern = "") const
     {
+        std::vector<std::string> v_names;
         if(pattern.empty())
         {
-            std::vector<std::string> v_names;
             for (int i=0; i < count(); i++) 
                 v_names.push_back(get_name(i));
             return v_names;
         }
         else
-            return filter_kdb_names(this->iode_type, pattern);
+        {
+            char** c_names = filter_names_from_global_db(pattern);
+            if(c_names == NULL)
+                return v_names;
+
+            int nb_names = SCR_tbl_size((unsigned char **) c_names);
+            for(int i=0; i < nb_names; i++)
+                v_names.push_back(std::string(c_names[i]));
+
+            SCR_free_tbl((unsigned char **) c_names);
+        }
+
+        return v_names;
     }
 
     std::string get_names_as_string(const std::string& pattern = "") const
@@ -154,7 +177,7 @@ public:
         }
         else
         {
-            std::vector<std::string> v_names = filter_kdb_names(this->iode_type, pattern);
+            std::vector<std::string> v_names = get_names(pattern);
             for(const std::string& name: v_names)
                 names += std::string(name) + ";";
         }

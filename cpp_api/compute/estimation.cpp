@@ -164,8 +164,10 @@ void Estimation::equations_estimate()
     // frees all allocated variables for the last estimation
     E_free_work();
 
-    char** c_eqs = filter_kdb_names_char_table(I_EQUATIONS, str_equations);
+    std::vector<std::string> v_eqs = Equations.get_names(str_equations);
+    char** c_eqs = vector_to_double_char(v_eqs);
     int rc = KE_est_s(kdb_eqs->get_KDB(), KV_WS, kdb_scl->get_KDB(), sample->c_sample, c_eqs, 0);
+    SCR_free_tbl((unsigned char**) c_eqs);
     if (rc != 0)
     {
         IodeExceptionFunction func_error("Cannot estimate (block of) equation(s) " + str_equations);
