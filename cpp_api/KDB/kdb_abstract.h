@@ -142,58 +142,15 @@ public:
         return name;
     }
 
-    std::vector<std::string> get_names(const std::string& pattern = "") const
-    {
-        std::vector<std::string> v_names;
-        if(pattern.empty())
-        {
-            for (int i=0; i < count(); i++) 
-                v_names.push_back(get_name(i));
-            return v_names;
-        }
-        else
-        {
-            char** c_names = filter_names_from_global_db(pattern);
-            if(c_names == NULL)
-                return v_names;
+    std::vector<std::string> get_names(const std::string& pattern = "", const bool must_exist = true) const;
 
-            int nb_names = SCR_tbl_size((unsigned char **) c_names);
-            for(int i=0; i < nb_names; i++)
-                v_names.push_back(std::string(c_names[i]));
-
-            SCR_free_tbl((unsigned char **) c_names);
-        }
-
-        return v_names;
-    }
-
-    std::string get_names_as_string(const std::string& pattern = "") const
-    {
-        std::string names;
-        if(pattern.empty())
-        {
-            for(int i=0; i < count(); i++) 
-                names += get_name(i) + ";";
-        }
-        else
-        {
-            std::vector<std::string> v_names = get_names(pattern);
-            for(const std::string& name: v_names)
-                names += std::string(name) + ";";
-        }
-
-        // remove last ;
-        if(!names.empty()) 
-            names.pop_back();
-
-        return names;
-    }
+    std::string get_names_as_string(const std::string& pattern = "", const bool must_exist = true) const;
 
     int set_name(const int pos, const std::string& new_name);
 
     int rename(const std::string& old_name, const std::string& new_name);
 
-    bool contains(const std::string& name) 
+    bool contains(const std::string& name) const
     { 
         KDB* kdb = get_KDB();
         if (kdb)

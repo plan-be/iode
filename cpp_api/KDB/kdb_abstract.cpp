@@ -93,6 +93,59 @@ char** KDBAbstract::filter_names_from_global_db(const std::string& pattern) cons
 
 // object name
 
+std::vector<std::string> KDBAbstract::get_names(const std::string& pattern, const bool must_exist) const
+{
+    std::vector<std::string> v_names;
+    if(pattern.empty())
+    {
+        for (int i=0; i < count(); i++) 
+            v_names.push_back(get_name(i));
+        return v_names;
+    }
+    else
+    {
+        char** c_names = filter_names_from_global_db(pattern);
+        if(c_names == NULL)
+            return v_names;
+
+        int nb_names = SCR_tbl_size((unsigned char **) c_names);
+        std::string name;
+        for(int i=0; i < nb_names; i++)
+        {
+            name = std::string(c_names[i]);
+            if(must_exist && !contains(name))
+                continue;
+            v_names.push_back(name);
+        }
+
+        SCR_free_tbl((unsigned char **) c_names);
+    }
+
+    return v_names;
+}
+
+std::string KDBAbstract::get_names_as_string(const std::string& pattern, const bool must_exist) const
+{
+    std::string names;
+    if(pattern.empty())
+    {
+        for(int i=0; i < count(); i++) 
+            names += get_name(i) + ";";
+    }
+    else
+    {
+        std::vector<std::string> v_names = get_names(pattern, must_exist);
+        for(const std::string& name: v_names)
+            names += std::string(name) + ";";
+    }
+
+    // remove last ;
+    if(!names.empty()) 
+        names.pop_back();
+
+    return names;
+}
+
 int KDBAbstract::set_name(const int pos, const std::string& new_name)
 {
     std::string old_name = get_name(pos);
