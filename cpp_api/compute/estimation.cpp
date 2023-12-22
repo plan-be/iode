@@ -72,115 +72,105 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
     return kdb_res;
 }
 
-
-void Estimation::set_equations_list(const std::string& str_equations)
-{
-    this->str_equations = str_equations;
-
-    IodeExceptionInvalidArguments invalid_error("Cannot estimate (block of) equation(s) " + str_equations);
-    if (str_equations.empty()) 
-    {
-        invalid_error.add_argument("(list of) equation(s)", "empty");
-        throw invalid_error;
-    }
-
-    if (kdb_eqs) delete kdb_eqs;
-    try
-    {
-        kdb_eqs = new KDBEquations(KDB_LOCAL, str_equations);
-    }
-    catch(IodeException)
-    {
-        invalid_error.add_argument("(list of) equation(s)", str_equations);
-        throw invalid_error;
-    }
-
-    v_equations = kdb_eqs->get_names();
-    current_eq = v_equations.begin();
-
-    // concatenate list of coefficients of each equations of the block
-    std::vector<std::string> coefficients_list;
-    std::vector<std::string> tmp_coefs_list;
-    std::string eq_name;
-    for (int i=0; i < kdb_eqs->count(); i++)
-    {
-        eq_name = kdb_eqs->get_name(i);
-        Equation eq = kdb_eqs->get(i);
-        tmp_coefs_list = eq.get_coefficients_list();
-        std::move(tmp_coefs_list.begin(), tmp_coefs_list.end(), std::back_inserter(coefficients_list));
-    }
-    // remove duplicate coefficient names
-    remove_duplicates(coefficients_list);
-    // convert vector to string
-    std::string scalars_list = boost::algorithm::join(coefficients_list, ";");
-
-    if(kdb_scl) delete kdb_scl;
-    try
-    {
-        kdb_scl = new KDBScalars(KDB_LOCAL, scalars_list);
-    }
-    catch(IodeException)
-    {
-        invalid_error.add_argument("list of found coefficients", scalars_list);
-        throw invalid_error;
-    }
-}
-
-Estimation::Estimation(const Sample& sample, const std::string& str_equations) 
-    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
-{
-    set_sample(sample);
-    set_equations_list(str_equations);
-}
-
-Estimation::Estimation(const Period& from, const Period& to, const std::string& str_equations)
-    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
+Estimation::Estimation(const std::string& from, const std::string& to)
+    : estimation_done(false), sample(nullptr), kdb_eqs(KDBEquations(KDB_LOCAL, "")), kdb_scl(KDBScalars(KDB_LOCAL, ""))
 {
     set_sample(from, to);
-    set_equations_list(str_equations);
-}
-
-Estimation::Estimation(const std::string& from, const std::string& to, const std::string& str_equations)
-    : sample(nullptr), kdb_eqs(nullptr), kdb_scl(nullptr)
-{
-    set_sample(from, to);
-    set_equations_list(str_equations);
 }
 
 Estimation::~Estimation()
 {
     // frees all allocated variables for the last estimation
-    E_free_work();
-    delete sample;
-    delete kdb_eqs;
-    delete kdb_scl;
+    if(estimation_done)
+        E_free_work();
+
+    if(sample) 
+        delete sample;
+}
+
+void Estimation::set_block(const std::string& block)
+{
+    try
+    {
+        v_equations.clear();
+        kdb_eqs.clear();
+        kdb_scl.clear();
+
+        // set kdb_eqs and v_equations
+        std::vector<std::string> v_equations_ = Equations.get_names(block);
+        for(const std::string& name: v_equations_)
+        {
+            Equation eq = Equations.get(name);
+            kdb_eqs.add(name, eq);
+            v_equations.push_back(name);
+        }
+
+        // reset iterator to the first equation of the list
+        current_eq = v_equations.begin();
+
+        // concatenate list of coefficients of each equations of the block
+        std::vector<std::string> coefficients_list;
+        std::vector<std::string> tmp_coefs_list;
+        for (int i=0; i < kdb_eqs.count(); i++)
+        {
+            Equation eq = kdb_eqs.get(i);
+            tmp_coefs_list = eq.get_coefficients_list();
+            std::move(tmp_coefs_list.begin(), tmp_coefs_list.end(), std::back_inserter(coefficients_list));
+        }
+        // remove duplicate coefficient names
+        remove_duplicates(coefficients_list);
+
+        // set kdb_scl
+        for(const std::string& name: coefficients_list)
+        {
+            Scalar scl = Scalars.get(name);
+            kdb_scl.add(name, scl);
+        }
+
+        // set block
+        this->block = block;
+    }
+    catch(std::exception& e)
+    {
+        throw std::runtime_error("Cannot update the block of equations to estimate.\nblock = " + 
+            block + "\n\n" + std::string(e.what()));
+    }
 }
 
 /**
  * Equivalent to B_EqsEstimateEqs
  */
-void Estimation::equations_estimate()
+void Estimation::equations_estimate(const std::string& block)
 {
     // frees all allocated variables for the last estimation
-    E_free_work();
+    if(estimation_done)
+        E_free_work();
 
-    std::vector<std::string> v_eqs = Equations.get_names(str_equations);
+    if(!block.empty())
+        set_block(block);
+
+    std::vector<std::string> v_eqs = Equations.get_names(this->block);
     char** c_eqs = vector_to_double_char(v_eqs);
-    int rc = KE_est_s(kdb_eqs->get_KDB(), KV_WS, kdb_scl->get_KDB(), sample->c_sample, c_eqs, 0);
+    int rc = KE_est_s(kdb_eqs.get_KDB(), KV_WS, kdb_scl.get_KDB(), sample->c_sample, c_eqs, 0);
     SCR_free_tbl((unsigned char**) c_eqs);
-    if (rc != 0)
+    if(rc == 0)
+        estimation_done = true;
+    else
     {
-        IodeExceptionFunction func_error("Cannot estimate (block of) equation(s) " + str_equations);
+        estimation_done = false;
+        IodeExceptionFunction func_error("Cannot estimate (block of) equation(s) " + this->block);
         func_error.add_argument("From: ", sample->start_period().to_string());
         func_error.add_argument("To:   ", sample->end_period().to_string());
-        func_error.add_argument("(block of) equation(s): ", str_equations);
+        func_error.add_argument("(block of) equation(s): ", block);
         throw func_error;
     }
+
 }
 
 void Estimation::save()
 {
-    Scalars.merge(*kdb_scl);
+    if(estimation_done)
+        Scalars.merge(kdb_scl);
 }
 
 void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)

@@ -84,22 +84,17 @@ private:
 
 class Estimation
 {
-    std::string str_equations;
+    bool estimation_done;
+    std::string block;
     std::vector<std::string> v_equations;
     std::vector<std::string>::iterator current_eq;
 
-    KDBEquations* kdb_eqs;
-    KDBScalars* kdb_scl;
+    KDBEquations kdb_eqs;
+    KDBScalars kdb_scl;
     Sample* sample;
 
-private:
-    void set_equations_list(const std::string& str_equations);
-
 public:
-    Estimation(const Sample& sample, const std::string& str_equations);
-    Estimation(const Period& from, const Period& to, const std::string& str_equations);
-    Estimation(const std::string& from, const std::string& to, const std::string& str_equations);
-
+    Estimation(const std::string& from = "", const std::string& to = "");
     ~Estimation();
 
     Sample get_sample() const
@@ -107,48 +102,73 @@ public:
         return Sample(*sample);
     }
 
-    void set_sample(const Sample& sample)
+    void set_sample(const Sample* sample = nullptr)
     {
-        if (this->sample) delete this->sample;
-        this->sample = new Sample(sample);
+        if(this->sample) 
+            delete this->sample;
+
+        // make a copy
+        if(sample)
+            this->sample = new Sample(*sample);
+        else
+            this->sample = new Sample(Variables.get_sample());
     }
     
-    void set_sample(const Period& from, const Period& to)
+    void set_sample(const Period* from = nullptr, const Period* to = nullptr)
     {
-        if (sample) delete sample;
+        if(this->sample) 
+            delete this->sample;
+
+        Sample vars_sample = Variables.get_sample();  
+        Period from_ = from ? Period(*from) : vars_sample.start_period();
+        Period to_ = to ? Period(*to) : vars_sample.end_period();
+
+        try
+        {
+            sample = new Sample(*from, *to);
+        }
+        catch(IodeException)
+        {
+            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + block, 
+                "Cannot create sample with range from " + from->to_string() + " to " + to->to_string());
+        }
+    }
+    
+    void set_sample(const std::string& from = "", const std::string& to = "")
+    {
+        if(this->sample) 
+            delete this->sample;
+
+        Sample vars_sample = Variables.get_sample();  
+        Period from_ = (!from.empty()) ? Period(from) : vars_sample.start_period();
+        Period to_ = (!to.empty()) ? Period(to) : vars_sample.end_period();
+
         try
         {
             sample = new Sample(from, to);
         }
         catch(IodeException)
         {
-            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + str_equations, 
-                "Cannot create sample with range from " + from.to_string() + " to " + to.to_string());
-        }
-    }
-    
-    void set_sample(const std::string& from, const std::string& to)
-    {
-        if (sample) delete sample;
-        try
-        {
-            sample = new Sample(from, to);
-        }
-        catch(IodeException)
-        {
-            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + str_equations, 
+            throw IodeExceptionInvalidArguments("Cannot estimate (block of) equation(s) " + block, 
                 "Cannot create sample with range from " + from + " to " + to);
         }
     }
+
+    std::string get_block() const
+    {
+        return block;
+    }
+
+    void set_block(const std::string& block);
 
     std::vector<std::string> get_list_equations() const
     {
         return v_equations;
     }
 
-    const KDBScalars* get_coefficients() { return kdb_scl; }
+    const KDBScalars& get_coefficients() { return kdb_scl; }
 
-    const KDBEquations* get_equations() { return kdb_eqs; }
+    const KDBEquations& get_equations() { return kdb_eqs; }
 
     NamedEquation current_equation() { return NamedEquation(*current_eq); }
 
@@ -164,7 +184,7 @@ public:
 
     CorrelationMatrix get_correlation_matrix() 
     { 
-        std::vector<std::string> v_coeffs = kdb_scl->get_names();
+        std::vector<std::string> v_coeffs = kdb_scl.get_names();
         return CorrelationMatrix(v_coeffs, E_MCORR); 
     }
 
@@ -207,7 +227,9 @@ public:
     /** 
      * Equivalent to B_EqsEstimateEqs
      */
-    void equations_estimate();
+    void equations_estimate(const std::string& block = "");
+
+    bool is_done() const { return estimation_done; }
 
     void save();
 
