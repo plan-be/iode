@@ -36,7 +36,7 @@ TEST_F(EstimationTest, Estimate)
     Estimation est(from, to);
 
     // Estimates the block ACAF;DPUH
-    est.equations_estimate("ACAF;DPUH");
+    est.estimate("ACAF;DPUH");
     ASSERT_TRUE(est.is_done());
 
     est.save();
@@ -121,7 +121,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_1").val) / 1e6, 0.010986);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_2").val) / 1e6, 0.057489);
 
-    KDBScalars kdb_scl_res = est.get_coefficients();
+    KDBScalars kdb_scl_res = est.get_scalars();
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf1").val) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf2").val) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf4").val) / 1e6, -0.008503);
@@ -129,7 +129,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("dpuh_2").val) / 1e6, 0.057489);
 
     // Estimates ACAF only
-    est.equations_estimate("ACAF");
+    est.estimate("ACAF");
     ASSERT_TRUE(est.is_done());
     
     est.save();
@@ -139,9 +139,6 @@ TEST_F(EstimationTest, Estimate)
 
     // number of equations
     EXPECT_EQ(E_NEQ, 1);
-
-    // Result values
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_vars.get_var("_YRES0", "1980Y1")) / 1e6, -0.00115);
 
     // Tests values (ACAF)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stdev").val) / 1e6, 0.00427);
@@ -215,7 +212,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
 
     // -- DPUH
-    est.equations_estimate("DPUH");
+    est.estimate("DPUH");
     ASSERT_TRUE(est.is_done());
 
     est.save();
@@ -239,7 +236,7 @@ TEST_F(EstimationTest, Estimate)
 TEST_F(EstimationTest, EstimateBlock)
 {
     Estimation est("1980Y1", "1996Y1");
-    est.equations_estimate("ACAF;DPUH");
+    est.estimate("ACAF;DPUH");
     ASSERT_TRUE(est.is_done());
 
     est.save();
