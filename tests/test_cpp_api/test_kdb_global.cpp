@@ -53,6 +53,20 @@ TEST_F(KDBGlobalTest, Filter)
     // Note: get_names() calls remove_duplicates() (which calls sort())
     remove_duplicates(expected_list_names);
     EXPECT_EQ(list_names, expected_list_names);
+
+    // pattern containing a name that does not exist in the global workspace
+    // -> name is skipped by default (must_exist = true)
+    list_names = Equations.get_names("A*;DO_NOT_EXIST");
+    expected_list_names.clear();
+    for (const std::string& name : all_names) if (name.front() == 'A') expected_list_names.push_back(name);
+    // Note: get_names() calls remove_duplicates() (which calls sort())
+    remove_duplicates(expected_list_names);
+    EXPECT_EQ(list_names, expected_list_names);
+
+    // must_exist = false
+    list_names = Equations.get_names("A*;DO_NOT_EXIST", false);
+    expected_list_names.push_back("DO_NOT_EXIST");
+    EXPECT_EQ(list_names, expected_list_names);
 }
 
 TEST_F(KDBGlobalTest, LowToHigh)
