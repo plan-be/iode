@@ -33,7 +33,13 @@ TEST_F(EstimationTest, Estimate)
     kdb_scl.update("dpuh_1", 0., 1.);
     kdb_scl.update("dpuh_2", 0., 1.);
 
-    Estimation* est = new Estimation(from, to, "ACAF;DPUH");
+    Estimation est(from, to);
+
+    // Estimates the block ACAF;DPUH
+    est.equations_estimate("ACAF;DPUH");
+    ASSERT_TRUE(est.is_done());
+
+    est.save();
 
     // see issue https://github.com/plan-be/iode/issues/433
     /*
@@ -44,17 +50,13 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(E_NEQ, 2);
     */
 
-    est->equations_estimate();
-    const KDBScalars* kdb_scl_res = est->get_coefficients();
-    est->save();
-
     // Sample
-    Sample sample = est->get_sample();
+    Sample sample = est.get_sample();
     EXPECT_EQ(sample.to_string(), from + ":" + to);
 
     // List of equations
     std::vector<std::string> expected_list_eqs = {"ACAF", "DPUH"};
-    std::vector<std::string> list_eqs = est->get_list_equations();
+    std::vector<std::string> list_eqs = est.get_list_equations();
     EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
     EXPECT_EQ(list_eqs, expected_list_eqs);
 
@@ -63,7 +65,7 @@ TEST_F(EstimationTest, Estimate)
     // Correlation matrix
     // -- ACAF;DPUH
 
-    CorrelationMatrix m_corr = est->get_correlation_matrix();
+    CorrelationMatrix m_corr = est.get_correlation_matrix();
     EXPECT_EQ(m_corr.nb_coeffs, E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
@@ -98,17 +100,17 @@ TEST_F(EstimationTest, Estimate)
     */
 
     // Current equation
-    NamedEquation named_eq = est->current_equation();
+    NamedEquation named_eq = est.current_equation();
     EXPECT_EQ(named_eq.name, "ACAF");
     EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
 
     // Next equation 
-    NamedEquation next_named_eq = est->next_equation();
+    NamedEquation next_named_eq = est.next_equation();
     EXPECT_EQ(next_named_eq.name, "DPUH");
     EXPECT_EQ(next_named_eq.eq.get_lec(), eq2.get_lec());
 
     // -- go back to first eq
-    next_named_eq = est->next_equation();
+    next_named_eq = est.next_equation();
     EXPECT_EQ(next_named_eq.name, "ACAF");
     EXPECT_EQ(next_named_eq.eq.get_lec(), eq.get_lec());
 
@@ -119,16 +121,18 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_1").val) / 1e6, 0.010986);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_2").val) / 1e6, 0.057489);
 
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").val) / 1e6, 0.01577);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").val) / 1e6, -8.e-06);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").val) / 1e6, -0.008503);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_1").val) / 1e6, 0.010986);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_2").val) / 1e6, 0.057489);
+    KDBScalars kdb_scl_res = est.get_coefficients();
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf1").val) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf2").val) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf4").val) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("dpuh_1").val) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("dpuh_2").val) / 1e6, 0.057489);
 
     // Estimates ACAF only
-    delete est;
-    est = new Estimation(from, to, "ACAF");
-    est->equations_estimate();
+    est.equations_estimate("ACAF");
+    ASSERT_TRUE(est.is_done());
+    
+    est.save();
 
     // number of coefficients 
     EXPECT_EQ(E_NCE, 3);
@@ -169,7 +173,7 @@ TEST_F(EstimationTest, Estimate)
     IODE_REAL min_value;
 
     // Observed values
-    Variable obs = est->get_observed_values("ACAF");
+    Variable obs = est.get_observed_values("ACAF");
     EXPECT_DOUBLE_EQ(round(1e6 * obs[0]) / 1e6, 0.011412);
     max_value = *std::max_element(obs.begin(), obs.end());
     EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.016028);
@@ -177,7 +181,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.002985);
 
     // Fitted values
-    Variable fitted = est->get_fitted_values("ACAF");
+    Variable fitted = est.get_fitted_values("ACAF");
     EXPECT_DOUBLE_EQ(round(1e6 * fitted[0]) / 1e6, 0.012562);
     max_value = *std::max_element(fitted.begin(), fitted.end());
     EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.012562);
@@ -185,7 +189,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * min_value) / 1e6, -0.002985);
 
     // Residual values
-    Variable residuals = est->get_residual_values("ACAF");
+    Variable residuals = est.get_residual_values("ACAF");
     EXPECT_DOUBLE_EQ(round(1e6 * residuals[0]) / 1e6, -0.00115);
     max_value = *std::max_element(residuals.begin(), residuals.end());
     EXPECT_DOUBLE_EQ(round(1e6 * max_value) / 1e6, 0.003537);
@@ -195,7 +199,7 @@ TEST_F(EstimationTest, Estimate)
     // Correlation matrix
     // -- ACAF
 
-    CorrelationMatrix m_corr = est->get_correlation_matrix();
+    CorrelationMatrix m_corr = est.get_correlation_matrix();
     EXPECT_EQ(m_corr.nb_coeffs, E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
@@ -211,9 +215,10 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
 
     // -- DPUH
-    delete est;
-    est = new Estimation(from, to, "DPUH");
-    est->equations_estimate();
+    est.equations_estimate("DPUH");
+    ASSERT_TRUE(est.is_done());
+
+    est.save();
 
     // number of coefficients 
     EXPECT_EQ(E_NCE, 2);
@@ -221,7 +226,7 @@ TEST_F(EstimationTest, Estimate)
     // number of equations
     EXPECT_EQ(E_NEQ, 1);
 
-    CorrelationMatrix m_corr2 = est->get_correlation_matrix();
+    CorrelationMatrix m_corr2 = est.get_correlation_matrix();
     EXPECT_EQ(m_corr2.nb_coeffs, E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr2.get_value(0, 0), 1.);
@@ -229,25 +234,23 @@ TEST_F(EstimationTest, Estimate)
     // -- line 1
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(1, 0)) / 1e6, -0.042291);
     EXPECT_DOUBLE_EQ(m_corr2.get_value(1, 1), 1.);
-
-    delete est;
 }
 
 TEST_F(EstimationTest, EstimateBlock)
 {
-    Estimation* est = new Estimation("1980Y1", "1996Y1", "ACAF;DPUH");
+    Estimation est("1980Y1", "1996Y1");
+    est.equations_estimate("ACAF;DPUH");
+    ASSERT_TRUE(est.is_done());
 
-    est->equations_estimate();
+    est.save();
 
-    NamedEquation first_eq = est->current_equation();
+    NamedEquation first_eq = est.current_equation();
     EXPECT_EQ(first_eq.name, "ACAF");
     EXPECT_EQ(first_eq.eq, Equation("ACAF"));
 
-    NamedEquation second_eq = est->next_equation();
+    NamedEquation second_eq = est.next_equation();
     EXPECT_EQ(second_eq.name, "DPUH");
     EXPECT_EQ(second_eq.eq, Equation("DPUH"));
-
-    delete est;
 }
 
 TEST_F(EstimationTest, DynamicAdjustment)
