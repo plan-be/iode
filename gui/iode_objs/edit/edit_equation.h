@@ -6,6 +6,7 @@
 
 #include <string>
 #include <array>
+#include <stdexcept>
 
 #include "ui_edit_equation.h"
 #include "edit_vars_sample.h"
@@ -31,7 +32,7 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
 {
     Q_OBJECT
 
-    Estimation*  estimation;
+    Estimation estimation;
     
     size_t hashBefore;
 	size_t hashAfter;	

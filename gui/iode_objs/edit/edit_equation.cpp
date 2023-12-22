@@ -15,8 +15,6 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* par
 
     connect(fullScreenShortcut, &QShortcut::activated, this, &EditEquationDialog::showMaximized);
 
-	estimation = nullptr;
-
 	int i = 0;
 	QList<QString> list_methods;
 	for (const std::string& method : vEquationMethods) list_methods << QString::fromStdString(method);
@@ -66,44 +64,35 @@ EditEquationDialog::~EditEquationDialog()
 	delete completer;
 
 	delete fullScreenShortcut;
-
-	if(estimation) delete estimation;
 }
 
 void EditEquationDialog::set_estimation()
 {
 	try
 	{
-		if(estimation)
-		{
-			delete estimation;
-			estimation = nullptr;
-		}
-
-		// sample
+		// set sample
 		std::string from = sampleFrom->extractAndVerify().toStdString();
 		std::string to = sampleTo->extractAndVerify().toStdString();
-		Sample sample(from, to);
+		estimation.set_sample(from, to);
 
-		// block
+		// set block
 		std::string block = lineBlock->extractAndVerify().toStdString();
 		if(block.empty()) 
 			block = lineName->extractAndVerify().toStdString();
+		estimation.set_block(block);
 		
 		// check method
 		int i_method = comboBoxMethod->extractAndVerify();
 		if(i_method < 0)
-			throw IodeExceptionInvalidArguments("Cannot estimate block or equation " + block, 
+			throw std::invalid_argument("Cannot estimate block or equation '" + block + "'\n" + 
 				"Please choose a method in the drop-down list");
 
-		estimation = new Estimation(sample, block);
-
-		NamedEquation equation = estimation->current_equation();
+		NamedEquation equation = estimation.current_equation();
 		display_equation(equation);
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
@@ -166,66 +155,60 @@ void EditEquationDialog::edit()
 			emit databaseModified();
 		}
 
-		if(estimation) 
-			estimation->save();
+		estimation.save();
 		
 		this->accept();
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
 void EditEquationDialog::display_coefs()
 {
-	if(estimation)
+	if(estimation.is_done())
 	{
 		try
 		{
-			EstimationCoefsDialog dialog(estimation, this);
+			EstimationCoefsDialog dialog(&estimation, this);
 			dialog.exec();
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+			QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		}	
 	}
 	else
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), "No estimation has been done yet");
+		QMessageBox::warning(nullptr, "WARNING", "No estimation has been done yet");
 	}
 }
 
 void EditEquationDialog::estimate()
 {
 	set_estimation();
-	if(estimation)
+	
+	try
 	{
-		try
-		{
-			estimation->equations_estimate();
-		}
-		catch (const std::exception& e)
-		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
-		}
+		estimation.equations_estimate();
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
 void EditEquationDialog::next()
 {
-	if(estimation)
+	try
 	{
-		try
-		{
-			NamedEquation equation = estimation->next_equation();
-			display_equation(equation);
-		}
-		catch (const std::exception& e)
-		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
-		}
+		NamedEquation equation = estimation.next_equation();
+		display_equation(equation);
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
@@ -239,21 +222,21 @@ void EditEquationDialog::dynamic_adjustment()
 
 void EditEquationDialog::results()
 {
-	if(estimation)
+	if(estimation.is_done())
 	{
 		try
 		{
-			EstimationResultsDialog dialog(estimation, this);
+			EstimationResultsDialog dialog(&estimation, this);
 			dialog.exec();
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+			QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		}
 	}
 	else
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), "No estimation has been done yet");
+		QMessageBox::warning(nullptr, "WARNING", "No estimation has been done yet");
 	}
 }
 
