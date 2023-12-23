@@ -75,20 +75,15 @@ KDBAbstract::~KDBAbstract()
 
 char** KDBAbstract::filter_names_from_global_db(const std::string& pattern) const
 {
-    if (pattern.empty()) 
-        return NULL;
-    else
-    {
-        char* c_pattern = to_char_array(pattern);
-        // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
-        char* c_lst = K_expand(this->iode_type, NULL, c_pattern, '*');
-        // Parses a string and replaces @filename and $listname by their contents
-        char** c_names = B_ainit_chk(c_lst, NULL, 0);
-        // remove duplicates
-        c_names = remove_duplicates(c_names);
-        // return names
-        return c_names; 
-    }
+    char* c_pattern = to_char_array(pattern);
+    // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+    char* c_lst = K_expand(this->iode_type, NULL, c_pattern, '*');
+    // Parses a string and replaces @filename and $listname by their contents
+    char** c_names = B_ainit_chk(c_lst, NULL, 0);
+    // remove duplicates
+    c_names = remove_duplicates(c_names);
+    // return names
+    return c_names; 
 }
 
 // object name
