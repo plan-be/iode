@@ -17,7 +17,7 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* par
 
 	int i = 0;
 	QList<QString> list_methods;
-	for (const std::string& method : vEquationMethods) list_methods << QString::fromStdString(method);
+	for (const std::string& method : v_eq_methods) list_methods << QString::fromStdString(method);
 
 	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_EQUATIONS, REQUIRED_FIELD);
 	comboBoxMethod = new WrapperComboBox(label_method->text(), *comboBox_method, OPTIONAL_FIELD, list_methods);
@@ -128,7 +128,7 @@ void EditEquationDialog::edit()
 		// TODO : remove extra \n
 		std::string lec = lineLec->extractAndVerify().toStdString();
 		int i_method = comboBoxMethod->extractAndVerify();
-		std::string method = (i_method >= 0) ? vEquationMethods[i_method] : "";
+		std::string method = (i_method >= 0) ? v_eq_methods[i_method] : "";
 		std::string from = sampleFrom->extractAndVerify().toStdString();
 		std::string to = sampleTo->extractAndVerify().toStdString();
 		std::string comment = lineComment->extractAndVerify().toStdString();
