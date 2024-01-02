@@ -133,6 +133,8 @@ public:
 
     void update_date();
 
+    void reset_date() { date = 0L; }
+
     // -- tests --
 
     std::array<float, EQS_NBTESTS> get_tests() const;
