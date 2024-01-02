@@ -182,7 +182,7 @@ std::string Equation::get_method() const
     int m = (int) this->method;
 
     if(m >= 0 && m < I_NB_EQ_METHODS)
-        return vEquationMethods[m];
+        return v_eq_methods[m];
     else
         // invalid value
         return "";
@@ -192,11 +192,11 @@ void Equation::set_method(const std::string& method)
 {
     int m = -1;
     for(int i = 0; i < I_NB_EQ_METHODS; i++) 
-        if(method == vEquationMethods[i]) m = i;
+        if(method == v_eq_methods[i]) m = i;
 
     if(m < 0)
         throw std::invalid_argument("The equation method '" + method + "' is not valid.\n" + 
-            "Accepted methods are: " + boost::algorithm::join(vEquationMethods, ", "));
+            "Accepted methods are: " + boost::algorithm::join(v_eq_methods, ", "));
 
     this->method = (char) m;
 }
