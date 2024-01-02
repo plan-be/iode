@@ -96,13 +96,13 @@ TEST_F(EquationTest, SplitEquation)
 TEST_F(EquationTest, Method)
 {
     std::string method;
-    std::string expected_method = vEquationMethods[0];
+    std::string expected_method = v_eq_methods[0];
 
     // get
     EXPECT_EQ(equation->get_method(), expected_method);
 
     // set
-    for (const std::string& method : vEquationMethods)
+    for (const std::string& method : v_eq_methods)
     {
         equation->set_method(method);
         EXPECT_EQ(equation->get_method(), method);
@@ -242,7 +242,7 @@ TEST_F(EquationTest, Hash)
 
     // different method
     hash_before = hash_after;
-    std::string new_method = vEquationMethods[1];
+    std::string new_method = v_eq_methods[1];
     equation->set_method(new_method); 
     hash_after = equation_hasher(*equation);
     EXPECT_NE(hash_before, hash_after);
