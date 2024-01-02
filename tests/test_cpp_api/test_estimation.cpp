@@ -33,22 +33,24 @@ TEST_F(EstimationTest, Estimate)
     kdb_scl.update("dpuh_1", 0., 1.);
     kdb_scl.update("dpuh_2", 0., 1.);
 
-    Estimation est(from, to);
+    EditAndEstimateEquations est(from, to);
+    est.set_instruments("");
+    est.set_method(0);
 
     // Estimates the block ACAF;DPUH
-    est.estimate("ACAF;DPUH");
-    ASSERT_TRUE(est.is_done());
+    est.set_block("ACAF;DPUH");
+    est.update_scalars();
+    est.estimate();
+    ASSERT_TRUE(est.is_estimation_done());
 
+    est.copy_eq_tests_values();
     est.save();
 
-    // see issue https://github.com/plan-be/iode/issues/433
-    /*
     // number of coefficients 
     EXPECT_EQ(E_NCE, 5);
 
     // number of equations
     EXPECT_EQ(E_NEQ, 2);
-    */
 
     // Sample
     Sample sample = est.get_sample();
@@ -60,8 +62,6 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
     EXPECT_EQ(list_eqs, expected_list_eqs);
 
-    // see issue https://github.com/plan-be/iode/issues/433
-    /*
     // Correlation matrix
     // -- ACAF;DPUH
 
@@ -69,35 +69,34 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(m_corr.nb_coeffs, E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 1)) / 1e6, -0.935);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 2)) / 1e6, 0.20016739);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 3)) / 1e6, 0.0448);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 4)) / 1e6, -0.0373);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 1)) / 1e6, -0.935266);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 2)) / 1e6, 0.200167);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 3)) / 1e6, 0.044832);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 4)) / 1e6, -0.03729);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 0)) / 1e6, -0.935);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 0)) / 1e6, -0.935266);
     EXPECT_DOUBLE_EQ(m_corr.get_value(1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 2)) / 1e6, -0.301);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 3)) / 1e6, -0.00166);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 4)) / 1e6, 0.0396);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 2)) / 1e6, -0.300833);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 3)) / 1e6, -0.001662);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 4)) / 1e6, 0.039581);
     // -- line 2
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 0)) / 1e6, 0.20016739);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 1)) / 1e6, -0.301);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 0)) / 1e6, 0.200167);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 1)) / 1e6, -0.300833);
     EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 3)) / 1e6, 0.000375);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 4)) / 1e6, -0.00893);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 4)) / 1e6, -0.008926);
     // -- line 3
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 0)) / 1e6, 0.0448);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 1)) / 1e6, -0.00166);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 0)) / 1e6, 0.044832);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 1)) / 1e6, -0.001662);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 2)) / 1e6, 0.000375);
     EXPECT_DOUBLE_EQ(m_corr.get_value(3, 3), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 4)) / 1e6, -0.0420);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(3, 4)) / 1e6, -0.041987);
     // -- line 3
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 0)) / 1e6, -0.0373);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 1)) / 1e6, 0.0396);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 2)) / 1e6, -0.00893);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 3)) / 1e6, -0.00420);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 0)) / 1e6, -0.03729);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 1)) / 1e6, 0.039581);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 2)) / 1e6, -0.008926);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 3)) / 1e6, -0.041987);
     EXPECT_DOUBLE_EQ(m_corr.get_value(4, 4), 1.);
-    */
 
     // Current equation
     NamedEquation named_eq = est.current_equation();
@@ -129,9 +128,12 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("dpuh_2").val) / 1e6, 0.057489);
 
     // Estimates ACAF only
-    est.estimate("ACAF");
-    ASSERT_TRUE(est.is_done());
+    est.set_block("ACAF");
+    est.update_scalars();
+    est.estimate();
+    ASSERT_TRUE(est.is_estimation_done());
     
+    est.copy_eq_tests_values();
     est.save();
 
     // number of coefficients 
@@ -196,25 +198,28 @@ TEST_F(EstimationTest, Estimate)
     // Correlation matrix
     // -- ACAF
 
-    CorrelationMatrix m_corr = est.get_correlation_matrix();
-    EXPECT_EQ(m_corr.nb_coeffs, E_NCE);
+    CorrelationMatrix m_corr2 = est.get_correlation_matrix();
+    EXPECT_EQ(m_corr2.nb_coeffs, E_NCE);
     // -- line 0
-    EXPECT_DOUBLE_EQ(m_corr.get_value(0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 1)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(0, 2)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(0, 1)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(0, 2)) / 1e6, 0.20017);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 0)) / 1e6, -0.936111);
-    EXPECT_DOUBLE_EQ(m_corr.get_value(1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(1, 2)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(1, 0)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(1, 2)) / 1e6, -0.300746);
     // -- line 2
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 0)) / 1e6, 0.20017);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(2, 1)) / 1e6, -0.300746);
-    EXPECT_DOUBLE_EQ(m_corr.get_value(2, 2), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(2, 0)) / 1e6, 0.20017);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(2, 1)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(m_corr2.get_value(2, 2), 1.);
 
     // -- DPUH
-    est.estimate("DPUH");
-    ASSERT_TRUE(est.is_done());
+    est.set_block("DPUH");
+    est.update_scalars();
+    est.estimate();
+    ASSERT_TRUE(est.is_estimation_done());
 
+    est.copy_eq_tests_values();
     est.save();
 
     // number of coefficients 
@@ -223,19 +228,19 @@ TEST_F(EstimationTest, Estimate)
     // number of equations
     EXPECT_EQ(E_NEQ, 1);
 
-    CorrelationMatrix m_corr2 = est.get_correlation_matrix();
-    EXPECT_EQ(m_corr2.nb_coeffs, E_NCE);
+    CorrelationMatrix m_corr3 = est.get_correlation_matrix();
+    EXPECT_EQ(m_corr3.nb_coeffs, E_NCE);
     // -- line 0
-    EXPECT_DOUBLE_EQ(m_corr2.get_value(0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(0, 1)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(m_corr3.get_value(0, 0), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr3.get_value(0, 1)) / 1e6, -0.042291);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2.get_value(1, 0)) / 1e6, -0.042291);
-    EXPECT_DOUBLE_EQ(m_corr2.get_value(1, 1), 1.);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr3.get_value(1, 0)) / 1e6, -0.042291);
+    EXPECT_DOUBLE_EQ(m_corr3.get_value(1, 1), 1.);
 }
 
 TEST_F(EstimationTest, EstimateBlock)
 {
-    Estimation est("1980Y1", "1996Y1");
+    EditAndEstimateEquations est("1980Y1", "1996Y1");
     est.estimate("ACAF;DPUH");
     ASSERT_TRUE(est.is_done());
 
