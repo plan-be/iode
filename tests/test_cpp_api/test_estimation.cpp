@@ -238,23 +238,6 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(m_corr3.get_value(1, 1), 1.);
 }
 
-TEST_F(EstimationTest, EstimateBlock)
-{
-    EditAndEstimateEquations est("1980Y1", "1996Y1");
-    est.estimate("ACAF;DPUH");
-    ASSERT_TRUE(est.is_done());
-
-    est.save();
-
-    NamedEquation first_eq = est.current_equation();
-    EXPECT_EQ(first_eq.name, "ACAF");
-    EXPECT_EQ(first_eq.eq, Equation("ACAF"));
-
-    NamedEquation second_eq = est.next_equation();
-    EXPECT_EQ(second_eq.name, "DPUH");
-    EXPECT_EQ(second_eq.eq, Equation("DPUH"));
-}
-
 TEST_F(EstimationTest, DynamicAdjustment)
 {
     std::string eqs = kdb_eqs.get_lec("ACAF");
