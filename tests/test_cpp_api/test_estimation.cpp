@@ -19,6 +19,160 @@ protected:
 };
 
 
+TEST_F(EstimationTest, SetBlock)
+{
+    std::vector<std::string> v_eqs;
+    std::vector<std::string> v_expected_eqs;
+
+    std::vector<std::string> v_coeffs;
+    std::vector<std::string> v_expected_coeffs;
+
+    std::string from = "1980Y1";
+    std::string to = "1996Y1";
+    EditAndEstimateEquations est(from, to);
+
+    Equation eq_ACAF("ACAF");
+    Equation eq_DPUH("DPUH");
+
+    // ---- block = ACAF;DPUH ----
+    // set_block("new_block", "currently_displayed_equation")
+    est.set_block("ACAF;DPUH", "ACAF");
+    
+    v_eqs = est.get_list_equations();
+    v_expected_eqs = {"ACAF", "DPUH"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    v_eqs = est.get_equations().get_names();
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    est.update_scalars();
+    v_coeffs = est.get_scalars().get_names();
+    v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
+    EXPECT_EQ(v_coeffs, v_expected_coeffs);
+
+    // current equation
+    NamedEquation named_eq = est.current_equation();
+    EXPECT_EQ(named_eq.name, "ACAF");
+    EXPECT_EQ(named_eq.eq.get_lec(), eq_ACAF.get_lec());
+
+    // next equation 
+    NamedEquation next_named_eq = est.next_equation();
+    EXPECT_EQ(next_named_eq.name, "DPUH");
+    EXPECT_EQ(next_named_eq.eq.get_lec(), eq_DPUH.get_lec());
+
+    // go back to first eq
+    next_named_eq = est.next_equation();
+    EXPECT_EQ(next_named_eq.name, "ACAF");
+    EXPECT_EQ(next_named_eq.eq.get_lec(), eq_ACAF.get_lec());
+
+    // ---- add a non existing equation to the block ----
+    // set_block("new_block", "currently_displayed_equation")
+    est.set_block("ACAF;DPUH;TEST", "DPUH");
+
+    v_eqs = est.get_list_equations();
+    v_expected_eqs = {"ACAF", "DPUH", "TEST"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    v_eqs = est.get_equations().get_names();
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    est.update_scalars();
+    v_coeffs = est.get_scalars().get_names();
+    v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
+    EXPECT_EQ(v_coeffs, v_expected_coeffs);
+
+    // current equation
+    named_eq = est.current_equation();
+    EXPECT_EQ(named_eq.name, "DPUH");
+    EXPECT_EQ(named_eq.eq.get_lec(), eq_DPUH.get_lec());
+
+    // next equation
+    next_named_eq = est.next_equation();
+    EXPECT_EQ(next_named_eq.name, "TEST");
+    EXPECT_EQ(next_named_eq.eq.get_lec(), "TEST := 0");
+
+    // next equation
+    next_named_eq = est.next_equation();
+    EXPECT_EQ(next_named_eq.name, "ACAF");
+    EXPECT_EQ(next_named_eq.eq.get_lec(), eq_ACAF.get_lec());
+
+    // ---- remove an equation from the block ----
+    // set_block("new_block", "currently_displayed_equation")
+    est.set_block("ACAF;TEST", "ACAF");
+
+    v_eqs = est.get_list_equations();
+    v_expected_eqs = {"ACAF", "TEST"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    v_eqs = est.get_equations().get_names();
+    v_expected_eqs = {"ACAF", "DPUH", "TEST"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    est.update_scalars();
+    v_coeffs = est.get_scalars().get_names();
+    v_expected_coeffs = {"acaf1", "acaf2", "acaf4"};
+    EXPECT_EQ(v_coeffs, v_expected_coeffs);
+
+    // current equation
+    named_eq = est.current_equation();
+    EXPECT_EQ(named_eq.name, "ACAF");
+    EXPECT_EQ(named_eq.eq.get_lec(), eq_ACAF.get_lec());
+
+    // next equation
+    next_named_eq = est.next_equation();
+    EXPECT_EQ(next_named_eq.name, "TEST");
+    EXPECT_EQ(next_named_eq.eq.get_lec(), "TEST := 0");
+
+    // ---- currently displayed equation not in the block -> add it to the block ----
+    // set_block("new_block", "currently_displayed_equation")
+    est.set_block("ACAF;TEST", "DPUH");
+
+    std::string block = est.get_block();
+    EXPECT_EQ(block, "ACAF;TEST;DPUH");
+
+    v_eqs = est.get_list_equations();
+    v_expected_eqs = {"ACAF", "TEST", "DPUH"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    v_eqs = est.get_equations().get_names();
+    v_expected_eqs = {"ACAF", "DPUH", "TEST"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    est.update_scalars();
+    v_coeffs = est.get_scalars().get_names();
+    v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
+    EXPECT_EQ(v_coeffs, v_expected_coeffs);
+
+    // current equation
+    named_eq = est.current_equation();
+    EXPECT_EQ(named_eq.name, "DPUH");
+    EXPECT_EQ(named_eq.eq.get_lec(), eq_DPUH.get_lec());
+
+    // ---- some scalars does not exist yet ----
+    Scalars.remove("dpuh_1");
+    Scalars.remove("dpuh_2");
+
+    EditAndEstimateEquations est_new_coeffs(from, to);
+    // set_block("new_block", "currently_displayed_equation")
+    est_new_coeffs.set_block("ACAF;DPUH", "ACAF");
+    
+    v_eqs = est_new_coeffs.get_list_equations();
+    v_expected_eqs = {"ACAF", "DPUH"};
+    EXPECT_EQ(v_eqs, v_expected_eqs);
+
+    est_new_coeffs.update_scalars();
+    v_coeffs = est_new_coeffs.get_scalars().get_names();
+    v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
+    EXPECT_EQ(v_coeffs, v_expected_coeffs);
+
+    KDBScalars kdb_scl_res = est_new_coeffs.get_scalars();;
+    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_1").val, 0.9);
+    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_1").relax, 1.0);
+    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_2").val, 0.9);
+    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_2").relax, 1.0);
+}
+
+
 TEST_F(EstimationTest, Estimate)
 {
     std::string from = "1980Y1";
@@ -56,12 +210,6 @@ TEST_F(EstimationTest, Estimate)
     Sample sample = est.get_sample();
     EXPECT_EQ(sample.to_string(), from + ":" + to);
 
-    // List of equations
-    std::vector<std::string> expected_list_eqs = {"ACAF", "DPUH"};
-    std::vector<std::string> list_eqs = est.get_list_equations();
-    EXPECT_EQ(list_eqs.size(), expected_list_eqs.size());
-    EXPECT_EQ(list_eqs, expected_list_eqs);
-
     // Correlation matrix
     // -- ACAF;DPUH
 
@@ -97,21 +245,6 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 2)) / 1e6, -0.008926);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr.get_value(4, 3)) / 1e6, -0.041987);
     EXPECT_DOUBLE_EQ(m_corr.get_value(4, 4), 1.);
-
-    // Current equation
-    NamedEquation named_eq = est.current_equation();
-    EXPECT_EQ(named_eq.name, "ACAF");
-    EXPECT_EQ(named_eq.eq.get_lec(), eq.get_lec());
-
-    // Next equation 
-    NamedEquation next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "DPUH");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), eq2.get_lec());
-
-    // -- go back to first eq
-    next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "ACAF");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), eq.get_lec());
 
     // Coeff values
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").val) / 1e6, 0.01577);
