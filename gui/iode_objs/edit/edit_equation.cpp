@@ -6,6 +6,9 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* par
 {
 	setupUi(this);
 
+	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+	main_window->computeHash(true);
+
 	completer = new IodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 	textEdit_lec->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
@@ -28,25 +31,31 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* par
 	lineBlock = new WrapperQLineEdit(label_block->text(), *lineEdit_block, OPTIONAL_FIELD);
 	lineInstruments = new WrapperQLineEdit(label_instruments->text(), *lineEdit_instruments, OPTIONAL_FIELD);
 
-	mapFields["Method"] = comboBoxMethod;
-	mapFields["From"] = sampleFrom;
-	mapFields["To"] = sampleTo;
-
 	std::string equation_name = equationName.toStdString();
 	if(!equation_name.empty() && Equations.contains(equation_name))
 	{
 		// --- existing equation ---
 		className = "TAB_EDIT_EQUATION";
 		lineEdit_name->setReadOnly(true);
-		NamedEquation equation(equation_name);
-		display_equation(equation);
+		
+		NamedEquation named_eq(equation_name);
+		display_equation(named_eq);
+
+		Equation eq = named_eq.eq;
+		comboBoxMethod->setQValue(eq.get_method_as_int());
+		Sample sample = eq.get_sample();
+		sampleFrom->setQValue(QString::fromStdString(sample.start_period().to_string()));
+		sampleTo->setQValue(QString::fromStdString(sample.end_period().to_string()));
+		lineBlock->setQValue(QString::fromStdString(eq.get_block()));
+		lineInstruments->setQValue(QString::fromStdString(eq.get_instruments()));
+		
+		update_list_equations_to_estimate();
 	}
 	else
 	{
 		// --- new equation ---
 		className = "TAB_ADD_EQUATION";
 		lineEdit_name->setReadOnly(false);
-		loadSettings();
 	}
 }
 
@@ -66,50 +75,42 @@ EditEquationDialog::~EditEquationDialog()
 	delete fullScreenShortcut;
 }
 
-void EditEquationDialog::set_estimation()
+// same as ODE_blk_save_cur() from o_est.c from the old GUI
+void EditEquationDialog::save_current_equation()
 {
-	try
-	{
-		// set sample
-		std::string from = sampleFrom->extractAndVerify().toStdString();
-		std::string to = sampleTo->extractAndVerify().toStdString();
-		estimation.set_sample(from, to);
-
-		// set block
-		std::string block = lineBlock->extractAndVerify().toStdString();
-		if(block.empty()) 
-			block = lineName->extractAndVerify().toStdString();
-		estimation.set_block(block);
-		
-		// check method
-		int i_method = comboBoxMethod->extractAndVerify();
-		if(i_method < 0)
-			throw std::invalid_argument("Cannot estimate block or equation '" + block + "'\n" + 
-				"Please choose a method in the drop-down list");
-
-		NamedEquation equation = estimation.current_equation();
-		display_equation(equation);
-	}
-	catch (const std::exception& e)
-	{
-		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
-	}
+	std::string lec = lineLec->extractAndVerify().toStdString();
+	std::string comment = lineComment->extractAndVerify().toStdString();
+	edit_est_eqs.update_current_equation(lec, comment);
 }
 
+// same as ODE_blk_check() from o_est.c from the old GUI
+void EditEquationDialog::update_list_equations_to_estimate()
+{
+	std::string current_eq_name = lineName->extractAndVerify().toStdString();
+	if(current_eq_name.empty())
+		throw std::invalid_argument("Empty equation name");
+
+	// update block
+	std::string block = lineBlock->extractAndVerify().toStdString();
+	if(block.empty()) 
+		block = lineName->extractAndVerify().toStdString();
+	edit_est_eqs.set_block(block, current_eq_name);
+
+	// the list of equations to estimate (block) may have been changed
+	// See EditAndEstimateEquations::set_block()
+	block = edit_est_eqs.get_block();
+	lineBlock->setQValue(QString::fromStdString(block));
+}
+
+// same as ODE_blk_cur() from o_est.c from the old GUI
 void EditEquationDialog::display_equation(const NamedEquation& equation)
 {
 	lineName->setQValue(QString::fromStdString(equation.name));
 	Equation eq = equation.eq;
 
 	// editable values
-	comboBoxMethod->setQValue(eq.get_method_as_int());
-	Sample sample = eq.get_sample();
-	sampleFrom->setQValue(QString::fromStdString(sample.start_period().to_string()));
-	sampleTo->setQValue(QString::fromStdString(sample.end_period().to_string()));
 	lineLec->setQValue(QString::fromStdString(eq.get_lec()));
 	lineComment->setQValue(QString::fromStdString(eq.get_comment()));
-	lineBlock->setQValue(QString::fromStdString(eq.get_block()));
-	lineInstruments->setQValue(QString::fromStdString(eq.get_instruments()));
 
 	// read-only values
 	std::array<float, EQS_NBTESTS> tests = eq.get_tests();
@@ -119,44 +120,27 @@ void EditEquationDialog::display_equation(const NamedEquation& equation)
 	lineEdit_tests_loglk->setText(QString::number(tests[IE_LOGLIK], 'g', 3));
 }
 
+// same as ODE_blk_save_fn() from o_est.c from old GUI
 void EditEquationDialog::edit()
 {
 	try
 	{
-		std::string equation_name = lineName->extractAndVerify().toStdString();
+		save_current_equation();
+		update_list_equations_to_estimate();
 
-		// TODO : remove extra \n
-		std::string lec = lineLec->extractAndVerify().toStdString();
-		int i_method = comboBoxMethod->extractAndVerify();
-		std::string method = (i_method >= 0) ? v_eq_methods[i_method] : "";
-		std::string from = sampleFrom->extractAndVerify().toStdString();
-		std::string to = sampleTo->extractAndVerify().toStdString();
-		std::string comment = lineComment->extractAndVerify().toStdString();
-		std::string block = lineBlock->extractAndVerify().toStdString();
-		std::string instruments = lineInstruments->extractAndVerify().toStdString();
-		
-		std::array<float, EQS_NBTESTS> tests = { 0.0 };
-
-		// update equation
-		if (Equations.contains(equation_name))
+		if(!edit_est_eqs.is_estimation_done())
 		{
-			Equation eq = Equations.get(equation_name);
-			computeHash(eq, true);
+			edit_est_eqs.update_scalars();
 
-			Equations.update(equation_name, lec, method, from, to, comment, instruments, block);
-		
-			Equation updated_eq = Equations.get(equation_name);
-			computeHash(updated_eq);
-		}
-		// new equation
-		else
-		{
-			Equations.add(equation_name, lec, method, from, to, comment, instruments, block);
-			emit databaseModified();
+			std::string instruments = lineInstruments->extractAndVerify().toStdString();
+			edit_est_eqs.set_instruments(instruments);
 		}
 
-		estimation.save();
-		
+		edit_est_eqs.save();
+
+		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
+		main_window->update_tab_and_completer();
+
 		this->accept();
 	}
 	catch (const std::exception& e)
@@ -165,33 +149,67 @@ void EditEquationDialog::edit()
 	}
 }
 
+// same as ODE_blk_coef_fn() from o_est.c from the old GUI
 void EditEquationDialog::display_coefs()
 {
-	if(estimation.is_done())
-	{
-		try
-		{
-			EstimationCoefsDialog dialog(&estimation, this);
-			dialog.exec();
-		}
-		catch (const std::exception& e)
-		{
-			QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
-		}	
-	}
-	else
-	{
-		QMessageBox::warning(nullptr, "WARNING", "No estimation has been done yet");
-	}
-}
-
-void EditEquationDialog::estimate()
-{
-	set_estimation();
-	
 	try
 	{
-		estimation.equations_estimate();
+		save_current_equation();
+		update_list_equations_to_estimate();
+
+		edit_est_eqs.update_scalars();
+		EstimationCoefsDialog dialog(&edit_est_eqs, this);
+		dialog.exec();
+	}
+	catch (const std::exception& e)
+	{
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
+	}	
+}
+
+// same as ODE_blk_est_fn() from o_est.c from the old GUI
+void EditEquationDialog::estimate()
+{
+	try
+	{
+		save_current_equation();
+
+		// set method
+		int i_method = comboBoxMethod->extractAndVerify();
+		if(i_method < 0)
+			throw std::invalid_argument("Invalid method. Please choose a method in the drop-down list");
+		edit_est_eqs.set_method(i_method);
+
+		// set sample
+		std::string from = sampleFrom->extractAndVerify().toStdString();
+		if(from.empty())
+			throw std::invalid_argument("Starting period for the sample is empty");
+
+		std::string to = sampleTo->extractAndVerify().toStdString();
+		if(to.empty())
+			throw std::invalid_argument("Ending period for the sample is empty");
+		
+		edit_est_eqs.set_sample(from, to);
+
+		// set instruments
+		std::string instruments = lineInstruments->extractAndVerify().toStdString();
+		edit_est_eqs.set_instruments(instruments);
+
+		// update list of equations to estimate 
+		update_list_equations_to_estimate();
+
+		// update list of coefficients 
+		edit_est_eqs.update_scalars();
+
+		// process estimation
+		edit_est_eqs.estimate();
+
+		// copy the resulting values for the tests for all equations
+		edit_est_eqs.copy_eq_tests_values();
+
+		// refresh the values for the tests of the current equation 
+		NamedEquation named_eq = edit_est_eqs.current_equation();
+		display_equation(named_eq);
 	}
 	catch (const std::exception& e)
 	{
@@ -199,11 +217,15 @@ void EditEquationDialog::estimate()
 	}
 }
 
+// same as ODE_blk_next_fn() from o_est.c from old GUI
 void EditEquationDialog::next()
 {
 	try
 	{
-		NamedEquation equation = estimation.next_equation();
+		save_current_equation();
+		update_list_equations_to_estimate();
+
+		NamedEquation equation = edit_est_eqs.next_equation();
 		display_equation(equation);
 	}
 	catch (const std::exception& e)
@@ -220,13 +242,14 @@ void EditEquationDialog::dynamic_adjustment()
 	lineLec->setQValue(lec);
 }
 
+// same as ODE_blk_res_fn() function from o_est.c from the old GUI
 void EditEquationDialog::results()
 {
-	if(estimation.is_done())
+	if(edit_est_eqs.is_estimation_done())
 	{
 		try
 		{
-			EstimationResultsDialog dialog(&estimation, this);
+			EstimationResultsDialog dialog(&edit_est_eqs, this);
 			dialog.exec();
 		}
 		catch (const std::exception& e)

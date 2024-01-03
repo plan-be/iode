@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "main_window_abstract.h"
 #include "iode_objs/views/scalars_view.h"
 #include "iode_objs/estimation/estimation_coefs.h"
 #include "iode_objs/estimation/estimation_results.h"
@@ -32,7 +33,7 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
 {
     Q_OBJECT
 
-    Estimation estimation;
+    EditAndEstimateEquations edit_est_eqs;
     
     size_t hashBefore;
 	size_t hashAfter;	
@@ -54,21 +55,9 @@ protected:
 	QString project_settings_filepath;
 
 private:
-    void set_estimation();
+    void save_current_equation();
+    void update_list_equations_to_estimate();
     void display_equation(const NamedEquation& equation);
-
-	void computeHash(Equation& eq, const bool before=false)
-	{
-		boost::hash<Equation> eq_hasher;
-		if(before)
-    		hashBefore = eq_hasher(eq);
-		else
-		{
-			hashAfter = eq_hasher(eq);
-			if(hashAfter != hashBefore) 
-				emit databaseModified();
-		}
-	}
 
 public:
     EditEquationDialog(const QString& equationName, QWidget* parent = Q_NULLPTR);
