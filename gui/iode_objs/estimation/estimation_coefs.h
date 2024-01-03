@@ -16,7 +16,7 @@ class EstimationCoefsDialog : public QDialog, public Ui::EstimationCoefsDialog
 	QShortcut* fullScreenShortcut;
 
 public:
-    EstimationCoefsDialog(Estimation* est, QWidget* parent = Q_NULLPTR) :
+    EstimationCoefsDialog(EditAndEstimateEquations* edit_est_eqs, QWidget* parent = Q_NULLPTR) :
         QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
     {
         setupUi(this);
@@ -24,7 +24,7 @@ public:
         QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
         tableView_coefs->setStyleSheet(stylesheet);
 
-        const KDBScalars kdb_coefs = est->get_coefficients();
+        const KDBScalars kdb_coefs = edit_est_eqs->get_scalars();
         // Warning: we need to create a copy of kdb_coefs because the passed kdb is deleted in 
         //          the IodeTemplateTableModel destructor
         ScalarsModel* scalarsModel = new ScalarsModel(this, new KDBScalars(kdb_coefs));

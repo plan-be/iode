@@ -21,7 +21,7 @@ class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDial
     Q_OBJECT
 
     int precision;
-    Estimation* est;
+    EditAndEstimateEquations* edit_est_eqs;
 
     QString from;
     QString to;
@@ -36,7 +36,7 @@ private:
     void dump_table(const QAbstractTableModel* table_model, QTextCursor& cursor);
 
 public:
-    EstimationResultsDialog(Estimation* est, QWidget* parent = Q_NULLPTR);
+    EstimationResultsDialog(EditAndEstimateEquations* edit_est_eqs, QWidget* parent = Q_NULLPTR);
     ~EstimationResultsDialog();
 
 signals:

@@ -1,8 +1,9 @@
 #include "estimation_results.h"
 
 
-EstimationResultsDialog::EstimationResultsDialog(Estimation* est, QWidget* parent) :
-    QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), precision(6), est(est)
+EstimationResultsDialog::EstimationResultsDialog(EditAndEstimateEquations* edit_est_eqs, QWidget* parent) :
+    QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
+    precision(6), edit_est_eqs(edit_est_eqs)
 {
     setupUi(this);
 
@@ -10,13 +11,13 @@ EstimationResultsDialog::EstimationResultsDialog(Estimation* est, QWidget* paren
 
     set_correlation_matrix_tab();
 
-    NamedEquation equation = est->current_equation();
+    NamedEquation equation = edit_est_eqs->current_equation();
     set_tests_tab(equation.eq);
 
-    Sample sample = est->get_sample();
+    Sample sample = edit_est_eqs->get_sample();
     from = QString::fromStdString(sample.start_period().to_string());
     to = QString::fromStdString(sample.end_period().to_string());
-    for(const std::string& name: est->get_list_equations()) 
+    for(const std::string& name: edit_est_eqs->get_list_equations()) 
         variables_names << QString::fromStdString(name);
 
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
@@ -38,7 +39,7 @@ void EstimationResultsDialog::set_coefficients_tab()
     QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
     tableView_coefs->setStyleSheet(stylesheet);
 
-    const KDBScalars kdb_coefs = est->get_coefficients();
+    const KDBScalars kdb_coefs = edit_est_eqs->get_scalars();
     // Warning: we need to create a copy of kdb_coefs because the passed kdb is deleted in 
     //          the IodeTemplateTableModel destructor
     ScalarsModel* scalarsModel = new ScalarsModel(this, new KDBScalars(kdb_coefs));
@@ -52,7 +53,7 @@ void EstimationResultsDialog::set_correlation_matrix_tab()
 
     try
     {
-        CorrelationMatrixModel* model = new CorrelationMatrixModel(est->get_correlation_matrix(), this);
+        CorrelationMatrixModel* model = new CorrelationMatrixModel(edit_est_eqs->get_correlation_matrix(), this);
         tableView_corr_matrix->setModel(model);
     }
     catch(const std::exception& e)
@@ -78,13 +79,13 @@ void EstimationResultsDialog::set_tests_tab(Equation& eq)
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 6
 void EstimationResultsDialog::plot_yobs_yest()
 {
-    NamedEquation nEq = est->current_equation();
+    NamedEquation nEq = edit_est_eqs->current_equation();
     std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
 
     // prepare local Variables KDB
     Variable values;
-    Sample sample = est->get_sample();
+    Sample sample = edit_est_eqs->get_sample();
     KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
     kdb_vars->set_sample(sample.start_period(), sample.end_period());
 
@@ -98,12 +99,12 @@ void EstimationResultsDialog::plot_yobs_yest()
     plotDialog->setPeriods(sample);
 
     // observed values
-    values = est->get_observed_values(nEq.name);
+    values = edit_est_eqs->get_observed_values(nEq.name);
     kdb_vars->add("OBSERVED", values);
     plotDialog->addSeries("OBSERVED", lhs + " : observed");
 
     // fitted values
-    values = est->get_fitted_values(nEq.name);
+    values = edit_est_eqs->get_fitted_values(nEq.name);
     kdb_vars->add("FITTED", values);
     plotDialog->addSeries("FITTED", lhs + " : fitted");
 
@@ -115,12 +116,12 @@ void EstimationResultsDialog::plot_yobs_yest()
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 7
 void EstimationResultsDialog::plot_residual()
 {
-    NamedEquation nEq = est->current_equation();
+    NamedEquation nEq = edit_est_eqs->current_equation();
     std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
 
     // prepare local Variables KDB
-    Sample sample = est->get_sample();
+    Sample sample = edit_est_eqs->get_sample();
     KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
     kdb_vars->set_sample(sample.start_period(), sample.end_period());
 
@@ -134,7 +135,7 @@ void EstimationResultsDialog::plot_residual()
     plotDialog->setPeriods(sample);
 
     // residual values
-    Variable values = est->get_residual_values(nEq.name);
+    Variable values = edit_est_eqs->get_residual_values(nEq.name);
     kdb_vars->add("RESIDUALS", values);
     plotDialog->addSeries("RESIDUALS", lhs + " : residuals");
 
@@ -229,7 +230,7 @@ void EstimationResultsDialog::print_output()
     cursor.insertHtml("<h3>Tests By Equation</h3>");
     cursor.insertText("\n\n");
 
-    Equation eq = est->current_equation().eq;
+    Equation eq = edit_est_eqs->current_equation().eq;
     std::array<float, EQS_NBTESTS> tests = eq.get_tests();
 
     QTextTable* table = cursor.insertTable(vEquationTests.size() + 1, 2);
