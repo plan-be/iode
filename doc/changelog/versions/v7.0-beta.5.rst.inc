@@ -33,6 +33,7 @@ Fixed Bugs 🛠️
   * (GUI) Fixed copy/paste variables from Excel returning an error when the variable's name contains 
           leading and/or trailing spaces (#414)
   * (GUI) Fixed running an IODE report when the path or the filename contains special characters (#415)
+  * (GUI) Fixed estimation not running if the block contained more than one equation (#433)
 
 
 Miscellaneous 🤷‍♀️
