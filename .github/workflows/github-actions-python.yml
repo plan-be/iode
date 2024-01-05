@@ -71,11 +71,22 @@ jobs:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ inputs.build-config }}
-          # - name: Build Python IODE (nanobind)
-          #   shell: bash -el {0}
-          #   run: pip install .
-          # - name: Test Python IODE (nanobind)
-          #   shell: bash -el {0}
-          #   run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_nanobind 
+          - name: Build SCR4, C and C++ API
+            shell: bash -el {0}
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_cpp_api              
+          - name: Build Python IODE (Cython)
+            shell: bash -el {0}
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_python 
+          - name: Test Python IODE (Cython)
+            shell: bash -el {0}
+            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target test_python 
+          - name: Upload PyIode compiled files
+            if: ${{ success() }}
+            uses: actions/upload-artifact@v3
+            with:
+              name: iode-python-3${{ matrix.python-minor-version }}
+              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py3${{ matrix.python-minor-version }}/"
+              if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
+
 
     
