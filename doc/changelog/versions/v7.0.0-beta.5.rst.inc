@@ -1,10 +1,7 @@
 Version7.0-beta.5
 =================
 
-In development
-
-New Features 🎉
----------------
+Released on 05/01/2024
 
 
 Improvements ✨
@@ -34,7 +31,3 @@ Fixed Bugs 🛠️
           leading and/or trailing spaces (#414)
   * (GUI) Fixed running an IODE report when the path or the filename contains special characters (#415)
   * (GUI) Fixed estimation not running if the block contained more than one equation (#433)
-
-
-Miscellaneous 🤷‍♀️
-----------------
