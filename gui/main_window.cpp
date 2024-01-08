@@ -38,6 +38,9 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
     // ---- menus ----
     buildRecentProjectsMenu();
 
+    actionUndo->setShortcut(QKeySequence::Undo);
+    actionRedo->setShortcut(QKeySequence::Redo);
+
     // ---- file explorer ----
     // connect the Tabs widget to the File Explorer
     treeView_file_explorer->setIodeTabWidget(tabWidget_IODE_objs);
@@ -349,6 +352,18 @@ void MainWindow::open_print_setup()
 {
     MenuFilePrintSetup dialog(this);
     dialog.exec();
+}
+
+// -------- Edit Menu --------
+
+void MainWindow::undo()
+{
+    
+}
+
+void MainWindow::redo()
+{
+    
 }
 
 // -------- Workspace Menu --------

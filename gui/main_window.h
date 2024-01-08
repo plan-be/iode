@@ -1,17 +1,18 @@
 #pragma once
 
-#include <QWidget>
 #include <QDir>
 #include <QList>
 #include <QAction>
+#include <QWidget>
 #include <QSettings>
 #include <QShortcut>
 #include <QCompleter>
 #include <QStringList>
-#include <QStringListModel>
-#include <QMessageBox>
-#include <QFileIconProvider>
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QKeySequence>
+#include <QStringListModel>
+#include <QFileIconProvider>
 
 #include "ui_main_window.h"
 #include "main_window_abstract.h"
@@ -158,6 +159,10 @@ public slots:
 	void open_import_variables_dialog();
 	void open_export_dialog();
 	void open_print_setup();
+
+	// Edit Menu
+	void undo();
+	void redo();
 
 	// Workspace Menu
 	void clear_workspace();

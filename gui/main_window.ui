@@ -192,7 +192,15 @@
     <addaction name="separator"/>
     <addaction name="actionAbout_Iode"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuWorkspace"/>
    <addaction name="menuData"/>
    <addaction name="menuRun"/>
@@ -209,8 +217,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>178</width>
-     <height>113</height>
+     <width>182</width>
+     <height>127</height>
     </size>
    </property>
    <property name="floating">
@@ -270,8 +278,8 @@
   <widget class="QDockWidget" name="dockWidget_command">
    <property name="minimumSize">
     <size>
-     <width>294</width>
-     <height>143</height>
+     <width>322</width>
+     <height>163</height>
     </size>
    </property>
    <property name="layoutDirection">
@@ -920,6 +928,16 @@
   <action name="actionKeyboard_Shortcuts">
    <property name="text">
     <string>Keyboard Shortcuts</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
    </property>
   </action>
  </widget>
@@ -1860,6 +1878,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionRedo</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>redo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionUndo</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>undo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1912,5 +1962,7 @@
   <slot>open_scan_objects_dialog()</slot>
   <slot>open_edit_tables_variables_dialog()</slot>
   <slot>open_print_setup()</slot>
+  <slot>undo()</slot>
+  <slot>redo()</slot>
  </slots>
 </ui>
