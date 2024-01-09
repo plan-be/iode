@@ -197,8 +197,6 @@ int IodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInf
         index = -1;
     }
 
-    if (index < 0) return index;
-
     return index;
 }
 
