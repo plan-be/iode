@@ -61,3 +61,50 @@ public:
         model->setData(index, new_value, Qt::EditRole);
     }
 };
+
+
+class UndoRename : public QUndoCommand
+{
+protected:
+    IodeAbstractTableModel* model;
+    QString new_name;
+    QString old_name;
+
+public:
+    UndoRename(IodeAbstractTableModel* model, const QString& new_name, const QString& old_name) : 
+        QUndoCommand("Rename '" + old_name + "' as '" + new_name + "'"), model(model), new_name(new_name), old_name(old_name) {}
+
+    void undo() override
+    { 
+        // We need to search the position of the name in the vertical header since running an IODE report 
+        // or an IODE command may have change the corresponding IODE database 
+        int section = -1;
+        for(int i = 0; i < model->rowCount(); i++)
+            if(new_name == model()->headerData(section, Qt::Vertical).toString())
+                section = i;
+        
+        if(section < 0)
+            QMessageBox::warning(nullptr, "WARNING", QString("Undo command:\n") + 
+                "Cannot rename '" + new_name + "' as '" + old_name "'.\n" + 
+                "Object '" + new_name "' not found");
+        else
+            model->setHeaderData(section, Qt::Vertical, old_name, Qt::EditRole);
+    }
+
+    void redo() override
+    { 
+        // We need to search the position of the name in the vertical header since running an IODE report 
+        // or an IODE command may have change the corresponding IODE database 
+        int section = -1;
+        for(int i = 0; i < model->rowCount(); i++)
+            if(old_name == model()->headerData(section, Qt::Vertical).toString())
+                section = i;
+        
+        if(section < 0)
+            QMessageBox::warning(nullptr, "WARNING", QString("Undo command:\n") + 
+                "Cannot rename '" + old_name + "' as '" + new_name "'.\n" + 
+                "Object '" + old_name "' not found");
+        else
+            model->setHeaderData(section, Qt::Vertical, new_name, Qt::EditRole);
+    }
+};
