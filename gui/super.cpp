@@ -5,13 +5,15 @@
 
 void gui_error_super(int level, char* msg)
 {
-	QMessageBox::critical(nullptr, "ERROR", QString(msg));
 	if (level > 0)
 	{
+		QMessageBox::critical(nullptr, "ERROR", QString(msg));
 		QMainWindow* main_window = static_cast<QMainWindow*>(get_main_window_ptr());
 		main_window->close();
 		exit(level);
 	}
+	else
+		throw std::runtime_error(msg);
 }
 
 void gui_warning_super(char* msg)
