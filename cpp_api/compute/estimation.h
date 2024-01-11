@@ -274,7 +274,7 @@ public:
         return v_equations;
     }
 
-    const KDBScalars& get_scalars() { return kdb_scl; }
+    KDBScalars* get_scalars() { return &kdb_scl; }
 
     /**
      * @brief update the local Scalars workspace 'kdb_scl'.
@@ -299,7 +299,7 @@ public:
      */
     void copy_eq_tests_values();
 
-    const KDBEquations& get_equations() { return kdb_eqs; }
+    KDBEquations* get_equations() { return &kdb_eqs; }
 
     /**
      * @brief update the LEC and comment of the current equation
