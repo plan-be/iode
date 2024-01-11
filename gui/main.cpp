@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
     // initialize IODE API
     IodeInit();
     gui_assign_super_API();
+    kpause_continue = 1;
 
     // set executable path
     executable_dir = QDir::currentPath();
