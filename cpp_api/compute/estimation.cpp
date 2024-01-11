@@ -281,8 +281,7 @@ void EditAndEstimateEquations::estimate()
     if(res == 0)        
         estimation_done = true;
     else
-        // B_display_last_error();
-        throw std::runtime_error("Cannot estimate (block of) equation(s) '" + this->block + "'");
+        B_display_last_error();
 }
 
 void EditAndEstimateEquations::save(const std::string& from, const std::string& to)
