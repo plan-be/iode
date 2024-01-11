@@ -42,11 +42,11 @@ TEST_F(EstimationTest, SetBlock)
     v_expected_eqs = {"ACAF", "DPUH"};
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
-    v_eqs = est.get_equations().get_names();
+    v_eqs = est.get_equations()->get_names();
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
     est.update_scalars();
-    v_coeffs = est.get_scalars().get_names();
+    v_coeffs = est.get_scalars()->get_names();
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
@@ -73,11 +73,11 @@ TEST_F(EstimationTest, SetBlock)
     v_expected_eqs = {"ACAF", "DPUH", "TEST"};
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
-    v_eqs = est.get_equations().get_names();
+    v_eqs = est.get_equations()->get_names();
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
     est.update_scalars();
-    v_coeffs = est.get_scalars().get_names();
+    v_coeffs = est.get_scalars()->get_names();
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
@@ -104,12 +104,12 @@ TEST_F(EstimationTest, SetBlock)
     v_expected_eqs = {"ACAF", "TEST"};
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
-    v_eqs = est.get_equations().get_names();
+    v_eqs = est.get_equations()->get_names();
     v_expected_eqs = {"ACAF", "DPUH", "TEST"};
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
     est.update_scalars();
-    v_coeffs = est.get_scalars().get_names();
+    v_coeffs = est.get_scalars()->get_names();
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
@@ -134,12 +134,12 @@ TEST_F(EstimationTest, SetBlock)
     v_expected_eqs = {"ACAF", "TEST", "DPUH"};
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
-    v_eqs = est.get_equations().get_names();
+    v_eqs = est.get_equations()->get_names();
     v_expected_eqs = {"ACAF", "DPUH", "TEST"};
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
     est.update_scalars();
-    v_coeffs = est.get_scalars().get_names();
+    v_coeffs = est.get_scalars()->get_names();
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
@@ -161,15 +161,15 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_eqs, v_expected_eqs);
 
     est_new_coeffs.update_scalars();
-    v_coeffs = est_new_coeffs.get_scalars().get_names();
+    v_coeffs = est_new_coeffs.get_scalars()->get_names();
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
-    KDBScalars kdb_scl_res = est_new_coeffs.get_scalars();;
-    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_1").val, 0.9);
-    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_1").relax, 1.0);
-    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_2").val, 0.9);
-    EXPECT_DOUBLE_EQ(kdb_scl_res.get("dpuh_2").relax, 1.0);
+    KDBScalars* kdb_scl_res = est_new_coeffs.get_scalars();;
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").val, 0.9);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").relax, 1.0);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2").val, 0.9);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2").relax, 1.0);
 }
 
 
@@ -253,12 +253,12 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_1").val) / 1e6, 0.010986);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_2").val) / 1e6, 0.057489);
 
-    KDBScalars kdb_scl_res = est.get_scalars();
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf1").val) / 1e6, 0.01577);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf2").val) / 1e6, -8.e-06);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("acaf4").val) / 1e6, -0.008503);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("dpuh_1").val) / 1e6, 0.010986);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res.get("dpuh_2").val) / 1e6, 0.057489);
+    KDBScalars* kdb_scl_res = est.get_scalars();
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").val) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").val) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").val) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_1").val) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_2").val) / 1e6, 0.057489);
 
     // Estimates ACAF only
     est.set_block("ACAF");
