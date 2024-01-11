@@ -9,6 +9,7 @@
 
 #include "ui_estimation_results.h"
 #include "correlation_matrix_model.h"
+#include "tests_eqs_model.h"
 #include "utils.h"
 #include "wrapper_classes.h"
 #include "iode_objs/models/scalars_model.h"
@@ -19,6 +20,7 @@
 class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDialog
 {
     Q_OBJECT
+    QString stylesheetHeader;
 
     int precision;
     EditAndEstimateEquations* edit_est_eqs;
@@ -32,7 +34,7 @@ class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDial
 private:
     void set_coefficients_tab();
     void set_correlation_matrix_tab();
-    void set_tests_tab(Equation& eq);
+    void set_tests_tab();
     void dump_table(const QAbstractTableModel* table_model, QTextCursor& cursor);
 
 public:
