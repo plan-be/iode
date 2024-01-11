@@ -6,13 +6,11 @@ EstimationResultsDialog::EstimationResultsDialog(EditAndEstimateEquations* edit_
     precision(6), edit_est_eqs(edit_est_eqs)
 {
     setupUi(this);
+    stylesheetHeader = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
 
     set_coefficients_tab();
-
     set_correlation_matrix_tab();
-
-    NamedEquation equation = edit_est_eqs->current_equation();
-    set_tests_tab(equation.eq);
+    set_tests_tab();
 
     Sample sample = edit_est_eqs->get_sample();
     from = QString::fromStdString(sample.start_period().to_string());
@@ -36,8 +34,7 @@ EstimationResultsDialog::~EstimationResultsDialog()
 
 void EstimationResultsDialog::set_coefficients_tab()
 {
-    QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
-    tableView_coefs->setStyleSheet(stylesheet);
+    tableView_coefs->setStyleSheet(stylesheetHeader);
 
     const KDBScalars kdb_coefs = edit_est_eqs->get_scalars();
     // Warning: we need to create a copy of kdb_coefs because the passed kdb is deleted in 
@@ -48,8 +45,7 @@ void EstimationResultsDialog::set_coefficients_tab()
 
 void EstimationResultsDialog::set_correlation_matrix_tab()
 {
-    QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
-    tableView_corr_matrix->setStyleSheet(stylesheet);
+    tableView_corr_matrix->setStyleSheet(stylesheetHeader);
 
     try
     {
@@ -62,17 +58,18 @@ void EstimationResultsDialog::set_correlation_matrix_tab()
     } 
 }
 
-void EstimationResultsDialog::set_tests_tab(Equation& eq)
+void EstimationResultsDialog::set_tests_tab()
 {
-    QGridLayout* layout = new QGridLayout(tab_tests);
-    std::array<float, EQS_NBTESTS> tests = eq.get_tests();
-    for(int i=0; i < vEquationTests.size(); i++)
+    tableView_tests->setStyleSheet(stylesheetHeader);
+
+    try
     {
-        QLabel* label = new QLabel(QString::fromStdString(vEquationTests[i]));
-        layout->addWidget(label, i, 0, Qt::AlignLeft);
-        QLineEdit* line = new QLineEdit(QString::number(tests[i], 'g', precision));
-        line->setReadOnly(true);
-        layout->addWidget(line, i, 1, Qt::AlignLeft);
+        TestsEqsModel* testsEqsModel = new TestsEqsModel(edit_est_eqs, this);
+        tableView_tests->setModel(testsEqsModel);
+    }
+    catch(const std::exception& e)
+    {
+        QMessageBox::warning(nullptr, "WARNING", "Cannot display the values for the tests.\n" + QString(e.what()));
     }
 }
 
