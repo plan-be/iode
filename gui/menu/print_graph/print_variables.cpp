@@ -105,6 +105,7 @@ void MenuPrintVariables::setup()
     try
     {
         MenuFileSettings dialog(this);
+        dialog.showPrintTab();
         dialog.exec();
     }
     catch (const std::exception& e)
