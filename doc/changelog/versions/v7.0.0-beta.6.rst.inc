@@ -11,6 +11,8 @@ Improvements ✨
 ---------------
 
   * (GUI) Align values right when displaying numbers (#445)
+  * (GUI) Possibility to choose between running reports from the project directory or 
+          from their parent directory (#447)
 
 
 Fixed Bugs 🛠️
