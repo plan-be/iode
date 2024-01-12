@@ -34,6 +34,7 @@ class IodeAbstractTableModel : public QAbstractTableModel
 
 protected:
 	QVector<QString> columnNames;
+	Qt::AlignmentFlag alignment;
 	size_t hashBefore;
 	size_t hashAfter;	
 
@@ -42,8 +43,7 @@ signals:
 
 public:
 	IodeAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
-		QAbstractTableModel(parent), columnNames(columnNames) {}
-
+		QAbstractTableModel(parent), columnNames(columnNames), alignment(Qt::AlignLeft) {}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override
 	{
