@@ -4,7 +4,7 @@
 void MenuPrintAbstract::printTableOrVariable(const bool isTable, const QString& names)
 {
     QSettings* project_settings = ProjectSettings::getProjectSettings();
-    bool printToFile = project_settings->value(MenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST).toBool();
+    bool printToFile = project_settings->value(MenuFileSettings::KEY_SETTINGS_PRINT_DEST).toBool();
 
     QString outputFile;
     QChar format;

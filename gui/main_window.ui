@@ -90,13 +90,7 @@
     <addaction name="actionImport_Variables"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
-    <addaction name="actionPrint_Setup"/>
-    <addaction name="separator"/>
-    <addaction name="actionPROFILES"/>
-    <addaction name="separator"/>
-    <addaction name="actionLoad_profile"/>
-    <addaction name="actionSave_profile"/>
-    <addaction name="actionReset_profile"/>
+    <addaction name="actionSettings"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -353,9 +347,9 @@
     <string>Export files respecting certain rules to IODE</string>
    </property>
   </action>
-  <action name="actionPrint_Setup">
+  <action name="actionSettings">
    <property name="text">
-    <string>Print Setup</string>
+    <string>Settings</string>
    </property>
    <property name="toolTip">
     <string>Change Print Setup</string>
@@ -1001,54 +995,6 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>open_import_comments_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionLoad_profile</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_load_settings_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSave_profile</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_save_settings_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionReset_profile</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_reset_settings_dialog()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1845,10 +1791,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionPrint_Setup</sender>
+   <sender>actionSettings</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>open_print_setup()</slot>
+   <slot>open_settings()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1864,9 +1810,6 @@
  <slots>
   <slot>about()</slot>
   <slot>open_import_comments_dialog()</slot>
-  <slot>open_load_settings_dialog()</slot>
-  <slot>open_save_settings_dialog()</slot>
-  <slot>open_reset_settings_dialog()</slot>
   <slot>clear_workspace()</slot>
   <slot>open_copy_into_workspace_dialog()</slot>
   <slot>open_merge_into_workspace_dialog()</slot>
@@ -1911,6 +1854,6 @@
   <slot>open_search_text_dialog()</slot>
   <slot>open_scan_objects_dialog()</slot>
   <slot>open_edit_tables_variables_dialog()</slot>
-  <slot>open_print_setup()</slot>
+  <slot>open_settings()</slot>
  </slots>
 </ui>
