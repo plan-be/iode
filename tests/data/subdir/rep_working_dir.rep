@@ -1,0 +1,9 @@
+$ Main report tests
+$ -----------------
+$ Syntax: 
+$debug 1
+$noparsing 
+$indent
+
+current working directory: @getdir()
+
