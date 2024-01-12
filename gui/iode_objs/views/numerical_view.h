@@ -114,6 +114,10 @@ public:
         QObject::connect(shortcutPastVars, &QShortcut::activated, this, &_NUMERICAL_VIEW_CLASS_NAME_::paste_vars);
 #endif
 
+        // headers
+        horizontalHeader()->setStretchLastSection(false);
+        verticalHeader()->setStretchLastSection(false);
+
         // context menu = popup menu displayed when a user right clicks
         setupContextMenu();
     }

@@ -19,7 +19,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
 
     // headers
     horizontalHeader()->setStretchLastSection(true);
-    verticalHeader()->setStretchLastSection(true);
+    verticalHeader()->setStretchLastSection(false);
 
     // stylesheet
     setStyleSheet(stylesheet);
