@@ -53,8 +53,10 @@ public:
 #else
     _NUMERICAL_MODEL_CLASS_NAME_(QVector<QString> columnNames, QObject* parent = nullptr, 
         const int precision = 2, K* kdb_external = nullptr): 
-        IodeTemplateTableModel<K>(columnNames, parent, kdb_external), precision(precision) 
-    {}
+        IodeTemplateTableModel<K>(columnNames, parent, kdb_external), precision(precision), format('f')
+    {
+        this->alignment = Qt::AlignRight;
+    }
 #endif
 
     QString valueToString(const double value) const

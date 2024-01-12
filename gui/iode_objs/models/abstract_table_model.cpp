@@ -75,7 +75,7 @@ QVariant IodeTemplateTableModel<K>::data(const QModelIndex& index, int role) con
 		return QVariant();
 
 	if (role == Qt::TextAlignmentRole)
-		return int(Qt::AlignLeft);
+		return int(alignment);
 
 	if ((role == Qt::DisplayRole || role == Qt::EditRole) && kdb)
 		return dataCell(index.row(), index.column());

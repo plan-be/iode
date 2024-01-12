@@ -17,6 +17,9 @@ QVariant CorrelationMatrixModel::data(const QModelIndex& index, int role) const
     if (index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
 
+	if (role == Qt::TextAlignmentRole)
+		return int(Qt::AlignRight);
+
     if (role == Qt::DisplayRole)
         return QString::number(corr_matrix.get_value(index.row(), index.column()), 'g', 6);
     else

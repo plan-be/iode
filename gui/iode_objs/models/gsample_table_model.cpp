@@ -45,7 +45,7 @@ QVariant GSampleTableModel::data(const QModelIndex& index, int role) const
 		return QVariant();
 
 	if (role == Qt::TextAlignmentRole)
-		return int(Qt::AlignLeft);
+		return int(Qt::AlignRight);
 
 	if (role == Qt::DisplayRole || role == Qt::EditRole)
 		return valueToString(table->get_value(index.row(), index.column(), get_precision()));
