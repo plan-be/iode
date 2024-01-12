@@ -17,6 +17,9 @@ void IodeReportEditor::run(const QString& filepath, const QString& parameters, c
 
     QString currentProjectDir = QDir::currentPath();
 
+    QSettings* project_settings = ProjectSettings::getProjectSettings();
+    bool runFromProjectDir = project_settings->value(MenuFileSettings::KEY_SETTINGS_RUN_REPORTS_FROM_PROJECT_DIR).toBool();
+
     try
     {
         if(output)
@@ -33,20 +36,23 @@ void IodeReportEditor::run(const QString& filepath, const QString& parameters, c
         setLang(language);
 
         // updates current directory execution (chdir)
-        QDir::setCurrent(QFileInfo(filepath).absolutePath());
+        if(!runFromProjectDir)
+            QDir::setCurrent(QFileInfo(filepath).absolutePath());
 
         // executes IODE report
         execute_report(filepath.toLocal8Bit().toStdString(), parameters.toLocal8Bit().toStdString());
 
         // reset current directory execution to project directory (chdir)
-        QDir::setCurrent(currentProjectDir);
+        if(!runFromProjectDir)
+            QDir::setCurrent(currentProjectDir);
 
         success = true;
     }
     catch(const std::exception& e)
     {        
         // reset current directory execution to project directory (chdir)
-        QDir::setCurrent(currentProjectDir);
+        if(!runFromProjectDir)
+            QDir::setCurrent(currentProjectDir);
 
         success = false;
 

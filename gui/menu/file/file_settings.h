@@ -14,14 +14,22 @@ class MenuFileSettings : public IodeSettingsDialog, public Ui::MenuFileSettings
 {
     Q_OBJECT
 
-    WrapperComboBox* wPrintDest;
+    WrapperComboBox*    wPrintDest;
+    WrapperRadioButton* wRunReportsFromProjectDir;
+    WrapperRadioButton* wRunReportsFromParentDir;
 
 public:
+    const static QString KEY_SETTINGS_RUN_REPORTS_FROM_PROJECT_DIR;
     const static QString KEY_SETTINGS_PRINT_DEST;
 
 public:
     MenuFileSettings(QWidget* parent = nullptr);
     ~MenuFileSettings();
+
+    void showPrintTab()
+    {
+        tabWidget->setCurrentWidget(tab_reports);
+    }
 
 public slots:
     void apply();

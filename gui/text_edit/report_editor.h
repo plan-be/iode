@@ -6,10 +6,12 @@
 #include <QAbstractItemView>
 
 #include "utils.h"
+#include "settings.h"
 #include "highlighter.h"
 #include "completer.h"
 #include "text_editor.h"
 #include "print/print.h"
+#include "menu/file/file_settings.h"
 #include "main_window_abstract.h"
 
 
