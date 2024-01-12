@@ -345,9 +345,9 @@ void MainWindow::open_export_dialog()
     dialog.exec();
 }
 
-void MainWindow::open_print_setup()
+void MainWindow::open_settings()
 {
-    MenuFilePrintSetup dialog(this);
+    MenuFileSettings dialog(this);
     dialog.exec();
 }
 

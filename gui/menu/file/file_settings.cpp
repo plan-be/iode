@@ -1,9 +1,9 @@
-#include "file_print_setup.h"
+#include "file_settings.h"
 
-const QString MenuFilePrintSetup::KEY_SETTINGS_PRINT_DEST = "MENU_FILE_PRINT_SETUP/Print_Dest";
+const QString MenuFileSettings::KEY_SETTINGS_PRINT_DEST = "MENU_FILE_SETTINGS/Print_Dest";
 
 
-MenuFilePrintSetup::MenuFilePrintSetup(QWidget* parent)
+MenuFileSettings::MenuFileSettings(QWidget* parent)
     : IodeSettingsDialog(parent)
 {
     setupUi(this);
@@ -15,28 +15,28 @@ MenuFilePrintSetup::MenuFilePrintSetup(QWidget* parent)
     mapFields["Print_Dest"] = wPrintDest;
     comboBox_print_dest->setCurrentIndex(0);
 
-    className = "MENU_FILE_PRINT_SETUP";
+    className = "MENU_FILE_SETTINGS";
     loadSettings();
 }
 
-MenuFilePrintSetup::~MenuFilePrintSetup()
+MenuFileSettings::~MenuFileSettings()
 {
     delete wPrintDest;
 }
 
 // Will call saveSettings -> see QSettings::closeEvent
-void MenuFilePrintSetup::apply()
+void MenuFileSettings::apply()
 {
     this->accept();
 }
 
-void MenuFilePrintSetup::set_print_options()
+void MenuFileSettings::set_print_options()
 {
     FilePrintPreferences dialog(static_cast<QWidget*>(parent()));
     dialog.exec();
 }
 
-void MenuFilePrintSetup::help()
+void MenuFileSettings::help()
 {
 	QDesktopServices::openUrl(url_manual);
 }

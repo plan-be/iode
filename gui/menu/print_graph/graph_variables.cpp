@@ -135,7 +135,7 @@ void MenuGraphVariables::setup()
 {
     try
     {
-        MenuFilePrintSetup dialog(this);
+        MenuFileSettings dialog(this);
         dialog.exec();
     }
     catch (const std::exception& e)

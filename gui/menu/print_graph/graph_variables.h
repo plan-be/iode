@@ -8,7 +8,7 @@
 #include "wrapper_classes.h"
 #include "plot/plot_vars.h"
 #include "text_edit/completer.h"
-#include "menu/file/file_print_setup.h"
+#include "menu/file/file_settings.h"
 
 
 /* NOTE FOR THE DEVELOPERS:

@@ -11,7 +11,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "print/print.h"
-#include "menu/file/file_print_setup.h"
+#include "menu/file/file_settings.h"
 #include "print/print_file_dialog.h"
 
 /* NOTE FOR THE DEVELOPERS:
