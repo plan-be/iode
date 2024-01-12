@@ -10,6 +10,8 @@ New Features 🎉
 Improvements ✨
 ---------------
 
+  * (GUI) Align values right when displaying numbers (#445)
+
 
 Fixed Bugs 🛠️
 -------------
