@@ -1,15 +1,16 @@
 #pragma once
 
-#include <QString>
 #include <QList>
+#include <QString>
+#include <QSpinBox>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QTextEdit>
-#include <QSpinBox>
+#include <QRadioButton>
 #include <QFontComboBox>
 #include <QPlainTextEdit>
 #include <QDoubleSpinBox>
-#include <QCheckBox>
 
 #include "./util/widgets/file_chooser.h"
 #include "./util/widgets/sample_edit.h"
@@ -38,6 +39,30 @@ public:
     T& getQField() { return qfield; }
 
     virtual U extractAndVerify() = 0;
+};
+
+
+class WrapperRadioButton : public TemplateWrapper<QRadioButton, bool>
+{
+public:
+    WrapperRadioButton(const QString name, QRadioButton& qfield) :
+        TemplateWrapper(name, qfield, EnumItemType::REQUIRED_FIELD) {}
+
+    QVariant getQValue()
+    {
+        return QVariant(qfield.isChecked());
+    }
+
+    void setQValue(const QVariant& qvalue)
+    {
+        bool value = qvalue.toBool();
+        qfield.setChecked(value);
+    }
+
+    bool extractAndVerify()
+    {
+        return qfield.isChecked();
+    }
 };
 
 
