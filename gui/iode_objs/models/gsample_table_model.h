@@ -13,23 +13,10 @@
 
 #include "utils.h"
 #include "util/widgets/file_chooser.h"
-#ifndef GSAMPLE_NUMERICAL_MODEL_HEADER
-#define _GSAMPLE_
 #include "numerical_table_model.h"
-#undef _GSAMPLE_
-#endif
 
 
-/* NOTE FOR THE DEVELOPPERS:
- * Because of how Qt is implemented, it is NOT possible for a template class
- * to define/override signals and slots (using Q_OBJECT)
- * ( see https://doc.qt.io/qt-5/moc.html#limitations )
- * 
- * Read-only model: https://doc.qt.io/qt-6/model-view-programming.html#read-only-access
- * 
- */
-
-class GSampleTableModel : public GSampleNumericalTableModel
+class GSampleTableModel : public QAbstractTableModel, public NumericalTableModel
 {
     QString refTable;
     QString variables;
@@ -59,6 +46,11 @@ public:
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 	bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+
+	void updateDisplayValues() override
+	{
+		reset();
+	}
 
 public slots:
 	void reset()
