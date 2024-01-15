@@ -2,6 +2,8 @@
 
 #include "utils.h"
 
+inline bool no_precision = false;
+
 /* NOTE FOR THE DEVELOPPERS:
  * Multiple Inheritance Requires QObject to Be First
  * If you are using multiple inheritance, moc assumes that the first inherited class
@@ -15,17 +17,21 @@
  */
 class NumericalTableModel
 {
-    int precision;
-    int min_precision;      // 0 if format = 'f', 1 if format = 'g' or 'e'
+    int  precision;
+    int  min_precision;      // 0 if format = 'f', 1 if format = 'g' or 'e'
     char format;
 
 public:
-    NumericalTableModel(const int precision = 2, const char format = 'f'): 
-        precision(precision), format(format) {}
+    NumericalTableModel(const int precision = 2, const char format = 'f'): precision(precision), format(format) {}
 
     QString valueToString(const double value) const
     {
-        return L_ISAN(value) ? QString::number(value, format, precision) : NAN_REP;
+        // QLocale::FloatingPointShortest -> the conversion algorithm will try to find the shortest accurate 
+        // representation for the given number. 'Accurate' means that you get the exact same number back from 
+        // an inverse conversion on the generated string representation. In particular, trailing zeros are omitted.
+        // see https://doc.qt.io/qt-6/qlocale.html#FloatingPointPrecisionOption-enum 
+        int precision_ = no_precision ? QLocale::FloatingPointShortest : precision;
+        return L_ISAN(value) ? QString::number(value, format, precision_) : NAN_REP;
     }
 
     int get_precision() const
