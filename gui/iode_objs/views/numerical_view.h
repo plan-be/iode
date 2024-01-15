@@ -22,10 +22,11 @@
 #include <QTableView>
 #include <QMessageBox>
 
+#include "utils.h"
+#include "iode_objs/models/numerical_table_model.h"
+
 #ifdef _GSAMPLE_
 #define GSAMPLE_NUMERICAL_VIEW_HEADER
-
-#include "utils.h"
 
 #define _NUMERICAL_VIEW_CLASS_NAME_ GSampleNumericalTableView
 
@@ -318,7 +319,7 @@ protected:
 
 	QList<QStringList> extractValues()
     {
-
+        no_precision = true;
         QItemSelectionRange selection_range =  this->selectionModel()->selection().first();
         QAbstractItemModel* model_ = this->model();
 
@@ -334,7 +335,8 @@ protected:
             }
             values.push_back(rowValues);
         }
-        
+
+        no_precision = false;
         return values;
     }
 
