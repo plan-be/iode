@@ -34,7 +34,7 @@
 #define _GSAMPLE_
 
 #ifndef GSAMPLE_NUMERICAL_VIEW_HEADER
-#include "iode_objs/views/numerical_view.h"
+#include "iode_objs/views/gsample_table_view.h"
 #endif
 
 #define _NUMERICAL_WIDGET_CLASS_NAME_ GSampleNumericalDialog
@@ -63,7 +63,7 @@ template <class M, class V> class _NUMERICAL_WIDGET_CLASS_NAME_ : public Templat
 #ifdef _GSAMPLE_
     QVBoxLayout* vLayout;
 
-    GSampleNumericalTableView* tableview;
+    GSampleTableView*  tableview;
     GSampleTableModel* objmodel;
 #endif
 
@@ -114,7 +114,7 @@ public:
         vLayout->setContentsMargins(0, 0, 0, 0);
         vLayout->setObjectName("vTabLayout");
 
-        tableview = new GSampleNumericalTableView(this);
+        tableview = new GSampleTableView(this);
         objmodel = new GSampleTableModel(refTable, gsample, nbDecimals, variables, tableview);
         tableview->setModel(objmodel);
         tableview->horizontalHeader()->setStretchLastSection(true);

@@ -11,22 +11,36 @@
 #include "plot/plot_vars.h"
 #include "print/print_file_dialog.h"
 #include "menu/print_graph/graph_variables.h"
-#ifndef TEMPLATE_NUMERICAL_VIEW_HEADER
 #include "numerical_view.h"
-#endif
+
+/* NOTE FOR THE DEVELOPERS:
+ * Multiple Inheritance Requires QObject to Be First
+ * If you are using multiple inheritance, moc assumes that the first inherited class
+ * is a subclass of QObject. Also, be sure that only the first inherited class is a QObject.
+ * https://doc.qt.io/qt-6/moc.html#multiple-inheritance-requires-qobject-to-be-first
+ * --> That's why the class below does not inherit from NumericalTableView but contains 
+ *     a member of type NumericalTableView
+ */
 
 
-class VariablesView : public TemplateNumericalTableView
+class VariablesView : public IodeAbstractTableView
 {
 	Q_OBJECT
+	NumericalTableView numeric;
 
 	QShortcut* plotSeriesShortcut;
 	QShortcut* graphsDialogShortcut;
 
+signals:
+	void newPlot(QDialog* plotDialog);
+	void newGraphsDialog(const QList<QString>& variableNames, const QString& from, const QString& to);
+
 public:
 	VariablesView(QWidget* parent = nullptr) 
-		: TemplateNumericalTableView(I_VARIABLES, new VariablesDelegate(parent), parent) 
+		: IodeAbstractTableView(I_VARIABLES, new VariablesDelegate(parent), parent), numeric(true)
 	{
+		numeric.setup(this);
+
 		// ---- Selection ----
 		// See: - https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-in-item-views
 		//      - https://doc.qt.io/qt-5/model-view-programming.html#selections
@@ -35,6 +49,7 @@ public:
 		// Selecting single items.
 		// See: https://doc.qt.io/qt-5/qabstractitemview.html#SelectionBehavior-enum
 		setSelectionBehavior(QTableView::SelectItems);
+
 		// -- Mode --
 		// When the user selects an item in the usual way, the selection is cleared and the new item selected. 
 		// However, if the user presses the Shift key while clicking on an item, all items between the current 
@@ -70,16 +85,19 @@ public:
     {
         QAction* action;
 
-        action = addAction("Plot", "Plot selected variables", plotSeriesShortcut->key());
-        QObject::connect(action, &QAction::triggered, this, &VariablesView::plot_series);
+        action = numeric.addAction_("Plot", "Plot selected variables", plotSeriesShortcut->key());
+        connect(action, &QAction::triggered, this, &VariablesView::plot_series);
 
-        action = addAction("Plot dialog", "Open the plot dialog", graphsDialogShortcut->key());
-        QObject::connect(action, &QAction::triggered, this, &VariablesView::open_graphs_dialog);
+        action = numeric.addAction_("Plot dialog", "Open the plot dialog", graphsDialogShortcut->key());
+    	connect(action, &QAction::triggered, this, &VariablesView::open_graphs_dialog);
 	}
 
-signals:
-	void newPlot(QDialog* plotDialog);
-	void newGraphsDialog(const QList<QString>& variableNames, const QString& from, const QString& to);
+protected:
+	void contextMenuEvent(QContextMenuEvent* event) override
+	{
+		numeric.popupContextMenu(event);
+		event->accept();
+	}
 
 public slots:
 	void print() override;
