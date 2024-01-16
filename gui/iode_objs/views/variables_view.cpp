@@ -78,8 +78,8 @@ void VariablesView::plot_series()
 {
 	try
 	{
-		QStringList variableNames = extractObjectsNames();
-		QStringList sample = extractSample();
+		QStringList variableNames = numeric.extractObjectsNames();
+		QStringList sample = numeric.extractSample();
 		QString from = sample.first();
 		QString to = sample.last();
 
@@ -103,8 +103,8 @@ void VariablesView::open_graphs_dialog()
 {
 	try
 	{
-		QStringList variableNames = extractObjectsNames();
-		QStringList sample = extractSample();
+		QStringList variableNames = numeric.extractObjectsNames();
+		QStringList sample = numeric.extractSample();
 		QString from = sample.first();
 		QString to = sample.last();
 

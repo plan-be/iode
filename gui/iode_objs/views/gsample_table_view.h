@@ -1,10 +1,7 @@
 #pragma once
 
-#include <QObject>
+#include <QTableView>
 
-#include "iode_objs/models/scalars_model.h"
-#include "iode_objs/delegates/scalars_delegate.h"
-#include "iode_objs/new/add_scalar.h"
 #include "numerical_view.h"
 
 /* NOTE FOR THE DEVELOPERS:
@@ -17,17 +14,16 @@
  */
 
 
-class ScalarsView : public IodeAbstractTableView
+class GSampleTableView: public QTableView
 {
-	Q_OBJECT
-	NumericalTableView numeric;
+    Q_OBJECT
+    NumericalTableView numeric;
 
 public:
-	ScalarsView(QWidget* parent = nullptr) 
-		: IodeAbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent), numeric(false) 
-	{
-		numeric.setup(this);
-	};
+    GSampleTableView(QWidget *parent = nullptr): QTableView(parent), numeric(false)
+    {
+        numeric.setup(this);
+    }
 
 protected:
 	void contextMenuEvent(QContextMenuEvent* event) override
@@ -35,7 +31,4 @@ protected:
 		numeric.popupContextMenu(event);
 		event->accept();
 	}
-
-public slots:
-	void new_obj();
 };

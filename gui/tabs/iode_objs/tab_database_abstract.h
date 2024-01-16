@@ -42,7 +42,7 @@ public:
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 
-        /* NOTE FOR THE DEVELOPPERS:
+        /* NOTE FOR THE DEVELOPERS:
          * I first tried to use a QGridLayout but some widgets were misaligned in the tabs. 
          * I could,'t find out why.
          * So I finally decided to mix QVBoxLayout and QHBoxLayout which solved the problem.
