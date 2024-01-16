@@ -190,3 +190,41 @@ in the name of the pushed branch:
 - `build_python`        -> triggered if the branch name contains either the word `python` or `nsis`
 - `build_doc`           -> triggered if the branch name contains either the word `doc` or `nsis`
 - `build_nsis`          -> triggered if the branch name contains either the word `nsis` or `release`
+
+# Troubleshooting
+
+## VS Code - IntelliSense
+
+The IntelliSense feature (= autocomplete for C/C++) of VS Code may not be able to find where the headers files of the 
+std, Boost and Qt libraries are located. 
+
+First, add a `c_cpp_properties.json` file as indicated in the documentation for 
+[developing with the C/C++ compiler MSVC with VS Code](https://code.visualstudio.com/docs/cpp/config-msvc#_cc-configurations).
+
+Then, in the `c_cpp_properties.json` file:
+
+1. add the following content for `includePath`:
+```
+	"includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}",
+        "${workspaceFolder}/scr4",
+        "C:/boost",
+        "C:/Qt/6.4.2/msvc2019_64/include",
+        "C:/Qt/6.4.2/msvc2019_64/include/QtCore",
+        "C:/Qt/6.4.2/msvc2019_64/include/QtGui",
+        "C:/Qt/6.4.2/msvc2019_64/include/QtWidgets",
+        "C:/Qt/6.4.2/msvc2019_64/include/QtCharts",
+        "C:/Qt/6.4.2/msvc2019_64/include/QtPrintSupport"
+  ],
+```
+You may have to adapt the path to the Boost and Qt libraries depending on where those libraries are installed on your computer.
+
+2. Update the value of `configurationProvider` and `compilerPath`. To find the path to your MSVC compiler, open a 
+`Developer Command Prompt` and type:
+```
+> where cl
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\bin\Hostx64\x64\cl.exe
+```
+
+3. Restart VS Code
