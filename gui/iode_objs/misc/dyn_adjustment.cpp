@@ -45,7 +45,7 @@ void DynAdjustmentDialog::adjust()
     }
     catch(const std::exception& e)
     {
-        QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+        QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
     }
 }
 

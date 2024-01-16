@@ -221,7 +221,7 @@ bool EditTableModel::setData(const QModelIndex& index, const QVariant& value, in
 		}
 		catch (const std::exception& e)
 		{
-			QMessageBox::critical(static_cast<QWidget*>(parent()), tr("ERROR"), tr(e.what()));
+			QMessageBox::warning(nullptr, "ERROR", QString(e.what()));
 		}
 	}
 	else
@@ -309,7 +309,7 @@ bool EditTableModel::removeRows(int position, int rows, const QModelIndex& index
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		return false;
 	}
 

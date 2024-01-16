@@ -63,7 +63,7 @@ bool IodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orien
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		return false;
 	}
 }
@@ -124,7 +124,7 @@ void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent
 			kdb_filter = nullptr;
 			kdb = kdb_global ? kdb_global : kdb_external;
 			if(!silent)
-				QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+				QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		}
 	}
 	else
@@ -254,7 +254,7 @@ bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelI
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), tr("WARNING"), tr(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 
 	endRemoveRows();
