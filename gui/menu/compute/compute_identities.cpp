@@ -48,8 +48,7 @@ MenuComputeIdentities::MenuComputeIdentities(QWidget* parent) :
     className = "MENU_COMPUTE_IDENTITIES";
     loadSettings();
 
-    KDBVariables kdb_var;
-    Sample sample = kdb_var.get_sample();
+    Sample sample = Variables.get_sample();
     if(sample.nb_periods() > 0)
     {
         if(qFrom->getQValue().toString().isEmpty())

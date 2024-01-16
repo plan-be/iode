@@ -35,8 +35,7 @@ void MenuWorkspaceSeasonalAdjustment::seasonal_adjustment()
         std::string series = wSeries->extractAndVerify().toStdString();
         double EPS_test = wEPSTest->extractAndVerify();
 
-        KDBVariables kdb;
-        kdb.seasonal_adjustment(filepath, series, EPS_test);
+        Variables.seasonal_adjustment(filepath, series, EPS_test);
     }
     catch (const std::exception& e)
     {

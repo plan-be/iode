@@ -34,8 +34,7 @@ void IdentitiesModel::executeIdentity(const int row)
 
 	try
 	{
-		KDBVariables kdb_vars;
-		Sample sample = kdb_vars.get_sample();
+		Sample sample = Variables.get_sample();
 		kdb->execute_identities(sample.start_period(), sample.end_period(), name.toStdString());
 		QMessageBox::information(nullptr, "INFO", "Identity " + name + " successfully executed");
 	}
