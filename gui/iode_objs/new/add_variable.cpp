@@ -16,10 +16,9 @@ void AddVariableDialog::add()
 {
 	try
 	{
-		KDBVariables kdb;
 		std::string name = lineName->extractAndVerify().toStdString();
 		std::string lec = lineDefinition->extractAndVerify().toStdString();
-		kdb.add(name, lec);
+		Variables.add(name, lec);
 		this->accept();
 	}
 	catch (const std::exception& e)

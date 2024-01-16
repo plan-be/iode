@@ -39,12 +39,11 @@ void MenuWorkspaceTrendCorrection::trend_correction()
         std::string series = wSeries->extractAndVerify().toStdString();
         bool log = wLog->extractAndVerify();
 
-        KDBVariables kdb;
-        kdb.trend_correction(filepath, lambda, series, log);
+        Variables.trend_correction(filepath, lambda, series, log);
     }
     catch (const std::exception& e)
     {
-        QMessageBox::critical(this, tr("ERROR"), tr(e.what()));
+        QMessageBox::critical(this, "ERROR", QString(e.what()));
         return;
     }
 

@@ -26,8 +26,7 @@ void TablesView::display()
 			return;
 
 		// generates the GSample representing the whole global sample
-		KDBVariables kdb_var;
-		Sample smpl = kdb_var.get_sample();
+		Sample smpl = Variables.get_sample();
 		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 		// computes and display the selected table
@@ -59,8 +58,7 @@ void TablesView::plot()
 			return;
 
 		// generates the GSample representing the whole global sample
-		KDBVariables kdb_var;
-		Sample smpl = kdb_var.get_sample();
+		Sample smpl = Variables.get_sample();
 		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 		// computes the tables and generates the associated graph

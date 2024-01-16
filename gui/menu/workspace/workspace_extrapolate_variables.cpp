@@ -45,8 +45,7 @@ void MenuWorkspaceExtrapolateVariables::extrapolate_variables()
         EnumSimulationInitialization method = (EnumSimulationInitialization) wMethod->extractAndVerify();
         std::string vars_list = wVarsList->extractAndVerify().toStdString();
 
-        KDBVariables kdb;
-        kdb.extrapolate(method, s_from, s_to, vars_list);
+        Variables.extrapolate(method, s_from, s_to, vars_list);
     }
     catch (const std::exception& e)
     {

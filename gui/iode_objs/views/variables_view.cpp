@@ -37,8 +37,7 @@ void VariablesView::print()
 			EnumLang lang = EnumLang::IT_ENGLISH;
 
 			// build the generalized sample
-			KDBVariables kdb_var;
-			Sample smpl = kdb_var.get_sample();
+			Sample smpl = Variables.get_sample();
 			QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 			// list of names = filter pattern or * if pattern is empty
@@ -86,8 +85,7 @@ void VariablesView::plot_series()
 
 		PlotVariablesDialog* plotDialog = new PlotVariablesDialog();
 
-		KDBVariables kdb_var;
-		plotDialog->setPeriods(kdb_var.get_sample(), from, to);
+		plotDialog->setPeriods(Variables.get_sample(), from, to);
 
 		foreach(const QString& variable, variableNames)
 			plotDialog->addSeries(variable);

@@ -81,8 +81,7 @@ void MenuGraphVariables::display()
         // periods for the plot
         QString from = wFrom->extractAndVerify();
         QString to = wTo->extractAndVerify();
-        KDBVariables kdb_var;
-        plotDialog->setPeriods(kdb_var.get_sample(), from, to);
+        plotDialog->setPeriods(Variables.get_sample(), from, to);
 
         // set min and max Y
         QString qMinY = wMinY->extractAndVerify();
