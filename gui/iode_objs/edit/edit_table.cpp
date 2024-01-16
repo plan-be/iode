@@ -59,7 +59,7 @@ void EditTableDialog::edit()
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
@@ -79,7 +79,7 @@ void EditTableDialog::plot()
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
@@ -119,7 +119,7 @@ void EditTableDialog::insert_line()
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
@@ -142,7 +142,7 @@ void EditTableDialog::delete_line()
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::warning(static_cast<QWidget*>(parent()), "WARNING", QString(e.what()));
+		QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 	}
 }
 
