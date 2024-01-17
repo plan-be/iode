@@ -65,6 +65,7 @@ public:
     {
         this->format = format;
         min_precision = (format == 'f') ? 0 : 1;
+        updateDisplayValues();
     }
 
     void precision_plus()
