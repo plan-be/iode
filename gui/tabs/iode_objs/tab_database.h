@@ -1,10 +1,7 @@
 #pragma once
 
 #include "tab_database_abstract.h"
-
-#ifndef TEMPLATE_NUMERICAL_WIDGET_HEADER
 #include "tab_numerical_values.h"
-#endif
 
 #include "iode_objs/models/comments_model.h"
 #include "iode_objs/models/equations_model.h"
@@ -83,12 +80,20 @@ public:
     }
 };
 
-class ScalarsWidget : public TemplateNumericalWidget<ScalarsModel, ScalarsView>
+class ScalarsWidget : public TemplateIodeObjectWidget<ScalarsModel, ScalarsView>
 {
+    NumericalWidget numeric; 
+
 public:
-    ScalarsWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_SCALARS, parent) 
+    ScalarsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_SCALARS, parent) 
     {
-        addHorizontalSpacer();
+        QHBoxLayout* bottomLayout = numeric.setup(this, objmodel, tableview);
+
+        QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        // -1 -> span over all rows/columns
+        bottomLayout->addSpacerItem(horizontalSpacer);
+
+        vLayout->addLayout(bottomLayout);
 
         connect(objmodel, &ScalarsModel::dataChanged, this, &ScalarsWidget::databaseModified);
         connect(objmodel, &ScalarsModel::headerDataChanged, this, &ScalarsWidget::databaseModified);
@@ -100,12 +105,12 @@ public:
 
     void loadSettings(const QSettings* project_settings) override
     {
-        loadNumericSettings(project_settings);
+        numeric.loadNumericSettings(project_settings);
     }
 
     void saveSettings(QSettings* project_settings) override
     {
-        saveNumericSettings(project_settings);
+        numeric.saveNumericSettings(project_settings);
     }
 };
 
@@ -124,17 +129,21 @@ public:
     }
 };
 
-class VariablesWidget : public TemplateNumericalWidget<VariablesModel, VariablesView>
+class VariablesWidget : public TemplateIodeObjectWidget<VariablesModel, VariablesView>
 {
     Q_OBJECT
+
+    NumericalWidget numeric; 
 
     QComboBox* comboMode;
     QShortcut* shortcutModePlus;
     QShortcut* shortcutModeMinus;
 
 public:
-    VariablesWidget(IodeAbstractTabWidget* parent) : TemplateNumericalWidget(I_VARIABLES, parent) 
+    VariablesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_VARIABLES, parent) 
     {
+        QHBoxLayout* bottomLayout = numeric.setup(this, objmodel, tableview);
+
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -154,7 +163,11 @@ public:
         comboMode->setCurrentIndex(0);
         bottomLayout->addWidget(comboMode, Qt::AlignLeft);
 
-        addHorizontalSpacer();
+        QSpacerItem* horizontalSpacer = new QSpacerItem(800, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        // -1 -> span over all rows/columns
+        bottomLayout->addSpacerItem(horizontalSpacer);
+
+        vLayout->addLayout(bottomLayout);
 
         // shortcuts
         shortcutModePlus = new QShortcut(QKeySequence(Qt::Key_F5), this);
@@ -187,7 +200,7 @@ public:
         if(!project_settings)
             return;
 
-        loadNumericSettings(project_settings);
+        numeric.loadNumericSettings(project_settings);
         int mode = project_settings->value("Mode", 0).toInt();
         comboMode->setCurrentIndex(mode);
     }
@@ -197,7 +210,7 @@ public:
         if(!project_settings)
             return;
         
-        saveNumericSettings(project_settings);
+        numeric.saveNumericSettings(project_settings);
         project_settings->setValue("Mode", comboMode->currentIndex());
     }
 
@@ -220,5 +233,4 @@ public slots:
         index = (index == 0) ? comboMode->count() - 1 : index - 1;
         comboMode->setCurrentIndex(index);
     }
-
 };

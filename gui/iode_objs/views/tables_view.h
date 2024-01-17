@@ -9,12 +9,7 @@
 #include "iode_objs/edit/edit_table.h"
 #include "iode_objs/new/add_table.h"
 #include "plot/plot_table.h"
-
-#ifndef GSAMPLE_NUMERICAL_WIDGET_HEADER
-#define _GSAMPLE_
-#include "tabs/iode_objs/tab_numerical_values.h"
-#undef _GSAMPLE_
-#endif
+#include "tabs/iode_objs/tab_gsample_table.h"
 
 
 class TablesView : public IodeTemplateTableView<EditTableDialog>
