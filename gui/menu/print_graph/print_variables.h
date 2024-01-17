@@ -10,13 +10,7 @@
 #include "wrapper_classes.h"
 #include "print_abstract.h"
 #include "text_edit/completer.h"
-
-#ifndef GSAMPLE_NUMERICAL_WIDGET_HEADER
-#define _GSAMPLE_
-#include "tabs/iode_objs/tab_numerical_values.h"
-#undef _GSAMPLE_
-#endif
-
+#include "tabs/iode_objs/tab_gsample_table.h"
 
 /* NOTE FOR THE DEVELOPERS:
  * All Menu Dialog classes MUST
