@@ -75,7 +75,7 @@ std::vector<double> GSampleGraph::get_series_values(const int row, const int fil
         pos = find_file_op(column);
         if(pos == fileop)
         {
-            period_pos = Period(&column.cl_per[0]).difference(sample->start_period());
+            period_pos = Period(column.cl_per[0]).difference(sample->start_period());
             y[period_pos] = get_value(row, col_val, nb_decimals);
         }
         col_val++;

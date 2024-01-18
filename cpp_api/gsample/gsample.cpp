@@ -27,8 +27,8 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     // - the list of unique file_1 (op) file_2 combinations
     // Note: - equivalent to T_prep_smpl()
     COL column = columns->cl_cols[0];
-    Period start_per(column.cl_per);
-    Period end_per(column.cl_per);
+    Period start_per(column.cl_per[0]);
+    Period end_per(column.cl_per[0]);
     int pos;
     for(int col=0; col < columns->cl_nb; col++)
     {
@@ -37,16 +37,16 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         if(pos < 0)
             files_ops.push_back(column);
 
-        Period per(columns->cl_cols[col].cl_per);
+        Period per(columns->cl_cols[col].cl_per[0]);
         if(per.difference(start_per) < 0)
         {
-            start_per.c_period->p_y = per.c_period->p_y;
-            start_per.c_period->p_s = per.c_period->p_s;
+            start_per.p_y = per.p_y;
+            start_per.p_s = per.p_s;
         }
         if(per.difference(end_per) > 0)
         {
-            end_per.c_period->p_y = per.c_period->p_y;
-            end_per.c_period->p_s = per.c_period->p_s;
+            end_per.p_y = per.p_y;
+            end_per.p_s = per.p_s;
         }
     }
     sample = new Sample(start_per, end_per);
@@ -289,7 +289,7 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
     // get period position 
     COL column = columns->cl_cols[col_pos];
     Sample var_sample(KSMPL(KV_WS));
-    int period_pos = Period(&column.cl_per[0]).difference(var_sample.start_period());
+    int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period());
 
     // get lec
     std::string lec = ref_table->getCellContent(line_ref, 1, false);

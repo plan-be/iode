@@ -3,86 +3,170 @@
 
 Period::Period()
 {
-    c_period = nullptr;
+    p_y = 0;
+    p_p = 0;
+    p_s = 0;
 }
 
-Period::Period(const Period& period)
+Period::Period(const Period& other)
 {
-    this->c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
-    memcpy(this->c_period, period.c_period, sizeof(PERIOD));
+    p_y = other.p_y;
+    p_p = other.p_p;
+    p_s = other.p_s;
 }
 
-Period::Period(const int year, const char periodicity, const int position)
+Period::Period(const PERIOD& other)
 {
-    IodeExceptionInvalidArguments error("Cannot create new Period");
-    int max_position;
+    p_y = other.p_y;
+    p_p = other.p_p;
+    p_s = other.p_s;
+}
+
+Period::Period(const int year, const char periodicity, const int step)
+{
+    std::string error_msg = "Cannot create a new period '" + std::to_string(year) + 
+        std::string(1, periodicity) + std::to_string(step) + "'\n";
+
     // check periodicity
-    if (mPeriodicities.count(periodicity) == 0)
+    int nb_periods;
+    try
     {
-        error.add_argument("periodicity", std::string(1, periodicity) + 
-                            " (possible values for the periodicity are " + std::string(L_PERIOD_CH) + ")");
-        throw error;
+        nb_periods = ::nb_periods_per_year(periodicity);
     }
-    // check position
-    max_position = mPeriodicities.at(periodicity);
-    if (position < 1 || position > max_position)
+    catch(const std::exception& e)
     {
-        error.add_argument("position", std::to_string(position) + 
-                            " (position argument must be in range [1, " + std::to_string(max_position) + "])");
-        throw error;
+        throw std::invalid_argument(error_msg + std::string(e.what()));
     }
+    
+    // check step
+    if (step < 1 || step > nb_periods)
+        throw std::invalid_argument(error_msg + "Period step must be in range [1, " + std::to_string(nb_periods) + "])");
+    
     // initialize class members
-    c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
-    c_period->p_y = year;
-    c_period->p_p = periodicity;
-    c_period->p_s = position;
+    p_y = year;
+    p_p = periodicity;
+    p_s = step;
 }
 
 Period::Period(const std::string str_period)
-{ 
-    c_period = PER_atoper(to_char_array(str_period));
-    if (c_period == NULL)
+{
+    p_y = 0;
+    p_p = 0;
+    p_s = 0;
+
+    if(str_period.empty())
+        throw std::invalid_argument("String for creating a period is empty");
+
+    std::string error_msg = "Cannot create a period from the string '" + str_period + "'\n";
+
+    // Search the position of the periodicity character
+    int i;
+    for(i = 0 ; i < 4 ; i++)
+        if(!isdigit(str_period[i])) 
+            break;
+
+    if(i == 0)
+        throw std::invalid_argument(error_msg);
+
+    // Check that the periodicity is valid
+    char periodicity = toupper(str_period[i]);
+    int max_step; 
+    try
     {
-        IodeExceptionInitialization error("Period", "Unknown"); 
-        error.add_argument("period", str_period);
-        throw error;
-    } 
-}
+        max_step = ::nb_periods_per_year(periodicity);
+    }
+    catch(const std::exception& e)
+    {
+        throw std::invalid_argument(error_msg + std::string(e.what()));
+    }
+    p_p = periodicity;
+    
+    // Retrieve the year (first digits). 
+    // If year < 50, adds 2000 (49Y1 => 2049Y1)
+    // if year < 200, adds 1900 (60Y1 => 1960Y1)
+    // NOTE: std::stoi() -> If no conversion could be performed, 
+    //       an invalid_argument exception is thrown.
+    try
+    {    
+        int year = std::stoi(str_period.substr(0, i));
+        if(year < 50) 
+            year += 2000;
+        else if(year < 200) 
+            year += 1900;
+        p_y = year;
+    }
+    catch(const std::exception& e)
+    {
+        throw std::invalid_argument(error_msg + std::string(e.what()));
+    }
 
-Period::Period(PERIOD* c_period) : c_period(c_period) 
-{
-    this->c_period = (PERIOD*) SW_nalloc(sizeof(PERIOD));
-    memcpy(this->c_period, c_period, sizeof(PERIOD));
-}
+    // calculate sub period
+    int step;
+    try
+    {
+        step = (str_period.size() == i) ? 1 : std::stoi(str_period.substr(i+1));
+    }
+    catch(const std::exception& e)
+    {
+        throw std::invalid_argument(error_msg + std::string(e.what()));
+    }
 
-Period::~Period()
-{
-    SW_nfree(c_period);
+    if(step > max_step)
+        throw std::invalid_argument(error_msg + "The maximum position in the year for the periodicity '" + 
+                                    std::to_string(periodicity) + "' is " + std::to_string(max_step));
+    p_s = step;
 }
 
 int Period::difference(const Period& other) const
-{
-    PERIOD* c_other = other.c_period;
-    if (c_other->p_p != c_period->p_p) 
+{   
+    if (p_p != other.p_p) 
     {
-        IodeExceptionFunction error("Cannot calculate the difference between the periods " + 
-            to_string() + " and " + other.to_string());
-        error.set_reason("The two periods must share the same periodicity");
-        error.add_argument("left  period periodicity", std::string(1, c_period->p_p));
-        error.add_argument("right period periodicity", std::string(1, c_other->p_p));
-        throw error;
+        std::string error_msg = "Cannot calculate the difference between the periods '" + 
+                                to_string() + "' and '" + other.to_string() + "'\n";
+        error_msg += "The two periods must share the same periodicity:\n";
+        error_msg += "left period periodicity :" + std::string(1, p_p) + "\n";
+        error_msg += "right period periodicity:" + std::string(1, other.p_p);
+        throw std::runtime_error(error_msg);
     }
-    return PER_diff_per(c_period, c_other);
+
+    return (nb_periods_per_year() * (p_y - other.p_y)) + (p_s - other.p_s);
 }
 
 Period Period::shift(const int nb_periods)
 {
-    // WARNING: PER_addper() returns a pointer to a STATIC structure
-    PERIOD* static_period = PER_addper(c_period, nb_periods);
-    // needed because the destructor of Period calls SW_nfree(c_period)
-    PERIOD shifted_period;
-    memcpy(&shifted_period, static_period, sizeof(PERIOD));
-    return Period(&shifted_period);
+    int nb_periods_per_year_ = nb_periods_per_year();
+    int delta_years;
+
+    Period shifted_period(*this);
+
+    // NOTE: - first step of the year is 1, not 0 !
+    //       - step is in range [1, nb periods per year]
+
+    // go forward
+    if(nb_periods >= 0) 
+    {
+        int sum_steps = shifted_period.p_s + nb_periods;
+        delta_years = (sum_steps - 1) / nb_periods_per_year_;
+
+        shifted_period.p_y += delta_years;
+        shifted_period.p_s = 1 + (sum_steps - 1) % nb_periods_per_year_;
+    }
+    // go backward
+    else 
+    {
+        int shift_steps = shifted_period.p_s + nb_periods;
+        if(shift_steps <= 0) 
+        {
+            delta_years = 1 + (-shift_steps) / nb_periods_per_year_;
+
+            shifted_period.p_y -= delta_years;
+            shifted_period.p_s = delta_years * nb_periods_per_year_ + shift_steps;
+        }
+        else 
+            shifted_period.p_s = shift_steps;
+    }
+
+    return shifted_period;
 }
 
 std::size_t hash_value(PERIOD const& c_period)
@@ -92,6 +176,17 @@ std::size_t hash_value(PERIOD const& c_period)
     boost::hash_combine(seed, c_period.p_y);
     boost::hash_combine(seed, c_period.p_s);
     boost::hash_combine(seed, c_period.p_p);
+
+    return seed;
+}
+
+std::size_t hash_value(Period const& period)
+{
+    std::size_t seed = 0;
+
+    boost::hash_combine(seed, period.p_y);
+    boost::hash_combine(seed, period.p_s);
+    boost::hash_combine(seed, period.p_p);
 
     return seed;
 }
