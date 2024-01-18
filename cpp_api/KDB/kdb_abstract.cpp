@@ -5,20 +5,14 @@
 KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern) : 
     kdb_type(kdb_type), iode_type(iode_type)
 {
-    if (K_WS[iode_type] == NULL) IodeInit();
+    if (K_WS[iode_type] == NULL) 
+        IodeInit();
     cpp_assign_super_API();
 
     iode_type_name = vIodeTypes[iode_type];
 
-    IodeExceptionInitialization error(iode_type_name);
-    error.add_argument("IODE type name (number): ", iode_type_name + " (" + std::to_string(iode_type) + ")");
-    error.add_argument("pattern: ", pattern);
-    error.add_argument("shallow copy? : ", kdb_type == KDB_SHALLOW_COPY ? "Yes" : "No");
-
     if (kdb_type == KDB_GLOBAL)
-    {
         local_kdb = NULL;
-    }
     else
     {
         char** c_names = filter_names_from_global_db(pattern);
@@ -27,48 +21,51 @@ KDBAbstract::KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode
         else
             local_kdb = hard_copy_kdb(K_WS[iode_type], c_names); 
         SCR_free_tbl((unsigned char**) c_names);
+
         if (local_kdb == NULL)
-        {
-            IodeExceptionInvalidArguments error("Cannot extract subset of KDB of " + iode_type_name + "s");
-            error.add_argument("filter pattern", pattern);
-            throw error;
-        }
+            throw std::runtime_error("Cannot extract subset from the database of " + iode_type_name + "s.\n" + 
+                                     "The filter pattern: '" + pattern + "' seems invalid");
     }
 }
 
 KDBAbstract::KDBAbstract(const KDBAbstract& kdb_to_copy)
 {
-    iode_type = kdb_to_copy.iode_type;
+    iode_type      = kdb_to_copy.iode_type;
     iode_type_name = kdb_to_copy.iode_type_name;
-    kdb_type = kdb_to_copy.kdb_type;
-    int nb_names = kdb_to_copy.count();
-    char** c_names;
-    switch (kdb_type)
+    kdb_type       = kdb_to_copy.kdb_type;
+
+    if (kdb_type == KDB_GLOBAL)
+        local_kdb = NULL;
+    else
     {
-    case KDB_GLOBAL:
-        local_kdb = nullptr;
-        break;
-    case KDB_LOCAL:
-        local_kdb = hard_copy_kdb(kdb_to_copy.local_kdb);
-        break;
-    case KDB_SHALLOW_COPY:
-        c_names = new char*[nb_names+1];
-        for(int i=0; i < nb_names; i++)
-            c_names[i] = KONAME(kdb_to_copy.local_kdb, i);
-        c_names[nb_names] = NULL;
-        local_kdb = K_quick_refer(K_WS[iode_type], c_names);
-        break;
-    default:
-        break;
+        if (kdb_type == KDB_SHALLOW_COPY)
+            local_kdb = hard_copy_kdb(kdb_to_copy.local_kdb);
+        else
+        {    
+            char** c_names;
+            int nb_names = kdb_to_copy.count();
+            c_names = new char*[nb_names+1];
+            for(int i=0; i < nb_names; i++)
+                c_names[i] = KONAME(kdb_to_copy.local_kdb, i);
+            c_names[nb_names] = NULL;
+            local_kdb = K_quick_refer(K_WS[iode_type], c_names);
+            delete[] c_names;
+        }
+
+        if (local_kdb == NULL)
+            throw std::runtime_error("Cannot copy " + iode_type_name + " database");
     }
 }
 
 KDBAbstract::~KDBAbstract()
 {
     // frees a KDB and its contents.
-    if (kdb_type == KDB_LOCAL) K_free(local_kdb);
+    if(kdb_type == KDB_LOCAL && local_kdb != NULL) 
+        K_free(local_kdb);
+    
     // the KDB struct is deleted (freed) but not the objects.
-    if(kdb_type == KDB_SHALLOW_COPY) K_free_kdb(local_kdb);
+    if(kdb_type == KDB_SHALLOW_COPY && local_kdb != NULL) 
+        K_free_kdb(local_kdb);
 }
 
 // private methods
