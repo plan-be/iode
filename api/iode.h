@@ -829,9 +829,9 @@ typedef struct _kdb_ {
 } KDB;
 
 typedef struct _period {
-    long    p_y; /* PERIOD LONG */
-    long    p_s; /* PERIOD LONG */
-    char    p_p;
+    long    p_y;        // year
+    long    p_s;        // position in the year (according to the periodicity)
+    char    p_p;        // periodicity (Y S Q M W D)
     char    p_pad[3];
 } PERIOD;
 
