@@ -34,12 +34,12 @@ public:
 
 	Period start_period() const
 	{
-		return Period(&c_sample->s_p1);
+		return Period(c_sample->s_p1);
 	}
 
 	Period end_period() const
 	{
-		return Period(&c_sample->s_p2);
+		return Period(c_sample->s_p2);
 	}
 
 	int nb_periods() const

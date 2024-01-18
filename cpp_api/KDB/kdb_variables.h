@@ -127,8 +127,8 @@ public:
     void copy_into(const std::string& input_file, const std::string& from = "", const std::string& to = "", 
         const std::string objects_names = "");
     
-    void copy_into(const std::string& input_file, const Period& from = nullptr, const Period& to = nullptr, 
-        const std::string objects_names = "");
+    void copy_into(const std::string& input_file, const Period* from = nullptr, const Period* to = nullptr, 
+        const std::string& objects_names = "");
 
     /**
      *  Syntax: $WsExtrapolate [method] from to [variable list]

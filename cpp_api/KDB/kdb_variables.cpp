@@ -279,13 +279,13 @@ int KDBVariables::get_nb_periods() const
 std::string KDBVariables::get_period(const int t) const
 {
     PERIOD period = KSMPL(get_KDB())->s_p1;
-    return Period(&period).shift(t).to_string();
+    return Period(period).shift(t).to_string();
 }
 
 float KDBVariables::get_period_as_float(const int t) const
 {
     PERIOD period = KSMPL(get_KDB())->s_p1;
-    return Period(&period).shift(t).to_float();
+    return Period(period).shift(t).to_float();
 }
 
 std::vector<std::string> KDBVariables::get_list_periods(const std::string& from, const std::string& to) const
@@ -332,11 +332,11 @@ void KDBVariables::copy_into(const std::string& input_file, const std::string& f
         if (res < 0) B_display_last_error();
 }
 
-void KDBVariables::copy_into(const std::string& input_file, const Period& from, const Period& to, 
-	const std::string objects_names)
+void KDBVariables::copy_into(const std::string& input_file, const Period* from, const Period* to, 
+	const std::string& objects_names)
 {
-	std::string s_from = (from == nullptr) ? "" : from.to_string();
-	std::string s_to = (to == nullptr) ? "" : to.to_string();
+	std::string s_from = (from == nullptr) ? "" : from->to_string();
+	std::string s_to = (to == nullptr) ? "" : to->to_string();
 	copy_into(input_file, s_from, s_to, objects_names);
 }
 

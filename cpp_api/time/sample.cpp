@@ -14,7 +14,7 @@ Sample::Sample(const Sample& sample)
 
 Sample::Sample(const Period& start_period, const Period& end_period)
 {
-    c_sample = PER_pertosmpl(start_period.c_period, end_period.c_period);
+    c_sample = PER_pertosmpl(const_cast<PERIOD*>((PERIOD*) &start_period), const_cast<PERIOD*>((PERIOD*) &end_period));
 }
 
 Sample::Sample(const std::string str_start_period, std::string str_end_period)
