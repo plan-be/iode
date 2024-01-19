@@ -62,7 +62,7 @@ void KDBIdentities::execute_identities(const Period& from, const Period& to, con
     char* c_identities_list = to_char_array(identities_list);
     char** idts = B_ainit_chk(c_identities_list, NULL, 0);
 
-    int rc = B_IdtExecuteIdts(sample.c_sample, idts);
+    int rc = B_IdtExecuteIdts(&sample, idts);
     SCR_free_tbl((unsigned char**) idts);
     if (rc != 0) B_display_last_error();
 }

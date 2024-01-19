@@ -275,7 +275,7 @@ void EditAndEstimateEquations::estimate()
     char** c_lecs = vector_to_double_char(v_lecs);
 
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in E_free_work()
-    int res = E_est(c_endos, c_lecs, Variables.get_KDB(), kdb_scl.get_KDB(), sample->c_sample, 
+    int res = E_est(c_endos, c_lecs, Variables.get_KDB(), kdb_scl.get_KDB(), sample, 
                     this->method, c_instrs, ESTIMATION_MAXIT, ESTIMATION_EPS);
 
     if(res == 0)        

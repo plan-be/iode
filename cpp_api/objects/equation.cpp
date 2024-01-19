@@ -223,15 +223,14 @@ void Equation::set_block(const std::string& block)
 
 Sample Equation::get_sample() const
 {
-    SAMPLE* smpl = const_cast<SAMPLE*>(&this->smpl);
-    return Sample(smpl);
+    return Sample(this->smpl);
 }
 
 void Equation::set_sample(std::string from, std::string to)
 {
     if (from.empty() || to.empty())
     {
-        Sample sample(KSMPL(KV_WS));
+        Sample sample(*KSMPL(KV_WS));
 
         if(from.empty()) 
             from = sample.start_period().to_string();
@@ -241,7 +240,7 @@ void Equation::set_sample(std::string from, std::string to)
     }
 
     Sample new_sample(from, to);
-    memcpy(&(this->smpl), new_sample.c_sample, sizeof(SAMPLE));
+    memcpy(&(this->smpl), &new_sample, sizeof(SAMPLE));
 }
 
 // -- comment --

@@ -248,16 +248,17 @@ void KDBAbstract::copy_into(const std::string& input_file, const std::string obj
     std::string buf = input_file + " ";
     if(kdb_type == I_VARIABLES)
     {
-        Sample smpl = KSMPL(get_KDB());
-        std::string from = smpl.start_period().to_string();
-        std::string to = smpl.end_period().to_string();
+        Sample sample(*KSMPL(get_KDB()));
+        std::string from = sample.start_period().to_string();
+        std::string to = sample.end_period().to_string();
         buf += from + " " + to + " ";
     }
     buf += objects_names;
 
     int res = B_WsCopy(const_cast<char*>(buf.c_str()), kdb_type);
 
-    if (res < 0) B_display_last_error();
+    if (res < 0) 
+        B_display_last_error();
 }
 
 // TODO JMP: please provide input values to test B_WsMerge()

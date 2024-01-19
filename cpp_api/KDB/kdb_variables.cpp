@@ -235,7 +235,7 @@ void KDBVariables::update(const std::string& name, const std::string& lec)
 
 Sample KDBVariables::get_sample() const
 {
-	return Sample(KSMPL(get_KDB()));
+	return Sample(*KSMPL(get_KDB()));
 }
 
 void KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -261,7 +261,7 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 void KDBVariables::set_sample(const Period& from, const Period& to)
 {
 	Sample sample(from, to);
-	int res = KV_sample(get_KDB(), sample.c_sample);
+	int res = KV_sample(get_KDB(), &sample);
 	if (res < 0) 
 	{
 		IodeExceptionFunction error("Cannot set sample", "Unknown");
@@ -352,7 +352,7 @@ void KDBVariables::extrapolate(const EnumSimulationInitialization method, const 
 	char* c_variables_list = const_cast<char*>(variables_list.c_str());
 	char** vars = (variables_list.empty()) ? NULL : B_ainit_chk(c_variables_list, NULL, 0);
 
-	int res = KV_extrapolate(kdb, (int) method, sample.c_sample, vars);
+	int res = KV_extrapolate(kdb, (int) method, &sample, vars);
 	SCR_free_tbl((unsigned char**) vars);
 
 	if (res < 0)
