@@ -48,7 +48,7 @@ TEST_F(SimulationTest, Simulation)
 {
     // Invalid arguments
     // invalid sample definition
-    EXPECT_THROW(sim.model_simulate("2000U1", to), IodeExceptionInvalidArguments);
+    EXPECT_THROW(sim.model_simulate("2000U1", to), std::invalid_argument);
     // invalid list of equations
     EXPECT_THROW(sim.model_simulate(from, to, "$UNKNOWN_LIST"), IodeExceptionInvalidArguments);
 
@@ -134,7 +134,7 @@ TEST_F(SimulationTest, SimulateSCC)
 {
     // Invalid arguments
     // invalid sample definition
-    EXPECT_THROW(sim.model_simulate_SCC("2000U1", to), IodeExceptionInvalidArguments);
+    EXPECT_THROW(sim.model_simulate_SCC("2000U1", to), std::invalid_argument);
     // invalid pre-recursive list
     EXPECT_THROW(sim.model_simulate_SCC(from, to, "UNKNOWN_LIST"), IodeExceptionInvalidArguments);
 

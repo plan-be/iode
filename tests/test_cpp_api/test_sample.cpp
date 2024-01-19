@@ -13,11 +13,20 @@ TEST(TestSample, Create)
 	Sample sample2(str_start, str_end);
 
 	// passing 2 C PERIOD structures
-	Sample sample3((PERIOD*) &start, (PERIOD*) &end);
+	PERIOD* c_start = PER_atoper("2015Y1");
+	PERIOD* c_end = PER_atoper("2020Y1");
+
+	Sample sample3(*c_start, *c_end);
+	
+	SW_nfree(c_start);
+	SW_nfree(c_end);
 
 	// passing a C SAMPLE structure
 	SAMPLE* c_sample = PER_pertosmpl((PERIOD*) &start, (PERIOD*) &end);
-	Sample sample4(c_sample);
+
+	Sample sample4(*c_sample);
+	
+	SW_nfree(c_sample);
 }
 
 TEST(TestSample, GetPeriodPosition)
@@ -76,25 +85,25 @@ TEST(TestSample, Hash)
 	Period end(2020, 'Y', 1);
 	Sample sample(start, end);
 
-	boost::hash<SAMPLE> sample_hasher;
-    hash_before = sample_hasher(*sample.c_sample);
+	boost::hash<Sample> sample_hasher;
+    hash_before = sample_hasher(sample);
 
 	// different starting year
 	Period earlier_start(2014, 'Y', 1);
 	Sample earlier_start_sample(earlier_start, end);
-	hash_after = sample_hasher(*earlier_start_sample.c_sample);
+	hash_after = sample_hasher(earlier_start_sample);
 	EXPECT_NE(hash_before, hash_after);
 
 	// different periodicity
 	Period month_start(2015, 'M', 1);
 	Period month_end(2020, 'M', 1);
 	Sample month_sample(month_start, month_end);
-	hash_after = sample_hasher(*month_sample.c_sample);
+	hash_after = sample_hasher(month_sample);
 	EXPECT_NE(hash_before, hash_after);
 
 	// different position
 	Period later_month_start(2015, 'M', 3);
 	Sample later_start_sample(later_month_start, month_end);
-	hash_after = sample_hasher(*later_start_sample.c_sample);
+	hash_after = sample_hasher(later_start_sample);
 	EXPECT_NE(hash_before, hash_after);
 }
