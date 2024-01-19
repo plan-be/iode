@@ -6,9 +6,9 @@ TEST(TestPeriod, Create)
 	Period period(2020, 'Y', 1);
 
 	// Invalid periodicity
-	EXPECT_THROW(Period(2020, 'T', 1), IodeExceptionInvalidArguments);
+	EXPECT_THROW(Period(2020, 'T', 1), std::invalid_argument);
 	// Invalid position
-	EXPECT_THROW(Period(2020, 'Q', 5), IodeExceptionInvalidArguments);
+	EXPECT_THROW(Period(2020, 'Q', 5), std::invalid_argument);
 
 	// passing a string
 	Period period2("2020Y1");
@@ -16,12 +16,12 @@ TEST(TestPeriod, Create)
 	// passing a PERIOD C_API struct
 	char buf[10] = "2020Y1";
 	PERIOD* c_period = PER_atoper(buf);
-	Period period3(c_period);
+	Period period3(*c_period);
 }
 
 TEST(TestPeriod, NbPeriodsPerYear)
 {
-	for (auto const& [periodicity, expected_nb_periods] : mPeriodicities)
+	for (auto const& [periodicity, expected_nb_periods] : map_periodicities)
 	{
 		Period period(2020, periodicity, 1);
 		int nb_periods = period.nb_periods_per_year();
@@ -64,18 +64,24 @@ TEST(TestPeriod, Shift)
 	Period periodY2(year2, 'Y', 1);
 	Period shifted_periodY = periodY1.shift(5);
 	EXPECT_EQ(shifted_periodY, periodY2);
+	shifted_periodY = periodY2.shift(-5);
+	EXPECT_EQ(shifted_periodY, periodY1);
 
 	// periodicity = Q
 	Period periodQ1(year1, 'Q', 2);
 	Period periodQ2(year2, 'Q', 3);
 	Period shifted_periodQ = periodQ1.shift(21);
 	EXPECT_EQ(shifted_periodQ, periodQ2);
+	shifted_periodQ = periodQ2.shift(-21);
+	EXPECT_EQ(shifted_periodQ, periodQ1);
 
 	// periodicity = W
 	Period periodW1(year1, 'W', 10);
 	Period periodW2(year2, 'W', 50);
 	Period shifted_periodW = periodW1.shift(300);
 	EXPECT_EQ(shifted_periodW, periodW2);
+	shifted_periodW = periodW2.shift(-300);
+	EXPECT_EQ(shifted_periodW, periodW1);
 }
 
 TEST(TestPeriod, ToString)
@@ -105,7 +111,7 @@ TEST(TestPeriod, ToString)
 TEST(TestPeriod, ToFloat)
 {
 	std::string str_period;
-	double res;
+	float res;
 
 	// periodicity = Y
 	str_period = "2020Y1";
@@ -133,16 +139,16 @@ TEST(TestPeriod, Hash)
 
 	Period period(2020, 'Y', 1);
 
-	boost::hash<PERIOD> period_hasher;
-    hash_before = period_hasher(*period.c_period);
+	boost::hash<Period> period_hasher;
+    hash_before = period_hasher(period);
 
 	// modify
 	Period shifted_period = period.shift(1);
-	hash_after = period_hasher(*shifted_period.c_period);
+	hash_after = period_hasher(shifted_period);
 	EXPECT_NE(hash_before, hash_after);
 
 	// return to original value
 	Period same_period = shifted_period.shift(-1);
-	hash_after = period_hasher(*same_period.c_period);
+	hash_after = period_hasher(same_period);
 	EXPECT_EQ(hash_before, hash_after);
 }

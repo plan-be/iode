@@ -13,12 +13,10 @@ TEST(TestSample, Create)
 	Sample sample2(str_start, str_end);
 
 	// passing 2 C PERIOD structures
-	PERIOD* c_start = start.c_period;
-	PERIOD* c_end = end.c_period;
-	Sample sample3(c_start, c_end);
+	Sample sample3((PERIOD*) &start, (PERIOD*) &end);
 
 	// passing a C SAMPLE structure
-	SAMPLE* c_sample = PER_pertosmpl(c_start, c_end);
+	SAMPLE* c_sample = PER_pertosmpl((PERIOD*) &start, (PERIOD*) &end);
 	Sample sample4(c_sample);
 }
 
