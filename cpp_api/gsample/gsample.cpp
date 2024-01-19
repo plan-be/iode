@@ -288,7 +288,7 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
 
     // get period position 
     COL column = columns->cl_cols[col_pos];
-    Sample var_sample(KSMPL(KV_WS));
+    Sample var_sample(*KSMPL(KV_WS));
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period());
 
     // get lec

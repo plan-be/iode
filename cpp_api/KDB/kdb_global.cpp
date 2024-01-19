@@ -183,9 +183,12 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl = NULL;
     else 
     {
-        // raise error if not valid
+        // raise an error if not valid
         Sample sample(from, to);
-        smpl = sample.c_sample;
+
+        memcpy(&(smpl->s_p1), &(sample.s_p1), sizeof(PERIOD));
+        memcpy(&(smpl->s_p2), &(sample.s_p2), sizeof(PERIOD));
+        smpl->s_nb = sample.s_nb;
     }
 
     KDB* dbc;
@@ -215,7 +218,9 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
             error.add_argument("Variable file", var_file);
             throw error;
         }
-        if(smpl != NULL) KV_sample(dbv, smpl);
+        
+        if(smpl != NULL) 
+            KV_sample(dbv, smpl);
     }
 
     std::string rule_file_ = check_file_exists(rule_file, caller_name);
