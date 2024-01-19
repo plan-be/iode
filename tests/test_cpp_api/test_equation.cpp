@@ -45,7 +45,7 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     EQ* c_eq = KEVAL(KE_WS, pos);
     ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
     ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
-    ASSERT_EQ(Sample(&c_eq->smpl), eq.get_sample());
+    ASSERT_EQ(Sample(c_eq->smpl), eq.get_sample());
     ASSERT_EQ(std::string(c_eq->cmt), eq.get_comment());
     ASSERT_EQ(std::string(c_eq->instr), eq.get_instruments());
     ASSERT_EQ(std::string(c_eq->blk), eq.get_block());
@@ -58,7 +58,7 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     memcpy(c_eq, &eq, sizeof(EQ));
     ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
     ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
-    ASSERT_EQ(Sample(&c_eq->smpl), eq.get_sample());
+    ASSERT_EQ(Sample(c_eq->smpl), eq.get_sample());
     ASSERT_EQ(std::string(c_eq->cmt), eq.get_comment());
     ASSERT_EQ(std::string(c_eq->instr), eq.get_instruments());
     ASSERT_EQ(std::string(c_eq->blk), eq.get_block());
