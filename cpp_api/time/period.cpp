@@ -55,7 +55,10 @@ Period::Period(const std::string str_period)
     p_s = 0;
 
     if(str_period.empty())
-        throw std::invalid_argument("String for creating a period is empty");
+    {
+        kwarning("String for creating a period is empty");
+        return;
+    }
 
     std::string error_msg = "Cannot create a period from the string '" + str_period + "'\n";
 
