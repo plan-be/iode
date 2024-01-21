@@ -14,8 +14,14 @@ void cpp_panic_super()
 	exit(2);
 }
 
+void cpp_warning(const char* msg)
+{
+	std::cout << "WARNING: " + std::string(msg) << std::endl;	
+}
+
 void cpp_assign_super_API()
 {
     IODE_assign_super_API();
+	kwarning_super = cpp_warning;
     kpanic_super = cpp_panic_super;
 }
