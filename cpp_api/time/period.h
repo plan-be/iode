@@ -29,6 +29,12 @@ const static std::map<char, int> map_periodicities =
  */
 inline int nb_periods_per_year(const char ch)
 {
+	if(ch == 0)
+	{
+		kwarning("Cannot get the number of periods per year:\nEmpty periodicity");
+		return 0;
+	}
+
 	char upper_ch = toupper(ch);
 	if(!map_periodicities.contains(upper_ch))
 		throw std::invalid_argument("Invalid periodicity '" + std::string(1, ch) + "'.\n" +
@@ -48,6 +54,12 @@ const static std::map<char, float> map_steps =
 
 inline float get_step(const char ch)
 {
+	if(ch == 0)
+	{
+		kwarning("Cannot convert the periodicity to float:\nEmpty periodicity");
+		return 0.f;
+	}
+
 	char upper_ch = toupper(ch);
 	if(!map_steps.contains(upper_ch))
 		throw std::invalid_argument("Invalid periodicity '" + std::string(1, ch) + "'.\n" +
