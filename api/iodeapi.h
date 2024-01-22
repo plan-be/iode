@@ -87,7 +87,7 @@ extern int IodeChartAxis(int hdl, int i);
 extern char *IodeChartTitle(int hdl, int i);
 extern double *IodeChartData(int hdl, int i);
 
-extern void kmsg_null(char*msg);
+extern void kmsg_null(const char* msg);
 extern void IodeSuppressMsgs();
 extern void IodeResetMsgs();
 
