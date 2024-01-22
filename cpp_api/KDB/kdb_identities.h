@@ -14,11 +14,16 @@ protected:
 
     Identity get_unchecked(const int pos) const override;
 
+    KDBIdentities(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_IDENTITIES, deep_copy, pattern) {};
+
 public:
-    KDBIdentities(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_IDENTITIES, pattern) {};
-    
-    KDBIdentities(const KDBIdentities& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+    KDBIdentities(const std::string& filepath="") : KDBTemplate(I_IDENTITIES, filepath) {}
+
+    KDBIdentities* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBIdentities(deep_copy, pattern);
+    }
 
     std::string get_lec(const int pos) const;
 
@@ -50,7 +55,7 @@ public:
  */
 inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
     std::size_t seed = 0;

@@ -9,7 +9,7 @@ List KDBLists::copy_obj(const List& original) const
 
 List KDBLists::get_unchecked(const int pos) const
 {
-	return std::string(KLVAL(get_KDB(), pos));
+	return std::string(KLVAL(get_database(), pos));
 }
 
 int KDBLists::add(const std::string& name, const List& list)

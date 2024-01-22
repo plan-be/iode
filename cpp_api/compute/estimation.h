@@ -102,8 +102,8 @@ class EditAndEstimateEquations
     std::vector<std::string> v_equations;
     std::vector<std::string>::iterator current_eq;
 
-    KDBEquations kdb_eqs;
-    KDBScalars kdb_scl;
+    KDBEquations* kdb_eqs;
+    KDBScalars* kdb_scl;
 
 public:
     EditAndEstimateEquations(const std::string& from = "", const std::string& to = "");
@@ -274,7 +274,7 @@ public:
         return v_equations;
     }
 
-    KDBScalars* get_scalars() { return &kdb_scl; }
+    KDBScalars* get_scalars() { return kdb_scl; }
 
     /**
      * @brief update the local Scalars workspace 'kdb_scl'.
@@ -299,7 +299,7 @@ public:
      */
     void copy_eq_tests_values();
 
-    KDBEquations* get_equations() { return &kdb_eqs; }
+    KDBEquations* get_equations() { return kdb_eqs; }
 
     /**
      * @brief update the LEC and comment of the current equation
@@ -311,7 +311,7 @@ public:
     NamedEquation current_equation() 
     {
         std::string name = *current_eq;
-        Equation eq = kdb_eqs.get(name);
+        Equation eq = kdb_eqs->get(name);
         return NamedEquation(name, eq); 
     }
 
@@ -323,13 +323,13 @@ public:
             current_eq = v_equations.begin();
 
         std::string name = *current_eq;
-        Equation eq = kdb_eqs.get(name);
+        Equation eq = kdb_eqs->get(name);
         return NamedEquation(name, eq);
     }
 
     CorrelationMatrix get_correlation_matrix() 
     { 
-        std::vector<std::string> v_coeffs = kdb_scl.get_names();
+        std::vector<std::string> v_coeffs = kdb_scl->get_names();
         return CorrelationMatrix(v_coeffs, E_MCORR); 
     }
 

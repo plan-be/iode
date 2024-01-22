@@ -9,12 +9,12 @@ Equation KDBEquations::copy_obj(const Equation& original) const
 
 Equation KDBEquations::get_unchecked(const int pos) const
 {
-    return Equation(pos, get_KDB());
+    return Equation(pos, get_database());
 }
 
 std::string KDBEquations::get_lec(const int pos) const
 { 
-    return KELEC(get_KDB(), pos); 
+    return KELEC(get_database(), pos); 
 }
 
 std::string KDBEquations::get_lec(const std::string& name) const
@@ -25,14 +25,7 @@ std::string KDBEquations::get_lec(const std::string& name) const
 
 int KDBEquations::add(const std::string& name, const Equation& obj)
 {
-    check_name(name, iode_type);
-
     char* c_name = to_char_array(name);
-
-    // throw exception if object with passed name already exist
-    if(K_find(get_KDB(), c_name) >= 0)
-        throw std::invalid_argument("Cannot add " + iode_type_name + " with name '" + name + "'.\n" +  
-            iode_type_name + " with name '" + name + "' already exists. Use the update() method instead.");
 
     Equation eq(obj);
     int pos = KDBTemplate::add(name, static_cast<EQ*>(&eq), c_name);
@@ -43,18 +36,11 @@ int KDBEquations::add(const std::string& name, const Equation& obj)
 int KDBEquations::add(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
     const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
-    check_name(name, iode_type);
-
     char* c_name = to_char_array(name);
 
-    // throw exception if object with passed name already exist
-    if (K_find(get_KDB(), c_name) >= 0)
-        throw std::invalid_argument("Cannot add " + iode_type_name + " with name '" + name + "'.\n" +  
-            iode_type_name + " with name '" + name + "' already exists. Use the update() method instead.");
-
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-
     int pos = KDBTemplate::add(name, static_cast<EQ*>(&eq), c_name);
+
     return pos;
 }
 
@@ -63,7 +49,6 @@ void KDBEquations::update(const std::string& name, const Equation& obj)
     char* c_name = to_char_array(name);
 
     Equation eq(obj);
-
     KDBTemplate::update(name, static_cast<EQ*>(&eq), c_name);
 }
 
@@ -73,7 +58,6 @@ void KDBEquations::update(const std::string& name, const std::string& lec, const
     char* c_name = to_char_array(name);
 
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-
     KDBTemplate::update(name, static_cast<EQ*>(&eq), c_name);
 }
 
@@ -84,6 +68,5 @@ void KDBEquations::update(const int pos, const std::string& lec, const std::stri
     char* c_name = to_char_array(name);
 
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-
     KDBTemplate::update(name, static_cast<EQ*>(&eq), c_name);
 }

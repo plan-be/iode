@@ -11,14 +11,14 @@ Identity KDBIdentities::copy_obj(const Identity& original) const
 
 Identity KDBIdentities::get_unchecked(const int pos) const
 {
-    return Identity(pos, get_KDB());
+    return Identity(pos, get_database());
 }
 
 std::string KDBIdentities::get_lec(const int pos) const
 {
     // throw exception if object with passed position is not valid
     get_name(pos);
-    return std::string(KILEC(get_KDB(), pos));
+    return std::string(KILEC(get_database(), pos));
 }
 
 std::string KDBIdentities::get_lec(const std::string& name) const

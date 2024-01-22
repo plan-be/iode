@@ -10,11 +10,16 @@ protected:
 
     List get_unchecked(const int pos) const override;
 
-public:
-    KDBLists(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_LISTS, pattern) {};
+    KDBLists(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_LISTS, deep_copy, pattern) {};
 
-    KDBLists(const KDBLists& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+public:
+    KDBLists(const std::string& filepath="") : KDBTemplate(I_LISTS, filepath) {}
+
+    KDBLists* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBLists(deep_copy, pattern);
+    }
 
     int add(const std::string& name, const List& list);
 
@@ -33,7 +38,7 @@ public:
  */
 inline std::size_t hash_value(KDBLists const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
     std::size_t seed = 0;

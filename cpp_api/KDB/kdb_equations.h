@@ -12,11 +12,16 @@ protected:
 
     Equation get_unchecked(const int pos) const override;
 
-public:
-    KDBEquations(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_EQUATIONS, pattern) {};
+    KDBEquations(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_EQUATIONS, deep_copy, pattern) {};
 
-    KDBEquations(const KDBEquations& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+public:
+    KDBEquations(const std::string& filepath="") : KDBTemplate(I_EQUATIONS, filepath) {}
+
+    KDBEquations* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBEquations(deep_copy, pattern);
+    }
 
     std::string get_lec(const int pos) const;
 
@@ -47,7 +52,7 @@ public:
  */
 inline std::size_t hash_value(KDBEquations const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
     std::size_t seed = 0;
