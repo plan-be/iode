@@ -7,13 +7,13 @@
 #include <QStatusBar>
 
 
-void gui_error_super(int level, char* msg);
+void gui_error_super(const int level, const char* msg);
 
-void gui_warning_super(char* msg);
+void gui_warning_super(const char* msg);
 
-void gui_msg_super(char* msg);
+void gui_msg_super(const char* msg);
 
-int gui_confirm_super(char* msg);
+int gui_confirm_super(const char* msg);
 
 void gui_panic_super();
 
