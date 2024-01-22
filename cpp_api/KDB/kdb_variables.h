@@ -42,11 +42,16 @@ protected:
 
     Variable get_unchecked(const int pos) const override;
 
-public:
-    KDBVariables(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_VARIABLES, pattern) {};
+    KDBVariables(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_VARIABLES, deep_copy, pattern) {};
 
-    KDBVariables(const KDBVariables& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+public:
+    KDBVariables(const std::string& filepath="") : KDBTemplate(I_VARIABLES, filepath) {}
+
+    KDBVariables* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBVariables(deep_copy, pattern);
+    }
 
     IODE_REAL get_var(const int pos, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
@@ -202,7 +207,7 @@ public:
  */
 inline std::size_t hash_value(KDBVariables const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
 	SAMPLE* smpl = KSMPL(kdb);

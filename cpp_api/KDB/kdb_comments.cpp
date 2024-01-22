@@ -9,7 +9,7 @@ Comment KDBComments::copy_obj(const Comment& original) const
 
 Comment KDBComments::get_unchecked(const int pos) const
 {
-    Comment comment = std::string(KCVAL(get_KDB(), pos));
+    Comment comment = std::string(KCVAL(get_database(), pos));
     return oem_to_utf8(comment);
 }
 

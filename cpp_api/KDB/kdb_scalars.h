@@ -11,11 +11,16 @@ protected:
 
     Scalar get_unchecked(const int pos) const override;
 
-public:
-    KDBScalars(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_SCALARS, pattern) {};
+    KDBScalars(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_SCALARS, deep_copy, pattern) {};
 
-    KDBScalars(const KDBScalars& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+public:
+    KDBScalars(const std::string& filepath="") : KDBTemplate(I_SCALARS, filepath) {}
+
+    KDBScalars* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBScalars(deep_copy, pattern);
+    }
 
     int add(const std::string& name, const Scalar& obj);
 
@@ -37,7 +42,7 @@ public:
  */
 inline std::size_t hash_value(KDBScalars const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
     std::size_t seed = 0;

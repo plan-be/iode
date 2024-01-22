@@ -23,13 +23,6 @@ const std::map<char, std::string> mLowToHigh =
     {'S', "Interpolation by Steps"}
 };
 
-
-void load_global_kdb(EnumIodeType iode_type, const std::string& filepath);
-
-void save_global_kdb(EnumIodeType iode_type, const std::string& filepath);
-
-void clear_global_kdb(EnumIodeType iode_type);
-
 /**
  * @brief check if data for IODE objects of type iodeType has been loaded in global K_WS 
  * 
@@ -37,10 +30,7 @@ void clear_global_kdb(EnumIodeType iode_type);
  * 
  * @return bool Wether or not K_WS corresponding to iodeType is empty.
  */
-bool is_global_kdb_loaded(const EnumIodeType iodeType);
-
-// QUESTION FOR JMP: is there a K function that already create a hard copy of subset of a KDB ?
-KDB* hard_copy_kdb(KDB* source_kdb, char** names=NULL);
+bool is_global_database_loaded(const EnumIodeType iodeType);
 
 // NOTE: remove function below -> IodeContents()
 void set_kdb_filename(KDB* kdb, const std::string& filename);

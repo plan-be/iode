@@ -45,7 +45,7 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
     }
 
     int pos = 0;
-    KDBScalars* kdb_res = new KDBScalars(KDB_LOCAL);
+    KDBScalars* kdb_res = new KDBScalars();
     // order 0
     add_df_test_coeff(kdb_res, "df_", res, pos);
     pos += 3;
@@ -73,20 +73,21 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
 }
 
 EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, const std::string& to)
-    : estimation_done(false), sample(nullptr), method(0), kdb_eqs(KDBEquations(KDB_LOCAL, "")), 
-      kdb_scl(KDBScalars(KDB_LOCAL, "")), current_eq(v_equations.end())
+    : estimation_done(false), sample(nullptr), method(0), current_eq(v_equations.end())
 {
     set_sample(from, to);
+    kdb_eqs = Equations.subset("", true);
+    kdb_scl = Scalars.subset("", true);
 }
 
 EditAndEstimateEquations::~EditAndEstimateEquations()
 {
     // frees all allocated variables for the last estimation
-    if(estimation_done)
-        E_free_work();
+    if(estimation_done) E_free_work();
 
-    if(sample) 
-        delete sample;
+    if(sample)  delete sample;
+    if(kdb_eqs) delete kdb_eqs;
+    if(kdb_scl) delete kdb_scl;
 }
 
 void EditAndEstimateEquations::set_block(const std::string& block, const std::string& current_eq_name)
@@ -119,18 +120,18 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
         for(const std::string& name: v_equations_)
         {
             // a. check if the equation is already present in the local database 'kdb_eqs'
-            if(!kdb_eqs.contains(name))
+            if(!kdb_eqs->contains(name))
             {
 	            // no -> check if in the global database
                 if(Equations.contains(name))
                 {
                     // yes -> copy equation from the global database to 'kdb_eqs' 
                     Equation eq = Equations.get(name);
-                    kdb_eqs.add(name, eq);
+                    kdb_eqs->add(name, eq);
                 }
                 else
                     // no -> add a new equation with LEC '<name> := 0' to 'kdb_eqs'
-                    kdb_eqs.add(name, name + " := 0");
+                    kdb_eqs->add(name, name + " := 0");
             }
 
             // b. add the equation name to the vector 'v_equations'
@@ -163,9 +164,9 @@ void EditAndEstimateEquations::update_scalars()
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
-    for (int i=0; i < kdb_eqs.count(); i++)
+    for (int i=0; i < kdb_eqs->count(); i++)
     {
-        Equation eq = kdb_eqs.get(i);
+        Equation eq = kdb_eqs->get(i);
         tmp_coefs_list = eq.get_coefficients_list();
         std::move(tmp_coefs_list.begin(), tmp_coefs_list.end(), std::back_inserter(coefficients_list));
     }
@@ -177,31 +178,31 @@ void EditAndEstimateEquations::update_scalars()
     for(const std::string& name: coefficients_list)
     {
         // check if it is already present in the local database 'kdb_scl'
-        if(!kdb_scl.contains(name))
+        if(!kdb_scl->contains(name))
         {
             // no -> check if in the global Scalars database
             if(Scalars.contains(name))
             {
                 // yes -> copy scalars from the global database to 'kdb_scl' 
                 Scalar scl = Scalars.get(name);
-                kdb_scl.add(name, scl);
+                kdb_scl->add(name, scl);
             }
             else
                 // no -> add a new scalar with value = 0.0 and relax = 1.0 to 'kdb_scl'
-                kdb_scl.add(name, 0.9, 1.0);
+                kdb_scl->add(name, 0.9, 1.0);
         }
     }
 
     // remove the scalars associated with equations which are not in the present block to estimate
-    for(const std::string& eq_name: kdb_eqs.get_names())
+    for(const std::string& eq_name: kdb_eqs->get_names())
     {
         // if eq_name is not contained in v_equations
         if(find(v_equations.begin(), v_equations.end(), eq_name) == v_equations.end())
         {
-            Equation eq = kdb_eqs.get(eq_name);
+            Equation eq = kdb_eqs->get(eq_name);
             for(const std::string& scl_name: eq.get_coefficients_list())
-                if(kdb_scl.contains(scl_name))
-                    kdb_scl.remove(scl_name);
+                if(kdb_scl->contains(scl_name))
+                    kdb_scl->remove(scl_name);
         }
     }
 }
@@ -227,9 +228,9 @@ void EditAndEstimateEquations::copy_eq_tests_values()
         tests[10]= (float) MATE(E_LOGLIK,      0, i);
 
         eq_name = v_equations.at(i);
-        Equation eq = kdb_eqs.get(eq_name);
+        Equation eq = kdb_eqs->get(eq_name);
         eq.set_tests(tests);
-        kdb_eqs.update(eq_name, eq);
+        kdb_eqs->update(eq_name, eq);
     }
 }
 
@@ -242,10 +243,10 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
         return;
 
     std::string name = *current_eq;
-    Equation eq = kdb_eqs.get(name);
+    Equation eq = kdb_eqs->get(name);
     eq.set_lec(lec, name);
     eq.set_comment(comment);
-    kdb_eqs.update(name, eq);
+    kdb_eqs->update(name, eq);
 }
 
 void EditAndEstimateEquations::estimate()
@@ -269,13 +270,13 @@ void EditAndEstimateEquations::estimate()
     std::vector<std::string> v_lecs;
     for(const std::string& eq_name: v_equations)
     {
-        lec = kdb_eqs.get_lec(eq_name);
+        lec = kdb_eqs->get_lec(eq_name);
         v_lecs.push_back(lec);
     }
     char** c_lecs = vector_to_double_char(v_lecs);
 
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in E_free_work()
-    int res = E_est(c_endos, c_lecs, Variables.get_KDB(), kdb_scl.get_KDB(), sample, 
+    int res = E_est(c_endos, c_lecs, Variables.get_database(), kdb_scl->get_database(), sample, 
                     this->method, c_instrs, ESTIMATION_MAXIT, ESTIMATION_EPS);
 
     if(res == 0)        
@@ -308,7 +309,7 @@ void EditAndEstimateEquations::save(const std::string& from, const std::string& 
     for(int i = 0; i < v_equations.size(); i++) 
     {
         eq_name = v_equations[i];
-        Equation eq = kdb_eqs.get(eq_name);
+        Equation eq = kdb_eqs->get(eq_name);
         eq.set_block(block);
         eq.set_method(method);
         eq.set_instruments(instruments);
@@ -335,7 +336,7 @@ void EditAndEstimateEquations::save(const std::string& from, const std::string& 
     }
 
     // merge the local Scalars into the global Scalars database
-    Scalars.merge(kdb_scl);
+    Scalars.merge(*kdb_scl);
 }
 
 void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)

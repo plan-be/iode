@@ -12,7 +12,7 @@ Variable KDBVariables::get_unchecked(const int pos) const
 	Variable vars;
 	int nb_obs = get_nb_periods();
 
-	KDB* kdb = get_KDB();
+	KDB* kdb = get_database();
 	vars.reserve(nb_obs);
 	for (int i=0; i < nb_obs; i++) 
 		vars.push_back(KV_get(kdb, pos, i, 0));
@@ -23,7 +23,7 @@ IODE_REAL KDBVariables::get_var(const int pos, const int t, const EnumIodeVarMod
 {
 	// throw exception if object with passed position is not valid
 	get_name(pos);
-    return KV_get(get_KDB(), pos, t, mode);
+    return KV_get(get_database(), pos, t, mode);
 }
 
 IODE_REAL KDBVariables::get_var(const int pos, const std::string& period, const EnumIodeVarMode mode) const
@@ -46,7 +46,7 @@ IODE_REAL* KDBVariables::get_var_ptr(const int pos)
 	// throw exception if object with passed position is not valid
 	get_name(pos);
 
-	return KVVAL(get_KDB(), pos, 0);
+	return KVVAL(get_database(), pos, 0);
 }
 
 IODE_REAL KDBVariables::get_var(const std::string& name, const int t, const EnumIodeVarMode mode) const
@@ -79,7 +79,7 @@ void KDBVariables::set_var(const int pos, const int t, const IODE_REAL value, co
 {
 	// throw exception if object with passed position is not valid
 	get_name(pos);
-	KV_set(get_KDB(), pos, t, mode, value);
+	KV_set(get_database(), pos, t, mode, value);
 }
 
 void KDBVariables::set_var(const int pos, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode)
@@ -235,7 +235,7 @@ void KDBVariables::update(const std::string& name, const std::string& lec)
 
 Sample KDBVariables::get_sample() const
 {
-	return Sample(*KSMPL(get_KDB()));
+	return Sample(*KSMPL(get_database()));
 }
 
 void KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -261,7 +261,7 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 void KDBVariables::set_sample(const Period& from, const Period& to)
 {
 	Sample sample(from, to);
-	int res = KV_sample(get_KDB(), &sample);
+	int res = KV_sample(get_database(), &sample);
 	if (res < 0) 
 	{
 		IodeExceptionFunction error("Cannot set sample", "Unknown");
@@ -278,13 +278,13 @@ int KDBVariables::get_nb_periods() const
 
 std::string KDBVariables::get_period(const int t) const
 {
-    PERIOD period = KSMPL(get_KDB())->s_p1;
+    PERIOD period = KSMPL(get_database())->s_p1;
     return Period(period).shift(t).to_string();
 }
 
 float KDBVariables::get_period_as_float(const int t) const
 {
-    PERIOD period = KSMPL(get_KDB())->s_p1;
+    PERIOD period = KSMPL(get_database())->s_p1;
     return Period(period).shift(t).to_float();
 }
 
@@ -344,7 +344,7 @@ void KDBVariables::copy_into(const std::string& input_file, const Period* from, 
 void KDBVariables::extrapolate(const EnumSimulationInitialization method, const std::string& from, 
 	const std::string& to, const std::string& variables_list)
 {
-	KDB* kdb = get_KDB();
+	KDB* kdb = get_database();
 	if (kdb == NULL) return;
 
 	Sample sample(from, to);
@@ -374,7 +374,7 @@ void KDBVariables::extrapolate(const EnumSimulationInitialization method, const 
 
 void KDBVariables::seasonal_adjustment(std::string& input_file, const std::string& series, const double eps_test)
 {
-	KDB* kdb = get_KDB();
+	KDB* kdb = get_database();
 	if (kdb == NULL) return;
 
 	std::string args;
@@ -404,7 +404,7 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 
 void KDBVariables::trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log)
 {
-	KDB* kdb = get_KDB();
+	KDB* kdb = get_database();
 	if (kdb == NULL) return;
 
 	std::string args;

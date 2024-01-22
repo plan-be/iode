@@ -11,11 +11,16 @@ protected:
 
     Table get_unchecked(const int pos) const override;
 
-public:
-    KDBTables(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_TABLES, pattern) {};
+    KDBTables(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_TABLES, deep_copy, pattern) {};
 
-    KDBTables(const KDBTables& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
+public:
+    KDBTables(const std::string& filepath="") : KDBTemplate(I_TABLES, filepath) {}
+
+    KDBTables* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBTables(deep_copy, pattern);
+    }
 
     std::string get_title(const int pos) const;
 
@@ -43,7 +48,7 @@ public:
  */
 inline std::size_t hash_value(KDBTables const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
     std::size_t seed = 0;

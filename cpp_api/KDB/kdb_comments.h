@@ -10,17 +10,23 @@ protected:
 
     Comment get_unchecked(const int pos) const override;
 
+    KDBComments(const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(I_COMMENTS, deep_copy, pattern) {}
+
 public:
-    KDBComments(const EnumIodeKDBType kdb_type = KDB_GLOBAL, const std::string& pattern = "") : 
-        KDBTemplate(kdb_type, I_COMMENTS, pattern) {};
+    KDBComments(const std::string& filepath="") : KDBTemplate(I_COMMENTS, filepath) {}
 
-    KDBComments(const KDBComments& kdb_to_copy) : KDBTemplate(kdb_to_copy) {}
-
+    KDBComments* subset(const std::string& pattern, const bool deep_copy=false)
+    {
+        return new KDBComments(deep_copy, pattern);
+    }
+    
     int add(const std::string& name, const Comment& comment);
 
     void update(const std::string& name, const Comment& comment);
 
     void update(const int pos, const Comment& comment);
+    
 };
 
 
@@ -34,7 +40,7 @@ public:
  */
 inline std::size_t hash_value(KDBComments const& cpp_kdb)
 {
-    KDB* kdb = cpp_kdb.get_KDB();
+    KDB* kdb = cpp_kdb.get_database();
     if(kdb == NULL) return 0;
 
     std::size_t seed = 0;

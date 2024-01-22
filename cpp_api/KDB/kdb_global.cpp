@@ -2,84 +2,11 @@
 #include "kdb_global.h"
 
 
-void load_global_kdb(EnumIodeType iode_type, const std::string& filepath)
-{
-    std::string filepath_ = check_filepath(filepath, (EnumIodeFile) iode_type, "load", true);
-
-    char* c_filepath = to_char_array(filepath_);
-
-    int res = B_WsLoad(c_filepath, iode_type);
-    if (res != EXIT_SUCCESS)
-        throw IodeExceptionFunction("Cannot load " + vIodeTypes[iode_type] + "s from file " + filepath, "Unknown");
-}
-
-void save_global_kdb(EnumIodeType iode_type, const std::string& filepath)
-{
-    std::string filepath_ = check_filepath(filepath, (EnumIodeFile) iode_type, "save", false);
-
-    char* c_filepath = to_char_array(filepath_);
-
-    int res = B_WsSave(c_filepath, iode_type);
-    if (res != EXIT_SUCCESS)
-        throw IodeExceptionFunction("Cannot save " + vIodeTypes[iode_type] + "s to file " + filepath, "Unknown");
-}
-
-void clear_global_kdb(EnumIodeType iode_type)
-{
-    int res = B_WsClear("", iode_type);
-    if (res != EXIT_SUCCESS)
-        throw IodeExceptionFunction("Cannot clear " + vIodeTypes[iode_type] + "s database", "Unknown");
-}
-
-bool is_global_kdb_loaded(const EnumIodeType iodeType) 
+bool is_global_database_loaded(const EnumIodeType iodeType) 
 { 
     if (K_WS[iodeType] == NULL) return false;
     if (K_WS[iodeType]->k_nb == 0) return false;
     return true; 
-}
-
-KDB* hard_copy_kdb(KDB* source_kdb, char** names)
-{
-    short iode_type = source_kdb->k_type;
-    int nb_objs = (names != NULL) ? SCR_tbl_size((unsigned char**) names) : source_kdb->k_nb;
-
-    // K_create() sets:
-    // - k_arch = #define ARCH
-    // - k_type = first argument of K_create()
-    // - k_mode = second argument of K_create()
-    // - k_nameptr = I_DEFAULT_FILENAME
-    KDB* dest_kdb = K_create(iode_type, source_kdb->k_mode);
-    if (dest_kdb == NULL) return NULL;
-    // copy char k_desc[K_MAX_DESC]
-    strncpy(dest_kdb->k_desc, source_kdb->k_desc, K_MAX_DESC);
-    // copy char k_data[K_MAX_DESC]
-    memcpy(dest_kdb->k_data, source_kdb->k_data, sizeof(char) * K_MAX_DESC);
-    // copy char k_compressed
-    dest_kdb->k_compressed = source_kdb->k_compressed;
-    // copy char* k_nameptr
-    dest_kdb->k_nameptr = copy_char_array(source_kdb->k_nameptr);
-    // copy k_magic[LMAGIC]
-    memcpy(dest_kdb->k_magic, source_kdb->k_magic, sizeof(char) * LMAGIC);
-    // copy k_oname[OK_MAX_FILE]  
-    strncpy(dest_kdb->k_oname, source_kdb->k_oname, OK_MAX_FILE);
-
-    int pos_dest_kdb;
-    char* c_obj_name;
-    for (int i=0; i<nb_objs; i++)
-    {
-        c_obj_name = (names != NULL) ? names[i] : KONAME(source_kdb, i);
-        pos_dest_kdb = K_dup(source_kdb, c_obj_name, dest_kdb, c_obj_name);
-        if (pos_dest_kdb < 0)
-        {
-            std::string obj_name = std::string(c_obj_name);
-            std::string action = "Trying to copy " + vIodeTypes[iode_type] + " named " + obj_name + " in new database";
-            if (pos_dest_kdb == -1) throw IodeExceptionFunction(action, "Object with name " + 
-                std::string(obj_name) + " does not exist in the source database");
-            else throw IodeExceptionFunction(action, "Unknown");
-        }
-    }
-
-    return dest_kdb;
 }
 
 // Replaced by K_get_kdb_nameptr()

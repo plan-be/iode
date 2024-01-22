@@ -9,7 +9,7 @@ Scalar KDBScalars::copy_obj(const Scalar& original) const
 
 Scalar KDBScalars::get_unchecked(const int pos) const
 {
-	return Scalar(pos, get_KDB());
+	return Scalar(pos, get_database());
 }
 
 int KDBScalars::add(const std::string& name, const Scalar& obj)

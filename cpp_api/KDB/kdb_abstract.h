@@ -2,6 +2,11 @@
 #include "utils/utils.h"
 #include "time/sample.h"
 #include "kdb_global.h"
+
+#include <string>
+#include <vector>
+#include <stdexcept>
+
 #include <boost/functional/hash.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -12,91 +17,86 @@ using List = std::string;
 using Variable = std::vector<IODE_REAL>;
 
 
-enum EnumIodeKDBType
+const static char DB_GLOBAL       = (char) 0;       //< K_WS[iode_type]
+const static char DB_DEEP_COPY    = (char) 1;       //< deep copy of a global KDB (useful when working with estimation of block of eqs in the GUI)
+const static char DB_SHALLOW_COPY = (char) 2;       //< shallow copy (useful when working on subset in the GUI)
+
+
+/**
+ * @note We use k_reserve[0] to store if the current database refers to a global database or 
+ *       if it is a deep or a shallow copy of a global database  
+ * 
+ */
+class KDBAbstract: public KDB
 {
-    KDB_GLOBAL,         //< K_WS[iode_type]
-    KDB_LOCAL,          //< hard copy of a global KDB (useful when working with estimation of block of eqs in the GUI)
-    KDB_SHALLOW_COPY    //< shallow copy (useful when working on subset in the GUI)
-};
-
-
-class KDBAbstract
-{
-protected:
-    // Note: Cannot define a KDB* global_kdb = K_WS[type] member because the pointer contained in 
-    // K_WS[type] may change in the course of the program (when loading files for example)
-
-    EnumIodeType iode_type;
-    std::string iode_type_name;
-    EnumIodeKDBType kdb_type;
-    KDB* local_kdb;         //< either a shallow copy (K_refer()) of a subset of a global KDB or a local kdb
-
 private:
     /**
-     * @brief Create a table of IODE object names extracted from the corresponding global database given a pattern.
+     * @brief Create a list of IODE object names extracted from the corresponding global database given a pattern.
      * 
      * @param pattern 
-     * @return char**
-     * 
-     * @warning the returned char** table must be freed using the SCR_free_tbl() function
+     * @return std::vector<std::string>
      */
-    char** filter_names_from_global_db(const std::string& pattern) const;
+    static std::vector<std::string> filter_names_from_global_db(const short db_type, const std::string& pattern);
+
+protected:
+    KDBAbstract(const EnumIodeType iode_type, const bool deep_copy, const std::string& pattern);
 
 public:
-    KDBAbstract(const std::string& filepath);
-
-    KDBAbstract(const EnumIodeKDBType kdb_type, const EnumIodeType iode_type, const std::string& pattern);
-
-    KDBAbstract(const KDBAbstract& kdb_to_copy);
+    KDBAbstract(const EnumIodeType iode_type, const std::string& filepath = "");
+    
+    // No copy constructor --> replaced by subset() method in derived classes
+    KDBAbstract(const KDBAbstract&) = delete;
 
     ~KDBAbstract();
 
-    int get_iode_type() const { return iode_type; }
+    int get_iode_type() const { return k_type; }
+
+    bool is_global_database() const { return k_reserved[0] == DB_GLOBAL; }
+
+    bool is_local_database() const { return k_reserved[0] == DB_DEEP_COPY; }
+
+    bool is_shallow_copy_database() const { return k_reserved[0] == DB_SHALLOW_COPY; }
+
+    KDB* get_database() const
+    {
+        KDB* kdb = is_global_database() ? K_WS[k_type] : const_cast<KDBAbstract*>(this);
+        if(kdb == NULL)
+            kwarning(("The current " + vIodeTypes[k_type] + " has not been set yet").c_str());
+        return kdb;
+    } 
 
     int count() const 
     { 
-        KDB* kdb = get_KDB();
-        if (kdb)
+        KDB* kdb = get_database();
+        if(kdb)
             return kdb->k_nb;
         else
             return 0;
     }
 
-    KDB* get_KDB() const
-    {
-        if (local_kdb) 
-            return local_kdb;
-        else
-            return K_WS[iode_type];
-    }
-
-    bool is_global_kdb() const { return local_kdb == NULL; }
-
-    bool is_shallow_copy() const { return kdb_type == KDB_SHALLOW_COPY; }
-
-    bool is_local_kdb() const { return kdb_type == KDB_LOCAL; }
-
     std::string get_filename() const 
     {
-        KDB* kdb = get_KDB();
-        if (kdb) 
-            return std::string(K_get_kdb_nameptr(kdb)); 
+        KDB* kdb = get_database();
+        if(kdb != NULL && kdb->k_nameptr != NULL) 
+            return std::string(kdb->k_nameptr); 
         else
             return "";
     }
 
     void set_filename(const std::string& filename) 
     { 
-        KDB* kdb = get_KDB();
-        if (kdb) set_kdb_filename(kdb, filename); 
+        KDB* kdb = get_database();
+        if(kdb != NULL)
+            set_kdb_filename(kdb, filename); 
     }
 
     std::string get_description() const 
     { 
-        KDB* kdb = get_KDB();
-        if (kdb == NULL) return "";
-
-        return std::string(kdb->k_desc); 
+        KDB* kdb = get_database();
+        if(kdb != NULL && kdb->k_desc != NULL) 
+            return std::string(kdb->k_desc);
+        else 
+            return "";
     }
 
     /**
@@ -109,22 +109,28 @@ public:
      */
     void set_description(const std::string& description)
     {
-        KDB* kdb = get_KDB();
-        if (kdb == NULL) return ;
+        KDB* kdb = get_database();
+        if (kdb == NULL) 
+            return ;
 
         size_t size = description.size() + 1;
-        if (size > K_MAX_DESC) size = (size_t) K_MAX_DESC;
+        if(size > K_MAX_DESC) 
+            size = (size_t) K_MAX_DESC;
         strncpy(kdb->k_desc, description.c_str(), size);
     }
 
     int get_position(const std::string& name) const
     {
-        check_name(name, iode_type);
-        KDB* kdb = get_KDB();
+        check_name(name, k_type);
+
+        KDB* kdb = get_database();
         int pos = -1;
-        if (kdb) pos = K_find(kdb, to_char_array(name));
-        if (pos < 0) throw IodeExceptionFunction("Cannot get position of " + iode_type_name + " named " + name,  
-            iode_type_name + " with name " + name + " does not exist.");
+        if(kdb != NULL) 
+            pos = K_find(kdb, to_char_array(name));
+        if(pos < 0) 
+            throw std::invalid_argument("Cannot get the position of the object named '" + name + 
+                                        "' in the database of '" + vIodeTypes[k_type] + "'.\n" +  
+                                        "The object with name '" + name + "' does not exist.");
         return pos;
     }
 
@@ -132,11 +138,12 @@ public:
 
     std::string get_name(const int pos) const 
     {
-        KDB* kdb = get_KDB();
-        if (kdb == NULL) return "";
-        if (pos < 0 || pos >= kdb->k_nb) 
-            throw IodeExceptionFunction("Cannot get name of " + iode_type_name + " at position " + std::to_string(pos),  
-                                        iode_type_name + " at position " + std::to_string(pos) + " does not exist.");
+        KDB* kdb = get_database();
+        if(kdb == NULL) 
+            return "";
+        if(pos < 0 || pos >= kdb->k_nb) 
+            throw std::invalid_argument("Cannot get the name of the object at position " + std::to_string(pos) + ".\n" +  
+                                        "The position must be in the range [0, " + std::to_string(kdb->k_nb - 1) + "].");
         std::string name_oem = std::string(kdb->k_objs[pos].o_name);
         std::string name = oem_to_utf8(name_oem);
         return name;
@@ -152,8 +159,8 @@ public:
 
     bool contains(const std::string& name) const
     { 
-        KDB* kdb = get_KDB();
-        if (kdb)
+        KDB* kdb = get_database();
+        if(kdb != NULL)
             return K_find(kdb, to_char_array(name)) >= 0; 
         else
             return false;
@@ -183,9 +190,7 @@ public:
 
     std::vector<std::string> get_associated_objects_list(const std::string& name, const EnumIodeType other_type);
 
-    // load - save - clear
-
-    void load(const std::string& filepath);
+    // save - clear
 
     void save(const std::string& filepath);
 

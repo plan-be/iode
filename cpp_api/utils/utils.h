@@ -66,7 +66,7 @@ inline std::string utf8_to_oem(const std::string str_utf8)
     return convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
 }
 
-static IodeRegexName get_regex_name(const EnumIodeType type)
+static IodeRegexName get_regex_name(const int type)
 {
     IodeRegexName nre;
     if (type == I_COMMENTS)
@@ -91,7 +91,7 @@ static IodeRegexName get_regex_name(const EnumIodeType type)
     return nre;
 }
 
-inline void check_name(const std::string name, const EnumIodeType type)
+inline void check_name(const std::string name, const int type)
 {
     std::string msg = "name " + name + " as " + vIodeTypes[type];
 
