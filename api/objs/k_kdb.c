@@ -61,7 +61,7 @@ static int K_objnamecmp(const void *p1, const void *p2)
  *  
  */
  
-static void K_sort(KDB* kdb)
+void K_sort(KDB* kdb)
 {
     qsort(KOBJS(kdb), (int) KNB(kdb), sizeof(KOBJ), K_objnamecmp);
 }

@@ -132,6 +132,7 @@ extern void *P_alloc_get_ptr(void *, int );
 extern int K_filetype(char *,char *,int *,SAMPLE *);
 
 /* k_kdb.c */
+extern void K_sort(KDB* kdb);
 extern KDB *K_init_kdb(int ,char *);
 extern char *K_get_kdb_nameptr(KDB *kdb);
 extern void K_set_kdb_name(KDB *kdb, U_ch *filename);
