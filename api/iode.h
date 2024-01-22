@@ -807,25 +807,24 @@ typedef char    ONAME[K_MAX_NAME + 1];
 typedef long    OSIZE;   /* JMP 23-05-00 */
 
 typedef struct  _kobj_ {
-    SWHDL       o_val;      /* SWHDL=long */ /* IODE64K */
-    ONAME       o_name;
+    SWHDL       o_val;          // position in the "SWAP" memory
+    ONAME       o_name;         // name of the object
     char        o_pad[3];
 } KOBJ;
 
 typedef struct _kdb_ {
-    KOBJ        *k_objs;
-	long        k_nb;
-    short       k_type;
-    short       k_mode;
-    char        k_arch[LMAGIC];
-    char        k_magic[LMAGIC];
-    //OFNAME       k_name; // 6.44
-    OFNAME       k_oname;  // 6.44 (compat size but not used)
-    char        k_desc[K_MAX_DESC];
-    char        k_data[K_MAX_DESC];     /* Client Data */
-    char        k_compressed;           /* IODE64K */
-    char        k_reserved[59];         /* 6.44 : decreased by 4 bytes for k_nameptr */
-    char        *k_nameptr;             /* 6.44 */ // Alignment on 4 bytes, not 8 => pb in Google tests (not /Zp1)
+    KOBJ        *k_objs;                // map <position in the "SWAP" memory, object name>
+	long        k_nb;                   // number of objects in the database
+    short       k_type;                 // type of the object: K_CMT, K_EQS, ..., K_VAR
+    short       k_mode;                 // case of the object name: K_UPPER, K_LOWER or K_ASIS 
+    char        k_arch[LMAGIC];         // ???
+    char        k_magic[LMAGIC];        // ???
+    OFNAME       k_oname;               // ??? (compat size but not used)
+    char        k_desc[K_MAX_DESC];     // ???
+    char        k_data[K_MAX_DESC];     // Sample if Variables database
+    char        k_compressed;           // ???
+    char        k_reserved[59];         // not used (NOTE: decreased by 4 bytes in version 6.44 for k_nameptr)
+    char        *k_nameptr;             // filepath to the database file
 } KDB;
 
 typedef struct _period {
