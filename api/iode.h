@@ -835,9 +835,9 @@ typedef struct _period {
 } PERIOD;
 
 typedef struct _sample {
-    PERIOD  s_p1,
-	    s_p2;
-    short   s_nb;
+    PERIOD  s_p1;       // starting period
+    PERIOD  s_p2;       // ending period
+    short   s_nb;       // number of periods in the sample
     char    s_pad[2];
 } SAMPLE;
 
