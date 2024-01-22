@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 
-void gui_error_super(int level, char* msg)
+void gui_error_super(const int level, const char* msg)
 {
 	if (level > 0)
 	{
@@ -16,18 +16,18 @@ void gui_error_super(int level, char* msg)
 		throw std::runtime_error(msg);
 }
 
-void gui_warning_super(char* msg)
+void gui_warning_super(const char* msg)
 {
 	QMessageBox::information(nullptr, "INFORMATION", QString(msg));
 }
 
-void gui_msg_super(char* msg)
+void gui_msg_super(const char* msg)
 {
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
 	main_window->display_output(QString(msg));
 }
 
-int gui_confirm_super(char* msg)
+int gui_confirm_super(const char* msg)
 {
 	QMessageBox::StandardButton answer = QMessageBox::question(nullptr, "CONFIRM", QString(msg));
 	if (answer == QMessageBox::Ok) return 1;
@@ -263,7 +263,7 @@ int gui_XodeRuleImport_super()
 
 int gui_view_tbl(TBL* tbl, char* smpl, char* name)
 {
-	int pos = K_find(KT_WS, name);
+	int pos = K_find(KT_WS, const_cast<char*>(name));
 	bool table_found = pos >= 0;
 
 	QString tableName = QString(name);
