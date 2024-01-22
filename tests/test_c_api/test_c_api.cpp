@@ -70,13 +70,10 @@ protected:
 public:
     void SetUp() override 
     {
-        // C++ consider all passed string value of the kind "..." to C function as CONSTANT
-        char buf1[64];
-        char buf2[64];
-
-        // NOTE: we assume that: 
-		//       - current path is binaryDir/tests/test_cpp_api
-		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
+        // NOTES: - C++ consider all passed string value of the kind "..." to C function as CONSTANT
+        //        - We assume that: 
+		//           * the current path is binaryDir/tests/test_cpp_api
+		//           * the data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::filesystem::path cwd = std::filesystem::current_path();
 		std::string str_path = cwd.parent_path().string() + "\\";
 		strcpy_s(input_test_dir, (str_path + "data\\").c_str());
@@ -1130,7 +1127,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     U_ch**      endo_exo;
     int         rc;
     LIS         lst, expected_lst;
-    void        (*kmsg_super_ptr)(char*);
+    void        (*kmsg_super_ptr)(const char*);
     double      XNATY_2000Y1;
 
 
@@ -1289,7 +1286,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
 TEST_F(IodeCAPITest, Tests_Estimation)
 {
     int         rc;
-    void        (*kmsg_super_ptr)(char*);
+    void        (*kmsg_super_ptr)(const char*);
     SAMPLE      *smpl;
     IODE_REAL   r2, *df;
 
