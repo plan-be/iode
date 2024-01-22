@@ -12,54 +12,56 @@
  * 
  * List of functions that can be superseeded
  * -----------------------------------------
- *     void kerror(int level, char* fmt, ...)       Displays an error message and optionally exits the program.
- *     void kpause(char* msg)                       Displays a message and then waits for the user to press ENTER.
- *     void kwarning(char* fmt, ...)                Displays a message and optionally asks the user to press ENTER before continuing.
- *     void kmsg(char* fmt, ...)                    Displays a message.
- *     int kconfirm(char *fmt,...)                  Displays a message and optionally asks confirmation before continuing.
- *     int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts) Displays a message box with optional buttons. 
- *     void krecordkey(int key)                     Records a key in the keyboard buffer. 
- *     void krecordtext(unsigned char*  text)       Records a text in the keyboard buffer in reverse order (LIFO).
- *     int Wprintf(char* fmt, ...)                  Displays a message.
- *     int SCR_panic()                              Exits the program (normally on a "memory full" event).
- *     void ksettitle()                             Set the window title (GUI only).
- *     int ktermvkey(int vkey)                      Defines the interval to wait between two checks on the keyboard buffer length (GUI only).
- *     int khitkey()                                Checks whether the keyboard buffer is not empty (GUI only).
- *     int kgetkey()                                Reads the next character in the keyboard buffer (GUI only).
- *     void kbeep()                                 Plays a sound (GUI only).
- *     SAMPLE *kasksmpl()                           Asks the user to give a SAMPLE (GUI only).
- *     int kexecsystem()                            Calls the fonction system().
- *     int kshellexec()                             Call the Win32 function ShellExecuteEx().
+ *     void kerror(const int level, const char* fmt, ...)       Displays an error message and optionally exits the program.
+ *     void kpause(const char* msg)                             Displays a message and then waits for the user to press ENTER.
+ *     void kwarning(const char* fmt, ...)                      Displays a message and optionally asks the user to press ENTER before continuing.
+ *     void kmsg(const char* fmt, ...)                          Displays a message.
+ *     int kconfirm(char *fmt,...)                              Displays a message and optionally asks confirmation before continuing.
+ *     int kmsgbox(const unsigned char *str,                    Displays a message box with optional buttons.
+ *                 const unsigned char *v, 
+ *                 const unsigned char **buts)  
+ *     void krecordkey(const int key)                           Records a key in the keyboard buffer. 
+ *     void krecordtext(const unsigned char*  text)             Records a text in the keyboard buffer in reverse order (LIFO).
+ *     int Wprintf(const char* fmt, ...)                        Displays a message.
+ *     int SCR_panic()                                          Exits the program (normally on a "memory full" event).
+ *     void ksettitle()                                         Set the window title (GUI only).
+ *     int ktermvkey(const int vkey)                            Defines the interval to wait between two checks on the keyboard buffer length (GUI only).
+ *     int khitkey()                                            Checks whether the keyboard buffer is not empty (GUI only).
+ *     int kgetkey()                                            Reads the next character in the keyboard buffer (GUI only).
+ *     void kbeep()                                             Plays a sound (GUI only).
+ *     SAMPLE *kasksmpl()                                       Asks the user to give a SAMPLE (GUI only).
+ *     int kexecsystem()                                        Calls the fonction system().
+ *     int kshellexec()                                         Call the Win32 function ShellExecuteEx().
  *
- *     int ODE_end()                                Ends an IODE session.
+ *     int ODE_end()                                            Ends an IODE session.
  *
  * SCR4 superseeded functions + assign
  * -----------------------------------
- *     char *A_expand_super_API(char* name)         Default implementation of A_expand() in IODE API
- *     void IODE_assign_super_API()                 Assigns default values to "super" (virtual) functions. 
+ *     char *A_expand_super_API(const char* name)               Default implementation of A_expand() in IODE API
+ *     void IODE_assign_super_API()                             Assigns default values to "super" (virtual) functions. 
  * 
  * List of function pointers that can replace the standard implementation  
  * ----------------------------------------------------------------------
- *      void (*kerror_super)(int level, char*msg);
- *      void (*kwarning_super)(char* msg);
- *      void (*kmsg_super)(char* msg);
- *      int  (*kwprintf_super)(char* msg);
+ *      void (*kerror_super)(const int level, const char* msg);
+ *      void (*kwarning_super)(const char* msg);
+ *      void (*kmsg_super)(const char* msg);
+ *      int  (*kwprintf_super)(const char* msg);
  *      void (*kpanic_super)(void);
- *      int  (*kconfirm_super)(char* msg);
- *      int  (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
+ *      int  (*kconfirm_super)(const char* msg);
+ *      int  (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts);
  *      int   kmsgbox_continue = 0;
  *      int   kpause_continue = 0;
- *      void (*krecordkey_super)(int ch);
- *      void (*krecordtext_super)(unsigned char *text);
+ *      void (*krecordkey_super)(const int ch);
+ *      void (*krecordtext_super)(const unsigned char* text);
  *      void (*ksettitle_super)(void);
- *      int  (*ktermvkey_super)(int vkey);
+ *      int  (*ktermvkey_super)(const int vkey);
  *      int  (*khitkey_super)();
  *      int  (*kgetkey_super)();
  *      void (*kbeep_super)(void);
  *      SAMPLE *(*kasksmpl_super)(void);
- *      int kexecsystem_super(char*);
- *      int kshellexec_super(char*);    
- *      int ODE_end_super(int);    
+ *      int kexecsystem_super(const char*);
+ *      int kshellexec_super(const char*);    
+ *      int ODE_end_super(const int);    
  *  
  */ 
 
@@ -68,26 +70,26 @@
 #include <stdarg.h>
 
 // Global variables
-void (*kerror_super)(int level, char*msg);
-void (*kwarning_super)(char* msg);
+void (*kerror_super)(const int level, const char*msg);
+void (*kwarning_super)(const char* msg);
 void (*kpause_super)();
-void (*kmsg_super)(char* msg);
-int  (*kwprintf_super)(char* msg);
+void (*kmsg_super)(const char* msg);
+int  (*kwprintf_super)(const char* msg);
 void (*kpanic_super)(void);
-int  (*kconfirm_super)(char* msg);
-int  (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);
+int  (*kconfirm_super)(const char* msg);
+int  (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts);
 int   kmsgbox_continue = 0; 
 int   kpause_continue = 0; 
-void (*krecordkey_super)(int ch);
+void (*krecordkey_super)(const int ch);
 void (*ksettitle_super)(void);
-int  (*ktermvkey_super)(int vkey);
+int  (*ktermvkey_super)(const int vkey);
 int  (*khitkey_super)();
 int  (*kgetkey_super)();
 void (*kbeep_super)(void);
 SAMPLE *(*kasksmpl_super)(void);
 int  (*kexecsystem_super)();
 int  (*kshellexec_super)();
-int  (*ODE_end_super)(int);
+int  (*ODE_end_super)(const int);
 
 /**
  *  Displays an error message and optionally exits the program.
@@ -100,7 +102,7 @@ int  (*ODE_end_super)(int);
  *  @param [in] ...         optional list of additional parameters    
  *  
  */
-void kerror(int level, char* fmt, ...)
+void kerror(const int level, const char* fmt, ...)
 {
     char    buf[10240];
     va_list myargs;
@@ -160,7 +162,7 @@ void kpause()
  *  @param [in] ...             optional list of additional parameters    
  *  
  */
-void kwarning(char* fmt, ...)
+void kwarning(const char* fmt, ...)
 {
     char    buf[10240];
     va_list myargs;
@@ -194,7 +196,7 @@ void kwarning(char* fmt, ...)
  *  @param [in] ...             optional list of additional parameters    
  *  
  */
-void kmsg(char* fmt, ...)
+void kmsg(const char* fmt, ...)
 {
     char    buf[10240];
     va_list myargs;
@@ -218,7 +220,7 @@ void kmsg(char* fmt, ...)
  *  
  *  @param [in] msg char*   message text 
  */
-void kmsg_null(char*msg) 
+void kmsg_null(const char* msg) 
 {
 }
 
@@ -227,10 +229,10 @@ void kmsg_null(char*msg)
  *  
  *  @param [in] IsOn int    0: suppress the messages, 1: restore the default function
   */
-void kmsg_toggle(int IsOn)
+void kmsg_toggle(const int IsOn)
 {
     static int  Current_IsOn = 1;
-    static void (*kmsg_super_ptr)(char*); 
+    static void (*kmsg_super_ptr)(const char*); 
     
     if(IsOn && !Current_IsOn) { 
         kmsg_super = kmsg_super_ptr;
@@ -256,7 +258,7 @@ void kmsg_toggle(int IsOn)
  *  @param [in] ...             optional list of additional parameters    
  *  
  */
-int kconfirm(char *fmt,...)
+int kconfirm(const char *fmt,...)
 {
     char    buf[10240];
     va_list myargs;
@@ -296,7 +298,7 @@ int kconfirm(char *fmt,...)
  *  @return          int    1 or returned value of kmsgbox_super()
  *  
  */
-int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)
+int kmsgbox(const unsigned char* str, const unsigned char* v, const unsigned char** buts)
 {
     if(kmsgbox_super != 0) 
         return((*kmsgbox_super)(str, v, buts));
@@ -319,7 +321,7 @@ int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)
  *  @param [in] key     int     key to record
  *  
  */
-void krecordkey(int key)
+void krecordkey(const int key)
 {
     if(krecordkey_super != 0) 
         (*krecordkey_super)(key);
@@ -333,7 +335,7 @@ void krecordkey(int key)
  *  
  *  @param [in] text    unsigned char*  text to record
  */
-void krecordtext(unsigned char*  text)
+void krecordtext(const unsigned char* text)
 {
     int     i;
 
@@ -424,7 +426,7 @@ void ksettitle()
  *  
  *  If the function pointer ktermvkey_super is not null, it is called instead.
  */
-int ktermvkey(int vkey)  
+int ktermvkey(const int vkey)  
 {
     if(ktermvkey_super) 
         return((*ktermvkey_super)(vkey));
@@ -486,7 +488,7 @@ void kbeep()
  *  If the function pointer kasksmpl_super is not null, it is called instead.
  */
 
-SAMPLE  *kasksmpl()
+SAMPLE* kasksmpl()
 {
     SAMPLE  *smpl = KSMPL(K_WS[K_VAR]);
 
@@ -508,7 +510,7 @@ SAMPLE  *kasksmpl()
  *  @return     int           return code of system or the replacement function        
  *  
  */
-int kexecsystem(char *arg)
+int kexecsystem(const char *arg)
 {
     int     rc;
 
@@ -532,7 +534,7 @@ int kexecsystem(char *arg)
  *  @return     int           0 or return code of the "super" replacement function
  *  
  */
-int kshellexec(char *arg)
+int kshellexec(const char *arg)
 {
     SHELLEXECUTEINFO    sei;
 
@@ -562,7 +564,7 @@ int kshellexec(char *arg)
  *  @return             char*   expanded string  
  *  
  */
-char    *A_expand_super_API(char* name)
+char* A_expand_super_API(const char* name)
 {
     int     pos;
 
@@ -580,7 +582,7 @@ char    *A_expand_super_API(char* name)
  *  @return 
  *  
  */
-int ODE_end(int st)
+int ODE_end(const int st)
 {
     if(ODE_end_super) 
         return((*ODE_end_super)(st));
