@@ -5,11 +5,10 @@ class TablesTest : public KDBTest, public ::testing::Test
 {
 protected:
     Table* table;
-    KDBTables kdb;
 
     void SetUp() override
     {
-        load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
+        KDBTables kdb_tbl(input_test_dir + "fun.tbl");
 
         int pos = K_find(K_WS[I_TABLES], "GFRPC");
         table = new Table(pos, nullptr);
@@ -26,8 +25,8 @@ protected:
 // extracted using KTVAL() are exactly the same
 TEST_F(TablesTest, AddGetTBL)
 {
-    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     // --- create a C struct TBL
     int nb_columns = 2;
@@ -140,10 +139,8 @@ TEST_F(TablesTest, AddGetTBL)
 TEST_F(TablesTest, Equivalence_C_CPP)
 {
     TCELL* div_cells;
-    TLINE* line;
-    TCELL* cell;
 
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     char* c_name = "cpp_table";
     int nb_columns = 2;

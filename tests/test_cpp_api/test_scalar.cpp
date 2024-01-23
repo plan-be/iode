@@ -7,7 +7,7 @@ protected:
 
 	void SetUp() override 
     {
-        load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
+        KDBScalars kdb_scl(input_test_dir + "fun.scl");
     }
 
 	// void TearDown() override {}

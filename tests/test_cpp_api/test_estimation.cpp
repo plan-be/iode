@@ -4,15 +4,11 @@
 class EstimationTest : public KDBTest, public ::testing::Test
 {
 protected:
-    KDBEquations kdb_eqs;
-    KDBScalars kdb_scl;
-    KDBVariables kdb_vars;
-
     void SetUp() override
     {
-        load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-        load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-        load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+        KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+        KDBScalars kdb_scl(input_test_dir + "fun.scl");
+        KDBVariables kdb_var(input_test_dir + "fun.var");
     }
 
     // void TearDown() override {}
@@ -181,11 +177,11 @@ TEST_F(EstimationTest, Estimate)
     Equation eq("ACAF");
     Equation eq2("DPUH");
 
-    kdb_scl.update("acaf1", 0., 1.);
-    kdb_scl.update("acaf2", 0., 1.);
-    kdb_scl.update("acaf4", 0., 1.);
-    kdb_scl.update("dpuh_1", 0., 1.);
-    kdb_scl.update("dpuh_2", 0., 1.);
+    Scalars.update("acaf1", 0., 1.);
+    Scalars.update("acaf2", 0., 1.);
+    Scalars.update("acaf4", 0., 1.);
+    Scalars.update("dpuh_1", 0., 1.);
+    Scalars.update("dpuh_2", 0., 1.);
 
     EditAndEstimateEquations est(from, to);
     est.set_instruments("");
@@ -247,11 +243,11 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(m_corr.get_value(4, 4), 1.);
 
     // Coeff values
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf1").val) / 1e6, 0.01577);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf2").val) / 1e6, -8.e-06);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("acaf4").val) / 1e6, -0.008503);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_1").val) / 1e6, 0.010986);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("dpuh_2").val) / 1e6, 0.057489);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf1").val) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf2").val) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf4").val) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("dpuh_1").val) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("dpuh_2").val) / 1e6, 0.057489);
 
     KDBScalars* kdb_scl_res = est.get_scalars();
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").val) / 1e6, 0.01577);
@@ -276,18 +272,18 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(E_NEQ, 1);
 
     // Tests values (ACAF)
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stdev").val) / 1e6, 0.00427);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_meany").val) / 1e6, 0.008185);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_ssres").val) / 1e6, 5.2e-05);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_stderr").val) / 1e6, 0.001927);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_sderrp").val) / 1e6, 23.542242);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_fstat").val) / 1e6, 32.285107);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_r2").val) / 1e6, 0.821815);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_r2adj").val) / 1e6, 0.79636);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_dw").val) / 1e6, 2.33007);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl.get("e0_loglik").val) / 1e6, 83.810104);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stdev").val) / 1e6, 0.00427);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_meany").val) / 1e6, 0.008185);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_ssres").val) / 1e6, 5.2e-05);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stderr").val) / 1e6, 0.001927);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_sderrp").val) / 1e6, 23.542242);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_fstat").val) / 1e6, 32.285107);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2").val) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2adj").val) / 1e6, 0.79636);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_dw").val) / 1e6, 2.33007);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_loglik").val) / 1e6, 83.810104);
 
-    Equation eq_est = kdb_eqs.get("ACAF");
+    Equation eq_est = Equations.get("ACAF");
     std::array<float, EQS_NBTESTS> tests = eq_est.get_tests();
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDEV]) / 1e6, 0.00427);
@@ -373,7 +369,7 @@ TEST_F(EstimationTest, Estimate)
 
 TEST_F(EstimationTest, DynamicAdjustment)
 {
-    std::string eqs = kdb_eqs.get_lec("ACAF");
+    std::string eqs = Equations.get_lec("ACAF");
     std::string c1 = "c1";
     std::string c2 = "";
     std::string adjusted_eqs;

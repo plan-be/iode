@@ -6,8 +6,8 @@ class KDBGlobalTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-        load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
+        KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+        KDBLists kdb_lst(input_test_dir + "fun.lst");
     }
 
     // void TearDown() override {}

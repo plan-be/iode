@@ -143,7 +143,7 @@ TEST_F(UtilsTest, removeDuplicates)
 {
 	char* pattern = "B*;G*;QA*;*_";
 
-	load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
+	KDBComments kdb_cmt(input_test_dir + "fun.cmt");
 
 	std::vector<std::string> v_expected_duplicate = { "BENEF", "BENEF_", "BQY", "BVY", 
 		"GAP", "GOSF", "GOSG", "GOSH", "GOSH_", "QAFF", "QAFF_", "QAF_", "QAG", "QAH", 
