@@ -5,18 +5,19 @@ class EquationTest : public KDBTest, public ::testing::Test
 {
 protected:
     Equation* equation;
-    KDBEquations kdb;
+    KDBEquations* kdb_eqs;
     std::string name = "ACAF";
 
     void SetUp() override
     {
-        load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
+        kdb_eqs = new KDBEquations(input_test_dir + "fun.eqs");
         equation = new Equation(name);
     }
 
     void TearDown() override
     {
         delete equation;
+        delete kdb_eqs;
     }
 };
 
@@ -33,7 +34,7 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     std::string instruments = equation->get_instruments();
     std::string block = equation->get_block();
 
-    kdb.remove(name);
+    kdb_eqs->remove(name);
 
     // test if a Equation object can be added to the Equations KDB via K_add()
     Equation eq(name, lec, method, from, to, comment, instruments, block, true);
@@ -174,7 +175,9 @@ TEST_F(EquationTest, Date)
 TEST_F(EquationTest, Tests)
 {
     std::array<float, EQS_NBTESTS> tests;
-    std::array<float, EQS_NBTESTS> expected_tests = { 1, 0.0042699, 0.00818467, 5.19945e-05, 0.0019271461, 23.545813, 32.2732, 0.82176137, 0.79629868, 2.3293459, 83.8075 };
+    std::array<float, EQS_NBTESTS> expected_tests = { 1.f, 0.0042699f, 0.00818467f, 5.19945e-05f, 
+                                                      0.0019271461f, 23.545813f, 32.2732f, 0.82176137f, 
+                                                      0.79629868f, 2.3293459f, 83.8075f };
 
     // get
     tests = equation->get_tests();

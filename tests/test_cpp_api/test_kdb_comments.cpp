@@ -6,7 +6,7 @@ class KDBCommentsTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override 
     {
-        load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
+        KDBComments kdb_cmt(input_test_dir + "fun.cmt");
     }
 
     // void TearDown() override {}
@@ -15,47 +15,45 @@ protected:
 
 TEST_F(KDBCommentsTest, Load)
 {
-    Comments.load(input_test_dir + "fun.cmt");
-    EXPECT_EQ(Comments.count(), 317);
+    KDBComments kdb(input_test_dir + "fun.cmt");
+    EXPECT_EQ(kdb.count(), 317);
 }
 
-TEST_F(KDBCommentsTest, CopyConstructor)
+TEST_F(KDBCommentsTest, Subset)
 {
+    std::string pattern = "A*";
     std::string comment = Comments.get("ACAF");
     std::string modified = "modified";
 
     // GLOBAL KDB
-    KDBComments kdb_copy(Comments);
-    EXPECT_EQ(kdb_copy.count(), 317);
-    EXPECT_TRUE(kdb_copy.is_global_kdb());
+    KDBComments kdb_global;
+    EXPECT_EQ(kdb_global.count(), 317);
+    EXPECT_TRUE(kdb_global.is_global_database());
 
-    // LOCAL KDB
-    KDBComments local_kdb(KDB_LOCAL, "A*");
-    KDBComments local_kdb_hard_copy(local_kdb);
-    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
-    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
-    local_kdb_hard_copy.update("ACAF", modified);
-    EXPECT_EQ(local_kdb.get("ACAF"), comment);
-    EXPECT_EQ(local_kdb_hard_copy.get("ACAF"), modified);
+    // DEEP COPY SUBSET
+    KDBComments* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
+    std::vector<std::string> names = kdb_global.get_names(pattern);
+    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    kdb_subset_deep_copy->update("ACAF", modified);
+    EXPECT_EQ(kdb_global.get("ACAF"), comment);
+    EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), modified);
 
-    // SHALLOW COPY KDB
-    KDBComments shallow_kdb(KDB_SHALLOW_COPY, "A*");
-    KDBComments shallow_kdb_copy(shallow_kdb);
-    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
-    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
-    shallow_kdb_copy.update("ACAF", modified);
-    EXPECT_EQ(shallow_kdb.get("ACAF"), modified);
-    EXPECT_EQ(shallow_kdb_copy.get("ACAF"), modified);
+    // SHALLOW COPY SUBSET
+    KDBComments* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    kdb_subset_shallow_copy->update("ACAF", modified);
+    EXPECT_EQ(kdb_global.get("ACAF"), modified);
+    EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), modified);
 }
 
 TEST_F(KDBCommentsTest, Save)
 {
     // save in binary format
-    save_global_kdb(I_COMMENTS, output_test_dir + "fun.cmt");
     Comments.save(output_test_dir + "fun.cmt");
 
     // save in ascii format
-    save_global_kdb(I_COMMENTS, output_test_dir + "fun.ac");
     Comments.save(output_test_dir + "fun.ac");
 }
 
@@ -85,7 +83,7 @@ TEST_F(KDBCommentsTest, GetName)
     name = Comments.get_name(0);
     EXPECT_EQ(name, "ACAF");
     
-    EXPECT_THROW(Comments.get_name(400), IodeExceptionFunction);
+    EXPECT_THROW(Comments.get_name(400), std::invalid_argument);
 }
 
 TEST_F(KDBCommentsTest, Rename)
@@ -107,12 +105,12 @@ TEST_F(KDBCommentsTest, Rename)
     // - name starting with a umber
     EXPECT_THROW(Comments.rename(old_name, "1_NEW_NAME"), IodeExceptionFunction);
     // - name using forbidden special characters
-    EXPECT_THROW(Comments.rename(old_name, "N�W_N@ME"), IodeExceptionFunction);
+    EXPECT_THROW(Comments.rename(old_name, "NËW_N@ME"), IodeExceptionFunction);
     // - old name does not exists
-    EXPECT_THROW(Comments.rename("EMPTY", "NEW_NAME"), IodeExceptionFunction);
+    EXPECT_THROW(Comments.rename("EMPTY", "NEW_NAME"), std::invalid_argument);
     // - new name already exists
     new_name = Comments.get_name(3);
-    EXPECT_THROW(Comments.rename(old_name, new_name), IodeExceptionFunction);
+    EXPECT_THROW(Comments.rename(old_name, new_name), std::invalid_argument);
     
     // set by position
     new_pos = Comments.set_name(1, "NEW_POS");
@@ -187,7 +185,7 @@ TEST_F(KDBCommentsTest, CreateRemove)
     EXPECT_EQ(Comments.get(name), new_comment);
 
     Comments.remove(name);
-    EXPECT_THROW(Comments.get(name), IodeExceptionFunction);
+    EXPECT_THROW(Comments.get(name), std::invalid_argument);
 
     // expect errors 
     std::string old_name = Comments.get_name(2);
@@ -199,7 +197,7 @@ TEST_F(KDBCommentsTest, CreateRemove)
     EXPECT_THROW(Comments.add("N�W_N@ME", new_comment), IodeExceptionFunction);
     // - name already exists
     name = Comments.get_name(3);
-    EXPECT_THROW(Comments.add(name, new_comment), IodeExceptionInitialization);
+    EXPECT_THROW(Comments.add(name, new_comment), std::invalid_argument);
 }
 
 TEST_F(KDBCommentsTest, Update)
@@ -212,7 +210,7 @@ TEST_F(KDBCommentsTest, Update)
     EXPECT_EQ(Comments.get(name), new_comment);
 
     // error: name does not exist
-    EXPECT_THROW(Comments.update("UNKNOWN", new_comment), IodeExceptionFunction);
+    EXPECT_THROW(Comments.update("UNKNOWN", new_comment), std::invalid_argument);
 
     // by position
     Comments.update(1, new_comment);
@@ -220,7 +218,7 @@ TEST_F(KDBCommentsTest, Update)
 
     // error: position does not exist
     int beyond_last_pos = Comments.count() + 10;
-    EXPECT_THROW(Comments.update(beyond_last_pos, new_comment), IodeExceptionFunction);
+    EXPECT_THROW(Comments.update(beyond_last_pos, new_comment), std::invalid_argument);
 }
 
 TEST_F(KDBCommentsTest, Copy)
@@ -241,18 +239,18 @@ TEST_F(KDBCommentsTest, Copy)
     Comments.add("DUP_" + name, copy_comment);
 
     // error: name does not exist
-    EXPECT_THROW(Comments.copy("UNKNOWN"), IodeExceptionFunction);
+    EXPECT_THROW(Comments.copy("UNKNOWN"), std::invalid_argument);
 
     // error: position does not exist
     int beyond_last_pos = Comments.count() + 10;
-    EXPECT_THROW(Comments.copy(beyond_last_pos), IodeExceptionFunction);
+    EXPECT_THROW(Comments.copy(beyond_last_pos), std::invalid_argument);
 }
 
 TEST_F(KDBCommentsTest, Filter)
 {
     std::string pattern = "A*;*_";
     std::vector<std::string> expected_names;
-    KDBComments* local_kdb;
+    KDBComments* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Comments.count(); p++) all_names.push_back(Comments.get_name(p));
@@ -271,50 +269,50 @@ TEST_F(KDBCommentsTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBComments(KDB_SHALLOW_COPY, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Comments.subset(pattern);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
     std::string name = "ACAF";
     std::string modified_comment = "Modified Comment";
-    local_kdb->update(name, modified_comment);
-    EXPECT_EQ(local_kdb->get(name), modified_comment);
+    kdb_subset->update(name, modified_comment);
+    EXPECT_EQ(kdb_subset->get(name), modified_comment);
     EXPECT_EQ(Comments.get(name), modified_comment);
 
     // add an element to the local KDB and check if it has also 
     // been added to the global KDB
     std::string new_name = "NEW_COMMENT";
     std::string new_comment = "New Comment";
-    local_kdb->add(new_name, new_comment);
-    EXPECT_EQ(local_kdb->get(new_name), new_comment);
+    kdb_subset->add(new_name, new_comment);
+    EXPECT_EQ(kdb_subset->get(new_name), new_comment);
     EXPECT_EQ(Comments.get(new_name), new_comment);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "COMMENT_NEW";
-    local_kdb->rename(old_name, new_name);
-    EXPECT_EQ(local_kdb->get(new_name), new_comment);
+    kdb_subset->rename(old_name, new_name);
+    EXPECT_EQ(kdb_subset->get(new_name), new_comment);
     EXPECT_EQ(Comments.get(new_name), new_comment);
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
-    local_kdb->remove(new_name);
-    EXPECT_FALSE(local_kdb->contains(new_name));
+    kdb_subset->remove(new_name);
+    EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Comments.contains(new_name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Comments.count(), nb_total_comments);
     EXPECT_EQ(Comments.get(name), modified_comment);
 }
 
-TEST_F(KDBCommentsTest, HardCopy)
+TEST_F(KDBCommentsTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
     std::vector<std::string> expected_names;
-    KDBComments* local_kdb;
+    KDBComments* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Comments.count(); p++) all_names.push_back(Comments.get_name(p));
@@ -333,44 +331,44 @@ TEST_F(KDBCommentsTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBComments(KDB_LOCAL, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Comments.subset(pattern, true);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "ACAF";
     std::string comment = Comments.get(name);
     std::string modified_comment = "Modified Comment";
-    local_kdb->update(name, modified_comment);
-    EXPECT_EQ(local_kdb->get(name), modified_comment);
+    kdb_subset->update(name, modified_comment);
+    EXPECT_EQ(kdb_subset->get(name), modified_comment);
     EXPECT_EQ(Comments.get(name), comment);
 
     // add an element to the local KDB and check if it has not 
     // been added to the global KDB
     std::string new_name = "NEW_COMMENT";
     std::string new_comment = "New Comment";
-    local_kdb->add(new_name, new_comment);
-    EXPECT_TRUE(local_kdb->contains(new_name));
-    EXPECT_EQ(local_kdb->get(new_name), new_comment);
+    kdb_subset->add(new_name, new_comment);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
+    EXPECT_EQ(kdb_subset->get(new_name), new_comment);
     EXPECT_FALSE(Comments.contains(new_name));
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
     name = "ACAG";
     new_name = "COMMENT_NEW";
-    local_kdb->rename(name, new_name);
-    EXPECT_TRUE(local_kdb->contains(new_name));
+    kdb_subset->rename(name, new_name);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Comments.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
     // been deleted from the global KDB
     name = "AOUC";
-    local_kdb->remove(name);
-    EXPECT_FALSE(local_kdb->contains(name));
+    kdb_subset->remove(name);
+    EXPECT_FALSE(kdb_subset->contains(name));
     EXPECT_TRUE(Comments.contains(name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Comments.count(), nb_total_comments);
 }
 
@@ -378,34 +376,34 @@ TEST_F(KDBCommentsTest, Merge)
 {
     std::string pattern = "A*";
 
-    // create hard copies kdb
-    KDBComments kdb0(KDB_LOCAL, pattern);
-    KDBComments kdb1(KDB_LOCAL, pattern);
-    KDBComments kdb_to_merge(KDB_LOCAL, pattern);
+    // create deep copies kdb
+    KDBComments* kdb0 = Comments.subset(pattern, true);
+    KDBComments* kdb1 = Comments.subset(pattern, true);
+    KDBComments* kdb_to_merge = Comments.subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_COMMENT";
     std::string new_comment = "New Comment";
-    kdb_to_merge.add(new_name, new_comment);
+    kdb_to_merge->add(new_name, new_comment);
 
     // modify an existing element of the KDB to be merge
     std::string name = "ACAF";
-    std::string unmodified_comment = kdb_to_merge.get(name);
+    std::string unmodified_comment = kdb_to_merge->get(name);
     std::string modified_comment = "Modified Comment";
-    kdb_to_merge.update(name, modified_comment);
+    kdb_to_merge->update(name, modified_comment);
 
     // merge (overwrite)
-    kdb0.merge(kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true);
     // a) check kdb0 contains new item of KDB to be merged
-    EXPECT_TRUE(kdb0.contains(new_name));
-    EXPECT_EQ(kdb0.get(new_name), new_comment);
+    EXPECT_TRUE(kdb0->contains(new_name));
+    EXPECT_EQ(kdb0->get(new_name), new_comment);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0.get(name), modified_comment); 
+    EXPECT_EQ(kdb0->get(name), modified_comment); 
 
     // merge (NOT overwrite)
-    kdb1.merge(kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1.get(name), unmodified_comment);
+    EXPECT_EQ(kdb1->get(name), unmodified_comment);
 }
 
 TEST_F(KDBCommentsTest, AssociatedObjs)
@@ -413,12 +411,13 @@ TEST_F(KDBCommentsTest, AssociatedObjs)
     std::string name = "ACAF";
     std::vector<std::string> objs_list;
 
-    load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-    load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
-    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
-    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
+    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
+    KDBLists kdb_lst(input_test_dir + "fun.lst");
+    KDBScalars kdb_scl(input_test_dir + "fun.scl");
+    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     std::vector<std::string> expected_cmts = { name };
     objs_list = Comments.get_associated_objects_list(name, I_COMMENTS);

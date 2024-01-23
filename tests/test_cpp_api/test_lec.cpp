@@ -6,7 +6,7 @@ class LecTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        load_global_kdb(I_VARIABLES, input_test_dir + "a.var");
+        KDBVariables kdb_var(input_test_dir + "a.var");
     }
 
     // void TearDown() override {}

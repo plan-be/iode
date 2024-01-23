@@ -4,40 +4,44 @@
 class GSampleTest : public KDBTest, public ::testing::Test
 {
 protected:
-    KDBTables kdb_tbl;
-    KDBVariables kdb_var;
+    KDBTables*    kdb_tbl;
+    KDBVariables* kdb_var;
     std::string var_file;
     std::string ref_file;
 
     void SetUp() override
     {
-        load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
+        kdb_tbl = new KDBTables(input_test_dir + "fun.tbl");
 
         var_file = input_test_dir + "fun.var";
         // C: -> c:
         var_file[0] = tolower(var_file[0]);
-        load_global_kdb(I_VARIABLES, var_file);
+        kdb_var = new KDBVariables(var_file);
 
         ref_file = input_test_dir + "ref.av";
         // slightly modify variables
         double value;
-        KDBVariables kdb_ref(EnumIodeKDBType::KDB_LOCAL, "Q_F;Q_I;KNFF;KLFHP;TFPFHP_");
-        for(int t=0; t < kdb_ref.get_nb_periods(); t++)
+        KDBVariables* kdb_ref = kdb_var->subset("Q_F;Q_I;KNFF;KLFHP;TFPFHP_", true);
+        for(int t=0; t < kdb_ref->get_nb_periods(); t++)
         {
-            for(const std::string& name: kdb_ref.get_names())
+            for(const std::string& name: kdb_ref->get_names())
             {
-                value = kdb_ref.get_var(name, t) * 0.98;
-                kdb_ref.set_var(name, t, value);
+                value = kdb_ref->get_var(name, t) * 0.98;
+                kdb_ref->set_var(name, t, value);
             }
         }
-        kdb_ref.save(ref_file);
+        kdb_ref->save(ref_file);
 
         // C: -> c:
         ref_file[0] = tolower(ref_file[0]);
         load_reference_kdb(2, I_VARIABLES_FILE, ref_file);
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        delete kdb_tbl;
+        delete kdb_var;
+    }
 };
 
 
@@ -172,7 +176,7 @@ TEST_F(GSampleTest, BuildFromVariables)
     std::string sample;
     std::vector<double> values;
 
-    kdb_tbl.add(table_name, 2, "", variables_list, false, false, false);
+    kdb_tbl->add(table_name, 2, "", variables_list, false, false, false);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -285,7 +289,7 @@ TEST_F(GSampleTest, BuildFromVariables)
     values = graph_2_files.get_series_values(3, 1);
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 11502.05);
 
-    kdb_tbl.remove(table_name);
+    kdb_tbl->remove(table_name);
 }
 
 TEST_F(GSampleTest, EditTable)
@@ -305,7 +309,7 @@ TEST_F(GSampleTest, EditTable)
     lec += "3+ln(10);";         // row 6
     lec += "0+KNFF";            // row 7
 
-    kdb_tbl.add(table_name, 2, "Test table to be edited", lec, false, false, false);
+    kdb_tbl->add(table_name, 2, "Test table to be edited", lec, false, false, false);
 
     // ---- prepare tables ----
 
@@ -387,10 +391,10 @@ TEST_F(GSampleTest, EditTable)
     // -> simple time series (current workspace) - 10 observations
     //    gsample = "2000:10";
     //    sample = "2000Y1:2009Y1";
-    double Q_F = kdb_var.get_var("Q_F", "2005Y1");
-    double Q_I = kdb_var.get_var("Q_I", "2005Y1");
-    double KNFF = kdb_var.get_var("KNFF", "2005Y1");
-    double KNFF_1 = kdb_var.get_var("KNFF", "2004Y1");
+    double Q_F = kdb_var->get_var("Q_F", "2005Y1");
+    double Q_I = kdb_var->get_var("Q_I", "2005Y1");
+    double KNFF = kdb_var->get_var("KNFF", "2005Y1");
+    double KNFF_1 = kdb_var->get_var("KNFF", "2004Y1");
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
     EXPECT_DOUBLE_EQ(table_simple.get_value(1, 5), round(Q_I * 100.) / 100.);               // "Q_I"
@@ -408,7 +412,7 @@ TEST_F(GSampleTest, EditTable)
 
     // propagate
     Q_F *= 0.9;
-    value = round(kdb_var.get_var("Q_F", "2005Y1") * 1e4) / 1e4;
+    value = round(kdb_var->get_var("Q_F", "2005Y1") * 1e4) / 1e4;
     EXPECT_DOUBLE_EQ(value, round(Q_F * 1e4) / 1e4);
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"
@@ -425,7 +429,7 @@ TEST_F(GSampleTest, EditTable)
 
     // propagate
     KNFF *= 0.9;
-    value = round(kdb_var.get_var("KNFF", "2005Y1") * 1e4) / 1e4;
+    value = round(kdb_var->get_var("KNFF", "2005Y1") * 1e4) / 1e4;
     EXPECT_DOUBLE_EQ(value, round(KNFF * 1e4) / 1e4);
 
     EXPECT_DOUBLE_EQ(table_simple.get_value(0, 5), round(Q_F * 100.) / 100.);               // "Q_F"

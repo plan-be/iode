@@ -6,7 +6,7 @@ class KDBIdentitiesTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
+        KDBIdentities kdb_idt(input_test_dir + "fun.idt");
     }
 
     // void TearDown() override {}
@@ -15,47 +15,45 @@ protected:
 
 TEST_F(KDBIdentitiesTest, Load)
 {
-    Identities.load(input_test_dir + "fun.idt");
-    EXPECT_EQ(Identities.count(), 48);
+    KDBIdentities kdb(input_test_dir + "fun.idt");
+    EXPECT_EQ(kdb.count(), 48);
 }
 
-TEST_F(KDBIdentitiesTest, CopyConstructor)
+TEST_F(KDBIdentitiesTest, Subset)
 {
+    std::string pattern = "A*";
     std::string lec = Identities.get_lec("AOUC");
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
 
     // GLOBAL KDB
-    KDBIdentities kdb_copy(Identities);
-    EXPECT_EQ(kdb_copy.count(), 48);
-    EXPECT_TRUE(kdb_copy.is_global_kdb());
+    KDBIdentities kdb_global;
+    EXPECT_EQ(kdb_global.count(), 48);
+    EXPECT_TRUE(kdb_global.is_global_database());
 
-    // LOCAL KDB
-    KDBIdentities local_kdb(KDB_LOCAL, "A*");
-    KDBIdentities local_kdb_hard_copy(local_kdb);
-    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
-    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
-    local_kdb_hard_copy.update("AOUC", new_lec);
-    EXPECT_EQ(local_kdb.get_lec("AOUC"), lec);
-    EXPECT_EQ(local_kdb_hard_copy.get_lec("AOUC"), new_lec);
+    // DEEP COPY SUBSET
+    KDBIdentities* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
+    std::vector<std::string> names = kdb_global.get_names(pattern);
+    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    kdb_subset_deep_copy->update("AOUC", new_lec);
+    EXPECT_EQ(kdb_global.get_lec("AOUC"), lec);
+    EXPECT_EQ(kdb_subset_deep_copy->get_lec("AOUC"), new_lec);
 
-    // SHALLOW COPY KDB
-    KDBIdentities shallow_kdb(KDB_SHALLOW_COPY, "A*");
-    KDBIdentities shallow_kdb_copy(shallow_kdb);
-    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
-    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
-    shallow_kdb_copy.update("AOUC", new_lec);
-    EXPECT_EQ(shallow_kdb.get_lec("AOUC"), new_lec);
-    EXPECT_EQ(shallow_kdb_copy.get_lec("AOUC"), new_lec);
+    // SHALLOW COPY SUBSET
+    KDBIdentities* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    kdb_subset_shallow_copy->update("AOUC", new_lec);
+    EXPECT_EQ(kdb_global.get_lec("AOUC"), new_lec);
+    EXPECT_EQ(kdb_subset_shallow_copy->get_lec("AOUC"), new_lec);
 }
 
 TEST_F(KDBIdentitiesTest, Save)
 {
     // save in binary format
-    save_global_kdb(I_IDENTITIES, output_test_dir + "fun.idt");
     Identities.save(output_test_dir + "fun.idt");
 
     // save in ascii format
-    save_global_kdb(I_IDENTITIES, output_test_dir + "fun.ai");
     Identities.save(output_test_dir + "fun.ai");
 }
 
@@ -147,7 +145,7 @@ TEST_F(KDBIdentitiesTest, CreateRemove)
     std::string lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
 
     Identities.remove(name);
-    EXPECT_THROW(Identities.get(name), IodeExceptionFunction);
+    EXPECT_THROW(Identities.get(name), std::invalid_argument);
 
     Identities.add(name, lec);
     EXPECT_EQ(Identities.get_lec(name), lec);
@@ -194,7 +192,7 @@ TEST_F(KDBIdentitiesTest, Filter)
 {
     std::string pattern = "A*;*_";
     std::vector<std::string> expected_names;
-    KDBIdentities* local_kdb;
+    KDBIdentities* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Identities.count(); p++) all_names.push_back(Identities.get_name(p));
@@ -213,50 +211,50 @@ TEST_F(KDBIdentitiesTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBIdentities(KDB_SHALLOW_COPY, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Identities.subset(pattern);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
     std::string name = "AOUC";
     std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
-    local_kdb->update(name, modified_lec);
-    EXPECT_EQ(local_kdb->get_lec(name), modified_lec);
+    kdb_subset->update(name, modified_lec);
+    EXPECT_EQ(kdb_subset->get_lec(name), modified_lec);
     EXPECT_EQ(Identities.get_lec(name), modified_lec);
 
     // add an element to the local KDB and check if it has also 
     // been added to the global KDB
     std::string new_name = "NEW_IDENTITY";
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
-    local_kdb->add(new_name, new_lec);
-    EXPECT_EQ(local_kdb->get_lec(new_name), new_lec);
+    kdb_subset->add(new_name, new_lec);
+    EXPECT_EQ(kdb_subset->get_lec(new_name), new_lec);
     EXPECT_EQ(Identities.get_lec(new_name), new_lec);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "IDENTITY_NEW";
-    local_kdb->rename(old_name, new_name);
-    EXPECT_EQ(local_kdb->get_lec(new_name), new_lec);
+    kdb_subset->rename(old_name, new_name);
+    EXPECT_EQ(kdb_subset->get_lec(new_name), new_lec);
     EXPECT_EQ(Identities.get_lec(new_name), new_lec);
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
-    local_kdb->remove(new_name);
-    EXPECT_FALSE(local_kdb->contains(new_name));
+    kdb_subset->remove(new_name);
+    EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Identities.contains(new_name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Identities.count(), nb_total_comments);
     EXPECT_EQ(Identities.get_lec(name), modified_lec);
 }
 
-TEST_F(KDBIdentitiesTest, HardCopy)
+TEST_F(KDBIdentitiesTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
     std::vector<std::string> expected_names;
-    KDBIdentities* local_kdb;
+    KDBIdentities* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Identities.count(); p++) all_names.push_back(Identities.get_name(p));
@@ -275,44 +273,44 @@ TEST_F(KDBIdentitiesTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBIdentities(KDB_LOCAL, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Identities.subset(pattern, true);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "AOUC";
     std::string lec = Identities.get_lec(name);
     std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
-    local_kdb->update(name, modified_lec);
-    EXPECT_EQ(local_kdb->get_lec(name), modified_lec);
+    kdb_subset->update(name, modified_lec);
+    EXPECT_EQ(kdb_subset->get_lec(name), modified_lec);
     EXPECT_EQ(Identities.get_lec(name), lec);
 
     // add an element to the local KDB and check if it has not 
     // been added to the global KDB
     std::string new_name = "NEW_IDENTITY";
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
-    local_kdb->add(new_name, new_lec);
-    EXPECT_TRUE(local_kdb->contains(new_name));
-    EXPECT_EQ(local_kdb->get_lec(new_name), new_lec);
+    kdb_subset->add(new_name, new_lec);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
+    EXPECT_EQ(kdb_subset->get_lec(new_name), new_lec);
     EXPECT_FALSE(Identities.contains(new_name));
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
     std::string old_name = "AOUC_";
     new_name = "IDENTITY_NEW";
-    local_kdb->rename(old_name, new_name);
-    EXPECT_TRUE(local_kdb->contains(new_name));
+    kdb_subset->rename(old_name, new_name);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Identities.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
     // been deleted from the global KDB
     name = "GAP_";
-    local_kdb->remove(name);
-    EXPECT_FALSE(local_kdb->contains(name));
+    kdb_subset->remove(name);
+    EXPECT_FALSE(kdb_subset->contains(name));
     EXPECT_TRUE(Identities.contains(name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Identities.count(), nb_total_comments);
 }
 
@@ -326,8 +324,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     // GAP_ "100*((QAF_/Q_F)-1)"
     std::string identities_list = "GAP2;GAP_";
 
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
-    KDBVariables kdb_var;
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     std::string period;
     Variable expected_gap2;
@@ -381,34 +378,34 @@ TEST_F(KDBIdentitiesTest, Merge)
 {
     std::string pattern = "A*";
 
-    // create hard copies kdb
-    KDBIdentities kdb0(KDB_LOCAL, pattern);
-    KDBIdentities kdb1(KDB_LOCAL, pattern);
-    KDBIdentities kdb_to_merge(KDB_LOCAL, pattern);
+    // create deep copies kdb
+    KDBIdentities* kdb0 = Identities.subset(pattern, true);
+    KDBIdentities* kdb1 = Identities.subset(pattern, true);
+    KDBIdentities* kdb_to_merge = Identities.subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_IDENTITY";
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
-    kdb_to_merge.add(new_name, new_lec);
+    kdb_to_merge->add(new_name, new_lec);
 
     // modify an existing element of the KDB to be merge
     std::string name = "AOUC";
-    std::string unmodified_lec = kdb_to_merge.get_lec(name);
+    std::string unmodified_lec = kdb_to_merge->get_lec(name);
     std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
-    kdb_to_merge.update(name, modified_lec);
+    kdb_to_merge->update(name, modified_lec);
 
     // merge (overwrite)
-    kdb0.merge(kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true);
     // a) check kdb0 contains new item of KDB to be merged
-    EXPECT_TRUE(kdb0.contains(new_name));
-    EXPECT_EQ(kdb0.get_lec(new_name), new_lec);
+    EXPECT_TRUE(kdb0->contains(new_name));
+    EXPECT_EQ(kdb0->get_lec(new_name), new_lec);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0.get_lec(name), modified_lec); 
+    EXPECT_EQ(kdb0->get_lec(name), modified_lec); 
 
     // merge (NOT overwrite)
-    kdb1.merge(kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1.get_lec(name), unmodified_lec);
+    EXPECT_EQ(kdb1->get_lec(name), unmodified_lec);
 }
 
 TEST_F(KDBIdentitiesTest, AssociatedObjs)
@@ -416,12 +413,13 @@ TEST_F(KDBIdentitiesTest, AssociatedObjs)
     std::string name = "RENT";
     std::vector<std::string> objs_list;
 
-    load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
-    load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
-    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
+    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
+    KDBLists kdb_lst(input_test_dir + "fun.lst");
+    KDBScalars kdb_scl(input_test_dir + "fun.scl");
+    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     objs_list = Identities.get_associated_objects_list(name, I_COMMENTS);
     EXPECT_EQ(objs_list.size(), 0);

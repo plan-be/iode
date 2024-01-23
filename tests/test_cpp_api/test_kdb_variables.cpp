@@ -11,7 +11,7 @@ protected:
 
     void SetUp() override
     {
-        load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+        KDBVariables kdb_var(input_test_dir + "fun.var");
     }
 
     // void TearDown() override {}
@@ -24,12 +24,13 @@ class KDBVariablesEmptyTest : public KDBTest, public ::testing::Test
 
 TEST_F(KDBVariablesTest, Load)
 {
-    Variables.load(input_test_dir + "fun.var");
-    EXPECT_EQ(Variables.count(), 394);
+    KDBVariables kdb(input_test_dir + "fun.var");
+    EXPECT_EQ(kdb.count(), 394);
 }
 
-TEST_F(KDBVariablesTest, CopyConstructor)
+TEST_F(KDBVariablesTest, Subset)
 {
+    std::string pattern = "A*";
     Variable var = Variables.get("ACAF");
     std::string lec = "10 + t";
     Variable new_var;
@@ -37,37 +38,34 @@ TEST_F(KDBVariablesTest, CopyConstructor)
     for (int p = 0; p < var.size(); p++) new_var.push_back(10.0 + p);
 
     // GLOBAL KDB
-    KDBVariables kdb_copy(Variables);
-    EXPECT_EQ(kdb_copy.count(), 394);
-    EXPECT_TRUE(kdb_copy.is_global_kdb());
+    KDBVariables kdb_global;
+    EXPECT_EQ(kdb_global.count(), 394);
+    EXPECT_TRUE(kdb_global.is_global_database());
 
-    // LOCAL KDB
-    KDBVariables local_kdb(KDB_LOCAL, "A*");
-    KDBVariables local_kdb_hard_copy(local_kdb);
-    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
-    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
-    local_kdb_hard_copy.update("ACAF", lec);
-    EXPECT_EQ(local_kdb.get("ACAF"), var);
-    EXPECT_EQ(local_kdb_hard_copy.get("ACAF"), new_var);
+    // DEEP COPY SUBSET
+    KDBVariables* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
+    std::vector<std::string> names = kdb_global.get_names(pattern);
+    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    kdb_subset_deep_copy->update("ACAF", lec);
+    EXPECT_EQ(kdb_global.get("ACAF"), var);
+    EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), new_var);
 
-    // SHALLOW COPY KDB
-    KDBVariables shallow_kdb(KDB_SHALLOW_COPY, "A*");
-    KDBVariables shallow_kdb_copy(shallow_kdb);
-    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
-    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
-    shallow_kdb_copy.update("ACAF", lec);
-    EXPECT_EQ(shallow_kdb.get("ACAF"), new_var);
-    EXPECT_EQ(shallow_kdb_copy.get("ACAF"), new_var);
+    // SHALLOW COPY SUBSET
+    KDBVariables* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    kdb_subset_shallow_copy->update("ACAF", lec);
+    EXPECT_EQ(kdb_global.get("ACAF"), new_var);
+    EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), new_var);
 }
 
 TEST_F(KDBVariablesTest, Save)
 {
     // save in binary format
-    save_global_kdb(I_VARIABLES, output_test_dir + "fun.var");
     Variables.save(output_test_dir + "fun.var");
 
     // save in ascii format
-    save_global_kdb(I_VARIABLES, output_test_dir + "fun.av");
     Variables.save(output_test_dir + "fun.av");
 }
 
@@ -267,10 +265,10 @@ TEST_F(KDBVariablesTest, CreateRemove)
 
     // --- already existing name
     std::fill(new_var.begin(), new_var.end(), 1);
-    EXPECT_THROW(Variables.add(new_name, new_var), IodeExceptionInitialization);
+    EXPECT_THROW(Variables.add(new_name, new_var), std::invalid_argument);
 
     Variables.remove(new_name);
-    EXPECT_THROW(Variables.get(new_name), IodeExceptionFunction);
+    EXPECT_THROW(Variables.get(new_name), std::invalid_argument);
 
     // --- wrong vector size
     new_var.pop_back();
@@ -422,7 +420,7 @@ TEST_F(KDBVariablesTest, Filter)
 {
     std::string pattern = "A*;*_";
     std::vector<std::string> expected_names;
-    KDBVariables* local_kdb;
+    KDBVariables* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Variables.count(); p++) all_names.push_back(Variables.get_name(p));
@@ -441,8 +439,8 @@ TEST_F(KDBVariablesTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBVariables(KDB_SHALLOW_COPY, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Variables.subset(pattern);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -452,8 +450,8 @@ TEST_F(KDBVariablesTest, Filter)
     Variable updated_var;
     updated_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++) updated_var.push_back(10. + p);
-    local_kdb->update(name, lec);
-    EXPECT_EQ(local_kdb->get(name), updated_var);
+    kdb_subset->update(name, lec);
+    EXPECT_EQ(kdb_subset->get(name), updated_var);
     EXPECT_EQ(Variables.get(name), updated_var);
 
     // add an element to the local KDB and check if it has also 
@@ -462,35 +460,35 @@ TEST_F(KDBVariablesTest, Filter)
     Variable new_var;
     new_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++) new_var.push_back(10. + p);
-    local_kdb->add(new_name, new_var);
-    EXPECT_EQ(local_kdb->get(new_name), new_var);
+    kdb_subset->add(new_name, new_var);
+    EXPECT_EQ(kdb_subset->get(new_name), new_var);
     EXPECT_EQ(Variables.get(new_name), new_var);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "VARIABLE_NEW";
-    local_kdb->rename(old_name, new_name);
-    EXPECT_EQ(local_kdb->get(new_name), new_var);
+    kdb_subset->rename(old_name, new_name);
+    EXPECT_EQ(kdb_subset->get(new_name), new_var);
     EXPECT_EQ(Variables.get(new_name), new_var);
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
-    local_kdb->remove(new_name);
-    EXPECT_FALSE(local_kdb->contains(new_name));
+    kdb_subset->remove(new_name);
+    EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Variables.contains(new_name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Variables.count(), nb_total_comments);
     EXPECT_EQ(Variables.get(name), updated_var);
 }
 
-TEST_F(KDBVariablesTest, HardCopy)
+TEST_F(KDBVariablesTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
     std::vector<std::string> expected_names;
-    KDBVariables* local_kdb;
+    KDBVariables* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Variables.count(); p++) all_names.push_back(Variables.get_name(p));
@@ -509,8 +507,8 @@ TEST_F(KDBVariablesTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBVariables(KDB_LOCAL, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Variables.subset(pattern, true);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
@@ -521,8 +519,8 @@ TEST_F(KDBVariablesTest, HardCopy)
     Variable updated_var;
     updated_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++) updated_var.push_back(10. + p);
-    local_kdb->update(name, lec);
-    EXPECT_EQ(local_kdb->get(name), updated_var);
+    kdb_subset->update(name, lec);
+    EXPECT_EQ(kdb_subset->get(name), updated_var);
     EXPECT_EQ(Variables.get(name), var);
 
     // add an element to the local KDB and check if it has not 
@@ -531,28 +529,28 @@ TEST_F(KDBVariablesTest, HardCopy)
     Variable new_var;
     new_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++) new_var.push_back(10. + p);
-    local_kdb->add(new_name, new_var);
-    EXPECT_TRUE(local_kdb->contains(new_name));
-    EXPECT_EQ(local_kdb->get(new_name), new_var);
+    kdb_subset->add(new_name, new_var);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
+    EXPECT_EQ(kdb_subset->get(new_name), new_var);
     EXPECT_FALSE(Variables.contains(new_name));
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
     name = "ACAG";
     new_name = "VARIABLE_NEW";
-    local_kdb->rename(name, new_name);
-    EXPECT_TRUE(local_kdb->contains(new_name));
+    kdb_subset->rename(name, new_name);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Variables.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
     // been deleted from the global KDB
     name = "AOUC";
-    local_kdb->remove(name);
-    EXPECT_FALSE(local_kdb->contains(name));
+    kdb_subset->remove(name);
+    EXPECT_FALSE(kdb_subset->contains(name));
     EXPECT_TRUE(Variables.contains(name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Variables.count(), nb_total_comments);
 }
 
@@ -560,41 +558,41 @@ TEST_F(KDBVariablesTest, Merge)
 {
     std::string pattern = "A*";
 
-    // create hard copies kdb
-    KDBVariables kdb0(KDB_LOCAL, pattern);
-    KDBVariables kdb1(KDB_LOCAL, pattern);
-    KDBVariables kdb_to_merge(KDB_LOCAL, pattern);
+    // create deep copies kdb
+    KDBVariables* kdb0 = Variables.subset(pattern, true);
+    KDBVariables* kdb1 = Variables.subset(pattern, true);
+    KDBVariables* kdb_to_merge = Variables.subset(pattern, true);
 
-    int nb_periods = kdb_to_merge.get_nb_periods();
+    int nb_periods = kdb_to_merge->get_nb_periods();
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_VARIABLE";
     Variable new_var;
     new_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++) new_var.push_back(10. + p);
-    kdb_to_merge.add(new_name, new_var);
+    kdb_to_merge->add(new_name, new_var);
 
     // modify an existing element of the KDB to be merge
     std::string name = "ACAF";
-    Variable unmodified_var = kdb_to_merge.get(name);
+    Variable unmodified_var = kdb_to_merge->get(name);
     std::string lec = "10 + t";
     Variable modified_var;
     modified_var.reserve(nb_periods);
     for (int p = 0; p < nb_periods; p++) modified_var.push_back(10. + p);
-    kdb_to_merge.update(name, lec);
+    kdb_to_merge->update(name, lec);
 
     // merge (overwrite)
-    kdb0.merge(kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true);
     // a) check kdb0 contains new item of KDB to be merged
-    EXPECT_TRUE(kdb0.contains(new_name));
-    EXPECT_EQ(kdb0.get(new_name), new_var);
+    EXPECT_TRUE(kdb0->contains(new_name));
+    EXPECT_EQ(kdb0->get(new_name), new_var);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0.get(name), modified_var); 
+    EXPECT_EQ(kdb0->get(name), modified_var); 
 
     // merge (NOT overwrite)
-    kdb1.merge(kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1.get(name), unmodified_var);
+    EXPECT_EQ(kdb1->get(name), unmodified_var);
 }
 
 TEST_F(KDBVariablesTest, AssociatedObjs)
@@ -602,12 +600,13 @@ TEST_F(KDBVariablesTest, AssociatedObjs)
     std::string name = "AOUC";
     std::vector<std::string> objs_list;
 
-    load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
-    load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-    load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
-    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
-    load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
+    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
+    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
+    KDBLists kdb_lst(input_test_dir + "fun.lst");
+    KDBScalars kdb_scl(input_test_dir + "fun.scl");
+    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     std::vector<std::string> expected_cmts = { name };
     objs_list = Variables.get_associated_objects_list(name, I_COMMENTS);

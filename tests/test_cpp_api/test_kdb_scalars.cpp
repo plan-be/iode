@@ -6,7 +6,7 @@ class KDBScalarsTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
+        KDBScalars kdb_scl(input_test_dir + "fun.scl");
     }
 
     // void TearDown() override {}
@@ -15,12 +15,13 @@ protected:
 
 TEST_F(KDBScalarsTest, Load)
 {
-    Scalars.load(input_test_dir + "fun.scl");
-    EXPECT_EQ(Scalars.count(), 161);
+    KDBScalars kdb(input_test_dir + "fun.scl");
+    EXPECT_EQ(kdb.count(), 161);
 }
 
-TEST_F(KDBScalarsTest, CopyConstructor)
+TEST_F(KDBScalarsTest, Subset)
 {
+    std::string pattern = "a*";
     Scalar scalar = Scalars.get("acaf1");
     IODE_REAL value = 0.0158;
     IODE_REAL relax = 0.98;
@@ -28,37 +29,34 @@ TEST_F(KDBScalarsTest, CopyConstructor)
     Scalar new_scalar(value, relax, std);
 
     // GLOBAL KDB
-    KDBScalars kdb_copy(Scalars);
-    EXPECT_EQ(kdb_copy.count(), 161);
-    EXPECT_TRUE(kdb_copy.is_global_kdb());
+    KDBScalars kdb_global;
+    EXPECT_EQ(kdb_global.count(), 161);
+    EXPECT_TRUE(kdb_global.is_global_database());
 
-    // LOCAL KDB
-    KDBScalars local_kdb(KDB_LOCAL, "a*");
-    KDBScalars local_kdb_hard_copy(local_kdb);
-    EXPECT_EQ(local_kdb.count(), local_kdb_hard_copy.count());
-    EXPECT_TRUE(local_kdb_hard_copy.is_local_kdb());
-    local_kdb_hard_copy.update("acaf1", value, relax, std);
-    EXPECT_EQ(local_kdb.get("acaf1"), scalar);
-    EXPECT_EQ(local_kdb_hard_copy.get("acaf1"), new_scalar);
+    // DEEP COPY SUBSET
+    KDBScalars* kdb_subset_deep_copy = kdb_global.subset(pattern, true);
+    std::vector<std::string> names = kdb_global.get_names(pattern);
+    EXPECT_EQ(kdb_subset_deep_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    kdb_subset_deep_copy->update("acaf1", value, relax, std);
+    EXPECT_EQ(kdb_global.get("acaf1"), scalar);
+    EXPECT_EQ(kdb_subset_deep_copy->get("acaf1"), new_scalar);
 
-    // SHALLOW COPY KDB
-    KDBScalars shallow_kdb(KDB_SHALLOW_COPY, "a*");
-    KDBScalars shallow_kdb_copy(shallow_kdb);
-    EXPECT_EQ(shallow_kdb.count(), shallow_kdb_copy.count());
-    EXPECT_TRUE(shallow_kdb_copy.is_shallow_copy());
-    shallow_kdb_copy.update("acaf1", value, relax, std);
-    EXPECT_EQ(shallow_kdb.get("acaf1"), new_scalar);
-    EXPECT_EQ(shallow_kdb_copy.get("acaf1"), new_scalar);
+    // SHALLOW COPY SUBSET
+    KDBScalars* kdb_subset_shallow_copy = kdb_global.subset(pattern, false);
+    EXPECT_EQ(kdb_subset_shallow_copy->count(), names.size());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    kdb_subset_shallow_copy->update("acaf1", value, relax, std);
+    EXPECT_EQ(kdb_global.get("acaf1"), new_scalar);
+    EXPECT_EQ(kdb_subset_shallow_copy->get("acaf1"), new_scalar);
 }
 
 TEST_F(KDBScalarsTest, Save)
 {
     // save in binary format
-    save_global_kdb(I_SCALARS, output_test_dir + "fun.scl");
     Scalars.save(output_test_dir + "fun.scl");
 
     // save in ascii format
-    save_global_kdb(I_SCALARS, output_test_dir + "fun.as");
     Scalars.save(output_test_dir + "fun.as");
 }
 
@@ -98,7 +96,7 @@ TEST_F(KDBScalarsTest, CreateRemove)
     EXPECT_TRUE(new_scalar.std < 1e-100);
 
     Scalars.remove(name);
-    EXPECT_THROW(Scalars.get(name), IodeExceptionFunction);
+    EXPECT_THROW(Scalars.get(name), std::invalid_argument);
 }
 
 TEST_F(KDBScalarsTest, Update)
@@ -130,7 +128,7 @@ TEST_F(KDBScalarsTest, Filter)
 {
     std::string pattern = "a*;*_";
     std::vector<std::string> expected_names;
-    KDBScalars* local_kdb;
+    KDBScalars* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Scalars.count(); p++) all_names.push_back(Scalars.get_name(p));
@@ -149,8 +147,8 @@ TEST_F(KDBScalarsTest, Filter)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBScalars(KDB_SHALLOW_COPY, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Scalars.subset(pattern);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -159,8 +157,8 @@ TEST_F(KDBScalarsTest, Filter)
     IODE_REAL updated_relax = 0.98;
     IODE_REAL updated_std = 0.0;
     Scalar expected_updated_scalar(updated_value, updated_relax, updated_std);
-    local_kdb->update(name, updated_value, updated_relax, updated_std);
-    Scalar updated_scalar_local = local_kdb->get(name);
+    kdb_subset->update(name, updated_value, updated_relax, updated_std);
+    Scalar updated_scalar_local = kdb_subset->get(name);
     EXPECT_EQ(updated_scalar_local, expected_updated_scalar);
     Scalar updated_scalar_global = Scalars.get(name);
     EXPECT_EQ(updated_scalar_global, expected_updated_scalar);
@@ -172,8 +170,8 @@ TEST_F(KDBScalarsTest, Filter)
     IODE_REAL relax = 1.0;
     IODE_REAL std = 0.0;
     Scalar expected_new_scalar(value, relax, std);
-    local_kdb->add(new_name, value, relax, std);
-    Scalar new_scalar_local = local_kdb->get(new_name);
+    kdb_subset->add(new_name, value, relax, std);
+    Scalar new_scalar_local = kdb_subset->get(new_name);
     EXPECT_EQ(new_scalar_local, expected_new_scalar);
     Scalar new_scalar_global = Scalars.get(new_name);
     EXPECT_EQ(new_scalar_global, expected_new_scalar);
@@ -183,30 +181,30 @@ TEST_F(KDBScalarsTest, Filter)
     std::string old_name = new_name;
     Scalar old_scalar(old_name);
     new_name = "scalar_new";
-    local_kdb->rename(old_name, new_name);
-    new_scalar_local = local_kdb->get(new_name);
+    kdb_subset->rename(old_name, new_name);
+    new_scalar_local = kdb_subset->get(new_name);
     EXPECT_EQ(new_scalar_local, old_scalar);
     new_scalar_global = Scalars.get(new_name);
     EXPECT_EQ(new_scalar_global, old_scalar);
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
-    local_kdb->remove(new_name);
-    EXPECT_FALSE(local_kdb->contains(new_name));
+    kdb_subset->remove(new_name);
+    EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Scalars.contains(new_name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Scalars.count(), nb_total_comments);
     updated_scalar_global = Scalars.get(name);
     EXPECT_EQ(updated_scalar_global, expected_updated_scalar);
 }
 
-TEST_F(KDBScalarsTest, HardCopy)
+TEST_F(KDBScalarsTest, DeepCopy)
 {
     std::string pattern = "a*;*_";
     std::vector<std::string> expected_names;
-    KDBScalars* local_kdb;
+    KDBScalars* kdb_subset;
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Scalars.count(); p++) all_names.push_back(Scalars.get_name(p));
@@ -225,8 +223,8 @@ TEST_F(KDBScalarsTest, HardCopy)
     expected_names.resize(std::distance(expected_names.begin(), it));
 
     // create local kdb
-    local_kdb = new KDBScalars(KDB_LOCAL, pattern);
-    EXPECT_EQ(local_kdb->count(), expected_names.size());
+    kdb_subset = Scalars.subset(pattern, true);
+    EXPECT_EQ(kdb_subset->count(), expected_names.size());
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
@@ -240,8 +238,8 @@ TEST_F(KDBScalarsTest, HardCopy)
     IODE_REAL updated_relax = 0.98;
     IODE_REAL updated_std = 0.0;
     Scalar expected_updated_scalar(updated_value, updated_relax, updated_std);
-    local_kdb->update(name, updated_value, updated_relax, updated_std);
-    Scalar updated_scalar_local = local_kdb->get(name);
+    kdb_subset->update(name, updated_value, updated_relax, updated_std);
+    Scalar updated_scalar_local = kdb_subset->get(name);
     EXPECT_EQ(updated_scalar_local, expected_updated_scalar);
     Scalar scalar_global = Scalars.get(name); 
     EXPECT_EQ(scalar_global, expected_scalar);
@@ -253,9 +251,9 @@ TEST_F(KDBScalarsTest, HardCopy)
     relax = 1.0;
     std = 0.0;
     Scalar expected_new_scalar(value, relax, std);
-    local_kdb->add(new_name, value, relax, std);
-    EXPECT_TRUE(local_kdb->contains(new_name));
-    Scalar new_scalar_local = local_kdb->get(new_name);
+    kdb_subset->add(new_name, value, relax, std);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
+    Scalar new_scalar_local = kdb_subset->get(new_name);
     EXPECT_EQ(new_scalar_local, expected_new_scalar);
     EXPECT_FALSE(Scalars.contains(new_name));
 
@@ -264,21 +262,21 @@ TEST_F(KDBScalarsTest, HardCopy)
     name = "acaf2";
     Scalar old_scalar(name);
     new_name = "scalar_new";
-    local_kdb->rename(name, new_name);
-    EXPECT_TRUE(local_kdb->contains(new_name));
-    new_scalar_local = local_kdb->get(new_name);
+    kdb_subset->rename(name, new_name);
+    EXPECT_TRUE(kdb_subset->contains(new_name));
+    new_scalar_local = kdb_subset->get(new_name);
     EXPECT_EQ(new_scalar_local, old_scalar);
     EXPECT_FALSE(Scalars.contains(new_name));
 
     // delete an element from the local KDB and check if it has not 
     // been deleted from the global KDB
     name = "acaf3";
-    local_kdb->remove(name);
-    EXPECT_FALSE(local_kdb->contains(name));
+    kdb_subset->remove(name);
+    EXPECT_FALSE(kdb_subset->contains(name));
     EXPECT_TRUE(Scalars.contains(name));
 
     // delete local kdb
-    delete local_kdb;
+    delete kdb_subset;
     EXPECT_EQ(Scalars.count(), nb_total_comments);
 }
 
@@ -286,10 +284,10 @@ TEST_F(KDBScalarsTest, Merge)
 {
     std::string pattern = "A*";
 
-    // create hard copies kdb
-    KDBScalars kdb0(KDB_LOCAL, pattern);
-    KDBScalars kdb1(KDB_LOCAL, pattern);
-    KDBScalars kdb_to_merge(KDB_LOCAL, pattern);
+    // create deep copies kdb
+    KDBScalars* kdb0 = Scalars.subset(pattern, true);
+    KDBScalars* kdb1 = Scalars.subset(pattern, true);
+    KDBScalars* kdb_to_merge = Scalars.subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "new_scalar";
@@ -297,29 +295,29 @@ TEST_F(KDBScalarsTest, Merge)
     IODE_REAL relax = 1.0;
     IODE_REAL std = 0.0;
     Scalar new_scalar(value, relax, std);
-    kdb_to_merge.add(new_name, value, relax, std);
+    kdb_to_merge->add(new_name, value, relax, std);
 
     // modify an existing element of the KDB to be merge
     std::string name = "acaf1";
-    Scalar unmodified_scalar = kdb_to_merge.get(name);
+    Scalar unmodified_scalar = kdb_to_merge->get(name);
     IODE_REAL updated_value = 0.0158;
     IODE_REAL updated_relax = 0.98;
     IODE_REAL updated_std = 0.0;
     Scalar modified_scalar(updated_value, updated_relax, updated_std);
-    kdb_to_merge.update(name, updated_value, updated_relax, updated_std);
+    kdb_to_merge->update(name, updated_value, updated_relax, updated_std);
 
     // merge (overwrite)
-    kdb0.merge(kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true);
     // a) check kdb0 contains new item of KDB to be merged
-    EXPECT_TRUE(kdb0.contains(new_name));
-    EXPECT_EQ(kdb0.get(new_name), new_scalar);
+    EXPECT_TRUE(kdb0->contains(new_name));
+    EXPECT_EQ(kdb0->get(new_name), new_scalar);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0.get(name), modified_scalar); 
+    EXPECT_EQ(kdb0->get(name), modified_scalar); 
 
     // merge (NOT overwrite)
-    kdb1.merge(kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1.get(name), unmodified_scalar);
+    EXPECT_EQ(kdb1->get(name), unmodified_scalar);
 }
 
 TEST_F(KDBScalarsTest, AssociatedObjs)
@@ -327,12 +325,13 @@ TEST_F(KDBScalarsTest, AssociatedObjs)
     std::string name = "gamma";
     std::vector<std::string> objs_list;
 
-    load_global_kdb(I_COMMENTS, input_test_dir + "fun.cmt");
-    load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-    load_global_kdb(I_IDENTITIES, input_test_dir + "fun.idt");
-    load_global_kdb(I_LISTS, input_test_dir + "fun.lst");
-    load_global_kdb(I_TABLES, input_test_dir + "fun.tbl");
-    load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
+    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
+    KDBLists kdb_lst(input_test_dir + "fun.lst");
+    KDBScalars kdb_scl(input_test_dir + "fun.scl");
+    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
+    KDBVariables kdb_var(input_test_dir + "fun.var");
 
     objs_list = Scalars.get_associated_objects_list(name, I_COMMENTS);
     EXPECT_EQ(objs_list.size(), 0);

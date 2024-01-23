@@ -11,9 +11,9 @@ protected:
 
     void SetUp() override
     {
-        load_global_kdb(I_EQUATIONS, input_test_dir + "fun.eqs");
-        load_global_kdb(I_SCALARS, input_test_dir + "fun.scl");
-        load_global_kdb(I_VARIABLES, input_test_dir + "fun.var");
+        KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+        KDBScalars kdb_scl(input_test_dir + "fun.scl");
+        KDBVariables kdb_var(input_test_dir + "fun.var");
 
         from = "2000Y1";
         to = "2002Y1";
