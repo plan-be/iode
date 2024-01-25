@@ -107,7 +107,7 @@ void Syntax()
 
 #endif
 
-// Fonctions annulées/remplacées temporairement pour passer le link
+// Fonctions annulï¿½es/remplacï¿½es temporairement pour passer le link
 
 // Pour tester l'estimation
 //#ifdef __cplusplus
@@ -665,8 +665,123 @@ void Tests_OBJECTS()
    
 }    
 
+/**
+ *  Checks:
+ *      - K_add() vs KTVAL() 
+ */    
+void Tests_TBL_ADD_GET()
+{
+    TBL     *tbl, *extracted_tbl;
+    TCELL   *cells_0;
+    TCELL   *cells_1;
+    TLINE   *line_0;
+    TLINE   *line_1;
+
+    int     nb_columns = 2;
+    char    *def = "A title";
+    char    *vars = "GOSG,YDTG,DTH,DTF,IT,YSSG+COTRES,RIDG,OCUG"; // Note that semi-colon are not accepted by B_ainit_chk() (see b_args.c)
+    char    **lecs;
+    char    *name;
+    char    *cell_cont_0;
+    char    *cell_cont_1;
+    int     mode = 1;
+    int     files = 1;
+    int     date = 1;
+    int     pos, i, j;
+
+    U_test_print_title("Tests TBL: compare KTVAL() and T_create() results");
+
+    // --- create a C struct TBL via T_auto()
+    lecs = B_ainit_chk(vars, NULL, 0);
+    tbl = T_create(nb_columns);
+	T_auto(tbl, def, lecs, mode, files, date);
+	SCR_free_tbl((unsigned char**) lecs);
+
+    // --- add the table to the Tables KDB
+    name = "c_table";
+    K_add(KT_WS, name, tbl);
+
+    // --- extract the table from the Table KDB
+    pos = K_find(KT_WS, name);
+    extracted_tbl = KTVAL(KT_WS, pos);
 
 
+    // --- check that both table are exactly the same
+    // ----- check all attributes that are not of type TLINE 
+    S4ASSERT(tbl->t_lang    == extracted_tbl->t_lang   , "Comparing t_lang   ");
+    S4ASSERT(tbl->t_free    == extracted_tbl->t_free   , "Comparing t_free   ");
+    S4ASSERT(tbl->t_nc      == extracted_tbl->t_nc     , "Comparing t_nc     ");
+    S4ASSERT(tbl->t_nl      == extracted_tbl->t_nl     , "Comparing t_nl     ");
+    S4ASSERT(tbl->t_zmin    == extracted_tbl->t_zmin   , "Comparing t_zmin   ");
+    S4ASSERT(tbl->t_zmax    == extracted_tbl->t_zmax   , "Comparing t_zmax   ");
+    S4ASSERT(tbl->t_ymin    == extracted_tbl->t_ymin   , "Comparing t_ymin   ");
+    S4ASSERT(tbl->t_ymax    == extracted_tbl->t_ymax   , "Comparing t_ymax   ");
+    S4ASSERT(tbl->t_attr    == extracted_tbl->t_attr   , "Comparing t_attr   ");
+    S4ASSERT(tbl->t_box     == extracted_tbl->t_box    , "Comparing t_box    ");
+    S4ASSERT(tbl->t_shadow  == extracted_tbl->t_shadow , "Comparing t_shadow ");
+    S4ASSERT(tbl->t_gridx   == extracted_tbl->t_gridx  , "Comparing t_gridx  ");
+    S4ASSERT(tbl->t_gridy   == extracted_tbl->t_gridy  , "Comparing t_gridy  ");
+    S4ASSERT(tbl->t_axis    == extracted_tbl->t_axis   , "Comparing t_axis   ");
+    S4ASSERT(tbl->t_align   == extracted_tbl->t_align  , "Comparing t_align  ");
+
+    // ----- check div line 
+    S4ASSERT(tbl->t_div.tl_type  == extracted_tbl->t_div.tl_type    , "Comparing t_div.tl_type ");
+    S4ASSERT(tbl->t_div.tl_graph == extracted_tbl->t_div.tl_graph   , "Comparing t_div.tl_graph");
+    S4ASSERT(tbl->t_div.tl_axis  == extracted_tbl->t_div.tl_axis    , "Comparing t_div.tl_axis ");
+    S4ASSERT(tbl->t_div.tl_pbyte == extracted_tbl->t_div.tl_pbyte   , "Comparing t_div.tl_pbyte");
+    cells_0 = (TCELL*) tbl->t_div.tl_val;
+    cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
+
+    for(j = 0; j < tbl->t_nc; j++)
+    {
+        S4ASSERT(cells_0[j].tc_type == cells_1[j].tc_type,  "Comparing div: cells_0[%d].tc_type == cells_1[%d].tc_type == %d", j, j, cells_1[j].tc_type);
+        S4ASSERT(cells_0[j].tc_attr == cells_1[j].tc_attr,  "Comparing div: cells_0[%d].tc_attr == cells_1[%d].tc_attr == %d", j, j, cells_1[j].tc_attr);
+    }
+
+    // ----- check all lines 
+    for(i = 0; i < tbl->t_nl; i++)
+    {
+        line_0 = tbl->t_line + i;
+        line_1 = extracted_tbl->t_line + i;
+
+        S4ASSERT(line_0->tl_type  == line_1->tl_type  , "line %d: line_0->tl_type  == line_1->tl_type  == %d", i, line_0->tl_type);
+        S4ASSERT(line_0->tl_graph == line_1->tl_graph , "line %d: line_0->tl_graph == line_1->tl_graph == %d", i, line_0->tl_graph);
+        S4ASSERT(line_0->tl_axis  == line_1->tl_axis  , "line %d: line_0->tl_axis  == line_1->tl_axis  == %d", i, line_0->tl_axis );
+        S4ASSERT(line_0->tl_pbyte == line_1->tl_pbyte , "line %d: line_0->tl_pbyte == line_1->tl_pbyte == %d", i, line_0->tl_pbyte);
+
+        cells_0 = (TCELL*) line_0->tl_val;
+        cells_1 = (TCELL*) line_1->tl_val;
+        switch (line_0->tl_type)
+        {
+          case KT_TITLE:
+            cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
+            cell_cont_1 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_1, 0));
+            S4ASSERT(U_cmp_strs(cell_cont_0, cell_cont_1), "line %d, KT_TITLE: cell contents == '%s'", i, cell_cont_1);
+            SCR_free(cell_cont_0);
+            SCR_free(cell_cont_1);
+            break;
+          case KT_CELL:
+            for(j = 0; j < tbl->t_nc; j++)
+            {
+                S4ASSERT(cells_0[j].tc_type == cells_1[j].tc_type, "line %d, col %d: tc_type == %d", i, j, cells_1[j].tc_type);
+                S4ASSERT(cells_0[j].tc_attr == cells_1[j].tc_attr, "line %d, col %d: tc_attr == %d", i, j, cells_1[j].tc_attr);
+                cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0, j));
+                cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1, j));
+                S4ASSERT(U_cmp_strs(cell_cont_0, cell_cont_1), "line %d, col %d: cell contents == '%s'", i, j, cell_cont_1);
+                SCR_free(cell_cont_0);
+                SCR_free(cell_cont_1);
+            }
+            break;
+          default:
+            S4ASSERT(cells_0 == NULL && cells_1 == NULL, "Other line: cells NULL by default");
+            break;
+        }
+    }
+
+    // --- free memory
+    T_free(tbl);
+    T_free(extracted_tbl);
+}
 
 /**
  *  Tests some LEC calculations.
@@ -686,7 +801,7 @@ void Tests_LEC()
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
-    //S4ASSERT(0, "Erreur forcée");
+    //S4ASSERT(0, "Erreur forcï¿½e");
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
     U_test_lec("LEC", "A[-1]",         2, A[1]);
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
@@ -1475,7 +1590,7 @@ void U_test_create_a_file(char* filename, int type)
     //  Create a file
     U_test_suppress_a2m_msgs();
     W_dest(filename, type); 
-    W_printf("This is a paragraph with accents: éàâêë\n"); // the current source file (test1.c) is ANSI coded
+    W_printf("This is a paragraph with accents: ï¿½ï¿½ï¿½ï¿½ï¿½\n"); // the current source file (test1.c) is ANSI coded
     W_close();
 }
 
@@ -1557,8 +1672,8 @@ void Tests_B_FSYS()
     //  Create toto.a2m -> ansi-coded file
     //sprintf(arg, "%s\\toto", IODE_OUTPUT_DIR);
     // U_test_create_a_file("toto", W_A2M); // Ansi-coded file 
-    // => Pb avec la conversion test_c_api => les fichiers diffèrent entre celui créé via test1.c
-    // et celui créé par test_c_api.cpp. Donc on va prendre une copie de data\toto.a2m
+    // => Pb avec la conversion test_c_api => les fichiers diffï¿½rent entre celui crï¿½ï¿½ via test1.c
+    // et celui crï¿½ï¿½ par test_c_api.cpp. Donc on va prendre une copie de data\toto.a2m
 
     // B_SysCopy(char* arg) : copy data\toto.a2m dans toto.a2m
     sprintf(arg, "%s\\toto.a2m toto.a2m", IODE_DATA_DIR);
