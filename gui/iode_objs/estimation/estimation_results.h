@@ -7,14 +7,15 @@
 #include <QVector>
 #include <QGridLayout>
 
+#include "utils.h"
+#include "wrapper_classes.h"
 #include "ui_estimation_results.h"
 #include "correlation_matrix_model.h"
 #include "tests_eqs_model.h"
-#include "utils.h"
-#include "wrapper_classes.h"
 #include "iode_objs/models/scalars_model.h"
 #include "plot/plot_vars.h"
 #include "main_window_abstract.h"
+#include "cpp_api/compute/estimation.h"
 
 
 class EstimationResultsDialog : public QDialog, public Ui::EstimationResultsDialog

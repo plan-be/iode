@@ -6,7 +6,7 @@ QVariant TablesModel::dataCell(const int row, const int col) const
 {
 	try
 	{
-		return QVariant(QString::fromStdString(kdb->get_title(row)));
+		return QVariant(QString::fromStdString(displayed_database->get_title(row)));
 	}
 	catch(const std::exception& e)
 	{
@@ -19,9 +19,9 @@ bool TablesModel::setValue(const int row, const int column, const QVariant& valu
 	try
 	{
 		QString title = value.toString();
-		Table table = kdb->get(row);
+		Table table = displayed_database->get(row);
 		table.set_title(0, title.toStdString());
-		kdb->update(row, table);
+		displayed_database->update(row, table);
 		return true;
 	}
 	catch(const std::exception& e)

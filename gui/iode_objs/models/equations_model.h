@@ -11,8 +11,8 @@ class EquationsModel : public IodeTemplateTableModel<KDBEquations>
 	Q_OBJECT
 
 public:
-	EquationsModel(QObject* parent = nullptr, KDBEquations* kdb_external = nullptr) 
-		: IodeTemplateTableModel({"Equation"}, parent, kdb_external) {};
+	EquationsModel(QObject* parent = nullptr, KDBEquations* database = nullptr) 
+		: IodeTemplateTableModel({"Equation"}, database, parent) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 

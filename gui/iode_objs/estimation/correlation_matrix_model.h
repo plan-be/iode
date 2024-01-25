@@ -8,9 +8,10 @@
 #include <QAbstractTableModel>
 
 #include "utils.h"
+#include "cpp_api/compute/estimation.h"
 
 
-/* NOTE FOR THE DEVELOPPERS:
+/* NOTE FOR THE DEVELOPERS:
  * Because of how Qt is implemented, it is NOT possible for a template class
  * to define/override signals and slots (using Q_OBJECT)
  * ( see https://doc.qt.io/qt-5/moc.html#limitations )

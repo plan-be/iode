@@ -8,6 +8,7 @@
 #include <QAbstractTableModel>
 
 #include "utils.h"
+#include "cpp_api/compute/estimation.h"
 
 
 class TestsEqsModel : public QAbstractTableModel

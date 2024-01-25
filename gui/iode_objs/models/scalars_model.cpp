@@ -8,7 +8,7 @@ QVariant ScalarsModel::dataCell(const int row, const int col) const
 
 	try
 	{
-		Scalar scalar = kdb->get(row);
+		Scalar scalar = displayed_database->get(row);
 
 		switch (col)
 		{
@@ -43,16 +43,16 @@ bool ScalarsModel::setValue(const int row, const int column, const QVariant& val
 {
 	try
 	{
-		Scalar scalar = kdb->get(row);
+		Scalar scalar = displayed_database->get(row);
 		double val = (value == "--") ? L_NAN : value.toDouble();
 
 		switch (column)
 		{
 		case 0:
-			kdb->update(row, val, scalar.relax);
+			displayed_database->update(row, val, scalar.relax);
 			break;
 		case 1:
-			kdb->update(row, scalar.val, val);
+			displayed_database->update(row, scalar.val, val);
 			break;
 		default:
 			break;

@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QShortcut>
 
 #include "ui_estimation_coefs.h"
 #include "utils.h"
@@ -24,7 +25,10 @@ public:
         QString stylesheet = "QHeaderView::section { background-color: lightGray; font: bold; border: 0.5px solid }";
         tableView_coefs->setStyleSheet(stylesheet);
 
-        ScalarsModel* scalarsModel = new ScalarsModel(this, edit_est_eqs->get_scalars());
+        // NOTE: make a copy of the estimation scalars database because the database 
+        //       passed to the constructor of ScalarsModel is deleted in its destructor 
+        KDBScalars* kdb_scl = edit_est_eqs->get_scalars()->subset("*");
+        ScalarsModel* scalarsModel = new ScalarsModel(this, kdb_scl);
         tableView_coefs->setModel(scalarsModel);
 
         fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
