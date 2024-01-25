@@ -315,31 +315,31 @@ public slots:
             {
             case I_COMMENTS:
                 tableView = new CommentsView(dialog);
-                tableView->setModel(new CommentsModel(dialog, new KDBComments(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new CommentsModel(dialog, Comments.subset(pattern)));
                 break;
             case I_EQUATIONS:
                 tableView = new EquationsView(dialog);
-                tableView->setModel(new EquationsModel(dialog, new KDBEquations(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new EquationsModel(dialog, Equations.subset(pattern)));
                 break;
             case I_IDENTITIES:
                 tableView = new IdentitiesView(dialog);
-                tableView->setModel(new IdentitiesModel(dialog, new KDBIdentities(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new IdentitiesModel(dialog, Identities.subset(pattern)));
                 break;
             case I_LISTS:
                 tableView = new ListsView(dialog);
-                tableView->setModel(new ListsModel(dialog, new KDBLists(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new ListsModel(dialog, Lists.subset(pattern)));
                 break;
             case I_SCALARS:
                 tableView = new ScalarsView(dialog);
-                tableView->setModel(new ScalarsModel(dialog, new KDBScalars(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new ScalarsModel(dialog, Scalars.subset(pattern)));
                 break;
             case I_TABLES:
                 tableView = new TablesView(dialog);
-                tableView->setModel(new TablesModel(dialog, new KDBTables(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new TablesModel(dialog, Tables.subset(pattern)));
                 break;
             case I_VARIABLES:
                 tableView = new VariablesView(dialog);
-                tableView->setModel(new VariablesModel(dialog, new KDBVariables(KDB_SHALLOW_COPY, pattern)));
+                tableView->setModel(new VariablesModel(dialog, Variables.subset(pattern)));
                 break;
             default:
                 break;

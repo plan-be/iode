@@ -80,7 +80,7 @@ void EstimationResultsDialog::plot_yobs_yest()
     // prepare local Variables KDB
     Variable values;
     Sample sample = edit_est_eqs->get_sample();
-    KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
+    KDBVariables* kdb_vars = Variables.subset("", true);
     kdb_vars->set_sample(sample.start_period(), sample.end_period());
 
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
@@ -116,7 +116,7 @@ void EstimationResultsDialog::plot_residual()
 
     // prepare local Variables KDB
     Sample sample = edit_est_eqs->get_sample();
-    KDBVariables* kdb_vars = new KDBVariables(KDB_LOCAL, "");
+    KDBVariables* kdb_vars = Variables.subset("", true);
     kdb_vars->set_sample(sample.start_period(), sample.end_period());
 
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
