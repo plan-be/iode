@@ -21,13 +21,10 @@ QVariant IodeTemplateTableModel<K>::headerData(int section, Qt::Orientation orie
 	if (orientation == Qt::Horizontal)
 		return columnNames[section];
 	else
-	{
-		if(!kdb)
-			return QVariant(" ");
-		
+	{	
 		try
 		{			
-			return QString::fromStdString(kdb->get_name(section));
+			return QString::fromStdString(displayed_database->get_name(section));
 		}
 		catch(const std::exception& e)
 		{
@@ -50,14 +47,11 @@ bool IodeTemplateTableModel<K>::setHeaderData(int section, Qt::Orientation orien
 	if(section >= rowCount())
 		return false;
 
-	if(!kdb)
-		return false;
-
 	try
 	{
 		QString old_name = headerData(section, orientation).toString();
 		QString new_name = value.toString();
-		kdb->rename(old_name.toStdString(), new_name.toStdString());
+		displayed_database->rename(old_name.toStdString(), new_name.toStdString());
 		emit headerDataChanged(orientation, section, section);
 		return true;
 	}
@@ -77,7 +71,7 @@ QVariant IodeTemplateTableModel<K>::data(const QModelIndex& index, int role) con
 	if (role == Qt::TextAlignmentRole)
 		return int(alignment);
 
-	if ((role == Qt::DisplayRole || role == Qt::EditRole) && kdb)
+	if (role == Qt::DisplayRole || role == Qt::EditRole)
 		return dataCell(index.row(), index.column());
 
 	return QVariant();
@@ -87,10 +81,7 @@ template <class K>
 bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole)
-	{
-		if(!kdb)
-			return false;
-		
+	{	
 		if(data(index, Qt::DisplayRole) == value) 
 			return false;
 		
@@ -110,36 +101,32 @@ bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant
 template <class K>
 void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent)
 {
-	K* kdb_ = kdb_global ? kdb_global : kdb_external;
-
-	if (!pattern.isEmpty())
+	if (pattern.isEmpty())
+		displayed_database = database;
+	else
 	{
 		try
 		{
-			if(kdb_filter) 
-				delete kdb_filter;
-			kdb_filter = kdb_->subset(pattern.toStdString());
-			kdb = kdb_filter;
+			if(database_subset) 
+				delete database_subset;
+			database_subset = database->subset(pattern.toStdString());
+			displayed_database = database_subset;
 		}
 		catch (const std::exception& e)
 		{
-			kdb_filter = nullptr;
-			kdb = kdb_;
+			database_subset = nullptr;
+			displayed_database = database;
 			if(!silent)
 				QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		}
 	}
-	else
-		kdb = kdb_;
 }
 
 template <class K>
 bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOverwrite)
 {
-	K* kdb_ = kdb_global ? kdb_global : kdb_external;
-
 	std::string std_filepath = filepath.toLocal8Bit().toStdString();
-	int type_ = kdb_ ? kdb_->get_iode_type() : get_iode_file_type(std_filepath);
+	int type_ = database->get_iode_type();
 
 	if (type_ < 0 || type_ > I_VARIABLES) 
 		return false;
@@ -151,7 +138,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 		// NOTE: check_filepath() converts to absolute path
 		std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "load file", true);
 
-		if(!forceOverwrite && (kdb_global->count() > 0))
+		if(!forceOverwrite && (database->count() > 0))
 		{
 			QString iodeTypeName = QString::fromStdString(vIodeTypes[iodeType]);
 			QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "There are " + 
@@ -162,6 +149,20 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 
 		// load Iode file in the global database
 		K kdb_(std_filepath);
+
+		// reset subset
+		if(database_subset)
+		{
+			delete database_subset;
+			database_subset = nullptr;
+		}
+
+		// point 'displayed_database' to the newly loaded 'database'
+		displayed_database = database;
+
+		// update the view
+		resetModel();
+
 		return true;
 	}
 	catch (const std::exception& e)
@@ -174,19 +175,14 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 template <class K>
 QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& filepath)
 {
-	// NOTE: we don't simply use kdb since it may point to kdb_filter
-	K* kdb_ = kdb_global ? kdb_global : kdb_external;
-
-	if(!kdb_)
-		return "";
-
-	if (kdb_->count() == 0) 
+	// NOTE: we don't simply use 'database' since it may point to 'database_subset'
+	if (database->count() == 0) 
 		return ""; 
 
-	EnumIodeType iodeType = (EnumIodeType) kdb_->get_iode_type();
+	EnumIodeType iodeType = (EnumIodeType) database->get_iode_type();
 	
 	// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
-	std::string std_filepath = filepath.isEmpty() ? kdb_->get_filename() : filepath.toLocal8Bit().toStdString();
+	std::string std_filepath = filepath.isEmpty() ? database->get_filename() : filepath.toLocal8Bit().toStdString();
 
 	// if KDB not linked to any file, ask the user to give/create a file to save in.
 	// Otherwise, check the filepath 
@@ -204,8 +200,8 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 
 	try
 	{
-		kdb_->set_filename(std_filepath);
-		kdb_->save(std_filepath);
+		database->save(std_filepath);
+		database->set_filename(std_filepath);
 	}
 	catch (const IodeException& e)
 	{
@@ -220,13 +216,8 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 template <class K>
 QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 {
-	// NOTE: we don't simply use kdb since it may point to kdb_filter
-	K* kdb_ = kdb_global ? kdb_global : kdb_external;
-
-	if(!kdb_)
-		return "";
-
-	if (kdb_->count() == 0) 
+	// NOTE: we don't simply use 'database' since it may point to 'database_subset'
+	if (database->count() == 0) 
 		return ""; 
 	
 	// ask user for new filepath
@@ -234,16 +225,13 @@ QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 	// call the save method
 	filepath = save(projectDir, filepath);
 	// update KDB filename
-	if (!filepath.isEmpty()) kdb_->set_filename(filepath.toLocal8Bit().toStdString());
+	if (!filepath.isEmpty()) database->set_filename(filepath.toLocal8Bit().toStdString());
 	return filepath;
 }
 
 template <class K>
 bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
-	if(!kdb)
-		return false;
-
 	std::string name;
 	beginRemoveRows(QModelIndex(), position, position + rows - 1);
 
@@ -252,7 +240,7 @@ bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelI
 		for (int row = position; row < position + rows; row++)
 		{
 			name = dataCell(row, 0).toString().toStdString();
-			kdb->remove(row);
+			displayed_database->remove(row);
 		}
 	}
 	catch (const std::exception& e)
@@ -269,11 +257,11 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 {
 	QStringList list;
 
-	if(!kdb)
+	if(database->count() == 0)
 		return list;
 
 	std::string std_name = name.toStdString();
-	int this_type = kdb->get_iode_type();
+	int this_type = database->get_iode_type();
 	bool listedInClec = other_type == I_SCALARS || other_type == I_VARIABLES;
 
 	if(this_type == I_EQUATIONS && listedInClec)
@@ -353,10 +341,10 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 {
 	QStringList list;
 
-	if(!kdb)
+	if(database->count() == 0)
 		return list;
 	
-	std::vector<std::string> std_list = kdb->get_associated_objects_list(name.toStdString(), other_type);
+	std::vector<std::string> std_list = database->get_associated_objects_list(name.toStdString(), other_type);
 	if(std_list.size() == 0)
 		return list;
 

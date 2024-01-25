@@ -6,7 +6,7 @@ QVariant CommentsModel::dataCell(const int row, const int col) const
 {
 	try
 	{
-		return QVariant(QString::fromStdString(kdb->get(row)));
+		return QVariant(QString::fromStdString(displayed_database->get(row)));
 	}
 	catch(const std::exception& e)
 	{
@@ -18,7 +18,7 @@ bool CommentsModel::setValue(const int row, const int column, const QVariant& va
 {
 	try
 	{
-		kdb->update(row, value.toString().toStdString());
+		displayed_database->update(row, value.toString().toStdString());
 		return true;
 	}
 	catch (const std::exception& e)

@@ -14,9 +14,9 @@ class VariablesModel : public IodeTemplateTableModel<KDBVariables>, public Numer
 	EnumIodeVarMode mode;
 
 public:
-	VariablesModel(QObject* parent = nullptr, KDBVariables* kdb_external = nullptr, const int nb_digits = 2, 
+	VariablesModel(QObject* parent = nullptr, KDBVariables* database = nullptr, const int nb_digits = 2, 
 		const EnumIodeVarMode mode = I_VAR_MODE_LEVEL): 
-		IodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_external), 
+		IodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, database, parent), 
 		NumericalTableModel(nb_digits), mode(mode) {}
 
 	QVariant dataCell(const int row, const int col) const override;

@@ -36,7 +36,10 @@ void EstimationResultsDialog::set_coefficients_tab()
 {
     tableView_coefs->setStyleSheet(stylesheetHeader);
 
-    ScalarsModel* scalarsModel = new ScalarsModel(this, edit_est_eqs->get_scalars());
+    // NOTE: make a copy of the estimation scalars database because the database 
+    //       passed to the constructor of ScalarsModel is deleted in its destructor 
+    KDBScalars* kdb_scl = edit_est_eqs->get_scalars()->subset("*");
+    ScalarsModel* scalarsModel = new ScalarsModel(this, kdb_scl);
     tableView_coefs->setModel(scalarsModel);
 }
 

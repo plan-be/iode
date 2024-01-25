@@ -8,7 +8,7 @@ QVariant VariablesModel::dataCell(const int row, const int col) const
 
 	try
 	{
-		var = kdb->get_var(row, col, mode);
+		var = displayed_database->get_var(row, col, mode);
 		return valueToString(var);
 	}
 	catch(const std::exception& e)
@@ -22,7 +22,7 @@ bool VariablesModel::setValue(const int row, const int column, const QVariant& v
 	try
 	{
 		double val = (value == NAN_REP || value == "") ? L_NAN : value.toDouble();
-		kdb->set_var(row, column, val);
+		displayed_database->set_var(row, column, val);
 		return true;
 	}
 	catch (const std::exception& e)

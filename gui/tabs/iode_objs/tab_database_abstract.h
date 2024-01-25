@@ -130,7 +130,6 @@ public:
     void reset()
     {
         clearKDB();
-        resetFilter();
     }
 
     virtual void setProjectDir(const QDir& projectDir)
@@ -282,7 +281,7 @@ public:
     void clearKDB()
     {
         objmodel->clearKDB();
-        tableview->update();
+        resetFilter();
     }
 
     void filter(const bool silent = false)

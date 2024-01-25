@@ -12,8 +12,8 @@ class ScalarsModel : public IodeTemplateTableModel<KDBScalars>, public Numerical
 	Q_OBJECT
 
 public:
-	ScalarsModel(QObject* parent = nullptr, KDBScalars* kdb_external = nullptr, const int nb_digits = 2): 
-		IodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, parent, kdb_external), 
+	ScalarsModel(QObject* parent = nullptr, KDBScalars* database = nullptr, const int nb_digits = 2): 
+		IodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, database, parent), 
 		NumericalTableModel(nb_digits) {}
 
 	QVariant dataCell(const int row, const int col) const override;

@@ -11,8 +11,8 @@ class ListsModel : public IodeTemplateTableModel<KDBLists>
 	Q_OBJECT
 
 public:
-	ListsModel(QObject* parent = nullptr, KDBLists* kdb_external = nullptr) 
-		: IodeTemplateTableModel({"List"}, parent, kdb_external) {};
+	ListsModel(QObject* parent = nullptr, KDBLists* database = nullptr) 
+		: IodeTemplateTableModel({"List"}, database, parent) {};
 
 	QVariant dataCell(const int row, const int col) const override;
 

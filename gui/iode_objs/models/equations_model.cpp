@@ -6,7 +6,7 @@ QVariant EquationsModel::dataCell(const int row, const int col) const
 {
 	try
 	{
-		return QVariant(QString::fromStdString(kdb->get_lec(row)));
+		return QVariant(QString::fromStdString(displayed_database->get_lec(row)));
 	}
 	catch(const std::exception& e)
 	{
@@ -19,7 +19,7 @@ bool EquationsModel::setValue(const int row, const int column, const QVariant& v
 	try
 	{
 		QString lec = value.toString();
-		kdb->update(row, lec.toStdString());
+		displayed_database->update(row, lec.toStdString());
 		return true;
 	}
 	catch(const std::exception& e)

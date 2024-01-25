@@ -6,7 +6,7 @@ QVariant IdentitiesModel::dataCell(const int row, const int col) const
 {
 	try
 	{
-		return QVariant(QString::fromStdString(kdb->get_lec(row)));
+		return QVariant(QString::fromStdString(displayed_database->get_lec(row)));
 	}
 	catch(const std::exception& e)
 	{
@@ -18,7 +18,7 @@ bool IdentitiesModel::setValue(const int row, const int column, const QVariant& 
 {
 	try
 	{
-		kdb->update(row, value.toString().toStdString());
+		displayed_database->update(row, value.toString().toStdString());
 		return true;
 	}
 	catch (const std::exception& e)
@@ -35,7 +35,7 @@ void IdentitiesModel::executeIdentity(const int row)
 	try
 	{
 		Sample sample = Variables.get_sample();
-		kdb->execute_identities(sample.start_period(), sample.end_period(), name.toStdString());
+		displayed_database->execute_identities(sample.start_period(), sample.end_period(), name.toStdString());
 		QMessageBox::information(nullptr, "INFO", "Identity " + name + " successfully executed");
 	}
 	catch(const std::exception& e)
