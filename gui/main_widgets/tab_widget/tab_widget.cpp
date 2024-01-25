@@ -44,8 +44,13 @@ IodeTabWidget::~IodeTabWidget()
 {
     saveSettings();
 
-    for(int i=0; i<I_NB_TYPES; i++) 
-        clear_global_kdb((EnumIodeType) i);
+    Comments.clear();
+    Equations.clear();
+    Identities.clear();
+    Lists.clear();
+    Scalars.clear();
+    Tables.clear();
+    Variables.clear();
 
     delete tabComments;
     delete tabEquations;

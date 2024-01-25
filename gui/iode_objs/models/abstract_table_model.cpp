@@ -110,25 +110,27 @@ bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant
 template <class K>
 void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent)
 {
+	K* kdb_ = kdb_global ? kdb_global : kdb_external;
+
 	if (!pattern.isEmpty())
 	{
 		try
 		{
 			if(kdb_filter) 
 				delete kdb_filter;
-			kdb_filter = new K(KDB_SHALLOW_COPY, pattern.toStdString());
+			kdb_filter = kdb_->subset(pattern.toStdString());
 			kdb = kdb_filter;
 		}
 		catch (const std::exception& e)
 		{
 			kdb_filter = nullptr;
-			kdb = kdb_global ? kdb_global : kdb_external;
+			kdb = kdb_;
 			if(!silent)
 				QMessageBox::warning(nullptr, "WARNING", QString(e.what()));
 		}
 	}
 	else
-		kdb = kdb_global ? kdb_global : kdb_external;
+		kdb = kdb_;
 }
 
 template <class K>
@@ -149,7 +151,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 		// NOTE: check_filepath() converts to absolute path
 		std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "load file", true);
 
-		if(!forceOverwrite && is_global_kdb_loaded(iodeType))
+		if(!forceOverwrite && (kdb_global->count() > 0))
 		{
 			QString iodeTypeName = QString::fromStdString(vIodeTypes[iodeType]);
 			QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "There are " + 
@@ -157,8 +159,9 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 				QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 			if(answer == QMessageBox::No) return false;
 		}
-		// load Iode file
-		load_global_kdb(iodeType, std_filepath);
+
+		// load Iode file in the global database
+		K kdb_(std_filepath);
 		return true;
 	}
 	catch (const std::exception& e)
