@@ -710,6 +710,7 @@ static TBL* K_tunpack64(char *pack)
     cell = (TCELL*)SW_nalloc(T_NC(tbl) * sizeof(TCELL));
     tbl->t_div.tl_val = (char*)cell;
     for(j = 0, p = 2; j < T_NC(tbl); j++) {
+        K_tcell32_64(cell32 + j, cell + j);
         if(cell32[j].tc_val != 0) {
             K_tcell32_64(cell32 + j, cell + j);
             cell[j].tc_val = P_alloc_get_ptr(pack, p);
@@ -732,8 +733,8 @@ static TBL* K_tunpack64(char *pack)
                 cell32 = (TCELL32*)P_get_ptr(pack, p);
                 p++;
                 for(j = 0; j < T_NC(tbl); j++) {
+                    K_tcell32_64(cell32 + j, cell + j);
                     if(cell32[j].tc_val != 0) {
-                        K_tcell32_64(cell32 + j, cell + j);
                         cell[j].tc_val = P_alloc_get_ptr(pack, p);
                         p++;
                     }
@@ -745,8 +746,8 @@ static TBL* K_tunpack64(char *pack)
                 tbl->t_line[i].tl_val = (char*)cell;
                 cell32 = (TCELL32*)P_get_ptr(pack, p);
                 p++;
+                K_tcell32_64(cell32 + 0, cell + 0);
                 if(cell32[0].tc_val != 0) {
-                    K_tcell32_64(cell32 + 0, cell + 0);
                     cell[0].tc_val = (char *)P_alloc_get_ptr(pack, p);
                     p++;
                 }
