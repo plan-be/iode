@@ -42,15 +42,15 @@ protected:
 
     Variable get_unchecked(const int pos) const override;
 
-    KDBVariables(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_VARIABLES, deep_copy, pattern) {};
+    KDBVariables(KDBVariables* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
     KDBVariables(const std::string& filepath="") : KDBTemplate(I_VARIABLES, filepath) {}
 
     KDBVariables* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBVariables(deep_copy, pattern);
+        return new KDBVariables(this, deep_copy, pattern);
     }
 
     IODE_REAL get_var(const int pos, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;

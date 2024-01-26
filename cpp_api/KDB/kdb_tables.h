@@ -11,15 +11,15 @@ protected:
 
     Table get_unchecked(const int pos) const override;
 
-    KDBTables(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_TABLES, deep_copy, pattern) {};
+    KDBTables(KDBTables* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
     KDBTables(const std::string& filepath="") : KDBTemplate(I_TABLES, filepath) {}
 
     KDBTables* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBTables(deep_copy, pattern);
+        return new KDBTables(this, deep_copy, pattern);
     }
 
     std::string get_title(const int pos) const;

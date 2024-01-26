@@ -39,7 +39,7 @@ private:
     static std::vector<std::string> filter_names_from_global_db(const short db_type, const std::string& pattern);
 
 protected:
-    KDBAbstract(const EnumIodeType iode_type, const bool deep_copy, const std::string& pattern);
+    KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern);
 
 public:
     KDBAbstract(const EnumIodeType iode_type, const std::string& filepath = "");

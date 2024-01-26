@@ -10,15 +10,15 @@ protected:
 
     List get_unchecked(const int pos) const override;
 
-    KDBLists(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_LISTS, deep_copy, pattern) {};
+    KDBLists(KDBLists* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
     KDBLists(const std::string& filepath="") : KDBTemplate(I_LISTS, filepath) {}
 
     KDBLists* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBLists(deep_copy, pattern);
+        return new KDBLists(this, deep_copy, pattern);
     }
 
     int add(const std::string& name, const List& list);

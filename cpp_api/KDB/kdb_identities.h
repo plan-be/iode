@@ -14,15 +14,15 @@ protected:
 
     Identity get_unchecked(const int pos) const override;
 
-    KDBIdentities(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_IDENTITIES, deep_copy, pattern) {};
+    KDBIdentities(KDBIdentities* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
     KDBIdentities(const std::string& filepath="") : KDBTemplate(I_IDENTITIES, filepath) {}
 
     KDBIdentities* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBIdentities(deep_copy, pattern);
+        return new KDBIdentities(this, deep_copy, pattern);
     }
 
     std::string get_lec(const int pos) const;
