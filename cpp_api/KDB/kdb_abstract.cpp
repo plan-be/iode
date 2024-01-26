@@ -49,10 +49,10 @@ KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& filepa
     k_reserved[0] = DB_GLOBAL;
 }
 
-KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const bool deep_copy, const std::string& pattern)
+KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern)
 {
-    KDB* source_kdb = K_WS[iode_type];
-    if(source_kdb == NULL)
+    KDB* source_kdb = kdb->get_database(); 
+    if(source_kdb == NULL || source_kdb == nullptr)
         throw std::runtime_error("Cannot create a deep copy of the database.\nThe input database is empty");
 
     // ---- prepare the subset database ----

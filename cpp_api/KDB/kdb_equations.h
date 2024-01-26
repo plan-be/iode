@@ -12,15 +12,15 @@ protected:
 
     Equation get_unchecked(const int pos) const override;
 
-    KDBEquations(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_EQUATIONS, deep_copy, pattern) {};
+    KDBEquations(KDBEquations* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
     KDBEquations(const std::string& filepath="") : KDBTemplate(I_EQUATIONS, filepath) {}
 
     KDBEquations* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBEquations(deep_copy, pattern);
+        return new KDBEquations(this, deep_copy, pattern);
     }
 
     std::string get_lec(const int pos) const;

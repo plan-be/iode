@@ -11,15 +11,15 @@ protected:
 
     Scalar get_unchecked(const int pos) const override;
 
-    KDBScalars(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_SCALARS, deep_copy, pattern) {};
+    KDBScalars(KDBScalars* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
     KDBScalars(const std::string& filepath="") : KDBTemplate(I_SCALARS, filepath) {}
 
     KDBScalars* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBScalars(deep_copy, pattern);
+        return new KDBScalars(this, deep_copy, pattern);
     }
 
     int add(const std::string& name, const Scalar& obj);

@@ -16,8 +16,8 @@ protected:
 
     virtual T get_unchecked(const int pos) const = 0;
 
-    KDBTemplate(const EnumIodeType iode_type, const bool deep_copy, const std::string& pattern) :
-        KDBAbstract(iode_type, deep_copy, pattern) {}
+    KDBTemplate(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern) :
+        KDBAbstract(kdb, deep_copy, pattern) {}
 
 public:
     KDBTemplate(const EnumIodeType iode_type, const std::string& filepath) : 

@@ -10,15 +10,15 @@ protected:
 
     Comment get_unchecked(const int pos) const override;
 
-    KDBComments(const bool deep_copy, const std::string& pattern) : 
-        KDBTemplate(I_COMMENTS, deep_copy, pattern) {}
+    KDBComments(KDBComments* kdb, const bool deep_copy, const std::string& pattern) : 
+        KDBTemplate(kdb, deep_copy, pattern) {}
 
 public:
     KDBComments(const std::string& filepath="") : KDBTemplate(I_COMMENTS, filepath) {}
 
     KDBComments* subset(const std::string& pattern, const bool deep_copy=false)
     {
-        return new KDBComments(deep_copy, pattern);
+        return new KDBComments(this, deep_copy, pattern);
     }
     
     int add(const std::string& name, const Comment& comment);
