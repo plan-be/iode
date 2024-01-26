@@ -133,7 +133,7 @@ TEST_F(KDBScalarsTest, Filter)
     std::vector<std::string> all_names;
     for (int p = 0; p < Scalars.count(); p++) all_names.push_back(Scalars.get_name(p));
 
-    int nb_total_comments = Scalars.count();
+    int nb_total_scalars = Scalars.count();
     // a*
     for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
     // *_
@@ -149,6 +149,7 @@ TEST_F(KDBScalarsTest, Filter)
     // create local kdb
     kdb_subset = Scalars.subset(pattern);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -195,9 +196,13 @@ TEST_F(KDBScalarsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Scalars.count(), nb_total_comments);
+    EXPECT_EQ(Scalars.count(), nb_total_scalars);
     updated_scalar_global = Scalars.get(name);
     EXPECT_EQ(updated_scalar_global, expected_updated_scalar);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Scalars.subset(pattern), std::runtime_error);
 }
 
 TEST_F(KDBScalarsTest, DeepCopy)
@@ -209,7 +214,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
     std::vector<std::string> all_names;
     for (int p = 0; p < Scalars.count(); p++) all_names.push_back(Scalars.get_name(p));
 
-    int nb_total_comments = Scalars.count();
+    int nb_total_scalars = Scalars.count();
     // a*
     for (const std::string& name : all_names) if (name.front() == 'a') expected_names.push_back(name);
     // *_
@@ -225,6 +230,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
     // create local kdb
     kdb_subset = Scalars.subset(pattern, true);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
@@ -277,7 +283,11 @@ TEST_F(KDBScalarsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Scalars.count(), nb_total_comments);
+    EXPECT_EQ(Scalars.count(), nb_total_scalars);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Scalars.subset(pattern, true), std::runtime_error);
 }
 
 TEST_F(KDBScalarsTest, Merge)

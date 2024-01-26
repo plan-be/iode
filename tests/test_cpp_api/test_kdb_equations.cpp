@@ -158,7 +158,7 @@ TEST_F(KDBEquationsTest, Filter)
     std::vector<std::string> all_names;
     for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
 
-    int nb_total_comments = Equations.count();
+    int nb_total_equations = Equations.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // $ENVI
@@ -177,6 +177,7 @@ TEST_F(KDBEquationsTest, Filter)
     // create local kdb
     kdb_subset = Equations.subset(pattern);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -208,8 +209,12 @@ TEST_F(KDBEquationsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Equations.count(), nb_total_comments);
+    EXPECT_EQ(Equations.count(), nb_total_equations);
     EXPECT_EQ(Equations.get_lec(name), lec);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Equations.subset(pattern), std::runtime_error);
 }
 
 TEST_F(KDBEquationsTest, DeepCopy)
@@ -223,7 +228,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
     std::vector<std::string> all_names;
     for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
 
-    int nb_total_comments = Equations.count();
+    int nb_total_equations = Equations.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // $ENVI
@@ -242,6 +247,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
     // create local kdb
     kdb_subset = Equations.subset(pattern, true);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
@@ -261,7 +267,11 @@ TEST_F(KDBEquationsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Equations.count(), nb_total_comments);
+    EXPECT_EQ(Equations.count(), nb_total_equations);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Equations.subset(pattern, true), std::runtime_error);
 }
 
 TEST_F(KDBEquationsTest, Merge)

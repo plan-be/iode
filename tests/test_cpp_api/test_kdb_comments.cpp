@@ -271,6 +271,7 @@ TEST_F(KDBCommentsTest, Filter)
     // create local kdb
     kdb_subset = Comments.subset(pattern);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -306,6 +307,25 @@ TEST_F(KDBCommentsTest, Filter)
     delete kdb_subset;
     EXPECT_EQ(Comments.count(), nb_total_comments);
     EXPECT_EQ(Comments.get(name), modified_comment);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Comments.subset(pattern), std::runtime_error);
+
+    // subset of a subset
+    pattern = "A*;*_";
+    kdb_subset = Comments.subset(pattern);
+
+    std::string pattern_subset_subset = "B*";
+    std::vector<std::string> expected_names_subset_subset;
+    for(const std::string& name: expected_names)
+        if(name.front() == 'B') expected_names_subset_subset.push_back(name);
+
+    KDBComments* kdb_subset_subset = kdb_subset->subset(pattern_subset_subset);
+    EXPECT_EQ(kdb_subset_subset->count(), expected_names_subset_subset.size());
+    EXPECT_EQ(kdb_subset_subset->get_names(), expected_names_subset_subset);
+    delete kdb_subset;
+    delete kdb_subset_subset;
 }
 
 TEST_F(KDBCommentsTest, DeepCopy)
@@ -333,7 +353,8 @@ TEST_F(KDBCommentsTest, DeepCopy)
     // create local kdb
     kdb_subset = Comments.subset(pattern, true);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
-
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
+    
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "ACAF";
@@ -370,6 +391,10 @@ TEST_F(KDBCommentsTest, DeepCopy)
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Comments.count(), nb_total_comments);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Comments.subset(pattern, true), std::runtime_error);
 }
 
 TEST_F(KDBCommentsTest, Merge)

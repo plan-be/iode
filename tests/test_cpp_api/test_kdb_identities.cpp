@@ -197,7 +197,7 @@ TEST_F(KDBIdentitiesTest, Filter)
     std::vector<std::string> all_names;
     for (int p = 0; p < Identities.count(); p++) all_names.push_back(Identities.get_name(p));
 
-    int nb_total_comments = Identities.count();
+    int nb_total_identities = Identities.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -213,6 +213,7 @@ TEST_F(KDBIdentitiesTest, Filter)
     // create local kdb
     kdb_subset = Identities.subset(pattern);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -246,8 +247,12 @@ TEST_F(KDBIdentitiesTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Identities.count(), nb_total_comments);
+    EXPECT_EQ(Identities.count(), nb_total_identities);
     EXPECT_EQ(Identities.get_lec(name), modified_lec);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Identities.subset(pattern), std::runtime_error);
 }
 
 TEST_F(KDBIdentitiesTest, DeepCopy)
@@ -259,7 +264,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
     std::vector<std::string> all_names;
     for (int p = 0; p < Identities.count(); p++) all_names.push_back(Identities.get_name(p));
 
-    int nb_total_comments = Identities.count();
+    int nb_total_identities = Identities.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *_
@@ -275,6 +280,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
     // create local kdb
     kdb_subset = Identities.subset(pattern, true);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
@@ -311,9 +317,12 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Identities.count(), nb_total_comments);
-}
+    EXPECT_EQ(Identities.count(), nb_total_identities);
 
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Identities.subset(pattern, true), std::runtime_error);
+}
 
 // QUESTION FOR JMP: How to test with variables file, scalars file and trace ?
 TEST_F(KDBIdentitiesTest, ExecuteIdentities)

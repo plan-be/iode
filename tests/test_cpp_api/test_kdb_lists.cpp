@@ -123,7 +123,7 @@ TEST_F(KDBListsTest, Filter)
     for (int p = 0; p < Lists.count(); p++) all_names.push_back(Lists.get_name(p));
     for (const std::string& name : all_names) if (name.front() == 'C') expected_names.push_back(name);
 
-    int nb_total_comments = Lists.count();
+    int nb_total_lists = Lists.count();
 
     // remove duplicate entries
     // NOTE: std::unique only removes consecutive duplicated elements, 
@@ -135,6 +135,7 @@ TEST_F(KDBListsTest, Filter)
     // create local kdb
     kdb_subset = Lists.subset(pattern);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
@@ -168,8 +169,12 @@ TEST_F(KDBListsTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Lists.count(), nb_total_comments);
+    EXPECT_EQ(Lists.count(), nb_total_lists);
     EXPECT_EQ(Lists.get(name), expanded_list);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Lists.subset(pattern), std::runtime_error);
 }
 
 TEST_F(KDBListsTest, DeepCopy)
@@ -189,11 +194,12 @@ TEST_F(KDBListsTest, DeepCopy)
     std::vector<std::string>::iterator it = std::unique(expected_names.begin(), expected_names.end());  
     expected_names.resize(std::distance(expected_names.begin(), it));
 
-    int nb_total_comments = Lists.count();
+    int nb_total_lists = Lists.count();
 
     // create local kdb
     kdb_subset = Lists.subset(pattern, true);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB didn't changed
@@ -230,7 +236,11 @@ TEST_F(KDBListsTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Lists.count(), nb_total_comments);
+    EXPECT_EQ(Lists.count(), nb_total_lists);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Lists.subset(pattern, true), std::runtime_error);
 }
 
 TEST_F(KDBListsTest, Merge)
