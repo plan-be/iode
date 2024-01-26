@@ -33,6 +33,7 @@ private:
     /**
      * @brief Create a list of IODE object names extracted from the corresponding global database given a pattern.
      * 
+     * @param db_type 
      * @param pattern 
      * @return std::vector<std::string>
      */
