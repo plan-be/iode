@@ -7,6 +7,7 @@
  *  -----------------
  *      char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int texts, int all)     Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...
  *      char *K_expand(int type, char* file, char* pattern, int all)                                    Retrieves all object names matching one or more patterns in a workspace or an object file.
+ *      char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)                                  Retrieves all object names matching one or more patterns in a KDB.
  *      int K_aggr(char* pattern, char* ename, char* nname) *                                           Transforms a variable name based on an "aggregation" pattern.
  *  
  */
@@ -162,6 +163,49 @@ char *K_expand(int type, char* file, char* pattern, int all)
     SCR_free_tbl(ptbl);
 
     if(file != NULL) K_free(kdb);
+    return(lst);
+}
+
+/**
+ *  Retrieves all object names matching one or more patterns in a KDB.
+ *  
+ *  @param [in] kdb     KDB*    KDB to search into or null to look in the workpace 
+ *  @param [in] type    int     Object type (K_CMT -> K_VAR)
+ *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
+ *  @param [in] all     int     character meaning "any char sequence" (normally '*')
+ *  
+ *  @return             char*   allocated semi-colon separated string with all matching names
+ *                              if no name found return allocated string of length 0 ("").
+ *  
+ */
+char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)
+{
+
+    int     i, np;
+    char    **ptbl, **tbl, *lst = NULL;
+
+    if(pattern == 0 || pattern[0] == 0 || type < K_CMT || type > K_VAR) return(NULL);
+
+    if(kdb == NULL) kdb = K_WS[type];
+
+    ptbl = SCR_vtoms(pattern, A_SEPS); /* JMP 14-08-98 */
+    np = SCR_tbl_size(ptbl);
+    for(i = 0; i < np; i++) {
+        if(ptbl[i][0] != '"' &&
+                (U_is_in(all, ptbl[i]) || U_is_in('?', ptbl[i]))) {
+            tbl = K_grep(kdb, ptbl[i], 0, 1, 0, 0, all);
+            SCR_free(ptbl[i]);
+            if(tbl != NULL) {
+                ptbl[i] = SCR_mtov(tbl, ';');
+                SCR_free_tbl(tbl);
+            }
+            else ptbl[i] = SCR_stracpy("");
+        }
+    }
+
+    lst = SCR_mtov(ptbl, ';');
+    SCR_free_tbl(ptbl);
+
     return(lst);
 }
 
