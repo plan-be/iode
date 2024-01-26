@@ -179,7 +179,7 @@ TEST_F(KDBTablesTest, Filter)
     std::vector<std::string> all_names;
     for (int p = 0; p < Tables.count(); p++) all_names.push_back(Tables.get_name(p));
 
-    int nb_total_comments = Tables.count();
+    int nb_total_tables = Tables.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *2
@@ -195,6 +195,7 @@ TEST_F(KDBTablesTest, Filter)
     // create local kdb
     kdb_subset = Tables.subset(pattern);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // add an element to the local KDB and check if it has also 
     // been added to the global KDB
@@ -230,7 +231,11 @@ TEST_F(KDBTablesTest, Filter)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Tables.count(), nb_total_comments);
+    EXPECT_EQ(Tables.count(), nb_total_tables);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Tables.subset(pattern), std::runtime_error);
 }
 
 TEST_F(KDBTablesTest, DeepCopy)
@@ -245,7 +250,7 @@ TEST_F(KDBTablesTest, DeepCopy)
     std::vector<std::string> all_names;
     for (int p = 0; p < Tables.count(); p++) all_names.push_back(Tables.get_name(p));
 
-    int nb_total_comments = Tables.count();
+    int nb_total_tables = Tables.count();
     // A*
     for (const std::string& name : all_names) if (name.front() == 'A') expected_names.push_back(name);
     // *2
@@ -261,6 +266,7 @@ TEST_F(KDBTablesTest, DeepCopy)
     // create local kdb
     kdb_subset = Tables.subset(pattern, true);
     EXPECT_EQ(kdb_subset->count(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
     // add an element to the local KDB and check if it has not 
     // been added to the global KDB
@@ -296,7 +302,11 @@ TEST_F(KDBTablesTest, DeepCopy)
 
     // delete local kdb
     delete kdb_subset;
-    EXPECT_EQ(Tables.count(), nb_total_comments);
+    EXPECT_EQ(Tables.count(), nb_total_tables);
+
+    // wrong pattern
+    pattern = "anjfks";
+    EXPECT_THROW(Tables.subset(pattern, true), std::runtime_error);
 }
 
 TEST_F(KDBTablesTest, Merge)
