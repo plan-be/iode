@@ -2,29 +2,6 @@
 #include "kdb_abstract.h"
 
 
-std::vector<std::string> KDBAbstract::filter_names_from_global_db(const short db_type, const std::string& pattern)
-{
-    char* c_pattern = to_char_array(pattern);
-    
-    // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
-    char* c_lst = K_expand(db_type, NULL, c_pattern, '*');
-    
-    // Parses a string and replaces @filename and $listname by their contents
-    char** c_names = B_ainit_chk(c_lst, NULL, 0);
-    
-    // convert char** -> std::vector<std::string>
-    std::vector<std::string> names;
-    for(int i=0; i < SCR_tbl_size((unsigned char **) c_names); i++)
-        names.push_back(c_names[i]);
-    SCR_free_tbl((unsigned char **) c_names);
-    
-    // remove duplicates
-    remove_duplicates(names);
-    
-    // return names
-    return names; 
-}
-
 KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& filepath)
 {
     cpp_assign_super_API();
@@ -68,7 +45,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     memcpy(k_reserved, source_kdb->k_reserved, sizeof(char) * 59);      // char[59]
     k_nameptr = copy_char_array(source_kdb->k_nameptr);                 // char*
 
-    std::vector<std::string> names = filter_names_from_global_db(k_type, pattern);
+    std::vector<std::string> names = filter_names_from_database(source_kdb, (EnumIodeType) k_type, pattern);
 
     std::string error_msg = "Cannot extract a subset of the database of " + vIodeTypes[k_type] + ".\n";
     int pos;
@@ -167,7 +144,8 @@ std::vector<std::string> KDBAbstract::get_names(const std::string& pattern, cons
     }
     else
     {
-        std::vector<std::string> v_names_ = filter_names_from_global_db(k_type, pattern);
+        KDB* kdb = get_database();
+        std::vector<std::string> v_names_ = filter_names_from_database(kdb, (EnumIodeType) k_type, pattern);
         if(v_names_.size() == 0)
             return v_names_;
 

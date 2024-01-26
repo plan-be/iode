@@ -21,6 +21,29 @@ void set_kdb_filename(KDB* kdb, const std::string& filename)
     K_set_kdb_name(kdb, (unsigned char*) filename.c_str());
 }
 
+std::vector<std::string> filter_names_from_database(KDB* kdb, const EnumIodeType iode_type, const std::string& pattern)
+{
+    char* c_pattern = to_char_array(pattern);
+    
+    // Retrieves all object names matching one or more patterns in K_WS (similar to grep)
+    char* c_lst = K_expand_kdb(kdb, (int) iode_type, c_pattern, '*');
+    
+    // Parses a string and replaces @filename and $listname by their contents
+    char** c_names = B_ainit_chk(c_lst, NULL, 0);
+    
+    // convert char** -> std::vector<std::string>
+    std::vector<std::string> names;
+    for(int i=0; i < SCR_tbl_size((unsigned char **) c_names); i++)
+        names.push_back(c_names[i]);
+    SCR_free_tbl((unsigned char **) c_names);
+    
+    // remove duplicates
+    remove_duplicates(names);
+    
+    // return names
+    return names; 
+}
+
 void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
                 const EnumLang lang, const std::string& debug_file)
 {
