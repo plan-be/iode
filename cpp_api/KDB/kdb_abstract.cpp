@@ -58,6 +58,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     // ---- prepare the subset database ----
     k_mode = source_kdb->k_mode;                                        // short
     k_type = source_kdb->k_type;                                        // short
+    k_objs = NULL;
     strncpy(k_arch, ARCH, LMAGIC);                                      // char[LMAGIC]
     strncpy(k_magic, source_kdb->k_magic, LMAGIC);                      // char[LMAGIC]
     strncpy(k_oname, source_kdb->k_oname, sizeof(OFNAME));              // OFNAME     
@@ -85,7 +86,15 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
             pos = K_dup(const_cast<KDB*>(source_kdb), c_name, this, c_name);
             if(pos < 0)
             {
-                K_free(this);
+                for(int i = 0; i < k_nb; i++)
+                    if(k_objs[i].o_val != 0) SW_free(k_objs[i].o_val);
+
+                SW_nfree(k_objs);
+                k_objs = NULL;
+
+                SCR_free(k_nameptr);
+                k_nameptr = NULL; 
+
                 error_msg += "Cannot to copy " + vIodeTypes[k_type] + " named '" + name + "' in the subset.\n";
                 if (pos == -1) 
                     error_msg += "Object with name '" + name + "' does not exist in the " + vIodeTypes[k_type] + " database.";
@@ -109,7 +118,12 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
             pos = K_find(const_cast<KDB*>(source_kdb), to_char_array(names[i]));
             if(pos < 0) 
             {
-                K_free_kdb(this);
+                SW_nfree(k_objs);
+                k_objs = NULL;
+
+                SCR_free(k_nameptr);
+                k_nameptr = NULL; 
+
                 error_msg += "Object with name '" + names[i] + "' does not exist in the " + vIodeTypes[k_type] + " database.";
                 throw std::runtime_error(error_msg);
             }
