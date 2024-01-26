@@ -29,16 +29,6 @@ const static char DB_SHALLOW_COPY = (char) 2;       //< shallow copy (useful whe
  */
 class KDBAbstract: public KDB
 {
-private:
-    /**
-     * @brief Create a list of IODE object names extracted from the corresponding global database given a pattern.
-     * 
-     * @param db_type 
-     * @param pattern 
-     * @return std::vector<std::string>
-     */
-    static std::vector<std::string> filter_names_from_global_db(const short db_type, const std::string& pattern);
-
 protected:
     KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern);
 
