@@ -190,4 +190,6 @@ public slots:
     }
 
     void clearTab() override;
+
+    void showObjectsList(EnumIodeType iodeType, const QStringList& objNames) override;
 };

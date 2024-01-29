@@ -439,3 +439,95 @@ void IodeTabWidget::clearTab()
 
     indexContextMenu = -1;
 }
+
+void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& objNames)
+{
+    int nb_objs = objNames.size();
+    if(nb_objs == 0)
+        return;
+
+    QDialog* dialog = new QDialog(nullptr);
+
+    try
+    {
+        QGridLayout* gridLayout = new QGridLayout(dialog);
+        gridLayout->setObjectName("gridLayout");
+
+        IodeAbstractTableView* tableView;
+        std::string pattern = objNames.join(";").toStdString();
+        switch (iodeType)
+        {
+        case I_COMMENTS:
+            tableView = new CommentsView(dialog);
+            tableView->setModel(new CommentsModel(dialog, Comments.subset(pattern)));
+            break;
+        case I_EQUATIONS:
+            tableView = new EquationsView(dialog);
+            tableView->setModel(new EquationsModel(dialog, Equations.subset(pattern)));
+            break;
+        case I_IDENTITIES:
+            tableView = new IdentitiesView(dialog);
+            tableView->setModel(new IdentitiesModel(dialog, Identities.subset(pattern)));
+            break;
+        case I_LISTS:
+            tableView = new ListsView(dialog);
+            tableView->setModel(new ListsModel(dialog, Lists.subset(pattern)));
+            break;
+        case I_SCALARS:
+            tableView = new ScalarsView(dialog);
+            tableView->setModel(new ScalarsModel(dialog, Scalars.subset(pattern)));
+            break;
+        case I_TABLES:
+            tableView = new TablesView(dialog);
+            tableView->setModel(new TablesModel(dialog, Tables.subset(pattern)));
+            break;
+        case I_VARIABLES:
+            tableView = new VariablesView(dialog);
+            tableView->setModel(new VariablesModel(dialog, Variables.subset(pattern)));
+            break;
+        default:
+            break;
+        }
+
+        // 1. The user cannot add or remove objects
+        // Disables delete shortcut
+        tableView->enableDeleteShortcut(false);
+
+        // 2. The user can modify the values of the objects
+        // Informs the tab representing the IODE objects of type 'iodeType' that a value has been changed 
+        int index = getIodeObjTabIndex(iodeType);
+        if(index < 0)
+        {
+            std::string type_ = vIodeTypes[iodeType];
+            throw IodeException("Cannot show IODE objects of type " + type_ + "\n" +
+                + "Database of objects of type " + type_ + " not found");
+        }
+        IodeAbstractWidget* tab = static_cast<IodeAbstractWidget*>(this->widget(index));
+        IodeAbstractTableModel* model_ = static_cast<IodeAbstractTableModel*>(tableView->model());
+        connect(model_, &CommentsModel::dataChanged, tab, [tab]{ tab->setModified(true); });
+        connect(model_, &CommentsModel::headerDataChanged, tab, [tab]{ tab->setModified(true); });
+
+        // updates the view -> computes the columns names if variables
+        tableView->update();
+
+        // adds the IODE objects table view to the popup dialog box
+        tableView->setObjectName("tableView");
+        gridLayout->addWidget(tableView, 0, 0, 1, 1);
+
+        // makes the dialog box non modal
+        dialog->setWindowModality(Qt::NonModal);
+        dialog->setModal(false);
+
+        // resizes the table to fit to the list of objects to display
+        tableView->setFixedHeight(tableView->preferredHeight());
+        dialog->setMinimumWidth(600);
+
+        // appends the new dialog box the list of open dialog boxes in the Main Window
+        emit newObjsListDialog(dialog);
+    }
+    catch(const std::exception& e)
+    {
+        delete dialog;
+        QMessageBox::critical(nullptr, "ERROR", QString(e.what()));
+    }
+}
