@@ -13,6 +13,8 @@ Improvements ✨
   * (GUI) Align values right when displaying numbers (#445)
   * (GUI) Possibility to choose between running reports from the project directory or 
           from their parent directory (#447)
+  * (GUI) The graphical user interval remembers the last 20 executed commands when the 
+          user reopens it (#386) 
 
 
 Fixed Bugs 🛠️
