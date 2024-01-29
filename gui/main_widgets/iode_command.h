@@ -1,9 +1,10 @@
 #pragma once
 #include "main_window_abstract.h"
 #include "text_edit/complete_line_edit.h"
+#include "settings.h"
 
 #include <QTextEdit>
-#include <QVector>
+#include <QStringList>
 
 
 /**
@@ -31,8 +32,11 @@ class IodeCommandLine: public IodeAutoCompleteLineEdit
 {
     Q_OBJECT
 
-    QVector<QString> executedCommandsList;
-    QVector<QString>::const_iterator it;            // const_iterator are for read-only access
+    const static int MAX_NB_COMMANDS_TO_REMEMBER = 20;
+    const static inline QString SETTINGS_GROUP_NAME = "IODE_COMMAND_LINE";
+
+    QStringList executedCommandsList;
+    QStringList::const_iterator it;            // const_iterator are for read-only access
 
     QTextEdit* output; 
 
@@ -40,11 +44,17 @@ public:
     IodeCommandLine(QWidget *parent = nullptr) 
         : IodeAutoCompleteLineEdit(parent), it(executedCommandsList.end()) {}
 
+    ~IodeCommandLine() 
+    {
+        saveSettings();
+    }
+
     void setup() 
     { 
         MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
         this->output = main_window->getOutput();
         setCompleter(main_window->getCompleter());
+        loadSettings();
     }
 
 protected:
@@ -53,6 +63,18 @@ protected:
      * @return bool weither or not to exit keyPressEvent() 
      */
     bool handleSpecialKeys(QKeyEvent *event);
+
+    /**
+     * @brief store the last MAX_NB_COMMANDS_TO_REMEMBER executed commands to the project settings file
+     * 
+     */
+    void saveSettings();
+
+    /**
+     * @brief load the list of the last MAX_NB_COMMANDS_TO_REMEMBER commands executed in the previous GUI session. 
+     * 
+     */
+    void loadSettings();
 
 public slots:
     void run_command();

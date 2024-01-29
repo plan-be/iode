@@ -37,6 +37,32 @@ bool IodeCommandLine::handleSpecialKeys(QKeyEvent *event)
     return false;
 }
 
+void IodeCommandLine::saveSettings()
+{
+    QSettings user_settings(QSettings::UserScope, this);
+    user_settings.beginGroup(SETTINGS_GROUP_NAME);
+    
+    int nbCommandsToSave = qMin(executedCommandsList.size(), MAX_NB_COMMANDS_TO_REMEMBER);
+    QStringList::const_iterator it_ = executedCommandsList.constEnd();
+    it_ -= nbCommandsToSave;
+    QStringList commandsToSave(it_, executedCommandsList.constEnd());
+    user_settings.setValue("LAST_EXECUTED_COMMANDS", commandsToSave);
+    
+    user_settings.endGroup();
+
+}
+
+void IodeCommandLine::loadSettings()
+{
+    QSettings user_settings(QSettings::UserScope, this);
+    user_settings.beginGroup(SETTINGS_GROUP_NAME);
+    
+    executedCommandsList = user_settings.value("LAST_EXECUTED_COMMANDS", QStringList()).toStringList();
+    it = executedCommandsList.end();
+    
+    user_settings.endGroup();
+}
+
 void IodeCommandLine::run_command()
 {
     QString cmd = text();
