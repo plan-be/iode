@@ -11,13 +11,18 @@ QWidget* get_tabs_widget_ptr()
 
 IodeTabWidget::IodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
 {
+    // global parameters
+    // NOTE: must initialized first since the function get_tabs_widget_ptr() is called 
+    //       in the constructor of the CommentsWidget, ... and VariablesWidget classes
+    tabs_widget_ptr = static_cast<QWidget*>(this);
+
     // prepare widgets for tabs associated with IODE object types
-    tabComments = new CommentsWidget(this);
+    tabComments  = new CommentsWidget(this);
     tabEquations = new EquationsWidget(this);
     tabIdentites = new IdentitiesWidget(this);
-    tabLists = new ListsWidget(this);
-    tabScalars = new ScalarsWidget(this);
-    tabTables = new TablesWidget(this);
+    tabLists     = new ListsWidget(this);
+    tabScalars   = new ScalarsWidget(this);
+    tabTables    = new TablesWidget(this);
     tabVariables = new VariablesWidget(this);
 
     connect(tabComments, &CommentsWidget::tabDatabaseModified, this, &IodeTabWidget::tabDatabaseModified);
@@ -35,9 +40,6 @@ IodeTabWidget::IodeTabWidget(QWidget* parent) : IodeAbstractTabWidget(parent)
     tabIodeObjects.append(tabScalars);
     tabIodeObjects.append(tabTables);
     tabIodeObjects.append(tabVariables);
-
-    // ---- global parameters ----
-    tabs_widget_ptr = static_cast<QWidget*>(this);
 }
 
 IodeTabWidget::~IodeTabWidget()

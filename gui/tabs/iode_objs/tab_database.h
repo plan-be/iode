@@ -23,7 +23,7 @@
 class CommentsWidget : public TemplateIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    CommentsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_COMMENTS, parent) 
+    CommentsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_COMMENTS, parent) 
     {
         connect(objmodel, &CommentsModel::dataChanged, this, &CommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::headerDataChanged, this, &CommentsWidget::databaseModified);
@@ -38,7 +38,7 @@ public:
 class EquationsWidget : public TemplateIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    EquationsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_EQUATIONS, parent) 
+    EquationsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_EQUATIONS, parent) 
     {
         connect(objmodel, &EquationsModel::dataChanged, this, &EquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::headerDataChanged, this, &EquationsWidget::databaseModified);
@@ -53,7 +53,7 @@ public:
 class IdentitiesWidget : public TemplateIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    IdentitiesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_IDENTITIES, parent) 
+    IdentitiesWidget(QWidget* parent) : TemplateIodeObjectWidget(I_IDENTITIES, parent) 
     {
         connect(objmodel, &IdentitiesModel::dataChanged, this, &IdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::headerDataChanged, this, &IdentitiesWidget::databaseModified);
@@ -68,7 +68,7 @@ public:
 class ListsWidget : public TemplateIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    ListsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_LISTS, parent) 
+    ListsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_LISTS, parent) 
     {
         connect(objmodel, &ListsModel::dataChanged, this, &ListsWidget::databaseModified);
         connect(objmodel, &ListsModel::headerDataChanged, this, &ListsWidget::databaseModified);
@@ -85,7 +85,7 @@ class ScalarsWidget : public TemplateIodeObjectWidget<ScalarsModel, ScalarsView>
     NumericalWidget numeric; 
 
 public:
-    ScalarsWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_SCALARS, parent) 
+    ScalarsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_SCALARS, parent) 
     {
         QHBoxLayout* bottomLayout = numeric.setup(this, objmodel, tableview);
 
@@ -117,7 +117,7 @@ public:
 class TablesWidget : public TemplateIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    TablesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_TABLES, parent) 
+    TablesWidget(QWidget* parent) : TemplateIodeObjectWidget(I_TABLES, parent) 
     {
         connect(objmodel, &TablesModel::dataChanged, this, &TablesWidget::databaseModified);
         connect(objmodel, &TablesModel::headerDataChanged, this, &TablesWidget::databaseModified);
@@ -140,7 +140,7 @@ class VariablesWidget : public TemplateIodeObjectWidget<VariablesModel, Variable
     QShortcut* shortcutModeMinus;
 
 public:
-    VariablesWidget(IodeAbstractTabWidget* parent) : TemplateIodeObjectWidget(I_VARIABLES, parent) 
+    VariablesWidget(QWidget* parent) : TemplateIodeObjectWidget(I_VARIABLES, parent) 
     {
         QHBoxLayout* bottomLayout = numeric.setup(this, objmodel, tableview);
 
