@@ -455,47 +455,35 @@ void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& ob
         QGridLayout* gridLayout = new QGridLayout(dialog);
         gridLayout->setObjectName("gridLayout");
 
-        IodeAbstractTableView* tableView;
-        std::string pattern = objNames.join(";").toStdString();
+        AbstractIodeObjectWidget* databaseWidget;
         switch (iodeType)
         {
         case I_COMMENTS:
-            tableView = new CommentsView(dialog);
-            tableView->setModel(new CommentsModel(dialog, Comments.subset(pattern)));
+            databaseWidget = new CommentsWidget(dialog);
             break;
         case I_EQUATIONS:
-            tableView = new EquationsView(dialog);
-            tableView->setModel(new EquationsModel(dialog, Equations.subset(pattern)));
+            databaseWidget = new EquationsWidget(dialog);
             break;
         case I_IDENTITIES:
-            tableView = new IdentitiesView(dialog);
-            tableView->setModel(new IdentitiesModel(dialog, Identities.subset(pattern)));
+            databaseWidget = new IdentitiesWidget(dialog);
             break;
         case I_LISTS:
-            tableView = new ListsView(dialog);
-            tableView->setModel(new ListsModel(dialog, Lists.subset(pattern)));
+            databaseWidget = new ListsWidget(dialog);
             break;
         case I_SCALARS:
-            tableView = new ScalarsView(dialog);
-            tableView->setModel(new ScalarsModel(dialog, Scalars.subset(pattern)));
+            databaseWidget = new ScalarsWidget(dialog);
             break;
         case I_TABLES:
-            tableView = new TablesView(dialog);
-            tableView->setModel(new TablesModel(dialog, Tables.subset(pattern)));
+            databaseWidget = new TablesWidget(dialog);
             break;
         case I_VARIABLES:
-            tableView = new VariablesView(dialog);
-            tableView->setModel(new VariablesModel(dialog, Variables.subset(pattern)));
+            databaseWidget = new VariablesWidget(dialog);
             break;
         default:
             break;
         }
 
-        // 1. The user cannot add or remove objects
-        // Disables delete shortcut
-        tableView->enableDeleteShortcut(false);
-
-        // 2. The user can modify the values of the objects
+        // The user can modify the values of the objects
         // Informs the tab representing the IODE objects of type 'iodeType' that a value has been changed 
         int index = getIodeObjTabIndex(iodeType);
         if(index < 0)
@@ -505,24 +493,27 @@ void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& ob
                 + "Database of objects of type " + type_ + " not found");
         }
         IodeAbstractWidget* tab = static_cast<IodeAbstractWidget*>(this->widget(index));
-        IodeAbstractTableModel* model_ = static_cast<IodeAbstractTableModel*>(tableView->model());
-        connect(model_, &CommentsModel::dataChanged, tab, [tab]{ tab->setModified(true); });
-        connect(model_, &CommentsModel::headerDataChanged, tab, [tab]{ tab->setModified(true); });
+        connect(databaseWidget, &AbstractIodeObjectWidget::tabDatabaseModified, tab, 
+            [tab](const EnumIodeType iodeType, const bool modified){ tab->setModified(modified); });
 
-        // updates the view -> computes the columns names if variables
-        tableView->update();
+        // update the view -> computes the columns names if variables
+        databaseWidget->update();
+
+        // filter names
+        QString pattern = objNames.join(";");
+        databaseWidget->filter(pattern);
 
         // adds the IODE objects table view to the popup dialog box
-        tableView->setObjectName("tableView");
-        gridLayout->addWidget(tableView, 0, 0, 1, 1);
+        databaseWidget->setObjectName("databaseWidget");
+        gridLayout->addWidget(databaseWidget, 0, 0, 1, 1);
 
         // makes the dialog box non modal
         dialog->setWindowModality(Qt::NonModal);
         dialog->setModal(false);
 
-        // resizes the table to fit to the list of objects to display
-        tableView->setFixedHeight(tableView->preferredHeight());
-        dialog->setMinimumWidth(600);
+        // resize the dialog window
+        int h = qMin(30 + databaseWidget->preferredHeight(), this->height());
+        dialog->resize(this->width(), h);
 
         // appends the new dialog box the list of open dialog boxes in the Main Window
         emit newObjsListDialog(dialog);
