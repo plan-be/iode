@@ -141,10 +141,12 @@ public:
     }
 
     virtual void clearKDB() = 0;
-    virtual void filter(const bool siltent = false) = 0;
+    virtual void filter(const bool silent = false) = 0;
+    virtual void filter(const QString& pattern, const bool silent = false) = 0;
     virtual void resetFilter() = 0;
     virtual QStringList getSelectedObjectsNames() const = 0;
     virtual void computeHash(const bool before=false) = 0;
+    virtual int preferredHeight() = 0;
 
 public slots:
     void setModified(bool modified) override
@@ -173,8 +175,7 @@ protected:
     QShortcut* shortcutAdd;
 
 public:
-    TemplateIodeObjectWidget(EnumIodeType iodeType, QWidget* parent) 
-        : AbstractIodeObjectWidget(iodeType, parent)
+    TemplateIodeObjectWidget(EnumIodeType iodeType, QWidget* parent) : AbstractIodeObjectWidget(iodeType, parent)
     {
         // prepare splitter
         splitter = new QSplitter(parent);
@@ -246,6 +247,15 @@ public:
         delete shortcutAdd;
     }
 
+    /**
+     * @brief get the preferred height
+     */
+    int preferredHeight()
+    {
+        int h = (vLayout->count() - 1) * 30; 
+        return h + tableview->preferredHeight();
+    }
+
     QString getTabText() const
     {
         if(isUnsavedDatabase())
@@ -289,6 +299,12 @@ public:
 
     void filter(const bool silent = false)
     {
+        tableview->filter(silent);
+    }
+
+    void filter(const QString& pattern, const bool silent = false)
+    {
+        lineEdit_filter->setText(pattern);
         tableview->filter(silent);
     }
 
