@@ -101,14 +101,18 @@ bool IodeTemplateTableModel<K>::setData(const QModelIndex& index, const QVariant
 template <class K>
 void IodeTemplateTableModel<K>::filter(const QString& pattern, const bool silent)
 {
+	if(database_subset)
+	{
+		delete database_subset;
+		database_subset = nullptr;
+	} 
+
 	if (pattern.isEmpty())
 		displayed_database = database;
 	else
 	{
 		try
 		{
-			if(database_subset) 
-				delete database_subset;
 			database_subset = database->subset(pattern.toStdString());
 			displayed_database = database_subset;
 		}
