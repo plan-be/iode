@@ -179,7 +179,9 @@ public:
         // prepare splitter
         splitter = new QSplitter(parent);
         splitter->setObjectName("splitter");
-        splitter->setGeometry(QRect(10, 43, 950, 560));
+        splitter->move(10, 43);
+        splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        
         splitter->setOrientation(Qt::Horizontal);
         splitter_ = splitter;
 
