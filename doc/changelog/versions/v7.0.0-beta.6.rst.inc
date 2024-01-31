@@ -26,6 +26,7 @@ Fixed Bugs 🛠️
           the last row in any case (#446)
   * (GUI) Fixed loss of precision when copying from IODE Variables and pasting to an Excel workbook 
           (values are copied with maximum precision possible) (#448)
+  * (GUI) Fixed use the shortcut CTRL (+ ALT) + F1...F7 more than once (cascading) (#464)
 
 
 Miscellaneous 🤷‍♀️
