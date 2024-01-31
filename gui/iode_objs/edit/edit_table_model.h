@@ -11,7 +11,7 @@
 #include "utils.h"
 
 
-/* NOTE FOR THE DEVELOPPERS:
+/* NOTE FOR THE DEVELOPERS:
  * 
  * Read-only model: https://doc.qt.io/qt-6/model-view-programming.html#read-only-access
  * Editable model:  https://doc.qt.io/qt-6/model-view-programming.html#editable-items
@@ -23,7 +23,6 @@ class EditTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-	QString tableName;
     Table* table;
 	size_t hashBefore;
 	size_t hashAfter;	
@@ -50,7 +49,7 @@ public:
 
 	EnumLineType get_line_type(const int row) const;
 
-	void save();
+	void save(const QString& name);
 
 	void computeHash(const bool before=false)
 	{

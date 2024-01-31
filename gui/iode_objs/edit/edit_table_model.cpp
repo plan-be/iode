@@ -1,7 +1,7 @@
 #pragma once
 #include "edit_table_model.h"
 
-EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbstractTableModel(parent), tableName(tableName)
+EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbstractTableModel(parent)
 {
 	try
 	{
@@ -323,7 +323,7 @@ EnumLineType EditTableModel::get_line_type(const int row) const
 	return row == 0 ? IT_CELL : table->get_line_type(row - 1);
 }
 
-void EditTableModel::save()
+void EditTableModel::save(const QString& name)
 {	
-	Tables.update(tableName.toStdString(), *table);
+	Tables.update(name.toStdString(), *table);
 }
