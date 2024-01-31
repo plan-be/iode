@@ -7,8 +7,9 @@ EditObjectDialog::EditObjectDialog(const EnumIodeType iodeType, const QString& o
 {
 	setupUi(this);
 
-    setWindowTitle("Edititing " + QString::fromStdString(vIodeTypes[iodeType]) + " " + objectName);
-    
+    setWindowTitle("Editing " + QString::fromStdString(vIodeTypes[iodeType]) + " " + objectName);
+
+    lineEdit_name->setText(objectName);
 	textEdit_content->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
     fullScreenShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this);
@@ -50,8 +51,9 @@ void EditCommentDialog::edit()
 {
     try
     {
+        std::string name = lineEdit_name->text().toStdString();
         Comment comment = textEdit_content->toPlainText().toStdString();
-        Comments.update(objectName.toStdString(), comment);
+        Comments.update(name, comment);
         computeHash(comment);
 
 		this->accept();

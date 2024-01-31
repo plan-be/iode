@@ -8,6 +8,8 @@ EditTableDialog::EditTableDialog(const QString& tableName, QWidget* parent)
 
 	tableView->setupModel(tableName);
 
+	lineEdit_name->setText(tableName);
+
 	for(const auto& [line_type, _] : mLineType) 
 		list_insert_types << QString::fromStdString(line_type);
 
@@ -51,8 +53,9 @@ void EditTableDialog::edit()
 {
 	try
 	{
+		QString name = lineEdit_name->text();
 		EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
-		table_model->save();
+		table_model->save(name);
 		table_model->computeHash();
 
 		this->accept();
