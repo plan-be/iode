@@ -1,8 +1,9 @@
 #include "edit_equation.h"
 
 
-EditEquationDialog::EditEquationDialog(const QString& equationName, QWidget* parent) : 
-	IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
+EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations* database, 
+	QWidget* parent) : IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
+	database(database)
 {
 	setupUi(this);
 

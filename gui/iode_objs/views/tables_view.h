@@ -12,7 +12,7 @@
 #include "tabs/iode_objs/tab_gsample_table.h"
 
 
-class TablesView : public IodeTemplateTableView<EditTableDialog>
+class TablesView : public IodeTemplateTableView<TablesModel, EditTableDialog>
 {
 	Q_OBJECT
 

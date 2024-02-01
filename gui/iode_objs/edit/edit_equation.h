@@ -40,6 +40,8 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
 
     IodeCompleter* completer;
 
+    KDBEquations* database;
+
     WrapperIodeNameEdit*    lineName;
     WrapperComboBox*        comboBoxMethod;
     WrapperSampleEdit*      sampleFrom;
@@ -60,7 +62,7 @@ private:
     void display_equation(const NamedEquation& equation);
 
 public:
-    EditEquationDialog(const QString& equationName, QWidget* parent = Q_NULLPTR);
+    EditEquationDialog(const QString& equationName, KDBEquations* database, QWidget* parent = Q_NULLPTR);
     ~EditEquationDialog();
 
 signals:

@@ -10,7 +10,7 @@
 #include "iode_objs/edit/edit_equation.h"
 
 
-class EquationsView : public IodeTemplateTableView<EditEquationDialog>
+class EquationsView : public IodeTemplateTableView<EquationsModel, EditEquationDialog>
 {
 	Q_OBJECT
 

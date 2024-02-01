@@ -9,6 +9,7 @@
 #include <QAbstractTableModel>
 
 #include "utils.h"
+#include "cpp_api/objects/table.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -23,17 +24,17 @@ class EditTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-    Table* table;
-	size_t hashBefore;
-	size_t hashAfter;	
-
-signals:
-	void databaseModified();
+    Table* table;	
 
 public:
     EditTableModel(const QString& tableName, QWidget* parent = Q_NULLPTR);
 
 	~EditTableModel();
+
+	Table getIodeTable() const
+	{
+		return *table;
+	}
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
@@ -48,21 +49,6 @@ public:
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
 
 	EnumLineType get_line_type(const int row) const;
-
-	void save(const QString& name);
-
-	void computeHash(const bool before=false)
-	{
-		boost::hash<TBL> table_hasher;
-		if(before)
-    		hashBefore = table_hasher(*table);
-		else
-		{
-			hashAfter = table_hasher(*table);
-			if(hashAfter != hashBefore) 
-				emit databaseModified();
-		}
-	}
 
 	int appendLine(EnumLineType lineType);
 

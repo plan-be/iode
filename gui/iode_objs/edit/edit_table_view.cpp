@@ -12,9 +12,9 @@ EditTableView::EditTableView(QWidget* parent): QTableView(parent)
 	setStyleSheet("QHeaderView::section { background-color: lightGray }");
 }
 
-void EditTableView::setupModel(const QString& tableName)
+void EditTableView::setupModel(const QString& name)
 {
-	EditTableModel* model = new EditTableModel(tableName, static_cast<QWidget*>(parent()));
+	EditTableModel* model = new EditTableModel(name, static_cast<QWidget*>(parent()));
 	setModel(model);
 
 	setItemDelegate(new EditTableDelegate());

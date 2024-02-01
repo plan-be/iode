@@ -9,13 +9,14 @@ EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbs
 	}
 	catch (const std::exception& e)
 	{
+		table = nullptr;
 		QMessageBox::critical(static_cast<QWidget*>(parent), tr("ERROR"), tr(e.what()));
 	}
 }
 
 EditTableModel::~EditTableModel()
 {
-	delete table;
+	if(table) delete table;
 }
 
 int EditTableModel::rowCount(const QModelIndex& parent) const
@@ -321,9 +322,4 @@ EnumLineType EditTableModel::get_line_type(const int row) const
 {
 	// first row represents the diviser line
 	return row == 0 ? IT_CELL : table->get_line_type(row - 1);
-}
-
-void EditTableModel::save(const QString& name)
-{	
-	Tables.update(name.toStdString(), *table);
 }
