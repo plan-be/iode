@@ -1,14 +1,15 @@
 #include "edit_table.h"
 
 
-EditTableDialog::EditTableDialog(const QString& tableName, QWidget* parent) 
-	: IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), tableName(tableName)
+EditTableDialog::EditTableDialog(const QString& name, KDBTables* database, QWidget* parent) 
+	: IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
+	  name(name.toStdString()), database(database), table(database->get(name.toStdString()))
 {
 	setupUi(this);
 
-	tableView->setupModel(tableName);
+	tableView->setupModel(name);
 
-	lineEdit_name->setText(tableName);
+	lineEdit_name->setText(name);
 
 	for(const auto& [line_type, _] : mLineType) 
 		list_insert_types << QString::fromStdString(line_type);
@@ -31,13 +32,7 @@ EditTableDialog::EditTableDialog(const QString& tableName, QWidget* parent)
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 	connect(this, &EditTableDialog::newPlot, main_window, &MainWindowAbstract::appendDialog);
 
-	// propagate signal
-	EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
-	connect(table_model, &EditTableModel::databaseModified, this, &EditTableDialog::databaseModified);
-
 	loadSettings();
-
-	table_model->computeHash(true);
 }
 
 EditTableDialog::~EditTableDialog()
@@ -53,11 +48,36 @@ void EditTableDialog::edit()
 {
 	try
 	{
-		QString name = lineEdit_name->text();
-		EditTableModel* table_model = static_cast<EditTableModel*>(tableView->model());
-		table_model->save(name);
-		table_model->computeHash();
+		std::string name_ = lineEdit_name->text().toStdString();
+		EditTableModel* edit_table_model = static_cast<EditTableModel*>(tableView->model());
+		Table table_ = edit_table_model->getIodeTable();
 
+		if(name_ == name)
+		{
+			if(table_ == table)
+			{
+				this->accept();
+				return;
+			}
+
+			database->update(name_, table_);
+		}
+		// check in / update the global IODE database since the variable 'database' may represents only a subset
+		else if(Tables.contains(name_))
+		{
+			int res = QMessageBox::question(nullptr, "WARNING", QString::fromStdString(name_) + " already exists. Replace it ?");
+			if(res != QMessageBox::StandardButton::Yes)
+			{
+				this->reject();
+				return;
+			}
+
+			Tables.update(name_, table_);
+		}
+		else
+			database->add(name_, table_);
+
+		emit databaseModified();
 		this->accept();
 	}
 	catch (const std::exception& e)
@@ -73,7 +93,7 @@ void EditTableDialog::plot()
         Sample smpl = Variables.get_sample();
         QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
  
-        GSampleGraph* gSampleGraph = new GSampleGraph(tableName.toStdString(), gsample.toStdString());
+        GSampleGraph* gSampleGraph = new GSampleGraph(name, gsample.toStdString());
 
         PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
         plotDialog->plot();
@@ -89,7 +109,7 @@ void EditTableDialog::insert_line()
 {
 	try
 	{
-		EditTableModel* tables_model = static_cast<EditTableModel*>(tableView->model());
+		EditTableModel* edit_table_model = static_cast<EditTableModel*>(tableView->model());
 		QModelIndexList selection = tableView->selectionModel()->selectedRows();
 		int position = (selection.count() > 0) ? selection[0].row() : -1;
 
@@ -103,17 +123,17 @@ void EditTableDialog::insert_line()
 		switch(insertWhere)
 		{
 		case INSERT_AT_THE_END:
-			new_pos = tables_model->appendLine(lineType);
+			new_pos = edit_table_model->appendLine(lineType);
 			break;
 		case INSERT_AFTER_CURRENT:
 			if(position < 0)
 				return;
-			new_pos = tables_model->insert_line(lineType, position, true);
+			new_pos = edit_table_model->insert_line(lineType, position, true);
 			break;
 		case INSERT_BEFORE_CURRENT:
 			if(position < 0)
 				return;
-			new_pos = tables_model->insert_line(lineType, position, false);
+			new_pos = edit_table_model->insert_line(lineType, position, false);
 			break;
 		default:
 			break;
@@ -129,7 +149,7 @@ void EditTableDialog::delete_line()
 {
 	try
 	{
-		EditTableModel* tables_model = static_cast<EditTableModel*>(tableView->model());
+		EditTableModel* edit_table_model = static_cast<EditTableModel*>(tableView->model());
 		QModelIndexList selection = tableView->selectionModel()->selectedRows();
 		if(selection.count() == 0)
 			return;
@@ -139,7 +159,7 @@ void EditTableDialog::delete_line()
 		if(row == 0)
 			return;
 		
-    	tables_model->removeRow(row, QModelIndex());
+    	edit_table_model->removeRow(row, QModelIndex());
     	update();
 	}
 	catch (const std::exception& e)

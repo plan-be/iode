@@ -11,7 +11,7 @@
 #include "iode_objs/edit/edit_iode_obj.h"
 
 
-class IdentitiesView : public IodeTemplateTableView<EditIdentityDialog>
+class IdentitiesView : public IodeTemplateTableView<IdentitiesModel, EditIdentityDialog>
 {
 	Q_OBJECT
 

@@ -14,6 +14,7 @@
 
 #include "plot/plot_table.h"
 #include "main_window_abstract.h"
+#include "iode_objs/models/abstract_table_model.h"
 #include "iode_objs/models/gsample_table_model.h"
 
 
@@ -37,19 +38,20 @@ class EditTableDialog : public IodeSettingsDialog, public Ui::EditTableDialog
 {
     Q_OBJECT
 
-    QString tableName;
+    std::string name;
+    Table table;
+    KDBTables* database;
 
     QShortcut* shortcutDelete;
+	QShortcut* fullScreenShortcut;
 
     WrapperComboBox* wInsertLineType;
     WrapperComboBox* wInsertWhere;
 
-	QShortcut* fullScreenShortcut;
-
     QList<QString> list_insert_types;
 
 public:
-    EditTableDialog(const QString& tableName, QWidget* parent = Q_NULLPTR);
+    EditTableDialog(const QString& name, KDBTables* database, QWidget* parent = Q_NULLPTR);
     ~EditTableDialog();
 
 signals:

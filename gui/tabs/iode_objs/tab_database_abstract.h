@@ -149,12 +149,14 @@ public:
     virtual void openEditDialog() = 0;
     virtual void computeHash(const bool before=false) = 0;
     virtual int preferredHeight() = 0;
+    virtual void resetModel() = 0;
 
 public slots:
     void setModified(bool modified) override
     {
         this->modified = modified;
-        emit tabDatabaseModified(iodeType, modified); 
+        if(modified) resetModel(); 
+        emit tabDatabaseModified(iodeType, modified);
     }
 
     void databaseModified()
@@ -276,6 +278,11 @@ public:
             return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database [0]";
         else
             return IodeAbstractWidget::getTooltip() + " [" + QString::number(objmodel->getNbObjects()) + "]";
+    }
+
+    void resetModel() override
+    {
+        objmodel->reset();
     }
 
     void openAddDialog() override

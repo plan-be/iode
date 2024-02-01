@@ -312,7 +312,7 @@ public slots:
 };
 
 
-template <class D> class IodeTemplateTableView : public IodeAbstractTableView
+template <class M, class D> class IodeTemplateTableView : public IodeAbstractTableView
 {
 	D* editDialog;
 
@@ -344,7 +344,8 @@ public:
 			delete editDialog;
 		}
 
-		editDialog = new D(name, static_cast<QWidget*>(this->parent()));
+		M* model_ = static_cast<M*>(model());
+		editDialog = new D(name, model_->get_displayed_database(), static_cast<QWidget*>(this->parent()));
 
 		// propagate signal
 		connect(editDialog, &D::databaseModified, this, &IodeAbstractTableView::databaseModified);

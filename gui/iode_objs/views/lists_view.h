@@ -9,7 +9,7 @@
 #include "iode_objs/edit/edit_iode_obj.h"
 
 
-class ListsView : public IodeTemplateTableView<EditListDialog>
+class ListsView : public IodeTemplateTableView<ListsModel, EditListDialog>
 {
 	Q_OBJECT
 

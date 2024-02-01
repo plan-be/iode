@@ -111,6 +111,12 @@ public:
 		if(database) delete database;
 	}
 
+	// NOTE: intended to be passed to the constructors of Edit(...)Dialog and Add(...)Dialog classes
+	K* get_displayed_database() const
+	{
+		return displayed_database;
+	}
+
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override
 	{
 		return displayed_database->count();

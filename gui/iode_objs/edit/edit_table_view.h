@@ -20,7 +20,7 @@ class EditTableView : public QTableView
 public:
     EditTableView(QWidget* parent = Q_NULLPTR);
 
-    void setupModel(const QString& tableName);
+    void setupModel(const QString& name);
 
 public slots:
     //void updateRows();

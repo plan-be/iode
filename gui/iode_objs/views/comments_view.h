@@ -9,7 +9,7 @@
 #include "iode_objs/edit/edit_iode_obj.h"
 
 
-class CommentsView : public IodeTemplateTableView<EditCommentDialog>
+class CommentsView : public IodeTemplateTableView<CommentsModel, EditCommentDialog>
 {
 	Q_OBJECT
 
