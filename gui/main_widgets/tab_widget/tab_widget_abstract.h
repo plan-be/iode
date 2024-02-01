@@ -184,6 +184,20 @@ public:
      */
 	void showTab(int index = -1);
 
+    /**
+     * @brief To be called from executed command lines or IODE reports
+     * 
+     * @param iodeType 
+     */
+    virtual void openAddDialog(const EnumIodeType iodeType) = 0;
+
+    /**
+     * @brief To be called from executed command lines or IODE reports
+     * 
+     * @param iodeType 
+     */
+    virtual void openEditDialog(const EnumIodeType iodeType) = 0;
+
 protected:
     virtual int getIodeObjTabIndex(const EnumIodeType iodeType) const = 0;
 

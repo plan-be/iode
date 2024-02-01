@@ -112,6 +112,10 @@ public:
      */
     QStringList getSelectedObjectsNames(const EnumIodeType iodeType);
 
+    void openAddDialog(const EnumIodeType iodeType) override;
+
+    void openEditDialog(const EnumIodeType iodeType) override;
+
 public slots:
     void tabTextModified(const QString& filepath, const bool modified)
     {
