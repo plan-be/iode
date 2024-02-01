@@ -145,6 +145,8 @@ public:
     virtual void filter(const QString& pattern, const bool silent = false) = 0;
     virtual void resetFilter() = 0;
     virtual QStringList getSelectedObjectsNames() const = 0;
+    virtual void openAddDialog() = 0;
+    virtual void openEditDialog() = 0;
     virtual void computeHash(const bool before=false) = 0;
     virtual int preferredHeight() = 0;
 
@@ -276,14 +278,14 @@ public:
             return IodeAbstractWidget::getTooltip() + " [" + QString::number(objmodel->getNbObjects()) + "]";
     }
 
-    M* get_model() const 
+    void openAddDialog() override
     {
-        return objmodel;
+        tableview->new_obj();
     }
-
-    V* get_view() const
+    
+    void openEditDialog() override
     {
-        return tableview;
+        tableview->edit_obj();
     }
 
     QString getFilepath() const

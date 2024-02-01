@@ -420,6 +420,20 @@ int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
     }
 }
 
+void IodeTabWidget::openAddDialog(const EnumIodeType iodeType)
+{
+    int index = getIodeObjTabIndex(iodeType);
+    AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
+    tabWidget->openAddDialog();
+}
+
+void IodeTabWidget::openEditDialog(const EnumIodeType iodeType)
+{
+    int index = getIodeObjTabIndex(iodeType);
+    AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
+    tabWidget->openEditDialog();
+}
+
 void IodeTabWidget::clearTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();

@@ -249,9 +249,9 @@ int gui_IdtExecute_super()
 
 int gui_EqsEstimate_super()
 {
-	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	EditEquationDialog dialog("", main_window);
-	return dialog.exec();
+	IodeTabWidget* tab_widget = static_cast<IodeTabWidget*>(get_tabs_widget_ptr());
+	tab_widget->openEditDialog(EnumIodeType::I_EQUATIONS);
+	return 0;
 }
 
 int gui_XodeRuleImport_super()
