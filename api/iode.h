@@ -126,9 +126,9 @@
 #define KNB(kdb)     ((kdb)->k_nb)
 #define KOBJS(kdb)   ((kdb)->k_objs)
 
-#define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)
-#define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)
-#define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))
+#define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)                 // name of the object
+#define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)                  // position of the object in the memory
+#define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object (as a char*)
 
 
 #define K_NBR_OBJ   7
@@ -807,13 +807,13 @@ typedef char    ONAME[K_MAX_NAME + 1];
 typedef long    OSIZE;   /* JMP 23-05-00 */
 
 typedef struct  _kobj_ {
-    SWHDL       o_val;          // position in the "SWAP" memory
+    SWHDL       o_val;          // "position" in the memory -> to be passed to SW_getptr()
     ONAME       o_name;         // name of the object
     char        o_pad[3];
 } KOBJ;
 
 typedef struct _kdb_ {
-    KOBJ        *k_objs;                // map <position in the "SWAP" memory, object name>
+    KOBJ        *k_objs;                // map <position in the memory, object name>
 	long        k_nb;                   // number of objects in the database
     short       k_type;                 // type of the object: K_CMT, K_EQS, ..., K_VAR
     short       k_mode;                 // case of the object name: K_UPPER, K_LOWER or K_ASIS 
