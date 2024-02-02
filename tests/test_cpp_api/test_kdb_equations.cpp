@@ -207,6 +207,10 @@ TEST_F(KDBEquationsTest, Filter)
     EXPECT_EQ(kdb_subset->get_lec(name), lec);
     EXPECT_EQ(Equations.get_lec(name), lec);
 
+    // try to add an element to the local KDB which is already present 
+    // in the global KDB
+    EXPECT_THROW(kdb_subset->add("BQY", lec, method, from, to, comment, instruments, block, date), std::invalid_argument);
+
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Equations.count(), nb_total_equations);

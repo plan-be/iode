@@ -245,6 +245,10 @@ TEST_F(KDBIdentitiesTest, Filter)
     EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Identities.contains(new_name));
 
+    // try to add an element to the local KDB which is already present 
+    // in the global KDB
+    EXPECT_THROW(kdb_subset->add("FLGR", new_lec), std::invalid_argument);
+
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Identities.count(), nb_total_identities);

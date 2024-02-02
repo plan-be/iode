@@ -479,6 +479,10 @@ TEST_F(KDBVariablesTest, Filter)
     EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Variables.contains(new_name));
 
+    // try to add an element to the local KDB which is already present 
+    // in the global KDB
+    EXPECT_THROW(kdb_subset->add("BENEF", new_var), std::invalid_argument);
+
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Variables.count(), nb_total_variables);
