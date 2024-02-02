@@ -194,6 +194,10 @@ TEST_F(KDBScalarsTest, Filter)
     EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Scalars.contains(new_name));
 
+    // try to add an element to the local KDB which is already present 
+    // in the global KDB
+    EXPECT_THROW(kdb_subset->add("gamma", new_scalar_local), std::invalid_argument);
+
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Scalars.count(), nb_total_scalars);

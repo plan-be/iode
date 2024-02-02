@@ -167,6 +167,10 @@ TEST_F(KDBListsTest, Filter)
     EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Lists.contains(new_name));
 
+    // try to add an element to the local KDB which is already present 
+    // in the global KDB
+    EXPECT_THROW(kdb_subset->add("ENDO", new_list), std::invalid_argument);
+
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Lists.count(), nb_total_lists);

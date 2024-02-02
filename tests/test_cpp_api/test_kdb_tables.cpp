@@ -229,6 +229,10 @@ TEST_F(KDBTablesTest, Filter)
     EXPECT_FALSE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Tables.contains(new_name));
 
+    // try to add an element to the local KDB which is already present 
+    // in the global KDB
+    EXPECT_THROW(kdb_subset->add("DEF", 2, def, vars, mode, files, date), std::invalid_argument);
+
     // delete local kdb
     delete kdb_subset;
     EXPECT_EQ(Tables.count(), nb_total_tables);
