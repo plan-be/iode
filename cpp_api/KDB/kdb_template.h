@@ -19,18 +19,6 @@ protected:
     KDBTemplate(KDBAbstract* kdb, const bool deep_copy, const std::string& pattern) :
         KDBAbstract(kdb, deep_copy, pattern) {}
 
-public:
-    KDBTemplate(const EnumIodeType iode_type, const std::string& filepath) : 
-        KDBAbstract(iode_type, filepath) {}
-
-    //  Create + Update + Get + Copy methods
-
-    // Note: The definition of a template must be visible in the translation unit in which it is instantiated 
-    // (which usually means your code in the header file), or it must be explicitly instantiated for the desired types. 
-    // That is simply how C++ templates work.
-    // https://stackoverflow.com/questions/23412703/visual-studio-static-libraries-and-variadic-template-classes#comment35876150_23412703
-    // https://stackoverflow.com/a/47890906
-
     template<class... Args> int add_or_update(KDB* kdb, const std::string& name, Args... args)
     {
         char* c_name = to_char_array(name);
@@ -43,6 +31,18 @@ public:
                                      "Reason: unknown");
         return pos;
     }
+
+public:
+    KDBTemplate(const EnumIodeType iode_type, const std::string& filepath) : 
+        KDBAbstract(iode_type, filepath) {}
+
+    //  Create + Update + Get + Copy methods
+
+    // Note: The definition of a template must be visible in the translation unit in which it is instantiated 
+    // (which usually means your code in the header file), or it must be explicitly instantiated for the desired types. 
+    // That is simply how C++ templates work.
+    // https://stackoverflow.com/questions/23412703/visual-studio-static-libraries-and-variadic-template-classes#comment35876150_23412703
+    // https://stackoverflow.com/a/47890906
 
     template<class... Args> int add(const std::string& name, Args... args)
     {
@@ -65,9 +65,9 @@ public:
             KDB* global_kdb = K_WS[k_type];
             if(check_object_already_exists(global_kdb, name))
                 throw std::invalid_argument(error_msg);
-            // add new obj to global KDB
+            // add new obj to the global KDB
             int pos_global = add_or_update(global_kdb, name, args...);
-            // add new entry to shallow copy KDB
+            // add a new entry and copy the pointer
             char* c_name = to_char_array(name);
             pos = K_add_entry(kdb, c_name);
             KSOVAL(kdb, pos) = KSOVAL(global_kdb, pos_global);
@@ -80,39 +80,27 @@ public:
     {
         // throw exception if object with passed position is not valid
         std::string name = get_name(pos);
-
-        std::string error_msg = "Cannot add " + vIodeTypes[k_type] + " with name '" + name + "'.\n";
-        error_msg += "The " + vIodeTypes[k_type] + " with name '" + name + "' already exists in the database.\n";
-        error_msg += "Use the update() method instead.";
-
-        KDB* kdb = get_database();
-        if(!check_object_already_exists(kdb, name))
-            throw std::runtime_error(error_msg);
         
         // NOTE: In the case of a shallow copy, only pointers to objects 
         //       are duplicated, not the objects.
-        //       Modifying an object passing either the shallow copy (this)
+        //       Modifying an object passing either the shallow copy
         //       or the global KDB (K_WS[k_type]) modifies the same object.
+        KDB* kdb = get_database();
         add_or_update(kdb, name, args...);
-
     }
 
     template<class... Args> void update(const std::string& name, Args... args)
     {
-        // throw exception if object with passed name does not exist
-        get_position(name);
-
-        std::string error_msg = "Cannot add " + vIodeTypes[k_type] + " with name '" + name + "'.\n";
-        error_msg += "The " + vIodeTypes[k_type] + " with name '" + name + "' already exists in the database.\n";
-        error_msg += "Use the update() method instead.";
+        std::string error_msg = "Cannot update " + vIodeTypes[k_type] + " with name '" + name + "'.\n";
+        error_msg += "Name '" + name + "' not found in the database.\nUse the add() method instead.";
 
         KDB* kdb = get_database();
         if(!check_object_already_exists(kdb, name))
-            throw std::runtime_error(error_msg);
-
+            throw std::invalid_argument(error_msg);
+        
         // NOTE: In the case of a shallow copy, only pointers to objects 
         //       are duplicated, not the objects.
-        //       Modifying an object passing either the shallow copy (this)
+        //       Modifying an object passing either the shallow copy
         //       or the global KDB (K_WS[k_type]) modifies the same object.
         add_or_update(kdb, name, args...);
     }
