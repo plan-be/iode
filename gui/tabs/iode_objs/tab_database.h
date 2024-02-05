@@ -30,7 +30,6 @@ public:
         connect(objmodel, &CommentsModel::rowsInserted, this, &CommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::rowsRemoved, this, &CommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::databaseModified, this, &CommentsWidget::databaseModified);
-        connect(tableview, &CommentsView::newObjectInserted, this, &CommentsWidget::databaseModified);
         connect(tableview, &CommentsView::databaseModified, this, &CommentsWidget::databaseModified);
     }
 };
@@ -45,7 +44,6 @@ public:
         connect(objmodel, &EquationsModel::rowsInserted, this, &EquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::rowsRemoved, this, &EquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::databaseModified, this, &EquationsWidget::databaseModified);
-        connect(tableview, &EquationsView::newObjectInserted, this, &EquationsWidget::databaseModified);
         connect(tableview, &EquationsView::databaseModified, this, &EquationsWidget::databaseModified);
     }
 };
@@ -60,7 +58,6 @@ public:
         connect(objmodel, &IdentitiesModel::rowsInserted, this, &IdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::rowsRemoved, this, &IdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::databaseModified, this, &IdentitiesWidget::databaseModified);
-        connect(tableview, &IdentitiesView::newObjectInserted, this, &IdentitiesWidget::databaseModified);
         connect(tableview, &IdentitiesView::databaseModified, this, &IdentitiesWidget::databaseModified);
     }
 };
@@ -75,7 +72,6 @@ public:
         connect(objmodel, &ListsModel::rowsInserted, this, &ListsWidget::databaseModified);
         connect(objmodel, &ListsModel::rowsRemoved, this, &ListsWidget::databaseModified);
         connect(objmodel, &ListsModel::databaseModified, this, &ListsWidget::databaseModified);
-        connect(tableview, &ListsView::newObjectInserted, this, &ListsWidget::databaseModified);
         connect(tableview, &ListsView::databaseModified, this, &ListsWidget::databaseModified);
     }
 };
@@ -100,7 +96,7 @@ public:
         connect(objmodel, &ScalarsModel::rowsInserted, this, &ScalarsWidget::databaseModified);
         connect(objmodel, &ScalarsModel::rowsRemoved, this, &ScalarsWidget::databaseModified);
         connect(objmodel, &ScalarsModel::databaseModified, this, &ScalarsWidget::databaseModified);
-        connect(tableview, &ScalarsView::newObjectInserted, this, &ScalarsWidget::databaseModified);
+        connect(tableview, &ScalarsView::databaseModified, this, &ScalarsWidget::databaseModified);
     }
 
     void loadSettings(const QSettings* project_settings) override
@@ -124,7 +120,6 @@ public:
         connect(objmodel, &TablesModel::rowsInserted, this, &TablesWidget::databaseModified);
         connect(objmodel, &TablesModel::rowsRemoved, this, &TablesWidget::databaseModified);
         connect(objmodel, &TablesModel::databaseModified, this, &TablesWidget::databaseModified);
-        connect(tableview, &TablesView::newObjectInserted, this, &TablesWidget::databaseModified);
         connect(tableview, &TablesView::databaseModified, this, &TablesWidget::databaseModified);
     }
 };
@@ -186,7 +181,7 @@ public:
         connect(objmodel, &VariablesModel::rowsInserted, this, &VariablesWidget::databaseModified);
         connect(objmodel, &VariablesModel::rowsRemoved, this, &VariablesWidget::databaseModified);
         connect(objmodel, &VariablesModel::databaseModified, this, &VariablesWidget::databaseModified);
-        connect(tableview, &VariablesView::newObjectInserted, this, &VariablesWidget::databaseModified);
+        connect(tableview, &VariablesView::databaseModified, this, &VariablesWidget::databaseModified);
     }
 
     ~VariablesWidget()

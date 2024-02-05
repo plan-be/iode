@@ -66,11 +66,14 @@ set(GUI_PLOT
 
 set(GUI_EDIT_OBJECT
     iode_objs/edit/edit_iode_obj.ui     iode_objs/edit/edit_iode_obj.h          iode_objs/edit/edit_iode_obj.cpp
+                                        iode_objs/edit/edit_comment.h
     iode_objs/edit/edit_equation.ui     iode_objs/edit/edit_equation.h          iode_objs/edit/edit_equation.cpp
+                                        iode_objs/edit/edit_identity.h
+                                        iode_objs/edit/edit_list.h
                                         iode_objs/edit/edit_table_view.h        iode_objs/edit/edit_table_view.cpp
                                         iode_objs/edit/edit_table_model.h       iode_objs/edit/edit_table_model.cpp
-    iode_objs/edit/edit_table.ui        iode_objs/edit/edit_table.h             iode_objs/edit/edit_table.cpp
                                         iode_objs/edit/edit_table_delegate.h    iode_objs/edit/edit_table_delegate.cpp
+    iode_objs/edit/edit_table.ui        iode_objs/edit/edit_table.h             iode_objs/edit/edit_table.cpp
     iode_objs/edit/edit_vars_sample.ui  iode_objs/edit/edit_vars_sample.h       iode_objs/edit/edit_vars_sample.cpp
 )
 
@@ -112,11 +115,11 @@ set(GUI_OBJS_VIEWS
     iode_objs/views/abstract_table_view.h   iode_objs/views/abstract_table_view.cpp
     iode_objs/views/numerical_view.h
     iode_objs/views/gsample_table_view.h
-    iode_objs/views/comments_view.h         iode_objs/views/comments_view.cpp
-    iode_objs/views/equations_view.h        iode_objs/views/equations_view.cpp
+    iode_objs/views/comments_view.h
+    iode_objs/views/equations_view.h
     iode_objs/views/identities_view.h       iode_objs/views/identities_view.cpp
-    iode_objs/views/lists_view.h            iode_objs/views/lists_view.cpp
-    iode_objs/views/scalars_view.h          iode_objs/views/scalars_view.cpp
+    iode_objs/views/lists_view.h
+    iode_objs/views/scalars_view.h
     iode_objs/views/tables_view.h           iode_objs/views/tables_view.cpp
     iode_objs/views/variables_view.h        iode_objs/views/variables_view.cpp
 )

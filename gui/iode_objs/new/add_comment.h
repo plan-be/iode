@@ -8,6 +8,7 @@
 #include "ui_add_object.h"
 #include "utils.h"
 #include "wrapper_classes.h"
+#include "iode_objs/models/comments_model.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -19,12 +20,16 @@
 class AddCommentDialog : public QDialog, public Ui::AddObjectDialog
 {
     Q_OBJECT
+    KDBComments* database;
 
     WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineDefinition;
 
 public:
-    AddCommentDialog(QWidget* parent = Q_NULLPTR);
+    AddCommentDialog(KDBComments* database, QWidget* parent = Q_NULLPTR);
+
+signals:
+    void newObjectInserted(QString);
 
 public slots:
     void add();

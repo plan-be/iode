@@ -8,6 +8,7 @@
 #include "ui_add_object.h"
 #include "utils.h"
 #include "wrapper_classes.h"
+#include "iode_objs/models/lists_model.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -19,12 +20,16 @@
 class AddListDialog : public QDialog, public Ui::AddObjectDialog
 {
     Q_OBJECT
+    KDBLists* database;
 
     WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineDefinition;
 
 public:
-    AddListDialog(QWidget* parent = Q_NULLPTR);
+    AddListDialog(KDBLists* database, QWidget* parent = Q_NULLPTR);
+
+signals:
+    void newObjectInserted(QString);
 
 public slots:
     void add();

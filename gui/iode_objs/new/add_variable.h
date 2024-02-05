@@ -9,6 +9,7 @@
 #include "iode_objs/edit/edit_vars_sample.h"
 #include "utils.h"
 #include "wrapper_classes.h"
+#include "iode_objs/models/variables_model.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -20,12 +21,16 @@
 class AddVariableDialog : public QDialog, public Ui::AddObjectDialog
 {
     Q_OBJECT
+    KDBVariables* database;
 
     WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineDefinition;
 
 public:
-    AddVariableDialog(QWidget* parent = Q_NULLPTR);
+    AddVariableDialog(KDBVariables* database, QWidget* parent = Q_NULLPTR);
+
+signals:
+    void newObjectInserted(QString);
 
 public slots:
     void add();

@@ -1,6 +1,6 @@
 #include "add_table.h"
 
-AddTableDialog::AddTableDialog(QWidget* parent) : IodeSettingsDialog(parent)
+AddTableDialog::AddTableDialog(KDBTables* database, QWidget* parent) : IodeSettingsDialog(parent), database(database)
 {
     setupUi(this);
 
@@ -48,9 +48,24 @@ void AddTableDialog::add()
         bool mode = checkBoxMode->extractAndVerify();
         bool files = checkBoxFiles->extractAndVerify();
         bool date = checkBoxDate->extractAndVerify();
-
-        Tables.add(name, nb_columns, title, lecs, mode, files, date);
-
+		// check if already exists in the global IODE database since the variable 'database' may represents only a subset
+		if(Tables.contains(name))
+		{
+			int res = QMessageBox::question(nullptr, "WARNING", QString::fromStdString(name) + " already exists. Replace it ?");
+			if(res != QMessageBox::StandardButton::Yes)
+			{
+				this->reject();
+				return;
+			}
+            Table table(nb_columns, title, lecs, mode, files, date);
+            Tables.update(name, table);
+		}
+        else
+        {
+            emit newObjectInserted(QString::fromStdString(name));
+            database->add(name, nb_columns, title, lecs, mode, files, date);
+        }
+        
         this->accept();
     }
     catch (const std::exception& e)

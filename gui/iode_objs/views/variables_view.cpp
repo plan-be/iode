@@ -63,17 +63,6 @@ void VariablesView::print()
 	}
 }
 
-void VariablesView::new_obj()
-{
-	if(!checkGlobalSample())
-		return;
-
-	AddVariableDialog dialog(this);
-	if(dialog.exec() == QDialog::Accepted)
-		emit newObjectInserted();
-	filter();
-}
-
 void VariablesView::plot_series()
 {
 	try

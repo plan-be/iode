@@ -17,14 +17,14 @@
  */
 
 
-class ScalarsView : public IodeAbstractTableView
+class ScalarsView : public IodeAbstractTableView, public TableViewAddObj<ScalarsModel, AddScalarDialog>
 {
 	Q_OBJECT
 	NumericalTableView numeric;
 
 public:
 	ScalarsView(QWidget* parent = nullptr) 
-		: IodeAbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent), numeric(false) 
+		: IodeAbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent), TableViewAddObj(this), numeric(false) 
 	{
 		numeric.setup(this);
 	};
@@ -37,5 +37,5 @@ protected:
 	}
 
 public slots:
-	void new_obj();
+	void new_obj()  { openAddDialog(); }
 };

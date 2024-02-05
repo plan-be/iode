@@ -1,14 +1,6 @@
 #include "identities_view.h"
 
 
-void IdentitiesView::new_obj()
-{
-	AddIdentityDialog dialog(this);
-	if(dialog.exec() == QDialog::Accepted)
-		emit newObjectInserted();
-	filter();
-}
-
 void IdentitiesView::executeCurrentIdentity()
 {
 	// get the selected object

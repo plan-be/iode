@@ -236,15 +236,16 @@ QString IodeTemplateTableModel<K>::saveAs(const QDir& projectDir)
 template <class K>
 bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelIndex& index)
 {
-	std::string name;
+	QString name;
 	beginRemoveRows(QModelIndex(), position, position + rows - 1);
 
 	try
 	{
 		for (int row = position; row < position + rows; row++)
 		{
-			name = dataCell(row, 0).toString().toStdString();
-			displayed_database->remove(row);
+			name = headerData(row, Qt::Vertical).toString();
+			displayed_database->remove(name.toStdString());
+			emit objectRemoved(name);
 		}
 	}
 	catch (const std::exception& e)

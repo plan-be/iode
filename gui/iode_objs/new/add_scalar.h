@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "settings.h"
 #include "wrapper_classes.h"
+#include "iode_objs/models/scalars_model.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -20,14 +21,18 @@
 class AddScalarDialog : public IodeSettingsDialog, public Ui::AddScalarDialog
 {
     Q_OBJECT
+    KDBScalars* database;
 
     WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineValue;
     WrapperDoubleSpinBox* spinBoxRelax;
 
 public:
-    AddScalarDialog(QWidget* parent = Q_NULLPTR);
+    AddScalarDialog(KDBScalars* database, QWidget* parent = Q_NULLPTR);
     ~AddScalarDialog();
+
+signals:
+    void newObjectInserted(QString);
 
 public slots:
     void add();
