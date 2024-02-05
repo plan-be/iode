@@ -43,10 +43,14 @@ static bool cell_equal(const TCELL* c_cell1, const TCELL* c_cell2)
 {
 	if (c_cell1->tc_type != c_cell2->tc_type) return false;
 	if (c_cell1->tc_attr != c_cell2->tc_attr) return false;
-	if (strcmp(T_cell_cont(const_cast<TCELL*>(c_cell1), 0), 
-		T_cell_cont(const_cast<TCELL*>(c_cell2), 0)) != 0) return false;
-
-	return true;
+	// need to create a copy because T_cell_cont returns a pointer to the global 
+	// allocated buffer BUF_DATA (see buf.c)
+	char* content1 = copy_char_array(T_cell_cont(const_cast<TCELL*>(c_cell1), 0));
+	char* content2 = copy_char_array(T_cell_cont(const_cast<TCELL*>(c_cell2), 0));
+	bool is_same_content = strcmp(content1, content2) == 0;
+	delete[] content1;
+	delete[] content2;
+	return is_same_content;
 }
 
 static bool line_equal(const int nb_columns, const TLINE* c_line1, const TLINE* c_line2)
