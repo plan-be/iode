@@ -65,7 +65,7 @@ static bool line_equal(const int nb_columns, const TLINE* c_line1, const TLINE* 
 	switch (c_line1->tl_type)
 	{
 	case IT_TITLE:
-		if (strcmp(T_cell_cont(cells_line1, 0), T_cell_cont(cells_line2, 0)) != 0) return false;
+		if (strcmp(cells_line1->tc_val, cells_line2->tc_val) != 0) return false;
 		break;
 	case IT_CELL:
 		for (int col = 0; col < nb_columns; col++) 
