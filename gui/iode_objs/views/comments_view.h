@@ -6,17 +6,19 @@
 #include "iode_objs/models/comments_model.h"
 #include "iode_objs/delegates/comments_delegate.h"
 #include "iode_objs/new/add_comment.h"
-#include "iode_objs/edit/edit_iode_obj.h"
+#include "iode_objs/edit/edit_comment.h"
 
 
-class CommentsView : public IodeTemplateTableView<CommentsModel, EditCommentDialog>
+class CommentsView : public IodeAbstractTableView, public TableViewEditObj<CommentsModel, EditCommentDialog>, public TableViewAddObj<CommentsModel, AddCommentDialog>
 {
 	Q_OBJECT
 
 public:
-	CommentsView(QWidget* parent = nullptr) : IodeTemplateTableView(I_COMMENTS, new CommentsDelegate(parent), parent) {};
+	CommentsView(QWidget* parent = nullptr) : 
+		IodeAbstractTableView(I_COMMENTS, new CommentsDelegate(parent), parent), 
+		TableViewEditObj(this), TableViewAddObj(this) {};
 
 public slots:
-	void new_obj();
+	void new_obj()  { openAddDialog(); }
 	void edit_obj() { openEditDialog(); }
 };

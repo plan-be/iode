@@ -33,10 +33,7 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
 {
     Q_OBJECT
 
-    EditAndEstimateEquations edit_est_eqs;
-    
-    size_t hashBefore;
-	size_t hashAfter;	
+    EditAndEstimateEquations edit_est_eqs;	
 
     IodeCompleter* completer;
 
@@ -67,6 +64,7 @@ public:
 
 signals:
     void databaseModified();
+    void newObjectInserted(QString);
 
 public slots:
     void edit();

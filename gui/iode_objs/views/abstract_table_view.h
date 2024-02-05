@@ -60,7 +60,6 @@ protected:
 	QShortcut* relatedVarShortcut;
 
 signals:
-	void newObjectInserted();
 	void databaseModified();
 	void showObjsRequest(EnumIodeType other_type, const QStringList& objNames);
 
@@ -253,8 +252,32 @@ public slots:
 		objectNameEdit->setHidden(true);
 		objectNameEdit->setText("");
 	}
+	
+	virtual void new_obj()  { }
+	virtual void edit_obj() { }
 
-	virtual void edit_obj() {}
+	void newObjectInserted(const QString& name)
+	{
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
+		if(table_model->filterActive())
+		{
+			QString pattern = filterLineEdit->text().trimmed();
+			pattern += ";" + name;
+			filterLineEdit->setText(pattern);
+		}
+	}
+
+	void objectRemoved(const QString& name)
+	{
+		IodeAbstractTableModel* table_model = static_cast<IodeAbstractTableModel*>(model());
+		if(table_model->filterActive())
+		{
+			QString pattern = filterLineEdit->text().trimmed();
+			if(pattern.contains(";" + name))
+				pattern.remove(";" + name);
+			filterLineEdit->setText(pattern);
+		}
+	}
 
 	void filter_slot() 
 	{ 
@@ -312,15 +335,17 @@ public slots:
 };
 
 
-template <class M, class D> class IodeTemplateTableView : public IodeAbstractTableView
+template <class M, class D> class TableViewEditObj
 {
+protected:
+	IodeAbstractTableView* tableview;
 	D* editDialog;
 
 public:
-	IodeTemplateTableView(EnumIodeType iodeType, BaseDelegate* delegate, QWidget* parent = nullptr):
-		IodeAbstractTableView(iodeType, delegate, parent), editDialog(nullptr) { }
+	TableViewEditObj(IodeAbstractTableView* tableview) : 
+		tableview(tableview), editDialog(nullptr) { }
 
-	~IodeTemplateTableView()
+	~TableViewEditObj()
 	{
 		if(editDialog)
 		{
@@ -331,12 +356,12 @@ public:
 
 	void openEditDialog()
 	{
-		QModelIndexList selection = selectionModel()->selectedRows();
+		QModelIndexList selection = tableview->selectionModel()->selectedRows();
 		if (selection.count() == 0) 
 			return;
 
 		int section = selection[0].row();
-		QString name = model()->headerData(section, Qt::Vertical).toString();
+		QString name = tableview->model()->headerData(section, Qt::Vertical).toString();
 		
 		if(editDialog)
 		{
@@ -344,14 +369,29 @@ public:
 			delete editDialog;
 		}
 
-		M* model_ = static_cast<M*>(model());
-		editDialog = new D(name, model_->get_displayed_database(), static_cast<QWidget*>(this->parent()));
+		M* model_ = static_cast<M*>(tableview->model());
+		editDialog = new D(name, model_->get_displayed_database(), static_cast<QWidget*>(tableview));
 
 		// propagate signal
-		connect(editDialog, &D::databaseModified, this, &IodeAbstractTableView::databaseModified);
-
+		QObject::connect(editDialog, &D::databaseModified, tableview, &IodeAbstractTableView::databaseModified);
 		editDialog->show();
-		
-		update();
+	}
+};
+
+template <class M, class A> class TableViewAddObj
+{
+	IodeAbstractTableView* tableview;
+
+public:
+	TableViewAddObj(IodeAbstractTableView* tableview) : tableview(tableview) { }
+
+protected:
+	void openAddDialog()
+	{
+		M* model_ = static_cast<M*>(tableview->model());
+		A dialog(model_->get_displayed_database(), static_cast<QWidget*>(tableview));
+		QObject::connect(&dialog, &A::newObjectInserted, tableview, &IodeAbstractTableView::newObjectInserted);
+		if(dialog.exec() == QDialog::Accepted)
+			model_->reset();
 	}
 };

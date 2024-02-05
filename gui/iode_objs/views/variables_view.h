@@ -23,7 +23,7 @@
  */
 
 
-class VariablesView : public IodeAbstractTableView
+class VariablesView : public IodeAbstractTableView, public TableViewAddObj<VariablesModel, AddVariableDialog>
 {
 	Q_OBJECT
 	NumericalTableView numeric;
@@ -37,7 +37,7 @@ signals:
 
 public:
 	VariablesView(QWidget* parent = nullptr) 
-		: IodeAbstractTableView(I_VARIABLES, new VariablesDelegate(parent), parent), numeric(true)
+		: IodeAbstractTableView(I_VARIABLES, new VariablesDelegate(parent), parent), TableViewAddObj(this), numeric(true)
 	{
 		numeric.setup(this);
 
@@ -101,7 +101,12 @@ protected:
 
 public slots:
 	void print() override;
-	void new_obj();
+	void new_obj() override
+	{ 
+		if(!checkGlobalSample())
+			return;
+		openAddDialog(); 
+	}
 	void plot_series();
 	void open_graphs_dialog();
 };

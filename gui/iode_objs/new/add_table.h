@@ -10,6 +10,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "text_edit/completer.h"
+#include "iode_objs/models/tables_model.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -21,6 +22,7 @@
 class AddTableDialog : public IodeSettingsDialog, public Ui::AddTableDialog
 {
     Q_OBJECT
+    KDBTables* database;
 
     WrapperIodeNameEdit*   lineName;
     WrapperSpinBox*        spinNbColumns;
@@ -33,8 +35,11 @@ class AddTableDialog : public IodeSettingsDialog, public Ui::AddTableDialog
     IodeCompleter* completer;
 
 public:
-    AddTableDialog(QWidget* parent = Q_NULLPTR);
+    AddTableDialog(KDBTables* database, QWidget* parent = Q_NULLPTR);
     ~AddTableDialog();
+
+signals:
+    void newObjectInserted(QString);
 
 public slots:
     void add();

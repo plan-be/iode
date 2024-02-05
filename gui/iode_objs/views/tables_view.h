@@ -12,7 +12,7 @@
 #include "tabs/iode_objs/tab_gsample_table.h"
 
 
-class TablesView : public IodeTemplateTableView<TablesModel, EditTableDialog>
+class TablesView : public IodeAbstractTableView, public TableViewEditObj<TablesModel, EditTableDialog>, public TableViewAddObj<TablesModel, AddTableDialog>
 {
 	Q_OBJECT
 
@@ -20,7 +20,8 @@ class TablesView : public IodeTemplateTableView<TablesModel, EditTableDialog>
 	QShortcut* shortcutPlot;
 
 public:
-	TablesView(QWidget* parent = nullptr) : IodeTemplateTableView(I_TABLES, new TablesDelegate(parent), parent)
+	TablesView(QWidget* parent = nullptr) : 
+		IodeAbstractTableView(I_TABLES, new TablesDelegate(parent), parent), TableViewEditObj(this), TableViewAddObj(this)
 	{
 		shortcutDisplay = new QShortcut(QKeySequence(Qt::Key_F7), this);
 		shortcutDisplay->setContext(Qt::WidgetWithChildrenShortcut);
@@ -38,7 +39,7 @@ public:
 	}
 
 public slots:
-	void new_obj();
+	void new_obj()  { openAddDialog(); }
 	void edit_obj() { openEditDialog(); }
 	void display();
 	void plot();

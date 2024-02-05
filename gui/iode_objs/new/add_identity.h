@@ -8,6 +8,7 @@
 #include "ui_add_object.h"
 #include "utils.h"
 #include "wrapper_classes.h"
+#include "iode_objs/models/identities_model.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -19,12 +20,16 @@
 class AddIdentityDialog : public QDialog, public Ui::AddObjectDialog
 {
     Q_OBJECT
+    KDBIdentities* database;
 
     WrapperIodeNameEdit* lineName;
     WrapperQLineEdit* lineDefinition;
 
 public:
-    AddIdentityDialog(QWidget* parent = Q_NULLPTR);
+    AddIdentityDialog(KDBIdentities* database, QWidget* parent = Q_NULLPTR);
+
+signals:
+    void newObjectInserted(QString);
 
 public slots:
     void add();

@@ -1,7 +1,7 @@
 #include "add_variable.h"
 
 
-AddVariableDialog::AddVariableDialog(QWidget* parent) : QDialog(parent)
+AddVariableDialog::AddVariableDialog(KDBVariables* database, QWidget* parent) : QDialog(parent), database(database)
 {
 	setupUi(this);
 
@@ -18,7 +18,23 @@ void AddVariableDialog::add()
 	{
 		std::string name = lineName->extractAndVerify().toStdString();
 		std::string lec = lineDefinition->extractAndVerify().toStdString();
-		Variables.add(name, lec);
+		// check if already exists in the global IODE database since the variable 'database' may represents only a subset
+		if(Variables.contains(name))
+		{
+			int res = QMessageBox::question(nullptr, "WARNING", QString::fromStdString(name) + " already exists. Replace it ?");
+			if(res != QMessageBox::StandardButton::Yes)
+			{
+				this->reject();
+				return;
+			}
+			Variables.update(name, lec);
+		}
+		else
+		{
+			emit newObjectInserted(QString::fromStdString(name));
+			database->add(name, lec);
+		}
+		
 		this->accept();
 	}
 	catch (const std::exception& e)

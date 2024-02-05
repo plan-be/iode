@@ -137,11 +137,20 @@ void EditEquationDialog::edit()
 			edit_est_eqs.set_instruments(instruments);
 		}
 
-		edit_est_eqs.save();
+		boost::hash<KDBEquations> hasher;
+		size_t hashBefore = hasher(Equations);
 
-		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-		main_window->update_tab_and_completer();
+		std::string from = sampleFrom->extractAndVerify().toStdString();
+		std::string to = sampleTo->extractAndVerify().toStdString();
 
+		std::vector<std::string> v_new_eqs = edit_est_eqs.save(from, to);
+		for(const std::string& name: v_new_eqs)
+			emit newObjectInserted(QString::fromStdString(name));
+
+		size_t hashAfter = hasher(Equations);
+		if(hashAfter != hashBefore)
+			emit databaseModified();
+		
 		this->accept();
 	}
 	catch (const std::exception& e)

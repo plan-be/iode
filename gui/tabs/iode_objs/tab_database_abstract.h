@@ -234,6 +234,9 @@ public:
         connect(tableview, &IodeAbstractTableView::showObjsRequest, tabWidget, &IodeAbstractTabWidget::showObjectsList);
         connect(tableview_2, &IodeAbstractTableView::showObjsRequest, tabWidget, &IodeAbstractTabWidget::showObjectsList);
 
+        // update filter pattern when an object is removed
+        connect(objmodel, &M::objectRemoved, tableview, &V::objectRemoved);
+
         splitter->addWidget(tableview);
         splitter->addWidget(tableview_2);
         tableview_2->hide();

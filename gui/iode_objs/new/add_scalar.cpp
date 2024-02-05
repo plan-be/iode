@@ -1,7 +1,7 @@
 #include "add_scalar.h"
 
 
-AddScalarDialog::AddScalarDialog(QWidget* parent) : IodeSettingsDialog(parent)
+AddScalarDialog::AddScalarDialog(KDBScalars* database, QWidget* parent) : IodeSettingsDialog(parent), database(database)
 {
 	setupUi(this);
 
@@ -31,7 +31,23 @@ void AddScalarDialog::add()
 		std::string name = lineName->extractAndVerify().toStdString();
 		IODE_REAL value = (IODE_REAL) lineValue->extractAndVerify().toDouble();
 		IODE_REAL relax = (IODE_REAL) spinBoxRelax->extractAndVerify();
-		Scalars.add(name, value, relax);
+		// check if already exists in the global IODE database since the variable 'database' may represents only a subset
+		if(Scalars.contains(name))
+		{
+			int res = QMessageBox::question(nullptr, "WARNING", QString::fromStdString(name) + " already exists. Replace it ?");
+			if(res != QMessageBox::StandardButton::Yes)
+			{
+				this->reject();
+				return;
+			}
+			Scalars.update(name, value, relax);
+		}
+		else
+		{
+			emit newObjectInserted(QString::fromStdString(name));
+			database->add(name, value, relax);
+		}
+		
 		this->accept();
 	}
 	catch (const std::exception& e)

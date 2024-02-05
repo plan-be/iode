@@ -40,6 +40,7 @@ protected:
 
 signals:
 	void databaseModified();
+	void objectRemoved(QString);
 
 public:
 	IodeAbstractTableModel(QVector<QString> columnNames, QObject* parent = nullptr) : 
@@ -53,6 +54,8 @@ public:
 	virtual int getNbObjects() const = 0;
 
 	virtual QString getFilepath() const = 0;
+
+	virtual bool filterActive() const = 0;
 
 protected:
 	void resetModel()
@@ -115,6 +118,11 @@ public:
 	K* get_displayed_database() const
 	{
 		return displayed_database;
+	}
+
+	bool filterActive() const
+	{
+		return database_subset != nullptr;
 	}
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override

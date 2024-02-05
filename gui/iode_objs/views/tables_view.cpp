@@ -1,14 +1,6 @@
 #include "tables_view.h"
 
 
-void TablesView::new_obj()
-{
-	AddTableDialog dialog(this);
-	if(dialog.exec() == QDialog::Accepted)
-		emit newObjectInserted();
-	filter();
-}
-
 void TablesView::display()
 {
 	// get the selected object
