@@ -380,14 +380,16 @@ public:
      * @brief - copy the Equations referenced in the vector v_equations from the local database 
      *          to the global database
      *        - if estimation -> create the Scalars containing the results of an estimated equation
-     *        - merge the local Scalars database into the global database
+     *        - merge the local Scalars database into the global Scalars database
+     *        - return the list of new equations 
      * 
-     * @param from starting period to copy if the estimation has not been done
-     * @param to   ending period to copy if the estimation has not been done
+     * @param from         starting period to copy if no estimation has been done
+     * @param to           ending period to copy if no estimation has been done
+     * @return             vector of the new equations names
      * 
      * @note equivalent to the ODE_blk_save() function from o_est.c from the old GUI
      */
-    void save(const std::string& from = "", const std::string& to = "");
+    std::vector<std::string> save(const std::string& from = "", const std::string& to = "");
 };
 
 

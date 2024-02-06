@@ -285,27 +285,30 @@ void EditAndEstimateEquations::estimate()
         B_display_last_error();
 }
 
-void EditAndEstimateEquations::save(const std::string& from, const std::string& to)
+std::vector<std::string> EditAndEstimateEquations::save(const std::string& from, const std::string& to)
 {
     std::string est_from = sample->start_period().to_string();
     std::string est_to = sample->end_period().to_string();
 
     std::string no_est_from;
     std::string no_est_to;
-    try
+    if(!estimation_done)
     {
-        Sample no_est_sample(from, to);
-        no_est_from = from;
-        no_est_to = to;
-    }
-    catch(const std::exception& e)
-    {
-        no_est_from = est_from;
-        no_est_to = est_to;
+        Sample vars_sample = Variables.get_sample();  
+        // throw an error if the string does not represent a valid period
+        Period from_per = (!from.empty()) ? Period(from) : vars_sample.start_period();
+        // throw an error if the string does not represent a valid period
+        Period to_per = (!to.empty()) ? Period(to) : vars_sample.end_period();
+        // check that from is before to
+        Sample no_est_sample(from_per, to_per);
+
+        no_est_from = from_per.to_string();
+        no_est_to = to_per.to_string();
     }
 
     // copy the Equations referenced in v_equations from the local database to the global one.
     std::string eq_name;
+    std::vector<std::string> v_new_eqs;
     for(int i = 0; i < v_equations.size(); i++) 
     {
         eq_name = v_equations[i];
@@ -332,11 +335,16 @@ void EditAndEstimateEquations::save(const std::string& from, const std::string& 
         if(Equations.contains(eq_name))
             Equations.update(eq_name, eq);
         else
+        {
             Equations.add(eq_name, eq);
+            v_new_eqs.push_back(eq_name);
+        }
     }
 
     // merge the local Scalars into the global Scalars database
     Scalars.merge(*kdb_scl);
+
+    return v_new_eqs;
 }
 
 void eqs_estimate(const std::string& eqs, const std::string& from, const std::string& to)
