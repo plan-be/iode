@@ -6,6 +6,9 @@ In development
 New Features 🎉
 ---------------
 
+  * (GUI) When a new object is created and the filter is active, the name of the new object is added to the filter's pattern
+  * (GUI) When an object is deleted and the filter is active, the name of the object is removed from the filter's pattern
+
 
 Improvements ✨
 ---------------
@@ -28,6 +31,7 @@ Fixed Bugs 🛠️
           (values are copied with maximum precision possible) (#448)
   * (GUI) Fixed use the shortcut CTRL (+ ALT) + F1...F7 more than once (cascading) (#464)
   * (GUI) Fixed missing field 'Name' when editing an IODE object (#467)  
+  * (GUI) Fixed new object not appearing in the list of IODE objects when the filter is active (#468) 
 
 
 Miscellaneous 🤷‍♀️
