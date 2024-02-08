@@ -32,6 +32,9 @@ Fixed Bugs 🛠️
   * (GUI) Fixed use the shortcut CTRL (+ ALT) + F1...F7 more than once (cascading) (#464)
   * (GUI) Fixed missing field 'Name' when editing an IODE object (#467)  
   * (GUI) Fixed new object not appearing in the list of IODE objects when the filter is active (#468) 
+  * (GUI) Fixed user interface crashing when deleting an IODE object via the IODE command line or by 
+          executing an IODE report while a subset of the IODE database is displayed 
+          (via the Filter field) (#473)   
 
 
 Miscellaneous 🤷‍♀️
