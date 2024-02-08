@@ -155,7 +155,15 @@ public slots:
     void setModified(bool modified) override
     {
         this->modified = modified;
-        if(modified) resetModel(); 
+        if(modified)
+        {
+            // we need to recompute the subset database in the IodeTemplateTableModel class if the filter is active 
+            // -> executing a command line or an IODE report may have renamed, added or removed IODE objects and 
+            //    then made the subset database invalid (remember that the subset database in the 
+            //    IodeTemplateTableModel class is a shallow copy of a subset of a global IODE database)  
+		    filter(true);
+            resetModel(); 
+        }
         emit tabDatabaseModified(iodeType, modified);
     }
 
