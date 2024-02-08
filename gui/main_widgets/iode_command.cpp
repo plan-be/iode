@@ -86,6 +86,7 @@ void IodeCommandLine::run_command()
     }
     catch(const std::exception& e)
     {
+        success = false;
         error_msg = QString::fromStdString(e.what());
         QMessageBox::warning(nullptr, "WARNING", error_msg + "\n");
     }
