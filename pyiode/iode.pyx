@@ -71,6 +71,9 @@
 # PYIODE API
 # ----------
 
+# The line below is to indicate to Cython that this .pyx file has to be compiled to C++.
+# distutils: language = c++
+
 include "iode.pxi" 
 
 # Included modules by topic
