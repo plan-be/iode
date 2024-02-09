@@ -408,6 +408,7 @@ keyboard_shortcuts.*
 /api/version.h
 /tests/**/*.ini
 /pyiode/iode.c
+/pyiode/iode.cpp
 /pyiode/cythonize_iode.py
 /tests/output
 /doc/src/iode1.mif
