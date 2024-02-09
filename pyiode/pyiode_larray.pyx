@@ -5,21 +5,21 @@
 # 
 # Interface between IODE ws and larray arrays.
 # ---------------------------------------------
-#   la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name = 'time')
+#   __la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name = 'time')
 #  
-#   larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_")   | Copies LArray la_input into IODE KV_WS.    
-#   ws_to_larray(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', split_axis_names = '', regex = None, split_sep = None, time_as_floats: bool = False) -> la.Array | Creates an LArray from the current KV_WS content
-#   ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> la.Array | Load an IODE var file into an Larray object with 2 axes (vars and time)  
+#   larray_to_ws(la_input: Array, time_axis_name: str = 'time', sep: str = "_")   | Copies LArray la_input into IODE KV_WS.    
+#   ws_to_larray(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', split_axis_names = '', regex = None, split_sep = None, time_as_floats: bool = False) -> Array | Creates an LArray from the current KV_WS content
+#   ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> Array | Load an IODE var file into an Larray object with 2 axes (vars and time)  
 #   larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]             | Return the first and last time axis labels as a list of 2 strings
 
     
 
-cdef la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name = 'time'):
+# private function -> must be imported by the end user
+cdef __la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name = 'time'):
     '''
     Calls C API fonction IodeCalcSamplePosition() to determine which elements of la_input to copy into KV_WS and 
     at which position in the KV_WS sample.
     '''
-      
     if time_axis_name not in la_input.axes:
         raise RuntimeError(f"Passed Array object must contain an axis named {time_axis_name}.\nGot axes {repr(la_input.axes)}.")
 
@@ -30,7 +30,7 @@ cdef la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name
 
 
 # TODO: check return values and return an error code 
-def larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_"):
+def larray_to_ws(la_input: Array, time_axis_name: str = 'time', sep: str = "_"):
     '''
     Copies Array la_input into IODE KV_WS.
     
@@ -41,6 +41,9 @@ def larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_
     cdef    int     la_pos
     cdef    int     la_lg
     
+    if la is None:
+        raise RuntimeError("larray library not found")
+
     # Retrieve the time_axis_name. Stop if no time_axis_name present in la_input.
     if time_axis_name not in la_input.axes:
         raise RuntimeError(f"Passed Array object must contain an axis named {time_axis_name}.\nGot axes {repr(la_input.axes)}.")
@@ -58,7 +61,7 @@ def larray_to_ws(la_input: la.Array, time_axis_name: str = 'time', sep: str = "_
     #   - la_pos: the position of the first element of la_input to be copied into WS
     #   - ws_pos: the position in KV_WS sample where to copy la_input[...la_pos]
     #   - the nb of la_input values to be copied 
-    la_to_ws_pos(la_input, &la_pos, &ws_pos, &la_lg, time_axis_name)
+    __la_to_ws_pos(la_input, &la_pos, &ws_pos, &la_lg, time_axis_name)
 
     # List of variable names
     vars = la_input.axes[0]
@@ -94,7 +97,7 @@ def ws_to_larray(vars_pattern: str = '*',
                  split_axis_names = '', 
                  regex = None, 
                  split_sep = None, 
-                 time_as_floats: bool = False) -> la.Array:
+                 time_as_floats: bool = False) -> Array:
     '''
     Creates an LArray from the current KV_WS content with time axis labels in the IODE syntax ['2000Q2',...].
     If time_as_floats is True, the time axis labels are doubles [2000.25,...]
@@ -105,10 +108,13 @@ def ws_to_larray(vars_pattern: str = '*',
         double[ : ,: : 1] data_view
         str v
     
+    if la is None:
+        raise RuntimeError("larray library not found")
+
     var_list = ws_content_var(vars_pattern)         # 6 = K_VAR
     
     # Define 2 original axes var and time
-    axis_var = la.Axis(var_list, vars_axis_name)
+    axis_var = Axis(var_list, vars_axis_name)
     axis_time = ws_sample_to_larray_axis(axis_name = time_axis_name, as_floats = time_as_floats)
 
     # Create LArray with 0
@@ -146,10 +152,13 @@ def ws_load_var_to_larray(filename: str,
                             time_axis_name = 'time', 
                             split_axis_names = None, 
                             regex = None, 
-                            split_sep = None) -> la.Array:
+                            split_sep = None) -> Array:
     
     '''Load an IODE .var file into an Larray object with 2 axes (vars and time) 
     '''
+
+    if la is None:
+        raise RuntimeError("larray library not found")
 
     # Load iode var file
     ws_load_var(filename)
@@ -166,9 +175,12 @@ def ws_load_var_to_larray(filename: str,
 
 
 
-def larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]:
+def larray_get_sample(la_input: Array, time_axis_name: str = 'time') -> List[Union[str,float]]:
     '''Return the first and last time axis labels as a list of 2 strings'''
     
+    if la is None:
+        raise RuntimeError("larray library not found")
+
     time = la_input.axes[time_axis_name]
     return [time.labels[0], time.labels[-1]]
 

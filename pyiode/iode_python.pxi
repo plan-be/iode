@@ -15,9 +15,19 @@ import sys
 import numpy as np
 cimport numpy as np
 import cython
-import larray as la
 import pandas as pd
- 
+
+from typing import Union, Any, List, Tuple
+
+try:
+    import larray as la
+    Array = la.Array
+    Axis = la.Axis
+except ImportError:
+    la = None
+    Array = Any
+    Axis = Any
+
 # C libraries
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport printf
@@ -28,9 +38,6 @@ from libcpp.vector cimport vector
 
 # Cython libraries
 from cpython cimport PyObject, Py_INCREF
-
-# Python libraries
-from typing import Union, List, Tuple
 
 #from enum import Enum
 

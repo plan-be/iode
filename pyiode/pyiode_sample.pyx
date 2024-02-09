@@ -14,7 +14,7 @@
 #     ws_sample_nb_periods() -> int                                                                 | Return the number of observations in the current KV_WS.
 #     ws_sample_to_string() -> str                                                                  | Return the current sample definition in a string: "from to", e.g.: "2000Y1 2020Y1"
 #     ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = False) -> List[str] | Return the current sample definition in a list
-#     ws_sample_to_larray_axis(axis_name: str = 'time', per_from:str = '', per_to: str = '', as_floats: bool = False) -> la.Axis | Return the current sample definition as an larray axis
+#     ws_sample_to_larray_axis(axis_name: str = 'time', per_from:str = '', per_to: str = '', as_floats: bool = False) -> Axis | Return the current sample definition as an larray axis
       
 
 def ws_sample_set(per_from: str, per_to: str) -> List[str]:
@@ -122,7 +122,7 @@ def ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = Fa
 #        return the sample per_from to per_to in floats instead of the KV_WS sample
 def ws_sample_to_larray_axis(axis_name: str = 'time', 
                              per_from:str = '', per_to: str = '', 
-                             as_floats: bool = False) -> la.Axis:
+                             as_floats: bool = False) -> Axis:
     '''
     Return the current sample or the sample [per_from, per_to] definition as an Axis.
         e.g.: Axis(["2000Y1", "2001Y1", ..., "2010Y1"], "time")
@@ -130,7 +130,9 @@ def ws_sample_to_larray_axis(axis_name: str = 'time',
     If as_floats == True, the list items are floats.
        e.g.: [2000.0, 2000.25, 2000.50,2000.75,...]
     '''
-    
+    if la is None:
+        raise RuntimeError("larray library not found")
+
     lst = ws_sample_to_list(per_from, per_to, as_floats)
-    ax = la.Axis(lst, axis_name)
+    ax = Axis(lst, axis_name)
     return ax 
