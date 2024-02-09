@@ -18,9 +18,18 @@ import cython
 import larray as la
 import pandas as pd
  
+# C libraries
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport printf
+
+# C++ libraries
+from libcpp.string cimport string
+from libcpp.vector cimport vector
+
+# Cython libraries
 from cpython cimport PyObject, Py_INCREF
+
+# Python libraries
 from typing import Union, List, Tuple
 
 #from enum import Enum
@@ -163,9 +172,7 @@ cdef extern from "iode.h":
     cdef void   W_print_pg_footer(char* arg)
 
     # SCR4 functions
-    cdef int    SCR_free_tbl(char **tbl)
     cdef int    SCR_free(void *ptr)
-
 
     # TO Check
     cdef int    PyIodePrint(char*name, void* values, int lg)
@@ -173,6 +180,8 @@ cdef extern from "iode.h":
     cdef void   IodeResetMsgs()
     cdef int    ODE_assign_super_PYIODE()
 
+cdef extern from "s_iode.c":
+    cdef int   free_tbl(char** tbl)
 
 
 # IODE OBJECT CLASS DECLARATIONS 

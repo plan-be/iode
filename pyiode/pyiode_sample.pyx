@@ -114,7 +114,7 @@ def ws_sample_to_list(per_from: str = "", per_to: str = "", as_floats: bool = Fa
             smpl = IodeCreateSampleAsPeriods(cstr(per_from), cstr(per_to))
     
         lst = pylist(smpl)
-        SCR_free_tbl(smpl)
+        free_tbl(smpl)
         return lst 
         
 

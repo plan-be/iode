@@ -60,3 +60,8 @@ int A2mGIF_HTML(A2MGRF *go, U_ch* filename)
 {
     return(0);
 } 
+
+int free_tbl(char** tbl)
+{
+    return SCR_free_tbl((unsigned char**) tbl);
+}

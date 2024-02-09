@@ -126,7 +126,7 @@ def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
             res[nb] = pystr(s)
             nb = nb + 1
 
-    SCR_free_tbl(cnt)
+    free_tbl(cnt)
 
     return res
 
