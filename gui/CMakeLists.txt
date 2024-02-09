@@ -1,6 +1,10 @@
 
 message(STATUS "\n---- GUI (QT) ----\n")
 
+if(SKBUILD)
+	message(STATUS "Skip target ${IODE_GUI_TARGET}\n")
+else()
+
 # https://doc.qt.io/qt-6.2/cmake-get-started.html
 
 set(CMAKE_AUTOUIC ON)
@@ -260,5 +264,7 @@ endif()
 else()
 
 message(WARNING "Qt not found")
+
+endif()
 
 endif()

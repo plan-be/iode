@@ -327,8 +327,10 @@ __pycache__/
 *.pyd
 pyproject.toml
 **/*.whl
-python_api/iode/tests/data
+pyiode/iode/_version.py
 python_api/iode/_version.py
+pyiode/iode/tests/data
+python_api/iode/tests/data
 
 # Cake - Uncomment if you are using it
 # tools/**
@@ -407,10 +409,6 @@ keyboard_shortcuts.*
 *.$$$
 /api/version.h
 /tests/**/*.ini
-/pyiode/iode.c
-/pyiode/iode.cpp
-/pyiode/iode_python.cpp
-/pyiode/cythonize_iode.py
 /tests/output
 /doc/src/iode1.mif
 /doc/src/iode2.mif

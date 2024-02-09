@@ -25,7 +25,7 @@
  - Python libraries:
    - cython
    - *(nanobind)*
-   - *(scikit-build-core)*
+   - scikit-build-core
    - pytest
    - numpy
    - pandas
@@ -53,9 +53,9 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py39 python=3.9 numpy pandas larray cython pytest (nanobind scikit-build-core)
-> conda create --name py310 python=3.10 numpy pandas larray cython pytest (nanobind scikit-build-core)
-> conda create --name py311 python=3.11 numpy pandas larray cython pytest (nanobind scikit-build-core)
+> conda create --name py39 python=3.9 numpy pandas larray cython pytest scikit-build-core (nanobind)
+> conda create --name py310 python=3.10 numpy pandas larray cython pytest scikit-build-core (nanobind)
+> conda create --name py311 python=3.11 numpy pandas larray cython pytest scikit-build-core (nanobind)
 ```
 
 # Building Project
@@ -88,7 +88,7 @@ where `<target>` is one the item in the list below:
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
-To build Python IODE (Cython), please run the Batch script makepy.bat in the subdirectory pydiode 
+To build Python IODE (Cython), please run the Batch script makepy.bat in the subdirectory pyiode 
 and provide a conda environment as argument:
 ```bash
 pyiode> makepy.bat py39 
@@ -119,16 +119,17 @@ The final and third step is to ask CMake to run the tests:
 ## Python API
 To test the Python API:
 
-*(nanobind): You first have to build it and install it locally.*
-*In a console, go to root directory of your local `iode` project.*
-*Then type:*
+You first have to build it and install it locally.
+In a console, go to root directory of your local `iode` project.
+Then type:
 ```bash
-> pip install .
+root_dir_iode> pip install .
 ```
+Note: you must have cython, numpy, pandas, larray, scikit-build-core and pytest installed.
 
-(cython + nanobind): Run the Python tests by calling the `test_python` target:
+Finally, type `pytest` () :
 ```bash
-cmake --build --preset <preset_config> --target test_python
+root_dir_iode> pytest
 ```
 
 # Working On An Issue

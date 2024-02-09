@@ -8,6 +8,8 @@
 # VISUAL STUDIO > 2019 => CMake 3.24
 cmake_minimum_required (VERSION 3.24)
 
+include(CMakePrintHelpers)
+
 # List of CMAKE variables: https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 
 # ---- dependencies ----
@@ -64,6 +66,11 @@ else()
   message(STATUS "Sanitize:           No")
 endif()
 message(STATUS "Generator:          ${CMAKE_GENERATOR}")
+if(SKBUILD)
+  message(STATUS "Scikit-Build-Core:  Yes")
+else()
+  message(STATUS "Scikit-Build-Core:  No")
+endif()
 
 # ---- sanitizers ----
 # add sanitizer flags if compiled and linked with DEBUG configuration 
@@ -239,11 +246,14 @@ endif()
 
 # -- find Python --
 message(CHECK_START "Search for Python")
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module 
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy
                     OPTIONAL_COMPONENTS Development.SABIModule)
 if(Python_FOUND)
   message(CHECK_PASS "found")
-  message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
+  cmake_print_variables(Python_VERSION)
+  cmake_print_variables(Python_EXECUTABLE)
+  cmake_print_variables(Python_INCLUDE_DIRS)
+  cmake_print_variables(Python_NumPy_INCLUDE_DIRS)
   set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
 else()
   message(CHECK_FAIL "not found")
@@ -297,20 +307,23 @@ add_subdirectory ("api")
 add_subdirectory ("cpp_api")
 
 # ---- executables ----
-if(NOT SKBUILD)
-  set(IODE_CLI_TARGET iodecmd)
-  add_subdirectory ("cmd")
-  set(IODE_GUI_TARGET iode_gui)
-  add_subdirectory ("gui")
-  add_subdirectory ("pyiode")
-endif()
 
+set(IODE_CLI_TARGET iodecmd)
+add_subdirectory ("cmd")
+set(IODE_GUI_TARGET iode_gui)
+add_subdirectory ("gui")
+
+# ---- python ----
+
+add_subdirectory ("pyiode")
 # add_subdirectory ("python_api")
 
 # ---- tests ----
+
 add_subdirectory ("tests")
 
 # ---- user doc ----
+
 if(NOT SKBUILD)
   add_subdirectory ("doc")
 endif()
