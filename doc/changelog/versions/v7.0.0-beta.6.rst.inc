@@ -1,7 +1,7 @@
 Version7.0-beta.6
 =================
 
-In development
+Released on 12/02/2024
 
 New Features 🎉
 ---------------
@@ -35,8 +35,3 @@ Fixed Bugs 🛠️
   * (GUI) Fixed user interface crashing when deleting an IODE object via the IODE command line or by 
           executing an IODE report while a subset of the IODE database is displayed 
           (via the Filter field) (#473)   
-
-
-Miscellaneous 🤷‍♀️
-----------------
-
