@@ -9,6 +9,7 @@
  *      char *B_msg(int n)                  Returns a static buffer containing the message n from file iode.msg. 
  *      void B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
  *      void B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
+ *      void B_get_last_error()             Returns the last recorded errors (in B_ERROR_MSG).
  *      void B_display_last_error()         Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().
  *      void B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
  *      void B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
@@ -167,6 +168,33 @@ void B_seterrn(int n, ...)
     va_end(myargs);
 }
 
+
+/**
+ *  Returns the last recorded errors (in B_ERROR_MSG).
+ *  Reset B_ERROR_MSG after having displayed its content.
+ *  This function is intended to be called from a C++ code which will wrap 
+ *  the returned char array into a C++ exception. 
+ *  The returned vector char* must be freed using SCR_free() by the caller.
+ *  
+ *  @global [in, out] B_ERROR_NB  int       number of records errors
+ *  @global [in, out] B_ERROR_MSG char**    recorded error messages
+ *  @return char**                          recorded error messages
+ */
+char* B_get_last_error()
+{
+    char* errors = NULL;
+
+    if(B_ERROR_NB == 0) return errors;
+    
+    // Adds a null pointer to close B_ERROR_MSG
+    SCR_add_ptr(&B_ERROR_MSG, &B_ERROR_NB, NULL);
+
+    errors = SCR_mtov(B_ERROR_MSG, '\n');
+
+    B_clear_last_error();
+
+    return errors;
+}
 
 /**
  *  Displays the last recorded errors (in B_ERROR_MSG) using kmsgbox().

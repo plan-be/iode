@@ -807,6 +807,7 @@ extern void B_IodeMsgPath();
 extern void B_seterror(char *,...);
 extern void B_seterrn(int , ...);
 
+extern char* B_get_last_error(void);
 extern void B_display_last_error(void);
 extern void B_print_last_error(void);
 extern void B_clear_last_error(void);
