@@ -365,6 +365,12 @@ TEST_F(EstimationTest, Estimate)
     // -- line 1
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr3.get_value(1, 0)) / 1e6, -0.042291);
     EXPECT_DOUBLE_EQ(m_corr3.get_value(1, 1), 1.);
+
+    // Error
+    est.set_block("ACAF");
+    est.update_scalars();
+    Variables.clear();
+    EXPECT_THROW(est.estimate(), std::runtime_error);
 }
 
 TEST_F(EstimationTest, DynamicAdjustment)
