@@ -37,8 +37,8 @@ iodemodule = Extension('iode',
                 "pyiode_cdef.pyx", "pyiode_data.pyx", "pyiode_estim.pyx", 
                 "pyiode_exec.pyx",  "pyiode_larray.pyx", "pyiode_lec.pyx",
                 "pyiode_model.pyx", "pyiode_objs.pyx", "pyiode_print.pyx", 
-                "pyiode_reports.pyx", "pyiode_sample.pyx", "pyiode_util.pyx",  
-                "pyiode_ws.pyx"],
+                "pyiode_reports.pyx", "pyiode_period.pyx", "pyiode_sample.pyx", 
+                "pyiode_util.pyx", "pyiode_ws.pyx"],
     language="c++",
     define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 )           
