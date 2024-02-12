@@ -261,8 +261,7 @@ public:
             {
                 this->instruments = "";
                 B_seterrn(213, to_char_array(instr), L_error());
-                B_display_last_error();
-                return;
+                throw std::runtime_error(get_last_error());
             }
         }
 

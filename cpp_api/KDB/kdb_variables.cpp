@@ -329,7 +329,12 @@ void KDBVariables::copy_into(const std::string& input_file, const std::string& f
 
         int res = B_WsCopy(const_cast<char*>(buf.c_str()), I_VARIABLES);
 
-        if (res < 0) B_display_last_error();
+        if (res < 0)
+		{
+			std::string msg = "Cannot copy the content of file '" + input_file + "' into the Variables database.\n";
+			msg += get_last_error();
+			throw std::runtime_error(msg);
+		}
 }
 
 void KDBVariables::copy_into(const std::string& input_file, const Period* from, const Period* to, 
