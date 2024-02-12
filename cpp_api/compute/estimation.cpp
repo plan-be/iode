@@ -282,7 +282,12 @@ void EditAndEstimateEquations::estimate()
     if(res == 0)        
         estimation_done = true;
     else
-        B_display_last_error();
+    {
+        std::string msg = "Cannot proceed estimation.\n";
+        msg += "equations: " + boost::algorithm::join(v_equations, ";") + "\n";
+        msg += get_last_error();
+        throw std::runtime_error(msg);
+    }
 }
 
 std::vector<std::string> EditAndEstimateEquations::save(const std::string& from, const std::string& to)

@@ -148,11 +148,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         error_msg += "Comments file " + cmt_file_;
         dbc = K_interpret(K_CMT, to_char_array(cmt_file));
         if(dbc == NULL)
-        {
-            IodeExceptionInvalidArguments error(error_msg);
-            error.add_argument("Comment file", cmt_file);
-            throw error;
-        }
+            throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
     KDB* dbv;
@@ -163,11 +159,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         error_msg += "Variables file " + var_file_;
         dbv = K_interpret(K_VAR, to_char_array(var_file));
         if(dbv == NULL)
-        {
-            IodeExceptionInvalidArguments error(error_msg);
-            error.add_argument("Variable file", var_file);
-            throw error;
-        }
+            throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
         if(smpl != NULL) 
             KV_sample(dbv, smpl);
@@ -222,7 +214,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     K_WARN_DUP = 0;
 
     if(res != 0) 
-        B_display_last_error();
+        throw std::runtime_error(get_last_error());
 }
 
 void low_to_high(const EnumIodeLtoH type, const char method, const std::string& filepath, const std::string& var_list)
