@@ -320,6 +320,14 @@ inline char** vector_to_double_char(const std::vector<std::string>& vec)
     return c_table;
 }
 
+inline std::string get_last_error()
+{
+    char* c_errors = B_get_last_error();
+    std::string msg(c_errors);
+    SCR_free(c_errors);
+    return msg;
+} 
+
 
 inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
 {
