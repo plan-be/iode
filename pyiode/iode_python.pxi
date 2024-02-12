@@ -320,21 +320,3 @@ class Equation:
         return res
 
 
-#class period:
-#    def __init__(self, y, s, p):
-#        self.p_y = y
-#        self.p_s = s
-#        self.p_p = p
-#
-#    def __str__(self):
-#        return f"{self.p_y}{self.p_p}{self.p_s}"
-#
-#class sample:
-#    def __init__(self, p1, p2):
-#        self.s_p1 = p1
-#        self.s_p2 = p2
-#
-#    def __str__(self):
-#        return f"{self.s_p1}:{self.s_p2}"
-# 
-
