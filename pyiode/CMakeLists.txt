@@ -2,22 +2,15 @@
 
 message(STATUS "\n---- CYTHON ----\n")
 
+# Do not compile in Debug mode, otherwise you’ll need to make a debug build 
+# of CPython from the source:
+# https://discuss.python.org/t/cannot-open-file-python311-d-lib/32399/4 
+
 if(MSVC)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(IODE_CYTHON_FLAGS "\"${IODE_DEBUG_INFO_FLAG}\", \"/Od\"")
-  else()
-    set(IODE_CYTHON_FLAGS "\"/O2\"")
-  endif()
-  set(IODE_CYTHON_FLAGS "${IODE_CYTHON_FLAGS}, \"/DVC\", \"/DSCRPROTO\", \"/DREALD\", \"/std:c++20\"")
+  set(IODE_CYTHON_FLAGS "\"/O2\", \"/DVC\", \"/DSCRPROTO\", \"/DREALD\", \"/std:c++20\"")
 else()
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(IODE_CYTHON_FLAGS "\"${IODE_DEBUG_INFO_FLAG}\", \"-Og\"")
-  else()
-  set(IODE_CYTHON_FLAGS "\"-Ofast\"")
-  endif()
-  set(IODE_CYTHON_FLAGS "${IODE_CYTHON_FLAGS}, \"-std=c++20\"")
+  set(IODE_CYTHON_FLAGS "\"-Ofast\", \"-std=c++20\"")
 endif()
-set(IODE_CYTHON_FLAGS "[${IODE_CYTHON_FLAGS}]")
 
 message(STATUS "Compile options for Cython: ${IODE_CYTHON_FLAGS}\n")
 
@@ -59,24 +52,28 @@ message(STATUS "DONE\n")
 
 
 if(Python_FOUND)
-  if(MSVC)
-    set(COMPILER msvc)
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(MSVC)
+      set(COMPILER msvc)
 
-    set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
+      set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
 
-    add_custom_target(iode_python
-                      COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
-                      DEPENDS cythonize_iode.py
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                      COMMENT "Building iode.pyd for Python version ${Python_VERSION}"
-                      )
-    add_dependencies(iode_python iode_c_api)
-
-    add_custom_command(TARGET iode_python POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
+      add_custom_target(iode_python
+                        COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER} ${PYTHON_BUILD_FLAGS}
+                        DEPENDS cythonize_iode.py
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        COMMENT "Moving iode.pyd file to ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_} directory"
+                        COMMENT "Building iode.pyd for Python version ${Python_VERSION}.\n"
                         )
+      add_dependencies(iode_python iode_c_api)
+
+      add_custom_command(TARGET iode_python POST_BUILD
+                          COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                          COMMENT "Moving iode.pyd file to ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_} directory"
+                          )
+    endif()
+  else()
+    message(WARNING "Cannot create the target iode_python in the Debug configuration\n")
   endif()
 
   if(TARGET iode_python)
