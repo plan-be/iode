@@ -103,9 +103,11 @@ def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
 
     Examples
     -------
-    >>> iode.ws_load_cmt("../fun.cmt")
-    >>> result = iode.ws_content("ACA*", 0)
-    >>> print(result)
+    >>> import iode
+    >>> iode.ws_load_cmt("../data/fun.cmt")
+    317
+    >>> names = iode.ws_content("ACA*", 0)
+    >>> names
     ['ACAF', 'ACAG']
     """
     cdef char **cnt = IodeContents(cstr(pattern), objtype)
