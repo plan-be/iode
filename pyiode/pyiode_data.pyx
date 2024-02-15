@@ -100,7 +100,7 @@ def data_update_var(varname: str, values, operation: str = "L", per_from: str = 
     varname: str
         variable name
         
-    values: any numeric iterable (list, tupple, ndarray)
+    values: any numeric iterable (list, tuple, ndarray)
         new values to set in varname
         
     operation: str
@@ -115,11 +115,17 @@ def data_update_var(varname: str, values, operation: str = "L", per_from: str = 
 
     Examples
     --------
-    >>> iode.ws_load_var("fun.var")
-    >>> rc = iode.data_update_var("ACAF", [1, 2, 3.1], "2000Y1")
-
-    '''
-     
+    >>> import iode
+    >>> iode.ws_load_var("../data/fun.var")
+    394
+    >>> ACAF = iode.get_var("ACAF")
+    >>> ACAF[:7]
+    [nan, nan, nan, nan, nan, nan, nan]
+    >>> iode.data_update_var("ACAF", [1, 2, 3.1], "L", "1962Y1")
+    >>> ACAF = iode.get_var("ACAF")
+    >>> ACAF[:7]
+    [nan, nan, nan, 2.0, 3.1000000000000001, nan, nan]
+    ''' 
     cmd = varname + " " + operation
     
     if per_from is None:
