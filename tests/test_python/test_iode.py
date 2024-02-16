@@ -85,17 +85,17 @@ def test_iode_ws_sample():
     varfile = str(IODE_DATA_DIR / "a.var")
     iode.ws_load_var(varfile)
     sample = iode.ws_sample_get()
-    assert sample == ['1990Y1', '2020Y1']
+    assert sample == ('1990Y1', '2020Y1')
     print(f"Sample of {varfile} = {sample}")
 
     sample = iode.ws_sample_set("1995Y1", "")
-    assert sample ==  ['1995Y1', '2020Y1']
+    assert sample ==  ('1995Y1', '2020Y1')
 
     sample = iode.ws_sample_set("", "2030Y1")
-    assert sample ==  ['1995Y1', '2030Y1']
+    assert sample ==  ('1995Y1', '2030Y1')
 
     sample = iode.ws_sample_set("2000Y1", "2002Y1")
-    assert sample ==  ['2000Y1', '2002Y1']
+    assert sample ==  ('2000Y1', '2002Y1')
 
     nobs = iode.ws_sample_nb_periods()
     assert nobs == 3
