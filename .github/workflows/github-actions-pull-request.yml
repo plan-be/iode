@@ -33,7 +33,7 @@ jobs:
       if: contains(github.head_ref, 'python')
       uses: ./.github/workflows/github-actions-python.yml 
       with:
-          build-config: windows-debug
+          build-config: windows-release
 
   build_doc:
       if: contains(github.head_ref, 'doc')
@@ -43,4 +43,4 @@ jobs:
     if: contains(github.head_ref, 'nsis')
     uses: ./.github/workflows/github-actions-nsis.yml 
     with:
-      build-config: windows-debug
+      build-config: windows-release
