@@ -169,7 +169,7 @@ done:
 // !!! NOT TESTED !!!
 KDB* B_htol_kdb(int method, KDB* kdb_from)
 {
-    int         lg, nb, rc = 0, i, j, f, t, shift, skip;
+    int         nb, rc = 0, i, j, f, t, shift, skip;
     IODE_REAL   *t_vec = NULL, *f_vec = NULL;
     KDB         *kdb_to = NULL;
     SAMPLE      *t_smpl = NULL;
