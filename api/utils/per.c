@@ -106,7 +106,8 @@ int PER_diff_per(PERIOD *p1, PERIOD *p2)
     int     nb;
 
     if(p1->p_p != p2->p_p) {
-        B_seterrn(85);
+        //B_seterrn(85);
+        B_seterror("Different periodicities");
         return(-1);
     }
     nb = L_PERIOD_NB[L_pos(L_PERIOD_CH, p1->p_p)];
@@ -239,7 +240,8 @@ PERIOD *PER_atoper(char *aper)
 
 fin:
     if(per->p_y == 0) {
-        B_seterrn(86, text);
+        //B_seterrn(86, text);
+        B_seterror("'%s' : incorrect period", text);
         SW_nfree(per);
         per = 0;
     }
@@ -260,7 +262,8 @@ fin:
 int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)
 {
     if((smp1->s_p1).p_p != (smp2->s_p1).p_p) {
-        B_seterrn(85);
+        //B_seterrn(85);
+        B_seterror("Different periodicities");
         return(-1);
     }
 
@@ -275,7 +278,8 @@ int PER_common_smpl(SAMPLE* smp1, SAMPLE* smp2, SAMPLE* res)
         res->s_p2 = smp1->s_p2;
 
     if((res->s_nb = PER_diff_per(&(res->s_p2), &(res->s_p1))) < 0) {
-        B_seterrn(87);
+        //B_seterrn(87);
+        B_seterror("Sample out of WS boundaries");
         return(-1);
     }
 
@@ -306,7 +310,8 @@ SAMPLE  *PER_atosmpl(char* a1, char* a2)
     smpl = PER_pertosmpl(p1, p2);
 
 err:
-    if(smpl == 0) B_seterrn(88, a1, a2);
+//    if(smpl == 0) B_seterrn(88, a1, a2);
+    if(smpl == 0) B_seterror("Illegal sample : %s %s", (a1 == 0)? "":a1, (a2 == 0)? "":a2);
     SW_nfree(p1);
     SW_nfree(p2);
     return(smpl);
@@ -318,7 +323,8 @@ err:
  *  
  *  @param [in] p1 PERIOD* period 1. Must be <= period 2.
  *  @param [in] p2 PERIOD* period 2.
- *  @return        SAMPLE* allocated sample [period1, period2].
+ *  @return        SAMPLE* allocated sample [period1, period2]. If the periodicity of p1 or p2 is null, 
+ *                         the resulting sample has no observation (smpl->s_nb = 0)
  *              
  *  @details The resulting SAMPLE being allocated, it is the programmer's responsability to free afterwards (SW_nfree()).
  */
@@ -329,16 +335,16 @@ SAMPLE  *PER_pertosmpl(PERIOD* p1, PERIOD* p2)
 
     memcpy(&(smpl->s_p1), p1, sizeof(PERIOD));
     memcpy(&(smpl->s_p2), p2, sizeof(PERIOD));
-    dif = PER_diff_per(&(smpl->s_p2), &(smpl->s_p1));
-    if(dif < 0) goto err;
+    smpl->s_nb = 0;                             
+    if(p1->p_p != 0 && p2->p_p != 0) {                  // Modified to accept periods {0,0,0}
+        dif = PER_diff_per(&(smpl->s_p2), &(smpl->s_p1));
+        if(dif < 0) {
+            SW_nfree(smpl);
+            return(NULL);
+        }
+        smpl->s_nb = dif + 1;
+    }
 
-    smpl->s_nb = dif + 1;
-    goto fin;
-
-err:
-    SW_nfree(smpl);
-    smpl = 0;
-fin:
     return(smpl);
 }
 
