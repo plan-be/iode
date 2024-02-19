@@ -24,7 +24,7 @@ public:
 	/**
      * @note same as PER_atosmpl() function
      */
-	Sample(const std::string str_start_period, std::string str_end_period);
+	Sample(const std::string str_start_period, const std::string str_end_period);
 
 	Period start_period() const
 	{
