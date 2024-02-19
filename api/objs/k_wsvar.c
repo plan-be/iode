@@ -28,10 +28,10 @@
 /**
  * Changes the SAMPLE of a KDB of variables. Truncates the vars and/or add NaN values to fill the variables on the new sample.
  * 
- * @param [in, out] kdb     KDB*        pointer to a KDB of variables
- * @param [in]      nsmpl   SAMPLE*     new sample 
- * @return                  int         -1 if the kdb's sample and nsmpl don't overlap
- *                                      0 otherwise
+ * @param [in, out] kdb     KDB*            pointer to a KDB of variables
+ * @param [in]      nsmpl   SAMPLE* | NULL  new sample or NULL. If NULL or empty, no changes are made to the current WS
+ * @return                  int             -1 if the kdb's sample and nsmpl don't overlap or the resulting set is empty
+ *                                          0 otherwise
  */
  
 int KV_sample(KDB *kdb, SAMPLE *nsmpl)
@@ -40,7 +40,10 @@ int KV_sample(KDB *kdb, SAMPLE *nsmpl)
     char    *ptr;
     SAMPLE  *ksmpl, smpl;
 
+    if(nsmpl == NULL || nsmpl->s_nb == 0) return(0);
+    
     ksmpl = (SAMPLE *) KDATA(kdb);
+
     if(ksmpl->s_nb != 0) {
         if(PER_common_smpl(ksmpl, nsmpl, &smpl) < 0) return(-1);
         if(smpl.s_nb > 0) {
