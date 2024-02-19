@@ -266,27 +266,27 @@ void E_PrintDF(char* lec, IODE_REAL* res, int drift, int trend, int order)
              lec, drift, trend, order, res[2]);
 
     W_print_tb("Coefficients and tests", 4);
-    W_printf("&1C &1CValue&1CStandard Error&1CT-Statistic\n");
+    W_printfRepl("&1C &1CValue&1CStandard Error&1CT-Statistic\n");
     W_printf(".tl\n");
 
-    W_printf("&1L%s&1D%lf&1D%lf&1D%lf\n",
+    W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf\n",
              "ADF", res[pos], res[pos + 1], res[pos + 2]);
     pos += 3;
 
     if(drift) {
-        W_printf("&1L%s&1D%lf&1D%lf&1D%lf\n",
+        W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf\n",
                  "Drift", res[pos], res[pos + 1], res[pos + 2]);
         pos += 3;
     }
 
     if(trend) {
-        W_printf("&1L%s&1D%lf&1D%lf&1D%lf\n",
+        W_printfRepl("&1L%s&1D%lf&1D%lf&1D%lf\n",
                  "Trend", res[pos], res[pos + 1], res[pos + 2]);
         pos += 3;
     }
 
     for(i = 1 ; i <= order ; i++) {
-        W_printf("&1LOrder %d&1D%lf&1D%lf&1D%lf\n",
+        W_printfRepl("&1LOrder %d&1D%lf&1D%lf&1D%lf\n",
                  i, res[pos], res[pos + 1], res[pos + 2]);
         pos += 3;
     }
