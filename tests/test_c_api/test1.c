@@ -97,8 +97,14 @@ void Syntax()
 
 // BEGIN_KEEP
 #ifdef _MSC_VER
+//  #if defined(_M_X64)  || defined(__x86_64__) || defined(__amd64__) || defined(_WIN64)
+    #ifdef _WIN64 
     char    *IODE_DATA_DIR   = "..\\data";
     char    *IODE_OUTPUT_DIR = "..\\output";
+  #else
+    char    *IODE_DATA_DIR   = "..\\data";
+    char    *IODE_OUTPUT_DIR = "..\\output";
+  #endif
 #else
 //    char    *IODE_DATA_DIR   = "..\\..\\api\\data";
 //    char    *IODE_OUTPUT_DIR = "..\\..\\api\\output";
@@ -107,7 +113,7 @@ void Syntax()
 
 #endif
 
-// Fonctions annulï¿½es/remplacï¿½es temporairement pour passer le link
+// Temporarily removed fns (to allow linking)
 
 // Pour tester l'estimation
 //#ifdef __cplusplus
@@ -646,6 +652,7 @@ void Tests_OBJECTS()
     char*       lst;
     int         pos;
     static int  done = 0;
+    char        asmpl1[80], asmpl2[80];
 
     U_test_print_title("Tests OBJECTS");
     U_test_CreateObjects();
@@ -662,8 +669,14 @@ void Tests_OBJECTS()
     
     pos = K_ren(KV_WS, "A", "AAA");
     S4ASSERT(K_find(KV_WS, "AAA") >= 0,  "K_ren(KV_WS, \"A\", \"AAA\")) = %d", pos);
-   
+        
+    // Test KV_sample()
+    PER_smpltoa(KSMPL(KV_WS), asmpl1);
+    KV_sample(KV_WS, NULL);
+    PER_smpltoa(KSMPL(KV_WS), asmpl2);
+    S4ASSERT(U_cmp_strs(asmpl1, asmpl2), "KV_sample(kdb, NULL) does not modify the current sample");
 }    
+
 
 /**
  *  Checks:
@@ -676,7 +689,7 @@ void Tests_TBL_ADD_GET()
     TCELL   *cells_1;
     TLINE   *line_0;
     TLINE   *line_1;
-
+    
     int     nb_columns = 2;
     char    *def = "A title";
     char    *vars = "GOSG,YDTG,DTH,DTF,IT,YSSG+COTRES,RIDG,OCUG"; // Note that semi-colon are not accepted by B_ainit_chk() (see b_args.c)
@@ -688,9 +701,10 @@ void Tests_TBL_ADD_GET()
     int     files = 1;
     int     date = 1;
     int     pos, i, j;
-
+    int     cond;
+    
     U_test_print_title("Tests TBL: compare KTVAL() and T_create() results");
-
+    
     // --- create a C struct TBL via T_auto()
     lecs = B_ainit_chk(vars, NULL, 0);
     tbl = T_create(nb_columns);
@@ -731,7 +745,7 @@ void Tests_TBL_ADD_GET()
     S4ASSERT(tbl->t_div.tl_pbyte == extracted_tbl->t_div.tl_pbyte   , "Comparing t_div.tl_pbyte");
     cells_0 = (TCELL*) tbl->t_div.tl_val;
     cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
-
+    
     for(j = 0; j < tbl->t_nc; j++)
     {
         S4ASSERT(cells_0[j].tc_type == cells_1[j].tc_type,  "Comparing div: cells_0[%d].tc_type == cells_1[%d].tc_type == %d", j, j, cells_1[j].tc_type);
@@ -743,12 +757,12 @@ void Tests_TBL_ADD_GET()
     {
         line_0 = tbl->t_line + i;
         line_1 = extracted_tbl->t_line + i;
-
+    
         S4ASSERT(line_0->tl_type  == line_1->tl_type  , "line %d: line_0->tl_type  == line_1->tl_type  == %d", i, line_0->tl_type);
         S4ASSERT(line_0->tl_graph == line_1->tl_graph , "line %d: line_0->tl_graph == line_1->tl_graph == %d", i, line_0->tl_graph);
         S4ASSERT(line_0->tl_axis  == line_1->tl_axis  , "line %d: line_0->tl_axis  == line_1->tl_axis  == %d", i, line_0->tl_axis );
         S4ASSERT(line_0->tl_pbyte == line_1->tl_pbyte , "line %d: line_0->tl_pbyte == line_1->tl_pbyte == %d", i, line_0->tl_pbyte);
-
+    
         cells_0 = (TCELL*) line_0->tl_val;
         cells_1 = (TCELL*) line_1->tl_val;
         switch (line_0->tl_type)
@@ -773,7 +787,8 @@ void Tests_TBL_ADD_GET()
             }
             break;
           default:
-            S4ASSERT(cells_0 == NULL && cells_1 == NULL, "Other line: cells NULL by default");
+            cond = cells_0 == NULL && cells_1 == NULL;
+            S4ASSERT(cond != 0, "Other line: cells NULL by default");
             break;
         }
     }
@@ -782,6 +797,7 @@ void Tests_TBL_ADD_GET()
     T_free(tbl);
     T_free(extracted_tbl);
 }
+
 
 /**
  *  Tests some LEC calculations.
@@ -801,7 +817,7 @@ void Tests_LEC()
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
-    //S4ASSERT(0, "Erreur forcï¿½e");
+    //S4ASSERT(0, "Generated error");
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
     U_test_lec("LEC", "A[-1]",         2, A[1]);
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
@@ -974,7 +990,7 @@ void Tests_Simulation()
     U_ch**      endo_exo;
     int         rc;
     LIS         lst, expected_lst;
-    void        (*kmsg_super_ptr)(char*);
+    void        (*kmsg_super_ptr)(const char*);
     double      XNATY_2000Y1;
     
     
@@ -1133,7 +1149,7 @@ void Tests_PrintTablesAndVars()
 void Tests_Estimation()
 {
     int         rc;
-    void        (*kmsg_super_ptr)(char*);
+    void        (*kmsg_super_ptr)(const char*);
     SAMPLE      *smpl;
     IODE_REAL   r2, *df;
 
@@ -1590,7 +1606,7 @@ void U_test_create_a_file(char* filename, int type)
     //  Create a file
     U_test_suppress_a2m_msgs();
     W_dest(filename, type); 
-    W_printf("This is a paragraph with accents: ï¿½ï¿½ï¿½ï¿½ï¿½\n"); // the current source file (test1.c) is ANSI coded
+    W_printf("This is a paragraph with accents: éàâêë\n"); // the current source file (test1.c) is ANSI coded
     W_close();
 }
 
@@ -1670,12 +1686,10 @@ void Tests_B_FSYS()
     
     
     //  Create toto.a2m -> ansi-coded file
-    //sprintf(arg, "%s\\toto", IODE_OUTPUT_DIR);
+    // sprintf(arg, "%s\\toto", IODE_OUTPUT_DIR);
     // U_test_create_a_file("toto", W_A2M); // Ansi-coded file 
-    // => Pb avec la conversion test_c_api => les fichiers diffï¿½rent entre celui crï¿½ï¿½ via test1.c
-    // et celui crï¿½ï¿½ par test_c_api.cpp. Donc on va prendre une copie de data\toto.a2m
-
-    // B_SysCopy(char* arg) : copy data\toto.a2m dans toto.a2m
+    // => Pb with conversions => files created by test1.c differ from those created by test_c_api.cpp. 
+    // Therefore, we copy data\toto.a2m into local toto.a2m
     sprintf(arg, "%s\\toto.a2m toto.a2m", IODE_DATA_DIR);
     rc = B_SysCopy(arg);
     cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m", "toto.a2m");
@@ -1791,6 +1805,47 @@ void Tests_B_IDT()
     S4ASSERT(U_test_eq(D[1], L_NAN), "(A+B)[1] is NaN");        // 1 == 2001Y1
     S4ASSERT(U_test_eq(D[2], 2.0 + 4.0), "(A+B)[2] == 6.0");    // 2 == 2002Y1
     S4ASSERT(U_test_eq(C[2], 6.0*2 - 0.92921251 ), "C[2] ==6.0*2 - 0.92921251");
+}
+
+
+// Test of identities execution for Python (b_api.c).
+void Tests_B_IDT_EXECUTE()
+{
+    double  *AOUC;
+    int     rc;
+    
+    U_test_print_title("Tests B_IDT_EXECUTE");
+    
+    K_free(KV_WS);
+    K_free(KI_WS);
+    //K_free(KS_WS);
+        
+    // Loads 3 WS and check ok
+    KI_RWS = KI_WS = U_test_K_interpret(K_IDT, "fun");
+    KV_RWS = KV_WS = U_test_K_interpret(K_VAR, "fun");
+    //KS_RWS = KS_WS = U_test_K_interpret(K_SCL, "fun");
+    
+    //iode.ws_load_idt(f"{IODE_DATA_DIR}fun")
+    //iode.ws_load_var(f"{IODE_DATA_DIR}fun")
+    //iode.ws_load_scl(f"{IODE_DATA_DIR}fun")
+    
+    AOUC = KVPTR("AOUC");
+    AOUC[1] = 0.1;
+    //iode.set_var("AOUC", AOUC)
+    
+    //rc = iode.idt_execute("1961:2015", "AOUC")
+    //print(f"rc={rc}")
+    rc = IodeExecuteIdts("1961Y1:2015Y1", "AOUC", NULL, NULL, 1);
+    printf("rc=%d\n", rc);
+    
+    //AOUC = iode.get_var("AOUC")
+    //test_eq(f"AOUC[1961Y1]", 0.24783192, AOUC[1])
+    
+    //varname = "AOUC"
+    //res = iode.exec_lec(f"{varname}[1961Y1]", 0)
+    //test_eq(f"{varname}[1961Y1]", 0.24783192, res)
+    S4ASSERT(U_test_eq(AOUC[1], 0.24783192), "AOUC[1961Y1] == 0.24783192");   
+    
 }
 
 void Tests_IMP_EXP()
@@ -2908,6 +2963,7 @@ int main(int argc, char **argv)
 //    // tests temporaires
 //    Tests_ARGS_ALD();   
 //    return(0);
+  
     
     Tests_IODEMSG();
     Tests_SWAP(); 
@@ -2915,6 +2971,7 @@ int main(int argc, char **argv)
     Tests_ERRMSGS();
     Tests_BUF();
     Tests_OBJECTS();
+    Tests_TBL_ADD_GET();
     Tests_LEC();
     Tests_EQS();
     Tests_ARGS();
@@ -2942,6 +2999,7 @@ int main(int argc, char **argv)
     Tests_B_REP_ENGINE();
     Tests_B_REP_FNS();
     Tests_B_REP_PROC();
+    Tests_B_IDT_EXECUTE();
     
     // Tests_B_PrintObjsDef();
   
