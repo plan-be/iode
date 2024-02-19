@@ -59,6 +59,8 @@ extern double *IodeGetVector(char *name, int *lg);
 extern int IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg);
 extern int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg);
 
+extern int IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace);
+
 extern int IodeEstimate(char* veqs, char* afrom, char* ato);
 
 extern int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug);
@@ -70,7 +72,9 @@ extern int IodeModelSimulateSCC(char *per_from, char *per_to,
                          double newton_eps, int newton_maxit, int newton_debug);
 extern double IodeModelSimNorm(char* period);
 extern int IodeModelSimNIter(char* period);
-extern int IodeModelSimCpu(char* period);                         
+extern int IodeModelSimCpu(char* period);     
+extern int IodeModelCpuSort();
+extern int IodeModelCpuSCC();
                          
 extern int IodeExecArgs(char *filename, char **args);
 extern int IodeExec(char *filename);
@@ -90,6 +94,10 @@ extern double *IodeChartData(int hdl, int i);
 extern void kmsg_null(const char* msg);
 extern void IodeSuppressMsgs();
 extern void IodeResetMsgs();
+
+void IodeAddErrorMsg(char* msg);
+void IodeDisplayErrorMsgs();
+void IodeClearErrorMsgs();
 
 extern int IodeSetNbDec(int nbdec);
 extern int IodeGetNbDec();
