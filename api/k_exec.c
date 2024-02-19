@@ -80,10 +80,10 @@ static int KI_strcmp(const char *pa, const char *pb);
 static KDB *KI_series_list(KDB* dbi);
 static KDB *KI_scalar_list(KDB* dbi);
 static int *KI_reorder(KDB* dbi);
-static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp);
+static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name);
 static int KI_read_vars_file(KDB* dbv, char* file);
 static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[]);
-static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp);
+static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name);
 static int KI_read_scls_file(KDB* dbs, char* file);
 static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[]);
 static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl);
@@ -341,13 +341,14 @@ static int *KI_reorder(KDB* dbi)
  *  Copies from the KDB dbv_tmp the unallocated VARs of dbv (i.e. the vars with no associated object).
  *  The output sample is dbv's.
  *  
- *  @param [in] KDB*    dbv     KDB of vars to read
- *  @param [in] KDB*    dbv_tmp temporary KDB (read from an external file) where the needed VARs must be copied from
- *  @return     int             nb of VARs copied
- *                              -3 if there is no common sample between dbv_tmp and dbv
+ *  @param [in] KDB*    dbv         KDB of vars to read
+ *  @param [in] KDB*    dbv_tmp     temporary KDB (read from an external file) where the needed VARs must be copied from
+ *  @param [in] char*   source_name name of the input source (WS or filename)
+ *  @return     int                 nb of VARs copied
+ *                                  -3 if there is no common sample between dbv_tmp and dbv
  *  
  */
-static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp)
+static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
 {
     int     j, pos, nb_found = 0,
             start, start_tmp;
@@ -365,7 +366,8 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp)
     else return(-3);
 
     if(KEXEC_TRACE) {
-        W_printfDbl(".par1 enum_1\nFile %s : ", KNAMEPTR(dbv_tmp)); 
+        //W_printfDbl(".par1 enum_1\nFile %s : ", KNAMEPTR(dbv_tmp)); 
+        W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); 
     }    
     for(j = 0 ; j < KNB(dbv); j++) {
         if(KSOVAL(dbv, j) != 0) continue;  /* series already present */
@@ -416,7 +418,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
         return(-1);
     }
 
-    nbf = KI_read_vars_db(dbv, kdb);
+    nbf = KI_read_vars_db(dbv, kdb, file);
     SCR_free_tbl(vars);
     K_free(kdb);
 
@@ -425,7 +427,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
 
 
 /**
- *  Reads from a list of files,the VARs needed to compute identities. 
+ *  Reads from a list of files, the VARs needed to compute identities. 
  *  For the variables to be read in the current KDB of VARs, specify "WS" as filename (required unless nb ==0).
  *  
  *  @param [in] KDB*    dbi         identities to be calculated
@@ -444,7 +446,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 
     if(nb == 0) {
         // No filename given => read in dbv_ws (normally KV_WS)
-        nbf = KI_read_vars_db(dbv, dbv_ws);
+        nbf = KI_read_vars_db(dbv, dbv_ws, "WS");
         if(nbf < 0) return(-1);
         nb_found += nbf;
     }
@@ -453,7 +455,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
         for(i = 0;  i < nb && nb_found < KNB(dbv); i++) {
             if(strcmp(files[i], "WS") == 0)
                 // Special name "WS" => read in dbv_ws 
-                nbf = KI_read_vars_db(dbv, dbv_ws);
+                nbf = KI_read_vars_db(dbv, dbv_ws, "WS");
             else
                 // Regular VAR file
                 nbf = KI_read_vars_file(dbv, files[i]);
@@ -473,10 +475,12 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
                 continue;
             }
             j++;
-            B_seterrn(90, KONAME(dbv, i));      // Exogenous series not found => error
+            //B_seterrn(90, KONAME(dbv, i));                     // Exogenous series not found => error
+            B_seterror("Variable %s not found", KONAME(dbv, i));   // Exogenous series not found => error
         }
         if(j == 0) return(0);                   // all VARs found
-        if(j == 10) B_seterrn(91);              // more than 10 exogenous vars not found => special msg (???) TODO: move this in the loop above ?
+        // if(j == 10) B_seterrn(91);                 // more than 10 exogenous vars not found => special msg 
+        if(j == 10) B_seterror("... others skipped"); // more than 10 exogenous vars not found => special msg 
         return(-2);
     }
     return(0);
@@ -486,20 +490,21 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
 /**
  *  Copies from the KDB dbs_tmp the unallocated SCLs of dbs (i.e. the SCL with no associated object).
  *  
- *  @param [in] KDB*    dbs     KDB of SCLs to read
- *  @param [in] KDB*    dbs_tmp temporary KDB (read from an external file) where the needed SCLs must be copied from
- *  @return     int             nb of SCLs copied
- *                              -3 if there is no common sample between dbv_tmp and dbv
+ *  @param [in] KDB*    dbs         KDB of SCLs to read
+ *  @param [in] KDB*    dbs_tmp     temporary KDB (read from an external file) where the needed SCLs must be copied from
+ *  @param [in] char*   source_name name of the input source (WS or filename)
+ *  @return     int                 nb of SCLs copied
+ *                                  -3 if there is no common sample between dbv_tmp and dbv
  */
-static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp)
+static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name)
 {
-    char    filename[K_MAX_FILE + 1];
+    //char    filename[K_MAX_FILE + 1];
     int     j, pos, nb_found = 0;
 
-    strcpy(filename, KNAMEPTR(dbs_tmp));      /* JMP 29-09-2015 */
-    SCR_replace(filename, "\\", "\\\\");
+    //strcpy(filename, KNAMEPTR(dbs_tmp));      /* JMP 29-09-2015 */
+    //SCR_replace(filename, "\\", "\\\\");
 
-    if(KEXEC_TRACE) W_printfDbl(".par1 enum_1\nFile %s : ", filename); /* JMP 19-10-99 */
+    if(KEXEC_TRACE) W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
     for(j = 0 ; j < KNB(dbs); j++) {
         if(KSOVAL(dbs, j) != 0) continue;
 
@@ -547,7 +552,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
         return(-1);
     }
 
-    nbf = KI_read_scls_db(dbs, kdb);
+    nbf = KI_read_scls_db(dbs, kdb, file);
     SCR_free_tbl(scls);
     K_free(kdb);
 
@@ -574,14 +579,14 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
     int     i, j, nbf, nb_found = 0;
 
     if(nb == 0) {
-        nbf = KI_read_scls_db(dbs, dbs_ws);
+        nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
         if(nbf < 0) return(-1);
         nb_found += nbf;
     }
     else {
         for(i = 0;  i < nb && nb_found < KNB(dbs); i++) {
             if(strcmp(files[i], "WS") == 0)
-                nbf = KI_read_scls_db(dbs, dbs_ws);
+                nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
             else
                 nbf = KI_read_scls_file(dbs, files[i]);
 
@@ -594,9 +599,11 @@ static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[])
         for(i = 0, j = 0 ; i < KNB(dbs) && j < 10; i++) {
             if(KSOVAL(dbs, i) != 0) continue;  /* series already present */
             j++;
-            B_seterrn(92, KONAME(dbs, i));
+            //B_seterrn(92, KONAME(dbs, i));
+            B_seterror("Scalar %s not found", KONAME(dbs, i));   // scalar not found
         }
-        if(j == 10) B_seterrn(91);
+        //if(j == 10) B_seterrn(91);
+        if(j == 10) B_seterror("... others skipped");
         return(-2);
     }
     return(0);
@@ -674,21 +681,27 @@ static int KI_execute(KDB* dbv, KDB* dbs, KDB* dbi, int* order, SAMPLE* smpl)
  *  @param [in] KDB*    dbs         Input SCL KDB
  *  @param [in] int     ns          number of input SCL files
  *  @param [in] char*   sfiles[]    Input SCL files
- *  @param [in] SAMPLE* smpl        execution SAMPLE
+ *  @param [in] SAMPLE* smpl        execution SAMPLE or NULL to select the current VAR KDB sample
  *  @return     KDB*                NULL on error (illegal SAMPLE, empty dbi, vars or scls not found...).
  *                                  The specific message is added via B_seterrn().
  */
-KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* smpl)
+KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], SAMPLE* in_smpl)
 {
     KDB     *dbv_i, *dbs_i;
+    SAMPLE  *smpl;
     int     *order;
     int     *KI_reorder();
     char    buf[80];
 
-    if(smpl == 0) {
+
+    smpl = KSMPL(KV_WS);
+    if(in_smpl != 0) smpl = in_smpl;
+    
+    if(smpl->s_nb == 0) {
         B_seterrn(93);
         return((KDB *)0);
     }
+    
     if(KSMPL(KV_WS)->s_nb != 0 &&
             (PER_diff_per(&(KSMPL(KV_WS)->s_p2), &(smpl->s_p2)) < 0
              || PER_diff_per(&(smpl->s_p1), &(KSMPL(KV_WS)->s_p1)) < 0)) {
@@ -711,12 +724,12 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     else  memcpy(KDATA(dbv_i), KSMPL(KV_WS), sizeof(SAMPLE));
 
     if(KEXEC_TRACE) {
-        W_printf("\n.par1 tit_0\nIDENTITIES EXECUTION\n");
+        W_printf("\n.par1 tit_0\nExecution of identities\n");
         W_printf(".par1 tit_1\nParameters\n");
         /*        W_printf(".par1 par_1\nList of identities :\n"); */
         W_printf(".par1 par_1\nExecution sample : %s\n",
                  PER_smpltoa(smpl, buf));
-        W_printf(".par1 tit_1\nVariables load\n");
+        W_printf(".par1 tit_1\nVariables loaded\n");
     }
     if(KI_read_vars(dbi, dbv_i, dbv, nv, vfiles)) {
         SW_nfree(order);
@@ -725,7 +738,7 @@ KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char*
     }
 
     dbs_i = KI_scalar_list(dbi);
-    if(KEXEC_TRACE) W_printf(".par1 tit_1\nScalars load\n");
+    if(KEXEC_TRACE) W_printf(".par1 tit_1\nScalars loaded\n");
     if(KI_read_scls(dbs_i, dbs, ns, sfiles)) {
         SW_nfree(order);
         K_free(dbv_i);
