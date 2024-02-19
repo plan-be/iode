@@ -615,6 +615,9 @@ extern int PG_fld_free(PAGE *pg);
 /* s_wuser.c */
 extern int WscrDOSUserInit(int argc,char *argv[]);
 
+/* s_wgetms.c */
+extern long WscrGetMS(); 
+
 /* s_cmtscr.c */
 extern int PG_display_scr(PAGE *pg);
 
