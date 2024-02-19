@@ -333,45 +333,54 @@ static void KE_print_test(FILE* fd, char* txt, IODE_REAL val)
  *  
  *  @param [in, out]    fd      FILE*       output stream    
  *  @param [in]         eq      EQ*         pointer to the EQ to print  
+ *  @param [in]         name    char*       equation endo (i.e. equation name)
  *  
  */
-static void KE_print_eq(FILE* fd, EQ* eq)
+static void KE_print_eq(FILE* fd, EQ* eq, char* name)
 {
     char    from[21], to[21], *SCR_long_to_date();
 
-    fprintf(fd, "{\n\t\"%s\"\n\t", eq->lec);
-    switch(eq->method) {
-        case 0 :
-            fprintf(fd, "LSQ\n");
-            break;
-        case 1 :
-            fprintf(fd, "ZELLNER\n");
-            break;
-        case 2 :
-            fprintf(fd, "INF\n");
-            break;
-        case 3 :
-            fprintf(fd, "GLS\n");
-            break;
-        case 4 :
-            fprintf(fd, "MAXLIK\n");
-            break;
-    }
-    if(eq->blk != NULL && eq->blk[0] != 0)
-        fprintf(fd, "\tBLOCK \"%s\"\n", eq->blk);
-    if(eq->instr != NULL && eq->instr[0] != 0)
-        fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instr);
-    if(eq->cmt != NULL && eq->cmt[0] != 0) { // JMP 9/4/2015
+    fprintf(fd, "{\n\t\"%s\"\n", eq->lec);
+    if(eq->cmt != NULL && eq->cmt[0] != 0 && strcmp(eq->cmt, " ") !=0 ) { // JMP 30/10/2023
         fprintf(fd, "\tCOMMENT ");
         SCR_fprintf_esc(fd, eq->cmt, 1);
         fprintf(fd, "\n");
     }
-    if((eq->smpl).s_nb != 0)
+
+    // Estimated equation => SAMPLE not null 30/10/2023
+    if((eq->smpl).s_nb != 0) {
+        switch(eq->method) {
+            case 0 :
+                fprintf(fd, "\tLSQ\n");
+                break;
+            case 1 :
+                fprintf(fd, "\tZELLNER\n");
+                break;
+            case 2 :
+                fprintf(fd, "\tINF\n");
+                break;
+            case 3 :
+                fprintf(fd, "\tGLS\n");
+                break;
+            case 4 :
+                fprintf(fd, "\tMAXLIK\n");
+                break;
+            default: 
+                fprintf(fd, "\t/* UNKNOWN ESTIMATION METHOD: %d*/\n", eq->method);
+                break;
+        }
+
         fprintf(fd, "\tSAMPLE %s %s\n",
-                PER_pertoa(&(eq->smpl.s_p1), from),
-                PER_pertoa(&(eq->smpl.s_p2), to)
-               );
-    if(eq->date != 0L)
+                    PER_pertoa(&(eq->smpl.s_p1), from),
+                    PER_pertoa(&(eq->smpl.s_p2), to)
+                   );
+
+        if(eq->blk != NULL && eq->blk[0] != 0 && strcmp(eq->blk, name) != 0) // JMP 30/10/2023
+            fprintf(fd, "\tBLOCK \"%s\"\n", eq->blk);
+        if(eq->instr != NULL && eq->instr[0] != 0)
+            fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instr);
+        
+        //if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);
         KE_print_test(fd, "STDEV",  eq->tests[1]);
         KE_print_test(fd, "MEANY",  eq->tests[2]);
@@ -382,6 +391,8 @@ static void KE_print_eq(FILE* fd, EQ* eq)
         KE_print_test(fd, "R2ADJ",  eq->tests[8]);
         KE_print_test(fd, "DW",     eq->tests[9]);
         KE_print_test(fd, "LOGLIK", eq->tests[10]);
+    }
+    
     fprintf(fd, "}\n");
 }
 
@@ -414,7 +425,7 @@ int KE_save_asc(KDB* kdb, char* filename)
     for(i = 0 ; i < KNB(kdb); i++) {
         fprintf(fd, "%s ", KONAME(kdb, i));
         eq = KEVAL(kdb, i);
-        KE_print_eq(fd, eq);
+        KE_print_eq(fd, eq, KONAME(kdb, i));
         E_free(eq);
     }
 
