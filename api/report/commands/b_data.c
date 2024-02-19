@@ -587,7 +587,7 @@ int B_DataUpdate(char* arg, int type)
 char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type)
 {
     int     rc = 0;
-    char    **args = NULL, **lst, buf[81];
+    char    **args = NULL, buf[81];
     char    **K_grep();
     KDB     *kdb = K_WS[type];
 
@@ -627,7 +627,7 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
 int B_DataSearch(char* arg, int type)
 {
     int     rc = 0, word, ecase, names, forms, texts;
-    char    **args = NULL, **lst, buf[81];
+    char    **args = NULL, **lst;
     char    **K_grep();
     KDB     *kdb = K_WS[type];
 
@@ -708,7 +708,11 @@ int B_DataEditCnf(char* arg)
  */
 static int my_strcmp(const void *pa, const void *pb)
 {
-    char    **a = pa, **b = pb;                 // TODO: warning 'initializing': different 'const' qualifiers
+    const char    **a, **b;      // TODO: warning 'initializing': different 'const' qualifiers
+    
+    a = (const char**) pa;
+    b = (const char**) pb;      
+
     return(strcmp(*a, *b));
     
     //const char    *a = pa, *b = pb; // JMP 1/10/2021 TODO: Check this => Does NOT work ???
