@@ -389,7 +389,7 @@ acaf4*(TIME=1995)"
 
 @ChronoGet()   
 ------------
-        @chronoget()              =>  "0"
+        @chronoget()              =>  "...variable..."
 
 
 
