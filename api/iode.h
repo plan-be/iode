@@ -45,9 +45,6 @@
 #define MAXFLOAT  FLT_MAX
 #define MINFLOAT  FLT_MIN
 #endif
- 
-
-//#include "o_objs.h" // JMP 8/12/2011
 
 /******************************* DEFINES **********************************/
 // ALD 23/11/2023
@@ -126,9 +123,9 @@
 #define KNB(kdb)     ((kdb)->k_nb)
 #define KOBJS(kdb)   ((kdb)->k_objs)
 
-#define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)                 // name of the object
-#define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)                  // position of the object in the memory
-#define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object (as a char*)
+#define KONAME(kdb, pos)    ((kdb)->k_objs[pos].o_name)
+#define KSOVAL(kdb, pos)    ((kdb)->k_objs[pos].o_val)
+#define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))
 
 
 #define K_NBR_OBJ   7
@@ -807,37 +804,38 @@ typedef char    ONAME[K_MAX_NAME + 1];
 typedef long    OSIZE;   /* JMP 23-05-00 */
 
 typedef struct  _kobj_ {
-    SWHDL       o_val;          // "position" in the memory -> to be passed to SW_getptr()
-    ONAME       o_name;         // name of the object
+    SWHDL       o_val;      /* SWHDL=long */ /* IODE64K */
+    ONAME       o_name;
     char        o_pad[3];
 } KOBJ;
 
 typedef struct _kdb_ {
-    KOBJ        *k_objs;                // map <position in the memory, object name>
-	long        k_nb;                   // number of objects in the database
-    short       k_type;                 // type of the object: K_CMT, K_EQS, ..., K_VAR
-    short       k_mode;                 // case of the object name: K_UPPER, K_LOWER or K_ASIS 
-    char        k_arch[LMAGIC];         // ???
-    char        k_magic[LMAGIC];        // ???
-    OFNAME       k_oname;               // ??? (compat size but not used)
-    char        k_desc[K_MAX_DESC];     // ???
-    char        k_data[K_MAX_DESC];     // Sample if Variables database
-    char        k_compressed;           // ???
-    char        k_reserved[59];         // not used (NOTE: decreased by 4 bytes in version 6.44 for k_nameptr)
-    char        *k_nameptr;             // filepath to the database file
+    KOBJ        *k_objs;
+	long        k_nb;
+    short       k_type;
+    short       k_mode;
+    char        k_arch[LMAGIC];
+    char        k_magic[LMAGIC];
+    //OFNAME       k_name; // 6.44
+    OFNAME       k_oname;  // 6.44 (compat size but not used)
+    char        k_desc[K_MAX_DESC];
+    char        k_data[K_MAX_DESC];     /* Client Data */
+    char        k_compressed;           /* IODE64K */
+    char        k_reserved[59];         /* 6.44 : decreased by 4 bytes for k_nameptr */
+    char        *k_nameptr;             /* 6.44 */ // Alignment on 4 bytes, not 8 => pb in Google tests (not /Zp1)
 } KDB;
 
 typedef struct _period {
-    long    p_y;        // year
-    long    p_s;        // position in the year (according to the periodicity)
-    char    p_p;        // periodicity (Y S Q M W D)
+    long    p_y; /* PERIOD LONG */
+    long    p_s; /* PERIOD LONG */
+    char    p_p;
     char    p_pad[3];
 } PERIOD;
 
 typedef struct _sample {
-    PERIOD  s_p1;       // starting period
-    PERIOD  s_p2;       // ending period
-    short   s_nb;       // number of periods in the sample
+    PERIOD  s_p1,
+	    s_p2;
+    short   s_nb;
     char    s_pad[2];
 } SAMPLE;
 
@@ -887,6 +885,11 @@ typedef struct _idt_ {
 #define EQS_NBTESTS     20
 
 // EQ = Equation (struct continaing a LEC equation, its compled form (CLEC), the estimation parameter and tests...)
+//
+// WARNING about the method property. 
+// Before using it, check that the method property value is in the appropriate range: in the very first versions of iode,
+// the allowed values for method were 'l', 'z', instead of 0, 1...
+
 typedef struct _eq_ {
     char    *lec;       // LEC form of the equation (LHS := RHS)
     CLEC    *clec;      // Compiled equation for the simulation
