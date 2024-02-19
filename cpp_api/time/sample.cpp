@@ -43,7 +43,7 @@ Sample::Sample(const Period& start_period, const Period& end_period)
     sample_from_periods(start_period, end_period);
 }
 
-Sample::Sample(const std::string str_start_period, std::string str_end_period)
+Sample::Sample(const std::string str_start_period, const std::string str_end_period)
 {
     std::string error_msg = "Cannot create a new sample from the start period '" + str_start_period + 
                             "' and end period '" + str_end_period + "'.\n";
