@@ -57,14 +57,25 @@
  *      int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos, int *ws_pos, int *py_lg) |
  *      int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg) | Determines the position to copy from (python object), where to copy to (KV_WS) and the nb of elements to copy 
  *  
+ *   IDENTITES
+ *  
+ *      int IodeExecuteIdts(char *asmpl, char *idt_list, char *var_files, char *scl_files, int trace) | Execute identities
+ *  
  *   ESTIMATION
  *  
  *      int IodeEstimate(char* veqs, char* afrom, char* ato)             | Estimate an equation of a given sample. 
  *  
  *   SIMULATION
  *  
- *      int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug) | Simulate of model.
- *  
+ *      int IodeModelSimulate(char *per_from, char *per_to, char *eqs_list, char *endo_exo_list, double eps, double relax, int maxit, int init_values, int sort_algo, int nb_passes, int debug, double newton_eps, int newton_maxit, int newton_debug) | Simulate a model.
+ *      int IodeModelCalcSCC(int nbtris, char* pre_listname, char* inter_listname, char* post_listname, char *eqs_list) | Decompose a model in its Strong Connex Components and optionally reorder the interdepend block. 
+ *      int IodeModelSimulateSCC(char *per_from, char *per_to, char *pre_eqlist, char *inter_eqlist, char* post_eqlist,...) | Simulate a model already sorted and decomposed into its SCC.
+ *      double IodeModelSimNorm(char* period)       | Returns the convergence threshold reached for the given period 
+ *      int IodeModelSimNIter(char* period)         | Returns the number of iterations needed to converge for the given period
+ *      int IodeModelSimCpu(char* period)           | Returns the elapsed time to reach the solution for the given period
+ *      int IodeModelCpuSort()                      | Return the time required to sort the model
+ *      int IodeModelCpuSCC()                       | Return the time required to reorder the model
+ *
  *   REPORTS
  *  
  *      int IodeExecArgs(char *filename, char **args)                    | Execute a report with optionnal parameters.
@@ -80,6 +91,9 @@
  *  
  *      void IodeSuppressMsgs()                                          | Suppress all messages from the A2M interpretor and from the IODE functions.
  *      void IodeResetMsgs()                                             | Reset the messages from the A2M interpretor and from the IODE functions.
+ *      void IodeAddErrorMsg(char* msg)                                  | Add a message in the error message stack
+ *      void IodeDisplayErrorMsgs()                                      | Display the error messages accumulated during the previous function calls.
+ *      void IodeClearErrorMsgs()                                        | Clear the stack of messages.
  *  
  *   MISCELLANEOUS
  *  
@@ -798,7 +812,7 @@ int IodeCalcSamplePosition(char *str_pyper_from, char* str_pyper_to, int *py_pos
     return(*py_lg);
 }
 
-
+ 
 /**
  *  Set the values of a subset of a variable.
  *  
@@ -842,6 +856,57 @@ int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int 
     // Save series in KV_WS
     pos = K_add(KV_WS, la_name, ws_var, &ws_lg);
     return(pos);
+}
+ 
+
+// --------------------
+// IDENTITIES FUNCTIONS
+// --------------------
+
+int IodeExecuteIdts(char *asmpl, char *idt_list, char *var_files, char *scl_files, int trace) 
+{
+    int     rc; 
+    U_ch    **idts, **pers;
+    SAMPLE  *smpl = NULL;
+
+    // Sample (null => full sample, see K_exec())
+    if(asmpl && asmpl[0] != 0) {
+        pers = SCR_vtoms(asmpl, " :");
+        if(SCR_tbl_size(pers) == 2) {
+            smpl = PER_atosmpl(pers[0], pers[1]);
+        }
+        SCR_free_tbl(pers);
+        if(smpl == NULL) {
+            kerror(0, "Bad sample: '%s'", asmpl);
+            return(-1);
+        }    
+    }
+    
+//    if(smpl == 0) {
+//        kerror(0, "IdtExecute: '%s' wrong sample ", asmpl);
+//        return(-1);
+//    }
+    
+    // Input files
+    if(var_files) B_IdtExecuteVarFiles(var_files);
+    if(scl_files) B_IdtExecuteSclFiles(scl_files);
+    
+    // Optional trace
+    KEXEC_TRACE = trace;
+    
+    // Idt list
+    idts = NULL;
+    if(idt_list && idt_list[0] != 0) {
+        idts  = SCR_vtoms(idt_list, " ,;\t");
+    }
+    
+    // Execution
+    rc = B_IdtExecuteIdts(smpl, idts);
+    
+    // Cleanup
+    SCR_free_tbl(idts);
+    SCR_free(smpl);
+    return(rc);
 }
 
 
@@ -1036,7 +1101,15 @@ int IodeModelSimCpu(char* period)
     return(RPF_SimCpuInt(args));
 }
 
+int IodeModelCpuSort()
+{
+    return(KSIM_CPU_SORT);
+}
 
+int IodeModelCpuSCC()
+{
+    return(KSIM_CPU_SCC);
+}
 
 // ----------------
 // REPORT FUNCTIONS
@@ -1228,6 +1301,35 @@ void IodeResetMsgs()
     A2mMessage_toggle(1);
 }
 
+
+// Manage the messages generated via B_seterror() and B_seterrn() (see b_errors.c)  
+
+/**
+ *  Add a new error message to the stack of messages.
+ *  
+ *  @param [in] msg char* text of the message
+ */
+void IodeAddErrorMsg(char* msg)
+{   
+    B_add_error(msg);
+}    
+
+/**
+ *  Display the error messages accumulated during the previous function calls.
+ */
+void IodeDisplayErrorMsgs()
+{
+    B_display_last_error();
+}    
+
+/**
+ *  Clear the stack of messages.
+ */
+ void IodeClearErrorMsgs()
+{
+    B_clear_last_error();
+}    
+
 // --------------
 // MISC FUNCTIONS
 // --------------
@@ -1252,6 +1354,5 @@ int IodeGetNbDec()
 {
     return(K_NBDEC);    // JMP 18-04-2022
 }
-
 
 
