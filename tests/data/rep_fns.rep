@@ -421,7 +421,7 @@ $ModelSimulate 2000Y1 2001Y1
 
 `@ChronoGet()   `
 `------------`
-        `@chronoget()`              =>  "@chronoget()"
+        `@chronoget()`              =>  "...variable..."
 
 
 

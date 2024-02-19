@@ -2,7 +2,6 @@ ACAF {
 	"(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
 acaf4*(TIME=1995)"
 	LSQ
-	BLOCK "ACAF"
 	SAMPLE 1980Y1 1996Y1
 	DATE 19980612
 	STDEV 0.0042699003
@@ -17,84 +16,53 @@ acaf4*(TIME=1995)"
 }
 ACAG {
 	"ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))"
-	LSQ
-	BLOCK "ACAG"
-	COMMENT " "
 }
 AOUC {
 	"AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]"
-	LSQ
-	BLOCK "AOUC"
 }
 BENEF {
 	"d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+
 YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)"
-	LSQ
-	BLOCK "BENEF"
-	COMMENT " "
 }
 BQY {
 	"BQY:=(YK+YN)/PBBP"
-		BLOCK "BQY"
 }
 BRUGP {
 	"BRUGP := 0"
-	LSQ
-	BLOCK "WLCP;BRUGP"
-	COMMENT " "
 }
 BVY {
 	"BVY:=YN+YK"
-		BLOCK "BVY"
 }
 CGU {
 	"CGU:=WBG+DPUG+QOUG"
-	LSQ
-	BLOCK "CGU"
-	COMMENT " "
 }
 COEFON {
 	"COEFON :=(ITON/(VBBP_P-VAG-VAH))[1990Y1]"
-	LSQ
-	BLOCK "COEFON"
-	COMMENT " "
 }
 COTRES {
 	"r COTRES :=r VBBP[-1]"
-	LSQ
-	BLOCK "COTRES"
-	COMMENT " "
 }
 DEBT {
 	"d DEBT := OCP-FLG"
-	LSQ
-	BLOCK "DEBT"
-	COMMENT " "
 }
 DPU {
 	"DPU:=DPUF+DPUG+DPUH"
-		BLOCK "DPU"
 }
 DPUF {
 	"r (DPUF/PIF):=r (VKFF*KNFF[-1])"
-	LSQ
-	BLOCK "DPUF"
 }
 DPUG {
 	"r DPUG:=r VBBP[-1]"
 	LSQ
-	BLOCK "DPUG"
 	SAMPLE 1963Y1 1988Y1
+	DATE 0
 }
 DPUGO {
 	"DPUGO:=DPUG/PDPUG"
-	LSQ
-	BLOCK "DPUGO"
 }
 DPUH {
 	"dln (DPUH/DPUHO):=dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC"
 	LSQ
-	BLOCK "DPUH"
 	SAMPLE 1972Y1 1996Y1
 	DATE 19980612
 	STDEV 0.037785605
@@ -109,114 +77,72 @@ DPUH {
 }
 DPUU {
 	"r DPUU := r DPU"
-	LSQ
-	BLOCK "DPUU"
-	COMMENT " "
 }
 DTF {
 	"ln (DTF-(DTFX*40.34)-100*(TIME>1998)):=dtf0+(dtf1*ln GOSF)+dtf2*ln(GOSF/VAF_)"
 	LSQ
-	BLOCK "DTF"
 	SAMPLE 1971Y1 1996Y1
+	DATE 0
 }
 DTH {
 	"dln (DTH/(NATY-UY)):= 1.4 * dln(((WBU_+YN+GOSH_)-(SSF+SSH))/(PC*(NATY-UY)))+
 dln PC+((DTHX*40.34)/DTH[-1]) -(20/DTH[-1])*(TIME=2001)
 -(30/DTH[-1])*(TIME=2005)-(30/DTH[-1])*(TIME=2006)"
 	LSQ
-	BLOCK "DTH"
 	SAMPLE 1971Y1 1994Y1
+	DATE 0
 }
 DTH1 {
 	"DTH1:=DTH1C"
-	LSQ
-	BLOCK "DTH1"
 }
 DTH1C {
 	"DTH1C:= PMINTP+0.37*PMDVD"
-	LSQ
-	BLOCK "DTH1C"
 }
 EX {
 	"grt EX := XEX"
-	LSQ
-	BLOCK "EX"
-	COMMENT " "
 }
 EXC {
 	"EXC := EXCC+ITEP"
-	LSQ
-	BLOCK "EXC"
-	COMMENT " "
 }
 EXCC {
 	"EXCC := (EXCCR/(1+EXCCR))*QC"
-	LSQ
-	BLOCK "EXCC"
-	COMMENT " "
 }
 FLF {
 	"FLF:=SF+ACAF-IFU"
-		BLOCK "FLF"
 }
 FLG {
 	"FLG:=SG+ACAG-IUG"
-	LSQ
-	BLOCK "FLG"
 }
 FLGR {
 	"FLGR :=FLG/VBBP"
-	LSQ
-	BLOCK "FLGR"
-	COMMENT " "
 }
 GAP {
 	"GAP := 100*((QBBP_P/QBBPPOT_)-1)"
-	LSQ
-	BLOCK "GAP"
-	COMMENT " "
 }
 GOSF {
 	"d GOSF:= d(VAF-(WCF+WDOM+SSFFIC))"
-	LSQ
-	BLOCK "GOSF"
 }
 GOSG {
 	"r GOSG := r VBBP[-1]"
-	LSQ
-	BLOCK "GOSG"
-	COMMENT " "
 }
 GOSH {
 	"r GOSH:= r VBBP"
-	LSQ
-	BLOCK "GOSH"
 }
 GOSH_ {
 	"r GOSH_ :=r VBBP[-1]"
-	LSQ
-	BLOCK "GOSH_"
-	COMMENT " "
 }
 IDF {
 	"IDF:=IDH-IDG-YK"
-		BLOCK "IDF"
 }
 IDG {
 	"IDG := YIDG- RIDG"
-	LSQ
-	BLOCK "IDG"
-	COMMENT " "
 }
 IDH {
 	"d IDH:=RLBE*(SH-VI5)/100"
-	LSQ
-	BLOCK "IDH"
 }
 IFU {
 	"IFU:=VIF+VS"
 	GLS
-	BLOCK "IFU"
 	SAMPLE 1971Y1 1996Y1
 	DATE 19980612
 	STDEV 0.11678226
@@ -231,167 +157,89 @@ IFU {
 }
 IHU {
 	"r IHU := r(VI+VS-(IFU+IUG))"
-	LSQ
-	BLOCK "IHU"
 }
 IT {
 	"IT := ITF+ITM+ITT-ITCEE"
-	LSQ
-	BLOCK "IT"
-	COMMENT " "
 }
 ITCEE {
 	"ITCEE:=TVACEE+ITCEEM"
-	LSQ
-	BLOCK "ITCEE"
 }
 ITCR {
 	"ITCR := VATPC-SUBR+EXCCR+ITCRX+ITDR"
-	LSQ
-	BLOCK "ITCR"
-	COMMENT " "
 }
 ITD {
 	"ITD := (ITDR/(1+ITDR))*(VC+QOUG+VIF+IUG+VI5+VS)"
-	LSQ
-	BLOCK "ITD"
-	COMMENT " "
 }
 ITEP {
 	"ITEP := (ITEPR/(1+ITEPR))*QAFF"
-	LSQ
-	BLOCK "ITEP"
-	COMMENT " "
 }
 ITF {
 	"ITF := ITFC+ITFGO+ITFGI+ITF5"
-	LSQ
-	BLOCK "ITF"
-	COMMENT " "
 }
 ITF5 {
 	"ITF5 := (ITF5R/(1+ITF5R))*VI5"
-	LSQ
-	BLOCK "ITF5"
-	COMMENT " "
 }
 ITFC {
 	"ITFC := (VATPC/(1+VATPC))*VC"
-	LSQ
-	BLOCK "ITFC"
-	COMMENT " "
 }
 ITFGI {
 	"ITFGI := (ITFIGR/(1+ITFIGR))*IUG"
-	LSQ
-	BLOCK "ITFGI"
-	COMMENT " "
 }
 ITFGO {
 	"ITFGO := (ITFGR/(1+ITFGR))*QOUG"
-	LSQ
-	BLOCK "ITFGO"
-	COMMENT " "
 }
 ITFQ {
 	"r ITFQ:=r QBBP[-1]"
-	LSQ
-	BLOCK "ITFQ"
 }
 ITGR {
 	"ITGR := ITFGR+ITDR"
-	LSQ
-	BLOCK "ITGR"
-	COMMENT " "
 }
 ITI5R {
 	"ITI5R := ITF5R+ITDR"
-	LSQ
-	BLOCK "ITI5R"
-	COMMENT " "
 }
 ITIFR {
 	"ITIFR :=ITDR"
-	LSQ
-	BLOCK "ITIFR"
-	COMMENT " "
 }
 ITIGR {
 	"ITIGR := ITFIGR+ITDR"
-	LSQ
-	BLOCK "ITIGR"
-	COMMENT " "
 }
 ITM {
 	"ITM := (ITMR/(1+ITMR)) * VM"
-	LSQ
-	BLOCK "ITM"
-	COMMENT " "
 }
 ITMQ {
 	"ITMQ:=(ITMQR/(ITMQR+1))*QM"
-	LSQ
-	BLOCK "ITMQ"
 }
 ITMQR {
 	"d ITMQR :=0"
-	LSQ
-	BLOCK "ITMQR"
-	COMMENT " "
 }
 ITNQ {
 	"ITNQ :=ITFQ+ITMQ+ITONQ"
-	LSQ
-	BLOCK "ITNQ"
-	COMMENT " "
 }
 ITON {
 	"ITON :=IT+ITCEE-(ITF+ITM)-SUB"
-	LSQ
-	BLOCK "ITON"
-	COMMENT " "
 }
 ITONQ {
 	"ITONQ :=COEFON*(QBBP_P-QAG-QAH)"
-	LSQ
-	BLOCK "ITONQ"
-	COMMENT " "
 }
 ITPL {
 	"r ITPL :=r VBBP[-1]"
-	LSQ
-	BLOCK "ITPL"
-	COMMENT " "
 }
 ITPR {
 	"r ITPR:=r VBBP[-1]"
-	LSQ
-	BLOCK "ITPR"
 }
 ITPS {
 	"r ITPS :=r VBBP[-1]"
-	LSQ
-	BLOCK "ITPS"
-	COMMENT " "
 }
 ITT {
 	"ITT := EXC+ITPL+ITD+ITPR+ITPS"
-	LSQ
-	BLOCK "ITT"
-	COMMENT " "
 }
 IUG {
 	"IUG := IUGR*VBBP"
-	LSQ
-	BLOCK "IUG"
-	COMMENT " "
 }
 KL {
 	"dln KL :=kl10+kl11*(kl14*mavg(5,ln(PIF/WCRH))-ln KL)[-1]
 +kl12*d(5,ln WCRH)+kl13*d(5,ln (PIF*(RLBER+VKF)))"
 	LSQ
-	BLOCK "KL"
-	COMMENT " "
 	SAMPLE 1974Y1 1996Y1
 	DATE 19980612
 	STDEV 0.016967019
@@ -408,20 +256,14 @@ KLFHP {
 	"ln (KLFHP/KLFHPO) := ln (KLFHP/KLFHPO)[-1]+k0+k1*(ln (KLFHP/KLFHPO)-ln PKF+ln WCRH)[-1]
 +k2*d(-ln PKF+ln WCRH)"
 	LSQ
-	BLOCK "KLFHP"
-	COMMENT " "
 	SAMPLE 1973Y1 1998Y1
+	DATE 0
 }
 KN5 {
 	"KN5:=(1-VK5)*KN5[-1]+QI5"
-	LSQ
-	BLOCK "KN5"
 }
 KNF {
 	"grt KNF:=grt KNFF"
-	LSQ
-	BLOCK "KNF"
-	COMMENT " "
 }
 KNFF {
 	"dln KNFF := knff0+knff1*ln(QAFF_/(Q_F+Q_I))[-1]+
@@ -429,8 +271,6 @@ knf2*ln mavg(3,(VAFF_-WCF_-WIND_-DTF)/(PIF*KNFF[-1]*
 (RLBER+VKFF+knf3)))+KNFFO
 +knff3*mavg(4,dln QAFF_)"
 	LSQ
-	BLOCK "KNFF"
-	COMMENT " "
 	SAMPLE 1972Y1 1996Y1
 	DATE 20000125
 	STDEV 0.012966477
@@ -445,39 +285,21 @@ knf2*ln mavg(3,(VAFF_-WCF_-WIND_-DTF)/(PIF*KNFF[-1]*
 }
 KNFFY {
 	"KNFFY := (KNFF+KNFF[-1])/2"
-	LSQ
-	BLOCK "KNFFY"
-	COMMENT " "
 }
 KNFY {
 	"KNFY := (KNF[-1]+KNF)/2"
-	LSQ
-	BLOCK "KNFY"
-	COMMENT " "
 }
 KNI {
 	"KNI := KNFF-KNF"
-	LSQ
-	BLOCK "KNI"
-	COMMENT " "
 }
 KNIY {
 	"KNIY := (KNI+KNI[-1])/2"
-	LSQ
-	BLOCK "KNIY"
-	COMMENT " "
 }
 NATY {
 	"grt NATY := XNATY"
-	LSQ
-	BLOCK "NATY"
-	COMMENT " "
 }
 NFY {
 	"NFY := NFYH/(.001*HF*(1-(1-PROF)*.01*PRDAL))"
-	LSQ
-	BLOCK "NFY"
-	COMMENT " "
 }
 NFYH {
 	"dln(NFYH/NFYHO) := nfyh3*dln QAF_+ nfyh1*dln(TFPFHP_)
@@ -485,8 +307,6 @@ NFYH {
 +nfyh5*dln(PKF/WCRH)
 +nfyh6*ln (QAF_/Q_F)[-1]"
 	LSQ
-	BLOCK "NFYH"
-	COMMENT " "
 	SAMPLE 1971Y1 1996Y1
 	DATE 20011226
 	STDEV 0.019502673
@@ -501,46 +321,27 @@ NFYH {
 }
 OCUF {
 	"r OCUF := r VBBP[-1]"
-	LSQ
-	BLOCK "OCUF"
-	COMMENT " "
 }
 OCUG {
 	"r OCUG := r VBBP[-1]"
-	LSQ
-	BLOCK "OCUG"
-	COMMENT " "
 }
 OCUH {
 	"r OCUH := r VBBP[-1]"
-	LSQ
-	BLOCK "OCUH"
-	COMMENT " "
 }
 PAF_ {
 	"PAF_ := VAF_/QAF_"
-	LSQ
-	BLOCK "PAF_"
-	COMMENT " "
 }
 PAG {
 	"PAG := VAG/QAG"
-		BLOCK "PAG"
-	COMMENT " "
 }
 PAH {
 	"PAH := VAH/QAH"
-	LSQ
-	BLOCK "PAH"
-	COMMENT " "
 }
 PBBP {
 	"PBBP:=VBBP/QBBP"
-		BLOCK "PBBP"
 }
 PBNP {
 	"PBNP:=VBNP/QBNP"
-		BLOCK "PBNP"
 }
 PC {
 	"dln(PC/((1+ITCR)*PCO)):=pc1*dln AOUC
@@ -548,8 +349,6 @@ PC {
 +(1-pc1)*dln(PC/(1+ITCR))[-1]
 +pc0+pc4*dln(QAF_/Q_F)[-1]"
 	LSQ
-	BLOCK "PC"
-	COMMENT " "
 	SAMPLE 1973Y1 1996Y1
 	DATE 20000130
 	STDEV 0.030821944
@@ -565,45 +364,29 @@ PC {
 PC_ {
 	"r(PC_) := r(PC)"
 	GLS
-	BLOCK "PC_"
-	COMMENT " "
 	SAMPLE 1972Y1 1993Y1
+	DATE 0
 }
 PDPUG {
 	"r PDPUG :=r  PC"
-	LSQ
-	BLOCK "PDPUG"
-	COMMENT " "
 }
 PFI {
 	"PFI:=((PC*(1-ITCR)*QC)+(PQOG*(1-ITGR)*QGO)+(PIF*(1-ITIFR)*
 QIF)+(PIG*(1-ITIGR)*QIG)+(PI5*(1-ITI5R)*QI5)+VS)/(QC+QGO+QI+
 QS)"
-	LSQ
-	BLOCK "PFI"
 }
 PFI_ {
 	"PFI_ :=((PC_*(1-ITCR)*QC_)+(PQOG*(1-ITGR)*QGO)+(PIF*(1-ITIFR)*QIF)+
 (PIG*(1-ITIGR)*QIG)+(PI5*(1-ITI5R)*QI5)+VS_)/(QC_+QGO+QI+QS_)"
-	LSQ
-	BLOCK "PFI_"
-	COMMENT " "
 }
 PFND {
 	"r PFND := r((VC+CGU+VI+VS)/(QC+QG+QI+QS))"
-	LSQ
-	BLOCK "PFND"
-	COMMENT " "
 }
 PG {
 	"PG :=CGU/QG"
-	LSQ
-	BLOCK "PG"
-	COMMENT " "
 }
 PI5 {
 	"r ((PI5/PI5O)*(1-ITI5R)):=r (PC*(1-ITCR))"
-		BLOCK "PI5"
 }
 PIF {
 	"dln((PIF/PIFO)*(1-ITIFR)):=(pif_1*d(.8*dln AOUC+.2*dln PMAB)
@@ -611,30 +394,23 @@ PIF {
 +dln ((PIF/PIFO)*(1-ITIFR))[-1])*0
 +dln PC/(1+ITCR)"
 	LSQ
-	BLOCK "PIF"
 	SAMPLE 1975Y1 1996Y1
+	DATE 0
 }
 PIG {
 	"r ((PIG/PIGO)*(1-ITIGR)):=r (PC*(1-ITCR))"
-		BLOCK "PIG"
 }
 PKF {
 	"PKF := PIF*(RLBER+VKFF+0.1)"
-	LSQ
-	BLOCK "PKF"
-	COMMENT " "
 }
 PM {
 	"PM:=VM/QM"
-		BLOCK "PM"
 }
 PMAB {
 	"dln (PMAB/PMABO) :=pmab0*(pmab1*ln(PWMAB*EX)
 -ln(PMAB/PMABO))[-1]+pmab4
 +pmab6*dln (PWMAB*EX)"
 	LSQ
-	BLOCK "PMAB"
-	COMMENT " "
 	SAMPLE 1971Y1 1996Y1
 	DATE 19980620
 	STDEV 0.053380836
@@ -649,87 +425,55 @@ PMAB {
 }
 PME {
 	"r PME:=r (PW3*EX)"
-	LSQ
-	BLOCK "QME;PME"
 }
 PMS {
 	"dln (PMS):=
 dln(PWMS)+dln(EX)"
 	LSQ
-	BLOCK "PMS"
-	COMMENT " "
 	SAMPLE 1971Y1 1996Y1
+	DATE 0
 }
 PMT {
 	"dln(PMT/PMTO):=dln (PWMAB*EX)"
 	LSQ
-	BLOCK "PMT"
 	SAMPLE 1975Y1 1993Y1
+	DATE 0
 }
 POIL {
 	"grt POIL := XPOIL"
-	LSQ
-	BLOCK "POIL"
-	COMMENT " "
 }
 PQOG {
 	"r PQOG := r PC"
-	LSQ
-	BLOCK "PQOG"
-	COMMENT " "
 }
 PROD {
 	"PROD := QAF/NFYH"
-	LSQ
-	BLOCK "PROD"
 }
 PW3 {
 	"r PW3 := r POIL"
-	LSQ
-	BLOCK "PW3"
-	COMMENT " "
 }
 PWBG {
 	"grt PWBG :=.5*((grt TWG)*(WBGP/WBG)[-1]+
 (grt TWGP)*(YSFIC/WBG)[-1])+grt ZJ"
-	LSQ
-	BLOCK "PWBG"
-	COMMENT " "
 }
 PWMAB {
 	"dln PWMAB := XPWMAB/100-dln EX"
-	LSQ
-	BLOCK "PWMAB"
-	COMMENT " "
 }
 PWMS {
 	"dln PWMS := XPWMS/100-dln EX"
-	LSQ
-	BLOCK "PWMS"
-	COMMENT " "
 }
 PWXAB {
 	"dln PWXAB := XPWXAB/100-dln EX"
-	LSQ
-	BLOCK "PWXAB"
-	COMMENT " "
 }
 PWXS {
 	"dln PWXS := XPWXS/100-dln EX"
-	LSQ
-	BLOCK "PWXS"
-	COMMENT " "
 }
 PX {
 	"PX:=VX/QX"
-		BLOCK "PX"
 }
 PXAB {
 	"dln (PXAB/PXABO) :=pxab1*dln(PWXAB*EX)+
 +(1-pxab1)*dln(PXAB)[-1]"
 	LSQ
-	BLOCK "PXAB"
-	COMMENT " "
 	SAMPLE 1972Y1 1996Y1
 	DATE 19980620
 	STDEV 0.058685016
@@ -743,21 +487,15 @@ PXAB {
 }
 PXB {
 	"PXB := VXB/QXB"
-	LSQ
-	BLOCK "PXB"
-	COMMENT " "
 }
 PXE {
 	"r PXE:=r (PW3*EX)"
-		BLOCK "PXE"
 }
 PXS {
 	"dln (PXS/PXSO) := pxs1 * dln(AOUC) +
  pxs2 * (ln(PC) -ln (PXS/PXSO))[-1]
  +pxs3*dln(QAF_/Q_F)[-1]+pxs4"
 	LSQ
-	BLOCK "PXS"
-	COMMENT " "
 	SAMPLE 1972Y1 1996Y1
 	DATE 20000130
 	STDEV 0.039930049
@@ -773,109 +511,66 @@ PXS {
 PXT {
 	"dln (PXT/PXTO):=dln PC"
 	LSQ
-	BLOCK "PXT"
 	SAMPLE 1961Y1 1993Y1
+	DATE 0
 }
 QAF {
 	"r QAF := r(QAFF-QAI)"
-	LSQ
-	BLOCK "QAF"
-	COMMENT " "
 }
 QAFF {
 	"r QAFF := r(QAT-(QAG+QAH))"
-	LSQ
-	BLOCK "QAFF"
 }
 QAFF_ {
 	"r QAFF_ :=r (QAT_-(QAG+QAH))"
-	LSQ
-	BLOCK "QAFF_"
-	COMMENT " "
 }
 QAF_ {
 	"r QAF_ := r(QAFF_-QAI_)"
-	LSQ
-	BLOCK "QAF_"
-	COMMENT " "
 }
 QAG {
 	"r QAG := r (QG-QGO)"
-		BLOCK "QAG"
-	COMMENT " "
 }
 QAH {
 	"r QAH := r QAH[-1]"
-	LSQ
-	BLOCK "QAH"
-	COMMENT " "
 }
 QAI {
 	"QAI := VAI/PAF_"
-	LSQ
-	BLOCK "QAI"
-	COMMENT " "
 }
 QAI_ {
 	"QAI_ :=VAI_/PAF_"
-	LSQ
-	BLOCK "QAI_"
-	COMMENT " "
 }
 QAT {
 	"r QAT := r(QBBP-ITNQ)"
-	LSQ
-	BLOCK "QAT"
-	COMMENT " "
 }
 QAT_ {
 	"r QAT_ := r(QBBP_P-ITNQ)"
-	LSQ
-	BLOCK "QAT_"
-	COMMENT " "
 }
 QBBP {
 	"r QBBP:= r(QC+QG+QI+QS+(QX-QM))"
-	LSQ
-	BLOCK "QBBP"
 }
 QBBPPOT_ {
 	"r QBBPPOT_ := r(Q_F+Q_I+QAGHP+QAHHP+ITNQHP)*(TIME<1999)
        +   r(Q_F+Q_I+QAG+QAH+ITNQ)*(TIME>1998)"
-	LSQ
-	BLOCK "QBBPPOT_"
-	COMMENT " "
 }
 QBBP_B {
 	"r QBBP_B:= r(QC+QG+QI+QS+(QX-QM))"
-	LSQ
-	BLOCK "QBBP_B"
-	COMMENT " "
 }
 QBBP_P {
 	"QBBP_P := (2*QBBP)-QBBP_B"
-	LSQ
-	BLOCK "QBBP_P"
-	COMMENT " "
 }
 QBNP {
 	"r QBNP := r(QBBP+BQY)"
-	LSQ
-	BLOCK "QBNP"
 }
 QC {
 	"r QC:=r QC_"
 	GLS
-	BLOCK "QC"
 	SAMPLE 1964Y1 1991Y1
+	DATE 0
 }
 QC_ {
 	"ln(QC_/QCO):=qc1_+qc2_*ln(YDH_/PC_)+qc0*ln(YDH_/PC_)[-1]
 +qc3*d(UY/NATY)[-1]+qc4*(0.01*RSBE-dln PC_)[-1]
 +qc6*(t=1993Y1)"
 	LSQ
-	BLOCK "QC_"
-	COMMENT " "
 	SAMPLE 1967Y1 1996Y1
 	DATE 20041031
 	STDEV 0.22061615
@@ -890,32 +585,21 @@ QC_ {
 }
 QFND {
 	"r QFND := r(QC+QG+QI+QS)"
-	LSQ
-	BLOCK "QFND"
-	COMMENT " "
 }
 QG {
 	"r QG:= r(WBGO+QGO+DPUGO)"
-	LSQ
-	BLOCK "QG"
 }
 QGO {
 	"QGO :=QOUG/PQOG"
-	LSQ
-	BLOCK "QGO"
-	COMMENT " "
 }
 QI {
 	"r QI:=r (QIF+QIG+QI5)"
-	LSQ
-	BLOCK "QI"
 }
 QI5 {
 	"QI5/QI5O:=(1-qi5_4)*(QI5/QI5O)[-1]-qi5_4*(1-VK5)*KN5[-1]+qi5_4*
 (qi5_5*(qi5_1+qi5_2*(YDH_/PC)+qi5_3*((PI5/PC)*(.01*RLBE-
 (d (5,ln PC/5)))))+(1-qi5_5)*KN5[-1])"
 	LSQ
-	BLOCK "QI5"
 	SAMPLE 1965Y1 1996Y1
 	DATE 19980620
 	STDEV 67.852379
@@ -930,32 +614,21 @@ QI5 {
 }
 QIF {
 	"QIF:= KNF-(1-VKF)*KNF[-1]"
-	LSQ
-	BLOCK "QIF"
 }
 QIG {
 	"QIG:=IUG/PIG"
-	LSQ
-	BLOCK "QIG"
 }
 QL {
 	"QL :=KLFHP**(ZZF_-1)*TFPFHP_"
-	LSQ
-	BLOCK "QL"
-	COMMENT " "
 }
 QM {
 	"r QM:= r (QMAB+QME+QMS+QMT)"
-	LSQ
-	BLOCK "QM"
 }
 QMAB {
 	"dln(QMAB/QMABO):=qmab_10+qmab_5*dln (PFI_/PMAB)+
 1*dln QQMAB_+qmab_4*(qmab_1+qmab_2*ln(PFI_/PMAB)
 +1*ln QQMAB_+qmab_10*t-ln(QMAB/QMABO))[-1]"
 	LSQ
-	BLOCK "QMAB"
-	COMMENT " "
 	SAMPLE 1972Y1 1996Y1
 	DATE 19980620
 	STDEV 0.062368844
@@ -973,16 +646,12 @@ QME {
 0.019*QIF+0.0247976*QIG+0.02907*QI5+.11881*QS_+
 .76698*QXE+.02969*QXAB +0.056*(QXS+QXT))+
 qme_2*dln (PME/PFI)"
-	LSQ
-	BLOCK "QME;PME"
 }
 QMS {
 	"dln (QMS/QMSO) :=qms1*dln (0.019*QC_+.016*QG+0.023*QIF+0.027*QIG+0.028*QI5 +
 .006*QS_+ .002*QXE+.021*QXAB +.037*(QXS+QXT))[-1]+qms2
 +qms3*dln (PMS/PFI)+qms4*(TIME=1989)+qms5*(TIME=1995)"
 	LSQ
-	BLOCK "QMS"
-	COMMENT " "
 	SAMPLE 1976Y1 1996Y1
 	DATE 19980620
 	STDEV 0.084672637
@@ -999,7 +668,6 @@ QMT {
 	"ln(QMT/QMTO):=qmt_1*ln (YDH_/PC)+
 qmt_2*ln (YDH_/PC)[-1]+qmt_3*ln ((PWXAB*EX)/PC)"
 	LSQ
-	BLOCK "QMT"
 	SAMPLE 1974Y1 1996Y1
 	DATE 19980620
 	STDEV 0.21539952
@@ -1014,72 +682,45 @@ qmt_2*ln (YDH_/PC)[-1]+qmt_3*ln ((PWXAB*EX)/PC)"
 }
 QOUG {
 	"r QOUG := r VBBP[-1]"
-	LSQ
-	BLOCK "QOUG"
-	COMMENT " "
 }
 QQMAB_ {
 	"QQMAB_ :=.25131*QC_+.06459*QG+.46412*QIF+.31415*QIG+.20257*QI5+
 .55279*QS_+.55453*QXAB+.0092*QXE +.046* QXS"
-	LSQ
-	BLOCK "QQMAB_"
-	COMMENT " "
 }
 QS {
 	"d (QS/QSO) := d  QS_"
-	LSQ
-	BLOCK "QS"
-	COMMENT " "
 }
 QS_ {
 	"(d QS_)/QBBP[-1] := -0.011*(TIME=1999)+0.004*(TIME=2000)"
-	LSQ
-	BLOCK "QS_"
-	COMMENT " "
 }
 QWXAB {
 	"grt QWXAB := XQWXAB"
-	LSQ
-	BLOCK "QWXAB"
-	COMMENT " "
 }
 QWXS {
 	"grt QWXS := XQWXS"
-	LSQ
-	BLOCK "QWXS"
-	COMMENT " "
 }
 QWXSS {
 	"grt QWXSS := XQWXSS"
-	LSQ
-	BLOCK "QWXSS"
-	COMMENT " "
 }
 QX {
 	"r QX := r(QXAB+QXE+QXS+QXT)"
 	LSQ
-	BLOCK "QX"
-	COMMENT " "
 	SAMPLE 1971Y1 1995Y1
+	DATE 0
 }
 QXAB {
 	"ln(QXAB/QXABO):=qxab1*mavg(2,ln(PWXAB*EX/AOUC))+qxab0
 +qxab2*ln QWXSS+qxab3*t+qxab4*(TIME>1994)"
 	LSQ
-	BLOCK "QXAB"
-	COMMENT " "
 	SAMPLE 1974Y1 1996Y1
+	DATE 0
 }
 QXB {
 	"r QXB := r(QXAB+QXE)"
-	LSQ
-	BLOCK "QXB"
-	COMMENT " "
 }
 QXE {
 	"dln (QXE/QXEO):=dln QME"
 	LSQ
-	BLOCK "QXE"
 	SAMPLE 1962Y1 1992Y1
 	DATE 19940520
 	STDEV 0.38079327
@@ -1097,7 +738,6 @@ QXS {
 (WCF_/QAF_))+qxs1*ln QWXS-ln (QXS/QXSO))[-1]+
 qxs4*dln QWXSS+qxs5*(TIME=1977)+qx6*(TIME=1995)"
 	LSQ
-	BLOCK "QXS"
 	SAMPLE 1973Y1 1996Y1
 	DATE 19980620
 	STDEV 0.08203423
@@ -1114,7 +754,6 @@ QXT {
 	"dln (QXT/QXTO):=qxt3*(qxt0+qxt1*ln((PWXAB*EX)/PC)-
 ln(QXT/QXTO))[-1]+qxt2*dln ((PWXAB*EX)/PC)"
 	LSQ
-	BLOCK "QXT"
 	SAMPLE 1973Y1 1996Y1
 	DATE 19980620
 	STDEV 0.085953832
@@ -1129,68 +768,38 @@ ln(QXT/QXTO))[-1]+qxt2*dln ((PWXAB*EX)/PC)"
 }
 Q_F {
 	"Q_F := KNFY*KLFHP**ZZF_*TFPFHP_"
-	LSQ
-	BLOCK "Q_F"
-	COMMENT " "
 }
 Q_I {
 	"Q_I := PROIHP_*mean(t-0,t+0,KNIY)"
-	LSQ
-	BLOCK "Q_I"
-	COMMENT " "
 }
 RDEBT {
 	"d RDEBT := 0.2*d (0.01*RSBE)+0.8*d(0.1*(0.01*RLBE)+0.9*(RDEBT
 -0.2*(0.01*RSBE)))[-1]"
-	LSQ
-	BLOCK "RDEBT"
-	COMMENT " "
 }
 RENT {
 	"RENT :=(VAF_-WCF_-DTF)/(PIF*KNF[-1]*(RLBER+VKFF+knf3))"
-	LSQ
-	BLOCK "RENT"
-	COMMENT " "
 }
 RIDG {
 	"r RIDG:=r VBBP[-1]"
-	LSQ
-	BLOCK "RIDG"
 }
 RIDGG {
 	"r RIDGG := r RIDG"
-	LSQ
-	BLOCK "RIDGG"
-	COMMENT " "
 }
 RIPBE {
 	"RIPBE/RIPBEO := .9*RSBE+.1*RLBE"
-	LSQ
-	BLOCK "RIPBE"
-	COMMENT " "
 }
 RLBE {
 	"RLBE :=XRLBER+100*dln PC"
-	LSQ
-	BLOCK "RLBE"
-	COMMENT " "
 }
 RSBE {
 	"RSBE :=XRSBER+100*dln PC"
-	LSQ
-	BLOCK "RSBE"
-	COMMENT " "
 }
 SBF {
 	"SBF:= SSFFIC+SBF3L"
-	LSQ
-	BLOCK "SBF"
 }
 SBF3L {
 	"SBF3L := sbf3l_0+sbf3l_1*SSF3L"
 	LSQ
-	BLOCK "SBF3L"
-	COMMENT " "
 	SAMPLE 1980Y1 1996Y1
 	DATE 19980620
 	STDEV 17.720501
@@ -1205,209 +814,122 @@ SBF3L {
 }
 SBG {
 	"SBG :=SBGX*ZJ+WLCP"
-	LSQ
-	BLOCK "SBG"
-	COMMENT " "
 }
 SBGX {
 	"grt SBGX := SBGXR"
-	LSQ
-	BLOCK "SBGX"
 }
 SBH {
 	"SBH:=SBG+SBF"
-	LSQ
-	BLOCK "SBH"
 }
 SF {
 	"SF:=GOSF+YSSF+OCUF-(DTF+SBF+IDF+VAMARE)"
-		BLOCK "SF"
 }
 SG {
 	"SG:=GOSG+IT+YDTG+YSSG+COTRES+OCUG-CGU-IDG-SUB+SUBCEE-SBG"
-	LSQ
-	BLOCK "SG"
 }
 SH {
 	"SH := YDH+VAMARE-VC"
-	LSQ
-	BLOCK "SH"
 }
 SSF {
 	"SSF:=SSF3+YSFIC+YSSF+COTRES"
-	LSQ
-	BLOCK "SSF"
 }
 SSF3 {
 	"SSF3:=SSF3P+YSEFP"
-	LSQ
-	BLOCK "SSF3"
 }
 SSF3L {
 	"SSF3L/WBF_ := (SSF3L/WBF_)[-1]"
-	LSQ
-	BLOCK "SSF3L"
-	COMMENT " "
 }
 SSF3P {
 	"SSF3P:=SSF3PR*WBF_+SSFDOM"
-	LSQ
-	BLOCK "SSF3P"
 }
 SSFDOM {
 	"SSFDOM:=SSRDOM*WDOM"
-		BLOCK "SSFDOM"
 }
 SSFF {
 	"SSFF:=SSF3P+SSF3L-SSFDOM+SSFFX"
-	LSQ
-	BLOCK "SSFF"
 }
 SSFFIC {
 	"SSFFIC/WBF_ := (SSFFIC/WBF_)[-1]"
-	LSQ
-	BLOCK "SSFFIC"
-	COMMENT " "
 }
 SSFFX {
 	"SSFFX/WBF := (SSFFX/WBF)[-1]"
-	LSQ
-	BLOCK "SSFFX"
-	COMMENT " "
 }
 SSFG {
 	"SSFG:=YSEFP+YSFIC+COTRES"
-	LSQ
-	BLOCK "SSFG"
 }
 SSH {
 	"SSH:=YSEFT1+YSEFT2+SSH3WW+SSH3WA+SSH3ZA+SSH3ZW"
-	LSQ
-	BLOCK "SSH"
 }
 SSH3GP {
 	"r SSH3GP :=r PC"
-	LSQ
-	BLOCK "SSH3GP"
-	COMMENT " "
 }
 SSH3O {
 	"SSH3O:=SSH3RO*WG"
-		BLOCK "SSH3O"
 }
 SSH3P {
 	"r SSH3P:= r YSFIC"
-	LSQ
-	BLOCK "SSH3P"
 }
 SSH3W {
 	"SSH3W:=SSH3RW*(WBF_+WDOM-SSFDOM)"
-	LSQ
-	BLOCK "SSH3W"
 }
 SSH3WA {
 	"r SSH3WA:=r YSSF"
-	LSQ
-	BLOCK "SSH3WA"
 }
 SSH3WW {
 	"SSH3WW:=SSH3P+SSH3O+SSH3W+SSH3GP"
-	LSQ
-	BLOCK "SSH3WW"
 	COMMENT "WERKNEMERSBIJDRAGEN IN HET VERPLICHTE STELSEL:ESER"
 }
 SSH3ZA {
 	"r SSH3ZA:=r YSSF"
-		BLOCK "SSH3ZA"
 }
 SSH3ZW {
 	"grt SSH3ZW:=grt SSHRZW+grt ((VAI_[-3])*
 (PC/PC[-3]))"
-	LSQ
-	BLOCK "SSH3ZW"
 }
 SSHFF {
 	"SSHFF := SSH3WA+SSH3W"
-	LSQ
-	BLOCK "SSHFF"
-	COMMENT " "
 }
 SUB {
 	"r SUB := r (SUBR*VBBP)"
-	LSQ
-	BLOCK "SUB"
-	COMMENT " "
 }
 SUBCEE {
 	"r SUBCEE :=r VBBP[-1]"
-	LSQ
-	BLOCK "SUBCEE"
-	COMMENT " "
 }
 TFPFHP_ {
 	"grt TFPFHP_ := XTFP"
-	LSQ
-	BLOCK "TFPFHP_"
-	COMMENT " "
 }
 TWG {
 	"grt TWG := TWGR"
-	LSQ
-	BLOCK "TWG"
-	COMMENT " "
 }
 TWGP {
 	"grt TWGP :=TWGR"
-	LSQ
-	BLOCK "TWGP"
-	COMMENT " "
 }
 ULCP {
 	"(ULCP/ULCPO) := (UY-ULAG)-ULIL-ULIO"
-	LSQ
-	BLOCK "ULCP"
 	COMMENT "CHOMEURS COMPLETS INDEMNISES,MOYENNE ANNUELLE"
 }
 UY {
 	"UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY"
-	LSQ
-	BLOCK "UY"
-	COMMENT " "
 }
 VAF {
 	"VAF :=VAFF-VAI"
-	LSQ
-	BLOCK "VAF"
-	COMMENT " "
 }
 VAFF {
 	"VAFF:=VAT-(VAG+VAH)"
-	LSQ
-	BLOCK "VAFF"
 }
 VAFF_ {
 	"VAFF_ :=VAT_-(VAG+VAH)"
-	LSQ
-	BLOCK "VAFF_"
-	COMMENT " "
 }
 VAF_ {
 	"VAF_ := VAFF_-VAI_"
-	LSQ
-	BLOCK "VAF_"
-	COMMENT " "
 }
 VAG {
 	"r VAG := r (WBG+DPUG)"
-		BLOCK "VAG"
-	COMMENT " "
 }
 VAH {
 	"VAH :=vah_1+vah_2*(.5*(VK5*KN5[-1]*PI5)+
 .5*(VK5*KN5[-1]*PI5)[-1])+vah_3*VAH[-1]"
 	LSQ
-	BLOCK "VAH"
-	COMMENT " "
 	SAMPLE 1965Y1 1996Y1
 	DATE 19980612
 	STDEV 200.707
@@ -1423,8 +945,6 @@ VAH {
 VAI {
 	"r VAI:= r VAI_"
 	LSQ
-	BLOCK "VAI"
-	COMMENT " "
 	SAMPLE 1961Y1 1993Y1
 	DATE 19950105
 	STDEV 0.046656549
@@ -1442,8 +962,6 @@ VAI_ {
 vai3_*dln QAFF_+vai4_*(vai1_+ln(WBF_/NFY)+
 vai2_*ln PM-ln(((VAI_/VAIO))/NIY))[-1]"
 	LSQ
-	BLOCK "VAI_"
-	COMMENT " "
 	SAMPLE 1961Y1 1996Y1
 	DATE 19980612
 	STDEV 0.036393154
@@ -1458,110 +976,64 @@ vai2_*ln PM-ln(((VAI_/VAIO))/NIY))[-1]"
 }
 VAMARE {
 	"r VAMARE := r WBF_"
-	LSQ
-	BLOCK "VAMARE"
-	COMMENT " "
 }
 VAT {
 	"VAT :=VBBP-(IT+ITCEE)+SUB"
-	LSQ
-	BLOCK "VAT"
-	COMMENT " "
 }
 VAT_ {
 	"VAT_ :=VBBP_P-(IT+ITCEE)+SUB"
-	LSQ
-	BLOCK "VAT_"
-	COMMENT " "
 }
 VBBP {
 	"VBBP:= VC+CGU+VI+VS+(VX-VM)"
-	LSQ
-	BLOCK "VBBP"
 }
 VBBP_B {
 	"VBBP_B:=VC_+CGU+VI+VS_+(VX-VM)"
-	LSQ
-	BLOCK "VBBP_B"
-	COMMENT " "
 }
 VBBP_P {
 	"VBBP_P := VBNP_P-BVY"
-	LSQ
-	BLOCK "VBBP_P"
-	COMMENT " "
 }
 VBNP {
 	"VBNP:= VBBP+BVY"
-	LSQ
-	BLOCK "VBNP"
 }
 VBNP_B {
 	"VBNP_B :=VBBP_B+BVY"
-	LSQ
-	BLOCK "VBNP_B"
-	COMMENT " "
 }
 VBNP_I {
 	"r VBNP_I :=r VBNP_B"
-	LSQ
-	BLOCK "VBNP_I"
-	COMMENT " "
 }
 VBNP_P {
 	"VBNP_P := (3*VBNP)-(VBNP_B+VBNP_I)"
-	LSQ
-	BLOCK "VBNP_P"
-	COMMENT " "
 }
 VC {
 	"VC:=QC*PC"
-	LSQ
-	BLOCK "VC"
 }
 VC_ {
 	"VC_ :=QC_*PC_"
-	GLS
-	BLOCK "VC_"
-	COMMENT " "
 }
 VI {
 	"VI:=VIF+IUG+VI5"
-	LSQ
-	BLOCK "VI"
 }
 VI5 {
 	"VI5:=QI5*PI5"
-		BLOCK "VI5"
 }
 VIF {
 	"VIF:=QIF*PIF"
-		BLOCK "VIF"
 }
 VM {
 	"VM:=VMAB+VME+VMS+VMT"
-	LSQ
-	BLOCK "VM"
 }
 VMAB {
 	"VMAB :=QMAB*PMAB"
-	LSQ
-	BLOCK "VMAB"
-	COMMENT " "
 }
 VME {
 	"VME:=PME*QME"
-		BLOCK "VME"
 }
 VMK {
 	"VMK/PC:=(VMK/PC)[-1]"
-	LSQ
-	BLOCK "VMK"
 }
 VMN {
 	"ln VMN:=vmn_1+vmn_2*ln (EFMY*(WCF/NFY))+vmn_3*ln VMN[-1]"
 	LSQ
-	BLOCK "VMN"
 	SAMPLE 1971Y1 1996Y1
 	DATE 19980620
 	STDEV 0.81608188
@@ -1576,26 +1048,17 @@ VMN {
 }
 VMS {
 	"VMS :=QMS*PMS"
-	LSQ
-	BLOCK "VMS"
-	COMMENT " "
 }
 VMT {
 	"VMT:=QMT*PMT"
-		BLOCK "VMT"
 }
 VS {
 	"d (VS-VSO) := d VS_"
-	LSQ
-	BLOCK "VS"
-	COMMENT " "
 }
 VS_ {
 	"VS_-VS_O :=vs0_+vs1_*grt(VAF_)+vs2_*grt PAF_+
 vs3_*grt(PW3*EX)"
 	LSQ
-	BLOCK "VS_"
-	COMMENT " "
 	SAMPLE 1961Y1 1996Y1
 	DATE 19980620
 	STDEV 15.835134
@@ -1610,35 +1073,23 @@ vs3_*grt(PW3*EX)"
 }
 VX {
 	"VX:=VXAB+VXE+VXS+VXT"
-	LSQ
-	BLOCK "VX"
 }
 VXAB {
 	"VXAB :=QXAB*PXAB"
-	LSQ
-	BLOCK "VXAB"
-	COMMENT " "
 }
 VXB {
 	"VXB := VXAB+VXE"
-	LSQ
-	BLOCK "VXB"
-	COMMENT " "
 }
 VXE {
 	"VXE:=QXE*PXE"
-		BLOCK "VXE"
 }
 VXK {
 	"(VXK/VXKO):=PC*((VXK/VXKO)/PC)[-1]"
-	LSQ
-	BLOCK "VXK"
 }
 VXN {
 	"ln (VXN/VXNO):=vxn_1+vxn_2*ln (EFXY*(WCF/NFY))+vxn_3
 *ln (VXN/VXNO)[-1]"
 	LSQ
-	BLOCK "VXN"
 	SAMPLE 1971Y1 1996Y1
 	DATE 19980620
 	STDEV 0.59703708
@@ -1653,209 +1104,120 @@ VXN {
 }
 VXS {
 	"VXS :=QXS*PXS"
-	LSQ
-	BLOCK "VXS"
-	COMMENT " "
 }
 VXT {
 	"VXT:=QXT*PXT"
-		BLOCK "VXT"
 }
 W {
 	"dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma *ln ((NATY-UY)/NATY)[-1]+gamma2
 +gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)
 +gamma5*ln PROD[-1])+(XW)+XWC"
 	LSQ
-	BLOCK "W"
-	COMMENT " "
 	SAMPLE 1975Y1 1997Y1
+	DATE 0
 }
 WBF {
 	"grt WBF:=grt WBF_"
-	LSQ
-	BLOCK "WBF"
-	COMMENT " "
 }
 WBF_ {
 	"grt WBF_:=(grt NFYH) +
 
 grt W"
-	LSQ
-	BLOCK "WBF_"
-	COMMENT " "
 }
 WBG {
 	"WBG:=WBGP+YSFIC"
-	LSQ
-	BLOCK "WBG"
 }
 WBGO {
 	"WBGO :=WBG/PWBG"
-	LSQ
-	BLOCK "WBGO"
-	COMMENT " "
 }
 WBGP {
 	"WBGP :=WBGR*TWG*NGY*ZJ"
-	LSQ
-	BLOCK "WBGP"
-	COMMENT " "
 }
 WBU {
 	"WBU :=WCF+SSFFIC+WBG+WDOM"
-	LSQ
-	BLOCK "WBU"
 }
 WBU_ {
 	"WBU_ :=WCF_+SSFFIC+WBG+WDOM"
-	LSQ
-	BLOCK "WBU_"
-	COMMENT " "
 }
 WCF {
 	"WCF := WBF+SSFF-SSFFIC"
-	LSQ
-	BLOCK "WCF"
-	COMMENT " "
 }
 WCF_ {
 	"WCF_ :=WBF_+SSFF"
-	LSQ
-	BLOCK "WCF_"
-	COMMENT " "
 }
 WCRH {
 	"WCRH := WCF/NFYH"
-	LSQ
-	BLOCK "WCRH"
-	COMMENT " "
 }
 WDOM {
 	"r WDOM:=r (PC*NDOMY)"
 	LSQ
-	BLOCK "WDOM"
 	SAMPLE 1954Y1 1993Y1
+	DATE 0
 }
 WG {
 	"WG:=WBG-SSFG"
-		BLOCK "WG"
 }
 WIND {
 	"r WIND:=r ((WBF/NFY)*NIY)"
-	LSQ
-	BLOCK "WIND"
 }
 WIND_ {
 	"r WIND_ :=r WIND"
-	LSQ
-	BLOCK "WIND_"
-	COMMENT " "
 }
 WLCP {
 	"r WLCP:=r ZJ * r ULCP"
-	LSQ
-	BLOCK "WLCP;BRUGP"
 	COMMENT "WERKLOOSHEIDSUITKERINGEN U.V.W.,ESER DEFINITIE"
 }
 WMIN {
 	"grt WMIN := grt ZJ+1"
-	LSQ
-	BLOCK "WMIN"
-	COMMENT " "
 }
 WNF {
 	"WNF :=WBF-SSHFF"
-	LSQ
-	BLOCK "WNF"
-	COMMENT " "
 }
 WNF_ {
 	"WNF_ :=WBF_-SSHFF"
-	LSQ
-	BLOCK "WNF_"
-	COMMENT " "
 }
 YDH {
 	"r YDH := r YDH_"
-	LSQ
-	BLOCK "YDH"
-	COMMENT " "
 }
 YDH_ {
 	"grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))"
-	LSQ
-	BLOCK "YDH_"
-	COMMENT " "
 }
 YDTG {
 	"YDTG:=DTF+DTH"
-	LSQ
-	BLOCK "YDTG"
 }
 YIDG {
 	"YIDG :=RDEBT*DEBT[-1]"
-	LSQ
-	BLOCK "YIDG"
-	COMMENT " "
 }
 YK {
 	"YK:=VXK-VMK"
-		BLOCK "YK"
 }
 YN {
 	"YN:=VXN-VMN"
-		BLOCK "YN"
 }
 YSEFP {
 	"YSEFP := YSEFPR*WBGP"
-	LSQ
-	BLOCK "YSEFP"
-	COMMENT " "
 }
 YSEFT1 {
 	"r YSEFT1 :=r WBGP"
-	LSQ
-	BLOCK "YSEFT1"
-	COMMENT " "
 }
 YSEFT2 {
 	"r YSEFT2 := r WBGP"
-	LSQ
-	BLOCK "YSEFT2"
-	COMMENT " "
 }
 YSFIC {
 	"YSFIC :=YSFICR*TWGP*ZJ"
-	LSQ
-	BLOCK "YSFIC"
-	COMMENT " "
 }
 YSSF {
 	"dln YSSF:=dln WBF_"
-	LSQ
-	BLOCK "YSSF"
 }
 YSSG {
 	"YSSG := SSF+SSH-(YSSF+COTRES)"
-	LSQ
-	BLOCK "YSSG"
-	COMMENT " "
 }
 ZF {
 	"grt ZF :=grt PC+ZX-0.05*grt PME"
-	LSQ
-	BLOCK "ZF"
-	COMMENT " "
 }
 ZJ {
 	"grt ZJ :=grt PC +ZX-0.05*grt PME"
-	LSQ
-	BLOCK "ZJ"
-	COMMENT " "
 }
 ZZF_ {
 	"ZZF_ := ZZF_[-1]"
-	LSQ
-	BLOCK "ZZF_"
-	COMMENT " "
 }
