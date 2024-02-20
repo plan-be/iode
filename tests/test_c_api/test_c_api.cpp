@@ -22,8 +22,14 @@
 
 // BEGIN_KEEP
 #ifdef _MSC_VER
+//  #if defined(_M_X64)  || defined(__x86_64__) || defined(__amd64__) || defined(_WIN64)
+    #ifdef _WIN64
     char    *IODE_DATA_DIR   = "..\\data";
     char    *IODE_OUTPUT_DIR = "..\\output";
+  #else
+    char    *IODE_DATA_DIR   = "..\\data";
+    char    *IODE_OUTPUT_DIR = "..\\output";
+  #endif
 #else
 //    char    *IODE_DATA_DIR   = "..\\..\\api\\data";
 //    char    *IODE_OUTPUT_DIR = "..\\..\\api\\output";
@@ -32,7 +38,7 @@
 
 #endif
 
-// Fonctions annulées/remplacées temporairement pour passer le link
+// Temporarily removed fns (to allow linking)
 
 // Pour tester l'estimation
 //#ifdef __cplusplus
@@ -70,10 +76,13 @@ protected:
 public:
     void SetUp() override 
     {
-        // NOTES: - C++ consider all passed string value of the kind "..." to C function as CONSTANT
-        //        - We assume that: 
-		//           * the current path is binaryDir/tests/test_cpp_api
-		//           * the data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
+        // C++ consider all passed string value of the kind "..." to C function as CONSTANT
+        char buf1[64];
+        char buf2[64];
+
+        // NOTE: we assume that: 
+		//       - current path is binaryDir/tests/test_cpp_api
+		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::filesystem::path cwd = std::filesystem::current_path();
 		std::string str_path = cwd.parent_path().string() + "\\";
 		strcpy_s(input_test_dir, (str_path + "data\\").c_str());
@@ -951,6 +960,7 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     char*       lst;
     int         pos;
     static int  done = 0;
+    char        asmpl1[80], asmpl2[80];
 
     U_test_print_title("Tests OBJECTS");
     U_test_CreateObjects();
@@ -968,6 +978,129 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     pos = K_ren(KV_WS, "A", "AAA");
     EXPECT_TRUE(K_find(KV_WS, "AAA") >= 0);
 
+    // Test KV_sample()
+    PER_smpltoa(KSMPL(KV_WS), asmpl1);
+    KV_sample(KV_WS, NULL);
+    PER_smpltoa(KSMPL(KV_WS), asmpl2);
+    EXPECT_TRUE(U_cmp_strs(asmpl1, asmpl2));
+
+}
+
+
+TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
+{
+    TBL     *tbl, *extracted_tbl;
+    TCELL   *cells_0;
+    TCELL   *cells_1;
+    TLINE   *line_0;
+    TLINE   *line_1;
+
+    int     nb_columns = 2;
+    char    *def = "A title";
+    char    *vars = "GOSG,YDTG,DTH,DTF,IT,YSSG+COTRES,RIDG,OCUG"; // Note that semi-colon are not accepted by B_ainit_chk() (see b_args.c)
+    char    **lecs;
+    char    *name;
+    char    *cell_cont_0;
+    char    *cell_cont_1;
+    int     mode = 1;
+    int     files = 1;
+    int     date = 1;
+    int     pos, i, j;
+    int     cond;
+
+    U_test_print_title("Tests TBL: compare KTVAL() and T_create() results");
+
+    // --- create a C struct TBL via T_auto()
+    lecs = B_ainit_chk(vars, NULL, 0);
+    tbl = T_create(nb_columns);
+	T_auto(tbl, def, lecs, mode, files, date);
+	SCR_free_tbl((unsigned char**) lecs);
+
+    // --- add the table to the Tables KDB
+    name = "c_table";
+    K_add(KT_WS, name, tbl);
+
+    // --- extract the table from the Table KDB
+    pos = K_find(KT_WS, name);
+    extracted_tbl = KTVAL(KT_WS, pos);
+
+
+    // --- check that both table are exactly the same
+    // ----- check all attributes that are not of type TLINE
+    EXPECT_EQ(tbl->t_lang, extracted_tbl->t_lang);
+    EXPECT_EQ(tbl->t_free, extracted_tbl->t_free);
+    EXPECT_EQ(tbl->t_nc, extracted_tbl->t_nc);
+    EXPECT_EQ(tbl->t_nl, extracted_tbl->t_nl);
+    EXPECT_EQ(tbl->t_zmin, extracted_tbl->t_zmin);
+    EXPECT_EQ(tbl->t_zmax, extracted_tbl->t_zmax);
+    EXPECT_EQ(tbl->t_ymin, extracted_tbl->t_ymin);
+    EXPECT_EQ(tbl->t_ymax, extracted_tbl->t_ymax);
+    EXPECT_EQ(tbl->t_attr, extracted_tbl->t_attr);
+    EXPECT_EQ(tbl->t_box, extracted_tbl->t_box);
+    EXPECT_EQ(tbl->t_shadow, extracted_tbl->t_shadow);
+    EXPECT_EQ(tbl->t_gridx, extracted_tbl->t_gridx);
+    EXPECT_EQ(tbl->t_gridy, extracted_tbl->t_gridy);
+    EXPECT_EQ(tbl->t_axis, extracted_tbl->t_axis);
+    EXPECT_EQ(tbl->t_align, extracted_tbl->t_align);
+
+    // ----- check div line
+    EXPECT_EQ(tbl->t_div.tl_type, extracted_tbl->t_div.tl_type);
+    EXPECT_EQ(tbl->t_div.tl_graph, extracted_tbl->t_div.tl_graph);
+    EXPECT_EQ(tbl->t_div.tl_axis, extracted_tbl->t_div.tl_axis);
+    EXPECT_EQ(tbl->t_div.tl_pbyte, extracted_tbl->t_div.tl_pbyte);
+    cells_0 = (TCELL*) tbl->t_div.tl_val;
+    cells_1 = (TCELL*) extracted_tbl->t_div.tl_val;
+
+    for(j = 0; j < tbl->t_nc; j++)
+    {
+        EXPECT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);
+        EXPECT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+    }
+
+    // ----- check all lines
+    for(i = 0; i < tbl->t_nl; i++)
+    {
+        line_0 = tbl->t_line + i;
+        line_1 = extracted_tbl->t_line + i;
+
+        EXPECT_EQ(line_0->tl_type, line_1->tl_type);
+        EXPECT_EQ(line_0->tl_graph, line_1->tl_graph);
+        EXPECT_EQ(line_0->tl_axis, line_1->tl_axis);
+        EXPECT_EQ(line_0->tl_pbyte, line_1->tl_pbyte);
+
+        cells_0 = (TCELL*) line_0->tl_val;
+        cells_1 = (TCELL*) line_1->tl_val;
+        switch (line_0->tl_type)
+        {
+          case KT_TITLE:
+            cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
+            cell_cont_1 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_1, 0));
+            EXPECT_EQ(U_cmp_strs(cell_cont_0, cell_cont_1), 1);
+            SCR_free(cell_cont_0);
+            SCR_free(cell_cont_1);
+            break;
+          case KT_CELL:
+            for(j = 0; j < tbl->t_nc; j++)
+            {
+                EXPECT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);
+                EXPECT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
+                cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0, j));
+                cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1, j));
+                EXPECT_EQ(U_cmp_strs(cell_cont_0, cell_cont_1), 1);
+                SCR_free(cell_cont_0);
+                SCR_free(cell_cont_1);
+            }
+            break;
+          default:
+            cond = cells_0 == NULL && cells_1 == NULL;
+            EXPECT_NE(cond, 0);
+            break;
+        }
+    }
+
+    // --- free memory
+    T_free(tbl);
+    T_free(extracted_tbl);
 }
 
 
@@ -986,7 +1119,7 @@ TEST_F(IodeCAPITest, Tests_LEC)
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
-    //S4ASSERT(0, "Erreur forcée");
+    //S4ASSERT(0, "Generated error");
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
     U_test_lec("LEC", "A[-1]",         2, A[1]);
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
@@ -1675,12 +1808,10 @@ TEST_F(IodeCAPITest, Tests_B_FSYS)
 
 
     //  Create toto.a2m -> ansi-coded file
-    //sprintf(arg, "%s\\toto", IODE_OUTPUT_DIR);
+    // sprintf(arg, "%s\\toto", IODE_OUTPUT_DIR);
     // U_test_create_a_file("toto", W_A2M); // Ansi-coded file
-    // => Pb avec la conversion test_c_api => les fichiers diffèrent entre celui créé via test1.c
-    // et celui créé par test_c_api.cpp. Donc on va prendre une copie de data\toto.a2m
-
-    // B_SysCopy(char* arg) : copy data\toto.a2m dans toto.a2m
+    // => Pb with conversions => files created by test1.c differ from those created by test_c_api.cpp.
+    // Therefore, we copy data\toto.a2m into local toto.a2m
     sprintf(arg, "%s\\toto.a2m toto.a2m", IODE_DATA_DIR);
     rc = B_SysCopy(arg);
     cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m", "toto.a2m");
@@ -1793,6 +1924,46 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     EXPECT_TRUE(U_test_eq(D[1], L_NAN));
     EXPECT_TRUE(U_test_eq(D[2], 2.0 + 4.0));
     EXPECT_TRUE(U_test_eq(C[2], 6.0*2 - 0.92921251 ));
+}
+
+
+TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
+{
+    double  *AOUC;
+    int     rc;
+
+    U_test_print_title("Tests B_IDT_EXECUTE");
+
+    K_free(KV_WS);
+    K_free(KI_WS);
+    //K_free(KS_WS);
+
+    // Loads 3 WS and check ok
+    KI_RWS = KI_WS = U_test_K_interpret(K_IDT, "fun");
+    KV_RWS = KV_WS = U_test_K_interpret(K_VAR, "fun");
+    //KS_RWS = KS_WS = U_test_K_interpret(K_SCL, "fun");
+
+    //iode.ws_load_idt(f"{IODE_DATA_DIR}fun")
+    //iode.ws_load_var(f"{IODE_DATA_DIR}fun")
+    //iode.ws_load_scl(f"{IODE_DATA_DIR}fun")
+
+    AOUC = KVPTR("AOUC");
+    AOUC[1] = 0.1;
+    //iode.set_var("AOUC", AOUC)
+
+    //rc = iode.idt_execute("1961:2015", "AOUC")
+    //print(f"rc={rc}")
+    rc = IodeExecuteIdts("1961Y1:2015Y1", "AOUC", NULL, NULL, 1);
+    printf("rc=%d\n", rc);
+
+    //AOUC = iode.get_var("AOUC")
+    //test_eq(f"AOUC[1961Y1]", 0.24783192, AOUC[1])
+
+    //varname = "AOUC"
+    //res = iode.exec_lec(f"{varname}[1961Y1]", 0)
+    //test_eq(f"{varname}[1961Y1]", 0.24783192, res)
+    EXPECT_TRUE(U_test_eq(AOUC[1], 0.24783192));
+
 }
 
 
