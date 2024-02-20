@@ -675,6 +675,7 @@ void Tests_OBJECTS()
     KV_sample(KV_WS, NULL);
     PER_smpltoa(KSMPL(KV_WS), asmpl2);
     S4ASSERT(U_cmp_strs(asmpl1, asmpl2), "KV_sample(kdb, NULL) does not modify the current sample");
+    
 }    
 
 
@@ -770,7 +771,7 @@ void Tests_TBL_ADD_GET()
           case KT_TITLE:
             cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
             cell_cont_1 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_1, 0));
-            S4ASSERT(U_cmp_strs(cell_cont_0, cell_cont_1), "line %d, KT_TITLE: cell contents == '%s'", i, cell_cont_1);
+            S4ASSERT(U_cmp_strs(cell_cont_0, cell_cont_1) == 1, "line %d, KT_TITLE: cell contents == '%s'", i, cell_cont_1);
             SCR_free(cell_cont_0);
             SCR_free(cell_cont_1);
             break;
@@ -781,7 +782,7 @@ void Tests_TBL_ADD_GET()
                 S4ASSERT(cells_0[j].tc_attr == cells_1[j].tc_attr, "line %d, col %d: tc_attr == %d", i, j, cells_1[j].tc_attr);
                 cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0, j));
                 cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1, j));
-                S4ASSERT(U_cmp_strs(cell_cont_0, cell_cont_1), "line %d, col %d: cell contents == '%s'", i, j, cell_cont_1);
+                S4ASSERT(U_cmp_strs(cell_cont_0, cell_cont_1) == 1, "line %d, col %d: cell contents == '%s'", i, j, cell_cont_1);
                 SCR_free(cell_cont_0);
                 SCR_free(cell_cont_1);
             }
