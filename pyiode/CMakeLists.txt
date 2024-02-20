@@ -59,12 +59,12 @@ if(Python_FOUND)
       set(CYTHON_OUTPUT "iode.cp${Python_VERSION_}-win_amd64.pyd")
 
       add_custom_target(iode_python
-                        COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER} ${PYTHON_BUILD_FLAGS}
+                        COMMAND ${Python_EXECUTABLE} cythonize_iode.py build_ext --inplace --compiler=${COMPILER}
                         DEPENDS cythonize_iode.py
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         COMMENT "Building iode.pyd for Python version ${Python_VERSION}.\n"
                         )
-      add_dependencies(iode_python iode_c_api)
+      add_dependencies(iode_python iode_cpp_api)
 
       add_custom_command(TARGET iode_python POST_BUILD
                           COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
