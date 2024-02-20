@@ -202,21 +202,6 @@ nan = L_NAN
 # ------------------------------
 # Note : to be improved / replaced bu C++ classes when Cython 3 becomes stable
 
-class Scalar:
-    def __init__(self, name:str, val:float=0.9, relax:float=1.0, std:float=float("nan")):
-        self.name = name
-        #iodescl = iodescl_to_ndarray(cstr(name))
-        self.value = val
-        self.relax = relax
-        self.std = std # or float("NaN") ?
-
-
-    def __str__(self):
-        return f'{self.name}=({self.value}, {self.relax}, {self.std})'
-
-    def __repr__(self):
-        return f'iode.scl("{self.name}", {self.value}, {self.relax}, {self.std})'
-
 
 class Equation:
     def __init__(self, 
