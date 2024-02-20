@@ -60,11 +60,10 @@
 #          - pyfloats(double *cvar, int lg) to convert a vector of doubles of length lg 
 #               into a python list of doubles
 #  
-#  3. In a DOS shell
+#  3. In a Developer Command Prompt:
 #      c:\> cd  <path_to_iode>/pyiode
-#      c:<path_to_iode>/pyiode> set64
-#      c:<path_to_iode>/pyiode> activate 
-#      c:<path_to_iode>/pyiode> makepy
+#      c:<path_to_iode>/pyiode> conda activate <conda_env>
+#      c:<path_to_iode>/pyiode> makepy.bat <conda_env>
    
 #  cython: binding=True, language_level=3, embedsignature=True
 
@@ -84,6 +83,8 @@ include "pyiode_util.pyx"
 include "pyiode_lec.pyx"
 include "pyiode_period.pyx"
 include "pyiode_sample.pyx"
+include "objects/scalar.pyx"
+include "pyiode_objs.pyx"
 include "pyiode_ws.pyx"
 include "pyiode_data.pyx"
 include "pyiode_estim.pyx"
@@ -91,7 +92,6 @@ include "pyiode_model.pyx"
 include "pyiode_exec.pyx"
 include "pyiode_print.pyx"
 include "pyiode_reports.pyx"
-include "pyiode_objs.pyx"
 include "pyiode_larray.pyx"
 include "pyiode_pandas.pyx"
 include "pyiode_wrt.pyx"
