@@ -54,7 +54,7 @@
   InstallDirRegKey HKCU "Software\IODE" "Install_Dir"
 
   ;Request application privileges
-  RequestExecutionLevel user
+  RequestExecutionLevel admin
 
 ;--------------------------------
 ;Variables
