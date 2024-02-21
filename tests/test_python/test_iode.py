@@ -277,12 +277,12 @@ def test_iode_set_scl():
 
     # Create SCl
     name = "myscl"
-    py_myscl = iode.Scalar("myscl", 1.2345, 1.0, 0.0)
+    py_myscl = iode.Scalar(1.2345, 1.0, 0.0)
 
     # Save py_scl as myscl in KS_WS + reread and check
-    iode.set_scl(py_myscl)
+    iode.set_scl(name, py_myscl)
     i_myscl = iode.get_scl(name)
-    assert repr(i_myscl) == repr(py_myscl)
+    assert i_myscl == py_myscl
 
 
 # VARIABLES IODE <-> PYTHON LISTS AND NDARRAYS
