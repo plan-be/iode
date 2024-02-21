@@ -60,7 +60,12 @@ Scalar::Scalar(const Scalar& scalar)
 
 std::string Scalar::to_string() const
 {
-    return "Scalar(" + std::to_string(val) + ", " + std::to_string(relax) + ", " + std::to_string(std) + ")";
+    std::string s = "Scalar(";
+    s += L_ISAN(val) ? std::format("{:g}, ", val) : "nan, ";
+    s += L_ISAN(relax) ? std::format("{:g}, ", relax) : "nan, ";
+    s += L_ISAN(std) ? std::format("{:g}", std) : "nan";
+    s += ")";
+    return s;
 }
 
 // required to be used in std::map
