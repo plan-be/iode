@@ -201,24 +201,22 @@ def set_lst(name: str, lst: str):
 # -------
 def get_scl(name: str) -> Scalar:
     '''Get an IODE scalar in an iode.Scalar class instance'''
-    #vararray = iodescl_to_ndarray(cstr(name))
-    #return vararray
     cdef    double cval
     cdef    double crelax
     cdef    double cstd
     
     cdef rc = IodeGetScl(cstr(name), &cval, &crelax, &cstd)
     if rc == 0:
-        res = Scalar(name, cval, crelax, cstd)
+        res = Scalar(cval, crelax, cstd)
         return res
     else:
         return None
 
 
-def set_scl(py_scl: Scalar):
+def set_scl(name: str, scalar: Scalar):
     '''Create or update an IODE scalar from an iode.Scalar class instance'''
-    if IodeSetScl(cstr(py_scl.name), py_scl.value, py_scl.relax, py_scl.std):
-        raise RuntimeError(f"Scalar {py_scl.name} cannot be set")
+    if IodeSetScl(cstr(name), scalar.value, scalar.relax, scalar.std):
+        raise RuntimeError(f"Scalar {name} cannot be set")
 
     
 # Tables
