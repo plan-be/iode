@@ -187,9 +187,16 @@ cdef extern from "iode.h":
     cdef void   IodeResetMsgs()
     cdef int    ODE_assign_super_PYIODE()
 
+    # constants
+    cdef double L_NAN
+
 cdef extern from "s_iode.c":
     cdef int   free_tbl(char** tbl)
 
+
+# IODE CONSTANTS
+# --------------
+nan = L_NAN
 
 # IODE OBJECT CLASS DECLARATIONS 
 # ------------------------------
