@@ -2,6 +2,12 @@ message(STATUS "\n---- NSIS ----\n")
 
 # ---- generate NSIS definitions script from a template file ----
 
+if()
+  set(INSTALL_PRIVILEGES "admin")
+else()
+  set(INSTALL_PRIVILEGES "user")
+endif()
+
 message(STATUS "Generating the NSIS definitions file ${PROJECT_SOURCE_DIR}/nsis/iode_definitions.nsh")
 message(STATUS "from the template file ${PROJECT_SOURCE_DIR}/nsis/iode_definitions_template.nsh.in\n")
 # ---- GENERATE NSH SCRIPT FROM TEMPLATE ----
@@ -129,6 +135,7 @@ message(STATUS "from the NSIS installer script ${IODE_NSIS_SCRIPT_DIR}/${IODE_NS
 file(READ ${IODE_NSIS_SCRIPT} FILE_CONTENTS)
 string(REPLACE "Installer" "Updater" FILE_CONTENTS "${FILE_CONTENTS}")
 string(REPLACE "setup.exe" "update.exe" FILE_CONTENTS "${FILE_CONTENTS}")
+string(REPLACE "RequestExecutionLevel admin" "RequestExecutionLevel user" FILE_CONTENTS "${FILE_CONTENTS}")
 file(WRITE "${IODE_NSIS_SCRIPT_DIR}/${IODE_NSIS_UPDATE_SCRIPT}" "${FILE_CONTENTS}")
 
 message(STATUS "DONE\n")
