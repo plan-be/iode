@@ -54,7 +54,7 @@ public:
 
 		setFocusProxy(lineEdit);
 
-		connect(browseButton, SIGNAL(clicked()), this, SLOT(browse()));
+		connect(browseButton, &QPushButton::clicked, this, &IodeFileChooser::browse);
 
 		// There is no QFileDialog::getSaveDirectory(). 
 		// Only QFileDialog::getExistingDirectory()
