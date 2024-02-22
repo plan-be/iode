@@ -83,7 +83,10 @@ include "pyiode_util.pyx"
 include "pyiode_lec.pyx"
 include "pyiode_period.pyx"
 include "pyiode_sample.pyx"
+
+include "objects/equation.pyx"
 include "objects/scalar.pyx"
+
 include "pyiode_objs.pyx"
 include "pyiode_ws.pyx"
 include "pyiode_data.pyx"
