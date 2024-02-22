@@ -97,20 +97,26 @@ int PER_nb(int ch)
  *  
  *  @param [in] p1 PERIOD * First period
  *  @param [in] p2 PERIOD * Second period
- *  @return        int      Number of periods bw p1 and p2 or -1 on error
+ *  @return        int      Number of periods bw p1 and p2. -1 if periodicities are different or illegal.
  *  
  *  @details On error, call B_seterrn(85) and returns -1.
  */
 int PER_diff_per(PERIOD *p1, PERIOD *p2)
 {
     int     nb;
+    int     period_pos;
 
     if(p1->p_p != p2->p_p) {
         //B_seterrn(85);
         B_seterror("Different periodicities");
         return(-1);
     }
-    nb = L_PERIOD_NB[L_pos(L_PERIOD_CH, p1->p_p)];
+    period_pos = L_pos(L_PERIOD_CH, p1->p_p);
+    if(period_pos < 0) {
+        B_seterror("Illegal periodicity");
+        return(-1);
+    }
+    nb = L_PERIOD_NB[period_pos];
     nb = nb * (p1->p_y - p2->p_y) + p1->p_s - p2->p_s;
 
     return(nb);
@@ -124,15 +130,26 @@ int PER_diff_per(PERIOD *p1, PERIOD *p2)
  *  
  *  @param [in] period  PERIOD* First period
  *  @param [in] shift   in      number of sub-periods to add to period
- *  @return             PERIOD* Pointer to a static PERIOD struct.
+ *  @return             PERIOD* Pointer to a static PERIOD struct or NULL if period is illegal
  *  
  */
 PERIOD  *PER_addper(PERIOD *period, int shift)
 {
     int     nb_per = L_PERIOD_NB[L_pos(L_PERIOD_CH, period->p_p)],
-            shiftper, backw;
+            shiftper, 
+            backw, 
+            period_pos;
     static  PERIOD  per;
 
+    period_pos = L_pos(L_PERIOD_CH, period->p_p);
+    if(period_pos < 0) {
+        B_seterror("Illegal periodicity");
+        return(NULL);
+    }
+
+        
+    nb_per = L_PERIOD_NB[period_pos];
+    
     memcpy(&per, period, sizeof(PERIOD));
     if(shift >= 0) {
         per.p_y += (per.p_s + shift - 1) / nb_per;
