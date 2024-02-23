@@ -1,8 +1,9 @@
 # distutils: language = c++
 
 from typing import Union, Tuple, List, Optional
-from scalar cimport Scalar as CScalar
-from scalar cimport hash_value
+
+from pyiode.objects.scalar cimport Scalar as CScalar
+from pyiode.objects.scalar cimport hash_value
 
 
 # Scalar wrapper class
