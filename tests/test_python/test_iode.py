@@ -181,7 +181,7 @@ def test_iode_get_eqs():
     e_ACAF = iode.get_eqs("ACAF")
     print(f"txt:  e_ACAF = '{e_ACAF}'")
     print(f"repr: e_ACAF = '{repr(e_ACAF)}'")
-    assert round(e_ACAF.e_r2, 5) == 0.82176
+    assert round(e_ACAF.test_r2, 5) == 0.82176
 
 
 def test_iode_set_eqs():
