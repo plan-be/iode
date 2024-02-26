@@ -151,6 +151,11 @@ public:
     float get_test_dw() const { return this->tests[IE_DW]; }
     float get_test_loglik() const { return this->tests[IE_LOGLIK]; }
 
+    void set_test(const EnumIodeEquationTest t, const float value)
+    {
+        this->tests[t] = value;
+    }
+
     void set_tests(const std::array<float, EQS_NBTESTS> tests);
 
     // -- misc --
