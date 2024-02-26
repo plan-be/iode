@@ -151,18 +151,11 @@ def get_eqs(eq_name: str) -> Equation:
     rc = IodeGetEqs(cstr(eq_name), &lec, &method, sample_from, sample_to, &blk, &instr, tests)
     if rc != 0:
         return None
-        
+    
+    py_tests = [tests[i] for i in range(10)]
+    comment = ""
     eq_res = Equation(eq_name, pystr(lec), method, pystr(sample_from), pystr(sample_to),  
-                 pystr(blk), pystr(instr),
-                 tests[1],
-                 tests[2],
-                 tests[3],
-                 tests[4], # Pas de 5 !
-                 tests[6],
-                 tests[7],
-                 tests[8],
-                 tests[9],
-                 tests[10])
+                comment, pystr(instr), pystr(blk), py_tests)
 
     return eq_res
 
