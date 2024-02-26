@@ -433,14 +433,24 @@ bool Equation::operator==(const Equation& other) const
 
 std::string Equation::to_string() const
 {
-    std::string s_tests = "[" + std::to_string(this->tests[0]);
+    std::string s_tests = "[" + std::format("{:g}" ,this->tests[0]);
     for(int i=1; i < EQS_NBTESTS; i++)
-        s_tests += ", " + std::to_string(this->tests[i]);
+        s_tests += ", " + std::format("{:g}", this->tests[i]);
     s_tests += "]";
 
-    return "Equation(" + get_lec() + ", " + get_method() + ", " + get_sample().to_string() + ", " + 
-        get_comment() + ", " + get_block() + ", " + get_instruments() + ", " + s_tests + ", " +
-        get_date_as_string() + ")";
+    Sample sample = get_sample();
+    std::string s_sample = (sample.nb_periods() == 0) ? "--" : sample.to_string();
+
+    std::string s = "Equation(";
+    s += "lec: " + get_lec() + ",\n";
+    s += "\tmethod: " + get_method() + ",\n";
+    s += "\tsample: " + s_sample + ",\n";
+    s += "\tcomment: " + get_comment() + ",\n";
+    s += "\tblock: " + get_block() + ",\n";
+    s += "\tinstruments: " + get_instruments() + ",\n";
+    s += "\ttests: " + s_tests + ",\n";
+    s += "\tdate: " + get_date_as_string() + ")";
+    return s;
 }
 
 NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
