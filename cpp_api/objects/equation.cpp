@@ -230,13 +230,27 @@ void Equation::set_sample(std::string from, std::string to)
 {
     if (from.empty() || to.empty())
     {
-        Sample sample(*KSMPL(KV_WS));
+        SAMPLE* c_vars_sample = KSMPL(KV_WS);
+        if(c_vars_sample == NULL || c_vars_sample->s_nb == 0)
+        {
+            this->smpl.s_nb = 0;
+            this->smpl.s_p1.p_y = 0;
+            this->smpl.s_p1.p_p = '\0';
+            this->smpl.s_p1.p_s = 0;
+            this->smpl.s_p2.p_y = 0;
+            this->smpl.s_p2.p_p = '\0';
+            this->smpl.s_p2.p_s = 0;
+            kwarning("Variables sample not yet set. Set equation sample to 0.");
+            return;
+        }
+
+        Sample vars_sample(*c_vars_sample);
 
         if(from.empty()) 
-            from = sample.start_period().to_string();
+            from = vars_sample.start_period().to_string();
 
         if(to.empty())   
-            to = sample.end_period().to_string();
+            to = vars_sample.end_period().to_string();
     }
 
     Sample new_sample(from, to);
