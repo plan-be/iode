@@ -334,7 +334,7 @@ inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
     std::vector<std::string> list;
 
     if(clec == NULL)
-        throw IodeException("Cannot get list of scalars.\nClec structure not defined.");
+        throw std::runtime_error("Cannot get list of scalars.\nClec structure not defined.");
     
     char* item_name;
     for(int i = 0; i < clec->nb_names; i++)
@@ -352,7 +352,7 @@ inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
     std::vector<std::string> list;
 
     if(clec == NULL)
-        throw IodeException("Cannot get list of variables.\nClec structure not defined.");
+        throw std::runtime_error("Cannot get list of variables.\nClec structure not defined.");
     
     char* item_name;
     for(int i = 0; i < clec->nb_names; i++)
