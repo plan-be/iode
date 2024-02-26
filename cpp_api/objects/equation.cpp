@@ -140,9 +140,6 @@ void Equation::set_lec(const std::string& lec, const std::string& endo)
     if(endo.empty())
         throw std::invalid_argument("Passed value for endo (equation name) is empty");
 
-    if(this->lec != NULL)
-        SW_nfree(this->lec);
-
     char* c_lec = to_char_array(lec);
     char* c_endo = to_char_array(endo);
     
