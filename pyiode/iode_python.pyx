@@ -135,6 +135,7 @@ include "objects/equation.pyx"
 include "objects/scalar.pyx"
 
 include "iode_database/abstract_database.pyx"
+include "iode_database/comments_database.pyx"
 
 include "pyiode_objs.pyx"
 include "pyiode_ws.pyx"

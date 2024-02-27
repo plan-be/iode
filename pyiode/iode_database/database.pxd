@@ -46,3 +46,25 @@ cdef extern from "KDB/kdb_abstract.h":
 
         void save(const string& filepath) except +
         void clear() except +
+
+cdef extern from "KDB/kdb_template.h":
+    cdef cppclass KDBTemplate[T](KDBAbstract):        
+        pass
+
+cdef extern from "KDB/kdb_comments.h":
+    cdef cppclass KDBComments(KDBTemplate[string]):
+        # Constructor
+        KDBComments(const string& filepath) except +
+
+        # Public methods
+        KDBComments* subset(const string& pattern, const bool deep_copy) except +
+        string get(const string& name) except +
+        string copy(const string& name) except +
+        int add(const string& name, const string& comment) except +
+        void update(const string& name, const string& comment) except +
+
+    size_t hash_value(KDBComments&) except +
+
+    # Define the global Comments instance
+    cdef KDBComments Comments
+
