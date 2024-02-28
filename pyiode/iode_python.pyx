@@ -124,6 +124,7 @@ LTOH_STEP   = 'S'
 # Included modules by topic
 # -------------------------
 
+include "common.pyx"
 include "pyiode_cdef.pyx"
 include "pyiode_util.pyx"
 include "pyiode_lec.pyx"
