@@ -5,7 +5,7 @@ from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 from libcpp cimport bool
 
-from pyiode.pyiode_sample cimport Sample
+from pyiode.pyiode_sample cimport CSample
 
 
 # declare C++ Equation class
@@ -44,7 +44,7 @@ cdef extern from "objects/equation.h":
         string get_block()
         void set_block(const string&) except +
 
-        Sample get_sample()
+        CSample get_sample()
         void set_sample(string, string) except +
 
         string get_comment()
