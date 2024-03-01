@@ -13,6 +13,8 @@
 #       reset_msgs()          | Reset the normal output mechanism during an IODE session.'''
 # ------------------------------------------------------------------------------------------------------------------
 
+from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs
+
 
 # Miscellaneous functions
 # -----------------------

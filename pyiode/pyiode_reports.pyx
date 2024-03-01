@@ -8,6 +8,8 @@
 #   report_exec(filename_parms: str)     | Execute a report
 #   reportline_exec(repline: str)        | Execute a report line
 
+from pyiode_reports cimport B_ReportExec, B_ReportLine
+
 
 # $ExecReport filename_parms
 # TODO: add parameters

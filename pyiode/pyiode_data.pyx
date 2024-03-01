@@ -35,6 +35,8 @@
 #  data_ras_var      
 #  data_pattern_*
 
+from pyiode_data cimport B_DataUpdate
+
 
 def data_update(obj_name: str, obj_value: str, obj_type: int): 
     r'''Update an IODE object (cmt, eqs, lst, idt) 

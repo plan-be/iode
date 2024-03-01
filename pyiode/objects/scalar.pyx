@@ -2,8 +2,8 @@
 
 from typing import Union, Tuple, List, Optional
 
-from pyiode.objects.scalar cimport Scalar as CScalar
-from pyiode.objects.scalar cimport hash_value
+from pyiode cimport L_NAN
+from pyiode.objects cimport CScalar, hash_value_scl
 
 
 # Scalar wrapper class
@@ -12,7 +12,7 @@ cdef class Scalar:
 
     cdef CScalar c_scalar
 
-    def __init__(self, value: float = 0.9, relax: float = 1.0, std: float = nan) -> Scalar:
+    def __init__(self, value: float = 0.9, relax: float = 1.0, std: float = L_NAN) -> Scalar:
         """
         An IODE scalar represents the parameters of an equation that can be estimated.
         It is represented by 'value' value, a 'relax' value and a standard deviation ('std') value.
@@ -102,4 +102,4 @@ cdef class Scalar:
         return self.c_scalar.to_string().decode("utf-8")
 
     def __hash__(self) -> int:
-        return <int>hash_value(self.c_scalar)
+        return <int>hash_value_scl(self.c_scalar)

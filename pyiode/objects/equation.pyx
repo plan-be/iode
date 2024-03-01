@@ -4,9 +4,7 @@ from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional
 
 from cython.operator cimport dereference
-from pyiode.objects.equation cimport EnumIodeEquationTest
-from pyiode.objects.equation cimport Equation as CEquation
-from pyiode.objects.equation cimport hash_value as hash_value_eq
+from pyiode.objects cimport EnumIodeEquationTest, CEquation, hash_value_eq
 
 
 # Equation wrapper class

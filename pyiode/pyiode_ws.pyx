@@ -80,8 +80,12 @@
 #   ws_import
 #   ws_export
 
-
 # TODO: rewrite IodeContents with regex or a better algorithm because K_grep() is VERY slow for large databases
+
+from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
+                        B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow)
+from iode_python cimport free_tbl
+
 
 def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
     r"""Return the names of objects of a given type, satisfying a pattern specification.

@@ -12,7 +12,17 @@
 #   ws_load_var_to_larray(filename: str, vars_pattern = '*', vars_axis_name = 'vars', time_axis_name = 'time', split_axis_names = None, regex = None, split_sep = None) -> Array | Load an IODE var file into an Larray object with 2 axes (vars and time)  
 #   larray_get_sample(la_input, time_axis_name = 'time') -> List[Union[str,float]]             | Return the first and last time axis labels as a list of 2 strings
 
-    
+try:
+    import larray as la
+    Array = la.Array
+    Axis = la.Axis
+except ImportError:
+    la = None
+    Array = Any
+    Axis = Any
+
+import numpy as np
+
 
 # private function -> must be imported by the end user
 cdef __la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_name = 'time'):

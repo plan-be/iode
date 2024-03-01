@@ -47,6 +47,12 @@
 #   get_var_as_ndarray(varname: str, copy = True) -> np.ndarray | get an IODE variable in a numpy ndarray
 #   set_var(varname, py_values)          | create or update an IODE variable from a list of floats or a ndarray
 
+import numpy as np
+from pyiode_objs cimport (IodeDeleteObj, IodeGetCmt, IodeSetCmt, IodeGetEqsLec, IodeGetEqs, IodeSetEqs, 
+                          IodeGetIdt, IodeSetIdt, IodeGetLst, IodeSetLst, IodeGetScl, IodeSetScl, 
+                          IodeCalcSamplePosition, IodeSetVector)
+from pyiode_data cimport B_DataDelete
+
 
 def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
     r'''Delete one or more IODE objects corresponding to the specified pattern.
