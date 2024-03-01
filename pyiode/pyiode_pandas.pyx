@@ -10,6 +10,9 @@
 #           time_axis_name: str = 'time', 
 #           time_as_floats: bool = False) -> pd.DataFrame           | Creates a DataFrame from the current KV_WS content
     
+import pandas as pd
+
+
 def df_to_ws(df_input: pd.DataFrame, time_axis_name: str = 'time'):
     '''
     Copies DataFrame df_input into IODE KV_WS.

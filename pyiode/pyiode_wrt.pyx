@@ -18,6 +18,10 @@
 #   w_print_pg_header(arg: str = "")                | Define the page header as from the current page
 #   w_print_pg_footer(arg: str = "")                | Define the page footer as from the current page
 
+from pyiode_wrt cimport (W_dest, W_close, W_flush, W_printf, W_print_enum, W_print_cmd, W_print_par, 
+                         W_print_tit, W_print_pg_header, W_print_pg_footer)
+
+
 def w_dest(filename: str = "", dest: int = W_DUMMY):
     '''Initialise a new output session'''
     W_dest(cstr(filename), dest)

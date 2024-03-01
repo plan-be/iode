@@ -10,6 +10,11 @@
 #   iodevar_to_ndarray(char *name, int copy = True) Create an numpy array from the content of an IODE variable
 #   iodesample_to_ndarray()                         Convert the current WS sample into a numpy 1D array of doubles
 
+cimport numpy as np
+from pyiode_cdef cimport IodeGetVector
+from pyiode_sample cimport IodeGetSampleAsDoubles
+
+
 cdef pylist(char** c_list):
     '''
     Convert a C vector of char* to a python list of strings

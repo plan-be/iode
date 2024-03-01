@@ -9,8 +9,18 @@
 
 # distutils: language = c++
 
-from typing import Union, Tuple, List, Optional
+from typing import Union, Tuple, List, Optional, Any
+from pyiode_sample cimport (IodeIsSampleSet, IodeSetSampleStr, IodeGetSampleAsString, 
+                            IodeCreateSampleAsPeriods)
 from pyiode_sample cimport Sample as CSample
+from iode_python cimport free_tbl
+
+try:
+    import larray as la
+    Axis = la.Axis
+except ImportError:
+    la = None
+    Axis = Any
 
 
 # Sample wrapper class

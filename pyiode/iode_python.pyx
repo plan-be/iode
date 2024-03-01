@@ -67,13 +67,59 @@
    
 #  cython: binding=True, language_level=3, embedsignature=True
 
+# distutils: language = c++
+from iode_python cimport IodeInit, ODE_assign_super_PYIODE
+
+
 # PYIODE API
 # ----------
 
-# The line below is to indicate to Cython that this .pyx file has to be compiled to C++.
-# distutils: language = c++
+# IODE defines used in python functions
+# -------------------------------------
+# (from #defines in iode.h)
 
-include "iode_python.pxi" 
+# Object and file types
+K_CMT = 0
+K_EQS = 1
+K_IDT = 2
+K_LST = 3
+K_SCL = 4
+K_TBL = 5
+K_VAR = 6
+
+# Simulation parameters
+SORT_CONNEX = 0
+SORT_BOTH   = 1
+SORT_NONE   = 2
+
+KV_INIT_TM1      = 0
+KV_INIT_TM1_A    = 1
+KV_INIT_EXTRA    = 2
+KV_INIT_EXTRA_A  = 3
+KV_INIT_ASIS     = 4
+KV_INIT_TM1_NA   = 5
+KV_INIT_EXTRA_NA = 6
+
+# Print outputs
+W_GDI   = 1
+W_A2M   = 7
+W_MIF   = 6
+W_HTML  = 5
+W_RTF   = 4
+W_CSV   = 8
+W_DUMMY = 9
+
+# HTOL methods
+HTOL_LAST = 0
+HTOL_MEAN = 1
+HTOL_SUM  = 2
+
+# LTOH defines 
+LTOH_STOCK  = 0
+LTOH_FLOW   = 1
+LTOH_LIN    = 'L'
+LTOH_CS     = 'C'
+LTOH_STEP   = 'S'
 
 # Included modules by topic
 # -------------------------
@@ -104,6 +150,7 @@ include "pyiode_wrt.pyx"
 # ----
 
 # Numpy must be initialized before we can use it safely.
+import numpy as np
 np.import_array()
 
 # IODE ws must initialize SWAP memory and create empty workspaces 

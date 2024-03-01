@@ -19,6 +19,9 @@
 #   model_simulate_save_niters 
 #   model_simulate_save_norms
 
+from pyiode_model cimport IodeModelSimulate
+
+
 def model_simulate(sample_from: str, sample_to: str, eqs_list=None, endo_exo_list=None,
                     eps: float = 0.0001, relax: float = 1.0, maxit: int = 100, 
                     init_values: int = KV_INIT_TM1, sort_algo: int = SORT_BOTH, nb_passes: int = 5, 
