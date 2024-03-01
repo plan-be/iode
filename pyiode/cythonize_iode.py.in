@@ -6,6 +6,8 @@ except ImportError:
     from distutils.core import setup
     from distutils.extension import Extension
 
+from Cython.Build import cythonize
+
 import numpy as np
 
 # Visual Studio dir structure
@@ -25,9 +27,10 @@ scr4_obj_dir      = f'{build_dir}/scr4/CMakeFiles/iode_scr4.dir'
 iode_obj_dir      = f'{build_dir}/api/CMakeFiles/iode_c_api.dir'
 iode_cpp_obj_dir  = f'{build_dir}/api/CMakeFiles/iode_cpp_api.dir'
 
-# Cythonize iode.pyx, compile generated file (iode.c) and link with appropriated libs
-iodemodule = Extension('iode',
-    include_dirs = [np.get_include(), boost_incl_dir, root_dir, scr4_incl_dir, iode_incl_dir, iode_cpp_incl_dir],
+# see https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html
+
+extensions = Extension('iode',
+    include_dirs = [np.get_include(), boost_incl_dir, root_dir, scr4_incl_dir, iode_incl_dir, iode_cpp_incl_dir, "."],
     library_dirs = [scr4_lib_dir, scr4_obj_dir, iode_lib_dir, iode_obj_dir, iode_cpp_lib_dir, iode_cpp_obj_dir],
     libraries = ['iode_scr4', 'iode_c_api', 'iode_cpp_api', 'odbc32', 'odbccp32', 'ws2_32', 'gdi32', 
                  'user32', 'advapi32', 'shell32', 'comdlg32', 'comctl32', 'Winspool', 'legacy_stdio_definitions'],
@@ -36,15 +39,18 @@ iodemodule = Extension('iode',
     depends = [ "iode_python.pyx", "s_iode.c", 
                 "pyiode_cdef.pyx", "pyiode_data.pyx", "pyiode_estim.pyx", 
                 "pyiode_exec.pyx",  "pyiode_larray.pyx", "pyiode_lec.pyx",
-                "pyiode_model.pyx", "objects/scalar.pyx", "pyiode_objs.pyx", 
-                "pyiode_print.pyx", "pyiode_reports.pyx", "pyiode_period.pyx", 
-                "pyiode_sample.pyx", "pyiode_util.pyx", "pyiode_ws.pyx"],
-    language="c++",
+                "pyiode_model.pyx", "objects/scalar.pyx", "objects/equation.pyx", 
+                "pyiode_objs.pyx", "pyiode_print.pyx", "pyiode_reports.pyx", 
+                "pyiode_period.pyx", "pyiode_sample.pyx", "pyiode_util.pyx", 
+                "pyiode_ws.pyx"],
     define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 )           
 
-# Create the .pyd file (?)
+# cythonize arguments: https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#cythonize-arguments
+# compiler_directives: https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#compiler-directives
+
 setup(
     name = 'iode',
-    ext_modules = [iodemodule]
+    ext_modules=cythonize(extensions, compiler_directives={"binding": True, "language_level": 3, "embedsignature": True, 
+                            "embedsignature.format": "python"})
 )
