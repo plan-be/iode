@@ -8,9 +8,9 @@
 
 enum EnumSimulationSortAlgorithm
 {
-    IS_SORT_CONNEX = SORT_CONNEX,
-    IS_SORT_BOTH = SORT_BOTH,
-    IS_SORT_NONE = SORT_NONE
+    I_SORT_CONNEX = SORT_CONNEX,
+    I_SORT_BOTH = SORT_BOTH,
+    I_SORT_NONE = SORT_NONE
 };
 
 const static std::array<std::string, 3> v_simulation_sort_algorithm =
