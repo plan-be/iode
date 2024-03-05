@@ -23,15 +23,11 @@ scr4_lib_dir       = f'{build_dir}/scr4'
 iode_lib_dir       = f'{build_dir}/api'
 iode_cpp_lib_dir   = f'{build_dir}/cpp_api'
 
-scr4_obj_dir      = f'{build_dir}/scr4/CMakeFiles/iode_scr4.dir'
-iode_obj_dir      = f'{build_dir}/api/CMakeFiles/iode_c_api.dir'
-iode_cpp_obj_dir  = f'{build_dir}/api/CMakeFiles/iode_cpp_api.dir'
-
 # see https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html
 
 extensions = Extension('iode',
-    include_dirs = [np.get_include(), boost_incl_dir, root_dir, scr4_incl_dir, iode_incl_dir, iode_cpp_incl_dir, "."],
-    library_dirs = [scr4_lib_dir, scr4_obj_dir, iode_lib_dir, iode_obj_dir, iode_cpp_lib_dir, iode_cpp_obj_dir],
+    include_dirs = [np.get_include(), boost_incl_dir, root_dir, scr4_incl_dir, iode_incl_dir, iode_cpp_incl_dir],
+    library_dirs = [scr4_lib_dir, iode_lib_dir, iode_cpp_lib_dir],
     libraries = ['iode_scr4', 'iode_c_api', 'iode_cpp_api', 'odbc32', 'odbccp32', 'ws2_32', 'gdi32', 
                  'user32', 'advapi32', 'shell32', 'comdlg32', 'comctl32', 'Winspool', 'legacy_stdio_definitions'],
 	extra_compile_args = [${IODE_CYTHON_FLAGS}],				
