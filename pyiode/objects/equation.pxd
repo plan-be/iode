@@ -8,8 +8,6 @@ from libcpp cimport bool
 from pyiode.pyiode_sample cimport CSample
 
 
-# declare C++ Equation class
-# see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
 cdef extern from "objects/equation.h":
 
     cdef int EQS_NBTESTS
@@ -27,11 +25,13 @@ cdef extern from "objects/equation.h":
         IE_DW,
         IE_LOGLIK
 
-    cdef cppclass Equation:
+    # declare C++ Equation class
+    # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
+    cdef cppclass CEquation "Equation":
         float tests[20]
 
-        Equation(const string&, const string&, const int, const string&, const string&, 
-                 const string&, const string&, const string&, const bool date) except +
+        CEquation(const string&, const string&, const int, const string&, const string&, 
+                  const string&, const string&, const string&, const bool date) except +
 
         string get_lec()
         void set_lec(const string&, const string&) except +
@@ -74,8 +74,8 @@ cdef extern from "objects/equation.h":
         vector[string] get_variables_list(const bool create_if_not_exit) except +
         pair[string, string] split_equation() except +
 
-        bool operator==(const Equation&) except +
+        bool operator==(const CEquation&) except +
 
         string to_string()
 
-    size_t hash_value(Equation&)
+    size_t hash_value(CEquation&)
