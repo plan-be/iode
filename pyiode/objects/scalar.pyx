@@ -2,8 +2,9 @@
 
 from typing import Union, Tuple, List, Optional
 
-from pyiode cimport L_NAN
-from pyiode.objects cimport CScalar, hash_value_scl
+from pyiode.iode_python cimport L_NAN
+from pyiode.objects.scalar cimport CScalar
+from pyiode.objects.scalar cimport hash_value as hash_value_scl
 
 
 # Scalar wrapper class
