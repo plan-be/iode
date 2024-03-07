@@ -191,9 +191,9 @@ endif()
 add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 
 # ---- include ----
-# CMAKE_SOURCE_DIR is the full path to the top level 
-# of the current CMake source tree
-include_directories(${CMAKE_SOURCE_DIR})
+# CMAKE_SOURCE_DIR is the full path to the top level of the current CMake source tree
+# TODO: modify iode.h so that there is no need to include the scr4 folder for ALL targets
+include_directories(${CMAKE_SOURCE_DIR} "${CMAKE_SOURCE_DIR}\\scr4")
 message(STATUS " ")
 message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
 
