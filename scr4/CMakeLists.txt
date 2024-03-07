@@ -63,8 +63,7 @@ set (SCR_IODE
 
 # Add source to this project's executable.
 add_library (iode_scr4 STATIC ${HEADER_IODE} ${SCR_IODE})
-
-target_include_directories (iode_scr4 PUBLIC ".")
+# target_include_directories(iode_scr4 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(TARGET iode_scr4)
 	message(STATUS "New target iode_scr4 enabled\n")
