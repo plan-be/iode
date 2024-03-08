@@ -21,10 +21,11 @@ def report_exec(filename_parms: str):
 
 
 # $ExecReportLine repline
-def reportline_exec(repline: str):
-    '''Execute a report line'''
+def reportline_exec(repline: Union[str, List[str]]):
+    '''Execute report line(s)'''
+    
+    repline = arg_to_str(repline, sep = '\n')
     rc = B_ReportLine(cstr(repline))
     if rc != 0:
         raise  RuntimeError(f"Execution of report line '{repline}' has failed. rc = {rc}")
-
 
