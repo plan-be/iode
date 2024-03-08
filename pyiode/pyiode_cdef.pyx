@@ -64,7 +64,7 @@ cdef pyfloats(double *cvar, int lg):
     return res    
 
 
-cdef iodevar_to_ndarray(char * name, int copy = True):
+cdef iodevar_to_ndarray(char * name, int copy = 1):
     '''
     Create an numpy array from the content of an IODE variable (KV_WS[name]). 
     The ndarray data may be either a newly allocated vector, or may point to the IODE memory.
