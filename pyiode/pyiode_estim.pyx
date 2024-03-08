@@ -16,7 +16,7 @@ def eqs_estimate(eq_list: Union[str, List[str]], afrom: str, ato: str):
     Estimate an equation or a block of equations on the given sample.
     The estimation method and the instruments must be specified in the equation before the estimation.
     '''
-    if type(eq_list) == list:
+    if isinstance(eq_list, list):
         eq_list = ','.join(eq_list)
 
     if IodeEstimate(cstr(eq_list), cstr(afrom), cstr(ato)):
