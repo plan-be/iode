@@ -33,5 +33,5 @@ cdef extern from "iode.h":
     # constants
     cdef double L_NAN
 
-cdef extern from "s_iode.c":
+cdef extern from "s_pyiode.c":
     cdef int   free_tbl(char** tbl)
