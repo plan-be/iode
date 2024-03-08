@@ -50,9 +50,9 @@ enum EnumIodeType
 // TODO: rename K_NBR_OBJ as I_NB_TYPES in C api
 const static int I_NB_TYPES = K_NBR_OBJ;
 
-const static std::array<std::string, I_NB_TYPES> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
-const static std::array<std::string, I_NB_TYPES> v_binary_ext = { "cmt", "eqs", "idt", "lst", "scl", "tbl", "var" };
-const static std::array<std::string, I_NB_TYPES> v_ascii_ext = { "ac", "ae", "ai", "al", "as", "at", "av" };
+const static std::vector<std::string> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
+const static std::vector<std::string> v_binary_ext = { "cmt", "eqs", "idt", "lst", "scl", "tbl", "var" };
+const static std::vector<std::string> v_ascii_ext = { "ac", "ae", "ai", "al", "as", "at", "av" };
 
 struct IodeRegexName
 {
@@ -70,7 +70,7 @@ enum EnumLang
 
 const static int I_NB_LANGS = 3;
 
-const static std::array<std::string, I_NB_LANGS> vLangs = { "English", "Dutch", "French" };
+const static std::vector<std::string> vLangs = { "English", "Dutch", "French" };
 
 
 enum EnumIodeFile
@@ -101,7 +101,7 @@ enum EnumIodeFile
 
 const static int I_NB_ENUM_FILE_EXT = 22;
 
-const static std::array<std::string, I_NB_ENUM_FILE_EXT> v_ext_names = 
+const static std::vector<std::string> v_ext_names = 
 { 
     "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", 
     "Report", "Text", "Ascii", "A2m", "Rtf", "Html", "Mif", "Csv", "Ref", "Agl", "Dif",
@@ -109,7 +109,7 @@ const static std::array<std::string, I_NB_ENUM_FILE_EXT> v_ext_names =
 };
 
 // same as k_ext defined in k_objfile.c
-const static std::array<std::string, 26> v_ext = 
+const static std::vector<std::string> v_ext = 
 {
     "cmt", "eqs", "idt", "lst", "scl", "tbl", "var",
     "ac",  "ae",  "ai",  "al",  "as",  "at",  "av",
@@ -175,7 +175,7 @@ enum EnumSimulationInitialization
     IV_INIT_EXTRA_NA = KV_INIT_EXTRA_NA
 };
 
-const static std::array<std::string, 7> v_simulation_initialization
+const static std::vector<std::string> v_simulation_initialization
 {
     "Y := Y[-1], if Y null or NA",                  // TM1
     "Y := Y[-1], always",                           // TM1_A
@@ -198,7 +198,7 @@ enum EnumIodeExportFormat
 
 const static int I_NB_EXPORT_FORMATS = 5;
 
-const static std::array<std::string, I_NB_EXPORT_FORMATS> vExportFormats = 
+const static std::vector<std::string> vExportFormats = 
 	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
 
 
@@ -213,7 +213,7 @@ enum EnumIodeGraphAxisThicks
 
 const static int I_NB_AXIS_THICKS = 3;
 
-const static std::array<std::string, I_NB_AXIS_THICKS> vGraphsAxisThicks = 
+const static std::vector<std::string> vGraphsAxisThicks = 
     { "Major thicks", "No grids", "Minor thicks" };
 
 
@@ -226,30 +226,30 @@ enum EnumIodeGraphChart
 
 const static int I_NB_CHART_TYPES = 3;
 
-const static std::array<std::string, I_NB_CHART_TYPES> vGraphsChartTypes = 
+const static std::vector<std::string> vGraphsChartTypes = 
     { "Line chart", "Scatter chart", "Bar chart" };
 
 
 const static int I_NB_COLORS = 8;
 
-const static std::array<std::string, I_NB_COLORS> vGraphsColors = 
+const static std::vector<std::string> vGraphsColors = 
     {"Blue", "Yellow", "Black", "White", "Red", "Green", "Cyan", "Magenta"};
 
 // ====== Fonts ======
 
 const static int I_NB_FONTS = 6;
 
-const static std::array<std::string, I_NB_FONTS> vIodeFonts =
+const static std::vector<std::string> vIodeFonts =
     {"Helvetica", "Times", "Courier", "Bookman", "Palatino", "Trebuchet MS"};
 
 // ====== Print ======
 
 const static int I_NB_PRINT_DEST = 2;
 
-const static std::array<std::string, I_NB_PRINT_DEST> vPrintDest = {"Windows printer", "File"};
+const static std::vector<std::string> vPrintDest = {"Windows printer", "File"};
 
 const static int I_NB_PRINT_FORMATS = 5;
 
-const static std::array<std::string, I_NB_PRINT_FORMATS> vPrintFormats =
+const static std::vector<std::string> vPrintFormats =
     {"A2M file (IODE ...)", "RTF file (Word, ...)", "HTML file (Internet)",
      "MIF file (Frame Maker)", "CSV file (Excel, ....)"};

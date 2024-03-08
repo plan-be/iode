@@ -13,7 +13,7 @@ enum EnumSimulationSortAlgorithm
     I_SORT_NONE = SORT_NONE
 };
 
-const static std::array<std::string, 3> v_simulation_sort_algorithm =
+const static std::vector<std::string> v_simulation_sort_algorithm =
 {
     "Connex compon. decomposition",
     "Connex compon. + Triangulation",

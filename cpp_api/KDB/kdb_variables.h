@@ -16,9 +16,7 @@ enum EnumIodeVarMode
 };
 
 const static int I_VAR_NB_MODES = 5;
-
-const static std::array<std::string, I_VAR_NB_MODES> v_var_modes = 
-    { "Level", "Differences", "Growth rates", "YoY Diffs", "YoY Grt" };
+const static std::vector<std::string> v_var_modes = { "Level", "Differences", "Growth rates", "YoY Diffs", "YoY Grt" };
 
 
 // TODO: wrapp functions from k_wsvar.c in KDBVariables

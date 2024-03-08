@@ -22,8 +22,7 @@ enum EnumIodeEquationMethod
 };
 
 const static int I_NB_EQ_METHODS = 5;
-
-const static std::array<std::string, I_NB_EQ_METHODS> v_eq_methods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
+const static std::vector<std::string> v_eq_methods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
 
 
 enum EnumIodeEquationTest
@@ -43,7 +42,7 @@ enum EnumIodeEquationTest
 
 const static int I_NB_EQ_TESTS = 11;
 
-const static std::array<std::string, I_NB_EQ_TESTS> vEquationTests = { 
+const static std::vector<std::string> vEquationTests = { 
     "Correlation",
     "St dev of residuals",
     "Mean of YOBS",
