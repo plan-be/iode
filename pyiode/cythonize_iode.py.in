@@ -84,8 +84,8 @@ extra_compile_args = [${IODE_CYTHON_FLAGS}]
 define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 
 extensions = Extension('iode',				
-                sources = ["iode_python.pyx", "s_iode.c"],
-                depends = [ "iode_python.pyx", "s_iode.c", 
+                sources = ["iode_python.pyx", "s_pyiode.c"],
+                depends = [ "iode_python.pyx", "s_pyiode.c", 
                             "pyiode_cdef.pyx", "pyiode_data.pyx", "pyiode_estim.pyx", 
                             "pyiode_exec.pyx",  "pyiode_larray.pyx", "pyiode_lec.pyx",
                             "pyiode_model.pyx", "objects/scalar.pyx", "objects/equation.pyx", 
