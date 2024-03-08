@@ -5,14 +5,14 @@
 #
 #  IODE workspaces functions
 #  -------------------------
-#   ws_content(pattern, objtype) -> List[str]       | Return the names of all objects of a given type, satisfying a pattern specification  
-#   ws_content_cmt(pattern) -> List[str]            | Returns the list of comment names corresponding to the given pattern
-#   ws_content_eqs(pattern) -> List[str]            | Returns the list of equation names corresponding to the given pattern
-#   ws_content_idt(pattern) -> List[str]            | Returns the list of identity names corresponding to the given pattern
-#   ws_content_lst(pattern) -> List[str]            | Returns the list of list names corresponding to the given pattern
-#   ws_content_scl(pattern) -> List[str]            | Returns the list of scalar names corresponding to the given pattern
-#   ws_content_tbl(pattern) -> List[str]            | Returns the list of table names corresponding to the given pattern
-#   ws_content_var(pattern) -> List[str]            | Returns the list of variable names corresponding to the given pattern
+#   ws_content(pattern: Union[str, List[str]] = '*', objtype) -> List[str]  | Return the names of all objects of a given type, satisfying pattern specification(s)  
+#   ws_content_cmt(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of comment names corresponding to the given pattern(s)
+#   ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of equation names corresponding to the given pattern(s)
+#   ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of identity names corresponding to the given pattern(s)
+#   ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of list names corresponding to the given pattern(s)
+#   ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of scalar names corresponding to the given pattern(s)
+#   ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of table names corresponding to the given pattern(s)
+#   ws_content_var(pattern: Union[str, List[str]] = '*') -> List[str]       | Returns the list of variable names corresponding to the given pattern(s)
 #
 #   ws_clear(filetype: int) | Clear WS of the given filetype (K_CMT..K_VAR)
 #   ws_clear_cmt()          | Clear the comment WS
@@ -21,7 +21,7 @@
 #   ws_clear_lst()          | Clear the list WS
 #   ws_clear_scl()          | Clear the scalar WS
 #   ws_clear_tbl()          | Clear the table WS
-#   ws_clear_var()          | Clear the varaible WS
+#   ws_clear_var()          | Clear the variable WS
 #   ws_clear_all()          | Clear all WS           
 #
 #   ws_load(filename: str, filetype: int) -> int | Load an IODE file and return the number of read objects
@@ -89,7 +89,7 @@ from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeConte
 from iode_python cimport free_tbl
 
 
-def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
+def __ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
     r"""Return the names of objects of a given type, satisfying a pattern specification.
 
     Parameters
@@ -115,6 +115,7 @@ def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
     >>> names
     ['ACAF', 'ACAG']
     """
+    
     cdef char **cnt = IodeContents(cstr(pattern), objtype)
     cdef int nb
 
@@ -133,33 +134,80 @@ def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
             res[nb] = pystr(s)
             nb = nb + 1
 
-    free_tbl(cnt)
+    SCR_free_tbl(cnt)
 
     return res
 
-def ws_content_cmt(pattern: str = '*') -> List[str]:
-    warnings.warn("ws_content_cmt() is deprecated. " + 
-        "Please use the new syntax: Comments.get_names(pattern)", DeprecationWarning)
-    return Comments.get_names(pattern)
+def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = 6) -> List[str]:
+    r"""Return the names of objects of a given type, satisfying pattern specification(s). 
+    The resulting list is sorted in alphabetic order.
 
-def ws_content_eqs(pattern: str = '*') -> List[str]:
+    Parameters
+    ----------
+    pattern: string or list of strings
+        each string may contain wildcards characters like '*' or '?'.
+        Default '*', meaning "all objects".
+
+    objtype: int
+        IODE object type (0-6, 0 for comments...)
+        Default 6 for
+
+    Returns
+    -------
+    List[str]
+        List of object names
+
+    Examples
+    -------
+    >>> import iode
+    >>> iode.ws_load_cmt("../fun.cmt")               
+    317
+    >>> result = iode.ws_content("ACA*", 0)          
+    >>> print(result)                                
+    ['ACAF', 'ACAG']
+    
+    >>> result = iode.ws_content(["PIF", "ACA*"], 0) 
+    >>> print(result)                                
+    ['ACAF', 'ACAG', 'PIF']
+
+    """
+
+    if isinstance(pattern, str):
+        return(__ws_content_from_str(pattern, objtype))
+
+    elif isinstance(pattern, list):
+        res = set()
+        for pattern1 in pattern:
+            res = res| set(__ws_content_from_str(pattern1, objtype))
+        res = list(res)
+        res.sort()
+        return res
+    else:
+        raise RuntimeError("ws_content() only accepts strings or list of strings")
+
+
+def ws_content_cmt(pattern: Union[str, List[str]] = '*') -> List[str]:
+    '''Returns the list of comment names corresponding to the given pattern'''
+    return ws_content(pattern, K_CMT)
+
+def ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of equation names corresponding to the given pattern'''
     return ws_content(pattern, K_EQS)
 
-def ws_content_idt(pattern: str = '*') -> List[str]:
+def ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of identity names corresponding to the given pattern'''
     return ws_content(pattern, K_IDT)
 
-def ws_content_lst(pattern: str = '*') -> List[str]:
+def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_LST)
 
-def ws_content_scl(pattern: str = '*') -> List[str]:
+def ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_SCL)
 
-def ws_content_tbl(pattern: str = '*') -> List[str]:
+def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_TBL)
 
-def ws_content_var(pattern: str = '*') -> List[str]:
+def ws_content_var(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_VAR)
 
 
@@ -273,7 +321,6 @@ def ws_save_var(filename: str):
 # High to Low
 # -----------
 def ws_htol(filename: str, varlist, series_type: int):
-    #if type(varlist) == list:
     if isinstance(varlist, list):
         varlist = ' '.join(varlist)
 
@@ -301,7 +348,6 @@ def ws_htol_sum(filename: str, varlist):
 # Low to High
 # -----------
 def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
-    #if type(varlist) == list:
     if isinstance(varlist, list):
         varlist = ' '.join(varlist)
 
