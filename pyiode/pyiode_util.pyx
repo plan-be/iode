@@ -17,7 +17,8 @@
 #       clear_error_msgs()                      | Empty the stack of error messages
 # ------------------------------------------------------------------------------------------------------------------
 
-from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs
+from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
+
 
 # Miscellaneous functions
 # -----------------------
