@@ -86,7 +86,7 @@ import warnings
 
 from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
                         B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow)
-from iode_python cimport free_tbl
+from iode_python cimport free_tbl, SCR_free_tbl
 
 
 def __ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
