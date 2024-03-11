@@ -9,7 +9,7 @@
 #   idt_execute(sample: Optional[Union[str, List[str]]] = None, idt_list: Optional[Union[str, List[str]]] = None, var_files: Optional[Union[str, List[str]]] = None, scl_files: Optional[Union[str, List[str]]] = None,trace: int = 0) | Execute a list of identities on a given sample
 
 cdef extern from "iode.h": 
-    IodeExecuteIdts()
+    cdef int    IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace)
 
 def idt_execute(sample: Optional[Union[str, List[str]]] = None, 
                 idt_list: Optional[Union[str, List[str]]] = None, 
