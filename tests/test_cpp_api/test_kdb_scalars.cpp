@@ -294,9 +294,29 @@ TEST_F(KDBScalarsTest, DeepCopy)
     EXPECT_THROW(Scalars.subset(pattern, true), std::runtime_error);
 }
 
+TEST_F(KDBScalarsTest, CopyInto)
+{
+    std::string pattern = "a* *_";
+    std::string filename = input_test_dir + "fun.scl";
+    int expected_nb_comments = Scalars.count();
+    std::vector<std::string> v_expected_names;
+
+    // Copy entire file
+    Scalars.clear();
+    Scalars.copy_into(filename, "*");
+    EXPECT_EQ(Scalars.count(), expected_nb_comments); 
+
+    // copy subset
+    v_expected_names = Scalars.get_names(pattern);
+    Scalars.clear();
+    Scalars.copy_into(filename, pattern);
+    EXPECT_EQ(Scalars.count(), v_expected_names.size());  
+    EXPECT_EQ(Scalars.get_names(), v_expected_names);  
+}
+
 TEST_F(KDBScalarsTest, Merge)
 {
-    std::string pattern = "A*";
+    std::string pattern = "a*";
 
     // create deep copies kdb
     KDBScalars* kdb0 = Scalars.subset(pattern, true);

@@ -313,6 +313,26 @@ TEST_F(KDBTablesTest, DeepCopy)
     EXPECT_THROW(Tables.subset(pattern, true), std::runtime_error);
 }
 
+TEST_F(KDBTablesTest, CopyInto)
+{
+    std::string pattern = "A* *_";
+    std::string filename = input_test_dir + "fun.tbl";
+    int expected_nb_comments = Tables.count();
+    std::vector<std::string> v_expected_names;
+
+    // Copy entire file
+    Tables.clear();
+    Tables.copy_into(filename, "*");
+    EXPECT_EQ(Tables.count(), expected_nb_comments); 
+
+    // copy subset
+    v_expected_names = Tables.get_names(pattern);
+    Tables.clear();
+    Tables.copy_into(filename, pattern);
+    EXPECT_EQ(Tables.count(), v_expected_names.size());  
+    EXPECT_EQ(Tables.get_names(), v_expected_names);  
+}
+
 TEST_F(KDBTablesTest, Merge)
 {
     std::string pattern = "A*";

@@ -392,6 +392,26 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
                  identities_list), std::runtime_error);
 }
 
+TEST_F(KDBIdentitiesTest, CopyInto)
+{
+    std::string pattern = "A* *_";
+    std::string filename = input_test_dir + "fun.idt";
+    int expected_nb_comments = Identities.count();
+    std::vector<std::string> v_expected_names;
+
+    // Copy entire file
+    Identities.clear();
+    Identities.copy_into(filename, "*");
+    EXPECT_EQ(Identities.count(), expected_nb_comments); 
+
+    // copy subset
+    v_expected_names = Identities.get_names(pattern);
+    Identities.clear();
+    Identities.copy_into(filename, pattern);
+    EXPECT_EQ(Identities.count(), v_expected_names.size());  
+    EXPECT_EQ(Identities.get_names(), v_expected_names);  
+}
+
 TEST_F(KDBIdentitiesTest, Merge)
 {
     std::string pattern = "A*";

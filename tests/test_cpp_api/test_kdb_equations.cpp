@@ -278,6 +278,26 @@ TEST_F(KDBEquationsTest, DeepCopy)
     EXPECT_THROW(Equations.subset(pattern, true), std::runtime_error);
 }
 
+TEST_F(KDBEquationsTest, CopyInto)
+{
+    std::string pattern = "A* *_";
+    std::string filename = input_test_dir + "fun.eqs";
+    int expected_nb_comments = Equations.count();
+    std::vector<std::string> v_expected_names;
+
+    // Copy entire file
+    Equations.clear();
+    Equations.copy_into(filename, "*");
+    EXPECT_EQ(Equations.count(), expected_nb_comments); 
+
+    // copy subset
+    v_expected_names = Equations.get_names(pattern);
+    Equations.clear();
+    Equations.copy_into(filename, pattern);
+    EXPECT_EQ(Equations.count(), v_expected_names.size());  
+    EXPECT_EQ(Equations.get_names(), v_expected_names);  
+}
+
 TEST_F(KDBEquationsTest, Merge)
 {
     std::string pattern = "A*";
