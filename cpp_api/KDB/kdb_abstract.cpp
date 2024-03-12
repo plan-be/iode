@@ -300,18 +300,8 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
 // TODO JMP: please provide input values to test B_WsCopy()
 void KDBAbstract::copy_into(const std::string& input_file, const std::string objects_names)
 {
-    std::string buf = input_file + " ";
-    if(k_type == I_VARIABLES)
-    {
-        Sample sample(*KSMPL(get_database()));
-        std::string from = sample.start_period().to_string();
-        std::string to = sample.end_period().to_string();
-        buf += from + " " + to + " ";
-    }
-    buf += objects_names;
-
+    std::string buf = input_file + " " + objects_names;
     int res = B_WsCopy(const_cast<char*>(buf.c_str()), k_type);
-
     if(res < 0)
     {
         std::string msg = "Cannot copy content of file '" + input_file + "' into the " + vIodeTypes[k_type] + " database.\n";
