@@ -48,6 +48,8 @@
 #   set_var(varname, py_values)          | create or update an IODE variable from a list of floats or a ndarray
 
 import numpy as np
+import warnings
+
 from pyiode_objs cimport (IodeDeleteObj, IodeGetCmt, IodeSetCmt, IodeGetEqsLec, IodeGetEqs, IodeSetEqs, 
                           IodeGetIdt, IodeSetIdt, IodeGetLst, IodeSetLst, IodeGetScl, IodeSetScl, 
                           IodeCalcSamplePosition, IodeSetVector)
@@ -94,7 +96,9 @@ def delete_obj(obj_name: str, obj_type: int):
         raise RuntimeError(f"Variable {obj_name} cannot be deleted")
 
 def delete_cmt(name: str):
-    delete_obj(name, K_CMT)
+    warnings.warn("delete_cmt() is deprecated. " + 
+        "Please use the new syntax: del Comments[name]", DeprecationWarning)
+    del Comments[name]
 
 def delete_eqs(name: str):
     return delete_obj(name, K_EQS)
@@ -122,16 +126,14 @@ def delete_var(name: str):
 # --------
 
 def get_cmt(name: str) -> str:
-    '''Return the text of an IODE comment'''
-    
-    cmt850 = IodeGetCmt(cstr(name))
-    return pystr(cmt850)
+    warnings.warn("get_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments[name]", DeprecationWarning)
+    return Comments[name]
 
 def set_cmt(name: str, cmt: str):
-    '''Update or create an IODE comment from a python str'''
-    
-    if IodeSetCmt(cstr(name), cstr(cmt)):
-        raise RuntimeError(f"Comment {name} cannot be set")
+    warnings.warn("set_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments[name] = value", DeprecationWarning)
+    Comments[name] = cmt
 
 
 # Equations

@@ -82,6 +82,8 @@
 
 # TODO: rewrite IodeContents with regex or a better algorithm because K_grep() is VERY slow for large databases
 
+import warnings
+
 from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
                         B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow)
 from iode_python cimport free_tbl
@@ -107,9 +109,8 @@ def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
 
     Examples
     -------
-    >>> import iode
-    >>> iode.ws_load_cmt("../data/fun.cmt")
-    317
+    >>> from iode import Comments, ws_content
+    >>> Comments.load("../data/fun.cmt")
     >>> names = iode.ws_content("ACA*", 0)
     >>> names
     ['ACAF', 'ACAG']
@@ -137,8 +138,9 @@ def ws_content(pattern: str = '*', objtype: int = 6) -> List[str]:
     return res
 
 def ws_content_cmt(pattern: str = '*') -> List[str]:
-    '''Returns the list of comment names corresponding to the given pattern'''
-    return ws_content(pattern, K_CMT)
+    warnings.warn("ws_content_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments.get_names(pattern)", DeprecationWarning)
+    return Comments.get_names(pattern)
 
 def ws_content_eqs(pattern: str = '*') -> List[str]:
     '''Returns the list of equation names corresponding to the given pattern'''
@@ -174,8 +176,9 @@ def ws_clear(filetype: int):
         raise RuntimeError(f"Workspace of type {filetype} cannot be cleared")
 
 def ws_clear_cmt():
-    '''Clear the comment WS'''
-    ws_clear(K_CMT)
+    warnings.warn("ws_clear_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments.clear()", DeprecationWarning)
+    Comments.clear()
 
 def ws_clear_eqs():
     ws_clear(K_EQS)
@@ -206,10 +209,10 @@ def ws_load(filename: str, filetype: int) -> int:
         raise RuntimeError(f"File {filename} of type {filetype} cannot be loaded")
     return nb    
 
-def ws_load_cmt(filename: str) -> int:
-    '''Load a comment file and return the number of read objects'''
-    
-    return ws_load(filename, K_CMT)
+def ws_load_cmt(filename: str):
+    warnings.warn("ws_load_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments.load(filepath)", DeprecationWarning)
+    Comments.load(filename)
 
 def ws_load_eqs(filename: str) -> int:
     return ws_load(filename, K_EQS)
@@ -238,8 +241,9 @@ def ws_save(filename: str, filetype: int):
         raise RuntimeError(f"Workspace of type {filetype} cannot be saved in file {filename}.")
 
 def ws_save_cmt(filename: str):
-    '''Save the current comment workspace'''
-    ws_save(filename, K_CMT)
+    warnings.warn("ws_save_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments.save(filepath)", DeprecationWarning)
+    Comments.save(filename)
 
 def ws_save_eqs(filename: str):
     '''Save the current equation workspace'''

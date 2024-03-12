@@ -35,6 +35,8 @@
 #  data_ras_var      
 #  data_pattern_*
 
+import warnings
+
 from pyiode_data cimport B_DataUpdate
 
 
@@ -67,8 +69,9 @@ def data_update(obj_name: str, obj_value: str, obj_type: int):
         raise RuntimeError(f"{obj_name} update failed")
 
 def data_update_cmt(obj_name: str, obj_value: str):
-    '''Create or update a comment'''
-    data_update(obj_name, obj_value, K_CMT)
+    warnings.warn("data_update_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments[name] = value", DeprecationWarning)
+    Comments[obj_name] = obj_value
     
 def data_update_eqs(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, K_EQS)
