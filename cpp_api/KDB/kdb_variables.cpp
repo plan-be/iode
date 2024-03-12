@@ -319,11 +319,14 @@ void KDBVariables::copy_into(const std::string& input_file, const std::string& f
 {
 	    std::string buf = input_file + " ";
 
-		Sample smpl = get_sample();
-		if (!from.empty()) buf += smpl.start_period().to_string() + " ";
-		if (!to.empty()) buf += smpl.end_period().to_string() + " ";
-        // thtrow error if wrong samples
-        Sample copy_sample(from, to);
+		if((!from.empty()) || (!to.empty()))
+		{
+			Sample var_sample = get_sample();
+			buf += from.empty() ? var_sample.start_period().to_string() + " " : from + " ";
+			buf += to.empty() ? var_sample.end_period().to_string() + " " : to + " ";
+			// throw error if wrong samples
+			Sample copy_sample(from, to);
+		}
 
         buf += objects_names;
 
