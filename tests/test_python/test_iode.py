@@ -27,6 +27,7 @@ try:
 except:
     pass
 
+from iode import Comments
 
 # MISC FUNCTIONS
 # --------------
@@ -38,8 +39,8 @@ def test_iode_version():
 # WS FUNCTIONS
 # ------------
 def test_iode_ws_content():
-    iode.ws_load_cmt(str(IODE_DATA_DIR / "fun.cmt"))
-    result = iode.ws_content_cmt("ACA*")
+    Comments.load(str(IODE_DATA_DIR / "fun.cmt"))
+    result = iode.ws_content("ACA*", 0)
     assert result == ["ACAF", "ACAG"]
 
 def test_iode_ws_clear_var():
@@ -113,52 +114,6 @@ def test_iode_ws_sample():
 
 # PYIODE_OBJECTS
 # --------------
-
-
-# IODE COMMENTS <-> PYTHON STRINGS
-# --------------------------------
-
-def test_iode_get_cmt():
-
-    iode.ws_load_cmt(str(IODE_DATA_DIR / "fun.cmt"))
-    c_ACAF = iode.get_cmt("ACAF")
-    c_EFM = iode.get_cmt("EFM")
-    c_XPWMAB = iode.get_cmt("XPWMAB")
-
-    print(f"ACAF   = '{c_ACAF}'")
-    print(f"EFM    = '{c_EFM}'")
-    print(f"XPWMAB = '{c_XPWMAB}'")
-
-    assert c_ACAF == "Ondernemingen: ontvangen kapitaaloverdrachten."
-    assert c_EFM == "Vreemde grensarbeiders in België (30 juni)."
-    assert c_XPWMAB == "Croissance des prix des biens importés"
-
-
-def test_iode_set_cmt():
-
-    # Clear CMT before creating new comments
-    iode.ws_clear_cmt()
-
-    # Create comment as py strings
-    pycmt1 = "New comment with éîâëéàçèï"
-    pycmt2 = "Other comment"
-
-    # Save them in KC_WS + check
-    rc = iode.set_cmt("MYCMT1", pycmt1)
-    rc = iode.set_cmt("MYCMT2", pycmt2)
-
-    ## Reload to check values
-    c_MYCMT1 = iode.get_cmt("MYCMT1")
-    c_MYCMT2 = iode.get_cmt("MYCMT2")
-
-    print(f"MYCMT1 = '{c_MYCMT1}'")
-    print(f"orig   = '{pycmt1}'")
-    print(f"MYCMT2 = '{c_MYCMT2}'")
-    print(f"orig   = '{pycmt2}'")
-
-    assert c_MYCMT1 == pycmt1
-    assert c_MYCMT2 == pycmt2
-
 
 # IODE EQUATIONS <-> PYTHON STRINGS
 # ---------------------------------
@@ -391,15 +346,6 @@ def test_iode_delete_objects():
 
 # DATA_UPDATE
 # -----------
-
-
-def test_iode_data_update_cmt():
-
-    A = "Comment of A"
-    iode.data_update_cmt("A", A)
-    new_A = iode.get_cmt("A")
-    assert new_A == A
-
 
 def test_iode_data_update_eqs():
 
