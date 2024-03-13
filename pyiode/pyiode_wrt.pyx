@@ -24,7 +24,7 @@ from pyiode_wrt cimport (W_dest, W_close, W_flush, W_printf, W_print_enum, W_pri
 
 def w_dest(filename: str = "", dest: int = W_DUMMY):
     '''Initialise a new output session'''
-    W_dest(cstr(filename), dest)
+    W_dest(_cstr(filename), dest)
 
 def w_flush():
     '''Flush the output session buffer.'''
@@ -36,7 +36,7 @@ def w_close():
 
 def w_print(txt: str = ""):
     '''Send a string into the output session buffer.'''
-    return W_printf(cstr("%s"), cstr(txt))
+    return W_printf(_cstr("%s"), _cstr(txt))
     
 def w_print_enum(level: int = 1, text: str = ""):
     '''Print a bulleted paragraph of the given level''' 
@@ -64,11 +64,11 @@ def w_print_tit(level: int = 1, title: str = ""):
 
 def w_print_pg_header(arg: str = ""):
     '''Define the page header as from the current page''' 
-    W_print_pg_header(cstr(arg))
+    W_print_pg_header(_cstr(arg))
     
 def w_print_pg_footer(arg: str = ""):
     '''Define the page footer as from the current page''' 
-    W_print_pg_footer(cstr(arg))
+    W_print_pg_footer(_cstr(arg))
 
     
 
