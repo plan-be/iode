@@ -403,16 +403,12 @@ keyboard_shortcuts.*
 *.bak
 *.prf
 *.$$$
-/api/version.h
-/tests/**/*.ini
+
 /pyiode/**/*.c
 !/pyiode/s_pyiode.c
 /pyiode/**/*.cpp
 !/pyiode/s_pyiode.c
 /pyiode/cythonize_iode.py
-/tests/output
-/doc/src/iode1.mif
-/doc/src/iode2.mif
 
 /pyiode_2023/**/*.c
 /pyiode_2023/**/*.pyd
@@ -421,3 +417,11 @@ keyboard_shortcuts.*
 /pyiode_2023/build
 /pyiode_2023/vc64
 /pyiode_2023/vc64/build
+
+/api/version.h
+/tests/**/*.ini
+/tests/output
+
+/doc/source/conf.py
+/doc/src/iode1.mif
+/doc/src/iode2.mif
