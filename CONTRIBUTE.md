@@ -100,6 +100,7 @@ where `<target>` is one the item in the list below:
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
+- `iode_doc`         -> Builds the user documentation (using Python Sphinx)
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
 To build Python IODE (Cython), please run the Batch script makepy.bat in the subdirectory pydiode 
