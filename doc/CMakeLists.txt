@@ -5,6 +5,22 @@
 cmake_minimum_required (VERSION 3.16)
 
 message(STATUS "\n---- DOC ----\n")
+
+# ---- generate conf.py (Python Sphinx) ----
+# configure_file() substitutes variable values referenced as @VAR@ or ${VAR} in the input file content. 
+# Each variable reference will be replaced with the current value of the variable, or the empty string 
+# if the variable is not defined.
+# see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/source/conf.py.in ${CMAKE_CURRENT_SOURCE_DIR}/source/conf.py)
+
+add_custom_target(iode_doc
+    COMMAND make html
+    DEPENDS source/conf.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Building Python (Sphinx) documentation using Python ${Python_VERSION}.\n"
+)
+add_dependencies(iode_doc iode_python)
+
 add_subdirectory(keyboard_shortcuts)
 
 ## Add source to this project's executable.
