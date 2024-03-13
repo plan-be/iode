@@ -14,6 +14,11 @@ def cpp_string_vector_to_py(vector[string] vec) -> List[str]:
     return [value.decode() for value in vec]
 
 
+# VERSION
+# -------
+__version__ = "${CMAKE_PROJECT_VERSION}"
+
+
 # IODE CONSTANTS
 # --------------
 nan: float = L_NAN
