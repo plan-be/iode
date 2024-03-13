@@ -390,26 +390,25 @@ keyboard_shortcuts.*
 *.tb$
 *.va$
 
-# NSIS
-/nsis/*.nsh
-!/nsis/*template*.nsh
-
-/nsis/*.nsi
-!/nsis/*template*.nsi
-
 # Others
 *.exp
 #*.ini
 *.bak
 *.prf
 *.$$$
+# ==== By Folders ====
 
+# C API
+/api/version.h
+
+# PYTHON
 /pyiode/**/*.c
 !/pyiode/s_pyiode.c
 /pyiode/**/*.cpp
 !/pyiode/s_pyiode.cpp
 /pyiode/common.pyx
 /pyiode/cythonize_iode.py
+/pyiode/common.pyx
 
 /pyiode_2023/**/*.c
 /pyiode_2023/**/*.pyd
@@ -419,10 +418,24 @@ keyboard_shortcuts.*
 /pyiode_2023/vc64
 /pyiode_2023/vc64/build
 
-/api/version.h
-/tests/**/*.ini
-/tests/output
+# NSIS
+/nsis/*.nsh
+!/nsis/*template*.nsh
 
+/nsis/*.nsi
+!/nsis/*template*.nsi
+
+# DOC
 /doc/source/conf.py
+/doc/source/_autosummary
+/doc/source/_generated
+
 /doc/src/iode1.mif
 /doc/src/iode2.mif
+
+/doc/build/doctrees
+/doc/build/html
+
+# TESTS
+/tests/**/*.ini
+/tests/output
