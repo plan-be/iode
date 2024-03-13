@@ -407,7 +407,8 @@ keyboard_shortcuts.*
 /pyiode/**/*.c
 !/pyiode/s_pyiode.c
 /pyiode/**/*.cpp
-!/pyiode/s_pyiode.c
+!/pyiode/s_pyiode.cpp
+/pyiode/common.pyx
 /pyiode/cythonize_iode.py
 
 /pyiode_2023/**/*.c
