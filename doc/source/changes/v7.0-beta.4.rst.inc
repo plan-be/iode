@@ -29,6 +29,6 @@ Fixed Bugs 🛠️
           a IODE database tab (#352)
 
 Miscellaneous 🤷‍♀️
-----------------
+-----------------
 
   * Compile the C API using the default alignment for the C structs (#350)
