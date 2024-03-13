@@ -30,6 +30,20 @@
    - numpy
    - pandas
    - larray
+   - sphinx 
+   - numpydoc
+   - nbsphinx
+   - sphinx_rtd_theme
+   - myst-parser
+
+**note**: to install `larray`, you have to run:
+```bash
+conda install -c larray-project larray
+```
+and for all other libraries:
+```bash
+conda install -c conda-forge <list of libraries>
+```
 
 (*) already installed on the Github Actions host-runner [windows-xxx](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
 
