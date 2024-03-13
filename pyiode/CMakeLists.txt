@@ -22,10 +22,8 @@ message(STATUS "from the template file ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iod
 # Each variable reference will be replaced with the current value of the variable, or the empty string 
 # if the variable is not defined.
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py
-)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py.in ${CMAKE_CURRENT_SOURCE_DIR}/cythonize_iode.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.pyx.in ${CMAKE_CURRENT_SOURCE_DIR}/common.pyx)
 
 message(STATUS "DONE\n")
 
