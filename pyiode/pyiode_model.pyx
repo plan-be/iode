@@ -40,8 +40,8 @@ def model_simulate(sample_from: str, sample_to: str, eqs_list=None, endo_exo_lis
     elif endo_exo_list is None:
         endo_exo_list = ""
         
-    if IodeModelSimulate(cstr(sample_from), cstr(sample_to), 
-                         cstr(eqs_list), cstr(endo_exo_list),
+    if IodeModelSimulate(_cstr(sample_from), _cstr(sample_to), 
+                         _cstr(eqs_list), _cstr(endo_exo_list),
                          eps, relax, maxit, init_values, sort_algo, nb_passes, debug, 
                          newton_eps, newton_maxit, newton_debug):
         raise RuntimeError(f"Simulation failed")

@@ -65,7 +65,7 @@ def data_update(obj_name: str, obj_value: str, obj_type: int):
     '''
      
     cmd = obj_name + " " + obj_value
-    if B_DataUpdate(cstr(cmd), obj_type):
+    if B_DataUpdate(_cstr(cmd), obj_type):
         raise RuntimeError(f"{obj_name} update failed")
 
 def data_update_cmt(obj_name: str, obj_value: str):
@@ -93,7 +93,7 @@ def data_update_scl(obj_name: str, value: float = None, relax: float = None, std
     if stderr is None: cmd += " -- "
     else:              cmd += " " + repr(stderr)
 
-    if B_DataUpdate(cstr(cmd), K_SCL):
+    if B_DataUpdate(_cstr(cmd), K_SCL):
         raise RuntimeError(f"Scalar {obj_name} update failed")
 
 def data_update_var(varname: str, values, operation: str = "L", per_from: str = None):
@@ -143,6 +143,6 @@ def data_update_var(varname: str, values, operation: str = "L", per_from: str = 
     #    cmd += f" {x}"
  
     #print(f"Command:{cmd}")
-    if B_DataUpdate(cstr(cmd), K_VAR) != 0:
+    if B_DataUpdate(_cstr(cmd), K_VAR) != 0:
         raise RuntimeError(f"Variable {varname} update failed")
 
