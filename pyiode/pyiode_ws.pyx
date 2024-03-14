@@ -82,6 +82,7 @@
 
 # TODO: rewrite IodeContents with regex or a better algorithm because K_grep() is VERY slow for large databases
 
+from collections.abc import Iterable
 import warnings
 
 from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
@@ -134,11 +135,11 @@ def __ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
             res[nb] = pystr(s)
             nb = nb + 1
 
-    SCR_free_tbl(cnt)
+    SCR_free_tbl(<unsigned char **>cnt)
 
     return res
 
-def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = 6) -> List[str]:
+def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = K_VAR) -> List[str]:
     r"""Return the names of objects of a given type, satisfying pattern specification(s). 
     The resulting list is sorted in alphabetic order.
 
@@ -149,8 +150,8 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = 6) -> List[s
         Default '*', meaning "all objects".
 
     objtype: int
-        IODE object type (0-6, 0 for comments...)
-        Default 6 for
+        IODE object type : K_CMT, K_EQS, K_IDT, K_LST, K_SCL, K_TBL, K_VAR
+        Default K_VAR
 
     Returns
     -------
@@ -175,7 +176,7 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = 6) -> List[s
     if isinstance(pattern, str):
         return(__ws_content_from_str(pattern, objtype))
 
-    elif isinstance(pattern, list):
+    elif isinstance(pattern, Iterable):
         res = set()
         for pattern1 in pattern:
             res = res| set(__ws_content_from_str(pattern1, objtype))
@@ -321,8 +322,9 @@ def ws_save_var(filename: str):
 # High to Low
 # -----------
 def ws_htol(filename: str, varlist, series_type: int):
-    if isinstance(varlist, list):
-        varlist = ' '.join(varlist)
+    varlist = arg_to_str(varlist, sep = ' ')
+#    if isinstance(varlist, list):
+#        varlist = ' '.join(varlist)
 
     arg = f"{filename} {varlist}"
     if series_type == HTOL_LAST:
@@ -348,9 +350,7 @@ def ws_htol_sum(filename: str, varlist):
 # Low to High
 # -----------
 def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
-    if isinstance(varlist, list):
-        varlist = ' '.join(varlist)
-
+    varlist = arg_to_str(varlist, sep = ' ')
     arg = f"{method} {filename} {varlist}"
     if series_type == LTOH_FLOW:
         if B_WsLtoHFlow(cstr(arg)):
