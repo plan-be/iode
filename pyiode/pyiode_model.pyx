@@ -14,24 +14,31 @@
 #                   init_values: int = KV_INIT_TM1, 
 #                   sort_algo: int = SORT_BOTH, 
 #                   nb_passes: int = 5, 
-#                   debug: int = 0, 
+#                   debug: bool = False, 
 #                   newton_eps: float = 1e-6, 
 #                   newton_maxit: int = 50, 
-#                   newton_debug: int = 0)          
+#                   newton_debug: bool = False)
 #  
 #   model_calc_scc(nb_passes: int = 5, 
-#                   pre_listname: str, 
-#                   inter_listname: str, 
-#                   post_listname: str, 
-#                   eqs_list = None)
-#  
-#   model_simulateparms => included int the parameters of model_simulate(), model_simulate_scc() and model_calc_scc()
-#  
+#                   pre_listname: str = "_PRE", 
+#                   inter_listname: str = "_INTER", 
+#                   post_listname: str = "_POST", 
+#                   eqs_list = None):
+#
 #   model_simulate_scc( sample_from: str, sample_to: str, 
-#                       pre_listname: str = "_PRE", 
-#                       inter_listname: str = "_INTER", 
-#                       post_listname: str = "_POST")
-                   
+#                           pre_listname: str = "_PRE", 
+#                           inter_listname: str = "_INTER", 
+#                           post_listname: str = "_POST",
+#                           eps: float = 0.0001, 
+#                           relax: float = 1.0, 
+#                           maxit: int = 100, 
+#                           init_values: int = KV_INIT_TM1, 
+#                           debug: bool = False, 
+#                           newton_eps: float = 1e-6, 
+#                           newton_maxit: int = 50, 
+#                           newton_debug: bool = False)
+#
+#  
 #   model_exchange => included in the parameters of model_simulate()
 #   model_compile  => not yet implemented
 #  
@@ -59,23 +66,15 @@ def model_simulate(sample_from: str, sample_to: str,
                     init_values: int = KV_INIT_TM1, 
                     sort_algo: int = SORT_BOTH, 
                     nb_passes: int = 5, 
-                    debug: int = 0, 
+                    debug: bool = False, 
                     newton_eps: float = 1e-6, 
                     newton_maxit: int = 50, 
-                    newton_debug: int = 0):
+                    newton_debug: bool = False):
     '''
     Simulate the model defined by eqs_list on the period [sample_from, sample_to].     
     '''
-    if isinstance(eqs_list, list):
-        eqs_list = ','.join(eqs_list)
-    elif eqs_list is None:
-        eqs_list = ""
-
-    if isinstance(endo_exo_list, list):
-        endo_exo_list = ','.join(endo_exo_list)
-    elif endo_exo_list is None:
-        endo_exo_list = ""
-        
+    eqs_list = arg_to_str(eqs_list, sep = ',')
+    endo_exo_list = arg_to_str(endo_exo_list, sep = ',')
     model_simulate_save_parms(eps, relax, maxit, init_values, sort_algo, nb_passes)
     
     if IodeModelSimulate(cstr(sample_from), cstr(sample_to), 
@@ -121,14 +120,10 @@ def model_calc_scc(nb_passes: int = 1,
     
     Examples
     --------
-    >>> iode.model_calc_scc(nb_passes=1)        # doctest: +SKIP
+    >>> iode.model_calc_scc(nb_passes=1)
     
     '''
-    if isinstance(eqs_list, list):
-        eqs_list = ','.join(eqs_list)
-    elif eqs_list is None:
-        eqs_list = ""
-    
+    eqs_list = arg_to_str(eqs_list, sep = ',')
     if IodeModelCalcSCC(nb_passes, 
                          cstr(pre_listname), cstr(inter_listname), cstr(post_listname),
                          cstr(eqs_list)):
@@ -143,16 +138,14 @@ def model_simulate_scc( sample_from: str, sample_to: str,
                         relax: float = 1.0, 
                         maxit: int = 100, 
                         init_values: int = KV_INIT_TM1, 
-                        debug: int = 0, 
+                        debug: bool = False, 
                         newton_eps: float = 1e-6, 
                         newton_maxit: int = 50, 
-                        newton_debug: int = 0):
+                        newton_debug: bool = False):
     '''
     Simulate a model defined by the 3 Connex Components (stored in 3 lists).
     '''
-
     model_simulate_save_parms(eps, relax, maxit, init_values, -1, -1)
-    
     if IodeModelSimulateSCC(cstr(sample_from), cstr(sample_to), 
                          cstr(pre_listname), cstr(inter_listname), cstr(post_listname),
                          eps, relax, maxit, init_values, debug, 
@@ -173,12 +166,6 @@ def model_simulate_save_parms(
         The purpose of this function is to enable later reporting
         via the functions model_simulate_maxit(), model_simulate_eps()...
     '''
-    global KSIM_MAXIT
-    global KSIM_EPS
-    global KSIM_RELAX
-    global KSIM_PASSES
-    global KSIM_SORT
-    global KSIM_START
 
     KSIM_MAXIT = maxit
     KSIM_EPS = eps
