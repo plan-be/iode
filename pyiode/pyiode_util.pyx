@@ -17,8 +17,8 @@
 #       clear_error_msgs()                      | Empty the stack of error messages
 # ------------------------------------------------------------------------------------------------------------------
 
+from collections.abc import Iterable
 from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
-
 
 # Miscellaneous functions
 # -----------------------
@@ -38,13 +38,13 @@ def pystr(cstr) -> str:
     if cstr is None: return None
     return cstr.decode("cp850")
 
-# Convert None, a list or str or an str to a str
+# Convert None, a string or an Iterable to a string
 def arg_to_str(arg, sep: str = ' ') -> str:
     '''Convert a string, a list of strings or None to a string.'''
-    if isinstance(arg, list):
-        return sep.join(arg)
-    elif isinstance(arg, str):
+    if isinstance(arg, str):
         return arg
+    if isinstance(arg, Iterable):
+        return sep.join(arg)
 #    elif callable(arg):
 #        res = arg()
 #        if callable(res): 
@@ -54,7 +54,7 @@ def arg_to_str(arg, sep: str = ' ') -> str:
     elif arg is None:
         return ""
     else:
-        raise RuntimeError(f"arg_to_str(): Bad argument type: {type(arg)}")
+        raise RuntimeError(f"arg_to_str(): Bad argument type: {type(arg).__name__}")
     
 
 
