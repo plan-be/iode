@@ -25,7 +25,7 @@ cdef extern from "iode.h":
 
     # SCR4 functions
     cdef int    SCR_free(void *ptr)
-    cdef int    SCR_free_tbl(char **tbl)
+    cdef int    SCR_free_tbl(unsigned char **tbl)
 
     # TO Check
     cdef int    PyIodePrint(char*name, void* values, int lg)
