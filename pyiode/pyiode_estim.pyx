@@ -16,9 +16,8 @@ def eqs_estimate(eq_list: Union[str, List[str]], afrom: str, ato: str):
     Estimate an equation or a block of equations on the given sample.
     The estimation method and the instruments must be specified in the equation before the estimation.
     '''
-    if isinstance(eq_list, list):
-        eq_list = ','.join(eq_list)
-
+    eq_list = arg_to_str(eq_list, sep = ',')
+    
     if IodeEstimate(cstr(eq_list), cstr(afrom), cstr(ato)):
         raise RuntimeError(f"Estimation of {eq_list} failed")
 
