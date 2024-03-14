@@ -5,11 +5,10 @@
 # 
 #  IODE report functions
 #  ---------------------
-#   report_exec(filename_parms: str)     | Execute a report
-#   reportline_exec(repline: str)        | Execute a report line
+#   report_exec(filename_parms: str)                | Execute a report with optional arguments
+#   reportline_exec(repline: Union[str, List[str]]) | Execute report line(s)
 
 from pyiode_reports cimport B_ReportExec, B_ReportLine
-
 
 # $ExecReport filename_parms
 # TODO: add parameters
@@ -28,4 +27,3 @@ def reportline_exec(repline: Union[str, List[str]]):
     rc = B_ReportLine(cstr(repline))
     if rc != 0:
         raise  RuntimeError(f"Execution of report line '{repline}' has failed. rc = {rc}")
-
