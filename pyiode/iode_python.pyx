@@ -50,11 +50,11 @@
 #      
 #      Create the Python equivalent to IodeMyFn() in the appropriate module pyiode_*.pyx.
 #          def myfn(arg):
-#              return IodeMyFn(cstr(arg))
+#              return IodeMyFn(_cstr(arg))
 #  
 #      If needed, use the python utility functions:
-#          - cstr() to translate python strings (utf8) to C char* (ansi code cp850)
-#          - pystr() to do the reverse
+#          - _cstr() to translate python strings (utf8) to C char* (ansi code cp850)
+#          - _pystr() to do the reverse
 #          - pylist(char** c_list) to convert C char** to python lists 
 #               (don't forget to free c_list afterwards, e.g. by a call to SCR_free_tbl(c_list))
 #          - pyfloats(double *cvar, int lg) to convert a vector of doubles of length lg 

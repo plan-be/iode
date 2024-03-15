@@ -86,13 +86,13 @@ def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
     >>> nbobjs2
     0
     '''
-    if B_DataDelete(cstr(pattern), obj_type):
+    if B_DataDelete(_cstr(pattern), obj_type):
         raise RuntimeError(f"Delete '{pattern}' of type {obj_type} failed")
 
 # delete_<obj_type> functions
 # ---------------------------
 def delete_obj(obj_name: str, obj_type: int):
-    if IodeDeleteObj(cstr(obj_name), obj_type): 
+    if IodeDeleteObj(_cstr(obj_name), obj_type): 
         raise RuntimeError(f"Variable {obj_name} cannot be deleted")
 
 def delete_cmt(name: str):
@@ -142,8 +142,8 @@ def set_cmt(name: str, cmt: str):
 def get_eqs_lec(eq_name: str) -> str:
     '''Return an IODE equation LEC form as a string'''
     
-    lec850 = IodeGetEqsLec(cstr(eq_name))
-    return pystr(lec850)
+    lec850 = IodeGetEqsLec(_cstr(eq_name))
+    return _pystr(lec850)
 
 def get_eqs(eq_name: str) -> Equation:
     '''Return an IODE equation as an iode.Equation class instance'''
@@ -156,45 +156,45 @@ def get_eqs(eq_name: str) -> Equation:
     cdef char   *instr
     cdef float  tests[20]
     
-    rc = IodeGetEqs(cstr(eq_name), &lec, &method, sample_from, sample_to, &blk, &instr, tests)
+    rc = IodeGetEqs(_cstr(eq_name), &lec, &method, sample_from, sample_to, &blk, &instr, tests)
     if rc != 0:
         return None
     
     py_tests = [tests[i] for i in range(10)]
     comment = ""
-    eq_res = Equation(eq_name, pystr(lec), method, pystr(sample_from), pystr(sample_to),  
-                comment, pystr(instr), pystr(blk), py_tests)
+    eq_res = Equation(eq_name, _pystr(lec), method, _pystr(sample_from), _pystr(sample_to),  
+                comment, _pystr(instr), _pystr(blk), py_tests)
 
     return eq_res
 
 
 # TODO: save other (optional) equation properties like tests, sample, method
 def set_eqs(eq_name: str, lec: str):
-    if IodeSetEqs(cstr(eq_name), cstr(lec)):
+    if IodeSetEqs(_cstr(eq_name), _cstr(lec)):
         raise RuntimeError(f"Equation {eq_name} cannot be set")
 
 # Identities
 # ----------
 def get_idt(name: str) -> str:
     '''Return the LEC formula of an IODE identity '''
-    idt850 = IodeGetIdt(cstr(name))
-    return pystr(idt850)
+    idt850 = IodeGetIdt(_cstr(name))
+    return _pystr(idt850)
 
 def set_idt(name: str, idt: str):
     '''Update or create an identity'''
-    if IodeSetIdt(cstr(name), cstr(idt)):
+    if IodeSetIdt(_cstr(name), _cstr(idt)):
         raise RuntimeError(f"Identity {name} cannot be set")
     
 # Lists
 # -----
 def get_lst(name: str) -> str:
     '''Return a list as a string'''
-    lst850 = IodeGetLst(cstr(name))
-    return pystr(lst850)
+    lst850 = IodeGetLst(_cstr(name))
+    return _pystr(lst850)
 
 def set_lst(name: str, lst: str):
     '''Update or create a list fro a string'''
-    if IodeSetLst(cstr(name), cstr(lst)):
+    if IodeSetLst(_cstr(name), _cstr(lst)):
         raise RuntimeError(f"List {name} cannot be set")
 
 
@@ -206,7 +206,7 @@ def get_scl(name: str) -> Scalar:
     cdef    double crelax
     cdef    double cstd
     
-    cdef rc = IodeGetScl(cstr(name), &cval, &crelax, &cstd)
+    cdef rc = IodeGetScl(_cstr(name), &cval, &crelax, &cstd)
     if rc == 0:
         res = Scalar(cval, crelax, cstd)
         return res
@@ -216,7 +216,7 @@ def get_scl(name: str) -> Scalar:
 
 def set_scl(name: str, scalar: Scalar):
     '''Create or update an IODE scalar from an iode.Scalar class instance'''
-    if IodeSetScl(cstr(name), scalar.value, scalar.relax, scalar.std):
+    if IodeSetScl(_cstr(name), scalar.value, scalar.relax, scalar.std):
         raise RuntimeError(f"Scalar {name} cannot be set")
 
     
@@ -243,7 +243,7 @@ def get_var(varname: str) -> List[float]:
 # Copy (or refer to) an IODE var into a ndarray
 def get_var_as_ndarray(varname: str, copy: bool = True) -> np.ndarray:
     '''Get an IODE variable in a numpy ndarray'''
-    vararray = iodevar_to_ndarray(cstr(varname), copy)
+    vararray = iodevar_to_ndarray(_cstr(varname), copy)
     return vararray 
 
 # Copy a ndarray or a list into KV_WS
@@ -257,7 +257,6 @@ def set_var(varname: str, py_values):
     ndarray = np.array(py_values, dtype = np.double) 
     
     c_values = <double*>np.PyArray_DATA(ndarray)
-    pos =  IodeSetVector(cstr(varname), c_values, 0, 0, -1)
+    pos =  IodeSetVector(_cstr(varname), c_values, 0, 0, -1)
     if pos < 0:
         raise RuntimeError(f"Variable {varname} cannot be set")
-    

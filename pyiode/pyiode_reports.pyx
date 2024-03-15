@@ -14,7 +14,7 @@ from pyiode_reports cimport B_ReportExec, B_ReportLine
 # TODO: (ald) add Parameters, Returns and Examples section 
 def report_exec(filename_parms: str):
     '''Execute a report'''
-    rc = B_ReportExec(cstr(filename_parms))
+    rc = B_ReportExec(_cstr(filename_parms))
     if rc != 0:
         raise  RuntimeError(f"Execution of report {'filename_parms'} has failed. rc = {rc}")
 
@@ -24,7 +24,7 @@ def report_exec(filename_parms: str):
 def reportline_exec(repline: Union[str, List[str]]):
     '''Execute report line(s)'''
     
-    repline = arg_to_str(repline, sep = '\n')
-    rc = B_ReportLine(cstr(repline))
+    repline = _arg_to_str(repline, sep = '\n')
+    rc = B_ReportLine(_cstr(repline))
     if rc != 0:
         raise  RuntimeError(f"Execution of report line '{repline}' has failed. rc = {rc}")

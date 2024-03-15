@@ -35,7 +35,7 @@ cdef __la_to_ws_pos(la_input, int* la_pos, int* ws_pos, int* la_lg, time_axis_na
         raise RuntimeError(f"Passed Array object must contain an axis named {time_axis_name}.\nGot axes {repr(la_input.axes)}.")
 
     time = la_input.axes[time_axis_name]
-    IodeCalcSamplePosition(cstr(time.labels[0]), cstr(time.labels[-1]), la_pos, ws_pos, la_lg)
+    IodeCalcSamplePosition(_cstr(time.labels[0]), _cstr(time.labels[-1]), la_pos, ws_pos, la_lg)
     #print(f"la_pos: {la_pos} - ws_pos: {ws_pos} - la_lg: {la_lg} ")
 
 
@@ -62,7 +62,7 @@ def larray_to_ws(la_input: Array, time_axis_name: str = 'time', sep: str = "_"):
 
     # Define the KV_WS sample if not yet set
     if not IodeIsSampleSet():
-        IodeSetSampleStr(cstr(time.labels[0]), cstr(time.labels[-1]))
+        IodeSetSampleStr(_cstr(time.labels[0]), _cstr(time.labels[-1]))
     
     # Push the time axis as last axis and combine all other axes 
     la_input = la_input.transpose(..., time_axis_name)
@@ -85,20 +85,20 @@ def larray_to_ws(la_input: Array, time_axis_name: str = 'time', sep: str = "_"):
             for v, la_line_data in zip(vars.labels, la_input.data):
                 # Save the vector of doubles in KV_WS
                 values = < double * > np.PyArray_DATA(la_line_data)
-                IodeSetVector(cstr(v), values, la_pos, ws_pos, la_lg)
+                IodeSetVector(_cstr(v), values, la_pos, ws_pos, la_lg)
         else:
             for v, la_line_data in zip(vars.labels, la_input.data):
                 la_line_data = la_line_data.copy()  # copy if non contiguous
                 # Save the vector of doubles in KV_WS
                 values = < double * > np.PyArray_DATA(la_line_data)
-                IodeSetVector(cstr(v), values, la_pos, ws_pos, la_lg)
+                IodeSetVector(_cstr(v), values, la_pos, ws_pos, la_lg)
     else:
         for v, la_line_data in zip(vars.labels, la_input.data):
             la_line_data = la_line_data.astype("double") # astype creates a copy
 
             # Save the vector of doubles in KV_WS
             values = <double*>np.PyArray_DATA(la_line_data)
-            IodeSetVector(cstr(v), values, la_pos, ws_pos, la_lg)
+            IodeSetVector(_cstr(v), values, la_pos, ws_pos, la_lg)
 
  
 # TODO: review this function logic / parameters 

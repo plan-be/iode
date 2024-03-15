@@ -6,9 +6,9 @@
 #  Utilities
 #  =========
 #       version() -> str                        | Return the Iode version.    
-#       cstr(pystr) -> bytes                    | Convert a python string (UTF8) to a C null terminated string (ANSI cp850).
-#       pystr(cstr) -> str                      | Convert a C null terminated string (ANSI cp850) into a python string (UTF8).
-#       arg_to_str(arg, sep: str = ' ') -> str  | Convert None, a list of str or an str to a str
+#       _cstr(pystr) -> bytes                   | Convert a python string (UTF8) to a C null terminated string (ANSI cp850).
+#       _pystr(cstr) -> str                     | Convert a C null terminated string (ANSI cp850) into a python string (UTF8).
+#       _arg_to_str(arg, sep: str = ' ') -> str | Convert None, a list of str or an str to a str
 #       suppress_msgs()                         | Suppress the output during an IODE session.'''
 #       reset_msgs()                            | Reset the normal output mechanism during an IODE session.'''
 #       
@@ -24,33 +24,26 @@ from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddE
 # -----------------------
 def version() -> str:
     "Return the Iode version."
-    return pystr(IodeVersion())
+    return _pystr(IodeVersion())
+
 
 # Conversions python-C strings
 # ----------------------------
-def cstr(pystr) -> bytes:
+def _cstr(py_str) -> bytes:
     '''Convert a python string (UTF8) to a C null terminated string (ANSI cp850).'''
-    if pystr is None: return None
-    return pystr.encode("cp850")
+    return py_str.encode("cp850") if py_str is not None else None
 
-def pystr(cstr) -> str:
+def _pystr(c_str) -> str:
     '''Convert a C null terminated string (ANSI cp850) into a python string (UTF8).'''
-    if cstr is None: return None
-    return cstr.decode("cp850")
+    return c_str.decode("cp850") if c_str is not None else None
 
-# Convert None, a string or an Iterable to a string
-def arg_to_str(arg, sep: str = ' ') -> str:
+# Convert None, a string or an Iterable of strings to a string
+def _arg_to_str(arg, sep: str = ' ') -> str:
     '''Convert a string, a list of strings or None to a string.'''
     if isinstance(arg, str):
         return arg
-    if isinstance(arg, Iterable):
+    elif isinstance(arg, Iterable) and all(isinstance(item, str) for item in arg):
         return sep.join(arg)
-#    elif callable(arg):
-#        res = arg()
-#        if callable(res): 
-#            raise RuntimeError(f"arg_to_str(): Bad argument type: {type(arg)}")
-#        else:
-#            return arg_to_str(res, sep)
     elif arg is None:
         return ""
     else:
@@ -87,7 +80,7 @@ def add_error_msg(msg: str = ''):
     >>> display_error_msgs() # doctest: +SKIP
     '''
 
-    IodeAddErrorMsg(cstr(msg))
+    IodeAddErrorMsg(_cstr(msg))
  
  
 def display_error_msgs():
