@@ -5,17 +5,17 @@
 #  
 #  Utilities using explicit C data types in arguments 
 #  --------------------------------------------------
-#   _pylist(char** c_list)                           Convert a C vector of char* to a python list of python str
-#   _pyfloats(double *cvar, int lg)                  Convert a C vector of lg doubles into a list of python floats 
-#   _iodevar_to_ndarray(char *name, int copy = True) Create an numpy array from the content of an IODE variable
-#   _iodesample_to_ndarray()                         Convert the current WS sample into a numpy 1D array of doubles
+#   pylist(char** c_list)                           Convert a C vector of char* to a python list of python str
+#   pyfloats(double *cvar, int lg)                  Convert a C vector of lg doubles into a list of python floats 
+#   iodevar_to_ndarray(char *name, int copy = True) Create an numpy array from the content of an IODE variable
+#   iodesample_to_ndarray()                         Convert the current WS sample into a numpy 1D array of doubles
 
 cimport numpy as np
 from pyiode_cdef cimport IodeGetVector
 from pyiode_sample cimport IodeGetSampleAsDoubles
 
 
-cdef _pylist(char** c_list):
+cdef pylist(char** c_list):
     '''
     Convert a C vector of char* to a python list of strings
     
@@ -51,7 +51,7 @@ cdef _pylist(char** c_list):
 
 
 
-cdef _pyfloats(double *cvar, int lg):
+cdef pyfloats(double *cvar, int lg):
     '''Convert a C vector of lg doubles into a list of python floats'''
     if cvar == NULL:
         return []
@@ -64,7 +64,7 @@ cdef _pyfloats(double *cvar, int lg):
     return res    
 
 
-cdef _iodevar_to_ndarray(char * name, int copy = True):
+cdef iodevar_to_ndarray(char * name, int copy = True):
     '''
     Create an numpy array from the content of an IODE variable (KV_WS[name]). 
     The ndarray data may be either a newly allocated vector, or may point to the IODE memory.
@@ -107,7 +107,7 @@ cdef _iodevar_to_ndarray(char * name, int copy = True):
  
 # Obsolete ? 
 # ----------
-cdef _iodesample_to_ndarray():
+cdef iodesample_to_ndarray():
     '''Convert the current WS sample into a numpy 1D array of doubles'''
     
     cdef np.npy_intp shape[1]
