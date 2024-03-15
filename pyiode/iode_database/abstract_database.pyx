@@ -136,7 +136,28 @@ cdef class _AbstractDatabase:
 
         Returns
         -------
-        { CommentsDatabase | EquationsDatabase | IdentitiesDatabase | ListsDatabase | ScalarsDatabase | TablesDatabase | VariablesDatabase }
+        { CommentsSubset | EquationsSubset | IdentitiesSubset | ListsSubset | ScalarsSubset | TablesSubset | VariablesSubset }
+        
+        Examples
+        --------
+        >>> from iode import Comments
+        >>> Comments.load("../data/fun.cmt")
+
+        >>> # create a subset with all comments with name starting with 'A'
+        >>> cmt_subset = Comments.subset("A*")
+        >>> cmt_subset.get_names()
+        ['ACAF', 'ACAG', 'ACOUG', 'AQC']
+        >>> # any modification made on the subset is visible in the global database
+        >>> cmt_subset['ACAF'] = "Modified Comment"
+        >>> Comments['ACAF']
+        'Modified Comment'
+
+        >>> # force to return a 'deep copy' subset
+        >>> cmt_subset = Comments.subset("*_", copy=True)
+        >>> # any modification made on the subset let the global database unchanged
+        >>> cmt_subset['BENEF_'] = "Modified Comment"
+        >>> Comments['BENEF_']
+        'Ondernemingen: niet-uitgekeerde winsten (vóór statistische aanpassing).'
         """
         raise NotImplementedError()
 
