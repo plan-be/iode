@@ -44,7 +44,7 @@ cdef pylist(char** c_list):
     nb = 0
     while c_list[nb] != NULL:
         s = bytes(c_list[nb])      
-        res[nb] = pystr(s)
+        res[nb] = _pystr(s)
         nb = nb + 1
         
     return res

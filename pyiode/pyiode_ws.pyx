@@ -117,7 +117,7 @@ def _ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
     ['ACAF', 'ACAG']
     """
     
-    cdef char **cnt = IodeContents(cstr(pattern), objtype)
+    cdef char **cnt = IodeContents(_cstr(pattern), objtype)
     cdef int nb
 
     res = []
@@ -132,7 +132,7 @@ def _ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
         nb = 0
         while cnt[nb] != NULL:
             s = bytes(cnt[nb])
-            res[nb] = pystr(s)
+            res[nb] = _pystr(s)
             nb = nb + 1
 
     free_tbl(cnt)
@@ -252,7 +252,7 @@ def ws_clear_var():
 def ws_load(filename: str, filetype: int) -> int:
     '''Load an IODE file and return the number of read objects'''
     
-    nb = IodeLoad(cstr(filename), filetype)
+    nb = IodeLoad(_cstr(filename), filetype)
     if nb < 0:
         raise RuntimeError(f"File {filename} of type {filetype} cannot be loaded")
     return nb    
@@ -285,7 +285,7 @@ def ws_load_var(filename: str) -> int:
 # -------
 def ws_save(filename: str, filetype: int):
     '''Save the current IODE workspace of a given type'''
-    if IodeSave(cstr(filename), filetype):
+    if IodeSave(_cstr(filename), filetype):
         raise RuntimeError(f"Workspace of type {filetype} cannot be saved in file {filename}.")
 
 def ws_save_cmt(filename: str):
@@ -321,19 +321,19 @@ def ws_save_var(filename: str):
 # High to Low
 # -----------
 def ws_htol(filename: str, varlist, series_type: int):
-    varlist = arg_to_str(varlist, sep = ' ')
+    varlist = _arg_to_str(varlist, sep = ' ')
 #    if isinstance(varlist, list):
 #        varlist = ' '.join(varlist)
 
     arg = f"{filename} {varlist}"
     if series_type == HTOL_LAST:
-        if B_WsHtoLLast(cstr(arg)):
+        if B_WsHtoLLast(_cstr(arg)):
             raise RuntimeError(f"ws_htol_last() on file {filename} failed.")
     elif series_type == HTOL_MEAN:
-        if B_WsHtoLMean(cstr(arg)):
+        if B_WsHtoLMean(_cstr(arg)):
             raise RuntimeError(f"ws_htol_mean() on file {filename} failed.")
     else:
-        if B_WsHtoLSum(cstr(arg)):
+        if B_WsHtoLSum(_cstr(arg)):
             raise RuntimeError(f"ws_htol_sum() on file {filename} failed.")
 
 def ws_htol_last(filename: str, varlist):
@@ -349,13 +349,13 @@ def ws_htol_sum(filename: str, varlist):
 # Low to High
 # -----------
 def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
-    varlist = arg_to_str(varlist, sep = ' ')
+    varlist = _arg_to_str(varlist, sep = ' ')
     arg = f"{method} {filename} {varlist}"
     if series_type == LTOH_FLOW:
-        if B_WsLtoHFlow(cstr(arg)):
+        if B_WsLtoHFlow(_cstr(arg)):
             raise RuntimeError(f"ws_ltoh_flow() on file {filename} failed.")
     else:
-        if B_WsLtoHStock(cstr(arg)):
+        if B_WsLtoHStock(_cstr(arg)):
             raise RuntimeError(f"ws_ltoh_stock() on file {filename} failed.")
 
 def ws_ltoh_flow(filename: str, varlist, method: Union[int, str] = LTOH_CS):

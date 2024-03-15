@@ -76,12 +76,12 @@ def model_simulate(sample_from: str, sample_to: str,
     '''
     Simulate the model defined by eqs_list on the period [sample_from, sample_to].     
     '''
-    eqs_list = arg_to_str(eqs_list, sep = ',')
-    endo_exo_list = arg_to_str(endo_exo_list, sep = ',')
+    eqs_list = _arg_to_str(eqs_list, sep = ',')
+    endo_exo_list = _arg_to_str(endo_exo_list, sep = ',')
     model_simulate_save_parms(eps, relax, maxit, init_values, sort_algo, nb_passes)
     
-    if IodeModelSimulate(cstr(sample_from), cstr(sample_to), 
-                         cstr(eqs_list), cstr(endo_exo_list),
+    if IodeModelSimulate(_cstr(sample_from), _cstr(sample_to), 
+                         _cstr(eqs_list), _cstr(endo_exo_list),
                          eps, relax, maxit, init_values, sort_algo, nb_passes, debug, 
                          newton_eps, newton_maxit, newton_debug):
         raise RuntimeError(f"Simulation failed")
@@ -128,10 +128,9 @@ def model_calc_scc(nb_passes: int = 1,
     274
     >>> model_calc_scc(nb_passes=1)
     '''
-    eqs_list = arg_to_str(eqs_list, sep = ',')
-    if IodeModelCalcSCC(nb_passes, 
-                         cstr(pre_listname), cstr(inter_listname), cstr(post_listname),
-                         cstr(eqs_list)):
+    eqs_list = _arg_to_str(eqs_list, sep = ',')
+    if IodeModelCalcSCC(nb_passes, _cstr(pre_listname), _cstr(inter_listname), 
+                        _cstr(post_listname), _cstr(eqs_list)):
         raise RuntimeError(f"Cannot create the model Connex Components")
     
 
@@ -152,10 +151,10 @@ def model_simulate_scc( sample_from: str, sample_to: str,
     Simulate a model defined by the 3 Connex Components (stored in 3 lists).
     '''
     model_simulate_save_parms(eps, relax, maxit, init_values, -1, -1)
-    if IodeModelSimulateSCC(cstr(sample_from), cstr(sample_to), 
-                         cstr(pre_listname), cstr(inter_listname), cstr(post_listname),
-                         eps, relax, maxit, init_values, debug, 
-                         newton_eps, newton_maxit, newton_debug):
+    if IodeModelSimulateSCC(_cstr(sample_from), _cstr(sample_to), 
+                            _cstr(pre_listname), _cstr(inter_listname), _cstr(post_listname),
+                            eps, relax, maxit, init_values, debug, 
+                            newton_eps, newton_maxit, newton_debug):
         raise RuntimeError(f"model_simulate_scc() failed")
         
 
@@ -179,8 +178,10 @@ def model_simulate_save_parms(
     KSIM_RELAX = relax
     KSIM_START = init_values
 
-    if nb_passes >= 0: KSIM_PASSES = nb_passes  # not used by model_simulate_scc()
-    if sort_algo >= 0: KSIM_SORT = sort_algo    # id.
+    if nb_passes >= 0: 
+        KSIM_PASSES = nb_passes  # not used by model_simulate_scc()
+    if sort_algo >= 0: 
+        KSIM_SORT = sort_algo    # id.
 
     
 # TODO: (ald) add Parameters, Returns and Examples section
@@ -245,16 +246,16 @@ def model_simulate_cpu_sort() -> int:
 # TODO: (ald) add Parameters, Returns and Examples section  
 def model_simulate_cpu(period: str) -> int:
     ''' Returns the elapsed time in ms during the last simulation of the given period'''
-    return IodeModelSimCpu(cstr(period))
+    return IodeModelSimCpu(_cstr(period))
 
 
 # TODO: (ald) add Parameters, Returns and Examples section  
 def model_simulate_niter(period: str) -> int:
     ''' Returns the number of iterations needed to reach a solution during the last simulation of the given period'''
-    return IodeModelSimNIter(cstr(period))
+    return IodeModelSimNIter(_cstr(period))
     
 
 # TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate_norm(period: str) -> float:
     ''' Returns the convergence threshold reached during the last simulation of the given period'''
-    return IodeModelSimNorm(cstr(period))
+    return IodeModelSimNorm(_cstr(period))

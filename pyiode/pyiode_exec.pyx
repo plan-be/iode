@@ -105,13 +105,13 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
 
     
     # Transforms Lists into strs
-    sample = arg_to_str(sample)
-    idt_list = arg_to_str(idt_list, ";")
-    var_files = arg_to_str(var_files, ";")
-    scl_files = arg_to_str(scl_files, ";")
+    sample = _arg_to_str(sample)
+    idt_list = _arg_to_str(idt_list, ";")
+    var_files = _arg_to_str(var_files, ";")
+    scl_files = _arg_to_str(scl_files, ";")
 
     clear_error_msgs() # clear messages before executing the function
-    rc = IodeExecuteIdts(cstr(sample), cstr(idt_list), cstr(var_files), cstr(scl_files), trace) 
+    rc = IodeExecuteIdts(_cstr(sample), _cstr(idt_list), _cstr(var_files), _cstr(scl_files), trace) 
     if rc < 0:
         display_error_msgs() 
         raise RuntimeError(f"idt_execute() failed.")
