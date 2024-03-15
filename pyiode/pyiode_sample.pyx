@@ -380,7 +380,7 @@ def ws_sample_to_list(from_period: str = "", to_period: str = "", as_floats: boo
         return
 
     if as_floats: 
-        vararray = iodesample_to_ndarray()
+        vararray = _iodesample_to_ndarray()
         return vararray
     else:
         start, end = ws_sample_get()
@@ -389,7 +389,7 @@ def ws_sample_to_list(from_period: str = "", to_period: str = "", as_floats: boo
         if not to_period:
             to_period = end
         smpl = IodeCreateSampleAsPeriods(_cstr(from_period), _cstr(to_period))
-        lst = pylist(smpl)
+        lst = _pylist(smpl)
         free_tbl(smpl)
         return lst 
         

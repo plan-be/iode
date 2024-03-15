@@ -40,6 +40,6 @@ def exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]:
         return IodeExecLecT(_cstr(lec), t)   # simple value
     else:
         cvar = IodeExecLec(_cstr(lec))       # vector of calculated values    
-        res = pyfloats(cvar, IodeGetSampleLength())
+        res = _pyfloats(cvar, IodeGetSampleLength())
         SCR_free(cvar)
         return res
