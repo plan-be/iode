@@ -21,13 +21,13 @@ from pyiode.iode_database.database cimport KDBAbstract as CKDBAbstract
 
 
 # Define the Python wrapper class for KDBAbstract
-cdef class __AbstractDatabase:
+cdef class _AbstractDatabase:
     cdef CKDBAbstract* abstract_db_ptr 
 
     # Constructor
     def __cinit__(self):
         # pointer *abstract_db_ptr is set in subclasses
-        if isinstance(self.__class__, __AbstractDatabase):
+        if isinstance(self.__class__, _AbstractDatabase):
             raise RuntimeError("Cannot instanciate an abstract class")
 
     # Destructor
@@ -375,7 +375,7 @@ cdef class __AbstractDatabase:
         if not isinstance(overwrite, bool):
             raise TypeError(f"'overwrite': Expected value of type boolean. Got value of type {type(overwrite).__name__}")
         
-        cdef CKDBAbstract* other_db_ptr = (<__AbstractDatabase>other).abstract_db_ptr
+        cdef CKDBAbstract* other_db_ptr = (<_AbstractDatabase>other).abstract_db_ptr
         self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
 
     def copy_into(self, input_files: Union[str, List[str]], objects_names: Union[str, List[str]]='*'):

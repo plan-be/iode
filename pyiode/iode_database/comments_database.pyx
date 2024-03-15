@@ -13,7 +13,7 @@ from pyiode.iode_database.database cimport Comments as cpp_global_comments
 
 
 @cython.final
-cdef class __CommentsDatabase(__AbstractDatabase):
+cdef class _CommentsDatabase(_AbstractDatabase):
     cdef CKDBComments* database_ptr
 
     def __cinit__(self):
@@ -31,8 +31,8 @@ cdef class __CommentsDatabase(__AbstractDatabase):
         cdef CKDBComments* kdb = new CKDBComments(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> __CommentsDatabase:
-        f"""{__AbstractDatabase.subset.__doc__}
+    def subset(self, pattern: str, copy: bool = False) -> _CommentsDatabase:
+        f"""{_AbstractDatabase.subset.__doc__}
 
         Examples
         --------
@@ -55,7 +55,7 @@ cdef class __CommentsDatabase(__AbstractDatabase):
         >>> Comments['BENEF_']
         'Ondernemingen: niet-uitgekeerde winsten (vóór statistische aanpassing).'
         """
-        cmt_subset = __CommentsDatabase()
+        cmt_subset = _CommentsDatabase()
         cmt_subset.database_ptr = cmt_subset.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return cmt_subset
 
@@ -87,4 +87,4 @@ cdef class __CommentsDatabase(__AbstractDatabase):
         self.database_ptr.update(name.encode(), comment.encode())
 
 
-Comments = __CommentsDatabase()
+Comments = _CommentsDatabase()
