@@ -243,7 +243,7 @@ def get_var(varname: str) -> List[float]:
 # Copy (or refer to) an IODE var into a ndarray
 def get_var_as_ndarray(varname: str, copy: bool = True) -> np.ndarray:
     '''Get an IODE variable in a numpy ndarray'''
-    vararray = iodevar_to_ndarray(_cstr(varname), copy)
+    vararray = _iodevar_to_ndarray(_cstr(varname), copy)
     return vararray 
 
 # Copy a ndarray or a list into KV_WS
