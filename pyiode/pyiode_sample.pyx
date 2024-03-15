@@ -247,11 +247,11 @@ def ws_sample_set(from_period: str, to_period: str) -> Optional[Tuple[str, str]]
         raise RuntimeError(f"ws_sample_set(): sample insufficiently undefined.") 
 
     if from_period == "":
-        rc = IodeSetSampleStr(_cstr(cursample[0]), _cstr(to_period))
+        rc = IodeSetSampleStr(cstr(cursample[0]), cstr(to_period))
     elif to_period == "":
-        rc = IodeSetSampleStr(_cstr(from_period), _cstr(cursample[1]))
+        rc = IodeSetSampleStr(cstr(from_period), cstr(cursample[1]))
     else: 
-        rc = IodeSetSampleStr(_cstr(from_period), _cstr(to_period))
+        rc = IodeSetSampleStr(cstr(from_period), cstr(to_period))
 
     if rc != 0:
         raise RuntimeError(f"ws_sample_set(): cannot set sample '{from_period}' '{to_period}'") 
@@ -281,7 +281,7 @@ def ws_sample_get() -> Optional[Tuple[str, str]]:
         return None
     else:
         c_str = IodeGetSampleAsString()
-        start, end = _pystr(c_str).split(" ")
+        start, end = pystr(c_str).split(" ")
         SCR_free(c_str)
         return start, end
 
@@ -388,7 +388,7 @@ def ws_sample_to_list(from_period: str = "", to_period: str = "", as_floats: boo
             from_period = start
         if not to_period:
             to_period = end
-        smpl = IodeCreateSampleAsPeriods(_cstr(from_period), _cstr(to_period))
+        smpl = IodeCreateSampleAsPeriods(cstr(from_period), cstr(to_period))
         lst = _pylist(smpl)
         free_tbl(smpl)
         return lst 

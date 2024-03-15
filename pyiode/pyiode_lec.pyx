@@ -37,9 +37,9 @@ def exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]:
     cdef    double* cvar
     
     if t >= 0:
-        return IodeExecLecT(_cstr(lec), t)   # simple value
+        return IodeExecLecT(cstr(lec), t)   # simple value
     else:
-        cvar = IodeExecLec(_cstr(lec))       # vector of calculated values    
+        cvar = IodeExecLec(cstr(lec))       # vector of calculated values    
         res = _pyfloats(cvar, IodeGetSampleLength())
         SCR_free(cvar)
         return res

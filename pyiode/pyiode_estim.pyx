@@ -19,7 +19,7 @@ def eqs_estimate(eq_list: Union[str, List[str]], afrom: str, ato: str):
     if type(eq_list) == list:
         eq_list = ','.join(eq_list)
 
-    if IodeEstimate(_cstr(eq_list), _cstr(afrom), _cstr(ato)):
+    if IodeEstimate(cstr(eq_list), cstr(afrom), cstr(ato)):
         raise RuntimeError(f"Estimation of {eq_list} failed")
 
 
