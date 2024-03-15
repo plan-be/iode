@@ -586,7 +586,7 @@ cdef class _AbstractDatabase:
 
     def __len__(self) -> int:
         """
-        Return the number of object in the database
+        Return the number of IODE objects in the current database.
 
         Returns
         -------
@@ -603,6 +603,13 @@ cdef class _AbstractDatabase:
 
     def __contains__(self, item) -> bool:
         """
+        Test if the IODE object named `item` is present in the current database.
+
+        Parameters
+        ----------
+        item: str
+            name of the IODE object. 
+
         Examples
         --------
         >>> from iode import Comments
@@ -621,6 +628,13 @@ cdef class _AbstractDatabase:
 
     def __getitem__(self, key):
         """
+        Return the IODE object named `key` from the current database.
+
+        Parameters
+        ----------
+        key: str
+            name of the IODE object to get.
+
         Examples
         --------
         >>> from iode import Comments
@@ -638,6 +652,15 @@ cdef class _AbstractDatabase:
 
     def __setitem__(self, key, value):
         """
+        Update/add an IODE object named `key` from/to the current database.
+
+        Parameters
+        ----------
+        key: str
+            name of the IODE object to update/add.
+        value: 
+            (new) value of the IODE object. 
+
         Examples
         --------
         >>> from iode import Comments
@@ -655,6 +678,13 @@ cdef class _AbstractDatabase:
 
     def __delitem__(self, key):
         """
+        Remove the IODE object named `key` from the current database.
+
+        Parameters
+        ----------
+        key: str
+            name of the IODE object to remove.
+
         Examples
         --------
         >>> from iode import Comments
