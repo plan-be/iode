@@ -109,7 +109,7 @@ def _ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
         List of object names
 
     Examples
-    -------
+    --------
     >>> from iode import Comments, ws_content
     >>> Comments.load("../data/fun.cmt")
     >>> names = iode.ws_content("ACA*", 0)
