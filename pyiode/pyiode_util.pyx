@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
-from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
+#from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
 
 # Miscellaneous functions
 # -----------------------
@@ -82,8 +82,9 @@ def add_error_msg(msg: str = ''):
         
     Examples
     --------
-    >>> iode.add_error_msg("Missing variables: QIG, PIG")
-    >>> iode.display_error_msgs()
+    >>> from iode import add_error_msg, display_error_msgs
+    >>> add_error_msg("Missing variables: QIG, PIG")
+    >>> display_error_msgs()
     '''
 
     IodeAddErrorMsg(cstr(msg))
@@ -97,9 +98,9 @@ def display_error_msgs():
         
     Examples
     --------
-    >>> iode.add_error_msg("Missing variables: QIG, PIG")
-    >>> iode.display_error_msgs()
-    '''
+    >>> from iode import add_error_msg, display_error_msgs
+    >>> add_error_msg("Missing variables: QIG, PIG")
+    >>> display_error_msgs()   '''
 
     IodeDisplayErrorMsgs()
  
@@ -111,9 +112,10 @@ def clear_error_msgs():
    
     Examples
     --------
-    >>> iode.clear_error_msgs() # reset the stack of messages
-    >>> iode.add_error_msg("Missing variables: QIG, PIG")
-    >>> iode.display_error_msgs()
-    '''
+    >>> from iode import clear_error_msgs, add_error_msg, display_error_msgs
+    >>> # reset the stack of messages
+    >>> clear_error_msgs() 
+    >>> add_error_msg("Missing variables: QIG, PIG")
+    >>> display_error_msgs()    '''
 
     IodeClearErrorMsgs()
