@@ -59,6 +59,7 @@ from pyiode_model cimport (IodeModelSimulate, IodeModelCalcSCC, IodeModelSimulat
                            IodeModelCpuSort, IodeModelCpuSCC, KSIM_MAXIT, KSIM_EPS, KSIM_RELAX, KSIM_PASSES, KSIM_SORT, KSIM_START, 
                            KSIM_CPU_SCC, KSIM_CPU_SORT)
 
+# TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate(sample_from: str, sample_to: str, 
                     eqs_list=None, 
                     endo_exo_list=None,
@@ -134,6 +135,7 @@ def model_calc_scc(nb_passes: int = 1,
         raise RuntimeError(f"Cannot create the model Connex Components")
     
 
+# TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate_scc( sample_from: str, sample_to: str, 
                         pre_listname: str = "_PRE", 
                         inter_listname: str = "_INTER", 
@@ -157,6 +159,7 @@ def model_simulate_scc( sample_from: str, sample_to: str,
         raise RuntimeError(f"model_simulate_scc() failed")
         
 
+# TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate_save_parms(
                     eps: float = 0.0001, 
                     relax: float = 1.0, 
@@ -165,7 +168,7 @@ def model_simulate_save_parms(
                     sort_algo: int = SORT_BOTH, 
                     nb_passes: int = 1):
     ''' 
-        Save in the global variabels KSIM_* the simulation parameters used during the last 
+        Save in the global variables KSIM_* the simulation parameters used during the last 
         call to model_simulate() and model_simulate_scc(). 
         The purpose of this function is to enable later reporting
         via the functions model_simulate_maxit(), model_simulate_eps()...
@@ -178,24 +181,29 @@ def model_simulate_save_parms(
 
     if nb_passes >= 0: KSIM_PASSES = nb_passes  # not used by model_simulate_scc()
     if sort_algo >= 0: KSIM_SORT = sort_algo    # id.
+
     
-   
+# TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate_maxit() -> int:
     ''' Returns the maxit parameter of the last simulation '''
     return KSIM_MAXIT
 
+# TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate_eps() -> float:
     ''' Returns the eps parameter of the last simulation '''
     return KSIM_EPS
 
+# TODO: (ald) add Parameters, Returns and Examples section  
 def model_simulate_relax() -> float:
     ''' Returns the relax parameter of the last simulation '''
     return KSIM_RELAX
 
+# TODO: (ald) add Parameters, Returns and Examples section 
 def model_simulate_nb_passes() -> int:
     ''' Returns the nb_passes parameter of the last simulation '''
     return KSIM_PASSES
 
+# TODO: (ald) add Parameters, Returns and Examples section  
 def model_simulate_sort_algo() -> int:
     ''' 
     Returns the sort_algo parameter of the last simulation: 
@@ -206,7 +214,8 @@ def model_simulate_sort_algo() -> int:
     
     return KSIM_SORT
 
-        
+
+# TODO: (ald) add Parameters, Returns and Examples section       
 def model_simulate_init_values() -> int:
     ''' 
     Returns the init_values parameter of the last simulation:
@@ -220,23 +229,32 @@ def model_simulate_init_values() -> int:
     '''
     return KSIM_START
 
+
+# TODO: (ald) add Parameters, Returns and Examples section 
 def model_simulate_cpu_scc() -> int:
     ''' Returns the elapsed time in ms during the last SCC decomposition '''
     return IodeModelCpuSCC()
 
+
+# TODO: (ald) add Parameters, Returns and Examples section 
 def model_simulate_cpu_sort() -> int:
     ''' Returns the elapsed time in ms during the last sort algorithm '''
     return IodeModelCpuSort()
 
 
+# TODO: (ald) add Parameters, Returns and Examples section  
 def model_simulate_cpu(period: str) -> int:
     ''' Returns the elapsed time in ms during the last simulation of the given period'''
     return IodeModelSimCpu(cstr(period))
 
+
+# TODO: (ald) add Parameters, Returns and Examples section  
 def model_simulate_niter(period: str) -> int:
     ''' Returns the number of iterations needed to reach a solution during the last simulation of the given period'''
     return IodeModelSimNIter(cstr(period))
+    
 
+# TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate_norm(period: str) -> float:
     ''' Returns the convergence threshold reached during the last simulation of the given period'''
     return IodeModelSimNorm(cstr(period))
