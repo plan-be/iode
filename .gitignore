@@ -375,8 +375,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/pyiode/vc64/build
-/pyiode/vc64
 
 # LaTeX
 keyboard_shortcuts.*
@@ -415,3 +413,11 @@ keyboard_shortcuts.*
 /tests/output
 /doc/src/iode1.mif
 /doc/src/iode2.mif
+
+/pyiode_2023/**/*.c
+/pyiode_2023/**/*.pyd
+!/pyiode_2023/s_iode.c
+/pyiode_2023/cythonize_iode.py
+/pyiode_2023/build
+/pyiode_2023/vc64
+/pyiode_2023/vc64/build
