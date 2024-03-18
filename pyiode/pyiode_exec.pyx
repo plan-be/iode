@@ -11,6 +11,7 @@
 cdef extern from "iode.h": 
     cdef int    IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace)
 
+# TODO: (ALD) rewrite Examples section below
 def idt_execute(sample: Optional[Union[str, List[str]]] = None, 
                 idt_list: Optional[Union[str, List[str]]] = None, 
                 var_files: Optional[Union[str, List[str]]] = None, 
@@ -50,8 +51,8 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
                     
                 Scalars loaded
                     From ../data/fun : gamma gamma2 gamma3 gamma4 knf3
-            
-    Examples
+    
+    Examples 
     --------
         IODE_DATA_DIR = "../data."
         
