@@ -8,23 +8,89 @@ on:
 jobs:
     build_doc:
         name: Build user documentation
-        runs-on: ubuntu-latest
+        runs-on: windows-latest
         env:
-          build-config: linux-debug
+          build-config: windows-release
+        # because of miniconda -> https://github.com/marketplace/actions/setup-miniconda#important
+        defaults:
+          run:
+            shell: bash -el {0}
         steps:
+          - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+          - run: echo "This job is now running on a ${{ runner.os }} server"
+          - run: echo "The name of the repository is ${{ github.repository }}."
+          - run: echo "The target branch of the current pull request is ${{ github.base_ref }}."
+          - run: echo "The source branch of the current pull request is ${{ github.head_ref }}."
+          - run: echo "The workspace directory is ${{ github.workspace }}."
           - name: Checkout repository code
             uses: actions/checkout@v2
           - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-          - name: update packages
-            run: sudo apt-get update
-          - name: Install ninja
-            run: sudo apt-get install -y ninja-build
-          - name: Install Tex Live
-            run: sudo apt-get install -y texlive
+          - name: Install dependencies on windows
+            if: runner.os == 'Windows'
+            run: |
+              choco install ninja
+              ninja --version
+              cmake --version
+          - name: Add cl.exe to PATH
+            if: runner.os == 'Windows'
+            # See https://github.com/marketplace/actions/enable-developer-command-prompt
+            uses: ilammy/msvc-dev-cmd@v1
+            with:
+              arch: x64
+          - name: Install C++ Boost lib
+            uses: ./.github/actions/install_boost
+          - name: Setup TeX Live
+            uses: teatimeguest/setup-texlive-action@v3
+            with:
+              packages: scheme-full
+              cache: true
+          # WARNING: please read https://github.com/marketplace/actions/setup-miniconda#important
+          #          Bash shells do not use ~/.profile or ~/.bashrc so these shells need to be explicitly 
+          #          declared as shell: bash -el {0} on steps that need to be properly activated 
+          #          (or use a default shell).
+          - name: Configure Conda
+            uses: conda-incubator/setup-miniconda@v2
+            with:
+              # channels: conda-forge, defaults
+              python-version: "3.11"
+              auto-update-conda: true
+              auto-activate-base: false
+              activate-environment: "py311"
+          - name: Check conda
+            run: conda info
+          - name: Conda environments
+            run: conda env list
+          - name: Install Python libraires
+            run: |
+              conda config --add channels conda-forge
+              conda config --add channels larray-project
+              conda install numpy pandas larray cython pytest sphinx numpydoc nbsphinx sphinx_rtd_theme myst-parser
+          - name: Check installed Python packages
+            run: conda list
           - name: Print preset config
             run: echo "${{ env.build-config }}"
+            # - To use the right Python (= conda) environment, cmake --preset <...> must be call AFTER setting up 
+            #   the Python (conda) environment
+            # - To let cmake find LaTeX compiler, cmake --preset <...> must be call AFTER installing the LaTeX compiler
           - name: Configure CMake
+            # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
+            # see CMakePresets.json file
+            # for more details about cmake preset:
+            #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
+            #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ env.build-config }}
+          - name: Build the SCR4, C and C++ API libs
+            uses: ./.github/actions/build_api
+            with:
+              cmake-config: ${{ env.build-config }}
+          - name: Test the C and C++ APIs
+            uses: ./.github/actions/test_api
+            with:
+              cmake-config: ${{ env.build-config }}
+          - name: Build Python IODE (Cython)
+            run: cmake --build --verbose --preset ${{ env.build-config }} --target iode_python
+          - name: Build User documentation (Sphinx)
+            run: cmake --build --verbose --preset ${{ env.build-config }} --target iode_doc
           - name: Build Keyboard Shortcuts PDF
             run: cmake --build --verbose --preset ${{ env.build-config }} --target keyboard_shortcuts
           - name: Upload documentation files
