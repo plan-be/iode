@@ -146,7 +146,7 @@ cdef class _AbstractDatabase:
         >>> # create a subset with all comments with name starting with 'A'
         >>> cmt_subset = Comments.subset("A*")
         >>> cmt_subset.get_names()
-        ['ACAF', 'ACAG', 'ACOUG', 'AQC']
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
         >>> # any modification made on the subset is visible in the global database
         >>> cmt_subset['ACAF'] = "Modified Comment"
         >>> Comments['ACAF']
@@ -157,7 +157,7 @@ cdef class _AbstractDatabase:
         >>> # any modification made on the subset let the global database unchanged
         >>> cmt_subset['BENEF_'] = "Modified Comment"
         >>> Comments['BENEF_']
-        'Ondernemingen: niet-uitgekeerde winsten (vóór statistische aanpassing).'
+        'Ondernemingen: niet-uitgekeerde winsten (vóór statistische\\naanpassing).'
         """
         raise NotImplementedError()
 
