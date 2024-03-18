@@ -87,10 +87,10 @@ import warnings
 
 from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
                         B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow)
-from iode_python cimport free_tbl, SCR_free_tbl
+from iode_python cimport free_tbl
 
 
-def __ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
+def _ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
     r"""Return the names of objects of a given type, satisfying a pattern specification.
 
     Parameters
@@ -135,7 +135,7 @@ def __ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
             res[nb] = pystr(s)
             nb = nb + 1
 
-    SCR_free_tbl(<unsigned char **>cnt)
+    free_tbl(cnt)
 
     return res
 
@@ -174,12 +174,12 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = K_VAR) -> Li
     """
 
     if isinstance(pattern, str):
-        return(__ws_content_from_str(pattern, objtype))
+        return(_ws_content_from_str(pattern, objtype))
 
     elif isinstance(pattern, Iterable):
         res = set()
         for pattern1 in pattern:
-            res = res| set(__ws_content_from_str(pattern1, objtype))
+            res = res| set(_ws_content_from_str(pattern1, objtype))
         res = list(res)
         res.sort()
         return res
