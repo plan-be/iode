@@ -122,8 +122,10 @@ def model_calc_scc(nb_passes: int = 1,
     
     Examples
     --------
-    >>> iode.model_calc_scc(nb_passes=1)
-    
+    >>> from iode import model_calc_scc, ws_load_eqs
+    >>> ws_load_eqs("../data/fun.eqs")
+    274
+    >>> model_calc_scc(nb_passes=1)
     '''
     eqs_list = arg_to_str(eqs_list, sep = ',')
     if IodeModelCalcSCC(nb_passes, 

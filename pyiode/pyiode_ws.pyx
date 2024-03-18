@@ -161,8 +161,7 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = K_VAR) -> Li
     Examples
     -------
     >>> import iode
-    >>> iode.ws_load_cmt("../fun.cmt")               
-    317
+    >>> iode.Comments.load("../data/fun.cmt")
     >>> result = iode.ws_content("ACA*", 0)          
     >>> print(result)                                
     ['ACAF', 'ACAG']
