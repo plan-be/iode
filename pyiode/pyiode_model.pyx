@@ -55,7 +55,9 @@
 # model_simulate_niter(period: str) -> int      | Returns the number of iterations needed to reach a solution during the last simulation of the given period
 # model_simulate_norm(period: str) -> float     | Returns the convergence threshold reached during the last simulation of the given period
 
-from pyiode_model cimport IodeModelSimulate, IodeModelCalcSCC, IodeModelSimulateSCC, IodeModelSimNorm, IodeModelSimNIter, IodeModelSimCpu, IodeModelCpuSort, IodeModelCpuSCC
+from pyiode_model cimport (IodeModelSimulate, IodeModelCalcSCC, IodeModelSimulateSCC, IodeModelSimNorm, IodeModelSimNIter, IodeModelSimCpu, 
+                           IodeModelCpuSort, IodeModelCpuSCC, KSIM_MAXIT, KSIM_EPS, KSIM_RELAX, KSIM_PASSES, KSIM_SORT, KSIM_START, 
+                           KSIM_CPU_SCC, KSIM_CPU_SORT)
 
 def model_simulate(sample_from: str, sample_to: str, 
                     eqs_list=None, 

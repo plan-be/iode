@@ -12,3 +12,11 @@ cdef extern from "iode.h":
     cdef int    IodeModelSimCpu(char* period)
     cdef int    IodeModelCpuSort()
     cdef int    IodeModelCpuSCC()
+    cdef int    KSIM_MAXIT 
+    cdef float  KSIM_EPS   
+    cdef float  KSIM_RELAX 
+    cdef int    KSIM_PASSES
+    cdef int    KSIM_SORT
+    cdef int    KSIM_START 
+    cdef int    KSIM_CPU_SCC
+    cdef int    KSIM_CPU_SORT
