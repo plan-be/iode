@@ -303,7 +303,6 @@ if(NOT SKBUILD)
   set(IODE_GUI_TARGET iode_gui)
   add_subdirectory ("gui")
   add_subdirectory ("pyiode")
-  add_subdirectory ("pyiode_2023")
 endif()
 
 # add_subdirectory ("python_api")
@@ -320,6 +319,12 @@ endif()
 if(TARGET ${IODE_GUI_TARGET})
   add_subdirectory("nsis")
 endif()
+
+# -- IODE-DOS (2023) --
+if(NOT SKBUILD)
+  add_subdirectory ("pyiode_2023")
+endif()
+
 
 message(STATUS " ")
 message(STATUS "=============================\n")
