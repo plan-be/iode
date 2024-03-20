@@ -376,11 +376,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# LaTeX
-keyboard_shortcuts.*
-!keyboard_shortcuts.tex
-!build/keyboard_shortcuts.pdf
-
 # IODE temporary files
 *.cm$
 *.eq$
@@ -435,6 +430,11 @@ keyboard_shortcuts.*
 
 /doc/build/doctrees
 /doc/build/html
+
+/doc/keyboard_shortcuts/*.*
+!/doc/keyboard_shortcuts/*.tex
+!/doc/keyboard_shortcuts/*.txt
+!build/keyboard_shortcuts.pdf
 
 # TESTS
 /tests/**/*.ini
