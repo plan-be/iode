@@ -5,9 +5,8 @@ from typing import List
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport L_NAN
-from pyiode.common cimport I_NB_TYPES
-from pyiode.common cimport vIodeTypes
+from pyiode.common cimport L_NAN, I_NB_TYPES
+from pyiode.common cimport vIodeTypes, v_var_modes, v_simulation_initialization
 
 
 def _cpp_string_vector_to_py(vector[string] vec) -> List[str]:
@@ -25,3 +24,5 @@ nan: float = L_NAN
 NB_TYPES: int = I_NB_TYPES
 
 IODE_TYPES_LIST = _cpp_string_vector_to_py(vIodeTypes)
+VARIABLES_MODES = _cpp_string_vector_to_py(v_var_modes)
+SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)
