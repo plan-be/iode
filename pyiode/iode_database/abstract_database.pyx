@@ -535,10 +535,14 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
-        >>> from iode import Comments
+        >>> from iode import Comments, Variables
         >>> Comments.load("../data/fun.cmt")
         >>> len(Comments)
         317
+
+        >>> Variables.load("../data/fun.var")
+        >>> len(Variables)
+        394
         """
         if self.is_subset():
             raise RuntimeError("Cannot call 'load' method on a subset of a database")
@@ -646,6 +650,23 @@ cdef class _AbstractDatabase:
         >>> Comments.load("../data/fun.cmt")
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
+
+        >>> from iode import Variables, nan
+        >>> Variables.load("../data/fun.var")
+        >>> Variables.sample
+        1960Y1:2015Y1
+        >>> # get the variable values for the whole sample
+        >>> Variables["ACAF"]                       # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        >>> # get the variable value for a specific period
+        >>> Variables["ACAF", "1990Y1"]
+        23.771
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> Variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
+        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        >>> # same as above but with the colon ':' inside the periods range string
+        >>> Variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
+        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
         """
         return self._get_object(key) 
 
@@ -672,6 +693,61 @@ cdef class _AbstractDatabase:
         >>> Comments["ACAF"] = "New Value"
         >>> Comments["ACAF"]
         'New Value'
+
+        >>> from iode import Variables
+        >>> Variables.load("../data/fun.var")
+
+        >>> # set all values of a Variable
+        >>> Variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        >>> # a. variable = same value for all periods
+        >>> Variables["ACAF"] = 0.
+        >>> Variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
+        >>> # b. variable = vector (list) containing a specific value for each period
+        >>> Variables["ACAF"] = list(range(Variables.nb_periods))
+        >>> Variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
+        >>> # c. variable = LEC expression
+        >>> Variables["ACAF"] = "t + 10"
+        >>> Variables["ACAF"]                   # doctest: +ELLIPSIS 
+        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
+
+        >>> # set one value of a Variable for a specific period
+        >>> Variables["ACAG", "1990Y1"]
+        -28.1721855713507
+        >>> Variables["ACAG", "1990Y1"] = -28.2
+        >>> Variables["ACAG", "1990Y1"]
+        -28.2
+
+        >>> # set the variable values for range of periods 
+        >>> # 1. using a Python slice
+        >>> # 1a. variable(periods) = same value for all periods
+        >>> Variables["ACAF", "1991Y1":"1995Y1"] = 0.0
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, 0.0, 0.0, 0.0, 0.0]
+        >>> # 1b. variable(periods) = vector (list) containing a specific value for each period
+        >>> Variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, 1.0, 2.0, 3.0, 4.0]
+        >>> # 1c. variable(periods) = LEC expression
+        >>> Variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [41.0, 42.0, 43.0, 44.0, 45.0]
+
+        >>> # 2. same as above but with the colon ':' inside the periods range string
+        >>> # 2a. variable(periods) = same value for all periods
+        >>> Variables["ACAF", "1991Y1:1995Y1"] = 0.0
+        >>> Variables["ACAF", "1991Y1:1995Y1"]
+        [0.0, 0.0, 0.0, 0.0, 0.0]
+        >>> # 2b. variable(periods) = vector (list) containing a specific value for each period
+        >>> Variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, -1.0, -2.0, -3.0, -4.0]
+        >>> # 2c. variable(periods) = LEC expression
+        >>> Variables["ACAF", "1991Y1:1995Y1"] = "t - 10"
+        >>> Variables["ACAF", "1991Y1:1995Y1"]
+        [21.0, 22.0, 23.0, 24.0, 25.0]
         """
         self._set_object(key, value) 
 

@@ -4,7 +4,9 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode.common cimport EnumIodeType
+from pyiode.common cimport EnumIodeType, EnumIodeVarMode, EnumSimulationInitialization
+from pyiode.pyiode_period cimport CPeriod
+from pyiode.pyiode_sample cimport CSample
 
 
 # C++ classes
@@ -31,20 +33,20 @@ cdef extern from "KDB/kdb_abstract.h":
         string get_filename() const
 
         string get_description() const
-        void set_description(const string& description) except +
+        void set_description(string& description) except +
 
-        vector[string] get_names(const string& pattern, bool must_exist) except +
-        int rename(const string& old_name, const string& new_name) except +
-        bool contains(const string& name) except +
-        void remove(const string& name) except +
+        vector[string] get_names(string& pattern, bool must_exist) except +
+        int rename(string& old_name, string& new_name) except +
+        bool contains(string& name) except +
+        void remove(string& name) except +
 
-        void merge(const KDBAbstract& other, bool overwrite) except +
-        void copy_into(const string& input_file, const string& objects_names) except +
-        void merge_into(const string& input_file) except +
+        void merge(KDBAbstract& other, bool overwrite) except +
+        void copy_into(string& input_file, string& objects_names) except +
+        void merge_into(string& input_file) except +
 
-        vector[string] get_associated_objects_list(const string& name, EnumIodeType other_type) except +
+        vector[string] get_associated_objects_list(string& name, EnumIodeType other_type) except +
 
-        void save(const string& filepath) except +
+        void save(string& filepath) except +
         void clear() except +
 
 cdef extern from "KDB/kdb_template.h":
@@ -54,17 +56,63 @@ cdef extern from "KDB/kdb_template.h":
 cdef extern from "KDB/kdb_comments.h":
     cdef cppclass KDBComments(KDBTemplate[string]):
         # Constructor
-        KDBComments(const string& filepath) except +
+        KDBComments(string& filepath) except +
 
         # Public methods
-        KDBComments* subset(const string& pattern, const bool deep_copy) except +
-        string get(const string& name) except +
-        string copy(const string& name) except +
-        int add(const string& name, const string& comment) except +
-        void update(const string& name, const string& comment) except +
+        KDBComments* subset(string& pattern, bool deep_copy) except +
+        string get(string& name) except +
+        string copy(string& name) except +
+        int add(string& name, string& comment) except +
+        void update(string& name, string& comment) except +
 
     size_t hash_value(KDBComments&) except +
 
     # Define the global Comments instance
     cdef KDBComments Comments
+
+
+cdef extern from "KDB/kdb_variables.h":
+    cdef cppclass KDBVariables(KDBTemplate[vector[double]]):
+        # Constructor
+        KDBVariables(string& filepath) except +
+
+        # Public methods
+        KDBVariables* subset(string& pattern, bool deep_copy) except +
+        vector[double] get(string& name) except +
+        vector[double] copy(string& name) except +
+        int add(string& name, vector[double]& values) except +
+        int add(string& name, string& lec) except +
+        void update(string& name, vector[double]& values) except +
+        void update(string& name, vector[double]& values, string& first_period, string& last_period) except +
+        void update(string& name, vector[double]& values, int t_first, int t_last) except +
+        void update(string& name, string& lec) except +
+        void update(string& name, string& lec, string& first_period, string& last_period) except +
+        void update(string& name, string& lec, int t_first, int t_last) except +
+
+        double get_var(int pos, int t, EnumIodeVarMode mode) except +
+        double get_var(string& name, int t, EnumIodeVarMode mode) except +
+        double get_var(string& name, string& period, EnumIodeVarMode mode) except +
+        double* get_var_ptr(string& name) except +
+
+        void set_var(int pos, int t, double value, EnumIodeVarMode mode) except +
+        void set_var(string& name, int t, double value, EnumIodeVarMode mode) except +
+        void set_var(string& name, string& period, double value, EnumIodeVarMode mode) except +
+
+        CSample get_sample()
+        void set_sample(string& from_, string& to) except +
+
+        int get_nb_periods()
+        string get_period(int t) except +
+        float get_period_as_float(int t) except +
+        vector[string] get_list_periods(string& from_, string& to) except +
+        vector[float] get_list_periods_as_float(string& from_, string& to) except +
+
+        void extrapolate(EnumSimulationInitialization method, string& from_, string& to, string& variables_list) except +
+        void seasonal_adjustment(string& input_file, string& series, double eps_test) except +
+        void trend_correction(string& input_file, double lambda_, string& series, bint log) except +
+
+    size_t hash_value(KDBVariables&) except +
+
+    # Define the global Variables instance
+    cdef KDBVariables Variables
 
