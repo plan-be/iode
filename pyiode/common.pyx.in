@@ -8,6 +8,22 @@ from libcpp.vector cimport vector
 from pyiode.common cimport L_NAN, I_NB_TYPES
 from pyiode.common cimport vIodeTypes, v_var_modes, v_simulation_initialization
 
+try:
+    import pandas as pd
+    DataFrame = pd.DataFrame
+except ImportError:
+    pd = None
+    DataFrame = Any
+
+try:
+    import larray as la
+    Array = la.Array
+    Axis = la.Axis
+except ImportError:
+    la = None
+    Array = Any
+    Axis = Any
+
 
 def _cpp_string_vector_to_py(vector[string] vec) -> List[str]:
     return [value.decode() for value in vec]
