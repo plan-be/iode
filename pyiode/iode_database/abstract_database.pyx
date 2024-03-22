@@ -535,10 +535,14 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
-        >>> from iode import Comments
+        >>> from iode import Comments, Variables
         >>> Comments.load("../data/fun.cmt")
         >>> len(Comments)
         317
+
+        >>> Variables.load("../data/fun.var")
+        >>> len(Variables)
+        394
         """
         if self.is_subset():
             raise RuntimeError("Cannot call 'load' method on a subset of a database")
@@ -646,6 +650,23 @@ cdef class _AbstractDatabase:
         >>> Comments.load("../data/fun.cmt")
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
+
+        >>> from iode import Variables, nan
+        >>> Variables.load("../data/fun.var")
+        >>> Variables.sample
+        1960Y1:2015Y1
+        >>> # get the variable values for the whole sample
+        >>> Variables["ACAF"]                       # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+        >>> # get the variable value for a specific period
+        >>> Variables["ACAF", "1990Y1"]
+        23.771
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> Variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
+        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        >>> # same as above but with the colon ':' inside the periods range string
+        >>> Variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
+        [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
         """
         return self._get_object(key) 
 
@@ -672,6 +693,25 @@ cdef class _AbstractDatabase:
         >>> Comments["ACAF"] = "New Value"
         >>> Comments["ACAF"]
         'New Value'
+
+        >>> from iode import Variables
+        >>> Variables.load("../data/fun.var")
+        >>> Variables["ACAF", "1990Y1"]
+        23.771
+        >>> # set the variable value for a specific period
+        >>> Variables["ACAF", "1990Y1"] = 23.2
+        >>> Variables["ACAF", "1990Y1"]
+        23.2
+        >>> # set the variable values for range of periods (using a Python slice)
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [26.240999, 30.159, 34.661999, 8.1610022, -13.130997]
+        >>> Variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, 1.0, 2.0, 3.0, 4.0]
+        >>> # same as above but with the colon ':' inside the periods range string
+        >>> Variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
+        >>> Variables["ACAF", "1991Y1":"1995Y1"]
+        [0.0, -1.0, -2.0, -3.0, -4.0]
         """
         self._set_object(key, value) 
 

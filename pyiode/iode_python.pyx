@@ -70,6 +70,18 @@
 # distutils: language = c++
 from iode_python cimport IodeInit, ODE_assign_super_PYIODE
 
+# MAIN
+# ----
+
+# Numpy must be initialized before we can use it safely.
+import numpy as np
+np.import_array()
+
+# IODE ws must initialize SWAP memory and create empty workspaces 
+IodeInit()
+
+# Super fns could be replaced here (optional)
+ODE_assign_super_PYIODE() 
 
 # PYIODE API
 # ----------
@@ -136,6 +148,7 @@ include "objects/scalar.pyx"
 
 include "iode_database/abstract_database.pyx"
 include "iode_database/comments_database.pyx"
+include "iode_database/variables_database.pyx"
 
 include "pyiode_objs.pyx"
 include "pyiode_ws.pyx"
@@ -145,23 +158,7 @@ include "pyiode_model.pyx"
 include "pyiode_exec.pyx"
 include "pyiode_print.pyx"
 include "pyiode_reports.pyx"
-include "pyiode_larray.pyx"
-include "pyiode_pandas.pyx"
 include "pyiode_wrt.pyx"
-
-
-# MAIN
-# ----
-
-# Numpy must be initialized before we can use it safely.
-import numpy as np
-np.import_array()
-
-# IODE ws must initialize SWAP memory and create empty workspaces 
-IodeInit()
-
-# Super fns could be replaced here (optional)
-ODE_assign_super_PYIODE() 
 
 
 # ------------------------------------------------------------------------------------------
