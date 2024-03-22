@@ -623,7 +623,7 @@ cdef class _AbstractDatabase:
             raise TypeError(f"Expected value of type string. Got value of type {type(item).__name__}")
         return self.abstract_db_ptr.contains(item.encode())
 
-    def _get_object(self, name: str):
+    def _get_object(self, key):
         raise NotImplementedError()
 
     def __getitem__(self, key):
@@ -642,12 +642,9 @@ cdef class _AbstractDatabase:
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         """
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
         return self._get_object(key) 
 
-    def _set_object(self, name: str, value):
+    def _set_object(self, key, value):
         raise NotImplementedError()
 
     def __setitem__(self, key, value):
@@ -671,9 +668,6 @@ cdef class _AbstractDatabase:
         >>> Comments["ACAF"]
         'New Value'
         """
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
         self._set_object(key, value) 
 
     def __delitem__(self, key):

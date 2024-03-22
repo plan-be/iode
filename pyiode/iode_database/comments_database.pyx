@@ -34,14 +34,20 @@ cdef class _CommentsDatabase(_AbstractDatabase):
         cmt_subset.database_ptr = cmt_subset.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return cmt_subset
 
-    def _get_object(self, name: str) -> str:
-        return self.database_ptr.get(name.encode()).decode()
+    def _get_object(self, key):
+        if not isinstance(key, str):
+            raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
+                "but got value of type {type(filepath).__name__}")
+        return self.database_ptr.get(key.encode()).decode()
 
-    def _set_object(self, name: str, value):
-        if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(name.encode(), value.encode())
+    def _set_object(self, key, value):
+        if not isinstance(key, str):
+            raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
+                "but got value of type {type(filepath).__name__}")
+        if self.database_ptr.contains(key.encode()):
+            self.database_ptr.update(key.encode(), value.encode())
         else:
-            self.database_ptr.add(name.encode(), value.encode())
+            self.database_ptr.add(key.encode(), value.encode())
     
     def add(self, name: str, comment: str):
         if not isinstance(name, str):
