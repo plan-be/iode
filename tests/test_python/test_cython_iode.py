@@ -17,12 +17,19 @@ IODE_VERBOSE = 1
 def test_cython_iode():
     iode.__test__ = {}
     for name, value in inspect.getmembers(iode):
-       doc = inspect.getdoc(value)
-       module = inspect.getmodule(value)
-       module = module.__name__ if module is not None else 'None'
-       if 'iode' in module and doc is not None:
-           print(f"add test for function/method '{name}'")
-           iode.__test__[name] = value.__doc__
+        module = inspect.getmodule(value)
+        module = module.__name__ if module is not None else ''
+        if 'iode' in module:
+            if inspect.isclass(value):
+                for name_, value_ in inspect.getmembers(value):
+                    doc = inspect.getdoc(value_)
+                    if doc is not None:
+                        print(f"add test for method '{name}.{name_}'")
+                        iode.__test__[f'{name}.{name_}'] = doc                 
+            doc = inspect.getdoc(value)
+            if doc is not None:
+                print(f"add test for function/method '{name}'")
+                iode.__test__[name] = doc
 
     # run doctests
     failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
