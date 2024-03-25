@@ -188,7 +188,9 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = K_VAR) -> Li
 
 def ws_content_cmt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of comment names corresponding to the given pattern'''
-    return ws_content(pattern, K_CMT)
+    warnings.warn("ws_content_cmt() is deprecated. " + 
+        "Please use the new syntax: Comments.get_names(pattern)", DeprecationWarning)
+    return Comments.get_names(pattern)
 
 def ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of equation names corresponding to the given pattern'''
