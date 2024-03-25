@@ -35,7 +35,8 @@ cdef class _AbstractDatabase:
         pass
 
     # Public methods
-    def get_iode_type(self) -> str:
+    @property
+    def iode_type(self) -> str:
         """
         Return the IODE type of the current database
 
@@ -47,7 +48,7 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import Comments
         >>> Comments.load("../data/fun.cmt")
-        >>> Comments.get_iode_type()
+        >>> Comments.iode_type
         'Comment'
         """
         return IODE_TYPES_LIST[self.abstract_db_ptr.get_iode_type()]
@@ -161,7 +162,8 @@ cdef class _AbstractDatabase:
         """
         raise NotImplementedError()
 
-    def get_filename(self) -> str:
+    @property
+    def filename(self) -> str:
         r"""
         Return the filepath associated with the current database.
 
@@ -175,13 +177,14 @@ cdef class _AbstractDatabase:
         >>> from pathlib import Path
         >>> from os.path import relpath
         >>> Comments.load("../data/fun.cmt")
-        >>> filepath = Comments.get_filename()
+        >>> filepath = Comments.filename
         >>> Path(filepath).name
         'fun.cmt'
         """
         return self.abstract_db_ptr.get_filename().decode()
 
-    def get_description(self) -> str:
+    @property
+    def description(self) -> str:
         """
         Return the description of the current database
 
@@ -193,31 +196,33 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import Comments
         >>> Comments.load("../data/fun.cmt")
-        >>> Comments.set_description("test data from file 'fun.cmt'")
-        >>> Comments.get_description()
+        >>> Comments.description = "test data from file 'fun.cmt'"
+        >>> Comments.description
         "test data from file 'fun.cmt'"
         """
         return self.abstract_db_ptr.get_description().decode()
 
-    def set_description(self, description: str):
+    @description.setter
+    def description(self, value: str):
         """
         Set the description of the current database.
 
         Parameters
         ----------
-        description: str
+        value: str
+            New description.
 
         Examples
         --------
         >>> from iode import Comments
         >>> Comments.load("../data/fun.cmt")
-        >>> Comments.set_description("test data from file 'fun.cmt'")
-        >>> Comments.get_description()
+        >>> Comments.description = "test data from file 'fun.cmt'"
+        >>> Comments.description
         "test data from file 'fun.cmt'"
         """
-        if not isinstance(description, str):
-            raise TypeError(f"'description': Expected value of type string. Got value of type {type(description).__name__}")
-        self.abstract_db_ptr.set_description(description.encode())
+        if not isinstance(value, str):
+            raise TypeError(f"'description': Expected value of type string. Got value of type {type(value).__name__}")
+        self.abstract_db_ptr.set_description(value.encode())
 
     def get_names(self, pattern: Union[str, List[str]]="") -> List[str]:
         """
