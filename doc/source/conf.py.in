@@ -18,6 +18,7 @@ import iode
 print(f"iode: {iode.__version__}, {iode.__file__}")
 
 iode.Database = iode._AbstractDatabase
+iode.Variables = iode._VariablesDatabase
 
 
 # -- Project information -----------------------------------------------------
