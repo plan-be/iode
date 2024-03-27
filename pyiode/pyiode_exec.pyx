@@ -60,43 +60,42 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
         iode.w_dest("test_iode.htm", iode.W_HTML)
     
         # Simple case: no vars in WS, sample given
-        iode.ws_clear_var()
-        iode.ws_sample_set("1960Y1", "2015Y1")
-        iode.ws_load_idt(f"{IODE_DATA_DIR}fun")
-        iode.idt_execute("1961Y1:2000Y1", "AOUC", f"{IODE_DATA_DIR}fun", trace = True)
-        AOUC = iode.get_var("AOUC")
-        test_eq('iode.idt_execute("1961Y1:2000Y1", "AOUC", f"{IODE_DATA_DIR}fun, trace = 1") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
+        iode.Variables.clear()
+        iode.Variables.sample = "1960Y1:2015Y1"
+        iode.ws_load_idt("../data/fun.idt")
+        iode.idt_execute("1961Y1:2000Y1", "AOUC", "../data/fun.idt", trace = True)
+        AOUC = iode.Variables["AOUC"]
+        test_eq('iode.idt_execute("1961Y1:2000Y1", "AOUC", "../data/fun.idt, trace = 1") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
         # Load WS + change value before execution to check the result
-        iode.ws_load_var(f"{IODE_DATA_DIR}fun")
-        AOUC = iode.get_var("AOUC")
+        iode.Variables.load("../data/fun.var")
+        AOUC = iode.Variables["AOUC"]
         AOUC[1] = 0.1 
-        iode.set_var("AOUC", AOUC) # var changed in IODE WS
+        iode.Variables["AOUC"] = AOUC
         iode.idt_execute("1961Y1:2015Y1", "AOUC")
-        AOUC = iode.get_var("AOUC")
+        AOUC = iode.Variables["AOUC"]
         test_eq('2. iode.idt_execute("1961Y1:2015Y1", "AOUC") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
-        # Shortest way using get_var_as_ndarray(..., False) => no iode.set_var() needed
-        iode.ws_load_var(f"{IODE_DATA_DIR}fun")
-        AOUC = iode.get_var_as_ndarray("AOUC", False)
+        iode.Variables.load("../data/fun.var")
+        AOUC = iode.Variables["AOUC"]
         AOUC[1] = 0.1
         iode.idt_execute("1961Y1:2015Y1", "AOUC")
         test_eq('3. iode.idt_execute("1961Y1:2015Y1", "AOUC") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
         # Alternative ways to call idt_execute
-        AOUC = iode.get_var_as_ndarray("AOUC", False)
+        AOUC = iode.Variables["AOUC"]
         AOUC[1] = 0.1
         iode.idt_execute(["1961Y1", "2015Y1"], ["AOUC", "FLGR"])
         test_eq('4. iode.idt_execute(["1961Y1", "2015Y1"], ["AOUC", "FLGR"]) -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
         # Call with empty parameters 
-        iode.ws_load_scl(f"{IODE_DATA_DIR}fun")
+        iode.ws_load_scl("../data/fun.scl")
         iode.delete_idt("SSFFX") # SSFFX contains non existent variables
-        AOUC = iode.get_var_as_ndarray("AOUC", False)
+        AOUC = iode.Variables["AOUC"]
         # AOUC[1] = 0.24783192
         AOUC[1] = 0.1
         iode.idt_execute() # all idts on full sample using current loaded WS
-        AOUC = iode.get_var_as_ndarray("AOUC", False)
+        AOUC = iode.Variables["AOUC"]
         test_eq(' 5. iode.idt_execute() -> AOUC[1961Y1]', 0.24677525, AOUC[1])
     
         iode.w_close()
