@@ -34,10 +34,9 @@ WORKSPACE
    Database.is_subset
    Database.is_copy_subset
 
-   Database.get_iode_type
-   Database.get_filename
-   Database.get_description
-   Database.set_description
+   Database.iode_type
+   Database.filename
+   Database.description
 
    Database.__getitem__
    Database.__setitem__
