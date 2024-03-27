@@ -116,7 +116,9 @@ def delete_tbl(name: str):
     return delete_obj(name, K_TBL)
 
 def delete_var(name: str):
-    return delete_obj(name, K_VAR)
+    warnings.warn("delete_var() is deprecated. " + 
+        "Please use the new syntax: del Variables[name]", DeprecationWarning)
+    del Variables[name]
    
 
 # Set and Get IODE objects
@@ -236,27 +238,18 @@ def set_scl(name: str, scalar: Scalar):
 # ---------
 
 def get_var(varname: str) -> List[float]:
-    '''Get an IODE variable in a list of floats'''
-    ndarray = get_var_as_ndarray(varname, True)
-    return list(ndarray)
+    warnings.warn("get_var() is deprecated. " + 
+        "Please use the new syntax: Variables[name]", DeprecationWarning)
+    return Variables[varname]
 
 # Copy (or refer to) an IODE var into a ndarray
 def get_var_as_ndarray(varname: str, copy: bool = True) -> np.ndarray:
-    '''Get an IODE variable in a numpy ndarray'''
-    vararray = _iodevar_to_ndarray(_cstr(varname), copy)
-    return vararray 
+    warnings.warn("get_var_as_ndarray() is deprecated. " + 
+        "Please use the new syntax: np.asarray(Variables[name])", DeprecationWarning)
+    return np.asarray(Variables[varname])
 
 # Copy a ndarray or a list into KV_WS
 def set_var(varname: str, py_values):
-    '''Create or update an IODE variable from a list of floats or a ndarray'''
-    cdef double  *c_values
-    
-    if not IodeIsSampleSet():
-        raise RuntimeError("py_to_var impossible: IODE sample not set")
-        
-    ndarray = np.array(py_values, dtype = np.double) 
-    
-    c_values = <double*>np.PyArray_DATA(ndarray)
-    pos =  IodeSetVector(_cstr(varname), c_values, 0, 0, -1)
-    if pos < 0:
-        raise RuntimeError(f"Variable {varname} cannot be set")
+    warnings.warn("set_var() is deprecated. " + 
+        "Please use the new syntax: Variables[name] = values", DeprecationWarning)
+    Variables[varname] = py_values

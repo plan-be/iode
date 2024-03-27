@@ -210,7 +210,9 @@ def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_TBL)
 
 def ws_content_var(pattern: Union[str, List[str]] = '*') -> List[str]:
-    return ws_content(pattern, K_VAR)
+    warnings.warn("ws_content_var() is deprecated. " + 
+        "Please use the new syntax: Variables.get_names(pattern)", DeprecationWarning)
+    return Variables.get_names(pattern)
 
 
 # Clear WS
@@ -246,7 +248,9 @@ def ws_clear_tbl():
     ws_clear(K_TBL)
 
 def ws_clear_var():
-    ws_clear(K_VAR)
+    warnings.warn("ws_clear_var() is deprecated. " + 
+        "Please use the new syntax: Variables.clear()", DeprecationWarning)
+    Variables.clear()
 
 
 # Load WS
@@ -280,7 +284,9 @@ def ws_load_tbl(filename: str) -> int:
     return ws_load(filename, K_TBL) 
                              
 def ws_load_var(filename: str) -> int:
-    return ws_load(filename, K_VAR)
+    warnings.warn("ws_load_var() is deprecated. " + 
+        "Please use the new syntax: Variables.load(filepath)", DeprecationWarning)
+    Variables.load(filename)
 
 
 # Save WS
@@ -316,8 +322,9 @@ def ws_save_tbl(filename: str):
     ws_save(filename, K_TBL)
 
 def ws_save_var(filename: str):
-    '''Save the current variable workspace'''
-    ws_save(filename, K_VAR)
+    warnings.warn("ws_save_var() is deprecated. " + 
+        "Please use the new syntax: Variables.save(filepath)", DeprecationWarning)
+    Variables.save(filename)
 
 
 # High to Low

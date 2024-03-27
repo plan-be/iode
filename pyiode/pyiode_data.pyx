@@ -13,28 +13,6 @@
 #  data_update_scl(obj_name: str, value: float = None, relax: float = None, stderr: float = None)    Create or update an IODE scalar
 #  data_update_var(varname: str, values, operation: str = "L", per_from: str = None)          Create or update an IODE variable starting at a specified period
 
-
-# TODO (not necessarily all of these functions)
-# ----
-#  data_update_tbl
-#  data_create_* 
-#  data_delete_*
-#  data_exist_* 
-#  data_update_
-#  data_append_*
-#  data_duplicate_*
-#  data_rename_* 
-#  data_search
-#  data_scan  
-#  data_list_*
-#  data_list_sort   
-#  data_compare_eps 
-#  data_compare_* 
-#  data_calc_lst      
-#  data_calc_var      
-#  data_ras_var      
-#  data_pattern_*
-
 import warnings
 
 from pyiode_data cimport B_DataUpdate
@@ -97,50 +75,7 @@ def data_update_scl(obj_name: str, value: float = None, relax: float = None, std
         raise RuntimeError(f"Scalar {obj_name} update failed")
 
 def data_update_var(varname: str, values, operation: str = "L", per_from: str = None):
-    # 
-    r'''Update an IODE variable starting at a specified period
-    
-    Parameters
-    ----------
-    varname: str
-        variable name
-        
-    values: any numeric iterable (list, tuple, ndarray)
-        new values to set in varname
-        
-    operation: str
-        values transformation = {L,l = level | D,d = differences | G,g = growth rates}
-        
-    per_from: str
-        period corresponding to values[0]
-        
-    Returns
-    -------
-    Runtime exception raised on error.
-
-    Examples
-    --------
-    >>> import iode
-    >>> iode.ws_load_var("../data/fun.var")
-    394
-    >>> ACAF = iode.get_var("ACAF")
-    >>> ACAF[:7]
-    [nan, nan, nan, nan, nan, nan, nan]
-    >>> iode.data_update_var("ACAF", [1, 2, 3.1], "L", "1962Y1")
-    >>> ACAF = iode.get_var("ACAF")
-    >>> ACAF[:7]
-    [nan, nan, 1.0, 2.0, 3.1000000000000001, nan, nan]
-    ''' 
-    cmd = varname + " " + operation
-    
-    if per_from is None:
-        smpl = ws_sample_get()
-        per_from = smpl[0]
-        
-    cmd = cmd + " " + per_from
-    cmd = cmd + " " + repr(values)[1:-1]
- 
-    #print(f"Command:{cmd}")
-    if B_DataUpdate(_cstr(cmd), K_VAR) != 0:
-        raise RuntimeError(f"Variable {varname} update failed")
-
+    warnings.warn("data_update_var() is deprecated. " + 
+        "Please use the new syntax:\nVariables[name, period] = value\n" + 
+        "Variables[name, period_start:period_end] = [vector, of , values]", DeprecationWarning)
+    Variables[varname, per_from:] = values
