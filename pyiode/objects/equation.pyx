@@ -161,12 +161,9 @@ cdef class Equation:
 
         Examples
         --------
-        >>> from iode import ws_load_var, ws_sample_get, Equation, Sample
-        >>> ws_load_var("../data/fun.var")
-        394
-        >>> start, end = ws_sample_get()
-        >>> var_sample = Sample(start, end)
-        >>> var_sample
+        >>> from iode import Variables, Equation, Sample
+        >>> Variables.load("../data/fun.var")
+        >>> Variables.sample
         1960Y1:2015Y1
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF.set_sample("1980Y1", "2010Y1")
@@ -232,14 +229,15 @@ cdef class Equation:
 
         Examples
         --------
-        >>> from iode import Equation, ws_load_scl, ws_clear_scl, ws_content_scl
+        >>> from iode import Equation, ws_load_scl, ws_clear_scl, ws_content_scl, Variables
         >>> ws_load_scl("../data/fun.scl")
         161
+        >>> Variables.load("../data/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
             method: LSQ,
-            sample: --,
+            sample: 1960Y1:2015Y1,
             comment: ,
             block: ,
             instruments: ,
@@ -279,9 +277,10 @@ cdef class Equation:
 
         Examples
         --------
-        >>> from iode import Equation, ws_load_var, ws_clear_var, ws_content_var, ws_sample_set
-        >>> ws_load_var("../data/fun.var")
-        394
+        >>> from iode import Equation, ws_load_scl, Variables
+        >>> ws_load_scl("../data/fun.scl")
+        161
+        >>> Variables.load("../data/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
@@ -295,19 +294,20 @@ cdef class Equation:
         >>> eq_ACAF.get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
         >>> # clear Variables database + reset vars sample
-        >>> ws_clear_var()
-        >>> ws_sample_set("1960Y1", "2015Y1")
-        ('1960Y1', '2015Y1')
+        >>> Variables.clear()
+        >>> Variables.sample = "1960Y1:2015Y1"
+        >>> Variables.sample
+        1960Y1:2015Y1
         >>> # Do not create variables in the Variables database
         >>> eq_ACAF.get_variables_list(False)
         ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> ws_content_var()
+        >>> Variables.get_names()
         []
         >>> # create variables on the flight
         >>> eq_ACAF.get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
         >>> # content of the Variables database
-        >>> ws_content_var()
+        >>> Variables.get_names()
         ['ACAF', 'GOSF', 'TIME', 'VAF']
         """
         return [var.decode("utf-8") for var in self.c_equation.get_variables_list(create_if_not_exit)]
