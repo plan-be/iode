@@ -57,6 +57,24 @@ WORKSPACE
 .. autosummary::
    :toctree: _generated
 
+   Variables.mode
+   Variables.sample
+   Variables.nb_periods
+   Variables.periods
+   Variables.periods_as_float
+   Variables.periods_subset
+   Variables.extrapolate
+   Variables.seasonal_adjustment
+   Variables.trend_correction
+   Variables.from_frame
+   Variables.to_frame
+   Variables.from_array
+   Variables.to_array
+
+
+.. autosummary::
+   :toctree: _generated
+
    ws_content
    ws_content_eqs
    ws_content_idt
