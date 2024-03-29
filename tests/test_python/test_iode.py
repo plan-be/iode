@@ -8,8 +8,6 @@
 import iode
 import pytest
 import larray as la
-import numpy as np
-import pandas as pd
 import logging
 
 from pathlib import Path
@@ -35,81 +33,6 @@ from iode import Comments
 def test_iode_version():
     result = iode.version()
     assert result == "IODE Modeling Software 7.0.0 - (c) 1990-2023 Federal Planning Bureau - Brussels"
-
-# WS FUNCTIONS
-# ------------
-def test_iode_ws_content():
-    Comments.load(str(IODE_DATA_DIR / "fun.cmt"))
-    result = iode.ws_content("ACA*", 0)
-    assert result == ["ACAF", "ACAG"]
-
-def test_iode_ws_clear_var():
-    varfile = str(IODE_DATA_DIR / "a.var")
-    nbvars = iode.ws_load_var(varfile)
-    print(f"{nbvars} variables have been read")
-
-    iode.ws_clear_var()
-    result = iode.ws_content_var("*")
-    assert isinstance(result, list) and len(result) == 0 
-
-def test_iode_ws_load_var():
-    # Loading var varfile in IODE memory (KV_WS): iode.ws_load_var(filename)
-    varfile = str(IODE_DATA_DIR / "a.var")
-    nbvars = iode.ws_load_var(varfile)
-    assert nbvars == 433
-
-def test_iode_ws_load_all():
-    # Comments
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 0)
-    assert nbvars == 317
-    # Equations
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 1)
-    assert nbvars == 274
-    # Identities
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 2)
-    assert nbvars == 48
-    # Lists
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 3)
-    assert nbvars == 17
-    # Scalars
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 4)
-    assert nbvars == 161
-    # Tables
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 5)
-    assert nbvars == 46
-    # Variables
-    nbvars = iode.ws_load(str(IODE_DATA_DIR / "fun"), 6)
-    assert nbvars == 394
-
-def test_iode_ws_sample():
-
-    varfile = str(IODE_DATA_DIR / "a.var")
-    iode.ws_load_var(varfile)
-    sample = iode.ws_sample_get()
-    assert sample == ('1990Y1', '2020Y1')
-    print(f"Sample of {varfile} = {sample}")
-
-    sample = iode.ws_sample_set("1995Y1", "")
-    assert sample ==  ('1995Y1', '2020Y1')
-
-    sample = iode.ws_sample_set("", "2030Y1")
-    assert sample ==  ('1995Y1', '2030Y1')
-
-    sample = iode.ws_sample_set("2000Y1", "2002Y1")
-    assert sample ==  ('2000Y1', '2002Y1')
-
-    nobs = iode.ws_sample_nb_periods()
-    assert nobs == 3
-    print(f"Nobs = {nobs}")
-
-    str1 = iode.ws_sample_to_string()
-    assert str1 == "2000Y1 2002Y1"
-
-    lst = iode.ws_sample_to_list()
-    assert lst == ["2000Y1", "2001Y1", "2002Y1"]
-
-    ax2 = iode.ws_sample_to_larray_axis()
-    assert repr(ax2) == repr(la.Axis(["2000Y1", "2001Y1", "2002Y1"], 'time'))
 
 
 # PYIODE_OBJECTS
@@ -240,78 +163,14 @@ def test_iode_set_scl():
     assert i_myscl == py_myscl
 
 
-# VARIABLES IODE <-> PYTHON LISTS AND NDARRAYS
-# --------------------------------------------
-
-def test_iode_get_var_as_ndarray():
-    '''
-    Getting and setting vectors of doubles from KV_WS
-    x points to KV_WS["A"] because get_var_as_ndarray(..., 1)
-
-    KV_WS["A"] is only modified via x[2] = ...
-    '''
-
-    varfile = str(IODE_DATA_DIR / "a.var")
-    nbvars = iode.ws_load_var(varfile)
-
-    name = "A"
-
-    # x points to KV_WS["A"] because get_var_as_ndarray(..., 0)
-    x = iode.get_var_as_ndarray(name, 0)
-    x[2] = 22222 # Modifies the variable A in KV_WS
-    A = iode.get_var("A")
-    assert A[2] == 22222.0
-
-    # y is a deep copy of KV_WS["A"] because get_var_as_ndarray(..., 0) => memory leak ?
-    y = iode.get_var_as_ndarray(name, 1)
-    y[2] = 33333 # Does not modify the variable A in KV_WS
-    A = iode.get_var("A")
-    assert A[2] == 22222.0
-
-    # XYY does not exist in KV_WS => new allocation ? 
-    # TODO: check this + does XYY exist in KV_WS ?
-    z = iode.get_var_as_ndarray("XYY", 1)
-    XYY = iode.get_var_as_ndarray("XYY", 1)
-    print("XYY : ", XYY)
-
-    # Saving a copy of the modified KV_WS
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "a_mod.var"))
-
-
-def test_iode_get_var():
-
-    varfile = str(IODE_DATA_DIR / "a.var")
-    iode.ws_load_var(varfile)
-    iode.ws_sample_set("1990Y1", "1992Y1")
-
-    A = iode.get_var("A")
-    B = [0.0, 1.0, 2]
-    assert A == B
-
-
-def test_iode_set_var():
-
-    nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
-
-    AA = [11, 22, 33]
-    AB = np.array([0.0, 111.0, 112.5], np.double)
-
-    iode.set_var("AA", AA)
-    iode.set_var("AB", AB)
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "a_mod2.var"))
-
-    iode.ws_load_var(str(IODE_OUTPUT_DIR / "a_mod2.var"))
-    new_AA = iode.get_var("AA")
-    new_AB = iode.get_var("AB")
-
-    assert new_AA[2] == AA[2] # 1993Y1
-    assert new_AB[1] == AB[1] # 1992Y1
+# EXECUTE LEC
+# -----------
 
 
 def test_iode_exec_lec():
-    nbvars = iode.ws_load_var(str(IODE_DATA_DIR / "a.var"))
+    iode.Variables.load(str(IODE_DATA_DIR / "a.var"))
 
-    v_A = iode.get_var("A")
+    v_A = iode.Variables["A"]
     vec = iode.exec_lec("1+A-1")
     assert vec == v_A
 
@@ -321,28 +180,6 @@ def test_iode_exec_lec():
 
 # REPORT DATA_* FUNCTIONS
 # -----------------------
-
-# DATA_DELETE
-# -----------
-
-
-def test_iode_delete_objects():    
-    # Load IDT ws and delete group of idts based on name pattern
-    iode.ws_load_idt(str(IODE_DATA_DIR / "fun.idt"))
-    nbobjs = len(iode.ws_content_idt("*"))
-
-    nbobjs_pattern = len(iode.ws_content_idt("KLL"))
-    with pytest.raises(RuntimeError):
-        iode.delete_objects("KLL", 2)
-    nbobjs_after_delete = len(iode.ws_content_idt("*"))
-    assert nbobjs_after_delete == nbobjs - nbobjs_pattern
-    
-    iode.ws_load_idt(str(IODE_DATA_DIR / "fun.idt"))
-    nbobjs_pattern = len(iode.ws_content_idt("X*"))
-    iode.delete_objects("X*", 2)
-    nbobjs_after_delete = len(iode.ws_content_idt("*"))
-    assert nbobjs_after_delete == nbobjs - nbobjs_pattern
-
 
 # DATA_UPDATE
 # -----------
@@ -363,49 +200,13 @@ def test_iode_data_update_eqs():
     assert new_A == A
 
 
-def test_iode_data_update_var():
-
-    varfile = str(IODE_DATA_DIR / "a.var")
-    nbvars = iode.ws_load_var(varfile)
-
-    A = iode.get_var("A")
-    A[2] = 123
-    B = [100, 101, 102] # 1992Y1 1993Y1 ...
-    iode.data_update_var("A", A)
-    iode.data_update_var("B", B, operation="L", per_from="1992Y1")  
-
-    new_A = iode.get_var("A")
-    new_B = iode.get_var("B")
-    assert new_A[2] == A[2] # 1992Y1
-    assert new_B[3] == B[1] # 1993Y1
-    assert new_B[4] == B[2] # 1994Y1
-
-
-# Miscellaneous functions
-# -----------------------
-
-# def test_iode_ws_load_varpy():
-# 
-#     print('iode.ws_load_varpy("split.var")')
-#     print(iode.ws_load_varpy("split.var"))
-# 
-#     print('iode.ws_load_varpy("split.var", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})")')
-#     print(iode.ws_load_varpy("split.var", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})"))
-# 
-#     print('print(iode.ws_load_varpy("split.var", axis_names="a,b", regex=r"(\w{2})(\w{2})"))')
-#     print(iode.ws_load_varpy("split.var", axis_names="a,b".split(","), regex=r"(\w{2})(\w{2})"))
-# 
-#     print('iode.ws_load_varpy("split.var", varsaxis="a_b", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})")')
-#     print(iode.ws_load_varpy("split.var", varsaxis="a_b", axis_names=["a", "b"], regex=r"(\w{2})(\w{2})"))
-
-
 # ESTIMATION
 # ----------
 
 
 def test_iode_eqs_estimation():
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
-    iode.ws_load_var(str(IODE_DATA_DIR / "fun.var"))
+    iode.Variables.load(str(IODE_DATA_DIR / "fun.var"))
     iode.ws_load_scl(str(IODE_DATA_DIR / "fun.scl"))
 
     name = "ACAF"
@@ -427,7 +228,7 @@ def test_iode_eqs_estimation():
 
 def test_iode_model_simulate():
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
-    iode.ws_load_var(str(IODE_DATA_DIR / "fun.var"))
+    iode.Variables.load(str(IODE_DATA_DIR / "fun.var"))
     iode.ws_load_scl(str(IODE_DATA_DIR / "fun.scl"))
 
     # Test non convergence
@@ -452,21 +253,21 @@ def test_iode_model_simulate_exchange():
 
     iode.suppress_msgs()
     iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
-    iode.ws_load_var(str(IODE_DATA_DIR / "fun.var"))
+    iode.Variables.load(str(IODE_DATA_DIR / "fun.var"))
     iode.ws_load_scl(str(IODE_DATA_DIR / "fun.scl"))
 
     # Version with exchange in at least 2 equations
     # Set values of endo UY
-    UY = iode.get_var("UY")
-    UY[40:43] = [650.0, 670.0, 680.0] # 2000Y1..2002Y1
-    iode.set_var("UY", UY)
+    UY = iode.Variables["UY"]
+    UY[40:43] = [650.0, 670.0, 680.0]   # 2000Y1..2002Y1
+    iode.Variables["UY"] = UY
 
     # Simulate with exchange UY - XNATY
     iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
 
     # Check result
-    UY = iode.get_var("UY")
-    XNATY = iode.get_var("XNATY")
+    UY = iode.Variables["UY"]
+    XNATY = iode.Variables["XNATY"]
     assert iode.exec_lec("UY[2000Y1]")[0] == 650.0
     assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006734
 
@@ -531,8 +332,8 @@ def test_iode_htol():
     #Read quaterly data and convert it to the current WS sample (yearly)
    
     # define a yearly sample
-    iode.ws_clear_var()
-    iode.ws_sample_set("2000Y1", "2020Y1")
+    iode.Variables.clear()
+    iode.Variables.sample = "2000Y1:2020Y1"
     
     # input filename
     filename = str(IODE_DATA_DIR / "fun_q.var")
@@ -560,8 +361,8 @@ def test_iode_ltoh():
     #Read yearly data data and convert it to the current WS sample (quaterly)
    
     # define a yearly sample
-    iode.ws_clear_var()
-    iode.ws_sample_set("2010Q1", "2020Q4")
+    iode.Variables.clear()
+    iode.Variables.sample = "2010Q1:2020Q4"
 
     # input filename
     filename = str(IODE_DATA_DIR / "fun.var")
@@ -606,10 +407,12 @@ def test_iode_ltoh():
 def test_iode_htol_la():
     # Creates a quaterly larray and convert it to a yearly one
    
+    periods = ["2000Q2", "2000Q3", "2000Q4"] + [f"{y}Q{q}" for y in range(2001, 2010) for q in [1, 2, 3, 4]] + ["2010Q1"]
+
     # Creating a new Quaterly 3D-Array la3D 
     vars = la.Axis("vars=AA,BB,CC")
     sectors = la.Axis("sectors=S1,S2")
-    time = iode.ws_sample_to_larray_axis('time', "2000Q2", "2010Q1")
+    time = la.Axis(periods, "time")
 
     la3D = la.ones([vars, sectors, time])
 
@@ -618,14 +421,15 @@ def test_iode_htol_la():
     la3D["2002Q2","S2"] = [11, 22, 33]  # AA_S2[2001Q4] = 11; BB_S2[2001Q4] = 22; CC_S2[2001Q4] = 33;
 
     # Saving la3D in KV_WS, then in file testq_3D.var
-    iode.ws_clear_var()
-    iode.larray_to_ws(la3D)
+    iode.Variables.clear()
+    iode.Variables.from_array(la3D)
+
     filename = str(IODE_OUTPUT_DIR / "testq_3D")
-    iode.ws_save_var(filename)
+    iode.Variables.save(filename)
  
     # Import testq_3D in yearly WS
-    iode.ws_clear_var()                 # Clear the ws before setting a new sample 
-    iode.ws_sample_set("2000Y1", "2010Y1")  
+    iode.Variables.clear() 
+    iode.Variables.sample = "2000Y1:2010Y1"  
     
     # Last Obs in year
     varname = "BB_S1"
@@ -647,317 +451,51 @@ def test_iode_htol_la():
 
     # save the new yearly ws
     filename = str(IODE_OUTPUT_DIR / "testy_3D")
-    iode.ws_save_var(filename)
-    
-    # read in la
-    la3Dy = iode.ws_load_var_to_larray(filename, split_axis_names=["vars", "sectors"], split_sep="_")
-    print(la3Dy)
+    iode.Variables.save(filename)
 
 
 # PANDAS FUNCTIONS
 # ----------------
 
-def test_iode_df_to_ws():
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Creating a new simple dataframe df
-    data = {"1991Y1": [0, 0.5, 1], "1992Y1": [2, 2.5, 3], "1993Y1": [4, 4.5, 5]}
-    index = ["AA", "BB", "CC"]
-    df = pd.DataFrame(data=data, index=index)
-    df.index.name = "vars"
-    df.columns.name = "time"
-
-    # Copying la1 to KV_WS
-    iode.df_to_ws(df)
-
-    # Check nb of objects
-    nbvars = len(iode.ws_content_var("*"))
-    assert nbvars == 3
-
-    # Check values
-    AA = iode.get_var("AA")
-    assert AA[1] ==  2.0
-
-
-def test_iode_df_to_ws_timeit():
+def test_from_frame_timeit():
     import timeit
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Creating a new simple dataframe df
-    data = {"1991Y1": [0, 0.5, 1], "1992Y1": [2, 2.5, 3], "1993Y1": [4, 4.5, 5]}
-    index = ["AA", "BB", "CC"]
-    df = pd.DataFrame(data=data, index=index)
-    df.index.name = "vars"
-    df.columns.name = "time"
-
-    stmt = "iode.df_to_ws(df)"
-    t = timeit.timeit(stmt, globals={"iode": iode, "df": df}, number=10000)
-    logging.info(f"{stmt}: {t}")
-
-    if nanobind:
-        var_names = df.index.to_list()
-        periods = df.columns.to_list()
-
-        stmt = "df.to_numpy(dtype=float, copy=False, na_value=iode.nan)"
-        t = timeit.timeit(stmt, globals={"iode": iode, "df": df}, number=10000)
-        logging.info(f"{stmt}: {t}")
-
-        # na_value=nan converts Numpy NaN to IODE NaN values
-        data = df.to_numpy(dtype=float, copy=False, na_value=iode.nan)
-
-        import iode.iode_python_api as cpp_api
-
-        assert data.flags['F_CONTIGUOUS']
-        stmt = "cpp_api.__set_vars_from_ndarray(var_names, periods[0], periods[-1], data)"
-        t = timeit.timeit(stmt, globals={"cpp_api": cpp_api, "var_names": var_names, "periods": periods, "data": data}, number=10000)
-        logging.info(f"{stmt} [F CONTIGUOUS]: {t}")
-
-        stmt = "np.ascontiguousarray(data)"
-        t = timeit.timeit(stmt, globals={"data": data, "np": np}, number=10000)
-        logging.info(f"{stmt}: {t}")
-
-        data = np.ascontiguousarray(data)
-
-        assert data.flags['C_CONTIGUOUS']
-        stmt = "cpp_api.__set_vars_from_ndarray_contiguous(var_names, periods[0], periods[-1], data)"
-        t = timeit.timeit(stmt, globals={"cpp_api": cpp_api, "var_names": var_names, "periods": periods, "data": data}, number=10000)
-        logging.info(f"{stmt} [C CONTIGUOUS]: {t}")
-
-        cpp_api.__set_vars_from_ndarray_contiguous(var_names, periods[0], periods[-1], data)
-
-
-def test_iode_ws_to_df():
-    # Clear the WS
-    iode.ws_load_var(str(IODE_DATA_DIR / "fun.var"))
-    df = iode.ws_to_df()
-    
-    # Check nb of objects
-    nbvars = len(df.index)
-    assert nbvars == 394
-
-    # Check values
-    value = df.loc["ACAF", "1990Y1"]
-    assert value == 23.771
-
-
-# LARRAY FUNCTIONS
-# ----------------
-
-def test_iode_larray_to_ws_2D():
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Creating a new simple 2D-Array la1
-    vars = la.Axis("vars=AA,BB,CC")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1")
-    la1 = la.ones([vars, time])
-
-    # Setting values in la1 for AA, BB and CC in 1990 and 1991
-    la1["1992Y1"] = [2, 3, 4]
-    la1["1993Y1"] = [22, 33, 44]
-
-    # Copying la1 to KV_WS
-    iode.larray_to_ws(la1)
-
-    # Check nb of objects
-    nbvars = len(iode.ws_content_var("*"))
-    assert nbvars == 3
-
-    # Check values
-    AA = iode.get_var("AA")
-    assert AA[1] == 2.0
-
-    # Saving KV_WS to la1/var
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la1.var"))
-
-
-# Working with a 3D-Array la3D (vars, sector, time)
-# -------------------------------------------------
-
-def test_iode_larray_to_ws_3D():
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Creating a new 3D-Array la3D
-    sectors = la.Axis("sectors=S1,S2")
-    vars = la.Axis("vars=AA,BB,CC")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1")
-
-    # Setting values in la3D for S1, S2 in 1900 and 1991
-    la3D = la.zeros([vars, sectors, time])
-    la3D["1991Y1","S1"] = [1, 2, 3]
-    la3D["1992Y1","S2"] = [11, 22, 33]
-
-    assert la3D.data.data.c_contiguous
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D)
-
-    # Check nb of objects
-    nbvars = len(iode.ws_content_var("*"))
-    assert nbvars == 6
-
-    # Check values
-    BB_S2 = iode.get_var("BB_S2")
-    assert BB_S2[1] == 22.0
-
-    # Save KV_WS to la3d.var
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la3D.var"))
-
-
-def test_iode_larray_to_ws_3D_R():
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Creating a new 3D-Array la3D
-    sectors = la.Axis("sectors=S1,S2")
-    vars = la.Axis("vars=AA,BB,CC")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1")
-
-    # Setting values in la3D for S1, S2 in 1900 and 1991
-    la3D = la.zeros([time, vars, sectors])
-    la3D["1991Y1","S1"]= [1, 2, 3]
-    la3D["1992Y1","S2"]=[11, 22, 33]
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D)
-
-    # Check nb of objects
-    nbvars = len(iode.ws_content_var("*"))
-    assert nbvars == 6
-
-    # Check values
-    BB_S2 = iode.get_var("BB_S2")
-    assert BB_S2[1] == 22.0
-
-    # Save KV_WS to file
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la3D_R.var"))
-
-
-def test_iode_larray_to_ws_long_sample():
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Set IODE sample
-    iode.ws_sample_set("1990Y1", "2000Y1")
-
-    # Creating a new 3D-Array la3D_R
-    sectors = la.Axis("sectors=S1,S2")
-    vars = la.Axis("vars=AA,BB,CC")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1")
-
-    # Setting values in la3D for S1, S2 in 1900 and 1991
-    la3D_R = la.zeros([time, vars, sectors])
-    la3D_R["1991Y1","S1"] = [7, 8, 9]
-    la3D_R["1992Y1","S2"] = (99, 88, 77)
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D_R)
-
-    # Check nb of objects
-    expected_nbvars = 6
-    nbvars = len(iode.ws_content_var("*"))
-    assert nbvars == 6
-
-    # Check values
-    BB_S2 = iode.get_var("BB_S2")
-    assert BB_S2[2] == 88.0
-
-    # Save KV_WS to la3d.var
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la3D_R2.var"))
-
-
-def test_iode_larray_to_ws_short_sample():
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Set IODE sample
-    iode.ws_sample_set("1992Y1", "1994Y1")
-
-    # Creating a new 3D-Array la3D_R
-    sectors = la.Axis("sectors=S1,S2")
-    vars = la.Axis("vars=AA,BB,CC")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1,1994Y1,1995Y1")
-
-    # Setting values in la3D for S1, S2 in 1900 and 1991
-    la3D_R = la.zeros([time, vars, sectors])
-    la3D_R["1991Y1","S1"] = [5, 6, 7]
-    la3D_R["1992Y1","S2"] = (99, 88, 77)
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D_R)
-
-    # Save KV_WS
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la3D_R3.var"))
-
-
-def test_iode_larray_to_ws_out_sample():
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Set IODE sample
-    iode.ws_sample_set("2000Y1", "2005Y1")
-
-    # Creating a new 3D-Array la3D_R
-    sectors = la.Axis("sectors=S1,S2")
-    vars = la.Axis("vars=AA,BB,CC")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1,1994Y1,1995Y1")
-
-    # Setting values in la3D for S1, S2 in 1900 and 1991
-    la3D_R = la.zeros([time, vars, sectors])
-    la3D_R["1991Y1","S1"] = [5, 6, 7]
-    la3D_R["1992Y1","S2"] = (99, 88, 77)
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D_R)
-
-    # Save KV_WS to la3d.var
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la3D_R4.var"))
-
-
-def test_iode_larray_to_ws_big_la():
-
-    # Clear the WS
-    iode.ws_clear_all()
-
-    # Set IODE sample
-    iode.ws_sample_set("1992Y1", "1994Y1")
-
-    # Creating Axes
-    sectors = la.Axis("sectors=S0,S1,S2,S3,S4,S5,S6,S7,S8,S9")
-    dim2 = la.Axis("dim2=A1,B1,C1,D1,E1,F1,G1,H1,I1, J1")
-    dim3 = la.Axis("dim3=A2,B2,C2,D2,E2,F2,G2,H2,I2, J2")
-    dim4 = la.Axis("dim4=A3,B3,C3,D3,E3,F3,G3,H3,I3, J3")
-    vars = la.Axis("vars=AA,BB,CC,DD,EE,FF,GG,HH,II,JJ")
-    time = la.Axis("time=1991Y1,1992Y1,1993Y1,1994Y1,1995Y1")
-
-    # Create a new LArray with time in the last position
-    la3D_R5 = la.zeros([vars, sectors, dim2, dim3, dim4, time])
-
-    # Setting values in la3D for S1, S2 in 1900 and 1991
-    la3D_R5["1992Y1","S1", "A1", "A2", "A3"] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    la3D_R5["1994Y1","S2", "A1", "A2", "A3"] = [11, 22, 33, 44, 55, 66, 77, 88, 99, 100.4]
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D_R5)
-
-    # Creating a new LArray with time in the middle
-    la3D_R5 = la.zeros([vars, sectors, time, dim2, dim3, dim4])
-
-    # Setting values in la
-    la3D_R5["1992Y1", "S1", "A1", "A2", "A3"] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    la3D_R5["1994Y1", "S2", "A1", "A2", "A3"] = [11, 22, 33, 44, 55, 66, 77, 88, 99, 100.4]
-
-    # Saving la3D in KV_WS
-    iode.larray_to_ws(la3D_R5)
-
-    # Save KV_WS
-    iode.ws_save_var(str(IODE_OUTPUT_DIR / "la3D_R5.var"))
+    import pandas as pd
+    import numpy as np
+
+    iode.Variables.clear()
+
+    # create the pandas DataFrame
+    vars_names = [f"A_{i}" for i in range(0, 10_000)]           # 10_000 variables
+    periods_list = [f"{i}Y1" for i in range(1951, 2051)]        # 100 periods
+    data = np.arange(len(vars_names) * len(periods_list), dtype=float).reshape(len(vars_names), len(periods_list))
+    df = pd.DataFrame(index=vars_names, columns=periods_list, data=data)
+
+    assert df.shape == (10_000, 100)
+    assert df.size == 1000_000
+
+    stmt = "iode.Variables.from_frame(df)"
+    nb_times = 10
+    t = timeit.timeit(stmt, globals={"iode": iode, "df": df}, number=nb_times)
+    logging.info(f"{stmt} (shape {df.shape}): {t} ({nb_times} times) -> {t / nb_times} per loop")
+
+def test_to_frame_timeit():
+    import timeit
+    import pandas as pd
+    import numpy as np
+
+    iode.Variables.clear()
+
+    # set sample to 100 periods
+    iode.Variables.sample = "1951Y1:2050Y1"
+    assert iode.Variables.nb_periods == 100
+
+    # create 10_000 variables
+    for i in range(0, 10_000):
+        iode.Variables[f"A_{i}"] = f"t + {i}"
+    assert len(iode.Variables) == 10_000
+
+    stmt = "df = iode.Variables.to_frame()"
+    nb_times = 10
+    t = timeit.timeit(stmt, globals={"iode": iode}, number=nb_times)
+    logging.info(f"{stmt} (shape ({len(iode.Variables)}, {iode.Variables.nb_periods})): "
+                 f"{t} ({nb_times} times) -> {t / nb_times} per loop")
