@@ -295,26 +295,30 @@ TEST_F(KDBVariablesTest, CreateRemove)
     Variables.remove(new_name);
 
     // --- using function that does not exist
-    EXPECT_THROW(Variables.add("FAILS", "func(t)"), IodeExceptionFunction);
+    EXPECT_THROW(Variables.add("FAILS", "func(t)"), std::runtime_error);
     // --- using variable that does not exist
-    EXPECT_THROW(Variables.add("FAILS", "ln Z"), IodeExceptionFunction);
+    EXPECT_THROW(Variables.add("FAILS", "ln Z"), std::runtime_error);
 }
 
 TEST_F(KDBVariablesTest, Update)
 {
     std::string name;
-    int nb_periods = Variables.get_nb_periods();
     std::string lec;
     Variable expected_var;
+    int nb_periods = Variables.get_nb_periods();
+    Sample sample = Variables.get_sample();
 
-    std::string period = "1980Y1";
-    int t = Variables.get_sample().get_period_position(period);
     Variable values;
-    for(int y=1980; y < 1990; y++)
+    for(int y=1980; y <= 1990; y++)
         values.push_back((double) y);
+
+    std::string first_period = "1980Y1";
+    std::string last_period = "1990Y1";
+    int t_first = sample.get_period_position(first_period);
+    int t_last = sample.get_period_position(last_period);
     
-    int t_too_far = nb_periods - ((int) values.size() / 2);
-    std::string period_too_far = Variables.get_period(t_too_far);
+    int t_last_wrong = t_last + 1;
+    std::string last_period_wrong = "1991Y1";
 
     // ---- by position ----
 
@@ -325,32 +329,40 @@ TEST_F(KDBVariablesTest, Update)
     EXPECT_EQ(Variables.get(pos), expected_var);
     // -- wrong size of the passed vector of new values
     expected_var.pop_back();
-    EXPECT_THROW(Variables.update(pos, expected_var), std::length_error);
+    EXPECT_THROW(Variables.update(pos, expected_var), std::range_error);
 
-    // 2) starting from a given period t
+    // 2) for a given range of periods (as int)
     expected_var = Variables.get(pos+1);
     for(int i=0; i < values.size(); i++)
-        expected_var[t + i] = values[i];
-    Variables.update(pos+1, t, values);
+        expected_var[t_first + i] = values[i];
+    Variables.update(pos+1, values, t_first, t_last);
     EXPECT_EQ(Variables.get(pos+1), expected_var);
-    // -- too much values to copy
-    EXPECT_THROW(Variables.update(pos+1, t_too_far, values), std::range_error);
+    // -- wrong last period
+    EXPECT_THROW(Variables.update(pos+1, values, t_first, t_last_wrong), std::range_error);
 
-    // 3) starting from a given period period
+    // 3) for a given range of periods (as string)
     expected_var = Variables.get(pos+2);
     for(int i=0; i < values.size(); i++)
-        expected_var[t + i] = values[i];
-    Variables.update(pos+2, period, values);
+        expected_var[t_first + i] = values[i];
+    Variables.update(pos+2, values, first_period, last_period);
     EXPECT_EQ(Variables.get(pos+2), expected_var);
-    // -- too much values to copy
-    EXPECT_THROW(Variables.update(pos+2, period_too_far, values), std::range_error);
+    // -- wrong last period
+    EXPECT_THROW(Variables.update(pos+2, values, first_period, last_period_wrong), std::range_error);
 
     // 4) pass a LEC expression
     expected_var.clear();
-    for (int p = 0; p < nb_periods; p++) 
-        expected_var.push_back(10.0 + p);
+    for(int t=0; t < nb_periods; t++)
+        expected_var.push_back(10.0 + t);
     lec = "10 + t";
     Variables.update(pos+3, lec);
+    EXPECT_EQ(Variables.get(pos+3), expected_var);
+
+    // 5) pass a LEC expression for a given range of periods (as int)
+    expected_var = Variables.get(pos+3);
+    for(int i=0; i < values.size(); i++)
+        expected_var[t_first + i] = 20.0 + t_first + i;
+    lec = "20 + t";
+    Variables.update(pos+3, lec, first_period, last_period);
     EXPECT_EQ(Variables.get(pos+3), expected_var);
 
     // ---- by name ----
@@ -364,36 +376,44 @@ TEST_F(KDBVariablesTest, Update)
     EXPECT_EQ(Variables.get(name), expected_var);
     // -- wrong size of the passed vector of new values
     expected_var.pop_back();
-    EXPECT_THROW(Variables.update(name, expected_var), std::length_error);
+    EXPECT_THROW(Variables.update(name, expected_var), std::range_error);
 
-    // 2) starting from a given period t
+    // 2) for a given range of periods (as int)
     name = Variables.get_name(pos+1);
     expected_var = Variables.get(name);
     for(int i=0; i < values.size(); i++)
-        expected_var[t + i] = values[i];
-    Variables.update(name, t, values);
+        expected_var[t_first + i] = values[i];
+    Variables.update(name, values, t_first, t_last);
     EXPECT_EQ(Variables.get(name), expected_var);
-    // -- too much values to copy
-    EXPECT_THROW(Variables.update(name, t_too_far, values), std::range_error);
+    // -- wrong last period
+    EXPECT_THROW(Variables.update(name, values, t_first, t_last_wrong), std::range_error);
 
-    // 3) starting from a given period period
+    // 3) for a given range of periods (as string)
     name = Variables.get_name(pos+2);
     expected_var = Variables.get(name);
     for(int i=0; i < values.size(); i++)
-        expected_var[t + i] = values[i];
-    Variables.update(name, period, values);
+        expected_var[t_first + i] = values[i];
+    Variables.update(name, values, first_period, last_period);
     EXPECT_EQ(Variables.get(name), expected_var);
-    // -- too much values to copy
-    EXPECT_THROW(Variables.update(name, period_too_far, values), std::range_error);
+    // -- wrong last period
+    EXPECT_THROW(Variables.update(name, values, first_period, last_period_wrong), std::range_error);
 
     // 4) pass a LEC expression
     name = Variables.get_name(pos+3);
     expected_var.clear();
-    for (int p = 0; p < nb_periods; p++) 
-        expected_var.push_back(20.0 + p);
-    lec = "20 + t";
+    for(int t=0; t < nb_periods; t++)
+        expected_var.push_back(30.0 + t);
+    lec = "30 + t";
     Variables.update(name, lec);
     EXPECT_EQ(Variables.get(name), expected_var);
+
+    // 5) pass a LEC expression for a given range of periods (as int)
+    expected_var = Variables.get(pos+3);
+    for(int i=0; i < values.size(); i++)
+        expected_var[t_first + i] = 40.0 + t_first + i;
+    lec = "40 + t";
+    Variables.update(pos+3, lec, first_period, last_period);
+    EXPECT_EQ(Variables.get(pos+3), expected_var);
 }
 
 TEST_F(KDBVariablesTest, Copy)
