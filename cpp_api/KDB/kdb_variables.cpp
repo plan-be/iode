@@ -113,19 +113,29 @@ void KDBVariables::set_var(const std::string& name, const Period& period, const 
 	set_var(name, t, value, mode);
 }
 
-Variable KDBVariables::new_var_from_lec(const std::string& lec)
+Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int t_first, const int t_last)
 {
+	std::string prefix = "Cannot calculate variable values: ";
+
+	int total_nb_periods = get_nb_periods();
+	if (total_nb_periods == 0) 
+		throw std::runtime_error(prefix + "The Variables sample has not been yet defined");
+
+	std::string error_msg = prefix + "the {} period position must be in the range [0, " + 
+							std::to_string(total_nb_periods - 1) + "]. Got value {:d}";
+	if(t_first < 0 || t_first >= total_nb_periods)
+		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("first", t_first)));
+
+	if(t_last < 0 || t_last >= total_nb_periods)
+		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("last", t_last)));
+
 	Variable var;
-
-	Sample sample = get_sample();
-	if (sample.nb_periods() == 0) throw IodeExceptionInitialization("variable", 
-		"Variables sample has not been yet defined");
-
-	var.reserve(sample.nb_periods());
+	var.reserve(t_last - t_first + 1);
 
 	if (lec.empty())
 	{
-		for (int t = 0; t < sample.nb_periods(); t++) var.push_back(L_NAN);
+		for (int t = t_first; t <= t_last; t++) 
+			var.push_back(L_NAN);
 		return var;
 	}
 
@@ -137,17 +147,28 @@ Variable KDBVariables::new_var_from_lec(const std::string& lec)
 	// The CLEC object is modified (inplace) by L_link()
 	if (clec != NULL && L_link(KV_WS, KS_WS, clec) == 0)
 	{
-		for (int t = 0; t < sample.nb_periods(); t++) var.push_back(L_exec(KV_WS, KS_WS, clec, t));
+		for (int t = t_first; t <= t_last; t++) 
+			var.push_back(L_exec(KV_WS, KS_WS, clec, t));
 		SW_nfree(clec);
 		return var;
 	}
 	else 
 	{
 		SW_nfree(clec);
-		IodeExceptionFunction error("Cannot create or update variable", "Unknown");
-		error.add_argument("lec", lec);
-		throw error;
+		throw std::runtime_error("Calculate variable values: Cannot compute LEC expressions: '" + lec + "'");
 	}
+}
+
+Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)
+{
+	Sample sample = get_sample();
+	if (sample.nb_periods() == 0) 
+		throw std::runtime_error("The Variables sample has not been yet defined");
+
+	int t_first = first_period.empty() ? 0 : sample.get_period_position(first_period);
+	int t_last = last_period.empty() ? sample.nb_periods() - 1 : sample.get_period_position(last_period);
+
+	return calculate_var_from_lec(lec, t_first, t_last);
 }
 
 int KDBVariables::add(const std::string& name, const Variable& variable)
@@ -163,74 +184,97 @@ int KDBVariables::add(const std::string& name, const Variable& variable)
 
 int KDBVariables::add(const std::string& name, const std::string& lec)
 {
-	Variable var = new_var_from_lec(lec);
+	int total_nb_periods = get_nb_periods();
+	if(total_nb_periods == 0)
+		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
+
+	Variable var = calculate_var_from_lec(lec, 0, total_nb_periods - 1);
 	return add(name, var);
 }
 
-void KDBVariables::update(const int pos, const Variable& variable)
+void KDBVariables::update(const int pos, const Variable& values, const int t_first, const int t_last)
 {
 	std::string name = get_name(pos);
-	update(name, variable);
+	update(name, values, t_first, t_last);
 }
 
-void KDBVariables::update(const int pos, const int t, const Variable& values)
+void KDBVariables::update(const int pos, const Variable& values, const std::string& first_period, const std::string& last_period)
 {
 	std::string name = get_name(pos);
-	update(name, t, values);
+	update(name, values, first_period, last_period);
 }
 
-void KDBVariables::update(const int pos, const std::string& period, const Variable& values)
+void KDBVariables::update(const int pos, const std::string& lec, const int t_first, const int t_last)
 {
 	std::string name = get_name(pos);
-	update(name, period, values);
+	update(name, lec, t_first, t_last);
 }
 
-void KDBVariables::update(const int pos, const std::string& lec)
+void KDBVariables::update(const int pos, const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
 	std::string name = get_name(pos);
-	update(name, lec);
+	update(name, lec, first_period, last_period);
 }
 
-void KDBVariables::update(const std::string& name, const Variable& variable)
+void KDBVariables::update(const std::string& name, const Variable& values, const int t_first, const int t_last)
 {
-	int var_size = (int) variable.size();
-	check_var_size("update", name, variable);
-	KDBTemplate::update(name, variable.data(), &var_size);
-}
+	std::string prefix = "Cannot update variable '" + name + "' values: ";
 
-void KDBVariables::update(const std::string& name, const int t, const Variable& values)
-{
-	int nb_periods = get_nb_periods();
+	int total_nb_periods = get_nb_periods();
+	if (total_nb_periods == 0) 
+		throw std::runtime_error(prefix + "The Variables sample has not been yet defined");
 
-	// check if vector of values too long
-	// position of the last period of the sample is (sample_size - 1)
-	if((t + values.size() - 1) > (nb_periods - 1))
-	{
-		std::string period = get_period(t);
-		throw std::range_error("Cannot update " + std::to_string(values.size()) + " values " + 
-				"of the Variable '" + name + "' starting from period " + period + ".\n" + 
-				"Too much values to copy");
-	}
+	std::string error_msg = prefix + "the {} period position must be in the range [0, " + 
+							std::to_string(total_nb_periods - 1) + "]. Got value {:d}";
+	if(t_first < 0 || t_first >= total_nb_periods)
+		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("first", t_first)));
+
+	if(t_last < 0 || t_last >= total_nb_periods)
+		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("last", t_last)));
+
+	int nb_periods = t_last - t_first + 1;
+	if (values.size() != nb_periods)
+		throw std::range_error(std::vformat(prefix + "the size of the passed vector ({:d}) " + 
+				"does match the number of expected periods ({:d} -> period {:d} to {:d})", 
+				std::make_format_args((int) values.size(), nb_periods, t_first, t_last)));
 
 	// prepare new Variable vector	
 	Variable variable = get(name);
 	for(int i=0; i < values.size(); i++)
-		variable[t + i] = values[i];
+		variable[t_first + i] = values[i];
 
 	// update the variable
-	update(name, variable);
+	KDBTemplate::update(name, variable.data(), &total_nb_periods);
 }
 
-void KDBVariables::update(const std::string& name, const std::string& period, const Variable& values)
+void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)
 {
-	int t = get_sample().get_period_position(period);
-	update(name, t, values);
+	Sample sample = get_sample();
+	if (sample.nb_periods() == 0) 
+		throw std::runtime_error("The Variables sample has not been yet defined");
+
+	int t_first = first_period.empty() ? 0 : sample.get_period_position(first_period);
+	int t_last = last_period.empty() ? sample.nb_periods() - 1 : sample.get_period_position(last_period);
+
+	update(name, values, t_first, t_last);
 }
 
-void KDBVariables::update(const std::string& name, const std::string& lec)
+void KDBVariables::update(const std::string& name, const std::string& lec, const int t_first, const int t_last)
 {
-	Variable var = new_var_from_lec(lec);
-	update(name, var);
+	Variable var = calculate_var_from_lec(lec, t_first, t_last);
+	update(name, var, t_first, t_last);
+}
+
+void KDBVariables::update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period)
+{
+	Sample sample = get_sample();
+	if (sample.nb_periods() == 0) 
+		throw std::runtime_error("The Variables sample has not been yet defined");
+	
+	int t_first = first_period.empty() ? 0 : sample.get_period_position(first_period);
+	int t_last = last_period.empty() ? sample.nb_periods() - 1 : sample.get_period_position(last_period);
+
+	update(name, lec, t_first, t_last);
 }
 
 Sample KDBVariables::get_sample() const

@@ -23,8 +23,6 @@ const static std::vector<std::string> v_var_modes = { "Level", "Differences", "G
 class KDBVariables : public KDBTemplate<Variable>
 {
 private:
-    Variable new_var_from_lec(const std::string& lec);
-
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
     {
         int nb_periods = get_nb_periods();
@@ -33,6 +31,10 @@ private:
 			    "vector for values is " + std::to_string(variable.size()) + " while the number of " + 
 			    "periods is " + std::to_string(nb_periods));
     }
+
+    Variable calculate_var_from_lec(const std::string& lec, const int t_first = 0, const int t_last = -1);
+
+    Variable calculate_var_from_lec(const std::string& lec, const std::string& first_period = "", const std::string& last_period = "");
 
 protected:
 
@@ -95,21 +97,21 @@ public:
 
     int add(const std::string& name, const std::string& lec);
 
-    void update(const int pos, const Variable& variable);
+    void update(const int pos, const Variable& values, const int t_first, const int t_last);
 
-    void update(const int pos, const int t, const Variable& values);
+    void update(const int pos, const Variable& values, const std::string& first_period = "", const std::string& last_period = "");
 
-    void update(const int pos, const std::string& period, const Variable& values);
+    void update(const int pos, const std::string& lec, const int t_first, const int t_last);
 
-    void update(const int pos, const std::string& lec);
+    void update(const int pos, const std::string& lec, const std::string& first_period = "", const std::string& last_period = "");
 
-    void update(const std::string& name, const Variable& variable);
+    void update(const std::string& name, const Variable& values, const int t_first, const int t_last);
 
-    void update(const std::string& name, const int t, const Variable& values);
+    void update(const std::string& name, const Variable& values, const std::string& first_period = "", const std::string& last_period = "");
 
-    void update(const std::string& name, const std::string& period, const Variable& values);
+    void update(const std::string& name, const std::string& lec, const int t_first, const int t_last);
 
-    void update(const std::string& name, const std::string& lec);
+    void update(const std::string& name, const std::string& lec, const std::string& first_period = "", const std::string& last_period = "");
 
     Sample get_sample() const;
 
