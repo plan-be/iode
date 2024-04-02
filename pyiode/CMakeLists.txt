@@ -67,6 +67,7 @@ if(Python_FOUND)
       add_custom_command(TARGET iode_python POST_BUILD
                           COMMAND ${CMAKE_COMMAND} -E copy ${CYTHON_OUTPUT} ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.pyd 
                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/iode.msg ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/iode.msg 
+                          COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/tests/data ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_}/tests/data
                           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                           COMMENT "Copying iode.pyd and iode.msg files to the ${CMAKE_CURRENT_BINARY_DIR}/py${Python_VERSION_} directory"
                           )
