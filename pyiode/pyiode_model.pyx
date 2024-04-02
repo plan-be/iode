@@ -123,8 +123,9 @@ def model_calc_scc(nb_passes: int = 1,
     
     Examples
     --------
+    >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import model_calc_scc, ws_load_eqs
-    >>> ws_load_eqs("../data/fun.eqs")
+    >>> ws_load_eqs(f"{SAMPLE_DATA_DIR}/fun.eqs")
     274
     >>> model_calc_scc(nb_passes=1)
     '''

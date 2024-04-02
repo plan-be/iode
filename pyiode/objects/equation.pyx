@@ -161,8 +161,9 @@ cdef class Equation:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables, Equation, Sample
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
@@ -200,6 +201,7 @@ cdef class Equation:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Equation
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> # date as default format "dd-mm-yyyy"
@@ -229,10 +231,11 @@ cdef class Equation:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Equation, ws_load_scl, ws_clear_scl, ws_content_scl, Variables
-        >>> ws_load_scl("../data/fun.scl")
+        >>> ws_load_scl(f"{SAMPLE_DATA_DIR}/fun.scl")
         161
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
@@ -277,10 +280,11 @@ cdef class Equation:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Equation, ws_load_scl, Variables
-        >>> ws_load_scl("../data/fun.scl")
+        >>> ws_load_scl(f"{SAMPLE_DATA_DIR}/fun.scl")
         161
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
@@ -322,6 +326,7 @@ cdef class Equation:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Equation
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> lhs, rhs = eq_ACAF.split_equation()

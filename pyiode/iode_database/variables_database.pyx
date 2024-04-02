@@ -378,9 +378,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
         >>> import pandas as pd
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> len(Variables)
         394
         >>> Variables.sample
@@ -531,8 +532,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> len(Variables)
         394
         >>> Variables.sample
@@ -582,8 +584,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.mode
         'Level'
         """
@@ -604,8 +607,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.mode
         'Level'
         >>> Variables["ACAF", "1990Y1"]
@@ -633,8 +637,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         """
@@ -656,8 +661,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
 
@@ -716,8 +722,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         >>> Variables.nb_periods
@@ -736,8 +743,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         >>> Variables.periods       # doctest: +ELLIPSIS 
@@ -756,8 +764,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         >>> Variables.periods_as_float          # doctest: +ELLIPSIS 
@@ -787,8 +796,9 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         >>> Variables.periods_subset("1990Y1", "2000Y1")                    # doctest: +ELLIPSIS
@@ -840,7 +850,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
-
+        >>> from iode import SAMPLE_DATA_DIR
         """
         sample = self.sample
 
@@ -877,7 +887,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
-
+        >>> from iode import SAMPLE_DATA_DIR
         """
         if isinstance(series, Iterable) and all(isinstance(name, str) for name in series):
             series = ';'.join(series)
@@ -905,7 +915,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
 
         Examples
         --------
-
+        >>> from iode import SAMPLE_DATA_DIR
         """
         if isinstance(series, Iterable) and all(isinstance(name, str) for name in series):
             series = ';'.join(series)

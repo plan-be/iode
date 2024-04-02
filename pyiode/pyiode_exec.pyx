@@ -54,7 +54,7 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
     
     Examples 
     --------
-        IODE_DATA_DIR = "../data."
+    >>> from iode import SAMPLE_DATA_DIR
         
         # define the "trace" file
         iode.w_dest("test_iode.htm", iode.W_HTML)
@@ -62,13 +62,13 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
         # Simple case: no vars in WS, sample given
         iode.Variables.clear()
         iode.Variables.sample = "1960Y1:2015Y1"
-        iode.ws_load_idt("../data/fun.idt")
-        iode.idt_execute("1961Y1:2000Y1", "AOUC", "../data/fun.idt", trace = True)
+        iode.ws_load_idt(f"{SAMPLE_DATA_DIR}/fun.idt")
+        iode.idt_execute("1961Y1:2000Y1", "AOUC", f"{SAMPLE_DATA_DIR}/fun.idt", trace = True)
         AOUC = iode.Variables["AOUC"]
-        test_eq('iode.idt_execute("1961Y1:2000Y1", "AOUC", "../data/fun.idt, trace = 1") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
+        test_eq('iode.idt_execute("1961Y1:2000Y1", "AOUC", f"{SAMPLE_DATA_DIR}/fun.idt, trace = 1") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
         # Load WS + change value before execution to check the result
-        iode.Variables.load("../data/fun.var")
+        iode.Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         AOUC = iode.Variables["AOUC"]
         AOUC[1] = 0.1 
         iode.Variables["AOUC"] = AOUC
@@ -76,7 +76,7 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
         AOUC = iode.Variables["AOUC"]
         test_eq('2. iode.idt_execute("1961Y1:2015Y1", "AOUC") -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
-        iode.Variables.load("../data/fun.var")
+        iode.Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         AOUC = iode.Variables["AOUC"]
         AOUC[1] = 0.1
         iode.idt_execute("1961Y1:2015Y1", "AOUC")
@@ -89,7 +89,7 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
         test_eq('4. iode.idt_execute(["1961Y1", "2015Y1"], ["AOUC", "FLGR"]) -> AOUC[1961Y1]', 0.24783192, AOUC[1])
     
         # Call with empty parameters 
-        iode.ws_load_scl("../data/fun.scl")
+        iode.ws_load_scl(f"{SAMPLE_DATA_DIR}/fun.scl")
         iode.delete_idt("SSFFX") # SSFFX contains non existent variables
         AOUC = iode.Variables["AOUC"]
         # AOUC[1] = 0.24783192

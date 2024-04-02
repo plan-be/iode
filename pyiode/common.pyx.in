@@ -1,6 +1,7 @@
 # distutils: language = c++
 
 from typing import List
+from pathlib import Path
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
@@ -33,6 +34,10 @@ def _cpp_string_vector_to_py(vector[string] vec) -> List[str]:
 # -------
 __version__ = "${CMAKE_PROJECT_VERSION}"
 
+# DATA SAMPLE
+# -----------
+
+SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # IODE CONSTANTS
 # --------------
