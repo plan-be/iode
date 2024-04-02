@@ -110,8 +110,9 @@ def _ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
 
     Examples
     --------
+    >>> from iode import SAMPLE_DATA_DIR
     >>> from iode import Comments, ws_content
-    >>> Comments.load("../data/fun.cmt")
+    >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
     >>> names = iode.ws_content("ACA*", 0)
     >>> names
     ['ACAF', 'ACAG']
@@ -161,7 +162,7 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = K_VAR) -> Li
     Examples
     -------
     >>> import iode
-    >>> iode.Comments.load("../data/fun.cmt")
+    >>> iode.Comments.load(f"{iode.SAMPLE_DATA_DIR}/fun.cmt")
     >>> result = iode.ws_content("ACA*", 0)          
     >>> print(result)                                
     ['ACAF', 'ACAG']

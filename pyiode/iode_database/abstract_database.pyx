@@ -46,8 +46,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.iode_type
         'Comment'
         """
@@ -63,8 +64,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.is_subset()
         False
         >>> cmt_subset = Comments.subset("A*")
@@ -93,8 +95,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.is_subset()
         False
         >>> # by default a 'shallow copy' subset is returned
@@ -141,8 +144,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
 
         >>> # create a subset with all comments with name starting with 'A'
         >>> cmt_subset = Comments.subset("A*")
@@ -173,10 +177,11 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
         >>> from pathlib import Path
         >>> from os.path import relpath
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> filepath = Comments.filename
         >>> Path(filepath).name
         'fun.cmt'
@@ -194,8 +199,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.description = "test data from file 'fun.cmt'"
         >>> Comments.description
         "test data from file 'fun.cmt'"
@@ -214,8 +220,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.description = "test data from file 'fun.cmt'"
         >>> Comments.description
         "test data from file 'fun.cmt'"
@@ -242,8 +249,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.get_names("A*;*_")         # doctest: +NORMALIZE_WHITESPACE
         ['ACAF', 'ACAG', 'AOUC', 'AQC', 'BENEF_', 'GOSH_', 
         'IDH_', 'PAFF_', 'PC_', 'PFI_', 'QAFF_', 'QAF_', 
@@ -286,8 +294,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
@@ -318,8 +327,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
@@ -358,8 +368,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
 
         >>> # copy comments with names starting with 'A' into a new database 'cmt_subset'
         >>> cmt_subset = Comments.subset("A*", deep_copy=True)
@@ -418,8 +429,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
         >>> # delete all comments with a name starting with 'A'
@@ -428,13 +440,13 @@ cdef class _AbstractDatabase:
         []
 
         >>> # load all comments with a name starting with 'A'
-        >>> Comments.copy_into("../data/fun.cmt", "A*")
+        >>> Comments.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
         >>> Comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
         >>> Comments.clear()
         >>> # load all comments
-        >>> Comments.copy_into("../data/fun.cmt")
+        >>> Comments.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
         """
@@ -468,8 +480,9 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
         >>> # delete all comments
@@ -478,7 +491,7 @@ cdef class _AbstractDatabase:
         0
 
         >>> # reload all comments
-        >>> Comments.merge_into("../data/fun.cmt")
+        >>> Comments.merge_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
         """
@@ -499,10 +512,11 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
-        >>> from iode import Equations, Scalars, Variables              # doctest: +SKIP
-        >>> Equations.load("../data/fun.eqs")                           # doctest: +SKIP
-        >>> Scalars.load("../data/fun.scl")                             # doctest: +SKIP
-        >>> Variables.load("../data/fun.var")                           # doctest: +SKIP
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Equations, Scalars, Variables                         # doctest: +SKIP
+        >>> Equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")                           # doctest: +SKIP
+        >>> Scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")                             # doctest: +SKIP
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")                           # doctest: +SKIP
 
         >>> # get list of scalars associated with the equation 'ACAF'
         >>> Equations.get_associated_objects_list("ACAF", I_SCALARS)    # doctest: +SKIP
@@ -535,12 +549,13 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments, Variables
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
 
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> len(Variables)
         394
         """
@@ -560,13 +575,14 @@ cdef class _AbstractDatabase:
         
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
-        >>> Comments.save("../data/fun2.cmt")
+        >>> Comments.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")
         >>> Comments.clear()
-        >>> Comments.load("../data/fun2.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun2.cmt")
         >>> len(Comments)
         317
         """
@@ -581,8 +597,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
         >>> Comments.clear()
@@ -603,8 +620,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(Comments)
         317
         """
@@ -621,8 +639,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> "ACAF" in Comments
         True
         >>> "ZCAF" in Comments
@@ -646,13 +665,14 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
         >>> from iode import Variables, nan
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> Variables.sample
         1960Y1:2015Y1
         >>> # get the variable values for the whole sample
@@ -686,8 +706,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         >>> Comments["ACAF"] = "New Value"
@@ -695,7 +716,7 @@ cdef class _AbstractDatabase:
         'New Value'
 
         >>> from iode import Variables
-        >>> Variables.load("../data/fun.var")
+        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
         >>> # set all values of a Variable
         >>> Variables["ACAF"]                   # doctest: +ELLIPSIS 
@@ -762,8 +783,9 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load("../data/fun.cmt")
+        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> "ACAF" in Comments
         True
         >>> del Comments["ACAF"]

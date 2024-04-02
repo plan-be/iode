@@ -76,7 +76,7 @@ def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
     Examples
     --------
     >>> import iode
-    >>> iode.ws_load_idt("../data/fun.idt")
+    >>> iode.ws_load_idt(f"{iode.SAMPLE_DATA_DIR}/fun.idt")
     48
     >>> nbobjs = len(iode.ws_content('X*', iode.K_IDT))
     >>> nbobjs
