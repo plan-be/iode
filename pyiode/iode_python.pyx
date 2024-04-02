@@ -44,7 +44,7 @@
 #        - Execute nmake to create 64 bits iode_c_api.lib => api/vc64/nmake
 #  
 #  2. In Python (*.pyx files)
-#      Add the new function declaration in iode.pxi in the section "cdef extern from "iode.h":":
+#      Add the new function declaration in iode.pxi in the section "cdef extern from "api/iode.h":":
 #          cdef int IodeMyFn(char* name)  
 #      (Note that there is no semi-colon at the end of the line !)
 #      

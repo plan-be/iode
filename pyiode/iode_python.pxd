@@ -14,7 +14,7 @@
 
 # Declarations of extern C functions and vars
 # -------------------------------------------
-cdef extern from "iode.h":
+cdef extern from "api/iode.h":
     # MISC functions
     #cdef char   *IODE_VERSION
     cdef int    IodeInit()

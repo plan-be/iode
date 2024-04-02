@@ -6,7 +6,7 @@ from libcpp cimport bool
 
 # declare C++ Scalar class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
-cdef extern from "objects/scalar.h":
+cdef extern from "cpp_api/objects/scalar.h":
     cdef cppclass CScalar "Scalar":
         double val
         double relax

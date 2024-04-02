@@ -4,7 +4,7 @@ from libcpp cimport bool
 
 from pyiode_period cimport CPeriod
 
-cdef extern from "iode.h":
+cdef extern from "api/iode.h":
     cdef int     IodeIsSampleSet()
     cdef int     IodeGetSampleLength()
     cdef char    **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
@@ -15,7 +15,7 @@ cdef extern from "iode.h":
 
 # declare C++ Sample class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
-cdef extern from "time/sample.h":
+cdef extern from "cpp_api/time/sample.h":
     cdef cppclass CSample "Sample":
         CSample() except +
         CSample(const CSample&) except +

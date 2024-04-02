@@ -2,12 +2,12 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 
-cdef extern from "iode.h":
+cdef extern from "api/iode.h":
     cdef double L_NAN
     cdef int I_NB_TYPES
 
 
-cdef extern from "common.h":
+cdef extern from "cpp_api/common.h":
     cdef enum EnumIodeType:
         I_COMMENTS,
         I_EQUATIONS,
@@ -30,7 +30,7 @@ cdef extern from "common.h":
 
     cdef vector[string] v_simulation_initialization
 
-cdef extern from "KDB/kdb_variables.h":
+cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef enum EnumIodeVarMode:
         I_VAR_MODE_LEVEL,
         I_VAR_MODE_DIFF,
