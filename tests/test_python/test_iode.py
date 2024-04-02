@@ -13,19 +13,10 @@ import logging
 from pathlib import Path
 
 # GLOBALS
-IODE_DATA_DIR = Path("../data").absolute()
+SAMPLE_DATA_DIR = Path(iode.SAMPLE_DATA_DIR).absolute()
 IODE_OUTPUT_DIR = Path("../output").absolute()
 IODE_VERBOSE = 1
 
-nanobind = False
-try:
-    from iode import TEST_DATA_DIR
-    IODE_DATA_DIR = TEST_DATA_DIR
-    nanobind = True
-except:
-    pass
-
-from iode import Comments
 
 # MISC FUNCTIONS
 # --------------
@@ -43,7 +34,7 @@ def test_iode_version():
 
 def test_iode_get_eqs_lec():
 
-    iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
+    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
     lec_BVY = iode.get_eqs_lec("BVY")
     print(f"lec_BVY = '{lec_BVY}'")
     assert lec_BVY == "BVY:=YN+YK"
@@ -51,7 +42,7 @@ def test_iode_get_eqs_lec():
 
 def test_iode_get_eqs():
 
-    iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
+    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
     e_BVY = iode.get_eqs("BVY")
     print(e_BVY)
     assert e_BVY.lec == "BVY:=YN+YK"
@@ -86,7 +77,7 @@ def test_iode_set_eqs():
 
 def test_iode_get_idt():
 
-    iode.ws_load_idt(str(IODE_DATA_DIR / "fun.idt"))
+    iode.ws_load_idt(str(SAMPLE_DATA_DIR / "fun.idt"))
     i_XEX = iode.get_idt("XEX")
     assert i_XEX == "grt EX"
 
@@ -115,7 +106,7 @@ def test_iode_set_idt():
 
 def test_iode_get_lst():
 
-    iode.ws_load_lst(str(IODE_DATA_DIR / "fun"))
+    iode.ws_load_lst(str(SAMPLE_DATA_DIR / "fun"))
     i_MYLIST = iode.get_lst("MYLIST")
     assert i_MYLIST == "A02_075_H_BRU A02_100_H_VLA"
 
@@ -140,7 +131,7 @@ def test_iode_set_lst():
 
 def test_iode_get_scl():
 
-    iode.ws_load_scl(str(IODE_DATA_DIR / "fun"))
+    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun"))
     name = "acaf1"
     i_acaf1 = iode.get_scl(name)
     assert round(i_acaf1.value, 7) == 0.0157684
@@ -168,7 +159,7 @@ def test_iode_set_scl():
 
 
 def test_iode_exec_lec():
-    iode.Variables.load(str(IODE_DATA_DIR / "a.var"))
+    iode.Variables.load(str(SAMPLE_DATA_DIR / "a.var"))
 
     v_A = iode.Variables["A"]
     vec = iode.exec_lec("1+A-1")
@@ -205,9 +196,9 @@ def test_iode_data_update_eqs():
 
 
 def test_iode_eqs_estimation():
-    iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
-    iode.Variables.load(str(IODE_DATA_DIR / "fun.var"))
-    iode.ws_load_scl(str(IODE_DATA_DIR / "fun.scl"))
+    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
+    iode.Variables.load(str(SAMPLE_DATA_DIR / "fun.var"))
+    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     name = "ACAF"
     iode.eqs_estimate(name, "1980Y1", "1996Y1")
@@ -227,9 +218,9 @@ def test_iode_eqs_estimation():
 
 
 def test_iode_model_simulate():
-    iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
-    iode.Variables.load(str(IODE_DATA_DIR / "fun.var"))
-    iode.ws_load_scl(str(IODE_DATA_DIR / "fun.scl"))
+    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
+    iode.Variables.load(str(SAMPLE_DATA_DIR / "fun.var"))
+    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     # Test non convergence
     iode.suppress_msgs()
@@ -252,9 +243,9 @@ def test_iode_model_simulate():
 def test_iode_model_simulate_exchange():
 
     iode.suppress_msgs()
-    iode.ws_load_eqs(str(IODE_DATA_DIR / "fun.eqs"))
-    iode.Variables.load(str(IODE_DATA_DIR / "fun.var"))
-    iode.ws_load_scl(str(IODE_DATA_DIR / "fun.scl"))
+    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
+    iode.Variables.load(str(SAMPLE_DATA_DIR / "fun.var"))
+    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     # Version with exchange in at least 2 equations
     # Set values of endo UY
@@ -336,7 +327,7 @@ def test_iode_htol():
     iode.Variables.sample = "2000Y1:2020Y1"
     
     # input filename
-    filename = str(IODE_DATA_DIR / "fun_q.var")
+    filename = str(SAMPLE_DATA_DIR / "fun_q.var")
     
     # Last Obs in year
     varname = "ACAF"
@@ -365,7 +356,7 @@ def test_iode_ltoh():
     iode.Variables.sample = "2010Q1:2020Q4"
 
     # input filename
-    filename = str(IODE_DATA_DIR / "fun.var")
+    filename = str(SAMPLE_DATA_DIR / "fun.var")
     
     # Linear interpolation / stock
     varname = "ACAF"
