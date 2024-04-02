@@ -8,7 +8,7 @@ from libcpp cimport bool
 from pyiode.pyiode_sample cimport CSample
 
 
-cdef extern from "objects/equation.h":
+cdef extern from "cpp_api/objects/equation.h":
 
     cdef int EQS_NBTESTS
 

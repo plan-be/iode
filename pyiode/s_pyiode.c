@@ -54,7 +54,7 @@ void ODE_assign_super_PYIODE()
 
 
 // Function used by A2M HTML generator (does not work in 64bits)
-#include "iode.h" 
+#include "api/iode.h" 
 
 int A2mGIF_HTML(A2MGRF *go, U_ch* filename) 
 {

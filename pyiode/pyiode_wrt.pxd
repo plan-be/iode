@@ -1,5 +1,5 @@
 
-cdef extern from "iode.h":
+cdef extern from "api/iode.h":
     cdef int    W_dest(char *filename,int type)
     cdef int    W_close()
     cdef int    W_flush()

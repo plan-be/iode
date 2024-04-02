@@ -1,5 +1,5 @@
 
-cdef extern from "iode.h":
+cdef extern from "api/iode.h":
     # WS functions
     cdef int    IodeLoad(char *filename, int filetype)
     cdef int    IodeSave(char *filename, int filetype) 

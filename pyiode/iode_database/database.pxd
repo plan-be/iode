@@ -21,7 +21,7 @@ from pyiode.pyiode_sample cimport CSample
 #            https://stackoverflow.com/a/23455514
 
 
-cdef extern from "KDB/kdb_abstract.h":
+cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    
         # Public methods
         int get_iode_type() const
@@ -49,11 +49,11 @@ cdef extern from "KDB/kdb_abstract.h":
         void save(string& filepath) except +
         void clear() except +
 
-cdef extern from "KDB/kdb_template.h":
+cdef extern from "cpp_api/KDB/kdb_template.h":
     cdef cppclass KDBTemplate[T](KDBAbstract):        
         pass
 
-cdef extern from "KDB/kdb_comments.h":
+cdef extern from "cpp_api/KDB/kdb_comments.h":
     cdef cppclass KDBComments(KDBTemplate[string]):
         # Constructor
         KDBComments(string& filepath) except +
@@ -71,7 +71,7 @@ cdef extern from "KDB/kdb_comments.h":
     cdef KDBComments Comments
 
 
-cdef extern from "KDB/kdb_variables.h":
+cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef cppclass KDBVariables(KDBTemplate[vector[double]]):
         # Constructor
         KDBVariables(string& filepath) except +

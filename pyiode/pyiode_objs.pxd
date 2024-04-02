@@ -1,5 +1,5 @@
 
-cdef extern from "iode.h":
+cdef extern from "api/iode.h":
     cdef int    IodeDeleteObj(char* name, int type)
 
     cdef char   *IodeGetCmt(char *name)
