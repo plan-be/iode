@@ -51,9 +51,7 @@ set(CPP_GSAMPLE
     gsample/gsample_graph.h     gsample/gsample_graph.cpp
     )
 
-set(CPP_LEGACY  
-    legacy/s_iode.c legacy/b_legacy.c
-   )
+set(CPP_LEGACY  legacy/s_iode.c)
 
 add_library(iode_cpp_api STATIC 
             iode_cpp_api.h      iode_cpp_api.cpp 
