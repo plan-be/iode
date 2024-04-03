@@ -3,12 +3,10 @@ message(STATUS "\n---- TESTS PYTHON ----\n")
 if(Python_FOUND AND TARGET iode_python)
   message(STATUS "Python EXECUTABLE: ${Python_EXECUTABLE}")
 
-  set(Python_VERSION_ "${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
-
   add_custom_target(test_python
-                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pyiode/py${Python_VERSION_}/iode.pyd iode.pyd
-                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pyiode/py${Python_VERSION_}/iode.msg iode.msg
-                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/pyiode/py${Python_VERSION_}/tests/data ./tests/data
+                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pyiode/iode.pyd iode.pyd
+                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pyiode/iode.msg iode.msg
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/pyiode/tests/data ./tests/data
                     COMMAND pytest
                     DEPENDS test_iode.py test_cython_iode.py
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
