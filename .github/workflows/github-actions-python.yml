@@ -85,7 +85,7 @@ jobs:
             uses: actions/upload-artifact@v3
             with:
               name: iode-python-3${{ matrix.python-minor-version }}
-              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py3${{ matrix.python-minor-version }}/"
+              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/"
               if-no-files-found: error    # 'warn' or 'ignore' are also available, defaults to `warn`
 
 
