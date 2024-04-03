@@ -27,12 +27,9 @@ cdef extern from "api/iode.h":
     cdef int    SCR_free(void *ptr)
     cdef int    SCR_free_tbl(unsigned char **tbl)
 
-    # TO Check
-    cdef int    PyIodePrint(char*name, void* values, int lg)
-    cdef int    ODE_assign_super_PYIODE()
-
     # constants
     cdef double L_NAN
 
-cdef extern from "s_pyiode.c":
+cdef extern from "s_pyiode.cpp":
+    cdef int   ODE_assign_super_PYIODE()
     cdef int   free_tbl(char** tbl)
