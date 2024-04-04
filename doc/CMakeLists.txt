@@ -23,7 +23,6 @@ add_custom_target(iode_doc
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Building Python (Sphinx) documentation using Python ${Python_VERSION}.\n"
 )
-add_dependencies(iode_doc iode_python)
 
 add_subdirectory(keyboard_shortcuts)
 
