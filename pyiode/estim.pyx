@@ -7,7 +7,7 @@
 # ------------------------
 #  eqs_estimate(eq_list, afrom:str, ato:str)  | Estimate an equation or a block of equations on the given sample.
 
-from pyiode_estim cimport IodeEstimate
+from estim cimport IodeEstimate
 
 
 #  TODO: add optional parameters to include all available estimation parameters (method, block...)

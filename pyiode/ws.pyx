@@ -85,7 +85,7 @@
 from collections.abc import Iterable
 import warnings
 
-from pyiode_ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
+from ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeClearAll, IodeContents, 
                         B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow)
 from iode_python cimport free_tbl
 

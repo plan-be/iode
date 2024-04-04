@@ -50,10 +50,10 @@
 import numpy as np
 import warnings
 
-from pyiode_objs cimport (IodeDeleteObj, IodeGetCmt, IodeSetCmt, IodeGetEqsLec, IodeGetEqs, IodeSetEqs, 
+from objs cimport (IodeDeleteObj, IodeGetCmt, IodeSetCmt, IodeGetEqsLec, IodeGetEqs, IodeSetEqs, 
                           IodeGetIdt, IodeSetIdt, IodeGetLst, IodeSetLst, IodeGetScl, IodeSetScl, 
                           IodeCalcSamplePosition, IodeSetVector)
-from pyiode_data cimport B_DataDelete
+from data cimport B_DataDelete
 
 
 def delete_objects(pattern: str = '*', obj_type: int = K_VAR):

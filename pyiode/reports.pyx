@@ -8,7 +8,7 @@
 #   report_exec(filename_parms: str)                | Execute a report with optional arguments
 #   reportline_exec(repline: Union[str, List[str]]) | Execute report line(s)
 
-from pyiode_reports cimport B_ReportExec, B_ReportLine
+from reports cimport B_ReportExec, B_ReportLine
 
 # $ExecReport filename_parms
 # TODO: (ald) add Parameters, Returns and Examples section 

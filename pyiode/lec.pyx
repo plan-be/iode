@@ -8,8 +8,8 @@
 # 
 #   exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]  | Compute a LEC formula using the current WS of VARs and SCLs
 
-from pyiode_lec cimport IodeExecLec, IodeExecLecT
-from pyiode_sample cimport IodeGetSampleLength
+from lec cimport IodeExecLec, IodeExecLecT
+from sample cimport IodeGetSampleLength
 from iode_python cimport SCR_free
 
 

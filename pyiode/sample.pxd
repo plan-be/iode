@@ -2,7 +2,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode_period cimport CPeriod
+from period cimport CPeriod
 
 cdef extern from "api/iode.h":
     cdef int     IodeIsSampleSet()

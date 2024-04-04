@@ -18,9 +18,9 @@
 #  
 #  Source files (*.pyx, *.pxi and *.c)
 #  -----------------------------------
-#  The python functions are split according to their specific topics in pyiode_*.pyx 
+#  The python functions are split according to their specific topics in *.pyx 
 #  where * can be ws, sample, objects, larray, reports...
-#  Some utility functions have also been added in the pyiode_util.pyx module.
+#  Some utility functions have also been added in the util.pyx module.
 #  
 #  The called C-api function signatures are found in iode.pxi.
 #  These functions are declared in iode.h (mostly in the sub file iodeapi.h) 
@@ -48,7 +48,7 @@
 #          cdef int IodeMyFn(char* name)  
 #      (Note that there is no semi-colon at the end of the line !)
 #      
-#      Create the Python equivalent to IodeMyFn() in the appropriate module pyiode_*.pyx.
+#      Create the Python equivalent to IodeMyFn() in the appropriate module *.pyx.
 #          def myfn(arg):
 #              return IodeMyFn(_cstr(arg))
 #  
@@ -137,11 +137,11 @@ LTOH_STEP   = 'S'
 # -------------------------
 
 include "common.pyx"
-include "pyiode_cdef.pyx"
-include "pyiode_util.pyx"
-include "pyiode_lec.pyx"
-include "pyiode_period.pyx"
-include "pyiode_sample.pyx"
+include "_cdef.pyx"
+include "util.pyx"
+include "lec.pyx"
+include "period.pyx"
+include "sample.pyx"
 
 include "objects/equation.pyx"
 include "objects/scalar.pyx"
@@ -150,15 +150,15 @@ include "iode_database/abstract_database.pyx"
 include "iode_database/comments_database.pyx"
 include "iode_database/variables_database.pyx"
 
-include "pyiode_objs.pyx"
-include "pyiode_ws.pyx"
-include "pyiode_data.pyx"
-include "pyiode_estim.pyx"
-include "pyiode_model.pyx"
-include "pyiode_exec.pyx"
-include "pyiode_print.pyx"
-include "pyiode_reports.pyx"
-include "pyiode_wrt.pyx"
+include "objs.pyx"
+include "ws.pyx"
+include "data.pyx"
+include "estim.pyx"
+include "model.pyx"
+include "exec.pyx"
+include "print.pyx"
+include "reports.pyx"
+include "wrt.pyx"
 
 
 # ------------------------------------------------------------------------------------------

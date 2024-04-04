@@ -5,7 +5,7 @@ from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 from libcpp cimport bool
 
-from pyiode.pyiode_sample cimport CSample
+from pyiode.sample cimport CSample
 
 
 cdef extern from "cpp_api/objects/equation.h":
