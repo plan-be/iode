@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
-from pyiode_util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
+from util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
 
 # Miscellaneous functions
 # -----------------------

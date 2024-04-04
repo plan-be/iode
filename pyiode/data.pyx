@@ -15,7 +15,7 @@
 
 import warnings
 
-from pyiode_data cimport B_DataUpdate
+from data cimport B_DataUpdate
 
 
 def data_update(obj_name: str, obj_value: str, obj_type: int): 

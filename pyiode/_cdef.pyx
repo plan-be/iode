@@ -9,8 +9,8 @@
 #   _pyfloats(double *cvar, int lg)                  Convert a C vector of lg doubles into a list of python floats 
 
 cimport numpy as np
-from pyiode_cdef cimport IodeGetVector
-from pyiode_sample cimport IodeGetSampleAsDoubles
+from _cdef cimport IodeGetVector
+from sample cimport IodeGetSampleAsDoubles
 
 
 cdef _pylist(char** c_list):

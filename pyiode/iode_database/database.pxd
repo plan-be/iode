@@ -5,8 +5,8 @@ from libcpp.vector cimport vector
 from libcpp cimport bool
 
 from pyiode.common cimport EnumIodeType, EnumIodeVarMode, EnumSimulationInitialization
-from pyiode.pyiode_period cimport CPeriod
-from pyiode.pyiode_sample cimport CSample
+from pyiode.period cimport CPeriod
+from pyiode.sample cimport CSample
 
 
 # C++ classes

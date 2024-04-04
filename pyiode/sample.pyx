@@ -10,7 +10,7 @@
 # distutils: language = c++
 
 from typing import Union, Tuple, List, Optional, Any
-from pyiode_sample cimport (CSample, IodeIsSampleSet, IodeSetSampleStr, IodeGetSampleAsString, 
+from sample cimport (CSample, IodeIsSampleSet, IodeSetSampleStr, IodeGetSampleAsString, 
                             IodeCreateSampleAsPeriods)
 from iode_python cimport free_tbl
 
