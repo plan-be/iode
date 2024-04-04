@@ -6,12 +6,6 @@ See https://cython.readthedocs.io/en/latest/src/userguide/faq.html#how-do-i-run-
 import iode
 import doctest
 import inspect
-from pathlib import Path
-
-# GLOBALS
-IODE_DATA_DIR = Path("../data").absolute()
-IODE_OUTPUT_DIR = Path("../output").absolute()
-IODE_VERBOSE = 1
 
 
 def test_cython_iode():

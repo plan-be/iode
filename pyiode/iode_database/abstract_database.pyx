@@ -370,7 +370,7 @@ cdef class _AbstractDatabase:
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Comments
-        >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> Comments.load(f"{{SAMPLE_DATA_DIR}}/fun.cmt")
 
         >>> # copy comments with names starting with 'A' into a new database 'cmt_subset'
         >>> cmt_subset = Comments.subset("A*", deep_copy=True)

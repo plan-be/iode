@@ -14,8 +14,11 @@ from pathlib import Path
 
 # GLOBALS
 SAMPLE_DATA_DIR = Path(iode.SAMPLE_DATA_DIR).absolute()
-IODE_OUTPUT_DIR = Path("../output").absolute()
+IODE_OUTPUT_DIR = (Path(__file__).parent.parent / "output").absolute()
 IODE_VERBOSE = 1
+
+if not IODE_OUTPUT_DIR.exists():
+    IODE_OUTPUT_DIR.mkdir()
 
 
 # MISC FUNCTIONS
