@@ -71,6 +71,26 @@ cdef extern from "cpp_api/KDB/kdb_comments.h":
     cdef KDBComments Comments
 
 
+cdef extern from "cpp_api/KDB/kdb_identities.h":
+    cdef cppclass KDBIdentities(KDBTemplate[string]):
+        # Constructor
+        KDBIdentities(string& filepath) except +
+
+        # Public methods
+        KDBIdentities* subset(string& pattern, bool deep_copy) except +
+        string get_lec(string& name) except +
+        string copy(string& name) except +
+        int add(string& name, string& identity_lec) except +
+        void update(string& name, string& identity_lec) except +
+        void execute_identities(string& from_, string& to, string& identities_list, 
+                                string& var_files, string& scalar_files, bint trace) except +
+
+    size_t hash_value(KDBIdentities&) except +
+
+    # Define the global Identities instance
+    cdef KDBIdentities Identities
+
+
 cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef cppclass KDBVariables(KDBTemplate[vector[double]]):
         # Constructor
