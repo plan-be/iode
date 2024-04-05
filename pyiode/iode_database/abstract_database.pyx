@@ -666,10 +666,22 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
+
+        Comments
+
         >>> from iode import Comments
         >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
+
+        Identities
+
+        >>> from iode import Identities
+        >>> Identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> Identities["AOUC"]
+        '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
+
+        Variables
 
         >>> from iode import Variables, nan
         >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
@@ -707,6 +719,9 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
+
+        Comments
+
         >>> from iode import Comments
         >>> Comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> Comments["ACAF"]
@@ -714,6 +729,18 @@ cdef class _AbstractDatabase:
         >>> Comments["ACAF"] = "New Value"
         >>> Comments["ACAF"]
         'New Value'
+
+        Identities
+
+        >>> from iode import Identities
+        >>> Identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> Identities["AOUC"]
+        '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
+        >>> Identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+        >>> Identities["AOUC"]
+        '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+
+        Variables
 
         >>> from iode import Variables
         >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
