@@ -199,7 +199,9 @@ def ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]:
 
 def ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of identity names corresponding to the given pattern'''
-    return ws_content(pattern, K_IDT)
+    warnings.warn("ws_content_idt() is deprecated. " + 
+        "Please use the new syntax: Identities.get_names(pattern)", DeprecationWarning)
+    return Identities.get_names(pattern)
 
 def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_LST)
@@ -237,7 +239,9 @@ def ws_clear_eqs():
     ws_clear(K_EQS)
 
 def ws_clear_idt():
-    ws_clear(K_IDT)
+    warnings.warn("ws_clear_idt() is deprecated. " + 
+        "Please use the new syntax: Identities.clear()", DeprecationWarning)
+    Identities.clear()
 
 def ws_clear_lst():
     ws_clear(K_LST)
@@ -273,7 +277,9 @@ def ws_load_eqs(filename: str) -> int:
     return ws_load(filename, K_EQS)
 
 def ws_load_idt(filename: str) -> int:
-    return ws_load(filename, K_IDT)
+    warnings.warn("ws_load_idt() is deprecated. " + 
+        "Please use the new syntax: Identities.load(filepath)", DeprecationWarning)
+    Identities.load(filename)
 
 def ws_load_lst(filename: str) -> int:
     return ws_load(filename, K_LST) 
@@ -308,7 +314,9 @@ def ws_save_eqs(filename: str):
 
 def ws_save_idt(filename: str):
     '''Save the current identity workspace'''
-    ws_save(filename, K_IDT)
+    warnings.warn("ws_save_idt() is deprecated. " + 
+        "Please use the new syntax: Identities.save(filepath)", DeprecationWarning)
+    Identities.save(filename)
 
 def ws_save_lst(filename: str):
     '''Save the current list workspace'''

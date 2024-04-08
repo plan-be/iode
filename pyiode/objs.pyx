@@ -72,19 +72,6 @@ def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
     Returns
     -------
     Raise an exception on error
-
-    Examples
-    --------
-    >>> import iode
-    >>> iode.ws_load_idt(f"{iode.SAMPLE_DATA_DIR}/fun.idt")
-    48
-    >>> nbobjs = len(iode.ws_content('X*', iode.K_IDT))
-    >>> nbobjs
-    13
-    >>> iode.delete_objects('X*', iode.K_IDT)
-    >>> nbobjs2 = len(iode.ws_content('X*', iode.K_IDT))
-    >>> nbobjs2
-    0
     '''
     if B_DataDelete(_cstr(pattern), obj_type):
         raise RuntimeError(f"Delete '{pattern}' of type {obj_type} failed")
@@ -104,7 +91,9 @@ def delete_eqs(name: str):
     return delete_obj(name, K_EQS)
 
 def delete_idt(name: str):
-    return delete_obj(name, K_IDT)
+    warnings.warn("delete_idt() is deprecated. " + 
+        "Please use the new syntax: del Identities[name]", DeprecationWarning)
+    del Identities[name]
     
 def delete_lst(name: str):
     return delete_obj(name, K_LST)
@@ -179,13 +168,15 @@ def set_eqs(eq_name: str, lec: str):
 # ----------
 def get_idt(name: str) -> str:
     '''Return the LEC formula of an IODE identity '''
-    idt850 = IodeGetIdt(_cstr(name))
-    return _pystr(idt850)
+    warnings.warn("get_idt() is deprecated. " + 
+        "Please use the new syntax: Identities[name]", DeprecationWarning)
+    return Identities[name]
 
 def set_idt(name: str, idt: str):
     '''Update or create an identity'''
-    if IodeSetIdt(_cstr(name), _cstr(idt)):
-        raise RuntimeError(f"Identity {name} cannot be set")
+    warnings.warn("set_idt() is deprecated. " + 
+        "Please use the new syntax: Identities[name] = value", DeprecationWarning)
+    Identities[name] = idt
     
 # Lists
 # -----

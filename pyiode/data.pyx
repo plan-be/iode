@@ -55,7 +55,9 @@ def data_update_eqs(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, K_EQS)
     
 def data_update_idt(obj_name: str, obj_value: str):
-    data_update(obj_name, obj_value, K_IDT)
+    warnings.warn("data_update_idt() is deprecated. " + 
+        "Please use the new syntax: Identities[name] = value", DeprecationWarning)
+    Identities[obj_name] = obj_value
     
 def data_update_lst(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, K_LST)
