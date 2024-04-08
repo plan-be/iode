@@ -152,6 +152,15 @@ Finally, type `pytest` () :
 root_dir_iode> pytest
 ```
 
+**Note**: to only create the wheel file, type:
+```bash
+root_dir_iode> pip wheel .
+```
+The, to install the wheel file, type:
+```bash
+root_dir_iode> pip install <iode-wheel-file>.whl
+```
+
 # Working On An Issue
 
 To work on (an) issue(s), create a new local branch from the remote origin/master branch.
