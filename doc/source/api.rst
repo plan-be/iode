@@ -52,7 +52,11 @@ WORKSPACE
    Database.copy_into
    Database.merge
    Database.merge_into
-   
+
+.. autosummary::
+   :toctree: _generated
+
+   Identities.execute 
 
 .. autosummary::
    :toctree: _generated
