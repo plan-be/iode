@@ -20,6 +20,10 @@ if(Python_FOUND)
     file(INSTALL ${CMAKE_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode)
     file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests)
 
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp")
+      file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp")
+    endif()
+
     # WARNING: 
     # 1. Files hierarchy: 
     #    - https://stackoverflow.com/a/10535470
