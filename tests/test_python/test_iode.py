@@ -67,35 +67,6 @@ def test_iode_set_eqs():
         iode.set_eqs("A", py_A)
 
 
-# IODE IDENTITIES <-> PYTHON STRINGS
-# ----------------------------------
-
-def test_iode_get_idt():
-
-    iode.ws_load_idt(str(SAMPLE_DATA_DIR / "fun.idt"))
-    i_XEX = iode.get_idt("XEX")
-    assert i_XEX == "grt EX"
-
-
-def test_iode_set_idt():
-
-    # Clear IDT before creating new object
-    iode.ws_clear_idt()
-
-    # Create comment as py strings
-    pyxex = "1 * (grt EX)"
-
-    # Save pyxex as XEX in KI_WS + check
-    iode.set_idt("XEX", pyxex)
-    i_XEX = iode.get_idt("XEX")
-    assert i_XEX == pyxex
-
-    # Test error
-    pyxex = "1 * (grt EX) - "
-    with pytest.raises(RuntimeError):
-        iode.set_idt("XEX", pyxex)
-    
-
 # IODE LISTS <-> PYTHON STRINGS
 # -----------------------------
 
@@ -154,9 +125,9 @@ def test_iode_set_scl():
 
 
 def test_iode_exec_lec():
-    iode.Variables.load(str(SAMPLE_DATA_DIR / "a.var"))
+    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "a.var"))
 
-    v_A = iode.Variables["A"]
+    v_A = var_db["A"]
     vec = iode.exec_lec("1+A-1")
     assert vec == v_A
 
@@ -192,7 +163,7 @@ def test_iode_data_update_eqs():
 
 def test_iode_eqs_estimation():
     iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    iode.Variables.load(str(SAMPLE_DATA_DIR / "fun.var"))
+    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
     iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     name = "ACAF"
@@ -214,7 +185,7 @@ def test_iode_eqs_estimation():
 
 def test_iode_model_simulate():
     iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    iode.Variables.load(str(SAMPLE_DATA_DIR / "fun.var"))
+    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
     iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     # Test non convergence
@@ -239,21 +210,21 @@ def test_iode_model_simulate_exchange():
 
     iode.suppress_msgs()
     iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    iode.Variables.load(str(SAMPLE_DATA_DIR / "fun.var"))
+    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
     iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     # Version with exchange in at least 2 equations
     # Set values of endo UY
-    UY = iode.Variables["UY"]
+    UY = var_db["UY"]
     UY[40:43] = [650.0, 670.0, 680.0]   # 2000Y1..2002Y1
-    iode.Variables["UY"] = UY
+    var_db["UY"] = UY
 
     # Simulate with exchange UY - XNATY
     iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
 
     # Check result
-    UY = iode.Variables["UY"]
-    XNATY = iode.Variables["XNATY"]
+    UY = var_db["UY"]
+    XNATY = var_db["XNATY"]
     assert iode.exec_lec("UY[2000Y1]")[0] == 650.0
     assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006734
 
@@ -316,10 +287,11 @@ def test_iode_wrt():
 
 def test_iode_htol():
     #Read quaterly data and convert it to the current WS sample (yearly)
+    var_db = iode.Variables()
    
     # define a yearly sample
-    iode.Variables.clear()
-    iode.Variables.sample = "2000Y1:2020Y1"
+    var_db.clear()
+    var_db.sample = "2000Y1:2020Y1"
     
     # input filename
     filename = str(SAMPLE_DATA_DIR / "fun_q.var")
@@ -345,10 +317,11 @@ def test_iode_htol():
 
 def test_iode_ltoh():
     #Read yearly data data and convert it to the current WS sample (quaterly)
-   
+    var_db = iode.Variables()
+
     # define a yearly sample
-    iode.Variables.clear()
-    iode.Variables.sample = "2010Q1:2020Q4"
+    var_db.clear()
+    var_db.sample = "2010Q1:2020Q4"
 
     # input filename
     filename = str(SAMPLE_DATA_DIR / "fun.var")
@@ -407,15 +380,16 @@ def test_iode_htol_la():
     la3D["2002Q2","S2"] = [11, 22, 33]  # AA_S2[2001Q4] = 11; BB_S2[2001Q4] = 22; CC_S2[2001Q4] = 33;
 
     # Saving la3D in KV_WS, then in file testq_3D.var
-    iode.Variables.clear()
-    iode.Variables.from_array(la3D)
+    var_db = iode.Variables()
+    var_db.clear()
+    var_db.from_array(la3D)
 
     filename = str(IODE_OUTPUT_DIR / "testq_3D")
-    iode.Variables.save(filename)
+    var_db.save(filename)
  
     # Import testq_3D in yearly WS
-    iode.Variables.clear() 
-    iode.Variables.sample = "2000Y1:2010Y1"  
+    var_db.clear() 
+    var_db.sample = "2000Y1:2010Y1"  
     
     # Last Obs in year
     varname = "BB_S1"
@@ -437,7 +411,7 @@ def test_iode_htol_la():
 
     # save the new yearly ws
     filename = str(IODE_OUTPUT_DIR / "testy_3D")
-    iode.Variables.save(filename)
+    var_db.save(filename)
 
 
 # PANDAS FUNCTIONS
@@ -448,7 +422,8 @@ def test_from_frame_timeit():
     import pandas as pd
     import numpy as np
 
-    iode.Variables.clear()
+    var_db = iode.Variables()
+    var_db.clear()
 
     # create the pandas DataFrame
     vars_names = [f"A_{i}" for i in range(0, 10_000)]           # 10_000 variables
@@ -459,9 +434,9 @@ def test_from_frame_timeit():
     assert df.shape == (10_000, 100)
     assert df.size == 1000_000
 
-    stmt = "iode.Variables.from_frame(df)"
+    stmt = "var_db.from_frame(df)"
     nb_times = 10
-    t = timeit.timeit(stmt, globals={"iode": iode, "df": df}, number=nb_times)
+    t = timeit.timeit(stmt, globals={"iode": iode, "df": df, "var_db": var_db}, number=nb_times)
     logging.info(f"{stmt} (shape {df.shape}): {t} ({nb_times} times) -> {t / nb_times} per loop")
 
 def test_to_frame_timeit():
@@ -469,19 +444,20 @@ def test_to_frame_timeit():
     import pandas as pd
     import numpy as np
 
-    iode.Variables.clear()
+    var_db = iode.Variables()
+    var_db.clear()
 
     # set sample to 100 periods
-    iode.Variables.sample = "1951Y1:2050Y1"
-    assert iode.Variables.nb_periods == 100
+    var_db.sample = "1951Y1:2050Y1"
+    assert var_db.nb_periods == 100
 
     # create 10_000 variables
     for i in range(0, 10_000):
-        iode.Variables[f"A_{i}"] = f"t + {i}"
-    assert len(iode.Variables) == 10_000
+        var_db[f"A_{i}"] = f"t + {i}"
+    assert len(var_db) == 10_000
 
-    stmt = "df = iode.Variables.to_frame()"
+    stmt = "df = var_db.to_frame()"
     nb_times = 10
-    t = timeit.timeit(stmt, globals={"iode": iode}, number=nb_times)
-    logging.info(f"{stmt} (shape ({len(iode.Variables)}, {iode.Variables.nb_periods})): "
+    t = timeit.timeit(stmt, globals={"iode": iode, "var_db": var_db}, number=nb_times)
+    logging.info(f"{stmt} (shape ({len(var_db)}, {var_db.nb_periods})): "
                  f"{t} ({nb_times} times) -> {t / nb_times} per loop")
