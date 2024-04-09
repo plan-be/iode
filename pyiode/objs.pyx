@@ -104,7 +104,10 @@ def delete_lst(name: str):
     del lst_db[name]
    
 def delete_scl(name: str):
-    return delete_obj(name, K_SCL)
+    warnings.warn("delete_lst() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\n del scl_db[name]", DeprecationWarning)
+    scl_db = Scalars()
+    del scl_db[name]
 
 def delete_tbl(name: str):
     return delete_obj(name, K_TBL)
@@ -208,24 +211,18 @@ def set_lst(name: str, lst: str):
 # -------
 def get_scl(name: str) -> Scalar:
     '''Get an IODE scalar in an iode.Scalar class instance'''
-    cdef    double cval
-    cdef    double crelax
-    cdef    double cstd
-    
-    cdef rc = IodeGetScl(_cstr(name), &cval, &crelax, &cstd)
-    if rc == 0:
-        res = Scalar(cval, crelax, cstd)
-        return res
-    else:
-        return None
-
+    warnings.warn("get_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db[name]", DeprecationWarning)
+    scl_db = Scalars()
+    return scl_db[name]
 
 def set_scl(name: str, scalar: Scalar):
     '''Create or update an IODE scalar from an iode.Scalar class instance'''
-    if IodeSetScl(_cstr(name), scalar.value, scalar.relax, scalar.std):
-        raise RuntimeError(f"Scalar {name} cannot be set")
+    warnings.warn("set_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db[name] = value", DeprecationWarning)
+    scl_db = Scalars()
+    scl_db[name] = scalar
 
-    
 # Tables
 # ------
 # ... not yet implemented ...

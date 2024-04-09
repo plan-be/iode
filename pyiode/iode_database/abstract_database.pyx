@@ -513,17 +513,18 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Equations, Scalars, Variables                         # doctest: +SKIP
-        >>> Equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")                           # doctest: +SKIP
-        >>> Scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")                             # doctest: +SKIP
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")                           # doctest: +SKIP
+        >>> from iode import ws_load_eqs, Scalars, Variables
+        >>> ws_load_eqs(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        274
+        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
 
         >>> # get list of scalars associated with the equation 'ACAF'
-        >>> Equations.get_associated_objects_list("ACAF", I_SCALARS)    # doctest: +SKIP
+        >>> Equations.get_associated_objects_list("ACAF", I_SCALARS)        # doctest: +SKIP
         ['acaf1', 'acaf2', 'acaf4']
 
         >>> # get list of variables associated with the equation 'ACAF'
-        >>> Equations.get_associated_objects_list("ACAF", I_VARIABLES)  # doctest: +SKIP
+        >>> Equations.get_associated_objects_list("ACAF", I_VARIABLES)      # doctest: +SKIP
         ['ACAF']  
         """
         if not isinstance(name, str):
