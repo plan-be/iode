@@ -124,13 +124,13 @@ def delete_var(name: str):
 
 def get_cmt(name: str) -> str:
     warnings.warn("get_cmt() is deprecated. " + 
-        "Please use the new syntax: cmt_db[name]", DeprecationWarning)
+        "Please use the new syntax:\ncmt_db = Comments()\ncmt_db[name]", DeprecationWarning)
     cmt_db = Comments()
     return cmt_db[name]
 
 def set_cmt(name: str, cmt: str):
     warnings.warn("set_cmt() is deprecated. " + 
-        "Please use the new syntax: cmt_db[name] = value", DeprecationWarning)
+        "Please use the new syntax:\ncmt_db = Comments()\ncmt_db[name] = value", DeprecationWarning)
     cmt_db = Comments()
     cmt_db[name] = cmt
 
@@ -177,14 +177,14 @@ def set_eqs(eq_name: str, lec: str):
 def get_idt(name: str) -> str:
     '''Return the LEC formula of an IODE identity '''
     warnings.warn("get_idt() is deprecated. " + 
-        "Please use the new syntax: idt_db[name]", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db[name]", DeprecationWarning)
     idt_db = Identities()
     return idt_db[name]
 
 def set_idt(name: str, idt: str):
     '''Update or create an identity'''
     warnings.warn("set_idt() is deprecated. " + 
-        "Please use the new syntax: idt_db[name] = value", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db[name] = value", DeprecationWarning)
     idt_db = Identities()
     idt_db[name] = idt
     
@@ -193,14 +193,14 @@ def set_idt(name: str, idt: str):
 def get_lst(name: str) -> str:
     '''Return a list as a string'''
     warnings.warn("get_lst() is deprecated. " + 
-        "Please use the new syntax: lst_db[name]", DeprecationWarning)
+        "Please use the new syntax:\nlst_db = Lists()\nlst_db[name]", DeprecationWarning)
     lst_db = Lists()
     return lst_db[name]
 
 def set_lst(name: str, lst: str):
     '''Update or create a list from a string'''
     warnings.warn("set_lst() is deprecated. " + 
-        "Please use the new syntax: lst_db[name] = value", DeprecationWarning)
+        "Please use the new syntax:\nlst_db = Lists()\nlst_db[name] = value", DeprecationWarning)
     lst_db = Lists()
     lst_db[name] = lst
 
@@ -243,7 +243,7 @@ def set_scl(name: str, scalar: Scalar):
 
 def get_var(varname: str) -> List[float]:
     warnings.warn("get_var() is deprecated. " + 
-        "Please use the new syntax: var_db[name]", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db[name]", DeprecationWarning)
     var_db = Variables()
     return var_db[varname]
 
@@ -257,6 +257,6 @@ def get_var_as_ndarray(varname: str, copy: bool = True) -> np.ndarray:
 # Copy a ndarray or a list into KV_WS
 def set_var(varname: str, py_values):
     warnings.warn("set_var() is deprecated. " + 
-        "Please use the new syntax: var_db[name] = values", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db[name] = values", DeprecationWarning)
     var_db = Variables()
     var_db[varname] = py_values

@@ -166,7 +166,7 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = K_VAR) -> Li
 def ws_content_cmt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of comment names corresponding to the given pattern'''
     warnings.warn("ws_content_cmt() is deprecated. " + 
-        "Please use the new syntax: cmt_db.get_names(pattern)", DeprecationWarning)
+        "Please use the new syntax:\ncmt_db = Comments()\ncmt_db.get_names(pattern)", DeprecationWarning)
     cmt_db = Comments()
     return cmt_db.get_names(pattern)
 
@@ -177,13 +177,13 @@ def ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]:
 def ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of identity names corresponding to the given pattern'''
     warnings.warn("ws_content_idt() is deprecated. " + 
-        "Please use the new syntax: idt_db.get_names(pattern)", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db.get_names(pattern)", DeprecationWarning)
     idt_db = Identities()
     return idt_db.get_names(pattern)
 
 def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
     warnings.warn("ws_content_lst() is deprecated. " + 
-        "Please use the new syntax: lst_db.get_names(pattern)", DeprecationWarning)
+        "Please use the new syntax:\nlst_db = Lists()\nlst_db.get_names(pattern)", DeprecationWarning)
     lst_db = Lists()
     return lst_db.get_names(pattern)
 
@@ -195,7 +195,7 @@ def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
 
 def ws_content_var(pattern: Union[str, List[str]] = '*') -> List[str]:
     warnings.warn("ws_content_var() is deprecated. " + 
-        "Please use the new syntax: var_db.get_names(pattern)", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db.get_names(pattern)", DeprecationWarning)
     var_db = Variables()
     return var_db.get_names(pattern)
 
@@ -214,7 +214,7 @@ def ws_clear(filetype: int):
 
 def ws_clear_cmt():
     warnings.warn("ws_clear_cmt() is deprecated. " + 
-        "Please use the new syntax: cmt_db.clear()", DeprecationWarning)
+        "Please use the new syntax:\ncmt_db = Comments()\ncmt_db.clear()", DeprecationWarning)
     cmt_db = Comments()
     cmt_db.clear()
 
@@ -223,13 +223,13 @@ def ws_clear_eqs():
 
 def ws_clear_idt():
     warnings.warn("ws_clear_idt() is deprecated. " + 
-        "Please use the new syntax: idt_db.clear()", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db.clear()", DeprecationWarning)
     idt_db = Identities()
     idt_db.clear()
 
 def ws_clear_lst():
     warnings.warn("ws_clear_lst() is deprecated. " + 
-        "Please use the new syntax: idt_db.clear()", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db.clear()", DeprecationWarning)
     lst_db = Lists()
     lst_db.clear()
 
@@ -241,7 +241,7 @@ def ws_clear_tbl():
 
 def ws_clear_var():
     warnings.warn("ws_clear_var() is deprecated. " + 
-        "Please use the new syntax: var_db.clear()", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db.clear()", DeprecationWarning)
     var_db = Variables()
     var_db.clear()
 
@@ -258,7 +258,7 @@ def ws_load(filename: str, filetype: int) -> int:
 
 def ws_load_cmt(filename: str):
     warnings.warn("ws_load_cmt() is deprecated. " + 
-        "Please use the new syntax: cmt_db = Comments(filepath)", DeprecationWarning)
+        "Please use the new syntax:\ncmt_db = Comments()\ncmt_db = Comments(filepath)", DeprecationWarning)
     return Comments(filename)
 
 def ws_load_eqs(filename: str) -> int:
@@ -266,12 +266,12 @@ def ws_load_eqs(filename: str) -> int:
 
 def ws_load_idt(filename: str) -> int:
     warnings.warn("ws_load_idt() is deprecated. " + 
-        "Please use the new syntax: idt_db = Identities(filepath)", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db = Identities(filepath)", DeprecationWarning)
     return Identities(filename)
 
 def ws_load_lst(filename: str) -> int:
     warnings.warn("ws_load_lst() is deprecated. " + 
-        "Please use the new syntax: lst_db = Lists(filepath)", DeprecationWarning)
+        "Please use the new syntax:\nlst_db = Lists()\nlst_db = Lists(filepath)", DeprecationWarning)
     return Identities(filename)
 
 def ws_load_scl(filename: str) -> int:
@@ -282,7 +282,7 @@ def ws_load_tbl(filename: str) -> int:
                              
 def ws_load_var(filename: str) -> int:
     warnings.warn("ws_load_var() is deprecated. " + 
-        "Please use the new syntax: var_db = Variables(filepath)", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db = Variables(filepath)", DeprecationWarning)
     var_db = Variables()
     var_db = Variables(filename)
 
@@ -296,7 +296,7 @@ def ws_save(filename: str, filetype: int):
 
 def ws_save_cmt(filename: str):
     warnings.warn("ws_save_cmt() is deprecated. " + 
-        "Please use the new syntax: cmt_db.save(filepath)", DeprecationWarning)
+        "Please use the new syntax:\ncmt_db = Comments()\ncmt_db.save(filepath)", DeprecationWarning)
     cmt_db = Comments()
     cmt_db.save(filename)
 
@@ -307,14 +307,14 @@ def ws_save_eqs(filename: str):
 def ws_save_idt(filename: str):
     '''Save the current identity workspace'''
     warnings.warn("ws_save_idt() is deprecated. " + 
-        "Please use the new syntax: idt_db.save(filepath)", DeprecationWarning)
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db.save(filepath)", DeprecationWarning)
     idt_db = Identities()
     idt_db.save(filename)
 
 def ws_save_lst(filename: str):
     '''Save the current list workspace'''
     warnings.warn("ws_save_lst() is deprecated. " + 
-        "Please use the new syntax: lst_db.save(filepath)", DeprecationWarning)
+        "Please use the new syntax:\nlst_db = Lists()\nlst_db.save(filepath)", DeprecationWarning)
     lst_db = Lists()
     lst_db.save(filename)
 
@@ -328,7 +328,7 @@ def ws_save_tbl(filename: str):
 
 def ws_save_var(filename: str):
     warnings.warn("ws_save_var() is deprecated. " + 
-        "Please use the new syntax: var_db.save(filepath)", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db.save(filepath)", DeprecationWarning)
     var_db = Variables()
     var_db.save(filename)
 
