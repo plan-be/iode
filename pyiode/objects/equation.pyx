@@ -232,9 +232,8 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Equation, ws_load_scl, ws_clear_scl, ws_content_scl, Variables
-        >>> ws_load_scl(f"{SAMPLE_DATA_DIR}/fun.scl")
-        161
+        >>> from iode import Equation, Scalars, Variables
+        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
@@ -249,17 +248,17 @@ cdef class Equation:
         >>> eq_ACAF.get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
         >>> # clear Scalars database
-        >>> ws_clear_scl()
+        >>> scl_db.clear()
         >>> # Do not create scalars in the Scalars database
         >>> eq_ACAF.get_coefficients_list(False)
         ['acaf1', 'acaf2', 'acaf4']
-        >>> ws_content_scl()
+        >>> scl_db.get_names()
         []
         >>> # create scalars on the flight
         >>> eq_ACAF.get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
         >>> # content of the Scalars database
-        >>> ws_content_scl()
+        >>> scl_db.get_names()
         ['acaf1', 'acaf2', 'acaf4']
         """
         return [coeff.decode("utf-8") for coeff in self.c_equation.get_coefficients_list(create_if_not_exit)]
@@ -281,9 +280,8 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Equation, ws_load_scl, Variables
-        >>> ws_load_scl(f"{SAMPLE_DATA_DIR}/fun.scl")
-        161
+        >>> from iode import Equation, Scalars, Variables
+        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE

@@ -188,7 +188,10 @@ def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
     return lst_db.get_names(pattern)
 
 def ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]:
-    return ws_content(pattern, K_SCL)
+    warnings.warn("ws_content_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db.get_names(pattern)", DeprecationWarning)
+    scl_db = Scalars()
+    return scl_db.get_names(pattern)
 
 def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_TBL)
@@ -234,7 +237,10 @@ def ws_clear_lst():
     lst_db.clear()
 
 def ws_clear_scl():
-    ws_clear(K_SCL)
+    warnings.warn("ws_clear_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db.clear()", DeprecationWarning)
+    scl_db = Scalars()
+    scl_db.clear()
 
 def ws_clear_tbl():
     ws_clear(K_TBL)
@@ -275,8 +281,10 @@ def ws_load_lst(filename: str) -> int:
     return Identities(filename)
 
 def ws_load_scl(filename: str) -> int:
-    return ws_load(filename, K_SCL) 
-                             
+    warnings.warn("ws_load_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db = Scalars(filepath)", DeprecationWarning)
+    return Scalars(filename) 
+                
 def ws_load_tbl(filename: str) -> int:
     return ws_load(filename, K_TBL) 
                              
@@ -320,7 +328,10 @@ def ws_save_lst(filename: str):
 
 def ws_save_scl(filename: str):
     '''Save the current scalar workspace'''
-    ws_save(filename, K_SCL)
+    warnings.warn("ws_save_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db.save(filepath)", DeprecationWarning)
+    scl_db = Scalars()
+    scl_db.save(filename)
 
 def ws_save_tbl(filename: str):
     '''Save the current table workspace'''

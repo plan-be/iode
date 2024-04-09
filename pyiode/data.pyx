@@ -68,18 +68,10 @@ def data_update_lst(obj_name: str, obj_value: str):
     lst_db[obj_name] = obj_value
     
 def data_update_scl(obj_name: str, value: float = None, relax: float = None, stderr: float = None):
-    cmd = obj_name + " "
-    if value is None: cmd += "-- "
-    else:             cmd += repr(value)
-
-    if relax is None: relax = 1.0
-    cmd += " " + repr(relax)
-
-    if stderr is None: cmd += " -- "
-    else:              cmd += " " + repr(stderr)
-
-    if B_DataUpdate(_cstr(cmd), K_SCL):
-        raise RuntimeError(f"Scalar {obj_name} update failed")
+    warnings.warn("data_update_scl() is deprecated. " + 
+        "Please use the new syntax:\nscl_db = Scalars()\nscl_db[name] = value, relax", DeprecationWarning)
+    scl_db = Scalars()
+    scl_db[obj_name] = value, relax
 
 def data_update_var(varname: str, values, operation: str = "L", per_from: str = None):
     warnings.warn("data_update_var() is deprecated. " + 
