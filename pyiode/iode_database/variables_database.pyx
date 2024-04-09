@@ -957,7 +957,7 @@ cdef class Variables(_AbstractDatabase):
 
 def df_to_ws(df_input: DataFrame, time_axis_name: str = 'time'):
     warnings.warn("df_to_ws() is deprecated. " + 
-        "Please use the new syntax: var_db.from_frame(df)", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db.from_frame(df)", DeprecationWarning)
 
 def ws_to_df(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', 
              time_as_floats: bool = False) -> DataFrame:
@@ -966,7 +966,7 @@ def ws_to_df(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_na
 
 def larray_to_ws(la_input: Array, time_axis_name: str = 'time', sep: str = "_"):
     warnings.warn("larray_to_ws() is deprecated. " + 
-        "Please use the new syntax: var_db.from_array(array)", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables()\nvar_db.from_array(array)", DeprecationWarning)
 
 def ws_to_larray(vars_pattern: str = '*', 
                  vars_axis_name: str = 'vars',     

@@ -55,7 +55,7 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
                     From ../data/fun : gamma gamma2 gamma3 gamma4 knf3
     '''
     warnings.warn("idt_execute() is deprecated. " + 
-        "Please use the new syntax: idt_db.execute(identities, from_period, " + 
+        "Please use the new syntax:\nidt_db = Identities()\nidt_db.execute(identities, from_period, " + 
         "to_period, var_files, scalar_files, trace)", DeprecationWarning)
     idt_db = Identities()
     from_period, to_period = sample.split(';')
