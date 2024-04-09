@@ -67,34 +67,6 @@ def test_iode_set_eqs():
         iode.set_eqs("A", py_A)
 
 
-# IODE SCALARS <-> PYTHON
-# -----------------------
-
-def test_iode_get_scl():
-
-    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun"))
-    name = "acaf1"
-    i_acaf1 = iode.get_scl(name)
-    assert round(i_acaf1.value, 7) == 0.0157684
-    assert round(i_acaf1.relax, 7) == 1.0
-    assert round(i_acaf1.std, 7) == 0.0013687
-
-
-def test_iode_set_scl():
-
-    # Clear SCL before creating new object
-    iode.ws_clear_scl()
-
-    # Create SCl
-    name = "myscl"
-    py_myscl = iode.Scalar(1.2345, 1.0, 0.0)
-
-    # Save py_scl as myscl in KS_WS + reread and check
-    iode.set_scl(name, py_myscl)
-    i_myscl = iode.get_scl(name)
-    assert i_myscl == py_myscl
-
-
 # EXECUTE LEC
 # -----------
 
@@ -139,14 +111,14 @@ def test_iode_data_update_eqs():
 def test_iode_eqs_estimation():
     iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
-    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
+    scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     name = "ACAF"
     iode.eqs_estimate(name, "1980Y1", "1996Y1")
 
     # Check acaf1 value after estimation
     name = "acaf1"
-    i_acaf1 = iode.get_scl(name)
+    i_acaf1 = scl_db[name]
     assert round(i_acaf1.value, 8) == 0.0157705
 
     # Check _YCALC[1980Y1]
@@ -161,7 +133,7 @@ def test_iode_eqs_estimation():
 def test_iode_model_simulate():
     iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
-    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
+    scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     # Test non convergence
     iode.suppress_msgs()
@@ -186,7 +158,7 @@ def test_iode_model_simulate_exchange():
     iode.suppress_msgs()
     iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
-    iode.ws_load_scl(str(SAMPLE_DATA_DIR / "fun.scl"))
+    scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
 
     # Version with exchange in at least 2 equations
     # Set values of endo UY
