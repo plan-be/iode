@@ -7,6 +7,7 @@ from libcpp cimport bool
 from pyiode.common cimport EnumIodeType, EnumIodeVarMode, EnumSimulationInitialization
 from pyiode.period cimport CPeriod
 from pyiode.sample cimport CSample
+from pyiode.objects.scalar cimport CScalar
 
 
 # C++ classes
@@ -107,6 +108,26 @@ cdef extern from "cpp_api/KDB/kdb_lists.h":
 
     # Define the global Lists instance
     cdef KDBLists Lists
+
+
+cdef extern from "cpp_api/KDB/kdb_scalars.h":
+    cdef cppclass KDBScalars(KDBTemplate[string]):
+        # Constructor
+        KDBScalars(string& filepath) except +
+
+        # Public methods
+        KDBScalars* subset(string& pattern, bool deep_copy) except +
+        CScalar get(string& name) except +
+        CScalar copy(string& name) except +
+        int add(string& name, CScalar& scalar) except +
+        int add(string& name, double value, double relax, double std) except +
+        void update(string& name, CScalar& scalar) except +
+        void update(string& name, double value, double relax, double std) except +
+
+    size_t hash_value(KDBScalars&) except +
+
+    # Define the global Scalars instance
+    cdef KDBScalars Scalars
 
 
 cdef extern from "cpp_api/KDB/kdb_variables.h":
