@@ -688,6 +688,20 @@ cdef class _AbstractDatabase:
         >>> lst_db["ENVI"]
         'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
 
+        Scalars
+
+        >>> from iode import Scalars
+        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> acaf1 = scl_db["acaf1"]
+        >>> acaf1
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> acaf1.value
+        0.01576840691268444
+        >>> acaf1.relax
+        1.0
+        >>> acaf1.std
+        0.0013687137980014086
+
         Variables
 
         >>> from iode import Variables, nan
@@ -756,6 +770,39 @@ cdef class _AbstractDatabase:
         >>> lst_db["ENVI"] = 'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
         >>> lst_db["ENVI"]
         'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
+
+        Scalars
+
+        >>> from iode import Scalars
+        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scl_db["acaf1"]
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> # only update the value
+        >>> scl_db["acaf1"] = 0.8
+        >>> scl_db["acaf1"]
+        Scalar(0.8, 1, nan)
+        >>> # upate value and relax (tuple)
+        >>> scl_db["acaf2"] = 0.8, 0.9
+        >>> scl_db["acaf2"]
+        Scalar(0.8, 0.9, nan)
+        >>> # upate value and relax (list)
+        >>> scl_db["acaf2"] = (0.7, 0.8)
+        >>> scl_db["acaf2"]
+        Scalar(0.7, 0.8, nan)
+        >>> # upate value and relax (dictionary)
+        >>> scl_db["acaf3"] = {"relax": 0.9, "value": 0.8}
+        >>> scl_db["acaf3"]
+        Scalar(0.8, 0.9, nan)
+        >>> # upate value and/or relax (Scalar object)
+        >>> acaf4 = scl_db["acaf4"]
+        >>> acaf4
+        Scalar(-0.00850518, 1, 0.0020833)
+        >>> acaf4.value = 0.8
+        >>> acaf4.relax = 0.9
+        >>> # WARNING: the standard deviation (std) cannot be changed manually
+        >>> scl_db["acaf4"] = acaf4
+        >>> scl_db["acaf4"]
+        Scalar(0.8, 0.9, 0.0020833)
 
         Variables
 
