@@ -149,6 +149,7 @@ include "objects/scalar.pyx"
 include "iode_database/abstract_database.pyx"
 include "iode_database/comments_database.pyx"
 include "iode_database/identities_database.pyx"
+include "iode_database/lists_database.pyx"
 include "iode_database/variables_database.pyx"
 
 include "objs.pyx"
