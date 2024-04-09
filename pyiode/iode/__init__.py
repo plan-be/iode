@@ -3,7 +3,7 @@ from pathlib import Path
 SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
-from .iode_python import (nan,
+from .iode_python import (nan, __version__, 
                           IODE_TYPES_LIST, NB_TYPES, K_CMT, K_EQS, K_IDT, K_LST, K_SCL, K_TBL, K_VAR, 
                           VARIABLES_MODES, 
                           SIMULATION_INITIALIZATION_LIST, KV_INIT_ASIS, KV_INIT_EXTRA, KV_INIT_EXTRA_A, 
