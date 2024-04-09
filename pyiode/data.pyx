@@ -62,7 +62,10 @@ def data_update_idt(obj_name: str, obj_value: str):
     idt_db[obj_name] = obj_value
     
 def data_update_lst(obj_name: str, obj_value: str):
-    data_update(obj_name, obj_value, K_LST)
+    warnings.warn("data_update_lst() is deprecated. " + 
+        "Please use the new syntax: lst_db[name] = value", DeprecationWarning)
+    lst_db = Lists()
+    lst_db[obj_name] = obj_value
     
 def data_update_scl(obj_name: str, value: float = None, relax: float = None, stderr: float = None):
     cmd = obj_name + " "

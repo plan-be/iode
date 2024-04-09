@@ -98,7 +98,10 @@ def delete_idt(name: str):
     del idt_db[name]
     
 def delete_lst(name: str):
-    return delete_obj(name, K_LST)
+    warnings.warn("delete_lst() is deprecated. " + 
+        "Please use the new syntax: del lst_db[name]", DeprecationWarning)
+    lst_db = Lists()
+    del lst_db[name]
    
 def delete_scl(name: str):
     return delete_obj(name, K_SCL)
@@ -189,14 +192,17 @@ def set_idt(name: str, idt: str):
 # -----
 def get_lst(name: str) -> str:
     '''Return a list as a string'''
-    lst850 = IodeGetLst(_cstr(name))
-    return _pystr(lst850)
+    warnings.warn("get_lst() is deprecated. " + 
+        "Please use the new syntax: lst_db[name]", DeprecationWarning)
+    lst_db = Lists()
+    return lst_db[name]
 
 def set_lst(name: str, lst: str):
-    '''Update or create a list fro a string'''
-    if IodeSetLst(_cstr(name), _cstr(lst)):
-        raise RuntimeError(f"List {name} cannot be set")
-
+    '''Update or create a list from a string'''
+    warnings.warn("set_lst() is deprecated. " + 
+        "Please use the new syntax: lst_db[name] = value", DeprecationWarning)
+    lst_db = Lists()
+    lst_db[name] = lst
 
 # Scalars
 # -------
