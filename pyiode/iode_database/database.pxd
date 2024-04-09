@@ -91,6 +91,24 @@ cdef extern from "cpp_api/KDB/kdb_identities.h":
     cdef KDBIdentities Identities
 
 
+cdef extern from "cpp_api/KDB/kdb_lists.h":
+    cdef cppclass KDBLists(KDBTemplate[string]):
+        # Constructor
+        KDBLists(string& filepath) except +
+
+        # Public methods
+        KDBLists* subset(string& pattern, bool deep_copy) except +
+        string get(string& name) except +
+        string copy(string& name) except +
+        int add(string& name, string& list_) except +
+        void update(string& name, string& list_) except +
+
+    size_t hash_value(KDBLists&) except +
+
+    # Define the global Lists instance
+    cdef KDBLists Lists
+
+
 cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef cppclass KDBVariables(KDBTemplate[vector[double]]):
         # Constructor

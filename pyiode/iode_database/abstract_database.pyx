@@ -681,6 +681,13 @@ cdef class _AbstractDatabase:
         >>> idt_db["AOUC"]
         '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
 
+        Lists
+
+        >>> from iode import Lists
+        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lst_db["ENVI"]
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
+
         Variables
 
         >>> from iode import Variables, nan
@@ -739,6 +746,16 @@ cdef class _AbstractDatabase:
         >>> idt_db["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
         >>> idt_db["AOUC"]
         '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+
+        Lists
+
+        >>> from iode import Lists
+        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lst_db["ENVI"]
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
+        >>> lst_db["ENVI"] = 'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
+        >>> lst_db["ENVI"]
+        'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
 
         Variables
 
