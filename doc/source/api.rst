@@ -72,6 +72,15 @@ Identities
    Identities.__init__
    Identities.execute 
 
+=====
+Lists
+=====
+
+.. autosummary::
+   :toctree: _generated
+
+   Lists.__init__
+
 =========
 Variables
 =========
@@ -100,36 +109,24 @@ Variables
 
    ws_content
    ws_content_eqs
-   ws_content_idt
-   ws_content_lst
    ws_content_scl
    ws_content_tbl
-   ws_content_var
    
    ws_clear
+   ws_clear_all
    ws_clear_eqs
-   ws_clear_idt
-   ws_clear_lst
    ws_clear_scl
    ws_clear_tbl
-   ws_clear_var
-   ws_clear_all
 
    ws_load
    ws_load_eqs
-   ws_load_idt
-   ws_load_lst
    ws_load_scl
    ws_load_tbl
-   ws_load_var
 
    ws_save
    ws_save_eqs
-   ws_save_idt
-   ws_save_lst
    ws_save_scl
    ws_save_tbl
-   ws_save_var
 
 
 ************
@@ -164,31 +161,6 @@ EQUATION
    data_update_eqs
    delete_eqs
 
-========
-IDENTITY
-========
-
-.. autosummary::
-   :toctree: _generated
-
-   get_idt
-   set_idt
-   idt_execute
-   data_update_idt
-   delete_idt
-
-====
-LIST
-====
-
-.. autosummary::
-   :toctree: _generated
-
-   get_lst
-   set_lst
-   data_update_lst
-   delete_lst
-
 ======
 SCALAR
 ======
@@ -210,19 +182,6 @@ TABLE
    :toctree: _generated
 
    delete_tbl
-
-========
-VARIABLE
-========
-
-.. autosummary::
-   :toctree: _generated
-
-   get_var
-   get_var_as_ndarray
-   set_var
-   data_update_var
-   delete_var
 
 
 ****
@@ -333,7 +292,6 @@ MISCELLANEOUS
 .. autosummary::
    :toctree: _generated
 
-   version
    suppress_msgs
    reset_msgs
 
@@ -350,10 +308,42 @@ DEPRECATED
    ws_load_cmt
    ws_save_cmt
 
+   ws_content_idt
+   ws_clear_idt
+   ws_load_idt
+   ws_save_idt
+
+   ws_content_lst
+   ws_clear_lst
+   ws_load_lst
+   ws_save_lst
+
+   ws_content_var
+   ws_clear_var
+   ws_load_var
+   ws_save_var
+
    delete_cmt
    get_cmt
    set_cmt
    data_update_cmt
+
+   get_idt
+   set_idt
+   idt_execute
+   data_update_idt
+   delete_idt
+
+   get_lst
+   set_lst
+   data_update_lst
+   delete_lst
+
+   get_var
+   get_var_as_ndarray
+   set_var
+   data_update_var
+   delete_var
 
    ws_sample_nb_periods
    ws_sample_to_string
