@@ -13,11 +13,33 @@ from pyiode.iode_database.database cimport Comments as cpp_global_comments
 
 
 @cython.final
-cdef class _CommentsDatabase(_AbstractDatabase):
+cdef class Comments(_AbstractDatabase):
     cdef CKDBComments* database_ptr
 
-    def __cinit__(self):
+    def __cinit__(self, filepath: str = None) -> Comments:
+        """
+        Get an instance of the IODE Comments database. 
+        Load the IODE comments from 'filepath' if given.
+
+        Parameters
+        ----------
+        filepath: str, optional
+            file containing the IODE comments to load.
+
+        Returns
+        -------
+        Comments
+
+        Examples
+        --------
+        >>> from iode import Comments, SAMPLE_DATA_DIR
+        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(cmt_db)
+        317
+        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_comments
+        if filepath is not None:
+            self.load(filepath)
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Comments 
@@ -29,8 +51,8 @@ cdef class _CommentsDatabase(_AbstractDatabase):
         cdef CKDBComments* kdb = new CKDBComments(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> _CommentsDatabase:
-        cmt_subset = _CommentsDatabase()
+    def subset(self, pattern: str, copy: bool = False) -> Comments:
+        cmt_subset = Comments()
         cmt_subset.database_ptr = cmt_subset.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return cmt_subset
 
@@ -58,6 +80,3 @@ cdef class _CommentsDatabase(_AbstractDatabase):
         if not isinstance(name, str):
             raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
         self.database_ptr.update(name.encode(), comment.encode())
-
-
-Comments = _CommentsDatabase()

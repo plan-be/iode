@@ -84,16 +84,18 @@ def delete_obj(obj_name: str, obj_type: int):
 
 def delete_cmt(name: str):
     warnings.warn("delete_cmt() is deprecated. " + 
-        "Please use the new syntax: del Comments[name]", DeprecationWarning)
-    del Comments[name]
+        "Please use the new syntax: del cmt_db[name]", DeprecationWarning)
+    cmt_db = Comments()
+    del cmt_db[name]
 
 def delete_eqs(name: str):
     return delete_obj(name, K_EQS)
 
 def delete_idt(name: str):
     warnings.warn("delete_idt() is deprecated. " + 
-        "Please use the new syntax: del Identities[name]", DeprecationWarning)
-    del Identities[name]
+        "Please use the new syntax: del idt_db[name]", DeprecationWarning)
+    idt_db = Identities()
+    del idt_db[name]
     
 def delete_lst(name: str):
     return delete_obj(name, K_LST)
@@ -106,8 +108,9 @@ def delete_tbl(name: str):
 
 def delete_var(name: str):
     warnings.warn("delete_var() is deprecated. " + 
-        "Please use the new syntax: del Variables[name]", DeprecationWarning)
-    del Variables[name]
+        "Please use the new syntax: del var_db[name]", DeprecationWarning)
+    var_db = Variables()
+    del var_db[name]
    
 
 # Set and Get IODE objects
@@ -118,13 +121,15 @@ def delete_var(name: str):
 
 def get_cmt(name: str) -> str:
     warnings.warn("get_cmt() is deprecated. " + 
-        "Please use the new syntax: Comments[name]", DeprecationWarning)
-    return Comments[name]
+        "Please use the new syntax: cmt_db[name]", DeprecationWarning)
+    cmt_db = Comments()
+    return cmt_db[name]
 
 def set_cmt(name: str, cmt: str):
     warnings.warn("set_cmt() is deprecated. " + 
-        "Please use the new syntax: Comments[name] = value", DeprecationWarning)
-    Comments[name] = cmt
+        "Please use the new syntax: cmt_db[name] = value", DeprecationWarning)
+    cmt_db = Comments()
+    cmt_db[name] = cmt
 
 
 # Equations
@@ -169,14 +174,16 @@ def set_eqs(eq_name: str, lec: str):
 def get_idt(name: str) -> str:
     '''Return the LEC formula of an IODE identity '''
     warnings.warn("get_idt() is deprecated. " + 
-        "Please use the new syntax: Identities[name]", DeprecationWarning)
-    return Identities[name]
+        "Please use the new syntax: idt_db[name]", DeprecationWarning)
+    idt_db = Identities()
+    return idt_db[name]
 
 def set_idt(name: str, idt: str):
     '''Update or create an identity'''
     warnings.warn("set_idt() is deprecated. " + 
-        "Please use the new syntax: Identities[name] = value", DeprecationWarning)
-    Identities[name] = idt
+        "Please use the new syntax: idt_db[name] = value", DeprecationWarning)
+    idt_db = Identities()
+    idt_db[name] = idt
     
 # Lists
 # -----
@@ -230,17 +237,20 @@ def set_scl(name: str, scalar: Scalar):
 
 def get_var(varname: str) -> List[float]:
     warnings.warn("get_var() is deprecated. " + 
-        "Please use the new syntax: Variables[name]", DeprecationWarning)
-    return Variables[varname]
+        "Please use the new syntax: var_db[name]", DeprecationWarning)
+    var_db = Variables()
+    return var_db[varname]
 
 # Copy (or refer to) an IODE var into a ndarray
 def get_var_as_ndarray(varname: str, copy: bool = True) -> np.ndarray:
     warnings.warn("get_var_as_ndarray() is deprecated. " + 
-        "Please use the new syntax: np.asarray(Variables[name])", DeprecationWarning)
-    return np.asarray(Variables[varname])
+        "Please use the new syntax: np.asarray(var_db[name])", DeprecationWarning)
+    var_db = Variables()
+    return np.asarray(var_db[varname])
 
 # Copy a ndarray or a list into KV_WS
 def set_var(varname: str, py_values):
     warnings.warn("set_var() is deprecated. " + 
-        "Please use the new syntax: Variables[name] = values", DeprecationWarning)
-    Variables[varname] = py_values
+        "Please use the new syntax: var_db[name] = values", DeprecationWarning)
+    var_db = Variables()
+    var_db[varname] = py_values
