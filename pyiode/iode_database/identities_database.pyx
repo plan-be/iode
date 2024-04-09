@@ -53,9 +53,9 @@ cdef class Identities(_AbstractDatabase):
         del kdb
 
     def subset(self, pattern: str, copy: bool = False) -> Identities:
-        cmt_subset = Identities()
-        cmt_subset.database_ptr = cmt_subset.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return cmt_subset
+        subset_ = Identities()
+        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return subset_
 
     def _get_object(self, key):
         if not isinstance(key, str):
