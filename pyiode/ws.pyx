@@ -182,7 +182,10 @@ def ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]:
     return idt_db.get_names(pattern)
 
 def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
-    return ws_content(pattern, K_LST)
+    warnings.warn("ws_content_lst() is deprecated. " + 
+        "Please use the new syntax: lst_db.get_names(pattern)", DeprecationWarning)
+    lst_db = Lists()
+    return lst_db.get_names(pattern)
 
 def ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_SCL)
@@ -225,7 +228,10 @@ def ws_clear_idt():
     idt_db.clear()
 
 def ws_clear_lst():
-    ws_clear(K_LST)
+    warnings.warn("ws_clear_lst() is deprecated. " + 
+        "Please use the new syntax: idt_db.clear()", DeprecationWarning)
+    lst_db = Lists()
+    lst_db.clear()
 
 def ws_clear_scl():
     ws_clear(K_SCL)
@@ -253,8 +259,7 @@ def ws_load(filename: str, filetype: int) -> int:
 def ws_load_cmt(filename: str):
     warnings.warn("ws_load_cmt() is deprecated. " + 
         "Please use the new syntax: cmt_db = Comments(filepath)", DeprecationWarning)
-    cmt_db = Comments()
-    cmt_db = Comments(filename)
+    return Comments(filename)
 
 def ws_load_eqs(filename: str) -> int:
     return ws_load(filename, K_EQS)
@@ -262,12 +267,13 @@ def ws_load_eqs(filename: str) -> int:
 def ws_load_idt(filename: str) -> int:
     warnings.warn("ws_load_idt() is deprecated. " + 
         "Please use the new syntax: idt_db = Identities(filepath)", DeprecationWarning)
-    idt_db = Identities()
-    idt_db = Identities(filename)
+    return Identities(filename)
 
 def ws_load_lst(filename: str) -> int:
-    return ws_load(filename, K_LST) 
-                             
+    warnings.warn("ws_load_lst() is deprecated. " + 
+        "Please use the new syntax: lst_db = Lists(filepath)", DeprecationWarning)
+    return Identities(filename)
+
 def ws_load_scl(filename: str) -> int:
     return ws_load(filename, K_SCL) 
                              
@@ -307,7 +313,10 @@ def ws_save_idt(filename: str):
 
 def ws_save_lst(filename: str):
     '''Save the current list workspace'''
-    ws_save(filename, K_LST)
+    warnings.warn("ws_save_lst() is deprecated. " + 
+        "Please use the new syntax: lst_db.save(filepath)", DeprecationWarning)
+    lst_db = Lists()
+    lst_db.save(filename)
 
 def ws_save_scl(filename: str):
     '''Save the current scalar workspace'''
