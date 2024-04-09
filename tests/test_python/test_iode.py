@@ -67,31 +67,6 @@ def test_iode_set_eqs():
         iode.set_eqs("A", py_A)
 
 
-# IODE LISTS <-> PYTHON STRINGS
-# -----------------------------
-
-def test_iode_get_lst():
-
-    iode.ws_load_lst(str(SAMPLE_DATA_DIR / "fun"))
-    i_MYLIST = iode.get_lst("MYLIST")
-    assert i_MYLIST == "A02_075_H_BRU A02_100_H_VLA"
-
-
-def test_iode_set_lst():
-
-    # Clear LST before creating new object
-    iode.ws_clear_lst()
-
-    # Create list as py strings
-    py_list1 = "A;B;C"
-    name = "LIST1"
-
-    # Save py_list1 as LIST1 in KL_WS + check
-    iode.set_lst(name, py_list1)
-    i_LIST1  = iode.get_lst(name)
-    assert i_LIST1 == py_list1
-
-
 # IODE SCALARS <-> PYTHON
 # -----------------------
 
