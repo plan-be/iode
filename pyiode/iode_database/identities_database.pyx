@@ -14,11 +14,33 @@ from pyiode.iode_database.database cimport Variables as cpp_global_variables
 
 
 @cython.final
-cdef class _IdentitiesDatabase(_AbstractDatabase):
+cdef class Identities(_AbstractDatabase):
     cdef CKDBIdentities* database_ptr
 
-    def __cinit__(self):
+    def __cinit__(self, filepath: str = None) -> Identities:
+        """
+        Get an instance of the IODE Identities database. 
+        Load the IODE identities from 'filepath' if given.
+
+        Parameters
+        ----------
+        filepath: str, optional
+            file containing the IODE identities to load.
+
+        Returns
+        -------
+        Identities
+
+        Examples
+        --------
+        >>> from iode import Identities, SAMPLE_DATA_DIR
+        >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> len(idt_db)
+        84
+        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_identities
+        if filepath is not None:
+            self.load(filepath)
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Identities 
@@ -30,8 +52,8 @@ cdef class _IdentitiesDatabase(_AbstractDatabase):
         cdef CKDBIdentities* kdb = new CKDBIdentities(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> _IdentitiesDatabase:
-        cmt_subset = _IdentitiesDatabase()
+    def subset(self, pattern: str, copy: bool = False) -> Identities:
+        cmt_subset = Identities()
         cmt_subset.database_ptr = cmt_subset.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return cmt_subset
 
@@ -94,54 +116,54 @@ cdef class _IdentitiesDatabase(_AbstractDatabase):
         Examples
         --------
         >>> from iode import Identities, Variables, SAMPLE_DATA_DIR
-        >>> Identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> sample = Variables.sample
+        >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> sample = var_db.sample
         >>> sample
         1960Y1:2015Y1
-        >>> Identities["GAP_"]
+        >>> idt_db["GAP_"]
         '100*((QAF_/Q_F)-1)'
-        >>> Identities["GAP2"]
+        >>> idt_db["GAP2"]
         '100*(QAFF_/(Q_F+Q_I))'
         >>> # reset variables GAP_ and GAP2
-        >>> Variables["GAP_"] = 0.
-        >>> Variables["GAP_"]                   # doctest: +ELLIPSIS 
+        >>> var_db["GAP_"] = 0.
+        >>> var_db["GAP_"]                   # doctest: +ELLIPSIS 
         [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
-        >>> Variables["GAP2"] = 0.
-        >>> Variables["GAP2"]                   # doctest: +ELLIPSIS 
+        >>> var_db["GAP2"] = 0.
+        >>> var_db["GAP2"]                   # doctest: +ELLIPSIS 
         [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
 
         >>> # compute GAP_ and GAP2 (assuming Scalars and Variables are already loaded)
-        >>> Identities.execute("GAP_;GAP2")
-        >>> Variables["GAP_"]                   # doctest: +ELLIPSIS 
+        >>> idt_db.execute("GAP_;GAP2")
+        >>> var_db["GAP_"]                   # doctest: +ELLIPSIS 
         [-3.20493949860704, -3.981808446333557, ..., 3.7800671441993616, 3.2396415884531793]
-        >>> Variables["GAP2"]                   # doctest: +ELLIPSIS 
+        >>> var_db["GAP2"]                   # doctest: +ELLIPSIS 
         [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
 
         >>> # compute GAP_ and GAP2 over a subset of the sample
-        >>> Variables["GAP_"] = 0.
-        >>> Variables["GAP2"] = 0.
-        >>> Identities.execute("GAP_;GAP2", "2000Y1", "2005Y1")
-        >>> Variables["GAP_", "2000Y1:2005Y1"]
+        >>> var_db["GAP_"] = 0.
+        >>> var_db["GAP2"] = 0.
+        >>> idt_db.execute("GAP_;GAP2", "2000Y1", "2005Y1")
+        >>> var_db["GAP_", "2000Y1:2005Y1"]
         [4.510095736743436, 3.312304975734315, 2.6151793579969107, 3.464117181974924, 5.478645527985804, 5.578699398837528]
-        >>> Variables["GAP2", "2000Y1:2005Y1"]
+        >>> var_db["GAP2", "2000Y1:2005Y1"]
         [104.60957761618035, 103.05782573291968, 102.17336700422976, 102.82322081548728, 104.4719275849864, 104.3586710898436]
 
         >>> # compute GAP_ and GAP2 assuming Variables are not already loaded
-        >>> Variables.clear()
-        >>> Variables.sample = '1960Y1:2015Y1'
-        >>> Variables.get_names()
+        >>> var_db.clear()
+        >>> var_db.sample = '1960Y1:2015Y1'
+        >>> var_db.get_names()
         []
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
-        >>> Identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables["GAP_"]                   # doctest: +ELLIPSIS 
+        >>> idt_db.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db["GAP_"]                   # doctest: +ELLIPSIS 
         [-3.20493949860704, -3.981808446333557, ..., 3.7800671441993616, 3.2396415884531793]
-        >>> Variables["GAP2"]                   # doctest: +ELLIPSIS 
+        >>> var_db["GAP2"]                   # doctest: +ELLIPSIS 
         [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
         >>> # note that the variables 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' are not 
-        >>> # present in the Variables database after running Identities.execute
-        >>> Variables.get_names()
+        >>> # present in the Variables database after running idt_db.execute
+        >>> var_db.get_names()
         ['GAP2', 'GAP_']
         """
         if identities is None:
@@ -195,7 +217,3 @@ cdef class _IdentitiesDatabase(_AbstractDatabase):
 
         self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
                                             var_files.encode(), scalar_files.encode(), <bint>trace)
-
-
-
-Identities = _IdentitiesDatabase()

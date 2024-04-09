@@ -202,34 +202,40 @@ cdef class Sample:
 
 def ws_sample_set(from_period: str, to_period: str) -> Optional[Tuple[str, str]]:
     warnings.warn("ws_sample_set() is deprecated. " + 
-        "Please use the new syntax: Variables.sample = 'from_period:to_period'", DeprecationWarning)
-    Variables.sample = f"{from_period}:{to_period}"
+        "Please use the new syntax: var_db.sample = 'from_period:to_period'", DeprecationWarning)
+    var_db = Variables()
+    var_db.sample = f"{from_period}:{to_period}"
 
 def ws_sample_get() -> Optional[Tuple[str, str]]: 
     warnings.warn("ws_sample_get() is deprecated. " + 
-        "Please use the new syntax: Variables.sample", DeprecationWarning)
-    return Variables.sample
+        "Please use the new syntax: var_db.sample", DeprecationWarning)
+    var_db = Variables()
+    return var_db.sample
 
 def ws_sample_nb_periods() -> int:
     warnings.warn("ws_sample_nb_periods() is deprecated. " + 
-        "Please use the new syntax: Variables.nb_periods", DeprecationWarning)
-    return Variables.nb_periods
+        "Please use the new syntax: var_db.nb_periods", DeprecationWarning)
+    var_db = Variables()
+    return var_db.nb_periods
 
 def ws_sample_to_string() -> Optional[str]:
     warnings.warn("ws_sample_to_string() is deprecated. " + 
-        "Please use the new syntax: Variables.sample", DeprecationWarning)
-    return Variables.sample
+        "Please use the new syntax: var_db.sample", DeprecationWarning)
+    var_db = Variables()
+    return var_db.sample
 
 def ws_sample_to_list(from_period: str = "", to_period: str = "", as_floats: bool = False) -> Optional[Union[List[str], np.ndarray]]:
     warnings.warn("ws_sample_to_list() is deprecated. " + 
-        "Please use the new syntax: Variables.periods", DeprecationWarning)
-    return Variables.periods
+        "Please use the new syntax: var_db.periods", DeprecationWarning)
+    var_db = Variables()
+    return var_db.periods
 
 def ws_sample_to_larray_axis(axis_name: str = 'time', 
                              from_period:str = '', to_period: str = '', 
                              as_floats: bool = False) -> Axis:
     warnings.warn("ws_sample_to_larray_axis() is deprecated. " + 
-        "Please use the new syntax:\nperiods_list = Variables.periods\n" + 
+        "Please use the new syntax:\nperiods_list = var_db.periods\n" + 
         "time_axis = la.Axis(name='time', labels=nperiods_list)", DeprecationWarning)
-    periods_list = Variables.periods
+    var_db = Variables()
+    periods_list = var_db.periods
     return Axis(name='time', labels=periods_list)

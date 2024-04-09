@@ -13,7 +13,7 @@ import warnings
 cdef extern from "api/iode.h": 
     cdef int    IodeExecuteIdts(char *smpl, char *idt_list, char *var_files, char *scl_files, int trace)
 
-# TODO: (ALD) rewrite Examples section below
+
 def idt_execute(sample: Optional[Union[str, List[str]]] = None, 
                 idt_list: Optional[Union[str, List[str]]] = None, 
                 var_files: Optional[Union[str, List[str]]] = None, 
@@ -55,7 +55,8 @@ def idt_execute(sample: Optional[Union[str, List[str]]] = None,
                     From ../data/fun : gamma gamma2 gamma3 gamma4 knf3
     '''
     warnings.warn("idt_execute() is deprecated. " + 
-        "Please use the new syntax: Identities.execute(identities, from_period, " + 
+        "Please use the new syntax: idt_db.execute(identities, from_period, " + 
         "to_period, var_files, scalar_files, trace)", DeprecationWarning)
+    idt_db = Identities()
     from_period, to_period = sample.split(';')
-    Identities.execute(idt_list, from_period, to_period, var_files, scl_files, trace)
+    idt_db.execute(idt_list, from_period, to_period, var_files, scl_files, trace)

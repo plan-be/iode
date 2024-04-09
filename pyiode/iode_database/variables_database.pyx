@@ -42,7 +42,7 @@ cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
     Returns
     -------
     out: ndarray 
-        1-dim numpy array containing the values of Variables[name]
+        1-dim numpy array containing the values of var_db[name]
     """  
     cdef np.npy_intp shape[1]   # int of the size of a pointer (32 ou 64 bits) See https://numpy.org/doc/stable/reference/c-api/dtype.html
     cdef int lg
@@ -66,13 +66,35 @@ cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
 
 
 @cython.final
-cdef class _VariablesDatabase(_AbstractDatabase):
+cdef class Variables(_AbstractDatabase):
     cdef CKDBVariables* database_ptr
     cdef EnumIodeVarMode mode_
 
-    def __cinit__(self):
+    def __cinit__(self, filepath: str = None) -> Variables:
+        """
+        Get an instance of the IODE Variables database. 
+        Load the IODE variables from 'filepath' if given.
+
+        Parameters
+        ----------
+        filepath: str, optional
+            file containing the IODE variables to load.
+
+        Returns
+        -------
+        Variables
+
+        Examples
+        --------
+        >>> from iode import Variables, SAMPLE_DATA_DIR
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> len(var_db)
+        394
+        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_variables
         self.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
+        if filepath is not None:
+            self.load(filepath)
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Variables 
@@ -84,8 +106,8 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         cdef CKDBVariables* kdb = new CKDBVariables(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> _VariablesDatabase:
-        subset_ = _VariablesDatabase()
+    def subset(self, pattern: str, copy: bool = False) -> Variables:
+        subset_ = Variables()
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
@@ -97,13 +119,13 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         # key = name, periods
         if isinstance(key, tuple):
             if len(key) > 2:
-                raise ValueError(f"Variables[...]: Expected maximum 2 arguments ('name' and 'periods'). "
+                raise ValueError(f"var_db[...]: Expected maximum 2 arguments ('name' and 'periods'). "
                                  f"Got {len(key)} arguments")
             name, periods_ = key
 
             # check name
             if not isinstance(name, str):
-                raise TypeError(f"Variables[name, periods]: first argument must be of type str. "
+                raise TypeError(f"var_db[name, periods]: first argument must be of type str. "
                                 f"Got first argument of type {type(name).__name__}.")
             
             # periods_ represent a unique period or a contiguous range of periods
@@ -138,11 +160,11 @@ cdef class _VariablesDatabase(_AbstractDatabase):
                 return name, periods_
             
             # wrong type for periods_
-            raise TypeError(f"Variables[name, periods]: 'periods' must represent either a period (str), a list of periods "
+            raise TypeError(f"var_db[name, periods]: 'periods' must represent either a period (str), a list of periods "
                             f"or a slice of periods (start_period:last_period). 'periods' is of type {type(periods_).__name__}.")
 
         # wrong key
-        raise ValueError(f"Variables[...]: Expected ['name'] or ['name', 'periods'] as arguments. Got {key} instead.")     
+        raise ValueError(f"var_db[...]: Expected ['name'] or ['name', 'periods'] as arguments. Got {key} instead.")     
         
     def _get_object(self, key):
         key = self._unfold_key(key)
@@ -175,10 +197,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
             if len(values) == nb_periods:
                 return [float(val) for val in values]
             else:
-                raise ValueError(f"Variables[key] = values: Expected 'values' to be a vector of length {nb_periods} " 
+                raise ValueError(f"var_db[key] = values: Expected 'values' to be a vector of length {nb_periods} " 
                                  f"but got vector of length {len(values)}.")    
         # wrong type for 'value'
-        raise TypeError("Variables[key] = value(s): Expected a float or a list of float as 'value(s)'. "
+        raise TypeError("var_db[key] = value(s): Expected a float or a list of float as 'value(s)'. "
                             f"Got 'value(s)' of type {type(values).__name__}") 
 
     def _set_object(self, key, value):
@@ -203,7 +225,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
                 if isinstance(value, int):
                     value = float(value)
                 if not isinstance(value, float):
-                    raise TypeError("Variables[key] = value: Expected 'value' to be a float. "
+                    raise TypeError("var_db[key] = value: Expected 'value' to be a float. "
                                     f"Got 'value' of type {type(value).__name__}")
                 self.database_ptr.set_var(<string>name.encode(), <string>periods.encode(), <double>value, self.mode_)
             # contiguous range of periods
@@ -223,7 +245,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
             # list of periods
             else:
                 if isinstance(value, str):
-                    raise NotImplementedError("Case Variables[key, periods] = lec where 'periods' does not represents "
+                    raise NotImplementedError("Case var_db[key, periods] = lec where 'periods' does not represents "
                                               "a contiguous range of periods is not implemented")
                 else:
                     values = self._convert_values(value, len(periods))
@@ -274,7 +296,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         >>> from iode import Variables
         >>> import numpy as np
         >>> import pandas as pd
-        >>> Variables.clear()
+        >>> var_db = Variables()
+        >>> var_db.clear()
+        >>> len(var_db)
+        0
 
         >>> # create the pandas DataFrame
         >>> vars_names = [f"{region}_{code}" for region in ["VLA", "WAL", "BXL"] for code in ["00", "01", "02"]]
@@ -296,16 +321,16 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         [9 rows x 11 columns]
 
         >>> # load into the IODE Variables database
-        >>> Variables.from_frame(df)
-        >>> len(Variables)
+        >>> var_db.from_frame(df)
+        >>> len(var_db)
         9
-        >>> Variables.get_names()
+        >>> var_db.get_names()
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
-        >>> Variables.sample
+        >>> var_db.sample
         1960Y1:1970Y1
-        >>> Variables["VLA_00"]
+        >>> var_db["VLA_00"]
         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-        >>> Variables["BXL_02"]
+        >>> var_db["BXL_02"]
         [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
         """
         cdef int df_pos
@@ -381,23 +406,23 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
         >>> import pandas as pd
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> len(Variables)
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> len(var_db)
         394
-        >>> Variables.sample
+        >>> var_db.sample
         1960Y1:2015Y1
-        >>> Variables.nb_periods
+        >>> var_db.nb_periods
         56
 
         >>> # Export the IODE Variables database as a pandas DataFrame
-        >>> df = Variables.to_frame()
+        >>> df = var_db.to_frame()
         >>> df.shape
         (394, 56)
         >>> df.index.to_list()              # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKFO', 'ZX', 'ZZF_']
         >>> df.columns.to_list()            # doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> Variables["AOUC"]               # doctest: +ELLIPSIS
+        >>> var_db["AOUC"]               # doctest: +ELLIPSIS
         [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
         >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
@@ -407,7 +432,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         2014Y1    1.423714
         2015Y1    1.460863
         Name: AOUC, dtype: float64    
-        >>> Variables["ZKFO"]               # doctest: +ELLIPSIS
+        >>> var_db["ZKFO"]               # doctest: +ELLIPSIS
         [1.0, 1.0, ... 1.0159901, 1.0159901]
         >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         time
@@ -464,7 +489,11 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import Variables
         >>> import larray as la
-        >>> Variables.clear()
+        >>> var_db = Variables()
+        >>> var_db.clear()
+        >>> len(var_db)
+        0
+
         >>> regions_axis = la.Axis("region=VLA,WAL,BXL")
         >>> code_axis = la.Axis("code=00..02")
         >>> periods_axis = la.Axis(name="time", labels=[f"{i}Y1" for i in range(1960, 1971)])
@@ -482,16 +511,16 @@ cdef class _VariablesDatabase(_AbstractDatabase):
            BXL         02    88.0    89.0    90.0  ...    96.0    97.0    98.0
         
         >>> # load the IODE Variables from the Array object
-        >>> Variables.from_array(array)
-        >>> len(Variables)
+        >>> var_db.from_array(array)
+        >>> len(var_db)
         9
-        >>> Variables.get_names()
+        >>> var_db.get_names()
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
-        >>> Variables.sample
+        >>> var_db.sample
         1960Y1:1970Y1
-        >>> Variables["VLA_00"]
+        >>> var_db["VLA_00"]
         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-        >>> Variables["BXL_02"]
+        >>> var_db["BXL_02"]
         [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
         """
         if la is None:
@@ -534,28 +563,28 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> len(Variables)
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> len(var_db)
         394
-        >>> Variables.sample
+        >>> var_db.sample
         1960Y1:2015Y1
-        >>> Variables.nb_periods
+        >>> var_db.nb_periods
         56
 
         >>> # Export the IODE Variables database as an (larray) Array object
-        >>> array = Variables.to_array()
+        >>> array = var_db.to_array()
         >>> array.shape
         (394, 56)
         >>> array.axes.info
         394 x 56
          names [394]: 'ACAF' 'ACAG' 'AOUC' ... 'ZKFO' 'ZX' 'ZZF_'
          time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
-        >>> Variables["AOUC"]               # doctest: +ELLIPSIS
+        >>> var_db["AOUC"]               # doctest: +ELLIPSIS
         [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
         >>> array["AOUC"]
         time  1960Y1  ...              2014Y1              2015Y1
                  nan  ...  1.4237139558484628  1.4608626117037322
-        >>> Variables["ZKFO"]               # doctest: +ELLIPSIS
+        >>> var_db["ZKFO"]               # doctest: +ELLIPSIS
         [1.0, 1.0, ..., 1.0159901, 1.0159901]
         >>> array["ZKFO"]
         time  1960Y1  1961Y1  1962Y1  ...     2012Y1     2013Y1     2014Y1     2015Y1
@@ -586,8 +615,8 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.mode
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.mode
         'Level'
         """
         return VARIABLES_MODES[self.mode_]
@@ -609,14 +638,14 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.mode
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.mode
         'Level'
-        >>> Variables["ACAF", "1990Y1"]
+        >>> var_db["ACAF", "1990Y1"]
         0.25
         
-        >>> Variables.mode = I_VAR_MODE_GROWTH_RATE
-        >>> Variables["ACAF", "1990Y1"]
+        >>> var_db.mode = I_VAR_MODE_GROWTH_RATE
+        >>> var_db["ACAF", "1990Y1"]
         0.25
         """
         if mode_ not in [EnumIodeVarMode.I_VAR_MODE_LEVEL, EnumIodeVarMode.I_VAR_MODE_DIFF, 
@@ -639,8 +668,8 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.sample
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.sample
         1960Y1:2015Y1
         """
         c_sample = self.database_ptr.get_sample()
@@ -663,31 +692,31 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.sample
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.sample
         1960Y1:2015Y1
 
         >>> # update sample by passing a string
-        >>> Variables.sample = '1970Y1:2020Y1'
-        >>> Variables.sample
+        >>> var_db.sample = '1970Y1:2020Y1'
+        >>> var_db.sample
         1970Y1:2020Y1
         >>> # start or end period are optional
-        >>> Variables.sample = ':2010Y1'
-        >>> Variables.sample
+        >>> var_db.sample = ':2010Y1'
+        >>> var_db.sample
         1970Y1:2010Y1
-        >>> Variables.sample = '1980Y1:'
-        >>> Variables.sample
+        >>> var_db.sample = '1980Y1:'
+        >>> var_db.sample
         1980Y1:2010Y1
 
         >>> # update sample by passing a slice
-        >>> Variables.sample = '1950Y1':'2000Y1'
-        >>> Variables.sample
+        >>> var_db.sample = '1950Y1':'2000Y1'
+        >>> var_db.sample
         1950Y1:2000Y1
 
         >>> # update sample by passing a start period and 
         >>> # an end period separated by a comma
-        >>> Variables.sample = '1980Y1', '2010Y1'
-        >>> Variables.sample
+        >>> var_db.sample = '1980Y1', '2010Y1'
+        >>> var_db.sample
         1980Y1:2010Y1
         """
         if isinstance(value, str):
@@ -705,7 +734,7 @@ cdef class _VariablesDatabase(_AbstractDatabase):
             if isinstance(to, Period):
                 to = str(to)
         else:
-            raise TypeError("Variables.sample = value: 'value' must be either a string 'start_period:last_period', "
+            raise TypeError("var_db.sample = value: 'value' must be either a string 'start_period:last_period', "
                             "a slice 'start_period':'last_period' or a tuple 'start_period', 'last_period'.\n "
                             f"Got 'value' of type {type(value).__name__}")
         
@@ -724,10 +753,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.sample
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.sample
         1960Y1:2015Y1
-        >>> Variables.nb_periods
+        >>> var_db.nb_periods
         56
         """
         return self.database_ptr.get_nb_periods()
@@ -745,10 +774,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.sample
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.sample
         1960Y1:2015Y1
-        >>> Variables.periods       # doctest: +ELLIPSIS 
+        >>> var_db.periods       # doctest: +ELLIPSIS 
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         """
         return [cpp_period.decode() for cpp_period in self.database_ptr.get_list_periods(bytes(), bytes())]
@@ -766,10 +795,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.sample
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.sample
         1960Y1:2015Y1
-        >>> Variables.periods_as_float          # doctest: +ELLIPSIS 
+        >>> var_db.periods_as_float          # doctest: +ELLIPSIS 
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
         return self.database_ptr.get_list_periods_as_float(bytes(), bytes())
@@ -798,12 +827,12 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Variables
-        >>> Variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> Variables.sample
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> var_db.sample
         1960Y1:2015Y1
-        >>> Variables.periods_subset("1990Y1", "2000Y1")                    # doctest: +ELLIPSIS
+        >>> var_db.periods_subset("1990Y1", "2000Y1")                    # doctest: +ELLIPSIS
         ['1990Y1', '1991Y1', ..., '1999Y1', '2000Y1']
-        >>> Variables.periods_subset("1990Y1", "2000Y1", as_float=True)     # doctest: +ELLIPSIS
+        >>> var_db.periods_subset("1990Y1", "2000Y1", as_float=True)     # doctest: +ELLIPSIS
         [1990.0, 1991.0, ..., 1999.0, 2000.0]
         """
         sample = self.sample
@@ -839,10 +868,10 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         method: int
             initialization method.
         from_: str or Period, optional
-            starting period to extrapolate Variables.
+            starting period to extrapolate var_db.
             Defaults to the starting period if the current sample.
         to: str or Period, optional
-            ending period to extrapolate Variables.
+            ending period to extrapolate var_db.
             Defaults to the ending period if the current sample.
         variables_list: str or list(str), optional
             list of variables to extrapolate.
@@ -926,21 +955,18 @@ cdef class _VariablesDatabase(_AbstractDatabase):
         self.database_ptr.trend_correction(input_file.encode(), lambda_, series.encode(), <bint>log)
 
 
-Variables = _VariablesDatabase()
-
-
 def df_to_ws(df_input: DataFrame, time_axis_name: str = 'time'):
     warnings.warn("df_to_ws() is deprecated. " + 
-        "Please use the new syntax: Variables.from_frame(df)", DeprecationWarning)
+        "Please use the new syntax: var_db.from_frame(df)", DeprecationWarning)
 
 def ws_to_df(vars_pattern: str = '*', vars_axis_name: str = 'vars', time_axis_name: str = 'time', 
              time_as_floats: bool = False) -> DataFrame:
     warnings.warn("ws_to_df() is deprecated. " + 
-        "Please use the new syntax: df = Variables.to_frame()", DeprecationWarning)
+        "Please use the new syntax: df = var_db.to_frame()", DeprecationWarning)
 
 def larray_to_ws(la_input: Array, time_axis_name: str = 'time', sep: str = "_"):
     warnings.warn("larray_to_ws() is deprecated. " + 
-        "Please use the new syntax: Variables.from_array(array)", DeprecationWarning)
+        "Please use the new syntax: var_db.from_array(array)", DeprecationWarning)
 
 def ws_to_larray(vars_pattern: str = '*', 
                  vars_axis_name: str = 'vars',     
@@ -950,7 +976,7 @@ def ws_to_larray(vars_pattern: str = '*',
                  split_sep = '', 
                  time_as_floats: bool = False) -> Array:
     warnings.warn("ws_to_larray() is deprecated. " + 
-        "Please use the new syntax: array = Variables.to_array()", DeprecationWarning)
+        "Please use the new syntax: array = var_db.to_array()", DeprecationWarning)
 
 def ws_load_var_to_larray(filename: str, 
                             vars_pattern = '*', 
@@ -960,5 +986,5 @@ def ws_load_var_to_larray(filename: str,
                             regex = None, 
                             split_sep = '') -> Array:
     warnings.warn("ws_load_var_to_larray() is deprecated. " + 
-        "Please use the new syntax:\nVariables.load(filename)\n" + 
-        "array = Variables.to_array()", DeprecationWarning)
+        "Please use the new syntax:\nvar_db = Variables(filename)\n" + 
+        "array = var_db.to_array()", DeprecationWarning)
