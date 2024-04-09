@@ -81,6 +81,15 @@ Lists
 
    Lists.__init__
 
+=======
+Scalars
+=======
+
+.. autosummary::
+   :toctree: _generated
+
+   Scalars.__init__
+
 =========
 Variables
 =========
@@ -109,23 +118,19 @@ Variables
 
    ws_content
    ws_content_eqs
-   ws_content_scl
    ws_content_tbl
    
    ws_clear
    ws_clear_all
    ws_clear_eqs
-   ws_clear_scl
    ws_clear_tbl
 
    ws_load
    ws_load_eqs
-   ws_load_scl
    ws_load_tbl
 
    ws_save
    ws_save_eqs
-   ws_save_scl
    ws_save_tbl
 
 
@@ -147,7 +152,24 @@ EQUATION
 .. autosummary::
    :toctree: _generated
 
-   Equation
+   Equation.__init__
+   Equation.lec
+   Equation.sample
+   Equation.method
+   Equation.comment
+   Equation.block
+   Equation.instruments
+   Equation.tests
+   Equation.test_stdev
+   Equation.test_meany
+   Equation.test_ssres
+   Equation.test_stderr
+   Equation.test_fstat
+   Equation.test_r2
+   Equation.test_r2adj
+   Equation.test_dw
+   Equation.test_loglik
+   Equation.data
    Equation.get_coefficients_list
    Equation.get_date_format  
    Equation.get_variables_list
@@ -169,10 +191,9 @@ SCALAR
    :toctree: _generated
 
    Scalar
-   get_scl
-   set_scl   
-   data_update_scl
-   delete_scl
+   Scalar.value
+   Scalar.relax
+   Scalar.std
 
 =====
 TABLE
@@ -318,6 +339,11 @@ DEPRECATED
    ws_load_lst
    ws_save_lst
 
+   ws_content_scl
+   ws_clear_scl
+   ws_load_scl
+   ws_save_scl
+
    ws_content_var
    ws_clear_var
    ws_load_var
@@ -338,6 +364,11 @@ DEPRECATED
    set_lst
    data_update_lst
    delete_lst
+
+   get_scl
+   set_scl   
+   data_update_scl
+   delete_scl
 
    get_var
    get_var_as_ndarray
