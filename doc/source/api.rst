@@ -53,14 +53,33 @@ WORKSPACE
    Database.merge
    Database.merge_into
 
+========
+Comments
+========
+
 .. autosummary::
    :toctree: _generated
 
+   Comments.__init__ 
+
+==========
+Identities
+==========
+
+.. autosummary::
+   :toctree: _generated
+
+   Identities.__init__
    Identities.execute 
 
+=========
+Variables
+=========
+
 .. autosummary::
    :toctree: _generated
 
+   Variables.__init__
    Variables.mode
    Variables.sample
    Variables.nb_periods
