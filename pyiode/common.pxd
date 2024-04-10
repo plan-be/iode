@@ -40,6 +40,21 @@ cdef extern from "cpp_api/objects/equation.h":
 
     cdef vector[string] v_eq_methods
 
+    cdef enum EnumIodeEquationTest:
+        IE_CORR,
+        IE_STDEV,
+        IE_MEANY, 
+        IE_SSRES, 
+        IE_STDERR,
+        IE_STDERRP,
+        IE_FSTAT, 
+        IE_R2,
+        IE_R2ADJ, 
+        IE_DW,
+        IE_LOGLIK
+        
+    cdef int EQS_NBTESTS
+
 cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef enum EnumIodeVarMode:
         I_VAR_MODE_LEVEL,

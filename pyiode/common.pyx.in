@@ -5,7 +5,9 @@ from typing import List
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport L_NAN, I_NB_TYPES
+from pyiode.common cimport L_NAN, I_NB_TYPES, EQS_NBTESTS
+from pyiode.common cimport (EnumIodeType, EnumIodeEquationMethod, EnumIodeEquationTest, EnumIodeVarMode, 
+                            EnumSimulationInitialization)
 from pyiode.common cimport vIodeTypes, v_eq_methods, v_var_modes, v_simulation_initialization
 
 try:
@@ -37,9 +39,54 @@ __version__ = "${CMAKE_PROJECT_VERSION}"
 # IODE CONSTANTS
 # --------------
 nan: float = L_NAN
-NB_TYPES: int = I_NB_TYPES
 
+COMMENTS: int = EnumIodeType.I_COMMENTS
+EQUATIONS: int = EnumIodeType.I_EQUATIONS
+IDENTITIES: int = EnumIodeType.I_IDENTITIES
+LISTS: int = EnumIodeType.I_LISTS
+SCALARS: int = EnumIodeType.I_SCALARS
+TABLES: int = EnumIodeType.I_TABLES
+VARIABLES: int = EnumIodeType.I_VARIABLES
+
+NB_TYPES: int = I_NB_TYPES
 IODE_TYPES_LIST = _cpp_string_vector_to_py(vIodeTypes)
+
+EQ_METHOD_LSQ: int = EnumIodeEquationMethod.IE_LSQ
+EQ_METHOD_ZELLNER: int = EnumIodeEquationMethod.IE_ZELLNER
+EQ_METHOD_INSTRUMENTAL: int = EnumIodeEquationMethod.IE_INSTRUMENTAL
+EQ_METHOD_GLS: int = EnumIodeEquationMethod.IE_GLS
+EQ_METHOD_MAX_LIKELIHOOD: int = EnumIodeEquationMethod.IE_MAX_LIKELIHOOD
+
 EQUATION_METHODS = _cpp_string_vector_to_py(v_eq_methods)
+
+EQ_TEST_CORR: int  = EnumIodeEquationTest.IE_CORR
+EQ_TEST_STDEV: int  = EnumIodeEquationTest.IE_STDEV
+EQ_TEST_MEANY: int  = EnumIodeEquationTest.IE_MEANY
+EQ_TEST_SSRES: int  = EnumIodeEquationTest.IE_SSRES
+EQ_TEST_STDERR: int  = EnumIodeEquationTest.IE_STDERR
+EQ_TEST_STDERRP: int  = EnumIodeEquationTest.IE_STDERRP
+EQ_TEST_FSTAT: int  = EnumIodeEquationTest.IE_FSTAT
+EQ_TEST_R2: int  = EnumIodeEquationTest.IE_R2
+EQ_TEST_R2ADJ: int  = EnumIodeEquationTest.IE_R2ADJ
+EQ_TEST_DW: int  = EnumIodeEquationTest.IE_DW
+EQ_TEST_LOGLIK: int  = EnumIodeEquationTest.IE_LOGLIK
+
+EQ_NB_TESTS: int = EQS_NBTESTS
+
+VAR_MODE_LEVEL: int = EnumIodeVarMode.I_VAR_MODE_LEVEL
+VAR_MODE_DIFF: int = EnumIodeVarMode.I_VAR_MODE_DIFF
+VAR_MODE_GROWTH_RATE: int = EnumIodeVarMode.I_VAR_MODE_GROWTH_RATE
+VAR_MODE_Y0Y_DIFF: int = EnumIodeVarMode.I_VAR_MODE_Y0Y_DIFF
+VAR_MODE_Y0Y_GROWTH_RATE: int = EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE
+
 VARIABLES_MODES = _cpp_string_vector_to_py(v_var_modes)
+
+SIMU_INIT_TM1: int = EnumSimulationInitialization.IV_INIT_TM1
+SIMU_INIT_TM1_A: int = EnumSimulationInitialization.IV_INIT_TM1_A
+SIMU_INIT_EXTRA: int = EnumSimulationInitialization.IV_INIT_EXTRA
+SIMU_INIT_EXTRA_A: int = EnumSimulationInitialization.IV_INIT_EXTRA_A
+SIMU_INIT_ASIS: int = EnumSimulationInitialization.IV_INIT_ASIS
+SIMU_INIT_TM1_NA: int = EnumSimulationInitialization.IV_INIT_TM1_NA
+SIMU_INIT_EXTRA_NA: int = EnumSimulationInitialization.IV_INIT_EXTRA_NA
+
 SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)

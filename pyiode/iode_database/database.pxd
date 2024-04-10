@@ -7,6 +7,7 @@ from libcpp cimport bool
 from pyiode.common cimport EnumIodeType, EnumIodeVarMode, EnumSimulationInitialization
 from pyiode.period cimport CPeriod
 from pyiode.sample cimport CSample
+from pyiode.objects.equation cimport CEquation
 from pyiode.objects.scalar cimport CScalar
 
 
@@ -70,6 +71,29 @@ cdef extern from "cpp_api/KDB/kdb_comments.h":
 
     # Define the global Comments instance
     cdef KDBComments Comments
+
+
+cdef extern from "cpp_api/KDB/kdb_equations.h":
+    cdef cppclass KDBEquations(KDBTemplate[string]):
+        # Constructor
+        KDBEquations(string& filepath) except +
+
+        # Public methods
+        KDBEquations* subset(string& pattern, bool deep_copy) except +
+        CEquation get(string& name) except +
+        CEquation copy(string& name) except +
+        string get_lec(string& name) except +
+        int add(string& name, CEquation& equation) except +
+        int add(string& name, string& lec, string& method, string& from_period, string& to_period, 
+                string& comment, string& instruments, string& block, bint date) except +
+        void update(string& name, CEquation& equation) except +
+        void update(string& name, string& lec, string& method, string& from_period, string& to_period, 
+                    string& comment, string& instruments, string& block, bint date) except +
+
+    size_t hash_value(KDBEquations&) except +
+
+    # Define the global Equations instance
+    cdef KDBEquations Equations
 
 
 cdef extern from "cpp_api/KDB/kdb_identities.h":

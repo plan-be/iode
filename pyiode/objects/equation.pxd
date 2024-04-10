@@ -6,25 +6,11 @@ from libcpp.map cimport map
 from libcpp.pair cimport pair
 from libcpp cimport bool
 
+from pyiode.common cimport EnumIodeEquationTest
 from pyiode.sample cimport CSample
 
 
 cdef extern from "cpp_api/objects/equation.h":
-
-    cdef int EQS_NBTESTS
-
-    cdef enum EnumIodeEquationTest:
-        IE_CORR,
-        IE_STDEV,
-        IE_MEANY, 
-        IE_SSRES, 
-        IE_STDERR,
-        IE_STDERRP,
-        IE_FSTAT, 
-        IE_R2,
-        IE_R2ADJ, 
-        IE_DW,
-        IE_LOGLIK
 
     # declare C++ Equation class
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
