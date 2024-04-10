@@ -6,7 +6,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.common cimport L_NAN, I_NB_TYPES
-from pyiode.common cimport vIodeTypes, v_var_modes, v_simulation_initialization
+from pyiode.common cimport vIodeTypes, v_eq_methods, v_var_modes, v_simulation_initialization
 
 try:
     import pandas as pd
@@ -40,5 +40,6 @@ nan: float = L_NAN
 NB_TYPES: int = I_NB_TYPES
 
 IODE_TYPES_LIST = _cpp_string_vector_to_py(vIodeTypes)
+EQUATION_METHODS = _cpp_string_vector_to_py(v_eq_methods)
 VARIABLES_MODES = _cpp_string_vector_to_py(v_var_modes)
 SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)

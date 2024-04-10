@@ -30,6 +30,16 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] v_simulation_initialization
 
+cdef extern from "cpp_api/objects/equation.h":
+    cdef enum EnumIodeEquationMethod:
+        IE_LSQ,
+        IE_ZELLNER,
+        IE_INSTRUMENTAL,
+        IE_GLS,
+        IE_MAX_LIKELIHOOD
+
+    cdef vector[string] v_eq_methods
+
 cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef enum EnumIodeVarMode:
         I_VAR_MODE_LEVEL,
