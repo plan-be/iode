@@ -6,7 +6,8 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.map cimport map
 from libcpp.string cimport string
 from cython.operator cimport dereference
-from pyiode.objects.equation cimport EnumIodeEquationTest, CEquation
+from pyiode.common cimport EnumIodeEquationTest
+from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
 
 

@@ -171,6 +171,7 @@ cdef class Variables(_AbstractDatabase):
 
         # return the whole variable (i.e. for the whole sample)
         if isinstance(key, str):
+            key = key.strip()
             return self.database_ptr.get(key.encode())
         # return the variable values for the selected periods
         else:
@@ -203,6 +204,36 @@ cdef class Variables(_AbstractDatabase):
         raise TypeError("var_db[key] = value(s): Expected a float or a list of float as 'value(s)'. "
                             f"Got 'value(s)' of type {type(values).__name__}") 
 
+    def _add(self, name: str, values: Union[str, float, List[float]]):
+        cdef vector[double] cpp_values
+
+        if not isinstance(name, str):
+            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
+
+        values = self._convert_values(values, self.nb_periods)
+        # values is a LEC expression
+        if isinstance(values, str):
+            self.database_ptr.add(<string>name.encode(), <string>values.encode())
+        # values is a vector of float
+        else:
+            cpp_values = [<double>value_ for value_ in values]
+            self.database_ptr.add(<string>name.encode(), cpp_values)
+
+    def _update(self, name: str, values: Union[str, float, List[float]]):
+        cdef vector[double] cpp_values
+
+        if not isinstance(name, str):
+            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
+
+        values = self._convert_values(values, self.nb_periods)
+        # values is a LEC expression
+        if isinstance(values, str):
+            self.database_ptr.update(<string>name.encode(), <string>values.encode())
+        # values is a vector of float
+        else:
+            cpp_values = [<double>value_ for value_ in values]
+            self.database_ptr.update(<string>name.encode(), cpp_values)
+
     def _set_object(self, key, value):
         cdef vector[double] cpp_values
         
@@ -210,12 +241,13 @@ cdef class Variables(_AbstractDatabase):
 
         # update/add a variable
         if isinstance(key, str):
+            key = key.strip()
             # add a new variable
             if key not in self:
-                self.add(key, value)
+                self._add(key, value)
             # update a variable
             else:
-                self.update(key, value)
+                self._update(key, value)
 
         # set variable value(s) for a (selection) of period(s)
         else:            
@@ -251,36 +283,6 @@ cdef class Variables(_AbstractDatabase):
                     values = self._convert_values(value, len(periods))
                     for period_, value_ in zip(periods, values):
                         self.database_ptr.set_var(<string>name.encode(), <string>period_.encode(), <double>value_, self.mode_)
-    
-    def add(self, name: str, values: Union[str, float, List[float]]):
-        cdef vector[double] cpp_values
-
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-
-        values = self._convert_values(values, self.nb_periods)
-        # values is a LEC expression
-        if isinstance(values, str):
-            self.database_ptr.add(<string>name.encode(), <string>values.encode())
-        # values is a vector of float
-        else:
-            cpp_values = [<double>value_ for value_ in values]
-            self.database_ptr.add(<string>name.encode(), cpp_values)
-
-    def update(self, name: str, values: Union[str, float, List[float]]):
-        cdef vector[double] cpp_values
-
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-
-        values = self._convert_values(values, self.nb_periods)
-        # values is a LEC expression
-        if isinstance(values, str):
-            self.database_ptr.update(<string>name.encode(), <string>values.encode())
-        # values is a vector of float
-        else:
-            cpp_values = [<double>value_ for value_ in values]
-            self.database_ptr.update(<string>name.encode(), cpp_values)
 
     def from_frame(self, df: DataFrame):
         """

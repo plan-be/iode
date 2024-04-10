@@ -59,28 +59,24 @@ cdef class Identities(_AbstractDatabase):
 
     def _get_object(self, key):
         if not isinstance(key, str):
-            raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+            raise TypeError(f"Cannot get identity '{key}'.\nExpected a string value for the name " + 
+                            f"but got value of type {type(key).__name__}")
+        key = key.strip()
         return self.database_ptr.get_lec(key.encode()).decode()
 
     def _set_object(self, key, value):
         if not isinstance(key, str):
-            raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+            raise TypeError(f"Cannot set identity '{key}'.\nExpected a string value for the name " + 
+                            f"but got name value of type {type(key).__name__}")
+        key = key.strip()
+        if not isinstance(value, str):
+            raise TypeError(f"Cannot set identity '{key}'.\nExpected a string value for {key} " + 
+                            f"but got value of type {type(value).__name__}")
+        value = value.strip()
         if self.database_ptr.contains(key.encode()):
             self.database_ptr.update(key.encode(), value.encode())
         else:
             self.database_ptr.add(key.encode(), value.encode())
-    
-    def add(self, name: str, identity: str):
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-        self.database_ptr.add(name.encode(), identity.encode())
-
-    def update(self, name: str, identity: str):
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-        self.database_ptr.update(name.encode(), identity.encode())
 
     def execute(self, identities: Union[str, List[str]] = None, from_period: Union[str, Period] = None, 
         to_period: Union[str, Period] = None, var_files: Union[str, List[str]] = None, 

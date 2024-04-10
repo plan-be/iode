@@ -4,10 +4,13 @@ SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
 from .iode_python import (nan, __version__, 
-                          IODE_TYPES_LIST, NB_TYPES, K_CMT, K_EQS, K_IDT, K_LST, K_SCL, K_TBL, K_VAR, 
-                          VARIABLES_MODES, 
-                          SIMULATION_INITIALIZATION_LIST, KV_INIT_ASIS, KV_INIT_EXTRA, KV_INIT_EXTRA_A, 
-                          KV_INIT_EXTRA_NA, KV_INIT_TM1, KV_INIT_TM1_A, KV_INIT_TM1_NA, 
+                          COMMENTS, EQUATIONS, IDENTITIES, LISTS, SCALARS, TABLES, VARIABLES, IODE_TYPES_LIST, NB_TYPES, 
+                          EQ_METHOD_LSQ, EQ_METHOD_ZELLNER, EQ_METHOD_INSTRUMENTAL, EQ_METHOD_GLS, EQ_METHOD_MAX_LIKELIHOOD, EQUATION_METHODS, 
+                          EQ_TEST_CORR, EQ_TEST_STDEV, EQ_TEST_MEANY, EQ_TEST_SSRES, EQ_TEST_STDERR, EQ_TEST_STDERRP, EQ_TEST_FSTAT, 
+                          EQ_TEST_R2, EQ_TEST_R2ADJ, EQ_TEST_DW, EQ_TEST_LOGLIK, EQ_NB_TESTS, 
+                          VAR_MODE_LEVEL, VAR_MODE_DIFF, VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE, VARIABLES_MODES, 
+                          SIMU_INIT_TM1, SIMU_INIT_TM1_A, SIMU_INIT_EXTRA, SIMU_INIT_EXTRA_A, SIMU_INIT_ASIS, SIMU_INIT_TM1_NA, 
+                          SIMU_INIT_EXTRA_NA, SIMULATION_INITIALIZATION_LIST, 
                           SORT_BOTH, SORT_CONNEX, SORT_NONE, 
                           HTOL_LAST, HTOL_MEAN, HTOL_SUM, LTOH_CS, LTOH_FLOW, LTOH_LIN, LTOH_STEP, LTOH_STOCK, 
                           W_A2M, W_CSV, W_DUMMY, W_GDI, W_HTML, W_MIF, W_RTF)
@@ -19,7 +22,7 @@ from .iode_python import Period, Sample, periodicities
 from .iode_python import Equation, List, Scalar
 
 # IODE databases
-from .iode_python import Comments, Identities, Lists, Scalars, Variables 
+from .iode_python import Comments, Equations, Identities, Lists, Scalars, Variables 
 
 # Reports
 
@@ -40,9 +43,13 @@ from .iode_python import exec_lec, add_error_msg, clear_error_msgs, display_erro
 __all__ = [
     # Constants
     'SAMPLE_DATA_DIR', 'nan',
-    'IODE_TYPES_LIST', 'NB_TYPES', 'K_CMT', 'K_EQS', 'K_IDT', 'K_LST', 'K_SCL', 'K_TBL', 'K_VAR', 'VARIABLES_MODES', 
-    'SIMULATION_INITIALIZATION_LIST', 
-    'KV_INIT_ASIS', 'KV_INIT_EXTRA', 'KV_INIT_EXTRA_A', 'KV_INIT_EXTRA_NA', 'KV_INIT_TM1', 'KV_INIT_TM1_A', 'KV_INIT_TM1_NA', 
+    'COMMENTS', 'EQUATIONS', 'IDENTITIES', 'LISTS', 'SCALARS', 'TABLES', 'VARIABLES', 'IODE_TYPES_LIST', 'NB_TYPES', 
+    'EQ_METHOD_LSQ', 'EQ_METHOD_ZELLNER', 'EQ_METHOD_INSTRUMENTAL', 'EQ_METHOD_GLS', 'EQ_METHOD_MAX_LIKELIHOOD', 'EQUATION_METHODS', 
+    'EQ_TEST_CORR', 'EQ_TEST_STDEV', 'EQ_TEST_MEANY', 'EQ_TEST_SSRES', 'EQ_TEST_STDERR', 'EQ_TEST_STDERRP', 'EQ_TEST_FSTAT', 
+    'EQ_TEST_R2', 'EQ_TEST_R2ADJ', 'EQ_TEST_DW', 'EQ_TEST_LOGLIK', 'EQ_NB_TESTS', 
+    'VAR_MODE_LEVEL', 'VAR_MODE_DIFF', 'VAR_MODE_GROWTH_RATE', 'VAR_MODE_Y0Y_DIFF', 'VAR_MODE_Y0Y_GROWTH_RATE', 'VARIABLES_MODES', 
+    'SIMU_INIT_TM1', 'SIMU_INIT_TM1_A', 'SIMU_INIT_EXTRA', 'SIMU_INIT_EXTRA_A', 'SIMU_INIT_ASIS', 'SIMU_INIT_TM1_NA', 
+    'SIMU_INIT_EXTRA_NA', 'SIMULATION_INITIALIZATION_LIST', 
     'SORT_BOTH', 'SORT_CONNEX', 'SORT_NONE', 
     'HTOL_LAST', 'HTOL_MEAN', 'HTOL_SUM', 'LTOH_CS', 'LTOH_FLOW', 'LTOH_LIN', 'LTOH_STEP', 'LTOH_STOCK', 
     'W_A2M', 'W_CSV', 'W_DUMMY', 'W_GDI', 'W_HTML', 'W_MIF', 'W_RTF',
@@ -54,7 +61,7 @@ __all__ = [
     'Equation', 'List', 'Scalar',
     
     # IODE databases
-    'Comments', 'Identities', 'Lists', 'Scalars', 'Variables', 
+    'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Variables', 
 
     # Reports
 

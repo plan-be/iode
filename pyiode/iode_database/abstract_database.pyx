@@ -502,7 +502,7 @@ cdef class _AbstractDatabase:
         self.abstract_db_ptr.merge_into(input_file.encode())
 
     def get_associated_objects_list(self, name: str, other_type: int):
-        """
+        r"""
         Return the list of all objects of type 'other_type' associated with the object named 'name' 
         from the current database.
 
@@ -512,20 +512,43 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import ws_load_eqs, Scalars, Variables
-        >>> ws_load_eqs(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        274
+        >>> from iode import SAMPLE_DATA_DIR, COMMENTS, EQUATIONS, LISTS, SCALARS, TABLES, VARIABLES
+        >>> from iode import Equations, Lists, Scalars, Variables, ws_load_tbl
+        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
         >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> ws_load_tbl(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        46
         >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> # get list of scalars associated with the equation 'ACAF'
-        >>> Equations.get_associated_objects_list("ACAF", I_SCALARS)        # doctest: +SKIP
-        ['acaf1', 'acaf2', 'acaf4']
+        >>> # get list of comments associated with the variable 'AOUC'
+        >>> var_db.get_associated_objects_list("AOUC", COMMENTS)
+        ['AOUC']
 
-        >>> # get list of variables associated with the equation 'ACAF'
-        >>> Equations.get_associated_objects_list("ACAF", I_VARIABLES)      # doctest: +SKIP
-        ['ACAF']  
+        >>> # get list of equations associated with the variable 'AOUC'
+        >>> var_db.get_associated_objects_list("AOUC", EQUATIONS)
+        ['AOUC', 'PC', 'PIF', 'PXS', 'QXAB']
+
+        >>> # get list of lists associated with the variable 'AOUC'
+        >>> var_db.get_associated_objects_list("AOUC", LISTS)
+        ['COPY0', 'ENDO0', 'TOTAL0']
+
+        >>> # get list of tables associated with the variable 'AOUC'
+        >>> var_db.get_associated_objects_list("AOUC", TABLES)
+        ['ANAPRIX', 'MULT1FR', 'MULT1RESU', 'T1', 'T1NIVEAU']
+
+        >>> # WARNING: In the case of Equations, the get_associated_objects_list method must not
+        >>> #          be confused with the get_coefficients_list and get_variables_list methods
+        >>> eqs_db["ACAF"].lec
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        >>> eqs_db["ACAF"].get_coefficients_list()
+        ['acaf1', 'acaf2', 'acaf4']
+        >>> eqs_db.get_associated_objects_list("ACAF", SCALARS)
+        []
+        >>> eqs_db["ACAF"].get_variables_list()
+        ['ACAF', 'VAF', 'GOSF', 'TIME']
+        >>> eqs_db.get_associated_objects_list("ACAF", VARIABLES)
+        ['ACAF']
         """
         if not isinstance(name, str):
             raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
@@ -533,7 +556,7 @@ cdef class _AbstractDatabase:
         if not isinstance(other_type, int):
             raise TypeError(f"'other_type': Expected value of type int. Got value of type {type(other_type).__name__}")
 
-        return [name_other.encode() for name_other in self.abstract_db_ptr.get_associated_objects_list(name.encode(), <EnumIodeType>other_type)]
+        return [name_other.decode() for name_other in self.abstract_db_ptr.get_associated_objects_list(name.encode(), <EnumIodeType>other_type)]
 
     def _load(self, filepath: str):
         raise NotImplementedError()
@@ -675,6 +698,32 @@ cdef class _AbstractDatabase:
         >>> cmt_db["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
+        Equations
+
+        >>> from iode import Equations
+        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
+        acaf4*(TIME=1995),
+                method: LSQ,
+                sample: 1980Y1:1996Y1,
+                comment: ,
+                block: ACAF,
+                instruments: ,
+                tests:
+                    corr: 1
+                    dw: 2.32935
+                    fstat: 32.2732
+                    loglik: 83.8075
+                    meany: 0.00818467
+                    r2: 0.821761
+                    r2adj: 0.796299
+                    ssres: 5.19945e-05
+                    stderr: 0.00192715
+                    stderrp: 23.5458
+                    stdev: 0.0042699
+                date: 12-06-1998)
+
         Identities
 
         >>> from iode import Identities
@@ -751,6 +800,91 @@ cdef class _AbstractDatabase:
         >>> cmt_db["ACAF"] = "New Value"
         >>> cmt_db["ACAF"]
         'New Value'
+
+        Equations
+
+        >>> from iode import Equations
+        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
+        acaf4*(TIME=1995),
+                method: LSQ,
+                sample: 1980Y1:1996Y1,
+                comment: ,
+                block: ACAF,
+                instruments: ,
+                tests:
+                    corr: 1
+                    dw: 2.32935
+                    fstat: 32.2732
+                    loglik: 83.8075
+                    meany: 0.00818467
+                    r2: 0.821761
+                    r2adj: 0.796299
+                    ssres: 5.19945e-05
+                    stderr: 0.00192715
+                    stderrp: 23.5458
+                    stdev: 0.0042699
+                date: 12-06-1998)
+        >>> # update only the LEC
+        >>> eqs_db["ACAF"] = "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
+                method: LSQ,
+                sample: 1980Y1:1996Y1,
+                comment: ,
+                block: ACAF,
+                instruments: ,
+                tests:
+                    corr: 1
+                    dw: 2.32935
+                    fstat: 32.2732
+                    loglik: 83.8075
+                    meany: 0.00818467
+                    r2: 0.821761
+                    r2adj: 0.796299
+                    ssres: 5.19945e-05
+                    stderr: 0.00192715
+                    stderrp: 23.5458
+                    stdev: 0.0042699
+                date: 12-06-1998)
+        >>> # upate block and sample of a block of equations to estimation (dictionary)
+        >>> estim_sample = "2000Y1:2010Y1"
+        >>> block = "ACAF; ACAG; AOUC"
+        >>> for eq_name in block.split(';'):
+        ...     eqs_db[eq_name] = {"sample": estim_sample, "block": block}
+        >>> (eqs_db["ACAF"].sample, eqs_db["ACAG"].sample, eqs_db["AOUC"].sample)
+        (2000Y1:2010Y1, 2000Y1:2010Y1, 2000Y1:2010Y1)
+        >>> (eqs_db["ACAF"].block, eqs_db["ACAG"].block, eqs_db["AOUC"].block)
+        ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
+        >>> # upate sample and block (Equation objects)
+        >>> eq_ACAF = eqs_db["ACAF"]
+        >>> eq_ACAF.set_lec("(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAF")
+        >>> eq_ACAF.method = "MAX_LIKELIHOOD"
+        >>> # new equation sample is from 1990Y1 to the last year of Variables
+        >>> eq_ACAF.sample = "1990Y1:"
+        >>> eq_ACAF.block = "ACAF"
+        >>> eqs_db["ACAF"] = eq_ACAF
+        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: (ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
+                method: MAX_LIKELIHOOD,
+                sample: 1990Y1:2015Y1,
+                comment: ,
+                block: ACAF,
+                instruments: ,
+                tests:
+                    corr: 1
+                    dw: 2.32935
+                    fstat: 32.2732
+                    loglik: 83.8075
+                    meany: 0.00818467
+                    r2: 0.821761
+                    r2adj: 0.796299
+                    ssres: 5.19945e-05
+                    stderr: 0.00192715
+                    stderrp: 23.5458
+                    stdev: 0.0042699
+                date: 12-06-1998)
 
         Identities
 
