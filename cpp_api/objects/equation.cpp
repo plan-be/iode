@@ -333,6 +333,23 @@ std::array<float, EQS_NBTESTS> Equation::get_tests() const
     return tests;
 }
 
+std::map<std::string, float> Equation::get_tests_as_map() const
+{
+    std::map<std::string, float> m_tests;
+    m_tests["corr"] = this->tests[IE_CORR];
+    m_tests["stdev"] = this->tests[IE_STDEV];
+    m_tests["meany"] = this->tests[IE_MEANY];
+    m_tests["ssres"] = this->tests[IE_SSRES];
+    m_tests["stderr"] = this->tests[IE_STDERR];
+    m_tests["stderrp"] = this->tests[IE_STDERRP];
+    m_tests["fstat"] = this->tests[IE_FSTAT];
+    m_tests["r2"] = this->tests[IE_R2];
+    m_tests["r2adj"] = this->tests[IE_R2ADJ];
+    m_tests["dw"] = this->tests[IE_DW];
+    m_tests["loglik"] = this->tests[IE_LOGLIK];
+    return m_tests;
+}
+
 float Equation::get_test(const EnumIodeEquationTest t) const
 {
     if(t < 0 || t >= EQS_NBTESTS)
@@ -430,11 +447,6 @@ bool Equation::operator==(const Equation& other) const
 
 std::string Equation::to_string() const
 {
-    std::string s_tests = "[" + std::format("{:g}" ,this->tests[0]);
-    for(int i=1; i < EQS_NBTESTS; i++)
-        s_tests += ", " + std::format("{:g}", this->tests[i]);
-    s_tests += "]";
-
     Sample sample = get_sample();
     std::string s_sample = (sample.nb_periods() == 0) ? "--" : sample.to_string();
 
@@ -445,7 +457,9 @@ std::string Equation::to_string() const
     s += "\tcomment: " + get_comment() + ",\n";
     s += "\tblock: " + get_block() + ",\n";
     s += "\tinstruments: " + get_instruments() + ",\n";
-    s += "\ttests: " + s_tests + ",\n";
+    s += "\ttests:\n";
+    for(const auto& [test_name, test_value]: this->get_tests_as_map())
+        s += "\t\t" + test_name + ": " + std::format("{:g}", test_value) + "\n";
     s += "\tdate: " + get_date_as_string() + ")";
     return s;
 }
