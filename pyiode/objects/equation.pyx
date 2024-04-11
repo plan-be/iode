@@ -1,8 +1,10 @@
 # distutils: language = c++
 
 from collections.abc import Iterable
-from typing import Union, Tuple, List, Optional
+from typing import Union, Tuple, List, Dict, Optional
 
+from libcpp.map cimport map
+from libcpp.string cimport string
 from cython.operator cimport dereference
 from pyiode.objects.equation cimport EnumIodeEquationTest, CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
@@ -15,8 +17,7 @@ cdef class Equation:
     cdef CEquation* c_equation
 
     def __cinit__(self, name: str, lec: str, method: Union[int, str] = "LSQ", from_period: Union[str, Period] = "", 
-        to_period: Union[str, Period] = "", comment: str = "", instruments: str = "", block: str = "", 
-        tests: Union[List[float], Tuple[float, ...]] = None, date: bool = False) -> Equation:
+        to_period: Union[str, Period] = "", comment: str = "", instruments: str = "", block: str = "") -> Equation:
         """
 
         Attributes
@@ -28,15 +29,7 @@ cdef class Equation:
         instruments: str
         block: str
             block of equations (to estimate) to which the equation belong.
-        test_stdev: float
-        test_meany: float
-        test_ssres: float
-        test_stderr: float
-        test_fstat: float
-        test_r2: float
-        test_r2adj: float
-        test_dw: float
-        test_loglik: float
+        tests: dict(str, float)
         date: str
             last time the equation has been estimated.
 
@@ -74,7 +67,18 @@ cdef class Equation:
             comment: ,
             block: ,
             instruments: ,
-            tests: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            tests:
+                corr: 0
+                dw: 0
+                fstat: 0
+                loglik: 0
+                meany: 0
+                r2: 0
+                r2adj: 0
+                ssres: 0
+                stderr: 0
+                stderrp: 0
+                stdev: 0
             date: )
         """
         if not isinstance(name, str):
@@ -109,13 +113,8 @@ cdef class Equation:
 
         self.c_equation = new CEquation(name.encode("utf-8"), lec.encode("utf-8"), 0, from_period.encode("utf-8"), 
                                         to_period.encode("utf-8"), comment.encode("utf-8"), instruments.encode("utf-8"), 
-                                        block.encode("utf-8"), <bint>date)
+                                        block.encode("utf-8"), <bint>False)
         self.method = method
-        if tests is not None:
-            if len(tests) != 10:
-                raise ValueError(f"'tests': Expected iterable of size 10.\nGot {len(tests)} elements")
-            for i, test_val in enumerate(tests): 
-                self.c_equation.set_test(<EnumIodeEquationTest>i, test_val)
 
     def __dealloc__(self):
         del self.c_equation
@@ -243,7 +242,18 @@ cdef class Equation:
             comment: ,
             block: ,
             instruments: ,
-            tests: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            tests:
+                corr: 0
+                dw: 0
+                fstat: 0
+                loglik: 0
+                meany: 0
+                r2: 0
+                r2adj: 0
+                ssres: 0
+                stderr: 0
+                stderrp: 0
+                stdev: 0
             date: )
         >>> eq_ACAF.get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
@@ -291,7 +301,18 @@ cdef class Equation:
             comment: ,
             block: ,
             instruments: ,
-            tests: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            tests:
+                corr: 0
+                dw: 0
+                fstat: 0
+                loglik: 0
+                meany: 0
+                r2: 0
+                r2adj: 0
+                ssres: 0
+                stderr: 0
+                stderrp: 0
+                stdev: 0
             date: )
         >>> eq_ACAF.get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
@@ -404,44 +425,9 @@ cdef class Equation:
         self.c_equation.set_block(value.encode("utf-8"))
 
     @property
-    def tests(self) -> List[float]:
-        return self.c_equation.tests
-
-    @property
-    def test_stdev(self) -> float:
-        return self.c_equation.get_test_stdev() 
-
-    @property
-    def test_meany(self) -> float:
-        return self.c_equation.get_test_meany() 
-
-    @property
-    def test_ssres(self) -> float:
-        return self.c_equation.get_test_ssres() 
-
-    @property
-    def test_stderr(self) -> float:
-        return self.c_equation.get_test_stderr() 
-
-    @property
-    def test_fstat(self) -> float:
-        return self.c_equation.get_test_fstat() 
-
-    @property
-    def test_r2(self) -> float:
-        return self.c_equation.get_test_r2() 
-
-    @property
-    def test_r2adj(self) -> float:
-        return self.c_equation.get_test_r2adj() 
-
-    @property
-    def test_dw(self) -> float:
-        return self.c_equation.get_test_dw() 
-
-    @property
-    def test_loglik(self) -> float:
-        return self.c_equation.get_test_loglik()
+    def tests(self) -> Dict[str, float]:
+        cdef map[string, float] cpp_tests = self.c_equation.get_tests_as_map()
+        return {item.first.encode(): item.second for item in cpp_tests}
 
     @property
     def date(self) -> str:
