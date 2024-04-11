@@ -12,7 +12,8 @@ cdef extern from "cpp_api/objects/scalar.h":
         double relax
         double std
         CScalar() except +
-        CScalar(const double, const double, const double) except +
+        CScalar(const CScalar& other) except +
+        CScalar(const double, const double) except +
         string to_string()
         bool operator==(const CScalar& other)
 

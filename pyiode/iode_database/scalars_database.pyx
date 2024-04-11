@@ -63,7 +63,9 @@ cdef class Scalars(_AbstractDatabase):
             raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
                 "but got value of type {type(filepath).__name__}")
         c_scalar = self.database_ptr.get(key.encode())
-        return Scalar(c_scalar.val, c_scalar.relax, c_scalar.std)
+        py_scalar = Scalar(c_scalar.val, c_scalar.relax)
+        py_scalar.c_scalar.std = c_scalar.std
+        return py_scalar
 
     def _convert_value_to_scalar(self, name: str, value: ScalarInput) -> Scalar:
         if isinstance(value, int):
