@@ -165,8 +165,7 @@ def get_eqs(eq_name: str) -> Equation:
     py_tests = [tests[i] for i in range(10)]
     comment = ""
     eq_res = Equation(eq_name, _pystr(lec), method, _pystr(sample_from), _pystr(sample_to),  
-                comment, _pystr(instr), _pystr(blk), py_tests)
-
+                comment, _pystr(instr), _pystr(blk))
     return eq_res
 
 

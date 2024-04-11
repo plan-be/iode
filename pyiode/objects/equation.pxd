@@ -2,6 +2,7 @@
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.map cimport map
 from libcpp.pair cimport pair
 from libcpp cimport bool
 
@@ -29,9 +30,11 @@ cdef extern from "cpp_api/objects/equation.h":
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CEquation "Equation":
         float tests[20]
+        long date
 
         CEquation(const string&, const string&, const int, const string&, const string&, 
                   const string&, const string&, const string&, const bool date) except +
+        CEquation(const CEquation& other) except +
 
         string get_lec()
         void set_lec(const string&, const string&) except +
@@ -53,22 +56,10 @@ cdef extern from "cpp_api/objects/equation.h":
         string get_instruments()
         void set_instruments(const string&) except +
 
-        long get_date()
         string get_date_as_string(const string&)
 
-        # Note: Cython does not support std::array
-        #       We then cannot use get_tests() and set_tests()
-        float get_test_stdev() 
-        float get_test_meany() 
-        float get_test_ssres() 
-        float get_test_stderr() 
-        float get_test_fstat() 
-        float get_test_r2() 
-        float get_test_r2adj() 
-        float get_test_dw() 
-        float get_test_loglik() 
-
-        void set_test(const EnumIodeEquationTest, const float) except +
+        map[string, float] get_tests_as_map()
+        void set_test(const EnumIodeEquationTest i, const float value) except +
 
         vector[string] get_coefficients_list(const bool create_if_not_exit) except +
         vector[string] get_variables_list(const bool create_if_not_exit) except +
