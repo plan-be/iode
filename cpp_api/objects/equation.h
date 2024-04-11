@@ -138,6 +138,8 @@ public:
 
     std::array<float, EQS_NBTESTS> get_tests() const;
 
+    std::map<std::string, float> get_tests_as_map() const;
+    
     float get_test(const EnumIodeEquationTest t) const;
 
     float get_test_stdev() const { return this->tests[IE_STDEV]; }
