@@ -12,7 +12,7 @@ cdef class Scalar:
 
     cdef CScalar c_scalar
 
-    def __init__(self, value: float = 0.9, relax: float = 1.0, std: float = nan) -> Scalar:
+    def __init__(self, value: float = 0.9, relax: float = 1.0) -> Scalar:
         """
         An IODE scalar represents the parameters of an equation that can be estimated.
         It is represented by 'value' value, a 'relax' value and a standard deviation ('std') value.
@@ -54,11 +54,8 @@ cdef class Scalar:
             raise TypeError("Expected value of type 'float' for the argument 'relax'.\n" +
                 "Got value of type '" + type(relax).__name__ + "'")  
         if relax < 0.0 or relax > 1.0:
-            raise ValueError("Expected 'relax' value between 0.0 and 1.0")
-        if not isinstance(std, float):
-            raise TypeError("Expected value of type 'float' for the argument 'std'.\n" +
-                "Got value of type '" + type(std).__name__ + "'")     
-        self.c_scalar = CScalar(value, relax, std)
+            raise ValueError("Expected 'relax' value between 0.0 and 1.0")    
+        self.c_scalar = CScalar(value, relax)
 
     # Attributes access
 
