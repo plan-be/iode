@@ -21,55 +21,8 @@ if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir()
 
 
-# PYIODE_OBJECTS
-# --------------
-
-# IODE EQUATIONS <-> PYTHON STRINGS
-# ---------------------------------
-
-def test_iode_get_eqs_lec():
-
-    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    lec_BVY = iode.get_eqs_lec("BVY")
-    print(f"lec_BVY = '{lec_BVY}'")
-    assert lec_BVY == "BVY:=YN+YK"
-
-
-def test_iode_get_eqs():
-
-    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    e_BVY = iode.get_eqs("BVY")
-    print(e_BVY)
-    assert e_BVY.lec == "BVY:=YN+YK"
-
-    e_ACAF = iode.get_eqs("ACAF")
-    print(f"txt:  e_ACAF = '{e_ACAF}'")
-    print(f"repr: e_ACAF = '{repr(e_ACAF)}'")
-    assert round(e_ACAF.test_r2, 5) == 0.82176
-
-
-def test_iode_set_eqs():
-
-    # Clear EQS WS before creating new object
-    iode.ws_clear_eqs()
-
-    # Create eq as py string
-    py_A = "grt A := grt B"
-
-    # Save py_GA as GA in KE_WS + check
-    iode.set_eqs("A", py_A)
-    iode_A  = iode.get_eqs_lec("A")
-    assert iode_A == py_A
-
-    # Test error
-    py_A = "(grt A"
-    with pytest.raises(RuntimeError):
-        iode.set_eqs("A", py_A)
-
-
 # EXECUTE LEC
 # -----------
-
 
 def test_iode_exec_lec():
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "a.var"))
@@ -81,35 +34,11 @@ def test_iode_exec_lec():
     res = iode.exec_lec("A+1", 0)
     assert  res == v_A[0] + 1
 
-
-# REPORT DATA_* FUNCTIONS
-# -----------------------
-
-# DATA_UPDATE
-# -----------
-
-def test_iode_data_update_eqs():
-
-    # Make a LEC error and check return code
-    A = "A := ln t +++ "
-    with pytest.raises(RuntimeError):
-        iode.data_update_eqs("A", A)
-
-    # Save a new equation A and check the return code
-    A = "A := ln t + 1"
-    iode.data_update_eqs("A", A)
-
-    # Get the lec value and compare with A
-    new_A = iode.get_eqs_lec("A")
-    assert new_A == A
-
-
 # ESTIMATION
 # ----------
 
-
 def test_iode_eqs_estimation():
-    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
+    eqs_db = iode.Equations(str(SAMPLE_DATA_DIR / "fun.eqs"))
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
     scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
 
@@ -125,13 +54,11 @@ def test_iode_eqs_estimation():
     res = iode.exec_lec("_YRES0[1980Y1]", 0)
     assert round(res, 8) == -0.00115008
 
-
 # SIMULATION
 # ----------
 
-
 def test_iode_model_simulate():
-    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
+    eqs_db = iode.Equations(str(SAMPLE_DATA_DIR / "fun.eqs"))
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
     scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
 
@@ -143,8 +70,7 @@ def test_iode_model_simulate():
     # Test convergence
     iode.model_simulate("2000Y1", "2002Y1", "", relax=0.7)
    
-
-    # Check some result after simulation (values obatined with the BORLAND compiler)
+    # Check some result after simulation (values obtained with the BORLAND compiler)
     # ACAF [2000..2002] before simulation = [10.0466107922005, 2.86792273645546, -0.929212509051645]
     # ACAF [2000..2002] after simulation  = [10.0466107922005, 2.62379276852768, -1.27462319299379]
     res = iode.exec_lec("ACAF[2002Y1]", 0)
@@ -152,11 +78,10 @@ def test_iode_model_simulate():
 
     iode.reset_msgs()
 
-
 def test_iode_model_simulate_exchange():
 
     iode.suppress_msgs()
-    iode.ws_load_eqs(str(SAMPLE_DATA_DIR / "fun.eqs"))
+    eqs_db = iode.Equations(str(SAMPLE_DATA_DIR / "fun.eqs"))
     var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
     scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
 
@@ -176,7 +101,6 @@ def test_iode_model_simulate_exchange():
     assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006734
 
     iode.reset_msgs()
-
 
 def test_iode_wrt():
 
@@ -231,7 +155,6 @@ def test_iode_wrt():
     iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.rtf"), iode.W_RTF)
     iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.csv"), iode.W_CSV)
 
-
 def test_iode_htol():
     #Read quaterly data and convert it to the current WS sample (yearly)
     var_db = iode.Variables()
@@ -260,7 +183,6 @@ def test_iode_htol():
     iode.ws_htol_sum(filename, varname)
     res = iode.exec_lec(f"{varname}[2014Y1]", 0)
     assert round(res, 6) == 1.423714
-
 
 def test_iode_ltoh():
     #Read yearly data data and convert it to the current WS sample (quaterly)
@@ -308,7 +230,6 @@ def test_iode_ltoh():
     iode.ws_ltoh_flow(filename, varname, iode.LTOH_STEP)
     res = iode.exec_lec(f"{varname}[2014Q3]", 0)
     assert round(res, 7) == 8.1050747
-
 
 def test_iode_htol_la():
     # Creates a quaterly larray and convert it to a yearly one
@@ -359,7 +280,6 @@ def test_iode_htol_la():
     # save the new yearly ws
     filename = str(IODE_OUTPUT_DIR / "testy_3D")
     var_db.save(filename)
-
 
 # PANDAS FUNCTIONS
 # ----------------
