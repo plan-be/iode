@@ -11,6 +11,11 @@ from pyiode.objects.equation cimport CEquation
 from pyiode.objects.scalar cimport CScalar
 
 
+cdef extern from "api/iode.h":
+    cdef int    IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
+    cdef int    IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)
+
+
 # C++ classes
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html 
 

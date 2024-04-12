@@ -1,50 +1,23 @@
-#  IODE EXTENSION FOR PYTHON
-#  =========================
-#  
-#     @header4iode
-#  
-#  IODE DATA functions (equivalent to $Data* report functions)
-#  -----------------------------------------------------------
-#  data_update(obj_name: str, obj_value: str, obj_type: int)                                 Create of update an IODE object (cmt, eqs, lst, idt) 
-#  data_update_cmt(obj_name: str, obj_value: str)                                            Create or update an IODE comment
-#  data_update_eqs(obj_name: str, obj_value: str)                                            Create or update an IODE equation 
-#  data_update_idt(obj_name: str, obj_value: str)                                            Create or update an IODE identity
-#  data_update_lst(obj_name: str, obj_value: str)                                            Create or update an IODE list
-#  data_update_scl(obj_name: str, value: float = None, relax: float = None, stderr: float = None)    Create or update an IODE scalar
-#  data_update_var(varname: str, values, operation: str = "L", per_from: str = None)          Create or update an IODE variable starting at a specified period
-
 import warnings
-
-from data cimport B_DataUpdate
 
 
 def data_update(obj_name: str, obj_value: str, obj_type: int): 
-    r'''Update an IODE object (cmt, eqs, lst, idt) 
-    
-    Parameters
-    ----------
-    obj_name: str
-        object name
-        
-    obj_value: str
-        new content of the object
-        
-    obj_type: int 
-        object type
-        
-    Returns
-    -------
-    Runtime exception raised on error.
-
-    Examples
-    --------
-    >>> iode.data_update("ACAF", "Comment of ACAF", iode.K_CMT)
-
-    '''
-     
-    cmd = obj_name + " " + obj_value
-    if B_DataUpdate(_cstr(cmd), obj_type):
-        raise RuntimeError(f"{obj_name} update failed")
+    if obj_type == 0:
+        data_update_cmt(obj_name, obj_value)
+    elif obj_type == 1:
+        data_update_eqs(obj_name, obj_value)
+    elif obj_type == 2:
+        data_update_idt(obj_name, obj_value)
+    elif obj_type == 3:
+        data_update_lst(obj_name, obj_value)
+    elif obj_type == 4:
+        data_update_scl(obj_name, obj_value)
+    elif obj_type == 5:
+        raise NotImplementedError("Please use the syntax:\ntbl_db = Tables()\ntbl_db[name] = table")
+    elif obj_type == 6:
+        data_update_var(obj_name, obj_value)
+    else:
+        raise ValueError(f"IODE type {obj_type} is invalid")
 
 def data_update_cmt(obj_name: str, obj_value: str):
     warnings.warn("data_update_cmt() is deprecated. " + 
@@ -53,7 +26,10 @@ def data_update_cmt(obj_name: str, obj_value: str):
     cmt_db[obj_name] = obj_value
     
 def data_update_eqs(obj_name: str, obj_value: str):
-    data_update(obj_name, obj_value, K_EQS)
+    warnings.warn("data_update_eqs() is deprecated. " + 
+        "Please use the new syntax:\neqs_db = Equations()\neqs_db[name] = new_lec", DeprecationWarning)
+    eqs_db = Equations()
+    eqs_db[obj_name] = obj_value
     
 def data_update_idt(obj_name: str, obj_value: str):
     warnings.warn("data_update_idt() is deprecated. " + 
