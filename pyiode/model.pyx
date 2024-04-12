@@ -124,9 +124,8 @@ def model_calc_scc(nb_passes: int = 1,
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR
-    >>> from iode import model_calc_scc, ws_load_eqs
-    >>> ws_load_eqs(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    274
+    >>> from iode import Equations, model_calc_scc
+    >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
     >>> model_calc_scc(nb_passes=1)
     '''
     eqs_list = _arg_to_str(eqs_list, sep = ',')
