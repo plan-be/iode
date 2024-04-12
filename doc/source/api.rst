@@ -62,6 +62,15 @@ Comments
 
    Comments.__init__ 
 
+=========
+Equations
+=========
+
+.. autosummary::
+   :toctree: _generated
+
+   Equations.__init__ 
+
 ==========
 Identities
 ==========
@@ -90,6 +99,19 @@ Scalars
 
    Scalars.__init__
 
+======
+Tables
+======
+
+.. autosummary::
+   :toctree: _generated
+
+   ws_content_tbl
+   ws_clear_tbl
+   ws_load_tbl
+   ws_save_tbl
+   delete_tbl
+
 =========
 Variables
 =========
@@ -111,27 +133,6 @@ Variables
    Variables.to_frame
    Variables.from_array
    Variables.to_array
-
-
-.. autosummary::
-   :toctree: _generated
-
-   ws_content
-   ws_content_eqs
-   ws_content_tbl
-   
-   ws_clear
-   ws_clear_all
-   ws_clear_eqs
-   ws_clear_tbl
-
-   ws_load
-   ws_load_eqs
-   ws_load_tbl
-
-   ws_save
-   ws_save_eqs
-   ws_save_tbl
 
 
 ************
@@ -177,12 +178,6 @@ EQUATION
    Equation.set_sample       
    Equation.split_equation
 
-   get_eqs_lec
-   get_eqs
-   set_eqs
-   data_update_eqs
-   delete_eqs
-
 ======
 SCALAR
 ======
@@ -198,11 +193,6 @@ SCALAR
 =====
 TABLE
 =====
-
-.. autosummary::
-   :toctree: _generated
-
-   delete_tbl
 
 
 ****
@@ -324,10 +314,21 @@ DEPRECATED
 .. autosummary::
    :toctree: _generated 
 
+   ws_content
+   ws_clear
+   ws_clear_all
+   ws_load
+   ws_save
+
    ws_content_cmt
    ws_clear_cmt
    ws_load_cmt
    ws_save_cmt
+
+   ws_content_eqs
+   ws_clear_eqs
+   ws_load_eqs
+   ws_save_eqs
 
    ws_content_idt
    ws_clear_idt
@@ -353,6 +354,12 @@ DEPRECATED
    get_cmt
    set_cmt
    data_update_cmt
+
+   get_eqs_lec
+   get_eqs
+   set_eqs
+   data_update_eqs
+   delete_eqs
 
    get_idt
    set_idt
