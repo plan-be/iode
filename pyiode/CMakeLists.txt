@@ -49,7 +49,7 @@ if(Python_FOUND)
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/s_pyiode.cpp ${CMAKE_CURRENT_BINARY_DIR}/s_pyiode.cpp
                       COMMAND ${CYTHON} ${CMAKE_CURRENT_SOURCE_DIR}/iode_python.pyx -3 --verbose --cplus 
                       --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} 
-                      --directive binding=True,embedsignature=True,embedsignature.format=python
+                      --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
                       --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp)
 
     python_add_library(iode_python MODULE ${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp WITH_SOABI)
