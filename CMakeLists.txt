@@ -315,10 +315,8 @@ add_subdirectory ("gui")
 
 # ---- python ----
 
-if(SKBUILD)
-  add_subdirectory ("pyiode")
-  # add_subdirectory ("python_api")
-endif()
+add_subdirectory ("pyiode")
+# add_subdirectory ("python_api")
 
 # ---- tests ----
 
