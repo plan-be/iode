@@ -83,7 +83,7 @@ cdef class Sample:
                     "Got argument of type '" + type(period).__name__ + "'")
             if isinstance(period, Period):
                 period = str(period)
-            return period.encode("utf-8")
+            return period.encode()
 
         if len(args) == 1:
             smpl = args[0]
@@ -119,7 +119,7 @@ cdef class Sample:
             TypeError("Expected argument of type str or 'Period'.\nGot argument of type '" + type(period).__name__ + "'")
         if isinstance(period, Period):
             period = str(period)
-        cdef string str_period = period.encode("utf-8")
+        cdef string str_period = period.encode()
         return self.c_sample.get_period_position(str_period)
 
     def get_list_periods(self, as_float: bool = False) -> Union[List[str], List[float]]:
@@ -143,7 +143,7 @@ cdef class Sample:
         if as_float:
             return self.c_sample.get_list_periods_as_float()
         else:
-            return [period.decode("utf-8") for period in self.c_sample.get_list_periods()]
+            return [period.decode() for period in self.c_sample.get_list_periods()]
 
     def intersection(self, other_sample: Sample) -> Sample:
         """
@@ -167,7 +167,7 @@ cdef class Sample:
         2000Y1:2015Y1
         """
         c_sample_inter = self.c_sample.intersection(other_sample.c_sample)
-        str_sample = c_sample_inter.to_string().decode("utf-8")
+        str_sample = c_sample_inter.to_string().decode()
         return Sample(*str_sample.split(':'))
 
     # Attributes access
@@ -175,12 +175,12 @@ cdef class Sample:
     @property
     def start(self) -> str:
         c_period = self.c_sample.start_period()
-        return c_period.to_string().decode("utf-8")
+        return c_period.to_string().decode()
 
     @property
     def end(self) -> str:
         c_period = self.c_sample.end_period()
-        return c_period.to_string().decode("utf-8")
+        return c_period.to_string().decode()
 
     @property
     def nb_periods(self) -> int:
@@ -194,10 +194,10 @@ cdef class Sample:
         return self.c_sample == other.c_sample
 
     def __str__(self) -> str:
-        return self.c_sample.to_string().decode("utf-8")
+        return self.c_sample.to_string().decode()
 
     def __repr__(self) -> str:
-        return self.c_sample.to_string().decode("utf-8")
+        return self.c_sample.to_string().decode()
 
 
 def ws_sample_set(from_period: str, to_period: str) -> Optional[Tuple[str, str]]:

@@ -87,7 +87,7 @@ cdef class Period:
                 raise ValueError("Expected a string a length 1 for the argument 'periodicity_'")
             if value not in periodicities:
                 raise ValueError(f"Wrong periodicity. Valid periodicity are: {periodicities}")
-            return value.encode("utf-8")[0]
+            return value.encode()[0]
 
         def check_step(value: int) -> int:
             if not isinstance(value, int):
@@ -115,7 +115,7 @@ cdef class Period:
             raise ValueError("Wrong number of arguments to create a new Period")
 
         if str_period:
-            self.c_period = CPeriod(<string>str_period.encode("utf-8"))
+            self.c_period = CPeriod(<string>str_period.encode())
         else:
             self.c_period = CPeriod(year_, periodicity_, step_)
 
@@ -228,7 +228,7 @@ cdef class Period:
         return self.c_period == other.c_period
 
     def __str__(self) -> str:
-        return self.c_period.to_string().decode("utf-8")
+        return self.c_period.to_string().decode()
 
     def __repr__(self) -> str:
-        return self.c_period.to_string().decode("utf-8")
+        return self.c_period.to_string().decode()
