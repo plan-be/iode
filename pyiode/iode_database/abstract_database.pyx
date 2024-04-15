@@ -781,7 +781,7 @@ cdef class _AbstractDatabase:
         >>> # only update the value
         >>> scl_db["acaf1"] = 0.8
         >>> scl_db["acaf1"]
-        Scalar(0.8, 1, nan)
+        Scalar(0.8, 1, 0.00136871)
         >>> # upate value and relax (tuple)
         >>> scl_db["acaf2"] = 0.8, 0.9
         >>> scl_db["acaf2"]
@@ -793,7 +793,7 @@ cdef class _AbstractDatabase:
         >>> # upate value and relax (dictionary)
         >>> scl_db["acaf3"] = {"relax": 0.9, "value": 0.8}
         >>> scl_db["acaf3"]
-        Scalar(0.8, 0.9, nan)
+        Scalar(0.8, 0.9, 0.87301)
         >>> # upate value and/or relax (Scalar object)
         >>> acaf4 = scl_db["acaf4"]
         >>> acaf4
