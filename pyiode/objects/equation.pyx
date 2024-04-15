@@ -112,9 +112,9 @@ cdef class Equation:
         if not isinstance(block, str):
             raise TypeError("'block': Expected value of type string.\nGot value of type '" + type(block).__name__ + "'")
 
-        self.c_equation = new CEquation(name.encode("utf-8"), lec.encode("utf-8"), 0, from_period.encode("utf-8"), 
-                                        to_period.encode("utf-8"), comment.encode("utf-8"), instruments.encode("utf-8"), 
-                                        block.encode("utf-8"), <bint>False)
+        self.c_equation = new CEquation(name.encode(), lec.encode(), 0, from_period.encode(), 
+                                        to_period.encode(), comment.encode(), instruments.encode(), 
+                                        block.encode(), <bint>False)
         self.method = method
 
     def __dealloc__(self):
@@ -144,7 +144,7 @@ cdef class Equation:
             raise TypeError("'lec': Expected value of type string.\nGot value of type '" + type(lec).__name__ + "'")
         if not isinstance(name, str):
             raise TypeError("'name': Expected value of type string.\nGot value of type '" + type(name).__name__ + "'")
-        self.c_equation.set_lec(lec.encode("utf-8"), name.encode("utf-8"))
+        self.c_equation.set_lec(lec.encode(), name.encode())
 
     def set_sample(self, from_period: Union[str, Period] = "", to_period: Union[str, Period] = ""):
         """
@@ -189,7 +189,7 @@ cdef class Equation:
             from_period = str(from_period)
         if isinstance(to_period, Period):
             to_period = str(to_period)
-        self.c_equation.set_sample(from_period.encode("utf-8"), to_period.encode("utf-8"))
+        self.c_equation.set_sample(from_period.encode(), to_period.encode())
 
     def get_date_format(self, format: str = "dd-mm-yyyy") -> str:
         """
@@ -213,7 +213,7 @@ cdef class Equation:
         """
         if not isinstance(format, str):
             raise TypeError("Expected value of type string.\nGot value of type '" + type(format).__name__ + "'")     
-        return self.c_equation.get_date_as_string(format.encode("utf-8")).decode("utf-8")
+        return self.c_equation.get_date_as_string(format.encode()).decode()
 
     def get_coefficients_list(self, create_if_not_exit: bool = True) -> List[str]:
         """
@@ -272,7 +272,7 @@ cdef class Equation:
         >>> scl_db.get_names()
         ['acaf1', 'acaf2', 'acaf4']
         """
-        return [coeff.decode("utf-8") for coeff in self.c_equation.get_coefficients_list(create_if_not_exit)]
+        return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(create_if_not_exit)]
 
     def get_variables_list(self, create_if_not_exit: bool = True) -> List[str]:
         """
@@ -334,7 +334,7 @@ cdef class Equation:
         >>> var_db.get_names()
         ['ACAF', 'GOSF', 'TIME', 'VAF']
         """
-        return [var.decode("utf-8") for var in self.c_equation.get_variables_list(create_if_not_exit)]
+        return [var.decode() for var in self.c_equation.get_variables_list(create_if_not_exit)]
 
     def split_equation(self) -> Tuple[str, str]:
         """
@@ -358,31 +358,31 @@ cdef class Equation:
         'acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
         """
         lhs, rhs = self.c_equation.split_equation()
-        return lhs.decode("utf-8"), rhs.decode("utf-8") 
+        return lhs.decode(), rhs.decode() 
 
     # Attributes access
 
     @property
     def lec(self) -> str:
-        return self.c_equation.get_lec().decode("utf-8")
+        return self.c_equation.get_lec().decode()
     
     @property
     def method(self) -> str:
-        return self.c_equation.get_method().decode("utf-8")
+        return self.c_equation.get_method().decode()
 
     @method.setter
     def method(self, value: Union[str, int]):
         if not isinstance(value, (str, int)):
             raise TypeError("Expected value of type string or int.\nGot value of type '" + type(value).__name__ + "'")
         if isinstance(value, str):
-            self.c_equation.set_method(<string>value.encode("utf-8"))
+            self.c_equation.set_method(<string>value.encode())
         else:
             # Note: <int> casting converts the Python type int to the cython.int type
             self.c_equation.set_method(<int>value)
 
     @property
     def sample(self) -> Sample:
-        str_sample = self.c_equation.get_sample().to_string().decode("utf-8")
+        str_sample = self.c_equation.get_sample().to_string().decode()
         from_period, to_period = str_sample.split(':')
         return Sample(from_period, to_period)
 
@@ -393,37 +393,37 @@ cdef class Equation:
         if isinstance(value, Sample):
             value = str(value)
         from_period, to_period = value.split(':')
-        self.c_equation.set_sample(from_period.encode("utf-8"), to_period.encode("utf-8"))
+        self.c_equation.set_sample(from_period.encode(), to_period.encode())
 
     @property
     def comment(self) -> str:
-        return self.c_equation.get_comment().decode("utf-8")
+        return self.c_equation.get_comment().decode()
 
     @comment.setter
     def comment(self, value: str):
         if not isinstance(value, str):
             raise TypeError("Expected value of type string.\nGot value of type '" + type(value).__name__ + "'")
-        self.c_equation.set_comment(value.encode("utf-8"))
+        self.c_equation.set_comment(value.encode())
 
     @property
     def instruments(self) -> str:
-        return self.c_equation.get_instruments().decode("utf-8")
+        return self.c_equation.get_instruments().decode()
 
     @instruments.setter
     def instruments(self, value: str):
         if not isinstance(value, str):
             raise TypeError("Expected value of type string.\nGot value of type '" + type(value).__name__ + "'")
-        self.c_equation.set_instruments(value.encode("utf-8"))
+        self.c_equation.set_instruments(value.encode())
 
     @property
     def block(self) -> str:
-        return self.c_equation.get_block().decode("utf-8")
+        return self.c_equation.get_block().decode()
 
     @block.setter
     def block(self, value: str):
         if not isinstance(value, str):
             raise TypeError("Expected value of type string.\nGot value of type '" + type(value).__name__ + "'")
-        self.c_equation.set_block(value.encode("utf-8"))
+        self.c_equation.set_block(value.encode())
 
     @property
     def tests(self) -> Dict[str, float]:
@@ -442,10 +442,10 @@ cdef class Equation:
         return self.c_equation == other.c_equation
 
     def __str__(self) -> str:
-        return self.c_equation.to_string().decode("utf-8")
+        return self.c_equation.to_string().decode()
 
     def __repr__(self) -> str:
-        return self.c_equation.to_string().decode("utf-8")
+        return self.c_equation.to_string().decode()
 
     def __hash__(self) -> int:
         return <int>hash_value_eq(dereference(self.c_equation))

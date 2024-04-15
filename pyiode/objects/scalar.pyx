@@ -93,10 +93,10 @@ cdef class Scalar:
         return self.c_scalar == other.c_scalar
 
     def __str__(self) -> str:
-        return self.c_scalar.to_string().decode("utf-8")
+        return self.c_scalar.to_string().decode()
 
     def __repr__(self) -> str:
-        return self.c_scalar.to_string().decode("utf-8")
+        return self.c_scalar.to_string().decode()
 
     def __hash__(self) -> int:
         return <int>hash_value_scl(self.c_scalar)
