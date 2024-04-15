@@ -62,47 +62,55 @@ cdef class Scalars(_AbstractDatabase):
         if not isinstance(key, str):
             raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
                 "but got value of type {type(filepath).__name__}")
-        c_scalar = self.database_ptr.get(key.encode())
+        cdef CScalar c_scalar = self.database_ptr.get(key.encode())
         py_scalar = Scalar(c_scalar.val, c_scalar.relax)
         py_scalar.c_scalar.std = c_scalar.std
         return py_scalar
-
-    def _convert_value_to_scalar(self, name: str, value: ScalarInput) -> Scalar:
-        if isinstance(value, int):
-            value = float(value)
-        if isinstance(value, Scalar):
-            return value
-        elif isinstance(value, float):
-            return Scalar(value)
-        elif isinstance(value, (tuple, list)) and all(isinstance(elem, (int, float)) for elem in value):
-            if len(value) > 2:
-                raise ValueError(f"Scalar '{name}': Expected input to be a tuple or list of length 2. "
-                                 f"Got {type(value).__name__} of length {len(value)}")
-            return Scalar(float(value[0]), float(value[1]))
-        elif isinstance(value, dict):
-            return Scalar(**value)
-        else:
-            raise TypeError(f"Scalar '{name}': Expected input to be of type float or tuple(float, float) "
-                            f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
 
     def _set_object(self, key, value):
         if not isinstance(key, str):
             raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
                 "but got value of type {type(filepath).__name__}")
-        scalar = self._convert_value_to_scalar(key, value)
+        if isinstance(value, int):
+            value = float(value) 
+
         if self.database_ptr.contains(key.encode()):
+            # update exisiting scalar
+            if isinstance(value, float):
+                scalar = self._get_object(key)
+                scalar.value = value
+            elif isinstance(value, Scalar):
+                scalar = value
+            elif isinstance(value, (tuple, list)) and all(isinstance(elem, (int, float)) for elem in value):
+                if len(value) > 2:
+                    raise ValueError(f"Update scalar '{key}': Expected input to be a tuple or list of length 2. "
+                                     f"Got {type(value).__name__} of length {len(value)}")
+                scalar = Scalar(float(value[0]), float(value[1]))
+            elif isinstance(value, dict):
+                scalar = self._get_object(key)
+                scalar.value = value.pop('value', scalar.value)
+                scalar.relax = value.pop('relax', scalar.relax)
+                if len(value):
+                    raise ValueError(f"Update scalar '{key}': only 'value' and 'relax' keys are accepted. "
+                                     f"Got unknown key(s): {';'.join(value.keys())}")
+            else:
+                raise TypeError(f"Update scalar '{key}': Expected input to be of type float or tuple(float, float) "
+                                f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
             self.database_ptr.update(key.encode(), scalar.value, scalar.relax, scalar.std)
         else:
+            # add a new scalar
+            if isinstance(value, float):
+                scalar = Scalar(value)
+            elif isinstance(value, Scalar):
+                scalar = value
+            elif isinstance(value, (tuple, list)) and all(isinstance(elem, (int, float)) for elem in value):
+                if len(value) > 2:
+                    raise ValueError(f"New scalar '{key}': Expected input to be a tuple or list of length 2. "
+                                     f"Got {type(value).__name__} of length {len(value)}")
+                scalar = Scalar(float(value[0]), float(value[1]))
+            elif isinstance(value, dict):
+                scalar = Scalar(**value)
+            else:
+                raise TypeError(f"New scalar '{key}': Expected input to be of type float or tuple(float, float) "
+                                f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
             self.database_ptr.add(key.encode(), scalar.value, scalar.relax, scalar.std)
-    
-    def add(self, name: str, value: ScalarInput):
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-        scalar = self._convert_value_to_scalar(name, value)
-        self.database_ptr.add(name.encode(), scalar.value, scalar.relax, scalar.std)
-
-    def update(self, name: str, value: ScalarInput):
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-        scalar = self._convert_value_to_scalar(name, value)
-        self.database_ptr.update(name.encode(), scalar.value, scalar.relax, scalar.std)
