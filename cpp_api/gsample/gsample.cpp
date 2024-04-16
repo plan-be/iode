@@ -85,11 +85,16 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     //           does not ends with '[1]' while it is the case in the old GUI. 
     for(int row=0; row < (int) ref_table->nb_lines(); row++)
     {
-        if(ref_table->get_line_type(row) != EnumLineType::IT_CELL) continue;
+        TableLine* line = ref_table->get_line(row);
+
+        if(line->get_line_type() != EnumLineType::IT_CELL) 
+            continue;
+        
         // QUESTION FOR JMP: Can we assume that the cell containing the '#' character will always be the second ?
-        if(ref_table->get_cell_type(row, 1) == EnumCellType::IT_STRING)
+        TableCell* cell = line->get_cell(1, ref_table->nb_columns());
+        if(cell->get_type() == EnumCellType::IT_STRING)
         {
-            std::string content = ref_table->get_cell_content(row, 1, false);
+            std::string content = cell->get_content(false);
             if(content.find('#') != std::string::npos)
             {
                 std::string column_name;
@@ -108,8 +113,11 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     }
 
     // For each table line, get line name + add a NaN value for each column
+    std::string name;
     for(int row=0; row < (int) ref_table->nb_lines(); row++)
     {
+        TableLine* line = ref_table->get_line(row);
+
         // QUESTION FOR JMP: Can we always assume that 
         //                   - the first cell will contain the name of the line ?
         //                   - the second cell will contain either the '#' character or a LEC expression ?
@@ -120,9 +128,11 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         //        if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
         //        break;
         // from which I understand that you assume that the LEC expression WILL be in the second cell
-        if(ref_table->get_line_type(row) == EnumLineType::IT_CELL && ref_table->get_cell_type(row, 1) == EnumCellType::IT_LEC)
+        if(line->get_line_type() == EnumLineType::IT_CELL && 
+           line->get_cell(1, ref_table->nb_columns())->get_type() == EnumCellType::IT_LEC)
         {
-            line_names.push_back(ref_table->get_cell_content(row, 0, false));
+            name = line->get_cell(0, ref_table->nb_columns())->get_content(false);
+            line_names.push_back(name);
             v_line_pos_in_ref_table.push_back(row);
 
             std::vector<double> row_values(column_names.size(), L_NAN);
@@ -202,14 +212,16 @@ bool GSampleTable::is_editable(const int line, const int col)
 
     // RULE 2: A cell cannot be updated if the corresponding LEC expression from the 
     //         reference table starts with 0+
-    int line_ref = v_line_pos_in_ref_table.at(line);
-    std::string lec = ref_table->get_cell_content(line_ref, 1, false);
+    int line_ref_pos = v_line_pos_in_ref_table.at(line);
+    TableLine* line_ref = ref_table->get_line(line_ref_pos);
+    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns());
+    std::string lec = cell_ref->get_content(false);
     if(lec.substr(0, 2) == "0+")
         return false;
 
     // RULE 3: A cell cannot be updated if the corresponding LEC expression from the 
     //         reference table does not refer to at least one variable
-    std::vector<std::string> variables = ref_table->get_variables_from_lec_cell(line_ref, 1);
+    std::vector<std::string> variables = cell_ref->get_variables_from_lec();
     if(variables.size() == 0)
         return false;
 
@@ -279,12 +291,15 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
             throw IodeException("The cell corresponding to the line\n" + line_names[line] + "\n" +
                                 "and column\n" + column_names[col] + "\ncannot be edited");
 
-    int line_ref = v_line_pos_in_ref_table.at(line);
+    int line_ref_pos = v_line_pos_in_ref_table.at(line);
     int col_pos = v_pos_in_columns_struct[col];
+
+    TableLine* line_ref = ref_table->get_line(line_ref_pos);
+    TableCell* cell_ref = line_ref->get_cell(1, ref_table->nb_columns());
 
     // RULE 4: Only the first variable found in the LEC expression is updated
     // see https://iode.plan.be/doku.php?id=edit_tables for the rules
-    std::string var_to_update = ref_table->get_variables_from_lec_cell(line_ref, 1).at(0);
+    std::string var_to_update = cell_ref->get_variables_from_lec().at(0);
 
     // get period position 
     COL column = columns->cl_cols[col_pos];
@@ -292,20 +307,22 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period());
 
     // get lec
-    std::string lec = ref_table->get_cell_content(line_ref, 1, false);
+    std::string lec = cell_ref->get_content(false);
 
     // get divider
-    std::string div_lec = ref_table->get_divider_cell_content(1, false);
+    TableLine* line_divider = ref_table->get_divider_line();
+    TableCell* cell_divider = line_divider->get_cell(1, ref_table->nb_columns());
+    std::string div_lec = cell_divider->get_content(false);
     if(div_lec.empty())
         div_lec = "1";
 
     // same as VT_calc() from o_vt.c from the old GUI
     bool success = propagate_new_value(lec, div_lec, var_to_update, value, period_pos);
     if(!success)
-        throw IodeException("The cell corresponding to the line\n" + line_names[line] + "\n" +
-                            "and column\n" + column_names[col] + "\ncannot be edited.\n\n" + 
-                            "Cannot calculate the new value for the variable " + var_to_update + "\n" + 
-                            "LEC expression: " + lec);
+        throw std::runtime_error("The cell corresponding to the line\n" + line_names[line] + "\n" +
+            "and column\n" + column_names[col] + "\ncannot be edited.\n\n" + 
+            "Cannot calculate the new value for the variable " + var_to_update + "\n" + 
+            "LEC expression: " + lec);
 
    // recompute all values of the GSample table
    compute_values();

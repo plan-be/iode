@@ -12,9 +12,6 @@
 #include <iostream>
 
 
-using int_bitset = std::bitset<sizeof(int)>;
-
-
 /* ****************************** *
  *           CONSTANTS            *
  * ****************************** */
