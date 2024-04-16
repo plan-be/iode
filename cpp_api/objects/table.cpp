@@ -3,6 +3,8 @@
 #include "table.h"
 
 
+// ================ CELL ================
+
 static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
 {
 	unsigned char* cell_src_content = (unsigned char*) T_cell_cont(const_cast<TCELL*>(c_cell_src), 0);
@@ -12,6 +14,169 @@ static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
 		T_set_string_cell(c_cell_dest, cell_src_content);
 	c_cell_dest->tc_attr = c_cell_src->tc_attr;
 }
+
+TableCell::TableCell(const EnumCellType cell_type, const std::string& content, const EnumCellAlign align, 
+	const bool bold, const bool italic, const bool underline)
+{
+	this->tc_type = (char) cell_type;
+	if(cell_type == EnumCellType::IT_STRING)
+		set_text(content);
+	else
+		set_lec(content);
+	this->tc_attr = (char) align;
+	set_bold(bold);
+	set_italic(italic);
+	set_underline(underline);
+}
+
+TableCell::~TableCell() {}
+
+void TableCell::free()
+{
+	T_free_cell(this);
+}
+
+// The table cell contains a "packed" IDT object (lec + clec) 
+// -> see T_set_lec_cell from k_tbl.c
+CLEC* TableCell::get_compiled_lec()
+{
+	if(tc_type != IT_LEC)
+		throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
+
+	if(tc_val == NULL)
+		throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
+
+	// see VT_edit() from o_vt.c from the old GUI
+	return (CLEC*) P_get_ptr(tc_val, 1);
+}
+
+std::vector<std::string> TableCell::get_variables_from_lec()
+{
+	CLEC* clec = get_compiled_lec();
+	return get_variables_from_clec(clec);
+}
+
+std::string TableCell::get_content(const bool quotes) const
+{
+	int mode = quotes ? 1 : 0;
+	std::string content_oem = std::string(T_cell_cont((TCELL*) this, mode));
+	std::string content = (tc_type == IT_STRING) ? oem_to_utf8(content_oem) : content_oem;
+	return content;
+}
+
+/**
+ * @brief 
+ *
+ * @param text text to be written in the cell. Note that leading and trailing double quotes are removed.
+ * 
+ * @note: The string argument `text` passed to this C++ method is assumed to be written with the UTF8 format
+ */
+void TableCell::set_text(const std::string& text)
+{
+	std::string text_oem = utf8_to_oem(text);
+	unsigned char* c_text = reinterpret_cast<unsigned char*>(to_char_array(text_oem));
+	T_set_string_cell((TCELL*) this, c_text);
+}
+
+void TableCell::set_lec(const std::string& lec)
+{
+	unsigned char* c_lec = reinterpret_cast<unsigned char*>(to_char_array(lec));
+	T_set_lec_cell((TCELL*) this, c_lec);
+}
+
+/**
+ * @brief Set the content of a cell.
+ *        Rule: If the content starts with a double quotes, we assume it is a string cell. 
+ *        Otherwise, it is a LEC cell.
+ *        Note that the leading and trailing double quotes are removed when the text is written 
+ *        in a string table cell.
+ * 
+ * @param content 
+ * 
+ * @note When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+ *       See function `T_create_cell()` in file `k_tbl.c` from the C API 
+ */
+void TableCell::set_content(const std::string& content)
+{
+	if(content.starts_with('\"'))
+		set_text(content);
+	else
+		set_lec(content);
+}
+
+EnumCellType TableCell::get_type() const
+{
+	return static_cast<EnumCellType>(tc_type);
+}
+
+void TableCell::set_type(const EnumCellType cell_type)
+{
+	this->tc_type = cell_type;
+}
+
+// TODO: check if it is correct
+EnumCellAlign TableCell::get_align() const
+{
+	return static_cast<EnumCellAlign>((int) (this->tc_attr / 8) * 8);
+}
+
+void TableCell::set_align(const EnumCellAlign align)
+{
+	char font = ((int) this->tc_attr) % 8;
+	this->tc_attr = ((char) align) + font;
+}
+
+bool TableCell::is_bold() const
+{
+	return bitset_8(this->tc_attr).test(0);
+}
+
+void TableCell::set_bold(const bool value)
+{
+	bitset_8 attr(this->tc_attr);
+	attr.set(0, value);
+	this->tc_attr = (char) attr.to_ulong();
+}
+
+bool TableCell::is_italic() const
+{
+	return bitset_8(this->tc_attr).test(1);
+}
+
+void TableCell::set_italic(const bool value)
+{
+	bitset_8 attr(this->tc_attr);
+	attr.set(1, value);
+	this->tc_attr = (char) attr.to_ulong();
+}
+
+bool TableCell::is_underline() const
+{
+	return bitset_8(this->tc_attr).test(2);
+}
+
+void TableCell::set_underline(const bool value)
+{
+	bitset_8 attr(this->tc_attr);
+	attr.set(2, value);
+	this->tc_attr = (char) attr.to_ulong();
+}
+
+bool TableCell::operator==(const TableCell& other) const
+{
+	if (tc_type != other.tc_type) return false;
+	if (tc_attr != other.tc_attr) return false;
+	// need to create a copy because T_cell_cont returns a pointer to the global 
+	// allocated buffer BUF_DATA (see buf.c)
+	char* content1 = copy_char_array(T_cell_cont((TCELL*) this, 0));
+	char* content2 = copy_char_array(T_cell_cont((TCELL*)(&other), 0));
+	bool is_same_content = strcmp(content1, content2) == 0;
+	delete[] content1;
+	delete[] content2;
+	return is_same_content;
+}
+
+// ================ LINE ================
 
 static void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src)
 {
@@ -39,44 +204,106 @@ static void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_c
 	}
 }
 
-static bool cell_equal(const TCELL* c_cell1, const TCELL* c_cell2)
+TableLine::TableLine(const EnumLineType line_type, const EnumGraphType graph_type, const bool axis_left)
 {
-	if (c_cell1->tc_type != c_cell2->tc_type) return false;
-	if (c_cell1->tc_attr != c_cell2->tc_attr) return false;
-	// need to create a copy because T_cell_cont returns a pointer to the global 
-	// allocated buffer BUF_DATA (see buf.c)
-	char* content1 = copy_char_array(T_cell_cont(const_cast<TCELL*>(c_cell1), 0));
-	char* content2 = copy_char_array(T_cell_cont(const_cast<TCELL*>(c_cell2), 0));
-	bool is_same_content = strcmp(content1, content2) == 0;
-	delete[] content1;
-	delete[] content2;
-	return is_same_content;
+	this->tl_type = (char) line_type;
+	this->tl_val = NULL;
+	set_line_graph(graph_type);
+	this->tl_pbyte = 0;
+	set_line_axis(axis_left);
 }
 
-static bool line_equal(const int nb_columns, const TLINE* c_line1, const TLINE* c_line2)
-{
-	if (c_line1->tl_type != c_line2->tl_type) return false;
-	if (c_line1->tl_axis != c_line2->tl_axis) return false;
-	if (c_line1->tl_graph != c_line2->tl_graph) return false;
-	if (c_line1->tl_pbyte != c_line2->tl_pbyte) return false;
+TableLine::~TableLine() {}
 
-	TCELL* cells_line1 = (TCELL*)c_line1->tl_val;
-	TCELL* cells_line2 = (TCELL*)c_line2->tl_val;
-	switch (c_line1->tl_type)
+void TableLine::free(const int nb_cells)
+{
+	T_free_line(this, nb_cells);
+}
+
+EnumLineType TableLine::get_line_type() const
+{
+	return static_cast<EnumLineType>(tl_type);
+}
+
+void TableLine::set_line_type(const EnumLineType line_type)
+{
+	tl_type = line_type;
+}
+
+EnumGraphType TableLine::get_line_graph() const
+{
+	return static_cast<EnumGraphType>(tl_graph);
+}
+
+void TableLine::set_line_graph(const EnumGraphType graph_type)
+{
+	tl_graph = graph_type;
+}
+
+bool TableLine::is_left_axis() const
+{
+	return tl_axis == 0;
+}
+
+void TableLine::set_line_axis(const bool is_left)
+{
+	tl_axis = is_left ? 0 : 1;
+}
+
+unsigned char TableLine::get_line_pbyte() const
+{
+	return tl_pbyte;
+}
+
+void TableLine::set_line_pbyte(const unsigned char pbyte)
+{
+	tl_pbyte = pbyte;
+}
+
+TableCell* TableLine::get_cell(const int column, const int nb_cells) const
+{
+	if(column < 0)
+		throw std::invalid_argument("Table cell position cannot be negative");
+
+	EnumLineType line_type = (EnumLineType) this->tl_type;
+	if(line_type != IT_TITLE && line_type != IT_CELL)
+		throw std::runtime_error("Table line of type " + get_line_type_as_string(line_type) + " has no cells"); 
+
+	if(line_type == IT_TITLE && column > 0)
+		throw std::invalid_argument("Table cell position for a TITLE line must be 0");
+
+	if(line_type == IT_CELL && column >= nb_cells)
+		throw std::invalid_argument("Table cell position cannot exceed " + std::to_string(nb_cells));
+
+	TableCell* cells = reinterpret_cast<TableCell*>(this->tl_val);
+	return &cells[column];
+}
+
+bool TableLine::equals(const TableLine& other, const int nb_cells) const
+{
+	if (tl_type != other.tl_type) return false;
+	if (tl_axis != other.tl_axis) return false;
+	if (tl_graph != other.tl_graph) return false;
+	if (tl_pbyte != other.tl_pbyte) return false;
+
+	TableCell* cells = (TableCell*) tl_val;
+	TableCell* cells_other = (TableCell*) other.tl_val;
+	if(tl_type == IT_TITLE)
+		return cells->get_content(false) == cells_other->get_content(false);
+	else if(tl_type == IT_CELL)
 	{
-	case IT_TITLE:
-		if (strcmp(cells_line1->tc_val, cells_line2->tc_val) != 0) return false;
-		break;
-	case IT_CELL:
-		for (int col = 0; col < nb_columns; col++) 
-			if(!cell_equal(&cells_line1[col], &cells_line2[col])) return false;
-		break;
-	default:
-		break;
+		for (int col = 0; col < nb_cells; col++) 
+			if(cells[col] != cells_other[col]) return false;
+		return true;
 	}
-
-	return true;
+	else
+		// tl_val == NULL for FILES, MODE, LINE and DATE type
+		return true;
 }
+
+
+// ================ TABLE ================
+
 
 bool table_equal(const TBL& table1, const TBL& table2)
 {
@@ -85,9 +312,17 @@ bool table_equal(const TBL& table1, const TBL& table2)
 	if(table1.t_nl != table2.t_nl) return false;
 	if(table1.t_nc != table2.t_nc) return false;
 
-	if (!line_equal(table1.t_nc, &table1.t_div, &table2.t_div)) return false;
+	int nb_columns = table1.t_nc;
+	TableLine* div1 = (TableLine*) const_cast<TLINE*>(&table1.t_div);
+	TableLine* div2 = (TableLine*) const_cast<TLINE*>(&table2.t_div);
+	if(!div1->equals(*div2, nb_columns))
+		return false;
+
+	TableLine* cells1 = (TableLine*) table1.t_line;
+	TableLine* cells2 = (TableLine*) table2.t_line;
 	for (int i = 0; i < table1.t_nl; i++)
-		if (!line_equal(table1.t_nc, &table1.t_line[i], &table2.t_line[i])) return false;
+		if (!cells1[i].equals(cells2[i], nb_columns)) 
+			return false;
 
 	if(table1.t_zmin != table2.t_zmin) return false;
 	if(table1.t_zmax != table2.t_zmax) return false;
@@ -404,248 +639,151 @@ void Table::set_graph_alignment(const EnumGraphAlign align)
 	t_align = align;
 }
 
-// ================ LINES ================
+// -------- LINES --------
 
-EnumLineType Table::get_line_type(const int row) const
+TableLine* Table::get_line(const int row)
 {
-	TLINE* line = get_line(row);
-	return static_cast<EnumLineType>(line->tl_type);
+	if (row < 0 || row > nb_lines())
+		throw std::invalid_argument("Cannot get table line at index " + std::to_string(row) + ".\n" + 
+			"Line index must be in range [0, " + std::to_string(nb_lines()) + "]");
+
+	return static_cast<TableLine*>(&this->t_line[row]);
 }
 
-void Table::set_line_type(const int row, const EnumLineType line_type)
+TableLine* Table::insert_line(const int pos, const EnumLineType line_type, const bool after)
 {
-	TLINE* line = get_line(row);
-	line->tl_type = line_type;
-}
+	if (pos < 0 || pos > nb_lines())
+		throw std::invalid_argument("Cannot insert table line at index " + std::to_string(pos) + ".\n" +  
+			"New line index must be in range [0, " + std::to_string(nb_lines() - 1) + "]");
 
-EnumGraphType Table::get_line_graph(const int row) const
-{
-	TLINE* line = get_line(row);
-	return static_cast<EnumGraphType>(line->tl_graph);
-}
+	int where_ = after ? 0 : 1;
+	// WARNING: When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+	int new_pos = T_insert_line(this, pos, line_type, where_);
+	if (new_pos < 0) 
+		throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
 
-void Table::set_line_graph(const int row, const EnumGraphType graph_type)
-{
-	TLINE* line = get_line(row);
-	line->tl_graph = graph_type;
-}
-
-bool Table::is_left_axis(const int row) const
-{
-	TLINE* line = get_line(row);
-	return line->tl_axis == 0;
-}
-
-void Table::set_line_axis(const int row, const bool is_left)
-{
-	TLINE* line = get_line(row);
-	line->tl_axis = is_left ? 0 : 1;
-}
-
-unsigned char Table::get_line_pbyte(const int row) const
-{
-	TLINE* line = get_line(row);
-	return line->tl_pbyte;
-}
-
-void Table::set_line_pbyte(const int row, const unsigned char pbyte)
-{
-	TLINE* line = get_line(row);
-	line->tl_pbyte = pbyte;
+	return static_cast<TableLine*>(&this->t_line[new_pos]);
 }
 
 // -------- DIVIDER --------
 
-EnumCellType Table::get_divider_cell_type(const int column) const
+TableLine* Table::get_divider_line()
 {
-	return get_cell_type(0, column, true);
-}
-
-EnumCellAttribute Table::get_divider_cell_align(const int column) const
-{
-	return get_cell_align(0, column, true);
-}
-
-int Table::get_divider_cell_font(const int column) const
-{
-	return get_cell_font(0, column, true);
-}
-
-std::string Table::get_divider_cell_content(const int column, const bool quotes) const
-{
-	return get_cell_content(0, column, quotes, true);
-}
-
-void Table::set_cell_divider_text(const int column, const std::string& text)
-{
-	set_cell_text(0, column, text, true);
-}
-
-void Table::set_cell_divider_lec(const int column, const std::string& lec)
-{
-	set_cell_lec(0, column, lec, true);
+	return static_cast<TableLine*>(&this->t_div);
 }
 
 // -------- TITLE --------
 
 // we assume that title string is written in UTF8 format
-int Table::insert_title(const int pos, const std::string& title, const bool after)
+TableLine* Table::insert_title(const int pos, const std::string& title, const bool after)
 {
-	int title_pos = insert_line(pos, IT_TITLE, after);
-	set_title(title_pos, title);
-	return title_pos;
+	TableLine* title_line = insert_line(pos, IT_TITLE, after);
+	title_line->get_cell(0, t_nc)->set_text(title);
+	return title_line;
 }
 
-int Table::add_title(const std::string& title)
+TableLine* Table::add_title(const std::string& title)
 {
 	return insert_title(nb_lines() - 1, title);
 }
 
-std::string Table::get_title(const int row) const
+std::string Table::get_title(const int row)
 {
-	TLINE* title_line = get_line(row);
-	EnumLineType line_type = (EnumLineType) title_line->tl_type;
-	if (line_type != IT_TITLE) throw IodeExceptionFunction("Cannot get table title.", 
-		"Line at position " + std::to_string(row) + " is not a Title line but of type " + 
-		get_line_type_as_string(line_type) + ".");
-	std::string title = get_cell_content(row, 0, false);
-	return title;
+	TableLine* line = get_line(row);
+	if(line->get_line_type() != EnumLineType::IT_TITLE) 
+		throw std::invalid_argument("Cannot get title at line index " + std::to_string(row) + ".\n" +
+			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
+			get_line_type_as_string(line->get_line_type()) + ".");
+	return line->get_cell(0, t_nc)->get_content(false);
 }
 
 // we assume that title string is written in UTF8 format
 void Table::set_title(const int row, const std::string title)
 {
-	TLINE* title_line = get_line(row);
-	if (title_line->tl_type != IT_TITLE) throw IodeExceptionFunction("Cannot set table title", 
-		"Line at position " + std::to_string(row) + " is not a TITLE line.");
-	set_cell_text(row, 0, title);
+	TableLine* line = get_line(row);
+	if(line->get_line_type() != EnumLineType::IT_TITLE) 
+		throw std::invalid_argument("Cannot set table title at index " + std::to_string(row) + ".\n" + 
+			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
+			get_line_type_as_string(line->get_line_type()) + ".");
+	line->get_cell(0, t_nc)->set_text(title);
 }
 
 // -------- CELLS --------
 
-int Table::insert_line_with_cells(const int pos, const bool after)
+TableLine* Table::insert_line_with_cells(const int pos, const bool after)
 {
-	int line_cells_pos = insert_line(pos, IT_CELL, after);
-	return line_cells_pos;
+	return insert_line(pos, IT_CELL, after);
 }
 
-int Table::add_line_with_cells()
+TableLine* Table::add_line_with_cells()
 {
 	return insert_line_with_cells(nb_lines() - 1);
 }
 
-std::vector<std::string> Table::get_variables_from_lec_cell(const int row, const int column)
-{
-	CLEC* clec = get_cell_compiled_lec(row, column);
-	return get_variables_from_clec(clec);
-}
-
 // -------- SEPARATOR --------
 
-int Table::insert_line_separator(const int pos, const bool after)
+TableLine* Table::insert_line_separator(const int pos, const bool after)
 {
 	return insert_line(pos, IT_LINE, after);
 }
 
-int Table::add_line_separator()
+TableLine* Table::add_line_separator()
 {
 	return insert_line_separator(nb_lines() - 1);
 }
 
 // -------- MODE --------
 
-int Table::insert_line_mode(const int pos, const bool after)
+TableLine* Table::insert_line_mode(const int pos, const bool after)
 {
 	return insert_line(pos, IT_MODE, after);
 }
 
-int Table::add_line_mode()
+TableLine* Table::add_line_mode()
 {
 	return insert_line_mode(nb_lines() - 1);
 }
 
 // -------- FILES --------
 
-int Table::insert_line_files(const int pos, const bool after)
+TableLine* Table::insert_line_files(const int pos, const bool after)
 {
 	return insert_line(pos, IT_FILES, after);
 }
 
-int Table::add_line_files()
+TableLine* Table::add_line_files()
 {
 	return insert_line_files(nb_lines() - 1);
 }
 
 // -------- DATE --------
 
-int Table::insert_line_date(const int pos, const bool after)
+TableLine* Table::insert_line_date(const int pos, const bool after)
 {
 	return insert_line(pos, IT_DATE, after);
 }
 
-int Table::add_line_date()
+TableLine* Table::add_line_date()
 {
 	return insert_line_date(nb_lines() - 1);
 }
 
-bool Table::operator==(const Table& other) const
-{
-	return table_equal(static_cast<TBL>(*this), static_cast<TBL>(other));
-}
-
-// ================ LINES (PRIVATE) ================
-
-TLINE* Table::get_line(const int row) const
-{
-	if (row < 0 || row > nb_lines())
-	{
-		IodeExceptionInvalidArguments error("Cannot get table line at position " + 
-			std::to_string(row) + ".\nLine position must be in range [0, " + 
-			std::to_string(nb_lines()) + "]");
-		error.add_argument("line position", std::to_string(row));
-		throw error;
-	}
-
-	return &t_line[row];
-}
-
-int Table::insert_line(const int pos, const EnumLineType line_type, const bool after)
-{
-	if (pos < 0 || pos > nb_lines())
-	{
-		IodeExceptionInvalidArguments error("Cannot insert table line",  
-			"New line position must be in range [0, " + std::to_string(nb_lines() - 1) + "]");
-		error.add_argument("new line position", std::to_string(pos));
-		throw error;
-	}
-
-	int where_ = after ? 0 : 1;
-	// WARNING: When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
-	int new_pos = T_insert_line(this, pos, line_type, where_);
-	if (new_pos < 0) throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
-	return new_pos;
-}
+// -------- FREE --------
 
 void Table::delete_line(const int row)
 {
+	if(row < 0)
+		throw std::invalid_argument("Cannot delete table line.\nTable line index cannot be negative.");
+
 	if(row >= nb_lines())
-	{
-		IodeExceptionInvalidArguments error("Cannot delete row at position " + std::to_string(row));
-		error.add_argument("position of the row to delete: ", std::to_string(row));
-		error.add_argument("number of rows: ", std::to_string(nb_lines()));
-		throw error;
-	}
+		throw std::invalid_argument("Cannot delete line at index " + std::to_string(row) + ".\n" +
+			"Line index must be in range [0, " + std::to_string(nb_lines()) + "]." );
 
 	// pointer to all lines of the table
     TLINE* lines = t_line;
 
     /* free line at position row */
-    TLINE* line = get_line(row);
-	EnumLineType line_type = get_line_type(row);
-	std::string content;
-	if(line_type == IT_CELL)
-		content = get_cell_content(row, 0, false);
-    T_free_line(line, nb_columns());
+    T_free_line(&lines[row], nb_columns());
 
     /* shift all lines after position row + 1 */
 	if(row < nb_lines() - 1)
@@ -670,195 +808,23 @@ void Table::delete_line(const int row)
 	}
 }
 
-void Table::free_line(const int row)
-{
-	T_free_line(get_line(row), nb_columns());
-}
+// -------- EQUAL --------
 
-void Table::free_cell(const int row, const int column)
+bool Table::operator==(const Table& other) const
 {
-	T_free_cell(get_cell(row, column, false));
+	return table_equal(static_cast<TBL>(*this), static_cast<TBL>(other));
 }
 
 // ================ TABLE (PRIVATE) ================
 
 void Table::free_all_lines()
 {
-    T_free_line(&t_div, nb_columns());
+
+    T_free_line(&t_div, t_nc);
 
     for(int i = 0; i < t_nl; i++)
-		free_line(i);
+		T_free_line(&t_line[i], t_nc);
     SW_nfree(t_line);
-}
-
-// ================ CELLS (PRIVATE) ================
-
-TCELL* Table::get_cell(const int row, const int column, const bool divider) const
-{
-	const TLINE* line = divider ? &t_div : get_line(row);
-
-	if (column < 0 || column > nb_columns())
-	{
-		IodeExceptionInvalidArguments error("Cannot get table cell at position (" +
-			std::to_string(row), + ", " + std::to_string(column) + ").\n" +   
-			"Cell column must be in range [0, " + std::to_string(nb_columns()) + "]");
-		error.add_argument("cell position", std::to_string(row) + ", " + std::to_string(column));
-		throw error;
-	}
-
-	EnumLineType line_type = (EnumLineType) line->tl_type;
-	if(line_type != IT_CELL && line_type != IT_TITLE)
-	{
-		IodeExceptionInvalidArguments error("Cannot get table cell or title at position (" +
-			std::to_string(row), + ", " + std::to_string(column) + ").\n" + 
-			"Expected line of type Cell or Title but got line of type " + get_line_type_as_string(line_type) + ".");
-		error.add_argument("cell position", std::to_string(row) + ", " + std::to_string(column));
-		throw error;
-	}
-
-	if(line_type == IT_TITLE && column > 0)
-	{
-		IodeExceptionInvalidArguments error("Line at position " + std::to_string(row) + 
-			" is of type Title.\nDid you expect line of type Cell?");
-		error.add_argument("cell position", std::to_string(row) + ", " + std::to_string(column));
-		throw error;
-	}
-
-	TCELL* cell = &reinterpret_cast<TCELL*>(line->tl_val)[column];
-	return cell;
-}
-
-// The table cell contains a "packed" IDT object (lec + clec) 
-// -> see T_set_lec_cell from k_tbl.c
-CLEC* Table::get_cell_compiled_lec(const int row, const int column)
-{
-	TCELL* cell = get_cell(row, column, false);
-
-	if(cell->tc_type != IT_LEC)
-	{
-		std::string msg = "The table cell at position ";
-		msg += "(" + std::to_string(row) + ", " + std::to_string(column) + ") ";
-		msg += "does not contain a LEC expression";
-		throw IodeException(msg);
-	}
-
-	if(cell->tc_val == NULL)
-	{
-		std::string msg = "Cannot extract content of the table cell at position ";
-		msg += "(" + std::to_string(row) + ", " + std::to_string(column) + ")";
-		throw IodeException(msg);
-	}
-
-	// see VT_edit() from o_vt.c from the old GUI
-	return (CLEC*) P_get_ptr(cell->tc_val, 1);
-}
-
-std::string Table::get_cell_content(const int row, const int column, const bool quotes, const bool divider) const
-{
-	TCELL* cell = get_cell(row, column, divider);
-	int mode = quotes ? 1 : 0;
-	std::string content_oem = std::string(T_cell_cont(cell, mode));
-	std::string content = (cell->tc_type == IT_STRING) ? oem_to_utf8(content_oem) : content_oem;
-	return content;
-}
-
-// 
-/**
- * @brief 
- * 
- * @param row 
- * @param column 
- * @param text text to be written in the cell. Note that leading and trailing double quotes are removed.
- * @param divider 
- * 
- * @note: The string argument `text` passed to this C++ method is assumed to be written with the UTF8 format
- */
-void Table::set_cell_text(const int row, const int column, const std::string& text, const bool divider)
-{
-	TCELL* cell = get_cell(row, column, divider);
-	std::string text_oem = utf8_to_oem(text);
-	unsigned char* c_text = reinterpret_cast<unsigned char*>(to_char_array(text_oem));
-	T_set_string_cell(cell, c_text);
-}
-
-void Table::set_cell_lec(const int row, const int column, const std::string& lec, const bool divider)
-{
-	TCELL* cell = get_cell(row, column, divider);
-	unsigned char* c_lec = reinterpret_cast<unsigned char*>(to_char_array(lec));
-	T_set_lec_cell(cell, c_lec);
-}
-
-/**
- * @brief Set the content of a cell.
- *        Rule: If the content starts with a double quotes, we assume it is a string cell. 
- *        Otherwise, it is a LEC cell.
- *        Note that the leading and trailing double quotes are removed when the text is written 
- *        in a string table cell.
- * 
- * @param row 
- * @param column 
- * @param content 
- * @param divider
- * 
- * @note When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
- *       See function `T_create_cell()` in file `k_tbl.c` from the C API 
- */
-void Table::set_cell_content(const int row, const int column, const std::string& content, const bool divider)
-{
-	if(content.starts_with('\"'))
-		set_cell_text(row, column, content, divider);
-	else
-		set_cell_lec(row, column, content, divider);
-}
-
-EnumCellType Table::get_cell_type(const int row, const int column, const bool divider) const
-{
-	TCELL* cell = get_cell(row, column, divider);
-	return static_cast<EnumCellType>(cell->tc_type);
-}
-
-void Table::set_cell_type(const int row, const int column, const EnumCellType cell_type, const bool divider)
-{
-	TCELL* cell = get_cell(row, column, divider);
-	cell->tc_type = cell_type;
-}
-
-// TODO: check if it is correct
-EnumCellAttribute Table::get_cell_align(const int row, const int column, const bool divider) const
-{
-	TCELL* cell = get_cell(row, column, divider);
-	return static_cast<EnumCellAttribute>(((int) cell->tc_attr / 8) * 8);
-}
-
-int Table::get_cell_font(const int row, const int column, const bool divider) const
-{
-	TCELL* cell = get_cell(row, column, divider);
-	return ((int) cell->tc_attr % 8);
-}
-
-bool Table::is_cell_bold_font(const int row, const int column, const bool divider) const
-{
-	int font = get_cell_font(row, column, divider);
-	return int_bitset(font).test(0);
-}
-
-bool Table::is_cell_italic_font(const int row, const int column, const bool divider) const
-{
-	int font = get_cell_font(row, column, divider);
-	return int_bitset(font).test(1);
-}
-
-bool Table::is_cell_underline_font(const int row, const int column, const bool divider) const
-{
-	int font = get_cell_font(row, column, divider);
-	return int_bitset(font).test(2);
-}
-
-void Table::set_cell_attribute(const int row, const int column, const char attr, const bool divider)
-{
-	// check cell exist at position (row, column)
-	get_cell(row, column, divider);
-	T_set_cell_attr(this, row, column, attr);
 }
 
 
