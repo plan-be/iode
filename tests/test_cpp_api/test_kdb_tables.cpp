@@ -68,14 +68,14 @@ TEST_F(KDBTablesTest, Get)
     EXPECT_EQ(table.get_title(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table.nb_lines(), 31);
     EXPECT_EQ(table.nb_columns(), 2);
-    EXPECT_EQ(table.get_line_type(0), IT_TITLE);
+    EXPECT_EQ(table.get_line(0)->get_line_type(), IT_TITLE);
 
     // by name
     Table table2 = Tables.get("GFRPC");
     EXPECT_EQ(table2.get_title(0), "Compte de l'ensemble des administrations publiques ");
     EXPECT_EQ(table2.nb_lines(), 31);
     EXPECT_EQ(table2.nb_columns(), 2);
-    EXPECT_EQ(table2.get_line_type(0), IT_TITLE);
+    EXPECT_EQ(table2.get_line(0)->get_line_type(), IT_TITLE);
 }
 
 TEST_F(KDBTablesTest, GetNames)
