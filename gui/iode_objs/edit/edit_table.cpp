@@ -119,21 +119,20 @@ void EditTableDialog::insert_line()
 
 		int insertWhere = wInsertWhere->extractAndVerify();
 
-		int new_pos;
 		switch(insertWhere)
 		{
 		case INSERT_AT_THE_END:
-			new_pos = edit_table_model->appendLine(lineType);
+			edit_table_model->appendLine(lineType);
 			break;
 		case INSERT_AFTER_CURRENT:
 			if(position < 0)
 				return;
-			new_pos = edit_table_model->insert_line(lineType, position, true);
+			edit_table_model->insert_line(lineType, position, true);
 			break;
 		case INSERT_BEFORE_CURRENT:
 			if(position < 0)
 				return;
-			new_pos = edit_table_model->insert_line(lineType, position, false);
+			edit_table_model->insert_line(lineType, position, false);
 			break;
 		default:
 			break;
