@@ -50,9 +50,9 @@ public:
 
 	EnumLineType get_line_type(const int row) const;
 
-	int appendLine(EnumLineType lineType);
+	void appendLine(EnumLineType lineType);
 
-	int insert_line(EnumLineType lineType, const int position, const bool after);
+	void insert_line(EnumLineType lineType, const int position, const bool after);
 
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
