@@ -25,7 +25,7 @@ from .iode_python import (nan, __version__,
 from .iode_python import Period, Sample, periodicities
 
 #IODE objects
-from .iode_python import Equation, List, Scalar
+from .iode_python import Equation, List, Scalar, Table
 
 # IODE databases
 from .iode_python import Comments, Equations, Identities, Lists, Scalars, Variables 
@@ -70,7 +70,7 @@ __all__ = [
     'Period', 'Sample', 'periodicities',
 
     #IODE objects
-    'Equation', 'List', 'Scalar',
+    'Equation', 'List', 'Scalar', 'Table'
     
     # IODE databases
     'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Variables', 

@@ -145,6 +145,7 @@ include "sample.pyx"
 
 include "objects/equation.pyx"
 include "objects/scalar.pyx"
+include "objects/table.pyx"
 
 include "iode_database/abstract_database.pyx"
 include "iode_database/comments_database.pyx"
