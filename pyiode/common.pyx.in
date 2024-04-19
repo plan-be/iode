@@ -6,11 +6,11 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.common cimport L_NAN, I_NB_TYPES, EQS_NBTESTS
-from pyiode.common cimport (EnumIodeType, EnumIodeEquationMethod, EnumIodeEquationTest, 
+from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, EnumIodeEquationTest, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             EnumIodeVarMode, EnumSimulationInitialization)
-from pyiode.common cimport vIodeTypes, v_eq_methods, v_var_modes, v_simulation_initialization
+from pyiode.common cimport vIodeTypes, vLangs, v_eq_methods, v_var_modes, v_simulation_initialization
 
 try:
     import pandas as pd
@@ -52,6 +52,12 @@ VARIABLES: int = EnumIodeType.I_VARIABLES
 
 NB_TYPES: int = I_NB_TYPES
 IODE_TYPES_LIST = _cpp_string_vector_to_py(vIodeTypes)
+
+LANG_ENGLISH: int = EnumLang.IT_ENGLISH
+LANG_DUTCH: int = EnumLang.IT_DUTCH
+LANG_FRENCH: int = EnumLang.IT_FRENCH
+
+LANGS_LIST = _cpp_string_vector_to_py(vLangs)
 
 EQ_METHOD_LSQ: int = EnumIodeEquationMethod.IE_LSQ
 EQ_METHOD_ZELLNER: int = EnumIodeEquationMethod.IE_ZELLNER
