@@ -218,6 +218,9 @@ public:
     Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
 		bool mode = false, bool files = false, bool date = false);
 
+    Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
+		const std::vector<std::string>& lecs, bool mode = false, bool files = false, bool date = false);
+
     Table(const int nb_columns, const std::string& def, const std::string& lecs, 
 		bool mode = false, bool files = false, bool date = false);
 
