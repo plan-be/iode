@@ -19,6 +19,13 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] vIodeTypes
 
+    cdef enum EnumLang:
+        IT_ENGLISH,
+        IT_DUTCH,
+        IT_FRENCH
+
+    cdef vector[string] vLangs
+
     cdef enum EnumSimulationInitialization:
         IV_INIT_TM1,
         IV_INIT_TM1_A,
