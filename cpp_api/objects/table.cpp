@@ -525,6 +525,31 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 	SCR_free_tbl((unsigned char**) c_lecs);
 }
 
+Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
+		     const std::vector<std::string>& lecs, bool mode, bool files, bool date)
+{
+	char* c_def = to_char_array(def);
+
+	if(titles.size() != lecs.size())
+		throw std::invalid_argument(std::string("Table: the list of title lines and the list of LEC ") + 
+			"expressions must have the same size.\n" + 
+			"Size of the list of title lines: " + std::to_string(titles.size()) + "\n" +
+			"Size of the list of LEC expressions: " + std::to_string(lecs.size()));
+
+	char** c_titles = vector_to_double_char(titles);
+	char** c_lecs = vector_to_double_char(lecs);
+
+	int c_mode = mode ? 1 : 0;
+	int c_files = files ? 1 : 0;
+	int c_date = date ? 1 : 0;
+
+	initialize(nb_columns);
+	T_default(this, c_def, c_titles, c_lecs, c_mode, c_files, c_date);
+
+	SCR_free_tbl((unsigned char**) c_titles);
+	SCR_free_tbl((unsigned char**) c_lecs);
+}
+
 Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
 	bool mode, bool files, bool date)
 {
@@ -550,7 +575,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
 
 	SCR_free_tbl((unsigned char**) c_lecs);
 }
-
 
 Table::Table(const Table& table)
 {
