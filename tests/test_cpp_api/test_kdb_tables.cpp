@@ -104,13 +104,15 @@ TEST_F(KDBTablesTest, GetTitle)
 
 TEST_F(KDBTablesTest, CreateRemove)
 {
+    int i;
     std::string name;
+    TableLine* line;
     KDBVariables kdb_var(input_test_dir + "fun.var");
     KDBLists kdb_lst(input_test_dir + "fun.lst");
 
     std::string list_name = "$ENVI";
-    // TODO JMP: is there a way to easily calculate the number of variables in a list ?
-    int nb_vars_envi = 10;
+    std::vector<std::string> vars_envi_list = {"EX", "PWMAB", "PWMS", "PWXAB", "PWXS", 
+        "QWXAB", "QWXS", "POIL", "NATY", "TFPFHP_"};
 
     // add empty table with 2 columns
     name = "TABLE1";
@@ -128,7 +130,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     // add tables and initialize it (variables as list)
     name = "TABLE2";
     std::string def = "A title";
-    std::vector<std::string> vars = { "GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG", list_name};
+    std::vector<std::string> vars = {"GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", "RIDG", "OCUG", list_name};
     bool mode = true;
     bool files = true;
     bool date = true;
@@ -137,21 +139,156 @@ TEST_F(KDBTablesTest, CreateRemove)
     // check that list $ENVI has been expanded
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
-    nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
+    nb_lines_vars = vars.size() + vars_envi_list.size() - 1;    // -1 for list_name which is expanded
     Table table2(name, nullptr);
     EXPECT_EQ(table2.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
+    // check lines
+    std::vector<std::string> expanded_vars = vars;
+    expanded_vars.pop_back();                                                                   // remove list_name
+    expanded_vars.insert(expanded_vars.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
+    
+    line = table2.get_line(0);
+    EXPECT_EQ(line->get_line_type(), IT_TITLE);
+    EXPECT_EQ(line->get_cell(0, 2)->get_content(false), def);
+    line = table2.get_line(1);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    line = table2.get_line(2);
+    EXPECT_EQ(line->get_line_type(), IT_CELL);
+    EXPECT_EQ(line->get_cell(0, 2)->get_content(false), "");
+    EXPECT_EQ(line->get_cell(1, 2)->get_content(false), "#S");
+    line = table2.get_line(3);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    for(i=0; i < nb_lines_vars; i++)
+    {
+        line = table2.get_line(i + nb_lines_header);
+        EXPECT_EQ(line->get_cell(0, 2)->get_content(false), expanded_vars[i]);
+        EXPECT_EQ(line->get_cell(1, 2)->get_content(false), expanded_vars[i]);
+    }
+    i += nb_lines_header;
+    line = table2.get_line(i++);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    if(mode)
+    {
+        line = table2.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_MODE);
+    }
+    if(files)
+    {
+        line = table2.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_FILES);
+    }
+    if(date)
+    {
+        line = table2.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_DATE);
+    }
 
     // remove table
     Tables.remove(name);
 
-    // add tables and initialize it (LEC cells as string)
+    // add tables and initialize it (titles + lecs lists)
     name = "TABLE3";
-    std::string lecs = "GOSG;YDTG;DTH;DTF;IT;YSSG+COTRES;RIDG;OCUG;" + list_name;
-    Tables.add(name, 2, def, lecs, mode, files, date);
+    std::vector<std::string> titles = {"GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"};
+    std::vector<std::string> lecs = {"GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
+    Tables.add(name, 2, def, titles, lecs, mode, files, date);
 
-    // check that list $ENVI has been expanded
+    // check lines
+    nb_lines_vars = (int) lecs.size();
     Table table3(name, nullptr);
     EXPECT_EQ(table3.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
+    line = table3.get_line(0);
+    EXPECT_EQ(line->get_line_type(), IT_TITLE);
+    EXPECT_EQ(line->get_cell(0, 2)->get_content(false), def);
+    line = table3.get_line(1);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    line = table3.get_line(2);
+    EXPECT_EQ(line->get_line_type(), IT_CELL);
+    EXPECT_EQ(line->get_cell(0, 2)->get_content(false), "");
+    EXPECT_EQ(line->get_cell(1, 2)->get_content(false), "#S");
+    line = table3.get_line(3);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    for(i=0; i < nb_lines_vars; i++)
+    {
+        line = table3.get_line(i + nb_lines_header);
+        EXPECT_EQ(line->get_cell(0, 2)->get_content(false), titles[i]);
+        EXPECT_EQ(line->get_cell(1, 2)->get_content(false), lecs[i]);
+    }
+    i += nb_lines_header;
+    line = table3.get_line(i++);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    if(mode)
+    {
+        line = table3.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_MODE);
+    }
+    if(files)
+    {
+        line = table3.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_FILES);
+    }
+    if(date)
+    {
+        line = table3.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_DATE);
+    }
+
+    // remove table
+    Tables.remove(name);
+
+    // add tables and initialize it (lecs as string)
+    name = "TABLE4";
+    std::string lecs_list;
+    for(const std::string& lec: lecs) 
+        lecs_list += lec + ";";
+    lecs_list += list_name;
+    Tables.add(name, 2, def, lecs_list, mode, files, date);
+
+    // check lines
+    nb_lines_vars = lecs.size() + vars_envi_list.size();
+    Table table4(name, nullptr);
+    EXPECT_EQ(table4.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+
+    std::vector<std::string> expanded_lecs = lecs;
+    expanded_lecs.insert(expanded_lecs.end(), vars_envi_list.begin(), vars_envi_list.end());    // add variables contained in the $ENVI list
+
+    line = table4.get_line(0);
+    EXPECT_EQ(line->get_line_type(), IT_TITLE);
+    EXPECT_EQ(line->get_cell(0, 2)->get_content(false), def);
+    line = table4.get_line(1);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    line = table4.get_line(2);
+    EXPECT_EQ(line->get_line_type(), IT_CELL);
+    EXPECT_EQ(line->get_cell(0, 2)->get_content(false), "");
+    EXPECT_EQ(line->get_cell(1, 2)->get_content(false), "#S");
+    line = table4.get_line(3);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    for(i=0; i < nb_lines_vars; i++)
+    {
+        line = table4.get_line(i + nb_lines_header);
+        EXPECT_EQ(line->get_cell(0, 2)->get_content(false), expanded_lecs[i]);
+        EXPECT_EQ(line->get_cell(1, 2)->get_content(false), expanded_lecs[i]);
+    }
+    i += nb_lines_header;
+    line = table4.get_line(i++);
+    EXPECT_EQ(line->get_line_type(), IT_LINE);
+    if(mode)
+    {
+        line = table4.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_MODE);
+    }
+    if(files)
+    {
+        line = table4.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_FILES);
+    }
+    if(date)
+    {
+        line = table4.get_line(i++);
+        EXPECT_EQ(line->get_line_type(), IT_DATE);
+    }
+
     // remove table
     Tables.remove(name);
 }

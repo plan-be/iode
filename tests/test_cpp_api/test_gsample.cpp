@@ -170,13 +170,13 @@ TEST_F(GSampleTest, BuildFromVariables)
 {
     std::string gsample;
     std::string table_name = "_GSAMPLE_";
-    std::string variables_list = "Q_I;Q_F;Q_I/Q_F;KNFF[-1]";
+    std::vector<std::string> variables = {"Q_I", "Q_F", "Q_I/Q_F", "KNFF[-1]"};
     std::string title = "";
     int nb_lines = 4;
     std::string sample;
     std::vector<double> values;
 
-    kdb_tbl->add(table_name, 2, "", variables_list, false, false, false);
+    kdb_tbl->add(table_name, 2, "", variables, false, false, false);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -300,16 +300,17 @@ TEST_F(GSampleTest, EditTable)
     std::string table_name = "TEST_EDIT";
 
     // new table (to be edited)
-    std::string lec = "Q_F;";   // row 0
-    lec += "Q_I;";              // row 1
-    lec += "Q_F/Q_I;";          // row 2
-    lec += "ln(Q_I+Q_F);";      // row 3
-    lec += "KNFF;";             // row 4
-    lec += "KNFF[-1];";         // row 5
-    lec += "3+ln(10);";         // row 6
-    lec += "0+KNFF";            // row 7
+    std::vector<std::string> lecs;
+    lecs.push_back("Q_F");              // row 0
+    lecs.push_back("Q_I");              // row 1
+    lecs.push_back("Q_F/Q_I");          // row 2
+    lecs.push_back("ln(Q_I+Q_F)");      // row 3
+    lecs.push_back("KNFF");             // row 4
+    lecs.push_back("KNFF[-1]");         // row 5
+    lecs.push_back("3+ln(10)");         // row 6
+    lecs.push_back("0+KNFF");           // row 7
 
-    kdb_tbl->add(table_name, 2, "Test table to be edited", lec, false, false, false);
+    kdb_tbl->add(table_name, 2, "Test table to be edited", lecs, false, false, false);
 
     // ---- prepare tables ----
 
