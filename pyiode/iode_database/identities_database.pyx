@@ -15,29 +15,35 @@ from pyiode.iode_database.database cimport Variables as cpp_global_variables
 
 @cython.final
 cdef class Identities(_AbstractDatabase):
+    """
+    IODE Identities database. 
+
+    Attributes
+    ----------
+    iode_type: str
+    filename: str
+    description: str
+
+    Parameters
+    ----------
+    filepath: str, optional
+        file containing the IODE identities to load.
+
+    Returns
+    -------
+    Identities
+
+    Examples
+    --------
+    >>> from iode import Identities, SAMPLE_DATA_DIR
+    >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
+    >>> len(idt_db)
+    48
+    """
+
     cdef CKDBIdentities* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Identities:
-        """
-        Get an instance of the IODE Identities database. 
-        Load the IODE identities from 'filepath' if given.
-
-        Parameters
-        ----------
-        filepath: str, optional
-            file containing the IODE identities to load.
-
-        Returns
-        -------
-        Identities
-
-        Examples
-        --------
-        >>> from iode import Identities, SAMPLE_DATA_DIR
-        >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> len(idt_db)
-        84
-        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_identities
         if filepath is not None:
             self.load(filepath)
