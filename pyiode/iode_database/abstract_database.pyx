@@ -513,12 +513,11 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, COMMENTS, EQUATIONS, LISTS, SCALARS, TABLES, VARIABLES
-        >>> from iode import Equations, Lists, Scalars, Variables, ws_load_tbl
+        >>> from iode import Equations, Lists, Scalars, Tables, Variables
         >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
         >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> ws_load_tbl(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        46
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
         >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
 
         >>> # get list of comments associated with the variable 'AOUC'
@@ -752,6 +751,33 @@ cdef class _AbstractDatabase:
         >>> acaf1.std
         0.0013687137980014086
 
+        Tables
+
+        >>> from iode import Tables
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tbl_db["YDH"]           # doctest: +NORMALIZE_WHITESPACE
+        DIVIS |                                                          1 |                                    PC_*40.34
+        TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
+        ----- | ---------------------------------------------------------------------------------------------------------
+        CELL  | ""                                                         |                     "#S"
+        CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
+        CELL  | "   Masse salariale totale"                                |                                         WBU_
+        CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN
+        CELL  | "   Surplus brut d'exploitation"                           |                                        GOSH_
+        CELL  | "   Revenu net de la propriété"                            |                                          IDH
+        CELL  | "Cotisations sociales et impôts"                           |                                  SSF+SSH+DTH
+        CELL  | "   Cotisations patronales"                                |                                          SSF
+        CELL  | "   Cotisations personnelles"                              |                                          SSH
+        CELL  | "IPP"                                                      |                                          DTH
+        CELL  | "Prestations sociales "                                    |                                     SBH+OCUH
+        CELL  | "   Sécurité sociale"                                      |                                          SBH
+        CELL  | "   Diverses prestations"                                  |                                         OCUH
+        CELL  | "Total"                                                    | (WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)
+        ----- | ---------------------------------------------------------------------------------------------------------
+        FILES |
+        DATE  |
+        <BLANKLINE>
+
         Variables
 
         >>> from iode import Variables, nan
@@ -939,6 +965,70 @@ cdef class _AbstractDatabase:
         >>> scl_db["acaf4"]
         Scalar(0.8, 0.9, 0.0020833)
 
+        Tables
+
+        >>> from iode import Tables
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+
+        >>> # -- new table --
+        >>> # 1. specify list of line titles and list of LEC expressions
+        >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
+        >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
+        >>> tbl_db["TABLE_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
+        ...                         "lines_titles": lines_titles, "mode": True, "files": True, "date": True}  
+        >>> tbl_db["TABLE_LECS"]         # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1              |
+        TITLE |         "New Table"
+        ----- | ----------------------------
+        CELL  | ""             |     "#S"
+        ----- | ----------------------------
+        CELL  | "GOSG:"        |        GOSG
+        CELL  | "YDTG:"        |        YDTG
+        CELL  | "DTH:"         |         DTH
+        CELL  | "DTF:"         |         DTF
+        CELL  | "IT:"          |          IT
+        CELL  | "YSSG+COTRES:" | YSSG+COTRES
+        CELL  | "RIDG:"        |        RIDG
+        CELL  | "OCUG:"        |        OCUG
+        ----- | ----------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+
+        >>> # 2. specify list of variables
+        >>> vars_list = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", "RIDG", "OCUG", "$ENVI"]
+        >>> tbl_db["TABLE_VARS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": vars_list, 
+        ...                         "mode": True, "files": True, "date": True}  
+        >>> tbl_db["TABLE_VARS"]             # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                                    |
+        TITLE |                                  "New Table"
+        ----- | -----------------------------------------------------------------------------
+        CELL  | ""                                                                   |  "#S"
+        ----- | -----------------------------------------------------------------------------
+        CELL  | "Bruto exploitatie-overschot: overheid (= afschrijvingen)."          |   GOSG
+        CELL  | "Overheid: geïnde indirecte belastingen."                            |   YDTG
+        CELL  | "Totale overheid: directe belasting van de gezinnen."                |    DTH
+        CELL  | "Totale overheid: directe vennootschapsbelasting."                   |    DTF
+        CELL  | "Totale indirecte belastingen."                                      |     IT
+        CELL  | "Globale overheid: ontvangen sociale zekerheidsbijdragen."           |   YSSG
+        CELL  | "Cotisation de responsabilisation."                                  | COTRES
+        CELL  | "Overheid: inkomen uit vermogen."                                    |   RIDG
+        CELL  | "Globale overheid: saldo van de ontvangen lopendeoverdrachten."      |   OCUG
+        CELL  | "Index wereldprijs - invoer van niet-energieprodukten, inUSD."       |  PWMAB
+        CELL  | "Index wereldprijs - invoer van diensten, in USD."                   |   PWMS
+        CELL  | "Index wereldprijs - uitvoer van niet-energieprodukten, inUSD."      |  PWXAB
+        CELL  | "Index wereldprijs - uitvoer van diensten, in USD."                  |   PWXS
+        CELL  | "Indicator van het volume van de wereldvraag naar goederen,1985=1."  |  QWXAB
+        CELL  | "Indicator van het volume van de wereldvraag naar diensten,1985=1."  |   QWXS
+        CELL  | "Brent olieprijs (USD per barrel)."                                  |   POIL
+        CELL  | "Totale beroepsbevolking (jaargemiddelde)."                          |   NATY
+        ----- | -----------------------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+
         Variables
 
         >>> from iode import Variables
@@ -1020,5 +1110,5 @@ cdef class _AbstractDatabase:
         """
         if not isinstance(key, str):
             raise TypeError(f"Cannot delete object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+                f"but got value of type {type(key).__name__}")
         self.abstract_db_ptr.remove(key.encode())
