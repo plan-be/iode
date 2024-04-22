@@ -14,29 +14,35 @@ from pyiode.iode_database.database cimport Lists as cpp_global_lists
 
 @cython.final
 cdef class Lists(_AbstractDatabase):
+    """
+    IODE Lists database. 
+
+    Attributes
+    ----------
+    iode_type: str
+    filename: str
+    description: str
+
+    Parameters
+    ----------
+    filepath: str, optional
+        file containing the IODE lists to load.
+
+    Returns
+    -------
+    Lists
+
+    Examples
+    --------
+    >>> from iode import Lists, SAMPLE_DATA_DIR
+    >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
+    >>> len(lst_db)
+    17
+    """
+
     cdef CKDBLists* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Lists:
-        """
-        Get an instance of the IODE Lists database. 
-        Load the IODE lists from 'filepath' if given.
-
-        Parameters
-        ----------
-        filepath: str, optional
-            file containing the IODE lists to load.
-
-        Returns
-        -------
-        Lists
-
-        Examples
-        --------
-        >>> from iode import Lists, SAMPLE_DATA_DIR
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> len(lst_db)
-        17
-        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_lists
         if filepath is not None:
             self.load(filepath)
