@@ -14,61 +14,57 @@ from pyiode.objects.equation cimport hash_value as hash_value_eq
 # Equation wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 cdef class Equation:
+    """
+    IODE equation.
 
-    cdef CEquation* c_equation
+    Attributes
+    ----------
+    lec: str
+    method: str
+    sample: Sample
+    comment: str
+    instruments: str
+    block: str
+        block of equations (to estimate) to which the equation belong.
+    tests: dict(str, float)
+    date: str
+        last time the equation has been estimated.
 
-    def __cinit__(self, name: str, lec: str, method: Union[int, str] = "LSQ", from_period: Union[str, Period] = "", 
-        to_period: Union[str, Period] = "", comment: str = "", instruments: str = "", block: str = "") -> Equation:
-        """
+    Parameters
+    ----------
+    name: str
+        Endogenous variable name.
+    lec: str
+        LEC expression of the equation.
+    method: int or {'LSQ', 'ZELLNER', 'INSTRUMENTAL', 'GLS', 'MAX_LIKELIHOOD'}, optional
+        Method used to estimate the coefficients of the equation.
+        Defaults to 'LSQ' (0).
+    from_period: str or Period, optional
+        Starting period for the estimation.
+        Defaults to the starting period of the sample associated with the IODE Variables database.
+    to_period: str or Period, optional
+        Ending period for the estimation.
+        Defaults to the ending period of the sample associated with the IODE Variables database.
+    comment: str, optional
+        Defaults to empty.
+    instruments: str, optional
+        Defaults to empty.
+    block: str, optional
+        block of equations (to estimate) to which the equation belong.
+        Defaults to empty.
 
-        Attributes
-        ----------
-        lec: str
-        method: str
-        sample: Sample
-        comment: str
-        instruments: str
-        block: str
-            block of equations (to estimate) to which the equation belong.
-        tests: dict(str, float)
-        date: str
-            last time the equation has been estimated.
-
-        Parameters
-        ----------
-        name: str
-            Endogenous variable name.
-        lec: str
-            LEC expression of the equation.
-        method: int or {'LSQ', 'ZELLNER', 'INSTRUMENTAL', 'GLS', 'MAX_LIKELIHOOD'}, optional
-            Method used to estimate the coefficients of the equation.
-            Defaults to 'LSQ' (0).
-        from_period: str or Period, optional
-            Starting period for the estimation.
-            Defaults to the starting period of the sample associated with the IODE Variables database.
-        to_period: str or Period, optional
-            Ending period for the estimation.
-            Defaults to the ending period of the sample associated with the IODE Variables database.
-        comment: str, optional
-            Defaults to empty.
-        instruments: str, optional
-            Defaults to empty.
-        block: str, optional
-            block of equations (to estimate) to which the equation belong.
-            Defaults to empty.
-
-        Examples
-        --------
-        >>> from iode import Equation
-        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
-        >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: --,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
+    Examples
+    --------
+    >>> from iode import Equation
+    >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+    >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+    Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
+        method: LSQ,
+        sample: 1960Y1:2015Y1,
+        comment: ,
+        block: ,
+        instruments: ,
+        tests:
                 corr: 0
                 dw: 0
                 fstat: 0
@@ -80,8 +76,13 @@ cdef class Equation:
                 stderr: 0
                 stderrp: 0
                 stdev: 0
-            date: )
-        """
+        date: )
+    """
+
+    cdef CEquation* c_equation
+
+    def __cinit__(self, name: str, lec: str, method: Union[int, str] = "LSQ", from_period: Union[str, Period] = "", 
+        to_period: Union[str, Period] = "", comment: str = "", instruments: str = "", block: str = "") -> Equation:
         if not isinstance(name, str):
             raise TypeError("'name': Expected value of type string.\nGot value of type '" + type(name).__name__ + "'")
 
