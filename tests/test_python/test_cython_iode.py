@@ -18,14 +18,14 @@ def test_cython_iode():
             for name_, value_ in inspect.getmembers(value):
                 doc = inspect.getdoc(value_)
                 if doc is not None:
-                    logging.info(f"add test for method '{name}.{name_}'")
                     iode.__test__[f'{name}.{name_}'] = doc                 
         doc = inspect.getdoc(value)
         if doc is not None:
-            logging.info(f"add test for function/method '{name}'")
             iode.__test__[name] = doc
 
     # run doctests
     failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
     assert failure_count == 0
     assert test_count > 0
+    for name in iode.__test__:
+        logging.info(f"tested function/method: '{name}'")
