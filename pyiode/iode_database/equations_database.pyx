@@ -69,7 +69,7 @@ cdef class Equations(_AbstractDatabase):
     def _get_object(self, key):
         if not isinstance(key, str):
             raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+                            f"but got value of type {type(key).__name__}")
         key = key.strip()
 
         c_eq = self.database_ptr.get(key.encode())
@@ -87,7 +87,7 @@ cdef class Equations(_AbstractDatabase):
         cdef CEquation* c_equation
         if not isinstance(key, str):
             raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+                            f"but got value of type {type(key).__name__}")
         key = key.strip()
 
         if self.database_ptr.contains(key.encode()):
