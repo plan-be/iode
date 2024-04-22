@@ -68,30 +68,41 @@ cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
 
 @cython.final
 cdef class Variables(_AbstractDatabase):
+    """
+    IODE Variables database. 
+
+    Attributes
+    ----------
+    iode_type: str
+    filename: str
+    description: str
+    mode: int
+    sample: Sample
+    nb_periods: int
+    periods: list(str)
+    periods_as_float: list(float)
+
+    Parameters
+    ----------
+    filepath: str, optional
+        file containing the IODE variables to load.
+
+    Returns
+    -------
+    Variables
+
+    Examples
+    --------
+    >>> from iode import Variables, SAMPLE_DATA_DIR
+    >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> len(var_db)
+    394
+    """
+
     cdef CKDBVariables* database_ptr
     cdef EnumIodeVarMode mode_
 
     def __cinit__(self, filepath: str = None) -> Variables:
-        """
-        Get an instance of the IODE Variables database. 
-        Load the IODE variables from 'filepath' if given.
-
-        Parameters
-        ----------
-        filepath: str, optional
-            file containing the IODE variables to load.
-
-        Returns
-        -------
-        Variables
-
-        Examples
-        --------
-        >>> from iode import Variables, SAMPLE_DATA_DIR
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> len(var_db)
-        394
-        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_variables
         self.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
         if filepath is not None:
@@ -167,7 +178,8 @@ cdef class Variables(_AbstractDatabase):
         # wrong key
         raise ValueError(f"var_db[...]: Expected ['name'] or ['name', 'periods'] as arguments. Got {key} instead.")     
         
-    def _get_object(self, key):
+    def _get_object(self, key): 
+
         key = self._unfold_key(key)
 
         # return the whole variable (i.e. for the whole sample)
@@ -176,7 +188,7 @@ cdef class Variables(_AbstractDatabase):
             return self.database_ptr.get(key.encode())
         # return the variable values for the selected periods
         else:
-            name, periods_ = key            
+            name, periods_ = key          
             # periods_ represents a unique period 
             if isinstance(periods_, str):
                 return self.database_ptr.get_var(<string>name.encode(), <string>periods_.encode(), self.mode_)
@@ -600,17 +612,17 @@ cdef class Variables(_AbstractDatabase):
         return la.from_frame(df)
 
     @property
-    def mode(self) -> EnumIodeVarMode:
+    def mode(self) -> str:
         """
         Return the current display mode for the values.
 
         Possible modes are:
         
-          * I_VAR_MODE_LEVEL,
-          * I_VAR_MODE_DIFF,
-          * I_VAR_MODE_GROWTH_RATE,
-          * I_VAR_MODE_Y0Y_DIFF,
-          * I_VAR_MODE_Y0Y_GROWTH_RATE
+          * VAR_MODE_LEVEL,
+          * VAR_MODE_DIFF,
+          * VAR_MODE_GROWTH_RATE,
+          * VAR_MODE_Y0Y_DIFF,
+          * VAR_MODE_Y0Y_GROWTH_RATE
 
         The default mode is 'Level'
 
@@ -622,7 +634,7 @@ cdef class Variables(_AbstractDatabase):
         >>> var_db.mode
         'Level'
         """
-        return VARIABLES_MODES[self.mode_]
+        return VARIABLES_MODES[<int>self.mode_]
 
     @mode.setter
     def mode(self, mode_: int):
@@ -631,15 +643,15 @@ cdef class Variables(_AbstractDatabase):
 
         Possible modes are:
         
-          * I_VAR_MODE_LEVEL,
-          * I_VAR_MODE_DIFF,
-          * I_VAR_MODE_GROWTH_RATE,
-          * I_VAR_MODE_Y0Y_DIFF,
-          * I_VAR_MODE_Y0Y_GROWTH_RATE
+          * VAR_MODE_LEVEL,
+          * VAR_MODE_DIFF,
+          * VAR_MODE_GROWTH_RATE,
+          * VAR_MODE_Y0Y_DIFF,
+          * VAR_MODE_Y0Y_GROWTH_RATE
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR, VAR_MODE_GROWTH_RATE
         >>> from iode import Variables
         >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> var_db.mode
@@ -647,16 +659,14 @@ cdef class Variables(_AbstractDatabase):
         >>> var_db["ACAF", "1990Y1"]
         0.25
         
-        >>> var_db.mode = I_VAR_MODE_GROWTH_RATE
+        >>> var_db.mode = VAR_MODE_GROWTH_RATE
         >>> var_db["ACAF", "1990Y1"]
         0.25
         """
-        if mode_ not in [EnumIodeVarMode.I_VAR_MODE_LEVEL, EnumIodeVarMode.I_VAR_MODE_DIFF, 
-            EnumIodeVarMode.I_VAR_MODE_GROWTH_RATE, EnumIodeVarMode.I_VAR_MODE_Y0Y_DIFF, 
-            EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE]:
-            raise ValueError("mode: possible values are [I_VAR_MODE_LEVEL, I_VAR_MODE_DIFF, "
-                             "I_VAR_MODE_GROWTH_RATE, I_VAR_MODE_Y0Y_DIFF, I_VAR_MODE_Y0Y_GROWTH_RATE]")
-        self.mode_ = mode_
+        if mode_ not in [VAR_MODE_LEVEL, VAR_MODE_DIFF, VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE]:
+            raise ValueError("mode: possible values are [VAR_MODE_LEVEL, VAR_MODE_DIFF, "
+                             "VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE]")
+        self.mode_ = <EnumIodeVarMode>mode_
 
     @property
     def sample(self) -> Sample:
