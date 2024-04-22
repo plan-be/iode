@@ -18,29 +18,35 @@ EquationInput = Union[str, Dict[str, Any], Equation]
 
 @cython.final
 cdef class Equations(_AbstractDatabase):
+    """
+    IODE Equations database. 
+
+    Attributes
+    ----------
+    iode_type: str
+    filename: str
+    description: str
+
+    Parameters
+    ----------
+    filepath: str, optional
+        file containing the IODE equations to load.
+
+    Returns
+    -------
+    Equations
+
+    Examples
+    --------
+    >>> from iode import Equations, SAMPLE_DATA_DIR
+    >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    >>> len(eqs_db)
+    274
+    """
+
     cdef CKDBEquations* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Equations:
-        """
-        Get an instance of the IODE Equations database. 
-        Load the IODE equations from 'filepath' if given.
-
-        Parameters
-        ----------
-        filepath: str, optional
-            file containing the IODE equations to load.
-
-        Returns
-        -------
-        Equations
-
-        Examples
-        --------
-        >>> from iode import Equations, SAMPLE_DATA_DIR
-        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> len(eqs_db)
-        274
-        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_equations
         if filepath is not None:
             self.load(filepath)
