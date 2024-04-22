@@ -16,29 +16,35 @@ ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, floa
 
 @cython.final
 cdef class Scalars(_AbstractDatabase):
+    """
+    IODE Scalars database. 
+
+    Attributes
+    ----------
+    iode_type: str
+    filename: str
+    description: str
+
+    Parameters
+    ----------
+    filepath: str, optional
+        file containing the IODE scalars to load.
+
+    Returns
+    -------
+    Scalars
+
+    Examples
+    --------
+    >>> from iode import Scalars, SAMPLE_DATA_DIR
+    >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
+    >>> len(scl_db)
+    161
+    """
+
     cdef CKDBScalars* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Scalars:
-        """
-        Get an instance of the IODE Scalars database. 
-        Load the IODE scalars from 'filepath' if given.
-
-        Parameters
-        ----------
-        filepath: str, optional
-            file containing the IODE scalars to load.
-
-        Returns
-        -------
-        Scalars
-
-        Examples
-        --------
-        >>> from iode import Scalars, SAMPLE_DATA_DIR
-        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> len(scl_db)
-        161
-        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_scalars
         if filepath is not None:
             self.load(filepath)
