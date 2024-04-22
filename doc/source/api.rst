@@ -192,6 +192,13 @@ SCALAR
 TABLE
 =====
 
+.. autosummary::
+   :toctree: _generated
+
+   Table
+
+   Table.nb_lines
+   Table.nb_columns
 
 ****
 TIME
