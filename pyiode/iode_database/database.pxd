@@ -4,11 +4,15 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode.common cimport EnumIodeType, EnumIodeVarMode, EnumSimulationInitialization
+from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, EnumIodeEquationTest, 
+                            EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
+                            EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
+                            EnumIodeVarMode, EnumSimulationInitialization)
 from pyiode.period cimport CPeriod
 from pyiode.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.scalar cimport CScalar
+from pyiode.objects.table cimport CTable
 
 
 cdef extern from "api/iode.h":
@@ -157,6 +161,31 @@ cdef extern from "cpp_api/KDB/kdb_scalars.h":
 
     # Define the global Scalars instance
     cdef KDBScalars Scalars
+
+
+cdef extern from "cpp_api/KDB/kdb_tables.h":
+    cdef cppclass KDBTables(KDBTemplate[string]):
+        # Constructor
+        KDBTables(string& filepath) except +
+
+        # Public methods
+        KDBTables* subset(string& pattern, bool deep_copy) except +
+        CTable get(string& name) except +
+        CTable copy(string& name) except +
+        int add(string name, CTable& table) except +
+        int add(string name, int nb_columns) except +
+        int add(string name, int nbColumns, string def_, vector[string] vars, 
+                bool mode=False, bool files=False, bool date=False) except +
+        int add(string name, int nbColumns, string def_, vector[string] titles, 
+                vector[string] lecs, bool mode=False, bool files=False, bool date=False) except +
+        int add(string name, int nbColumns, string def_, string lecs, bool mode=False, 
+                bool files=False, bool date=False) except +
+        void update(string& name, CTable& table) except +
+    
+    size_t hash_value(KDBTables&) except +
+
+    # Define the global Tables instance
+    cdef KDBTables Tables
 
 
 cdef extern from "cpp_api/KDB/kdb_variables.h":

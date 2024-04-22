@@ -28,7 +28,7 @@ from .iode_python import Period, Sample, periodicities
 from .iode_python import Equation, List, Scalar, Table
 
 # IODE databases
-from .iode_python import Comments, Equations, Identities, Lists, Scalars, Variables 
+from .iode_python import Comments, Equations, Identities, Lists, Scalars, Tables, Variables 
 
 # Reports
 
@@ -73,7 +73,7 @@ __all__ = [
     'Equation', 'List', 'Scalar', 'Table'
     
     # IODE databases
-    'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Variables', 
+    'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables', 
 
     # Reports
 
