@@ -67,7 +67,7 @@ cdef class Scalars(_AbstractDatabase):
     def _get_object(self, key):
         if not isinstance(key, str):
             raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+                            f"but got value of type {type(key).__name__}")
         key = key.strip()
 
         cdef CScalar c_scalar = self.database_ptr.get(key.encode())
@@ -78,7 +78,7 @@ cdef class Scalars(_AbstractDatabase):
     def _set_object(self, key, value):
         if not isinstance(key, str):
             raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                "but got value of type {type(filepath).__name__}")
+                            f"but got value of type {type(key).__name__}")
         key = key.strip()
         
         if isinstance(value, int):
