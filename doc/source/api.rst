@@ -26,6 +26,10 @@ WORKSPACE
    :toctree: _generated
    :template: database_methods.rst
 
+   Database.iode_type
+   Database.filename
+   Database.description
+
    Database.load
    Database.save
    Database.clear
@@ -60,7 +64,7 @@ Comments
 .. autosummary::
    :toctree: _generated
 
-   Comments.__init__ 
+   Comments 
 
 =========
 Equations
@@ -69,7 +73,7 @@ Equations
 .. autosummary::
    :toctree: _generated
 
-   Equations.__init__ 
+   Equations 
 
 ==========
 Identities
@@ -78,7 +82,7 @@ Identities
 .. autosummary::
    :toctree: _generated
 
-   Identities.__init__
+   Identities
    Identities.execute 
 
 =====
@@ -88,7 +92,7 @@ Lists
 .. autosummary::
    :toctree: _generated
 
-   Lists.__init__
+   Lists
 
 =======
 Scalars
@@ -97,7 +101,7 @@ Scalars
 .. autosummary::
    :toctree: _generated
 
-   Scalars.__init__
+   Scalars
 
 ======
 Tables
@@ -119,12 +123,14 @@ Variables
 .. autosummary::
    :toctree: _generated
 
-   Variables.__init__
+   Variables
+
    Variables.mode
    Variables.sample
    Variables.nb_periods
    Variables.periods
    Variables.periods_as_float
+   
    Variables.periods_subset
    Variables.extrapolate
    Variables.seasonal_adjustment
@@ -153,7 +159,8 @@ EQUATION
 .. autosummary::
    :toctree: _generated
 
-   Equation.__init__
+   Equation
+
    Equation.lec
    Equation.sample
    Equation.method
@@ -161,16 +168,7 @@ EQUATION
    Equation.block
    Equation.instruments
    Equation.tests
-   Equation.test_stdev
-   Equation.test_meany
-   Equation.test_ssres
-   Equation.test_stderr
-   Equation.test_fstat
-   Equation.test_r2
-   Equation.test_r2adj
-   Equation.test_dw
-   Equation.test_loglik
-   Equation.data
+
    Equation.get_coefficients_list
    Equation.get_date_format  
    Equation.get_variables_list
@@ -293,7 +291,6 @@ LARRAY
    larray_to_ws
    ws_to_larray
    ws_load_var_to_larray
-   larray_get_sample
 
 
 *************
