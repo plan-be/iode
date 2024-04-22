@@ -9,44 +9,44 @@ from pyiode.objects.scalar cimport hash_value as hash_value_scl
 # Scalar wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 cdef class Scalar:
+    """
+    An IODE scalar represents the parameters of an equation that can be estimated.
+    It is represented by 'value' value, a 'relax' value and a standard deviation ('std') value.
+
+    Attributes
+    ----------
+    value: float
+    relax: float
+    std: float
+
+    Parameters
+    ----------
+    value: float
+        value of the scalar. Defaults to 0.9.
+    relax: float
+        relax value of the scalar. The value must be between 0.0 and 1.0.
+        Defaults to 1.0
+
+    Examples
+    --------
+    >>> from iode import Scalar
+    >>> # default scalar
+    >>> scalar = Scalar()
+    >>> scalar
+    Scalar(0.9, 1, nan)
+    >>> # default relax
+    >>> scalar = Scalar(0.5)
+    >>> scalar
+    Scalar(0.5, 1, nan)
+    >>> # specific value and relax
+    >>> scalar = Scalar(0.5, 0.8)
+    >>> scalar
+    Scalar(0.5, 0.8, nan)
+    """
 
     cdef CScalar c_scalar
 
-    def __init__(self, value: float = 0.9, relax: float = 1.0) -> Scalar:
-        """
-        An IODE scalar represents the parameters of an equation that can be estimated.
-        It is represented by 'value' value, a 'relax' value and a standard deviation ('std') value.
-
-        Attributes
-        ----------
-        value: float
-        relax: float
-        std: float
-
-        Parameters
-        ----------
-        value: float
-            value of the scalar. Defaults to 0.9.
-        relax: float
-            relax value of the scalar. The value must be between 0.0 and 1.0.
-            Defaults to 1.0
-
-        Examples
-        --------
-        >>> from iode import Scalar
-        >>> # default scalar
-        >>> scalar = Scalar()
-        >>> scalar
-        Scalar(0.9, 1, nan)
-        >>> # default relax
-        >>> scalar = Scalar(0.5)
-        >>> scalar
-        Scalar(0.5, 1, nan)
-        >>> # specific value and relax
-        >>> scalar = Scalar(0.5, 0.8)
-        >>> scalar
-        Scalar(0.5, 0.8, nan)
-        """
+    def __cinit__(self, value: float = 0.9, relax: float = 1.0) -> Scalar:
         if not isinstance(value, float):
             raise TypeError("Expected value of type 'float' for the argument 'value'.\n" +
                 "Got value of type '" + type(value).__name__ + "'")
