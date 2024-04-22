@@ -14,29 +14,35 @@ from pyiode.iode_database.database cimport Comments as cpp_global_comments
 
 @cython.final
 cdef class Comments(_AbstractDatabase):
+    """
+    IODE Comments database. 
+
+    Attributes
+    ----------
+    iode_type: str
+    filename: str
+    description: str
+
+    Parameters
+    ----------
+    filepath: str, optional
+        file containing the IODE comments to load.
+
+    Returns
+    -------
+    Comments
+
+    Examples
+    --------
+    >>> from iode import Comments, SAMPLE_DATA_DIR
+    >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    >>> len(cmt_db)
+    317
+    """
+
     cdef CKDBComments* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Comments:
-        """
-        Get an instance of the IODE Comments database. 
-        Load the IODE comments from 'filepath' if given.
-
-        Parameters
-        ----------
-        filepath: str, optional
-            file containing the IODE comments to load.
-
-        Returns
-        -------
-        Comments
-
-        Examples
-        --------
-        >>> from iode import Comments, SAMPLE_DATA_DIR
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
-        317
-        """
         self.database_ptr = self.abstract_db_ptr = &cpp_global_comments
         if filepath is not None:
             self.load(filepath)
