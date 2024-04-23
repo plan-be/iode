@@ -7,7 +7,8 @@ from libcpp cimport bool
 from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, EnumIodeEquationTest, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization)
+                            EnumIodeVarMode, EnumSimulationInitialization, EnumIodeLtoH, 
+                            EnumIodeHtoL)
 from pyiode.period cimport CPeriod
 from pyiode.sample cimport CSample
 from pyiode.objects.equation cimport CEquation

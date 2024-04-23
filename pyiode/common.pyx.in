@@ -1,16 +1,19 @@
 # distutils: language = c++
 
-from typing import List
+from typing import List, Dict
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.map cimport map
 
 from pyiode.common cimport L_NAN, I_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, EnumIodeEquationTest, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization)
-from pyiode.common cimport vIodeTypes, vLangs, v_eq_methods, v_var_modes, v_simulation_initialization
+                            EnumIodeVarMode, EnumSimulationInitialization, EnumIodeLtoH, 
+                            EnumIodeHtoL)
+from pyiode.common cimport (vIodeTypes, vLangs, v_eq_methods, v_var_modes, v_simulation_initialization, 
+                            mLowToHigh)
 
 try:
     import pandas as pd
@@ -29,8 +32,15 @@ except ImportError:
     Axis = Any
 
 
+# The function below exists because Cython seems to refuse to iterate over 
+# a const std container except in a function or method
 def _cpp_string_vector_to_py(vector[string] vec) -> List[str]:
     return [value.decode() for value in vec]
+
+# The function below exists because Cython seems to refuse to iterate over 
+# a const std container except in a function or method
+def _cpp_char_string_map_to_py(map[char, string] c_map) ->Dict[str, str]:
+    return {chr(item.first): item.second.decode() for item in c_map}
 
 
 # VERSION
@@ -155,3 +165,28 @@ SIMU_INIT_TM1_NA: int = EnumSimulationInitialization.IV_INIT_TM1_NA
 SIMU_INIT_EXTRA_NA: int = EnumSimulationInitialization.IV_INIT_EXTRA_NA
 
 SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)
+
+LTOH_STOCK: int = EnumIodeLtoH.LTOH_STOCK
+LTOH_FLOW: int = EnumIodeLtoH.LTOH_FLOW
+
+LTOH_LIN: str = 'L'
+LTOH_CS: str = 'C'
+LTOH_STEP: str = 'S'
+
+HTOL_LAST: int = EnumIodeHtoL.HTOL_LAST
+HTOL_MEAN: int = EnumIodeHtoL.HTOL_MEAN
+HTOL_SUM: int = EnumIodeHtoL.HTOL_SUM 
+
+LOW_TO_HIGH_DICT: Dict[str, str] = _cpp_char_string_map_to_py(mLowToHigh)
+
+SORT_CONNEX: int = 0
+SORT_BOTH: int = 1
+SORT_NONE: int = 2
+
+W_GDI: int = 1
+W_A2M: int = 7
+W_MIF: int = 6
+W_HTML: int = 5
+W_RTF: int = 4
+W_CSV: int = 8
+W_DUMMY: int = 9

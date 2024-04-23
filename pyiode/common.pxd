@@ -1,5 +1,6 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.map cimport map
 
 
 cdef extern from "api/iode.h":
@@ -107,6 +108,18 @@ cdef extern from "cpp_api/objects/table.h":
         IG_LOG,
         IG_SEMILOG,
         IG_PERCENT
+
+cdef extern from "cpp_api/KDB/kdb_global.h":
+    cdef enum EnumIodeLtoH:
+        LTOH_STOCK,
+        LTOH_FLOW
+
+    cdef enum EnumIodeHtoL:
+        HTOL_LAST,
+        HTOL_MEAN,
+        HTOL_SUM 
+
+    cdef map[char, string] mLowToHigh
 
 cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef enum EnumIodeVarMode:

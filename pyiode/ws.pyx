@@ -4,7 +4,7 @@ import warnings
 from ws cimport B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow
 
 
-def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = K_VAR) -> List[str]:
+def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = VARIABLES) -> List[str]:
     if obj_type == 0:
         ws_content_cmt(pattern)
     elif obj_type == 1:
