@@ -140,7 +140,7 @@ _deprecated = [
     'delete_obj', 'delete_objects', 'delete_cmt', 'delete_eqs', 'delete_idt', 'delete_lst', 'delete_scl', 'delete_tbl', 'delete_var', 
     
     'idt_execute', 'eqs_estimate', 
-    'ws_htol', 'ws_htol_last', 'ws_htol_mean', 'ws_htol_sum','ws_ltoh', 'ws_ltoh_flow', 'ws_ltoh_stock', 
+    'ws_htol', 'ws_htol_last', 'ws_htol_mean', 'ws_htol_sum', 'ws_ltoh', 'ws_ltoh_flow', 'ws_ltoh_stock', 
 
     # Reports
     'report_exec', 'reportline_exec',
