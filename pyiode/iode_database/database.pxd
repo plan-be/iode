@@ -32,6 +32,10 @@ cdef extern from "api/iode.h":
 #               from derived cimport DerivedRealName as Derived   
 #            https://stackoverflow.com/a/23455514
 
+cdef extern from "cpp_api/KDB/kdb_global.h":
+    void low_to_high(EnumIodeLtoH type_, char method, string& filepath, string& var_list) except +
+    void high_to_low(EnumIodeHtoL type_, string& filepath, string& var_list) except +
+
 
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    

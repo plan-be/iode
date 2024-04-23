@@ -108,6 +108,7 @@ include "iode_database/lists_database.pyx"
 include "iode_database/scalars_database.pyx"
 include "iode_database/tables_database.pyx"
 include "iode_database/variables_database.pyx"
+include "iode_database/global_funcs_database.pyx"
 
 include "objs.pyx"
 include "ws.pyx"
