@@ -110,11 +110,7 @@ Tables
 .. autosummary::
    :toctree: _generated
 
-   ws_content_tbl
-   ws_clear_tbl
-   ws_load_tbl
-   ws_save_tbl
-   delete_tbl
+   Tables
 
 =========
 Variables
@@ -144,13 +140,6 @@ Variables
 ************
 IODE OBJECTS
 ************
-
-.. autosummary::
-   :toctree: _generated
-
-   delete_objects
-   delete_obj
-   data_update
 
 ========
 EQUATION
@@ -324,6 +313,10 @@ DEPRECATED
    ws_load
    ws_save
 
+   delete_objects
+   delete_obj
+   data_update
+
    ws_content_cmt
    ws_clear_cmt
    ws_load_cmt
@@ -348,6 +341,11 @@ DEPRECATED
    ws_clear_scl
    ws_load_scl
    ws_save_scl
+
+   ws_content_tbl
+   ws_clear_tbl
+   ws_load_tbl
+   ws_save_tbl
 
    ws_content_var
    ws_clear_var
@@ -380,6 +378,8 @@ DEPRECATED
    set_scl   
    data_update_scl
    delete_scl
+
+   delete_tbl
 
    get_var
    get_var_as_ndarray
