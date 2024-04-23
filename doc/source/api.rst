@@ -136,6 +136,16 @@ Variables
    Variables.from_array
    Variables.to_array
 
+=============
+Miscellaneous
+=============
+
+.. autosummary::
+   :toctree: _generated
+
+   low_to_high
+   high_to_low
+
 
 ************
 IODE OBJECTS
