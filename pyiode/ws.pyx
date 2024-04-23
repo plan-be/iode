@@ -1,7 +1,4 @@
-from collections.abc import Iterable
 import warnings
-
-from ws cimport B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow
 
 
 def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = VARIABLES) -> List[str]:
@@ -272,46 +269,51 @@ def ws_save_var(filename: str):
 
 # High to Low
 # -----------
-def ws_htol(filename: str, varlist, series_type: int):
-    varlist = _arg_to_str(varlist, sep = ' ')
-#    if isinstance(varlist, list):
-#        varlist = ' '.join(varlist)
 
-    arg = f"{filename} {varlist}"
+def ws_htol(filename: str, varlist, series_type: int):
     if series_type == HTOL_LAST:
-        if B_WsHtoLLast(_cstr(arg)):
-            raise RuntimeError(f"ws_htol_last() on file {filename} failed.")
+        ws_htol_last(filename, varlist)
     elif series_type == HTOL_MEAN:
-        if B_WsHtoLMean(_cstr(arg)):
-            raise RuntimeError(f"ws_htol_mean() on file {filename} failed.")
+        ws_htol_mean(filename, varlist)
+    elif series_type == HTOL_SUM:
+        ws_htol_sum(filename, varlist)
     else:
-        if B_WsHtoLSum(_cstr(arg)):
-            raise RuntimeError(f"ws_htol_sum() on file {filename} failed.")
+        raise ValueError("Wrong value for 'series_type'")
 
 def ws_htol_last(filename: str, varlist):
-    ws_htol(filename, varlist, HTOL_LAST)
+    warnings.warn("ws_ltoh_stock() is deprecated. " + 
+        "Please use the new syntax:\nhigh_to_low(HTOL_LAST, filepath, var_list)", DeprecationWarning)
+    high_to_low(HTOL_LAST, filename, varlist)
 
 def ws_htol_mean(filename: str, varlist):
-    ws_htol(filename, varlist, HTOL_MEAN)
+    warnings.warn("ws_htol_mean() is deprecated. " + 
+        "Please use the new syntax:\nhigh_to_low(HTOL_MEAN, filepath, var_list)", DeprecationWarning)
+    high_to_low(HTOL_MEAN, filename, varlist)
 
 def ws_htol_sum(filename: str, varlist):
-    ws_htol(filename, varlist, HTOL_SUM)
+    warnings.warn("ws_htol_sum() is deprecated. " + 
+        "Please use the new syntax:\nhigh_to_low(HTOL_SUM, filepath, var_list)", DeprecationWarning)
+    high_to_low(HTOL_SUM, filename, varlist)
 
 
 # Low to High
 # -----------
 def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
-    varlist = _arg_to_str(varlist, sep = ' ')
-    arg = f"{method} {filename} {varlist}"
+    if isinstance(method, int):
+        method = chr(method)
     if series_type == LTOH_FLOW:
-        if B_WsLtoHFlow(_cstr(arg)):
-            raise RuntimeError(f"ws_ltoh_flow() on file {filename} failed.")
+        ws_ltoh_flow(filename, varlist, method)
+    elif series_type == LTOH_STOCK:
+        ws_ltoh_stock(filename, varlist, method)
     else:
-        if B_WsLtoHStock(_cstr(arg)):
-            raise RuntimeError(f"ws_ltoh_stock() on file {filename} failed.")
+        raise ValueError("Wrong value for 'series_type'")
 
 def ws_ltoh_flow(filename: str, varlist, method: Union[int, str] = LTOH_CS):
-    ws_ltoh(filename, varlist, LTOH_FLOW, method)
+    warnings.warn("ws_ltoh_flow() is deprecated. " + 
+        "Please use the new syntax:\nlow_to_high(LTOH_FLOW, method, filepath, var_list)", DeprecationWarning)
+    low_to_high(LTOH_FLOW, method, filename, varlist)
 
 def ws_ltoh_stock(filename: str, varlist, method: Union[int, str] = LTOH_CS):
-    ws_ltoh(filename, varlist, LTOH_STOCK, method)
+    warnings.warn("ws_ltoh_stock() is deprecated. " + 
+        "Please use the new syntax:\nlow_to_high(LTOH_STOCK, method, filepath, var_list)", DeprecationWarning)
+    low_to_high(LTOH_STOCK, method, filename, varlist)
