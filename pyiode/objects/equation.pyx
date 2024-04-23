@@ -429,7 +429,7 @@ cdef class Equation:
     @property
     def tests(self) -> Dict[str, float]:
         cdef map[string, float] cpp_tests = self.c_equation.get_tests_as_map()
-        return {item.first.encode(): item.second for item in cpp_tests}
+        return {item.first.decode(): item.second for item in cpp_tests}
 
     @property
     def date(self) -> str:
