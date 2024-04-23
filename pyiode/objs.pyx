@@ -1,10 +1,8 @@
 import numpy as np
 import warnings
 
-from objs cimport IodeDeleteObj
 
-
-def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
+def delete_objects(pattern: str = '*', obj_type: int = VARIABLES):
     from iode import ws_content
     names = ws_content(pattern, obj_type)
     for name in names:
@@ -62,15 +60,17 @@ def delete_scl(name: str):
     del scl_db[name]
 
 def delete_tbl(name: str):
-    if IodeDeleteObj(_cstr(name), K_TBL): 
-        raise RuntimeError(f"Variable {name} cannot be deleted")
+    warnings.warn("delete_tbl() is deprecated. " + 
+        "Please use the new syntax:\ntbl_db = Tables()\n del tbl_db[name]", DeprecationWarning)
+    tbl_db = Tables()
+    del tbl_db[name]
 
 def delete_var(name: str):
     warnings.warn("delete_var() is deprecated. " + 
         "Please use the new syntax: del var_db[name]", DeprecationWarning)
     var_db = Variables()
     del var_db[name]
-   
+
 # Set and Get IODE objects
 # ------------------------
 

@@ -1,51 +1,8 @@
 from collections.abc import Iterable
 import warnings
 
-from ws cimport (IodeLoad, IodeSave, IodeClearWs, IodeContents, 
-                B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow)
-from iode_python cimport free_tbl
+from ws cimport B_WsHtoLLast, B_WsHtoLMean, B_WsHtoLSum, B_WsLtoHStock, B_WsLtoHFlow
 
-# TODO: rewrite IodeContents with regex or a better algorithm because K_grep() is VERY slow for large databases
-
-
-def _ws_content_from_str(pattern: str = '*', objtype: int = 6) -> List[str]:
-    r"""Return the names of objects of a given type, satisfying a pattern specification.
-
-    Parameters
-    ----------
-    pattern: string
-        string containing wildcards characters like '*' or '?'.
-        Default '*', meaning "all objects".
-
-    objtype: int
-        IODE object type (0-6, 0 for comments...)
-        Default 6 for
-
-    Returns
-    -------
-    List[str]
-        List of object names
-    """
-    cdef char **cnt = IodeContents(_cstr(pattern), objtype)
-    cdef int nb
-
-    res = []
-    if cnt != NULL:
-        # nb = number of strings in cnt
-        nb = 0
-        while cnt[nb] != NULL:
-            nb = nb + 1
-        res = [None] * nb
-
-        # Assigns each C string to a value of the list res
-        nb = 0
-        while cnt[nb] != NULL:
-            s = bytes(cnt[nb])
-            res[nb] = _pystr(s)
-            nb = nb + 1
-
-    free_tbl(cnt)
-    return res
 
 def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = K_VAR) -> List[str]:
     if obj_type == 0:
@@ -99,18 +56,10 @@ def ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return scl_db.get_names(pattern)
 
 def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
-    if isinstance(pattern, str):
-        return(_ws_content_from_str(pattern, K_TBL))
-
-    elif isinstance(pattern, Iterable):
-        res = set()
-        for pattern_ in pattern:
-            res = res| set(_ws_content_from_str(pattern_, K_TBL))
-        res = list(res)
-        res.sort()
-        return res
-    else:
-        raise RuntimeError("ws_content() only accepts strings or list of strings")
+    warnings.warn("ws_content_tbl() is deprecated. " + 
+        "Please use the new syntax:\ntbl_db = Tables()\ntbl_db.get_names(pattern)", DeprecationWarning)
+    tbl_db = Tables()
+    return tbl_db.get_names(pattern)
 
 def ws_content_var(pattern: Union[str, List[str]] = '*') -> List[str]:
     warnings.warn("ws_content_var() is deprecated. " + 
@@ -181,8 +130,10 @@ def ws_clear_scl():
     scl_db.clear()
 
 def ws_clear_tbl():
-    if IodeClearWs(K_TBL):
-        raise RuntimeError(f"Workspace of type {K_TBL} cannot be cleared")
+    warnings.warn("ws_clear_tbl() is deprecated. " + 
+        "Please use the new syntax:\ntbl_db = Tables()\ntbl_db.clear()", DeprecationWarning)
+    tbl_db = Tables()
+    tbl_db.clear()
 
 def ws_clear_var():
     warnings.warn("ws_clear_var() is deprecated. " + 
@@ -238,10 +189,9 @@ def ws_load_scl(filename: str) -> int:
     return Scalars(filename) 
                 
 def ws_load_tbl(filename: str) -> int:
-    nb = IodeLoad(_cstr(filename), K_TBL)
-    if nb < 0:
-        raise RuntimeError(f"File {filename} of type {K_TBL} cannot be loaded")
-    return nb 
+    warnings.warn("ws_load_tbl() is deprecated. " + 
+        "Please use the new syntax:\ntbl_db = Tables(filepath)", DeprecationWarning)
+    return Tables(filename) 
                              
 def ws_load_var(filename: str) -> int:
     warnings.warn("ws_load_var() is deprecated. " + 
@@ -308,8 +258,10 @@ def ws_save_scl(filename: str):
 
 def ws_save_tbl(filename: str):
     '''Save the current table workspace'''
-    if IodeSave(_cstr(filename), K_TBL):
-        raise RuntimeError(f"Workspace of type {K_TBL} cannot be saved in file {filename}.")
+    warnings.warn("ws_save_tbl() is deprecated. " + 
+        "Please use the new syntax:\ntbl_db = Tables()\ntbl_db.save(filepath)", DeprecationWarning)
+    tbl_db = Tables()
+    tbl_db.save(filename)
 
 def ws_save_var(filename: str):
     warnings.warn("ws_save_var() is deprecated. " + 
