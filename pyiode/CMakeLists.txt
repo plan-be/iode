@@ -47,7 +47,7 @@ if(Python_FOUND)
                       DEPENDS iode_python.pyx s_pyiode.cpp
                       VERBATIM
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/s_pyiode.cpp ${CMAKE_CURRENT_BINARY_DIR}/s_pyiode.cpp
-                      COMMAND ${CYTHON} ${CMAKE_CURRENT_SOURCE_DIR}/iode_python.pyx -3 --verbose --cplus 
+                      COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_python.pyx -3 --verbose --cplus 
                       --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} 
                       --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
                       --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp)
