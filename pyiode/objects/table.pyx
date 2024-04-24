@@ -246,6 +246,191 @@ cdef class Table:
     def nb_columns(self) -> int:
         return <int>(self.c_table.nb_columns())
 
+    @property
+    def language(self) -> str:
+        f"""
+        Language.
+
+        Parameters
+        ----------
+        lang : int
+            Possible values are {LANG_ENGLISH} (LANG_ENGLISH), {LANG_DUTCH} (LANG_DUTCH) and 
+            {LANG_FRENCH} (LANG_FRENCH).
+
+        Examples
+        --------
+        >>> from iode import Table, LANG_ENGLISH, LANG_DUTCH, LANG_FRENCH
+        >>> table = Table()
+        >>> table.language
+        ''
+        >>> table.language = LANG_DUTCH
+        >>> table.language
+        'Dutch'
+        """
+        return self.c_table.get_language().encode()
+
+    @language.setter
+    def language(self, lang: int):
+        if not isinstance(lang, int):
+            raise TypeError(f"Expected value of type int. Got value of type {type(lang).__name__} instead")
+        if lang not in [LANG_ENGLISH, LANG_DUTCH, LANG_FRENCH]:
+            raise ValueError(f"The value for 'language' must be either {LANG_ENGLISH} (LANG_ENGLISH), "
+                             f"{LANG_DUTCH} (LANG_DUTCH) or {LANG_FRENCH} (LANG_FRENCH).\n"
+                             f"Got value {lang} instead.")
+        self.c_table.set_language(<EnumLang>lang)
+
+    @property
+    def gridx(self) -> str:
+        """
+        The gridx value of the table.
+
+        Parameters
+        ----------
+        gridx: str or int
+            Possible values are 'major'/GRAPH_GRID_MAJOR, 
+            'none'/GRAPH_GRID_NONE and 'minor'/GRAPH_GRID_MINOR.
+
+        Examples
+        --------
+        >>> from iode import Table, GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR
+        >>> table = Table()
+        >>> table.gridx
+        'major'
+        >>> table.gridx = GRAPH_GRID_NONE
+        >>> table.gridx
+        'none'
+        >>> table.gridx = 'minor'
+        >>> table.gridx
+        'minor'
+        """
+        return GRAPH_GRID_DICT[<int>(self.c_table.get_gridx())]
+
+    @gridx.setter
+    def gridx(self, gridx: Union[str, int]):
+        if not isinstance(gridx, (str, int)):
+            raise TypeError(f"Expected value of type str or int. Got value of type {type(gridx).__name__} instead")
+        if isinstance(gridx, str):
+            gridx = GRAPH_GRID_REV_DICT[gridx] if gridx in GRAPH_GRID_REV_DICT else -1
+        if gridx not in GRAPH_GRID_DICT:
+            raise ValueError(f"Possible values are {list(GRAPH_GRID_DICT.values())} or "
+                             f"[GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR].\n"
+                             f"Got value {gridx} instead.")
+        self.c_table.set_gridx(<EnumGraphGrid>gridx)
+
+    @property
+    def gridy(self) -> str:
+        """
+        The gridy value of the table.
+
+        Parameters
+        ----------
+        gridy: str or int
+            Possible values are 'major'/GRAPH_GRID_MAJOR, 
+            'none'/GRAPH_GRID_NONE and 'minor'/GRAPH_GRID_MINOR.
+
+        Examples
+        --------
+        >>> from iode import Table, GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR
+        >>> table = Table()
+        >>> table.gridy
+        'major'
+        >>> table.gridy = GRAPH_GRID_NONE
+        >>> table.gridy
+        'none'
+        >>> table.gridy = 'minor'
+        >>> table.gridy
+        'minor'
+        """
+        return GRAPH_GRID_DICT[<int>(self.c_table.get_gridy())]
+
+    @gridy.setter
+    def gridy(self, gridy: Union[str, int]):
+        if not isinstance(gridy, (str, int)):
+            raise TypeError(f"Expected value of type str or int. Got value of type {type(gridy).__name__} instead")
+        if isinstance(gridy, str):
+            gridy = GRAPH_GRID_REV_DICT[gridy] if gridy in GRAPH_GRID_REV_DICT else -1
+        if gridy not in GRAPH_GRID_DICT:
+            raise ValueError(f"Possible values are {list(GRAPH_GRID_DICT.values())} or "
+                             f"[GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR].\n"
+                             f"Got value {gridy} instead.")
+        self.c_table.set_gridy(<EnumGraphGrid>gridy)
+
+    @property
+    def graph_axis(self) -> str:
+        """
+        Graph axis of the table.
+
+        Parameters
+        ----------
+        axis : str or int
+            Possible values are 'values'/GRAPH_AXIS_VALUES, 'log'/GRAPH_AXIS_LOG, 
+            'semilog'/GRAPH_AXIS_SEMILOG, 'percent'/GRAPH_AXIS_PERCENT
+
+        Examples
+        --------
+        >>> from iode import Table, GRAPH_AXIS_VALUES, GRAPH_AXIS_LOG, GRAPH_AXIS_SEMILOG, GRAPH_AXIS_PERCENT
+        >>> table = Table()
+        >>> table.graph_axis
+        'values'
+        >>> table.graph_axis = GRAPH_AXIS_LOG
+        >>> table.graph_axis
+        'log'
+        >>> table.graph_axis = 'percent'
+        >>> table.graph_axis
+        'percent'
+        """
+        return GRAPH_AXIS_DICT[self.c_table.get_graph_axis()]
+
+    @graph_axis.setter
+    def graph_axis(self, axis: Union[str, int]):
+        if not isinstance(axis, (str, int)):
+            raise TypeError(f"Expected value of type str or int. Got value of type {type(axis).__name__} instead")
+        if isinstance(axis, str):
+            axis = GRAPH_AXIS_REV_DICT[axis] if axis in GRAPH_AXIS_REV_DICT else -1
+        if axis not in GRAPH_AXIS_DICT:
+            raise ValueError(f"Possible values are {list(GRAPH_AXIS_DICT.values())} or "
+                             f"[GRAPH_AXIS_VALUES, GRAPH_AXIS_LOG, GRAPH_AXIS_SEMILOG, GRAPH_AXIS_PERCENT].\n"
+                             f"Got value {axis} instead.")
+        self.c_table.set_graph_axis(<EnumGraphAxis>axis)
+
+    @property
+    def graph_alignment(self) -> str:
+        """
+        Graph alignment of the table.
+
+        Parameters
+        ----------
+        align : str or int
+            Possible values are 'left'/GRAPH_ALIGN_LEFT, 'center'/GRAPH_ALIGN_CENTER, 
+            'right'/GRAPH_ALIGN_RIGHT.
+
+        Examples
+        --------
+        >>> from iode import Table, GRAPH_ALIGN_LEFT, GRAPH_ALIGN_CENTER, GRAPH_ALIGN_RIGHT
+        >>> table = Table()
+        >>> table.graph_alignment
+        'left'
+        >>> table.graph_alignment = GRAPH_ALIGN_CENTER
+        >>> table.graph_alignment
+        'center'
+        >>> table.graph_alignment = 'right'
+        >>> table.graph_alignment
+        'right'
+        """
+        return GRAPH_ALIGN_DICT[<int>(self.c_table.get_graph_alignment())]
+
+    @graph_alignment.setter
+    def graph_alignment(self, align: Union[str, int]):
+        if not isinstance(align, (str, int)):
+            raise TypeError(f"Expected value of type str or int. Got value of type {type(align).__name__} instead")
+        if isinstance(align, str):
+            align = GRAPH_ALIGN_REV_DICT[align] if align in GRAPH_ALIGN_REV_DICT else -1
+        if align not in GRAPH_ALIGN_DICT:
+            raise ValueError(f"Possible values are {list(GRAPH_ALIGN_DICT.values())} or "
+                             f"[GRAPH_ALIGN_LEFT, GRAPH_ALIGN_CENTER, GRAPH_ALIGN_RIGHT].\n"
+                             f"Got value {align} instead.")
+        self.c_table.set_graph_alignment(<EnumGraphAlign>align)
+
     def __str__(self) -> str:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
