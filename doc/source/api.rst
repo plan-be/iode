@@ -198,6 +198,19 @@ TABLE
 
    Table.nb_lines
    Table.nb_columns
+   Table.language
+   Table.gridx
+   Table.gridy
+   Table.graph_axis
+   Table.graph_alignment
+   
+   Table.index
+   Table.insert
+   Table.__len__
+   Table.__getitem__
+   Table.__setitem__
+   Table.__delitem__
+   Table.__iadd__
 
 ****
 TIME
