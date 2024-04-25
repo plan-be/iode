@@ -94,23 +94,26 @@ EQ_NB_TESTS: int = EQS_NBTESTS
 CELL_TYPE_LEC: int = EnumCellType.IT_LEC
 CELL_TYPE_STRING: int = EnumCellType.IT_STRING
 
-CELL_TYPE_DICT = {"LEC": CELL_TYPE_LEC, "STRING": CELL_TYPE_STRING}
+CELL_TYPE_DICT = {CELL_TYPE_LEC: "LEC", CELL_TYPE_STRING: "STRING"}
+CELL_TYPE_REV_DICT = {value: key for key, value in CELL_TYPE_DICT.items()}
 
 CELL_FONT_NORMAL: int = EnumCellFont.IT_NORMAL
 CELL_FONT_BOLD: int = EnumCellFont.IT_BOLD
 CELL_FONT_ITALIC: int = EnumCellFont.IT_ITALIC
 CELL_FONT_UNDERLINE: int = EnumCellFont.IT_UNDERLINE
 
-CELL_FONT_DICT = {"normal": CELL_FONT_NORMAL, "bold": CELL_FONT_BOLD, 
-                  "italic": CELL_FONT_ITALIC, "underline": CELL_FONT_UNDERLINE}
+CELL_FONT_DICT = {CELL_FONT_NORMAL: "normal", CELL_FONT_BOLD: "bold", 
+                  CELL_FONT_ITALIC: "italic", CELL_FONT_UNDERLINE: "underline"}
+CELL_FONT_REV_DICT = {value: key for key, value in CELL_FONT_DICT.items()}
 
 CELL_ALIGN_CENTER: int = EnumCellAlign.IT_CENTER
 CELL_ALIGN_LEFT: int = EnumCellAlign.IT_LEFT
 CELL_ALIGN_RIGHT: int = EnumCellAlign.IT_RIGHT
 CELL_ALIGN_DECIMAL: int = EnumCellAlign.IT_DECIMAL
 
-CELL_ALIGN_DICT = {"center": CELL_ALIGN_CENTER, "left": CELL_ALIGN_LEFT, 
-                   "right": CELL_ALIGN_RIGHT, "decimal": CELL_ALIGN_DECIMAL}
+CELL_ALIGN_DICT = {CELL_ALIGN_CENTER: "center", CELL_ALIGN_LEFT: "left", 
+                   CELL_ALIGN_RIGHT: "right", CELL_ALIGN_DECIMAL: "decimal"}
+CELL_ALIGN_REV_DICT = {value: key for key, value in CELL_ALIGN_DICT.items()}
 
 LINE_TYPE_FILES: int = EnumLineType.IT_FILES
 LINE_TYPE_MODE: int = EnumLineType.IT_MODE
@@ -119,34 +122,39 @@ LINE_TYPE_LINE: int = EnumLineType.IT_LINE
 LINE_TYPE_TITLE: int = EnumLineType.IT_TITLE
 LINE_TYPE_DATE: int = EnumLineType.IT_DATE
 
-LINE_TYPE_DICT = {"FILES": LINE_TYPE_FILES, "MODE": LINE_TYPE_MODE, "CELL": LINE_TYPE_CELL, 
-                  "LINE": LINE_TYPE_LINE, "TITLE": LINE_TYPE_TITLE, "DATE": LINE_TYPE_DATE}
+LINE_TYPE_DICT = {LINE_TYPE_FILES: "FILES", LINE_TYPE_MODE: "MODE", LINE_TYPE_CELL: "CELL", 
+                  LINE_TYPE_LINE: "LINE", LINE_TYPE_TITLE: "TITLE", LINE_TYPE_DATE: "DATE"}
+LINE_TYPE_REV_DICT = {value: key for key, value in LINE_TYPE_DICT.items()}
 
 GRAPH_TYPE_LINE: int = EnumGraphType.IG_LINE
 GRAPH_TYPE_SCATTER: int = EnumGraphType.IG_SCATTER
 GRAPH_TYPE_BAR: int = EnumGraphType.IG_BAR
 
-GRAPH_TYPE_DICT = {"line": GRAPH_TYPE_LINE, "scatter": GRAPH_TYPE_SCATTER, "bar": GRAPH_TYPE_BAR}
+GRAPH_TYPE_DICT = {GRAPH_TYPE_LINE: "line", GRAPH_TYPE_SCATTER: "scatter", GRAPH_TYPE_BAR: "bar"}
+GRAPH_TYPE_REV_DICT = {value: key for key, value in GRAPH_TYPE_DICT.items()}
 
 GRAPH_GRID_MAJOR: int = EnumGraphGrid.IG_MAJOR
 GRAPH_GRID_NONE: int = EnumGraphGrid.IG_NONE
 GRAPH_GRID_MINOR: int = EnumGraphGrid.IG_MINOR
 
-GRAPH_GRID_DICT = {"major": GRAPH_GRID_MAJOR, "none": GRAPH_GRID_NONE, "minor": GRAPH_GRID_MINOR}
+GRAPH_GRID_DICT = {GRAPH_GRID_MAJOR: "major", GRAPH_GRID_NONE: "none", GRAPH_GRID_MINOR: "minor"}
+GRAPH_GRID_REV_DICT = {value: key for key, value in GRAPH_GRID_DICT.items()}
 
 GRAPH_ALIGN_LEFT: int = EnumGraphAlign.IG_LEFT
 GRAPH_ALIGN_CENTER: int = EnumGraphAlign.IG_CENTER
 GRAPH_ALIGN_RIGHT: int = EnumGraphAlign.IG_RIGHT
 
-GRAPH_ALIGN_DICT = {"left": GRAPH_ALIGN_LEFT, "center": GRAPH_ALIGN_CENTER, "right": GRAPH_ALIGN_RIGHT}
+GRAPH_ALIGN_DICT = {GRAPH_ALIGN_LEFT: "left", GRAPH_ALIGN_CENTER: "center", GRAPH_ALIGN_RIGHT: "right"}
+GRAPH_ALIGN_REV_DICT = {value: key for key, value in GRAPH_ALIGN_DICT.items()}
 
 GRAPH_AXIS_VALUES: int = EnumGraphAxis.IG_VALUES
 GRAPH_AXIS_LOG: int = EnumGraphAxis.IG_LOG
 GRAPH_AXIS_SEMILOG: int = EnumGraphAxis.IG_SEMILOG
 GRAPH_AXIS_PERCENT: int = EnumGraphAxis.IG_PERCENT
 
-GRAPH_AXIS_DICT = {"values": GRAPH_AXIS_VALUES, "log": GRAPH_AXIS_LOG, 
-                   "semilog": GRAPH_AXIS_SEMILOG, "percent": GRAPH_AXIS_PERCENT}
+GRAPH_AXIS_DICT = {GRAPH_AXIS_VALUES: "values", GRAPH_AXIS_LOG: "log", 
+                   GRAPH_AXIS_SEMILOG: "semilog", GRAPH_AXIS_PERCENT: "percent"}
+GRAPH_AXIS_REV_DICT = {value: key for key, value in GRAPH_AXIS_DICT.items()}
 
 VAR_MODE_LEVEL: int = EnumIodeVarMode.I_VAR_MODE_LEVEL
 VAR_MODE_DIFF: int = EnumIodeVarMode.I_VAR_MODE_DIFF
