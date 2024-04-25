@@ -11,8 +11,6 @@ from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
 
 
-_LINE_TYPE_REVERSE_DICT = {value: key for key, value in LINE_TYPE_DICT.items()}
-
 # Table wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 cdef class Table:
@@ -289,10 +287,10 @@ cdef class Table:
             if line_type == LINE_TYPE_TITLE:
                 # remove newline characters
                 content = ''.join(line[1].splitlines())
-                s += _LINE_TYPE_REVERSE_DICT[line_type].ljust(5) + " | " + content.center(table_length)
+                s += LINE_TYPE_DICT[line_type].ljust(5) + " | " + content.center(table_length)
             elif line_type == LINE_TYPE_CELL:
                 # i == 0 -> divider line
-                s += "DIVIS" if i == 0 else _LINE_TYPE_REVERSE_DICT[line_type].ljust(5)
+                s += "DIVIS" if i == 0 else LINE_TYPE_DICT[line_type].ljust(5)
                 line = line[1:]
                 for j in range(nb_cols):
                     s += " | "
@@ -312,7 +310,7 @@ cdef class Table:
             elif line_type == LINE_TYPE_LINE:
                 s += '-' * 5 + " | " + '-' * table_length
             else:
-                s += _LINE_TYPE_REVERSE_DICT[line_type].ljust(5) + " | "
+                s += LINE_TYPE_DICT[line_type].ljust(5) + " | "
             s += "\n"
         
         return s
