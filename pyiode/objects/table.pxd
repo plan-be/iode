@@ -105,33 +105,33 @@ cdef extern from "cpp_api/objects/table.h":
 
         # Lines
         CTableLine* get_line(int row) except +
-        CTableLine* insert_line(int pos, EnumLineType line_type, bint after=True) except +
+        CTableLine* insert_line(int pos, EnumLineType line_type, bint after) except +
         CTableLine* get_divider_line() except +
 
         # Title
-        CTableLine* insert_title(int pos, string& title, bint after=True) except +
+        CTableLine* insert_title(int pos, string& title, bint after) except +
         CTableLine* add_title(string& title) except +
         string get_title(int row) except +
         void set_title(int row, string& title) except +
 
         # Cells
-        CTableLine* insert_line_with_cells(int pos, bint after=True) except +
+        CTableLine* insert_line_with_cells(int pos, bint after) except +
         CTableLine* add_line_with_cells() except +
 
         # Separator
-        CTableLine* insert_line_separator(int pos, bint after=True) except +
+        CTableLine* insert_line_separator(int pos, bint after) except +
         CTableLine* add_line_separator() except +
 
         # Mode
-        CTableLine* insert_line_mode(int pos, bint after=True) except +
+        CTableLine* insert_line_mode(int pos, bint after) except +
         CTableLine* add_line_mode() except +
 
         # Files
-        CTableLine* insert_line_files(int pos, bint after=True) except +
+        CTableLine* insert_line_files(int pos, bint after) except +
         CTableLine* add_line_files() except +
 
         # Date
-        CTableLine* insert_line_date(int pos, bint after=True) except +
+        CTableLine* insert_line_date(int pos, bint after) except +
         CTableLine* add_line_date() except +
 
         # Free
