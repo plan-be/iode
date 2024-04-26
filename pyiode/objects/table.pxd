@@ -52,7 +52,6 @@ cdef extern from "cpp_api/objects/table.h":
 
         # Getters and Setters
         EnumLineType get_line_type()
-        void set_line_type(EnumLineType line_type) except +
 
         EnumGraphType get_line_graph()
         void set_line_graph(EnumGraphType graph_type) except +

@@ -777,6 +777,14 @@ cdef class _AbstractDatabase:
         FILES |
         DATE  |
         <BLANKLINE>
+        nb lines: 19
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>        
 
         Variables
 
@@ -967,7 +975,7 @@ cdef class _AbstractDatabase:
 
         Tables
 
-        >>> from iode import Tables
+        >>> from iode import Tables, Table
         >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
 
         >>> # -- new table --
@@ -994,6 +1002,14 @@ cdef class _AbstractDatabase:
         MODE  |
         FILES |
         DATE  |
+        <BLANKLINE>
+        nb lines: 16
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
         <BLANKLINE>
 
         >>> # 2. specify list of variables
@@ -1027,6 +1043,110 @@ cdef class _AbstractDatabase:
         MODE  |
         FILES |
         DATE  |
+        <BLANKLINE>
+        nb lines: 25
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+
+        >>> # -- update table --
+        >>> table = tbl_db["TABLE_LECS"]
+        >>> table                   # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1              |
+        TITLE |         "New Table"
+        ----- | ----------------------------
+        CELL  | ""             |     "#S"
+        ----- | ----------------------------
+        CELL  | "GOSG:"        |        GOSG
+        CELL  | "YDTG:"        |        YDTG
+        CELL  | "DTH:"         |         DTH
+        CELL  | "DTF:"         |         DTF
+        CELL  | "IT:"          |          IT
+        CELL  | "YSSG+COTRES:" | YSSG+COTRES
+        CELL  | "RIDG:"        |        RIDG
+        CELL  | "OCUG:"        |        OCUG
+        ----- | ----------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 16
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+
+        >>> # set graph axis type
+        >>> table.graph_axis = 'semilog'
+        >>> # print last line
+        >>> table[-1]
+        <DATE>
+        >>> # delete last line
+        >>> del table[-1]
+        >>> # get index of line containing YSSG+COTRES
+        >>> index = table.index("YSSG+COTRES")
+        >>> table[index]
+        ('"YSSG+COTRES:"', 'YSSG+COTRES')
+        >>> # get line type
+        >>> table[index].line_type
+        'CELL'
+        >>> # get line graph type
+        >>> table[index].graph_type
+        'line'
+        >>> # know if axis is left
+        >>> table[index].axis_left
+        True
+        >>> # update cells
+        >>> # double quotes "    -> STRING cell
+        >>> # no double quotes " -> LEC cell
+        >>> table[index] = ('"YSSG:"', 'YSSG')
+        >>> table[index]
+        ('"YSSG:"', 'YSSG')
+        >>> # insert a new title line surrounded by two separator lines
+        >>> table.insert(index, '-')
+        >>> table.insert(index + 1, "New Title")
+        >>> table.insert(index + 2, '-')
+        >>> # append a new sepatator line
+        >>> table += '-'
+
+        >>> # warning: do not forget to actually update the IODE Table database  
+        >>> tbl_db["TABLE_LECS"] = table
+        >>> tbl_db["TABLE_LECS"]                # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1       |
+        TITLE |  "New Table"
+        ----- | --------------
+        CELL  | ""      | "#S"
+        ----- | --------------
+        CELL  | "GOSG:" | GOSG
+        CELL  | "YDTG:" | YDTG
+        CELL  | "DTH:"  |  DTH
+        CELL  | "DTF:"  |  DTF
+        CELL  | "IT:"   |   IT
+        CELL  | "YSSG:" | YSSG
+        ----- | --------------
+        TITLE |  "New Title"
+        ----- | --------------
+        CELL  | "RIDG:" | RIDG
+        CELL  | "OCUG:" | OCUG
+        ----- | --------------
+        MODE  |
+        FILES |
+        ----- | --------------
+        <BLANKLINE>
+        nb lines: 19
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'semilog'
+        graph_alignment: 'left'
         <BLANKLINE>
 
         Variables
