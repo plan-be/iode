@@ -23,6 +23,12 @@ def test_cython_iode():
         if doc is not None:
             iode.__test__[name] = doc
 
+    from iode.iode_python import TableLine
+    for name_, value_ in inspect.getmembers(TableLine):
+        doc = inspect.getdoc(value_)
+        if doc is not None:
+            iode.__test__[f'TableLine.{name_}'] = doc 
+
     # run doctests
     failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
     assert failure_count == 0
