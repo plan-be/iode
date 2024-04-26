@@ -12,6 +12,281 @@ from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
 
 
+# TableCell wrapper class
+# see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
+# see also https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+cdef class TableCell:
+    """
+    IODE Table cell.
+
+    Attributes
+    ----------
+    cell_type: int
+        Type of cell content. Possible value is 'STRING' or 'LEC'.
+    align: int
+        Alignment of the text in the cell. Possible values are 'center', 'left', 'right', 'decimal' or 
+        CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.
+    bold: bool
+    italic: bool
+    underline: bool
+
+    Examples
+    --------
+    >>> from iode import SAMPLE_DATA_DIR
+    >>> from iode import Tables, Table
+    >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> table = tbl_db["ANAPRIX"]
+    >>> table           # doctest: +NORMALIZE_WHITESPACE
+    DIVIS | 1                            |
+    TITLE |                        "Analyse des prix"
+    ----- | ---------------------------------------------------------------
+    CELL  | ""                           |               "#s"
+    ----- | ---------------------------------------------------------------
+    CELL  | "GAP_"                       |                             GAP_
+    CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
+    <BLANKLINE>
+    nb lines: 6
+    nb columns: 2
+    language: 'English'
+    gridx: 'major'
+    gridy: 'major'
+    graph_axis: 'values'
+    graph_alignment: 'left'
+    <BLANKLINE>
+
+    >>> table[4]
+    ('"GAP_"', 'GAP_')
+    >>> # first cell
+    >>> table[4][0]
+    "GAP_"
+    >>> table[4][0].cell_type
+    'STRING'
+    >>> # second cell
+    >>> table[4][1]
+    GAP_
+    >>> table[4][1].cell_type
+    'CELL'
+    """
+    cdef CTableCell* c_cell
+    cdef int nb_columns
+
+    def __init__(self):
+        # Prevent accidental instantiation from normal Python code
+        # since we cannot pass a struct pointer into a Python constructor.
+        raise TypeError("This class cannot be instantiated directly.")
+
+    def __cinit__(self):
+        self.c_cell = NULL
+        self.nb_columns = 0
+
+    def __dealloc__(self):
+        pass
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    cdef TableCell from_ptr(CTableCell* c_cell_ptr, int nb_columns):
+        """
+        Factory function to create TableCell objects from given CTableCell pointer.
+        """
+        # Fast call to __new__() that bypasses the __init__() constructor.
+        cdef TableCell wrapper = TableCell.__new__(TableCell)
+        wrapper.c_cell = c_cell_ptr
+        wrapper.nb_columns = nb_columns
+        return wrapper
+
+    @property
+    def cell_type(self) -> str:
+        """
+        Type of the content of the cell. Possible value is 'STRING' or 'LEC'.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table[4]
+        ('"GAP_"', 'GAP_')
+        >>> # first cell
+        >>> table[4][0]
+        "GAP_"
+        >>> table[4][0].cell_type
+        'STRING'
+        >>> # second cell
+        >>> table[4][1]
+        GAP_
+        >>> table[4][1].cell_type
+        'LEC'
+        """
+        return CELL_TYPE_DICT[<int>(self.c_cell.get_type())] if self.c_cell is not NULL else None
+
+    @property
+    def align(self) -> str:
+        """
+        Alignment of the text in the cell.
+
+        Parameters
+        ----------
+        align : str or int
+            The alignment to set for the cell.
+            Possible values are 'center', 'left', 'right', 'decimal' or 
+            CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table[4][0].align
+        'left'
+        >>> table[4][0].align = 'center'
+        >>> table[4][0].align
+        'center'
+        >>> table[4][0].align = CELL_ALIGN_RIGHT
+        >>> table[4][0].align
+        'right'
+        """
+        return CELL_ALIGN_DICT[<int>self.c_cell.get_align()] if self.c_cell is not NULL else None
+
+    @align.setter
+    def align(self, value: Union[int, str]):
+        if not isinstance(value, (int, str)):
+            raise TypeError(f"Expected value of type int or str. Got value of type {type(value).__name__} instead.")
+        if isinstance(value, str):
+            value = value.lower()
+            value = CELL_ALIGN_REV_DICT[value] if value in CELL_ALIGN_REV_DICT else -1
+        if value not in CELL_ALIGN_DICT:
+            raise ValueError(f"Possible values are 'center', 'left', 'right', 'decimal' or CELL_ALIGN_CENTER, "
+                             f"CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.\nGot value {value} instead.") 
+        self.c_cell.set_align(<EnumCellAlign>value)
+
+    @property
+    def bold(self) -> bool:
+        """
+        Whether or not the cell text is bold.
+
+        Parameters
+        ----------
+        value : bool
+            True to set the cell as bold, False otherwise.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table[4][0].bold
+        False
+        >>> table[4][0].bold = True
+        >>> table[4][0].bold
+        True
+        """
+        return self.c_cell.is_bold() if self.c_cell is not NULL else None
+
+    @bold.setter
+    def bold(self, value: bool):
+        if self.c_cell is not NULL:
+            self.c_cell.set_bold(<bint>value)
+
+    @property
+    def italic(self) -> bool:
+        """
+        Whether or not the cell text is italic.
+
+        Parameters
+        ----------
+        value : bool
+            True to set the cell as italic, False otherwise.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table[4][0].italic
+        False
+        >>> table[4][0].italic = True
+        >>> table[4][0].italic
+        True
+        """
+        return self.c_cell.is_italic() if self.c_cell is not NULL else None
+
+    @italic.setter
+    def italic(self, value: bool):
+        if self.c_cell is not NULL:
+            self.c_cell.set_italic(<bint>value)
+
+    @property
+    def underline(self) -> bool:
+        """
+        Whether or not the cell text is underline.
+
+        Parameters
+        ----------
+        value : bool
+            True to set the cell as underlined, False otherwise.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table[4][0].underline
+        False
+        >>> table[4][0].underline = True
+        >>> table[4][0].underline
+        True
+        """
+        return self.c_cell.is_underline() if self.c_cell is not NULL else None
+
+    @underline.setter
+    def underline(self, value: bool):
+        if self.c_cell is not NULL:
+            self.c_cell.set_underline(<bint>value)
+
+    def get_variables_from_lec(self) -> List[str]:
+        """
+        Get the list of variables associated with the LEC expression of a cell of type 'LEC'.
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Variables, Tables
+        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]    
+        >>> table[5]
+        ('"dln (PC/(1+ITCR))-dln AOUC"', '100*(dln (PC/(1+ITCR))-dln AOUC)')
+        >>> table[5][1].get_variables_from_lec()
+        ['PC', 'ITCR', 'AOUC']
+        """      
+        if self.c_cell is NULL:
+            return
+        if self.cell_type != 'LEC':
+            warnings.warn("Cannot get list of variables from a cell which is not of type 'LEC'")
+            return [] 
+        return [item.decode() for item in self.c_cell.get_variables_from_lec()]
+
+    def __str__(self) -> str:
+        if self.c_cell is NULL:
+            return ''
+        quotes = <int>(self.c_cell.get_type()) == CELL_TYPE_STRING
+        content = self.c_cell.get_content(<bint>quotes).decode()
+        # remove newline characters
+        return ''.join(content.splitlines())
+    
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
 # TableLine wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 # see also https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
@@ -19,7 +294,7 @@ cdef class TableLine:
     """
     IODE Table line.
 
-    Parameters
+    Attributes
     ----------
     line_type: int
         Type of the table line. Possible values are 'TITLE', 'CELL', 'LINE', 'MODE', 'FILES', 'DATE' or 
@@ -35,30 +310,20 @@ cdef class TableLine:
 
     Examples
     --------
-    >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
-    >>> from iode import Comments, Lists, Variables, Table
-    >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-    >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-    >>> table_title = "Table example"
-    >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
-    >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
-    >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
+    >>> from iode import SAMPLE_DATA_DIR
+    >>> from iode import Tables, Table
+    >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> table = tbl_db["ANAPRIX"]
     >>> table           # doctest: +NORMALIZE_WHITESPACE
-    DIVIS | 1              |
-    TITLE |       "Table example"
-    ----- | ----------------------------
-    CELL  |                |     "#S"
-    ----- | ----------------------------
-    CELL  | "GOSG:"        |        GOSG
-    CELL  | "YSSG+COTRES:" | YSSG+COTRES
-    CELL  | "OCUG:"        |        OCUG
-    ----- | ----------------------------
-    MODE  |
-    FILES |
-    DATE  |
+    DIVIS | 1                            |
+    TITLE |                        "Analyse des prix"
+    ----- | ---------------------------------------------------------------
+    CELL  | ""                           |               "#s"
+    ----- | ---------------------------------------------------------------
+    CELL  | "GAP_"                       |                             GAP_
+    CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
     <BLANKLINE>
-    nb lines: 11
+    nb lines: 6
     nb columns: 2
     language: 'English'
     gridx: 'major'
@@ -114,30 +379,20 @@ cdef class TableLine:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> table_title = "Table example"
-        >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
-        >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
-        >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
-        TITLE |       "Table example"
-        ----- | ----------------------------
-        CELL  |                |     "#S"
-        ----- | ----------------------------
-        CELL  | "GOSG:"        |        GOSG
-        CELL  | "YSSG+COTRES:" | YSSG+COTRES
-        CELL  | "OCUG:"        |        OCUG
-        ----- | ----------------------------
-        MODE  |
-        FILES |
-        DATE  |
+        DIVIS | 1                            |
+        TITLE |                        "Analyse des prix"
+        ----- | ---------------------------------------------------------------
+        CELL  | ""                           |               "#s"
+        ----- | ---------------------------------------------------------------
+        CELL  | "GAP_"                       |                             GAP_
+        CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
         <BLANKLINE>
-        nb lines: 11
+        nb lines: 6
         nb columns: 2
         language: 'English'
         gridx: 'major'
@@ -147,12 +402,12 @@ cdef class TableLine:
         <BLANKLINE>
 
         >>> table[0]
-        Table example
+        Analyse des prix
         >>> table[0].line_type
         'TITLE'
 
         >>> table[4]
-        ('"GOSG:"', 'GOSG')
+        ('"GAP_"', 'GAP_')
         >>> table[4].line_type
         'CELL'
         """
@@ -171,30 +426,20 @@ cdef class TableLine:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, GRAPH_TYPE_BAR
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> table_title = "Table example"
-        >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
-        >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
-        >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
+        >>> from iode import SAMPLE_DATA_DIR, GRAPH_TYPE_LINE, GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
-        TITLE |       "Table example"
-        ----- | ----------------------------
-        CELL  |                |     "#S"
-        ----- | ----------------------------
-        CELL  | "GOSG:"        |        GOSG
-        CELL  | "YSSG+COTRES:" | YSSG+COTRES
-        CELL  | "OCUG:"        |        OCUG
-        ----- | ----------------------------
-        MODE  |
-        FILES |
-        DATE  |
+        DIVIS | 1                            |
+        TITLE |                        "Analyse des prix"
+        ----- | ---------------------------------------------------------------
+        CELL  | ""                           |               "#s"
+        ----- | ---------------------------------------------------------------
+        CELL  | "GAP_"                       |                             GAP_
+        CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
         <BLANKLINE>
-        nb lines: 11
+        nb lines: 6
         nb columns: 2
         language: 'English'
         gridx: 'major'
@@ -204,7 +449,7 @@ cdef class TableLine:
         <BLANKLINE>
 
         >>> table[4]
-        ('"GOSG:"', 'GOSG')
+        ('"GAP_"', 'GAP_')
         >>> table[4].graph_type
         'line'
         >>> table[4].graph_type = "scatter"
@@ -241,30 +486,20 @@ cdef class TableLine:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> table_title = "Table example"
-        >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
-        >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
-        >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
-        TITLE |       "Table example"
-        ----- | ----------------------------
-        CELL  |                |     "#S"
-        ----- | ----------------------------
-        CELL  | "GOSG:"        |        GOSG
-        CELL  | "YSSG+COTRES:" | YSSG+COTRES
-        CELL  | "OCUG:"        |        OCUG
-        ----- | ----------------------------
-        MODE  |
-        FILES |
-        DATE  |
+        DIVIS | 1                            |
+        TITLE |                        "Analyse des prix"
+        ----- | ---------------------------------------------------------------
+        CELL  | ""                           |               "#s"
+        ----- | ---------------------------------------------------------------
+        CELL  | "GAP_"                       |                             GAP_
+        CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
         <BLANKLINE>
-        nb lines: 11
+        nb lines: 6
         nb columns: 2
         language: 'English'
         gridx: 'major'
@@ -274,7 +509,7 @@ cdef class TableLine:
         <BLANKLINE>
 
         >>> table[4]
-        ('"GOSG:"', 'GOSG')
+        ('"GAP_"', 'GAP_')
         >>> table[4].axis_left
         True
         >>> table[4].axis_left = False
@@ -291,8 +526,135 @@ cdef class TableLine:
             raise TypeError(f"Expected value of type bool. Got value of type {type(value).__name__} instead")
         self.c_line.set_line_axis(<bint>value)
 
+    def __len__(self) -> int:
+        return self.nb_columns
+
+    def _get_row_from_index(self, index: int) -> int:
+        if not isinstance(index, int):
+            raise TypeError(f"The index of the cell must be of type int. "
+                            f"Got an index value of type {type(index).__name__} instead.")
+        if not (-self.nb_columns < index < self.nb_columns):
+            raise ValueError(f"The index of the cell must be in range [{-self.nb_columns + 1, self.nb_columns - 1}].\n"
+                             f"Got value {index} instead.")
+        if index < 0:
+            index = self.nb_columns + index
+        return index
+
+    def __getitem__(self, index) -> TableCell:
+        """
+        Get the cell of a line.
+
+        Parameters
+        ----------
+        index: int
+            index of the cell.
+
+        Returns
+        -------
+        TableCell
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table           # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                            |
+        TITLE |                        "Analyse des prix"
+        ----- | ---------------------------------------------------------------
+        CELL  | ""                           |               "#s"
+        ----- | ---------------------------------------------------------------
+        CELL  | "GAP_"                       |                             GAP_
+        CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
+        <BLANKLINE>
+        nb lines: 6
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+
+        >>> table[4][0]
+        "GAP_"
+        >>> table[4][1]
+        GAP_
+        """
+        cdef CTableCell* c_cell
+
+        if self.c_line is NULL:
+            return
+
+        row = self._get_row_from_index(index)
+        c_cell = self.c_line.get_cell(row, self.nb_columns)
+        return TableCell.from_ptr(c_cell, self.nb_columns)
+
+    def __setitem__(self, index, value):
+        r"""
+        Update the content of a cell of the line.
+
+        Parameters
+        ----------
+        index: int
+            index of the cell.
+        value: str or TableCell
+            new content of the cell.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Tables, Table
+        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tbl_db["ANAPRIX"]
+        >>> table           # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                            |
+        TITLE |                        "Analyse des prix"
+        ----- | ---------------------------------------------------------------
+        CELL  | ""                           |               "#s"
+        ----- | ---------------------------------------------------------------
+        CELL  | "GAP_"                       |                             GAP_
+        CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
+        <BLANKLINE>
+        nb lines: 6
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+
+        >>> # warning: content of cells of type 'STRING' must be surrounded by double quotes
+        >>> table[5][0] = '"dln(PC/ITCR) - dln AOUC"'
+        >>> table[5][0]
+        "dln(PC/ITCR) - dln AOUC"
+        >>> # warning: if the new content is not surrounded by double quotes, 
+        >>> #          it is considerer as 'LEC' cell
+        >>> table[5][1] = '100*(dln(PC / ITCR) - dln AOUC)'
+        >>> table[5][1]
+        100*(dln(PC / ITCR) - dln AOUC)
+        """
+        if self.c_line is NULL:
+            return
+        
+        row = self._get_row_from_index(index)
+        if isinstance(value, TableCell):
+            value = str(value)
+        if not isinstance(value, str):
+            raise TypeError(f"Expected value of type str or TableCell. Got value of type {type(value).__name__} instead.")
+        c_cell = self.c_line.get_cell(row, self.nb_columns)
+        c_cell.set_content(value.encode())
+        
+    def __delitem__(self, index):
+        raise RuntimeError("A Table cell cannot be deleted")
+
     def __str__(self) -> str:
         cdef CTableCell* c_cell
+
+        if self.c_line is NULL:
+            return ''
 
         line_type = <int>(self.c_line.get_line_type())
         nb_columns = self.nb_columns
