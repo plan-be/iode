@@ -212,6 +212,15 @@ TABLE
    Table.__delitem__
    Table.__iadd__
 
+.. autosummary::
+   :toctree: _generated
+
+   TableLine
+
+   TableLine.axis_left
+   TableLine.graph_type
+   TableLine.line_type
+
 ****
 TIME
 ****
