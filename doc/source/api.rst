@@ -221,6 +221,17 @@ TABLE
    TableLine.graph_type
    TableLine.line_type
 
+.. autosummary::
+   :toctree: _generated
+
+   TableCell
+
+   TableCell.cell_type
+   TableCell.align
+   TableCell.bold
+   TableCell.italic
+   TableCell.underline
+
 ****
 TIME
 ****
