@@ -26,7 +26,7 @@ from .iode_python import (nan, __version__,
 from .iode_python import Period, Sample, periodicities
 
 # IODE objects
-# NOTE: didn't add TableLine to avoid users to create instances of this class.
+# NOTE: didn't add TableLine/TableCell to avoid users to create instances of this class.
 #       TableLine instances must only be created from a Table instance.
 from .iode_python import Equation, List, Scalar, Table
 
@@ -50,7 +50,7 @@ from .iode_python import (model_calc_scc, model_simulate, model_simulate_cpu, mo
 from .iode_python import exec_lec, add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
 
 
-# NOTE: didn't add TableLine to avoid users to create instances of this class.
+# NOTE: didn't add TableLine/TableCell to avoid users to create instances of this class.
 #       TableLine instances must only be created from a Table instance.
 __all__ = [
     # Constants
