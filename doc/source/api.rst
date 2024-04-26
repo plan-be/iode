@@ -318,7 +318,6 @@ LARRAY
 
    larray_to_ws
    ws_to_larray
-   ws_load_var_to_larray
 
 
 *************
