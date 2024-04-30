@@ -36,23 +36,36 @@ cdef class Scalars(_AbstractDatabase):
 
     Examples
     --------
-    >>> from iode import Scalars, SAMPLE_DATA_DIR
-    >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-    >>> len(scl_db)
+    >>> from iode import scalars, SAMPLE_DATA_DIR
+    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    >>> len(scalars)
     161
     """
 
     cdef CKDBScalars* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Scalars:
-        self.database_ptr = self.abstract_db_ptr = &cpp_global_scalars
-        if filepath is not None:
-            self.load(filepath)
+        self.database_ptr = NULL
+        self.abstract_db_ptr = NULL
+
+    def __init__(self, filepath: str = None):
+        # Prevent accidental instantiation from normal Python code
+        # since we cannot pass a struct pointer into a Python constructor.
+        raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Scalars 
         # which does not need to be manually deleted 
         pass
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    def _get_instance() -> Scalars:
+        # call to __new__() that bypasses the __init__() constructor.
+        cdef Scalars wrapper = Scalars.__new__(Scalars)
+        wrapper.database_ptr = &cpp_global_scalars
+        wrapper.abstract_db_ptr = &cpp_global_scalars
+        return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
@@ -60,7 +73,7 @@ cdef class Scalars(_AbstractDatabase):
         del kdb
 
     def subset(self, pattern: str, copy: bool = False) -> Scalars:
-        subset_ = Scalars()
+        cdef Scalars subset_ = Scalars.__new__(Scalars)
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
@@ -124,3 +137,6 @@ cdef class Scalars(_AbstractDatabase):
                 raise TypeError(f"New scalar '{key}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
             self.database_ptr.add(key.encode(), scalar.value, scalar.relax, scalar.std)
+
+
+scalars: Scalars = Scalars._get_instance()

@@ -47,9 +47,9 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.iode_type
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.iode_type
         'Comment'
         """
         return IODE_TYPES_LIST[self.abstract_db_ptr.get_iode_type()]
@@ -65,11 +65,11 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.is_subset()
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.is_subset()
         False
-        >>> cmt_subset = cmt_db.subset("A*")
+        >>> cmt_subset = comments.subset("A*")
         >>> cmt_subset.is_subset()
         True
         """
@@ -96,18 +96,18 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.is_subset()
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.is_subset()
         False
         >>> # by default a 'shallow copy' subset is returned
-        >>> cmt_subset = cmt_db.subset("A*")
+        >>> cmt_subset = comments.subset("A*")
         >>> cmt_subset.is_subset()
         True
         >>> cmt_subset.is_copy_subset()
         False
         >>> # force to return a 'deep copy' subset
-        >>> cmt_subset = cmt_db.subset("A*", copy=True)
+        >>> cmt_subset = comments.subset("A*", copy=True)
         >>> cmt_subset.is_copy_subset()
         True
         """
@@ -145,23 +145,23 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
 
         >>> # create a subset with all comments with name starting with 'A'
-        >>> cmt_subset = cmt_db.subset("A*")
+        >>> cmt_subset = comments.subset("A*")
         >>> cmt_subset.get_names()
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
         >>> # any modification made on the subset is visible in the global database
         >>> cmt_subset['ACAF'] = "Modified Comment"
-        >>> cmt_db['ACAF']
+        >>> comments['ACAF']
         'Modified Comment'
 
         >>> # force to return a 'deep copy' subset
-        >>> cmt_subset = cmt_db.subset("*_", copy=True)
+        >>> cmt_subset = comments.subset("*_", copy=True)
         >>> # any modification made on the subset let the global database unchanged
         >>> cmt_subset['BENEF_'] = "Modified Comment"
-        >>> cmt_db['BENEF_']
+        >>> comments['BENEF_']
         'Ondernemingen: niet-uitgekeerde winsten (vóór statistische\\naanpassing).'
         """
         raise NotImplementedError()
@@ -178,11 +178,11 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
+        >>> from iode import comments
         >>> from pathlib import Path
         >>> from os.path import relpath
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> filepath = cmt_db.filename
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> filepath = comments.filename
         >>> Path(filepath).name
         'fun.cmt'
         """
@@ -200,10 +200,10 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.description = "test data from file 'fun.cmt'"
-        >>> cmt_db.description
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.description = "test data from file 'fun.cmt'"
+        >>> comments.description
         "test data from file 'fun.cmt'"
         """
         return self.abstract_db_ptr.get_description().decode()
@@ -221,10 +221,10 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.description = "test data from file 'fun.cmt'"
-        >>> cmt_db.description
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.description = "test data from file 'fun.cmt'"
+        >>> comments.description
         "test data from file 'fun.cmt'"
         """
         if not isinstance(value, str):
@@ -250,9 +250,9 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.get_names("A*;*_")         # doctest: +NORMALIZE_WHITESPACE
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.get_names("A*;*_")         # doctest: +NORMALIZE_WHITESPACE
         ['ACAF', 'ACAG', 'AOUC', 'AQC', 'BENEF_', 'GOSH_', 
         'IDH_', 'PAFF_', 'PC_', 'PFI_', 'QAFF_', 'QAF_', 
         'QAI_', 'QAT_', 'QBBPPOT_', 'QC_', 'QQMAB_', 'QS_', 
@@ -260,7 +260,7 @@ cdef class _AbstractDatabase:
         'WBF_', 'WBU_', 'WCF_', 'WCR1_', 'WCR2_', 'WIND_', 
         'WNF_', 'YDH_', 'ZZ_']
         >>> # or equivalently
-        >>> cmt_db.get_names(["A*", "*_"])    # doctest: +NORMALIZE_WHITESPACE
+        >>> comments.get_names(["A*", "*_"])    # doctest: +NORMALIZE_WHITESPACE
         ['ACAF', 'ACAG', 'AOUC', 'AQC', 'BENEF_', 'GOSH_', 
         'IDH_', 'PAFF_', 'PC_', 'PFI_', 'QAFF_', 'QAF_', 
         'QAI_', 'QAT_', 'QBBPPOT_', 'QC_', 'QQMAB_', 'QS_', 
@@ -268,7 +268,7 @@ cdef class _AbstractDatabase:
         'WBF_', 'WBU_', 'WCF_', 'WCR1_', 'WCR2_', 'WIND_', 
         'WNF_', 'YDH_', 'ZZ_']
         >>> # get the list of all names
-        >>> cmt_db.get_names()                # doctest: +ELLIPSIS
+        >>> comments.get_names()                # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKF', 'ZX', 'ZZ_']
         """
         if not isinstance(pattern, str) and isinstance(pattern, Iterable) and all(isinstance(item, str) for item in pattern):
@@ -295,16 +295,16 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db["ACAF"]
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
         >>> # rename comment 'ACAF' as 'ACCAF'
-        >>> cmt_db.rename("ACAF", "ACCAF")
-        >>> "ACCAF" in cmt_db
+        >>> comments.rename("ACAF", "ACCAF")
+        >>> "ACCAF" in comments
         True
-        >>> cmt_db["ACCAF"]
+        >>> comments["ACCAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         """
         if not isinstance(old_name, str):
@@ -328,21 +328,21 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db.get_names("A*")
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
         >>> # remove one object
-        >>> cmt_db.remove("ACAF")
-        >>> cmt_db.get_names("A*")
+        >>> comments.remove("ACAF")
+        >>> comments.get_names("A*")
         ['ACAG', 'AOUC', 'AQC']
 
         >>> # remove all objects with a name ending by '_'
-        >>> cmt_db.get_names("*_")            # doctest: +ELLIPSIS
+        >>> comments.get_names("*_")            # doctest: +ELLIPSIS
         ['BENEF_', 'GOSH_', 'IDH_', ..., 'WNF_', 'YDH_', 'ZZ_']
-        >>> cmt_db.remove("*_")
-        >>> cmt_db.get_names("*_")
+        >>> comments.remove("*_")
+        >>> comments.get_names("*_")
         []
         """
         if isinstance(names, str):
@@ -369,17 +369,17 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{{SAMPLE_DATA_DIR}}/fun.cmt")
+        >>> from iode import comments
+        >>> comments.load(f"{{SAMPLE_DATA_DIR}}/fun.cmt")
 
         >>> # copy comments with names starting with 'A' into a new database 'cmt_subset'
-        >>> cmt_subset = cmt_db.subset("A*", deep_copy=True)
+        >>> cmt_subset = comments.subset("A*", deep_copy=True)
         >>> cmt_subset.get_names()
         ['ACAF', 'ACAG', 'ACOUG', 'AQC']
 
         >>> # remove 'ACAF' and 'ACAG' from the global Comments database
-        >>> cmt_db.remove('ACAF;ACAG')
-        >>> cmt_db.get_names("A*")
+        >>> comments.remove('ACAF;ACAG')
+        >>> comments.get_names("A*")
         ['ACOUG']
 
         >>> # update the content of 'ACOUG' in 'cmt_subset'
@@ -387,23 +387,23 @@ cdef class _AbstractDatabase:
         >>> cmt_subset['ACOUG']
         'Comment modified'
         >>> # content of 'ACOUG' in the global Comments database
-        >>> cmt_db['ACOUG']
+        >>> comments['ACOUG']
         ''
 
         >>> # merge 'cmt_subset' into the global Comments database
         >>> # preserve 'ACOUG' in the global Comments database
-        >>> cmt_db.merge(cmt_subset, overwrite=False)
-        >>> cmt_db.contains('ACAF')
+        >>> comments.merge(cmt_subset, overwrite=False)
+        >>> comments.contains('ACAF')
         True
-        >>> cmt_db.contains('ACAG')
+        >>> comments.contains('ACAG')
         True
-        >>> cmt_db['ACOUG']
+        >>> comments['ACOUG']
         ''
 
         >>> # merge 'cmt_subset' into the global Comments database
         >>> # overwrite the content of 'ACOUG' in the global Comments database 
-        >>> cmt_db.merge(cmt_subset)
-        >>> cmt_db['ACOUG']
+        >>> comments.merge(cmt_subset)
+        >>> comments['ACOUG']
         ''
         """
         if not isinstance(other, type(self)):
@@ -430,24 +430,24 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
         >>> # delete all comments with a name starting with 'A'
-        >>> cmt_db.remove("A*")
-        >>> cmt_db.get_names("A*")
+        >>> comments.remove("A*")
+        >>> comments.get_names("A*")
         []
 
         >>> # load all comments with a name starting with 'A'
-        >>> cmt_db.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
-        >>> cmt_db.get_names("A*")
+        >>> comments.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
+        >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
-        >>> cmt_db.clear()
+        >>> comments.clear()
         >>> # load all comments
-        >>> cmt_db.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> comments.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
         """
         if isinstance(input_files, str):
@@ -481,18 +481,18 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
         >>> # delete all comments
-        >>> cmt_db.clear()
-        >>> len(cmt_db)
+        >>> comments.clear()
+        >>> len(comments)
         0
 
         >>> # reload all comments
-        >>> cmt_db.merge_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> comments.merge_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
         """
         if not isinstance(input_file, str):
@@ -513,40 +513,40 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, COMMENTS, EQUATIONS, LISTS, SCALARS, TABLES, VARIABLES
-        >>> from iode import Equations, Lists, Scalars, Tables, Variables
-        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import equations, lists, scalars, tables, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
         >>> # get list of comments associated with the variable 'AOUC'
-        >>> var_db.get_associated_objects_list("AOUC", COMMENTS)
+        >>> variables.get_associated_objects_list("AOUC", COMMENTS)
         ['AOUC']
 
         >>> # get list of equations associated with the variable 'AOUC'
-        >>> var_db.get_associated_objects_list("AOUC", EQUATIONS)
+        >>> variables.get_associated_objects_list("AOUC", EQUATIONS)
         ['AOUC', 'PC', 'PIF', 'PXS', 'QXAB']
 
         >>> # get list of lists associated with the variable 'AOUC'
-        >>> var_db.get_associated_objects_list("AOUC", LISTS)
+        >>> variables.get_associated_objects_list("AOUC", LISTS)
         ['COPY0', 'ENDO0', 'TOTAL0']
 
         >>> # get list of tables associated with the variable 'AOUC'
-        >>> var_db.get_associated_objects_list("AOUC", TABLES)
+        >>> variables.get_associated_objects_list("AOUC", TABLES)
         ['ANAPRIX', 'MULT1FR', 'MULT1RESU', 'T1', 'T1NIVEAU']
 
         >>> # WARNING: In the case of Equations, the get_associated_objects_list method must not
         >>> #          be confused with the get_coefficients_list and get_variables_list methods
-        >>> eqs_db["ACAF"].lec
+        >>> equations["ACAF"].lec
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
-        >>> eqs_db["ACAF"].get_coefficients_list()
+        >>> equations["ACAF"].get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
-        >>> eqs_db.get_associated_objects_list("ACAF", SCALARS)
+        >>> equations.get_associated_objects_list("ACAF", SCALARS)
         []
-        >>> eqs_db["ACAF"].get_variables_list()
+        >>> equations["ACAF"].get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> eqs_db.get_associated_objects_list("ACAF", VARIABLES)
+        >>> equations.get_associated_objects_list("ACAF", VARIABLES)
         ['ACAF']
         """
         if not isinstance(name, str):
@@ -573,13 +573,13 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments, Variables
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> from iode import comments, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
 
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> len(var_db)
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> len(variables)
         394
         """
         if self.is_subset():
@@ -599,14 +599,14 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
-        >>> cmt_db.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")
-        >>> cmt_db.clear()
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun2.cmt")
-        >>> len(cmt_db)
+        >>> comments.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")
+        >>> comments.clear()
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun2.cmt")
+        >>> len(comments)
         317
         """
         if not isinstance(filepath, str):
@@ -621,12 +621,12 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
-        >>> cmt_db.clear()
-        >>> len(cmt_db)
+        >>> comments.clear()
+        >>> len(comments)
         0
         """
         self.abstract_db_ptr.clear()
@@ -644,9 +644,9 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> len(cmt_db)
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
         317
         """
         return self.abstract_db_ptr.count()
@@ -663,11 +663,11 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> "ACAF" in cmt_db
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> "ACAF" in comments
         True
-        >>> "ZCAF" in cmt_db
+        >>> "ZCAF" in comments
         False
         """
         if not isinstance(item, str):
@@ -692,16 +692,16 @@ cdef class _AbstractDatabase:
 
         Comments
 
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db["ACAF"]
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
 
         Equations
 
-        >>> from iode import Equations
-        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        >>> from iode import equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
         acaf4*(TIME=1995),
                 method: LSQ,
@@ -725,23 +725,23 @@ cdef class _AbstractDatabase:
 
         Identities
 
-        >>> from iode import Identities
-        >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> idt_db["AOUC"]
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities["AOUC"]
         '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
 
         Lists
 
-        >>> from iode import Lists
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> lst_db["ENVI"]
+        >>> from iode import lists
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists["ENVI"]
         'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
 
         Scalars
 
-        >>> from iode import Scalars
-        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> acaf1 = scl_db["acaf1"]
+        >>> from iode import scalars
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> acaf1 = scalars["acaf1"]
         >>> acaf1
         Scalar(0.0157684, 1, 0.00136871)
         >>> acaf1.value
@@ -753,9 +753,9 @@ cdef class _AbstractDatabase:
 
         Tables
 
-        >>> from iode import Tables
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> tbl_db["YDH"]           # doctest: +NORMALIZE_WHITESPACE
+        >>> from iode import tables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
         ----- | ---------------------------------------------------------------------------------------------------------
@@ -788,21 +788,21 @@ cdef class _AbstractDatabase:
 
         Variables
 
-        >>> from iode import Variables, nan
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> var_db.sample
+        >>> from iode import variables, nan
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.sample
         1960Y1:2015Y1
         >>> # get the variable values for the whole sample
-        >>> var_db["ACAF"]                       # doctest: +ELLIPSIS 
+        >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
         >>> # get the variable value for a specific period
-        >>> var_db["ACAF", "1990Y1"]
+        >>> variables["ACAF", "1990Y1"]
         23.771
         >>> # get the variable values for range of periods (using a Python slice)
-        >>> var_db["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
+        >>> variables["ACAF", "1990Y1":"2000Y1"]    # doctest: +ELLIPSIS 
         [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
         >>> # same as above but with the colon ':' inside the periods range string
-        >>> var_db["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
+        >>> variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
         [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
         """
         return self._get_object(key) 
@@ -827,19 +827,19 @@ cdef class _AbstractDatabase:
 
         Comments
 
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> cmt_db["ACAF"]
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
-        >>> cmt_db["ACAF"] = "New Value"
-        >>> cmt_db["ACAF"]
+        >>> comments["ACAF"] = "New Value"
+        >>> comments["ACAF"]
         'New Value'
 
         Equations
 
-        >>> from iode import Equations
-        >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
-        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        >>> from iode import equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
         acaf4*(TIME=1995),
                 method: LSQ,
@@ -861,8 +861,8 @@ cdef class _AbstractDatabase:
                     stdev: 0.0042699
                 date: 12-06-1998)
         >>> # update only the LEC
-        >>> eqs_db["ACAF"] = "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
-        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        >>> equations["ACAF"] = "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
                 method: LSQ,
                 sample: 1980Y1:1996Y1,
@@ -886,20 +886,20 @@ cdef class _AbstractDatabase:
         >>> estim_sample = "2000Y1:2010Y1"
         >>> block = "ACAF; ACAG; AOUC"
         >>> for eq_name in block.split(';'):
-        ...     eqs_db[eq_name] = {"sample": estim_sample, "block": block}
-        >>> (eqs_db["ACAF"].sample, eqs_db["ACAG"].sample, eqs_db["AOUC"].sample)
+        ...     equations[eq_name] = {"sample": estim_sample, "block": block}
+        >>> (equations["ACAF"].sample, equations["ACAG"].sample, equations["AOUC"].sample)
         (2000Y1:2010Y1, 2000Y1:2010Y1, 2000Y1:2010Y1)
-        >>> (eqs_db["ACAF"].block, eqs_db["ACAG"].block, eqs_db["AOUC"].block)
+        >>> (equations["ACAF"].block, equations["ACAG"].block, equations["AOUC"].block)
         ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
         >>> # upate sample and block (Equation objects)
-        >>> eq_ACAF = eqs_db["ACAF"]
+        >>> eq_ACAF = equations["ACAF"]
         >>> eq_ACAF.set_lec("(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAF")
         >>> eq_ACAF.method = "MAX_LIKELIHOOD"
         >>> # new equation sample is from 1990Y1 to the last year of Variables
         >>> eq_ACAF.sample = "1990Y1:"
         >>> eq_ACAF.block = "ACAF"
-        >>> eqs_db["ACAF"] = eq_ACAF
-        >>> eqs_db["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        >>> equations["ACAF"] = eq_ACAF
+        >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
                 method: MAX_LIKELIHOOD,
                 sample: 1990Y1:2015Y1,
@@ -922,69 +922,69 @@ cdef class _AbstractDatabase:
 
         Identities
 
-        >>> from iode import Identities
-        >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> idt_db["AOUC"]
+        >>> from iode import identities
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> identities["AOUC"]
         '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
-        >>> idt_db["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
-        >>> idt_db["AOUC"]
+        >>> identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+        >>> identities["AOUC"]
         '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
 
         Lists
 
-        >>> from iode import Lists
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> lst_db["ENVI"]
+        >>> from iode import lists
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> lists["ENVI"]
         'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
-        >>> lst_db["ENVI"] = 'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
-        >>> lst_db["ENVI"]
+        >>> lists["ENVI"] = 'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
+        >>> lists["ENVI"]
         'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
 
         Scalars
 
-        >>> from iode import Scalars
-        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> scl_db["acaf1"]
+        >>> from iode import scalars
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> scalars["acaf1"]
         Scalar(0.0157684, 1, 0.00136871)
         >>> # only update the value
-        >>> scl_db["acaf1"] = 0.8
-        >>> scl_db["acaf1"]
+        >>> scalars["acaf1"] = 0.8
+        >>> scalars["acaf1"]
         Scalar(0.8, 1, 0.00136871)
         >>> # upate value and relax (tuple)
-        >>> scl_db["acaf2"] = 0.8, 0.9
-        >>> scl_db["acaf2"]
+        >>> scalars["acaf2"] = 0.8, 0.9
+        >>> scalars["acaf2"]
         Scalar(0.8, 0.9, nan)
-        >>> # upate value and relax (list)
-        >>> scl_db["acaf2"] = (0.7, 0.8)
-        >>> scl_db["acaf2"]
+        >>> # update value and relax (list)
+        >>> scalars["acaf2"] = (0.7, 0.8)
+        >>> scalars["acaf2"]
         Scalar(0.7, 0.8, nan)
         >>> # upate value and relax (dictionary)
-        >>> scl_db["acaf3"] = {"relax": 0.9, "value": 0.8}
-        >>> scl_db["acaf3"]
+        >>> scalars["acaf3"] = {"relax": 0.9, "value": 0.8}
+        >>> scalars["acaf3"]
         Scalar(0.8, 0.9, 0.87301)
         >>> # upate value and/or relax (Scalar object)
-        >>> acaf4 = scl_db["acaf4"]
+        >>> acaf4 = scalars["acaf4"]
         >>> acaf4
         Scalar(-0.00850518, 1, 0.0020833)
         >>> acaf4.value = 0.8
         >>> acaf4.relax = 0.9
         >>> # WARNING: the standard deviation (std) cannot be changed manually
-        >>> scl_db["acaf4"] = acaf4
-        >>> scl_db["acaf4"]
+        >>> scalars["acaf4"] = acaf4
+        >>> scalars["acaf4"]
         Scalar(0.8, 0.9, 0.0020833)
 
         Tables
 
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
 
         >>> # -- new table --
         >>> # 1. specify list of line titles and list of LEC expressions
         >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
-        >>> tbl_db["TABLE_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
+        >>> tables["TABLE_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
         ...                         "lines_titles": lines_titles, "mode": True, "files": True, "date": True}  
-        >>> tbl_db["TABLE_LECS"]         # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_LECS"]         # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
         ----- | ----------------------------
@@ -1014,9 +1014,9 @@ cdef class _AbstractDatabase:
 
         >>> # 2. specify list of variables
         >>> vars_list = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", "RIDG", "OCUG", "$ENVI"]
-        >>> tbl_db["TABLE_VARS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": vars_list, 
+        >>> tables["TABLE_VARS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": vars_list, 
         ...                         "mode": True, "files": True, "date": True}  
-        >>> tbl_db["TABLE_VARS"]             # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_VARS"]             # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                                                    |
         TITLE |                                  "New Table"
         ----- | -----------------------------------------------------------------------------
@@ -1054,7 +1054,7 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
 
         >>> # -- update table --
-        >>> table = tbl_db["TABLE_LECS"]
+        >>> table = tables["TABLE_LECS"]
         >>> table                   # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
@@ -1117,8 +1117,8 @@ cdef class _AbstractDatabase:
         >>> table += '-'
 
         >>> # warning: do not forget to actually update the IODE Table database  
-        >>> tbl_db["TABLE_LECS"] = table
-        >>> tbl_db["TABLE_LECS"]                # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_LECS"] = table
+        >>> tables["TABLE_LECS"]                # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1       |
         TITLE |  "New Table"
         ----- | --------------
@@ -1151,59 +1151,59 @@ cdef class _AbstractDatabase:
 
         Variables
 
-        >>> from iode import Variables
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import variables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
         >>> # set all values of a Variable
-        >>> var_db["ACAF"]                   # doctest: +ELLIPSIS 
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
         >>> # a. variable = same value for all periods
-        >>> var_db["ACAF"] = 0.
-        >>> var_db["ACAF"]                   # doctest: +ELLIPSIS 
+        >>> variables["ACAF"] = 0.
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
         >>> # b. variable = vector (list) containing a specific value for each period
-        >>> var_db["ACAF"] = list(range(var_db.nb_periods))
-        >>> var_db["ACAF"]                   # doctest: +ELLIPSIS 
+        >>> variables["ACAF"] = list(range(variables.nb_periods))
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
         >>> # c. variable = LEC expression
-        >>> var_db["ACAF"] = "t + 10"
-        >>> var_db["ACAF"]                   # doctest: +ELLIPSIS 
+        >>> variables["ACAF"] = "t + 10"
+        >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
 
         >>> # set one value of a Variable for a specific period
-        >>> var_db["ACAG", "1990Y1"]
+        >>> variables["ACAG", "1990Y1"]
         -28.1721855713507
-        >>> var_db["ACAG", "1990Y1"] = -28.2
-        >>> var_db["ACAG", "1990Y1"]
+        >>> variables["ACAG", "1990Y1"] = -28.2
+        >>> variables["ACAG", "1990Y1"]
         -28.2
 
         >>> # set the variable values for range of periods 
         >>> # 1. using a Python slice
         >>> # 1a. variable(periods) = same value for all periods
-        >>> var_db["ACAF", "1991Y1":"1995Y1"] = 0.0
-        >>> var_db["ACAF", "1991Y1":"1995Y1"]
+        >>> variables["ACAF", "1991Y1":"1995Y1"] = 0.0
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
         [0.0, 0.0, 0.0, 0.0, 0.0]
         >>> # 1b. variable(periods) = vector (list) containing a specific value for each period
-        >>> var_db["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
-        >>> var_db["ACAF", "1991Y1":"1995Y1"]
+        >>> variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
         [0.0, 1.0, 2.0, 3.0, 4.0]
         >>> # 1c. variable(periods) = LEC expression
-        >>> var_db["ACAF", "1991Y1":"1995Y1"] = "t + 10"
-        >>> var_db["ACAF", "1991Y1":"1995Y1"]
+        >>> variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
         [41.0, 42.0, 43.0, 44.0, 45.0]
 
         >>> # 2. same as above but with the colon ':' inside the periods range string
         >>> # 2a. variable(periods) = same value for all periods
-        >>> var_db["ACAF", "1991Y1:1995Y1"] = 0.0
-        >>> var_db["ACAF", "1991Y1:1995Y1"]
+        >>> variables["ACAF", "1991Y1:1995Y1"] = 0.0
+        >>> variables["ACAF", "1991Y1:1995Y1"]
         [0.0, 0.0, 0.0, 0.0, 0.0]
         >>> # 2b. variable(periods) = vector (list) containing a specific value for each period
-        >>> var_db["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
-        >>> var_db["ACAF", "1991Y1":"1995Y1"]
+        >>> variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
+        >>> variables["ACAF", "1991Y1":"1995Y1"]
         [0.0, -1.0, -2.0, -3.0, -4.0]
         >>> # 2c. variable(periods) = LEC expression
-        >>> var_db["ACAF", "1991Y1:1995Y1"] = "t - 10"
-        >>> var_db["ACAF", "1991Y1:1995Y1"]
+        >>> variables["ACAF", "1991Y1:1995Y1"] = "t - 10"
+        >>> variables["ACAF", "1991Y1:1995Y1"]
         [21.0, 22.0, 23.0, 24.0, 25.0]
         """
         self._set_object(key, value) 
@@ -1220,12 +1220,12 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> "ACAF" in cmt_db
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> "ACAF" in comments
         True
-        >>> del cmt_db["ACAF"]
-        >>> "ACAF" in cmt_db
+        >>> del comments["ACAF"]
+        >>> "ACAF" in comments
         False
         """
         if not isinstance(key, str):

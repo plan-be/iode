@@ -34,23 +34,36 @@ cdef class Comments(_AbstractDatabase):
 
     Examples
     --------
-    >>> from iode import Comments, SAMPLE_DATA_DIR
-    >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    >>> len(cmt_db)
+    >>> from iode import comments, SAMPLE_DATA_DIR
+    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    >>> len(comments)
     317
     """
 
     cdef CKDBComments* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Comments:
-        self.database_ptr = self.abstract_db_ptr = &cpp_global_comments
-        if filepath is not None:
-            self.load(filepath)
+        self.database_ptr = NULL
+        self.abstract_db_ptr = NULL
+
+    def __init__(self, filepath: str = None):
+        # Prevent accidental instantiation from normal Python code
+        # since we cannot pass a struct pointer into a Python constructor.
+        raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Comments 
         # which does not need to be manually deleted 
         pass
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    def _get_instance() -> Comments:
+        # call to __new__() that bypasses the __init__() constructor.
+        cdef Comments wrapper = Comments.__new__(Comments)
+        wrapper.database_ptr = &cpp_global_comments
+        wrapper.abstract_db_ptr = &cpp_global_comments
+        return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
@@ -58,7 +71,8 @@ cdef class Comments(_AbstractDatabase):
         del kdb
 
     def subset(self, pattern: str, copy: bool = False) -> Comments:
-        subset_ = Comments()
+        # call to __new__() that bypasses the __init__() constructor.
+        cdef Comments subset_ = Comments.__new__(Comments)
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
@@ -82,3 +96,6 @@ cdef class Comments(_AbstractDatabase):
             self.database_ptr.update(key.encode(), value.encode())
         else:
             self.database_ptr.add(key.encode(), value.encode())
+
+
+comments: Comments = Comments._get_instance()

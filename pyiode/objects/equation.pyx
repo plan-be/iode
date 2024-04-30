@@ -55,7 +55,8 @@ cdef class Equation:
 
     Examples
     --------
-    >>> from iode import Equation
+    >>> from iode import Equation, variables
+    >>> variables.sample = "1960Y1:2015Y1"
     >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
     >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
     Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
@@ -163,9 +164,9 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Variables, Equation, Sample
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> var_db.sample
+        >>> from iode import variables, Equation, Sample
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.sample
         1960Y1:2015Y1
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF.set_sample("1980Y1", "2010Y1")
@@ -233,9 +234,9 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Equation, Scalars, Variables
-        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Equation, scalars, variables
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
@@ -260,17 +261,17 @@ cdef class Equation:
         >>> eq_ACAF.get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
         >>> # clear Scalars database
-        >>> scl_db.clear()
+        >>> scalars.clear()
         >>> # Do not create scalars in the Scalars database
         >>> eq_ACAF.get_coefficients_list(False)
         ['acaf1', 'acaf2', 'acaf4']
-        >>> scl_db.get_names()
+        >>> scalars.get_names()
         []
         >>> # create scalars on the flight
         >>> eq_ACAF.get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
         >>> # content of the Scalars database
-        >>> scl_db.get_names()
+        >>> scalars.get_names()
         ['acaf1', 'acaf2', 'acaf4']
         """
         return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(create_if_not_exit)]
@@ -292,9 +293,9 @@ cdef class Equation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Equation, Scalars, Variables
-        >>> scl_db = Scalars(f"{SAMPLE_DATA_DIR}/fun.scl")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Equation, scalars, variables
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
@@ -319,20 +320,20 @@ cdef class Equation:
         >>> eq_ACAF.get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
         >>> # clear Variables database + reset vars sample
-        >>> var_db.clear()
-        >>> var_db.sample = "1960Y1:2015Y1"
-        >>> var_db.sample
+        >>> variables.clear()
+        >>> variables.sample = "1960Y1:2015Y1"
+        >>> variables.sample
         1960Y1:2015Y1
         >>> # Do not create variables in the Variables database
         >>> eq_ACAF.get_variables_list(False)
         ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> var_db.get_names()
+        >>> variables.get_names()
         []
         >>> # create variables on the flight
         >>> eq_ACAF.get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
         >>> # content of the Variables database
-        >>> var_db.get_names()
+        >>> variables.get_names()
         ['ACAF', 'GOSF', 'TIME', 'VAF']
         """
         return [var.decode() for var in self.c_equation.get_variables_list(create_if_not_exit)]

@@ -38,23 +38,36 @@ cdef class Equations(_AbstractDatabase):
 
     Examples
     --------
-    >>> from iode import Equations, SAMPLE_DATA_DIR
-    >>> eqs_db = Equations(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    >>> len(eqs_db)
+    >>> from iode import equations, SAMPLE_DATA_DIR
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    >>> len(equations)
     274
     """
 
     cdef CKDBEquations* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Equations:
-        self.database_ptr = self.abstract_db_ptr = &cpp_global_equations
-        if filepath is not None:
-            self.load(filepath)
+        self.database_ptr = NULL
+        self.abstract_db_ptr = NULL
+
+    def __init__(self, filepath: str = None):
+        # Prevent accidental instantiation from normal Python code
+        # since we cannot pass a struct pointer into a Python constructor.
+        raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Equations 
         # which does not need to be manually deleted 
         pass
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    def _get_instance() -> Equations:
+        # call to __new__() that bypasses the __init__() constructor.
+        cdef Equations wrapper = Equations.__new__(Equations)
+        wrapper.database_ptr = &cpp_global_equations
+        wrapper.abstract_db_ptr = &cpp_global_equations
+        return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
@@ -62,7 +75,8 @@ cdef class Equations(_AbstractDatabase):
         del kdb
 
     def subset(self, pattern: str, copy: bool = False) -> Equations:
-        subset_ = Equations()
+        # call to __new__() that bypasses the __init__() constructor.
+        cdef Equations subset_ = Equations.__new__(Equations)
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
@@ -143,3 +157,6 @@ cdef class Equations(_AbstractDatabase):
                                 f"dict or Equation. Got value of type {type(value).__name__}")
             c_equation = (<Equation>equation).c_equation
             self.database_ptr.add(key.encode(), dereference(c_equation))
+
+
+equations: Equations = Equations._get_instance()

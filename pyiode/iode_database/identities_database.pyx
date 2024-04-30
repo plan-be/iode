@@ -35,23 +35,36 @@ cdef class Identities(_AbstractDatabase):
 
     Examples
     --------
-    >>> from iode import Identities, SAMPLE_DATA_DIR
-    >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
-    >>> len(idt_db)
+    >>> from iode import identities, SAMPLE_DATA_DIR
+    >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    >>> len(identities)
     48
     """
 
     cdef CKDBIdentities* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Identities:
-        self.database_ptr = self.abstract_db_ptr = &cpp_global_identities
-        if filepath is not None:
-            self.load(filepath)
+        self.database_ptr = NULL
+        self.abstract_db_ptr = NULL
+
+    def __init__(self, filepath: str = None):
+        # Prevent accidental instantiation from normal Python code
+        # since we cannot pass a struct pointer into a Python constructor.
+        raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
         # self.database_ptr points to the C++ global instance Identities 
         # which does not need to be manually deleted 
         pass
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    def _get_instance() -> Identities:
+        # call to __new__() that bypasses the __init__() constructor.
+        cdef Identities wrapper = Identities.__new__(Identities)
+        wrapper.database_ptr = &cpp_global_identities
+        wrapper.abstract_db_ptr = &cpp_global_identities
+        return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
     def _load(self, filepath: str):
@@ -59,7 +72,7 @@ cdef class Identities(_AbstractDatabase):
         del kdb
 
     def subset(self, pattern: str, copy: bool = False) -> Identities:
-        subset_ = Identities()
+        cdef Identities subset_ = Identities.__new__(Identities)
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
@@ -117,55 +130,55 @@ cdef class Identities(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import Identities, Variables, SAMPLE_DATA_DIR
-        >>> idt_db = Identities(f"{SAMPLE_DATA_DIR}/fun.idt")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> sample = var_db.sample
+        >>> from iode import identities, variables, SAMPLE_DATA_DIR
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> sample = variables.sample
         >>> sample
         1960Y1:2015Y1
-        >>> idt_db["GAP_"]
+        >>> identities["GAP_"]
         '100*((QAF_/Q_F)-1)'
-        >>> idt_db["GAP2"]
+        >>> identities["GAP2"]
         '100*(QAFF_/(Q_F+Q_I))'
         >>> # reset variables GAP_ and GAP2
-        >>> var_db["GAP_"] = 0.
-        >>> var_db["GAP_"]                   # doctest: +ELLIPSIS 
+        >>> variables["GAP_"] = 0.
+        >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
         [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
-        >>> var_db["GAP2"] = 0.
-        >>> var_db["GAP2"]                   # doctest: +ELLIPSIS 
+        >>> variables["GAP2"] = 0.
+        >>> variables["GAP2"]                   # doctest: +ELLIPSIS 
         [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
 
         >>> # compute GAP_ and GAP2 (assuming Scalars and Variables are already loaded)
-        >>> idt_db.execute("GAP_;GAP2")
-        >>> var_db["GAP_"]                   # doctest: +ELLIPSIS 
+        >>> identities.execute("GAP_;GAP2")
+        >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
         [-3.20493949860704, -3.981808446333557, ..., 3.7800671441993616, 3.2396415884531793]
-        >>> var_db["GAP2"]                   # doctest: +ELLIPSIS 
+        >>> variables["GAP2"]                   # doctest: +ELLIPSIS 
         [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
 
         >>> # compute GAP_ and GAP2 over a subset of the sample
-        >>> var_db["GAP_"] = 0.
-        >>> var_db["GAP2"] = 0.
-        >>> idt_db.execute("GAP_;GAP2", "2000Y1", "2005Y1")
-        >>> var_db["GAP_", "2000Y1:2005Y1"]
+        >>> variables["GAP_"] = 0.
+        >>> variables["GAP2"] = 0.
+        >>> identities.execute("GAP_;GAP2", "2000Y1", "2005Y1")
+        >>> variables["GAP_", "2000Y1:2005Y1"]
         [4.510095736743436, 3.312304975734315, 2.6151793579969107, 3.464117181974924, 5.478645527985804, 5.578699398837528]
-        >>> var_db["GAP2", "2000Y1:2005Y1"]
+        >>> variables["GAP2", "2000Y1:2005Y1"]
         [104.60957761618035, 103.05782573291968, 102.17336700422976, 102.82322081548728, 104.4719275849864, 104.3586710898436]
 
         >>> # compute GAP_ and GAP2 assuming Variables are not already loaded
-        >>> var_db.clear()
-        >>> var_db.sample = '1960Y1:2015Y1'
-        >>> var_db.get_names()
+        >>> variables.clear()
+        >>> variables.sample = '1960Y1:2015Y1'
+        >>> variables.get_names()
         []
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
-        >>> idt_db.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> var_db["GAP_"]                   # doctest: +ELLIPSIS 
+        >>> identities.execute("GAP_;GAP2", var_files=f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables["GAP_"]                   # doctest: +ELLIPSIS 
         [-3.20493949860704, -3.981808446333557, ..., 3.7800671441993616, 3.2396415884531793]
-        >>> var_db["GAP2"]                   # doctest: +ELLIPSIS 
+        >>> variables["GAP2"]                   # doctest: +ELLIPSIS 
         [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
         >>> # note that the variables 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' are not 
-        >>> # present in the Variables database after running idt_db.execute
-        >>> var_db.get_names()
+        >>> # present in the Variables database after running identities.execute
+        >>> variables.get_names()
         ['GAP2', 'GAP_']
         """
         if identities is None:
@@ -219,3 +232,6 @@ cdef class Identities(_AbstractDatabase):
 
         self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
                                             var_files.encode(), scalar_files.encode(), <bint>trace)
+
+
+identities: Identities = Identities._get_instance()
