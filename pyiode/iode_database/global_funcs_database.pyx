@@ -38,11 +38,10 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR, LTOH_STOCK, LTOH_FLOW, LTOH_CS, LTOH_LIN, LTOH_STEP
-    >>> from iode import Variables, low_to_high
-    >>> var_db = Variables()
-    >>> var_db.clear()
+    >>> from iode import variables, low_to_high
+    >>> variables.clear()
     >>> # define a yearly sample
-    >>> var_db.sample = "2010Q1:2020Q4"
+    >>> variables.sample = "2010Q1:2020Q4"
     >>> # input filepath
     >>> filepath = f"{SAMPLE_DATA_DIR}/fun.var"
     
@@ -50,43 +49,43 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     
     >>> # "stock" -> the result is a linear interpolation of the 2 surrounding source values.
     >>> low_to_high(LTOH_STOCK, 'L', filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2014Q1":"2014Q4"]
+    >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-72.50614701966526, -76.11763971671049, -79.7291324137557, -83.34062511080091]
-    >>> var_db["ACAG", "2014Q1":"2014Q4"]
+    >>> variables["ACAG", "2014Q1":"2014Q4"]
     [31.63267881532112, 31.895218819946884, 32.15775882457264, 32.4202988291984]
 
     Linear interpolation / flow
     
     >>> # "flow" -> the result is the source value divided by the nb of sub-periods. 
     >>> low_to_high(LTOH_FLOW, 'L', filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2014Q1":"2014Q4"]
+    >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
-    >>> var_db["ACAG", "2014Q1":"2014Q4"]
+    >>> variables["ACAG", "2014Q1":"2014Q4"]
     [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
 
     Cubic splines / stock
     
     >>> low_to_high(LTOH_STOCK, 'C', filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2012Q1":"2012Q4"]
+    >>> variables["ACAF", "2012Q1":"2012Q4"]
     [-47.2984169294621, -50.052041225380975, -52.80566552129986, -55.55928981721873]
-    >>> var_db["ACAG", "2012Q1":"2012Q4"]
+    >>> variables["ACAG", "2012Q1":"2012Q4"]
     [29.544440560604077, 29.804280757173238, 30.064120953742403, 30.323961150311572]
 
     Cubic splines / flow
     
     >>> low_to_high(LTOH_FLOW, 'C', filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2012Q1":"2012Q4"]
+    >>> variables["ACAF", "2012Q1":"2012Q4"]
     [-12.748422687629207, -13.436828761608925, -14.270289043196508, -15.103749324784092]
-    >>> var_db["ACAG", "2012Q1":"2012Q4"]
+    >>> variables["ACAG", "2012Q1":"2012Q4"]
     [7.483230672890683, 7.548190722032976, 7.6135768258069625, 7.678962929580949]
 
     Step / stock
     
     >>> # "stock" -> the result has the same value as the source
     >>> low_to_high(LTOH_STOCK, 'S', filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2014Q1":"2014Q4"]
+    >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-83.34062511080091, -83.34062511080091, -83.34062511080091, -83.34062511080091]
-    >>> var_db["ACAG", "2014Q1":"2014Q4"]
+    >>> variables["ACAG", "2014Q1":"2014Q4"]
     [32.4202988291984, 32.4202988291984, 32.4202988291984, 32.4202988291984]
 
     Step / flow
@@ -94,9 +93,9 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     >>> # "flow" -> the result is the source value plus a portion of 
     >>> # the difference between the 2 surrounding values in the source
     >>> low_to_high(LTOH_FLOW, 'S', filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2014Q1":"2014Q4"]
+    >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
-    >>> var_db["ACAG", "2014Q1":"2014Q4"]
+    >>> variables["ACAG", "2014Q1":"2014Q4"]
     [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
     """
     if not isinstance(type_of_series, int):
@@ -144,36 +143,35 @@ def high_to_low(type_of_series: int, filepath: str, var_list: Union[str, List[st
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR, HTOL_LAST, HTOL_MEAN, HTOL_SUM
-    >>> from iode import Variables, high_to_low
-    >>> var_db = Variables()
-    >>> var_db.clear()
+    >>> from iode import variables, high_to_low
+    >>> variables.clear()
     >>> # define a yearly sample
-    >>> var_db.sample = "2000Y1:2020Y1"
+    >>> variables.sample = "2000Y1:2020Y1"
     >>> # input filepath
     >>> filepath = f"{SAMPLE_DATA_DIR}/fun_q.var"
     
     Last Obs in year
     
     >>> high_to_low(HTOL_LAST, filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2010Y1":"2014Y1"]
+    >>> variables["ACAF", "2010Y1":"2014Y1"]
     [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
-    >>> var_db["ACAG", "2010Y1":"2014Y1"]
+    >>> variables["ACAG", "2010Y1":"2014Y1"]
     [7.063482244552621, 7.321150091008727, 7.580990287577893, 7.842534702673841, 8.1050747072996]
 
     Mean of year
     
     >>> high_to_low(HTOL_MEAN, filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2010Y1":"2014Y1"]
+    >>> variables["ACAF", "2010Y1":"2014Y1"]
     [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
-    >>> var_db["ACAG", "2010Y1":"2014Y1"]
+    >>> variables["ACAG", "2010Y1":"2014Y1"]
     [7.063482244552621, 7.321150091008727, 7.580990287577893, 7.842534702673841, 8.1050747072996]
 
     Sum
     
     >>> high_to_low(HTOL_SUM, filepath, ["ACAF", "ACAG"])
-    >>> var_db["ACAF", "2010Y1":"2014Y1"]
+    >>> variables["ACAF", "2010Y1":"2014Y1"]
     [-151.30971532917755, -178.1791705341729, -222.23715926887493, -275.5786172904802, -333.36250044320366]
-    >>> var_db["ACAG", "2010Y1":"2014Y1"]
+    >>> variables["ACAG", "2010Y1":"2014Y1"]
     [28.253928978210485, 29.284600364034908, 30.323961150311572, 31.370138810695362, 32.4202988291984]
     """
     if not isinstance(type_of_series, int):

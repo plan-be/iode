@@ -25,9 +25,9 @@ if not IODE_OUTPUT_DIR.exists():
 # -----------
 
 def test_iode_exec_lec():
-    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "a.var"))
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/a.var")
 
-    v_A = var_db["A"]
+    v_A = iode.variables["A"]
     vec = iode.exec_lec("1+A-1")
     assert vec == v_A
 
@@ -38,16 +38,16 @@ def test_iode_exec_lec():
 # ----------
 
 def test_iode_eqs_estimation():
-    eqs_db = iode.Equations(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
-    scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
+    iode.equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    iode.scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
 
     name = "ACAF"
     iode.eqs_estimate(name, "1980Y1", "1996Y1")
 
     # Check acaf1 value after estimation
     name = "acaf1"
-    i_acaf1 = scl_db[name]
+    i_acaf1 = iode.scalars[name]
     assert round(i_acaf1.value, 8) == 0.0157705
 
     # Check _YCALC[1980Y1]
@@ -58,9 +58,9 @@ def test_iode_eqs_estimation():
 # ----------
 
 def test_iode_model_simulate():
-    eqs_db = iode.Equations(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
-    scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
+    iode.equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    iode.scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
 
     # Test non convergence
     iode.suppress_msgs()
@@ -81,22 +81,22 @@ def test_iode_model_simulate():
 def test_iode_model_simulate_exchange():
 
     iode.suppress_msgs()
-    eqs_db = iode.Equations(str(SAMPLE_DATA_DIR / "fun.eqs"))
-    var_db = iode.Variables(str(SAMPLE_DATA_DIR / "fun.var"))
-    scl_db = iode.Scalars(str(SAMPLE_DATA_DIR / "fun.scl"))
+    iode.equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    iode.scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
 
     # Version with exchange in at least 2 equations
     # Set values of endo UY
-    UY = var_db["UY"]
+    UY = iode.variables["UY"]
     UY[40:43] = [650.0, 670.0, 680.0]   # 2000Y1..2002Y1
-    var_db["UY"] = UY
+    iode.variables["UY"] = UY
 
     # Simulate with exchange UY - XNATY
     iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
 
     # Check result
-    UY = var_db["UY"]
-    XNATY = var_db["XNATY"]
+    UY = iode.variables["UY"]
+    XNATY = iode.variables["XNATY"]
     assert iode.exec_lec("UY[2000Y1]")[0] == 650.0
     assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006734
 
@@ -163,8 +163,7 @@ def test_from_frame_timeit():
     import pandas as pd
     import numpy as np
 
-    var_db = iode.Variables()
-    var_db.clear()
+    iode.variables.clear()
 
     # create the pandas DataFrame
     vars_names = [f"A_{i}" for i in range(0, 10_000)]           # 10_000 variables
@@ -175,9 +174,9 @@ def test_from_frame_timeit():
     assert df.shape == (10_000, 100)
     assert df.size == 1000_000
 
-    stmt = "var_db.from_frame(df)"
+    stmt = "iode.variables.from_frame(df)"
     nb_times = 10
-    t = timeit.timeit(stmt, globals={"iode": iode, "df": df, "var_db": var_db}, number=nb_times)
+    t = timeit.timeit(stmt, globals={"iode": iode, "df": df, "iode.variables": iode.variables}, number=nb_times)
     logging.info(f"{stmt} (shape {df.shape}): {t} ({nb_times} times) -> {t / nb_times} per loop")
 
 def test_to_frame_timeit():
@@ -185,20 +184,19 @@ def test_to_frame_timeit():
     import pandas as pd
     import numpy as np
 
-    var_db = iode.Variables()
-    var_db.clear()
+    iode.variables.clear()
 
     # set sample to 100 periods
-    var_db.sample = "1951Y1:2050Y1"
-    assert var_db.nb_periods == 100
+    iode.variables.sample = "1951Y1:2050Y1"
+    assert iode.variables.nb_periods == 100
 
     # create 10_000 variables
     for i in range(0, 10_000):
-        var_db[f"A_{i}"] = f"t + {i}"
-    assert len(var_db) == 10_000
+        iode.variables[f"A_{i}"] = f"t + {i}"
+    assert len(iode.variables) == 10_000
 
-    stmt = "df = var_db.to_frame()"
+    stmt = "df = iode.variables.to_frame()"
     nb_times = 10
-    t = timeit.timeit(stmt, globals={"iode": iode, "var_db": var_db}, number=nb_times)
-    logging.info(f"{stmt} (shape ({len(var_db)}, {var_db.nb_periods})): "
+    t = timeit.timeit(stmt, globals={"iode": iode, "iode.variables": iode.variables}, number=nb_times)
+    logging.info(f"{stmt} (shape ({len(iode.variables)}, {iode.variables.nb_periods})): "
                  f"{t} ({nb_times} times) -> {t / nb_times} per loop")

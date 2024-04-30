@@ -33,9 +33,9 @@ cdef class TableCell:
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR
-    >>> from iode import Tables, Table
-    >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    >>> table = tbl_db["ANAPRIX"]
+    >>> from iode import tables, Table
+    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> table = tables["ANAPRIX"]
     >>> table           # doctest: +NORMALIZE_WHITESPACE
     DIVIS | 1                            |
     TITLE |                        "Analyse des prix"
@@ -102,9 +102,9 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table[4]
         ('"GAP_"', 'GAP_')
         >>> # first cell
@@ -135,9 +135,9 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table[4][0].align
         'left'
         >>> table[4][0].align = 'center'
@@ -174,9 +174,9 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table[4][0].bold
         False
         >>> table[4][0].bold = True
@@ -203,9 +203,9 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table[4][0].italic
         False
         >>> table[4][0].italic = True
@@ -232,9 +232,9 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table[4][0].underline
         False
         >>> table[4][0].underline = True
@@ -259,10 +259,10 @@ cdef class TableCell:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Variables, Tables
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]    
+        >>> from iode import variables, tables
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]    
         >>> table[5]
         ('"dln (PC/(1+ITCR))-dln AOUC"', '100*(dln (PC/(1+ITCR))-dln AOUC)')
         >>> table[5][1].get_variables_from_lec()
@@ -311,9 +311,9 @@ cdef class TableLine:
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR
-    >>> from iode import Tables, Table
-    >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-    >>> table = tbl_db["ANAPRIX"]
+    >>> from iode import tables, Table
+    >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    >>> table = tables["ANAPRIX"]
     >>> table           # doctest: +NORMALIZE_WHITESPACE
     DIVIS | 1                            |
     TITLE |                        "Analyse des prix"
@@ -380,9 +380,9 @@ cdef class TableLine:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
@@ -427,9 +427,9 @@ cdef class TableLine:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, GRAPH_TYPE_LINE, GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
@@ -487,9 +487,9 @@ cdef class TableLine:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
@@ -556,9 +556,9 @@ cdef class TableLine:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
@@ -605,9 +605,9 @@ cdef class TableLine:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Tables, Table
-        >>> tbl_db = Tables(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> table = tbl_db["ANAPRIX"]
+        >>> from iode import tables, Table
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> table = tables["ANAPRIX"]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
@@ -720,10 +720,10 @@ cdef class Table:
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR
-    >>> from iode import Comments, Lists, Variables, Table
-    >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-    >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-    >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> from iode import Table, comments, lists, variables
+    >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
     >>> # empty table
     >>> table = Table()
@@ -1158,10 +1158,10 @@ cdef class Table:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1245,10 +1245,10 @@ cdef class Table:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1417,10 +1417,10 @@ cdef class Table:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1487,10 +1487,10 @@ cdef class Table:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1598,10 +1598,10 @@ cdef class Table:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
@@ -1673,10 +1673,10 @@ cdef class Table:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
-        >>> from iode import Comments, Lists, Variables, Table
-        >>> cmt_db = Comments(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> lst_db = Lists(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> var_db = Variables(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> from iode import Table, comments, lists, variables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> table_title = "Table example"
         >>> lines_titles = ["GOSG:", "YSSG+COTRES:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
