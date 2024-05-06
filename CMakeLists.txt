@@ -246,7 +246,7 @@ endif()
 
 # -- find Python --
 message(CHECK_START "Search for Python")
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy
+find_package(Python COMPONENTS Interpreter Development.Module NumPy
                     OPTIONAL_COMPONENTS Development.SABIModule)
 if(Python_FOUND)
   message(CHECK_PASS "found")
