@@ -10,7 +10,7 @@
 #include "wrapper_classes.h"
 #include "print_abstract.h"
 #include "text_edit/completer.h"
-#include "tabs/iode_objs/tab_gsample_table.h"
+#include "tabs/iode_objs/tab_computed_table.h"
 
 /* NOTE FOR THE DEVELOPERS:
  * All Menu Dialog classes MUST

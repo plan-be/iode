@@ -9,7 +9,7 @@
 #include "iode_objs/edit/edit_table.h"
 #include "iode_objs/new/add_table.h"
 #include "plot/plot_table.h"
-#include "tabs/iode_objs/tab_gsample_table.h"
+#include "tabs/iode_objs/tab_computed_table.h"
 
 
 class TablesView : public IodeAbstractTableView, public TableViewEditObj<TablesModel, EditTableDialog>, public TableViewAddObj<TablesModel, AddTableDialog>

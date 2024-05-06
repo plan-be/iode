@@ -93,7 +93,7 @@ void EditTableDialog::plot()
         Sample smpl = Variables.get_sample();
         QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
  
-        GSampleGraph* gSampleGraph = new GSampleGraph(name, gsample.toStdString());
+        ComputedTableGraph* gSampleGraph = new ComputedTableGraph(name, gsample.toStdString());
 
         PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
         plotDialog->plot();

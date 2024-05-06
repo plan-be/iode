@@ -36,7 +36,7 @@ MenuPrintTables::MenuPrintTables(QWidget* parent) : MenuPrintAbstract(parent)
 MenuPrintTables::~MenuPrintTables()
 {
     clear_all_reference_kdbs();
-    foreach(GSampleNumericalDialog* view, tableViews) view->close();
+    foreach(ComputedTableNumericalDialog* view, tableViews) view->close();
     tableViews.clear();
 
     delete wTablesNames;
@@ -82,7 +82,7 @@ void MenuPrintTables::display()
         for(int i=0; i < nb_names; i++)
         {
             QString tableName(c_table_names[i]); 
-            GSampleNumericalDialog* view = new GSampleNumericalDialog(tableName, gsample, nb_decimals, "", this);
+            ComputedTableNumericalDialog* view = new ComputedTableNumericalDialog(tableName, gsample, nb_decimals, "", this);
             tableViews.append(view);
             view->open();
         }

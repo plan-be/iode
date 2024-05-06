@@ -9,7 +9,7 @@
 #include "settings.h"
 #include "wrapper_classes.h"
 #include "text_edit/completer.h"
-#include "tabs/iode_objs/tab_gsample_table.h"
+#include "tabs/iode_objs/tab_computed_table.h"
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -23,7 +23,7 @@ class MenuDataEditTables: public IodeSettingsDialog, public Ui::MenuDataEditTabl
 {
     Q_OBJECT
     
-    QVector<GSampleNumericalDialog*> tableViews;
+    QVector<ComputedTableNumericalDialog*> tableViews;
 
     WrapperQPlainTextEdit*   wTablesNames;
 

@@ -14,13 +14,13 @@
  */
 
 
-class GSampleTableView: public QTableView
+class ComputedTableView: public QTableView
 {
     Q_OBJECT
     NumericalTableView numeric;
 
 public:
-    GSampleTableView(QWidget *parent = nullptr): QTableView(parent), numeric(false)
+    ComputedTableView(QWidget *parent = nullptr): QTableView(parent), numeric(false)
     {
         numeric.setup(this);
     }

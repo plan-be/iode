@@ -46,7 +46,7 @@ set(GUI_TABS
                             tabs/tab_abstract.h
                             tabs/iode_objs/tab_database_abstract.h
                             tabs/iode_objs/tab_numerical_values.h
-                            tabs/iode_objs/tab_gsample_table.h
+                            tabs/iode_objs/tab_computed_table.h
                             tabs/iode_objs/tab_database.h
                             tabs/tab_text_abstract.h                tabs/tab_text_abstract.cpp
     tabs/tab_text.ui        tabs/tab_text.h                         tabs/tab_text.cpp
@@ -101,7 +101,7 @@ set(GUI_OBJS_MODELS
     iode_objs/models/scalars_model.h            iode_objs/models/scalars_model.cpp
     iode_objs/models/tables_model.h             iode_objs/models/tables_model.cpp
     iode_objs/models/variables_model.h          iode_objs/models/variables_model.cpp
-    iode_objs/models/gsample_table_model.h      iode_objs/models/gsample_table_model.cpp    
+    iode_objs/models/computed_table_model.h     iode_objs/models/computed_table_model.cpp    
 )
 
 set(GUI_OBJS_DELEGATES
@@ -118,7 +118,7 @@ set(GUI_OBJS_DELEGATES
 set(GUI_OBJS_VIEWS
     iode_objs/views/abstract_table_view.h   iode_objs/views/abstract_table_view.cpp
     iode_objs/views/numerical_view.h
-    iode_objs/views/gsample_table_view.h
+    iode_objs/views/computed_table_view.h
     iode_objs/views/comments_view.h
     iode_objs/views/equations_view.h
     iode_objs/views/identities_view.h       iode_objs/views/identities_view.cpp

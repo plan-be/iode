@@ -10,10 +10,10 @@ class PlotTableDialog : public PlotDialog
 {
     Q_OBJECT
 
-    GSampleGraph* gsample_graph;
+    ComputedTableGraph* gsample_graph;
 
 public:
-    PlotTableDialog(GSampleGraph* gsample_graph, EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
+    PlotTableDialog(ComputedTableGraph* gsample_graph, EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
         EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, 
         QWidget* parent = nullptr);
     ~PlotTableDialog();
