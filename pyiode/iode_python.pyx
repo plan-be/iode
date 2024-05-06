@@ -93,8 +93,9 @@ include "common.pyx"
 include "_cdef.pyx"
 include "util.pyx"
 include "lec.pyx"
-include "period.pyx"
-include "sample.pyx"
+
+include "time/period.pyx"
+include "time/sample.pyx"
 
 include "objects/equation.pyx"
 include "objects/scalar.pyx"

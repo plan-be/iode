@@ -2,16 +2,8 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from period cimport CPeriod
+from time.period cimport CPeriod
 
-cdef extern from "api/iode.h":
-    cdef int     IodeIsSampleSet()
-    cdef int     IodeGetSampleLength()
-    cdef char    **IodeCreateSampleAsPeriods(char* aper_from, char* aper_to) 
-    cdef char    **IodeGetSampleAsPeriods()
-    cdef char    *IodeGetSampleAsString()
-    cdef int     IodeSetSampleStr(char* str_from, char* str_to)
-    cdef double  *IodeGetSampleAsDoubles(int *lg)
 
 # declare C++ Sample class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
