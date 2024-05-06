@@ -2,7 +2,7 @@
 
 from typing import Union, Tuple
 from libcpp.string cimport string
-from period cimport CPeriod
+from time.period cimport CPeriod
 
 
 periodicities = ["Y", "S", "Q", "M", "W", "D"]

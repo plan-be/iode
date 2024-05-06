@@ -7,7 +7,7 @@ from libcpp.pair cimport pair
 from libcpp cimport bool
 
 from pyiode.common cimport EnumIodeEquationTest
-from pyiode.sample cimport CSample
+from pyiode.time.sample cimport CSample
 
 
 cdef extern from "cpp_api/objects/equation.h":

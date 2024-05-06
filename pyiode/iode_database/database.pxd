@@ -9,8 +9,8 @@ from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, Enum
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             EnumIodeVarMode, EnumSimulationInitialization, EnumIodeLtoH, 
                             EnumIodeHtoL)
-from pyiode.period cimport CPeriod
-from pyiode.sample cimport CSample
+from pyiode.time.period cimport CPeriod
+from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.table cimport CTable

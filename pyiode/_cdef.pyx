@@ -10,7 +10,6 @@
 
 cimport numpy as np
 from _cdef cimport IodeGetVector
-from sample cimport IodeGetSampleAsDoubles
 
 
 cdef _pylist(char** c_list):

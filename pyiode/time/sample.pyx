@@ -10,8 +10,7 @@
 # distutils: language = c++
 
 from typing import Union, Tuple, List, Optional, Any
-from sample cimport (CSample, IodeIsSampleSet, IodeSetSampleStr, IodeGetSampleAsString, 
-                            IodeCreateSampleAsPeriods)
+from time.sample cimport CSample
 from iode_python cimport free_tbl
 
 try:
