@@ -19,7 +19,7 @@ MenuDataEditTables::MenuDataEditTables(QWidget* parent)
 MenuDataEditTables::~MenuDataEditTables()
 {
     clear_all_reference_kdbs();
-    foreach(GSampleNumericalDialog* view, tableViews) view->close();
+    foreach(ComputedTableNumericalDialog* view, tableViews) view->close();
     tableViews.clear();
 
     delete wTablesNames;
@@ -42,7 +42,7 @@ void MenuDataEditTables::display()
         for(int i=0; i < nb_names; i++)
         {
             QString tableName(c_table_names[i]); 
-            GSampleNumericalDialog* view = new GSampleNumericalDialog(tableName, gsample, 4, "", this);
+            ComputedTableNumericalDialog* view = new ComputedTableNumericalDialog(tableName, gsample, 4, "", this);
             tableViews.append(view);
             view->open();
         }

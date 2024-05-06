@@ -283,7 +283,7 @@ int gui_view_tbl(TBL* tbl, char* smpl, char* name)
 	}
 
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	GSampleNumericalDialog view(tableName, gsample, nb_decimals, QString(""), main_window);
+	ComputedTableNumericalDialog view(tableName, gsample, nb_decimals, QString(""), main_window);
 	int res = view.exec();
 
 	if(!table_found)

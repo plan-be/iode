@@ -1,7 +1,7 @@
 #include "plot_table.h"
 
 
-PlotTableDialog::PlotTableDialog(GSampleGraph* gsample_graph, EnumIodeGraphChart chartType, const bool logScale, 
+PlotTableDialog::PlotTableDialog(ComputedTableGraph* gsample_graph, EnumIodeGraphChart chartType, const bool logScale, 
     EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, QWidget* parent)
     : PlotDialog(chartType, logScale, xTicks, yTicks, parent), gsample_graph(gsample_graph)
 {

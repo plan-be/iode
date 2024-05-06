@@ -17,13 +17,13 @@ void TablesView::display()
 		if(!checkGlobalSample())
 			return;
 
-		// generates the GSample representing the whole global sample
+		// generates the ComputedTable representing the whole global sample
 		Sample smpl = Variables.get_sample();
 		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 		// computes and display the selected table
 		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-		GSampleNumericalDialog* view = new GSampleNumericalDialog(tableName, gsample, 4, "", this);
+		ComputedTableNumericalDialog* view = new ComputedTableNumericalDialog(tableName, gsample, 4, "", this);
 		main_window->appendDialog(view);
 	}
     catch (const std::exception& e)
@@ -49,13 +49,13 @@ void TablesView::plot()
 		if(!checkGlobalSample())
 			return;
 
-		// generates the GSample representing the whole global sample
+		// generates the ComputedTable representing the whole global sample
 		Sample smpl = Variables.get_sample();
 		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
 
 		// computes the tables and generates the associated graph
 		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
-		GSampleGraph* gSampleGraph = new GSampleGraph(tableName.toStdString(), gsample.toStdString());
+		ComputedTableGraph* gSampleGraph = new ComputedTableGraph(tableName.toStdString(), gsample.toStdString());
 		PlotTableDialog* plotDialog = new PlotTableDialog(gSampleGraph);
 		main_window->appendPlot(plotDialog);
 	}

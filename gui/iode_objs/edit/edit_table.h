@@ -15,7 +15,7 @@
 #include "plot/plot_table.h"
 #include "main_window_abstract.h"
 #include "iode_objs/models/abstract_table_model.h"
-#include "iode_objs/models/gsample_table_model.h"
+#include "iode_objs/models/computed_table_model.h"
 
 
 enum EnumInsertWhere

@@ -16,18 +16,18 @@
 #include "numerical_table_model.h"
 
 
-class GSampleTableModel : public QAbstractTableModel, public NumericalTableModel
+class ComputedTableModel : public QAbstractTableModel, public NumericalTableModel
 {
     QString refTable;
     QString variables;
 
-    GSampleTable *table;
+    ComputedTable *table;
 
 public:
 
-    GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
+    ComputedTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
 		const QString& variables, QObject *parent);
-    ~GSampleTableModel();
+    ~ComputedTableModel();
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override
 	{

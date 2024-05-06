@@ -7,8 +7,8 @@
 #include <QVBoxLayout>
 
 #include "tab_numerical_values.h"
-#include "iode_objs/models/gsample_table_model.h"
-#include "iode_objs/views/gsample_table_view.h"
+#include "iode_objs/models/computed_table_model.h"
+#include "iode_objs/views/computed_table_view.h"
 
 /* NOTE FOR THE DEVELOPERS:
  * Multiple Inheritance Requires QObject to Be First
@@ -20,7 +20,7 @@
  */
 
 
-class GSampleNumericalDialog : public QDialog
+class ComputedTableNumericalDialog : public QDialog
 {
     Q_OBJECT
 
@@ -28,8 +28,8 @@ class GSampleNumericalDialog : public QDialog
 
     QVBoxLayout* vLayout;
 
-    GSampleTableView*  tableview;
-    GSampleTableModel* objmodel;
+    ComputedTableView*  tableview;
+    ComputedTableModel* objmodel;
 
 protected:
     QString getGroupName()
@@ -44,7 +44,7 @@ protected:
     }
 
 public:
-    GSampleNumericalDialog(const QString& refTable, const QString& gsample, const int nbDecimals, 
+    ComputedTableNumericalDialog(const QString& refTable, const QString& gsample, const int nbDecimals, 
         const QString& variables, QWidget *parent = nullptr): 
         QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint) 
     {
@@ -54,8 +54,8 @@ public:
         vLayout->setContentsMargins(0, 0, 0, 0);
         vLayout->setObjectName("vTabLayout");
 
-        tableview = new GSampleTableView(this);
-        objmodel = new GSampleTableModel(refTable, gsample, nbDecimals, variables, tableview);
+        tableview = new ComputedTableView(this);
+        objmodel = new ComputedTableModel(refTable, gsample, nbDecimals, variables, tableview);
         tableview->setModel(objmodel);
         tableview->horizontalHeader()->setStretchLastSection(true);
 
@@ -82,7 +82,7 @@ public:
             this->setWindowTitle("Table of series");
     }
 
-    ~GSampleNumericalDialog()
+    ~ComputedTableNumericalDialog()
     {
         delete objmodel;
         delete tableview;

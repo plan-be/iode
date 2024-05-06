@@ -1,24 +1,24 @@
-#include "gsample_table_model.h"
+#include "computed_table_model.h"
 
 
-GSampleTableModel::GSampleTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
+ComputedTableModel::ComputedTableModel(const QString& refTable, const QString& gsample, const int nbDecimals, 
     const QString& variables, QObject *parent): QAbstractTableModel(parent), NumericalTableModel(nbDecimals), 
     refTable(refTable), variables(variables)
 {
     if(!variables.isEmpty())
         Tables.add(refTable.toStdString(), 2, "", variables.toStdString(), false, false, false);
 
-    table = new GSampleTable(refTable.toStdString(), gsample.toStdString());
+    table = new ComputedTable(refTable.toStdString(), gsample.toStdString());
 }
 
-GSampleTableModel::~GSampleTableModel()
+ComputedTableModel::~ComputedTableModel()
 {
     delete table;
     if(!variables.isEmpty())
         Tables.remove(refTable.toStdString());
 }
 
-Qt::ItemFlags GSampleTableModel::flags(const QModelIndex& index) const
+Qt::ItemFlags ComputedTableModel::flags(const QModelIndex& index) const
 {
 	if (!index.isValid())
 		return Qt::ItemIsEnabled;
@@ -28,7 +28,7 @@ Qt::ItemFlags GSampleTableModel::flags(const QModelIndex& index) const
 	return QAbstractItemModel::flags(index) | flag;
 }
 
-QVariant GSampleTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ComputedTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role != Qt::DisplayRole)
 		return QVariant();
@@ -39,7 +39,7 @@ QVariant GSampleTableModel::headerData(int section, Qt::Orientation orientation,
         return QString::fromStdString(table->get_line_name(section));
 }
 
-QVariant GSampleTableModel::data(const QModelIndex& index, int role) const
+QVariant ComputedTableModel::data(const QModelIndex& index, int role) const
 {
 	if (!index.isValid())
 		return QVariant();
@@ -53,7 +53,7 @@ QVariant GSampleTableModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
-bool GSampleTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool ComputedTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
