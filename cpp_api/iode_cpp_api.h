@@ -26,4 +26,5 @@
 #include "lec/lec.h"
 #include "compute/simulation.h"
 #include "compute/estimation.h"
-#include "gsample/gsample_graph.h"
+#include "computed_table/computed_table.h"
+#include "computed_table/computed_table_graph.h"

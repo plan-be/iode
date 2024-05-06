@@ -1,14 +1,14 @@
-#include "gsample.h"
 #include <map>
 #include <vector>
+#include "computed_table.h"
 
 
-class GSampleGraph: public GSampleTable
+class ComputedTableGraph: public ComputedTable
 {
     int nb_decimals;
 
 public:
-    GSampleGraph(const std::string& ref_table_name, const std::string& gsample);
+    ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample);
 
     std::vector<Period> get_series_periods();
 
