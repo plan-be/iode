@@ -1,10 +1,10 @@
-#include "gsample.h"
+#include "computed_table.h"
 
 
-GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string& gsample) 
+ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample) 
     : ref_table_name(ref_table_name), gsample(gsample)
 {
-    IodeExceptionInitialization error("GSampleOutput", "Cannot compile generalized sample " + 
+    IodeExceptionInitialization error("ComputedTableOutput", "Cannot compile generalized sample " + 
                                        gsample + " according to the input table " + ref_table_name);
 
     ref_table = new Table(ref_table_name, nullptr);
@@ -72,7 +72,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
         {
             kdb = K_RWS[I_VARIABLES][ref - 1];
             if(kdb == NULL) 
-                throw IodeExceptionInitialization("GSampleOutput", "file[" + std::to_string(ref) + "] is not present");
+                throw IodeExceptionInitialization("ComputedTableOutput", "file[" + std::to_string(ref) + "] is not present");
             files.push_back(std::string(kdb->k_nameptr));
         }
     }
@@ -143,7 +143,7 @@ GSampleTable::GSampleTable(const std::string& ref_table_name, const std::string&
     compute_values();
 }
 
-GSampleTable::~GSampleTable()
+ComputedTable::~ComputedTable()
 {
     COL_free_cols(columns);
     
@@ -151,7 +151,7 @@ GSampleTable::~GSampleTable()
     delete sample;
 }
 
-int GSampleTable::find_file_op(const COL& col)
+int ComputedTable::find_file_op(const COL& col)
 {
     if(files_ops.size() == 0)
         return -1;
@@ -169,7 +169,7 @@ int GSampleTable::find_file_op(const COL& col)
     return -1;
 }
 
-void GSampleTable::compute_values()
+void ComputedTable::compute_values()
 {
     // For each ref_table line containing a LEC cell, compute and store all values using 
     // the generalized sample
@@ -186,7 +186,7 @@ void GSampleTable::compute_values()
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
         res = COL_exec(ref_table, line, columns);
-        if(res < 0) throw IodeExceptionInitialization("GSampleOutput", "Cannot compute value corresponding to row " + 
+        if(res < 0) throw IodeExceptionInitialization("ComputedTableOutput", "Cannot compute value corresponding to row " + 
             std::to_string(line) + " of table " + ref_table_name);
         
         // store all values
@@ -198,7 +198,7 @@ void GSampleTable::compute_values()
     }
 }
 
-bool GSampleTable::is_editable(const int line, const int col)
+bool ComputedTable::is_editable(const int line, const int col)
 {
     // RULE 1: A cell cannot be updated if the corresponding column (COL object)
     //         - contains on operation on periods or files
@@ -232,7 +232,7 @@ bool GSampleTable::is_editable(const int line, const int col)
 //        For the moment, there is a memory problem when the function ends and
 //        thus when the KDBVariable object is destroyed. 
 //        -> problem linked to the compiler option /Zp1
-bool GSampleTable::propagate_new_value(const std::string& lec, const std::string& div_lec, 
+bool ComputedTable::propagate_new_value(const std::string& lec, const std::string& div_lec, 
         const std::string& var_name, const double value, const int period_pos)
 {
     double res;
@@ -280,7 +280,7 @@ bool GSampleTable::propagate_new_value(const std::string& lec, const std::string
 //        For the moment, there is a memory problem when the function ends and
 //        thus when the KDBVariable object is destroyed. 
 //        -> problem linked to the compiler option /Zp1
-void GSampleTable::set_value(const int line, const int col, const double value, bool check_if_editable)
+void ComputedTable::set_value(const int line, const int col, const double value, bool check_if_editable)
 {
     // Reject NaN value
     if(!L_ISAN(value))
@@ -324,6 +324,6 @@ void GSampleTable::set_value(const int line, const int col, const double value, 
             "Cannot calculate the new value for the variable " + var_to_update + "\n" + 
             "LEC expression: " + lec);
 
-   // recompute all values of the GSample table
+   // recompute all values of the ComputedTable table
    compute_values();
 }

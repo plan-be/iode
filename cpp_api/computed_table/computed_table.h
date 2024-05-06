@@ -16,7 +16,7 @@
 
 // TODO JMP: I would like to create a C++ class that gives all public methods I need 
 //           to generates output tables and graphs provided in the menu Print/Graph of the GUI.
-//           I would like you to read carefully the code of the GSampleTable class below and makes 
+//           I would like you to read carefully the code of the ComputedTable class below and makes 
 //           comments/recommandations to get a complete class that does what it is supposed to do.
 
 // TODO ALD: - tranform FIL and COL into C++ classes
@@ -27,12 +27,12 @@
  * @brief The present class represents the output table resulting from the compilation 
  *        of a generalized sample given a reference table.
  * 
- * Given a GSample table defined by 
+ * Given a ComputedTable table defined by 
  * - M lines,
  * - N observations (nb periods of the sample)
  * - 2 combinations file_1 (op) file_2      -> fop0 and fop1
  * - 2 combinations period_1 (op) period_2  -> pop0 and pop1 
- * the computed GSample table is structured as follow:
+ * the computed ComputedTable table is structured as follow:
  * 
  *          |           obs0             |  ...  |           obsN             |
  *          |    pop 0    |     pop1     |  ...  |    pop 0    |     pop1     |
@@ -42,7 +42,7 @@
  * line ... |      |      |       |      |  ...  |      |      |       |      |
  * line M   |      |      |       |      |  ...  |      |      |       |      |
  */
-class GSampleTable
+class ComputedTable
 {
 protected:
     Table*       ref_table;
@@ -93,8 +93,8 @@ private:
             const std::string& var_name, const double value, const int period_pos);
 
 public:
-    GSampleTable(const std::string& ref_table_name, const std::string& gsample);
-    ~GSampleTable();
+    ComputedTable(const std::string& ref_table_name, const std::string& gsample);
+    ~ComputedTable();
 
     int get_nb_lines() const
     {

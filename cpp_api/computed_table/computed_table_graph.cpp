@@ -1,12 +1,12 @@
-#include "gsample_graph.h"
+#include "computed_table_graph.h"
 
 
-GSampleGraph::GSampleGraph(const std::string& ref_table_name, const std::string& gsample) :
-    GSampleTable(ref_table_name, gsample), nb_decimals(8)
+ComputedTableGraph::ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample) :
+    ComputedTable(ref_table_name, gsample), nb_decimals(8)
 {
 }
 
-std::vector<Period> GSampleGraph::get_series_periods()
+std::vector<Period> ComputedTableGraph::get_series_periods()
 {
     std::vector<Period> x;
     x.reserve(get_nb_periods());
@@ -29,7 +29,7 @@ std::vector<Period> GSampleGraph::get_series_periods()
  * 
  * @note see function APIGraphLineTitle() (k_graph.c)
  */
-std::string GSampleGraph::get_series_name(const int row, const int fileop)
+std::string ComputedTableGraph::get_series_name(const int row, const int fileop)
 {
     std::string name = line_names[row];
     if(files_ops.size() > 1 || files_ops[fileop].cl_opf != COL_NOP)
@@ -40,12 +40,12 @@ std::string GSampleGraph::get_series_name(const int row, const int fileop)
 // TODO JMP : please check that the comment below and the method implementation are correct.
 /**
  * @note 
- * Given a GSample table defined by 
+ * Given a ComputedTable table defined by 
  * - M lines,
  * - N observations (nb periods of the sample)
  * - 2 combinations file_1 (op) file_2      -> fop0 and fop1
  * - 2 combinations period_1 (op) period_2  -> pop0 and pop1 
- * the computed GSample table is structured as follow:
+ * the computed ComputedTable table is structured as follow:
  * 
  *          |           obs0             |  ...  |           obsN             |
  *          |    pop 0    |     pop1     |  ...  |    pop 0    |     pop1     |
@@ -57,7 +57,7 @@ std::string GSampleGraph::get_series_name(const int row, const int fileop)
  * 
  * See function T_GraphLine() (k_graph.c)
  */
-std::vector<double> GSampleGraph::get_series_values(const int row, const int fileop)
+std::vector<double> ComputedTableGraph::get_series_values(const int row, const int fileop)
 {
     int nb_periods = get_nb_periods();
     int nb_files_ops = get_nb_files_ops();
@@ -84,7 +84,7 @@ std::vector<double> GSampleGraph::get_series_values(const int row, const int fil
     return y;
 }
 
-std::map<std::string, std::vector<double>> GSampleGraph::get_series(const int fileop)
+std::map<std::string, std::vector<double>> ComputedTableGraph::get_series(const int fileop)
 {
     if(fileop < 0 || fileop >= files_ops.size())
     {
