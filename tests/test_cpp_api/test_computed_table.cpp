@@ -54,10 +54,13 @@ TEST_F(ComputedTableTest, BuildFromTable)
     std::string sample;
     std::vector<double> values;
 
+    Table ref_table = kdb_tbl->get(table_name);
+
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
     sample = "2000Y1:2009Y1";
-    ComputedTable table_simple(table_name, gsample);
+    ComputedTable table_by_name(table_name, gsample);       // passing table name 
+    ComputedTable table_simple(&ref_table, gsample);        // passing table pointer
     EXPECT_EQ(table_simple.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_simple.get_nb_columns(), 10);
     EXPECT_EQ(table_simple.get_nb_files(), 1);
@@ -79,7 +82,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_simple.get_value(3, 0), 0.99);
     EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), 1.04);
 
-    ComputedTableGraph graph_simple(table_name, gsample);
+    ComputedTableGraph graph_simple(&ref_table, gsample);
     EXPECT_EQ(graph_simple.get_nb_series(), nb_lines);
     EXPECT_EQ(graph_simple.get_series_name(0, 0), "Output potentiel");
     EXPECT_EQ(graph_simple.get_series_name(1, 0), "Stock de capital");
@@ -95,7 +98,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_grt(table_name, gsample);
+    ComputedTable table_grt(&ref_table, gsample);
     EXPECT_EQ(table_grt.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_grt.get_nb_columns(), 5 * 2);
     EXPECT_EQ(table_grt.get_nb_files(), 1);
@@ -112,7 +115,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_grt.get_value(3, 0), 1.1);
     EXPECT_DOUBLE_EQ(table_grt.get_value(3, 5), 1.0);
 
-    ComputedTableGraph graph_grt(table_name, gsample);
+    ComputedTableGraph graph_grt(&ref_table, gsample);
     EXPECT_EQ(graph_grt.get_nb_series(), nb_lines);
     EXPECT_EQ(graph_grt.get_series_name(0, 0), "Output potentiel");
     EXPECT_EQ(graph_grt.get_series_name(1, 0), "Stock de capital");
@@ -128,7 +131,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     // simple time series (one extra file) - 5 observations
     gsample = "2010[1;2]:5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_2_files(table_name, gsample);
+    ComputedTable table_2_files(&ref_table, gsample);
     EXPECT_EQ(table_2_files.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_2_files.get_nb_columns(), 5 * 2);
     EXPECT_EQ(table_2_files.get_nb_files(), 2);
@@ -146,7 +149,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_2_files.get_value(3, 0), 1.1);
     EXPECT_DOUBLE_EQ(table_2_files.get_value(3, 5), 1.1);
 
-    ComputedTableGraph graph_2_files(table_name, gsample);
+    ComputedTableGraph graph_2_files(&ref_table, gsample);
     EXPECT_EQ(graph_2_files.get_nb_series(), nb_lines * 2);
     EXPECT_EQ(graph_2_files.get_series_name(0, 0), "Output potentiel [1]");
     EXPECT_EQ(graph_2_files.get_series_name(0, 1), "Output potentiel [2]");
@@ -169,19 +172,18 @@ TEST_F(ComputedTableTest, BuildFromTable)
 TEST_F(ComputedTableTest, BuildFromVariables)
 {
     std::string gsample;
-    std::string table_name = "_GSAMPLE_";
     std::vector<std::string> variables = {"Q_I", "Q_F", "Q_I/Q_F", "KNFF[-1]"};
     std::string title = "";
     int nb_lines = 4;
     std::string sample;
     std::vector<double> values;
 
-    kdb_tbl->add(table_name, 2, "", variables, false, false, false);
+    Table ref_table(2, "", variables, false, false, false);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
     sample = "2000Y1:2009Y1";
-    ComputedTable table_simple(table_name, gsample);
+    ComputedTable table_simple(&ref_table, gsample);
     EXPECT_EQ(table_simple.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_simple.get_nb_columns(), 10);
     EXPECT_EQ(table_simple.get_nb_files(), 1);
@@ -203,7 +205,7 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     EXPECT_DOUBLE_EQ(table_simple.get_value(3, 0), 8083.55);
     EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), 9468.89);
 
-    ComputedTableGraph graph_simple(table_name, gsample);
+    ComputedTableGraph graph_simple(&ref_table, gsample);
     EXPECT_EQ(graph_simple.get_nb_series(), nb_lines);
     EXPECT_EQ(graph_simple.get_series_name(0, 0), "Q_I");
     EXPECT_EQ(graph_simple.get_series_name(1, 0), "Q_F"); 
@@ -219,7 +221,7 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_grt(table_name, gsample);
+    ComputedTable table_grt(&ref_table, gsample);
     EXPECT_EQ(table_grt.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_grt.get_nb_columns(), 5 * 2);
     EXPECT_EQ(table_grt.get_nb_files(), 1);
@@ -236,7 +238,7 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     EXPECT_DOUBLE_EQ(table_grt.get_value(3, 0), 11293.85);
     EXPECT_DOUBLE_EQ(table_grt.get_value(3, 5), 1.84);
 
-    ComputedTableGraph graph_grt(table_name, gsample);
+    ComputedTableGraph graph_grt(&ref_table, gsample);
     EXPECT_EQ(graph_grt.get_nb_series(), nb_lines);
     EXPECT_EQ(graph_grt.get_series_name(0, 0), "Q_I");
     EXPECT_EQ(graph_grt.get_series_name(1, 0), "Q_F");
@@ -252,7 +254,7 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     // simple time series (one extra file) - 5 observations
     gsample = "2010[1;2]:5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_2_files(table_name, gsample);
+    ComputedTable table_2_files(&ref_table, gsample);
     EXPECT_EQ(table_2_files.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_2_files.get_nb_columns(), 5 * 2);
     EXPECT_EQ(table_2_files.get_nb_files(), 2);
@@ -270,7 +272,7 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     EXPECT_DOUBLE_EQ(table_2_files.get_value(3, 0), 11293.85);
     EXPECT_DOUBLE_EQ(table_2_files.get_value(3, 5), 11502.05);
 
-    ComputedTableGraph graph_2_files(table_name, gsample);
+    ComputedTableGraph graph_2_files(&ref_table, gsample);
     EXPECT_EQ(graph_2_files.get_nb_series(), nb_lines * 2);
     EXPECT_EQ(graph_2_files.get_series_name(0, 0), "Q_I [1]");
     EXPECT_EQ(graph_2_files.get_series_name(0, 1), "Q_I [2]");
@@ -288,8 +290,6 @@ TEST_F(ComputedTableTest, BuildFromVariables)
     EXPECT_DOUBLE_EQ(round(values[0] * 100) / 100, 11293.85);
     values = graph_2_files.get_series_values(3, 1);
     EXPECT_DOUBLE_EQ(round(values[2] * 100) / 100, 11502.05);
-
-    kdb_tbl->remove(table_name);
 }
 
 TEST_F(ComputedTableTest, EditTable)
@@ -297,7 +297,6 @@ TEST_F(ComputedTableTest, EditTable)
     double value;
     std::string sample;
     std::string gsample;
-    std::string table_name = "TEST_EDIT";
 
     // new table (to be edited)
     std::vector<std::string> lecs;
@@ -310,32 +309,32 @@ TEST_F(ComputedTableTest, EditTable)
     lecs.push_back("3+ln(10)");         // row 6
     lecs.push_back("0+KNFF");           // row 7
 
-    kdb_tbl->add(table_name, 2, "Test table to be edited", lecs, false, false, false);
+    Table ref_table(2, "Test table to be edited", lecs, false, false, false);
 
     // ---- prepare tables ----
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
     sample = "2000Y1:2009Y1";
-    ComputedTable table_simple(table_name, gsample);
+    ComputedTable table_simple(&ref_table, gsample);
     EXPECT_EQ(table_simple.get_nb_columns(), 10);
 
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_grt(table_name, gsample);
+    ComputedTable table_grt(&ref_table, gsample);
     EXPECT_EQ(table_grt.get_nb_columns(), 5 * 2);
 
     // simple time series (one extra file) - 5 observations
     gsample = "2010[1;2]:5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_2_files(table_name, gsample);
+    ComputedTable table_2_files(&ref_table, gsample);
     EXPECT_EQ(table_2_files.get_nb_columns(), 5 * 2);
 
     // one time series - 10 observations - values only from external file
     gsample = "2000[2]:10";
     sample = "2000Y1:2009Y1";
-    ComputedTable table_file_2(table_name, gsample);
+    ComputedTable table_file_2(&ref_table, gsample);
     EXPECT_EQ(table_file_2.get_nb_columns(), 5 * 2);
 
     // ---- check if editable ----
