@@ -9,6 +9,7 @@ class ComputedTableGraph: public ComputedTable
 
 public:
     ComputedTableGraph(const std::string& ref_table_name, const std::string& gsample);
+    ComputedTableGraph(Table* ref_table, const std::string& gsample);
 
     std::vector<Period> get_series_periods();
 

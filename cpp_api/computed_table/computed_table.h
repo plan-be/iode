@@ -46,7 +46,6 @@ class ComputedTable
 {
 protected:
     Table*       ref_table;
-    std::string  ref_table_name;
     std::string  gsample;
     Sample*      sample;
     COLS*        columns;
@@ -76,6 +75,11 @@ protected:
 
 private:
     /**
+     * @warning to be called only by the constructors 
+     */
+    void initialize();
+
+    /**
      * @brief 
      * 
      * @param lec 
@@ -94,6 +98,7 @@ private:
 
 public:
     ComputedTable(const std::string& ref_table_name, const std::string& gsample);
+    ComputedTable(Table* ref_table, const std::string& gsample);
     ~ComputedTable();
 
     int get_nb_lines() const

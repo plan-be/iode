@@ -6,6 +6,11 @@ ComputedTableGraph::ComputedTableGraph(const std::string& ref_table_name, const 
 {
 }
 
+ComputedTableGraph::ComputedTableGraph(Table* ref_table, const std::string& gsample) : 
+    ComputedTable(ref_table, gsample), nb_decimals(8)
+{
+}
+
 std::vector<Period> ComputedTableGraph::get_series_periods()
 {
     std::vector<Period> x;
