@@ -101,6 +101,8 @@ include "objects/equation.pyx"
 include "objects/scalar.pyx"
 include "objects/table.pyx"
 
+include "computed_table/computed_table.pyx"
+
 include "iode_database/abstract_database.pyx"
 include "iode_database/comments_database.pyx"
 include "iode_database/equations_database.pyx"

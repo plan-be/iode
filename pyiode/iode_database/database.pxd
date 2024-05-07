@@ -4,11 +4,11 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, EnumIodeEquationTest, 
+from pyiode.common cimport (EnumIodeType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
+                            EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization, EnumIodeLtoH, 
-                            EnumIodeHtoL)
+                            EnumIodeVarMode, EnumSimulationInitialization)
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
@@ -36,6 +36,10 @@ cdef extern from "cpp_api/KDB/kdb_global.h":
     void low_to_high(EnumIodeLtoH type_, char method, string& filepath, string& var_list) except +
     void high_to_low(EnumIodeHtoL type_, string& filepath, string& var_list) except +
 
+cdef extern from "cpp_api/KDB/kdb_reference.h":
+    void load_reference_kdb(int index, EnumIodeFile iode_file, string& filepath) except +
+    void clear_reference_kdb(int index, EnumIodeFile iode_file) except +
+    void clear_all_reference_kdbs() except +
 
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    
