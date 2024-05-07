@@ -1,13 +1,9 @@
 #include "computed_table.h"
 
 
-ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample) 
-    : ref_table_name(ref_table_name), gsample(gsample)
+void ComputedTable::initialize()
 {
-    IodeExceptionInitialization error("ComputedTableOutput", "Cannot compile generalized sample " + 
-                                       gsample + " according to the input table " + ref_table_name);
-
-    ref_table = new Table(ref_table_name, nullptr);
+    std::string error_msg = "Cannot compute table with the generalized sample '" + gsample + "'";
 
     /* ---- see c_calc.c ----
      *      1. call COL_cc(smpl) to compile the GSAMPLE in a COLS struct, say cls.
@@ -20,7 +16,8 @@ ComputedTable::ComputedTable(const std::string& ref_table_name, const std::strin
 
     // Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in the passed table.
     columns = COL_cc(to_char_array(gsample));
-    if(columns == NULL) throw error;
+    if(columns == NULL) 
+        throw std::invalid_argument(error_msg);
 
     // Compute 
     // - minimum sample containing all periods present in the columns.
@@ -53,7 +50,8 @@ ComputedTable::ComputedTable(const std::string& ref_table_name, const std::strin
 
     // Returns the number of columns for the computed table + 1.
     int dim = COL_resize(ref_table, columns);
-    if(dim == 0) throw error;
+    if(dim == 0) 
+        throw std::runtime_error(error_msg);
 
     // Get filepath of each reference file
     // Note: - equivalent to T_find_files()
@@ -72,7 +70,7 @@ ComputedTable::ComputedTable(const std::string& ref_table_name, const std::strin
         {
             kdb = K_RWS[I_VARIABLES][ref - 1];
             if(kdb == NULL) 
-                throw IodeExceptionInitialization("ComputedTableOutput", "file[" + std::to_string(ref) + "] is not present");
+                throw std::invalid_argument("file[" + std::to_string(ref) + "] is not present");
             files.push_back(std::string(kdb->k_nameptr));
         }
     }
@@ -143,12 +141,25 @@ ComputedTable::ComputedTable(const std::string& ref_table_name, const std::strin
     compute_values();
 }
 
+ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample) : gsample(gsample)
+{
+    ref_table = new Table(ref_table_name, nullptr);
+    initialize();
+}
+
+ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample) : gsample(gsample)
+{
+    if(!ref_table)
+        throw std::runtime_error("Cannot compute table. Table is null.");
+    this->ref_table = new Table(*ref_table);
+    initialize();
+}
+
 ComputedTable::~ComputedTable()
 {
     COL_free_cols(columns);
-    
-    delete ref_table;
     delete sample;
+    delete ref_table;
 }
 
 int ComputedTable::find_file_op(const COL& col)
@@ -186,8 +197,8 @@ void ComputedTable::compute_values()
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
         res = COL_exec(ref_table, line, columns);
-        if(res < 0) throw IodeExceptionInitialization("ComputedTableOutput", "Cannot compute value corresponding to row " + 
-            std::to_string(line) + " of table " + ref_table_name);
+        if(res < 0) 
+            throw std::runtime_error("Cannot compute values corresponding to row '" + get_line_name(row) + "'");
         
         // store all values
         for(int col = 0; col < v_pos_in_columns_struct.size(); col++)
