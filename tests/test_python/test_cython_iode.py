@@ -35,6 +35,12 @@ def test_cython_iode():
         if doc is not None:
             iode.__test__[f'TableCell.{name_}'] = doc 
 
+    from iode.iode_python import ComputedTable
+    for name_, value_ in inspect.getmembers(ComputedTable):
+        doc = inspect.getdoc(value_)
+        if doc is not None:
+            iode.__test__[f'ComputedTable.{name_}'] = doc 
+
     # run doctests
     failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
     assert failure_count == 0
