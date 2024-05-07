@@ -29,8 +29,8 @@ from .iode_python import (nan, __version__,
 from .iode_python import Period, Sample, periodicities
 
 # IODE objects
-# NOTE: didn't add TableLine/TableCell to avoid users to create instances of this class.
-#       TableLine instances must only be created from a Table instance.
+# NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
+#       TableLine/TableCell/ComputedTable instances must only be created from a Table instance.
 from .iode_python import Equation, List, Scalar, Table
 
 # IODE databases
@@ -54,8 +54,8 @@ from .iode_python import (model_calc_scc, model_simulate, model_simulate_cpu, mo
 from .iode_python import exec_lec, add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
 
 
-# NOTE: didn't add TableLine/TableCell to avoid users to create instances of this class.
-#       TableLine instances must only be created from a Table instance.
+# NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
+#       TableLine/TableCell/ComputedTable instances must only be created from a Table instance.
 __all__ = [
     # Constants
     'SAMPLE_DATA_DIR', 'nan',
@@ -84,7 +84,7 @@ __all__ = [
     'Period', 'Sample', 'periodicities',
 
     #IODE objects
-    'Equation', 'List', 'Scalar', 'Table'
+    'Equation', 'List', 'Scalar', 'Table',
     
     # IODE databases
     'comments', 'equations', 'identities', 'lists', 'scalars', 'tables', 'variables', 

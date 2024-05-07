@@ -10,6 +10,7 @@ from pyiode.common cimport (EnumCellType, EnumCellAlign, EnumCellFont, EnumLineT
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType)
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
+from pyiode.iode_database.database cimport load_reference_kdb
 
 
 # TableCell wrapper class
@@ -1362,6 +1363,170 @@ cdef class Table:
         else:
             raise TypeError(f"The value of 'value' must be of type int, str, list(str) or tuple(str).\n"
                             f"Got value of type {type(value).__name__} instead.")
+
+    def compute(self, generalized_sample: str, extra_files: Union[str, List[str]] = None, nb_decimals: int = 2) -> ComputedTable:
+        """
+        Compute the values corresponding to LEC expressions in cells.
+        
+        The values are calculated for given a *generalized sample*. 
+        This sample contains the following information:
+
+          - the sampling of the periods to take into account 
+          - the operations to be performed on the periods
+          - the list of files involved in the computation of the table
+          - the operations to be performed between files
+          - the repetition factor
+
+        The syntax of the *generalized sample* follows the rules described below.
+
+        The syntax of a period: 
+        
+          - a period is indicated as in LEC: 'yyPpp' or 'yyyyPpp' where yyyy indicates the year, 
+            P the periodicity and pp the sub-period (1990Y1) 
+          - a period can be shifted n periods to the left or right using the operators <n and >n 
+          - when used with a null argument, the shift oprerators have a special meaning: 
+              - <0 means "first period of the year" 
+              - >0 means "last period of the year" 
+          - the special periods 'BOS', 'EOS' and 'NOW' can be used to represent the beginning 
+            or end of the current sample or the current period (PC clock)
+          - the special periods 'BOS1', 'EOS1' and 'NOW1' are equivalent to the previous ones, 
+            except that they are moved to the first sub-period of the year of 'BOS', 'EOS' and 
+            'NOW' respectively (if NOW = 2012M5, NOW1 = 2012M1)
+          - each period is separated from the next by a semicolon 
+          - a period or group of periods can be repeated: simply place the colon character (:) after 
+            the definition of the column or group of columns, followed by the desired number of repetitions. 
+            Repetitions are made with an increment of one period, unless followed by an asterisk and a value. 
+            This value is then the repeat increment. It can be negative, in which case the periods are 
+            presented in decreasing order
+          - the repeat, increment and shift can be the words PER (or P) or SUB (or S), which respectively indicate 
+            the number of periods in a year of the current sample and the current sub-period
+          - the file definition is optional and is enclosed in square brackets. 
+            It applies to all preceding period definitions
+
+        The following file operations are possible:
+
+          - absolute value: [1] 
+          - difference: [1-2] 
+          - difference in percent: [1/2] 
+          - sum: [1+2] 
+          - average: [1~2] or [1^2]. 
+
+        The following period operations are possible:
+
+          - value: (75) 
+          - growth rate over one or more periods: (75/74, 75/70) 
+          - average growth rate: (75//70) 
+          - difference: (75-74, 75-70) 
+          - average difference: (75--70) 
+          - average: (75~74) or (75^74) 
+          - sum of consecutive periods: (70Q1+70Q4) 
+          - index or base value: (76=70) 
+
+        Repetition can be performed with an increment greater than 1 or less than 0: 
+        simply place a star followed by the step after the number of repetitions (70:3*5 = 70, 75, 80).
+
+        Examples::
+
+            70; 75; 80:6 = 70:3*5; 81:5 = 70; 75; 80; 81; 82; 83; 84; 85
+            70/69:2 = 70/69; 71/70
+            (70; 70-69):2 = 70; 70-69; 71; 71-70;
+            70[1,2]:2*5 = 70[1]; 70[2]; 75[1]; 75[2]
+            (70;75)[1,2-1] = 70[1]; 75[1]; 70[2-1]; 75[2-1]
+            (70;75;(80; 80/79):2)[1,2] = 70[1]; 70[2]; 75[1]; 75[2]; 80[1]; 80[2]; 80/79[1]; 80/79[2] 81[1]; 81[2]; 81/80[1]; 81/80[2]
+            2000Y1>5 = 2005Y1
+            1999M1>12 = 2000M1
+            EOS<1 = 2019Y1                         (if EOS == 2020Y1)
+            BOS<1 = 1959Y1                         (if BOS == 1960Y1)
+            EOS<4:5*-1 =2016;2017;2018;2019;2020   (if EOS = 2020Y1)
+
+        Parameters
+        ----------
+        generalized_sample: str
+            Generalized sample (see above).
+        extra_files: str or list(str)
+            (List of) extra file(s) referenced in the generalized sample.
+        nb_decimals: int
+            The number of decimals to display.
+
+        Returns
+        -------
+        ComputedTable
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Table, tables, variables
+        >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> tables["C8_1"]          # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                  |
+        TITLE |      "Déterminants de l'output potentiel"
+        ----- | ---------------------------------------------
+        CELL  | ""                                 |   "#s"
+        ----- | ---------------------------------------------
+        CELL  | "Output potentiel"                 |  Q_F+Q_I
+        CELL  | "Stock de capital"                 | KNFF[-1]
+        CELL  | "Intensité de capital"             |    KLFHP
+        CELL  | "Productivité totale des facteurs" |  TFPFHP_
+        <BLANKLINE>
+        nb lines: 8
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+        >>> # simple time series (current workspace) - 6 observations - 4 decimals
+        >>> computed_table = tables["C8_1"].compute("2000:6", nb_decimals=4)
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
+           line title \ period[file]     |     00    |     01    |     02    |     03    |     04    |     05
+        ---------------------------------------------------------------------------------------------------------
+        Output potentiel                 | 5495.2128 | 5627.8589 | 5748.7804 | 5857.9529 | 5966.1999 | 6103.6318
+        Stock de capital                 | 8083.5517 | 8359.8908 | 8647.9354 | 8910.3393 | 9175.8106 | 9468.8865
+        Intensité de capital             |    0.5032 |    0.4896 |    0.4758 |    0.4623 |    0.4481 |    0.4349
+        Productivité totale des facteurs |    0.9938 |    1.0037 |    1.0137 |    1.0239 |    1.0341 |    1.0445
+        <BLANKLINE>        
+        >>> # two time series (current workspace) - 5 observations - 2 decimals (default)
+        >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
+           line title \ period[file]     |    10    | 10/09 |    11    | 11/10 |    12    | 12/11 |    13    | 13/12 |    14    | 14/13
+        --------------------------------------------------------------------------------------------------------------------------------
+        Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
+        Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
+        Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
+        <BLANKLINE>
+        >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals (default)
+        >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
+        >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
+           line title \ period[file]     |  10[1]   |  10[2]   |  11[1]   |  11[2]   |  12[1]   |  12[2]   |  13[1]   |  13[2]   |  14[1]   |  14[2]    
+        ----------------------------------------------------------------------------------------------------------------------------------------------- 
+        Output potentiel                 |  6936.11 |  6797.39 |  7045.34 |  6904.44 |  7161.54 |  7018.31 |  7302.29 |  7156.24 |  7460.12 |  7310.91  
+        Stock de capital                 | 11293.85 | 11067.97 | 11525.01 | 11294.51 | 11736.78 | 11502.05 | 11975.49 | 11735.98 | 12263.95 | 12018.67  
+        Intensité de capital             |     0.39 |     0.38 |     0.38 |     0.37 |     0.37 |     0.36 |     0.36 |     0.36 |     0.36 |     0.35  
+        Productivité totale des facteurs |      1.1 |     1.08 |     1.11 |     1.09 |     1.12 |      1.1 |     1.13 |     1.11 |     1.14 |     1.12  
+        <BLANKLINE>
+        """
+        if not isinstance(generalized_sample, str):
+            raise TypeError(f"'generalized_sample': Expected value of type str. "
+                            f"Got value of type {type(generalized_sample).__name__} instead")
+        if not generalized_sample:
+            raise ValueError("'generalized_sample' must not be empty")
+
+        if extra_files is not None:
+            if isinstance(extra_files, str):
+                extra_files = [extra_file.strip() for extra_file in extra_files.split(';')]
+            for i, extra_file in enumerate(extra_files):
+                if not isinstance(extra_file, str):
+                    raise TypeError(f"'extra_files': Expected value of type str or list of str. "
+                                    f"Got value of type {type(extra_files).__name__} instead")
+                load_reference_kdb(i + 2, FILE_VARIABLES, extra_file.encode())
+
+        if not isinstance(nb_decimals, int):
+            raise TypeError(f"'nb_decimals': Expected value of type int. "
+                            f"Got value of type {type(nb_decimals).__name__} instead")
+        return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def __len__(self) -> int:
         """
