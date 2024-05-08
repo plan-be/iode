@@ -20,6 +20,32 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] vIodeTypes
 
+    cdef enum EnumIodeFile:
+        I_COMMENTS_FILE,
+        I_EQUATIONS_FILE,
+        I_IDENTITIES_FILE,
+        I_LISTS_FILE,
+        I_SCALARS_FILE,
+        I_TABLES_FILE,
+        I_VARIABLES_FILE,
+        I_REPORTS_FILE,
+        I_TEXT_FILE,
+        I_ASCII_FILE,
+        I_A2M_FILE,
+        I_RTF_FILE,
+        I_HTML_FILE,
+        I_MIF_FILE,
+        I_CSV_FILE,
+        I_REF_FILE,
+        I_AGL_FILE,
+        I_DIF_FILE,
+        I_LOGS_FILE,
+        I_SETTINGS_FILE,
+        I_ANY_FILE,
+        I_DIRECTORY
+
+    cdef vector[string] v_ext_names
+
     cdef enum EnumLang:
         IT_ENGLISH,
         IT_DUTCH,
