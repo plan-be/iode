@@ -204,6 +204,7 @@ TABLE
    Table.graph_axis
    Table.graph_alignment
    
+   Table.compute
    Table.index
    Table.insert
    Table.__len__
@@ -231,6 +232,33 @@ TABLE
    TableCell.bold
    TableCell.italic
    TableCell.underline
+
+==============
+COMPUTED TABLE
+==============
+
+.. autosummary::
+   :toctree: _generated
+
+   ComputedTable
+
+   ComputedTable.nb_decimals
+   ComputedTable.nb_lines
+   ComputedTable.lines
+   ComputedTable.nb_columns
+   ComputedTable.columns
+   ComputedTable.nb_files
+   ComputedTable.files
+   ComputedTable.nb_operations_between_files
+   ComputedTable.sample
+   ComputedTable.nb_periods
+   ComputedTable.title
+
+   ComputedTable.is_editable
+   ComputedTable.to_array
+   ComputedTable.to_frame
+   ComputedTable.__getitem__
+   ComputedTable.__setitem__
 
 ****
 TIME
