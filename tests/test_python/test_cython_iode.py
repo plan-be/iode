@@ -41,6 +41,8 @@ def test_cython_iode():
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
 
+    iode.suppress_msgs()
+
     # run doctests
     failure_count, test_count = doctest.testmod(iode, globs={"iode": iode})
     assert failure_count == 0
