@@ -7,13 +7,13 @@ from libcpp.vector cimport vector
 from libcpp.map cimport map
 
 from pyiode.common cimport L_NAN, I_NB_TYPES, EQS_NBTESTS
-from pyiode.common cimport (EnumIodeType, EnumLang, EnumIodeEquationMethod, EnumIodeEquationTest, 
+from pyiode.common cimport (EnumIodeType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
+                            EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization, EnumIodeLtoH, 
-                            EnumIodeHtoL)
-from pyiode.common cimport (vIodeTypes, vLangs, v_eq_methods, v_var_modes, v_simulation_initialization, 
-                            mLowToHigh)
+                            EnumIodeVarMode, EnumSimulationInitialization)
+from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
+                            v_simulation_initialization, mLowToHigh)
 
 try:
     import pandas as pd
@@ -62,6 +62,31 @@ VARIABLES: int = EnumIodeType.I_VARIABLES
 
 NB_TYPES: int = I_NB_TYPES
 IODE_TYPES_LIST = _cpp_string_vector_to_py(vIodeTypes)
+
+FILE_COMMENTS: int = EnumIodeFile.I_COMMENTS_FILE
+FILE_EQUATIONS: int = EnumIodeFile.I_EQUATIONS_FILE
+FILE_IDENTITIES: int = EnumIodeFile.I_IDENTITIES_FILE
+FILE_LISTS: int = EnumIodeFile.I_LISTS_FILE
+FILE_SCALARS: int = EnumIodeFile.I_SCALARS_FILE
+FILE_TABLES: int = EnumIodeFile.I_TABLES_FILE
+FILE_VARIABLES: int = EnumIodeFile.I_VARIABLES_FILE
+FILE_REPORTS: int = EnumIodeFile.I_REPORTS_FILE
+FILE_TEXT: int = EnumIodeFile.I_TEXT_FILE
+FILE_ASCII: int = EnumIodeFile.I_ASCII_FILE
+FILE_A2M: int = EnumIodeFile.I_A2M_FILE
+FILE_RTF: int = EnumIodeFile.I_RTF_FILE
+FILE_HTML: int = EnumIodeFile.I_HTML_FILE
+FILE_MIF: int = EnumIodeFile.I_MIF_FILE
+FILE_CSV: int = EnumIodeFile.I_CSV_FILE
+FILE_REF: int = EnumIodeFile.I_REF_FILE
+FILE_AGL: int = EnumIodeFile.I_AGL_FILE
+FILE_DIF: int = EnumIodeFile.I_DIF_FILE
+FILE_LOGS: int = EnumIodeFile.I_LOGS_FILE
+FILE_SETTINGS: int = EnumIodeFile.I_SETTINGS_FILE
+FILE_ANY: int = EnumIodeFile.I_ANY_FILE
+FILE_DIRECTORY: int = EnumIodeFile.I_DIRECTORY
+
+IODE_FILE_TYPES_LIST = _cpp_string_vector_to_py(v_ext_names)
 
 LANG_ENGLISH: int = EnumLang.IT_ENGLISH
 LANG_DUTCH: int = EnumLang.IT_DUTCH
