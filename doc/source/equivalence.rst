@@ -136,3 +136,89 @@ Equivalence Between IODE Report Functions and IODE Python
 .. [#f1] Assuming module ``os`` is imported.
 .. [#f2] Assuming module ``datetime`` is imported.
 .. [#f3] Assuming module ``time`` is imported.
+
+
+********************************************************
+Equivalence Between IODE Report Commands and IODE Python
+********************************************************
+
+==========
+Workspaces
+==========
+
+Below *[Workspace]* must be replaced by either:
+  - comments
+  - equations
+  - identities
+  - lists
+  - scalars
+  - tables
+  - variables
+
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | IODE Report Commands | Python Equivalent                                                                                                   |
+    +======================+=====================================================================================================================+
+    | ``WsLoad``           | ``[workspace].load(filepath)`` --> See :meth:`Database.load`                                                        |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsCopy``           | ``[workspace].copy_into(filepath)`` --> See :meth:`Database.copy_into`                                              |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsMerge``          | ``[workspace].merge_into(filepath)`` --> See :meth:`Database.merge_into`                                            |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsClear``          | ``[workspace].clear()`` --> See :meth:`Database.clear`                                                              |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsClearAll``       | Not Implemented                                                                                                     |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsDescr``          | ``[workspace].description`` --> See :meth:`Database.description`                                                    |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsSave``           | ``[workspace].save(filepath)`` --> See :meth:`Database.save`                                                        |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsSaveCmp``        | Not Yet Implemented                                                                                                 |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsSample``         | ``variables.sample = "1990Y1:2050Y1"`` --> See :meth:`Variables.sample`                                             |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsExtrapolate``    | ``variables.extrapolate(method, from_, to_, variables_list)`` --> See :meth:`Variables.extrapolate`                 |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsLtohStock``      | ``low_to_high(LTOH_STOCK, method, filepath, var_list)`` --> See :func:`low_to_high`                                 |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsLtohFlow``       | ``low_to_high(LTOH_FLOW, method, filepath, var_list)`` --> See :func:`low_to_high`                                  |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsHtolSum``        | ``high_to_low(HTOL_SUM, filepath, var_list)`` --> See :func:`high_to_low`                                           |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsHtolMean``       | ``high_to_low(HTOL_MEAN, filepath, var_list)`` --> See :func:`high_to_low`                                          |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsHtolLast``       | ``high_to_low(HTOL_LAST, filepath, var_list)`` --> See :func:`high_to_low`                                          |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsSeasonAdj``      | ``variables.seasonal_adjustment(input_file, eps_test, series)`` --> See :meth:`Variables.seasonal_adjustment`       |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsSeasAdj``        | ``variables.seasonal_adjustment(input_file, eps_test, series)`` --> See :meth:`Variables.seasonal_adjustment`       |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsTrend``          | ``variables.trend_correction(input_file, lambda_, series, log=True)`` --> See :meth:`Variables.trend_correction`    |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsTrendStd``       | ``variables.trend_correction(input_file, lambda_, series, log=False)`` --> See :meth:`Variables.trend_correction`   |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsImport``         | ``[workspace].load(filepath)`` --> See :meth:`Database.load`                                                        |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsExport``         | ``[workspace].save(filepath)`` --> See :meth:`Database.save`                                                        |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``WsImportEviews``   | Not Implemented                                                                                                     |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``CsvSave``          | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``CsvDigits``        | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``CsvSep``           | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    |                      | `ndf.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_    |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``CsvDec``           | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    |                      | `ndf.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_    |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``CsvNaN``           | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+    | ``CsvAxes``          | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
+    +----------------------+---------------------------------------------------------------------------------------------------------------------+
+
+.. [#f4] Assuming library ``pandas`` is installed.
