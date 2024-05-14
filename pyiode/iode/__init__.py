@@ -32,6 +32,7 @@ from .iode_python import Period, Sample, periodicities
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance.
 from .iode_python import Equation, List, Scalar, Table
+from .util import split_list
 
 # IODE databases
 from .iode_python import comments, equations, identities, lists, scalars, tables, variables
@@ -84,7 +85,7 @@ __all__ = [
     'Period', 'Sample', 'periodicities',
 
     #IODE objects
-    'Equation', 'List', 'Scalar', 'Table',
+    'Equation', 'List', 'Scalar', 'Table', 'split_list', 
     
     # IODE databases
     'comments', 'equations', 'identities', 'lists', 'scalars', 'tables', 'variables', 
