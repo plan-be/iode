@@ -12,7 +12,7 @@ Equivalence Between IODE Report Functions and IODE Python
 *********************************************************
 
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | IODE Report Functions                | Python equivalence                                                                                                                  |            
+   | IODE Report Functions                | Python Equivalent                                                                                                                   |            
    +======================================+=====================================================================================================================================+
    | ``@upper(txt)``                      | `txt.upper() <https://docs.python.org/3/library/stdtypes.html#str.upper>`_                                                          |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
@@ -28,7 +28,7 @@ Equivalence Between IODE Report Functions and IODE Python
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | ``@count(txt)``                      | `len(txt.split(',')) <https://docs.python.org/3/library/stdtypes.html#str.split>`_                                                  |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@index(n, list_txt)``              | `iode.split_list(list_txt)[n-1] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                 |
+   | ``@index(n, list_txt)``              | `split_list(list_txt)[n-1] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                      |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | ``@sqz(txt)``                        | `txt.replace(' ', '') <https://docs.python.org/3/library/stdtypes.html#str.replace>`_                                               |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
@@ -40,11 +40,11 @@ Equivalence Between IODE Report Functions and IODE Python
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | ``@void(t1, ...)``                   | No equivalence                                                                                                                      |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@vtake(n, list_txt)``              | `iode.split_list(list_txt)[:n] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                  |
+   | ``@vtake(n, list_txt)``              | `split_list(list_txt)[:n] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                       |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@vdrop(n, list_txt)``              | `iode.split_list(list_txt)[n:] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                  |
+   | ``@vdrop(n, list_txt)``              | `split_list(list_txt)[n:] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                       |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@vcount(list_txt)``                | `len(iode.split_list(list_txt)) <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                 |
+   | ``@vcount(list_txt)``                | `len(split_list(list_txt)) <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_                      |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | ``@fdelete(filepath)``               | `Path(filepath).unlink() <https://docs.python.org/3/library/pathlib.html#pathlib.Path.unlink>`_                                     |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
@@ -146,7 +146,7 @@ Equivalence Between IODE Report Commands and IODE Python
 Workspaces
 ==========
 
-Below *[Workspace]* must be replaced by either:
+Below *workspace* must be replaced by either:
   - comments
   - equations
   - identities
@@ -158,19 +158,19 @@ Below *[Workspace]* must be replaced by either:
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | IODE Report Commands | Python Equivalent                                                                                                   |
     +======================+=====================================================================================================================+
-    | ``WsLoad``           | ``[workspace].load(filepath)`` --> See :meth:`Database.load`                                                        |
+    | ``WsLoad``           | ``workspace.load(filepath)`` --> See :meth:`Database.load`                                                          |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsCopy``           | ``[workspace].copy_into(filepath)`` --> See :meth:`Database.copy_into`                                              |
+    | ``WsCopy``           | ``workspace.copy_into(filepath)`` --> See :meth:`Database.copy_into`                                                |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsMerge``          | ``[workspace].merge_into(filepath)`` --> See :meth:`Database.merge_into`                                            |
+    | ``WsMerge``          | ``workspace.merge_into(filepath)`` --> See :meth:`Database.merge_into`                                              |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsClear``          | ``[workspace].clear()`` --> See :meth:`Database.clear`                                                              |
+    | ``WsClear``          | ``workspace.clear()`` --> See :meth:`Database.clear`                                                                |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | ``WsClearAll``       | Not Implemented                                                                                                     |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsDescr``          | ``[workspace].description`` --> See :meth:`Database.description`                                                    |
+    | ``WsDescr``          | ``workspace.description`` --> See :meth:`Database.description`                                                      |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsSave``           | ``[workspace].save(filepath)`` --> See :meth:`Database.save`                                                        |
+    | ``WsSave``           | ``workspace.save(filepath)`` --> See :meth:`Database.save`                                                          |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | ``WsSaveCmp``        | Not Yet Implemented                                                                                                 |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
@@ -196,29 +196,110 @@ Below *[Workspace]* must be replaced by either:
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | ``WsTrendStd``       | ``variables.trend_correction(input_file, lambda_, series, log=False)`` --> See :meth:`Variables.trend_correction`   |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsImport``         | ``[workspace].load(filepath)`` --> See :meth:`Database.load`                                                        |
+    | ``WsImport``         | ``workspace.load(filepath)`` --> See :meth:`Database.load`                                                          |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsExport``         | ``[workspace].save(filepath)`` --> See :meth:`Database.save`                                                        |
+    | ``WsExport``         | ``workspace.save(filepath)`` --> See :meth:`Database.save`                                                          |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | ``WsImportEviews``   | Not Implemented                                                                                                     |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``CsvSave``          | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    | ``CsvSave``          | ``df = workspace.to_frame()`` --> See :meth:`iode.Variables.to_frame`                                               |
     |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``CsvDigits``        | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    | ``CsvDigits``        | ``df = workspace.to_frame()`` --> See :meth:`iode.Variables.to_frame`                                               |
     |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``CsvSep``           | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    | ``CsvSep``           | ``df = workspace.to_frame()`` --> See :meth:`iode.Variables.to_frame`                                               |
     |                      | `ndf.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_    |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``CsvDec``           | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    | ``CsvDec``           | ``df = workspace.to_frame()`` --> See :meth:`iode.Variables.to_frame`                                               |
     |                      | `ndf.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_    |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``CsvNaN``           | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    | ``CsvNaN``           | ``df = workspace.to_frame()`` --> See :meth:`iode.Variables.to_frame`                                               |
     |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``CsvAxes``          | ``df = [workspace].to_frame()`` --> See :meth:`iode.Variables.to_frame`                                             |
+    | ``CsvAxes``          | ``df = workspace.to_frame()`` --> See :meth:`iode.Variables.to_frame`                                               |
     |                      | `df.to_csv(filepath, ...) <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html>`_  [#f4]_     |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
 
 .. [#f4] Assuming library ``pandas`` is installed.
+
+
+====
+Data
+====
+
+Below *workspace* must be replaced by either:
+  - comments
+  - equations
+  - identities
+  - lists
+  - scalars
+  - tables
+  - variables
+
+
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | IODE Report Commands | Python Equivalent                                                                                                            |
+    +======================+==============================================================================================================================+
+    | ``datacreate``       | ``if name not in workspace:  `` --> See :meth:`Database.__contains__`                                                        |
+    |                      | ``    workspace[name] = value`` --> See :meth:`Database.__setitem__`                                                         |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datadelete``       | ``del workspace[name]`` --> See See :meth:`Database.__delitem__`                                                             |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``dataexist``        | ``name in workspace`` --> See :meth:`Database.__contains__`                                                                  |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``dataedit``         | ``workspace[name] = value`` --> See :meth:`Database.__setitem__`                                                             |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``dataupdate``       | ``workspace[name] = value`` --> See :meth:`Database.__setitem__`                                                             |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``dataappend``       | Operator += Not Yet Implemented                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``dataduplicate``    | ``workspace[new_name] = workspace[name]`` --> See :meth:`Database.__setitem__`                                               |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datarename``       | ``workspace.rename(old_name, new_name)`` --> See :meth:`Database.rename`                                                     |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datasearch``       | Not Yet Implemented                                                                                                          |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datascan``         | Not Yet Implemented                                                                                                          |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datalistXxx``      | ``names = workspace.get_names(pattern)`` --> See :meth:`Database.get_names`                                                  |
+    |                      | ``lists[listname] = names`` --> See :meth:`Database.__setitem__`                                                             |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datalistsort``     | ``lst = split_list(lists[listname]))``   --> See :func:`split_list`                                                          |
+    |                      | ``lists[sorted_listname] = sorted(lst)``                                                                                     |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datacompareEps``   | Not Yet Implemented                                                                                                          |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datacompareXxx``   | Not Yet Implemented                                                                                                          |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datacalclst``      | ``list1, list2 = split_list(lists[list1]), split_list(lists[list2])``                                                        |
+    |                      | union:        ``list(set(list1) | set(list2))``                                                                              |
+    |                      | intersection: ``list(set(list1) & set(list2))``                                                                              |
+    |                      | difference:   ``list(set(list1) - set(list2))``                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datacalcvar``      | ``variables[varname] = lec_formula`` --> See :meth:`Database.__setitem__`                                                    |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datadisplaygraph`` | ``df = variables.to_frame()`` then see `Chart visualization <https://pandas.pydata.org/docs/user_guide/visualization.html>`_ |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datasavegraph``    | ``df = variables.to_frame()`` then see `Chart visualization <https://pandas.pydata.org/docs/user_guide/visualization.html>`_ |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datawidthvar``     | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datandecvar``      | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datamodevar``      | ``variables.mode = VAR_MODE_LEVEL`` --> See :meth:`Variables.mode`                                                           |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datastartvar``     | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datawidthtbl``     | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datawidthscl``     | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datandecscl``      | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``dataeditcnf``      | Not Implemented                                                                                                              |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datarasvar``       | Not Yet Implemented                                                                                                          |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
+    | ``datapatternXXX``   | Not Yet Implemented                                                                                                          |
+    +----------------------+------------------------------------------------------------------------------------------------------------------------------+
