@@ -175,6 +175,15 @@ EQUATION
    Equation.set_sample       
    Equation.split_equation
 
+====
+LIST
+====
+
+.. autosummary::
+   :toctree: _generated
+
+   split_list
+
 ======
 SCALAR
 ======
