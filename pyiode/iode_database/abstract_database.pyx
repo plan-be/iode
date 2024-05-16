@@ -69,7 +69,7 @@ cdef class _AbstractDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> comments.is_subset()
         False
-        >>> cmt_subset = comments.subset("A*")
+        >>> cmt_subset = comments.copy("A*")
         >>> cmt_subset.is_subset()
         True
         """
@@ -100,14 +100,9 @@ cdef class _AbstractDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> comments.is_subset()
         False
-        >>> # by default a 'shallow copy' subset is returned
-        >>> cmt_subset = comments.subset("A*")
+        >>> cmt_subset = comments.copy("A*")
         >>> cmt_subset.is_subset()
         True
-        >>> cmt_subset.is_copy_subset()
-        False
-        >>> # force to return a 'deep copy' subset
-        >>> cmt_subset = comments.subset("A*", copy=True)
         >>> cmt_subset.is_copy_subset()
         True
         """
@@ -115,17 +110,14 @@ cdef class _AbstractDatabase:
             return False
         return self.abstract_db_ptr.is_local_database()
 
-    def subset(pattern: str, copy: bool = False) -> Self:
-        """
-        Create a subset of a global IODE database.
+    def _subset(self, pattern: str, copy: bool) -> Self:
+        raise NotImplementedError()
 
-        If 'copy' is True, a *deep copy* subset is returned. 
-        This means that any change made on an object of the subset will **NOT** 
-        modify the corresponding object in the global IODE database.
-
-        If 'copy' is False (default), a *shallow copy* subset is returned. 
-        This means that any change made on an object of the subset will also 
-        modify the corresponding object in the global IODE database.
+    def copy(self, pattern: str) -> Self:
+        f"""
+        Create a *copy subset* of a global IODE database. 
+        Any change made on an IODE object of the *copy subset* will **NOT** 
+        modify the corresponding IODE object in the global IODE database.
 
         Parameters
         ----------
@@ -134,37 +126,27 @@ cdef class _AbstractDatabase:
             E.g. "A*" will select all IODE objects with the name starting with 'A', 
             "*_" will select all IODE objects with the name ending with '_' and 
             "*" will select all IODE objects.
-        copy: bool, optional
-            whether or not to return *deep copy* subset.
-            Defaults to False. 
 
         Returns
         -------
-        { CommentsSubset | EquationsSubset | IdentitiesSubset | ListsSubset | ScalarsSubset | TablesSubset | VariablesSubset }
+        {type(Self).__name__}
         
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.load(f"{{SAMPLE_DATA_DIR}}/fun.cmt")
 
-        >>> # create a subset with all comments with name starting with 'A'
-        >>> cmt_subset = comments.subset("A*")
-        >>> cmt_subset.get_names()
-        ['ACAF', 'ACAG', 'AOUC', 'AQC']
-        >>> # any modification made on the subset is visible in the global database
-        >>> cmt_subset['ACAF'] = "Modified Comment"
-        >>> comments['ACAF']
+        >>> cmt_subset_copy = comments.copy("*_")
+        >>> # any modification made on the copy subset 
+        >>> # let the global workspace unchanged
+        >>> cmt_subset_copy['BENEF_'] = "Modified Comment"
+        >>> cmt_subset_copy['BENEF_']
         'Modified Comment'
-
-        >>> # force to return a 'deep copy' subset
-        >>> cmt_subset = comments.subset("*_", copy=True)
-        >>> # any modification made on the subset let the global database unchanged
-        >>> cmt_subset['BENEF_'] = "Modified Comment"
         >>> comments['BENEF_']
         'Ondernemingen: niet-uitgekeerde winsten (vóór statistische\\naanpassing).'
         """
-        raise NotImplementedError()
+        return self._subset(pattern, copy=True)
 
     @property
     def filename(self) -> str:
