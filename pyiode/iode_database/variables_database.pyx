@@ -138,79 +138,90 @@ cdef class Variables(_AbstractDatabase):
         subset_db.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
         return subset_db
 
-    def _unfold_key(self, key) -> Union[str, Tuple[str, Any]]:
-        # key is the name of a Variable
-        if isinstance(key, str):
-            return key
-        
-        # key = name, periods
-        if isinstance(key, tuple):
-            if len(key) > 2:
-                raise ValueError(f"variables[...]: Expected maximum 2 arguments ('name' and 'periods'). "
-                                 f"Got {len(key)} arguments")
-            name, periods_ = key
+    def _unfold_key(self, key) -> Tuple[Union[str, List[str]], Optional[str, Tuple[int, int], List[str]]]:
+        cdef CSample c_sample
 
-            # check name
-            if not isinstance(name, str):
-                raise TypeError(f"variables[name, periods]: first argument must be of type str. "
-                                f"Got first argument of type {type(name).__name__}.")
+        # no selection on periods
+        if not isinstance(key, tuple):
+            return super()._unfold_key(key), None
+        # key = names, periods
+        else:
+            if len(key) > 2:
+                raise ValueError(f"variables[...]: Expected maximum 2 arguments ('names' and 'periods'). "
+                                 f"Got {len(key)} arguments")
+            names, periods_ = key
+
+            # get selection on Variable name(s)
+            names = super()._unfold_key(names) 
             
-            # periods_ represent a unique period or a contiguous range of periods
+            # periods_ represents a unique period or a contiguous range of periods
             if isinstance(periods_, str): 
                 # periods_ represents a contiguous range of periods
                 if ':' in periods_:
-                    sample = self.sample
                     first_period, last_period = periods_.split(':')
                     if not first_period:
-                        first_period = sample.start
+                        first_period = None
                     if not last_period:
-                        last_period = sample.end
-                    return name, (first_period, last_period)
+                        last_period = None
+                    periods_ = slice(first_period, last_period)
                 # periods_ represents a unique period
                 else:
-                    return name, periods_
+                    return names, periods_
+            
+            # check if periods_ is a list of periods
+            if isinstance(periods_, Iterable) and all(isinstance(period_, (str, Period)) for period_ in periods_):
+                return names, [str(period_) if isinstance(period_, Period) else period_ for period_ in periods_]
             
             # convert slice to a (start, end) tuple or a list of periods if step is not None
             if isinstance(periods_, slice):
                 sample = self.sample
-                start_period = sample.start if periods_.start is None else periods_.start
+                first_period = sample.start if periods_.start is None else periods_.start
                 last_period = sample.end if periods_.stop is None else periods_.stop
                 if periods_.step is not None:
-                    periods_ = self.periods_subset(start_period, last_period)[::periods_.step]
+                    return names, self.periods_subset(first_period, last_period)[::periods_.step]
                 else:
-                    periods_ = (start_period, last_period)
-                return name, periods_
-
-            # check if periods_ is a list of periods
-            if isinstance(periods_, Iterable) and all(isinstance(period_, (str, Period)) for period_ in periods_):
-                periods_ = [str(period_) if isinstance(period_, Period) else period_ for period_ in periods_]
-                return name, periods_
-            
-            # wrong type for periods_
-            raise TypeError(f"variables[name, periods]: 'periods' must represent either a period (str), a list of periods "
-                            f"or a slice of periods (start_period:last_period). 'periods' is of type {type(periods_).__name__}.")
+                    c_sample = self.database_ptr.get_sample()
+                    t_first = c_sample.get_period_position(<string>first_period.encode())
+                    t_last = c_sample.get_period_position(<string>last_period.encode())
+                    return names, (t_first, t_last)
+            else:
+                # wrong type for periods_
+                raise TypeError(f"variables[names, periods]: 'periods' must represent either a period (str), a list of periods "
+                                f"or a slice of periods (start_period:last_period). 'periods' is of type {type(periods_).__name__}.")
 
         # wrong key
-        raise ValueError(f"variables[...]: Expected ['name'] or ['name', 'periods'] as arguments. Got {key} instead.")     
+        raise ValueError(f"variables[...]: Expected ['names'] or ['names', 'periods'] as arguments. Got '{key}' instead.")     
         
-    def _get_object(self, key): 
-
-        key = self._unfold_key(key)
-
-        # return the whole variable (i.e. for the whole sample)
-        if isinstance(key, str):
-            key = key.strip()
-            return self.database_ptr.get(key.encode())
-        # return the variable values for the selected periods
-        else:
-            name, periods_ = key          
-            # periods_ represents a unique period 
-            if isinstance(periods_, str):
-                return self.database_ptr.get_var(<string>name.encode(), <string>periods_.encode(), self.mode_)
-            # periods_ represents a range/list of periods
-            if isinstance(periods_, tuple):
-                periods_ = self.periods_subset(*periods_)
+    def _get_variable(self, name: str, periods_: Union[str, List[str]]) -> Union[float, List[float]]: 
+        # periods_ represents all periods
+        if periods_ is None:
+            return self.database_ptr.get(name.encode())     
+        # periods_ represents a unique period 
+        elif isinstance(periods_, str):
+            return self.database_ptr.get_var(<string>name.encode(), <string>periods_.encode(), self.mode_)
+        # periods_ represents a contiguous range of periods
+        elif isinstance(periods_, tuple):
+            t_first, t_last = periods_
+            return [self.database_ptr.get_var(<string>name.encode(), <int>t, self.mode_) for t in range(t_first, t_last+1)]
+        # periods_ represents a range/list of periods
+        elif isinstance(periods_, list):
             return [self.database_ptr.get_var(<string>name.encode(), <string>period_.encode(), self.mode_) for period_ in periods_]
+        else:
+            raise TypeError("Wrong selection of periods. Expected None or value of type str or list(str). "
+                            f"Got value of type {type(periods_).__name__} instead.")
+
+    # overriden for Variables
+    def __getitem__(self, key):
+        names, periods_ = self._unfold_key(key)
+        # names represents a single Variable
+        if len(names) == 1:
+            return self._get_variable(names[0], periods_)
+        # names represents a selection of Variables
+        elif periods_ is None:
+            names = ';'.join(names)
+            return self._subset(names, copy=False)
+        else:
+            return [self._get_variable(name, periods_) for name in names]
 
     def _convert_values(self, values, nb_periods) -> Union[str, float, List[float]]:
         # value is a LEC expression
@@ -238,6 +249,7 @@ cdef class Variables(_AbstractDatabase):
         if not isinstance(name, str):
             raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
 
+        # raise an error if values is a vector and len(values) != self.nb_periods
         values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
@@ -253,6 +265,7 @@ cdef class Variables(_AbstractDatabase):
         if not isinstance(name, str):
             raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
 
+        # raise an error if values is a vector and len(values) != self.nb_periods
         values = self._convert_values(values, self.nb_periods)
         # values is a LEC expression
         if isinstance(values, str):
@@ -262,55 +275,67 @@ cdef class Variables(_AbstractDatabase):
             cpp_values = [<double>value_ for value_ in values]
             self.database_ptr.update(<string>name.encode(), cpp_values)
 
-    def _set_object(self, key, value):
+    def _set_object(self, name: str, values: Any, periods_: Optional[str, Tuple[int, int], List[str]]):
         cdef vector[double] cpp_values
+
+        name = name.strip()
         
-        key = self._unfold_key(key)
-
-        # update/add a variable
-        if isinstance(key, str):
-            key = key.strip()
-            # add a new variable
-            if key not in self:
-                self._add(key, value)
-            # update a variable
-            else:
-                self._update(key, value)
-
-        # set variable value(s) for a (selection) of period(s)
-        else:            
-            name, periods = key
-            # only one period 
-            if isinstance(periods, str):
+        # new Variable -> raise an error if values is a vector and len(values) != self.nb_periods
+        if name not in self:
+            self._add(name, values)
+        # update a Variable
+        else:
+            # update values for the whole sample
+            # raise an error if values is a vector and len(values) != self.nb_periods
+            if periods_ is None:
+                self._update(name, values)
+            # update the value for only one period 
+            elif isinstance(periods_, str):
+                value = values
                 if isinstance(value, int):
                     value = float(value)
                 if not isinstance(value, float):
                     raise TypeError("variables[key] = value: Expected 'value' to be a float. "
                                     f"Got 'value' of type {type(value).__name__}")
-                self.database_ptr.set_var(<string>name.encode(), <string>periods.encode(), <double>value, self.mode_)
-            # contiguous range of periods
-            elif isinstance(periods, tuple):
-                first_period, last_period = periods
+                self.database_ptr.set_var(<string>name.encode(), <string>periods_.encode(), <double>value, self.mode_)
+            # update values for a contiguous range of periods
+            elif isinstance(periods_, tuple):
+                first_period, last_period = periods_
+                nb_periods = last_period - first_period + 1
                 # values is a LEC expression
-                if isinstance(value, str):
-                    self.database_ptr.update(<string>name.encode(), <string>value.encode(), <string>first_period.encode(), 
-                        <string>last_period.encode())
+                if isinstance(values, str):
+                    self.database_ptr.update(<string>name.encode(), <string>values.encode(), <int>first_period, <int>last_period)
                 else:
-                    c_sample = self.database_ptr.get_sample()
-                    t_first = c_sample.get_period_position(<string>first_period.encode())
-                    t_last = c_sample.get_period_position(<string>last_period.encode())
-                    values = self._convert_values(value, t_last - t_first + 1)
-                    cpp_values = [<double>value_ for value_ in values]
-                    self.database_ptr.update(<string>name.encode(), cpp_values, <int>t_first, <int>t_last)
-            # list of periods
+                    values = self._convert_values(values, nb_periods)
+                    cpp_values = [<double>value for value in values]
+                    self.database_ptr.update(<string>name.encode(), cpp_values, <int>first_period, <int>last_period)
+            # update values for a list of periods
             else:
-                if isinstance(value, str):
-                    raise NotImplementedError("Case variables[key, periods] = lec where 'periods' does not represents "
+                if isinstance(values, str):
+                    raise NotImplementedError(f"Case variables[key, periods] = lec where '{periods_}' does not represents "
                                               "a contiguous range of periods is not implemented")
                 else:
-                    values = self._convert_values(value, len(periods))
-                    for period_, value_ in zip(periods, values):
-                        self.database_ptr.set_var(<string>name.encode(), <string>period_.encode(), <double>value_, self.mode_)
+                    values = self._convert_values(values, len(periods_))
+                    for period, value in zip(periods_, values):
+                        self.database_ptr.set_var(<string>name.encode(), <string>period.encode(), <double>value, self.mode_)
+
+    # overriden for Variables
+    def __setitem__(self, key, value):
+        names, periods_ = self._unfold_key(key)
+        # update/add a single Variable
+        if len(names) == 1:
+            self._set_object(names[0], value, periods_)
+        # update/add several variables
+        else:
+            # if value is a string (LEC expression) or a numerical value -> set the same value for all Variables
+            values = [value] * len(names) if isinstance(value, str) or not isinstance(value, Iterable) else value
+            # check list of values has the same length as list of names
+            if len(names) != len(values):
+                raise ValueError(f"Cannot add/update Variables for the selection key '{key}'.\n"
+                                f"{len(values)} values has been passed while the selection key '{key}' "
+                                f"represents {len(names)} objects.")
+            for name, value in zip(names, values):
+                self._set_object(name, value, periods_) 
 
     def from_frame(self, df: DataFrame):
         """

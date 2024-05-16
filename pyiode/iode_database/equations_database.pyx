@@ -76,9 +76,9 @@ cdef class Equations(_AbstractDatabase):
 
     def _subset(self, pattern: str, copy: bool) -> Equations:
         # call to __new__() that bypasses the __init__() constructor.
-        cdef Equations subset_db = Equations.__new__(Equations)
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+        cdef Equations subset_ = Equations.__new__(Equations)
+        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return subset_
 
     def _get_object(self, key):
         if not isinstance(key, str):
