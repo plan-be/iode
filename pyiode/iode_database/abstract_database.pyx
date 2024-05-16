@@ -146,6 +146,8 @@ cdef class _AbstractDatabase:
         >>> comments['BENEF_']
         'Ondernemingen: niet-uitgekeerde winsten (vóór statistische\\naanpassing).'
         """
+        if not isinstance(pattern, str):
+            raise TypeError(f"'pattern': Expected value of type str. Got value of type {type(pattern).__name__} instead.")
         return self._subset(pattern, copy=True)
 
     @property
@@ -656,17 +658,78 @@ cdef class _AbstractDatabase:
             raise TypeError(f"Expected value of type string. Got value of type {type(item).__name__}")
         return self.abstract_db_ptr.contains(item.encode())
 
+    # needs to be overriden for Variables
+    def _unfold_key(self, key) -> List[str]:
+        names = []
+        if isinstance(key, str):
+            key = key.strip()
+            # key represents a slice
+            if ':' in key:
+                key = key.split(key)
+                if len(key) != 2:
+                    raise ValueError("When selecting a subset of a workspace, "
+                                     "the character ':' must only appear once")
+                first_name, last_name = key
+                key = slice(first_name, last_name)
+            # key represents either a single IODE object or a pattern (A* for example)
+            else:
+                names = self.get_names(key)
+                # names is empty -> key represents the name of a new object
+                if not len(names):
+                    names = [key]
+                return names
+        # key represents a selection of IODE objects
+        elif isinstance(key, Iterable) and all(isinstance(item, str) for item in key):
+            # empty key
+            if not len(key):
+                raise ValueError(f"Empty list of names for {self.iode_type} objects.")
+            return key
+        
+        # key represents a slice
+        if isinstance(key, slice):
+            if key.step is not None:
+                raise ValueError("When selecting a subset of a workspace using a slice, the step cannot be used")
+            names = self.get_names()
+            first_name, last_name = key.start, key.stop
+            # raise an error if first_name refers to an IODE object that does not exist
+            first_index = names.index(first_name)
+            # raise an error if last_name refers to an IODE object that does not exist
+            last_index = names.index(last_name)
+            # last_name must be equal or after first_name
+            if last_index < first_index:
+                raise ValueError(f"Cannot select {self.iode_type} objects between '{first_name}' and '{last_name}'. "
+                                 f"'{first_name}' is after '{last_name}'.")
+            names = names[first_index:last_index+1]
+            # invalid key
+            if not len(names):
+                raise ValueError(f"Invalid name or pattern '{key}' for {self.iode_type} objects.")
+            return names
+
+        # invalid type for key
+        raise TypeError(f"Invalid type for the selection key '{key}' when trying to select {self.iode_type} objects.\n"
+                        f"Expected selection key of type str, list of str or slice(str, str).\n"
+                        f"Got selection key of type {type(key).__name__} instead.")
+
     def _get_object(self, key):
         raise NotImplementedError()
 
+    def _subset(self, pattern: str, copy: bool) -> Self:
+        raise NotImplementedError()
+
+    # needs to be overriden for Variables
     def __getitem__(self, key):
         """
-        Return the IODE object named `key` from the current database.
+        Return the (subset of) IODE object(s) referenced by `key`.
 
         Parameters
         ----------
-        key: str
-            name of the IODE object to get.
+        key: str or list(str)
+            (the list of) name(s) of the IODE object(s) to get.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Returns
+        -------
+        Single IODE object or a subset of the database.
 
         Examples
         --------
@@ -676,13 +739,23 @@ cdef class _AbstractDatabase:
 
         >>> from iode import comments
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> # a) get one Comment
         >>> comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
+        >>> # b) get a subset of the Comments database using a pattern
+        >>> comments_subset = comments["A*"]
+        >>> comments_subset.get_names()
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        >>> # c) get a subset of the Comments database using a list of names
+        >>> comments_subset = comments[["ACAF", "AOUC", "BQY", "BVY"]]
+        >>> comments_subset.get_names()
+        ['ACAF', 'AOUC', 'BQY', 'BVY']
 
         Equations
 
         >>> from iode import equations
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> # a) get one Equation
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
         acaf4*(TIME=1995),
@@ -704,25 +777,52 @@ cdef class _AbstractDatabase:
                     stderrp: 23.5458
                     stdev: 0.0042699
                 date: 12-06-1998)
+        >>> # b) get a subset of the Equations database using a pattern
+        >>> equations_subset = equations["A*"]
+        >>> equations_subset.get_names()
+        ['ACAF', 'ACAG', 'AOUC']
+        >>> # c) get a subset of the Equations database using a list of names
+        >>> equations_subset = equations[["ACAF", "AOUC", "BQY", "BVY"]]
+        >>> equations_subset.get_names()
+        ['ACAF', 'AOUC', 'BQY', 'BVY']
 
         Identities
 
         >>> from iode import identities
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> # a) get one identities
         >>> identities["AOUC"]
         '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
+        >>> # b) get a subset of the Identities database using a pattern
+        >>> identities_subset = identities["X*"]
+        >>> identities_subset.get_names()
+        ['XEX', 'XNATY', 'XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS', 'XQWXAB', 'XQWXS', 'XQWXSS', 'XRLBER', 'XTFP', 'XW']
+        >>> # c) get a subset of the Identities database using a list of names
+        >>> identities_subset = identities[["XEX", "XPWMAB", "XPWMS", "XQWXS", "XTFP"]]
+        >>> identities_subset.get_names()
+        ['XEX', 'XPWMAB', 'XPWMS', 'XQWXS', 'XTFP']
 
         Lists
 
         >>> from iode import lists
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> # a) get one lists
         >>> lists["ENVI"]
         'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
+        >>> # b) get a subset of the Lists database using a pattern
+        >>> lists_subset = lists["E*"]
+        >>> lists_subset.get_names()
+        ['ENDO', 'ENDO0', 'ENDO1', 'ENVI']
+        >>> # c) get a subset of the Lists database using a list of names
+        >>> lists_subset = lists[["COPY", "ENDO", "ENVI", "TOTAL"]]
+        >>> lists_subset.get_names()
+        ['COPY', 'ENDO', 'ENVI', 'TOTAL']
 
         Scalars
 
         >>> from iode import scalars
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> # a) get one scalars
         >>> acaf1 = scalars["acaf1"]
         >>> acaf1
         Scalar(0.0157684, 1, 0.00136871)
@@ -732,11 +832,20 @@ cdef class _AbstractDatabase:
         1.0
         >>> acaf1.std
         0.0013687137980014086
+        >>> # b) get a subset of the Scalars database using a pattern
+        >>> scalars_subset = scalars["a*"]
+        >>> scalars_subset.get_names()
+        ['acaf1', 'acaf2', 'acaf3', 'acaf4']
+        >>> # c) get a subset of the Scalars database using a list of names
+        >>> scalars_subset = scalars[["acaf1", "acaf4", "dpuh_1", "dpuh_2"]]
+        >>> scalars_subset.get_names()
+        ['acaf1', 'acaf4', 'dpuh_1', 'dpuh_2']
 
         Tables
 
         >>> from iode import tables
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+        >>> # a) get one tables
         >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
@@ -767,6 +876,14 @@ cdef class _AbstractDatabase:
         graph_axis: 'values'
         graph_alignment: 'left'
         <BLANKLINE>        
+        >>> # b) get a subset of the Tables database using a pattern
+        >>> tables_subset = tables["C8_*"]
+        >>> tables_subset.get_names()
+        ['C8_1', 'C8_10', 'C8_11', 'C8_13', 'C8_14', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
+        >>> # c) get a subset of the Tables database using a list of names
+        >>> tables_subset = tables[["C8_1", "C8_2", "C8_4", "C8_5", "C8_7"]]
+        >>> tables_subset.get_names()
+        ['C8_1', 'C8_2', 'C8_4', 'C8_5', 'C8_7']
 
         Variables
 
@@ -774,6 +891,7 @@ cdef class _AbstractDatabase:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
         1960Y1:2015Y1
+        >>> # -------- a) get one Variable --------
         >>> # get the variable values for the whole sample
         >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
@@ -786,22 +904,51 @@ cdef class _AbstractDatabase:
         >>> # same as above but with the colon ':' inside the periods range string
         >>> variables["ACAF", "1990Y1:2000Y1"]      # doctest: +ELLIPSIS 
         [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
+        >>> # b) -------- get a subset of the Variables database using a pattern --------
+        >>> variables_subset = variables["A*"]
+        >>> variables_subset.get_names()
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> # get the variable values for a specific period
+        >>> variables["A*", "1990Y1"]
+        [23.771, -28.1721855713507, 1.0, 0.9373591502749314, 1.0]
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> variables["A*", "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
+        [[23.771, 26.240999, 30.159, ..., 1.2031082, 1.3429699656745855, 1.3386028553645442]]
+        >>> # c) -------- get a subset of the Variables database using a list of names --------
+        >>> variables_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
+        >>> variables_subset.get_names()
+        ['ACAF', 'ACAG', 'AQC', 'BQY', 'BVY']
+        >>> # get the variable values for a specific period
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1"]
+        [23.771, -28.1721855713507, 1.0, -34.099998, -34.099997]
+        >>> # get the variable values for range of periods (using a Python slice)
+        >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1":"2000Y1"]      # doctest: +ELLIPSIS 
+        [[23.771, 26.240999, 30.159, ..., 140.73978, 144.8587818455608, 150.05335230584103]]
         """
-        return self._get_object(key) 
+        names = self._unfold_key(key)
+        # names represents a single IODE object
+        if len(names) == 1:
+            return self._get_object(names[0])
+        # names represents a selection of IODE objects
+        else:
+            names = ';'.join(names)
+            return self._subset(names, copy=False)
 
     def _set_object(self, key, value):
         raise NotImplementedError()
 
+    # needs to be overriden for Variables
     def __setitem__(self, key, value):
-        """
-        Update/add an IODE object named `key` from/to the current database.
+        r"""
+        Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
 
         Parameters
         ----------
-        key: str
-            name of the IODE object to update/add.
+        key: str or list(str)
+            (list of) name(s) of the IODE object(s) to update/add.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
         value: 
-            (new) value of the IODE object. 
+            (new) value(s) of the IODE object(s). 
 
         Examples
         --------
@@ -811,16 +958,68 @@ cdef class _AbstractDatabase:
 
         >>> from iode import comments
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> # a) add one comment
+        >>> comments["BDY"] = "Difference net incomes (YN - YK)"
+        >>> comments["BDY"]
+        'Difference net incomes (YN - YK)'
+
+        >>> # b) update one comment
         >>> comments["ACAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         >>> comments["ACAF"] = "New Value"
         >>> comments["ACAF"]
         'New Value'
 
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> comments_subset = comments["A*"]
+        >>> comments_subset.get_names()
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        >>> # 2) add a comment to the subset 
+        >>> comments_subset["A0"] = "New Comment"
+        >>> comments_subset["A0"]
+        'New Comment'
+        >>> # --> new comment also appears in the global workspace
+        >>> "A0" in comments
+        True
+        >>> comments["A0"]
+        'New Comment'
+        >>> # 3) update a comment in the subset
+        >>> comments_subset["A0"] = "Updated Comment"
+        >>> comments_subset["A0"]
+        'Updated Comment'
+        >>> # --> comment is also updated in the global workspace
+        >>> comments["A0"]
+        'Updated Comment'
+
         Equations
 
         >>> from iode import equations
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> # a) add one equation
+        >>> equations["BDY"] = "BDY := YN - YK"
+        >>> equations["BDY"]                    # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: BDY := YN - YK,
+            method: LSQ,
+            sample: 1960Y1:2015Y1,
+            comment: ,
+            block: ,
+            instruments: ,
+            tests:
+                    corr: 0
+                    dw: 0
+                    fstat: 0
+                    loglik: 0
+                    meany: 0
+                    r2: 0
+                    r2adj: 0
+                    ssres: 0
+                    stderr: 0
+                    stderrp: 0
+                    stdev: 0
+            date: )
+        
+        >>> # b) update one equation        
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
         acaf4*(TIME=1995),
@@ -902,30 +1101,193 @@ cdef class _AbstractDatabase:
                     stdev: 0.0042699
                 date: 12-06-1998)
 
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> equations_subset = equations["A*"]
+        >>> equations_subset.get_names()
+        ['ACAF', 'ACAG', 'AOUC']
+        >>> # 2) add a equation to the subset 
+        >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]"
+        >>> equations_subset["AOUC_"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1],
+            method: LSQ,
+            sample: 1960Y1:2015Y1,
+            comment: ,
+            block: ,
+            instruments: ,
+            tests:
+                    corr: 0
+                    dw: 0
+                    fstat: 0
+                    loglik: 0
+                    meany: 0
+                    r2: 0
+                    r2adj: 0
+                    ssres: 0
+                    stderr: 0
+                    stderrp: 0
+                    stdev: 0
+            date: )
+        >>> # --> new equation also appears in the global workspace
+        >>> "AOUC_" in equations
+        True
+        >>> equations["AOUC_"]                      # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1],
+            method: LSQ,
+            sample: 1960Y1:2015Y1,
+            comment: ,
+            block: ,
+            instruments: ,
+            tests:
+                    corr: 0
+                    dw: 0
+                    fstat: 0
+                    loglik: 0
+                    meany: 0
+                    r2: 0
+                    r2adj: 0
+                    ssres: 0
+                    stderr: 0
+                    stderrp: 0
+                    stdev: 0
+            date: )
+        >>> # 3) update a equation in the subset
+        >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]"
+        >>> equations_subset["AOUC_"]           # doctest: +NORMALIZE_WHITESPACE
+            Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1],
+            method: LSQ,
+            sample: 1960Y1:2015Y1,
+            comment: ,
+            block: ,
+            instruments: ,
+            tests:
+                    corr: 0
+                    dw: 0
+                    fstat: 0
+                    loglik: 0
+                    meany: 0
+                    r2: 0
+                    r2adj: 0
+                    ssres: 0
+                    stderr: 0
+                    stderrp: 0
+                    stdev: 0
+            date: )
+        >>> # --> equation is also updated in the global workspace
+        >>> equations["AOUC_"]                  # doctest: +NORMALIZE_WHITESPACE
+        Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1],
+            method: LSQ,
+            sample: 1960Y1:2015Y1,
+            comment: ,
+            block: ,
+            instruments: ,
+            tests:
+                    corr: 0
+                    dw: 0
+                    fstat: 0
+                    loglik: 0
+                    meany: 0
+                    r2: 0
+                    r2adj: 0
+                    ssres: 0
+                    stderr: 0
+                    stderrp: 0
+                    stdev: 0
+            date: )
+
         Identities
 
         >>> from iode import identities
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> # a) add one identity
+        >>> identities["BDY"] = "YN - YK"
+        >>> identities["BDY"]
+        'YN - YK'
+
+        >>> # b) update one identity
         >>> identities["AOUC"]
         '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
         >>> identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
         >>> identities["AOUC"]
         '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
 
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> identities_subset = identities["X*"]
+        >>> identities_subset.get_names()
+        ['XEX', 'XNATY', 'XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS', 'XQWXAB', 'XQWXS', 'XQWXSS', 'XRLBER', 'XTFP', 'XW']
+        >>> # 2) add an identity to the subset 
+        >>> identities_subset["XDPU"] = "grt DPU"
+        >>> identities_subset["XDPU"]
+        'grt DPU'
+        >>> # --> new identity also appears in the global workspace
+        >>> "XDPU" in identities
+        True
+        >>> identities["XDPU"]
+        'grt DPU'
+        >>> # 3) update an identity in the subset
+        >>> identities_subset["XDPU"] = "0"
+        >>> identities_subset["XDPU"]
+        '0'
+        >>> # --> identity is also updated in the global workspace
+        >>> identities["XDPU"]
+        '0'
+
         Lists
 
         >>> from iode import lists
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> # a) add one list
+        >>> from iode import variables
+        >>> lists["A_VAR"] = ';'.join(variables.get_names("A*"))
+        >>> lists["A_VAR"]
+        'ACAF;ACAG;AOUC;AOUC_;AQC'
+
+        >>> # b) update one list
         >>> lists["ENVI"]
         'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
         >>> lists["ENVI"] = 'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
         >>> lists["ENVI"]
         'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
 
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> lists_subset = lists["E*"]
+        >>> lists_subset.get_names()
+        ['ENDO', 'ENDO0', 'ENDO1', 'ENVI']
+        >>> # 2) add a list to the subset 
+        >>> from iode import variables
+        >>> lists_subset["E_VAR"] = ";".join(variables.get_names("E*"))
+        >>> lists_subset["E_VAR"]
+        'EFMY;EFXY;EX;EXC;EXCC;EXCCR'
+        >>> # --> new list also appears in the global workspace
+        >>> "E_VAR" in lists
+        True
+        >>> lists["E_VAR"]
+        'EFMY;EFXY;EX;EXC;EXCC;EXCCR'
+        >>> # 3) update a list in the subset
+        >>> lists_subset["E_VAR"] = "EX;EXC;EXCC;EXCCR"
+        >>> lists_subset["E_VAR"]
+        'EX;EXC;EXCC;EXCCR'
+        >>> # --> list is also updated in the global workspace
+        >>> lists["E_VAR"]
+        'EX;EXC;EXCC;EXCCR'
+
         Scalars
 
         >>> from iode import scalars
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> # a) -------- add one scalar -------- 
+        >>> # 1. default relax to 1.0
+        >>> scalars["a0"] = 0.1
+        >>> scalars["a0"]
+        Scalar(0.1, 1, nan)
+        >>> # 2. value + relax
+        >>> scalars["a1"] = 0.1, 0.9
+        >>> scalars["a1"]
+        Scalar(0.1, 0.9, nan)
+
+        >>> # b) -------- update one scalar --------
         >>> scalars["acaf1"]
         Scalar(0.0157684, 1, 0.00136871)
         >>> # only update the value
@@ -955,12 +1317,33 @@ cdef class _AbstractDatabase:
         >>> scalars["acaf4"]
         Scalar(0.8, 0.9, 0.0020833)
 
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> scalars_subset = scalars["a*"]
+        >>> scalars_subset.get_names()
+        ['a0', 'a1', 'acaf1', 'acaf2', 'acaf3', 'acaf4']
+        >>> # 2) add a scalar to the subset 
+        >>> scalars_subset["acaf0"] = 1.0, 1.0
+        >>> scalars_subset["acaf0"]
+        Scalar(1, 1, nan)
+        >>> # --> new scalar also appears in the global workspace
+        >>> "acaf0" in scalars
+        True
+        >>> scalars["acaf0"]
+        Scalar(1, 1, nan)
+        >>> # 3) update a scalar in the subset
+        >>> scalars_subset["acaf0"] = 0.1
+        >>> scalars_subset["acaf0"]
+        Scalar(0.1, 1, nan)
+        >>> # --> scalar is also updated in the global workspace
+        >>> scalars["acaf0"]
+        Scalar(0.1, 1, nan)
+
         Tables
 
         >>> from iode import tables, Table
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-
-        >>> # -- new table --
+        >>> # a) -------- new table --------
         >>> # 1. specify list of line titles and list of LEC expressions
         >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
@@ -1035,7 +1418,7 @@ cdef class _AbstractDatabase:
         graph_alignment: 'left'
         <BLANKLINE>
 
-        >>> # -- update table --
+        >>> # b) -------- update table --------
         >>> table = tables["TABLE_LECS"]
         >>> table                   # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
@@ -1131,86 +1514,278 @@ cdef class _AbstractDatabase:
         graph_alignment: 'left'
         <BLANKLINE>
 
+        >>> # c) working on a subset
+        >>> # 1) get subset
+        >>> tables_subset = tables["C8_*"]
+        >>> tables_subset.get_names()
+        ['C8_1', 'C8_10', 'C8_11', 'C8_13', 'C8_14', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
+        >>> # 2) add a table to the subset 
+        >>> vars_list = ["XNATY", "XPOIL", "XPWMAB", "XPWXAB"]
+        >>> tables_subset["X_GRT"] = {"nb_columns": 2, "table_title": "Croissance", "lecs_or_vars": vars_list, 
+        ...                           "mode": True, "files": True, "date": True}  
+        >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 12
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+        >>> # --> new table also appears in the global workspace
+        >>> "X_GRT" in tables
+        True
+        >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 12
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+        >>> # 3) update a table in the subset
+        >>> table_x_grt = tables_subset["X_GRT"]
+        >>> index = table_x_grt.index("XPWXAB")
+        >>> table_x_grt.insert(index, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
+        >>> # warning: do not forget to actually update the IODE Table subset
+        >>> tables_subset["X_GRT"] = table_x_grt
+        >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        CELL  | "Croissance des marchés pertinents"                     | XQWXSS
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 13
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+        >>> # --> table is also updated in the global workspace
+        >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
+        DIVIS | 1                                                       |
+        TITLE |                           "Croissance"
+        ----- | ----------------------------------------------------------------
+        CELL  | ""                                                      |  "#S"
+        ----- | ----------------------------------------------------------------
+        CELL  | "Croissance de la population active"                    |  XNATY
+        CELL  | "Croissance du prix du pétrole"                         |  XPOIL
+        CELL  | "Croissance des prix des biens importés"                | XPWMAB
+        CELL  | "Croissance des prix des marchés pertinents à l'export" | XPWXAB
+        CELL  | "Croissance des marchés pertinents"                     | XQWXSS
+        ----- | ----------------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 13
+        nb columns: 2
+        language: 'English'
+        gridx: 'major'
+        gridy: 'major'
+        graph_axis: 'values'
+        graph_alignment: 'left'
+        <BLANKLINE>
+
         Variables
 
-        >>> from iode import variables
+        >>> from iode import variables, nan
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> # a) -------- add one variable --------
+        >>> # 1) same value for all periods
+        >>> variables["A0"] = nan
+        >>> variables["A0"]                     # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # 2) vector (list) containing a specific value for each period
+        >>> variables["A1"] = list(range(variables.nb_periods))
+        >>> variables["A1"]                     # doctest: +ELLIPSIS 
+        [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
+        >>> # 3) LEC expression
+        >>> variables["A2"] = "t + 10"
+        >>> variables["A2"]                     # doctest: +ELLIPSIS 
+        [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
 
-        >>> # set all values of a Variable
+        >>> # b) -------- update one variable --------
+        >>> # 1) update all values of a Variable
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
-        >>> # a. variable = same value for all periods
-        >>> variables["ACAF"] = 0.
+        >>> # 1.I) same value for all periods
+        >>> variables["ACAF"] = nan
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
-        [0.0, 0.0, 0.0, ..., 0.0, 0.0, 0.0]
-        >>> # b. variable = vector (list) containing a specific value for each period
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # 1.II) vector (list) containing a specific value for each period
         >>> variables["ACAF"] = list(range(variables.nb_periods))
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [0.0, 1.0, 2.0, ..., 53.0, 54.0, 55.0]
-        >>> # c. variable = LEC expression
+        >>> # 1.III) LEC expression
         >>> variables["ACAF"] = "t + 10"
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [10.0, 11.0, 12.0, ..., 63.0, 64.0, 65.0]
 
-        >>> # set one value of a Variable for a specific period
+        >>> # 2) set one value of a Variable for a specific period
         >>> variables["ACAG", "1990Y1"]
         -28.1721855713507
         >>> variables["ACAG", "1990Y1"] = -28.2
         >>> variables["ACAG", "1990Y1"]
         -28.2
 
-        >>> # set the variable values for range of periods 
-        >>> # 1. using a Python slice
-        >>> # 1a. variable(periods) = same value for all periods
+        >>> # 3) set the variable values for range of periods 
+        >>> # 3.I) using a Python slice
+        >>> # 3.I.a) variable(periods) = same value for all periods
         >>> variables["ACAF", "1991Y1":"1995Y1"] = 0.0
         >>> variables["ACAF", "1991Y1":"1995Y1"]
         [0.0, 0.0, 0.0, 0.0, 0.0]
-        >>> # 1b. variable(periods) = vector (list) containing a specific value for each period
+        >>> # 3.I.b) variable(periods) = vector (list) containing a specific value for each period
         >>> variables["ACAF", "1991Y1":"1995Y1"] = [0., 1., 2., 3., 4.]
         >>> variables["ACAF", "1991Y1":"1995Y1"]
         [0.0, 1.0, 2.0, 3.0, 4.0]
-        >>> # 1c. variable(periods) = LEC expression
+        >>> # 3.I.c) variable(periods) = LEC expression
         >>> variables["ACAF", "1991Y1":"1995Y1"] = "t + 10"
         >>> variables["ACAF", "1991Y1":"1995Y1"]
         [41.0, 42.0, 43.0, 44.0, 45.0]
 
-        >>> # 2. same as above but with the colon ':' inside the periods range string
-        >>> # 2a. variable(periods) = same value for all periods
+        >>> # 3.II) same as above but with the colon ':' inside the periods range string
+        >>> # 3.II.a) variable(periods) = same value for all periods
         >>> variables["ACAF", "1991Y1:1995Y1"] = 0.0
         >>> variables["ACAF", "1991Y1:1995Y1"]
         [0.0, 0.0, 0.0, 0.0, 0.0]
-        >>> # 2b. variable(periods) = vector (list) containing a specific value for each period
+        >>> # 3.II.b) variable(periods) = vector (list) containing a specific value for each period
         >>> variables["ACAF", "1991Y1:1995Y1"] = [0., -1., -2., -3., -4.]
         >>> variables["ACAF", "1991Y1":"1995Y1"]
         [0.0, -1.0, -2.0, -3.0, -4.0]
-        >>> # 2c. variable(periods) = LEC expression
+        >>> # 3.II.c) variable(periods) = LEC expression
         >>> variables["ACAF", "1991Y1:1995Y1"] = "t - 10"
         >>> variables["ACAF", "1991Y1:1995Y1"]
         [21.0, 22.0, 23.0, 24.0, 25.0]
+
+        >>> # c) -------- working on a subset --------
+        >>> # 1) get subset
+        >>> variables_subset = variables["A*"]
+        >>> variables_subset.get_names()
+        ['A0', 'A1', 'A2', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+        >>> # 2) add a variable to the subset 
+        >>> from iode import nan
+        >>> variables_subset["A3"] = nan
+        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # --> new variable also appears in the global workspace
+        >>> "A3" in variables
+        True
+        >>> variables["A3"]                     # doctest: +ELLIPSIS 
+        [-2e+37, -2e+37, ..., -2e+37, -2e+37]
+        >>> # 3) update a variable in the subset
+        >>> variables_subset["A3"] = 0.0
+        >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
+        [0.0, 0.0, ..., 0.0, 0.0]
+        >>> # --> variable is also updated in the global workspace
+        >>> variables["A3"]                     # doctest: +ELLIPSIS 
+        [0.0, 0.0, ..., 0.0, 0.0]
         """
-        self._set_object(key, value) 
+        names = self._unfold_key(key)
+        # update/add a single IODE object
+        if len(names) == 1:
+            self._set_object(names[0], value)
+        # update/add several IODE objects
+        else:
+            # if value is a string or a numerical value -> set the same value for all objects 
+            values = [value] * len(names) if isinstance(value, str) or not isinstance(value, Iterable) else value
+            # check list of values has the same length as list of names
+            if len(names) != len(values):
+                raise ValueError(f"Cannot add/update values for {self.iode_type} objects for the selection key '{key}'.\n"
+                                f"{len(values)} values has been passed while the selection key '{key}' "
+                                f"represents {len(names)} objects.")
+            for name, value in zip(names, values):
+                self._set_object(name, value) 
 
     def __delitem__(self, key):
         """
-        Remove the IODE object named `key` from the current database.
+        Remove the (subset of) IODE object(s) referenced by `key` from the current database.
 
         Parameters
         ----------
-        key: str
-            name of the IODE object to remove.
+        key: str or list(str)
+            (list of) name(s) of the IODE object(s) to be removed.
+            The list of names can be given as a string pattern (e.g. "A*;*_").
 
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> "ACAF" in comments
-        True
+        >>> comments.get_names("A*")
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+
+        >>> # a) delete one comment
         >>> del comments["ACAF"]
-        >>> "ACAF" in comments
+        >>> comments.get_names("A*")
+        ['ACAG', 'AOUC', 'AQC']
+
+        >>> # b) delete several comments at once using a pattern
+        >>> del comments["A*"]
+        >>> comments.get_names("A*")
+        []
+
+        >>> # c) delete several comments at once using a list of names
+        >>> comments.get_names("B*")
+        ['BENEF', 'BENEF_', 'BQY', 'BVY']
+        >>> del comments[["BENEF", "BQY"]]
+        >>> comments.get_names("B*")
+        ['BENEF_', 'BVY']
+
+        >>> # delete one comment from a subset of the global database
+        >>> comments_subset = comments["D*"]
+        >>> comments_subset.get_names()
+        ['DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> del comments_subset["DPUGO"]
+        >>> comments_subset.get_names()
+        ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> # comment also deleted in the globale database
+        >>> "DPUGO" in comments
         False
+        >>> comments.get_names("D*")
+        ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
         """
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot delete object {key}.\nExpected a string value for {key} " + 
-                f"but got value of type {type(key).__name__}")
-        self.abstract_db_ptr.remove(key.encode())
+        names = self._unfold_key(key)
+        for name in names:
+            self.abstract_db_ptr.remove(name.encode())

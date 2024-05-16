@@ -72,9 +72,9 @@ cdef class Comments(_AbstractDatabase):
 
     def _subset(self, pattern: str, copy: bool) -> Comments:
         # call to __new__() that bypasses the __init__() constructor.
-        cdef Comments subset_db = Comments.__new__(Comments)
-        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_db
+        cdef Comments subset_ = Comments.__new__(Comments)
+        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return subset_
 
     def _get_object(self, key):
         if not isinstance(key, str):
