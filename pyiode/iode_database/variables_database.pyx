@@ -132,11 +132,11 @@ cdef class Variables(_AbstractDatabase):
         cdef CKDBVariables* kdb = new CKDBVariables(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> Variables:
-        cdef Variables subset_ = Variables.__new__(Variables)
-        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        subset_.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
-        return subset_
+    def _subset(self, pattern: str, copy: bool) -> Variables:
+        cdef Variables subset_db = Variables.__new__(Variables)
+        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        subset_db.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
+        return subset_db
 
     def _unfold_key(self, key) -> Union[str, Tuple[str, Any]]:
         # key is the name of a Variable

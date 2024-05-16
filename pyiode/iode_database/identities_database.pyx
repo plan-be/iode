@@ -71,10 +71,10 @@ cdef class Identities(_AbstractDatabase):
         cdef CKDBIdentities* kdb = new CKDBIdentities(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> Identities:
-        cdef Identities subset_ = Identities.__new__(Identities)
-        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_
+    def _subset(self, pattern: str, copy: bool) -> Identities:
+        cdef Identities subset_db = Identities.__new__(Identities)
+        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return subset_db
 
     def _get_object(self, key):
         if not isinstance(key, str):

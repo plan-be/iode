@@ -70,10 +70,10 @@ cdef class Lists(_AbstractDatabase):
         cdef CKDBLists* kdb = new CKDBLists(filepath.encode())
         del kdb
 
-    def subset(self, pattern: str, copy: bool = False) -> Lists:
-        cdef Lists subset_ = Lists.__new__(Lists)
-        subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        return subset_
+    def _subset(self, pattern: str, copy: bool) -> Lists:
+        cdef Lists subset_db = Lists.__new__(Lists)
+        subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
+        return subset_db
 
     def _get_object(self, key):
         if not isinstance(key, str):
