@@ -59,6 +59,9 @@ cdef class Equation:
     >>> variables.sample = "1960Y1:2015Y1"
     >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
     >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+    # GDM> the __repr__ should be more Python-code like, ideally eval(repr_str) should be valid
+    #      (ie replace ":" by "=" and display "repr()" of comment, block and instruments, and MAYBE avoid showing
+    #       values which are the same as default values)
     Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
         method: LSQ,
         sample: 1960Y1:2015Y1,
@@ -122,6 +125,8 @@ cdef class Equation:
     def __dealloc__(self):
         del self.c_equation
 
+    # GDM> what is the point of the name argument if you cannot change the name (or maybe I misunderstand the doctest)?
+    #      Besides, if you remove the name argument, you could make this a property setter, which would be nicer IMO
     def set_lec(self, lec: str, name: str):
         """
         Update LEC expression of the current equation.
@@ -148,6 +153,9 @@ cdef class Equation:
             raise TypeError("'name': Expected value of type string.\nGot value of type '" + type(name).__name__ + "'")
         self.c_equation.set_lec(lec.encode(), name.encode())
 
+    # GDM> I think the property is enough. If you want to make setting only one bound easier,
+    #      I think adding from_period and to_period properties might be a better idea. If you
+    #      keep this method, I think the property way of doing should be mentioned and/or shown in the docstring/test.
     def set_sample(self, from_period: Union[str, Period] = "", to_period: Union[str, Period] = ""):
         """
         Set the sample for the estimation of coefficients.
@@ -193,6 +201,8 @@ cdef class Equation:
             to_period = str(to_period)
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
 
+    # GDM: the name of the method is confusing (I thought it would return the *format*, not the date).
+    #      call this get_date() instead?
     def get_date_format(self, format: str = "dd-mm-yyyy") -> str:
         """
         Return the date of last estimation in a given format.
@@ -207,6 +217,7 @@ cdef class Equation:
         >>> from iode import Equation
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> # date as default format "dd-mm-yyyy"
+        # GDM> this example is not very interesting. Should have an example with an actual date.
         >>> eq_ACAF.date
         ''
         >>> # date with specific format
@@ -217,6 +228,11 @@ cdef class Equation:
             raise TypeError("Expected value of type string.\nGot value of type '" + type(format).__name__ + "'")     
         return self.c_equation.get_date_as_string(format.encode()).decode()
 
+    # GDM> rename to get_coefficients? or even a .coefficients (readonly) property and move the "create missing scalars
+    #      feature" to a dedicated method? I don't understand exactly in which circumstances it can happen
+    #      that there are equations with missing scalars, but the conditional side effect seems odd to me.
+    #      From my uninformed point of view, it would seem more logical if the missing scalars were created in the
+    #      Equation init method or even in a dedicated create_equation_and_scalars() function
     def get_coefficients_list(self, create_if_not_exit: bool = True) -> List[str]:
         """
         Return the list of coefficients present in the equation.
@@ -276,6 +292,7 @@ cdef class Equation:
         """
         return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(create_if_not_exit)]
 
+    # same comments as for coefficients
     def get_variables_list(self, create_if_not_exit: bool = True) -> List[str]:
         """
         Return the list of variables present in the equation.

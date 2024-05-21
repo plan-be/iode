@@ -331,6 +331,8 @@ cdef class Variables(_AbstractDatabase):
         0
 
         >>> # create the pandas DataFrame
+        # this example if fine for me but I fear it is needlessly complex
+        # (you need to know double for loops, np.arange, reshape, etc. to understand it)
         >>> vars_names = [f"{region}_{code}" for region in ["VLA", "WAL", "BXL"] for code in ["00", "01", "02"]]
         >>> periods_list = [f"{i}Y1" for i in range(1960, 1971)]
         >>> data = np.arange(len(vars_names) * len(periods_list), dtype=float).reshape(len(vars_names), len(periods_list))
@@ -482,7 +484,7 @@ cdef class Variables(_AbstractDatabase):
         periods_list = self.periods_as_float if sample_as_floats else self.periods
         nb_periods_ = len(periods_list)
 
-        # Copy values from the IODE Variables database to a NUmpy 2D array
+        # Copy values from the IODE Variables database to a Numpy 2D array
         data = np.empty((len(vars_list), len(periods_list)), dtype=np.float64)
         for i, name in enumerate(vars_list):
             # cpp_values_ptr = self.database_ptr.get_var_ptr(name.encode())
@@ -491,6 +493,7 @@ cdef class Variables(_AbstractDatabase):
         
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
         # replace IODE NaN values by numpy or pandas values
+        # GDM> I suspect this is buggy as you do not seem to store the result, nor use inplace=True
         df.where(df < L_NAN * (1.0 - 1e-30))
         df.index.name = vars_axis_name
         df.columns.name = time_axis_name
@@ -524,6 +527,7 @@ cdef class Variables(_AbstractDatabase):
 
         >>> regions_axis = la.Axis("region=VLA,WAL,BXL")
         >>> code_axis = la.Axis("code=00..02")
+        # GDM> why not use: periods_axis = la.Axis("time=1960Y1..1970Y1")
         >>> periods_axis = la.Axis(name="time", labels=[f"{i}Y1" for i in range(1960, 1971)])
         >>> array = la.ndtest((regions_axis, code_axis, periods_axis), dtype=float)
         >>> array
@@ -568,6 +572,7 @@ cdef class Variables(_AbstractDatabase):
         if array.ndim > 2:
             array = array.combine_axes(array.axes[:-1], sep=sep)
 
+        # GDM> it is inefficient to go via pandas (creates useless Index objects)
         df = array.to_frame()
         self.from_frame(df)
 
@@ -621,6 +626,7 @@ cdef class Variables(_AbstractDatabase):
         if la is None:
             raise RuntimeError("larray library not found")
 
+        # GDM> it is inefficient to go via pandas (creates useless Index objects)
         df = self.to_frame(vars_axis_name, time_axis_name, sample_as_floats)
         return la.from_frame(df)
 
@@ -725,6 +731,7 @@ cdef class Variables(_AbstractDatabase):
         >>> # update sample by passing a string
         >>> variables.sample = '1970Y1:2020Y1'
         >>> variables.sample
+        # GDM> maybe add quotes to the sample repr, so that set and get are symmetric?
         1970Y1:2020Y1
         >>> # start or end period are optional
         >>> variables.sample = ':2010Y1'
@@ -735,6 +742,8 @@ cdef class Variables(_AbstractDatabase):
         1980Y1:2010Y1
 
         >>> # update sample by passing a slice
+        # GDM> AFAIK, this is (unfortunately) not a valid syntax in Python?!? (at least Python <= 3.11)
+        #      outside of getitem, you need to use slice('1950Y1', '2000Y1'), which is kinda ugly
         >>> variables.sample = '1950Y1':'2000Y1'
         >>> variables.sample
         1950Y1:2000Y1
@@ -891,6 +900,7 @@ cdef class Variables(_AbstractDatabase):
 
         Parameters
         ----------
+        # GDM> use Enum or str?
         method: int
             initialization method.
         from_: str or Period, optional
@@ -899,6 +909,9 @@ cdef class Variables(_AbstractDatabase):
         to: str or Period, optional
             ending period to extrapolate variables.
             Defaults to the ending period if the current sample.
+        # GDM>
+        # * why not just 'variables'?
+        # * from the code, it does not seem to be optional (None does not seem to be handled)
         variables_list: str or list(str), optional
             list of variables to extrapolate.
             Defaults to all.
@@ -936,6 +949,7 @@ cdef class Variables(_AbstractDatabase):
             filepath to the input file.
         eps_test: float
             ???
+        # GDM> is there a reason this is called series instead of variables
         series: str or list(str), optional
             list of series on which to apply seasonal adjustment.
             Defaults to all variables.
@@ -961,6 +975,7 @@ cdef class Variables(_AbstractDatabase):
             filepath to the input file.
         lambda_: float
             ???
+        # GDM> why not variables?
         series: str or list(str), optional
             list of series on which to apply the trend correction.
             Defaults to all variables.

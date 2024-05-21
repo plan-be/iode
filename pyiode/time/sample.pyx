@@ -44,7 +44,7 @@ cdef class Sample:
             First period of the sample.
         end: str
             Last period of the sample.
-        nb_periods
+        nb_periods: int
             Total number of sub periods in the sample. 
 
         Examples
@@ -99,6 +99,10 @@ cdef class Sample:
         else:
             ValueError("Expected either one argument of type 'Sample' or two arguments of type str or 'Period'")
     
+    # GDM>
+    # * I am totally unsure about this but maybe rename it to .index()? (that is less clear but more consistent)
+    # * document what happens if the period is not in the sample. Does it return some specific int (e.g. -1) or
+        raise an exception?
     def get_period_position(self, period: Union[str, Period]) -> int:
         """
         Position of the 'period' in the sample.
@@ -121,6 +125,11 @@ cdef class Sample:
         cdef string str_period = period.encode()
         return self.c_sample.get_period_position(str_period)
 
+    # GDM>
+    # * the name seems wrong English to me. I think it should be either get_period_list() or list_periods().
+    # * Also, I would rather use a non-boolean argument: astype=str or format='str' or whatever, so
+    #   that if (in the future) you want to support returning them as Period instances, you can do so without
+    #   breaking the API or having to use two distinct, mutually exclusive arguments
     def get_list_periods(self, as_float: bool = False) -> Union[List[str], List[float]]:
         """
         List of all periods of the sample.
@@ -171,16 +180,19 @@ cdef class Sample:
 
     # Attributes access
 
+    # GDM> I wonder if returning a Period instance wouldn't be better?
     @property
     def start(self) -> str:
         c_period = self.c_sample.start_period()
         return c_period.to_string().decode()
 
+    # GDM> idem
     @property
     def end(self) -> str:
         c_period = self.c_sample.end_period()
         return c_period.to_string().decode()
 
+    # GDM> use __len__ for this?
     @property
     def nb_periods(self) -> int:
         return self.c_sample.nb_periods()

@@ -12,6 +12,8 @@ from lec cimport IodeExecLec, IodeExecLecT
 from iode_python cimport SCR_free
 
 
+# GDM> I think there should be some kind of Workspace singleton class (which would contain a few AbstractDatabase attributes)
+#      and exec_lec would be a method of that class
 def exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]:
     '''
     Compute a LEC formula using the current WS of VARs and SCLs.

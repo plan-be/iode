@@ -60,7 +60,8 @@ from model cimport (IodeModelSimulate, IodeModelCalcSCC, IodeModelSimulateSCC, I
                            KSIM_CPU_SCC, KSIM_CPU_SORT)
 
 # TODO: (ald) add Parameters, Returns and Examples section
-def model_simulate(sample_from: str, sample_to: str, 
+# GDM> model_* functions would also be good candidates for methods of the Workspace class
+def model_simulate(sample_from: str, sample_to: str,
                     eqs_list=None, 
                     endo_exo_list=None,
                     eps: float = 0.0001, 
@@ -87,7 +88,10 @@ def model_simulate(sample_from: str, sample_to: str,
         raise RuntimeError(f"Simulation failed")
         
     
-  
+
+# GDM> this signature seems unpythonic to me. I do *not* know how feasible to implement or practical to use it would be,
+#      or if it would cause other problems in the API, but returning 3 new lists instead of storing the results
+#      in global lists would seem a lot more Pythonic to me.
 def model_calc_scc(nb_passes: int = 1, 
                    pre_listname: str = "_PRE", 
                    inter_listname: str = "_INTER", 
@@ -159,6 +163,8 @@ def model_simulate_scc( sample_from: str, sample_to: str,
         
 
 # TODO: (ald) add Parameters, Returns and Examples section
+# GDM> is this a costly operation? If not, I would make the model_simulate_* functions/methods return a
+#      SimulationResult object with that information instead.
 def model_simulate_save_parms(
                     eps: float = 0.0001, 
                     relax: float = 1.0, 

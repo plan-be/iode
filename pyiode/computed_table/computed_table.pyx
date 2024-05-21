@@ -121,7 +121,8 @@ cdef class ComputedTable:
         Productivité totale des facteurs |    0.99 |     1.0 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
 
-        >>> # specify to print 4 decimals  
+        >>> # specify to print 4 decimals
+        # GDM> set it via the property instead of recreating it from scratch?
         >>> computed_table = tables["C8_1"].compute("2000:6", nb_decimals=4)
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |     00    |     01    |     02    |     03    |     04    |     05

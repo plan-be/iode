@@ -112,6 +112,7 @@ cdef class Equations(_AbstractDatabase):
             elif isinstance(value, Equation):
                 equation = value
             elif isinstance(value, dict):
+                # GDM> it seems odd to have this code/capability here instead of as an Equation method (e.g. Equation.update(dict) -- I don't know if that also exists)
                 equation = self._get_object(key)
                 if 'lec' in value:
                     equation.set_lec(value.pop('lec').strip(), key)

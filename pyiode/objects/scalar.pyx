@@ -11,6 +11,7 @@ from pyiode.objects.scalar cimport hash_value as hash_value_scl
 cdef class Scalar:
     """
     An IODE scalar represents the parameters of an equation that can be estimated.
+    # GDM> it is unclear to me what relax and std do
     It is represented by 'value' value, a 'relax' value and a standard deviation ('std') value.
 
     Attributes
@@ -22,6 +23,8 @@ cdef class Scalar:
     Parameters
     ----------
     value: float
+        # GDM> it is very odd to have a default value here. I guess that's because iode the GUI has one, but in
+        #      the API, I would make the argument mendatory
         value of the scalar. Defaults to 0.9.
     relax: float
         relax value of the scalar. The value must be between 0.0 and 1.0.

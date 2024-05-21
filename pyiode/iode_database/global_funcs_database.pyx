@@ -8,6 +8,12 @@ from pyiode.iode_database.database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.database cimport high_to_low as cpp_high_to_low
 
 
+# * use Enums for type_of_series and method instead of int and str (or use strings for both)
+# * use longer "constant" name for method: 'linear', 'cubic', 'steps'
+# * support Path objects for filepath
+# * this function should really be in memory instead of using a file, but I understand that is
+#   not possible at the moment because of the single global "variables" collection/database.
+# * you might want to  a step in the right
 def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union[str, List[str]]):
     """
     Transform low periodicity series to high periodicity series (i.e. variables). 

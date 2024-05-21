@@ -22,8 +22,14 @@ cdef class TableCell:
 
     Attributes
     ----------
+    # GDM>
+    # * I *wonder* if using StringCell and LecCell subclasses wouldn't be better (for example if LecCell had additional methods)?
+    # * either the type hint or possible values are wrong.
     cell_type: int
         Type of cell content. Possible value is 'STRING' or 'LEC'.
+    # GDM>
+    # * unsure allowing both string and ints brings anything. Should use either Enum or strings IMO.
+    # * the type hint is wrong (it is missing str)
     align: int
         Alignment of the text in the cell. Possible values are 'center', 'left', 'right', 'decimal' or 
         CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.
@@ -249,6 +255,7 @@ cdef class TableCell:
         if self.c_cell is not NULL:
             self.c_cell.set_underline(<bint>value)
 
+    # GDM> I feel like this should be a .get_variables() method (or .variables property) on a LEC (or Lec, or whatever the name) class
     def get_variables_from_lec(self) -> List[str]:
         """
         Get the list of variables associated with the LEC expression of a cell of type 'LEC'.
@@ -297,10 +304,20 @@ cdef class TableLine:
 
     Attributes
     ----------
+    # GDM>
+    # * I *wonder* if using subclasses per type wouldn't be better (for example if LecCell had additional methods)?
+    # * unsure allowing both string and ints brings anything. Should use either Enum or strings IMO, not both.
+    # * the type hint is wrong
     line_type: int
         Type of the table line. Possible values are 'TITLE', 'CELL', 'LINE', 'MODE', 'FILES', 'DATE' or 
         LINE_TYPE_TITLE, LINE_TYPE_CELL, LINE_TYPE_LINE, LINE_TYPE_MODE, LINE_TYPE_FILES, LINE_TYPE_DATE.
 
+    # GDM>
+    # * possible values are ... what???
+    # * (not a comment on the Python API, but rather on how Iode seems to work): having graph_type in a *table*line
+    #   seems very odd to me. I wonder if Table and Graphs would not be better as two distinct concepts, possibly
+    #   sharing some values, instead of being intertwined like this.
+    #   I admit, it is probably too late/too hard/undesirable to change how Iode works now, but I still wonder...
     graph_type: int
         Graph type associated with the table line. Possible values are {', '.join(GRAPH_TYPE_DICT.values())} 
         or GRAPH_TYPE_LINE, GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR.
@@ -632,7 +649,7 @@ cdef class TableLine:
         >>> table[5][0]
         "dln(PC/ITCR) - dln AOUC"
         >>> # warning: if the new content is not surrounded by double quotes, 
-        >>> #          it is considerer as 'LEC' cell
+        >>> #          it is considered as 'LEC' cell
         >>> table[5][1] = '100*(dln(PC / ITCR) - dln AOUC)'
         >>> table[5][1]
         100*(dln(PC / ITCR) - dln AOUC)
@@ -734,6 +751,10 @@ cdef class Table:
     ----- | --------
     CELL  |   | "#S"
     ----- | --------
+    # GDM>
+    # * I think it would be more pleasant if the table repr stopped here except for non-default argument values
+    # * even when nb_lines or nb columns are non-default, displaying them seems redundant (at least when the entire
+    #   table is displayed)
     <BLANKLINE>
     nb lines: 4
     nb columns: 2
@@ -1232,12 +1253,18 @@ cdef class Table:
         index: int
             index where to insert a line.
         value: int or str or list(str) or tuple(str) or TableLine
+            # GDM> the \n in the following lines seem odd. Do they actually do anything in a docstring?
             value of the new line.\n
-            If int, 'value' represents the type of the new line: LINE_TYPE_FILES, LINE_TYPE_MODE, 
+            # GDM> I *wonder* if an explicit and optional line_type argument would not be cleaner for the 'int' use case.
+            If int, 'value' represents the type of the new line: LINE_TYPE_FILES, LINE_TYPE_MODE,
+            # GDM> LINE_TYPE_SEPARATOR instead of LINE_TYPE_LINE would be clearer IMO
             LINE_TYPE_DATE, LINE_TYPE_LINE.\n
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
             If an iterable of str, 'value' represents the content of the cells of the new line.\n
+        # GDM> I suppose this mimics iode internal behavior and/or gui and/or reports, but having after default to True is
+        #      very confusing to me because the new object is not at the specified index. It is also contrary to Python standard.
+        #      If you keep it like this, a big fat warning would help.
         after: bool, optional
             If True, insert the new line after the line at the specified index. 
             If False, insert the new line before the line at the specified index. 
@@ -1296,6 +1323,13 @@ cdef class Table:
         >>> # insert new line with cells
         >>> # "    -> STRING cell
         >>> # no " -> LEC cell
+        # GDM> as much as I understand this explanation, I think it is not clear
+        #      enough for inexperienced Python programmers,
+        #      as I think somebody is bound to write
+        #      >>> table.insert(index, ["RIDG:", 'RIDG'])
+        #      and expect it to work.
+        # GDM> Another way to make the difference between string and lec would be to use:
+        #      >>> table.insert(index, ['RIDG:', LEC('RIDG')])
         >>> table.insert(index, ['"RIDG:', 'RIDG'])
 
         >>> table           # doctest: +NORMALIZE_WHITESPACE
@@ -1382,9 +1416,10 @@ cdef class Table:
         The syntax of a period: 
         
           - a period is indicated as in LEC: 'yyPpp' or 'yyyyPpp' where yyyy indicates the year, 
-            P the periodicity and pp the sub-period (1990Y1) 
+            P the periodicity and pp the sub-period (e.g. 1990Y1)
           - a period can be shifted n periods to the left or right using the operators <n and >n 
-          - when used with a null argument, the shift oprerators have a special meaning: 
+          # GDM> s/null/zero/ ?
+          - when used with a null argument, the shift operators have a special meaning:
               - <0 means "first period of the year" 
               - >0 means "last period of the year" 
           - the special periods 'BOS', 'EOS' and 'NOW' can be used to represent the beginning 
@@ -1431,6 +1466,7 @@ cdef class Table:
             70/69:2 = 70/69; 71/70
             (70; 70-69):2 = 70; 70-69; 71; 71-70;
             70[1,2]:2*5 = 70[1]; 70[2]; 75[1]; 75[2]
+            # GDM> , is not mentioned in file operations above
             (70;75)[1,2-1] = 70[1]; 75[1]; 70[2-1]; 75[2-1]
             (70;75;(80; 80/79):2)[1,2] = 70[1]; 70[2]; 75[1]; 75[2]; 80[1]; 80[2]; 80/79[1]; 80/79[2] 81[1]; 81[2]; 81/80[1]; 81/80[2]
             2000Y1>5 = 2005Y1
@@ -1443,8 +1479,14 @@ cdef class Table:
         ----------
         generalized_sample: str
             Generalized sample (see above).
+        # GDM>
+        # * it is unclear to me at this point what is the relation between extra_files and the file operation numbers. Is the
+        #   current "variables" database always 1, and extra_files 2, 3, etc. or something else?
+        # * should mention it is optional
+        # * add support for pathlib.Path
         extra_files: str or list(str)
             (List of) extra file(s) referenced in the generalized sample.
+        # * should mention it is optional/default value
         nb_decimals: int
             The number of decimals to display.
 
@@ -1495,6 +1537,7 @@ cdef class Table:
         Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
         Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
         Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
+        # GDM> the output seems strange. Shouldn't it be 1.10, 1.00 etc (2 decimals) so that the dot is aligned?
         Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
         <BLANKLINE>
         >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals (default)
@@ -1536,6 +1579,7 @@ cdef class Table:
 
         Notes
         -----
+        # GDM> s/if/in?
         The special divider line is not taken into account if the returned number of lines.
 
         Examples

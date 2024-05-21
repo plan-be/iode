@@ -10,6 +10,10 @@
 
 from reports cimport B_ReportExec, B_ReportLine
 
+# GDM> I don't really know how report works, so I don't know if a report loads a workspace inside the report
+#      or if you execute a report once a workspace is already loaded. If it is the second option,
+#      maybe make this a method on the Workspace class. Otherwise (or maybe either way?), create a Report class and make
+#      an execute() method on it.
 # $ExecReport filename_parms
 # TODO: (ald) add Parameters, Returns and Examples section 
 def report_exec(filename_parms: str):

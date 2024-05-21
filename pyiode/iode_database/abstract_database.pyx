@@ -35,6 +35,8 @@ cdef class _AbstractDatabase:
         pass
 
     # Public methods
+
+    # GDM> I do not think this property should exist/be public (isn't the subclass name enough?)
     @property
     def iode_type(self) -> str:
         """
@@ -415,6 +417,8 @@ cdef class _AbstractDatabase:
         cdef CKDBAbstract* other_db_ptr = (<_AbstractDatabase>other).abstract_db_ptr
         self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
 
+    # GDM> I find the function name confusing, with that name and signature, I expected the opposite flow of data
+    #      I think copy_from would be a better name
     def copy_into(self, input_files: Union[str, List[str]], objects_names: Union[str, List[str]]='*'):
         """
         Copy (a subset of) objects from the input file(s) 'input_files' into the current database.
@@ -469,6 +473,9 @@ cdef class _AbstractDatabase:
 
         self.abstract_db_ptr.copy_into(input_files.encode(), objects_names.encode())
 
+    # GDM>:
+    # * same comment as above (i.e. rename to merge_from?)
+    # * what is the difference between merge_into and copy_to? The doctests do not help me understand the difference.
     def merge_into(self, input_file: str):
         """
         Merge all objects stored in the input file 'input_file' into the current database.
@@ -501,6 +508,17 @@ cdef class _AbstractDatabase:
         input_file = str(Path(input_file).resolve())
         self.abstract_db_ptr.merge_into(input_file.encode())
 
+    # GDM>
+    # * I think the API would be nicer if that information was available as properties on the "single object" classes
+    #   (e.g. Equation, Scalar, Table). You might need to create classes for Comment, Identity, List and Variable,
+    #   but this seems like a good thing to me anyway.
+    #   For example,
+    #     >>> variables.get_associated_objects_list("AOUC", COMMENTS)
+    #   would become:
+    #     >>> variables["AOUC"].comments
+    # * the warning in the doctest seems very useful, given that I fail to see the difference but it lacks enough
+    #   explanation (for me) to understand those differences. In short, the
+    #   so maybe the above comment is not pertinent.
     def get_associated_objects_list(self, name: str, other_type: int):
         r"""
         Return the list of all objects of type 'other_type' associated with the object named 'name' 

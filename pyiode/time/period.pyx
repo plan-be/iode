@@ -34,6 +34,8 @@ cdef class Period:
                 Year of the period.
 
             * periodicity: {'Y', 'S', 'Q', 'M', 'W', 'D'}, optional
+                # GDM> not urgent, but you probably want to document those
+                #      letters explicitly.
                 Periodicity of the period. Defaults to 'Y'.
 
             * step: int, optional
@@ -161,6 +163,8 @@ cdef class Period:
 
     def shift(self, nb_periods: int) -> Period:
         """
+        # GDM> please document in which way it shifts for positive/negative numbers. Only the example gives us
+        #      that information currently.
         Shift the period by a number of sub periods. 
         The number of sub period may be negative.
 

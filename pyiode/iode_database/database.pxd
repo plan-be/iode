@@ -1,5 +1,7 @@
 # distutils: language = c++
 
+# GDM> rename file to something like kdb_database or kdb or cpp_api_database or ... to make it clearer
+       this is not part of the abstract_database python hierarchy? Currently only the file extension hints at it.
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
