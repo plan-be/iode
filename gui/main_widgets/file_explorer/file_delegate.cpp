@@ -17,22 +17,18 @@ void FileDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
 {
     QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
     QString new_name = lineEdit->text();
+    QString old_name = model->data(index, Qt::DisplayRole).toString();
     // build path to the renamed file or directory
     QiodeFileExplorerProxyModel* fileModel = static_cast<QiodeFileExplorerProxyModel*>(model);
     QDir parent_dir = fileModel->fileInfo(index).absoluteDir();
     QString new_path = parent_dir.filePath(new_name);
-    QFileInfo fileInfo(new_path);
-    // user tries to rename a file or a directory with the same name as an existing one
-    if (fileInfo.exists())
-    {
-        QString type = fileInfo.isDir() ? "Directory" : "File";
-        QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", type + " " + 
-            fileInfo.fileName() + " already exist!\n Overwrite it ?", 
-            QMessageBox::Yes | QMessageBox::Discard, QMessageBox::Yes);
-        if (answer == QMessageBox::Discard) return;
-        // delete existing file or directory
-        SystemItem(fileModel->fileInfo(index)).remove();
-    }
+    QString old_path = parent_dir.filePath(old_name);
+
+    SystemItem file_item(QFileInfo(old_path), false);
+    bool success = file_item.rename(new_name);
+    if(!success)
+        return;
+
     model->setData(index, new_name, Qt::EditRole);
 }
 
