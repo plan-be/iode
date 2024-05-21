@@ -193,13 +193,104 @@ private:
         QDir parentDir = sourceDir;
         // if no parent directory, do nothing (Don't delete C:\\ !)
         if(!parentDir.cdUp()) return false;
-        // remove all files and sub-directories
-        if(!sourceDir.removeRecursively()) return false;
+        // Removes the directory, including all its contents.
+        // If a file or directory cannot be removed, removeRecursively() keeps going and attempts to delete 
+        // as many files and sub-directories as possible, then returns false.
+        // If the directory was already removed, the method returns true (expected result already reached).
+        return sourceDir.removeRecursively();
+    }
 
-        // remove remaining empty directory
-        // Note: according to Qt documentation, the deleted directory 
-        //       must be empty before to call rmdir()
-        return parentDir.rmdir(sourceDir.dirName());
+    bool renameFile(const QString& newName, const QString& oldFilePath = "")
+    {
+        bool success = true;
+
+        QFileInfo oldFileInfo = (oldFilePath.isEmpty()) ? sourceInfo : QFileInfo(oldFilePath);
+        if(!oldFileInfo.exists())
+            return false;
+        
+        const QString oldPath = oldFileInfo.absoluteFilePath();
+        const QDir sourceDir = oldFileInfo.absoluteDir();
+        const QString oldName = oldFileInfo.fileName(); 
+        QFile oldFile(oldPath);
+
+        const QString newPath = sourceDir.absoluteFilePath(newName);
+        QFileInfo newFileInfo(newPath);
+
+        // user tries to rename a file with the same name as an existing one
+        if (newFileInfo.exists())
+        {
+            QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "File " + 
+                newName + " already exist!\n Overwrite it ?", QMessageBox::Yes | QMessageBox::Discard, QMessageBox::Yes);
+            if (answer == QMessageBox::Discard) 
+                return false;
+            // rename existing file to temporary name
+            // See https://doc.qt.io/qt-6/qfile.html#rename 
+            // If a file with the name newName already exists, rename() returns false (i.e., QFile will not overwrite it).
+            // The file is closed before it is renamed.
+            // If the rename operation fails, Qt will attempt to copy this file's contents to newName, and 
+            // then remove this file, keeping only newName. If that copy operation fails or this file can't be 
+            // removed, the destination file newName is removed to restore the old state.
+            success = QFile::rename(newPath, newPath + "$");
+            if(success)
+                success = QFile::rename(oldPath, newPath);
+            if(success)
+                success = removeFile(newPath + "$");
+        }
+        else
+            success = QFile::rename(oldPath, newPath);
+
+        if(!success)
+            QMessageBox::warning(nullptr, "WARNING", "Could not rename " + oldName + " as " + newName);
+        
+        return success;
+    }
+
+    bool renameDir(const QString& newName, const QString& oldDirPath = "")
+    {
+        bool success = true;
+
+        QFileInfo oldDirInfo = (oldDirPath.isEmpty()) ? sourceInfo : QFileInfo(oldDirPath);
+        if(!oldDirInfo.exists()) 
+            return false;
+
+        const QString oldPath = oldDirInfo.absoluteFilePath();
+        QDir oldDir(oldPath);
+        const QString oldName = oldDir.dirName();
+
+        QDir parentDir = oldDir;
+        // if no parent directory, do nothing (Don't delete C:\\ !)
+        if(!parentDir.cdUp()) return false;
+
+        const QString newPath = parentDir.absoluteFilePath(newName);
+        QFileInfo newDirInfo(newPath);
+
+        // user tries to rename a directory with the same name as an existing one
+        if (newDirInfo.exists())
+        {
+            QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "Directory " + 
+                newName + " already exist!\n Overwrite it ?", QMessageBox::Yes | QMessageBox::Discard, QMessageBox::Yes);
+            if (answer == QMessageBox::Discard) 
+                return false;
+            // rename existing directory to temporary name
+            // see https://doc.qt.io/qt-6/qdir.html#rename 
+            // On most file systems, rename() fails only if oldName does not exist, or if a file with the new name already exists. 
+            // However, there are also other reasons why rename() can fail. For example, on at least one file system rename() fails 
+            // if newName points to an open file.
+            // If oldName is a file (not a directory) that can't be renamed right away, Qt will try to copy oldName to newName and 
+            // remove oldName.
+            success = parentDir.rename(newName, "~" + newName);
+            if(success)
+                success = parentDir.rename(oldName, newName);
+            if(success)
+                success = removeDir(parentDir.absoluteFilePath("~" + newName));
+        }
+        else
+            success = parentDir.rename(oldName, newName);
+            
+        if(!success)
+            QMessageBox::warning(nullptr, "WARNING", "Could not rename directory " + oldName + " as " + newName);
+
+        return success;
     }
 
 public:
@@ -253,6 +344,14 @@ public:
     {
         if(_isFile) return removeFile();
         if(_isDir) return removeDir();
+        // not a directory or a file (e.g. symbolic link, executable, ...)
+        return false;
+    }
+
+    bool rename(const QString& newName)
+    {
+        if(_isFile) return renameFile(newName);
+        if(_isDir) return renameDir(newName);
         // not a directory or a file (e.g. symbolic link, executable, ...)
         return false;
     }
