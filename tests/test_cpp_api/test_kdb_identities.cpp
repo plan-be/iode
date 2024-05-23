@@ -392,7 +392,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
                  identities_list), std::runtime_error);
 }
 
-TEST_F(KDBIdentitiesTest, CopyInto)
+TEST_F(KDBIdentitiesTest, CopyFrom)
 {
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + "fun.idt";
@@ -401,13 +401,13 @@ TEST_F(KDBIdentitiesTest, CopyInto)
 
     // Copy entire file
     Identities.clear();
-    Identities.copy_into(filename, "*");
+    Identities.copy_from(filename, "*");
     EXPECT_EQ(Identities.count(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Identities.get_names(pattern);
     Identities.clear();
-    Identities.copy_into(filename, pattern);
+    Identities.copy_from(filename, pattern);
     EXPECT_EQ(Identities.count(), v_expected_names.size());  
     EXPECT_EQ(Identities.get_names(), v_expected_names);  
 }

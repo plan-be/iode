@@ -588,7 +588,7 @@ TEST_F(KDBVariablesTest, DeepCopy)
     EXPECT_THROW(Variables.subset(pattern, true), std::runtime_error);
 }
 
-TEST_F(KDBVariablesTest, CopyInto)
+TEST_F(KDBVariablesTest, CopyFrom)
 {
     std::string filename = input_test_dir + "fun.var";
     int expected_nb_comments = Variables.count();
@@ -596,7 +596,7 @@ TEST_F(KDBVariablesTest, CopyInto)
 
     // Copy entire file
     Variables.clear();
-    Variables.copy_into(filename, "", "", "*");
+    Variables.copy_from(filename, "", "", "*");
     EXPECT_EQ(Variables.count(), expected_nb_comments); 
     EXPECT_NEAR(Variables.get_var("ACAF", "1992Y1"), 30.159, 1e-3);
     EXPECT_NEAR(Variables.get_var("ACAG", "1992Y1"), -40.286, 1e-3);
@@ -605,7 +605,7 @@ TEST_F(KDBVariablesTest, CopyInto)
     Variables.clear();
     Variables.set_sample("1990Y1", "2000Y1");
     Variables.add("ACAF", "t");
-    Variables.copy_into(filename, "1992Y1", "1993Y1", "ACAF ACAG");
+    Variables.copy_from(filename, "1992Y1", "1993Y1", "ACAF ACAG");
     EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1991Y1"), 1.0); 
     EXPECT_NEAR(Variables.get_var("ACAF", "1992Y1"), 30.159, 1e-3); 
     EXPECT_DOUBLE_EQ(Variables.get_var("ACAG", "1991Y1"), L_NAN);
@@ -614,7 +614,7 @@ TEST_F(KDBVariablesTest, CopyInto)
     // copy partial WS on an existing one without specifying the sample
     Variables.clear();
     Variables.set_sample("1990Y1", "2000Y1");
-    Variables.copy_into(filename, "", "", "ACAF ACAG");
+    Variables.copy_from(filename, "", "", "ACAF ACAG");
     EXPECT_NEAR(Variables.get_var("ACAF", "1992Y1"), 30.159, 1e-3);
     EXPECT_NEAR(Variables.get_var("ACAG", "1992Y1"), -40.286, 1e-3);
 }
