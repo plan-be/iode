@@ -46,7 +46,7 @@ WORKSPACE
    Database.get_names
    Database.rename
 
-   Database.get_associated_objects_list
+   Database.search
 
    Database.copy_from
    Database.merge

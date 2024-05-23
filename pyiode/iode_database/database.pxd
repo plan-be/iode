@@ -64,7 +64,8 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
         void copy_from(string& input_file, string& objects_names) except +
         void merge_from(string& input_file) except +
 
-        vector[string] get_associated_objects_list(string& name, EnumIodeType other_type) except +
+        vector[string] search(string& pattern, bint word, bint case_sensitive, bint in_name, 
+                              bint in_formula, bint in_text, string& list_result) except +
 
         void save(string& filepath) except +
         void clear() except +
