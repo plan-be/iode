@@ -48,7 +48,7 @@ WORKSPACE
 
    Database.get_associated_objects_list
 
-   Database.copy_into
+   Database.copy_from
    Database.merge
    Database.merge_into
 
