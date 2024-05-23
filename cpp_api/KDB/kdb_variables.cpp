@@ -358,7 +358,7 @@ std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& fr
 	}
 }
 
-void KDBVariables::copy_into(const std::string& input_file, const std::string& from, const std::string& to, 
+void KDBVariables::copy_from(const std::string& input_file, const std::string& from, const std::string& to, 
 	const std::string objects_names)
 {
 	    std::string buf = input_file + " ";
@@ -384,12 +384,12 @@ void KDBVariables::copy_into(const std::string& input_file, const std::string& f
 		}
 }
 
-void KDBVariables::copy_into(const std::string& input_file, const Period* from, const Period* to, 
+void KDBVariables::copy_from(const std::string& input_file, const Period* from, const Period* to, 
 	const std::string& objects_names)
 {
 	std::string s_from = (from == nullptr) ? "" : from->to_string();
 	std::string s_to = (to == nullptr) ? "" : to->to_string();
-	copy_into(input_file, s_from, s_to, objects_names);
+	copy_from(input_file, s_from, s_to, objects_names);
 }
 
 // TODO JMP : please provide input for testing KV_extrapolate

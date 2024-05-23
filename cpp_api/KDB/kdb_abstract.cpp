@@ -298,7 +298,7 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
 }
 
 // TODO JMP: please provide input values to test B_WsCopy()
-void KDBAbstract::copy_into(const std::string& input_file, const std::string objects_names)
+void KDBAbstract::copy_from(const std::string& input_file, const std::string objects_names)
 {
     std::string buf = input_file + " " + objects_names;
     int res = B_WsCopy(const_cast<char*>(buf.c_str()), k_type);

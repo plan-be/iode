@@ -167,7 +167,7 @@ public:
 
     void merge(const KDBAbstract& other, const bool overwrite=true);
 
-    void copy_into(const std::string& input_file, const std::string objects_names = "*");
+    void copy_from(const std::string& input_file, const std::string objects_names = "*");
 
     /**
      *  Syntax: $WsMerge<type> filename
