@@ -349,7 +349,35 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	if(database->count() == 0)
 		return list;
 	
-	std::vector<std::string> std_list = database->get_associated_objects_list(name.toStdString(), other_type);
+	std::string cpp_name = name.toStdString();
+	std::vector<std::string> std_list;
+	switch (other_type)
+	{
+	case I_COMMENTS:
+		std_list = Comments.search(cpp_name);
+		break;
+	case I_EQUATIONS:
+		std_list = Equations.search(cpp_name);
+		break;
+	case I_IDENTITIES:
+		std_list = Identities.search(cpp_name);
+		break;
+	case I_LISTS:
+		std_list = Lists.search(cpp_name);
+		break;
+	case I_SCALARS:
+		std_list = Scalars.search(cpp_name);
+		break;
+	case I_TABLES:
+		std_list = Tables.search(cpp_name);
+		break;
+	case I_VARIABLES:
+		std_list = Variables.search(cpp_name);
+		break;
+	default:
+		break;
+	}
+	
 	if(std_list.size() == 0)
 		return list;
 
