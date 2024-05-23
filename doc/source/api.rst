@@ -50,7 +50,7 @@ WORKSPACE
 
    Database.copy_from
    Database.merge
-   Database.merge_into
+   Database.merge_from
 
 ========
 Comments

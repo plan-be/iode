@@ -469,7 +469,7 @@ cdef class _AbstractDatabase:
 
         self.abstract_db_ptr.copy_from(input_files.encode(), objects_names.encode())
 
-    def merge_into(self, input_file: str):
+    def merge_from(self, input_file: str):
         """
         Merge all objects stored in the input file 'input_file' into the current database.
 
@@ -491,7 +491,7 @@ cdef class _AbstractDatabase:
         0
 
         >>> # reload all comments
-        >>> comments.merge_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.merge_from(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(comments)
         317
         """
@@ -499,7 +499,7 @@ cdef class _AbstractDatabase:
             raise TypeError(f"'input_file': Expected value of type string. Got value of type {type(input_file).__name__}")
         # convert relative path to absolute path
         input_file = str(Path(input_file).resolve())
-        self.abstract_db_ptr.merge_into(input_file.encode())
+        self.abstract_db_ptr.merge_from(input_file.encode())
 
     def get_associated_objects_list(self, name: str, other_type: int):
         r"""
