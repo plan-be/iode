@@ -62,7 +62,7 @@ cdef extern from "cpp_api/KDB/kdb_abstract.h":
 
         void merge(KDBAbstract& other, bool overwrite) except +
         void copy_from(string& input_file, string& objects_names) except +
-        void merge_into(string& input_file) except +
+        void merge_from(string& input_file) except +
 
         vector[string] get_associated_objects_list(string& name, EnumIodeType other_type) except +
 
