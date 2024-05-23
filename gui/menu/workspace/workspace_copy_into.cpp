@@ -49,25 +49,25 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
         switch (iodeType)
         {
         case I_COMMENTS:
-            Comments.copy_into(input_file, object_names);
+            Comments.copy_from(input_file, object_names);
             break;
         case I_EQUATIONS:
-            Equations.copy_into(input_file, object_names);
+            Equations.copy_from(input_file, object_names);
             break;
         case I_IDENTITIES:
-            Identities.copy_into(input_file, object_names);
+            Identities.copy_from(input_file, object_names);
             break;
         case I_LISTS:
-            Lists.copy_into(input_file, object_names);
+            Lists.copy_from(input_file, object_names);
             break;
         case I_SCALARS:
-            Scalars.copy_into(input_file, object_names);
+            Scalars.copy_from(input_file, object_names);
             break;
         case I_TABLES:
-            Tables.copy_into(input_file, object_names);
+            Tables.copy_from(input_file, object_names);
             break;
         case I_VARIABLES:
-            Variables.copy_into(input_file, from, to, object_names);
+            Variables.copy_from(input_file, from, to, object_names);
             break;
         default:
             break;
