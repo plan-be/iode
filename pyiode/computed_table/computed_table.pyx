@@ -122,7 +122,7 @@ cdef class ComputedTable:
         <BLANKLINE>
 
         >>> # specify to print 4 decimals  
-        >>> computed_table = tables["C8_1"].compute("2000:6", nb_decimals=4)
+        >>> computed_table.nb_decimals = 4
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |     00    |     01    |     02    |     03    |     04    |     05
         ---------------------------------------------------------------------------------------------------------
