@@ -510,9 +510,9 @@ TEST_F(KDBTablesTest, Merge)
     EXPECT_EQ(kdb1->get(name), unmodified_table);
 }
 
-TEST_F(KDBTablesTest, AssociatedObjs)
+TEST_F(KDBTablesTest, Search)
 {
-    std::string name = "ENVI";
+    std::string tbl_name = "ENVI";
     std::vector<std::string> objs_list;
 
     KDBComments kdb_cmt(input_test_dir + "fun.cmt");
@@ -523,27 +523,27 @@ TEST_F(KDBTablesTest, AssociatedObjs)
     KDBTables kdb_tbl(input_test_dir + "fun.tbl");
     KDBVariables kdb_var(input_test_dir + "fun.var");
 
-    objs_list = Tables.get_associated_objects_list(name, I_COMMENTS);
+    objs_list = Comments.search(tbl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Tables.get_associated_objects_list(name, I_EQUATIONS);
+    objs_list = Equations.search(tbl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Tables.get_associated_objects_list(name, I_IDENTITIES);
+    objs_list = Identities.search(tbl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    std::vector<std::string> expected_lst = { name };
-    objs_list = Tables.get_associated_objects_list(name, I_LISTS);
+    std::vector<std::string> expected_lst = { tbl_name };
+    objs_list = Lists.search(tbl_name);
     EXPECT_EQ(objs_list, expected_lst);
 
-    objs_list = Tables.get_associated_objects_list(name, I_SCALARS);
+    objs_list = Scalars.search(tbl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    std::vector<std::string> expected_tbl = { name };
-    objs_list = Tables.get_associated_objects_list(name, I_TABLES);
+    std::vector<std::string> expected_tbl = { tbl_name };
+    objs_list = Tables.search(tbl_name);
     EXPECT_EQ(objs_list, expected_tbl);
 
-    objs_list = Tables.get_associated_objects_list(name, I_VARIABLES);
+    objs_list = Variables.search(tbl_name);
     EXPECT_EQ(objs_list.size(), 0);
 }
 

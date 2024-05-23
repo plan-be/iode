@@ -339,9 +339,9 @@ TEST_F(KDBEquationsTest, Merge)
     EXPECT_EQ(kdb1->get_lec(name), unmodified_lec);
 }
 
-TEST_F(KDBEquationsTest, AssociatedObjs)
+TEST_F(KDBEquationsTest, Search)
 {
-    std::string name = "ACAG";
+    std::string eqs_name = "ACAG";
     std::vector<std::string> objs_list;
 
     KDBComments kdb_cmt(input_test_dir + "fun.cmt");
@@ -352,30 +352,30 @@ TEST_F(KDBEquationsTest, AssociatedObjs)
     KDBTables kdb_tbl(input_test_dir + "fun.tbl");
     KDBVariables kdb_var(input_test_dir + "fun.var");
 
-    std::vector<std::string> expected_cmts = { name };
-    objs_list = Equations.get_associated_objects_list(name, I_COMMENTS);
+    std::vector<std::string> expected_cmts = { eqs_name };
+    objs_list = Comments.search(eqs_name);
     EXPECT_EQ(objs_list, expected_cmts);
 
-    std::vector<std::string> expected_eqs = { name, "FLG" };
-    objs_list = Equations.get_associated_objects_list(name, I_EQUATIONS);
+    std::vector<std::string> expected_eqs = { eqs_name, "FLG" };
+    objs_list = Equations.search(eqs_name);
     EXPECT_EQ(objs_list, expected_eqs);
 
-    objs_list = Equations.get_associated_objects_list(name, I_IDENTITIES);
+    objs_list = Identities.search(eqs_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    std::vector<std::string> expected_lts = { "COPY0", "ENDO0", "TOTAL0" };
-    objs_list = Equations.get_associated_objects_list(name, I_LISTS);
+    std::vector<std::string> expected_lts = { "COPY0", "ENDO0", "TOTAL0", "_RES" };
+    objs_list = Lists.search(eqs_name);
     EXPECT_EQ(objs_list, expected_lts);
 
-    objs_list = Equations.get_associated_objects_list(name, I_SCALARS);
+    objs_list = Scalars.search(eqs_name);
     EXPECT_EQ(objs_list.size(), 0);
 
     std::vector<std::string> expected_tbl = { "GFR", "GFRLEVEL" };
-    objs_list = Equations.get_associated_objects_list(name, I_TABLES);
+    objs_list = Tables.search(eqs_name);
     EXPECT_EQ(objs_list, expected_tbl);
 
-    std::vector<std::string> expected_vars = { name };
-    objs_list = Equations.get_associated_objects_list(name, I_VARIABLES);
+    std::vector<std::string> expected_vars = { eqs_name };
+    objs_list = Variables.search(eqs_name);
     EXPECT_EQ(objs_list, expected_vars);
 }
 

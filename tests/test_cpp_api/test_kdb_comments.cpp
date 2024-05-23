@@ -455,9 +455,9 @@ TEST_F(KDBCommentsTest, Merge)
     EXPECT_EQ(kdb1->get(name), unmodified_comment);
 }
 
-TEST_F(KDBCommentsTest, AssociatedObjs)
+TEST_F(KDBCommentsTest, Search)
 {
-    std::string name = "ACAF";
+    std::string cmt_name = "ACAF";
     std::vector<std::string> objs_list;
 
     KDBComments kdb_cmt(input_test_dir + "fun.cmt");
@@ -468,29 +468,29 @@ TEST_F(KDBCommentsTest, AssociatedObjs)
     KDBTables kdb_tbl(input_test_dir + "fun.tbl");
     KDBVariables kdb_var(input_test_dir + "fun.var");
 
-    std::vector<std::string> expected_cmts = { name };
-    objs_list = Comments.get_associated_objects_list(name, I_COMMENTS);
+    std::vector<std::string> expected_cmts = { cmt_name };
+    objs_list = Comments.search(cmt_name);
     EXPECT_EQ(objs_list, expected_cmts);
 
-    std::vector<std::string> expected_eqs = { name, "FLF" };
-    objs_list = Comments.get_associated_objects_list(name, I_EQUATIONS);
+    std::vector<std::string> expected_eqs = { cmt_name, "FLF" };
+    objs_list = Equations.search(cmt_name);
     EXPECT_EQ(objs_list, expected_eqs);
 
-    objs_list = Comments.get_associated_objects_list(name, I_IDENTITIES);
+    objs_list = Identities.search(cmt_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    std::vector<std::string> expected_lts = { "COPY0", "ENDO0", "TOTAL0" };
-    objs_list = Comments.get_associated_objects_list(name, I_LISTS);
+    std::vector<std::string> expected_lts = { "COPY0", "ENDO0", "TOTAL0", "_RES" };
+    objs_list = Lists.search(cmt_name);
     EXPECT_EQ(objs_list, expected_lts);
 
-    objs_list = Comments.get_associated_objects_list(name, I_SCALARS);
+    objs_list = Scalars.search(cmt_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Comments.get_associated_objects_list(name, I_TABLES);
+    objs_list = Tables.search(cmt_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    std::vector<std::string> expected_vars = { name };
-    objs_list = Comments.get_associated_objects_list(name, I_VARIABLES);
+    std::vector<std::string> expected_vars = { cmt_name };
+    objs_list = Variables.search(cmt_name);
     EXPECT_EQ(objs_list, expected_vars);
 }
 
