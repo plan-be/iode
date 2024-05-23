@@ -501,10 +501,52 @@ cdef class _AbstractDatabase:
         input_file = str(Path(input_file).resolve())
         self.abstract_db_ptr.merge_from(input_file.encode())
 
-    def get_associated_objects_list(self, name: str, other_type: int):
-        r"""
-        Return the list of all objects of type 'other_type' associated with the object named 'name' 
-        from the current database.
+    def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, in_formula: bool=True, 
+               in_text: bool=True, list_result: str="_RES"):
+        r"""Return a list of all objects from the current database having a specific pattern in their names or LEC expression, comment...
+          
+        The following characters in *pattern* have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+        
+        The Search method depends on the type of object:
+
+        - Comments: the name and text of the comments are analyzed 
+        - Equations: the name and LEC form of the equations are analyzed 
+        - Identities: the name and LEC form of the identities are analyzed 
+        - Lists: the name and text of the lists are analyzed 
+        - Scalars: the name of the scalars is analyzed 
+        - Tables: the table name, titles and LEC forms are analyzed 
+        - Variables: the name of the variables is analyzed 
+
+        Parameters
+        ----------
+        pattern: str     
+            string to search
+        word: bool, optional
+            Whether or not the pattern to be searched for must be a whole word and not part of a word. 
+            Default to True.
+        case_sensitive: bool, optional
+            Whether or not the search is case sensitive.
+            Default to True.
+        in_name: bool, optional
+            Whether or not to also search in object names.
+            Default to True.
+        in_formula: bool, optional
+            Whether or not to also search in LEC expressions (for Equations, Identities and Tables (LEC cells)).
+            Default to True.
+        in_text: bool, optional
+            Whether or not to also search in texts (for Comments, lists, Equations (comment) and Tables (text cells)).
+            Default to True.
+        list_result: str, optional
+            Name of the IODE list in which the resulting list of objects is saved.
+            Default to *_RES*.
 
         Returns
         -------
@@ -512,50 +554,37 @@ cdef class _AbstractDatabase:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, COMMENTS, EQUATIONS, LISTS, SCALARS, TABLES, VARIABLES
-        >>> from iode import equations, lists, scalars, tables, variables
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments, equations, identities, lists, tables
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
-        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-        >>> # get list of comments associated with the variable 'AOUC'
-        >>> variables.get_associated_objects_list("AOUC", COMMENTS)
-        ['AOUC']
+        >>> # get list of comments containing 'Bruto'
+        >>> comments.search("Bruto")            # doctest: +ELLIPSIS 
+        ['GOSF', 'GOSG', 'GOSH', 'GOSH_', ..., 'VIF', 'VIG', 'YDH', 'YDH_']
 
-        >>> # get list of equations associated with the variable 'AOUC'
-        >>> variables.get_associated_objects_list("AOUC", EQUATIONS)
+        >>> # get list of equations containing 'AOUC'
+        >>> equations.search("AOUC")
         ['AOUC', 'PC', 'PIF', 'PXS', 'QXAB']
 
-        >>> # get list of lists associated with the variable 'AOUC'
-        >>> variables.get_associated_objects_list("AOUC", LISTS)
+        >>> # get list of identities containing 'NDOMY'
+        >>> identities.search("NDOMY")
+        ['LCLASS', 'LKEYN', 'UCLASS']
+
+        >>> # get list of IODE lists containing 'AOUC'
+        >>> lists.search("AOUC")
         ['COPY0', 'ENDO0', 'TOTAL0']
 
-        >>> # get list of tables associated with the variable 'AOUC'
-        >>> variables.get_associated_objects_list("AOUC", TABLES)
+        >>> # get list of IODE tables containing 'AOUC' in cells
+        >>> tables.search("AOUC")
         ['ANAPRIX', 'MULT1FR', 'MULT1RESU', 'T1', 'T1NIVEAU']
-
-        >>> # WARNING: In the case of Equations, the get_associated_objects_list method must not
-        >>> #          be confused with the get_coefficients_list and get_variables_list methods
-        >>> equations["ACAF"].lec
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
-        >>> equations["ACAF"].get_coefficients_list()
-        ['acaf1', 'acaf2', 'acaf4']
-        >>> equations.get_associated_objects_list("ACAF", SCALARS)
-        []
-        >>> equations["ACAF"].get_variables_list()
-        ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> equations.get_associated_objects_list("ACAF", VARIABLES)
-        ['ACAF']
         """
-        if not isinstance(name, str):
-            raise TypeError(f"'name': Expected value of type string. Got value of type {type(name).__name__}")
-
-        if not isinstance(other_type, int):
-            raise TypeError(f"'other_type': Expected value of type int. Got value of type {type(other_type).__name__}")
-
-        return [name_other.decode() for name_other in self.abstract_db_ptr.get_associated_objects_list(name.encode(), <EnumIodeType>other_type)]
+        return [name_other.decode() for name_other in self.abstract_db_ptr.search(pattern.encode(), 
+                <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, 
+                list_result.encode())]
 
     def _load(self, filepath: str):
         raise NotImplementedError()
