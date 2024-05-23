@@ -247,7 +247,7 @@ TEST_F(KDBListsTest, DeepCopy)
     EXPECT_THROW(Lists.subset(pattern, true), std::runtime_error);
 }
 
-TEST_F(KDBListsTest, CopyInto)
+TEST_F(KDBListsTest, CopyFrom)
 {
     std::string pattern = "C* T*";
     std::string filename = input_test_dir + "fun.lst";
@@ -256,13 +256,13 @@ TEST_F(KDBListsTest, CopyInto)
 
     // Copy entire file
     Lists.clear();
-    Lists.copy_into(filename, "*");
+    Lists.copy_from(filename, "*");
     EXPECT_EQ(Lists.count(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Lists.get_names(pattern);
     Lists.clear();
-    Lists.copy_into(filename, pattern);
+    Lists.copy_from(filename, pattern);
     EXPECT_EQ(Lists.count(), v_expected_names.size());  
     EXPECT_EQ(Lists.get_names(), v_expected_names);  
 }

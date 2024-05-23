@@ -401,7 +401,7 @@ TEST_F(KDBCommentsTest, DeepCopy)
     EXPECT_THROW(Comments.subset(pattern, true), std::runtime_error);
 }
 
-TEST_F(KDBCommentsTest, CopyInto)
+TEST_F(KDBCommentsTest, CopyFrom)
 {
     std::string pattern = "A* *_";
     std::string filename = input_test_dir + "fun.cmt";
@@ -410,13 +410,13 @@ TEST_F(KDBCommentsTest, CopyInto)
 
     // Copy entire file
     Comments.clear();
-    Comments.copy_into(filename, "*");
+    Comments.copy_from(filename, "*");
     EXPECT_EQ(Comments.count(), expected_nb_comments); 
 
     // copy subset
     v_expected_names = Comments.get_names(pattern);
     Comments.clear();
-    Comments.copy_into(filename, pattern);
+    Comments.copy_from(filename, pattern);
     EXPECT_EQ(Comments.count(), v_expected_names.size());  
     EXPECT_EQ(Comments.get_names(), v_expected_names);  
 }
