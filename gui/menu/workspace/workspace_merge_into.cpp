@@ -37,25 +37,25 @@ void MenuWorkspaceMergeInto::merge_into_workspace()
         switch (iodeType)
         {
         case I_COMMENTS:
-            Comments.merge_into(input_file);
+            Comments.merge_from(input_file);
             break;
         case I_EQUATIONS:
-            Equations.merge_into(input_file);
+            Equations.merge_from(input_file);
             break;
         case I_IDENTITIES:
-            Identities.merge_into(input_file);
+            Identities.merge_from(input_file);
             break;
         case I_LISTS:
-            Lists.merge_into(input_file);
+            Lists.merge_from(input_file);
             break;
         case I_SCALARS:
-            Scalars.merge_into(input_file);
+            Scalars.merge_from(input_file);
             break;
         case I_TABLES:
-            Tables.merge_into(input_file);
+            Tables.merge_from(input_file);
             break;
         case I_VARIABLES:
-            Variables.merge_into(input_file);
+            Variables.merge_from(input_file);
             break;
         default:
             break;
