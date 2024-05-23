@@ -354,9 +354,9 @@ TEST_F(KDBScalarsTest, Merge)
     EXPECT_EQ(kdb1->get(name), unmodified_scalar);
 }
 
-TEST_F(KDBScalarsTest, AssociatedObjs)
+TEST_F(KDBScalarsTest, Search)
 {
-    std::string name = "gamma";
+    std::string scl_name = "gamma";
     std::vector<std::string> objs_list;
 
     KDBComments kdb_cmt(input_test_dir + "fun.cmt");
@@ -367,28 +367,28 @@ TEST_F(KDBScalarsTest, AssociatedObjs)
     KDBTables kdb_tbl(input_test_dir + "fun.tbl");
     KDBVariables kdb_var(input_test_dir + "fun.var");
 
-    objs_list = Scalars.get_associated_objects_list(name, I_COMMENTS);
+    objs_list = Comments.search(scl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
     std::vector<std::string> expected_eqs = { "W" };
-    objs_list = Scalars.get_associated_objects_list(name, I_EQUATIONS);
+    objs_list = Equations.search(scl_name);
     EXPECT_EQ(objs_list, expected_eqs);
 
     std::vector<std::string> expected_idt = { "NAWRU" };
-    objs_list = Scalars.get_associated_objects_list(name, I_IDENTITIES);
+    objs_list = Identities.search(scl_name);
     EXPECT_EQ(objs_list, expected_idt);
 
-    objs_list = Scalars.get_associated_objects_list(name, I_LISTS);
+    objs_list = Lists.search(scl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    std::vector<std::string> expected_scl = { name };
-    objs_list = Scalars.get_associated_objects_list(name, I_SCALARS);
+    std::vector<std::string> expected_scl = { scl_name };
+    objs_list = Scalars.search(scl_name);
     EXPECT_EQ(objs_list, expected_scl);
 
-    objs_list = Scalars.get_associated_objects_list(name, I_TABLES);
+    objs_list = Tables.search(scl_name);
     EXPECT_EQ(objs_list.size(), 0);
 
-    objs_list = Scalars.get_associated_objects_list(name, I_VARIABLES);
+    objs_list = Variables.search(scl_name);
     EXPECT_EQ(objs_list.size(), 0);
 }
 
