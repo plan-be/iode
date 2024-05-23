@@ -69,7 +69,7 @@ cdef class _AbstractDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> comments.is_subset()
         False
-        >>> cmt_subset = comments.copy("A*")
+        >>> cmt_subset = comments["A*"].copy()
         >>> cmt_subset.is_subset()
         True
         """
@@ -100,7 +100,7 @@ cdef class _AbstractDatabase:
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> comments.is_subset()
         False
-        >>> cmt_subset = comments.copy("A*")
+        >>> cmt_subset = comments["A*"].copy()
         >>> cmt_subset.is_subset()
         True
         >>> cmt_subset.is_copy_subset()
@@ -113,42 +113,78 @@ cdef class _AbstractDatabase:
     def _subset(self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
 
-    def copy(self, pattern: str) -> Self:
-        f"""
-        Create a *copy subset* of a global IODE database. 
-        Any change made on an IODE object of the *copy subset* will **NOT** 
-        modify the corresponding IODE object in the global IODE database.
-
-        Parameters
-        ----------
-        pattern: str
-            string pattern used to select the IODE objects to group in the returned subset.
-            E.g. "A*" will select all IODE objects with the name starting with 'A', 
-            "*_" will select all IODE objects with the name ending with '_' and 
-            "*" will select all IODE objects.
+    def copy(self) -> Self:
+        """
+        Create a *copy* of an IODE database. 
+        Any change made on the *copied database* will **NOT** 
+        modify the corresponding the global IODE database.
 
         Returns
         -------
-        {type(Self).__name__}
+        Database
         
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
-        >>> comments.load(f"{{SAMPLE_DATA_DIR}}/fun.cmt")
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
 
-        >>> cmt_subset_copy = comments.copy("*_")
-        >>> # any modification made on the copy subset 
-        >>> # let the global workspace unchanged
-        >>> cmt_subset_copy['BENEF_'] = "Modified Comment"
-        >>> cmt_subset_copy['BENEF_']
+        Database subset
+
+        >>> # without using copy(), any modification made on 
+        >>> # the copy subset will also change the corresponding 
+        >>> # IODE database
+        >>> cmt_subset = comments["A*"]
+        >>> cmt_subset.get_names()
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        >>> # a) add a comment
+        >>> cmt_subset["A_NEW"] = "New comment"
+        >>> "A_NEW" in cmt_subset
+        True
+        >>> "A_NEW" in comments
+        True
+        >>> comments["A_NEW"]
+        'New comment'
+        >>> # b) modify a comment
+        >>> cmt_subset["ACAF"] = "Modified Comment"
+        >>> cmt_subset["ACAF"]
         'Modified Comment'
-        >>> comments['BENEF_']
-        'Ondernemingen: niet-uitgekeerde winsten (vóór statistische\\naanpassing).'
+        >>> comments["ACAF"]
+        'Modified Comment'
+        >>> # c) delete a comment
+        >>> del cmt_subset["ACAG"]
+        >>> "ACAG" in cmt_subset
+        False
+        >>> "ACAG" in comments
+        False
+
+        Copied database subset
+
+        >>> cmt_subset_copy = comments["B*"].copy()
+        >>> cmt_subset_copy.get_names()
+        ['BENEF', 'BENEF_', 'BQY', 'BVY']
+        >>> # by using copy(), any modification made on the copy subset 
+        >>> # let the global workspace unchanged
+        >>> # a) add a comment -> only added in the copied subset
+        >>> cmt_subset_copy["B_NEW"] = "New Comment"
+        >>> "B_NEW" in cmt_subset_copy
+        True
+        >>> "B_NEW" in comments
+        False
+        >>> # b) modify a comment -> only modified in the copied subset
+        >>> cmt_subset_copy["BENEF"] = "Modified Comment"
+        >>> cmt_subset_copy["BENEF"]
+        'Modified Comment'
+        >>> comments["BENEF"]
+        'Ondernemingen: niet-uitgekeerde winsten.'
+        >>> # c) delete a comment -> only deleted in the copied subset
+        >>> del cmt_subset_copy["BENEF_"]
+        >>> "BENEF_" in cmt_subset_copy
+        False
+        >>> "BENEF_" in comments
+        True
         """
-        if not isinstance(pattern, str):
-            raise TypeError(f"'pattern': Expected value of type str. Got value of type {type(pattern).__name__} instead.")
-        return self._subset(pattern, copy=True)
+        return self._subset('*', copy=True)
 
     @property
     def filename(self) -> str:
