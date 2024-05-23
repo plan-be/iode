@@ -311,14 +311,14 @@ void KDBAbstract::copy_from(const std::string& input_file, const std::string obj
 }
 
 // TODO JMP: please provide input values to test B_WsMerge()
-void KDBAbstract::merge_into(const std::string& input_file)
+void KDBAbstract::merge_from(const std::string& input_file)
 {
     KDB* kdb = get_database();
     if(kdb == NULL) 
         return;
 
     // throw an error if the passed filepath is not valid
-    std::string input_file_ = check_filepath(input_file, (EnumIodeFile) k_type, "merge_into", true);
+    std::string input_file_ = check_filepath(input_file, (EnumIodeFile) k_type, "merge_from", true);
     
     int res = K_cat(kdb, to_char_array(input_file));
     if(res < 0) 

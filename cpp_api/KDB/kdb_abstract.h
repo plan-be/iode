@@ -177,7 +177,7 @@ public:
      *  
      *  @see https://iode.plan.be/doku.php?id=wsmerge
      */
-    void merge_into(const std::string& input_file);
+    void merge_from(const std::string& input_file);
 
     std::vector<std::string> get_associated_objects_list(const std::string& name, const EnumIodeType other_type);
 
