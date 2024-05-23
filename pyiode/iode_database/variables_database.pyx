@@ -73,7 +73,6 @@ cdef class Variables(_AbstractDatabase):
 
     Attributes
     ----------
-    iode_type: str
     filename: str
     description: str
     mode: int

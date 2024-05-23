@@ -26,7 +26,6 @@ WORKSPACE
    :toctree: _generated
    :template: database_methods.rst
 
-   Database.iode_type
    Database.filename
    Database.description
 
@@ -37,10 +36,6 @@ WORKSPACE
    Database.is_subset
    Database.is_copy_subset
    Database.copy
-
-   Database.iode_type
-   Database.filename
-   Database.description
 
    Database.__getitem__
    Database.__setitem__

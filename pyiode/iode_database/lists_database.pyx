@@ -19,7 +19,6 @@ cdef class Lists(_AbstractDatabase):
 
     Attributes
     ----------
-    iode_type: str
     filename: str
     description: str
 

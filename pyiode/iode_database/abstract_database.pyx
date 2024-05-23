@@ -34,26 +34,6 @@ cdef class _AbstractDatabase:
     def __dealloc__(self):
         pass
 
-    # Public methods
-    @property
-    def iode_type(self) -> str:
-        """
-        Return the IODE type of the current database
-
-        Returns
-        -------
-        str
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> comments.iode_type
-        'Comment'
-        """
-        return IODE_TYPES_LIST[self.abstract_db_ptr.get_iode_type()]
-
     def is_subset(self) -> bool:
         """
         Whether or not the present object represents a subset of a global IODE database.
@@ -718,7 +698,7 @@ cdef class _AbstractDatabase:
         elif isinstance(key, Iterable) and all(isinstance(item, str) for item in key):
             # empty key
             if not len(key):
-                raise ValueError(f"Empty list of names for {self.iode_type} objects.")
+                raise ValueError(f"Empty list of names for {type(self).__name__} objects.")
             return key
         
         # key represents a slice
@@ -733,16 +713,16 @@ cdef class _AbstractDatabase:
             last_index = names.index(last_name)
             # last_name must be equal or after first_name
             if last_index < first_index:
-                raise ValueError(f"Cannot select {self.iode_type} objects between '{first_name}' and '{last_name}'. "
+                raise ValueError(f"Cannot select {type(self).__name__} objects between '{first_name}' and '{last_name}'. "
                                  f"'{first_name}' is after '{last_name}'.")
             names = names[first_index:last_index+1]
             # invalid key
             if not len(names):
-                raise ValueError(f"Invalid name or pattern '{key}' for {self.iode_type} objects.")
+                raise ValueError(f"Invalid name or pattern '{key}' for {type(self).__name__} objects.")
             return names
 
         # invalid type for key
-        raise TypeError(f"Invalid type for the selection key '{key}' when trying to select {self.iode_type} objects.\n"
+        raise TypeError(f"Invalid type for the selection key '{key}' when trying to select {type(self).__name__} objects.\n"
                         f"Expected selection key of type str, list of str or slice(str, str).\n"
                         f"Got selection key of type {type(key).__name__} instead.")
 
@@ -1768,7 +1748,7 @@ cdef class _AbstractDatabase:
             values = [value] * len(names) if isinstance(value, str) or not isinstance(value, Iterable) else value
             # check list of values has the same length as list of names
             if len(names) != len(values):
-                raise ValueError(f"Cannot add/update values for {self.iode_type} objects for the selection key '{key}'.\n"
+                raise ValueError(f"Cannot add/update values for {type(self).__name__} objects for the selection key '{key}'.\n"
                                 f"{len(values)} values has been passed while the selection key '{key}' "
                                 f"represents {len(names)} objects.")
             for name, value in zip(names, values):
