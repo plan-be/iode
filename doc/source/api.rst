@@ -34,9 +34,9 @@ WORKSPACE
    Database.save
    Database.clear
 
-   Database.subset
    Database.is_subset
    Database.is_copy_subset
+   Database.copy
 
    Database.iode_type
    Database.filename
