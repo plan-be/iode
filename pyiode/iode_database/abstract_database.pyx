@@ -415,7 +415,7 @@ cdef class _AbstractDatabase:
         cdef CKDBAbstract* other_db_ptr = (<_AbstractDatabase>other).abstract_db_ptr
         self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
 
-    def copy_into(self, input_files: Union[str, List[str]], objects_names: Union[str, List[str]]='*'):
+    def copy_from(self, input_files: Union[str, List[str]], objects_names: Union[str, List[str]]='*'):
         """
         Copy (a subset of) objects from the input file(s) 'input_files' into the current database.
 
@@ -440,13 +440,13 @@ cdef class _AbstractDatabase:
         []
 
         >>> # load all comments with a name starting with 'A'
-        >>> comments.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
+        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")
         >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
         >>> comments.clear()
         >>> # load all comments
-        >>> comments.copy_into(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> len(comments)
         317
         """
@@ -467,7 +467,7 @@ cdef class _AbstractDatabase:
             raise TypeError("'objects_names': Expected value of type string or list of strings. " + 
                 "Got value of type {type(objects_names).__name__}")
 
-        self.abstract_db_ptr.copy_into(input_files.encode(), objects_names.encode())
+        self.abstract_db_ptr.copy_from(input_files.encode(), objects_names.encode())
 
     def merge_into(self, input_file: str):
         """
