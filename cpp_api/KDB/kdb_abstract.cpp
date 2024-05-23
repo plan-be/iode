@@ -326,17 +326,34 @@ void KDBAbstract::merge_from(const std::string& input_file)
                                  vIodeTypes[k_type] + " database");
 }
 
-// TODO ald: rewrite B_DataSearchParms() in C++
-std::vector<std::string> KDBAbstract::get_associated_objects_list(const std::string& name, const EnumIodeType other_type)
+// TODO ALD: rewrite B_DataSearchParms() in C++
+std::vector<std::string> KDBAbstract::search(const std::string& pattern, const bool word, const bool case_sensitive, 
+        const bool in_name, const bool in_formula, const bool in_text, const std::string& list_result)
 {
-    char** c_list = B_DataSearchParms(to_char_array(name), 1, 1, 1, 1, 1, (int) other_type);
-
     std::vector<std::string> objs_list;
+
+    int c_word  = word ? 1 : 0;
+    int c_ecase = case_sensitive ? 1 : 0;
+    int c_names = in_name ? 1 : 0;
+    int c_forms = in_formula ? 1 : 0;
+    int c_texts = in_text ? 1 : 0;
+    char** c_list = B_DataSearchParms(to_char_array(pattern), c_word, c_ecase, c_names, c_forms, c_texts, (int) this->k_type);
+
+    // check if returned list of objects is not null
     if(c_list == NULL || SCR_tbl_size((unsigned char**) c_list) == 0)
         return objs_list;
+
+    // save as IODE list (default to list _RES)
+    KL_lst(to_char_array(list_result), c_list, 200);
     
+    // convert C table as C++ vector
     for(int i=0; i < SCR_tbl_size((unsigned char**) c_list); i++)
         objs_list.push_back(std::string(c_list[i]));
+
+    // free allocated memory for the returned C table
+    SCR_free_tbl((unsigned char**) c_list);
+
+    // return C++ vector
     return objs_list;
 }
 

@@ -179,7 +179,20 @@ public:
      */
     void merge_from(const std::string& input_file);
 
-    std::vector<std::string> get_associated_objects_list(const std::string& name, const EnumIodeType other_type);
+    /**
+     *  Searches all objects containing a given string in their names and/or definitions.
+     *  
+     *  Syntax
+     *  ------
+     *      $DataSearch<type> mask word ecase in_name in_formula in_text list_result
+     *        (word, ecase, in_name, in_formula, in_text := 0 ou 1)
+     *        (mask := suite of chars or ?, *)
+     *        (list_result := name of the resulting list
+     *  
+     *  @see https://iode.plan.be/doku.php?id=datasearch for details
+     */
+    std::vector<std::string> search(const std::string& pattern, const bool word=true, const bool case_sensitive=true, 
+        const bool in_name=true, const bool in_formula=true, const bool in_text=true, const std::string& list_result="_RES");
 
     // save - clear
 
