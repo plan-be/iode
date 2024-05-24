@@ -10,7 +10,7 @@ from pyiode.common cimport (EnumCellType, EnumCellAlign, EnumCellFont, EnumLineT
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType)
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
-from pyiode.iode_database.database cimport load_reference_kdb
+from pyiode.iode_database.cpp_api_database cimport load_reference_kdb
 
 
 # TableCell wrapper class

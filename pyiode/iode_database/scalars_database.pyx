@@ -8,8 +8,8 @@ else:
     Self = Any
 
 cimport cython
-from pyiode.iode_database.database cimport KDBScalars as CKDBScalars
-from pyiode.iode_database.database cimport Scalars as cpp_global_scalars
+from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
+from pyiode.iode_database.cpp_api_database cimport Scalars as cpp_global_scalars
 
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
 

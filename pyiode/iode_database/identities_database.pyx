@@ -8,9 +8,9 @@ else:
     Self = Any
 
 cimport cython
-from pyiode.iode_database.database cimport KDBIdentities as CKDBIdentities
-from pyiode.iode_database.database cimport Identities as cpp_global_identities
-from pyiode.iode_database.database cimport Variables as cpp_global_variables
+from pyiode.iode_database.cpp_api_database cimport KDBIdentities as CKDBIdentities
+from pyiode.iode_database.cpp_api_database cimport Identities as cpp_global_identities
+from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 
 
 @cython.final

@@ -4,8 +4,8 @@ from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 
 from pyiode.common cimport EnumIodeLtoH, EnumIodeHtoL
-from pyiode.iode_database.database cimport low_to_high as cpp_low_to_high 
-from pyiode.iode_database.database cimport high_to_low as cpp_high_to_low
+from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high 
+from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
 
 
 def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union[str, List[str]]):

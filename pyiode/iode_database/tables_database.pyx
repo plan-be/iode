@@ -10,8 +10,8 @@ else:
 cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.table cimport CTable
-from pyiode.iode_database.database cimport KDBTables as CKDBTables
-from pyiode.iode_database.database cimport Tables as cpp_global_tables
+from pyiode.iode_database.cpp_api_database cimport KDBTables as CKDBTables
+from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 
 
 @cython.final
