@@ -123,6 +123,8 @@ Variables
    Variables.periods_as_float
    
    Variables.periods_subset
+   Variables.low_to_high
+   Variables.high_to_low
    Variables.extrapolate
    Variables.seasonal_adjustment
    Variables.trend_correction
@@ -130,17 +132,6 @@ Variables
    Variables.to_frame
    Variables.from_array
    Variables.to_array
-
-=============
-Miscellaneous
-=============
-
-.. autosummary::
-   :toctree: _generated
-
-   low_to_high
-   high_to_low
-
 
 ************
 IODE OBJECTS

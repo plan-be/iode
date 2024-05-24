@@ -178,15 +178,15 @@ Below *workspace* must be replaced by either:
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | ``WsExtrapolate``    | ``variables.extrapolate(method, from_, to_, variables_list)`` --> See :meth:`Variables.extrapolate`                 |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsLtohStock``      | ``low_to_high(LTOH_STOCK, method, filepath, var_list)`` --> See :func:`low_to_high`                                 |
+    | ``WsLtohStock``      | ``variables.low_to_high(LTOH_STOCK, method, filepath, var_list)`` --> See :meth:`Variables.low_to_high`             |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsLtohFlow``       | ``low_to_high(LTOH_FLOW, method, filepath, var_list)`` --> See :func:`low_to_high`                                  |
+    | ``WsLtohFlow``       | ``variables.low_to_high(LTOH_FLOW, method, filepath, var_list)`` --> See :meth:`Variables.low_to_high`              |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsHtolSum``        | ``high_to_low(HTOL_SUM, filepath, var_list)`` --> See :func:`high_to_low`                                           |
+    | ``WsHtolSum``        | ``variables.high_to_low(HTOL_SUM, filepath, var_list)`` --> See :meth:`Variables.high_to_low`                       |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsHtolMean``       | ``high_to_low(HTOL_MEAN, filepath, var_list)`` --> See :func:`high_to_low`                                          |
+    | ``WsHtolMean``       | ``variables.high_to_low(HTOL_MEAN, filepath, var_list)`` --> See :meth:`Variables.high_to_low`                      |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
-    | ``WsHtolLast``       | ``high_to_low(HTOL_LAST, filepath, var_list)`` --> See :func:`high_to_low`                                          |
+    | ``WsHtolLast``       | ``variables.high_to_low(HTOL_LAST, filepath, var_list)`` --> See :meth:`Variables.high_to_low`                      |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
     | ``WsSeasonAdj``      | ``variables.seasonal_adjustment(input_file, eps_test, series)`` --> See :meth:`Variables.seasonal_adjustment`       |
     +----------------------+---------------------------------------------------------------------------------------------------------------------+
