@@ -8,22 +8,22 @@ from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_hig
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
 
 
-def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union[str, List[str]]):
+def low_to_high(type_of_series: str, method: str, filepath: str, var_list: Union[str, List[str]]):
     """
     Transform low periodicity series to high periodicity series (i.e. variables). 
 
     Parameters
     ----------
-    type_of_series : int
+    type_of_series : str
         Two types of series are considered: 'stock' and 'flow':
-            - LTOH_STOCK : the interpolated values are of the same order of magnitude as the original values
-            - LTOH_FLOW : the values of the sub-periods are additive over a period
+            - 'S' (LTOH_STOCK) : the interpolated values are of the same order of magnitude as the original values
+            - 'F' (LTOH_FLOW) : the values of the sub-periods are additive over a period
 
     method : str
         Method to use for transformation. Three methods can be used:
-            - 'L' : Linear interpolation
-            - 'C' : Cubic Spliness
-            - 'S' : Steps
+            - 'L' (LTOH_LINEAR) : Linear interpolation
+            - 'C' (LTOH_CUBIC_SPLINESS) : Cubic Spliness
+            - 'S' (LTOH_STEP) : Steps
 
     filepath : str
         Filepath to the source data file.
@@ -37,7 +37,8 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
 
     Examples
     --------
-    >>> from iode import SAMPLE_DATA_DIR, LTOH_STOCK, LTOH_FLOW, LTOH_CS, LTOH_LIN, LTOH_STEP
+    >>> from iode import SAMPLE_DATA_DIR, LTOH_STOCK, LTOH_FLOW
+    >>> from iode import LTOH_CUBIC_SPLINESS, LTOH_LINEAR, LTOH_STEP
     >>> from iode import variables, low_to_high
     >>> variables.clear()
     >>> # define a yearly sample
@@ -48,7 +49,7 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     Linear interpolation / stock
     
     >>> # "stock" -> the result is a linear interpolation of the 2 surrounding source values.
-    >>> low_to_high(LTOH_STOCK, 'L', filepath, ["ACAF", "ACAG"])
+    >>> low_to_high(LTOH_STOCK, LTOH_LINEAR, filepath, ["ACAF", "ACAG"])
     >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-72.50614701966526, -76.11763971671049, -79.7291324137557, -83.34062511080091]
     >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -57,7 +58,7 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     Linear interpolation / flow
     
     >>> # "flow" -> the result is the source value divided by the nb of sub-periods. 
-    >>> low_to_high(LTOH_FLOW, 'L', filepath, ["ACAF", "ACAG"])
+    >>> low_to_high(LTOH_FLOW, LTOH_LINEAR, filepath, ["ACAF", "ACAG"])
     >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
     >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -65,7 +66,7 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
 
     Cubic splines / stock
     
-    >>> low_to_high(LTOH_STOCK, 'C', filepath, ["ACAF", "ACAG"])
+    >>> low_to_high(LTOH_STOCK, LTOH_CUBIC_SPLINESS, filepath, ["ACAF", "ACAG"])
     >>> variables["ACAF", "2012Q1":"2012Q4"]
     [-47.2984169294621, -50.052041225380975, -52.80566552129986, -55.55928981721873]
     >>> variables["ACAG", "2012Q1":"2012Q4"]
@@ -73,7 +74,7 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
 
     Cubic splines / flow
     
-    >>> low_to_high(LTOH_FLOW, 'C', filepath, ["ACAF", "ACAG"])
+    >>> low_to_high(LTOH_FLOW, LTOH_CUBIC_SPLINESS, filepath, ["ACAF", "ACAG"])
     >>> variables["ACAF", "2012Q1":"2012Q4"]
     [-12.748422687629207, -13.436828761608925, -14.270289043196508, -15.103749324784092]
     >>> variables["ACAG", "2012Q1":"2012Q4"]
@@ -82,7 +83,7 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     Step / stock
     
     >>> # "stock" -> the result has the same value as the source
-    >>> low_to_high(LTOH_STOCK, 'S', filepath, ["ACAF", "ACAG"])
+    >>> low_to_high(LTOH_STOCK, LTOH_STEP, filepath, ["ACAF", "ACAG"])
     >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-83.34062511080091, -83.34062511080091, -83.34062511080091, -83.34062511080091]
     >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -92,23 +93,26 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     
     >>> # "flow" -> the result is the source value plus a portion of 
     >>> # the difference between the 2 surrounding values in the source
-    >>> low_to_high(LTOH_FLOW, 'S', filepath, ["ACAF", "ACAG"])
+    >>> low_to_high(LTOH_FLOW, LTOH_STEP, filepath, ["ACAF", "ACAG"])
     >>> variables["ACAF", "2014Q1":"2014Q4"]
     [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
     >>> variables["ACAG", "2014Q1":"2014Q4"]
     [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
     """
-    if not isinstance(type_of_series, int):
-        raise TypeError(f"'type_of_series': Expected value of type int. Got value of type {type(type_of_series).__name__} instead")
+    if not isinstance(type_of_series, str):
+        raise TypeError(f"'type_of_series': Expected value of type str. Got value of type {type(type_of_series).__name__} instead")
 
-    if type_of_series not in [LTOH_STOCK, LTOH_FLOW]:
-        raise ValueError(f"'type_of_series': possible values are LTOH_STOCK or LTOH_FLOW. Got value {type_of_series} instead")
+    type_of_series = type_of_series.upper()
+    if type_of_series not in "SF":
+        raise ValueError(f"'type_of_series': possible values are 'S' (LTOH_STOCK) or 'F' (LTOH_FLOW). "
+                         f"Got value {type_of_series} instead")
 
     if not isinstance(method, str):
         raise TypeError(f"'method': Expected value of type str of one character. Got value of type {type(method).__name__} instead")
 
     if method not in "LCS":
-        raise ValueError(f"'method': possible values are 'L', 'C' or 'S'. Got value {method} instead")
+        raise ValueError(f"'method': possible values are 'L' (LTOH_LINEAR), 'C' (LTOH_CUBIC_SPLINESS) or 'S' (LTOH_STEP). " 
+                         f"Got value {method} instead")
 
     if not isinstance(filepath, str):
         raise TypeError(f"'filepath': Expected value of type str. Got value of type {type(filepath).__name__} instead")
@@ -119,7 +123,8 @@ def low_to_high(type_of_series: int, method: str, filepath: str, var_list: Union
     if not isinstance(var_list, str):
         raise TypeError(f"'filepath': Expected value of type str or list of str. Got value of type {type(filepath).__name__} instead")
 
-    cpp_low_to_high(<EnumIodeLtoH>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
+    i_type_of_series = LTOH_SERIES_TYPES_DICT[type_of_series]
+    cpp_low_to_high(<EnumIodeLtoH>i_type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
 
 
 def high_to_low(type_of_series: int, filepath: str, var_list: Union[str, List[str]]):
