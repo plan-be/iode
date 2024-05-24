@@ -199,11 +199,12 @@ SIMU_INIT_EXTRA_NA: int = EnumSimulationInitialization.IV_INIT_EXTRA_NA
 
 SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)
 
-LTOH_STOCK: int = EnumIodeLtoH.LTOH_STOCK
-LTOH_FLOW: int = EnumIodeLtoH.LTOH_FLOW
+LTOH_STOCK: str = 'S'
+LTOH_FLOW: str = 'F'
+LTOH_SERIES_TYPES_DICT = {'S': EnumIodeLtoH.LTOH_STOCK, 'F': EnumIodeLtoH.LTOH_FLOW}
 
-LTOH_LIN: str = 'L'
-LTOH_CS: str = 'C'
+LTOH_LINEAR: str = 'L'
+LTOH_CUBIC_SPLINESS: str = 'C'
 LTOH_STEP: str = 'S'
 
 HTOL_LAST: int = EnumIodeHtoL.HTOL_LAST
