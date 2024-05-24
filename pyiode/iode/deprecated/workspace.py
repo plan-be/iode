@@ -3,8 +3,7 @@ from typing import Union, List, Any
 
 from iode import (COMMENTS, EQUATIONS, IDENTITIES, LISTS, SCALARS, TABLES, VARIABLES, 
                   LTOH_FLOW, LTOH_STOCK, LTOH_CUBIC_SPLINESS, HTOL_LAST, HTOL_MEAN, HTOL_SUM, 
-                  comments, equations, identities, lists, scalars, tables, variables, 
-                  low_to_high, high_to_low)
+                  comments, equations, identities, lists, scalars, tables, variables)
 
 
 def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = VARIABLES) -> List[str]:
@@ -266,18 +265,18 @@ def ws_htol(filename: str, varlist, series_type: int):
 
 def ws_htol_last(filename: str, varlist):
     warnings.warn("ws_ltoh_stock() is deprecated. " + 
-        "Please use the new syntax:\nhigh_to_low(HTOL_LAST, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    high_to_low(HTOL_LAST, filename, varlist)
+        "Please use the new syntax:\nvariables.high_to_low(HTOL_LAST, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.high_to_low(HTOL_LAST, filename, varlist)
 
 def ws_htol_mean(filename: str, varlist):
     warnings.warn("ws_htol_mean() is deprecated. " + 
-        "Please use the new syntax:\nhigh_to_low(HTOL_MEAN, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    high_to_low(HTOL_MEAN, filename, varlist)
+        "Please use the new syntax:\nvariables.high_to_low(HTOL_MEAN, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.high_to_low(HTOL_MEAN, filename, varlist)
 
 def ws_htol_sum(filename: str, varlist):
     warnings.warn("ws_htol_sum() is deprecated. " + 
-        "Please use the new syntax:\nhigh_to_low(HTOL_SUM, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    high_to_low(HTOL_SUM, filename, varlist)
+        "Please use the new syntax:\nvariables.high_to_low(HTOL_SUM, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.high_to_low(HTOL_SUM, filename, varlist)
 
 
 # Low to High
@@ -295,10 +294,10 @@ def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
 
 def ws_ltoh_flow(filename: str, varlist, method: Union[int, str] = LTOH_CUBIC_SPLINESS):
     warnings.warn("ws_ltoh_flow() is deprecated. " + 
-        "Please use the new syntax:\nlow_to_high(LTOH_FLOW, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    low_to_high(LTOH_FLOW, method, filename, varlist)
+        "Please use the new syntax:\nvariables.low_to_high(LTOH_FLOW, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.low_to_high(LTOH_FLOW, method, filename, varlist)
 
 def ws_ltoh_stock(filename: str, varlist, method: Union[int, str] = LTOH_CUBIC_SPLINESS):
     warnings.warn("ws_ltoh_stock() is deprecated. " + 
-        "Please use the new syntax:\nlow_to_high(LTOH_STOCK, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    low_to_high(LTOH_STOCK, method, filename, varlist)
+        "Please use the new syntax:\nvariables.low_to_high(LTOH_STOCK, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.low_to_high(LTOH_STOCK, method, filename, varlist)

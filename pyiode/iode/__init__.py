@@ -37,7 +37,6 @@ from .util import split_list
 # IODE databases
 from .iode_python import comments, equations, identities, lists, scalars, tables, variables
 from .iode_python import Comments, Equations, Identities, Lists, Scalars, Tables, Variables
-from .iode_python import low_to_high, high_to_low 
 
 # Reports
 
@@ -90,7 +89,6 @@ __all__ = [
     # IODE databases
     'comments', 'equations', 'identities', 'lists', 'scalars', 'tables', 'variables', 
     'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables', 
-    'low_to_high', 'high_to_low',
 
     # Reports
 
