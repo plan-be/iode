@@ -108,6 +108,15 @@ def _numpy_array_to_ws(data, vars_names: Iterable[str], periods_list: Iterable[s
             values = <double*>np.PyArray_DATA(row_data)
             IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
 
+def _ws_to_numpy_array(vars_list: List[str], nb_periods: int) -> np.ndarray:
+    # Copy values from the IODE Variables database to a Numpy 2D array
+    data = np.empty((len(vars_list), nb_periods), dtype=np.float64)
+    for i, name in enumerate(vars_list):
+        # cpp_values_ptr = self.database_ptr.get_var_ptr(name.encode())
+        # data[i] = [cpp_values_ptr[t] for t in range(0, nb_periods_)]
+        data[i] = _iodevar_to_ndarray(_cstr(name), False)
+    return data
+
 
 @cython.final
 cdef class Variables(_AbstractDatabase):
@@ -515,18 +524,11 @@ cdef class Variables(_AbstractDatabase):
 
         if pd is None:
             raise RuntimeError("pandas library not found")
-
+        
         vars_list = self.get_names()
         periods_list = self.periods_as_float if sample_as_floats else self.periods
-        nb_periods_ = len(periods_list)
+        data = _ws_to_numpy_array(vars_list, len(periods_list))
 
-        # Copy values from the IODE Variables database to a Numpy 2D array
-        data = np.empty((len(vars_list), len(periods_list)), dtype=np.float64)
-        for i, name in enumerate(vars_list):
-            # cpp_values_ptr = self.database_ptr.get_var_ptr(name.encode())
-            # data[i] = [cpp_values_ptr[t] for t in range(0, nb_periods_)]
-            data[i] = _iodevar_to_ndarray(_cstr(name), False)
-        
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
         df.index.name = vars_axis_name
         df.columns.name = time_axis_name
@@ -662,8 +664,13 @@ cdef class Variables(_AbstractDatabase):
         if la is None:
             raise RuntimeError("larray library not found")
 
-        df = self.to_frame(vars_axis_name, time_axis_name, sample_as_floats)
-        return la.from_frame(df)
+        vars_list = self.get_names()
+        periods_list = self.periods_as_float if sample_as_floats else self.periods
+        data = _ws_to_numpy_array(vars_list, len(periods_list))
+        
+        vars_axis = la.Axis(name=vars_axis_name, labels=vars_list)
+        time_axis = la.Axis(name=time_axis_name, labels=periods_list)
+        return la.Array(axes=(vars_axis, time_axis), data=data)
 
     @property
     def mode(self) -> str:
