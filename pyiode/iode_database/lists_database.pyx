@@ -8,8 +8,8 @@ else:
     Self = Any
 
 cimport cython
-from pyiode.iode_database.database cimport KDBLists as CKDBLists
-from pyiode.iode_database.database cimport Lists as cpp_global_lists
+from pyiode.iode_database.cpp_api_database cimport KDBLists as CKDBLists
+from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
 
 
 @cython.final

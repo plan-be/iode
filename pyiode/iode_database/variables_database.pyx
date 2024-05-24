@@ -12,9 +12,9 @@ cimport cython
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from pyiode.common cimport L_NAN, EnumIodeVarMode
-from pyiode.iode_database.database cimport IodeSetVector, IodeCalcSamplePosition
-from pyiode.iode_database.database cimport KDBVariables as CKDBVariables
-from pyiode.iode_database.database cimport Variables as cpp_global_variables
+from pyiode.iode_database.cpp_api_database cimport IodeSetVector, IodeCalcSamplePosition
+from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
+from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 
 
 cdef inline _df_to_ws_pos(df, start_period: str, last_period:str, int* la_pos, int* ws_pos, int* lg):

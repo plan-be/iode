@@ -8,8 +8,8 @@ else:
     Self = Any
 
 cimport cython
-from pyiode.iode_database.database cimport KDBComments as CKDBComments
-from pyiode.iode_database.database cimport Comments as cpp_global_comments
+from pyiode.iode_database.cpp_api_database cimport KDBComments as CKDBComments
+from pyiode.iode_database.cpp_api_database cimport Comments as cpp_global_comments
 
 
 @cython.final

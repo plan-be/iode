@@ -10,8 +10,8 @@ else:
 cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.equation cimport CEquation
-from pyiode.iode_database.database cimport KDBEquations as CKDBEquations
-from pyiode.iode_database.database cimport Equations as cpp_global_equations
+from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
+from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
 
