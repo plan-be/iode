@@ -207,9 +207,10 @@ LTOH_LINEAR: str = 'L'
 LTOH_CUBIC_SPLINESS: str = 'C'
 LTOH_STEP: str = 'S'
 
-HTOL_LAST: int = EnumIodeHtoL.HTOL_LAST
-HTOL_MEAN: int = EnumIodeHtoL.HTOL_MEAN
-HTOL_SUM: int = EnumIodeHtoL.HTOL_SUM 
+HTOL_LAST: str = 'L'
+HTOL_MEAN: str = 'M'
+HTOL_SUM: str = 'S'
+HTOL_SERIES_TYPES_DICT = {'L': EnumIodeHtoL.HTOL_LAST, 'M': EnumIodeHtoL.HTOL_MEAN, 'S': EnumIodeHtoL.HTOL_SUM}
 
 LOW_TO_HIGH_DICT: Dict[str, str] = _cpp_char_string_map_to_py(mLowToHigh)
 
