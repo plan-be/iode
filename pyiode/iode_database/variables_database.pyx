@@ -512,7 +512,7 @@ cdef class Variables(_AbstractDatabase):
         periods_list = self.periods_as_float if sample_as_floats else self.periods
         nb_periods_ = len(periods_list)
 
-        # Copy values from the IODE Variables database to a NUmpy 2D array
+        # Copy values from the IODE Variables database to a Numpy 2D array
         data = np.empty((len(vars_list), len(periods_list)), dtype=np.float64)
         for i, name in enumerate(vars_list):
             # cpp_values_ptr = self.database_ptr.get_var_ptr(name.encode())
@@ -520,8 +520,6 @@ cdef class Variables(_AbstractDatabase):
             data[i] = _iodevar_to_ndarray(_cstr(name), False)
         
         df = DataFrame(index=vars_list, columns=periods_list, data=data)
-        # replace IODE NaN values by numpy or pandas values
-        df.where(df < L_NAN * (1.0 - 1e-30))
         df.index.name = vars_axis_name
         df.columns.name = time_axis_name
         return df
