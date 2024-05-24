@@ -361,9 +361,13 @@ cdef class Variables(_AbstractDatabase):
         >>> periods_list = [f"{i}Y1" for i in range(1960, 1971)]
         >>> data = np.arange(len(vars_names) * len(periods_list), dtype=float).reshape(len(vars_names), len(periods_list))
         >>> df = pd.DataFrame(index=vars_names, columns=periods_list, data=data)
+        >>> # set first and last value to nan
+        >>> df.loc["VLA_00", "1960Y1"] = np.nan
+        >>> df.loc["BXL_02", "1970Y1"] = np.nan
+        >>> # display the dataframe
         >>> df          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
                 1960Y1  1961Y1  1962Y1  1963Y1  ...  1967Y1  1968Y1  1969Y1  1970Y1
-        VLA_00     0.0     1.0     2.0     3.0  ...     7.0     8.0     9.0    10.0
+        VLA_00     NaN     1.0     2.0     3.0  ...     7.0     8.0     9.0    10.0
         VLA_01    11.0    12.0    13.0    14.0  ...    18.0    19.0    20.0    21.0
         VLA_02    22.0    23.0    24.0    25.0  ...    29.0    30.0    31.0    32.0
         WAL_00    33.0    34.0    35.0    36.0  ...    40.0    41.0    42.0    43.0
@@ -371,7 +375,7 @@ cdef class Variables(_AbstractDatabase):
         WAL_02    55.0    56.0    57.0    58.0  ...    62.0    63.0    64.0    65.0
         BXL_00    66.0    67.0    68.0    69.0  ...    73.0    74.0    75.0    76.0
         BXL_01    77.0    78.0    79.0    80.0  ...    84.0    85.0    86.0    87.0
-        BXL_02    88.0    89.0    90.0    91.0  ...    95.0    96.0    97.0    98.0
+        BXL_02    88.0    89.0    90.0    91.0  ...    95.0    96.0    97.0     NaN
         <BLANKLINE>
         [9 rows x 11 columns]
 
@@ -384,9 +388,9 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         1960Y1:1970Y1
         >>> variables["VLA_00"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+        [-2e+37, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
         >>> variables["BXL_02"]
-        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
+        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, -2e+37]
         """
         cdef int df_pos
         cdef int ws_pos
@@ -544,17 +548,21 @@ cdef class Variables(_AbstractDatabase):
         --------
         >>> from iode import variables
         >>> import larray as la
+        >>> import numpy as np
         >>> variables.clear()
         >>> len(variables)
         0
 
         >>> regions_axis = la.Axis("region=VLA,WAL,BXL")
         >>> code_axis = la.Axis("code=00..02")
-        >>> periods_axis = la.Axis(name="time", labels=[f"{i}Y1" for i in range(1960, 1971)])
+        >>> periods_axis = la.Axis("time=1960Y1..1970Y1")
         >>> array = la.ndtest((regions_axis, code_axis, periods_axis), dtype=float)
+        >>> # set first and last value to nan
+        >>> array["VLA", "00", "1960Y1"] = np.nan
+        >>> array["BXL", "02", "1970Y1"] = np.nan
         >>> array
         region  code\time  1960Y1  1961Y1  1962Y1  ...  1968Y1  1969Y1  1970Y1
-           VLA         00     0.0     1.0     2.0  ...     8.0     9.0    10.0
+           VLA         00     nan     1.0     2.0  ...     8.0     9.0    10.0
            VLA         01    11.0    12.0    13.0  ...    19.0    20.0    21.0
            VLA         02    22.0    23.0    24.0  ...    30.0    31.0    32.0
            WAL         00    33.0    34.0    35.0  ...    41.0    42.0    43.0
@@ -562,7 +570,7 @@ cdef class Variables(_AbstractDatabase):
            WAL         02    55.0    56.0    57.0  ...    63.0    64.0    65.0
            BXL         00    66.0    67.0    68.0  ...    74.0    75.0    76.0
            BXL         01    77.0    78.0    79.0  ...    85.0    86.0    87.0
-           BXL         02    88.0    89.0    90.0  ...    96.0    97.0    98.0
+           BXL         02    88.0    89.0    90.0  ...    96.0    97.0     nan
         
         >>> # load the IODE Variables from the Array object
         >>> variables.from_array(array)
@@ -573,9 +581,9 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         1960Y1:1970Y1
         >>> variables["VLA_00"]
-        [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+        [-2e+37, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
         >>> variables["BXL_02"]
-        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0]
+        [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, -2e+37]
         """
         if la is None:
             raise RuntimeError("larray library not found")
