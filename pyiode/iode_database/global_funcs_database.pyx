@@ -127,17 +127,17 @@ def low_to_high(type_of_series: str, method: str, filepath: str, var_list: Union
     cpp_low_to_high(<EnumIodeLtoH>i_type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
 
 
-def high_to_low(type_of_series: int, filepath: str, var_list: Union[str, List[str]]):
+def high_to_low(type_of_series: str, filepath: str, var_list: Union[str, List[str]]):
     """
     Transform high periodicity to low periodicity series (i.e. variables).
 
     Parameters
     ----------
-    type_of_series : int
+    type_of_series : str
         Three types of series are considered : 
-            - HTOL_LAST : last sub-period value
-            - HTOL_MEAN : average of sub-period data
-            - HTOL_SUM : addition of sub-period data
+            - 'L' (HTOL_LAST) : last sub-period value
+            - 'M' (HTOL_MEAN) : average of sub-period data
+            - 'S' (HTOL_SUM) : addition of sub-period data
 
     filepath : str
         Filepath to the source data file.
@@ -179,11 +179,13 @@ def high_to_low(type_of_series: int, filepath: str, var_list: Union[str, List[st
     >>> variables["ACAG", "2010Y1":"2014Y1"]
     [28.253928978210485, 29.284600364034908, 30.323961150311572, 31.370138810695362, 32.4202988291984]
     """
-    if not isinstance(type_of_series, int):
-        raise TypeError(f"'type_of_series': Expected value of type int. Got value of type {type(type_of_series).__name__} instead")
+    if not isinstance(type_of_series, str):
+        raise TypeError(f"'type_of_series': Expected value of type str. Got value of type {type(type_of_series).__name__} instead")
 
+    type_of_series = type_of_series.upper()
     if type_of_series not in [HTOL_LAST, HTOL_MEAN, HTOL_SUM]:
-        raise ValueError(f"'type_of_series': possible values are HTOL_LAST, HTOL_MEAN or HTOL_SUM. Got value {type_of_series} instead")
+        raise ValueError(f"'type_of_series': possible values are 'L' (HTOL_LAST), 'M' (HTOL_MEAN) or 'S' (HTOL_SUM). "
+                         f"Got value {type_of_series} instead")
 
     if not isinstance(filepath, str):
         raise TypeError(f"'filepath': Expected value of type str. Got value of type {type(filepath).__name__} instead")
@@ -194,4 +196,5 @@ def high_to_low(type_of_series: int, filepath: str, var_list: Union[str, List[st
     if not isinstance(var_list, str):
         raise TypeError(f"'filepath': Expected value of type str or list of str. Got value of type {type(filepath).__name__} instead")
 
-    cpp_high_to_low(<EnumIodeHtoL>type_of_series, filepath.encode(), var_list.encode())
+    i_type_of_series = HTOL_SERIES_TYPES_DICT[type_of_series]
+    cpp_high_to_low(<EnumIodeHtoL>i_type_of_series, filepath.encode(), var_list.encode())
