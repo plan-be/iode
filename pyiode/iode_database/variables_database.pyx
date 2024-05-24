@@ -67,6 +67,47 @@ cdef inline _iodevar_to_ndarray(char* name, bint copy = True):
         vararray.fill(np.nan)
     return vararray
 
+# TODO: (ALD) - check in the Cython 3.0 documentation if there is no other way to create and initialize a Numpy array
+#             - rewrite this function to be based on the C++ API
+def _numpy_array_to_ws(data, vars_names: Iterable[str], periods_list: Iterable[str]):
+    cdef int df_pos
+    cdef int ws_pos
+    cdef int lg
+
+    nb_periods_ = len(periods_list)
+    lg = nb_periods_
+    start_period, last_period = periods_list[0], periods_list[-1]
+
+    # calculate:
+    #   - df_pos: the position of the first element of data to be copied into WS
+    #   - ws_pos: the position in KV_WS sample where to copy df[...pos]
+    #   - the nb of values to be copied 
+    IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), &df_pos, &ws_pos, &lg)
+
+    # replace numpy/pandas NaN by IODE NaN
+    data = np.nan_to_num(data, nan=nan)
+
+    # copy each line of array into KV_WS on the time intersection of df and KV_WS
+    # values = <double*>np.PyArray_DATA(df[vars_names[0]].data)
+    if np.issubdtype(data.dtype, np.floating):
+        if data.data.c_contiguous:
+            for name, row_data in zip(vars_names, data):
+                # Save the vector of doubles in KV_WS
+                values = < double * > np.PyArray_DATA(row_data)
+                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+        else:
+            for name, row_data in zip(vars_names, data):
+                row_data = row_data.copy()  # copy if non contiguous
+                # Save the vector of doubles in KV_WS
+                values = < double * > np.PyArray_DATA(row_data)
+                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+    else:
+        for name, row_data in zip(vars_names, data):
+            row_data = row_data.astype("double") # astype creates a copy
+            # Save the vector of doubles in KV_WS
+            values = <double*>np.PyArray_DATA(row_data)
+            IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+
 
 @cython.final
 cdef class Variables(_AbstractDatabase):
@@ -392,55 +433,22 @@ cdef class Variables(_AbstractDatabase):
         >>> variables["BXL_02"]
         [88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, -2e+37]
         """
-        cdef int df_pos
-        cdef int ws_pos
-        cdef int lg
-
         if pd is None:
             raise RuntimeError("pandas library not found")
-
-        # replace numpy/pandas NaN by IODE NaN
-        df = df.fillna(nan)
 
         # list of variable names
         vars_names = df.index.to_list()
 
         # list of periods
         periods_list = df.columns.to_list()
-        start_period, last_period = periods_list[0], periods_list[-1]
-        self.sample = f"{start_period}:{last_period}"
 
-        nb_periods_ = len(periods_list)
-        lg = nb_periods_
+        # override the current sample
+        self.sample = f"{periods_list[0]}:{periods_list[-1]}"
 
-        # calculate:
-        #   - df_pos: the position of the first element of data to be copied into WS
-        #   - ws_pos: the position in KV_WS sample where to copy df[...pos]
-        #   - the nb of values to be copied 
-        IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), &df_pos, &ws_pos, &lg)
-
-        # copy each line of array into KV_WS on the time intersection of df and KV_WS
-        # values = <double*>np.PyArray_DATA(df[vars_names[0]].data)
-
+        # numpy data
         data = df.to_numpy(copy=False)
-        if np.issubdtype(data.dtype, np.floating):
-            if data.data.c_contiguous:
-                for name, row_data in zip(vars_names, data):
-                    # Save the vector of doubles in KV_WS
-                    values = < double * > np.PyArray_DATA(row_data)
-                    IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-            else:
-                for name, row_data in zip(vars_names, data):
-                    row_data = row_data.copy()  # copy if non contiguous
-                    # Save the vector of doubles in KV_WS
-                    values = < double * > np.PyArray_DATA(row_data)
-                    IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
-        else:
-            for name, row_data in zip(vars_names, data):
-                row_data = row_data.astype("double") # astype creates a copy
-                # Save the vector of doubles in KV_WS
-                values = <double*>np.PyArray_DATA(row_data)
-                IodeSetVector(_cstr(name), values, df_pos, ws_pos, lg)
+
+        _numpy_array_to_ws(data, vars_names, periods_list)
 
     def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> DataFrame:
         """
@@ -599,9 +607,10 @@ cdef class Variables(_AbstractDatabase):
         array = array.transpose(..., time_axis_name)
         if array.ndim > 2:
             array = array.combine_axes(array.axes[:-1], sep=sep)
-
-        df = array.to_frame()
-        self.from_frame(df)
+        
+        vars_names = array.axes[0].labels
+        periods_list = array.axes[1].labels
+        _numpy_array_to_ws(array.data, vars_names, periods_list)
 
     def to_array(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> Array:
         """
