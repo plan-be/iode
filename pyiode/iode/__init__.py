@@ -45,10 +45,7 @@ from .iode_python import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_prin
                           w_print_pg_footer, w_print_pg_header, w_print_tit)
 
 # Estimation - Simulation
-from .iode_python import (model_calc_scc, model_simulate, model_simulate_cpu, model_simulate_cpu_scc, 
-                          model_simulate_cpu_sort, model_simulate_eps, model_simulate_init_values, 
-                          model_simulate_maxit, model_simulate_nb_passes, model_simulate_niter, model_simulate_norm, 
-                          model_simulate_relax, model_simulate_save_parms, model_simulate_scc, model_simulate_sort_algo)
+from .iode_python import Simulation
 
 # lec
 from .iode_python import execute_lec
@@ -100,10 +97,7 @@ __all__ = [
     'w_print_pg_header', 'w_print_tit', 
 
     # Estimation - Simulation
-    'model_calc_scc', 'model_simulate', 'model_simulate_cpu', 'model_simulate_cpu_scc', 'model_simulate_cpu_sort', 
-    'model_simulate_eps', 'model_simulate_init_values', 'model_simulate_maxit', 'model_simulate_nb_passes', 
-    'model_simulate_niter', 'model_simulate_norm', 'model_simulate_relax', 'model_simulate_save_parms', 
-    'model_simulate_scc', 'model_simulate_sort_algo', 
+    'Simulation', 
 
     # lec
     'execute_lec', 
