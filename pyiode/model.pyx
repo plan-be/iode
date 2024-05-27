@@ -11,8 +11,8 @@
 #                   eps: float = 0.0001, 
 #                   relax: float = 1.0, 
 #                   maxit: int = 100, 
-#                   init_values: int = SIMU_INIT_TM1, 
-#                   sort_algo: int = SORT_BOTH, 
+#                   init_values: int = EnumSimulationInitialization.IV_INIT_TM1, 
+#                   sort_algo: int = EnumSimulationSortAlgorithm.I_SORT_BOTH, 
 #                   nb_passes: int = 5, 
 #                   debug: bool = False, 
 #                   newton_eps: float = 1e-6, 
@@ -32,7 +32,7 @@
 #                           eps: float = 0.0001, 
 #                           relax: float = 1.0, 
 #                           maxit: int = 100, 
-#                           init_values: int = SIMU_INIT_TM1, 
+#                           init_values: int = EnumSimulationInitialization.IV_INIT_TM1, 
 #                           debug: bool = False, 
 #                           newton_eps: float = 1e-6, 
 #                           newton_maxit: int = 50, 
@@ -56,8 +56,9 @@
 # model_simulate_norm(period: str) -> float     | Returns the convergence threshold reached during the last simulation of the given period
 
 from model cimport (IodeModelSimulate, IodeModelCalcSCC, IodeModelSimulateSCC, IodeModelSimNorm, IodeModelSimNIter, IodeModelSimCpu, 
-                           IodeModelCpuSort, IodeModelCpuSCC, KSIM_MAXIT, KSIM_EPS, KSIM_RELAX, KSIM_PASSES, KSIM_SORT, KSIM_START, 
-                           KSIM_CPU_SCC, KSIM_CPU_SORT)
+                    IodeModelCpuSort, IodeModelCpuSCC, KSIM_MAXIT, KSIM_EPS, KSIM_RELAX, KSIM_PASSES, KSIM_SORT, KSIM_START, 
+                    KSIM_CPU_SCC, KSIM_CPU_SORT)
+from pyiode.common cimport EnumSimulationSortAlgorithm, EnumSimulationInitialization
 
 # TODO: (ald) add Parameters, Returns and Examples section
 def model_simulate(sample_from: str, sample_to: str, 
@@ -66,8 +67,8 @@ def model_simulate(sample_from: str, sample_to: str,
                     eps: float = 0.0001, 
                     relax: float = 1.0, 
                     maxit: int = 100, 
-                    init_values: int = SIMU_INIT_TM1, 
-                    sort_algo: int = SORT_BOTH, 
+                    init_values: int = EnumSimulationInitialization.IV_INIT_TM1, 
+                    sort_algo: int = EnumSimulationSortAlgorithm.I_SORT_BOTH, 
                     nb_passes: int = 5, 
                     debug: bool = False, 
                     newton_eps: float = 1e-6, 
@@ -142,7 +143,7 @@ def model_simulate_scc( sample_from: str, sample_to: str,
                         eps: float = 0.0001, 
                         relax: float = 1.0, 
                         maxit: int = 100, 
-                        init_values: int = SIMU_INIT_TM1, 
+                        init_values: int = EnumSimulationInitialization.IV_INIT_TM1, 
                         debug: bool = False, 
                         newton_eps: float = 1e-6, 
                         newton_maxit: int = 50, 
@@ -163,8 +164,8 @@ def model_simulate_save_parms(
                     eps: float = 0.0001, 
                     relax: float = 1.0, 
                     maxit: int = 100, 
-                    init_values: int = SIMU_INIT_TM1, 
-                    sort_algo: int = SORT_BOTH, 
+                    init_values: int = EnumSimulationInitialization.IV_INIT_TM1, 
+                    sort_algo: int = EnumSimulationSortAlgorithm.I_SORT_BOTH, 
                     nb_passes: int = 1):
     ''' 
         Save in the global variables KSIM_* the simulation parameters used during the last 
@@ -208,9 +209,9 @@ def model_simulate_nb_passes() -> int:
 def model_simulate_sort_algo() -> int:
     ''' 
     Returns the sort_algo parameter of the last simulation: 
-        - iode.SORT_CONNEX (0) for SCC decomposition only
-        - iode.SORT_BOTH (1)   for SCC decomposition and triangulation
-        - iode.SORT_NONE (2)   for no reordering nor SCC decomposition
+        - SIMULATION_SORT_CONNEX (0) for SCC decomposition only
+        - SIMULATION_EnumSimulationSortAlgorithm.I_SORT_BOTH (1)   for SCC decomposition and triangulation
+        - SIMULATION_SORT_NONE (2)   for no reordering nor SCC decomposition
     '''
     
     return KSIM_SORT
@@ -220,13 +221,13 @@ def model_simulate_sort_algo() -> int:
 def model_simulate_init_values() -> int:
     ''' 
     Returns the init_values parameter of the last simulation:
-        - iode.SIMU_INIT_TM1      (0): Y := Y[-1], if Y null or NA 
-        - iode.SIMU_INIT_TM1_A    (1): Y := Y[-1], always 
-        - iode.SIMU_INIT_EXTRA    (2): Y := extrapolation, if Y null or NA 
-        - iode.SIMU_INIT_EXTRA_A  (3): Y := extrapolation, always 
-        - iode.SIMU_INIT_ASIS     (4): Y unchanged 
-        - iode.SIMU_INIT_TM1_NA   (5): Y := Y[-1], if Y is NA 
-        - iode.SIMU_INIT_EXTRA_NA (6): Y := extrapolation, if Y is NA 
+        - EnumSimulationInitialization.IV_INIT_TM1      (0): Y := Y[-1], if Y null or NA 
+        - EnumSimulationInitialization.IV_INIT_TM1_A    (1): Y := Y[-1], always 
+        - SIMULATION_INIT_EXTRA    (2): Y := extrapolation, if Y null or NA 
+        - SIMULATION_INIT_EXTRA_A  (3): Y := extrapolation, always 
+        - SIMULATION_INIT_ASIS     (4): Y unchanged 
+        - EnumSimulationInitialization.IV_INIT_TM1_NA   (5): Y := Y[-1], if Y is NA 
+        - SIMULATION_INIT_EXTRA_NA (6): Y := extrapolation, if Y is NA 
     '''
     return KSIM_START
 
