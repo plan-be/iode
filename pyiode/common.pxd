@@ -157,3 +157,10 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
 
     cdef vector[string] v_var_modes
     
+cdef extern from "cpp_api/compute/simulation.h":
+    cdef enum EnumSimulationSortAlgorithm:
+        I_SORT_CONNEX,
+        I_SORT_BOTH,
+        I_SORT_NONE
+
+    cdef vector[string] v_simulation_sort_algorithm

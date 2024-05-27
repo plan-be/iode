@@ -11,9 +11,11 @@ from pyiode.common cimport (EnumIodeType, EnumIodeFile, EnumLang, EnumIodeEquati
                             EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization)
+                            EnumIodeVarMode, EnumSimulationInitialization, 
+                            EnumSimulationSortAlgorithm)
 from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
-                            v_simulation_initialization, mLowToHigh)
+                            v_simulation_initialization, v_simulation_sort_algorithm, 
+                            mLowToHigh)
 
 try:
     import pandas as pd
@@ -189,16 +191,6 @@ VAR_MODE_Y0Y_GROWTH_RATE: int = EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE
 
 VARIABLES_MODES = _cpp_string_vector_to_py(v_var_modes)
 
-SIMU_INIT_TM1: int = EnumSimulationInitialization.IV_INIT_TM1
-SIMU_INIT_TM1_A: int = EnumSimulationInitialization.IV_INIT_TM1_A
-SIMU_INIT_EXTRA: int = EnumSimulationInitialization.IV_INIT_EXTRA
-SIMU_INIT_EXTRA_A: int = EnumSimulationInitialization.IV_INIT_EXTRA_A
-SIMU_INIT_ASIS: int = EnumSimulationInitialization.IV_INIT_ASIS
-SIMU_INIT_TM1_NA: int = EnumSimulationInitialization.IV_INIT_TM1_NA
-SIMU_INIT_EXTRA_NA: int = EnumSimulationInitialization.IV_INIT_EXTRA_NA
-
-SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)
-
 LTOH_STOCK: str = 'S'
 LTOH_FLOW: str = 'F'
 LTOH_SERIES_TYPES_DICT = {'S': EnumIodeLtoH.LTOH_STOCK, 'F': EnumIodeLtoH.LTOH_FLOW}
@@ -214,9 +206,33 @@ HTOL_SERIES_TYPES_DICT = {'L': EnumIodeHtoL.HTOL_LAST, 'M': EnumIodeHtoL.HTOL_ME
 
 LOW_TO_HIGH_DICT: Dict[str, str] = _cpp_char_string_map_to_py(mLowToHigh)
 
-SORT_CONNEX: int = 0
-SORT_BOTH: int = 1
-SORT_NONE: int = 2
+SIMULATION_SORT_CONNEX: str = 'connex'
+SIMULATION_SORT_BOTH: str = 'both'
+SIMULATION_SORT_NONE: str = 'none'
+
+SIMULATION_SORT_ALGORITHMS = _cpp_string_vector_to_py(v_simulation_sort_algorithm)
+SIMULATION_SORT_ALGORITHM_DICT = {EnumSimulationSortAlgorithm.I_SORT_CONNEX: 'connex', 
+                                  EnumSimulationSortAlgorithm.I_SORT_BOTH: 'both',
+                                  EnumSimulationSortAlgorithm.I_SORT_NONE: 'none'}
+SIMULATION_SORT_ALGORITHM_REV_DICT = {value: key for key, value in SIMULATION_SORT_ALGORITHM_DICT.items()}
+
+SIMULATION_INIT_TM1: str = 'tm1'
+SIMULATION_INIT_TM1_A: str = 'tm1_a'
+SIMULATION_INIT_EXTRA: str = 'extra'
+SIMULATION_INIT_EXTRA_A: str = 'extra_a'
+SIMULATION_INIT_ASIS: str = 'asis'
+SIMULATION_INIT_TM1_NA: str = 'tm1_na'
+SIMULATION_INIT_EXTRA_NA: str = 'extra_na'
+
+SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)
+SIMULATION_INITIALIZATION_DICT = {EnumSimulationInitialization.IV_INIT_TM1: 'tm1',
+                                  EnumSimulationInitialization.IV_INIT_TM1_A: 'tm1_a',
+                                  EnumSimulationInitialization.IV_INIT_EXTRA: 'extra',
+                                  EnumSimulationInitialization.IV_INIT_EXTRA_A: 'extra_a',
+                                  EnumSimulationInitialization.IV_INIT_ASIS: 'asis',
+                                  EnumSimulationInitialization.IV_INIT_TM1_NA: 'tm1_na',
+                                  EnumSimulationInitialization.IV_INIT_EXTRA_NA: 'extra_na'}
+SIMULATION_INITIALIZATION_REV_DICT = {value: key for key, value in SIMULATION_INITIALIZATION_DICT.items()}
 
 W_GDI: int = 1
 W_A2M: int = 7
