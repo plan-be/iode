@@ -20,6 +20,11 @@ from .iode_objects import (get_cmt, get_eqs, get_eqs_lec, get_idt, get_lst, get_
 # lec
 from .lec import exec_lec
 
+# model
+from .model import (model_simulate, model_calc_scc, model_simulate_scc, model_simulate_save_parms, 
+                    model_simulate_maxit, model_simulate_eps, model_simulate_relax, model_simulate_nb_passes, 
+                    model_simulate_sort_algo, model_simulate_init_values, model_simulate_niter, model_simulate_norm)
+
 # miscellaneous
 
 # Reports
@@ -50,6 +55,11 @@ _deprecated = [
     
     # lec
     'exec_lec', 
+    
+    # model
+    'model_simulate', 'model_calc_scc', 'model_simulate_scc', 'model_simulate_save_parms', 
+    'model_simulate_maxit', 'model_simulate_eps', 'model_simulate_relax', 'model_simulate_nb_passes', 
+    'model_simulate_sort_algo', 'model_simulate_init_values', 'model_simulate_niter', 'model_simulate_norm',
 
     # miscellaneous
 
