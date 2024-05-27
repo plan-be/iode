@@ -112,6 +112,8 @@ include "iode_database/scalars_database.pyx"
 include "iode_database/tables_database.pyx"
 include "iode_database/variables_database.pyx"
 
+include "compute/simulation.pyx"
+
 include "estim.pyx"
 include "model.pyx"
 include "print.pyx"
