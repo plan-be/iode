@@ -294,7 +294,23 @@ SIMULATION
 .. autosummary::
    :toctree: _generated
    
-   model_simulate
+   Simulation
+
+   Simulation.convergence_threshold
+   Simulation.relax
+   Simulation.sort_algorithm
+   Simulation.initialization_method
+   Simulation.max_nb_iterations
+   Simulation.max_nb_iterations_newton
+   Simulation.nb_passes
+   Simulation.debug
+   Simulation.debug_newton
+
+   Simulation.model_exchange
+   Simulation.model_compile
+   Simulation.model_simulate
+   Simulation.model_calculate_SCC
+   Simulation.model_simulate_SCC
 
 
 ***
