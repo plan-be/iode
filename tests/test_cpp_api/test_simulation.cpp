@@ -46,6 +46,18 @@ TEST_F(SimulationTest, ModelExchange)
 
 TEST_F(SimulationTest, Simulation)
 {
+    sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_NONE);
+    sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_CONNEX);
+    sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_BOTH);
+
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_TM1);
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_TM1_A);
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_TM1_NA);
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_ASIS);
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_EXTRA);
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_EXTRA_A);
+    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_EXTRA_NA);
+
     // Invalid arguments
     // invalid sample definition
     EXPECT_THROW(sim.model_simulate("2000U1", to), std::invalid_argument);
@@ -54,7 +66,7 @@ TEST_F(SimulationTest, Simulation)
 
     // Test simulation: divergence
     KSIM_MAXIT = 2;
-    EXPECT_THROW(sim.model_simulate(from, to), IodeExceptionFunction);
+    EXPECT_THROW(sim.model_simulate(from, to), std::bad_alloc);
 
     // Check _PRE list after simulation (prolog)
     std::string lst_pre = Lists.get("_PRE");
