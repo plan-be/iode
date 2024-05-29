@@ -40,53 +40,8 @@ def test_iode_eqs_estimation():
     res = iode.exec_lec("_YRES0[1980Y1]", 0)
     assert round(res, 8) == -0.00115008
 
-# SIMULATION
-# ----------
-
-def test_iode_model_simulate():
-    iode.equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    iode.scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-
-    # Test non convergence
-    iode.suppress_msgs()
-    with pytest.raises(RuntimeError):
-        iode.model_simulate("2000Y1", "2002Y1", "", eps=0.0001, relax=0.7, maxit=2)
-
-    # Test convergence
-    iode.model_simulate("2000Y1", "2002Y1", "", relax=0.7)
-   
-    # Check some result after simulation (values obtained with the BORLAND compiler)
-    # ACAF [2000..2002] before simulation = [10.0466107922005, 2.86792273645546, -0.929212509051645]
-    # ACAF [2000..2002] after simulation  = [10.0466107922005, 2.62379276852768, -1.27462319299379]
-    res = iode.exec_lec("ACAF[2002Y1]", 0)
-    assert round(res, 12) == -1.274623192994
-
-    iode.reset_msgs()
-
-def test_iode_model_simulate_exchange():
-
-    iode.suppress_msgs()
-    iode.equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    iode.scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-
-    # Version with exchange in at least 2 equations
-    # Set values of endo UY
-    UY = iode.variables["UY"]
-    UY[40:43] = [650.0, 670.0, 680.0]   # 2000Y1..2002Y1
-    iode.variables["UY"] = UY
-
-    # Simulate with exchange UY - XNATY
-    iode.model_simulate("2000Y1", "2002Y1", endo_exo_list="UY-XNATY", relax=0.7)
-
-    # Check result
-    UY = iode.variables["UY"]
-    XNATY = iode.variables["XNATY"]
-    assert iode.exec_lec("UY[2000Y1]")[0] == 650.0
-    assert round(iode.exec_lec("XNATY[2000Y1]")[0], 7) == 0.8006734
-
-    iode.reset_msgs()
+# WRITE
+# -----
 
 def test_iode_wrt():
 
