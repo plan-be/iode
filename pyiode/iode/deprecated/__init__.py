@@ -17,6 +17,9 @@ from .iode_objects import (get_cmt, get_eqs, get_eqs_lec, get_idt, get_lst, get_
                            data_update_idt, data_update_lst, data_update_scl, data_update_var, delete_obj, delete_objects, 
                            delete_cmt, delete_eqs, delete_idt, delete_lst, delete_scl, delete_tbl, delete_var, idt_execute) 
 
+# lec
+from .lec import exec_lec
+
 # miscellaneous
 
 # Reports
@@ -45,6 +48,9 @@ _deprecated = [
     'data_update_var', 'delete_obj', 'delete_objects', 'delete_cmt', 'delete_eqs', 'delete_idt', 'delete_lst', 
     'delete_scl', 'delete_tbl', 'delete_var', 'idt_execute',  
     
+    # lec
+    'exec_lec', 
+
     # miscellaneous
 
     # Reports
