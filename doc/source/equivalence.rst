@@ -355,3 +355,19 @@ Computed Tables
     | ``ViewNdec``         | ``tables[table_name].compute(generalized_sample, extra_files, nb_decimals)`` --> See :meth:`iode.Table.compute` |
     +----------------------+-----------------------------------------------------------------------------------------------------------------+
 
+==================
+Execute Identities 
+==================
+
+    +----------------------+-------------------------------------------------------------------------------------------------------------------------+
+    | IODE Report Commands | Python Equivalent                                                                                                       |
+    +======================+=========================================================================================================================+
+    | `idtexecute`         | ``identities.execute(identities, from_period, to_period, var_files, scalar_files, trace)`` --> See `Identities.execute` | 
+    +----------------------+-------------------------------------------------------------------------------------------------------------------------+
+    | `idtexecutetrace`    | ``identities.execute(identities, from_period, to_period, var_files, scalar_files, trace)`` --> See `Identities.execute` |
+    +----------------------+-------------------------------------------------------------------------------------------------------------------------+
+    | `idtexecutevarfiles` | ``identities.execute(identities, from_period, to_period, var_files, scalar_files, trace)`` --> See `Identities.execute` |
+    +----------------------+-------------------------------------------------------------------------------------------------------------------------+
+    | `idtexecutesclfiles` | ``identities.execute(identities, from_period, to_period, var_files, scalar_files, trace)`` --> See `Identities.execute` |
+    +----------------------+-------------------------------------------------------------------------------------------------------------------------+
+  
