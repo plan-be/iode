@@ -50,8 +50,11 @@ from .iode_python import (model_calc_scc, model_simulate, model_simulate_cpu, mo
                           model_simulate_maxit, model_simulate_nb_passes, model_simulate_niter, model_simulate_norm, 
                           model_simulate_relax, model_simulate_save_parms, model_simulate_scc, model_simulate_sort_algo)
 
+# lec
+from .iode_python import execute_lec
+
 # miscellaneous
-from .iode_python import exec_lec, add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
+from .iode_python import add_error_msg, clear_error_msgs, display_error_msgs, reset_msgs, suppress_msgs
 
 
 # NOTE: didn't add TableLine/TableCell/ComputedTable to avoid users to create instances of these classes.
@@ -102,8 +105,11 @@ __all__ = [
     'model_simulate_niter', 'model_simulate_norm', 'model_simulate_relax', 'model_simulate_save_parms', 
     'model_simulate_scc', 'model_simulate_sort_algo', 
 
+    # lec
+    'execute_lec', 
+
     # miscellaneous
-    'exec_lec', 'add_error_msg', 'clear_error_msgs', 'display_error_msgs', 'reset_msgs', 'suppress_msgs', 
+    'add_error_msg', 'clear_error_msgs', 'display_error_msgs', 'reset_msgs', 'suppress_msgs', 
 ]
 
 # ==== DEPRECATED API ====
