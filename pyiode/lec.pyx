@@ -1,43 +1,75 @@
-#  IODE EXTENSION FOR PYTHON
-#  =========================
-#  
-#     @header4iode
-#  
-#  IODE LEC functions 
-#  ------------------
-# 
-#   exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]  | Compute a LEC formula using the current WS of VARs and SCLs
+# distutils: language = c++
 
-from lec cimport IodeExecLec, IodeExecLecT
-from iode_python cimport SCR_free
+from lec cimport execute_lec as cpp_execute_lec
 
 
-def exec_lec(lec: str, t: int = -1) -> Union[float, List[float]]:
-    '''
-    Compute a LEC formula using the current WS of VARs and SCLs.
-    The formula may be evaluate at a specific position in the sample (t) 
-    or on the whole sample (if t is < 0).
+def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, List[float]]:
+    """
+    Compute a LEC formula using the current Variables and Scalars databases.
+    The formula may be evaluate at a specific period or on the whole sample 
+    (no value for *period* is passed).
     
     Parameters
     ----------
     lec: str
-        LEC expression
-    t: int
-        if >= 0: position in the KV_WS sample of the value to be calculated
-        if < 0, the full sample is returned
+        LEC expression to be evaluated.
+    period: str or int or Period, optional
+        Period at which the LEC formula is evaluated.
+        If the passed value is of type int, then it represents 
+        the position of the period in the current sample.
+        If the passed value is None, empty string or -1, the LEC expression 
+        is evaluated over the whole sample.
+        Default to None.
     
     Returns
     -------
-    float or list of floats
-    if t >= 0: return simple float
-    if t < 0: return a list of floats
-    '''
-    cdef    double* cvar
-    
-    if t >= 0:
-        return IodeExecLecT(_cstr(lec), t)   # simple value
-    else:
-        cvar = IodeExecLec(_cstr(lec))       # vector of calculated values    
-        res = _pyfloats(cvar, variables.nb_periods)
-        SCR_free(cvar)
-        return res
+    float or list(float)
+
+    Examples
+    --------
+    >>> from iode import SAMPLE_DATA_DIR
+    >>> from iode import execute_lec, equations, scalars, variables
+    >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    >>> equations["ACAF"].lec       # doctest: +NORMALIZE_WHITESPACE
+    '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\\nacaf4*(TIME=1995)'
+    >>> variables["ACAF", "2000Y1"]
+    10.046610792200543
+    >>> lec = "(acaf1 + acaf2 * GOSF[-1] + acaf4*(TIME=1995)) * VAF[-1]"
+    >>> # pass a period value as string
+    >>> execute_lec(lec, "2000Y1")
+    10.046610792200543
+    >>> # pass a period position in the sample
+    >>> t = variables.sample.get_period_position("2000Y1")
+    >>> t
+    40
+    >>> execute_lec(lec, t)
+    10.046610792200543
+    >>> # compute the LEC formula over the whole sample
+    >>> execute_lec(lec)        # doctest: +ELLIPSIS
+    [-2e+37, 4.2884154594335815, 4.532163174288473, ..., -83.34062511080091, -96.41041982848331]
+    >>> variables["ACAF"]       # doctest: +ELLIPSIS
+    [-2e+37, -2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
+    """
+    # evaluate LEC expression over the whole sample
+    if period is None:
+        return cpp_execute_lec(lec.encode())
+
+    if isinstance(period, int):
+        if period >= 0:
+            return cpp_execute_lec(<string>lec.encode(), <int>period)
+        # evaluate LEC expression over the whole sample
+        else:
+            return cpp_execute_lec(lec.encode())
+
+    if isinstance(period, Period):
+        period = str(period)
+
+    if isinstance(period, str):
+        if len(period):
+            return cpp_execute_lec(<string>lec.encode(), <string>period.encode())
+        # evaluate LEC expression over the whole sample
+        else:
+           return cpp_execute_lec(lec.encode())
