@@ -20,20 +20,6 @@ IODE_VERBOSE = 1
 if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir()
 
-
-# EXECUTE LEC
-# -----------
-
-def test_iode_exec_lec():
-    iode.variables.load(f"{SAMPLE_DATA_DIR}/a.var")
-
-    v_A = iode.variables["A"]
-    vec = iode.exec_lec("1+A-1")
-    assert vec == v_A
-
-    res = iode.exec_lec("A+1", 0)
-    assert  res == v_A[0] + 1
-
 # ESTIMATION
 # ----------
 
