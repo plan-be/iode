@@ -297,14 +297,22 @@ SIMULATION
    model_simulate
 
 
-*************
-REPORTS - LEC
-*************
+***
+LEC
+***
 
 .. autosummary::
    :toctree: _generated
 
-   exec_lec
+   execute_lec
+
+*******
+REPORTS
+*******
+
+.. autosummary::
+   :toctree: _generated
+
    report_exec
    reportline_exec
 
@@ -455,3 +463,5 @@ DEPRECATED
    ws_sample_nb_periods
    ws_sample_to_string
    ws_sample_to_list
+
+   exec_lec
