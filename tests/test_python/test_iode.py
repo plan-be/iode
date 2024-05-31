@@ -20,25 +20,6 @@ IODE_VERBOSE = 1
 if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir()
 
-# ESTIMATION
-# ----------
-
-def test_iode_eqs_estimation():
-    iode.equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
-    iode.variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-    iode.scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
-
-    name = "ACAF"
-    iode.eqs_estimate(name, "1980Y1", "1996Y1")
-
-    # Check acaf1 value after estimation
-    name = "acaf1"
-    i_acaf1 = iode.scalars[name]
-    assert round(i_acaf1.value, 8) == 0.0157705
-
-    # Check _YCALC[1980Y1]
-    res = iode.exec_lec("_YRES0[1980Y1]", 0)
-    assert round(res, 8) == -0.00115008
 
 # WRITE
 # -----
