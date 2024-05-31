@@ -9,7 +9,7 @@ DynAdjustmentDialog::DynAdjustmentDialog(QString& lec, QWidget* parent) :
     textEdit_equation->setText(lec);
 
     QList<QString> list_methods;
-    for(const std::string& method : v_adjstment_method) list_methods.append(QString::fromStdString(method));
+    for(const std::string& method : v_adjustment_method) list_methods.append(QString::fromStdString(method));
     comboMethod = new WrapperComboBox(label_method->text(), *comboBox_method, REQUIRED_FIELD, list_methods);
     lineCoef1 = new WrapperQLineEdit(label_coefs->text(), *lineEdit_coef1, REQUIRED_FIELD);
     lineCoef2 = new WrapperQLineEdit(label_coefs->text(), *lineEdit_coef2, REQUIRED_FIELD);
