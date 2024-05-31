@@ -41,6 +41,9 @@ cdef extern from "cpp_api/KDB/kdb_reference.h":
     void clear_reference_kdb(int index, EnumIodeFile iode_file) except +
     void clear_all_reference_kdbs() except +
 
+cdef extern from "cpp_api/compute/simulation.h":
+    void eqs_estimate(const string& eqs, const string& from_period, const string& to_period) except +
+
 cdef extern from "cpp_api/KDB/kdb_abstract.h":
     cdef cppclass KDBAbstract:    
         # Public methods
