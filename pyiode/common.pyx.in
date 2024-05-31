@@ -7,15 +7,17 @@ from libcpp.vector cimport vector
 from libcpp.map cimport map
 
 from pyiode.common cimport L_NAN, I_NB_TYPES, EQS_NBTESTS
+from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
+from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
 from pyiode.common cimport (EnumIodeType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
                             EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             EnumIodeVarMode, EnumSimulationInitialization, 
-                            EnumSimulationSortAlgorithm)
+                            EnumSimulationSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
-                            mLowToHigh)
+                            v_adjustment_method, mLowToHigh)
 
 try:
     import pandas as pd
@@ -233,6 +235,14 @@ SIMULATION_INITIALIZATION_DICT = {EnumSimulationInitialization.IV_INIT_TM1: 'tm1
                                   EnumSimulationInitialization.IV_INIT_TM1_NA: 'tm1_na',
                                   EnumSimulationInitialization.IV_INIT_EXTRA_NA: 'extra_na'}
 SIMULATION_INITIALIZATION_REV_DICT = {value: key for key, value in SIMULATION_INITIALIZATION_DICT.items()}
+
+ESTIMATION_MAXIT: int = C_ESTIMATION_MAXIT 
+ESTIMATION_EPS: float = C_ESTIMATION_EPS
+
+ADJUSTMENT_PARTIAL: int = EnumIodeAdjustmentMethod.AM_PARTIAL_ADJUSTMENT
+ADJUSTMENT_ERROR_CORRECTION_METHOD: int = EnumIodeAdjustmentMethod.AM_ERROR_CORRECTION_METHOD
+
+ADJUSTMENT_METHODS_LIST = _cpp_string_vector_to_py(v_adjustment_method)
 
 W_GDI: int = 1
 W_A2M: int = 7

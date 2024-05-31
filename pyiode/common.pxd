@@ -164,3 +164,12 @@ cdef extern from "cpp_api/compute/simulation.h":
         I_SORT_NONE
 
     cdef vector[string] v_simulation_sort_algorithm
+
+cdef extern from "cpp_api/compute/estimation.h":
+    cdef enum EnumIodeAdjustmentMethod:
+        AM_PARTIAL_ADJUSTMENT,
+        AM_ERROR_CORRECTION_METHOD
+
+    cdef vector[string] v_adjustment_method
+    cdef int    ESTIMATION_MAXIT
+    cdef double ESTIMATION_EPS
