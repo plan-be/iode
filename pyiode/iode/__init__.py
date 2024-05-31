@@ -46,7 +46,7 @@ from .iode_python import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_prin
                           w_print_pg_footer, w_print_pg_header, w_print_tit)
 
 # Estimation - Simulation
-from .iode_python import Simulation
+from .iode_python import Simulation, dynamic_adjustment, dickey_fuller_test 
 
 # lec
 from .iode_python import execute_lec
@@ -99,7 +99,7 @@ __all__ = [
     'w_print_pg_header', 'w_print_tit', 
 
     # Estimation - Simulation
-    'Simulation', 
+    'Simulation', 'dynamic_adjustment', 'dickey_fuller_test', 
 
     # lec
     'execute_lec', 

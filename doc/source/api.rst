@@ -285,6 +285,8 @@ ESTIMATION
    :toctree: _generated
 
    eqs_estimate
+   dynamic_adjustment
+   dickey_fuller_test 
 
 
 **********
