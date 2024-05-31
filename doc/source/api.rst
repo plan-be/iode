@@ -285,7 +285,7 @@ ESTIMATION
 .. autosummary::
    :toctree: _generated
 
-   eqs_estimate
+   Equations.estimate
    dynamic_adjustment
    dickey_fuller_test 
 
@@ -484,6 +484,8 @@ DEPRECATED
    ws_sample_to_list
 
    exec_lec
+
+   eqs_estimate
 
    model_simulate
    model_calc_scc
