@@ -149,13 +149,14 @@ cdef class Variables(_AbstractDatabase):
     >>> len(variables)
     394
     """
-
+    cdef bint ptr_owner
     cdef CKDBVariables* database_ptr
     cdef EnumIodeVarMode mode_
 
     def __cinit__(self, filepath: str = None) -> Variables:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
         self.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
 
     def __init__(self, filepath: str = None):
@@ -164,17 +165,25 @@ cdef class Variables(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Variables 
+        # if self.database_ptr points to the C++ global instance Variables 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Variables:
+    cdef Variables _from_ptr(CKDBVariables* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Variables wrapper = Variables.__new__(Variables)
-        wrapper.database_ptr = &cpp_global_variables
-        wrapper.abstract_db_ptr = &cpp_global_variables
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_variables
+            wrapper.abstract_db_ptr = &cpp_global_variables
         wrapper.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
         return wrapper
 
@@ -1220,4 +1229,4 @@ cdef class Variables(_AbstractDatabase):
         self.database_ptr.trend_correction(input_file.encode(), lambda_, series.encode(), <bint>log)
 
 
-variables: Variables = Variables._get_instance()
+variables: Variables = Variables._from_ptr()

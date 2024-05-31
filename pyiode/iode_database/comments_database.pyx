@@ -38,12 +38,13 @@ cdef class Comments(_AbstractDatabase):
     >>> len(comments)
     317
     """
-
+    cdef bint ptr_owner
     cdef CKDBComments* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Comments:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -51,17 +52,25 @@ cdef class Comments(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Comments 
+        # if self.database_ptr points to the C++ global instance Comments 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Comments:
+    cdef Comments _from_ptr(CKDBComments* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Comments wrapper = Comments.__new__(Comments)
-        wrapper.database_ptr = &cpp_global_comments
-        wrapper.abstract_db_ptr = &cpp_global_comments
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_comments
+            wrapper.abstract_db_ptr = &cpp_global_comments
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -97,4 +106,4 @@ cdef class Comments(_AbstractDatabase):
             self.database_ptr.add(key.encode(), value.encode())
 
 
-comments: Comments = Comments._get_instance()
+comments: Comments = Comments._from_ptr()

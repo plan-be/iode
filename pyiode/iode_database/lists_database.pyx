@@ -38,12 +38,13 @@ cdef class Lists(_AbstractDatabase):
     >>> len(lists)
     17
     """
-
+    cdef bint ptr_owner
     cdef CKDBLists* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Lists:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -51,17 +52,25 @@ cdef class Lists(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Lists 
+        # if self.database_ptr points to the C++ global instance Lists 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Lists:
+    cdef Lists _from_ptr(CKDBLists* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
-        wrapper.database_ptr = &cpp_global_lists
-        wrapper.abstract_db_ptr = &cpp_global_lists
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_lists
+            wrapper.abstract_db_ptr = &cpp_global_lists
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -96,4 +105,4 @@ cdef class Lists(_AbstractDatabase):
             self.database_ptr.add(key.encode(), value.encode())
 
 
-lists: Lists = Lists._get_instance()
+lists: Lists = Lists._from_ptr()

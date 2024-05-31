@@ -40,12 +40,13 @@ cdef class Scalars(_AbstractDatabase):
     >>> len(scalars)
     161
     """
-
+    cdef bint ptr_owner
     cdef CKDBScalars* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Scalars:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -53,17 +54,25 @@ cdef class Scalars(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Scalars 
+        # if self.database_ptr points to the C++ global instance Scalars 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Scalars:
+    cdef Scalars _from_ptr(CKDBScalars* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Scalars wrapper = Scalars.__new__(Scalars)
-        wrapper.database_ptr = &cpp_global_scalars
-        wrapper.abstract_db_ptr = &cpp_global_scalars
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_scalars
+            wrapper.abstract_db_ptr = &cpp_global_scalars
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -138,4 +147,4 @@ cdef class Scalars(_AbstractDatabase):
             self.database_ptr.add(key.encode(), scalar.value, scalar.relax, scalar.std)
 
 
-scalars: Scalars = Scalars._get_instance()
+scalars: Scalars = Scalars._from_ptr()

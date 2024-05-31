@@ -40,12 +40,13 @@ cdef class Tables(_AbstractDatabase):
     >>> len(tables)
     46
     """
-
+    cdef bint ptr_owner
     cdef CKDBTables* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Tables:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -53,17 +54,25 @@ cdef class Tables(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Tables 
+        # if self.database_ptr points to the C++ global instance Tables 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Tables:
+    cdef Tables _from_ptr(CKDBTables* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Tables wrapper = Tables.__new__(Tables)
-        wrapper.database_ptr = &cpp_global_tables
-        wrapper.abstract_db_ptr = &cpp_global_tables
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_tables
+            wrapper.abstract_db_ptr = &cpp_global_tables
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -119,4 +128,4 @@ cdef class Tables(_AbstractDatabase):
             self.database_ptr.add(<string>(key.encode()), dereference(c_table))
 
 
-tables: Tables = Tables._get_instance()
+tables: Tables = Tables._from_ptr()

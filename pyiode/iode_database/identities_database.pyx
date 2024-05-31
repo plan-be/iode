@@ -39,12 +39,13 @@ cdef class Identities(_AbstractDatabase):
     >>> len(identities)
     48
     """
-
+    cdef bint ptr_owner
     cdef CKDBIdentities* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Identities:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -52,17 +53,25 @@ cdef class Identities(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Identities 
+        # if self.database_ptr points to the C++ global instance Identities 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Identities:
+    cdef Identities _from_ptr(CKDBIdentities* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Identities wrapper = Identities.__new__(Identities)
-        wrapper.database_ptr = &cpp_global_identities
-        wrapper.abstract_db_ptr = &cpp_global_identities
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_identities
+            wrapper.abstract_db_ptr = &cpp_global_identities
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -233,4 +242,4 @@ cdef class Identities(_AbstractDatabase):
                                             var_files.encode(), scalar_files.encode(), <bint>trace)
 
 
-identities: Identities = Identities._get_instance()
+identities: Identities = Identities._from_ptr()

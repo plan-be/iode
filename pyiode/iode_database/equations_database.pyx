@@ -42,12 +42,13 @@ cdef class Equations(_AbstractDatabase):
     >>> len(equations)
     274
     """
-
+    cdef bint ptr_owner
     cdef CKDBEquations* database_ptr
 
     def __cinit__(self, filepath: str = None) -> Equations:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
+        self.ptr_owner = False
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -55,17 +56,25 @@ cdef class Equations(_AbstractDatabase):
         raise TypeError("This class cannot be instantiated directly.")
 
     def __dealloc__(self):
-        # self.database_ptr points to the C++ global instance Equations 
+        # if self.database_ptr points to the C++ global instance Equations 
         # which does not need to be manually deleted 
-        pass
+        if self.ptr_owner and self.database_ptr is not NULL:
+            del self.database_ptr
+            self.database_ptr = NULL
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    def _get_instance() -> Equations:
+    cdef Equations _from_ptr(CKDBEquations* database_ptr = NULL):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Equations wrapper = Equations.__new__(Equations)
-        wrapper.database_ptr = &cpp_global_equations
-        wrapper.abstract_db_ptr = &cpp_global_equations
+        if database_ptr is not NULL:
+            wrapper.ptr_owner = True
+            wrapper.database_ptr = database_ptr
+            wrapper.abstract_db_ptr = database_ptr
+        else:
+            wrapper.ptr_owner = False
+            wrapper.database_ptr = &cpp_global_equations
+            wrapper.abstract_db_ptr = &cpp_global_equations
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -158,4 +167,4 @@ cdef class Equations(_AbstractDatabase):
             self.database_ptr.add(key.encode(), dereference(c_equation))
 
 
-equations: Equations = Equations._get_instance()
+equations: Equations = Equations._from_ptr()
