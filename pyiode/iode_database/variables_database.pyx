@@ -9,10 +9,11 @@ else:
     Self = Any
 
 cimport cython
+cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from pyiode.common cimport L_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL
-from pyiode.iode_database.cpp_api_database cimport IodeSetVector, IodeCalcSamplePosition
+from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high

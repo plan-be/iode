@@ -17,8 +17,9 @@ from pyiode.objects.table cimport CTable
 
 
 cdef extern from "api/iode.h":
-    cdef int    IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
-    cdef int    IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)
+    cdef double  *IodeGetVector(char *name, int *lg)
+    cdef int     IodeCalcSamplePosition(char *str_la_from, char* str_la_to, int *la_pos, int *ws_pos, int *la_lg)
+    cdef int     IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int la_lg)
 
 
 # C++ classes
