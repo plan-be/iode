@@ -45,7 +45,7 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
     }
 
     int pos = 0;
-    KDBScalars* kdb_res = new KDBScalars();
+    KDBScalars* kdb_res = Scalars.subset("", true);
     // order 0
     add_df_test_coeff(kdb_res, "df_", res, pos);
     pos += 3;
