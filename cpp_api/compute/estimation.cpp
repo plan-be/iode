@@ -22,10 +22,10 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
     return adjusted_eqs;
 }
 
-// Note: Same as E_SclToReal()
+// Note: +/- the same as E_SclToReal()
 static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, IODE_REAL* res, const int pos)
 {
-    kdb->add(coeff_name, res[pos], res[pos+1], (!L_IS0(res[pos+2])) ? res[pos]/res[pos+2] : L_NAN);
+    kdb->add(coeff_name, res[pos], (res[pos+1] < 1.0) ? res[pos+1]: 1.0, (!L_IS0(res[pos+2])) ? res[pos]/res[pos+2] : L_NAN);
 }
 
 // QUESTION FOR JMP : Why E_UnitRoot does not return a new KDB of scalars ? 
