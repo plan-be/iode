@@ -188,15 +188,13 @@ par exemple pendant une phase de mise au point.
 &EN ~c-man~C : ne g�n�re par les manuels (readme.htm, iode.chm, pages du site wiki)
 &EN ~c-objs~C : ne force pas la recompilation des sources .c et .cpp
 
-Le programme g�n�re d'abord les librairies n�cessaires en 32 et 64 bits (64 bits uniquement pour pyiode). 
+Le programme g�n�re d'abord les librairies n�cessaires en 32 et 64 bits. 
 
 En sortie, les fichiers suivants auront �t� reg�n�r�s :
 
 &EN  ./cmd/iodecmd.exe
 &EN  ./dos/iode.exe
 &EN  ./iodecom/iodecom.exe
-&EN  ./pyiode/py39/iode.pyd
-&EN  ./pyiode/py310/iode.pyd
 &EN  ./doc/build/readme.htm 
 &EN  ./doc/build/iode.chm
 &EN  ./nsis/iode6xx.exe
@@ -219,8 +217,6 @@ En sortie, les fichiers suivants auront �t� reg�n�r�s :
     if /I [%2] == [-objs] set objs=0
     
     set iodepath=c:\\usr\\iode_src
-    ;set pyiodepath= %USERPROFILE%\\source\\repos\\iode\\pyiode
-    set pyiodepath= %iodepath%\\pyiode
     set scr4path=c:\\usr\\scr4_src
     
     :: SCR Borland 32
@@ -269,38 +265,6 @@ En sortie, les fichiers suivants auront �t� reg�n�r�s :
     call make64
     if %errorlevel% NEQ 0 goto :err
     
-    :: goto :EOF
-    
-    :: iode.pyd -- python dll 64 bits
-    :pyiode
-    call c:\\scr\\set64.bat
-    
-    :: 1. scr4 libs VC64
-    cd %scr4path%\\vc64
-    if [%objs%] == [1] del *.obj
-    call nmake s4iode.lib
-    if %errorlevel% NEQ 0 goto :err
-    
-    :: 2: iodelibs VC64
-    cd %iodepath%\\api\\vc64
-    if [%objs%] == [1] del *.obj
-    call nmake iode_c_api.lib
-    if %errorlevel% NEQ 0 goto :err
-    
-    :: 3. iode.pyd
-    cd %iodepath%\\pyiode
-    del iode.c
-    
-    :: python 3.9 =>> pyiode\\vc64\\py39\\iode.pyd
-    call activate py39
-    call makepy.bat
-    if %errorlevel% NEQ 0 goto :err
-    
-    :: python 3.10 =>> pyiode\\vc64\\py10\\iode.pyd
-    call activate py10
-    call makepy.bat
-    if %errorlevel% NEQ 0 goto :err
-    
     :: NSIS
     cd %iodepath%\\nsis
     call makeinst.bat
@@ -342,7 +306,6 @@ SETLOCAL
 
 :: Define local source directory
 set IODE_DIR=..
-set PYIODE_DIR=%IODE_DIR%/pyiode
 set WIKI_DIR=/apache24/htdocs/w-iode
 
 :: Ouverture et mode
@@ -354,34 +317,6 @@ echo prompt                         >>>> upload_iode_ovh.ftp
 
 
 ::goto pages
-
-:: Python modules on wiki server
-echo cd /www/w-iode/data/media/download         >>>> upload_iode_ovh.ftp
-echo mkdir py36                                 >>>> upload_iode_ovh.ftp
-echo mkdir py37                                 >>>> upload_iode_ovh.ftp
-echo mkdir py38                                 >>>> upload_iode_ovh.ftp
-echo mkdir py39                                 >>>> upload_iode_ovh.ftp
-echo mkdir py310                                >>>> upload_iode_ovh.ftp
-
-echo lcd %PYIODE_DIR%/py36                      >>>> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py36    >>>> upload_iode_ovh.ftp
-echo mput iode.pyd                              >>>> upload_iode_ovh.ftp
-
-echo lcd %PYIODE_DIR%/py37                      >>>> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py37    >>>> upload_iode_ovh.ftp
-echo mput iode.pyd                              >>>> upload_iode_ovh.ftp
-
-echo lcd %PYIODE_DIR%/py38                      >>>> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py38    >>>> upload_iode_ovh.ftp
-echo mput iode.pyd                              >>>> upload_iode_ovh.ftp
-
-echo lcd %PYIODE_DIR%/py39                      >>>> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py39    >>>> upload_iode_ovh.ftp
-echo mput iode.pyd                              >>>> upload_iode_ovh.ftp
-
-echo lcd %PYIODE_DIR%/py310                     >>>> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py310   >>>> upload_iode_ovh.ftp
-echo mput iode.pyd                              >>>> upload_iode_ovh.ftp
 
 :: Installer
 echo cd /www/w-iode/data/media/download         >>>> upload_iode_ovh.ftp

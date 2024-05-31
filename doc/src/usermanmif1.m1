@@ -2,17 +2,17 @@
 #include "intro.m1"
 
 &TI Contenu du manuel
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
-Le manuel de Iode est compos‚ des chapitres suivants :
+Le manuel de Iode est composï¿½ des chapitres suivants :
 
-&EN <Introduction au logiciel> : pr‚sentation des notions de base
+&EN <Introduction au logiciel> : prï¿½sentation des notions de base
 			       (objets, workspaces, etc)
 
 &EN <Le programme IODE       > : gestion des objets, construction et
-			       exploitation des modŠles ‚conom‚triques
+			       exploitation des modï¿½les ï¿½conomï¿½triques
 
 &EN <Le langage LEC          > : syntaxe des formules dans IODE
 
@@ -20,15 +20,13 @@ Le manuel de Iode est compos‚ des chapitres suivants :
 
 &EN <Le programme IODECMD    > : utilisation de IODE sans interface
 
-&EN <Module python pour IODE><IODE: python module> : utilisation des functions et objets IODE en python
-
 &EN Le programme A2M : interface de traduction des fichiers A2m
 
 &EN Interfaces avec Excel, APL, ODBC : interfaces avec d'autres outils et langages
 
 
-&EN Methods and algorithms : description des m‚thodes d'estimation et de simulation utilis‚es dans IODE
-&EN Annexes : syntaxe des programmes et des fichiers ascii support‚s par
+&EN Methods and algorithms : description des mï¿½thodes d'estimation et de simulation utilisï¿½es dans IODE
+&EN Annexes : syntaxe des programmes et des fichiers ascii supportï¿½s par
 IODE, sample d'impression...
 
 

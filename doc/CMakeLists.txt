@@ -59,7 +59,6 @@ add_subdirectory(keyboard_shortcuts)
     #    src/dev/LEC.m
     #    src/dev/MAKE_IODE.m
     #    src/dev/PRINTING.m
-    #    src/dev/PYIODE.m
     #    src/dev/REPORTS.m
     #    src/dev/SIMUL.m
     #    src/dev/SOURCES.m

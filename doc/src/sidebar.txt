@@ -49,7 +49,6 @@
     * [[interface_tussen_relationele_db_s_en_iode|Interface tussen Relationele DB's en Iode]]
     * [[interface_entre_excel_et_iode|Interface entre Excel et Iode]]
     * [[interface_entre_l_apl_et_iode|Interface entre l'Apl et Iode]]
-  * **[[iodecolon_python_module|IODE: python module]]**
     * [[workspace_management|Workspace management]]
     * [[object_management|Object management]]
     * [[larray_slash_iode_conversions|Larray / IODE conversions]]
