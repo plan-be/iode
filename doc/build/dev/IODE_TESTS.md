@@ -43,8 +43,5 @@ The log file `./testall.log` is generated during the process.
             ./tests/test_c_api/mk.bat: rebuild iode_c_api.lib, test1.exe and test1cpp.exe
             ./tests/test_c_api/unittests.bat: run the tests on iode api            
             
-        ./tests/pyiode: pyiode tests
-            ./tests/pyiode/mk.bat: rebuild iode.pyd for python 3.9 and 3.10
-            ./tests/pyiode/unittests.bat: run the tests on iode.pyd under python 3.9 and 3.10
+        ./tests/test_python: pyiode tests
 ```
-

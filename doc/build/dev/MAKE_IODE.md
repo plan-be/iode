@@ -191,8 +191,6 @@ En sortie, les fichiers suivants auront �t� reg�n�r�s :
 - ./cmd/iodecmd.exe
 - ./dos/iode.exe
 - ./iodecom/iodecom.exe
-- ./pyiode/py39/iode.pyd
-- ./pyiode/py310/iode.pyd
 - ./doc/build/readme.htm
 - ./doc/build/iode.chm
 - ./nsis/iode6xx.exe
@@ -215,8 +213,6 @@ En sortie, les fichiers suivants auront �t� reg�n�r�s :
     if /I [%2] == [-objs] set objs=0
     
     set iodepath=c:\usr\iode_src
-    ;set pyiodepath= %USERPROFILE%\source\repos\iode\pyiode
-    set pyiodepath= %iodepath%\pyiode
     set scr4path=c:\usr\scr4_src
     
     :: SCR Borland 32
@@ -265,38 +261,6 @@ En sortie, les fichiers suivants auront �t� reg�n�r�s :
     call make64
     if %errorlevel% NEQ 0 goto :err
     
-    :: goto :EOF
-    
-    :: iode.pyd -- python dll 64 bits
-    :pyiode
-    call c:\scr\set64.bat
-    
-    :: 1. scr4 libs VC64
-    cd %scr4path%\vc64
-    if [%objs%] == [1] del *.obj
-    call nmake s4iode.lib
-    if %errorlevel% NEQ 0 goto :err
-    
-    :: 2: iodelibs VC64
-    cd %iodepath%\api\vc64
-    if [%objs%] == [1] del *.obj
-    call nmake iode_c_api.lib
-    if %errorlevel% NEQ 0 goto :err
-    
-    :: 3. iode.pyd
-    cd %iodepath%\pyiode
-    del iode.c
-    
-    :: python 3.9 => pyiode\vc64\py39\iode.pyd
-    call activate py39
-    call makepy.bat
-    if %errorlevel% NEQ 0 goto :err
-    
-    :: python 3.10 => pyiode\vc64\py10\iode.pyd
-    call activate py10
-    call makepy.bat
-    if %errorlevel% NEQ 0 goto :err
-    
     :: NSIS
     cd %iodepath%\nsis
     call makeinst.bat
@@ -337,7 +301,6 @@ SETLOCAL
  
 :: Define local source directory
 set IODE_DIR=..
-set PYIODE_DIR=%IODE_DIR%/pyiode
 set WIKI_DIR=/apache24/htdocs/w-iode
  
 :: Ouverture et mode
@@ -349,34 +312,6 @@ echo prompt                         >> upload_iode_ovh.ftp
  
  
 ::goto pages
- 
-:: Python modules on wiki server
-echo cd /www/w-iode/data/media/download         >> upload_iode_ovh.ftp
-echo mkdir py36                                 >> upload_iode_ovh.ftp
-echo mkdir py37                                 >> upload_iode_ovh.ftp
-echo mkdir py38                                 >> upload_iode_ovh.ftp
-echo mkdir py39                                 >> upload_iode_ovh.ftp
-echo mkdir py310                                >> upload_iode_ovh.ftp
- 
-echo lcd %PYIODE_DIR%/py36                      >> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py36    >> upload_iode_ovh.ftp
-echo mput iode.pyd                              >> upload_iode_ovh.ftp
- 
-echo lcd %PYIODE_DIR%/py37                      >> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py37    >> upload_iode_ovh.ftp
-echo mput iode.pyd                              >> upload_iode_ovh.ftp
- 
-echo lcd %PYIODE_DIR%/py38                      >> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py38    >> upload_iode_ovh.ftp
-echo mput iode.pyd                              >> upload_iode_ovh.ftp
- 
-echo lcd %PYIODE_DIR%/py39                      >> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py39    >> upload_iode_ovh.ftp
-echo mput iode.pyd                              >> upload_iode_ovh.ftp
- 
-echo lcd %PYIODE_DIR%/py310                     >> upload_iode_ovh.ftp
-echo cd /www/w-iode/data/media/download/py310   >> upload_iode_ovh.ftp
-echo mput iode.pyd                              >> upload_iode_ovh.ftp
  
 :: Installer
 echo cd /www/w-iode/data/media/download         >> upload_iode_ovh.ftp

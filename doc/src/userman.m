@@ -13,7 +13,7 @@ START
 
 <Annexes>
     ANNEXES
-    ÄÄÄÄÄÄÄ
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &EN Annexe 1 : <Syntaxe du programme iode>
 &EN Annexe 2 : <Syntaxe du programme iodecmd>
@@ -21,8 +21,8 @@ START
 &EN Annexe 4 : <Sample d'impression>
 &EN Annexe 5 : <Formats ASCII des objets>
 &EN Annexe 6 : <Lexique>
-&EN Annexe 7 : <L'‚diteur MMT>
-&EN Annexe 8 : <G‚n‚ration d'un fichier d'aide Windows>
+&EN Annexe 7 : <L'ï¿½diteur MMT>
+&EN Annexe 8 : <Gï¿½nï¿½ration d'un fichier d'aide Windows>
 ........... &EN Annexe 9 : Methods and algorithms
 
 ...&EN Annexe 8 : <<Support technique>>
@@ -53,4 +53,3 @@ START
 #include "sql.m"
 #include "methods.m"
 #include "interfaces.m"
-#include "pyiode.m"

@@ -52,7 +52,7 @@ Location: `c:/usr/iode_src`
 
 |Directory|Target|Contents|
 |:---|:---|:---|
-|`./pyiode`|py\{vers\}/iode.pyd|makepy.bat, cythonize\_iode.py, test\_iode.py, .pyx and .pxi sources|
+|`./pyiode`|py\{vers\}/iode.pyd|*.pyx and *.pxd sources|
 |`./api/vc64`|iode_c_api.lib (64 bits MSVC)|64 bits objects \+ VC makefile|
 |`scr4_src/vc64`|s4iode.lib (64 bits MSVC)|64 bits objects \+ VC makefile|
 
@@ -74,7 +74,7 @@ GitHub repository: `https://github.com/plan-be/iode`
 |`./tests/output`||results of test1.exe and test1cpp.exe|
 |`./cpp_api`|iode_cpp_api.lib (64 bits MSVC)|api sources|
 |`./cmd`|iodecmd.exe|iodecmd sources|
-|`./pyiode`|py\{vers\}/iode.pyd|\*.pxi, \*.pyx \+ makepy.bat \+ cythonize\_iode.py \+ test\_iode.py|
+|`./pyiode`|py\{vers\}/iode.pyd|\*.pxy and \*.pyd source files|
 |`./gui`|iode\_gui.exe|Qt sources|
 |`./scr4`|iode_scr4.lib|scr4 sources files for iode|
 |`./man`|iode.chm, iode.plan.be, readme.htm, iode.pdf|makechm.bat, makewiki.bat, makereadme.bat, makemif.bat, makedev.bat, makeall.bat|

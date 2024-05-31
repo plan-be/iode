@@ -36,4 +36,3 @@ START
 #include "sql.m"
 #include "interfaces.m"
 #include "iodecmd.m"
-#include "pyiode.m"
