@@ -15,55 +15,6 @@
 #  IODE functions operate inside IODE-SWAP memory. 
 #  Exchanges between IODE objects (in IODE-SWAP) and python objects (larray, numpy or pandas objects in python memory) 
 #  are made possible via interface functions.
-#  
-#  Source files (*.pyx, *.pxi and *.c)
-#  -----------------------------------
-#  The python functions are split according to their specific topics in *.pyx 
-#  where * can be ws, sample, objects, larray, reports...
-#  Some utility functions have also been added in the util.pyx module.
-#  
-#  The called C-api function signatures are found in iode.pxi.
-#  These functions are declared in iode.h (mostly in the sub file iodeapi.h) 
-#  and defined (again for the most part) in b_api.c.
-# 
-#
-#  How to add a new Py-function based on a C-function
-#  --------------------------------------------------
-#  
-#  1. In C
-#      Create the new function in one of the iode_c_api C modules, for example in api/b_api.c:
-#           int IodeMyFn(char* name) 
-#      Declare the new function in api/iodeapi.h
-#  
-#      For Visual Studio (CMake) version:
-#        - Regenerate iode_c_api.lib (using CMake)
-#  
-#      For non Visual Studio version (standard Microsoft nmake / cl compiler):
-#        - Goto .../iode/api/vc64 
-#        - Execute set64.bat to create the environment variables for VC64 nmake
-#        - Execute nmake to create 64 bits iode_c_api.lib => api/vc64/nmake
-#  
-#  2. In Python (*.pyx files)
-#      Add the new function declaration in iode.pxi in the section "cdef extern from "api/iode.h":":
-#          cdef int IodeMyFn(char* name)  
-#      (Note that there is no semi-colon at the end of the line !)
-#      
-#      Create the Python equivalent to IodeMyFn() in the appropriate module *.pyx.
-#          def myfn(arg):
-#              return IodeMyFn(_cstr(arg))
-#  
-#      If needed, use the python utility functions:
-#          - _cstr() to translate python strings (utf8) to C char* (ansi code cp850)
-#          - _pystr() to do the reverse
-#          - _pylist(char** c_list) to convert C char** to python lists 
-#               (don't forget to free c_list afterwards, e.g. by a call to SCR_free_tbl(c_list))
-#          - _pyfloats(double *cvar, int lg) to convert a vector of doubles of length lg 
-#               into a python list of doubles
-#  
-#  3. In a Developer Command Prompt:
-#      c:\> cd  <path_to_iode>/pyiode
-#      c:<path_to_iode>/pyiode> conda activate <conda_env>
-#      c:<path_to_iode>/pyiode> makepy.bat <conda_env>
    
 #  cython: binding=True, language_level=3, embedsignature=True
 
@@ -90,7 +41,6 @@ ODE_assign_super_PYIODE()
 # -------------------------
 
 include "common.pyx"
-include "_cdef.pyx"
 include "util.pyx"
 include "lec.pyx"
 
