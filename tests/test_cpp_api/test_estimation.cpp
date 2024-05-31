@@ -447,7 +447,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
 
     scl_drift = new Scalar(kdb_res->get("df_d"));
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->val) / 1e6, -2.351039);
-    EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.588698);
+    EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 1.588698);
     delete scl_drift;
 
@@ -466,7 +466,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
 
     scl_drift = new Scalar(kdb_res->get("df_d"));
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->val) / 1e6, 10.599557);
-    EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 5.620008);
+    EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 5.620008);
     delete scl_drift;
 
