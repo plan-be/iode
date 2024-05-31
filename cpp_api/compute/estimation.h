@@ -20,7 +20,7 @@ enum EnumIodeAdjustmentMethod
     AM_ERROR_CORRECTION_METHOD
 };
 
-const static std::vector<std::string> v_adjstment_method =
+const static std::vector<std::string> v_adjustment_method =
 {
     "Partial Adjustment",
     "Error Correction Model"
