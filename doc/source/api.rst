@@ -68,7 +68,8 @@ Equations
 .. autosummary::
    :toctree: _generated
 
-   Equations 
+   Equations
+   Equations.estimate 
 
 ==========
 Identities

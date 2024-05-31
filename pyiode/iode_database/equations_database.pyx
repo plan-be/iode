@@ -12,6 +12,8 @@ from cython.operator cimport dereference
 from pyiode.objects.equation cimport CEquation
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 from pyiode.iode_database.cpp_api_database cimport Equations as cpp_global_equations
+from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
+from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
 
 EquationInput = Union[str, Dict[str, Any], Equation]
 
@@ -165,6 +167,129 @@ cdef class Equations(_AbstractDatabase):
                                 f"dict or Equation. Got value of type {type(value).__name__}")
             c_equation = (<Equation>equation).c_equation
             self.database_ptr.add(key.encode(), dereference(c_equation))
+
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, list_eqs: Union[str, List[str]]=None):
+        r"""
+        Estimate an equation or a block of equations.
+
+        At the end of the estimation process, certain variables and scalars are automatically created 
+        if the process has converged. These variables and scalars can be used for computational purposes and, 
+        as they are part of the global workspace, can be saved for future use.
+
+        The tests resulting from the last estimation are saved as scalars. The same applies to residuals, 
+        left-hand and right-hand members of equations.
+
+        Saved tests (as scalars) have the following names (`e<ith>_*` for the <ith> equation of the block):
+
+            - `e<ith>_n`  : number of sample periods 
+            - `e<ith>_k`  : number of estimated coefficients 
+            - `e<ith>_stdev` : std dev of residuals 
+            - `e<ith>_meany` : mean of Y 
+            - `e<ith>_ssres` : sum of squares of residuals 
+            - `e<ith>_stderr` : std error 
+            - `e<ith>_stderrp` : std error percent (in %) 
+            - `e<ith>_fstat` : F-Stat 
+            - `e<ith>_r2`  : R square 
+            - `e<ith>_r2adj`  : adjusted R-squared 
+            - `e<ith>_dw` : Durbin-Watson 
+            - `e<ith>_loglik`  : Log Likelihood 
+
+        Calculated series are saved in special variables:
+
+            - `_YCALC<i>` : right-hand side of the <ith> equation in the block
+            - `_YOBS<i>` : left-hand side of the <ith> equation in the block 
+            - `_YRES<i>` : residuals of the <ith> equation of the block 
+
+        Outside the estimation sample, the series values are :math:`NA`.
+
+        Parameters
+        ----------
+        from_period : str or Period, optional
+            The starting period of the execution range. 
+            Defaults to the starting period of the current Variables sample.
+        to_period : str or Period, optional
+            The ending period of the execution range.
+            Defaults to the ending period of the current Variables sample.
+        list_eqs: str or list(str), optional
+            List of equations to be estimated. 
+            If not provided, all equations of the present Equations database will be estimated.
+            Default to None (all equations).
+
+        Warnings
+        --------
+        If some equations to be estimated belongs to a same block, the *block* (:meth:`Equation.block`), 
+        *method* (:meth:`Equation.method`), and *instruments* (':meth:`Equation.instruments`) of each of 
+        them must have been updated before.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+        >>> equations["ACAF"].lec
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        >>> equations["DPUH"].lec
+        'dln (DPUH/DPUHO):=dpuh_1+dpuh_2*dln(IHU/PI5)+dln PC'
+
+        >>> # create scalars
+        >>> scalars["acaf1"] = 0., 1.
+        >>> scalars["acaf2"] = 0., 1.
+        >>> scalars["acaf4"] = 0., 1.
+        >>> scalars["dpuh_1"] = 0., 1.
+        >>> scalars["dpuh_2"] = 0., 1.
+
+        >>> # estimate an equation
+        >>> equations.estimate("1980Y1", "1996Y1", "ACAF")
+        >>> scalars["acaf1"]
+        Scalar(0.0157705, 1, 0.00136949)
+        >>> scalars["acaf2"]
+        Scalar(-7.96505e-06, 1, 1.48247e-06)
+        >>> scalars["acaf4"]
+        Scalar(-0.0085027, 1, 0.00208257)
+        >>> scalars["dpuh_1"]
+        Scalar(0, 1, nan)
+        >>> scalars["dpuh_2"]
+        Scalar(0, 1, nan)
+
+        >>> # estimate a block
+        >>> # prepare equations (same block and method)
+        >>> block = "ACAF;DPUH"
+        >>> for name in block.split(";"):
+        ...     equations[name] = {"block": block, "method": "LSQ"}
+        >>> equations.estimate("1980Y1", "1996Y1", block)
+        >>> scalars["acaf1"]
+        Scalar(0.0157705, 1, 0.00136079)
+        >>> scalars["acaf2"]
+        Scalar(-7.96505e-06, 1, 1.47188e-06)
+        >>> scalars["acaf4"]
+        Scalar(-0.0085027, 1, 0.00206603)
+        >>> scalars["dpuh_1"]
+        Scalar(0.0109855, 1, 0.00481857)
+        >>> scalars["dpuh_2"]
+        Scalar(0.0574893, 1, 0.0368951)
+        """
+        if from_period is None or to_period is None:
+            c_sample = cpp_global_variables.get_sample()
+            if from_period is None:
+                from_period = c_sample.start_period().to_string().decode()
+            if to_period is None:
+                to_period = c_sample.end_period().to_string().decode()
+        
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        if list_eqs is None:
+            list_eqs = ';'.join(self.get_names())
+
+        if not isinstance(list_eqs, str) and isinstance(list_eqs, Iterable) and \
+            all(isinstance(item, str) for item in list_eqs):
+            list_eqs = ';'.join(list_eqs)
+        
+        cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode())
 
 
 equations: Equations = Equations._from_ptr()
