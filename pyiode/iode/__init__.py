@@ -110,9 +110,6 @@ __all__ = [
 
 # ==== DEPRECATED API ====
 
-# miscellaneous
-from .iode_python import eqs_estimate
-
 # Reports
 from .iode_python import report_exec, reportline_exec
 
@@ -121,9 +118,6 @@ from .deprecated import *
 from .deprecated import _deprecated
 
 _deprecated += [
-    # miscellaneous
-    'eqs_estimate', 
-
     # Reports
     'report_exec', 'reportline_exec',
 ]

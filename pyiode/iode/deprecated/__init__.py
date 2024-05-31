@@ -20,6 +20,9 @@ from .iode_objects import (get_cmt, get_eqs, get_eqs_lec, get_idt, get_lst, get_
 # lec
 from .lec import exec_lec
 
+# estimation
+from .estimation import eqs_estimate
+
 # model
 from .model import (model_simulate, model_calc_scc, model_simulate_scc, model_simulate_save_parms, 
                     model_simulate_maxit, model_simulate_eps, model_simulate_relax, model_simulate_nb_passes, 
@@ -55,6 +58,9 @@ _deprecated = [
     
     # lec
     'exec_lec', 
+
+    # estimation
+    'eqs_estimate', 
     
     # model
     'model_simulate', 'model_calc_scc', 'model_simulate_scc', 'model_simulate_save_parms', 

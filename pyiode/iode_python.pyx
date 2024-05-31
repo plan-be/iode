@@ -115,7 +115,6 @@ include "iode_database/variables_database.pyx"
 include "compute/estimation.pyx"
 include "compute/simulation.pyx"
 
-include "estim.pyx"
 include "print.pyx"
 include "reports.pyx"
 include "wrt.pyx"
