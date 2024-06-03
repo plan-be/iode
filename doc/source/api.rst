@@ -147,6 +147,7 @@ EQUATION
 
    Equation
 
+   Equation.endogenous
    Equation.lec
    Equation.sample
    Equation.method
