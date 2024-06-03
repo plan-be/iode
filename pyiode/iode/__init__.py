@@ -40,6 +40,7 @@ from .iode_python import comments, equations, identities, lists, scalars, tables
 from .iode_python import Comments, Equations, Identities, Lists, Scalars, Tables, Variables
 
 # Reports
+from .iode_python import execute_report, execute_command
 
 # Printing
 from .iode_python import (w_close, w_dest, w_flush, w_print, w_print_cmd, w_print_enum, w_print_par, 
@@ -93,6 +94,7 @@ __all__ = [
     'Comments', 'Equations', 'Identities', 'Lists', 'Scalars', 'Tables', 'Variables', 
 
     # Reports
+    'execute_report', 'execute_command', 
 
     # Printing
     'w_close', 'w_dest', 'w_flush', 'w_print', 'w_print_cmd', 'w_print_enum', 'w_print_par', 'w_print_pg_footer', 
