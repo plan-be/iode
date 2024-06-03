@@ -19,21 +19,36 @@ cdef class Equation:
 
     Attributes
     ----------
+    endogenous: str
+        name of the endogenous variable. It must the same as the name of the present 
+        equation in the Equations database. 
     lec: str
+        LEC expression of the equation.
     method: str
+        estimation method. Possible values are:
+
+            - "LSQ"
+            - "ZELLNER"
+            - "INSTRUMENTAL"
+            - "GLS (3SLS)"
+            - "MAX_LIKELIHOOD"
     sample: Sample
+        estimaton sample.
     comment: str
     instruments: str
+        estimation instruments.
     block: str
         block of equations (to estimate) to which the equation belong.
     tests: dict(str, float)
+        tests values associated with the estimation of the equation.
     date: str
         last time the equation has been estimated.
 
     Parameters
     ----------
-    name: str
-        Endogenous variable name.
+    endogenous: str
+        Name of the endogenous variable. It must the same as the name of the present 
+        equation in the Equations database. 
     lec: str
         LEC expression of the equation.
     method: int or {'LSQ', 'ZELLNER', 'INSTRUMENTAL', 'GLS', 'MAX_LIKELIHOOD'}, optional
@@ -79,50 +94,29 @@ cdef class Equation:
                 stdev: 0
         date: )
     """
-
+    cdef string cpp_endogenous
     cdef CEquation* c_equation
 
-    def __cinit__(self, name: str, lec: str, method: Union[int, str] = "LSQ", from_period: Union[str, Period] = "", 
+    def __cinit__(self, endogenous: str, lec: str, method: Union[int, str] = "LSQ", from_period: Union[str, Period] = "", 
         to_period: Union[str, Period] = "", comment: str = "", instruments: str = "", block: str = "") -> Equation:
-        if not isinstance(name, str):
-            raise TypeError("'name': Expected value of type string.\nGot value of type '" + type(name).__name__ + "'")
-
-        if not isinstance(lec, str):
-            raise TypeError("'lec': Expected value of type string.\nGot value of type '" + type(lec).__name__ + "'")
-
-        if not isinstance(method, (str, int)):
-            raise TypeError("'method': Expected value of type string or int.\nGot value of type '" + type(method).__name__ + "'")
-
-        if not isinstance(from_period, (str, Period)):
-            raise TypeError("'from_period': Expected value of type string or 'Period'.\n" +
-                            "Got value of type '" + type(from_period).__name__ + "'")
         if isinstance(from_period, Period):
             from_period = str(from_period)
 
-        if not isinstance(to_period, (str, Period)):
-            raise TypeError("'to_period': Expected value of type string or 'Period'.\n" + 
-                            "Got value of type '" + type(to_period).__name__ + "'")
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
-        if not isinstance(comment, str):
-            raise TypeError("'comment': Expected value of type string.\nGot value of type '" + type(comment).__name__ + "'")
-
-        if not isinstance(instruments, str):
-            raise TypeError("'instruments': Expected value of type string.\nGot value of type '" + type(instruments).__name__ + "'")
-
-        if not isinstance(block, str):
-            raise TypeError("'block': Expected value of type string.\nGot value of type '" + type(block).__name__ + "'")
-
-        self.c_equation = new CEquation(name.encode(), lec.encode(), 0, from_period.encode(), 
+        self.cpp_endogenous = endogenous.encode()
+        self.c_equation = new CEquation(self.cpp_endogenous, lec.encode(), 0, from_period.encode(), 
                                         to_period.encode(), comment.encode(), instruments.encode(), 
                                         block.encode(), <bint>False)
         self.method = method
 
     def __dealloc__(self):
+        self.cpp_endogenous = b''
         del self.c_equation
+        self.c_equation = NULL
 
-    def set_lec(self, lec: str, name: str):
+    def set_lec(self, lec: str, endogenous: str):
         """
         Update LEC expression of the current equation.
 
@@ -130,23 +124,22 @@ cdef class Equation:
         --------
         >>> from iode import Equation
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF.endogenous
+        'ACAF'
         >>> eq_ACAF.lec
         '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
         >>> # remove acaf1 from the LEC expression of the ACAF equation
         >>> eq_ACAF.set_lec("(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAF")
         >>> eq_ACAF.lec
         '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
-        >>> # wrong endogenous name
+        >>> # wrong name for the endogenous variable
         >>> eq_ACAF.set_lec("(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAG")
         Traceback (most recent call last):
         ... 
         ValueError: Cannot set LEC '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' to the equation named 'ACAG'
         """
-        if not isinstance(lec, str):
-            raise TypeError("'lec': Expected value of type string.\nGot value of type '" + type(lec).__name__ + "'")
-        if not isinstance(name, str):
-            raise TypeError("'name': Expected value of type string.\nGot value of type '" + type(name).__name__ + "'")
-        self.c_equation.set_lec(lec.encode(), name.encode())
+        self.cpp_endogenous = endogenous.encode()
+        self.c_equation.set_lec(lec.encode(), self.cpp_endogenous)
 
     def set_sample(self, from_period: Union[str, Period] = "", to_period: Union[str, Period] = ""):
         """
@@ -181,16 +174,12 @@ cdef class Equation:
         >>> eq_ACAF.sample
         1960Y1:2000Y1
         """
-        if not isinstance(from_period, (str, Period)):
-            raise TypeError("'from_period': Expected value of type string or 'Period'.\n" +
-                            "Got value of type '" + type(from_period).__name__ + "'")
-        if not isinstance(to_period, (str, Period)):
-            raise TypeError("'to_period': Expected value of type string or 'Period'.\n" + 
-                            "Got value of type '" + type(to_period).__name__ + "'")
         if isinstance(from_period, Period):
             from_period = str(from_period)
+
         if isinstance(to_period, Period):
             to_period = str(to_period)
+
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
 
     def get_date_format(self, format: str = "dd-mm-yyyy") -> str:
@@ -212,9 +201,7 @@ cdef class Equation:
         >>> # date with specific format
         >>> eq_ACAF.get_date_format("dd/mm/yyyy")
         ''
-        """
-        if not isinstance(format, str):
-            raise TypeError("Expected value of type string.\nGot value of type '" + type(format).__name__ + "'")     
+        """   
         return self.c_equation.get_date_as_string(format.encode()).decode()
 
     def get_coefficients_list(self, create_if_not_exit: bool = True) -> List[str]:
@@ -365,6 +352,10 @@ cdef class Equation:
     # Attributes access
 
     @property
+    def endogenous(self) -> str:
+        return self.cpp_endogenous.decode()
+
+    @property
     def lec(self) -> str:
         return self.c_equation.get_lec().decode()
     
@@ -374,8 +365,6 @@ cdef class Equation:
 
     @method.setter
     def method(self, value: Union[str, int]):
-        if not isinstance(value, (str, int)):
-            raise TypeError("Expected value of type string or int.\nGot value of type '" + type(value).__name__ + "'")
         if isinstance(value, str):
             self.c_equation.set_method(<string>value.encode())
         else:
@@ -390,11 +379,10 @@ cdef class Equation:
 
     @sample.setter
     def sample(self, value: Union[str, Sample]):
-        if not isinstance(value, (str, Sample)):
-            raise TypeError("Expected value of type string or 'Sample'.\nGot value of type '" + type(value).__name__ + "'")
         if isinstance(value, Sample):
             value = str(value)
         from_period, to_period = value.split(':')
+
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
 
     @property
@@ -403,8 +391,6 @@ cdef class Equation:
 
     @comment.setter
     def comment(self, value: str):
-        if not isinstance(value, str):
-            raise TypeError("Expected value of type string.\nGot value of type '" + type(value).__name__ + "'")
         self.c_equation.set_comment(value.encode())
 
     @property
@@ -413,8 +399,6 @@ cdef class Equation:
 
     @instruments.setter
     def instruments(self, value: str):
-        if not isinstance(value, str):
-            raise TypeError("Expected value of type string.\nGot value of type '" + type(value).__name__ + "'")
         self.c_equation.set_instruments(value.encode())
 
     @property
@@ -423,8 +407,6 @@ cdef class Equation:
 
     @block.setter
     def block(self, value: str):
-        if not isinstance(value, str):
-            raise TypeError("Expected value of type string.\nGot value of type '" + type(value).__name__ + "'")
         self.c_equation.set_block(value.encode())
 
     @property
@@ -439,8 +421,6 @@ cdef class Equation:
     # Special methods
 
     def __eq__(self, other: Equation) -> bool:
-        if not isinstance(other, Equation):
-            raise TypeError(f"Expected argument of type 'Equation'.\nGot argument of type '{type(other).__name__}'")
         return self.c_equation == other.c_equation
 
     def __str__(self) -> str:

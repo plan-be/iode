@@ -1,6 +1,8 @@
 # distutils: language = c++
 
 from pathlib import Path
+import warnings
+
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 import sys
@@ -307,13 +309,12 @@ cdef class _AbstractDatabase:
         >>> comments["ACCAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         """
-        if not isinstance(old_name, str):
-            raise TypeError(f"'old_name': Expected value of type string. Got value of type {type(old_name).__name__}")
-        if not isinstance(new_name, str):
-            raise TypeError(f"'new_name': Expected value of type string. Got value of type {type(new_name).__name__}")
-        new_pos = self.abstract_db_ptr.rename(old_name.encode(), new_name.encode())
-        if new_pos < 0:
-            raise RuntimeError(f"Could not rename item '{old_name}' as '{new_name}'")
+        if self.abstract_db_ptr.get_iode_type() == EQUATIONS:
+            warnings.warn("Renaming an Equation is not allowed")
+        else:
+            new_pos = self.abstract_db_ptr.rename(old_name.encode(), new_name.encode())
+            if new_pos < 0:
+                raise RuntimeError(f"Could not rename item '{old_name}' as '{new_name}'")
 
     def remove(self, names: Union[str, List[str]]):
         """
