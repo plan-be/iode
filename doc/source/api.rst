@@ -336,7 +336,9 @@ REPORTS
 
    report_exec
    reportline_exec
-
+   
+   execute_report
+   execute_command
 
 *****
 PRINT
