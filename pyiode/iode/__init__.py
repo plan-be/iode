@@ -112,16 +112,7 @@ __all__ = [
 
 # ==== DEPRECATED API ====
 
-# Reports
-from .iode_python import report_exec, reportline_exec
-
-
 from .deprecated import *
 from .deprecated import _deprecated
-
-_deprecated += [
-    # Reports
-    'report_exec', 'reportline_exec',
-]
 
 __all__ += _deprecated

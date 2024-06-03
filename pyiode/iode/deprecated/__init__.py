@@ -28,9 +28,8 @@ from .model import (model_simulate, model_calc_scc, model_simulate_scc, model_si
                     model_simulate_maxit, model_simulate_eps, model_simulate_relax, model_simulate_nb_passes, 
                     model_simulate_sort_algo, model_simulate_init_values, model_simulate_niter, model_simulate_norm)
 
-# miscellaneous
-
 # Reports
+from .report import report_exec, reportline_exec
 
 # compatibility with other libraries
 from .compat_pandas import df_to_ws, ws_to_df
@@ -67,9 +66,8 @@ _deprecated = [
     'model_simulate_maxit', 'model_simulate_eps', 'model_simulate_relax', 'model_simulate_nb_passes', 
     'model_simulate_sort_algo', 'model_simulate_init_values', 'model_simulate_niter', 'model_simulate_norm',
 
-    # miscellaneous
-
     # Reports
+    'report_exec', 'reportline_exec', 
 
     # compatibility with other libraries
     'df_to_ws', 'ws_to_df', 'larray_to_ws', 'ws_to_larray', 'ws_load_var_to_larray', 'ws_sample_to_larray_axis'
