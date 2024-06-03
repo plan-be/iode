@@ -313,6 +313,7 @@ Equations
     | IODE Report Commands | Python Equivalent                                                                           |
     +======================+=============================================================================================+
     | ``EqsEstimate``      | ``equations.estimate(from_period, to_period, list_eqs)`` --> See :meth:`Equations.estimate` |
+    |                      | or ``equations[name].estimate(from_period, to_period)`` --> See :meth:`Equation.estimate`   |
     +----------------------+---------------------------------------------------------------------------------------------+
     | ``EqsStepWise``      | Not Yet Implemented                                                                         |
     +----------------------+---------------------------------------------------------------------------------------------+
