@@ -334,9 +334,6 @@ REPORTS
 .. autosummary::
    :toctree: _generated
 
-   report_exec
-   reportline_exec
-   
    execute_report
    execute_command
 
@@ -503,3 +500,6 @@ DEPRECATED
    model_simulate_init_values
    model_simulate_niter
    model_simulate_norm
+
+   report_exec
+   reportline_exec
