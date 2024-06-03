@@ -382,33 +382,72 @@ keyboard_shortcuts.*
 !build/keyboard_shortcuts.pdf
 
 # IODE temporary files
-*.cm$
-*.eq$
-*.id$
-*.ls$
-*.sc$
-*.tb$
-*.va$
+**/*.cm$
+**/*.eq$
+**/*.id$
+**/*.ls$
+**/*.sc$
+**/*.tb$
+**/*.va$
 
 # Others
-*.exp
-#*.ini
-*.bak
-*.prf
-*.$$$
+**/*.exp
+#**/*.ini
+**/*.bak
+**/*.prf
+**/*.$$$
+**/*.rep
+
 # ==== By Folders ====
+
+# ROOT
+
+*.cmt
+*.eqs
+*.idt
+*.lst
+*.scl
+*.tbl
+*.var
+
+*.ac
+*.ae
+*.ai
+*.al
+*.as
+*.at
+*.av
+
+*.rep
 
 # C API
 /api/version.h
 
 # PYTHON
 /pyiode/**/*.c
-!/pyiode/s_pyiode.c
 /pyiode/**/*.cpp
+!/pyiode/s_pyiode.c
 !/pyiode/s_pyiode.cpp
 /pyiode/common.pyx
 /pyiode/iode/tests
 /pyiode/iode/iode.msg
+
+/pyiode/**/*.rep
+/pyiode/**/*.cmt
+/pyiode/**/*.eqs
+/pyiode/**/*.idt
+/pyiode/**/*.lst
+/pyiode/**/*.scl
+/pyiode/**/*.tbl
+/pyiode/**/*.var
+/pyiode/**/*.ac
+/pyiode/**/*.ae
+/pyiode/**/*.ai
+/pyiode/**/*.al
+/pyiode/**/*.as
+/pyiode/**/*.at
+/pyiode/**/*.av
+
 
 /pyiode_2023/**/*.c
 /pyiode_2023/**/*.pyd
