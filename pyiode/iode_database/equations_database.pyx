@@ -90,10 +90,7 @@ cdef class Equations(_AbstractDatabase):
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
-    def _get_object(self, key):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(key).__name__}")
+    def _get_object(self, key: str):
         key = key.strip()
 
         c_eq = self.database_ptr.get(key.encode())
@@ -107,15 +104,12 @@ cdef class Equations(_AbstractDatabase):
             eq.c_equation.set_test(<EnumIodeEquationTest>i, test_val)
         return eq
 
-    def _set_object(self, key, value):
+    def _set_object(self, key: str, value):
         cdef CEquation* c_equation
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set object {key}.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(key).__name__}")
         key = key.strip()
 
+        # update existing equation
         if self.database_ptr.contains(key.encode()):
-            # update existing equation
             if isinstance(value, str):
                 equation = self._get_object(key)
                 equation.set_lec(value.strip(), key)
@@ -150,17 +144,20 @@ cdef class Equations(_AbstractDatabase):
                                 f"Got value of type {type(value).__name__}")
             c_equation = (<Equation>equation).c_equation
             self.database_ptr.update(key.encode(), dereference(c_equation))
+        # add a new equation
         else:
-            # add a new equation
             if isinstance(value, str):
-                equation = Equation(name=key, lec=value.strip())
+                equation = Equation(endogenous=key, lec=value.strip())
             elif isinstance(value, Equation):
+                if value.endogenous != key:
+                    raise ValueError(f"Name of the endogenous variable '{value.endogenous}' must be the same as "
+                                     f"the name of the inserted equation '{key}' in the Equations database")
                 equation = value
             elif isinstance(value, (tuple, list)):
                 value = [key] + list(value)
                 equation = Equation(*value)
             elif isinstance(value, dict):
-                value['name'] = key
+                value['endogenous'] = key
                 equation = Equation(**value)
             else:
                 raise TypeError(f"New equation '{key}': Expected input to be of type str or tuple or list or "
