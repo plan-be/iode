@@ -162,6 +162,7 @@ EQUATION
    Equation.set_lec
    Equation.set_sample       
    Equation.split_equation
+   Equation.estimate
 
 ====
 LIST

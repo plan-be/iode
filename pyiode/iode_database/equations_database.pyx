@@ -238,6 +238,8 @@ cdef class Equations(_AbstractDatabase):
 
         >>> # estimate an equation
         >>> equations.estimate("1980Y1", "1996Y1", "ACAF")
+        >>> # or equivalenty
+        >>> equations["ACAF"].estimate("1980Y1", "1996Y1")
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136949)
         >>> scalars["acaf2"]

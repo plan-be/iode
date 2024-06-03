@@ -349,6 +349,92 @@ cdef class Equation:
         lhs, rhs = self.c_equation.split_equation()
         return lhs.decode(), rhs.decode() 
 
+    def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None):
+        r"""
+        Estimate the present equation.
+
+        At the end of the estimation process, certain variables and scalars are automatically created 
+        if the process has converged. These variables and scalars can be used for computational purposes and, 
+        as they are part of the global workspace, can be saved for future use.
+
+        The tests resulting from the last estimation are saved as scalars. The same applies to residuals, 
+        left-hand and right-hand members of equations.
+
+        Saved tests (as scalars) have the following names:
+
+            - `e0_n` : number of sample periods 
+            - `e0_k` : number of estimated coefficients 
+            - `e0_stdev` : std dev of residuals 
+            - `e0_meany` : mean of Y 
+            - `e0_ssres` : sum of squares of residuals 
+            - `e0_stderr` : std error 
+            - `e0_stderrp` : std error percent (in %) 
+            - `e0_fstat` : F-Stat 
+            - `e0_r2` : R square 
+            - `e0_r2adj` : adjusted R-squared 
+            - `e0_dw` : Durbin-Watson 
+            - `e0_loglik` : Log Likelihood 
+
+        Calculated series are saved in special variables:
+
+            - `_YCALC0` : right-hand side of the equation
+            - `_YOBS0` : left-hand side of the equation
+            - `_YRES0` : residuals of the equation
+
+        Outside the estimation sample, the series values are :math:`NA`.
+
+        Parameters
+        ----------
+        from_period : str or Period, optional
+            The starting period of the execution range. 
+            Defaults to the starting period of the current Variables sample.
+        to_period : str or Period, optional
+            The ending period of the execution range.
+            Defaults to the ending period of the current Variables sample.
+
+        Warnings
+        --------
+        If the present equation belongs to a block, you must use the :meth:`Equations.estimate` method instead.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+        >>> eq_ACAF = equations["ACAF"]
+        >>> eq_ACAF.lec
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+
+        >>> # create scalars
+        >>> scalars["acaf1"] = 0., 1.
+        >>> scalars["acaf2"] = 0., 1.
+        >>> scalars["acaf4"] = 0., 1.
+
+        >>> # estimate the ACQF equation
+        >>> eq_ACAF.estimate("1980Y1", "1996Y1")
+        >>> scalars["acaf1"]
+        Scalar(0.0157705, 1, 0.00136949)
+        >>> scalars["acaf2"]
+        Scalar(-7.96505e-06, 1, 1.48247e-06)
+        >>> scalars["acaf4"]
+        Scalar(-0.0085027, 1, 0.00208257)
+        """
+        if from_period is None or to_period is None:
+            c_sample = cpp_global_variables.get_sample()
+            if from_period is None:
+                from_period = c_sample.start_period().to_string().decode()
+            if to_period is None:
+                to_period = c_sample.end_period().to_string().decode()
+        
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+        
+        cpp_eqs_estimate(self.cpp_endogenous, from_period.encode(), to_period.encode())
+
     # Attributes access
 
     @property
