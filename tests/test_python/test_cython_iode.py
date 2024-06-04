@@ -41,6 +41,12 @@ def test_cython_iode():
         if doc is not None:
             iode.__test__[f'ComputedTable.{name_}'] = doc 
 
+    from iode.iode_python import EditAndEstimateEquations
+    for name_, value_ in inspect.getmembers(EditAndEstimateEquations):
+        doc = inspect.getdoc(value_)
+        if doc is not None:
+            iode.__test__[f'EditAndEstimateEquations.{name_}'] = doc 
+
     iode.suppress_msgs()
 
     # run doctests
