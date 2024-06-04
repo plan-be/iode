@@ -56,3 +56,13 @@ cdef extern from "cpp_api/objects/equation.h":
         string to_string()
 
     size_t hash_value(CEquation&)
+
+    # declare C++ NamedEquation struct
+    cdef cppclass NamedEquation:
+        # attributes
+        string name
+        CEquation eq
+
+        # constructors
+        NamedEquation(const string& name)
+        NamedEquation(const string& name, const CEquation& eq)
