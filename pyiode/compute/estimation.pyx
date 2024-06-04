@@ -125,9 +125,10 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     >>> df_scalars["df3"]
     Scalar(-0.211047, 0.170708, 0.170708)
     """
+    # Note: cpp_dickey_fuller_test allocates a new CKDBScalars* pointer
     cdef CKDBScalars* df_scalars
     df_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
-    return Scalars._from_ptr(df_scalars)
+    return Scalars._from_ptr(df_scalars, <bint>True)
 
 
 # CorrelationMatrix wrapper class

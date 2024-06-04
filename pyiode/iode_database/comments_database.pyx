@@ -60,11 +60,11 @@ cdef class Comments(_AbstractDatabase):
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef Comments _from_ptr(CKDBComments* database_ptr = NULL):
+    cdef Comments _from_ptr(CKDBComments* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Comments wrapper = Comments.__new__(Comments)
         if database_ptr is not NULL:
-            wrapper.ptr_owner = True
+            wrapper.ptr_owner = owner
             wrapper.database_ptr = database_ptr
             wrapper.abstract_db_ptr = database_ptr
         else:

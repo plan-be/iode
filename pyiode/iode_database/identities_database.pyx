@@ -61,11 +61,11 @@ cdef class Identities(_AbstractDatabase):
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef Identities _from_ptr(CKDBIdentities* database_ptr = NULL):
+    cdef Identities _from_ptr(CKDBIdentities* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Identities wrapper = Identities.__new__(Identities)
         if database_ptr is not NULL:
-            wrapper.ptr_owner = True
+            wrapper.ptr_owner = owner
             wrapper.database_ptr = database_ptr
             wrapper.abstract_db_ptr = database_ptr
         else:

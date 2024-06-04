@@ -62,11 +62,11 @@ cdef class Scalars(_AbstractDatabase):
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef Scalars _from_ptr(CKDBScalars* database_ptr = NULL):
+    cdef Scalars _from_ptr(CKDBScalars* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Scalars wrapper = Scalars.__new__(Scalars)
         if database_ptr is not NULL:
-            wrapper.ptr_owner = True
+            wrapper.ptr_owner = owner
             wrapper.database_ptr = database_ptr
             wrapper.abstract_db_ptr = database_ptr
         else:
