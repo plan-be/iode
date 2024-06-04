@@ -15,3 +15,12 @@ cdef extern from "cpp_api/compute/estimation.h":
     string dynamic_adjustment(const EnumIodeAdjustmentMethod method, const string& eqs, const string& c1, const string& c2)
     CKDBScalars* dickey_fuller_test(const string& lec, bint drift, bint trend, int order)
 
+    # Declaration of the CorrelationMatrix class
+    cdef cppclass CCorrelationMatrix "CorrelationMatrix":
+        # public member variables
+        const int nb_coeffs
+
+        # public methods
+        string get_name(const int i)
+        double get_value(const int row, const int col)
+
