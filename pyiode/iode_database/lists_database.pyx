@@ -60,11 +60,11 @@ cdef class Lists(_AbstractDatabase):
 
     # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
     @staticmethod
-    cdef Lists _from_ptr(CKDBLists* database_ptr = NULL):
+    cdef Lists _from_ptr(CKDBLists* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
         if database_ptr is not NULL:
-            wrapper.ptr_owner = True
+            wrapper.ptr_owner = owner
             wrapper.database_ptr = database_ptr
             wrapper.abstract_db_ptr = database_ptr
         else:
