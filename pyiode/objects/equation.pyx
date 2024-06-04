@@ -517,3 +517,15 @@ cdef class Equation:
 
     def __hash__(self) -> int:
         return <int>hash_value_eq(dereference(self.c_equation))
+
+
+cdef Equation _to_py_equation(string endo, CEquation c_eq):
+    str_sample = c_eq.get_sample().to_string().decode()
+    from_period, to_period = str_sample.split(':')
+    py_eq = Equation(endo.decode(), c_eq.get_lec().decode(), c_eq.get_method().decode(), 
+                    from_period, to_period, c_eq.get_comment().decode(), 
+                    c_eq.get_instruments().decode(), c_eq.get_block().decode())
+    py_eq.c_equation.date = c_eq.date
+    for i, test_val in enumerate(c_eq.tests): 
+        py_eq.c_equation.set_test(<EnumIodeEquationTest>i, test_val)
+    return py_eq

@@ -92,17 +92,8 @@ cdef class Equations(_AbstractDatabase):
 
     def _get_object(self, key: str):
         key = key.strip()
-
         c_eq = self.database_ptr.get(key.encode())
-        str_sample = c_eq.get_sample().to_string().decode()
-        from_period, to_period = str_sample.split(':')
-        eq = Equation(key, c_eq.get_lec().decode(), c_eq.get_method().decode(), 
-                      from_period, to_period, c_eq.get_comment().decode(), 
-                      c_eq.get_instruments().decode(), c_eq.get_block().decode())
-        eq.c_equation.date = c_eq.date
-        for i, test_val in enumerate(c_eq.tests): 
-            eq.c_equation.set_test(<EnumIodeEquationTest>i, test_val)
-        return eq
+        return _to_py_equation(key.encode(), c_eq)
 
     def _set_object(self, key: str, value):
         cdef CEquation* c_equation
