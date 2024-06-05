@@ -447,11 +447,26 @@ cdef class Equation:
     
     @property
     def method(self) -> str:
+        """
+        Estimation method.
+
+        Parameters
+        ----------
+        value: str or int
+            Possible values are:
+
+                - "LSQ" (EQ_METHOD_LSQ)
+                - "ZELLNER" (EQ_METHOD_ZELLNER)
+                - "INSTRUMENTAL" (EQ_METHOD_INSTRUMENTAL)
+                - "GLS (3SLS)" (EQ_METHOD_GLS)
+                - "MAX_LIKELIHOOD" (EQ_METHOD_MAX_LIKELIHOOD)
+        """
         return self.c_equation.get_method().decode()
 
     @method.setter
     def method(self, value: Union[str, int]):
         if isinstance(value, str):
+            value = value.upper()
             self.c_equation.set_method(<string>value.encode())
         else:
             # Note: <int> casting converts the Python type int to the cython.int type
@@ -480,11 +495,24 @@ cdef class Equation:
         self.c_equation.set_comment(value.encode())
 
     @property
-    def instruments(self) -> str:
-        return self.c_equation.get_instruments().decode()
+    def instruments(self) -> Union[str, List[str]]:
+        """
+        Instrument(s) used for the estimation.
+
+        Parameters
+        ----------
+        value: str or list(str)
+            If several instruments are required for the estimation, they can be passed either as 
+            a unique string in which instruments are separated by a semi colon ';' or as a list of 
+            strings.
+        """
+        _instruments = self.c_equation.get_instruments().decode().split(';')
+        return _instruments[0] if len(_instruments) == 1 else _instruments
 
     @instruments.setter
-    def instruments(self, value: str):
+    def instruments(self, value: Union[str, List[str]]):
+        if not isinstance(value, str):
+            value = ';'.join(value)
         self.c_equation.set_instruments(value.encode())
 
     @property
@@ -492,7 +520,9 @@ cdef class Equation:
         return self.c_equation.get_block().decode()
 
     @block.setter
-    def block(self, value: str):
+    def block(self, value: Union[str, List[str]]):
+        if not isinstance(value, str):
+            value = ';'.join(value)
         self.c_equation.set_block(value.encode())
 
     @property
