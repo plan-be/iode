@@ -98,11 +98,11 @@ LANG_FRENCH: int = EnumLang.IT_FRENCH
 
 LANGS_LIST = _cpp_string_vector_to_py(vLangs)
 
-EQ_METHOD_LSQ: int = EnumIodeEquationMethod.IE_LSQ
-EQ_METHOD_ZELLNER: int = EnumIodeEquationMethod.IE_ZELLNER
-EQ_METHOD_INSTRUMENTAL: int = EnumIodeEquationMethod.IE_INSTRUMENTAL
-EQ_METHOD_GLS: int = EnumIodeEquationMethod.IE_GLS
-EQ_METHOD_MAX_LIKELIHOOD: int = EnumIodeEquationMethod.IE_MAX_LIKELIHOOD
+EQ_METHOD_LSQ: int = 0
+EQ_METHOD_ZELLNER: int = 1
+EQ_METHOD_INSTRUMENTAL: int = 2
+EQ_METHOD_GLS: int = 3
+EQ_METHOD_MAX_LIKELIHOOD: int = 4
 
 EQUATION_METHODS = _cpp_string_vector_to_py(v_eq_methods)
 
