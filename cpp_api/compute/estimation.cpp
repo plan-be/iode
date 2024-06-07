@@ -78,6 +78,7 @@ EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, cons
     set_sample(from, to);
     kdb_eqs = Equations.subset("", true);
     kdb_scl = Scalars.subset("", true);
+    m_corr = nullptr;
 }
 
 EditAndEstimateEquations::~EditAndEstimateEquations()
@@ -88,6 +89,7 @@ EditAndEstimateEquations::~EditAndEstimateEquations()
     if(sample)  delete sample;
     if(kdb_eqs) delete kdb_eqs;
     if(kdb_scl) delete kdb_scl;
+    if(m_corr)  delete m_corr;
 }
 
 void EditAndEstimateEquations::set_block(const std::string& block, const std::string& current_eq_name)
@@ -279,10 +281,19 @@ void EditAndEstimateEquations::estimate()
     int res = E_est(c_endos, c_lecs, Variables.get_database(), kdb_scl->get_database(), sample, 
                     this->method, c_instrs, ESTIMATION_MAXIT, ESTIMATION_EPS);
 
-    if(res == 0)        
+    if(res == 0)
+    {
         estimation_done = true;
+        std::vector<std::string> v_coeffs = kdb_scl->get_names();
+
+        if(m_corr) delete m_corr;
+        m_corr = new CorrelationMatrix(v_coeffs, E_MCORR); 
+    }
     else
     {
+        if(m_corr) delete m_corr;
+        m_corr = nullptr;
+
         std::string msg = "Cannot proceed estimation.\n";
         msg += "equations: " + boost::algorithm::join(v_equations, ";") + "\n";
         msg += get_last_error();
