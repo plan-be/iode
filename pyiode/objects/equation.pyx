@@ -474,9 +474,8 @@ cdef class Equation:
 
     @property
     def sample(self) -> Sample:
-        str_sample = self.c_equation.get_sample().to_string().decode()
-        from_period, to_period = str_sample.split(':')
-        return Sample(from_period, to_period)
+        cdef CSample sample = self.c_equation.get_sample()
+        return Sample._from_ptr(new CSample(sample), <bint>True)
 
     @sample.setter
     def sample(self, value: Union[str, Sample]):

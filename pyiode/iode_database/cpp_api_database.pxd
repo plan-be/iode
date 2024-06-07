@@ -229,7 +229,7 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         void set_var(string& name, int t, double value, EnumIodeVarMode mode) except +
         void set_var(string& name, string& period, double value, EnumIodeVarMode mode) except +
 
-        CSample get_sample()
+        CSample* get_sample()
         void set_sample(string& from_, string& to) except +
 
         int get_nb_periods()
