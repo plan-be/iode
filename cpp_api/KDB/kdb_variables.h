@@ -113,7 +113,8 @@ public:
 
     void update(const std::string& name, const std::string& lec, const std::string& first_period = "", const std::string& last_period = "");
 
-    Sample get_sample() const;
+    // WARNING: the returned Sample pointer must not be deleted
+    Sample* get_sample() const;
 
     void set_sample(const std::string& from, const std::string& to);
 

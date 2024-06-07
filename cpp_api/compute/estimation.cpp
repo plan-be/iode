@@ -310,11 +310,11 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     std::string no_est_to;
     if(!estimation_done)
     {
-        Sample vars_sample = Variables.get_sample();  
+        Sample* vars_sample = Variables.get_sample();  
         // throw an error if the string does not represent a valid period
-        Period from_per = (!from.empty()) ? Period(from) : vars_sample.start_period();
+        Period from_per = (!from.empty()) ? Period(from) : vars_sample->start_period();
         // throw an error if the string does not represent a valid period
-        Period to_per = (!to.empty()) ? Period(to) : vars_sample.end_period();
+        Period to_per = (!to.empty()) ? Period(to) : vars_sample->end_period();
         // check that from is before to
         Sample no_est_sample(from_per, to_per);
 
@@ -367,11 +367,11 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
 {
     std::string error_msg = "Could not estimate equations " + eqs + "\n";
 
-    Sample sample = Variables.get_sample();
-    if(sample.nb_periods() == 0)
+    Sample* sample = Variables.get_sample();
+    if(sample->nb_periods() == 0)
         throw std::runtime_error(error_msg + "No sample is defined");
-    std::string from_ = (from.empty()) ? sample.start_period().to_string() : from;
-    std::string to_ = (to.empty()) ? sample.end_period().to_string() : to;
+    std::string from_ = (from.empty()) ? sample->start_period().to_string() : from;
+    std::string to_ = (to.empty()) ? sample->end_period().to_string() : to;
 
     int res = KE_estim(to_char_array(eqs), to_char_array(from_), to_char_array(to_));
     if(res != 0)
