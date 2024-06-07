@@ -203,8 +203,8 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(E_NEQ, 2);
 
     // Sample
-    Sample sample = est.get_sample();
-    EXPECT_EQ(sample.to_string(), from + ":" + to);
+    Sample* sample = est.get_sample();
+    EXPECT_EQ(sample->to_string(), from + ":" + to);
 
     // Correlation matrix
     // -- ACAF;DPUH

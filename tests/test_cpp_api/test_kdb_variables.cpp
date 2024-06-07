@@ -75,7 +75,7 @@ TEST_F(KDBVariablesTest, GetSetVar)
     IODE_REAL new_value;
     int nb_periods = Variables.get_nb_periods();
     std::string name = Variables.get_name(pos + 1);
-    Period start = Variables.get_sample().start_period();
+    Period start = Variables.get_sample()->start_period();
 
     // period as int
     value = 1.2130001;
@@ -123,39 +123,39 @@ TEST_F(KDBVariablesTest, GetSetVar)
 
 TEST_F(KDBVariablesEmptyTest, Sample)
 {
-    Sample sample_undef = Variables.get_sample();
-    EXPECT_EQ(sample_undef.nb_periods(), 0);
-    EXPECT_EQ(sample_undef.to_string(), ":");
+    Sample* sample_undef = Variables.get_sample();
+    EXPECT_EQ(sample_undef->nb_periods(), 0);
+    EXPECT_EQ(sample_undef->to_string(), ":");
 
     EXPECT_THROW(Variables.set_sample("", "2015Y1"), std::invalid_argument);
     EXPECT_THROW(Variables.set_sample("1960Y1", ""), std::invalid_argument);
 
     // set sample
     Variables.set_sample("1960Y1", "2015Y1");
-    EXPECT_EQ(Variables.get_sample().to_string(), "1960Y1:2015Y1");
+    EXPECT_EQ(Variables.get_sample()->to_string(), "1960Y1:2015Y1");
 }
 
 TEST_F(KDBVariablesTest, Sample)
 {
-    Sample sample = Variables.get_sample();
+    Sample* sample = Variables.get_sample();
     Sample expected_sample("1960Y1", "2015Y1");
-    EXPECT_EQ(sample.to_string(), expected_sample.to_string());
+    EXPECT_EQ(sample->to_string(), expected_sample.to_string());
 
     // does nothing
     Variables.set_sample("", "");
-    EXPECT_EQ(sample.to_string(), expected_sample.to_string());
+    EXPECT_EQ(sample->to_string(), expected_sample.to_string());
 
     // update 'to'
     Variables.set_sample("", "2016Y1");
-    EXPECT_EQ(Variables.get_sample().to_string(), "1960Y1:2016Y1");
+    EXPECT_EQ(Variables.get_sample()->to_string(), "1960Y1:2016Y1");
 
     // update 'from'
     Variables.set_sample("1959Y1", "");
-    EXPECT_EQ(Variables.get_sample().to_string(), "1959Y1:2016Y1");
+    EXPECT_EQ(Variables.get_sample()->to_string(), "1959Y1:2016Y1");
 
     // update sample
     Variables.set_sample("1950Y1", "2020Y1");
-    EXPECT_EQ(Variables.get_sample().to_string(), "1950Y1:2020Y1");
+    EXPECT_EQ(Variables.get_sample()->to_string(), "1950Y1:2020Y1");
 }
 
 TEST_F(KDBVariablesTest, GetNbPeriods)
@@ -306,7 +306,7 @@ TEST_F(KDBVariablesTest, Update)
     std::string lec;
     Variable expected_var;
     int nb_periods = Variables.get_nb_periods();
-    Sample sample = Variables.get_sample();
+    Sample* sample = Variables.get_sample();
 
     Variable values;
     for(int y=1980; y <= 1990; y++)
@@ -314,8 +314,8 @@ TEST_F(KDBVariablesTest, Update)
 
     std::string first_period = "1980Y1";
     std::string last_period = "1990Y1";
-    int t_first = sample.get_period_position(first_period);
-    int t_last = sample.get_period_position(last_period);
+    int t_first = sample->get_period_position(first_period);
+    int t_last = sample->get_period_position(last_period);
     
     int t_last_wrong = t_last + 1;
     std::string last_period_wrong = "1991Y1";
