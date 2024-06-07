@@ -375,7 +375,7 @@ cdef class ComputedTable:
         >>> computed_table.nb_periods
         5
         >>> computed_table.sample
-        2010Y1:2014Y1
+        '2010Y1:2014Y1'
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    10    | 10/09 |    11    | 11/10 |    12    | 12/11 |    13    | 13/12 |    14    | 14/13
         --------------------------------------------------------------------------------------------------------------------------------
@@ -404,7 +404,7 @@ cdef class ComputedTable:
         >>> computed_table.nb_periods
         5
         >>> computed_table.sample
-        2010Y1:2014Y1
+        '2010Y1:2014Y1'
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    10    | 10/09 |    11    | 11/10 |    12    | 12/11 |    13    | 13/12 |    14    | 14/13
         --------------------------------------------------------------------------------------------------------------------------------

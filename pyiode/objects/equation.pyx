@@ -160,19 +160,19 @@ cdef class Equation:
         >>> from iode import variables, Equation, Sample
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF.set_sample("1980Y1", "2010Y1")
         >>> eq_ACAF.sample
-        1980Y1:2010Y1
+        '1980Y1:2010Y1'
         >>> # change only the starting period
         >>> eq_ACAF.set_sample(from_period="1970Y1")
         >>> eq_ACAF.sample
-        1970Y1:2015Y1
+        '1970Y1:2015Y1'
         >>> # change only the ending period
         >>> eq_ACAF.set_sample(to_period="2000Y1")
         >>> eq_ACAF.sample
-        1960Y1:2000Y1
+        '1960Y1:2000Y1'
         """
         if isinstance(from_period, Period):
             from_period = str(from_period)
@@ -310,7 +310,7 @@ cdef class Equation:
         >>> variables.clear()
         >>> variables.sample = "1960Y1:2015Y1"
         >>> variables.sample
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> # Do not create variables in the Variables database
         >>> eq_ACAF.get_variables_list(False)
         ['ACAF', 'VAF', 'GOSF', 'TIME']

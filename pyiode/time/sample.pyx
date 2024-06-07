@@ -27,7 +27,7 @@ cdef class Sample:
 
     cdef CSample c_sample
 
-    def __init__(self, *args: Union[Sample, Tuple[Union[str, Period], Union[str, Period]]]) -> Sample:
+    def __init__(self, *args) -> Sample:
         """
         A sample represents the series of sub periods attached to the IODE variables.
         
@@ -53,17 +53,17 @@ cdef class Sample:
         >>> # passing two strings
         >>> sample = Sample("1960Y1", "2015Y1")
         >>> sample
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> # passing two Period objects
         >>> start_period = Period("1960Y1")
         >>> end_period = Period("2015Y1")
         >>> sample = Sample(start_period, end_period)
         >>> sample
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> # copy a sample
         >>> sample_copy = Sample(sample)
         >>> sample_copy
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> # error: Incompatible periodicities
         >>> sample = Sample("1960Y1", "2015Q1")
         Traceback (most recent call last):
@@ -73,31 +73,36 @@ cdef class Sample:
         left period periodicity :Q
         right period periodicity:Y
         """
-        cdef string start_period
-        cdef string end_period  
-
-        def check_period(period) -> string:
-            if not isinstance(period, (str, Period)):
-                TypeError("Expected str or 'Period' object for the starting period.\n" + 
-                    "Got argument of type '" + type(period).__name__ + "'")
-            if isinstance(period, Period):
-                period = str(period)
-            return period.encode()
-
         if len(args) == 1:
-            smpl = args[0]
-            if not isinstance(smpl, Sample):
-                raise TypeError("Expected one argument of type 'Sample' or two arguments of type str or 'Period'.\n" + 
-                    "Got argument of type '" + type(smpl).__name__ + "'")
-            start_period = check_period(smpl.start)
-            end_period = check_period(smpl.end)
-            self.c_sample = CSample(start_period, end_period)
+            value = args[0]
+            if isinstance(value, str):
+                if ':' not in value:
+                    raise ValueError("Sample initialization value must be written as 'start_period:end_period'")
+                start_period, end_period = value.split(':')
+            elif isinstance(value, Sample):
+                start_period = str(value.start)
+                end_period = str(value.end)
+            else:
+                raise TypeError(f"Expected value of type str, Sample or tuple(str, str). "
+                                f"Got value of type '{type(value).__name__}' instead")
         elif len(args) == 2:
-            start_period = check_period(args[0])
-            end_period = check_period(args[1])
-            self.c_sample = CSample(start_period, end_period)
+            start_period, end_period = args
+
+            if isinstance(start_period, Period):
+                start_period = str(start_period)
+            if not isinstance(start_period, str):
+                raise TypeError("Expected value of type str or Period for the starting period for the sample. "
+                                f"Got value of type '{type(start_period).__name__}' instead")
+
+            if isinstance(end_period, Period):
+                end_period = str (end_period)
+            if not isinstance(end_period, str):
+                raise TypeError("Expected value of type str or Period for the starting period for the sample. "
+                                f"Got value of type '{type(end_period).__name__}' instead")
         else:
-            ValueError("Expected either one argument of type 'Sample' or two arguments of type str or 'Period'")
+            raise TypeError(f"Expected one or two arguments. Got {len(args)} arguments.")
+
+        self.c_sample = CSample(start_period.encode(), end_period.encode())
     
     def get_period_position(self, period: Union[str, Period]) -> int:
         """
@@ -157,13 +162,13 @@ cdef class Sample:
         >>> from iode import Sample
         >>> sample = Sample("1960Y1", "2015Y1")
         >>> sample
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> sample_2 = Sample("2000Y1", "2040Y1")
         >>> sample_2
-        2000Y1:2040Y1
+        '2000Y1:2040Y1'
         >>> sample_intersec = sample.intersection(sample_2)
         >>> sample_intersec
-        2000Y1:2015Y1
+        '2000Y1:2015Y1'
         """
         c_sample_inter = self.c_sample.intersection(other_sample.c_sample)
         str_sample = c_sample_inter.to_string().decode()
@@ -196,4 +201,4 @@ cdef class Sample:
         return self.c_sample.to_string().decode()
 
     def __repr__(self) -> str:
-        return self.c_sample.to_string().decode()
+        return repr(str(self))

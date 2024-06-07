@@ -936,7 +936,7 @@ cdef class _AbstractDatabase:
         >>> from iode import variables, nan
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
-        1960Y1:2015Y1
+        '1960Y1:2015Y1'
         >>> # -------- a) get one Variable --------
         >>> # get the variable values for the whole sample
         >>> variables["ACAF"]                       # doctest: +ELLIPSIS 
@@ -1115,7 +1115,7 @@ cdef class _AbstractDatabase:
         >>> for eq_name in block.split(';'):
         ...     equations[eq_name] = {"sample": estim_sample, "block": block}
         >>> (equations["ACAF"].sample, equations["ACAG"].sample, equations["AOUC"].sample)
-        (2000Y1:2010Y1, 2000Y1:2010Y1, 2000Y1:2010Y1)
+        ('2000Y1:2010Y1', '2000Y1:2010Y1', '2000Y1:2010Y1')
         >>> (equations["ACAF"].block, equations["ACAG"].block, equations["AOUC"].block)
         ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
         >>> # upate sample and block (Equation objects)
