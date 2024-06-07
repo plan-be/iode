@@ -37,7 +37,7 @@ TEST_F(LecTest, LEC)
 
     std::string period = "2002Y1";
     value = execute_lec("A - 1", period);
-    t = Variables.get_sample().get_period_position(period);
+    t = Variables.get_sample()->get_period_position(period);
     EXPECT_DOUBLE_EQ(var_A[t] - 1, value);
 
     std::vector<double> values = execute_lec("1 + A - 1");
