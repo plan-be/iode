@@ -224,7 +224,7 @@ public:
                 int start_column;
                 QString from;
                 QString to;
-                Sample sample_vars = Variables.get_sample();
+                Sample* sample_vars = Variables.get_sample();
                 
                 // check if the first line represents the periods 
                 QList<QString> cells = lines[0].split("\t");
@@ -250,7 +250,7 @@ public:
                     return;
                 }
                 
-                start_column = sample_vars.get_period_position(from.toStdString());
+                start_column = sample_vars->get_period_position(from.toStdString());
 
                 int row=0; 
                 int column=0;

@@ -34,8 +34,8 @@ void IdentitiesModel::executeIdentity(const int row)
 
 	try
 	{
-		Sample sample = Variables.get_sample();
-		displayed_database->execute_identities(sample.start_period(), sample.end_period(), name.toStdString());
+		Sample* sample = Variables.get_sample();
+		displayed_database->execute_identities(sample->start_period(), sample->end_period(), name.toStdString());
 		QMessageBox::information(nullptr, "INFO", "Identity " + name + " successfully executed");
 	}
 	catch(const std::exception& e)

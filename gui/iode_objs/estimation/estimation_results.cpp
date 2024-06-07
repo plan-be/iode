@@ -12,9 +12,9 @@ EstimationResultsDialog::EstimationResultsDialog(EditAndEstimateEquations* edit_
     set_correlation_matrix_tab();
     set_tests_tab();
 
-    Sample sample = edit_est_eqs->get_sample();
-    from = QString::fromStdString(sample.start_period().to_string());
-    to = QString::fromStdString(sample.end_period().to_string());
+    Sample* sample = edit_est_eqs->get_sample();
+    from = QString::fromStdString(sample->start_period().to_string());
+    to = QString::fromStdString(sample->end_period().to_string());
     for(const std::string& name: edit_est_eqs->get_list_equations()) 
         variables_names << QString::fromStdString(name);
 
@@ -82,9 +82,9 @@ void EstimationResultsDialog::plot_yobs_yest()
 
     // prepare local Variables KDB
     Variable values;
-    Sample sample = edit_est_eqs->get_sample();
+    Sample* sample = edit_est_eqs->get_sample();
     KDBVariables* kdb_vars = Variables.subset("", true);
-    kdb_vars->set_sample(sample.start_period(), sample.end_period());
+    kdb_vars->set_sample(sample->start_period(), sample->end_period());
 
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
@@ -93,7 +93,7 @@ void EstimationResultsDialog::plot_yobs_yest()
     plotDialog->setTitle(title);
 
     // set the periods for the plot
-    plotDialog->setPeriods(sample);
+    plotDialog->setPeriods(*sample);
 
     // observed values
     values = edit_est_eqs->get_observed_values(nEq.name);
@@ -118,9 +118,9 @@ void EstimationResultsDialog::plot_residual()
     QString lhs = QString::fromStdString(lrhs.first);
 
     // prepare local Variables KDB
-    Sample sample = edit_est_eqs->get_sample();
+    Sample* sample = edit_est_eqs->get_sample();
     KDBVariables* kdb_vars = Variables.subset("", true);
-    kdb_vars->set_sample(sample.start_period(), sample.end_period());
+    kdb_vars->set_sample(sample->start_period(), sample->end_period());
 
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
@@ -129,7 +129,7 @@ void EstimationResultsDialog::plot_residual()
     plotDialog->setTitle(title);
 
     // set the periods for the plot
-    plotDialog->setPeriods(sample);
+    plotDialog->setPeriods(*sample);
 
     // residual values
     Variable values = edit_est_eqs->get_residual_values(nEq.name);

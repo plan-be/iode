@@ -90,8 +90,8 @@ void EditTableDialog::plot()
 {
 	try
 	{
-        Sample smpl = Variables.get_sample();
-        QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+        Sample* smpl = Variables.get_sample();
+        QString gsample = QString::fromStdString(smpl->start_period().to_string()) + ":" + QString::number(smpl->nb_periods());
  
         ComputedTableGraph* gSampleGraph = new ComputedTableGraph(name, gsample.toStdString());
 
