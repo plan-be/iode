@@ -110,9 +110,9 @@ public:
     EditAndEstimateEquations(const std::string& from = "", const std::string& to = "");
     ~EditAndEstimateEquations();
 
-    Sample get_sample() const
+    Sample* get_sample() const
     {
-        return Sample(*sample);
+        return sample;
     }
 
     void set_sample(const Sample* sample = nullptr)
