@@ -124,7 +124,7 @@ public:
         if(sample)
             this->sample = new Sample(*sample);
         else
-            this->sample = new Sample(Variables.get_sample());
+            this->sample = new Sample(*Variables.get_sample());
     }
     
     void set_sample(const Period* from = nullptr, const Period* to = nullptr)
@@ -132,9 +132,9 @@ public:
         if(this->sample) 
             delete this->sample;
 
-        Sample vars_sample = Variables.get_sample();  
-        Period from_ = from ? Period(*from) : vars_sample.start_period();
-        Period to_ = to ? Period(*to) : vars_sample.end_period();
+        Sample* vars_sample = Variables.get_sample();  
+        Period from_ = from ? Period(*from) : vars_sample->start_period();
+        Period to_ = to ? Period(*to) : vars_sample->end_period();
 
         try
         {
@@ -152,9 +152,9 @@ public:
         if(this->sample) 
             delete this->sample;
 
-        Sample vars_sample = Variables.get_sample();  
-        Period from_ = (!from.empty()) ? Period(from) : vars_sample.start_period();
-        Period to_ = (!to.empty()) ? Period(to) : vars_sample.end_period();
+        Sample* vars_sample = Variables.get_sample();  
+        Period from_ = (!from.empty()) ? Period(from) : vars_sample->start_period();
+        Period to_ = (!to.empty()) ? Period(to) : vars_sample->end_period();
 
         try
         {

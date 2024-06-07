@@ -28,13 +28,13 @@ IODE_REAL KDBVariables::get_var(const int pos, const int t, const EnumIodeVarMod
 
 IODE_REAL KDBVariables::get_var(const int pos, const std::string& period, const EnumIodeVarMode mode) const
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	return get_var(pos, t, mode);
 }
 
 IODE_REAL KDBVariables::get_var(const int pos, const Period& period, const EnumIodeVarMode mode) const
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	return get_var(pos, t, mode);
 }
 
@@ -58,13 +58,13 @@ IODE_REAL KDBVariables::get_var(const std::string& name, const int t, const Enum
 
 IODE_REAL KDBVariables::get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode) const
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	return get_var(name, t, mode);
 }
 
 IODE_REAL KDBVariables::get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode) const
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	return get_var(name, t, mode);
 }
 
@@ -84,13 +84,13 @@ void KDBVariables::set_var(const int pos, const int t, const IODE_REAL value, co
 
 void KDBVariables::set_var(const int pos, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode)
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	set_var(pos, t, value, mode);
 }
 
 void KDBVariables::set_var(const int pos, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode)
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	set_var(pos, t, value, mode);
 }
 
@@ -103,13 +103,13 @@ void KDBVariables::set_var(const std::string& name, const int t, const IODE_REAL
 
 void KDBVariables::set_var(const std::string& name, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode)
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	set_var(name, t, value, mode);
 }
 
 void KDBVariables::set_var(const std::string& name, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode)
 {
-	int t = get_sample().get_period_position(period);
+	int t = get_sample()->get_period_position(period);
 	set_var(name, t, value, mode);
 }
 
@@ -167,12 +167,12 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 
 Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
-	Sample sample = get_sample();
-	if (sample.nb_periods() == 0) 
+	Sample* sample = get_sample();
+	if (sample->nb_periods() == 0) 
 		throw std::runtime_error("The Variables sample has not been yet defined");
 
-	int t_first = first_period.empty() ? 0 : sample.get_period_position(first_period);
-	int t_last = last_period.empty() ? sample.nb_periods() - 1 : sample.get_period_position(last_period);
+	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
+	int t_last = last_period.empty() ? sample->nb_periods() - 1 : sample->get_period_position(last_period);
 
 	return calculate_var_from_lec(lec, t_first, t_last);
 }
@@ -264,12 +264,12 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 
 void KDBVariables::update(const std::string& name, const Variable& values, const std::string& first_period, const std::string& last_period)
 {
-	Sample sample = get_sample();
-	if (sample.nb_periods() == 0) 
+	Sample* sample = get_sample();
+	if (sample->nb_periods() == 0) 
 		throw std::runtime_error("The Variables sample has not been yet defined");
 
-	int t_first = first_period.empty() ? 0 : sample.get_period_position(first_period);
-	int t_last = last_period.empty() ? sample.nb_periods() - 1 : sample.get_period_position(last_period);
+	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
+	int t_last = last_period.empty() ? sample->nb_periods() - 1 : sample->get_period_position(last_period);
 
 	update(name, values, t_first, t_last);
 }
@@ -282,19 +282,20 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 
 void KDBVariables::update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period)
 {
-	Sample sample = get_sample();
-	if (sample.nb_periods() == 0) 
+	Sample* sample = get_sample();
+	if (sample->nb_periods() == 0) 
 		throw std::runtime_error("The Variables sample has not been yet defined");
 	
-	int t_first = first_period.empty() ? 0 : sample.get_period_position(first_period);
-	int t_last = last_period.empty() ? sample.nb_periods() - 1 : sample.get_period_position(last_period);
+	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
+	int t_last = last_period.empty() ? sample->nb_periods() - 1 : sample->get_period_position(last_period);
 
 	update(name, lec, t_first, t_last);
 }
 
-Sample KDBVariables::get_sample() const
+// WARNING: the returned Sample pointer must not be deleted
+Sample* KDBVariables::get_sample() const
 {
-	return Sample(*KSMPL(get_database()));
+	return static_cast<Sample*>(KSMPL(get_database()));
 }
 
 void KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -302,15 +303,15 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 	if(from.empty() && to.empty())
 		return;
 	
-	Sample sample = get_sample();
-    if (sample.nb_periods() == 0 && (from.empty() || to.empty()))
+	Sample* sample = get_sample();
+    if (sample->nb_periods() == 0 && (from.empty() || to.empty()))
 	{
         throw std::invalid_argument(std::string("Current sample is empty.\n") + 
 			"Please provide a value for both 'from' and 'to' arguments"); 
 	}
 
-	std::string from_ = from.empty() ? sample.start_period().to_string() : from;
-	std::string to_ = to.empty() ? sample.end_period().to_string() : to;
+	std::string from_ = from.empty() ? sample->start_period().to_string() : from;
+	std::string to_ = to.empty() ? sample->end_period().to_string() : to;
 
 	Period period_from(from_);
 	Period period_to(to_);
@@ -332,7 +333,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 
 int KDBVariables::get_nb_periods() const
 {
-    return get_sample().nb_periods();
+    return get_sample()->nb_periods();
 }
 
 std::string KDBVariables::get_period(const int t) const
@@ -349,26 +350,26 @@ float KDBVariables::get_period_as_float(const int t) const
 
 std::vector<std::string> KDBVariables::get_list_periods(const std::string& from, const std::string& to) const
 {
-	Sample sample = get_sample();
+	Sample* sample = get_sample();
 	if(from.empty() && to.empty())
-		return sample.get_list_periods();
+		return sample->get_list_periods();
 	else
 	{
-		std::string from_ = from.empty() ? sample.start_period().to_string() : from;
-		std::string to_ = to.empty() ? sample.end_period().to_string() : to;
+		std::string from_ = from.empty() ? sample->start_period().to_string() : from;
+		std::string to_ = to.empty() ? sample->end_period().to_string() : to;
 		return Sample(from_, to_).get_list_periods();
 	}
 }
 
 std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& from, const std::string& to) const
 {
-	Sample sample = get_sample();
+	Sample* sample = get_sample();
 	if(from.empty() && to.empty())
-		return sample.get_list_periods_as_float();
+		return sample->get_list_periods_as_float();
 	else
 	{
-		std::string from_ = from.empty() ? sample.start_period().to_string() : from;
-		std::string to_ = to.empty() ? sample.end_period().to_string() : to;
+		std::string from_ = from.empty() ? sample->start_period().to_string() : from;
+		std::string to_ = to.empty() ? sample->end_period().to_string() : to;
 		return Sample(from_, to_).get_list_periods_as_float();
 	}
 }
@@ -380,9 +381,9 @@ void KDBVariables::copy_from(const std::string& input_file, const std::string& f
 
 		if((!from.empty()) || (!to.empty()))
 		{
-			Sample var_sample = get_sample();
-			buf += from.empty() ? var_sample.start_period().to_string() + " " : from + " ";
-			buf += to.empty() ? var_sample.end_period().to_string() + " " : to + " ";
+			Sample* var_sample = get_sample();
+			buf += from.empty() ? var_sample->start_period().to_string() + " " : from + " ";
+			buf += to.empty() ? var_sample->end_period().to_string() + " " : to + " ";
 			// throw error if wrong samples
 			Sample copy_sample(from, to);
 		}
