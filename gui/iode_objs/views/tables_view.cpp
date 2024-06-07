@@ -18,8 +18,8 @@ void TablesView::display()
 			return;
 
 		// generates the ComputedTable representing the whole global sample
-		Sample smpl = Variables.get_sample();
-		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+		Sample* smpl = Variables.get_sample();
+		QString gsample = QString::fromStdString(smpl->start_period().to_string()) + ":" + QString::number(smpl->nb_periods());
 
 		// computes and display the selected table
 		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
@@ -50,8 +50,8 @@ void TablesView::plot()
 			return;
 
 		// generates the ComputedTable representing the whole global sample
-		Sample smpl = Variables.get_sample();
-		QString gsample = QString::fromStdString(smpl.start_period().to_string()) + ":" + QString::number(smpl.nb_periods());
+		Sample* smpl = Variables.get_sample();
+		QString gsample = QString::fromStdString(smpl->start_period().to_string()) + ":" + QString::number(smpl->nb_periods());
 
 		// computes the tables and generates the associated graph
 		MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());

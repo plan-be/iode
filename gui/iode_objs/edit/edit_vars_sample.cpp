@@ -7,16 +7,16 @@ EditIodeSampleDialog::EditIodeSampleDialog(QWidget* parent) : QDialog(parent)
 	sampleFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_from, REQUIRED_FIELD);
 	sampleTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_to, REQUIRED_FIELD);
 
-	Sample sample = Variables.get_sample();
-	if (sample.nb_periods() == 0)
+	Sample* sample = Variables.get_sample();
+	if (sample->nb_periods() == 0)
 	{
 		labelTitle->setText("New Variables Sample");
 	}
 	else
 	{
 		labelTitle->setText("Variables Sample");
-		QString from = QString::fromStdString(sample.start_period().to_string());
-		QString to = QString::fromStdString(sample.end_period().to_string());
+		QString from = QString::fromStdString(sample->start_period().to_string());
+		QString to = QString::fromStdString(sample->end_period().to_string());
 		sampleFrom->setQValue(from);
 		sampleTo->setQValue(to);
 	}

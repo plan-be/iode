@@ -48,18 +48,18 @@ MenuComputeIdentities::MenuComputeIdentities(QWidget* parent) :
     className = "MENU_COMPUTE_IDENTITIES";
     loadSettings();
 
-    Sample sample = Variables.get_sample();
-    if(sample.nb_periods() > 0)
+    Sample* sample = Variables.get_sample();
+    if(sample->nb_periods() > 0)
     {
         if(qFrom->getQValue().toString().isEmpty())
         {
-            QString start_period = QString::fromStdString(sample.start_period().to_string());
+            QString start_period = QString::fromStdString(sample->start_period().to_string());
             qFrom->setQValue(QVariant(start_period));
         } 
 
         if(qTo->getQValue().toString().isEmpty())
         {
-            QString end_period = QString::fromStdString(sample.end_period().to_string());
+            QString end_period = QString::fromStdString(sample->end_period().to_string());
             qTo->setQValue(QVariant(end_period));
         }
     }
