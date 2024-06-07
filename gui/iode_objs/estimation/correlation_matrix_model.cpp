@@ -6,7 +6,7 @@ QVariant CorrelationMatrixModel::headerData(int section, Qt::Orientation orienta
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    return QString::fromStdString(corr_matrix.get_name(section));
+    return QString::fromStdString(corr_matrix->get_name(section));
 }
 
 QVariant CorrelationMatrixModel::data(const QModelIndex& index, int role) const
@@ -21,7 +21,7 @@ QVariant CorrelationMatrixModel::data(const QModelIndex& index, int role) const
 		return int(Qt::AlignRight);
 
     if (role == Qt::DisplayRole)
-        return QString::number(corr_matrix.get_value(index.row(), index.column()), 'g', 6);
+        return QString::number(corr_matrix->get_value(index.row(), index.column()), 'g', 6);
     else
         return QVariant();
 }

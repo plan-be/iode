@@ -25,22 +25,23 @@
 
 class CorrelationMatrixModel : public QAbstractTableModel
 {
-    CorrelationMatrix corr_matrix;
+    CorrelationMatrix* corr_matrix;
 
 public:
-    CorrelationMatrixModel(CorrelationMatrix corr_matrix, QObject* parent = nullptr) : 
+    CorrelationMatrixModel(CorrelationMatrix* corr_matrix, QObject* parent = nullptr) : 
         QAbstractTableModel(parent), corr_matrix(corr_matrix) {}
 
+	// WARNING: Do not delete corr_matrix has it deleted by the instance of EditAndEstimateEquations
     ~CorrelationMatrixModel() {}
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return corr_matrix.nb_coeffs;
+		return corr_matrix->nb_coeffs;
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return corr_matrix.nb_coeffs;
+		return corr_matrix->nb_coeffs;
 	}
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
