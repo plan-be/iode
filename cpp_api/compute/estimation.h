@@ -104,6 +104,7 @@ class EditAndEstimateEquations
 
     KDBEquations* kdb_eqs;
     KDBScalars* kdb_scl;
+    CorrelationMatrix* m_corr;
 
 public:
     EditAndEstimateEquations(const std::string& from = "", const std::string& to = "");
@@ -326,10 +327,9 @@ public:
         return NamedEquation(name, eq);
     }
 
-    CorrelationMatrix get_correlation_matrix() 
+    CorrelationMatrix* get_correlation_matrix() 
     { 
-        std::vector<std::string> v_coeffs = kdb_scl->get_names();
-        return CorrelationMatrix(v_coeffs, E_MCORR); 
+        return m_corr;
     }
 
     std::vector<IODE_REAL> get_observed_values(const std::string& name) const
