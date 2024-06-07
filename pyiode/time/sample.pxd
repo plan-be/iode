@@ -9,6 +9,7 @@ from time.period cimport CPeriod
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
 cdef extern from "cpp_api/time/sample.h":
     cdef cppclass CSample "Sample":
+        CSample(const CSample& sample) except +
         CSample(const string, const string) except +
         CPeriod start_period()
         CPeriod end_period()

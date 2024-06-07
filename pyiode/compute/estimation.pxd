@@ -37,7 +37,7 @@ cdef extern from "cpp_api/compute/estimation.h":
         CEditAndEstimateEquations(const string& from_period, const string& to_period) except +
         
         # getter and setter methods
-        CSample get_sample()
+        CSample* get_sample()
         void set_sample() except +
         void set_sample(const CSample* sample) except +
         void set_sample(const string& from_period, const string& to_period) except +

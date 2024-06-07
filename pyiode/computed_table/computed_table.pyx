@@ -415,9 +415,7 @@ cdef class ComputedTable:
         <BLANKLINE>
         """
         cdef CSample* c_sample = self.c_computed_table.get_sample()
-        start_period = c_sample.start_period().to_string().decode()
-        end_period = c_sample.end_period().to_string().decode()
-        return Sample(start_period, end_period)
+        return Sample._from_ptr(c_sample, <bint>False)
 
     @property
     def title(self) -> str:

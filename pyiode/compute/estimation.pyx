@@ -312,10 +312,8 @@ cdef class EditAndEstimateEquations:
         >>> estimation.sample
         '1980Y1:1996Y1'
         """
-        cdef CSample c_sample = self.c_estimation_ptr.get_sample()
-        start_period = c_sample.start_period().to_string().decode()
-        end_period = c_sample.end_period().to_string().decode()
-        return Sample(start_period, end_period)
+        cdef CSample* c_sample = self.c_estimation_ptr.get_sample()
+        return Sample._from_ptr(c_sample, <bint>False)
 
     @sample.setter 
     def sample(self, value: Union[str, slice, Tuple[Union[str, Period], Union[str, Period]], Sample]):

@@ -9,9 +9,10 @@
 
 # distutils: language = c++
 
+from cython.operator cimport dereference
+
 from typing import Union, Tuple, List, Optional, Any
 from time.sample cimport CSample
-from iode_python cimport free_tbl
 
 try:
     import larray as la
@@ -24,85 +25,53 @@ except ImportError:
 # Sample wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 cdef class Sample:
+    """
+    A sample represents the series of sub periods attached to the IODE variables.
 
-    cdef CSample c_sample
+    Attributes
+    ----------
+    start: str
+        First period of the sample.
+    end: str
+        Last period of the sample.
+    nb_periods
+        Total number of sub periods in the sample. 
 
-    def __init__(self, *args) -> Sample:
+    Examples
+    --------
+    >>> from iode import variables, SAMPLE_DATA_DIR
+    >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+    >>> variables.sample
+    '1960Y1:2015Y1'
+    """
+    cdef bint ptr_owner
+    cdef CSample* c_sample
+
+    def __init__(self):
+        # Prevent accidental instantiation from normal Python code
+        # since we cannot pass a struct pointer into a Python constructor.
+        raise TypeError("This class cannot be instantiated directly.")
+
+    def __cinit__(self):
+        self.ptr_owner = False
+        self.c_sample = NULL
+
+    def __dealloc__(self):
+        if self.ptr_owner and self.c_sample is not NULL:
+            del self.c_sample
+            self.c_sample = NULL
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    cdef Sample _from_ptr(CSample* ptr, bint owner=False):
         """
-        A sample represents the series of sub periods attached to the IODE variables.
-        
-        Parameters
-        ----------
-        start_period: str or Period
-            First period of the sample.
-        end_period: str or Period
-            Last period of the sample.
-
-        Attributes
-        ----------
-        start: str
-            First period of the sample.
-        end: str
-            Last period of the sample.
-        nb_periods
-            Total number of sub periods in the sample. 
-
-        Examples
-        --------
-        >>> from iode import Sample, Period
-        >>> # passing two strings
-        >>> sample = Sample("1960Y1", "2015Y1")
-        >>> sample
-        '1960Y1:2015Y1'
-        >>> # passing two Period objects
-        >>> start_period = Period("1960Y1")
-        >>> end_period = Period("2015Y1")
-        >>> sample = Sample(start_period, end_period)
-        >>> sample
-        '1960Y1:2015Y1'
-        >>> # copy a sample
-        >>> sample_copy = Sample(sample)
-        >>> sample_copy
-        '1960Y1:2015Y1'
-        >>> # error: Incompatible periodicities
-        >>> sample = Sample("1960Y1", "2015Q1")
-        Traceback (most recent call last):
-        ... 
-        RuntimeError: Cannot calculate the difference between the periods '2015Q1' and '1960Y1'
-        The two periods must share the same periodicity:
-        left period periodicity :Q
-        right period periodicity:Y
+        Factory function to create Sample objects from a given CSample pointer.
         """
-        if len(args) == 1:
-            value = args[0]
-            if isinstance(value, str):
-                if ':' not in value:
-                    raise ValueError("Sample initialization value must be written as 'start_period:end_period'")
-                start_period, end_period = value.split(':')
-            elif isinstance(value, Sample):
-                start_period = str(value.start)
-                end_period = str(value.end)
-            else:
-                raise TypeError(f"Expected value of type str, Sample or tuple(str, str). "
-                                f"Got value of type '{type(value).__name__}' instead")
-        elif len(args) == 2:
-            start_period, end_period = args
-
-            if isinstance(start_period, Period):
-                start_period = str(start_period)
-            if not isinstance(start_period, str):
-                raise TypeError("Expected value of type str or Period for the starting period for the sample. "
-                                f"Got value of type '{type(start_period).__name__}' instead")
-
-            if isinstance(end_period, Period):
-                end_period = str (end_period)
-            if not isinstance(end_period, str):
-                raise TypeError("Expected value of type str or Period for the starting period for the sample. "
-                                f"Got value of type '{type(end_period).__name__}' instead")
-        else:
-            raise TypeError(f"Expected one or two arguments. Got {len(args)} arguments.")
-
-        self.c_sample = CSample(start_period.encode(), end_period.encode())
+        # Fast call to __new__() that bypasses the __init__() constructor.
+        cdef Sample wrapper = Sample.__new__(Sample)
+        wrapper.c_sample = ptr
+        wrapper.ptr_owner = owner
+        return wrapper
     
     def get_period_position(self, period: Union[str, Period]) -> int:
         """
@@ -114,9 +83,9 @@ cdef class Sample:
 
         Examples
         --------
-        >>> from iode import Sample
-        >>> sample = Sample("1960Y1", "2015Y1")
-        >>> sample.get_period_position("1982Y1")
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.sample.get_period_position("1982Y1")
         22
         """
         if not isinstance(period, (str, Period)):
@@ -137,11 +106,11 @@ cdef class Sample:
 
         Examples
         --------
-        >>> from iode import Sample
-        >>> sample = Sample("1960Y1", "2015Y1")
-        >>> sample.get_list_periods()    #doctest: +ELLIPSIS
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.sample.get_list_periods()    #doctest: +ELLIPSIS
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
-        >>> sample.get_list_periods(as_float=True)    #doctest: +ELLIPSIS
+        >>> variables.sample.get_list_periods(as_float=True)    #doctest: +ELLIPSIS
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
         if as_float:
@@ -159,20 +128,20 @@ cdef class Sample:
 
         Examples
         --------
-        >>> from iode import Sample
-        >>> sample = Sample("1960Y1", "2015Y1")
-        >>> sample
+        >>> from iode import variables, SAMPLE_DATA_DIR
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.sample
         '1960Y1:2015Y1'
-        >>> sample_2 = Sample("2000Y1", "2040Y1")
-        >>> sample_2
+        >>> variables_2 = variables.copy()
+        >>> variables_2.sample = "2000Y1:2040Y1"
+        >>> variables_2.sample
         '2000Y1:2040Y1'
-        >>> sample_intersec = sample.intersection(sample_2)
+        >>> sample_intersec = variables.sample.intersection(variables_2.sample)
         >>> sample_intersec
         '2000Y1:2015Y1'
         """
-        c_sample_inter = self.c_sample.intersection(other_sample.c_sample)
-        str_sample = c_sample_inter.to_string().decode()
-        return Sample(*str_sample.split(':'))
+        cdef CSample c_sample_inter = self.c_sample.intersection(dereference(other_sample.c_sample))
+        return Sample._from_ptr(new CSample(c_sample_inter), <bint>True)
 
     # Attributes access
 
@@ -193,8 +162,6 @@ cdef class Sample:
     # Special methods
 
     def __eq__(self, other: Sample) -> bool:
-        if not isinstance(other, Sample):
-            raise TypeError(f"Expected argument of type 'Sample'.\nGot argument of type '{type(other)}'")
         return self.c_sample == other.c_sample
 
     def __str__(self) -> str:

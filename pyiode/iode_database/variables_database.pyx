@@ -200,7 +200,7 @@ cdef class Variables(_AbstractDatabase):
         return subset_db
 
     def _unfold_key(self, key) -> Tuple[Union[str, List[str]], Optional[str, Tuple[int, int], List[str]]]:
-        cdef CSample c_sample
+        cdef CSample* c_sample
 
         # no selection on periods
         if not isinstance(key, tuple):
@@ -756,10 +756,8 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         '1960Y1:2015Y1'
         """
-        c_sample = self.database_ptr.get_sample()
-        first_period = c_sample.start_period().to_string().decode()
-        last_period = c_sample.end_period().to_string().decode()
-        return Sample(first_period, last_period)
+        cdef CSample* c_sample = self.database_ptr.get_sample()
+        return Sample._from_ptr(c_sample, <bint>False)
 
     @sample.setter    
     def sample(self, value: Union[str, slice, Tuple[Union[str, Period], Union[str, Period]]]):
