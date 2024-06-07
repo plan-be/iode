@@ -121,13 +121,19 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	if (total_nb_periods == 0) 
 		throw std::runtime_error(prefix + "The Variables sample has not been yet defined");
 
-	std::string error_msg = prefix + "the {} period position must be in the range [0, " + 
-							std::to_string(total_nb_periods - 1) + "]. Got value {:d}";
+	std::string error_msg = "period position must be in the range [0, " + 
+	                        std::to_string(total_nb_periods - 1) + "]. Got value ";
 	if(t_first < 0 || t_first >= total_nb_periods)
-		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("first", t_first)));
+	{
+		error_msg = prefix + "the first " + error_msg + std::to_string(t_first);
+		throw std::invalid_argument(error_msg);
+	}
 
 	if(t_last < 0 || t_last >= total_nb_periods)
-		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("last", t_last)));
+	{
+		error_msg = prefix + "the last " + error_msg + std::to_string(t_last);
+		throw std::invalid_argument(error_msg);	
+	}
 
 	Variable var;
 	var.reserve(t_last - t_first + 1);
@@ -224,19 +230,28 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 	if (total_nb_periods == 0) 
 		throw std::runtime_error(prefix + "The Variables sample has not been yet defined");
 
-	std::string error_msg = prefix + "the {} period position must be in the range [0, " + 
-							std::to_string(total_nb_periods - 1) + "]. Got value {:d}";
+	std::string error_msg = "period position must be in the range [0, " + 
+	                        std::to_string(total_nb_periods - 1) + "]. Got value ";
 	if(t_first < 0 || t_first >= total_nb_periods)
-		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("first", t_first)));
+	{
+		error_msg = prefix + "the first " + error_msg + std::to_string(t_first);
+		throw std::invalid_argument(error_msg);
+	}
 
 	if(t_last < 0 || t_last >= total_nb_periods)
-		throw std::invalid_argument(std::vformat(error_msg, std::make_format_args("last", t_last)));
+	{
+		error_msg = prefix + "the last " + error_msg + std::to_string(t_last);
+		throw std::invalid_argument(error_msg);	
+	}
 
 	int nb_periods = t_last - t_first + 1;
 	if (values.size() != nb_periods)
-		throw std::range_error(std::vformat(prefix + "the size of the passed vector ({:d}) " + 
-				"does match the number of expected periods ({:d} -> period {:d} to {:d})", 
-				std::make_format_args((int) values.size(), nb_periods, t_first, t_last)));
+	{
+		error_msg = prefix + "the size of the passed vector " + std::to_string(values.size()) +  
+				    " does match the number of expected periods (" + std::to_string(nb_periods) + 
+					" -> period " + std::to_string(t_first) + " to " + std::to_string(t_last) + ")";
+		throw std::range_error(error_msg);
+	}
 
 	// prepare new Variable vector	
 	Variable variable = get(name);
