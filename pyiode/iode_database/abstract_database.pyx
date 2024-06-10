@@ -764,14 +764,34 @@ cdef class _AbstractDatabase:
 
     # needs to be overriden for Variables
     def __getitem__(self, key):
-        """
+        r"""
         Return the (subset of) IODE object(s) referenced by `key`.
+
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
 
         Parameters
         ----------
         key: str or list(str)
             (the list of) name(s) of the IODE object(s) to get.
-            The list of names can be given as a string pattern (e.g. "A*;*_").
+            The list of objects to get can be specified by a pattern or by a list of sub-patterns (e.g. "A*;*_").
 
         Returns
         -------
@@ -988,11 +1008,32 @@ cdef class _AbstractDatabase:
         r"""
         Update/add a (subset of) IODE object(s) referenced by `key` from/to the current database.
 
+        The `key` can represent a single object name (e.g. "ACAF") or a list of object names ("ACAF;ACAG;AOUC") 
+        or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `key` represents a list of object names or of sub-patterns, each name or sub-pattern is separated 
+        by a `separator` character which is either a whitespace ` `, or a comma `,`, or a semi-colon `;`, or a 
+        tabulation `\t`, or a newline `\n`.
+
+        A (sub-)`pattern` is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `key` can contain references to IODE lists which are prefixed with the symbol `$`.
+
         Parameters
         ----------
         key: str or list(str)
-            (list of) name(s) of the IODE object(s) to update/add.
-            The list of names can be given as a string pattern (e.g. "A*;*_").
+            (the list of) name(s) of the IODE object(s) to update/add.
+            The list of objects to update/add can be specified by a pattern or by a list of sub-patterns 
+            (e.g. "A*;*_").
         value: 
             (new) value(s) of the IODE object(s). 
 
