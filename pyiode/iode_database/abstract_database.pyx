@@ -510,7 +510,7 @@ cdef class _AbstractDatabase:
         
             - `*` : any character sequence, even empty
             - `?` : any character (one and only one)
-            - `@` : any alphanumerical char
+            - `@` : any alphanumerical char [A-Za-z0-9]
             - `&` : any non alphanumerical char
             - `|` : any alphanumeric character or none at the beginning and end of a string 
             - `!` : any non-alphanumeric character or none at the beginning and end of a string 
