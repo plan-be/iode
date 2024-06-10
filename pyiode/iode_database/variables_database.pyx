@@ -1312,28 +1312,49 @@ cdef class Variables(_AbstractDatabase):
         self.database_ptr.extrapolate(<EnumSimulationInitialization>method, from_period.encode(), to_period.encode(), 
                                       variables_list.encode())
 
-    def seasonal_adjustment(self, input_file: str, eps_test: float, series: Union[str, List[str]] = None):
+    # TODO : add doctests (ask Geert Bryon)
+    def seasonal_adjustment(self, input_file: str, eps_test: float=5.0, series: Union[str, List[str]] = None):
         """
+        Eliminate seasonal variations in monthly series (= variables).
+
+        The method constructs deseasonalized series using the *Census XI method*, as well as cyclical 
+        and stochastic trend components. Thus, In addition to the deseasonalized series (named after 
+        the series in the input file), the result is two other series:
+
+            - the series containing the cyclical trend component named : `_C<name>` where *name* is the original name
+            - the series containing the stochastic component called : `_I<name>` where *name* is the original name
+
+        Note that the deseasonalized series is the product of the other two.
+
+        To do this, the list of *series* (= variables) are loaded from the specified file *input_file* 
+        into the current IODE Variables database and simultaneously modifies the selected *series* if necessary.
+
+        The new *series* are added to or replace (for existing names) those in the current IODE Variables database.
+
+        In the case of non-existent value (NA) for one of the periods, the result is NA for the whole year.
 
         Parameters
         ----------
-        input_file: str
-            filepath to the input file.
-        eps_test: float
-            ???
+        input_file: str or Path
+            Filepath to the input file.
+        eps_test: float, optional
+            Criterion verifying whether a seasonal influence is present in a series
+            Default to 5.0.
         series: str or list(str), optional
-            list of series on which to apply seasonal adjustment.
-            Defaults to all variables.
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
+            list of series on which to apply the seasonal adjustment.
+            Defaults to None (all variables).
         """
-        if isinstance(series, Iterable) and all(isinstance(name, str) for name in series):
+        if isinstance(input_file, str):
+            input_file = Path(input_file)
+        if not input_file.exists():
+            raise ValueError(f"file '{str(input_file)}' not found.")
+        input_file = str(input_file)
+
+        if series is None:
+            series = ''
+        if not isinstance(series, str) and isinstance(series, Iterable) and \
+            all(isinstance(name, str) for name in series):
             series = ';'.join(series)
-        if not isinstance(series, str):
-            raise TypeError("series: Expected value of type string or list of string. " 
-                            f"Got value of type {type(series).__name__}")
 
         self.database_ptr.seasonal_adjustment(input_file.encode(), series.encode(), eps_test)
 
