@@ -701,6 +701,82 @@ TEST_F(KDBVariablesTest, Search)
     EXPECT_EQ(objs_list, expected_vars);
 }
 
+TEST_F(KDBVariablesTest, Extrapolate)
+{
+    Variables.clear();
+    Variables.set_sample("1995Y1", "2020Y1");
+    Variables.add("ACAF", "t");
+
+    // Y := Y[-1], if Y null or NA
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_TM1, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 6.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), 6.0);
+
+    // Y := Y[-1], always
+    Variables.update("ACAF", "t");
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_TM1_A, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), 4.0);
+
+    // Y := extrapolation, if Y null or NA
+    Variables.update("ACAF", "t");
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_EXTRA, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), 5.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 6.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), 7.0);
+
+    // Y := extrapolation, always
+    Variables.update("ACAF", "t");
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_EXTRA_A, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), 5.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 6.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), 7.0);
+
+    // Y unchanged
+    Variables.update("ACAF", "t");
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_ASIS, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), L_NAN);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 6.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), L_NAN);
+
+    // Y := Y[-1], if Y = NA
+    Variables.update("ACAF", "t");
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_TM1_NA, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 6.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), 6.0);
+
+    // Y := extrapolation, if Y = NA
+    Variables.update("ACAF", "t");
+    Variables.set_var("ACAF", "2000Y1", L_NAN);
+    Variables.set_var("ACAF", "2002Y1", L_NAN);
+    Variables.extrapolate(EnumSimulationInitialization::IV_INIT_EXTRA_NA, "2000Y1", "2020Y1");
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "1999Y1"), 4.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2000Y1"), 5.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2001Y1"), 6.0);
+    EXPECT_DOUBLE_EQ(Variables.get_var("ACAF", "2002Y1"), 7.0);
+}
+
 TEST_F(KDBVariablesTest, Hash)
 {
     boost::hash<KDBVariables> kdb_hasher;
