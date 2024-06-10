@@ -12,7 +12,7 @@ cimport cython
 cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from pyiode.common cimport L_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL
+from pyiode.common cimport L_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL, EnumSimulationInitialization
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -1180,47 +1180,137 @@ cdef class Variables(_AbstractDatabase):
         i_type_of_series = HTOL_SERIES_TYPES_DICT[type_of_series]
         cpp_high_to_low(<EnumIodeHtoL>i_type_of_series, filepath.encode(), var_list.encode())
 
-    def extrapolate(self, method: int, from_: Union[str, Period] = None, to: Union[str, Period] = None, 
+    def extrapolate(self, method: Union[str, int], from_period: Union[str, Period] = None, to_period: Union[str, Period] = None, 
                     variables_list: Union[str, List[str]] = None):
         """
+        Extrapolate variables using one the method described below, based on previous periods.
+
+        The possible methods are as follows:
+
+          - :math:`Y := Y[-1], if Y null or NA` (tm1) : each null or NA endogen at the start takes the value of 
+            the previous period,
+          - :math:`Y := Y[-1], always` (tm1_a) : each endogen takes the value of the previous period at the start,
+          - :math:`Y := extrapolation, if Y null or NA` (extra) : each null or NA endogen takes as value a linear 
+            extrapolation of the two previous periods,
+          - :math:`Y := extrapolation, always` (extra_a) : each endogen takes as its value a linear extrapolation of 
+            the two preceding periods, whether or not it is zero at the start,
+          - :math:`Y unchanged` (asis): endogenous values are not initialized. They retain their value whether or 
+            not they are zero,
+          - :math:`Y := Y[-1], if Y = NA` (tm1_na): each NA value takes the value of the previous period,
+          - :math:`Y := extrapolation, if Y = NA` (extra_na): each NA value takes the value of a linear extrapolation of 
+            the two previous periods.
+
+        The sample over which the calculation is to be performed must be supplied. 
+        This sample must be a sub-sample of the global sample defined in the current Variables database.
+
+        In addition, the list of variables to be extrapolated can be specified. 
+        If this list is not given, all variables will be extrapolated.
 
         Parameters
         ----------
-        method: int
-            initialization method.
-        from_: str or Period, optional
+        method: str or int
+            initialization method. Possible values are:
+              - "tm1" (SIMULATION_INIT_TM1): :math:`Y := Y[-1], if Y null or NA`
+              - "tm1_a" (SIMULATION_INIT_TM1_A): :math:`Y := Y[-1], always`
+              - "extra" (SIMULATION_INIT_EXTRA): :math:`Y := extrapolation, if Y null or NA`
+              - "extra_a" (SIMULATION_INIT_EXTRA_A): :math:`Y := extrapolation, always`
+              - "asis" (SIMULATION_INIT_ASIS): :math:`Y unchanged`
+              - "tm1_na" (SIMULATION_INIT_TM1_NA): :math:`Y := Y[-1], if Y = NA`
+              - "extra_na" (SIMULATION_INIT_EXTRA_NA): :math:`Y := extrapolation, if Y = NA`
+        from_period: str or Period, optional
             starting period to extrapolate variables.
             Defaults to the starting period if the current sample.
-        to: str or Period, optional
+        to_period: str or Period, optional
             ending period to extrapolate variables.
             Defaults to the ending period if the current sample.
         variables_list: str or list(str), optional
             list of variables to extrapolate.
-            Defaults to all.
+            Defaults to None (all variables).
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables, nan
+        >>> variables.clear()
+        >>> variables.sample = "2000Y1:2020Y1"
+
+        >>> def reset_ACAF():
+        ...     variables["ACAF"] = "t"
+        ...     variables["ACAF", ["2005Y1", "2007Y1"]] = nan
+        >>> # create ACAF
+        >>> reset_ACAF()
+        >>> variables["ACAF", :"2010Y1"]
+        [0.0, 1.0, 2.0, 3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0, 10.0]
+
+        >>> # "tm1" (Y := Y[-1], if Y null or NA)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("tm1", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
+
+        >>> # "tm1_a" (Y := Y[-1], always)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("tm1_a", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+
+        >>> # "extra" (Y := extrapolation, if Y null or NA)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("extra", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+
+        >>> # "extra_a" (Y := extrapolation, always)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("extra_a", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+
+        >>> # "asis" (Y unchanged)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("asis", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0]
+
+        >>> # "tm1_na" (Y := Y[-1], if Y = NA)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("tm1_na", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
+
+        >>> # "extra_na" (Y := extrapolation, if Y = NA)
+        >>> reset_ACAF()
+        >>> variables.extrapolate("extra_na", "2005Y1", "2010Y1")
+        >>> variables["ACAF", "2003Y1":"2009Y1"]
+        [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
         """
-        sample = self.sample
+        if isinstance(method, str):
+            method = method.lower()
+            method = SIMULATION_INITIALIZATION_REV_DICT[method]
+        if method not in SIMULATION_INITIALIZATION_DICT:
+            raise ValueError(f"'method': Possible values are {list(SIMULATION_INITIALIZATION_DICT.values())}. " 
+                             f"Got value {method} instead.") 
 
-        if from_ is None:
-            from_ = sample.start
-        if isinstance(from_, Period):
-            from_ = str(from_)
+        if from_period is None or to_period is None:
+            sample = self.sample
+            if from_period is None:
+                from_period = sample.start
+            if to_period is None:
+                to_period = sample.end
 
-        if to is None:
-            to = sample.end
-        if isinstance(to, Period):
-            to = str(to)
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
 
-        if isinstance(variables_list, Iterable) and all(isinstance(name, str) for name in variables_list):
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
+
+        if variables_list is None:
+            variables_list = ''
+        if not isinstance(variables_list, str) and isinstance(variables_list, Iterable) and \
+            all(isinstance(name, str) for name in variables_list):
             variables_list = ';'.join(variables_list)
-        if not isinstance(variables_list, str):
-            raise TypeError("series: Expected value of type string or list of string. "
-                            f"Got value of type {type(variables_list).__name__}")
 
-        self.database_ptr.extrapolate(method, from_.encode(), to.encode(), variables_list.encode())
+        self.database_ptr.extrapolate(<EnumSimulationInitialization>method, from_period.encode(), to_period.encode(), 
+                                      variables_list.encode())
 
     def seasonal_adjustment(self, input_file: str, eps_test: float, series: Union[str, List[str]] = None):
         """
