@@ -1343,6 +1343,10 @@ cdef class Variables(_AbstractDatabase):
         series: str or list(str), optional
             list of series on which to apply the seasonal adjustment.
             Defaults to None (all variables).
+
+        See Also
+        --------
+        Variables.trend_correction
         """
         if isinstance(input_file, str):
             input_file = Path(input_file)
@@ -1358,31 +1362,44 @@ cdef class Variables(_AbstractDatabase):
 
         self.database_ptr.seasonal_adjustment(input_file.encode(), series.encode(), eps_test)
 
+    # TODO : add doctests (ask Geert Bryon)
     def trend_correction(self, input_file: str, lambda_: float, series: Union[str, List[str]] = None, log: bool = False):
         """
+        Implementation of the *Hodrick-Prescott method* for trend series (= variables) construction. 
+        The principle is the same as for deseasonalization: series read from a file are imported and transformed simultaneously.
+
+        If the `log` flag is set, the series are log-transformed before calculation and exp-transformed after calculation. 
+        The series values must therefore be strictly positive.
 
         Parameters
         ----------
         input_file: str
             filepath to the input file.
         lambda_: float
-            ???
+            Lambda parameter of the Hodrick-Prescott method.
         series: str or list(str), optional
             list of series on which to apply the trend correction.
-            Defaults to all variables.
-        log: bool = False
-            Whether or not to print log messages.
+            Defaults to None (all variables).
+        log: bool, optional
+            Whether or not the series are log-transformed before calculation and exp-transformed 
+            after calculation. The series values must therefore be strictly positive.
             Defaults to False.
 
-        Examples
+        See Also
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        Variables.seasonal_adjustment
         """
-        if isinstance(series, Iterable) and all(isinstance(name, str) for name in series):
+        if isinstance(input_file, str):
+            input_file = Path(input_file)
+        if not input_file.exists():
+            raise ValueError(f"file '{str(input_file)}' not found.")
+        input_file = str(input_file)
+
+        if series is None:
+            series = ''
+        if not isinstance(series, str) and isinstance(series, Iterable) and \
+            all(isinstance(name, str) for name in series):
             series = ';'.join(series)
-        if not isinstance(series, str):
-            raise TypeError("series: Expected value of type string or list of string. "
-                            f"Got value of type {type(series).__name__}")
 
         self.database_ptr.trend_correction(input_file.encode(), lambda_, series.encode(), <bint>log)
 
