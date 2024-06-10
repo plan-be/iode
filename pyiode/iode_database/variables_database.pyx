@@ -528,6 +528,35 @@ cdef class Variables(_AbstractDatabase):
         2014Y1    1.01599
         2015Y1    1.01599
         Name: ZKFO, dtype: float64
+
+        >>> # Export a subset of the IODE Variables database as a pandas DataFrame
+        >>> df = variables["A*;*_"].to_frame()
+        >>> df.shape
+        (33, 56)
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
+        >>> df.columns.to_list()            # doctest: +ELLIPSIS
+        ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS
+        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1960Y1         NaN
+        1961Y1    0.247832
+        ...
+        2014Y1    1.423714
+        2015Y1    1.460863
+        Name: AOUC, dtype: float64    
+        >>> variables["ZZF_"]               # doctest: +ELLIPSIS
+        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1960Y1    0.6884
+        1961Y1    0.6884
+        ...
+        2014Y1    0.6884
+        2015Y1    0.6884
+        Name: ZZF_, dtype: float64
         """
         cdef np.ndarray[np.double_t, ndim = 2] data
         cdef double* cpp_values_ptr
@@ -670,6 +699,25 @@ cdef class Variables(_AbstractDatabase):
         >>> array["ZKFO"]
         time  1960Y1  1961Y1  1962Y1  ...     2012Y1     2013Y1     2014Y1     2015Y1
                  1.0     1.0     1.0  ...  1.0159901  1.0159901  1.0159901  1.0159901
+
+        >>> # Export a subset of the IODE Variables database as an (larray) Array object
+        >>> array = variables["A*;*_"].to_array()
+        >>> array.shape
+        (33, 56)
+        >>> array.axes.info
+        33 x 56
+         names [33]: 'ACAF' 'ACAG' 'AOUC' ... 'WNF_' 'YDH_' 'ZZF_'
+         time [56]: '1960Y1' '1961Y1' '1962Y1' ... '2013Y1' '2014Y1' '2015Y1'
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS
+        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> array["AOUC"]
+        time  1960Y1  ...              2014Y1              2015Y1
+                 nan  ...  1.4237139558484628  1.4608626117037322
+        >>> variables["ZZF_"]               # doctest: +ELLIPSIS
+        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        >>> array["ZZF_"]
+        time      1960Y1      1961Y1  ...      2013Y1      2014Y1      2015Y1
+              0.68840039  0.68840039  ...  0.68840039  0.68840039  0.68840039
         """
         if la is None:
             raise RuntimeError("larray library not found")
