@@ -152,8 +152,6 @@ cdef class TableCell:
 
     @align.setter
     def align(self, value: Union[int, str]):
-        if not isinstance(value, (int, str)):
-            raise TypeError(f"Expected value of type int or str. Got value of type {type(value).__name__} instead.")
         if isinstance(value, str):
             value = value.lower()
             value = CELL_ALIGN_REV_DICT[value] if value in CELL_ALIGN_REV_DICT else -1
@@ -466,8 +464,6 @@ cdef class TableLine:
     def graph_type(self, value: Union[int, str]):
         if self.c_line is NULL:
             return
-        if not isinstance(value, (int, str)):
-            raise TypeError(f"Expected value of type int or str. Got value of type {type(value).__name__} instead")
         if isinstance(value, str):
             value = value.lower()
             value = GRAPH_TYPE_REV_DICT[value] if value in GRAPH_TYPE_REV_DICT else -1
@@ -523,8 +519,6 @@ cdef class TableLine:
     def axis_left(self, value: bool):
         if self.c_line is NULL:
             return
-        if not isinstance(value, bool):
-            raise TypeError(f"Expected value of type bool. Got value of type {type(value).__name__} instead")
         self.c_line.set_line_axis(<bint>value)
 
     def __len__(self) -> int:
@@ -972,8 +966,6 @@ cdef class Table:
 
     @language.setter
     def language(self, lang: int):
-        if not isinstance(lang, int):
-            raise TypeError(f"Expected value of type int. Got value of type {type(lang).__name__} instead")
         if lang not in [LANG_ENGLISH, LANG_DUTCH, LANG_FRENCH]:
             raise ValueError(f"The value for 'language' must be either {LANG_ENGLISH} (LANG_ENGLISH), "
                              f"{LANG_DUTCH} (LANG_DUTCH) or {LANG_FRENCH} (LANG_FRENCH).\n"
@@ -1008,8 +1000,6 @@ cdef class Table:
 
     @gridx.setter
     def gridx(self, gridx: Union[str, int]):
-        if not isinstance(gridx, (str, int)):
-            raise TypeError(f"Expected value of type str or int. Got value of type {type(gridx).__name__} instead")
         if isinstance(gridx, str):
             gridx = GRAPH_GRID_REV_DICT[gridx] if gridx in GRAPH_GRID_REV_DICT else -1
         if gridx not in GRAPH_GRID_DICT:
@@ -1046,8 +1036,6 @@ cdef class Table:
 
     @gridy.setter
     def gridy(self, gridy: Union[str, int]):
-        if not isinstance(gridy, (str, int)):
-            raise TypeError(f"Expected value of type str or int. Got value of type {type(gridy).__name__} instead")
         if isinstance(gridy, str):
             gridy = GRAPH_GRID_REV_DICT[gridy] if gridy in GRAPH_GRID_REV_DICT else -1
         if gridy not in GRAPH_GRID_DICT:
@@ -1084,8 +1072,6 @@ cdef class Table:
 
     @graph_axis.setter
     def graph_axis(self, axis: Union[str, int]):
-        if not isinstance(axis, (str, int)):
-            raise TypeError(f"Expected value of type str or int. Got value of type {type(axis).__name__} instead")
         if isinstance(axis, str):
             axis = GRAPH_AXIS_REV_DICT[axis] if axis in GRAPH_AXIS_REV_DICT else -1
         if axis not in GRAPH_AXIS_DICT:
@@ -1122,8 +1108,6 @@ cdef class Table:
 
     @graph_alignment.setter
     def graph_alignment(self, align: Union[str, int]):
-        if not isinstance(align, (str, int)):
-            raise TypeError(f"Expected value of type str or int. Got value of type {type(align).__name__} instead")
         if isinstance(align, str):
             align = GRAPH_ALIGN_REV_DICT[align] if align in GRAPH_ALIGN_REV_DICT else -1
         if align not in GRAPH_ALIGN_DICT:

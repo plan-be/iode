@@ -130,7 +130,7 @@ cdef extern from "cpp_api/KDB/kdb_identities.h":
         string copy(string& name) except +
         int add(string& name, string& identity_lec) except +
         void update(string& name, string& identity_lec) except +
-        void execute_identities(string& from_, string& to, string& identities_list, 
+        void execute_identities(string& from_period, string& to, string& identities_list, 
                                 string& var_files, string& scalar_files, bint trace) except +
 
     size_t hash_value(KDBIdentities&) except +
@@ -230,15 +230,15 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         void set_var(string& name, string& period, double value, EnumIodeVarMode mode) except +
 
         CSample* get_sample()
-        void set_sample(string& from_, string& to) except +
+        void set_sample(string& from_period, string& to_period) except +
 
         int get_nb_periods()
         string get_period(int t) except +
         float get_period_as_float(int t) except +
-        vector[string] get_list_periods(string& from_, string& to) except +
-        vector[float] get_list_periods_as_float(string& from_, string& to) except +
+        vector[string] get_list_periods(string& from_period, string& to_period) except +
+        vector[float] get_list_periods_as_float(string& from_period, string& to_period) except +
 
-        void extrapolate(EnumSimulationInitialization method, string& from_, string& to, string& variables_list) except +
+        void extrapolate(EnumSimulationInitialization method, string& from_period, string& to, string& variables_list) except +
         void seasonal_adjustment(string& input_file, string& series, double eps_test) except +
         void trend_correction(string& input_file, double lambda_, string& series, bint log) except +
 

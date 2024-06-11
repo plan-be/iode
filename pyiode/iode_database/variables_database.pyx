@@ -733,7 +733,7 @@ cdef class Variables(_AbstractDatabase):
     @property
     def mode(self) -> str:
         """
-        Return the current display mode for the values.
+        Current display mode for the IODE Variables values.
 
         Possible modes are:
         
@@ -743,45 +743,34 @@ cdef class Variables(_AbstractDatabase):
           * VAR_MODE_Y0Y_DIFF,
           * VAR_MODE_Y0Y_GROWTH_RATE
 
-        The default mode is 'Level'
+        The default mode is 'Level'.
+
+        Parameters
+        ----------
+        value: int
+            New mode value.
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import SAMPLE_DATA_DIR, VAR_MODE_LEVEL, VAR_MODE_GROWTH_RATE
         >>> from iode import variables
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.mode
         'Level'
+        >>> variables["ACAF", "1990Y1"]
+        23.771
+        
+        >>> variables.mode = VAR_MODE_GROWTH_RATE
+        >>> variables["ACAF", "1990Y1"]
+        38.48528176607737
+        >>> variables.mode = VAR_MODE_LEVEL
+        >>> variables["ACAF", "1990Y1"]
+        23.771
         """
         return VARIABLES_MODES[<int>self.mode_]
 
     @mode.setter
     def mode(self, mode_: int):
-        """
-        Set the display mode for the Variables values.
-
-        Possible modes are:
-        
-          * VAR_MODE_LEVEL,
-          * VAR_MODE_DIFF,
-          * VAR_MODE_GROWTH_RATE,
-          * VAR_MODE_Y0Y_DIFF,
-          * VAR_MODE_Y0Y_GROWTH_RATE
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR, VAR_MODE_GROWTH_RATE
-        >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> variables.mode
-        'Level'
-        >>> variables["ACAF", "1990Y1"]
-        0.25
-        
-        >>> variables.mode = VAR_MODE_GROWTH_RATE
-        >>> variables["ACAF", "1990Y1"]
-        0.25
-        """
         if mode_ not in [VAR_MODE_LEVEL, VAR_MODE_DIFF, VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE]:
             raise ValueError("mode: possible values are [VAR_MODE_LEVEL, VAR_MODE_DIFF, "
                              "VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE]")
@@ -790,33 +779,12 @@ cdef class Variables(_AbstractDatabase):
     @property
     def sample(self) -> Sample:
         """
-        Return the current Variables sample.
-
-        Returns
-        -------
-        Sample
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import variables
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> variables.sample
-        '1960Y1:2015Y1'
-        """
-        cdef CSample* c_sample = self.database_ptr.get_sample()
-        return Sample._from_ptr(c_sample, <bint>False)
-
-    @sample.setter    
-    def sample(self, value: Union[str, slice, Tuple[Union[str, Period], Union[str, Period]]]):
-        """
-        Set/Update the sample of the Variables database.
+        Current sample of the IODE Variables database.
 
         Parameters
         ----------
-        value: str or slice(str, str) or tuple(str, str)
-            New sample as string 'start_period:last_period' or as a slice 'start_period':'last_period' 
-            or as a tuple 'start_period', 'last_period'.
+        value: str or tuple(str, str)
+            New sample as string 'start_period:last_period' or as a tuple 'start_period', 'last_period'.
         
         Examples
         --------
@@ -838,37 +806,33 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.sample
         '1980Y1:2010Y1'
 
-        >>> # update sample by passing a slice
-        >>> variables.sample = '1950Y1':'2000Y1'
-        >>> variables.sample
-        '1950Y1:2000Y1'
-
         >>> # update sample by passing a start period and 
         >>> # an end period separated by a comma
         >>> variables.sample = '1980Y1', '2010Y1'
         >>> variables.sample
         '1980Y1:2010Y1'
         """
+        cdef CSample* c_sample = self.database_ptr.get_sample()
+        return Sample._from_ptr(c_sample, <bint>False)
+
+    @sample.setter    
+    def sample(self, value: Union[str, Tuple[Union[str, Period], Union[str, Period]]]):
         if isinstance(value, str):
             if ':' not in value:
-                raise ValueError(f"sample: Missing colon ':' in the definition of the new sample. Got value {value}.")
-            from_, to = value.split(':')
-        elif isinstance(value, slice):
-            sample = self.sample
-            from_ = sample.start if value.start is None else value.start
-            to = sample.end if value.stop is None else value.stop
-        elif isinstance(value, tuple) and len(value) == 2:
-            from_, to = value
-            if isinstance(from_, Period):
-                from_ = str(from_)
-            if isinstance(to, Period):
-                to = str(to)
-        else:
-            raise TypeError("variables.sample = value: 'value' must be either a string 'start_period:last_period', "
-                            "a slice 'start_period':'last_period' or a tuple 'start_period', 'last_period'.\n "
-                            f"Got 'value' of type {type(value).__name__}")
+                raise ValueError("sample: Missing colon ':' in the definition of the new sample. "
+                                 f"Got value '{value}'.")
+            from_period, to_period = value.split(':')
+        elif isinstance(value, tuple):
+            if not len(value) == 2:
+                raise ValueError("'sample': Expected two values: from_period, to_period. "
+                                 f"Got {len(value)} values.")
+            from_period, to_period = value
+            if isinstance(from_period, Period):
+                from_period = str(from_period)
+            if isinstance(to_period, Period):
+                to_period = str(to_period)
         
-        self.database_ptr.set_sample(from_.encode(), to.encode())
+        self.database_ptr.set_sample(from_period.encode(), to_period.encode())
 
     @property
     def nb_periods(self) -> int:
@@ -933,16 +897,17 @@ cdef class Variables(_AbstractDatabase):
         """
         return self.database_ptr.get_list_periods_as_float(bytes(), bytes())
 
-    def periods_subset(self, from_: Union[str, Period] = None, to: Union[str, Period] = None, as_float: bool = False):
+    def periods_subset(self, from_period: Union[str, Period] = None, to_period: Union[str, Period] = None, 
+                       as_float: bool = False):
         """
         Return a subset of the periods from the current Variables sample.
 
         Parameters
         ----------
-        from_: str or Period, optional
+        from_period: str or Period, optional
             first period of the subset of periods.
             Defaults to the first period of the current Variables sample.
-        to: str or Period, optional
+        to_period: str or Period, optional
             last period of the subset of periods.
             Defaults to the last period of the current Variables sample.
         as_float: bool, optional
@@ -965,29 +930,23 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.periods_subset("1990Y1", "2000Y1", as_float=True)     # doctest: +ELLIPSIS
         [1990.0, 1991.0, ..., 1999.0, 2000.0]
         """
-        sample = self.sample
-
-        if not from_:
-            from_ = sample.start
-        if isinstance(from_, Period):
-            from_ = str(from_)
-        if not isinstance(from_, str):
-            raise TypeError(f"from_: Expected value of type str or 'Period'. Got value of type {type(from_).__name__}")
-
-        if not to:
-            to = sample.end
-        if isinstance(to, Period):
-            to = str(to)
-        if not isinstance(to, str):
-            raise TypeError(f"to: Expected value of type str or 'Period'. Got value of type {type(to).__name__}")
-
-        if not isinstance(as_float, bool):
-            raise TypeError(f"as_float: Expected value of type bool. Got value of type {type(as_float).__name__}")
+        if from_period is None or to_period is None:
+            sample = self.sample
+            if from_period is None:
+                from_period = sample.start
+            if to_period is None:
+                to_period = sample.end
+        
+        if isinstance(from_period, Period):
+            from_period = str(from_period)
+        if isinstance(to_period, Period):
+            to_period = str(to_period)
 
         if as_float:
-            return self.database_ptr.get_list_periods_as_float(from_.encode(), to.encode())
+            return self.database_ptr.get_list_periods_as_float(from_period.encode(), to_period.encode())
         else:
-            return [cpp_period.decode() for cpp_period in self.database_ptr.get_list_periods(from_.encode(), to.encode())]
+            return [cpp_period.decode() for cpp_period in 
+                    self.database_ptr.get_list_periods(from_period.encode(), to_period.encode())]
         
     def low_to_high(self, type_of_series: str, method: str, filepath: str, var_list: Union[str, List[str]]):
         """

@@ -193,11 +193,12 @@ cdef class _AbstractDatabase:
     @property
     def description(self) -> str:
         """
-        Return the description of the current database
+        Description of the current database.
 
-        Returns
-        -------
-        str
+        Parameters
+        ----------
+        value: str
+            New description.
         
         Examples
         --------
@@ -212,25 +213,6 @@ cdef class _AbstractDatabase:
 
     @description.setter
     def description(self, value: str):
-        """
-        Set the description of the current database.
-
-        Parameters
-        ----------
-        value: str
-            New description.
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import comments
-        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
-        >>> comments.description = "test data from file 'fun.cmt'"
-        >>> comments.description
-        "test data from file 'fun.cmt'"
-        """
-        if not isinstance(value, str):
-            raise TypeError(f"'description': Expected value of type string. Got value of type {type(value).__name__}")
         self.abstract_db_ptr.set_description(value.encode())
 
     def get_names(self, pattern: Union[str, List[str]]="") -> List[str]:
