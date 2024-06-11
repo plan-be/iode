@@ -2,6 +2,7 @@
 
 from typing import Union, Tuple, List, Optional
 
+from pyiode.util cimport L_ISAN
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.scalar cimport hash_value as hash_value_scl
 
@@ -33,15 +34,15 @@ cdef class Scalar:
     >>> # default scalar
     >>> scalar = Scalar()
     >>> scalar
-    Scalar(0.9, 1, nan)
+    Scalar(0.9, 1, na)
     >>> # default relax
     >>> scalar = Scalar(0.5)
     >>> scalar
-    Scalar(0.5, 1, nan)
+    Scalar(0.5, 1, na)
     >>> # specific value and relax
     >>> scalar = Scalar(0.5, 0.8)
     >>> scalar
-    Scalar(0.5, 0.8, nan)
+    Scalar(0.5, 0.8, na)
     """
 
     cdef CScalar c_scalar
@@ -84,15 +85,13 @@ cdef class Scalar:
     # Special methods
 
     def __eq__(self, other: Scalar) -> bool:
-        if not isinstance(other, Scalar):
-            raise TypeError(f"Expected argument of type 'Scalar'.\nGot argument of type '{type(other).__name__}'")
         return self.c_scalar == other.c_scalar
 
     def __str__(self) -> str:
-        return self.c_scalar.to_string().decode()
+        return f"Scalar({_iode_number_to_str(self.value)}, {_iode_number_to_str(self.relax)}, {_iode_number_to_str(self.std)})"
 
     def __repr__(self) -> str:
-        return self.c_scalar.to_string().decode()
+        return str(self)
 
     def __hash__(self) -> int:
         return <int>hash_value_scl(self.c_scalar)

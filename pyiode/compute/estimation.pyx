@@ -525,9 +525,9 @@ cdef class EditAndEstimateEquations:
         >>> scalars_res.get_names()
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> scalars_res["dpuh_1"]
-        Scalar(0.9, 1, nan)
+        Scalar(0.9, 1, na)
         >>> scalars_res["dpuh_2"]
-        Scalar(0.9, 1, nan)
+        Scalar(0.9, 1, na)
         """
         return self.c_estimation_ptr.get_block().decode()
 
@@ -1022,9 +1022,9 @@ cdef class EditAndEstimateEquations:
         >>> scalars_est.get_names()
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> scalars_est["acaf1"]
-        Scalar(0.9, 1, nan)
+        Scalar(0.9, 1, na)
         >>> scalars_est["dpuh_1"]
-        Scalar(0.9, 1, nan)
+        Scalar(0.9, 1, na)
 
         >>> equations_est = estimation.equations_db
         >>> equations_est["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
@@ -1178,9 +1178,9 @@ cdef class EditAndEstimateEquations:
                     stdev: 0
             date: )
         >>> scalars["acaf1"]
-        Scalar(0.9, 1, nan)
+        Scalar(0.9, 1, na)
         >>> scalars["dpuh_1"]
-        Scalar(0.9, 1, nan)
+        Scalar(0.9, 1, na)
 
         >>> # save results in the global databases
         >>> new_eqs = estimation.save()
