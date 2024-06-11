@@ -1085,19 +1085,44 @@ cdef class Variables(_AbstractDatabase):
         cpp_low_to_high(<EnumIodeLtoH>i_type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
 
 
-    def high_to_low(self, type_of_series: str, filepath: str, var_list: Union[str, List[str]]):
+    def high_to_low(self, type_of_series: str, filepath: Union[str, Path], var_list: Union[str, List[str]]):
         """
-        Transform high periodicity to low periodicity series (i.e. variables).
+        Build series of lower periodicity by (summing the / taking the average of the / taking the 
+        last observation of) sub-periods.
+
+        The list of specified series (variables) from the input file are loaded into the current 
+        Variables database and the periodicity of these series (variables) is modified simultaneously. 
+        The new periodicity is the one currently defined in the current Variables database.
+
+        The loaded series are added to or replace those (for existing names) in the current 
+        Variables database.
+
+        This procedure exists for the following cases:
+
+            - monthly to annual 
+              (annual observation = sum of 12 months / average of 12 months / December value) 
+            - quarterly to annual 
+              (annual observation = sum of 4 quarters / average of 4 quarters / last quarter value) 
+            - monthly to quarterly 
+              (quarterly observation = sum of 3 months / average of 3 months / value for the last month of the quarter) 
+
+        Three types of series are available:
+
+            - sum ('S'): addition of sub-periods data
+            - mean ('M'): average of sub-periods data
+            - last ('L'): last observation
+
+        In the case of a non-existent value (:math:`NA`) for one of the sub-periods, the result is :math:`NA`.
 
         Parameters
         ----------
         type_of_series : str
-            Three types of series are considered : 
-                - 'L' (HTOL_LAST) : last sub-period value
-                - 'M' (HTOL_MEAN) : average of sub-period data
+            Three types of series are available: 
                 - 'S' (HTOL_SUM) : addition of sub-period data
+                - 'M' (HTOL_MEAN) : average of sub-period data
+                - 'L' (HTOL_LAST) : last observation
 
-        filepath : str
+        filepath : str or Path
             Filepath to the source data file.
 
         var_list : str or list(str)
@@ -1137,22 +1162,20 @@ cdef class Variables(_AbstractDatabase):
         >>> variables["ACAG", "2010Y1":"2014Y1"]
         [28.253928978210485, 29.284600364034908, 30.323961150311572, 31.370138810695362, 32.4202988291984]
         """
-        if not isinstance(type_of_series, str):
-            raise TypeError(f"'type_of_series': Expected value of type str. Got value of type {type(type_of_series).__name__} instead")
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+        if not filepath.exists():
+            raise ValueError(f"file '{str(filepath)}' not found.")
+        filepath = str(filepath)
 
         type_of_series = type_of_series.upper()
         if type_of_series not in [HTOL_LAST, HTOL_MEAN, HTOL_SUM]:
             raise ValueError(f"'type_of_series': possible values are 'L' (HTOL_LAST), 'M' (HTOL_MEAN) or 'S' (HTOL_SUM). "
                             f"Got value {type_of_series} instead")
 
-        if not isinstance(filepath, str):
-            raise TypeError(f"'filepath': Expected value of type str. Got value of type {type(filepath).__name__} instead")
-
-        if isinstance(var_list, Iterable) and all(isinstance(item, str) for item in var_list):
+        if not isinstance(var_list, str) and isinstance(var_list, Iterable) and \
+            all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
-
-        if not isinstance(var_list, str):
-            raise TypeError(f"'filepath': Expected value of type str or list of str. Got value of type {type(filepath).__name__} instead")
 
         i_type_of_series = HTOL_SERIES_TYPES_DICT[type_of_series]
         cpp_high_to_low(<EnumIodeHtoL>i_type_of_series, filepath.encode(), var_list.encode())
