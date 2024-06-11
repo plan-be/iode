@@ -24,7 +24,7 @@ from util cimport (L_ISAN, IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAd
 
 def is_NA(value: float) -> bool:
     """
-    Check whether a float value represents a valid IODE number or an IODE non-defined :math:`NA` value.
+    Check whether a float value represents a valid IODE number or an IODE *Not Available* :math:`NA` value.
 
     Parameters
     ----------
@@ -33,20 +33,20 @@ def is_NA(value: float) -> bool:
     Returns
     -------
     bool
-        True if the float value represents a valid IODE number. 
+        True if the float value represents an IODE *Not Available* :math:`NA` value.
 
     Examples
     --------
     >>> from iode import NA, is_NA
     >>> is_NA(1.0)
-    True
-    >>> is_NA(NA)
     False
+    >>> is_NA(NA)
+    True
     """
-    return L_ISAN(value)
+    return not L_ISAN(value)
 
 def _iode_number_to_str(value: float) -> str:
-    return f"{value:g}" if is_NA(value) else "na"
+    return "na" if is_NA(value) else f"{value:g}"
 
 
 # Miscellaneous functions
