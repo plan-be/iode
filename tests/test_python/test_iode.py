@@ -7,6 +7,8 @@
 
 import iode
 import pytest
+import numpy as np
+import pandas as pd
 import larray as la
 import logging
 
@@ -20,6 +22,59 @@ IODE_VERBOSE = 1
 if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir()
 
+
+# Variables
+# ---------
+
+def test_from_frame():
+    # check that pandas nan are converted to IODE NA
+    iode.variables.clear()
+    assert len(iode.variables) == 0
+
+    # create the pandas DataFrame
+    vars_names = [f"{region}_{code}" for region in ["VLA", "WAL", "BXL"] for code in ["00", "01", "02"]]
+    periods_list = [f"{i}Y1" for i in range(1960, 1971)]
+    data = np.arange(len(vars_names) * len(periods_list), dtype=float).reshape(len(vars_names), len(periods_list))
+    df = pd.DataFrame(index=vars_names, columns=periods_list, data=data)
+    # set first and last value to nan
+    df.loc["VLA_00", "1960Y1"] = np.nan
+    df.loc["BXL_02", "1970Y1"] = np.nan
+
+    # load into the IODE Variables database
+    iode.variables.from_frame(df)
+    assert len(iode.variables) == 9
+    assert str(iode.variables.sample) == '1960Y1:1970Y1'
+
+    # check some valid and NA values
+    assert iode.is_NA(iode.variables["VLA_00", "1960Y1"])
+    assert iode.variables["VLA_00", "1970Y1"] == 10.0
+    assert iode.variables["BXL_02", "1960Y1"] == 88.0
+    assert iode.is_NA(iode.variables["BXL_02", "1970Y1"])
+
+
+def test_from_array():
+    # check that LArray nan are converted to IODE NA
+    iode.variables.clear()
+    assert len(iode.variables) == 0
+
+    regions_axis = la.Axis("region=VLA,WAL,BXL")
+    code_axis = la.Axis("code=00..02")
+    periods_axis = la.Axis("time=1960Y1..1970Y1")
+    array = la.ndtest((regions_axis, code_axis, periods_axis), dtype=float)
+    # set first and last value to nan
+    array["VLA", "00", "1960Y1"] = np.nan
+    array["BXL", "02", "1970Y1"] = np.nan
+    
+    # load the IODE Variables from the Array object
+    iode.variables.from_array(array)
+    assert len(iode.variables) == 9
+    assert str(iode.variables.sample) == '1960Y1:1970Y1'
+
+    # check some valid and NA values
+    assert iode.is_NA(iode.variables["VLA_00", "1960Y1"])
+    assert iode.variables["VLA_00", "1970Y1"] == 10.0
+    assert iode.variables["BXL_02", "1960Y1"] == 88.0
+    assert iode.is_NA(iode.variables["BXL_02", "1970Y1"])
 
 # WRITE
 # -----
