@@ -45,6 +45,9 @@ def is_NA(value: float) -> bool:
     """
     return L_ISAN(value)
 
+def _iode_number_to_str(value: float) -> str:
+    return f"{value:g}" if is_NA(value) else "na"
+
 
 # Miscellaneous functions
 # -----------------------
