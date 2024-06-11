@@ -87,7 +87,7 @@ def _numpy_array_to_ws(data, vars_names: Iterable[str], periods_list: Iterable[s
     IodeCalcSamplePosition(_cstr(start_period), _cstr(last_period), &df_pos, &ws_pos, &lg)
 
     # replace numpy/pandas NaN by IODE NaN
-    data = np.nan_to_num(data, nan=nan)
+    data = np.nan_to_num(data, nan=NA)
 
     # copy each line of array into KV_WS on the time intersection of df and KV_WS
     # values = <double*>np.PyArray_DATA(df[vars_names[0]].data)
@@ -1229,13 +1229,13 @@ cdef class Variables(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import variables, nan
+        >>> from iode import variables, NA
         >>> variables.clear()
         >>> variables.sample = "2000Y1:2020Y1"
 
         >>> def reset_ACAF():
         ...     variables["ACAF"] = "t"
-        ...     variables["ACAF", ["2005Y1", "2007Y1"]] = nan
+        ...     variables["ACAF", ["2005Y1", "2007Y1"]] = NA
         >>> # create ACAF
         >>> reset_ACAF()
         >>> variables["ACAF", :"2010Y1"]

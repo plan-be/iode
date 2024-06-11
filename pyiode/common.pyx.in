@@ -54,7 +54,7 @@ __version__ = "${CMAKE_PROJECT_VERSION}"
 
 # IODE CONSTANTS
 # --------------
-nan: float = L_NAN
+NA: float = L_NAN
 
 COMMENTS: int = EnumIodeType.I_COMMENTS
 EQUATIONS: int = EnumIodeType.I_EQUATIONS
