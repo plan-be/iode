@@ -58,16 +58,6 @@ Scalar::Scalar(const Scalar& scalar)
     this->std = scalar.std;
 }
 
-std::string Scalar::to_string() const
-{
-    std::string s = "Scalar(";
-    s += L_ISAN(val) ? std::format("{:g}, ", val) : "nan, ";
-    s += L_ISAN(relax) ? std::format("{:g}, ", relax) : "nan, ";
-    s += L_ISAN(std) ? std::format("{:g}", std) : "nan";
-    s += ")";
-    return s;
-}
-
 // required to be used in std::map
 Scalar& Scalar::operator=(const Scalar& scalar)
 {
