@@ -1350,11 +1350,11 @@ cdef class _AbstractDatabase:
         >>> # 1. default relax to 1.0
         >>> scalars["a0"] = 0.1
         >>> scalars["a0"]
-        Scalar(0.1, 1, nan)
+        Scalar(0.1, 1, na)
         >>> # 2. value + relax
         >>> scalars["a1"] = 0.1, 0.9
         >>> scalars["a1"]
-        Scalar(0.1, 0.9, nan)
+        Scalar(0.1, 0.9, na)
 
         >>> # b) -------- update one scalar --------
         >>> scalars["acaf1"]
@@ -1366,11 +1366,11 @@ cdef class _AbstractDatabase:
         >>> # upate value and relax (tuple)
         >>> scalars["acaf2"] = 0.8, 0.9
         >>> scalars["acaf2"]
-        Scalar(0.8, 0.9, nan)
+        Scalar(0.8, 0.9, na)
         >>> # update value and relax (list)
         >>> scalars["acaf2"] = (0.7, 0.8)
         >>> scalars["acaf2"]
-        Scalar(0.7, 0.8, nan)
+        Scalar(0.7, 0.8, na)
         >>> # upate value and relax (dictionary)
         >>> scalars["acaf3"] = {"relax": 0.9, "value": 0.8}
         >>> scalars["acaf3"]
@@ -1394,19 +1394,19 @@ cdef class _AbstractDatabase:
         >>> # 2) add a scalar to the subset 
         >>> scalars_subset["acaf0"] = 1.0, 1.0
         >>> scalars_subset["acaf0"]
-        Scalar(1, 1, nan)
+        Scalar(1, 1, na)
         >>> # --> new scalar also appears in the global workspace
         >>> "acaf0" in scalars
         True
         >>> scalars["acaf0"]
-        Scalar(1, 1, nan)
+        Scalar(1, 1, na)
         >>> # 3) update a scalar in the subset
         >>> scalars_subset["acaf0"] = 0.1
         >>> scalars_subset["acaf0"]
-        Scalar(0.1, 1, nan)
+        Scalar(0.1, 1, na)
         >>> # --> scalar is also updated in the global workspace
         >>> scalars["acaf0"]
-        Scalar(0.1, 1, nan)
+        Scalar(0.1, 1, na)
 
         Tables
 

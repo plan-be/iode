@@ -238,9 +238,9 @@ cdef class Equations(_AbstractDatabase):
         >>> scalars["acaf4"]
         Scalar(-0.0085027, 1, 0.00208257)
         >>> scalars["dpuh_1"]
-        Scalar(0, 1, nan)
+        Scalar(0, 1, na)
         >>> scalars["dpuh_2"]
-        Scalar(0, 1, nan)
+        Scalar(0, 1, na)
 
         >>> # estimate a block
         >>> # prepare equations (same block and method)
