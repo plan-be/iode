@@ -1,6 +1,7 @@
 # distutils: language = c++
 
 import warnings
+from pathlib import Path
 from collections.abc import Iterable
 from typing import Union, Tuple, List, Optional, Any
 if sys.version_info.minor >= 11:
@@ -948,24 +949,46 @@ cdef class Variables(_AbstractDatabase):
             return [cpp_period.decode() for cpp_period in 
                     self.database_ptr.get_list_periods(from_period.encode(), to_period.encode())]
         
-    def low_to_high(self, type_of_series: str, method: str, filepath: str, var_list: Union[str, List[str]]):
+    def low_to_high(self, type_of_series: str, method: str, filepath: Union[str, Path], var_list: Union[str, List[str]]):
         """
-        Transform low periodicity series to high periodicity series (i.e. variables). 
+        Build series with higher periodicity for *stock data* (Unemployment, Debt, ...) or 
+        *flow data* (GNP, Deficit, ...).
+
+        The list of specified series (variables) from the input file are loaded into the current 
+        Variables database and the periodicity of these series (variables) is modified simultaneously. 
+        The new periodicity is the one currently defined in the current Variables database.
+
+        The loaded series are added to or replace those (for existing names) in the current 
+        Variables database.
+
+        This procedure exists for the following cases:
+
+            - annual to monthly 
+            - annual to quarterly 
+            - quarterly to monthly 
+        
+        Two types of series are available, one for stocks ('L'), the other for flows ('S').
+
+        Three interpolation methods are available:
+
+            - linear ('L'): A[1980Q{1,2,3,4}] = A[1979Y1] + i * (A[1980Y1] - A[1979Y1])/4 i = 1,2,3,4 
+            - cubic splines ('C'): cubic interpolation 
+            - step ('S') : A[1980Q{1,2,3,4}] = A[1980Y1] 
 
         Parameters
         ----------
         type_of_series : str
             Two types of series are considered: 'stock' and 'flow':
-                - 'S' (LTOH_STOCK) : the interpolated values are of the same order of magnitude as the original values
-                - 'F' (LTOH_FLOW) : the values of the sub-periods are additive over a period
+                - 'S' (LTOH_STOCK): stock data (Unemployment, Debt, ...)
+                - 'F' (LTOH_FLOW): flow data (GNP, Deficit, ...)
 
         method : str
             Method to use for transformation. Three methods can be used:
                 - 'L' (LTOH_LINEAR) : Linear interpolation
                 - 'C' (LTOH_CUBIC_SPLINES) : Cubic Spliness
-                - 'S' (LTOH_STEP) : Steps
+                - 'S' (LTOH_STEP) : Step
 
-        filepath : str
+        filepath : str or Path
             Filepath to the source data file.
 
         var_list : str or list(str)
@@ -1039,29 +1062,24 @@ cdef class Variables(_AbstractDatabase):
         >>> variables["ACAG", "2014Q1":"2014Q4"]
         [8.1050747072996, 8.1050747072996, 8.1050747072996, 8.1050747072996]
         """
-        if not isinstance(type_of_series, str):
-            raise TypeError(f"'type_of_series': Expected value of type str. Got value of type {type(type_of_series).__name__} instead")
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+        if not filepath.exists():
+            raise ValueError(f"file '{str(filepath)}' not found.")
+        filepath = str(filepath)
 
         type_of_series = type_of_series.upper()
         if type_of_series not in "SF":
             raise ValueError(f"'type_of_series': possible values are 'S' (LTOH_STOCK) or 'F' (LTOH_FLOW). "
                             f"Got value {type_of_series} instead")
 
-        if not isinstance(method, str):
-            raise TypeError(f"'method': Expected value of type str of one character. Got value of type {type(method).__name__} instead")
-
         if method not in "LCS":
             raise ValueError(f"'method': possible values are 'L' (LTOH_LINEAR), 'C' (LTOH_CUBIC_SPLINES) or 'S' (LTOH_STEP). " 
                             f"Got value {method} instead")
 
-        if not isinstance(filepath, str):
-            raise TypeError(f"'filepath': Expected value of type str. Got value of type {type(filepath).__name__} instead")
-
-        if isinstance(var_list, Iterable) and all(isinstance(item, str) for item in var_list):
+        if not isinstance(var_list, str) and isinstance(var_list, Iterable) and \
+            all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
-
-        if not isinstance(var_list, str):
-            raise TypeError(f"'filepath': Expected value of type str or list of str. Got value of type {type(filepath).__name__} instead")
 
         i_type_of_series = LTOH_SERIES_TYPES_DICT[type_of_series]
         cpp_low_to_high(<EnumIodeLtoH>i_type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
