@@ -962,7 +962,7 @@ cdef class Variables(_AbstractDatabase):
         method : str
             Method to use for transformation. Three methods can be used:
                 - 'L' (LTOH_LINEAR) : Linear interpolation
-                - 'C' (LTOH_CUBIC_SPLINESS) : Cubic Spliness
+                - 'C' (LTOH_CUBIC_SPLINES) : Cubic Spliness
                 - 'S' (LTOH_STEP) : Steps
 
         filepath : str
@@ -978,7 +978,7 @@ cdef class Variables(_AbstractDatabase):
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, LTOH_STOCK, LTOH_FLOW
-        >>> from iode import LTOH_CUBIC_SPLINESS, LTOH_LINEAR, LTOH_STEP
+        >>> from iode import LTOH_CUBIC_SPLINES, LTOH_LINEAR, LTOH_STEP
         >>> from iode import variables
         >>> variables.clear()
         >>> # define a yearly sample
@@ -1006,7 +1006,7 @@ cdef class Variables(_AbstractDatabase):
 
         Cubic splines / stock
         
-        >>> variables.low_to_high(LTOH_STOCK, LTOH_CUBIC_SPLINESS, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LTOH_STOCK, LTOH_CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2012Q1":"2012Q4"]
         [-47.2984169294621, -50.052041225380975, -52.80566552129986, -55.55928981721873]
         >>> variables["ACAG", "2012Q1":"2012Q4"]
@@ -1014,7 +1014,7 @@ cdef class Variables(_AbstractDatabase):
 
         Cubic splines / flow
         
-        >>> variables.low_to_high(LTOH_FLOW, LTOH_CUBIC_SPLINESS, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LTOH_FLOW, LTOH_CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2012Q1":"2012Q4"]
         [-12.748422687629207, -13.436828761608925, -14.270289043196508, -15.103749324784092]
         >>> variables["ACAG", "2012Q1":"2012Q4"]
@@ -1051,7 +1051,7 @@ cdef class Variables(_AbstractDatabase):
             raise TypeError(f"'method': Expected value of type str of one character. Got value of type {type(method).__name__} instead")
 
         if method not in "LCS":
-            raise ValueError(f"'method': possible values are 'L' (LTOH_LINEAR), 'C' (LTOH_CUBIC_SPLINESS) or 'S' (LTOH_STEP). " 
+            raise ValueError(f"'method': possible values are 'L' (LTOH_LINEAR), 'C' (LTOH_CUBIC_SPLINES) or 'S' (LTOH_STEP). " 
                             f"Got value {method} instead")
 
         if not isinstance(filepath, str):

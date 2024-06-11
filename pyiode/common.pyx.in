@@ -198,7 +198,7 @@ LTOH_FLOW: str = 'F'
 LTOH_SERIES_TYPES_DICT = {'S': EnumIodeLtoH.LTOH_STOCK, 'F': EnumIodeLtoH.LTOH_FLOW}
 
 LTOH_LINEAR: str = 'L'
-LTOH_CUBIC_SPLINESS: str = 'C'
+LTOH_CUBIC_SPLINES: str = 'C'
 LTOH_STEP: str = 'S'
 
 HTOL_LAST: str = 'L'
