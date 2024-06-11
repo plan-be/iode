@@ -287,7 +287,7 @@ cdef class EditAndEstimateEquations:
     @property
     def sample(self) -> Sample:
         """
-        Set/Update the estimation sample.
+        Estimation sample.
 
         Parameters
         ----------

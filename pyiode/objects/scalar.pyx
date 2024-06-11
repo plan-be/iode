@@ -65,8 +65,6 @@ cdef class Scalar:
 
     @value.setter 
     def value(self, val: float):
-        if not isinstance(val, float):
-            raise TypeError("Expected value of type 'float'.\nGot value of type '" + type(val).__name__ + "'")
         self.c_scalar.val = val
     
     @property
@@ -75,8 +73,6 @@ cdef class Scalar:
 
     @relax.setter
     def relax(self, relax_: float):
-        if not isinstance(relax_, float):
-            raise TypeError("Expected value of type 'float'.\nGot value of type '" + type(relax_).__name__ + "'")
         if relax_ < 0.0 or relax_ > 1.0:
             raise ValueError("Expected relax value between 0.0 and 1.0")
         self.c_scalar.relax = relax_
