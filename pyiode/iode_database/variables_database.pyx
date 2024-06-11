@@ -408,6 +408,12 @@ cdef class Variables(_AbstractDatabase):
         The index of the passed DataFrame is sorted in alphabetical order before 
         copying to IODE Variables database.
 
+        Warnings
+        --------
+        IODE and pandas don't use the same constant to represent NaN values.
+        When loading a pandas DataFrame into the Variables database, the pandas 
+        NaN values (:math:`nan`) are converted to IODE NaN values (:math:`NA`).
+
         Examples
         --------
         >>> from iode import variables
@@ -487,6 +493,12 @@ cdef class Variables(_AbstractDatabase):
         sample_as_floats: bool, optional
             Whether or not to export periods as string or float values.
             Defaults to False (periods are exported as string values).
+
+        Warnings
+        --------
+        IODE and pandas don't use the same constant to represent NaN values.
+        When exporting IODE variables as a pandas DataFrame, the IODE NaN values 
+        (:math:`NA`) are converted to pandas NaN values (:math:`nan`).
 
         Examples
         --------
@@ -592,6 +604,12 @@ cdef class Variables(_AbstractDatabase):
             If the 'array' as more than two axes, the separator 
             'sep' is used to group labels of the non-time axes.
 
+        Warnings
+        --------
+        IODE and LArray don't use the same constant to represent NaN values.
+        When loading a LArray Array into the Variables database, the LArray 
+        NaN values (:math:`nan`) are converted to IODE NaN values (:math:`NA`).
+
         Examples
         --------
         >>> from iode import variables
@@ -669,6 +687,12 @@ cdef class Variables(_AbstractDatabase):
         sample_as_floats: bool, optional
             Whether or not to convert periods as float values.
             Defaults to False (periods are exported as string values).
+
+        Warnings
+        --------
+        IODE and LArray don't use the same constant to represent NaN values.
+        When exporting IODE variables as a LArray Array, the IODE NaN values 
+        (:math:`NA`) are converted to LArray NaN values (:math:`nan`).
 
         Examples
         --------
