@@ -935,7 +935,7 @@ cdef class _AbstractDatabase:
 
         Variables
 
-        >>> from iode import variables, nan
+        >>> from iode import variables, NA
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.sample
         '1960Y1:2015Y1'
@@ -1699,11 +1699,11 @@ cdef class _AbstractDatabase:
 
         Variables
 
-        >>> from iode import variables, nan
+        >>> from iode import variables, NA
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> # a) -------- add one variable --------
         >>> # 1) same value for all periods
-        >>> variables["A0"] = nan
+        >>> variables["A0"] = NA
         >>> variables["A0"]                     # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
         >>> # 2) vector (list) containing a specific value for each period
@@ -1720,7 +1720,7 @@ cdef class _AbstractDatabase:
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -83.34062511080091, -96.41041982848331]
         >>> # 1.I) same value for all periods
-        >>> variables["ACAF"] = nan
+        >>> variables["ACAF"] = NA
         >>> variables["ACAF"]                   # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
         >>> # 1.II) vector (list) containing a specific value for each period
@@ -1774,8 +1774,8 @@ cdef class _AbstractDatabase:
         >>> variables_subset.get_names()
         ['A0', 'A1', 'A2', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
         >>> # 2) add a variable to the subset 
-        >>> from iode import nan
-        >>> variables_subset["A3"] = nan
+        >>> from iode import NA
+        >>> variables_subset["A3"] = NA
         >>> variables_subset["A3"]              # doctest: +ELLIPSIS 
         [-2e+37, -2e+37, ..., -2e+37, -2e+37]
         >>> # --> new variable also appears in the global workspace
