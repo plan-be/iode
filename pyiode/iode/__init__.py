@@ -3,7 +3,7 @@ from pathlib import Path
 SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
-from .iode_python import (NA, __version__, 
+from .iode_python import (__version__, NA, is_NA, 
                           COMMENTS, EQUATIONS, IDENTITIES, LISTS, SCALARS, TABLES, VARIABLES, IODE_TYPES_LIST, NB_TYPES, 
                           FILE_COMMENTS, FILE_EQUATIONS, FILE_IDENTITIES, FILE_LISTS, FILE_SCALARS, FILE_TABLES, FILE_VARIABLES, 
                           FILE_REPORTS, FILE_TEXT, FILE_ASCII, FILE_A2M, FILE_RTF, FILE_HTML, FILE_MIF, FILE_CSV, FILE_REF, 
@@ -60,7 +60,7 @@ from .iode_python import add_error_msg, clear_error_msgs, display_error_msgs, re
 #       TableLine/TableCell/ComputedTable instances must only be created from a Table instance.
 __all__ = [
     # Constants
-    'SAMPLE_DATA_DIR', 'NA',
+    'SAMPLE_DATA_DIR', 'NA', 'is_NA', 
     'COMMENTS', 'EQUATIONS', 'IDENTITIES', 'LISTS', 'SCALARS', 'TABLES', 'VARIABLES', 'IODE_TYPES_LIST', 'NB_TYPES', 
     'FILE_COMMENTS', 'FILE_EQUATIONS', 'FILE_IDENTITIES', 'FILE_LISTS', 'FILE_SCALARS', 'FILE_TABLES', 'FILE_VARIABLES', 
     'FILE_REPORTS', 'FILE_TEXT', 'FILE_ASCII', 'FILE_A2M', 'FILE_RTF', 'FILE_HTML', 'FILE_MIF', 'FILE_CSV', 'FILE_REF', 
