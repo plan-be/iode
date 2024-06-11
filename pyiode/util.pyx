@@ -18,7 +18,33 @@
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
-from util cimport IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs
+from util cimport (L_ISAN, IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, 
+                   IodeDisplayErrorMsgs, IodeClearErrorMsgs)
+
+
+def is_NA(value: float) -> bool:
+    """
+    Check whether a float value represents a valid IODE number or an IODE non-defined :math:`NA` value.
+
+    Parameters
+    ----------
+    value: float
+
+    Returns
+    -------
+    bool
+        True if the float value represents a valid IODE number. 
+
+    Examples
+    --------
+    >>> from iode import NA, is_NA
+    >>> is_NA(1.0)
+    True
+    >>> is_NA(NA)
+    False
+    """
+    return L_ISAN(value)
+
 
 # Miscellaneous functions
 # -----------------------

@@ -389,6 +389,7 @@ MISCELLANEOUS
 .. autosummary::
    :toctree: _generated
 
+   is_NA
    suppress_msgs
    reset_msgs
 
