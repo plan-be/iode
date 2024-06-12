@@ -19,20 +19,20 @@ from pyiode.compute.estimation cimport CCorrelationMatrix
 from pyiode.compute.estimation cimport CEditAndEstimateEquations
 
 
-def dynamic_adjustment(method: int, eqs: str, c1: str = "c1", c2: str = "c2") -> str:
+def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str = "c1", c2: str = "c2") -> str:
     r"""
     Transform a LEC equation to add a dynamic adjustment.
     
     Two methods can be used. Given the equation :math:`LHS = RHS`, we have:
     
-        - **Partial Adjustment** (0): :math:`d(LHS) = c1 * (RHS - (LHS)[-1])`
-        - **Error Correction Model** (1): :math:`d(LHS) = c1 * d(RHS) + c2 * (RHS -LHS)[-1]`
+        - **Partial Adjustment** (PARTIAL): :math:`d(LHS) = c1 * (RHS - (LHS)[-1])`
+        - **Error Correction Model** (ERROR_CORRECTION): :math:`d(LHS) = c1 * d(RHS) + c2 * (RHS -LHS)[-1]`
     
     Parameters
     ----------
-    method: int    
+    method: AdjustmentMethod or str 
         Method used for the dynamic adjustment. 
-        Possible values are 0 (ADJUSTMENT_PARTIAL) or 1 (ADJUSTMENT_ERROR_CORRECTION_METHOD).
+        Possible values are PARTIAL or ERROR_CORRECTION.
     eqs: str
         LEC equation to dynamically adjust.
     c1: str, optional        
@@ -50,8 +50,7 @@ def dynamic_adjustment(method: int, eqs: str, c1: str = "c1", c2: str = "c2") ->
 
     Examples
     --------
-    >>> from iode import SAMPLE_DATA_DIR, equations
-    >>> from iode import dynamic_adjustment, ADJUSTMENT_PARTIAL, ADJUSTMENT_ERROR_CORRECTION_METHOD
+    >>> from iode import SAMPLE_DATA_DIR, equations, dynamic_adjustment, AdjustmentMethod
     >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
     >>> lec = equations["ACAF"].lec           # doctest: +NORMALIZE_WHITESPACE
     >>> lec
@@ -59,19 +58,20 @@ def dynamic_adjustment(method: int, eqs: str, c1: str = "c1", c2: str = "c2") ->
     
     Partial Adjustment
 
-    >>> partial_adjust_eq = dynamic_adjustment(ADJUSTMENT_PARTIAL, lec)
+    >>> partial_adjust_eq = dynamic_adjustment(AdjustmentMethod.PARTIAL, lec)
     >>> partial_adjust_eq
     'd((ACAF/VAF[-1])) := c1 * (acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995) -((ACAF/VAF[-1]))[-1])'
 
     Error Correction Model
 
-    >>> error_corr_adjust_eq = dynamic_adjustment(ADJUSTMENT_ERROR_CORRECTION_METHOD, lec)
+    >>> error_corr_adjust_eq = dynamic_adjustment(AdjustmentMethod.ERROR_CORRECTION, lec)
     >>> error_corr_adjust_eq
     'd((ACAF/VAF[-1])) := c1 * d(acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)) + c2 * (acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995) -(ACAF/VAF[-1]))[-1]'
     """
-    if method not in [ADJUSTMENT_PARTIAL, ADJUSTMENT_ERROR_CORRECTION_METHOD]:
-        raise ValueError(f"'method': Possible values are {ADJUSTMENT_PARTIAL} or {ADJUSTMENT_ERROR_CORRECTION_METHOD}. "
-                         f"Got value {method} instead.")
+    if isinstance(method, str):
+        method = method.upper()
+        method = AdjustmentMethod[AdjustmentMethod]
+    method = int(method)
     return cpp_dynamic_adjustment(<EnumIodeAdjustmentMethod>method, eqs.encode(), c1.encode(), c2.encode()).decode()
 
 
@@ -551,20 +551,12 @@ cdef class EditAndEstimateEquations:
 
         Parameters
         ----------
-        value: str or int
-            Possible values are:
-
-                - "LSQ" (EQ_METHOD_LSQ)
-                - "ZELLNER" (EQ_METHOD_ZELLNER)
-                - "INSTRUMENTAL" (EQ_METHOD_INSTRUMENTAL)
-                - "GLS (3SLS)" (EQ_METHOD_GLS)
-                - "MAX_LIKELIHOOD" (EQ_METHOD_MAX_LIKELIHOOD)
+        value: EqMethod or str
+            Possible values are LSQ, ZELLNER, INSTRUMENTAL, GLS, MAX_LIKELIHOOD.
         
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> from iode import (EQ_METHOD_LSQ, EQ_METHOD_ZELLNER, EQ_METHOD_INSTRUMENTAL, 
-        ...                   EQ_METHOD_GLS, EQ_METHOD_MAX_LIKELIHOOD)
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, EqMethod
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
@@ -575,22 +567,22 @@ cdef class EditAndEstimateEquations:
         
         >>> estimation.method
         'LSQ'
-        >>> estimation.method = "ZELLNER"
+        >>> estimation.method = EqMethod.ZELLNER
         >>> estimation.method
         'ZELLNER'
-        >>> estimation.method = EQ_METHOD_GLS
+        >>> estimation.method = "MAX_LIKELIHOOD"
         >>> estimation.method
-        'GLS (3SLS)'
+        'MAX_LIKELIHOOD'
         """
         return self.c_estimation_ptr.get_method().decode()
 
     @method.setter
-    def method(self, value: Union[str, int]):
+    def method(self, value: Union[EqMethod, str]):
         if isinstance(value, str):
             value = value.upper()
-            self.c_estimation_ptr.set_method(<string>value.encode())
-        else:
-            self.c_estimation_ptr.set_method(<int>value)
+            value = EqMethod[value]
+        value = int(value)
+        self.c_estimation_ptr.set_method(<int>value)
 
     @property
     def instruments(self) -> Union[str, List[str]]:
@@ -611,8 +603,6 @@ cdef class EditAndEstimateEquations:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> from iode import (EQ_METHOD_LSQ, EQ_METHOD_ZELLNER, EQ_METHOD_INSTRUMENTAL, 
-        ...                   EQ_METHOD_GLS, EQ_METHOD_MAX_LIKELIHOOD)
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")

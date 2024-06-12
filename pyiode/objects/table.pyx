@@ -22,11 +22,11 @@ cdef class TableCell:
 
     Attributes
     ----------
-    cell_type: int
+    cell_type: TableCellType
         Type of cell content. Possible value is 'STRING' or 'LEC'.
-    align: int
+    align: TableCellAlign
         Alignment of the text in the cell. Possible values are 'center', 'left', 'right', 'decimal' or 
-        CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.
+        TableCellAlign.CENTER, TableCellAlign.LEFT, TableCellAlign.RIGHT, TableCellAlign.DECIMAL.
     bold: bool
     italic: bool
     underline: bool
@@ -48,11 +48,11 @@ cdef class TableCell:
     <BLANKLINE>
     nb lines: 6
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
 
     >>> table[4]
@@ -98,7 +98,8 @@ cdef class TableCell:
     @property
     def cell_type(self) -> str:
         """
-        Type of the content of the cell. Possible value is 'STRING' or 'LEC'.
+        Type of the content of the cell. 
+        Possible value are STRING or LEC.
 
         Examples
         --------
@@ -119,7 +120,7 @@ cdef class TableCell:
         >>> table[4][1].cell_type
         'LEC'
         """
-        return CELL_TYPE_DICT[<int>(self.c_cell.get_type())] if self.c_cell is not NULL else None
+        return TableCellType(<int>(self.c_cell.get_type())).name if self.c_cell is not NULL else None
 
     @property
     def align(self) -> str:
@@ -128,36 +129,32 @@ cdef class TableCell:
 
         Parameters
         ----------
-        align : str or int
+        align : TableCellAlign or str
             The alignment to set for the cell.
-            Possible values are 'center', 'left', 'right', 'decimal' or 
-            CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.
+            Possible values are CENTER, LEFT, RIGHT or DECIMAL.
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, CELL_ALIGN_CENTER, CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL
-        >>> from iode import tables, Table
+        >>> from iode import SAMPLE_DATA_DIR, tables, Table, TableCellAlign
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
         >>> table = tables["ANAPRIX"]
         >>> table[4][0].align
-        'left'
-        >>> table[4][0].align = 'center'
+        'LEFT'
+        >>> table[4][0].align = TableCellAlign.CENTER
         >>> table[4][0].align
-        'center'
-        >>> table[4][0].align = CELL_ALIGN_RIGHT
+        'CENTER'
+        >>> table[4][0].align = "right"
         >>> table[4][0].align
-        'right'
+        'RIGHT'
         """
-        return CELL_ALIGN_DICT[<int>self.c_cell.get_align()] if self.c_cell is not NULL else None
+        return TableCellAlign(<int>(self.c_cell.get_align())).name if self.c_cell is not NULL else None
 
     @align.setter
-    def align(self, value: Union[int, str]):
+    def align(self, value: Union[TableCellAlign, str]):
         if isinstance(value, str):
-            value = value.lower()
-            value = CELL_ALIGN_REV_DICT[value] if value in CELL_ALIGN_REV_DICT else -1
-        if value not in CELL_ALIGN_DICT:
-            raise ValueError(f"Possible values are 'center', 'left', 'right', 'decimal' or CELL_ALIGN_CENTER, "
-                             f"CELL_ALIGN_LEFT, CELL_ALIGN_RIGHT, CELL_ALIGN_DECIMAL.\nGot value {value} instead.") 
+            value = value.upper()
+            value = TableCellAlign[value]
+        value = int(value)
         self.c_cell.set_align(<EnumCellAlign>value)
 
     @property
@@ -277,7 +274,7 @@ cdef class TableCell:
     def __str__(self) -> str:
         if self.c_cell is NULL:
             return ''
-        quotes = <int>(self.c_cell.get_type()) == CELL_TYPE_STRING
+        quotes = <int>(self.c_cell.get_type()) == TableCellType.STRING
         content = self.c_cell.get_content(<bint>quotes).decode()
         # remove newline characters
         return ''.join(content.splitlines())
@@ -295,13 +292,11 @@ cdef class TableLine:
 
     Attributes
     ----------
-    line_type: int
-        Type of the table line. Possible values are 'TITLE', 'CELL', 'LINE', 'MODE', 'FILES', 'DATE' or 
-        LINE_TYPE_TITLE, LINE_TYPE_CELL, LINE_TYPE_LINE, LINE_TYPE_MODE, LINE_TYPE_FILES, LINE_TYPE_DATE.
+    line_type: TableLineType
+        Type of the table line. Possible values are TITLE, CELL, LINE, MODE, FILES or DATE.
 
-    graph_type: int
-        Graph type associated with the table line. Possible values are {', '.join(GRAPH_TYPE_DICT.values())} 
-        or GRAPH_TYPE_LINE, GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR.
+    graph_type: TableLineGraph
+        Graph type associated with the table line. Possible values are LINE, SCATTER or BAR.
 
     axis_left: bool
         Whether or not the values of the present line correspond to the Y axis 
@@ -324,11 +319,11 @@ cdef class TableLine:
     <BLANKLINE>
     nb lines: 6
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
 
     >>> table[0]
@@ -336,7 +331,7 @@ cdef class TableLine:
     >>> table[0].line_type
     'TITLE'
     >>> table[0].graph_type
-    'line'
+    'LINE'
     >>> table[0].axis_left
     True
     """
@@ -370,7 +365,8 @@ cdef class TableLine:
     @property
     def line_type(self) -> str:
         """
-        Type of the table line
+        Type of the table line.
+        Possible values are TITLE, CELL, LINE, MODE, FILES or DATE.
 
         Returns
         -------
@@ -393,11 +389,11 @@ cdef class TableLine:
         <BLANKLINE>
         nb lines: 6
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> table[0]
@@ -410,22 +406,21 @@ cdef class TableLine:
         >>> table[4].line_type
         'CELL'
         """
-        return LINE_TYPE_DICT[<int>(self.c_line.get_line_type())] if self.c_line is not NULL else None
+        return TableLineType(<int>(self.c_line.get_line_type())).name if self.c_line is not NULL else None
     
     @property
     def graph_type(self) -> str:
         """
-        Graph type associated with the table line
+        Graph type associated with the table line.
 
         Parameters
         ----------
-        value: int
-            Possible values are 'line', 'scatter', 'bar' or  
-            GRAPH_TYPE_LINE, GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR.
+        value: TableLineGraph
+            Possible values are LINE, SCATTER or BAR.
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, GRAPH_TYPE_LINE, GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR
+        >>> from iode import SAMPLE_DATA_DIR, TableLineGraph
         >>> from iode import tables, Table
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
         >>> table = tables["ANAPRIX"]
@@ -440,36 +435,34 @@ cdef class TableLine:
         <BLANKLINE>
         nb lines: 6
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> table[4]
         ('"GAP_"', 'GAP_')
         >>> table[4].graph_type
-        'line'
+        'LINE'
         >>> table[4].graph_type = "scatter"
         >>> table[4].graph_type
-        'scatter'
-        >>> table[4].graph_type = GRAPH_TYPE_BAR
+        'SCATTER'
+        >>> table[4].graph_type = TableLineGraph.BAR
         >>> table[4].graph_type
-        'bar'
+        'BAR'
         """
-        return GRAPH_TYPE_DICT[<int>(self.c_line.get_line_graph())] if self.c_line is not NULL else None
+        return TableLineGraph(<int>(self.c_line.get_line_graph())).name if self.c_line is not NULL else None
 
     @graph_type.setter
-    def graph_type(self, value: Union[int, str]):
+    def graph_type(self, value: Union[TableLineGraph, str]):
         if self.c_line is NULL:
             return
         if isinstance(value, str):
-            value = value.lower()
-            value = GRAPH_TYPE_REV_DICT[value] if value in GRAPH_TYPE_REV_DICT else -1
-        if value not in GRAPH_TYPE_DICT:
-            raise ValueError(f"Possible values are {GRAPH_TYPE_DICT.values()} or [GRAPH_TYPE_LINE, "
-                             f"GRAPH_TYPE_SCATTER, GRAPH_TYPE_BAR].\nGot value {value} instead.")
+            value = value.upper()
+            value = TableLineGraph[value]
+        value = int(value)
         self.c_line.set_line_graph(<EnumGraphType>value)
 
     @property
@@ -498,11 +491,11 @@ cdef class TableLine:
         <BLANKLINE>
         nb lines: 6
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> table[4]
@@ -565,11 +558,11 @@ cdef class TableLine:
         <BLANKLINE>
         nb lines: 6
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> table[4][0]
@@ -614,11 +607,11 @@ cdef class TableLine:
         <BLANKLINE>
         nb lines: 6
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # warning: content of cells of type 'STRING' must be surrounded by double quotes
@@ -653,20 +646,20 @@ cdef class TableLine:
 
         line_type = <int>(self.c_line.get_line_type())
         nb_columns = self.nb_columns
-        if line_type == LINE_TYPE_TITLE:
+        if line_type == TableLineType.TITLE:
             content = self.c_line.get_cell(0, nb_columns).get_content(<bint>False).decode()
             # remove newline characters
             return ''.join(content.splitlines())
-        elif line_type == LINE_TYPE_CELL:
+        elif line_type == TableLineType.CELL:
             cells_content = []
             for j in range(nb_columns):
                 c_cell = self.c_line.get_cell(j, nb_columns)
-                quotes = <int>(c_cell.get_type()) == CELL_TYPE_STRING
+                quotes = <int>(c_cell.get_type()) == TableCellType.STRING
                 content = c_cell.get_content(<bint>quotes).decode()
                 # remove newline characters
                 cells_content += [''.join(content.splitlines())]
             return str(tuple(cells_content))
-        elif line_type == LINE_TYPE_LINE:
+        elif line_type == TableLineType.LINE:
             return '---'
         else:
             return f"<{self.line_type}>"
@@ -731,11 +724,11 @@ cdef class Table:
     <BLANKLINE>
     nb lines: 4
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
 
     >>> # the first cell represents a line title and the second a LEC expression
@@ -764,11 +757,11 @@ cdef class Table:
     <BLANKLINE>
     nb lines: 16
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
 
     >>> # if the argument 'lines_titles' is not used, the argument 'lecs_or_vars' represents 
@@ -810,11 +803,11 @@ cdef class Table:
     <BLANKLINE>
     nb lines: 27
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
 
     >>> # variables or LEC expressions can be also passed as a single string
@@ -853,11 +846,11 @@ cdef class Table:
     <BLANKLINE>
     nb lines: 27
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
     """
 
@@ -949,28 +942,31 @@ cdef class Table:
 
         Parameters
         ----------
-        lang : int
-            Possible values are 'English' (LANG_ENGLISH), 'Dutch' (LANG_DUTCH) and 'French' (LANG_FRENCH).
+        value : IodeLanguage or str
+            Possible values are ENGLISH, DUTCH, FRENCH.
 
         Examples
         --------
-        >>> from iode import Table, LANG_ENGLISH, LANG_DUTCH, LANG_FRENCH
+        >>> from iode import Table, IodeLanguage
         >>> table = Table()
         >>> table.language
-        'English'
-        >>> table.language = LANG_DUTCH
+        'ENGLISH'
+        >>> table.language = IodeLanguage.DUTCH
         >>> table.language
-        'Dutch'
+        'DUTCH'
+        >>> table.language = "French"
+        >>> table.language
+        'FRENCH'
         """
-        return self.c_table.get_language().decode()
+        return self.c_table.get_language().decode().upper()
 
     @language.setter
-    def language(self, lang: int):
-        if lang not in [LANG_ENGLISH, LANG_DUTCH, LANG_FRENCH]:
-            raise ValueError(f"The value for 'language' must be either {LANG_ENGLISH} (LANG_ENGLISH), "
-                             f"{LANG_DUTCH} (LANG_DUTCH) or {LANG_FRENCH} (LANG_FRENCH).\n"
-                             f"Got value {lang} instead.")
-        self.c_table.set_language(<EnumLang>lang)
+    def language(self, value: Union[IodeLanguage, str]):
+        if isinstance(value, str):
+            value = value.upper()
+            value = IodeLanguage[value]
+        value = int(value)
+        self.c_table.set_language(<EnumLang>value)
 
     @property
     def gridx(self) -> str:
@@ -979,34 +975,31 @@ cdef class Table:
 
         Parameters
         ----------
-        gridx: str or int
-            Possible values are 'major'/GRAPH_GRID_MAJOR, 
-            'none'/GRAPH_GRID_NONE and 'minor'/GRAPH_GRID_MINOR.
+        value: TableGraphGrid or str
+            Possible values are MAJOR, NONE or MINOR.
 
         Examples
         --------
-        >>> from iode import Table, GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR
+        >>> from iode import Table, TableGraphGrid
         >>> table = Table()
         >>> table.gridx
-        'major'
-        >>> table.gridx = GRAPH_GRID_NONE
+        'MAJOR'
+        >>> table.gridx = TableGraphGrid.NONE
         >>> table.gridx
-        'none'
-        >>> table.gridx = 'minor'
+        'NONE'
+        >>> table.gridx = "minor"
         >>> table.gridx
-        'minor'
+        'MINOR'
         """
-        return GRAPH_GRID_DICT[<int>(self.c_table.get_gridx())]
+        return TableGraphGrid(<int>(self.c_table.get_gridx())).name
 
     @gridx.setter
-    def gridx(self, gridx: Union[str, int]):
-        if isinstance(gridx, str):
-            gridx = GRAPH_GRID_REV_DICT[gridx] if gridx in GRAPH_GRID_REV_DICT else -1
-        if gridx not in GRAPH_GRID_DICT:
-            raise ValueError(f"Possible values are {list(GRAPH_GRID_DICT.values())} or "
-                             f"[GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR].\n"
-                             f"Got value {gridx} instead.")
-        self.c_table.set_gridx(<EnumGraphGrid>gridx)
+    def gridx(self, value: Union[TableGraphGrid, str]):
+        if isinstance(value, str):
+            value = value.upper()
+            value = TableGraphGrid[value]
+        value = int(value)
+        self.c_table.set_gridx(<EnumGraphGrid>value)
 
     @property
     def gridy(self) -> str:
@@ -1015,34 +1008,31 @@ cdef class Table:
 
         Parameters
         ----------
-        gridy: str or int
-            Possible values are 'major'/GRAPH_GRID_MAJOR, 
-            'none'/GRAPH_GRID_NONE and 'minor'/GRAPH_GRID_MINOR.
+        value: TableGraphGrid or str
+            Possible values are MAJOR, NONE or MINOR.
 
         Examples
         --------
-        >>> from iode import Table, GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR
+        >>> from iode import Table, TableGraphGrid
         >>> table = Table()
         >>> table.gridy
-        'major'
-        >>> table.gridy = GRAPH_GRID_NONE
+        'MAJOR'
+        >>> table.gridy = TableGraphGrid.NONE
         >>> table.gridy
-        'none'
-        >>> table.gridy = 'minor'
+        'NONE'
+        >>> table.gridy = "minor"
         >>> table.gridy
-        'minor'
+        'MINOR'
         """
-        return GRAPH_GRID_DICT[<int>(self.c_table.get_gridy())]
+        return TableGraphGrid(<int>(self.c_table.get_gridy())).name
 
     @gridy.setter
-    def gridy(self, gridy: Union[str, int]):
-        if isinstance(gridy, str):
-            gridy = GRAPH_GRID_REV_DICT[gridy] if gridy in GRAPH_GRID_REV_DICT else -1
-        if gridy not in GRAPH_GRID_DICT:
-            raise ValueError(f"Possible values are {list(GRAPH_GRID_DICT.values())} or "
-                             f"[GRAPH_GRID_MAJOR, GRAPH_GRID_NONE, GRAPH_GRID_MINOR].\n"
-                             f"Got value {gridy} instead.")
-        self.c_table.set_gridy(<EnumGraphGrid>gridy)
+    def gridy(self, value: Union[TableGraphGrid, str]):
+        if isinstance(value, str):
+            value = value.upper()
+            value = TableGraphGrid[value]
+        value = int(value)
+        self.c_table.set_gridy(<EnumGraphGrid>value)
 
     @property
     def graph_axis(self) -> str:
@@ -1051,34 +1041,31 @@ cdef class Table:
 
         Parameters
         ----------
-        axis : str or int
-            Possible values are 'values'/GRAPH_AXIS_VALUES, 'log'/GRAPH_AXIS_LOG, 
-            'semilog'/GRAPH_AXIS_SEMILOG, 'percent'/GRAPH_AXIS_PERCENT
+        axis : TableGraphAxis or str
+            Possible values are VALUES, LOG, SEMILOG or PERCENT.
 
         Examples
         --------
-        >>> from iode import Table, GRAPH_AXIS_VALUES, GRAPH_AXIS_LOG, GRAPH_AXIS_SEMILOG, GRAPH_AXIS_PERCENT
+        >>> from iode import Table, TableGraphAxis
         >>> table = Table()
         >>> table.graph_axis
-        'values'
-        >>> table.graph_axis = GRAPH_AXIS_LOG
+        'VALUES'
+        >>> table.graph_axis = TableGraphAxis.LOG
         >>> table.graph_axis
-        'log'
-        >>> table.graph_axis = 'percent'
+        'LOG'
+        >>> table.graph_axis = "percent"
         >>> table.graph_axis
-        'percent'
+        'PERCENT'
         """
-        return GRAPH_AXIS_DICT[self.c_table.get_graph_axis()]
+        return TableGraphAxis(self.c_table.get_graph_axis()).name
 
     @graph_axis.setter
-    def graph_axis(self, axis: Union[str, int]):
-        if isinstance(axis, str):
-            axis = GRAPH_AXIS_REV_DICT[axis] if axis in GRAPH_AXIS_REV_DICT else -1
-        if axis not in GRAPH_AXIS_DICT:
-            raise ValueError(f"Possible values are {list(GRAPH_AXIS_DICT.values())} or "
-                             f"[GRAPH_AXIS_VALUES, GRAPH_AXIS_LOG, GRAPH_AXIS_SEMILOG, GRAPH_AXIS_PERCENT].\n"
-                             f"Got value {axis} instead.")
-        self.c_table.set_graph_axis(<EnumGraphAxis>axis)
+    def graph_axis(self, value: Union[TableGraphAxis, str]):
+        if isinstance(value, str):
+            value = value.upper()
+            value = TableGraphAxis[value]
+        value = int(value)
+        self.c_table.set_graph_axis(<EnumGraphAxis>value)
 
     @property
     def graph_alignment(self) -> str:
@@ -1087,34 +1074,31 @@ cdef class Table:
 
         Parameters
         ----------
-        align : str or int
-            Possible values are 'left'/GRAPH_ALIGN_LEFT, 'center'/GRAPH_ALIGN_CENTER, 
-            'right'/GRAPH_ALIGN_RIGHT.
+        value : TableGraphAlign or str
+            Possible values are LEFT, CENTER or RIGHT.
 
         Examples
         --------
-        >>> from iode import Table, GRAPH_ALIGN_LEFT, GRAPH_ALIGN_CENTER, GRAPH_ALIGN_RIGHT
+        >>> from iode import Table, TableGraphAlign
         >>> table = Table()
         >>> table.graph_alignment
-        'left'
-        >>> table.graph_alignment = GRAPH_ALIGN_CENTER
+        'LEFT'
+        >>> table.graph_alignment = TableGraphAlign.CENTER
         >>> table.graph_alignment
-        'center'
-        >>> table.graph_alignment = 'right'
+        'CENTER'
+        >>> table.graph_alignment = "right"
         >>> table.graph_alignment
-        'right'
+        'RIGHT'
         """
-        return GRAPH_ALIGN_DICT[<int>(self.c_table.get_graph_alignment())]
+        return TableGraphAlign(<int>(self.c_table.get_graph_alignment())).name
 
     @graph_alignment.setter
-    def graph_alignment(self, align: Union[str, int]):
-        if isinstance(align, str):
-            align = GRAPH_ALIGN_REV_DICT[align] if align in GRAPH_ALIGN_REV_DICT else -1
-        if align not in GRAPH_ALIGN_DICT:
-            raise ValueError(f"Possible values are {list(GRAPH_ALIGN_DICT.values())} or "
-                             f"[GRAPH_ALIGN_LEFT, GRAPH_ALIGN_CENTER, GRAPH_ALIGN_RIGHT].\n"
-                             f"Got value {align} instead.")
-        self.c_table.set_graph_alignment(<EnumGraphAlign>align)
+    def graph_alignment(self, value: Union[TableGraphAlign, str]):
+        if isinstance(value, str):
+            value = value.upper()
+            value = TableGraphAlign[value]
+        value = int(value)
+        self.c_table.set_graph_alignment(<EnumGraphAlign>value)
 
     def _get_row_from_index(self, index: int) -> int:
         if not isinstance(index, int):
@@ -1142,7 +1126,7 @@ cdef class Table:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
+        >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import Table, comments, lists, variables
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
@@ -1167,11 +1151,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>        
 
         >>> table.index("Table example")
@@ -1192,11 +1176,11 @@ cdef class Table:
         for i in range(len(self)):
             c_line = self.c_table.get_line(i)
             line_type = <int>(c_line.get_line_type())
-            if line_type == LINE_TYPE_TITLE:
+            if line_type == TableLineType.TITLE:
                 content = c_line.get_cell(0, nb_columns).get_content(<bint>False).decode().strip()
                 if content == key:
                     return i
-            elif line_type == LINE_TYPE_CELL:
+            elif line_type == TableLineType.CELL:
                 for j in range(nb_columns):
                     c_cell = c_line.get_cell(j, nb_columns)
                     content = c_cell.get_content(<bint>False).decode().strip()
@@ -1207,7 +1191,7 @@ cdef class Table:
         
         raise ValueError(f"Content '{key}' not found in table")
 
-    def insert(self, index: int, value: Union[int, str, List[str], Tuple[str], TableLine], after: bool = True):
+    def insert(self, index: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType], after: bool = True):
         r"""
         Insert a new line in the table.
 
@@ -1215,10 +1199,9 @@ cdef class Table:
         ----------
         index: int
             index where to insert a line.
-        value: int or str or list(str) or tuple(str) or TableLine
+        value: str or list(str) or tuple(str) or TableLine or TableLineType
             value of the new line.\n
-            If int, 'value' represents the type of the new line: LINE_TYPE_FILES, LINE_TYPE_MODE, 
-            LINE_TYPE_DATE, LINE_TYPE_LINE.\n
+            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.\n
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
             If an iterable of str, 'value' represents the content of the cells of the new line.\n
@@ -1229,7 +1212,7 @@ cdef class Table:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
+        >>> from iode import SAMPLE_DATA_DIR, TableLineType
         >>> from iode import Table, comments, lists, variables
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
@@ -1254,11 +1237,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> index = table.index("YSSG+COTRES:")
@@ -1274,7 +1257,7 @@ cdef class Table:
         >>> index += 1
 
         >>> # insert new separator line 
-        >>> table.insert(index, LINE_TYPE_LINE)
+        >>> table.insert(index, TableLineType.LINE)
         >>> index += 1
 
         >>> # insert new line with cells
@@ -1302,28 +1285,28 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 15
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         """
         cdef CTableLine* c_line
 
         row = self._get_row_from_index(index)
-        if isinstance(value, int):
-            if value == LINE_TYPE_FILES:
+        if isinstance(value, TableLineType):
+            if value == TableLineType.FILES:
                 self.c_table.insert_line_files(row, <bint>after)
-            elif value == LINE_TYPE_MODE: 
+            elif value == TableLineType.MODE: 
                 self.c_table.insert_line_mode(row, <bint>after)
-            elif value == LINE_TYPE_DATE: 
+            elif value == TableLineType.DATE: 
                 self.c_table.insert_line_date(row, <bint>after)
-            elif value == LINE_TYPE_LINE: 
+            elif value == TableLineType.LINE: 
                 self.c_table.insert_line_separator(row, <bint>after)
             else:
-                raise ValueError(f"The value of 'value' must be either LINE_TYPE_FILES, LINE_TYPE_MODE, "
-                                 f"LINE_TYPE_DATE or LINE_TYPE_LINE.\nGot value {value} instead.")
+                raise ValueError(f"The value of 'value' must be either TableLineType.FILES, TableLineType.MODE, "
+                                 f"TableLineType.DATE or TableLineType.LINE.\nGot value {value} instead.")
         elif isinstance(value, str):
             if all(character == '-' for character in value):
                 self.c_table.insert_line_separator(row, <bint>after)
@@ -1340,13 +1323,10 @@ cdef class Table:
                 c_line.get_cell(j, nb_columns).set_content(value[j].encode())
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_line_type())
-            if line_type == LINE_TYPE_TITLE or line_type == LINE_TYPE_CELL:
+            if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
                 self.insert(row, str(value))
             else:
                 self.insert(row, line_type)
-        else:
-            raise TypeError(f"The value of 'value' must be of type int, str, list(str) or tuple(str).\n"
-                            f"Got value of type {type(value).__name__} instead.")
 
     def compute(self, generalized_sample: str, extra_files: Union[str, List[str]] = None, nb_decimals: int = 2) -> ComputedTable:
         """
@@ -1455,11 +1435,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 8
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         >>> # simple time series (current workspace) - 6 observations - 4 decimals
         >>> computed_table = tables["C8_1"].compute("2000:6", nb_decimals=4)
@@ -1505,7 +1485,7 @@ cdef class Table:
                 if not isinstance(extra_file, str):
                     raise TypeError(f"'extra_files': Expected value of type str or list of str. "
                                     f"Got value of type {type(extra_files).__name__} instead")
-                load_reference_kdb(i + 2, FILE_VARIABLES, extra_file.encode())
+                load_reference_kdb(i + 2, IodeFileExt.VARIABLES, extra_file.encode())
 
         if not isinstance(nb_decimals, int):
             raise TypeError(f"'nb_decimals': Expected value of type int. "
@@ -1535,11 +1515,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 4
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> len(table)
@@ -1590,11 +1570,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> table[0]
@@ -1660,11 +1640,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # warning: line of type 'MODE', 'FILES', 'DATE' and 'LINE' cannot be updated.
@@ -1697,11 +1677,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         """
         cdef CTableLine* c_line
@@ -1717,12 +1697,12 @@ cdef class Table:
         c_line = self.c_table.get_line(row)
         line_type = <int>(c_line.get_line_type())
         nb_columns = self.nb_columns
-        if line_type == LINE_TYPE_TITLE:
+        if line_type == TableLineType.TITLE:
             if not isinstance(value, str):
                 raise TypeError(f"Cannot upate line {row}. Expected new content of type str. "
                                 f"Got new content of type {type(value).__name__} instead.")
             c_line.get_cell(0, nb_columns).set_text(value.encode())
-        elif line_type == LINE_TYPE_CELL:
+        elif line_type == TableLineType.CELL:
             if not (isinstance(value, Iterable) and all(isinstance(item, str) for item in value)):
                 raise TypeError(f"Cannot upate cells at line {row}. Expected new content of type list or tuple of str.\n"
                                 f"Got new content of type {type(value).__name__} instead.")
@@ -1733,7 +1713,7 @@ cdef class Table:
                 c_cell = c_line.get_cell(j, nb_columns)
                 c_cell.set_content(cell_content.encode())
         else:
-            warnings.warn(f"Line of type '{LINE_TYPE_DICT[line_type]}' cannot be updated")
+            warnings.warn(f"Line of type '{TableLineType(line_type).name}' cannot be updated")
     
     def __delitem__(self, index: int):
         """
@@ -1771,11 +1751,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE> 
 
         >>> # remove the MODE line
@@ -1795,33 +1775,32 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 10
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>        
         """
         row = self._get_row_from_index(index)
         self.c_table.delete_line(row)
 
-    def __iadd__(self, value: Union[int, str, List[str], Tuple[str], TableLine]):
+    def __iadd__(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]):
         """
         Append a new line to the table.
 
         Parameters
         ----------
-        value: int or str or list(str) or tuple(str) or TableLine
+        value: str or list(str) or tuple(str) or TableLine or TableLineType
             value of the new line.\n
-            If int, 'value' represents the type of the new line: LINE_TYPE_FILES, LINE_TYPE_MODE, 
-            LINE_TYPE_DATE, LINE_TYPE_LINE.\n
+            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.\n
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
             If an iterable of str, 'value' represents the content of the cells of the new line.\n
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, LINE_TYPE_LINE
+        >>> from iode import SAMPLE_DATA_DIR, TableLineType
         >>> from iode import Table, comments, lists, variables
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
@@ -1842,11 +1821,11 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 7
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # append a separator line
@@ -1856,7 +1835,7 @@ cdef class Table:
         >>> table += "New Title"
 
         >>> # append a separator line 
-        >>> table += LINE_TYPE_LINE
+        >>> table += TableLineType.LINE
 
         >>> # append a line with cells
         >>> # "    -> STRING cell
@@ -1879,27 +1858,27 @@ cdef class Table:
         <BLANKLINE>
         nb lines: 11
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         """
         cdef CTableLine* c_line
 
-        if isinstance(value, int):
-            if value == LINE_TYPE_FILES:
+        if isinstance(value, TableLineType):
+            if value == TableLineType.FILES:
                 self.c_table.add_line_files()
-            elif value == LINE_TYPE_MODE: 
+            elif value == TableLineType.MODE: 
                 self.c_table.add_line_mode()
-            elif value == LINE_TYPE_DATE: 
+            elif value == TableLineType.DATE: 
                 self.c_table.add_line_date()
-            elif value == LINE_TYPE_LINE: 
+            elif value == TableLineType.LINE: 
                 self.c_table.add_line_separator()
             else:
-                raise ValueError(f"The value of 'value' must be either LINE_TYPE_FILES, LINE_TYPE_MODE, "
-                                 f"LINE_TYPE_DATE or LINE_TYPE_LINE.\nGot value {value} instead.")
+                raise ValueError(f"The value of 'value' must be either TableLineType.FILES, TableLineType.MODE, "
+                                 f"TableLineType.DATE or TableLineType.LINE.\nGot value {value} instead.")
         elif isinstance(value, str):
             if all(character == '-' for character in value):
                 self.c_table.add_line_separator()
@@ -1916,13 +1895,10 @@ cdef class Table:
                 c_line.get_cell(j, nb_columns).set_content(value[j].encode())
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_line_type())
-            if line_type == LINE_TYPE_TITLE or line_type == LINE_TYPE_CELL:
+            if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
                 self.__iadd__(str(value))
             else:
                 self.__iadd__(line_type)
-        else:
-            raise TypeError(f"The value of 'value' must be of type int, str, list(str) or tuple(str).\n"
-                            f"Got value of type {type(value).__name__} instead.")
         return self
 
     def __str__(self) -> str:
@@ -1938,16 +1914,16 @@ cdef class Table:
         for i in range(-1, self.nb_lines):
             c_line = self.c_table.get_line(i) if i >= 0 else self.c_table.get_divider_line()
             line_type = <int>(c_line.get_line_type())
-            if line_type == LINE_TYPE_TITLE:
+            if line_type == TableLineType.TITLE:
                 content = c_line.get_cell(0, nb_cols).get_content(<bint>True).decode()
                 if len(content) > max_title_length:
                     max_title_length = <int>len(content)
                 lines += [[line_type, content]]
-            elif line_type == LINE_TYPE_CELL:
+            elif line_type == TableLineType.CELL:
                 cells_content = []
                 for j in range(nb_cols):
                     c_cell = c_line.get_cell(j, nb_cols)
-                    quotes = <int>(c_cell.get_type()) == CELL_TYPE_STRING
+                    quotes = <int>(c_cell.get_type()) == TableCellType.STRING
                     cell_align = <int>(c_cell.get_align())
                     content = c_cell.get_content(<bint>quotes).decode()
                     if len(content) > max_cells_length[j]:
@@ -1963,13 +1939,14 @@ cdef class Table:
         s = ""
         for i, line in enumerate(lines):
             line_type = line if isinstance(line, int) else line[0]
-            if line_type == LINE_TYPE_TITLE:
+            line_type_name = TableLineType(line_type).name
+            if line_type == TableLineType.TITLE:
                 # remove newline characters
                 content = ''.join(line[1].splitlines())
-                s += LINE_TYPE_DICT[line_type].ljust(5) + " | " + content.center(table_length)
-            elif line_type == LINE_TYPE_CELL:
+                s += line_type_name.ljust(5) + " | " + content.center(table_length)
+            elif line_type == TableLineType.CELL:
                 # i == 0 -> divider line
-                s += "DIVIS" if i == 0 else LINE_TYPE_DICT[line_type].ljust(5)
+                s += "DIVIS" if i == 0 else line_type_name.ljust(5)
                 line = line[1:]
                 for j in range(nb_cols):
                     s += " | "
@@ -1977,19 +1954,19 @@ cdef class Table:
                     cell_width = max_cells_length[j]
                     # remove newline characters
                     cell_content = ''.join(cell_content.splitlines())
-                    if cell_align == CELL_ALIGN_LEFT:
+                    if cell_align == TableCellAlign.LEFT:
                         s += cell_content.ljust(cell_width)
-                    elif cell_align == CELL_ALIGN_RIGHT:
+                    elif cell_align == TableCellAlign.RIGHT:
                         s += cell_content.rjust(cell_width)
-                    elif cell_align == CELL_ALIGN_CENTER:
+                    elif cell_align == TableCellAlign.CENTER:
                         s += cell_content.center(cell_width)
                     # TODO: check what to do with DECIMAL cell
-                    elif cell_align == CELL_ALIGN_DECIMAL:
+                    elif cell_align == TableCellAlign.DECIMAL:
                         s += cell_content.rjust(cell_width)
-            elif line_type == LINE_TYPE_LINE:
+            elif line_type == TableLineType.LINE:
                 s += '-' * 5 + " | " + '-' * table_length
             else:
-                s += LINE_TYPE_DICT[line_type].ljust(5) + " | "
+                s += line_type_name.ljust(5) + " | "
             s += "\n"
         
         return s

@@ -1,7 +1,7 @@
 import warnings
 from typing import List 
 
-from iode import Simulation
+from iode import Simulation, SimulationSort, SimulationInitialization
 
 
 def model_simulate(sample_from: str, sample_to: str, 
@@ -10,8 +10,8 @@ def model_simulate(sample_from: str, sample_to: str,
                    eps: float = 0.0001, 
                    relax: float = 1.0, 
                    maxit: int = 100, 
-                   init_values: int = 0, 
-                   sort_algo: int = 1, 
+                   init_values: int = SimulationInitialization.TM1.value,
+                   sort_algo: int = SimulationSort.BOTH.value, 
                    nb_passes: int = 5, 
                    debug: bool = False, 
                    newton_eps: float = 1e-6, 
@@ -47,7 +47,7 @@ def model_simulate_scc( sample_from: str, sample_to: str,
                         eps: float = 0.0001, 
                         relax: float = 1.0, 
                         maxit: int = 100, 
-                        init_values: int = 0, 
+                        init_values: int = SimulationInitialization.TM1.value,
                         debug: bool = False, 
                         newton_eps: float = 1e-6, 
                         newton_maxit: int = 50, 
@@ -65,8 +65,8 @@ def model_simulate_save_parms(
                     eps: float = 0.0001, 
                     relax: float = 1.0, 
                     maxit: int = 100, 
-                    init_values: int = 0, 
-                    sort_algo: int = 1, 
+                    init_values: int = SimulationInitialization.TM1.value,
+                    sort_algo: int = SimulationSort.BOTH.value, 
                     nb_passes: int = 1):
     warnings.warn("model_simulate_save_parms() is deprecated. Please use the new syntax:\n" + 
                   "simu = Simulation(convergence_threshold, relax, max_nb_iterations, sort_algorithm, " +

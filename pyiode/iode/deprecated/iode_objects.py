@@ -2,13 +2,12 @@ import numpy as np
 import warnings
 from typing import List, Union, Optional 
 
-from iode import (COMMENTS, EQUATIONS, IDENTITIES, LISTS, SCALARS, TABLES, VARIABLES, 
-                  comments, equations, identities, lists, scalars, tables, variables,
+from iode import (IodeTypes, comments, equations, identities, lists, scalars, tables, variables,
                   Equation, Scalar)
 from .workspace import ws_content
 
 
-def delete_objects(pattern: str = '*', obj_type: int = VARIABLES):
+def delete_objects(pattern: str = '*', obj_type: int = IodeTypes.VARIABLES):
     names = ws_content(pattern, obj_type)
     for name in names:
         delete_obj(name, obj_type)
@@ -17,19 +16,19 @@ def delete_objects(pattern: str = '*', obj_type: int = VARIABLES):
 # ---------------------------
 
 def delete_obj(obj_name: str, obj_type: int):
-    if obj_type == COMMENTS:
+    if obj_type == IodeTypes.COMMENTS:
         delete_cmt(obj_name, obj_type)
-    elif obj_type == EQUATIONS:
+    elif obj_type == IodeTypes.EQUATIONS:
         delete_eqs(obj_name, obj_type)
-    elif obj_type == IDENTITIES:
+    elif obj_type == IodeTypes.IDENTITIES:
         delete_idt(obj_name, obj_type)
-    elif obj_type == LISTS:
+    elif obj_type == IodeTypes.LISTS:
         delete_lst(obj_name, obj_type)
-    elif obj_type == SCALARS:
+    elif obj_type == IodeTypes.SCALARS:
         delete_scl(obj_name, obj_type)
-    elif obj_type == TABLES:
+    elif obj_type == IodeTypes.TABLES:
         delete_tbl(obj_name, obj_type)
-    elif obj_type == VARIABLES:
+    elif obj_type == IodeTypes.VARIABLES:
         delete_var(obj_name, obj_type)
     else:
         raise ValueError(f"IODE type {obj_type} is invalid")
@@ -169,19 +168,19 @@ def set_var(varname: str, py_values):
     variables[varname] = py_values
 
 def data_update(obj_name: str, obj_value: str, obj_type: int): 
-    if obj_type == COMMENTS:
+    if obj_type == IodeTypes.COMMENTS:
         data_update_cmt(obj_name, obj_value)
-    elif obj_type == EQUATIONS:
+    elif obj_type == IodeTypes.EQUATIONS:
         data_update_eqs(obj_name, obj_value)
-    elif obj_type == IDENTITIES:
+    elif obj_type == IodeTypes.IDENTITIES:
         data_update_idt(obj_name, obj_value)
-    elif obj_type == LISTS:
+    elif obj_type == IodeTypes.LISTS:
         data_update_lst(obj_name, obj_value)
-    elif obj_type == SCALARS:
+    elif obj_type == IodeTypes.SCALARS:
         data_update_scl(obj_name, obj_value)
-    elif obj_type == TABLES:
+    elif obj_type == IodeTypes.TABLES:
         raise NotImplementedError("Please use the syntax: tables[name] = table")
-    elif obj_type == VARIABLES:
+    elif obj_type == IodeTypes.VARIABLES:
         data_update_var(obj_name, obj_value)
     else:
         raise ValueError(f"IODE type {obj_type} is invalid")

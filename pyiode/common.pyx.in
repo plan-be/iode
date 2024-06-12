@@ -1,6 +1,12 @@
 # distutils: language = c++
 
 from typing import List, Dict
+import sys
+if sys.version_info.minor >= 11:
+    from enum import IntEnum, StrEnum
+else:
+    from enum import Enum, IntEnum
+    StrEnum = Enum
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
@@ -56,198 +62,160 @@ __version__ = "${CMAKE_PROJECT_VERSION}"
 # --------------
 NA: float = L_NAN
 
-COMMENTS: int = EnumIodeType.I_COMMENTS
-EQUATIONS: int = EnumIodeType.I_EQUATIONS
-IDENTITIES: int = EnumIodeType.I_IDENTITIES
-LISTS: int = EnumIodeType.I_LISTS
-SCALARS: int = EnumIodeType.I_SCALARS
-TABLES: int = EnumIodeType.I_TABLES
-VARIABLES: int = EnumIodeType.I_VARIABLES
 
-NB_TYPES: int = I_NB_TYPES
-IODE_TYPES_LIST = _cpp_string_vector_to_py(vIodeTypes)
+# IODE ENUMS
+# ----------
 
-FILE_COMMENTS: int = EnumIodeFile.I_COMMENTS_FILE
-FILE_EQUATIONS: int = EnumIodeFile.I_EQUATIONS_FILE
-FILE_IDENTITIES: int = EnumIodeFile.I_IDENTITIES_FILE
-FILE_LISTS: int = EnumIodeFile.I_LISTS_FILE
-FILE_SCALARS: int = EnumIodeFile.I_SCALARS_FILE
-FILE_TABLES: int = EnumIodeFile.I_TABLES_FILE
-FILE_VARIABLES: int = EnumIodeFile.I_VARIABLES_FILE
-FILE_REPORTS: int = EnumIodeFile.I_REPORTS_FILE
-FILE_TEXT: int = EnumIodeFile.I_TEXT_FILE
-FILE_ASCII: int = EnumIodeFile.I_ASCII_FILE
-FILE_A2M: int = EnumIodeFile.I_A2M_FILE
-FILE_RTF: int = EnumIodeFile.I_RTF_FILE
-FILE_HTML: int = EnumIodeFile.I_HTML_FILE
-FILE_MIF: int = EnumIodeFile.I_MIF_FILE
-FILE_CSV: int = EnumIodeFile.I_CSV_FILE
-FILE_REF: int = EnumIodeFile.I_REF_FILE
-FILE_AGL: int = EnumIodeFile.I_AGL_FILE
-FILE_DIF: int = EnumIodeFile.I_DIF_FILE
-FILE_LOGS: int = EnumIodeFile.I_LOGS_FILE
-FILE_SETTINGS: int = EnumIodeFile.I_SETTINGS_FILE
-FILE_ANY: int = EnumIodeFile.I_ANY_FILE
-FILE_DIRECTORY: int = EnumIodeFile.I_DIRECTORY
+class IodeTypes(IntEnum):
+    COMMENTS = EnumIodeType.I_COMMENTS
+    EQUATIONS = EnumIodeType.I_EQUATIONS
+    IDENTITIES = EnumIodeType.I_IDENTITIES
+    LISTS = EnumIodeType.I_LISTS
+    SCALARS = EnumIodeType.I_SCALARS
+    TABLES = EnumIodeType.I_TABLES
+    VARIABLES = EnumIodeType.I_VARIABLES
 
-IODE_FILE_TYPES_LIST = _cpp_string_vector_to_py(v_ext_names)
+class IodeFileExt(IntEnum):
+    COMMENTS = EnumIodeFile.I_COMMENTS_FILE
+    EQUATIONS = EnumIodeFile.I_EQUATIONS_FILE
+    IDENTITIES = EnumIodeFile.I_IDENTITIES_FILE
+    LISTS = EnumIodeFile.I_LISTS_FILE
+    SCALARS = EnumIodeFile.I_SCALARS_FILE
+    TABLES = EnumIodeFile.I_TABLES_FILE
+    VARIABLES = EnumIodeFile.I_VARIABLES_FILE
+    REPORTS = EnumIodeFile.I_REPORTS_FILE
+    TEXT = EnumIodeFile.I_TEXT_FILE
+    ASCII = EnumIodeFile.I_ASCII_FILE
+    A2M = EnumIodeFile.I_A2M_FILE
+    RTF = EnumIodeFile.I_RTF_FILE
+    HTML = EnumIodeFile.I_HTML_FILE
+    MIF = EnumIodeFile.I_MIF_FILE
+    CSV = EnumIodeFile.I_CSV_FILE
+    REF = EnumIodeFile.I_REF_FILE
+    AGL = EnumIodeFile.I_AGL_FILE
+    DIF = EnumIodeFile.I_DIF_FILE
+    LOGS = EnumIodeFile.I_LOGS_FILE
+    SETTINGS = EnumIodeFile.I_SETTINGS_FILE
+    ANY = EnumIodeFile.I_ANY_FILE
+    DIRECTORY = EnumIodeFile.I_DIRECTORY
 
-LANG_ENGLISH: int = EnumLang.IT_ENGLISH
-LANG_DUTCH: int = EnumLang.IT_DUTCH
-LANG_FRENCH: int = EnumLang.IT_FRENCH
+class IodeLanguage(IntEnum):
+    ENGLISH = EnumLang.IT_ENGLISH
+    DUTCH = EnumLang.IT_DUTCH
+    FRENCH = EnumLang.IT_FRENCH
 
-LANGS_LIST = _cpp_string_vector_to_py(vLangs)
+class EqMethod(IntEnum):
+    LSQ = 0
+    ZELLNER = 1
+    INSTRUMENTAL = 2
+    GLS = 3
+    MAX_LIKELIHOOD = 4
 
-EQ_METHOD_LSQ: int = 0
-EQ_METHOD_ZELLNER: int = 1
-EQ_METHOD_INSTRUMENTAL: int = 2
-EQ_METHOD_GLS: int = 3
-EQ_METHOD_MAX_LIKELIHOOD: int = 4
+class EqTest(IntEnum):
+    CORR = EnumIodeEquationTest.IE_CORR
+    STDEV = EnumIodeEquationTest.IE_STDEV
+    MEANY = EnumIodeEquationTest.IE_MEANY
+    SSRES = EnumIodeEquationTest.IE_SSRES
+    STDERR = EnumIodeEquationTest.IE_STDERR
+    STDERRP = EnumIodeEquationTest.IE_STDERRP
+    FSTAT = EnumIodeEquationTest.IE_FSTAT
+    R2 = EnumIodeEquationTest.IE_R2
+    R2ADJ = EnumIodeEquationTest.IE_R2ADJ
+    DW = EnumIodeEquationTest.IE_DW
+    LOGLIK = EnumIodeEquationTest.IE_LOGLIK
 
-EQUATION_METHODS = _cpp_string_vector_to_py(v_eq_methods)
+class TableCellType(IntEnum):
+    LEC = EnumCellType.IT_LEC
+    STRING = EnumCellType.IT_STRING
 
-EQ_TEST_CORR: int = EnumIodeEquationTest.IE_CORR
-EQ_TEST_STDEV: int = EnumIodeEquationTest.IE_STDEV
-EQ_TEST_MEANY: int = EnumIodeEquationTest.IE_MEANY
-EQ_TEST_SSRES: int = EnumIodeEquationTest.IE_SSRES
-EQ_TEST_STDERR: int = EnumIodeEquationTest.IE_STDERR
-EQ_TEST_STDERRP: int = EnumIodeEquationTest.IE_STDERRP
-EQ_TEST_FSTAT: int = EnumIodeEquationTest.IE_FSTAT
-EQ_TEST_R2: int = EnumIodeEquationTest.IE_R2
-EQ_TEST_R2ADJ: int = EnumIodeEquationTest.IE_R2ADJ
-EQ_TEST_DW: int = EnumIodeEquationTest.IE_DW
-EQ_TEST_LOGLIK: int = EnumIodeEquationTest.IE_LOGLIK
+class TableCellFont(IntEnum):
+    NORMAL = EnumCellFont.IT_NORMAL
+    BOLD = EnumCellFont.IT_BOLD
+    ITALIC = EnumCellFont.IT_ITALIC
+    UNDERLINE = EnumCellFont.IT_UNDERLINE
 
-EQ_NB_TESTS: int = EQS_NBTESTS
+class TableCellAlign(IntEnum):
+    CENTER = EnumCellAlign.IT_CENTER
+    LEFT = EnumCellAlign.IT_LEFT
+    RIGHT = EnumCellAlign.IT_RIGHT
+    DECIMAL = EnumCellAlign.IT_DECIMAL
 
-CELL_TYPE_LEC: int = EnumCellType.IT_LEC
-CELL_TYPE_STRING: int = EnumCellType.IT_STRING
+class TableLineType(IntEnum):
+    FILES = EnumLineType.IT_FILES
+    MODE = EnumLineType.IT_MODE
+    CELL = EnumLineType.IT_CELL
+    LINE = EnumLineType.IT_LINE
+    TITLE = EnumLineType.IT_TITLE
+    DATE = EnumLineType.IT_DATE
 
-CELL_TYPE_DICT = {CELL_TYPE_LEC: "LEC", CELL_TYPE_STRING: "STRING"}
-CELL_TYPE_REV_DICT = {value: key for key, value in CELL_TYPE_DICT.items()}
+class TableLineGraph(IntEnum):
+    LINE = EnumGraphType.IG_LINE
+    SCATTER = EnumGraphType.IG_SCATTER
+    BAR = EnumGraphType.IG_BAR
 
-CELL_FONT_NORMAL: int = EnumCellFont.IT_NORMAL
-CELL_FONT_BOLD: int = EnumCellFont.IT_BOLD
-CELL_FONT_ITALIC: int = EnumCellFont.IT_ITALIC
-CELL_FONT_UNDERLINE: int = EnumCellFont.IT_UNDERLINE
+class TableGraphGrid(IntEnum):
+    MAJOR = EnumGraphGrid.IG_MAJOR
+    NONE = EnumGraphGrid.IG_NONE
+    MINOR = EnumGraphGrid.IG_MINOR
 
-CELL_FONT_DICT = {CELL_FONT_NORMAL: "normal", CELL_FONT_BOLD: "bold", 
-                  CELL_FONT_ITALIC: "italic", CELL_FONT_UNDERLINE: "underline"}
-CELL_FONT_REV_DICT = {value: key for key, value in CELL_FONT_DICT.items()}
+class TableGraphAlign(IntEnum):
+    LEFT = EnumGraphAlign.IG_LEFT
+    CENTER = EnumGraphAlign.IG_CENTER
+    RIGHT = EnumGraphAlign.IG_RIGHT
 
-CELL_ALIGN_CENTER: int = EnumCellAlign.IT_CENTER
-CELL_ALIGN_LEFT: int = EnumCellAlign.IT_LEFT
-CELL_ALIGN_RIGHT: int = EnumCellAlign.IT_RIGHT
-CELL_ALIGN_DECIMAL: int = EnumCellAlign.IT_DECIMAL
+class TableGraphAxis(IntEnum):
+    VALUES = EnumGraphAxis.IG_VALUES
+    LOG = EnumGraphAxis.IG_LOG
+    SEMILOG = EnumGraphAxis.IG_SEMILOG
+    PERCENT = EnumGraphAxis.IG_PERCENT
 
-CELL_ALIGN_DICT = {CELL_ALIGN_CENTER: "center", CELL_ALIGN_LEFT: "left", 
-                   CELL_ALIGN_RIGHT: "right", CELL_ALIGN_DECIMAL: "decimal"}
-CELL_ALIGN_REV_DICT = {value: key for key, value in CELL_ALIGN_DICT.items()}
+class VarsMode(IntEnum):
+    LEVEL = EnumIodeVarMode.I_VAR_MODE_LEVEL
+    DIFF = EnumIodeVarMode.I_VAR_MODE_DIFF
+    GROWTH_RATE = EnumIodeVarMode.I_VAR_MODE_GROWTH_RATE
+    Y0Y_DIFF = EnumIodeVarMode.I_VAR_MODE_Y0Y_DIFF
+    Y0Y_GROWTH_RATE = EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE
 
-LINE_TYPE_FILES: int = EnumLineType.IT_FILES
-LINE_TYPE_MODE: int = EnumLineType.IT_MODE
-LINE_TYPE_CELL: int = EnumLineType.IT_CELL
-LINE_TYPE_LINE: int = EnumLineType.IT_LINE
-LINE_TYPE_TITLE: int = EnumLineType.IT_TITLE
-LINE_TYPE_DATE: int = EnumLineType.IT_DATE
+class LowToHighType(IntEnum):
+    STOCK = EnumIodeLtoH.LTOH_STOCK
+    FLOW = EnumIodeLtoH.LTOH_FLOW
 
-LINE_TYPE_DICT = {LINE_TYPE_FILES: "FILES", LINE_TYPE_MODE: "MODE", LINE_TYPE_CELL: "CELL", 
-                  LINE_TYPE_LINE: "LINE", LINE_TYPE_TITLE: "TITLE", LINE_TYPE_DATE: "DATE"}
-LINE_TYPE_REV_DICT = {value: key for key, value in LINE_TYPE_DICT.items()}
+class LowToHighMethod(StrEnum):
+    LINEAR = 'L'
+    CUBIC_SPLINES = 'C'
+    STEP = 'S'
 
-GRAPH_TYPE_LINE: int = EnumGraphType.IG_LINE
-GRAPH_TYPE_SCATTER: int = EnumGraphType.IG_SCATTER
-GRAPH_TYPE_BAR: int = EnumGraphType.IG_BAR
+class HighToLowType(IntEnum):
+    LAST = EnumIodeHtoL.HTOL_LAST
+    MEAN = EnumIodeHtoL.HTOL_MEAN
+    SUM = EnumIodeHtoL.HTOL_SUM
 
-GRAPH_TYPE_DICT = {GRAPH_TYPE_LINE: "line", GRAPH_TYPE_SCATTER: "scatter", GRAPH_TYPE_BAR: "bar"}
-GRAPH_TYPE_REV_DICT = {value: key for key, value in GRAPH_TYPE_DICT.items()}
+class SimulationSort(IntEnum):
+    CONNEX = EnumSimulationSortAlgorithm.I_SORT_CONNEX
+    BOTH = EnumSimulationSortAlgorithm.I_SORT_BOTH
+    NONE = EnumSimulationSortAlgorithm.I_SORT_NONE
 
-GRAPH_GRID_MAJOR: int = EnumGraphGrid.IG_MAJOR
-GRAPH_GRID_NONE: int = EnumGraphGrid.IG_NONE
-GRAPH_GRID_MINOR: int = EnumGraphGrid.IG_MINOR
+class SimulationInitialization(IntEnum):
+    TM1 = EnumSimulationInitialization.IV_INIT_TM1
+    TM1_A = EnumSimulationInitialization.IV_INIT_TM1_A
+    EXTRA = EnumSimulationInitialization.IV_INIT_EXTRA
+    EXTRA_A = EnumSimulationInitialization.IV_INIT_EXTRA_A
+    ASIS = EnumSimulationInitialization.IV_INIT_ASIS
+    TM1_NA = EnumSimulationInitialization.IV_INIT_TM1_NA
+    EXTRA_NA = EnumSimulationInitialization.IV_INIT_EXTRA_NA
 
-GRAPH_GRID_DICT = {GRAPH_GRID_MAJOR: "major", GRAPH_GRID_NONE: "none", GRAPH_GRID_MINOR: "minor"}
-GRAPH_GRID_REV_DICT = {value: key for key, value in GRAPH_GRID_DICT.items()}
-
-GRAPH_ALIGN_LEFT: int = EnumGraphAlign.IG_LEFT
-GRAPH_ALIGN_CENTER: int = EnumGraphAlign.IG_CENTER
-GRAPH_ALIGN_RIGHT: int = EnumGraphAlign.IG_RIGHT
-
-GRAPH_ALIGN_DICT = {GRAPH_ALIGN_LEFT: "left", GRAPH_ALIGN_CENTER: "center", GRAPH_ALIGN_RIGHT: "right"}
-GRAPH_ALIGN_REV_DICT = {value: key for key, value in GRAPH_ALIGN_DICT.items()}
-
-GRAPH_AXIS_VALUES: int = EnumGraphAxis.IG_VALUES
-GRAPH_AXIS_LOG: int = EnumGraphAxis.IG_LOG
-GRAPH_AXIS_SEMILOG: int = EnumGraphAxis.IG_SEMILOG
-GRAPH_AXIS_PERCENT: int = EnumGraphAxis.IG_PERCENT
-
-GRAPH_AXIS_DICT = {GRAPH_AXIS_VALUES: "values", GRAPH_AXIS_LOG: "log", 
-                   GRAPH_AXIS_SEMILOG: "semilog", GRAPH_AXIS_PERCENT: "percent"}
-GRAPH_AXIS_REV_DICT = {value: key for key, value in GRAPH_AXIS_DICT.items()}
-
-VAR_MODE_LEVEL: int = EnumIodeVarMode.I_VAR_MODE_LEVEL
-VAR_MODE_DIFF: int = EnumIodeVarMode.I_VAR_MODE_DIFF
-VAR_MODE_GROWTH_RATE: int = EnumIodeVarMode.I_VAR_MODE_GROWTH_RATE
-VAR_MODE_Y0Y_DIFF: int = EnumIodeVarMode.I_VAR_MODE_Y0Y_DIFF
-VAR_MODE_Y0Y_GROWTH_RATE: int = EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE
-
-VARIABLES_MODES = _cpp_string_vector_to_py(v_var_modes)
-
-LTOH_STOCK: str = 'S'
-LTOH_FLOW: str = 'F'
-LTOH_SERIES_TYPES_DICT = {'S': EnumIodeLtoH.LTOH_STOCK, 'F': EnumIodeLtoH.LTOH_FLOW}
-
-LTOH_LINEAR: str = 'L'
-LTOH_CUBIC_SPLINES: str = 'C'
-LTOH_STEP: str = 'S'
-
-HTOL_LAST: str = 'L'
-HTOL_MEAN: str = 'M'
-HTOL_SUM: str = 'S'
-HTOL_SERIES_TYPES_DICT = {'L': EnumIodeHtoL.HTOL_LAST, 'M': EnumIodeHtoL.HTOL_MEAN, 'S': EnumIodeHtoL.HTOL_SUM}
-
-LOW_TO_HIGH_DICT: Dict[str, str] = _cpp_char_string_map_to_py(mLowToHigh)
-
-SIMULATION_SORT_CONNEX: str = 'connex'
-SIMULATION_SORT_BOTH: str = 'both'
-SIMULATION_SORT_NONE: str = 'none'
-
-SIMULATION_SORT_ALGORITHMS = _cpp_string_vector_to_py(v_simulation_sort_algorithm)
-SIMULATION_SORT_ALGORITHM_DICT = {EnumSimulationSortAlgorithm.I_SORT_CONNEX: 'connex', 
-                                  EnumSimulationSortAlgorithm.I_SORT_BOTH: 'both',
-                                  EnumSimulationSortAlgorithm.I_SORT_NONE: 'none'}
-SIMULATION_SORT_ALGORITHM_REV_DICT = {value: key for key, value in SIMULATION_SORT_ALGORITHM_DICT.items()}
-
-SIMULATION_INIT_TM1: str = 'tm1'
-SIMULATION_INIT_TM1_A: str = 'tm1_a'
-SIMULATION_INIT_EXTRA: str = 'extra'
-SIMULATION_INIT_EXTRA_A: str = 'extra_a'
-SIMULATION_INIT_ASIS: str = 'asis'
-SIMULATION_INIT_TM1_NA: str = 'tm1_na'
-SIMULATION_INIT_EXTRA_NA: str = 'extra_na'
-
-SIMULATION_INITIALIZATION_LIST = _cpp_string_vector_to_py(v_simulation_initialization)
-SIMULATION_INITIALIZATION_DICT = {EnumSimulationInitialization.IV_INIT_TM1: 'tm1',
-                                  EnumSimulationInitialization.IV_INIT_TM1_A: 'tm1_a',
-                                  EnumSimulationInitialization.IV_INIT_EXTRA: 'extra',
-                                  EnumSimulationInitialization.IV_INIT_EXTRA_A: 'extra_a',
-                                  EnumSimulationInitialization.IV_INIT_ASIS: 'asis',
-                                  EnumSimulationInitialization.IV_INIT_TM1_NA: 'tm1_na',
-                                  EnumSimulationInitialization.IV_INIT_EXTRA_NA: 'extra_na'}
-SIMULATION_INITIALIZATION_REV_DICT = {value: key for key, value in SIMULATION_INITIALIZATION_DICT.items()}
-
-ESTIMATION_MAXIT: int = C_ESTIMATION_MAXIT 
+ESTIMATION_MAXIT = C_ESTIMATION_MAXIT 
 ESTIMATION_EPS: float = C_ESTIMATION_EPS
 
-ADJUSTMENT_PARTIAL: int = EnumIodeAdjustmentMethod.AM_PARTIAL_ADJUSTMENT
-ADJUSTMENT_ERROR_CORRECTION_METHOD: int = EnumIodeAdjustmentMethod.AM_ERROR_CORRECTION_METHOD
+class AdjustmentMethod(IntEnum):
+    PARTIAL = EnumIodeAdjustmentMethod.AM_PARTIAL_ADJUSTMENT
+    ERROR_CORRECTION = EnumIodeAdjustmentMethod.AM_ERROR_CORRECTION_METHOD
 
-ADJUSTMENT_METHODS_LIST = _cpp_string_vector_to_py(v_adjustment_method)
-
-W_GDI: int = 1
-W_A2M: int = 7
-W_MIF: int = 6
-W_HTML: int = 5
-W_RTF: int = 4
-W_CSV: int = 8
-W_DUMMY: int = 9
+class WriteFileExt(IntEnum):
+    GDI = 1
+    A2M = 7
+    MIF = 6
+    HTML = 5
+    RTF = 4
+    CSV = 8
+    DUMMY = 9

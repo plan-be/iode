@@ -80,25 +80,25 @@ cdef class Simulation:
         of iterations, the model has not converged, the process stops with an error message. 
         This parameter prevents the process from looping indefinitely.  
         Default to 100.
-    sort_algorithm: str
+    sort_algorithm: SimulationSort
         Sorting algorithm used to reorganized the list of equations *before* the simulation is performed.
         This reorganization can be usefully to to speed up the simulation.
         Possible values are:
-            - "none" (SIMULATION_SORT_NONE): do not use any sorting algorithm
-            - "connex" (SIMULATION_SORT_CONNEX): use the *Strongly Connected Component (SCC)* method only
-            - "both" (SIMULATION_SORT_BOTH): use both the *SCC* and the *Pseudo-triangulation* methods
-        Default to "both".
-    initialization_method: str
+            - NONE: do not use any sorting algorithm
+            - CONNEX: use the *Strongly Connected Component (SCC)* method only
+            - BOTH: use both the *SCC* and the *Pseudo-triangulation* methods
+        Default to BOTH.
+    initialization_method: SimulationInitialization
         At the start of each period to be simulated, a starting value must be chosen for each endogenous variable. 
         Possible values are:
-            - "tm1" (SIMULATION_INIT_TM1): :math:`Y := Y[-1], if Y null or NA`
-            - "tm1_a" (SIMULATION_INIT_TM1_A): :math:`Y := Y[-1], always`
-            - "extra" (SIMULATION_INIT_EXTRA): :math:`Y := extrapolation, if Y null or NA`
-            - "extra_a" (SIMULATION_INIT_EXTRA_A): :math:`Y := extrapolation, always`
-            - "asis" (SIMULATION_INIT_ASIS): :math:`Y unchanged`
-            - "tm1_na" (SIMULATION_INIT_TM1_NA): :math:`Y := Y[-1], if Y = NA`
-            - "extra_na" (SIMULATION_INIT_EXTRA_NA): :math:`Y := extrapolation, if Y = NA`
-        Default to "tm1".
+            - TM1: :math:`Y := Y[-1], if Y null or NA`
+            - TM1_A: :math:`Y := Y[-1], always`
+            - EXTRA: :math:`Y := extrapolation, if Y null or NA`
+            - EXTRA_A: :math:`Y := extrapolation, always`
+            - ASIS: :math:`Y unchanged`
+            - TM1_NA: :math:`Y := Y[-1], if Y = NA`
+            - EXTRA_NA: :math:`Y := extrapolation, if Y = NA`
+        Default to TM1.
     debug: bool
         Option to automatically generates IODE lists containing pre- and post-recursive equations: 
         `_PRE`, `_INTER` and `_POST`.
@@ -126,9 +126,9 @@ cdef class Simulation:
     >>> simu.max_nb_iterations
     100
     >>> simu.sort_algorithm
-    'both (Connex compon. + Triangulation)'
+    'BOTH (Connex compon. + Triangulation)'
     >>> simu.initialization_method
-    'tm1 (Y := Y[-1], if Y null or NA)'
+    'TM1 (Y := Y[-1], if Y null or NA)'
     >>> simu.debug
     False
     >>> simu.nb_passes
@@ -140,7 +140,8 @@ cdef class Simulation:
 
     # See function B_ModelSimulateParms() from api/report/commands/b_model.c and global variables in api/simulation/k_sim_main.c
     def __cinit__(self, convergence_threshold: float = 0.001, relax: float = 1.0, max_nb_iterations: int = 100, 
-                  sort_algorithm: Union[int, str] = SIMULATION_SORT_BOTH, initialization_method: Union[int, str] = SIMULATION_INIT_TM1, 
+                  sort_algorithm: Union[SimulationSort, str] = SimulationSort.BOTH, 
+                  initialization_method: Union[SimulationInitialization, str] = SimulationInitialization.TM1, 
                   debug: bool = False, nb_passes: int = 5, debug_newton: bool = False):
         self.c_simulation = new CSimulation()
         self.convergence_threshold = convergence_threshold
@@ -342,54 +343,51 @@ cdef class Simulation:
 
         Parameters
         ----------
-        value: str or int
+        value: SimulationSort or str
             New value for the used sorting algorithm. 
             Possible values are:
-              - "none" (SIMULATION_SORT_NONE): do not use any sorting algorithm
-              - "connex" (SIMULATION_SORT_CONNEX): use the *Strongly Connected Component (SCC)* method only
-              - "both" (SIMULATION_SORT_BOTH): use both the *SCC* and the *Pseudo-triangulation* methods
+              - NONE: do not use any sorting algorithm
+              - CONNEX: use the *Strongly Connected Component (SCC)* method only
+              - BOTH: use both the *SCC* and the *Pseudo-triangulation* methods
 
         Examples
         -------- 
-        >>> from iode import SIMULATION_SORT_NONE, SIMULATION_SORT_CONNEX, SIMULATION_SORT_BOTH
-        >>> from iode import Simulation
+        >>> from iode import Simulation, SimulationSort
         >>> simu = Simulation()
         >>> # default value
         >>> simu.sort_algorithm
-        'both (Connex compon. + Triangulation)'
+        'BOTH (Connex compon. + Triangulation)'
 
         >>> simu.sort_algorithm = "none"
         >>> simu.sort_algorithm
-        'none (None)'
-        >>> simu.sort_algorithm = SIMULATION_SORT_NONE
+        'NONE (None)'
+        >>> simu.sort_algorithm = SimulationSort.NONE
         >>> simu.sort_algorithm
-        'none (None)'
+        'NONE (None)'
 
         >>> simu.sort_algorithm = "connex"
         >>> simu.sort_algorithm
-        'connex (Connex compon. decomposition)'
-        >>> simu.sort_algorithm = SIMULATION_SORT_CONNEX
+        'CONNEX (Connex compon. decomposition)'
+        >>> simu.sort_algorithm = SimulationSort.CONNEX
         >>> simu.sort_algorithm
-        'connex (Connex compon. decomposition)'
+        'CONNEX (Connex compon. decomposition)'
 
         >>> simu.sort_algorithm = "both"
         >>> simu.sort_algorithm
-        'both (Connex compon. + Triangulation)'
-        >>> simu.sort_algorithm = SIMULATION_SORT_BOTH
+        'BOTH (Connex compon. + Triangulation)'
+        >>> simu.sort_algorithm = SimulationSort.BOTH
         >>> simu.sort_algorithm
-        'both (Connex compon. + Triangulation)'
+        'BOTH (Connex compon. + Triangulation)'
         """
-        i_sort_algorithm: int = self.c_simulation.get_sort_algorithm()
-        return f"{SIMULATION_SORT_ALGORITHM_DICT[i_sort_algorithm]} " + \
+        return f"{SimulationSort(<int>(self.c_simulation.get_sort_algorithm())).name} " + \
                f"({self.c_simulation.get_sort_algorithm_as_string().decode()})"
 
     @sort_algorithm.setter
-    def sort_algorithm(self, value: Union[int, str]):
+    def sort_algorithm(self, value: Union[SimulationSort, str]):
         if isinstance(value, str):
-            value = SIMULATION_SORT_ALGORITHM_REV_DICT[value]
-        if value not in SIMULATION_SORT_ALGORITHM_DICT:
-            raise ValueError(f"'sort_algorithm': Possible values are {list(SIMULATION_SORT_ALGORITHM_DICT.values())}. "
-                             f"Got value {value} instead.")
+            value = value.upper()
+            value = SimulationSort[value]
+        value = int(value)
         self.c_simulation.set_sort(<EnumSimulationSortAlgorithm>value)
 
     @property
@@ -397,102 +395,97 @@ cdef class Simulation:
         """
         At the start of each period to be simulated, a starting value must be chosen for each endogenous variable. 
         This value can be :
-          - :math:`Y := Y[-1], if Y null or NA` (tm1) : each null or NA endogen at the start takes the value of 
+          - :math:`Y := Y[-1], if Y null or NA` (TM1) : each null or NA endogen at the start takes the value of 
             the previous period,
-          - :math:`Y := Y[-1], always` (tm1_a) : each endogen takes the value of the previous period at the start,
-          - :math:`Y := extrapolation, if Y null or NA` (extra) : each null or NA endogen takes as value a linear 
+          - :math:`Y := Y[-1], always` (TM1_A) : each endogen takes the value of the previous period at the start,
+          - :math:`Y := extrapolation, if Y null or NA` (EXTRA) : each null or NA endogen takes as value a linear 
             extrapolation of the two previous periods,
-          - :math:`Y := extrapolation, always` (extra_a) : each endogen takes as its value a linear extrapolation of 
+          - :math:`Y := extrapolation, always` (EXTRA_A) : each endogen takes as its value a linear extrapolation of 
             the two preceding periods, whether or not it is zero at the start,
-          - :math:`Y unchanged` (asis): endogenous values are not initialized. They retain their value whether or 
+          - :math:`Y unchanged` (ASIS): endogenous values are not initialized. They retain their value whether or 
             not they are zero,
-          - :math:`Y := Y[-1], if Y = NA` (tm1_na): each NA value takes the value of the previous period,
-          - :math:`Y := extrapolation, if Y = NA` (extra_na): each NA value takes the value of a linear extrapolation of 
+          - :math:`Y := Y[-1], if Y = NA` (TM1_NA): each NA value takes the value of the previous period,
+          - :math:`Y := extrapolation, if Y = NA` (EXTRA_NA): each NA value takes the value of a linear extrapolation of 
             the two previous periods.
 
         Parameters
         ----------
-        value: str or int
+        value: SimulationInitialization or str
             initialization method. Possible values are:
-              - "tm1" (SIMULATION_INIT_TM1): :math:`Y := Y[-1], if Y null or NA`
-              - "tm1_a" (SIMULATION_INIT_TM1_A): :math:`Y := Y[-1], always`
-              - "extra" (SIMULATION_INIT_EXTRA): :math:`Y := extrapolation, if Y null or NA`
-              - "extra_a" (SIMULATION_INIT_EXTRA_A): :math:`Y := extrapolation, always`
-              - "asis" (SIMULATION_INIT_ASIS): :math:`Y unchanged`
-              - "tm1_na" (SIMULATION_INIT_TM1_NA): :math:`Y := Y[-1], if Y = NA`
-              - "extra_na" (SIMULATION_INIT_EXTRA_NA): :math:`Y := extrapolation, if Y = NA`
+              - TM1: :math:`Y := Y[-1], if Y null or NA`
+              - TM1_A: :math:`Y := Y[-1], always`
+              - EXTRA: :math:`Y := extrapolation, if Y null or NA`
+              - EXTRA_A: :math:`Y := extrapolation, always`
+              - ASIS: :math:`Y unchanged`
+              - TM1_NA: :math:`Y := Y[-1], if Y = NA`
+              - EXTRA_NA: :math:`Y := extrapolation, if Y = NA`
 
         Examples
         -------- 
-        >>> from iode import (SIMULATION_INIT_TM1, SIMULATION_INIT_TM1_A, SIMULATION_INIT_EXTRA, 
-        ...                   SIMULATION_INIT_EXTRA_A, SIMULATION_INIT_ASIS, SIMULATION_INIT_TM1_NA, 
-        ...                   SIMULATION_INIT_EXTRA_NA)
-        >>> from iode import Simulation
+        >>> from iode import Simulation, SimulationInitialization
         >>> simu = Simulation()
         >>> # default value
         >>> simu.initialization_method
-        'tm1 (Y := Y[-1], if Y null or NA)'
+        'TM1 (Y := Y[-1], if Y null or NA)'
 
-        >>> simu.initialization_method = "tm1"
+        >>> simu.initialization_method = "TM1"
         >>> simu.initialization_method
-        'tm1 (Y := Y[-1], if Y null or NA)'
-        >>> simu.initialization_method = SIMULATION_INIT_TM1
+        'TM1 (Y := Y[-1], if Y null or NA)'
+        >>> simu.initialization_method = SimulationInitialization.TM1
         >>> simu.initialization_method
-        'tm1 (Y := Y[-1], if Y null or NA)'
+        'TM1 (Y := Y[-1], if Y null or NA)'
 
-        >>> simu.initialization_method = "tm1_a"
+        >>> simu.initialization_method = "TM1_A"
         >>> simu.initialization_method
-        'tm1_a (Y := Y[-1], always)'
-        >>> simu.initialization_method = SIMULATION_INIT_TM1_A
+        'TM1_A (Y := Y[-1], always)'
+        >>> simu.initialization_method = SimulationInitialization.TM1_A
         >>> simu.initialization_method
-        'tm1_a (Y := Y[-1], always)'
+        'TM1_A (Y := Y[-1], always)'
 
-        >>> simu.initialization_method = "extra"
+        >>> simu.initialization_method = "EXTRA"
         >>> simu.initialization_method
-        'extra (Y := extrapolation, if Y null or NA)'
-        >>> simu.initialization_method = SIMULATION_INIT_EXTRA
+        'EXTRA (Y := extrapolation, if Y null or NA)'
+        >>> simu.initialization_method = SimulationInitialization.EXTRA
         >>> simu.initialization_method
-        'extra (Y := extrapolation, if Y null or NA)'
+        'EXTRA (Y := extrapolation, if Y null or NA)'
 
-        >>> simu.initialization_method = "extra_a"
+        >>> simu.initialization_method = "EXTRA_A"
         >>> simu.initialization_method
-        'extra_a (Y := extrapolation, always)'
-        >>> simu.initialization_method = SIMULATION_INIT_EXTRA_A
+        'EXTRA_A (Y := extrapolation, always)'
+        >>> simu.initialization_method = SimulationInitialization.EXTRA_A
         >>> simu.initialization_method
-        'extra_a (Y := extrapolation, always)'
+        'EXTRA_A (Y := extrapolation, always)'
 
-        >>> simu.initialization_method = "asis"
+        >>> simu.initialization_method = "ASIS"
         >>> simu.initialization_method
-        'asis (Y unchanged)'
-        >>> simu.initialization_method = SIMULATION_INIT_ASIS
+        'ASIS (Y unchanged)'
+        >>> simu.initialization_method = SimulationInitialization.ASIS
         >>> simu.initialization_method
-        'asis (Y unchanged)'
+        'ASIS (Y unchanged)'
 
-        >>> simu.initialization_method = "tm1_na"
+        >>> simu.initialization_method = "TM1_NA"
         >>> simu.initialization_method
-        'tm1_na (Y := Y[-1], if Y = NA)'
-        >>> simu.initialization_method = SIMULATION_INIT_TM1_NA
+        'TM1_NA (Y := Y[-1], if Y = NA)'
+        >>> simu.initialization_method = SimulationInitialization.TM1_NA
         >>> simu.initialization_method
-        'tm1_na (Y := Y[-1], if Y = NA)'
+        'TM1_NA (Y := Y[-1], if Y = NA)'
 
-        >>> simu.initialization_method = "extra_na"
+        >>> simu.initialization_method = "EXTRA_NA"
         >>> simu.initialization_method
-        'extra_na (Y := extrapolation, if Y = NA)'
-        >>> simu.initialization_method = SIMULATION_INIT_EXTRA_NA
+        'EXTRA_NA (Y := extrapolation, if Y = NA)'
+        >>> simu.initialization_method = SimulationInitialization.EXTRA_NA
         >>> simu.initialization_method
-        'extra_na (Y := extrapolation, if Y = NA)'
+        'EXTRA_NA (Y := extrapolation, if Y = NA)'
         """
-        i_initialization_method: int = self.c_simulation.get_initialization_method()
-        return f"{SIMULATION_INITIALIZATION_DICT[i_initialization_method]} " + \
+        return f"{SimulationInitialization(<int>(self.c_simulation.get_initialization_method())).name} " + \
                f"({self.c_simulation.get_initialization_method_as_string().decode()})"
 
     @initialization_method.setter
-    def initialization_method(self, value: Union[int, str]):
+    def initialization_method(self, value: Union[SimulationInitialization, str]):
         if isinstance(value, str):
-            value = SIMULATION_INITIALIZATION_REV_DICT[value]
-        if value not in SIMULATION_INITIALIZATION_DICT:
-            raise ValueError(f"'initialization_method': Possible values are {list(SIMULATION_INITIALIZATION_DICT.values())}. " 
-                             f"Got value {value} instead.") 
+            value = value.upper()
+            value = SimulationInitialization[value]
+        value = int(value)
         self.c_simulation.set_initialization_method(<EnumSimulationInitialization>value)
     
     @property

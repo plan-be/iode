@@ -33,11 +33,11 @@ cdef class ComputedTable:
     <BLANKLINE>
     nb lines: 8
     nb columns: 2
-    language: 'English'
-    gridx: 'major'
-    gridy: 'major'
-    graph_axis: 'values'
-    graph_alignment: 'left'
+    language: 'ENGLISH'
+    gridx: 'MAJOR'
+    gridy: 'MAJOR'
+    graph_axis: 'VALUES'
+    graph_alignment: 'LEFT'
     <BLANKLINE>
     >>> # simple time series (current workspace) - 6 observations - 4 decimals
     >>> computed_table = tables["C8_1"].compute("2000:6", nb_decimals=4)
@@ -485,11 +485,11 @@ cdef class ComputedTable:
         <BLANKLINE>
         nb lines: 12
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # compute table
@@ -668,11 +668,11 @@ cdef class ComputedTable:
         <BLANKLINE>
         nb lines: 12
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # compute table
@@ -752,11 +752,11 @@ cdef class ComputedTable:
         <BLANKLINE>
         nb lines: 12
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # compute table

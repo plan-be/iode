@@ -81,7 +81,7 @@ def test_from_array():
 
 def test_iode_wrt():
 
-    def iode_wrt_1(filename:str="", dest:int=iode.W_A2M):
+    def iode_wrt_1(filename:str="", dest: iode.WriteFileExt = iode.WriteFileExt.A2M):
         iode.w_dest(filename, dest)
         
         iode.w_print(".sep |\n")
@@ -126,11 +126,11 @@ def test_iode_wrt():
         
         iode.w_close()
 
-    iode_wrt_1("", iode.W_DUMMY)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.htm"), iode.W_HTML)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.a2m"), iode.W_A2M)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.rtf"), iode.W_RTF)
-    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.csv"), iode.W_CSV)
+    iode_wrt_1("", iode.WriteFileExt.DUMMY)
+    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.htm"), iode.WriteFileExt.HTML)
+    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.a2m"), iode.WriteFileExt.A2M)
+    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.rtf"), iode.WriteFileExt.RTF)
+    iode_wrt_1(str(IODE_OUTPUT_DIR / "test_wrt.csv"), iode.WriteFileExt.CSV)
 
 # PANDAS FUNCTIONS
 # ----------------

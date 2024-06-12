@@ -753,47 +753,43 @@ cdef class Variables(_AbstractDatabase):
     def mode(self) -> str:
         """
         Current display mode for the IODE Variables values.
-
-        Possible modes are:
-        
-          * VAR_MODE_LEVEL,
-          * VAR_MODE_DIFF,
-          * VAR_MODE_GROWTH_RATE,
-          * VAR_MODE_Y0Y_DIFF,
-          * VAR_MODE_Y0Y_GROWTH_RATE
-
-        The default mode is 'Level'.
+        The default mode is 'LEVEL'.
 
         Parameters
         ----------
-        value: int
+        value: VarsMode or str
             New mode value.
+            Possible modes are LEVEL, DIFF, GROWTH_RATE, Y0Y_DIFF or Y0Y_GROWTH_RATE.
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, VAR_MODE_LEVEL, VAR_MODE_GROWTH_RATE
-        >>> from iode import variables
+        >>> from iode import SAMPLE_DATA_DIR, variables, VarsMode
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> variables.mode
-        'Level'
+        'LEVEL'
         >>> variables["ACAF", "1990Y1"]
         23.771
         
-        >>> variables.mode = VAR_MODE_GROWTH_RATE
+        >>> variables.mode = VarsMode.GROWTH_RATE
+        >>> variables.mode
+        'GROWTH_RATE'
         >>> variables["ACAF", "1990Y1"]
         38.48528176607737
-        >>> variables.mode = VAR_MODE_LEVEL
+        >>> variables.mode = "level"
+        >>> variables.mode
+        'LEVEL'
         >>> variables["ACAF", "1990Y1"]
         23.771
         """
-        return VARIABLES_MODES[<int>self.mode_]
+        return VarsMode(<int>self.mode_).name
 
     @mode.setter
-    def mode(self, mode_: int):
-        if mode_ not in [VAR_MODE_LEVEL, VAR_MODE_DIFF, VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE]:
-            raise ValueError("mode: possible values are [VAR_MODE_LEVEL, VAR_MODE_DIFF, "
-                             "VAR_MODE_GROWTH_RATE, VAR_MODE_Y0Y_DIFF, VAR_MODE_Y0Y_GROWTH_RATE]")
-        self.mode_ = <EnumIodeVarMode>mode_
+    def mode(self, value: Union[VarsMode, str]):
+        if isinstance(value, str):
+            value = value.upper()
+            value = VarsMode[value]
+        value = int(value)
+        self.mode_ = <EnumIodeVarMode>value
 
     @property
     def sample(self) -> Sample:
@@ -967,7 +963,8 @@ cdef class Variables(_AbstractDatabase):
             return [cpp_period.decode() for cpp_period in 
                     self.database_ptr.get_list_periods(from_period.encode(), to_period.encode())]
         
-    def low_to_high(self, type_of_series: str, method: str, filepath: Union[str, Path], var_list: Union[str, List[str]]):
+    def low_to_high(self, type_of_series: Union[LowToHighType, str], method: Union[LowToHighMethod, str], 
+                    filepath: Union[str, Path], var_list: Union[str, List[str]]):
         """
         Build series with higher periodicity for *stock data* (Unemployment, Debt, ...) or 
         *flow data* (GNP, Deficit, ...).
@@ -985,26 +982,26 @@ cdef class Variables(_AbstractDatabase):
             - annual to quarterly 
             - quarterly to monthly 
         
-        Two types of series are available, one for stocks ('L'), the other for flows ('S').
+        Two types of series are available, one for stocks (STOCK), the other for flows (FLOW).
 
         Three interpolation methods are available:
 
-            - linear ('L'): A[1980Q{1,2,3,4}] = A[1979Y1] + i * (A[1980Y1] - A[1979Y1])/4 i = 1,2,3,4 
-            - cubic splines ('C'): cubic interpolation 
-            - step ('S') : A[1980Q{1,2,3,4}] = A[1980Y1] 
+            - linear (LINEAR): A[1980Q{1,2,3,4}] = A[1979Y1] + i * (A[1980Y1] - A[1979Y1])/4 i = 1,2,3,4 
+            - cubic splines (CUBIC_SPLINES): cubic interpolation 
+            - step (STEP) : A[1980Q{1,2,3,4}] = A[1980Y1] 
 
         Parameters
         ----------
-        type_of_series : str
+        type_of_series : LowToHighType or str
             Two types of series are considered: 'stock' and 'flow':
-                - 'S' (LTOH_STOCK): stock data (Unemployment, Debt, ...)
-                - 'F' (LTOH_FLOW): flow data (GNP, Deficit, ...)
+                - STOCK: stock data (Unemployment, Debt, ...)
+                - FLOW: flow data (GNP, Deficit, ...)
 
-        method : str
+        method : LowToHighMethod or str
             Method to use for transformation. Three methods can be used:
-                - 'L' (LTOH_LINEAR) : Linear interpolation
-                - 'C' (LTOH_CUBIC_SPLINES) : Cubic Spliness
-                - 'S' (LTOH_STEP) : Step
+                - LINEAR ('L'): Linear interpolation
+                - CUBIC_SPLINES ('C'): Cubic Spliness
+                - STEP ('S'): Step
 
         filepath : str or Path
             Filepath to the source data file.
@@ -1018,9 +1015,7 @@ cdef class Variables(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, LTOH_STOCK, LTOH_FLOW
-        >>> from iode import LTOH_CUBIC_SPLINES, LTOH_LINEAR, LTOH_STEP
-        >>> from iode import variables
+        >>> from iode import SAMPLE_DATA_DIR, variables, LowToHighType, LowToHighMethod
         >>> variables.clear()
         >>> # define a yearly sample
         >>> variables.sample = "2010Q1:2020Q4"
@@ -1030,7 +1025,7 @@ cdef class Variables(_AbstractDatabase):
         Linear interpolation / stock
         
         >>> # "stock" -> the result is a linear interpolation of the 2 surrounding source values.
-        >>> variables.low_to_high(LTOH_STOCK, LTOH_LINEAR, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.LINEAR, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
         [-72.50614701966526, -76.11763971671049, -79.7291324137557, -83.34062511080091]
         >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -1039,7 +1034,7 @@ cdef class Variables(_AbstractDatabase):
         Linear interpolation / flow
         
         >>> # "flow" -> the result is the source value divided by the nb of sub-periods. 
-        >>> variables.low_to_high(LTOH_FLOW, LTOH_LINEAR, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.LINEAR, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
         [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
         >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -1047,7 +1042,7 @@ cdef class Variables(_AbstractDatabase):
 
         Cubic splines / stock
         
-        >>> variables.low_to_high(LTOH_STOCK, LTOH_CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2012Q1":"2012Q4"]
         [-47.2984169294621, -50.052041225380975, -52.80566552129986, -55.55928981721873]
         >>> variables["ACAG", "2012Q1":"2012Q4"]
@@ -1055,7 +1050,7 @@ cdef class Variables(_AbstractDatabase):
 
         Cubic splines / flow
         
-        >>> variables.low_to_high(LTOH_FLOW, LTOH_CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.CUBIC_SPLINES, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2012Q1":"2012Q4"]
         [-12.748422687629207, -13.436828761608925, -14.270289043196508, -15.103749324784092]
         >>> variables["ACAG", "2012Q1":"2012Q4"]
@@ -1064,7 +1059,7 @@ cdef class Variables(_AbstractDatabase):
         Step / stock
         
         >>> # "stock" -> the result has the same value as the source
-        >>> variables.low_to_high(LTOH_STOCK, LTOH_STEP, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LowToHighType.STOCK, LowToHighMethod.STEP, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
         [-83.34062511080091, -83.34062511080091, -83.34062511080091, -83.34062511080091]
         >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -1074,7 +1069,7 @@ cdef class Variables(_AbstractDatabase):
         
         >>> # "flow" -> the result is the source value plus a portion of 
         >>> # the difference between the 2 surrounding values in the source
-        >>> variables.low_to_high(LTOH_FLOW, LTOH_STEP, filepath, ["ACAF", "ACAG"])
+        >>> variables.low_to_high(LowToHighType.FLOW, LowToHighMethod.STEP, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2014Q1":"2014Q4"]
         [-20.83515627770023, -20.83515627770023, -20.83515627770023, -20.83515627770023]
         >>> variables["ACAG", "2014Q1":"2014Q4"]
@@ -1086,24 +1081,25 @@ cdef class Variables(_AbstractDatabase):
             raise ValueError(f"file '{str(filepath)}' not found.")
         filepath = str(filepath)
 
-        type_of_series = type_of_series.upper()
-        if type_of_series not in "SF":
-            raise ValueError(f"'type_of_series': possible values are 'S' (LTOH_STOCK) or 'F' (LTOH_FLOW). "
-                            f"Got value {type_of_series} instead")
+        if isinstance(type_of_series, str):
+            type_of_series = type_of_series.upper()
+            type_of_series = LowToHighType[type_of_series]
+        type_of_series = int(type_of_series)
 
-        if method not in "LCS":
-            raise ValueError(f"'method': possible values are 'L' (LTOH_LINEAR), 'C' (LTOH_CUBIC_SPLINES) or 'S' (LTOH_STEP). " 
-                            f"Got value {method} instead")
+        if isinstance(method, str):
+            method = method.upper()
+            if len(method) > 1:
+                method = LowToHighMethod[method]
+        else:
+            method = method.value
 
         if not isinstance(var_list, str) and isinstance(var_list, Iterable) and \
             all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
 
-        i_type_of_series = LTOH_SERIES_TYPES_DICT[type_of_series]
-        cpp_low_to_high(<EnumIodeLtoH>i_type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
+        cpp_low_to_high(<EnumIodeLtoH>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
 
-
-    def high_to_low(self, type_of_series: str, filepath: Union[str, Path], var_list: Union[str, List[str]]):
+    def high_to_low(self, type_of_series: Union[HighToLowType, str], filepath: Union[str, Path], var_list: Union[str, List[str]]):
         """
         Build series of lower periodicity by (summing the / taking the average of the / taking the 
         last observation of) sub-periods.
@@ -1126,19 +1122,19 @@ cdef class Variables(_AbstractDatabase):
 
         Three types of series are available:
 
-            - sum ('S'): addition of sub-periods data
-            - mean ('M'): average of sub-periods data
-            - last ('L'): last observation
+            - SIM: addition of sub-periods data
+            - MEAN: average of sub-periods data
+            - LAST: last observation
 
         In the case of a non-existent value (:math:`NA`) for one of the sub-periods, the result is :math:`NA`.
 
         Parameters
         ----------
-        type_of_series : str
+        type_of_series : HighToLowType or str
             Three types of series are available: 
-                - 'S' (HTOL_SUM) : addition of sub-period data
-                - 'M' (HTOL_MEAN) : average of sub-period data
-                - 'L' (HTOL_LAST) : last observation
+                - SUM : addition of sub-period data
+                - MEAN : average of sub-period data
+                - LAST : last observation
 
         filepath : str or Path
             Filepath to the source data file.
@@ -1148,8 +1144,7 @@ cdef class Variables(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, HTOL_LAST, HTOL_MEAN, HTOL_SUM
-        >>> from iode import variables
+        >>> from iode import SAMPLE_DATA_DIR, variables, HighToLowType
         >>> variables.clear()
         >>> # define a yearly sample
         >>> variables.sample = "2000Y1:2020Y1"
@@ -1158,7 +1153,7 @@ cdef class Variables(_AbstractDatabase):
         
         Last Obs in year
         
-        >>> variables.high_to_low(HTOL_LAST, filepath, ["ACAF", "ACAG"])
+        >>> variables.high_to_low(HighToLowType.LAST, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2010Y1":"2014Y1"]
         [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
         >>> variables["ACAG", "2010Y1":"2014Y1"]
@@ -1166,7 +1161,7 @@ cdef class Variables(_AbstractDatabase):
 
         Mean of year
         
-        >>> variables.high_to_low(HTOL_MEAN, filepath, ["ACAF", "ACAG"])
+        >>> variables.high_to_low(HighToLowType.MEAN, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2010Y1":"2014Y1"]
         [-37.82742883229439, -44.544792633543224, -55.55928981721873, -68.89465432262006, -83.34062511080091]
         >>> variables["ACAG", "2010Y1":"2014Y1"]
@@ -1174,7 +1169,7 @@ cdef class Variables(_AbstractDatabase):
 
         Sum
         
-        >>> variables.high_to_low(HTOL_SUM, filepath, ["ACAF", "ACAG"])
+        >>> variables.high_to_low(HighToLowType.SUM, filepath, ["ACAF", "ACAG"])
         >>> variables["ACAF", "2010Y1":"2014Y1"]
         [-151.30971532917755, -178.1791705341729, -222.23715926887493, -275.5786172904802, -333.36250044320366]
         >>> variables["ACAG", "2010Y1":"2014Y1"]
@@ -1186,35 +1181,34 @@ cdef class Variables(_AbstractDatabase):
             raise ValueError(f"file '{str(filepath)}' not found.")
         filepath = str(filepath)
 
-        type_of_series = type_of_series.upper()
-        if type_of_series not in [HTOL_LAST, HTOL_MEAN, HTOL_SUM]:
-            raise ValueError(f"'type_of_series': possible values are 'L' (HTOL_LAST), 'M' (HTOL_MEAN) or 'S' (HTOL_SUM). "
-                            f"Got value {type_of_series} instead")
+        if isinstance(type_of_series, str):
+            type_of_series = type_of_series.upper()
+            type_of_series = LowToHighType[type_of_series]
+        type_of_series = int(type_of_series)
 
         if not isinstance(var_list, str) and isinstance(var_list, Iterable) and \
             all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
 
-        i_type_of_series = HTOL_SERIES_TYPES_DICT[type_of_series]
-        cpp_high_to_low(<EnumIodeHtoL>i_type_of_series, filepath.encode(), var_list.encode())
+        cpp_high_to_low(<EnumIodeHtoL>type_of_series, filepath.encode(), var_list.encode())
 
-    def extrapolate(self, method: Union[str, int], from_period: Union[str, Period] = None, to_period: Union[str, Period] = None, 
-                    variables_list: Union[str, List[str]] = None):
+    def extrapolate(self, method: Union[SimulationInitialization, str], from_period: Union[str, Period] = None, 
+                    to_period: Union[str, Period] = None, variables_list: Union[str, List[str]] = None):
         """
         Extrapolate variables using one the method described below, based on previous periods.
 
         The possible methods are as follows:
 
-          - :math:`Y := Y[-1], if Y null or NA` (tm1) : each null or NA endogen at the start takes the value of 
+          - :math:`Y := Y[-1], if Y null or NA` (TM1) : each null or NA endogen at the start takes the value of 
             the previous period,
-          - :math:`Y := Y[-1], always` (tm1_a) : each endogen takes the value of the previous period at the start,
-          - :math:`Y := extrapolation, if Y null or NA` (extra) : each null or NA endogen takes as value a linear 
+          - :math:`Y := Y[-1], always` (TM1_A) : each endogen takes the value of the previous period at the start,
+          - :math:`Y := extrapolation, if Y null or NA` (EXTRA) : each null or NA endogen takes as value a linear 
             extrapolation of the two previous periods,
-          - :math:`Y := extrapolation, always` (extra_a) : each endogen takes as its value a linear extrapolation of 
+          - :math:`Y := extrapolation, always` (EXTRA_A) : each endogen takes as its value a linear extrapolation of 
             the two preceding periods, whether or not it is zero at the start,
-          - :math:`Y unchanged` (asis): endogenous values are not initialized. They retain their value whether or 
+          - :math:`Y unchanged` (ASIS): endogenous values are not initialized. They retain their value whether or 
             not they are zero,
-          - :math:`Y := Y[-1], if Y = NA` (tm1_na): each NA value takes the value of the previous period,
+          - :math:`Y := Y[-1], if Y = NA` (TM1_NA): each NA value takes the value of the previous period,
           - :math:`Y := extrapolation, if Y = NA` (extra_na): each NA value takes the value of a linear extrapolation of 
             the two previous periods.
 
@@ -1226,15 +1220,15 @@ cdef class Variables(_AbstractDatabase):
 
         Parameters
         ----------
-        method: str or int
+        method: SimulationInitialization or str
             initialization method. Possible values are:
-              - "tm1" (SIMULATION_INIT_TM1): :math:`Y := Y[-1], if Y null or NA`
-              - "tm1_a" (SIMULATION_INIT_TM1_A): :math:`Y := Y[-1], always`
-              - "extra" (SIMULATION_INIT_EXTRA): :math:`Y := extrapolation, if Y null or NA`
-              - "extra_a" (SIMULATION_INIT_EXTRA_A): :math:`Y := extrapolation, always`
-              - "asis" (SIMULATION_INIT_ASIS): :math:`Y unchanged`
-              - "tm1_na" (SIMULATION_INIT_TM1_NA): :math:`Y := Y[-1], if Y = NA`
-              - "extra_na" (SIMULATION_INIT_EXTRA_NA): :math:`Y := extrapolation, if Y = NA`
+              - TM1: :math:`Y := Y[-1], if Y null or NA`
+              - TM1_A: :math:`Y := Y[-1], always`
+              - EXTRA: :math:`Y := extrapolation, if Y null or NA`
+              - EXTRA_A: :math:`Y := extrapolation, always`
+              - ASIS: :math:`Y unchanged`
+              - TM1_NA: :math:`Y := Y[-1], if Y = NA`
+              - EXTRA_NA: :math:`Y := extrapolation, if Y = NA`
         from_period: str or Period, optional
             starting period to extrapolate variables.
             Defaults to the starting period if the current sample.
@@ -1247,7 +1241,7 @@ cdef class Variables(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import variables, NA
+        >>> from iode import variables, NA, SimulationInitialization
         >>> variables.clear()
         >>> variables.sample = "2000Y1:2020Y1"
 
@@ -1259,54 +1253,52 @@ cdef class Variables(_AbstractDatabase):
         >>> variables["ACAF", :"2010Y1"]
         [0.0, 1.0, 2.0, 3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0, 10.0]
 
-        >>> # "tm1" (Y := Y[-1], if Y null or NA)
+        >>> # "TM1" (Y := Y[-1], if Y null or NA)
         >>> reset_ACAF()
-        >>> variables.extrapolate("tm1", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.TM1, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
 
-        >>> # "tm1_a" (Y := Y[-1], always)
+        >>> # "TM1_A" (Y := Y[-1], always)
         >>> reset_ACAF()
-        >>> variables.extrapolate("tm1_a", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.TM1_A, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
 
-        >>> # "extra" (Y := extrapolation, if Y null or NA)
+        >>> # "EXTRA" (Y := extrapolation, if Y null or NA)
         >>> reset_ACAF()
-        >>> variables.extrapolate("extra", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.EXTRA, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
 
-        >>> # "extra_a" (Y := extrapolation, always)
+        >>> # "EXTRA_A" (Y := extrapolation, always)
         >>> reset_ACAF()
-        >>> variables.extrapolate("extra_a", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.EXTRA_A, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
 
-        >>> # "asis" (Y unchanged)
+        >>> # "ASIS" (Y unchanged)
         >>> reset_ACAF()
-        >>> variables.extrapolate("asis", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.ASIS, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, -2e+37, 6.0, -2e+37, 8.0, 9.0]
 
-        >>> # "tm1_na" (Y := Y[-1], if Y = NA)
+        >>> # "TM1_NA" (Y := Y[-1], if Y = NA)
         >>> reset_ACAF()
-        >>> variables.extrapolate("tm1_na", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.TM1_NA, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, 4.0, 6.0, 6.0, 8.0, 9.0]
 
-        >>> # "extra_na" (Y := extrapolation, if Y = NA)
+        >>> # "EXTRA_NA" (Y := extrapolation, if Y = NA)
         >>> reset_ACAF()
-        >>> variables.extrapolate("extra_na", "2005Y1", "2010Y1")
+        >>> variables.extrapolate(SimulationInitialization.EXTRA_NA, "2005Y1", "2010Y1")
         >>> variables["ACAF", "2003Y1":"2009Y1"]
         [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
         """
         if isinstance(method, str):
-            method = method.lower()
-            method = SIMULATION_INITIALIZATION_REV_DICT[method]
-        if method not in SIMULATION_INITIALIZATION_DICT:
-            raise ValueError(f"'method': Possible values are {list(SIMULATION_INITIALIZATION_DICT.values())}. " 
-                             f"Got value {method} instead.") 
+            method = method.upper()
+            method = SimulationInitialization[method]
+        method = int(method)
 
         if from_period is None or to_period is None:
             sample = self.sample
