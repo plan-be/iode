@@ -291,7 +291,7 @@ cdef class _AbstractDatabase:
         >>> comments["ACCAF"]
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         """
-        if self.abstract_db_ptr.get_iode_type() == EQUATIONS:
+        if self.abstract_db_ptr.get_iode_type() == IodeTypes.EQUATIONS:
             warnings.warn("Renaming an Equation is not allowed")
         else:
             new_pos = self.abstract_db_ptr.rename(old_name.encode(), new_name.encode())
@@ -918,11 +918,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 19
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>        
         >>> # b) get a subset of the Tables database using a pattern
         >>> tables_subset = tables["C8_*"]
@@ -1063,7 +1063,7 @@ cdef class _AbstractDatabase:
 
         Equations
 
-        >>> from iode import equations
+        >>> from iode import equations, EqMethod
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> # a) add one equation
         >>> equations["BDY"] = "BDY := YN - YK"
@@ -1144,7 +1144,7 @@ cdef class _AbstractDatabase:
         >>> # upate sample and block (Equation objects)
         >>> eq_ACAF = equations["ACAF"]
         >>> eq_ACAF.set_lec("(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAF")
-        >>> eq_ACAF.method = "MAX_LIKELIHOOD"
+        >>> eq_ACAF.method = EqMethod.MAX_LIKELIHOOD
         >>> # new equation sample is from 1990Y1 to the last year of Variables
         >>> eq_ACAF.sample = "1990Y1:"
         >>> eq_ACAF.block = "ACAF"
@@ -1410,7 +1410,7 @@ cdef class _AbstractDatabase:
 
         Tables
 
-        >>> from iode import tables, Table
+        >>> from iode import tables, Table, TableGraphAxis
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
         >>> # a) -------- new table --------
         >>> # 1. specify list of line titles and list of LEC expressions
@@ -1439,11 +1439,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 16
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # 2. specify list of variables
@@ -1480,11 +1480,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 25
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # b) -------- update table --------
@@ -1510,15 +1510,15 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 16
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # set graph axis type
-        >>> table.graph_axis = 'semilog'
+        >>> table.graph_axis = TableGraphAxis.SEMILOG
         >>> # print last line
         >>> table[-1]
         <DATE>
@@ -1533,7 +1533,7 @@ cdef class _AbstractDatabase:
         'CELL'
         >>> # get line graph type
         >>> table[index].graph_type
-        'line'
+        'LINE'
         >>> # know if axis is left
         >>> table[index].axis_left
         True
@@ -1576,11 +1576,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 19
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'semilog'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'SEMILOG'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         >>> # c) working on a subset
@@ -1609,11 +1609,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 12
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         >>> # --> new table also appears in the global workspace
         >>> "X_GRT" in tables
@@ -1635,11 +1635,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 12
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         >>> # 3) update a table in the subset
         >>> table_x_grt = tables_subset["X_GRT"]
@@ -1665,11 +1665,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 13
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
         >>> # --> table is also updated in the global workspace
         >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
@@ -1690,11 +1690,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
         nb lines: 13
         nb columns: 2
-        language: 'English'
-        gridx: 'major'
-        gridy: 'major'
-        graph_axis: 'values'
-        graph_alignment: 'left'
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
         <BLANKLINE>
 
         Variables

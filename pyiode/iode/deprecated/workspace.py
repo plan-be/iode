@@ -1,25 +1,24 @@
 import warnings
 from typing import Union, List, Any
 
-from iode import (COMMENTS, EQUATIONS, IDENTITIES, LISTS, SCALARS, TABLES, VARIABLES, 
-                  LTOH_FLOW, LTOH_STOCK, LTOH_CUBIC_SPLINES, HTOL_LAST, HTOL_MEAN, HTOL_SUM, 
-                  comments, equations, identities, lists, scalars, tables, variables)
+from iode import (IodeTypes, comments, equations, identities, lists, scalars, tables, variables, 
+                  LowToHighType, LowToHighMethod, HighToLowType)
 
 
-def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = VARIABLES) -> List[str]:
-    if obj_type == COMMENTS:
+def ws_content(pattern: Union[str, List[str]] = '*', obj_type: int = IodeTypes.VARIABLES) -> List[str]:
+    if obj_type == IodeTypes.COMMENTS:
         return ws_content_cmt(pattern)
-    elif obj_type == EQUATIONS:
+    elif obj_type == IodeTypes.EQUATIONS:
         return ws_content_eqs(pattern)
-    elif obj_type == IDENTITIES:
+    elif obj_type == IodeTypes.IDENTITIES:
         return ws_content_idt(pattern)
-    elif obj_type == LISTS:
+    elif obj_type == IodeTypes.LISTS:
         return ws_content_lst(pattern)
-    elif obj_type == SCALARS:
+    elif obj_type == IodeTypes.SCALARS:
         return ws_content_scl(pattern)
-    elif obj_type == TABLES:
+    elif obj_type == IodeTypes.TABLES:
         return ws_content_tbl(pattern)
-    elif obj_type == VARIABLES:
+    elif obj_type == IodeTypes.VARIABLES:
         return ws_content_var(pattern)
     else:
         raise ValueError(f"IODE type {obj_type} is invalid")
@@ -77,19 +76,19 @@ def ws_clear_all():
 
 def ws_clear(filetype: int):
     '''Clear WS of the given filetype (K_CMT..K_VAR)'''
-    if filetype == COMMENTS:
+    if filetype == IodeTypes.COMMENTS:
         ws_clear_cmt()
-    elif filetype == EQUATIONS:
+    elif filetype == IodeTypes.EQUATIONS:
         ws_clear_eqs()
-    elif filetype == IDENTITIES:
+    elif filetype == IodeTypes.IDENTITIES:
         ws_clear_idt()
-    elif filetype == LISTS:
+    elif filetype == IodeTypes.LISTS:
         ws_clear_lst()
-    elif filetype == SCALARS:
+    elif filetype == IodeTypes.SCALARS:
         ws_clear_scl()
-    elif filetype == TABLES:
+    elif filetype == IodeTypes.TABLES:
         ws_clear_tbl()
-    elif filetype == VARIABLES:
+    elif filetype == IodeTypes.VARIABLES:
         ws_clear_var()
     else:
         raise ValueError(f"IODE type {filetype} is invalid")
@@ -134,19 +133,19 @@ def ws_clear_var():
 
 def ws_load(filename: str, filetype: int) -> Any:
     '''Load an IODE file and return the number of read objects'''
-    if filetype == COMMENTS:
+    if filetype == IodeTypes.COMMENTS:
         ws_load_cmt(filename)
-    elif filetype == EQUATIONS:
+    elif filetype == IodeTypes.EQUATIONS:
         ws_load_eqs(filename)
-    elif filetype == IDENTITIES:
+    elif filetype == IodeTypes.IDENTITIES:
         ws_load_idt(filename)
-    elif filetype == LISTS:
+    elif filetype == IodeTypes.LISTS:
         ws_load_lst(filename)
-    elif filetype == SCALARS:
+    elif filetype == IodeTypes.SCALARS:
         ws_load_scl(filename)
-    elif filetype == TABLES:
+    elif filetype == IodeTypes.TABLES:
         ws_load_tbl(filename)
-    elif filetype == VARIABLES:
+    elif filetype == IodeTypes.VARIABLES:
         ws_load_var(filename)
     else:
         raise ValueError(f"IODE type {filetype} is invalid") 
@@ -191,19 +190,19 @@ def ws_load_var(filename: str) -> int:
 
 def ws_save(filename: str, filetype: int):
     '''Save the current IODE workspace of a given type'''
-    if filetype == COMMENTS:
+    if filetype == IodeTypes.COMMENTS:
         ws_save_cmt(filename)
-    elif filetype == EQUATIONS:
+    elif filetype == IodeTypes.EQUATIONS:
         ws_save_eqs(filename)
-    elif filetype == IDENTITIES:
+    elif filetype == IodeTypes.IDENTITIES:
         ws_save_idt(filename)
-    elif filetype == LISTS:
+    elif filetype == IodeTypes.LISTS:
         ws_save_lst(filename)
-    elif filetype == SCALARS:
+    elif filetype == IodeTypes.SCALARS:
         ws_save_scl(filename)
-    elif filetype == TABLES:
+    elif filetype == IodeTypes.TABLES:
         ws_save_tbl(filename)
-    elif filetype == VARIABLES:
+    elif filetype == IodeTypes.VARIABLES:
         ws_save_var(filename)
     else:
         raise ValueError(f"IODE type {filetype} is invalid") 
@@ -254,29 +253,29 @@ def ws_save_var(filename: str):
 # -----------
 
 def ws_htol(filename: str, varlist, series_type: int):
-    if series_type == HTOL_LAST:
+    if series_type == HighToLowType.LAST:
         ws_htol_last(filename, varlist)
-    elif series_type == HTOL_MEAN:
+    elif series_type == HighToLowType.MEAN:
         ws_htol_mean(filename, varlist)
-    elif series_type == HTOL_SUM:
+    elif series_type == HighToLowType.SUM:
         ws_htol_sum(filename, varlist)
     else:
         raise ValueError("Wrong value for 'series_type'")
 
 def ws_htol_last(filename: str, varlist):
     warnings.warn("ws_ltoh_stock() is deprecated. " + 
-        "Please use the new syntax:\nvariables.high_to_low(HTOL_LAST, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    variables.high_to_low(HTOL_LAST, filename, varlist)
+        "Please use the new syntax:\nvariables.high_to_low(HighToLowType.LAST, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.high_to_low(HighToLowType.LAST, filename, varlist)
 
 def ws_htol_mean(filename: str, varlist):
     warnings.warn("ws_htol_mean() is deprecated. " + 
-        "Please use the new syntax:\nvariables.high_to_low(HTOL_MEAN, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    variables.high_to_low(HTOL_MEAN, filename, varlist)
+        "Please use the new syntax:\nvariables.high_to_low(HighToLowType.MEAN, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.high_to_low(HighToLowType.MEAN, filename, varlist)
 
 def ws_htol_sum(filename: str, varlist):
     warnings.warn("ws_htol_sum() is deprecated. " + 
-        "Please use the new syntax:\nvariables.high_to_low(HTOL_SUM, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    variables.high_to_low(HTOL_SUM, filename, varlist)
+        "Please use the new syntax:\nvariables.high_to_low(HighToLowType.SUM, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.high_to_low(HighToLowType.SUM, filename, varlist)
 
 
 # Low to High
@@ -285,19 +284,19 @@ def ws_htol_sum(filename: str, varlist):
 def ws_ltoh(filename: str, varlist, series_type, method: Union[int, str]):
     if isinstance(method, int):
         method = chr(method)
-    if series_type == LTOH_FLOW:
+    if series_type == LowToHighType.FLOW:
         ws_ltoh_flow(filename, varlist, method)
-    elif series_type == LTOH_STOCK:
+    elif series_type == LowToHighType.STOCK:
         ws_ltoh_stock(filename, varlist, method)
     else:
         raise ValueError("Wrong value for 'series_type'")
 
-def ws_ltoh_flow(filename: str, varlist, method: Union[int, str] = LTOH_CUBIC_SPLINES):
+def ws_ltoh_flow(filename: str, varlist, method: Union[int, str] = LowToHighMethod.CUBIC_SPLINES.value):
     warnings.warn("ws_ltoh_flow() is deprecated. " + 
-        "Please use the new syntax:\nvariables.low_to_high(LTOH_FLOW, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    variables.low_to_high(LTOH_FLOW, method, filename, varlist)
+        "Please use the new syntax:\nvariables.low_to_high(LowToHighType.FLOW, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.low_to_high(LowToHighType.FLOW, method, filename, varlist)
 
-def ws_ltoh_stock(filename: str, varlist, method: Union[int, str] = LTOH_CUBIC_SPLINES):
+def ws_ltoh_stock(filename: str, varlist, method: Union[int, str] = LowToHighMethod.CUBIC_SPLINES.value):
     warnings.warn("ws_ltoh_stock() is deprecated. " + 
-        "Please use the new syntax:\nvariables.low_to_high(LTOH_STOCK, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
-    variables.low_to_high(LTOH_STOCK, method, filename, varlist)
+        "Please use the new syntax:\nvariables.low_to_high(LowToHighType.STOCK, method, filepath, var_list)",DeprecationWarning, stacklevel=2)
+    variables.low_to_high(LowToHighType.STOCK, method, filename, varlist)

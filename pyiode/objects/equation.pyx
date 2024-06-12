@@ -452,25 +452,17 @@ cdef class Equation:
 
         Parameters
         ----------
-        value: str or int
-            Possible values are:
-
-                - "LSQ" (EQ_METHOD_LSQ)
-                - "ZELLNER" (EQ_METHOD_ZELLNER)
-                - "INSTRUMENTAL" (EQ_METHOD_INSTRUMENTAL)
-                - "GLS (3SLS)" (EQ_METHOD_GLS)
-                - "MAX_LIKELIHOOD" (EQ_METHOD_MAX_LIKELIHOOD)
+        value: EqMethod or str
+            Possible values are LSQ, ZELLNER, INSTRUMENTAL, GLS, MAX_LIKELIHOOD.
         """
         return self.c_equation.get_method().decode()
 
     @method.setter
-    def method(self, value: Union[str, int]):
+    def method(self, value: Union[EqMethod, str]):
         if isinstance(value, str):
             value = value.upper()
-            self.c_equation.set_method(<string>value.encode())
-        else:
-            # Note: <int> casting converts the Python type int to the cython.int type
-            self.c_equation.set_method(<int>value)
+            value = EqMethod[value]
+        self.c_equation.set_method(int(value))
 
     @property
     def sample(self) -> Sample:

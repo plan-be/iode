@@ -28,7 +28,6 @@ cdef extern from "cpp_api/objects/equation.h":
         int get_method_as_int()
         string get_method()
         void set_method(const int) except +
-        void set_method(const string&) except +
 
         string get_block()
         void set_block(const string&) except +
