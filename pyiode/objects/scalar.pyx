@@ -11,14 +11,19 @@ from pyiode.objects.scalar cimport hash_value as hash_value_scl
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 cdef class Scalar:
     """
-    An IODE scalar represents the parameters of an equation that can be estimated.
-    It is represented by 'value' value, a 'relax' value and a standard deviation ('std') value.
+    IODE Scalars are dimensionless variables defined by a single value. 
+    They can be the estimated coefficients in an equation or constant values over time (relax = 0).
 
     Attributes
     ----------
     value: float
+        Value of the scalar.
     relax: float
+        Relaxation parameter used in the context of equations estimation.
+        For example, setting the relaxation parameter to 0 will 'lock' the coefficient 
+        during the estimation process. 
     std: float
+        Standard deviation. Calculated during the estimation process.
 
     Parameters
     ----------
