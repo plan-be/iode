@@ -123,15 +123,10 @@ cdef class Equation:
         """   
         return self.c_equation.get_date_as_string(format.encode()).decode()
 
-    def get_coefficients_list(self, create_if_not_exit: bool = True) -> List[str]:
+    @property
+    def coefficients(self) -> List[str]:
         """
-        Return the list of coefficients present in the equation.
-
-        Parameters
-        ----------
-        create_if_not_exit: bool, optional
-            Whether or not to create an entry in the Scalars database for each coefficient not found in it. 
-            Defaults to True.
+        Return the list of coefficients present in the current equation.
 
         Returns
         -------
@@ -150,23 +145,39 @@ cdef class Equation:
                  method = 'LSQ',
                  from_period = '1960Y1',
                  to_period = '2015Y1')
-        >>> eq_ACAF.get_coefficients_list()
+        >>> eq_ACAF.coefficients
         ['acaf1', 'acaf2', 'acaf4']
-        >>> # clear Scalars database
+        """
+        return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(<bint>False)]
+
+    def _get_and_create_coefficients(self) -> List[str]:
+        """
+        Return the list of coefficients present in the equation. 
+        Create an entry in the Scalars database for each coefficient not found in it. 
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Equation, scalars, variables
         >>> scalars.clear()
-        >>> # Do not create scalars in the Scalars database
-        >>> eq_ACAF.get_coefficients_list(False)
-        ['acaf1', 'acaf2', 'acaf4']
-        >>> scalars.get_names()
-        []
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> # create scalars on the flight
-        >>> eq_ACAF.get_coefficients_list()
+        >>> eq_ACAF._get_and_create_coefficients()
         ['acaf1', 'acaf2', 'acaf4']
-        >>> # content of the Scalars database
         >>> scalars.get_names()
         ['acaf1', 'acaf2', 'acaf4']
         """
-        return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(create_if_not_exit)]
+        return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(<bint>True)]
 
     def get_variables_list(self, create_if_not_exit: bool = True) -> List[str]:
         """
