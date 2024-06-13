@@ -158,8 +158,7 @@ EQUATION
 
    Equation.get_coefficients_list
    Equation.get_date_format  
-   Equation.get_variables_list
-   Equation.set_sample       
+   Equation.get_variables_list      
    Equation.split_equation
    Equation.estimate
 

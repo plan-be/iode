@@ -102,47 +102,6 @@ cdef class Equation:
         del self.c_equation
         self.c_equation = NULL
 
-    def set_sample(self, from_period: Union[str, Period] = "", to_period: Union[str, Period] = ""):
-        """
-        Set the sample for the estimation of coefficients.
-
-        Parameters
-        ----------
-        from_period: str or Period, optional
-            starting period for the estimation.
-            Defaults to the starting period of the sample associated with the IODE Variables database.
-        to_period: str or Period, optional
-            ending period for the estimation.
-            Defaults to the ending period of the sample associated with the IODE Variables database.
-
-        Examples
-        --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import variables, Equation, Sample
-        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> variables.sample
-        '1960Y1:2015Y1'
-        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
-        >>> eq_ACAF.set_sample("1980Y1", "2010Y1")
-        >>> eq_ACAF.sample
-        '1980Y1:2010Y1'
-        >>> # change only the starting period
-        >>> eq_ACAF.set_sample(from_period="1970Y1")
-        >>> eq_ACAF.sample
-        '1970Y1:2015Y1'
-        >>> # change only the ending period
-        >>> eq_ACAF.set_sample(to_period="2000Y1")
-        >>> eq_ACAF.sample
-        '1960Y1:2000Y1'
-        """
-        if isinstance(from_period, Period):
-            from_period = str(from_period)
-
-        if isinstance(to_period, Period):
-            to_period = str(to_period)
-
-        self.c_equation.set_sample(from_period.encode(), to_period.encode())
-
     def get_date_format(self, format: str = "dd-mm-yyyy") -> str:
         """
         Return the date of last estimation in a given format.
@@ -431,6 +390,50 @@ cdef class Equation:
 
     @property
     def sample(self) -> Sample:
+        """
+        Estimation sample of the current equation.
+
+        Parameters
+        ----------
+        value: str or Sample
+            New estimation sample
+
+        Examples
+        --------
+        >>> from iode import Equation, variables
+        >>> variables.clear()
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF.sample
+        ':'
+
+        >>> # set Variables sample
+        >>> variables.sample = "1960Y1:2015Y1"
+        >>> variables.sample
+        '1960Y1:2015Y1'
+
+        >>> # specify starting and ending periods
+        >>> eq_ACAF.sample = "1980Y1:2000Y1"
+        >>> eq_ACAF.sample
+        '1980Y1:2000Y1'
+
+        >>> # specify only the starting period 
+        >>> # -> ending period = ending period of the Variables sample
+        >>> eq_ACAF.sample = "1990Y1:"
+        >>> eq_ACAF.sample
+        '1990Y1:2015Y1'
+
+        >>> # specify only the ending period 
+        >>> # -> starting period = starting period of the Variables sample
+        >>> eq_ACAF.sample = ":2010Y1"
+        >>> eq_ACAF.sample
+        '1960Y1:2010Y1'
+
+        >>> # specify nothing
+        >>> # new equation sample = Variables sample
+        >>> eq_ACAF.sample = ":"
+        >>> eq_ACAF.sample
+        '1960Y1:2015Y1'
+        """
         cdef CSample sample = self.c_equation.get_sample()
         return Sample._from_ptr(new CSample(sample), <bint>True)
 
@@ -438,6 +441,8 @@ cdef class Equation:
     def sample(self, value: Union[str, Sample]):
         if isinstance(value, Sample):
             value = str(value)
+        if ':' not in value:
+            raise ValueError("New sample value must contain the colon character ':'")
         from_period, to_period = value.split(':')
 
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
