@@ -102,7 +102,7 @@ cdef class Equation:
         del self.c_equation
         self.c_equation = NULL
 
-    def get_date_format(self, format: str = "dd-mm-yyyy") -> str:
+    def get_formated_date(self, format: str = "dd-mm-yyyy") -> str:
         """
         Return the date of last estimation in a given format.
 
@@ -112,15 +112,14 @@ cdef class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import Equation
-        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> # date as default format "dd-mm-yyyy"
-        >>> eq_ACAF.date
-        ''
+        >>> equations["ACAF"].date
+        '12-06-1998'
         >>> # date with specific format
-        >>> eq_ACAF.get_date_format("dd/mm/yyyy")
-        ''
+        >>> equations["ACAF"].get_formated_date("dd/mm/yyyy")
+        '12/06/1998'
         """   
         return self.c_equation.get_date_as_string(format.encode()).decode()
 
@@ -493,7 +492,7 @@ cdef class Equation:
 
     @property
     def date(self) -> str:
-        return self.get_date_format()
+        return self.get_formated_date()
 
     # Special methods
 
