@@ -1018,45 +1018,17 @@ cdef class EditAndEstimateEquations:
 
         >>> equations_est = estimation.equations_db
         >>> equations_est["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> equations_est["DPUH"]               # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'DPUH',
+                 lec = 'dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
 
         >>> estimation.is_done
         False
@@ -1086,87 +1058,53 @@ cdef class EditAndEstimateEquations:
 
         >>> estimation.copy_eq_tests_values()
         >>> equations_est["ACAF"]             # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 1
-                    dw: 2.33007
-                    fstat: 32.2851
-                    loglik: 83.8101
-                    meany: 0.00818467
-                    r2: 0.821815
-                    r2adj: 0.79636
-                    ssres: 5.19787e-05
-                    stderr: 0.00192685
-                    stderrp: 23.5422
-                    stdev: 0.0042699
-            date: )
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                method = 'LSQ',
+                from_period = '1960Y1',
+                to_period = '2015Y1',
+                tests = {corr = 1,
+                         dw = 2.33007,
+                         fstat = 32.2851,
+                         loglik = 83.8101,
+                         meany = 0.00818467,
+                         r2 = 0.821815,
+                         r2adj = 0.79636,
+                         ssres = 5.19787e-05,
+                         stderr = 0.00192685,
+                         stderrp = 23.5422,
+                         stdev = 0.0042699})
         >>> equations_est["DPUH"]             # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0.126096
-                    dw: 3.15593
-                    fstat: 3.51611
-                    loglik: 43.5743
-                    meany: 0.0505132
-                    r2: 0.189895
-                    r2adj: 0.135888
-                    ssres: 0.00591031
-                    stderr: 0.01985
-                    stderrp: 39.2966
-                    stdev: 0.0213538
-            date: )
+        Equation(endogenous = 'DPUH',
+                lec = 'dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)',
+                method = 'LSQ',
+                from_period = '1960Y1',
+                to_period = '2015Y1',
+                tests = {corr = 0.126096,
+                         dw = 3.15593,
+                         fstat = 3.51611,
+                         loglik = 43.5743,
+                         meany = 0.0505132,
+                         r2 = 0.189895,
+                         r2adj = 0.135888,
+                         ssres = 0.00591031,
+                         stderr = 0.01985,
+                         stderrp = 39.2966,
+                         stdev = 0.0213538})
 
         >>> # global Equations and Scalars databases are left intact by the method estimate()
         >>> equations["ACAF"]                   # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> equations["DPUH"]                   # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'DPUH',
+                 lec = 'dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> scalars["acaf1"]
         Scalar(0.9, 1, na)
         >>> scalars["dpuh_1"]
@@ -1177,45 +1115,43 @@ cdef class EditAndEstimateEquations:
         >>> new_eqs
         []
         >>> equations["ACAF"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: 1980Y1:1996Y1,
-            comment: ,
-            block: ACAF;DPUH,
-            instruments: ,
-            tests:
-                    corr: 1
-                    dw: 2.33007
-                    fstat: 32.2851
-                    loglik: 83.8101
-                    meany: 0.00818467
-                    r2: 0.821815
-                    r2adj: 0.79636
-                    ssres: 5.19787e-05
-                    stderr: 0.00192685
-                    stderrp: 23.5422
-                    stdev: 0.0042699
-            date: ...)
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF;DPUH',
+                 tests = {corr = 1,
+                          dw = 2.33007,
+                          fstat = 32.2851,
+                          loglik = 83.8101,
+                          meany = 0.00818467,
+                          r2 = 0.821815,
+                          r2adj = 0.79636,
+                          ssres = 5.19787e-05,
+                          stderr = 0.00192685,
+                          stderrp = 23.5422,
+                          stdev = 0.0042699},
+                 date = '13-06-2024')
         >>> equations["DPUH"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Equation(lec: dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC),
-            method: LSQ,
-            sample: 1980Y1:1996Y1,
-            comment: ,
-            block: ACAF;DPUH,
-            instruments: ,
-            tests:
-                    corr: 0.126096
-                    dw: 3.15593
-                    fstat: 3.51611
-                    loglik: 43.5743
-                    meany: 0.0505132
-                    r2: 0.189895
-                    r2adj: 0.135888
-                    ssres: 0.00591031
-                    stderr: 0.01985
-                    stderrp: 39.2966
-                    stdev: 0.0213538
-            date: ...)
+        Equation(endogenous = 'DPUH',
+                 lec = 'dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF;DPUH',
+                 tests = {corr = 0.126096,
+                          dw = 3.15593,
+                          fstat = 3.51611,
+                          loglik = 43.5743,
+                          meany = 0.0505132,
+                          r2 = 0.189895,
+                          r2adj = 0.135888,
+                          ssres = 0.00591031,
+                          stderr = 0.01985,
+                          stderrp = 39.2966,
+                          stdev = 0.0213538},
+                 date = ...)
         >>> scalars["acaf1"]
         Scalar(0.0157705, 1, 0.00136079)
         >>> scalars["dpuh_1"]
