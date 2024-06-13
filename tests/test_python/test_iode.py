@@ -22,6 +22,31 @@ IODE_VERBOSE = 1
 if not IODE_OUTPUT_DIR.exists():
     IODE_OUTPUT_DIR.mkdir()
 
+# Equations
+# ---------
+
+def test_print_equation():
+    iode.equations.load(f"{iode.SAMPLE_DATA_DIR}/fun.eqs")
+    eq_ACAF = iode.equations["ACAF"]
+    string_eq_ACAF = ("Equation(endogenous = ACAF,\n"
+                      "         lec = (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995),\n"
+                      "         method = LSQ,\n"
+                      "         sample = 1980Y1:1996Y1,\n"
+                      "         block = ACAF,\n"
+                      "         tests = corr = 1,\n"
+                      "                 dw = 2.32935,\n"
+                      "                 fstat = 32.2732,\n"
+                      "                 loglik = 83.8075,\n"
+                      "                 meany = 0.00818467,\n"
+                      "                 r2 = 0.821761,\n"
+                      "                 r2adj = 0.796299,\n"
+                      "                 ssres = 5.19945e-05,\n"
+                      "                 stderr = 0.00192715,\n"
+                      "                 stderrp = 23.5458,\n"
+                      "                 stdev = 0.0042699,\n"
+                      "         date = 12-06-1998)")
+    assert str(eq_ACAF) == string_eq_ACAF
+
 
 # Variables
 # ---------
