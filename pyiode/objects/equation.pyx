@@ -179,15 +179,10 @@ cdef class Equation:
         """
         return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(<bint>True)]
 
-    def get_variables_list(self, create_if_not_exit: bool = True) -> List[str]:
+    @property
+    def variables(self) -> List[str]:
         """
         Return the list of variables present in the equation.
-
-        Parameters
-        ----------
-        create_if_not_exit: bool, optional
-            Whether or not to create an entry in the Variables database for each variable not found in it. 
-            Defaults to True.
 
         Returns
         -------
@@ -206,27 +201,40 @@ cdef class Equation:
                  method = 'LSQ',
                  from_period = '1960Y1',
                  to_period = '2015Y1')
-
-        >>> eq_ACAF.get_variables_list()
+        >>> eq_ACAF.variables
         ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> # clear Variables database + reset vars sample
+        """
+        return [var.decode() for var in self.c_equation.get_variables_list(<bint>False)]
+
+    def _get_and_create_variables(self) -> List[str]:
+        """
+        Return the list of variables present in the equation.
+        Create an entry in the Variables database for each variable not found in it. 
+
+        Returns
+        -------
+        list(str)
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import Equation, scalars, variables
         >>> variables.clear()
         >>> variables.sample = "1960Y1:2015Y1"
-        >>> variables.sample
-        '1960Y1:2015Y1'
-        >>> # Do not create variables in the Variables database
-        >>> eq_ACAF.get_variables_list(False)
-        ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> variables.get_names()
-        []
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> # create variables on the flight
-        >>> eq_ACAF.get_variables_list()
+        >>> eq_ACAF._get_and_create_variables()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> # content of the Variables database
         >>> variables.get_names()
         ['ACAF', 'GOSF', 'TIME', 'VAF']
         """
-        return [var.decode() for var in self.c_equation.get_variables_list(create_if_not_exit)]
+        return [var.decode() for var in self.c_equation.get_variables_list(<bint>True)]
 
     def split_equation(self) -> Tuple[str, str]:
         """
