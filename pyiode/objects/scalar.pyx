@@ -31,29 +31,19 @@ cdef class Scalar:
     Examples
     --------
     >>> from iode import Scalar
-    >>> # default scalar
-    >>> scalar = Scalar()
+    >>> # default relax
+    >>> scalar = Scalar(0.9)
     >>> scalar
     Scalar(0.9, 1, na)
-    >>> # default relax
-    >>> scalar = Scalar(0.5)
-    >>> scalar
-    Scalar(0.5, 1, na)
     >>> # specific value and relax
-    >>> scalar = Scalar(0.5, 0.8)
+    >>> scalar = Scalar(0.9, 0.8)
     >>> scalar
-    Scalar(0.5, 0.8, na)
+    Scalar(0.9, 0.8, na)
     """
 
     cdef CScalar c_scalar
 
-    def __cinit__(self, value: float = 0.9, relax: float = 1.0) -> Scalar:
-        if not isinstance(value, float):
-            raise TypeError("Expected value of type 'float' for the argument 'value'.\n" +
-                "Got value of type '" + type(value).__name__ + "'")
-        if not isinstance(relax, float):
-            raise TypeError("Expected value of type 'float' for the argument 'relax'.\n" +
-                "Got value of type '" + type(relax).__name__ + "'")  
+    def __cinit__(self, value: float, relax: float = 1.0) -> Scalar:  
         if relax < 0.0 or relax > 1.0:
             raise ValueError("Expected 'relax' value between 0.0 and 1.0")    
         self.c_scalar = CScalar(value, relax)
