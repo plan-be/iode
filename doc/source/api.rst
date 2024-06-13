@@ -156,9 +156,9 @@ EQUATION
    Equation.instruments
    Equation.tests
    Equation.coefficients
+   Equation.variables      
 
    Equation.get_formated_date  
-   Equation.get_variables_list      
    Equation.split_equation
    Equation.estimate
 
