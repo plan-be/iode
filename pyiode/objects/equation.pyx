@@ -102,31 +102,6 @@ cdef class Equation:
         del self.c_equation
         self.c_equation = NULL
 
-    def set_lec(self, lec: str, endogenous: str):
-        """
-        Update LEC expression of the current equation.
-
-        Examples
-        --------
-        >>> from iode import Equation
-        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
-        >>> eq_ACAF.endogenous
-        'ACAF'
-        >>> eq_ACAF.lec
-        '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
-        >>> # remove acaf1 from the LEC expression of the ACAF equation
-        >>> eq_ACAF.set_lec("(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAF")
-        >>> eq_ACAF.lec
-        '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
-        >>> # wrong name for the endogenous variable
-        >>> eq_ACAF.set_lec("(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAG")
-        Traceback (most recent call last):
-        ... 
-        ValueError: Cannot set LEC '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' to the equation named 'ACAG'
-        """
-        self.cpp_endogenous = endogenous.encode()
-        self.c_equation.set_lec(lec.encode(), self.cpp_endogenous)
-
     def set_sample(self, from_period: Union[str, Period] = "", to_period: Union[str, Period] = ""):
         """
         Set the sample for the estimation of coefficients.
@@ -402,8 +377,39 @@ cdef class Equation:
 
     @property
     def lec(self) -> str:
+        """
+        LEC expression of the current equation.
+
+        Paramaters
+        ----------
+        value: str
+            New LEC expression.
+
+        Examples
+        --------
+        >>> from iode import Equation
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF.endogenous
+        'ACAF'
+        >>> eq_ACAF.lec
+        '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
+        >>> # remove acaf1 from the LEC expression of the ACAF equation
+        >>> eq_ACAF.lec = "(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> eq_ACAF.lec
+        '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
+        >>> # wrong name for the endogenous variable
+        >>> eq_ACAF.lec = "(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        Traceback (most recent call last):
+        ... 
+        ValueError: Cannot set LEC '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' to the equation named 'ACAF'
+        """
         return self.c_equation.get_lec().decode()
     
+    @lec.setter
+    def lec(self, value: str):
+        value = value.strip()
+        self.c_equation.set_lec(value.encode(), self.cpp_endogenous)
+
     @property
     def method(self) -> str:
         """
