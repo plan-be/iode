@@ -445,24 +445,6 @@ bool Equation::operator==(const Equation& other) const
     return true;
 }
 
-std::string Equation::to_string() const
-{
-    Sample sample = get_sample();
-    std::string s_sample = (sample.nb_periods() == 0) ? "--" : sample.to_string();
-
-    std::string s = "Equation(";
-    s += "lec: " + get_lec() + ",\n";
-    s += "\tmethod: " + get_method() + ",\n";
-    s += "\tsample: " + s_sample + ",\n";
-    s += "\tcomment: " + get_comment() + ",\n";
-    s += "\tblock: " + get_block() + ",\n";
-    s += "\tinstruments: " + get_instruments() + ",\n";
-    s += "\ttests:\n";
-    for(const auto& [test_name, test_value]: this->get_tests_as_map())
-        s += "\t\t" + test_name + ": " + std::format("{:g}", test_value) + "\n";
-    s += "\tdate: " + get_date_as_string() + ")";
-    return s;
-}
 
 NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
 {
