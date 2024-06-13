@@ -156,8 +156,8 @@ EQUATION
    Equation.instruments
    Equation.tests
 
+   Equation.get_formated_date  
    Equation.get_coefficients_list
-   Equation.get_date_format  
    Equation.get_variables_list      
    Equation.split_equation
    Equation.estimate
