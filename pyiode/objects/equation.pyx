@@ -24,14 +24,13 @@ cdef class Equation:
         equation in the Equations database. 
     lec: str
         LEC expression of the equation.
-    method: str
+    method: EqMethod
         estimation method. Possible values are:
-
-            - "LSQ"
-            - "ZELLNER"
-            - "INSTRUMENTAL"
-            - "GLS (3SLS)"
-            - "MAX_LIKELIHOOD"
+            - LSQ
+            - ZELLNER
+            - INSTRUMENTAL
+            - GLS (3SLS)
+            - MAX_LIKELIHOOD
     sample: Sample
         estimaton sample.
     comment: str
@@ -51,9 +50,9 @@ cdef class Equation:
         equation in the Equations database. 
     lec: str
         LEC expression of the equation.
-    method: int or {'LSQ', 'ZELLNER', 'INSTRUMENTAL', 'GLS', 'MAX_LIKELIHOOD'}, optional
+    method: EqMethod or str, optional
         Method used to estimate the coefficients of the equation.
-        Defaults to 'LSQ' (0).
+        Defaults to LSQ.
     from_period: str or Period, optional
         Starting period for the estimation.
         Defaults to the starting period of the sample associated with the IODE Variables database.
@@ -74,31 +73,18 @@ cdef class Equation:
     >>> variables.sample = "1960Y1:2015Y1"
     >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
     >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
-    Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-        method: LSQ,
-        sample: 1960Y1:2015Y1,
-        comment: ,
-        block: ,
-        instruments: ,
-        tests:
-                corr: 0
-                dw: 0
-                fstat: 0
-                loglik: 0
-                meany: 0
-                r2: 0
-                r2adj: 0
-                ssres: 0
-                stderr: 0
-                stderrp: 0
-                stdev: 0
-        date: )
+    Equation(endogenous = 'ACAF',
+             lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+             method = 'LSQ',
+             from_period = '1960Y1',
+             to_period = '2015Y1')
     """
     cdef string cpp_endogenous
     cdef CEquation* c_equation
 
-    def __cinit__(self, endogenous: str, lec: str, method: Union[int, str] = "LSQ", from_period: Union[str, Period] = "", 
-        to_period: Union[str, Period] = "", comment: str = "", instruments: str = "", block: str = "") -> Equation:
+    def __cinit__(self, endogenous: str, lec: str, method: Union[EqMethod, str] = EqMethod.LSQ, 
+        from_period: Union[str, Period] = "", to_period: Union[str, Period] = "", comment: str = "", 
+        instruments: str = "", block: str = "") -> Equation:
         if isinstance(from_period, Period):
             from_period = str(from_period)
 
@@ -226,25 +212,11 @@ cdef class Equation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                corr: 0
-                dw: 0
-                fstat: 0
-                loglik: 0
-                meany: 0
-                r2: 0
-                r2adj: 0
-                ssres: 0
-                stderr: 0
-                stderrp: 0
-                stdev: 0
-            date: )
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> eq_ACAF.get_coefficients_list()
         ['acaf1', 'acaf2', 'acaf4']
         >>> # clear Scalars database
@@ -285,25 +257,12 @@ cdef class Equation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
         >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                corr: 0
-                dw: 0
-                fstat: 0
-                loglik: 0
-                meany: 0
-                r2: 0
-                r2adj: 0
-                ssres: 0
-                stderr: 0
-                stderrp: 0
-                stdev: 0
-            date: )
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+
         >>> eq_ACAF.get_variables_list()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
         >>> # clear Variables database + reset vars sample
@@ -531,10 +490,54 @@ cdef class Equation:
         return self.c_equation == other.c_equation
 
     def __str__(self) -> str:
-        return self.c_equation.to_string().decode()
+        sample = self.sample
+        tests = self.tests
+        indent = " " * len("Equation(")
+
+        s = [f"endogenous = {self.endogenous}"]
+        s += [f"lec = {self.lec}"]
+        s += [f"method = {self.method}"]
+        if sample.nb_periods > 0:
+            s+= [f"sample = {sample}"]
+        if self.comment:
+            s += [f"comment = {self.comment}"]
+        if self.block:
+            s += [f"block = {self.block}"]
+        if self.instruments:
+            s += [f"instruments = {self.instruments}"]
+        if tests['corr'] > 0.0:
+            indent_tests = " " * len("tests = ")
+            s += ["tests = " + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+                                for key, value in self.tests.items())]
+        if self.date:
+            s += [f"date = {self.date}"]
+
+        return "Equation(" + f",\n{indent}".join(s) + ")"
 
     def __repr__(self) -> str:
-        return self.c_equation.to_string().decode()
+        sample = self.sample
+        tests = self.tests
+        indent = " " * len("Equation(")
+
+        s = [f"endogenous = {repr(self.endogenous)}"]
+        s += [f"lec = {repr(self.lec)}"]
+        s += [f"method = {repr(self.method)}"]
+        if sample.nb_periods > 0:
+            s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]
+        if self.comment:
+            s += [f"comment = {repr(self.comment)}"]
+        if self.block:
+            s += [f"block = {repr(self.block)}"]
+        if self.instruments:
+            s += [f"instruments = {repr(self.instruments)}"]
+        if tests['corr'] > 0.0:
+            indent_tests = " " * len("tests = {")
+            s += ["tests = {" + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+                                for key, value in self.tests.items()) + "}"]
+        if self.date:
+            s += [f"date = {repr(self.date)}"]
+
+        return "Equation(" + f",\n{indent}".join(s) + ")" 
 
     def __hash__(self) -> int:
         return <int>hash_value_eq(dereference(self.c_equation))

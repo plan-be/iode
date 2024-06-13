@@ -805,26 +805,25 @@ cdef class _AbstractDatabase:
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> # a) get one Equation
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
-        acaf4*(TIME=1995),
-                method: LSQ,
-                sample: 1980Y1:1996Y1,
-                comment: ,
-                block: ACAF,
-                instruments: ,
-                tests:
-                    corr: 1
-                    dw: 2.32935
-                    fstat: 32.2732
-                    loglik: 83.8075
-                    meany: 0.00818467
-                    r2: 0.821761
-                    r2adj: 0.796299
-                    ssres: 5.19945e-05
-                    stderr: 0.00192715
-                    stderrp: 23.5458
-                    stdev: 0.0042699
-                date: 12-06-1998)
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+
         >>> # b) get a subset of the Equations database using a pattern
         >>> equations_subset = equations["A*"]
         >>> equations_subset.get_names()
@@ -1068,70 +1067,53 @@ cdef class _AbstractDatabase:
         >>> # a) add one equation
         >>> equations["BDY"] = "BDY := YN - YK"
         >>> equations["BDY"]                    # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: BDY := YN - YK,
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'BDY',
+                 lec = 'BDY := YN - YK',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         
         >>> # b) update one equation        
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+
-        acaf4*(TIME=1995),
-                method: LSQ,
-                sample: 1980Y1:1996Y1,
-                comment: ,
-                block: ACAF,
-                instruments: ,
-                tests:
-                    corr: 1
-                    dw: 2.32935
-                    fstat: 32.2732
-                    loglik: 83.8075
-                    meany: 0.00818467
-                    r2: 0.821761
-                    r2adj: 0.796299
-                    ssres: 5.19945e-05
-                    stderr: 0.00192715
-                    stderrp: 23.5458
-                    stdev: 0.0042699
-                date: 12-06-1998)
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
         >>> # update only the LEC
         >>> equations["ACAF"] = "(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-                method: LSQ,
-                sample: 1980Y1:1996Y1,
-                comment: ,
-                block: ACAF,
-                instruments: ,
-                tests:
-                    corr: 1
-                    dw: 2.32935
-                    fstat: 32.2732
-                    loglik: 83.8075
-                    meany: 0.00818467
-                    r2: 0.821761
-                    r2adj: 0.796299
-                    ssres: 5.19945e-05
-                    stderr: 0.00192715
-                    stderrp: 23.5458
-                    stdev: 0.0042699
-                date: 12-06-1998)
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
         >>> # upate block and sample of a block of equations to estimation (dictionary)
         >>> estim_sample = "2000Y1:2010Y1"
         >>> block = "ACAF; ACAG; AOUC"
@@ -1150,25 +1132,24 @@ cdef class _AbstractDatabase:
         >>> eq_ACAF.block = "ACAF"
         >>> equations["ACAF"] = eq_ACAF
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: (ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995),
-                method: MAX_LIKELIHOOD,
-                sample: 1990Y1:2015Y1,
-                comment: ,
-                block: ACAF,
-                instruments: ,
-                tests:
-                    corr: 1
-                    dw: 2.32935
-                    fstat: 32.2732
-                    loglik: 83.8075
-                    meany: 0.00818467
-                    r2: 0.821761
-                    r2adj: 0.796299
-                    ssres: 5.19945e-05
-                    stderr: 0.00192715
-                    stderrp: 23.5458
-                    stdev: 0.0042699
-                date: 12-06-1998)
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'MAX_LIKELIHOOD',
+                 from_period = '1990Y1',
+                 to_period = '2015Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
 
         >>> # c) working on a subset
         >>> # 1) get subset
@@ -1178,91 +1159,35 @@ cdef class _AbstractDatabase:
         >>> # 2) add a equation to the subset 
         >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]"
         >>> equations_subset["AOUC_"]               # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1],
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> # --> new equation also appears in the global workspace
         >>> "AOUC_" in equations
         True
         >>> equations["AOUC_"]                      # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1],
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> # 3) update a equation in the subset
         >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]"
         >>> equations_subset["AOUC_"]           # doctest: +NORMALIZE_WHITESPACE
-            Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1],
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
         >>> # --> equation is also updated in the global workspace
         >>> equations["AOUC_"]                  # doctest: +NORMALIZE_WHITESPACE
-        Equation(lec: AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1],
-            method: LSQ,
-            sample: 1960Y1:2015Y1,
-            comment: ,
-            block: ,
-            instruments: ,
-            tests:
-                    corr: 0
-                    dw: 0
-                    fstat: 0
-                    loglik: 0
-                    meany: 0
-                    r2: 0
-                    r2adj: 0
-                    ssres: 0
-                    stderr: 0
-                    stderrp: 0
-                    stdev: 0
-            date: )
+        Equation(endogenous = 'AOUC_',
+                 lec = 'AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1]',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
 
         Identities
 
