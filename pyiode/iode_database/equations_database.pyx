@@ -103,13 +103,13 @@ cdef class Equations(_AbstractDatabase):
         if self.database_ptr.contains(key.encode()):
             if isinstance(value, str):
                 equation = self._get_object(key)
-                equation.set_lec(value.strip(), key)
+                equation.lec = value
             elif isinstance(value, Equation):
                 equation = value
             elif isinstance(value, dict):
                 equation = self._get_object(key)
                 if 'lec' in value:
-                    equation.set_lec(value.pop('lec').strip(), key)
+                    equation.lec = value.pop('lec')
                 if 'method' in value:
                     equation.method = value.pop('method')
                 if 'sample' in value:

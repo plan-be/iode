@@ -1125,7 +1125,7 @@ cdef class _AbstractDatabase:
         ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
         >>> # upate sample and block (Equation objects)
         >>> eq_ACAF = equations["ACAF"]
-        >>> eq_ACAF.set_lec("(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)", "ACAF")
+        >>> eq_ACAF.lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
         >>> eq_ACAF.method = EqMethod.MAX_LIKELIHOOD
         >>> # new equation sample is from 1990Y1 to the last year of Variables
         >>> eq_ACAF.sample = "1990Y1:"
