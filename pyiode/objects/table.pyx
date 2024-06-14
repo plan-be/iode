@@ -1635,7 +1635,7 @@ cdef class Table:
         Stock de capital                 | 8083.5517 | 8359.8908 | 8647.9354 | 8910.3393 | 9175.8106 | 9468.8865
         Intensité de capital             |    0.5032 |    0.4896 |    0.4758 |    0.4623 |    0.4481 |    0.4349
         Productivité totale des facteurs |    0.9938 |    1.0037 |    1.0137 |    1.0239 |    1.0341 |    1.0445
-        <BLANKLINE>        
+        <BLANKLINE>
         >>> # two time series (current workspace) - 5 observations - 2 decimals (default)
         >>> computed_table = tables["C8_1"].compute("(2010;2010/2009):5")
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
@@ -1643,8 +1643,8 @@ cdef class Table:
         --------------------------------------------------------------------------------------------------------------------------------
         Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
         Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
-        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
-        Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 | -1.90
+        Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         >>> # simple time series (current workspace + one extra file) - 5 observations - 2 decimals (default)
         >>> computed_table = tables["C8_1"].compute("2010[1;2]:5", extra_files=f"{SAMPLE_DATA_DIR}/ref.av")
@@ -1654,7 +1654,7 @@ cdef class Table:
         Output potentiel                 |  6936.11 |  6797.39 |  7045.34 |  6904.44 |  7161.54 |  7018.31 |  7302.29 |  7156.24 |  7460.12 |  7310.91  
         Stock de capital                 | 11293.85 | 11067.97 | 11525.01 | 11294.51 | 11736.78 | 11502.05 | 11975.49 | 11735.98 | 12263.95 | 12018.67  
         Intensité de capital             |     0.39 |     0.38 |     0.38 |     0.37 |     0.37 |     0.36 |     0.36 |     0.36 |     0.36 |     0.35  
-        Productivité totale des facteurs |      1.1 |     1.08 |     1.11 |     1.09 |     1.12 |      1.1 |     1.13 |     1.11 |     1.14 |     1.12  
+        Productivité totale des facteurs |     1.10 |     1.08 |     1.11 |     1.09 |     1.12 |     1.10 |     1.13 |     1.11 |     1.14 |     1.12  
         <BLANKLINE>
         """
         if not generalized_sample:

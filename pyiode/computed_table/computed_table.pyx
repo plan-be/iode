@@ -115,10 +115,10 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    00   |    01   |    02   |    03   |    04   |    05
         ---------------------------------------------------------------------------------------------
-        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 |  5966.2 | 6103.63
+        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 | 5966.20 | 6103.63
         Stock de capital                 | 8083.55 | 8359.89 | 8647.94 | 8910.34 | 9175.81 | 9468.89
-        Intensité de capital             |     0.5 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
-        Productivité totale des facteurs |    0.99 |     1.0 |    1.01 |    1.02 |    1.03 |    1.04
+        Intensité de capital             |    0.50 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
+        Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
 
         >>> # specify to print 4 decimals  
@@ -161,10 +161,10 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    00   |    01   |    02   |    03   |    04   |    05
         ---------------------------------------------------------------------------------------------
-        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 |  5966.2 | 6103.63
+        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 | 5966.20 | 6103.63
         Stock de capital                 | 8083.55 | 8359.89 | 8647.94 | 8910.34 | 9175.81 | 9468.89
-        Intensité de capital             |     0.5 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
-        Productivité totale des facteurs |    0.99 |     1.0 |    1.01 |    1.02 |    1.03 |    1.04
+        Intensité de capital             |    0.50 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
+        Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
         """
         return self.c_computed_table.get_nb_lines()
@@ -190,10 +190,10 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    00   |    01   |    02   |    03   |    04   |    05
         ---------------------------------------------------------------------------------------------
-        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 |  5966.2 | 6103.63
+        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 | 5966.20 | 6103.63
         Stock de capital                 | 8083.55 | 8359.89 | 8647.94 | 8910.34 | 9175.81 | 9468.89
-        Intensité de capital             |     0.5 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
-        Productivité totale des facteurs |    0.99 |     1.0 |    1.01 |    1.02 |    1.03 |    1.04
+        Intensité de capital             |    0.50 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
+        Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
         """
         return [self.c_computed_table.get_line_name(i).decode() for i in range(self.nb_lines)]
@@ -221,8 +221,8 @@ cdef class ComputedTable:
         --------------------------------------------------------------------------------------------------------------------------------
         Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
         Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
-        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
-        Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 | -1.90
+        Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
         return self.c_computed_table.get_nb_columns()
@@ -250,8 +250,8 @@ cdef class ComputedTable:
         --------------------------------------------------------------------------------------------------------------------------------
         Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
         Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
-        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
-        Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 | -1.90
+        Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
         return [self.c_computed_table.get_column_name(j).decode() for j in range(self.nb_columns)]
@@ -282,8 +282,8 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     | 10[1-2] | 11[1-2] | 12[1-2] | 13[1-2] | 14[1-2]
         -----------------------------------------------------------------------------------
-        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |   149.2
-        Stock de capital                 |  225.88 |   230.5 |  234.74 |  239.51 |  245.28
+        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |  149.20
+        Stock de capital                 |  225.88 |  230.50 |  234.74 |  239.51 |  245.28
         Intensité de capital             |    0.01 |    0.01 |    0.01 |    0.01 |    0.01
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
@@ -316,8 +316,8 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     | 10[1-2] | 11[1-2] | 12[1-2] | 13[1-2] | 14[1-2]
         -----------------------------------------------------------------------------------
-        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |   149.2
-        Stock de capital                 |  225.88 |   230.5 |  234.74 |  239.51 |  245.28
+        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |  149.20
+        Stock de capital                 |  225.88 |  230.50 |  234.74 |  239.51 |  245.28
         Intensité de capital             |    0.01 |    0.01 |    0.01 |    0.01 |    0.01
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
@@ -350,8 +350,8 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     | 10[1-2] | 11[1-2] | 12[1-2] | 13[1-2] | 14[1-2]
         -----------------------------------------------------------------------------------
-        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |   149.2
-        Stock de capital                 |  225.88 |   230.5 |  234.74 |  239.51 |  245.28
+        Output potentiel                 |  138.72 |  140.91 |  143.23 |  146.05 |  149.20
+        Stock de capital                 |  225.88 |  230.50 |  234.74 |  239.51 |  245.28
         Intensité de capital             |    0.01 |    0.01 |    0.01 |    0.01 |    0.01
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
@@ -381,8 +381,8 @@ cdef class ComputedTable:
         --------------------------------------------------------------------------------------------------------------------------------
         Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
         Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
-        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
-        Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 | -1.90
+        Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
         return self.c_computed_table.get_nb_periods()
@@ -410,8 +410,8 @@ cdef class ComputedTable:
         --------------------------------------------------------------------------------------------------------------------------------
         Output potentiel                 |  6936.11 |  1.74 |  7045.34 |  1.57 |  7161.54 |  1.65 |  7302.29 |  1.97 |  7460.12 |  2.16
         Stock de capital                 | 11293.85 |  2.82 | 11525.01 |  2.05 | 11736.78 |  1.84 | 11975.49 |  2.03 | 12263.95 |  2.41
-        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 |  -1.9
-        Productivité totale des facteurs |      1.1 |   1.0 |     1.11 |   1.0 |     1.12 |   1.0 |     1.13 |   1.0 |     1.14 |   1.0
+        Intensité de capital             |     0.39 | -2.17 |     0.38 | -2.05 |     0.37 | -1.91 |     0.36 | -1.86 |     0.36 | -1.90
+        Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
         cdef CSample* c_sample = self.c_computed_table.get_sample()
@@ -497,13 +497,13 @@ cdef class ComputedTable:
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
-        Q_F                         |  5842.74 |  5725.89 |          1.9 |          1.9 |  5930.75 |  5812.13 |         1.51 |         1.51
-        Q_I                         |  1093.37 |   1071.5 |         0.89 |         0.89 |   1114.6 |   1092.3 |         1.94 |         1.94
-        Q_F/Q_I                     |     5.34 |     5.34 |          1.0 |          1.0 |     5.32 |     5.32 |        -0.43 |        -0.43
-        ln(Q_I+Q_F)                 |     8.84 |     8.82 |          0.2 |          0.2 |     8.86 |     8.84 |         0.18 |         0.18
+        Q_F                         |  5842.74 |  5725.89 |         1.90 |         1.90 |  5930.75 |  5812.13 |         1.51 |         1.51
+        Q_I                         |  1093.37 |  1071.50 |         0.89 |         0.89 |  1114.60 |  1092.30 |         1.94 |         1.94
+        Q_F/Q_I                     |     5.34 |     5.34 |         1.00 |         1.00 |     5.32 |     5.32 |        -0.43 |        -0.43
+        ln(Q_I+Q_F)                 |     8.84 |     8.82 |         0.20 |         0.20 |     8.86 |     8.84 |         0.18 |         0.18
         KNFF                        | 11525.01 | 11294.51 |         2.05 |         2.05 | 11736.78 | 11502.05 |         1.84 |         1.84
         KNFF[-1]                    | 11293.85 | 11067.97 |         2.82 |         2.82 | 11525.01 | 11294.51 |         2.05 |         2.05
-        3+ln(10)                    |      5.3 |      5.3 |          0.0 |          0.0 |      5.3 |      5.3 |          0.0 |          0.0
+        3+ln(10)                    |     5.30 |     5.30 |         0.00 |         0.00 |     5.30 |     5.30 |         0.00 |         0.00
         0+KNFF                      | 11525.01 | 11294.51 |         2.05 |         2.05 | 11736.78 | 11502.05 |         1.84 |         1.84
         <BLANKLINE>
 
@@ -543,10 +543,10 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    00   |    01   |    02   |    03   |    04   |    05
         ---------------------------------------------------------------------------------------------
-        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 |  5966.2 | 6103.63
+        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 | 5966.20 | 6103.63
         Stock de capital                 | 8083.55 | 8359.89 | 8647.94 | 8910.34 | 9175.81 | 9468.89
-        Intensité de capital             |     0.5 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
-        Productivité totale des facteurs |    0.99 |     1.0 |    1.01 |    1.02 |    1.03 |    1.04
+        Intensité de capital             |    0.50 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
+        Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
         >>> df = computed_table.to_frame()
         >>> df                          # doctest: +NORMALIZE_WHITESPACE
@@ -587,10 +587,10 @@ cdef class ComputedTable:
         >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
            line title \ period[file]     |    00   |    01   |    02   |    03   |    04   |    05
         ---------------------------------------------------------------------------------------------
-        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 |  5966.2 | 6103.63
+        Output potentiel                 | 5495.21 | 5627.86 | 5748.78 | 5857.95 | 5966.20 | 6103.63
         Stock de capital                 | 8083.55 | 8359.89 | 8647.94 | 8910.34 | 9175.81 | 9468.89
-        Intensité de capital             |     0.5 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
-        Productivité totale des facteurs |    0.99 |     1.0 |    1.01 |    1.02 |    1.03 |    1.04
+        Intensité de capital             |    0.50 |    0.49 |    0.48 |    0.46 |    0.45 |    0.43
+        Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
         >>> array = computed_table.to_array()
         >>> array                       # doctest: +NORMALIZE_WHITESPACE
@@ -680,13 +680,13 @@ cdef class ComputedTable:
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
-        Q_F                         |  5842.74 |  5725.89 |          1.9 |          1.9 |  5930.75 |  5812.13 |         1.51 |         1.51
-        Q_I                         |  1093.37 |   1071.5 |         0.89 |         0.89 |   1114.6 |   1092.3 |         1.94 |         1.94
-        Q_F/Q_I                     |     5.34 |     5.34 |          1.0 |          1.0 |     5.32 |     5.32 |        -0.43 |        -0.43
-        ln(Q_I+Q_F)                 |     8.84 |     8.82 |          0.2 |          0.2 |     8.86 |     8.84 |         0.18 |         0.18
+        Q_F                         |  5842.74 |  5725.89 |         1.90 |         1.90 |  5930.75 |  5812.13 |         1.51 |         1.51
+        Q_I                         |  1093.37 |  1071.50 |         0.89 |         0.89 |  1114.60 |  1092.30 |         1.94 |         1.94
+        Q_F/Q_I                     |     5.34 |     5.34 |         1.00 |         1.00 |     5.32 |     5.32 |        -0.43 |        -0.43
+        ln(Q_I+Q_F)                 |     8.84 |     8.82 |         0.20 |         0.20 |     8.86 |     8.84 |         0.18 |         0.18
         KNFF                        | 11525.01 | 11294.51 |         2.05 |         2.05 | 11736.78 | 11502.05 |         1.84 |         1.84
         KNFF[-1]                    | 11293.85 | 11067.97 |         2.82 |         2.82 | 11525.01 | 11294.51 |         2.05 |         2.05
-        3+ln(10)                    |      5.3 |      5.3 |          0.0 |          0.0 |      5.3 |      5.3 |          0.0 |          0.0
+        3+ln(10)                    |     5.30 |     5.30 |         0.00 |         0.00 |     5.30 |     5.30 |         0.00 |         0.00
         0+KNFF                      | 11525.01 | 11294.51 |         2.05 |         2.05 | 11736.78 | 11502.05 |         1.84 |         1.84
         <BLANKLINE>
 
@@ -764,13 +764,13 @@ cdef class ComputedTable:
         >>> computed_table                      # doctest: +NORMALIZE_WHITESPACE
          line title \ period[file]  | 2010[1]  | 2010[2]  | 2010/2009[1] | 2010/2009[2] | 2011[1]  | 2011[2]  | 2011/2010[1] | 2011/2010[2]
         ------------------------------------------------------------------------------------------------------------------------------------
-        Q_F                         |  5842.74 |  5725.89 |          1.9 |          1.9 |  5930.75 |  5812.13 |         1.51 |         1.51
-        Q_I                         |  1093.37 |   1071.5 |         0.89 |         0.89 |   1114.6 |   1092.3 |         1.94 |         1.94
-        Q_F/Q_I                     |     5.34 |     5.34 |          1.0 |          1.0 |     5.32 |     5.32 |        -0.43 |        -0.43
-        ln(Q_I+Q_F)                 |     8.84 |     8.82 |          0.2 |          0.2 |     8.86 |     8.84 |         0.18 |         0.18
+        Q_F                         |  5842.74 |  5725.89 |         1.90 |         1.90 |  5930.75 |  5812.13 |         1.51 |         1.51
+        Q_I                         |  1093.37 |  1071.50 |         0.89 |         0.89 |  1114.60 |  1092.30 |         1.94 |         1.94
+        Q_F/Q_I                     |     5.34 |     5.34 |         1.00 |         1.00 |     5.32 |     5.32 |        -0.43 |        -0.43
+        ln(Q_I+Q_F)                 |     8.84 |     8.82 |         0.20 |         0.20 |     8.86 |     8.84 |         0.18 |         0.18
         KNFF                        | 11525.01 | 11294.51 |         2.05 |         2.05 | 11736.78 | 11502.05 |         1.84 |         1.84
         KNFF[-1]                    | 11293.85 | 11067.97 |         2.82 |         2.82 | 11525.01 | 11294.51 |         2.05 |         2.05
-        3+ln(10)                    |      5.3 |      5.3 |          0.0 |          0.0 |      5.3 |      5.3 |          0.0 |          0.0
+        3+ln(10)                    |     5.30 |     5.30 |         0.00 |         0.00 |     5.30 |     5.30 |         0.00 |         0.00
         0+KNFF                      | 11525.01 | 11294.51 |         2.05 |         2.05 | 11736.78 | 11502.05 |         1.84 |         1.84
         <BLANKLINE>
 
@@ -831,7 +831,8 @@ cdef class ComputedTable:
         data = []
         column_names = []
         for j, column_name in enumerate(self.columns):
-            column_data = [str(self.c_computed_table.get_value(i, j, self.nb_decimals)) for i in range(self.nb_lines)]
+            column_data = [f"{self.c_computed_table.get_value(i, j, -1):.{self.nb_decimals}f}" 
+                           for i in range(self.nb_lines)]
             max_length = max([len(column_name)] + [len(value) for value in column_data])
             column_names += [column_name.center(max_length)]
             data += [[value.rjust(max_length) for value in column_data]]
