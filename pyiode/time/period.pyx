@@ -15,9 +15,17 @@ cdef class Period:
     cdef CPeriod c_period
 
     def __init__(self, *args: Union[str, Tuple[int, str, int]]) -> Period:
-        f"""
-        An IODE period is defined by a year, a periodicity ({", ".join(periodicities)}) and by a position 
-        in the year.
+        """
+        An IODE period is defined by a year, a periodicity and by a position in the year.
+
+        Possible values for the periodicity are:
+
+            - Y: yearly
+            - S: semestrial
+            - Q: quarterly
+            - M: monthly
+            - W: weekly
+            - D: daily
 
         Parameters
         ----------
@@ -34,10 +42,12 @@ cdef class Period:
                 Year of the period.
 
             * periodicity: {'Y', 'S', 'Q', 'M', 'W', 'D'}, optional
-                Periodicity of the period. Defaults to 'Y'.
+                Periodicity of the period. 
+                Default to 'Y' (yearly).
 
             * step: int, optional
-                Position of the period in the year. Defaults to 1.
+                Position of the period in the year. 
+                Default to 1.
 
         Attributes
         ----------
@@ -75,24 +85,12 @@ cdef class Period:
         cdef int step_ = 1
         cdef str str_period = ''
 
-        def check_year(value: int) -> int:
-            if not isinstance(value, int):
-                raise TypeError("Expected an integer for the argument 'year'.\nGot argument of type '" + type(value).__name__ + "'")
-            return value
-
         def check_periodicity(value: str) -> int:
-            if not isinstance(value, str):
-                raise TypeError("Expected a string for the argument 'periodicity_'.\nGot type '" + type(value).__name__ + "'")
-            if len(value) > 1:
-                raise ValueError("Expected a string a length 1 for the argument 'periodicity_'")
+            if len(value) != 1:
+                raise ValueError("'periodicity': Expected string of length 1")
             if value not in periodicities:
-                raise ValueError(f"Wrong periodicity. Valid periodicity are: {periodicities}")
+                raise ValueError(f"Wrong periodicity. Valid periodicity are: 'Y', 'S', 'Q', 'M', 'W' or 'D'")
             return value.encode()[0]
-
-        def check_step(value: int) -> int:
-            if not isinstance(value, int):
-                raise TypeError("Expected an integer for the argument 'step'.\nGot argument of type '" + type(value).__name__ + "'")
-            return value
 
         if len(args) == 1:
             arg = args[0]
@@ -105,12 +103,12 @@ cdef class Period:
             else:
                 raise ValueError("Expected argument of type int, 'Period' or string.\nGot argument of type '" + type(arg).__name__ + "'")
         elif len(args) == 2:
-            year_ = check_year(args[0])
+            year_ = args[0]
             periodicity_ = check_periodicity(args[1])
         elif len(args) == 3:
-            year_ = check_year(args[0])
+            year_ = args[0]
             periodicity_ = check_periodicity(args[1])
-            step_ = check_step(args[2])
+            step_ = args[2]
         else:
             raise ValueError("Wrong number of arguments to create a new Period")
 
@@ -155,8 +153,6 @@ cdef class Period:
         >>> period_2.difference(period)
         6
         """
-        if not isinstance(other, Period):
-            raise TypeError(f"Expected argument of type 'Period'.\nGot argument of type '{type(other)}'")
         return self.c_period.difference(other.c_period)
 
     def shift(self, nb_periods: int) -> Period:
@@ -181,8 +177,6 @@ cdef class Period:
         >>> shifted_period
         2001Q4
         """
-        if not isinstance(nb_periods, int):
-            raise TypeError(f"Expected argument of type int.\nGot argument of type '{type(nb_periods)}'")
         shifted_period = self.c_period.shift(nb_periods)
         return Period(shifted_period.p_y, chr(shifted_period.p_p), shifted_period.p_s)
 
@@ -210,21 +204,35 @@ cdef class Period:
 
     @property
     def year(self) -> int:
+        """
+        Corresponding year of the period
+        """
         return self.c_period.p_y
 
     @property
     def periodicity(self) -> str:
+        """
+        Possible values are:
+
+            - Y: yearly
+            - S: semestrial
+            - Q: quarterly
+            - M: monthly
+            - W: weekly
+            - D: daily
+        """
         return self.c_period.p_p
 
     @property
     def step(self) -> int:
+        """
+        Position of the period in the year
+        """
         return self.c_period.p_s
 
     # Special methods
 
     def __eq__(self, other: Period) -> bool:
-        if not isinstance(other, Period):
-            raise TypeError(f"Expected argument of type 'Period'.\nGot argument of type '{type(other)}'")
         return self.c_period == other.c_period
 
     def __str__(self) -> str:
