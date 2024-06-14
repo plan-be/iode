@@ -195,10 +195,14 @@ TABLE
    Table.nb_lines
    Table.nb_columns
    Table.language
+   Table.ymin
+   Table.ymax
    Table.gridx
    Table.gridy
    Table.graph_axis
    Table.graph_alignment
+   Table.box
+   Table.shadow
    
    Table.compute
    Table.index
