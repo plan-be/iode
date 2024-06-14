@@ -62,23 +62,23 @@ cdef class Period:
         >>> # passing a string
         >>> period = Period("2000Y1")
         >>> period
-        2000Y1
+        '2000Y1'
         >>> # passing year, periodicity and step
         >>> period = Period(2010, 'Q', 1)
         >>> period
-        2010Q1
+        '2010Q1'
         >>> # passing only year
         >>> period = Period(2010)
         >>> period
-        2010Y1
+        '2010Y1'
         >>> # passing year and periodicity
         >>> period = Period(2010, 'Q')
         >>> period
-        2010Q1
+        '2010Q1'
         >>> # copy a period
         >>> period_2 = Period(period)
         >>> period_2
-        2010Q1
+        '2010Q1'
         """
         cdef int year_ = 0
         cdef char periodicity_ = b'Y'
@@ -176,15 +176,15 @@ cdef class Period:
         >>> from iode import Period
         >>> period = Period(2000, 'Q', 1)
         >>> period
-        2000Q1
+        '2000Q1'
         >>> # shift forward
         >>> shifted_period = period.shift(7)
         >>> shifted_period
-        2001Q4
+        '2001Q4'
         >>> # shift backward
         >>> shifted_period = period.shift(-7)
         >>> shifted_period
-        1998Q2
+        '1998Q2'
         """
         shifted_period = self.c_period.shift(nb_periods)
         return Period(shifted_period.p_y, chr(shifted_period.p_p), shifted_period.p_s)
@@ -248,4 +248,4 @@ cdef class Period:
         return self.c_period.to_string().decode()
 
     def __repr__(self) -> str:
-        return self.c_period.to_string().decode()
+        return repr(str(self))

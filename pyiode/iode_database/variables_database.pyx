@@ -239,6 +239,10 @@ cdef class Variables(_AbstractDatabase):
                 sample = self.sample
                 first_period = sample.start if periods_.start is None else periods_.start
                 last_period = sample.end if periods_.stop is None else periods_.stop
+                if isinstance(first_period, Period):
+                    first_period = str(first_period)
+                if isinstance(last_period, Period):
+                    last_period = str(last_period)
                 if periods_.step is not None:
                     return names, self.periods_subset(first_period, last_period)[::periods_.step]
                 else:
