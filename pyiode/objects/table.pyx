@@ -1380,11 +1380,11 @@ cdef class Table:
         index: int
             index where to insert a line.
         value: str or list(str) or tuple(str) or TableLine or TableLineType
-            value of the new line.\n
-            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.\n
+            value of the new line.
+            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
-            If an iterable of str, 'value' represents the content of the cells of the new line.\n
+            If an iterable of str, 'value' represents the content of the cells of the new line.
         after: bool, optional
             If True, insert the new line after the line at the specified index. 
             If False, insert the new line before the line at the specified index. 
@@ -1966,11 +1966,11 @@ cdef class Table:
         Parameters
         ----------
         value: str or list(str) or tuple(str) or TableLine or TableLineType
-            value of the new line.\n
-            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.\n
+            value of the new line.
+            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
-            If an iterable of str, 'value' represents the content of the cells of the new line.\n
+            If an iterable of str, 'value' represents the content of the cells of the new line.
 
         Examples
         --------
