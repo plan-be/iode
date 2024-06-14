@@ -42,7 +42,7 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
     >>> execute_lec(lec, "2000Y1")
     10.046610792200543
     >>> # pass a period position in the sample
-    >>> t = variables.sample.get_period_position("2000Y1")
+    >>> t = variables.sample.index("2000Y1")
     >>> t
     40
     >>> execute_lec(lec, t)
