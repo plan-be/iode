@@ -175,22 +175,22 @@ cdef class Sample:
     # Attributes access
 
     @property
-    def start(self) -> str:
+    def start(self) -> Period:
         if self.c_sample is NULL:
             warnings.warns("'sample' is not defined")
             return None
         else:
             c_period = self.c_sample.start_period()
-            return c_period.to_string().decode()
+            return Period(c_period.to_string().decode())
 
     @property
-    def end(self) -> str:
+    def end(self) -> Period:
         if self.c_sample is NULL:
             warnings.warns("'sample' is not defined")
             return None
         else:
             c_period = self.c_sample.end_period()
-            return c_period.to_string().decode()
+            return Period(c_period.to_string().decode())
 
     @property
     def nb_periods(self) -> int:

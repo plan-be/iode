@@ -526,7 +526,7 @@ cdef class Equation:
         s = [f"endogenous = {self.endogenous}"]
         s += [f"lec = {self.lec}"]
         s += [f"method = {self.method}"]
-        if sample.nb_periods > 0:
+        if len(sample):
             s+= [f"sample = {sample}"]
         if self.comment:
             s += [f"comment = {self.comment}"]
@@ -551,7 +551,7 @@ cdef class Equation:
         s = [f"endogenous = {repr(self.endogenous)}"]
         s += [f"lec = {repr(self.lec)}"]
         s += [f"method = {repr(self.method)}"]
-        if sample.nb_periods > 0:
+        if len(sample):
             s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]
         if self.comment:
             s += [f"comment = {repr(self.comment)}"]
