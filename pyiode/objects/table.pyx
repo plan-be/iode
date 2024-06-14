@@ -1679,7 +1679,7 @@ cdef class Table:
 
         Notes
         -----
-        The special divider line is not taken into account if the returned number of lines.
+        The special divider line is not taken into account in the returned number of lines.
 
         Examples
         --------
