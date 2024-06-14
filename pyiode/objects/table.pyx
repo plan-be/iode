@@ -1371,7 +1371,7 @@ cdef class Table:
         
         raise ValueError(f"Content '{key}' not found in table")
 
-    def insert(self, index: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType], after: bool = True):
+    def insert(self, index: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType]):
         r"""
         Insert a new line in the table.
 
@@ -1385,10 +1385,6 @@ cdef class Table:
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
             If an iterable of str, 'value' represents the content of the cells of the new line.
-        after: bool, optional
-            If True, insert the new line after the line at the specified index. 
-            If False, insert the new line before the line at the specified index. 
-            Defaults to True.
 
         Examples
         --------
@@ -1429,20 +1425,21 @@ cdef class Table:
         5
 
         >>> # insert new separator line
-        >>> table.insert(index, '-')
         >>> index += 1
+        >>> table.insert(index, '-')
 
         >>> # insert new title
-        >>> table.insert(index, "New Title")
         >>> index += 1
+        >>> table.insert(index, "New Title")
 
         >>> # insert new separator line 
-        >>> table.insert(index, TableLineType.LINE)
         >>> index += 1
+        >>> table.insert(index, TableLineType.LINE)
 
         >>> # insert new line with cells
         >>> # "    -> STRING cell
         >>> # no " -> LEC cell
+        >>> index += 1
         >>> table.insert(index, ['"RIDG:', 'RIDG'])
 
         >>> table           # doctest: +NORMALIZE_WHITESPACE
@@ -1477,25 +1474,25 @@ cdef class Table:
         row = self._get_row_from_index(index)
         if isinstance(value, TableLineType):
             if value == TableLineType.FILES:
-                self.c_table.insert_line_files(row, <bint>after)
+                self.c_table.insert_line_files(row, <bint>False)
             elif value == TableLineType.MODE: 
-                self.c_table.insert_line_mode(row, <bint>after)
+                self.c_table.insert_line_mode(row, <bint>False)
             elif value == TableLineType.DATE: 
-                self.c_table.insert_line_date(row, <bint>after)
+                self.c_table.insert_line_date(row, <bint>False)
             elif value == TableLineType.LINE: 
-                self.c_table.insert_line_separator(row, <bint>after)
+                self.c_table.insert_line_separator(row, <bint>False)
             else:
                 raise ValueError(f"The value of 'value' must be either TableLineType.FILES, TableLineType.MODE, "
                                  f"TableLineType.DATE or TableLineType.LINE.\nGot value {value} instead.")
         elif isinstance(value, str):
             if all(character == '-' for character in value):
-                self.c_table.insert_line_separator(row, <bint>after)
+                self.c_table.insert_line_separator(row, <bint>False)
             elif '|' in value:
                 self.insert(row, value.split('|'))
             else:
-                self.c_table.insert_title(row, value.encode(), <bint>after)
+                self.c_table.insert_title(row, value.encode(), <bint>False)
         elif isinstance(value, Iterable) and all(isinstance(item, str) for item in value):
-            c_line = self.c_table.insert_line_with_cells(row, <bint>after)
+            c_line = self.c_table.insert_line_with_cells(row, <bint>False)
             nb_columns = self.nb_columns
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")

@@ -1469,9 +1469,9 @@ cdef class _AbstractDatabase:
         >>> table[index]
         ('"YSSG:"', 'YSSG')
         >>> # insert a new title line surrounded by two separator lines
-        >>> table.insert(index, '-')
-        >>> table.insert(index + 1, "New Title")
-        >>> table.insert(index + 2, '-')
+        >>> table.insert(index + 1, '-')
+        >>> table.insert(index + 2, "New Title")
+        >>> table.insert(index + 3, '-')
         >>> # append a new sepatator line
         >>> table += '-'
 
@@ -1569,7 +1569,7 @@ cdef class _AbstractDatabase:
         >>> # 3) update a table in the subset
         >>> table_x_grt = tables_subset["X_GRT"]
         >>> index = table_x_grt.index("XPWXAB")
-        >>> table_x_grt.insert(index, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
+        >>> table_x_grt.insert(index + 1, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
         >>> # warning: do not forget to actually update the IODE Table subset
         >>> tables_subset["X_GRT"] = table_x_grt
         >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
