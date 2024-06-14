@@ -20,16 +20,94 @@ cdef class TableCell:
     """
     IODE Table cell.
 
+    Cells in TITLE and CELL lines can contain text. Cells in CELL lines can also contain LEC expressions. 
+    Cells of other line types (LINE, FILES, MODE and DATE) do not contain any information, as this would 
+    not result in printing.
+
+    Interpolation Of Text Cells
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Text cells in a table can contain expressions that adapt to the sample when printed. 
+    These expressions are composed of the '#' character, followed by a letter and optionally a number:
+
+    The letter indicates the value to be taken: 'y' for the year, for example.
+
+    The number indicates the period to be taken into account. In fact, several periods may be involved in 
+    calculating the column (80/79, for example). 80 will correspond to period 1, and 79 to period 2, so the 
+    number can take the values 1 and 2.
+
+    Some expressions do not need a number. For example, '#O' indicates the operation performed on the years 
+    (like growth rate) and must not be followed by 1 or 2.
+
+    If one expression is not followed by a number, then the value 1 is used for the number.
+
+    The expressions can contain:
+
+    Syntax          Meaning                     Example
+    ---------------------------------------------------
+    #y1 or #y2      year of column              80
+    #Y1 or #Y2      year of column              1980
+    #p              periodicity                 q
+    #P              periodicity                 Q
+    #M1 or #M2      sub-period  Monthly         February
+                                Quarterly       IV
+                                Yearly          -
+                                Other           52
+    #m1 or #m2      sub-period  Monthly         Feb
+                                Quarterly       iv
+                                Annual          -
+                                Other           52
+    #r1 or #r2      sub-period  Monthly         ix
+                                Quarterly       iv
+                                Yearly          -
+                                Other           52
+    #R1 or #R2      sub-period  Monthly         IX
+                                Quarterly       IV
+                                Yearly          -
+                                Other           52
+    #n1 or #n2      sub-period                  7
+    #N1 or #N2      sub-period                  11
+    #o              period transaction          /
+    #O              period operation            Growth Rates
+    #F or #F        files used                  [1-2]
+
+    For the ease of writing, the following macros are defined::
+
+        #t is equivalent to #y1#P1#n1#o1#y2#P2#n2    
+        #T is equivalent to #Y1#P1#n1#o1#Y2#P2#n2    
+        #S is equivalent to #T#F    
+        #s is equivalent to #t#f
+
+    Depending on the sample, some expressions may or may not be empty: if there is no period operation 
+    (growth rate), all variables followed by 2 (#Y2) remain empty, as do the #O and #o operations.
+
+    If only one file is used to calculate the table, #f and #F remain empty.
+
+    If the periodicity is annual, the variables #P, #N, #M, #R remain empty, whether in upper or lower case, 
+    followed by 1 or 2.
+
     Attributes
     ----------
     cell_type: TableCellType
-        Type of cell content. Possible value is 'STRING' or 'LEC'.
+        Type of cell content. 
+        Possible value is STRING or LEC.
     align: TableCellAlign
-        Alignment of the text in the cell. Possible values are 'center', 'left', 'right', 'decimal' or 
-        TableCellAlign.CENTER, TableCellAlign.LEFT, TableCellAlign.RIGHT, TableCellAlign.DECIMAL.
+        Alignment of the text in the cell. 
+        Possible values are CENTER, LEFT, RIGHT or DECIMAL.
     bold: bool
     italic: bool
     underline: bool
+
+    Warnings
+    --------
+    To distinguish a STRING cell from a LEC cell, **the text of a STRING cell must begin with double 
+    quotation marks** (which will not be printed). **A cell that does not begin with a double quotation 
+    mark will be considered a LEC form** and syntactically verified.
+
+    See Also
+    --------
+    TableLine
+    Table
 
     Examples
     --------
@@ -291,6 +369,24 @@ cdef class TableLine:
     """
     IODE Table line.
 
+    The following line types are defined:
+
+        - TITLE: this is a title line. The text encoded in the first column is printed across the entire width of the table. 
+                 A LEC form in this type of line makes no sense and is rejected by the editor. 
+        - CELL: this is a *normal* table line: the first column contains a line title, the second a LEC form which, 
+                once calculated for the requested periods, will provide the values for columns 2 and following in the table. 
+                In fact, both columns can be either text or a LEC form, but the point of placing a LEC form in the first 
+                column is not obvious. On the other hand, you can place two headings in both columns, or at least leave the 
+                second column empty to mark a separation in the table. 
+        - LINE: this type of line can contain neither text nor LEC shapes: it's simply a dividing line in the middle of the table.
+        - FILES: when printed, this line will contain the names of files containing printed data extending across the entire 
+                 width of the table. If several files are printed in comparison, this line is automatically multiplied. 
+                 No data (text or LEC) can be encoded in the columns of this line type. 
+        - MODE: this is a line which depends on the period operations performed when the table is printed. 
+                For example, if a column is printed as a growth rate, a carry forward will be indicated in the line 
+                corresponding to MODE. No data can be encoded in columns of this type. 
+        - DATE: a line of this type will contain the date on which the table was printed. 
+
     Attributes
     ----------
     line_type: TableLineType
@@ -299,9 +395,14 @@ cdef class TableLine:
     graph_type: TableLineGraph
         Graph type associated with the table line. Possible values are LINE, SCATTER or BAR.
 
-    axis_left: bool
-        Whether or not the values of the present line correspond to the Y axis 
-        displayed on the left of the graph. Defaults to True.
+    axis_left: bool 
+        Indicate whether the y-axis should be on the left (True) or on the right (False) of the chart.
+        Defaults to True (left).
+
+    See Also
+    --------
+    TableCell
+    Table
 
     Examples
     --------
@@ -668,9 +769,44 @@ cdef class TableLine:
 
 # Table wrapper class
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
+# TODO : implement properties ymin, ymax, box and shadow
 cdef class Table:
     """
-    IODE Table.
+    IODE tables are objects designed to present variables and scalars (results or data) in the
+    form of tables of figures or graphs. They are defined as a set of lines of various types
+    (title, formula, dividers, etc.). These lines contain formulas that will be calculated when 
+    printed, based on the values in the series, for example after a simulation. 
+    IODE tables therefore do not contain numbers, but rather the formulas that will be used to calculate 
+    the values to be printed in the tables.
+
+    Each line in a table has a set of attributes, the most important of which is its type. 
+    This type determines how the line will be printed, and the possible contents of the line definition. 
+    The other attributes concern the type of characters to be used when printing and the framing of the line. 
+    The table also contains graphic attributes that concern the layout of the graphic that will eventually 
+    be built with this table. 
+
+    Attributes
+    ----------
+    ymin: float
+        Minimum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
+        The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
+        an optimum scale value. 
+    ymax: float 
+        Maximum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
+        The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
+        an optimum scale value. 
+    gridx: TableGraphGrid
+         X-grid options: MAJOR, NONE or MINOR.
+    gridy: TableGraphGrid
+         Y-grid options: MAJOR, NONE or MINOR.
+    graph_axis: TableGraphAxis
+         Y-axis scale: VALUES, LOG, SEMILOG or PERCENT.
+    graph_alignment: TableGraphAlign
+        Graph alignment: LEFT, CENTER or RIGHT.
+    box: bool 
+        Whether the graph should be boxed. 
+    shadow: bool
+        Whether or not to place a shadow behind the chart.
 
     Parameters
     ----------
@@ -702,6 +838,11 @@ cdef class Table:
     Returns
     -------
     Table
+
+    See Also
+    --------
+    TableCell
+    TableLine
 
     Examples
     --------
@@ -948,9 +1089,41 @@ cdef class Table:
         self.c_table.set_language(<EnumLang>value)
 
     @property
+    def ymin(self) -> float:
+        """
+        Minimum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
+        The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
+        an optimum scale value. 
+
+        """
+        warnings.warn("'ymin' is not yet implemented")
+
+    @ymin.setter
+    def ymin(self, value: float):
+        warnings.warn("'ymin' is not yet implemented")
+
+    @property
+    def ymax(self) -> float:
+        """
+        Maximum values on the Y axis. If data falls outside these values, the axis scale adapts to the data. 
+        The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
+        an optimum scale value. 
+
+        """
+        warnings.warn("'ymax' is not yet implemented")
+    
+    @ymax.setter
+    def ymax(self, value: float):
+        warnings.warn("'ymax' is not yet implemented")
+
+    @property
     def gridx(self) -> str:
         """
-        The gridx value of the table.
+        The gridx value of the table offers a choice of three X-grid options: 
+        
+            - MAJOR: draws a line across the entire graph at each main axis graduation
+            - NONE: removes the grid from the graph.
+            - MINOR: draws a line at all graduations 
 
         Parameters
         ----------
@@ -983,7 +1156,11 @@ cdef class Table:
     @property
     def gridy(self) -> str:
         """
-        The gridy value of the table.
+        The gridy value of the table offers a choice of three Y-grid options: 
+        
+            - MAJOR: draws a line across the entire graph at each main axis graduation
+            - NONE: removes the grid from the graph.
+            - MINOR: draws a line at all graduations 
 
         Parameters
         ----------
@@ -1016,7 +1193,12 @@ cdef class Table:
     @property
     def graph_axis(self) -> str:
         """
-        Graph axis of the table.
+        Graph axis of the table allows you to select the type of axis: 
+        
+            - VALUES : level
+            - LOG: logarithmic scale
+            - SEMILOG: semi-logarithmic scale 
+            - PERCENT: Y scale in percent from 0 to 100
 
         Parameters
         ----------
@@ -1078,6 +1260,28 @@ cdef class Table:
             value = TableGraphAlign[value]
         value = int(value)
         self.c_table.set_graph_alignment(<EnumGraphAlign>value)
+
+    @property
+    def box(self) -> bool:
+        """ 
+        Whether the graph should be boxed. 
+        """
+        warnings.warn("'box' is not yet implemented")
+
+    @box.setter
+    def box(self, value: bool):
+        warnings.warn("'box' is not yet implemented")
+
+    @property
+    def shadow(self) -> bool:
+        """
+        Whether or not to place a shadow behind the chart.
+        """
+        warnings.warn("'shadow' is not yet implemented")
+
+    @shadow.setter
+    def shadow(self, value: bool):
+        warnings.warn("'shadow' is not yet implemented")
 
     def _get_row_from_index(self, index: int) -> int:
         if not (-len(self) < index < len(self)):
