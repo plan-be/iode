@@ -157,13 +157,15 @@ cdef class Period:
 
     def shift(self, nb_periods: int) -> Period:
         """
-        Shift the period by a number of sub periods. 
-        The number of sub period may be negative.
+        Shift the current period by a number of sub periods.
+        If the number of sub periods is positive, the shift is time forward.  
+        Conversely, if the number of sub periods is negative, the shift is time backward.  
 
         Parameters
         ----------
         nb_periods: int
-            Number of sub period. May be negative.
+            Number of sub periods. 
+            The shift is time forward if positive and time backward if negative. 
 
         Returns
         -------
@@ -173,9 +175,16 @@ cdef class Period:
         --------
         >>> from iode import Period
         >>> period = Period(2000, 'Q', 1)
+        >>> period
+        2000Q1
+        >>> # shift forward
         >>> shifted_period = period.shift(7)
         >>> shifted_period
         2001Q4
+        >>> # shift backward
+        >>> shifted_period = period.shift(-7)
+        >>> shifted_period
+        1998Q2
         """
         shifted_period = self.c_period.shift(nb_periods)
         return Period(shifted_period.p_y, chr(shifted_period.p_p), shifted_period.p_s)
