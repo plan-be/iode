@@ -1523,9 +1523,9 @@ cdef class Table:
         The syntax of a period: 
         
           - a period is indicated as in LEC: 'yyPpp' or 'yyyyPpp' where yyyy indicates the year, 
-            P the periodicity and pp the sub-period (1990Y1) 
+            P the periodicity and pp the sub-period (e.g. 1990Y1) 
           - a period can be shifted n periods to the left or right using the operators <n and >n 
-          - when used with a null argument, the shift oprerators have a special meaning: 
+          - when used with a zero argument, the shift oprerators have a special meaning: 
               - <0 means "first period of the year" 
               - >0 means "last period of the year" 
           - the special periods 'BOS', 'EOS' and 'NOW' can be used to represent the beginning 
@@ -1542,7 +1542,7 @@ cdef class Table:
           - the repeat, increment and shift can be the words PER (or P) or SUB (or S), which respectively indicate 
             the number of periods in a year of the current sample and the current sub-period
           - the file definition is optional and is enclosed in square brackets. 
-            It applies to all preceding period definitions
+            It applies to all preceding period definitions.
 
         The following file operations are possible:
 
@@ -1551,6 +1551,9 @@ cdef class Table:
           - difference in percent: [1/2] 
           - sum: [1+2] 
           - average: [1~2] or [1^2]. 
+
+        The file [1] always refers to the current workspace. 
+        Extra files (if passed as argument) are numeroted from 2 to 5.
 
         The following period operations are possible:
 
@@ -1584,10 +1587,15 @@ cdef class Table:
         ----------
         generalized_sample: str
             Generalized sample (see above).
-        extra_files: str or list(str)
+        extra_files: str or list(str), optional
             (List of) extra file(s) referenced in the generalized sample.
-        nb_decimals: int
+            Maximum 4 files can be passed as argument.
+            The file [1] always refers to the current workspace. 
+            Extra files (if passed as argument) are numeroted from 2 to 5.
+            Default to None (no extra files).
+        nb_decimals: int, optional
             The number of decimals to display.
+            Default to 2.
 
         Returns
         -------
