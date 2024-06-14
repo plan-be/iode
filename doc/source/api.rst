@@ -282,7 +282,7 @@ TIME
    Sample.end
    Sample.nb_periods
    Sample.index  
-   Sample.get_list_periods     
+   Sample.get_period_list     
    Sample.intersection
 
 
