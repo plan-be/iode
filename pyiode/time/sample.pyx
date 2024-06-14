@@ -26,7 +26,7 @@ except ImportError:
 # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#create-cython-wrapper-class 
 cdef class Sample:
     """
-    A sample represents the series of sub periods attached to the IODE variables.
+    A sample represents the series of sub periods attached to the IODE variables or to the estimation process.
 
     Attributes
     ----------
@@ -34,7 +34,7 @@ cdef class Sample:
         First period of the sample.
     end: str
         Last period of the sample.
-    nb_periods
+    nb_periods: int
         Total number of sub periods in the sample. 
 
     Examples
@@ -88,8 +88,8 @@ cdef class Sample:
         >>> variables.sample.get_period_position("1982Y1")
         22
         """
-        if not isinstance(period, (str, Period)):
-            TypeError("Expected argument of type str or 'Period'.\nGot argument of type '" + type(period).__name__ + "'")
+        if self.c_sample is NULL:
+            raise RuntimeError("'sample' is not defined")
         if isinstance(period, Period):
             period = str(period)
         cdef string str_period = period.encode()
@@ -113,6 +113,8 @@ cdef class Sample:
         >>> variables.sample.get_list_periods(as_float=True)    #doctest: +ELLIPSIS
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
+        if self.c_sample is NULL:
+            raise RuntimeError("'sample' is not defined")
         if as_float:
             return self.c_sample.get_list_periods_as_float()
         else:
@@ -140,6 +142,10 @@ cdef class Sample:
         >>> sample_intersec
         '2000Y1:2015Y1'
         """
+        if self.c_sample is NULL:
+            raise RuntimeError("'sample' is not defined")
+        if other_sample.c_sample is NULL:
+            raise RuntimeError("Passed sample to 'intersection(sample)' represents an empty sample")
         cdef CSample c_sample_inter = self.c_sample.intersection(dereference(other_sample.c_sample))
         return Sample._from_ptr(new CSample(c_sample_inter), <bint>True)
 
