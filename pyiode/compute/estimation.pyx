@@ -1132,7 +1132,7 @@ cdef class EditAndEstimateEquations:
                           stderr = 0.00192685,
                           stderrp = 23.5422,
                           stdev = 0.0042699},
-                 date = '13-06-2024')
+                 date = ...)
         >>> equations["DPUH"]             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Equation(endogenous = 'DPUH',
                  lec = 'dln(DPUH/DPUHO) := dpuh_1 + dpuh_2 * dln(IHU/PI5) + dln(PC)',
