@@ -228,6 +228,7 @@ TABLE
    TableCell.bold
    TableCell.italic
    TableCell.underline
+   TableCell.variables
 
 ==============
 COMPUTED TABLE

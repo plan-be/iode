@@ -244,7 +244,8 @@ cdef class TableCell:
         if self.c_cell is not NULL:
             self.c_cell.set_underline(<bint>value)
 
-    def get_variables_from_lec(self) -> List[str]:
+    @property
+    def variables(self) -> List[str]:
         """
         Get the list of variables associated with the LEC expression of a cell of type 'LEC'.
 
@@ -261,9 +262,9 @@ cdef class TableCell:
         >>> table = tables["ANAPRIX"]    
         >>> table[5]
         ('"dln (PC/(1+ITCR))-dln AOUC"', '100*(dln (PC/(1+ITCR))-dln AOUC)')
-        >>> table[5][1].get_variables_from_lec()
+        >>> table[5][1].variables
         ['PC', 'ITCR', 'AOUC']
-        """      
+        """
         if self.c_cell is NULL:
             return
         if self.cell_type != 'LEC':
