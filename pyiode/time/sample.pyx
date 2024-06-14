@@ -162,25 +162,59 @@ cdef class Sample:
 
     @property
     def start(self) -> str:
-        c_period = self.c_sample.start_period()
-        return c_period.to_string().decode()
+        if self.c_sample is NULL:
+            warnings.warns("'sample' is not defined")
+            return None
+        else:
+            c_period = self.c_sample.start_period()
+            return c_period.to_string().decode()
 
     @property
     def end(self) -> str:
-        c_period = self.c_sample.end_period()
-        return c_period.to_string().decode()
+        if self.c_sample is NULL:
+            warnings.warns("'sample' is not defined")
+            return None
+        else:
+            c_period = self.c_sample.end_period()
+            return c_period.to_string().decode()
 
     @property
     def nb_periods(self) -> int:
-        return self.c_sample.nb_periods()
+        if self.c_sample is NULL:
+            warnings.warns("'sample' is not defined")
+            return 0
+        else:
+            return self.c_sample.nb_periods()
 
     # Special methods
 
+    def __len__(self) -> int:
+        if self.c_sample is NULL:
+            warnings.warns("'sample' is not defined")
+            return 0
+        else:
+            return self.c_sample.nb_periods()
+
     def __eq__(self, other: Sample) -> bool:
-        return self.c_sample == other.c_sample
+        if self.c_sample is NULL:
+            warnings.warns("'sample' in 'sample == other' is not defined")
+            return False
+        elif other.c_sample is NULL:
+            warnings.warns("other sample in 'sample == other' is not defined")
+            return False
+        else:
+            return self.c_sample == other.c_sample
 
     def __str__(self) -> str:
-        return self.c_sample.to_string().decode()
+        if self.c_sample is NULL:
+            warnings.warns("'sample' is not defined")
+            return ''
+        else:
+            return self.c_sample.to_string().decode()
 
     def __repr__(self) -> str:
-        return repr(str(self))
+        if self.c_sample is NULL:
+            warnings.warns("'sample' is not defined")
+            return ''
+        else:
+            return repr(str(self))
