@@ -73,7 +73,7 @@ cdef class Sample:
         wrapper.ptr_owner = owner
         return wrapper
     
-    def get_period_position(self, period: Union[str, Period]) -> int:
+    def index(self, period: Union[str, Period]) -> int:
         """
         Position of the 'period' in the sample.
 
@@ -81,12 +81,21 @@ cdef class Sample:
         -------
         int
 
+        Raises
+        ------
+        IndexError
+            If the 'period' has not been found in the sample.
+
         Examples
         --------
         >>> from iode import variables, SAMPLE_DATA_DIR
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
-        >>> variables.sample.get_period_position("1982Y1")
+        >>> variables.sample.index("1982Y1")
         22
+        >>> variables.sample.index("2020Y1")
+        Traceback (most recent call last):
+        ... 
+        IndexError: The period '2020Y1' is not in the sample '1960Y1:2015Y1'
         """
         if self.c_sample is NULL:
             raise RuntimeError("'sample' is not defined")

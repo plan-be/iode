@@ -269,18 +269,21 @@ TIME
    :toctree: _generated
 
    Period
+   Period.year
+   Period.periodicity
+   Period.step
    Period.difference
    Period.nb_periods_per_year  
    Period.shift
    Period.to_float
 
    Sample
+   Sample.start
+   Sample.end
+   Sample.nb_periods
+   Sample.index  
    Sample.get_list_periods     
-   Sample.get_period_position  
    Sample.intersection
-
-   ws_sample_get
-   ws_sample_set
 
 
 **********
@@ -487,6 +490,8 @@ DEPRECATED
    ws_sample_nb_periods
    ws_sample_to_string
    ws_sample_to_list
+   ws_sample_get
+   ws_sample_set
 
    exec_lec
 
