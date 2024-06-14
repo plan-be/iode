@@ -519,9 +519,6 @@ cdef class TableLine:
         return self.nb_columns
 
     def _get_row_from_index(self, index: int) -> int:
-        if not isinstance(index, int):
-            raise TypeError(f"The index of the cell must be of type int. "
-                            f"Got an index value of type {type(index).__name__} instead.")
         if not (-self.nb_columns < index < self.nb_columns):
             raise ValueError(f"The index of the cell must be in range [{-self.nb_columns + 1, self.nb_columns - 1}].\n"
                              f"Got value {index} instead.")
@@ -863,30 +860,11 @@ cdef class Table:
         cdef vector[string] cpp_lines_titles = []
         cdef vector[string] cpp_lecs = []
 
-        if not isinstance(nb_columns, int):
-            raise TypeError(f"'nb_columns': Expected value of type int. "
-                            f"Got value of type {type(nb_columns).__name__} instead")
         if nb_columns < 1:
             raise ValueError(f"'nb_columns': Expected value greater than 0. Got value '{nb_columns}'.")
 
-        if not isinstance(table_title, str):
-            raise TypeError(f"'table_title': Expected value of type str. "
-                            f"Got value of type {type(table_title).__name__} instead")
-
         if lecs_or_vars is None:
             lecs_or_vars = ""
-
-        if not isinstance(mode, bool):
-            raise TypeError(f"'mode': Expected value of type bool. "
-                            f"Got value of type {type(mode).__name__} instead")
-        
-        if not isinstance(files, bool):
-            raise TypeError(f"'files': Expected value of type bool. "
-                            f"Got value of type {type(files).__name__} instead")
-        
-        if not isinstance(date, bool):
-            raise TypeError(f"'date': Expected value of type bool. "
-                            f"Got value of type {type(date).__name__} instead")
 
         if lines_titles is None:
             variables = lecs_or_vars
@@ -1102,9 +1080,6 @@ cdef class Table:
         self.c_table.set_graph_alignment(<EnumGraphAlign>value)
 
     def _get_row_from_index(self, index: int) -> int:
-        if not isinstance(index, int):
-            raise TypeError(f"The index of the line must be of type int. "
-                            f"Got an index value of type {type(index).__name__} instead")
         if not (-len(self) < index < len(self)):
             raise ValueError(f"The index of the line must be in range [{-len(self)+1, len(self)-1}].\n"
                              f"Got value {index} instead.")
@@ -1473,9 +1448,6 @@ cdef class Table:
         Productivité totale des facteurs |      1.1 |     1.08 |     1.11 |     1.09 |     1.12 |      1.1 |     1.13 |     1.11 |     1.14 |     1.12  
         <BLANKLINE>
         """
-        if not isinstance(generalized_sample, str):
-            raise TypeError(f"'generalized_sample': Expected value of type str. "
-                            f"Got value of type {type(generalized_sample).__name__} instead")
         if not generalized_sample:
             raise ValueError("'generalized_sample' must not be empty")
 
@@ -1488,9 +1460,6 @@ cdef class Table:
                                     f"Got value of type {type(extra_files).__name__} instead")
                 load_reference_kdb(i + 2, IodeFileExt.VARIABLES, extra_file.encode())
 
-        if not isinstance(nb_decimals, int):
-            raise TypeError(f"'nb_decimals': Expected value of type int. "
-                            f"Got value of type {type(nb_decimals).__name__} instead")
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
     def __len__(self) -> int:
