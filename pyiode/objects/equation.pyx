@@ -513,6 +513,42 @@ cdef class Equation:
     def date(self) -> str:
         return self.get_formated_date()
 
+    # misc
+
+    def _as_tuple(self):
+        r"""
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                method = 'LSQ',
+                from_period = '1980Y1',
+                to_period = '1996Y1',
+                block = 'ACAF',
+                tests = {corr = 1,
+                         dw = 2.32935,
+                         fstat = 32.2732,
+                         loglik = 83.8075,
+                         meany = 0.00818467,
+                         r2 = 0.821761,
+                         r2adj = 0.796299,
+                         ssres = 5.19945e-05,
+                         stderr = 0.00192715,
+                         stderrp = 23.5458,
+                         stdev = 0.0042699},
+                date = '12-06-1998')
+        >>> equations["ACAF"]._as_tuple()         # doctest: +NORMALIZE_WHITESPACE
+        ('ACAF', '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)', 'LSQ', '1980Y1:1996Y1', '', '', 'ACAF', 
+        1.0, 2.329345941543579, 32.273193359375, 83.80752563476562, 0.008184665814042091, 0.8217613697052002, 
+        0.7962986826896667, 5.1994487876072526e-05, 0.0019271461060270667, 23.545812606811523, 0.004269900266081095, 
+        '12-06-1998')
+        """
+        return self.endogenous, self.lec, self.method, str(self.sample), self.comment, self.instruments, \
+               self.block, *list(self.tests.values()), self.date
+
     # Special methods
 
     def __eq__(self, other: Equation) -> bool:
