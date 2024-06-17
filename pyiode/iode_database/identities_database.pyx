@@ -241,5 +241,120 @@ cdef class Identities(_AbstractDatabase):
         self.database_ptr.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
                                             var_files.encode(), scalar_files.encode(), <bint>trace)
 
+    def from_series(self, s: Series):
+        r"""
+        Copy the pandas Series `s` into the IODE Identities database.
+        The identity names to copy are deduced from the index of the Series.
+
+        Parameters
+        ----------
+        s: Series
+            pandas Series containing the identities to copy into the IODE Identities database.
+
+        Notes
+        -----
+        The index of the passed Series is sorted in alphabetical order before 
+        copying to IODE Identities database.
+
+        See Also
+        --------
+        Identities.to_series
+
+        Examples
+        --------
+        >>> from iode import identities
+        >>> import pandas as pd
+        >>> identities.clear()
+        >>> len(identities)
+        0
+
+        >>> # create the pandas Series
+        >>> names = ["CONST", "LOG_T", "EXP_T", "GRT_T", "MAVG_T", "DER_LOG_T"]
+        >>> data = ["1", "ln t", "exp t", "grt t", "mavg t", "d(ln t)"]
+        >>> s = pd.Series(data=data, index=names, dtype=str, name="Identities")
+        >>> # display the pandas series
+        >>> s          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        CONST              1
+        LOG_T           ln t
+        EXP_T          exp t
+        GRT_T          grt t
+        MAVG_T        mavg t
+        DER_LOG_T    d(ln t)
+        Name: Identities, dtype: object
+
+        >>> # load into the IODE Identities database
+        >>> identities.from_series(s)
+        >>> len(identities)
+        6
+        
+        >>> identities.get_names()             # doctest: +ELLIPSIS
+        ['CONST', 'DER_LOG_T', 'EXP_T', 'GRT_T', 'LOG_T', 'MAVG_T']
+        >>> identities["LOG_T"]
+        'ln t'
+        >>> identities["DER_LOG_T"]
+        'd(ln t)'
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+
+        for index, value in s.items():
+            self._set_object(index, value)
+
+    def to_series(self) -> Series:
+        r"""
+        Create a pandas Series from the current Identities database.
+        The index of the returned Series is build from the Identities names.
+
+        See Also
+        --------
+        Identities.from_series
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, identities
+        >>> import pandas as pd
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> len(identities)
+        48
+
+        >>> # Export the IODE Identities database as a pandas Series
+        >>> s = identities.to_series()
+        >>> len(s)
+        48
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['AOUC', 'AOUC_', 'FLGR', ..., 'XW', 'Y', 'YSEFPR', 'YSFICR']
+        >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+        >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+
+        >>> # Export a subset of the IODE Identities database as a pandas Series
+        >>> s = identities["X*;*_"].to_series()
+        >>> len(s)
+        15
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['AOUC_', 'GAP_', 'XEX', 'XNATY', ..., 'XTFP', 'XW']
+        >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+        >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+        
+        names = self.get_names()
+        data = [self._get_object(name) for name in names]
+        return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
+
 
 identities: Identities = Identities._from_ptr()
