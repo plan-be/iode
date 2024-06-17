@@ -27,9 +27,11 @@ from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var
 
 try:
     import pandas as pd
+    Series = pd.Series
     DataFrame = pd.DataFrame
 except ImportError:
     pd = None
+    Series = Any
     DataFrame = Any
 
 try:
