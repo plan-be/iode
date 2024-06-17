@@ -405,7 +405,14 @@ cdef class Variables(_AbstractDatabase):
 
     def from_frame(self, df: DataFrame):
         """
-        Copies the pandas DataFrame df into the IODE Variables database.
+        Copy the pandas DataFrame `df` into the IODE Variables database.
+        The variable names to copy are deduced from the index of the DataFrame.
+        The column names must match the sub-periods of the current Variables sample.
+
+        Parameters
+        ----------
+        df: DataFrame
+            pandas DataFrame containing the variables to copy into the IODE Variables database.
 
         Notes
         -----
@@ -417,6 +424,10 @@ cdef class Variables(_AbstractDatabase):
         IODE and pandas don't use the same constant to represent NaN values.
         When loading a pandas DataFrame into the Variables database, the pandas 
         NaN values (:math:`nan`) are converted to IODE NaN values (:math:`NA`).
+
+        See Also
+        --------
+        Variables.to_frame
 
         Examples
         --------
@@ -479,7 +490,7 @@ cdef class Variables(_AbstractDatabase):
 
     def to_frame(self, vars_axis_name: str = 'names', time_axis_name: str = 'time', sample_as_floats: bool = False) -> DataFrame:
         """
-        Creates a pandas DataFrame from the current Variables database.
+        Create a pandas DataFrame from the current Variables database.
         The index of the returned DataFrame is build from the Variables names 
         and the columns from the periods.
 
@@ -500,6 +511,10 @@ cdef class Variables(_AbstractDatabase):
         IODE and pandas don't use the same constant to represent NaN values.
         When exporting IODE variables as a pandas DataFrame, the IODE NaN values 
         (:math:`NA`) are converted to pandas NaN values (:math:`nan`).
+
+        See Also
+        --------
+        Variables.from_frame
 
         Examples
         --------
