@@ -105,5 +105,120 @@ cdef class Comments(_AbstractDatabase):
         else:
             self.database_ptr.add(key.encode(), value.encode())
 
+    def from_series(self, s: Series):
+        r"""
+        Copy the pandas Series `s` into the IODE Comments database.
+        The comment names to copy are deduced from the index of the Series.
+
+        Parameters
+        ----------
+        s: Series
+            pandas Series containing the comments to copy into the IODE Comments database.
+
+        Notes
+        -----
+        The index of the passed Series is sorted in alphabetical order before 
+        copying to IODE Comments database.
+
+        See Also
+        --------
+        Comments.to_series
+
+        Examples
+        --------
+        >>> from iode import comments
+        >>> import pandas as pd
+        >>> comments.clear()
+        >>> len(comments)
+        0
+
+        >>> # create the pandas Series
+        >>> names = ["A0", "A1", "B0", "B1", "C0", "C1"]
+        >>> data = ["A zero", "A one", "B zero", "B one", "C zero", "C one"]
+        >>> s = pd.Series(data=data, index=names, dtype=str, name="Comments")
+        >>> # display the pandas series
+        >>> s          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        A0     A zero
+        A1     A one
+        B0    B zero
+        B1     B one
+        C0    C zero
+        C1     C one
+        Name: Comments, dtype: object
+
+        >>> # load into the IODE Comments database
+        >>> comments.from_series(s)
+        >>> len(comments)
+        6
+        
+        >>> comments.get_names()             # doctest: +ELLIPSIS
+        ['A0', 'A1', 'B0', 'B1', 'C0', 'C1']
+        >>> comments["B0"]
+        'B zero'
+        >>> comments["C1"]
+        'C one'
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+
+        for index, value in s.items():
+            self._set_object(index, value)
+
+    def to_series(self) -> Series:
+        r"""
+        Create a pandas Series from the current Comments database.
+        The index of the returned Series is build from the Comments names.
+
+        See Also
+        --------
+        Comments.from_series
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, comments
+        >>> import pandas as pd
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
+        317
+
+        >>> # Export the IODE Comments database as a pandas Series
+        >>> s = comments.to_series()
+        >>> len(s)
+        317
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', 'AQC', ..., 'ZJ', 'ZKF', 'ZX', 'ZZ_']
+        >>> comments["ACAF"]                # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> s["ACAF"]                       # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> comments["ZZ_"]                 # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        >>> s["ZZ_"]                        # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+
+        >>> # Export a subset of the IODE Comments database as a pandas Series
+        >>> s = comments["A*;*_"].to_series()
+        >>> len(s)
+        34
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', 'AQC', ..., 'WIND_', 'WNF_', 'YDH_', 'ZZ_']
+        >>> comments["ACAF"]                # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> s["ACAF"]                       # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> comments["ZZ_"]                 # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        >>> s["ZZ_"]                        # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+        
+        names = self.get_names()
+        data = [self._get_object(name) for name in names]
+        return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
+
 
 comments: Comments = Comments._from_ptr()

@@ -60,6 +60,8 @@ Comments
    :toctree: _generated
 
    Comments 
+   Comments.from_series
+   Comments.to_series
 
 =========
 Equations
