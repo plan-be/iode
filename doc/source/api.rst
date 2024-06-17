@@ -93,6 +93,8 @@ Lists
    :toctree: _generated
 
    Lists
+   Lists.from_series
+   Lists.to_series
 
 =======
 Scalars
