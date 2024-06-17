@@ -104,6 +104,9 @@ Scalars
    :toctree: _generated
 
    Scalars
+   Scalars.from_series
+   Scalars.from_frame
+   Scalars.to_frame
 
 ======
 Tables

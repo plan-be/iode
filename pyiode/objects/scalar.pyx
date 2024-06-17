@@ -77,6 +77,21 @@ cdef class Scalar:
     def std(self) -> float:
         return self.c_scalar.std
 
+    # misc
+
+    def _as_tuple(self) -> Tuple[float, float, float]:
+        """
+        Export the current scalar as a tuple
+
+        Examples
+        --------
+        >>> from iode import Scalar
+        >>> scalar = Scalar(0.9, 0.8)
+        >>> scalar._as_tuple()
+        (0.9, 0.8, -2e+37)
+        """
+        return self.c_scalar.val, self.c_scalar.relax, self.c_scalar.std
+
     # Special methods
 
     def __eq__(self, other: Scalar) -> bool:
