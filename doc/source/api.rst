@@ -81,7 +81,9 @@ Identities
    :toctree: _generated
 
    Identities
-   Identities.execute 
+   Identities.execute
+   Identities.from_series
+   Identities.to_series
 
 =====
 Lists
