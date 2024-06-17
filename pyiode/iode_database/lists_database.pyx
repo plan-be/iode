@@ -104,5 +104,132 @@ cdef class Lists(_AbstractDatabase):
         else:
             self.database_ptr.add(key.encode(), value.encode())
 
+    def from_series(self, s: Series):
+        r"""
+        Copy the pandas Series `s` into the IODE Lists database.
+        The IODE list names to copy are deduced from the index of the Series.
+
+        Parameters
+        ----------
+        s: Series
+            pandas Series containing the IODE lists to copy into the IODE Lists database.
+
+        Notes
+        -----
+        The index of the passed Series is sorted in alphabetical order before 
+        copying to IODE Lists database.
+
+        See Also
+        --------
+        Lists.to_series
+
+        Examples
+        --------
+        >>> from iode import lists, split_list
+        >>> import pandas as pd
+        >>> lists.clear()
+        >>> len(lists)
+        0
+
+        >>> # create the pandas Series
+        >>> names = ["SEMICOLON_LST", "COMMA_LST", "WHITESPACE_LST", "TAB_LST", "MIX_LST"]
+        >>> semicolon_lst = "A;B;C;D;E;F"
+        >>> comma_lst = "A,B,C,D,E,F"
+        >>> whitespace_lst = "A B C D E F" 
+        >>> tab_lst = "A    B    C    D    E    F"
+        >>> mix_lst = "  A;B,C D    E;F  "
+        >>> data = [semicolon_lst, comma_lst, whitespace_lst, tab_lst, mix_lst]
+        >>> s = pd.Series(data=data, index=names, dtype=str, name="Lists")
+        >>> # display the pandas series
+        >>> s          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        SEMICOLON_LST                        A;B;C;D;E;F
+        COMMA_LST                            A,B,C,D,E,F
+        WHITESPACE_LST                       A B C D E F
+        TAB_LST               A    B    C    D    E    F
+        MIX_LST                         A;B,C D    E;F
+        Name: Lists, dtype: object
+
+        >>> # load into the IODE Lists database
+        >>> lists.from_series(s)
+        >>> len(lists)
+        5
+        
+        >>> lists.get_names()
+        ['COMMA_LST', 'MIX_LST', 'SEMICOLON_LST', 'TAB_LST', 'WHITESPACE_LST']
+        >>> lists["SEMICOLON_LST"]
+        'A;B;C;D;E;F'
+        >>> split_list(lists["SEMICOLON_LST"])
+        ['A', 'B', 'C', 'D', 'E', 'F']
+        >>> # note: leading and trailing whitespaces are automatically stripped 
+        >>> #       when copied into the Lists database
+        >>> mix_lst
+        '  A;B,C D    E;F  '
+        >>> lists["MIX_LST"]
+        'A;B,C D    E;F'
+        >>> split_list(lists["MIX_LST"])
+        ['A', 'B', 'C', 'D', 'E', 'F']
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+
+        for index, value in s.items():
+            self._set_object(index, value)
+
+    def to_series(self) -> Series:
+        r"""
+        Create a pandas Series from the current Lists database.
+        The index of the returned Series is build from the Lists names.
+
+        See Also
+        --------
+        Lists.from_series
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, lists
+        >>> import pandas as pd
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> len(lists)
+        17
+
+        >>> # Export the IODE Lists database as a pandas Series
+        >>> s = lists.to_series()
+        >>> len(s)
+        17
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['COPY', 'COPY0', 'COPY1', ..., 'XSCENARIO', '_SCAL', '_SEARCH']
+        >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+
+        >>> # Export a subset of the IODE Lists database as a pandas Series
+        >>> s = lists["E*;MA*"].to_series()
+        >>> len(s)
+        5
+
+        >>> s.index.to_list()
+        ['ENDO', 'ENDO0', 'ENDO1', 'ENVI', 'MAINEQ']
+        >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+        
+        names = self.get_names()
+        data = [self._get_object(name) for name in names]
+        return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
+
 
 lists: Lists = Lists._from_ptr()
