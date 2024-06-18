@@ -307,6 +307,8 @@ long Equation::get_date() const
 std::string Equation::get_date_as_string(const std::string& date_format) const
 {
     std::string date;
+    // note: dates are stored as follow: yyyymmdd
+    //       for example, "18-06-2024" will be stored as long value 20240618 
     long l_date = this->date;
     if(l_date > 0)
     {
@@ -322,6 +324,13 @@ std::string Equation::get_date_as_string(const std::string& date_format) const
 void Equation::update_date()
 {
     this->date = SCR_current_date();
+}
+
+void Equation::set_date(const std::string& date, const std::string& date_format)
+{
+    // note: dates are stored as follow: yyyymmdd
+    //       for example, "18-06-2024" will be stored as long value 20240618 
+    this->date = SCR_fdate_to_long(to_char_array(date), to_char_array(date_format));
 }
 
 // -- tests --
