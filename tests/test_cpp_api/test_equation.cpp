@@ -170,6 +170,18 @@ TEST_F(EquationTest, Date)
     int current_date = SCR_current_date();
     equation->update_date();
     EXPECT_EQ(equation->get_date(), current_date);
+
+    long date = 20240618;
+    equation->set_date(date);
+    EXPECT_EQ(equation->get_date(), date);
+
+    std::string s_date = "20-05-2010";
+    equation->set_date(s_date);
+    EXPECT_EQ(equation->get_date(), 20100520);
+
+    s_date = "07/08/2016";
+    equation->set_date(s_date, "dd/mm/yyyy");
+    EXPECT_EQ(equation->get_date(), 20160807);
 }
 
 TEST_F(EquationTest, Tests)
