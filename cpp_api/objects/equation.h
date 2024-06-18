@@ -132,6 +132,10 @@ public:
 
     void update_date();
 
+    void set_date(const long date) { this->date = date; }
+
+    void set_date(const std::string& date, const std::string& date_format = "dd-mm-yyyy");
+
     void reset_date() { date = 0L; }
 
     // -- tests --
