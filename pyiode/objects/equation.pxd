@@ -41,7 +41,12 @@ cdef extern from "cpp_api/objects/equation.h":
         string get_instruments()
         void set_instruments(const string&) except +
 
+        long get_date()
         string get_date_as_string(const string&)
+        void set_date(const long date) except +
+        void set_date(string&, string&) except +
+        void update_date()
+        void reset_date()
 
         map[string, float] get_tests_as_map()
         void set_test(const EnumIodeEquationTest i, const float value) except +

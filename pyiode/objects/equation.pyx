@@ -578,6 +578,36 @@ cdef class Equation:
         for i, value in enumerate(tests):
             self.c_equation.set_test(<EnumIodeEquationTest>i, value)
 
+    def _set_date(self, value: str, format: str = "dd-mm-yyyy"):
+        r"""
+        Examples
+        --------
+        >>> from iode import Equation, variables
+        >>> variables.sample = "1960Y1:2015Y1"
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+        >>> eq_ACAF.date
+        ''
+        >>> eq_ACAF._set_date("18-06-2024")
+        >>> eq_ACAF.date
+        '18-06-2024'
+        >>> eq_ACAF._set_date("20/06/2024", "dd/mm/yyyy")
+        >>> eq_ACAF.date
+        '20-06-2024'
+        >>> eq_ACAF._set_date("")
+        >>> eq_ACAF.date
+        ''
+        """
+        if not value:
+            self.c_equation.reset_date()
+        else:    
+            self.c_equation.set_date(value.encode(), format.encode())
+
     def _as_tuple(self):
         r"""
         Examples
