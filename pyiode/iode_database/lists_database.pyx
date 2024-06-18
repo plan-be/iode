@@ -7,6 +7,8 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
+from iode.util import split_list
+
 cimport cython
 from pyiode.iode_database.cpp_api_database cimport KDBLists as CKDBLists
 from pyiode.iode_database.cpp_api_database cimport Lists as cpp_global_lists
@@ -90,15 +92,11 @@ cdef class Lists(_AbstractDatabase):
         key = key.strip()
         return self.database_ptr.get(key.encode()).decode()
 
-    def _set_object(self, key, value):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot set list '{key}'.\nExpected a string value for the name " + 
-                            f"but got name value of type {type(key).__name__}")
+    def _set_object(self, key: str, value: str):
         key = key.strip()
-        if not isinstance(value, str):
-            raise TypeError(f"Cannot set list '{key}'.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(value).__name__}")
         value = value.strip()
+        # normalize the IODE list
+        value = ';'.join(split_list(value))
         if self.database_ptr.contains(key.encode()):
             self.database_ptr.update(key.encode(), value.encode())
         else:
@@ -125,7 +123,7 @@ cdef class Lists(_AbstractDatabase):
 
         Examples
         --------
-        >>> from iode import lists, split_list
+        >>> from iode import lists
         >>> import pandas as pd
         >>> lists.clear()
         >>> len(lists)
@@ -158,16 +156,13 @@ cdef class Lists(_AbstractDatabase):
         ['COMMA_LST', 'MIX_LST', 'SEMICOLON_LST', 'TAB_LST', 'WHITESPACE_LST']
         >>> lists["SEMICOLON_LST"]
         'A;B;C;D;E;F'
-        >>> split_list(lists["SEMICOLON_LST"])
-        ['A', 'B', 'C', 'D', 'E', 'F']
-        >>> # note: leading and trailing whitespaces are automatically stripped 
-        >>> #       when copied into the Lists database
-        >>> mix_lst
-        '  A;B,C D    E;F  '
+        >>> # note: when added or updated, an IODE list is normalized.
+        >>> #       - leading and trailing whitespaces are stripped
+        >>> #       - items of the IODE list are separated by a semicolon
+        >>> lists["COMMA_LST"]
+        'A;B;C;D;E;F'
         >>> lists["MIX_LST"]
-        'A;B,C D    E;F'
-        >>> split_list(lists["MIX_LST"])
-        ['A', 'B', 'C', 'D', 'E', 'F']
+        'A;B;C;D;E;F'
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
