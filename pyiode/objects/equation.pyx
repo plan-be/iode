@@ -29,7 +29,7 @@ cdef class Equation:
             - LSQ
             - ZELLNER
             - INSTRUMENTAL
-            - GLS (3SLS)
+            - GLS
             - MAX_LIKELIHOOD
     sample: Sample
         estimaton sample.
@@ -396,14 +396,37 @@ cdef class Equation:
         ----------
         value: EqMethod or str
             Possible values are LSQ, ZELLNER, INSTRUMENTAL, GLS, MAX_LIKELIHOOD.
+
+        Examples
+        --------
+        >>> from iode import Equation, EqMethod
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> # default value
+        >>> eq_ACAF.method
+        'LSQ'
+        >>> eq_ACAF.method = EqMethod.GLS
+        >>> eq_ACAF.method
+        'GLS'
+        >>> eq_ACAF.method = 'MAX_LIKELIHOOD'
+        >>> eq_ACAF.method
+        'MAX_LIKELIHOOD'
         """
-        return self.c_equation.get_method().decode()
+        return EqMethod(<int>(self.c_equation.get_method_as_int())).name
 
     @method.setter
     def method(self, value: Union[EqMethod, str]):
         if isinstance(value, str):
             value = value.upper()
-            value = EqMethod[value]
+            # warning: In the IODE ascii and binary files, the method is stored as a string (char*).
+            #          In particular: 
+            #              - if no method have been specifed, the method is stored as an empty string
+            #              - the GLS method is returned as 'GLS (3SLS)'   
+            if not value:
+                value = EqMethod.LSQ         
+            elif "GLS" in value:
+                value = EqMethod.GLS
+            else:
+                value = EqMethod[value]
         self.c_equation.set_method(int(value))
 
     @property
