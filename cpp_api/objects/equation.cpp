@@ -162,12 +162,13 @@ char Equation::get_solved() const
 
 int Equation::get_method_as_int() const
 {
-    return (int) this->method;
+    int m = (int) this->method;
+    return (m >= 0 && m < I_NB_EQ_METHODS) ? m : 0;
 }
 
 void Equation::set_method(const int method)
 {
-    if(method >= I_NB_EQ_METHODS)
+    if(method < 0 || method >= I_NB_EQ_METHODS)
         throw std::invalid_argument("Invalid value " + std::to_string(method) + " for the equation method. " + 
             "The passed value must be in the range [0, " + std::to_string(I_NB_EQ_METHODS - 1) + "]");
 
