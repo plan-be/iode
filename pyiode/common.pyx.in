@@ -126,6 +126,8 @@ class EqTest(IntEnum):
     DW = EnumIodeEquationTest.IE_DW
     LOGLIK = EnumIodeEquationTest.IE_LOGLIK
 
+EQ_TEST_NAMES: Tuple[str, ...] = tuple(member.name.lower() for member in EqTest)
+
 class TableCellType(IntEnum):
     LEC = EnumCellType.IT_LEC
     STRING = EnumCellType.IT_STRING
