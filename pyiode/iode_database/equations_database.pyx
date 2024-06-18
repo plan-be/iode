@@ -281,5 +281,413 @@ cdef class Equations(_AbstractDatabase):
         
         cpp_eqs_estimate(list_eqs.encode(), from_period.encode(), to_period.encode())
 
+    def from_series(self, s: Series):
+        r"""
+        Copy the pandas Series `s` into the IODE Equations database.
+        The equation names to copy are deduced from the index of the Series.
+
+        Parameters
+        ----------
+        s: Series
+            pandas Series containing the equations as LEC expressions to copy into the Equations database.
+            All other Equation attributes (method, sample, comment, block, ...) will be set to their default 
+            values (see :class:`Equation`).
+
+        Notes
+        -----
+        The index of the passed Series is sorted in alphabetical order before 
+        copying to IODE Equations database.
+
+        See Also
+        --------
+        Equations.from_frame
+        Equations.to_frame
+
+        Examples
+        --------
+        >>> from iode import equations, variables
+        >>> import pandas as pd
+        >>> variables.clear()
+        >>> variables.sample = "1960Y1:2015Y1"
+        >>> equations.clear()
+        >>> len(equations)
+        0
+
+        >>> # create the pandas Series
+        >>> data = {"A": "A := t",
+        ...         "B": "B := grt A",
+        ...         "C": "C := exp t",
+        ...         "D": "ln D := t",
+        ...         "E": "1/E := B",
+        ...         "F": "d(F) := t + 1"}
+        >>> s = pd.Series(data)
+        >>> # display the pandas series
+        >>> s                   # doctest: +NORMALIZE_WHITESPACE
+        A           A := t
+        B       B := grt A
+        C       C := exp t
+        D        ln D := t
+        E         1/E := B
+        F    d(F) := t + 1
+        dtype: object
+
+        >>> # load into the IODE Equations database
+        >>> equations.from_series(s)
+        >>> len(equations)
+        6
+        
+        >>> equations.get_names()
+        ['A', 'B', 'C', 'D', 'E', 'F']
+        >>> equations["A"]      # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'A',
+                lec = 'A := t',
+                method = 'LSQ',
+                from_period = '1960Y1',
+                to_period = '2015Y1')
+        >>> equations["F"]      # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'F',
+                lec = 'd(F) := t + 1',
+                method = 'LSQ',
+                from_period = '1960Y1',
+                to_period = '2015Y1')
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+
+        for index, value in s.items():
+            self._set_object(index, value)
+
+    def from_frame(self, df: DataFrame):
+        r"""
+        Copy the pandas DataFrame `df` into the IODE Equations database.
+        The equation names to copy are deduced from the index of the DataFrame.
+
+        Parameters
+        ----------
+        df: DataFrame
+            pandas DataFrame containing the equations to copy into the Equations database.
+            The passed DataFrame must at least contains:
+                - an index containing the names of the equations
+                - a column labeled 'lec' containing the LEC expressions of the equations.
+            Other possible columns are 'method', 'sample', 'comment', 'instruments' and 'block'
+            (see :class:`Equation`).
+
+        Notes
+        -----
+        The index of the passed DataFrame is sorted in alphabetical order before 
+        copying to IODE Equations database.
+
+        See Also
+        --------
+        Equations.from_series
+        Equations.to_frame
+
+        Examples
+        --------
+        >>> from iode import equations, variables
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> variables.clear()
+        >>> variables.sample = "1960Y1:2015Y1"
+        >>> equations.clear()
+        >>> len(equations)
+        0
+
+        >>> # create the pandas DataFrame
+        >>> columns=["lec", "method", "sample", "corr", "fstat", "r2", "date"]
+        >>> data = {"A": ["A := t", "LSQ", "1980Y1:2010Y1", 1.0, 0.79, 0.05, "12-06-1998"],
+        ...         "B": ["B := grt A", "LSQ", "1980Y1:2010Y1", 1.0, 0.896, 0.15, "12-06-1998"],
+        ...         "C": ["C := exp t", "ZELLNER", "1990Y1:", 1.0, 0.1258, 0.0225, ""],
+        ...         "D": ["ln D := t", "MAX_LIKELIHOOD", "", 1.0, 0.358, 0.0698, "12-06-1998"],
+        ...         "E": ["1/E := B", "LSQ", ":2010Y1", 1.0, 0.689, 2.23e-03, ""],
+        ...         "F": ["d(F) := t + 1", "GLS", "", 1.0, 0.05, 4.568e-04, ""]}
+        >>> df = pd.DataFrame.from_dict(data, orient='index', columns=columns)
+        >>> # display the pandas series
+        >>> df                  # doctest: +NORMALIZE_WHITESPACE
+                     lec          method         sample  ...   fstat        r2        date
+        A         A := t             LSQ  1980Y1:2010Y1  ...  0.7900  0.050000  12-06-1998
+        B     B := grt A             LSQ  1980Y1:2010Y1  ...  0.8960  0.150000  12-06-1998
+        C     C := exp t         ZELLNER        1990Y1:  ...  0.1258  0.022500
+        D      ln D := t  MAX_LIKELIHOOD                 ...  0.3580  0.069800  12-06-1998
+        E       1/E := B             LSQ        :2010Y1  ...  0.6890  0.002230
+        F  d(F) := t + 1             GLS                 ...  0.0500  0.000457
+        <BLANKLINE>
+        [6 rows x 7 columns]
+
+        >>> # load into the IODE Equations database
+        >>> equations.from_frame(df)
+        >>> len(equations)
+        6
+        
+        >>> equations.get_names()
+        ['A', 'B', 'C', 'D', 'E', 'F']
+        >>> df.loc["A"]         # doctest: +NORMALIZE_WHITESPACE  
+        lec              A := t
+        method              LSQ
+        sample    1980Y1:2010Y1
+        corr                1.0
+        fstat              0.79
+        r2                 0.05
+        date         12-06-1998
+        Name: A, dtype: object
+        >>> equations["A"]      # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'A',
+                 lec = 'A := t',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '2010Y1',
+                 tests = {corr = 1,
+                          dw = 0,
+                          fstat = 0.79,
+                          loglik = 0,
+                          meany = 0,
+                          r2 = 0.05,
+                          r2adj = 0,
+                          ssres = 0,
+                          stderr = 0,
+                          stderrp = 0,
+                          stdev = 0},
+                 date = '12-06-1998')
+        >>> df.loc["F"]         # doctest: +NORMALIZE_WHITESPACE
+        lec       d(F) := t + 1
+        method              GLS
+        sample
+        corr                1.0
+        fstat              0.05
+        r2             0.000457
+        date
+        Name: F, dtype: object
+        >>> equations["F"]      # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'F',
+                 lec = 'd(F) := t + 1',
+                 method = 'GLS',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 tests = {corr = 1,
+                          dw = 0,
+                          fstat = 0.05,
+                          loglik = 0,
+                          meany = 0,
+                          r2 = 0.0004568,
+                          r2adj = 0,
+                          ssres = 0,
+                          stderr = 0,
+                          stderrp = 0,
+                          stdev = 0})
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+
+        if 'lec' not in df.columns:
+            raise ValueError("Expected at least one column with name 'lec'. "
+                             f"Got dataframe with column names {df.columns.to_list()}")
+
+        if len(df.columns) == 1:
+            self.from_series(df['lec'])
+        else:
+            test_names = [member.name.lower() for member in EqTest]
+            for row in df.itertuples(name='Equation'):
+                args = row._asdict()
+                # note: equation name = endogenous variable
+                endogenous = args.pop('Index')
+                sample = args.pop('sample', '')
+                if not sample:
+                    from_period, to_period = '', ''
+                else:
+                    from_period, to_period = sample.split(":")
+                args["from_period"] = from_period
+                args["to_period"] = to_period
+                # date and tests cannot be set by the users
+                date = args.pop('date', '')
+                test_values = [args.pop(test_name, 0.0) for test_name in EQ_TEST_NAMES]
+
+                equation = Equation(endogenous, **args)
+                equation._set_tests(test_values)
+                equation._set_date(date)
+
+                self._set_object(endogenous, equation)
+
+    def to_frame(self) -> DataFrame:
+        r"""
+        Create a pandas DataFrame from the current Equations database.
+        The index of the returned DataFrame is build from the Equations names.
+
+        See Also
+        --------
+        Equations.from_series
+        Equations.from_frame
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> import pandas as pd
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> len(equations)
+        274
+
+        >>> # Export the IODE Equations database as a pandas DataFrame
+        >>> df = equations.to_frame()
+        >>> len(df)
+        274
+
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'YSSG', 'ZF', 'ZJ', 'ZZF_']
+        >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+        >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        endogenous                                                  ACAF
+        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        method                                                       LSQ
+        sample                                             1980Y1:1996Y1
+        comment
+        instruments
+        block                                                       ACAF
+        corr                                                         1.0
+        stdev                                                   2.329346
+        meany                                                  32.273193
+        ssres                                                  83.807526
+        stderr                                                  0.008185
+        stderrp                                                 0.821761
+        fstat                                                   0.796299
+        r2                                                      0.000052
+        r2adj                                                   0.001927
+        dw                                                     23.545813
+        loglik                                                   0.00427
+        date                                                  12-06-1998
+        Name: ACAF, dtype: object  
+        >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'YDH_',
+                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 comment = ' ',
+                 block = 'YDH_')
+        >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
+        endogenous                                                  YDH_
+        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        method                                                       LSQ
+        sample                                             1960Y1:2015Y1
+        comment
+        instruments
+        block                                                       YDH_
+        corr                                                         0.0
+        stdev                                                        0.0
+        meany                                                        0.0
+        ssres                                                        0.0
+        stderr                                                       0.0
+        stderrp                                                      0.0
+        fstat                                                        0.0
+        r2                                                           0.0
+        r2adj                                                        0.0
+        dw                                                           0.0
+        loglik                                                       0.0
+        date
+        Name: YDH_, dtype: object
+
+        >>> # Export a subset of the IODE Equations database as a pandas DataFrame
+        >>> df = equations["A*;*_"].to_frame()
+        >>> len(df)
+        29
+
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
+        >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+        >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        endogenous                                                  ACAF
+        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        method                                                       LSQ
+        sample                                             1980Y1:1996Y1
+        comment
+        instruments
+        block                                                       ACAF
+        corr                                                         1.0
+        stdev                                                   2.329346
+        meany                                                  32.273193
+        ssres                                                  83.807526
+        stderr                                                  0.008185
+        stderrp                                                 0.821761
+        fstat                                                   0.796299
+        r2                                                      0.000052
+        r2adj                                                   0.001927
+        dw                                                     23.545813
+        loglik                                                   0.00427
+        date                                                  12-06-1998
+        Name: ACAF, dtype: object
+        >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'YDH_',
+                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 comment = ' ',
+                 block = 'YDH_')
+        >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
+        endogenous                                                  YDH_
+        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        method                                                       LSQ
+        sample                                             1960Y1:2015Y1
+        comment
+        instruments
+        block                                                       YDH_
+        corr                                                         0.0
+        stdev                                                        0.0
+        meany                                                        0.0
+        ssres                                                        0.0
+        stderr                                                       0.0
+        stderrp                                                      0.0
+        fstat                                                        0.0
+        r2                                                           0.0
+        r2adj                                                        0.0
+        dw                                                           0.0
+        loglik                                                       0.0
+        date
+        Name: YDH_, dtype: object
+        """
+        if pd is None:
+            raise RuntimeError("pandas library not found")
+        
+        dtype = {"endogenous": str, "lec": str, "method": str, "sample": str, 
+                 "comment": str, "instruments": str, "block": str}
+        dtype.update({test_name: float for test_name in EQ_TEST_NAMES})
+        dtype.update({"date": str})
+        data = {name: self._get_object(name)._as_tuple() for name in self.get_names()}
+        return pd.DataFrame.from_dict(data, orient='index', columns=list(dtype.keys())).astype(dtype)
+
 
 equations: Equations = Equations._from_ptr()
