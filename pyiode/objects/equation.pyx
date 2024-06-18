@@ -538,6 +538,46 @@ cdef class Equation:
 
     # misc
 
+    def _set_tests(self, tests: List[float]):
+        r"""
+        Examples
+        --------
+        >>> from iode import Equation, variables
+        >>> variables.sample = "1960Y1:2015Y1"
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1')
+        >>> test_values = [1.0, 2.32935, 32.2732, 83.8075, 0.00818467, 0.821761, 0.796299, 
+        ...                5.19945e-05, 0.00192715, 23.5458, 0.0042699]
+        >>> eq_ACAF._set_tests(test_values)
+        >>> eq_ACAF         # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 tests = {corr = 1,
+                          dw = 23.5458,
+                          fstat = 0.796299,
+                          loglik = 0.0042699,
+                          meany = 32.2732,
+                          r2 = 5.19945e-05,
+                          r2adj = 0.00192715,
+                          ssres = 83.8075,
+                          stderr = 0.00818467,
+                          stderrp = 0.821761,
+                          stdev = 2.32935})
+        """
+        if len(tests) != len(EqTest):
+            raise ValueError("Cannot set equation test values. "
+                             f"Expected vector of size {len(EqTest)} but got vector of size {len(tests)}.")
+        for i, value in enumerate(tests):
+            self.c_equation.set_test(<EnumIodeEquationTest>i, value)
+
     def _as_tuple(self):
         r"""
         Examples
