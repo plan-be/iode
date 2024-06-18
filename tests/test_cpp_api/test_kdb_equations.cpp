@@ -77,6 +77,7 @@ TEST_F(KDBEquationsTest, Get)
 {
     int pos = 0;
     std::string name = Equations.get_name(pos);
+    std::string expected_lec;
 
     // by pos
     Equation eq1 = Equations.get(pos);
@@ -97,6 +98,18 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq3.get_date_as_string(), "");
     EXPECT_EQ(eq3.get_sample().to_string(), ":");
     EXPECT_EQ(eq3.get_method(), "");
+
+    Equation eq_W = Equations.get("W");
+    expected_lec = "dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma *ln ((NATY-UY)/NATY)[-1]+gamma2\n";
+    expected_lec += "+gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)\n";
+    expected_lec += "+gamma5*ln PROD[-1])+(XW)+XWC";
+    EXPECT_EQ(eq_W.get_lec(), expected_lec);
+    EXPECT_EQ(eq_W.get_method(), "LSQ");
+    EXPECT_EQ(eq_W.get_sample().to_string(), "1975Y1:1997Y1");
+    EXPECT_EQ(eq_W.get_comment(), " ");
+    EXPECT_EQ(eq_W.get_instruments(), "");
+    EXPECT_EQ(eq_W.get_block(), "W");
+    EXPECT_EQ(eq_W.get_date_as_string(), "");
 }
 
 TEST_F(KDBEquationsTest, GetNames)
