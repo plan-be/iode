@@ -41,7 +41,7 @@ TEST_F(IdentityTest, GetCoefficients)
 {
     Identity idt_coeffs(name_idt_coeffs, nullptr);
 
-    std::vector<std::string> expected_coefs_list = {"gamma2", "gamma3", "gamma4", "gamma"};
+    std::vector<std::string> expected_coefs_list = {"gamma2", "gamma3", "gamma4", "gamma_"};
     std::vector<std::string> coefs_list = idt_coeffs.get_coefficients_list();
     EXPECT_EQ(coefs_list, expected_coefs_list);
 
@@ -50,7 +50,7 @@ TEST_F(IdentityTest, GetCoefficients)
     EXPECT_TRUE(Scalars.contains("gamma2"));
     EXPECT_TRUE(Scalars.contains("gamma3"));
     EXPECT_TRUE(Scalars.contains("gamma4"));
-    EXPECT_TRUE(Scalars.contains("gamma"));
+    EXPECT_TRUE(Scalars.contains("gamma_"));
 }
 
 TEST_F(IdentityTest, GetVariables)
