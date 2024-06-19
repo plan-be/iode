@@ -1662,12 +1662,11 @@ VXT {
 		BLOCK "VXT"
 }
 W {
-	"dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma *ln ((NATY-UY)/NATY)[-1]+gamma2
+	"dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma_ *ln ((NATY-UY)/NATY)[-1]+gamma2
 +gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)
 +gamma5*ln PROD[-1])+(XW)+XWC"
 	LSQ
 	BLOCK "W"
-	COMMENT " "
 	SAMPLE 1975Y1 1997Y1
 }
 WBF {

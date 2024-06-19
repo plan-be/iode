@@ -15,7 +15,7 @@ PROF)*0.01*PRDAL)))"
 MU "(1-VM/VBBP)/((1-(DTH+IT+YSSG+COTRES-SBG)/VBBP)*(1-(VC/VBBP)*(1-VM/VBBP)
 ))"
 NAWRU "1-exp((gamma2+gamma3*ln(W/ZJ)[-1]+gamma4*ln(WMIN/ZJ))/
-gamma)"
+gamma_)"
 NFYHO "1"
 OCP "d DEBT + FLG"
 PCO "1"

@@ -196,7 +196,7 @@ TEST_F(KDBScalarsTest, Filter)
 
     // try to add an element to the local KDB which is already present 
     // in the global KDB
-    EXPECT_THROW(kdb_subset->add("gamma", new_scalar_local), std::invalid_argument);
+    EXPECT_THROW(kdb_subset->add("gamma_", new_scalar_local), std::invalid_argument);
 
     // delete local kdb
     delete kdb_subset;
@@ -356,7 +356,7 @@ TEST_F(KDBScalarsTest, Merge)
 
 TEST_F(KDBScalarsTest, Search)
 {
-    std::string scl_name = "gamma";
+    std::string scl_name = "gamma_";
     std::vector<std::string> objs_list;
 
     KDBComments kdb_cmt(input_test_dir + "fun.cmt");
