@@ -344,7 +344,7 @@ cdef class Scalars(_AbstractDatabase):
         >>> # Export a subset of the IODE Scalars database as a pandas DataFrame
         >>> df = scalars["a*;*_"].to_frame()
         >>> len(df)
-        18
+        19
 
         >>> df.index.to_list()              # doctest: +ELLIPSIS
         ['acaf1', 'acaf2', 'acaf3', ..., 'vs1_', 'vs2_', 'vs3_']
