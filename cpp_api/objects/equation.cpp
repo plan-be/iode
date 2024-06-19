@@ -37,9 +37,13 @@ Equation::Equation(const int pos, KDB* kdb)
     EQ* c_eq = KEVAL(kdb, pos);
     copy_from_EQ_obj(c_eq);
     E_free(c_eq);
+
     // re-compute CLEC
     char* name = KONAME(kdb, pos);
     this->clec = L_solve(this->lec, name);
+    if (this->clec == NULL)
+        throw std::runtime_error("Failed to compute LEC expression '" + std::string(this->lec) + 
+                    "' of equation named '" + std::string(name) + "'");
 }
 
 Equation::Equation(const std::string& name, KDB* kdb)
@@ -55,8 +59,12 @@ Equation::Equation(const std::string& name, KDB* kdb)
     EQ* c_eq = KEVAL(kdb, pos);
     copy_from_EQ_obj(c_eq);
     E_free(c_eq);
+
     // re-compute CLEC
     this->clec = L_solve(this->lec, to_char_array(name));
+    if (this->clec == NULL)
+        throw std::runtime_error("Failed to compute LEC expression '" + std::string(this->lec) + 
+                    "' of equation named '" + std::string(name) + "'");
 }
 
 Equation::Equation(const std::string& name, const std::string& lec, const int method, const std::string& from, const std::string& to, 
