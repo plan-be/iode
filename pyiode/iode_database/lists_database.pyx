@@ -85,18 +85,18 @@ cdef class Lists(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get list '{key}'.\nExpected a string value for the name " + 
-                            f"but got value of type {type(key).__name__}")
-        key = key.strip()
-        return self.database_ptr.get(key.encode()).decode()
+    def _get_object(self, key: str):
+        return self.database_ptr.get(key.strip().encode()).decode()
 
-    def _set_object(self, key: str, value: str):
+    def _set_object(self, key: str, value: Union[str, List[str]]):
         key = key.strip()
-        value = value.strip()
+        if isinstance(value, str):
+            value = value.strip()
+            value = split_list(value)
+        else:
+            value = [item.strip() for item in value]
         # normalize the IODE list
-        value = ';'.join(split_list(value))
+        value = ';'.join(value)
         if self.database_ptr.contains(key.encode()):
             self.database_ptr.update(key.encode(), value.encode())
         else:
