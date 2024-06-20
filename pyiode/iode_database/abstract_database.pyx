@@ -1268,20 +1268,34 @@ cdef class _AbstractDatabase:
 
         Lists
 
-        >>> from iode import lists
+        >>> from iode import lists, variables
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
         >>> # a) add one list
-        >>> from iode import variables
-        >>> lists["A_VAR"] = ';'.join(variables.get_names("A*"))
+        >>> # --- by passing a string 
+        >>> lists["A_VAR"] = "ACAF;ACAG;AOUC;AOUC_;AQC"
         >>> lists["A_VAR"]
         'ACAF;ACAG;AOUC;AOUC_;AQC'
+        >>> # --- by passing a Python list
+        >>> b_vars = variables.get_names("B*")
+        >>> b_vars
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
+        >>> lists["B_VAR"] = b_vars
+        >>> lists["B_VAR"]
+        'BENEF;BQY;BRUGP;BVY'
 
         >>> # b) update one list
-        >>> lists["ENVI"]
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
-        >>> lists["ENVI"] = 'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
-        >>> lists["ENVI"]
-        'PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY'
+        >>> # --- by passing a string
+        >>> lists["A_VAR"] = "ACAF;ACAG;AOUC;AQC"
+        >>> lists["A_VAR"]
+        'ACAF;ACAG;AOUC;AQC'
+        >>> # --- by passing a Python list
+        >>> b_y_vars = variables.get_names("B*Y")
+        >>> b_y_vars
+        ['BQY', 'BVY']
+        >>> lists["B_VAR"] = b_y_vars
+        >>> lists["B_VAR"]
+        'BQY;BVY'
 
         >>> # c) working on a subset
         >>> # 1) get subset
@@ -1289,8 +1303,7 @@ cdef class _AbstractDatabase:
         >>> lists_subset.names
         ['ENDO', 'ENDO0', 'ENDO1', 'ENVI']
         >>> # 2) add a list to the subset 
-        >>> from iode import variables
-        >>> lists_subset["E_VAR"] = ";".join(variables.get_names("E*"))
+        >>> lists_subset["E_VAR"] = variables.get_names("E*")
         >>> lists_subset["E_VAR"]
         'EFMY;EFXY;EX;EXC;EXCC;EXCCR'
         >>> # --> new list also appears in the global workspace
@@ -1417,32 +1430,34 @@ cdef class _AbstractDatabase:
         >>> tables["TABLE_VARS"]             # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                                                    |
         TITLE |                                  "New Table"
-        ----- | -----------------------------------------------------------------------------
-        CELL  | ""                                                                   |  "#S"
-        ----- | -----------------------------------------------------------------------------
-        CELL  | "Bruto exploitatie-overschot: overheid (= afschrijvingen)."          |   GOSG
-        CELL  | "Overheid: geïnde indirecte belastingen."                            |   YDTG
-        CELL  | "Totale overheid: directe belasting van de gezinnen."                |    DTH
-        CELL  | "Totale overheid: directe vennootschapsbelasting."                   |    DTF
-        CELL  | "Totale indirecte belastingen."                                      |     IT
-        CELL  | "Globale overheid: ontvangen sociale zekerheidsbijdragen."           |   YSSG
-        CELL  | "Cotisation de responsabilisation."                                  | COTRES
-        CELL  | "Overheid: inkomen uit vermogen."                                    |   RIDG
-        CELL  | "Globale overheid: saldo van de ontvangen lopendeoverdrachten."      |   OCUG
-        CELL  | "Index wereldprijs - invoer van niet-energieprodukten, inUSD."       |  PWMAB
-        CELL  | "Index wereldprijs - invoer van diensten, in USD."                   |   PWMS
-        CELL  | "Index wereldprijs - uitvoer van niet-energieprodukten, inUSD."      |  PWXAB
-        CELL  | "Index wereldprijs - uitvoer van diensten, in USD."                  |   PWXS
-        CELL  | "Indicator van het volume van de wereldvraag naar goederen,1985=1."  |  QWXAB
-        CELL  | "Indicator van het volume van de wereldvraag naar diensten,1985=1."  |   QWXS
-        CELL  | "Brent olieprijs (USD per barrel)."                                  |   POIL
-        CELL  | "Totale beroepsbevolking (jaargemiddelde)."                          |   NATY
-        ----- | -----------------------------------------------------------------------------
+        ----- | ------------------------------------------------------------------------------
+        CELL  | ""                                                                   |   "#S"
+        ----- | ------------------------------------------------------------------------------
+        CELL  | "Bruto exploitatie-overschot: overheid (= afschrijvingen)."          |    GOSG
+        CELL  | "Overheid: geïnde indirecte belastingen."                            |    YDTG
+        CELL  | "Totale overheid: directe belasting van de gezinnen."                |     DTH
+        CELL  | "Totale overheid: directe vennootschapsbelasting."                   |     DTF
+        CELL  | "Totale indirecte belastingen."                                      |      IT
+        CELL  | "Globale overheid: ontvangen sociale zekerheidsbijdragen."           |    YSSG
+        CELL  | "Cotisation de responsabilisation."                                  |  COTRES
+        CELL  | "Overheid: inkomen uit vermogen."                                    |    RIDG
+        CELL  | "Globale overheid: saldo van de ontvangen lopendeoverdrachten."      |    OCUG
+        CELL  | "Wisselkoers van de USD t.o.v. de BEF (jaargemiddelde)."             |      EX
+        CELL  | "Index wereldprijs - invoer van niet-energieprodukten, inUSD."       |   PWMAB
+        CELL  | "Index wereldprijs - invoer van diensten, in USD."                   |    PWMS
+        CELL  | "Index wereldprijs - uitvoer van niet-energieprodukten, inUSD."      |   PWXAB
+        CELL  | "Index wereldprijs - uitvoer van diensten, in USD."                  |    PWXS
+        CELL  | "Indicator van het volume van de wereldvraag naar goederen,1985=1."  |   QWXAB
+        CELL  | "Indicator van het volume van de wereldvraag naar diensten,1985=1."  |    QWXS
+        CELL  | "Brent olieprijs (USD per barrel)."                                  |    POIL
+        CELL  | "Totale beroepsbevolking (jaargemiddelde)."                          |    NATY
+        CELL  | "TFPFHP_"                                                            | TFPFHP_
+        ----- | ------------------------------------------------------------------------------
         MODE  |
         FILES |
         DATE  |
         <BLANKLINE>
-        nb lines: 25
+        nb lines: 27
         nb columns: 2
         language: 'ENGLISH'
         gridx: 'MAJOR'
