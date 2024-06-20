@@ -704,6 +704,27 @@ cdef class _AbstractDatabase:
             raise TypeError(f"Expected value of type string. Got value of type {type(item).__name__}")
         return self.abstract_db_ptr.contains(item.encode())
 
+    def __iter__(self):
+        """
+        Iterate over object names.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> cmt_subset = comments["A*"]
+        >>> cmt_subset.names
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
+        >>> for name in cmt_subset:
+        ...     print(name)
+        ACAF
+        ACAG
+        AOUC
+        AQC
+        """
+        return iter(self.names)
+
     # needs to be overriden for Variables
     def _unfold_key(self, key) -> List[str]:
         names = []
