@@ -194,7 +194,7 @@ cdef class Scalars(_AbstractDatabase):
         >>> len(scalars)
         6
         
-        >>> scalars.get_names()
+        >>> scalars.names
         ['alpha_', 'alpha_0', 'alpha_1', 'beta_', 'beta_0', 'beta_1']
         >>> scalars["alpha_1"]
         Scalar(0.1, 1, na)
@@ -267,7 +267,7 @@ cdef class Scalars(_AbstractDatabase):
         >>> len(scalars)
         6
         
-        >>> scalars.get_names()
+        >>> scalars.names
         ['alpha_', 'alpha_0', 'alpha_1', 'beta_', 'beta_0', 'beta_1']
         >>> df.loc["alpha_1"]
         value    0.1
@@ -366,7 +366,7 @@ cdef class Scalars(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
-        data = {name: self._get_object(name)._as_tuple() for name in self.get_names()}
+        data = {name: self._get_object(name)._as_tuple() for name in self.names}
         return pd.DataFrame.from_dict(data, orient='index', dtype="float64", columns=["value", "relax", "std"])
 
 

@@ -174,7 +174,7 @@ cdef class Equation:
         >>> # create scalars on the flight
         >>> eq_ACAF._get_and_create_coefficients()
         ['acaf1', 'acaf2', 'acaf4']
-        >>> scalars.get_names()
+        >>> scalars.names
         ['acaf1', 'acaf2', 'acaf4']
         """
         return [coeff.decode() for coeff in self.c_equation.get_coefficients_list(<bint>True)]
@@ -231,7 +231,7 @@ cdef class Equation:
         >>> # create variables on the flight
         >>> eq_ACAF._get_and_create_variables()
         ['ACAF', 'VAF', 'GOSF', 'TIME']
-        >>> variables.get_names()
+        >>> variables.names
         ['ACAF', 'GOSF', 'TIME', 'VAF']
         """
         return [var.decode() for var in self.c_equation.get_variables_list(<bint>True)]

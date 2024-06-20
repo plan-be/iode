@@ -175,7 +175,7 @@ cdef class Identities(_AbstractDatabase):
         >>> # compute GAP_ and GAP2 assuming Variables are not already loaded
         >>> variables.clear()
         >>> variables.sample = '1960Y1:2015Y1'
-        >>> variables.get_names()
+        >>> variables.names
         []
         >>> # setting the var_files argument will fetch the required values of 
         >>> # 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' from the passed Variables file
@@ -186,7 +186,7 @@ cdef class Identities(_AbstractDatabase):
         [96.92655844699298, 97.39603007168847, ..., 102.14581982070376, 101.58578527761608]
         >>> # note that the variables 'QAF_', 'QAFF_', 'Q_F' and 'Q_I' are not 
         >>> # present in the Variables database after running identities.execute
-        >>> variables.get_names()
+        >>> variables.names
         ['GAP2', 'GAP_']
         """
         if identities is None:
@@ -287,7 +287,7 @@ cdef class Identities(_AbstractDatabase):
         >>> len(identities)
         6
         
-        >>> identities.get_names()             # doctest: +ELLIPSIS
+        >>> identities.names             # doctest: +ELLIPSIS
         ['CONST', 'DER_LOG_T', 'EXP_T', 'GRT_T', 'LOG_T', 'MAVG_T']
         >>> identities["LOG_T"]
         'ln t'
@@ -352,7 +352,7 @@ cdef class Identities(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
-        names = self.get_names()
+        names = self.names
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 
