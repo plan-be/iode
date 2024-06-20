@@ -393,12 +393,12 @@ cdef class EditAndEstimateEquations:
         >>> estimation.equations_list
         ['ACAF', 'DPUH']
         >>> equations_res = estimation.equations_db
-        >>> equations_res.get_names()
+        >>> equations_res.names
         ['ACAF', 'DPUH']
         >>> # ---- scalars list ----
         >>> estimation.update_scalars()
         >>> scalars_res = estimation.scalars_db
-        >>> scalars_res.get_names()
+        >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> # ---- current equation ----
         >>> current_eq = estimation.current_equation
@@ -429,12 +429,12 @@ cdef class EditAndEstimateEquations:
         >>> estimation.equations_list
         ['ACAF', 'DPUH', 'TEST']
         >>> equations_res = estimation.equations_db
-        >>> equations_res.get_names()
+        >>> equations_res.names
         ['ACAF', 'DPUH', 'TEST']
         >>> # ---- scalars list ----
         >>> estimation.update_scalars()
         >>> scalars_res = estimation.scalars_db
-        >>> scalars_res.get_names()
+        >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> # ---- current equation ----
         >>> current_eq = estimation.current_equation
@@ -465,12 +465,12 @@ cdef class EditAndEstimateEquations:
         >>> estimation.equations_list
         ['ACAF', 'TEST']
         >>> equations_res = estimation.equations_db
-        >>> equations_res.get_names()
+        >>> equations_res.names
         ['ACAF', 'DPUH', 'TEST']
         >>> # ---- scalars list ----
         >>> estimation.update_scalars()
         >>> scalars_res = estimation.scalars_db
-        >>> scalars_res.get_names()
+        >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4']
         >>> # ---- current equation ----
         >>> current_eq = estimation.current_equation
@@ -495,12 +495,12 @@ cdef class EditAndEstimateEquations:
         >>> estimation.equations_list
         ['ACAF', 'TEST', 'DPUH']
         >>> equations_res = estimation.equations_db
-        >>> equations_res.get_names()
+        >>> equations_res.names
         ['ACAF', 'DPUH', 'TEST']
         >>> # ---- scalars list ----
         >>> estimation.update_scalars()
         >>> scalars_res = estimation.scalars_db
-        >>> scalars_res.get_names()
+        >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> # ---- current equation ----
         >>> current_eq = estimation.current_equation
@@ -522,7 +522,7 @@ cdef class EditAndEstimateEquations:
         >>> # ---- scalars list ----
         >>> estimation_new_coeffs.update_scalars()
         >>> scalars_res = estimation_new_coeffs.scalars_db
-        >>> scalars_res.get_names()
+        >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> scalars_res["dpuh_1"]
         Scalar(0.9, 1, na)
@@ -695,13 +695,13 @@ cdef class EditAndEstimateEquations:
         >>> estimation.equations_list
         ['ACAF', 'DPUH']
         >>> equations_res = estimation.equations_db
-        >>> equations_res.get_names()
+        >>> equations_res.names
         ['ACAF', 'DPUH']
         
         >>> # ---- scalars list ----
         >>> estimation.update_scalars()
         >>> scalars_res = estimation.scalars_db
-        >>> scalars_res.get_names()
+        >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         """
         cdef CKDBScalars* c_scalars_ptr = self.c_estimation_ptr.get_scalars()
@@ -733,7 +733,7 @@ cdef class EditAndEstimateEquations:
         >>> estimation.equations_list
         ['ACAF', 'DPUH']
         >>> equations_res = estimation.equations_db
-        >>> equations_res.get_names()
+        >>> equations_res.names
         ['ACAF', 'DPUH']
         """
         cdef CKDBEquations* c_equations_ptr = self.c_estimation_ptr.get_equations()
@@ -1006,10 +1006,10 @@ cdef class EditAndEstimateEquations:
         'ACAF;DPUH'
 
         >>> scalars_est = estimation.scalars_db
-        >>> scalars_est.get_names()
+        >>> scalars_est.names
         []
         >>> estimation.update_scalars()
-        >>> scalars_est.get_names()
+        >>> scalars_est.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         >>> scalars_est["acaf1"]
         Scalar(0.9, 1, na)

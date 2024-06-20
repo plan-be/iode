@@ -151,7 +151,7 @@ cdef class Comments(_AbstractDatabase):
         >>> len(comments)
         6
         
-        >>> comments.get_names()             # doctest: +ELLIPSIS
+        >>> comments.names             # doctest: +ELLIPSIS
         ['A0', 'A1', 'B0', 'B1', 'C0', 'C1']
         >>> comments["B0"]
         'B zero'
@@ -216,7 +216,7 @@ cdef class Comments(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
-        names = self.get_names()
+        names = self.names
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 

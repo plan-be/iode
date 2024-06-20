@@ -117,7 +117,7 @@ cdef class _AbstractDatabase:
         >>> # the copy subset will also change the corresponding 
         >>> # IODE database
         >>> cmt_subset = comments["A*"]
-        >>> cmt_subset.get_names()
+        >>> cmt_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
         >>> # a) add a comment
         >>> cmt_subset["A_NEW"] = "New comment"
@@ -143,7 +143,7 @@ cdef class _AbstractDatabase:
         Copied database subset
 
         >>> cmt_subset_copy = comments["B*"].copy()
-        >>> cmt_subset_copy.get_names()
+        >>> cmt_subset_copy.names
         ['BENEF', 'BENEF_', 'BQY', 'BVY']
         >>> # by using copy(), any modification made on the copy subset 
         >>> # let the global workspace unchanged
@@ -252,14 +252,32 @@ cdef class _AbstractDatabase:
         'WBF_', 'WBU_', 'WCF_', 'WCR1_', 'WCR2_', 'WIND_', 
         'WNF_', 'YDH_', 'ZZ_']
         >>> # get the list of all names
-        >>> comments.get_names()                # doctest: +ELLIPSIS
+        >>> comments.names                # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKF', 'ZX', 'ZZ_']
         """
         if not isinstance(pattern, str) and isinstance(pattern, Iterable) and all(isinstance(item, str) for item in pattern):
             pattern = ';'.join(pattern)
-        if not isinstance(pattern, str):
-            raise TypeError(f"'pattern': Expected a string value or a list of strings. Got value of type {type(pattern).__name__}")
         return [name.decode() for name in self.abstract_db_ptr.get_names(pattern.encode(), <bint>True)]
+
+    @property
+    def names(self) -> List[str]:
+        """
+        List of names of all objects in the current database.
+
+        Returns
+        -------
+        list(str)
+        
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> # get the list of all names
+        >>> comments.names                # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'ZKF', 'ZX', 'ZZ_']
+        """
+        return [name.decode() for name in self.abstract_db_ptr.get_names(b'', <bint>True)]
 
     def rename(self, old_name: str, new_name: str):
         """
@@ -357,7 +375,7 @@ cdef class _AbstractDatabase:
 
         >>> # copy comments with names starting with 'A' into a new database 'cmt_subset'
         >>> cmt_subset = comments.subset("A*", deep_copy=True)
-        >>> cmt_subset.get_names()
+        >>> cmt_subset.names
         ['ACAF', 'ACAG', 'ACOUG', 'AQC']
 
         >>> # remove 'ACAF' and 'ACAG' from the global Comments database
@@ -717,7 +735,7 @@ cdef class _AbstractDatabase:
         if isinstance(key, slice):
             if key.step is not None:
                 raise ValueError("When selecting a subset of a workspace using a slice, the step cannot be used")
-            names = self.get_names()
+            names = self.names
             first_name, last_name = key.start, key.stop
             # raise an error if first_name refers to an IODE object that does not exist
             first_index = names.index(first_name)
@@ -792,11 +810,11 @@ cdef class _AbstractDatabase:
         'Ondernemingen: ontvangen kapitaaloverdrachten.'
         >>> # b) get a subset of the Comments database using a pattern
         >>> comments_subset = comments["A*"]
-        >>> comments_subset.get_names()
+        >>> comments_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
         >>> # c) get a subset of the Comments database using a list of names
         >>> comments_subset = comments[["ACAF", "AOUC", "BQY", "BVY"]]
-        >>> comments_subset.get_names()
+        >>> comments_subset.names
         ['ACAF', 'AOUC', 'BQY', 'BVY']
 
         Equations
@@ -826,11 +844,11 @@ cdef class _AbstractDatabase:
 
         >>> # b) get a subset of the Equations database using a pattern
         >>> equations_subset = equations["A*"]
-        >>> equations_subset.get_names()
+        >>> equations_subset.names
         ['ACAF', 'ACAG', 'AOUC']
         >>> # c) get a subset of the Equations database using a list of names
         >>> equations_subset = equations[["ACAF", "AOUC", "BQY", "BVY"]]
-        >>> equations_subset.get_names()
+        >>> equations_subset.names
         ['ACAF', 'AOUC', 'BQY', 'BVY']
 
         Identities
@@ -842,11 +860,11 @@ cdef class _AbstractDatabase:
         '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
         >>> # b) get a subset of the Identities database using a pattern
         >>> identities_subset = identities["X*"]
-        >>> identities_subset.get_names()
+        >>> identities_subset.names
         ['XEX', 'XNATY', 'XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS', 'XQWXAB', 'XQWXS', 'XQWXSS', 'XRLBER', 'XTFP', 'XW']
         >>> # c) get a subset of the Identities database using a list of names
         >>> identities_subset = identities[["XEX", "XPWMAB", "XPWMS", "XQWXS", "XTFP"]]
-        >>> identities_subset.get_names()
+        >>> identities_subset.names
         ['XEX', 'XPWMAB', 'XPWMS', 'XQWXS', 'XTFP']
 
         Lists
@@ -858,11 +876,11 @@ cdef class _AbstractDatabase:
         'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
         >>> # b) get a subset of the Lists database using a pattern
         >>> lists_subset = lists["E*"]
-        >>> lists_subset.get_names()
+        >>> lists_subset.names
         ['ENDO', 'ENDO0', 'ENDO1', 'ENVI']
         >>> # c) get a subset of the Lists database using a list of names
         >>> lists_subset = lists[["COPY", "ENDO", "ENVI", "TOTAL"]]
-        >>> lists_subset.get_names()
+        >>> lists_subset.names
         ['COPY', 'ENDO', 'ENVI', 'TOTAL']
 
         Scalars
@@ -881,11 +899,11 @@ cdef class _AbstractDatabase:
         0.0013687137980014086
         >>> # b) get a subset of the Scalars database using a pattern
         >>> scalars_subset = scalars["a*"]
-        >>> scalars_subset.get_names()
+        >>> scalars_subset.names
         ['acaf1', 'acaf2', 'acaf3', 'acaf4']
         >>> # c) get a subset of the Scalars database using a list of names
         >>> scalars_subset = scalars[["acaf1", "acaf4", "dpuh_1", "dpuh_2"]]
-        >>> scalars_subset.get_names()
+        >>> scalars_subset.names
         ['acaf1', 'acaf4', 'dpuh_1', 'dpuh_2']
 
         Tables
@@ -925,11 +943,11 @@ cdef class _AbstractDatabase:
         <BLANKLINE>        
         >>> # b) get a subset of the Tables database using a pattern
         >>> tables_subset = tables["C8_*"]
-        >>> tables_subset.get_names()
+        >>> tables_subset.names
         ['C8_1', 'C8_10', 'C8_11', 'C8_13', 'C8_14', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
         >>> # c) get a subset of the Tables database using a list of names
         >>> tables_subset = tables[["C8_1", "C8_2", "C8_4", "C8_5", "C8_7"]]
-        >>> tables_subset.get_names()
+        >>> tables_subset.names
         ['C8_1', 'C8_2', 'C8_4', 'C8_5', 'C8_7']
 
         Variables
@@ -953,7 +971,7 @@ cdef class _AbstractDatabase:
         [23.771, 26.240999, ..., 13.530404919696034, 10.046610792200543]
         >>> # b) -------- get a subset of the Variables database using a pattern --------
         >>> variables_subset = variables["A*"]
-        >>> variables_subset.get_names()
+        >>> variables_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
         >>> # get the variable values for a specific period
         >>> variables["A*", "1990Y1"]
@@ -963,7 +981,7 @@ cdef class _AbstractDatabase:
         [[23.771, 26.240999, 30.159, ..., 1.2031082, 1.3429699656745855, 1.3386028553645442]]
         >>> # c) -------- get a subset of the Variables database using a list of names --------
         >>> variables_subset = variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"]]
-        >>> variables_subset.get_names()
+        >>> variables_subset.names
         ['ACAF', 'ACAG', 'AQC', 'BQY', 'BVY']
         >>> # get the variable values for a specific period
         >>> variables[["ACAF", "ACAG", "AQC", "BQY", "BVY"], "1990Y1"]
@@ -1041,7 +1059,7 @@ cdef class _AbstractDatabase:
         >>> # c) working on a subset
         >>> # 1) get subset
         >>> comments_subset = comments["A*"]
-        >>> comments_subset.get_names()
+        >>> comments_subset.names
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
         >>> # 2) add a comment to the subset 
         >>> comments_subset["A0"] = "New Comment"
@@ -1154,7 +1172,7 @@ cdef class _AbstractDatabase:
         >>> # c) working on a subset
         >>> # 1) get subset
         >>> equations_subset = equations["A*"]
-        >>> equations_subset.get_names()
+        >>> equations_subset.names
         ['ACAF', 'ACAG', 'AOUC']
         >>> # 2) add a equation to the subset 
         >>> equations_subset["AOUC_"] = "AOUC_ := ((WCRH/QL)/(WCRH/QL)[1990Y1]) * (VAFF/(VM+VAFF))[-1] + PM * (VM/(VAFF+VM))[-1]"
@@ -1208,7 +1226,7 @@ cdef class _AbstractDatabase:
         >>> # c) working on a subset
         >>> # 1) get subset
         >>> identities_subset = identities["X*"]
-        >>> identities_subset.get_names()
+        >>> identities_subset.names
         ['XEX', 'XNATY', 'XPOIL', 'XPWMAB', 'XPWMS', 'XPWXAB', 'XPWXS', 'XQWXAB', 'XQWXS', 'XQWXSS', 'XRLBER', 'XTFP', 'XW']
         >>> # 2) add an identity to the subset 
         >>> identities_subset["XDPU"] = "grt DPU"
@@ -1247,7 +1265,7 @@ cdef class _AbstractDatabase:
         >>> # c) working on a subset
         >>> # 1) get subset
         >>> lists_subset = lists["E*"]
-        >>> lists_subset.get_names()
+        >>> lists_subset.names
         ['ENDO', 'ENDO0', 'ENDO1', 'ENVI']
         >>> # 2) add a list to the subset 
         >>> from iode import variables
@@ -1314,7 +1332,7 @@ cdef class _AbstractDatabase:
         >>> # c) working on a subset
         >>> # 1) get subset
         >>> scalars_subset = scalars["a*"]
-        >>> scalars_subset.get_names()
+        >>> scalars_subset.names
         ['a0', 'a1', 'acaf1', 'acaf2', 'acaf3', 'acaf4']
         >>> # 2) add a scalar to the subset 
         >>> scalars_subset["acaf0"] = 1.0, 1.0
@@ -1511,7 +1529,7 @@ cdef class _AbstractDatabase:
         >>> # c) working on a subset
         >>> # 1) get subset
         >>> tables_subset = tables["C8_*"]
-        >>> tables_subset.get_names()
+        >>> tables_subset.names
         ['C8_1', 'C8_10', 'C8_11', 'C8_13', 'C8_14', 'C8_2', 'C8_3', 'C8_4', 'C8_5', 'C8_6', 'C8_7', 'C8_8', 'C8_9']
         >>> # 2) add a table to the subset 
         >>> vars_list = ["XNATY", "XPOIL", "XPWMAB", "XPWXAB"]
@@ -1696,7 +1714,7 @@ cdef class _AbstractDatabase:
         >>> # c) -------- working on a subset --------
         >>> # 1) get subset
         >>> variables_subset = variables["A*"]
-        >>> variables_subset.get_names()
+        >>> variables_subset.names
         ['A0', 'A1', 'A2', 'ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
         >>> # 2) add a variable to the subset 
         >>> from iode import NA
@@ -1769,10 +1787,10 @@ cdef class _AbstractDatabase:
 
         >>> # delete one comment from a subset of the global database
         >>> comments_subset = comments["D*"]
-        >>> comments_subset.get_names()
+        >>> comments_subset.names
         ['DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
         >>> del comments_subset["DPUGO"]
-        >>> comments_subset.get_names()
+        >>> comments_subset.names
         ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
         >>> # comment also deleted in the globale database
         >>> "DPUGO" in comments

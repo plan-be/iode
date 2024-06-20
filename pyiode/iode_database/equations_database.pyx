@@ -273,7 +273,7 @@ cdef class Equations(_AbstractDatabase):
             to_period = str(to_period)
 
         if list_eqs is None:
-            list_eqs = ';'.join(self.get_names())
+            list_eqs = ';'.join(self.names)
 
         if not isinstance(list_eqs, str) and isinstance(list_eqs, Iterable) and \
             all(isinstance(item, str) for item in list_eqs):
@@ -336,7 +336,7 @@ cdef class Equations(_AbstractDatabase):
         >>> len(equations)
         6
         
-        >>> equations.get_names()
+        >>> equations.names
         ['A', 'B', 'C', 'D', 'E', 'F']
         >>> equations["A"]      # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'A',
@@ -419,7 +419,7 @@ cdef class Equations(_AbstractDatabase):
         >>> len(equations)
         6
         
-        >>> equations.get_names()
+        >>> equations.names
         ['A', 'B', 'C', 'D', 'E', 'F']
         >>> df.loc["A"]         # doctest: +NORMALIZE_WHITESPACE  
         lec              A := t
@@ -686,7 +686,7 @@ cdef class Equations(_AbstractDatabase):
                  "comment": str, "instruments": str, "block": str}
         dtype.update({test_name: float for test_name in EQ_TEST_NAMES})
         dtype.update({"date": str})
-        data = {name: self._get_object(name)._as_tuple() for name in self.get_names()}
+        data = {name: self._get_object(name)._as_tuple() for name in self.names}
         return pd.DataFrame.from_dict(data, orient='index', columns=list(dtype.keys())).astype(dtype)
 
 

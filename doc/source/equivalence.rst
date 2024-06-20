@@ -68,19 +68,19 @@ Equivalence Between IODE Report Functions and IODE Python
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | ``@ChronoGet()``                     | `elapsed_time = time.time_ns() - start <https://docs.python.org/3/library/time.html#time.time_ns>`_ [#f3]_                          |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@cexpand(pattern)``                | ``comments.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                  |
+   | ``@cexpand(pattern)``                | ``comments.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                       |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@eexpand(pattern)``                | ``equations.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                 |
+   | ``@eexpand(pattern)``                | ``equations.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                      |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@iexpand(pattern)``                | ``identities.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                |
+   | ``@iexpand(pattern)``                | ``identities.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                     |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@lexpand(pattern)``                | ``lists.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                     |
+   | ``@lexpand(pattern)``                | ``lists.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                          |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@sexpand(pattern)``                | ``scalars.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                   |
+   | ``@sexpand(pattern)``                | ``scalars.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                        |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@texpand(pattern)``                | ``tables.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                    |
+   | ``@texpand(pattern)``                | ``tables.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                         |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
-   | ``@vexpand(pattern)``                | ``variables.get_names(pattern)`` --> See :meth:`Database.get_names`                                                                 |
+   | ``@vexpand(pattern)``                | ``variables.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names`                                      |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
    | ``@vliste(eq_name)``                 | ``equations[eq_name].get_variables_list()`` --> See :meth:`Equation.get_variables_list`                                             |
    +--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
@@ -262,7 +262,7 @@ Below *workspace* must be replaced by either:
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datascan``         | Not Yet Implemented                                                                                                            |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
-    | ``datalistXxx``      | ``names = workspace.get_names(pattern)`` --> See :meth:`Database.get_names`                                                    |
+    | ``datalistXxx``      | ``names = workspace.get_names(pattern)`` --> See :meth:`Database.get_names` and :meth:`Database.names``                        |
     |                      | ``lists[listname] = names`` --> See :meth:`Database.__setitem__`                                                               |
     +----------------------+--------------------------------------------------------------------------------------------------------------------------------+
     | ``datalistsort``     | ``lst = split_list(lists[listname]))``   --> See :func:`split_list`                                                            |

@@ -26,6 +26,7 @@ WORKSPACE
    :toctree: _generated
    :template: database_methods.rst
 
+   Database.names
    Database.filename
    Database.description
 
@@ -37,14 +38,14 @@ WORKSPACE
    Database.is_copy_subset
    Database.copy
 
+   Database.get_names
+   Database.rename
+
    Database.__getitem__
    Database.__setitem__
    Database.__delitem__
    Database.__contains__
    Database.__len__
-
-   Database.get_names
-   Database.rename
 
    Database.search
 

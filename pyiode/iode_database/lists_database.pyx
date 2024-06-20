@@ -152,7 +152,7 @@ cdef class Lists(_AbstractDatabase):
         >>> len(lists)
         5
         
-        >>> lists.get_names()
+        >>> lists.names
         ['COMMA_LST', 'MIX_LST', 'SEMICOLON_LST', 'TAB_LST', 'WHITESPACE_LST']
         >>> lists["SEMICOLON_LST"]
         'A;B;C;D;E;F'
@@ -222,7 +222,7 @@ cdef class Lists(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
-        names = self.get_names()
+        names = self.names
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 

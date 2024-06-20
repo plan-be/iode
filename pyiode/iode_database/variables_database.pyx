@@ -462,7 +462,7 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.from_frame(df)
         >>> len(variables)
         9
-        >>> variables.get_names()
+        >>> variables.names
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
         >>> variables.sample
         '1960Y1:1970Y1'
@@ -593,7 +593,7 @@ cdef class Variables(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
-        vars_list = self.get_names()
+        vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
         data = _ws_to_numpy_array(vars_list, len(periods_list))
 
@@ -655,7 +655,7 @@ cdef class Variables(_AbstractDatabase):
         >>> variables.from_array(array)
         >>> len(variables)
         9
-        >>> variables.get_names()
+        >>> variables.names
         ['BXL_00', 'BXL_01', 'BXL_02', 'VLA_00', 'VLA_01', 'VLA_02', 'WAL_00', 'WAL_01', 'WAL_02']
         >>> variables.sample
         '1960Y1:1970Y1'
@@ -760,7 +760,7 @@ cdef class Variables(_AbstractDatabase):
         if la is None:
             raise RuntimeError("larray library not found")
 
-        vars_list = self.get_names()
+        vars_list = self.names
         periods_list = self.periods_as_float if sample_as_floats else self.periods
         data = _ws_to_numpy_array(vars_list, len(periods_list))
         
