@@ -41,11 +41,12 @@ WORKSPACE
    Database.get_names
    Database.rename
 
+   Database.__len__
+   Database.__contains__
+   Database.__iter__
    Database.__getitem__
    Database.__setitem__
    Database.__delitem__
-   Database.__contains__
-   Database.__len__
 
    Database.search
 
