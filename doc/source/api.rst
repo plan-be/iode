@@ -74,6 +74,8 @@ Equations
 
    Equations
    Equations.estimate 
+   Equations.from_frame
+   Equations.to_frame
 
 ==========
 Identities
