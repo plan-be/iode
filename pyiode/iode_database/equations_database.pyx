@@ -690,5 +690,175 @@ cdef class Equations(_AbstractDatabase):
         data = {name: self._get_object(name)._as_tuple()[1:] for name in self.names}
         return pd.DataFrame.from_dict(data, orient='index', columns=list(dtype.keys())).astype(dtype)
 
+    @property
+    def df(self) -> DataFrame:
+        r"""
+        Create a pandas DataFrame from the current Equations database.
+        The index of the returned DataFrame is build from the Equations names.
+
+        See Also
+        --------
+        Equations.to_frame
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> import pandas as pd
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+        >>> len(equations)
+        274
+
+        >>> # Export the IODE Equations database as a pandas DataFrame
+        >>> df = equations.df
+        >>> len(df)
+        274
+
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'YSSG', 'ZF', 'ZJ', 'ZZF_']
+        >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+        >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        method                                                       LSQ
+        sample                                             1980Y1:1996Y1
+        comment
+        instruments
+        block                                                       ACAF
+        corr                                                         1.0
+        stdev                                                   2.329346
+        meany                                                  32.273193
+        ssres                                                  83.807526
+        stderr                                                  0.008185
+        stderrp                                                 0.821761
+        fstat                                                   0.796299
+        r2                                                      0.000052
+        r2adj                                                   0.001927
+        dw                                                     23.545813
+        loglik                                                   0.00427
+        date                                                  12-06-1998
+        Name: ACAF, dtype: object  
+        >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'YDH_',
+                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 comment = ' ',
+                 block = 'YDH_')
+        >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
+        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        method                                                       LSQ
+        sample                                             1960Y1:2015Y1
+        comment
+        instruments
+        block                                                       YDH_
+        corr                                                         0.0
+        stdev                                                        0.0
+        meany                                                        0.0
+        ssres                                                        0.0
+        stderr                                                       0.0
+        stderrp                                                      0.0
+        fstat                                                        0.0
+        r2                                                           0.0
+        r2adj                                                        0.0
+        dw                                                           0.0
+        loglik                                                       0.0
+        date
+        Name: YDH_, dtype: object
+
+        >>> # Export a subset of the IODE Equations database as a pandas DataFrame
+        >>> df = equations["A*;*_"].df
+        >>> len(df)
+        29
+
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
+        >>> equations["ACAF"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'ACAF',
+                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)',
+                 method = 'LSQ',
+                 from_period = '1980Y1',
+                 to_period = '1996Y1',
+                 block = 'ACAF',
+                 tests = {corr = 1,
+                          dw = 2.32935,
+                          fstat = 32.2732,
+                          loglik = 83.8075,
+                          meany = 0.00818467,
+                          r2 = 0.821761,
+                          r2adj = 0.796299,
+                          ssres = 5.19945e-05,
+                          stderr = 0.00192715,
+                          stderrp = 23.5458,
+                          stdev = 0.0042699},
+                 date = '12-06-1998')
+        >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
+        lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
+        method                                                       LSQ
+        sample                                             1980Y1:1996Y1
+        comment
+        instruments
+        block                                                       ACAF
+        corr                                                         1.0
+        stdev                                                   2.329346
+        meany                                                  32.273193
+        ssres                                                  83.807526
+        stderr                                                  0.008185
+        stderrp                                                 0.821761
+        fstat                                                   0.796299
+        r2                                                      0.000052
+        r2adj                                                   0.001927
+        dw                                                     23.545813
+        loglik                                                   0.00427
+        date                                                  12-06-1998
+        Name: ACAF, dtype: object
+        >>> equations["YDH_"]               # doctest: +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'YDH_',
+                 lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
+                 method = 'LSQ',
+                 from_period = '1960Y1',
+                 to_period = '2015Y1',
+                 comment = ' ',
+                 block = 'YDH_')
+        >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
+        lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
+        method                                                       LSQ
+        sample                                             1960Y1:2015Y1
+        comment
+        instruments
+        block                                                       YDH_
+        corr                                                         0.0
+        stdev                                                        0.0
+        meany                                                        0.0
+        ssres                                                        0.0
+        stderr                                                       0.0
+        stderrp                                                      0.0
+        fstat                                                        0.0
+        r2                                                           0.0
+        r2adj                                                        0.0
+        dw                                                           0.0
+        loglik                                                       0.0
+        date
+        Name: YDH_, dtype: object
+        """
+        return self.to_frame()      
+
 
 equations: Equations = Equations._from_ptr()

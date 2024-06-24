@@ -931,6 +931,96 @@ cdef class Variables(_AbstractDatabase):
         """
         return self.database_ptr.get_list_periods_as_float(bytes(), bytes())
 
+    @property
+    def df(self) -> DataFrame:
+        r"""
+        Create a pandas DataFrame from the current Variables database.
+        The index of the returned DataFrame is build from the Variables names 
+        and the columns from the periods.
+
+        Warnings
+        --------
+        IODE and pandas don't use the same constant to represent NaN values.
+        When exporting IODE variables as a pandas DataFrame, the IODE NaN values 
+        (:math:`NA`) are converted to pandas NaN values (:math:`nan`).
+
+        See Also
+        --------
+        Variables.to_frame
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import variables
+        >>> import pandas as pd
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> len(variables)
+        394
+        >>> variables.sample
+        '1960Y1:2015Y1'
+        >>> variables.nb_periods
+        56
+
+        >>> # Export the IODE Variables database as a pandas DataFrame
+        >>> df = variables.df
+        >>> df.shape
+        (394, 56)
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'ZKFO', 'ZX', 'ZZF_']
+        >>> df.columns.to_list()            # doctest: +ELLIPSIS
+        ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS
+        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1960Y1         NaN
+        1961Y1    0.247832
+        ...
+        2014Y1    1.423714
+        2015Y1    1.460863
+        Name: AOUC, dtype: float64    
+        >>> variables["ZKFO"]               # doctest: +ELLIPSIS
+        [1.0, 1.0, ... 1.0159901, 1.0159901]
+        >>> df.loc["ZKFO"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1960Y1    1.00000
+        1961Y1    1.00000
+        ...
+        2014Y1    1.01599
+        2015Y1    1.01599
+        Name: ZKFO, dtype: float64
+
+        >>> # Export a subset of the IODE Variables database as a pandas DataFrame
+        >>> df = variables["A*;*_"].df
+        >>> df.shape
+        (33, 56)
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', ..., 'WNF_', 'YDH_', 'ZZF_']
+        >>> df.columns.to_list()            # doctest: +ELLIPSIS
+        ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
+        >>> variables["AOUC"]               # doctest: +ELLIPSIS
+        [nan, 0.24783191606766575, ..., 1.4237139558484628, 1.4608626117037322]
+        >>> df.loc["AOUC"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1960Y1         NaN
+        1961Y1    0.247832
+        ...
+        2014Y1    1.423714
+        2015Y1    1.460863
+        Name: AOUC, dtype: float64    
+        >>> variables["ZZF_"]               # doctest: +ELLIPSIS
+        [0.68840039, 0.68840039, ..., 0.68840039, 0.68840039]
+        >>> df.loc["ZZF_"]                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        time
+        1960Y1    0.6884
+        1961Y1    0.6884
+        ...
+        2014Y1    0.6884
+        2015Y1    0.6884
+        Name: ZZF_, dtype: float64 
+        """
+        return self.to_frame()
+
     def periods_subset(self, from_period: Union[str, Period] = None, to_period: Union[str, Period] = None, 
                        as_float: bool = False):
         """

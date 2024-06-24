@@ -356,5 +356,57 @@ cdef class Identities(_AbstractDatabase):
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 
+    @property
+    def series(self) -> Series:
+        r"""
+        Create a pandas Series from the current Identities database.
+        The index of the returned Series is build from the Identities names.
+
+        See Also
+        --------
+        Identities.to_series
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, identities
+        >>> import pandas as pd
+        >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+        >>> len(identities)
+        48
+
+        >>> # Export the IODE Identities database as a pandas Series
+        >>> s = identities.series
+        >>> len(s)
+        48
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['AOUC', 'AOUC_', 'FLGR', ..., 'XW', 'Y', 'YSEFPR', 'YSFICR']
+        >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+        >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+
+        >>> # Export a subset of the IODE Identities database as a pandas Series
+        >>> s = identities["X*;*_"].series
+        >>> len(s)
+        15
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['AOUC_', 'GAP_', 'XEX', 'XNATY', ..., 'XTFP', 'XW']
+        >>> identities["GAP_"]              # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> s["GAP_"]                       # doctest: +NORMALIZE_WHITESPACE
+        '100*((QAF_/Q_F)-1)' 
+        >>> identities["XTFP"]              # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+        >>> s["XTFP"]                       # doctest: +NORMALIZE_WHITESPACE
+        'grt TFPFHP_'
+        """
+        return self.to_series()
+
 
 identities: Identities = Identities._from_ptr()

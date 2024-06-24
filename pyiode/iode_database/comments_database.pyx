@@ -220,5 +220,57 @@ cdef class Comments(_AbstractDatabase):
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 
+    @property
+    def series(self) -> Series:
+        r"""
+        Create a pandas Series from the current Comments database.
+        The index of the returned Series is build from the Comments names.
+
+        See Also
+        --------
+        Comments.to_series
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, comments
+        >>> import pandas as pd
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+        >>> len(comments)
+        317
+
+        >>> # Export the IODE Comments database as a pandas Series
+        >>> s = comments.series
+        >>> len(s)
+        317
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', 'AQC', ..., 'ZJ', 'ZKF', 'ZX', 'ZZ_']
+        >>> comments["ACAF"]                # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> s["ACAF"]                       # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> comments["ZZ_"]                 # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        >>> s["ZZ_"]                        # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+
+        >>> # Export a subset of the IODE Comments database as a pandas Series
+        >>> s = comments["A*;*_"].series
+        >>> len(s)
+        34
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['ACAF', 'ACAG', 'AOUC', 'AQC', ..., 'WIND_', 'WNF_', 'YDH_', 'ZZ_']
+        >>> comments["ACAF"]                # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> s["ACAF"]                       # doctest: +NORMALIZE_WHITESPACE
+        'Ondernemingen: ontvangen kapitaaloverdrachten.' 
+        >>> comments["ZZ_"]                 # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        >>> s["ZZ_"]                        # doctest: +NORMALIZE_WHITESPACE
+        'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
+        """
+        return self.to_series()
+
 
 comments: Comments = Comments._from_ptr()
