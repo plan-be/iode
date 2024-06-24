@@ -226,5 +226,57 @@ cdef class Lists(_AbstractDatabase):
         data = [self._get_object(name) for name in names]
         return pd.Series(data=data, index=names, dtype=str, name=self.__class__.__name__)
 
+    @property
+    def series(self) -> Series:
+        r"""
+        Create a pandas Series from the current Lists database.
+        The index of the returned Series is build from the Lists names.
+
+        See Also
+        --------
+        Lists.to_series
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, lists
+        >>> import pandas as pd
+        >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
+        >>> len(lists)
+        17
+
+        >>> # Export the IODE Lists database as a pandas Series
+        >>> s = lists.series
+        >>> len(s)
+        17
+
+        >>> s.index.to_list()               # doctest: +ELLIPSIS
+        ['COPY', 'COPY0', 'COPY1', ..., 'XSCENARIO', '_SCAL', '_SEARCH']
+        >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+
+        >>> # Export a subset of the IODE Lists database as a pandas Series
+        >>> s = lists["E*;MA*"].series
+        >>> len(s)
+        5
+
+        >>> s.index.to_list()
+        ['ENDO', 'ENDO0', 'ENDO1', 'ENVI', 'MAINEQ']
+        >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
+        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
+        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        """
+        return self.to_series()
+
 
 lists: Lists = Lists._from_ptr()

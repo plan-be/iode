@@ -62,6 +62,8 @@ Comments
    :toctree: _generated
 
    Comments 
+   Comments.series
+
    Comments.from_series
    Comments.to_series
 
@@ -73,6 +75,8 @@ Equations
    :toctree: _generated
 
    Equations
+   Equations.df
+
    Equations.estimate 
    Equations.from_frame
    Equations.to_frame
@@ -85,6 +89,8 @@ Identities
    :toctree: _generated
 
    Identities
+   Identities.series
+
    Identities.execute
    Identities.from_series
    Identities.to_series
@@ -97,6 +103,8 @@ Lists
    :toctree: _generated
 
    Lists
+   Lists.series
+
    Lists.from_series
    Lists.to_series
 
@@ -108,6 +116,8 @@ Scalars
    :toctree: _generated
 
    Scalars
+   Scalars.df
+
    Scalars.from_series
    Scalars.from_frame
    Scalars.to_frame
@@ -135,6 +145,7 @@ Variables
    Variables.nb_periods
    Variables.periods
    Variables.periods_as_float
+   Variables.df
    
    Variables.periods_subset
    Variables.low_to_high

@@ -369,5 +369,68 @@ cdef class Scalars(_AbstractDatabase):
         data = {name: self._get_object(name)._as_tuple() for name in self.names}
         return pd.DataFrame.from_dict(data, orient='index', dtype="float64", columns=["value", "relax", "std"])
 
+    @property
+    def df(self) -> DataFrame:
+        r"""
+        Create a pandas DataFrame from the current Scalars database.
+        The index of the returned DataFrame is build from the Scalars names.
+
+        See Also
+        --------
+        Scalars.to_frame
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, scalars
+        >>> import pandas as pd
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+        >>> len(scalars)
+        161
+
+        >>> # Export the IODE Scalars database as a pandas DataFrame
+        >>> df = scalars.df
+        >>> len(df)
+        161
+
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['acaf1', 'acaf2', 'acaf3', ..., 'zkf1', 'zkf2', 'zkf3']
+        >>> scalars["acaf1"]                # doctest: +NORMALIZE_WHITESPACE
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> df.loc["acaf1"]                 # doctest: +NORMALIZE_WHITESPACE
+        value    0.015768
+        relax    1.000000
+        std      0.001369
+        Name: acaf1, dtype: float64
+        >>> scalars["qc0_"]                 # doctest: +NORMALIZE_WHITESPACE
+        Scalar(0.178165, 1, 0.102838)
+        >>> df.loc["qc0_"]                  # doctest: +NORMALIZE_WHITESPACE
+        value    0.178165
+        relax    1.000000
+        std      0.102838
+        Name: qc0_, dtype: float64
+
+        >>> # Export a subset of the IODE Scalars database as a pandas DataFrame
+        >>> df = scalars["a*;*_"].df
+        >>> len(df)
+        19
+
+        >>> df.index.to_list()              # doctest: +ELLIPSIS
+        ['acaf1', 'acaf2', 'acaf3', ..., 'vs1_', 'vs2_', 'vs3_']
+        >>> scalars["acaf1"]                # doctest: +NORMALIZE_WHITESPACE
+        Scalar(0.0157684, 1, 0.00136871)
+        >>> df.loc["acaf1"]                 # doctest: +NORMALIZE_WHITESPACE
+        value    0.015768
+        relax    1.000000
+        std      0.001369
+        Name: acaf1, dtype: float64
+        >>> scalars["qc0_"]                 # doctest: +NORMALIZE_WHITESPACE
+        Scalar(0.178165, 1, 0.102838)
+        >>> df.loc["qc0_"]                  # doctest: +NORMALIZE_WHITESPACE
+        value    0.178165
+        relax    1.000000
+        std      0.102838
+        Name: qc0_, dtype: float64
+        """
+        return self.to_frame()
 
 scalars: Scalars = Scalars._from_ptr()
