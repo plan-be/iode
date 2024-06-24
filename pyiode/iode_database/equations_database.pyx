@@ -490,6 +490,11 @@ cdef class Equations(_AbstractDatabase):
                 args = row._asdict()
                 # note: equation name = endogenous variable
                 endogenous = args.pop('Index')
+                if 'endogenous' in args:
+                    if args['endogenous'] != endogenous:
+                        raise ValueError(f"Mismatch between equation name '{endogenous}' and "
+                                         f"its endogenous variable name '{args['endogenous']}'")
+                    del args['endogenous']
                 sample = args.pop('sample', '')
                 if not sample:
                     from_period, to_period = '', ''
@@ -552,7 +557,6 @@ cdef class Equations(_AbstractDatabase):
                           stdev = 0.0042699},
                  date = '12-06-1998')
         >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        endogenous                                                  ACAF
         lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
         method                                                       LSQ
         sample                                             1980Y1:1996Y1
@@ -581,7 +585,6 @@ cdef class Equations(_AbstractDatabase):
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
-        endogenous                                                  YDH_
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
         sample                                             1960Y1:2015Y1
@@ -629,7 +632,6 @@ cdef class Equations(_AbstractDatabase):
                           stdev = 0.0042699},
                  date = '12-06-1998')
         >>> df.loc["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
-        endogenous                                                  ACAF
         lec            (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*...
         method                                                       LSQ
         sample                                             1980Y1:1996Y1
@@ -658,7 +660,6 @@ cdef class Equations(_AbstractDatabase):
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
-        endogenous                                                  YDH_
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
         sample                                             1960Y1:2015Y1
@@ -682,11 +683,11 @@ cdef class Equations(_AbstractDatabase):
         if pd is None:
             raise RuntimeError("pandas library not found")
         
-        dtype = {"endogenous": str, "lec": str, "method": str, "sample": str, 
-                 "comment": str, "instruments": str, "block": str}
+        dtype = {"lec": str, "method": str, "sample": str, "comment": str, "instruments": str, "block": str}
         dtype.update({test_name: float for test_name in EQ_TEST_NAMES})
         dtype.update({"date": str})
-        data = {name: self._get_object(name)._as_tuple() for name in self.names}
+        # note: [:1] to skip endogenous value which is the same as name
+        data = {name: self._get_object(name)._as_tuple()[1:] for name in self.names}
         return pd.DataFrame.from_dict(data, orient='index', columns=list(dtype.keys())).astype(dtype)
 
 
