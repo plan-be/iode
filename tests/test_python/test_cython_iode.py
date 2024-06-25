@@ -47,6 +47,9 @@ def test_cython_iode():
         if doc is not None:
             iode.__test__[f'EditAndEstimateEquations.{name_}'] = doc 
 
+    from iode.util import table2str
+    iode.__test__['table2str'] = table2str.__doc__
+
     iode.suppress_msgs()
 
     # run doctests
