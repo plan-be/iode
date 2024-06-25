@@ -14,7 +14,7 @@ from pyiode.iode_database.cpp_api_database cimport Comments as cpp_global_commen
 
 @cython.final
 cdef class Comments(_AbstractDatabase):
-    """
+    r"""
     IODE Comments database. 
 
     Attributes
@@ -37,6 +37,25 @@ cdef class Comments(_AbstractDatabase):
     >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
     >>> len(comments)
     317
+    >>> comments            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Comments
+    nb comments: 317
+    filename: ...\tests\data\fun.cmt
+    <BLANKLINE>
+     name                                                  comments
+    ACAF        Ondernemingen: ontvangen kapitaaloverdrachten.
+    ACAG        Totale overheid: netto ontvangen kapitaaloverdrachten.
+    AOUC        Kost per eenheid produkt.
+    AQC         Kost per eenheid produkt: kapitaal en arbeid.
+    BENEF       Ondernemingen: niet-uitgekeerde winsten.
+    ...         ...
+    ZF          Indexeringscoëfficiënt voor de lonen in de private sector.
+    ZJ          Indexeringscoëfficiënt voor de sociale uitkeringen, vertraagd in de periode 1984-1988, voor de
+                verrekening van de indexsprongen bij de vervangingsinkomens (1984, 1985, 1987).
+    ZKF         Bezettingsgraad van de produktiecapaciteit.
+    ZX          Saut d'index (correction en %)
+    ZZ_         Marktsector (ondernemingen en zelfstandigen): loonquote (gemiddelde 1954-94).
+    <BLANKLINE>
     """
     cdef bint ptr_owner
     cdef CKDBComments* database_ptr
@@ -271,6 +290,10 @@ cdef class Comments(_AbstractDatabase):
         'Marktsector (ondernemingen en zelfstandigen): loonquote\n(gemiddelde 1954-94).'
         """
         return self.to_series()
+
+    def _str_table(self, names: List[str]) -> str:
+        columns = {"name": names, "comments": [join_lines(self._get_object(name)) for name in names]}
+        return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "comments": JUSTIFY.LEFT})
 
 
 comments: Comments = Comments._from_ptr()

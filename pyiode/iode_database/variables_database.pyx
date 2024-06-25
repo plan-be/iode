@@ -122,7 +122,7 @@ def _ws_to_numpy_array(vars_list: List[str], nb_periods: int) -> np.ndarray:
 
 @cython.final
 cdef class Variables(_AbstractDatabase):
-    """
+    r"""
     IODE Variables database. 
 
     Attributes
@@ -150,6 +150,27 @@ cdef class Variables(_AbstractDatabase):
     >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
     >>> len(variables)
     394
+    >>> variables           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Variables
+    nb variables: 394
+    filename: ...\tests\data\fun.var
+    description: Modèle fun - Simulation 1
+    sample: 1960Y1:2015Y1
+    mode: LEVEL
+    <BLANKLINE>
+     name       1960Y1  1961Y1  1962Y1  1963Y1  1964Y1  1965Y1  ...     2009Y1  2010Y1  2011Y1  2012Y1  2013Y1  2014Y1  2015Y1
+    ACAF            na      na      na      na      na      na  ...     -37.46  -37.83  -44.54  -55.56  -68.89  -83.34  -96.41
+    ACAG            na      na      na      na      na      na  ...      27.23   28.25   29.28   30.32   31.37   32.42   33.47
+    AOUC            na    0.25    0.25    0.26    0.28    0.29  ...       1.29    1.31    1.33    1.36    1.39    1.42    1.46
+    AOUC_           na      na      na      na      na      na  ...       1.23    1.25    1.27    1.30    1.34    1.37    1.41
+    AQC           0.22    0.22    0.22    0.23    0.24    0.25  ...       1.45    1.46    1.48    1.51    1.56    1.61    1.67
+    ...            ...     ...     ...     ...     ...     ...  ...        ...     ...     ...     ...     ...     ...     ...
+    ZJ              na      na      na      na      na      na  ...       1.49    1.51    1.53    1.56    1.59    1.63    1.67
+    ZKF           0.80    0.81    0.82    0.81    0.83    0.82  ...       0.87    0.87    0.87    0.87    0.87    0.87    0.87
+    ZKFO          1.00    1.00    1.00    1.00    1.00    1.00  ...       1.02    1.02    1.02    1.02    1.02    1.02    1.02
+    ZX            0.00    0.00    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00    0.00    0.00    0.00    0.00
+    ZZF_          0.69    0.69    0.69    0.69    0.69    0.69  ...       0.69    0.69    0.69    0.69    0.69    0.69    0.69
+    <BLANKLINE>
     """
     cdef bint ptr_owner
     cdef CKDBVariables* database_ptr
@@ -1522,5 +1543,16 @@ cdef class Variables(_AbstractDatabase):
 
         self.database_ptr.trend_correction(input_file.encode(), lambda_, series.encode(), <bint>log)
 
+    def _str_header(self) -> str:
+        s = super()._str_header() 
+        s += f"sample: {self.sample}\n"
+        s += f"mode: {self.mode}\n"
+        return s
+
+    def _str_table(self, names: List[str]) -> str:
+        columns = {"name": names}
+        for t, period in enumerate(self.periods):
+            columns[period] = [self.database_ptr.get_var(<string>name.encode(), <int>t, self.mode_) for name in names]
+        return table2str(columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
 variables: Variables = Variables._from_ptr()

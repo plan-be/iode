@@ -16,7 +16,7 @@ from pyiode.iode_database.cpp_api_database cimport Tables as cpp_global_tables
 
 @cython.final
 cdef class Tables(_AbstractDatabase):
-    """
+    r"""
     IODE Tables database. 
 
     Attributes
@@ -39,6 +39,24 @@ cdef class Tables(_AbstractDatabase):
     >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
     >>> len(tables)
     46
+    >>> tables          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Tables
+    nb tables: 46
+    filename: ...\tests\data\fun.tbl
+    <BLANKLINE>
+      name                             table titles
+    ANAKNFF     Déterminants de la croissance de K
+    ANAPRIX     Analyse des prix
+    C8_1        Déterminants de l'output potentiel
+    C8_10       Coin salarial parafiscal
+    C8_11       Propension moyenne à épargner
+    ...         ...
+    UCLASS      Chômage classique
+    UY          Taux de chômage
+    XPC         Inflation: PC
+    XQBBP       Croissance
+    YDH         Tableau B-3. Revenu disponible des ménages à prix constant
+    <BLANKLINE>
     """
     cdef bint ptr_owner
     cdef CKDBTables* database_ptr
@@ -126,6 +144,11 @@ cdef class Tables(_AbstractDatabase):
                                 f"dict or Table. Got value of type {type(value).__name__} instead")
             c_table = (<Table>table).c_table
             self.database_ptr.add(<string>(key.encode()), dereference(c_table))
+
+    def _str_table(self, names: List[str]) -> str:
+        titles = [join_lines(self.database_ptr.get_title(name.encode()).decode()) for name in names]
+        columns = {"name": names, "table titles": titles}
+        return table2str(columns, max_lines=10, max_width=-1, justify_funcs={"name": JUSTIFY.LEFT, "table titles": JUSTIFY.LEFT})
 
 
 tables: Tables = Tables._from_ptr()

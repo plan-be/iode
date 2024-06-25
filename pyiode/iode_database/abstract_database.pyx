@@ -11,6 +11,8 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
+from iode.util import join_lines, table2str, JUSTIFY
+
 from cython.operator cimport dereference
 from pyiode.common cimport EnumIodeType
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
@@ -1837,3 +1839,27 @@ cdef class _AbstractDatabase:
         names = self._unfold_key(key)
         for name in names:
             self.abstract_db_ptr.remove(name.encode())
+
+    def _str_header(self) -> str:
+        type_name = self.__class__.__name__
+        s = f"Workspace: {type_name}\n"
+        s += f"nb {type_name.lower()}: {len(self)}\n"
+        s += f"filename: {self.filename}\n"
+        if self.description:
+            s += f"description: {self.description}\n"
+        return s
+    
+    def _str_table(self, names: List[str]) -> str:
+        raise NotImplementedError()
+
+    def __str__(self) -> str:
+        s = self._str_header() + '\n'
+        if len(self):
+            names = self.names
+            if len(names) >= 12:
+                names = names[:6] + names[-6:]
+            s += self._str_table(names)
+        return s
+
+    def __repr__(self) -> str:
+        return str(self)

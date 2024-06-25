@@ -186,6 +186,7 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
         KDBTables* subset(string& pattern, bool deep_copy) except +
         CTable get(string& name) except +
         CTable copy(string& name) except +
+        string get_title(string& name) except +
         int add(string name, CTable& table) except +
         int add(string name, int nb_columns) except +
         int add(string name, int nbColumns, string def_, vector[string] vars, 
