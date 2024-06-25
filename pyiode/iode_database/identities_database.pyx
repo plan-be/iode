@@ -15,7 +15,7 @@ from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_varia
 
 @cython.final
 cdef class Identities(_AbstractDatabase):
-    """
+    r"""
     IODE Identities database. 
 
     Attributes
@@ -38,6 +38,24 @@ cdef class Identities(_AbstractDatabase):
     >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
     >>> len(identities)
     48
+    >>> identities              # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Identities
+    nb identities: 48
+    filename: ...\tests\data\fun.idt
+    <BLANKLINE>
+     name                                                   identities
+    AOUC        ((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]
+    AOUC_       exp(ln(((WCF/NFYH)/QL)+PKF/(QAFF/KNFFY))*(QAFF/(QX+QAFF)+.05)[-1]+ln PM*(QM/ (QAFF+QM)-0.05)[-1])
+    FLGR        FLG/VBBP
+    GAP2        100*(QAFF_/(Q_F+Q_I))
+    GAP_        100*((QAF_/Q_F)-1)
+    ...         ...
+    XTFP        grt TFPFHP_
+    XW          0
+    Y           QBBP_P
+    YSEFPR      YSEFP/WBGP
+    YSFICR      YSFIC/(TWGP*ZJ)
+    <BLANKLINE>
     """
     cdef bint ptr_owner
     cdef CKDBIdentities* database_ptr
@@ -407,6 +425,10 @@ cdef class Identities(_AbstractDatabase):
         'grt TFPFHP_'
         """
         return self.to_series()
+
+    def _str_table(self, names: List[str]) -> str:
+        columns = {"name": names, "identities": [join_lines(self._get_object(name)) for name in names]}
+        return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "identities": JUSTIFY.LEFT})
 
 
 identities: Identities = Identities._from_ptr()

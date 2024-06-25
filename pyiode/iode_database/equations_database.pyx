@@ -20,7 +20,7 @@ EquationInput = Union[str, Dict[str, Any], Equation]
 
 @cython.final
 cdef class Equations(_AbstractDatabase):
-    """
+    r"""
     IODE Equations database. 
 
     Attributes
@@ -43,6 +43,24 @@ cdef class Equations(_AbstractDatabase):
     >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
     >>> len(equations)
     274
+    >>> equations           # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Equations
+    nb equations: 274
+    filename: ...\tests\data\fun.eqs
+    <BLANKLINE>
+     name                                                    lec                                                method      sample      block    fstat      r2adj     dw     loglik    date
+    ACAF        (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                                           LSQ  1980Y1:1996Y1    ACAF   32.2732     0.7963  2.3293  83.8075 12-06-1998
+    ACAG        ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))                         LSQ  1960Y1:2015Y1    ACAG    0.0000     0.0000  0.0000   0.0000
+    AOUC        AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                     LSQ  1960Y1:2015Y1    AOUC    0.0000     0.0000  0.0000   0.0000
+    BENEF       d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)     LSQ  1960Y1:2015Y1   BENEF    0.0000     0.0000  0.0000   0.0000
+    BQY         BQY:=(YK+YN)/PBBP                                                                                  LSQ  1960Y1:2015Y1     BQY    0.0000     0.0000  0.0000   0.0000
+    ...         ...                                                                                                ...            ...     ...       ...        ...     ...      ...        ...
+    YSSF        dln YSSF:=dln WBF_                                                                                 LSQ  1960Y1:2015Y1    YSSF    0.0000     0.0000  0.0000   0.0000
+    YSSG        YSSG := SSF+SSH-(YSSF+COTRES)                                                                      LSQ  1960Y1:2015Y1    YSSG    0.0000     0.0000  0.0000   0.0000
+    ZF          grt ZF :=grt PC+ZX-0.05*grt PME                                                                    LSQ  1960Y1:2015Y1      ZF    0.0000     0.0000  0.0000   0.0000
+    ZJ          grt ZJ :=grt PC +ZX-0.05*grt PME                                                                   LSQ  1960Y1:2015Y1      ZJ    0.0000     0.0000  0.0000   0.0000
+    ZZF_        ZZF_ := ZZF_[-1]                                                                                   LSQ  1960Y1:2015Y1    ZZF_    0.0000     0.0000  0.0000   0.0000
+    <BLANKLINE>
     """
     cdef bint ptr_owner
     cdef CKDBEquations* database_ptr
@@ -860,5 +878,17 @@ cdef class Equations(_AbstractDatabase):
         """
         return self.to_frame()      
 
+    def _str_table(self, names: List[str]) -> str:
+        data = []
+        for name in names:
+            eq = self._get_object(name)
+            tests = eq.tests
+            data += [[join_lines(eq.lec), eq.method, str(eq.sample), eq.block, tests["fstat"], 
+                     tests["r2adj"], tests["dw"], tests["loglik"], eq.date]]
+        # transpose data
+        data = [list(row) for row in zip(*data)]
+        columns = {"name": names, "lec": data[0], "method": data[1], "sample": data[2], "block": data[3], 
+                   "fstat": data[4], "r2adj": data[5], "dw": data[6], "loglik": data[7], "date": data[8]}
+        return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lec": JUSTIFY.LEFT})
 
 equations: Equations = Equations._from_ptr()

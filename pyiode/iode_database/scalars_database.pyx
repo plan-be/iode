@@ -16,7 +16,7 @@ ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, floa
 
 @cython.final
 cdef class Scalars(_AbstractDatabase):
-    """
+    r"""
     IODE Scalars database. 
 
     Attributes
@@ -39,6 +39,24 @@ cdef class Scalars(_AbstractDatabase):
     >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
     >>> len(scalars)
     161
+    >>> scalars         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    Workspace: Scalars
+    nb scalars: 161
+    filename: ...\tests\data\fun.scl
+    <BLANKLINE>
+     name        value  relax    std
+    acaf1        0.0158 1.0000  0.0014
+    acaf2       -0.0000 1.0000  0.0000
+    acaf3        2.5026 1.0000  0.8730
+    acaf4       -0.0085 1.0000  0.0021
+    dlnpaf       0.9000 1.0000      na
+    ...             ...    ...     ...
+    y6           0.0000 0.0000  0.0000
+    y7          -0.1550 1.0000  0.3239
+    zkf1         0.2011 1.0000  0.3757
+    zkf2         0.7921 1.0000  0.1812
+    zkf3        -7.2712 1.0000  2.6764
+    <BLANKLINE>
     """
     cdef bint ptr_owner
     cdef CKDBScalars* database_ptr
@@ -432,5 +450,13 @@ cdef class Scalars(_AbstractDatabase):
         Name: qc0_, dtype: float64
         """
         return self.to_frame()
+
+    def _str_table(self, names: List[str]) -> str:
+        data = [[name] + list(self._get_object(name)._as_tuple()) for name in names]
+        # transpose data
+        data = [list(row) for row in zip(*data)]
+        columns = {"name": data[0], "value": data[1], "relax": data[2], "std": data[3]}
+        return table2str(columns, max_lines=10, precision=4, justify_funcs={"name": JUSTIFY.LEFT})
+
 
 scalars: Scalars = Scalars._from_ptr()
