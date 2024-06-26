@@ -84,8 +84,12 @@ public:
     std::string get_description() const 
     { 
         KDB* kdb = get_database();
-        if(kdb != NULL && kdb->k_desc != NULL) 
-            return std::string(kdb->k_desc);
+        if(kdb != NULL && kdb->k_desc != NULL)
+        {
+            std::string desc_oem = std::string(kdb->k_desc); 
+            std::string desc = oem_to_utf8(desc_oem);
+            return desc;
+        }
         else 
             return "";
     }
@@ -104,10 +108,11 @@ public:
         if (kdb == NULL) 
             return ;
 
-        size_t size = description.size() + 1;
+        std::string desc_oem = utf8_to_oem(description);
+        size_t size = desc_oem.size() + 1;
         if(size > K_MAX_DESC) 
             size = (size_t) K_MAX_DESC;
-        strncpy(kdb->k_desc, description.c_str(), size);
+        strncpy(kdb->k_desc, desc_oem.c_str(), size);
     }
 
     int get_position(const std::string& name) const
