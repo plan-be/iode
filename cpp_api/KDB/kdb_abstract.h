@@ -69,7 +69,11 @@ public:
     {
         KDB* kdb = get_database();
         if(kdb != NULL && kdb->k_nameptr != NULL) 
-            return std::string(kdb->k_nameptr); 
+        {
+            std::string filename_oem = std::string(kdb->k_nameptr); 
+            std::string filename = oem_to_utf8(filename_oem);
+            return filename;
+        }
         else
             return "";
     }
@@ -78,7 +82,10 @@ public:
     { 
         KDB* kdb = get_database();
         if(kdb != NULL)
-            set_kdb_filename(kdb, filename); 
+        {
+            std::string filename_oem = utf8_to_oem(filename);
+            set_kdb_filename(kdb, filename_oem); 
+        }
     }
 
     std::string get_description() const 
