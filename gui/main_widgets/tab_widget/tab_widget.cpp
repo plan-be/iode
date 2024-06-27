@@ -285,7 +285,7 @@ void IodeTabWidget::resetFilter(const EnumIodeType iodeType)
 void IodeTabWidget::clearWorkspace()
 {
     foreach(AbstractIodeObjectWidget* tabWidget, tabIodeObjects) tabWidget->clearKDB();
-    for(int i=0; i < I_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
+    for(int i=0; i < IODE_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
 }
 
 QStringList IodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)

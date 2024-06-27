@@ -136,7 +136,7 @@ inline EnumIodeFile get_iode_file_type(const std::string& filepath)
 
 inline int get_iode_type(const std::string& iode_type_as_string)
 {
-    for(int i=0; i < I_NB_TYPES; i++) if(iode_type_as_string == vIodeTypes[i]) return i;
+    for(int i=0; i < IODE_NB_TYPES; i++) if(iode_type_as_string == vIodeTypes[i]) return i;
     return -1;
 }
 

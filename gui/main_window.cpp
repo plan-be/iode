@@ -703,7 +703,7 @@ void MainWindow::update_tab_and_completer(const int iodeType)
     if(iodeType > 0)
         index = tabWidget_IODE_objs->updateObjectTab((EnumIodeType) iodeType);
     else
-        for(int i = 0; i < I_NB_TYPES; i++)
+        for(int i = 0; i < IODE_NB_TYPES; i++)
             tabWidget_IODE_objs->updateObjectTab((EnumIodeType) i);
 
         // update the list of Iode object names available for autocomplete
