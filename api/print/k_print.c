@@ -9,8 +9,8 @@
  *  List of functions 
  *  -----------------
  *      int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)            Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL
- *      void T_fmt_val(char* buf, IODE_REAL val, int lg, int nd)    Formats a double value
- *      void T_print_val(IODE_REAL val)                             Prints a IODE_REAL value using W_printf()
+ *      void T_fmt_val(char* buf, double val, int lg, int nd)    Formats a double value
+ *      void T_print_val(double val)                             Prints a double value using W_printf()
  *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
@@ -66,13 +66,13 @@ int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)
  *  Formats a double value. Uses SCR_fmt_dbl(). See http://xon.be/scr4/libs1/libs1167.htm.
  *  
  *  @param [in, out]    char*       buf     placeholder of the result
- *  @param [in]         IODE_REAL   val     input real value
+ *  @param [in]         double   val     input real value
  *  @param [in]         int         lg      max result string length
  *  @param [in]         int         nd      number of decimal places 
  *  
  */
  
-void T_fmt_val(char* buf, IODE_REAL val, int lg, int nd) 
+void T_fmt_val(char* buf, double val, int lg, int nd) 
 {
     if(L_ISAN(val)) SCR_fmt_dbl(val, buf, lg, nd);
     else strcpy(buf, "-.-");
@@ -81,14 +81,14 @@ void T_fmt_val(char* buf, IODE_REAL val, int lg, int nd)
 
 
 /**
- *  Prints a IODE_REAL value using W_printf().
+ *  Prints a double value using W_printf().
  *  
- *  @param  [in] IODE_REAL  val      value to print
+ *  @param  [in] double  val      value to print
  *  @global [in] int        K_NBDEC  number of decimal places
  *  
  */
  
-void T_print_val(IODE_REAL val)
+void T_print_val(double val)
 {
     char    buf[64];
 

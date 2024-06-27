@@ -20,11 +20,11 @@ namespace nb = nanobind;
  * see https://nanobind.readthedocs.io/en/latest/ndarray.html for documentation
  */
 
-using numpy_var = nb::ndarray<nb::numpy, IODE_REAL, nb::ndim<1>>;
-using numpy_var_contiguous = nb::ndarray<nb::numpy, IODE_REAL, nb::c_contig, nb::ndim<1>>;
+using numpy_var = nb::ndarray<nb::numpy, double, nb::ndim<1>>;
+using numpy_var_contiguous = nb::ndarray<nb::numpy, double, nb::c_contig, nb::ndim<1>>;
 
-using numpy_vars = nb::ndarray<nb::numpy, IODE_REAL, nb::ndim<2>>;
-using numpy_vars_contiguous = nb::ndarray<nb::numpy, IODE_REAL, nb::c_contig, nb::ndim<2>>;
+using numpy_vars = nb::ndarray<nb::numpy, double, nb::ndim<2>>;
+using numpy_vars_contiguous = nb::ndarray<nb::numpy, double, nb::c_contig, nb::ndim<2>>;
 
 struct VarInput
 {
@@ -59,7 +59,7 @@ inline numpy_var get_var_as_ndarray(const std::string& name)
     if(nb_obs == 0)
         return numpy_var(NULL, { 0 });
 
-    IODE_REAL* var_ptr = Variables.get_var_ptr(name);
+    double* var_ptr = Variables.get_var_ptr(name);
     return numpy_var(var_ptr, { nb_obs });
 }
 
@@ -83,7 +83,7 @@ inline void __set_var_from_ndarray(const std::string& name, const std::string& f
     if(!Variables.contains(name))
     {
         Variable variable(nb_periods_ws, L_NAN);
-        IODE_REAL* var_data_ptr = variable.data();
+        double* var_data_ptr = variable.data();
     
         // fill leading values with IODE NaN
         for(int j=0; j < vi.t_start; j++)
@@ -130,20 +130,20 @@ inline void __set_var_from_ndarray_contiguous(const std::string& name, const std
     Sample sample = Variables.get_sample();
     int nb_periods_ws = sample.nb_periods();
 
-    IODE_REAL* np_data_ptr = array.data();
+    double* np_data_ptr = array.data();
 
     // add new Variable
     if(!Variables.contains(name))
     {
         Variable variable(nb_periods_ws, L_NAN);
-        IODE_REAL* var_data_ptr = variable.data();
+        double* var_data_ptr = variable.data();
     
         // fill leading values with IODE NaN
         for(int j=0; j < vi.t_start; j++)
             var_data_ptr[j] = L_NAN;
         
         // copy values from the passed Numpy array
-        memcpy(var_data_ptr + vi.t_start, np_data_ptr, vi.nb_periods * sizeof(IODE_REAL));
+        memcpy(var_data_ptr + vi.t_start, np_data_ptr, vi.nb_periods * sizeof(double));
 
         // fill trailing values with IODE NaN
         for(int j=vi.t_end; j < nb_periods_ws; j++)
@@ -154,8 +154,8 @@ inline void __set_var_from_ndarray_contiguous(const std::string& name, const std
     // update existing Variable
     else
     {
-        IODE_REAL* var_data_ptr = Variables.get_var_ptr(name);
-        memcpy(var_data_ptr + vi.t_start, np_data_ptr, vi.nb_periods * sizeof(IODE_REAL));
+        double* var_data_ptr = Variables.get_var_ptr(name);
+        memcpy(var_data_ptr + vi.t_start, np_data_ptr, vi.nb_periods * sizeof(double));
     }
 }
 
@@ -185,7 +185,7 @@ inline void __set_vars_from_ndarray(const std::vector<std::string>& names, const
         // add new Variable
         if(!Variables.contains(name))
         {
-            IODE_REAL* var_data_ptr = variable.data();
+            double* var_data_ptr = variable.data();
             // fill leading values with IODE NaN
             for(int j=0; j < vi.t_start; j++)
                 var_data_ptr[j] = L_NAN;
@@ -234,7 +234,7 @@ inline void __set_vars_from_ndarray_contiguous(const std::vector<std::string>& n
     Variable variable(nb_periods_ws, L_NAN);
     Variable values(vi.nb_periods, L_NAN);
     
-    IODE_REAL* np_data_ptr = array.data();
+    double* np_data_ptr = array.data();
     for(int i=0; i < nb_names; i++)
     {
         name = names[i];
@@ -242,13 +242,13 @@ inline void __set_vars_from_ndarray_contiguous(const std::vector<std::string>& n
         // add new Variable
         if(!Variables.contains(name))
         {
-            IODE_REAL* var_data_ptr = variable.data();
+            double* var_data_ptr = variable.data();
             // fill leading values with IODE NaN
             for(int j=0; j < vi.t_start; j++)
                 var_data_ptr[j] = L_NAN;
             
             // copy values from the passed Numpy array
-            memcpy(var_data_ptr + vi.t_start, np_data_ptr + (i * vi.nb_periods), vi.nb_periods * sizeof(IODE_REAL));
+            memcpy(var_data_ptr + vi.t_start, np_data_ptr + (i * vi.nb_periods), vi.nb_periods * sizeof(double));
 
             // fill trailing values with IODE NaN
             for(int j=vi.t_end; j < nb_periods_ws; j++)
@@ -259,8 +259,8 @@ inline void __set_vars_from_ndarray_contiguous(const std::vector<std::string>& n
         // update existing Variable
         else
         {
-            IODE_REAL* var_data_ptr = Variables.get_var_ptr(name);
-            memcpy(var_data_ptr + vi.t_start, np_data_ptr + (i * vi.nb_periods), vi.nb_periods * sizeof(IODE_REAL));
+            double* var_data_ptr = Variables.get_var_ptr(name);
+            memcpy(var_data_ptr + vi.t_start, np_data_ptr + (i * vi.nb_periods), vi.nb_periods * sizeof(double));
         }
     }
 }

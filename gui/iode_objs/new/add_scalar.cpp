@@ -29,8 +29,8 @@ void AddScalarDialog::add()
 	try
 	{
 		std::string name = lineName->extractAndVerify().toStdString();
-		IODE_REAL value = (IODE_REAL) lineValue->extractAndVerify().toDouble();
-		IODE_REAL relax = (IODE_REAL) spinBoxRelax->extractAndVerify();
+		double value = (double) lineValue->extractAndVerify().toDouble();
+		double relax = (double) spinBoxRelax->extractAndVerify();
 		// check if already exists in the global IODE database since the variable 'database' may represents only a subset
 		if(Scalars.contains(name))
 		{

@@ -25,7 +25,7 @@
  *      int K_lpack(char** pack, char* a1)                  Packs an IODE LST object 
  *      int K_spack(char **pack, char *a1)                  Packs an IODE SCL object 
  *      int K_tpack(char** pack, char* a1)                  Packs an IODE TBL object 
- *      int K_vpack(char **pack, IODE_REAL *a1, int *a2)    Packs an IODE VAR object. 
+ *      int K_vpack(char **pack, double *a1, int *a2)    Packs an IODE VAR object. 
  *      int K_opack(char** pack, char* a1, int* a2)         Reserved for future new objects
  * 
  * Unpacking functions
@@ -54,24 +54,24 @@
  * If a1 is defined, packs a1.
  * 
  * @param [out] pack    (char **)       placeholder for the pointer to the packed object 
- * @param [in]  a1      (IODE_REAL*)    pointer to the first VAR element 
+ * @param [in]  a1      (double*)    pointer to the first VAR element 
  * @param [in]  a2      (int *)         pointer to the number of elements in the VAR
  * 
  * @return int -1 if the variable is empty, 0 if ok
 */
-int K_vpack(char **pack, IODE_REAL *a1, int *a2)
+int K_vpack(char **pack, double *a1, int *a2)
 {
     int     i;
-    IODE_REAL* ptr;
+    double* ptr;
 
     if(*a2 == 0) return(-1);
     *pack = P_create();
     if(a1 == NULL) {
-        *pack = P_add(*pack, NULL, sizeof(IODE_REAL) * *a2);
-        ptr = (IODE_REAL*)P_get_ptr(*pack, 0);
+        *pack = P_add(*pack, NULL, sizeof(double) * *a2);
+        ptr = (double*)P_get_ptr(*pack, 0);
         for(i = 0; i < *a2; i++) ptr[i] = L_NAN;
     }
-    else *pack = P_add(*pack, (char*)a1, sizeof(IODE_REAL) * *a2);
+    else *pack = P_add(*pack, (char*)a1, sizeof(double) * *a2);
     return(0);
 }
 

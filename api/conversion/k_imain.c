@@ -66,7 +66,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
     int     i, nb, size, pos, shift = 0, cmpt = 0;
     char    iname[256];
     ONAME   oname;
-    IODE_REAL    *vector = NULL, value;
+    double    *vector = NULL, value;
     YYFILE  *yy;
 
     if(smpl == NULL || IMP_readrule(rulefile) < 0) return(kdb);
@@ -93,7 +93,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
     nb = smpl->s_nb;
 
     if(impdef->imp_vec_fn != NULL) {
-        vector = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
+        vector = (double *) SW_nalloc(nb * sizeof(double));
         if(vector == NULL) goto err;
 
         while(1) {

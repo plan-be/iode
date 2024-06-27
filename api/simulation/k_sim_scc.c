@@ -22,7 +22,7 @@
 extern KDB          *KSIM_DBV,      // See k_sim_main.c
                     *KSIM_DBS,      // 
                     *KSIM_DBE;      // 
-extern IODE_REAL    *KSIM_XK,       // 
+extern double    *KSIM_XK,       // 
                     *KSIM_XK1;      // 
 
 extern int          *KSIM_ORDER;    // position in dbe of the equations (to simulate) in the execution order
@@ -132,7 +132,7 @@ static int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (IODE_REAL *) SCR_malloc(sizeof(IODE_REAL) * KSMPL(dbv)->s_nb);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->s_nb);
     KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->s_nb);
     KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->s_nb);
 
@@ -154,8 +154,8 @@ static int K_simul_SCC_init(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl)
         }
     }
 
-    KSIM_XK  = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * KSIM_INTER);
-    KSIM_XK1 = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * KSIM_INTER);
+    KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
+    KSIM_XK1 = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
     return(0);
 
 fin:

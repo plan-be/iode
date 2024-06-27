@@ -284,7 +284,7 @@ Main functions for model simulations.
 |:---|:---|
 |`int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
 |`void K_simul_free()`|Frees all temporary allocated memory for the simulation.|
-|`IODE_REAL K_calc_clec(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
+|`double K_calc_clec(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
 #### k\_sim\_order.c {#T12}
 

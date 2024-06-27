@@ -16,9 +16,9 @@ protected:
 
 TEST_F(ScalarTest, Equivalence_C_CPP)
 {
-    IODE_REAL val = 1.25;
-    IODE_REAL relax = 0.9;
-    IODE_REAL std = 6.5;
+    double val = 1.25;
+    double relax = 0.9;
+    double std = 6.5;
     char* name = "cpp_scalar";
 
     // test if a Scalar object can be added to the Scalars KDB via K_add()

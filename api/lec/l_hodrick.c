@@ -6,8 +6,8 @@
  *  List of functions
  *  -----------------
  * 
- *      int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std)     Hodrick-Prescott filter. 
- *      void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim)           Prepares HP_calc()
+ *      int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)     Hodrick-Prescott filter. 
+ *      void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)           Prepares HP_calc()
  */
 
 #include "iode.h"
@@ -17,18 +17,18 @@
  *  The filtering of f_vec is stored in t_vec.
  *  The number of elements in f_vec must be >= 4.
  *  
- *  @param [in]  IODE_REAL*  f_vec  input series
- *  @param [out] IODE_REAL*  t_vec  resulting series, L_NAN if nb < 4
+ *  @param [in]  double*  f_vec  input series
+ *  @param [out] double*  t_vec  resulting series, L_NAN if nb < 4
  *  @param [in]  int         nb      number of input data (size of f_vec)
- *  @param [in]  IODE_REAL   lambda  weight (?)
+ *  @param [in]  double   lambda  weight (?)
  *  @param [in]  int         std     1 if estimated in level, 0 for log estimation
  *  @return      int                 0 on success, -1 on error                         
  *  **TODO: add info on error
  */
-int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std)
+int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)
 {
 
-    static  IODE_REAL y1[3] = {1.0, -2.0, 1.0},
+    static  double y1[3] = {1.0, -2.0, 1.0},
                       y2[4] = {-2.0, 5.0, -4.0, 1.0},
                       yn[5] = {1.0, -4.0, 6.0, -4.0, 1.0};
     int     i, j;
@@ -112,15 +112,15 @@ err:
  *  Puts NaN in t_vec before *beg and after *beg + *dim. 
  *  !Does NOT copy f_vec values in t_vec!
  *  
- *  @param [in]  IODE_REAL* f_vec   input data
- *  @param [out] IODE_REAL* t_vec   output data
+ *  @param [in]  double* f_vec   input data
+ *  @param [out] double* t_vec   output data
  *  @param [in]  int        nb      size of f_vec
  *  @param [out] int*       beg     first non NaN position in f_vec
  *  @param [out] int*       dim     number of non NaN consecutive values in f_vec
  *  @return      void           
  *  
  */
-void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim)
+void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)
 {
     int     i;
 

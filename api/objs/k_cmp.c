@@ -128,17 +128,17 @@ double K_CMP_EPS = 1e-7;
 
 
 /**
- *  Compares 2 IODE_REAL values. 
+ *  Compares 2 double values. 
  *  
  *  The values are considered equal if their relative difference is less than K_CMP_EPS.
  *  
- *  @param [in] v1      IODE_REAL   first value
- *  @param [in] v2      IODE_REAL   second value
+ *  @param [in] v1      double   first value
+ *  @param [in] v2      double   second value
  *  @return             int         0 if |(v1 - v2)/v1| < K_CMP_EPS, 1 otherwise.
  *  
  */
 
-static int K_cmpvar_1(IODE_REAL v1, IODE_REAL v2)
+static int K_cmpvar_1(double v1, double v2)
 {
     double  diff;
     if(v1 == v2) return(0);
@@ -157,8 +157,8 @@ static int K_cmpvar_1(IODE_REAL v1, IODE_REAL v2)
  *  
  *  See also K_cmpvar_1().
  *  
- *  @param [in] p1      char*   pointer to the first variable (will be cast to IODE_REAL).
- *  @param [in] p2      char*   pointer to the second variable (will be cast to IODE_REAL).
+ *  @param [in] p1      char*   pointer to the first variable (will be cast to double).
+ *  @param [in] p2      char*   pointer to the second variable (will be cast to double).
  *  @param [in] name    char*   unused. Present to ensure the same function signature as K_cmpeqs()... See K_cmpobjs[].
  *  @return             int     0 if the 2 variables are equal, 1 otherwise.
  *  
@@ -166,7 +166,7 @@ static int K_cmpvar_1(IODE_REAL v1, IODE_REAL v2)
 
 static int K_cmpvar(char* p1, char* p2, char* name)
 {
-    IODE_REAL *r1, *r2;
+    double *r1, *r2;
     int     i, nb = KSMPL(KV_WS)->s_nb;
 
 

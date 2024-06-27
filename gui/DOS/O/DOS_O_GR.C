@@ -29,13 +29,13 @@ int     view, res;
 {
     char    buf[256], lhs[80], rhs[80];
     int     i, t, nt, ng;
-    IODE_REAL    *y;
+    double    *y;
     extern char *KLG_OBS[], *KLG_CALC[], *KLG_RES[];
 
     ng = M_NL(mlhs);
     nt = M_NC(mlhs);
 
-    y = (IODE_REAL *)SW_nalloc(sizeof(IODE_REAL) * nt);
+    y = (double *)SW_nalloc(sizeof(double) * nt);
 
     for(i = 0; i < ng && res == 0; i ++) {
         if(view) W_InitDisplay();
@@ -114,7 +114,7 @@ char    *names;
 {
     char    *buf, **vars;
     int     i, t, ng, var_nb, rc = 0;
-    IODE_REAL    *y;
+    double    *y;
     extern char *KLG_MODES[][3];        /* JMP38 01-10-92 */
 
     vars = (char **)SCR_vtoms(names, "+-");
@@ -124,7 +124,7 @@ char    *names;
         return(-1);
     }
 
-    y = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * nt);
+    y = (double *) SW_nalloc(sizeof(double) * nt);
 
     T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
@@ -142,7 +142,7 @@ char    *names;
         }
 
         for(t = 0; t < nt; t++)
-            y[t] = (IODE_REAL ) KV_get(kdb, var_nb, dt + t, (int)global_VM);
+            y[t] = (double ) KV_get(kdb, var_nb, dt + t, (int)global_VM);
         T_GraphLegend(0, "LLBL"[type], vars[i], NULL);
         /*        T_GraphLegend(0, "LBLL"[type], vars[i], NULL); */
         T_GraphTimeData(smpl, y);

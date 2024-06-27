@@ -12,8 +12,8 @@
  *    char* K_optr0(KDB *kdb, char* name)              ~ kdb[name][0]
  *    char *K_oval1(KDB* kdb, int pos)                 ~ kdb[pos][1]
  *    char* K_optr1(KDB *kdb, char* name)              ~ kdb[name][1]
- *    IODE_REAL *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
- *    IODE_REAL *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
+ *    double *K_vval(KDB* kdb, int pos, int t)      ~ kdb[pos][t]
+ *    double *K_vptr(KDB* kdb, char* name, int t)   ~ kdb[name][t]
  *    EQ* K_eptr(KDB* kdb, char* name)                 ~ kdb[name]
  *    TBL* K_tptr(KDB* kdb, char* name)                ~ kdb[name] 
  *  
@@ -147,12 +147,12 @@ char* K_optr1(KDB *kdb, char* name)
  *  @param [in] kdb     KDB*         KDB of any type
  *  @param [in] pos     int          object position in kdb
  *  @param [in] t       int          shift in the variable
- *  @return             IODE_REAL*   pointer to "kdb[pos][t]"
+ *  @return             double*   pointer to "kdb[pos][t]"
  *  
  */
-IODE_REAL *K_vval(KDB* kdb, int pos, int t)
+double *K_vval(KDB* kdb, int pos, int t)
 {
-    return(((IODE_REAL *)K_oval(kdb, pos, 0)) + t);
+    return(((double *)K_oval(kdb, pos, 0)) + t);
 }
 
 
@@ -162,10 +162,10 @@ IODE_REAL *K_vval(KDB* kdb, int pos, int t)
  *  @param [in] kdb     KDB*         KDB of any type
  *  @param [in] name    int          object name
  *  @param [in] t       int          shift in the variable
- *  @return             IODE_REAL*   pointer to "kdb[name][t]"
+ *  @return             double*   pointer to "kdb[name][t]"
  *  
  */
-IODE_REAL *K_vptr(KDB* kdb, char* name, int t)
+double *K_vptr(KDB* kdb, char* name, int t)
 {
     int pos;
     

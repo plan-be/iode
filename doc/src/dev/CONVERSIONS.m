@@ -360,7 +360,7 @@ Functions to import variables and comments in ASCII format.
 ..tb
 | Syntax                                                                | Description    
 | ~cint IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)                            | Reads the sample (required) in an ASCII variable file.
-| ~cint IMP_vec_asc(YYFILE* yy, char* name, int dim, IODE_REAL* vector) | Reads a VAR name and values in an ASCII variable file format. 
+| ~cint IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector) | Reads a VAR name and values in an ASCII variable file format. 
 | ~cint IMP_hd_casc(IMPDEF* impdef, char* file, int lang)               | Opens an ASCII comment file for reading with the YY library functions. 
 | ~cint IMP_vec_casc(char* name, char** cmt)                            | Reads one comment on the open YY stream.
 ..te
@@ -387,7 +387,7 @@ Functions to import variables in rotated ASCII format.
 ..tb
 | Syntax                                                                   | Description    
 | ~cint IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)                              | Reads the sample (required) and the list of VARs in a rotated ASCII variable file.
-| ~cint IMP_elem_rasc(YYFILE* yy, char* name, int* shift, IODE_REAL* value)| Reads one value in an ASCII variable file format. 
+| ~cint IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value)| Reads one value in an ASCII variable file format. 
 | ~cint IMP_end_rasc()                                                     | Frees the allocated vars during the rotated ASCII file import session.
 ..te
 >
@@ -431,7 +431,7 @@ See also k_edif.c for an example of DIF format.
 | ~cint DIF_skip_to(YYFILE* yy, int skey)                              | Moves forward to the keyword skey or EOF or EOD.
 | ~cint DIF_cell(YYFILE* yy, char** str, double* value)                | Reads the next cell which can contain a real or a string.
 | ~cint IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)                           | Reads the header of a DIF file and determines the sample of the content.
-| ~cint IMP_vec_dif(YYFILE* yy, char* name, int dim, IODE_REAL* vector)| Reads a VAR name and values in a DIF file.
+| ~cint IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)| Reads a VAR name and values in a DIF file.
 | ~cint IMP_end_dif()                                                  | Cleanup the DIF global variables.
 ..te
 >

@@ -5,8 +5,8 @@
  *
  *  List of functions 
  *  -----------------
- *    int B_PrintVal(IODE_REAL val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
- *    IODE_REAL B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
+ *    int B_PrintVal(double val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
+ *    double B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
  *    int B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
  *    int B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
  *    int B_isdef(char* txt)                                           | Checks if a string contains non space charaters.
@@ -58,7 +58,7 @@ int     B_EQS_LEC;      // Specify how to print a LEC expression
  *  @param [in] val double  value to print
  *  @return         int     0
  */
-int B_PrintVal(IODE_REAL val)
+int B_PrintVal(double val)
 {
     // B_NBDEC replaced by K_NBDEC JMP 18/04/2022
     int     nbdec = K_NBDEC;
@@ -76,7 +76,7 @@ int B_PrintVal(IODE_REAL val)
  *  @param [in] scl SCL*    given scalar 
  *  @return         double  value / stderr 
  */
-IODE_REAL B_calc_ttest(SCL* scl)
+double B_calc_ttest(SCL* scl)
 {
     if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
         return(scl->val / scl->std);
@@ -743,7 +743,7 @@ int B_PrintDefScl(KDB* kdb, int pos)
 // Print the variable kdb[pos] in a table. Sub-function of B_PrintObjDef_1().
 int B_PrintDefVar(KDB* kdb, int pos)
 {
-    IODE_REAL    *val;
+    double    *val;
     SAMPLE  *smpl;
     int     j;
 

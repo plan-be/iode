@@ -8,19 +8,19 @@ START
 
 <Version 6.64> (30/06/2022)>
     Version 6.64 (30/06/2022)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Version IODE pour python
-————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Dans le module iode de python (iode.pyd), la fonction python
 &CO
     iode.report(filename)
 &TX
 
-est corrigée. Elle se comporte comme son équivalent dans les rapport :
+est corrigï¿½e. Elle se comporte comme son ï¿½quivalent dans les rapport :
 
 &CO
     $ReportExec filename
@@ -28,26 +28,26 @@ est corrigée. Elle se comporte comme son équivalent dans les rapport :
 
 
 &TI DataListSort
-————————————————
-Cette fonction était erronée depuis la version 6.63: le tri ne se faisait pas correctement.
-Ce bug est corrigé.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Cette fonction ï¿½tait erronï¿½e depuis la version 6.63: le tri ne se faisait pas correctement.
+Ce bug est corrigï¿½.
 
-Par ailleurs, une liste définie avec des ; comme séparateur peut être réordonnancée par
-cette fonction, ce qui' n'était pas le cas auparavant.
+Par ailleurs, une liste dï¿½finie avec des ; comme sï¿½parateur peut ï¿½tre rï¿½ordonnancï¿½e par
+cette fonction, ce qui' n'ï¿½tait pas le cas auparavant.
 
 
 &TI Reports
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &IT $foreach index
-————————————
-Si un $define portant le même nom que l'index d'une boucle $foreach existant
-avant d'entrer dans une boucle, ce define n'était pas restauré à la fin de
-la boucle. Il était erronément remplacé à la fin de la boucle par la liste
-de valeurs passée comme argument.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Si un $define portant le mï¿½me nom que l'index d'une boucle $foreach existant
+avant d'entrer dans une boucle, ce define n'ï¿½tait pas restaurï¿½ ï¿½ la fin de
+la boucle. Il ï¿½tait erronï¿½ment remplacï¿½ ï¿½ la fin de la boucle par la liste
+de valeurs passï¿½e comme argument.
 
-Dorénavant, l'index d'une boucle $foreach est restauré après la boucle si il
-était défini avant l'appel.
+Dorï¿½navant, l'index d'une boucle $foreach est restaurï¿½ aprï¿½s la boucle si il
+ï¿½tait dï¿½fini avant l'appel.
 
 &EX
 
@@ -71,28 +71,28 @@ A is XYZ
 &TX
 
 &IT Oem to Ansi conversion
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Implementation of $SysAnsiToOem and $SysOemToAnsi.
 
 
 &IT Parsing of @function()
-————————————————————————————
-Les noms reconnus des @functions() peuvent dorénavant contenir des chiffres
-ou le caractère '_'.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les noms reconnus des @functions() peuvent dorï¿½navant contenir des chiffres
+ou le caractï¿½re '_'.
 
 De plus, lorsque le nom d'une @function n'est pas reconnu, le texte est
-conservé inchangé dans le résultat du rapport.
+conservï¿½ inchangï¿½ dans le rï¿½sultat du rapport.
 
 
-&IT @function() avec des paramètres entre quotes
-————————————————————————————
+&IT @function() avec des paramï¿½tres entre quotes
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Le second argument d'expressions avec 2 paramètres entre quotes comme ~c@fn("abc","def")~C
-était ignorés. Cette erreur est corrigée.
+Le second argument d'expressions avec 2 paramï¿½tres entre quotes comme ~c@fn("abc","def")~C
+ï¿½tait ignorï¿½s. Cette erreur est corrigï¿½e.
 
 
 &IT Parsing of {@function()}
-————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 As of now, when an expression between accolades contains @-functions, these
  @-functions are calculed and replaced by their value before the evaluation of {expression}.
 
@@ -104,24 +104,24 @@ As of now, when an expression between accolades contains @-functions, these
 
 
 &IT New $multiline command
-——————————————————————————
-Par défaut, une ligne de rapport peut dorénavant se prolonger sur la ligne suivante si
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Par dï¿½faut, une ligne de rapport peut dorï¿½navant se prolonger sur la ligne suivante si
 elle se termine par un espace suivi d'un backslash ~c(\)~C.
 Si c'est la cas,
-le caractère de retour à la ligne est inséré entre les lignes ~c(\n)~C.
+le caractï¿½re de retour ï¿½ la ligne est insï¿½rï¿½ entre les lignes ~c(\n)~C.
 
-Cela permet par exemple de construire dans un rapport des équations qui se décomposent
+Cela permet par exemple de construire dans un rapport des ï¿½quations qui se dï¿½composent
 sur plusieurs lignes, rendant leur lecture plus simple.
 
-Pour ne pas permettre cette extension (compatilibilié avec les versions
-antérieures) il suffit de placer la commande ~c$multiline 0~C avant les
-lignes concernées. Sans argument, le multi-lignes est accepté.
+Pour ne pas permettre cette extension (compatilibiliï¿½ avec les versions
+antï¿½rieures) il suffit de placer la commande ~c$multiline 0~C avant les
+lignes concernï¿½es. Sans argument, le multi-lignes est acceptï¿½.
 
 &CO
    $multiline [{Nn0}]
 &TX
 
-Par exemple, on peut dorénavant écrire :
+Par exemple, on peut dorï¿½navant ï¿½crire :
 
 &CO
     $multiline 1
@@ -129,9 +129,9 @@ Par exemple, on peut dorénavant écrire :
     c2 * t
 &TX
 
-La définition de l'équation A sera alors sur deux lignes.
+La dï¿½finition de l'ï¿½quation A sera alors sur deux lignes.
 
-A l'inverse, sans le multiline, une erreur est générée. Ainsi
+A l'inverse, sans le multiline, une erreur est gï¿½nï¿½rï¿½e. Ainsi
 
 &CO
     $multiline 0
@@ -139,7 +139,7 @@ A l'inverse, sans le multiline, une erreur est générée. Ainsi
     c2 * t
 &TX
 
-essaie de créer une équation terminée par ~c"+ \"~C, ce qui donne le résultat suivant :
+essaie de crï¿½er une ï¿½quation terminï¿½e par ~c"+ \"~C, ce qui donne le rï¿½sultat suivant :
 
 &CO
     essais.rep[23] - $multiline 0
@@ -149,8 +149,8 @@ essaie de créer une équation terminée par ~c"+ \"~C, ce qui donne le résultat su
 &TX
 
 &IT New $noparsing command
-——————————————————————————
-Par defaut, les textes entre backquotes (`) ne sont pas parsés dans les rapports.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Par defaut, les textes entre backquotes (`) ne sont pas parsï¿½s dans les rapports.
 La commande $noparsing permet de modifier ce comportement.
 
 &CO
@@ -172,8 +172,8 @@ conserve le texte entre backquotes et parse le reste de la ligne:
 
 
 &IT New $undef command
-——————————————————————————
-Les macros peuvent etre supprimée par la commande $undef ou $undefine.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les macros peuvent etre supprimï¿½e par la commande $undef ou $undefine.
 
 &CO
     $undef macro_name
@@ -190,61 +190,61 @@ Les macros peuvent etre supprimée par la commande $undef ou $undefine.
 &TX
 
 &IT New $shift_args command
-———————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Alias of ~c$shift~C.
 
 &IT iodecmd: $ask command
-———————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
     $ask label question
 &TX
 
-La commande $ask fonctionne dorénavant dans l'environnement iodecmd. La question est affichée
-à l'écran et une réponse est attendue: si un des caractères "OoJjYy1" est entré, la réponse
-est positive et le rapport se poursuit au label indiqué.
+La commande $ask fonctionne dorï¿½navant dans l'environnement iodecmd. La question est affichï¿½e
+ï¿½ l'ï¿½cran et une rï¿½ponse est attendue: si un des caractï¿½res "OoJjYy1" est entrï¿½, la rï¿½ponse
+est positive et le rapport se poursuit au label indiquï¿½.
 
 
-&IT Noms des fichiers ascii après lecture dans IODE
-———————————————————————————————————————————————————
+&IT Noms des fichiers ascii aprï¿½s lecture dans IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Lors de la lecture de fichiers ascii (~c"test.av"~C par exemple), le nom du fichier
-source était remplacé par ~c"ws"~C dans le WS concerné.
+source ï¿½tait remplacï¿½ par ~c"ws"~C dans le WS concernï¿½.
 Par exemple, si on lit le fichier ~c"test.av",~C le nom du WS est ~c"ws.var"~C.
 
-Dorénavant, lorsqu'un fichier ascii est lu dans IODE, par exemple ~c"test.av",~C 3 cas sont
-distingués :
+Dorï¿½navant, lorsqu'un fichier ascii est lu dans IODE, par exemple ~c"test.av",~C 3 cas sont
+distinguï¿½s :
 &EN si le fichier existe, le nom du WS conserve le nom avec l'extension ascii (ici ~c"test.av"~C)
 
-&EN si le fichier n'existe pas mais qu'un fichier avec le même nom mais avec l'extension
+&EN si le fichier n'existe pas mais qu'un fichier avec le mï¿½me nom mais avec l'extension
 normale (ici ~c".var"~C) existe, c'est ce fichier ~c"test.var"~C qui est lu et le nom
 du ws devient celui du fichier ~c".var"~C
 
-&EN si le fichier n'existe pas et qu'il n'existe pas de fichier ~c".var"~C de même nom,
+&EN si le fichier n'existe pas et qu'il n'existe pas de fichier ~c".var"~C de mï¿½me nom,
 le nom du ws (vide dans ce cas) devient ~c"ws.var"~C, comme dans les versions
-antérieures.
+antï¿½rieures.
 
 
 >
 
 <Version 6.63> (30/09/2020)>
     Version 6.63 (30/09/2020)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Authentification des logiciels
-——————————————————————————————————
-Les programmes ~ciode.exe~C, ~ciodecmd.exe~C et ~ciodecom.exe~C ont été
-adaptés afin d'éviter d'être bloqués par McAfee Active Threat Protection
-(découpe des exécutables en deux modules : programme et data).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les programmes ~ciode.exe~C, ~ciodecmd.exe~C et ~ciodecom.exe~C ont ï¿½tï¿½
+adaptï¿½s afin d'ï¿½viter d'ï¿½tre bloquï¿½s par McAfee Active Threat Protection
+(dï¿½coupe des exï¿½cutables en deux modules : programme et data).
 
-Par ailleurs les programmes sont dorénavant signés avec le certificat du BFP
-et donc authentifiés comme tels.
+Par ailleurs les programmes sont dorï¿½navant signï¿½s avec le certificat du BFP
+et donc authentifiï¿½s comme tels.
 
 
 &TI Manuel
-——————————
-La version Winhelp du manuel n'est plus distribuée car non supportée par les
-dernières versions de Windows. Seules les versions locale (HtmlHelp) et Web
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La version Winhelp du manuel n'est plus distribuï¿½e car non supportï¿½e par les
+derniï¿½res versions de Windows. Seules les versions locale (HtmlHelp) et Web
 (iode.plan.be) sont encore disponibles.
 
 
@@ -253,94 +253,94 @@ dernières versions de Windows. Seules les versions locale (HtmlHelp) et Web
 
 <Version 6.62> (29/05/2020)
     Version 6.62 (29/05/2020)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Check Version
-—————————————————
-La fonction de vérification de version (cfr iode.ini =>> ~c[General] CheckVersion~C) est
-désactivée en raison d'un problème de compatibilité avec la nouvelle version
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La fonction de vï¿½rification de version (cfr iode.ini =>> ~c[General] CheckVersion~C) est
+dï¿½sactivï¿½e en raison d'un problï¿½me de compatibilitï¿½ avec la nouvelle version
 du site iode.plan.be.
 >
 
 
 <Version 6.61> (15/05/2019)
     Version 6.61 (16/05/2019)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Hodrick-Prescott filter
-———————————————————————————
-La fonction de calcul de trend basée sur le "filtre Hodrick-Prescott"
-transforme les séries à traiter en logarithme avant d'effectuer le calcul
-d'optimisation proprement dit. Une fois calculées, les séries contenant le
-trend sont transformées à nouveau en passant à l'exponentielle.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La fonction de calcul de trend basï¿½e sur le "filtre Hodrick-Prescott"
+transforme les sï¿½ries ï¿½ traiter en logarithme avant d'effectuer le calcul
+d'optimisation proprement dit. Une fois calculï¿½es, les sï¿½ries contenant le
+trend sont transformï¿½es ï¿½ nouveau en passant ï¿½ l'exponentielle.
 
-Ceci a deux conséquences :
+Ceci a deux consï¿½quences :
 
-&EN seules les parties strictement positives des séries peuvent être traitées
-&EN une série purement linéaire, qui ne présente donc aucune déviation par
-rapport au trend, devrait être identique après filtrage. Ce n'est plus le cas
-si on lui applique une transformation du type log, même si on repasse
-ensuite à l'exponentielle.
+&EN seules les parties strictement positives des sï¿½ries peuvent ï¿½tre traitï¿½es
+&EN une sï¿½rie purement linï¿½aire, qui ne prï¿½sente donc aucune dï¿½viation par
+rapport au trend, devrait ï¿½tre identique aprï¿½s filtrage. Ce n'est plus le cas
+si on lui applique une transformation du type log, mï¿½me si on repasse
+ensuite ï¿½ l'exponentielle.
 
-Une nouvelle fonction plus standard a donc été ajoutée à IODE. Cette fonction
-est plus en ligne avec les résultats obtenus avec les logiciels standard comme stata.
+Une nouvelle fonction plus standard a donc ï¿½tï¿½ ajoutï¿½e ï¿½ IODE. Cette fonction
+est plus en ligne avec les rï¿½sultats obtenus avec les logiciels standard comme stata.
 
 
 &IT Nouvelle fonction de rapport
-————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &CO
     $WsTrendStd filename lambda series1 series1...
 &TX
 
-&IT Nouvel opérateur LEC
-————————————————————————
+&IT Nouvel opï¿½rateur LEC
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
     hpstd([[from,]to],expr)  : calcul sans passage au logarithme de ~cexpr~C
 &TX
 
-Les paramètres sont :
-&EN from : période de départ du calcul, première année par défaut
-&EN to : période de fin de calcul, dernière année par défaut
-&EN expr : expression LEC quelconque. Doit être strictement positif pour ~chp()~C
+Les paramï¿½tres sont :
+&EN from : pï¿½riode de dï¿½part du calcul, premiï¿½re annï¿½e par dï¿½faut
+&EN to : pï¿½riode de fin de calcul, derniï¿½re annï¿½e par dï¿½faut
+&EN expr : expression LEC quelconque. Doit ï¿½tre strictement positif pour ~chp()~C
 
-&IT Nouvel écran
-————————————————
-L'écran Workspace / Trend Hodrick-Prescott filter a été adapté en conséquence en proposant
+&IT Nouvel ï¿½cran
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+L'ï¿½cran Workspace / Trend Hodrick-Prescott filter a ï¿½tï¿½ adaptï¿½ en consï¿½quence en proposant
 le choix entre le passage au logarithme ou non.
 
 &TI Taux de croissance moyens
-—————————————————————————————
-Correction d'un bug qui s'est glissé dans la version 6.58 dans le calcul des
-taux de croissance moyens. Ce bug rendait en général les taux de croissance
-moyens beaucoup plus élevés que ce qu'ils devaient être.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Correction d'un bug qui s'est glissï¿½ dans la version 6.58 dans le calcul des
+taux de croissance moyens. Ce bug rendait en gï¿½nï¿½ral les taux de croissance
+moyens beaucoup plus ï¿½levï¿½s que ce qu'ils devaient ï¿½tre.
 
 >
 
 <Version 6.60> (11/04/2019)
     Version 6.60 (11/04/2019)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports : nouvelles fonctions
-——————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Des fonctions de rapport ont été ajoutées :
-&EN @mkdir : créer un répertoire
-&EN @rmdir : supprimer un répertoire
+Des fonctions de rapport ont ï¿½tï¿½ ajoutï¿½es :
+&EN @mkdir : crï¿½er un rï¿½pertoire
+&EN @rmdir : supprimer un rï¿½pertoire
 &EN @getdir : afficher le repertoire courant
-&EN @chdir : changer de répertoire courant
+&EN @chdir : changer de rï¿½pertoire courant
 &EN @void : supprimer l'output d'une fonction
 
 Par ailleurs les commandes qui changent le directory courant affichent le
-nouveau directory dans la barre de titre de la fenêtre.
+nouveau directory dans la barre de titre de la fenï¿½tre.
 
 &IT Exemple
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
   ## Utilisation des commandes de gestion de dirs
   ## --------------------------------------------
@@ -354,8 +354,8 @@ nouveau directory dans la barre de titre de la fenêtre.
   $msg Chdir       : @chdir(..)
 &TX
 
-Résultat
-————————
+Rï¿½sultat
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &CO
   Current dir : c:\usr\iode
@@ -366,8 +366,8 @@ Résultat
 
 
 &TI Correctif : save WS / CSV format
-————————————————————————————————————
-Les fichiers de variables peuvent  à nouveau être sauvés en format csv via le menu
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les fichiers de variables peuvent  ï¿½ nouveau ï¿½tre sauvï¿½s en format csv via le menu
 "Workspace / Save Workspace" ou via la commande $WsSaveVar dans un rapport.
 
 &CO
@@ -377,8 +377,8 @@ $WsSaveVar test.csv
 &TX
 
 &TI Filtre Hodrick-Prescott
-———————————————————————————
-La description de la méthode a été ajoutée au manuel de IODE dans
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La description de la mï¿½thode a ï¿½tï¿½ ajoutï¿½e au manuel de IODE dans
 la partie "Le programme IODE / Workspace / Trend Correction".
 
 
@@ -386,42 +386,42 @@ la partie "Le programme IODE / Workspace / Trend Correction".
 
 <Version 6.59> (13/03/2019)
     Version 6.59 (13/03/2019)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports : nouvelles fonctions $ModelSimulateSave*
-——————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
-Le nombre d'itérations et le seuil de convergence atteint lors de la dernière simulation
-peuvent être sauvés dans des ~uvariables~U IODE. Deux nouvelles fonctions de rapport
-ont été créées à cette fin :
+Le nombre d'itï¿½rations et le seuil de convergence atteint lors de la derniï¿½re simulation
+peuvent ï¿½tre sauvï¿½s dans des ~uvariables~U IODE. Deux nouvelles fonctions de rapport
+ont ï¿½tï¿½ crï¿½ï¿½es ï¿½ cette fin :
 
 
 &EN $ModelSimulateSaveNiters ~ivar_name~I
 &EN $ModelSimulateSaveNorms  ~ivar_name~I
 
-Pour rappel, les fonctions de rapport suivantes permettent d'obtenir les mêmes informations :
+Pour rappel, les fonctions de rapport suivantes permettent d'obtenir les mï¿½mes informations :
 
 
 &EN ~c@SimNiter(period)~C
 &EN ~c@SimNorm(period)~C
 
 &IT $ModelSimulateSaveNiters
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Cette commande permet de sauver dans une variable le nombre d'itérations
-qui ont été nécessaires pour chaque période lors de la dernière simulation.
+Cette commande permet de sauver dans une variable le nombre d'itï¿½rations
+qui ont ï¿½tï¿½ nï¿½cessaires pour chaque pï¿½riode lors de la derniï¿½re simulation.
 
-Le nom de la variable résultat est passé comme paramètre.
+Le nom de la variable rï¿½sultat est passï¿½ comme paramï¿½tre.
 
 S'il n'y a pas encore eu de simulation dans le cours de la session, la variable est
-créée avec des valeurs NA.
+crï¿½ï¿½e avec des valeurs NA.
 
-Si une simulation a déjà eu lieu, les valeurs des périodes non simulées sont fixées à 0 et
-celles des périodes simulées contiennent le nombre d'itérations nécessaires à
-la convergence pour cette période. S'il n'y a pas de convergence, la valeur est celle du
-paramètre MAXIT de la simulation.
+Si une simulation a dï¿½jï¿½ eu lieu, les valeurs des pï¿½riodes non simulï¿½es sont fixï¿½es ï¿½ 0 et
+celles des pï¿½riodes simulï¿½es contiennent le nombre d'itï¿½rations nï¿½cessaires ï¿½
+la convergence pour cette pï¿½riode. S'il n'y a pas de convergence, la valeur est celle du
+paramï¿½tre MAXIT de la simulation.
 
 
 Syntaxe :
@@ -435,19 +435,19 @@ Exemple :
 &TX
 
 &IT $ModelSimulateSaveNorms
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Cette commande permet de sauver dans une variable le seuil de convergence (la norme) atteint
-pour chaque période lors de la dernière simulation.
+pour chaque pï¿½riode lors de la derniï¿½re simulation.
 
-Le nom de la variable résultat est passé comme paramètre.
+Le nom de la variable rï¿½sultat est passï¿½ comme paramï¿½tre.
 
 S'il n'y a pas encore eu de simulation dans le cours de la session, la variable est
-créée avec des valeurs NA.
+crï¿½ï¿½e avec des valeurs NA.
 
-Si une simulation a déjà eu lieu, les valeurs des périodes non simulées sont fixées à 0 et
-celles des périodes simulées contiennent le seuil de convergence
-pour cette période.
+Si une simulation a dï¿½jï¿½ eu lieu, les valeurs des pï¿½riodes non simulï¿½es sont fixï¿½es ï¿½ 0 et
+celles des pï¿½riodes simulï¿½es contiennent le seuil de convergence
+pour cette pï¿½riode.
 
 Syntaxe :
 &CO
@@ -460,38 +460,38 @@ Exemple :
 
 
 &TI Filtre Hodrick-Prescott
-——————————————————————————
-La valeur du paramètre lambda peut dorénavant être un nombre réel. Auparavant,
-cette valeur était un nombre entier.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La valeur du paramï¿½tre lambda peut dorï¿½navant ï¿½tre un nombre rï¿½el. Auparavant,
+cette valeur ï¿½tait un nombre entier.
 
 >
 
 <Version 6.58> (20/01/2019)
     Version 6.58 (20/01/2019)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports : $DataCreateGraph
-———————————————————————————————
-Correction : l'ordre des paramètres de définition des grids est corrigé pour
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Correction : l'ordre des paramï¿½tres de dï¿½finition des grids est corrigï¿½ pour
 correspondre au manuel.
 
 
-&TI Comment exécuter un rapport IODE
-————————————————————————————————————
-Il est possible d'exécuter un rapport IODE (soit ~cmyreport.rep~C) de
-plusieurs façons. En plus de la méthode habituelle à travers l'interface de IODE,
-on peut lancer un rapport IODE de 3 façons :
+&TI Comment exï¿½cuter un rapport IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Il est possible d'exï¿½cuter un rapport IODE (soit ~cmyreport.rep~C) de
+plusieurs faï¿½ons. En plus de la mï¿½thode habituelle ï¿½ travers l'interface de IODE,
+on peut lancer un rapport IODE de 3 faï¿½ons :
 
-&EN en lançant le programme ~ciode~C suivi du nom du fichier rapport dans un "Command Prompt"
-&EN en lançant le programme ~ciodecmd~C suivi du nom du fichier rapport dans un "Command Prompt"
+&EN en lanï¿½ant le programme ~ciode~C suivi du nom du fichier rapport dans un "Command Prompt"
+&EN en lanï¿½ant le programme ~ciodecmd~C suivi du nom du fichier rapport dans un "Command Prompt"
 &EN dans l'explorateur Windows en double-cliquant sur le fichier .rep
 
 Pour illustrer cela, voici un exemple de rapport.
 
 &IT LoadWs.rep
-——————————————
-Le rapport suivant charge 5 WS en mémoire.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le rapport suivant charge 5 WS en mï¿½moire.
 
 &CO
 $define file c:\iode\example\fun
@@ -503,43 +503,43 @@ $WsLoadTbl %file%
 $WsLoadCmt %file%
 &TX
 
-&IT Exécuter un rapport dans un "Command Prompt" avec le programme ~ciode~C
-———————————————————————————————————————————————————————————————————————
+&IT Exï¿½cuter un rapport dans un "Command Prompt" avec le programme ~ciode~C
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 A partir de la version 6.58, il suffit de lancer la commande iode en lui
-passant le nom du rapport comme paramètre. Par exemple :
+passant le nom du rapport comme paramï¿½tre. Par exemple :
 
 &CO
   c:\iode>> iode LoadWs.rep
 &TX
 
-Iode est alors lancé et LoadWs.rep est exécuté ~udans l'interface de IODE~U.
-Si le rapport se termine par ~c$quitode~C, IODE est quitté à la fin du
+Iode est alors lancï¿½ et LoadWs.rep est exï¿½cutï¿½ ~udans l'interface de IODE~U.
+Si le rapport se termine par ~c$quitode~C, IODE est quittï¿½ ï¿½ la fin du
 rapport.
 
-A noter que le directory où a été installé iode doit se trouver dans le PATH pour
-que cela fonctionne. Sans cela, Windows ne pourrait savoir où trouver le
+A noter que le directory oï¿½ a ï¿½tï¿½ installï¿½ iode doit se trouver dans le PATH pour
+que cela fonctionne. Sans cela, Windows ne pourrait savoir oï¿½ trouver le
 programme...
 
 Pour changer le PATH,
 &EN 1. aller dans ~cControl Panel\All Control Panel Items\System~C
-&EN 2. sélectionnez "Advanced system Settings"
-&EN 3. sélectionnez l'onglet "Advanced"
-&EN 4. sélectionnez "Environment Variables"
+&EN 2. sï¿½lectionnez "Advanced system Settings"
+&EN 3. sï¿½lectionnez l'onglet "Advanced"
+&EN 4. sï¿½lectionnez "Environment Variables"
 &EN 5. allez aux "System variables"
 &EN 6. double-cliquez sur la variable "Path"
-&EN 7. ajoutez le directory d'installation de IODE (si cela n'a pas encore été fait)
+&EN 7. ajoutez le directory d'installation de IODE (si cela n'a pas encore ï¿½tï¿½ fait)
 &EN 8. Cliquez OK (3x) pour confirmer
 
 Le prochain lancement du "Command Prompt", la nouvelle valeur de la variable
 ~cPath~C sera connue.
 
-&IT Exécuter un rapport dans un "Command Prompt" avec le programme ~ciodecmd~C
-———————————————————————————————————————————————————————————————————————————
-Le programme iodecmd permet d'exécuter un rapport IODE sans
-interface utilisateur. Une fois le rapport terminé, iodecmd rend la main.
+&IT Exï¿½cuter un rapport dans un "Command Prompt" avec le programme ~ciodecmd~C
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le programme iodecmd permet d'exï¿½cuter un rapport IODE sans
+interface utilisateur. Une fois le rapport terminï¿½, iodecmd rend la main.
 
-Par défaut, le résultat de chaque commande est affiché à l'écran :
+Par dï¿½faut, le rï¿½sultat de chaque commande est affichï¿½ ï¿½ l'ï¿½cran :
 &CO
   c:\iode>> iodecmd LoadWs.rep
 
@@ -556,43 +556,43 @@ Loading example\fun
 &TX
 
 &IT Lancement d'un rapport dans l'explorateur Windows
-—————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Il est possible de lancer un rapport dans l'explorateur Windows en
-double-cliquant sur le fichier. Condition préalable:il faut associer les fichiers
-~c*.rep~C avec le programme IODE. Suite aux restrictions apportées par Microsoft,
+double-cliquant sur le fichier. Condition prï¿½alable:il faut associer les fichiers
+~c*.rep~C avec le programme IODE. Suite aux restrictions apportï¿½es par Microsoft,
 cette association (comme les autres) ne se fait plus automatiquement.
 
-A noter que cela ne peut fonctionner qu'à partir de la version 6.58.
+A noter que cela ne peut fonctionner qu'ï¿½ partir de la version 6.58.
 
 >
 
 <Version 6.57> (02/03/2018)
     Version 6.57 (02/03/2018)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI E-Views
-———————————
-Nouvelles directives dans les fichiers d'équations EVIEWS. Les directives
-doivent se trouver seules sur une ligne. Elles peuvent être en majuscules, minuscules ou
-un mélange des deux.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Nouvelles directives dans les fichiers d'ï¿½quations EVIEWS. Les directives
+doivent se trouver seules sur une ligne. Elles peuvent ï¿½tre en majuscules, minuscules ou
+un mï¿½lange des deux.
 
-Elles déterminent la façon dont les termes des équations ou identités EVIEWS
-du type ~cname(1)~C doivent être traduites en IODE.
+Elles dï¿½terminent la faï¿½on dont les termes des ï¿½quations ou identitï¿½s EVIEWS
+du type ~cname(1)~C doivent ï¿½tre traduites en IODE.
 
 &CO
   KEEP COEFS:
   DROP COEFS:
 &TX
 
-&EN Après KEEP COEFS:, la traduction de ~cname(1)~C ou ~cNAME(1)~C donne ~cname_1~C.
-&EN Après DROP COEFS:, la traduction de ~cname(1)~C ou ~cNAME(1)~C donne ~cname~C.
+&EN Aprï¿½s KEEP COEFS:, la traduction de ~cname(1)~C ou ~cNAME(1)~C donne ~cname_1~C.
+&EN Aprï¿½s DROP COEFS:, la traduction de ~cname(1)~C ou ~cNAME(1)~C donne ~cname~C.
 
-Au début de la lecture fichier, ~cDROP COEFS:~C est la valeur initiale.
+Au dï¿½but de la lecture fichier, ~cDROP COEFS:~C est la valeur initiale.
 
 &IT Exemple de fichier EVIEWS
-—————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &CO
 Identities:
@@ -608,8 +608,8 @@ B_QHOCADD  = (b_qh_c_1(1)  * B_CO1)  + (b_qh_c_2(1)  * B_CO2)  + (b_qh_c_7(1)  *
 B_QHOCR_NC  = b_qh_cr_14(1)  * B_CO14
 &TX
 
-&IT Résultat en IODE
-————————————————————
+&IT Rï¿½sultat en IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 B_QHOA := b_1_2*B_C0122222
 B_QHOB := b_qh_b_14_1*B_CO14
@@ -620,83 +620,83 @@ B_QHOCR_NC := b_qh_cr_14*B_CO14
 >
 <Version 6.56> (27/01/2017)
     Version 6.56 (27/01/2017)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Sauvetage des workspaces (fix)
-——————————————————————————
-Dans l'écran de sauvetage des workspaces, les ws pour lesquels aucune extension n'est
-indiquée sont à nouveau sauvés en format IODE (~c.var~C, ~c.cmt~C , ...). Dans la version
-précédente, aucun sauvetage n'était effectué.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans l'ï¿½cran de sauvetage des workspaces, les ws pour lesquels aucune extension n'est
+indiquï¿½e sont ï¿½ nouveau sauvï¿½s en format IODE (~c.var~C, ~c.cmt~C , ...). Dans la version
+prï¿½cï¿½dente, aucun sauvetage n'ï¿½tait effectuï¿½.
 
-Si une extension de format ascii est indiquée, le ws est sauvé en format ascii.
+Si une extension de format ascii est indiquï¿½e, le ws est sauvï¿½ en format ascii.
 
-Les commandes de rapport ~c$WsSave*~C opèrent de la même manière.
+Les commandes de rapport ~c$WsSave*~C opï¿½rent de la mï¿½me maniï¿½re.
 
 
-&TI Génération de fichiers csv
-——————————————————————————————
+&TI Gï¿½nï¿½ration de fichiers csv
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &IT A partir des rapports ($WsSaveCsvVar, $csvsep et $csvdec)
-—————————————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Les paramètres de ces commandes (séparateur de liste et caractère décimal)
-sont initialisés par les valeurs des "International Settings" définies dans
-Windows. De cette façon, les fichiers csv générés sont directement lisibles
-en Excel sans avoir à se préoccuper des séparateurs et autres caractères
-décimaux.
+Les paramï¿½tres de ces commandes (sï¿½parateur de liste et caractï¿½re dï¿½cimal)
+sont initialisï¿½s par les valeurs des "International Settings" dï¿½finies dans
+Windows. De cette faï¿½on, les fichiers csv gï¿½nï¿½rï¿½s sont directement lisibles
+en Excel sans avoir ï¿½ se prï¿½occuper des sï¿½parateurs et autres caractï¿½res
+dï¿½cimaux.
 
-&IT A partir de l'écran Save Workspace
-——————————————————————————————————————————————————————
-Dans l'écran "Workspace/Save Workspace",
-si l'extension du fichier est ~c.csv~C, le fichier est sauvé en format CSV.
-Les paramètres (séparateur et caractère décimal) sont fixés par les
-commandes ~c$csvsep~C et ~c$csvdec~C ou, à défaut, par les valeurs des
-locales Windows. Les fichiers peuvent donc directement être ouverts en Excel.
+&IT A partir de l'ï¿½cran Save Workspace
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans l'ï¿½cran "Workspace/Save Workspace",
+si l'extension du fichier est ~c.csv~C, le fichier est sauvï¿½ en format CSV.
+Les paramï¿½tres (sï¿½parateur et caractï¿½re dï¿½cimal) sont fixï¿½s par les
+commandes ~c$csvsep~C et ~c$csvdec~C ou, ï¿½ dï¿½faut, par les valeurs des
+locales Windows. Les fichiers peuvent donc directement ï¿½tre ouverts en Excel.
 
 &TI Copy/Paste de variables entre Excel et IODE
-———————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &NO Cette nouvelle fonction est encore en phase de test.
 
-La copie de valeurs à partir d'Excel vers l'éditeur de variables de IODE est
-amélioré à plusieurs égards :
+La copie de valeurs ï¿½ partir d'Excel vers l'ï¿½diteur de variables de IODE est
+amï¿½liorï¿½ ï¿½ plusieurs ï¿½gards :
 
-&EN les virgules décimales sont traitées correctement
-&EN les signes de devise (currency) sont ignorés dans les copies vers IODE
-&EN les cellules vides sont interprétées comme -- (na)
+&EN les virgules dï¿½cimales sont traitï¿½es correctement
+&EN les signes de devise (currency) sont ignorï¿½s dans les copies vers IODE
+&EN les cellules vides sont interprï¿½tï¿½es comme -- (na)
 
-Attention cependant à ce que le séparateur entre les valeurs doit être la
-tabulation. Les blancs sont ignorés.
+Attention cependant ï¿½ ce que le sï¿½parateur entre les valeurs doit ï¿½tre la
+tabulation. Les blancs sont ignorï¿½s.
 
 Si la copie provient
-d'un autre logiciel, il faut s'assurer que c'est bien le TAB qui sépare les
+d'un autre logiciel, il faut s'assurer que c'est bien le TAB qui sï¿½pare les
 valeurs.
 
-&NO Cette fonction utilise les "locale" de Windows pour déterminer les
-séparateur de milliers et de décimales. Comme le séparateur de milliers
-est parfois le point (1.234,5 par exemple), il faut être attentif que 1.23 est en fait
-123 car le signe des milliers est ignoré.
+&NO Cette fonction utilise les "locale" de Windows pour dï¿½terminer les
+sï¿½parateur de milliers et de dï¿½cimales. Comme le sï¿½parateur de milliers
+est parfois le point (1.234,5 par exemple), il faut ï¿½tre attentif que 1.23 est en fait
+123 car le signe des milliers est ignorï¿½.
 
 >
 
 <Version 6.55> (05/01/2017)
     Version 6.55 (05/01/2017)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Ouverture d'anciens fichiers
-————————————————————————————————
-Correction d'un bug lors de l'ouverture des fichiers de version antérieure
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Correction d'un bug lors de l'ouverture des fichiers de version antï¿½rieure
 (magic number 504d).
 
 
-&TI Interprétation des macros
-————————————————————————————
+&TI Interprï¿½tation des macros
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Lorsqu'une macro (string entre %) n'est pas trouvée, le texte de la macro
-est conservé tel quel, % inclus.
+Lorsqu'une macro (string entre %) n'est pas trouvï¿½e, le texte de la macro
+est conservï¿½ tel quel, % inclus.
 
 Pour rappel, voici un rapport qui indique comment se comportent les macros :
 
@@ -720,7 +720,7 @@ $msg %%!macro1%% %!macro1%
 $msg %%##macro1%% %##macro1%
 &TX
 
-Le résultat de ce rapport est :
+Le rï¿½sultat de ce rapport est :
 &CO
 -----------------------------------------------
 Undefined Macros - Normal, uppercase, lowercase
@@ -738,31 +738,31 @@ Macro modifications : normal, squeezed, uppercase, lowercase
 &TX
 
 &TI Orthographe
-—————————
-Correction d'une erreur d'orthographe en français dans les textes automatiques des
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Correction d'une erreur d'orthographe en franï¿½ais dans les textes automatiques des
 tableaux/graphiques.
 
 &TI iode -fontsize
-——————————————————
-Le paramètre ~c-fontsize nn~C est prioritaire sur la définition
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le paramï¿½tre ~c-fontsize nn~C est prioritaire sur la dï¿½finition
 ~c[FONT] FONTSIZE=nn~C dans le fichier ~ciode.ini~C.
 >
 
 <Version 6.54> (22/08/2016)
     Version 6.54 (22/08/2016)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Duplex and page orientation printing options
-————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Pour éviter les problèmes liés aux mises à jour des drivers des imprimantes Windows,
-les options d'impression en recto/verso et en portait/landscape ont été annulées:
-ces options ne sont plus affichées dans l'écran "Print Setup/Options/Printer" et ne
+Pour ï¿½viter les problï¿½mes liï¿½s aux mises ï¿½ jour des drivers des imprimantes Windows,
+les options d'impression en recto/verso et en portait/landscape ont ï¿½tï¿½ annulï¿½es:
+ces options ne sont plus affichï¿½es dans l'ï¿½cran "Print Setup/Options/Printer" et ne
 sont plus actives dans les commandes des rapports.
 
-Pour éviter les problèmes de compatibilités avec des rapports existants, les fonctions
+Pour ï¿½viter les problï¿½mes de compatibilitï¿½s avec des rapports existants, les fonctions
 
 &EN  $PrintOrientation
 &EN  $PrintDuplex
@@ -773,98 +773,98 @@ restent valides, mais n'ont plus d'effet sur la configuration des imprimantes.
 
 <Version 6.53> (18/07/2016)
     Version 6.53 (18/07/2016)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI E-Views to IODE
-——————————————————
-&EN L'importation des coefficients est à nouveau opérationnelle. Cette option
-avait été supprimée dans la version précédente.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN L'importation des coefficients est ï¿½ nouveau opï¿½rationnelle. Cette option
+avait ï¿½tï¿½ supprimï¿½e dans la version prï¿½cï¿½dente.
 
-&EN Les lignes commençant par ~c@INNOV~C sont ignorées.
+&EN Les lignes commenï¿½ant par ~c@INNOV~C sont ignorï¿½es.
 
-Pour rappel, la méthode d'importation fonctionne comme suit :
+Pour rappel, la mï¿½thode d'importation fonctionne comme suit :
 
 &IT Lignes "Forecasting Equation:" et "Substituted coefficients:"
-————————————————————————————————————————————————————
-Lorsqu'une ligne ~cForecasting Equation~C est rencontrée, l'équation qui la
-suit (après avoir sauté une ligne) est lue et conservée en mémoire jusqu' à la ligne
- ~cSubstituted Coefficients:~C suivante. Cette dernière est alors analysée et les
-valeurs des coefficients en sont extraites et placées dans dans scalaires
-IODE. Ces scalaires portent le nom de l'endogène de l'équation avec le
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Lorsqu'une ligne ~cForecasting Equation~C est rencontrï¿½e, l'ï¿½quation qui la
+suit (aprï¿½s avoir sautï¿½ une ligne) est lue et conservï¿½e en mï¿½moire jusqu' ï¿½ la ligne
+ ~cSubstituted Coefficients:~C suivante. Cette derniï¿½re est alors analysï¿½e et les
+valeurs des coefficients en sont extraites et placï¿½es dans dans scalaires
+IODE. Ces scalaires portent le nom de l'endogï¿½ne de l'ï¿½quation avec le
 suffixe ~c_1~C, ~c_2~C, ...
 
-L'équation initiale est transformée pour remplacer les coefficients ~cC(1)~C... par
-les noms des scalaires ~cendo_1~C, ... et elle est finalement sauvée dans IODE.
+L'ï¿½quation initiale est transformï¿½e pour remplacer les coefficients ~cC(1)~C... par
+les noms des scalaires ~cendo_1~C, ... et elle est finalement sauvï¿½e dans IODE.
 
 &IT Lignes "~cEstimation Command:~C" et "~cEstimation Equation:~C"
-—————————————————————————————————————————————————————————————————————————————
-Ces lignes sont ignorées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Ces lignes sont ignorï¿½es.
 
 
-&IT Lignes après "~cIDENTITIES:~C"
-————————————————————————————
+&IT Lignes aprï¿½s "~cIDENTITIES:~C"
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Les lignes contenant des identités sont interprétées comme équations à partir du moment où :
+Les lignes contenant des identitï¿½s sont interprï¿½tï¿½es comme ï¿½quations ï¿½ partir du moment oï¿½ :
 
-&EN soit une ligne contenant le texte ~cIdentities:~C est trouvée
-&EN soit une première identité préfixée par ~c@IDENTITY~C est trouvée
+&EN soit une ligne contenant le texte ~cIdentities:~C est trouvï¿½e
+&EN soit une premiï¿½re identitï¿½ prï¿½fixï¿½e par ~c@IDENTITY~C est trouvï¿½e
 
-A partir de ce moment toutes les lignes contenant du texte sont interprétées par
-le programme comme des équations IODE.
+A partir de ce moment toutes les lignes contenant du texte sont interprï¿½tï¿½es par
+le programme comme des ï¿½quations IODE.
 
-En cas d'erreur de syntaxe, la lecture s'arrête et un message d'erreur est produit.
+En cas d'erreur de syntaxe, la lecture s'arrï¿½te et un message d'erreur est produit.
 >
 
 <Version 6.52> (21/06/2016)
     Version 6.52 (21/06/2016)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI E-Views to IODE
-——————————————————
-La syntaxe des fichiers de transfert E-Views to Iode est légèrement modifiée pour
-permettre une plus grande souplesse : les lignes contenant des identités ne
-sont plus interprétées qu'à partir du moment où :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La syntaxe des fichiers de transfert E-Views to Iode est lï¿½gï¿½rement modifiï¿½e pour
+permettre une plus grande souplesse : les lignes contenant des identitï¿½s ne
+sont plus interprï¿½tï¿½es qu'ï¿½ partir du moment oï¿½ :
 
-&EN soit une ligne contenant le texte ~cIdentities:~C est trouvée
-&EN soit une première identité préfixée par ~c@IDENTITY~C est trouvée
+&EN soit une ligne contenant le texte ~cIdentities:~C est trouvï¿½e
+&EN soit une premiï¿½re identitï¿½ prï¿½fixï¿½e par ~c@IDENTITY~C est trouvï¿½e
 
-A partir de ce moment toutes les lignes contenant du texte sont interprétées par
-le programme comme des équations IODE.
+A partir de ce moment toutes les lignes contenant du texte sont interprï¿½tï¿½es par
+le programme comme des ï¿½quations IODE.
 
-En cas d'erreur de syntaxe, la lecture s'arrête et un message d'erreur est produit.
+En cas d'erreur de syntaxe, la lecture s'arrï¿½te et un message d'erreur est produit.
 
 
 &TI Corrections
-———————————————
-&EN la lecture et l'écriture de fichiers de profils sont corrigées
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN la lecture et l'ï¿½criture de fichiers de profils sont corrigï¿½es
 
 
 &TI IodeCom
-———————————
-La version précédente ne fonctionnait plus correctement sur certaines machines en raison
-de l'absence d'une dll dans la distribution. Ce problème est corrigé.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La version prï¿½cï¿½dente ne fonctionnait plus correctement sur certaines machines en raison
+de l'absence d'une dll dans la distribution. Ce problï¿½me est corrigï¿½.
 
 &TI IodeCmd
-———————————
-Les messages d'erreurs précis sont à présent affichés dans ~ciodecmd~C. Auparavant
-seul le message ~c"Error ... Msg##nn"~C était affiché.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les messages d'erreurs prï¿½cis sont ï¿½ prï¿½sent affichï¿½s dans ~ciodecmd~C. Auparavant
+seul le message ~c"Error ... Msg##nn"~C ï¿½tait affichï¿½.
 
 >
 
 <Version 6.51> (04/04/2016)
     Version 6.51 (04/04/2016)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Fonctions de rapport : format LArray
-————————————————————————————————————————
-De nouvelles fonctions de rapport permettant le sauvetage de séries dans le
-format csv adapté au package Python LArray ont été créées :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+De nouvelles fonctions de rapport permettant le sauvetage de sï¿½ries dans le
+format csv adaptï¿½ au package Python LArray ont ï¿½tï¿½ crï¿½ï¿½es :
 
 &EN $WsSaveCsvVar filename [from to] [vars]
 &EN $CsvSep
@@ -872,18 +872,18 @@ format csv adapté au package Python LArray ont été créées :
 &EN $CsvDigits (changer)
 
 &IT Exemple
-———————————
-Le rapport suivant fixe d'abord les paramètres :
-&EN le séparateur de cellules (défaut ,)
-&EN le nombre de chiffres significatifs (défaut 10)
-&EN le caractère décimal (défaut .)
-&EN le texte pour les valeurs NaN (défaut vide)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le rapport suivant fixe d'abord les paramï¿½tres :
+&EN le sï¿½parateur de cellules (dï¿½faut ,)
+&EN le nombre de chiffres significatifs (dï¿½faut 10)
+&EN le caractï¿½re dï¿½cimal (dï¿½faut .)
+&EN le texte pour les valeurs NaN (dï¿½faut vide)
 
-Il lance crée ensuite 4 fichiers selon des modes différents :
+Il lance crï¿½e ensuite 4 fichiers selon des modes diffï¿½rents :
 &EN toutes les variables sur ou tout le sample
-&EN toutes les variables sur la période 2003Y1 2010Y1
-&EN les variables commençant par ~cAC~C sur la période 2009Y1 2010Y1
-&EN les variables commençant par ~cAC~C ou ~cB~C sur tout le sample du WS
+&EN toutes les variables sur la pï¿½riode 2003Y1 2010Y1
+&EN les variables commenï¿½ant par ~cAC~C sur la pï¿½riode 2009Y1 2010Y1
+&EN les variables commenï¿½ant par ~cAC~C ou ~cB~C sur tout le sample du WS
 
 &CO
 $wsloadvar ..\fun\fun
@@ -902,10 +902,10 @@ $WsCsvSaveVar fun3 AC* B*
 
 &TX
 
-Les fichiers résultant de ce rapports sont :
+Les fichiers rï¿½sultant de ce rapports sont :
 
 &TI fun.csv
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
  var\time;1960;1961;1962;1963;1964;1965;1966;1967;1968;1969;1970;...
  ACAF;nan;nan;nan;nan;nan;nan;nan;nan;nan;nan;1.2130001;5.2020001;9.184;...
@@ -914,7 +914,7 @@ Les fichiers résultant de ce rapports sont :
 &TX
 
 &TI fun1.csv
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
  var\time;2003;2004;2005;2006;2007;2008;2009;2010
  ACAF;nan;nan;nan;nan;nan;nan;nan;nan
@@ -924,7 +924,7 @@ Les fichiers résultant de ce rapports sont :
 &TX
 
 &TI fun2.csv
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
  var\time;2009;2010
  ACAF;nan;nan
@@ -933,7 +933,7 @@ Les fichiers résultant de ce rapports sont :
 &TX
 
 &TI fun3.csv
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 var\time;1960;1961;1962;1963;1964;1965;1966;1967;1968;1969;1970;1971;...
 ACAF;nan;nan;nan;nan;nan;nan;nan;nan;nan;nan;1.213;5.202;9.184;8.079;...
@@ -946,45 +946,45 @@ BVY;7.2;7.1;7.1;6.6;6.8;9.4;10.3;11.3;12.4;13.3;17.2;17;19.5;19.2;22.3;...
 &TX
 
 &TI Correction DDE
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Extension des buffers pour la copie vers Excel en DDE.
 
 >
 
 <Version 6.50> (25/01/2016)
     Version 6.50 (25/01/2016)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Adaptations techniques
-————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
-&EN Planning Corner : REAL ->> IODE_REAL
+&EN Planning Corner : REAL ->> double
 &EN Compilateur BCC32 7.10 Embarcadero
 >
 
 <Version 6.49> (19/01/2016)
     Version 6.49 (19/01/2016)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI WsImportEViews
-————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Cette fonction de rapport a été étendue :
+Cette fonction de rapport a ï¿½tï¿½ ï¿½tendue :
 
 &EN Support des fonctions LOG, DLOG, EXP
 &EN Fonction ~c@TREND~C traduite en ~ct~C
-&EN La fin des lignes à partir d'une quote (caractère  ') est ignorée
-&EN Support des lignes sans préfixe @IDENTITY
+&EN La fin des lignes ï¿½ partir d'une quote (caractï¿½re  ') est ignorï¿½e
+&EN Support des lignes sans prï¿½fixe @IDENTITY
 &EN Support des coefficients VARNAME(n) ->> varname_1
-&EN Les expressions C(n) ne sont plus traitées séparément, mais comme n'importe quelle
+&EN Les expressions C(n) ne sont plus traitï¿½es sï¿½parï¿½ment, mais comme n'importe quelle
 autre expression VARNAME(n).
-&EN le séparateur entre membre de gauche et de droite de l'équation est le premier
-signe = rencontré s'il n'est pas entre parenthèses. Par exemple :
+&EN le sï¿½parateur entre membre de gauche et de droite de l'ï¿½quation est le premier
+signe = rencontrï¿½ s'il n'est pas entre parenthï¿½ses. Par exemple :
 
 &CO
   A + (TIME=2015) = X + Y
@@ -999,82 +999,82 @@ devient bien :
 
 <Version 6.48> (12/10/2015)
     Version 6.48 (12/10/2015)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Check Last Version
-————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Correctif : la vérification de la dernière version peut être supprimée via
-le fichier iode.ini (voir 6.47), paramètre ~c[General] CheckVersion=0~C.
+Correctif : la vï¿½rification de la derniï¿½re version peut ï¿½tre supprimï¿½e via
+le fichier iode.ini (voir 6.47), paramï¿½tre ~c[General] CheckVersion=0~C.
 
-Cependant, l'accès au site ~ciode.plan.be~C était quand-même effectué, même
-si ce paramètre était fixé à 0, ce qui bloquait quelques secondes le
-démarrage de IODE en cas de blocage du site.
+Cependant, l'accï¿½s au site ~ciode.plan.be~C ï¿½tait quand-mï¿½me effectuï¿½, mï¿½me
+si ce paramï¿½tre ï¿½tait fixï¿½ ï¿½ 0, ce qui bloquait quelques secondes le
+dï¿½marrage de IODE en cas de blocage du site.
 
 >
 
 <Version 6.47> (06/10/2015)
     Version 6.47 (06/10/2015)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Check Last Version
-——————————————————————
-La dernière version du logiciel se trouve sur le site ~ciode.plan.be~C. A
-chaque démarrage de IODE, la version courante est comparée avec la dernière
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La derniï¿½re version du logiciel se trouve sur le site ~ciode.plan.be~C. A
+chaque dï¿½marrage de IODE, la version courante est comparï¿½e avec la derniï¿½re
 version disponible sur le serveur. Si une nouvelle version est disponible,
-l'utilisateur est prévenu via un message et via le titre de la fenêtre.
+l'utilisateur est prï¿½venu via un message et via le titre de la fenï¿½tre.
 
-Ce check, et le message qui l'accompagne éventuellement, peuvent être supprimés via le
-paramètre ~cGeneral/CheckVersion~C du fichier ~ciode.ini~C.
+Ce check, et le message qui l'accompagne ï¿½ventuellement, peuvent ï¿½tre supprimï¿½s via le
+paramï¿½tre ~cGeneral/CheckVersion~C du fichier ~ciode.ini~C.
 
 
 
 &TI IODE.INI
-————————————
-De nouveaux paramètres sont définis :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+De nouveaux paramï¿½tres sont dï¿½finis :
 
 &CO
 [General]
 Banner=0
 CheckVersion=0
 &TX
-&EN ~cBanner~C permet de supprimer l'affichage du banner au démarrage de IODE
+&EN ~cBanner~C permet de supprimer l'affichage du banner au dï¿½marrage de IODE
 &EN ~cCheckVersion~C permet de supprimer la recherche de nouvelle version sur le
 site ~ciode.plan.be~C et dons de ne plus afficher de message si la version
-courante n'est plus la dernière.
+courante n'est plus la derniï¿½re.
 
 
 &TI Correctifs
-————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Corrections de bugs :
 &EN impression de fichiers A2M
-&EN édition de tableaux de comparaison de fichiers
+&EN ï¿½dition de tableaux de comparaison de fichiers
 &EN affichage des noms de fichiers dans des graphiques
 
 >
 
 <Version 6.46> (16/09/2015)
     Version 6.46 (16/09/2015)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Fichier iode.ini
-————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Un nouveau fichier de paramètres est ajouté à IODE : ~ciode.ini~C.
-Ce fichier est lu au démarrage de IODE.
+Un nouveau fichier de paramï¿½tres est ajoutï¿½ ï¿½ IODE : ~ciode.ini~C.
+Ce fichier est lu au dï¿½marrage de IODE.
 
 
 &IT Localisation
-————————————————
-Le fichier ~ciode.ini~C se trouve par défaut dans le
-répertoire d'installation de IODE (par défault ~cc:\iode~C). On peut
-spécifier un autre fichier en utilisant le nouveau paramètre ~c-iodeini~C au
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le fichier ~ciode.ini~C se trouve par dï¿½faut dans le
+rï¿½pertoire d'installation de IODE (par dï¿½fault ~cc:\iode~C). On peut
+spï¿½cifier un autre fichier en utilisant le nouveau paramï¿½tre ~c-iodeini~C au
 lancement de IODE.
 
 Par exemple :
@@ -1084,24 +1084,24 @@ Par exemple :
 
 
 &IT Syntaxe du fichier iode.ini
-——————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 La syntaxe du fichier est proche de celle des fichiers ~c.ini~C  :
-&EN chaque section débute par un nom entre []. Par exemple :
+&EN chaque section dï¿½bute par un nom entre []. Par exemple :
 ~c[Fonts]~C.
-&EN dans chaque section, les paramètres sont indiqués sous la forme
-~cparam=values~C ou ~cparam~C si une valeur ne doit pas être fournie.
-&EN Un ligne qui commence par un point-virgule est ignorée
+&EN dans chaque section, les paramï¿½tres sont indiquï¿½s sous la forme
+~cparam=values~C ou ~cparam~C si une valeur ne doit pas ï¿½tre fournie.
+&EN Un ligne qui commence par un point-virgule est ignorï¿½e
 
 &IT Contenu de iode.ini
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Ce fichier contient actuellement les informations suivantes, mais sera
-étendu dans le futur :
+ï¿½tendu dans le futur :
 
 Section ~c[Screen]~C
-————————————————
-&EN Nl : nombre de lignes de la fenêtre Iode (en caractères)
-&EN Nc : nombre de colonnes de la fenêtre Iode (en caractères)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN Nl : nombre de lignes de la fenï¿½tre Iode (en caractï¿½res)
+&EN Nc : nombre de colonnes de la fenï¿½tre Iode (en caractï¿½res)
 
 &CO
 [SCREEN]
@@ -1111,12 +1111,12 @@ NC=90
 
 
 Section ~c[Font]~C
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN2 ~cFontName~C : nom
 &EN2 ~cFontSize~C : taille (en points)
 &EN2 ~cFontSizeMin~C : taille minimum
 &EN2 ~cFontSizeMax~C : taille maximum
-&EN2 ~cFontSizeIncr~C : incrément en point de la taille des caractères
+&EN2 ~cFontSizeIncr~C : incrï¿½ment en point de la taille des caractï¿½res
 
 &CO
 [FONT]
@@ -1130,23 +1130,23 @@ FontSizeIncr=1
 
 
 Sections ~i[palette_name]~I
-———————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Ces sections contiennent la description RGB des couleurs utilisées dans l'écran.
-Seule la palette [Palette_Default] est utilisée par Iode. Si elle est
-présente, elle remplace les valeurs par défaut de Iode.
+Ces sections contiennent la description RGB des couleurs utilisï¿½es dans l'ï¿½cran.
+Seule la palette [Palette_Default] est utilisï¿½e par Iode. Si elle est
+prï¿½sente, elle remplace les valeurs par dï¿½faut de Iode.
 
 La logique est la suivante :
-&EN les trois premières valeurs représentent le code RGB (Red, Green, Blue)
+&EN les trois premiï¿½res valeurs reprï¿½sentent le code RGB (Red, Green, Blue)
 de la couleur de fond (background)
 
-&EN les trois dernières valeurs représentent le code RGB (Red, Green, Blue)
-du caractère (foreground).
+&EN les trois derniï¿½res valeurs reprï¿½sentent le code RGB (Red, Green, Blue)
+du caractï¿½re (foreground).
 
-Ainsi 0 0 0 représente le noir et 255 255 255 représente le blanc. Toute combinaison
-permet de créer une palette complète de couleurs.
+Ainsi 0 0 0 reprï¿½sente le noir et 255 255 255 reprï¿½sente le blanc. Toute combinaison
+permet de crï¿½er une palette complï¿½te de couleurs.
 
-Pour simplifier l'écriture, on peut utiliser les mots suivants dans le texte :
+Pour simplifier l'ï¿½criture, on peut utiliser les mots suivants dans le texte :
 &EN BLACK    ==    0,   0,   0
 &EN WHITE    ==  255, 255, 255
 &EN RED      ==  255,   0,   0
@@ -1184,10 +1184,10 @@ Chelp2      =   191, 191, 191,    127, 127, 127
 &TX
 
 &TI Correction de bugs
-—————————————————————
-&EN Fonctions corrigées :
-&EN2 ~c$DataCompare~C : les comparaisons d'équations et d'identités
-    donnaient comme différentes des équations/identités identiques.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN Fonctions corrigï¿½es :
+&EN2 ~c$DataCompare~C : les comparaisons d'ï¿½quations et d'identitï¿½s
+    donnaient comme diffï¿½rentes des ï¿½quations/identitï¿½s identiques.
 
 &EN2 ~c##FileRename, ##FileCopy, ##WsHtolLast, ##WsLtoHFlow, ##WsLtoHStock,
 ##WsSeasonAdj, ##WsTrend~C : iode pouvait stopper en raison de la longueur
@@ -1197,45 +1197,45 @@ des noms de fichiers.
 
 <Version 6.45> (07/09/2015)
     Version 6.45 (07/09/2015)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Aide en ligne
-—————————————————
-Deux formats de fichiers sont dorénavant supportés : les format ~c  .hlp~C et ~c.chm.~C
-Il s'agit du même manuel, mais chaque format offre des fonctions spécifiques
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Deux formats de fichiers sont dorï¿½navant supportï¿½s : les format ~c  .hlp~C et ~c.chm.~C
+Il s'agit du mï¿½me manuel, mais chaque format offre des fonctions spï¿½cifiques
 de recherche et d'affichage.
 
-On peut passer d'un format à un autre dans le menu ~cHelp~C.
+On peut passer d'un format ï¿½ un autre dans le menu ~cHelp~C.
 
-L'accès au site ~ciode.plan.be~C est également ajouté directement dans la menu Help.
+L'accï¿½s au site ~ciode.plan.be~C est ï¿½galement ajoutï¿½ directement dans la menu Help.
 
 &IT Fichier ~ciode.hlp~C
-————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Il s'agit de l'ancien système WinHelp de Windows. Cette formule présente
+Il s'agit de l'ancien systï¿½me WinHelp de Windows. Cette formule prï¿½sente
 l'avantage de pointer directement sur la page du manuel correspondant au
-contexte courant. Dans l'édition des rapports par exemple, en cliquant sur F10 avec
-le curseur sur un nom de fonction, on accède directement à la page désirée.
+contexte courant. Dans l'ï¿½dition des rapports par exemple, en cliquant sur F10 avec
+le curseur sur un nom de fonction, on accï¿½de directement ï¿½ la page dï¿½sirï¿½e.
 
-Contrainte : à partir de Vista, il faut avoir préalablement
-installé le logiciel WinHelp pour pouvoir exploiter ce format. Ce logiciel
+Contrainte : ï¿½ partir de Vista, il faut avoir prï¿½alablement
+installï¿½ le logiciel WinHelp pour pouvoir exploiter ce format. Ce logiciel
 est gratuit et est disponible sur le site de Microsoft.
 
 &IT Fichier ~ciode.chm~C
-————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Ce fichier est d'un format plus récent et présentent
-d'autres fonctions de recherche et d'indexation. Il est proposé par
-défaut. Ce manuel n'est cependant pas piloté par iode : une fois ouvert, l'utilisateur
-doit rechercher la page qui l'intéresse à travers l'interface du programme lui-même.
+Ce fichier est d'un format plus rï¿½cent et prï¿½sentent
+d'autres fonctions de recherche et d'indexation. Il est proposï¿½ par
+dï¿½faut. Ce manuel n'est cependant pas pilotï¿½ par iode : une fois ouvert, l'utilisateur
+doit rechercher la page qui l'intï¿½resse ï¿½ travers l'interface du programme lui-mï¿½me.
 
-Dans les deux cas, le fichier d'aide doit se trouver dans même directory que
+Dans les deux cas, le fichier d'aide doit se trouver dans mï¿½me directory que
 le programme ~ciode.exe~C.
 
 &TI Correction de bugs
-—————————————————————
-&EN Fonctions corrigées :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN Fonctions corrigï¿½es :
 &EN2 ~c$DataCompareXxx~C
 &EN2 ~c$DataDuplicate~C
 &EN2 ~c$DataListXxx~C
@@ -1244,22 +1244,22 @@ le programme ~ciode.exe~C.
 
 <Version 6.44> (10/04/2015)
     Version 6.44 (10/04/2015)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Sauvetage et relecture des WS en Ascii
-——————————————————————————————————————————
-Le sauvetage en ascii des fichiers de commentaires, d'équations, de listes
-et de tableaux prend en compte les caractères ~c"~C et ~c\~C qui peuvent être
-présents dans certains textes (titres, commentaires, ...).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le sauvetage en ascii des fichiers de commentaires, d'ï¿½quations, de listes
+et de tableaux prend en compte les caractï¿½res ~c"~C et ~c\~C qui peuvent ï¿½tre
+prï¿½sents dans certains textes (titres, commentaires, ...).
 
-Ces caractères sont précédés au moment du sauvetage par un backslash (~c\~C). Cela permet
-de relire ensuite sans problème le fichier ascii généré (~c.ac, .ae, .al, .at~C).
+Ces caractï¿½res sont prï¿½cï¿½dï¿½s au moment du sauvetage par un backslash (~c\~C). Cela permet
+de relire ensuite sans problï¿½me le fichier ascii gï¿½nï¿½rï¿½ (~c.ac, .ae, .al, .at~C).
 
-&TI Noms de WS dépassant 63 caractères
-————————————————————————————————————————————————————————————————————————
-Les noms de WS supérieurs à 63 caractères et/ou contenant des espaces sont à
-présent gérés par IODE. Cela permet de placer ses fichiers dans n'importe quel directory comme :
+&TI Noms de WS dï¿½passant 63 caractï¿½res
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les noms de WS supï¿½rieurs ï¿½ 63 caractï¿½res et/ou contenant des espaces sont ï¿½
+prï¿½sent gï¿½rï¿½s par IODE. Cela permet de placer ses fichiers dans n'importe quel directory comme :
 &CO
 ~cC:\Users\My Name\SharePoint\share sgad\cic\IODE\TresLongNomdeDirectoryPourTesterIode~C
 &TX
@@ -1267,40 +1267,40 @@ présent gérés par IODE. Cela permet de placer ses fichiers dans n'importe quel d
 Les fichiers avec des noms longs et/ou des espaces dans leur nom
 sont utilisables dans les situations suivantes :
 
-&EN Ouverture à partir de l'explorateur Windows
-&EN Lancement à partir d'un shell dos ("Command Prompt")
+&EN Ouverture ï¿½ partir de l'explorateur Windows
+&EN Lancement ï¿½ partir d'un shell dos ("Command Prompt")
 &EN Rapports : dans les fonctions ~c$WsLoad*~C, ~c$WsSave*~C, etc.
 
-&TI Caractères accentués en HTML
-————————————————————————————————
-Tous les caractères minuscules accentués sont traduits dans la forme html du type "&...;".
+&TI Caractï¿½res accentuï¿½s en HTML
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Tous les caractï¿½res minuscules accentuï¿½s sont traduits dans la forme html du type "&...;".
 
 &TI Enregistrement des touches
-——————————————————————————————
-Il est possible d'enregistrer dans un fichier les séquences de touches
-utilisées pendant une session iode. Il faut pour ce faire lancer ~ciode~C
-avec le paramètre ~c-rec~C comme ci-dessous :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Il est possible d'enregistrer dans un fichier les sï¿½quences de touches
+utilisï¿½es pendant une session iode. Il faut pour ce faire lancer ~ciode~C
+avec le paramï¿½tre ~c-rec~C comme ci-dessous :
 
 &CO
     iode -rec filename
 &TX
 
-Le fichier (ici ~cfilename~C) contiendra des séquences de touches codifiées
-selon la syntaxe décrite dans la version 6.27 de iode. Ce fichier peut être
-édité à l'aide d'un éditeur ascii.
+Le fichier (ici ~cfilename~C) contiendra des sï¿½quences de touches codifiï¿½es
+selon la syntaxe dï¿½crite dans la version 6.27 de iode. Ce fichier peut ï¿½tre
+ï¿½ditï¿½ ï¿½ l'aide d'un ï¿½diteur ascii.
 
-Ces touches peuvent ensuite être "rejouées" automatiquement. Cela permet par exemple :
-&EN de lancer des opérations répétitives sans avoir à passer par les rapports
-&EN de lancer des procédures de test unitaires
+Ces touches peuvent ensuite ï¿½tre "rejouï¿½es" automatiquement. Cela permet par exemple :
+&EN de lancer des opï¿½rations rï¿½pï¿½titives sans avoir ï¿½ passer par les rapports
+&EN de lancer des procï¿½dures de test unitaires
 
-Toutes les opérations ne sont cependant pas exploitables : les opérations
-effectuées à l'aide de la souris ne sont pas supportées. Il faut également
-être attentif au fait que la position dans un menu ou le contenu d'un écran
+Toutes les opï¿½rations ne sont cependant pas exploitables : les opï¿½rations
+effectuï¿½es ï¿½ l'aide de la souris ne sont pas supportï¿½es. Il faut ï¿½galement
+ï¿½tre attentif au fait que la position dans un menu ou le contenu d'un ï¿½cran
 de saisie peuvent changer entre deux lancements successifs de iode.
 
 &TI Correction de bugs
-—————————————————————
-Lors de l'édition des tableaux, une erreur pouvait se produire
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Lors de l'ï¿½dition des tableaux, une erreur pouvait se produire
 lors de la destruction de lignes.
 
 
@@ -1308,21 +1308,21 @@ lors de la destruction de lignes.
 
 <Version 6.43> (24/02/2014)
     Version 6.43 (24/02/2014)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI IODECMD : arguments
-———————————
-Le lancement d'un rapport à l'aide de iodecmd peut contenir les arguments du rapport :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le lancement d'un rapport ï¿½ l'aide de iodecmd peut contenir les arguments du rapport :
 &CO
   c:\>> iodecmd -y -v myrep arg1 arg2
 &TX
 
-Les paramètres du programme ~ciodecmd~C doivent se trouver avant le nom du rapport sans
-quoi ils sont considérés comme des arguments du rapport et passés comme tels au rapport.
+Les paramï¿½tres du programme ~ciodecmd~C doivent se trouver avant le nom du rapport sans
+quoi ils sont considï¿½rï¿½s comme des arguments du rapport et passï¿½s comme tels au rapport.
 
 &TI Conversion UTF8
-———————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 De nouvelles fonctions de rapport permettent de transformer des fichiers codes ANSI ou OEM
 en UTF-8 directement depuis des rapports.
 
@@ -1333,9 +1333,9 @@ en UTF-8 directement depuis des rapports.
 
 
 &TI Conversion ANSI-OEM
-———————————————————
-Les fonctions de rapport suivantes convertissent des fichiers codés ANSI en OEM
-et réciproquement.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les fonctions de rapport suivantes convertissent des fichiers codï¿½s ANSI en OEM
+et rï¿½ciproquement.
 
 &CO
     $SysAnsiToOem inputfile outputfile
@@ -1346,18 +1346,18 @@ et réciproquement.
 
 <Version 6.42> (07/10/2013)
     Version 6.42 (07/10/2013)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
-&TI Génération de tableaux HTML
-———————————————————————————————
-Lors de la génération de tableau en HTML, des classes par défaut sont utilisées pour les tags suivants :
+&TI Gï¿½nï¿½ration de tableaux HTML
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Lors de la gï¿½nï¿½ration de tableau en HTML, des classes par dï¿½faut sont utilisï¿½es pour les tags suivants :
 &EN <<TABLE>> : A2mTable
 &EN <<TR>> : A2mTR
 &EN <<TH>> : A2mTH
 &EN <<TD>> : A2mTD
 
-Ces tags peuvent être remplacés par d'autres via 4 commandes dans les rapports :
+Ces tags peuvent ï¿½tre remplacï¿½s par d'autres via 4 commandes dans les rapports :
 &CO
   $PrintHtmlTableClass [myTableClass]
   $PrintHtmlTRClass    [myTRClass]
@@ -1365,50 +1365,50 @@ Ces tags peuvent être remplacés par d'autres via 4 commandes dans les rapports :
   $PrintHtmlTDClass    [myTDClass]
 &TX
 
-Les noms de classes vides suppriment la référence à la classe dans le tag html.
+Les noms de classes vides suppriment la rï¿½fï¿½rence ï¿½ la classe dans le tag html.
 
 
 >
 
 <Version 6.41> (15/07/2013)
     Version 6.41 (15/07/2013)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
-&TI Gestion Mémoire
-———————————————————
-Amélioration  de la gestion des "swaps" pour permettre la gestion de plus
-de ~bblocs~B mémoire (>>32767).
+&TI Gestion Mï¿½moire
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Amï¿½lioration  de la gestion des "swaps" pour permettre la gestion de plus
+de ~bblocs~B mï¿½moire (>>32767).
 
 On a dans la version courante :
-&EN 262144 bytes par bloc mémoire  (ou plus pour des objects plus grands)
-&EN 65535 blocs mémoire maximum
+&EN 262144 bytes par bloc mï¿½moire  (ou plus pour des objects plus grands)
+&EN 65535 blocs mï¿½moire maximum
 >
 
 <Version 6.40> (20/02/2013)
     Version 6.40 (20/02/2013)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &IT $indent
-———————————
-Il est dorénavant possible d'indenter les commandes dans les rapports.
-La commande ~c$indent~C sans argument indique qu'à partir de ce moment, les
-commandes peuvent ne plus être collées à la marge. Avec l'argument N ou n ou
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Il est dorï¿½navant possible d'indenter les commandes dans les rapports.
+La commande ~c$indent~C sans argument indique qu'ï¿½ partir de ce moment, les
+commandes peuvent ne plus ï¿½tre collï¿½es ï¿½ la marge. Avec l'argument N ou n ou
 0, le comportement ancien reprend.
 
 
-Pour éviter les problèmes de compatibilité entre les versions de IODE, la valeur
-par défaut est de ne pas accepter les indentations.
+Pour ï¿½viter les problï¿½mes de compatibilitï¿½ entre les versions de IODE, la valeur
+par dï¿½faut est de ne pas accepter les indentations.
 
 &CO
    $indent [{Nn0}]
 &TX
 
-Par exemple, on peut écrire :
+Par exemple, on peut ï¿½crire :
 
 &CO
 $indent
@@ -1430,7 +1430,7 @@ $procend
 
 $procexec print2 A B C
 &TX
-Le résultat produit est le suivant  :
+Le rï¿½sultat produit est le suivant  :
 
 &CO
 print2 : A
@@ -1444,9 +1444,9 @@ print : 3
 &TX
 
 &IT $procdef, $procend, $procexec
-—————————————————————————————————
-Les instructions de ce groupe permettent de construire des procédures, c'est à dire des
-listes de commandes qui peuvent être réutilisées et paramétrées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les instructions de ce groupe permettent de construire des procï¿½dures, c'est ï¿½ dire des
+listes de commandes qui peuvent ï¿½tre rï¿½utilisï¿½es et paramï¿½trï¿½es.
 
 &CO
  $procdef procname [fparm1 ...]
@@ -1454,42 +1454,42 @@ listes de commandes qui peuvent être réutilisées et paramétrées.
  $procend
 &TX
 
-où
-&EN ~bprocname~B est le nom de la procédure (case sensitive).
-&EN ~bfparm1~B est le premier paramètre ~iformel~I de la procédure
+oï¿½
+&EN ~bprocname~B est le nom de la procï¿½dure (case sensitive).
+&EN ~bfparm1~B est le premier paramï¿½tre ~iformel~I de la procï¿½dure
 
-&IT Appel d'une procédure
-—————————————————————————
+&IT Appel d'une procï¿½dure
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 L'appel se fait simplement par la commande :
 
 &CO
 $procexec nom_proc aparm1 ...
 &TX
 
-où
-&EN ~bprocname~B est le nom de la procédure (case sensitive).
-&EN ~baparm1~B est le premier paramètre ~iactuel~I de la procédure
+oï¿½
+&EN ~bprocname~B est le nom de la procï¿½dure (case sensitive).
+&EN ~baparm1~B est le premier paramï¿½tre ~iactuel~I de la procï¿½dure
 
-&IT Paramètres
-——————————————
-Les paramètres formels sont traités dans la procédure comme des defines
-(locaux à la procédure) : ils doivent être appelés par ~c%fparm%~C.
+&IT Paramï¿½tres
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les paramï¿½tres formels sont traitï¿½s dans la procï¿½dure comme des defines
+(locaux ï¿½ la procï¿½dure) : ils doivent ï¿½tre appelï¿½s par ~c%fparm%~C.
 
-Leurs valeurs sont fixées comme suit :
+Leurs valeurs sont fixï¿½es comme suit :
 
-&EN S'il y a moins de paramètres actuels que de paramètres formels ou si
-leur nombre est égal, les valeurs des paramètres actuels sont assignées dans
-l'ordre aux premiers paramètres formels. Les paramètres formels
-excédentaires sont considérés comme vides.
+&EN S'il y a moins de paramï¿½tres actuels que de paramï¿½tres formels ou si
+leur nombre est ï¿½gal, les valeurs des paramï¿½tres actuels sont assignï¿½es dans
+l'ordre aux premiers paramï¿½tres formels. Les paramï¿½tres formels
+excï¿½dentaires sont considï¿½rï¿½s comme vides.
 
-&EN S'il y a plus de paramètres actuels que de paramètres formels, les
-paramètres formels, ~bsauf le dernier~B, reçoivent les valeurs de premiers
-paramètres actuels, dans l'ordre de leur passage.
-~bLe dernier paramètres formel reçoit la valeur de tous
-les paramètres actuels restants~B.
+&EN S'il y a plus de paramï¿½tres actuels que de paramï¿½tres formels, les
+paramï¿½tres formels, ~bsauf le dernier~B, reï¿½oivent les valeurs de premiers
+paramï¿½tres actuels, dans l'ordre de leur passage.
+~bLe dernier paramï¿½tres formel reï¿½oit la valeur de tous
+les paramï¿½tres actuels restants~B.
 
-Exemple avec plus de paramètres actuels de formels :
-————————————————————————————————————————————————————
+Exemple avec plus de paramï¿½tres actuels de formels :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 $indent
 $procdef print list
@@ -1500,17 +1500,17 @@ $procend
 $procexec print A B C
 &TX
 
-Résultat :
+Rï¿½sultat :
 &CO
 print : A
 print : B
 print : C
 &TX
-On constate que le paramètre formel ~clist~C reçoit toutes les valeurs
-passées à la procédure. La boucle itère donc 3 fois.
+On constate que le paramï¿½tre formel ~clist~C reï¿½oit toutes les valeurs
+passï¿½es ï¿½ la procï¿½dure. La boucle itï¿½re donc 3 fois.
 
-Exemple avec moins de paramètres actuels de formels :
-————————————————————————————————————————————————————
+Exemple avec moins de paramï¿½tres actuels de formels :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 $indent
 $procdef print titre list
@@ -1522,37 +1522,37 @@ $procend
 $procexec print "Mon Titre"
 &TX
 
-Résultat :
+Rï¿½sultat :
 &CO
 Mon Titre
 &TX
-Cette fois, le premier paramètre ~ctitre~C contient ~c"Mon Titre"~C qui est
-imprimé avant la boucle. Par contre, la boucle ne s'exécute pas car le
-paramètre ~clist~C est vide.
+Cette fois, le premier paramï¿½tre ~ctitre~C contient ~c"Mon Titre"~C qui est
+imprimï¿½ avant la boucle. Par contre, la boucle ne s'exï¿½cute pas car le
+paramï¿½tre ~clist~C est vide.
 
-&IT Portée de la définition d'une procédure
-———————————————————————————————————————————
-1. Les procédures doivent être définies avant de pouvoir être appelées.
+&IT Portï¿½e de la dï¿½finition d'une procï¿½dure
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+1. Les procï¿½dures doivent ï¿½tre dï¿½finies avant de pouvoir ï¿½tre appelï¿½es.
 
-2. Une fois définie, une procédure reste appelable au sein de la même session de IODE, même
-si le rapport qui l'a définie est terminé. On peut exécuter un rapport qui n'a
-d'autre effet que de charger des procédures en mémoire. Ces procédures resteront disponibles
+2. Une fois dï¿½finie, une procï¿½dure reste appelable au sein de la mï¿½me session de IODE, mï¿½me
+si le rapport qui l'a dï¿½finie est terminï¿½. On peut exï¿½cuter un rapport qui n'a
+d'autre effet que de charger des procï¿½dures en mï¿½moire. Ces procï¿½dures resteront disponibles
 pendant toutes la session IODE.
 
-3. Une procédure peut être remplacée par une autre du même nom à tout moment.
+3. Une procï¿½dure peut ï¿½tre remplacï¿½e par une autre du mï¿½me nom ï¿½ tout moment.
 
-&IT Portée des paramètres formels
-—————————————————————————————————
-Les paramètres formels sont traités comme des defines dont la portée est
-limitée à la procédure courante.
+&IT Portï¿½e des paramï¿½tres formels
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les paramï¿½tres formels sont traitï¿½s comme des defines dont la portï¿½e est
+limitï¿½e ï¿½ la procï¿½dure courante.
 
-Par conséquent, si un define existe ~uavant l'appelU de la procédure avec le même nom qu'un
-des paramètres, ce define ne peut être utilisé au sein de la procédure.
-Après la procédure, il reprend sa valeur antérieure.
+Par consï¿½quent, si un define existe ~uavant l'appelU de la procï¿½dure avec le mï¿½me nom qu'un
+des paramï¿½tres, ce define ne peut ï¿½tre utilisï¿½ au sein de la procï¿½dure.
+Aprï¿½s la procï¿½dure, il reprend sa valeur antï¿½rieure.
 
 Exemple :
 &CO
-$define titre Quotients de mortalité
+$define titre Quotients de mortalitï¿½
 $show Avant la proc : %titre%
 
 $procdef print titre list
@@ -1563,20 +1563,20 @@ $procdef print titre list
 $procend
 
 $procexec print "Mon Titre"
-$show Après la proc :%titre%
+$show Aprï¿½s la proc :%titre%
 &TX
 
-Résultat :
+Rï¿½sultat :
 &CO
-Avant la proc : Quotients de mortalité
+Avant la proc : Quotients de mortalitï¿½
 Pendant la proc :Mon Titre
-Après la proc :Quotients de mortalité
+Aprï¿½s la proc :Quotients de mortalitï¿½
 &TX
 
 &TI E-Views
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Dans la commande ~c$WsImportEviews~C,
-la traduction de la fonction de taux de croissance (@PCH) en grt est remplacée par 0.01 * grt.
+la traduction de la fonction de taux de croissance (@PCH) en grt est remplacï¿½e par 0.01 * grt.
 &CO
     @PCH(X)  ->> 0.01 * grt(X)
 &TX
@@ -1585,22 +1585,22 @@ la traduction de la fonction de taux de croissance (@PCH) en grt est remplacée p
 
 <Version 6.39> (13/02/2013)
     Version 6.39 (13/02/2013)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports
-————————
-Correction de bugs mineurs dans la construction de tableaux dans les rapports à l'aide
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Correction de bugs mineurs dans la construction de tableaux dans les rapports ï¿½ l'aide
 de commentaires (fonction ~c$DataUpdateTbl~C).
 >
 
 <Version 6.38> (11/02/2013)
     Version 6.38 (11/02/2013)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI IODECMD
-————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Syntaxe :
 
 &CO
@@ -1616,26 +1616,26 @@ where :
 
 
 &IT Error messages
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 The error messages are now included in iodecmd (replacing msg like "error
 ##nnn" by something more readable).
 
 
 &TI Reports
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &IT $Quit or $QuitOde
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 L'utilisation de la fonction $quit dans un rapport iode provoquait une erreur dans iodecmd.
-Cette erreur est corrigée.
+Cette erreur est corrigï¿½e.
 
 &IT $EqsEstimate
-———————————————
-Les coefficients inexistants avant l'estimation sont créés automatiquement.
-Cela évite de devoir les créer dans une commande séparée.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les coefficients inexistants avant l'estimation sont crï¿½ï¿½s automatiquement.
+Cela ï¿½vite de devoir les crï¿½er dans une commande sï¿½parï¿½e.
 
 &IT $vseps, @vtake(), @vdrop(), @vcount()
-—————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 New commands and functions that allow an easier manipulation of lists
 in the report execution process.
 
@@ -1658,27 +1658,27 @@ Exemple :
 &TX
 
 &IT Boucles :  $foreach et $next
-———————————————————
-Cette commande de rapport permet de simplifier l'écriture de
-boucles ou de boucles imbriquées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Cette commande de rapport permet de simplifier l'ï¿½criture de
+boucles ou de boucles imbriquï¿½es.
 
-La commande $foreach permet de spécifier
+La commande $foreach permet de spï¿½cifier
 un index et la liste de valeurs que cet index doit successivement prendre.
 
-La commande $next permet de revenir au point de départ de la boucle
-($foreach) et de passer à la valeur suivante de l'index.
+La commande $next permet de revenir au point de dï¿½part de la boucle
+($foreach) et de passer ï¿½ la valeur suivante de l'index.
 
 &SY2
     $foreach {index} {values}
     ...
     $next {index}
 &TX
-où
-&EN ~c{index}~C est un nom de macro de maximum 10 caractères (par exemple ~ci, idx, PAYS~C , ...)
-&EN ~c{values}~C est une liste de valeurs séparées par des virgules, blancs ou
-point-virgules. Les séparateurs peuvent être modifiés par la commande ~c$vseps~C
+oï¿½
+&EN ~c{index}~C est un nom de macro de maximum 10 caractï¿½res (par exemple ~ci, idx, PAYS~C , ...)
+&EN ~c{values}~C est une liste de valeurs sï¿½parï¿½es par des virgules, blancs ou
+point-virgules. Les sï¿½parateurs peuvent ï¿½tre modifiï¿½s par la commande ~c$vseps~C
 
-Exemple 1 : boucles imbriquées
+Exemple 1 : boucles imbriquï¿½es
 &CO
     $foreach I BE BXL VL WAL
 	$foreach J H F
@@ -1699,23 +1699,23 @@ Exemple 2 : utilisation de listes
 
 
 &IT $goto
-—————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 La fonction goto prend un ou deux arguments :
-&EN argument 1 : le label où le programme doit pointer
-&EN argument 2 (optionnel) :indique s'il faut ou non aller au label indiqué.
-Si cet argument est un nombre différent de 0, le rapport se poursuit au
-label indiqué. Sinon le rapport se poursuit à la ligne suivante.
+&EN argument 1 : le label oï¿½ le programme doit pointer
+&EN argument 2 (optionnel) :indique s'il faut ou non aller au label indiquï¿½.
+Si cet argument est un nombre diffï¿½rent de 0, le rapport se poursuit au
+label indiquï¿½. Sinon le rapport se poursuit ï¿½ la ligne suivante.
 
-Auparavant, le rapport se poursuivait au label uniquement si l'argument 2 était 1. Toutes les
-autres valeurs étaient équivalentes à 0.
+Auparavant, le rapport se poursuivait au label uniquement si l'argument 2 ï¿½tait 1. Toutes les
+autres valeurs ï¿½taient ï¿½quivalentes ï¿½ 0.
 
 &TI Execution of identities
-—————————————————————————
-Augmentation des performances pour les grands ensembles d'identités et les
-identités très longues : cpu diminué d'un facteur 20.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Augmentation des performances pour les grands ensembles d'identitï¿½s et les
+identitï¿½s trï¿½s longues : cpu diminuï¿½ d'un facteur 20.
 
 &TI Format Ascii
-————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Les valeurs suivantes sont reconnues comme na dans les fichiers ASCII :
 &CO
     .
@@ -1723,49 +1723,49 @@ Les valeurs suivantes sont reconnues comme na dans les fichiers ASCII :
     na
 &TX
 
-Attention, deux points collés sont considérés comme deux valeurs na distinctes. Ainsi,
+Attention, deux points collï¿½s sont considï¿½rï¿½s comme deux valeurs na distinctes. Ainsi,
 
 &CO
     1 ./. 2 .. 3
 &TX
-équivant à :
+ï¿½quivant ï¿½ :
 &CO
     1 na na na 2 na na 3
 &TX
 
 &TI  Estimation
-———————————————
-L'estimation d'équations dont les coefficients ont des valeurs nulles pouvait dans
-certains cas être erronnée. Les coefficients nuls sont fixés à 0.1 avant de lancer le
-processus d'estimation, ce qui pourrait dans certains cas poser problème.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+L'estimation d'ï¿½quations dont les coefficients ont des valeurs nulles pouvait dans
+certains cas ï¿½tre erronnï¿½e. Les coefficients nuls sont fixï¿½s ï¿½ 0.1 avant de lancer le
+processus d'estimation, ce qui pourrait dans certains cas poser problï¿½me.
 >
 
 <Version 6.37> (28/09/2012)
     Version 6.37 (28/09/2012)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Memory leaks
-————————————————
-Différentes corrections ont été apportées pour permettre de gagner ou de
-récupérer de l'espace mémoire.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Diffï¿½rentes corrections ont ï¿½tï¿½ apportï¿½es pour permettre de gagner ou de
+rï¿½cupï¿½rer de l'espace mï¿½moire.
 
 &EN IodeEnd() : suppression des WS
-&EN SimulateSCC() : récupération de stracpy() des noms de équations
+&EN SimulateSCC() : rï¿½cupï¿½ration de stracpy() des noms de ï¿½quations
 &EN Repeat() : free(line)
 &EN GMacro() : free(tmp)
-&EN KI_scalar_list() : déplacement dans la boucle d'un free
+&EN KI_scalar_list() : dï¿½placement dans la boucle d'un free
 &EN Remplacement de malloc, realloc et free par SCR_*().
 
 >
 
 <Version 6.36> (31/05/2012)
     Version 6.36 (31/05/2012)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Genereralized Samples
-—————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Different elements have been added to the generalized sample syntax :
 
 
@@ -1788,7 +1788,7 @@ they shift the period by the specified number of periods.
 &EN reverse increments : ~c2000:5*-n~C creates a sample in reverse order : ~c2004;2003;2002;2001;2000~C.
 
 &IT BOS, EOS, NOW, BOS1, EOS1, NOW1, SUB, PER
-———————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Assuming that ~c1990M6:2010M12~C is the current sample,
 the following samples are equivalent to each other :
 
@@ -1806,7 +1806,7 @@ The sub-period depends on the current periodicity. In the case of Weekly series,
 the current week is based on the ISO-8601 standard.
 
 &IT Shift operators <<n and >>n
-—————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 When the value of the sample is not known in advance, for example when the
 variable file is a report parameter or when a report can be used with different
 input file, it is
@@ -1849,7 +1849,7 @@ The shift operators can also be applied on expressions :
 
 &TX
 &IT Increments
-——————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 A range of periods is defined by :
 
 &EN the first period
@@ -1864,11 +1864,11 @@ to use negative increments, allowing expressions such as :
 &TX
 
 &TI E-Views to IODE
-———————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Object : extraction of equations, scalars and identities from E-Views export data.
 
 &IT Format of E-Views data
-————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &CO
 Forecasting Equation:
@@ -1904,145 +1904,145 @@ Coefficients" are extracted.
 &EN every detected coefficient is saved in the Scalars WS.
 
 &IT Fonction de rapport
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Pour exploiter ce format, il faut appeler la fonction de rapport suivante :
 &CO
     $WsImportEviews filename
 &TX
 
-où filename est le nom du fichier à importer. Les WS courants sont augmentés des équations
-et scalaires détectés.
+oï¿½ filename est le nom du fichier ï¿½ importer. Les WS courants sont augmentï¿½s des ï¿½quations
+et scalaires dï¿½tectï¿½s.
 
 
 &TI Comparaison de WS de variables
-——————————————————————————————————
-Correction d'un bug qui rendait la comparaison des séries incorrecte (les
-premières et dernières valeurs n'étaient pas comparées).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Correction d'un bug qui rendait la comparaison des sï¿½ries incorrecte (les
+premiï¿½res et derniï¿½res valeurs n'ï¿½taient pas comparï¿½es).
 
 >
 
 <Version 6.35> (28/03/2012)
     Version 6.35 (28/03/2012)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Simulation
-——————————————
-La performance des simulations, spécifiquement lors du démarrage (link, sort), a été
-largement améliorée. Pour atteindre cet objectif, le processus de simulation
-a été divisé en 2 étapes. La première ne s'occupe que du réordonnancement du
-modèle, la seconde de la simulation.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La performance des simulations, spï¿½cifiquement lors du dï¿½marrage (link, sort), a ï¿½tï¿½
+largement amï¿½liorï¿½e. Pour atteindre cet objectif, le processus de simulation
+a ï¿½tï¿½ divisï¿½ en 2 ï¿½tapes. La premiï¿½re ne s'occupe que du rï¿½ordonnancement du
+modï¿½le, la seconde de la simulation.
 
-De plus, des améliorations notables ont été apportées à plusieurs
-endroits en terme de vitesse d'exécution dans la phase de démarrage. La
-simulation démarre quasi instantanément même avec un modèle dépassant les
-100 000 équations.
+De plus, des amï¿½liorations notables ont ï¿½tï¿½ apportï¿½es ï¿½ plusieurs
+endroits en terme de vitesse d'exï¿½cution dans la phase de dï¿½marrage. La
+simulation dï¿½marre quasi instantanï¿½ment mï¿½me avec un modï¿½le dï¿½passant les
+100 000 ï¿½quations.
 
-&IT Découpe de la simulation en deux passages
-—————————————————————————————————————————————
+&IT Dï¿½coupe de la simulation en deux passages
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Deux nouvelles fonctions de rapport et les deux écrans de saisie
-correspondant ont été créés.
+Deux nouvelles fonctions de rapport et les deux ï¿½crans de saisie
+correspondant ont ï¿½tï¿½ crï¿½ï¿½s.
 
 ~uComposantes Fortement Connexes~U
-——————————————————————————————
-La première fonction permet de décomposer le modèle en composantes fortement
-connexes (CFC ou SCC pour Strongly Connex Components) et de le réordonnancer.
-Trois listes sont donc créées : équations prérécursives,
-interdépendantes et postrécursives.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La premiï¿½re fonction permet de dï¿½composer le modï¿½le en composantes fortement
+connexes (CFC ou SCC pour Strongly Connex Components) et de le rï¿½ordonnancer.
+Trois listes sont donc crï¿½ï¿½es : ï¿½quations prï¿½rï¿½cursives,
+interdï¿½pendantes et postrï¿½cursives.
 
-Lors du réordonnancement du modèle, le
-nombre d'itérations de triangulation (tri) pour le block interdépendant doit
-être spécifié. Cette valeur n'a évidemment d'effet que sur la liste des
-équations interdépendantes.
+Lors du rï¿½ordonnancement du modï¿½le, le
+nombre d'itï¿½rations de triangulation (tri) pour le block interdï¿½pendant doit
+ï¿½tre spï¿½cifiï¿½. Cette valeur n'a ï¿½videmment d'effet que sur la liste des
+ï¿½quations interdï¿½pendantes.
 
-Ces 3 listes ne doivent être contruites qu'une seule fois pour une version donnée du modèle.
+Ces 3 listes ne doivent ï¿½tre contruites qu'une seule fois pour une version donnï¿½e du modï¿½le.
 
-Cette première fonction a la syntaxe suivante :
+Cette premiï¿½re fonction a la syntaxe suivante :
 
 &CO
     $ModelCalcSCC nbtri lstpre lstinter lstpost
 &TX
-où :
+oï¿½ :
 
-&EN nbtri est le nombre d'itérations de triangulation à effectuer
-&EN lst* sont les NOMS des listes destinées à contenir les résultats du tri des équations
+&EN nbtri est le nombre d'itï¿½rations de triangulation ï¿½ effectuer
+&EN lst* sont les NOMS des listes destinï¿½es ï¿½ contenir les rï¿½sultats du tri des ï¿½quations
 
 ~uSimulation~U
-——————————————
-La seconde fonction lance la simulation du modèle sur base des trois listes
-préalablement construites par la fonction $ModelCalcSCC (ou à la main).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La seconde fonction lance la simulation du modï¿½le sur base des trois listes
+prï¿½alablement construites par la fonction $ModelCalcSCC (ou ï¿½ la main).
 
 Sa syntaxe est :
 
 &CO
     $ModelSimulateSCC from to pre inter post
 &TX
-où :
-&EN from et to déterminent le sample de simulation
-&EN pre, inter et post sont les listes qui définissent l'ordre d'exécution du modèle.
+oï¿½ :
+&EN from et to dï¿½terminent le sample de simulation
+&EN pre, inter et post sont les listes qui dï¿½finissent l'ordre d'exï¿½cution du modï¿½le.
 
 
 &IT Choix du nombre de tris
-———————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Après la décompostion en CFC, le bloc interdépendant est trié pour augmenter la vitesse
-de la simulation. Le nombre de passage de l'algorithme de tri peut être
-spécifié à plusieurs endroits :
+Aprï¿½s la dï¿½compostion en CFC, le bloc interdï¿½pendant est triï¿½ pour augmenter la vitesse
+de la simulation. Le nombre de passage de l'algorithme de tri peut ï¿½tre
+spï¿½cifiï¿½ ï¿½ plusieurs endroits :
 
-&EN Dans l'écran de simulation "standard" : paramètre "Passes" fixé
-&EN Dans l'écran de calcul de la décomposition du modèle :  paramètre "Triangulation Iterations"
-&EN Comme paramètre dans la commande rapport $ModelCalcSCC
-&EN Comme dernier paramètre dans la commande rapport $ModelSimulateParms
+&EN Dans l'ï¿½cran de simulation "standard" : paramï¿½tre "Passes" fixï¿½
+&EN Dans l'ï¿½cran de calcul de la dï¿½composition du modï¿½le :  paramï¿½tre "Triangulation Iterations"
+&EN Comme paramï¿½tre dans la commande rapport $ModelCalcSCC
+&EN Comme dernier paramï¿½tre dans la commande rapport $ModelSimulateParms
 
-&NO Dans les versions antérieures, le nombre de passages de la triangulation spécifié dans
-l'écran de simulation n'avait pas d'effet
+&NO Dans les versions antï¿½rieures, le nombre de passages de la triangulation spï¿½cifiï¿½ dans
+l'ï¿½cran de simulation n'avait pas d'effet
 
 &IT Debug
-—————————
-L'option debug activait la génération d'un fichier simul.dbg qui contenait une quantité énorme
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+L'option debug activait la gï¿½nï¿½ration d'un fichier simul.dbg qui contenait une quantitï¿½ ï¿½norme
 d'informations. Dans cette version, seules les listes ~c_PRE, _INTER~C et
-~c_POST~C (avec la découpe du modèle) sont générées.
+~c_POST~C (avec la dï¿½coupe du modï¿½le) sont gï¿½nï¿½rï¿½es.
 
 &IT Commande de rapport $ModelSimulateParms
-———————————————————————————————————————————
-Cette commande prend un paramètre supplémentaire avec le nombre d'itérations
-de triangulation demandées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Cette commande prend un paramï¿½tre supplï¿½mentaire avec le nombre d'itï¿½rations
+de triangulation demandï¿½es.
 
 &TI Fonctions de rapport
-————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Les fonctions suivantes permettent d'obtenir la valeur de certains
-paramètres de simulation :
+paramï¿½tres de simulation :
 
 &CO
-    @SimEps()   : retourne la valeur du critère de convergence utilisé pour
-		  la dernière simulation
-    @SimRelax() : retourne la valeur du paramètre de relaxation utilisé pour
-		  la dernière simulation
-    @SimMaxit() : retourne la valeur du maximum d'itérations utilisé
-		  pour la dernière simulation
+    @SimEps()   : retourne la valeur du critï¿½re de convergence utilisï¿½ pour
+		  la derniï¿½re simulation
+    @SimRelax() : retourne la valeur du paramï¿½tre de relaxation utilisï¿½ pour
+		  la derniï¿½re simulation
+    @SimMaxit() : retourne la valeur du maximum d'itï¿½rations utilisï¿½
+		  pour la derniï¿½re simulation
 &TX
 
-Les résultats par période de simulation peuvent être récupérés via les fonctions suivantes :
+Les rï¿½sultats par pï¿½riode de simulation peuvent ï¿½tre rï¿½cupï¿½rï¿½s via les fonctions suivantes :
 &CO
-    @SimNiter(period) : nombre d'itérations nécessaires à la
-		     résolution du modèle à l'année period
-    @SimNorm(period)  : seuil de convergence atteint à la résolution
-		     du modèle à l'année period
+    @SimNiter(period) : nombre d'itï¿½rations nï¿½cessaires ï¿½ la
+		     rï¿½solution du modï¿½le ï¿½ l'annï¿½e period
+    @SimNorm(period)  : seuil de convergence atteint ï¿½ la rï¿½solution
+		     du modï¿½le ï¿½ l'annï¿½e period
 &TX
 
-Un chrono virtuel a été ajouté pour permettre de calculer les durées de traitement :
+Un chrono virtuel a ï¿½tï¿½ ajoutï¿½ pour permettre de calculer les durï¿½es de traitement :
 
 &CO
-    @ChronoReset() : remet le chrono à 0
-    @ChronoGet()   : retourne le temps écoulé (en msecs) depuis le dernier
+    @ChronoReset() : remet le chrono ï¿½ 0
+    @ChronoGet()   : retourne le temps ï¿½coulï¿½ (en msecs) depuis le dernier
 		  reset du chrono
 &TX
 
 
 &IT Exemple
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 L'exemple ci-dessous compare les performances selon le nombre de tri de
 l'algorithme de simulation.
 
@@ -2121,13 +2121,13 @@ l'algorithme de simulation.
 &TX
 
 &TI Comparaison de WS de variables
-——————————————————————————————————
-La comparaison des WS de varialbles s'effectait sur base d'une stricte égalité binaire.
-Par conséquent les résultats de simulation avaient peu de chance d'être considérés comme
-égaux, une différence à 1e-15 suffisant à faire échouer le test d'égalité.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La comparaison des WS de varialbles s'effectait sur base d'une stricte ï¿½galitï¿½ binaire.
+Par consï¿½quent les rï¿½sultats de simulation avaient peu de chance d'ï¿½tre considï¿½rï¿½s comme
+ï¿½gaux, une diffï¿½rence ï¿½ 1e-15 suffisant ï¿½ faire ï¿½chouer le test d'ï¿½galitï¿½.
 
 Une nouvelle fonction de rapport, ~c$DataCompareEps~C, permet de fixer le
-seuil en-deçà duquel le test d'égalité est considéré comme ayant été
+seuil en-deï¿½ï¿½ duquel le test d'ï¿½galitï¿½ est considï¿½rï¿½ comme ayant ï¿½tï¿½
 satisfait.
 
 Le test de comparaison est :
@@ -2140,67 +2140,67 @@ Le test de comparaison est :
     $DataCompareEps eps
 &TX
 
-L'écran de comparaison de WS (Data/List/File Compare) permet également de
-spécifier cette valeur (paramètre Threshold).
+L'ï¿½cran de comparaison de WS (Data/List/File Compare) permet ï¿½galement de
+spï¿½cifier cette valeur (paramï¿½tre Threshold).
 
-&TI Seuil de comparaison par défaut
-—————————————————————
-Le seuil de comparaison est fixé à 1e-7 par défaut.
+&TI Seuil de comparaison par dï¿½faut
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le seuil de comparaison est fixï¿½ ï¿½ 1e-7 par dï¿½faut.
 >
 
 
 
 <Version 6.34> (29/02/2012)
     Version 6.34 (29/02/2012)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Commandes d'impression en rtf et mif
-————————————————————————————————————————
-Les commandes de numérotation des pages et de définition des headers et footers de pages
-ont été implémentées pour les sorties rtf (Word) et mif (Framemaker).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les commandes de numï¿½rotation des pages et de dï¿½finition des headers et footers de pages
+ont ï¿½tï¿½ implï¿½mentï¿½es pour les sorties rtf (Word) et mif (Framemaker).
 
 Par exemple :
 &CO
     $printdest resfun.rtf RTF
     $printpagefooter Ecopol - @date("dd/mm/yy") - page%d
-    $printpageheader Hypothèses et résultats de la projection de base
+    $printpageheader Hypothï¿½ses et rï¿½sultats de la projection de base
 &TX
 
-Par ailleurs, une partie du catalogue de paragraphes est supprimée : il s'agit par
-exemple de par_2, enum_6, ... qui ne sont jamais utilisés.
+Par ailleurs, une partie du catalogue de paragraphes est supprimï¿½e : il s'agit par
+exemple de par_2, enum_6, ... qui ne sont jamais utilisï¿½s.
 
 
 &TI Hodrick Preskott
-————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Amélioration de la fonction dans le cas où l'expression contient des NaN :
-les premières et dernières valeurs NaN sont skippées.
+Amï¿½lioration de la fonction dans le cas oï¿½ l'expression contient des NaN :
+les premiï¿½res et derniï¿½res valeurs NaN sont skippï¿½es.
 
 
 &TI Nouvelles fonctions de rapport
-——————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 De nouvelles fonctions de rapports permettent d'automatiser plus facilement
 certains processus, notamment en extrayant des informations des objets
-équations.
+ï¿½quations.
 
-Le SAMPLE d'estimation d'une équation peut être retrouvé dans un rapport à l'aide
+Le SAMPLE d'estimation d'une ï¿½quation peut ï¿½tre retrouvï¿½ dans un rapport ï¿½ l'aide
 de la fonction ~c@eqsample~C. La partie "FROM" et la partie "TO" sont obtenues
 respectivement par les fonctions @eqsamplefrom et @eqsampleto.
 
 A l'aide de ces fonctions, il devient facile d'automatiser le processus de
-réestimation.
+rï¿½estimation.
 
 &CO
-    @eqsample(eqname)     : retourne le sample d'estimation de l'équation ~ceqname~C
+    @eqsample(eqname)     : retourne le sample d'estimation de l'ï¿½quation ~ceqname~C
     @eqsamplefrom(eqname) : retourne la partie FROM du sample d'estimation
     @eqsampleto(eqname)   : retourne la partie TO du sample d'estimation
-    @eqlhs(eqname)        : retourne le membre de gauche d'une équations
-    @eqrhs(eqname)        : retourne le membre de droite d'une équations
+    @eqlhs(eqname)        : retourne le membre de gauche d'une ï¿½quations
+    @eqrhs(eqname)        : retourne le membre de droite d'une ï¿½quations
 &TX
 
-Dans l'exemple suivant, on extrait la première année d'estimation de l'équation ENDO1
-pour réestimer l'équation sur un sample prolongé à droite.
+Dans l'exemple suivant, on extrait la premiï¿½re annï¿½e d'estimation de l'ï¿½quation ENDO1
+pour rï¿½estimer l'ï¿½quation sur un sample prolongï¿½ ï¿½ droite.
 
 &CO
     $EqsEstimate @eqsamplefrom(ENDO1) 2012Y1 ENDO1
@@ -2209,19 +2209,19 @@ pour réestimer l'équation sur un sample prolongé à droite.
 
 
 &TI Transferts entre Excel et IODE dans les rapports
-————————————————————————————————————————————————————
-Avant cette version de IODE, pour qu'un transfert de données entre Excel et
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Avant cette version de IODE, pour qu'un transfert de donnï¿½es entre Excel et
 IODE via la fonction ~c$ExceLGetVar~C puisse fonctionner, le format des
-nombres à transférer ne pouvait contenir de séparateur de milliers ni de
-signe de devise comme $ ou £.
+nombres ï¿½ transfï¿½rer ne pouvait contenir de sï¿½parateur de milliers ni de
+signe de devise comme $ ou ï¿½.
 
-A partir de :  cette version, les formats contenant des séparateurs de milliers ou des
-devises sont correctement interprétés.
+A partir de :  cette version, les formats contenant des sï¿½parateurs de milliers ou des
+devises sont correctement interprï¿½tï¿½s.
 
-Par défaut, IODE lit la définition des valeurs des séparateurs de milliers
-et le caractère des devises dans les paramètres "régionaux" (Regional
-Settings). Si ces informations ne conviennent pas, elles peuvent être
-modifiées par les commandes de rapport suivantes :
+Par dï¿½faut, IODE lit la dï¿½finition des valeurs des sï¿½parateurs de milliers
+et le caractï¿½re des devises dans les paramï¿½tres "rï¿½gionaux" (Regional
+Settings). Si ces informations ne conviennent pas, elles peuvent ï¿½tre
+modifiï¿½es par les commandes de rapport suivantes :
 
 &CO
     $ExcelThousand
@@ -2229,36 +2229,36 @@ modifiées par les commandes de rapport suivantes :
 &TX
 
 &IT $ExcelThousand
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Syntaxe :
 &CO
     $ExcelThousand [char]
 &TX
 
-La valeur de char remplace celle du séparateur de milliers définie dans les
-paramètres de Windows. Lorsque ce caractère est rencontré lors du transfert
-d'Excel vers IODE, il est ignoré.
+La valeur de char remplace celle du sï¿½parateur de milliers dï¿½finie dans les
+paramï¿½tres de Windows. Lorsque ce caractï¿½re est rencontrï¿½ lors du transfert
+d'Excel vers IODE, il est ignorï¿½.
 
-Certaines valeurs spéciales de ~cchar~C ont une interprétation particulière :
+Certaines valeurs spï¿½ciales de ~cchar~C ont une interprï¿½tation particuliï¿½re :
 
-&EN d, D, p ou P : le séparateur est le point
-&EN c ou C : le séparateur est la virgule
-&EN ~cspace~C ou ~cs~C ou ~cSpace~C : le séparateur est l'espace
-&EN n, N ou pas d'argument : il n'y a pas de séparateur
-&EN tout autre valeur est prise telle quelle comme séparateur
+&EN d, D, p ou P : le sï¿½parateur est le point
+&EN c ou C : le sï¿½parateur est la virgule
+&EN ~cspace~C ou ~cs~C ou ~cSpace~C : le sï¿½parateur est l'espace
+&EN n, N ou pas d'argument : il n'y a pas de sï¿½parateur
+&EN tout autre valeur est prise telle quelle comme sï¿½parateur
 
 &IT $ExcelCurrency
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Syntaxe :
 &CO
     $ExcelCurrency [char]
 &TX
 
-La valeur de char remplace celle du caractère indiquant la devise dans les
-paramètres de Windows. Lorsque ce caractère est rencontré lors du transfert
-d'Excel vers IODE, il est ignoré.
+La valeur de char remplace celle du caractï¿½re indiquant la devise dans les
+paramï¿½tres de Windows. Lorsque ce caractï¿½re est rencontrï¿½ lors du transfert
+d'Excel vers IODE, il est ignorï¿½.
 
-Certaines valeurs spéciales de ~cchar~C ont une interprétation particulière :
+Certaines valeurs spï¿½ciales de ~cchar~C ont une interprï¿½tation particuliï¿½re :
 
 &EN d, D : dollar
 &EN e ou E : euro
@@ -2267,7 +2267,7 @@ Certaines valeurs spéciales de ~cchar~C ont une interprétation particulière :
 &EN tout autre valeur est prise telle quelle comme signe de devise
 
 &IT Exemple
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Fichier Excel :
 &CO
   |    B       C       D       E
@@ -2289,37 +2289,37 @@ $ExcelGetVar A 1990Y1 Sheet1!R3C2:R3C10
 
 <Version 6.33> (23/06/2011)
     Version 6.33 (23/06/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Transfert IODE vers Excel dans les rapports : ~c$ExcelLang,~C ~c$ExcelDecimal~C
-———————————————————————————————————————————————————————————————————————————
-Deux nouvelles fonctions permettent de spécifier dans les rapports la
-version linguistique d'Excel et la séparateur décimal qui doit être utilisé dans les
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Deux nouvelles fonctions permettent de spï¿½cifier dans les rapports la
+version linguistique d'Excel et la sï¿½parateur dï¿½cimal qui doit ï¿½tre utilisï¿½ dans les
 transfert de IODE vers Excel.
 
 &IT $ExcelLang
-——————————————
-Par défaut, IODE considère que la version linguistique de Excel est
-l'anglais. Cela implique que les ~cRanges~C dans Excel doivent s'écrire
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Par dï¿½faut, IODE considï¿½re que la version linguistique de Excel est
+l'anglais. Cela implique que les ~cRanges~C dans Excel doivent s'ï¿½crire
 ~cRnCn~C (par exemple R2C4 pour ligne (Row) 2, colonne (Column) 4).
 
-Dans les autres langues, cette écriture ne convient plus et IODE doit
-envoyer les données par exemple vers ~cL2C4~C au lieu de ~cR2C4~C dans la
-version française.
+Dans les autres langues, cette ï¿½criture ne convient plus et IODE doit
+envoyer les donnï¿½es par exemple vers ~cL2C4~C au lieu de ~cR2C4~C dans la
+version franï¿½aise.
 
 Pour assurer qu'un rapport IODE reste valable quelle que soit la langue
-d'Excel, la commande ~c$ExcelLang~C a été ajoutée à IODE. Elle a pour
+d'Excel, la commande ~c$ExcelLang~C a ï¿½tï¿½ ajoutï¿½e ï¿½ IODE. Elle a pour
 syntaxe :
 
 &CO
     $ExcelLang {F|N}
 &TX
-Tout autre paramètre (E par exemple) remettra IODE en version anglaise.
+Tout autre paramï¿½tre (E par exemple) remettra IODE en version anglaise.
 
 Exemple
-———————
-Dans l'exemple ci-dessous, IODE enverra le contenu de la variable AAA à
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans l'exemple ci-dessous, IODE enverra le contenu de la variable AAA ï¿½
 partir de la cellule L1C1 du Sheet1 du fichier Excel ouvert.
 
 &CO
@@ -2327,32 +2327,32 @@ partir de la cellule L1C1 du Sheet1 du fichier Excel ouvert.
     $ExcelSetVar AAA Sheet1!R1C1
 &TX
 
-&NO Il faut noter que dans la commande ~c$ExcelSetXxx~C, ~ble range reste défini
+&NO Il faut noter que dans la commande ~c$ExcelSetXxx~C, ~ble range reste dï¿½fini
 comme ~cR1C1~C~B. C'est uniquement en interne qu'IODE transformera cette
 information en ~cL1C1~C.
 
 &IT $ExcelDecimal
-——————————————
-Par défaut, IODE envoie les données numériques vers Excel en utilisant
- ~ble séparateur décimal défini dans les "Regional Settings" de Windows
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Par dï¿½faut, IODE envoie les donnï¿½es numï¿½riques vers Excel en utilisant
+ ~ble sï¿½parateur dï¿½cimal dï¿½fini dans les "Regional Settings" de Windows
  (voir Control Panel)~B.
 
-Cette option ne fonctionne que si le séparateur décimal n'a pas été modifié
-dans Excel : on peut en effet décider d'utiliser le ~bpoint décimal~B dans Excel alors
-que dans Windows, c'est la ~bvirgule~B qui a été choisie.
+Cette option ne fonctionne que si le sï¿½parateur dï¿½cimal n'a pas ï¿½tï¿½ modifiï¿½
+dans Excel : on peut en effet dï¿½cider d'utiliser le ~bpoint dï¿½cimal~B dans Excel alors
+que dans Windows, c'est la ~bvirgule~B qui a ï¿½tï¿½ choisie.
 
-Pour permettre de forcer l'envoi vers une version Excel dans laquelle le séparateur décimal
-ne serait pas celui de Windows, une nouvelle fonction de rapport a été introduite. Sa syntaxe est :
+Pour permettre de forcer l'envoi vers une version Excel dans laquelle le sï¿½parateur dï¿½cimal
+ne serait pas celui de Windows, une nouvelle fonction de rapport a ï¿½tï¿½ introduite. Sa syntaxe est :
 
 &CO
     $ExcelDecimal {C}
 &TX
-L'absence de paramètre C ou tout autre paramètre que C (comma) sélectionne le point décimal.
+L'absence de paramï¿½tre C ou tout autre paramï¿½tre que C (comma) sï¿½lectionne le point dï¿½cimal.
 
 Exemple
-———————
-Dans l'exemple ci-dessous, IODE enverra le contenu de la variable AAA avec des virgules comme séparateur décimal
-à partir de la cellule L1C1 du Sheet1 du fichier Excel ouvert.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans l'exemple ci-dessous, IODE enverra le contenu de la variable AAA avec des virgules comme sï¿½parateur dï¿½cimal
+ï¿½ partir de la cellule L1C1 du Sheet1 du fichier Excel ouvert.
 
 &CO
     $ExcelDecimal C
@@ -2364,16 +2364,16 @@ Dans l'exemple ci-dessous, IODE enverra le contenu de la variable AAA avec des v
 
 <Version 6.32> (17/05/2011)
     Version 6.32 (17/05/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports : $WsExtrapolate, $DataScan, $EqsEstimate
-———————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 $WsExtrapolate, $DataScan, $EqsEstimate : lorqu'une variable fournie comme
-argument n'existait pas, le rapport continuait son exécution même si
-~c$OnError~C était fixé à ~cAbort~C ou ~cExit.~C
+argument n'existait pas, le rapport continuait son exï¿½cution mï¿½me si
+~c$OnError~C ï¿½tait fixï¿½ ï¿½ ~cAbort~C ou ~cExit.~C
 
-Ainsi, dans l'exemple qui suit, le message Hello s'affiche même si la
+Ainsi, dans l'exemple qui suit, le message Hello s'affiche mï¿½me si la
 variable ~cUnknownVar~C n'existe pas.
 
 &CO
@@ -2384,77 +2384,77 @@ variable ~cUnknownVar~C n'existe pas.
 
 
 &TI Editeur de rapports
-———————————————————————
-Les couleurs de l'éditeur de rapport ont été modifiées pour améliorer la lisibilité.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les couleurs de l'ï¿½diteur de rapport ont ï¿½tï¿½ modifiï¿½es pour amï¿½liorer la lisibilitï¿½.
 
 &TI Graphiques
-——————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN Added MULTIBAR PERCENT to HTML
 &EN Changed MULTIBAR (HTML, RTF) to category chart (ex 1990,1991,2010, 2020)
 &EN Corrected bug when " (double quote) is in the graph title (HTML only)
 &EN Corrected bug in legends (RTF ldo example)
 
 &TI Users Manual
-————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 A new chapter "Methods and algorithms" has been added to the users manual.
 
 >
 
 <Version 6.31> (05/04/2011)
     Version 6.31 (05/04/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI IODECOM
-————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Ajout du programme IodeComServer dans la distribution de IODE.
 >
 
 <Version 6.30> (28/03/2011)
     Version 6.30 (28/03/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Corrections
-——————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 L'affichage de messages trop longs plantait IODE : cette erreur est
-corrigée, la limite dépendant maintenant de la taille de l'écran.
+corrigï¿½e, la limite dï¿½pendant maintenant de la taille de l'ï¿½cran.
 
 &IT Graphiques en MIF
-—————————————————————
-Amélioration des textes dans les graphiques : adaptation de la taille des caractères à la définition a2m
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Amï¿½lioration des textes dans les graphiques : adaptation de la taille des caractï¿½res ï¿½ la dï¿½finition a2m
 
 &IT Affichage
-—————————————
-La taille minimum des caractères est portée à 6 points au lieu de 4 auparavant, ce qui était illisible sur
-la plupart des écrans.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La taille minimum des caractï¿½res est portï¿½e ï¿½ 6 points au lieu de 4 auparavant, ce qui ï¿½tait illisible sur
+la plupart des ï¿½crans.
 >
 
 
 <Version 6.29> (17/03/2011)
     Version 6.29 (17/03/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Programme d'installation d'un upgrade
-——————————————————————————————————————————
-Le nouveau programme d'installation de IODE permet d'associer des fichiers à IODE.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le nouveau programme d'installation de IODE permet d'associer des fichiers ï¿½ IODE.
 Pour ce faire, il faut augmenter les droits de l'utilisateur qui installe le programme en
-les plaçant au niveau d'Administrateur.
+les plaï¿½ant au niveau d'Administrateur.
 
-Après l'installation initiale, et donc après l'association entre
-les fichiers iode (.var, .eqs, ...) et le programme lui-même. cette augmentation n'est plus nécessaire
+Aprï¿½s l'installation initiale, et donc aprï¿½s l'association entre
+les fichiers iode (.var, .eqs, ...) et le programme lui-mï¿½me. cette augmentation n'est plus nï¿½cessaire
 pour remplacer le programme ou les fichiers constituant le logiciel et sa documentation.
-Un installateur "upgrade" a donc été construit pour permettre à l'utilisateur d'effectuer lui-même la mise
-à niveau de sa version.
+Un installateur "upgrade" a donc ï¿½tï¿½ construit pour permettre ï¿½ l'utilisateur d'effectuer lui-mï¿½me la mise
+ï¿½ niveau de sa version.
 
 
 &TI Rapports
-————————————
-&EN La commande ~c$quit~C est ajoutée et est synonime de $quitode
-&EN La commande ~c$shift~C peut avoir comme paramètre le nombre de ~c"shift"~C à effectuer
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN La commande ~c$quit~C est ajoutï¿½e et est synonime de $quitode
+&EN La commande ~c$shift~C peut avoir comme paramï¿½tre le nombre de ~c"shift"~C ï¿½ effectuer
 
 &CO
     $shift 2
@@ -2464,77 +2464,77 @@ Un installateur "upgrade" a donc été construit pour permettre à l'utilisateur d'
 >
 <Version 6.28> (14/03/2011)
     Version 6.28 (14/03/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Nouvelle version du programme d'installation
-———————————————————————————————————————————————
-Cette version intègre les nouveautés suivantes :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Cette version intï¿½gre les nouveautï¿½s suivantes :
 
-&EN restriction d'accès aux comptes administrateurs
-&EN rétablissement de la liaison automatique entre les fichiers de IODE et le programme IODE, y compris sous
+&EN restriction d'accï¿½s aux comptes administrateurs
+&EN rï¿½tablissement de la liaison automatique entre les fichiers de IODE et le programme IODE, y compris sous
     Vista et Windows 7.
-&EN séléction des composants à installer :
-&EN2 Shortcuts dans le menu démarrer (onglets IODE)
-&EN2 Thèmes et styles pour les graphiques (nouveau)
-&EN2 Modèle fun d'exemple (nouveau)
-&EN2 Version COM de IODE (enregistrement automatique), permettant un accès
-    optimisé aux fonctions de IODE par exemple en VBA (Excel, ...) ou en APL (nouveau)
-&EN2 Configuration de Textpad et de Notepad++ pour l'édition des rapports de
+&EN sï¿½lï¿½ction des composants ï¿½ installer :
+&EN2 Shortcuts dans le menu dï¿½marrer (onglets IODE)
+&EN2 Thï¿½mes et styles pour les graphiques (nouveau)
+&EN2 Modï¿½le fun d'exemple (nouveau)
+&EN2 Version COM de IODE (enregistrement automatique), permettant un accï¿½s
+    optimisï¿½ aux fonctions de IODE par exemple en VBA (Excel, ...) ou en APL (nouveau)
+&EN2 Configuration de Textpad et de Notepad++ pour l'ï¿½dition des rapports de
     IODE (colorisation syntaxique et auto-completion) (nouveau)
-&EN2 Fichiers Excel et APL d'interfaçage avec IODE
+&EN2 Fichiers Excel et APL d'interfaï¿½age avec IODE
 
 
-&TI Resize de la fenêtre de IODE
-————————————————————————————————
-La taille de la fenêtre est mémorisée dans le fichier de profil de IODE. Au prochain démarrage, cette
-taille est donc reprise par défaut.
+&TI Resize de la fenï¿½tre de IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La taille de la fenï¿½tre est mï¿½morisï¿½e dans le fichier de profil de IODE. Au prochain dï¿½marrage, cette
+taille est donc reprise par dï¿½faut.
 
 
 &TI Largeur de la colonne des noms d'objets
-———————————————————————————————————————————
-La largeur de la première colonne des tableaux d'objets est mémorisée pour
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La largeur de la premiï¿½re colonne des tableaux d'objets est mï¿½morisï¿½e pour
 les sessions suiVantes dans le fichier de profil de IODE.
 
 >
 <Version 6.27> (03/03/2011)
     Version 6.27 (03/03/2011)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
-&TI Resize de la fenêtre de IODE
-————————————————————————————————
+&TI Resize de la fenï¿½tre de IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-La taille de la fenêtre de IODE peut être adaptée par l'utilisateur :
+La taille de la fenï¿½tre de IODE peut ï¿½tre adaptï¿½e par l'utilisateur :
 
-&EN en tirant sur le bord de la fenêtre
-&EN en double-cliquant dans le titre de la fenêtre
+&EN en tirant sur le bord de la fenï¿½tre
+&EN en double-cliquant dans le titre de la fenï¿½tre
 &EN en indiquant le nombre de lignes et de colonnes dans la ligne de commande
 
-En combinaison avec une diminution de la taille des caractères, cela permet de visualiser
-un nombre beaucoup plus grand d'informations sur l'écran.
+En combinaison avec une diminution de la taille des caractï¿½res, cela permet de visualiser
+un nombre beaucoup plus grand d'informations sur l'ï¿½cran.
 
-&TI Taille de caractères
-————————————————————————
+&TI Taille de caractï¿½res
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 La combinaison de touches ~cCtrl+Wheel~c + ~cUp~C ou ~cDown~C augmente ou diminue la taille de la police de
-caractères courante (limité entre 3 points et 50 points). La taille de la fenêtre
-s'adapte en conséquence.
+caractï¿½res courante (limitï¿½ entre 3 points et 50 points). La taille de la fenï¿½tre
+s'adapte en consï¿½quence.
 
-La taille initiale peut être déterminée au démarrage de IODE via le paramètres ~c-fontsize~C  ~cnb_points~C.
+La taille initiale peut ï¿½tre dï¿½terminï¿½e au dï¿½marrage de IODE via le paramï¿½tres ~c-fontsize~C  ~cnb_points~C.
 
-&TI Fermeture de la fenêtre
-———————————————————————————
-La croix dans le coin supérieur droit de la fenêtre permet de quitter IODE (comme le ferait ~cAlt+X~C).
+&TI Fermeture de la fenï¿½tre
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La croix dans le coin supï¿½rieur droit de la fenï¿½tre permet de quitter IODE (comme le ferait ~cAlt+X~C).
 
 
-&TI Déplacement dans les tableaux d'édition
-———————————————————————————————————————————
-La roulette de la souris ("Mouse wheel") permet de déplacer le tableau d'objets et cours d'édition vers
+&TI Dï¿½placement dans les tableaux d'ï¿½dition
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La roulette de la souris ("Mouse wheel") permet de dï¿½placer le tableau d'objets et cours d'ï¿½dition vers
 le haut ou vers le bas.
 
 &TI New parameters
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 New parameters in the iode command line have been created :
 
 &EN ~c-nl~C ~cnumber~C : number specifies the number of lines of the Iode window
@@ -2545,78 +2545,78 @@ New parameters in the iode command line have been created :
 &EN ~c-pbs "string"~C : same as pbf buf with a string defined on the command line
 
 
-&TI Syntaxe des séquences ~cplayback~C
-——————————————————————————————————
-Une séquence ~cPlayback~C consiste en une suite de touches, de commentaires et de messages.
+&TI Syntaxe des sï¿½quences ~cplayback~C
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Une sï¿½quence ~cPlayback~C consiste en une suite de touches, de commentaires et de messages.
 
-Les règles suivantes s'appliquent :
+Les rï¿½gles suivantes s'appliquent :
 
-&EN Tous les caractères d'espacement (nl, return, ff, tab) sont
-    ignorés sauf le blanc.
+&EN Tous les caractï¿½res d'espacement (nl, return, ff, tab) sont
+    ignorï¿½s sauf le blanc.
 
-&EN Tous les caractères ascii sont envoyés dans le buffer de lecture, blanc compris
-&EN Les séquences suivantes indiquent que le premier caractère qui suit (ou la touche @..) sera
-modifié par ~cAlt,~C ~cCtrl~C ou ~cshift~C.
-&EN2 ~c&a~C : le prochain caractère sera ~calt+char~C
-&EN2 ~c&c~C : le prochain caractère sera ~cctrl+char~C
-&EN2 ~c&s~C : le prochain caractère sera ~cshift+char~C
+&EN Tous les caractï¿½res ascii sont envoyï¿½s dans le buffer de lecture, blanc compris
+&EN Les sï¿½quences suivantes indiquent que le premier caractï¿½re qui suit (ou la touche @..) sera
+modifiï¿½ par ~cAlt,~C ~cCtrl~C ou ~cshift~C.
+&EN2 ~c&a~C : le prochain caractï¿½re sera ~calt+char~C
+&EN2 ~c&c~C : le prochain caractï¿½re sera ~cctrl+char~C
+&EN2 ~c&s~C : le prochain caractï¿½re sera ~cshift+char~C
 
-&EN Le délai d'attente entre deux touches peut être modifié à l'aide des séquences suivantes :
+&EN Le dï¿½lai d'attente entre deux touches peut ï¿½tre modifiï¿½ ï¿½ l'aide des sï¿½quences suivantes :
 
-&EN2 ~c&d0~C : le délai d'attente entre deux touches est annulé
-&EN2 ~c&d-~C : le délai d'attente entre deux chars est diminué de 50 ms
-&EN2 ~c&d+~C : le délai d'attente entre deux chars est augmenté de 50 ms
+&EN2 ~c&d0~C : le dï¿½lai d'attente entre deux touches est annulï¿½
+&EN2 ~c&d-~C : le dï¿½lai d'attente entre deux chars est diminuï¿½ de 50 ms
+&EN2 ~c&d+~C : le dï¿½lai d'attente entre deux chars est augmentï¿½ de 50 ms
 
-&EN La suite de l'exécution peut être interrompue et un message peut être affiché :
+&EN La suite de l'exï¿½cution peut ï¿½tre interrompue et un message peut ï¿½tre affichï¿½ :
 &EN2 ~c&m[Msg]~C : affiche le message Msg et attend qu'on presse une touche
-    avant de reprendre. Le message se termine à la fin de la ligne courante.
-&EN ~c&n~C : équivalent d'un retour à la ligne dans le message
+    avant de reprendre. Le message se termine ï¿½ la fin de la ligne courante.
+&EN ~c&n~C : ï¿½quivalent d'un retour ï¿½ la ligne dans le message
 &EN ~c&autre_char~C : renvoie autre_char
 
-&EN Les séquences suivantes renvoient des touches spéciales :
-&EN2 @F1 à @F9 : renvoie SCR_F1 à F9 (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @FA à @FJ : renvoie SCR_F10 à F19 (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @l : renvoie SCR_CSR_LEFT (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @r : renvoie SCR_CSR_RIGHT (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @u : renvoie SCR_CSR_UP (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @d : renvoie SCR_CSR_DOWN (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @p : renvoie SCR_CSR_PG_UP  (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @n : renvoie SCR_CSR_PG_DN  (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @h : renvoie SCR_CSR_HOME  (ou Shift, Ctrl, Alt en fonction de ce qui précède)
-&EN2 @e : renvoie SCR_CSR_PG_END (ou Shift, Ctrl, Alt en fonction de ce qui précède)
+&EN Les sï¿½quences suivantes renvoient des touches spï¿½ciales :
+&EN2 @F1 ï¿½ @F9 : renvoie SCR_F1 ï¿½ F9 (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @FA ï¿½ @FJ : renvoie SCR_F10 ï¿½ F19 (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @l : renvoie SCR_CSR_LEFT (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @r : renvoie SCR_CSR_RIGHT (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @u : renvoie SCR_CSR_UP (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @d : renvoie SCR_CSR_DOWN (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @p : renvoie SCR_CSR_PG_UP  (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @n : renvoie SCR_CSR_PG_DN  (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @h : renvoie SCR_CSR_HOME  (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
+&EN2 @e : renvoie SCR_CSR_PG_END (ou Shift, Ctrl, Alt en fonction de ce qui prï¿½cï¿½de)
 &EN2 @I : renvoie SCR_INSERT
 &EN2 @D : renvoie SCR_DELETE
-&EN2 @R : renvoie SCR_ENTER (ou Shift, Ctrl en fonction de ce qui précède)
+&EN2 @R : renvoie SCR_ENTER (ou Shift, Ctrl en fonction de ce qui prï¿½cï¿½de)
 &EN2 @E : renvoie SCR_ESCAPE
-&EN2 @B : renvoie SCR_BACKSPACE (ou Shift, Ctrl en fonction de ce qui précède)
-&EN2 @T : renvoie SCR_TAB (ou Shift, Ctrl en fonction de ce qui précède)
+&EN2 @B : renvoie SCR_BACKSPACE (ou Shift, Ctrl en fonction de ce qui prï¿½cï¿½de)
+&EN2 @T : renvoie SCR_TAB (ou Shift, Ctrl en fonction de ce qui prï¿½cï¿½de)
 &EN2 @autre_char : renvoie autre_char
 
-&EN Le caractère ## marque le début d'un commentaire qui va jusqu'à la fin de
+&EN Le caractï¿½re ## marque le dï¿½but d'un commentaire qui va jusqu'ï¿½ la fin de
 la ligne
 
 &IT Exemples
-———————————
-La commande qui suit démarre iode et effectue les opérations suivantes :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La commande qui suit dï¿½marre iode et effectue les opï¿½rations suivantes :
 &CO
     iode -pbs "@R&adt@R@R"
 &TX
 
-&EN ~c@R~C : enter dans l'écran d'accueil
+&EN ~c@R~C : enter dans l'ï¿½cran d'accueil
 &EN ~c&ad~C : Alt+D : va dans le menu Data
 &EN ~ct~C : va sur l'option Tables
 &EN ~c@R~C : entre dans le sous-menu
 &EN ~c@R~C : ouvre l'option "Edit WS"
 
-Le fichier qui suit reprend l'essentiel des possibilités.
+Le fichier qui suit reprend l'essentiel des possibilitï¿½s.
 &CO
-    ## Diminue le délai des touches
+    ## Diminue le dï¿½lai des touches
     &d0
     ## Affiche un message et attend la touche ENTER
     &mLoad workspaces : Menu Workspace, function Load Work Space
     ## Entre dans la page Load WS
     @R@r@R@R
-    ## Introduit le nom des fichiers à charger (@T = TAB pour passer au suivant)
+    ## Introduit le nom des fichiers ï¿½ charger (@T = TAB pour passer au suivant)
     ..\ode\fun@T
     ..\ode\fun@T
     ..\ode\fun@T
@@ -2631,9 +2631,9 @@ Le fichier qui suit reprend l'essentiel des possibilités.
     ## Delai de 50ms
     @ -------------
     &d0&d+
-    ## Alt+D : se déplace dans le menu Data
+    ## Alt+D : se dï¿½place dans le menu Data
     &ad
-    ## T, Enter, Enter : va sur Tables, et entre dans le scroll d'édition
+    ## T, Enter, Enter : va sur Tables, et entre dans le scroll d'ï¿½dition
     t@R@R
     ## Maximise (Ctrl + X)
     &cX
@@ -2646,13 +2646,13 @@ Le fichier qui suit reprend l'essentiel des possibilités.
     @d@d@d@d
     ## Edit
     @R@FA@R
-    ## Idem avec un délai de 150ms
+    ## Idem avec un dï¿½lai de 150ms
     ## ---------------------------
-    &mMême séquence avec un délai de 150 ms
+    &mMï¿½me sï¿½quence avec un dï¿½lai de 150 ms
     &d0&d+&d+&d+
-    ## Alt+D : se déplace dans le menu Data
+    ## Alt+D : se dï¿½place dans le menu Data
     &ad
-    ## T, Enter, Enter : va sur Tables, et entre dans le scroll d'édition
+    ## T, Enter, Enter : va sur Tables, et entre dans le scroll d'ï¿½dition
     t@R@R
     ## Maximise (Ctrl + X)
     &cX
@@ -2675,11 +2675,11 @@ Le fichier qui suit reprend l'essentiel des possibilités.
 >
 <Version 6.26> (04/08/2010)
     Version 6.26 (04/08/2010)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Division par 0 en LEC
-—————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 La nouvelle fonction LEC ~cdiv0(x,y)~C retourne 0 lorsque y vaut 0.
 &CO
     div0(x, y) = 0 si y = 0
@@ -2688,20 +2688,20 @@ La nouvelle fonction LEC ~cdiv0(x,y)~C retourne 0 lorsque y vaut 0.
 &TX
 
 &TI Corrections LEC
-———————————————————
-Deux corrections ont été apportées dans le traducteur LEC :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Deux corrections ont ï¿½tï¿½ apportï¿½es dans le traducteur LEC :
 
-&EN la limite de longueur des expressions LEC après remplacement des macros
-    ($NAME) est portée de 4000 à 40000 caractères.
+&EN la limite de longueur des expressions LEC aprï¿½s remplacement des macros
+    ($NAME) est portï¿½e de 4000 ï¿½ 40000 caractï¿½res.
 
-&EN lorsque le nombre d'arguments d'une fonction à nombre d'arguments variable dépasse 255
-    l'erreur est correctement signalée. Auparavant, elle était dans certains
-    cas ignorée et générait des résultats imprésibles (exemple fonction ~clsum~C).
+&EN lorsque le nombre d'arguments d'une fonction ï¿½ nombre d'arguments variable dï¿½passe 255
+    l'erreur est correctement signalï¿½e. Auparavant, elle ï¿½tait dans certains
+    cas ignorï¿½e et gï¿½nï¿½rait des rï¿½sultats imprï¿½sibles (exemple fonction ~clsum~C).
 
 &TI Correction Rapports
-———————————————————————
-Dans le cas de certaines erreurs LEC (expressions trop longues), l'exécution
-des rapports s'arrêtait. Un message d'erreur est dorénavant affiché dans ce cas.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans le cas de certaines erreurs LEC (expressions trop longues), l'exï¿½cution
+des rapports s'arrï¿½tait. Un message d'erreur est dorï¿½navant affichï¿½ dans ce cas.
 
 
 
@@ -2709,18 +2709,18 @@ des rapports s'arrêtait. Un message d'erreur est dorénavant affiché dans ce cas.
 
 <Version 6.25> (17/06/2010)
     Version 6.25 (17/06/2010)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Graphiques en Flash dans les pages HTML
-———————————————————————————————————————————
-Les graphiques générés dans le format HTML sont remplacés par une version
-Flash (Fusion Chart). Cela signifie que lorsqu'on choisit de générer en
-sortie un fichier HTML, ceux-ci contiennent la définition de graphiques
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les graphiques gï¿½nï¿½rï¿½s dans le format HTML sont remplacï¿½s par une version
+Flash (Fusion Chart). Cela signifie que lorsqu'on choisit de gï¿½nï¿½rer en
+sortie un fichier HTML, ceux-ci contiennent la dï¿½finition de graphiques
 exploitables en flash.
 
-Ces graphiques nécessitent une librairie dont la source est définie dans le
-fichier ~cswf.ini~C. Par défaut, ce fichier contient les données suivantes :
+Ces graphiques nï¿½cessitent une librairie dont la source est dï¿½finie dans le
+fichier ~cswf.ini~C. Par dï¿½faut, ce fichier contient les donnï¿½es suivantes :
 
 &CO
 [SWF]
@@ -2730,87 +2730,87 @@ fichier ~cswf.ini~C. Par défaut, ce fichier contient les données suivantes :
     ROUNDED=1
     GRADIENT=1
 &TX
-où
+oï¿½
 
-&EN ~cJSPATH~C indiquent où trouver le programme de définition des graphiques
+&EN ~cJSPATH~C indiquent oï¿½ trouver le programme de dï¿½finition des graphiques
 
-&EN ~cGRAPHPATH~C indiquent où trouver les librairies flash
+&EN ~cGRAPHPATH~C indiquent oï¿½ trouver les librairies flash
 
 &EN ~cANIMATE~C vaut 1 pour que l'affichage soit progressif
 
 &EN ~cROUNDED~C vaut 1 pour avoir des coins des cadres et des barres "arrondis"
 
-&EN ~cGRADIENT~C indique si les couleurs doivent être pleines (0) ou progressives (1)
+&EN ~cGRADIENT~C indique si les couleurs doivent ï¿½tre pleines (0) ou progressives (1)
 
 
 >
 
 <Version 6.24> (15/04/2010)
     Version 6.24 (15/04/2010)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
-&TI Ouverture de fichiers sur réseau
-———————————————————————————————————
-Iode se plantait parfois lors de l'ouverture de fichiers sur réseau à partir
-de l'Explorateur Windows ou lorsque le répertoire par défaut était un
-répertoire réseau. Cette erreur est corrigée.
+&TI Ouverture de fichiers sur rï¿½seau
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Iode se plantait parfois lors de l'ouverture de fichiers sur rï¿½seau ï¿½ partir
+de l'Explorateur Windows ou lorsque le rï¿½pertoire par dï¿½faut ï¿½tait un
+rï¿½pertoire rï¿½seau. Cette erreur est corrigï¿½e.
 
 &TI Limitation des noms de fichiers
-———————————————————————————————————
-&EN La limite des noms de fichiers à 63 caractères reste
-d'application pour des raisons de compatibilité entre les versions
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN La limite des noms de fichiers ï¿½ 63 caractï¿½res reste
+d'application pour des raisons de compatibilitï¿½ entre les versions
 successives des fichiers workspace.
 
-&EN Les noms de fichiers ne doivent si possible pas contenir de séparateur
-comme l'espace ou la virgule, y compris dans le nom des répertoires. En
-effet, l'ouverture à partir de l'Explorateur Windows ne fonctionne pas dans
+&EN Les noms de fichiers ne doivent si possible pas contenir de sï¿½parateur
+comme l'espace ou la virgule, y compris dans le nom des rï¿½pertoires. En
+effet, l'ouverture ï¿½ partir de l'Explorateur Windows ne fonctionne pas dans
 ce cas.
 
 >
 
 <Version 6.23> (01/04/2009)
     Version 6.23 (01/04/2009)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
-&TI Gestion mémoire
-——————————————
-Révision des allocations dans les rapports :
-&EN nouvelle librairie d'allocation de mémoire
-&EN optimisation de l'espace mémoire alloué (évite en partie le morcèlement
-progressif de la mémoire dans le cas des longs rapports)
+&TI Gestion mï¿½moire
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Rï¿½vision des allocations dans les rapports :
+&EN nouvelle librairie d'allocation de mï¿½moire
+&EN optimisation de l'espace mï¿½moire allouï¿½ (ï¿½vite en partie le morcï¿½lement
+progressif de la mï¿½moire dans le cas des longs rapports)
 
 &EN nouvelle version des librairies C++
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Ces modifications augmentent la performance de certaines fonctions et
-permettent de passer à 2GB de RAM utilisée.
+permettent de passer ï¿½ 2GB de RAM utilisï¿½e.
 
 
 
 &TI Rapports
-————————————
-Réécriture de la fonction $Repeat pour :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Rï¿½ï¿½criture de la fonction $Repeat pour :
 
 &EN gain (parfois important) de vitesse
-&EN résoudre le problème des rapports "croisés" (le fichier temporaire
-    ~cws.rep~C n'est plus utilisé)
+&EN rï¿½soudre le problï¿½me des rapports "croisï¿½s" (le fichier temporaire
+    ~cws.rep~C n'est plus utilisï¿½)
 
 &TI Graphiques Stacked
-——————————————————————
-Programmation des graphiques barres "stacked" en Frame (MIF) et à l'écran.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Programmation des graphiques barres "stacked" en Frame (MIF) et ï¿½ l'ï¿½cran.
 
-&TI Police de caractères pour les graphiques
-————————————————————————————————————————————
-Nouveau paramètre optionnel ~cfontsize~C  permettant de préciser la taille des caractères
+&TI Police de caractï¿½res pour les graphiques
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Nouveau paramï¿½tre optionnel ~cfontsize~C  permettant de prï¿½ciser la taille des caractï¿½res
 dans les graphiques.
 
 &CO
     $PrintGraphSize width height [fontsize]
 
-    où :
-	width et height représentent la taille du graphique en mm
+    oï¿½ :
+	width et height reprï¿½sentent la taille du graphique en mm
 	fontsize donne la taille de la police du graphique en points
 &TX
 
@@ -2819,71 +2819,71 @@ dans les graphiques.
 
 <Version 6.22> (18/11/2008)
     Version 6.22 (18/11/2008)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Graphiques
-——————————————
-Quelques améliorations ont été apportées dans l'affichage des graphiques :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Quelques amï¿½liorations ont ï¿½tï¿½ apportï¿½es dans l'affichage des graphiques :
 &EN suppression de "Minor Ticks" sur l'axe des X
 &EN modification du placement des "Minor Ticks" sur l'axe des Y et Z
 
 &TI Corrections :
-—————————————————
-Après le chargement des "thèmes" graphiques (.thm), le directory d'origine
-est restauré.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Aprï¿½s le chargement des "thï¿½mes" graphiques (.thm), le directory d'origine
+est restaurï¿½.
 
 >
 
 <Version 6.21> (27/10/2008)
     Version 6.21 (27/10/2008)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
-&TI Méthode d'estimation "Maximum likelihood" (BHHH)
-————————————————————————————————————————————————————
-Une nouvelle méthode d'estimation est proposée dans l'écran de définition
-des équations : MaxLik (Berndt, Hall, Hall and Hausman). La méthode est
-décrite dans les "Annals of Economic and Social Measument, 3/4, 1974".
+&TI Mï¿½thode d'estimation "Maximum likelihood" (BHHH)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Une nouvelle mï¿½thode d'estimation est proposï¿½e dans l'ï¿½cran de dï¿½finition
+des ï¿½quations : MaxLik (Berndt, Hall, Hall and Hausman). La mï¿½thode est
+dï¿½crite dans les "Annals of Economic and Social Measument, 3/4, 1974".
 
-Il s'agit en fait d'une généralisation des méthodes existantes qui modifie
-la direction de déplacement de la solution à chaque itération et non pas une
-seule fois (comme dans les cas des méthodes 3SLS ou Zellner) ou aucune fois
+Il s'agit en fait d'une gï¿½nï¿½ralisation des mï¿½thodes existantes qui modifie
+la direction de dï¿½placement de la solution ï¿½ chaque itï¿½ration et non pas une
+seule fois (comme dans les cas des mï¿½thodes 3SLS ou Zellner) ou aucune fois
 (comme dans les autres cas, soit LSQ ou INSTR).
 
 
 &TI Format ASCII
-————————————
-Dans le format de définition des équations (fichiers .ae), la méthode doit
-s'écrire MAXLIK (à la place par exemple de LSQ).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans le format de dï¿½finition des ï¿½quations (fichiers .ae), la mï¿½thode doit
+s'ï¿½crire MAXLIK (ï¿½ la place par exemple de LSQ).
 
 
 &TI Fonction de rapport $EqsSetMethod
-—————————————————————————————————————
-Le numéro d'ordre de la méthode MAXLIK est 4.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Le numï¿½ro d'ordre de la mï¿½thode MAXLIK est 4.
 
 &CO
     $EqsSetMethod   {0|1|2|3|4} eqname1 eqname2 ...
-	où 0 indique la méthode LSQ (moindres carrés)
-	1 indique la méthode Zellner
-	2 indique la méthode INF (2 stages avec instruments)
-	3 indique la méthode GLS (3 stages avec instruments)
-	4 indique la méthode MAXLIK
-	eqname1 .. sont des noms d'équations existantes
+	oï¿½ 0 indique la mï¿½thode LSQ (moindres carrï¿½s)
+	1 indique la mï¿½thode Zellner
+	2 indique la mï¿½thode INF (2 stages avec instruments)
+	3 indique la mï¿½thode GLS (3 stages avec instruments)
+	4 indique la mï¿½thode MAXLIK
+	eqname1 .. sont des noms d'ï¿½quations existantes
 &TX
 
 
 &EN Formats ASCII
-—————————————————
-Dans les formats des variables et des scalaires, la valeur NaN peut être indiquée
-soit par na, soit par /, pour permettre la lecture des données provenant de SAS.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans les formats des variables et des scalaires, la valeur NaN peut ï¿½tre indiquï¿½e
+soit par na, soit par /, pour permettre la lecture des donnï¿½es provenant de SAS.
 
-&TI Sample généralisé
-—————————————————————
+&TI Sample gï¿½nï¿½ralisï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Dans le cas des fichiers, il est possible d'imprimer une colonne en "base"
-d'un autre fichier, c'est-à-dire en divisant le fichier courant par un autre et en
+d'un autre fichier, c'est-ï¿½-dire en divisant le fichier courant par un autre et en
 
 Par exemple le sample suivant sur les fichier 1 et 2 :
 &CO
@@ -2891,7 +2891,7 @@ Par exemple le sample suivant sur les fichier 1 et 2 :
     2000[1;2;1=2]
 &TX
 
-pourrait donner comme résultat :
+pourrait donner comme rï¿½sultat :
 
 ..tb 4
 ..sep @
@@ -2909,45 +2909,45 @@ pourrait donner comme résultat :
 
 
 &TI Impression des formes LEC avec coefficients
-——————————————————————————————————————————————
-Dans le cas de l'impression d'équations avec remplacement des coefficients
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans le cas de l'impression d'ï¿½quations avec remplacement des coefficients
 par leurs valeurs (fonction "Print Objects definition"),
-le nombre de décimales demandées dans l'écran ou dans le rapport spécifie le
-nombre de décimales de chaque coefficients.
+le nombre de dï¿½cimales demandï¿½es dans l'ï¿½cran ou dans le rapport spï¿½cifie le
+nombre de dï¿½cimales de chaque coefficients.
 
-La valeur -1 peut toujours être utilisée pour que le système imprime le
-maximum de décimales disponibles.
+La valeur -1 peut toujours ï¿½tre utilisï¿½e pour que le systï¿½me imprime le
+maximum de dï¿½cimales disponibles.
 
-Ce même nombre de décimales est utilisé pour l'impression des t-tests dans l'équation.
+Ce mï¿½me nombre de dï¿½cimales est utilisï¿½ pour l'impression des t-tests dans l'ï¿½quation.
 
-Cette modification a un impact sur l'impression des Equations et des Identités.
+Cette modification a un impact sur l'impression des Equations et des Identitï¿½s.
 
 
 &TI Impression des scalaires
-————————————————————————————
-L'impression des scalaires a été revue :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+L'impression des scalaires a ï¿½tï¿½ revue :
 
-&EN le nombre de décimales indiquées à l'écran est utilisé pour les valeurs
+&EN le nombre de dï¿½cimales indiquï¿½es ï¿½ l'ï¿½cran est utilisï¿½ pour les valeurs
 des coefficients, des standard errors et des tests t
 
-&EN les valeurs na sont imprimées comme -.-
+&EN les valeurs na sont imprimï¿½es comme -.-
 
 
 >
 
 <Version 6.20> (07/04/2008)
     Version 6.20 (07/04/2008)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 
 &TI Graphs
-——————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Bug bij het printen naar RTF opgelost.
 
 
 &TI Nieuwe LEC functies
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &CO
     gamma(x) = gamma functie
@@ -2957,11 +2957,11 @@ Bug bij het printen naar RTF opgelost.
 
 <Version 6.19> (07/02/2008)
     Version 6.19 (07/02/2008)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI DataCalcLst
-———————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Een lijst kan worden opgebouwd door het product te maken van twee bestaande
 lijsten.
@@ -2974,7 +2974,7 @@ De lijst RES wordt gemaakt bestaande uit alle combinaties (product) van
 lijst ONE en TWO.
 
 &IT Voorbeeld
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
     $DataUpdateLst L1 R1;R2
     $DataUpdateLst L2 C1;C2;C3
@@ -2984,7 +2984,7 @@ L1_L2 = R1C1;R1C2;R1C3;R2C1;R2C2;R2C3
 &TX
 
 &TI Nieuwe LEC functies
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 &EN urandom(s) = random uniform verdeeld in het interval [0,s[
@@ -2995,17 +2995,17 @@ en standaard afwijking s
 
 <Version 6.18> (01/12/2008)
     Version 6.18 (01/12/2008)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Grafieken in Word
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 De grafieken zijn aangepast aan wat er bestond in FrameMaker. Als u
 afdrukt in RTF (Word), krijgt u dezelfde grafieken als op het scherm.
 
 &TI MultiBarCharts
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Nieuwe BarCharts (Stacked Barchart, Stacked in Percent) zijn nu beschikbaar.
 
 &SY
@@ -3028,11 +3028,11 @@ het maken van grafieken.
 
 Theme is het pad naar het bestand, als het pad niet volledig is kijkt iode
 in de directory waar iode wordt opgestart en daarna in de directory waarin
-iode geïnstalleerd is.
+iode geï¿½nstalleerd is.
 
 
 &IT Voorbeeld
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
     $PrintGraphTheme c:\usr\ode\bw.thm
 &TX
@@ -3059,7 +3059,7 @@ waar :
 &EN Bar color={orange, blue, red, violet, black, gray, paleblue, green}, style={solid, bdiaognal, fdiagonal}
 
 &TI ColorBand
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Plaats een gekleurde achtergrond (bv. om forcast periode aan te duiden)
 
@@ -3073,55 +3073,55 @@ Plaats een gekleurde achtergrond (bv. om forcast periode aan te duiden)
 
 <Version 6.17> (20/07/2007)
     Version 6.17 (20/07/2007)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Nouvelles fonctions d'exportations des graphiques
-—————————————————————————————————————————————————————
-Les fonctions graphiques ont été améliorées dans de nombreux aspects. Ces fonctions
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les fonctions graphiques ont ï¿½tï¿½ amï¿½liorï¿½es dans de nombreux aspects. Ces fonctions
 permettent notamment maintenant d'exporter directement des graphiques dans
-une dimension adéquate vers Word.
+une dimension adï¿½quate vers Word.
 
 &TI Fonction LEC app()
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 La fonction
-~capp()~C du LEC a été améliorée pour les cas de séries contenant des
+~capp()~C du LEC a ï¿½tï¿½ amï¿½liorï¿½e pour les cas de sï¿½ries contenant des
 valeurs nulles.
 
-Le résultat de la fonction
+Le rï¿½sultat de la fonction
 ~capp(A,~C B) est obtenu comme suit au
 temps t :
 
 &EN Si
-~cA[t]~C est défini,
-~cA[t]~C est retourné
+~cA[t]~C est dï¿½fini,
+~cA[t]~C est retournï¿½
 
 &EN Si
-~cA[t]~C n'est pas défini, on calcule les valeurs
+~cA[t]~C n'est pas dï¿½fini, on calcule les valeurs
 ~ct0~C et
 ~ct1~C autour de
 ~ct~C
 telles que
 ~cA[t0]~C et
-~cA[t1]~C soient définis et non nuls. Si ni
+~cA[t1]~C soient dï¿½finis et non nuls. Si ni
 ~ct0~C ni
 ~ct1~C ne
-peuvent être trouvés, retourne
-~cNaN.~C Il s'agit dans ce cas d'un série
+peuvent ï¿½tre trouvï¿½s, retourne
+~cNaN.~C Il s'agit dans ce cas d'un sï¿½rie
 ~cA~C
-valant ~cNaN~C sur toute la période.
+valant ~cNaN~C sur toute la pï¿½riode.
 
 &EN si seul
-~ct0~C est défini, retourne
+~ct0~C est dï¿½fini, retourne
 ~cB[t] * (A[t0] / B[t0])~C
 
 &EN Si seul
-~ct1~C est défini, retourne
+~ct1~C est dï¿½fini, retourne
 ~cB[t] * (A[t1] / B[t1])~C
 
 &EN Si
 ~ct0~C et
-~ct1~C sont définis, calcule d'abord
+~ct1~C sont dï¿½finis, calcule d'abord
 ~cDelta = (A[t1]/A[t0]) / (B[t1]/B[t0])~C
 puis retourne
 ~cA[t0] * (B[t]/B[t0]) * Delta ** ((t-t0)/(t1-t0))~C
@@ -3131,12 +3131,12 @@ puis retourne
 
 <Version 6.16> (14/06/2007)
     Version 6.16 (14/06/2007)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Fonction LEC if()
-—————————————————————
-Dans le cas d'une condition dont la valeur est NaN, le résultat de la
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Dans le cas d'une condition dont la valeur est NaN, le rï¿½sultat de la
 fonction if(cond, iftrue, iffalse) est iffalse.
 
 Auparavant, cette fonction retournant iftrue.
@@ -3149,34 +3149,34 @@ Exemple :
 >
 <Version 6.15> (14/03/2007)
     Version 6.15 (14/03/2007)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
-&TI Gestion mémoire (en test)
-—————————————————————
-La gestion des objets en mémoire est modifiée pour permettre la création
-d'un plus grand nombre d'objets. On constate en effet que, suivant la taille mémoire
-disponible, le nombre maximum d'objets d'un même type ne pouvait dépasser
-les 300 à 400 000.
+&TI Gestion mï¿½moire (en test)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La gestion des objets en mï¿½moire est modifiï¿½e pour permettre la crï¿½ation
+d'un plus grand nombre d'objets. On constate en effet que, suivant la taille mï¿½moire
+disponible, le nombre maximum d'objets d'un mï¿½me type ne pouvait dï¿½passer
+les 300 ï¿½ 400 000.
 
-Cette version permet de créer plusieurs millions d'objets d'un même type :
-des tests ont été menés jusqu'à 2.850.000 objets.
+Cette version permet de crï¿½er plusieurs millions d'objets d'un mï¿½me type :
+des tests ont ï¿½tï¿½ menï¿½s jusqu'ï¿½ 2.850.000 objets.
 
-Cette modification a un coût : les blocs mémoire alloués aux objets étant
-plus grands, les manipulations (modifications, destructions, créations)
-peuvent parfois être un peu ralenties.
+Cette modification a un coï¿½t : les blocs mï¿½moire allouï¿½s aux objets ï¿½tant
+plus grands, les manipulations (modifications, destructions, crï¿½ations)
+peuvent parfois ï¿½tre un peu ralenties.
 
-&TI Création d'objets
-—————————————————————
-Lors de la création de nombreux objets à partir d'un rapport, l'ajout des nouveaux
+&TI Crï¿½ation d'objets
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Lors de la crï¿½ation de nombreux objets ï¿½ partir d'un rapport, l'ajout des nouveaux
 objets dans la tables des objets peut devenir relativement lent en raison du
-réordonnancement constant de la table des noms nécessité par cette
-opération d'insertion. Ce problème disparaît cependant lorsque les noms sont
-créés dans l'ordre alphabétique : le gain de temps pour quelques centaines de milliers
+rï¿½ordonnancement constant de la table des noms nï¿½cessitï¿½ par cette
+opï¿½ration d'insertion. Ce problï¿½me disparaï¿½t cependant lorsque les noms sont
+crï¿½ï¿½s dans l'ordre alphabï¿½tique : le gain de temps pour quelques centaines de milliers
 d'objets peut atteindre un rapport de 10.
 
-Dans l'exemple suivant, le nom des objets crées le sont par ordre
-alphabétique (la fonction @fmt permet de formater les entiers : on crée donc
+Dans l'exemple suivant, le nom des objets crï¿½es le sont par ordre
+alphabï¿½tique (la fonction @fmt permet de formater les entiers : on crï¿½e donc
 dans l'ordre A000000000, A000000001, etc et pas A1, A2, etc.
 
 &CO
@@ -3196,53 +3196,53 @@ $quit
 
 <Version 6.14> (23/01/2007)
     Version 6.14 (23/01/2007)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 &TI Messages d'erreur
-—————————————————————
-Quelques messages d'erreur n'étaient pas correctement représentés à l'écran (MSG##nnn apparaissait à la place du texte).
-Cette erreur est corrigée.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Quelques messages d'erreur n'ï¿½taient pas correctement reprï¿½sentï¿½s ï¿½ l'ï¿½cran (MSG##nnn apparaissait ï¿½ la place du texte).
+Cette erreur est corrigï¿½e.
 
-&TI Mémoire disponible
-——————————————————————
-La quantité de mémoire disponible affichée dans le bas de l'écran de IODE représente
-dorénavant la mémoire RAM libre et plus, comme c'était le cas dans les versions
-précédentes, toute la mémoire, y compris la mémoire virtuelle.
+&TI Mï¿½moire disponible
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+La quantitï¿½ de mï¿½moire disponible affichï¿½e dans le bas de l'ï¿½cran de IODE reprï¿½sente
+dorï¿½navant la mï¿½moire RAM libre et plus, comme c'ï¿½tait le cas dans les versions
+prï¿½cï¿½dentes, toute la mï¿½moire, y compris la mï¿½moire virtuelle.
 
-Cette nouvelle valeur est plus indicative sur la quantité utilement
-disponible : la mémoire paginée sur disque est particulièrement lente et
-l'utiliser n'est pas réellement praticable.
+Cette nouvelle valeur est plus indicative sur la quantitï¿½ utilement
+disponible : la mï¿½moire paginï¿½e sur disque est particuliï¿½rement lente et
+l'utiliser n'est pas rï¿½ellement praticable.
 
 >
 <Version 6.13> (22/11/2006)
     Version 6.13 (22/11/2006)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 &TI Longueur des noms de fichiers
-—————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-La longueur des noms de fichiers Iode est limitée à 63 caractères.
-De façon générale, les noms trop longs sont une source de problèmes dans
+La longueur des noms de fichiers Iode est limitï¿½e ï¿½ 63 caractï¿½res.
+De faï¿½on gï¿½nï¿½rale, les noms trop longs sont une source de problï¿½mes dans
 IODE. Modifier cette limite
 imposerait de transformer tous les WS (qui contiennent en interne le nom sur 63
-caractères max).
+caractï¿½res max).
 
-Les modifications suivantes ont été apportées dans cette version pour éviter les
+Les modifications suivantes ont ï¿½tï¿½ apportï¿½es dans cette version pour ï¿½viter les
 plantages du programme :
-&EN les noms de rapports de plus de 63 caractères sont acceptés dans l'écran de
-    lancement des rapports et dans les rapports IODE eux-mêmes
+&EN les noms de rapports de plus de 63 caractï¿½res sont acceptï¿½s dans l'ï¿½cran de
+    lancement des rapports et dans les rapports IODE eux-mï¿½mes
     ~c($ReportExec)~C
 
-&EN Si une tentative de sauvetage de fichiers Iode est effectuée avec un nom de
-    fichier de plus de 63 caractères, un message d'erreur est produit et le processus s'arrête.
+&EN Si une tentative de sauvetage de fichiers Iode est effectuï¿½e avec un nom de
+    fichier de plus de 63 caractï¿½res, un message d'erreur est produit et le processus s'arrï¿½te.
 
 >
 <Version 6.12> (22/06/2006)
     Version 6.12 (22/06/2006)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Grafieken
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Bij het maken van grafieken werd de periode veelal tot 2010 als de
 observaties stopten in bijv 2006. Nu worden enkel de aangegeven periodes
@@ -3257,10 +3257,10 @@ in
 &TX
 
 &TI Nieuwe rapportfuncties
-——————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &IT 1. DataRasVar
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Vertrekkende van de waarden van variabelen beantwoordend aan pattern,
 worden de waarden verdeeld via een RAS methode.
@@ -3316,9 +3316,9 @@ RAS berekent dan de cellen zo dat de nieuwe randvoorwaarden gelden en
 overschrijft de onkende waarden (Not Available)
 
 &IT 2. DataPatternXXX
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Deze functie creëert lijsten met daarin de namen van objecten
+Deze functie creï¿½ert lijsten met daarin de namen van objecten
 die voldoen aan een opgegeven patroon.
 
 ~uSyntax~U
@@ -3353,21 +3353,21 @@ inzoverre R1C1,R1C2,R2C1,R2C2,R3C1,R3C2 variabelen zijn in WS
 &TX
 
 &IT 3. $WsClearAll
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Maakt alle WS-en leeg.
 
 &IT 4. @evalue
-——————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Geeft de formule van de EQS opgegeven als argument.
 
 >
 <Version 6.11> (10/11/2004)
     Version 6.11 (10/11/2004)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Nouvelles fonctions de rapport
-——————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN ~b@sqz(string)~B : supprime les blancs de string
 &EN ~b@strip(string)~B : supprime les blancs de fin de string
 
@@ -3378,28 +3378,28 @@ Geeft de formule van de EQS opgegeven als argument.
 
 ..esc ~
 &TI Nouvelles fonctions LEC
-———————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Trois nouvelles fonctions sont introduites dans le langage LEC :
 
-&EN  ~cfloor(expr)~C : partie entière de l'expression
-&EN  ~cceil(expr)~C : partie entière de l'expression plus 1
-&EN  ~cround(expr [, n])~C : arrondi de expr à la nème décimale. Si n n'est pas défini, il est fixé à 0.
+&EN  ~cfloor(expr)~C : partie entiï¿½re de l'expression
+&EN  ~cceil(expr)~C : partie entiï¿½re de l'expression plus 1
+&EN  ~cround(expr [, n])~C : arrondi de expr ï¿½ la nï¿½me dï¿½cimale. Si n n'est pas dï¿½fini, il est fixï¿½ ï¿½ 0.
 
 &TI Nouvelles fonctions de rapport
-——————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &EN ~c@time([format])~C : renvoie l'heure. Le format contient ~chh~C pour l'heure,
-    ~cmm~C pour les minutes et ~css~C pour les secondes. Par défaut, le format est : ~c"hh:mm:ss"~C.
+    ~cmm~C pour les minutes et ~css~C pour les secondes. Par dï¿½faut, le format est : ~c"hh:mm:ss"~C.
 
 &EN ~c@date([format])~C : renvoie la date. Le format contient ~cdd~C pour le
-    jour, ~cmm~C pour le mois et ~cyyyy~C pour l'année. Par défaut, le
+    jour, ~cmm~C pour le mois et ~cyyyy~C pour l'annï¿½e. Par dï¿½faut, le
     format est ~c"dd-mm-yyyy"~C
 
-&EN ~c@take(n,string)~C : extrait les ~cn~C premiers caractères de ~cstring~C. Si ~cn~C est négatif, extrait les n derniers.
-&EN ~c@drop(n,string)~C : supprime les ~cn~C premiers caractères de ~cstring~C. Si ~cn~C est négatif, supprime les n derniers.
-&EN ~c@count(string)~C : retourne le nombre d'éléments de string (séparés par des virgules)
-&EN ~c@index(n,list)~C : retourne l'élément ~cn~C de ~clist~C
+&EN ~c@take(n,string)~C : extrait les ~cn~C premiers caractï¿½res de ~cstring~C. Si ~cn~C est nï¿½gatif, extrait les n derniers.
+&EN ~c@drop(n,string)~C : supprime les ~cn~C premiers caractï¿½res de ~cstring~C. Si ~cn~C est nï¿½gatif, supprime les n derniers.
+&EN ~c@count(string)~C : retourne le nombre d'ï¿½lï¿½ments de string (sï¿½parï¿½s par des virgules)
+&EN ~c@index(n,list)~C : retourne l'ï¿½lï¿½ment ~cn~C de ~clist~C
 
 &EX
     @take(3,iode)    : iod
@@ -3414,42 +3414,42 @@ Trois nouvelles fonctions sont introduites dans le langage LEC :
 
 <Version 6.09> (06/09/2004)
     Version 6.09 (06/09/2004)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI Correction de la fonction de rapport $DataUpdateVar
-———————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Cette fonction interprétait comme ~cna~C les valeurs ~c+0.0~C ou ~c-0.0~C ou
-~c.0~C. Cette erreur est corrigée.
+Cette fonction interprï¿½tait comme ~cna~C les valeurs ~c+0.0~C ou ~c-0.0~C ou
+~c.0~C. Cette erreur est corrigï¿½e.
 >
 <Version 6.08> (16/08/2004)
     Version 6.08 (16/08/2004)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
-&TI Intégration de valeurs d'Excel dans les rapports
-————————————————————————————————————————————————————
-Si un worksheet Excel contient des données nécessaires à l'exécution d'un rapport,
-il est facile d'intégrer dynamiquement des valeurs ou des ranges de valeurs dans le texte
+&TI Intï¿½gration de valeurs d'Excel dans les rapports
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Si un worksheet Excel contient des donnï¿½es nï¿½cessaires ï¿½ l'exï¿½cution d'un rapport,
+il est facile d'intï¿½grer dynamiquement des valeurs ou des ranges de valeurs dans le texte
 d'un rapport.
 
-Il suffit de placer la référence aux cellules nécessaires entre accollades
+Il suffit de placer la rï¿½fï¿½rence aux cellules nï¿½cessaires entre accollades
 dans une ligne de rapport :
 
 &CO
     $DataUpdateVar {=Sheet1!R2C1} %YEAR% {=Sheet1!R2C2:R3C10}
 &TX
 
-La première référence ~c{=Sheet1!R2C1}~C est lue dans Excel (le fichier doit
-évidemment être préalablement ouvert) et est replacée dans la ligne de
-commande. Dans l'exemple, il s'agira du nom de la série à modifier.
+La premiï¿½re rï¿½fï¿½rence ~c{=Sheet1!R2C1}~C est lue dans Excel (le fichier doit
+ï¿½videmment ï¿½tre prï¿½alablement ouvert) et est replacï¿½e dans la ligne de
+commande. Dans l'exemple, il s'agira du nom de la sï¿½rie ï¿½ modifier.
 
 
-La seconde référence ~c{=Sheet1!R2C2:R3C10}~C est également remplacée par la
-valeur dans Excel. S'il y a plusieurs cellules, celles-ci sont séparées par
+La seconde rï¿½fï¿½rence ~c{=Sheet1!R2C2:R3C10}~C est ï¿½galement remplacï¿½e par la
+valeur dans Excel. S'il y a plusieurs cellules, celles-ci sont sï¿½parï¿½es par
 des blancs.
 
 Dans l'exemple, on aura par exemple :
@@ -3458,17 +3458,17 @@ Dans l'exemple, on aura par exemple :
     $DataUpdateVar PNB 1990 3.23 2.34 2.56 3.12 3.45
 &TX
 
-Après remplacement, la commande est exécutée comme n'importe quelle autre
+Aprï¿½s remplacement, la commande est exï¿½cutï¿½e comme n'importe quelle autre
 commande de rapport.
 
 
 &TI Commande de rapport $ExcelWrite
-———————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Cette fonction permet d'écrire du texte ou des valeurs quelconques dans une feuille Excel.
+Cette fonction permet d'ï¿½crire du texte ou des valeurs quelconques dans une feuille Excel.
 
-Remplace les cellules spécifiées par la ou les valeurs données. Plusieurs
-colonnes sont séparées par ~c\t~C et plusieurs lignes par ~c\n~C.
+Remplace les cellules spï¿½cifiï¿½es par la ou les valeurs donnï¿½es. Plusieurs
+colonnes sont sï¿½parï¿½es par ~c\t~C et plusieurs lignes par ~c\n~C.
 
 &SY2
     $ExcelWrite MySheet!R4C4 texte[\ttexte][\ntexte][...]
@@ -3485,20 +3485,20 @@ colonnes sont séparées par ~c\t~C et plusieurs lignes par ~c\n~C.
 
 <Version 6.07> (08/03/2004)
     Version 6.07 (08/03/2004)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
-&TI Définition des samples
-——————————————————————
-    Correction : lorsque une période est incomplètement donnée (~c2000Y~C au
-    lieu de ~c2000Y1~C), le ~c1~C est fixé par défaut (au lieu de ~c0~C auparavant).
-    De même, ~c2000Q~C vaut ~c2000Q1~C.
+&TI Dï¿½finition des samples
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction : lorsque une pï¿½riode est incomplï¿½tement donnï¿½e (~c2000Y~C au
+    lieu de ~c2000Y1~C), le ~c1~C est fixï¿½ par dï¿½faut (au lieu de ~c0~C auparavant).
+    De mï¿½me, ~c2000Q~C vaut ~c2000Q1~C.
 
 &TI Lecture des tables en ASCII
-———————————————————————————
-    Les valeurs min et max peuvent contenir une valeur négative dans les
-    fichiers ASCII de définition des tableaux.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les valeurs min et max peuvent contenir une valeur nï¿½gative dans les
+    fichiers ASCII de dï¿½finition des tableaux.
 
     Par exemple :
 &CO
@@ -3521,96 +3521,96 @@ colonnes sont séparées par ~c\t~C et plusieurs lignes par ~c\n~C.
 &TX
 
 &TI Impression des tableaux avec fichier manquant
-—————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Lors du calcul de tableaux ou de graphiques pour l'affichage ou
     l'impression, si un des fichiers source ([1], [2], ...) n'est pas
-    défini, IODE ne s'arrête plus à chaque calcul, mais affiche un message
-    dans le bas de l'écran et donne des ~c--~C comme résultat pour les colonnes
+    dï¿½fini, IODE ne s'arrï¿½te plus ï¿½ chaque calcul, mais affiche un message
+    dans le bas de l'ï¿½cran et donne des ~c--~C comme rï¿½sultat pour les colonnes
     correspondantes.
 
 &TI Impressions multiples
-—————————————————————
-    Une erreur dans la version précédente ne permettait plus d'imprimer
-    plusieurs fois au cours de la même session de IODE. Cette erreur est corrigée.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Une erreur dans la version prï¿½cï¿½dente ne permettait plus d'imprimer
+    plusieurs fois au cours de la mï¿½me session de IODE. Cette erreur est corrigï¿½e.
 
 &TI Taux de croissances moyens
-——————————————————————————
-    Les samples généralisés contenant ~c//~C (taux de croissance moyens) sont à
-    nouveau acceptés.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les samples gï¿½nï¿½ralisï¿½s contenant ~c//~C (taux de croissance moyens) sont ï¿½
+    nouveau acceptï¿½s.
 
 
 &TI Graphiques
-——————————
-    Corrections dans les graphiques : Minor et Major grids adaptés
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Corrections dans les graphiques : Minor et Major grids adaptï¿½s
     (uniquement pour l'impression).
 >
 
 <Version 6.06> (02/02/2004)
     Version 6.06 (02/02/2004)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI Simulation
-——————————
-    Lorsque la méthode de réordonnancement (Sort algorithm) est fixée à
-    "None" et qu'une liste d'équations non vide est fournie, l'ordre de la
-    liste est conservé pour la simulation.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsque la mï¿½thode de rï¿½ordonnancement (Sort algorithm) est fixï¿½e ï¿½
+    "None" et qu'une liste d'ï¿½quations non vide est fournie, l'ordre de la
+    liste est conservï¿½ pour la simulation.
 
-    Cela implique en général un nombre supérieur d'itérations mais évite le
-    temps du réordonnancement.
+    Cela implique en gï¿½nï¿½ral un nombre supï¿½rieur d'itï¿½rations mais ï¿½vite le
+    temps du rï¿½ordonnancement.
 
 &TI Graphiques
-——————————
-    Le fichier iode.ini qui contient les données d'affichage des graphiques
-    est placé dans le répertoire temporaire de Windows. Ce fichier est donc
-    accessible en écriture ce qui évite, lorque les droits de l'utilisateur
-    sont limités, que la fenêtre graphique refuse de se fermer.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le fichier iode.ini qui contient les donnï¿½es d'affichage des graphiques
+    est placï¿½ dans le rï¿½pertoire temporaire de Windows. Ce fichier est donc
+    accessible en ï¿½criture ce qui ï¿½vite, lorque les droits de l'utilisateur
+    sont limitï¿½s, que la fenï¿½tre graphique refuse de se fermer.
 
 &TI Report line
-——————————
-    Le fichier ws.rep qui contient la ligne de rapport à exécuter (fonction
-    "Report/Execute a report line") est placé dans le répertoire temporaire
-    de Windows. Ce fichier est donc accessible en écriture ce qui permet,
-    même si les droits de l'utilisateur sont limités, de créer le fichier.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le fichier ws.rep qui contient la ligne de rapport ï¿½ exï¿½cuter (fonction
+    "Report/Execute a report line") est placï¿½ dans le rï¿½pertoire temporaire
+    de Windows. Ce fichier est donc accessible en ï¿½criture ce qui permet,
+    mï¿½me si les droits de l'utilisateur sont limitï¿½s, de crï¿½er le fichier.
 
-    Cette fonction est notamment nécessaire dans le cadre de l'utilisation
+    Cette fonction est notamment nï¿½cessaire dans le cadre de l'utilisation
     de IODE comme objet COM.
 >
 <Version 6.05> (10/10/2003)
     Version 6.05 (10/10/2003)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI Commande rapport de gestion de directory et de fichiers
-———————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    Nouvelles commandes ajoutées aux rapports :
+    Nouvelles commandes ajoutï¿½es aux rapports :
 
 &EN $chdir dirname : change de directory courant
-&EN $mkdir dirname : crée un directory
-&EN $rmdir dirname : détruit un directory
+&EN $mkdir dirname : crï¿½e un directory
+&EN $rmdir dirname : dï¿½truit un directory
 &EN $SysAppendFile in out : ajoute le fichier in au fichier out
 &EN $A2mToPrinter file.a2m : imprime le fichier file.a2m
 
 &TI Formattage d'entiers
-————————————————————————
-    Nouvelle fonction ~c@fmt(val,fmt)~C qui retourne un string formatté.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouvelle fonction ~c@fmt(val,fmt)~C qui retourne un string formattï¿½.
 
-    Formatte un entier val suivant un format fmt donné. Le résultat est un
-    string transformé de longueur égale à celle de fmt.
+    Formatte un entier val suivant un format fmt donnï¿½. Le rï¿½sultat est un
+    string transformï¿½ de longueur ï¿½gale ï¿½ celle de fmt.
 
-    Les caractères reconnus dans le format sont : 'X', 'x', '9', '0'. Ils
-    signifient qu'aux seules positions de ces caractères seront placés dans
-    leur ordre d'apparition les caractères résultant du formattage de val.
-    Seul cas particulier : le caractère '0' qui sera remplacé par une '0' si
-    le caractère correspondant dans le formattage de val est ' '.
+    Les caractï¿½res reconnus dans le format sont : 'X', 'x', '9', '0'. Ils
+    signifient qu'aux seules positions de ces caractï¿½res seront placï¿½s dans
+    leur ordre d'apparition les caractï¿½res rï¿½sultant du formattage de val.
+    Seul cas particulier : le caractï¿½re '0' qui sera remplacï¿½ par une '0' si
+    le caractï¿½re correspondant dans le formattage de val est ' '.
 
 &SY
     @fmt(val,fmt)
-    où
-    val = valeur entière
+    oï¿½
+    val = valeur entiï¿½re
     fmt = format
 &TX
 
@@ -3618,49 +3618,49 @@ colonnes sont séparées par ~c\t~C et plusieurs lignes par ~c\n~C.
     @fmt(123,0009)   --->> 0123
     @fmt(123,A0000A)   --->> A00123A
 &TX
-    Attention, les blancs avant et après le format sont repris dans le résultat.
+    Attention, les blancs avant et aprï¿½s le format sont repris dans le rï¿½sultat.
 
 &TI Underflow et Overflow
-—————————————————————————
-Les calculs non tolérés (exponentielles en particulier) sont prises en
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Les calculs non tolï¿½rï¿½s (exponentielles en particulier) sont prises en
 compte plus correctement notamment dans les fonctions d'estimation.
 
-Auparavant, un message du type "Underflow error" était affiché et Iode se
+Auparavant, un message du type "Underflow error" ï¿½tait affichï¿½ et Iode se
 plantait...
 >
 <Version 6.04> (18/01/2002)
     Version 6.04 (18/01/2002)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI Longueur des lignes de rapports
-———————————————————————————————
-    La longueur max est portée à 10000 caractères.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La longueur max est portï¿½e ï¿½ 10000 caractï¿½res.
 
 &TI Output HTML
-———————————
-    Cadrage des cellules de titres à droite (au lieu de centré).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Cadrage des cellules de titres ï¿½ droite (au lieu de centrï¿½).
 
 &TI Output HELPHTML
-———————————————
-    Idem HTML et correction des titres de la table des matières.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Idem HTML et correction des titres de la table des matiï¿½res.
 
 &TI Output MIF
-——————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Gestion des sauts de pages dans les rapports (.page).
 
 &TI LEC
-———————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Correction de la fonction exp(a, b). Cette fontion prenait toujours
-    l'exponentielle népérienne. Elle permet maintenant de prendre la puissance
+    l'exponentielle nï¿½pï¿½rienne. Elle permet maintenant de prendre la puissance
     de n'importe quelle formule.
 
     Notons que
 &CO
     exp(a, b)  == a**b
 &TX
-    D'autre part, les erreurs de calculs résultant de mauvaises valeurs
+    D'autre part, les erreurs de calculs rï¿½sultant de mauvaises valeurs
     des arguments sont mieux prises en charge par IODE :
 
 &CO
@@ -3671,240 +3671,240 @@ plantait...
 
 <Version 6.03> (13/12/2001)
     Version 6.03 (13/12/2001)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Simulation
-——————————
-    Correction de la méthode Newton dans le cas du goal-seeking et d'une
-    équation non résolue par rapport à l'endogène.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction de la mï¿½thode Newton dans le cas du goal-seeking et d'une
+    ï¿½quation non rï¿½solue par rapport ï¿½ l'endogï¿½ne.
 
 &TI Graphiques
-——————————
-    Amélioration des routines graphiques.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Amï¿½lioration des routines graphiques.
 >
 
 <Version 6.02>
     Version 6.02 (16/11/2000)
-    ———————————————————————————————————————————————————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI LEC
-———
+ï¿½ï¿½ï¿½
     Deux nouvelles fonctions dans le langage LEC :
 &CO
 	hp([[from,]to],expr) : filtre Hodrick-Prescott
-	appdif(expr1, expr2) : complète la série expr1 sur base de la série
-			       apparentée expr2 en tenant compte des
-			       différences au lieu des taux de croissance
+	appdif(expr1, expr2) : complï¿½te la sï¿½rie expr1 sur base de la sï¿½rie
+			       apparentï¿½e expr2 en tenant compte des
+			       diffï¿½rences au lieu des taux de croissance
 			       (comme dans app())
 &TX
-    La fonction app() est modifiée :
+    La fonction app() est modifiï¿½e :
 &CO
-	app(expr1, expr2) : dans le cas où plusieurs observations sont
-	    manquantes, le taux de croissance est réparti de manière
-	    équilibrée entre les points connus.
+	app(expr1, expr2) : dans le cas oï¿½ plusieurs observations sont
+	    manquantes, le taux de croissance est rï¿½parti de maniï¿½re
+	    ï¿½quilibrï¿½e entre les points connus.
 &TX
-&TI Gestion Mémoire
-———————
-    Augmentation de l'espace mémoire dans le cas de grands WS
+&TI Gestion Mï¿½moire
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Augmentation de l'espace mï¿½moire dans le cas de grands WS
     (variable interne K_CHUNCK=1024).
 >
 
 <Version 6.01>
     Version 6.01 (16/10/2000)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouvelles @-functions:
 &CO
 	@cvalue(name, ...) : texte de commentaires
-	@vvalue(name, ...) : valeurs de séries
-	@sample(B|E|nil)   : sample courant (début, fin, les deux)
+	@vvalue(name, ...) : valeurs de sï¿½ries
+	@sample(B|E|nil)   : sample courant (dï¿½but, fin, les deux)
 &TX
 &TI Readme
-——————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Affichage du readme sous forme HTML.
 
 &TI Distribution
-————————————
-    Distribution de IODE à partir du site ~l"http://www.plan.be/fr/soft/iode.htm"www.plan.be~L
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Distribution de IODE ï¿½ partir du site ~l"http://www.plan.be/fr/soft/iode.htm"www.plan.be~L
 
 &TI Graphiques
-——————————
-	Nouvelle librairie graphique (TeeChart) plus étendue pour
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Nouvelle librairie graphique (TeeChart) plus ï¿½tendue pour
 	l'affichage et l'impression des graphiques.
 >
 <Version 5.32>
     Version 5.32 (16/08/2000)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Low to High
-——————————
-    Lorsqu'une série contient des données manquantes au milieu de la période
-    de définition, la transformation se fait pour chaque partie définie.
-    Auparavant, seule la première partie était traitée.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsqu'une sï¿½rie contient des donnï¿½es manquantes au milieu de la pï¿½riode
+    de dï¿½finition, la transformation se fait pour chaque partie dï¿½finie.
+    Auparavant, seule la premiï¿½re partie ï¿½tait traitï¿½e.
 
-&TI Estimation : méthode stepwise
+&TI Estimation : mï¿½thode stepwise
 &CO
     $EqsStepWise from to eqname leccond {r2|fstat}
 &TX
 
 &TI Rapports
-————————
-    Nouvelles fonctions de rapports pour l'échange avec Excel:
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouvelles fonctions de rapports pour l'ï¿½change avec Excel:
 
 &CO
-    $ExcelSetScl name cell : fixe une valeur dans Excel à partir d'un scalaire IODE
-    $ExcelGetScl name cell : récupère une valeur de scalaire à partir d'Excel
-    $ExcelGetCmt name cell : récupère une valeur de commentaire à partir d'Excel
+    $ExcelSetScl name cell : fixe une valeur dans Excel ï¿½ partir d'un scalaire IODE
+    $ExcelGetScl name cell : rï¿½cupï¿½re une valeur de scalaire ï¿½ partir d'Excel
+    $ExcelGetCmt name cell : rï¿½cupï¿½re une valeur de commentaire ï¿½ partir d'Excel
 &TX
 
 &TI Nouveaux formats et limites de IODE
 
-Cette version supprime la plupart des limites inhérentes au logiciel IODE.
+Cette version supprime la plupart des limites inhï¿½rentes au logiciel IODE.
 Elle introduit en plus un algorithme de compression pour diminuer la taille
 requise par les WS sur disque.
 
-&IT Compatibilité avec les versions antérieures
-———————————————————————————————————————————
-    Les anciens fichiers sont interprétés automatiquement lors du chargement.
+&IT Compatibilitï¿½ avec les versions antï¿½rieures
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les anciens fichiers sont interprï¿½tï¿½s automatiquement lors du chargement.
     Les nouveaux ne sont plus lisibles dans les anciennes versions de IODE.
 
 &IT Nombre d'objets
-———————————————
-    Le nombre maximum d'objets gérables simultanément en WS passe de 65535 à
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le nombre maximum d'objets gï¿½rables simultanï¿½ment en WS passe de 65535 ï¿½
     2,147,483,647 (si le hardware le permet).
 
 &IT Nom des objets
-——————————————
-    Le nom des objets peut contenir 20 caractères maximum au lieu de 10.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le nom des objets peut contenir 20 caractï¿½res maximum au lieu de 10.
 
 &IT Taille des objets
-—————————————————
-    La taille des objets est limitée à 2,147,483,647 bytes au lieu de 32,500.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La taille des objets est limitï¿½e ï¿½ 2,147,483,647 bytes au lieu de 32,500.
 
 &IT Nombre de colonnes des tableaux
-———————————————————————————————
-    Le nombre de colonnes d'un tableau est limité à 99 (au lieu de 20 auparavant).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le nombre de colonnes d'un tableau est limitï¿½ ï¿½ 99 (au lieu de 20 auparavant).
 
 
 &IT Compression des fichiers
-————————————————————————
-    Les différents WS peuvent être comprimés au moment de leur sauvetage.
-    Selon le type d'objet et leur définition, la compression peut aller de
-    30 à 75%.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les diffï¿½rents WS peuvent ï¿½tre comprimï¿½s au moment de leur sauvetage.
+    Selon le type d'objet et leur dï¿½finition, la compression peut aller de
+    30 ï¿½ 75%.
 
-    Chaque objet étant comprimé individuellement, le coût au niveau du temps
-    de sauvetage peut être important pour les fichiers contenant de nombreux
-    objets ou sur des machines lentes (1000 variables de 25 obs. à la sec.
+    Chaque objet ï¿½tant comprimï¿½ individuellement, le coï¿½t au niveau du temps
+    de sauvetage peut ï¿½tre important pour les fichiers contenant de nombreux
+    objets ou sur des machines lentes (1000 variables de 25 obs. ï¿½ la sec.
     sur un Pentium III 450 MHz).
 
-    Iode reconnaît et transforme automatiquement les fichiers comprimés.
+    Iode reconnaï¿½t et transforme automatiquement les fichiers comprimï¿½s.
 
-    Le chargement n'est pratiquement pas pénalisé par la procédure de
-    décompression. Un seul cas fait exception : les fichiers de variables
-    dont les séries doivent être chargées par une fonction de type
+    Le chargement n'est pratiquement pas pï¿½nalisï¿½ par la procï¿½dure de
+    dï¿½compression. Un seul cas fait exception : les fichiers de variables
+    dont les sï¿½ries doivent ï¿½tre chargï¿½es par une fonction de type
     $WsCopyVar: dans ce cas, la lecture est ralentie par le fait que les
-    longueurs des séries comprimées deviennent variables et que le fichier
-    doit par conséquent être lu séquentiellement.
+    longueurs des sï¿½ries comprimï¿½es deviennent variables et que le fichier
+    doit par consï¿½quent ï¿½tre lu sï¿½quentiellement.
 
-    Le panneau de sauvetage présente un checkbox qui permet d'indiquer si on
+    Le panneau de sauvetage prï¿½sente un checkbox qui permet d'indiquer si on
     souhaite ou non comprimer les fichiers.
 
 &TI Rapports
-    ————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La fonction $WsSaveCmpXxx permet de sauver les WS en les comprimant.
 
     Nouvelle fonction ~c@srelax(scl1,scl2,...)~C qui retourne la valeur
     du relax d'un scalaire.
 
 &TI DDE
-———
+ï¿½ï¿½ï¿½
     Correction dans les transferts entre IODE et APL. Les valeurs
-    inférieures à 1e-10 plantaient parfois IODE.
+    infï¿½rieures ï¿½ 1e-10 plantaient parfois IODE.
 
 &TI LEC
-———
-    Correction pour les équations du type log(X) :=
+ï¿½ï¿½ï¿½
+    Correction pour les ï¿½quations du type log(X) :=
 >
 <Version 5.31>
     Version 5.31 (11/05/2000)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI IMPORT GEM
-——————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La fonction ~cFile/Import~C lit le nouveau format des fichiers GEM (projet
     Nemesis/E3ME).
 
-    La fonction de rapport ~c$FileImportVar~C est également implémentée pour ce
+    La fonction de rapport ~c$FileImportVar~C est ï¿½galement implï¿½mentï¿½e pour ce
     nouveau format:
 &CO
 	$FileImportVar GEM rulefile infile outfile from to  [trace]
 &TX
 
-&TI Formattage de périodes dans les rapports
-————————————————————————————————————————
-    L'expression {1980Y1 - 1@@T} dans les rapports ne donne le résultat
-    correct - à savoir 1979Y1 - que si le sample courant contient 1979Y1. Si
-    le sample était par exemple 1980Y1 2000Y1, le résultat était 1981Y1.
-    Cette erreur est corrigée.
+&TI Formattage de pï¿½riodes dans les rapports
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    L'expression {1980Y1 - 1@@T} dans les rapports ne donne le rï¿½sultat
+    correct - ï¿½ savoir 1979Y1 - que si le sample courant contient 1979Y1. Si
+    le sample ï¿½tait par exemple 1980Y1 2000Y1, le rï¿½sultat ï¿½tait 1981Y1.
+    Cette erreur est corrigï¿½e.
 >
 <Version 5.30>
     Version 5.30 (13/04/2000)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Simulation
-——————————
-    Le processus de simulation ne s'arrête plus si une valeur NAN est atteinte
-    dans le prologue et l'épilogue du modèle (les parties non interdépendantes).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le processus de simulation ne s'arrï¿½te plus si une valeur NAN est atteinte
+    dans le prologue et l'ï¿½pilogue du modï¿½le (les parties non interdï¿½pendantes).
 >
 <Version 5.29>
     Version 5.29 (17/03/2000)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    Une ligne de rapport est interprétée avant d'être (éventuellement)
-    exécutée. Cette interprétation se fait de la façon suivante:
+    Une ligne de rapport est interprï¿½tï¿½e avant d'ï¿½tre (ï¿½ventuellement)
+    exï¿½cutï¿½e. Cette interprï¿½tation se fait de la faï¿½on suivante:
 
-    L'ordre d'interprétation est le suivant :
+    L'ordre d'interprï¿½tation est le suivant :
 
-    Les caractères spéciaux sont : ~b%, { et @.~B
+    Les caractï¿½res spï¿½ciaux sont : ~b%, { et @.~B
 
-    Chaque ligne est interprétée de gauche à droite. Dès qu'un des
-    caractères spéciaux est rencontré, un traitement particulier est
-    appliqué.
+    Chaque ligne est interprï¿½tï¿½e de gauche ï¿½ droite. Dï¿½s qu'un des
+    caractï¿½res spï¿½ciaux est rencontrï¿½, un traitement particulier est
+    appliquï¿½.
 
 Si on rencontre % :
-&EN si le suivant est %, un seul % est conservé comme du texte
+&EN si le suivant est %, un seul % est conservï¿½ comme du texte
 &CO
     Exemple : augmentation de 10%% du PNB ->> un seul % reste dans le texte
 &TX
-&EN sinon, la macro est remplacée par sa valeur ou vide si la macro n'existe pas :
+&EN sinon, la macro est remplacï¿½e par sa valeur ou vide si la macro n'existe pas :
 &CO
 	    Exemple : la variable %VAR% ->> la variable XYZ
 &TX
 
 Si on rencontre { :
-&EN si le suivant est {, un seul { est conservé comme du texte, le texte est
-    lu jusqu'à }, les macros sont remplacées
+&EN si le suivant est {, un seul { est conservï¿½ comme du texte, le texte est
+    lu jusqu'ï¿½ }, les macros sont remplacï¿½es
 
-&EN2 si le texte résultat commence par $ ou ##, il s'agit d'une commande
-	  de rapport qui est exécutée et le résultat (0 ou 1) se retrouve
+&EN2 si le texte rï¿½sultat commence par $ ou ##, il s'agit d'une commande
+	  de rapport qui est exï¿½cutï¿½e et le rï¿½sultat (0 ou 1) se retrouve
 	  dans le texte.
-&EN2 sinon, le texte résultat est calculé comme une formule LEC à la
-	  période courante définie par $SetTime. Si la formule se termine
-	  pas @T ou @999.999, le résultat est formaté en conséquence.
+&EN2 sinon, le texte rï¿½sultat est calculï¿½ comme une formule LEC ï¿½ la
+	  pï¿½riode courante dï¿½finie par $SetTime. Si la formule se termine
+	  pas @T ou @999.999, le rï¿½sultat est formatï¿½ en consï¿½quence.
 
 Si on rencontre @ :
 
-&EN2 si le suivant est @, un seul @ est conservé comme du texte,
-	le texte est lu jusqu'à la parenthèse fermante,
-	la fonction correspondante est exécutée. A noter qu'en
-	l'absence de parenthèses, le texte reste inchangé (Ex.: gb@plan.be
+&EN2 si le suivant est @, un seul @ est conservï¿½ comme du texte,
+	le texte est lu jusqu'ï¿½ la parenthï¿½se fermante,
+	la fonction correspondante est exï¿½cutï¿½e. A noter qu'en
+	l'absence de parenthï¿½ses, le texte reste inchangï¿½ (Ex.: gb@plan.be
 	reste tel quel).
 
 &CO
@@ -3917,10 +3917,10 @@ Si on rencontre @ :
 &TX
 
 &TI Formattage dans les rapports
-————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Le format dans les formules LEC des rapports peut s'exprimer comme .9, auquel
-    cas, le nombre de décimales est fixé et le nombre de positions avant la virgule
-    est déterminé par la valeur du nombre lui-même.
+    cas, le nombre de dï¿½cimales est fixï¿½ et le nombre de positions avant la virgule
+    est dï¿½terminï¿½ par la valeur du nombre lui-mï¿½me.
 
     Exemple :
 &CO
@@ -3936,7 +3936,7 @@ Si on rencontre @ :
 ..esc ~
 
 &TI Format Ascii des tableaux
-—————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Le format ascii des tableaux comprend maintenant les informations
     concernant les attributs graphiques.
 
@@ -3966,18 +3966,18 @@ Si on rencontre @ :
 
 <Version 5.27>
     Version  5.27 (25/2/2000)
-———————————————————————————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI High to Low
-———————————
-    Correction dans le cas des données non disponibles.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction dans le cas des donnï¿½es non disponibles.
 >
 <Version 5.26>
     Version 5.26 (7/2/2000)
-———————————————————————————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Two new functions to automate the import of variables and comments in
     various external formats.
 
@@ -4003,7 +4003,7 @@ Si on rencontre @ :
 	trace = debug file (optional)
 &TX
 &IT Examples
-    ————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
     $FileImportCmt TXT bstrule.txt bf-06ser.txt bh\p6d.cmt D p6d.log
     $FileImportVar TXT bstrule.txt bf-06obs.txt bh\p6y.var 1980Y1 2000Y1 p6y.log
@@ -4016,36 +4016,36 @@ Si on rencontre @ :
 ..esc ~
 
 &TI Load WS
-———————
-    En cas de problème lors de la lecture d'un fichier (fichier incomplet
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    En cas de problï¿½me lors de la lecture d'un fichier (fichier incomplet
     par exemple), IODE s'efforce de lire le maximum d'objets.
-    Cependant,si un fichier pose problème, un message d'erreur est généré et
+    Cependant,si un fichier pose problï¿½me, un message d'erreur est gï¿½nï¿½rï¿½ et
     il y a lieu de sauver son travail au plus vite. De plus, il est
-    conseillé de sauver les données du fichier à problème dans un format
+    conseillï¿½ de sauver les donnï¿½es du fichier ï¿½ problï¿½me dans un format
     Ascii et de le recharger par la suite.
 
 &TI Low to High
-———————————
-    La fonction Low To High s'est enrichie d'une nouvelle méthode
-    d'interpolation en plus des 2 existantes. Cette méthode (Step) conserve
-    une valeur constante (celle de l'observation de la série de base,
-    éventuellement divisée par le nombre de sous-périodes) pour toutes les
-    observations calculées).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La fonction Low To High s'est enrichie d'une nouvelle mï¿½thode
+    d'interpolation en plus des 2 existantes. Cette mï¿½thode (Step) conserve
+    une valeur constante (celle de l'observation de la sï¿½rie de base,
+    ï¿½ventuellement divisï¿½e par le nombre de sous-pï¿½riodes) pour toutes les
+    observations calculï¿½es).
 
     D'autre part, la syntaxe des fonctions de rapport correspondantes est :
 &CO
 	$WsLToHFlow  {L|C|S} file var1 var2 ...
 	$WsLToHStock {L|C|S} file var1 var2 ...
-    avec L pour interpolation linéaire
+    avec L pour interpolation linï¿½aire
 	 C pour interpolation par Cubic Splines
 	 S pour interpolation par Steps
 &TX
 
 &TI Aide
-————
+ï¿½ï¿½ï¿½ï¿½
     Le fichier d'aide en format HtmlHelp (plus convivial, plus lisible) est
-    intégré dans IODE. Cependant, si le système HtmlHelp n'est pas installé
-    sur la machine cible, l'ancien fichier d'aide est utilisé.
+    intï¿½grï¿½ dans IODE. Cependant, si le systï¿½me HtmlHelp n'est pas installï¿½
+    sur la machine cible, l'ancien fichier d'aide est utilisï¿½.
 >
 
 <Version 5.24> (20/1/2000)
@@ -4054,7 +4054,7 @@ Si on rencontre @ :
 ..esc ~
 &TI Corrections
 
-&EN    Interface ~bDataStream~B : corrections pour les années à partir de 2000
+&EN    Interface ~bDataStream~B : corrections pour les annï¿½es ï¿½ partir de 2000
 
 &EN     Interface ~bODBC~B : adaptation aux champs de grande taille (longueur max : 4K)
 >
@@ -4063,28 +4063,28 @@ Version 5.23 (13/12/1999)
 
 
 &TI LEC
-———
-    La fonction ~capp()~C de calcul de série apparentées est modifiée dans
-    le cas d'une rétropolation ou d'une extrapolation sur base d'une
-    série apparentée. Le taux de croissance est utilisé pour les valeurs
-    en dehors de la période de définition de la série à compléter.
+ï¿½ï¿½ï¿½
+    La fonction ~capp()~C de calcul de sï¿½rie apparentï¿½es est modifiï¿½e dans
+    le cas d'une rï¿½tropolation ou d'une extrapolation sur base d'une
+    sï¿½rie apparentï¿½e. Le taux de croissance est utilisï¿½ pour les valeurs
+    en dehors de la pï¿½riode de dï¿½finition de la sï¿½rie ï¿½ complï¿½ter.
 >
 <Version 5.22>
     Version 5.22 (19/09/99)
 
 &TI Importations
-————————————
-    Le format d'échange Belgostat version 2000 est disponible dans le
-    panneau d'importation. Les commentaires et séries peuvent être
-    importés.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le format d'ï¿½change Belgostat version 2000 est disponible dans le
+    panneau d'importation. Les commentaires et sï¿½ries peuvent ï¿½tre
+    importï¿½s.
 
-    Ce format remplace dorénavant le format DIF-Belgostat. Les fichiers
-    de données ne sont plus disponibles via l'ancienne connexion
+    Ce format remplace dorï¿½navant le format DIF-Belgostat. Les fichiers
+    de donnï¿½es ne sont plus disponibles via l'ancienne connexion
     Belgostat, mais sous forme de fichiers complets sur le site Internet
     de la BNB (voir GB pour infos).
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouvelles fonctions :
 &CO
 	@sstderr(scalar, ...)
@@ -4093,27 +4093,27 @@ Version 5.23 (13/12/1999)
     Exemple
 &CO
 	$show Valeur de a1 : @sstderr(a1)
-	A est le premier paramètre ? @equal(A,%1%)
+	A est le premier paramï¿½tre ? @equal(A,%1%)
 &TX
-    Résultat
+    Rï¿½sultat
 &CO
 	Valeur de a1 : 2.23
-	A est le premier paramètre ? 0
+	A est le premier paramï¿½tre ? 0
 &TX
 
     Modification support YoY pour Diff et Grt :
 &CO
 	$DataUpdateVar varname [{L | D | G | DY | GY}] period values
 &TX
-    Excel : Correction dans ~c$ExcelSetVar~C : la dernière observation était
+    Excel : Correction dans ~c$ExcelSetVar~C : la derniï¿½re observation ï¿½tait
     manquante.
 
 &TI Lectures tableaux
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Lors de la lecture d'un tableau en ASCII (fichier .at), si une
-    forme LEC est erronée ou vide, la cellule correspondante contient
+    forme LEC est erronï¿½e ou vide, la cellule correspondante contient
     la forme LEC sous forme d'un string. Il est alors possible de
-    la corriger dans l'éditeur de tableau (si cela est souhaité).
+    la corriger dans l'ï¿½diteur de tableau (si cela est souhaitï¿½).
 >
 
 <Version 5.21>
@@ -4123,12 +4123,12 @@ Version 5.23 (13/12/1999)
 
 &TI Interface ODBC
 
-    De nouvelles fonctions de rapport permettent d'exécuter des requêtes
+    De nouvelles fonctions de rapport permettent d'exï¿½cuter des requï¿½tes
     SQL. Ces fonctions permettent par exemple de construire automatiquement
-    des séries au format IODE à partir de bases de données Access, Oracle
-    ou même de fichiers de texte.
+    des sï¿½ries au format IODE ï¿½ partir de bases de donnï¿½es Access, Oracle
+    ou mï¿½me de fichiers de texte.
 
-    Les commandes de rapport se présentent sous forme de fonctions:
+    Les commandes de rapport se prï¿½sentent sous forme de fonctions:
 &CO
 	@SqlOpen(ODBC_source[,user,passwd])
 	@SqlQuery("SQL Query")
@@ -4137,105 +4137,105 @@ Version 5.23 (13/12/1999)
 	@SqlRecord([field_nb[,field_nb[,...]]])
 	@SqlClose()
 &TX
-    Pour pouvoir accéder à une base de données dans IODE, il faut
-    préalablement définir une 'source ODBC' (Open DataBase Connectivity),
-    ce qui peut être fait très facilement à l'aide du programme ODBC32
+    Pour pouvoir accï¿½der ï¿½ une base de donnï¿½es dans IODE, il faut
+    prï¿½alablement dï¿½finir une 'source ODBC' (Open DataBase Connectivity),
+    ce qui peut ï¿½tre fait trï¿½s facilement ï¿½ l'aide du programme ODBC32
     inclus dans le Control Panel de Windows.
 
-    La syntaxe complète et des exemples peuvent être trouvés dans le manuel.
+    La syntaxe complï¿½te et des exemples peuvent ï¿½tre trouvï¿½s dans le manuel.
 
 &TI Rapports
 
     Les titres et pieds de pages introduits par les commandes
-    ~c$PrintPageHeader~C et ~c$PrintPageFooter~C sont conservés si le résultat
-    de l'impression est sauvegardé dans un fichier a2m.
+    ~c$PrintPageHeader~C et ~c$PrintPageFooter~C sont conservï¿½s si le rï¿½sultat
+    de l'impression est sauvegardï¿½ dans un fichier a2m.
 >
 
 <Version 5.20>
     Version 5.20 (21/06/99)
-    ———————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 &TI Installation
-————————————————
-    Les fichiers nécessaires à l'utilisation de la version HTML Help de l'aide
-    de IODE sont intégrés dans le programme d'installation de IODE.
-    Ces fichiers ne doivent être installés que pour les versions Windows
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les fichiers nï¿½cessaires ï¿½ l'utilisation de la version HTML Help de l'aide
+    de IODE sont intï¿½grï¿½s dans le programme d'installation de IODE.
+    Ces fichiers ne doivent ï¿½tre installï¿½s que pour les versions Windows
     95 et NT 4.0. Ils font partie de Windows 98.
 
 &TI Programme A2M
-—————————————————
-    Le programme A2M qui permet, à l'extérieur de IODE, d'imprimer ou de
-    transformer des fichiers A2M, est corrigé.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le programme A2M qui permet, ï¿½ l'extï¿½rieur de IODE, d'imprimer ou de
+    transformer des fichiers A2M, est corrigï¿½.
 
 &TI Rapports
-————————
-&EN L'impression des tableaux faisant appel à plusieurs fichiers de
-      variables nécessite un appel à la fonction ~c$PrintTblFile~C avant
-      chaque appel à ~c$PrintTbl.~C Idem pour les graphiques. Ce n'est pas
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN L'impression des tableaux faisant appel ï¿½ plusieurs fichiers de
+      variables nï¿½cessite un appel ï¿½ la fonction ~c$PrintTblFile~C avant
+      chaque appel ï¿½ ~c$PrintTbl.~C Idem pour les graphiques. Ce n'est pas
       nouveau, mais cela peut surprendre!
 
-&EN Nouvelle fonction ~c$RepeatString~C permettant de choisir le string à
-      remplacer dans la commande répétée par ~c$Repeat.~C
+&EN Nouvelle fonction ~c$RepeatString~C permettant de choisir le string ï¿½
+      remplacer dans la commande rï¿½pï¿½tï¿½e par ~c$Repeat.~C
 &CO
       $RepeatString ++
       $Repeat "$DataDuplicateVar ++ ++_1" A B C
-      copie la série A sous A_1, B sous B_1, etc.
+      copie la sï¿½rie A sous A_1, B sous B_1, etc.
 &TX
 
 &TI Impression de rapports
-——————————————————————
-    Les numéros de lignes sont imprimés par la fonction d'impression des
-    rapports. Par ailleurs, cette fonction imprime à nouveau l'entièreté
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les numï¿½ros de lignes sont imprimï¿½s par la fonction d'impression des
+    rapports. Par ailleurs, cette fonction imprime ï¿½ nouveau l'entiï¿½retï¿½
     des rapports.
 
 &TI Simulation
-——————————
-    L'algorithme de Newton-Raphson a été légèrement amélioré.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    L'algorithme de Newton-Raphson a ï¿½tï¿½ lï¿½gï¿½rement amï¿½liorï¿½.
 >
 
 <Version 5.19>
     Version 5.19 (31/05/99)
-———————————————————————————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 &TI Rapports
-————————
-    Les lignes des rapports peuvent dorénavant atteindre une longueur
-    maximale de 4095 caractères. Cependant, si la ligne contient une
-    forme LEC, il est possible que l'espace nécessaire à la forme
-    compilée de cette dernière dépasse la limite du LEC.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les lignes des rapports peuvent dorï¿½navant atteindre une longueur
+    maximale de 4095 caractï¿½res. Cependant, si la ligne contient une
+    forme LEC, il est possible que l'espace nï¿½cessaire ï¿½ la forme
+    compilï¿½e de cette derniï¿½re dï¿½passe la limite du LEC.
 >
 <Version 5.18>
     Version 5.18 (30/04/99)
-———————————————————————————————————————————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &IT Transformation de strings
 
-    Nouvelles ~c@fonctions~C nécessaires pour certains rapports.
+    Nouvelles ~c@fonctions~C nï¿½cessaires pour certains rapports.
 
 &EN @month(mois, langue)
 &EN @ansi(mois, langue)
 
 Exemples :
 &CO
-    @ansi(@month(2,F)) : Février
+    @ansi(@month(2,F)) : Fï¿½vrier
     @ansi(@month(2,N)) : Februari
     @ansi(@month(2,E)) : February
 &TX
 
-&IT Génération d'un HtmlHelp
+&IT Gï¿½nï¿½ration d'un HtmlHelp
 &CO
-    $PrintHtmlHelp [YES|No] : permet de générer des fichiers HTML Help.
+    $PrintHtmlHelp [YES|No] : permet de gï¿½nï¿½rer des fichiers HTML Help.
 &TX
 
 &IT Fonction de bouclage
 &CO
     $Repeat "command" args :
 &TX
-Cette fonction permet d'exécuter une commande sur une liste d'arguments
-sans devoir créer un rapport à cette fin. La position de l'argument dans
-la liste est représentée par le caractère de soulignement.
+Cette fonction permet d'exï¿½cuter une commande sur une liste d'arguments
+sans devoir crï¿½er un rapport ï¿½ cette fin. La position de l'argument dans
+la liste est reprï¿½sentï¿½e par le caractï¿½re de soulignement.
 
 Exemples :
 
@@ -4243,7 +4243,7 @@ Exemples :
 	1. Tri de plusieurs listes
 
 	    $Repeat "$DataListSort _ _" A B C
-		équivaut à
+		ï¿½quivaut ï¿½
 
 	    $DataListSort A A
 	    $DataListSort B B
@@ -4252,7 +4252,7 @@ Exemples :
 	2. Duplicate Vars
 
 	    Avec les nouvelles fonctions @fn(), on peut copier toutes les
-	    variables d'un WS en une seule opération :
+	    variables d'un WS en une seule opï¿½ration :
 
 	    $Repeat "$DataDuplicateVar _ _1" @vexpand(*)
 &TX
@@ -4263,40 +4263,40 @@ Exemples :
 ..esc ~
 
 &TI Seasonal adjustment
-———————————————————
-    Nouveau paramètre dans le panneau de démarrage qui permet de libérer
-    le critère vérifiant si une influence saisonnière est présente dans
-    une série.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouveau paramï¿½tre dans le panneau de dï¿½marrage qui permet de libï¿½rer
+    le critï¿½re vï¿½rifiant si une influence saisonniï¿½re est prï¿½sente dans
+    une sï¿½rie.
 
-    Le même paramètre peut être passé comme argument supplémentaire à la fonction
+    Le mï¿½me paramï¿½tre peut ï¿½tre passï¿½ comme argument supplï¿½mentaire ï¿½ la fonction
     de rapport $WsSeasAdj :
 &CO
 	$WsSeasAdj Filename Varname Varname ... Eps
 &TX
 
 &TI LEC
-———
-    Nouveaux opérateurs :
+ï¿½ï¿½ï¿½
+    Nouveaux opï¿½rateurs :
 
-&EN ~clastobs(from,~C ~cto,~C ~cexpr)~C : calcule la dernière observation sur
-	    une période donnée
+&EN ~clastobs(from,~C ~cto,~C ~cexpr)~C : calcule la derniï¿½re observation sur
+	    une pï¿½riode donnï¿½e
 
-&EN ~cinterpol(expr)~C : fournit une valeur à expr en t en interpolant ou
-	    extrapolant les valeurs connues (actuellement de façon linéaire).
+&EN ~cinterpol(expr)~C : fournit une valeur ï¿½ expr en t en interpolant ou
+	    extrapolant les valeurs connues (actuellement de faï¿½on linï¿½aire).
 
-&EN ~capp(expr1,~C ~cexpr2)~C : fournit une valeur à expr1 en t en utilisant
-	    la série expr2 comme série apparentée
+&EN ~capp(expr1,~C ~cexpr2)~C : fournit une valeur ï¿½ expr1 en t en utilisant
+	    la sï¿½rie expr2 comme sï¿½rie apparentï¿½e
 
-&EN ~crandom(expr)~C : fournit un nombre aléatoire compris entre -expr/2 et +expr/2.
+&EN ~crandom(expr)~C : fournit un nombre alï¿½atoire compris entre -expr/2 et +expr/2.
 
     Modifications:
 
-	Les opérateurs ~clmean~C et ~clstderr~C ne retournent plus de valeur ~cNA~C
+	Les opï¿½rateurs ~clmean~C et ~clstderr~C ne retournent plus de valeur ~cNA~C
 	lorsqu'une des observations est ~cNA:~C ils n'utilisent simplement plus
 	les valeurs indisponibles dans les calculs.
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouvelles fonctions dans le groupe @function() :
 &CO
 	@ttitle(tablename,tablename, ...) : titre des tableaux
@@ -4314,28 +4314,28 @@ Exemples :
 &TX
 
 &TI Impression de tableaux
-——————————————————————
-    Lorsqu'une variable n'est pas définie, les tableaux s'affichent ou
-    s'impriment avec -- comme valeur pour les cellules concernées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsqu'une variable n'est pas dï¿½finie, les tableaux s'affichent ou
+    s'impriment avec -- comme valeur pour les cellules concernï¿½es.
 >
 <Version 5.16>
     Version 5.16 (24/02/99)
 
 &TI LEC
-———
-    Nouvel opérateur :
+ï¿½ï¿½ï¿½
+    Nouvel opï¿½rateur :
 
-&EN ~clstderr(expr,~C ~cexpr,~C ~c...)~C : calcule la déviation standard
-	    des expressions passées comme paramètre
+&EN ~clstderr(expr,~C ~cexpr,~C ~c...)~C : calcule la dï¿½viation standard
+	    des expressions passï¿½es comme paramï¿½tre
 
 &TI Rapports
-————————
-    Nouveau groupe de fonctions dont la syntaxe générale est :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouveau groupe de fonctions dont la syntaxe gï¿½nï¿½rale est :
 &CO
 	@function_name(arg1, arg2, ...)
 &TX
-    Ce groupe de fonctions va progressivement être étendu selon les demandes
-    des utilisateurs. Actuellement, les fonctions définies sont :
+    Ce groupe de fonctions va progressivement ï¿½tre ï¿½tendu selon les demandes
+    des utilisateurs. Actuellement, les fonctions dï¿½finies sont :
 &CO
 	@upper(texte) : mise d'un texte en majuscules
 	@lower(texte) : mise d'un texte en minuscules
@@ -4343,11 +4343,11 @@ Exemples :
 	@time([format[]) : heure
 	@replace(string, from, to) : substitution d'un texte par une autre
 
-	@fdelete(filename) : détruit le fichier filename
-	@fappend(filename,string|NL, ...) : écrit dans un fichier les textes
-				passés comme argument
+	@fdelete(filename) : dï¿½truit le fichier filename
+	@fappend(filename,string|NL, ...) : ï¿½crit dans un fichier les textes
+				passï¿½s comme argument
 &TX
-    Sont en projet (les idées sont bienvenues) :
+    Sont en projet (les idï¿½es sont bienvenues) :
 &CO
 	@ttitle(tablename,tablename, ...) : titre des tableaux
 	@tgetnl(tablename) : nombre de lignes d'un tableau
@@ -4357,12 +4357,12 @@ Exemples :
 	@tgetcell(tablename,line,col) : contenu de la cellule [line, col]
 
 	@cvalue(name, ...) : texte du commentaire
-	@evalue(name, ...) : forme LEC de l'équation
-	@ivalue(name, ...) : forme LEC de l'identité
-	@lvalue(name, ...) : définition de la liste
+	@evalue(name, ...) : forme LEC de l'ï¿½quation
+	@ivalue(name, ...) : forme LEC de l'identitï¿½
+	@lvalue(name, ...) : dï¿½finition de la liste
 	@svalue(name, ...) : valeur du scalaire
 	@tvalue(name, ...) :
-	@vvalue(name, ...) : vecteur formatté des données
+	@vvalue(name, ...) : vecteur formattï¿½ des donnï¿½es
 
 	@elistv(objname, ...) : liste des variables dans les eqs objname
 	@ilistv(objname, ...) : liste des variables dans les idts objname
@@ -4380,14 +4380,14 @@ Exemples :
 	@vexpand(pattern, ...)
 &TX
 
-    Ces fonctions s'exécutent dans le cadre d'une ligne de rapport et le
-    résultat de la fonction est imprimé dans l'output du rapport.
+    Ces fonctions s'exï¿½cutent dans le cadre d'une ligne de rapport et le
+    rï¿½sultat de la fonction est imprimï¿½ dans l'output du rapport.
 
     Par exemple :
 &CO
 	Le tableau T1 a pour titre @ttitle(T1). Ce titre en majuscules
-	est par conséquent @upper(@ttitle(T1)). Ce texte est imprimé
-	le @date() à @time().
+	est par consï¿½quent @upper(@ttitle(T1)). Ce texte est imprimï¿½
+	le @date() ï¿½ @time().
 &TX
     Pour placer le titre du tableau T1 dans le fichier toto.txt :
 &CO
@@ -4398,7 +4398,7 @@ Exemples :
     Version 5.15 (25/01/99)
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouvelles fonctions :
 &CO
 	$PrintHtmlStrip {Yes | No}
@@ -4414,27 +4414,27 @@ Exemples :
 ..esc ~
 
 &TI Copy
-————
+ï¿½ï¿½ï¿½ï¿½
     La fonction de copy d'objet (WorkSpace/Copy Into Workspace) et
-    la fonction de rapport équivalente sont corrigées.
+    la fonction de rapport ï¿½quivalente sont corrigï¿½es.
 
 &TI Euro
-————
-    La valeur de conversion euro/FB est fixée à ~c40.3399~C dans le LEC.
+ï¿½ï¿½ï¿½ï¿½
+    La valeur de conversion euro/FB est fixï¿½e ï¿½ ~c40.3399~C dans le LEC.
 
-    Exemple : si on a une série ~cA~C en FB, a forme ~c(A/euro)~C fournit
-    la valeur en euro de cette série. Rappelons qu'un diviseur de colonne
-    peut être introduit dans les tableaux, ce qui permet de transformer
-    très facilement les tableaux.
+    Exemple : si on a une sï¿½rie ~cA~C en FB, a forme ~c(A/euro)~C fournit
+    la valeur en euro de cette sï¿½rie. Rappelons qu'un diviseur de colonne
+    peut ï¿½tre introduit dans les tableaux, ce qui permet de transformer
+    trï¿½s facilement les tableaux.
 
 &TI Y2K
-———
-    Les valeurs des samples généralisés (pour les impressions) et des
-    périodes dans le LEC sont adaptées pour permettre l'écriture des
-    années au-delà de l'an 2000 en deux chiffres.
+ï¿½ï¿½ï¿½
+    Les valeurs des samples gï¿½nï¿½ralisï¿½s (pour les impressions) et des
+    pï¿½riodes dans le LEC sont adaptï¿½es pour permettre l'ï¿½criture des
+    annï¿½es au-delï¿½ de l'an 2000 en deux chiffres.
 
-    Ainsi les années inférieures à 50 sont considérées comme 20xx et celles
-    supérieures à 50 comme 19xx. Par exemple :
+    Ainsi les annï¿½es infï¿½rieures ï¿½ 50 sont considï¿½rï¿½es comme 20xx et celles
+    supï¿½rieures ï¿½ 50 comme 19xx. Par exemple :
 &CO
 	A[0Y1]     == A[2000Y1]
 	20Y1:3     == 2020Y1:3
@@ -4448,18 +4448,18 @@ Exemples :
 ..esc ~
 
 &TI LEC
-———
-    Nouvel opérateur ~ceuro~C dont la valeur sera correctement fixée le 1/1/99.
+ï¿½ï¿½ï¿½
+    Nouvel opï¿½rateur ~ceuro~C dont la valeur sera correctement fixï¿½e le 1/1/99.
 
 &TI Impression de variables
-———————————————————————
-    Le caractère espace ne peut plus être utilisé comme séparateur de liste
-    dans l'écran PRINT/VIEW Variables, afin de permettre d'y placer
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le caractï¿½re espace ne peut plus ï¿½tre utilisï¿½ comme sï¿½parateur de liste
+    dans l'ï¿½cran PRINT/VIEW Variables, afin de permettre d'y placer
     des formules LEC comme d A.
 
 &TI Rapports
-————————
-    ~c$DataDelete~C accepte les wildcards comme argument. Enfin une façon
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    ~c$DataDelete~C accepte les wildcards comme argument. Enfin une faï¿½on
     rapide de perdre tout votre travail sans devoir couper le PC.
 >
 
@@ -4469,80 +4469,80 @@ Exemples :
 ..esc ~
 
 &TI 'Unit Root' tests
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Les tests de Dickey-Fuller sont disponibles au niveau des rapports
-    et du panneau d'estimation d'équations.
+    et du panneau d'estimation d'ï¿½quations.
 
-    Les tests sont sauvegardés dans des scalaires dont le nom est
-    composé du préfixe df_ et du nom de la première série apparaissant
-    dans la formule à tester. Par exemple, le test pour la formule
+    Les tests sont sauvegardï¿½s dans des scalaires dont le nom est
+    composï¿½ du prï¿½fixe df_ et du nom de la premiï¿½re sï¿½rie apparaissant
+    dans la formule ï¿½ tester. Par exemple, le test pour la formule
     ~cd(A0GR+A0GF)~C est ~cdf_a0gr.~C
 
 &IT    Dans les rapports
-    —————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 	$StatUnitRoot drift trend order expression
 &TX
-    où
+    oï¿½
 &CO
-	drift : 0 ou 1 selon que la formule à estimer doive incorporer
+	drift : 0 ou 1 selon que la formule ï¿½ estimer doive incorporer
 		un terme constant (1) ou non (0)
-	trend : 0 ou 1 selon que la formule à estimer doive incorporer
+	trend : 0 ou 1 selon que la formule ï¿½ estimer doive incorporer
 		un terme de trend (1) ou non (0)
-	order : l'ordre du polynome à estimer pour obtenir les tests
-	expression : forme LEC à tester
+	order : l'ordre du polynome ï¿½ estimer pour obtenir les tests
+	expression : forme LEC ï¿½ tester
 &TX
     Par exemple :
 &CO
 	$StatUnitRoot 1 1 3 A
 &TX
-    L'équation estimée est :
+    L'ï¿½quation estimï¿½e est :
 &CO
 	d(A) := df_ * A[-1]+
 		    df_d +    /* DRIFT */
 		    df_t * t +  /* TREND */
 		    df1 * d(A[-1]) + df2*d(A[-2]) + df3*d(A[-3]) /* ORDER */
 &TX
-    Seuls le test de Dickey-Fuller est sauvegardé dans un scalaire sous
+    Seuls le test de Dickey-Fuller est sauvegardï¿½ dans un scalaire sous
     le nom ~cdf_a~C dans le cas de l'exemple.
 
 &IT Dans le panneau d'estimation
 
-    La touche F3 ou le bouton "Unit Root" permettent de spécifier et de
-    tester une ou plusieurs formules. Les résultats sont affichés dans
-    la fenêtre.
+    La touche F3 ou le bouton "Unit Root" permettent de spï¿½cifier et de
+    tester une ou plusieurs formules. Les rï¿½sultats sont affichï¿½s dans
+    la fenï¿½tre.
 
-    Le seul scalaire sauvegardé est celui correspondant à la dernière
-    expression testée.
+    Le seul scalaire sauvegardï¿½ est celui correspondant ï¿½ la derniï¿½re
+    expression testï¿½e.
 
-&TI Agrégation de séries
-—————————————————————
+&TI Agrï¿½gation de sï¿½ries
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     De nouvelles fonctions de rapports permettent d'effectuer
-    des agrégations, des produits ou des sommes de séries.
-    Les séries à traiter peuvent se trouver en WS ou dans un
+    des agrï¿½gations, des produits ou des sommes de sï¿½ries.
+    Les sï¿½ries ï¿½ traiter peuvent se trouver en WS ou dans un
     fichier externe.
 
-    Quatre nouvelles fonctions de rapport ont été définies à cet effet:
+    Quatre nouvelles fonctions de rapport ont ï¿½tï¿½ dï¿½finies ï¿½ cet effet:
 &CO
-    $WsAggrChar [char] : définit le caractère à introduire dans le
-			 code des séries créées
-    $WsAggrSum  pattern [filename] : somme des séries définies par pattern
-    $WsAggrMean pattern [filename] : moyenne des séries
-    $WsAggrProd pattern [filename] : produit des séries
+    $WsAggrChar [char] : dï¿½finit le caractï¿½re ï¿½ introduire dans le
+			 code des sï¿½ries crï¿½ï¿½es
+    $WsAggrSum  pattern [filename] : somme des sï¿½ries dï¿½finies par pattern
+    $WsAggrMean pattern [filename] : moyenne des sï¿½ries
+    $WsAggrProd pattern [filename] : produit des sï¿½ries
 &TX
-    Si filename est défini, les séries du fichier seront utilisées à
+    Si filename est dï¿½fini, les sï¿½ries du fichier seront utilisï¿½es ï¿½
     la place de celles du WS.
 
-    ~cpattern~C est défini comme une séquence de parties de noms placées
-    entre crochets ou parenthèses. Chaque partie peut contenir des
-    caractères alphanumériques ou un point d'interrogation.
+    ~cpattern~C est dï¿½fini comme une sï¿½quence de parties de noms placï¿½es
+    entre crochets ou parenthï¿½ses. Chaque partie peut contenir des
+    caractï¿½res alphanumï¿½riques ou un point d'interrogation.
 
-    Les parties de noms entre parenthèses ne sont pas agrégées. Celles
+    Les parties de noms entre parenthï¿½ses ne sont pas agrï¿½gï¿½es. Celles
     entre crochets le sont.
 
 &IT    Exemple
-    ———————
-	Soit un WS avec des séries par pays (BE, FR, GE), et par secteur
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Soit un WS avec des sï¿½ries par pays (BE, FR, GE), et par secteur
 	(S101..S999):
 &CO
 	    BES101, BES102 ... BES199
@@ -4563,103 +4563,103 @@ Exemples :
 	    GBS901, GBS902 ... GBS999
 &TX
 
-    On peut créer la somme de tous les secteurs pour chaque pays par
+    On peut crï¿½er la somme de tous les secteurs pour chaque pays par
     les commandes :
 &CO
 	$WsAggrChar _
 	$WsAggrSum (??)[????]
 &TX
-    Les séries créées seront :
+    Les sï¿½ries crï¿½ï¿½es seront :
 &CO
 	    BE____, FR____, ..., GB____
 &TX
-    Les points d'interrogations entre () permettent de préciser les
-    codes de séries à traiter. Les autres indiquent les parties à
-    agréger. Dans ce cas les points d'interrogation sont
-    remplacés par des _ (ou un autre caractère selon l'argument
-    de ~c$WsAggrChar~C) dans les séries résultats. Ce caractère
-    peut être blanc. Dans l'exemple, les séries créées sont alors BE, FR
+    Les points d'interrogations entre () permettent de prï¿½ciser les
+    codes de sï¿½ries ï¿½ traiter. Les autres indiquent les parties ï¿½
+    agrï¿½ger. Dans ce cas les points d'interrogation sont
+    remplacï¿½s par des _ (ou un autre caractï¿½re selon l'argument
+    de ~c$WsAggrChar~C) dans les sï¿½ries rï¿½sultats. Ce caractï¿½re
+    peut ï¿½tre blanc. Dans l'exemple, les sï¿½ries crï¿½ï¿½es sont alors BE, FR
     et GB.
 
-    On peut également créer la somme de tous les pays par secteur ou
+    On peut ï¿½galement crï¿½er la somme de tous les pays par secteur ou
     la somme de tous les pays pour certains secteurs :
 &CO
-	$WsAggrSum [??](????) : crée __S101, __S102, ...
-	$WsAggrSum [??](??)[??] : crée __S1__, __S1__, ...
+	$WsAggrSum [??](????) : crï¿½e __S101, __S102, ...
+	$WsAggrSum [??](??)[??] : crï¿½e __S1__, __S1__, ...
 &TX
-    On peut limiter la création à un seul ou à quelques codes :
+    On peut limiter la crï¿½ation ï¿½ un seul ou ï¿½ quelques codes :
 &CO
-	$WsAggrSum (BE)[S??9] : crée BES__9
-	$WsAggrSum (BES)[?](?9) : crée BES_09, BES_19, BES_29, ... BES_99
+	$WsAggrSum (BE)[S??9] : crï¿½e BES__9
+	$WsAggrSum (BES)[?](?9) : crï¿½e BES_09, BES_19, BES_29, ... BES_99
 &TX
-&IT    Caractère de regroupement
-    —————————————————————————
-    La commande ~c$WsAggrChar~C permet de spécifier le caractère à
-    placer dans les séries générées. Ce caractère peut être blanc.
-    Pour éviter que des séries déjà agrégées soient reprises dans une
-    agrégation ultérieure, ces séries ne sont pas retenues dans le
-    calcul si le caractère d'agrégat courant se trouve à une position
-    correspondant dans pattern à un point d'interrogation entre
-    crochets. Ainsi, la série ~cBE____~C ne sera pas reprise dans le
+&IT    Caractï¿½re de regroupement
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La commande ~c$WsAggrChar~C permet de spï¿½cifier le caractï¿½re ï¿½
+    placer dans les sï¿½ries gï¿½nï¿½rï¿½es. Ce caractï¿½re peut ï¿½tre blanc.
+    Pour ï¿½viter que des sï¿½ries dï¿½jï¿½ agrï¿½gï¿½es soient reprises dans une
+    agrï¿½gation ultï¿½rieure, ces sï¿½ries ne sont pas retenues dans le
+    calcul si le caractï¿½re d'agrï¿½gat courant se trouve ï¿½ une position
+    correspondant dans pattern ï¿½ un point d'interrogation entre
+    crochets. Ainsi, la sï¿½rie ~cBE____~C ne sera pas reprise dans le
     calcul ~c(BE)[????]~C. Par contre elle sera reprise dans le calcul
     ~c[??](????)~C, car dans ce dernier cas elle n'intervient pas dans
     la somme.
 
-    Supposons que les séries ~cBE____~C, ~cFR____~C et ~cGB____~C soient
-    définies ainsi que ~cBES101~C, ...
+    Supposons que les sï¿½ries ~cBE____~C, ~cFR____~C et ~cGB____~C soient
+    dï¿½finies ainsi que ~cBES101~C, ...
 
-    ~c$WsAggrSum~C ~c(??)[????]~C génère ~cBE____~C, ~cFR____~C, etc.
-    Elle n'utilise donc pas les séries contenant ~c_~C après la deuxième
+    ~c$WsAggrSum~C ~c(??)[????]~C gï¿½nï¿½re ~cBE____~C, ~cFR____~C, etc.
+    Elle n'utilise donc pas les sï¿½ries contenant ~c_~C aprï¿½s la deuxiï¿½me
     position, comme ~cBE____~C. En effet, si on les reprenaient, on
-    additionnerait deux fois les mêmes séries.
+    additionnerait deux fois les mï¿½mes sï¿½ries.
 
-    ~c$WsAggrSum~C ~c[??](????)~C génère ~c______~C en prenant la somme
+    ~c$WsAggrSum~C ~c[??](????)~C gï¿½nï¿½re ~c______~C en prenant la somme
     de ~cBE____,~C ~cFR____,~C ~cGB____,~C ce qui est correct car les
-    autres séries (comme ~cBES101~C) donnent lieu à d'autres séries
+    autres sï¿½ries (comme ~cBES101~C) donnent lieu ï¿½ d'autres sï¿½ries
     (~c__S101~C).
 >
 <Version 5.11>
     Version 5.11 (03/11/98)
 
 &TI Support des longs noms de fichiers
-——————————————————————————————————
-    IODE supporte les noms de plus de 15 caractères dans la limite
-    des champs des écrans de saisie. La sélection de fichiers
-    dans des répertoires comme ~c\My~C ~cDocuments~C est également possible
-    pour des fichiers à longs noms.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    IODE supporte les noms de plus de 15 caractï¿½res dans la limite
+    des champs des ï¿½crans de saisie. La sï¿½lection de fichiers
+    dans des rï¿½pertoires comme ~c\My~C ~cDocuments~C est ï¿½galement possible
+    pour des fichiers ï¿½ longs noms.
 
 &TI Correction Simulation
-—————————————————————
-    Une petite correction a été apportée au programme de simulation
-    dans le cas de valeurs d'endogènes très petites (en général
-    dans le cas de récupération de données de la version simple
-    précision).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Une petite correction a ï¿½tï¿½ apportï¿½e au programme de simulation
+    dans le cas de valeurs d'endogï¿½nes trï¿½s petites (en gï¿½nï¿½ral
+    dans le cas de rï¿½cupï¿½ration de donnï¿½es de la version simple
+    prï¿½cision).
 >
 
 <Version 5.10> (14/10/98)
     Version 5.10 (14/10/98)
-    ———————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ..esc ~
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    ~cWsCopyVar~C : correction dans le cas où la copie ne concerne
-    qu'une seule année.
+    ~cWsCopyVar~C : correction dans le cas oï¿½ la copie ne concerne
+    qu'une seule annï¿½e.
 
 &CO
      $WsCopyVar 1970Y1 1970Y1 A* B*
 &TX
 
 &TI Estimation
-——————————
-    Les graphiques ne pouvaient être affichés ou imprimés dans le cas
-    où le séparateur entre le membre de gauche et le membre de droite
-    de l'équation (:=) se trouvait à la ligne. Ce bug est corrigé.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les graphiques ne pouvaient ï¿½tre affichï¿½s ou imprimï¿½s dans le cas
+    oï¿½ le sï¿½parateur entre le membre de gauche et le membre de droite
+    de l'ï¿½quation (:=) se trouvait ï¿½ la ligne. Ce bug est corrigï¿½.
 
 &TI Langage LEC
-———————————
-    Nouvel opérateur LEC qui retourne le signe d'une expression:
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouvel opï¿½rateur LEC qui retourne le signe d'une expression:
 &CO
     sign(expr) vaut
 		    1 si expr >>= 0
@@ -4667,158 +4667,158 @@ Exemples :
 &TX
 
 &TI Marquer/Copier/Coller
-—————————————————————
-    Les opérations de "copier/coller" peuvent être effectuées entre
-    IODE et d'autres programmes Windows (Excel, ...) ou entre différents
-    écrans de IODE. Le "Clipboard" de Windows est utilisé pour stocker
-    les données copiées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les opï¿½rations de "copier/coller" peuvent ï¿½tre effectuï¿½es entre
+    IODE et d'autres programmes Windows (Excel, ...) ou entre diffï¿½rents
+    ï¿½crans de IODE. Le "Clipboard" de Windows est utilisï¿½ pour stocker
+    les donnï¿½es copiï¿½es.
 
-    Les touches de fonction classiques de Windows ont été implémentées
-    pour faciliter cet usage : Shift+curseur permet de sélectionner
-    ou d'étendre la sélection et la souris permet de marquer
+    Les touches de fonction classiques de Windows ont ï¿½tï¿½ implï¿½mentï¿½es
+    pour faciliter cet usage : Shift+curseur permet de sï¿½lectionner
+    ou d'ï¿½tendre la sï¿½lection et la souris permet de marquer
     des parties de texte. Pour placer du texte dans le Clipboard
-    et copier ce qui s'y trouve à la position du curseur, on
+    et copier ce qui s'y trouve ï¿½ la position du curseur, on
     utilisera respectivement les touches Ctrl+C et Ctrl+V.
 
-    Cette nouvelle facilité est très pratique dans de nombreux
+    Cette nouvelle facilitï¿½ est trï¿½s pratique dans de nombreux
     cas :
 
-&EN  recopier un nom de fichier à charger dans le panneau Load WS
-&EN  copier des parties d'équations dans d'autres équations
-&EN  copier des valeurs de séries vers Excel, ou de Excel vers IODE
-&EN  copier des séries dans un fichier Ascii ou les récupérer
+&EN  recopier un nom de fichier ï¿½ charger dans le panneau Load WS
+&EN  copier des parties d'ï¿½quations dans d'autres ï¿½quations
+&EN  copier des valeurs de sï¿½ries vers Excel, ou de Excel vers IODE
+&EN  copier des sï¿½ries dans un fichier Ascii ou les rï¿½cupï¿½rer
 	  d'un fichier Ascii
-&EN  recopier les valeurs d'une année pour plusieurs séries dans
-	  une autre année
-&EN  copier entre deux instances de IODE qui tournent en même temps
+&EN  recopier les valeurs d'une annï¿½e pour plusieurs sï¿½ries dans
+	  une autre annï¿½e
+&EN  copier entre deux instances de IODE qui tournent en mï¿½me temps
 &EN  etc
 
-&IT     1. En édition d'un écran
-    ————————————————————————
-      Cette partie s'applique par exemple à l'écran Load WorkSpace.
+&IT     1. En ï¿½dition d'un ï¿½cran
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      Cette partie s'applique par exemple ï¿½ l'ï¿½cran Load WorkSpace.
 
       MARQUER
-      ———————
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN  entrer dans un champ : marque tout le champ
 &EN  Ctrl+L : marque tout le champ courant
-&EN  Shift+Left : prolonge la marque d'un caractère vers la gauche
-&EN  Shift+Right : prolonge la marque d'un caractère vers la droite
-&EN  Shift+Home : prolonge la marque jusqu'au début du champ
-&EN  Shift+End : prolonge la marque jusqu'à la fin du champ
-&EN  cliquer avec la souris et garder le bouton de gauche enfoncé :
-	  définit ou prolonge la partie marquée
+&EN  Shift+Left : prolonge la marque d'un caractï¿½re vers la gauche
+&EN  Shift+Right : prolonge la marque d'un caractï¿½re vers la droite
+&EN  Shift+Home : prolonge la marque jusqu'au dï¿½but du champ
+&EN  Shift+End : prolonge la marque jusqu'ï¿½ la fin du champ
+&EN  cliquer avec la souris et garder le bouton de gauche enfoncï¿½ :
+	  dï¿½finit ou prolonge la partie marquï¿½e
 
       DEMARQUER
-      —————————
-&EN  tout déplacement du curseur supprime les marques (LEFT, RIGHT,
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  tout dï¿½placement du curseur supprime les marques (LEFT, RIGHT,
 	    HOME, END)
-&EN  tout caractère entré supprime (et détruit) les marques
+&EN  tout caractï¿½re entrï¿½ supprime (et dï¿½truit) les marques
 &EN  DEL supprime les marques
 
       DETRUIRE
-      ————————
-&EN  n'importe quel caractère remplace la partie marquée
-&EN  DEL : détruit la partie marquée
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  n'importe quel caractï¿½re remplace la partie marquï¿½e
+&EN  DEL : dï¿½truit la partie marquï¿½e
 
       COPIER
-      ——————
-&EN  Ctrl+C : copie ce qui est marqué dans le clipboard
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+C : copie ce qui est marquï¿½ dans le clipboard
 
       COLLER
-      ——————
-&EN  Ctrl+V : copie à partir de la position courante
-		   les données du clipboard (qui peuvent provenir
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+V : copie ï¿½ partir de la position courante
+		   les donnï¿½es du clipboard (qui peuvent provenir
 		   d'un autre programme) et remplace la marque
 		   courante
 
-&IT    2. En édition des variables
-    ———————————————————————————
+&IT    2. En ï¿½dition des variables
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
       MARQUER
-      ———————
-&EN  Ctrl+L : marque la cellule courante ou étend la marque
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+L : marque la cellule courante ou ï¿½tend la marque
 &EN  Shift+Left, Shift+Right, Shift+Home, Shift+End, Shift+PgDn,
-	  Shift+PgUp : marque ou étend la marque
+	  Shift+PgUp : marque ou ï¿½tend la marque
 
       DEMARQUER
-      —————————
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN  Ctrl+U : supprime les marques
 
       COPIER
-      ——————
-&EN  Ctrl+C : copie ce qui est marqué dans le clipboard
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+C : copie ce qui est marquï¿½ dans le clipboard
 
       COLLER
-      ——————
-&EN  Ctrl+V : copie à partir de la position courante
-		   les données du clipboard
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+V : copie ï¿½ partir de la position courante
+		   les donnï¿½es du clipboard
 
       Ces fonctions permettent par exemple de copier des colonnes ou
-      des lignes de données entre Excel et IODE, ou encore de
-      copier une année vers une autre pour un ensemble de variables.
+      des lignes de donnï¿½es entre Excel et IODE, ou encore de
+      copier une annï¿½e vers une autre pour un ensemble de variables.
 
-&IT    3. En édition des champs EDITOR (rapports, équations, listes, etc)
-    ——————————————————————————————————————————————————————————————————
-      Cette partie s'applique par exemple à l'éditeur de rapports,
-      à la saisie d'une équation, à la défition d'un sample d'impression.
+&IT    3. En ï¿½dition des champs EDITOR (rapports, ï¿½quations, listes, etc)
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      Cette partie s'applique par exemple ï¿½ l'ï¿½diteur de rapports,
+      ï¿½ la saisie d'une ï¿½quation, ï¿½ la dï¿½fition d'un sample d'impression.
 
       MARQUER
-      ———————
-&EN  Ctrl+L : marque la ligne courante ou prolonge jusqu'à
-		   la ligne courante (inchangé)
-&EN  Ctrl+T : marque le caractère courant ou prolonge la marque
-		   (inchangé)
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+L : marque la ligne courante ou prolonge jusqu'ï¿½
+		   la ligne courante (inchangï¿½)
+&EN  Ctrl+T : marque le caractï¿½re courant ou prolonge la marque
+		   (inchangï¿½)
 &EN  Alt+B  : marque la colonne courante ou prolonge la marque
-		   (inchangé)
-&EN  Shift+Left : prolonge la marque d'un caractère vers la gauche
-&EN  Shift+Right : prolonge la marque d'un caractère vers la droite
+		   (inchangï¿½)
+&EN  Shift+Left : prolonge la marque d'un caractï¿½re vers la gauche
+&EN  Shift+Right : prolonge la marque d'un caractï¿½re vers la droite
 &EN  Shift+PgUp : prolonge la marque d'une page vers le haut
 &EN  Shift+PgDn : prolonge la marque d'une page vers le bas
-&EN  Shift+Home : prolonge la marque jusqu'au début du champ
-&EN  Shift+End : prolonge la marque jusqu'à la fin du champ
-&EN  cliquer avec la souris et garder le bouton de gauche enfoncé :
-	  définit ou prolonge la partie marquée (rectangle)
+&EN  Shift+Home : prolonge la marque jusqu'au dï¿½but du champ
+&EN  Shift+End : prolonge la marque jusqu'ï¿½ la fin du champ
+&EN  cliquer avec la souris et garder le bouton de gauche enfoncï¿½ :
+	  dï¿½finit ou prolonge la partie marquï¿½e (rectangle)
 
       DEMARQUER
-      —————————
-&EN  Ctrl+U : supprime les marques (ne détruit pas)
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+U : supprime les marques (ne dï¿½truit pas)
 
       DETRUIRE
-      ————————
-&EN  Ctrl+D : détruit ce qui est marqué et supprime les marques
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+D : dï¿½truit ce qui est marquï¿½ et supprime les marques
 
       COPIER
-      ——————
-&EN  Ctrl+C : copie ce qui est marqué dans le clipboard de Windows
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+C : copie ce qui est marquï¿½ dans le clipboard de Windows
 
       COLLER
-      ——————
-&EN  Ctrl+V : copie à partir de la position courante
-		   les données du clipboard (qui peuvent provenir
+      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN  Ctrl+V : copie ï¿½ partir de la position courante
+		   les donnï¿½es du clipboard (qui peuvent provenir
 		   d'un autre programme) et remplace la marque
 		   courante
 >
 <Version 5.09> (05/10/98)
     Version 5.09 (05/10/98)
-    ———————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Rapports
-————————
-    La commande ~c$system~C fonctionne à nouveau dans la version
-    Win95 de IODE. Cela permet notamment d'exécuter des fichiers
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La commande ~c$system~C fonctionne ï¿½ nouveau dans la version
+    Win95 de IODE. Cela permet notamment d'exï¿½cuter des fichiers
     de commandes ~c(.bat),~C y compris des programmes 16 bits.
 
-    La commande est bloquante, c'est-à-dire que le programme attend
-    la fin de l'exécution de la commande ~c$system~C avant de continuer
+    La commande est bloquante, c'est-ï¿½-dire que le programme attend
+    la fin de l'exï¿½cution de la commande ~c$system~C avant de continuer
     le rapport.
 
 &TI Utilitaire wait.exe
-———————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     Pour permettre de synchroniser des programmes Windows successifs,
-    l'utilitaire wait.exe est ajouté aux fichiers distribués.
+    l'utilitaire wait.exe est ajoutï¿½ aux fichiers distribuï¿½s.
 
 &IT    Exemple d'utilisation
-    —————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 	Rapport test.rep
 	----------------
@@ -4835,14 +4835,14 @@ Exemples :
 	    wait db2var -v %1 -f %2
 &TX
     Sans utiliser ~cwait~C dans le fichier ~carima.bat,~C le programme
-    ~cl_ax23~C s'exécute sans attendre la fin de ~cvar2db.~C
+    ~cl_ax23~C s'exï¿½cute sans attendre la fin de ~cvar2db.~C
 >
 <Version 5.08> (25/09/98)
     Version 5.08 (25/09/98)
-    ———————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI LEC
-———
-    Nouveaux opérateurs en LEC :
+ï¿½ï¿½ï¿½
+    Nouveaux opï¿½rateurs en LEC :
 
 &CO
 	isan(expr) : retourne 0 si expr est NAN et 1 sinon
@@ -4854,18 +4854,18 @@ Exemples :
 >
 <Version 5.07> (26/08/98)
     Version 5.07 (26/08/98)
-    ———————————————————————
-&TI Format CSV inversé
-——————————————————
-    Il est possible d'exporter des séries en format CSV inversé,
-    c'est-à-dire avec les séries en lignes et non en colonnes.
-    Dans ce format, les commentaires ne sont pas exportés pour
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&TI Format CSV inversï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Il est possible d'exporter des sï¿½ries en format CSV inversï¿½,
+    c'est-ï¿½-dire avec les sï¿½ries en lignes et non en colonnes.
+    Dans ce format, les commentaires ne sont pas exportï¿½s pour
     des raisons de largeur de colonnes insuffisantes.
 
 &TI Rapports
-————————
-    Macro ~c%-nom%~C supprime dans la macro tous les caractères non
-    aplhanumériques ou de soulignement.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Macro ~c%-nom%~C supprime dans la macro tous les caractï¿½res non
+    aplhanumï¿½riques ou de soulignement.
 &CO
 	$define ARG0 Abc[-3]
 	$msg %ARG0%
@@ -4883,21 +4883,21 @@ Exemples :
 >
 <Version 5.06>
     Version 5.06 (11/08/98)
-    ———————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Utilisation de wildcards
-————————————————————————
-    Afin de simplifier l'écriture, il est possible d'utiliser des
-    "wildcards". Ces wildcards sont l'étoile (*) ou le point
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Afin de simplifier l'ï¿½criture, il est possible d'utiliser des
+    "wildcards". Ces wildcards sont l'ï¿½toile (*) ou le point
     d'interrogation (?).
 
-&EN * : indique une suite quelconque de caractères, même vide
-&EN ? : indique un caractère unique
+&EN * : indique une suite quelconque de caractï¿½res, mï¿½me vide
+&EN ? : indique un caractï¿½re unique
 
-    On utilisera des noms contenant des étoiles ou des points
-    d'interrogation dans certains écrans, dans les formes LEC et dans
-    certaines fonctions de rapport. Ces noms sont remplacés par
-    des listes contenant les noms correspondants présents en WS.
+    On utilisera des noms contenant des ï¿½toiles ou des points
+    d'interrogation dans certains ï¿½crans, dans les formes LEC et dans
+    certaines fonctions de rapport. Ces noms sont remplacï¿½s par
+    des listes contenant les noms correspondants prï¿½sents en WS.
 
     Supposons que les variables A1F, A0F, B1F, B0G, AF, BG et A soient
     en WS. On a alors :
@@ -4912,19 +4912,19 @@ Exemples :
 	A?*     == A1F;A0F;AF (mais pas A)
 &TX
 
-    Dans cette version de IODE, ce type d'expression peut être utilisé
+    Dans cette version de IODE, ce type d'expression peut ï¿½tre utilisï¿½
     dans
 
-&EN l'écran ou la fonction $WsCopyXxx
-&EN l'écran ou la fonction de création de tableau $DataUpdateTbl
-&EN l'écran ou la fonction d'impression de variables $PrintVar
+&EN l'ï¿½cran ou la fonction $WsCopyXxx
+&EN l'ï¿½cran ou la fonction de crï¿½ation de tableau $DataUpdateTbl
+&EN l'ï¿½cran ou la fonction d'impression de variables $PrintVar
 &EN les formes LEC (entre quotes)
 
-    Dans le cas de la forme LEC, l'expression à étendre doit être
-    fournie entre quotes (') pour la distinguer de l'opérateur *.
+    Dans le cas de la forme LEC, l'expression ï¿½ ï¿½tendre doit ï¿½tre
+    fournie entre quotes (') pour la distinguer de l'opï¿½rateur *.
 
-    Dans le cas des écrans ou des rapports, les parties à ne pas
-    étendre doivent être exprimées entre double quotes (").
+    Dans le cas des ï¿½crans ou des rapports, les parties ï¿½ ne pas
+    ï¿½tendre doivent ï¿½tre exprimï¿½es entre double quotes (").
 
     Ainsi,
 &CO
@@ -4932,7 +4932,7 @@ Exemples :
 
 	A*;"lsum('A*')" sera traduit en A1;..;lsum('A*')
 &TX
-    Dans les rapports, les fonction suivantes sont concernées par
+    Dans les rapports, les fonction suivantes sont concernï¿½es par
     cette modification :
 &CO
 	$WsCopyXxx filename args
@@ -4942,73 +4942,73 @@ Exemples :
 &TX
 
 &TI Extensions LEC
-——————————————
-    Lorsque l'opérateur le permet (lsum, max et min), on peut
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsque l'opï¿½rateur le permet (lsum, max et min), on peut
     utiliser les wildcards dans le langage LEC. Cependant, pour
-    distinguer l'étoile et l'opérateur fois, la liste à étendre
-    doit être entourée de quotes simples('). Ainsi,
+    distinguer l'ï¿½toile et l'opï¿½rateur fois, la liste ï¿½ ï¿½tendre
+    doit ï¿½tre entourï¿½e de quotes simples('). Ainsi,
 
       ~clsum('A*')~C
-    est équivalent à
+    est ï¿½quivalent ï¿½
       ~clsum(A1,A2,AX)~C si A1, A2 et AX sont
-     les seules séries commençant pas A dans le WS courant.
+     les seules sï¿½ries commenï¿½ant pas A dans le WS courant.
 
-    On peut également utiliser une combinaison de noms de séries :
+    On peut ï¿½galement utiliser une combinaison de noms de sï¿½ries :
 
 	~cmax('*G;*F')~C
 
 
-    Le nombre maximum d'opérandes des opérateurs ~clsum(),~C ~cmax()~C
-    et ~cmin()~C est porté à 255, de façon à pouvoir exploiter au mieux
+    Le nombre maximum d'opï¿½randes des opï¿½rateurs ~clsum(),~C ~cmax()~C
+    et ~cmin()~C est portï¿½ ï¿½ 255, de faï¿½on ï¿½ pouvoir exploiter au mieux
     les wildcards.
 
 &IT    Remarque importante
-    ———————————————————
-    Les noms contenant des wildcards dans les formes LEC sont résolus en
-    fonction du contenu du WS COURANT. La forme LEC compilée est
-    mémorisée avec ces noms. Si on change le contenu du WS, il est
-    possible que certaines séries n'existent plus ou que de nouvelles
-    apparaissent. La forme compilée n'étant pas changée automatiquement,
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les noms contenant des wildcards dans les formes LEC sont rï¿½solus en
+    fonction du contenu du WS COURANT. La forme LEC compilï¿½e est
+    mï¿½morisï¿½e avec ces noms. Si on change le contenu du WS, il est
+    possible que certaines sï¿½ries n'existent plus ou que de nouvelles
+    apparaissent. La forme compilï¿½e n'ï¿½tant pas changï¿½e automatiquement,
     il faut si on souhaite adapter la forme LEC au nouveau contenu,
-    recompiler la forme en l'éditant.
+    recompiler la forme en l'ï¿½ditant.
 
 &TI Load WS
-———————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Correction d'une erreur (rare mais possible) dans le chargement
     de fichiers de scalaires.
 
 
 &TI Rapports
-————————
-    Correction dans les messages d'erreurs (plus de précision dans
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction dans les messages d'erreurs (plus de prï¿½cision dans
     le texte).
 
-    Les caractères % et { peuvent être introduits comme texte
-    normal en étant doublés. Le texte %%1%% ne sera donc pas interprété
+    Les caractï¿½res % et { peuvent ï¿½tre introduits comme texte
+    normal en ï¿½tant doublï¿½s. Le texte %%1%% ne sera donc pas interprï¿½tï¿½
     comme une macro, mais comme le texte %1%.
 
-    Commentaires : une ligne de commentaire vide ne génère plus de
+    Commentaires : une ligne de commentaire vide ne gï¿½nï¿½re plus de
     message d'erreur. Elle peut commencer par $ ou par #.
 
     Nouvelles fonctions:
 
 &CO
-	 $Debug {Yes|No} : affiche le numéro de la ligne et le fichier
-			   en cours d'exécution dans les rapports.
+	 $Debug {Yes|No} : affiche le numï¿½ro de la ligne et le fichier
+			   en cours d'exï¿½cution dans les rapports.
 
 	 $SysMoveFile filein fileout : renomme un fichier
 
 	 $SysCopyFile filein fileout : copie un fichier
 
-	 $SysDeleteFile file1 file2 ... : détruit des fichiers
+	 $SysDeleteFile file1 file2 ... : dï¿½truit des fichiers
 &TX
 
 &TI Edition des variables
-—————————————————————
-    Deux nouvelles options ont été ajoutées à la touche ~cF5~C lors de
-    l'édition des tableaux de variables. Ces options permettent
-    d'afficher les valeurs en différences et en taux de croissance
-    sur une année (Year On Year). On a donc maintenant dans l'ordre:
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Deux nouvelles options ont ï¿½tï¿½ ajoutï¿½es ï¿½ la touche ~cF5~C lors de
+    l'ï¿½dition des tableaux de variables. Ces options permettent
+    d'afficher les valeurs en diffï¿½rences et en taux de croissance
+    sur une annï¿½e (Year On Year). On a donc maintenant dans l'ordre:
 
 &EN level
 &EN difference
@@ -5017,50 +5017,50 @@ Exemples :
 &EN YoY growth rate
 
     Pour faciliter la navigation, on peut utiliser ~cshift+F5~C pour
-    revenir au mode précédent.
+    revenir au mode prï¿½cï¿½dent.
 
-    Les graphiques s'affichent en fonction du mode utilisé. Ainsi, si
+    Les graphiques s'affichent en fonction du mode utilisï¿½. Ainsi, si
     l'affichage s'effectue en taux de croissance, la touche ~cF8~C fait
-    apparaître le graphique dans le même mode.
+    apparaï¿½tre le graphique dans le mï¿½me mode.
 
 &TI HTML
-————
+ï¿½ï¿½ï¿½ï¿½
     Le format HTML de sortie des impressions est enrichi et permet
     de placer automatiquement des graphiques dans les documents. Les
     fichiers graphiques portent le nom IMGn.GIF et se trouvent dans le
-    répertoire de travail. Les graphiques sont automatiquement
-    référencés dans le fichier HTML résultat.
+    rï¿½pertoire de travail. Les graphiques sont automatiquement
+    rï¿½fï¿½rencï¿½s dans le fichier HTML rï¿½sultat.
 
-    Pour permettre de paramétrer la génération des fichiers GIF,
-    un nouveau panneau est intégré dans les "Printer Options". Les options
-    qui y sont définies peuvent également être définies par des
+    Pour permettre de paramï¿½trer la gï¿½nï¿½ration des fichiers GIF,
+    un nouveau panneau est intï¿½grï¿½ dans les "Printer Options". Les options
+    qui y sont dï¿½finies peuvent ï¿½galement ï¿½tre dï¿½finies par des
     fonctions de rapport.
 
     Les fonctions de rapports sont :
 &CO
-	$PrintGIFBackColor color    : définit la couleur de fond des
+	$PrintGIFBackColor color    : dï¿½finit la couleur de fond des
 				      graphiques
-	$PrintGIFTransColor color   : définit la couleur considérée comme
+	$PrintGIFTransColor color   : dï¿½finit la couleur considï¿½rï¿½e comme
 				      "transparente"
-	$PrintGIFTransparent Yes|No : indique si le fichier GIF doit être au
+	$PrintGIFTransparent Yes|No : indique si le fichier GIF doit ï¿½tre au
 				      format transparent
-	$PrintGIFInterlaced Yes|No  : indique si le fichier GIF doit être au
-				      format interlacé
+	$PrintGIFInterlaced Yes|No  : indique si le fichier GIF doit ï¿½tre au
+				      format interlacï¿½
 	$PrintGIFFilled Yes|No      : indique s'il faut remplir les barres dans
 				      les bar charts
-	$PrintGIFFont numéro        : indique si le numéro du font à utiliser
-				      pour les labels (voir écran pour
+	$PrintGIFFont numï¿½ro        : indique si le numï¿½ro du font ï¿½ utiliser
+				      pour les labels (voir ï¿½cran pour
 				      les valeurs possibles).
 &TX
 >
 <Version 5.05>
     Version 5.05 (31/07/1998)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Rapports
-————————
-    La macro ~c%*%~C représente tous les arguments du rapport.
-    Il est à noter que la commande ~c$shift~C supprime le premier argument
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La macro ~c%*%~C reprï¿½sente tous les arguments du rapport.
+    Il est ï¿½ noter que la commande ~c$shift~C supprime le premier argument
     de ~c%*%~C.
 
 
@@ -5077,83 +5077,83 @@ Exemples :
     $ReportExec sub2.rep %*%
     ...
 
-    Exécution du rapport
+    Exï¿½cution du rapport
     --------------------
     $ReportExec Main.rep A B C D E
 
 &TX
-    Le rapport ~csub1.rep~C reçoit comme arguments tous
-    les arguments passés à ~cmain.rep,~C soit ~cA B C D E~C.
-    Le rapport ~csub2.rep~C reçoit les arguments ~cB C D E~C.
+    Le rapport ~csub1.rep~C reï¿½oit comme arguments tous
+    les arguments passï¿½s ï¿½ ~cmain.rep,~C soit ~cA B C D E~C.
+    Le rapport ~csub2.rep~C reï¿½oit les arguments ~cB C D E~C.
 
 
-&TI Nouveaux opérateurs LEC
-———————————————————————
-    Les opérateurs suivants ont été ajoutés au langage LEC :
+&TI Nouveaux opï¿½rateurs LEC
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les opï¿½rateurs suivants ont ï¿½tï¿½ ajoutï¿½s au langage LEC :
 
 &CO
 	- lsum(expr1, expr2, ...) : calcule la somme d'une liste
-	  de séries
+	  de sï¿½ries
 
-	- index([[from,] to,] valeur, expr) : retourne la première période
-	  où valeur apparaît dans la série expr entre les périodes
-	  from et to. Si la valeur n'apparaît pas dans expr, -- est
-	  retourné.
+	- index([[from,] to,] valeur, expr) : retourne la premiï¿½re pï¿½riode
+	  oï¿½ valeur apparaï¿½t dans la sï¿½rie expr entre les pï¿½riodes
+	  from et to. Si la valeur n'apparaï¿½t pas dans expr, -- est
+	  retournï¿½.
 
 	- acf([[from,] to,] valeur, expr) : retourne la fonction
-	  d'auto-correlation de degré valeur de l'expression expr
-	  sur le sample from à to.
+	  d'auto-correlation de degrï¿½ valeur de l'expression expr
+	  sur le sample from ï¿½ to.
 
 &TX
 
     Exemples
 &CO
-	Soient A et B définies sur 1970Y1-1990Y1
+	Soient A et B dï¿½finies sur 1970Y1-1990Y1
 	A = 0 1 2 3 ...
 	B = 2 4 6 8 ...
 
 	lsum(A,B) vaut 2 5 8 11 ...
 
-	index(6, B) vaut -- -- 2 2 2 2 ... (ce qui équivaut en LEC
-					    à -- -- 1972Y1 1972Y1 ...)
+	index(6, B) vaut -- -- 2 2 2 2 ... (ce qui ï¿½quivaut en LEC
+					    ï¿½ -- -- 1972Y1 1972Y1 ...)
 	index(1971Y1, 1990Y1, 6, B) vaut 2 2 2 2 ...
 &TX
 
 &TI Impressions
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Les impressions ne fonctionnaient plus correctement dans la version
-    précédente pour certains drivers (qms, hp). Cette erreur est
-    corrigée.
+    prï¿½cï¿½dente pour certains drivers (qms, hp). Cette erreur est
+    corrigï¿½e.
 
-    Les tableaux générés en Frame (mif) contiennent le titre
-    dans le corps du tableau et plus dans un paragraphe séparé.
+    Les tableaux gï¿½nï¿½rï¿½s en Frame (mif) contiennent le titre
+    dans le corps du tableau et plus dans un paragraphe sï¿½parï¿½.
 
 &TI Aanpassing van Census II methode
-————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Om geen informatie te verliezen bij het berekenen van de laatste
     observaties, werd het algoritme aangepast. Bij onvolledige periodes
     worden, krijgen gegevens op het einde van de periode voorang.
 
 
 &TI Schatten van vgln
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Bij het on-line schatten van vgln worden nu ook de testen als scalars
     weggeschreven.
 
 
 &TI IODE-XLS interface
-———————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Lijsten kunnen worden gebruikt bij het opvragen van gegevens
 
 >
 <Version 5.04>
     Version 5.04 (01/04/1998)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI ACCESS RESEAU ET NOMS DE FICHIERS
-—————————————————————————————————
-    Des fichiers d'un autre ordinateur du réseau peuvent être accédés
-    directement dans IODE sans avoir à monter un drive réseau.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Des fichiers d'un autre ordinateur du rï¿½seau peuvent ï¿½tre accï¿½dï¿½s
+    directement dans IODE sans avoir ï¿½ monter un drive rï¿½seau.
 
     Par exemple, on peut dans le panneau de LOAD WS entrer un nom
     comme :
@@ -5162,46 +5162,46 @@ Exemples :
 	\\GB\iode\stat\naccount.var
 &TX
 
-    qui fait référence au drive "iode" défini sur la machine "GB".
+    qui fait rï¿½fï¿½rence au drive "iode" dï¿½fini sur la machine "GB".
 
-    La lecture des répertoire est également possible sur un drive
-    réseau.
+    La lecture des rï¿½pertoire est ï¿½galement possible sur un drive
+    rï¿½seau.
 
     Pour permettre l'introduction de noms plus longs, les champs des
-    pages contenant un ou des noms de fichiers ont été étendus à 64
-    caractères.
+    pages contenant un ou des noms de fichiers ont ï¿½tï¿½ ï¿½tendus ï¿½ 64
+    caractï¿½res.
 
 &TI RTF
-———
-    Les impressions en RTF sont également valables pour les graphiques.
-    Les graphiques créés sont inclus dans le fichier RTF en format
-    hexadécimal et sont interprétés par Word ou le compilateur
+ï¿½ï¿½ï¿½
+    Les impressions en RTF sont ï¿½galement valables pour les graphiques.
+    Les graphiques crï¿½ï¿½s sont inclus dans le fichier RTF en format
+    hexadï¿½cimal et sont interprï¿½tï¿½s par Word ou le compilateur
     d'aide Windows.
 
-    La dimension de ces graphiques est déterminée par les paramètres
-    définis dans Print Preferences/A2m ou par la commande de rapport
+    La dimension de ces graphiques est dï¿½terminï¿½e par les paramï¿½tres
+    dï¿½finis dans Print Preferences/A2m ou par la commande de rapport
     $PrintGraphSize.
 
 &TI MIF
-———
-    La génération des tableaux en MIF est améliorée : la largeur de
-    la première colonne est adaptée au contenu et celle des colonnes
-    suivantes est proportionnellement répartie en fonction du nombre
+ï¿½ï¿½ï¿½
+    La gï¿½nï¿½ration des tableaux en MIF est amï¿½liorï¿½e : la largeur de
+    la premiï¿½re colonne est adaptï¿½e au contenu et celle des colonnes
+    suivantes est proportionnellement rï¿½partie en fonction du nombre
     de colonnes.
 
-    Graphiques : les attributs des caractères dans les Labels et Titres
-    des graphiques sont corrigés.
+    Graphiques : les attributs des caractï¿½res dans les Labels et Titres
+    des graphiques sont corrigï¿½s.
 
 &TI PRINTER
-———————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouvelles options d'impressions :
 
 &EN Landscape ou Portrait
 &EN Simplex, Duplex, Vertical Duplex
-&EN Sélection de l'imprimante par défaut.
+&EN Sï¿½lection de l'imprimante par dï¿½faut.
 
 &TI RAPPORTS
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Trois nouvelles fonctions :
 
 &EN $SetPrinter PrinterName
@@ -5209,17 +5209,17 @@ Exemples :
 &EN $PrintDuplex {Simplex | Duplex | VerticalDuplex}
 
 &TI PRECISION DES DONNEES
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    Affichage en 8 ou 15 chiffres significatifs à l'édition.
-    La touche F6 permet de changer la précision de l'édition des
+    Affichage en 8 ou 15 chiffres significatifs ï¿½ l'ï¿½dition.
+    La touche F6 permet de changer la prï¿½cision de l'ï¿½dition des
     variables (8 ou 15 chiffres significatifs).
     Sauvetage en 8 ou 15 chiffres significatifs en .av et .as
-    Version double précision pour les Variables et les Scalaires.
+    Version double prï¿½cision pour les Variables et les Scalaires.
 
 &TI Fonctions LEC
-———
-    Nouveaux opérateurs
+ï¿½ï¿½ï¿½
+    Nouveaux opï¿½rateurs
 &CO
      var([from [,to],] x)             == sum((xi-xm)**2) / n
      covar([from [,to],] x, y)        == sum((xi-xm)*(yi-ym)) / n
@@ -5229,76 +5229,76 @@ Exemples :
 &TX
     Modifications
 &CO
-    stderr : corrigé (estimateur non biaisé) == sqrt(sum((xi-xm)**2/(n-1)
+    stderr : corrigï¿½ (estimateur non biaisï¿½) == sqrt(sum((xi-xm)**2/(n-1)
 &TX
-    L'ancien opérateur stderr est remplacé par stddev.
+    L'ancien opï¿½rateur stderr est remplacï¿½ par stddev.
 
 &TI MESSAGES
-————————
-    Dans les rapports, les messages envoyés par $show sont affichés dans
-    la dernière ligne de l'écran même dans le cours d'une procédure
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Dans les rapports, les messages envoyï¿½s par $show sont affichï¿½s dans
+    la derniï¿½re ligne de l'ï¿½cran mï¿½me dans le cours d'une procï¿½dure
     longue.
 
 &TI WS/COPY
-———————
-    Correction dans le cas de listes non définies passées comme argument
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction dans le cas de listes non dï¿½finies passï¿½es comme argument
     de la fonction.
 
 &TI ESTIMATION DE BLOCS
-———————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Correction dans l'estimation de blocs dans les rapports. Auparavant,
-    il fallait passer tous les noms des équations du bloc comme argument
-    de la fonction EsqEstimate. Une seule équation suffit maintenant si
+    il fallait passer tous les noms des ï¿½quations du bloc comme argument
+    de la fonction EsqEstimate. Une seule ï¿½quation suffit maintenant si
     elle contient le bloc.
 >
 <Version 5.03>
     Version 5.03 (08/02/1998)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Tableaux
-————————
-    Sélection des lignes à copier ou détruire par Ctrl+L à nouveau
-    opérationnelle.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Sï¿½lection des lignes ï¿½ copier ou dï¿½truire par Ctrl+L ï¿½ nouveau
+    opï¿½rationnelle.
 
     Options graphiques :
 
-&EN l'alignement des observations par rapport à l'abcisse (année)
-	  peut être spécifié par courbe (touche F4).
+&EN l'alignement des observations par rapport ï¿½ l'abcisse (annï¿½e)
+	  peut ï¿½tre spï¿½cifiï¿½ par courbe (touche F4).
 
-&EN les options box et shadow sont opérationnelles dans
+&EN les options box et shadow sont opï¿½rationnelles dans
 	  l'affichage et l'impression des graphiques. Shadow
 	  indique si on veut ou non un hachurage autour du graphique.
 
-&EN les Grids (Major, minor ou None) sont implémentées
+&EN les Grids (Major, minor ou None) sont implï¿½mentï¿½es
 
 &TI Graphiques
-——————————
-    Quelques corrections d'affichage ont été opérées dans les graphiques.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Quelques corrections d'affichage ont ï¿½tï¿½ opï¿½rï¿½es dans les graphiques.
     En particulier :
 
 &EN il est possible d'imprimer des graphiques sans titre
 &EN les bars charts fonctionnent
 
-    Il est possible de modifier la taille des graphiques à imprimer
-    ou à intégrer (Frame) par les Options d'impression (Print Setup/A2M).
+    Il est possible de modifier la taille des graphiques ï¿½ imprimer
+    ou ï¿½ intï¿½grer (Frame) par les Options d'impression (Print Setup/A2M).
 
-    Les options Background Color et Brush + Box sont opérationnelles
+    Les options Background Color et Brush + Box sont opï¿½rationnelles
     pour les graphiques automatiques (variables et estimations).
 
-    La position des bars ou des lignes par rapport à l'abcisse peut être
+    La position des bars ou des lignes par rapport ï¿½ l'abcisse peut ï¿½tre
     choisie : gauche, centre ou droite (voir TABLEAUX).
 
 &TI ESTIMATION
-——————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Les graphiques des estimations contiennent le nom de la variable
-    endogène.
+    endogï¿½ne.
 
 
 &TI A2M
-———
-    La génération des fichiers A2M s'est enrichie d'une commande
-    de définition des cadres, couleur et fond des graphiques.
-    Cette commande est générée automatiquement en fonction
+ï¿½ï¿½ï¿½
+    La gï¿½nï¿½ration des fichiers A2M s'est enrichie d'une commande
+    de dï¿½finition des cadres, couleur et fond des graphiques.
+    Cette commande est gï¿½nï¿½rï¿½e automatiquement en fonction
     des options retenues dans IODE.
 &CO
      .gbox box color brush
@@ -5311,41 +5311,41 @@ Exemples :
 &TX
 
 &TI Properties
-——————————
-    Une nouvelle option du menu système (Properties) permet de
-    visualiser le contenu global des WS, le directory de départ et
-    la mémoire disponible.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Une nouvelle option du menu systï¿½me (Properties) permet de
+    visualiser le contenu global des WS, le directory de dï¿½part et
+    la mï¿½moire disponible.
 
-    Cette option est disponible à la fois lorsque la fenêtre est active
-    et lorsqu'elle est minimisée (bouton de droite).
+    Cette option est disponible ï¿½ la fois lorsque la fenï¿½tre est active
+    et lorsqu'elle est minimisï¿½e (bouton de droite).
 
-&TI Titre de la fenêtre IODE
-———————————————————
-    Le titre de la fenêtre contient le nom du directory de lancement
-    de IODE et un numéro d'ordre correspondant à la chronologie de
-    démarrage des processus IODE.
+&TI Titre de la fenï¿½tre IODE
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le titre de la fenï¿½tre contient le nom du directory de lancement
+    de IODE et un numï¿½ro d'ordre correspondant ï¿½ la chronologie de
+    dï¿½marrage des processus IODE.
 
-&TI Taille des caractères
-—————————————————————
-    La taille des caractères est maintenu pour les sessions suivantes de
-    IODE (après modification par le menu Système de la fenêtre IODE).
+&TI Taille des caractï¿½res
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La taille des caractï¿½res est maintenu pour les sessions suivantes de
+    IODE (aprï¿½s modification par le menu Systï¿½me de la fenï¿½tre IODE).
 
-&TI Génération de fichiers d'aide Windows
-—————————————————————————————————————
-    La génération des fichiers d'aide de Windows est rendue possible
-    dans cette version avec une découpe en sujets (topics).
+&TI Gï¿½nï¿½ration de fichiers d'aide Windows
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La gï¿½nï¿½ration des fichiers d'aide de Windows est rendue possible
+    dans cette version avec une dï¿½coupe en sujets (topics).
 
-    Lors des impressions, chaque tableau et chaque équation avec
-    résultats d'estimation constituent un nouveau topic du fichier
+    Lors des impressions, chaque tableau et chaque ï¿½quation avec
+    rï¿½sultats d'estimation constituent un nouveau topic du fichier
     d'aide.
 
-    De plus les fonctions de rapport suivantes permettent de spécifier
+    De plus les fonctions de rapport suivantes permettent de spï¿½cifier
     les niveaux et le titres des sujets de l'aide.
 
 &TI Fonctions de Rapports
-—————————————————————————
-    Des nouvelles fonctions ont été introduites dans les rapports pour
-    permettre de spécifier les options d'impression dans le corps
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Des nouvelles fonctions ont ï¿½tï¿½ introduites dans les rapports pour
+    permettre de spï¿½cifier les options d'impression dans le corps
     d'un rapport.
 
 &CO
@@ -5375,120 +5375,120 @@ Exemples :
 &TX
 
 &TI Echanges EXCEL-IODE
-———————————————————
-    Lorsque la configuration de la machine définit la virgule comme
-    séparateur des chiffres décimaux, les tranferts IODE-Excel
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsque la configuration de la machine dï¿½finit la virgule comme
+    sï¿½parateur des chiffres dï¿½cimaux, les tranferts IODE-Excel
     remplacent les virgules par des points dans les nombres (et
     inversement).
 
 &TI Ligne de commande
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La syntaxe du programme IODE.EXE permet de charger plusieurs
-    fichiers en une seule opération :
+    fichiers en une seule opï¿½ration :
 
 &CO
     iode monws.var monws.cmt monws.at
     iode monws.*
 &TX
-    Le tableau d'édition correspondant au dernier fichier de la liste
-    (ici monws.tbl) sera ouvert au démarrage de IODE.
-    Les fichiers non iode ne sont pas chargés.
+    Le tableau d'ï¿½dition correspondant au dernier fichier de la liste
+    (ici monws.tbl) sera ouvert au dï¿½marrage de IODE.
+    Les fichiers non iode ne sont pas chargï¿½s.
 
-    De plus, les fichiers ASCII (.ac, .av, ...) peuvent également
-    être chargés de cette façon.
+    De plus, les fichiers ASCII (.ac, .av, ...) peuvent ï¿½galement
+    ï¿½tre chargï¿½s de cette faï¿½on.
 
 &TI Automatic launch in Netscape
-——————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Le programme d'installation de IODE enregistre les types de fichiers
     .var, .cmt, etc de telle sorte que, si un lien vers un fichier IODE
-    apparaît dans une page HTML (via Netscape par exemple), il soit
+    apparaï¿½t dans une page HTML (via Netscape par exemple), il soit
     possible d'ouvrir directement le fichier en question dans IODE.
 
-    IODE est lancé et le fichier référencé est chargé dans le WS
+    IODE est lancï¿½ et le fichier rï¿½fï¿½rencï¿½ est chargï¿½ dans le WS
     correspondant.
 
-    Attention, le fichier ainsi chargé est préalablement sauvé par
-    Netscape dans un fichier temporaire situé dans le directory
+    Attention, le fichier ainsi chargï¿½ est prï¿½alablement sauvï¿½ par
+    Netscape dans un fichier temporaire situï¿½ dans le directory
     ~c\Windows\Temp~C.
 >
 
 <Version 5.02>
     Version 5.02 (20/12/1997)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Impressions Objets
-——————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Correction dans l'impression des variables.
 
 &TI Rapports
-————————
-    Création des listes : le point-virgule sert de séparateur (au lieu
-    de la virgule antérieurement).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Crï¿½ation des listes : le point-virgule sert de sï¿½parateur (au lieu
+    de la virgule antï¿½rieurement).
 
 &IT     $DSImportDB
-    ———————————
-    Importation de données de DataStream.
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Importation de donnï¿½es de DataStream.
 
    Syntaxe :
 &CO
 	$DSImportDB nom_data_stream1, ...
 &TX
     Cette fonction va lire sur le sample courant la ou les variables
-    définies par nom_data_stream1, ... et crée dans le WS courant une
-    série dont le nom est construit en remplaçant les caractères non
-    alphanumériques par des understroke.
+    dï¿½finies par nom_data_stream1, ... et crï¿½e dans le WS courant une
+    sï¿½rie dont le nom est construit en remplaï¿½ant les caractï¿½res non
+    alphanumï¿½riques par des understroke.
 
    Exemple :
 &CO
 	$DSImportDB BEGDP..A12
 &TX
-    crée ~cBEGDP__A12~C dans le WS courant.
+    crï¿½e ~cBEGDP__A12~C dans le WS courant.
 
-    Si le nom_data_stream contient le caractère pourcent (%), la
-    fonction ne s'exécute pas car % est un caractère réservé dans les
-    rapports. Pour pallier ce problème, il faut créer une liste
-    contenant le nom des séries et appeler DSImportDB avec la liste
+    Si le nom_data_stream contient le caractï¿½re pourcent (%), la
+    fonction ne s'exï¿½cute pas car % est un caractï¿½re rï¿½servï¿½ dans les
+    rapports. Pour pallier ce problï¿½me, il faut crï¿½er une liste
+    contenant le nom des sï¿½ries et appeler DSImportDB avec la liste
     comme argument.
 
 &CO
 	$DSImportDB $MYLST
 &TX
-    Note : cette fonction n'est opérationnelle actuellement que sur les machines
-	   qui ont un accès à DataStream.
+    Note : cette fonction n'est opï¿½rationnelle actuellement que sur les machines
+	   qui ont un accï¿½s ï¿½ DataStream.
 
 &TI Uninstall
-—————————
-    Nouvelle fonction de désinstallation de IODE. Cette fonction est
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouvelle fonction de dï¿½sinstallation de IODE. Cette fonction est
     accessible soit via Control Panel/Install Software, soit dans le
     menu START/Groupe IODE.
 >
 <Version 5.01>
     Version 5.01 (17/12/1997)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La fonction $EqsEstimate imprime les graphiques des observations
-    et des valeurs estimées.
+    et des valeurs estimï¿½es.
 &CO
     $IdtExecuteTrace werkt terug
 &TX
 &TI Execute IDT's
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Bij het uitvoeren van identiteiten wordt er per default geen output
     meer gegenereerd. Alleen als de "Trace" of "Debug" optie wordt gebruikt
     krijgt u een overzicht van de uitgevoerde identiteiten. Dit kan u
     fullscreen, of door het $IdtExecuteTrace commando in rapporten.
 
 &TI Print Files
-———————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     U kan uw a2m-files en rapport-definities vanuit IODE afprinten.
 >
 <Version 5.0>
     Version 5.0 (15/10/1997)
-    ————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Direct Printen vanuit IODE
-——————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     In de vorige versies van IODE, moest een A2M-file worden aangemaakt om
     later af te drukken op een printer of door te sturen naar een ander
@@ -5512,10 +5512,10 @@ Exemples :
     U zal merken dat de "windows" waarin u de printopdracht geeft lichtjes
     zijn veranderd. Het veld waarin de naam van de A2M-file stond is om
     evidente redenen verdwenen. Wil u toch nog A2M-files maken, geen nood.
-    Eén van de formaten waaronder u kan printen is good-old A2M.
+    Eï¿½n van de formaten waaronder u kan printen is good-old A2M.
 
 &TI Grafieken in A2M
-————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     Vanaf de versie 4.80 van IODE kan u naast tabellen, IODE-objecten en
     tekst ook grafieken afdrukken of omzetten naar MIF. Het A2M-formaat
@@ -5547,7 +5547,7 @@ Exemples :
     Reeds bestaande A2M-bestanden blijven compatibel.
 
 &TI Printen vanuit een Rapport
-——————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     Bij het uitvoeren van een rapport moet u aangeven onder welke vorm
     en in welke file u uw output wil recuperen. Per default wordt niets
@@ -5559,12 +5559,12 @@ Exemples :
     A2M-bestanden blijven aanmaken.
 
 &IT    Vroeger
-    ———————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 	$PrintDest filename (vb. $PrintDest tabel.a2m)
 &TX
 &IT    Nu
-    ——
+    ï¿½ï¿½
 &CO
 	$PrintDest
 &TX
@@ -5579,7 +5579,7 @@ Exemples :
 		gespecifieerd, is A2M het gekozen formaat
 
 &TI Wisselwerking EXCEL en IODE-rapporten
-—————————————————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nieuwe rapportfuncties in IODE laten u toe om IODE-objecten weg
     te schrijven naar Excel, gegevens uit Excel te gebuiken om IODE
     data aan te passen, etc...
@@ -5621,7 +5621,7 @@ Exemples :
 
 
 &TI XODE in IODE
-————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     U kan alle functies uit XODE in IODE gebruiken. Als u bij de "Save" of
     de "Load" van een file een ASCII-extensie gebruikt (bijv. ac voor
     commentaarbestanden) dam wordt een IODE-ascii bestand weggeschreven of
@@ -5637,146 +5637,146 @@ Exemples :
     van XODE terug.
 
 &TI RAPPORTS
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouvelles fonctions dans les rapports :
 
-&EN ~c$Minimize~C : minimise la fenêtre de IODE (par exemple pour
-		    afficher des graphiques de Excel générés par
+&EN ~c$Minimize~C : minimise la fenï¿½tre de IODE (par exemple pour
+		    afficher des graphiques de Excel gï¿½nï¿½rï¿½s par
 		    la simulation en cours)
-&EN ~c$Maximize~C : restaure la fenêtre de IODE
-&EN ~c$Sleep~C nn : arrête le processus pendant nn millièmes de seconde.
-		    Cela permet à un client ou un serveur DDE de
-		    conserver le contrôle en cas de requêtes trop
+&EN ~c$Maximize~C : restaure la fenï¿½tre de IODE
+&EN ~c$Sleep~C nn : arrï¿½te le processus pendant nn milliï¿½mes de seconde.
+		    Cela permet ï¿½ un client ou un serveur DDE de
+		    conserver le contrï¿½le en cas de requï¿½tes trop
 		    rapides.
 &TI CORRECTION
-——————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Erreur lors de la destruction d'un objet (tableau par exemple)
-    corrigée.
+    corrigï¿½e.
 
 &TI RAPPORTS
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La fonction ~c$EqsEstimate~C imprime les graphiques des observations
-    et des valeurs estimées.
+    et des valeurs estimï¿½es.
 >
 
 <Version 4.73>
     Version 4.73 (08/08/1997)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Calcul de taux de croissance moyens
-———————————————————————————————————
-    Lorsqu'une valeur négative résulte de la division de la période
-    de fin par la période de début dans un calcul de taux de croissance
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsqu'une valeur nï¿½gative rï¿½sulte de la division de la pï¿½riode
+    de fin par la pï¿½riode de dï¿½but dans un calcul de taux de croissance
     moyen, le calcul de la racine de cette valeur 1/n est impossible.
-    Dans ce cas, la valeur retournée est --, alors qu'auparavant, le
+    Dans ce cas, la valeur retournï¿½e est --, alors qu'auparavant, le
     programme avait un comportement erratique.
 >
 <Version 4.71>
     Version 4.71 (20/05/1997)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI IMPRESSIONS
-———————————
-    Le nombre de caractères prévus pour les valeurs des tableaux et des
-    coefficients est augmenté.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le nombre de caractï¿½res prï¿½vus pour les valeurs des tableaux et des
+    coefficients est augmentï¿½.
 
 &TI *ODEW32
-———————
-    Amélioration de la gestion de l'utilisation CPU de la machine.
-    Cette correction améliore sur certaines configurations les
-    performances d'accès aux réseaux.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Amï¿½lioration de la gestion de l'utilisation CPU de la machine.
+    Cette correction amï¿½liore sur certaines configurations les
+    performances d'accï¿½s aux rï¿½seaux.
 >
 <Version 4.72>
     Version 4.72 (17/06/1997)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-La version 4.72 contient trois groupes de fichiers supplémentaires :
+La version 4.72 contient trois groupes de fichiers supplï¿½mentaires :
 
-&EN Version IODE double précision
+&EN Version IODE double prï¿½cision
 &EN WS APL d'interface avec IODE
 &EN Programme A2M pour Windows 95
 
 &TI VERSION DOUBLE PRECISION
-————————————————————————
-    Les données numériques (séries, coefficients, ...) sont gérées en
-    IODE en simple précision, c'est-à-dire avec une précision de 8
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les donnï¿½es numï¿½riques (sï¿½ries, coefficients, ...) sont gï¿½rï¿½es en
+    IODE en simple prï¿½cision, c'est-ï¿½-dire avec une prï¿½cision de 8
     chiffres significatifs.
 
     Dans certains cas, cette limite est "un peu courte". A cette fin,
-    une version double précision (16 chiffres significatifs) a été
-    développée. Les programmes de cette version (uniquement win32) sont
+    une version double prï¿½cision (16 chiffres significatifs) a ï¿½tï¿½
+    dï¿½veloppï¿½e. Les programmes de cette version (uniquement win32) sont
     IODEW32d, XODEW32d, GODEW32d et TODEW32d.
 
     Pour pouvoir exploiter ces programmes, il faut d'abord exporter en
-    ASCII tous les fichiers nécessaires, à l'exception des commentaires
+    ASCII tous les fichiers nï¿½cessaires, ï¿½ l'exception des commentaires
     et des listes. Utilisez pour cela XODEW32. Les fichiers de
-    variables, de tableaux, d'identités et d'équations contenant des
-    informations numériques, ils doivent être traduits avant exploitation.
+    variables, de tableaux, d'identitï¿½s et d'ï¿½quations contenant des
+    informations numï¿½riques, ils doivent ï¿½tre traduits avant exploitation.
 
-    Il faut ensuite importer ces fichiers en double précision à l'aide
-    de XODEW32d. On constatera évidemment que les fichiers peuvent
+    Il faut ensuite importer ces fichiers en double prï¿½cision ï¿½ l'aide
+    de XODEW32d. On constatera ï¿½videmment que les fichiers peuvent
     doubler de taille.
 
-    Ensuite, IODEW32d peut être utilisé exactement comme IODEW32.
+    Ensuite, IODEW32d peut ï¿½tre utilisï¿½ exactement comme IODEW32.
 
 
 &TI WS APL d'interface avec IODE
-————————————————————————————
-    Les fonctions de ce WS sont affichées lors de son chargement.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les fonctions de ce WS sont affichï¿½es lors de son chargement.
 
     Elles permettent :
 
-&EN de piloter IODE à partir de l'APL
-&EN de charger des données de IODE vers APL
-&EN de copier les données de l'APL vers IODE
+&EN de piloter IODE ï¿½ partir de l'APL
+&EN de charger des donnï¿½es de IODE vers APL
+&EN de copier les donnï¿½es de l'APL vers IODE
 
-    Pour que cela fonctionne, il faut démarrer le programme IODEW32 ou
+    Pour que cela fonctionne, il faut dï¿½marrer le programme IODEW32 ou
     IODEW32d. Plus d'explications seront fournies dans un document
-    séparé.
+    sï¿½parï¿½.
 
 
 &TI PROGRAMME A2M pour WIN95
-————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Un programme permettant d'imprimer ou de traduire des fichiers a2m
-    en différents langages est distribué sur les disquettes de IODE.
+    en diffï¿½rents langages est distribuï¿½ sur les disquettes de IODE.
 
-    Ce programme, indépendant de IODE, peut être lancé n'importe quand
-    et exploité en cours de travail dans IODE. Il ne fonctionne que sous
+    Ce programme, indï¿½pendant de IODE, peut ï¿½tre lancï¿½ n'importe quand
+    et exploitï¿½ en cours de travail dans IODE. Il ne fonctionne que sous
     Windows 95.
 
-    A2m contient également une série d'utilitaires de manipulation de
+    A2m contient ï¿½galement une sï¿½rie d'utilitaires de manipulation de
     fichiers HTML.
 
 &TI DDE SERVER
-——————————
-    Un serveur DDE est implémenté dans IODEW32 et IODEW95. Cela
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Un serveur DDE est implï¿½mentï¿½ dans IODEW32 et IODEW95. Cela
     signifie qu'il est possible d'exploiter les fonctions et les
-    données de IODE dans le cadre d'autres programmes, comme
+    donnï¿½es de IODE dans le cadre d'autres programmes, comme
     Excel ou APL.
 
-    La version actuelle est encore une version limitée: toutes les
-    possibilités exploitables ne sont donc pas implémentées. En fonction
-    des demandes futures, d'autres fonctions pourront être définies.
+    La version actuelle est encore une version limitï¿½e: toutes les
+    possibilitï¿½s exploitables ne sont donc pas implï¿½mentï¿½es. En fonction
+    des demandes futures, d'autres fonctions pourront ï¿½tre dï¿½finies.
 
 &IT    Utilisation en Excel
-    ————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Par exemple, on peut placer dans une cellule d'un tableau Excel
-    la référence à une variable de IODE sous le format suivant :
+    la rï¿½fï¿½rence ï¿½ une variable de IODE sous le format suivant :
 &CO
 	=IODE|XVAR!'SER1!Sheet1!R2C2'
 &TX
-    La valeur de la série sera placée à la position demandée.
+    La valeur de la sï¿½rie sera placï¿½e ï¿½ la position demandï¿½e.
 
 &IT    Utilisation en APL
-    ————————————————————
-    En APL, un WS IODE a été programmé pour permettre de lancer des
-    commandes de rapport à partir d'une fonction APL, charger en APL des
-    données de IODE et replacer ces données après modification dans
-    l'environnement IODE. Une fonction permet de piloter complètement
-    IODE à partir de l'APL.
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    En APL, un WS IODE a ï¿½tï¿½ programmï¿½ pour permettre de lancer des
+    commandes de rapport ï¿½ partir d'une fonction APL, charger en APL des
+    donnï¿½es de IODE et replacer ces donnï¿½es aprï¿½s modification dans
+    l'environnement IODE. Une fonction permet de piloter complï¿½tement
+    IODE ï¿½ partir de l'APL.
 
 &IT    Fonctions du serveur DDE
-    ————————————————————————
-    Les données techniques qui suivent permettent d'exploiter le
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les donnï¿½es techniques qui suivent permettent d'exploiter le
     serveur DDE dans le cadre d'autres programmes.
 &CO
     Service : IODE
@@ -5790,32 +5790,32 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 	     SAMPLE = sample du WS IODE courant
 
 	     CLIST  = liste des commentaires du WS IODE courant
-	     ELIST  = liste des équations du WS IODE courant
-	     ILIST  = liste des identités du WS IODE courant
+	     ELIST  = liste des ï¿½quations du WS IODE courant
+	     ILIST  = liste des identitï¿½s du WS IODE courant
 	     LLIST  = liste des listes du WS IODE courant
 	     SLIST  = liste des scalaires du WS IODE courant
 	     TLIST  = liste des tableaux du WS IODE courant
 	     VLIST  = liste des variables du WS IODE courant
 
 	     CNAME  = nom du fichier des commentaires de IODE
-	     ENAME  = nom du fichier des équations de IODE
-	     INAME  = nom du fichier des identités de IODE
+	     ENAME  = nom du fichier des ï¿½quations de IODE
+	     INAME  = nom du fichier des identitï¿½s de IODE
 	     LNAME  = nom du fichier des listes de IODE
 	     SNAME  = nom du fichier des scalaires de IODE
 	     TNAME  = nom du fichier des tableaux  de IODE
 	     VNAME  = nom du fichier des variables de IODE
 
 	     CDESCR = description du fichier des commentaires de IODE
-	     EDESCR = description du fichier des équations de IODE
-	     IDESCR = description du fichier des identités de IODE
+	     EDESCR = description du fichier des ï¿½quations de IODE
+	     IDESCR = description du fichier des identitï¿½s de IODE
 	     LDESCR = description du fichier des listes de IODE
 	     SDESCR = description du fichier des scalaires de IODE
 	     TDESCR = description du fichier des tableaux  de IODE
 	     VDESCR = description du fichier des variables de IODE
 
 	     CNB    = nombre de commentaires dans IODE
-	     ENB    = nombre de équations dans IODE
-	     INB    = nombre de identités dans IODE
+	     ENB    = nombre de ï¿½quations dans IODE
+	     INB    = nombre de identitï¿½s dans IODE
 	     LNB    = nombre de listes dans IODE
 	     SNB    = nombre de scalaires dans IODE
 	     TNB    = nombre de tableaux  dans IODE
@@ -5823,45 +5823,45 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 
 	Items de CMT, EQS, IDT, LST, SCL, TBL, VAR
 	------------------------------------------
-	     L'item est le nom de l'objet. La valeur retournée
-	     est la définition de l'objet.
+	     L'item est le nom de l'objet. La valeur retournï¿½e
+	     est la dï¿½finition de l'objet.
 
 	Items de XVAR
 	-------------
-	    L'item est composé de trois éléments séparés par des ! :
-		- nom de la ou des variables séparés par des virgules ou
-		    des blancs. t représente une ligne de périodes
-		- nom du sheet où placer le résultat
-		- range de la première cellule dans ce sheet
+	    L'item est composï¿½ de trois ï¿½lï¿½ments sï¿½parï¿½s par des ! :
+		- nom de la ou des variables sï¿½parï¿½s par des virgules ou
+		    des blancs. t reprï¿½sente une ligne de pï¿½riodes
+		- nom du sheet oï¿½ placer le rï¿½sultat
+		- range de la premiï¿½re cellule dans ce sheet
 
-	    Cette requête génère un Poke vers excel avec la définition
+	    Cette requï¿½te gï¿½nï¿½re un Poke vers excel avec la dï¿½finition
 	    des variables et leur code.
 
-	    Si aucun nom de série n'est donné, une série avec les
-	    valeurs des périodes précède. Sinon, on peut placer
-	    les périodes en indiquant la série t (minuscule).
+	    Si aucun nom de sï¿½rie n'est donnï¿½, une sï¿½rie avec les
+	    valeurs des pï¿½riodes prï¿½cï¿½de. Sinon, on peut placer
+	    les pï¿½riodes en indiquant la sï¿½rie t (minuscule).
 
 	    S'il n'y a pas de sheet, Sheet1 est choisi comme destination
 	    S'il n'y a pas de range, R1C1 est choisi comme destination
 
 	    Exemples
 	    --------
-		IODE|XVAR!' ' : toutes les séries dans le sheet1, en R1C1
-				avec les périodes
-		IODE|XVAR!'t,QC0,QAFF!Sheet2!R1C1' : séries QCO et QAFF
+		IODE|XVAR!' ' : toutes les sï¿½ries dans le sheet1, en R1C1
+				avec les pï¿½riodes
+		IODE|XVAR!'t,QC0,QAFF!Sheet2!R1C1' : sï¿½ries QCO et QAFF
 				dans le Sheet2 en position R1C1, avec
-				les périodes en première ligne
-		IODE|XVAR!'QC0!Sheet2!R1C1' : série QCO sans les périodes
+				les pï¿½riodes en premiï¿½re ligne
+		IODE|XVAR!'QC0!Sheet2!R1C1' : sï¿½rie QCO sans les pï¿½riodes
 
 	Items de XCMT
 	-------------
-	    L'item est composé de trois éléments séparés par des ! :
-		- nom de la ou des commentaires séparés par des virgules ou
+	    L'item est composï¿½ de trois ï¿½lï¿½ments sï¿½parï¿½s par des ! :
+		- nom de la ou des commentaires sï¿½parï¿½s par des virgules ou
 		    des blancs
-		- nom du sheet où placer le résultat
-		- range de la première cellule dans ce sheet
+		- nom du sheet oï¿½ placer le rï¿½sultat
+		- range de la premiï¿½re cellule dans ce sheet
 
-	    Cette requête génère un Poke vers excel avec la valeur des
+	    Cette requï¿½te gï¿½nï¿½re un Poke vers excel avec la valeur des
 	    commentaires et leurs codes.
 
 	    S'il n'y a pas de sheet, Sheet1 est choisi comme destination
@@ -5883,40 +5883,40 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 	     SAMPLE = change le sample du WS IODE courant (format IODE)
 
 	     CNAME  = change le nom du fichier des commentaires de IODE
-	     ENAME  = change le nom du fichier des équations de IODE
-	     INAME  = change le nom du fichier des identités de IODE
+	     ENAME  = change le nom du fichier des ï¿½quations de IODE
+	     INAME  = change le nom du fichier des identitï¿½s de IODE
 	     LNAME  = change le nom du fichier des listes de IODE
 	     SNAME  = change le nom du fichier des scalaires de IODE
 	     TNAME  = change le nom du fichier des tableaux  de IODE
 	     VNAME  = change le nom du fichier des variables de IODE
 
 	     CDESCR = change la description des commentaires de IODE
-	     EDESCR = change la description des équations de IODE
-	     IDESCR = change la description des identités de IODE
+	     EDESCR = change la description des ï¿½quations de IODE
+	     IDESCR = change la description des identitï¿½s de IODE
 	     LDESCR = change la description des listes de IODE
 	     SDESCR = change la description des scalaires de IODE
 	     TDESCR = change la description des tableaux  de IODE
 	     VDESCR = change la description des variables de IODE
 
 	     CCLEAR = Clear des commentaires dans IODE
-	     ECLEAR = Clear des équations dans IODE
-	     ICLEAR = Clear des identités dans IODE
+	     ECLEAR = Clear des ï¿½quations dans IODE
+	     ICLEAR = Clear des identitï¿½s dans IODE
 	     LCLEAR = Clear des listes dans IODE
 	     SCLEAR = Clear des scalaires dans IODE
 	     TCLEAR = Clear des tableaux dans IODE
 	     VCLEAR = Clear des variables dans IODE
 
 	     CLOAD = Load un fichier de commentaires dans IODE
-	     ELOAD = Load un fichier d'équations dans IODE
-	     ILOAD = Load un fichier d'identités dans IODE
+	     ELOAD = Load un fichier d'ï¿½quations dans IODE
+	     ILOAD = Load un fichier d'identitï¿½s dans IODE
 	     LLOAD = Load un fichier de listes dans IODE
 	     SLOAD = Load un fichier de scalaires dans IODE
 	     TLOAD = Load un fichier de tableaux dans IODE
 	     VLOAD = Load un fichier de variables dans IODE
 
 	     CSAVE = Sauve le fichier de commentaires de IODE
-	     ESAVE = Sauve le fichier d'équations de IODE
-	     ISAVE = Sauve le fichier d'identités de IODE
+	     ESAVE = Sauve le fichier d'ï¿½quations de IODE
+	     ISAVE = Sauve le fichier d'identitï¿½s de IODE
 	     LSAVE = Sauve le fichier de listes de IODE
 	     SSAVE = Sauve le fichier de scalaires de IODE
 	     TSAVE = Sauve le fichier de tableaux de IODE
@@ -5924,9 +5924,9 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 
 	Items de PLAY
 	-------------
-	     TEXT : data = texte à placer dans le buffer clavier
+	     TEXT : data = texte ï¿½ placer dans le buffer clavier
 		    de IODE
-	     KEYS : data = texte des touches à placer dans le buffer
+	     KEYS : data = texte des touches ï¿½ placer dans le buffer
 		    clavier : aA..aZ, aF1..aF10, cA..cZ, cF1..cF10,
 			      sF1..sF10, ESC, ENTER, BACKSPACE,
 			      HOME, END, LEFT, RIGHT, UP, DOWN,
@@ -5934,14 +5934,14 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 
 	Items de CMT, EQS, IDT, LST, SCL, TBL, VAR
 	------------------------------------------
-	    Nom de l'objet à modifier.
-	    Data contient la valeur avec des TAB comme séparateur
+	    Nom de l'objet ï¿½ modifier.
+	    Data contient la valeur avec des TAB comme sï¿½parateur
 	    dans le cas des variables.
 
 	Items de REP
 	------------
 	    La valeur de l'item est sans signification.
-	    La valeur de data est une commande de rapport à exécuter
+	    La valeur de data est une commande de rapport ï¿½ exï¿½cuter
 	    (ex. '$WsLoadVar test')
 &TX
 >
@@ -5949,29 +5949,29 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 <Version 4.70>
     Version 4.70 (10/03/1997)
 
-&TI Génération de fichiers HTML
+&TI Gï¿½nï¿½ration de fichiers HTML
 
 
-&IT   Paramètres de QODE
+&IT   Paramï¿½tres de QODE
 
-    De nouveaux paramères se sont ajoutés au programme QODE pour
-    affiner la génération des fichiers HTML :
+    De nouveaux paramï¿½res se sont ajoutï¿½s au programme QODE pour
+    affiner la gï¿½nï¿½ration des fichiers HTML :
 
-&EN -toc tit_level : indique s'il faut générer une table des
-	 matières au début du document et jusqu'à quel niveau de titre
+&EN -toc tit_level : indique s'il faut gï¿½nï¿½rer une table des
+	 matiï¿½res au dï¿½but du document et jusqu'ï¿½ quel niveau de titre
 
 &EN -parb tit_level et
 
 &EN -pari tit_level : indique s'il faut donner un niveau de
-	    titre aux paragraphes parb et pari (on donc éventuellement
-	    les introduire dans la table des matières
+	    titre aux paragraphes parb et pari (on donc ï¿½ventuellement
+	    les introduire dans la table des matiï¿½res
 
-&IT    HTML généré
-    ———————————
-    En début et en fin du fichier HTML se trouvent deux commentaires
+&IT    HTML gï¿½nï¿½rï¿½
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    En dï¿½but et en fin du fichier HTML se trouvent deux commentaires
     qui permettent d'effectuer un remplacement automatique dans le
     fichier, afin par exemple de placer une barre navigationnelle
-    standardisée en haut et en bas du document.
+    standardisï¿½e en haut et en bas du document.
 
     Ces commentaires sont :
 &CO
@@ -5982,7 +5982,7 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 	<<!ENDFOOTER>>
 &TX
     Le programme scr4_sbs permet de substituer ces textes par le contenu
-    d'un fichier. La commande à effectuer est :
+    d'un fichier. La commande ï¿½ effectuer est :
 &CO
 	scr4_sbs "<<STARTHEADER>>" "<<!ENDHEADER>>" replacefile
 		file.htm
@@ -5992,244 +5992,244 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
     ces textes compris, par le contenu du fichier replacefile.
 
 &TI Graphiques
-——————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Correction de l'affichage et de l'impression des graphiques
-    à partir des tableaux. Le buffer contenant le titre du tableau est
-    alloué dynamiquement: auparavant, un titre de plus de 80 caractères
+    ï¿½ partir des tableaux. Le buffer contenant le titre du tableau est
+    allouï¿½ dynamiquement: auparavant, un titre de plus de 80 caractï¿½res
     plantait le programme.
 
 &TI Fichier printcap for WinNFS de Network Instruments
-———————————————————————————————————
-    Le fichier printcap.ni contient les instructions nécessaires
-    à l'impression via IODE32 ou QODE sous Windows 95. EN effet,
-    le logiciel Winsock Companion de Network Instruments est utilisé
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le fichier printcap.ni contient les instructions nï¿½cessaires
+    ï¿½ l'impression via IODE32 ou QODE sous Windows 95. EN effet,
+    le logiciel Winsock Companion de Network Instruments est utilisï¿½
     en lieu et place de PC-NFS sous WIndows 95, ce qui exige une autre
     configuration.
 
-    Attention, à la différence des la version PC-NFS, les imprimantes
-    doivent être préalablement définies dans l'environnement Windows
-    pour pouvoir être utilisées.
+    Attention, ï¿½ la diffï¿½rence des la version PC-NFS, les imprimantes
+    doivent ï¿½tre prï¿½alablement dï¿½finies dans l'environnement Windows
+    pour pouvoir ï¿½tre utilisï¿½es.
 
 &TI Corrections de bugs
-———
-    Les variables ~c_YOBSi~C, ~c_YCALCi~C et ~c_YRESi~C générées
-    automatiquement lors des estimations étaient parfois absentes. Cette
-    erreur est corrigée.
+ï¿½ï¿½ï¿½
+    Les variables ~c_YOBSi~C, ~c_YCALCi~C et ~c_YRESi~C gï¿½nï¿½rï¿½es
+    automatiquement lors des estimations ï¿½taient parfois absentes. Cette
+    erreur est corrigï¿½e.
 
-&TI QODE : génération de fichier MIF
+&TI QODE : gï¿½nï¿½ration de fichier MIF
 
-    La traduction de fichiers a2m en format MIF était impossible
-    si la largeur d'une colonne (la première) était supérieure à
-    60 caractères. Cette limite est portée à 400 caractères.
+    La traduction de fichiers a2m en format MIF ï¿½tait impossible
+    si la largeur d'une colonne (la premiï¿½re) ï¿½tait supï¿½rieure ï¿½
+    60 caractï¿½res. Cette limite est portï¿½e ï¿½ 400 caractï¿½res.
 
-    La limite à 60 caractères est cependant conservée pour les outputs
-    en fichier formattés Ascii.
+    La limite ï¿½ 60 caractï¿½res est cependant conservï¿½e pour les outputs
+    en fichier formattï¿½s Ascii.
 >
 <Version 4.69>
     Version 4.69 (12/09/1996)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ..esc ~
 
 &TI WsCopyVar, HighToLow, LowToHigh, Census X11
-———————————————————————————————————————————
-    Ces fonctions sont corrigées : en utilisation hors des
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Ces fonctions sont corrigï¿½es : en utilisation hors des
     rapports, elles plantaient IODE (toutes versions).
 
-&TI Génération des tableaux
-———————————————————————
+&TI Gï¿½nï¿½ration des tableaux
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Correction dans le calcul lorsque le diviseur est non LEC.
 
 &TI Simulation
-——————————
-    La version DOS 32 bits a été quelque peu accélérée.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La version DOS 32 bits a ï¿½tï¿½ quelque peu accï¿½lï¿½rï¿½e.
 
 &TI Estimation
-——————————
-    Les tests résultant de la dernière estimation sont sauvés dans
-    des scalaires de façon à permettre différents calcul par la
-    suite. Il en va de même pour les résidus, membres de gauche et
-    de droite des équations.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les tests rï¿½sultant de la derniï¿½re estimation sont sauvï¿½s dans
+    des scalaires de faï¿½on ï¿½ permettre diffï¿½rents calcul par la
+    suite. Il en va de mï¿½me pour les rï¿½sidus, membres de gauche et
+    de droite des ï¿½quations.
 
-    Les tests portent les noms suivants (~ce0_*~C pour la première équation
-    du bloc, ~ce1_*~C pour la deuxième, ...) :
+    Les tests portent les noms suivants (~ce0_*~C pour la premiï¿½re ï¿½quation
+    du bloc, ~ce1_*~C pour la deuxiï¿½me, ...) :
 
-&EN        ~ce0_n       ~C  : nombre de période du sample
-&EN        ~ce0_k       ~C  : nombre de coefficients estimés
-&EN        ~ce0_stdev   ~C  : std dev des résidus
+&EN        ~ce0_n       ~C  : nombre de pï¿½riode du sample
+&EN        ~ce0_k       ~C  : nombre de coefficients estimï¿½s
+&EN        ~ce0_stdev   ~C  : std dev des rï¿½sidus
 &EN        ~ce0_meany   ~C  : moyenne de Y
-&EN        ~ce0_ssres   ~C  : somme du carrés des résidus
+&EN        ~ce0_ssres   ~C  : somme du carrï¿½s des rï¿½sidus
 &EN        ~ce0_stderr  ~C  : std error
 &EN        ~ce0_stderrp ~C  : std error %
 &EN        ~ce0_fstat   ~C  : F-Stat
-&EN        ~ce0_r2      ~C  : R carré
-&EN        ~ce0_r2adj   ~C  : R carré ajusté
+&EN        ~ce0_r2      ~C  : R carrï¿½
+&EN        ~ce0_r2adj   ~C  : R carrï¿½ ajustï¿½
 &EN        ~ce0_dw      ~C  : Durbin-Watson
 &EN        ~ce0_loglik  ~C  : Log Likelihood
 
-    Les séries calculées sont également sauvées dans une variable
+    Les sï¿½ries calculï¿½es sont ï¿½galement sauvï¿½es dans une variable
     sous les noms :
 
-&EN  ~c_YCALC0~C pour le membre de droite de la première équation du
-	  bloc, ~c_YCALC1~C pour la deuxième équation, etc.
+&EN  ~c_YCALC0~C pour le membre de droite de la premiï¿½re ï¿½quation du
+	  bloc, ~c_YCALC1~C pour la deuxiï¿½me ï¿½quation, etc.
 
-&EN  ~c_YOBS0~C pour le membre de gauche de la première équation du
-	  bloc, ~c_YOBS1~C pour la deuxième équation, etc.
+&EN  ~c_YOBS0~C pour le membre de gauche de la premiï¿½re ï¿½quation du
+	  bloc, ~c_YOBS1~C pour la deuxiï¿½me ï¿½quation, etc.
 
-&EN  ~c_YRES0~C pour les résidus de la première équation du bloc, ...
+&EN  ~c_YRES0~C pour les rï¿½sidus de la premiï¿½re ï¿½quation du bloc, ...
 
-    En dehors du sample d'estimation, les valeurs de la série sont --.
+    En dehors du sample d'estimation, les valeurs de la sï¿½rie sont --.
 >
 
 <Version 4.68>
     Version 4.68 (16/07/1996)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI HTML
-————
-&EN Correction dans le cas des caractères spéciaux ayant une
-      signification particulière en HTML (<</A>>, ...). Ces caractères
-      étaient transformés auparavant.
+ï¿½ï¿½ï¿½ï¿½
+&EN Correction dans le cas des caractï¿½res spï¿½ciaux ayant une
+      signification particuliï¿½re en HTML (<</A>>, ...). Ces caractï¿½res
+      ï¿½taient transformï¿½s auparavant.
 
-&EN Le format des tableaux est allégé : les lignes verticales
-      et horizontales sont supprimées. De plus, les cellules de
-      type LINE génèrent une ligne intercalaire dans le tableau
+&EN Le format des tableaux est allï¿½gï¿½ : les lignes verticales
+      et horizontales sont supprimï¿½es. De plus, les cellules de
+      type LINE gï¿½nï¿½rent une ligne intercalaire dans le tableau
       en HTML.
 
-&EN L'alignement des nombres se fait à droite et plus sur
-      le point décimal. En effet, Netscape ne gère pas correctement
-      l'alignement décimal.
+&EN L'alignement des nombres se fait ï¿½ droite et plus sur
+      le point dï¿½cimal. En effet, Netscape ne gï¿½re pas correctement
+      l'alignement dï¿½cimal.
 
 &TI Estimation
-——————————
-    L'impression des résultats des estimations ne génère plus de
-    tableaux pour éviter les sauts de pages inutiles en Postscript.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    L'impression des rï¿½sultats des estimations ne gï¿½nï¿½re plus de
+    tableaux pour ï¿½viter les sauts de pages inutiles en Postscript.
 
 &TI Print/View Variables
-————————————————————
-    Il est dorénavant possible d'afficher des valeurs résultant de
-    formules contenant l'opérateur * ou contenant des virgules (min,
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Il est dorï¿½navant possible d'afficher des valeurs rï¿½sultant de
+    formules contenant l'opï¿½rateur * ou contenant des virgules (min,
     vmax, ...).
-    Cependant, les séparateurs entre les formules sont dorénavant
-    limités aux blancs, points-virgules et retour ligne.
+    Cependant, les sï¿½parateurs entre les formules sont dorï¿½navant
+    limitï¿½s aux blancs, points-virgules et retour ligne.
 
 &TI Noms de fichiers
-————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     A la demande de plusieurs utilisateurs, la longueur des noms de
-    fichiers est portée dans la plupart des écrans à un minimum de 40
-    caractères.
-    Le prix à payer est que les "profiles" des versions antérieures
+    fichiers est portï¿½e dans la plupart des ï¿½crans ï¿½ un minimum de 40
+    caractï¿½res.
+    Le prix ï¿½ payer est que les "profiles" des versions antï¿½rieures
     ne sont plus compatibles avec la version 4.68.
 
 &TI Fichiers a2m
-————————————
-    Dans les écrans où l'on permet d'"imprimer" dans un fichier a2m,
-    il est possible de spécifier si l'on souhaite que le fichiers
-    soient vidés avant l'impression. Cela permet d'éviter que
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Dans les ï¿½crans oï¿½ l'on permet d'"imprimer" dans un fichier a2m,
+    il est possible de spï¿½cifier si l'on souhaite que le fichiers
+    soient vidï¿½s avant l'impression. Cela permet d'ï¿½viter que
     des fichiers d'output accumulent des impressions successives.
 
-    Notons que cette option est liée à la fonction de rapport
+    Notons que cette option est liï¿½e ï¿½ la fonction de rapport
     $PrintDestNew (voir 4.67).
 
 &TI Execute identities
-——————————————————
-    Le fichier "trace" optionnel est réinitialisé à chaque exécution.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le fichier "trace" optionnel est rï¿½initialisï¿½ ï¿½ chaque exï¿½cution.
 
 &TI Simulation Debug
-————————————————
-    L'option debug de la simulation génère automatiquement des listes
-    comprenant des équations pré- et post-récursives.
-    Dans cette version, un fichier de trace est également généré. Ce
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    L'option debug de la simulation gï¿½nï¿½re automatiquement des listes
+    comprenant des ï¿½quations prï¿½- et post-rï¿½cursives.
+    Dans cette version, un fichier de trace est ï¿½galement gï¿½nï¿½rï¿½. Ce
     fichier se nomme "simul.dbg" et se trouve dans le directory
-    d'où IODE a été lancé.
-    Le fichier de trace comprend actuellement la liste des équations
-    pour lesquelles une sous-itération (Newton-Raphson) a été
-    nécessaire et le nombre de sous-itérations.
+    d'oï¿½ IODE a ï¿½tï¿½ lancï¿½.
+    Le fichier de trace comprend actuellement la liste des ï¿½quations
+    pour lesquelles une sous-itï¿½ration (Newton-Raphson) a ï¿½tï¿½
+    nï¿½cessaire et le nombre de sous-itï¿½rations.
 
 &TI Remarques
-—————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Dans les rapports, les expressions du type
 &CO
 	    $Goto label {X[1975Y1] << 2}
 &TX
-    ne fonctionnent que si la période est fixée par la fonction
+    ne fonctionnent que si la pï¿½riode est fixï¿½e par la fonction
 &CO
 	    $SetTime
 &TX
-    Si ce n'est pas le cas, l'expression (même si l'année est fixée
-    comme dans l'exemple) ne s'exécutent pas.
+    Si ce n'est pas le cas, l'expression (mï¿½me si l'annï¿½e est fixï¿½e
+    comme dans l'exemple) ne s'exï¿½cutent pas.
 >
 <Version 4.67> (12/07/1996)
     Version 4.67 (12/07/1996)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Versions Windows
-————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN Meilleure gestion de la souris.
 &EN Stop possible plus souvent.
 
 &TI HTML
-————
-    Il est possible de spécifier un fichier HTML comme sortie de
-      QODE ou TODE. Cette fonction génére du HTML 3.0 (y compris les
+ï¿½ï¿½ï¿½ï¿½
+    Il est possible de spï¿½cifier un fichier HTML comme sortie de
+      QODE ou TODE. Cette fonction gï¿½nï¿½re du HTML 3.0 (y compris les
       tableaux).
 
-&TI Critère de convergence Newton
-—————————————————————————————
-    Dans cette version, on a repris deux types de critères dans le
-    cas d'une équation non résolue par rapport à l'endogène ou dans
-    le cas du goal seeking. Dans la version 4.66, on avait renforcé
+&TI Critï¿½re de convergence Newton
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Dans cette version, on a repris deux types de critï¿½res dans le
+    cas d'une ï¿½quation non rï¿½solue par rapport ï¿½ l'endogï¿½ne ou dans
+    le cas du goal seeking. Dans la version 4.66, on avait renforcï¿½
     les contraintes de convergence. Dans la version 4.67, en attendant
-    un refonte de l'algorithme, on reprend le critère 4.66 (critère
+    un refonte de l'algorithme, on reprend le critï¿½re 4.66 (critï¿½re
     fort, comme dans KaA), mais en cas de non convergence par cette
-    méthode, on reprend le critère antérieur (v.4.65).
+    mï¿½thode, on reprend le critï¿½re antï¿½rieur (v.4.65).
 
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &IT    Nouvelle fonction $msg
-    ——————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	Elle affiche le texte de l'argument et attend une touche avant
-	de continuer. Cela permet de stopper momentanément le rapport
-	pour afficher un message à l'intention de l'utilisateur,
-	contrairement à la fonction $show qui affiche dans le bas de
-	l'écran mais ne stoppe pas.
+	de continuer. Cela permet de stopper momentanï¿½ment le rapport
+	pour afficher un message ï¿½ l'intention de l'utilisateur,
+	contrairement ï¿½ la fonction $show qui affiche dans le bas de
+	l'ï¿½cran mais ne stoppe pas.
 
 &CO
 	    $msg texte libre
 &TX
 &IT    Macros
-    ——————
-	Les macros sont définies entre des pourcents : %FILE%. Si le
-	premier pourcent est immédiatement suivi du caractère
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Les macros sont dï¿½finies entre des pourcents : %FILE%. Si le
+	premier pourcent est immï¿½diatement suivi du caractï¿½re
 
-&EN            ## : le contenu de la macro est transposé en majuscules
-&EN            ! : le contenu de la macro est transposé en minuscules
+&EN            ## : le contenu de la macro est transposï¿½ en majuscules
+&EN            ! : le contenu de la macro est transposï¿½ en minuscules
 
 	Par exemple,
 &CO
 	    ##define TOTO TBL1
 	    Premier  tableau : %!TOTO%
-	    Deuxième tableau : %##TOTO%
+	    Deuxiï¿½me tableau : %##TOTO%
 &TX
-	Donnera à l'exécution :
+	Donnera ï¿½ l'exï¿½cution :
 &CO
 	    Premier  tableau : tbl1
-	    Deuxième tableau : TBL1
+	    Deuxiï¿½me tableau : TBL1
 &TX
 &IT    Noms des fichiers a2m
-    —————————————————————
-	Pour éviter les problèmes de noms de fichiers entre DOS et
-	Unix, les noms des fichiers a2m définis par la commande
-	$PrintDest sont toujours transposés en minuscules.
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Pour ï¿½viter les problï¿½mes de noms de fichiers entre DOS et
+	Unix, les noms des fichiers a2m dï¿½finis par la commande
+	$PrintDest sont toujours transposï¿½s en minuscules.
 
-	Le nom des fichiers output peut atteindre 64 caractères au
+	Le nom des fichiers output peut atteindre 64 caractï¿½res au
 	lieu de 40 auparavant.
 
 &IT    Fonction FileDelete*
-    ————————————————————
-	Le fichier destination de l'output est fermé avant toute
-	destruction de fichier pour éviter les erreurs dans les
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Le fichier destination de l'output est fermï¿½ avant toute
+	destruction de fichier pour ï¿½viter les erreurs dans les
 	rapports du type suivant :
 &CO
 	    $PrintDest res.a2m
@@ -6240,158 +6240,158 @@ La version 4.72 contient trois groupes de fichiers supplémentaires :
 	    $Goto Again
 &TX
 &IT    Nouvelle fonction $PrintDestNew
-    ———————————————————————————————
-	Cette fonction détruit le fichier output avant de commencer
-	à l'utiliser. Cela évite de créer de gigantesques fichiers
-	accumulant tous les résultats successifs.
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Cette fonction dï¿½truit le fichier output avant de commencer
+	ï¿½ l'utiliser. Cela ï¿½vite de crï¿½er de gigantesques fichiers
+	accumulant tous les rï¿½sultats successifs.
 >
 
 <Version 4.66> (17/01/1996)
     Version 4.66 (17/01/1996)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-&TI Critère de convergence Newton
-—————————————————————————————
-    Lorsqu'une équation n'est pas résolue analytiquement par IODE
-    (endogène répétée dans l'équation), un sous-algorithme de Newton est
-    utilisé pour obtenir la convergence de cette équation.
+&TI Critï¿½re de convergence Newton
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsqu'une ï¿½quation n'est pas rï¿½solue analytiquement par IODE
+    (endogï¿½ne rï¿½pï¿½tï¿½e dans l'ï¿½quation), un sous-algorithme de Newton est
+    utilisï¿½ pour obtenir la convergence de cette ï¿½quation.
 
-    En raison du manque relatif de précision dans les calculs, cette
-    sous itération peut dans certains cas ne pas converger correctement.
+    En raison du manque relatif de prï¿½cision dans les calculs, cette
+    sous itï¿½ration peut dans certains cas ne pas converger correctement.
 
     Dans cette version, la contrainte de convergence est plus
     restrictive qu'auparavant, s'alignant de la sorte sur celui de KaA.
-    Par conséquent, il est possible que certaines équations ne
+    Par consï¿½quent, il est possible que certaines ï¿½quations ne
     convergent plus dans cette nouvelle version.
 
-    Dans une version en préparation, tout ce problème sera revu et de
-    nouveaux algorithmes seront proposés.
+    Dans une version en prï¿½paration, tout ce problï¿½me sera revu et de
+    nouveaux algorithmes seront proposï¿½s.
 
 &TI Noms des fichiers (Load)
-————————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Un erreur se produisait lors du chargement d'un fichier dont le nom
-    était du type "../nom". Le message "file not found or incompatible
-    type" était alors produit. Cette erreur est corrigée.
+    ï¿½tait du type "../nom". Le message "file not found or incompatible
+    type" ï¿½tait alors produit. Cette erreur est corrigï¿½e.
 
 &TI Profiles
-————————
-    Les profils qui permettent de retrouver d'une session à l'autre les
-    mêmes écrans sont standardisés (DOS 16 bits ou 32 bits).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les profils qui permettent de retrouver d'une session ï¿½ l'autre les
+    mï¿½mes ï¿½crans sont standardisï¿½s (DOS 16 bits ou 32 bits).
 >
 
 
 <Versions 4.64-65> (17/10/1995)
     Versions 4.64-65 (17/10/1995)
-    —————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Qode (Postscript)
-—————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Le driver Postscript incorporé dans QODE et QODE32 a été adapté aux
+Le driver Postscript incorporï¿½ dans QODE et QODE32 a ï¿½tï¿½ adaptï¿½ aux
 imprimantes HP4m+ et HP4mv.
 
-Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
-		 aux nouvelles imprimantes réseau.
+Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptï¿½s
+		 aux nouvelles imprimantes rï¿½seau.
 
 >
 
 <Version 4.63> (02/10/1995)
     Version 4.63 (02/10/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Tableaux en Mif
-———————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     Une simplification de l'importation en Frame des tableaux (QODE) a
-    été apportée dans cette version : auparavant, il fallait disposer du
+    ï¿½tï¿½ apportï¿½e dans cette version : auparavant, il fallait disposer du
     fichier a2m.m4 dans le directory du fichier mif pour pouvoir ouvrir
-    avec succès en Frame un fichier MIF contenant un tableau
+    avec succï¿½s en Frame un fichier MIF contenant un tableau
     (et encore...).
-    Typiquement, si ce n'était pas le cas, on obtenait un document Frame
+    Typiquement, si ce n'ï¿½tait pas le cas, on obtenait un document Frame
     vide.
 
-    Dorénavant, l'importation des tableaux répond aux règles suivantes :
+    Dorï¿½navant, l'importation des tableaux rï¿½pond aux rï¿½gles suivantes :
 
 &EN        il ne faut plus de fichier a2m.m4
 &EN        il n'y a plus de lignes en haut et en bas du document,
-	  héritage des versions 1.0 et 1.3 de Frame
-&EN        les tableaux générés sont de type "Format A", formt défini dans
+	  hï¿½ritage des versions 1.0 et 1.3 de Frame
+&EN        les tableaux gï¿½nï¿½rï¿½s sont de type "Format A", formt dï¿½fini dans
 	  le catalogue de tableaux de tout fichier Frame
 
-    Pratiquement, pour importer des tableaux en Frame, on procède
+    Pratiquement, pour importer des tableaux en Frame, on procï¿½de
     comme suit :
 
-&EN        créer les tableaux dans un fichier a2m en IODE ou IODE32
+&EN        crï¿½er les tableaux dans un fichier a2m en IODE ou IODE32
 	    (Print Tables)
 &EN         "Quick print a2m file" vers un fichier mif
 &EN         lancer Frame
-&EN         deux possibilités ensuite :
+&EN         deux possibilitï¿½s ensuite :
 
 &EN2             ouvrir le fichier mif (File/Open)
 &EN2             importer le fichier mif dans un document existant
 		(File/Import/File)
 
     Dans le dernier cas (File/Import), on peut exploiter un format
-    prédéfini : il suffit de définir dans un template de Frame
+    prï¿½dï¿½fini : il suffit de dï¿½finir dans un template de Frame
     un type de tableau "Format A" selon ses desiderata.
 >
 
 
 <Version 4.62> (29/09/1995)
     Version 4.62 (29/09/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Versions ?ODE32
-———————————————
-    Une erreur s'est glissée dans le portage de la version 4.61 en 32 bits.
-    L'interprétation des valeurs non entières (dans les fichiers
-    ASCII, les équations et les identités) était erronée.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Une erreur s'est glissï¿½e dans le portage de la version 4.61 en 32 bits.
+    L'interprï¿½tation des valeurs non entiï¿½res (dans les fichiers
+    ASCII, les ï¿½quations et les identitï¿½s) ï¿½tait erronï¿½e.
 >
 
 <Version 4.61> (02/09/1995)
     Version 4.61 (02/09/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Regroupement de fichiers
-————————————————————————
-    Le nombre de fichiers distribués dans IODE est considérablement
-    diminué : les exécutables de IODE intègrent toutes les informations
-    nécessaires à leur fonctionnement, exception faite des fichiers
-    d'aide et du fichier printcap de définition des imprimantes locales.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le nombre de fichiers distribuï¿½s dans IODE est considï¿½rablement
+    diminuï¿½ : les exï¿½cutables de IODE intï¿½grent toutes les informations
+    nï¿½cessaires ï¿½ leur fonctionnement, exception faite des fichiers
+    d'aide et du fichier printcap de dï¿½finition des imprimantes locales.
 >
 
 <Version 4.60> (15/05/1995)
     Version 4.60 (15/05/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI LEC : variable i
-————————————————
-    Nouvelle variable dans le langage LEC permettant de connaître lors
-    d'un calcul la différence entre l'année de calcul d'une
-    sous-expression par rapport à l'année de calcul de toute la formule.
-    Cette variable s'appelle i et son comportement s'apparente à celui
-    de t. Elle est donc invariante par rapport à l'année de calcul d'une
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Nouvelle variable dans le langage LEC permettant de connaï¿½tre lors
+    d'un calcul la diffï¿½rence entre l'annï¿½e de calcul d'une
+    sous-expression par rapport ï¿½ l'annï¿½e de calcul de toute la formule.
+    Cette variable s'appelle i et son comportement s'apparente ï¿½ celui
+    de t. Elle est donc invariante par rapport ï¿½ l'annï¿½e de calcul d'une
     formule LEC.
 
-    On calcule toujours une forme LEC pour une valeur du temps t donnée,
-    mais dans une sous-expression, t peut être différent. C'est par
-    exemple le cas pour les opérateurs d(), dln(), sum(), ...
-    On peut, grace à i, connaître la différence entre le t de calcul de la
+    On calcule toujours une forme LEC pour une valeur du temps t donnï¿½e,
+    mais dans une sous-expression, t peut ï¿½tre diffï¿½rent. C'est par
+    exemple le cas pour les opï¿½rateurs d(), dln(), sum(), ...
+    On peut, grace ï¿½ i, connaï¿½tre la diffï¿½rence entre le t de calcul de la
     formule et le t de calcul de la sous-expression courante.
 
     On peut donc calculer des expressions comme
 &CO
 	sum(t-2, t-4, A / (1 - i)**2),
 &TX
-    qui équivaut à :
+    qui ï¿½quivaut ï¿½ :
 &CO
 	A[-2]/(1-(-2))**2 + A[-3]/(1-(-3))**2 + A[-4]/(1-(-4))**2
 &TX
-    Sans i, une telle expression ne peut être écrite en LEC.
+    Sans i, une telle expression ne peut ï¿½tre ï¿½crite en LEC.
 
-    Cet opérateur a été implémenté pour permettre la traduction de
-    l'opérateur SUM de TROLL.
+    Cet opï¿½rateur a ï¿½tï¿½ implï¿½mentï¿½ pour permettre la traduction de
+    l'opï¿½rateur SUM de TROLL.
 
-    Ainsi, si on calcule une expression pour un t donné, i prend les
+    Ainsi, si on calcule une expression pour un t donnï¿½, i prend les
     valeurs suivantes selon les cas. Attention, les expressions
-    indiquées ci-dessous sont les formules complètes, et pas
+    indiquï¿½es ci-dessous sont les formules complï¿½tes, et pas
     une sous-expression!
 
 &CO
@@ -6406,61 +6406,61 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 		A[+3] + A[+4] / 4
 &TX
 &TI High to Low
-———————————
-    Correction dans le cas des fichiers input dont la dernière observation
-    fait partie du calcul des séries output : un fichier 93M1:94M12
-    donnait la valeur NA pour l'année 94.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction dans le cas des fichiers input dont la derniï¿½re observation
+    fait partie du calcul des sï¿½ries output : un fichier 93M1:94M12
+    donnait la valeur NA pour l'annï¿½e 94.
 
 >
 
 <Version 4.59> (06/03/1995)
     Version 4.59 (06/03/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Tableaux
-————————
-    Correction de la fonction de création automatique (rapports).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction de la fonction de crï¿½ation automatique (rapports).
 
 &TI Listes
-——————
-    Toutes les listes générées ont pour séparateur le point-virgule au
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Toutes les listes gï¿½nï¿½rï¿½es ont pour sï¿½parateur le point-virgule au
     lieu de la virgule.
 
     Lors de l'importation de listes via XODE, les listes avec
-    séparateur point-virgule sont correctement transférées et non
-    plus scindées en plusieurs lignes séparées n'importe où.
+    sï¿½parateur point-virgule sont correctement transfï¿½rï¿½es et non
+    plus scindï¿½es en plusieurs lignes sï¿½parï¿½es n'importe oï¿½.
 
 >
 
 <Version 4.58> (13/02/1995)
     Version 4.58 (13/02/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Simulation
-——————————
-    Les valeurs initiales des endogènes sont calculées également
-    pour les blocs pré- et post-récursifs. Auparavant, seuls les
-    endogènes du bloc interdépendant étaient initialisées.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les valeurs initiales des endogï¿½nes sont calculï¿½es ï¿½galement
+    pour les blocs prï¿½- et post-rï¿½cursifs. Auparavant, seuls les
+    endogï¿½nes du bloc interdï¿½pendant ï¿½taient initialisï¿½es.
 
 &TI Tableaux
-————————
-    La création automatique des tableaux s'est enrichie de deux nouvelles
-    fonctionnalités : au niveau des rapports et au niveau de la création
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La crï¿½ation automatique des tableaux s'est enrichie de deux nouvelles
+    fonctionnalitï¿½s : au niveau des rapports et au niveau de la crï¿½ation
     manuelle d'un tableau.
 
 &IT    1. Dans les rapports
-    ————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	La fonction $DataUpdateTbl a la syntaxe suivante :
 &CO
 	    $DataUpdateTbl table_name title;lec1;lec2;...
 &TX
-	Si title est un nom de commentaire, le commentaire est utilisé
+	Si title est un nom de commentaire, le commentaire est utilisï¿½
 	comme titre.
-	De même, si on trouve des noms de variables comme forme lec, et
+	De mï¿½me, si on trouve des noms de variables comme forme lec, et
 	qu'il existe un commentaire pour ces variables, le titre de
-	la ligne correspondante est remplacé par la valeur du
+	la ligne correspondante est remplacï¿½ par la valeur du
 	commentaire.
 
 &IT        Exemple
-	———————
+	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	Supposons qu'il existe en WS un commentaire pour A et non pour
 	B, et un commentaire TIT :
 &CO
@@ -6471,21 +6471,21 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 &CO
 		$DataUpdateTbl T1 TIT;A;B;A+B
 &TX
-	crée le tableau T1 avec la forme suivante :
+	crï¿½e le tableau T1 avec la forme suivante :
 &CO
-	    ———————————————————————————————————————————È
-	    ­          Titre de mon tabelo              ­
-	    ­                                           ­
-	    ­  Produit national brut               A    ­
-	    ­  B                                   B    ­
-	    ­  A+B                                 A+B  ­
-	    Ë———————————————————————————————————————————€
+	    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	    ï¿½          Titre de mon tabelo              ï¿½
+	    ï¿½                                           ï¿½
+	    ï¿½  Produit national brut               A    ï¿½
+	    ï¿½  B                                   B    ï¿½
+	    ï¿½  A+B                                 A+B  ï¿½
+	    Ë—ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TX
-&IT    2. Création manuelle
-    ————————————————————
-	Les mêmes règles s'appliquent dans la création d'un tableau. De
+&IT    2. Crï¿½ation manuelle
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Les mï¿½mes rï¿½gles s'appliquent dans la crï¿½ation d'un tableau. De
 	plus, il est possible d'utiliser des listes dans le champ de
-	définition des formes LEC.
+	dï¿½finition des formes LEC.
 
 
 >
@@ -6493,16 +6493,16 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 
 <Version 4.57> (25/01/1995)
     Version 4.57 (25/01/1995)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Estimation
-——————————
-    1. L'écran de définition des équations reprend dorénavant les
-       valeurs des tests avec 3 décimales, y compris dans le cas
-       des blocs d'équations. Ces mêmes tests sont sauvés dans
-       toutes les équations du bloc.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    1. L'ï¿½cran de dï¿½finition des ï¿½quations reprend dorï¿½navant les
+       valeurs des tests avec 3 dï¿½cimales, y compris dans le cas
+       des blocs d'ï¿½quations. Ces mï¿½mes tests sont sauvï¿½s dans
+       toutes les ï¿½quations du bloc.
 
-    2. L'impression des coefficients se fait en format décimal dans
-       tous les cas, alors qu'auparavant le format dépendait de
+    2. L'impression des coefficients se fait en format dï¿½cimal dans
+       tous les cas, alors qu'auparavant le format dï¿½pendait de
        la valeur (1e-03 au lieu de 0.001).
 
 >
@@ -6510,100 +6510,100 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 
 <Version 4.56> (02/12/1994)
     Version 4.56 (02/12/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Xode
-————
-&EN (Ré-)Adaptation de XODE pour la lecture des données des fichiers NIS.
+ï¿½ï¿½ï¿½ï¿½
+&EN (Rï¿½-)Adaptation de XODE pour la lecture des donnï¿½es des fichiers NIS.
 &EN  Correction de la lecture des tableaux ascii.
 
 &TI Iode/Tableaux
-—————————————
-    Le nombre maximum de colonnes d'un tableau est porté à 20. Rappelons
-    cependant que la taille totale d'un objet ne peut dépasser 16000
-    bytes (texte, formules LEC, données internes). Plus le nombre de
-    colonnes est élévé, plus le nombre de lignes devra être limité !
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le nombre maximum de colonnes d'un tableau est portï¿½ ï¿½ 20. Rappelons
+    cependant que la taille totale d'un objet ne peut dï¿½passer 16000
+    bytes (texte, formules LEC, donnï¿½es internes). Plus le nombre de
+    colonnes est ï¿½lï¿½vï¿½, plus le nombre de lignes devra ï¿½tre limitï¿½ !
 
 >
 
 <Version 4.55> (28/10/1994)
     Version 4.55 (28/10/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Xode
-————
+ï¿½ï¿½ï¿½ï¿½
     Adaptation au nouveau format des fichiers NIS.
 
 &TI Fode
-————
-    Amélioration de la version batch du programme. La nouvelle syntaxe
+ï¿½ï¿½ï¿½ï¿½
+    Amï¿½lioration de la version batch du programme. La nouvelle syntaxe
     est :
 &CO
 	fode[32] -i file ... -o outputfile
 &TX
-    Dans le cas où fode est lancé sans paramètre, il fonctionne
+    Dans le cas oï¿½ fode est lancï¿½ sans paramï¿½tre, il fonctionne
     comme avant en mode interactif.
-    Sinon, les fichiers suivant -i sont traités et le résultat
-    est placé dans le fichier ASCII défini par le paramètre -o.
+    Sinon, les fichiers suivant -i sont traitï¿½s et le rï¿½sultat
+    est placï¿½ dans le fichier ASCII dï¿½fini par le paramï¿½tre -o.
 
-    Amélioration de la présentation en colonnes lorsque le texte
-    d'une colonne s'étend sur plusieurs lignes.
+    Amï¿½lioration de la prï¿½sentation en colonnes lorsque le texte
+    d'une colonne s'ï¿½tend sur plusieurs lignes.
 
 >
 
 <Version 4.54> (23/08/1994)
     Version 4.54 (23/08/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Editeur MMT
-———————————
-    Le sauvetage d'un fichier édité à l'aide de l'éditeur intégré MMT
-    plaçait des tabulations en début de lignes lorsqu'au moins 8
-    blancs étaient présents. Lors de l'impression d'un tel fichier
-    (par exemple dans le cadre de FODE), ces blancs de début de lignes
-    semblaient - sur certaines imprimantes - être ignorés. En fait,
-    les imprimantes ne représentent pas toutes les tabulations de la
-    même manière, ce qui explique les éventuels problèmes.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le sauvetage d'un fichier ï¿½ditï¿½ ï¿½ l'aide de l'ï¿½diteur intï¿½grï¿½ MMT
+    plaï¿½ait des tabulations en dï¿½but de lignes lorsqu'au moins 8
+    blancs ï¿½taient prï¿½sents. Lors de l'impression d'un tel fichier
+    (par exemple dans le cadre de FODE), ces blancs de dï¿½but de lignes
+    semblaient - sur certaines imprimantes - ï¿½tre ignorï¿½s. En fait,
+    les imprimantes ne reprï¿½sentent pas toutes les tabulations de la
+    mï¿½me maniï¿½re, ce qui explique les ï¿½ventuels problï¿½mes.
 
-    Pour pallier ces inconvénients, l'éditeur intégré MMT sauve
-    dorénavant tous les blancs comme tels, sans remplacer les suites
+    Pour pallier ces inconvï¿½nients, l'ï¿½diteur intï¿½grï¿½ MMT sauve
+    dorï¿½navant tous les blancs comme tels, sans remplacer les suites
     de 8 blancs par des tabulations.
 
 
     Attention : cette modification n'est valable que dans IODE, TODE,
-		FODE, etc, mais pas dans le programme indépendant MMT.
+		FODE, etc, mais pas dans le programme indï¿½pendant MMT.
 
 &TI Xode
-————
-    Rules file : une ligne blanche intercalaire arrêtait le processus de
-    lecture. Dorénavant les lignes blanches sont ignorées.
+ï¿½ï¿½ï¿½ï¿½
+    Rules file : une ligne blanche intercalaire arrï¿½tait le processus de
+    lecture. Dorï¿½navant les lignes blanches sont ignorï¿½es.
 
 &TI Xode : Export by rule
-—————————————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    Cette nouvelle option permet de générer des fichiers
-    de données en formats externes : Comma separated values (CSV), TSP,
+    Cette nouvelle option permet de gï¿½nï¿½rer des fichiers
+    de donnï¿½es en formats externes : Comma separated values (CSV), TSP,
     WKS (Lotus/Excel), DIF.
 
     Le nom du fichier de variables est requis.
 
-    Le fichier des "rules" permet de limiter les variables à exporter et
-    éventuellement d'en changer les noms.
+    Le fichier des "rules" permet de limiter les variables ï¿½ exporter et
+    ï¿½ventuellement d'en changer les noms.
 
-    Si un fichier de commentaires est indiqué, chaque variable est
-    accompagnée der son commentaire.
+    Si un fichier de commentaires est indiquï¿½, chaque variable est
+    accompagnï¿½e der son commentaire.
 
-    Si le sample n'est pas précisé, toutes les observations sont
-    fournies dans le fichier résultat.
+    Si le sample n'est pas prï¿½cisï¿½, toutes les observations sont
+    fournies dans le fichier rï¿½sultat.
 
-    Dans le cas du format CSV, deux éléments sont libres : le séparateur
-    de colonnes (par défaut ;) et la représentation de la valeur
-    inconnue (par défaut ##N/A).
+    Dans le cas du format CSV, deux ï¿½lï¿½ments sont libres : le sï¿½parateur
+    de colonnes (par dï¿½faut ;) et la reprï¿½sentation de la valeur
+    inconnue (par dï¿½faut ##N/A).
 
-    Dans le cas des fichiers WKS, un "Label" est associé à chaque range
-    de valeurs, ce label étant identique au code de la série.
+    Dans le cas des fichiers WKS, un "Label" est associï¿½ ï¿½ chaque range
+    de valeurs, ce label ï¿½tant identique au code de la sï¿½rie.
 
 &TI Xode
-————
+ï¿½ï¿½ï¿½ï¿½
     La fonction d'importation de XODE accepte les valeurs des tests
-    statistiques de l'estimation sous forme d'un mot-clé et de la
+    statistiques de l'estimation sous forme d'un mot-clï¿½ et de la
     valeur du test. Par exemple :
 &CO
 	STDEV 0.228351
@@ -6616,27 +6616,27 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 	DW 0.512136
 	LOGLIK 32.272
 &TX
-    Ces informations sont générées automatiquement par la fonction
+    Ces informations sont gï¿½nï¿½rï¿½es automatiquement par la fonction
     d'exportation de XODE.
 >
 
 <Version 4.53> (06/06/1994)
     Version 4.53 (06/06/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Rapports
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La fonction $ReportExec accepte une liste comme argument :
 &CO
 	    $ReportExec test $LISTE
 &TX
-    reçoit comme argument les éléments de la liste $LISTE et permet
-    donc d'exécuter un rapport type sur un nombre initialement
+    reï¿½oit comme argument les ï¿½lï¿½ments de la liste $LISTE et permet
+    donc d'exï¿½cuter un rapport type sur un nombre initialement
     inconnu d'arguments. Par exemple, pour remplacer tous les 0 par
     des NA pour la liste $LISTE de variables, il suffit de faire :
 
 
     FICHIER ZTONA.REP
-    —————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 	$label again
 	$goto fin {%0%=0}
@@ -6647,18 +6647,18 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 	$label fin
 &TX
     APPEL
-    —————
+    ï¿½ï¿½ï¿½ï¿½ï¿½
 &CO
 	$ReportExec ztona $LISTE
 &TX
-	ou, dans l'écran d'exécution :
+	ou, dans l'ï¿½cran d'exï¿½cution :
 &CO
 	Report Name : ztona.rep
 	Argument    : $LISTE
 &TX
 
 &TI Lec
-———
+ï¿½ï¿½ï¿½
     La fonction moyenne mobile
 &CO
 	ma(n, expr)
@@ -6667,58 +6667,58 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 &CO
 	mavg(, expr)
 &TX
-    suite à une erreur dans le manuel.
+    suite ï¿½ une erreur dans le manuel.
 
-    Les deux sont dorénavant disponibles.
+    Les deux sont dorï¿½navant disponibles.
 
 &TI Simulation
-——————————
-    Correction : lorsqu'une liste d'équations est introduite et que
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Correction : lorsqu'une liste d'ï¿½quations est introduite et que
     cette liste n'existe pas, un message d'erreur est produit. Auparavant,
-    toutes les équations étaient simulées.
+    toutes les ï¿½quations ï¿½taient simulï¿½es.
 
 &TI Saisie de valeurs
-—————————————————
-    Dans l'édition manuelle des données (WS de variables ou via
-    tableaux), quelques modifications ont été apportées pour améliorer
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Dans l'ï¿½dition manuelle des donnï¿½es (WS de variables ou via
+    tableaux), quelques modifications ont ï¿½tï¿½ apportï¿½es pour amï¿½liorer
     l'interface :
 
-&EN les 8 chiffres significatifs sont affichés
-&EN si l'affichage de la valeur dépasse la taille de la cellule,
+&EN les 8 chiffres significatifs sont affichï¿½s
+&EN si l'affichage de la valeur dï¿½passe la taille de la cellule,
 	  celle-ci est temporairement agrandie.
 &EN lors de la saisie via tableau, les 8 chiffres significatifs
-	  sont conservés
+	  sont conservï¿½s
 
 &TI Rappel
-    ——————
-	    Il est inutile d'espérer que plus de 8 chiffres significatifs
-	    soient conservés dans les valeurs des séries : les valeurs
-	    "float" affichent n'importe quoi au-delà du huitième chiffre.
-	    Ainsi, la valeur 0.012345678 exploite toute la précision
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	    Il est inutile d'espï¿½rer que plus de 8 chiffres significatifs
+	    soient conservï¿½s dans les valeurs des sï¿½ries : les valeurs
+	    "float" affichent n'importe quoi au-delï¿½ du huitiï¿½me chiffre.
+	    Ainsi, la valeur 0.012345678 exploite toute la prï¿½cision
 	    disponible est introduire 0.012345678912 ne modifiera plus la
 	    valeur machine du nombre.
 >
 
 <Version 4.52> (24/05/1994)
     Version 4.52 (24/05/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Corrections
-———————————
-&EN Impressions des tableaux : correction de la séparation entre les
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN Impressions des tableaux : correction de la sï¿½paration entre les
       colonnes.
 &EN Rapports : comportement bizarre en version 16 bits
-&EN Estimation : si le nombre de degrés de liberté est 0, les tests
-	    sont corrigés
+&EN Estimation : si le nombre de degrï¿½s de libertï¿½ est 0, les tests
+	    sont corrigï¿½s
 
 &TI Trend Correction
-————————————————
-    Implémentation de la méthode Hodrick-Prescott pour la construction
-    de série de trend. Le principe est le même que pour la
-    dessaisonnalisation : les séries lues dans un fichier sont importées
-    et transformées simultanément.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Implï¿½mentation de la mï¿½thode Hodrick-Prescott pour la construction
+    de sï¿½rie de trend. Le principe est le mï¿½me que pour la
+    dessaisonnalisation : les sï¿½ries lues dans un fichier sont importï¿½es
+    et transformï¿½es simultanï¿½ment.
 
-    Une note technique de Bart Hertveldt décrit la méthode et son
+    Une note technique de Bart Hertveldt dï¿½crit la mï¿½thode et son
     utilisation.
 
     Les fonctions de rapport ont la syntaxe suivante :
@@ -6730,48 +6730,48 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 
 <Version 4.51> (15/04/1994)
     Version 4.51 (15/04/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Impressions de tableaux
-————————————————————
-    La séparation entre les colonnes des tableaux en Postscript est
-    ajustée pour permettre de placer plus de colonnes sur une même page.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La sï¿½paration entre les colonnes des tableaux en Postscript est
+    ajustï¿½e pour permettre de placer plus de colonnes sur une mï¿½me page.
 
 &TI Edition de tableaux
-————————————————————
-    La dernière ligne de l'écran contient une indication sur les
-    attributs de la cellule sélectionnée : cadrage et polices de
-    caractères.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La derniï¿½re ligne de l'ï¿½cran contient une indication sur les
+    attributs de la cellule sï¿½lectionnï¿½e : cadrage et polices de
+    caractï¿½res.
 >
 
 <Version 4.50> (18/03/1994)
     Version 4.50 (18/03/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Lec
-———
-    Les formules faisant intervenir des lags négatifs (leads), du
-    type l(-2, A), dln(-2, X+Y), retournaient un résultat incorrect en
-    raison des arrondis des nombres négatifs.
+ï¿½ï¿½ï¿½
+    Les formules faisant intervenir des lags nï¿½gatifs (leads), du
+    type l(-2, A), dln(-2, X+Y), retournaient un rï¿½sultat incorrect en
+    raison des arrondis des nombres nï¿½gatifs.
 
-    Cette erreur est corrigée et, par exemple, si A vaut 1, 2, 3, 4, ...,
+    Cette erreur est corrigï¿½e et, par exemple, si A vaut 1, 2, 3, 4, ...,
     l(2, A) vaut 3, 4, ..., tandis que l(-2, A) vaut --, --, 1, 2, ...
 >
 
 <Version 4.49> (23/02/1994)
     Version 4.49 (23/02/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Xode
-————
+ï¿½ï¿½ï¿½ï¿½
     Correction d'un Bug : l'exportation en ASCII de tableaux dont
-    certaines cellules étaient vides étaient incorrecte : ces cellules
-    étaient "sautées". Lors de la réimportation de tableaux, il en
-    résultait un décalage dans les colonnes.
+    certaines cellules ï¿½taient vides ï¿½taient incorrecte : ces cellules
+    ï¿½taient "sautï¿½es". Lors de la rï¿½importation de tableaux, il en
+    rï¿½sultait un dï¿½calage dans les colonnes.
 
-    Typiquement, la première ligne contenant la période "##s" dans
-    la deuxième colonne se voyait modifiée par deux xode successifs :
-    avant on avait une première colonne vide, après, la première colonne
-    contenait la période :
+    Typiquement, la premiï¿½re ligne contenant la pï¿½riode "##s" dans
+    la deuxiï¿½me colonne se voyait modifiï¿½e par deux xode successifs :
+    avant on avait une premiï¿½re colonne vide, aprï¿½s, la premiï¿½re colonne
+    contenait la pï¿½riode :
 &CO
 	AVANT :        ""            "##s"
 	APRES :        "##s"          ""
@@ -6781,60 +6781,60 @@ Bureau du Plan : les fichiers printcap.nfs et printcap sont adaptés
 
 <Version 4.48> (16/02/1994)
     Version 4.48 (16/02/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &TI Impression de tableaux
-—————————
- Option fixed width characters pour les tableaux où l'alignement
-      est nécessaire
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ Option fixed width characters pour les tableaux oï¿½ l'alignement
+      est nï¿½cessaire
 
 &TI Lec
-———
-Les calculs incorporant des périodes dans des fonctions telles
-      que sum() ou mean() étaient incorrects lorsque ces périodes
-      étaient négatives (mean(-2, X)). Cette erreur est corrigée.
+ï¿½ï¿½ï¿½
+Les calculs incorporant des pï¿½riodes dans des fonctions telles
+      que sum() ou mean() ï¿½taient incorrects lorsque ces pï¿½riodes
+      ï¿½taient nï¿½gatives (mean(-2, X)). Cette erreur est corrigï¿½e.
 
 &TI Simulation et extrapolation
-———————————————————————————
- Deux options complémentaires permettent de prolonger une série
-      ou de choisir le point de départ d'une simulation en prenant la
-      valeur de l'année précédente ou une extrapolation des deux années
-      précédentes uniquement si la valeur courante est NA.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ Deux options complï¿½mentaires permettent de prolonger une sï¿½rie
+      ou de choisir le point de dï¿½part d'une simulation en prenant la
+      valeur de l'annï¿½e prï¿½cï¿½dente ou une extrapolation des deux annï¿½es
+      prï¿½cï¿½dentes uniquement si la valeur courante est NA.
 >
 
 <Version 4.47> (10/02/1994)
     Version 4.47 (10/02/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI View Tables and Graphics
-————————————————————————
-    Lorsque plusieurs tableaux doivent être affichés (sous forme de
-    graphique ou de tableau de nombres), un tableau déroulant reprenant le
-    nom de chaque tableau ainsi que son titre est proposé.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsque plusieurs tableaux doivent ï¿½tre affichï¿½s (sous forme de
+    graphique ou de tableau de nombres), un tableau dï¿½roulant reprenant le
+    nom de chaque tableau ainsi que son titre est proposï¿½.
 
-    Il suffit de presser ENTER sur le tableau souhaité pour afficher le
-    résultat (tableau ou graphique).
+    Il suffit de presser ENTER sur le tableau souhaitï¿½ pour afficher le
+    rï¿½sultat (tableau ou graphique).
 
 
 &TI Edit Objects
-————————————
-    Lors de l'édition des objets, un sous-menu propose d'éditer
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lors de l'ï¿½dition des objets, un sous-menu propose d'ï¿½diter
     tout le WS ou seulement une liste. De plus, F10 permet d'entrer
-    directement en édition de tout le WS.
+    directement en ï¿½dition de tout le WS.
 
-    Dans le cas des listes, différentes fonctions ont été regroupées
-    à ce niveau du menu et certaines se sont ajoutées :
+    Dans le cas des listes, diffï¿½rentes fonctions ont ï¿½tï¿½ regroupï¿½es
+    ï¿½ ce niveau du menu et certaines se sont ajoutï¿½es :
 
 &EN         Recherche de texte dans les objets
 &EN         Tri des listes
 &EN         Analyse (Scan) de WS
 &EN         Stocker la liste des objets d'un fichier ou du WS
-&EN         Effectuer des opérations (intersection, union, différence)
+&EN         Effectuer des opï¿½rations (intersection, union, diffï¿½rence)
 	  sur des listes
-&EN         Calculer le nombre d'éléments d'une liste
+&EN         Calculer le nombre d'ï¿½lï¿½ments d'une liste
 
     Dans le cas des variables, une nouvelle fonction permet la mise
-    à jour des séries par le biais de tableaux. Si plusieurs tableaux sont
-    demandés, un menu avec les tableaux est affiché, et non plus tous les
+    ï¿½ jour des sï¿½ries par le biais de tableaux. Si plusieurs tableaux sont
+    demandï¿½s, un menu avec les tableaux est affichï¿½, et non plus tous les
     tableaux successivement.
 
     Les fonctions de rapports correspondantes sont :
@@ -6842,55 +6842,55 @@ Les calculs incorporant des périodes dans des fonctions telles
 &CO
 	    - $DataListVar name pattern [file]
 	    - $DataCalcLst res lst1 op lst2
-		    où op = {+,*,-}
+		    oï¿½ op = {+,*,-}
 
 	    - $ViewByTbl list
 &TX
 
 &TI Sample
-——————
-    Les périodes définies dans les écrans DataEditGraph, IdtExecute et
-    ModelSimulate sont adaptées lors d'un changement du sample du WS ou
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les pï¿½riodes dï¿½finies dans les ï¿½crans DataEditGraph, IdtExecute et
+    ModelSimulate sont adaptï¿½es lors d'un changement du sample du WS ou
     lors d'un chargement de fichier de variables.
 
     Cette modification a lieu dans les cas suivants :
 
-&EN         periodicité WS != nouvelle periodicité
+&EN         periodicitï¿½ WS != nouvelle periodicitï¿½
 &EN         si WS.from >> nouveau from
 &EN         si WS.to   << nouveau to
 
-&TI Graph sur base de séries
-————————————————————————
-&EN F8 dans le tableau déroulant des variables affiche le graphique de
-      la série sur laquelle le curseur se trouve avec les propriétés du
-      plus récent appel à la fonction DataEditGraph
+&TI Graph sur base de sï¿½ries
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN F8 dans le tableau dï¿½roulant des variables affiche le graphique de
+      la sï¿½rie sur laquelle le curseur se trouve avec les propriï¿½tï¿½s du
+      plus rï¿½cent appel ï¿½ la fonction DataEditGraph
 
-&EN Shift-F8 dans le même tableau remplace l'ancien F8 et permet donc
-      de grouper plusieurs séries sur le même graphique. De plus, cette
-      fonction permet de modifier les propriétés (Sample, type, ...) des
-      futurs graphiques affichés à l'aide de F8.
+&EN Shift-F8 dans le mï¿½me tableau remplace l'ancien F8 et permet donc
+      de grouper plusieurs sï¿½ries sur le mï¿½me graphique. De plus, cette
+      fonction permet de modifier les propriï¿½tï¿½s (Sample, type, ...) des
+      futurs graphiques affichï¿½s ï¿½ l'aide de F8.
 
-&TI Exécution directe d'identités
-————————————————————————————
-&EN F7 dans le tableau déroulant des identités exécute l'identité
-      courante sur toute la période du WS
+&TI Exï¿½cution directe d'identitï¿½s
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+&EN F7 dans le tableau dï¿½roulant des identitï¿½s exï¿½cute l'identitï¿½
+      courante sur toute la pï¿½riode du WS
 
 &EN Shift-F7 lance la fonction IdtExecute
 
 &TI Xode bug (HP)
-—————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 &EN xode -i *.eqs fonctionne
-&EN impression en PostScript fonctionne à nouveau
+&EN impression en PostScript fonctionne ï¿½ nouveau
 
 &TI DataCompare
-———————————
-    Le contenu du WS courant peut être comparé à celui d'un fichier.
-    Le résultat de cette comparaison est composé de 4 listes :
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Le contenu du WS courant peut ï¿½tre comparï¿½ ï¿½ celui d'un fichier.
+    Le rï¿½sultat de cette comparaison est composï¿½ de 4 listes :
 
-&EN         objets trouvés dans le WS seulement
-&EN         objets trouvés dans le fichier seulement
-&EN         objets trouvés dans les deux, avec la même définition
-&EN         objets trouvés dans les deux, avec une définition différente
+&EN         objets trouvï¿½s dans le WS seulement
+&EN         objets trouvï¿½s dans le fichier seulement
+&EN         objets trouvï¿½s dans les deux, avec la mï¿½me dï¿½finition
+&EN         objets trouvï¿½s dans les deux, avec une dï¿½finition diffï¿½rente
 
     Dans un rapport :
 &CO
@@ -6903,10 +6903,10 @@ Les calculs incorporant des périodes dans des fonctions telles
 &TX
 
 &TI Estimate
-————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Une fonction de construction automatique d'ajustements dynamiques
-    est ajoutée dans le panneau de définition d'équation.
-    Deux méthodes sont disponibles :
+    est ajoutï¿½e dans le panneau de dï¿½finition d'ï¿½quation.
+    Deux mï¿½thodes sont disponibles :
 
     Partial Adjustment (1 coefficient c1):
 &CO
@@ -6917,70 +6917,70 @@ Les calculs incorporant des périodes dans des fonctions telles
 	lhs := rhs ->> d(lhs) := c1 * d(rhs) + c2 * (rhs-lhs)[-1]
 &TX
 &TI Load et Save de WS
-——————————————————
-    Lors de la lecture et de l'écriture des WS sur disque, des
-    vérifications complémentaires sont effectuées pour s'assurer de la
-    bonne fin de l'opération (notamment de le cas de timeout sur
-    réseau).
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lors de la lecture et de l'ï¿½criture des WS sur disque, des
+    vï¿½rifications complï¿½mentaires sont effectuï¿½es pour s'assurer de la
+    bonne fin de l'opï¿½ration (notamment de le cas de timeout sur
+    rï¿½seau).
 
 &TI Object Names
-————————————
-    Les noms des objets sont vérifiés lors de leur création et ne
-    peuvent contenir que des lettres, chiffres ou le caractère _.
-    En outre, le premier caractère ne peut être un chiffre.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Les noms des objets sont vï¿½rifiï¿½s lors de leur crï¿½ation et ne
+    peuvent contenir que des lettres, chiffres ou le caractï¿½re _.
+    En outre, le premier caractï¿½re ne peut ï¿½tre un chiffre.
 
 &TI Qode
-————
+ï¿½ï¿½ï¿½ï¿½
     Nouvelle option -fw pour l'impression des tableaux a2m. Cette option
-    remplace les caractères proportionnels standards par des non
+    remplace les caractï¿½res proportionnels standards par des non
     proportionnels. Le but est de conserver l'alignement dans
     les tableaux contenant des blancs.
 
 &TI Impression de tableaux
-—————————
-    Bug solutionné : l'impression avec un sample erronné donne un
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Bug solutionnï¿½ : l'impression avec un sample erronnï¿½ donne un
       message d'erreur.
 
 &TI Seasonal Adjustment
-———————————————————
-    Une message d'erreur est affiché si une variable n'existe pas dans
-    le fichier indiqué.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Une message d'erreur est affichï¿½ si une variable n'existe pas dans
+    le fichier indiquï¿½.
 
 &TI Bug connu
-—————————
-    Dans la seule version 16 bits, le remplacement récursif des listes
-    par leur valeur peut créer une erreur si plus de 3 niveaux
-    d'imbrication sont nécessaires.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Dans la seule version 16 bits, le remplacement rï¿½cursif des listes
+    par leur valeur peut crï¿½er une erreur si plus de 3 niveaux
+    d'imbrication sont nï¿½cessaires.
 &CO
 	A = $B
 	B = $C
 	C = $D
 &TX
-    L'utilisation de $A peut entraîner une erreur.
+    L'utilisation de $A peut entraï¿½ner une erreur.
 >
 
 <Version 4.45-4.46> (05/01/1994)
     Version 4.45-4.46 (05/01/1994)
-    ——————————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Gode
-————
+ï¿½ï¿½ï¿½ï¿½
     L'impression de graphiques dans IODE32 restait dans le programme
     GODE32. Il fallait donc quitter le programme GODE (a-X) pour revenir
-    à IODE32. Cette erreur est à présent corrigée.
+    ï¿½ IODE32. Cette erreur est ï¿½ prï¿½sent corrigï¿½e.
 
 &TI Reports
-———————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La macro %0% est le nombre d'arguments du rapport.
 
 &TI Simulation
-——————————
-    La simulation peut être interrompu par l'utilisateur.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    La simulation peut ï¿½tre interrompu par l'utilisateur.
 
 &TI Xode
-————
+ï¿½ï¿½ï¿½ï¿½
     Nouveau format d'importation : PRN d'AREMOS : le fichier
-    des variables se présente comme suit :
+    des variables se prï¿½sente comme suit :
 &CO
 	"VARNAME" val1 val2 ....
 	...
@@ -6990,47 +6990,47 @@ Les calculs incorporant des périodes dans des fonctions telles
 
 <Version 4.44> (04/01/1994)
     Version 4.44 (04/01/1994)
-    —————————————————————————
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 &TI Dessaisonalisation
-——————————————————
-    Cette fonction est opérationnelle pour les séries comprenant des
-    nombres négatifs. (corrigée)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Cette fonction est opï¿½rationnelle pour les sï¿½ries comprenant des
+    nombres nï¿½gatifs. (corrigï¿½e)
 
 &TI Installation
-————————————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Nouveau programme d'installation, guidant l'utilisateur, notamment
     en indiquant l'espace disponible sur chaque disque, en modifiant
     le fichier autoexec.bat et en permettant d'adapter le fichier
-    printcap de définition des imprimantes.
+    printcap de dï¿½finition des imprimantes.
 
 &TI Rapport
-———————
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     La macro %0% est le nombre d'arguments du rapport.
 
 
 &TI Xode
-————
-    Nouveaux formats importés (variables et commentaires) : fichiers de
-    type PRN générés par AREMOS.
+ï¿½ï¿½ï¿½ï¿½
+    Nouveaux formats importï¿½s (variables et commentaires) : fichiers de
+    type PRN gï¿½nï¿½rï¿½s par AREMOS.
 
 &TI Simulation
-——————————
-    Lorsqu'une équation n'est pas définie explicitement par rapport à
-    son endogène ou lorsque celle-ci apparaît plusieurs fois dans
-    l'équation, l'algorithme de simulation essaie de résoudre cette
-    équation par une méthode de Newton. Si cette méthode ne fournit pas
-    de résultat, une méthode de type sécante recherche à son tour une
-    solution pour l'équation.
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Lorsqu'une ï¿½quation n'est pas dï¿½finie explicitement par rapport ï¿½
+    son endogï¿½ne ou lorsque celle-ci apparaï¿½t plusieurs fois dans
+    l'ï¿½quation, l'algorithme de simulation essaie de rï¿½soudre cette
+    ï¿½quation par une mï¿½thode de Newton. Si cette mï¿½thode ne fournit pas
+    de rï¿½sultat, une mï¿½thode de type sï¿½cante recherche ï¿½ son tour une
+    solution pour l'ï¿½quation.
 
     Il n'est cependant pas garanti qu'une solution soit obtenue dans
-    tous les cas. Les fonctions non continues (singularités) comme
+    tous les cas. Les fonctions non continues (singularitï¿½s) comme
 &CO
 	X := a + b * 1 / (X + 1)
 &TX
-    peuvent poser des problèmes en passant par la valeur -1.
-    En cas de problème, la seule solution actuelle est de modifier la
-    forme de l'équation :
+    peuvent poser des problï¿½mes en passant par la valeur -1.
+    En cas de problï¿½me, la seule solution actuelle est de modifier la
+    forme de l'ï¿½quation :
 &CO
 	(X - a) * (X + 1) := b
 &TX

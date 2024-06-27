@@ -15,7 +15,7 @@
  *  List of functions 
  *  -----------------
  *      int IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)                               Reads the sample (required) and the list of VARs in a rotated ASCII variable file.
- *      int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, IODE_REAL* value) Reads one value in an ASCII variable file format. 
+ *      int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value) Reads one value in an ASCII variable file format. 
  *      int IMP_end_rasc()                                                      Frees the allocated vars during the rotated ASCII file import session.
  */
 
@@ -81,11 +81,11 @@ int IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)
  *  @param [in, out]    YYFILE*     yy      open YY stream 
  *  @param [out]        char*       name    name of the variable (= RASC_toc[RASC_cv])
  *  @param [out]        int*        shift   read period position 
- *  @param [in, out]    IODE_REAL*  value   read value (L_NAN for na values)
+ *  @param [in, out]    double*  value   read value (L_NAN for na values)
  *  @return             int                 0 on success, -1 if EOF is reached before the first value
  */
  
-int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, IODE_REAL* value)
+int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value)
 {
     if(YY_lex(yy) == YY_EOF) return(-1);
     else YY_unread(yy);

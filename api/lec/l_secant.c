@@ -42,7 +42,7 @@ static KDB     *LN_DBV, *LN_DBS;    // Current KDB of vars and scalars
 static double L_fx(double x, int t)
 {
     double  fx;
-    IODE_REAL    *d_ptr, oldx;
+    double    *d_ptr, oldx;
 
     d_ptr = L_getvar(LN_DBV, LN_VARNB);
     oldx = d_ptr[t];
@@ -133,7 +133,7 @@ double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
     double  x1, x2, xl, xh, xr,
             dx, tmp,
             fxl, fxh, fxr;
-    IODE_REAL    *d_ptr;
+    double    *d_ptr;
 
     LN_DBV = dbv;
     LN_DBS = dbs;

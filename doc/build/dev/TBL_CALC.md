@@ -108,8 +108,8 @@ Functions to generate IODE tables in A2M format based on TBL structures and GSAM
 |Syntax|Description|
 |:---|:---|
 |`int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)`|Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in TBL|
-|`void T_fmt_val(char* buf, IODE_REAL val, int lg, int nd)`|Formats a double value|
-|`void T_print_val(IODE_REAL val)`|Prints a IODE\_REAL value using W\_printf()|
+|`void T_fmt_val(char* buf, double val, int lg, int nd)`|Formats a double value|
+|`void T_print_val(double val)`|Prints a IODE\_REAL value using W\_printf()|
 |`void T_open_cell(int attr, int straddle, int type)`|Prints the header of an a2m table cell|
 |`void T_open_attr(int attr)`|Opens an A2M attribute sequence.|
 |`void T_close_attr(int attr)`|Closes an A2M attribute sequence.|
@@ -140,9 +140,9 @@ Includes some A2M helper functions.
 |`int T_GraphTitle(char *txt)`|Defines the graph title by sending a2m command ".gtitle" to W\_printf().|
 |`int T_GraphLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*time\* axis (.gty or .gtz, see a2m language) with its position, type and title.|
 |`int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*xy\* axis with its position, type and title.|
-|`int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y)`|Adds numerical data on a \*time\* graph line or bar.|
-|`int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y)`|Adds numerical data on a \*xy\* graph line or bar.|
-|`int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSAMPLE.|
+|`int T_GraphTimeData(SAMPLE *smpl, double *y)`|Adds numerical data on a \*time\* graph line or bar.|
+|`int T_GraphXYData(int nb, double *x, double *y)`|Adds numerical data on a \*xy\* graph line or bar.|
+|`int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSAMPLE.|
 |`int T_find_opf(COLS *fcls, COL *cl)`|Tries to find the position in \*fcls of the opf (operation on files) in cl.|
 |`int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)`|Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.|
 |`int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)`|Prints or displays graph(s) from variable list(s) or combination(s) or variables.|

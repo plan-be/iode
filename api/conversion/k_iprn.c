@@ -25,10 +25,10 @@
 #include "iode.h"
 
 
-IODE_REAL PRN_readreal(yy)
+double PRN_readreal(yy)
 YYFILE  *yy;
 {
-    IODE_REAL    val;
+    double    val;
     int     minus = 1;
 
 ag:
@@ -64,7 +64,7 @@ int IMP_vec_prn(yy, name, dim, vector)
 YYFILE  *yy;
 char    *name;
 int     dim;
-IODE_REAL    *vector;
+double    *vector;
 {
     int i, key;
 

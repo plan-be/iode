@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 	int size_char_ptr = sizeof(char*);
 	int size_short = sizeof(short);
 	int size_long = sizeof(long);
-	int size_real = sizeof(IODE_REAL);
+	int size_real = sizeof(double);
 
 	std::ofstream output;
 	std::string filename = "iode_structs_";
@@ -117,9 +117,9 @@ int main(int argc, char **argv)
 		output << "size of LIS:      " << sizeof(LIS) << std::endl;
 		output << "alignof LIS:      " << alignof(LIS) << std::endl;
 		output << "------------------------------" << std::endl;
-		output << "IODE_REAL val     " << sizeof(IODE_REAL) << std::endl;
-		output << "IODE_REAL relax   " << sizeof(IODE_REAL) << std::endl;
-		output << "IODE_REAL std     " << sizeof(IODE_REAL) << std::endl;
+		output << "double val     " << sizeof(double) << std::endl;
+		output << "double relax   " << sizeof(double) << std::endl;
+		output << "double std     " << sizeof(double) << std::endl;
 		output << ""                   << std::endl;
 		output << "SUM =             " << 3 * size_real << std::endl;
 		output << "size of SCL:      " << sizeof(SCL) << std::endl;
@@ -174,7 +174,7 @@ int main(int argc, char **argv)
 		output << "size of TBL:      " << sizeof(TBL) << std::endl;
 		output << "alignof TBL:      " << alignof(TBL) << std::endl;
 		output << "------------------------------" << std::endl;
-		output << "typedef IODE_REAL* VAR " << sizeof(IODE_REAL*) << std::endl;
+		output << "typedef double* VAR " << sizeof(double*) << std::endl;
 		output << "size of VAR:           " << sizeof(VAR) << std::endl;
 		output << "alignof VAR:           " << alignof(VAR) << std::endl;
 		output << ""                        << std::endl;

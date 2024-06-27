@@ -14,7 +14,7 @@ public:
 
     Scalar(const std::string& name, KDB* kdb = nullptr);
 
-    Scalar(const IODE_REAL value, const IODE_REAL relax=1.0, const IODE_REAL std=L_NAN);
+    Scalar(const double value, const double relax=1.0, const double std=L_NAN);
 
     Scalar(const Scalar& scalar);
 

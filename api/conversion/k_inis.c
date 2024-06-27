@@ -28,7 +28,7 @@ int IMP_vec_nis(yy, name, dim, vector)
 YYFILE  *yy;
 char    *name;
 int     dim;
-IODE_REAL    *vector;
+double    *vector;
 {
     char    line[85], value[11], *ptr;
     int     i, lg, nb;

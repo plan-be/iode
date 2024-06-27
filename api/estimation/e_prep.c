@@ -41,8 +41,8 @@ KDB     *E_DBV;         // KDB of variables used for the estimation
 KDB     *E_DBS;         // KDB of scalars used for the estimation
 SAMPLE  *E_SMPL;        // Current estimation sample
 char    E_MET;          // Current estimation method
-IODE_REAL E_CONV_TEST;  // Sum of the squares of the relative differences between 2 iterations
-IODE_REAL E_EPS;        // Convergence criterion (threshold) for the estimation
+double E_CONV_TEST;  // Sum of the squares of the relative differences between 2 iterations
+double E_EPS;        // Convergence criterion (threshold) for the estimation
 CLEC    **E_CRHS;       // List of CLEC corresponding to the right members of the equations
 char    **E_LECS;       // List (block) of simultaneous equations of the current estimation
 char    **E_INSTRS;     // List of instruments (LEC formulas) of the current estimation    
@@ -394,7 +394,7 @@ static int E_prep_coefs()
 void E_get_C()
 {
     int     i;
-    IODE_REAL    c;
+    double    c;
 
     for(i = 0 ; i < E_NC ; i++) {
         c = KSVAL(E_DBS, E_C_NBS[i])->val;

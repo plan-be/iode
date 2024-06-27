@@ -216,7 +216,7 @@ int B_DataCalcVar(char* arg)
     KDB         *kdb = K_WS[K_VAR];
     CLEC        *clec = 0;
     int         pos;
-    IODE_REAL   d;
+    double   d;
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
 
@@ -490,12 +490,12 @@ int B_DataUpdate(char* arg, int type)
 
         switch(nb_args) {
         case 2:
-            scl.val = (IODE_REAL) atof(args[1]);
+            scl.val = (double) atof(args[1]);
             break;
 
         case 3:
-            scl.val = (IODE_REAL) atof(args[1]);
-            scl.relax = (IODE_REAL) atof(args[2]);
+            scl.val = (double) atof(args[1]);
+            scl.relax = (double) atof(args[2]);
             break;
         default :
             B_seterrn(OM_DUPD_SCL_ERR);
@@ -562,7 +562,7 @@ int B_DataUpdate(char* arg, int type)
     A_free(args);
     SCR_free(per);
     if(rc >= 0) rc = 0;
-    if(rc < 0) rc = -1; // Pour ‚viter return dans les rapports si rc = -2
+    if(rc < 0) rc = -1; // Pour ï¿½viter return dans les rapports si rc = -2
     return(rc);
 }
 

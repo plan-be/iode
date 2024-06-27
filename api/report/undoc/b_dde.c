@@ -52,7 +52,7 @@
  *      int B_ExcelSave(char *arg)
  *      int B_ExcelSaveAs(char *arg)
  *      int B_ExcelNew(char *arg)
- *      int IodeFmtVal(char *buf, IODE_REAL val)
+ *      int IodeFmtVal(char *buf, double val)
  */
 
 
@@ -831,8 +831,8 @@ int B_ExcelThousand(char *arg)
 Tells IODE to skip the currency sign when readinf Excel data (for $ExcelGetVar).
 $ExcelSetCurrency => no sep
 $ExcelSetCurrency Dollar => skip $
-$ExcelSetCurrency Pound => skip £
-$ExcelSetCurrency Euro => skip €
+$ExcelSetCurrency Pound => skip ï¿½
+$ExcelSetCurrency Euro => skip ï¿½
 $ExcelSetCurrency c => skip c (any c)
 $ExcelSetCurrency [no arg] => no sep
 */
@@ -854,12 +854,12 @@ int B_ExcelCurrency(char *arg)
 
             case 'e': /* EUR */
             case 'E':
-                SCR_sCURRENCY = '€';
+                SCR_sCURRENCY = 'ï¿½';
                 break;
 
             case 'p': /* Pound */
             case 'P':
-                SCR_sCURRENCY = '£';
+                SCR_sCURRENCY = 'ï¿½';
                 break;
 
             default:
@@ -940,7 +940,7 @@ int B_ExcelSet(char *arg, int type)
     KDB         *kdb = K_WS[type];
     SCL         *scl;
     PERIOD      *per = NULL;
-    IODE_REAL   d;
+    double   d;
     char        **args = NULL,
                 *ptr = NULL,
                 *item, *smpl;
@@ -1185,7 +1185,7 @@ int B_ExcelSendKeys(char *arg)
 */
 
 
-int IodeFmtVal(char *buf, IODE_REAL val)
+int IodeFmtVal(char *buf, double val)
 {
     if(L_ISAN(val)) {
         if(fabs(val) < 1e-12) val =0.0;

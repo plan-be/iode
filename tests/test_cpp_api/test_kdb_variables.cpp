@@ -71,8 +71,8 @@ TEST_F(KDBVariablesTest, Save)
 
 TEST_F(KDBVariablesTest, GetSetVar)
 {
-    IODE_REAL value;
-    IODE_REAL new_value;
+    double value;
+    double new_value;
     int nb_periods = Variables.get_nb_periods();
     std::string name = Variables.get_name(pos + 1);
     Period start = Variables.get_sample()->start_period();

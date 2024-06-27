@@ -55,10 +55,10 @@ int IMP_vec_gem(yy, name, dim, vector)
 YYFILE  *yy;
 char    *name;
 int     dim;
- IODE_REAL    *vector;
+ double    *vector;
 {
     int     i;
-    IODE_REAL    val;
+    double    val;
 
     if(GEM_cser == GEM_nser) {
 	GEM_cser = 0;
@@ -189,7 +189,7 @@ int     GEM_nbper;
 
 char    GEM_rubr[81];
 int     GEM_nser = 0, GEM_cser, GEM_nobs = 0;
-IODE_REAL    *GEM_mat = NULL;
+double    *GEM_mat = NULL;
 
 
 int IMP_hd_gem(yy, smpl)
@@ -208,10 +208,10 @@ SAMPLE  *smpl;
     return(0);
 }
 
-IODE_REAL GEM_read_real(yy)
+double GEM_read_real(yy)
 YYFILE  *yy;
 {
-    IODE_REAL    val;
+    double    val;
     int     minus = 1, p = 0;
 
 
@@ -253,7 +253,7 @@ int IMP_vec_gem(yy, name, dim, vector)
 YYFILE  *yy;
 char    *name;
 int     dim;
-IODE_REAL    *vector;
+double    *vector;
 {
     int     i, from;
 
@@ -265,7 +265,7 @@ IODE_REAL    *vector;
         if(GEM_nser * GEM_nobs == 0)  return(-1);
 
         if(GEM_mat) SCR_free(GEM_mat);
-        GEM_mat = (IODE_REAL *) SCR_malloc(GEM_nser * GEM_nobs * sizeof(IODE_REAL));
+        GEM_mat = (double *) SCR_malloc(GEM_nser * GEM_nobs * sizeof(double));
 
         GEM_readrubr(yy);
         YY_skip_to_eol(yy);

@@ -110,8 +110,8 @@ Main estimation functions \+ some utilities.
 |`KDB *E_DBS;`|KDB of scalars used for the estimation|
 |`SAMPLE *E_SMPL;`|Current estimation sample|
 |`char E_MET;`|Current estimation method|
-|`IODE_REAL E_CONV_TEST;`|Sum of the squares of the relative differences between 2 iterations|
-|`IODE_REAL E_EPS;`|Convergence criterion (threshold) for the estimation|
+|`double E_CONV_TEST;`|Sum of the squares of the relative differences between 2 iterations|
+|`double E_EPS;`|Convergence criterion (threshold) for the estimation|
 |`CLEC **E_CRHS;`|List of CLEC corresponding to the right members of the equations|
 |`char **E_LECS;`|List (block) of simultaneous equations of the current estimation|
 |`char **E_INSTRS;`|List of instruments (LEC formulas) of the current estimation|
@@ -188,11 +188,11 @@ Implementation of the Dickey\-Fuller test (presence of a unit root in an autoreg
 
 |Syntax|Description|
 |:---|:---|
-|`IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)`|implementation of the Dickey\-Fuller test|
-|`void E_PrintDF(char* lec, IODE_REAL* res, int drift, int trend, int order)`|prints the results of the Dickey\-Fuller test|
+|`double *E_UnitRoot(char* varname, int drift, int trend, int order)`|implementation of the Dickey\-Fuller test|
+|`void E_PrintDF(char* lec, double* res, int drift, int trend, int order)`|prints the results of the Dickey\-Fuller test|
 |**Utility functions**||
 |`int E_GetLecName(char* lec, char* name)`|retrieves the name of the first variable in a lec expression|
-|`void E_SclToReal(char* name, IODE_REAL* res)`|stores the content of a scalar in a vector of doubles|
+|`void E_SclToReal(char* name, double* res)`|stores the content of a scalar in a vector of doubles|
 
 ### e\_step.c {#T11}
 
@@ -202,8 +202,8 @@ The selection is done by blocking all possible combinaisons of coefficients.
 
 |Syntax|Description|
 |:---|:---|
-|`IODE_REAL C_evallec(char* lec, int t)`|Evaluates a LEC expression at a specific period of time.|
-|`IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
+|`double C_evallec(char* lec, int t)`|Evaluates a LEC expression at a specific period of time.|
+|`double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)`|For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)|
 
 # IODE: Equation Edition and Estimation GUI {#T12}
 

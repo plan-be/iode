@@ -202,7 +202,7 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 |:---|:---|
 |`int PER_nb(int ch)`|gives the nbr of periods in one year for the periodicity ch|
 |`int PER_nbper(PERIOD* period)`|retrieves the number of periods in one year in a period|
-|`IODE_REAL PER_per2real(PERIOD* from, int i)`|adds a number of sub\-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).|
+|`double PER_per2real(PERIOD* from, int i)`|adds a number of sub\-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).|
 
 ### yy.c {#T12}
 
@@ -210,7 +210,7 @@ Helper functions for reading and writing IODE ascii files.
 
 |Syntax|Description|
 |:---|:---|
-|`IODE_REAL K_read_real(YYFILE *yy)`|reads a token on the YY stream and interprets the token as a IODE\_REAL (double) if possible.|
+|`double K_read_real(YYFILE *yy)`|reads a token on the YY stream and interprets the token as a IODE\_REAL (double) if possible.|
 |`long K_read_long(YYFILE* yy)`|reads the next token on the YY stream and returns a long.|
 |`char* K_read_str(YYFILE* yy)`|reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.|
 |`PERIOD *K_read_per(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition (\{long\}\{char\}\{long\}).|
@@ -355,10 +355,10 @@ Functions acting on workspaces of variables.
 |`void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
 |`int KV_add(char* varname)`|Adds a new variable in KV\_WS. Fills it with L\_NAN.|
 |`double KV_get(KDB *kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
-|`void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
+|`void KV_set(KDB *kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
 |`int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)`|Extrapolates variables on a selected SAMPLE according to one of the available methods.|
 |`KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
-|`void KV_init_values_1(IODE_REAL* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
+|`void KV_init_values_1(double* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 |`double KV_get_at_t(char*varname, int t)`|Retrieves the value of varname\[t\]|
 |`double KV_get_at_per(char*varname, PERIOD* per)`|Retrieves the value of varname\[per\]|
 |`double KV_get_at_aper(char*varname, char* aper)`|Retrieves the value of varname\[aper\]|
@@ -443,7 +443,7 @@ Functions for "packing" and "unpacking" IODE objects.
 |`int K_lpack(char** pack, char* a1)`|Packs an IODE LST object|
 |`int K_spack(char **pack, char *a1)`|Packs an IODE SCL object|
 |`int K_tpack(char** pack, char* a1)`|Packs an IODE TBL object|
-|`int K_vpack(char **pack, IODE_REAL *a1, int *a2)`|Packs an IODE VAR object.|
+|`int K_vpack(char **pack, double *a1, int *a2)`|Packs an IODE VAR object.|
 |`int K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
 
 #### Unpacking functions (for TBL and EQ only ?) {#T30}
@@ -477,8 +477,8 @@ List of functions
 |`char* K_optr0(KDB *kdb, char* name)`| kdb\[name\]\[0\]|
 |`char *K_oval1(KDB* kdb, int pos)`| kdb\[pos\]\[1\]|
 |`char* K_optr1(KDB *kdb, char* name)`| kdb\[name\]\[1\]|
-|`IODE_REAL *K_vval(KDB* kdb, int pos, int t)`| kdb\[pos\]\[t\]|
-|`IODE_REAL *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
+|`double *K_vval(KDB* kdb, int pos, int t)`| kdb\[pos\]\[t\]|
+|`double *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
 |`EQ* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
 |`TBL* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
 |**Equation tests**||
@@ -711,8 +711,8 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 
 |Syntax|Description|
 |:---|:---|
-|`IODE_REAL *L_getvar(KDB* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
-|`IODE_REAL L_getscl(KDB* kdb, int pos)`|Retrieves a scalar value.|
+|`double *L_getvar(KDB* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
+|`double L_getscl(KDB* kdb, int pos)`|Retrieves a scalar value.|
 |`SAMPLE *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
 |`int L_findscl(KDB* kdb, char *name)`|Retrieves a scalar position.|
 |`int L_findvar(KDB* kdb, char* name)`|Retrieves a variable position.|
@@ -892,5 +892,5 @@ Some of IODE report commands line $ExcelGet are implemented here.
 |`int B_ExcelSave(char *arg)`||
 |`int B_ExcelSaveAs(char *arg)`||
 |`int B_ExcelNew(char *arg)`||
-|`int IodeFmtVal(char *buf, IODE_REAL val)`||
+|`int IodeFmtVal(char *buf, double val)`||
 

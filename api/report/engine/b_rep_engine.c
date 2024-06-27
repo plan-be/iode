@@ -117,8 +117,8 @@
  *      char *RP_gmacro(char* str)                                          Calculates a macro value. The macro may contain expressions between {} or @-functions
  *      char *RP_gcmd(char* str)                                            Calculates the value of an expression between curly brackets.
  *      int RP_evaltime()                                                   Calculates RP_T, the position in the current sample of the current calculation period RP_PER.
- *      IODE_REAL RP_evallec(char* lec)                                     Evaluates a LEC expression in (the period) RP_PER. 
- *      int RP_fmt(char* buf, char* format, IODE_REAL value)                Formats a double. 
+ *      double RP_evallec(char* lec)                                     Evaluates a LEC expression in (the period) RP_PER. 
+ *      int RP_fmt(char* buf, char* format, double value)                Formats a double. 
  *      int RP_eval(char** res, char* farg)                                 Interprets strings between accolades found in a report line.
  *      int RP_add(char** line, int* lg, int* j, char* res)                 Reallocates the string line (of length *lg) in order to concatanate res from the position *j.
  *      int RP_expand(char** line, char* buf)                               Expands a report line by replacing macros, lec expressions and @-functions par their calculated values
@@ -173,8 +173,8 @@ char *RP_extract(char* buf, int* i, int ch);
 char *RP_gmacro(char* str);
 char *RP_gcmd(char* str);
 int RP_evaltime();
-IODE_REAL RP_evallec(char* lec);
-int RP_fmt(char* buf, char* format, IODE_REAL value);
+double RP_evallec(char* lec);
+int RP_fmt(char* buf, char* format, double value);
 int RP_eval(char** res, char* farg);
 int RP_add(char** line, int* lg, int* j, char* res);
 int RP_expand(char** line, char* buf);
@@ -679,13 +679,13 @@ int RP_evaltime()
  *  Evaluates a LEC expression in (the period) RP_PER. 
  *  
  *  @param [in, out]    char*       lec     LEC expression or empty string (the expression is first stripped, hence the [out]).
- *  @return             IODE_REAL           L_NAN on error or if RP_PER is before the current WS sample
+ *  @return             double           L_NAN on error or if RP_PER is before the current WS sample
  *                                          calculated LEC value on success
  */
-IODE_REAL RP_evallec(char* lec)
+double RP_evallec(char* lec)
 {
     CLEC    *clec;
-    IODE_REAL    x = L_NAN;
+    double    x = L_NAN;
 
     if(RP_evaltime() < 0) return(L_NAN);
 
@@ -720,10 +720,10 @@ IODE_REAL RP_evallec(char* lec)
  *  
  *  @param [in, out] char*       buf        formatted double
  *  @param [in]      char*       format     format (see above)
- *  @param [in]      IODE_REAL   value      any double 
+ *  @param [in]      double   value      any double 
  *  @return          int                    0 always              
  */
-int RP_fmt(char* buf, char* format, IODE_REAL value)
+int RP_fmt(char* buf, char* format, double value)
 {
     int     t, lg = 20, nbdec = -1;
     char    **fmt;
@@ -790,7 +790,7 @@ int RP_eval(char** res, char* farg)
     char        ch, name[31],
                 *lec, *fmt;
     int         rc, rp_rt, pos, inv;
-    IODE_REAL   x, RP_evallec();
+    double   x, RP_evallec();
 
     *res = SW_nalloc(41);
     ch = farg[0];
@@ -961,7 +961,7 @@ int RP_fneval(char** res, char* str)
     int     i, rc = 0;
 
     *res = 0;
-    // tbl = SCR_vtoms3(str, "(,", 1); // Buggé si on a fn("ssdff","sdfsdf")
+    // tbl = SCR_vtoms3(str, "(,", 1); // Buggï¿½ si on a fn("ssdff","sdfsdf")
     tbl = SCR_vtomsq(str, "(,", '"');  // JMP 20/10/2022
     
     // Find the function name (in lowercase)
@@ -1453,7 +1453,7 @@ int B_ReportLine(char* line)
         goto done;
     }
 
-    // Premier rapport ? (début de session de rapport)
+    // Premier rapport ? (dï¿½but de session de rapport)
     if(RP_DEPTH == 0) {
         RP_T = 0;
         memset(&RP_PER, 0, sizeof(PERIOD));
@@ -1464,20 +1464,20 @@ int B_ReportLine(char* line)
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
-    // Crée une struct REPFILE
+    // Crï¿½e une struct REPFILE
     rf = (REPFILE *) RP_alloc(sizeof(REPFILE));
     rf->filename = RP_stracpy("temp.rep");// JMP 4/02/09
     rf->tbl = RP_vtom(line, '\n');
     rf->curline = 0;
     rf->nblines = RP_tbl_size(rf->tbl); // JMP 4/02/09
 
-    // Exécute la ligne (non expandée à ce stade)
+    // Exï¿½cute la ligne (non expandï¿½e ï¿½ ce stade)
     rc = RP_ReportExec_tbl(rf);
 
-    // Libère : rf et remet CUR_REPFILE à 0
+    // Libï¿½re : rf et remet CUR_REPFILE ï¿½ 0
     RP_free_repfile(rf);
 
-    // Remonte un niveau de profondeur d'exécution des rapports
+    // Remonte un niveau de profondeur d'exï¿½cution des rapports
     RP_DEPTH --;
 
 done:

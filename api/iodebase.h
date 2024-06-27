@@ -113,8 +113,8 @@ extern int K_cmp(char *,KDB *,KDB *);
 /* k_lec.c */
 extern char *(*L_expand_super)(char* list_name);
 
-extern IODE_REAL *L_getvar(KDB *,int );
-extern IODE_REAL L_getscl(KDB *,int );
+extern double *L_getvar(KDB *,int );
+extern double L_getscl(KDB *,int );
 extern SAMPLE *L_getsmpl(KDB *);
 extern int L_findscl(KDB *,char *);
 extern int L_findvar(KDB *,char *);
@@ -204,11 +204,11 @@ extern SAMPLE *PER_atosmpl(char *,char *);
 extern SAMPLE *PER_pertosmpl(PERIOD *,PERIOD *);
 extern char *PER_smpltoa(SAMPLE *,char *);
 extern int PER_nbper(PERIOD *);
-extern IODE_REAL PER_per2real(PERIOD *,int );
-extern char *PER_real2a(IODE_REAL ,int );
+extern double PER_per2real(PERIOD *,int );
+extern char *PER_real2a(double ,int );
 
 /* yy.c */
-extern IODE_REAL K_read_real(YYFILE *);
+extern double K_read_real(YYFILE *);
 extern long K_read_long(YYFILE *);
 extern char *K_read_str(YYFILE *);
 extern PERIOD *K_read_per(YYFILE *);
@@ -371,8 +371,8 @@ extern double L_interpol(unsigned char *,short ,int ,double *,int );
 extern double L_app(unsigned char *,short ,int ,double *,int );
 
 /* l_hodrick.c */
-extern int HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std);
-extern void HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim);
+extern int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
+extern void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
 extern CLEC *L_solve(char *,char *);
@@ -413,8 +413,8 @@ extern int E_scl_in_eq(int ,int );
 //extern int E_c_ivcc(void);
 
 /* e_step.c */
-extern IODE_REAL C_evallec(char *,int);
-extern IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
+extern double C_evallec(char *,int);
+extern double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
 
 /* e_tests.c */
 extern double M_c_line(MAT *,int ,int );
@@ -477,7 +477,7 @@ extern double KV_get(KDB *,int ,int ,int );
 extern void KV_set(KDB *,int ,int ,int ,double );
 extern int KV_extrapolate(KDB *,int ,SAMPLE *,char **);
 extern KDB *KV_aggregate(KDB *,int ,char *,char *);
-void KV_init_values_1(IODE_REAL* val, int t, int method);
+void KV_init_values_1(double* val, int t, int method);
 //extern int KV_GetSmpl(SAMPLE *,char *);
 extern double KV_get_at_t(char*varname, int t);
 extern double KV_get_at_per(char*varname, PERIOD* per);
@@ -895,8 +895,8 @@ extern char *RP_extract(char* buf, int* i, int ch);
 extern char *RP_gmacro(char* str);
 extern char *RP_gcmd(char* str);
 extern int RP_evaltime();
-extern IODE_REAL RP_evallec(char* lec);
-extern int RP_fmt(char* buf, char* format, IODE_REAL value);
+extern double RP_evallec(char* lec);
+extern int RP_fmt(char* buf, char* format, double value);
 extern int RP_eval(char** res, char* farg);
 extern int RP_add(char** line, int* lg, int* j, char* res);
 extern int RP_expand(char** line, char* buf);
@@ -1008,7 +1008,7 @@ extern U_ch* RPF_SimSortNbPasses();
 extern U_ch* RPF_SimSortAlgo();
 extern U_ch* RPF_SimInitValues();
 
-extern IODE_REAL RPF_SimNormReal(U_ch** args);
+extern double RPF_SimNormReal(U_ch** args);
 extern U_ch *RPF_SimNorm(U_ch** args);
 
 extern int RPF_SimNIterInt(U_ch** args);
@@ -1423,8 +1423,8 @@ extern int B_WsTrend(char *);
 extern int B_WsTrendStd(char *);
 //extern int HP_smpl(SAMPLE *,SAMPLE *,SAMPLE **,int *);
 //extern int HP_calc(double *,double *,int ,int );
-//extern int HP_calc(double *,double *,int , IODE_REAL);     // JMP 7-3-2019
-//extern int HP_calc(double *,double *,int , IODE_REAL, int);  // JMP 12-4-2019
+//extern int HP_calc(double *,double *,int , double);     // JMP 7-3-2019
+//extern int HP_calc(double *,double *,int , double, int);  // JMP 12-4-2019
 //extern void HP_test(double *,double *,int ,int *,int *);
 
 /* w_wrt1.c */
@@ -1655,21 +1655,21 @@ extern int APIChartNl(int hdl);
 extern char *APIChartTitle(int hdl, int i);
 extern int APIChartType(int hdl, int i);
 extern int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-extern int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls);
+extern int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
 extern int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i);
-extern int APIGraphTimeData(int hdl, SAMPLE *smpl, IODE_REAL *y);
-extern int APIGraphTitle(int hdl, char *txt, IODE_REAL *x, int nb);
+extern int APIGraphTimeData(int hdl, SAMPLE *smpl, double *y);
+extern int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 extern int APIPrepareChart(TBL *tbl, char *gsmpl);
 extern int T_GraphEnd();
 extern int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
 extern int T_GraphLegend(int axis, int type, char *txt, char *fileop);
-extern int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls);
-//extern int T_GraphLineData(int nb, IODE_REAL *x, IODE_REAL *y);
+extern int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
+//extern int T_GraphLineData(int nb, double *x, double *y);
 //extern int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
 extern int T_GraphTest(TBL *tbl);
-extern int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y);
+extern int T_GraphTimeData(SAMPLE *smpl, double *y);
 extern int T_GraphTitle(char *txt);
-extern int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y);
+extern int T_GraphXYData(int nb, double *x, double *y);
 extern int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
 extern int T_find_opf(COLS *fcls, COL *cl);
 extern int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode);
@@ -1892,7 +1892,7 @@ extern int B_ExcelPrint(char *arg);
 extern int B_ExcelSave(char *arg);
 extern int B_ExcelSaveAs(char *arg);
 extern int B_ExcelNew(char *arg);
-extern int IodeFmtVal(char *buf, IODE_REAL val);
+extern int IodeFmtVal(char *buf, double val);
 
 /* b_ds.c (MSC) */
 extern char *__cdecl B_DSPeriod2Date(struct _period *per,char *date,char *freq);

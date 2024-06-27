@@ -13,7 +13,7 @@ int     *OE_VEC = NULL,
          OE_NB = 0, OE_CUR = 0,
          OE_DONE = 0, OE_EST, OE_MAXIT = 100;
 
-IODE_REAL    OE_EPS = 0.0000001;
+double    OE_EPS = 0.0000001;
 
 
 /* Interface functions */

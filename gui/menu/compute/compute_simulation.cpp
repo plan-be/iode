@@ -78,10 +78,10 @@ void MenuComputeSimulation::compute()
         std::string exchange = qExchange->extractAndVerify().toStdString();
         std::string from = qFrom->extractAndVerify().toStdString();
         std::string to = qTo->extractAndVerify().toStdString();
-        IODE_REAL convergence = std::stod(qConvergence->extractAndVerify().toStdString());
+        double convergence = std::stod(qConvergence->extractAndVerify().toStdString());
         int max_iterations = qMaxIterations->extractAndVerify();
         bool debug = qCheckDebug->extractAndVerify();
-        IODE_REAL relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
+        double relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
         EnumSimulationInitialization initialisation = (EnumSimulationInitialization) qSimInitialisation->extractAndVerify();
         EnumSimulationSortAlgorithm sort_algorithm = (EnumSimulationSortAlgorithm) qSortAlgorithm->extractAndVerify();
         int nb_passes = qNbPasses->extractAndVerify();

@@ -19,7 +19,7 @@
  *  List of functions 
  *  -----------------
  *      int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)                            Reads the sample (required) in an ASCII variable file.
- *      int IMP_vec_asc(YYFILE* yy, char* name, int dim, IODE_REAL* vector) Reads a VAR name and values in an ASCII variable file format. 
+ *      int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in an ASCII variable file format. 
  *      int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)               Opens an ASCII comment file for reading with the YY library functions. 
  *      int IMP_vec_casc(char* name, char** cmt)                            Reads one comment on the open YY stream.
  */
@@ -63,10 +63,10 @@ int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)
  *  @param [in, out]    YYFILE*     yy      open YY stream 
  *  @param [out]        char*       name    name of the variable (read on yy)
  *  @param [in]         int         dim     nb of elements to read (=sample size)
- *  @param [in, out]    IODE_REAL*  vector  read values (L_NAN for na values)
+ *  @param [in, out]    double*  vector  read values (L_NAN for na values)
  *  @return             int                 0 on success, -1 if EOF is reached before the VAR name
  */
-int IMP_vec_asc(YYFILE* yy, char* name, int dim, IODE_REAL* vector)
+int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)
 {
     int i;
 

@@ -4,7 +4,7 @@
 
 QVariant VariablesModel::dataCell(const int row, const int col) const
 {
-	IODE_REAL var;
+	double var;
 
 	try
 	{

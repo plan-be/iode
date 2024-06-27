@@ -19,26 +19,26 @@ Variable KDBVariables::get_unchecked(const int pos) const
 	return vars;
 }
 
-IODE_REAL KDBVariables::get_var(const int pos, const int t, const EnumIodeVarMode mode) const
+double KDBVariables::get_var(const int pos, const int t, const EnumIodeVarMode mode) const
 {
 	// throw exception if object with passed position is not valid
 	get_name(pos);
     return KV_get(get_database(), pos, t, mode);
 }
 
-IODE_REAL KDBVariables::get_var(const int pos, const std::string& period, const EnumIodeVarMode mode) const
+double KDBVariables::get_var(const int pos, const std::string& period, const EnumIodeVarMode mode) const
 {
 	int t = get_sample()->get_period_position(period);
 	return get_var(pos, t, mode);
 }
 
-IODE_REAL KDBVariables::get_var(const int pos, const Period& period, const EnumIodeVarMode mode) const
+double KDBVariables::get_var(const int pos, const Period& period, const EnumIodeVarMode mode) const
 {
 	int t = get_sample()->get_period_position(period);
 	return get_var(pos, t, mode);
 }
 
-IODE_REAL* KDBVariables::get_var_ptr(const int pos)
+double* KDBVariables::get_var_ptr(const int pos)
 {
 	if(get_nb_periods() == 0)
 		return NULL;
@@ -49,65 +49,65 @@ IODE_REAL* KDBVariables::get_var_ptr(const int pos)
 	return KVVAL(get_database(), pos, 0);
 }
 
-IODE_REAL KDBVariables::get_var(const std::string& name, const int t, const EnumIodeVarMode mode) const
+double KDBVariables::get_var(const std::string& name, const int t, const EnumIodeVarMode mode) const
 {
 	// throw exception if object with passed name does not exist
     int pos = get_position(name);
     return get_var(pos, t, mode);
 }
 
-IODE_REAL KDBVariables::get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode) const
+double KDBVariables::get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode) const
 {
 	int t = get_sample()->get_period_position(period);
 	return get_var(name, t, mode);
 }
 
-IODE_REAL KDBVariables::get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode) const
+double KDBVariables::get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode) const
 {
 	int t = get_sample()->get_period_position(period);
 	return get_var(name, t, mode);
 }
 
-IODE_REAL* KDBVariables::get_var_ptr(const std::string& name)
+double* KDBVariables::get_var_ptr(const std::string& name)
 {
 	// throw exception if object with passed name does not exist
 	int pos = get_position(name);
 	return get_var_ptr(pos);
 }
 
-void KDBVariables::set_var(const int pos, const int t, const IODE_REAL value, const EnumIodeVarMode mode)
+void KDBVariables::set_var(const int pos, const int t, const double value, const EnumIodeVarMode mode)
 {
 	// throw exception if object with passed position is not valid
 	get_name(pos);
 	KV_set(get_database(), pos, t, mode, value);
 }
 
-void KDBVariables::set_var(const int pos, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode)
+void KDBVariables::set_var(const int pos, const std::string& period, const double value, const EnumIodeVarMode mode)
 {
 	int t = get_sample()->get_period_position(period);
 	set_var(pos, t, value, mode);
 }
 
-void KDBVariables::set_var(const int pos, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode)
+void KDBVariables::set_var(const int pos, const Period& period, const double value, const EnumIodeVarMode mode)
 {
 	int t = get_sample()->get_period_position(period);
 	set_var(pos, t, value, mode);
 }
 
-void KDBVariables::set_var(const std::string& name, const int t, const IODE_REAL value, const EnumIodeVarMode mode)
+void KDBVariables::set_var(const std::string& name, const int t, const double value, const EnumIodeVarMode mode)
 {
 	// throw exception if object with passed name does not exist
 	int pos = get_position(name);
 	set_var(pos, t, value, mode);
 }
 
-void KDBVariables::set_var(const std::string& name, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode)
+void KDBVariables::set_var(const std::string& name, const std::string& period, const double value, const EnumIodeVarMode mode)
 {
 	int t = get_sample()->get_period_position(period);
 	set_var(name, t, value, mode);
 }
 
-void KDBVariables::set_var(const std::string& name, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode)
+void KDBVariables::set_var(const std::string& name, const Period& period, const double value, const EnumIodeVarMode mode)
 {
 	int t = get_sample()->get_period_position(period);
 	set_var(name, t, value, mode);

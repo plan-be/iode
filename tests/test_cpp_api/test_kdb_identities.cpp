@@ -344,10 +344,10 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     Variable expected_gap_;
     expected_gap2.reserve(10);
     expected_gap_.reserve(10);
-    IODE_REAL qaff_;
-    IODE_REAL qaf_;
-    IODE_REAL q_f;
-    IODE_REAL q_i;
+    double qaff_;
+    double qaf_;
+    double q_f;
+    double q_i;
     for (int y=y_from; y <= y_to; y++)
     {
         period = std::to_string(y) + "Y1";

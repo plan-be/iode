@@ -8,7 +8,7 @@
  *      N;0104104000023;   1;19801231;               8,3;D
  *      D;code;freq;date;value;status
  *   
- *      0104104000023;N;Werkloosheidsgraden (bron: Eurostat), Seizoengezuiverde gegevens;Taux de chômage (source: Eurostat), Données désaissonnalisées;Taux de chômage (source: Eurostat), Données désaissonnalisées;           ;             0,010;
+ *      0104104000023;N;Werkloosheidsgraden (bron: Eurostat), Seizoengezuiverde gegevens;Taux de chï¿½mage (source: Eurostat), Donnï¿½es dï¿½saissonnalisï¿½es;Taux de chï¿½mage (source: Eurostat), Donnï¿½es dï¿½saissonnalisï¿½es;           ;             0,010;
  *      code;N;cmtnl;cmtfr;cmten;units1;units2
  *
  *  List of functions 
@@ -48,7 +48,7 @@ SAMPLE  *smpl;
 int TXT_set(date, shift, tval, dval)
 char    *date, *tval;
 int     *shift;
-IODE_REAL    *dval;
+double    *dval;
 {
     PERIOD  *per;
     char    buf[21], y[5], m[3];
@@ -88,7 +88,7 @@ int IMP_elem_txt(yy, name, shift, vector)
 YYFILE  *yy;
 char    *name;
 int     *shift;
-IODE_REAL    *vector;
+double    *vector;
 {
     char    buf[257], **tbl = NULL;
     long    nbper;

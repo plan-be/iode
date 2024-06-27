@@ -13,8 +13,8 @@
  *  
  *  List of functions 
  *  -----------------
- *      IODE_REAL C_evallec(char* lec, int t)                                    Evaluates a LEC expression at a specific period of time.
- *      IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
+ *      double C_evallec(char* lec, int t)                                    Evaluates a LEC expression at a specific period of time.
+ *      double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
  *                                                                                  coefficient configuration that gives 
  *                                                                                  the best statistical result (for a chosen test).
  */
@@ -24,9 +24,9 @@
 // Function declarations
 static int E_GetScls(CLEC* clec, char*** scl);
 static void E_SetScl(int relax, char* name);
-IODE_REAL C_evallec(char* lec, int t);
-static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test);
-IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
+double C_evallec(char* lec, int t);
+static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test);
+double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test);
 
 
 /**
@@ -77,13 +77,13 @@ static void E_SetScl(int relax, char* name)
  *  
  *  @param [in] char*       lec     LEC expression
  *  @param [in] int         t       period of calculation (starts at 0 = first period of the sample)
- *  @return     IODE_REAL           L_NAN on error, lec[t] on success
+ *  @return     double           L_NAN on error, lec[t] on success
  */
  
-IODE_REAL C_evallec(char* lec, int t)
+double C_evallec(char* lec, int t)
 {
     CLEC        *clec;
-    IODE_REAL   x = L_NAN;
+    double   x = L_NAN;
     char        tmplec[4096];
 
     SCR_strlcpy(tmplec, lec, 4094); // For C++ when lec is a const string (in the DATA memory segment)
@@ -117,14 +117,14 @@ IODE_REAL C_evallec(char* lec, int t)
  *  @param [in] SAMPLE*     smpl    estimation sample
  *  @param [in] char**      eqs     table of equation names (only eqs[0] is used)
  *  @param [in] char*       test    name of the statistical test to optimize: "fstat" or "r2"
- *  @return     IODE_REAL           value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
+ *  @return     double           value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
  */
  
-static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test)   
+static double E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char** eqs, char* test)   
 {
     int         j, cscl, nscl, rc;
     char        buf[512];
-    IODE_REAL   res;
+    double   res;
     char        etest[20];
 
     cscl = 1;
@@ -214,11 +214,11 @@ static IODE_REAL E_StepWise_1(int i, int nbscl, char** scl, SAMPLE* smpl, char**
  *  @return     int             best test "test" value
  */
 
-IODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
+double E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)
 {
     int         i, l=0,nbscl, nbcom;
     int         pos, lasti;
-    IODE_REAL   lnumtest,numtest;
+    double   lnumtest,numtest;
     EQ          *eq;
     CLEC        *cl;
     char        **scl = NULL, **eqs = NULL;

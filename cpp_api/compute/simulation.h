@@ -28,22 +28,22 @@ public:
 
     // ==== GETTER AND SETTER ====
 
-    IODE_REAL get_convergence_threshold()
+    double get_convergence_threshold()
     {
         return KSIM_EPS;
     }
 
-    void set_convergence_threshold(IODE_REAL threshold)
+    void set_convergence_threshold(double threshold)
     {
         KSIM_EPS = threshold;
     }
 
-    IODE_REAL get_relax()
+    double get_relax()
     {
         return KSIM_RELAX;
     }
 
-    void set_relax(IODE_REAL relax)
+    void set_relax(double relax)
     {
         KSIM_RELAX = relax;
     }

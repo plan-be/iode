@@ -129,7 +129,7 @@ int (*K_xdrobj[])() = {
 
 #define K_xdrSHORT(a)   XDR_rev(a, 1, sizeof(short))
 #define K_xdrLONG(a)    XDR_rev(a, 1, sizeof(long))
-#define K_xdrREAL(a)    XDR_rev(a, 1, sizeof(IODE_REAL))
+#define K_xdrREAL(a)    XDR_rev(a, 1, sizeof(double))
 
 /**
  *  Translates a short int from little-endian to big-endian or the other way round (the translation is symmetrical ?).
@@ -470,7 +470,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
         K_xdrSHORT(&nl);
     }
     XDR_rev(tbl, 4, sizeof(short));
-    XDR_rev(&(tbl->t_zmin), 4, sizeof(IODE_REAL));
+    XDR_rev(&(tbl->t_zmin), 4, sizeof(double));
 
     /* div:1  TCELL machine independent */
     len = P_get_len(pack, 1);
@@ -596,7 +596,7 @@ static int K_exdr(unsigned char* ptr, unsigned char** xdr_ptr)
         K_xdrCLEC(P_get_ptr(ptr, 1), 0);
         K_xdrSMPL(P_get_ptr(ptr, 4));
         K_xdrLONG(P_get_ptr(ptr, 8));
-        XDR_rev(P_get_ptr(ptr, 9), 20, sizeof(IODE_REAL));
+        XDR_rev(P_get_ptr(ptr, 9), 20, sizeof(double));
     }
     else {
         /* intel write */
@@ -664,7 +664,7 @@ static int K_sxdr(unsigned char* ptr, unsigned char** xdr_ptr)
     if(xdr_ptr == NULL) {
         /* intel read */
         K_xdrPACK(ptr, 0);
-        XDR_rev(P_get_ptr(ptr, 0), 3, sizeof(IODE_REAL));
+        XDR_rev(P_get_ptr(ptr, 0), 3, sizeof(double));
     }
     else {
         /* intel write */
@@ -672,7 +672,7 @@ static int K_sxdr(unsigned char* ptr, unsigned char** xdr_ptr)
         *xdr_ptr = SW_nalloc(len);
         memcpy(*xdr_ptr, ptr, len);
         len = P_get_len(ptr, 0);
-        XDR_rev(P_get_ptr(*xdr_ptr, 0), 3, sizeof(IODE_REAL));
+        XDR_rev(P_get_ptr(*xdr_ptr, 0), 3, sizeof(double));
 
         K_xdrPACK(*xdr_ptr, len);
     }
@@ -721,7 +721,7 @@ static int K_vxdr(unsigned char* ptr, unsigned char** xdr_ptr)
 
         pos = (U_sh *) ptr;
         len = P_get_len(ptr, 0);
-        XDR_rev(P_get_ptr(ptr, 0), len/sizeof(IODE_REAL), sizeof(IODE_REAL));
+        XDR_rev(P_get_ptr(ptr, 0), len/sizeof(double), sizeof(double));
     }
     else {
         /* intel write */
@@ -729,7 +729,7 @@ static int K_vxdr(unsigned char* ptr, unsigned char** xdr_ptr)
         *xdr_ptr = SW_nalloc(len);
         memcpy(*xdr_ptr, ptr, len);
         len = P_get_len(ptr, 0);
-        XDR_rev(P_get_ptr(*xdr_ptr, 0), len/sizeof(IODE_REAL), sizeof(IODE_REAL));
+        XDR_rev(P_get_ptr(*xdr_ptr, 0), len/sizeof(double), sizeof(double));
 
         K_xdrPACK(*xdr_ptr, len);
     }

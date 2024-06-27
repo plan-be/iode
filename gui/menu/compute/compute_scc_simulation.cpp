@@ -64,10 +64,10 @@ void MenuComputeSCCSimulation::compute()
     {
         std::string from = qFrom->extractAndVerify().toStdString();
         std::string to = qTo->extractAndVerify().toStdString();
-        IODE_REAL convergence = std::stod(qConvergence->extractAndVerify().toStdString());
+        double convergence = std::stod(qConvergence->extractAndVerify().toStdString());
         int max_iterations = qMaxIterations->extractAndVerify();
         bool debug = qCheckDebug->extractAndVerify();
-        IODE_REAL relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
+        double relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
         EnumSimulationInitialization initialisation = (EnumSimulationInitialization) qSimInitialisation->extractAndVerify();
         std::string pre_recursive_list_name = qPreRecursiveListName->extractAndVerify().toStdString();
         std::string inter_recursive_list_name = qInterRecursiveListName->extractAndVerify().toStdString();

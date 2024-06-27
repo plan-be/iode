@@ -444,8 +444,8 @@ C_StatUnitRoot()
 	    pos, nb;
     char    *buf = NULL,
 	    *res, **series = NULL;
-    IODE_REAL    **df;
-    extern  IODE_REAL    *B_StatUnitRoot_1();
+    double    **df;
+    extern  double    *B_StatUnitRoot_1();
 
     if(vkp_unitroot_SERIES != NULL) {
 	series = SCR_vtom(vkp_unitroot_SERIES, ';');
@@ -458,7 +458,7 @@ C_StatUnitRoot()
 	res = vkp_unitroot_RES = SCR_malloc(nb * 80 * (20 + vkp_unitroot_ORDER));
 	if(res == NULL) goto done;
 
-	df = (IODE_REAL **) SCR_malloc(4 * nb * sizeof(IODE_REAL *));
+	df = (double **) SCR_malloc(4 * nb * sizeof(double *));
 
 	for(j = 0; j < nb; j++) {
 	    sprintf(res + strlen(res),"%-13s %-9s %-9s %-9s %-9s\n",
@@ -578,10 +578,11 @@ SB_WsTimeSeries()
 }
 */
 
-/* now in b_ws.c IODE_REAL    C_evallec(lec, t)
+/* now in b_ws.cdouble
+ IODE_REAL    C_evallec(lec, t)
 char    *lec;
 {
-    CLEC    *clec;
+    doubleclec;
     IODE_REAL    x = L_NAN;
 
     SCR_strip(lec);
@@ -600,8 +601,9 @@ char    *lec;
 }
 */
 T_GraphGrid(axis, label, value)
-int     axis;
-char    *label; IODE_REAL    value;
+int     axis;double
+char    *label;
+ IODE_REAL    value;
 {
     char    ax;
 
@@ -618,7 +620,7 @@ C_WsTimeSeries()
     char    *buf = NULL,
 	    *from   = vkp_wstimeseries_FROM,
 	    to[10],
-	    *series = vkp_wstimeseries_SERIES;
+	   double= vkp_wstimeseries_SERIES;
     int     rc = 0, t, dt, nt, i, lag;
     IODE_REAL    *y = NULL,
 	    mean, var, stddev, acf[24];
@@ -662,7 +664,7 @@ C_WsTimeSeries()
 //        }
 //        E_DickeyFuller(smpl, series);
     }
-    else goto err;
+    else doubledouble
 
     y = (IODE_REAL *)SW_nalloc(sizeof(IODE_REAL) * nt);
     sprintf(buf, "%s", vkp_wstimeseries_SERIES);
