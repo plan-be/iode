@@ -391,7 +391,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
         *nc = 2;
         *nl = 1;
         switch(type) {
-            case K_CMT :
+            case COMMENTS :
                 obj = (char *)KCVAL(kdb, objnb);
                 break;
             case K_EQS :
@@ -543,7 +543,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
 
     if(strcmp(szTopic, "WS") == 0)   return(IodeDdeGetWS(szItem));
     if(strcmp(szTopic, "XVAR") == 0) return(IodeDdeGetXObj(szItem, K_VAR));
-    if(strcmp(szTopic, "XCMT") == 0) return(IodeDdeGetXObj(szItem, K_CMT));
+    if(strcmp(szTopic, "XCMT") == 0) return(IodeDdeGetXObj(szItem, COMMENTS));
     if(strcmp(szTopic, "XLST") == 0) return(IodeDdeGetXObj(szItem, K_LST));
     if(strcmp(szTopic, "XIDT") == 0) return(IodeDdeGetXObj(szItem, K_IDT));
     if(strcmp(szTopic, "XTBL") == 0) return(IodeDdeGetXObj(szItem, K_TBL));
@@ -562,7 +562,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
         case K_TBL :
             return((char *)0);
 
-        case K_CMT :
+        case COMMENTS :
         case K_LST :
             res = SCR_stracpy((char *)KCVAL(kdb, objnb));
             SCR_replace(res, "\t", " ");
@@ -953,7 +953,7 @@ int B_ExcelSet(char *arg, int type)
 
     item = args[nb_args - 1];
     switch(type) {
-        case K_CMT :
+        case COMMENTS :
             ptr = SCR_stracpy(KCVAL(kdb, pos));
             break;
         case K_IDT :

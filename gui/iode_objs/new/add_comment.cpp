@@ -8,7 +8,7 @@ AddCommentDialog::AddCommentDialog(KDBComments* database, QWidget* parent) : QDi
 	label_title->setText("Add Comment");
 	label_definition->setText("Comment");
 
-	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_COMMENTS, REQUIRED_FIELD);
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, COMMENTS, REQUIRED_FIELD);
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 

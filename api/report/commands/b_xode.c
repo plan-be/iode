@@ -49,7 +49,7 @@ int B_FileImportCmt(char* arg)
     if(nb_args == 6) trace = args[5];
     else             trace = empty_buf;
 
-    rc = IMP_RuleImport(K_CMT, trace, rule, oufile, infile,
+    rc = IMP_RuleImport(COMMENTS, trace, rule, oufile, infile,
                       empty_buf, empty_buf, format, lang);
 
 fin:

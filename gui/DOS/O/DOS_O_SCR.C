@@ -8,7 +8,7 @@ int pos, type;
 
     if(KNB(kdb) == 0) return(0);
     switch(KTYPE(kdb)) {
-	case K_CMT :
+	case COMMENTS :
 	case K_LST :
 	case K_SCL :
 	case K_TBL :

@@ -117,7 +117,7 @@ fin:
  *  Sub-function of B_FileDelete() to delete one single file.
  *  
  *  @param [in] char*   arg  filename
- *  @param [in] int*    type file type (value defined in iode.h between K_CMT and K_CSV). See also K_set_ext().
+ *  @param [in] int*    type file type (value defined in iode.h between COMMENTS and K_CSV). See also K_set_ext().
  *  @return 
  */
  

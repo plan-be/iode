@@ -104,7 +104,7 @@ char    *name;
 int     type;
 {
     switch(type) {
-	case K_CMT :
+	case COMMENTS :
 	case K_IDT :
 	case K_VAR :
 	case K_LST : return(SB_DataEditCil1(name, type));

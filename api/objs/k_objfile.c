@@ -39,7 +39,7 @@
  *   - next extensions : other IODE files
  */
 char k_ext[][4] = {
-    "cmt", // 0 = K_CMT
+    "cmt", // 0 = COMMENTS
     "eqs", // 1 = K_EQS
     "idt", // ... 
     "lst",
@@ -161,7 +161,7 @@ int K_has_ext(char* filename)
  *   
  *  @param [out]    res   char*   resulting filename
  *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     file type (value defined in iode.h between K_CMT and K_CSV) 
+ *  @param [in]     type  int     file type (value defined in iode.h between COMMENTS and K_CSV) 
  *  @return               char*   res (same pointer)
  *  
  *  @example : 
@@ -185,7 +185,7 @@ char *K_set_ext(char* res, char* fname, int type)
  *   
  *  @param [out]    res   char*   resulting filename
  *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     file type (value defined in iode.h between K_CMT and K_CSV) 
+ *  @param [in]     type  int     file type (value defined in iode.h between COMMENTS and K_CSV) 
  *  @return               char*   res (same pointer)
  *  
  *  @example : 
@@ -359,7 +359,7 @@ error :
  *      - transposes objects to 64 bits 
  *      - converts to the current IODE object version.
  *  
- * @param [in]   ftype      int     file type (K_CMT -> K_VAR)
+ * @param [in]   ftype      int     file type (COMMENTS -> K_VAR)
  * @param [in]   fname      FNAME   filename
  * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
  * @param [in]   objs       char**  null or list of objects to load
@@ -596,7 +596,7 @@ error:
  *  @param [out] descr      char*   NULL or pointer to copy the description of the file
  *  @param [out] nobjs      int*    NULL or pointer to the number of objs in the file
  *  @param [out] smpl       SAMPLE* NULL or pointer to the sample of the file (for K_VAR only)
- *  @return                 int     on success: file type (K_CMT...)
+ *  @return                 int     on success: file type (COMMENTS...)
  *                                  on error: 
  *                                      -1 if filename is empty 
  *                                      -1 if IODE object version is < 0 or > 3
@@ -657,7 +657,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
  *  
  *  @param [in] filename    char*   file to "inspect"
  *  @param [in] type        int     type expected
- *  @return                 int     on success file type (K_CMT...)
+ *  @return                 int     on success file type (COMMENTS...)
  *                                  on error : -2 if file and file.ext cannot be opened
  *                                             -1 if the file type or the object version is not recognized 
  *  
@@ -698,7 +698,7 @@ static int K_findtype(char* filename, int type)
  *  If the file is an ascii file (.ac, .ae... or .csv), the corresponding function 
  *      (*K_load_asc[type])() is called.
  *
- *  @param [in]   type       int     file type (K_CMT,...K_AC,..., K_CSV)
+ *  @param [in]   type       int     file type (COMMENTS,...K_AC,..., K_CSV)
  *  @param [in]   filename   char*   file to load
  *  @return                  KDB*    KDB with the content of filename on success
  *                                   NULL on error
@@ -719,7 +719,7 @@ KDB *K_interpret(int type, char* filename)
     ftype = K_findtype(filename, type);
 //    printf("type=%d, ftype=%d\n", type, ftype);
     if(ftype == -1) { // file exists but when opened, type not recognized => test ascii contents
-        if(type >= K_CMT && type <= K_VAR && 
+        if(type >= COMMENTS && type <= K_VAR && 
             K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + K_AC]) == 0) {
                 kdb = (*K_load_asc[type])(filename);
             }

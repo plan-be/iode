@@ -187,7 +187,7 @@ KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
     if(impdef->imp_hd_fn != NULL
             && (*(impdef->imp_hd_fn))(impdef, cfile, lang) < 0) goto err;
 
-    kdb = K_create(K_CMT, ASIS_CASE);
+    kdb = K_create(COMMENTS, ASIS_CASE);
 
     if(impdef->imp_vec_fn != NULL) {
 
@@ -370,7 +370,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
 /**
  *  Imports variables or comments in various formats.
  *  
- *  @param [in] int     type    type of objects to import: K_CMT or K_VAR
+ *  @param [in] int     type    type of objects to import: COMMENTS or K_VAR
  *  @param [in] char*   trace   if trace[0] != 0, prints a list of the object name modifications
  *  @param [in] char*   rule    rule file
  *  @param [in] char*   ode     output IODE file
@@ -386,7 +386,7 @@ int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char
     int     rc = -1;
     
     switch(type) {
-        case K_CMT   :
+        case COMMENTS   :
             rc = IMP_RuleImportCmt(trace, rule, ode, asc, fmt, lang);
             break;
 

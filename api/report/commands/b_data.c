@@ -19,12 +19,12 @@
  *  
  *  When called by the report engine, these functions have 2 parameters: 
  *      - the argument of the function (the remaining of the report line)
- *      - the type of object treated (K_CMT <= type <= K_VAR)
+ *      - the type of object treated (COMMENTS <= type <= K_VAR)
  *  
  *  For these functions, the parameters and return values are as follows: 
  *  
  *      @param [in] char*   arg     report line without the command 
- *      @param [in] int     type    type of object whose names are to be saved in the list (bw K_CMT and K_VAR)
+ *      @param [in] int     type    type of object whose names are to be saved in the list (bw COMMENTS and K_VAR)
  *      @return     int             0 on success, -1 on error 
  *
  *  For instance, the report command 
@@ -44,7 +44,7 @@
  *    
  *  When called by the report engine, these functions have 2 parameters: 
  *      - the argument of the function (the remaining of the report line)
- *      - the type of object treated (K_CMT <= type <= K_CSV)
+ *      - the type of object treated (COMMENTS <= type <= K_CSV)
  *  
  *  The parameters and return values are the same as for the functions with an IODE object type parameter.
  *
@@ -264,7 +264,7 @@ int B_DataCreate_1(char* arg, int* ptype)
     if(K_find(kdb, arg) >= 0) return(-1);
 
     switch(*ptype) {
-        case K_CMT :
+        case COMMENTS :
         case K_LST :
         case K_SCL :
             if(K_add(kdb, arg, NULL) < 0) return(-1);
@@ -467,7 +467,7 @@ int B_DataUpdate(char* arg, int type)
     }
 
     switch(type) {
-    case K_CMT : /* Name Val */
+    case COMMENTS : /* Name Val */
     case K_IDT :
     case K_LST :
         rc = K_add(kdb, name, arg + lg + 1, name);
@@ -880,7 +880,7 @@ int B_DataAppend(char* arg, int type)
     char    name[K_MAX_NAME + 1], *ptr, *nptr, *text;
 
     switch(type) {
-    case K_CMT :
+    case COMMENTS :
     case K_LST :
         break;
 
@@ -904,7 +904,7 @@ int B_DataAppend(char* arg, int type)
 
         ptr = KOVAL(kdb, pos);
         nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
-        if(type == K_CMT)
+        if(type == COMMENTS)
             sprintf(nptr, "%s %s", ptr, text);
         else
             sprintf(nptr, "%s,%s", ptr, text);

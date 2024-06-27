@@ -9,7 +9,7 @@ class EditCommentDialog: public TemplateEditObjectDialog<KDBComments>
 
 public:
     EditCommentDialog(const QString& name, KDBComments* database, QWidget* parent = Q_NULLPTR) : 
-        TemplateEditObjectDialog(I_COMMENTS, name, database, parent) 
+        TemplateEditObjectDialog(COMMENTS, name, database, parent) 
     {
         value = database->get(name.toStdString());
         textEdit_content->setPlainText(QString::fromStdString(value));

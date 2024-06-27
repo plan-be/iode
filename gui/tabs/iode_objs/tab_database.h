@@ -23,7 +23,7 @@
 class CommentsWidget : public TemplateIodeObjectWidget<CommentsModel, CommentsView>
 {
 public:
-    CommentsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_COMMENTS, parent) 
+    CommentsWidget(QWidget* parent) : TemplateIodeObjectWidget(COMMENTS, parent) 
     {
         connect(objmodel, &CommentsModel::dataChanged, this, &CommentsWidget::databaseModified);
         connect(objmodel, &CommentsModel::headerDataChanged, this, &CommentsWidget::databaseModified);

@@ -511,7 +511,7 @@ For these functions, the parameters and return values are as follows:
 
 ```
     @param [in] char*   arg     report line without the first word
-    @param [in] int     type    type of object to be manipulated (K_CMT <= type <= K_VAR)
+    @param [in] int     type    type of object to be manipulated (COMMENTS <= type <= K_VAR)
     @return     int             0 on success, -1 on error
 ```
 

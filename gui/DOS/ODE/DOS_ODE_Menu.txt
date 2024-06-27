@@ -55,8 +55,8 @@ V	"Save Work Space"             : SB_WsSave
 	------------------------
 	"Comments"
 	------------------------
-V	"Edit WS      "   : SB_DataEditScroll(0L, K_CMT)
-	"Edit List    "   : SB_DataEdit(0L, K_CMT)
+V	"Edit WS      "   : SB_DataEditScroll(0L, COMMENTS)
+	"Edit List    "   : SB_DataEdit(0L, COMMENTS)
 
 	------------------------
 	"Equations"

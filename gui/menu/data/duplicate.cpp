@@ -6,7 +6,7 @@ MenuDataDuplicateObj::MenuDataDuplicateObj(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_COMMENTS, this);
+    completer = new IodeCompleter(false, false, COMMENTS, this);
     lineEdit_obj_name->setCompleter(completer);
     comboBox_iode_types->setCurrentIndex(0);
 
@@ -46,7 +46,7 @@ void MenuDataDuplicateObj::duplicate()
 
         switch (iode_type)
         {
-        case I_COMMENTS:
+        case COMMENTS:
             Comments.add(dup_obj_name, Comments.copy(obj_name));
             break;
         case I_EQUATIONS:

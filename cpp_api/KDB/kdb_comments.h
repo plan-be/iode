@@ -14,7 +14,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {}
 
 public:
-    KDBComments(const std::string& filepath="") : KDBTemplate(I_COMMENTS, filepath) {}
+    KDBComments(const std::string& filepath="") : KDBTemplate(COMMENTS, filepath) {}
 
     KDBComments* subset(const std::string& pattern, const bool deep_copy=false)
     {

@@ -56,7 +56,7 @@ def data_update(obj_name: str, obj_value: str, obj_type: int):
 
     Examples
     --------
-    >>> iode.data_update("ACAF", "Comment of ACAF", iode.K_CMT)
+    >>> iode.data_update("ACAF", "Comment of ACAF", iode.COMMENTS)
 
     '''
      
@@ -66,7 +66,7 @@ def data_update(obj_name: str, obj_value: str, obj_type: int):
 
 def data_update_cmt(obj_name: str, obj_value: str):
     '''Create or update a comment'''
-    data_update(obj_name, obj_value, K_CMT)
+    data_update(obj_name, obj_value, COMMENTS)
     
 def data_update_eqs(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, K_EQS)

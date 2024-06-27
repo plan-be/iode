@@ -192,7 +192,7 @@ char *IodeVersion()
  *  Load an IODE workspace file.
  *  
  *  @param [in] name    char*   filename 
- *  @param [in] type    int     file type (K_CMT...K_VAR)
+ *  @param [in] type    int     file type (COMMENTS...K_VAR)
  *  @return             int     nb of objects read or -1 on error
  */
 int  IodeLoad(char *name, int type)
@@ -228,7 +228,7 @@ int  IodeSave(char *name, int type)
  */
 int IodeClearWs(int type)
 {
-    if(type >= K_CMT && type <= K_VAR) 
+    if(type >= COMMENTS && type <= K_VAR) 
         K_clear(K_WS[type]);
     return(0);
 }
@@ -243,7 +243,7 @@ int IodeClearAll()
 {
     int type;
 
-    for(type = K_CMT; type <= K_VAR; type++)
+    for(type = COMMENTS; type <= K_VAR; type++)
         K_clear(K_WS[type]);
     
     return(0);

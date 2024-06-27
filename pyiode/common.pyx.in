@@ -69,7 +69,7 @@ NA: float = L_NAN
 # ----------
 
 class IodeTypes(IntEnum):
-    COMMENTS = EnumIodeType.I_COMMENTS
+    COMMENTS = EnumIodeType.COMMENTS
     EQUATIONS = EnumIodeType.I_EQUATIONS
     IDENTITIES = EnumIodeType.I_IDENTITIES
     LISTS = EnumIodeType.I_LISTS
@@ -78,7 +78,7 @@ class IodeTypes(IntEnum):
     VARIABLES = EnumIodeType.I_VARIABLES
 
 class IodeFileExt(IntEnum):
-    COMMENTS = EnumIodeFile.I_COMMENTS_FILE
+    COMMENTS = EnumIodeFile.COMMENTS_FILE
     EQUATIONS = EnumIodeFile.I_EQUATIONS_FILE
     IDENTITIES = EnumIodeFile.I_IDENTITIES_FILE
     LISTS = EnumIodeFile.I_LISTS_FILE

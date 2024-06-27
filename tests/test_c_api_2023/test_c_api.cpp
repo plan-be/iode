@@ -1619,7 +1619,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_TRUE(U_cmp_strs(lst, "A;B;B;C;D;X;Y;Z"));
 
     // B_DataUpdate()
-    rc = B_DataUpdate("U Comment of U"       , K_CMT);
+    rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U");
     EXPECT_EQ(cond, 1);
 
@@ -1644,7 +1644,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(rc, 0);
 
     // B_DataSearch(char* arg, int type)
-    rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", K_CMT);
+    rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KLPTR("NEWLIST"), "U");
     EXPECT_EQ(cond, 1);
 
@@ -1662,7 +1662,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY");
     EXPECT_EQ(cond, 1);
 
-    rc = B_DataAppend("U - More comment on U", K_CMT);
+    rc = B_DataAppend("U - More comment on U", COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U");
     EXPECT_EQ(cond, 1);
 
@@ -2024,11 +2024,11 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(K_CMT, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
+    rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
     if(rc == 0) {
-        KC_RWS = KC_WS = K_interpret(K_CMT, outfile);
+        KC_RWS = KC_WS = K_interpret(COMMENTS, outfile);
         cond = (KC_WS != NULL) && U_cmp_strs(KCPTR("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
         EXPECT_EQ(cond, 1);
     }
@@ -2316,7 +2316,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
-    U_test_B_WsLoad("fun", K_CMT, 317);
+    U_test_B_WsLoad("fun", COMMENTS, 317);
     U_test_B_WsLoad("fun", K_EQS, 274);
     U_test_B_WsLoad("fun", K_IDT, 48);
     U_test_B_WsLoad("fun", K_LST, 17);
@@ -2326,7 +2326,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");
-    U_test_B_WsSave("fun", "fun2", K_CMT, 317);
+    U_test_B_WsSave("fun", "fun2", COMMENTS, 317);
     U_test_B_WsSave("fun", "fun2", K_EQS, 274);
     U_test_B_WsSave("fun", "fun2", K_IDT, 48);
     U_test_B_WsSave("fun", "fun2", K_LST, 17);
@@ -2336,7 +2336,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
     U_test_print_title("B_WsSaveCmp()");
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_CMT, 317);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", COMMENTS, 317);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_EQS, 274);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_IDT, 48);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
@@ -2346,7 +2346,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
-    U_test_B_WsExport("fun.cmt", "fun2.ac", K_CMT);
+    U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS);
     U_test_B_WsExport("fun.eqs", "fun2.ae", K_EQS);
     U_test_B_WsExport("fun.idt", "fun2.ai", K_IDT);
     U_test_B_WsExport("fun.lst", "fun2.al", K_LST);
@@ -2356,7 +2356,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsClear(char* arg, int type)                $WsClear<type>
     U_test_print_title("B_WsClear()");
-    U_test_B_WsClear(K_CMT);
+    U_test_B_WsClear(COMMENTS);
     U_test_B_WsClear(K_EQS);
     U_test_B_WsClear(K_IDT);
     U_test_B_WsClear(K_LST);
@@ -2366,7 +2366,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
     U_test_print_title("B_WsImport()");
-    U_test_B_WsImport("fun2.ac", K_CMT, 317);
+    U_test_B_WsImport("fun2.ac", COMMENTS, 317);
     U_test_B_WsImport("fun2.ae", K_EQS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
     U_test_B_WsImport("fun2.al", K_LST, 17);
@@ -2399,7 +2399,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
     U_test_print_title("B_WsDescr()");
-    U_test_B_WsDescr("Ws content description", K_CMT);
+    U_test_B_WsDescr("Ws content description", COMMENTS);
     U_test_B_WsDescr("Ws content description", K_EQS);
     U_test_B_WsDescr("Ws content description", K_IDT);
     U_test_B_WsDescr("Ws content description", K_LST);
@@ -2411,7 +2411,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes)
     // Should be reviewed for C++ w/o /Zp1
     U_test_print_title("B_WsName()");
-    U_test_B_WsName("funtest", K_CMT);
+    U_test_B_WsName("funtest", COMMENTS);
     U_test_B_WsName("funtest", K_EQS);
     U_test_B_WsName("funtest", K_IDT);
     U_test_B_WsName("funtest", K_LST);
@@ -2424,7 +2424,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsCopyVar();
 
     U_test_print_title("B_WsCopy() - other objects");
-    U_test_B_WsCopy("fun", K_CMT, 317);
+    U_test_B_WsCopy("fun", COMMENTS, 317);
     U_test_B_WsCopy("fun", K_EQS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsCopy("fun", K_IDT, 48);   // Idem in IDT NAWRU
     U_test_B_WsCopy("fun", K_LST, 17);
@@ -2437,7 +2437,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsMergeVar();
 
     U_test_print_title("B_WsMerge() - other objects");
-    U_test_B_WsMerge("fun", K_CMT, 317);
+    U_test_B_WsMerge("fun", COMMENTS, 317);
     U_test_B_WsMerge("fun", K_EQS, 274);
     U_test_B_WsMerge("fun", K_IDT, 48);
     U_test_B_WsMerge("fun", K_SCL, 161);

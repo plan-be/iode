@@ -492,12 +492,12 @@ In that way, only one function is needed for $DataDelete~iVar~I, $DataDelete~iId
 
 When called by the report engine, these functions have 2 parameters:
 &EN the argument of the function (the report line without the function name)
-&EN the type of object treated (K_CMT <<= type <<= K_VAR)
+&EN the type of object treated (COMMENTS <<= type <<= K_VAR)
 
 For these functions, the parameters and return values are as follows:
 &CO
     @param [in] char*   arg     report line without the first word
-    @param [in] int     type    type of object to be manipulated (K_CMT <<= type <<= K_VAR)
+    @param [in] int     type    type of object to be manipulated (COMMENTS <<= type <<= K_VAR)
     @return     int             0 on success, -1 on error
 &TX
 For instance, the report command
@@ -518,7 +518,7 @@ instead of object type suffix (.cmt...).
 
 When called by the report engine, these functions have also 2 parameters:
 &EN the argument of the function (report line without function name)
-&EN the type of ~bfile~B treated (K_CMT <<= type <<= K_CSV)
+&EN the type of ~bfile~B treated (COMMENTS <<= type <<= K_CSV)
 
 The parameters and return values are the same as for the functions with an IODE object type parameter.
 

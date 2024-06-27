@@ -84,7 +84,7 @@ def delete_obj(obj_name: str, obj_type: int):
         raise RuntimeError(f"Variable {obj_name} cannot be deleted")
 
 def delete_cmt(name: str):
-    delete_obj(name, K_CMT)
+    delete_obj(name, COMMENTS)
 
 def delete_eqs(name: str):
     return delete_obj(name, K_EQS)

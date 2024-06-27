@@ -288,7 +288,7 @@ int B_PrintObjDef_1(char* arg, int* type)
     if(khitkey() != 0) kgetkey();               // JMP 11/12/2021
 
     switch(*type) {
-        case K_CMT :
+        case COMMENTS :
             rc = B_PrintDefCmt(kdb, pos);
             W_flush();
             break;

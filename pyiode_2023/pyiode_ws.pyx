@@ -14,7 +14,7 @@
 #   ws_content_tbl(pattern) -> List[str]            | Returns the list of table names corresponding to the given pattern(s)
 #   ws_content_var(pattern) -> List[str]            | Returns the list of variable names corresponding to the given pattern(s)
 #
-#   ws_clear(filetype: int) | Clear WS of the given filetype (K_CMT..K_VAR)
+#   ws_clear(filetype: int) | Clear WS of the given filetype (COMMENTS..K_VAR)
 #   ws_clear_cmt()          | Clear the comment WS
 #   ws_clear_eqs()          | Clear the equation WS
 #   ws_clear_idt()          | Clear the identity WS
@@ -178,7 +178,7 @@ def ws_content(pattern: Union[str, List[str]] = '*', objtype: int = 6) -> List[s
 
 def ws_content_cmt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of comment names corresponding to the given pattern'''
-    return ws_content(pattern, K_CMT)
+    return ws_content(pattern, COMMENTS)
 
 def ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of equation names corresponding to the given pattern'''
@@ -209,13 +209,13 @@ def ws_clear_all():
         raise RuntimeError(f"Cannot clear all workspaces.")
 
 def ws_clear(filetype: int):
-    '''Clear WS of the given filetype (K_CMT..K_VAR)'''
+    '''Clear WS of the given filetype (COMMENTS..K_VAR)'''
     if IodeClearWs(filetype):
         raise RuntimeError(f"Workspace of type {filetype} cannot be cleared")
 
 def ws_clear_cmt():
     '''Clear the comment WS'''
-    ws_clear(K_CMT)
+    ws_clear(COMMENTS)
 
 def ws_clear_eqs():
     ws_clear(K_EQS)
@@ -249,7 +249,7 @@ def ws_load(filename: str, filetype: int) -> int:
 def ws_load_cmt(filename: str) -> int:
     '''Load a comment file and return the number of read objects'''
     
-    return ws_load(filename, K_CMT)
+    return ws_load(filename, COMMENTS)
 
 def ws_load_eqs(filename: str) -> int:
     return ws_load(filename, K_EQS)
@@ -279,7 +279,7 @@ def ws_save(filename: str, filetype: int):
 
 def ws_save_cmt(filename: str):
     '''Save the current comment workspace'''
-    ws_save(filename, K_CMT)
+    ws_save(filename, COMMENTS)
 
 def ws_save_eqs(filename: str):
     '''Save the current equation workspace'''

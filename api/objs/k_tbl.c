@@ -536,7 +536,7 @@ void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)
     int     i, pos,
             nb = SCR_tbl_size(vars),
             nbt = 0, nbl = 0;
-    KDB     *kdb = K_WS[K_CMT];
+    KDB     *kdb = K_WS[COMMENTS];
     char    *titg, **titls = NULL, **lecs = NULL;
 
     pos = K_find(kdb, def);

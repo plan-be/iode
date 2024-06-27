@@ -59,7 +59,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     // for editing IODE object names
     objectNameEdit = new QLineEdit(this);
     QString acceptedLetters;
-    if (iodeType == I_COMMENTS)
+    if (iodeType == COMMENTS)
         acceptedLetters = "A-Za-z";
     else if (iodeType == I_SCALARS)
         acceptedLetters = "a-z";
@@ -98,7 +98,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     varsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     scalarsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
 
-    connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_COMMENTS); });
+    connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(COMMENTS); });
     connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_EQUATIONS); });
     connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_IDENTITIES); });
     connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_LISTS); });
@@ -123,7 +123,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     relatedTblShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     relatedVarShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
-    connect(relatedCmtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_COMMENTS); });
+    connect(relatedCmtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(COMMENTS); });
     connect(relatedEqShortcut , &QShortcut::activated, this, [this]{ showRelatedObjs(I_EQUATIONS); });
     connect(relatedIdtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_IDENTITIES); });
     connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_LISTS); });

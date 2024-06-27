@@ -472,7 +472,7 @@ void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& ob
         AbstractIodeObjectWidget* databaseWidget;
         switch (iodeType)
         {
-        case I_COMMENTS:
+        case COMMENTS:
             databaseWidget = new CommentsWidget(dialog);
             break;
         case I_EQUATIONS:

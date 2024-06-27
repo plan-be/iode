@@ -15,7 +15,7 @@ class CommentsView : public IodeAbstractTableView, public TableViewEditObj<Comme
 
 public:
 	CommentsView(QWidget* parent = nullptr) : 
-		IodeAbstractTableView(I_COMMENTS, new CommentsDelegate(parent), parent), 
+		IodeAbstractTableView(COMMENTS, new CommentsDelegate(parent), parent), 
 		TableViewEditObj(this), TableViewAddObj(this) {};
 
 public slots:

@@ -69,8 +69,8 @@ public:
     {
         switch (iodeType)
         {
-        case I_COMMENTS:
-            iodeDatabases.insert(I_COMMENTS, &Comments);
+        case COMMENTS:
+            iodeDatabases.insert(COMMENTS, &Comments);
             break;
         case I_EQUATIONS:
             iodeDatabases.insert(I_EQUATIONS, &Equations);
@@ -108,7 +108,7 @@ public:
             addIodeType(iodeType, false);
         else
         {
-            iodeDatabases.insert(I_COMMENTS, &Comments);
+            iodeDatabases.insert(COMMENTS, &Comments);
             iodeDatabases.insert(I_EQUATIONS, &Equations);
             iodeDatabases.insert(I_IDENTITIES, &Identities);
             iodeDatabases.insert(I_LISTS, &Lists);

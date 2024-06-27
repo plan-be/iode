@@ -38,9 +38,9 @@ IodeProperties()
     sprintf(txt, "Current Directory:\n\t%s\n\n", buf);
     strcat(txt, "Workspaces:\n");
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++) {
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++) {
         sprintf(buf, "\t%s :\t%d objects [%s]\n",
-                IODE_TYPES[i], KNB(K_WS[K_CMT + i]), KNAMEPTR(K_WS[K_CMT + i])); /* JMP 03-06-2015 */
+                IODE_TYPES[i], KNB(K_WS[COMMENTS + i]), KNAMEPTR(K_WS[COMMENTS + i])); /* JMP 03-06-2015 */
         strcat(txt, buf);
     }
 
@@ -168,7 +168,7 @@ ODE_DisplayBanner()
 	
 	// Banner
 	if(ODE_BANNER) PG_edit_window(odep_info);
-	ODE_BANNER = 1; // A partir de la deuxième fois, on affiche d'office (car vient du menu)
+	ODE_BANNER = 1; // A partir de la deuxiï¿½me fois, on affiche d'office (car vient du menu)
 	
 	// Message pour nouvelle version
 	if(ODE_CHECKVERSION && firstpass == 0 && SCR_cstrcmp(ODE_LASTVERS, ODE_CURVERS)) {
@@ -224,7 +224,7 @@ int ODE_check_page_size()
     SCR_PAGE_SIZE[1]= max(MIN_NC, SCR_PAGE_SIZE[1]);
 }
 
-// Fonctions appel‚es lors du resize de la fenˆtre DOSWIN
+// Fonctions appelï¿½es lors du resize de la fenï¿½tre DOSWIN
 int ODE_adapt_ncnl(int nl, int nc) /* JMP 08-01-11 */
 {
     ODE_adapt_size(nl - SCR_PAGE_SIZE[0], nc - SCR_PAGE_SIZE[1]); /* JMP 03-12-10 */
@@ -241,14 +241,14 @@ ODE_adapt_size(int incrnl, int incrnc) /* JMP 03-12-10 */
     // if no change, return
     //if(incrnl == 0 && incrnc == 0) return(0);
 
-    // Eviter la r‚entrance
+    // Eviter la rï¿½entrance
     if(inuse) return(0);
     else inuse = 1;
 
     // Eviter de resize dans MMT
 //    if(MMT_CURRENT) return(0);
 
-    // Ne faire de changements qui si on a un incr‚ment non nul
+    // Ne faire de changements qui si on a un incrï¿½ment non nul
     if(1 || incrnl != 0 || incrnc != 0) {
         // Si  MMT en cours, undisplay
         //ODE_ResizeMMTs0();
@@ -274,7 +274,7 @@ ODE_adapt_size(int incrnl, int incrnc) /* JMP 03-12-10 */
         oldscreen = SCR_SCREEN;
         SCR_SCREEN = newscreen;
 
-        // Tout l'‚cran NEW en bleu
+        // Tout l'ï¿½cran NEW en bleu
         //SCR_set_attr(SCR_BLUE);
 		SCR_set_attr(SCR_BLACK);
         SCR_fill(' ', 0, 0, SCR_PAGE_SIZE[0], SCR_PAGE_SIZE[1]);
@@ -289,17 +289,17 @@ ODE_adapt_size(int incrnl, int incrnc) /* JMP 03-12-10 */
         SCR_set_attr(SCR_REVERSE);
         SCR_fill(' ', 1, 0, 1, SCR_PAGE_SIZE[1]);
         SCR_fill(' ', SCR_PAGE_SIZE[0] - 1, 0, 1, SCR_PAGE_SIZE[1]);
-        SCR_write(SCR_PAGE_SIZE[0] - 1, SCR_PAGE_SIZE[1] - 9, "³", 1);
-        SCR_write(SCR_PAGE_SIZE[0] - 1, SCR_PAGE_SIZE[1] - 17, "³", 1);
-        //SCR_write(SCR_PAGE_SIZE[0] - 1, SCR_PAGE_SIZE[1] - 28, "³", 1);
+        SCR_write(SCR_PAGE_SIZE[0] - 1, SCR_PAGE_SIZE[1] - 9, "ï¿½", 1);
+        SCR_write(SCR_PAGE_SIZE[0] - 1, SCR_PAGE_SIZE[1] - 17, "ï¿½", 1);
+        //SCR_write(SCR_PAGE_SIZE[0] - 1, SCR_PAGE_SIZE[1] - 28, "ï¿½", 1);
 
         // Recopier OLD DANS NEW
         // Ligne de menu (sans INPUT)
-        im = SCR_extract_image(oldscreen, 1, 0, 1, onc - 7); // -7 pour ‚viter INPUT
+        im = SCR_extract_image(oldscreen, 1, 0, 1, onc - 7); // -7 pour ï¿½viter INPUT
         SCR_im_to_im(newscreen, im, 0, 0);
         SCR_free_image(im);
 
-        // Centre de l'‚cran
+        // Centre de l'ï¿½cran
         im = SCR_extract_image(oldscreen, 2, 0, min(onl, SCR_PAGE_SIZE[0]) - 4, onc);
         SCR_im_to_im(newscreen, im, 0, 0);
         SCR_free_image(im);
@@ -315,7 +315,7 @@ ODE_adapt_size(int incrnl, int incrnc) /* JMP 03-12-10 */
         SCR_free_image(im);
         */
 
-        // Free ancien ‚cran
+        // Free ancien ï¿½cran
         SCR_free_image(oldscreen);
 
         /* Reset infos positions on screen */
@@ -342,7 +342,7 @@ ODE_adapt_size(int incrnl, int incrnc) /* JMP 03-12-10 */
         // Si SCROLL en cours, resize
         ODE_ResizeScrolls(); /* JMP 04-02-11 */
 
-        // Si MMT actif, effacer et recr‚er l'image
+        // Si MMT actif, effacer et recrï¿½er l'image
         //ODE_ResizeMMTs1();
 
         //DebugActif = 1;
@@ -488,7 +488,7 @@ int ISC_init_start_replicas() {
 }
 
 
-// Resize de la fenˆtre MMT
+// Resize de la fenï¿½tre MMT
 
 #include <s_mmt.h>
 
@@ -503,7 +503,7 @@ ODE_ResizeMMTs1()
 {
 
     if(MMT_CURRENT) {
-        ED_init_im(); // aprŠs resize
+        ED_init_im(); // aprï¿½s resize
         ED_set_pos();
         ED_display();
         ED_set_cursor();
