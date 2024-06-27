@@ -807,16 +807,19 @@ extern  int     G_CUR_TITLE;
 #define G_MAXOBS            1024
 
 /*------ ESTIMATION ------------ */
-#define E_NO_EQ_ERR     1
-#define E_MEM_ERR       2
-#define E_SYNTAX_ERR    3
-#define E_LINK_ERR      4
-#define E_DREG_ERR      5
-#define E_NAN_ERR       6
-#define E_VCC_SING_ERR  7
-#define E_VCU_SING_ERR  8
-#define E_GMG_SING_ERR  9
-#define E_NO_SCALARS    10
+enum IodeEstimationError
+{
+    EST_NO_EQ_ERR = 1,
+    EST_MEM_ERR,
+    EST_SYNTAX_ERR,
+    EST_LINK_ERR,
+    EST_DREG_ERR,
+    EST_NAN_ERR,
+    EST_VCC_SING_ERR,
+    EST_VCU_SING_ERR,
+    EST_GMG_SING_ERR,
+    EST_NO_SCALARS
+};
 
 
 /* SIMULATION */

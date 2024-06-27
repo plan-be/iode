@@ -18,7 +18,7 @@
  *  
  *  List of global variables
  *  ------------------------
- * int       E_errno;        Last estimation error number (between E_NO_EQ_ERR and E_NO_SCALARS
+ * int       E_errno;        Last estimation error number (between EST_NO_EQ_ERR and EST_NO_SCALARS
  * int       E_NEQ;          Number of equations in the current block of equations
  * int       E_NCE;          Number of estimated coefficients in the current block of equations
  * int       E_NC;           Number of coefficients (est and non est) in the current block of equations
@@ -152,7 +152,7 @@ static int E_c_rhs()
             x = E_rhs_ij(i, t);
             if(IODE_IS_A_NUMBER(x)) MATE(E_RHS, i, t) = x;
             else  {
-                E_errno = E_NAN_ERR;
+                E_errno = EST_NAN_ERR;
                 return(-1);
             }
         }
@@ -186,7 +186,7 @@ static int E_residuals()
 static int E_deltac()
 {
     M_solve(E_dC, E_VCC, E_GMU);
-    if(M_errno) return(E_errno = E_VCC_SING_ERR);
+    if(M_errno) return(E_errno = EST_VCC_SING_ERR);
     return(0);
 }
 
@@ -207,7 +207,7 @@ static int E_deltac()
  *  @param [in] int     coef_nb     coefficient position in the list of all coefs, non estimed include
  *  @param [in] int     est_coef_nb coefficient position in the list of estimated coefs
  *  @param [in] double  h           step used to compute the numerical derivative
- *  @return     int                 0 on success, -1 on error (E_errno set to E_NAN_ERR)
+ *  @return     int                 0 on success, -1 on error (E_errno set to EST_NAN_ERR)
  */
 static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
 {
@@ -226,7 +226,7 @@ static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
                     MATE(E_G, est_coef_nb, i * E_T + j) =
                         (x - MATE(E_RHS, i, j)) / h;
                 else  {
-                    E_errno = E_NAN_ERR;
+                    E_errno = EST_NAN_ERR;
                     return(-1);
                 }
             }
@@ -406,12 +406,12 @@ static int E_c_vcu()
  *  
  *      IVCU = VCU^-1  (NEQ x NEQ)
  *  
- *  @return     int     0 on success, E_errno = E_VCU_SING_ERR on error
+ *  @return     int     0 on success, E_errno = EST_VCU_SING_ERR on error
  */
 static int E_c_ivcu()
 {
     M_inv_1(E_IVCU, E_VCU);
-    if(M_errno) return(E_errno = E_VCU_SING_ERR);
+    if(M_errno) return(E_errno = EST_VCU_SING_ERR);
     return(0);
 }
 
@@ -445,12 +445,12 @@ static int E_c_mcu()
  *  
  *      VCC = VCC^-1 (NCE x NCE)
  *  
- *  @return     int     0 on success, E_errno = E_VCC_SING_ERR on error
+ *  @return     int     0 on success, E_errno = EST_VCC_SING_ERR on error
  */
 static int E_c_ivcc()
 {
     M_inv_1(E_VCCTMP, E_VCC);
-    if(M_errno != 0) return(E_errno = E_VCC_SING_ERR);
+    if(M_errno != 0) return(E_errno = EST_VCC_SING_ERR);
     M_copy(E_VCC, E_VCCTMP);
     return(0);
 }
