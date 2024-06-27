@@ -83,7 +83,7 @@ void MenuComputeSimulation::compute()
         bool debug = qCheckDebug->extractAndVerify();
         double relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
         VariablesInitialization initialisation = (VariablesInitialization) qSimInitialisation->extractAndVerify();
-        EnumSimulationSortAlgorithm sort_algorithm = (EnumSimulationSortAlgorithm) qSortAlgorithm->extractAndVerify();
+        SimuSortAlgorithm sort_algorithm = (SimuSortAlgorithm) qSortAlgorithm->extractAndVerify();
         int nb_passes = qNbPasses->extractAndVerify();
 
         Simulation sim;

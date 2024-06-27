@@ -6,13 +6,6 @@
 #include "KDB/kdb_lists.h"
 
 
-enum EnumSimulationSortAlgorithm
-{
-    I_SORT_CONNEX = SORT_CONNEX,
-    I_SORT_BOTH = SORT_BOTH,
-    I_SORT_NONE = SORT_NONE
-};
-
 const static std::vector<std::string> v_simulation_sort_algorithm =
 {
     "Connex compon. decomposition",
@@ -68,9 +61,9 @@ public:
         KSIM_NEWTON_MAXIT = nb_iterations;
     }
 
-    EnumSimulationSortAlgorithm get_sort_algorithm()
+    SimuSortAlgorithm get_sort_algorithm()
     {
-        return (EnumSimulationSortAlgorithm) KSIM_SORT;
+        return (SimuSortAlgorithm) KSIM_SORT;
     }
 
     std::string get_sort_algorithm_as_string()
@@ -78,7 +71,7 @@ public:
         return v_simulation_sort_algorithm[KSIM_SORT];
     }
 
-    void set_sort(EnumSimulationSortAlgorithm sort_algorithm)
+    void set_sort(SimuSortAlgorithm sort_algorithm)
     {
         KSIM_SORT = sort_algorithm;
     }

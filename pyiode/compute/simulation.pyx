@@ -3,7 +3,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from pyiode.compute.simulation cimport CSimulation
-from pyiode.common cimport EnumSimulationSortAlgorithm, VariablesInitialization
+from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
 
 # Simulation wrapper class
@@ -388,7 +388,7 @@ cdef class Simulation:
             value = value.upper()
             value = SimulationSort[value]
         value = int(value)
-        self.c_simulation.set_sort(<EnumSimulationSortAlgorithm>value)
+        self.c_simulation.set_sort(<SimuSortAlgorithm>value)
 
     @property
     def initialization_method(self) -> str:
