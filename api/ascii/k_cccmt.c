@@ -102,7 +102,7 @@ KDB *KC_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_CMT, K_ASIS);
+    kdb = K_create(K_CMT, ASIS_CASE);
     
     //DebugForce("filename: %s", kdb->k_nameptr);
     

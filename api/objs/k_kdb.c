@@ -73,7 +73,7 @@ void K_sort(KDB* kdb)
 /**
  *  @brief Allocates and initialise a KDB struct.
  *  
- *  Object "mode" (K_UPPER, K_LOWER or K_ASIS) is assigned according to object type. 
+ *  Object "mode" (UPPER_CASE, LOWER_CASE or ASIS_CASE) is assigned according to object type. 
  *  
  *  @param [in] type        int     KDB object type (K_CMT...K_VAR).
  *  @param [in] filename    char*   file where the KDB will be saved (can be changed before saving the KDB).
@@ -87,17 +87,17 @@ KDB *K_init_kdb(int type, char* filename)
 
     switch(type) {
         case K_CMT :
-            mode = K_ASIS;
+            mode = ASIS_CASE;
             break;
         case K_EQS :
         case K_IDT :
         case K_LST :
         case K_TBL :
         case K_VAR :
-            mode = K_UPPER;
+            mode = UPPER_CASE;
             break;
         case K_SCL :
-            mode = K_LOWER;
+            mode = LOWER_CASE;
             break;
     }
     kdb = K_create(type, mode);
@@ -169,7 +169,7 @@ void K_set_kdb_fullpath(KDB *kdb, U_ch *filename)
  *  Depending on value of the mode parameter, the object names will be automatically translated to lower or upper case or let unmodified.
  *    
  *  @param [in] type    int     type of object the KDB will contain
- *  @param [in] mode    int     case of the object name: K_UPPER, K_LOWER or K_ASIS 
+ *  @param [in] mode    int     case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
  *  @return             KDB*    new allocated KDB
  *  
  */

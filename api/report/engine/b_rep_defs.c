@@ -6,7 +6,7 @@
  *  Implementation of the report $defines and of the mechanism to push/pop macros in PROCDEF 
  *  and FOREACH blocks.
  *  
- *  The $defines are stored in a special KDB (RP_MACRO) of type K_ASIS.
+ *  The $defines are stored in a special KDB (RP_MACRO) of type ASIS_CASE.
  *  
  *  List of functions
  *  -----------------
@@ -37,7 +37,7 @@ KDB     *RP_MACRO = NULL;   // KDB containing the macros during a report executi
 int RP_macro_createdb()
 {
     if(RP_MACRO) return(0);
-    RP_MACRO = K_create(K_OBJ, K_ASIS);
+    RP_MACRO = K_create(K_OBJ, ASIS_CASE);
     if(RP_MACRO == NULL) {
         B_seterrn(250);
         return(-3);

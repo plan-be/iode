@@ -340,7 +340,7 @@ KDB  *K_load_odbc(int ftype, char *odbc, int no, char **objs)
     odsn = OOpenDSN(tbl[0], "", "");
     if(odsn == NULL) goto err;
 
-    kdb = K_create(ftype, K_UPPER);
+    kdb = K_create(ftype, UPPER_CASE);
     // Sample 
     sprintf(buf, "SELECT DISTINCT Begin, End FROM %s WHERE Project='RSZ'", tbl[1]);
     ocsr = OQuery(odsn, buf);

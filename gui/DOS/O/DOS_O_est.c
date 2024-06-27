@@ -186,12 +186,12 @@ ODE_blk_res_fn()
             SCR_add_ptr(&E_txt, &E_ntxt,    "Correlation");
             SCR_add_ptr(&E_txt, &E_ntxt,    "St dev of residuals");
             SCR_add_ptr(&E_txt, &E_ntxt,    "Mean of YOBS");
-            SCR_add_ptr(&E_txt, &E_ntxt,    "ä Residualsý");
+            SCR_add_ptr(&E_txt, &E_ntxt,    "ï¿½ Residualsï¿½");
             SCR_add_ptr(&E_txt, &E_ntxt,    "Standard error");
             SCR_add_ptr(&E_txt, &E_ntxt,    "Standard error in %");
             SCR_add_ptr(&E_txt, &E_ntxt,    "F-stat");
-            SCR_add_ptr(&E_txt, &E_ntxt,    "Rý");
-            SCR_add_ptr(&E_txt, &E_ntxt,    "Rý adjusted");
+            SCR_add_ptr(&E_txt, &E_ntxt,    "Rï¿½");
+            SCR_add_ptr(&E_txt, &E_ntxt,    "Rï¿½ adjusted");
             SCR_add_ptr(&E_txt, &E_ntxt,    "Durbin-Watson");
             SCR_add_ptr(&E_txt, &E_ntxt,    "Log Likelihood");
             SCR_add_ptr(&E_txt, &E_ntxt,    NULL);
@@ -241,12 +241,12 @@ fin:
 ODE_blk_init()
 {
     if(OE_DBE == NULL) {
-        OE_DBE = K_create(K_OBJ, K_UPPER);
+        OE_DBE = K_create(K_OBJ, UPPER_CASE);
         if(OE_DBE == NULL) goto err;
     }
 
     if(OE_DBS == NULL) {
-        OE_DBS = K_create(K_SCL, K_LOWER);
+        OE_DBS = K_create(K_SCL, LOWER_CASE);
         if(OE_DBS == NULL) {
             K_free(OE_DBE);
             OE_DBE = NULL;
@@ -302,7 +302,7 @@ ODE_blk_check()
 
     /* Check names */
     for(i = 0; i < nblk; i++)         /* JMP 24-02-98 */
-        if(K_key(blk[i], K_UPPER) < 0) {
+        if(K_key(blk[i], UPPER_CASE) < 0) {
             rc = -1;
             B_seterrn(213);
             goto cleanup;

@@ -104,7 +104,7 @@ KDB *KS_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_SCL, K_LOWER); 
+    kdb = K_create(K_SCL, LOWER_CASE); 
     K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 30/11/2022
     while(1) {
         switch(YY_lex(yy)) {

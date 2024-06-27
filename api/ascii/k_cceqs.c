@@ -257,7 +257,7 @@ KDB *KE_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_EQS, K_UPPER);
+    kdb = K_create(K_EQS, UPPER_CASE);
         
     while(1) {
         switch(YY_read(yy)) {

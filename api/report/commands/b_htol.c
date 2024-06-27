@@ -112,7 +112,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    to = K_create(K_VAR, K_UPPER);
+    to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
     t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
     f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(IODE_REAL));
@@ -179,7 +179,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         goto done;
     }
 
-    kdb_to = K_create(K_VAR, K_UPPER);
+    kdb_to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb_to), t_smpl, sizeof(SAMPLE));
     t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
     f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(kdb_from)->s_nb) * sizeof(IODE_REAL));

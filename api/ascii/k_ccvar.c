@@ -89,7 +89,7 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
     SAMPLE  *smpl, *kasksmpl();
 
     // Create and empty KDB for vars
-    kdb = K_create(K_VAR, K_UPPER);
+    kdb = K_create(K_VAR, UPPER_CASE);
 
     // The keyword sample must be the first on the YY stream */
     // if not:
