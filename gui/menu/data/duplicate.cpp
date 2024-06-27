@@ -61,7 +61,7 @@ void MenuDataDuplicateObj::duplicate()
         case SCALARS:
             Scalars.add(dup_obj_name, Scalars.copy(obj_name));
             break; 
-        case I_TABLES:
+        case TABLES:
             Tables.add(dup_obj_name, Tables.copy(obj_name));
             break; 
         case I_VARIABLES:

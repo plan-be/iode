@@ -80,7 +80,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                         found = !SCR_grep_gnl(pattern, KECMT(kdb, i), ecase, all);
                     break;
 
-                case K_TBL:
+                case TABLES:
                     tbl = KTVAL(kdb, i);
                     for(k = 0; k < T_NL(tbl) && !found; k++) {
                         tline = tbl->t_line + k;

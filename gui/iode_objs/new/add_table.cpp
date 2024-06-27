@@ -7,7 +7,7 @@ AddTableDialog::AddTableDialog(KDBTables* database, QWidget* parent) : IodeSetti
 	completer = new IodeCompleter(false, false, {SCALARS, I_VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 
-    lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_TABLES, REQUIRED_FIELD);
+    lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, TABLES, REQUIRED_FIELD);
     spinNbColumns = new WrapperSpinBox(label_nb_columns->text(), *spinBox_nb_columns, REQUIRED_FIELD);
     lineTitle = new WrapperQLineEdit(label_table_title->text(), *lineEdit_table_title, REQUIRED_FIELD);
     textLEC = new WrapperQPlainTextEdit(label_lec->text(), *textEdit_lec, REQUIRED_FIELD);

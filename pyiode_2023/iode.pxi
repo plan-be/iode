@@ -36,7 +36,7 @@ EQUATIONS = 1
 IDENTITIES = 2
 LISTS = 3
 SCALARS = 4
-K_TBL = 5
+TABLES = 5
 K_VAR = 6
 
 # Simulation parameters

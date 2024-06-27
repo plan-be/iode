@@ -113,7 +113,7 @@ public:
 class TablesWidget : public TemplateIodeObjectWidget<TablesModel, TablesView>
 {
 public:
-    TablesWidget(QWidget* parent) : TemplateIodeObjectWidget(I_TABLES, parent) 
+    TablesWidget(QWidget* parent) : TemplateIodeObjectWidget(TABLES, parent) 
     {
         connect(objmodel, &TablesModel::dataChanged, this, &TablesWidget::databaseModified);
         connect(objmodel, &TablesModel::headerDataChanged, this, &TablesWidget::databaseModified);

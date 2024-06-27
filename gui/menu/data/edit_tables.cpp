@@ -6,7 +6,7 @@ MenuDataEditTables::MenuDataEditTables(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_TABLES, textEdit_table_names);
+    completer = new IodeCompleter(false, false, TABLES, textEdit_table_names);
     textEdit_table_names->setCompleter(completer);
 
     wTablesNames = new WrapperQPlainTextEdit(label_table_names->text(), *textEdit_table_names, REQUIRED_FIELD);

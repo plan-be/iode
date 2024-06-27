@@ -58,9 +58,9 @@ TEST_F(UtilsTest, getIodeFileType)
 	EXPECT_EQ(get_iode_file_type(filename), SCALARS_FILE);
 
 	filename = input_test_dir + "fun.tbl";
-	EXPECT_EQ(get_iode_file_type(filename), I_TABLES_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), TABLES_FILE);
 	filename = input_test_dir + "fun.at";
-	EXPECT_EQ(get_iode_file_type(filename), I_TABLES_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), TABLES_FILE);
 
 	filename = input_test_dir + "fun.var";
 	EXPECT_EQ(get_iode_file_type(filename), I_VARIABLES_FILE);

@@ -299,7 +299,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             KOBJS(kdb)[i].o_val = pos;
             break;
 
-        case K_TBL :
+        case TABLES :
             opos = KOBJS(kdb)[i].o_val;
             optr = SW_getptr(opos);
             tbl = K_tunpack(optr);

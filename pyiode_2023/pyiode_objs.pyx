@@ -99,7 +99,7 @@ def delete_scl(name: str):
     return delete_obj(name, SCALARS)
 
 def delete_tbl(name: str):
-    return delete_obj(name, K_TBL)
+    return delete_obj(name, TABLES)
 
 def delete_var(name: str):
     return delete_obj(name, K_VAR)

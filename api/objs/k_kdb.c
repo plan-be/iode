@@ -92,7 +92,7 @@ KDB *K_init_kdb(int type, char* filename)
         case EQUATIONS :
         case IDENTITIES :
         case LISTS :
-        case K_TBL :
+        case TABLES :
         case K_VAR :
             mode = UPPER_CASE;
             break;

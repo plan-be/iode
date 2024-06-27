@@ -122,7 +122,7 @@ int K_add(KDB* kdb, char* name, ...)
           scl = va_arg(vargs, SCL *);
           rc = K_spack(&pack, (char*) scl);
           break;            
-      case K_TBL: 
+      case TABLES: 
           tbl = va_arg(vargs, TBL *);
           rc = K_tpack(&pack, (char*)tbl);
           break;            

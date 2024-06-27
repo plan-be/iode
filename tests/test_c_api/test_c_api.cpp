@@ -1223,7 +1223,7 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
 
     sprintf(in_filename,  "%s\\fun.tbl", IODE_DATA_DIR);
 
-    kdb_tbl = K_interpret(K_TBL, in_filename);
+    kdb_tbl = K_interpret(TABLES, in_filename);
     EXPECT_NE(kdb_tbl, nullptr);
     if(kdb_tbl) {
         sprintf(out_filename, "%s\\fun_copy.at", IODE_OUTPUT_DIR);
@@ -1368,7 +1368,7 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     EXPECT_NE(kdbv, nullptr);
 
     // Load the TBL workspace
-    K_RWS[K_TBL][0] = K_WS[K_TBL] = kdbt  = U_test_K_interpret(K_TBL, "fun.tbl");
+    K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.tbl");
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[K_VAR][2]
@@ -1638,7 +1638,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     cond = (rc == 0) && U_test_eq(1.2, val);
     EXPECT_EQ(cond, 1);
 
-    rc = B_DataUpdate("U  Title of U;U;2*U"  , K_TBL);
+    rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
     smpl = KSMPL(KV_WS);
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , K_VAR);
     EXPECT_EQ(rc, 0);
@@ -2321,7 +2321,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsLoad("fun", IDENTITIES, 48);
     U_test_B_WsLoad("fun", LISTS, 17);
     U_test_B_WsLoad("fun", SCALARS, 161);
-    U_test_B_WsLoad("fun", K_TBL, 46);
+    U_test_B_WsLoad("fun", TABLES, 46);
     U_test_B_WsLoad("fun", K_VAR, 394);
 
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
@@ -2331,7 +2331,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsSave("fun", "fun2", IDENTITIES, 48);
     U_test_B_WsSave("fun", "fun2", LISTS, 17);
     U_test_B_WsSave("fun", "fun2", SCALARS, 161);
-    U_test_B_WsSave("fun", "fun2", K_TBL, 46);
+    U_test_B_WsSave("fun", "fun2", TABLES, 46);
     U_test_B_WsSave("fun", "fun2", K_VAR, 394);
 
     // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
@@ -2341,7 +2341,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsSaveCmp("fun", "fun2cmp", IDENTITIES, 48);
     U_test_B_WsSaveCmp("fun", "fun2cmp", LISTS, 17);
     U_test_B_WsSaveCmp("fun", "fun2cmp", SCALARS, 161);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", TABLES, 46);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
 
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
@@ -2351,7 +2351,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsExport("fun.idt", "fun2.ai", IDENTITIES);
     U_test_B_WsExport("fun.lst", "fun2.al", LISTS);
     U_test_B_WsExport("fun.scl", "fun2.as", SCALARS);
-    U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
+    U_test_B_WsExport("fun.tbl", "fun2.at", TABLES);
     U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
 
     // int B_WsClear(char* arg, int type)                $WsClear<type>
@@ -2361,7 +2361,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsClear(IDENTITIES);
     U_test_B_WsClear(LISTS);
     U_test_B_WsClear(SCALARS);
-    U_test_B_WsClear(K_TBL);
+    U_test_B_WsClear(TABLES);
     U_test_B_WsClear(K_VAR);
 
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
@@ -2371,7 +2371,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsImport("fun2.ai", IDENTITIES, 48);
     U_test_B_WsImport("fun2.al", LISTS, 17);
     U_test_B_WsImport("fun2.as", SCALARS, 161);
-    U_test_B_WsImport("fun2.at", K_TBL, 46);
+    U_test_B_WsImport("fun2.at", TABLES, 46);
     U_test_B_WsImport("fun2.av", K_VAR, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
 
@@ -2404,7 +2404,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsDescr("Ws content description", IDENTITIES);
     U_test_B_WsDescr("Ws content description", LISTS);
     U_test_B_WsDescr("Ws content description", SCALARS);
-    U_test_B_WsDescr("Ws content description", K_TBL);
+    U_test_B_WsDescr("Ws content description", TABLES);
     U_test_B_WsDescr("Ws content description", K_VAR);
 
     // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
@@ -2416,7 +2416,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsName("funtest", IDENTITIES);
     U_test_B_WsName("funtest", LISTS);
     U_test_B_WsName("funtest", SCALARS);
-    U_test_B_WsName("funtest", K_TBL);
+    U_test_B_WsName("funtest", TABLES);
     U_test_B_WsName("funtest", K_VAR);
 
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
@@ -2429,7 +2429,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsCopy("fun", IDENTITIES, 48);   // Idem in IDT NAWRU
     U_test_B_WsCopy("fun", LISTS, 17);
     U_test_B_WsCopy("fun", SCALARS, 161);
-    U_test_B_WsCopy("fun", K_TBL, 46);
+    U_test_B_WsCopy("fun", TABLES, 46);
 
 
     // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
@@ -2441,7 +2441,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsMerge("fun", EQUATIONS, 274);
     U_test_B_WsMerge("fun", IDENTITIES, 48);
     U_test_B_WsMerge("fun", SCALARS, 161);
-    U_test_B_WsMerge("fun", K_TBL, 46);
+    U_test_B_WsMerge("fun", TABLES, 46);
 
     // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
     U_test_print_title("B_WsExtrapolate");

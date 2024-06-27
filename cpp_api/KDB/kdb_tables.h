@@ -15,7 +15,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
-    KDBTables(const std::string& filepath="") : KDBTemplate(I_TABLES, filepath) {}
+    KDBTables(const std::string& filepath="") : KDBTemplate(TABLES, filepath) {}
 
     KDBTables* subset(const std::string& pattern, const bool deep_copy=false)
     {

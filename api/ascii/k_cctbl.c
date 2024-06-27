@@ -425,7 +425,7 @@ KDB *KT_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_TBL, UPPER_CASE);
+    kdb = K_create(TABLES, UPPER_CASE);
     K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 30/11/2022
     
     while(1) {
@@ -433,7 +433,7 @@ KDB *KT_load_asc(char* filename)
             case YY_EOF :
                 if(cmpt) {
                     char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, K_TBL);
+                    K_set_ext_asc(asc_filename, filename, TABLES);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

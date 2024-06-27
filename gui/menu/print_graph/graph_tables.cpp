@@ -6,7 +6,7 @@ MenuGraphTables::MenuGraphTables(QWidget* parent) :
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_TABLES, textEdit_table_names);
+    completer = new IodeCompleter(false, false, TABLES, textEdit_table_names);
     textEdit_table_names->setCompleter(completer);
 
     QList<QString> q_langs;

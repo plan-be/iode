@@ -113,7 +113,7 @@ int i;
 	case IDENTITIES :strcpy(STATIC_BUF, "IDENTITY");    break;
 	case LISTS :strcpy(STATIC_BUF, "LIST");        break;
 	case SCALARS :strcpy(STATIC_BUF, scl[i]);        break;
-	case K_TBL :strcpy(STATIC_BUF, "TABLE TITLE"); break;
+	case TABLES :strcpy(STATIC_BUF, "TABLE TITLE"); break;
 	}
     if((type == K_VAR && !(scrl->sc_ir)) || type == SCALARS) { /* JMP 10-02-97 */
 	SCR_pad(STATIC_BUF, len);
@@ -189,7 +189,7 @@ int i, j;
     case LISTS :
 	    return(KLVAL(kdb, i));
 
-    case K_TBL :
+    case TABLES :
 	    tbl = KTVAL(kdb, i);
 /*            if(j == 0) sprintf(STATIC_BUF, "%d", tbl->t_nc); */
 	    T_get_title(tbl);     /* JMP 13-11-93 */
@@ -245,7 +245,7 @@ int i;
 	case COMMENTS :
 	case EQUATIONS :
 	case IDENTITIES :
-	case K_TBL :
+	case TABLES :
 	case LISTS :
 		    // return(65); /* JMP 09-01-11 */
 		    return(SCR_PAGE_SIZE[1] - 10); /* JMP 09-01-11 */
@@ -290,7 +290,7 @@ int i, j;
 	case LISTS :
 	case K_VAR :  rc = ODE_edit_obj1(kdb, -1); break;
 	case SCALARS :  rc = ODE_edit_scl(kdb, -1, -1); break;
-	case K_TBL :  rc = ODE_edit_tbl(kdb, -1, -1); break;
+	case TABLES :  rc = ODE_edit_tbl(kdb, -1, -1); break;
 	default    :  return(-1);
 	}
 #ifndef SCR4W32 /* JMP 10-02-97 */
@@ -306,7 +306,7 @@ int i, j;
     KDB         *kdb = (KDB *) scrl->sc_pcl;  /* JMP 10-02-97 */
 
     if(ODE_VIEW) {
-	if(KTYPE(kdb) == K_TBL)
+	if(KTYPE(kdb) == TABLES)
 	    switch(ODE_VIEW) {
 	    case 1: B_ViewPrintTbl_1(KONAME(kdb, i), ODE_SMPL); break;
 	    case 2: B_ViewPrintGr_1(KONAME(kdb, i), ODE_SMPL); break;
@@ -320,7 +320,7 @@ int i, j;
     case IDENTITIES :
     case LISTS :  return(ODE_edit_obj1(kdb, i));
     case SCALARS :  return(ODE_edit_scl_cell(kdb, i, j));
-    case K_TBL :  return(ODE_edit_tbl(kdb, i, -1));
+    case TABLES :  return(ODE_edit_tbl(kdb, i, -1));
     case K_VAR :  return(ODE_edit_var_cell(kdb, i, j));
     default    :  return(-1);
     }
@@ -440,7 +440,7 @@ int     key, i, j;
 	    if(KTYPE(kdb) == K_VAR) global_PREC = (global_PREC == 8) ? 15 : 8; /* JMP 29-04-98 */
 	    break;
 	case SCR_F7  :
-	    if(KTYPE(kdb) == K_TBL)
+	    if(KTYPE(kdb) == TABLES)
 		B_ViewPrintTbl_1(KONAME(kdb, i), ODE_SMPL);
 	    if(KTYPE(kdb) == IDENTITIES) {
 		sprintf(buf, "%s %s %s",
@@ -456,7 +456,7 @@ int     key, i, j;
 	    break;
 	case SCR_F8  :
 	    if(KTYPE(kdb) == K_VAR) C_AutoEditGraph(KONAME(kdb, i), global_VM);
-	    if(KTYPE(kdb) == K_TBL) B_ViewPrintGr_1(KONAME(kdb, i), ODE_SMPL);
+	    if(KTYPE(kdb) == TABLES) B_ViewPrintGr_1(KONAME(kdb, i), ODE_SMPL);
 	    break;
 
 	case SCR_S_F8  :
@@ -543,7 +543,7 @@ int     *l, *c;
 
     kdb = scrl->sc_pcl; /* JMP 10-02-97 */
     if(KTYPE(kdb) == K_VAR) *c = global_VS;
-    if(KTYPE(kdb) == K_TBL && ODE_SMPL[0] == '\0') {
+    if(KTYPE(kdb) == TABLES && ODE_SMPL[0] == '\0') {
 	sprintf(ODE_SMPL, "%s:%d", PER_pertoa(&(KSMPL(KV_WS)->s_p1), NULL), KSMPL(KV_WS)->s_nb);
     }
     return(0);
@@ -771,7 +771,7 @@ ag:
 	    SCRL->sc_scmts = OSCRL_VARSCMTS;
 	    NOHSBAR = 1;
 	    break;
-	case K_TBL :
+	case TABLES :
 	    SCRL->sc_cmt = "Space=Menu F1=Hlp F2=Name+ F7=Test F8=Graph Esc=Quit Enter=Edit Ins=Add Delete";
 	    SCRL->sc_scmts = OSCRL_TABSCMTS;
 	    NOROT   = 1;

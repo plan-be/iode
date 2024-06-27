@@ -308,7 +308,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             rc = B_PrintDefScl(kdb, pos);
             W_flush();
             break;
-        case K_TBL :
+        case TABLES :
             rc = B_PrintDefTbl(kdb, pos);
             W_flush();
             break;
@@ -769,13 +769,13 @@ char    *name, *smpl;
     int rc, pos;
     TBL *tbl;
 
-    pos = K_find(K_WS[K_TBL], name);
+    pos = K_find(K_WS[TABLES], name);
     if (pos < 0) {
 	B_seterror("Table %.80s not found", name);
 	return(-1);
     }
 
-    tbl = KTVAL(K_WS[K_TBL], pos);
+    tbl = KTVAL(K_WS[TABLES], pos);
     rc = T_print_tbl(tbl, smpl);
     if(rc < 0) B_seterror("Table %.80s not printed", name);
 
