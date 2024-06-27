@@ -37,9 +37,9 @@ static int check_scl_var(char *eqs)
 
     for(j = 0 ; j < cl->nb_names ; j++) {
         if(L_ISCOEF(cl->lnames[j].name)) {
-            if(K_find(K_WS[K_SCL],cl->lnames[j].name)== -1) {
+            if(K_find(K_WS[SCALARS],cl->lnames[j].name)== -1) {
                 sprintf(buf, "%s 0.9 1", cl->lnames[j].name);
-                B_DataUpdate(buf, K_SCL);
+                B_DataUpdate(buf, SCALARS);
             }
         }
         else {

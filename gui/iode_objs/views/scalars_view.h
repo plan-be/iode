@@ -24,7 +24,7 @@ class ScalarsView : public IodeAbstractTableView, public TableViewAddObj<Scalars
 
 public:
 	ScalarsView(QWidget* parent = nullptr) 
-		: IodeAbstractTableView(I_SCALARS, new ScalarsDelegate(parent), parent), TableViewAddObj(this), numeric(false) 
+		: IodeAbstractTableView(SCALARS, new ScalarsDelegate(parent), parent), TableViewAddObj(this), numeric(false) 
 	{
 		numeric.setup(this);
 	};

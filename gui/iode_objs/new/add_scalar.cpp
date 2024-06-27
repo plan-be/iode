@@ -5,7 +5,7 @@ AddScalarDialog::AddScalarDialog(KDBScalars* database, QWidget* parent) : IodeSe
 {
 	setupUi(this);
 
-	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_SCALARS, REQUIRED_FIELD);
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, SCALARS, REQUIRED_FIELD);
 	lineValue = new WrapperQLineEdit(label_value->text(), *lineEdit_value, REQUIRED_FIELD);
 	spinBoxRelax = new WrapperDoubleSpinBox(label_relax->text(), *doubleSpinBox_relax, REQUIRED_FIELD);
 

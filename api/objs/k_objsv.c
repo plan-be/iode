@@ -118,7 +118,7 @@ int K_add(KDB* kdb, char* name, ...)
           txt = va_arg(vargs, char *);
           rc = K_lpack(&pack, txt);
           break;            
-      case K_SCL: 
+      case SCALARS: 
           scl = va_arg(vargs, SCL *);
           rc = K_spack(&pack, (char*) scl);
           break;            

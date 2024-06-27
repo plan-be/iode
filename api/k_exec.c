@@ -178,7 +178,7 @@ static KDB *KI_scalar_list(KDB* dbi)
     LNAME   *lname;
     CLEC    *clec, *tclec;
 
-    dbs = K_create(K_SCL, LOWER_CASE);
+    dbs = K_create(SCALARS, LOWER_CASE);
     for(i = 0; i < KNB(dbi); i++) {
         clec = KICLEC(dbi, i);
         tclec = (CLEC *)SW_nalloc(clec->tot_lg);
@@ -546,7 +546,7 @@ static int KI_read_scls_file(KDB* dbs, char* file)
     SCR_add_ptr(&scls, &nbs, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
-    kdb = K_load(K_SCL, file, nbs, scls);
+    kdb = K_load(SCALARS, file, nbs, scls);
     if(kdb == 0) {
         B_seterrn(96, file);
         return(-1);

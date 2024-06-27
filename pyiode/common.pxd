@@ -14,7 +14,7 @@ cdef extern from "cpp_api/common.h":
         EQUATIONS,
         IDENTITIES,
         LISTS,
-        I_SCALARS,
+        SCALARS,
         I_TABLES,
         I_VARIABLES
 
@@ -25,7 +25,7 @@ cdef extern from "cpp_api/common.h":
         EQUATIONS_FILE,
         IDENTITIES_FILE,
         LISTS_FILE,
-        I_SCALARS_FILE,
+        SCALARS_FILE,
         I_TABLES_FILE,
         I_VARIABLES_FILE,
         I_REPORTS_FILE,

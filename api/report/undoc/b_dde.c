@@ -552,7 +552,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     type = IodeDdeType(szTopic);
     if(type < 0 || type > 6) return(SCR_stracpy("Error"));
     kdb = K_WS[type];
-    if(type == K_SCL) SCR_lower(szItem);
+    if(type == SCALARS) SCR_lower(szItem);
     objnb = K_find(kdb, szItem);
     if(objnb < 0) return((char *)0);
 
@@ -581,7 +581,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             }
             return(res);
 
-        case K_SCL :
+        case SCALARS :
             res = SCR_malloc(40);
             scl = KSVAL(kdb, objnb);
             if(!L_ISAN(scl->val)) strcpy(res, "0");
@@ -965,7 +965,7 @@ int B_ExcelSet(char *arg, int type)
         case EQUATIONS :
             ptr = SCR_stracpy(KELEC(kdb, pos));
             break;
-        case K_SCL :
+        case SCALARS :
             scl = KSVAL(kdb, pos); /* JMP 10-08-00 */
             d = scl->val;          /* JMP 10-08-00 */
             ptr = SCR_malloc(80);  /* JMP 10-08-00 */

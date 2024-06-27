@@ -81,8 +81,8 @@ public:
         case LISTS:
             iodeDatabases.insert(LISTS, &Lists);
             break;
-        case I_SCALARS:
-            iodeDatabases.insert(I_SCALARS, &Scalars);
+        case SCALARS:
+            iodeDatabases.insert(SCALARS, &Scalars);
             break;
         case I_TABLES:
             iodeDatabases.insert(I_TABLES, &Tables);
@@ -112,7 +112,7 @@ public:
             iodeDatabases.insert(EQUATIONS, &Equations);
             iodeDatabases.insert(IDENTITIES, &Identities);
             iodeDatabases.insert(LISTS, &Lists);
-            iodeDatabases.insert(I_SCALARS, &Scalars);
+            iodeDatabases.insert(SCALARS, &Scalars);
             iodeDatabases.insert(I_TABLES, &Tables);
             iodeDatabases.insert(I_VARIABLES, &Variables);
         }

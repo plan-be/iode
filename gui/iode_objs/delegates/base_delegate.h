@@ -22,7 +22,7 @@ class BaseDelegate : public QStyledItemDelegate
 public:
 	BaseDelegate(EnumIodeType iodeType, QObject* parent = nullptr) : QStyledItemDelegate(parent), iodeType(iodeType) 
 	{
-		lineEdit = iodeType == I_SCALARS || iodeType == I_VARIABLES;
+		lineEdit = iodeType == SCALARS || iodeType == I_VARIABLES;
 	}
 
 	~BaseDelegate() {}

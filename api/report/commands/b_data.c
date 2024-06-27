@@ -229,9 +229,9 @@ int B_DataCalcVar(char* arg)
 
     if(lec[0]) {
         clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, K_WS[K_SCL], clec)) {
+        if(clec != 0 && !L_link(kdb, K_WS[SCALARS], clec)) {
             for(t = 0 ; t < KSMPL(kdb)->s_nb ; t++) {
-                d = L_exec(kdb, K_WS[K_SCL], clec, t);
+                d = L_exec(kdb, K_WS[SCALARS], clec, t);
                 *(KVVAL(kdb, pos, t)) = d;
             }
             SW_nfree(clec);
@@ -266,7 +266,7 @@ int B_DataCreate_1(char* arg, int* ptype)
     switch(*ptype) {
         case COMMENTS :
         case LISTS :
-        case K_SCL :
+        case SCALARS :
             if(K_add(kdb, arg, NULL) < 0) return(-1);
             else return(0);
 
@@ -481,7 +481,7 @@ int B_DataUpdate(char* arg, int type)
         rc = K_upd_tbl(name, arg + lg + 1);
         break;
 
-    case K_SCL : /* Name Val [Relax] */
+    case SCALARS : /* Name Val [Relax] */
         args = SCR_vtoms(arg, B_SEPS);
         nb_args = SCR_tbl_size(args);
         scl.val = 0.9;
@@ -886,7 +886,7 @@ int B_DataAppend(char* arg, int type)
 
     case EQUATIONS :
     case IDENTITIES :
-    case K_SCL :
+    case SCALARS :
     case K_TBL :
     case K_VAR :
         B_seterror("DataAppend : only lists and comments");

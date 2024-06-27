@@ -247,7 +247,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             KOBJS(kdb)[i].o_val = pos;
             break;
 
-        case K_SCL :
+        case SCALARS :
             if(vers == 2) return;
             nb = 3;
             /* Do New allocation & get dbl ptr*/

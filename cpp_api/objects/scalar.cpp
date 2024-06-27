@@ -11,7 +11,7 @@ Scalar::Scalar()
 Scalar::Scalar(const int pos, KDB* kdb)
 {
     if (!kdb) 
-        kdb = K_WS[I_SCALARS];
+        kdb = K_WS[SCALARS];
 
     if (pos < 0 || pos > kdb->k_nb)
     {
@@ -31,7 +31,7 @@ Scalar::Scalar(const int pos, KDB* kdb)
 Scalar::Scalar(const std::string& name, KDB* kdb)
 {
     if (!kdb) 
-        kdb = K_WS[I_SCALARS];
+        kdb = K_WS[SCALARS];
 
     int pos = K_find(kdb, to_char_array(name));
     if (pos < 0) 

@@ -112,10 +112,10 @@ int i;
 	case EQUATIONS :strcpy(STATIC_BUF, "EQUATION");    break;
 	case IDENTITIES :strcpy(STATIC_BUF, "IDENTITY");    break;
 	case LISTS :strcpy(STATIC_BUF, "LIST");        break;
-	case K_SCL :strcpy(STATIC_BUF, scl[i]);        break;
+	case SCALARS :strcpy(STATIC_BUF, scl[i]);        break;
 	case K_TBL :strcpy(STATIC_BUF, "TABLE TITLE"); break;
 	}
-    if((type == K_VAR && !(scrl->sc_ir)) || type == K_SCL) { /* JMP 10-02-97 */
+    if((type == K_VAR && !(scrl->sc_ir)) || type == SCALARS) { /* JMP 10-02-97 */
 	SCR_pad(STATIC_BUF, len);
 	U_center_text(STATIC_BUF);
 	}
@@ -196,7 +196,7 @@ int i, j;
 	    T_free(tbl);
 	    return(STATIC_BUF);
 
-    case K_SCL :
+    case SCALARS :
 	    scl = (SCL *) KSVAL(kdb, i);
 	    switch(j) {
 		case 0 : var = scl->val; break;
@@ -230,7 +230,7 @@ SCROLL  *scrl;
 
     switch(KTYPE(kdb)) {
 	case K_VAR :  return((int) KSMPL(kdb)->s_nb);
-	case K_SCL :  return(4);
+	case SCALARS :  return(4);
 	default    :  return(1);
     }
 }
@@ -249,7 +249,7 @@ int i;
 	case LISTS :
 		    // return(65); /* JMP 09-01-11 */
 		    return(SCR_PAGE_SIZE[1] - 10); /* JMP 09-01-11 */
-	case K_SCL : return((int)global_SW);
+	case SCALARS : return((int)global_SW);
 	case K_VAR : return((int)global_VW);
 	}
 }
@@ -289,7 +289,7 @@ int i, j;
 	case IDENTITIES :
 	case LISTS :
 	case K_VAR :  rc = ODE_edit_obj1(kdb, -1); break;
-	case K_SCL :  rc = ODE_edit_scl(kdb, -1, -1); break;
+	case SCALARS :  rc = ODE_edit_scl(kdb, -1, -1); break;
 	case K_TBL :  rc = ODE_edit_tbl(kdb, -1, -1); break;
 	default    :  return(-1);
 	}
@@ -319,7 +319,7 @@ int i, j;
     case EQUATIONS :
     case IDENTITIES :
     case LISTS :  return(ODE_edit_obj1(kdb, i));
-    case K_SCL :  return(ODE_edit_scl_cell(kdb, i, j));
+    case SCALARS :  return(ODE_edit_scl_cell(kdb, i, j));
     case K_TBL :  return(ODE_edit_tbl(kdb, i, -1));
     case K_VAR :  return(ODE_edit_var_cell(kdb, i, j));
     default    :  return(-1);
@@ -382,7 +382,7 @@ int     i, j;
 {
     KDB     *kdb = (KDB *) scrl->sc_pcl; /* JMP 10-02-97 */
 
-    if(KTYPE(kdb) == K_SCL) {
+    if(KTYPE(kdb) == SCALARS) {
 	switch(j) {
 	    case 0 : return(SCR_BLUE);
 	    case 1 : return(30);
@@ -413,19 +413,19 @@ int     key, i, j;
 	case SCR_S_F2 : ODE_adj_title(scrl, -1); break; /* JMP 10-02-97 */
 	case SCR_F3  :
 	    if(KTYPE(kdb) == K_VAR) ODE_adj_vwidth(scrl, 1); /* JMP 10-02-97 */
-	    if(KTYPE(kdb) == K_SCL) ODE_adj_swidth(1);
+	    if(KTYPE(kdb) == SCALARS) ODE_adj_swidth(1);
 	    break;
 	case SCR_S_F3  :
 	    if(KTYPE(kdb) == K_VAR) ODE_adj_vwidth(scrl, -1);/* JMP 10-02-97 */
-	    if(KTYPE(kdb) == K_SCL) ODE_adj_swidth(-1);
+	    if(KTYPE(kdb) == SCALARS) ODE_adj_swidth(-1);
 	    break;
 	case SCR_F4  :
 	    if(KTYPE(kdb) == K_VAR) ODE_adj_vndec(1);
-	    if(KTYPE(kdb) == K_SCL) ODE_adj_sndec(1);
+	    if(KTYPE(kdb) == SCALARS) ODE_adj_sndec(1);
 	    break;
 	case SCR_S_F4  :
 	    if(KTYPE(kdb) == K_VAR) ODE_adj_vndec(-1);
-	    if(KTYPE(kdb) == K_SCL) ODE_adj_sndec(-1);
+	    if(KTYPE(kdb) == SCALARS) ODE_adj_sndec(-1);
 	    break;
 	case SCR_F5  :
 	    if(KTYPE(kdb) == K_VAR) global_VM = (global_VM + 1) % 5;
@@ -760,7 +760,7 @@ ag:
 	    NOROT   = 1;
 	    NOHSBAR = 1;
 	    break;
-	case  K_SCL :
+	case  SCALARS :
 	    SCRL->sc_cmt = "Space=Menu F1=Help F2=Name+ F3=Cell+ F4=NDec+ Esc=Quit Enter=Edit Ins=Add Delete";
 	    SCRL->sc_scmts = OSCRL_SCMTS;
 	    NOROT   = 1;
@@ -792,7 +792,7 @@ ag:
 	SCRL->sc_ncl = 0;               /* JMP 30-05-97 */
     }
 
-//    if(type != K_SCL) SCR_record_key(SCR_C_X); /* JMP 09-01-11 */
+//    if(type != SCALARS) SCR_record_key(SCR_C_X); /* JMP 09-01-11 */
     SCRL_edit(SCRL);
     SCRL_deselect_all();
     if(t_kdb != NULL) K_free_kdb(t_kdb);

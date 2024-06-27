@@ -88,7 +88,7 @@ def data_update_scl(obj_name: str, value: float = None, relax: float = None, std
     if stderr is None: cmd += " -- "
     else:              cmd += " " + repr(stderr)
 
-    if B_DataUpdate(cstr(cmd), K_SCL):
+    if B_DataUpdate(cstr(cmd), SCALARS):
         raise RuntimeError(f"Scalar {obj_name} update failed")
 
 def data_update_var(varname: str, values, operation: str = "L", per_from: str = None):

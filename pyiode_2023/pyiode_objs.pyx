@@ -96,7 +96,7 @@ def delete_lst(name: str):
     return delete_obj(name, LISTS)
    
 def delete_scl(name: str):
-    return delete_obj(name, K_SCL)
+    return delete_obj(name, SCALARS)
 
 def delete_tbl(name: str):
     return delete_obj(name, K_TBL)

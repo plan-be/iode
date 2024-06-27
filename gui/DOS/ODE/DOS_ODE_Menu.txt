@@ -87,8 +87,8 @@ V	"Edit WS      "   : SB_DataEditScroll(0L, LISTS)
 	------------------------
 	"Scalars" 
 	------------------------
-V	"Edit WS      "   : SB_DataEditScroll(0L, K_SCL)
-	"Edit List    "   : SB_DataEdit(0L, K_SCL)
+V	"Edit WS      "   : SB_DataEditScroll(0L, SCALARS)
+	"Edit List    "   : SB_DataEdit(0L, SCALARS)
 
 	------------------------
 	"Tables"  

@@ -391,7 +391,7 @@ public:
 	
 	    // Loads 3 WS and check ok
 	    KE_RWS = KE_WS = U_test_K_interpret(EQUATIONS, filename);
-	    KS_RWS = KS_WS = U_test_K_interpret(K_SCL, filename);
+	    KS_RWS = KS_WS = U_test_K_interpret(SCALARS, filename);
 	    KV_RWS = KV_WS = U_test_K_interpret(K_VAR, filename);
 	}
 
@@ -850,7 +850,7 @@ public:
 	    char    arg[256], scalar[30];
 	
 	    // Load needed data
-	    //U_test_B_WsLoad("fun", K_SCL, 161);
+	    //U_test_B_WsLoad("fun", SCALARS, 161);
 	    //U_test_B_WsLoad("fun", K_VAR, 394);
 	
 	    // Dickey-Fuller test (E_UnitRoot)
@@ -1633,7 +1633,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     cond = (rc == 0) && U_cmp_strs(KLPTR("U"), "A,B,C");
     EXPECT_EQ(cond, 1);
 
-    rc = B_DataUpdate("U  1.2 1"             , K_SCL);
+    rc = B_DataUpdate("U  1.2 1"             , SCALARS);
     val = K_s_get_value (KS_WS, "U");
     cond = (rc == 0) && U_test_eq(1.2, val);
     EXPECT_EQ(cond, 1);
@@ -1667,7 +1667,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_EQ(cond, 1);
 
     // B_DataList(char* arg, int type)
-    rc = B_DataList("LC ac*", K_SCL);
+    rc = B_DataList("LC ac*", SCALARS);
     cond = (rc == 0) && U_cmp_strs(KLPTR("LC"), "acaf1;acaf2;acaf3;acaf4");
     printf("LC = \"%s\"\n", KLPTR("LC"));
     EXPECT_EQ(cond, 1);
@@ -1941,7 +1941,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     // Loads 3 WS and check ok
     KI_RWS = KI_WS = U_test_K_interpret(IDENTITIES, "fun");
     KV_RWS = KV_WS = U_test_K_interpret(K_VAR, "fun");
-    //KS_RWS = KS_WS = U_test_K_interpret(K_SCL, "fun");
+    //KS_RWS = KS_WS = U_test_K_interpret(SCALARS, "fun");
 
     //iode.ws_load_idt(f"{IODE_DATA_DIR}fun")
     //iode.ws_load_var(f"{IODE_DATA_DIR}fun")
@@ -2320,7 +2320,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsLoad("fun", EQUATIONS, 274);
     U_test_B_WsLoad("fun", IDENTITIES, 48);
     U_test_B_WsLoad("fun", LISTS, 17);
-    U_test_B_WsLoad("fun", K_SCL, 161);
+    U_test_B_WsLoad("fun", SCALARS, 161);
     U_test_B_WsLoad("fun", K_TBL, 46);
     U_test_B_WsLoad("fun", K_VAR, 394);
 
@@ -2330,7 +2330,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsSave("fun", "fun2", EQUATIONS, 274);
     U_test_B_WsSave("fun", "fun2", IDENTITIES, 48);
     U_test_B_WsSave("fun", "fun2", LISTS, 17);
-    U_test_B_WsSave("fun", "fun2", K_SCL, 161);
+    U_test_B_WsSave("fun", "fun2", SCALARS, 161);
     U_test_B_WsSave("fun", "fun2", K_TBL, 46);
     U_test_B_WsSave("fun", "fun2", K_VAR, 394);
 
@@ -2340,7 +2340,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsSaveCmp("fun", "fun2cmp", EQUATIONS, 274);
     U_test_B_WsSaveCmp("fun", "fun2cmp", IDENTITIES, 48);
     U_test_B_WsSaveCmp("fun", "fun2cmp", LISTS, 17);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_SCL, 161);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", SCALARS, 161);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
 
@@ -2350,7 +2350,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsExport("fun.eqs", "fun2.ae", EQUATIONS);
     U_test_B_WsExport("fun.idt", "fun2.ai", IDENTITIES);
     U_test_B_WsExport("fun.lst", "fun2.al", LISTS);
-    U_test_B_WsExport("fun.scl", "fun2.as", K_SCL);
+    U_test_B_WsExport("fun.scl", "fun2.as", SCALARS);
     U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
     U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
 
@@ -2360,7 +2360,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsClear(EQUATIONS);
     U_test_B_WsClear(IDENTITIES);
     U_test_B_WsClear(LISTS);
-    U_test_B_WsClear(K_SCL);
+    U_test_B_WsClear(SCALARS);
     U_test_B_WsClear(K_TBL);
     U_test_B_WsClear(K_VAR);
 
@@ -2370,7 +2370,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsImport("fun2.ae", EQUATIONS, 274);
     U_test_B_WsImport("fun2.ai", IDENTITIES, 48);
     U_test_B_WsImport("fun2.al", LISTS, 17);
-    U_test_B_WsImport("fun2.as", K_SCL, 161);
+    U_test_B_WsImport("fun2.as", SCALARS, 161);
     U_test_B_WsImport("fun2.at", K_TBL, 46);
     U_test_B_WsImport("fun2.av", K_VAR, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
@@ -2403,7 +2403,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsDescr("Ws content description", EQUATIONS);
     U_test_B_WsDescr("Ws content description", IDENTITIES);
     U_test_B_WsDescr("Ws content description", LISTS);
-    U_test_B_WsDescr("Ws content description", K_SCL);
+    U_test_B_WsDescr("Ws content description", SCALARS);
     U_test_B_WsDescr("Ws content description", K_TBL);
     U_test_B_WsDescr("Ws content description", K_VAR);
 
@@ -2415,7 +2415,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsName("funtest", EQUATIONS);
     U_test_B_WsName("funtest", IDENTITIES);
     U_test_B_WsName("funtest", LISTS);
-    U_test_B_WsName("funtest", K_SCL);
+    U_test_B_WsName("funtest", SCALARS);
     U_test_B_WsName("funtest", K_TBL);
     U_test_B_WsName("funtest", K_VAR);
 
@@ -2428,7 +2428,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsCopy("fun", EQUATIONS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsCopy("fun", IDENTITIES, 48);   // Idem in IDT NAWRU
     U_test_B_WsCopy("fun", LISTS, 17);
-    U_test_B_WsCopy("fun", K_SCL, 161);
+    U_test_B_WsCopy("fun", SCALARS, 161);
     U_test_B_WsCopy("fun", K_TBL, 46);
 
 
@@ -2440,7 +2440,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsMerge("fun", COMMENTS, 317);
     U_test_B_WsMerge("fun", EQUATIONS, 274);
     U_test_B_WsMerge("fun", IDENTITIES, 48);
-    U_test_B_WsMerge("fun", K_SCL, 161);
+    U_test_B_WsMerge("fun", SCALARS, 161);
     U_test_B_WsMerge("fun", K_TBL, 46);
 
     // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
@@ -2462,7 +2462,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
     // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
     U_test_print_title("B_StatUnitRoot");
-    U_test_B_WsLoad("fun", K_SCL, 161);
+    U_test_B_WsLoad("fun", SCALARS, 161);
     U_test_B_WsLoad("fun", K_VAR, 394);
 
     U_test_B_StatUnitRoot(0, 0, 0, "ACAF", 0.958325);

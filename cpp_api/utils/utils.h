@@ -74,7 +74,7 @@ static IodeRegexName get_regex_name(const int type)
         nre.regex = "A-Za-z";
         nre.type = "capital or lowercase";
     }
-    else if (type == I_SCALARS)
+    else if (type == SCALARS)
     {
         nre.regex = "a-z";
         nre.type = "lowercase";

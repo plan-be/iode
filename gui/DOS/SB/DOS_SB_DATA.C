@@ -110,7 +110,7 @@ int     type;
 	case LISTS : return(SB_DataEditCil1(name, type));
 	case EQUATIONS : return(SB_DataEditEqs1(name));
 	case K_TBL :
-	case K_SCL : return(0);
+	case SCALARS : return(0);
 	}
 
     return(0);

@@ -10,7 +10,7 @@ int pos, type;
     switch(KTYPE(kdb)) {
 	case COMMENTS :
 	case LISTS :
-	case K_SCL :
+	case SCALARS :
 	case K_TBL :
 	case K_VAR :
 	    lst = A_init(KONAME(kdb, pos)); break;
@@ -85,11 +85,11 @@ int     type;
     LNAME   *lname;
 
     lname = &(clec->lnames[0]);
-    if(type != K_SCL) SCR_add_ptr(&lst, &nlst, name);
+    if(type != SCALARS) SCR_add_ptr(&lst, &nlst, name);
 
     for(i = 0; i < clec->nb_names; i++) {
 	scl = L_ISCOEF(lname[i].name);
-	if((scl && type != K_SCL) || (!scl && type == K_SCL)) continue;
+	if((scl && type != SCALARS) || (!scl && type == SCALARS)) continue;
 	SCR_add_ptr(&lst, &nlst, lname[i].name);
 	}
 

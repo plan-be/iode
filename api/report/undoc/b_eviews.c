@@ -225,7 +225,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                         var = 1;
                     }
                     else {
-                        // Début expression ()
+                        // Dï¿½but expression ()
                         parlevel++;
                         sprintf(lec + strlen(lec), "(");
                     }
@@ -361,7 +361,7 @@ EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
         lasteq += pos1 + 2;
         pos1 = U_pos(')', lasteq);
         if(pos1 < 0) return(-1);
-        lasteq += pos1 + 1; // après C(...)
+        lasteq += pos1 + 1; // aprï¿½s C(...)
     }
 
     return(idx);
@@ -468,7 +468,7 @@ int EV_cc_file(char *filename)
             if(K_upd_eqs(endo, lec, lasteq, 0, 0L, 0L, 0L, 0L, 0)) break;
             for(i = 0 ; i < nbcoefs ; i++) {
                 sprintf(buf, "%s_%d %lf 1", SCR_lower(endo), i + 1, coefs[i + 1]);
-                if(B_DataUpdate(buf, K_SCL)) goto err;
+                if(B_DataUpdate(buf, SCALARS)) goto err;
             }
             continue;
         }

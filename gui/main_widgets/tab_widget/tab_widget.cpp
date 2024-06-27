@@ -484,7 +484,7 @@ void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& ob
         case LISTS:
             databaseWidget = new ListsWidget(dialog);
             break;
-        case I_SCALARS:
+        case SCALARS:
             databaseWidget = new ScalarsWidget(dialog);
             break;
         case I_TABLES:
