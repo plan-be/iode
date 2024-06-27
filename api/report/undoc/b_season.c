@@ -50,7 +50,7 @@ int B_season(char* arg)
     nbper = DS_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &shift);
     if(nbper < 0) goto done;
 
-    to = K_create(K_VAR, K_UPPER);
+    to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
     nb = t_smpl->s_nb;
     t_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));

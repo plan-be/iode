@@ -57,7 +57,7 @@ int K_SECRETSEP = '#'; // JMP 14/2/2013 pour les macros pushed A#n in reports
  *  
  *  
  *  @param [in, out] name    char*   name to check
- *  @param [in]      mode    int     K_UPPER, K_LOWER of K_ASIS 
+ *  @param [in]      mode    int     UPPER_CASE, LOWER_CASE of ASIS_CASE 
  *  @return                  int     0 if the name is valid
  *                                   -1 otherwise (illegal character)
  *  
@@ -75,13 +75,13 @@ int K_key(char* name, int mode)
         if(!SCR_is_anum(name[i]) && name[i] != '_' && name[i] != K_SECRETSEP) return(-1); // JMP 14/2/2013 pour les macros pushed A#n
 
     switch(mode) {
-        case K_UPPER :
+        case UPPER_CASE :
             SCR_upper(name);
             break;
-        case K_LOWER :
+        case LOWER_CASE :
             SCR_lower(name);
             break;
-        case K_ASIS  :
+        case ASIS_CASE  :
             break;
     }
 

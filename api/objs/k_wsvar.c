@@ -434,7 +434,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     eval = (IODE_REAL*) SCR_malloc(nb_per * sizeof(IODE_REAL));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
-    ndbv = K_create(K_VAR, K_UPPER);
+    ndbv = K_create(K_VAR, UPPER_CASE);
     if(ndbv == NULL) goto done;
     else memcpy(KDATA(ndbv), KSMPL(edbv), sizeof(SAMPLE));
 

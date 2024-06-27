@@ -68,7 +68,7 @@ static int B_WsTrendAll(char* arg, int std)
 
     if(HP_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &shift) < 0) goto done;
 
-    to = K_create(K_VAR, K_UPPER);
+    to = K_create(K_VAR, UPPER_CASE);
     nb = t_smpl->s_nb;
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
     t_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));

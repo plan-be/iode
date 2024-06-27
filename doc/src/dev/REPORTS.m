@@ -274,7 +274,7 @@ b_rep_defs.c
 Implementation of the report $defines and of the mechanism to push/pop macros in PROCDEF
 and FOREACH blocks.
 
-The $defines are stored in the special ~cKDB RP_MACRO~C of type K_ASIS.
+The $defines are stored in the special ~cKDB RP_MACRO~C of type ASIS_CASE.
 
 &IT List of functions
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯

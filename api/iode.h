@@ -71,9 +71,12 @@
 #define K_CHUNCK    (64 * 1024)
 #define LMAGIC      32
 
-#define K_UPPER     0       /* default for mode */
-#define K_LOWER     1
-#define K_ASIS      2
+enum IodeCase
+{
+    UPPER_CASE,       /* default for mode */
+    LOWER_CASE,
+    ASIS_CASE
+};
 
 // REALD defines if not yet defined (to avoid compilation warning)
 #ifndef REALD
@@ -813,7 +816,7 @@ typedef struct _kdb_ {
     KOBJ        *k_objs;                // map <position in the memory, object name>
 	long        k_nb;                   // number of objects in the database
     short       k_type;                 // type of the object: K_CMT, K_EQS, ..., K_VAR
-    short       k_mode;                 // case of the object name: K_UPPER, K_LOWER or K_ASIS 
+    short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     char        k_arch[LMAGIC];         // not used
     char        k_magic[LMAGIC];        // not used
     OFNAME       k_oname;               // not used : old version of filename replaced since 6.44 by k_nameptr (allocated)

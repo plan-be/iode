@@ -134,7 +134,7 @@ static KDB *KI_series_list(KDB* dbi)
     tbl = 0;
     ntbl = 0;
 
-    // Ajoute dans un tableau toutes les noms de vars rencontrés **sans vérifier les doublons (will eliminated by the call to K_add_entry() below).  
+    // Ajoute dans un tableau toutes les noms de vars rencontrï¿½s **sans vï¿½rifier les doublons (will eliminated by the call to K_add_entry() below).  
     for(i = 0; i < KNB(dbi); i++) {
         SCR_add_ptr(&tbl, &ntbl, KONAME(dbi, i));
         clec = KICLEC(dbi, i);
@@ -152,7 +152,7 @@ static KDB *KI_series_list(KDB* dbi)
     qsort(tbl, ntbl - 1, sizeof(char *), KI_strcmp);
 
     // Create a new KDB of vars with all the names in tbl
-    dbv = K_create(K_VAR, K_UPPER);
+    dbv = K_create(K_VAR, UPPER_CASE);
     for(i = 1; i < ntbl; i++) {
         if(tbl[i] == 0 || strcmp(tbl[i], tbl[i -1]))
             K_add_entry(dbv, tbl[i - 1]);
@@ -178,7 +178,7 @@ static KDB *KI_scalar_list(KDB* dbi)
     LNAME   *lname;
     CLEC    *clec, *tclec;
 
-    dbs = K_create(K_SCL, K_LOWER);
+    dbs = K_create(K_SCL, LOWER_CASE);
     for(i = 0; i < KNB(dbi); i++) {
         clec = KICLEC(dbi, i);
         tclec = (CLEC *)SW_nalloc(clec->tot_lg);

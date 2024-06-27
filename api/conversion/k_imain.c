@@ -88,7 +88,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
     if(impdef->imp_hd_fn != NULL
             && (*(impdef->imp_hd_fn))(yy, smpl) < 0) goto err;
 
-    kdb = K_create(K_VAR, K_UPPER);
+    kdb = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
     nb = smpl->s_nb;
 
@@ -187,7 +187,7 @@ KDB *IMP_InterpretCmt(IMPDEF* impdef, char* rulefile, char* cfile, int lang)
     if(impdef->imp_hd_fn != NULL
             && (*(impdef->imp_hd_fn))(impdef, cfile, lang) < 0) goto err;
 
-    kdb = K_create(K_CMT, K_ASIS);
+    kdb = K_create(K_CMT, ASIS_CASE);
 
     if(impdef->imp_vec_fn != NULL) {
 
