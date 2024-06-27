@@ -54,7 +54,7 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
         case EQUATIONS:
             Equations.copy_from(input_file, object_names);
             break;
-        case I_IDENTITIES:
+        case IDENTITIES:
             Identities.copy_from(input_file, object_names);
             break;
         case I_LISTS:

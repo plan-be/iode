@@ -57,14 +57,14 @@ KDB *KI_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_IDT, UPPER_CASE);
+    kdb = K_create(IDENTITIES, UPPER_CASE);
     K_set_kdb_fullpath(kdb, (U_ch*)filename); // JMP 28/11/2022
     while(1) {
         switch(YY_lex(yy)) {
             case YY_EOF :
                 if(cmpt) {
                     char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, K_IDT);
+                    K_set_ext_asc(asc_filename, filename, IDENTITIES);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

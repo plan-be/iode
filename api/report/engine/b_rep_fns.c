@@ -827,7 +827,7 @@ U_ch *RPF_ivalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     int     pos, i;
-    KDB     *kdb = K_WS[K_IDT];
+    KDB     *kdb = K_WS[IDENTITIES];
 
     if(kdb == NULL) return(res);
 
@@ -1281,7 +1281,7 @@ U_ch *RPF_eexpand(U_ch **args)
  */
 U_ch *RPF_iexpand(U_ch **args)
 {
-    return(RPF_expand(args, K_IDT));
+    return(RPF_expand(args, IDENTITIES));
 }
 
 

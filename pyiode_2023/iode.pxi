@@ -33,7 +33,7 @@ from typing import Union, List, Tuple, Optional
 # Object and file types
 COMMENTS = 0
 EQUATIONS = 1
-K_IDT = 2
+IDENTITIES = 2
 K_LST = 3
 K_SCL = 4
 K_TBL = 5

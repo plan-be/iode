@@ -51,7 +51,7 @@ public:
 class IdentitiesWidget : public TemplateIodeObjectWidget<IdentitiesModel, IdentitiesView>
 {
 public:
-    IdentitiesWidget(QWidget* parent) : TemplateIodeObjectWidget(I_IDENTITIES, parent) 
+    IdentitiesWidget(QWidget* parent) : TemplateIodeObjectWidget(IDENTITIES, parent) 
     {
         connect(objmodel, &IdentitiesModel::dataChanged, this, &IdentitiesWidget::databaseModified);
         connect(objmodel, &IdentitiesModel::headerDataChanged, this, &IdentitiesWidget::databaseModified);

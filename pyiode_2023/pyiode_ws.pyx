@@ -186,7 +186,7 @@ def ws_content_eqs(pattern: Union[str, List[str]] = '*') -> List[str]:
 
 def ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]:
     '''Returns the list of identity names corresponding to the given pattern'''
-    return ws_content(pattern, K_IDT)
+    return ws_content(pattern, IDENTITIES)
 
 def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_LST)
@@ -221,7 +221,7 @@ def ws_clear_eqs():
     ws_clear(EQUATIONS)
 
 def ws_clear_idt():
-    ws_clear(K_IDT)
+    ws_clear(IDENTITIES)
 
 def ws_clear_lst():
     ws_clear(K_LST)
@@ -255,7 +255,7 @@ def ws_load_eqs(filename: str) -> int:
     return ws_load(filename, EQUATIONS)
 
 def ws_load_idt(filename: str) -> int:
-    return ws_load(filename, K_IDT)
+    return ws_load(filename, IDENTITIES)
 
 def ws_load_lst(filename: str) -> int:
     return ws_load(filename, K_LST) 
@@ -287,7 +287,7 @@ def ws_save_eqs(filename: str):
 
 def ws_save_idt(filename: str):
     '''Save the current identity workspace'''
-    ws_save(filename, K_IDT)
+    ws_save(filename, IDENTITIES)
 
 def ws_save_lst(filename: str):
     '''Save the current list workspace'''

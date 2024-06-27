@@ -285,7 +285,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 		for(const std::string& obj_name : std_list)
 			list << QString::fromStdString(obj_name);
 	}
-	else if(this_type == I_IDENTITIES && listedInClec)
+	else if(this_type == IDENTITIES && listedInClec)
 	{
 		Identity idt(std_name, nullptr);
 
@@ -313,7 +313,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 			if(Equations.contains(std_name))
 				list << name;
 			break;
-		case I_IDENTITIES:
+		case IDENTITIES:
 			if(Identities.contains(std_name))
 				list << name;
 			break;
@@ -359,7 +359,7 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	case EQUATIONS:
 		std_list = Equations.search(cpp_name);
 		break;
-	case I_IDENTITIES:
+	case IDENTITIES:
 		std_list = Identities.search(cpp_name);
 		break;
 	case I_LISTS:

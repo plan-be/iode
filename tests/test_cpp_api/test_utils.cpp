@@ -43,9 +43,9 @@ TEST_F(UtilsTest, getIodeFileType)
 	EXPECT_EQ(get_iode_file_type(filename), EQUATIONS_FILE);
 
 	filename = input_test_dir + "fun.idt";
-	EXPECT_EQ(get_iode_file_type(filename), I_IDENTITIES_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), IDENTITIES_FILE);
 	filename = input_test_dir + "fun.ai";
-	EXPECT_EQ(get_iode_file_type(filename), I_IDENTITIES_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), IDENTITIES_FILE);
 
 	filename = input_test_dir + "fun.lst";
 	EXPECT_EQ(get_iode_file_type(filename), I_LISTS_FILE);

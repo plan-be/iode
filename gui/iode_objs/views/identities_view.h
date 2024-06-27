@@ -20,7 +20,7 @@ class IdentitiesView : public IodeAbstractTableView, public TableViewEditObj<Ide
 
 public:
 	IdentitiesView(QWidget* parent = nullptr) : 
-		IodeAbstractTableView(I_IDENTITIES, new IdentitiesDelegate(parent), parent), 
+		IodeAbstractTableView(IDENTITIES, new IdentitiesDelegate(parent), parent), 
 		TableViewEditObj(this), TableViewAddObj(this) 
 	{
 		// ---- keyboard shortcuts ----

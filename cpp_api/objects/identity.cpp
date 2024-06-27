@@ -12,7 +12,7 @@ void Identity::copy_from_IDT_obj(const IDT* obj)
 Identity::Identity(const int pos, KDB* kdb)
 {
     if (!kdb) 
-        kdb = K_WS[I_IDENTITIES];
+        kdb = K_WS[IDENTITIES];
 
     if (pos < 0 || pos > kdb->k_nb)
     {
@@ -29,7 +29,7 @@ Identity::Identity(const int pos, KDB* kdb)
 Identity::Identity(const std::string& name, KDB* kdb)
 {
     if (!kdb) 
-        kdb = K_WS[I_IDENTITIES];
+        kdb = K_WS[IDENTITIES];
 
     int pos = K_find(kdb, to_char_array(name));
     if (pos < 0) 

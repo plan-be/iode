@@ -8,7 +8,7 @@ AddIdentityDialog::AddIdentityDialog(KDBIdentities* database, QWidget* parent) :
 	label_title->setText("Add Identity");
 	label_definition->setText("Identity");
 
-	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_IDENTITIES, REQUIRED_FIELD);
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, IDENTITIES, REQUIRED_FIELD);
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 

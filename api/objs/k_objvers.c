@@ -273,7 +273,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             KOBJS(kdb)[i].o_val = pos;
             break;
 
-        case K_IDT :
+        case IDENTITIES :
             opos = KOBJS(kdb)[i].o_val;
             optr = SW_getptr(opos);
             K_ipack(&pack, P_get_ptr(optr, 0));

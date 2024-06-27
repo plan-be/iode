@@ -553,7 +553,7 @@ void MainWindow::open_compute_identities_dialog()
     MenuComputeIdentities dialog(this);
 
     QString identites;
-    QStringList identitiesList = tabWidget_IODE_objs->getSelectedObjectsNames(I_IDENTITIES);
+    QStringList identitiesList = tabWidget_IODE_objs->getSelectedObjectsNames(IDENTITIES);
     if(identitiesList.size() > 0)
         dialog.setIdentitiesNames(identitiesList);
 

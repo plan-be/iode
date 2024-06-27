@@ -1425,9 +1425,9 @@ void Tests_B_DATA()
     
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     
-    rc = B_DataUpdate("U 2 * A"              , K_IDT);
+    rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     cond = (rc == 0) && U_cmp_strs(KIPTR("U"), "2 * A");
-    S4ASSERT(cond == 1, "B_DataUpdate(\"U 2 * A\", K_IDT) = \"%s\"", KIPTR("U"));
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U 2 * A\", IDENTITIES) = \"%s\"", KIPTR("U"));
     
     rc = B_DataUpdate("U A,B,C"             , K_LST);
     cond = (rc == 0) && U_cmp_strs(KLPTR("U"), "A,B,C");
@@ -1822,7 +1822,7 @@ void Tests_B_IDT_EXECUTE()
     //K_free(KS_WS);
         
     // Loads 3 WS and check ok
-    KI_RWS = KI_WS = U_test_K_interpret(K_IDT, "fun");
+    KI_RWS = KI_WS = U_test_K_interpret(IDENTITIES, "fun");
     KV_RWS = KV_WS = U_test_K_interpret(K_VAR, "fun");
     //KS_RWS = KS_WS = U_test_K_interpret(K_SCL, "fun");
     
@@ -2607,7 +2607,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsLoad()");
     U_test_B_WsLoad("fun", COMMENTS, 317);
     U_test_B_WsLoad("fun", EQUATIONS, 274);
-    U_test_B_WsLoad("fun", K_IDT, 48);
+    U_test_B_WsLoad("fun", IDENTITIES, 48);
     U_test_B_WsLoad("fun", K_LST, 17);
     U_test_B_WsLoad("fun", K_SCL, 161);
     U_test_B_WsLoad("fun", K_TBL, 46);
@@ -2617,7 +2617,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsSave()");
     U_test_B_WsSave("fun", "fun2", COMMENTS, 317);
     U_test_B_WsSave("fun", "fun2", EQUATIONS, 274);
-    U_test_B_WsSave("fun", "fun2", K_IDT, 48);
+    U_test_B_WsSave("fun", "fun2", IDENTITIES, 48);
     U_test_B_WsSave("fun", "fun2", K_LST, 17);
     U_test_B_WsSave("fun", "fun2", K_SCL, 161);
     U_test_B_WsSave("fun", "fun2", K_TBL, 46);
@@ -2627,7 +2627,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsSaveCmp()");
     U_test_B_WsSaveCmp("fun", "fun2cmp", COMMENTS, 317);
     U_test_B_WsSaveCmp("fun", "fun2cmp", EQUATIONS, 274);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_IDT, 48);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", IDENTITIES, 48);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_SCL, 161);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
@@ -2637,7 +2637,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsExport()");
     U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS); 
     U_test_B_WsExport("fun.eqs", "fun2.ae", EQUATIONS); 
-    U_test_B_WsExport("fun.idt", "fun2.ai", K_IDT);
+    U_test_B_WsExport("fun.idt", "fun2.ai", IDENTITIES);
     U_test_B_WsExport("fun.lst", "fun2.al", K_LST);
     U_test_B_WsExport("fun.scl", "fun2.as", K_SCL); 
     U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
@@ -2647,7 +2647,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsClear()");
     U_test_B_WsClear(COMMENTS);
     U_test_B_WsClear(EQUATIONS);
-    U_test_B_WsClear(K_IDT);
+    U_test_B_WsClear(IDENTITIES);
     U_test_B_WsClear(K_LST);
     U_test_B_WsClear(K_SCL);
     U_test_B_WsClear(K_TBL);
@@ -2657,7 +2657,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsImport()");
     U_test_B_WsImport("fun2.ac", COMMENTS, 317);
     U_test_B_WsImport("fun2.ae", EQUATIONS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
-    U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
+    U_test_B_WsImport("fun2.ai", IDENTITIES, 47);   // Idem in IDT NAWRU
     U_test_B_WsImport("fun2.al", K_LST, 17);
     U_test_B_WsImport("fun2.as", K_SCL, 161);
     U_test_B_WsImport("fun2.at", K_TBL, 46);
@@ -2690,7 +2690,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsDescr()");
     U_test_B_WsDescr("Ws content description", COMMENTS);
     U_test_B_WsDescr("Ws content description", EQUATIONS);
-    U_test_B_WsDescr("Ws content description", K_IDT);
+    U_test_B_WsDescr("Ws content description", IDENTITIES);
     U_test_B_WsDescr("Ws content description", K_LST);
     U_test_B_WsDescr("Ws content description", K_SCL);
     U_test_B_WsDescr("Ws content description", K_TBL);
@@ -2702,7 +2702,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsName()");
     U_test_B_WsName("funtest", COMMENTS);
     U_test_B_WsName("funtest", EQUATIONS);
-    U_test_B_WsName("funtest", K_IDT);
+    U_test_B_WsName("funtest", IDENTITIES);
     U_test_B_WsName("funtest", K_LST);
     U_test_B_WsName("funtest", K_SCL);
     U_test_B_WsName("funtest", K_TBL);
@@ -2715,7 +2715,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsCopy() - other objects");
     U_test_B_WsCopy("fun", COMMENTS, 317);
     U_test_B_WsCopy("fun", EQUATIONS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
-    U_test_B_WsCopy("fun", K_IDT, 48);   // Idem in IDT NAWRU
+    U_test_B_WsCopy("fun", IDENTITIES, 48);   // Idem in IDT NAWRU
     U_test_B_WsCopy("fun", K_LST, 17);
     U_test_B_WsCopy("fun", K_SCL, 161);
     U_test_B_WsCopy("fun", K_TBL, 46);
@@ -2728,7 +2728,7 @@ void Tests_B_WS()
     U_test_print_title("B_WsMerge() - other objects");
     U_test_B_WsMerge("fun", COMMENTS, 317);
     U_test_B_WsMerge("fun", EQUATIONS, 274);  
-    U_test_B_WsMerge("fun", K_IDT, 48);   
+    U_test_B_WsMerge("fun", IDENTITIES, 48);   
     U_test_B_WsMerge("fun", K_SCL, 161);
     U_test_B_WsMerge("fun", K_TBL, 46);
     

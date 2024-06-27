@@ -279,7 +279,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             sprintf(deflt, "%s := %s", arg, arg);
             return(K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0));
 
-        case K_IDT :
+        case IDENTITIES :
             sprintf(deflt, "%s", arg);
             if(K_add(kdb, arg, deflt) < 0) return(-1);
             else return(0);
@@ -468,7 +468,7 @@ int B_DataUpdate(char* arg, int type)
 
     switch(type) {
     case COMMENTS : /* Name Val */
-    case K_IDT :
+    case IDENTITIES :
     case K_LST :
         rc = K_add(kdb, name, arg + lg + 1, name);
         break;
@@ -809,7 +809,7 @@ int B_DataScan(char* arg, int type)
     char    **objs;
     int     rc = -1;
 
-    if(type != K_IDT && type != EQUATIONS && type != K_TBL) {
+    if(type != IDENTITIES && type != EQUATIONS && type != K_TBL) {
         B_seterrn(122);
         return(-1);
     }
@@ -885,7 +885,7 @@ int B_DataAppend(char* arg, int type)
         break;
 
     case EQUATIONS :
-    case K_IDT :
+    case IDENTITIES :
     case K_SCL :
     case K_TBL :
     case K_VAR :

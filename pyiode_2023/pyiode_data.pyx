@@ -72,7 +72,7 @@ def data_update_eqs(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, EQUATIONS)
     
 def data_update_idt(obj_name: str, obj_value: str):
-    data_update(obj_name, obj_value, K_IDT)
+    data_update(obj_name, obj_value, IDENTITIES)
     
 def data_update_lst(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, K_LST)

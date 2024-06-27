@@ -110,7 +110,7 @@ int K_add(KDB* kdb, char* name, ...)
           endo = va_arg(vargs, char *);
           rc = K_epack(&pack, (char*) eq, endo);
           break;            
-      case K_IDT: 
+      case IDENTITIES: 
           lec = va_arg(vargs, char *);
           rc = K_ipack(&pack, lec);
           break;            

@@ -18,7 +18,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
-    KDBIdentities(const std::string& filepath="") : KDBTemplate(I_IDENTITIES, filepath) {}
+    KDBIdentities(const std::string& filepath="") : KDBTemplate(IDENTITIES, filepath) {}
 
     KDBIdentities* subset(const std::string& pattern, const bool deep_copy=false)
     {
