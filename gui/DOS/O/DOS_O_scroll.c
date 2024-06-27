@@ -204,7 +204,7 @@ int i, j;
 		case 2 : var = scl->std; break;
 		case 3 : if(IODE_IS_A_NUMBER(scl->val)
 			    && IODE_IS_A_NUMBER(scl->std)
-				&& !L_IS0(scl->std))
+				&& !IODE_IS_0(scl->std))
 				    var = scl->val/scl->std;
 			 else var = IODE_NAN;
 		}

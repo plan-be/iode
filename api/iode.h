@@ -85,7 +85,7 @@ enum IodeCase
 
 #define IODE_NAN              (double)(-2.0e37)
 #define IODE_IS_A_NUMBER(x)   ((x) >= (double)(-1.0e37))
-#define L_IS0(x)              (((x) > 0 && (x) < 1.0e-36) || ((x) <= 0 && (-x) < 1.0e-36))
+#define IODE_IS_0(x)          (((x) > 0 && (x) < 1.0e-36) || ((x) <= 0 && (-x) < 1.0e-36))
 
 #if defined(DOS) || defined(SCRW32)
 #define P_ALIGN     4

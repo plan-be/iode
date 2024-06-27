@@ -35,7 +35,7 @@ int B_season(char* arg)
     if(nb == 0) goto done;
 
     eps = atof(data[nb - 1]);
-    if(L_IS0(eps)) SEASON_EPS = 5.0;
+    if(IODE_IS_0(eps)) SEASON_EPS = 5.0;
     else {
         SEASON_EPS = eps;
         nb --;

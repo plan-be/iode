@@ -22,7 +22,7 @@ QVariant ScalarsModel::dataCell(const int row, const int col) const
 			value = valueToString(scalar.std);
 			break;
 		case 3:
-			if (IODE_IS_A_NUMBER(scalar.val) && IODE_IS_A_NUMBER(scalar.std) && !L_IS0(scalar.std))
+			if (IODE_IS_A_NUMBER(scalar.val) && IODE_IS_A_NUMBER(scalar.std) && !IODE_IS_0(scalar.std))
 				value = valueToString(scalar.val / scalar.std);
 			else
 				value = NAN_REP;

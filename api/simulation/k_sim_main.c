@@ -236,7 +236,7 @@ static int K_interdep_1(int t)
         /* Check convergence */
         if(IODE_IS_A_NUMBER(KSIM_XK[j])) {
             d = (KSIM_XK[j] - x);   // d = diff between 2 iterations
-            if(!L_IS0(KSIM_XK[j]))  
+            if(!IODE_IS_0(KSIM_XK[j]))  
                 pd = min(fabs(1 - x / KSIM_XK[j]), fabs(d)); // if ||endo|| != 0, norm = relative difference
             else 
                 pd = fabs(d);                                // else norm = |d| 
@@ -296,7 +296,7 @@ static int K_interdep_2(int t)
 
             // Calcule la 'norme' = fabs de la diff�rence relative entre 2 it.
             //   ou de la diff entre 2 it.
-            if(!L_IS0(KSIM_XK[j]))
+            if(!IODE_IS_0(KSIM_XK[j]))
                 pd = min(fabs(1 - KSIM_XK1[j] / KSIM_XK[j]), fabs(d));
             else
                 pd = fabs(d);
@@ -408,7 +408,7 @@ static int K_diverge(int t, char* lst, double eps)
             */
 
             d = (KSIM_XK[j] - x);
-            if(!L_IS0(KSIM_XK[j]))
+            if(!IODE_IS_0(KSIM_XK[j]))
                 pd = min(fabs(1 - x / KSIM_XK[j]), fabs(d));
             else pd = fabs(d);
 
