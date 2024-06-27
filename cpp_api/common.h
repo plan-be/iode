@@ -44,9 +44,6 @@ enum EnumIodeType
     I_VARIABLES = K_VAR
 };
 
-// TODO: rename K_NBR_OBJ as I_NB_TYPES in C api
-const static int I_NB_TYPES = K_NBR_OBJ;
-
 const static std::vector<std::string> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
 const static std::vector<std::string> v_binary_ext = { "cmt", "eqs", "idt", "lst", "scl", "tbl", "var" };
 const static std::vector<std::string> v_ascii_ext = { "ac", "ae", "ai", "al", "as", "at", "av" };

@@ -5,7 +5,7 @@ from libcpp.map cimport map
 
 cdef extern from "api/iode.h":
     cdef double L_NAN
-    cdef int I_NB_TYPES
+    cdef int IODE_NB_TYPES
 
 
 cdef extern from "cpp_api/common.h":
