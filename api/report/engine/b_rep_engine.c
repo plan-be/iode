@@ -696,8 +696,8 @@ double RP_evallec(char* lec)
             B_seterror("Syntax error %.80s", L_error());
             return(x);
         }
-        if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[K_SCL], clec))
-            x = L_exec(K_WS[K_VAR], K_WS[K_SCL], clec, RP_T);
+        if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[SCALARS], clec))
+            x = L_exec(K_WS[K_VAR], K_WS[SCALARS], clec, RP_T);
         SW_nfree(clec);
     }
 

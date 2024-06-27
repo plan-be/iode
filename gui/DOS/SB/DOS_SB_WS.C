@@ -592,8 +592,8 @@ char    *lec;
 	    B_seterror("Syntax error %.80s", L_error());
 	    return(x);
 	}
-	if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[K_SCL], clec))
-	    x = L_exec(K_WS[K_VAR], K_WS[K_SCL], clec, t);
+	if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[SCALARS], clec))
+	    x = L_exec(K_WS[K_VAR], K_WS[SCALARS], clec, t);
 	SW_nfree(clec);
     }
 

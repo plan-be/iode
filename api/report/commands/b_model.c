@@ -38,10 +38,10 @@ static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
     int     rc;
 
     if(eqs == NULL || SCR_tbl_size(eqs) == 0)
-        rc = K_simul(K_WS[EQUATIONS], K_WS[K_VAR], K_WS[K_SCL], smpl, KSIM_EXO, NULL);
+        rc = K_simul(K_WS[EQUATIONS], K_WS[K_VAR], K_WS[SCALARS], smpl, KSIM_EXO, NULL);
     else {
         tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size(eqs), eqs);
-        rc = K_simul(tdbe, K_WS[K_VAR], K_WS[K_SCL], smpl, KSIM_EXO, eqs);
+        rc = K_simul(tdbe, K_WS[K_VAR], K_WS[SCALARS], smpl, KSIM_EXO, eqs);
         K_free_kdb(tdbe);
     }
 
@@ -325,7 +325,7 @@ int B_ModelSimulateSCC(char *const_arg)
     SCR_free_tbl(eqs);
 
     // Lance la simulation
-    rc = K_simul_SCC(tdbe, K_WS[K_VAR], K_WS[K_SCL], smpl, pre, inter, post);
+    rc = K_simul_SCC(tdbe, K_WS[K_VAR], K_WS[SCALARS], smpl, pre, inter, post);
 
     // Cleanup
     K_free_kdb(tdbe);

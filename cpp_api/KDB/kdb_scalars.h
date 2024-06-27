@@ -15,7 +15,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
-    KDBScalars(const std::string& filepath="") : KDBTemplate(I_SCALARS, filepath) {}
+    KDBScalars(const std::string& filepath="") : KDBTemplate(SCALARS, filepath) {}
 
     KDBScalars* subset(const std::string& pattern, const bool deep_copy=false)
     {

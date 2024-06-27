@@ -616,8 +616,8 @@ U_ch *RPF_sstderr(U_ch** args)
 
     for(i = 0 ; args[i] ; i++) {
         if(i > 0) res = SCR_strafcat(res, " ");
-        pos = K_find(K_WS[K_SCL], args[i]);
-        if(pos < 0 || (scl = KSVAL(K_WS[K_SCL], pos)) == 0) {
+        pos = K_find(K_WS[SCALARS], args[i]);
+        if(pos < 0 || (scl = KSVAL(K_WS[SCALARS], pos)) == 0) {
             strcpy(buf, "--");
         }
         else {
@@ -649,8 +649,8 @@ U_ch *RPF_srelax(U_ch** args)
 
     for(i = 0 ; args[i] ; i++) {
         if(i > 0) res = SCR_strafcat(res, " ");
-        pos = K_find(K_WS[K_SCL], args[i]);
-        if(pos < 0 || (scl = KSVAL(K_WS[K_SCL], pos)) == 0) {
+        pos = K_find(K_WS[SCALARS], args[i]);
+        if(pos < 0 || (scl = KSVAL(K_WS[SCALARS], pos)) == 0) {
             strcpy(buf, "--");
         }
         else {
@@ -1314,7 +1314,7 @@ U_ch *RPF_lexpand(U_ch **args)
  */
 U_ch *RPF_sexpand(U_ch **args)
 {
-    return(RPF_expand(args, K_SCL));
+    return(RPF_expand(args, SCALARS));
 }
 
 

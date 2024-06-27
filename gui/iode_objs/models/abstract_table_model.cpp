@@ -267,14 +267,14 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 
 	std::string std_name = name.toStdString();
 	int this_type = database->get_iode_type();
-	bool listedInClec = other_type == I_SCALARS || other_type == I_VARIABLES;
+	bool listedInClec = other_type == SCALARS || other_type == I_VARIABLES;
 
 	if(this_type == EQUATIONS && listedInClec)
 	{
 		Equation eq(std_name);
 
 		std::vector<std::string> std_list;
-		if(other_type == I_SCALARS)
+		if(other_type == SCALARS)
 			std_list =  eq.get_coefficients_list();
 		else
 			std_list = eq.get_variables_list();
@@ -290,7 +290,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 		Identity idt(std_name, nullptr);
 
 		std::vector<std::string> std_list;
-		if(other_type == I_SCALARS)
+		if(other_type == SCALARS)
 			std_list =  idt.get_coefficients_list();
 		else
 			std_list = idt.get_variables_list();
@@ -321,7 +321,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 			if(Lists.contains(std_name))
 				list << name;
 			break;
-		case I_SCALARS:
+		case SCALARS:
 			if(Scalars.contains(std_name))
 				list << name;
 			break;
@@ -365,7 +365,7 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	case LISTS:
 		std_list = Lists.search(cpp_name);
 		break;
-	case I_SCALARS:
+	case SCALARS:
 		std_list = Scalars.search(cpp_name);
 		break;
 	case I_TABLES:

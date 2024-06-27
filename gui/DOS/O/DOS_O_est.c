@@ -246,7 +246,7 @@ ODE_blk_init()
     }
 
     if(OE_DBS == NULL) {
-        OE_DBS = K_create(K_SCL, LOWER_CASE);
+        OE_DBS = K_create(SCALARS, LOWER_CASE);
         if(OE_DBS == NULL) {
             K_free(OE_DBE);
             OE_DBE = NULL;

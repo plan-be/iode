@@ -510,7 +510,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
 
         lpos = 0;
 
-        if(KTYPE(kdb) == K_VAR || KTYPE(kdb) == K_SCL) {
+        if(KTYPE(kdb) == K_VAR || KTYPE(kdb) == SCALARS) {
             if(K_read_len(fd, vers, &len)) goto error;
         }
 
@@ -522,7 +522,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
             }
 
             // skip this pos - lpos entries 
-            if(kdb->k_compressed == 0 && (KTYPE(kdb) == K_VAR || KTYPE(kdb) == K_SCL)) {
+            if(kdb->k_compressed == 0 && (KTYPE(kdb) == K_VAR || KTYPE(kdb) == SCALARS)) {
                 if(pos - lpos > 0)
                     kseek(fd, (long) len * (pos -lpos), 1);
             }

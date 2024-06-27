@@ -599,7 +599,7 @@ double *B_StatUnitRoot_1(char* arg, int print)
     if(df) {
         E_GetLecName(arg + lg + 1, name);
         sprintf(buf, "df_%s %lf", name, df[2]);
-        B_DataUpdate(buf, K_SCL);
+        B_DataUpdate(buf, SCALARS);
     }
     return(df);
 }

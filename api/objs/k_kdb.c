@@ -96,7 +96,7 @@ KDB *K_init_kdb(int type, char* filename)
         case K_VAR :
             mode = UPPER_CASE;
             break;
-        case K_SCL :
+        case SCALARS :
             mode = LOWER_CASE;
             break;
     }

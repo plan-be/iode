@@ -10,7 +10,7 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations
 	MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
 	main_window->computeHash(true);
 
-	completer = new IodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_lec);
+	completer = new IodeCompleter(false, false, {SCALARS, I_VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 	textEdit_lec->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 

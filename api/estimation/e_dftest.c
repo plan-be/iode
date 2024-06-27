@@ -151,24 +151,24 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     /* Dickey Fuller */
     // Construction de l'équation à estimer, partie par partie selon les parms
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    //B_DataCreate("df_", K_SCL);
+    //B_DataCreate("df_", SCALARS);
     K_add(KS_WS, "df_", NULL);
     
     if(drift) {
         sprintf(buf + strlen(buf), "+ df_d");
-        //B_DataCreate("df_d", K_SCL);
+        //B_DataCreate("df_d", SCALARS);
         K_add(KS_WS, "df_d", NULL);
     }
 
     if(trend) {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        //B_DataCreate("df_t", K_SCL);
+        //B_DataCreate("df_t", SCALARS);
         K_add(KS_WS, "df_t", NULL);
     }
 
     for(i = 1 ; i <= order ; i++) {
         sprintf(scl, "df%d", i);
-        //B_DataCreate(scl, K_SCL);
+        //B_DataCreate(scl, SCALARS);
         K_add(KS_WS, scl, NULL);
     }
 
@@ -191,20 +191,20 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     pos = 0;
     if(res) E_SclToReal("df_", res + pos);
     pos += 3;
-    //B_DataDelete("df_", K_SCL);
+    //B_DataDelete("df_", SCALARS);
     K_del_by_name(KS_WS, "df_");
 
     if(drift) {
         if(res) E_SclToReal("df_d", res + pos);
         pos += 3;
-        //B_DataDelete("df_d", K_SCL);
+        //B_DataDelete("df_d", SCALARS);
         K_del_by_name(KS_WS, "df_d");
     }
 
     if(trend) {
         if(res) E_SclToReal("df_t", res + pos);
         pos += 3;
-        //B_DataDelete("df_t", K_SCL);
+        //B_DataDelete("df_t", SCALARS);
         K_del_by_name(KS_WS, "df_t");
     }
 
@@ -212,7 +212,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         sprintf(buf, "df%d", i);
         if(res) E_SclToReal(buf, res + pos);
         pos += 3;
-        //B_DataDelete(buf, K_SCL);
+        //B_DataDelete(buf, SCALARS);
         K_del_by_name(KS_WS, buf);
     }
 

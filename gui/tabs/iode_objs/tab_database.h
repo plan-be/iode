@@ -81,7 +81,7 @@ class ScalarsWidget : public TemplateIodeObjectWidget<ScalarsModel, ScalarsView>
     NumericalWidget numeric; 
 
 public:
-    ScalarsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_SCALARS, parent) 
+    ScalarsWidget(QWidget* parent) : TemplateIodeObjectWidget(SCALARS, parent) 
     {
         QHBoxLayout* bottomLayout = numeric.setup(this, objmodel, tableview);
 

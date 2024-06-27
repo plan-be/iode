@@ -61,7 +61,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     QString acceptedLetters;
     if (iodeType == COMMENTS)
         acceptedLetters = "A-Za-z";
-    else if (iodeType == I_SCALARS)
+    else if (iodeType == SCALARS)
         acceptedLetters = "a-z";
     else
         acceptedLetters = "A-Z";
@@ -104,7 +104,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(LISTS); });
     connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_TABLES); });
     connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_VARIABLES); });
-    connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_SCALARS); });
+    connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(SCALARS); });
 
     // get list of related objects
 	relatedCmtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F1), this);
@@ -127,7 +127,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(relatedEqShortcut , &QShortcut::activated, this, [this]{ showRelatedObjs(EQUATIONS); });
     connect(relatedIdtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(IDENTITIES); });
     connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(LISTS); });
-    connect(relatedSclShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_SCALARS); });
+    connect(relatedSclShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(SCALARS); });
     connect(relatedTblShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_TABLES); });
     connect(relatedVarShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_VARIABLES); });
 }

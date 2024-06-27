@@ -27,9 +27,9 @@ MenuComputeIdentities::MenuComputeIdentities(QWidget* parent) :
     qVariablesFile1 = new WrapperFileChooser(label_variables_list->text(), *fileChooser_var_file1, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
     qVariablesFile2 = new WrapperFileChooser(label_variables_list->text(), *fileChooser_var_file2, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
     qVariablesFile3 = new WrapperFileChooser(label_variables_list->text(), *fileChooser_var_file3, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    qScalarsFile1 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file1, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
-    qScalarsFile2 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file2, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
-    qScalarsFile3 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file3, OPTIONAL_FIELD, I_SCALARS_FILE, EXISTING_FILE);
+    qScalarsFile1 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file1, OPTIONAL_FIELD, SCALARS_FILE, EXISTING_FILE);
+    qScalarsFile2 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file2, OPTIONAL_FIELD, SCALARS_FILE, EXISTING_FILE);
+    qScalarsFile3 = new WrapperFileChooser(label_scalars_list->text(), *fileChooser_scl_file3, OPTIONAL_FIELD, SCALARS_FILE, EXISTING_FILE);
     qTrace = new WrapperCheckBox(label_trace->text(), *checkBox_trace, REQUIRED_FIELD);
     qLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
 

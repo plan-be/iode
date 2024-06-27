@@ -14,7 +14,7 @@ EditObjectDialog::EditObjectDialog(const EnumIodeType iodeType, const QString& n
 
     if(iodeType == IDENTITIES || iodeType == LISTS)
     {
-        completer = new IodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_content);
+        completer = new IodeCompleter(false, false, {SCALARS, I_VARIABLES}, textEdit_content);
         textEdit_content->setCompleter(completer);
     }
 

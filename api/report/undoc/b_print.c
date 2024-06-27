@@ -304,7 +304,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             rc = B_PrintDefLst(kdb, pos);
             W_flush();
             break;
-        case K_SCL :
+        case SCALARS :
             rc = B_PrintDefScl(kdb, pos);
             W_flush();
             break;

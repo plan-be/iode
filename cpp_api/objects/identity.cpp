@@ -103,8 +103,8 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
             c_name = const_cast<char*>(coeff_name.data());
             // adds a new scalar with values { 0.9, 1.0, L_NAN } to the Scalars Database
             // see K_add() and K_spack()
-            if (K_find(K_WS[I_SCALARS], c_name) < 0) 
-                K_add(K_WS[I_SCALARS], c_name, NULL);
+            if (K_find(K_WS[SCALARS], c_name) < 0) 
+                K_add(K_WS[SCALARS], c_name, NULL);
         }
     }
 

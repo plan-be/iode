@@ -586,10 +586,10 @@ int IodeGetScl(char *name, double* value, double *relax, double *std_err)
     int     pos;
     SCL     *scl;
 
-    pos = K_find(K_WS[K_SCL], name);
+    pos = K_find(K_WS[SCALARS], name);
     if(pos < 0) return(-1);
 
-    scl = KSVAL(K_WS[K_SCL], pos);
+    scl = KSVAL(K_WS[SCALARS], pos);
     *value = scl->val;
     *relax = scl->relax;
     *std_err = scl->std;

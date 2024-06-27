@@ -192,7 +192,7 @@ def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, LISTS)
 
 def ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]:
-    return ws_content(pattern, K_SCL)
+    return ws_content(pattern, SCALARS)
 
 def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_TBL)
@@ -227,7 +227,7 @@ def ws_clear_lst():
     ws_clear(LISTS)
 
 def ws_clear_scl():
-    ws_clear(K_SCL)
+    ws_clear(SCALARS)
 
 def ws_clear_tbl():
     ws_clear(K_TBL)
@@ -261,7 +261,7 @@ def ws_load_lst(filename: str) -> int:
     return ws_load(filename, LISTS) 
                              
 def ws_load_scl(filename: str) -> int:
-    return ws_load(filename, K_SCL) 
+    return ws_load(filename, SCALARS) 
                              
 def ws_load_tbl(filename: str) -> int:
     return ws_load(filename, K_TBL) 
@@ -295,7 +295,7 @@ def ws_save_lst(filename: str):
 
 def ws_save_scl(filename: str):
     '''Save the current scalar workspace'''
-    ws_save(filename, K_SCL)
+    ws_save(filename, SCALARS)
 
 def ws_save_tbl(filename: str):
     '''Save the current table workspace'''
