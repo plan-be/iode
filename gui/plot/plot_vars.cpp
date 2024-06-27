@@ -1,7 +1,7 @@
 #include "plot_vars.h"
 
 PlotVariablesDialog::PlotVariablesDialog(KDBVariables* kdb_vars, EnumIodeGraphChart chartType, 
-    EnumIodeVarMode varMode, const bool logScale, EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, 
+    IodeVarMode varMode, const bool logScale, EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, 
     QWidget* parent) : PlotDialog(chartType, logScale, xTicks, yTicks, parent), varMode(varMode)
 {
     if(kdb_vars)
@@ -42,10 +42,10 @@ void PlotVariablesDialog::addSeries(const QString& variable, const QString& lege
 
 void PlotVariablesDialog::updateVarMode(int index)
 {
-    if(index < 0 || index >= I_VAR_NB_MODES)
+    if(index < 0 || index >= IODE_NB_VAR_MODES)
         return;
     
-    varMode = (EnumIodeVarMode) index;
+    varMode = (IodeVarMode) index;
 
     for(PlotSeries& series: chart_series)
     {

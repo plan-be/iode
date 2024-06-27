@@ -132,7 +132,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
                     goto err;
                 }
             }
-            KV_set(kdb, pos, shift, K_LEVEL, value);
+            KV_set(kdb, pos, shift, VAR_MODE_LEVEL, value);
         }
 
     }

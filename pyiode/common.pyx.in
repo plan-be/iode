@@ -19,7 +19,7 @@ from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEq
                             EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, VariablesInitialization, 
+                            IodeVarMode, VariablesInitialization, 
                             EnumSimulationSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
@@ -174,11 +174,11 @@ class TableGraphAxis(IntEnum):
     PERCENT = EnumGraphAxis.IG_PERCENT
 
 class VarsMode(IntEnum):
-    LEVEL = EnumIodeVarMode.I_VAR_MODE_LEVEL
-    DIFF = EnumIodeVarMode.I_VAR_MODE_DIFF
-    GROWTH_RATE = EnumIodeVarMode.I_VAR_MODE_GROWTH_RATE
-    Y0Y_DIFF = EnumIodeVarMode.I_VAR_MODE_Y0Y_DIFF
-    Y0Y_GROWTH_RATE = EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE
+    LEVEL = IodeVarMode.VAR_MODE_LEVEL
+    DIFF = IodeVarMode.VAR_MODE_DIFF
+    GROWTH_RATE = IodeVarMode.VAR_MODE_GROWTH_RATE
+    Y0Y_DIFF = IodeVarMode.VAR_MODE_Y0Y_DIFF
+    Y0Y_GROWTH_RATE = IodeVarMode.VAR_MODE_Y0Y_GROWTH_RATE
 
 class LowToHighType(IntEnum):
     STOCK = IodeLowToHigh.LTOH_STOCK

@@ -13,7 +13,7 @@ cimport cython
 cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from pyiode.common cimport IODE_NAN, EnumIodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
+from pyiode.common cimport IODE_NAN, IodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -174,13 +174,13 @@ cdef class Variables(_AbstractDatabase):
     """
     cdef bint ptr_owner
     cdef CKDBVariables* database_ptr
-    cdef EnumIodeVarMode mode_
+    cdef IodeVarMode mode_
 
     def __cinit__(self, filepath: str = None) -> Variables:
         self.database_ptr = NULL
         self.abstract_db_ptr = NULL
         self.ptr_owner = False
-        self.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
+        self.mode_ = IodeVarMode.VAR_MODE_LEVEL
 
     def __init__(self, filepath: str = None):
         # Prevent accidental instantiation from normal Python code
@@ -207,7 +207,7 @@ cdef class Variables(_AbstractDatabase):
             wrapper.ptr_owner = False
             wrapper.database_ptr = &cpp_global_variables
             wrapper.abstract_db_ptr = &cpp_global_variables
-        wrapper.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
+        wrapper.mode_ = IodeVarMode.VAR_MODE_LEVEL
         return wrapper
 
     # TODO: implement KDBAbstract::load() method (for global KDB only)
@@ -218,7 +218,7 @@ cdef class Variables(_AbstractDatabase):
     def _subset(self, pattern: str, copy: bool) -> Variables:
         cdef Variables subset_db = Variables.__new__(Variables)
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
-        subset_db.mode_ = EnumIodeVarMode.I_VAR_MODE_LEVEL
+        subset_db.mode_ = IodeVarMode.VAR_MODE_LEVEL
         return subset_db
 
     def _unfold_key(self, key) -> Tuple[Union[str, List[str]], Optional[str, Tuple[int, int], List[str]]]:
@@ -829,7 +829,7 @@ cdef class Variables(_AbstractDatabase):
             value = value.upper()
             value = VarsMode[value]
         value = int(value)
-        self.mode_ = <EnumIodeVarMode>value
+        self.mode_ = <IodeVarMode>value
 
     @property
     def sample(self) -> Sample:

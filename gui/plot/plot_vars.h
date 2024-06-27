@@ -7,13 +7,13 @@ class PlotVariablesDialog : public PlotDialog
     Q_OBJECT
 
     KDBVariables* kdb_vars;
-    EnumIodeVarMode varMode;
+    IodeVarMode varMode;
 
     QComboBox* comboVarMode;
 
 public:
     PlotVariablesDialog(KDBVariables* kdb_vars = nullptr, EnumIodeGraphChart chartType = I_G_CHART_LINE, 
-        EnumIodeVarMode varMode = I_VAR_MODE_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
+        IodeVarMode varMode = VAR_MODE_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
         EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, QWidget* parent = nullptr);
     ~PlotVariablesDialog();
 

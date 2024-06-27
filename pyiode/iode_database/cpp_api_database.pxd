@@ -8,7 +8,7 @@ from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEq
                             EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, VariablesInitialization)
+                            IodeVarMode, VariablesInitialization)
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
@@ -221,14 +221,14 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         void update(string& name, string& lec, string& first_period, string& last_period) except +
         void update(string& name, string& lec, int t_first, int t_last) except +
 
-        double get_var(int pos, int t, EnumIodeVarMode mode) except +
-        double get_var(string& name, int t, EnumIodeVarMode mode) except +
-        double get_var(string& name, string& period, EnumIodeVarMode mode) except +
+        double get_var(int pos, int t, IodeVarMode mode) except +
+        double get_var(string& name, int t, IodeVarMode mode) except +
+        double get_var(string& name, string& period, IodeVarMode mode) except +
         double* get_var_ptr(string& name) except +
 
-        void set_var(int pos, int t, double value, EnumIodeVarMode mode) except +
-        void set_var(string& name, int t, double value, EnumIodeVarMode mode) except +
-        void set_var(string& name, string& period, double value, EnumIodeVarMode mode) except +
+        void set_var(int pos, int t, double value, IodeVarMode mode) except +
+        void set_var(string& name, int t, double value, IodeVarMode mode) except +
+        void set_var(string& name, string& period, double value, IodeVarMode mode) except +
 
         CSample* get_sample()
         void set_sample(string& from_period, string& to_period) except +

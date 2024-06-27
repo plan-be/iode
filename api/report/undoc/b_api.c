@@ -685,11 +685,11 @@ int IodeSetTblFile(int ref, char *filename)
  *  @param [in] t    int    position in the sample
  *  @param [in] mode int    see below
  *  @return          double  depends on the param mode (can be IODE_NAN if the operation is impossible):
- *                               K_LEVEL : no modification    x[t]
- *                               K_DIFF  : diff on one period (x[t]-x[t-1])
- *                               K_DIFFY : diff on one year   (x[t]-x[t-{nb sub periods}])
- *                               K_GRT   : grt on one period  (x[t]/x[t-1] - 1)*100
- *                               K_GRTY  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
+ *                               VAR_MODE_LEVEL : no modification    x[t]
+ *                               VAR_MODE_DIFF  : diff on one period (x[t]-x[t-1])
+ *                               VAR_MODE_Y0Y_DIFF : diff on one year   (x[t]-x[t-{nb sub periods}])
+ *                               VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
+ *                               VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
 double IodeGetVarT(char *name, int t, int mode)
 {
@@ -714,11 +714,11 @@ double IodeGetVarT(char *name, int t, int mode)
  *  @param [in] name    char*   variable name
  *  @param [in] t       int     position in the sample
  *  @param [in] mode    int     one of the defines below. x is the new value of name[t]
- *                                  K_LEVEL : no modification    x[t] = new
- *                                  K_DIFF  : diff on one period x[t] = x[t-1] + new
- *                                  K_DIFFY : diff on one year   x[t] = x[t-{nb sub periods}] + new
- *                                  K_GRT   : grt on one period  x[t] = (1 + 0.01*new) * x[t-1]
- *                                  K_GRTY  : grt on one year    x[t] = (1 + 0.01*new) * x[t-{nb sub periods}] 
+ *                                  VAR_MODE_LEVEL : no modification    x[t] = new
+ *                                  VAR_MODE_DIFF  : diff on one period x[t] = x[t-1] + new
+ *                                  VAR_MODE_Y0Y_DIFF : diff on one year   x[t] = x[t-{nb sub periods}] + new
+ *                                  VAR_MODE_GROWTH_RATE   : grt on one period  x[t] = (1 + 0.01*new) * x[t-1]
+ *                                  VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    x[t] = (1 + 0.01*new) * x[t-{nb sub periods}] 
  *  @param [in] value   double  value on which, in combination with mode, the new value is calculated
  *                              
  */

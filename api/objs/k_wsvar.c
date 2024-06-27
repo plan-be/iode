@@ -193,11 +193,11 @@ int KV_add(char* varname)
  * @param [in] mode      int     transformation of the value, see below. 
  *
  * @return               double  depends on the param mode (can be IODE_NAN if the operation is impossible):
- *                                    K_LEVEL : no modification    x[t]
- *                                    K_DIFF  : diff on one period (x[t]-x[t-1])
- *                                    K_DIFFY : diff on one year   (x[t]-x[t-{nb sub periods}])
- *                                    K_GRT   : grt on one period  (x[t]/x[t-1] - 1)*100
- *                                    K_GRTY  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
+ *                                    VAR_MODE_LEVEL : no modification    x[t]
+ *                                    VAR_MODE_DIFF  : diff on one period (x[t]-x[t-1])
+ *                                    VAR_MODE_Y0Y_DIFF : diff on one year   (x[t]-x[t-{nb sub periods}])
+ *                                    VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
+ *                                    VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
 double KV_get(KDB *kdb, int pos, int t, int mode)
 {
@@ -210,13 +210,13 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
     pernb = PER_nb((smpl->s_p1).p_p);
 
     switch(mode) {
-        case K_LEVEL :
+        case VAR_MODE_LEVEL :
             var = *KVVAL(kdb, pos, t);
             break;
-        case K_DIFF :
+        case VAR_MODE_DIFF :
             pernb = 1;
         /* NO BREAK */
-        case K_DIFFY : 
+        case VAR_MODE_Y0Y_DIFF : 
             if(t < pernb) {
                 var = IODE_NAN;
                 break;
@@ -227,10 +227,10 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
             else var = IODE_NAN;
             break;
 
-        case K_GRT :
+        case VAR_MODE_GROWTH_RATE :
             pernb = 1;
         /* NO BREAK */
-        case K_GRTY :
+        case VAR_MODE_Y0Y_GROWTH_RATE :
             if(t < pernb) {
                 var = IODE_NAN;
                 break;
@@ -255,11 +255,11 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  * @param [in]       t         int         index in the variable (0 = first position in the series...)
  * @param [in]       mode      int         transformation of the value, see below. 
  * @param [in]       new       double   new value of VAR[t] before transformation according to mode, see below. 
- *                                              K_LEVEL : no modification    x[t] = new
- *                                              K_DIFF  : diff on one period x[t] = x[t-1] + new
- *                                              K_DIFFY : diff on one year   x[t] = x[t-{nb sub periods}] + new
- *                                              K_GRT   : grt on one period  x[t] = (1 + 0.01*new) * x[t-1]
- *                                              K_GRTY  : grt on one year    x[t] = (1 + 0.01*new) * x[t-{nb sub periods}] 
+ *                                              VAR_MODE_LEVEL : no modification    x[t] = new
+ *                                              VAR_MODE_DIFF  : diff on one period x[t] = x[t-1] + new
+ *                                              VAR_MODE_Y0Y_DIFF : diff on one year   x[t] = x[t-{nb sub periods}] + new
+ *                                              VAR_MODE_GROWTH_RATE   : grt on one period  x[t] = (1 + 0.01*new) * x[t-1]
+ *                                              VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    x[t] = (1 + 0.01*new) * x[t-{nb sub periods}] 
  *                              
  */
  
@@ -274,24 +274,24 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
 
     var = KVVAL(kdb, pos, 0);
     switch(mode) {
-        case K_LEVEL :
+        case VAR_MODE_LEVEL :
             var[t] = new;
             break;
 
-        case K_DIFF :
+        case VAR_MODE_DIFF :
             pernb = 1;
         /* NO BREAK */
-        case K_DIFFY :
+        case VAR_MODE_Y0Y_DIFF :
             if(t < pernb)  break;
 
             if(IODE_IS_A_NUMBER(new) && IODE_IS_A_NUMBER(var[t - pernb])) var[t] = var[t - pernb] + new;
             else var[t] = IODE_NAN;
             break;
 
-        case K_GRT :
+        case VAR_MODE_GROWTH_RATE :
             pernb = 1;
         /* NO BREAK */
-        case K_GRTY :
+        case VAR_MODE_Y0Y_GROWTH_RATE :
             if(t < pernb) break;
 
             if(IODE_IS_A_NUMBER(new) && IODE_IS_A_NUMBER(var[t - pernb]))

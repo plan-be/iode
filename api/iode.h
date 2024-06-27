@@ -359,12 +359,17 @@ enum IodeDatabaseType
 //#define W_DISP  A2M_DESTGDIWMF
 #define W_DISP  A2M_DESTTCHRT
 
-/*--------------- KVAR_MODE parameters ------------------------*/
-#define K_LEVEL 0
-#define K_DIFF  1
-#define K_GRT   2
-#define K_DIFFY 3
-#define K_GRTY  4
+/*--------------- VAR_MODE parameters ------------------------*/
+enum IodeVarMode
+{
+    VAR_MODE_LEVEL,              //< no modification             x[t]
+    VAR_MODE_DIFF,               //< difference on one period    (x[t]-x[t-1])
+    VAR_MODE_GROWTH_RATE,        //< growth rate on one period   (x[t]/x[t-1] - 1)*100
+    VAR_MODE_Y0Y_DIFF,           //< difference on one year      (x[t]-x[t-{nb sub periods}])
+    VAR_MODE_Y0Y_GROWTH_RATE     //< growth rate on one year     (x[t]/x[t-{nb sub periods}] - 1) * 100
+};
+
+const static int IODE_NB_VAR_MODES = 5;
 
 /*--------------- VAR_INIT enum ------------------------*/
 enum VariablesInitialization

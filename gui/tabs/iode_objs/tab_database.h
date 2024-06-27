@@ -212,7 +212,7 @@ public:
 public slots:
     void updateMode(const int index)
     {
-        objmodel->setMode((EnumIodeVarMode) index);
+        objmodel->setMode((IodeVarMode) index);
     }
 
     void nextMode()

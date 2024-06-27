@@ -148,12 +148,12 @@ cdef extern from "cpp_api/KDB/kdb_global.h":
     cdef map[char, string] mLowToHigh
 
 cdef extern from "cpp_api/KDB/kdb_variables.h":
-    cdef enum EnumIodeVarMode:
-        I_VAR_MODE_LEVEL,
-        I_VAR_MODE_DIFF,
-        I_VAR_MODE_GROWTH_RATE,
-        I_VAR_MODE_Y0Y_DIFF,
-        I_VAR_MODE_Y0Y_GROWTH_RATE
+    cdef enum IodeVarMode:
+        VAR_MODE_LEVEL,
+        VAR_MODE_DIFF,
+        VAR_MODE_GROWTH_RATE,
+        VAR_MODE_Y0Y_DIFF,
+        VAR_MODE_Y0Y_GROWTH_RATE
 
     cdef vector[string] v_var_modes
     

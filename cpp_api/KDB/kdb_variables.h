@@ -5,17 +5,6 @@
 #include <stdexcept>
 
 
-// TODO: replace KVAR_MODE section in iode.h by the enum below
-enum EnumIodeVarMode
-{
-    I_VAR_MODE_LEVEL,              //< no modification             x[t]
-    I_VAR_MODE_DIFF,               //< difference on one period    (x[t]-x[t-1])
-    I_VAR_MODE_GROWTH_RATE,        //< growth rate on one period   (x[t]/x[t-1] - 1)*100
-    I_VAR_MODE_Y0Y_DIFF,           //< difference on one year      (x[t]-x[t-{nb sub periods}])
-    I_VAR_MODE_Y0Y_GROWTH_RATE     //< growth rate on one year     (x[t]/x[t-{nb sub periods}] - 1) * 100
-};
-
-const static int I_VAR_NB_MODES = 5;
 const static std::vector<std::string> v_var_modes = { "Level", "Differences", "Growth rates", "YoY Diffs", "YoY Grt" };
 
 
@@ -53,11 +42,11 @@ public:
         return new KDBVariables(this, deep_copy, pattern);
     }
 
-    double get_var(const int pos, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const int pos, const int t, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
-    double get_var(const int pos, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const int pos, const std::string& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
-    double get_var(const int pos, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const int pos, const Period& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
     /**
      *  Returns a pointer to the first value of the Variable. 
@@ -67,11 +56,11 @@ public:
      */
     double* get_var_ptr(const int pos);
 
-    double get_var(const std::string& name, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const std::string& name, const int t, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
-    double get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const std::string& name, const std::string& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
-    double get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const std::string& name, const Period& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
 
     /**
      *  Returns a pointer to the first value of the Variable. 
@@ -81,17 +70,17 @@ public:
      */
     double* get_var_ptr(const std::string& name);
 
-    void set_var(const int pos, const int t, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const int pos, const int t, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
-    void set_var(const int pos, const std::string& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const int pos, const std::string& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
-    void set_var(const int pos, const Period& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const int pos, const Period& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const int t, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const std::string& name, const int t, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const std::string& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const std::string& name, const std::string& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const Period& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const std::string& name, const Period& period, const double value, const IodeVarMode mode = VAR_MODE_LEVEL);
 
     int add(const std::string& name, const Variable& variable);
 
