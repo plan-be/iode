@@ -242,7 +242,7 @@ void E_SclToReal(char* name, double* res)
     scl = KSVAL(KS_WS, pos);
     res[0] = scl->val;
     res[1] = scl->std;
-    if(!L_IS0(scl->std)) res[2] = scl->val/scl->std;
+    if(!IODE_IS_0(scl->std)) res[2] = scl->val/scl->std;
 }
 
 

@@ -236,7 +236,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
                 break;
             }
             vt = KVVAL(kdb, pos, 0);
-            if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]) && !L_IS0(vt[t - pernb]))
+            if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]) && !IODE_IS_0(vt[t - pernb]))
                 var = (vt[t]/vt[t - pernb] - 1) * 100.0;
             else var = IODE_NAN;
             break;
@@ -329,7 +329,7 @@ void KV_init_values_1(double* val, int t, int method)
 
     switch(method) {
         case KV_INIT_TM1 :
-            if(IODE_IS_A_NUMBER(val[t]) && !L_IS0(val[t])) return;
+            if(IODE_IS_A_NUMBER(val[t]) && !IODE_IS_0(val[t])) return;
             goto calc1;
         case KV_INIT_TM1_NA :
             if(IODE_IS_A_NUMBER(val[t])) return;
@@ -340,7 +340,7 @@ calc1:
             if(t > 0 && IODE_IS_A_NUMBER(val[t - 1])) val[t] = val[t - 1];
             return;
         case KV_INIT_EXTRA :
-            if(IODE_IS_A_NUMBER(val[t]) && !L_IS0(val[t])) return;
+            if(IODE_IS_A_NUMBER(val[t]) && !IODE_IS_0(val[t])) return;
             goto calc2;
         case KV_INIT_EXTRA_NA :
             if(IODE_IS_A_NUMBER(val[t])) return;

@@ -433,7 +433,7 @@ static int E_c_mcu()
     for(i = 0 ; i < E_NEQ ; i++)
         for(j = 0 ; j <= i ; j++) {
             x = sqrt(MATE(E_VCU, i, i) * MATE(E_VCU, j, j));
-            if(!L_IS0(x))
+            if(!IODE_IS_0(x))
                 MATE(E_MCU, i, j) = MATE(E_MCU, j, i) = MATE(E_VCU, i, j) / x;
         }
 

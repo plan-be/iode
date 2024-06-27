@@ -240,7 +240,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             for(j = 0 ; j < nb ; j++) {
                 sprintf(buf, "%.8g", f[j]);
                 d[j] = atof(buf);
-                if(L_IS0(d[j])) d[j] = 0.0; /* JMP 30-10-98 */
+                if(IODE_IS_0(d[j])) d[j] = 0.0; /* JMP 30-10-98 */
                 /*d[j] = (double)f[j]; */
             }
             SW_free(opos);
@@ -266,7 +266,7 @@ void K_setvers(KDB* kdb, int i, int vers)
                 //Debug("%.8lg", d[j]);
                 sprintf(buf, "%.8lg", d[j]);
                 d[j] = atof(buf);
-                if(L_IS0(d[j])) d[j] = 0.0; /* JMP 30-10-98 */
+                if(IODE_IS_0(d[j])) d[j] = 0.0; /* JMP 30-10-98 */
             }
 
             SW_free(opos);
