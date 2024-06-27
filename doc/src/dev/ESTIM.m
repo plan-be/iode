@@ -89,7 +89,7 @@ Main estimation functions + some utilities.
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 ..tb
 | Declaration                   | Description
-| ~cint       E_errno;          | Last estimation error number (between E_NO_EQ_ERR and E_NO_SCALARS
+| ~cint       E_errno;          | Last estimation error number (between EST_NO_EQ_ERR and EST_NO_SCALARS
 | ~cint       E_NEQ;            | Number of equations in the current block of equations
 | ~cint       E_NCE;            | Number of estimated coefficients in the current block of equations
 | ~cint       E_NC;             | Number of coefficients (est and non est) in the current block of equations

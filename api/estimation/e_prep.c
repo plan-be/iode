@@ -29,7 +29,7 @@ int E_prep(char** lecs, char** instrs);
 
 
 // Global variables used by the estimation methods
-int     E_errno;        // Last estimation error number (between E_NO_EQ_ERR and E_NO_SCALARS
+int     E_errno;        // Last estimation error number (between EST_NO_EQ_ERR and EST_NO_SCALARS
 int     E_NEQ;          // Number of equations in the current block of equations
 int     E_NCE;          // Number of estimated coefficients in the current block of equations
 int     E_NC;           // Number of coefficients (est and non est) in the current block of equations
@@ -89,23 +89,23 @@ MAT     *E_RHS,
 
 // Texts corresponding to E_errno codes
 char    *E_ERRORS[] = {
-    "E_NO_EQ_ERR",
-    "E_MEM_ERR",
-    "E_SYNTAX_ERR",
-    "E_LINK_ERR",
-    "E_DREG_ERR",
-    "E_NAN_ERR",
-    "E_VCC_SING_ERR",
-    "E_VCU_SING_ERR",
-    "E_GMG_SING_ERR",
-    "E_NO_SCALARS"
+    "EST_NO_EQ_ERR",
+    "EST_MEM_ERR",
+    "EST_SYNTAX_ERR",
+    "EST_LINK_ERR",
+    "EST_DREG_ERR",
+    "EST_NAN_ERR",
+    "EST_VCC_SING_ERR",
+    "EST_VCU_SING_ERR",
+    "EST_GMG_SING_ERR",
+    "EST_NO_SCALARS"
 };
 
 
 /**
  *  Creates MAT struct's needed for the estimation of a block of equations.
  *  
- *  @return     int     0 or an error code (E_MEM_ERR ::= Memory full).
+ *  @return     int     0 or an error code (EST_MEM_ERR ::= Memory full).
  */
 static int E_prep_alloc()
 {
@@ -143,7 +143,7 @@ static int E_prep_alloc()
     E_MCORRU        = M_alloc(E_NEQ, E_NEQ);        // Correlation matrix bw error terms of equations
     E_DEV           = M_alloc(E_NEQ, E_T);          // Deviation between observed and calculated values
 
-    if(M_errno) E_errno = E_MEM_ERR;
+    if(M_errno) E_errno = EST_MEM_ERR;
     return(E_errno);
 }
 
@@ -175,37 +175,37 @@ static int E_prep_lecs(char** lecs)
     double  x;
 
     E_NEQ = SCR_tbl_size(lecs);
-    if(E_NEQ < 1) return(E_errno = E_NO_EQ_ERR);
+    if(E_NEQ < 1) return(E_errno = EST_NO_EQ_ERR);
 
     E_LHS = M_alloc(E_NEQ, E_T);
-    if(E_LHS == 0) return(E_errno = E_MEM_ERR);
+    if(E_LHS == 0) return(E_errno = EST_MEM_ERR);
     E_CRHS = (CLEC **) SW_nalloc(E_NEQ * sizeof(CLEC *));
-    if(E_CRHS == 0) return(E_errno = E_MEM_ERR);
+    if(E_CRHS == 0) return(E_errno = EST_MEM_ERR);
     for(i = 0 ; i < E_NEQ ; i++) {
         pos = L_split_eq(lecs[i]);
-        if(pos < 0) return(E_errno = E_SYNTAX_ERR);
+        if(pos < 0) return(E_errno = EST_SYNTAX_ERR);
         lecs[i][pos] = 0;
         clec = L_cc(lecs[i]);
-        if(clec == 0) return(E_errno = E_SYNTAX_ERR);
-        if(E_add_scls(clec, E_DBS)) return(E_errno = E_LINK_ERR); // JMP 13/11/2012
+        if(clec == 0) return(E_errno = EST_SYNTAX_ERR);
+        if(E_add_scls(clec, E_DBS)) return(E_errno = EST_LINK_ERR); // JMP 13/11/2012
         if(L_link(E_DBV, E_DBS, clec) != 0) {
             SW_nfree(clec); // GB 14/11/2012
-            return(E_errno = E_LINK_ERR);
+            return(E_errno = EST_LINK_ERR);
         }
         for(t = 0 ; t < E_T ; t++) {
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) {
                 SW_nfree(clec); // GB 14/11/2012
-                return(E_errno = E_NAN_ERR);
+                return(E_errno = EST_NAN_ERR);
             }
             MATE(E_LHS, i, t) = x;
         }
         SW_nfree(clec); // GB 14/11/2012
         lecs[i][pos] = ':';
         E_CRHS[i] = L_cc(lecs[i] + pos + 2);
-        if(E_CRHS[i] == 0) return(E_errno = E_SYNTAX_ERR);
-        if(E_add_scls(E_CRHS[i], E_DBS)) return(E_errno = E_LINK_ERR); // JMP 13/11/2012
-        if(L_link(E_DBV, E_DBS, E_CRHS[i]) != 0) return(E_errno = E_LINK_ERR);
+        if(E_CRHS[i] == 0) return(E_errno = EST_SYNTAX_ERR);
+        if(E_add_scls(E_CRHS[i], E_DBS)) return(E_errno = EST_LINK_ERR); // JMP 13/11/2012
+        if(L_link(E_DBV, E_DBS, E_CRHS[i]) != 0) return(E_errno = EST_LINK_ERR);
     }
 
     return(0);
@@ -266,26 +266,26 @@ static int E_prep_instrs(char** instrs)
     // Check allocation succeeded
     if(minstr == 0 || mip == 0 || miip == 0 ||
             miipi == 0 || mipiipi == 0 || E_D == 0) {
-        E_errno = E_MEM_ERR;
+        E_errno = EST_MEM_ERR;
         goto fin;
     }
     for(i = 0 ; i < E_T ; i++) MATE(minstr, i, 0) = 1.0;
     for(i = 0 ; i < E_NINSTR ; i++) {
         clec = L_cc(instrs[i]);
         if(clec == 0) {
-            E_errno = E_SYNTAX_ERR;
+            E_errno = EST_SYNTAX_ERR;
             goto fin;
         }
         if(L_link(E_DBV, E_DBS, clec) != 0) {
             SW_nfree(clec);
-            E_errno = E_LINK_ERR;
+            E_errno = EST_LINK_ERR;
             goto fin;
         }
         for(t = 0 ; t < E_T ; t++) {
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) {
                 SW_nfree(clec);
-                E_errno = E_NAN_ERR;
+                E_errno = EST_NAN_ERR;
                 goto fin;
             }
             MATE(minstr, t, i + 1) = x;
@@ -296,7 +296,7 @@ static int E_prep_instrs(char** instrs)
     M_xprimx(miip, minstr);
     M_inv_1(miipi, miip);
     if(M_errno != 0) {
-        E_errno = E_DREG_ERR;
+        E_errno = EST_DREG_ERR;
         goto fin;
     }
     M_trans(mip, minstr);
@@ -343,7 +343,7 @@ static int E_prep_coefs()
     // Creates the vector E_C_NBS of positions of the coefficients in E_DBS
     E_C_NBS = (int *)SW_nalloc(E_NC * sizeof(int));
     if(E_C_NBS == 0) {
-        E_errno = E_MEM_ERR;
+        E_errno = EST_MEM_ERR;
         return(-1);
     }
     
@@ -368,7 +368,7 @@ static int E_prep_coefs()
 
     if(E_NCE == 0) { /* GB 26/02/97 */
         B_seterrn(77);
-        E_errno = E_NO_SCALARS;
+        E_errno = EST_NO_SCALARS;
         return(-1);
     }
 
