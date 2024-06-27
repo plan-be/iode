@@ -95,7 +95,7 @@ TEST_F(KDBIdentitiesTest, Get)
     int pos = 0;
     std::string name = Identities.get_name(pos);
     CLEC* clec = NULL;
-    CLEC* expected_clec = KICLEC(K_WS[I_IDENTITIES], pos);
+    CLEC* expected_clec = KICLEC(K_WS[IDENTITIES], pos);
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
 
     // by position

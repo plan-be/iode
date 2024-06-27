@@ -133,7 +133,7 @@ enum IodeCase
 
 #define COMMENTS       0
 #define EQUATIONS       1
-#define K_IDT       2
+#define IDENTITIES       2
 #define K_LST       3
 #define K_SCL       4
 #define K_TBL       5
@@ -292,7 +292,7 @@ enum IodeCase
 /*----------------------- WS ----------------------------*/
 #define KC_WS   K_WS[COMMENTS]
 #define KE_WS   K_WS[EQUATIONS]
-#define KI_WS   K_WS[K_IDT]
+#define KI_WS   K_WS[IDENTITIES]
 #define KL_WS   K_WS[K_LST]
 #define KS_WS   K_WS[K_SCL]
 #define KT_WS   K_WS[K_TBL]
@@ -300,7 +300,7 @@ enum IodeCase
 
 #define KC_RWS   K_RWS[COMMENTS][K_PWS[COMMENTS]]
 #define KE_RWS   K_RWS[EQUATIONS][K_PWS[EQUATIONS]]
-#define KI_RWS   K_RWS[K_IDT][K_PWS[K_IDT]]
+#define KI_RWS   K_RWS[IDENTITIES][K_PWS[IDENTITIES]]
 #define KL_RWS   K_RWS[K_LST][K_PWS[K_LST]]
 #define KS_RWS   K_RWS[K_SCL][K_PWS[K_SCL]]
 #define KT_RWS   K_RWS[K_TBL][K_PWS[K_TBL]]

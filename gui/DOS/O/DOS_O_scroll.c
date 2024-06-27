@@ -110,7 +110,7 @@ int i;
 	    break;
 	case COMMENTS :strcpy(STATIC_BUF, "COMMENT");     break;
 	case EQUATIONS :strcpy(STATIC_BUF, "EQUATION");    break;
-	case K_IDT :strcpy(STATIC_BUF, "IDENTITY");    break;
+	case IDENTITIES :strcpy(STATIC_BUF, "IDENTITY");    break;
 	case K_LST :strcpy(STATIC_BUF, "LIST");        break;
 	case K_SCL :strcpy(STATIC_BUF, scl[i]);        break;
 	case K_TBL :strcpy(STATIC_BUF, "TABLE TITLE"); break;
@@ -171,7 +171,7 @@ int i, j;
 	SCR_fmt_dbl(var, STATIC_BUF, (int)global_VW, (int)global_VN);
 	return(STATIC_BUF);
 
-    case K_IDT :
+    case IDENTITIES :
 	    return(KILEC(kdb, i));
 
     case EQUATIONS :
@@ -244,7 +244,7 @@ int i;
     switch(KTYPE(kdb)) {
 	case COMMENTS :
 	case EQUATIONS :
-	case K_IDT :
+	case IDENTITIES :
 	case K_TBL :
 	case K_LST :
 		    // return(65); /* JMP 09-01-11 */
@@ -286,7 +286,7 @@ int i, j;
     switch(KTYPE(kdb)) {
 	case COMMENTS :
 	case EQUATIONS :
-	case K_IDT :
+	case IDENTITIES :
 	case K_LST :
 	case K_VAR :  rc = ODE_edit_obj1(kdb, -1); break;
 	case K_SCL :  rc = ODE_edit_scl(kdb, -1, -1); break;
@@ -317,7 +317,7 @@ int i, j;
     switch(KTYPE(kdb)) {
     case COMMENTS :
     case EQUATIONS :
-    case K_IDT :
+    case IDENTITIES :
     case K_LST :  return(ODE_edit_obj1(kdb, i));
     case K_SCL :  return(ODE_edit_scl_cell(kdb, i, j));
     case K_TBL :  return(ODE_edit_tbl(kdb, i, -1));
@@ -442,7 +442,7 @@ int     key, i, j;
 	case SCR_F7  :
 	    if(KTYPE(kdb) == K_TBL)
 		B_ViewPrintTbl_1(KONAME(kdb, i), ODE_SMPL);
-	    if(KTYPE(kdb) == K_IDT) {
+	    if(KTYPE(kdb) == IDENTITIES) {
 		sprintf(buf, "%s %s %s",
 			PER_pertoa(&(KSMPL(K_WS[K_VAR])->s_p1), per1),
 			PER_pertoa(&(KSMPL(K_WS[K_VAR])->s_p2), per2),
@@ -452,7 +452,7 @@ int     key, i, j;
 	    }
 	    break;
 	case SCR_S_F7  :
-	    if(KTYPE(kdb) == K_IDT) SB_IdtExecute();
+	    if(KTYPE(kdb) == IDENTITIES) SB_IdtExecute();
 	    break;
 	case SCR_F8  :
 	    if(KTYPE(kdb) == K_VAR) C_AutoEditGraph(KONAME(kdb, i), global_VM);
@@ -754,7 +754,7 @@ ag:
     SCRL->sc_incc = ncc[type];
     SCRL->sc_inlc = SCR_PAGE_SIZE[0] - 6; /* JMP 03-02-11 */
     switch(type) {
-	case  K_IDT :
+	case  IDENTITIES :
 	    SCRL->sc_cmt = "Space=Menu F1=Help F2=Name+ F3=Cell+ F7=s-F7=Exec Enter=Edit Ins=Add Del";
 	    SCRL->sc_scmts = OSCRL_SIDTS;
 	    NOROT   = 1;

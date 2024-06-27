@@ -68,11 +68,11 @@ def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
     Examples
     --------
     >>> iode.wsloadidt("fun.idt")
-    >>> nbobjs = len(iode.ws_content('X*', K_IDT))
-    >>> iode.delete_objects('X*', K_IDT)
-    >>> nbobjs2 = len(iode.ws_content('X*', K_IDT))
-    >>> print(f"iode.delete_objects('X*', K_IDT): before: {nbobjs}. After: {nbobjs2}")
-    iode.delete_objects('X*', K_IDT2): before: 13. After: 0
+    >>> nbobjs = len(iode.ws_content('X*', IDENTITIES))
+    >>> iode.delete_objects('X*', IDENTITIES)
+    >>> nbobjs2 = len(iode.ws_content('X*', IDENTITIES))
+    >>> print(f"iode.delete_objects('X*', IDENTITIES): before: {nbobjs}. After: {nbobjs2}")
+    iode.delete_objects('X*', IDENTITIES2): before: 13. After: 0
     '''
     if B_DataDelete(cstr(pattern), obj_type):
         raise RuntimeError(f"Delete '{pattern}' of type {obj_type} failed")
@@ -90,7 +90,7 @@ def delete_eqs(name: str):
     return delete_obj(name, EQUATIONS)
 
 def delete_idt(name: str):
-    return delete_obj(name, K_IDT)
+    return delete_obj(name, IDENTITIES)
     
 def delete_lst(name: str):
     return delete_obj(name, K_LST)

@@ -296,7 +296,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             rc = B_PrintDefEqs(kdb, pos);
             W_flush();
             break;
-        case K_IDT :
+        case IDENTITIES :
             rc = B_PrintDefIdt(kdb, pos);
             W_flush();
             break;

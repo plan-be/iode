@@ -45,7 +45,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
 
     for(i = 0; i < KNB(kdb); i++) {
         switch(KTYPE(kdb)) {
-            case K_IDT :
+            case IDENTITIES :
                 KI_scan(kdb, i, exo, scal);
                 break;
             case EQUATIONS :

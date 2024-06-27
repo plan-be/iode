@@ -105,7 +105,7 @@ int     type;
 {
     switch(type) {
 	case COMMENTS :
-	case K_IDT :
+	case IDENTITIES :
 	case K_VAR :
 	case K_LST : return(SB_DataEditCil1(name, type));
 	case EQUATIONS : return(SB_DataEditEqs1(name));

@@ -38,7 +38,7 @@ protected:
         case EQUATIONS:
             index = this->indexOf(tabEquations);
             break;
-        case I_IDENTITIES:
+        case IDENTITIES:
             index = this->indexOf(tabIdentites);
             break;
         case I_LISTS:

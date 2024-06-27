@@ -90,7 +90,7 @@ KDB *K_init_kdb(int type, char* filename)
             mode = ASIS_CASE;
             break;
         case EQUATIONS :
-        case K_IDT :
+        case IDENTITIES :
         case K_LST :
         case K_TBL :
         case K_VAR :

@@ -9,7 +9,7 @@ class EditIdentityDialog: public TemplateEditObjectDialog<KDBIdentities>
 
 public:
     EditIdentityDialog(const QString& name, KDBIdentities* database, QWidget* parent = Q_NULLPTR) : 
-        TemplateEditObjectDialog(I_IDENTITIES, name, database, parent) 
+        TemplateEditObjectDialog(IDENTITIES, name, database, parent) 
     {
         value = database->get_lec(name.toStdString());
         textEdit_content->setPlainText(QString::fromStdString(value));

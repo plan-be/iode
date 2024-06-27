@@ -12,7 +12,7 @@ EditObjectDialog::EditObjectDialog(const EnumIodeType iodeType, const QString& n
 
     lineEdit_name->setText(name);
 
-    if(iodeType == I_IDENTITIES || iodeType == I_LISTS)
+    if(iodeType == IDENTITIES || iodeType == I_LISTS)
     {
         completer = new IodeCompleter(false, false, {I_SCALARS, I_VARIABLES}, textEdit_content);
         textEdit_content->setCompleter(completer);

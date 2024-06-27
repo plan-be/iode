@@ -67,8 +67,8 @@ V	"Edit WS      "   : SB_DataEditScroll(0L, EQUATIONS)
 	------------------------
 	"Identities"
 	------------------------
-V	"Edit WS      "   : SB_DataEditScroll(0L, K_IDT)
-	"Edit List    "   : SB_DataEdit(0L, K_IDT)
+V	"Edit WS      "   : SB_DataEditScroll(0L, IDENTITIES)
+	"Edit List    "   : SB_DataEdit(0L, IDENTITIES)
 
 	------------------------
 	"Lists"   
