@@ -38,7 +38,7 @@ class EditObjectDialog : public QDialog, public Ui::EditObjectDialog
 protected:
     std::string name;
     std::string value;
-    EnumIodeType iodeType;
+    IodeDatabaseType iodeType;
 
     IodeCompleter* completer;
 
@@ -46,7 +46,7 @@ signals:
 	void databaseModified();
 
 public:
-    EditObjectDialog(const EnumIodeType iodeType, const QString& name, QWidget* parent = Q_NULLPTR);
+    EditObjectDialog(const IodeDatabaseType iodeType, const QString& name, QWidget* parent = Q_NULLPTR);
     ~EditObjectDialog();
 
 protected:
@@ -64,7 +64,7 @@ protected:
     K* database;
 
 public:
-    TemplateEditObjectDialog(const EnumIodeType iodeType, const QString& name, K* database, 
+    TemplateEditObjectDialog(const IodeDatabaseType iodeType, const QString& name, K* database, 
         QWidget* parent = Q_NULLPTR) : EditObjectDialog(iodeType, name, parent), database(database) {}
     ~TemplateEditObjectDialog() {}
 };

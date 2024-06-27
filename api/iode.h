@@ -129,16 +129,18 @@ enum IodeCase
 #define KGOVAL(kdb, pos)    (SW_getptr((kdb)->k_objs[pos].o_val))       // pointer to the object in the scr4/swap (as a char*)
 
 
+enum IodeDatabaseType
+{
+    COMMENTS,
+    EQUATIONS,
+    IDENTITIES,
+    LISTS,
+    SCALARS,
+    TABLES,
+    VARIABLES
+};
+
 #define IODE_NB_TYPES   7
-
-#define COMMENTS       0
-#define EQUATIONS       1
-#define IDENTITIES       2
-#define LISTS       3
-#define SCALARS       4
-#define TABLES       5
-#define VARIABLES       6
-
 #define K_OBJ       7
 
 #define K_AC        8

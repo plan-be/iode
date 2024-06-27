@@ -32,9 +32,6 @@ const static char NAN_REP[3] = "--";
   */
 
 
-// TODO: replace K by I as below in C api + group them in an enum
-// enum EnumIodeType
-
 const static std::vector<std::string> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
 const static std::vector<std::string> v_binary_ext = { "cmt", "eqs", "idt", "lst", "scl", "tbl", "var" };
 const static std::vector<std::string> v_ascii_ext = { "ac", "ae", "ai", "al", "as", "at", "av" };

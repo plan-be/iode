@@ -17,7 +17,7 @@ class IodeCompleter: public QCompleter
 
     QStringList reportCommandsList;
     QStringList lecFunctionsList;
-    QMap<EnumIodeType, KDBAbstract*> iodeDatabases;
+    QMap<IodeDatabaseType, KDBAbstract*> iodeDatabases;
 
     QVector<int> iodeTypes;
     bool reportCommands;

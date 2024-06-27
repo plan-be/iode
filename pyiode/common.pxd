@@ -9,7 +9,7 @@ cdef extern from "api/iode.h":
 
 
 cdef extern from "cpp_api/common.h":
-    cdef enum EnumIodeType:
+    cdef enum IodeDatabaseType:
         COMMENTS,
         EQUATIONS,
         IDENTITIES,

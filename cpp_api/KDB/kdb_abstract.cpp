@@ -2,7 +2,7 @@
 #include "kdb_abstract.h"
 
 
-KDBAbstract::KDBAbstract(const EnumIodeType iode_type, const std::string& filepath)
+KDBAbstract::KDBAbstract(const IodeDatabaseType iode_type, const std::string& filepath)
 {
     cpp_assign_super_API();
 
@@ -45,7 +45,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
     memcpy(k_reserved, source_kdb->k_reserved, sizeof(char) * 59);      // char[59]
     k_nameptr = copy_char_array(source_kdb->k_nameptr);                 // char*
 
-    std::vector<std::string> names = filter_names_from_database(source_kdb, (EnumIodeType) k_type, pattern);
+    std::vector<std::string> names = filter_names_from_database(source_kdb, (IodeDatabaseType) k_type, pattern);
 
     std::string error_msg = "Cannot extract a subset of the database of " + vIodeTypes[k_type] + ".\n";
     int pos;
@@ -145,7 +145,7 @@ std::vector<std::string> KDBAbstract::get_names(const std::string& pattern, cons
     else
     {
         KDB* kdb = get_database();
-        std::vector<std::string> v_names_ = filter_names_from_database(kdb, (EnumIodeType) k_type, pattern);
+        std::vector<std::string> v_names_ = filter_names_from_database(kdb, (IodeDatabaseType) k_type, pattern);
         if(v_names_.size() == 0)
             return v_names_;
 

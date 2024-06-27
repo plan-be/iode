@@ -79,7 +79,7 @@ public slots:
 	 * @param name 
 	 * @param other_type 
 	 */
-	virtual QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type) = 0;
+	virtual QStringList getSameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type) = 0;
 
 	/**
 	 * @brief get the list of all related objects of type other_type.
@@ -87,7 +87,7 @@ public slots:
 	 * @param name 
 	 * @param other_type 
 	 */
-	virtual QStringList getRelatedObjs(const QString& name, const EnumIodeType other_type) = 0;
+	virtual QStringList getRelatedObjs(const QString& name, const IodeDatabaseType other_type) = 0;
 };
 
 
@@ -198,9 +198,9 @@ public:
 		return false; 
 	}
 
-	QStringList getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type) override;
+	QStringList getSameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type) override;
 
-	QStringList getRelatedObjs(const QString& name, const EnumIodeType other_type) override;
+	QStringList getRelatedObjs(const QString& name, const IodeDatabaseType other_type) override;
 
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
