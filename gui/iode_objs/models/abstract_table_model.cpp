@@ -269,7 +269,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 	int this_type = database->get_iode_type();
 	bool listedInClec = other_type == I_SCALARS || other_type == I_VARIABLES;
 
-	if(this_type == I_EQUATIONS && listedInClec)
+	if(this_type == EQUATIONS && listedInClec)
 	{
 		Equation eq(std_name);
 
@@ -309,7 +309,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 			if(Comments.contains(std_name))
 				list << name;
 			break;
-		case I_EQUATIONS:
+		case EQUATIONS:
 			if(Equations.contains(std_name))
 				list << name;
 			break;
@@ -356,7 +356,7 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	case COMMENTS:
 		std_list = Comments.search(cpp_name);
 		break;
-	case I_EQUATIONS:
+	case EQUATIONS:
 		std_list = Equations.search(cpp_name);
 		break;
 	case I_IDENTITIES:

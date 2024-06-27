@@ -163,7 +163,7 @@ static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tes
     if(pos < 0) 
         eq = (EQ *) SW_nalloc(sizeof(EQ));
     else 
-        eq = KEVAL(K_WS[K_EQS], pos);
+        eq = KEVAL(K_WS[EQUATIONS], pos);
 
     SW_nfree(eq->lec);
     eq->lec = SCR_stracpy(lec);
@@ -172,7 +172,7 @@ static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tes
     
     memcpy(&(eq->tests), tests, EQS_NBTESTS * sizeof(float));   
     memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
-    rc = K_add(K_WS[K_EQS], name, eq, name);
+    rc = K_add(K_WS[EQUATIONS], name, eq, name);
     if(rc < 0) {
         rc = -1;
         B_seterror(L_error());

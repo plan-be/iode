@@ -23,7 +23,7 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
 Equation::Equation(const int pos, KDB* kdb)
 {
     if (!kdb) 
-        kdb = K_WS[I_EQUATIONS];
+        kdb = K_WS[EQUATIONS];
 
     if (pos < 0 || pos > kdb->k_nb)
     {
@@ -49,7 +49,7 @@ Equation::Equation(const int pos, KDB* kdb)
 Equation::Equation(const std::string& name, KDB* kdb)
 {
     if (!kdb) 
-        kdb = K_WS[I_EQUATIONS];
+        kdb = K_WS[EQUATIONS];
 
     int pos = K_find(kdb, to_char_array(name));
     if (pos < 0) 

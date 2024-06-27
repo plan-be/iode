@@ -14,7 +14,7 @@ int pos, type;
 	case K_TBL :
 	case K_VAR :
 	    lst = A_init(KONAME(kdb, pos)); break;
-	case K_EQS :
+	case EQUATIONS :
 	    lst = A_clec(KONAME(kdb, pos), KECLEC(kdb, pos), type); break;
 	case K_IDT :
 	    lst = A_clec(KONAME(kdb, pos), KICLEC(kdb, pos), type); break;

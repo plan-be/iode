@@ -116,7 +116,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
         // check each name if is valid
         // If there is an invalid name, throw an error
         for(const std::string& name: v_equations_)
-            check_name(name, I_EQUATIONS);
+            check_name(name, EQUATIONS);
 
         // for each equation name from the block
         for(const std::string& name: v_equations_)

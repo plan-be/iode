@@ -377,11 +377,11 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* 
     int     pos, rc;
     EQ      *eq;
 
-    pos = K_find(K_WS[K_EQS], name);
+    pos = K_find(K_WS[EQUATIONS], name);
     if(pos < 0) 
         eq = (EQ *) SW_nalloc(sizeof(EQ));
     else 
-        eq = KEVAL(K_WS[K_EQS], pos);
+        eq = KEVAL(K_WS[EQUATIONS], pos);
 
     if(lec != NULL) {
         SW_nfree(eq->lec);
@@ -410,7 +410,7 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* 
     if(smpl != NULL) memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
     /*    else memset(&(eq->smpl), 0, sizeof(SAMPLE)); */
 
-    rc = K_add(K_WS[K_EQS], name, eq, name);
+    rc = K_add(K_WS[EQUATIONS], name, eq, name);
     if(rc < 0) {
         rc = -1;
         B_seterror(L_error());

@@ -17,7 +17,7 @@ class EquationsView : public IodeAbstractTableView, public TableViewEditObj<Equa
 
 public:
 	EquationsView(QWidget* parent = nullptr) : 
-		IodeAbstractTableView(I_EQUATIONS, new EquationsDelegate(parent), parent), 
+		IodeAbstractTableView(EQUATIONS, new EquationsDelegate(parent), parent), 
 		TableViewEditObj(this) {}
 
 protected:

@@ -275,7 +275,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             if(K_add(kdb, arg, NULL, &nb_per) < 0) return(-1);
             else return(0);
 
-        case K_EQS :
+        case EQUATIONS :
             sprintf(deflt, "%s := %s", arg, arg);
             return(K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0));
 
@@ -370,7 +370,7 @@ int B_DataRename(char* arg, int type)
     int     rc = 0;
     char    **args;
 
-    if(type == K_EQS) return(-1); /* Rename of EQS has no sense */
+    if(type == EQUATIONS) return(-1); /* Rename of EQS has no sense */
 
     args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) return(-1);
@@ -403,7 +403,7 @@ int B_DataRename(char* arg, int type)
     char    **args;
     KDB     *kdb = K_WS[type];
 
-    if(type == K_EQS) {
+    if(type == EQUATIONS) {
         B_seterrn(OM_DDUP_NO_SENSE);
         return(-1); /* Duplicate of EQS has no sense */
     }
@@ -473,7 +473,7 @@ int B_DataUpdate(char* arg, int type)
         rc = K_add(kdb, name, arg + lg + 1, name);
         break;
 
-    case K_EQS :
+    case EQUATIONS :
         rc = K_upd_eqs(name, arg + lg + 1, NULL, -1, NULL, NULL, NULL, NULL, 0);
         break;
 
@@ -809,7 +809,7 @@ int B_DataScan(char* arg, int type)
     char    **objs;
     int     rc = -1;
 
-    if(type != K_IDT && type != K_EQS && type != K_TBL) {
+    if(type != K_IDT && type != EQUATIONS && type != K_TBL) {
         B_seterrn(122);
         return(-1);
     }
@@ -884,7 +884,7 @@ int B_DataAppend(char* arg, int type)
     case K_LST :
         break;
 
-    case K_EQS :
+    case EQUATIONS :
     case K_IDT :
     case K_SCL :
     case K_TBL :

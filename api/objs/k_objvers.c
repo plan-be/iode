@@ -285,7 +285,7 @@ void K_setvers(KDB* kdb, int i, int vers)
             KOBJS(kdb)[i].o_val = pos;
             break;
 
-        case K_EQS :
+        case EQUATIONS :
             opos = KOBJS(kdb)[i].o_val;
             optr = SW_getptr(opos);
             eq = K_eunpack(optr);

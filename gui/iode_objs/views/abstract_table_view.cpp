@@ -99,7 +99,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     scalarsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
 
     connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(COMMENTS); });
-    connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_EQUATIONS); });
+    connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(EQUATIONS); });
     connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_IDENTITIES); });
     connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_LISTS); });
     connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_TABLES); });
@@ -124,7 +124,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     relatedVarShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
     connect(relatedCmtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(COMMENTS); });
-    connect(relatedEqShortcut , &QShortcut::activated, this, [this]{ showRelatedObjs(I_EQUATIONS); });
+    connect(relatedEqShortcut , &QShortcut::activated, this, [this]{ showRelatedObjs(EQUATIONS); });
     connect(relatedIdtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_IDENTITIES); });
     connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_LISTS); });
     connect(relatedSclShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_SCALARS); });

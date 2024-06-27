@@ -34,7 +34,7 @@ MenuDataScanObjects::~MenuDataScanObjects()
 }
 
 // TODO ALD: implement a scan_objects() method in KDBAbstract + tests
-// Tests: iode type = I_EQUATIONS, list to scan = ???
+// Tests: iode type = EQUATIONS, list to scan = ???
 void MenuDataScanObjects::scan()
 {
     try

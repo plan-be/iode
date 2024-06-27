@@ -292,7 +292,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             rc = B_PrintDefCmt(kdb, pos);
             W_flush();
             break;
-        case K_EQS :
+        case EQUATIONS :
             rc = B_PrintDefEqs(kdb, pos);
             W_flush();
             break;

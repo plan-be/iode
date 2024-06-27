@@ -113,7 +113,7 @@ char        **KSIM_EXO = NULL;        //
 char        *KSIM_PATH = NULL;        //
 KDB         *KSIM_DBV;                // KDB of variables used for the simulation. Normally K_WS[K_VAR]
 KDB         *KSIM_DBS;                // KDB of scalars used for the simulation. Normally K_WS[K_SCL]
-KDB         *KSIM_DBE;                // KDB of equations defining the model to simulation. Can K_WS[K_EQS] or a subset.
+KDB         *KSIM_DBE;                // KDB of equations defining the model to simulation. Can K_WS[EQUATIONS] or a subset.
 
 extern int  KSIM_PRE,                 // number of equations in the "prolog" block 
             KSIM_INTER,               // number of equations in the "interdep" block

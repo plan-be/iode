@@ -38,9 +38,9 @@ static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
     int     rc;
 
     if(eqs == NULL || SCR_tbl_size(eqs) == 0)
-        rc = K_simul(K_WS[K_EQS], K_WS[K_VAR], K_WS[K_SCL], smpl, KSIM_EXO, NULL);
+        rc = K_simul(K_WS[EQUATIONS], K_WS[K_VAR], K_WS[K_SCL], smpl, KSIM_EXO, NULL);
     else {
-        tdbe = K_refer(K_WS[K_EQS], SCR_tbl_size(eqs), eqs);
+        tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size(eqs), eqs);
         rc = K_simul(tdbe, K_WS[K_VAR], K_WS[K_SCL], smpl, KSIM_EXO, eqs);
         K_free_kdb(tdbe);
     }
@@ -205,14 +205,14 @@ int B_ModelCompile(char* arg)
 
     if(arg == NULL || arg[0] == 0) {
         /* EndoExo whole WS */
-        return(KE_compile(K_WS[K_EQS]));
+        return(KE_compile(K_WS[EQUATIONS]));
     }
     else {
         eqs = B_ainit_chk(arg, NULL, 0);
         if(eqs == NULL || SCR_tbl_size(eqs) == 0)
-            return(KE_compile(K_WS[K_EQS]));
+            return(KE_compile(K_WS[EQUATIONS]));
         else {
-            tdbe = K_refer(K_WS[K_EQS], SCR_tbl_size(eqs), eqs);
+            tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size(eqs), eqs);
             rc = KE_compile(tdbe);
             K_free_kdb(tdbe);
             SCR_free_tbl(eqs);
@@ -251,9 +251,9 @@ int B_ModelCalcSCC(char *const_arg)
     // eqs if given
     eqs = B_ainit_chk(arg + lg1, NULL, 0);
     if(SCR_tbl_size(eqs) == 0)
-        tdbe = K_WS[K_EQS];
+        tdbe = K_WS[EQUATIONS];
     else
-        tdbe = K_quick_refer(K_WS[K_EQS], eqs);
+        tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
 
     rc = KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
 
@@ -321,7 +321,7 @@ int B_ModelSimulateSCC(char *const_arg)
     eqs1 = SCR_union_quick(pre, inter); // JMP 29/8/2012
     eqs = SCR_union_quick(eqs1, post);  // JMP 29/8/2012
     SCR_free_tbl(eqs1);                 // JMP 29/8/2012
-    tdbe = K_quick_refer(K_WS[K_EQS], eqs);
+    tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
     SCR_free_tbl(eqs);
 
     // Lance la simulation

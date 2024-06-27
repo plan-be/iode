@@ -48,7 +48,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
             case K_IDT :
                 KI_scan(kdb, i, exo, scal);
                 break;
-            case K_EQS :
+            case EQUATIONS :
                 KE_scan(kdb, i, exo, scal);
                 break;
             case K_TBL :

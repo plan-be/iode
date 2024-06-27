@@ -39,7 +39,7 @@ void MenuWorkspaceMergeInto::merge_into_workspace()
         case COMMENTS:
             Comments.merge_from(input_file);
             break;
-        case I_EQUATIONS:
+        case EQUATIONS:
             Equations.merge_from(input_file);
             break;
         case I_IDENTITIES:

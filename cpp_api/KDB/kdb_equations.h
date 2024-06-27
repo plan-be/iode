@@ -16,7 +16,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
-    KDBEquations(const std::string& filepath="") : KDBTemplate(I_EQUATIONS, filepath) {}
+    KDBEquations(const std::string& filepath="") : KDBTemplate(EQUATIONS, filepath) {}
 
     KDBEquations* subset(const std::string& pattern, const bool deep_copy=false)
     {

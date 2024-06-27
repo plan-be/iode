@@ -866,7 +866,7 @@ U_ch *RPF_evalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     int     pos, i;
-    KDB     *kdb = K_WS[K_EQS];
+    KDB     *kdb = K_WS[EQUATIONS];
 
     if(kdb == NULL) return(res);
 
@@ -900,7 +900,7 @@ U_ch *RPF_eqsample(U_ch** args)
 {
     U_ch    *res = 0;
     int     pos;
-    KDB     *kdb = K_WS[K_EQS];
+    KDB     *kdb = K_WS[EQUATIONS];
 
     if(kdb == NULL) return(res);             // Equation WS  empty
     if(SCR_tbl_size(args) != 1) return(res); // 1! eq
@@ -928,7 +928,7 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
 {
     U_ch    *res = 0;
     int     pos;
-    KDB     *kdb = K_WS[K_EQS];
+    KDB     *kdb = K_WS[EQUATIONS];
     SAMPLE  *smpl;
 
     if(kdb == NULL) return(res);             // Equation WS  empty
@@ -990,7 +990,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch    *eq = 0, *rhs;
     int     pos, poscolon;
-    KDB     *kdb = K_WS[K_EQS];
+    KDB     *kdb = K_WS[EQUATIONS];
 
     if(kdb == NULL) return(eq);             // Equation WS  empty
     if(SCR_tbl_size(args) != 1) return(eq); // 1! eq
@@ -1136,9 +1136,9 @@ U_ch *RPF_vsliste(U_ch** args, int type)
     if(SCR_tbl_size(args) < 1) return(NULL);
 
     for(i = 0 ; args[i] ; i++) {
-        pos = K_find(K_WS[K_EQS], args[i]);
+        pos = K_find(K_WS[EQUATIONS], args[i]);
         if(pos < 0) continue;
-        eq = KEVAL(K_WS[K_EQS], pos);
+        eq = KEVAL(K_WS[EQUATIONS], pos);
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
         E_free(eq);
     }
@@ -1265,7 +1265,7 @@ U_ch *RPF_cexpand(U_ch **args)
  */
 U_ch *RPF_eexpand(U_ch **args)
 {
-    return(RPF_expand(args, K_EQS));
+    return(RPF_expand(args, EQUATIONS));
 }
 
 
