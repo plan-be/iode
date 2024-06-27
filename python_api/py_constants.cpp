@@ -87,13 +87,13 @@ void init_constants(nb::module_ &m)
       m.attr("SORT_BOTH")   = (int) SORT_BOTH;
       m.attr("SORT_NONE")   = (int) SORT_NONE;
 
-      m.attr("IV_INIT_TM1")      = (int) IV_INIT_TM1;
-      m.attr("IV_INIT_TM1_A")    = (int) IV_INIT_TM1_A;
-      m.attr("IV_INIT_EXTRA")    = (int) IV_INIT_EXTRA;
-      m.attr("IV_INIT_EXTRA_A")  = (int) IV_INIT_EXTRA_A;
-      m.attr("IV_INIT_ASIS")     = (int) IV_INIT_ASIS;
-      m.attr("IV_INIT_TM1_NA")   = (int) IV_INIT_TM1_NA;
-      m.attr("IV_INIT_EXTRA_NA") = (int) IV_INIT_EXTRA_NA;
+      m.attr("VAR_INIT_TM1")      = (int) VAR_INIT_TM1;
+      m.attr("VAR_INIT_TM1_A")    = (int) VAR_INIT_TM1_A;
+      m.attr("VAR_INIT_EXTRA")    = (int) VAR_INIT_EXTRA;
+      m.attr("VAR_INIT_EXTRA_A")  = (int) VAR_INIT_EXTRA_A;
+      m.attr("VAR_INIT_ASIS")     = (int) VAR_INIT_ASIS;
+      m.attr("VAR_INIT_TM1_NA")   = (int) VAR_INIT_TM1_NA;
+      m.attr("VAR_INIT_EXTRA_NA") = (int) VAR_INIT_EXTRA_NA;
 
       // Print outputs
       m.attr("W_GDI")   = (int) W_GDI; 

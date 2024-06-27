@@ -19,7 +19,7 @@ from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEq
                             EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization, 
+                            EnumIodeVarMode, VariablesInitialization, 
                             EnumSimulationSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
@@ -200,13 +200,13 @@ class SimulationSort(IntEnum):
     NONE = EnumSimulationSortAlgorithm.I_SORT_NONE
 
 class SimulationInitialization(IntEnum):
-    TM1 = EnumSimulationInitialization.IV_INIT_TM1
-    TM1_A = EnumSimulationInitialization.IV_INIT_TM1_A
-    EXTRA = EnumSimulationInitialization.IV_INIT_EXTRA
-    EXTRA_A = EnumSimulationInitialization.IV_INIT_EXTRA_A
-    ASIS = EnumSimulationInitialization.IV_INIT_ASIS
-    TM1_NA = EnumSimulationInitialization.IV_INIT_TM1_NA
-    EXTRA_NA = EnumSimulationInitialization.IV_INIT_EXTRA_NA
+    TM1 = VariablesInitialization.VAR_INIT_TM1
+    TM1_A = VariablesInitialization.VAR_INIT_TM1_A
+    EXTRA = VariablesInitialization.VAR_INIT_EXTRA
+    EXTRA_A = VariablesInitialization.VAR_INIT_EXTRA_A
+    ASIS = VariablesInitialization.VAR_INIT_ASIS
+    TM1_NA = VariablesInitialization.VAR_INIT_TM1_NA
+    EXTRA_NA = VariablesInitialization.VAR_INIT_EXTRA_NA
 
 ESTIMATION_MAXIT = C_ESTIMATION_MAXIT 
 ESTIMATION_EPS: float = C_ESTIMATION_EPS

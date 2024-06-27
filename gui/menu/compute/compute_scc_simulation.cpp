@@ -68,7 +68,7 @@ void MenuComputeSCCSimulation::compute()
         int max_iterations = qMaxIterations->extractAndVerify();
         bool debug = qCheckDebug->extractAndVerify();
         double relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
-        EnumSimulationInitialization initialisation = (EnumSimulationInitialization) qSimInitialisation->extractAndVerify();
+        VariablesInitialization initialisation = (VariablesInitialization) qSimInitialisation->extractAndVerify();
         std::string pre_recursive_list_name = qPreRecursiveListName->extractAndVerify().toStdString();
         std::string inter_recursive_list_name = qInterRecursiveListName->extractAndVerify().toStdString();
         std::string post_recursive_list_name = qPostRecursiveListName->extractAndVerify().toStdString();

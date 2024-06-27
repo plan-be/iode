@@ -11,7 +11,7 @@
 #                   eps: float = 0.0001, 
 #                   relax: float = 1.0, 
 #                   maxit: int = 100, 
-#                   init_values: int = KV_INIT_TM1, 
+#                   init_values: int = VAR_INIT_TM1, 
 #                   sort_algo: int = SORT_BOTH, 
 #                   nb_passes: int = 5, 
 #                   debug: int = 0, 
@@ -58,7 +58,7 @@ def model_simulate(sample_from: str, sample_to: str,
                     eps: float = 0.0001, 
                     relax: float = 1.0, 
                     maxit: int = 100, 
-                    init_values: int = KV_INIT_TM1, 
+                    init_values: int = VAR_INIT_TM1, 
                     sort_algo: int = SORT_BOTH, 
                     nb_passes: int = 5, 
                     debug: int = 0, 
@@ -144,7 +144,7 @@ def model_simulate_scc( sample_from: str, sample_to: str,
                         eps: float = 0.0001, 
                         relax: float = 1.0, 
                         maxit: int = 100, 
-                        init_values: int = KV_INIT_TM1, 
+                        init_values: int = VAR_INIT_TM1, 
                         debug: int = 0, 
                         newton_eps: float = 1e-6, 
                         newton_maxit: int = 50, 
@@ -166,7 +166,7 @@ def model_simulate_save_parms(
                     eps: float = 0.0001, 
                     relax: float = 1.0, 
                     maxit: int = 100, 
-                    init_values: int = KV_INIT_TM1, 
+                    init_values: int = VAR_INIT_TM1, 
                     sort_algo: int = SORT_BOTH, 
                     nb_passes: int = 1):
     ''' 
@@ -221,13 +221,13 @@ def model_simulate_sort_algo() -> int:
 def model_simulate_init_values() -> int:
     ''' 
     Returns the init_values parameter of the last simulation:
-        - iode.KV_INIT_TM1      (0): Y := Y[-1], if Y null or NA 
-        - iode.KV_INIT_TM1_A    (1): Y := Y[-1], always 
-        - iode.KV_INIT_EXTRA    (2): Y := extrapolation, if Y null or NA 
-        - iode.KV_INIT_EXTRA_A  (3): Y := extrapolation, always 
-        - iode.KV_INIT_ASIS     (4): Y unchanged 
-        - iode.KV_INIT_TM1_NA   (5): Y := Y[-1], if Y is NA 
-        - iode.KV_INIT_EXTRA_NA (6): Y := extrapolation, if Y is NA 
+        - iode.VAR_INIT_TM1      (0): Y := Y[-1], if Y null or NA 
+        - iode.VAR_INIT_TM1_A    (1): Y := Y[-1], always 
+        - iode.VAR_INIT_EXTRA    (2): Y := extrapolation, if Y null or NA 
+        - iode.VAR_INIT_EXTRA_A  (3): Y := extrapolation, always 
+        - iode.VAR_INIT_ASIS     (4): Y unchanged 
+        - iode.VAR_INIT_TM1_NA   (5): Y := Y[-1], if Y is NA 
+        - iode.VAR_INIT_EXTRA_NA (6): Y := extrapolation, if Y is NA 
     '''
     return KSIM_START
 

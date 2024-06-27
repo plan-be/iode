@@ -7,7 +7,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport EnumSimulationSortAlgorithm, EnumSimulationInitialization
+from pyiode.common cimport EnumSimulationSortAlgorithm, VariablesInitialization
 
 
 cdef extern from "cpp_api/compute/simulation.h":
@@ -36,9 +36,9 @@ cdef extern from "cpp_api/compute/simulation.h":
         void set_sort(EnumSimulationSortAlgorithm sort_algorithm)
 
         # Getter and Setter for initialization method
-        EnumSimulationInitialization get_initialization_method()
+        VariablesInitialization get_initialization_method()
         string get_initialization_method_as_string()
-        void set_initialization_method(EnumSimulationInitialization method)
+        void set_initialization_method(VariablesInitialization method)
 
         # Getter and Setter for debug mode
         bint is_debug_active()

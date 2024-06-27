@@ -137,17 +137,6 @@ const static std::map<std::string, EnumIodeFile> mFileExtensions =
 };
 
 
-enum EnumSimulationInitialization
-{
-    IV_INIT_TM1 = KV_INIT_TM1,
-    IV_INIT_TM1_A = KV_INIT_TM1_A,
-    IV_INIT_EXTRA = KV_INIT_EXTRA,
-    IV_INIT_EXTRA_A = KV_INIT_EXTRA_A,
-    IV_INIT_ASIS = KV_INIT_ASIS,
-    IV_INIT_TM1_NA = KV_INIT_TM1_NA,
-    IV_INIT_EXTRA_NA = KV_INIT_EXTRA_NA
-};
-
 const static std::vector<std::string> v_simulation_initialization
 {
     "Y := Y[-1], if Y null or NA",                  // TM1

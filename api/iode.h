@@ -366,14 +366,17 @@ enum IodeDatabaseType
 #define K_DIFFY 3
 #define K_GRTY  4
 
-/*--------------- VAR_INIT defines ------------------------*/
-#define KV_INIT_TM1       0
-#define KV_INIT_TM1_A     1
-#define KV_INIT_EXTRA     2
-#define KV_INIT_EXTRA_A   3
-#define KV_INIT_ASIS      4
-#define KV_INIT_TM1_NA    5
-#define KV_INIT_EXTRA_NA  6
+/*--------------- VAR_INIT enum ------------------------*/
+enum VariablesInitialization
+{
+    VAR_INIT_TM1,
+    VAR_INIT_TM1_A,
+    VAR_INIT_EXTRA,
+    VAR_INIT_EXTRA_A,
+    VAR_INIT_ASIS,
+    VAR_INIT_TM1_NA,
+    VAR_INIT_EXTRA_NA
+};
 
 /*--------------- WS HTOL defines ------------------------*/
 #define WS_HTOL_LAST   0

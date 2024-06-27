@@ -13,7 +13,7 @@ cimport cython
 cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from pyiode.common cimport IODE_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL, EnumSimulationInitialization
+from pyiode.common cimport IODE_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL, VariablesInitialization
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -1449,7 +1449,7 @@ cdef class Variables(_AbstractDatabase):
             all(isinstance(name, str) for name in variables_list):
             variables_list = ';'.join(variables_list)
 
-        self.database_ptr.extrapolate(<EnumSimulationInitialization>method, from_period.encode(), to_period.encode(), 
+        self.database_ptr.extrapolate(<VariablesInitialization>method, from_period.encode(), to_period.encode(), 
                                       variables_list.encode())
 
     # TODO : add doctests (ask Geert Bryon)

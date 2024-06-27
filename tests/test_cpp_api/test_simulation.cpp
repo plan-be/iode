@@ -21,7 +21,7 @@ protected:
         endo_exo = "UY-XNATY";
 
         // Simulation std parameters
-        KSIM_START = KV_INIT_TM1;
+        KSIM_START = VAR_INIT_TM1;
         KSIM_EPS = 0.0001;
         KSIM_MAXIT = 100;
         KSIM_RELAX = 0.7;
@@ -50,13 +50,13 @@ TEST_F(SimulationTest, Simulation)
     sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_CONNEX);
     sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_BOTH);
 
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_TM1);
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_TM1_A);
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_TM1_NA);
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_ASIS);
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_EXTRA);
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_EXTRA_A);
-    sim.set_initialization_method(EnumSimulationInitialization::IV_INIT_EXTRA_NA);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1_A);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1_NA);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_ASIS);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_A);
+    sim.set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_NA);
 
     // Invalid arguments
     // invalid sample definition

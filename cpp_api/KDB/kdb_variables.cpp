@@ -408,7 +408,7 @@ void KDBVariables::copy_from(const std::string& input_file, const Period* from, 
 	copy_from(input_file, s_from, s_to, objects_names);
 }
 
-void KDBVariables::extrapolate(const EnumSimulationInitialization method, const std::string& from, 
+void KDBVariables::extrapolate(const VariablesInitialization method, const std::string& from, 
 	const std::string& to, const std::string& variables_list)
 {
 	KDB* kdb = get_database();
@@ -433,7 +433,7 @@ void KDBVariables::extrapolate(const EnumSimulationInitialization method, const 
 	}
 }
 
-void KDBVariables::extrapolate(const EnumSimulationInitialization method, const Period& from, 
+void KDBVariables::extrapolate(const VariablesInitialization method, const Period& from, 
 	const Period& to, const std::string& variables_list)
 {
 	extrapolate(method, from.to_string(), to.to_string(), variables_list);
