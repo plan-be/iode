@@ -1990,13 +1990,13 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     sprintf(outfile, "%s\\fun_xode.csv", IODE_OUTPUT_DIR);
     sprintf(reffile, "%s\\fun_xode.csv.ref", IODE_DATA_DIR);
-    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_CSV);
+    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_CSV);
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.csv", "fun_xode.csv.ref");
     EXPECT_EQ(cond, 1);
 
     sprintf(outfile, "%s\\fun_xode.rcsv", IODE_OUTPUT_DIR);
     sprintf(reffile, "%s\\fun_xode.rcsv.ref", IODE_DATA_DIR);
-    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXP_RCSV);
+    rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_RCSV);
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
     EXPECT_EQ(cond, 1);
 
@@ -2004,7 +2004,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     sprintf(outfile, "%s\\fun2.tsp", IODE_OUTPUT_DIR);
     sprintf(reffile, "%s\\fun2.ref.tsp", IODE_DATA_DIR);
     sprintf(rulefile, "%s\\rules.txt", IODE_DATA_DIR);
-    rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXP_TSP);
+    rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXPORT_TSP);
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun2.tsp", "fun2.ref.tsp");
     EXPECT_EQ(cond, 1);
 

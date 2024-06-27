@@ -60,7 +60,7 @@ void MenuFileExport::save()
 
         std::string from = wFrom->extractAndVerify().toStdString();
         std::string to = wTo->extractAndVerify().toStdString();
-        EnumIodeExportFormat format = (EnumIodeExportFormat) wExportFormat->extractAndVerify();
+        IodeExportFormat format = (IodeExportFormat) wExportFormat->extractAndVerify();
         std::string save_file = wExportFile->extractAndVerify().toStdString();
         std::string nan = wNan->extractAndVerify().toStdString();
         std::string separator = wSeparator->extractAndVerify().toStdString();

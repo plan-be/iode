@@ -402,11 +402,16 @@ enum IodeLowToHigh
 
 
 /*---------------- IMPORT/EXPORT: FORMAT DEFINES -------------------------*/
-#define EXP_CSV  0
-#define EXP_DIF  1
-#define EXP_WKS  2
-#define EXP_TSP  3
-#define EXP_RCSV 4
+enum IodeExportFormat
+{
+    EXPORT_CSV,
+    EXPORT_DIF,
+    EXPORT_WKS,
+    EXPORT_TSP,
+    EXPORT_RCSV
+};
+
+const static int IODE_NB_EXPORT_FORMATS = 5;
 
 #define IMP_FMT_ASCII     0
 #define IMP_FMT_ROT_ASCII 1
