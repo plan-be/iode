@@ -511,7 +511,7 @@ For these functions, the parameters and return values are as follows:
 
 ```
     @param [in] char*   arg     report line without the first word
-    @param [in] int     type    type of object to be manipulated (COMMENTS <= type <= K_VAR)
+    @param [in] int     type    type of object to be manipulated (COMMENTS <= type <= VARIABLES)
     @return     int             0 on success, -1 on error
 ```
 
@@ -524,9 +524,9 @@ For instance, the report command
 generates the C call:
 
 ```
-    B_DataDelete("A B C", K_VAR);
+    B_DataDelete("A B C", VARIABLES);
  
-    where arg == "A B C" and type == K_VAR
+    where arg == "A B C" and type == VARIABLES
 ```
 
 #### Functions with a file extension suffix (csv, txt...) {#T32}
@@ -551,7 +551,7 @@ calls the C function
 ```
     B_FileDelete(arg, K_CSV);
  
-    where arg == "myfile" and type == K_VAR
+    where arg == "myfile" and type == VARIABLES
 ```
 
 #### Other functions {#T33}
@@ -707,8 +707,8 @@ For instance, the report command
 generates the C call:
 
 ```
-    B_DataDelete("A B C", K_VAR);
-    where arg == "A B C" and type == K_VAR
+    B_DataDelete("A B C", VARIABLES);
+    where arg == "A B C" and type == VARIABLES
 ```
 
 #### Other functions {#T51}

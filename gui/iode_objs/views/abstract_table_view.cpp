@@ -103,7 +103,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(IDENTITIES); });
     connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(LISTS); });
     connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(TABLES); });
-    connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_VARIABLES); });
+    connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(VARIABLES); });
     connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(SCALARS); });
 
     // get list of related objects
@@ -129,7 +129,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(LISTS); });
     connect(relatedSclShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(SCALARS); });
     connect(relatedTblShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(TABLES); });
-    connect(relatedVarShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_VARIABLES); });
+    connect(relatedVarShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(VARIABLES); });
 }
 
 IodeAbstractTableView::~IodeAbstractTableView()

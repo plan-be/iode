@@ -41,7 +41,7 @@ int B_season(char* arg)
         nb --;
     }
 
-    from = K_load(K_VAR, name, nb, data);
+    from = K_load(VARIABLES, name, nb, data);
     if(from == NULL || nb != KNB(from)) {
         B_seterror("Empty data set or inexistant variable");
         goto done;
@@ -50,7 +50,7 @@ int B_season(char* arg)
     nbper = DS_smpl(KSMPL(from), KSMPL(KV_WS), &t_smpl, &shift);
     if(nbper < 0) goto done;
 
-    to = K_create(K_VAR, UPPER_CASE);
+    to = K_create(VARIABLES, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
     nb = t_smpl->s_nb;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));

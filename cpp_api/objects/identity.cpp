@@ -121,7 +121,7 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
     {
-        SAMPLE* sample = KSMPL(K_WS[I_VARIABLES]);
+        SAMPLE* sample = KSMPL(K_WS[VARIABLES]);
         if(sample == NULL || sample->s_nb == 0)
             throw IodeException("Cannot return the list of variables associated with the identity " + 
                                 std::string(this->lec) +"\nThe global sample is not yet defined");
@@ -133,8 +133,8 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
             c_name = const_cast<char*>(var_name.data());
             // adds a new variable with nb_obs L_NAN values to the Variables Database
             // see K_add() and K_vpack()
-            if (K_find(K_WS[I_VARIABLES], c_name) < 0) 
-                K_add(K_WS[I_VARIABLES], c_name, NULL, &nb_obs);
+            if (K_find(K_WS[VARIABLES], c_name) < 0) 
+                K_add(K_WS[VARIABLES], c_name, NULL, &nb_obs);
         }
     }
 

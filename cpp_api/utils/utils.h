@@ -205,7 +205,7 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
     }
     else
     {
-        if(file_type > I_VARIABLES_FILE) 
+        if(file_type > VARIABLES_FILE) 
             throw IodeExceptionFunction("Cannot run " + caller_name, 
                 "You must provide an extension for the file " + p_filepath.string());
 

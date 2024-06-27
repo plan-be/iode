@@ -5,13 +5,13 @@
  *  --------------------------------------
  *  
  *  This module calculates the values of table cells based on:
- *  - a list of files loaded in memory and stored in K_RWS[K_VAR].
+ *  - a list of files loaded in memory and stored in K_RWS[VARIABLES].
  *  - a group of column definitions (COLS = GSAMPLE compiled by COL_cc(gsample))
  *      where each column defines:
  *          - the period(s) to be used for the calculations (1 or 2 periods)
  *          - an optional operation between the periods (ex growth rates)
- *          - the position in K_RWS[K_VAR][...] of the (max 2) files to be used for the calculations: 
- *              1 for the WS, 2 for the file K_RWS[K_VAR][0]...
+ *          - the position in K_RWS[VARIABLES][...] of the (max 2) files to be used for the calculations: 
+ *              1 for the WS, 2 for the file K_RWS[VARIABLES][0]...
  *          - an optional operation between the files (ex: diff in %)
  *  - the LEC formulas defined in the table cells 
  *  
@@ -53,10 +53,10 @@ static CLEC *COL_cp_clec(CLEC* clec)
 
 
 /**
- *  Links a CLEC. The VAR KDB file is K_RWS[K_VAR][i - 1]. The SCL KDB is the current workspace. 
+ *  Links a CLEC. The VAR KDB file is K_RWS[VARIABLES][i - 1]. The SCL KDB is the current workspace. 
  *  
- *  @param [in] int     i       position of the KBD pointer in K_RWS[K_VAR], starting at 1 for pos 0
- *  @param [in] CLEC*   clec    Compiled LEC to link with K_RWS[K_VAR]]i - 1]
+ *  @param [in] int     i       position of the KBD pointer in K_RWS[VARIABLES], starting at 1 for pos 0
+ *  @param [in] CLEC*   clec    Compiled LEC to link with K_RWS[VARIABLES]]i - 1]
  *  @return     int             0 on success, 
  *                              -1 on error. A message is sent to kmsg() if the file is not present.
  *  
@@ -65,7 +65,7 @@ static int COL_link(int i, CLEC* clec)
 {
     KDB     *kdb = NULL;
 
-    kdb = K_RWS[K_VAR][i - 1];
+    kdb = K_RWS[VARIABLES][i - 1];
     if(kdb == NULL) {
         kmsg("File [%d] not present", i);
         return(-1);
@@ -79,7 +79,7 @@ static int COL_link(int i, CLEC* clec)
  *  Calculates the value of a table CELL on a specific GSAMPLE column (COL).
  *  
  *  First links clec and dclec (divisor) according to the COL definition (which 
- *  includes the files numbers and periods, that both refer to K_WS[K_VAR]). 
+ *  includes the files numbers and periods, that both refer to K_WS[VARIABLES]). 
  *  The linking of scalars is always done with KS_WS, the current SCL workspace.
  *  
  *  The result is stored in cl->cl_res, which is L_NAN on error.
@@ -101,7 +101,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
         if(cl->cl_fnb[i] == 0) continue;
         if(COL_link(cl->cl_fnb[i], clec)) goto err;                 // TODO: consistency: impossible clec link returns 0, but -1 for dclec
         if(dclec && COL_link(cl->cl_fnb[i], dclec)) return(-1);
-        kdb = K_RWS[K_VAR][cl->cl_fnb[i] - 1];
+        kdb = K_RWS[VARIABLES][cl->cl_fnb[i] - 1];
 
         for(j = 0 ; j < 2 ; j++) {
             if(j == 1 && cl->cl_opy == COL_NOP) {
@@ -138,7 +138,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 if(per == 0) break;
                 if(vy[1] == 0.0) goto err;
 
-                // Correction JMP 13/4/2018 pour taux de croissance négatifs
+                // Correction JMP 13/4/2018 pour taux de croissance nï¿½gatifs
                 mant = vy[0] / vy[1]; // JMP 16/5/2019
                 sign = 1;
                 if(mant < 0) {

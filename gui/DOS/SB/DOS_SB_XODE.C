@@ -76,7 +76,7 @@ int     fmt;
     }
 
     if(vfile[0] != 0) {
-        dbv = K_interpret(K_VAR, vfile);
+        dbv = K_interpret(VARIABLES, vfile);
         if(dbv == 0) return(-1); // JMP 29-05-2012
         if(smpl != NULL) KV_sample(dbv, smpl);
     }

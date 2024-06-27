@@ -426,7 +426,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     SAMPLE  *smpl;
 
     if(filename == NULL || filename[0] == 0) edbv = dbv;
-    else edbv = K_interpret(K_VAR, filename);
+    else edbv = K_interpret(VARIABLES, filename);
     if(edbv == NULL) goto done;
 
     smpl = KSMPL(edbv);
@@ -434,7 +434,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
-    ndbv = K_create(K_VAR, UPPER_CASE);
+    ndbv = K_create(VARIABLES, UPPER_CASE);
     if(ndbv == NULL) goto done;
     else memcpy(KDATA(ndbv), KSMPL(edbv), sizeof(SAMPLE));
 

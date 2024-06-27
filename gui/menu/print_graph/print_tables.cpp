@@ -13,10 +13,10 @@ MenuPrintTables::MenuPrintTables(QWidget* parent) : MenuPrintAbstract(parent)
 
     wTablesNames = new WrapperQPlainTextEdit(label_table_names->text(), *textEdit_table_names, REQUIRED_FIELD);
     wSample = new WrapperQTextEdit(label_sample->text(), *textEdit_sample, REQUIRED_FIELD);
-    wFile2 = new WrapperFileChooser(label_file_2->text(), *fileChooser_file_2, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile3 = new WrapperFileChooser(label_file_3->text(), *fileChooser_file_3, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile4 = new WrapperFileChooser(label_file_4->text(), *fileChooser_file_4, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile5 = new WrapperFileChooser(label_file_5->text(), *fileChooser_file_5, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
+    wFile2 = new WrapperFileChooser(label_file_2->text(), *fileChooser_file_2, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile3 = new WrapperFileChooser(label_file_3->text(), *fileChooser_file_3, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile4 = new WrapperFileChooser(label_file_4->text(), *fileChooser_file_4, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile5 = new WrapperFileChooser(label_file_5->text(), *fileChooser_file_5, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
     wLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
     wNbDecimals = new WrapperSpinBox(label_nb_decimals->text(), *spinBox_nb_decimals, REQUIRED_FIELD);
     
@@ -71,10 +71,10 @@ void MenuPrintTables::display()
 
         int nb_decimals = wNbDecimals->extractAndVerify();
 
-        if(!file_2.empty()) load_reference_kdb(2, I_VARIABLES_FILE, file_2);
-        if(!file_3.empty()) load_reference_kdb(3, I_VARIABLES_FILE, file_3);
-        if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
-        if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
+        if(!file_2.empty()) load_reference_kdb(2, VARIABLES_FILE, file_2);
+        if(!file_3.empty()) load_reference_kdb(3, VARIABLES_FILE, file_3);
+        if(!file_4.empty()) load_reference_kdb(4, VARIABLES_FILE, file_4);
+        if(!file_5.empty()) load_reference_kdb(5, VARIABLES_FILE, file_5);
 
         // Parses a string and replaces @filename and $listname by their contents
         char** c_table_names = B_ainit_chk(tableNames.toStdString().data(), NULL, 0);

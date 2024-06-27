@@ -54,7 +54,7 @@ void MenuWorkspaceMergeInto::merge_into_workspace()
         case TABLES:
             Tables.merge_from(input_file);
             break;
-        case I_VARIABLES:
+        case VARIABLES:
             Variables.merge_from(input_file);
             break;
         default:

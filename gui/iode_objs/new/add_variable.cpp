@@ -8,7 +8,7 @@ AddVariableDialog::AddVariableDialog(KDBVariables* database, QWidget* parent) : 
 	label_title->setText("Add Variable");
 	label_definition->setText("LEC");
 
-	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_VARIABLES, REQUIRED_FIELD);
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, VARIABLES, REQUIRED_FIELD);
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 

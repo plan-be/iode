@@ -135,7 +135,7 @@ class VariablesWidget : public TemplateIodeObjectWidget<VariablesModel, Variable
     QShortcut* shortcutModeMinus;
 
 public:
-    VariablesWidget(QWidget* parent) : TemplateIodeObjectWidget(I_VARIABLES, parent) 
+    VariablesWidget(QWidget* parent) : TemplateIodeObjectWidget(VARIABLES, parent) 
     {
         QHBoxLayout* bottomLayout = numeric.setup(this, objmodel, tableview);
 

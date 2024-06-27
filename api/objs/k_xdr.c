@@ -248,7 +248,7 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
     XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
     XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
 
-    if(type == K_VAR) {
+    if(type == VARIABLES) {
         smpl = (SAMPLE *) KDATA(xdr_kdb);
         K_xdrSMPL(smpl);
     }

@@ -50,7 +50,7 @@ protected:
         case TABLES:
             index = this->indexOf(tabTables);
             break;
-        case I_VARIABLES:
+        case VARIABLES:
             index = this->indexOf(tabVariables);
             break;
         default:

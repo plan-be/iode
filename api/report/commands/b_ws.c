@@ -244,7 +244,7 @@ int B_WsSample(char* arg)
 {
     char    **args;
     SAMPLE  *new = NULL;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
 
     args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) goto err;
@@ -291,7 +291,7 @@ int B_WsClearAll(char* arg)
 {
     int i;
 
-    for(i = COMMENTS; i <= K_VAR; i++) B_WsClear("", i);
+    for(i = COMMENTS; i <= VARIABLES; i++) B_WsClear("", i);
     return(0);
 }
 
@@ -371,7 +371,7 @@ int B_WsCopy(char* arg, int type)
         return(-1);
     }
 
-    if(type == K_VAR && SCR_tbl_size(data0) >= 2) {
+    if(type == VARIABLES && SCR_tbl_size(data0) >= 2) {
         smpl = PER_atosmpl(data0[0], data0[1]);
         if(smpl != NULL) shift = 2;
         else B_clear_last_error();
@@ -440,7 +440,7 @@ int B_WsExtrapolate(char* arg)
     int     nb_args, p = 0, method = 0, rc = -1;
     char    **args, **vars;
     SAMPLE  *smpl;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size(args);
@@ -482,7 +482,7 @@ int B_WsAggr(int method, char* arg)
 {
     int     nb_args, rc = -1;
     char    **args, *pattern = NULL;
-    KDB     *kdb = K_WS[K_VAR], *nkdb = NULL;
+    KDB     *kdb = K_WS[VARIABLES], *nkdb = NULL;
 
     args = B_ainit_chk(arg, NULL, 0);
     nb_args = SCR_tbl_size(args);
@@ -594,7 +594,7 @@ double *B_StatUnitRoot_1(char* arg, int print)
     if(print && df != NULL) 
         E_PrintDF(arg + lg + 1, df, drift, trend, order);
 
-//    B_DataDelete("_DF", K_VAR);
+//    B_DataDelete("_DF", VARIABLES);
 
     if(df) {
         E_GetLecName(arg + lg + 1, name);
@@ -668,7 +668,7 @@ int B_CsvSave(char* arg, int type)
         data0 = 0;
     }
 
-    if(data0 && type == K_VAR && SCR_tbl_size(data0) >= 2) {
+    if(data0 && type == VARIABLES && SCR_tbl_size(data0) >= 2) {
         if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0])) {
             shift = 2;
             smpl = PER_atosmpl(data0[0], data0[1]);

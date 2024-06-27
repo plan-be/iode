@@ -34,7 +34,7 @@ public slots:
     }
     void updateThreshold(int iode_type)
     {
-        if(iode_type == I_VARIABLES)
+        if(iode_type == VARIABLES)
             wThreshold->getQField().setEnabled(true);
         else
             wThreshold->getQField().setEnabled(false);

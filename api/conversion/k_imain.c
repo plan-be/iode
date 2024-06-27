@@ -88,7 +88,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
     if(impdef->imp_hd_fn != NULL
             && (*(impdef->imp_hd_fn))(yy, smpl) < 0) goto err;
 
-    kdb = K_create(K_VAR, UPPER_CASE);
+    kdb = K_create(VARIABLES, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
     nb = smpl->s_nb;
 
@@ -370,7 +370,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
 /**
  *  Imports variables or comments in various formats.
  *  
- *  @param [in] int     type    type of objects to import: COMMENTS or K_VAR
+ *  @param [in] int     type    type of objects to import: COMMENTS or VARIABLES
  *  @param [in] char*   trace   if trace[0] != 0, prints a list of the object name modifications
  *  @param [in] char*   rule    rule file
  *  @param [in] char*   ode     output IODE file
@@ -390,7 +390,7 @@ int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char
             rc = IMP_RuleImportCmt(trace, rule, ode, asc, fmt, lang);
             break;
 
-        case K_VAR   :
+        case VARIABLES   :
             rc = IMP_RuleImportVar(trace, rule, ode, asc, from, to, fmt);
             break;
 

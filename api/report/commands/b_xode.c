@@ -96,7 +96,7 @@ int B_FileImportVar(char* arg)
     if(nb_args == 7) trace = args[6];
     else             trace = empty_buf;
 
-    rc = IMP_RuleImport(K_VAR, trace, rule, oufile, infile,
+    rc = IMP_RuleImport(VARIABLES, trace, rule, oufile, infile,
                       from, to, format, 0);
 
 fin:

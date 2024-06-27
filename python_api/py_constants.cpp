@@ -16,7 +16,7 @@ void init_constants(nb::module_ &m)
       m.attr("I_LST") = (int) LISTS;
       m.attr("I_SCL") = (int) SCALARS;
       m.attr("I_TBL") = (int) TABLES;
-      m.attr("I_VAR") = (int) I_VARIABLES;
+      m.attr("I_VAR") = (int) VARIABLES;
 
       // Methods to estimation equations
       m.attr("E_LSQ")            = (int) IE_LSQ;

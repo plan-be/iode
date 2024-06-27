@@ -129,7 +129,7 @@ char *IodeDdeGetWS(char *szItem)
     kdb = K_WS[type];
     if(strcmp(szItem, "SAMPLE") == 0) {
         res = SCR_malloc(40);
-        PER_smpltoa(KSMPL(K_WS[K_VAR]), res);
+        PER_smpltoa(KSMPL(K_WS[VARIABLES]), res);
         return(res);
     }
     else if(strcmp(szItem + 1, "LIST") == 0) {
@@ -163,7 +163,7 @@ char *IodeDdeGetWS(char *szItem)
 char *IodeDdeCreateSeries(int objnb, int bt)
 {
     char    *res, buf[128];
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
     int     t;
     double  x;
 
@@ -186,7 +186,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
 char *IodeDdeCreatePer(int bt)
 {
     char    *res;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
     PERIOD  *per;
     int     t;
 
@@ -462,7 +462,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
     if(hConv == 0) return(SCR_stracpy("Error"));
 
     switch(type) {
-        case K_VAR:
+        case VARIABLES:
             if(SCR_tbl_size(lst) == 0) {
                 res = IodeDdeCreatePer(0);
                 WscrDdeSetItem(hConv,
@@ -542,7 +542,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     kmsg("Dispatching DDE-call: %s!%s", szTopic, szItem);
 
     if(strcmp(szTopic, "WS") == 0)   return(IodeDdeGetWS(szItem));
-    if(strcmp(szTopic, "XVAR") == 0) return(IodeDdeGetXObj(szItem, K_VAR));
+    if(strcmp(szTopic, "XVAR") == 0) return(IodeDdeGetXObj(szItem, VARIABLES));
     if(strcmp(szTopic, "XCMT") == 0) return(IodeDdeGetXObj(szItem, COMMENTS));
     if(strcmp(szTopic, "XLST") == 0) return(IodeDdeGetXObj(szItem, LISTS));
     if(strcmp(szTopic, "XIDT") == 0) return(IodeDdeGetXObj(szItem, IDENTITIES));
@@ -569,7 +569,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             SCR_replace(res, "\n", " ");
             return(res);
 
-        case K_VAR :
+        case VARIABLES :
             res = SCR_malloc(40 * (1 + KSMPL(kdb)->s_nb)); /* JMP 29-06-00 */
             for(t = 0 ; t < KSMPL(kdb)->s_nb ; t++) {
                 x = *(KVVAL(kdb, objnb, t));
@@ -687,7 +687,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
     kdb = K_WS[type];
 
     tmp = SCR_malloc((int)strlen(szBuffer) + 30);
-    if(type == K_VAR) {
+    if(type == VARIABLES) {
         sprintf(tmp, "%s %s %s", szItem,
                 PER_pertoa(&(KSMPL(kdb)->s_p1), buf), szBuffer);
     }
@@ -979,7 +979,7 @@ int B_ExcelSet(char *arg, int type)
             ptr = IodeDdeCreateTbl(pos, smpl, &nc, &nl, -1);
             break;
 
-        case K_VAR : /* Name Period nVal */
+        case VARIABLES : /* Name Period nVal */
             per = PER_atoper(args[1]);
             if(per == NULL
                     || (shift = PER_diff_per(per, &(KSMPL(kdb)->s_p1))) < 0) shift = 0;

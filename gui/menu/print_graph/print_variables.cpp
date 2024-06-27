@@ -5,7 +5,7 @@ MenuPrintVariables::MenuPrintVariables(QWidget* parent) : MenuPrintAbstract(pare
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_VARIABLES, textEdit_variable_names);
+    completer = new IodeCompleter(false, false, VARIABLES, textEdit_variable_names);
     textEdit_variable_names->setCompleter(completer);
 
     QList<QString> q_langs;
@@ -13,10 +13,10 @@ MenuPrintVariables::MenuPrintVariables(QWidget* parent) : MenuPrintAbstract(pare
 
     wVariablesNames = new WrapperQPlainTextEdit(label_variable_names->text(), *textEdit_variable_names, REQUIRED_FIELD);
     wSample = new WrapperQTextEdit(label_sample->text(), *textEdit_sample, REQUIRED_FIELD);
-    wFile2 = new WrapperFileChooser(label_file_2->text(), *fileChooser_file_2, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile3 = new WrapperFileChooser(label_file_3->text(), *fileChooser_file_3, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile4 = new WrapperFileChooser(label_file_4->text(), *fileChooser_file_4, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile5 = new WrapperFileChooser(label_file_5->text(), *fileChooser_file_5, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
+    wFile2 = new WrapperFileChooser(label_file_2->text(), *fileChooser_file_2, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile3 = new WrapperFileChooser(label_file_3->text(), *fileChooser_file_3, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile4 = new WrapperFileChooser(label_file_4->text(), *fileChooser_file_4, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile5 = new WrapperFileChooser(label_file_5->text(), *fileChooser_file_5, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
     wLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
     wNbDecimals = new WrapperSpinBox(label_nb_decimals->text(), *spinBox_nb_decimals, REQUIRED_FIELD);
     
@@ -71,10 +71,10 @@ void MenuPrintVariables::display()
 
         int nb_decimals = wNbDecimals->extractAndVerify();
 
-        if(!file_2.empty()) load_reference_kdb(2, I_VARIABLES_FILE, file_2);
-        if(!file_3.empty()) load_reference_kdb(3, I_VARIABLES_FILE, file_3);
-        if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
-        if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
+        if(!file_2.empty()) load_reference_kdb(2, VARIABLES_FILE, file_2);
+        if(!file_3.empty()) load_reference_kdb(3, VARIABLES_FILE, file_3);
+        if(!file_4.empty()) load_reference_kdb(4, VARIABLES_FILE, file_4);
+        if(!file_5.empty()) load_reference_kdb(5, VARIABLES_FILE, file_5);
 
         ComputedTableNumericalDialog view(tableName, gsample, nb_decimals, variables, this);
         view.exec();

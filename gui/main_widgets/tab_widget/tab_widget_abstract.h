@@ -433,7 +433,7 @@ protected slots:
         // REMINDER: By design 
         //           - there is only ONE tab per type of IODE database
         //           - the tabs representing an IODE database CANNOT be closed
-        if(tabWidget->getFiletype() <= I_VARIABLES_FILE)
+        if(tabWidget->getFiletype() <= VARIABLES_FILE)
         {
             actionClose->setVisible(false);
             actionClear->setVisible(true);

@@ -66,7 +66,7 @@ fin:
     if(from != 0) fclose(from);
     if(to != 0) {
         fclose(to);
-        if(type <= K_VAR) K_setname(buf_to, buf_to);  // JMP 27/10/2021
+        if(type <= VARIABLES) K_setname(buf_to, buf_to);  // JMP 27/10/2021
     }
     A_free(args);
     return(rc);
@@ -104,7 +104,7 @@ int B_FileRename(char* arg, int type)
     K_set_ext(buf_from, args[0], type);
     K_set_ext(buf_to, args[1], type);
     if(SCR_rename(buf_from, buf_to))  rc = -1;
-    else if(type <= K_VAR && K_setname(buf_to, buf_to)) rc = -1; // JMP 27/10/2021
+    else if(type <= VARIABLES && K_setname(buf_to, buf_to)) rc = -1; // JMP 27/10/2021
 
 fin:
     if(rc < 0) B_seterror("Unable to rename %s", buf_from);

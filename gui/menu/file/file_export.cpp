@@ -16,7 +16,7 @@ MenuFileExport::MenuFileExport(QWidget* parent) :
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, OPTIONAL_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, OPTIONAL_FIELD);
     wExportFormat = new WrapperComboBox(label_format->text(), *comboBox_format, REQUIRED_FIELD, q_formats);
-    wExportFile = new WrapperFileChooser(label_save_file->text(), *fileChooser_save_file, REQUIRED_FIELD, I_VARIABLES_FILE, NEW_FILE);
+    wExportFile = new WrapperFileChooser(label_save_file->text(), *fileChooser_save_file, REQUIRED_FIELD, VARIABLES_FILE, NEW_FILE);
     wNan = new WrapperQLineEdit(label_nan->text(), *lineEdit_nan, REQUIRED_FIELD);
     wSeparator = new WrapperQLineEdit(label_separator->text(), *lineEdit_separator, REQUIRED_FIELD);
     wDebugFile = new WrapperFileChooser(label_debug->text(), *fileChooser_debug_file, OPTIONAL_FIELD, I_LOGS_FILE, NEW_FILE);

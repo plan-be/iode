@@ -34,11 +34,11 @@ static int E_GetSmpl(SAMPLE *smpl, char *name)
 {
     int     pos, t;
     double    *val;
-    SAMPLE  *wsmpl = KSMPL(K_WS[K_VAR]);
+    SAMPLE  *wsmpl = KSMPL(K_WS[VARIABLES]);
 
-    pos = K_find(K_WS[K_VAR], name);
+    pos = K_find(K_WS[VARIABLES], name);
     if(pos < 0) return(-1);
-    val = KVVAL(K_WS[K_VAR], pos, 0);
+    val = KVVAL(K_WS[VARIABLES], pos, 0);
 
     for(t = 0 ; t < wsmpl->s_nb ; t++)
         if(L_ISAN(val[t])) break;

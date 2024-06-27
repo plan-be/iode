@@ -167,7 +167,7 @@ int B_DSUpdateVar(char *name, PERIOD *per, char *val)
         SCR_replace(val, "#n/a", "na"); // Modif na au lieu de -- 27/08/2009
 
         sprintf(update, "%s %s %s", name, PER_pertoa(per, period), val);
-        rc = B_DataUpdate(update, K_VAR);
+        rc = B_DataUpdate(update, VARIABLES);
         SCR_free(update);
     }
     return(rc);
@@ -247,9 +247,9 @@ int B_DSImportDb(char *arg)
 {
     SAMPLE  *smpl;
 
-    if(KSMPL(K_WS[K_VAR])->s_nb == 0) return(-1);
+    if(KSMPL(K_WS[VARIABLES])->s_nb == 0) return(-1);
 
     WscrDdeSetTimeOut(10000, 3);
-    smpl = KSMPL(K_WS[K_VAR]);
+    smpl = KSMPL(K_WS[VARIABLES]);
     return(B_ainit_loop(arg, B_DSImportDb_1, (char *)smpl));
 }

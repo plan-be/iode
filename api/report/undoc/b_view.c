@@ -74,7 +74,7 @@ int B_ViewPrintVar(char* arg, int mode)
     SCR_free_tbl(args);
 
     A_SEPS = ";\t\n"; /* JMP 24-12-98 */
-    lst = K_expand(K_VAR, NULL, arg + strlen(smpl) + 1, '*');
+    lst = K_expand(VARIABLES, NULL, arg + strlen(smpl) + 1, '*');
     args = B_ainit_chk(lst, NULL, 0);
     SCR_free(lst);
     A_SEPS = oldseps;    /* JMP 14-07-96 */
@@ -321,14 +321,14 @@ int B_ViewTblFile(char* arg)
             goto err;
         }
 
-        kdb = K_interpret(K_VAR, args[1]);
+        kdb = K_interpret(VARIABLES, args[1]);
         if(kdb == NULL) {
             rc = -1;
             goto err;
         }
 
-        K_free(K_RWS[K_VAR][ref - 1]);
-        K_RWS[K_VAR][ref - 1] = kdb;
+        K_free(K_RWS[VARIABLES][ref - 1]);
+        K_RWS[VARIABLES][ref - 1] = kdb;
     }
 
 err:
@@ -343,8 +343,8 @@ int B_ViewTblEnd()
     int     i;
 
     for(i = 1; i < 5; i++) {
-        K_free(K_RWS[K_VAR][i]);
-        K_RWS[K_VAR][i] = NULL;
+        K_free(K_RWS[VARIABLES][i]);
+        K_RWS[VARIABLES][i] = NULL;
     }
     ODE_VIEW = 0;
     ODE_SMPL[0] = '\0';

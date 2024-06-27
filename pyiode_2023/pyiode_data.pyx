@@ -129,6 +129,6 @@ def data_update_var(varname: str, values, operation: str = "L", per_from: str = 
     cmd = cmd + " " + per_from 
     cmd = cmd + " " + repr(values)[1:-1]
     #print(f"Command:{cmd}")
-    if B_DataUpdate(cstr(cmd), K_VAR) != 0:
+    if B_DataUpdate(cstr(cmd), VARIABLES) != 0:
         raise RuntimeError(f"Variable {varname} update failed")
 

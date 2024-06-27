@@ -12,7 +12,7 @@ int pos, type;
 	case LISTS :
 	case SCALARS :
 	case TABLES :
-	case K_VAR :
+	case VARIABLES :
 	    lst = A_init(KONAME(kdb, pos)); break;
 	case EQUATIONS :
 	    lst = A_clec(KONAME(kdb, pos), KECLEC(kdb, pos), type); break;

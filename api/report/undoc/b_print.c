@@ -312,7 +312,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             rc = B_PrintDefTbl(kdb, pos);
             W_flush();
             break;
-        case K_VAR :
+        case VARIABLES :
             if(BEG % 47 == 0) {
                 SAMPLE  *smpl;
                 PERIOD  *per;

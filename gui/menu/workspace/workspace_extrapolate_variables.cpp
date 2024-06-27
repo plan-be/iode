@@ -6,7 +6,7 @@ MenuWorkspaceExtrapolateVariables::MenuWorkspaceExtrapolateVariables(QWidget* pa
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_VARIABLES, textEdit_variables_list);
+    completer = new IodeCompleter(false, false, VARIABLES, textEdit_variables_list);
     textEdit_variables_list->setCompleter(completer);
 
     QList<QString> methodsList; 

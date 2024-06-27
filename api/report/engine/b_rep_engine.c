@@ -464,7 +464,7 @@ int RP_find_fn(char* name, int* type, int fs)
             lg = (int)strlen(B_fns[i].keyw);
             if(strncmp(name, B_fns[i].keyw, lg)) continue;
             for(j = 0 ; k_ext[j] ; j++) {
-                if(j > K_VAR && B_fns[i].type % 2) break;
+                if(j > VARIABLES && B_fns[i].type % 2) break;
                 if(strcmp(k_ext[j], name + lg) == 0) {
                     *type = j;
                     return(i);
@@ -696,8 +696,8 @@ double RP_evallec(char* lec)
             B_seterror("Syntax error %.80s", L_error());
             return(x);
         }
-        if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[SCALARS], clec))
-            x = L_exec(K_WS[K_VAR], K_WS[SCALARS], clec, RP_T);
+        if(clec != 0 && !L_link(K_WS[VARIABLES], K_WS[SCALARS], clec))
+            x = L_exec(K_WS[VARIABLES], K_WS[SCALARS], clec, RP_T);
         SW_nfree(clec);
     }
 

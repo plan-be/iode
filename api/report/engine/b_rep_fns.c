@@ -748,7 +748,7 @@ U_ch *RPF_vvalue(U_ch** args)
     U_ch    *res = 0, buf[128];
     double    *val;
     SAMPLE  *smpl;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
     int     pos, i, j;
 
     if(kdb == NULL) return(res);
@@ -1067,7 +1067,7 @@ U_ch *RPF_sample(U_ch** args)
     U_ch    *res = 0, buf[128];
     char    per1[20], per2[20];
     SAMPLE  *smpl;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
     char     what = 'F';
 
     smpl = (SAMPLE *) KDATA(kdb);
@@ -1346,7 +1346,7 @@ U_ch *RPF_texpand(U_ch **args)
  */
 U_ch *RPF_vexpand(U_ch **args)
 {
-    return(RPF_expand(args, K_VAR));
+    return(RPF_expand(args, VARIABLES));
 }
 
 
