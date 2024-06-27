@@ -237,7 +237,7 @@ int     varnb, t;
 	L_link(KV_WS, KS_WS, clec);
 	res = L_exec(KV_WS, KS_WS, clec, t);
 	SW_nfree(clec);
-	if(!L_ISAN(res)) goto err;
+	if(!IODE_IS_A_NUMBER(res)) goto err;
 	res *= *val;
 	goto ok;
 	}
@@ -252,7 +252,7 @@ int     varnb, t;
     L_link(KV_WS, KS_WS, clec);
     res = L_exec(KV_WS, KS_WS, clec, t);
     SW_nfree(clec);
-    if(L_ISAN(res)) goto ok;
+    if(IODE_IS_A_NUMBER(res)) goto ok;
 
 newton:
 /*    sprintf(tmp, "(%s) - %lg * (%s)", lec, *val, dlec); /* JMP 09-04-98 */
@@ -262,7 +262,7 @@ newton:
     L_link(KV_WS, KS_WS, clec);
     res = L_zero(KV_WS, KS_WS, clec, t, varnb, varnb);
     SW_nfree(clec);
-    if(L_ISAN(res)) goto ok;
+    if(IODE_IS_A_NUMBER(res)) goto ok;
     goto err;
 
 ok:
@@ -322,10 +322,10 @@ int     i, j;
 
     if(ODE_edit_val(&val, (int)global_VTW)) goto rec;
     ODE_edit_rec_scl_var();
-    if(!L_ISAN(val)) goto rec;
+    if(!IODE_IS_A_NUMBER(val)) goto rec;
 
     old = *KVVAL(KV_WS, varnb, t);
-    if(VT_calc(lec, dlec, name, &val, varnb, t) || !L_ISAN(val)) val = old;
+    if(VT_calc(lec, dlec, name, &val, varnb, t) || !IODE_IS_A_NUMBER(val)) val = old;
     *KVVAL(KV_WS, varnb, t) = val;
     T_calc_val(tbl, name);
 err:

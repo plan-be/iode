@@ -53,7 +53,7 @@ L_REAL L_times(L_REAL a, L_REAL b) {return(a * b);}
 
 L_REAL L_divide(L_REAL a, L_REAL b) 
 {
-    if(!L_ISAN(b) || !L_ISAN(a) || b == 0) {
+    if(!IODE_IS_A_NUMBER(b) || !IODE_IS_A_NUMBER(a) || b == 0) {
         return((L_REAL)IODE_NAN);
     }
     return(a / b);

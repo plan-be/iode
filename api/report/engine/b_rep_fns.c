@@ -621,7 +621,7 @@ U_ch *RPF_sstderr(U_ch** args)
             strcpy(buf, "--");
         }
         else {
-            if(L_ISAN(scl->std))
+            if(IODE_IS_A_NUMBER(scl->std))
                 sprintf(buf, "%lf", (double) scl->std);
             else
                 strcpy(buf, "--");
@@ -654,7 +654,7 @@ U_ch *RPF_srelax(U_ch** args)
             strcpy(buf, "--");
         }
         else {
-            if(L_ISAN(scl->relax))
+            if(IODE_IS_A_NUMBER(scl->relax))
                 sprintf(buf, "%lf", (double) scl->relax);
             else
                 strcpy(buf, "--");

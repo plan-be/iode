@@ -225,7 +225,7 @@ KDB *KV_load_asc(char *filename)
  */
 static void KV_print_val(FILE* fd, double val)
 {
-    if(L_ISAN(val))
+    if(IODE_IS_A_NUMBER(val))
 #ifdef REALD
         fprintf(fd, "%.15lg ", (double)(val)); /* JMP 09-04-98 */
 #else
@@ -389,7 +389,7 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
         if(pos >= 0) {
             val = KVVAL(kdb, pos, 0);
             for(j = 0 ; j < smpl->s_nb; j++, val++) {
-                if(L_ISAN(*val)) {
+                if(IODE_IS_A_NUMBER(*val)) {
                     sprintf(buf, fmt, (double)(*val));
                     if(dec[0] != '.') SCR_replace(buf, ".", dec);
                 }

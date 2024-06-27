@@ -34,9 +34,9 @@ static int KS_read_scl(KDB* kdb, YYFILE* yy, char* name)
 
     /* READ AT MOST 3 REALS */
     scl.val = K_read_real(yy);
-    if(!L_ISAN(scl.val)) scl.val = 0.9;
+    if(!IODE_IS_A_NUMBER(scl.val)) scl.val = 0.9;
     scl.relax = K_read_real(yy);
-    if(!L_ISAN(scl.relax)) scl.relax = 1.0;
+    if(!IODE_IS_A_NUMBER(scl.relax)) scl.relax = 1.0;
     scl.std = K_read_real(yy);
 
     /* CONTINUE READING UNTIL END OF VALUES */
@@ -145,13 +145,13 @@ KDB *KS_load_asc(char* filename)
  */
 static void KS_print_scl(FILE* fd, SCL* scl)
 {
-    if(L_ISAN(scl->val)) fprintf(fd, "%.14lg ", (double)(scl->val)); /* JMP 06/10/2022 */ 
+    if(IODE_IS_A_NUMBER(scl->val)) fprintf(fd, "%.14lg ", (double)(scl->val)); /* JMP 06/10/2022 */ 
     else fprintf(fd, "na ");
 
-    if(L_ISAN(scl->relax)) fprintf(fd, "%.14lg ", (double)(scl->relax)); /* JMP 06/10/2022 */
+    if(IODE_IS_A_NUMBER(scl->relax)) fprintf(fd, "%.14lg ", (double)(scl->relax)); /* JMP 06/10/2022 */
     else fprintf(fd, "na ");
 
-    if(L_ISAN(scl->std)) fprintf(fd, "%.14lg ", (double)(scl->std));     /* JMP 06/10/2022 */
+    if(IODE_IS_A_NUMBER(scl->std)) fprintf(fd, "%.14lg ", (double)(scl->std));     /* JMP 06/10/2022 */
     else fprintf(fd, "na ");
 }
 

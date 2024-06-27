@@ -78,7 +78,7 @@ int B_PrintVal(double val)
  */
 double B_calc_ttest(SCL* scl)
 {
-    if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
+    if(IODE_IS_A_NUMBER(scl->val) && IODE_IS_A_NUMBER(scl->std) && !L_IS0(scl->std))
         return(scl->val / scl->std);
     return(IODE_NAN);
 }

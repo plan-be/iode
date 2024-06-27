@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
-from util cimport (L_ISAN, IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, 
+from util cimport (IODE_IS_A_NUMBER, IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, 
                    IodeDisplayErrorMsgs, IodeClearErrorMsgs)
 
 
@@ -43,7 +43,7 @@ def is_NA(value: float) -> bool:
     >>> is_NA(NA)
     True
     """
-    return not L_ISAN(value)
+    return not IODE_IS_A_NUMBER(value)
 
 def _iode_number_to_str(value: float) -> str:
     return "na" if is_NA(value) else f"{value:g}"

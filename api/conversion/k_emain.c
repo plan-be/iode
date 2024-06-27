@@ -136,7 +136,7 @@ static void EXP_set(char* na, char* sep)
  */
 void EXP_val(char* tmp, double val)
 {
-    if(L_ISAN(val)) {
+    if(IODE_IS_A_NUMBER(val)) {
         SCR_fmt_dbl(val, tmp, 20, -1);
         SCR_sqz(tmp);
     }

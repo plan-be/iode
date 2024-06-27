@@ -173,10 +173,10 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
                 SCR_replace(cvar, "y", yvars[ccol]);
 
                 var = RasGetVar(cvar, rt);
-                if(!L_ISAN(var)) goto cleanup;
+                if(!IODE_IS_A_NUMBER(var)) goto cleanup;
 
                 fvar = RasGetVar(cvar, ct); // fixed var for current year
-                if(!L_ISAN(fvar))  MATE(A, crow, ccol) = var;
+                if(!IODE_IS_A_NUMBER(fvar))  MATE(A, crow, ccol) = var;
                 else {
                     MATE(A, crow, ccol) = 0.0;
                     row[crow] -= fvar;
@@ -191,7 +191,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
             strcpy(cvar, rvar);
             SCR_replace(cvar, "x", xvars[crow]);
             var = RasGetVar(cvar, ct);
-            if(!L_ISAN(var)) goto cleanup;
+            if(!IODE_IS_A_NUMBER(var)) goto cleanup;
             row[crow] += var;
         }
 
@@ -201,7 +201,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
             strcpy(cvar, rvar);
             SCR_replace(cvar, "y", yvars[ccol]);
             var = RasGetVar(cvar, ct);
-            if(!L_ISAN(var)) goto cleanup;
+            if(!IODE_IS_A_NUMBER(var)) goto cleanup;
             col[ccol] += var;
         }
 
@@ -216,7 +216,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
                 strcpy(cvar, rvar);
                 SCR_replace(cvar, "y", yvars[ccol]);
                 // keep var if fixed
-                if(!L_ISAN(RasGetVar(cvar, ct)))
+                if(!IODE_IS_A_NUMBER(RasGetVar(cvar, ct)))
                     if(RasSetVar(cvar, ct, MATE(A, crow, ccol)) < 0) goto cleanup;
             }
         }

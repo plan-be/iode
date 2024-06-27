@@ -41,12 +41,12 @@ static int E_GetSmpl(SAMPLE *smpl, char *name)
     val = KVVAL(K_WS[VARIABLES], pos, 0);
 
     for(t = 0 ; t < wsmpl->s_nb ; t++)
-        if(L_ISAN(val[t])) break;
+        if(IODE_IS_A_NUMBER(val[t])) break;
 
     memcpy(&(smpl->s_p1), PER_addper(&(wsmpl->s_p1), t), sizeof(PERIOD));
 
     for(; t < wsmpl->s_nb ; t++)
-        if(!L_ISAN(val[t])) break;
+        if(!IODE_IS_A_NUMBER(val[t])) break;
 
     memcpy(&(smpl->s_p2), PER_addper(&(wsmpl->s_p1), t), sizeof(PERIOD));
 

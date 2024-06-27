@@ -99,10 +99,10 @@ int T_GraphInit(double w, double h,
     W_printf(".gbox %d %c %d\n", box, A2M_BACKCOLOR, brush);
 
 
-    if(L_ISAN(ymin)) W_printf(".gyMin %lg\n", ymin);
-    if(L_ISAN(ymax)) W_printf(".gyMax %lg\n", ymax);
-    if(L_ISAN(zmin)) W_printf(".gzMin %lg\n", zmin);
-    if(L_ISAN(zmax)) W_printf(".gzMax %lg\n", zmax);
+    if(IODE_IS_A_NUMBER(ymin)) W_printf(".gyMin %lg\n", ymin);
+    if(IODE_IS_A_NUMBER(ymax)) W_printf(".gyMax %lg\n", ymax);
+    if(IODE_IS_A_NUMBER(zmin)) W_printf(".gzMin %lg\n", zmin);
+    if(IODE_IS_A_NUMBER(zmax)) W_printf(".gzMax %lg\n", zmax);
     return(0);
 }
 

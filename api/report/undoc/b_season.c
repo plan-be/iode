@@ -109,11 +109,11 @@ int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift)
     int     f, nj, rc = 0, tolag;
     double    ti[12], maxti = 0.0, minti = 150.0;
 
-    for(*beg = 0; *beg < nb && !L_ISAN(vec[*beg]); (*beg)++);
+    for(*beg = 0; *beg < nb && !IODE_IS_A_NUMBER(vec[*beg]); (*beg)++);
     /*    if(*beg != 0) *beg = ((*beg)/nbper + 1) * nbper;  GB 23/07/98 */
 
     *shift = 0.0;
-    for(*dim = *beg; *dim < nb && L_ISAN(vec[*dim]); (*dim)++)
+    for(*dim = *beg; *dim < nb && IODE_IS_A_NUMBER(vec[*dim]); (*dim)++)
         *shift = min(*shift, vec[*dim]);
 
 
@@ -445,7 +445,7 @@ int DS_extr(double* vec, int dim, int nbper, double* bi, double shift)
 {
     int i, m;
 
-    for(i = 0; i < dim && L_ISAN(vec[i]); i++) {
+    for(i = 0; i < dim && IODE_IS_A_NUMBER(vec[i]); i++) {
         m = i % nbper;
         vec[i]= 100.0 * vec[i]/bi[m];
         vec[i] -= shift;

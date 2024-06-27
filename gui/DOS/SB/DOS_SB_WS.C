@@ -607,7 +607,7 @@ char    *label;
 {
     char    ax;
 
-    if(!L_ISAN(value)) return;
+    if(!IODE_IS_A_NUMBER(value)) return;
 
     ax = "xyz"[axis];
     if (label != NULL) W_printf(".g%clabs (%f \"%s\")\n", ax, value, label);

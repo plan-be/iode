@@ -1,6 +1,6 @@
 
 cdef extern from "api/iode.h":
-    cdef bint   L_ISAN(double)
+    cdef bint   IODE_IS_A_NUMBER(double)
     cdef char   *IodeVersion()
     cdef void   IodeSuppressMsgs()
     cdef void   IodeResetMsgs()

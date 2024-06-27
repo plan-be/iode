@@ -228,7 +228,7 @@ int     lg;
     SCRL_ccoord(&l, &c);
 /*    SCR_fmt_dbl(*val, buf, 20, -1); /* JMP 09-04-98 */
 /*  SCR_fmt_dbl(*val, buf, 20, 15);   /* JMP 09-04-98 */
-    if(L_ISAN(*val)) {
+    if(IODE_IS_A_NUMBER(*val)) {
 #ifdef REALD
 	if(global_PREC == 0) global_PREC = 8;
 	sprintf(buf1, "%%.%ldlg", global_PREC);

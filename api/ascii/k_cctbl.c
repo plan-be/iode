@@ -526,7 +526,7 @@ char axis, type;
  
 static void KT_min(FILE* fd, char* str, float value)
 {
-    if(L_ISAN(value)) fprintf(fd, "\n%s %f ", str, value);
+    if(IODE_IS_A_NUMBER(value)) fprintf(fd, "\n%s %f ", str, value);
 }
 
 

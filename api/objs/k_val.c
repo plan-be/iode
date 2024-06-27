@@ -265,7 +265,7 @@ double K_s_get_info(KDB* kdb, char*name, int info_nb)
         case 1 :  val = scl->relax; break;
         case 2 :  val = scl->std; break;
         case 3 :  
-                if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
+                if(IODE_IS_A_NUMBER(scl->val) && IODE_IS_A_NUMBER(scl->std) && !L_IS0(scl->std))
                     val = scl->val / scl->std;
                 else 
                     val = IODE_NAN;

@@ -31,7 +31,7 @@ public:
         // an inverse conversion on the generated string representation. In particular, trailing zeros are omitted.
         // see https://doc.qt.io/qt-6/qlocale.html#FloatingPointPrecisionOption-enum 
         int precision_ = no_precision ? QLocale::FloatingPointShortest : precision;
-        return L_ISAN(value) ? QString::number(value, format, precision_) : NAN_REP;
+        return IODE_IS_A_NUMBER(value) ? QString::number(value, format, precision_) : NAN_REP;
     }
 
     int get_precision() const

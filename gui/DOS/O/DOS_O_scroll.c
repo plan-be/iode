@@ -202,8 +202,8 @@ int i, j;
 		case 0 : var = scl->val; break;
 		case 1 : var = scl->relax; break;
 		case 2 : var = scl->std; break;
-		case 3 : if(L_ISAN(scl->val)
-			    && L_ISAN(scl->std)
+		case 3 : if(IODE_IS_A_NUMBER(scl->val)
+			    && IODE_IS_A_NUMBER(scl->std)
 				&& !L_IS0(scl->std))
 				    var = scl->val/scl->std;
 			 else var = IODE_NAN;
@@ -890,7 +890,7 @@ ODE_ClipAddText(KDB *kdb, int i, int j, U_ch ***tline, int *ntline)
     double  var;
 
     var = KV_get(kdb, i, j, (int)global_VM);
-    if(L_ISAN(var))
+    if(IODE_IS_A_NUMBER(var))
 #ifdef REALD
 	sprintf(STATIC_BUF, "%.15lg", (double)(var));
 #else

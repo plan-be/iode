@@ -133,14 +133,14 @@ static int B_htol(int method, char* arg)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
                 for(j = 0; j < shift; j++) {
-                    if(L_ISAN(f_vec[f + j])) t_vec[t] += f_vec[f + j];
+                    if(IODE_IS_A_NUMBER(f_vec[f + j])) t_vec[t] += f_vec[f + j];
                     else {
                         t_vec[t] = IODE_NAN;
                         break;
                     }
                 }
 
-            if(method == WS_HTOL_MEAN && L_ISAN(t_vec[t])) t_vec[t] /= shift;
+            if(method == WS_HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
         }
 
         nb = t_smpl->s_nb;
@@ -200,14 +200,14 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
                 for(j = 0; j < shift; j++) {
-                    if(L_ISAN(f_vec[f + j])) t_vec[t] += f_vec[f + j];
+                    if(IODE_IS_A_NUMBER(f_vec[f + j])) t_vec[t] += f_vec[f + j];
                     else {
                         t_vec[t] = IODE_NAN;
                         break;
                     }
                 }
 
-            if(method == WS_HTOL_MEAN && L_ISAN(t_vec[t])) t_vec[t] /= shift;
+            if(method == WS_HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
         }
 
         nb = t_smpl->s_nb;
