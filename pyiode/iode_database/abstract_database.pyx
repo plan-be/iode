@@ -14,7 +14,7 @@ else:
 from iode.util import join_lines, table2str, JUSTIFY
 
 from cython.operator cimport dereference
-from pyiode.common cimport EnumIodeType
+from pyiode.common cimport IodeDatabaseType
 from pyiode.iode_database.cpp_api_database cimport KDBAbstract as CKDBAbstract
 
 

@@ -24,7 +24,7 @@ class AbstractIodeObjectWidget: public IodeAbstractWidget
     Q_OBJECT
 
 protected:
-    EnumIodeType iodeType;
+    IodeDatabaseType iodeType;
     QDir projectDir;
 
     QVBoxLayout* vLayout;
@@ -34,10 +34,10 @@ protected:
     QPushButton* pushButton_add;
 
 signals:
-    void tabDatabaseModified(const EnumIodeType iodeType, const bool modified);
+    void tabDatabaseModified(const IodeDatabaseType iodeType, const bool modified);
 
 public:
-    AbstractIodeObjectWidget(const EnumIodeType iodeType, QWidget* parent) : 
+    AbstractIodeObjectWidget(const IodeDatabaseType iodeType, QWidget* parent) : 
         IodeAbstractWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
@@ -187,7 +187,7 @@ protected:
     QShortcut* shortcutAdd;
 
 public:
-    TemplateIodeObjectWidget(EnumIodeType iodeType, QWidget* parent) : AbstractIodeObjectWidget(iodeType, parent)
+    TemplateIodeObjectWidget(IodeDatabaseType iodeType, QWidget* parent) : AbstractIodeObjectWidget(iodeType, parent)
     {
         // prepare splitter
         splitter = new QSplitter(parent);

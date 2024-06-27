@@ -132,7 +132,7 @@ void IodeTabWidget::loadSettings()
                 }
                 else
                 {
-                    index = updateObjectTab((EnumIodeType) filetype);
+                    index = updateObjectTab((IodeDatabaseType) filetype);
                     if(index != i) 
                         this->tabBar()->moveTab(index, i);
                 }
@@ -275,7 +275,7 @@ void IodeTabWidget::resetFilters()
     foreach(AbstractIodeObjectWidget* tabWidget, tabIodeObjects) tabWidget->resetFilter();
 }
 
-void IodeTabWidget::resetFilter(const EnumIodeType iodeType)
+void IodeTabWidget::resetFilter(const IodeDatabaseType iodeType)
 {
     AbstractIodeObjectWidget* tabWidget = getIodeObjTab(iodeType);
     if(tabWidget)
@@ -285,10 +285,10 @@ void IodeTabWidget::resetFilter(const EnumIodeType iodeType)
 void IodeTabWidget::clearWorkspace()
 {
     foreach(AbstractIodeObjectWidget* tabWidget, tabIodeObjects) tabWidget->clearKDB();
-    for(int i=0; i < IODE_NB_TYPES; i++) updateObjectTab((EnumIodeType) i);
+    for(int i=0; i < IODE_NB_TYPES; i++) updateObjectTab((IodeDatabaseType) i);
 }
 
-QStringList IodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)
+QStringList IodeTabWidget::getSelectedObjectsNames(const IodeDatabaseType iodeType)
 {
         AbstractIodeObjectWidget* tabWidget = getIodeObjTab(iodeType);
         if(tabWidget)
@@ -297,7 +297,7 @@ QStringList IodeTabWidget::getSelectedObjectsNames(const EnumIodeType iodeType)
             return QStringList();
 }
 
-int IodeTabWidget::updateObjectTab(const EnumIodeType iodeType)
+int IodeTabWidget::updateObjectTab(const IodeDatabaseType iodeType)
 {
     int index;
     try
@@ -420,14 +420,14 @@ int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
     }
 }
 
-void IodeTabWidget::openAddDialog(const EnumIodeType iodeType)
+void IodeTabWidget::openAddDialog(const IodeDatabaseType iodeType)
 {
     int index = getIodeObjTabIndex(iodeType);
     AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
     tabWidget->openAddDialog();
 }
 
-void IodeTabWidget::openEditDialog(const EnumIodeType iodeType)
+void IodeTabWidget::openEditDialog(const IodeDatabaseType iodeType)
 {
     int index = getIodeObjTabIndex(iodeType);
     AbstractIodeObjectWidget* tabWidget = static_cast<AbstractIodeObjectWidget*>(this->widget(index));
@@ -449,14 +449,14 @@ void IodeTabWidget::clearTab()
         {
             AbstractIodeObjectWidget* kdbWidget = static_cast<AbstractIodeObjectWidget*>(tabWidget);
             kdbWidget->clearKDB();
-            updateObjectTab((EnumIodeType) filetype);
+            updateObjectTab((IodeDatabaseType) filetype);
         }
     }
 
     indexContextMenu = -1;
 }
 
-void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& objNames)
+void IodeTabWidget::showObjectsList(IodeDatabaseType iodeType, const QStringList& objNames)
 {
     int nb_objs = objNames.size();
     if(nb_objs == 0)
@@ -508,7 +508,7 @@ void IodeTabWidget::showObjectsList(EnumIodeType iodeType, const QStringList& ob
         }
         IodeAbstractWidget* tab = static_cast<IodeAbstractWidget*>(this->widget(index));
         connect(databaseWidget, &AbstractIodeObjectWidget::tabDatabaseModified, tab, 
-            [tab](const EnumIodeType iodeType, const bool modified){ tab->setModified(modified); });
+            [tab](const IodeDatabaseType iodeType, const bool modified){ tab->setModified(modified); });
 
         // update the view -> computes the columns names if variables
         databaseWidget->update();

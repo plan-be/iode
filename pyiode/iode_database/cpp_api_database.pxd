@@ -4,7 +4,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode.common cimport (EnumIodeType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
+from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
                             EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 

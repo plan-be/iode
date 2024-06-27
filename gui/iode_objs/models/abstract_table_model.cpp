@@ -135,7 +135,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 	if (type_ < 0 || type_ > VARIABLES) 
 		return false;
 
-	EnumIodeType iodeType = (EnumIodeType) type_;
+	IodeDatabaseType iodeType = (IodeDatabaseType) type_;
 
 	try
 	{
@@ -183,7 +183,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 	if (database->count() == 0) 
 		return ""; 
 
-	EnumIodeType iodeType = (EnumIodeType) database->get_iode_type();
+	IodeDatabaseType iodeType = (IodeDatabaseType) database->get_iode_type();
 	
 	// if not provided as argument, get path to the file associated with KDB of objects of type iodeType
 	std::string std_filepath = filepath.isEmpty() ? database->get_filename() : filepath.toLocal8Bit().toStdString();
@@ -258,7 +258,7 @@ bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelI
 }
 
 template <class K>
-QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const EnumIodeType other_type)
+QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type)
 {
 	QStringList list;
 
@@ -342,7 +342,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 }
 
 template <class K>
-QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const EnumIodeType other_type)
+QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const IodeDatabaseType other_type)
 {
 	QStringList list;
 

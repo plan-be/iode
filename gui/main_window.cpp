@@ -701,10 +701,10 @@ void MainWindow::update_tab_and_completer(const int iodeType)
 
     // compute hash + update tab(s)
     if(iodeType > 0)
-        index = tabWidget_IODE_objs->updateObjectTab((EnumIodeType) iodeType);
+        index = tabWidget_IODE_objs->updateObjectTab((IodeDatabaseType) iodeType);
     else
         for(int i = 0; i < IODE_NB_TYPES; i++)
-            tabWidget_IODE_objs->updateObjectTab((EnumIodeType) i);
+            tabWidget_IODE_objs->updateObjectTab((IodeDatabaseType) i);
 
         // update the list of Iode object names available for autocomplete
         completer->updateIodeOjectsListNames();
