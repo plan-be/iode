@@ -53,14 +53,14 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] vLangs
 
-    cdef enum EnumSimulationInitialization:
-        IV_INIT_TM1,
-        IV_INIT_TM1_A,
-        IV_INIT_EXTRA,
-        IV_INIT_EXTRA_A,
-        IV_INIT_ASIS,
-        IV_INIT_TM1_NA,
-        IV_INIT_EXTRA_NA
+    cdef enum VariablesInitialization:
+        VAR_INIT_TM1,
+        VAR_INIT_TM1_A,
+        VAR_INIT_EXTRA,
+        VAR_INIT_EXTRA_A,
+        VAR_INIT_ASIS,
+        VAR_INIT_TM1_NA,
+        VAR_INIT_EXTRA_NA
 
     cdef vector[string] v_simulation_initialization
 

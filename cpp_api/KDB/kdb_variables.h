@@ -152,7 +152,7 @@ public:
      *  
      *  @see https://iode.plan.be/doku.php?id=wsextrapolate
      */
-    void extrapolate(const EnumSimulationInitialization method, const std::string& from, 
+    void extrapolate(const VariablesInitialization method, const std::string& from, 
         const std::string& to, const std::string& variables_list="");
 
     /**
@@ -171,7 +171,7 @@ public:
      *  
      *  @see https://iode.plan.be/doku.php?id=wsextrapolate
      */
-    void extrapolate(const EnumSimulationInitialization method, const Period& from, 
+    void extrapolate(const VariablesInitialization method, const Period& from, 
         const Period& to, const std::string& variables_list="");
 
     // TODO JMP: please provide input for unit test

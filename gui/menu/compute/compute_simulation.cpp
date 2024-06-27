@@ -82,7 +82,7 @@ void MenuComputeSimulation::compute()
         int max_iterations = qMaxIterations->extractAndVerify();
         bool debug = qCheckDebug->extractAndVerify();
         double relaxation = std::stod(qRelaxation->extractAndVerify().toStdString());
-        EnumSimulationInitialization initialisation = (EnumSimulationInitialization) qSimInitialisation->extractAndVerify();
+        VariablesInitialization initialisation = (VariablesInitialization) qSimInitialisation->extractAndVerify();
         EnumSimulationSortAlgorithm sort_algorithm = (EnumSimulationSortAlgorithm) qSortAlgorithm->extractAndVerify();
         int nb_passes = qNbPasses->extractAndVerify();
 

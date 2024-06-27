@@ -83,9 +83,9 @@ public:
         KSIM_SORT = sort_algorithm;
     }
 
-    EnumSimulationInitialization get_initialization_method()
+    VariablesInitialization get_initialization_method()
     {
-        return (EnumSimulationInitialization) KSIM_START;
+        return (VariablesInitialization) KSIM_START;
     }
 
     std::string get_initialization_method_as_string()
@@ -93,7 +93,7 @@ public:
         return v_simulation_initialization[KSIM_START];
     }
 
-    void set_initialization_method(EnumSimulationInitialization method)
+    void set_initialization_method(VariablesInitialization method)
     {
         KSIM_START = method;
     }

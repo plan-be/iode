@@ -8,7 +8,7 @@ from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEq
                             EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
-                            EnumIodeVarMode, EnumSimulationInitialization)
+                            EnumIodeVarMode, VariablesInitialization)
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
@@ -239,7 +239,7 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         vector[string] get_list_periods(string& from_period, string& to_period) except +
         vector[float] get_list_periods_as_float(string& from_period, string& to_period) except +
 
-        void extrapolate(EnumSimulationInitialization method, string& from_period, string& to, string& variables_list) except +
+        void extrapolate(VariablesInitialization method, string& from_period, string& to, string& variables_list) except +
         void seasonal_adjustment(string& input_file, string& series, double eps_test) except +
         void trend_correction(string& input_file, double lambda_, string& series, bint log) except +
 

@@ -312,13 +312,13 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
  *  @return                     void
  *  
  *  Methods:
- *       KV_INIT_ASIS     : val[t] remains unchanged
- *       KV_INIT_TM1      : if(val[t] == 0 or val[t] == NaN) val[t] = val[t-1] (*)
- *       KV_INIT_TM1_NA   : if(val[t] == NaN)                val[t] = val[t-1] (*)
- *       KV_INIT_TM1_A    :                                  val[t] = val[t-1] (*)
- *       KV_INIT_EXTRA    : if(val[t] == 0 or val[t] == NaN) val[t] = fn(val[t-1], val[t-2]) (*)
- *       KV_INIT_EXTRA_NA : if(val[t] <> NaN)                val[t] = fn(val[t-1], val[t-3]) (*)
- *       KV_INIT_EXTRA_A  :                                  val[t] = fn(val[t-1], val[t-3]) (*)
+ *       VAR_INIT_ASIS     : val[t] remains unchanged
+ *       VAR_INIT_TM1      : if(val[t] == 0 or val[t] == NaN) val[t] = val[t-1] (*)
+ *       VAR_INIT_TM1_NA   : if(val[t] == NaN)                val[t] = val[t-1] (*)
+ *       VAR_INIT_TM1_A    :                                  val[t] = val[t-1] (*)
+ *       VAR_INIT_EXTRA    : if(val[t] == 0 or val[t] == NaN) val[t] = fn(val[t-1], val[t-2]) (*)
+ *       VAR_INIT_EXTRA_NA : if(val[t] <> NaN)                val[t] = fn(val[t-1], val[t-3]) (*)
+ *       VAR_INIT_EXTRA_A  :                                  val[t] = fn(val[t-1], val[t-3]) (*)
  *       
  *       where fn(v1, v2) = 2 * v1 - v2
  *      (*) If val[t-1] and / or val[t-2] are NaN, val[t] = 1.0
@@ -328,24 +328,24 @@ void KV_init_values_1(double* val, int t, int method)
 {
 
     switch(method) {
-        case KV_INIT_TM1 :
+        case VAR_INIT_TM1 :
             if(IODE_IS_A_NUMBER(val[t]) && !IODE_IS_0(val[t])) return;
             goto calc1;
-        case KV_INIT_TM1_NA :
+        case VAR_INIT_TM1_NA :
             if(IODE_IS_A_NUMBER(val[t])) return;
             goto calc1;
-        case KV_INIT_TM1_A :
+        case VAR_INIT_TM1_A :
 calc1:
             val[t] = 1.0;
             if(t > 0 && IODE_IS_A_NUMBER(val[t - 1])) val[t] = val[t - 1];
             return;
-        case KV_INIT_EXTRA :
+        case VAR_INIT_EXTRA :
             if(IODE_IS_A_NUMBER(val[t]) && !IODE_IS_0(val[t])) return;
             goto calc2;
-        case KV_INIT_EXTRA_NA :
+        case VAR_INIT_EXTRA_NA :
             if(IODE_IS_A_NUMBER(val[t])) return;
             goto calc2;
-        case KV_INIT_EXTRA_A :
+        case VAR_INIT_EXTRA_A :
 calc2:
             val[t] = 1.0;
             if(t > 0 && IODE_IS_A_NUMBER(val[t - 1])) {
@@ -353,7 +353,7 @@ calc2:
                     val[t] = 2 * val[t - 1] - val[t - 2];
                 else val[t] = val[t - 1];
             }
-        case KV_INIT_ASIS :
+        case VAR_INIT_ASIS :
             return;
     }
 }

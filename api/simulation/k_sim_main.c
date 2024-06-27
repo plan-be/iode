@@ -108,7 +108,7 @@ int         *KSIM_POSXK;              // Position in KSIM_DBV of the endo variab
 int         *KSIM_POSXK_REV;          // Position in KSIM_DBE of the equation whose endo is "KSIM_DBV[i]" reverse of KSIM_POSXK
 int         KSIM_PASSES = 5;          // Number of passes for the heuristic triangulation algorithm
 int         KSIM_SORT = SORT_BOTH;    // Reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
-int         KSIM_START = KV_INIT_TM1; // Endogenous initial values: @see KV_init_values_1() for available options
+int         KSIM_START = VAR_INIT_TM1; // Endogenous initial values: @see KV_init_values_1() for available options
 char        **KSIM_EXO = NULL;        // 
 char        *KSIM_PATH = NULL;        //
 KDB         *KSIM_DBV;                // KDB of variables used for the simulation. Normally K_WS[VARIABLES]
@@ -135,7 +135,7 @@ static void K_init_values(int t)
     int         i;
     double        *val;
 
-    if(KSIM_START == KV_INIT_ASIS) return;
+    if(KSIM_START == VAR_INIT_ASIS) return;
 
     for(i = 0 ; i < KSIM_PRE + KSIM_INTER + KSIM_POST; i++) {
         val = KVVAL(KSIM_DBV, KSIM_POSXK[KSIM_ORDER[i]], 0);

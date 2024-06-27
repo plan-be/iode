@@ -1283,7 +1283,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
-    KSIM_START = KV_INIT_TM1;
+    KSIM_START = VAR_INIT_TM1;
     KSIM_EPS = 0.0001;
     KSIM_MAXIT = 100;
     KSIM_RELAX = 0.7;
@@ -2203,7 +2203,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     EXPECT_NE(kdbe, nullptr);
 
     // B_ModelSimulateParms()
-    KSIM_START = KV_INIT_TM1;
+    KSIM_START = VAR_INIT_TM1;
     KSIM_EPS = 0.00001;
     KSIM_MAXIT = 1000;
     KSIM_RELAX = 1.0;

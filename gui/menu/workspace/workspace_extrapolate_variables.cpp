@@ -42,7 +42,7 @@ void MenuWorkspaceExtrapolateVariables::extrapolate_variables()
     {
         std::string s_from = wFrom->extractAndVerify().toStdString();
         std::string s_to = wTo->extractAndVerify().toStdString();
-        EnumSimulationInitialization method = (EnumSimulationInitialization) wMethod->extractAndVerify();
+        VariablesInitialization method = (VariablesInitialization) wMethod->extractAndVerify();
         std::string vars_list = wVarsList->extractAndVerify().toStdString();
 
         Variables.extrapolate(method, s_from, s_to, vars_list);

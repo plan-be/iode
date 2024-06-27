@@ -1014,7 +1014,7 @@ void Tests_Simulation()
     
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
-    KSIM_START = KV_INIT_TM1;
+    KSIM_START = VAR_INIT_TM1;
     KSIM_EPS = 0.0001;
     KSIM_MAXIT = 100;
     KSIM_RELAX = 0.7;
@@ -2083,7 +2083,7 @@ void Tests_B_MODEL()
     S4ASSERT(kdbe != NULL, "K_interpret(EQUATIONS, \"%s\")", filename);
     
     // B_ModelSimulateParms()
-    KSIM_START = KV_INIT_TM1;
+    KSIM_START = VAR_INIT_TM1;
     KSIM_EPS = 0.00001;
     KSIM_MAXIT = 1000;
     KSIM_RELAX = 1.0;
