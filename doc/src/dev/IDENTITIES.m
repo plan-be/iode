@@ -90,7 +90,7 @@ When VARs are read from external files, they are shortened or expanded to match 
 
 On the other hand, one can execute identities on a sub-sample. In this case, there are 2 possibilities:
 &EN if a calculated VAR already exists in the current WS, its values are left unchanged outside the calculation sample
-&EN if the VAR is created, the values outside the calculation sample are set to L_NAN.
+&EN if the VAR is created, the values outside the calculation sample are set to IODE_NAN.
  
 
 &TI List of functions

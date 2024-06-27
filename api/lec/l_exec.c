@@ -50,13 +50,13 @@ int     L_curt;         // current value of t
 #ifdef _MSC_VER
 int _matherr(struct _exception *a)
 {
-    a->retval = (double)L_NAN;
+    a->retval = (double)IODE_NAN;
     return(1);
 }
 #else
 int matherr(struct exception *a)
 {
-    a->retval = (double)L_NAN;
+    a->retval = (double)IODE_NAN;
     return(1);
 }
 #endif
@@ -72,16 +72,16 @@ void L_fperror()
 }
 
 /**
- *  Checks if at least one of the last nargs values on the stack is L_NAN.
- *  If it is the case, go back nargs-1 steps on the stack and set L_NAN on the new top of the stack
+ *  Checks if at least one of the last nargs values on the stack is IODE_NAN.
+ *  If it is the case, go back nargs-1 steps on the stack and set IODE_NAN on the new top of the stack
  *  Ex.: 
- *      if the stack is {L_NAN, 2, 3...}
+ *      if the stack is {IODE_NAN, 2, 3...}
  *  after the call to L_stackna(&stack, 2)
- *      the stack will be {L_NAN, 3...}
+ *      the stack will be {IODE_NAN, 3...}
  *      
  *  @param [in, out] p_stack     L_REAL**    pointer to the pointer to the stack
  *  @param [in]      nargs       int         number of arguments
- *  @return                      int         1 if L_NAN has been found and the stack is modified
+ *  @return                      int         1 if IODE_NAN has been found and the stack is modified
  *                                           0 otherwise
  */
 int L_stackna(L_REAL** p_stack, int nargs)
@@ -92,7 +92,7 @@ int L_stackna(L_REAL** p_stack, int nargs)
     for(i = 0 ; i < nargs ; i++)
         if(!L_ISAN(*(stack - i))) {
             (*p_stack) -= nargs - 1;
-            **p_stack = L_NAN;
+            **p_stack = IODE_NAN;
             return(1);
         }
     return(0);
@@ -139,7 +139,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
             if(cvar.per.p_y == 0)  len += t;
             stack++;
             if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->s_nb) {
-                *stack = L_NAN;
+                *stack = IODE_NAN;
                 /*                L_errno = L_BOUNDS_ERR;
                 		longjmp(L_JMP, 1);
                 */
@@ -240,9 +240,9 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                         break;
                     }
                     kerror(0, "Internal error (L_exec)");
-                    return((double)L_NAN);
+                    return((double)IODE_NAN);
             }
-        /*        if(*stack <= L_NAN) return((double)L_NAN); */
+        /*        if(*stack <= IODE_NAN) return((double)IODE_NAN); */
     }
     return((double)*stack);
 }
@@ -260,7 +260,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
  *  @param [in] expr CLEC*      compiled and linked (with dbv and dbs) LEC
  *  @param [in] t    int        time of calculation (index in dbv sample)
  *  @return          L_REAL     result of the calculation 
- *                              L_NAN on error (and L_errno is set)
+ *                              IODE_NAN on error (and L_errno is set)
  */
 L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
 {
@@ -277,7 +277,7 @@ L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
     L_errno = 0;
     
     // Leave if empty CLEC
-    if(expr == 0) return((double)L_NAN);
+    if(expr == 0) return((double)IODE_NAN);
     
     // Set the handle on floating point exception to L_fperror
     if(L_SIG == 0) {
@@ -287,7 +287,7 @@ L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
     
     // Set the point of return on FPE
     if(setjmp(L_JMP))
-        return((double)L_NAN); // On FPE, return L_NAN
+        return((double)IODE_NAN); // On FPE, return IODE_NAN
     
     pos = sizeof(CLEC) + (expr->nb_names - 1) * sizeof(LNAME);
     

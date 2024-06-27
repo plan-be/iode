@@ -28,7 +28,7 @@ cdef extern from "api/iode.h":
     cdef int    SCR_free_tbl(unsigned char **tbl)
 
     # constants
-    cdef double L_NAN
+    cdef double IODE_NAN
 
 cdef extern from "s_pyiode.cpp":
     cdef int   ODE_assign_super_PYIODE()

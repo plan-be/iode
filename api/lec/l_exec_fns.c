@@ -76,14 +76,14 @@ L_REAL L_logn(L_REAL v)
     double  x;
 
     if(!L_ISAN(v) || v <= 0) {
-        return((L_REAL)L_NAN);
+        return((L_REAL)IODE_NAN);
         /*      L_errno = L_LOG_ERR;
         	longjmp(L_JMP, 1);
         */
     }
 
     x = log((double)v);
-    if(_isnan(x)) x = L_NAN; /* JMP 18-01-02 */
+    if(_isnan(x)) x = IODE_NAN; /* JMP 18-01-02 */
     return((L_REAL)x);
 }
 
@@ -118,9 +118,9 @@ L_REAL L_expn(L_REAL* stack, int nargs)
     double  x, a, b;
 
     if(nargs == 1) {
-        if(*stack >= DMAXEXP || *stack <= DMINEXP) return(L_NAN);
+        if(*stack >= DMAXEXP || *stack <= DMINEXP) return(IODE_NAN);
         x = exp(*stack);
-        if(x >= MAXDOUBLE || x <= MINDOUBLE) return(L_NAN);
+        if(x >= MAXDOUBLE || x <= MINDOUBLE) return(IODE_NAN);
         return(x);
     }
     else {
@@ -128,10 +128,10 @@ L_REAL L_expn(L_REAL* stack, int nargs)
         b = *stack;
         return(L_exp(a, b));
         /* ancienne version pre-2018
-        if(a < 0 && b != (int)b) return(L_NAN);
+        if(a < 0 && b != (int)b) return(IODE_NAN);
         x = (L_REAL)pow((double)(*(stack - 1)), (double)(*stack)); // JMP 18-01-02
-        if(_isnan(x)) x = L_NAN;
-        if(x >= MAXDOUBLE || x <= MINDOUBLE) x = L_NAN;
+        if(_isnan(x)) x = IODE_NAN;
+        if(x >= MAXDOUBLE || x <= MINDOUBLE) x = IODE_NAN;
         return((L_REAL)x);
         */
     }
@@ -169,7 +169,7 @@ L_REAL L_tanh (L_REAL* stack) {return((L_REAL)tanh((double)*stack));}
 L_REAL L_sinh (L_REAL* stack) {return((L_REAL)sinh((double)*stack));}
 L_REAL L_cosh (L_REAL* stack) {return((L_REAL)cosh((double)*stack));}
 L_REAL L_abs  (L_REAL* stack) {return((L_REAL)fabs((double)*stack));}
-L_REAL L_sqrt (L_REAL* stack) {return((*stack < 0) ? L_NAN: (L_REAL)sqrt((double)*stack));}
+L_REAL L_sqrt (L_REAL* stack) {return((*stack < 0) ? IODE_NAN: (L_REAL)sqrt((double)*stack));}
 L_REAL L_int  (L_REAL* stack) {return((L_REAL)floor((double)(0.5 + *stack)));}
 L_REAL L_rad  (L_REAL* stack) {return((L_REAL)(((double)(*stack)) * M_PI / 180.0));}
 
@@ -204,7 +204,7 @@ L_REAL L_lmean(L_REAL* stack, int nargs)
         }
     }
     if(no) return(m / no);
-    else return(L_NAN);
+    else return(IODE_NAN);
 }
 
 L_REAL L_fnisan(L_REAL* stack, int nargs) {return((L_REAL)L_ISAN(*stack));}
@@ -241,7 +241,7 @@ L_REAL L_lstderr(L_REAL* stack, int nargs)
         }
     }
     if(no > 1) return(sqrt(m / (no - 1)));
-    else return(L_NAN);
+    else return(IODE_NAN);
 }
 
 L_REAL L_random(L_REAL* stack)
@@ -373,7 +373,7 @@ L_REAL L_div0(L_REAL *stack, int nargs)
     double a = *(stack - 1);
     double b = *stack;
 
-    if(!L_ISAN(b) || !L_ISAN(a)) return((L_REAL)L_NAN);
+    if(!L_ISAN(b) || !L_ISAN(a)) return((L_REAL)IODE_NAN);
     else if(b == 0) return(0);
     return(a / b);
 }

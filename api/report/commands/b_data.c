@@ -486,7 +486,7 @@ int B_DataUpdate(char* arg, int type)
         nb_args = SCR_tbl_size(args);
         scl.val = 0.9;
         scl.relax = 1.0;
-        scl.std = L_NAN;
+        scl.std = IODE_NAN;
 
         switch(nb_args) {
         case 2:
@@ -548,7 +548,7 @@ int B_DataUpdate(char* arg, int type)
                 nb_p ++;
                 for(i = 0; i < nb_upd; i++) {
                     var = (double) atof(args[i + nb_p]);
-                    if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) var = L_NAN; /* JMP 06-09-2004 */
+                    if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) var = IODE_NAN; /* JMP 06-09-2004 */
                     KV_set(kdb, pos, shift + i, mode, var);
                 }
             }
@@ -1249,9 +1249,9 @@ static int B_DataEditGraph(int view, char* arg)
     ygrid = B_argpos("JNM",  args[3][0]); // Id
  
     axis  = B_argpos("LGSP", args[4][0]);
-    if(memcmp(args[5], "--", 2) == 0) ymin = L_NAN;
+    if(memcmp(args[5], "--", 2) == 0) ymin = IODE_NAN;
     else                              ymin = atof(args[5]);
-    if(memcmp(args[6], "--", 2) == 0) ymax = L_NAN;
+    if(memcmp(args[6], "--", 2) == 0) ymax = IODE_NAN;
     else                              ymax = atof(args[6]);
 
     smpl = PER_atosmpl(args[7], args[8]);

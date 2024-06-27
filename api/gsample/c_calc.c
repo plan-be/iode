@@ -82,7 +82,7 @@ static int COL_link(int i, CLEC* clec)
  *  includes the files numbers and periods, that both refer to K_WS[VARIABLES]). 
  *  The linking of scalars is always done with KS_WS, the current SCL workspace.
  *  
- *  The result is stored in cl->cl_res, which is L_NAN on error.
+ *  The result is stored in cl->cl_res, which is IODE_NAN on error.
  *       
  *  @param [in, out] COL*  cl    COL on which the calculation must be applied
  *  @param [in, out] CLEC* clec  compiled LEC expression of the table cell
@@ -206,7 +206,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
 
     return(0);
 err:
-    cl->cl_res = L_NAN;
+    cl->cl_res = IODE_NAN;
     return(0);
 }
 

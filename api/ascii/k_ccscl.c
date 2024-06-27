@@ -18,7 +18,7 @@
  *  Reads 3 values on yy. Each token must be a number (long or double). If not : 
  *      the first value is replaced by 0.9 (value of the scalar)
  *      the second value (relax) is replaced by 1.0
- *      the 3d value (stderr) is replaced by L_NAN
+ *      the 3d value (stderr) is replaced by IODE_NAN
  *  
  *  @param [in, out ]   kdb     KDB*    KDB of SCLs
  *  @param [in, out]    yy      YYFILE* stream (file or string) to be read 
@@ -137,7 +137,7 @@ KDB *KS_load_asc(char* filename)
 
 
 /**
- *  Writes the definition of a SCL to a file. L_NAN are represented by na.
+ *  Writes the definition of a SCL to a file. IODE_NAN are represented by na.
  *  
  *  @param [in] fd  pointer to a FILE
  *  @param [in] scl pointer to the SCL

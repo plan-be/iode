@@ -176,7 +176,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
     oldx = x = d_ptr[0];
     if(!L_ISAN(x)) {
         if(KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb));
-        return((double)L_NAN);
+        return((double)IODE_NAN);
     }
 
     // Case 1: equation Y : = f(X) analytically solved
@@ -188,7 +188,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
     // Case 2: 0 := f(X,Y) 
     else {
         shift = *(L_getvar(dbv, eqvarnb) + t);
-        if(!L_ISAN(shift)) return((double)L_NAN); 
+        if(!L_ISAN(shift)) return((double)IODE_NAN); 
         ax = fabs(shift);
     }
 
@@ -251,7 +251,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
 
 err:
     d_ptr[0] = oldx;
-    return((double)L_NAN);
+    return((double)IODE_NAN);
 }
 
 
@@ -287,9 +287,9 @@ function value and the first derivative of the function.
 
 /*
 #define SOLVE_MAXIT 100 // Maximum allowed number of iterations.
-#define SOLVE_ERROR L_NAN
-#define SOLVE_ERROR1 (L_NAN - 1e20)
-#define SOLVE_ERROR2 (L_NAN + 1e20)
+#define SOLVE_ERROR IODE_NAN
+#define SOLVE_ERROR1 (IODE_NAN - 1e20)
+#define SOLVE_ERROR2 (IODE_NAN + 1e20)
 
 
 SolveIsError(double val)
@@ -529,7 +529,7 @@ int     t, varnb, eqvarnb;
     else SOLVE_SHIFT = x1;
     if(!L_ISAN(x1)) x1 = 1.0;
 
-    if(SolveFindBrackets(SolveIodeFn, x1, &xl, &xh)) return(L_NAN);
+    if(SolveFindBrackets(SolveIodeFn, x1, &xl, &xh)) return(IODE_NAN);
     x = SolveNewtonSecant(SolveIodeFn, xl, xh, 1e-7, 100);
     return(x);
 }

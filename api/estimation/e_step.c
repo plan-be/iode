@@ -77,13 +77,13 @@ static void E_SetScl(int relax, char* name)
  *  
  *  @param [in] char*       lec     LEC expression
  *  @param [in] int         t       period of calculation (starts at 0 = first period of the sample)
- *  @return     double           L_NAN on error, lec[t] on success
+ *  @return     double           IODE_NAN on error, lec[t] on success
  */
  
 double C_evallec(char* lec, int t)
 {
     CLEC        *clec;
-    double   x = L_NAN;
+    double   x = IODE_NAN;
     char        tmplec[4096];
 
     SCR_strlcpy(tmplec, lec, 4094); // For C++ when lec is a const string (in the DATA memory segment)

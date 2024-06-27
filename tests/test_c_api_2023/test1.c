@@ -576,8 +576,8 @@ double U_test_calc_lec(char* lec, int t)
     double  res;
 
     clec = L_cc(lec);
-    if(clec == NULL) return(L_NAN);
-    if(L_link(KV_WS, KS_WS, clec)) return(L_NAN);
+    if(clec == NULL) return(IODE_NAN);
+    if(L_link(KV_WS, KS_WS, clec)) return(IODE_NAN);
     res = L_exec(KV_WS, KS_WS, clec, t);
     SCR_free(clec);
     return(res);
@@ -1131,8 +1131,8 @@ void Tests_PrintTablesAndVars()
     // Print vars as graphs
     varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", (U_ch*)",;");
     smpl = PER_atosmpl("1990Y1", "2010Y1");
-    rc = V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, smpl, varlist);
-    S4ASSERT(rc == 0, "V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, 2000Y1:2020Y1, ACAF;ACAG)");
+    rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
+    S4ASSERT(rc == 0, "V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, 2000Y1:2020Y1, ACAF;ACAG)");
     SCR_free_tbl((U_ch**)varlist);
     SCR_free(smpl);
     
@@ -1803,7 +1803,7 @@ void Tests_B_IDT()
     C = (double*)KVPTR("C");
     D = (double*)KVPTR("D");
     
-    S4ASSERT(U_test_eq(D[1], L_NAN), "(A+B)[1] is NaN");        // 1 == 2001Y1
+    S4ASSERT(U_test_eq(D[1], IODE_NAN), "(A+B)[1] is NaN");        // 1 == 2001Y1
     S4ASSERT(U_test_eq(D[2], 2.0 + 4.0), "(A+B)[2] == 6.0");    // 2 == 2002Y1
     S4ASSERT(U_test_eq(C[2], 6.0*2 - 0.92921251 ), "C[2] ==6.0*2 - 0.92921251");
 }
@@ -2319,7 +2319,7 @@ int U_test_B_WsCopyVar()
     cond =  (rc == 0) && 
             (U_test_eq(ACAF91, 1.0) != 0) &&
             (U_test_eq(ACAF92, 30.159000) != 0) &&
-            (U_test_eq(ACAG90, L_NAN) != 0) && 
+            (U_test_eq(ACAG90, IODE_NAN) != 0) && 
             (U_test_eq(ACAG92, -40.286) != 0);
             
     S4ASSERT(cond != 0, "B_WsCopy(\"%s\", VARIABLES) == 0", arg);
@@ -2423,10 +2423,10 @@ int U_test_B_WsExtrapolate(int method, double expected_value)
     B_WsClearAll("");
     B_WsSample("1995Y1 2020Y1");
     
-    // Create ACAF = 0 1 L_NAN...
+    // Create ACAF = 0 1 IODE_NAN...
     nb = 11;
     ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
-    ACAF[7] = L_NAN;
+    ACAF[7] = IODE_NAN;
     pos = K_add(KV_WS, "ACAF", ACAF, &nb);
 
     // $WsExtrapolate [method] from to [variable list]
@@ -2738,7 +2738,7 @@ void Tests_B_WS()
     U_test_B_WsExtrapolate(1, 4.0);
     U_test_B_WsExtrapolate(2, 7.0);
     U_test_B_WsExtrapolate(3, 7.0);
-    U_test_B_WsExtrapolate(4, L_NAN);
+    U_test_B_WsExtrapolate(4, IODE_NAN);
     U_test_B_WsExtrapolate(5, 6.0);
     U_test_B_WsExtrapolate(6, 7.0);
     

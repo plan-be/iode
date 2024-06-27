@@ -229,15 +229,15 @@ ag:
                 goto ag;
             }
             YY_unread(yy);
-            return(L_NAN);
+            return(IODE_NAN);
 
         case YY_WORD   :
             if(strcmp("na", yy->yy_text) != 0)
                 YY_unread(yy);
-            return(L_NAN);
+            return(IODE_NAN);
         default :
             YY_unread(yy);
-            return(L_NAN);
+            return(IODE_NAN);
     }
 
     if(YY_lex(yy) == YY_WORD) {
@@ -275,7 +275,7 @@ double    *vector;
     GEM_name(name);
     from = GEM_smpl.s_nb - GEM_nobs;                            /* JMP 16-05-00 */
     if(from < 0) from = 0;                                      /* JMP 16-05-00 */
-    for(i = 0; i < from; i++) vector[i] = L_NAN;                /* JMP 16-05-00 */
+    for(i = 0; i < from; i++) vector[i] = IODE_NAN;                /* JMP 16-05-00 */
     for(i = from; i < GEM_smpl.s_nb; i++) {     /* JMP 16-05-00 */
         if(i < dim) vector[i] = GEM_mat[GEM_cser + (i - from) *(GEM_nser)];
     }

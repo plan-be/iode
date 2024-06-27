@@ -88,7 +88,7 @@ double    *vector;
 
     if(DIF_cell(yy, NULL, &value) < 0) return(-1);
     if(DIF_cell(yy, NULL, &status) < 0) return(-1);
-    if(status < 2) *vector = L_NAN;
+    if(status < 2) *vector = IODE_NAN;
     else *vector = value;
 
     DIF_skip_to(yy, DIF_BOT);

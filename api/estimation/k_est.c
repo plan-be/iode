@@ -55,7 +55,7 @@ extern  int     E_T, E_NCE;
 static void E_savescl(double val, int eqnb, char*txt)  
 {
     char    buf[40];                        // JMP 25/04/2022 : 20 -> 40 
-    static SCL  scl = {0.9, 1.0, L_NAN}; // Why static ?
+    static SCL  scl = {0.9, 1.0, IODE_NAN}; // Why static ?
 
     scl.val = val;
     sprintf(buf, "e%d_%s", eqnb, txt);

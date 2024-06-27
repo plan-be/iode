@@ -81,7 +81,7 @@ int IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)
  *  @param [in, out]    YYFILE*     yy      open YY stream 
  *  @param [out]        char*       name    name of the variable (= RASC_toc[RASC_cv])
  *  @param [out]        int*        shift   read period position 
- *  @param [in, out]    double*  value   read value (L_NAN for na values)
+ *  @param [in, out]    double*  value   read value (IODE_NAN for na values)
  *  @return             int                 0 on success, -1 if EOF is reached before the first value
  */
  

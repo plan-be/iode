@@ -25,7 +25,7 @@
  *  Returns the first (partial) SAMPLE on which a specific variable is 
  *  defined (i.e.: is not NaN).
  *  
- *  @param [in, out]  SAMPLE*  smpl     First sample on which the variable is not L_NAN
+ *  @param [in, out]  SAMPLE*  smpl     First sample on which the variable is not IODE_NAN
  *  @param [in]       char*    name     variable to be analysed (from KV_WS)
  *  @return           int               0 if name is found in KV_WS, -1 otherwise
  */

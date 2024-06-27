@@ -53,10 +53,10 @@ TBL *T_create(int dim)
     T_NC(tbl)   = dim;
     T_LANG(tbl) = KT_ENGLISH;
 
-    tbl->t_zmin = (float)L_NAN;
-    tbl->t_zmax = (float)L_NAN;
-    tbl->t_ymin = (float)L_NAN;
-    tbl->t_ymax = (float)L_NAN;
+    tbl->t_zmin = (float)IODE_NAN;
+    tbl->t_zmax = (float)IODE_NAN;
+    tbl->t_ymin = (float)IODE_NAN;
+    tbl->t_ymax = (float)IODE_NAN;
 
     tbl->t_div.tl_type = KT_CELL;
     tbl->t_div.tl_val  = SW_nalloc(dim * sizeof(TCELL));

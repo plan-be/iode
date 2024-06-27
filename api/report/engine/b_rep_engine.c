@@ -679,15 +679,15 @@ int RP_evaltime()
  *  Evaluates a LEC expression in (the period) RP_PER. 
  *  
  *  @param [in, out]    char*       lec     LEC expression or empty string (the expression is first stripped, hence the [out]).
- *  @return             double           L_NAN on error or if RP_PER is before the current WS sample
+ *  @return             double           IODE_NAN on error or if RP_PER is before the current WS sample
  *                                          calculated LEC value on success
  */
 double RP_evallec(char* lec)
 {
     CLEC    *clec;
-    double    x = L_NAN;
+    double    x = IODE_NAN;
 
-    if(RP_evaltime() < 0) return(L_NAN);
+    if(RP_evaltime() < 0) return(IODE_NAN);
 
     SCR_strip(lec);
     if(lec[0]) {

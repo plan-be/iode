@@ -36,7 +36,7 @@ static double RasGetVar(char  *name, int t)
     pos = K_find(kdb, name);
     if(pos < 0) {
         B_seterror(B_msg(300), name);
-        var = L_NAN;
+        var = IODE_NAN;
     }
     else          var = *KVVAL(kdb, pos, t);
 

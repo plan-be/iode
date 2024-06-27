@@ -6,7 +6,7 @@
  *    int KV_sample(KDB *kdb, SAMPLE *nsmpl)                                  Changes the SAMPLE of a KDB of variables.
  *    int KV_merge(KDB *kdb1, KDB* kdb2, int replace)                         Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
  *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(char* varname)                                               Adds a new variable in KV_WS. Fills it with L_NAN.
+ *    int KV_add(char* varname)                                               Adds a new variable in KV_WS. Fills it with IODE_NAN.
  *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
  *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
  *    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
@@ -156,8 +156,8 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 
 
 /**
- *  Adds a new variable in KV_WS. Fills it with L_NAN.
- *  If the variable already exists, replaces all values by L_NAN.
+ *  Adds a new variable in KV_WS. Fills it with IODE_NAN.
+ *  If the variable already exists, replaces all values by IODE_NAN.
  *  
  *  @param [in] char*   varname     name of the new variable
  *  @return     int                 position of varname in the KV_WS
@@ -171,14 +171,14 @@ int KV_add(char* varname)
     pos = K_find(KV_WS, varname);
     if(pos < 0) {
         nobs = KSMPL(KV_WS)->s_nb;
-        pos = K_add(KV_WS, varname, NULL, &nobs); // Set L_NAN if the new var
+        pos = K_add(KV_WS, varname, NULL, &nobs); // Set IODE_NAN if the new var
     }
     else { 
-        // Replaces all values by L_NAN 
+        // Replaces all values by IODE_NAN 
         vptr = KVPTR(varname);
         if(vptr == NULL) return(-1);
         for(t = 0; t < KSMPL(KV_WS)->s_nb; t++) 
-            vptr[t] = L_NAN;
+            vptr[t] = IODE_NAN;
     }
         
     return(pos);
@@ -192,7 +192,7 @@ int KV_add(char* varname)
  * @param [in] t         int     index in the variable (0 = first position in the series...)
  * @param [in] mode      int     transformation of the value, see below. 
  *
- * @return               double  depends on the param mode (can be L_NAN if the operation is impossible):
+ * @return               double  depends on the param mode (can be IODE_NAN if the operation is impossible):
  *                                    K_LEVEL : no modification    x[t]
  *                                    K_DIFF  : diff on one period (x[t]-x[t-1])
  *                                    K_DIFFY : diff on one year   (x[t]-x[t-{nb sub periods}])
@@ -218,13 +218,13 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
         /* NO BREAK */
         case K_DIFFY : 
             if(t < pernb) {
-                var = L_NAN;
+                var = IODE_NAN;
                 break;
             }
             vt = KVVAL(kdb, pos, 0);
             if(L_ISAN(vt[t]) && L_ISAN(vt[t - pernb]))
                 var = vt[t] - vt[t - pernb];
-            else var = L_NAN;
+            else var = IODE_NAN;
             break;
 
         case K_GRT :
@@ -232,13 +232,13 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
         /* NO BREAK */
         case K_GRTY :
             if(t < pernb) {
-                var = L_NAN;
+                var = IODE_NAN;
                 break;
             }
             vt = KVVAL(kdb, pos, 0);
             if(L_ISAN(vt[t]) && L_ISAN(vt[t - pernb]) && !L_IS0(vt[t - pernb]))
                 var = (vt[t]/vt[t - pernb] - 1) * 100.0;
-            else var = L_NAN;
+            else var = IODE_NAN;
             break;
     }
 
@@ -285,7 +285,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
             if(t < pernb)  break;
 
             if(L_ISAN(new) && L_ISAN(var[t - pernb])) var[t] = var[t - pernb] + new;
-            else var[t] = L_NAN;
+            else var[t] = IODE_NAN;
             break;
 
         case K_GRT :
@@ -296,7 +296,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
 
             if(L_ISAN(new) && L_ISAN(var[t - pernb]))
                 var[t] = (new/100.0 + 1.0) * var[t - pernb];
-            else var[t] = L_NAN;
+            else var[t] = IODE_NAN;
             break;
     }
 }
@@ -466,11 +466,11 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
             else {
                 if(method == 1) { /* m = 1 PROD */
                     if(L_ISAN(eval[t])) nval[t] *= eval[t];
-                    else nval[t] = L_NAN;
+                    else nval[t] = IODE_NAN;
                 }
                 else { /* m != 1 SUM or MEAN */
                     if(L_ISAN(eval[t])) nval[t] += eval[t];
-                    else nval[t] = L_NAN;
+                    else nval[t] = IODE_NAN;
                 }
             }
         }
@@ -548,7 +548,7 @@ int KV_aper_pos(char* aper2)
  *  @param [in] int     t       position to retrieve starting at 0
  *  
  *  @return     double          value of varname[t]
- *                              L_NAN on error
+ *                              IODE_NAN on error
  *  
  */
  
@@ -557,9 +557,9 @@ double KV_get_at_t(char*varname, int t)
     double  *var_ptr;
     
     var_ptr = KVPTR(varname);
-    if(var_ptr == NULL) return(L_NAN);
+    if(var_ptr == NULL) return(IODE_NAN);
     
-    if(t < 0 || KSMPL(KV_WS)->s_nb < t) return(L_NAN);
+    if(t < 0 || KSMPL(KV_WS)->s_nb < t) return(IODE_NAN);
     return(var_ptr[t]);
 }
 
@@ -573,7 +573,7 @@ double KV_get_at_t(char*varname, int t)
  *  @param [in] PERIOD* per     PERIOD to retrieve
  *  
  *  @return     double          value of varname[per]
- *                              L_NAN on error
+ *                              IODE_NAN on error
  *  
  */
  
@@ -596,7 +596,7 @@ double KV_get_at_per(char*varname, PERIOD* per)
  *  @param [in] char*   aper    PERIOD in text format (e.g.: "2001Y1")
  *  
  *  @return     double          value of varname[aper]
- *                              L_NAN on error
+ *                              IODE_NAN on error
  *  
  */
  

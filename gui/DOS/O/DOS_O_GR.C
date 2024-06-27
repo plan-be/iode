@@ -40,7 +40,7 @@ int     view, res;
     for(i = 0; i < ng && res == 0; i ++) {
         if(view) W_InitDisplay();
 
-        T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, L_NAN, L_NAN, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH); /* JMP 19-02-98 */
+        T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH); /* JMP 19-02-98 */
         sprintf(buf, "Equation %s : observed and fitted values", titles[i]);    /* JMP 26-02-98 */
         T_GraphTitle(buf);                             /* JMP 26-02-98 */
 
@@ -66,7 +66,7 @@ int     view, res;
     for(i = 0; i < ng && res == 1; i ++) {
         if(view) W_InitDisplay();
 
-        T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, L_NAN, L_NAN, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
+        T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
         sprintf(buf, "Equation %s : residuals", titles[i]);    /* JMP 26-02-98 */
         T_GraphTitle(buf);                                     /* JMP 26-02-98 */
 
@@ -126,7 +126,7 @@ char    *names;
 
     y = (double *) SW_nalloc(sizeof(double) * nt);
 
-    T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
+    T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
     buf = SCR_malloc(strlen(names) + 20);
     sprintf(buf, "%s (%s)", names, KLG_MODES[global_VM][0]);

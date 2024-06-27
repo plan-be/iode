@@ -44,7 +44,7 @@ bool ScalarsModel::setValue(const int row, const int column, const QVariant& val
 	try
 	{
 		Scalar scalar = displayed_database->get(row);
-		double val = (value == "--") ? L_NAN : value.toDouble();
+		double val = (value == "--") ? IODE_NAN : value.toDouble();
 
 		switch (column)
 		{

@@ -5,7 +5,7 @@ Scalar::Scalar()
 {
     this->val = 0.0;
     this->relax = 1.0;
-    this->std = L_NAN;
+    this->std = IODE_NAN;
 }
 
 Scalar::Scalar(const int pos, KDB* kdb)

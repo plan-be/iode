@@ -13,7 +13,7 @@ cimport cython
 cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from pyiode.common cimport L_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL, EnumSimulationInitialization
+from pyiode.common cimport IODE_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL, EnumSimulationInitialization
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables

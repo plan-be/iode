@@ -133,7 +133,7 @@ void ComputedTable::initialize()
             line_names.push_back(name);
             v_line_pos_in_ref_table.push_back(row);
 
-            std::vector<double> row_values(column_names.size(), L_NAN);
+            std::vector<double> row_values(column_names.size(), IODE_NAN);
             values.push_back(row_values);
         }
     }

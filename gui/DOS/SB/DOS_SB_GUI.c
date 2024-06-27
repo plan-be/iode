@@ -44,9 +44,9 @@ char    *arg;
     ygrid = B_argpos("JNM",  args[3][0]); // Id
  
     axis  = B_argpos("LGSP", args[4][0]);
-    if(memcmp(args[5], "--", 2) == 0) ymin = L_NAN;
+    if(memcmp(args[5], "--", 2) == 0) ymin = IODE_NAN;
     else                              ymin = atof(args[5]);
-    if(memcmp(args[6], "--", 2) == 0) ymax = L_NAN;
+    if(memcmp(args[6], "--", 2) == 0) ymax = IODE_NAN;
     else                              ymax = atof(args[6]);
 
     smpl = PER_atosmpl(args[7], args[8]);

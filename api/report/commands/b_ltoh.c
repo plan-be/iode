@@ -39,7 +39,7 @@ static double LTOH_ylin(double* y, double x)
     
     if(L_ISAN(y[lo]) && L_ISAN(y[hi]))
         res = a*y[lo] + b*y[hi];
-    else res = L_NAN;
+    else res = IODE_NAN;
     return(res);
 }
 
@@ -63,7 +63,7 @@ static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, 
     int     dim, j, f, t, beg;
     double    x;
 
-    for(t = 0; t < t_nb; t++) t_vec[t] = L_NAN;
+    for(t = 0; t < t_nb; t++) t_vec[t] = IODE_NAN;
     beg = 0;
     while(1) {
         while(beg < f_nb && !L_ISAN(f_vec[beg])) beg++;
@@ -114,7 +114,7 @@ static int LTOH_step(int type, double* f_vec, int f_nb, double* t_vec, int t_nb,
 {
     int     dim, j, f, t, beg;
 
-    for(t = 0; t < t_nb; t++) t_vec[t] = L_NAN;
+    for(t = 0; t < t_nb; t++) t_vec[t] = IODE_NAN;
     beg = 0;
     while(1) {
         while(beg < f_nb && !L_ISAN(f_vec[beg])) beg++;
@@ -180,7 +180,7 @@ static double LTOH_ycs(double* y, double* y2, double x)
     double    res, a, b;
     int     hi, lo;
 
-    if(x < 0) return(L_NAN);
+    if(x < 0) return(IODE_NAN);
 
     lo = (int) floor(x);
     hi = (int) (lo + 1.0);
@@ -191,7 +191,7 @@ static double LTOH_ycs(double* y, double* y2, double x)
     if(L_ISAN(y[lo]) && L_ISAN(y[hi]))
         res = a*y[lo] + b*y[hi] +
               ((a*a*a - a)*y2[lo] + (b*b*b - b)*y2[hi])/6.0;
-    else res = L_NAN;
+    else res = IODE_NAN;
     return(res);
 }
 
@@ -202,7 +202,7 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
     double    *y2 = (double *) SW_nalloc(sizeof(double) * f_nb),
                   x, sum, d;
 
-    for(t = 0; t < t_nb; t++) t_vec[t] = L_NAN;
+    for(t = 0; t < t_nb; t++) t_vec[t] = IODE_NAN;
     beg = f = 0;
     while(1) {
         while(beg < f_nb && !L_ISAN(f_vec[beg])) beg++;
@@ -219,7 +219,7 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
                     x += f;
                     t_vec[t + j] = LTOH_ycs(f_vec, y2, x);
                     if(L_ISAN(t_vec[t + j]) && L_ISAN(sum)) sum += t_vec[t + j];
-                    else sum = L_NAN;
+                    else sum = IODE_NAN;
                 }
 
                 if(L_ISAN(sum)) {
@@ -250,7 +250,7 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
  *  @param [in]   SAMPLE*  f_smpl     sample of the input var file
  *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS 
  *  @param [out]  SAMPLE** t_smpl     allocated target sample
- *  @param [out]  int*     skip       nb of periods to skip (i.e. set to L_NAN) in the **target** variable 
+ *  @param [out]  int*     skip       nb of periods to skip (i.e. set to IODE_NAN) in the **target** variable 
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
  *  @return       rc                  0 on success, -1 on error (incompatible perriodicity...) 
  */

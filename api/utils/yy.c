@@ -23,12 +23,12 @@
 
 /**
  *  Reads a token on the YY stream and interprets the token as a double (double) if possible.
- *  If not, returns L_NAN and rewinds the YY stream.
+ *  If not, returns IODE_NAN and rewinds the YY stream.
  *  
  *  The token can be a double, a long or the string "na". Other values are rejected.
  *  
  *  @param [in, out]    yy  YYFILE*     YY stream
- *  @return                 double   value of the next token or L_NAN.
+ *  @return                 double   value of the next token or IODE_NAN.
  *  
  */
 double K_read_real(YYFILE *yy)
@@ -55,15 +55,15 @@ ag:
             if(yy->yy_text[0] != '/' &&
                     yy->yy_text[0] != '.')  /* JMP 03-01-2013 */
                 YY_unread(yy);             /* GB / = na  ??? */
-            return(L_NAN);
+            return(IODE_NAN);
 
         case YY_WORD   :
             if(strcmp("na", yy->yy_text) != 0)
                 YY_unread(yy);
-            return(L_NAN);
+            return(IODE_NAN);
         default :
             YY_unread(yy);
-            return(L_NAN);
+            return(IODE_NAN);
     }
 
     return(val);
