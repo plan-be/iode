@@ -71,7 +71,7 @@ void MenuGraphVariables::display()
     try
     {
         EnumIodeGraphChart chartType = (EnumIodeGraphChart) wChartType->extractAndVerify();
-        EnumIodeVarMode varMode = (EnumIodeVarMode) wVarMode->extractAndVerify();
+        IodeVarMode varMode = (IodeVarMode) wVarMode->extractAndVerify();
         bool logScale = wYAxisScale->extractAndVerify();
         EnumIodeGraphAxisThicks xTicks = (EnumIodeGraphAxisThicks) wXTicks->extractAndVerify();
         EnumIodeGraphAxisThicks yTicks = (EnumIodeGraphAxisThicks) wYTicks->extractAndVerify();

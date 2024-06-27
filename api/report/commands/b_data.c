@@ -514,21 +514,21 @@ int B_DataUpdate(char* arg, int type)
             case 'd' :
             case 'D' :
                 nb_p = 2;
-                mode = K_DIFF;
-                if(U_is_in(args[1][1], "Yy")) mode = K_DIFFY;
+                mode = VAR_MODE_DIFF;
+                if(U_is_in(args[1][1], "Yy")) mode = VAR_MODE_Y0Y_DIFF;
                 break;
             case 'g' :
             case 'G' :
                 nb_p = 2;
-                mode = K_GRT;
-                if(U_is_in(args[1][1], "Yy")) mode = K_GRTY;
+                mode = VAR_MODE_GROWTH_RATE;
+                if(U_is_in(args[1][1], "Yy")) mode = VAR_MODE_Y0Y_GROWTH_RATE;
                 break;
 
             case 'l' :
             case 'L' :
                 nb_p = 2;
             default  :
-                mode = K_LEVEL;
+                mode = VAR_MODE_LEVEL;
                 break;
             }
             nb_upd = nb_args - nb_p - 1;

@@ -11,11 +11,11 @@ class VariablesModel : public IodeTemplateTableModel<KDBVariables>, public Numer
 {
 	Q_OBJECT
 
-	EnumIodeVarMode mode;
+	IodeVarMode mode;
 
 public:
 	VariablesModel(QObject* parent = nullptr, KDBVariables* database = nullptr, const int nb_digits = 2, 
-		const EnumIodeVarMode mode = I_VAR_MODE_LEVEL): 
+		const IodeVarMode mode = VAR_MODE_LEVEL): 
 		IodeTemplateTableModel({"Value", "Relax", "Std", "T-Stat"}, database, parent), 
 		NumericalTableModel(nb_digits), mode(mode) {}
 
@@ -30,7 +30,7 @@ public:
 
 public slots:
 	void reset() override;
-	void setMode(const EnumIodeVarMode mode)
+	void setMode(const IodeVarMode mode)
 	{
 		this->mode = mode;
 		this->reset();
