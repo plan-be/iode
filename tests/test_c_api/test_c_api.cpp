@@ -2367,8 +2367,8 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
     U_test_print_title("B_WsImport()");
     U_test_B_WsImport("fun2.ac", K_CMT, 317);
-    U_test_B_WsImport("fun2.ae", K_EQS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
-    U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
+    U_test_B_WsImport("fun2.ae", K_EQS, 274);
+    U_test_B_WsImport("fun2.ai", K_IDT, 48);
     U_test_B_WsImport("fun2.al", K_LST, 17);
     U_test_B_WsImport("fun2.as", K_SCL, 161);
     U_test_B_WsImport("fun2.at", K_TBL, 46);
