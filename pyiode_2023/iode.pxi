@@ -31,7 +31,7 @@ from typing import Union, List, Tuple, Optional
 # (from #defines in iode.h)
 
 # Object and file types
-K_CMT = 0
+COMMENTS = 0
 K_EQS = 1
 K_IDT = 2
 K_LST = 3

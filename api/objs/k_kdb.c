@@ -75,7 +75,7 @@ void K_sort(KDB* kdb)
  *  
  *  Object "mode" (UPPER_CASE, LOWER_CASE or ASIS_CASE) is assigned according to object type. 
  *  
- *  @param [in] type        int     KDB object type (K_CMT...K_VAR).
+ *  @param [in] type        int     KDB object type (COMMENTS...K_VAR).
  *  @param [in] filename    char*   file where the KDB will be saved (can be changed before saving the KDB).
  *  @return                 KDB*    allocated KDB. 
  *  
@@ -86,7 +86,7 @@ KDB *K_init_kdb(int type, char* filename)
     KDB     *kdb;
 
     switch(type) {
-        case K_CMT :
+        case COMMENTS :
             mode = ASIS_CASE;
             break;
         case K_EQS :

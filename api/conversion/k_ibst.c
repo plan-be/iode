@@ -185,7 +185,7 @@ int     lang;
     if(DIF_skip_to(FYY, DIF_BOT) < 0) return(-1);
     if(DIF_skip_to(RYY, DIF_BOT) < 0) return(-1);
 
-    C_kdb = K_create(K_CMT, ASIS_CASE);
+    C_kdb = K_create(COMMENTS, ASIS_CASE);
 
     while(1) {
         if(DIF_long(RYY, &dummy) < 0) break;  /* tbl */

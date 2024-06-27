@@ -33,9 +33,9 @@ TEST_F(UtilsTest, getIodeFileType)
 	EXPECT_EQ(get_iode_file_type(input_test_dir), I_DIRECTORY);
 
 	filename = input_test_dir + "fun.cmt";
-	EXPECT_EQ(get_iode_file_type(filename), I_COMMENTS_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), COMMENTS_FILE);
 	filename = input_test_dir + "fun.ac";
-	EXPECT_EQ(get_iode_file_type(filename), I_COMMENTS_FILE);
+	EXPECT_EQ(get_iode_file_type(filename), COMMENTS_FILE);
 
 	filename = input_test_dir + "fun.eqs";
 	EXPECT_EQ(get_iode_file_type(filename), I_EQUATIONS_FILE);
@@ -111,22 +111,22 @@ TEST_F(UtilsTest, checkFilepath)
 
 	// fake directory
 	filepath = "C:\\Users\\ald\\wrong\\path\\fun.cmt";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "save", false), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, COMMENTS_FILE, "save", false), IodeExceptionFunction);
 
 	// wrong extension
 	filepath = output_test_dir + "fun.eqs";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "save", false), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, COMMENTS_FILE, "save", false), IodeExceptionFunction);
 
 	filepath = output_test_dir + "fun.docx";
 	EXPECT_THROW(check_filepath(filepath, I_TEXT_FILE, "save", false), IodeExceptionFunction);
 
 	// file does not exist
 	filepath = input_test_dir + "funxxx.cmt";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "load", true), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, COMMENTS_FILE, "load", true), IodeExceptionFunction);
 
 	// file does not exist (no extension given)
 	filepath = input_test_dir + "funxxx";
-	EXPECT_THROW(check_filepath(filepath, I_COMMENTS_FILE, "load", true), IodeExceptionFunction);
+	EXPECT_THROW(check_filepath(filepath, COMMENTS_FILE, "load", true), IodeExceptionFunction);
 
 	// No extension but not an IODE objects file
 	filepath = input_test_dir + "fun";
@@ -134,7 +134,7 @@ TEST_F(UtilsTest, checkFilepath)
 
 	// extension added automatically
 	filepath = input_test_dir + "fun";
-	filepath = check_filepath(filepath, I_COMMENTS_FILE, "load", true);
+	filepath = check_filepath(filepath, COMMENTS_FILE, "load", true);
 	EXPECT_EQ(filepath, input_test_dir + "fun.cmt");
 }
 
@@ -162,7 +162,7 @@ TEST_F(UtilsTest, removeDuplicates)
 
 	// Before removing duplicates
 	// Retrieves all object names matching one or more patterns in K_WS (similar to grep)
-	char* c_lst = K_expand(I_COMMENTS, NULL, pattern, '*');
+	char* c_lst = K_expand(COMMENTS, NULL, pattern, '*');
 	// Parses a string and replaces @filename and $listname by their contents
 	char** c_names = B_ainit_chk(c_lst, NULL, 0);
 	int nb_names = SCR_tbl_size((unsigned char**) c_names);

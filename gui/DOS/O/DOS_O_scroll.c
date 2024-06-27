@@ -108,7 +108,7 @@ int i;
 	    PER_pertoa(PER_addper(&(KSMPL(kdb)->s_p1), i), STATIC_BUF);
 	    //strcpy(STATIC_BUF, STATIC_BUF + 2);
 	    break;
-	case K_CMT :strcpy(STATIC_BUF, "COMMENT");     break;
+	case COMMENTS :strcpy(STATIC_BUF, "COMMENT");     break;
 	case K_EQS :strcpy(STATIC_BUF, "EQUATION");    break;
 	case K_IDT :strcpy(STATIC_BUF, "IDENTITY");    break;
 	case K_LST :strcpy(STATIC_BUF, "LIST");        break;
@@ -183,7 +183,7 @@ int i, j;
     */
 	    return(KELEC(kdb, i));
 
-    case K_CMT :
+    case COMMENTS :
 	    return(KCVAL(kdb, i));
 
     case K_LST :
@@ -242,7 +242,7 @@ int i;
     KDB *kdb = (KDB *) scrl->sc_pcl;  /* JMP 10-02-97 */
 
     switch(KTYPE(kdb)) {
-	case K_CMT :
+	case COMMENTS :
 	case K_EQS :
 	case K_IDT :
 	case K_TBL :
@@ -284,7 +284,7 @@ int i, j;
     if(ODE_VIEW) return(-1);
 
     switch(KTYPE(kdb)) {
-	case K_CMT :
+	case COMMENTS :
 	case K_EQS :
 	case K_IDT :
 	case K_LST :
@@ -315,7 +315,7 @@ int i, j;
     }
 
     switch(KTYPE(kdb)) {
-    case K_CMT :
+    case COMMENTS :
     case K_EQS :
     case K_IDT :
     case K_LST :  return(ODE_edit_obj1(kdb, i));
@@ -522,7 +522,7 @@ int     key, i, j;
     else line = j;
 
     switch(key) {
-    case SCR_HELP_KEY : HLP_edit("simulation du mod┼le"); return(-1);
+    case SCR_HELP_KEY : HLP_edit("simulation du modО©╫le"); return(-1);
     case SCR_F7 : return(ODE_exec_c());
     case SCR_F8 : return(ODE_exec_a());
     }
@@ -567,18 +567,18 @@ YYKEYS OSCRL_GCMTS[] = {
     "Modify",     SCR_ENTER,
     "Delete",     SCR_DELETE,
     "New",        SCR_INSERT,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Max",        SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "View Cmts",  SCR_A_F1,
     "View Eqs",   SCR_A_F2,
     "View Idts",  SCR_A_F3,
     "View Cmts",  SCR_A_F4,
     "View Scls",  SCR_A_F5,
     "View Vars",  SCR_A_F7,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };
@@ -592,11 +592,11 @@ YYKEYS OSCRL_TABSCMTS[] = {
     "Modify",     SCR_ENTER,
     "Delete",     SCR_DELETE,
     "New",        SCR_INSERT,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Max",        SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };
@@ -609,15 +609,15 @@ YYKEYS OSCRL_SCMTS[] = {
     "Cell width-",SCR_S_F3,
     "NDec+",      SCR_F4,
     "NDec-",      SCR_S_F4,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Modify",     SCR_ENTER,
     "Delete",     SCR_DELETE,
     "New",        SCR_INSERT,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Maximize",   SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };
@@ -628,15 +628,15 @@ YYKEYS OSCRL_SIDTS[] = {
     "Name width-",SCR_S_F2,
     "Exec Current", SCR_F7,
     "Execute list", SCR_S_F7,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Modify",     SCR_ENTER,
     "Delete",     SCR_DELETE,
     "New",        SCR_INSERT,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Maximize",   SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
-    "дддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };
@@ -655,16 +655,16 @@ YYKEYS OSCRL_VARSCMTS[] = {
     "Graph",      SCR_F8,
     "Graphic Par",SCR_S_F8,
     "Rotate",     SCR_F9,           /* Windows JMP 10-02-97 */
-    "ддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Modify",     SCR_ENTER,
     "Delete",     SCR_DELETE,
     "New",        SCR_INSERT,
-    "ддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Maximize",   SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
     "Rotate",     SCR_C_R,
-    "ддддддддддддддд",   0,
+    "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };

@@ -10,7 +10,7 @@ MenuWorkspaceCopyInto::MenuWorkspaceCopyInto(QWidget* parent) :
     for(const std::string& iode_type: vIodeTypes) qIodeTypes << QString::fromStdString(iode_type);
 
     wComboBoxObjectType = new WrapperComboBox(label_object_type->text(), *comboBox_object_type, REQUIRED_FIELD, qIodeTypes);
-    wFileChooserInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, I_COMMENTS_FILE, EXISTING_FILE);
+    wFileChooserInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, COMMENTS_FILE, EXISTING_FILE);
     wSampleEditSampleFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, OPTIONAL_FIELD);
     wSampleEditSampleTo = new WrapperSampleEdit(sampleEdit_sample_to->text(), *sampleEdit_sample_to, OPTIONAL_FIELD);
     wTextEditObjectNames = new WrapperQTextEdit(label_object_names->text(), *textEdit_object_names, OPTIONAL_FIELD);
@@ -48,7 +48,7 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
 
         switch (iodeType)
         {
-        case I_COMMENTS:
+        case COMMENTS:
             Comments.copy_from(input_file, object_names);
             break;
         case I_EQUATIONS:

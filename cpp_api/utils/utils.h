@@ -69,7 +69,7 @@ inline std::string utf8_to_oem(const std::string str_utf8)
 static IodeRegexName get_regex_name(const int type)
 {
     IodeRegexName nre;
-    if (type == I_COMMENTS)
+    if (type == COMMENTS)
     {
         nre.regex = "A-Za-z";
         nre.type = "capital or lowercase";

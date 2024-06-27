@@ -8,7 +8,7 @@ class CommentsDelegate : public BaseDelegate
 	Q_OBJECT
 
 public:
-	CommentsDelegate(QObject* parent = nullptr) : BaseDelegate(I_COMMENTS, parent) {}
+	CommentsDelegate(QObject* parent = nullptr) : BaseDelegate(COMMENTS, parent) {}
 
 	~CommentsDelegate() {}
 };

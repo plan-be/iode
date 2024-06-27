@@ -11,7 +11,7 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
 
     wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
     wThreshold = new WrapperQLineEdit(label_threshold->text(), *lineEdit_threshold, OPTIONAL_FIELD);
-    wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, OPTIONAL_FIELD, I_COMMENTS_FILE, EXISTING_FILE);
+    wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, OPTIONAL_FIELD, COMMENTS_FILE, EXISTING_FILE);
     wResultWSOnly = new WrapperQLineEdit(label_list_ws_only->text(), *lineEdit_list_ws_only, REQUIRED_FIELD);
     wResultFileOnly = new WrapperQLineEdit(label_list_file_only->text(), *lineEdit_list_file_only, REQUIRED_FIELD);
     wResultBothEqual = new WrapperQLineEdit(label_list_both_equal->text(), *lineEdit_list_both_equal, REQUIRED_FIELD);
@@ -26,7 +26,7 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
     mapFields["ResultBothDifferent"] = wResultBothDifferent;
 
     wThreshold->getQField().setValidator(new QDoubleValidator(&wThreshold->getQField()));
-    updateThreshold(I_COMMENTS);
+    updateThreshold(COMMENTS);
 
     connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateThreshold);
     connect(&wComboIodeTypes->getQField(), &QComboBox::currentIndexChanged, this, &MenuDataFileCompare::updateFileChooser);

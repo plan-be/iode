@@ -10,7 +10,7 @@ void init_constants(nb::module_ &m)
       m.attr("nan") = L_NAN;
 
       // Object and file types
-      m.attr("I_CMT") = (int) I_COMMENTS;
+      m.attr("I_CMT") = (int) COMMENTS;
       m.attr("I_EQS") = (int) I_EQUATIONS;
       m.attr("I_IDT") = (int) I_IDENTITIES;
       m.attr("I_LST") = (int) I_LISTS;

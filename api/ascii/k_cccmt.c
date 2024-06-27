@@ -102,7 +102,7 @@ KDB *KC_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_CMT, ASIS_CASE);
+    kdb = K_create(COMMENTS, ASIS_CASE);
     
     //DebugForce("filename: %s", kdb->k_nameptr);
     
@@ -111,7 +111,7 @@ KDB *KC_load_asc(char* filename)
             case YY_EOF :
                 if(cmpt) {
                     char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, K_CMT);
+                    K_set_ext_asc(asc_filename, filename, COMMENTS);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

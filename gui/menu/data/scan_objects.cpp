@@ -6,7 +6,7 @@ MenuDataScanObjects::MenuDataScanObjects(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_COMMENTS, this);
+    completer = new IodeCompleter(false, false, COMMENTS, this);
     textEdit_lists_to_scan->setCompleter(completer);
     comboBox_iode_types->setCurrentIndex(0);
 

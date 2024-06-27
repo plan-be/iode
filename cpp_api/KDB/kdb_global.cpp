@@ -62,7 +62,7 @@ void import_cmt(const std::string& input_file, const std::string& save_file, con
     std::string input_file_ = check_file_exists(input_file, caller_name);
     args += input_file_ + " ";
 
-    std::string save_file_ = check_filepath(save_file, I_COMMENTS_FILE, caller_name, false);
+    std::string save_file_ = check_filepath(save_file, COMMENTS_FILE, caller_name, false);
     args += save_file_ + " ";
 
     args += std::to_string((int) lang) + " ";
@@ -146,7 +146,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
         error_msg += "Comments file " + cmt_file_;
-        dbc = K_interpret(K_CMT, to_char_array(cmt_file));
+        dbc = K_interpret(COMMENTS, to_char_array(cmt_file));
         if(dbc == NULL)
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
@@ -167,7 +167,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     std::string rule_file_ = check_file_exists(rule_file, caller_name);
 
-    std::string save_file_ = check_filepath(save_file, I_COMMENTS_FILE, caller_name, false);
+    std::string save_file_ = check_filepath(save_file, COMMENTS_FILE, caller_name, false);
 
     if(!debug_file.empty()) 
     {

@@ -82,7 +82,7 @@ int     fmt;
     }
 
     if(cfile[0] != 0)
-        dbc = K_interpret(K_CMT, cfile);    
+        dbc = K_interpret(COMMENTS, cfile);    
     if(fmt < 4)
         rc = EXP_Ws(expdef, dbv, dbc, rule, out, na, sep); /* JMP 28-08-98 */
     else

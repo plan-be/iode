@@ -12,7 +12,7 @@ MenuFileImportVariables::MenuFileImportVariables(QWidget* parent) :
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, I_ANY_FILE, EXISTING_FILE);
     wRuleFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, I_ANY_FILE, EXISTING_FILE);
 
-    wSaveFile = new WrapperFileChooser(label_save->text(), *fileChooser_save_file, REQUIRED_FIELD, I_COMMENTS_FILE, NEW_FILE);
+    wSaveFile = new WrapperFileChooser(label_save->text(), *fileChooser_save_file, REQUIRED_FIELD, COMMENTS_FILE, NEW_FILE);
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
 

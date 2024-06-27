@@ -305,7 +305,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 	{
 		switch (other_type)
 		{
-		case I_COMMENTS:
+		case COMMENTS:
 			if(Comments.contains(std_name))
 				list << name;
 			break;
@@ -353,7 +353,7 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	std::vector<std::string> std_list;
 	switch (other_type)
 	{
-	case I_COMMENTS:
+	case COMMENTS:
 		std_list = Comments.search(cpp_name);
 		break;
 	case I_EQUATIONS:

@@ -322,8 +322,8 @@ void MainWindow::open_import_comments_dialog()
     MenuFileImportComments dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
-        tabWidget_IODE_objs->resetFilter(I_COMMENTS);
-        update_tab_and_completer(I_COMMENTS);
+        tabWidget_IODE_objs->resetFilter(COMMENTS);
+        update_tab_and_completer(COMMENTS);
     }
 }
 

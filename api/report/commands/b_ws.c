@@ -291,7 +291,7 @@ int B_WsClearAll(char* arg)
 {
     int i;
 
-    for(i = K_CMT; i <= K_VAR; i++) B_WsClear("", i);
+    for(i = COMMENTS; i <= K_VAR; i++) B_WsClear("", i);
     return(0);
 }
 

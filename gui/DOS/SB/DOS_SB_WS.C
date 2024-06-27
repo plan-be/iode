@@ -11,10 +11,10 @@ int     key;
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++)
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
 	if(key == SCR_F2 + i || key == SCR_F10) {
-	    if(B_WsLoad(vkp_wsload_vCMT[i], K_CMT + i)) goto err;
-	    if(i == K_VAR - K_CMT) SB_ResetSample();
+	    if(B_WsLoad(vkp_wsload_vCMT[i], COMMENTS + i)) goto err;
+	    if(i == K_VAR - COMMENTS) SB_ResetSample();
 	}
 
     return(0);
@@ -94,9 +94,9 @@ C_InitWsSave()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++) {
-	SCR_strlcpy(vkp_wssave_vCMT[i], KNAMEPTR(K_WS[K_CMT + i]), 254);  
-	vkp_wssave_vCNB[i] =  KNB(K_WS[K_CMT + i]);
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++) {
+	SCR_strlcpy(vkp_wssave_vCMT[i], KNAMEPTR(K_WS[COMMENTS + i]), 254);  
+	vkp_wssave_vCNB[i] =  KNB(K_WS[COMMENTS + i]);
 	}
     return(0);
 }
@@ -108,10 +108,10 @@ C_WsSave()
 
 /*    C_WsName(); */
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++) {
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++) {
 	if(SCR_LKEY == SCR_F2 + i || SCR_LKEY == SCR_F10) {
 	    K_LZH = vkp_wssave_vCC[i]; /* JMP 28-05-00 */
-	    rc = B_WsSave(vkp_wssave_vCMT[i], K_CMT + i);
+	    rc = B_WsSave(vkp_wssave_vCMT[i], COMMENTS + i);
 	    K_LZH = klzh;              /* JMP 28-05-00 */
 	    if(rc) {
 		B_display_last_error();
@@ -134,8 +134,8 @@ C_InitWsDescr()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++)
-	SCR_strlcpy(vkp_wsdescr_vDCMT[i], KDESC(K_WS[K_CMT + i]), 50);
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+	SCR_strlcpy(vkp_wsdescr_vDCMT[i], KDESC(K_WS[COMMENTS + i]), 50);
     return(0);
 }
 
@@ -143,8 +143,8 @@ C_WsDescr()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++)
-	B_WsDescr(vkp_wsdescr_vDCMT[i], K_CMT + i);
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+	B_WsDescr(vkp_wsdescr_vDCMT[i], COMMENTS + i);
     return(0);
 }
 
@@ -161,8 +161,8 @@ C_InitWsClear()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++)
-	vkp_wsclear_vCNB[i] =  KNB(K_WS[K_CMT + i]);
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+	vkp_wsclear_vCNB[i] =  KNB(K_WS[COMMENTS + i]);
 
     return(0);
 }
@@ -171,9 +171,9 @@ C_WsClear()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - K_CMT ; i++)
+    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
 	if((SCR_LKEY == SCR_F2 + i || SCR_LKEY == SCR_F10))
-		 B_WsClear(0L, K_CMT + i);
+		 B_WsClear(0L, COMMENTS + i);
 
     return(0);
 }

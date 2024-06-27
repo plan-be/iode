@@ -65,7 +65,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 
         if(!found) {
             switch(KTYPE(kdb)) {
-                case K_CMT :
+                case COMMENTS :
                     if(texts) found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);
                     break;
                 case K_LST :
@@ -119,7 +119,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
 /**
  *  Retrieves all object names matching one or more patterns in a workspace or an object file.
  *  
- *  @param [in] type    int     Object type (K_CMT -> K_VAR)
+ *  @param [in] type    int     Object type (COMMENTS -> K_VAR)
  *  @param [in] file    char*   filename to search into or null to look in the workpace 
  *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
@@ -136,7 +136,7 @@ char *K_expand(int type, char* file, char* pattern, int all)
     KDB     *kdb;
 
     if(pattern == 0 || pattern[0] == 0 ||
-            type < K_CMT || type > K_VAR) return(NULL);
+            type < COMMENTS || type > K_VAR) return(NULL);
 
     if(file == NULL) kdb = K_WS[type];
     else {
@@ -170,7 +170,7 @@ char *K_expand(int type, char* file, char* pattern, int all)
  *  Retrieves all object names matching one or more patterns in a KDB.
  *  
  *  @param [in] kdb     KDB*    KDB to search into or null to look in the workpace 
- *  @param [in] type    int     Object type (K_CMT -> K_VAR)
+ *  @param [in] type    int     Object type (COMMENTS -> K_VAR)
  *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
  *  
@@ -184,7 +184,7 @@ char *K_expand_kdb(KDB* kdb, int type, char* pattern, int all)
     int     i, np;
     char    **ptbl, **tbl, *lst = NULL;
 
-    if(pattern == 0 || pattern[0] == 0 || type < K_CMT || type > K_VAR) return(NULL);
+    if(pattern == 0 || pattern[0] == 0 || type < COMMENTS || type > K_VAR) return(NULL);
 
     if(kdb == NULL) kdb = K_WS[type];
 

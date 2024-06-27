@@ -713,7 +713,7 @@ U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     int     pos, i;
-    KDB     *kdb = K_WS[K_CMT];
+    KDB     *kdb = K_WS[COMMENTS];
 
     if(kdb == NULL) return(res);
 
@@ -1249,7 +1249,7 @@ U_ch *RPF_expand(U_ch** args, int type)
  */
 U_ch *RPF_cexpand(U_ch **args)
 {
-    return(RPF_expand(args, K_CMT));
+    return(RPF_expand(args, COMMENTS));
 }
 
 

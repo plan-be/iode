@@ -150,7 +150,7 @@ int B_DSUpdateCmt(char *name, char *val)
     update = SCR_malloc(K_MAX_NAME + 3 + (int)strlen(val)); /* IODE64K */
     if(update) {
         sprintf(update, "%s %s", name, val);
-        rc = B_DataUpdate(update, K_CMT);
+        rc = B_DataUpdate(update, COMMENTS);
         SCR_free(update);
     }
     return(rc);

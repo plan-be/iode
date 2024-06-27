@@ -32,7 +32,7 @@ protected:
 
         switch (iodeType)
         {
-        case I_COMMENTS:
+        case COMMENTS:
             index = this->indexOf(tabComments);
             break;
         case I_EQUATIONS:

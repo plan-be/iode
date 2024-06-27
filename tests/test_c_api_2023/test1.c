@@ -1419,9 +1419,9 @@ void Tests_B_DATA()
     S4ASSERT(U_cmp_strs(lst, "A;B;B;C;D;X;Y;Z"), "B_DataListSort(\"L1 RES\") = \"%s\"", lst);
     
     // B_DataUpdate()
-    rc = B_DataUpdate("U Comment of U"       , K_CMT);
+    rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U");
-    S4ASSERT(cond == 1, "B_DataUpdate(\"U Comment of U\", K_CMT) = \"%s\"", KCPTR("U"));
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U Comment of U\", COMMENTS) = \"%s\"", KCPTR("U"));
     
     rc = B_DataUpdate("U U := c1 + c2*Z"     , K_EQS);
     
@@ -1444,9 +1444,9 @@ void Tests_B_DATA()
     S4ASSERT(rc == 0, "B_DataUpdate(\"U L 2000Y1 2 3.1 4e2\" , K_VAR)");
     
     // B_DataSearch(char* arg, int type)
-    rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", K_CMT);
+    rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KLPTR("NEWLIST"), "U");
-    S4ASSERT(cond == 1, "B_DataSearch(\"of 0 0 1 0 1 NEWLIST\", K_CMT) = \"%s\"", KLPTR("NEWLIST"));
+    S4ASSERT(cond == 1, "B_DataSearch(\"of 0 0 1 0 1 NEWLIST\", COMMENTS) = \"%s\"", KLPTR("NEWLIST"));
     
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", K_EQS);
@@ -1462,9 +1462,9 @@ void Tests_B_DATA()
     cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY");
     S4ASSERT(cond == 1, "B_DataAppend(\"_SCAL XXX,YYY\", K_LST) = %d", rc);
 
-    rc = B_DataAppend("U - More comment on U", K_CMT);
+    rc = B_DataAppend("U - More comment on U", COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U");
-    S4ASSERT(cond == 1, "B_DataAppend(\"U - More comment on U\", K_CMT) = %d", rc);
+    S4ASSERT(cond == 1, "B_DataAppend(\"U - More comment on U\", COMMENTS) = %d", rc);
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", K_SCL);
@@ -1906,11 +1906,11 @@ void Tests_IMP_EXP()
    
     sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(K_CMT, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
-    S4ASSERT(rc == 0, "IMP_RuleImport(K_CMT, trace, \"%s\", \"%s\", \"%s\", NULL, NULL, IMP_FMT_ASCII, 0)", rulefile, outfile, reffile);
+    rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
+    S4ASSERT(rc == 0, "IMP_RuleImport(COMMENTS, trace, \"%s\", \"%s\", \"%s\", NULL, NULL, IMP_FMT_ASCII, 0)", rulefile, outfile, reffile);
     
     if(rc == 0) {
-        KC_RWS = KC_WS = K_interpret(K_CMT, outfile);  
+        KC_RWS = KC_WS = K_interpret(COMMENTS, outfile);  
         cond = (KC_WS != NULL) && U_cmp_strs(KCPTR("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
         S4ASSERT(cond == 1, "KK_AF == \"Ondernemingen: ontvangen kapitaaloverdrachten.\"");
     }
@@ -2605,7 +2605,7 @@ void Tests_B_WS()
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
-    U_test_B_WsLoad("fun", K_CMT, 317);
+    U_test_B_WsLoad("fun", COMMENTS, 317);
     U_test_B_WsLoad("fun", K_EQS, 274);
     U_test_B_WsLoad("fun", K_IDT, 48);
     U_test_B_WsLoad("fun", K_LST, 17);
@@ -2615,7 +2615,7 @@ void Tests_B_WS()
     
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");
-    U_test_B_WsSave("fun", "fun2", K_CMT, 317);
+    U_test_B_WsSave("fun", "fun2", COMMENTS, 317);
     U_test_B_WsSave("fun", "fun2", K_EQS, 274);
     U_test_B_WsSave("fun", "fun2", K_IDT, 48);
     U_test_B_WsSave("fun", "fun2", K_LST, 17);
@@ -2625,7 +2625,7 @@ void Tests_B_WS()
            
     // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
     U_test_print_title("B_WsSaveCmp()");
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_CMT, 317);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", COMMENTS, 317);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_EQS, 274);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_IDT, 48);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
@@ -2635,7 +2635,7 @@ void Tests_B_WS()
     
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
-    U_test_B_WsExport("fun.cmt", "fun2.ac", K_CMT); 
+    U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS); 
     U_test_B_WsExport("fun.eqs", "fun2.ae", K_EQS); 
     U_test_B_WsExport("fun.idt", "fun2.ai", K_IDT);
     U_test_B_WsExport("fun.lst", "fun2.al", K_LST);
@@ -2645,7 +2645,7 @@ void Tests_B_WS()
 
     // int B_WsClear(char* arg, int type)                $WsClear<type> 
     U_test_print_title("B_WsClear()");
-    U_test_B_WsClear(K_CMT);
+    U_test_B_WsClear(COMMENTS);
     U_test_B_WsClear(K_EQS);
     U_test_B_WsClear(K_IDT);
     U_test_B_WsClear(K_LST);
@@ -2655,7 +2655,7 @@ void Tests_B_WS()
      
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
     U_test_print_title("B_WsImport()");
-    U_test_B_WsImport("fun2.ac", K_CMT, 317);
+    U_test_B_WsImport("fun2.ac", COMMENTS, 317);
     U_test_B_WsImport("fun2.ae", K_EQS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsImport("fun2.ai", K_IDT, 47);   // Idem in IDT NAWRU
     U_test_B_WsImport("fun2.al", K_LST, 17);
@@ -2688,7 +2688,7 @@ void Tests_B_WS()
     
     // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
     U_test_print_title("B_WsDescr()");
-    U_test_B_WsDescr("Ws content description", K_CMT);
+    U_test_B_WsDescr("Ws content description", COMMENTS);
     U_test_B_WsDescr("Ws content description", K_EQS);
     U_test_B_WsDescr("Ws content description", K_IDT);
     U_test_B_WsDescr("Ws content description", K_LST);
@@ -2700,7 +2700,7 @@ void Tests_B_WS()
     // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes) 
     // Should be reviewed for C++ w/o /Zp1
     U_test_print_title("B_WsName()");
-    U_test_B_WsName("funtest", K_CMT);
+    U_test_B_WsName("funtest", COMMENTS);
     U_test_B_WsName("funtest", K_EQS);
     U_test_B_WsName("funtest", K_IDT);
     U_test_B_WsName("funtest", K_LST);
@@ -2713,7 +2713,7 @@ void Tests_B_WS()
     U_test_B_WsCopyVar();
 
     U_test_print_title("B_WsCopy() - other objects");
-    U_test_B_WsCopy("fun", K_CMT, 317);
+    U_test_B_WsCopy("fun", COMMENTS, 317);
     U_test_B_WsCopy("fun", K_EQS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsCopy("fun", K_IDT, 48);   // Idem in IDT NAWRU
     U_test_B_WsCopy("fun", K_LST, 17);
@@ -2726,7 +2726,7 @@ void Tests_B_WS()
     U_test_B_WsMergeVar();
     
     U_test_print_title("B_WsMerge() - other objects");
-    U_test_B_WsMerge("fun", K_CMT, 317);
+    U_test_B_WsMerge("fun", COMMENTS, 317);
     U_test_B_WsMerge("fun", K_EQS, 274);  
     U_test_B_WsMerge("fun", K_IDT, 48);   
     U_test_B_WsMerge("fun", K_SCL, 161);

@@ -101,7 +101,7 @@ int K_add(KDB* kdb, char* name, ...)
     }    
 
     switch(KTYPE(kdb)) {
-      case K_CMT: 
+      case COMMENTS: 
           txt = va_arg(vargs, char *);
           rc = K_cpack(&pack, txt);
           break;            

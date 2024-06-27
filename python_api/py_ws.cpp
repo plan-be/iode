@@ -7,7 +7,7 @@ void init_ws(nb::module_ &m)
 
     m.def("ws_content", &ws_content, nb::arg("pattern"), nb::arg("iode_type") = (int) I_VARIABLES, 
         "Return the names of objects of a given IODE data type, satisfying a pattern specification.");
-    m.def("ws_content_cmt", [](const std::string& pattern){ return ws_content(pattern, I_COMMENTS); }, nb::arg("pattern"),
+    m.def("ws_content_cmt", [](const std::string& pattern){ return ws_content(pattern, COMMENTS); }, nb::arg("pattern"),
         "Return the list of comment names corresponding to the given pattern");
     m.def("ws_content_eqs", [](const std::string& pattern){ return ws_content(pattern, I_EQUATIONS); }, nb::arg("pattern"),
         "Return the list of equation names corresponding to the given pattern");
@@ -149,7 +149,7 @@ void ws_clear(const int iode_type)
 {
     switch (iode_type)
     {
-    case I_COMMENTS:
+    case COMMENTS:
         Comments.clear();
         break;
     case I_EQUATIONS:
@@ -189,7 +189,7 @@ int ws_load(const std::string& filename, const int iode_type)
 
     switch (iode_type_)
     {
-    case I_COMMENTS:
+    case COMMENTS:
         Comments.load(filename);
         return Comments.count();
         break;
@@ -232,7 +232,7 @@ void ws_save(const std::string& filename, const int iode_type)
 {
     switch (iode_type)
     {
-    case I_COMMENTS:
+    case COMMENTS:
         Comments.save(filename);
         break;
     case I_EQUATIONS:

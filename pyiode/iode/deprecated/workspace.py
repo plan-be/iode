@@ -75,7 +75,7 @@ def ws_clear_all():
     ws_clear_var()
 
 def ws_clear(filetype: int):
-    '''Clear WS of the given filetype (K_CMT..K_VAR)'''
+    '''Clear WS of the given filetype (COMMENTS..K_VAR)'''
     if filetype == IodeTypes.COMMENTS:
         ws_clear_cmt()
     elif filetype == IodeTypes.EQUATIONS:
