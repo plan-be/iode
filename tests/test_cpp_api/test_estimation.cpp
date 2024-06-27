@@ -185,7 +185,7 @@ TEST_F(EstimationTest, Estimate)
 
     EditAndEstimateEquations est(from, to);
     est.set_instruments("");
-    est.set_method(0);
+    est.set_method(EQ_LSQ);
 
     // Estimates the block ACAF;DPUH
     est.set_block("ACAF;DPUH");

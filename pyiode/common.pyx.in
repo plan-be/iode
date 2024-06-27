@@ -15,7 +15,7 @@ from libcpp.map cimport map
 from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
-from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
+from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, IodeEquationMethod, 
                             EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 

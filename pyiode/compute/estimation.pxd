@@ -7,7 +7,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport EnumIodeAdjustmentMethod
+from pyiode.common cimport IodeEquationMethod, EnumIodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport NamedEquation
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
@@ -46,7 +46,7 @@ cdef extern from "cpp_api/compute/estimation.h":
         void set_block(const string& block, const string& current_eq_name) except +
         
         string get_method()
-        void set_method(const int method) except +
+        void set_method(const IodeEquationMethod method) except +
         void set_method(const string& method) except +
         
         string get_instruments()

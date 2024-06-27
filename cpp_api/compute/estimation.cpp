@@ -73,7 +73,7 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
 }
 
 EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, const std::string& to)
-    : estimation_done(false), sample(nullptr), method(0), current_eq(v_equations.end())
+    : estimation_done(false), sample(nullptr), method(EQ_LSQ), current_eq(v_equations.end())
 {
     set_sample(from, to);
     kdb_eqs = Equations.subset("", true);

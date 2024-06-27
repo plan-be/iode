@@ -97,7 +97,7 @@ class EditAndEstimateEquations
     Sample* sample;
     std::string block;
     std::string instruments;
-    int method;
+    IodeEquationMethod method;
 
     std::vector<std::string> v_equations;
     std::vector<std::string>::iterator current_eq;
@@ -208,26 +208,22 @@ public:
         return method;
     }
 
-    void set_method(const int method)
+    void set_method(const IodeEquationMethod method)
     {
-        if(method >= I_NB_EQ_METHODS)
-            throw std::invalid_argument("Invalid value " + std::to_string(method) + " for the method.\n" + 
-                "The passed value must be in the range [0, " + std::to_string(I_NB_EQ_METHODS - 1) + "]");
-
         this->method = method;
     }
 
     void set_method(const std::string& method)
     {
         int m = -1;
-        for(int i = 0; i < I_NB_EQ_METHODS; i++) 
+        for(int i = 0; i < IODE_NB_EQ_METHODS; i++) 
             if(method == v_eq_methods[i]) m = i;
 
         if(m < 0)
             throw std::invalid_argument("The method '" + method + "' is not valid.\n" + 
                 "Accepted methods are: " + boost::algorithm::join(v_eq_methods, ", "));
 
-        this->method = m;
+        this->method = (IodeEquationMethod) m;
     }
 
     std::string get_instruments() const

@@ -188,7 +188,7 @@ void EditEquationDialog::estimate()
 		int i_method = comboBoxMethod->extractAndVerify();
 		if(i_method < 0)
 			throw std::invalid_argument("Invalid method. Please choose a method in the drop-down list");
-		edit_est_eqs.set_method(i_method);
+		edit_est_eqs.set_method((IodeEquationMethod) i_method);
 
 		// set sample
 		std::string from = sampleFrom->extractAndVerify().toStdString();
