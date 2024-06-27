@@ -50,7 +50,7 @@ static double LTOH_ylin(double* y, double x)
  *  If the series is a "flow", the result is the source value divided by the nb of sub-periods. 
  *  If the series is a "stock", the result is a linear interpolation of the 2 surrounding source values.
  *  
- *  @param [in]  int         type   of series: WS_LTOH_FLOW or WS_LTOH_STOCK
+ *  @param [in]  int         type   of series: LTOH_FLOW or LTOH_STOCK
  *  @param [in]  double*  f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
  *  @param [out] double*  t_vec  destination vector 
@@ -72,7 +72,7 @@ static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, 
         dim -= 1;
         if(dim > beg) {
 
-            if(type == WS_LTOH_FLOW) {
+            if(type == LTOH_FLOW) {
                 for(f = beg, t = beg*shift; f < dim; f++, t+= shift) {
                     for(j = 0; j < shift; j++) {
                         t_vec[t + j] = f_vec[f]/shift;
@@ -102,7 +102,7 @@ static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, 
  *  If the series is a "flow", the result is the source value plus a portion of the difference bw the 2 surrounding values in the source
  *  If the series is a "stock", the result has the same value as the source
  *  
- *  @param [in]  int         type   of series: WS_LTOH_FLOW or WS_LTOH_STOCK
+ *  @param [in]  int         type   of series: LTOH_FLOW or LTOH_STOCK
  *  @param [in]  double*  f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
  *  @param [out] double*  t_vec  destination vector 
@@ -123,7 +123,7 @@ static int LTOH_step(int type, double* f_vec, int f_nb, double* t_vec, int t_nb,
 
         if(dim > beg) {
 
-            if(type == WS_LTOH_FLOW) {
+            if(type == LTOH_FLOW) {
                 for(f = beg, t = beg*shift; f < dim; f++, t+= shift) {
                     for(j = 0; j < shift; j++) {
                         t_vec[t + j] = f_vec[f]/shift;
@@ -208,7 +208,7 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
         while(beg < f_nb && !IODE_IS_A_NUMBER(f_vec[beg])) beg++;
         if(beg >= f_nb) break;
 
-        if(type == WS_LTOH_FLOW) {
+        if(type == LTOH_FLOW) {
             for(f = beg; f < f_nb && IODE_IS_A_NUMBER(f_vec[f]); f++) f_vec[f] = f_vec[f]/shift;
             dim = LTOH_y2cs(f_vec + beg, f_nb - beg, y2);
 
@@ -300,7 +300,7 @@ static int LTOH_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* skip
 /**
  *  Sub-function of the report functions B_WsLtoHStock() and B_WsLtoHFlow().
  *  
- *  @param [in] int     type    type of series: WS_LTOH_FLOW or WS_LTOH_STOCK
+ *  @param [in] int     type    type of series: LTOH_FLOW or LTOH_STOCK
  *  @param [in] char*   arg     parameter passed from the calling report function
  *  @return     int             0 on success, not null on error (file not found, incompatible samples...)
  */
@@ -343,14 +343,14 @@ static int B_ltoh(int type, char* arg)
     for(i = 0; i < KNB(from); i++) {
         memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(double));
         switch(method[0]) {
-            case WS_LTOH_CS :
+            case LTOH_CS :
                 LTOH_cs(type,
                         f_vec, (int) KSMPL(from)->s_nb,
                         t_vec, (int) t_smpl->s_nb,
                         shift);
                 break;
 
-            case WS_LTOH_STEP:
+            case LTOH_STEP:
                 LTOH_step(type,
                           f_vec, (int) KSMPL(from)->s_nb,
                           t_vec, (int) t_smpl->s_nb,
@@ -358,7 +358,7 @@ static int B_ltoh(int type, char* arg)
                 break;
 
             default       :
-            case WS_LTOH_LIN :
+            case LTOH_LIN :
                 LTOH_lin(type,
                          f_vec, (int) KSMPL(from)->s_nb,
                          t_vec, (int) t_smpl->s_nb,
@@ -396,7 +396,7 @@ done:
  */
 int B_WsLtoHStock(char* arg)
 {
-    return(B_ltoh(WS_LTOH_STOCK, arg));
+    return(B_ltoh(LTOH_STOCK, arg));
 }
 
 
@@ -411,5 +411,5 @@ int B_WsLtoHStock(char* arg)
  */
 int B_WsLtoHFlow(char* arg)
 {
-    return(B_ltoh(WS_LTOH_FLOW, arg));
+    return(B_ltoh(LTOH_FLOW, arg));
 }

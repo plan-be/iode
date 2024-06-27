@@ -378,18 +378,24 @@ enum VariablesInitialization
     VAR_INIT_EXTRA_NA
 };
 
-/*--------------- WS HTOL defines ------------------------*/
-#define WS_HTOL_LAST   0
-#define WS_HTOL_MEAN   1
-#define WS_HTOL_SUM    2
+/*--------------- WS HTOL enum ------------------------*/
+enum IodeHighToLow
+{
+    HTOL_LAST,
+    HTOL_MEAN,
+    HTOL_SUM 
+};
 
-/*--------------- WS LTOH defines ------------------------*/
-#define WS_LTOH_STOCK  0
-#define WS_LTOH_FLOW   1
+/*--------------- WS LTOH enum + constants -------------*/
+enum IodeLowToHigh
+{
+    LTOH_STOCK,
+    LTOH_FLOW
+};
 
-#define WS_LTOH_LIN    'L'
-#define WS_LTOH_CS     'C'
-#define WS_LTOH_STEP   'S'
+#define LTOH_LIN    'L'
+#define LTOH_CS     'C'
+#define LTOH_STEP   'S'
 
 /*----------------------- MISC --------------------------------*/
 #define K_ISFILE(filename)  (filename != 0 && filename[0] != '-' && filename[0] != 0)

@@ -70,20 +70,20 @@ void init_ws(nb::module_ &m)
 
     m.def("ws_htol", nb::overload_cast<const std::string&, const std::string&, const int>(&ws_htol), 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("series_type"));
-    m.def("ws_htol_last", [](const std::string& filename, const std::string& varlist) { ws_htol(filename, varlist, (int) EnumIodeHtoL::HTOL_LAST); }, 
+    m.def("ws_htol_last", [](const std::string& filename, const std::string& varlist) { ws_htol(filename, varlist, (int) IodeHighToLow::HTOL_LAST); }, 
         nb::arg("filename"), nb::arg("varlist"));
-    m.def("ws_htol_mean", [](const std::string& filename, const std::string& varlist) { ws_htol(filename, varlist, (int) EnumIodeHtoL::HTOL_MEAN); }, 
+    m.def("ws_htol_mean", [](const std::string& filename, const std::string& varlist) { ws_htol(filename, varlist, (int) IodeHighToLow::HTOL_MEAN); }, 
         nb::arg("filename"), nb::arg("varlist"));
-    m.def("ws_htol_sum",  [](const std::string& filename, const std::string& varlist) { ws_htol(filename, varlist, (int) EnumIodeHtoL::HTOL_SUM); }, 
+    m.def("ws_htol_sum",  [](const std::string& filename, const std::string& varlist) { ws_htol(filename, varlist, (int) IodeHighToLow::HTOL_SUM); }, 
         nb::arg("filename"), nb::arg("varlist"));
 
     m.def("ws_htol", nb::overload_cast<const std::string&, const std::vector<std::string>&, const int>(&ws_htol), 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("series_type"));
-    m.def("ws_htol_last", [](const std::string& filename, const std::vector<std::string>& varlist) { ws_htol(filename, varlist, (int) EnumIodeHtoL::HTOL_LAST); }, 
+    m.def("ws_htol_last", [](const std::string& filename, const std::vector<std::string>& varlist) { ws_htol(filename, varlist, (int) IodeHighToLow::HTOL_LAST); }, 
         nb::arg("filename"), nb::arg("varlist"));
-    m.def("ws_htol_mean", [](const std::string& filename, const std::vector<std::string>& varlist) { ws_htol(filename, varlist, (int) EnumIodeHtoL::HTOL_MEAN); }, 
+    m.def("ws_htol_mean", [](const std::string& filename, const std::vector<std::string>& varlist) { ws_htol(filename, varlist, (int) IodeHighToLow::HTOL_MEAN); }, 
         nb::arg("filename"), nb::arg("varlist"));
-    m.def("ws_htol_sum",  [](const std::string& filename, const std::vector<std::string>& varlist) { ws_htol(filename, varlist, (int) EnumIodeHtoL::HTOL_SUM); }, 
+    m.def("ws_htol_sum",  [](const std::string& filename, const std::vector<std::string>& varlist) { ws_htol(filename, varlist, (int) IodeHighToLow::HTOL_SUM); }, 
         nb::arg("filename"), nb::arg("varlist"));
 
     // Low To High functions
@@ -91,19 +91,19 @@ void init_ws(nb::module_ &m)
     m.def("ws_ltoh", nb::overload_cast<const std::string&, const std::string&, const int, const char>(&ws_ltoh), 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("series_type"), nb::arg("method"));
     m.def("ws_ltoh_flow",  [](const std::string& filename, const std::string& varlist, const char method = 'C') 
-        { ws_ltoh(filename, varlist, EnumIodeLtoH::LTOH_FLOW, method); }, 
+        { ws_ltoh(filename, varlist, IodeLowToHigh::LTOH_FLOW, method); }, 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("method") = 'C');
     m.def("ws_ltoh_stock", [](const std::string& filename, const std::string& varlist, const char method = 'C') 
-        { ws_ltoh(filename, varlist, EnumIodeLtoH::LTOH_STOCK, method); }, 
+        { ws_ltoh(filename, varlist, IodeLowToHigh::LTOH_STOCK, method); }, 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("method") = 'C');
 
     m.def("ws_ltoh", nb::overload_cast<const std::string&, const std::vector<std::string>&, const int, const char>(&ws_ltoh), 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("series_type"), nb::arg("method"));
     m.def("ws_ltoh_flow",  [](const std::string& filename, const std::vector<std::string>& varlist, const char method = 'C') 
-        { ws_ltoh(filename, varlist, EnumIodeLtoH::LTOH_FLOW, method); }, 
+        { ws_ltoh(filename, varlist, IodeLowToHigh::LTOH_FLOW, method); }, 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("method") = 'C');
     m.def("ws_ltoh_stock", [](const std::string& filename, const std::vector<std::string>& varlist, const char method = 'C') 
-        { ws_ltoh(filename, varlist, EnumIodeLtoH::LTOH_STOCK, method); }, 
+        { ws_ltoh(filename, varlist, IodeLowToHigh::LTOH_STOCK, method); }, 
         nb::arg("filename"), nb::arg("varlist"), nb::arg("method") = 'C');
 }
 
@@ -266,11 +266,11 @@ void ws_save(const std::string& filename, const int iode_type)
 
 void ws_htol(const std::string& filename, const std::string& varlist, const int series_type)
 {
-    if(series_type < 0 || series_type > EnumIodeHtoL::HTOL_SUM)
+    if(series_type < 0 || series_type > IodeHighToLow::HTOL_SUM)
         throw std::invalid_argument("The value " + std::to_string(series_type) + " is invalid.\n" + 
-                                    "The value must be in range [0, " + std::to_string(EnumIodeHtoL::HTOL_SUM) + "]");
+                                    "The value must be in range [0, " + std::to_string(IodeHighToLow::HTOL_SUM) + "]");
 
-    high_to_low((EnumIodeHtoL) series_type, filename, varlist);
+    high_to_low((IodeHighToLow) series_type, filename, varlist);
 }
 
 void ws_htol(const std::string& filename, const std::vector<std::string>& varlist, const int series_type)
@@ -284,11 +284,11 @@ void ws_htol(const std::string& filename, const std::vector<std::string>& varlis
 
 void ws_ltoh(const std::string& filename, const std::string& varlist, const int series_type, const char method)
 {
-    if(series_type < 0 || series_type > EnumIodeLtoH::LTOH_FLOW)
+    if(series_type < 0 || series_type > IodeLowToHigh::LTOH_FLOW)
     throw std::invalid_argument("The value " + std::to_string(series_type) + " is invalid.\n" + 
-                                "The value must be in range [0, " + std::to_string(EnumIodeLtoH::LTOH_FLOW) + "]");
+                                "The value must be in range [0, " + std::to_string(IodeLowToHigh::LTOH_FLOW) + "]");
 
-    low_to_high((EnumIodeLtoH) series_type, method, filename, varlist);
+    low_to_high((IodeLowToHigh) series_type, method, filename, varlist);
 }
 
 void ws_ltoh(const std::string& filename, const std::vector<std::string>& varlist, const int series_type, const char method)

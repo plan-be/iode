@@ -217,7 +217,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         throw std::runtime_error(get_last_error());
 }
 
-void low_to_high(const EnumIodeLtoH type, const char method, const std::string& filepath, const std::string& var_list)
+void low_to_high(const IodeLowToHigh type, const char method, const std::string& filepath, const std::string& var_list)
 {
     int res;
 
@@ -241,7 +241,7 @@ void low_to_high(const EnumIodeLtoH type, const char method, const std::string& 
     }
 }
 
-void high_to_low(const EnumIodeHtoL type, const std::string& filepath, const std::string& var_list)
+void high_to_low(const IodeHighToLow type, const std::string& filepath, const std::string& var_list)
 {
     int res;
     std::string type_name; 

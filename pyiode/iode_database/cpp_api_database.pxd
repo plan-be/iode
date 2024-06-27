@@ -5,7 +5,7 @@ from libcpp.vector cimport vector
 from libcpp cimport bool
 
 from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
-                            EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
+                            EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             EnumIodeVarMode, VariablesInitialization)
@@ -34,8 +34,8 @@ cdef extern from "api/iode.h":
 #            https://stackoverflow.com/a/23455514
 
 cdef extern from "cpp_api/KDB/kdb_global.h":
-    void low_to_high(EnumIodeLtoH type_, char method, string& filepath, string& var_list) except +
-    void high_to_low(EnumIodeHtoL type_, string& filepath, string& var_list) except +
+    void low_to_high(IodeLowToHigh type_, char method, string& filepath, string& var_list) except +
+    void high_to_low(IodeHighToLow type_, string& filepath, string& var_list) except +
 
 cdef extern from "cpp_api/KDB/kdb_reference.h":
     void load_reference_kdb(int index, EnumIodeFile iode_file, string& filepath) except +

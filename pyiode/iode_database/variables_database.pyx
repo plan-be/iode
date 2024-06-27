@@ -13,7 +13,7 @@ cimport cython
 cimport numpy as np
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from pyiode.common cimport IODE_NAN, EnumIodeVarMode, EnumIodeLtoH, EnumIodeHtoL, VariablesInitialization
+from pyiode.common cimport IODE_NAN, EnumIodeVarMode, IodeLowToHigh, IodeHighToLow, VariablesInitialization
 from pyiode.iode_database.cpp_api_database cimport IodeGetVector, IodeSetVector, IodeCalcSamplePosition
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CKDBVariables
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -1227,7 +1227,7 @@ cdef class Variables(_AbstractDatabase):
             all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
 
-        cpp_low_to_high(<EnumIodeLtoH>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
+        cpp_low_to_high(<IodeLowToHigh>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())
 
     def high_to_low(self, type_of_series: Union[HighToLowType, str], filepath: Union[str, Path], var_list: Union[str, List[str]]):
         """
@@ -1320,7 +1320,7 @@ cdef class Variables(_AbstractDatabase):
             all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
 
-        cpp_high_to_low(<EnumIodeHtoL>type_of_series, filepath.encode(), var_list.encode())
+        cpp_high_to_low(<IodeHighToLow>type_of_series, filepath.encode(), var_list.encode())
 
     def extrapolate(self, method: Union[SimulationInitialization, str], from_period: Union[str, Period] = None, 
                     to_period: Union[str, Period] = None, variables_list: Union[str, List[str]] = None):

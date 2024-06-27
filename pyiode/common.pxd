@@ -136,11 +136,11 @@ cdef extern from "cpp_api/objects/table.h":
         IG_PERCENT
 
 cdef extern from "cpp_api/KDB/kdb_global.h":
-    cdef enum EnumIodeLtoH:
+    cdef enum IodeLowToHigh:
         LTOH_STOCK,
         LTOH_FLOW
 
-    cdef enum EnumIodeHtoL:
+    cdef enum IodeHighToLow:
         HTOL_LAST,
         HTOL_MEAN,
         HTOL_SUM 

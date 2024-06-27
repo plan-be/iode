@@ -112,7 +112,7 @@ void init_constants(nb::module_ &m)
       // LTOH defines 
       m.attr("LTOH_STOCK")  = (int) LTOH_STOCK;
       m.attr("LTOH_FLOW")   = (int) LTOH_FLOW;
-      m.attr("LTOH_LIN")    = WS_LTOH_LIN; 
-      m.attr("LTOH_CS")     = WS_LTOH_CS;
-      m.attr("LTOH_STEP")   = WS_LTOH_STEP;
+      m.attr("LTOH_LIN")    = LTOH_LIN; 
+      m.attr("LTOH_CS")     = LTOH_CS;
+      m.attr("LTOH_STEP")   = LTOH_STEP;
 }
