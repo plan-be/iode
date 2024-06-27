@@ -150,7 +150,7 @@ static int E_c_rhs()
     for(i = 0 ; i < E_NEQ ; i++) {
         for(t = 0 ; t < E_T ; t++) {
             x = E_rhs_ij(i, t);
-            if(L_ISAN(x)) MATE(E_RHS, i, t) = x;
+            if(IODE_IS_A_NUMBER(x)) MATE(E_RHS, i, t) = x;
             else  {
                 E_errno = E_NAN_ERR;
                 return(-1);
@@ -222,7 +222,7 @@ static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
             for(j = 0 ; j < E_T ; j++) {
                 x = E_rhs_ij(i, j);
                 if(x >= MAXFLOAT) x = IODE_NAN;
-                if(L_ISAN(x))
+                if(IODE_IS_A_NUMBER(x))
                     MATE(E_G, est_coef_nb, i * E_T + j) =
                         (x - MATE(E_RHS, i, j)) / h;
                 else  {

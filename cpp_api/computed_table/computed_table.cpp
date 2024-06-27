@@ -278,7 +278,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
 
     SW_nfree(clec);
 
-    if(!L_ISAN(res))
+    if(!IODE_IS_A_NUMBER(res))
         return false;
 
     // update the variable var_name in the database
@@ -294,7 +294,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
 void ComputedTable::set_value(const int line, const int col, const double value, bool check_if_editable)
 {
     // Reject NaN value
-    if(!L_ISAN(value))
+    if(!IODE_IS_A_NUMBER(value))
         throw IodeException("A NaN value is not accepted to edit a cell of a computed table");
 
     if(check_if_editable)

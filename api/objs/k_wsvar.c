@@ -222,7 +222,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
                 break;
             }
             vt = KVVAL(kdb, pos, 0);
-            if(L_ISAN(vt[t]) && L_ISAN(vt[t - pernb]))
+            if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]))
                 var = vt[t] - vt[t - pernb];
             else var = IODE_NAN;
             break;
@@ -236,7 +236,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
                 break;
             }
             vt = KVVAL(kdb, pos, 0);
-            if(L_ISAN(vt[t]) && L_ISAN(vt[t - pernb]) && !L_IS0(vt[t - pernb]))
+            if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]) && !L_IS0(vt[t - pernb]))
                 var = (vt[t]/vt[t - pernb] - 1) * 100.0;
             else var = IODE_NAN;
             break;
@@ -284,7 +284,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
         case K_DIFFY :
             if(t < pernb)  break;
 
-            if(L_ISAN(new) && L_ISAN(var[t - pernb])) var[t] = var[t - pernb] + new;
+            if(IODE_IS_A_NUMBER(new) && IODE_IS_A_NUMBER(var[t - pernb])) var[t] = var[t - pernb] + new;
             else var[t] = IODE_NAN;
             break;
 
@@ -294,7 +294,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, double new)
         case K_GRTY :
             if(t < pernb) break;
 
-            if(L_ISAN(new) && L_ISAN(var[t - pernb]))
+            if(IODE_IS_A_NUMBER(new) && IODE_IS_A_NUMBER(var[t - pernb]))
                 var[t] = (new/100.0 + 1.0) * var[t - pernb];
             else var[t] = IODE_NAN;
             break;
@@ -329,27 +329,27 @@ void KV_init_values_1(double* val, int t, int method)
 
     switch(method) {
         case KV_INIT_TM1 :
-            if(L_ISAN(val[t]) && !L_IS0(val[t])) return;
+            if(IODE_IS_A_NUMBER(val[t]) && !L_IS0(val[t])) return;
             goto calc1;
         case KV_INIT_TM1_NA :
-            if(L_ISAN(val[t])) return;
+            if(IODE_IS_A_NUMBER(val[t])) return;
             goto calc1;
         case KV_INIT_TM1_A :
 calc1:
             val[t] = 1.0;
-            if(t > 0 && L_ISAN(val[t - 1])) val[t] = val[t - 1];
+            if(t > 0 && IODE_IS_A_NUMBER(val[t - 1])) val[t] = val[t - 1];
             return;
         case KV_INIT_EXTRA :
-            if(L_ISAN(val[t]) && !L_IS0(val[t])) return;
+            if(IODE_IS_A_NUMBER(val[t]) && !L_IS0(val[t])) return;
             goto calc2;
         case KV_INIT_EXTRA_NA :
-            if(L_ISAN(val[t])) return;
+            if(IODE_IS_A_NUMBER(val[t])) return;
             goto calc2;
         case KV_INIT_EXTRA_A :
 calc2:
             val[t] = 1.0;
-            if(t > 0 && L_ISAN(val[t - 1])) {
-                if(t > 1 && L_ISAN(val[t - 2]))
+            if(t > 0 && IODE_IS_A_NUMBER(val[t - 1])) {
+                if(t > 1 && IODE_IS_A_NUMBER(val[t - 2]))
                     val[t] = 2 * val[t - 1] - val[t - 2];
                 else val[t] = val[t - 1];
             }
@@ -465,11 +465,11 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
             if(added) nval[t] = eval[t];
             else {
                 if(method == 1) { /* m = 1 PROD */
-                    if(L_ISAN(eval[t])) nval[t] *= eval[t];
+                    if(IODE_IS_A_NUMBER(eval[t])) nval[t] *= eval[t];
                     else nval[t] = IODE_NAN;
                 }
                 else { /* m != 1 SUM or MEAN */
-                    if(L_ISAN(eval[t])) nval[t] += eval[t];
+                    if(IODE_IS_A_NUMBER(eval[t])) nval[t] += eval[t];
                     else nval[t] = IODE_NAN;
                 }
             }
@@ -481,7 +481,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         for(npos = 0; npos < KNB(ndbv); npos++) {
             nval = KVVAL(ndbv, npos, 0);
             for(t = 0; t < smpl->s_nb; t++)
-                if(L_ISAN(nval[t])) nval[t] /= times[npos];
+                if(IODE_IS_A_NUMBER(nval[t])) nval[t] /= times[npos];
         }
     }
 

@@ -23,7 +23,7 @@ UnitRootDialog::~UnitRootDialog()
 
 QString UnitRootDialog::get_tstat(Scalar& scalar)
 {
-    if (L_ISAN(scalar.val) && L_ISAN(scalar.std) && !L_IS0(scalar.std))
+    if (IODE_IS_A_NUMBER(scalar.val) && IODE_IS_A_NUMBER(scalar.std) && !L_IS0(scalar.std))
         return QString::number(scalar.val / scalar.std, 'g', precision);
     else
         return NAN_REP;

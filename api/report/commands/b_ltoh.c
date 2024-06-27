@@ -37,7 +37,7 @@ static double LTOH_ylin(double* y, double x)
     a = hi - x;
     b = x - lo;
     
-    if(L_ISAN(y[lo]) && L_ISAN(y[hi]))
+    if(IODE_IS_A_NUMBER(y[lo]) && IODE_IS_A_NUMBER(y[hi]))
         res = a*y[lo] + b*y[hi];
     else res = IODE_NAN;
     return(res);
@@ -66,9 +66,9 @@ static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, 
     for(t = 0; t < t_nb; t++) t_vec[t] = IODE_NAN;
     beg = 0;
     while(1) {
-        while(beg < f_nb && !L_ISAN(f_vec[beg])) beg++;
+        while(beg < f_nb && !IODE_IS_A_NUMBER(f_vec[beg])) beg++;
         if(beg >= f_nb) break;
-        for(dim = beg; dim < f_nb && L_ISAN(f_vec[dim]); dim++);
+        for(dim = beg; dim < f_nb && IODE_IS_A_NUMBER(f_vec[dim]); dim++);
         dim -= 1;
         if(dim > beg) {
 
@@ -117,9 +117,9 @@ static int LTOH_step(int type, double* f_vec, int f_nb, double* t_vec, int t_nb,
     for(t = 0; t < t_nb; t++) t_vec[t] = IODE_NAN;
     beg = 0;
     while(1) {
-        while(beg < f_nb && !L_ISAN(f_vec[beg])) beg++;
+        while(beg < f_nb && !IODE_IS_A_NUMBER(f_vec[beg])) beg++;
         if(beg >= f_nb) break;
-        for(dim = beg; dim < f_nb && L_ISAN(f_vec[dim]); dim++);
+        for(dim = beg; dim < f_nb && IODE_IS_A_NUMBER(f_vec[dim]); dim++);
 
         if(dim > beg) {
 
@@ -155,7 +155,7 @@ static int LTOH_y2cs(double* y, int n, double* y2)
     u = (double *) SW_nalloc(n * sizeof(double));
     y2[0] = u[0] = 0.0;
 
-    for(i = 1; i < n - 1 && L_ISAN(y[i]); i++) {
+    for(i = 1; i < n - 1 && IODE_IS_A_NUMBER(y[i]); i++) {
         s = 0.5; /* (x[i] - x[i-1])/(x[i+1] - x[i-1]) */
         p = s * y2[i-1] + 2.0;
         y2[i] = (s - 1)/p;
@@ -188,7 +188,7 @@ static double LTOH_ycs(double* y, double* y2, double x)
     a = hi - x;
     b = x - lo;
 
-    if(L_ISAN(y[lo]) && L_ISAN(y[hi]))
+    if(IODE_IS_A_NUMBER(y[lo]) && IODE_IS_A_NUMBER(y[hi]))
         res = a*y[lo] + b*y[hi] +
               ((a*a*a - a)*y2[lo] + (b*b*b - b)*y2[hi])/6.0;
     else res = IODE_NAN;
@@ -205,11 +205,11 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
     for(t = 0; t < t_nb; t++) t_vec[t] = IODE_NAN;
     beg = f = 0;
     while(1) {
-        while(beg < f_nb && !L_ISAN(f_vec[beg])) beg++;
+        while(beg < f_nb && !IODE_IS_A_NUMBER(f_vec[beg])) beg++;
         if(beg >= f_nb) break;
 
         if(type == WS_LTOH_FLOW) {
-            for(f = beg; f < f_nb && L_ISAN(f_vec[f]); f++) f_vec[f] = f_vec[f]/shift;
+            for(f = beg; f < f_nb && IODE_IS_A_NUMBER(f_vec[f]); f++) f_vec[f] = f_vec[f]/shift;
             dim = LTOH_y2cs(f_vec + beg, f_nb - beg, y2);
 
             for(f = beg, t = beg*shift; f < dim + beg; f++, t+= shift) {
@@ -218,11 +218,11 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
                     x = (double)(j - 1) / (double) shift;
                     x += f;
                     t_vec[t + j] = LTOH_ycs(f_vec, y2, x);
-                    if(L_ISAN(t_vec[t + j]) && L_ISAN(sum)) sum += t_vec[t + j];
+                    if(IODE_IS_A_NUMBER(t_vec[t + j]) && IODE_IS_A_NUMBER(sum)) sum += t_vec[t + j];
                     else sum = IODE_NAN;
                 }
 
-                if(L_ISAN(sum)) {
+                if(IODE_IS_A_NUMBER(sum)) {
                     d = (f_vec[f] * shift - sum)/shift;
                     for(j = 0; j < shift; j++) t_vec[t + j] += d;
                 }

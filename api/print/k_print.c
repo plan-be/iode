@@ -74,7 +74,7 @@ int T_prep_cls(TBL* tbl, char* smpl, COLS** cls)
  
 void T_fmt_val(char* buf, double val, int lg, int nd) 
 {
-    if(L_ISAN(val)) SCR_fmt_dbl(val, buf, lg, nd);
+    if(IODE_IS_A_NUMBER(val)) SCR_fmt_dbl(val, buf, lg, nd);
     else strcpy(buf, "-.-");
     SCR_sqz(buf);
 }

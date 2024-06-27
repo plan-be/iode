@@ -90,7 +90,7 @@ int L_stackna(L_REAL** p_stack, int nargs)
     L_REAL  *stack = *p_stack;
 
     for(i = 0 ; i < nargs ; i++)
-        if(!L_ISAN(*(stack - i))) {
+        if(!IODE_IS_A_NUMBER(*(stack - i))) {
             (*p_stack) -= nargs - 1;
             **p_stack = IODE_NAN;
             return(1);

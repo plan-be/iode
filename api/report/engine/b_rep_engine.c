@@ -841,7 +841,7 @@ int RP_eval(char** res, char* farg)
 
     x = RP_evallec(lec);
     // TODO: reset farg[pos] = '@' ?
-    if(!L_ISAN(x)) return(-1);  // Empty string on error
+    if(!IODE_IS_A_NUMBER(x)) return(-1);  // Empty string on error
     
     RP_fmt(*res, fmt, x);       // The formated value is returned
     return(0);

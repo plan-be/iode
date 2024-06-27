@@ -80,16 +80,16 @@ L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short 
     int     from, to, j;
 
     meanx = L_mean(expr1, len1, t, stack, nargs - 1);
-    if(!L_ISAN(meanx)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(meanx)) return(IODE_NAN);
     meany = L_mean(expr2, len2, t, stack, nargs - 1);
-    if(!L_ISAN(meany)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(meany)) return(IODE_NAN);
 
     L_tfn_args(t, stack, nargs - 1, &from, &to);
     for(j = from ; j <= to ; j++) {
         vx = L_exec_sub(expr1, len1, j, stack);
-        if(!L_ISAN(vx)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
         vy = L_exec_sub(expr2, len2, j, stack);
-        if(!L_ISAN(vy)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
 
         sxx += (vx - meanx) * (vx - meanx);
         syy += (vy - meany) * (vy - meany);
@@ -174,15 +174,15 @@ L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short
     if(n == 0) return(IODE_NAN);
 
     meanx = L_mean(expr1, len1, t, stack, nargs - 1);
-    if(!L_ISAN(meanx)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(meanx)) return(IODE_NAN);
     meany = L_mean(expr2, len2, t, stack, nargs - 1);
-    if(!L_ISAN(meany)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(meany)) return(IODE_NAN);
 
     for(j = from ; j <= to ; j++) {
         vx = L_exec_sub(expr1, len1, j, stack);
-        if(!L_ISAN(vx)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
         vy = L_exec_sub(expr2, len2, j, stack);
-        if(!L_ISAN(vy)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
 
         if(orig) sxy += vx * vy;
         else     sxy += (vx - meanx) * (vy - meany);
@@ -278,7 +278,7 @@ L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nar
     L_REAL  v1;
 
     v1 = L_var(expr, nvargs, t, stack, nargs);
-    if(!L_ISAN(v1) || v1 < 0) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(v1) || v1 < 0) return(IODE_NAN);
     else return(sqrt(v1));
 }
 
@@ -328,11 +328,11 @@ L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nar
     if(n == 0) return(IODE_NAN);
 
     vx = L_exec_sub(expr1, len1, t, stack);
-    if(!L_ISAN(vx)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
 
     for(j = from ; j <= to ; j++) {
         vy = L_exec_sub(expr2, len2, j, stack);
-        if(!L_ISAN(vy)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
 
         if(fabs(vx - vy) < 1e-30) return((L_REAL)j);
     }
@@ -372,25 +372,25 @@ L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
     if(n == 0) return(IODE_NAN);
 
     vx = L_exec_sub(expr1, len1, t, stack);
-    if(!L_ISAN(vx)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
     k = (int)vx;
     if(k < 0 || k > n / 4) return(IODE_NAN);
 
     meanx = L_mean(expr2, len2, t, stack, nargs - 1);
-    if(!L_ISAN(meanx)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(meanx)) return(IODE_NAN);
 
     for(j = from ; j <= to - k ; j++) {
         vx = L_exec_sub(expr2, len2, j, stack);
-        if(!L_ISAN(vx)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
         vy = L_exec_sub(expr2, len2, j + k, stack);
-        if(!L_ISAN(vy)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
 
         sxy += (vx - meanx) * (vy - meanx);
     }
 
     for(j = from ; j <= to ; j++) {
         vx = L_exec_sub(expr2, len2, j, stack);
-        if(!L_ISAN(vx)) return(IODE_NAN);
+        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
         sxy0 += (vx - meanx) * (vx - meanx);
     }
 
@@ -423,27 +423,27 @@ int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, 
     nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
     for(vt[1] = t + 1 ; vt[1] < nobs ; vt[1]++) {
         vy[1] = L_exec_sub(expr1, len1, vt[1], stack);
-        if(L_ISAN(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) break;
+        if(IODE_IS_A_NUMBER(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) break;
     }
 
     /* 2. Calc val before t */
     for(vt[0] = t - 1 ; vt[0] >= 0 ; vt[0]--) {
         vy[0] = L_exec_sub(expr1, len1, vt[0], stack);
-        if(L_ISAN(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
+        if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
     }
 
     /* if NO value after AND before t, return IODE_NAN */
-    if(!L_ISAN(vy[0]) && !L_ISAN(vy[1])) return(-1);
-    if(L_ISAN(vy[0]) && L_ISAN(vy[1])) return(0);
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(-1);
+    if(IODE_IS_A_NUMBER(vy[0]) && IODE_IS_A_NUMBER(vy[1])) return(0);
 
     /* if no value after, calc before t0 */
-    if(!L_ISAN(vy[1])) {
+    if(!IODE_IS_A_NUMBER(vy[1])) {
         vy[1] = vy[0];
         vt[1] = vt[0];
         vy[0] = IODE_NAN;
         for(vt[0] = vt[1] - 1 ; vt[0] >= 0 ; vt[0]--) {
             vy[0] = L_exec_sub(expr1, len1, vt[0], stack);
-            if(L_ISAN(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
+            if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
         }
     }
 
@@ -454,7 +454,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, 
         vy[1] = IODE_NAN;
         for(vt[1] = vt[0] + 1 ; vt[1] < nobs ; vt[1]++) {
             vy[1] = L_exec_sub(expr1, len1, vt[1], stack);
-            if(L_ISAN(vy[1])) break;
+            if(IODE_IS_A_NUMBER(vy[1])) break;
         }
     }
 
@@ -482,14 +482,14 @@ L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int n
 
     /* 1. Calc val in t */
     vx = L_exec_sub(expr1, len1, t, stack);
-    if(L_ISAN(vx)) return(vx);
+    if(IODE_IS_A_NUMBER(vx)) return(vx);
 
     /* 2. Calc values around t */
     L_calcvals(expr1, len1, t, stack, vt, vy, 0);
     nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
 
     /* 3. Calc result */
-    if(!L_ISAN(vy[0]) && !L_ISAN(vy[1])) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
     if(vt[0] < 0) return(vy[1]);
     if(vt[1] >= nobs) return(vy[0]);
     itc = (vy[0] * vt[1] - vy[1] * vt[0]) / (vt[1] - vt[0]);
@@ -510,25 +510,25 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
 
     /* 1. Calc val in t */
     vx = L_exec_sub(expr1, len1, t, stack);
-    if(L_ISAN(vx)) return(vx);
+    if(IODE_IS_A_NUMBER(vx)) return(vx);
 
     /* 2. Calc values around t */
     L_calcvals(expr1, len1, t, stack, vt, vy, 1);
     nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
 
     /* if NO value after AND before t, return IODE_NAN */
-    if(!L_ISAN(vy[0]) && !L_ISAN(vy[1])) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
 
     /* Valeurs apparent‚es */
     ayt = L_exec_sub(expr2, len2, t, stack);
-    if(!L_ISAN(ayt)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(ayt)) return(IODE_NAN);
     ay[0] = ay[1] = IODE_NAN; /* JMP 19-07-07 */
     if(vt[0] >= 0)   ay[0] = L_exec_sub(expr2, len2, vt[0], stack);
     if(vt[1] < nobs) ay[1] = L_exec_sub(expr2, len2, vt[1], stack);
 
     // Deux valeurs trouv‚es dans la s‚rie initiale
     // !! Les deux valeurs doivent exister dans la s‚rie apparent‚e
-    if(L_ISAN(ay[0]) && L_ISAN(ay[1])) {
+    if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) {
         if(vt[0] < t && vt[1] > t) {
             /*            return(ayt * (vy[0] / ay[0] + vy[1] / ay[1]) / 2); */
             // delta = (vy[1]/vy[0])/(ay[1]/ay[0]);
@@ -547,12 +547,12 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
         }
     }
     // Seule la valeur en t0 est d‚finie : res(t) <- APP(t) * (ORIG(t0) / APP(t0))
-    if(L_ISAN(ay[0])) {
+    if(IODE_IS_A_NUMBER(ay[0])) {
         if(fabs(ay[0]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
         return(ayt * (vy[0] / ay[0]));
     }
     // Seule la valeur en t1 est d‚finie : res(t) <- APP(t) * (ORIG(t1) / APP(t1))
-    if(L_ISAN(ay[1])) {
+    if(IODE_IS_A_NUMBER(ay[1])) {
         if(fabs(ay[1]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
         return(ayt * (vy[1] / ay[1]));
     }
@@ -573,22 +573,22 @@ L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs
 
     /* 1. Calc val in t */
     vx = L_exec_sub(expr1, len1, t, stack);
-    if(L_ISAN(vx)) return(vx);
+    if(IODE_IS_A_NUMBER(vx)) return(vx);
 
     /* 2. Calc values around t */
     L_calcvals(expr1, len1, t, stack, vt, vy, 0);
     nobs = (L_getsmpl(L_EXEC_DBV))->s_nb;
 
     /* if NO value after AND before t, return IODE_NAN */
-    if(!L_ISAN(vy[0]) && !L_ISAN(vy[1])) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
 
     /* Valeurs apparent‚es */
     ayt = L_exec_sub(expr2, len2, t, stack);
-    if(!L_ISAN(ayt)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(ayt)) return(IODE_NAN);
     if(vt[0] >= 0)   ay[0] = L_exec_sub(expr2, len2, vt[0], stack);
     if(vt[1] < nobs) ay[1] = L_exec_sub(expr2, len2, vt[1], stack);
 
-    if(L_ISAN(ay[0]) && L_ISAN(ay[1])) {
+    if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) {
         if(vt[0] < t && vt[1] > t) {
             delta = (ay[1] - ay[0] + vy[0] - vy[1]) / (vt[1]-vt[0]);
             return(ayt + vy[0] - ay[0] - (t - vt[0]) * delta);
@@ -599,8 +599,8 @@ L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs
             return(ayt + (vy[j] - ay[j]));
         }
     }
-    if(L_ISAN(ay[0]))                return(ayt + (vy[0] - ay[0]));
-    if(L_ISAN(ay[1]))                return(ayt + (vy[1] - ay[1]));
+    if(IODE_IS_A_NUMBER(ay[0]))                return(ayt + (vy[0] - ay[0]));
+    if(IODE_IS_A_NUMBER(ay[1]))                return(ayt + (vy[1] - ay[1]));
     return(IODE_NAN);
 }
 
@@ -619,7 +619,7 @@ L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, 
     expr2 = expr + len1 + 2 * sizeof(short);
 
     v = L_exec_sub(expr1, len1, t, stack);
-    if(!L_ISAN(v)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(v)) return(IODE_NAN);
     lambda = v;
 
     L_tfn_args(t, stack, nargs - 1, &from, &to);
@@ -632,12 +632,12 @@ L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, 
     if(itmp == NULL || otmp == NULL) goto err;
     for(j = from ; j <= to ; j++) {
         itmp[j - from] = L_exec_sub(expr2, len2, j, stack);
-        // if(!L_ISAN(itmp[j - from])) goto err;            /* JMP 26-07-11 */
+        // if(!IODE_IS_A_NUMBER(itmp[j - from])) goto err;            /* JMP 26-07-11 */
     }
 
     /*
         for(j = from, nbna = 0 ; j <= to ; j++, nbna++) {
-    	if(L_ISAN(itmp[j - from])) break;
+    	if(IODE_IS_A_NUMBER(itmp[j - from])) break;
         }
         if(lg - nbna < 5) goto err;
     */

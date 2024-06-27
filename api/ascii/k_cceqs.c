@@ -321,8 +321,8 @@ err:
 
 static void KE_print_test(FILE* fd, char* txt, double val)
 {
-    if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %.8lg\n", txt, val); /* JMP 05-09-2022 : .15 -> .8 */
-    //if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %lg\n", txt, val); /* JMP 05-09-2022 */
+    if(val != 0 && IODE_IS_A_NUMBER(val)) fprintf(fd, "\t%s %.8lg\n", txt, val); /* JMP 05-09-2022 : .15 -> .8 */
+    //if(val != 0 && IODE_IS_A_NUMBER(val)) fprintf(fd, "\t%s %lg\n", txt, val); /* JMP 05-09-2022 */
 }
 
 

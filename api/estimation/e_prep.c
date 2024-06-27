@@ -194,7 +194,7 @@ static int E_prep_lecs(char** lecs)
         }
         for(t = 0 ; t < E_T ; t++) {
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
-            if(!L_ISAN(x)) {
+            if(!IODE_IS_A_NUMBER(x)) {
                 SW_nfree(clec); // GB 14/11/2012
                 return(E_errno = E_NAN_ERR);
             }
@@ -283,7 +283,7 @@ static int E_prep_instrs(char** instrs)
         }
         for(t = 0 ; t < E_T ; t++) {
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
-            if(!L_ISAN(x)) {
+            if(!IODE_IS_A_NUMBER(x)) {
                 SW_nfree(clec);
                 E_errno = E_NAN_ERR;
                 goto fin;

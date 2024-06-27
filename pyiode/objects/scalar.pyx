@@ -2,7 +2,7 @@
 
 from typing import Union, Tuple, List, Optional
 
-from pyiode.util cimport L_ISAN
+from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.scalar cimport hash_value as hash_value_scl
 

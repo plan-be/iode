@@ -353,7 +353,7 @@ QBarCategoryAxis* PlotDialog::createXBarAxis()
 void PlotDialog::computeMinMaxIntervalYAxis(const QList<double>& values)
 {
     // minimum value on the Y axis
-    if (L_ISAN(fixedMinY))
+    if (IODE_IS_A_NUMBER(fixedMinY))
         minY = fixedMinY; 
     else
     {
@@ -362,15 +362,15 @@ void PlotDialog::computeMinMaxIntervalYAxis(const QList<double>& values)
     }
 
     // maximum value on the Y axis
-    if (L_ISAN(fixedMaxY))
+    if (IODE_IS_A_NUMBER(fixedMaxY))
         maxY = fixedMaxY; 
     else
         maxY = *std::max_element(values.begin(), values.end());
 
     double range = maxY - minY;
     int order = (int) log10(range);
-    if (!L_ISAN(fixedMaxY)) maxY = (((int) (maxY / pow(10, order))) + 1) * pow(10, order);
-    if (!L_ISAN(fixedMinY) && minY < 0.0) minY = (((int) (minY / pow(10, order))) - 1) * pow(10, order);
+    if (!IODE_IS_A_NUMBER(fixedMaxY)) maxY = (((int) (maxY / pow(10, order))) + 1) * pow(10, order);
+    if (!IODE_IS_A_NUMBER(fixedMinY) && minY < 0.0) minY = (((int) (minY / pow(10, order))) - 1) * pow(10, order);
     YTickInterval = pow(10, order);
 }
 
@@ -423,7 +423,7 @@ void PlotDialog::buildSeries()
                 XValue = minX;
                 foreach(const double value, series.y)
                 {
-                    if(L_ISAN(value))
+                    if(IODE_IS_A_NUMBER(value))
                     {
                         line_series->append(XValue, value);
                         values << value;
@@ -447,7 +447,7 @@ void PlotDialog::buildSeries()
                 XValue = minX;
                 foreach(const double value, series.y)
                 {
-                    if(L_ISAN(value))
+                    if(IODE_IS_A_NUMBER(value))
                     {
                         scatter_series->append(XValue, value);
                         values << value;
@@ -468,7 +468,7 @@ void PlotDialog::buildSeries()
                 QBarSet *set = new QBarSet(series.name);
                 foreach(const double value, series.y)
                 { 
-                    if(!L_ISAN(value)) 
+                    if(!IODE_IS_A_NUMBER(value)) 
                         values << 0.0;
                     else
                         values << value;

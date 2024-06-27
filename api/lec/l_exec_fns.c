@@ -75,7 +75,7 @@ L_REAL L_logn(L_REAL v)
 {
     double  x;
 
-    if(!L_ISAN(v) || v <= 0) {
+    if(!IODE_IS_A_NUMBER(v) || v <= 0) {
         return((L_REAL)IODE_NAN);
         /*      L_errno = L_LOG_ERR;
         	longjmp(L_JMP, 1);
@@ -177,7 +177,7 @@ L_REAL L_if(L_REAL* stack, int nargs)
 {
     double  cond = *(stack - 2);
 
-    if(!L_ISAN(cond) || fabs(cond) < 1e-15)  return(*stack); /* JMP 14-06-07 */
+    if(!IODE_IS_A_NUMBER(cond) || fabs(cond) < 1e-15)  return(*stack); /* JMP 14-06-07 */
     else                                     return(*(stack - 1));
 }
 
@@ -198,7 +198,7 @@ L_REAL L_lmean(L_REAL* stack, int nargs)
     int     j, no = 0;
 
     for(j = 0 ; j < nargs ; j++) {
-        if(L_ISAN(*(stack - j))) {             /* JMP 03-03-99 */
+        if(IODE_IS_A_NUMBER(*(stack - j))) {             /* JMP 03-03-99 */
             m += *(stack - j);
             no++;
         }
@@ -207,7 +207,7 @@ L_REAL L_lmean(L_REAL* stack, int nargs)
     else return(IODE_NAN);
 }
 
-L_REAL L_fnisan(L_REAL* stack, int nargs) {return((L_REAL)L_ISAN(*stack));}
+L_REAL L_fnisan(L_REAL* stack, int nargs) {return((L_REAL)IODE_IS_A_NUMBER(*stack));}
 L_REAL L_lcount(L_REAL* stack, int nargs) {return((L_REAL)nargs);}
 
 L_REAL L_lprod(L_REAL* stack, int nargs)
@@ -234,7 +234,7 @@ L_REAL L_lstderr(L_REAL* stack, int nargs)
 
     mean = L_lmean(stack, nargs);
     for(j = 0 ; j < nargs ; j++) {
-        if(L_ISAN(*(stack - j))) {             /* JMP 03-03-99 */
+        if(IODE_IS_A_NUMBER(*(stack - j))) {             /* JMP 03-03-99 */
             x = *(stack - j) - mean;
             m += x * x;
             no++;
@@ -373,7 +373,7 @@ L_REAL L_div0(L_REAL *stack, int nargs)
     double a = *(stack - 1);
     double b = *stack;
 
-    if(!L_ISAN(b) || !L_ISAN(a)) return((L_REAL)IODE_NAN);
+    if(!IODE_IS_A_NUMBER(b) || !IODE_IS_A_NUMBER(a)) return((L_REAL)IODE_NAN);
     else if(b == 0) return(0);
     return(a / b);
 }

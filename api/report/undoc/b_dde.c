@@ -172,7 +172,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
     strcat(res, "\t");
     for(t = bt ; t < KSMPL(kdb)->s_nb ; t++) {
         x = *(KVVAL(kdb, objnb, t));
-        if(!L_ISAN(x)) strcpy(buf, "#N/A");
+        if(!IODE_IS_A_NUMBER(x)) strcpy(buf, "#N/A");
         // else           SCR_fmt_dbl(x, buf, 16, -1); /* JMP 01-02-99 */
         else           IodeFmtVal(buf, x);             /* JMP 01-02-99 */
         strcat(res, buf);
@@ -262,7 +262,7 @@ char    *IodeTblCell(TCELL *cell, COL *cl, int nbdec)
             SW_nfree(ptr);
         }
         else {
-            if(!L_ISAN(cl->cl_res)) strcpy(buf, "#N/A");
+            if(!IODE_IS_A_NUMBER(cl->cl_res)) strcpy(buf, "#N/A");
             else {
                 sprintf(buf, "%80.20lf", cl->cl_res); /* JMP 18-10-07 */
                 SCR_sqz(buf);                         /* JMP 18-10-07 */
@@ -573,7 +573,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             res = SCR_malloc(40 * (1 + KSMPL(kdb)->s_nb)); /* JMP 29-06-00 */
             for(t = 0 ; t < KSMPL(kdb)->s_nb ; t++) {
                 x = *(KVVAL(kdb, objnb, t));
-                if(!L_ISAN(x)) strcpy(buf, "0");
+                if(!IODE_IS_A_NUMBER(x)) strcpy(buf, "0");
                 //else           SCR_fmt_dbl(x, buf, 16, -1);  /* JMP 01-02-99 */
                 else           IodeFmtVal(buf, x);             /* JMP 01-02-99 */
                 strcat(res, buf);
@@ -584,7 +584,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
         case SCALARS :
             res = SCR_malloc(40);
             scl = KSVAL(kdb, objnb);
-            if(!L_ISAN(scl->val)) strcpy(res, "0");
+            if(!IODE_IS_A_NUMBER(scl->val)) strcpy(res, "0");
             //else                  SCR_fmt_dbl(scl->val, res, 16, -1); /* JMP 01-02-99 */
             else                  IodeFmtVal(res, scl->val);    /* JMP 01-02-99 */
             return(res);
@@ -1187,7 +1187,7 @@ int B_ExcelSendKeys(char *arg)
 
 int IodeFmtVal(char *buf, double val)
 {
-    if(L_ISAN(val)) {
+    if(IODE_IS_A_NUMBER(val)) {
         if(fabs(val) < 1e-12) val =0.0;
 #ifdef REALD
         sprintf(buf, "%.15lg ", (double)(val));

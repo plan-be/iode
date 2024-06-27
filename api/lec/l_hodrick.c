@@ -124,9 +124,9 @@ void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)
 {
     int     i;
 
-    for(*beg = 0; *beg < nb && !L_ISAN(f_vec[*beg]); (*beg)++)
+    for(*beg = 0; *beg < nb && !IODE_IS_A_NUMBER(f_vec[*beg]); (*beg)++)
         t_vec[*beg] = IODE_NAN;
-    for(*dim = *beg; *dim < nb && L_ISAN(f_vec[*dim]); (*dim)++);
+    for(*dim = *beg; *dim < nb && IODE_IS_A_NUMBER(f_vec[*dim]); (*dim)++);
 
     for(i = *dim; i < nb; i++) t_vec[i] = IODE_NAN;
     *dim -= *beg; /* JMP 26-07-11 */

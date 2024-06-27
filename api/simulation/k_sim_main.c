@@ -194,7 +194,7 @@ static int K_prolog(int t)
     for(i = 0; i < KSIM_PRE; i++)  {
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
         KSIM_VAL(KSIM_ORDER[i], t) = x;
-        // if(!L_ISAN(x)) return(-1); /* JMP 13-04-00 */
+        // if(!IODE_IS_A_NUMBER(x)) return(-1); /* JMP 13-04-00 */
     }
     return(0);
 }
@@ -231,10 +231,10 @@ static int K_interdep_1(int t)
 
         /* execute lec */
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
-        if(!L_ISAN(x)) return(-1);
+        if(!IODE_IS_A_NUMBER(x)) return(-1);
 
         /* Check convergence */
-        if(L_ISAN(KSIM_XK[j])) {
+        if(IODE_IS_A_NUMBER(KSIM_XK[j])) {
             d = (KSIM_XK[j] - x);   // d = diff between 2 iterations
             if(!L_IS0(KSIM_XK[j]))  
                 pd = min(fabs(1 - x / KSIM_XK[j]), fabs(d)); // if ||endo|| != 0, norm = relative difference
@@ -285,13 +285,13 @@ static int K_interdep_2(int t)
 
         /* execute lec and save in KSIM_XK1 */
         KSIM_XK1[j] = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
-        if(!L_ISAN(KSIM_XK1[j])) return(-1); // NaN value --> stop simulation
+        if(!IODE_IS_A_NUMBER(KSIM_XK1[j])) return(-1); // NaN value --> stop simulation
     }
 
     // Stage 2
     KSIM_NORM = 0.0;
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
-        if(L_ISAN(KSIM_XK[j])) { // Valeur pr�c�dente d�finie
+        if(IODE_IS_A_NUMBER(KSIM_XK[j])) { // Valeur pr�c�dente d�finie
             d = KSIM_XK[j] - KSIM_XK1[j]; // Diff between iterations
 
             // Calcule la 'norme' = fabs de la diff�rence relative entre 2 it.
@@ -360,7 +360,7 @@ static int K_epilog(int t)
     for(i = KSIM_PRE + KSIM_INTER, j = 0; j < KSIM_POST; i++, j++)  {
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
         KSIM_VAL(KSIM_ORDER[i], t) = x;
-        // if(!L_ISAN(x)) return(-1);  
+        // if(!IODE_IS_A_NUMBER(x)) return(-1);  
     }
     return(0);
 }
@@ -399,10 +399,10 @@ static int K_diverge(int t, char* lst, double eps)
 
         /* execute lec */
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
-        if(!L_ISAN(x)) return(-1); // TODO: Add to _DIVER instead ?
+        if(!IODE_IS_A_NUMBER(x)) return(-1); // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
-        if(L_ISAN(KSIM_XK[j])) {
+        if(IODE_IS_A_NUMBER(KSIM_XK[j])) {
             /* ?????????????
             d = (KSIM_XK[j] - x) * KSIM_RELAX;
             */
@@ -707,7 +707,7 @@ double K_calc_clec(int eqnb, int t, int varnb, int msg)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
     else
         x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
-    if(!L_ISAN(x) && msg)
+    if(!IODE_IS_A_NUMBER(x) && msg)
         kerror(0, "%s : becomes unavailable at %s%s",
                KONAME(KSIM_DBV, varnb), /* JMP 16-06-99 a la place de eqvarnb */
                PER_pertoa(PER_addper(&(KSMPL(KSIM_DBV)->s_p1), t), buf),

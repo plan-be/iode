@@ -142,7 +142,7 @@ double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 
     d_ptr = L_getvar(dbv, varnb);
     x1 = d_ptr[t];
-    if(!L_ISAN(x1)) {
+    if(!IODE_IS_A_NUMBER(x1)) {
         //return((double)IODE_NAN);
         x1 = 0.9;
     }
@@ -155,7 +155,7 @@ double L_secant(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
     }
     else {
         LN_SHIFT = *(L_getvar(dbv, eqvarnb) + t);
-        if(!L_ISAN(LN_SHIFT)) {
+        if(!IODE_IS_A_NUMBER(LN_SHIFT)) {
             return((double)IODE_NAN); /* GB 03-11-2003 */
         }
         x1 = fabs(LN_SHIFT);

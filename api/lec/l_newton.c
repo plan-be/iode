@@ -140,7 +140,7 @@ double L_zero(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
     double  x;
 
     x = L_newton(dbv, dbs, clec, t, varnb, eqvarnb);
-    if(!L_ISAN(x)) x = L_secant(dbv, dbs, clec, t, varnb, eqvarnb);
+    if(!IODE_IS_A_NUMBER(x)) x = L_secant(dbv, dbs, clec, t, varnb, eqvarnb);
 
     return(x);
 }
@@ -174,7 +174,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
 
     d_ptr = L_getvar(dbv, varnb) + t;
     oldx = x = d_ptr[0];
-    if(!L_ISAN(x)) {
+    if(!IODE_IS_A_NUMBER(x)) {
         if(KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb));
         return((double)IODE_NAN);
     }
@@ -188,7 +188,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
     // Case 2: 0 := f(X,Y) 
     else {
         shift = *(L_getvar(dbv, eqvarnb) + t);
-        if(!L_ISAN(shift)) return((double)IODE_NAN); 
+        if(!IODE_IS_A_NUMBER(shift)) return((double)IODE_NAN); 
         ax = fabs(shift);
     }
 
@@ -205,7 +205,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         fx = L_exec(dbv, dbs, clec, t);
         if(KSIM_NEWTON_DEBUG) L_debug("   - f(%lg) = %lg\n", x, fx);
 
-        if(!L_ISAN(fx)) {
+        if(!IODE_IS_A_NUMBER(fx)) {
             if(KSIM_NEWTON_DEBUG) { // Message iniquement en cas de pb
                 L_debug("Eq %s - Endo %s : shift=%lf\n", KONAME(dbv, eqvarnb), KONAME(dbv, varnb), shift);
                 L_debug("   - f(%lg) = %lg\n", x, fx);
@@ -227,7 +227,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         d_ptr = L_getvar(dbv, varnb) + t;
         d_ptr[0] = x + h;
         fxh = L_exec(dbv, dbs, clec, t);
-        if(!L_ISAN(fxh)) {
+        if(!IODE_IS_A_NUMBER(fxh)) {
             if(KSIM_NEWTON_DEBUG) L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
             goto err;
         }
@@ -243,7 +243,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
         x -= dx;
         d_ptr[0] = x;
         fx = L_exec(dbv, dbs, clec, t);
-        if(!L_ISAN(fx)) x = ox - dx / 4;
+        if(!IODE_IS_A_NUMBER(fx)) x = ox - dx / 4;
         it++;
     }
 
@@ -269,7 +269,7 @@ double L_newton(KDB* dbv, KDB* dbs, CLEC* clec, int t, int varnb, int eqvarnb)
     double      x;
 
     x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
-    if(!L_ISAN(x)) x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
+    if(!IODE_IS_A_NUMBER(x)) x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
     return(x);
 }
 
@@ -294,7 +294,7 @@ function value and the first derivative of the function.
 
 SolveIsError(double val)
 {
-    if(L_ISAN(val)) return(0);
+    if(IODE_IS_A_NUMBER(val)) return(0);
     return(1);
 //    if(val < SOLVE_ERROR2 && val > SOLVE_ERROR1) return(1);
 //    return(0);
@@ -527,7 +527,7 @@ int     t, varnb, eqvarnb;
     x1 = d_ptr[t];
     if(varnb == eqvarnb) SOLVE_SHIFT = 0.0;
     else SOLVE_SHIFT = x1;
-    if(!L_ISAN(x1)) x1 = 1.0;
+    if(!IODE_IS_A_NUMBER(x1)) x1 = 1.0;
 
     if(SolveFindBrackets(SolveIodeFn, x1, &xl, &xh)) return(IODE_NAN);
     x = SolveNewtonSecant(SolveIodeFn, xl, xh, 1e-7, 100);
