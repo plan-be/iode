@@ -82,11 +82,9 @@ enum IodeCase
 #ifndef REALD
     #define REALD
 #endif
-// IODE_REAL forced to double (-DREALD not needed anymore) => JMP 19/02/2022
-#define IODE_REAL    double
 
-#define L_NAN       (IODE_REAL)(-2.0e37)
-#define L_ISAN(x)   ((x) >= (IODE_REAL)(-1.0e37))
+#define L_NAN       (double)(-2.0e37)
+#define L_ISAN(x)   ((x) >= (double)(-1.0e37))
 #define L_IS0(x)    (((x) > 0 && (x) < 1.0e-36) || ((x) <= 0 && (-x) < 1.0e-36))
 
 #if defined(DOS) || defined(SCRW32)
@@ -511,7 +509,7 @@ enum IodeCase
 #define L_REAL  double
 #define LECREAL float
 #define s_dbl   sizeof(LECREAL)
-#define s_ptr   sizeof(IODE_REAL *)
+#define s_ptr   sizeof(double *)
 #define s_short sizeof(short)
 #define s_long  sizeof(long)
 
@@ -860,16 +858,16 @@ typedef struct _clec_ {
  *  IODE OBJECTS STRUCT
  */
 
-// VAR = Variable (pointer to a vector of IODE_REAL)
-typedef IODE_REAL     *VAR;
+// VAR = Variable (pointer to a vector of double)
+typedef double     *VAR;
 
 // SCL = Scalar (struct containing a scalar value, and if estimated, its relaxation parameter and its standard error).
 typedef struct _scl_ {
-    IODE_REAL    val;       // Value of the scalar
-    IODE_REAL    relax;     // Relaxation parameter. Used only for estimation.
+    double    val;       // Value of the scalar
+    double    relax;     // Relaxation parameter. Used only for estimation.
 			    // If null, the parameter will not be estimated.
 			    // If 0 < relax < 1, the convergence of the estimation will be slowed down. To use when the estimation process diverges.
-    IODE_REAL    std;       // Standard error. Result of the estimation.
+    double    std;       // Standard error. Result of the estimation.
 } SCL;
 
 // CMT = Comment (string)
@@ -971,7 +969,7 @@ typedef struct _col_ {
     PERIOD  cl_per[2];          // period 1 , period 2
     short   cl_opf;             // operator on files => cl_fnb[0] cl_opf cl_fnb[1]
     short   cl_fnb[2];          // position in K_RWS of file1 and file2 (starts at 1)
-    IODE_REAL    cl_val[2][2];  // computed values of the LEC formulas on periods / files => max 4 values see table below
+    double    cl_val[2][2];  // computed values of the LEC formulas on periods / files => max 4 values see table below
 
     /*   {{v00, v01},{v10,v11}}
 
@@ -985,7 +983,7 @@ typedef struct _col_ {
             | cl_val[1,0] | cl_val[1,1]
             |             |
     */
-    IODE_REAL    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
+    double    cl_res;        // computed value (v00 opp v10) opf (v01 opp v11)
 } COL;
 
 // COLS: group of COL's = result of a GSAMPLE compilation
@@ -1049,7 +1047,7 @@ typedef struct _expdef_ {
 typedef struct _alec {      /* LEC atomic element */
 	int     al_type;        /* type : L_VAR, L_COEF, L_CONST ... */
     union {
-	LECREAL v_real;         /* constant values IODE_REAL */
+	LECREAL v_real;         /* constant values double */
 	long    v_long;         /* constant values long int */
 	int     v_nb_args;      /* nb of args for fn */
 	struct {
@@ -1178,7 +1176,7 @@ extern char     **IMP_rule;
 extern char     **IMP_pat;
 extern int      IMP_trace;
 
-extern IODE_REAL    KSIM_EPS,               // Model simulation convergence threshold
+extern double    KSIM_EPS,               // Model simulation convergence threshold
 		    KSIM_RELAX,             // Model relaxation parameter ("damping")
 		    KSIM_NEWTON_EPS,        // Newton-Raphson convergence threshold
 		    KSIM_NEWTON_STEP;       // Newton-Raphson step to calculate the local derivative (f(x+h) - f(x)) / h
@@ -1284,7 +1282,7 @@ extern int  E_errno, E_IT, E_MAXIT, E_CONV,
 extern KDB  *E_DBV, *E_DBS;
 extern SAMPLE  *E_SMPL;
 extern char E_MET;
-extern IODE_REAL E_CONV_TEST, E_EPS;
+extern double E_CONV_TEST, E_EPS;
 extern CLEC **E_CRHS;
 extern char **E_LECS, **E_INSTRS, **E_ENDOS;
 extern char *E_ERRORS[];
@@ -1331,7 +1329,7 @@ extern MAT  *E_RHS,
 extern int          KSIM_MAXIT;     // Maximum number of iteration to reach a solution
 extern int          *KSIM_NITERS;   // Numbers of iterations needed for each simulation period
 extern long         *KSIM_CPUS;     // Elapsed time for each simulation period
-extern IODE_REAL    *KSIM_NORMS;    // Convergence threshold reached at the end of each simulation period
+extern double    *KSIM_NORMS;    // Convergence threshold reached at the end of each simulation period
 
 extern int          KSIM_CPU_SCC;   // Elapsed time to compute SCC
 extern int          KSIM_CPU_SORT;  // Elapsed time to sort interdep block

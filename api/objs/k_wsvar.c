@@ -8,10 +8,10 @@
  *    void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                    Merges 2 KDB of variables, then deletes the second one.
  *    int KV_add(char* varname)                                               Adds a new variable in KV_WS. Fills it with L_NAN.
  *    double KV_get(KDB *kdb, int pos, int t, int mode)                       Gets VAR[t]  where VAR is the series in position pos in kdb. 
- *    void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
+ *    void KV_set(KDB *kdb, int pos, int t, int mode, double new)          Sets VAR[t], where VAR is the series in position pos in kdb. 
  *    int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)     Extrapolates variables on a selected SAMPLE according to one of the available methods.
  *    KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)  Creates a new KDB with variables created by aggregation based on variable names.
- *    void KV_init_values_1(IODE_REAL* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
+ *    void KV_init_values_1(double* val, int t, int method)                Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
  *    int KV_per_pos(PERIOD* per2)                                            Retrieves the position of a PERIOD in the current KV_WS sample.
  *    int KV_aper_pos(char* aper2)                                            Retrieves the position of a period in text format in the current KV_WS sample.  
@@ -58,9 +58,9 @@ int KV_sample(KDB *kdb, SAMPLE *nsmpl)
         ptr = SW_getptr(new_val);
         if(KSOVAL(kdb, i) != 0) {
             if(smpl.s_nb > 0)
-                memcpy((IODE_REAL *)(P_get_ptr(ptr, 0)) + start2,
+                memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
                        KVVAL(kdb, i, start1),
-                       sizeof(IODE_REAL) * smpl.s_nb);
+                       sizeof(double) * smpl.s_nb);
             SW_free(KSOVAL(kdb, i));
         }
         KSOVAL(kdb, i) = new_val;
@@ -106,9 +106,9 @@ int KV_merge(KDB *kdb1, KDB* kdb2, int replace)
         else if(!replace) continue;
 
         if(pos >= 0 && KSOVAL(kdb2, i) != 0)
-            memcpy((IODE_REAL *) KVVAL(kdb1, pos, start1),
-                   (IODE_REAL *) KVVAL(kdb2, i, start2),
-                   sizeof(IODE_REAL) * smpl.s_nb);
+            memcpy((double *) KVVAL(kdb1, pos, start1),
+                   (double *) KVVAL(kdb2, i, start2),
+                   sizeof(double) * smpl.s_nb);
     }
 
     return(0);
@@ -165,7 +165,7 @@ void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)
 int KV_add(char* varname)
 {
     int         pos, t, nobs;
-    IODE_REAL   *vptr;
+    double   *vptr;
     
     // Create varname with NaN 
     pos = K_find(KV_WS, varname);
@@ -203,7 +203,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
 {
     int     pernb;
     double  var;
-    IODE_REAL    *vt;
+    double    *vt;
     SAMPLE  *smpl;
 
     smpl = (SAMPLE *) KDATA(kdb);
@@ -254,7 +254,7 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  * @param [in]       pos       int         position of the variable in the kdb
  * @param [in]       t         int         index in the variable (0 = first position in the series...)
  * @param [in]       mode      int         transformation of the value, see below. 
- * @param [in]       new       IODE_REAL   new value of VAR[t] before transformation according to mode, see below. 
+ * @param [in]       new       double   new value of VAR[t] before transformation according to mode, see below. 
  *                                              K_LEVEL : no modification    x[t] = new
  *                                              K_DIFF  : diff on one period x[t] = x[t-1] + new
  *                                              K_DIFFY : diff on one year   x[t] = x[t-{nb sub periods}] + new
@@ -263,10 +263,10 @@ double KV_get(KDB *kdb, int pos, int t, int mode)
  *                              
  */
  
-void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
+void KV_set(KDB *kdb, int pos, int t, int mode, double new)
 {
     int     pernb;
-    IODE_REAL    *var;
+    double    *var;
     SAMPLE  *smpl;
 
     smpl = (SAMPLE *) KDATA(kdb);
@@ -306,7 +306,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
 /**
  *  Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *      
- *  @param [in, out]    val     IODE_REAL*  pointer to the VAR data
+ *  @param [in, out]    val     double*  pointer to the VAR data
  *  @param [in]         t       int         position in val to be calculated  
  *  @param [in]         method  int         extrapolation method 
  *  @return                     void
@@ -324,7 +324,7 @@ void KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)
  *      (*) If val[t-1] and / or val[t-2] are NaN, val[t] = 1.0
  *
  */
-void KV_init_values_1(IODE_REAL* val, int t, int method)
+void KV_init_values_1(double* val, int t, int method)
 {
 
     switch(method) {
@@ -377,7 +377,7 @@ calc2:
 int KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)
 {
     int         rc = -1, i, v, bt, t;
-    IODE_REAL   *val;
+    double   *val;
     KDB         *edbv = NULL;
 
     bt = PER_diff_per(&(smpl->s_p1), &(KSMPL(dbv)->s_p1));
@@ -421,7 +421,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
     int     t, nb_per, added, *times, nbtimes = 500,
                                          epos, npos;
     ONAME   ename, nname;
-    IODE_REAL    *eval = NULL, *nval;
+    double    *eval = NULL, *nval;
     KDB     *edbv = NULL, *ndbv = NULL;
     SAMPLE  *smpl;
 
@@ -431,7 +431,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
 
     smpl = KSMPL(edbv);
     nb_per = KSMPL(edbv)->s_nb;
-    eval = (IODE_REAL*) SCR_malloc(nb_per * sizeof(IODE_REAL));
+    eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = K_create(K_VAR, UPPER_CASE);
@@ -459,7 +459,7 @@ KDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)
         }
         if(npos < 0) goto done;
 
-        memcpy(eval, KVVAL(edbv, epos, 0), nb_per * sizeof(IODE_REAL));
+        memcpy(eval, KVVAL(edbv, epos, 0), nb_per * sizeof(double));
         nval = KVVAL(ndbv, npos, 0);
         for(t = 0; t < smpl->s_nb; t++) {
             if(added) nval[t] = eval[t];

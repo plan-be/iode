@@ -37,11 +37,11 @@ YYKEYS KV_TABLE[] = {
 static int KV_read_vec(KDB* kdb, YYFILE* yy, char* name)
 {
     int     i, keyw, pos, nb;
-    IODE_REAL    *vec;
+    double    *vec;
     SAMPLE  *smpl;
 
     smpl = (SAMPLE *) KDATA(kdb);
-    vec = (IODE_REAL *) SW_nalloc(smpl->s_nb * sizeof(IODE_REAL));
+    vec = (double *) SW_nalloc(smpl->s_nb * sizeof(double));
 
     /* READ AT MOST nobs OBSERVATIONS */
     for(i = 0; i < smpl->s_nb; i++)  vec[i] = K_read_real(yy);
@@ -219,11 +219,11 @@ KDB *KV_load_asc(char *filename)
  *  Prints the representation of one value on fd. For NaN value, prints "na". 
  *  
  *  @param [in, out]    fd      FILE *      output stream    
- *  @param [in]         val     IODE_REAL   value to print  
+ *  @param [in]         val     double   value to print  
  *  @return 
  *  
  */
-static void KV_print_val(FILE* fd, IODE_REAL val)
+static void KV_print_val(FILE* fd, double val)
 {
     if(L_ISAN(val))
 #ifdef REALD
@@ -248,7 +248,7 @@ int KV_save_asc(KDB* kdb, char* filename)
 {
     FILE    *fd;
     int     i, j;
-    IODE_REAL    *val;
+    double    *val;
     SAMPLE  *smpl;
 
     if(filename[0] == '-') fd = stdout;
@@ -321,7 +321,7 @@ int KV_save_csv(KDB *kdb, char *filename, SAMPLE *smpl, char **varlist)
     FILE        *fd;
     int         i, j, nb, pos;
     char        fmt[80], buf[256], *sep, *dec, *nan, *axes, **lst;
-    IODE_REAL   *val;
+    double   *val;
     PERIOD      *per;
 
     // Parameters : sep, dec, nbdec, nan,

@@ -101,8 +101,8 @@ Main estimation functions + some utilities.
 | ~cKDB       *E_DBS;           | KDB of scalars used for the estimation
 | ~cSAMPLE    *E_SMPL;          | Current estimation sample
 | ~cchar      E_MET;            | Current estimation method
-| ~cIODE_REAL E_CONV_TEST;      | Sum of the squares of the relative differences between 2 iterations
-| ~cIODE_REAL E_EPS;            | Convergence criterion (threshold) for the estimation
+| ~cdouble E_CONV_TEST;      | Sum of the squares of the relative differences between 2 iterations
+| ~cdouble E_EPS;            | Convergence criterion (threshold) for the estimation
 | ~cCLEC      **E_CRHS;         | List of CLEC corresponding to the right members of the equations
 | ~cchar      **E_LECS;         | List (block) of simultaneous equations of the current estimation
 | ~cchar      **E_INSTRS;       | List of instruments (LEC formulas) of the current estimation    
@@ -187,11 +187,11 @@ Implementation of the Dickey-Fuller test (presence of a unit root in an autoregr
 
 ..tb
 | Syntax                                                                       | Description
-| ~cIODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)      | implementation of the Dickey-Fuller test
-| ~cvoid E_PrintDF(char* lec, IODE_REAL* res, int drift, int trend, int order) | prints the results of the Dickey-Fuller test
+| ~cdouble *E_UnitRoot(char* varname, int drift, int trend, int order)      | implementation of the Dickey-Fuller test
+| ~cvoid E_PrintDF(char* lec, double* res, int drift, int trend, int order) | prints the results of the Dickey-Fuller test
 | ~bUtility functions
 | ~cint E_GetLecName(char* lec, char* name)                                    | retrieves the name of the first variable in a lec expression
-| ~cvoid E_SclToReal(char* name, IODE_REAL* res)                               | stores the content of a scalar in a vector of doubles
+| ~cvoid E_SclToReal(char* name, double* res)                               | stores the content of a scalar in a vector of doubles
 ..te 
 
 &TI e_step.c
@@ -206,8 +206,8 @@ The selection is done by blocking all possible combinaisons of coefficients.
 
 ..tb 
 | Syntax                                                                    | Description
-| ~cIODE_REAL C_evallec(char* lec, int t)                                   | Evaluates a LEC expression at a specific period of time.
-| ~cIODE_REAL E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)| For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)
+| ~cdouble C_evallec(char* lec, int t)                                   | Evaluates a LEC expression at a specific period of time.
+| ~cdouble E_StepWise(SAMPLE* smpl, char* eqname, char* cond, char* test)| For a given equation, tries all combinations of coefficients and saves the coefficient configuration that gives the best statistical result (for a chosen test)
 ..te 
 
 >

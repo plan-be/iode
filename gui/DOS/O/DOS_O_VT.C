@@ -71,7 +71,7 @@ int i;
     COL     *cl = VT_cls->cl_cols;
     TLINE   *line;
     TCELL   *cell;
-    IODE_REAL    *vec = NULL;
+    double    *vec = NULL;
     char    *COL_text(), *str;
 
     line = tbl->t_line + i;
@@ -85,7 +85,7 @@ int i;
 /*  cell += 1;                       /* JMP 28-11-93 */
     cell += 1 + j % (T_NC(tbl) - 1); /* JMP 28-11-93 */
 
-    if(VT_val[i] != 0) vec = (IODE_REAL *) SW_getptr(VT_val[i]);
+    if(VT_val[i] != 0) vec = (double *) SW_getptr(VT_val[i]);
     v = 1 + j;
 
     switch(line->tl_type) {
@@ -286,7 +286,7 @@ int     i, j;
     ONAME   name;
     char    *lec, *dlec;
     COL     *cl = VT_cls->cl_cols;
-    IODE_REAL    *vec = NULL, old;
+    double    *vec = NULL, old;
     int     k, v, varnb = -1, t;
     double  val;
 
@@ -317,7 +317,7 @@ int     i, j;
 	}
     if(varnb < 0) goto rec;
 
-    if(VT_val[i] != 0) vec = (IODE_REAL *) SW_getptr(VT_val[i]);
+    if(VT_val[i] != 0) vec = (double *) SW_getptr(VT_val[i]);
     val =  vec[j + 1];
 
     if(ODE_edit_val(&val, (int)global_VTW)) goto rec;
@@ -344,11 +344,11 @@ YYKEYS VTSCRL_SCMTS[] = {
     "NDec+",      SCR_F4,
     "NDec-",      SCR_S_F4,
     "Files",      SCR_F5,
-    "ÄÄÄÄÄÄÄÄÄÄÄÄÄ",   0,
+    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   0,
     "Maximize",   SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
-    "ÄÄÄÄÄÄÄÄÄÄÄÄÄ",   0,
+    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };
@@ -441,7 +441,7 @@ char    *smpl;
     for(i = 0; i < nl; i++) {
 	line = T_L(tbl) + i;
 	if(line->tl_type == KT_CELL) {
-	    VT_val[i] = SW_alloc(sizeof(IODE_REAL) * tbl_dim);
+	    VT_val[i] = SW_alloc(sizeof(double) * tbl_dim);
 	    if(VT_val[i] < 0) return(-1);
 	    }
 	}
@@ -523,12 +523,12 @@ int     i;
 COLS    *cls;
 int     *vals;
 {
-    IODE_REAL    *vec;
+    double    *vec;
     int     d, v, j, rc, nc;
 
     COL_clear(cls);
     if(COL_exec(tbl, i, cls) < 0) return(-1);
-    vec = (IODE_REAL *)SW_getptr(vals[i]);
+    vec = (double *)SW_getptr(vals[i]);
 
     nc = T_NC(tbl);
     for(j = 0, v = 0; j < cls->cl_nb && v < tbl_dim; j++) {

@@ -46,7 +46,7 @@ void init_iode_objs(nb::module_ &m)
         .def_rw("relax", &Scalar::relax)
         .def_ro("std", &Scalar::std)
         .def(nb::init<const std::string&>())
-        .def(nb::init<const IODE_REAL, const IODE_REAL, const IODE_REAL>())
+        .def(nb::init<const double, const double, const double>())
         .def(nb::self == nb::self)
         .def("__str__", &Scalar::to_string)
         .def("__repr__", &Scalar::to_string);

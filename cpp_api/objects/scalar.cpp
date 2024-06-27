@@ -44,7 +44,7 @@ Scalar::Scalar(const std::string& name, KDB* kdb)
     this->std = c_scalar->std;
 }
 
-Scalar::Scalar(const IODE_REAL value, const IODE_REAL relax, const IODE_REAL std)
+Scalar::Scalar(const double value, const double relax, const double std)
 {
     this->val = value;
     this->relax = relax;

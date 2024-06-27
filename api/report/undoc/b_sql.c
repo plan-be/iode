@@ -304,7 +304,7 @@ U_ch *RPS_Close(U_ch** args)
 /*
 // OLD FUNCTIONS FOR A SPECIFIC PROJECT 
 
-static int Str2Vec(IODE_REAL* vec, char* buf, int nb)
+static int Str2Vec(double* vec, char* buf, int nb)
 {
     int     i, nbtbl;
     char    **tbl;
@@ -312,7 +312,7 @@ static int Str2Vec(IODE_REAL* vec, char* buf, int nb)
     tbl = SCR_vtom(buf, ' ');
 
     nbtbl = SCR_tbl_size(tbl);
-    for(i = 0; i < nb && i < nbtbl; i++) vec[i] = (IODE_REAL) atof(tbl[i]);
+    for(i = 0; i < nb && i < nbtbl; i++) vec[i] = (double) atof(tbl[i]);
     for(; i < nb; i++) vec[i] = L_NAN;
     SCR_free_tbl(tbl);
 }
@@ -326,7 +326,7 @@ KDB  *K_load_odbc(int ftype, char *odbc, int no, char **objs)
               *name, *values;
     KDB     *kdb = NULL, *tkdb = NULL;
     SAMPLE  *smpl = NULL;
-    IODE_REAL    *vec = NULL;
+    double    *vec = NULL;
     ODSN    *odsn = NULL;
     OCSR    *ocsr = NULL;
     extern  int ODebugDetail;
@@ -352,7 +352,7 @@ KDB  *K_load_odbc(int ftype, char *odbc, int no, char **objs)
     if(KV_sample(kdb, smpl) < 0) goto err;
     memcpy((SAMPLE *) KDATA(kdb), smpl, sizeof(SAMPLE));
     nb = smpl->s_nb;
-    vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
+    vec = (double *) SW_nalloc(nb * sizeof(double));
 
     if(no == 0) {
         sprintf(buf, "SELECT Name, Values FROM %s WHERE Project='RSZ' AND Name Like '%%'", tbl[1]);

@@ -363,9 +363,9 @@ static int B_CreateEmptyVar(char *name)
  *  Retrieves the pointer to the first value of a variable data.
  *  
  *  @param [in] char*       name    variable name
- *  @return     IODE_REAL*          pointer to the var "name"
+ *  @return     double*          pointer to the var "name"
  */
-static IODE_REAL *B_GetVarPtr(char *name)
+static double *B_GetVarPtr(char *name)
 {
     int     pos;
     KDB     *dbv = K_WS[K_VAR];
@@ -387,12 +387,12 @@ static IODE_REAL *B_GetVarPtr(char *name)
  *  Creates name if it does not exist.
  *  
  *  @param [in, out] char*       name   variable name
- *  @param [in]      IODE_REAL*  vec    pointer to the values to copy in name
+ *  @param [in]      double*  vec    pointer to the values to copy in name
  */
-static int B_CreateVarFromVecOfDoubles(char *name, IODE_REAL *vec)
+static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
     KDB         *dbv = K_WS[K_VAR];
-    IODE_REAL   *x;
+    double   *x;
     int         t;
 
     // Create var and get Ptr
@@ -418,7 +418,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, IODE_REAL *vec)
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
     KDB         *dbv = K_WS[K_VAR];
-    IODE_REAL   *x;
+    double   *x;
     int         t;
 
     // Create var and get Ptr
@@ -462,7 +462,7 @@ int B_ModelSimulateSaveNIters(char *arg)
  */
 int B_ModelSimulateSaveNorms(char *arg)
 {
-    extern IODE_REAL   *KSIM_NORMS;	// Norme de convergence par année JMP 21/3/2012
+    extern double   *KSIM_NORMS;	// Norme de convergence par annï¿½e JMP 21/3/2012
 
     return(B_CreateVarFromVecOfDoubles(arg, KSIM_NORMS));
 }

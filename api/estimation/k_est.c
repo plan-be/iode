@@ -31,7 +31,7 @@ int KE_estim(char* veqs, char* afrom, char* ato);
 
 // Global vars
 //char            **EST_ARGS; // not used ?
-IODE_REAL       KEST_EPS = 0.00001;
+double       KEST_EPS = 0.00001;
 char            KEST_METHOD = 0;
 int             KEST_MAXIT = 100;
 extern  int     E_T, E_NCE;
@@ -122,7 +122,7 @@ void E_tests2scl(EQ* eq, int j, int n, int k)
 static void E_savevar(char* name, int eqnb, MAT* mat) 
 {
     int         t;
-    IODE_REAL   *var; 
+    double   *var; 
     char        varname[80];
     
     // Varname = name{eqnb}. Ex: _YRES0, _YCALC1...

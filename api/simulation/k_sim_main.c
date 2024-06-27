@@ -2,7 +2,7 @@
  * @header4iode
  *
  *   The Gauss-Seidel algorithm
- *   ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+ *   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *  
  *  A macroeconomic model is a system of nonlinear equations that must be solved with respect 
  *  to its endogenous variables, say {yi}. 
@@ -84,7 +84,7 @@
  *
  *      int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
  *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
- *      IODE_REAL K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
+ *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
  
 #include "iode.h"
@@ -93,14 +93,14 @@
 #define KSIM_NAME(i)        (KONAME(KSIM_DBV, KSIM_POSXK[i]))     // Name  of the endogenous of equation i (possibly after endo-exo)  
 
 // Global variables
-IODE_REAL   *KSIM_NORMS = 0;	      // Convergence threshold reached at the end of each simulation period 
-IODE_REAL   KSIM_NORM;                // Error measure: maximum difference between 2 iterations 
+double   *KSIM_NORMS = 0;	      // Convergence threshold reached at the end of each simulation period 
+double   KSIM_NORM;                // Error measure: maximum difference between 2 iterations 
 int         *KSIM_NITERS = 0; 	      // Numbers of iterations needed for each simulation period
 long        *KSIM_CPUS = 0; 	      // Elapsed time for each simulation period
-IODE_REAL   KSIM_EPS = 0.001;         // Required max convergence threshold
-IODE_REAL   KSIM_RELAX = 1.0;         // Relaxation parameter
-IODE_REAL   *KSIM_XK;                 // Values of the endogenous variables (in the interdep block) at the end of the previous iteration 
-IODE_REAL   *KSIM_XK1;                // Values of the endogenous variables (in the interdep block) during the current iteration
+double   KSIM_EPS = 0.001;         // Required max convergence threshold
+double   KSIM_RELAX = 1.0;         // Relaxation parameter
+double   *KSIM_XK;                 // Values of the endogenous variables (in the interdep block) at the end of the previous iteration 
+double   *KSIM_XK1;                // Values of the endogenous variables (in the interdep block) during the current iteration
 int         KSIM_MAXIT= 100;          // Maximum number of iteration to reach a solution
 int         KSIM_DEBUG = 0;           // Debug level: 0 = no debugging output
 int         KSIM_MAXDEPTH;            // Number of equations in the model
@@ -133,7 +133,7 @@ extern int  KSIM_PRE,                 // number of equations in the "prolog" blo
 static void K_init_values(int t)
 {
     int         i;
-    IODE_REAL        *val;
+    double        *val;
 
     if(KSIM_START == KV_INIT_ASIS) return;
 
@@ -150,7 +150,7 @@ static void K_init_values(int t)
  *      ENDO[i,t]=KSIM_XK[i]
  *  
  *  @param  [in]  int           t         index of the period where the data must be copied
- *  @global [in]  IODE_REAL*    KSIM_XK   result of the last Gauss-Seidel iteration 
+ *  @global [in]  double*    KSIM_XK   result of the last Gauss-Seidel iteration 
  *  
  */
 static void K_restore_XK(int t)
@@ -189,7 +189,7 @@ void K_simul_free()
 static int K_prolog(int t)
 {
     int     i;
-    IODE_REAL    x;
+    double    x;
 
     for(i = 0; i < KSIM_PRE; i++)  {
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
@@ -213,14 +213,14 @@ static int K_prolog(int t)
  *  @param [in]     int         t            simulated period
  *  @return         int                      0 if the equation return a real value
  *                                           -1 if the equation returns L_NAN
- *  @global [out]   IODE_REAL   KSIM_NORM    maximum difference bw endos before and after iteration
+ *  @global [out]   double   KSIM_NORM    maximum difference bw endos before and after iteration
  *  
  */
  
 static int K_interdep_1(int t)
 {
     int     i, j;
-    IODE_REAL    x;
+    double    x;
     double  d, pd;
 
 
@@ -270,7 +270,7 @@ static int K_interdep_1(int t)
  *  @param [in]     int         t  index of the calculation period
  *  @return         int         -1 if the result of an equation is L_NAN
  *                              0 otherwise
- *  @global [out]   IODE_REAL   KSIM_NORM    maximum difference between 2 iterations
+ *  @global [out]   double   KSIM_NORM    maximum difference between 2 iterations
  */
  
 static int K_interdep_2(int t)
@@ -291,10 +291,10 @@ static int K_interdep_2(int t)
     // Stage 2
     KSIM_NORM = 0.0;
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)  {
-        if(L_ISAN(KSIM_XK[j])) { // Valeur précédente définie
+        if(L_ISAN(KSIM_XK[j])) { // Valeur prï¿½cï¿½dente dï¿½finie
             d = KSIM_XK[j] - KSIM_XK1[j]; // Diff between iterations
 
-            // Calcule la 'norme' = fabs de la différence relative entre 2 it.
+            // Calcule la 'norme' = fabs de la diffï¿½rence relative entre 2 it.
             //   ou de la diff entre 2 it.
             if(!L_IS0(KSIM_XK[j]))
                 pd = min(fabs(1 - KSIM_XK1[j] / KSIM_XK[j]), fabs(d));
@@ -354,7 +354,7 @@ static int K_interdep(int t)
 static int K_epilog(int t)
 {
     int     i, j;
-    IODE_REAL    x;
+    double    x;
 
 
     for(i = KSIM_PRE + KSIM_INTER, j = 0; j < KSIM_POST; i++, j++)  {
@@ -372,7 +372,7 @@ static int K_epilog(int t)
  *  
  *  @param [in] int         t       current simulation period
  *  @param [in] char*       lst     name of the list to create
- *  @param [in] IODE_REAL   eps     convergence threshold
+ *  @param [in] double   eps     convergence threshold
  *  @return     int                 0 on success, -1 if at least one equation returns L_NAN. 
  *  TODO: 
  *      Why returning -1 
@@ -380,12 +380,12 @@ static int K_epilog(int t)
  *      replace B_ fns by K_ fns (see comments)
  *  
  */
-static int K_diverge(int t, char* lst, IODE_REAL eps)
+static int K_diverge(int t, char* lst, double eps)
 {
     //char        buf[81];
     char        *diverg = NULL;
     int         i, j, pos;
-    IODE_REAL   x;
+    double   x;
     double      d, pd;
 
     // Delete lst 
@@ -519,11 +519,11 @@ int K_simul_1(int t)
  *                                  NULL if the order must be calculated by K_simul()
  *  @return     int                 0 on succes, -1 on error            
  *  
- *  @global [out] IODE_REAL   *KSIM_NORMS     convergence threshold reached at the end of each simulation period
+ *  @global [out] double   *KSIM_NORMS     convergence threshold reached at the end of each simulation period
  *  @global [out] int		  *KSIM_NITERS    Numbers of iterations needed for each simulation period
  *  @global [out] int		  *KSIM_CPUS      CPU needed for each simulation period
- *  @global [in]  IODE_REAL   KSIM_EPS        Required max convergence threshold
- *  @global [in]  IODE_REAL   KSIM_RELAX      Relaxation parameter
+ *  @global [in]  double   KSIM_EPS        Required max convergence threshold
+ *  @global [in]  double   KSIM_RELAX      Relaxation parameter
  *  @global [in]  int         KSIM_MAXIT      Maximum number of iteration to reach a solution   
  *  @global [in]  int         KSIM_DEBUG      Debug level: 0 = no debugging output
  *  @global [in]  int         KSIM_SORT       reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH  
@@ -540,7 +540,7 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
             rc = -1,
             cpu_iter;
     char    **var = NULL;
-    IODE_REAL    *x;
+    double    *x;
 
     if(KNB(dbe) == 0) {
         B_seterrn(110);
@@ -573,7 +573,7 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (IODE_REAL *) SCR_malloc(sizeof(IODE_REAL) * KSMPL(dbv)->s_nb);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * KSMPL(dbv)->s_nb);
     KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * KSMPL(dbv)->s_nb);
     KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * KSMPL(dbv)->s_nb);
 
@@ -642,8 +642,8 @@ int K_simul(KDB* dbe, KDB* dbv, KDB* dbs, SAMPLE* smpl, char** endo_exo, char** 
     if(KSIM_DEBUG) K_lstorder("_PRE", "_INTER", "_POST");
 
     // SIMULATE 
-    KSIM_XK  = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * KSIM_INTER);
-    KSIM_XK1 = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * KSIM_INTER);
+    KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
+    KSIM_XK1 = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
 
     for(i = 0; i < smpl->s_nb; i++, t++) {
         cpu_iter = WscrGetMS();
@@ -685,17 +685,17 @@ fin:
  *  @param [in] int         t       index of the period to be calculated
  *  @param [in] int         varnb   position of the variable to calculate in the global KV_DB
  *  @param [in] int         msg     indicated if the function kerror() must be called on error (no solution found)
- *  @return     IODE_REAL           on succes: the equation solution
+ *  @return     double           on succes: the equation solution
  *                                  on error of if no solution can be found: L_NAN 
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
 
-IODE_REAL K_calc_clec(int eqnb, int t, int varnb, int msg)
+double K_calc_clec(int eqnb, int t, int varnb, int msg)
 {
     int     lg, eqvarnb = -1;
     CLEC    *clec;
-    IODE_REAL    x;
+    double    x;
     char    buf[10];
 
 //Debug("Eq %s\n", KONAME(KSIM_DBE, eqnb));
@@ -741,7 +741,7 @@ static void K_lstorder_1(char* lstname, int eq1, int eqn)
                     maxl = 1000;
     extern  KDB*    KSIM_DBV;
 
-    // Détruit la liste cible et les sous-listes
+    // Dï¿½truit la liste cible et les sous-listes
     sprintf(buf, "%s*", lstname);
     //B_DataDelete(buf, K_LST); // Old version usign B_*() fns
     lst_todel = K_expand(K_LST, NULL, buf, '*');

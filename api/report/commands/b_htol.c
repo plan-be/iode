@@ -90,7 +90,7 @@ static int B_htol(int method, char* arg)
     int     lg, nb, rc = 0,
                     i, j, f, t, shift, skip;
     char    file[K_MAX_FILE + 1], **data = NULL;
-    IODE_REAL    *t_vec = NULL, *f_vec = NULL;
+    double    *t_vec = NULL, *f_vec = NULL;
     KDB     *from = NULL, *to = NULL;
     SAMPLE  *t_smpl = NULL;
 
@@ -114,12 +114,12 @@ static int B_htol(int method, char* arg)
 
     to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
-    f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(IODE_REAL));
+    t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(double));
 
     for(i = 0; i < KNB(from); i++) {
-        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(IODE_REAL));
-        memset(t_vec, 0, t_smpl->s_nb * sizeof(IODE_REAL));
+        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(double));
+        memset(t_vec, 0, t_smpl->s_nb * sizeof(double));
 
         for(f = 0, t = 0; f < skip; f++) {
             if(f != 0 && f % shift == 0) {
@@ -170,7 +170,7 @@ done:
 KDB* B_htol_kdb(int method, KDB* kdb_from)
 {
     int         nb, rc = 0, i, j, f, t, shift, skip;
-    IODE_REAL   *t_vec = NULL, *f_vec = NULL;
+    double   *t_vec = NULL, *f_vec = NULL;
     KDB         *kdb_to = NULL;
     SAMPLE      *t_smpl = NULL;
 
@@ -181,12 +181,12 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
 
     kdb_to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb_to), t_smpl, sizeof(SAMPLE));
-    t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
-    f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(kdb_from)->s_nb) * sizeof(IODE_REAL));
+    t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + KSMPL(kdb_from)->s_nb) * sizeof(double));
 
     for(i = 0; i < KNB(kdb_from); i++) {
-        memcpy(f_vec, KVVAL(kdb_from, i, 0), KSMPL(kdb_from)->s_nb * sizeof(IODE_REAL));
-        memset(t_vec, 0, t_smpl->s_nb * sizeof(IODE_REAL));
+        memcpy(f_vec, KVVAL(kdb_from, i, 0), KSMPL(kdb_from)->s_nb * sizeof(double));
+        memset(t_vec, 0, t_smpl->s_nb * sizeof(double));
 
         for(f = 0, t = 0; f < skip; f++) {
             if(f != 0 && f % shift == 0) {

@@ -169,7 +169,7 @@ static double L_newton_1(int algo, KDB* dbv, KDB* dbs, CLEC* clec, int t, int va
 {
     double  oldx, x, fx, fxh, h = KSIM_NEWTON_STEP, eps = KSIM_NEWTON_EPS, ax, afx, dx = 0.0, ox;
     int     it = 0;
-    IODE_REAL    *d_ptr, shift;
+    double    *d_ptr, shift;
     extern  int KSIM_DEBUG;
 
     d_ptr = L_getvar(dbv, varnb) + t;
@@ -499,7 +499,7 @@ KDB     *SOLVE_DBV, *SOLVE_DBS;
 double SolveIodeFn(double x)
 {
     double  fx;
-    IODE_REAL    *d_ptr;
+    double    *d_ptr;
 
     d_ptr = L_getvar(SOLVE_DBV, SOLVE_VARNB);
     d_ptr[SOLVE_T] = x;
@@ -514,7 +514,7 @@ KDB     *dbv, *dbs;
 CLEC    *clec;
 int     t, varnb, eqvarnb;
 {
-    IODE_REAL    *d_ptr;
+    double    *d_ptr;
     double  x, x1, xl, xh;
 
     SOLVE_DBV = dbv;

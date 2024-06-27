@@ -29,7 +29,7 @@
  *    - Lists       K_add(KDB* kdb, char* name, char* list)
  *    - Scalars     K_add(KDB* kdb, char* name, SCL* scalar)
  *    - Tables      K_add(KDB* kdb, char* name, TBL *tbl) 
- *    - Variables   K_add(KDB* kdb, char* name, IODE_REAL* var, int* nb_obs) [nb_obs = kdb SAMPLE size]
+ *    - Variables   K_add(KDB* kdb, char* name, double* var, int* nb_obs) [nb_obs = kdb SAMPLE size]
  *  
  *  @note: the name of an equation MUST be the name of its endogenous variable
  *  
@@ -90,7 +90,7 @@ int K_add(KDB* kdb, char* name, ...)
     char*   lec;
     SCL*    scl;
     TBL*    tbl;
-    IODE_REAL* var;
+    double* var;
     int*    lgptr;
 
     va_start(vargs, name);

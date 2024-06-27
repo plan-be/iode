@@ -21,14 +21,14 @@
 
 /**
  *  Calculates the linear interpolation of y in x (~y[x])
- *  @param [in] IODE_REAL*  y   vector of double
- *  @param [in] IODE_REAL   x   x-value for which y[x] is seached 
- *  @return     IODE_REAL       approximation of y[x] 
+ *  @param [in] double*  y   vector of double
+ *  @param [in] double   x   x-value for which y[x] is seached 
+ *  @return     double       approximation of y[x] 
  */ 
-static IODE_REAL LTOH_ylin(IODE_REAL* y, IODE_REAL x)
+static double LTOH_ylin(double* y, double x)
 {
 
-    IODE_REAL    res, a, b;
+    double    res, a, b;
     int     hi, lo;
 
     lo = (int) floor(x);
@@ -51,17 +51,17 @@ static IODE_REAL LTOH_ylin(IODE_REAL* y, IODE_REAL x)
  *  If the series is a "stock", the result is a linear interpolation of the 2 surrounding source values.
  *  
  *  @param [in]  int         type   of series: WS_LTOH_FLOW or WS_LTOH_STOCK
- *  @param [in]  IODE_REAL*  f_vec  source vector
+ *  @param [in]  double*  f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
- *  @param [out] IODE_REAL*  t_vec  destination vector 
+ *  @param [out] double*  t_vec  destination vector 
  *  @param [in]  int         t_nb   nb of values in the destination vector
  *  @param [in]  int         shift  nb of sub periods in the destination sample
  *  @return      int         0 always       
  */
-static int LTOH_lin(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t_nb, int shift)
+static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, int shift)
 {
     int     dim, j, f, t, beg;
-    IODE_REAL    x;
+    double    x;
 
     for(t = 0; t < t_nb; t++) t_vec[t] = L_NAN;
     beg = 0;
@@ -82,7 +82,7 @@ static int LTOH_lin(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int 
             else {
                 for(f = beg, t = (beg+1)*shift; f < dim; f++, t+= shift) {
                     for(j = 0; j < shift; j++) {
-                        x = (IODE_REAL)(j + 1) / (IODE_REAL) shift;
+                        x = (double)(j + 1) / (double) shift;
                         x += f;
                         t_vec[t + j] = LTOH_ylin(f_vec, x);
                     }
@@ -103,14 +103,14 @@ static int LTOH_lin(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int 
  *  If the series is a "stock", the result has the same value as the source
  *  
  *  @param [in]  int         type   of series: WS_LTOH_FLOW or WS_LTOH_STOCK
- *  @param [in]  IODE_REAL*  f_vec  source vector
+ *  @param [in]  double*  f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
- *  @param [out] IODE_REAL*  t_vec  destination vector 
+ *  @param [out] double*  t_vec  destination vector 
  *  @param [in]  int         t_nb   nb of values in the destination vector
  *  @param [in]  int         shift  nb of sub periods in the destination sample
  *  @return      int         0 always       
  */
-static int LTOH_step(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t_nb, int shift)
+static int LTOH_step(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, int shift)
 {
     int     dim, j, f, t, beg;
 
@@ -146,13 +146,13 @@ static int LTOH_step(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int
 
 // Cubic Spline sub-functions 
 
-static int LTOH_y2cs(IODE_REAL* y, int n, IODE_REAL* y2)
+static int LTOH_y2cs(double* y, int n, double* y2)
 {
     int     i, dim;
-    IODE_REAL    *u, p, s;
+    double    *u, p, s;
 
     /* "natural" cubic spline */
-    u = (IODE_REAL *) SW_nalloc(n * sizeof(IODE_REAL));
+    u = (double *) SW_nalloc(n * sizeof(double));
     y2[0] = u[0] = 0.0;
 
     for(i = 1; i < n - 1 && L_ISAN(y[i]); i++) {
@@ -174,10 +174,10 @@ static int LTOH_y2cs(IODE_REAL* y, int n, IODE_REAL* y2)
 }
 
 
-static IODE_REAL LTOH_ycs(IODE_REAL* y, IODE_REAL* y2, IODE_REAL x)
+static double LTOH_ycs(double* y, double* y2, double x)
 {
 
-    IODE_REAL    res, a, b;
+    double    res, a, b;
     int     hi, lo;
 
     if(x < 0) return(L_NAN);
@@ -196,10 +196,10 @@ static IODE_REAL LTOH_ycs(IODE_REAL* y, IODE_REAL* y2, IODE_REAL x)
 }
 
 
-static int LTOH_cs(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t_nb, int shift)
+static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, int shift)
 {
     int     dim, j, f, t, beg;
-    IODE_REAL    *y2 = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * f_nb),
+    double    *y2 = (double *) SW_nalloc(sizeof(double) * f_nb),
                   x, sum, d;
 
     for(t = 0; t < t_nb; t++) t_vec[t] = L_NAN;
@@ -215,7 +215,7 @@ static int LTOH_cs(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t
             for(f = beg, t = beg*shift; f < dim + beg; f++, t+= shift) {
                 sum = 0.0;
                 for(j = 0; j < shift; j++) {
-                    x = (IODE_REAL)(j - 1) / (IODE_REAL) shift;
+                    x = (double)(j - 1) / (double) shift;
                     x += f;
                     t_vec[t + j] = LTOH_ycs(f_vec, y2, x);
                     if(L_ISAN(t_vec[t + j]) && L_ISAN(sum)) sum += t_vec[t + j];
@@ -232,7 +232,7 @@ static int LTOH_cs(int type, IODE_REAL* f_vec, int f_nb, IODE_REAL* t_vec, int t
             dim = LTOH_y2cs(f_vec + beg, f_nb - beg, y2);
             for(f = beg, t = (beg+1)*shift; f < dim + beg; f++, t+= shift) {
                 for(j = 0; j < shift; j++) {
-                    x = (IODE_REAL)(j + 1) / (IODE_REAL) shift;
+                    x = (double)(j + 1) / (double) shift;
                     x += f;
                     t_vec[t + j] = LTOH_ycs(f_vec, y2, x);
                 }
@@ -310,7 +310,7 @@ static int B_ltoh(int type, char* arg)
     int     lg, nb, rc = 0,
                     i, shift, skip;
     char    method[81], file[K_MAX_FILE + 1], **data = NULL;
-    IODE_REAL    *t_vec = NULL, *f_vec = NULL;
+    double    *t_vec = NULL, *f_vec = NULL;
     KDB     *from = NULL, *to = NULL;
     SAMPLE  *t_smpl = NULL;
 
@@ -337,11 +337,11 @@ static int B_ltoh(int type, char* arg)
 
     to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    t_vec = (IODE_REAL *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(IODE_REAL));
-    f_vec = (IODE_REAL *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(IODE_REAL));
+    t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
+    f_vec = (double *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(double));
 
     for(i = 0; i < KNB(from); i++) {
-        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(IODE_REAL));
+        memcpy(f_vec, KVVAL(from, i, 0), KSMPL(from)->s_nb * sizeof(double));
         switch(method[0]) {
             case WS_LTOH_CS :
                 LTOH_cs(type,

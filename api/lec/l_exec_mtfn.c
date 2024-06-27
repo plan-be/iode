@@ -608,10 +608,10 @@ L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, 
 {
     char    *expr1, *expr2;
     short   len1, len2;
-    IODE_REAL    v, *itmp = NULL, *otmp = NULL;
+    double    v, *itmp = NULL, *otmp = NULL;
     //int     from, to, j, lg, lambda, nbna, dim;      /* JMP 7-3-2019 */
     int     from, to, j, lg, nbna, dim;         /* JMP 7-3-2019 */
-    IODE_REAL   lambda;                         /* JMP 7-3-2019 */
+    double   lambda;                         /* JMP 7-3-2019 */
 
     memcpy(&len1, expr, sizeof(short));
     expr1 = expr + sizeof(short);
@@ -626,8 +626,8 @@ L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, 
     if(t < from || t > to) goto err;
     lg = to - from + 1;
     if(lg < 5) goto err;
-    itmp = (IODE_REAL *) SCR_malloc(lg * sizeof(IODE_REAL));
-    otmp = (IODE_REAL *) SCR_malloc(lg * sizeof(IODE_REAL));
+    itmp = (double *) SCR_malloc(lg * sizeof(double));
+    otmp = (double *) SCR_malloc(lg * sizeof(double));
 
     if(itmp == NULL || otmp == NULL) goto err;
     for(j = from ; j <= to ; j++) {

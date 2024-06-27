@@ -24,7 +24,7 @@ int B_season(char* arg)
     int     nb, lg, rc = -1,
                     i, j, shift, beg, dim, nbper;
     char    name[K_MAX_FILE + 1], **data = NULL;
-    IODE_REAL    *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
+    double    *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
                   eps, scale, season[12];
     KDB     *from = NULL, *to = NULL;
     SAMPLE  *t_smpl = NULL;
@@ -53,9 +53,9 @@ int B_season(char* arg)
     to = K_create(K_VAR, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
     nb = t_smpl->s_nb;
-    t_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
-    c_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
-    i_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
+    t_vec = (double *) SW_nalloc(nb * sizeof(double));
+    c_vec = (double *) SW_nalloc(nb * sizeof(double));
+    i_vec = (double *) SW_nalloc(nb * sizeof(double));
     for(i = 0; i < nb; i++) c_vec[i] = i_vec[i] = L_NAN;
 
     for(i = 0; i < KNB(from); i++) {
@@ -63,12 +63,12 @@ int B_season(char* arg)
         dim = nb;  /* GB 23/07/98 */
         for(j = 0; j < nb; j++) c_vec[j] = i_vec[j] = L_NAN;
         memcpy(t_vec,
-               KVVAL(from, i, 0) + shift, nb * sizeof(IODE_REAL));
+               KVVAL(from, i, 0) + shift, nb * sizeof(double));
 
 
         if(!DS_test(t_vec, nb, &beg, &dim, nbper, &scale)) {
             memcpy(t_vec,
-                   KVVAL(from, i, 0) + shift, nb * sizeof(IODE_REAL));
+                   KVVAL(from, i, 0) + shift, nb * sizeof(double));
             K_add(to, KONAME(from, i), t_vec, &(nb));
             continue;
         }
@@ -104,10 +104,10 @@ done:
 }
 
 
-int DS_test(IODE_REAL* vec, int nb, int* beg, int* dim, int nbper, IODE_REAL* shift)
+int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift)
 {
     int     f, nj, rc = 0, tolag;
-    IODE_REAL    ti[12], maxti = 0.0, minti = 150.0;
+    double    ti[12], maxti = 0.0, minti = 150.0;
 
     for(*beg = 0; *beg < nb && !L_ISAN(vec[*beg]); (*beg)++);
     /*    if(*beg != 0) *beg = ((*beg)/nbper + 1) * nbper;  GB 23/07/98 */
@@ -149,22 +149,22 @@ int DS_test(IODE_REAL* vec, int nb, int* beg, int* dim, int nbper, IODE_REAL* sh
     return(rc);
 }
 
-int DS_vec(IODE_REAL* vec, IODE_REAL* c1, IODE_REAL* i1, IODE_REAL* season, int nb, int nbper, IODE_REAL shift)
+int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbper, double shift)
 {
     int     m, j, f,
             nbj = nb/nbper;
 
-    IODE_REAL   *ai = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL)),
-                *bi = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL)),
-                *ci = (IODE_REAL *) SW_nalloc((nb + 14) * sizeof(IODE_REAL)),
-                *m5 = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL)),
-                *ma = (IODE_REAL *) SW_nalloc((nbj + 4) * sizeof(IODE_REAL)),
-                *ma7 = (IODE_REAL *) SW_nalloc((nbj + 6) * sizeof(IODE_REAL)),
+    double   *ai = (double *) SW_nalloc(nb * sizeof(double)),
+                *bi = (double *) SW_nalloc(nb * sizeof(double)),
+                *ci = (double *) SW_nalloc((nb + 14) * sizeof(double)),
+                *m5 = (double *) SW_nalloc(nb * sizeof(double)),
+                *ma = (double *) SW_nalloc((nbj + 4) * sizeof(double)),
+                *ma7 = (double *) SW_nalloc((nbj + 6) * sizeof(double)),
                 s[12], d, di1;
 
-    static IODE_REAL w5[5] = {1.0, 2.0, 3.0, 2.0, 1.0};
-    static IODE_REAL w7[7] = {1.0, 2.0, 3.0, 3.0, 3.0, 2.0, 1.0};
-    static IODE_REAL w15[15] = {-3.0, -6.0, -5.0, 3.0, 21.0, 46.0, 67.0, 74.0, 67.0, 46.0, 21.0, 3.0, -5.0, -6.0, -3.0};
+    static double w5[5] = {1.0, 2.0, 3.0, 2.0, 1.0};
+    static double w7[7] = {1.0, 2.0, 3.0, 3.0, 3.0, 2.0, 1.0};
+    static double w15[15] = {-3.0, -6.0, -5.0, 3.0, 21.0, 46.0, 67.0, 74.0, 67.0, 46.0, 21.0, 3.0, -5.0, -6.0, -3.0};
 
     /* Ai, Bi */
     for(f = nbper/2; f < nb - nbper/2; f++) {
@@ -441,7 +441,7 @@ int DS_smpl(SAMPLE* f_smpl, SAMPLE* ws_smpl, SAMPLE** t_smpl, int* shift)
 
 
 
-int DS_extr(IODE_REAL* vec, int dim, int nbper, IODE_REAL* bi, IODE_REAL shift)
+int DS_extr(double* vec, int dim, int nbper, double* bi, double shift)
 {
     int i, m;
 

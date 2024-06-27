@@ -32,7 +32,7 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
 /**
  * @brief a.k.a Unit Root.
  * 
- * @return IODE_REAL 
+ * @return double 
  */
 KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
 
@@ -69,7 +69,7 @@ public:
         return coeffs[i];
     }
 
-    IODE_REAL get_value(const int row, const int col) const
+    double get_value(const int row, const int col) const
     {
         check_index(row, "Row");
         check_index(col, "Column");
@@ -332,9 +332,9 @@ public:
         return m_corr;
     }
 
-    std::vector<IODE_REAL> get_observed_values(const std::string& name) const
+    std::vector<double> get_observed_values(const std::string& name) const
     {
-        std::vector<IODE_REAL> values;
+        std::vector<double> values;
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
             return values;
@@ -344,9 +344,9 @@ public:
         return values;
     }
 
-    std::vector<IODE_REAL> get_fitted_values(const std::string& name) const
+    std::vector<double> get_fitted_values(const std::string& name) const
     {
-        std::vector<IODE_REAL> values;
+        std::vector<double> values;
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
             return values;
@@ -356,9 +356,9 @@ public:
         return values;
     }
 
-    std::vector<IODE_REAL> get_residual_values(const std::string& name) const
+    std::vector<double> get_residual_values(const std::string& name) const
     {
-        std::vector<IODE_REAL> values;
+        std::vector<double> values;
         auto it = find(v_equations.begin(), v_equations.end(), name);
         if(it == v_equations.end())
             return values;

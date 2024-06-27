@@ -9,13 +9,13 @@
  *  
  *  List of functions 
  *  -----------------
- *      IODE_REAL *E_UnitRoot(char* varname, int drift, int trend, int order)      : implementation of the Dickey-Fuller test
- *      void E_PrintDF(char* lec, IODE_REAL* res, int drift, int trend, int order) : prints the results of the Dickey-Fuller test
+ *      double *E_UnitRoot(char* varname, int drift, int trend, int order)      : implementation of the Dickey-Fuller test
+ *      void E_PrintDF(char* lec, double* res, int drift, int trend, int order) : prints the results of the Dickey-Fuller test
  *  
  *  Utilities
  *  ---------
  *      int E_GetLecName(char* lec, char* name)      : retrieves the name of the first variable in a lec expression
- *      void E_SclToReal(char* name, IODE_REAL* res) : Stores the content of a scalar in a vector of doubles
+ *      void E_SclToReal(char* name, double* res) : Stores the content of a scalar in a vector of doubles
  */
 
 #include "iode.h"
@@ -33,7 +33,7 @@
 static int E_GetSmpl(SAMPLE *smpl, char *name)
 {
     int     pos, t;
-    IODE_REAL    *val;
+    double    *val;
     SAMPLE  *wsmpl = KSMPL(K_WS[K_VAR]);
 
     pos = K_find(K_WS[K_VAR], name);
@@ -119,17 +119,17 @@ static int E_UnitRoot_1(SAMPLE* smpl, char* buf)
  *  @param [in] int         drift   0 or 1 indicating whether the formula to be estimated must incorporate a constant term (1) or not (0) 
  *  @param [in] int         trend   0 or 1 depending on whether the formula to be estimated should incorporate a trend term (1) or not (0) 
  *  @param [in] int         order   the order of the polynomial to be estimated 
- *  @return     IODE_REAL   allocated vector of the estimated scalars, 3 values for each estimated coefficient: 
+ *  @return     double   allocated vector of the estimated scalars, 3 values for each estimated coefficient: 
  *                              (value, stderr, t-test)
  *                          NULL on error (illegal lec, sample too short)
  */
  
-IODE_REAL *E_UnitRoot(char* lec, int drift, int trend, int order)
+double *E_UnitRoot(char* lec, int drift, int trend, int order)
 {
     int         i, pos, rc = -1;
     char        buf[1024], scl[11], varname[64];
     SAMPLE      smpl;
-    IODE_REAL   *res = NULL, *vec;
+    double   *res = NULL, *vec;
 
 
     // Computes the lec formula and stores the result in the VAR _DF
@@ -184,7 +184,7 @@ IODE_REAL *E_UnitRoot(char* lec, int drift, int trend, int order)
 
 
     if(rc == 0)
-        res = (IODE_REAL *) SCR_malloc((drift + trend + order + 1)* 3 * sizeof(IODE_REAL));
+        res = (double *) SCR_malloc((drift + trend + order + 1)* 3 * sizeof(double));
     else
         res = NULL;
 
@@ -229,9 +229,9 @@ cleanup:
  *  Stores the content of a scalar in a vector of doubles : value, stderr and t-test.
  *  
  *  @param [in] char*       name    name of the scalar 
- *  @param [in] IODE_REAL*  res     pointer to the result 
+ *  @param [in] double*  res     pointer to the result 
  */
-void E_SclToReal(char* name, IODE_REAL* res)
+void E_SclToReal(char* name, double* res)
 {
     int pos;
     SCL *scl;
@@ -250,12 +250,12 @@ void E_SclToReal(char* name, IODE_REAL* res)
  *  Prints the results of the Dickey-Fuller test.
  *  
  *  @param [in] char*       lec     LEC expression 
- *  @param [in] IODE_REAL*  res     result (coefs) of the DF test
+ *  @param [in] double*  res     result (coefs) of the DF test
  *  @param [in] int         drift   parameter of E_UnitRoot()
  *  @param [in] int         trend   parameter of E_UnitRoot()
  *  @param [in] int         order   parameter of E_UnitRoot()
  */
-void E_PrintDF(char* lec, IODE_REAL* res, int drift, int trend, int order)
+void E_PrintDF(char* lec, double* res, int drift, int trend, int order)
 {
     int     i, pos = 0;
 

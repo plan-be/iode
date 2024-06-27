@@ -5,7 +5,7 @@
  * Some of these functions parse files and/or strings using the SCR4 group of functions "YY". 
  * See http://www.xon.be/scr4/libs1/libs157.htm for more details.
  *
- *    IODE_REAL K_read_real(YYFILE *yy):    reads a token on the YY stream and interprets the token as a IODE_REAL (double) if possible.
+ *    double K_read_real(YYFILE *yy):    reads a token on the YY stream and interprets the token as a double (double) if possible.
  *    long K_read_long(YYFILE* yy):         reads the next token on the YY stream and returns a long. 
  *    char* K_read_str(YYFILE* yy):         reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.  
  *    PERIOD *K_read_per(YYFILE* yy):       reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition (<long><char><long>).
@@ -22,18 +22,18 @@
 #include "iode.h"
 
 /**
- *  Reads a token on the YY stream and interprets the token as a IODE_REAL (double) if possible.
+ *  Reads a token on the YY stream and interprets the token as a double (double) if possible.
  *  If not, returns L_NAN and rewinds the YY stream.
  *  
  *  The token can be a double, a long or the string "na". Other values are rejected.
  *  
  *  @param [in, out]    yy  YYFILE*     YY stream
- *  @return                 IODE_REAL   value of the next token or L_NAN.
+ *  @return                 double   value of the next token or L_NAN.
  *  
  */
-IODE_REAL K_read_real(YYFILE *yy)
+double K_read_real(YYFILE *yy)
 {
-    IODE_REAL    val;
+    double    val;
     int     minus = 1;
 
 ag:
@@ -50,7 +50,7 @@ ag:
                 minus = -1;
                 goto ag;
             }
-            //  YY_unread(yy); // Annul‚ version 6.21
+            //  YY_unread(yy); // Annulï¿½ version 6.21
 
             if(yy->yy_text[0] != '/' &&
                     yy->yy_text[0] != '.')  /* JMP 03-01-2013 */

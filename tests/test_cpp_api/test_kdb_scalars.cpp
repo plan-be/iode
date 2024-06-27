@@ -23,9 +23,9 @@ TEST_F(KDBScalarsTest, Subset)
 {
     std::string pattern = "a*";
     Scalar scalar = Scalars.get("acaf1");
-    IODE_REAL value = 0.0158;
-    IODE_REAL relax = 0.98;
-    IODE_REAL std = 0.0;
+    double value = 0.0158;
+    double relax = 0.98;
+    double std = 0.0;
     Scalar new_scalar(value, relax, std);
 
     // GLOBAL KDB
@@ -86,8 +86,8 @@ TEST_F(KDBScalarsTest, GetNames)
 TEST_F(KDBScalarsTest, CreateRemove)
 {
     std::string name = "new_scalar";
-    IODE_REAL value = 0.012365879;
-    IODE_REAL relax = 1.;
+    double value = 0.012365879;
+    double relax = 1.;
 
     Scalars.add(name, value, relax);
     Scalar new_scalar = Scalars.get(name);
@@ -102,8 +102,8 @@ TEST_F(KDBScalarsTest, CreateRemove)
 TEST_F(KDBScalarsTest, Update)
 {
     std::string name = Scalars.get_name(0);
-    IODE_REAL value = 0.0158;
-    IODE_REAL relax = 0.98;
+    double value = 0.0158;
+    double relax = 0.98;
 
     Scalars.update(name, value, relax);
     Scalar updated_scalar = Scalars.get(name);
@@ -154,9 +154,9 @@ TEST_F(KDBScalarsTest, Filter)
     // modify an element of the local KDB and check if the 
     // corresponding element of the global KDB also changes
     std::string name = "acaf1";
-    IODE_REAL updated_value = 0.0158;
-    IODE_REAL updated_relax = 0.98;
-    IODE_REAL updated_std = 0.0;
+    double updated_value = 0.0158;
+    double updated_relax = 0.98;
+    double updated_std = 0.0;
     Scalar expected_updated_scalar(updated_value, updated_relax, updated_std);
     kdb_subset->update(name, updated_value, updated_relax, updated_std);
     Scalar updated_scalar_local = kdb_subset->get(name);
@@ -167,9 +167,9 @@ TEST_F(KDBScalarsTest, Filter)
     // add an element to the local KDB and check if it has also 
     // been added to the global KDB
     std::string new_name = "new_scalar";
-    IODE_REAL value = 0.012365879;
-    IODE_REAL relax = 1.0;
-    IODE_REAL std = 0.0;
+    double value = 0.012365879;
+    double relax = 1.0;
+    double std = 0.0;
     Scalar expected_new_scalar(value, relax, std);
     kdb_subset->add(new_name, value, relax, std);
     Scalar new_scalar_local = kdb_subset->get(new_name);
@@ -240,13 +240,13 @@ TEST_F(KDBScalarsTest, DeepCopy)
     // corresponding element of the global KDB didn't changed
     std::string name = "acaf1";
     Scalar scalar = Scalars.get(name);
-    IODE_REAL value = scalar.val;
-    IODE_REAL relax = scalar.relax;
-    IODE_REAL std = scalar.std;
+    double value = scalar.val;
+    double relax = scalar.relax;
+    double std = scalar.std;
     Scalar expected_scalar(value, relax, std);
-    IODE_REAL updated_value = 0.0158;
-    IODE_REAL updated_relax = 0.98;
-    IODE_REAL updated_std = 0.0;
+    double updated_value = 0.0158;
+    double updated_relax = 0.98;
+    double updated_std = 0.0;
     Scalar expected_updated_scalar(updated_value, updated_relax, updated_std);
     kdb_subset->update(name, updated_value, updated_relax, updated_std);
     Scalar updated_scalar_local = kdb_subset->get(name);
@@ -325,18 +325,18 @@ TEST_F(KDBScalarsTest, Merge)
 
     // add an element to the KDB to be merged
     std::string new_name = "new_scalar";
-    IODE_REAL value = 0.012365879;
-    IODE_REAL relax = 1.0;
-    IODE_REAL std = 0.0;
+    double value = 0.012365879;
+    double relax = 1.0;
+    double std = 0.0;
     Scalar new_scalar(value, relax, std);
     kdb_to_merge->add(new_name, value, relax, std);
 
     // modify an existing element of the KDB to be merge
     std::string name = "acaf1";
     Scalar unmodified_scalar = kdb_to_merge->get(name);
-    IODE_REAL updated_value = 0.0158;
-    IODE_REAL updated_relax = 0.98;
-    IODE_REAL updated_std = 0.0;
+    double updated_value = 0.0158;
+    double updated_relax = 0.98;
+    double updated_std = 0.0;
     Scalar modified_scalar(updated_value, updated_relax, updated_std);
     kdb_to_merge->update(name, updated_value, updated_relax, updated_std);
 
@@ -405,8 +405,8 @@ TEST_F(KDBScalarsTest, Hash)
 
     // modify an entry
     hash_val = hash_val_modified;
-    IODE_REAL value = 0.0158;
-    IODE_REAL relax = 0.98;
+    double value = 0.0158;
+    double relax = 0.98;
     Scalars.update("new_name", value, relax);
     hash_val_modified = kdb_hasher(Scalars);
     EXPECT_NE(hash_val, hash_val_modified);

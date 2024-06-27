@@ -181,8 +181,8 @@ in the result, like ~c{1 + %C%}~C, the source report had to contain more backquo
 | ~cchar *RP_gmacro(char* str)                                        | Calculates a macro value. The macro may contain expressions between {} or @-functions
 | ~cchar *RP_gcmd(char* str)                                          | Calculates the value of an expression between curly brackets.
 | ~cint RP_evaltime()                                                 | Calculates RP_T, the position in the current sample of the current calculation period RP_PER.
-| ~cIODE_REAL RP_evallec(char* lec)                                   | Evaluates a LEC expression in (the period) RP_PER.
-| ~cint RP_fmt(char* buf, char* format, IODE_REAL value)              | Formats a double.
+| ~cdouble RP_evallec(char* lec)                                   | Evaluates a LEC expression in (the period) RP_PER.
+| ~cint RP_fmt(char* buf, char* format, double value)              | Formats a double.
 | ~cint RP_eval(char** res, char* farg)                               | Interprets strings between accolades found in a report line.
 | ~cint RP_add(char** line, int* lg, int* j, char* res)               | Reallocates the string line (of length *lg) in order to concatanate res from the position *j.
 | ~cint RP_expand(char** line, char* buf)                             | Expands a report line by replacing macros, lec expressions and @-functions par their calculated values
@@ -855,7 +855,7 @@ Functions related to WS management (clear, load, save, sample, import...).
 | ~cint B_WsAggrSum(char* arg)                       | $WsAggrSum pattern filename
 | ~cint B_WsAggrProd(char* arg)                      | $WsAggrProd pattern filename
 | ~cint B_WsAggrMean(char* arg)                      | $WsAggrMean pattern filename
-| ~cIODE_REAL *B_StatUnitRoot_1(char* arg, int print)| Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
+| ~cdouble *B_StatUnitRoot_1(char* arg, int print)| Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
 | ~cint B_StatUnitRoot(char* arg)                    | $StatUnitRoot drift trend order expression
 | ~cint B_CsvSave(char* arg, int type)               | $CsvSave<<type>> file name1 name2 ...
 | ~cint B_CsvNbDec(char *nbdec)                      | $CsvNbDec nn
@@ -1106,8 +1106,8 @@ Functions (and their subfunctions) to print IODE object definitions.
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 ..tb
 | Syntax                                               | Description or equivalent in Reports
-| ~cint B_PrintVal(IODE_REAL val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
-| ~cIODE_REAL B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
+| ~cint B_PrintVal(double val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
+| ~cdouble B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
 | ~cint B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
 | ~cint B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
 | ~cint B_isdef(char* txt)                                           | Checks if a string contains non space charaters.

@@ -104,8 +104,8 @@ int L_stackna(L_REAL** p_stack, int nargs)
  * 
  *  The variable, scalar and sample values are retrieved by calling 3 user defined functions (see also k_lec.c):
  * 
- *      IODE_REAL*  L_getvar(dbv, pos) : returns the pointer to the variable at position pos in dbv.
- *      IODE_REAL   L_getscl(dbs, pos) : returns the value of the scalar at position pos in dbs.
+ *      double*  L_getvar(dbv, pos) : returns the pointer to the variable at position pos in dbv.
+ *      double   L_getscl(dbs, pos) : returns the value of the scalar at position pos in dbs.
  *      SMPL*       L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
  *
  *  The process iterates on the compiled LEC expression. 
@@ -122,7 +122,7 @@ int L_stackna(L_REAL** p_stack, int nargs)
  */
 L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
 {
-    IODE_REAL    *d_ptr;
+    double    *d_ptr;
     LECREAL r;
     int     j, nargs, keyw, nvargs;
     long    l;
@@ -265,7 +265,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
 L_REAL L_exec(KDB* dbv, KDB* dbs, CLEC* expr, int t)
 {
     int	pos; //short   pos;
-    L_REAL  stack[1000];    // 1000 pour reculer certains plantages (non solutionné...) TODO: manage the stack overflow ?
+    L_REAL  stack[1000];    // 1000 pour reculer certains plantages (non solutionnï¿½...) TODO: manage the stack overflow ?
 
     // Use globals to limit the number of parameters in function calls
     L_EXEC_DBV = dbv;   
@@ -350,7 +350,7 @@ void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to)
  *  @param [in] char*       lec     LEC expression 
  *  @param [in] KDB*        dbv     KDB of variables used in lec 
  *  @param [in] KDB*        dbs     KDB of SCL used in lec
- *  @return     IODE_REAL*          calculated lec expression on the whole dbv sample    
+ *  @return     double*          calculated lec expression on the whole dbv sample    
  *                                  NULL on error (error can be retrieved via a call to L_error()
  */
 L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)
@@ -364,7 +364,7 @@ L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)
     clec = L_cc(lec);
     if(clec != 0 && !L_link(dbv, dbs, clec)) {
         nb = KSMPL(dbv)->s_nb;
-        vec = (IODE_REAL*) SW_nalloc(nb * sizeof(IODE_REAL));
+        vec = (double*) SW_nalloc(nb * sizeof(double));
         for(t = 0 ; t < nb ; t++) {
             vec[t] = L_exec(dbv, dbs, clec, t);
         }

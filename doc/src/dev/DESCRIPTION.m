@@ -235,7 +235,7 @@ Functions for manipulating PERIOD and SAMPLE in IODE.
 | Syntax                                        | Description  
 | ~cint PER_nb(int ch)                          | gives the nbr of periods in one year for the periodicity ch
 | ~cint PER_nbper(PERIOD* period)               | retrieves the number of periods in one year in a period
-| ~cIODE_REAL PER_per2real(PERIOD* from, int i) | adds a number of sub-periods to a PERIOD and returns a         numerical representation of the result (used mainly for tables and graphs formatting).
+| ~cdouble PER_per2real(PERIOD* from, int i) | adds a number of sub-periods to a PERIOD and returns a         numerical representation of the result (used mainly for tables and graphs formatting).
 ..te
 
 &TI yy.c
@@ -244,7 +244,7 @@ Helper functions for reading and writing IODE ascii files.
 
 ..tb
 | Syntax                                          | Description  
-| ~cIODE_REAL K_read_real(YYFILE *yy)             | reads a token on the YY stream and interprets the token as a IODE_REAL (double) if possible.
+| ~cdouble K_read_real(YYFILE *yy)             | reads a token on the YY stream and interprets the token as a double (double) if possible.
 | ~clong K_read_long(YYFILE* yy)                  | reads the next token on the YY stream and returns a long. 
 | ~cchar* K_read_str(YYFILE* yy)                  | reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.  
 | ~cPERIOD *K_read_per(YYFILE* yy)                | reads the next tokens on the YY stream and tries to interpret them as a PERIOD definition ({long}{char}{long}).
@@ -331,10 +331,10 @@ Functions acting on workspaces of variables.
 | ~cvoid KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                  | Merges 2 KDB of variables, then deletes the second one.
 | ~cint KV_add(char* varname)                                             | Adds a new variable in KV_WS. Fills it with L_NAN.
 | ~cdouble KV_get(KDB *kdb, int pos, int t, int mode)                     | Gets VAR[t]  where VAR is the series in position pos in kdb. 
-| ~cvoid KV_set(KDB *kdb, int pos, int t, int mode, IODE_REAL new)        | Sets VAR[t], where VAR is the series in position pos in kdb. 
+| ~cvoid KV_set(KDB *kdb, int pos, int t, int mode, double new)        | Sets VAR[t], where VAR is the series in position pos in kdb. 
 | ~cint KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)   | Extrapolates variables on a selected SAMPLE according to one of the available methods.
 | ~cKDB *KV_aggregate(KDB *dbv, int method, char *pattern, char *filename)| Creates a new KDB with variables created by aggregation based on variable names._
-| ~cvoid KV_init_values_1(IODE_REAL* val, int t, int method)              | Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
+| ~cvoid KV_init_values_1(double* val, int t, int method)              | Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
 | ~cdouble KV_get_at_t(char*varname, int t)                               | Retrieves the value of varname[t] 
 | ~cdouble KV_get_at_per(char*varname, PERIOD* per)                       | Retrieves the value of varname[per] 
 | ~cdouble KV_get_at_aper(char*varname, char* aper)                       | Retrieves the value of varname[aper]
@@ -379,7 +379,7 @@ How to create IODE objects using K_add():
 | Lists       | K_add(KDB* kdb, char* name, char* list)
 | Scalars     | K_add(KDB* kdb, char* name, SCL* scalar)
 | Tables      | K_add(KDB* kdb, char* name, TBL *tbl) 
-| Variables   | K_add(KDB* kdb, char* name, IODE_REAL* var, int nb_obs) [nb_obs = kdb SAMPLE size]
+| Variables   | K_add(KDB* kdb, char* name, double* var, int nb_obs) [nb_obs = kdb SAMPLE size]
 ..te
 
 Note: the name of an equation MUST be the name of its endogenous variable.
@@ -425,7 +425,7 @@ Functions for "packing" and "unpacking" IODE objects.
 | ~cint K_lpack(char** pack, char* a1)                 | Packs an IODE LST object 
 | ~cint K_spack(char **pack, char *a1)                 | Packs an IODE SCL object 
 | ~cint K_tpack(char** pack, char* a1)                 | Packs an IODE TBL object 
-| ~cint K_vpack(char **pack, IODE_REAL *a1, int *a2)   | Packs an IODE VAR object. 
+| ~cint K_vpack(char **pack, double *a1, int *a2)   | Packs an IODE VAR object. 
 | ~cint K_opack(char** pack, char* a1, int* a2)        | Reserved for future new objects
 ..te
 
@@ -462,8 +462,8 @@ List of functions
 | ~cchar* K_optr0(KDB *kdb, char* name)             | ~ kdb[name][0]
 | ~cchar *K_oval1(KDB* kdb, int pos)                | ~ kdb[pos][1]
 | ~cchar* K_optr1(KDB *kdb, char* name)             | ~ kdb[name][1]
-| ~cIODE_REAL *K_vval(KDB* kdb, int pos, int t)     | ~ kdb[pos][t]
-| ~cIODE_REAL *K_vptr(KDB* kdb, char* name, int t)  | ~ kdb[name][t]
+| ~cdouble *K_vval(KDB* kdb, int pos, int t)     | ~ kdb[pos][t]
+| ~cdouble *K_vptr(KDB* kdb, char* name, int t)  | ~ kdb[name][t]
 | ~cEQ* K_eptr(KDB* kdb, char* name)                | ~ kdb[name]
 | ~cTBL* K_tptr(KDB* kdb, char* name)               | ~ kdb[name]
 | ~bEquation tests          
@@ -727,8 +727,8 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 
 ..tb
 | Syntax                                    | Description    
-| ~cIODE_REAL *L_getvar(KDB* kdb, int pos)  | Retrieves a pointer to the first element of a VAR.  
-| ~cIODE_REAL L_getscl(KDB* kdb, int pos)   | Retrieves a scalar value.
+| ~cdouble *L_getvar(KDB* kdb, int pos)  | Retrieves a pointer to the first element of a VAR.  
+| ~cdouble L_getscl(KDB* kdb, int pos)   | Retrieves a scalar value.
 | ~cSAMPLE *L_getsmpl(KDB* kdb)             | Retrieves the sample of a KDB.
 | ~cint L_findscl(KDB* kdb, char *name)     | Retrieves a scalar position.
 | ~cint L_findvar(KDB* kdb, char* name)     | Retrieves a variable position.
@@ -944,7 +944,7 @@ Some of IODE report commands line $ExcelGet are implemented here.
 | ~cint B_ExcelSave(char *arg)
 | ~cint B_ExcelSaveAs(char *arg)
 | ~cint B_ExcelNew(char *arg)
-| ~cint IodeFmtVal(char *buf, IODE_REAL val)
+| ~cint IodeFmtVal(char *buf, double val)
 ..te
 
 >

@@ -17,7 +17,7 @@
  *      int DIF_skip_to(YYFILE* yy, int skey)                               Moves forward to the keyword skey or EOF or EOD.
  *      int DIF_cell(YYFILE* yy, char** str, double* value)                 Reads the next cell which can contain a real or a string.
  *      int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)                            Reads the header of a DIF file and determines the sample of the content.
- *      int IMP_vec_dif(YYFILE* yy, char* name, int dim, IODE_REAL* vector) Reads a VAR name and values in a DIF file.
+ *      int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector) Reads a VAR name and values in a DIF file.
  *      int IMP_end_dif()                                                   Cleanup the DIF global variables.
  *
  */
@@ -184,10 +184,10 @@ done :
  *  @param [in, out] YYFILE*    yy      open YY stream
  *  @param [out]     char*      name    name of the series
  *  @param [in]      int        dim     nb of values to read
- *  @param [out]     IODE_REAL* vector  pointer to the values
+ *  @param [out]     double* vector  pointer to the values
  *  @return          int             0 if a all values have been read, -1 if EOF or EOD is reached before
  */
-int IMP_vec_dif(YYFILE* yy, char* name, int dim, IODE_REAL* vector)
+int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)
 {
     int     i, rc = 0;
     char    *str = NULL;
@@ -202,7 +202,7 @@ int IMP_vec_dif(YYFILE* yy, char* name, int dim, IODE_REAL* vector)
     for(i = 0; i < dim; i++) {
         rc = DIF_cell(yy, NULL, &value);
         if(rc < 0) return(-1);
-        vector[i] = (IODE_REAL) value;
+        vector[i] = (double) value;
     }
 
     DIF_skip_to(yy, DIF_BOT);

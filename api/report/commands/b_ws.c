@@ -27,7 +27,7 @@
  * int B_WsAggrSum(char* arg)                        $WsAggrSum pattern filename
  * int B_WsAggrProd(char* arg)                       $WsAggrProd pattern filename
  * int B_WsAggrMean(char* arg)                       $WsAggrMean pattern filename
- * IODE_REAL *B_StatUnitRoot_1(char* arg, int print) Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
+ * double *B_StatUnitRoot_1(char* arg, int print) Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
  * int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
  * int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
  * int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
@@ -112,7 +112,7 @@ int X_findtype(char* filename)
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019
     if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(K_CSV); // Correction JMP 25/3/2019
-    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas très cohérent...
+    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas trï¿½s cohï¿½rent...
 
     // Sais plus a quoi ca peut servir... => a supprimer
     for(i = 16 ; strcmp(k_ext[i], "xxx") !=0 ; i++) {
@@ -566,15 +566,15 @@ int B_WsAggrMean(char* arg)
  *  
  *  @param [in] arg         See B_StatUnitRoot()
  *  @param [in] print       0 to not print, print otherwise
- *  @return     IODE_REAL*  result of E_UnitRoot()
+ *  @return     double*  result of E_UnitRoot()
  */
 
-IODE_REAL *B_StatUnitRoot_1(char* arg, int print)
+double *B_StatUnitRoot_1(char* arg, int print)
 {
     int     lg, drift, trend, order, rc = -1;
     char    name[80], buf[1024];
-    IODE_REAL    *df = NULL;
-    extern  IODE_REAL *E_UnitRoot();
+    double    *df = NULL;
+    extern  double *E_UnitRoot();
 
     lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     drift = atoi(name);
@@ -622,7 +622,7 @@ IODE_REAL *B_StatUnitRoot_1(char* arg, int print)
 int B_StatUnitRoot(char* arg)
 {
     int     rc = -1;
-    IODE_REAL    *df;
+    double    *df;
 
     df = B_StatUnitRoot_1(arg, 1);
     if(df) rc = 0;

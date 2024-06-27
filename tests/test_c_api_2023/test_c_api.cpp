@@ -276,7 +276,7 @@ public:
 	{
 	    char*       lst;
 	    SAMPLE*     smpl;
-	    IODE_REAL   A[64], B[64];
+	    double   A[64], B[64];
 	    int         nb, i, pos;
 	    static int  done = 0;
 	
@@ -335,7 +335,7 @@ public:
 	    return(diff < 1e-5);
 	}
 
-	void U_test_lec(char* title, char* lec, int t, IODE_REAL expected_val)
+	void U_test_lec(char* title, char* lec, int t, double expected_val)
 	{
 	    CLEC*   clec;
 	    //char    buf[256];
@@ -625,7 +625,7 @@ public:
 	{
 	    char    arg[256];
 	    int     rc, cond, nb, pos;
-	    IODE_REAL *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
+	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    // 1. Copy full VAR file (Att: * required)
 	    B_WsClearAll("");
@@ -703,7 +703,7 @@ public:
 	{
 	    int         rc, cond, nb, pos;
 	    char        arg[256];
-	    IODE_REAL   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
+	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
@@ -755,7 +755,7 @@ public:
 
 	int U_test_B_WsExtrapolate(int method, double expected_value)
 	{
-	    IODE_REAL   *ACAF, ACAF2002;
+	    double   *ACAF, ACAF2002;
 	    char        arg[512];
 	    int         pos, rc, nb,cond;
 	
@@ -792,7 +792,7 @@ public:
 
 	int U_test_B_WsAggregate()
 	{
-	    IODE_REAL   A_2000, B_2000, AC_2000;
+	    double   A_2000, B_2000, AC_2000;
 	    char        arg[512];
 	    int         rc, cond;
 	
@@ -1106,15 +1106,15 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
 
 TEST_F(IodeCAPITest, Tests_LEC)
 {
-    IODE_REAL *A, *B;
+    double *A, *B;
 
     U_test_print_title("Tests LEC");
 
     // Create objects
     U_test_CreateObjects();
 
-    A = (IODE_REAL*)KVPTR("A");
-    B = (IODE_REAL*)KVPTR("B");
+    A = (double*)KVPTR("A");
+    B = (double*)KVPTR("B");
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
@@ -1421,7 +1421,7 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     int         rc;
     void        (*kmsg_super_ptr)(const char*);
     SAMPLE      *smpl;
-    IODE_REAL   r2, *df;
+    double   r2, *df;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation");
@@ -1550,7 +1550,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 {
     char        *lst, buf[512];
     int         rc, i, cond;
-    IODE_REAL   *A1, val;
+    double   *A1, val;
     SAMPLE      *smpl;
     char        *filename = "fun";
 
@@ -1876,7 +1876,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     char        idtexec[] = "2002Y1 2007Y1 C D";
     char        idtexec2[] = "2002Y1 2007Y1 C D";
     int         rc;
-    IODE_REAL   *C, *D;
+    double   *C, *D;
 
     U_test_print_title("Tests B_IDT");
 
@@ -1918,8 +1918,8 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
 
 
     // Check the values
-    C = (IODE_REAL*)KVPTR("C");
-    D = (IODE_REAL*)KVPTR("D");
+    C = (double*)KVPTR("C");
+    D = (double*)KVPTR("D");
 
     EXPECT_TRUE(U_test_eq(D[1], L_NAN));
     EXPECT_TRUE(U_test_eq(D[2], 2.0 + 4.0));

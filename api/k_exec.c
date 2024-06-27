@@ -376,7 +376,7 @@ static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name)
         if(pos < 0) continue;
         KSOVAL(dbv, j) = KV_alloc_var(vsmpl->s_nb);
         memcpy(KVVAL(dbv, j, start), KVVAL(dbv_tmp, pos, start_tmp),
-               sizeof(IODE_REAL) * smpl.s_nb);
+               sizeof(double) * smpl.s_nb);
         if(KEXEC_TRACE)
             W_printf("%s ", KONAME(dbv, j));
         nb_found++;

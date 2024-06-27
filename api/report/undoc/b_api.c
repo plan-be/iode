@@ -381,8 +381,8 @@ double *IodeGetSampleAsDoubles(int *lg)
     from = &smpl->s_p1;
     for(t = 0;  t < smpl->s_nb; t++) {
         per = PER_nbper(from);
-        value[t] = (IODE_REAL) from->p_y + (from->p_s + t - 1)/per
-                   + ((from->p_s + t - 1) % per)/ (IODE_REAL) per;
+        value[t] = (double) from->p_y + (from->p_s + t - 1)/per
+                   + ((from->p_s + t - 1) % per)/ (double) per;
     }
 
     return(value);

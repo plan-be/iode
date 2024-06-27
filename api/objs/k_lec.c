@@ -3,8 +3,8 @@
  *
  * Functions implementing the interface between the LEC functions and the IODE KDB's.
  *  
- *      IODE_REAL *L_getvar(KDB* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
- *      IODE_REAL L_getscl(KDB* kdb, int pos)   Retrieves a scalar value.
+ *      double *L_getvar(KDB* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
+ *      double L_getscl(KDB* kdb, int pos)   Retrieves a scalar value.
  *      SAMPLE *L_getsmpl(KDB* kdb)             Retrieves the sample of a KDB.
  *      int L_findscl(KDB* kdb, char *name)     Retrieves a scalar position.
  *      int L_findvar(KDB* kdb, char* name)     Retrieves a variable position.
@@ -20,7 +20,7 @@
  *  @return             IODE_READ   pointer to the first value of the variable
  *  
  */
-IODE_REAL *L_getvar(KDB* kdb, int pos)
+double *L_getvar(KDB* kdb, int pos)
 {
     return(KVVAL(kdb, pos, 0));
 }
@@ -34,7 +34,7 @@ IODE_REAL *L_getvar(KDB* kdb, int pos)
  *  @return             IODE_READ   value of the scalar
  *  
  */
-IODE_REAL L_getscl(KDB* kdb, int pos)
+double L_getscl(KDB* kdb, int pos)
 {
     SCL *scl;
 

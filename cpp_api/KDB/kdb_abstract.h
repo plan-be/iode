@@ -14,7 +14,7 @@
 // using is the C++11 version of typedef
 using Comment = std::string;
 using List = std::string;
-using Variable = std::vector<IODE_REAL>;
+using Variable = std::vector<double>;
 
 
 const static char DB_GLOBAL       = (char) 0;       //< K_WS[iode_type]

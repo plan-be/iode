@@ -297,8 +297,8 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_DW]) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_LOGLIK]) / 1e6, 83.810104);
 
-    IODE_REAL max_value;
-    IODE_REAL min_value;
+    double max_value;
+    double min_value;
 
     // Observed values
     Variable obs = est.get_observed_values("ACAF");

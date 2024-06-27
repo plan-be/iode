@@ -47,7 +47,7 @@ static int B_WsTrendAll(char* arg, int std)
 {
     int         lg, nb, rc = 0, i, shift = 0, /* lambda,*/ beg, dim = 0;
     char        file[K_MAX_FILE + 1], **data = NULL;
-    IODE_REAL   *t_vec = NULL, *f_vec = NULL, lambda; // JMP 22/1/2019
+    double   *t_vec = NULL, *f_vec = NULL, lambda; // JMP 22/1/2019
     KDB         *from = NULL, *to = NULL;
     SAMPLE      *t_smpl = NULL;
 
@@ -71,12 +71,12 @@ static int B_WsTrendAll(char* arg, int std)
     to = K_create(K_VAR, UPPER_CASE);
     nb = t_smpl->s_nb;
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
-    t_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
-    f_vec = (IODE_REAL *) SW_nalloc(nb * sizeof(IODE_REAL));
+    t_vec = (double *) SW_nalloc(nb * sizeof(double));
+    f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
     for(i = 0; i < KNB(from); i++) {
         memcpy(f_vec,
-               KVVAL(from, i, 0) + shift, nb * sizeof(IODE_REAL));
+               KVVAL(from, i, 0) + shift, nb * sizeof(double));
 
         HP_test(f_vec, t_vec, nb, &beg, &dim);
         HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std); //  JMP 12/4/2019

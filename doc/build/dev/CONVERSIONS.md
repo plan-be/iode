@@ -378,7 +378,7 @@ Functions to import variables and comments in ASCII format.
 |Syntax|Description|
 |:---|:---|
 |`int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) in an ASCII variable file.|
-|`int IMP_vec_asc(YYFILE* yy, char* name, int dim, IODE_REAL* vector)`|Reads a VAR name and values in an ASCII variable file format.|
+|`int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in an ASCII variable file format.|
 |`int IMP_hd_casc(IMPDEF* impdef, char* file, int lang)`|Opens an ASCII comment file for reading with the YY library functions.|
 |`int IMP_vec_casc(char* name, char** cmt)`|Reads one comment on the open YY stream.|
 
@@ -403,7 +403,7 @@ See also k\_edif.c for an example of DIF format.
 |`int DIF_skip_to(YYFILE* yy, int skey)`|Moves forward to the keyword skey or EOF or EOD.|
 |`int DIF_cell(YYFILE* yy, char** str, double* value)`|Reads the next cell which can contain a real or a string.|
 |`int IMP_hd_dif(YYFILE* yy, SAMPLE* smpl)`|Reads the header of a DIF file and determines the sample of the content.|
-|`int IMP_vec_dif(YYFILE* yy, char* name, int dim, IODE_REAL* vector)`|Reads a VAR name and values in a DIF file.|
+|`int IMP_vec_dif(YYFILE* yy, char* name, int dim, double* vector)`|Reads a VAR name and values in a DIF file.|
 |`int IMP_end_dif()`|Cleanup the DIF global variables.|
 
 ### k\_ibst.c {#T41}
@@ -499,7 +499,7 @@ Functions to import variables in rotated ASCII format.
 |Syntax|Description|
 |:---|:---|
 |`int IMP_hd_rasc(YYFILE* yy, SAMPLE* smpl)`|Reads the sample (required) and the list of VARs in a rotated ASCII variable file.|
-|`int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, IODE_REAL* value)`|Reads one value in an ASCII variable file format.|
+|`int IMP_elem_rasc(YYFILE* yy, char* name, int* shift, double* value)`|Reads one value in an ASCII variable file format.|
 |`int IMP_end_rasc()`|Frees the allocated vars during the rotated ASCII file import session.|
 
 ### k\_itxt.c {#T56}

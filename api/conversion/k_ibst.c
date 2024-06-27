@@ -57,7 +57,7 @@ int IMP_elem_bst(yy, name, shift, vector)
 YYFILE  *yy;
 char    *name;
 int     *shift;
-IODE_REAL    *vector;
+double    *vector;
 {
     char    buf[21], *str = NULL;
     long    y, s, nbper;

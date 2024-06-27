@@ -373,8 +373,8 @@ Hodrick-Prescott filter. These functions are subfunctions of L_hp*() defined on 
 
 ..tb
 | Syntax | Description
-| ~cint HP_calc(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, IODE_REAL lambda, int std) | Hodrick-Prescott filter. 
-| ~cvoid HP_test(IODE_REAL *f_vec, IODE_REAL *t_vec, int nb, int *beg, int *dim)       | Prepares HP_calc()
+| ~cint HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std) | Hodrick-Prescott filter. 
+| ~cvoid HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)       | Prepares HP_calc()
 ..te
 >
 <LEC virtual functions>
@@ -386,8 +386,8 @@ Implemention of the LEC library virtual functions for SCL and VAR references.
 
 ..tb
 | Syntax                                    | Description    
-| ~cIODE_REAL *L_getvar(KDB* kdb, int pos)  | Retrieves a pointer to the first element of a VAR.  
-| ~cIODE_REAL L_getscl(KDB* kdb, int pos)   | Retrieves a scalar value.
+| ~cdouble *L_getvar(KDB* kdb, int pos)  | Retrieves a pointer to the first element of a VAR.  
+| ~cdouble L_getscl(KDB* kdb, int pos)   | Retrieves a scalar value.
 | ~cSAMPLE *L_getsmpl(KDB* kdb)             | Retrieves the sample of a KDB.
 | ~cint L_findscl(KDB* kdb, char *name)     | Retrieves a scalar position.
 | ~cint L_findvar(KDB* kdb, char* name)     | Retrieves a variable position.

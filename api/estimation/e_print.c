@@ -357,13 +357,13 @@ int E_graph(char** titles, SAMPLE* smpl, MAT* mlhs, MAT* mrhs, int view, int res
 {
     char    buf[256], lhs[80], rhs[80];
     int     i, t, nt, ng;
-    IODE_REAL    *y;
+    double    *y;
     extern char *KLG_OBS[], *KLG_CALC[], *KLG_RES[];
 
     ng = M_NL(mlhs);
     nt = M_NC(mlhs);
 
-    y = (IODE_REAL *)SW_nalloc(sizeof(IODE_REAL) * nt);
+    y = (double *)SW_nalloc(sizeof(double) * nt);
 
     for(i = 0; i < ng && res == 0; i ++) {
         if(view) W_InitDisplay();

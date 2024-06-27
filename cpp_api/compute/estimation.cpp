@@ -23,7 +23,7 @@ std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method,
 }
 
 // Note: +/- the same as E_SclToReal()
-static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, IODE_REAL* res, const int pos)
+static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, double* res, const int pos)
 {
     kdb->add(coeff_name, res[pos], (res[pos+1] < 1.0) ? res[pos+1]: 1.0, (!L_IS0(res[pos+2])) ? res[pos]/res[pos+2] : L_NAN);
 }
@@ -33,7 +33,7 @@ static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, IO
 //                    Then, why not working on a local KDB of scalars ?
 KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
 {
-    IODE_REAL* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
+    double* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
     if(!res)
     {
         IodeExceptionFunction error("Cannot perform Unit Root (Dickey Fuller test)", "Unknown");

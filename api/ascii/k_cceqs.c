@@ -314,12 +314,12 @@ err:
  *  
  *  @param [in, out]    fd      FILE*       output stream    
  *  @param [in]         txt     char*       keyword of the test (ex. "DW")
- *  @param [in]         val     IODE_REAL   value of the stat test
+ *  @param [in]         val     double   value of the stat test
  *  @return 
  *  
  */
 
-static void KE_print_test(FILE* fd, char* txt, IODE_REAL val)
+static void KE_print_test(FILE* fd, char* txt, double val)
 {
     if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %.8lg\n", txt, val); /* JMP 05-09-2022 : .15 -> .8 */
     //if(val != 0 && L_ISAN(val)) fprintf(fd, "\t%s %lg\n", txt, val); /* JMP 05-09-2022 */

@@ -53,11 +53,11 @@ public:
         return new KDBVariables(this, deep_copy, pattern);
     }
 
-    IODE_REAL get_var(const int pos, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const int pos, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const int pos, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const int pos, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const int pos, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const int pos, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
     /**
      *  Returns a pointer to the first value of the Variable. 
@@ -65,13 +65,13 @@ public:
      *  @param    pos   int        Variable position in the workspace   
      *  @return         double*    pointer to the Variable values
      */
-    IODE_REAL* get_var_ptr(const int pos);
+    double* get_var_ptr(const int pos);
 
-    IODE_REAL get_var(const std::string& name, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const std::string& name, const int t, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const std::string& name, const std::string& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
-    IODE_REAL get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
+    double get_var(const std::string& name, const Period& period, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL) const;
 
     /**
      *  Returns a pointer to the first value of the Variable. 
@@ -79,19 +79,19 @@ public:
      *  @param    name   std::string   variable name   
      *  @return          double*       pointer to the Variable values
      */
-    IODE_REAL* get_var_ptr(const std::string& name);
+    double* get_var_ptr(const std::string& name);
 
-    void set_var(const int pos, const int t, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const int pos, const int t, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const int pos, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const int pos, const std::string& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const int pos, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const int pos, const Period& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const int t, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const std::string& name, const int t, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const std::string& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const std::string& name, const std::string& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
-    void set_var(const std::string& name, const Period& period, const IODE_REAL value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
+    void set_var(const std::string& name, const Period& period, const double value, const EnumIodeVarMode mode = I_VAR_MODE_LEVEL);
 
     int add(const std::string& name, const Variable& variable);
 

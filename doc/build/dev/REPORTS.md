@@ -235,8 +235,8 @@ Note that this is not the exact result of a report execution: to keep some expre
 |`char *RP_gmacro(char* str)`|Calculates a macro value. The macro may contain expressions between \{\} or @\-functions|
 |`char *RP_gcmd(char* str)`|Calculates the value of an expression between curly brackets.|
 |`int RP_evaltime()`|Calculates RP\_T, the position in the current sample of the current calculation period RP\_PER.|
-|`IODE_REAL RP_evallec(char* lec)`|Evaluates a LEC expression in (the period) RP\_PER.|
-|`int RP_fmt(char* buf, char* format, IODE_REAL value)`|Formats a double.|
+|`double RP_evallec(char* lec)`|Evaluates a LEC expression in (the period) RP\_PER.|
+|`int RP_fmt(char* buf, char* format, double value)`|Formats a double.|
 |`int RP_eval(char** res, char* farg)`|Interprets strings between accolades found in a report line.|
 |`int RP_add(char** line, int* lg, int* j, char* res)`|Reallocates the string line (of length \*lg) in order to concatanate res from the position \*j.|
 |`int RP_expand(char** line, char* buf)`|Expands a report line by replacing macros, lec expressions and @\-functions par their calculated values|
@@ -827,7 +827,7 @@ Functions related to WS management (clear, load, save, sample, import...).
 |`int B_WsAggrSum(char* arg)`|$WsAggrSum pattern filename|
 |`int B_WsAggrProd(char* arg)`|$WsAggrProd pattern filename|
 |`int B_WsAggrMean(char* arg)`|$WsAggrMean pattern filename|
-|`IODE_REAL *B_StatUnitRoot_1(char* arg, int print)`|Sub function of B\_StatUnitRoot() with an optional parameter to print the result (or not).|
+|`double *B_StatUnitRoot_1(char* arg, int print)`|Sub function of B\_StatUnitRoot() with an optional parameter to print the result (or not).|
 |`int B_StatUnitRoot(char* arg)`|$StatUnitRoot drift trend order expression|
 |`int B_CsvSave(char* arg, int type)`|$CsvSave<type> file name1 name2 ...|
 |`int B_CsvNbDec(char *nbdec)`|$CsvNbDec nn|
@@ -940,8 +940,8 @@ Functions (and their subfunctions) to print IODE object definitions.
 
 |Syntax|Description or equivalent in Reports|||
 |:---|:---|:---|:---|
-|`int B_PrintVal(IODE_REAL val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
-|`IODE_REAL B_calc_ttest(SCL* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
+|`int B_PrintVal(double val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
+|`double B_calc_ttest(SCL* scl)`|Return the t\-test of a scalar or L\_NAN if it cannot be determined.|||
 |`int B_replesc(unsigned char* out, unsigned char* in)`|Replace \\ by / in a string|||
 |`int B_PrintDefGnl(char* name, char* text)`|Print an object name and its title in an enum\_1 paragraph.|||
 |`int B_isdef(char* txt)`|Checks if a string contains non space charaters.|||

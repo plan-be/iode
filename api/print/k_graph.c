@@ -17,9 +17,9 @@
  *      int T_GraphTitle(char *txt)                                             Defines the graph title by sending a2m command ".gtitle" to W_printf().
  *      int T_GraphLegend(int axis, int type, char *txt, char *fileop)          Adds (in A2M) graph *time* axis (.gty or .gtz, see a2m language) with its position, type and title.
  *      int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)        Adds (in A2M) graph *xy* axis with its position, type and title.
- *      int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y)                         Adds numerical data on a *time* graph line or bar.
- *      int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y)                   Adds numerical data on a *xy* graph line or bar.
- *      int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSAMPLE. 
+ *      int T_GraphTimeData(SAMPLE *smpl, double *y)                         Adds numerical data on a *time* graph line or bar.
+ *      int T_GraphXYData(int nb, double *x, double *y)                   Adds numerical data on a *xy* graph line or bar.
+ *      int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSAMPLE. 
  *      int T_find_opf(COLS *fcls, COL *cl)                                     Tries to find the position in *fcls of the opf (operation on files) in cl.
  *      int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)                   Given a compiled GSAMPLE, constructs a new COLS struct with unique file ops and the minimum SAMPLE smpl containing all periods present in cls.
  *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, SAMPLE* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
@@ -36,9 +36,9 @@ int T_GraphTitle(char *txt);
 int T_GraphLegend(int axis, int type, char *txt, char *fileop);
 static int T_GraphLineTitle(TLINE *line, COLS *fcls, int i);
 int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
-int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y);
-int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y);
-int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls);
+int T_GraphTimeData(SAMPLE *smpl, double *y);
+int T_GraphXYData(int nb, double *x, double *y);
+int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
 int T_find_opf(COLS *fcls, COL *cl);
 int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl);
 
@@ -136,7 +136,7 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     COLS    *cls, *fcls;
     TLINE   *line;
     SAMPLE  smpl;
-    IODE_REAL    step,
+    double    step,
                  *x, *y;
     TCELL   *cell;
     extern char *KLG_OPERS_TEXTS[][3];
@@ -155,13 +155,13 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
     files = T_find_files(cls);
     if(files == 0) return(-1); /* JMP 11-06-99 */
 
-    x = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * smpl.s_nb);
+    x = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
     step = 1.0 / PER_nbper(&(smpl.s_p1));
     x[0] = PER_per2real(&(smpl.s_p1), 0);
     if(step < 1) x[0] += step/2; /* GB 23-11-2010, center Q en M  */
     for(i = 1; i < smpl.s_nb; i++) x[i] = x[i - 1] + step;
 
-    y = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * smpl.s_nb);
+    y = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
 
     //if(B_viewmode != 0) B_PrintRtfTopic(T_get_title(tbl)); /* JMP 06-01-02 */
     //if(mode != 0) B_PrintRtfTopic(T_get_title(tbl)); // JMP 11-05-2022
@@ -288,10 +288,10 @@ int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)
  *  Example of result: "2000Y1 2.3 2.5 ..."
  *  
  *  @param [in] SAMPLE*     smpl    sample of the data in y
- *  @param [in] IODE_REAL*  y       y-values
+ *  @param [in] double*  y       y-values
  *  @return     int                 0 always
  */
-int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y)
+int T_GraphTimeData(SAMPLE *smpl, double *y)
 {
     int     i = 0;
     char    buf[21];
@@ -312,11 +312,11 @@ int T_GraphTimeData(SAMPLE *smpl, IODE_REAL *y)
  *  Example of result: "1.3 3000.2     1.7 2000.3     1.1 1500.0"
  *  
  *  @param [in] int         nb  number of observations in x and y
- *  @param [in] IODE_REAL*  x   x-values
- *  @param [in] IODE_REAL*  y   y-values
+ *  @param [in] double*  x   x-values
+ *  @param [in] double*  y   y-values
  *  @return     int             0 always
  */
-int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y)
+int T_GraphXYData(int nb, double *x, double *y)
 {
     int     i = 0;
     char    bufx[21], bufy[21];
@@ -343,13 +343,13 @@ int T_GraphXYData(int nb, IODE_REAL *x, IODE_REAL *y)
  *  @param [in]  COLS*       cls    compiled GSAMPLE containing the calculated values 
  *                                  for each operation on files and periods
  *  @param [in]  SAMPLE*     smpl   SAMPLE of the data
- *  @param [in]  IODE_REAL*  x      unused  
- *  @param [out] IODE_REAL*  y      data of the 
+ *  @param [in]  double*  x      unused  
+ *  @param [out] double*  y      data of the 
  *  @param [in]  COLS*       fcls   
  *  @return 
  *  
  */
-int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)
+int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TLINE   *line = T_L(tbl) + i;
@@ -467,7 +467,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
 {
     char    *buf, **vars;
     int     i, t, ng, var_nb, rc = 0;
-    IODE_REAL    *y;
+    double    *y;
     extern char *KLG_MODES[][3];        /* JMP38 01-10-92 */
 
     vars = (char **)SCR_vtoms(names, "+-");
@@ -477,7 +477,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         return(-1);
     }
 
-    y = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * nt);
+    y = (double *) SW_nalloc(sizeof(double) * nt);
 
     T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
@@ -496,8 +496,8 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         }
 
         for(t = 0; t < nt; t++) {
-            //y[t] = (IODE_REAL ) KV_get(kdb, var_nb, dt + t, (int)global_VM);
-            y[t] = (IODE_REAL ) KV_get(kdb, var_nb, dt + t, mode);
+            //y[t] = (double ) KV_get(kdb, var_nb, dt + t, (int)global_VM);
+            y[t] = (double ) KV_get(kdb, var_nb, dt + t, mode);
         }
         T_GraphLegend(0, "LLBL"[type], vars[i], NULL);
         /*        T_GraphLegend(0, "LBLL"[type], vars[i], NULL); */
@@ -594,7 +594,7 @@ typedef struct _apichrt {
     char    **ChrtTitle;
     char    *ChrtType;
     int     *ChrtAxis;
-    IODE_REAL    **ChrtData;
+    double    **ChrtData;
     int     ChrtI;
     int     ChrtNb;
 } APICHRT;
@@ -604,9 +604,9 @@ APICHRT **API_CHARTS = 0;
 int     API_NBCHARTS = 0;
 
 // Functions declarations 
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls);
-int APIGraphTimeData(int hdl, SAMPLE *smpl, IODE_REAL *y);
-int APIGraphTitle(int hdl, char *txt, IODE_REAL *x, int nb);
+int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls);
+int APIGraphTimeData(int hdl, SAMPLE *smpl, double *y);
+int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
 int APIGraphLineTitle(int hdl, TLINE *line, COLS *fcls, int i);
 APICHRT *APIChartInit(int nl);
@@ -622,7 +622,7 @@ double *APIChartData(int hdl, int i);
 int APIPrepareChart(TBL *tbl, char *gsmpl);
 
 
-int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x, IODE_REAL *y, COLS *fcls)
+int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TLINE   *line = T_L(tbl) + i;
@@ -651,15 +651,15 @@ int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, IODE_REAL *x
  *  
  *  @param [in] int         hdl  
  *  @param [in] SAMPLE*     smpl 
- *  @param [in] IODE_REAL*  y    
+ *  @param [in] double*  y    
  *  @return 
  */
-int APIGraphTimeData(int hdl, SAMPLE *smpl, IODE_REAL *y)
+int APIGraphTimeData(int hdl, SAMPLE *smpl, double *y)
 {
     int         nb = smpl->s_nb;
     APICHRT    *Chrt = API_CHARTS[hdl];
-    Chrt->ChrtData[Chrt->ChrtI] = (double *)SW_nalloc(sizeof(IODE_REAL) * nb);
-    memcpy(Chrt->ChrtData[Chrt->ChrtI], y, sizeof(IODE_REAL) * nb);
+    Chrt->ChrtData[Chrt->ChrtI] = (double *)SW_nalloc(sizeof(double) * nb);
+    memcpy(Chrt->ChrtData[Chrt->ChrtI], y, sizeof(double) * nb);
     return(0);
 }
 
@@ -668,11 +668,11 @@ int APIGraphTimeData(int hdl, SAMPLE *smpl, IODE_REAL *y)
  *  
  *  @param [in] int         hdl 
  *  @param [in] char*       txt 
- *  @param [in] IODE_REAL*  x   
+ *  @param [in] double*  x   
  *  @param [in] int         nb  
  *  @return 
  */
-int APIGraphTitle(int hdl, char *txt, IODE_REAL *x, int nb)
+int APIGraphTitle(int hdl, char *txt, double *x, int nb)
 {
     int         i = 0;
 
@@ -681,8 +681,8 @@ int APIGraphTitle(int hdl, char *txt, IODE_REAL *x, int nb)
     Chrt->ChrtTitle[Chrt->ChrtI] = SCR_stracpy(txt);
     SCR_OemToAnsi(Chrt->ChrtTitle[Chrt->ChrtI],
                   Chrt->ChrtTitle[Chrt->ChrtI]);
-    Chrt->ChrtData[Chrt->ChrtI] = (double *) SW_nalloc(sizeof(IODE_REAL) * nb);
-    memcpy(Chrt->ChrtData[Chrt->ChrtI], x, sizeof(IODE_REAL) * nb);
+    Chrt->ChrtData[Chrt->ChrtI] = (double *) SW_nalloc(sizeof(double) * nb);
+    memcpy(Chrt->ChrtData[Chrt->ChrtI], x, sizeof(double) * nb);
     Chrt->ChrtI++;
     return(0);
 }
@@ -749,7 +749,7 @@ APICHRT *APIChartInit(int nl)
     Chrt->ChrtTitle = (char **) SW_nalloc(sizeof(char *) * nl);
     Chrt->ChrtType = (char *) SW_nalloc(sizeof(char) * nl);
     Chrt->ChrtAxis = (int *) SW_nalloc(sizeof(int) * nl);
-    Chrt->ChrtData = (IODE_REAL **) SW_nalloc(sizeof(IODE_REAL *) * nl);
+    Chrt->ChrtData = (double **) SW_nalloc(sizeof(double *) * nl);
     Chrt->ChrtI = 0;
     Chrt->ChrtNb = 0;
     return(Chrt);
@@ -863,7 +863,7 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     COLS    *cls, *fcls;
     TLINE   *line;
     SAMPLE  smpl;
-    IODE_REAL    step,
+    double    step,
                  *x, *y;
     TCELL   *cell;
     extern char *KLG_OPERS_TEXTS[][3];
@@ -876,11 +876,11 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
     T_prep_smpl(cls, &fcls, &smpl);
     files = T_find_files(cls);
     if(files == 0) return(-1); /* JMP 11-06-99 */
-    x = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * smpl.s_nb);
+    x = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
     step = 1.0 / PER_nbper(&(smpl.s_p1));
     x[0] = PER_per2real(&(smpl.s_p1), 0);
     for(i = 1; i < smpl.s_nb; i++) x[i] = x[i - 1] + step;
-    y = (IODE_REAL *) SW_nalloc(sizeof(IODE_REAL) * smpl.s_nb);
+    y = (double *) SW_nalloc(sizeof(double) * smpl.s_nb);
     hdl = APIChartAlloc(T_NL(tbl));
     w = 1;
     for(i = 0; i < T_NL(tbl) && w > 0; i++) {

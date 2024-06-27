@@ -27,7 +27,7 @@
  * 
  *      int PER_nb(int ch): gives the nbr of periods in one year for the periodicity ch
  *      int PER_nbper(PERIOD* period): retrieves the number of periods in one year in a period.
- *      IODE_REAL PER_per2real(PERIOD* from, int i): adds a number of sub-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).
+ *      double PER_per2real(PERIOD* from, int i): adds a number of sub-periods to a PERIOD and returns a numerical representation of the result (used mainly for tables and graphs formatting).
  * 
  */
 
@@ -157,12 +157,12 @@ PERIOD  *PER_addper(PERIOD *period, int shift)
     }
     else {
         shiftper = per.p_s + shift;
-        if(shiftper <= 0) { // année recule
+        if(shiftper <= 0) { // annï¿½e recule
             backw = 1 + (-shiftper) / nb_per;
             per.p_y -= backw;
             per.p_s = backw * nb_per + shiftper;
         }
-        else { // année inchangée
+        else { // annï¿½e inchangï¿½e
             per.p_s = shiftper;
         }
     }
@@ -409,19 +409,19 @@ int PER_nbper(PERIOD* period)
  *  
  *  @param [in] from    PERIOD*
  *  @param [in] i       int
- *  @return             IODE_REAL
+ *  @return             double
  *  
  */
-IODE_REAL PER_per2real(PERIOD* from, int i)
+double PER_per2real(PERIOD* from, int i)
 {
     int     per;
-    IODE_REAL    value;
+    double    value;
 
     per = PER_nbper(from);
     if(per == 0) return(0.0);
-    value = (IODE_REAL) from->p_y + 
+    value = (double) from->p_y + 
             (from->p_s + i - 1) / per + 
-            ((from->p_s + i - 1) % per)/ (IODE_REAL) per;
+            ((from->p_s + i - 1) % per)/ (double) per;
 
     return(value);
 }
