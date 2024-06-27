@@ -790,7 +790,7 @@ U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     int     pos, i;
-    KDB     *kdb = K_WS[K_LST];
+    KDB     *kdb = K_WS[LISTS];
 
     if(kdb == NULL) return(res);
 
@@ -1297,7 +1297,7 @@ U_ch *RPF_iexpand(U_ch **args)
  */
 U_ch *RPF_lexpand(U_ch **args)
 {
-    return(RPF_expand(args, K_LST));
+    return(RPF_expand(args, LISTS));
 }
 
 

@@ -63,7 +63,7 @@ int B_DSTimedOut(char *name)
     char    buf[81];
 
     sprintf(buf, "_DSTIMEO %s", name);
-    B_DataAppend(buf, K_LST);
+    B_DataAppend(buf, LISTS);
     return(0);
 }
 

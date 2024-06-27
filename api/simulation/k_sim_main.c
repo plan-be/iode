@@ -389,7 +389,7 @@ static int K_diverge(int t, char* lst, double eps)
     double      d, pd;
 
     // Delete lst 
-    //if(B_DataExist(lst, K_LST) >= 0) B_DataDelete(lst, K_LST);
+    //if(B_DataExist(lst, LISTS) >= 0) B_DataDelete(lst, LISTS);
     pos = K_find(KL_WS, lst);
     if(pos >= 0) K_del(KL_WS, pos);
     
@@ -417,7 +417,7 @@ static int K_diverge(int t, char* lst, double eps)
                 if(diverg) diverg = SCR_strafcat(diverg, ",");
                 diverg = SCR_strafcat(diverg, KSIM_NAME(KSIM_ORDER[i]));
                 //sprintf(buf, "%s %s", lst, KSIM_NAME(KSIM_ORDER[i]));
-                //B_DataAppend(buf, K_LST);
+                //B_DataAppend(buf, LISTS);
             }
         }
     }
@@ -743,8 +743,8 @@ static void K_lstorder_1(char* lstname, int eq1, int eqn)
 
     // D�truit la liste cible et les sous-listes
     sprintf(buf, "%s*", lstname);
-    //B_DataDelete(buf, K_LST); // Old version usign B_*() fns
-    lst_todel = K_expand(K_LST, NULL, buf, '*');
+    //B_DataDelete(buf, LISTS); // Old version usign B_*() fns
+    lst_todel = K_expand(LISTS, NULL, buf, '*');
     if(lst_todel) {
         tbl_todel = SCR_vtom(lst_todel, ';');
         for(i = 0; tbl_todel[i] ; i++)

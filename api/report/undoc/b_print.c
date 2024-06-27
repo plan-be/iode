@@ -300,7 +300,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             rc = B_PrintDefIdt(kdb, pos);
             W_flush();
             break;
-        case K_LST :
+        case LISTS :
             rc = B_PrintDefLst(kdb, pos);
             W_flush();
             break;

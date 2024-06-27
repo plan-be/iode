@@ -216,13 +216,13 @@ int KL_lst(char* name, char** lst, int chunck)
 
     nb = SCR_tbl_size(lst);
     if(nb == 0) {
-        if(K_add(K_WS[K_LST], name, "") < 0)  rc = -1;
+        if(K_add(K_WS[LISTS], name, "") < 0)  rc = -1;
         goto done;
     }
 
     if(nb < chunck || chunck < 0) { /* GB 16/10/2007 */
         str = SCR_mtov(lst, ';'); /* JMP 09-03-95 */
-        if(K_add(K_WS[K_LST], name, str) < 0)  rc = -1;
+        if(K_add(K_WS[LISTS], name, str) < 0)  rc = -1;
         SCR_free(str);
         return(rc);
     }
@@ -236,7 +236,7 @@ int KL_lst(char* name, char** lst, int chunck)
         str = SCR_mtov(lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(K_add(K_WS[K_LST], buf, str) < 0)  rc = -1;
+        if(K_add(K_WS[LISTS], buf, str) < 0)  rc = -1;
         SCR_free(str);
 
         if(i + chunck < nb)  lst[i + chunck] = ptr;
@@ -250,7 +250,7 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(K_add(K_WS[K_LST], name, str) < 0) rc = -1;
+    if(K_add(K_WS[LISTS], name, str) < 0) rc = -1;
     SW_nfree(str);
 
 done:
@@ -285,10 +285,10 @@ unsigned char **KL_expand(char *str)
     if(SCR_tbl_size(tbl) == 0) return(tbl);
     for(i = 0 ; tbl[i] ; i++) {
         if(tbl[i][0] == '$') {
-            pos = K_find(K_WS[K_LST], tbl[i] + 1);
+            pos = K_find(K_WS[LISTS], tbl[i] + 1);
             if(pos >= 0) {
                 SCR_free(tbl[i]); // plus besoin car remplac� par sa valeur
-                tbl2 = KL_expand(KLVAL(K_WS[K_LST], pos));
+                tbl2 = KL_expand(KLVAL(K_WS[LISTS], pos));
                 nb2 = SCR_tbl_size(tbl2);
                 // Insertion dans tbl de la liste � la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);

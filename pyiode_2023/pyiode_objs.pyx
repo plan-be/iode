@@ -93,7 +93,7 @@ def delete_idt(name: str):
     return delete_obj(name, IDENTITIES)
     
 def delete_lst(name: str):
-    return delete_obj(name, K_LST)
+    return delete_obj(name, LISTS)
    
 def delete_scl(name: str):
     return delete_obj(name, K_SCL)

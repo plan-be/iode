@@ -479,7 +479,7 @@ void MainWindow::open_sort_and_calculus_dialog()
 
     MenuDataSortExpandList dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_tab_and_completer(I_LISTS);
+        update_tab_and_completer(LISTS);
 }
 
 void MainWindow::open_list_calculus_dialog()
@@ -488,7 +488,7 @@ void MainWindow::open_list_calculus_dialog()
 
     MenuDataListCalculus dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_tab_and_completer(I_LISTS);
+        update_tab_and_completer(LISTS);
 }
 
 void MainWindow::open_file_contents_dialog()
@@ -497,7 +497,7 @@ void MainWindow::open_file_contents_dialog()
 
     MenuDataFileContents dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_tab_and_completer(I_LISTS);
+        update_tab_and_completer(LISTS);
 }
 
 void MainWindow::open_file_compare_dialog()
@@ -506,7 +506,7 @@ void MainWindow::open_file_compare_dialog()
 
     MenuDataFileCompare dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_tab_and_completer(I_LISTS);
+        update_tab_and_completer(LISTS);
 }
 
 void MainWindow::open_search_text_dialog()
@@ -515,7 +515,7 @@ void MainWindow::open_search_text_dialog()
 
     MenuDataSearchText dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_tab_and_completer(I_LISTS);
+        update_tab_and_completer(LISTS);
 }
 
 void MainWindow::open_scan_objects_dialog()
@@ -524,7 +524,7 @@ void MainWindow::open_scan_objects_dialog()
 
     MenuDataScanObjects dialog(this);
     if (dialog.exec() == QDialog::Accepted)
-        update_tab_and_completer(I_LISTS);
+        update_tab_and_completer(LISTS);
 }
 
 void MainWindow::open_edit_tables_variables_dialog()

@@ -65,7 +65,7 @@ public:
 class ListsWidget : public TemplateIodeObjectWidget<ListsModel, ListsView>
 {
 public:
-    ListsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_LISTS, parent) 
+    ListsWidget(QWidget* parent) : TemplateIodeObjectWidget(LISTS, parent) 
     {
         connect(objmodel, &ListsModel::dataChanged, this, &ListsWidget::databaseModified);
         connect(objmodel, &ListsModel::headerDataChanged, this, &ListsWidget::databaseModified);

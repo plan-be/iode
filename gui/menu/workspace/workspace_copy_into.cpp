@@ -57,7 +57,7 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
         case IDENTITIES:
             Identities.copy_from(input_file, object_names);
             break;
-        case I_LISTS:
+        case LISTS:
             Lists.copy_from(input_file, object_names);
             break;
         case I_SCALARS:

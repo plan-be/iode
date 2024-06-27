@@ -41,7 +41,7 @@ protected:
         case IDENTITIES:
             index = this->indexOf(tabIdentites);
             break;
-        case I_LISTS:
+        case LISTS:
             index = this->indexOf(tabLists);
             break;
         case I_SCALARS:

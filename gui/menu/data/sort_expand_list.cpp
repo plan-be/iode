@@ -5,7 +5,7 @@ MenuDataSortExpandList::MenuDataSortExpandList(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_LISTS, this);
+    completer = new IodeCompleter(false, false, LISTS, this);
     lineEdit_sort->setCompleter(completer);
 
     wLineSort = new WrapperQLineEdit(label_sort->text(), *lineEdit_sort, REQUIRED_FIELD);

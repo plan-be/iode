@@ -101,7 +101,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(COMMENTS); });
     connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(EQUATIONS); });
     connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(IDENTITIES); });
-    connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_LISTS); });
+    connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(LISTS); });
     connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_TABLES); });
     connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_VARIABLES); });
     connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(I_SCALARS); });
@@ -126,7 +126,7 @@ IodeAbstractTableView::IodeAbstractTableView(EnumIodeType iodeType, BaseDelegate
     connect(relatedCmtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(COMMENTS); });
     connect(relatedEqShortcut , &QShortcut::activated, this, [this]{ showRelatedObjs(EQUATIONS); });
     connect(relatedIdtShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(IDENTITIES); });
-    connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_LISTS); });
+    connect(relatedLstShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(LISTS); });
     connect(relatedSclShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_SCALARS); });
     connect(relatedTblShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_TABLES); });
     connect(relatedVarShortcut, &QShortcut::activated, this, [this]{ showRelatedObjs(I_VARIABLES); });

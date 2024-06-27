@@ -5,7 +5,7 @@ MenuDataListCalculus::MenuDataListCalculus(QWidget* parent)
 {
     setupUi(this);
 
-    completer = new IodeCompleter(false, false, I_LISTS, this);
+    completer = new IodeCompleter(false, false, LISTS, this);
     lineEdit_list1->setCompleter(completer);
     lineEdit_list2->setCompleter(completer);
 
@@ -38,8 +38,8 @@ MenuDataListCalculus::~MenuDataListCalculus()
 }
 
 // TODO ALD: implement a calculus() method in KDBLists + tests
-//    B_DataUpdate("LST1 A,B,C", K_LST);
-//    B_DataUpdate("LST2 C,D,E", K_LST);
+//    B_DataUpdate("LST1 A,B,C", LISTS);
+//    B_DataUpdate("LST2 C,D,E", LISTS);
 //
 //    rc = B_DataCalcLst("_RES LST1 + LST2");
 //    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E");

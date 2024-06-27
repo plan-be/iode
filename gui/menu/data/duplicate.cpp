@@ -55,7 +55,7 @@ void MenuDataDuplicateObj::duplicate()
         case IDENTITIES:
             Identities.add(dup_obj_name, Identities.copy(obj_name));
             break; 
-        case I_LISTS:
+        case LISTS:
             Lists.add(dup_obj_name, Lists.copy(obj_name));
             break; 
         case I_SCALARS:

@@ -13,7 +13,7 @@ void init_constants(nb::module_ &m)
       m.attr("I_CMT") = (int) COMMENTS;
       m.attr("I_EQS") = (int) EQUATIONS;
       m.attr("I_IDT") = (int) IDENTITIES;
-      m.attr("I_LST") = (int) I_LISTS;
+      m.attr("I_LST") = (int) LISTS;
       m.attr("I_SCL") = (int) I_SCALARS;
       m.attr("I_TBL") = (int) I_TABLES;
       m.attr("I_VAR") = (int) I_VARIABLES;

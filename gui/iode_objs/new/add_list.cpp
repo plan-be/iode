@@ -8,7 +8,7 @@ AddListDialog::AddListDialog(KDBLists* database, QWidget* parent) : QDialog(pare
 	label_title->setText("Add List");
 	label_definition->setText("List");
 
-	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_LISTS, REQUIRED_FIELD);
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, LISTS, REQUIRED_FIELD);
 	lineDefinition = new WrapperQLineEdit(label_definition->text(), *lineEdit_definition, REQUIRED_FIELD);
 }
 

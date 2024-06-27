@@ -26,9 +26,9 @@ void C_DataSearch()
 	B_display_last_error();
 
     else {
-	pos = K_find(K_WS[K_LST], vkp_search_OUT);
+	pos = K_find(K_WS[LISTS], vkp_search_OUT);
 	if(pos >= 0)
-	    SCR_strlcpy(vkp_search_RES, KLVAL(K_WS[K_LST], pos), 80);
+	    SCR_strlcpy(vkp_search_RES, KLVAL(K_WS[LISTS], pos), 80);
 	}
     PG_display_flds(vkp_search);
 }
@@ -107,7 +107,7 @@ int     type;
 	case COMMENTS :
 	case IDENTITIES :
 	case K_VAR :
-	case K_LST : return(SB_DataEditCil1(name, type));
+	case LISTS : return(SB_DataEditCil1(name, type));
 	case EQUATIONS : return(SB_DataEditEqs1(name));
 	case K_TBL :
 	case K_SCL : return(0);
@@ -377,9 +377,9 @@ void C_DataList()
 	B_display_last_error();
 
     else {
-	pos = K_find(K_WS[K_LST], vkp_dlist_NAME);
+	pos = K_find(K_WS[LISTS], vkp_dlist_NAME);
 	if(pos >= 0)
-	    SCR_strlcpy(vkp_dlist_RES, KLVAL(K_WS[K_LST], pos), 160);
+	    SCR_strlcpy(vkp_dlist_RES, KLVAL(K_WS[LISTS], pos), 160);
 	    vkp_dlist_CNT = B_DataListCount(vkp_dlist_NAME);
 	}
 
@@ -409,9 +409,9 @@ void C_DataCalcLst()
     if(B_DataCalcLst(buf)) B_display_last_error();
 
     else {
-	pos = K_find(K_WS[K_LST], vkp_calclist_OUT);
+	pos = K_find(K_WS[LISTS], vkp_calclist_OUT);
 	if(pos >= 0) {
-	    SCR_strlcpy(vkp_calclist_RES, KLVAL(K_WS[K_LST], pos), 160);
+	    SCR_strlcpy(vkp_calclist_RES, KLVAL(K_WS[LISTS], pos), 160);
 	    vkp_calclist_CNT = B_DataListCount(vkp_calclist_OUT);
 	}
     }

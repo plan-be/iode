@@ -146,16 +146,16 @@ int B_DataPattern(char* arg,int type)
             SCR_replace(rvar, "x", xvars[crow]);
             if(ncols == 0) {
                 sprintf(toappend, "%s %s", lstname, rvar);
-                if(crow == 0) B_DataUpdate(toappend, K_LST);
-                else B_DataAppend(toappend, K_LST);
+                if(crow == 0) B_DataUpdate(toappend, LISTS);
+                else B_DataAppend(toappend, LISTS);
             }
             for(ccol = 0; ccol < ncols; ccol++) {
                 strcpy(cvar, rvar);
                 SCR_replace(cvar, "y", yvars[ccol]);
                 if(B_DataExist(cvar, type) >= 0) {
                     sprintf(toappend, "%s %s", lstname, cvar);
-                    if(crow == 0 && ccol == 0) B_DataUpdate(toappend, K_LST); // Creates the list
-                    else B_DataAppend(toappend, K_LST);                       // Appends to the list  
+                    if(crow == 0 && ccol == 0) B_DataUpdate(toappend, LISTS); // Creates the list
+                    else B_DataAppend(toappend, LISTS);                       // Appends to the list  
                 }
             }
         }
@@ -265,7 +265,7 @@ int B_DataCreate_1(char* arg, int* ptype)
 
     switch(*ptype) {
         case COMMENTS :
-        case K_LST :
+        case LISTS :
         case K_SCL :
             if(K_add(kdb, arg, NULL) < 0) return(-1);
             else return(0);
@@ -469,7 +469,7 @@ int B_DataUpdate(char* arg, int type)
     switch(type) {
     case COMMENTS : /* Name Val */
     case IDENTITIES :
-    case K_LST :
+    case LISTS :
         rc = K_add(kdb, name, arg + lg + 1, name);
         break;
 
@@ -774,7 +774,7 @@ int B_DataListSort(char* arg)
     qsort(lsti, SCR_tbl_size(lsti), sizeof(char **), my_strcmp);
     lst = SCR_mtov(lsti, ';');  /* JMP 09-03-95 */
 
-    if(K_add(K_WS[K_LST], out, lst) < 0) {
+    if(K_add(K_WS[LISTS], out, lst) < 0) {
         B_seterrn(66, out);
         rc = -1;
     }
@@ -881,7 +881,7 @@ int B_DataAppend(char* arg, int type)
 
     switch(type) {
     case COMMENTS :
-    case K_LST :
+    case LISTS :
         break;
 
     case EQUATIONS :
@@ -1043,16 +1043,16 @@ int B_DataCalcLst(char* arg)
     op   = args[2];
     list2 = args[3];
 
-    p1 = K_find(K_WS[K_LST], list1);
-    p2 = K_find(K_WS[K_LST], list2);
+    p1 = K_find(K_WS[LISTS], list1);
+    p2 = K_find(K_WS[LISTS], list2);
     if(p1 < 0 || p2 < 0) {
         B_seterror("List %s not in WS", (p1 < 0) ? list1:list2); // JMP 4/02/09
         rc = -1;
         goto done;
     }
 
-    l1 = B_ainit_chk(KLVAL(K_WS[K_LST], p1), NULL, 0);
-    l2 = B_ainit_chk(KLVAL(K_WS[K_LST], p2), NULL, 0);
+    l1 = B_ainit_chk(KLVAL(K_WS[LISTS], p1), NULL, 0);
+    l2 = B_ainit_chk(KLVAL(K_WS[LISTS], p2), NULL, 0);
     switch(op[0]) {
     case '+' :
         lst = SCR_union(l1, l2);

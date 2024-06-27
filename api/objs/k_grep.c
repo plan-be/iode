@@ -68,7 +68,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                 case COMMENTS :
                     if(texts) found = !SCR_grep_gnl(pattern, KCVAL(kdb, i), ecase, all);
                     break;
-                case K_LST :
+                case LISTS :
                     if(texts) found = !SCR_grep_gnl(pattern, KLVAL(kdb, i), ecase, all);
                     break;
                 case IDENTITIES :
