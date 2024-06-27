@@ -6,7 +6,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.map cimport map
 from libcpp.string cimport string
 from cython.operator cimport dereference
-from pyiode.common cimport EnumIodeEquationTest
+from pyiode.common cimport IodeEquationMethod, EnumIodeEquationTest
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
 
@@ -92,7 +92,7 @@ cdef class Equation:
             to_period = str(to_period)
 
         self.cpp_endogenous = endogenous.encode()
-        self.c_equation = new CEquation(self.cpp_endogenous, lec.encode(), 0, from_period.encode(), 
+        self.c_equation = new CEquation(self.cpp_endogenous, lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
                                         to_period.encode(), comment.encode(), instruments.encode(), 
                                         block.encode(), <bint>False)
         self.method = method
@@ -427,7 +427,8 @@ cdef class Equation:
                 value = EqMethod.GLS
             else:
                 value = EqMethod[value]
-        self.c_equation.set_method(int(value))
+        value = int(value)
+        self.c_equation.set_method(<IodeEquationMethod>(value))
 
     @property
     def sample(self) -> Sample:

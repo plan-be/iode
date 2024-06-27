@@ -582,7 +582,7 @@ cdef class EditAndEstimateEquations:
             value = value.upper()
             value = EqMethod[value]
         value = int(value)
-        self.c_estimation_ptr.set_method(<int>value)
+        self.c_estimation_ptr.set_method(<IodeEquationMethod>value)
 
     @property
     def instruments(self) -> Union[str, List[str]]:

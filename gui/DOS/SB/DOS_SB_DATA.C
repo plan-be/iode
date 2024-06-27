@@ -220,7 +220,7 @@ C_DataEditEqs1()
     else {
 	rc = B_DataUpdateEqs(name, vkp_eqs_LEC,
 			 vkp_eqs_CMT,
-			 vkp_eqs_METHOD + KE_LSQ,
+			 vkp_eqs_METHOD + ASCII_LSQ,
 			 smpl,
 			 vkp_eqs_INSTRS,
 			 vkp_eqs_BLK,

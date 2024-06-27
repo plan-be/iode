@@ -11,17 +11,6 @@
 #include "lec/lec.h"
 
 
-// TODO: replace K by I as below in C api + group them in an enum
-enum EnumIodeEquationMethod
-{
-    IE_LSQ = KE_LSQ,
-    IE_ZELLNER = KE_ZEL,
-    IE_INSTRUMENTAL = KE_INF,
-    IE_GLS = KE_GLS,
-    IE_MAX_LIKELIHOOD = KE_MAXLIK 
-};
-
-const static int I_NB_EQ_METHODS = 5;
 const static std::vector<std::string> v_eq_methods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
 
 
@@ -67,11 +56,13 @@ public:
 
     Equation(const std::string& name, KDB* kdb = nullptr);
 
-    Equation(const std::string& name, const std::string& lec, const int method = 0, const std::string& from = "", const std::string& to = "", 
-        const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
+    Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method = EQ_LSQ, const std::string& from = "", 
+        const std::string& to = "", const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", 
+        const bool date = true);
     
-    Equation(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", const std::string& to = "", 
-        const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", const bool date = true);
+    Equation(const std::string& name, const std::string& lec, const std::string& method = "LSQ", const std::string& from = "", 
+        const std::string& to = "", const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", 
+        const bool date = true);
 
     Equation(const Equation& other);
 
@@ -94,7 +85,7 @@ public:
 
     int get_method_as_int() const;
 
-    void set_method(const int method);
+    void set_method(const IodeEquationMethod method);
     
     std::string get_method() const;
 

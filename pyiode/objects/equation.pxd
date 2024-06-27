@@ -6,7 +6,7 @@ from libcpp.map cimport map
 from libcpp.pair cimport pair
 from libcpp cimport bool
 
-from pyiode.common cimport EnumIodeEquationTest
+from pyiode.common cimport IodeEquationMethod, EnumIodeEquationTest
 from pyiode.time.sample cimport CSample
 
 
@@ -18,7 +18,7 @@ cdef extern from "cpp_api/objects/equation.h":
         float tests[20]
         long date
 
-        CEquation(const string&, const string&, const int, const string&, const string&, 
+        CEquation(const string&, const string&, const IodeEquationMethod, const string&, const string&, 
                   const string&, const string&, const string&, const bool date) except +
         CEquation(const CEquation& other) except +
 
@@ -27,7 +27,7 @@ cdef extern from "cpp_api/objects/equation.h":
 
         int get_method_as_int()
         string get_method()
-        void set_method(const int) except +
+        void set_method(const IodeEquationMethod) except +
 
         string get_block()
         void set_block(const string&) except +

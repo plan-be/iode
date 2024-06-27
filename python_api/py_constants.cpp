@@ -19,11 +19,11 @@ void init_constants(nb::module_ &m)
       m.attr("I_VAR") = (int) VARIABLES;
 
       // Methods to estimation equations
-      m.attr("E_LSQ")            = (int) IE_LSQ;
-      m.attr("E_ZELLNER")        = (int) IE_ZELLNER;
-      m.attr("E_INSTRUMENTAL")   = (int) IE_INSTRUMENTAL;
-      m.attr("E_GLS")            = (int) IE_GLS;
-      m.attr("E_MAX_LIKELIHOOD") = (int) IE_MAX_LIKELIHOOD;
+      m.attr("E_LSQ")            = (int) EQ_LSQ;
+      m.attr("E_ZELLNER")        = (int) EQ_ZELLNER;
+      m.attr("E_INSTRUMENTAL")   = (int) EQ_INSTRUMENTAL;
+      m.attr("E_GLS")            = (int) EQ_GLS;
+      m.attr("E_MAX_LIKELIHOOD") = (int) EQ_MAX_LIKELIHOOD;
 
       // test values
       m.attr("IE_CORR")    = (int) IE_CORR;

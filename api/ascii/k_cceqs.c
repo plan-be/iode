@@ -17,28 +17,28 @@
  */
  
 YYKEYS KE_TABLE[] = {
-    "{",            KE_OPEN,
-    "}",            KE_CLOSE,
-    "BLOCK",        KE_BLK,
-    "COMMENT",      KE_CMT,
-    "DATE",         KE_DATE,
-    "INF",          KE_INF,
-    "INSTRUMENTS",  KE_INSTR,
-    "GLS",          KE_GLS,
-    "LSQ",          KE_LSQ,
-    "SAMPLE",       KE_SMPL,
-    "ZELLNER",      KE_ZEL,
-    "MAXLIK",       KE_MAXLIK,
+    "{",            ASCII_OPEN,
+    "}",            ASCII_CLOSE,
+    "BLOCK",        ASCII_BLK,
+    "COMMENT",      ASCII_CMT,
+    "DATE",         ASCII_DATE,
+    "INF",          ASCII_INF,
+    "INSTRUMENTS",  ASCII_INSTR,
+    "GLS",          ASCII_GLS,
+    "LSQ",          ASCII_LSQ,
+    "SAMPLE",       ASCII_SMPL,
+    "ZELLNER",      ASCII_ZEL,
+    "MAXLIK",       ASCII_MAXLIK,
 
-    "STDEV",        KE_STDEV,
-    "MEANY",        KE_MEANY,
-    "SSRES",        KE_SSRES,
-    "STDERR",       KE_STDERR,
-    "FSTAT",        KE_FSTAT,
-    "R2",           KE_R2,
-    "R2ADJ",        KE_R2ADJ,
-    "DW",           KE_DW,
-    "LOGLIK",       KE_LOGLIK
+    "STDEV",        ASCII_STDEV,
+    "MEANY",        ASCII_MEANY,
+    "SSRES",        ASCII_SSRES,
+    "STDERR",       ASCII_STDERR,
+    "FSTAT",        ASCII_FSTAT,
+    "R2",           ASCII_R2,
+    "R2ADJ",        ASCII_R2ADJ,
+    "DW",           ASCII_DW,
+    "LOGLIK",       ASCII_LOGLIK
 };
 
 
@@ -62,7 +62,7 @@ static EQ* KE_read_eq(YYFILE* yy)
 
     eq = (EQ *) SW_nalloc(sizeof(EQ));
     eq->method = 0;
-    if((keyw = YY_lex(yy)) != KE_OPEN)  {
+    if((keyw = YY_lex(yy)) != ASCII_OPEN)  {
         YY_unread(yy);
         lec = K_read_str(yy);
         eq->lec = K_wrap(lec, 60);  
@@ -90,71 +90,71 @@ static EQ* KE_read_eq(YYFILE* yy)
             case YY_WORD :
             case YY_EOF  :
                 YY_unread(yy);
-            case KE_CLOSE:
+            case ASCII_CLOSE:
                 return(eq);
-            case KE_DATE :
+            case ASCII_DATE :
                 eq->date = K_read_long(yy);
                 break;
 
-            case KE_LSQ :
-                eq->method = 0;
+            case ASCII_LSQ :
+                eq->method = EQ_LSQ;
                 break;
-            case KE_ZEL :
-                eq->method = 1;
+            case ASCII_ZEL :
+                eq->method = EQ_ZELLNER;
                 break;
-            case KE_INF :
-                eq->method = 2;
+            case ASCII_INF :
+                eq->method = EQ_INSTRUMENTAL;
                 break;
-            case KE_GLS :
-                eq->method = 3;
+            case ASCII_GLS :
+                eq->method = EQ_GLS;
                 break;
-            case KE_MAXLIK :
-                eq->method = 4;
+            case ASCII_MAXLIK :
+                eq->method = EQ_MAX_LIKELIHOOD;
                 break;
 
-            case KE_SMPL :
+            case ASCII_SMPL :
                 smpl = K_read_smpl(yy);
                 if(smpl == NULL) goto err;
                 memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
                 break;
-            case KE_BLK  :
+            case ASCII_BLK  :
                 eq->blk = K_read_str(yy);
                 if(eq->blk == NULL) goto err;
                 break;
-            case KE_CMT  :
+            case ASCII_CMT  :
                 eq->cmt = K_read_str(yy);
                 if(eq->cmt == NULL) goto err;
                 break;
-            case KE_INSTR:
+            case ASCII_INSTR:
                 eq->instr = K_read_str(yy);
                 if(eq->instr == NULL) goto err;
                 break;
 
-            case KE_STDEV :
+            case ASCII_STDEV :
                 eq->tests[1] = (float) K_read_real(yy);
                 break;
-            case KE_MEANY :
+            case ASCII_MEANY :
                 eq->tests[2] = (float) K_read_real(yy);
                 break;
-            case KE_SSRES :
+            case ASCII_SSRES :
                 eq->tests[3] = (float) K_read_real(yy);
                 break;
-            case KE_STDERR :
+            case ASCII_STDERR :
                 eq->tests[4] = (float) K_read_real(yy);
                 break;
-            case KE_FSTAT :
+            case ASCII_FSTAT :
                 eq->tests[6] = (float) K_read_real(yy);
                 break;
-            case KE_R2 :
+            case ASCII_R2 :
                 eq->tests[7] = (float) K_read_real(yy);
                 break;
-            case KE_R2ADJ :
+            case ASCII_R2ADJ :
                 eq->tests[8] = (float) K_read_real(yy);
                 break;
-            case KE_DW :
+            case ASCII_DW :
                 eq->tests[9] = (float) K_read_real(yy);
                 break;
-            case KE_LOGLIK :
+            case ASCII_LOGLIK :
                 eq->tests[10] = (float) K_read_real(yy);
                 break;
 

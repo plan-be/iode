@@ -67,8 +67,8 @@ Equation::Equation(const std::string& name, KDB* kdb)
                     "' of equation named '" + std::string(name) + "'");
 }
 
-Equation::Equation(const std::string& name, const std::string& lec, const int method, const std::string& from, const std::string& to, 
-    const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
+Equation::Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method, const std::string& from, 
+    const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
     this->lec = NULL, 
     this->clec = NULL, 
@@ -89,8 +89,8 @@ Equation::Equation(const std::string& name, const std::string& lec, const int me
         update_date();
 }
 
-Equation::Equation(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, const std::string& to, 
-    const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
+Equation::Equation(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
+    const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
     this->lec = NULL, 
     this->clec = NULL, 
@@ -171,15 +171,11 @@ char Equation::get_solved() const
 int Equation::get_method_as_int() const
 {
     int m = (int) this->method;
-    return (m >= 0 && m < I_NB_EQ_METHODS) ? m : 0;
+    return (m >= 0 && m < IODE_NB_EQ_METHODS) ? m : 0;
 }
 
-void Equation::set_method(const int method)
+void Equation::set_method(const IodeEquationMethod method)
 {
-    if(method < 0 || method >= I_NB_EQ_METHODS)
-        throw std::invalid_argument("Invalid value " + std::to_string(method) + " for the equation method. " + 
-            "The passed value must be in the range [0, " + std::to_string(I_NB_EQ_METHODS - 1) + "]");
-
     this->method = (char) method;
 }
 
@@ -187,7 +183,7 @@ std::string Equation::get_method() const
 {
     int m = (int) this->method;
 
-    if(m >= 0 && m < I_NB_EQ_METHODS)
+    if(m >= 0 && m < IODE_NB_EQ_METHODS)
         return v_eq_methods[m];
     else
         // invalid value
@@ -197,7 +193,7 @@ std::string Equation::get_method() const
 void Equation::set_method(const std::string& method)
 {
     int m = -1;
-    for(int i = 0; i < I_NB_EQ_METHODS; i++) 
+    for(int i = 0; i < IODE_NB_EQ_METHODS; i++) 
         if(method == v_eq_methods[i]) m = i;
 
     if(m < 0)

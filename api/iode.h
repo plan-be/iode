@@ -268,28 +268,42 @@ enum IodeDatabaseType
 #define  KT_CHUNCK   5
 
 /*----------------------- EQUATIONS ----------------------------*/
-#define  KE_BLK             0
-#define  KE_CMT             1
-#define  KE_INSTR           2
-#define  KE_METH            3
-#define  KE_SMPL            4
-#define  KE_LSQ             5
-#define  KE_ZEL             6
-#define  KE_INF             7
-#define  KE_GLS             8
-#define  KE_DATE            9
-#define  KE_OPEN           10
-#define  KE_CLOSE          11
-#define  KE_STDEV          12
-#define  KE_MEANY          13
-#define  KE_SSRES          14
-#define  KE_STDERR         15
-#define  KE_FSTAT          16
-#define  KE_R2             17
-#define  KE_R2ADJ          18
-#define  KE_DW             19
-#define  KE_LOGLIK         20
-#define  KE_MAXLIK         21
+enum IodeEquationMethod
+{
+    EQ_LSQ,
+    EQ_ZELLNER,
+    EQ_INSTRUMENTAL,
+    EQ_GLS,
+    EQ_MAX_LIKELIHOOD
+};
+
+const static int IODE_NB_EQ_METHODS = 5;
+
+enum IodeEquationAscii
+{
+    ASCII_BLK,
+    ASCII_CMT,
+    ASCII_INSTR,
+    ASCII_METH,
+    ASCII_SMPL,
+    ASCII_LSQ,
+    ASCII_ZEL,
+    ASCII_INF,
+    ASCII_GLS,
+    ASCII_DATE,
+    ASCII_OPEN,
+    ASCII_CLOSE,
+    ASCII_STDEV,
+    ASCII_MEANY,
+    ASCII_SSRES,
+    ASCII_STDERR,
+    ASCII_FSTAT,
+    ASCII_R2,
+    ASCII_R2ADJ,
+    ASCII_DW,
+    ASCII_LOGLIK,
+    ASCII_MAXLIK
+};
 
 /*----------------------- WS ----------------------------*/
 #define KC_WS   K_WS[COMMENTS]

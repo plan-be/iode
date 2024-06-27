@@ -64,14 +64,15 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] v_simulation_initialization
 
-cdef extern from "cpp_api/objects/equation.h":
-    cdef enum EnumIodeEquationMethod:
-        IE_LSQ,
-        IE_ZELLNER,
-        IE_INSTRUMENTAL,
-        IE_GLS,
-        IE_MAX_LIKELIHOOD
+cdef extern from "api/iode.h":
+    cdef enum IodeEquationMethod:
+        EQ_LSQ,
+        EQ_ZELLNER,
+        EQ_INSTRUMENTAL,
+        EQ_GLS,
+        EQ_MAX_LIKELIHOOD
 
+cdef extern from "cpp_api/objects/equation.h":
     cdef vector[string] v_eq_methods
 
     cdef enum EnumIodeEquationTest:
