@@ -35,7 +35,6 @@ const static char NAN_REP[3] = "--";
 // TODO: replace K by I as below in C api + group them in an enum
 enum EnumIodeType
 {
-    I_TABLES = K_TBL,
     I_VARIABLES = K_VAR
 };
 
@@ -69,7 +68,7 @@ enum EnumIodeFile
     IDENTITIES_FILE,
     LISTS_FILE,
     SCALARS_FILE,
-    I_TABLES_FILE,
+    TABLES_FILE,
     I_VARIABLES_FILE,
     I_REPORTS_FILE,
     I_TEXT_FILE,
@@ -124,8 +123,8 @@ const static std::map<std::string, EnumIodeFile> mFileExtensions =
     {".al",  LISTS_FILE},
     {".scl", SCALARS_FILE},
     {".as",  SCALARS_FILE},
-    {".tbl", I_TABLES_FILE},
-    {".at",  I_TABLES_FILE},
+    {".tbl", TABLES_FILE},
+    {".at",  TABLES_FILE},
     {".var", I_VARIABLES_FILE},
     {".av",  I_VARIABLES_FILE},
     {".rep", I_REPORTS_FILE},

@@ -465,7 +465,7 @@ void Table::copy_from_TBL_obj(const TBL* obj)
 Table::Table(const int pos, KDB* kdb)
 {
 	if (!kdb) 
-		kdb = K_WS[I_TABLES];
+		kdb = K_WS[TABLES];
 
 	if (pos < 0 || pos > kdb->k_nb)
 	{
@@ -484,7 +484,7 @@ Table::Table(const int pos, KDB* kdb)
 Table::Table(const std::string& name, KDB* kdb)
 {
 	if (!kdb) 
-		kdb = K_WS[I_TABLES];
+		kdb = K_WS[TABLES];
 
 	int pos = K_find(kdb, to_char_array(name));
 	if (pos < 0) 

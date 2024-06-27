@@ -11,7 +11,7 @@ int pos, type;
 	case COMMENTS :
 	case LISTS :
 	case SCALARS :
-	case K_TBL :
+	case TABLES :
 	case K_VAR :
 	    lst = A_init(KONAME(kdb, pos)); break;
 	case EQUATIONS :

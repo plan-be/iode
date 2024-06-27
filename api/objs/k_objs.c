@@ -463,7 +463,7 @@ int K_upd_tbl(char* name, char* arg)
     SCR_free_tbl(lecs);
 
 add:
-    rc = K_add(K_WS[K_TBL], name, tbl);
+    rc = K_add(K_WS[TABLES], name, tbl);
 
     if(rc >= 0) rc = 0;
     if(rc < 0) rc = -1; // Pour ‚viter return dans les rapports si rc = -2

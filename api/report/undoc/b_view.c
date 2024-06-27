@@ -162,13 +162,13 @@ int B_ViewPrintTbl_1(char* name, char* smpl)
     int rc, pos;
     TBL *tbl;
 
-    pos = K_find(K_WS[K_TBL], name);
+    pos = K_find(K_WS[TABLES], name);
     if(pos < 0) {
         B_seterrn(80, name);
         return(-1);
     }
 
-    tbl = KTVAL(K_WS[K_TBL], pos);
+    tbl = KTVAL(K_WS[TABLES], pos);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl, smpl, name);
     else
@@ -208,13 +208,13 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     for(i = 0; i < ng; i ++) {
         if(view) W_InitDisplay();
 
-        pos = K_find(K_WS[K_TBL], tbls[i]);
+        pos = K_find(K_WS[TABLES], tbls[i]);
         if(pos < 0) {
             B_seterrn(80, tbls[i]);
             rc = -1;
             break;
         }
-        tbl = KTVAL(K_WS[K_TBL], pos);
+        tbl = KTVAL(K_WS[TABLES], pos);
         //KT_nb++;
         hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode); // JMP 11-05-2022 to avoid extern in k_graph.c
 
@@ -277,7 +277,7 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
             else ODE_VIEW = 2;
             //strcpy(ODE_SMPL, smpl);
             SCR_strlcpy(ODE_SMPL, smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
-            ODE_scroll(K_WS[K_TBL], args + 1);
+            ODE_scroll(K_WS[TABLES], args + 1);
         }
 
         SCR_free_tbl(args);

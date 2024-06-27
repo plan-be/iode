@@ -63,7 +63,7 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
         case SCALARS:
             Scalars.copy_from(input_file, object_names);
             break;
-        case I_TABLES:
+        case TABLES:
             Tables.copy_from(input_file, object_names);
             break;
         case I_VARIABLES:

@@ -286,7 +286,7 @@ char    *IodeDdeCreateTbl(int objnb, char *ismpl, int *nc, int *nl, int nbdec)
                           nf = 0, nm = 0;
     char    gsmpl[128], **l = NULL, *buf, *res = NULL; /* JMP 30-04-98 */
 
-    TBL     *tbl = KTVAL(K_WS[K_TBL], objnb);
+    TBL     *tbl = KTVAL(K_WS[TABLES], objnb);
     COLS    *cls;
     TLINE   *line;
     SAMPLE  *smpl = (SAMPLE *) KDATA(KV_WS);
@@ -387,7 +387,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
     char    *obj, *res;
     KDB     *kdb = K_WS[type];
 
-    if(type != K_TBL) {
+    if(type != TABLES) {
         *nc = 2;
         *nl = 1;
         switch(type) {
@@ -546,7 +546,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(strcmp(szTopic, "XCMT") == 0) return(IodeDdeGetXObj(szItem, COMMENTS));
     if(strcmp(szTopic, "XLST") == 0) return(IodeDdeGetXObj(szItem, LISTS));
     if(strcmp(szTopic, "XIDT") == 0) return(IodeDdeGetXObj(szItem, IDENTITIES));
-    if(strcmp(szTopic, "XTBL") == 0) return(IodeDdeGetXObj(szItem, K_TBL));
+    if(strcmp(szTopic, "XTBL") == 0) return(IodeDdeGetXObj(szItem, TABLES));
     if(strcmp(szTopic, "XREP") == 0) return(IodeDdeGetReportRC(szItem));
 
     type = IodeDdeType(szTopic);
@@ -559,7 +559,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     switch(type) {
         case EQUATIONS :
         case IDENTITIES :
-        case K_TBL :
+        case TABLES :
             return((char *)0);
 
         case COMMENTS :
@@ -972,7 +972,7 @@ int B_ExcelSet(char *arg, int type)
             IodeFmtVal(ptr, d);    /* JMP 01-02-99 */
             break;                 /* JMP 10-08-00 */
 
-        case K_TBL :
+        case TABLES :
             if(nb_args == 3) smpl = args[1];
             else smpl = NULL;
 

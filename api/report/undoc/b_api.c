@@ -627,7 +627,7 @@ char* IodeGetTbl(char *name, char *gsmpl)
     int     pos, nc, nl;
     char    *ptr;
 
-    pos = K_find(K_WS[K_TBL], name);
+    pos = K_find(K_WS[TABLES], name);
     if(pos < 0) return("Not in WS");
 
     ptr = IodeDdeCreateTbl(pos, gsmpl, &nc, &nl, K_NBDEC);  
@@ -642,8 +642,8 @@ char* IodeGetTblTitle(char *name)
     char    *ptr;
     TBL     *tbl;
 
-    pos = K_find(K_WS[K_TBL], name);
-    if(pos < 0 || (tbl = KTVAL(K_WS[K_TBL], pos)) == 0)
+    pos = K_find(K_WS[TABLES], name);
+    if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0)
         return("Not in WS");
 
     /* returns only ptr to string, NO ALLOC is done */
@@ -659,8 +659,8 @@ TBL* IodeGetTblDefinition(char *name)
     TBL     *tbl;
 
     if(name ==  NULL) pos = 0;
-    else pos = K_find(K_WS[K_TBL], name);
-    if(pos < 0 || (tbl = KTVAL(K_WS[K_TBL], pos)) == 0)
+    else pos = K_find(K_WS[TABLES], name);
+    if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0)
         return(NULL);
     else return(tbl);
 }
@@ -1239,8 +1239,8 @@ int IodeGetChart(char *name, char *gsmpl)
     int     pos;
     TBL     *tbl;
 
-    pos = K_find(K_WS[K_TBL], name);
-    if(pos < 0 || (tbl = KTVAL(K_WS[K_TBL], pos)) == 0)
+    pos = K_find(K_WS[TABLES], name);
+    if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0)
         return(-1);
 
     return(APIPrepareChart(tbl, gsmpl));

@@ -325,7 +325,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 			if(Scalars.contains(std_name))
 				list << name;
 			break;
-		case I_TABLES:
+		case TABLES:
 			if(Tables.contains(std_name))
 				list << name;
 			break;
@@ -368,7 +368,7 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	case SCALARS:
 		std_list = Scalars.search(cpp_name);
 		break;
-	case I_TABLES:
+	case TABLES:
 		std_list = Tables.search(cpp_name);
 		break;
 	case I_VARIABLES:

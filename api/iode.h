@@ -136,7 +136,7 @@ enum IodeCase
 #define IDENTITIES       2
 #define LISTS       3
 #define SCALARS       4
-#define K_TBL       5
+#define TABLES       5
 #define K_VAR       6
 
 #define K_OBJ       7
@@ -295,7 +295,7 @@ enum IodeCase
 #define KI_WS   K_WS[IDENTITIES]
 #define KL_WS   K_WS[LISTS]
 #define KS_WS   K_WS[SCALARS]
-#define KT_WS   K_WS[K_TBL]
+#define KT_WS   K_WS[TABLES]
 #define KV_WS   K_WS[K_VAR]
 
 #define KC_RWS   K_RWS[COMMENTS][K_PWS[COMMENTS]]
@@ -303,7 +303,7 @@ enum IodeCase
 #define KI_RWS   K_RWS[IDENTITIES][K_PWS[IDENTITIES]]
 #define KL_RWS   K_RWS[LISTS][K_PWS[LISTS]]
 #define KS_RWS   K_RWS[SCALARS][K_PWS[SCALARS]]
-#define KT_RWS   K_RWS[K_TBL][K_PWS[K_TBL]]
+#define KT_RWS   K_RWS[TABLES][K_PWS[TABLES]]
 #define KV_RWS   K_RWS[K_VAR][K_PWS[K_VAR]]
 
 

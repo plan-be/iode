@@ -685,8 +685,8 @@ U_ch *RPF_ttitle(U_ch** args)
 
     for(i = 0 ; args[i] ; i++) {
         if(i > 0) res = SCR_strafcat(res, "\n");
-        pos = K_find(K_WS[K_TBL], args[i]);
-        if(pos < 0 || (tbl = KTVAL(K_WS[K_TBL], pos)) == 0) {
+        pos = K_find(K_WS[TABLES], args[i]);
+        if(pos < 0 || (tbl = KTVAL(K_WS[TABLES], pos)) == 0) {
             sprintf(buf, "Table %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
@@ -1330,7 +1330,7 @@ U_ch *RPF_sexpand(U_ch **args)
  */
 U_ch *RPF_texpand(U_ch **args)
 {
-    return(RPF_expand(args, K_TBL));
+    return(RPF_expand(args, TABLES));
 }
 
 

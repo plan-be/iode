@@ -10,7 +10,7 @@ protected:
     {
         KDBTables kdb_tbl(input_test_dir + "fun.tbl");
 
-        int pos = K_find(K_WS[I_TABLES], "GFRPC");
+        int pos = K_find(K_WS[TABLES], "GFRPC");
         table = new Table(pos, nullptr);
     }
 

@@ -954,8 +954,8 @@ void Tests_TBL32_64()
 
     sprintf(in_filename,  "%s\\fun.tbl", IODE_DATA_DIR);
    
-    kdb_tbl = K_interpret(K_TBL, in_filename);
-    S4ASSERT(kdb_tbl != NULL, "K_interpret(K_TBL, \"%s\")", in_filename);
+    kdb_tbl = K_interpret(TABLES, in_filename);
+    S4ASSERT(kdb_tbl != NULL, "K_interpret(TABLES, \"%s\")", in_filename);
     if(kdb_tbl) {
         sprintf(out_filename, "%s\\fun_copy.at", IODE_OUTPUT_DIR);
         rc = KT_save_asc(kdb_tbl, out_filename);
@@ -1099,8 +1099,8 @@ void Tests_PrintTablesAndVars()
     S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", "fun.var");
 
     // Load the TBL workspace
-    K_RWS[K_TBL][0] = K_WS[K_TBL] = kdbt  = U_test_K_interpret(K_TBL, "fun.tbl");
-    S4ASSERT(kdbt != NULL, "K_interpret(K_TBL, \"%s\")", "fun.tbl");
+    K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.tbl");
+    S4ASSERT(kdbt != NULL, "K_interpret(TABLES, \"%s\")", "fun.tbl");
 
     // Load a second VAR workspace in K_RWS[K_VAR][2]
     sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, "fun.var");
@@ -1438,7 +1438,7 @@ void Tests_B_DATA()
     cond = (rc == 0) && U_test_eq(1.2, val);
     S4ASSERT(cond == 1, "B_DataUpdate(\"U 1.2 1\", SCALARS) = %g", val);
     
-    rc = B_DataUpdate("U  Title of U;U;2*U"  , K_TBL);
+    rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
     smpl = KSMPL(KV_WS);
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , K_VAR);
     S4ASSERT(rc == 0, "B_DataUpdate(\"U L 2000Y1 2 3.1 4e2\" , K_VAR)");
@@ -2610,7 +2610,7 @@ void Tests_B_WS()
     U_test_B_WsLoad("fun", IDENTITIES, 48);
     U_test_B_WsLoad("fun", LISTS, 17);
     U_test_B_WsLoad("fun", SCALARS, 161);
-    U_test_B_WsLoad("fun", K_TBL, 46);
+    U_test_B_WsLoad("fun", TABLES, 46);
     U_test_B_WsLoad("fun", K_VAR, 394);
     
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
@@ -2620,7 +2620,7 @@ void Tests_B_WS()
     U_test_B_WsSave("fun", "fun2", IDENTITIES, 48);
     U_test_B_WsSave("fun", "fun2", LISTS, 17);
     U_test_B_WsSave("fun", "fun2", SCALARS, 161);
-    U_test_B_WsSave("fun", "fun2", K_TBL, 46);
+    U_test_B_WsSave("fun", "fun2", TABLES, 46);
     U_test_B_WsSave("fun", "fun2", K_VAR, 394);
            
     // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
@@ -2630,7 +2630,7 @@ void Tests_B_WS()
     U_test_B_WsSaveCmp("fun", "fun2cmp", IDENTITIES, 48);
     U_test_B_WsSaveCmp("fun", "fun2cmp", LISTS, 17);
     U_test_B_WsSaveCmp("fun", "fun2cmp", SCALARS, 161);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", TABLES, 46);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
     
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
@@ -2640,7 +2640,7 @@ void Tests_B_WS()
     U_test_B_WsExport("fun.idt", "fun2.ai", IDENTITIES);
     U_test_B_WsExport("fun.lst", "fun2.al", LISTS);
     U_test_B_WsExport("fun.scl", "fun2.as", SCALARS); 
-    U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
+    U_test_B_WsExport("fun.tbl", "fun2.at", TABLES);
     U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
 
     // int B_WsClear(char* arg, int type)                $WsClear<type> 
@@ -2650,7 +2650,7 @@ void Tests_B_WS()
     U_test_B_WsClear(IDENTITIES);
     U_test_B_WsClear(LISTS);
     U_test_B_WsClear(SCALARS);
-    U_test_B_WsClear(K_TBL);
+    U_test_B_WsClear(TABLES);
     U_test_B_WsClear(K_VAR);
      
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
@@ -2660,7 +2660,7 @@ void Tests_B_WS()
     U_test_B_WsImport("fun2.ai", IDENTITIES, 47);   // Idem in IDT NAWRU
     U_test_B_WsImport("fun2.al", LISTS, 17);
     U_test_B_WsImport("fun2.as", SCALARS, 161);
-    U_test_B_WsImport("fun2.at", K_TBL, 46);
+    U_test_B_WsImport("fun2.at", TABLES, 46);
     U_test_B_WsImport("fun2.av", K_VAR, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
     
@@ -2693,7 +2693,7 @@ void Tests_B_WS()
     U_test_B_WsDescr("Ws content description", IDENTITIES);
     U_test_B_WsDescr("Ws content description", LISTS);
     U_test_B_WsDescr("Ws content description", SCALARS);
-    U_test_B_WsDescr("Ws content description", K_TBL);
+    U_test_B_WsDescr("Ws content description", TABLES);
     U_test_B_WsDescr("Ws content description", K_VAR);
     
     // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
@@ -2705,7 +2705,7 @@ void Tests_B_WS()
     U_test_B_WsName("funtest", IDENTITIES);
     U_test_B_WsName("funtest", LISTS);
     U_test_B_WsName("funtest", SCALARS);
-    U_test_B_WsName("funtest", K_TBL);
+    U_test_B_WsName("funtest", TABLES);
     U_test_B_WsName("funtest", K_VAR);
     
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
@@ -2718,7 +2718,7 @@ void Tests_B_WS()
     U_test_B_WsCopy("fun", IDENTITIES, 48);   // Idem in IDT NAWRU
     U_test_B_WsCopy("fun", LISTS, 17);
     U_test_B_WsCopy("fun", SCALARS, 161);
-    U_test_B_WsCopy("fun", K_TBL, 46);
+    U_test_B_WsCopy("fun", TABLES, 46);
     
     
     // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
@@ -2730,7 +2730,7 @@ void Tests_B_WS()
     U_test_B_WsMerge("fun", EQUATIONS, 274);  
     U_test_B_WsMerge("fun", IDENTITIES, 48);   
     U_test_B_WsMerge("fun", SCALARS, 161);
-    U_test_B_WsMerge("fun", K_TBL, 46);
+    U_test_B_WsMerge("fun", TABLES, 46);
     
     // int B_WsExtrapolate(char* arg)                    $WsExtrapolate [method] from to [variable list]
     U_test_print_title("B_WsExtrapolate");
@@ -2864,7 +2864,7 @@ void Tests_B_REP_PROC()
 //    // Test cell separator '@'
 //    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
 //    A2M_SEPCH = '@';                // Change A2M_SEPCH
-//    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+//    B_PrintObjDef("C8_1", TABLES);   // Print TBL definition
 //    W_close();                      // Close the printing session
 //    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
 //    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);
@@ -2872,7 +2872,7 @@ void Tests_B_REP_PROC()
 //    // Test cell separator '|'
 //    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
 //    A2M_SEPCH = '|';                // Change A2M_SEPCH
-//    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+//    B_PrintObjDef("C8_1", TABLES);   // Print TBL definition
 //    W_close();                      // Close the printing session
 //    U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm");
 //    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
@@ -2881,7 +2881,7 @@ void Tests_B_REP_PROC()
 //    // Test cell separator '&'
 //    W_dest(filename, W_HTML);       // Read A2M_SEPCH ini file
 //    A2M_SEPCH = '&';                // Change A2M_SEPCH
-//    B_PrintObjDef("C8_1", K_TBL);   // Print TBL definition
+//    B_PrintObjDef("C8_1", TABLES);   // Print TBL definition
 //    W_close();                      // Close the printing session
 //    //S4ASSERT(U_test_compare_outfile_to_reffile("test_printobj.htm", "test_printobj.ref.htm"), "B_PrintObjDef(%c)", A2M_SEPCH);
 //    S4ASSERT(U_diff_files(reffilename, filename) != 0, "B_PrintObjDef(%c)", A2M_SEPCH);

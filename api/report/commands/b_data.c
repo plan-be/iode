@@ -283,7 +283,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             sprintf(deflt, "%s", arg);
             if(K_add(kdb, arg, deflt) < 0) return(-1);
             else return(0);
-        case K_TBL :
+        case TABLES :
             return(K_upd_tbl(arg, "TITLE;LEC"));
     }
     return(-1);
@@ -477,7 +477,7 @@ int B_DataUpdate(char* arg, int type)
         rc = K_upd_eqs(name, arg + lg + 1, NULL, -1, NULL, NULL, NULL, NULL, 0);
         break;
 
-    case K_TBL :
+    case TABLES :
         rc = K_upd_tbl(name, arg + lg + 1);
         break;
 
@@ -809,7 +809,7 @@ int B_DataScan(char* arg, int type)
     char    **objs;
     int     rc = -1;
 
-    if(type != IDENTITIES && type != EQUATIONS && type != K_TBL) {
+    if(type != IDENTITIES && type != EQUATIONS && type != TABLES) {
         B_seterrn(122);
         return(-1);
     }
@@ -887,7 +887,7 @@ int B_DataAppend(char* arg, int type)
     case EQUATIONS :
     case IDENTITIES :
     case SCALARS :
-    case K_TBL :
+    case TABLES :
     case K_VAR :
         B_seterror("DataAppend : only lists and comments");
         return(-1);

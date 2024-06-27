@@ -21,7 +21,7 @@ class TablesView : public IodeAbstractTableView, public TableViewEditObj<TablesM
 
 public:
 	TablesView(QWidget* parent = nullptr) : 
-		IodeAbstractTableView(I_TABLES, new TablesDelegate(parent), parent), TableViewEditObj(this), TableViewAddObj(this)
+		IodeAbstractTableView(TABLES, new TablesDelegate(parent), parent), TableViewEditObj(this), TableViewAddObj(this)
 	{
 		shortcutDisplay = new QShortcut(QKeySequence(Qt::Key_F7), this);
 		shortcutDisplay->setContext(Qt::WidgetWithChildrenShortcut);
