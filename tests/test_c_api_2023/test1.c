@@ -1895,8 +1895,8 @@ void Tests_IMP_EXP()
     
     sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
-    S4ASSERT(rc == 0, "IMP_RuleImport(VARIABLES, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMP_FMT_ASCII, 0)", outfile, reffile);
+    rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
+    S4ASSERT(rc == 0, "IMP_RuleImport(VARIABLES, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMPORT_ASCII, 0)", outfile, reffile);
     
     KV_RWS = KV_WS = K_interpret(VARIABLES, outfile);  
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
@@ -1906,8 +1906,8 @@ void Tests_IMP_EXP()
    
     sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
-    S4ASSERT(rc == 0, "IMP_RuleImport(COMMENTS, trace, \"%s\", \"%s\", \"%s\", NULL, NULL, IMP_FMT_ASCII, 0)", rulefile, outfile, reffile);
+    rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMPORT_ASCII, 0);
+    S4ASSERT(rc == 0, "IMP_RuleImport(COMMENTS, trace, \"%s\", \"%s\", \"%s\", NULL, NULL, IMPORT_ASCII, 0)", rulefile, outfile, reffile);
     
     if(rc == 0) {
         KC_RWS = KC_WS = K_interpret(COMMENTS, outfile);  

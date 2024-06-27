@@ -413,14 +413,19 @@ enum IodeExportFormat
 
 const static int IODE_NB_EXPORT_FORMATS = 5;
 
-#define IMP_FMT_ASCII     0
-#define IMP_FMT_ROT_ASCII 1
-#define IMP_FMT_DIF       2
-#define IMP_FMT_Bistel    3
-#define IMP_FMT_NIS       4
-#define IMP_FMT_GEM       5
-#define IMP_FMT_PRN       6
-#define IMP_FMT_TXT       7
+enum IodeImportFormat
+{
+    IMPORT_ASCII,
+    IMPORT_ROT_ASCII,
+    IMPORT_DIF,
+    IMPORT_BISTEL,
+    IMPORT_NIS,
+    IMPORT_GEM,
+    IMPORT_PRN,
+    IMPORT_TXT
+};
+
+const static int IODE_NB_IMPORT_FORMATS = 8;
 
 /*---------------- IMPORT/EXPORT: ASC -------------------------*/
 #define ASC_SMPL 1
