@@ -823,9 +823,13 @@ enum IodeEstimationError
 
 
 /* SIMULATION */
-#define SORT_CONNEX    0
-#define SORT_BOTH      1
-#define SORT_NONE      2
+
+enum SimuSortAlgorithm
+{
+    SORT_CONNEX,
+    SORT_BOTH,
+    SORT_NONE
+};
 
 /******************************* TYPEDEFS **********************************/
 typedef char    OFNAME[OK_MAX_FILE];

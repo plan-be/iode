@@ -46,9 +46,9 @@ TEST_F(SimulationTest, ModelExchange)
 
 TEST_F(SimulationTest, Simulation)
 {
-    sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_NONE);
-    sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_CONNEX);
-    sim.set_sort(EnumSimulationSortAlgorithm::I_SORT_BOTH);
+    sim.set_sort(SimuSortAlgorithm::SORT_NONE);
+    sim.set_sort(SimuSortAlgorithm::SORT_CONNEX);
+    sim.set_sort(SimuSortAlgorithm::SORT_BOTH);
 
     sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1);
     sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1_A);

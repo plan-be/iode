@@ -20,7 +20,7 @@ from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEq
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             IodeVarMode, VariablesInitialization, 
-                            EnumSimulationSortAlgorithm, EnumIodeAdjustmentMethod)
+                            SimuSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
                             v_adjustment_method, mLowToHigh)
@@ -195,9 +195,9 @@ class HighToLowType(IntEnum):
     SUM = IodeHighToLow.HTOL_SUM
 
 class SimulationSort(IntEnum):
-    CONNEX = EnumSimulationSortAlgorithm.I_SORT_CONNEX
-    BOTH = EnumSimulationSortAlgorithm.I_SORT_BOTH
-    NONE = EnumSimulationSortAlgorithm.I_SORT_NONE
+    CONNEX = SimuSortAlgorithm.SORT_CONNEX
+    BOTH = SimuSortAlgorithm.SORT_BOTH
+    NONE = SimuSortAlgorithm.SORT_NONE
 
 class SimulationInitialization(IntEnum):
     TM1 = VariablesInitialization.VAR_INIT_TM1
