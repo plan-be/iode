@@ -518,7 +518,7 @@ char *IodeGetEqsLec(char *name)
     pos = K_find(KE_WS, name);
     if(pos < 0) return(NULL);
 
-    return(KELEC(K_WS[K_EQS], pos));
+    return(KELEC(K_WS[EQUATIONS], pos));
 }
 
 // Change the LEC form of an equation.
@@ -951,9 +951,9 @@ int IodeModelCalcSCC(int nbtris, char* pre_listname, char* inter_listname, char*
     }    
 
     if(SCR_tbl_size(eqs) == 0)
-        tdbe = K_WS[K_EQS];
+        tdbe = K_WS[EQUATIONS];
     else
-        tdbe = K_quick_refer(K_WS[K_EQS], eqs);
+        tdbe = K_quick_refer(K_WS[EQUATIONS], eqs);
 
     rc = KE_ModelCalcSCC(tdbe, nbtris, pre_listname, inter_listname, post_listname);
 

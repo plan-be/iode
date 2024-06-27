@@ -11,7 +11,7 @@ cdef extern from "api/iode.h":
 cdef extern from "cpp_api/common.h":
     cdef enum EnumIodeType:
         COMMENTS,
-        I_EQUATIONS,
+        EQUATIONS,
         I_IDENTITIES,
         I_LISTS,
         I_SCALARS,
@@ -22,7 +22,7 @@ cdef extern from "cpp_api/common.h":
 
     cdef enum EnumIodeFile:
         COMMENTS_FILE,
-        I_EQUATIONS_FILE,
+        EQUATIONS_FILE,
         I_IDENTITIES_FILE,
         I_LISTS_FILE,
         I_SCALARS_FILE,

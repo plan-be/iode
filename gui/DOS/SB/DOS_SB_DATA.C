@@ -108,7 +108,7 @@ int     type;
 	case K_IDT :
 	case K_VAR :
 	case K_LST : return(SB_DataEditCil1(name, type));
-	case K_EQS : return(SB_DataEditEqs1(name));
+	case EQUATIONS : return(SB_DataEditEqs1(name));
 	case K_TBL :
 	case K_SCL : return(0);
 	}
@@ -166,14 +166,14 @@ C_DataEditCil1()
 SB_DataEditEqs1(name)
 char    *name;
 {
-    int     pos = K_find(K_WS[K_EQS], name);
+    int     pos = K_find(K_WS[EQUATIONS], name);
     char    per[10];
     EQ      *eq;
 
     PG_reset(vkp_eqs);
     if(pos >= 0) {
 	SCR_strlcpy(vkp_eqs_NAME, name, K_MAX_NAME); /* IODE64K */
-	eq = KEVAL(K_WS[K_EQS], pos);
+	eq = KEVAL(K_WS[EQUATIONS], pos);
 
 	vkp_eqs_METHOD = eq->method;
 /*        vkp_eqs_DATE   = eq->date; */
@@ -210,7 +210,7 @@ C_DataEditEqs1()
 
     strcpy(name, vkp_eqs_NAME);
     SCR_sqz(name);
-    if(K_find(K_WS[K_EQS], name) >= 0 && ODE_ask(OM_REPLACE)) return(-1);
+    if(K_find(K_WS[EQUATIONS], name) >= 0 && ODE_ask(OM_REPLACE)) return(-1);
 
     smpl = PER_atosmpl(vkp_eqs_FROM, vkp_eqs_TO);
     if(smpl == 0) {

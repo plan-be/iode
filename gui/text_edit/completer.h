@@ -72,8 +72,8 @@ public:
         case COMMENTS:
             iodeDatabases.insert(COMMENTS, &Comments);
             break;
-        case I_EQUATIONS:
-            iodeDatabases.insert(I_EQUATIONS, &Equations);
+        case EQUATIONS:
+            iodeDatabases.insert(EQUATIONS, &Equations);
             break;
         case I_IDENTITIES:
             iodeDatabases.insert(I_IDENTITIES, &Identities);
@@ -109,7 +109,7 @@ public:
         else
         {
             iodeDatabases.insert(COMMENTS, &Comments);
-            iodeDatabases.insert(I_EQUATIONS, &Equations);
+            iodeDatabases.insert(EQUATIONS, &Equations);
             iodeDatabases.insert(I_IDENTITIES, &Identities);
             iodeDatabases.insert(I_LISTS, &Lists);
             iodeDatabases.insert(I_SCALARS, &Scalars);

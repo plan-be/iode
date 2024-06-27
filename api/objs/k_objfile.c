@@ -40,7 +40,7 @@
  */
 char k_ext[][4] = {
     "cmt", // 0 = COMMENTS
-    "eqs", // 1 = K_EQS
+    "eqs", // 1 = EQUATIONS
     "idt", // ... 
     "lst",
     "scl",

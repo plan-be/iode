@@ -74,7 +74,7 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                 case K_IDT :
                     if(forms) found = !SCR_grep_gnl(pattern, KILEC(kdb, i), ecase, all);
                     break;
-                case K_EQS :
+                case EQUATIONS :
                     if(forms) found = !SCR_grep_gnl(pattern, KELEC(kdb, i), ecase, all);
                     if(!found && texts)
                         found = !SCR_grep_gnl(pattern, KECMT(kdb, i), ecase, all);

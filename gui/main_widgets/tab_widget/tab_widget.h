@@ -35,7 +35,7 @@ protected:
         case COMMENTS:
             index = this->indexOf(tabComments);
             break;
-        case I_EQUATIONS:
+        case EQUATIONS:
             index = this->indexOf(tabEquations);
             break;
         case I_IDENTITIES:

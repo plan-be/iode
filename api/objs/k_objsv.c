@@ -38,7 +38,7 @@
  *      EQ*     eq;
  *      char*   name;
  *      ...
- *      rc = K_add(K_WS[K_EQS], name, eq, name);
+ *      rc = K_add(K_WS[EQUATIONS], name, eq, name);
  *  
  *  
  *  @param [in, out]    kdb     KDB*    kdb to which the object is added
@@ -105,7 +105,7 @@ int K_add(KDB* kdb, char* name, ...)
           txt = va_arg(vargs, char *);
           rc = K_cpack(&pack, txt);
           break;            
-      case K_EQS: 
+      case EQUATIONS: 
           eq = va_arg(vargs, EQ *);
           endo = va_arg(vargs, char *);
           rc = K_epack(&pack, (char*) eq, endo);

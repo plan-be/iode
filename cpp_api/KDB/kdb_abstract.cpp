@@ -191,7 +191,7 @@ int KDBAbstract::set_name(const int pos, const std::string& new_name)
 
 int KDBAbstract::rename(const std::string& old_name, const std::string& new_name)
 {
-    if (k_type == I_EQUATIONS) 
+    if (k_type == EQUATIONS) 
         throw std::runtime_error(std::string("Cannot rename an equation.\n") + 
                                  "The name of an equation is always its endogenous variable");
 

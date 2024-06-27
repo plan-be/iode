@@ -35,7 +35,6 @@ const static char NAN_REP[3] = "--";
 // TODO: replace K by I as below in C api + group them in an enum
 enum EnumIodeType
 {
-    I_EQUATIONS = K_EQS,
     I_IDENTITIES = K_IDT,
     I_LISTS = K_LST,
     I_SCALARS = K_SCL,
@@ -69,7 +68,7 @@ const static std::vector<std::string> vLangs = { "English", "Dutch", "French" };
 enum EnumIodeFile
 {
     COMMENTS_FILE,
-    I_EQUATIONS_FILE,
+    EQUATIONS_FILE,
     I_IDENTITIES_FILE,
     I_LISTS_FILE,
     I_SCALARS_FILE,
@@ -120,8 +119,8 @@ const static std::map<std::string, EnumIodeFile> mFileExtensions =
 {
     {".cmt", COMMENTS_FILE},
     {".ac",  COMMENTS_FILE},
-    {".eqs", I_EQUATIONS_FILE},
-    {".ae",  I_EQUATIONS_FILE},
+    {".eqs", EQUATIONS_FILE},
+    {".ae",  EQUATIONS_FILE},
     {".idt", I_IDENTITIES_FILE},
     {".ai",  I_IDENTITIES_FILE},
     {".lst", I_LISTS_FILE},

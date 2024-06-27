@@ -23,7 +23,7 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations
 	QList<QString> list_methods;
 	for (const std::string& method : v_eq_methods) list_methods << QString::fromStdString(method);
 
-	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, I_EQUATIONS, REQUIRED_FIELD);
+	lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, EQUATIONS, REQUIRED_FIELD);
 	comboBoxMethod = new WrapperComboBox(label_method->text(), *comboBox_method, OPTIONAL_FIELD, list_methods);
 	sampleFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_from, OPTIONAL_FIELD);
 	sampleTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_to, OPTIONAL_FIELD);

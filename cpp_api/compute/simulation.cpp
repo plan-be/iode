@@ -34,16 +34,16 @@ void Simulation::model_exchange(const std::string& list_exo)
  */
 void Simulation::model_compile(const std::string& list_eqs)
 {
-    if (list_eqs.empty()) KE_compile(K_WS[I_EQUATIONS]);            // EndoExo whole WS
+    if (list_eqs.empty()) KE_compile(K_WS[EQUATIONS]);            // EndoExo whole WS
     else 
     {
         char* c_list_eqs = to_char_array(list_eqs);
         char** eqs = B_ainit_chk(c_list_eqs, NULL, 0);
         int nb_eqs = SCR_tbl_size((unsigned char**) eqs);
-        if (eqs == NULL || nb_eqs == 0) KE_compile(K_WS[K_EQS]);   // EndoExo whole WS
+        if (eqs == NULL || nb_eqs == 0) KE_compile(K_WS[EQUATIONS]);   // EndoExo whole WS
         else 
         {
-            KDB* tdbe = K_refer(K_WS[I_EQUATIONS], nb_eqs, eqs);
+            KDB* tdbe = K_refer(K_WS[EQUATIONS], nb_eqs, eqs);
             int rc = KE_compile(tdbe);
             K_free_kdb(tdbe);
             SCR_free_tbl((unsigned char**) eqs);
@@ -88,10 +88,10 @@ void Simulation::model_simulate(const std::string& from, const std::string& to, 
 
     int rc;
     if (SCR_tbl_size((unsigned char**) c_eqs) == 0)
-        rc = K_simul(K_WS[I_EQUATIONS], K_WS[I_VARIABLES], K_WS[I_SCALARS], sample, KSIM_EXO, NULL);
+        rc = K_simul(K_WS[EQUATIONS], K_WS[I_VARIABLES], K_WS[I_SCALARS], sample, KSIM_EXO, NULL);
     else 
     {
-        KDB* tdbe = K_refer(K_WS[I_EQUATIONS], SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
+        KDB* tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
         rc = K_simul(tdbe, K_WS[I_VARIABLES], K_WS[I_SCALARS], sample, KSIM_EXO, c_eqs);
         K_free_kdb(tdbe);
         SCR_free_tbl((unsigned char**) c_eqs);
@@ -142,12 +142,12 @@ void Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     KDB* tdbe;
     if (SCR_tbl_size((unsigned char**) c_eqs) == 0)
     {
-        tdbe = K_WS[I_EQUATIONS];
+        tdbe = K_WS[EQUATIONS];
         rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
     }
     else
     {
-        tdbe = K_refer(K_WS[I_EQUATIONS], SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
+        tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
         rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
         K_free_kdb(tdbe);
         SCR_free_tbl((unsigned char**) c_eqs);
@@ -209,7 +209,7 @@ void Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     std::string list_eqs = list_pre + list_inter + list_post;
     char** c_eqs = B_ainit_chk(to_char_array(list_eqs), NULL, 0);
 
-    KDB* tdbe = K_refer(K_WS[I_EQUATIONS], SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
+    KDB* tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size((unsigned char**) c_eqs), c_eqs);
     int rc = K_simul_SCC(tdbe, K_WS[I_VARIABLES], K_WS[I_SCALARS], sample, c_pre, c_inter, c_post);
 
     K_free_kdb(tdbe);

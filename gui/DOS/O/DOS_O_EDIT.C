@@ -13,7 +13,7 @@ int     pos;
     if(pos < 0) name[0] = 0;
     else strcpy(name, KONAME(kdb, pos));
     if(SB_DataEditObj1(name, type) < 0) return(-1);
-    if(type == K_EQS) strcpy(name, vkp_eqs_NAME);
+    if(type == EQUATIONS) strcpy(name, vkp_eqs_NAME);
     else              strcpy(name, vkp_edit_NAME);
     p1 = K_find(K_WS[type], name);
     if(p1 < 0) return(-1);

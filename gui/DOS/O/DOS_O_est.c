@@ -605,7 +605,7 @@ ODE_blk_save()
 
 
             /* GB 27/07/98 */
-            eq = KEVAL(K_WS[K_EQS], K_find(K_WS[K_EQS], name));
+            eq = KEVAL(K_WS[EQUATIONS], K_find(K_WS[EQUATIONS], name));
             E_tests2scl(eq, i, E_T, E_NCE);
         }
         else {

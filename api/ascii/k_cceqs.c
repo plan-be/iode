@@ -257,7 +257,7 @@ KDB *KE_load_asc(char* filename)
     }
 
     /* READ FILE */
-    kdb = K_create(K_EQS, UPPER_CASE);
+    kdb = K_create(EQUATIONS, UPPER_CASE);
         
     while(1) {
         switch(YY_read(yy)) {
@@ -266,7 +266,7 @@ KDB *KE_load_asc(char* filename)
             case YY_EOF :
                 if(cmpt) {
                     char    asc_filename[1024];
-                    K_set_ext_asc(asc_filename, filename, K_EQS);
+                    K_set_ext_asc(asc_filename, filename, EQUATIONS);
                     K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

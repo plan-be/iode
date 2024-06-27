@@ -87,7 +87,7 @@ def delete_cmt(name: str):
     delete_obj(name, COMMENTS)
 
 def delete_eqs(name: str):
-    return delete_obj(name, K_EQS)
+    return delete_obj(name, EQUATIONS)
 
 def delete_idt(name: str):
     return delete_obj(name, K_IDT)

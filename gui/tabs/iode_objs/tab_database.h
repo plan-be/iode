@@ -37,7 +37,7 @@ public:
 class EquationsWidget : public TemplateIodeObjectWidget<EquationsModel, EquationsView>
 {
 public:
-    EquationsWidget(QWidget* parent) : TemplateIodeObjectWidget(I_EQUATIONS, parent) 
+    EquationsWidget(QWidget* parent) : TemplateIodeObjectWidget(EQUATIONS, parent) 
     {
         connect(objmodel, &EquationsModel::dataChanged, this, &EquationsWidget::databaseModified);
         connect(objmodel, &EquationsModel::headerDataChanged, this, &EquationsWidget::databaseModified);

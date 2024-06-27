@@ -394,7 +394,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
             case COMMENTS :
                 obj = (char *)KCVAL(kdb, objnb);
                 break;
-            case K_EQS :
+            case EQUATIONS :
                 obj = (char *)KELEC(kdb, objnb);
                 break;
             case K_IDT :
@@ -557,7 +557,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(objnb < 0) return((char *)0);
 
     switch(type) {
-        case K_EQS :
+        case EQUATIONS :
         case K_IDT :
         case K_TBL :
             return((char *)0);
@@ -962,7 +962,7 @@ int B_ExcelSet(char *arg, int type)
         case K_LST :
             ptr = SCR_stracpy(KLVAL(kdb, pos));
             break;
-        case K_EQS :
+        case EQUATIONS :
             ptr = SCR_stracpy(KELEC(kdb, pos));
             break;
         case K_SCL :

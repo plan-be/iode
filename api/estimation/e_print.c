@@ -328,9 +328,9 @@ static int E_graph_calc_lhs(char* name, char* res, char* rhs)
 
     memset(res, 0, 71);
     memset(rhs, 0, 71);
-    pos = K_find(K_WS[K_EQS], name);
+    pos = K_find(K_WS[EQUATIONS], name);
     if(pos < 0) return(-1);
-    lec = KELEC(K_WS[K_EQS], pos);
+    lec = KELEC(K_WS[EQUATIONS], pos);
     i = L_split_eq(lec);
     if(i < 0) return(-1);
     i = min(i, 70);

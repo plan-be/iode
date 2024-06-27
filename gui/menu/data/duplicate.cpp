@@ -49,7 +49,7 @@ void MenuDataDuplicateObj::duplicate()
         case COMMENTS:
             Comments.add(dup_obj_name, Comments.copy(obj_name));
             break;
-        case I_EQUATIONS:
+        case EQUATIONS:
             throw IodeException("Cannot duplicate an equation");
             break;     
         case I_IDENTITIES:

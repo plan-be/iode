@@ -109,7 +109,7 @@ int i;
 	    //strcpy(STATIC_BUF, STATIC_BUF + 2);
 	    break;
 	case COMMENTS :strcpy(STATIC_BUF, "COMMENT");     break;
-	case K_EQS :strcpy(STATIC_BUF, "EQUATION");    break;
+	case EQUATIONS :strcpy(STATIC_BUF, "EQUATION");    break;
 	case K_IDT :strcpy(STATIC_BUF, "IDENTITY");    break;
 	case K_LST :strcpy(STATIC_BUF, "LIST");        break;
 	case K_SCL :strcpy(STATIC_BUF, scl[i]);        break;
@@ -174,7 +174,7 @@ int i, j;
     case K_IDT :
 	    return(KILEC(kdb, i));
 
-    case K_EQS :
+    case EQUATIONS :
     /*
 	    if(SCRL == &deb_sc)
 		return(KELEC(kdb, KSIM_ORDER[i]));
@@ -243,7 +243,7 @@ int i;
 
     switch(KTYPE(kdb)) {
 	case COMMENTS :
-	case K_EQS :
+	case EQUATIONS :
 	case K_IDT :
 	case K_TBL :
 	case K_LST :
@@ -285,7 +285,7 @@ int i, j;
 
     switch(KTYPE(kdb)) {
 	case COMMENTS :
-	case K_EQS :
+	case EQUATIONS :
 	case K_IDT :
 	case K_LST :
 	case K_VAR :  rc = ODE_edit_obj1(kdb, -1); break;
@@ -316,7 +316,7 @@ int i, j;
 
     switch(KTYPE(kdb)) {
     case COMMENTS :
-    case K_EQS :
+    case EQUATIONS :
     case K_IDT :
     case K_LST :  return(ODE_edit_obj1(kdb, i));
     case K_SCL :  return(ODE_edit_scl_cell(kdb, i, j));

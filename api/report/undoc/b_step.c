@@ -30,9 +30,9 @@ static int check_scl_var(char *eqs)
     CLEC*   cl;
     char    buf[1024];
 
-    pos = K_find(K_WS[K_EQS], eqs);
+    pos = K_find(K_WS[EQUATIONS], eqs);
     if(pos < 0) return(-1);             // JMP 04/07/2022
-    eq = KEVAL(K_WS[K_EQS], pos);
+    eq = KEVAL(K_WS[EQUATIONS], pos);
     cl = eq->clec;
 
     for(j = 0 ; j < cl->nb_names ; j++) {
@@ -83,7 +83,7 @@ int B_EqsStepWise(char* arg)
         kerror(0,"Incorrect sample");
         return(1);
     }
-    if(K_find(K_WS[K_EQS],eqs)== -1) {                            /*GŠre les erreurs d'‚quation*/
+    if(K_find(K_WS[EQUATIONS],eqs)== -1) {                            /*GŠre les erreurs d'‚quation*/
         kerror(0,"Eqs %s not found",eqs);
         return(1);
     }
