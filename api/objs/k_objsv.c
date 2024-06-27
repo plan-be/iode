@@ -126,7 +126,7 @@ int K_add(KDB* kdb, char* name, ...)
           tbl = va_arg(vargs, TBL *);
           rc = K_tpack(&pack, (char*)tbl);
           break;            
-      case K_VAR: 
+      case VARIABLES: 
           var = va_arg(vargs, double *);  
           lgptr = va_arg(vargs, int*);
           rc = K_vpack(&pack, var, lgptr);

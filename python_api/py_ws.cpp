@@ -5,7 +5,7 @@ void init_ws(nb::module_ &m)
 {
     // Workspace functions
 
-    m.def("ws_content", &ws_content, nb::arg("pattern"), nb::arg("iode_type") = (int) I_VARIABLES, 
+    m.def("ws_content", &ws_content, nb::arg("pattern"), nb::arg("iode_type") = (int) VARIABLES, 
         "Return the names of objects of a given IODE data type, satisfying a pattern specification.");
     m.def("ws_content_cmt", [](const std::string& pattern){ return ws_content(pattern, COMMENTS); }, nb::arg("pattern"),
         "Return the list of comment names corresponding to the given pattern");
@@ -19,7 +19,7 @@ void init_ws(nb::module_ &m)
         "Return the list of scalar names corresponding to the given pattern");
     m.def("ws_content_tbl", [](const std::string& pattern){ return ws_content(pattern, TABLES); }, nb::arg("pattern"),
         "Return the list of table names corresponding to the given pattern");
-    m.def("ws_content_var", [](const std::string& pattern){ return ws_content(pattern, I_VARIABLES); }, nb::arg("pattern"),
+    m.def("ws_content_var", [](const std::string& pattern){ return ws_content(pattern, VARIABLES); }, nb::arg("pattern"),
         "Return the list of variable names corresponding to the given pattern");
 
     m.def("ws_clear_all", &ws_clear_all, "Clear all workspaces");
@@ -110,10 +110,10 @@ void init_ws(nb::module_ &m)
 
 std::vector<std::string> ws_content(const std::string& pattern, const int iode_type)
 {
-    if(iode_type < 0 || iode_type > I_VARIABLES)
+    if(iode_type < 0 || iode_type > VARIABLES)
         throw std::invalid_argument("Invalid value " + std::to_string(iode_type) + " for the argument " +
                                     "'iode_type'.\nThe value must be in range [0, " + 
-                                    std::to_string(I_VARIABLES) + "]");
+                                    std::to_string(VARIABLES) + "]");
 
     char** cnt = IodeContents(const_cast<char*>(pattern.c_str()), iode_type);
 
@@ -167,13 +167,13 @@ void ws_clear(const int iode_type)
     case TABLES:
         Tables.clear();
         break;
-    case I_VARIABLES:
+    case VARIABLES:
         Variables.clear();
         break;    
     default:
         throw std::invalid_argument("Invalid value " + std::to_string(iode_type) + " for the argument " +
                                     "'iode_type'.\nThe value must be in range [0, " + 
-                                    std::to_string(I_VARIABLES) + "]");
+                                    std::to_string(VARIABLES) + "]");
         break;
     }
 }
@@ -213,14 +213,14 @@ int ws_load(const std::string& filename, const int iode_type)
         Tables.load(filename);
         return Tables.count();
         break;
-    case I_VARIABLES:
+    case VARIABLES:
         Variables.load(filename);
         return Variables.count();
         break;
     default:
         throw std::invalid_argument("Invalid value " + std::to_string(iode_type) + " for the argument " +
                                     "'iode_type'.\nThe value must be in range [0, " + 
-                                    std::to_string(I_VARIABLES) + "]");
+                                    std::to_string(VARIABLES) + "]");
         break;
     }
     return -1;
@@ -250,13 +250,13 @@ void ws_save(const std::string& filename, const int iode_type)
     case TABLES:
         Tables.save(filename);
         break;
-    case I_VARIABLES:
+    case VARIABLES:
         Variables.save(filename);
         break;    
     default:
         throw std::invalid_argument("Invalid value " + std::to_string(iode_type) + " for the argument " +
                                     "'iode_type'.\nThe value must be in range [0, " + 
-                                    std::to_string(I_VARIABLES) + "]");
+                                    std::to_string(VARIABLES) + "]");
         break;
     }
 }

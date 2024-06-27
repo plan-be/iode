@@ -137,7 +137,7 @@ enum IodeCase
 #define LISTS       3
 #define SCALARS       4
 #define TABLES       5
-#define K_VAR       6
+#define VARIABLES       6
 
 #define K_OBJ       7
 
@@ -296,7 +296,7 @@ enum IodeCase
 #define KL_WS   K_WS[LISTS]
 #define KS_WS   K_WS[SCALARS]
 #define KT_WS   K_WS[TABLES]
-#define KV_WS   K_WS[K_VAR]
+#define KV_WS   K_WS[VARIABLES]
 
 #define KC_RWS   K_RWS[COMMENTS][K_PWS[COMMENTS]]
 #define KE_RWS   K_RWS[EQUATIONS][K_PWS[EQUATIONS]]
@@ -304,7 +304,7 @@ enum IodeCase
 #define KL_RWS   K_RWS[LISTS][K_PWS[LISTS]]
 #define KS_RWS   K_RWS[SCALARS][K_PWS[SCALARS]]
 #define KT_RWS   K_RWS[TABLES][K_PWS[TABLES]]
-#define KV_RWS   K_RWS[K_VAR][K_PWS[K_VAR]]
+#define KV_RWS   K_RWS[VARIABLES][K_PWS[VARIABLES]]
 
 
 /*----------------------- COLS ----------------------------*/
@@ -813,7 +813,7 @@ typedef struct  _kobj_ {
 typedef struct _kdb_ {
     KOBJ        *k_objs;                // map <position in the memory, object name>
 	long        k_nb;                   // number of objects in the database
-    short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., K_VAR
+    short       k_type;                 // type of the object: COMMENTS, EQUATIONS, ..., VARIABLES
     short       k_mode;                 // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     char        k_arch[LMAGIC];         // not used
     char        k_magic[LMAGIC];        // not used

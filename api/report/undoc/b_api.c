@@ -192,7 +192,7 @@ char *IodeVersion()
  *  Load an IODE workspace file.
  *  
  *  @param [in] name    char*   filename 
- *  @param [in] type    int     file type (COMMENTS...K_VAR)
+ *  @param [in] type    int     file type (COMMENTS...VARIABLES)
  *  @return             int     nb of objects read or -1 on error
  */
 int  IodeLoad(char *name, int type)
@@ -228,7 +228,7 @@ int  IodeSave(char *name, int type)
  */
 int IodeClearWs(int type)
 {
-    if(type >= COMMENTS && type <= K_VAR) 
+    if(type >= COMMENTS && type <= VARIABLES) 
         K_clear(K_WS[type]);
     return(0);
 }
@@ -243,7 +243,7 @@ int IodeClearAll()
 {
     int type;
 
-    for(type = COMMENTS; type <= K_VAR; type++)
+    for(type = COMMENTS; type <= VARIABLES; type++)
         K_clear(K_WS[type]);
     
     return(0);
@@ -272,7 +272,7 @@ int IodeGetSampleLength()
 {
     SAMPLE  *smpl;
 
-    smpl = (SAMPLE *) KDATA(K_WS[K_VAR]);
+    smpl = (SAMPLE *) KDATA(K_WS[VARIABLES]);
     return(smpl->s_nb);
 }
 
@@ -374,7 +374,7 @@ double *IodeGetSampleAsDoubles(int *lg)
     PERIOD	*from;
     int		t, per;
 
-    smpl = (SAMPLE *) KDATA(K_WS[K_VAR]);
+    smpl = (SAMPLE *) KDATA(K_WS[VARIABLES]);
     *lg = smpl->s_nb;
 
     value = (double *) SW_nalloc(smpl->s_nb * sizeof(double));
@@ -700,10 +700,10 @@ double IodeGetVarT(char *name, int t, int mode)
     smpl = KSMPL(KV_WS);
     if(t > smpl->s_nb) return(L_NAN);
 
-    pos = K_find(K_WS[K_VAR], name);
+    pos = K_find(K_WS[VARIABLES], name);
     if(pos < 0) return(L_NAN);
 
-    value = KV_get(K_WS[K_VAR], pos, t, mode);
+    value = KV_get(K_WS[VARIABLES], pos, t, mode);
     return(value);
 }
 
@@ -733,7 +733,7 @@ int IodeSetVarT(char *name, int t, int mode, double value)
     pos = K_find(KV_WS, name);
     if(pos < 0) return(-1);
 
-    KV_set(K_WS[K_VAR], pos, t, mode, value);
+    KV_set(K_WS[VARIABLES], pos, t, mode, value);
     return(0);
 }
 
@@ -754,9 +754,9 @@ double *IodeGetVector(char *name, int *lg)
     smpl = KSMPL(KV_WS);
     *lg = smpl->s_nb;
 
-    pos = K_find(K_WS[K_VAR], name);
+    pos = K_find(K_WS[VARIABLES], name);
     if(pos >= 0) {
-        value = KVVAL(K_WS[K_VAR], pos, 0);
+        value = KVVAL(K_WS[VARIABLES], pos, 0);
     }
     return(value);
 }

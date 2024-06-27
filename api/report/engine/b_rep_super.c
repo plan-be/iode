@@ -13,7 +13,7 @@
  *  
  *  For example, in a report, the command "#WsLoad" calls the GUI function SB_WsLoad() which opens 
  *  the Dialog "Workspace / Load" and waits for a user action. In constrast, the command "$WsLoadVar" 
- *  calls B_WsLoad(filename, K_VAR) which loads a WS, but without user interaction.
+ *  calls B_WsLoad(filename, VARIABLES) which loads a WS, but without user interaction.
  *  
  *  Note that the GUI default functions defined in this file are empty (SB_*(), B_Scroll*()...
  *  

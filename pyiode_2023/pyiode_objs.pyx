@@ -16,7 +16,7 @@
 #   
 #  List of functions
 #  -----------------
-#   delete_objects(pattern: str = '*', obj_type: int = K_VAR)  |   delete the objects whose names satisfy the given pattern
+#   delete_objects(pattern: str = '*', obj_type: int = VARIABLES)  |   delete the objects whose names satisfy the given pattern
 #
 #   delete_obj(name: str, obj_type: int) | delete the object named name of type obj_type
 #   delete_cmt(name: str)                | delete the comment named name
@@ -48,7 +48,7 @@
 #   set_var(varname, py_values)          | create or update an IODE variable from a list of floats or a ndarray
 
 
-def delete_objects(pattern: str = '*', obj_type: int = K_VAR):
+def delete_objects(pattern: str = '*', obj_type: int = VARIABLES):
     r'''Delete one or more IODE objects corresponding to the specified pattern.
     
     Parameters
@@ -102,7 +102,7 @@ def delete_tbl(name: str):
     return delete_obj(name, TABLES)
 
 def delete_var(name: str):
-    return delete_obj(name, K_VAR)
+    return delete_obj(name, VARIABLES)
    
 
 # Set and Get IODE objects

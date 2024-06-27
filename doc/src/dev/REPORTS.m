@@ -492,12 +492,12 @@ In that way, only one function is needed for $DataDelete~iVar~I, $DataDelete~iId
 
 When called by the report engine, these functions have 2 parameters:
 &EN the argument of the function (the report line without the function name)
-&EN the type of object treated (COMMENTS <<= type <<= K_VAR)
+&EN the type of object treated (COMMENTS <<= type <<= VARIABLES)
 
 For these functions, the parameters and return values are as follows:
 &CO
     @param [in] char*   arg     report line without the first word
-    @param [in] int     type    type of object to be manipulated (COMMENTS <<= type <<= K_VAR)
+    @param [in] int     type    type of object to be manipulated (COMMENTS <<= type <<= VARIABLES)
     @return     int             0 on success, -1 on error
 &TX
 For instance, the report command
@@ -506,9 +506,9 @@ For instance, the report command
 &TX
 generates the C call:
 &CO
-    B_DataDelete("A B C", K_VAR);
+    B_DataDelete("A B C", VARIABLES);
 
-    where arg == "A B C" and type == K_VAR
+    where arg == "A B C" and type == VARIABLES
 &TX
 
 &IT Functions with a file extension suffix (csv, txt...)
@@ -530,7 +530,7 @@ calls the C function
 &CO
     B_FileDelete(arg, K_CSV);
 
-    where arg == "myfile" and type == K_VAR
+    where arg == "myfile" and type == VARIABLES
 &TX
 
 &IT Other functions
@@ -608,8 +608,8 @@ For instance, the report command
 &TX
 generates the C call:
 &CO
-    B_DataDelete("A B C", K_VAR);
-    where arg == "A B C" and type == K_VAR
+    B_DataDelete("A B C", VARIABLES);
+    where arg == "A B C" and type == VARIABLES
 &TX
 
 &IT Other functions
@@ -884,7 +884,7 @@ one for the non GUI version ($) and one for the GUI version (##).
 
 For example, the command "##WsLoad" calls the GUI function SB_WsLoad() which opens
 the Dialog "Workspace / Load" and waits for a user action. In contrast, the command "$WsLoadVar"
-calls B_WsLoad(filename, K_VAR) which loads a WS, but without user interaction.
+calls B_WsLoad(filename, VARIABLES) which loads a WS, but without user interaction.
 
 In non-GUI programs, a call to a GUI-function must be replaced by a default implementation, generally
 a empty one.

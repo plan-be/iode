@@ -77,7 +77,7 @@ int     i, j;
 	    }
 	    A_SEPS = T_SEPS;
 
-	    lst = K_expand(K_VAR, NULL, vktp_create_LEC, '*');
+	    lst = K_expand(VARIABLES, NULL, vktp_create_LEC, '*');
 	    lecs = B_ainit_chk(lst, NULL, 0);
 	    SCR_free(lst);
 

@@ -14,7 +14,7 @@
 #   ws_content_tbl(pattern) -> List[str]            | Returns the list of table names corresponding to the given pattern(s)
 #   ws_content_var(pattern) -> List[str]            | Returns the list of variable names corresponding to the given pattern(s)
 #
-#   ws_clear(filetype: int) | Clear WS of the given filetype (COMMENTS..K_VAR)
+#   ws_clear(filetype: int) | Clear WS of the given filetype (COMMENTS..VARIABLES)
 #   ws_clear_cmt()          | Clear the comment WS
 #   ws_clear_eqs()          | Clear the equation WS
 #   ws_clear_idt()          | Clear the identity WS
@@ -198,7 +198,7 @@ def ws_content_tbl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, TABLES)
 
 def ws_content_var(pattern: Union[str, List[str]] = '*') -> List[str]:
-    return ws_content(pattern, K_VAR)
+    return ws_content(pattern, VARIABLES)
 
 
 # Clear WS
@@ -209,7 +209,7 @@ def ws_clear_all():
         raise RuntimeError(f"Cannot clear all workspaces.")
 
 def ws_clear(filetype: int):
-    '''Clear WS of the given filetype (COMMENTS..K_VAR)'''
+    '''Clear WS of the given filetype (COMMENTS..VARIABLES)'''
     if IodeClearWs(filetype):
         raise RuntimeError(f"Workspace of type {filetype} cannot be cleared")
 
@@ -233,7 +233,7 @@ def ws_clear_tbl():
     ws_clear(TABLES)
 
 def ws_clear_var():
-    ws_clear(K_VAR)
+    ws_clear(VARIABLES)
 
 
 # Load WS
@@ -267,7 +267,7 @@ def ws_load_tbl(filename: str) -> int:
     return ws_load(filename, TABLES) 
                              
 def ws_load_var(filename: str) -> int:
-    return ws_load(filename, K_VAR)
+    return ws_load(filename, VARIABLES)
 
 
 # Save WS
@@ -303,7 +303,7 @@ def ws_save_tbl(filename: str):
 
 def ws_save_var(filename: str):
     '''Save the current variable workspace'''
-    ws_save(filename, K_VAR)
+    ws_save(filename, VARIABLES)
 
 
 # High to Low

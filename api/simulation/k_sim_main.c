@@ -111,7 +111,7 @@ int         KSIM_SORT = SORT_BOTH;    // Reordering option : SORT_NONE, SORT_CON
 int         KSIM_START = KV_INIT_TM1; // Endogenous initial values: @see KV_init_values_1() for available options
 char        **KSIM_EXO = NULL;        // 
 char        *KSIM_PATH = NULL;        //
-KDB         *KSIM_DBV;                // KDB of variables used for the simulation. Normally K_WS[K_VAR]
+KDB         *KSIM_DBV;                // KDB of variables used for the simulation. Normally K_WS[VARIABLES]
 KDB         *KSIM_DBS;                // KDB of scalars used for the simulation. Normally K_WS[SCALARS]
 KDB         *KSIM_DBE;                // KDB of equations defining the model to simulation. Can K_WS[EQUATIONS] or a subset.
 

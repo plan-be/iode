@@ -4,7 +4,7 @@ AddTableDialog::AddTableDialog(KDBTables* database, QWidget* parent) : IodeSetti
 {
     setupUi(this);
 
-	completer = new IodeCompleter(false, false, {SCALARS, I_VARIABLES}, textEdit_lec);
+	completer = new IodeCompleter(false, false, {SCALARS, VARIABLES}, textEdit_lec);
 	textEdit_lec->setCompleter(completer);
 
     lineName = new WrapperIodeNameEdit(label_name->text(), *lineEdit_name, TABLES, REQUIRED_FIELD);

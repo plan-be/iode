@@ -85,7 +85,7 @@ public:
 		int height = horizontalHeader()->height();
 		for(int i = 0; i < model()->rowCount(); i++)
 			height += rowHeight(i);
-		if(iodeType == I_VARIABLES)
+		if(iodeType == VARIABLES)
 			height += 20;
 		return height;
 	}

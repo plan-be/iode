@@ -19,12 +19,12 @@
  *  
  *  When called by the report engine, these functions have 2 parameters: 
  *      - the argument of the function (the remaining of the report line)
- *      - the type of object treated (COMMENTS <= type <= K_VAR)
+ *      - the type of object treated (COMMENTS <= type <= VARIABLES)
  *  
  *  For these functions, the parameters and return values are as follows: 
  *  
  *      @param [in] char*   arg     report line without the command 
- *      @param [in] int     type    type of object whose names are to be saved in the list (bw COMMENTS and K_VAR)
+ *      @param [in] int     type    type of object whose names are to be saved in the list (bw COMMENTS and VARIABLES)
  *      @return     int             0 on success, -1 on error 
  *
  *  For instance, the report command 
@@ -33,9 +33,9 @@
  *  
  *  generates the C call: 
  *  
- *      B_DataDelete("A B C", K_VAR);
+ *      B_DataDelete("A B C", VARIABLES);
  *
- *  where arg == "A B C" and type == K_VAR   
+ *  where arg == "A B C" and type == VARIABLES   
  *      
  *  
  *  Functions with a file extension suffix (csv, txt...)
@@ -56,7 +56,7 @@
  *  
  *      B_FileDelete(arg, K_CSV);
  *
- *  where arg == "myfile" and type == K_VAR   
+ *  where arg == "myfile" and type == VARIABLES   
  *      
  *  
  *  Other functions
@@ -213,7 +213,7 @@ int B_DataCalcVar(char* arg)
 {
     char        name[K_MAX_NAME + 1], *lec;
     int         lg, t, nb;
-    KDB         *kdb = K_WS[K_VAR];
+    KDB         *kdb = K_WS[VARIABLES];
     CLEC        *clec = 0;
     int         pos;
     double   d;
@@ -270,7 +270,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             if(K_add(kdb, arg, NULL) < 0) return(-1);
             else return(0);
 
-        case K_VAR :
+        case VARIABLES :
             nb_per = KSMPL(kdb)->s_nb;
             if(K_add(kdb, arg, NULL, &nb_per) < 0) return(-1);
             else return(0);
@@ -505,7 +505,7 @@ int B_DataUpdate(char* arg, int type)
         if(rc == 0) rc = K_add(kdb, args[0], &scl);
         break;
 
-    case K_VAR : /* Name [D|d|G|g|L|l] Period nVal */
+    case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
         args = SCR_vtoms(arg, B_SEPS);
         nb_args = SCR_tbl_size(args);
         if(nb_args > 1) {
@@ -888,7 +888,7 @@ int B_DataAppend(char* arg, int type)
     case IDENTITIES :
     case SCALARS :
     case TABLES :
-    case K_VAR :
+    case VARIABLES :
         B_seterror("DataAppend : only lists and comments");
         return(-1);
     }

@@ -74,7 +74,7 @@ void init_ws(nb::module_ &m);
     ['ACAF', 'ACAG']
     """
 */
-std::vector<std::string> ws_content(const std::string& pattern = "*", const int iode_type = I_VARIABLES);
+std::vector<std::string> ws_content(const std::string& pattern = "*", const int iode_type = VARIABLES);
 
 // Clear WS
 

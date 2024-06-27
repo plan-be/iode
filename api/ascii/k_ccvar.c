@@ -89,7 +89,7 @@ static KDB *KV_load_yy(YYFILE* yy, int ask)
     SAMPLE  *smpl, *kasksmpl();
 
     // Create and empty KDB for vars
-    kdb = K_create(K_VAR, UPPER_CASE);
+    kdb = K_create(VARIABLES, UPPER_CASE);
 
     // The keyword sample must be the first on the YY stream */
     // if not:
@@ -207,7 +207,7 @@ KDB *KV_load_asc(char *filename)
     kdb = KV_load_asc_type_ask(filename, 0, 0);
     if(kdb && KNB(kdb) > 0) {
         char    asc_filename[1024];
-        K_set_ext_asc(asc_filename, filename, K_VAR);
+        K_set_ext_asc(asc_filename, filename, VARIABLES);
         K_set_kdb_fullpath(kdb, (U_ch*)asc_filename); // JMP 03/12/2022
     }
    

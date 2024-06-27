@@ -415,7 +415,7 @@ static int L_string()
     char    *ptr, *K_expand();
 
     L_read_string();
-    ptr = K_expand(K_VAR, NULL, LYYTEXT, '*');
+    ptr = K_expand(VARIABLES, NULL, LYYTEXT, '*');
     if(ptr == 0) return(L_errno = L_MACRO_ERR);
     SCR_replace(ptr, ";", ",");
     YY_record(L_YY, ptr);

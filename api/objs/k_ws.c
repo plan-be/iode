@@ -82,8 +82,8 @@ void K_end_ws(int ws)
 
 /**
  *  Loads a VAR file for use in GSAMPLE (print tables and graphs).
- *  Stores its KDB pointer in K_RWS[K_VAR][ref - 1]. 
- *  If filename is NULL, frees K_RWS[K_VAR][ref - 1].
+ *  Stores its KDB pointer in K_RWS[VARIABLES][ref - 1]. 
+ *  If filename is NULL, frees K_RWS[VARIABLES][ref - 1].
  *  
  *  Example: the files [1], [2] and [3] used in a GSAMPLE "2000Y1[1,2,3]" are loaded:
  *      - [1] == current content of the VAR workspace
@@ -93,7 +93,7 @@ void K_end_ws(int ws)
  *  @param [in] int     ref         reference number that will be used in GSAMPLE. 
  *                                  Restriction : 2 <= ref <= 5
  *  @param [in] char*   filename    file to load. 
- *                                  If NULL, frees K_RWS[K_VAR][ref-1]
+ *                                  If NULL, frees K_RWS[VARIABLES][ref-1]
  *  @return     int                 0 on success, -1 on error (file not found, ref out of range...)
  *  
  */
@@ -108,16 +108,16 @@ int K_load_RWS(int ref, char *filename)
     }
     
     if(filename == NULL) {
-        K_free(K_RWS[K_VAR][ref - 1]);
-        K_RWS[K_VAR][ref - 1] = NULL;
+        K_free(K_RWS[VARIABLES][ref - 1]);
+        K_RWS[VARIABLES][ref - 1] = NULL;
         return(0);
     }
 
-    kdb = K_interpret(K_VAR, filename);
+    kdb = K_interpret(VARIABLES, filename);
     if(kdb == NULL) return(-1);
 
-    K_free(K_RWS[K_VAR][ref - 1]);
-    K_RWS[K_VAR][ref - 1] = kdb;
+    K_free(K_RWS[VARIABLES][ref - 1]);
+    K_RWS[VARIABLES][ref - 1] = kdb;
 
     return(0);
 }

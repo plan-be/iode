@@ -37,7 +37,7 @@ signals:
 
 public:
 	VariablesView(QWidget* parent = nullptr) 
-		: IodeAbstractTableView(I_VARIABLES, new VariablesDelegate(parent), parent), TableViewAddObj(this), numeric(true)
+		: IodeAbstractTableView(VARIABLES, new VariablesDelegate(parent), parent), TableViewAddObj(this), numeric(true)
 	{
 		numeric.setup(this);
 

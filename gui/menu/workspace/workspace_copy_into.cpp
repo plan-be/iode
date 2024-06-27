@@ -66,7 +66,7 @@ void MenuWorkspaceCopyInto::copy_into_workspace()
         case TABLES:
             Tables.copy_from(input_file, object_names);
             break;
-        case I_VARIABLES:
+        case VARIABLES:
             Variables.copy_from(input_file, from, to, object_names);
             break;
         default:

@@ -101,7 +101,7 @@ static int B_htol(int method, char* arg)
     nb = SCR_tbl_size(data);
     if(nb == 0) goto done;
 
-    from = K_load(K_VAR, file, nb, data);
+    from = K_load(VARIABLES, file, nb, data);
     if(from == NULL) {
         rc = -1;
         goto done;
@@ -112,7 +112,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    to = K_create(K_VAR, UPPER_CASE);
+    to = K_create(VARIABLES, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(to), t_smpl, sizeof(SAMPLE));
     t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + KSMPL(from)->s_nb) * sizeof(double));
@@ -179,7 +179,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         goto done;
     }
 
-    kdb_to = K_create(K_VAR, UPPER_CASE);
+    kdb_to = K_create(VARIABLES, UPPER_CASE);
     memcpy((SAMPLE *) KDATA(kdb_to), t_smpl, sizeof(SAMPLE));
     t_vec = (double *) SW_nalloc((1 + t_smpl->s_nb) * sizeof(double));
     f_vec = (double *) SW_nalloc((1 + KSMPL(kdb_from)->s_nb) * sizeof(double));

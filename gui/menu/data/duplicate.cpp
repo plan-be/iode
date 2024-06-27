@@ -64,7 +64,7 @@ void MenuDataDuplicateObj::duplicate()
         case TABLES:
             Tables.add(dup_obj_name, Tables.copy(obj_name));
             break; 
-        case I_VARIABLES:
+        case VARIABLES:
             Variables.add(dup_obj_name, Variables.copy(obj_name));
             break; 
         default:

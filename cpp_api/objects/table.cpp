@@ -560,7 +560,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
 	{
 		char* pattern = to_char_array(lecs);
 		// Retrieves all variable names matching one or more patterns in KV_WS (similar to grep)
-		char* lst = K_expand(I_VARIABLES, NULL, pattern, '*');
+		char* lst = K_expand(VARIABLES, NULL, pattern, '*');
 		// Parses a string and replaces @filename and $listname by their contents
 		c_lecs = B_ainit_chk(lst, NULL, 0);
 		SCR_free(lst);

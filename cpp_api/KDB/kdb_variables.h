@@ -46,7 +46,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
-    KDBVariables(const std::string& filepath="") : KDBTemplate(I_VARIABLES, filepath) {}
+    KDBVariables(const std::string& filepath="") : KDBTemplate(VARIABLES, filepath) {}
 
     KDBVariables* subset(const std::string& pattern, const bool deep_copy=false)
     {

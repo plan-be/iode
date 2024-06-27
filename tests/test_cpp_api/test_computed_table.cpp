@@ -34,7 +34,7 @@ protected:
 
         // C: -> c:
         ref_file[0] = tolower(ref_file[0]);
-        load_reference_kdb(2, I_VARIABLES_FILE, ref_file);
+        load_reference_kdb(2, VARIABLES_FILE, ref_file);
     }
 
     void TearDown() override 

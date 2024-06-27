@@ -106,7 +106,7 @@ int     type;
     switch(type) {
 	case COMMENTS :
 	case IDENTITIES :
-	case K_VAR :
+	case VARIABLES :
 	case LISTS : return(SB_DataEditCil1(name, type));
 	case EQUATIONS : return(SB_DataEditEqs1(name));
 	case TABLES :
@@ -128,7 +128,7 @@ int     type;
     val = "";
     if(pos >= 0) {
 	SCR_strlcpy(vkp_edit_NAME, name, K_MAX_NAME);  /* IODE64K */
-	if(type != K_VAR) val = KCVAL(K_WS[type], pos);
+	if(type != VARIABLES) val = KCVAL(K_WS[type], pos);
     }
 /*
     SCR_strfacpy(&(vkp_edit_VAL), val);
@@ -154,7 +154,7 @@ C_DataEditCil1()
 
     txt = SW_nalloc(K_MAX_NAME + 10 + strlen(vkp_edit_VAL)); /* IODE64K */
     sprintf(txt, "%s %s", name, vkp_edit_VAL);
-    if(type == K_VAR)
+    if(type == VARIABLES)
 	rc = B_DataCalcVar(txt);
     else
 	rc = B_DataUpdate(txt, type);

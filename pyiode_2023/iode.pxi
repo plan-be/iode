@@ -37,7 +37,7 @@ IDENTITIES = 2
 LISTS = 3
 SCALARS = 4
 TABLES = 5
-K_VAR = 6
+VARIABLES = 6
 
 # Simulation parameters
 SORT_CONNEX = 0

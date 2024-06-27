@@ -14,10 +14,10 @@ MenuGraphTables::MenuGraphTables(QWidget* parent) :
 
     wTableNames = new WrapperQPlainTextEdit(label_table_names->text(), *textEdit_table_names, REQUIRED_FIELD);
     wSample = new WrapperQTextEdit(label_sample->text(), *textEdit_sample, REQUIRED_FIELD);
-    wFile2 = new WrapperFileChooser(label_file_2->text(), *fileChooser_file_2, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile3 = new WrapperFileChooser(label_file_3->text(), *fileChooser_file_3, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile4 = new WrapperFileChooser(label_file_4->text(), *fileChooser_file_4, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
-    wFile5 = new WrapperFileChooser(label_file_5->text(), *fileChooser_file_5, OPTIONAL_FIELD, I_VARIABLES_FILE, EXISTING_FILE);
+    wFile2 = new WrapperFileChooser(label_file_2->text(), *fileChooser_file_2, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile3 = new WrapperFileChooser(label_file_3->text(), *fileChooser_file_3, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile4 = new WrapperFileChooser(label_file_4->text(), *fileChooser_file_4, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
+    wFile5 = new WrapperFileChooser(label_file_5->text(), *fileChooser_file_5, OPTIONAL_FIELD, VARIABLES_FILE, EXISTING_FILE);
     wLanguage = new WrapperComboBox(label_language->text(), *comboBox_language, REQUIRED_FIELD, q_langs);
     
     mapFields["TableNames"] = wTableNames;
@@ -64,10 +64,10 @@ void MenuGraphTables::display()
 
         EnumLang lang = EnumLang (wLanguage->extractAndVerify() + IT_ENGLISH);
 
-        if(!file_2.empty()) load_reference_kdb(2, I_VARIABLES_FILE, file_2);
-        if(!file_3.empty()) load_reference_kdb(3, I_VARIABLES_FILE, file_3);
-        if(!file_4.empty()) load_reference_kdb(4, I_VARIABLES_FILE, file_4);
-        if(!file_5.empty()) load_reference_kdb(5, I_VARIABLES_FILE, file_5);
+        if(!file_2.empty()) load_reference_kdb(2, VARIABLES_FILE, file_2);
+        if(!file_3.empty()) load_reference_kdb(3, VARIABLES_FILE, file_3);
+        if(!file_4.empty()) load_reference_kdb(4, VARIABLES_FILE, file_4);
+        if(!file_5.empty()) load_reference_kdb(5, VARIABLES_FILE, file_5);
 
         MainWindowAbstract* main_window = static_cast<MainWindowAbstract*>(get_main_window_ptr());
         foreach(const QString& tableName, qTablesList)

@@ -132,7 +132,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 	std::string std_filepath = filepath.toLocal8Bit().toStdString();
 	int type_ = database->get_iode_type();
 
-	if (type_ < 0 || type_ > I_VARIABLES) 
+	if (type_ < 0 || type_ > VARIABLES) 
 		return false;
 
 	EnumIodeType iodeType = (EnumIodeType) type_;
@@ -267,7 +267,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 
 	std::string std_name = name.toStdString();
 	int this_type = database->get_iode_type();
-	bool listedInClec = other_type == SCALARS || other_type == I_VARIABLES;
+	bool listedInClec = other_type == SCALARS || other_type == VARIABLES;
 
 	if(this_type == EQUATIONS && listedInClec)
 	{
@@ -329,7 +329,7 @@ QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& n
 			if(Tables.contains(std_name))
 				list << name;
 			break;
-		case I_VARIABLES:
+		case VARIABLES:
 			if(Variables.contains(std_name))
 				list << name;
 			break;
@@ -371,7 +371,7 @@ QStringList IodeTemplateTableModel<K>::getRelatedObjs(const QString& name, const
 	case TABLES:
 		std_list = Tables.search(cpp_name);
 		break;
-	case I_VARIABLES:
+	case VARIABLES:
 		std_list = Variables.search(cpp_name);
 		break;
 	default:

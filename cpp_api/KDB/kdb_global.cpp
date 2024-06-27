@@ -95,7 +95,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
     std::string input_file_ = check_file_exists(input_file, caller_name);
     args += input_file_ + " ";
 
-    std::string save_file_ = check_filepath(save_file, I_VARIABLES_FILE, caller_name, false);
+    std::string save_file_ = check_filepath(save_file, VARIABLES_FILE, caller_name, false);
     args += save_file_ + " ";
 
     // raise error if not valid
@@ -157,7 +157,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         std::string var_file_ = check_file_exists(var_file, caller_name);
         if (dbc != NULL) error_msg += "and";
         error_msg += "Variables file " + var_file_;
-        dbv = K_interpret(K_VAR, to_char_array(var_file));
+        dbv = K_interpret(VARIABLES, to_char_array(var_file));
         if(dbv == NULL)
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
@@ -221,7 +221,7 @@ void low_to_high(const EnumIodeLtoH type, const char method, const std::string& 
 {
     int res;
 
-    check_filepath(filepath, I_VARIABLES_FILE, "low_to_high", true);
+    check_filepath(filepath, VARIABLES_FILE, "low_to_high", true);
     std::string method_name = mLowToHigh.at(method);
 
     std::string arg = std::string(1, method) + " " + filepath + " " + var_list;
@@ -246,7 +246,7 @@ void high_to_low(const EnumIodeHtoL type, const std::string& filepath, const std
     int res;
     std::string type_name; 
 
-    check_filepath(filepath, I_VARIABLES_FILE, "high_to_low", true);
+    check_filepath(filepath, VARIABLES_FILE, "high_to_low", true);
 
     std::string arg = filepath + " " + var_list;
     char* c_arg = to_char_array(arg);

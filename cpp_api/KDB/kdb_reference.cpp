@@ -25,7 +25,7 @@ void clear_reference_kdb(const int ref, EnumIodeFile iode_file)
 
 void clear_all_reference_kdbs()
 {
-    for(int iode_file = COMMENTS_FILE; iode_file <= I_VARIABLES_FILE; iode_file++)
+    for(int iode_file = COMMENTS_FILE; iode_file <= VARIABLES_FILE; iode_file++)
         for(int ref = 2; ref <= 5; ref++)
             clear_reference_kdb(ref, (EnumIodeFile) iode_file);
 }

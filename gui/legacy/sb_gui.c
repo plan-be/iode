@@ -58,7 +58,7 @@ int     view, res;
 /* sb_ws.c */
 SAMPLE* K_ask_smpl()
 {
-    SAMPLE* smpl = KSMPL(K_WS[K_VAR]);
+    SAMPLE* smpl = KSMPL(K_WS[VARIABLES]);
     return(smpl);
 }
 

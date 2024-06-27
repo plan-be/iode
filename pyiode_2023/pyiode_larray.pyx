@@ -105,7 +105,7 @@ def ws_to_larray(vars_pattern: str = '*',
         double[ : ,: : 1] data_view
         str v
     
-    var_list = ws_content_var(vars_pattern)         # 6 = K_VAR
+    var_list = ws_content_var(vars_pattern)         # 6 = VARIABLES
     
     # Define 2 original axes var and time
     axis_var = la.Axis(var_list, vars_axis_name)

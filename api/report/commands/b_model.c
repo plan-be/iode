@@ -38,10 +38,10 @@ static int B_ModelSimulateEqs(SAMPLE* smpl, char** eqs)
     int     rc;
 
     if(eqs == NULL || SCR_tbl_size(eqs) == 0)
-        rc = K_simul(K_WS[EQUATIONS], K_WS[K_VAR], K_WS[SCALARS], smpl, KSIM_EXO, NULL);
+        rc = K_simul(K_WS[EQUATIONS], K_WS[VARIABLES], K_WS[SCALARS], smpl, KSIM_EXO, NULL);
     else {
         tdbe = K_refer(K_WS[EQUATIONS], SCR_tbl_size(eqs), eqs);
-        rc = K_simul(tdbe, K_WS[K_VAR], K_WS[SCALARS], smpl, KSIM_EXO, eqs);
+        rc = K_simul(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, KSIM_EXO, eqs);
         K_free_kdb(tdbe);
     }
 
@@ -325,7 +325,7 @@ int B_ModelSimulateSCC(char *const_arg)
     SCR_free_tbl(eqs);
 
     // Lance la simulation
-    rc = K_simul_SCC(tdbe, K_WS[K_VAR], K_WS[SCALARS], smpl, pre, inter, post);
+    rc = K_simul_SCC(tdbe, K_WS[VARIABLES], K_WS[SCALARS], smpl, pre, inter, post);
 
     // Cleanup
     K_free_kdb(tdbe);
@@ -368,7 +368,7 @@ static int B_CreateEmptyVar(char *name)
 static double *B_GetVarPtr(char *name)
 {
     int     pos;
-    KDB     *dbv = K_WS[K_VAR];
+    KDB     *dbv = K_WS[VARIABLES];
     char    uname[1024];
 
     // get var position in KDB
@@ -391,7 +391,7 @@ static double *B_GetVarPtr(char *name)
  */
 static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
-    KDB         *dbv = K_WS[K_VAR];
+    KDB         *dbv = K_WS[VARIABLES];
     double   *x;
     int         t;
 
@@ -417,7 +417,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
  */
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
-    KDB         *dbv = K_WS[K_VAR];
+    KDB         *dbv = K_WS[VARIABLES];
     double   *x;
     int         t;
 

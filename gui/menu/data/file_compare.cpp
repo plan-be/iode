@@ -61,7 +61,7 @@ void MenuDataFileCompare::compare()
         std::string list_both_equal = wResultBothEqual->extractAndVerify().toStdString();
         std::string list_both_different = wResultBothDifferent->extractAndVerify().toStdString();
 
-        if(iode_type == I_VARIABLES)
+        if(iode_type == VARIABLES)
 	        B_DataCompareEps(threshold.data());
 
         std::string buf = input_file + " " + list_ws_ony + " " + list_file_only + " ";

@@ -453,7 +453,7 @@ int K_upd_tbl(char* name, char* arg)
     }
     A_SEPS = T_SEPS;
 
-    lst = K_expand(K_VAR, NULL, arg, '*');
+    lst = K_expand(VARIABLES, NULL, arg, '*');
     lecs = B_ainit_chk(lst, NULL, 0);
     SCR_free(lst);
     /*    lecs = B_ainit_chk(arg, 0L, 0);  */

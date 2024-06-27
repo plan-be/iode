@@ -18,7 +18,7 @@ MenuComputeSimulation::MenuComputeSimulation(QWidget* parent) :
 
 	completer_eqs = new IodeCompleter(false, false, EQUATIONS, textEdit_equations_list);
 	textEdit_equations_list->setCompleter(completer_eqs);
-	completer_var = new IodeCompleter(false, false, I_VARIABLES, textEdit_exchange);
+	completer_var = new IodeCompleter(false, false, VARIABLES, textEdit_exchange);
 	textEdit_exchange->setCompleter(completer_var);
 
     for(const std::string& initialisation: v_simulation_initialization) qInitialisationList << QString::fromStdString(initialisation);

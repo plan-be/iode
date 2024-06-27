@@ -152,7 +152,7 @@ static KDB *KI_series_list(KDB* dbi)
     qsort(tbl, ntbl - 1, sizeof(char *), KI_strcmp);
 
     // Create a new KDB of vars with all the names in tbl
-    dbv = K_create(K_VAR, UPPER_CASE);
+    dbv = K_create(VARIABLES, UPPER_CASE);
     for(i = 1; i < ntbl; i++) {
         if(tbl[i] == 0 || strcmp(tbl[i], tbl[i -1]))
             K_add_entry(dbv, tbl[i - 1]);
@@ -412,7 +412,7 @@ static int KI_read_vars_file(KDB* dbv, char* file)
     SCR_add_ptr(&vars, &nbv, NULL);
     SCR_ADD_PTR_CHUNCK = o_add_ptr_chunck;
 
-    kdb = K_load(K_VAR, file, nbv, vars);
+    kdb = K_load(VARIABLES, file, nbv, vars);
     if(kdb == 0) {
         B_seterrn(96, file);
         return(-1);

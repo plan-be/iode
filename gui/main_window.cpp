@@ -305,7 +305,7 @@ void MainWindow::check_vars_sample()
                     Variables.set_sample(from, to);
                 }
                 
-                update_tab_and_completer(I_VARIABLES);
+                update_tab_and_completer(VARIABLES);
             }
             catch(const std::exception& e)
             {
@@ -334,8 +334,8 @@ void MainWindow::open_import_variables_dialog()
     MenuFileImportVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
-        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
-        update_tab_and_completer(I_VARIABLES);
+        tabWidget_IODE_objs->resetFilter(VARIABLES);
+        update_tab_and_completer(VARIABLES);
     }
 }
 
@@ -407,7 +407,7 @@ void MainWindow::open_change_variables_sample_dialog()
             Variables.set_sample(from, to);
         }
         
-        update_tab_and_completer(I_VARIABLES);
+        update_tab_and_completer(VARIABLES);
     }
     catch(const std::exception& e)
     {
@@ -422,8 +422,8 @@ void MainWindow::open_extrapolate_variables_dialog()
     MenuWorkspaceExtrapolateVariables dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
-        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
-        update_tab_and_completer(I_VARIABLES);
+        tabWidget_IODE_objs->resetFilter(VARIABLES);
+        update_tab_and_completer(VARIABLES);
     }
 }
 
@@ -435,8 +435,8 @@ void MainWindow::open_high_to_low_dialog()
     MenuWorkspaceHighToLow dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
-        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
-        update_tab_and_completer(I_VARIABLES);
+        tabWidget_IODE_objs->resetFilter(VARIABLES);
+        update_tab_and_completer(VARIABLES);
     }
 }
 
@@ -448,8 +448,8 @@ void MainWindow::open_low_to_high_dialog()
     MenuWorkspaceLowToHigh dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
-        tabWidget_IODE_objs->resetFilter(I_VARIABLES);
-        update_tab_and_completer(I_VARIABLES);
+        tabWidget_IODE_objs->resetFilter(VARIABLES);
+        update_tab_and_completer(VARIABLES);
     }
 }
 

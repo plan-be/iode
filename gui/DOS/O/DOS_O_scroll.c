@@ -87,7 +87,7 @@ SCROLL  *scrl;
     sprintf(STATIC_BUF, "%s [%d objects]",
 	 ((KNAMEPTR(kdb) != 0) ? KNAMEPTR(kdb) : "Noname"), (int) KNB(kdb));
 
-    if(KTYPE(kdb) == K_VAR) {
+    if(KTYPE(kdb) == VARIABLES) {
 	strcat(STATIC_BUF, " - ");
 	strcat(STATIC_BUF, KLG_MODES[global_VM][0]);
 	}
@@ -104,7 +104,7 @@ int i;
 
     type = KTYPE(kdb);
     switch(type) {
-	case K_VAR :
+	case VARIABLES :
 	    PER_pertoa(PER_addper(&(KSMPL(kdb)->s_p1), i), STATIC_BUF);
 	    //strcpy(STATIC_BUF, STATIC_BUF + 2);
 	    break;
@@ -115,7 +115,7 @@ int i;
 	case SCALARS :strcpy(STATIC_BUF, scl[i]);        break;
 	case TABLES :strcpy(STATIC_BUF, "TABLE TITLE"); break;
 	}
-    if((type == K_VAR && !(scrl->sc_ir)) || type == SCALARS) { /* JMP 10-02-97 */
+    if((type == VARIABLES && !(scrl->sc_ir)) || type == SCALARS) { /* JMP 10-02-97 */
 	SCR_pad(STATIC_BUF, len);
 	U_center_text(STATIC_BUF);
 	}
@@ -166,7 +166,7 @@ int i, j;
     int             k;
 
     switch(KTYPE(kdb)) {
-    case K_VAR :
+    case VARIABLES :
 	var = KV_get(kdb, i, j, (int)global_VM);
 	SCR_fmt_dbl(var, STATIC_BUF, (int)global_VW, (int)global_VN);
 	return(STATIC_BUF);
@@ -229,7 +229,7 @@ SCROLL  *scrl;
     KDB *kdb = (KDB *) scrl->sc_pcl; /* JMP 10-02-97 */
 
     switch(KTYPE(kdb)) {
-	case K_VAR :  return((int) KSMPL(kdb)->s_nb);
+	case VARIABLES :  return((int) KSMPL(kdb)->s_nb);
 	case SCALARS :  return(4);
 	default    :  return(1);
     }
@@ -250,7 +250,7 @@ int i;
 		    // return(65); /* JMP 09-01-11 */
 		    return(SCR_PAGE_SIZE[1] - 10); /* JMP 09-01-11 */
 	case SCALARS : return((int)global_SW);
-	case K_VAR : return((int)global_VW);
+	case VARIABLES : return((int)global_VW);
 	}
 }
 
@@ -288,7 +288,7 @@ int i, j;
 	case EQUATIONS :
 	case IDENTITIES :
 	case LISTS :
-	case K_VAR :  rc = ODE_edit_obj1(kdb, -1); break;
+	case VARIABLES :  rc = ODE_edit_obj1(kdb, -1); break;
 	case SCALARS :  rc = ODE_edit_scl(kdb, -1, -1); break;
 	case TABLES :  rc = ODE_edit_tbl(kdb, -1, -1); break;
 	default    :  return(-1);
@@ -321,7 +321,7 @@ int i, j;
     case LISTS :  return(ODE_edit_obj1(kdb, i));
     case SCALARS :  return(ODE_edit_scl_cell(kdb, i, j));
     case TABLES :  return(ODE_edit_tbl(kdb, i, -1));
-    case K_VAR :  return(ODE_edit_var_cell(kdb, i, j));
+    case VARIABLES :  return(ODE_edit_var_cell(kdb, i, j));
     default    :  return(-1);
     }
 
@@ -389,7 +389,7 @@ int     i, j;
 	    default: return(31);
 	    }
 	}
-    else if(KTYPE(kdb) == K_VAR) {
+    else if(KTYPE(kdb) == VARIABLES) {
 	if(VAR_is_sel(i, j)) return(SCR_RED);
 	}
     return(SCR_BLUE);
@@ -412,40 +412,40 @@ int     key, i, j;
 	case SCR_F2   : ODE_adj_title(scrl, 1);  break; /* JMP 10-02-97 */
 	case SCR_S_F2 : ODE_adj_title(scrl, -1); break; /* JMP 10-02-97 */
 	case SCR_F3  :
-	    if(KTYPE(kdb) == K_VAR) ODE_adj_vwidth(scrl, 1); /* JMP 10-02-97 */
+	    if(KTYPE(kdb) == VARIABLES) ODE_adj_vwidth(scrl, 1); /* JMP 10-02-97 */
 	    if(KTYPE(kdb) == SCALARS) ODE_adj_swidth(1);
 	    break;
 	case SCR_S_F3  :
-	    if(KTYPE(kdb) == K_VAR) ODE_adj_vwidth(scrl, -1);/* JMP 10-02-97 */
+	    if(KTYPE(kdb) == VARIABLES) ODE_adj_vwidth(scrl, -1);/* JMP 10-02-97 */
 	    if(KTYPE(kdb) == SCALARS) ODE_adj_swidth(-1);
 	    break;
 	case SCR_F4  :
-	    if(KTYPE(kdb) == K_VAR) ODE_adj_vndec(1);
+	    if(KTYPE(kdb) == VARIABLES) ODE_adj_vndec(1);
 	    if(KTYPE(kdb) == SCALARS) ODE_adj_sndec(1);
 	    break;
 	case SCR_S_F4  :
-	    if(KTYPE(kdb) == K_VAR) ODE_adj_vndec(-1);
+	    if(KTYPE(kdb) == VARIABLES) ODE_adj_vndec(-1);
 	    if(KTYPE(kdb) == SCALARS) ODE_adj_sndec(-1);
 	    break;
 	case SCR_F5  :
-	    if(KTYPE(kdb) == K_VAR) global_VM = (global_VM + 1) % 5;
+	    if(KTYPE(kdb) == VARIABLES) global_VM = (global_VM + 1) % 5;
 	    break;
 	case SCR_S_F5  :
-	    if(KTYPE(kdb) == K_VAR) {
+	    if(KTYPE(kdb) == VARIABLES) {
 		if(global_VM == 0) global_VM = 4;
 		else global_VM--;
 		}
 	    break;
 	case SCR_F6  :
-	    if(KTYPE(kdb) == K_VAR) global_PREC = (global_PREC == 8) ? 15 : 8; /* JMP 29-04-98 */
+	    if(KTYPE(kdb) == VARIABLES) global_PREC = (global_PREC == 8) ? 15 : 8; /* JMP 29-04-98 */
 	    break;
 	case SCR_F7  :
 	    if(KTYPE(kdb) == TABLES)
 		B_ViewPrintTbl_1(KONAME(kdb, i), ODE_SMPL);
 	    if(KTYPE(kdb) == IDENTITIES) {
 		sprintf(buf, "%s %s %s",
-			PER_pertoa(&(KSMPL(K_WS[K_VAR])->s_p1), per1),
-			PER_pertoa(&(KSMPL(K_WS[K_VAR])->s_p2), per2),
+			PER_pertoa(&(KSMPL(K_WS[VARIABLES])->s_p1), per1),
+			PER_pertoa(&(KSMPL(K_WS[VARIABLES])->s_p2), per2),
 			KONAME(kdb, i));
 		if(B_IdtExecute(buf)) B_display_last_error();
 		else ODE_error(OM_EXEC_ACH);
@@ -455,16 +455,16 @@ int     key, i, j;
 	    if(KTYPE(kdb) == IDENTITIES) SB_IdtExecute();
 	    break;
 	case SCR_F8  :
-	    if(KTYPE(kdb) == K_VAR) C_AutoEditGraph(KONAME(kdb, i), global_VM);
+	    if(KTYPE(kdb) == VARIABLES) C_AutoEditGraph(KONAME(kdb, i), global_VM);
 	    if(KTYPE(kdb) == TABLES) B_ViewPrintGr_1(KONAME(kdb, i), ODE_SMPL);
 	    break;
 
 	case SCR_S_F8  :
-	    if(KTYPE(kdb) == K_VAR) SB_DataEditGraph();  /* JMP 31-03-99 */
+	    if(KTYPE(kdb) == VARIABLES) SB_DataEditGraph();  /* JMP 31-03-99 */
 	    break;
 
 	case SCR_S_F9  :            /* Windows JMP 10-02-97 */
-	    if(KTYPE(kdb) == K_VAR) scrl->sc_ir = (scrl->sc_ir + 1) % 2;
+	    if(KTYPE(kdb) == VARIABLES) scrl->sc_ir = (scrl->sc_ir + 1) % 2;
 	    break;
 
 	case SCR_A_F1:
@@ -478,13 +478,13 @@ int     key, i, j;
 	    break;
 
 	case SCR_C_V:
-	    if(KTYPE(kdb) == K_VAR) ODE_settext(kdb, i, j);
+	    if(KTYPE(kdb) == VARIABLES) ODE_settext(kdb, i, j);
 	    break;
 	case SCR_C_P:
-	    if(KTYPE(kdb) == K_VAR) ODE_importtext(kdb, i, j);
+	    if(KTYPE(kdb) == VARIABLES) ODE_importtext(kdb, i, j);
 	    break;
 	case SCR_C_L:
-	    if(KTYPE(kdb) == K_VAR) VAR_select(i, j);
+	    if(KTYPE(kdb) == VARIABLES) VAR_select(i, j);
 	    break;
 	case SCR_S_CSR_LEFT:
 	case SCR_S_CSR_RIGHT:
@@ -499,10 +499,10 @@ int     key, i, j;
 	    SCR_record_key(SCR_C_L);      /* JMP 10-10-98 */
 	    break;
 	case SCR_C_C:
-	    if(KTYPE(kdb) == K_VAR) ODE_ClipCopy(kdb);
+	    if(KTYPE(kdb) == VARIABLES) ODE_ClipCopy(kdb);
 	    break;
 	case SCR_C_U:
-	    if(KTYPE(kdb) == K_VAR) VAR_deselect();
+	    if(KTYPE(kdb) == VARIABLES) VAR_deselect();
 	    break;
 
 	}
@@ -542,7 +542,7 @@ int     *l, *c;
     KDB *kdb;
 
     kdb = scrl->sc_pcl; /* JMP 10-02-97 */
-    if(KTYPE(kdb) == K_VAR) *c = global_VS;
+    if(KTYPE(kdb) == VARIABLES) *c = global_VS;
     if(KTYPE(kdb) == TABLES && ODE_SMPL[0] == '\0') {
 	sprintf(ODE_SMPL, "%s:%d", PER_pertoa(&(KSMPL(KV_WS)->s_p1), NULL), KSMPL(KV_WS)->s_nb);
     }
@@ -556,7 +556,7 @@ int     l, c;
     KDB *kdb;
 
     kdb = scrl->sc_pcl;  /* JMP 10-02-97 */
-    if(KTYPE(kdb) == K_VAR) global_VS = c;
+    if(KTYPE(kdb) == VARIABLES) global_VS = c;
     return(0);
 }
 
@@ -719,7 +719,7 @@ char    **lst;
     ncc[0] = ncc[1] = ncc[2] = ncc[3] = ncc[5] = ncc[6] = SCR_PAGE_SIZE[1] - 4;
     type = KTYPE(kdb);
 ag:
-    if(type == K_VAR && KSMPL(kdb)->s_nb == 0) {
+    if(type == VARIABLES && KSMPL(kdb)->s_nb == 0) {
 	if(SCR_confirme("Sample undefined. Set it ? (Y/N)")) return(-1);
 	SB_WsSample();
 	goto ag;
@@ -766,7 +766,7 @@ ag:
 	    NOROT   = 1;
 	    NOHSBAR = 1;
 	    break;
-	case K_VAR :
+	case VARIABLES :
 	    SCRL->sc_cmt = "Space=Menu F1=Help F2=Name+ F3=Cell+ F4=Ndec+ F5=Mode F6=Prec F8=Graph Ins=New";
 	    SCRL->sc_scmts = OSCRL_VARSCMTS;
 	    NOHSBAR = 1;

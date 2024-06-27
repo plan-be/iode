@@ -43,7 +43,7 @@ static int check_scl_var(char *eqs)
             }
         }
         else {
-            if(K_find(K_WS[K_VAR],cl->lnames[j].name)== -1) {
+            if(K_find(K_WS[VARIABLES],cl->lnames[j].name)== -1) {
                 kerror(0,"Var %s from %s not found",cl->lnames[j].name,eqs);
                 E_free(eq); // JMP 08/07/2022
                 return(-1);

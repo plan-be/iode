@@ -604,7 +604,7 @@ void U_test_load_fun_esv(char* filename)
     // Loads 3 WS and check ok
     KE_RWS = KE_WS = U_test_K_interpret(EQUATIONS, filename);
     KS_RWS = KS_WS = U_test_K_interpret(SCALARS, filename);
-    KV_RWS = KV_WS = U_test_K_interpret(K_VAR, filename);
+    KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, filename);
 }
 
 
@@ -922,8 +922,8 @@ void Tests_K_OBJFILE()
     sprintf(in_filename,  "%s\\fun.var", IODE_DATA_DIR);
     sprintf(out_filename, "%s\\fun_copy.var", IODE_OUTPUT_DIR);
     
-    kdb_var = K_interpret(K_VAR, in_filename);
-    S4ASSERT(kdb_var != NULL, "K_interpret(K_VAR, \"%s\")", in_filename);
+    kdb_var = K_interpret(VARIABLES, in_filename);
+    S4ASSERT(kdb_var != NULL, "K_interpret(VARIABLES, \"%s\")", in_filename);
     if(kdb_var) {
         S4ASSERT(KNB(kdb_var) == 394, "KNB(\"%s\") == 394", in_filename);
         rc = K_save(kdb_var, out_filename);
@@ -1002,7 +1002,7 @@ void Tests_Simulation()
 
     // Check
     kdbv = KV_WS;
-    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
+    S4ASSERT(kdbv != NULL, "K_interpret(VARIABLES, \"%s\")", filename);
     kdbs = KS_WS;
     S4ASSERT(kdbs != NULL, "K_interpret(SCALARS, \"%s\")", filename);
     kdbe = KE_WS;
@@ -1095,14 +1095,14 @@ void Tests_PrintTablesAndVars()
     U_test_print_title("Tests Print TBL as Tables and Graphs");
 
     // Load the VAR workspace
-    K_RWS[K_VAR][0] = K_WS[K_VAR] = kdbv  = U_test_K_interpret(K_VAR, "fun.var");
-    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", "fun.var");
+    K_RWS[VARIABLES][0] = K_WS[VARIABLES] = kdbv  = U_test_K_interpret(VARIABLES, "fun.var");
+    S4ASSERT(kdbv != NULL, "K_interpret(VARIABLES, \"%s\")", "fun.var");
 
     // Load the TBL workspace
     K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.tbl");
     S4ASSERT(kdbt != NULL, "K_interpret(TABLES, \"%s\")", "fun.tbl");
 
-    // Load a second VAR workspace in K_RWS[K_VAR][2]
+    // Load a second VAR workspace in K_RWS[VARIABLES][2]
     sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, "fun.var");
     rc = K_load_RWS(2, fullfilename);
     S4ASSERT(rc == 0, "K_load_RWS(2, \"%s\")", fullfilename);
@@ -1369,9 +1369,9 @@ void Tests_B_DATA()
     
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort() 
-    B_DataPattern("RC xy $AB $BC", K_VAR); 
+    B_DataPattern("RC xy $AB $BC", VARIABLES); 
     lst = KLPTR("RC");
-    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC"), "B_DataPattern(\"RC xy $AB $BC\", K_VAR) = \"AB,AC,BB,BC\"");
+    S4ASSERT(U_cmp_strs(lst, "AB,AC,BB,BC"), "B_DataPattern(\"RC xy $AB $BC\", VARIABLES) = \"AB,AC,BB,BC\"");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
@@ -1440,8 +1440,8 @@ void Tests_B_DATA()
     
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
     smpl = KSMPL(KV_WS);
-    rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , K_VAR);
-    S4ASSERT(rc == 0, "B_DataUpdate(\"U L 2000Y1 2 3.1 4e2\" , K_VAR)");
+    rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , VARIABLES);
+    S4ASSERT(rc == 0, "B_DataUpdate(\"U L 2000Y1 2 3.1 4e2\" , VARIABLES)");
     
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
@@ -1823,7 +1823,7 @@ void Tests_B_IDT_EXECUTE()
         
     // Loads 3 WS and check ok
     KI_RWS = KI_WS = U_test_K_interpret(IDENTITIES, "fun");
-    KV_RWS = KV_WS = U_test_K_interpret(K_VAR, "fun");
+    KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, "fun");
     //KS_RWS = KS_WS = U_test_K_interpret(SCALARS, "fun");
     
     //iode.ws_load_idt(f"{IODE_DATA_DIR}fun")
@@ -1895,10 +1895,10 @@ void Tests_IMP_EXP()
     
     sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(K_VAR, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
-    S4ASSERT(rc == 0, "IMP_RuleImport(K_VAR, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMP_FMT_ASCII, 0)", outfile, reffile);
+    rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
+    S4ASSERT(rc == 0, "IMP_RuleImport(VARIABLES, trace, NULL, \"%s\", \"%s\", \"2000Y1\", \"2010Y1\", IMP_FMT_ASCII, 0)", outfile, reffile);
     
-    KV_RWS = KV_WS = K_interpret(K_VAR, outfile);  
+    KV_RWS = KV_WS = K_interpret(VARIABLES, outfile);  
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
 
 
@@ -1939,7 +1939,7 @@ void Tests_B_XODE()
     rc = B_FileImportVar(cmd);
     S4ASSERT(rc == 0, "B_FileImportVar(\"%s\")", cmd);
     
-    KV_RWS = KV_WS = K_interpret(K_VAR, outfile);  
+    KV_RWS = KV_WS = K_interpret(VARIABLES, outfile);  
     U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
     
     U_test_reset_kmsg_msgs(); 
@@ -2076,7 +2076,7 @@ void Tests_B_MODEL()
 
     // Check
     kdbv = KV_WS;
-    S4ASSERT(kdbv != NULL, "K_interpret(K_VAR, \"%s\")", filename);
+    S4ASSERT(kdbv != NULL, "K_interpret(VARIABLES, \"%s\")", filename);
     kdbs = KS_WS;
     S4ASSERT(kdbs != NULL, "K_interpret(SCALARS, \"%s\")", filename);
     kdbe = KE_WS;
@@ -2290,13 +2290,13 @@ int U_test_B_WsCopyVar()
     // 1. Copy full VAR file (Att: * required)
     B_WsClearAll("");
     sprintf(arg,  "%s\\fun.var *", IODE_DATA_DIR);
-    rc = B_WsCopy(arg, K_VAR);    
+    rc = B_WsCopy(arg, VARIABLES);    
     ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
     ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
     cond =  (rc == 0) && 
             (U_test_eq(ACAF92, 30.159000) != 0) &&
             (U_test_eq(ACAG92, -40.286) != 0);
-    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", K_VAR) == 0", arg);
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", VARIABLES) == 0", arg);
 
     // 2. Copy partial WS (92-93) on an existing one
     // 2.1 Set Sample + create ACAF
@@ -2309,7 +2309,7 @@ int U_test_B_WsCopyVar()
     
     // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
     sprintf(arg,  "%s\\fun.var 1992Y1 1993Y1 ACAF ACAG", IODE_DATA_DIR);
-    rc = B_WsCopy(arg, K_VAR);    
+    rc = B_WsCopy(arg, VARIABLES);    
         
     // 2.3 Tests    
     ACAF91 = U_test_calc_lec("ACAF[1991Y1]", 0);
@@ -2322,7 +2322,7 @@ int U_test_B_WsCopyVar()
             (U_test_eq(ACAG90, L_NAN) != 0) && 
             (U_test_eq(ACAG92, -40.286) != 0);
             
-    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", K_VAR) == 0", arg);
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", VARIABLES) == 0", arg);
 
     // 3. Copy partial WS on an existing one w/o specifying the sample
     // 3.1 Set Sample 
@@ -2331,7 +2331,7 @@ int U_test_B_WsCopyVar()
     
     // Copy ACAF and ACAG (does not specify a sample)
     sprintf(arg,  "%s\\fun.var ACAF ACAG", IODE_DATA_DIR);
-    rc = B_WsCopy(arg, K_VAR);    
+    rc = B_WsCopy(arg, VARIABLES);    
     ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
     ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
         
@@ -2339,7 +2339,7 @@ int U_test_B_WsCopyVar()
             (U_test_eq(ACAF92, 30.159000) != 0) &&
             (U_test_eq(ACAG92, -40.286) != 0);
             
-    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", K_VAR) == 0", arg);
+    S4ASSERT(cond != 0, "B_WsCopy(\"%s\", VARIABLES) == 0", arg);
     
     return(cond);
 }
@@ -2368,13 +2368,13 @@ int U_test_B_WsMergeVar()
     // 1. Merge into an empty WS
     B_WsClearAll("");
     sprintf(arg,  "%s\\fun.var", IODE_DATA_DIR);
-    rc = B_WsMerge(arg, K_VAR);
+    rc = B_WsMerge(arg, VARIABLES);
     ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
     ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
     cond =  (rc == 0) && 
             (U_test_eq(ACAF92, 30.159000) != 0) &&
             (U_test_eq(ACAG92, -40.286) != 0);
-    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", K_VAR) == 0", arg);
+    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", VARIABLES) == 0", arg);
     
     // 2. Merge into an existing WS inb a different SAMPLE
     B_WsClearAll("");
@@ -2385,7 +2385,7 @@ int U_test_B_WsMergeVar()
     pos = K_add(KV_WS, "ACAF", ACAF, &nb);
     // Merge
     sprintf(arg,  "%s\\fun.var", IODE_DATA_DIR);
-    rc = B_WsMerge(arg, K_VAR);
+    rc = B_WsMerge(arg, VARIABLES);
     //Check 
     ACAF00 = U_test_calc_lec("ACAF[2000Y1]", 0);
     ACAF16 = U_test_calc_lec("ACAF[2016Y1]", 0);
@@ -2394,7 +2394,7 @@ int U_test_B_WsMergeVar()
             (U_test_eq(ACAF00, 10.046611) != 0) &&
             (U_test_eq(ACAF16, 16.0) != 0) &&
             (U_test_eq(ACAG00, -41.534787) != 0);
-    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", K_VAR) == 0", arg);  
+    S4ASSERT(cond != 0, "B_WsMerge(\"%s\", VARIABLES) == 0", arg);  
     return(cond);
 }
 
@@ -2514,7 +2514,7 @@ int U_test_B_StatUnitRoot(int drift, int trend, int order, char* varname, double
 
     // Load needed data
     //U_test_B_WsLoad("fun", SCALARS, 161);
-    //U_test_B_WsLoad("fun", K_VAR, 394);
+    //U_test_B_WsLoad("fun", VARIABLES, 394);
     
     // Dickey-Fuller test (E_UnitRoot)
     // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
@@ -2558,9 +2558,9 @@ int U_test_B_Csv()
     cond = (rc == 0) && (strcmp(KV_CSV_DEC, ".") == 0);
     S4ASSERT(cond != 0, "B_CsvDec(\".\") == \"%s\"", KV_CSV_DEC);
 
-    U_test_B_WsLoad("fun", K_VAR, 394);
+    U_test_B_WsLoad("fun", VARIABLES, 394);
     sprintf(arg, "%s\\funcsv.csv A* *G", IODE_OUTPUT_DIR);
-    rc = B_CsvSave(arg, K_VAR);
+    rc = B_CsvSave(arg, VARIABLES);
     
     cond = (rc == 0) && U_test_compare_outfile_to_reffile("funcsv.csv", "funcsv.csv");
     S4ASSERT(cond != 0, "B_CsvSave(\"funcsv.csv\")");
@@ -2611,7 +2611,7 @@ void Tests_B_WS()
     U_test_B_WsLoad("fun", LISTS, 17);
     U_test_B_WsLoad("fun", SCALARS, 161);
     U_test_B_WsLoad("fun", TABLES, 46);
-    U_test_B_WsLoad("fun", K_VAR, 394);
+    U_test_B_WsLoad("fun", VARIABLES, 394);
     
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");
@@ -2621,7 +2621,7 @@ void Tests_B_WS()
     U_test_B_WsSave("fun", "fun2", LISTS, 17);
     U_test_B_WsSave("fun", "fun2", SCALARS, 161);
     U_test_B_WsSave("fun", "fun2", TABLES, 46);
-    U_test_B_WsSave("fun", "fun2", K_VAR, 394);
+    U_test_B_WsSave("fun", "fun2", VARIABLES, 394);
            
     // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
     U_test_print_title("B_WsSaveCmp()");
@@ -2631,7 +2631,7 @@ void Tests_B_WS()
     U_test_B_WsSaveCmp("fun", "fun2cmp", LISTS, 17);
     U_test_B_WsSaveCmp("fun", "fun2cmp", SCALARS, 161);
     U_test_B_WsSaveCmp("fun", "fun2cmp", TABLES, 46);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", VARIABLES, 394);
     
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
@@ -2641,7 +2641,7 @@ void Tests_B_WS()
     U_test_B_WsExport("fun.lst", "fun2.al", LISTS);
     U_test_B_WsExport("fun.scl", "fun2.as", SCALARS); 
     U_test_B_WsExport("fun.tbl", "fun2.at", TABLES);
-    U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
+    U_test_B_WsExport("fun.var", "fun2.av", VARIABLES);
 
     // int B_WsClear(char* arg, int type)                $WsClear<type> 
     U_test_print_title("B_WsClear()");
@@ -2651,7 +2651,7 @@ void Tests_B_WS()
     U_test_B_WsClear(LISTS);
     U_test_B_WsClear(SCALARS);
     U_test_B_WsClear(TABLES);
-    U_test_B_WsClear(K_VAR);
+    U_test_B_WsClear(VARIABLES);
      
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
     U_test_print_title("B_WsImport()");
@@ -2661,7 +2661,7 @@ void Tests_B_WS()
     U_test_B_WsImport("fun2.al", LISTS, 17);
     U_test_B_WsImport("fun2.as", SCALARS, 161);
     U_test_B_WsImport("fun2.at", TABLES, 46);
-    U_test_B_WsImport("fun2.av", K_VAR, 394);
+    U_test_B_WsImport("fun2.av", VARIABLES, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
     
     // int B_WsSample(char* arg)                         $WsSample period_from period_to
@@ -2694,7 +2694,7 @@ void Tests_B_WS()
     U_test_B_WsDescr("Ws content description", LISTS);
     U_test_B_WsDescr("Ws content description", SCALARS);
     U_test_B_WsDescr("Ws content description", TABLES);
-    U_test_B_WsDescr("Ws content description", K_VAR);
+    U_test_B_WsDescr("Ws content description", VARIABLES);
     
     // int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
     // Test skipped: alignment pb with Google Tests (k_nameptr aligned on 60 bytes, => not 8 bytes) 
@@ -2706,10 +2706,10 @@ void Tests_B_WS()
     U_test_B_WsName("funtest", LISTS);
     U_test_B_WsName("funtest", SCALARS);
     U_test_B_WsName("funtest", TABLES);
-    U_test_B_WsName("funtest", K_VAR);
+    U_test_B_WsName("funtest", VARIABLES);
     
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
-    U_test_print_title("B_WsCopy() - K_VAR");
+    U_test_print_title("B_WsCopy() - VARIABLES");
     U_test_B_WsCopyVar();
 
     U_test_print_title("B_WsCopy() - other objects");
@@ -2722,7 +2722,7 @@ void Tests_B_WS()
     
     
     // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
-    U_test_print_title("B_WsMerge() - K_VAR");
+    U_test_print_title("B_WsMerge() - VARIABLES");
     U_test_B_WsMergeVar();
     
     U_test_print_title("B_WsMerge() - other objects");
@@ -2752,7 +2752,7 @@ void Tests_B_WS()
     // int B_StatUnitRoot(char* arg)                     $StatUnitRoot drift trend order expression
     U_test_print_title("B_StatUnitRoot");
     U_test_B_WsLoad("fun", SCALARS, 161);
-    U_test_B_WsLoad("fun", K_VAR, 394);
+    U_test_B_WsLoad("fun", VARIABLES, 394);
 
     U_test_B_StatUnitRoot(0, 0, 0, "ACAF", 0.958325);
     U_test_B_StatUnitRoot(1, 0, 0, "ACAF", 1.117498);

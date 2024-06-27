@@ -16,7 +16,7 @@ cdef extern from "cpp_api/common.h":
         LISTS,
         SCALARS,
         TABLES,
-        I_VARIABLES
+        VARIABLES
 
     cdef vector[string] vIodeTypes
 
@@ -27,7 +27,7 @@ cdef extern from "cpp_api/common.h":
         LISTS_FILE,
         SCALARS_FILE,
         TABLES_FILE,
-        I_VARIABLES_FILE,
+        VARIABLES_FILE,
         I_REPORTS_FILE,
         I_TEXT_FILE,
         I_ASCII_FILE,

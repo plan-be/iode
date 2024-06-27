@@ -168,7 +168,7 @@ int K_has_ext(char* filename)
  *      char buf[256];
  *  
  *      strcpy(filename, "example.xxx      ");
- *      K_set_ext(buf, filename, K_VAR);
+ *      K_set_ext(buf, filename, VARIABLES);
  *      printf("'%s'\n", buf);  // 'example.var'
  *      K_set_ext(buf, filename, K_CSV);
  *      printf("'%s'\n", buf);  // 'example.csv'
@@ -192,7 +192,7 @@ char *K_set_ext(char* res, char* fname, int type)
  *      char buf[256];
  *  
  *      strcpy(filename, "example.xxx      ");
- *      K_set_ext_asc(buf, filename, K_VAR);
+ *      K_set_ext_asc(buf, filename, VARIABLES);
  *      printf("'%s'\n", buf);  // 'example.av'
  */
 char *K_set_ext_asc(char* res, char* fname, int type)
@@ -359,7 +359,7 @@ error :
  *      - transposes objects to 64 bits 
  *      - converts to the current IODE object version.
  *  
- * @param [in]   ftype      int     file type (COMMENTS -> K_VAR)
+ * @param [in]   ftype      int     file type (COMMENTS -> VARIABLES)
  * @param [in]   fname      FNAME   filename
  * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
  * @param [in]   objs       char**  null or list of objects to load
@@ -510,7 +510,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
 
         lpos = 0;
 
-        if(KTYPE(kdb) == K_VAR || KTYPE(kdb) == SCALARS) {
+        if(KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS) {
             if(K_read_len(fd, vers, &len)) goto error;
         }
 
@@ -522,7 +522,7 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
             }
 
             // skip this pos - lpos entries 
-            if(kdb->k_compressed == 0 && (KTYPE(kdb) == K_VAR || KTYPE(kdb) == SCALARS)) {
+            if(kdb->k_compressed == 0 && (KTYPE(kdb) == VARIABLES || KTYPE(kdb) == SCALARS)) {
                 if(pos - lpos > 0)
                     kseek(fd, (long) len * (pos -lpos), 1);
             }
@@ -595,7 +595,7 @@ error:
  *  @param [in]  filename   char*   file to analyze
  *  @param [out] descr      char*   NULL or pointer to copy the description of the file
  *  @param [out] nobjs      int*    NULL or pointer to the number of objs in the file
- *  @param [out] smpl       SAMPLE* NULL or pointer to the sample of the file (for K_VAR only)
+ *  @param [out] smpl       SAMPLE* NULL or pointer to the sample of the file (for VARIABLES only)
  *  @return                 int     on success: file type (COMMENTS...)
  *                                  on error: 
  *                                      -1 if filename is empty 
@@ -640,7 +640,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
 
     if (descr) strcpy(descr, kdb.k_desc);
     if (nobjs) *nobjs = KNB(&kdb);
-    if (smpl && kdb.k_type == K_VAR)
+    if (smpl && kdb.k_type == VARIABLES)
         memcpy(smpl, KSMPL(&kdb), sizeof(SAMPLE));
 
     return(kdb.k_type);
@@ -670,7 +670,7 @@ static int K_findtype(char* filename, int type)
 
     ftype = K_filetype(filename, 0L, 0L, 0L); // Open the file to retrieve its content type
     
-    if(type == K_VAR && U_is_in('!', filename)) return(type); /* Give ODBC a try */
+    if(type == VARIABLES && U_is_in('!', filename)) return(type); /* Give ODBC a try */
 
     if(ftype != -2) return(ftype); // -2 => file cannot be opened
     
@@ -719,7 +719,7 @@ KDB *K_interpret(int type, char* filename)
     ftype = K_findtype(filename, type);
 //    printf("type=%d, ftype=%d\n", type, ftype);
     if(ftype == -1) { // file exists but when opened, type not recognized => test ascii contents
-        if(type >= COMMENTS && type <= K_VAR && 
+        if(type >= COMMENTS && type <= VARIABLES && 
             K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + K_AC]) == 0) {
                 kdb = (*K_load_asc[type])(filename);
             }
@@ -770,7 +770,7 @@ static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, SAMPLE
     from = K_load(KTYPE(to), file, no, objs);
     if(from == NULL) return(-1);
 
-    if(KTYPE(to) == K_VAR) {
+    if(KTYPE(to) == VARIABLES) {
         if(smpl == NULL) memcpy(&csmpl, KSMPL(from), sizeof(SAMPLE));
         else rc = PER_common_smpl(smpl, KSMPL(from), &csmpl);
 
@@ -906,7 +906,7 @@ int K_cat(KDB* ikdb, char* filename)
         //strcpy(KNAME(ikdb), KNAME(kdb));
         K_set_kdb_name(ikdb, KNAMEPTR(kdb)); // JMP 3/6/2015
     }
-    if(KTYPE(ikdb) == K_VAR) KV_merge_del(ikdb, kdb, 1);
+    if(KTYPE(ikdb) == VARIABLES) KV_merge_del(ikdb, kdb, 1);
     else K_merge_del(ikdb, kdb, 1);
 
     return(0);

@@ -260,7 +260,7 @@ char **T_find_files(COLS* cls)
 
     for(i = 1; i < K_MAX_FREF + 1; i++) {
         if(files[i] == 0) continue;
-        kdb = K_RWS[K_VAR][i - 1];
+        kdb = K_RWS[VARIABLES][i - 1];
         if(kdb == NULL) {
             B_seterror("File %d not present", i);
             SCR_add_ptr(&names, &nf, 0L);

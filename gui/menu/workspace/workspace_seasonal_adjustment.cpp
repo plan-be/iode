@@ -8,7 +8,7 @@ MenuWorkspaceSeasonalAdjustment::MenuWorkspaceSeasonalAdjustment(QWidget* parent
     setupUi(this);
 
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, 
-                                        I_VARIABLES_FILE, EXISTING_FILE); 
+                                        VARIABLES_FILE, EXISTING_FILE); 
     wSeries = new WrapperQTextEdit(label_series->text(), *textEdit_series, OPTIONAL_FIELD);  
     wEPSTest = new WrapperDoubleSpinBox(label_EPS_test->text(), *doubleSpinBox_EPS_test, OPTIONAL_FIELD); 
 

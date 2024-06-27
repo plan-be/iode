@@ -38,7 +38,7 @@ IodeProperties()
     sprintf(txt, "Current Directory:\n\t%s\n\n", buf);
     strcat(txt, "Workspaces:\n");
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++) {
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++) {
         sprintf(buf, "\t%s :\t%d objects [%s]\n",
                 IODE_TYPES[i], KNB(K_WS[COMMENTS + i]), KNAMEPTR(K_WS[COMMENTS + i])); /* JMP 03-06-2015 */
         strcat(txt, buf);

@@ -174,7 +174,7 @@ int IodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeF
 
 int IodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText)
 {
-    if (fileType <= I_VARIABLES_FILE) 
+    if (fileType <= VARIABLES_FILE) 
         return -1;
 
     QString fullPath = fileInfo.absoluteFilePath();
@@ -327,7 +327,7 @@ void IodeAbstractTabWidget::closeTab()
 
     // Tabs representing an IODE database file cannot be closed.
     // This is by design.
-    if(fileType <= I_VARIABLES_FILE)
+    if(fileType <= VARIABLES_FILE)
         return;
 
     removeTab(index);

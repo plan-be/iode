@@ -15,7 +15,7 @@
 static int RasSetVar(char  *name, int t, double var)
 {
     int     pos;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
 
     pos = K_find(kdb, name);
     if(pos < 0) {
@@ -31,7 +31,7 @@ static double RasGetVar(char  *name, int t)
 {
     int     pos;
     double  var;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
 
     pos = K_find(kdb, name);
     if(pos < 0) {
@@ -143,7 +143,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     char    cvar[K_MAX_NAME + 1], rvar[K_MAX_NAME + 1];
     MAT     *A;
     double *col, *row, var, fvar;
-    KDB     *kdb = K_WS[K_VAR];
+    KDB     *kdb = K_WS[VARIABLES];
 
     if(rper != NULL && cper != NULL) {
         rt = PER_diff_per(rper, &(KSMPL(kdb)->s_p1));

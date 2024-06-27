@@ -11,10 +11,10 @@ int     key;
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++)
 	if(key == SCR_F2 + i || key == SCR_F10) {
 	    if(B_WsLoad(vkp_wsload_vCMT[i], COMMENTS + i)) goto err;
-	    if(i == K_VAR - COMMENTS) SB_ResetSample();
+	    if(i == VARIABLES - COMMENTS) SB_ResetSample();
 	}
 
     return(0);
@@ -42,7 +42,7 @@ C_WsCopy()
     else {
 	buf = SW_nalloc(strlen(vkp_wscopy_OBJS) + 1024);   /* JMP 15-09-2015 */
 	if(buf == NULL) return(-1);
-	if(vkp_wscopy_TYPE == K_VAR &&
+	if(vkp_wscopy_TYPE == VARIABLES &&
 		vkp_wscopy_FROM[0] != 0 && vkp_wscopy_TO[0] != 0)
 	    sprintf(buf, "%s %s %s %s",
 		    vkp_wscopy_FILE,
@@ -94,7 +94,7 @@ C_InitWsSave()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++) {
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++) {
 	SCR_strlcpy(vkp_wssave_vCMT[i], KNAMEPTR(K_WS[COMMENTS + i]), 254);  
 	vkp_wssave_vCNB[i] =  KNB(K_WS[COMMENTS + i]);
 	}
@@ -108,7 +108,7 @@ C_WsSave()
 
 /*    C_WsName(); */
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++) {
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++) {
 	if(SCR_LKEY == SCR_F2 + i || SCR_LKEY == SCR_F10) {
 	    K_LZH = vkp_wssave_vCC[i]; /* JMP 28-05-00 */
 	    rc = B_WsSave(vkp_wssave_vCMT[i], COMMENTS + i);
@@ -134,7 +134,7 @@ C_InitWsDescr()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++)
 	SCR_strlcpy(vkp_wsdescr_vDCMT[i], KDESC(K_WS[COMMENTS + i]), 50);
     return(0);
 }
@@ -143,7 +143,7 @@ C_WsDescr()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++)
 	B_WsDescr(vkp_wsdescr_vDCMT[i], COMMENTS + i);
     return(0);
 }
@@ -161,7 +161,7 @@ C_InitWsClear()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++)
 	vkp_wsclear_vCNB[i] =  KNB(K_WS[COMMENTS + i]);
 
     return(0);
@@ -171,7 +171,7 @@ C_WsClear()
 {
     int     i;
 
-    for(i = 0 ; i <= K_VAR - COMMENTS ; i++)
+    for(i = 0 ; i <= VARIABLES - COMMENTS ; i++)
 	if((SCR_LKEY == SCR_F2 + i || SCR_LKEY == SCR_F10))
 		 B_WsClear(0L, COMMENTS + i);
 
@@ -187,7 +187,7 @@ SB_WsSample()
 
 C_InitWsSample()
 {
-    SAMPLE  *smpl = KSMPL(K_WS[K_VAR]);
+    SAMPLE  *smpl = KSMPL(K_WS[VARIABLES]);
     char    buf[15];
 
     strcpy(vkp_wssample_OFROM, PER_pertoa(&(smpl->s_p1), buf));
@@ -363,18 +363,18 @@ char    *from, *to;
     char    f[10], t[10];
     PERIOD  *p1, *p2;
 
-    PER_pertoa(&(KSMPL(K_WS[K_VAR])->s_p1), f);
-    PER_pertoa(&(KSMPL(K_WS[K_VAR])->s_p2), t);
+    PER_pertoa(&(KSMPL(K_WS[VARIABLES])->s_p1), f);
+    PER_pertoa(&(KSMPL(K_WS[VARIABLES])->s_p2), t);
     p1 = PER_atoper(from);
     p2 = PER_atoper(to);
 
-    if(p1 == NULL || PER_nbper(p1) != PER_nbper(&(KSMPL(K_WS[K_VAR])->s_p1))
-	|| PER_diff_per(p1, &(KSMPL(K_WS[K_VAR])->s_p1)) < 0)
+    if(p1 == NULL || PER_nbper(p1) != PER_nbper(&(KSMPL(K_WS[VARIABLES])->s_p1))
+	|| PER_diff_per(p1, &(KSMPL(K_WS[VARIABLES])->s_p1)) < 0)
 		    SCR_strlcpy(from, f, 10);
 
-    if(p2 == NULL || PER_nbper(p2) != PER_nbper(&(KSMPL(K_WS[K_VAR])->s_p2))
-	|| PER_diff_per(p2, &(KSMPL(K_WS[K_VAR])->s_p2)) > 0
-	|| PER_diff_per(&(KSMPL(K_WS[K_VAR])->s_p1), p2) > 0)
+    if(p2 == NULL || PER_nbper(p2) != PER_nbper(&(KSMPL(K_WS[VARIABLES])->s_p2))
+	|| PER_diff_per(p2, &(KSMPL(K_WS[VARIABLES])->s_p2)) > 0
+	|| PER_diff_per(&(KSMPL(K_WS[VARIABLES])->s_p1), p2) > 0)
 		    SCR_strlcpy(to, t, 10);
 
     SW_nfree(p1);
@@ -385,7 +385,7 @@ char    *from, *to;
 
 SB_WsTrend()
 {
-    SAMPLE  *smpl = KSMPL(K_WS[K_VAR]);
+    SAMPLE  *smpl = KSMPL(K_WS[VARIABLES]);
 
     switch(PER_nbper(&(smpl->s_p1))) {
 	case 4  :    vkp_wstrend_LAMBDA = 1600; break;
@@ -552,7 +552,7 @@ done:
 
 SAMPLE  *K_ask_smpl()
 {
-    SAMPLE  *smpl = KSMPL(K_WS[K_VAR]);
+    SAMPLE  *smpl = KSMPL(K_WS[VARIABLES]);
     char    buf[15];
 
     strcpy(vkp_asksample_FROM, PER_pertoa(&(smpl->s_p1), buf));
@@ -568,7 +568,7 @@ SAMPLE  *K_ask_smpl()
 /*
 SB_WsTimeSeries()
 {
-    SAMPLE  *smpl = KSMPL(K_WS[K_VAR]);
+    SAMPLE  *smpl = KSMPL(K_WS[VARIABLES]);
     char    buf[15];
 
 //    strcpy(vkp_wstimeseries_FROM, PER_pertoa(&(smpl->s_p1), buf));
@@ -592,8 +592,8 @@ char    *lec;
 	    B_seterror("Syntax error %.80s", L_error());
 	    return(x);
 	}
-	if(clec != 0 && !L_link(K_WS[K_VAR], K_WS[SCALARS], clec))
-	    x = L_exec(K_WS[K_VAR], K_WS[SCALARS], clec, t);
+	if(clec != 0 && !L_link(K_WS[VARIABLES], K_WS[SCALARS], clec))
+	    x = L_exec(K_WS[VARIABLES], K_WS[SCALARS], clec, t);
 	SW_nfree(clec);
     }
 
@@ -634,9 +634,9 @@ C_WsTimeSeries()
     lag = atoi(vkp_wstimeseries_LAG);
     if(smpl == NULL) goto err;
 
-    t = PER_diff_per(&(smpl->s_p2), &(KSMPL(K_WS[K_VAR])->s_p1));
+    t = PER_diff_per(&(smpl->s_p2), &(KSMPL(K_WS[VARIABLES])->s_p1));
     nt = smpl->s_nb;
-    dt = PER_diff_per(&(smpl->s_p1), &(KSMPL(K_WS[K_VAR])->s_p1));
+    dt = PER_diff_per(&(smpl->s_p1), &(KSMPL(K_WS[VARIABLES])->s_p1));
 
     if(vkp_wstimeseries_SERIES != NULL) {
 	sprintf(buf, "mean(%s, %s, %s)", from, to, series);

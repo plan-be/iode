@@ -87,8 +87,8 @@ public:
         case TABLES:
             iodeDatabases.insert(TABLES, &Tables);
             break;
-        case I_VARIABLES:
-            iodeDatabases.insert(I_VARIABLES, &Variables);
+        case VARIABLES:
+            iodeDatabases.insert(VARIABLES, &Variables);
             break;
         default:
             break;
@@ -114,7 +114,7 @@ public:
             iodeDatabases.insert(LISTS, &Lists);
             iodeDatabases.insert(SCALARS, &Scalars);
             iodeDatabases.insert(TABLES, &Tables);
-            iodeDatabases.insert(I_VARIABLES, &Variables);
+            iodeDatabases.insert(VARIABLES, &Variables);
         }
 
         if(updateListModel)

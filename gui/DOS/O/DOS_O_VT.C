@@ -549,7 +549,7 @@ VT_files()
     KDB     *kdb;
 
     for(i = 0; i < K_MAX_FREF; i++) {
-	kdb = K_RWS[K_VAR][i];
+	kdb = K_RWS[VARIABLES][i];
 	if(kdb == NULL) continue;
 
 	sprintf(buf, "[%d] %s", i + 1, KNAMEPTR(kdb));

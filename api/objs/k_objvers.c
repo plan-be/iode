@@ -228,7 +228,7 @@ void K_setvers(KDB* kdb, int i, int vers)
     if(vers == 0 || vers == 3) return;
     K_repack(kdb, i);
     switch(KTYPE(kdb)) {
-        case K_VAR :
+        case VARIABLES :
             if(vers == 2) return;
             opos = KOBJS(kdb)[i].o_val;
             nb = KSMPL(kdb)->s_nb;
