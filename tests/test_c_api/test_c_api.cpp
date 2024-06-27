@@ -2013,7 +2013,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMP_FMT_ASCII, 0);
+    rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
     KV_RWS = KV_WS = K_interpret(VARIABLES, outfile);
@@ -2024,7 +2024,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
     sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
-    rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMP_FMT_ASCII, 0);
+    rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
     if(rc == 0) {
