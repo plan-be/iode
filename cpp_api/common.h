@@ -148,18 +148,6 @@ const static std::vector<std::string> v_simulation_initialization
     "Y := extrapolation, if Y = NA"                 // EXTRA_NA -> Y := fn(Y[-1], Y[-3])
 };
 
-
-enum EnumIodeExportFormat
-{
-    I_EXP_FMT_CSV,
-    I_EXP_FMT_DIF,
-    I_EXP_FMT_WKS,
-    I_EXP_FMT_TSP,
-    I_EXP_FMT_RCSV
-};
-
-const static int I_NB_EXPORT_FORMATS = 5;
-
 const static std::vector<std::string> vExportFormats = 
 	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
 

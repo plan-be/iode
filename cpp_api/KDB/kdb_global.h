@@ -115,7 +115,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
  *  @see https://iode.plan.be/doku.php?id=export
  */
 void export_as(const std::string& var_file, const std::string cmt_file, const std::string& from, const std::string& to, 
-               const EnumIodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
+               const IodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
                const std::string& nan, const std::string& separator, const std::string& debug_file = "");
 
 void low_to_high(const IodeLowToHigh type, const char method, const std::string& filepath, const std::string& var_list);

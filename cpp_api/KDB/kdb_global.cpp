@@ -122,7 +122,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
 }
 
 void export_as(const std::string& var_file, const std::string cmt_file, const std::string& from, const std::string& to, 
-			   const EnumIodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
+			   const IodeExportFormat format, const std::string& save_file, const std::string& rule_file, 
 			   const std::string& nan, const std::string& separator, const std::string& debug_file)
 {
     std::string caller_name = "export_as";
@@ -183,16 +183,16 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     EXPDEF  *expdef;
     switch(format) {
-        case I_EXP_FMT_CSV:
+        case EXPORT_CSV:
             expdef = &EXPCSV;
             break;
-        case I_EXP_FMT_DIF:
+        case EXPORT_DIF:
             expdef = &EXPDIF;
             break;
-        case I_EXP_FMT_WKS:
+        case EXPORT_WKS:
             expdef = &EXPWKS;
             break;
-        case I_EXP_FMT_TSP:
+        case EXPORT_TSP:
             expdef = &EXPTSP;
             break;
         default:
@@ -200,7 +200,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     }
 
     int res;
-    if(format < I_EXP_FMT_RCSV)
+    if(format < EXPORT_RCSV)
         res = EXP_Ws(expdef, dbv, dbc, to_char_array(rule_file_), to_char_array(save_file_), 
                      to_char_array(nan), to_char_array(separator));
     else
