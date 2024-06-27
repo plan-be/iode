@@ -80,7 +80,7 @@ static int HTOL_smpl(SAMPLE *f_smpl, SAMPLE *ws_smpl, SAMPLE **t_smpl, int* skip
  *  
  *  The source periodicity is that of the source file. The target periodicity is the current WS periodicity.
  *  
- *  @param [in] int     method  aggregation method : WS_HTOL_LAST, WS_HTOL_MEAN or WS_HTOL_SUM
+ *  @param [in] int     method  aggregation method : HTOL_LAST, HTOL_MEAN or HTOL_SUM
  *  @param [in] char*   arg     parameter of the report function (see B_WsHtoLLast() for an example of the syntax)
  *  @return     int             0 on success, -1 on error (file not found, SAMPLEs incompatible...)    
  */
@@ -129,7 +129,7 @@ static int B_htol(int method, char* arg)
         }
 
         for(; f + shift <= KSMPL(from)->s_nb; t++, f += shift) { /* JMP_M 4.20 21-07-95 */
-            if(method == WS_HTOL_LAST)
+            if(method == HTOL_LAST)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
                 for(j = 0; j < shift; j++) {
@@ -140,7 +140,7 @@ static int B_htol(int method, char* arg)
                     }
                 }
 
-            if(method == WS_HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
+            if(method == HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
         }
 
         nb = t_smpl->s_nb;
@@ -196,7 +196,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         }
 
         for(; f + shift <= KSMPL(kdb_from)->s_nb; t++, f += shift) { 
-            if(method == WS_HTOL_LAST)
+            if(method == HTOL_LAST)
                 t_vec[t] = f_vec[f + shift - 1] ;
             else /* SUM and MEAN */
                 for(j = 0; j < shift; j++) {
@@ -207,7 +207,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
                     }
                 }
 
-            if(method == WS_HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
+            if(method == HTOL_MEAN && IODE_IS_A_NUMBER(t_vec[t])) t_vec[t] /= shift;
         }
 
         nb = t_smpl->s_nb;
@@ -236,7 +236,7 @@ done:
  */
 int B_WsHtoLLast(char* arg)
 {
-    return(B_htol(WS_HTOL_LAST, arg));
+    return(B_htol(HTOL_LAST, arg));
 }
 
 
@@ -247,7 +247,7 @@ int B_WsHtoLLast(char* arg)
  */
 int B_WsHtoLMean(char* arg)
 {
-    return(B_htol(WS_HTOL_MEAN, arg));
+    return(B_htol(HTOL_MEAN, arg));
 }
 
 
@@ -258,5 +258,5 @@ int B_WsHtoLMean(char* arg)
  */
 int B_WsHtoLSum(char* arg)
 {
-    return(B_htol(WS_HTOL_SUM, arg));
+    return(B_htol(HTOL_SUM, arg));
 }

@@ -16,7 +16,7 @@ from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
 from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, EnumIodeEquationMethod, 
-                            EnumIodeEquationTest, EnumIodeLtoH, EnumIodeHtoL, 
+                            EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             EnumIodeVarMode, VariablesInitialization, 
@@ -181,8 +181,8 @@ class VarsMode(IntEnum):
     Y0Y_GROWTH_RATE = EnumIodeVarMode.I_VAR_MODE_Y0Y_GROWTH_RATE
 
 class LowToHighType(IntEnum):
-    STOCK = EnumIodeLtoH.LTOH_STOCK
-    FLOW = EnumIodeLtoH.LTOH_FLOW
+    STOCK = IodeLowToHigh.LTOH_STOCK
+    FLOW = IodeLowToHigh.LTOH_FLOW
 
 class LowToHighMethod(StrEnum):
     LINEAR = 'L'
@@ -190,9 +190,9 @@ class LowToHighMethod(StrEnum):
     STEP = 'S'
 
 class HighToLowType(IntEnum):
-    LAST = EnumIodeHtoL.HTOL_LAST
-    MEAN = EnumIodeHtoL.HTOL_MEAN
-    SUM = EnumIodeHtoL.HTOL_SUM
+    LAST = IodeHighToLow.HTOL_LAST
+    MEAN = IodeHighToLow.HTOL_MEAN
+    SUM = IodeHighToLow.HTOL_SUM
 
 class SimulationSort(IntEnum):
     CONNEX = EnumSimulationSortAlgorithm.I_SORT_CONNEX
