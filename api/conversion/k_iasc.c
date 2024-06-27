@@ -58,12 +58,12 @@ int IMP_hd_asc(YYFILE* yy, SAMPLE* smpl)
 /**
  *  Reads a VAR name and values in an ASCII variable file format. 
  *       name val1 val2... 
- *  where val<n> is a double or the string na for L_NAN values.
+ *  where val<n> is a double or the string na for IODE_NAN values.
  *   
  *  @param [in, out]    YYFILE*     yy      open YY stream 
  *  @param [out]        char*       name    name of the variable (read on yy)
  *  @param [in]         int         dim     nb of elements to read (=sample size)
- *  @param [in, out]    double*  vector  read values (L_NAN for na values)
+ *  @param [in, out]    double*  vector  read values (IODE_NAN for na values)
  *  @return             int                 0 on success, -1 if EOF is reached before the VAR name
  */
 int IMP_vec_asc(YYFILE* yy, char* name, int dim, double* vector)

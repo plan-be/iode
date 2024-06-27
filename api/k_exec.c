@@ -62,7 +62,7 @@
  *  When VARs are read from external files, they are shortened or expanded to match the current WS sample.
  *  On the other hand, one can execute identities on a sub-sample. In this case, there are 2 possibilities:
  *      - if a calculated VAR already exists in the current WS, its values are left unchanged outside the calculation sample
- *      - if the VAR is created, the values outside the calculation sample are set to L_NAN.
+ *      - if the VAR is created, the values outside the calculation sample are set to IODE_NAN.
  *   
  *  
  *  List of functions 
@@ -470,7 +470,7 @@ static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[])
         dim = KSMPL(dbv)->s_nb;
         for(i = 0, j = 0 ; i < KNB(dbv) && j < 10; i++) {
             if(KSOVAL(dbv, i) != 0) continue;               // series already present in dbv
-            if(K_find(dbi, KONAME(dbv, i)) >= 0) {          // series = identity ("endogenous") => creates an L_NAN VA
+            if(K_find(dbi, KONAME(dbv, i)) >= 0) {          // series = identity ("endogenous") => creates an IODE_NAN VA
                 K_add(dbv, KONAME(dbv, i), NULL, &dim);      
                 continue;
             }

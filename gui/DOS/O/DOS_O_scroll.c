@@ -206,7 +206,7 @@ int i, j;
 			    && L_ISAN(scl->std)
 				&& !L_IS0(scl->std))
 				    var = scl->val/scl->std;
-			 else var = L_NAN;
+			 else var = IODE_NAN;
 		}
 
 	    SCR_fmt_dbl(var, STATIC_BUF, (int)global_SW, (int)global_SN);

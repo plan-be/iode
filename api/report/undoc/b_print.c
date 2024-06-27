@@ -6,7 +6,7 @@
  *  List of functions 
  *  -----------------
  *    int B_PrintVal(double val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
- *    double B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
+ *    double B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or IODE_NAN if it cannot be determined.
  *    int B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
  *    int B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
  *    int B_isdef(char* txt)                                           | Checks if a string contains non space charaters.
@@ -71,7 +71,7 @@ int B_PrintVal(double val)
 
 
 /**
- *  Return the t-test of a scalar or L_NAN if it cannot be determined.
+ *  Return the t-test of a scalar or IODE_NAN if it cannot be determined.
  *      
  *  @param [in] scl SCL*    given scalar 
  *  @return         double  value / stderr 
@@ -80,7 +80,7 @@ double B_calc_ttest(SCL* scl)
 {
     if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
         return(scl->val / scl->std);
-    return(L_NAN);
+    return(IODE_NAN);
 }
 
 /**

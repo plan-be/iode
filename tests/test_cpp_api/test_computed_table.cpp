@@ -485,5 +485,5 @@ TEST_F(ComputedTableTest, EditTable)
     EXPECT_THROW(table_simple.set_value(7, 5, KNFF * 0.9), IodeException);
 
     // 7) trying to modify a cell value by passing a NaN value
-    EXPECT_THROW(table_simple.set_value(1, 5, L_NAN), IodeException);
+    EXPECT_THROW(table_simple.set_value(1, 5, IODE_NAN), IodeException);
 }

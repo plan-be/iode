@@ -313,7 +313,7 @@ static int Str2Vec(double* vec, char* buf, int nb)
 
     nbtbl = SCR_tbl_size(tbl);
     for(i = 0; i < nb && i < nbtbl; i++) vec[i] = (double) atof(tbl[i]);
-    for(; i < nb; i++) vec[i] = L_NAN;
+    for(; i < nb; i++) vec[i] = IODE_NAN;
     SCR_free_tbl(tbl);
 }
 

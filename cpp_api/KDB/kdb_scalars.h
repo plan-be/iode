@@ -24,13 +24,13 @@ public:
 
     int add(const std::string& name, const Scalar& obj);
 
-    int add(const std::string& name, const double value, const double relax, const double std=L_NAN);
+    int add(const std::string& name, const double value, const double relax, const double std=IODE_NAN);
 
     void update(const std::string& name, const Scalar& obj);
 
-    void update(const std::string& name, const double value, const double relax, const double std = L_NAN);
+    void update(const std::string& name, const double value, const double relax, const double std = IODE_NAN);
 
-    void update(const int pos, const double value, const double relax, const double std = L_NAN);
+    void update(const int pos, const double value, const double relax, const double std = IODE_NAN);
 };
 
 

@@ -37,7 +37,7 @@
  * Allocation functions (VAR & SCL only)
  * -------------------------------------
  *      int KS_alloc_scl()          Allocates space for a new SCL (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.
- *      int KV_alloc_var(int nb)    Allocates space for a new VAR of length nb in the swap area, initialises it to L_NAN and returns the "swap" handle.
+ *      int KV_alloc_var(int nb)    Allocates space for a new VAR of length nb in the swap area, initialises it to IODE_NAN and returns the "swap" handle.
  * 
  * @note The "modern" terminology for pack and unpack is "serialize" and "deserialize".
  * @see scr4/s_swap.h (http://www.xon.be/scr4/libs1/libs1236.htm) for more details.
@@ -49,7 +49,7 @@
 /**
  * Packs an IODE VAR object. 
  * 
- * If a1 is NULL, creates a VAR of length *a2 filled with L_NAN.
+ * If a1 is NULL, creates a VAR of length *a2 filled with IODE_NAN.
  * 
  * If a1 is defined, packs a1.
  * 
@@ -69,7 +69,7 @@ int K_vpack(char **pack, double *a1, int *a2)
     if(a1 == NULL) {
         *pack = P_add(*pack, NULL, sizeof(double) * *a2);
         ptr = (double*)P_get_ptr(*pack, 0);
-        for(i = 0; i < *a2; i++) ptr[i] = L_NAN;
+        for(i = 0; i < *a2; i++) ptr[i] = IODE_NAN;
     }
     else *pack = P_add(*pack, (char*)a1, sizeof(double) * *a2);
     return(0);
@@ -429,7 +429,7 @@ int   K_epack(char **pack, char *a1, char *endo)
 
 int K_spack(char **pack, char *a1)
 {
-    static    SCL scl = { 0.9, 1.0, L_NAN };
+    static    SCL scl = { 0.9, 1.0, IODE_NAN };
 
     *pack = P_create();
     if(a1 == NULL)
@@ -865,7 +865,7 @@ int KS_alloc_scl()
 
 
 /**
- * Allocates space for a VAR of length nb in the swap area, initialises it to L_NAN and returns the swap handle.
+ * Allocates space for a VAR of length nb in the swap area, initialises it to IODE_NAN and returns the swap handle.
  * 
  * @param nb  int length of the VAR element.
  *

@@ -583,7 +583,7 @@ SB_WsTimeSeries()
 char    *lec;
 {
     doubleclec;
-    IODE_REAL    x = L_NAN;
+    IODE_REAL    x = IODE_NAN;
 
     SCR_strip(lec);
     if(lec[0]) {
@@ -673,7 +673,7 @@ C_WsTimeSeries()
     if(lag == 0) {
 	W_InitDisplay();
 	T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
-	    0, 2, L_NAN, L_NAN, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
+	    0, 2, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
 	T_GraphTitle(buf);
 
 	T_GraphLegend(0, 'L', buf, NULL);
@@ -687,7 +687,7 @@ C_WsTimeSeries()
     else {
 	W_InitDisplay();
 	T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
-	    0, 2, L_NAN, L_NAN, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
+	    0, 2, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
 	sprintf(buf, "%s vs %s[-%d]", vkp_wstimeseries_SERIES,
 				      vkp_wstimeseries_SERIES, lag);
 	T_GraphTitle(buf);

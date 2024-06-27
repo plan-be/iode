@@ -339,7 +339,7 @@ err:
  *  @param [in] char*   cfile   input CMT file name. If NULL or empty, KC_WS is used
  *  @param [in] char*   from    first period to export
  *  @param [in] char*   to      last period to export
- *  @param [in] char*   na      string to use for L_NAN values
+ *  @param [in] char*   na      string to use for IODE_NAN values
  *  @param [in] char*   sep     separators between cells
  *  @param [in] int     fmt     output format: 0=CSV, 1=DIF, 2=WKS, 3=TSP, default=Rotated CSV
  *  @return     int             0 on success, 

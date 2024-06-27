@@ -49,14 +49,14 @@ double    *vector;
         SCR_strlcpy(value, ptr, 10);            /* JMP 13-02-2013 */
         value[10] = 0;
         SCR_sqz(value);
-        if(value[0] == '\0') vector[i] = L_NAN;
+        if(value[0] == '\0') vector[i] = IODE_NAN;
         else vector[i] = atof(value);
         ptr += 11;
         lg -= 11;
     }
 
     while(i < nb) {
-        vector[i] = L_NAN;
+        vector[i] = IODE_NAN;
         i++;
     }
 

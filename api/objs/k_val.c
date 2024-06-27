@@ -215,7 +215,7 @@ TBL* K_tptr(KDB* kdb, char* name)
  *  @param [in] KDB*    kdb      KDB containing EQ name
  *  @param [in] char*   name     name of the equation (=endogenous)
  *  @param [in] int     test_nb  position of the test in eq->tests 
- *  @return     double           test value or L_NAN if equation name not found
+ *  @return     double           test value or IODE_NAN if equation name not found
  *  
  */
 double K_etest(KDB* kdb, char*name, int test_nb)
@@ -224,7 +224,7 @@ double K_etest(KDB* kdb, char*name, int test_nb)
     float   *tests;
     
     pos = K_find(kdb, name);
-    if(pos < 0) return(L_NAN);         // name not found
+    if(pos < 0) return(IODE_NAN);         // name not found
     
     tests = KETESTS(kdb, pos);
     return((double) tests[test_nb]);
@@ -248,17 +248,17 @@ double K_e_loglik(KDB* kdb, char*name) {return(K_etest(kdb, name, 10));}
  *  @param [in] KDB*    kdb      KDB containing SCL name
  *  @param [in] char*   name     name of the scalar 
  *  @param [in] int     info_nb  0 = scalar, 1 = relax , 2 = std, 3: t-test
- *  @return     double           value or L_NAN if scalar name not found or t-test undefined
+ *  @return     double           value or IODE_NAN if scalar name not found or t-test undefined
  *  
  */
 double K_s_get_info(KDB* kdb, char*name, int info_nb)
 {
     int     pos;
     SCL     *scl;
-    double  val = L_NAN;
+    double  val = IODE_NAN;
     
     pos = K_find(kdb, name);
-    if(pos < 0) return(L_NAN);         // name not found
+    if(pos < 0) return(IODE_NAN);         // name not found
     
     scl = KSVAL(kdb, pos);
     switch(info_nb) {
@@ -268,7 +268,7 @@ double K_s_get_info(KDB* kdb, char*name, int info_nb)
                 if(L_ISAN(scl->val) && L_ISAN(scl->std) && !L_IS0(scl->std))
                     val = scl->val / scl->std;
                 else 
-                    val = L_NAN;
+                    val = IODE_NAN;
                 break;    
             
         default: val = scl->val; break;

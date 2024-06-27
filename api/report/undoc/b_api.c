@@ -684,7 +684,7 @@ int IodeSetTblFile(int ref, char *filename)
  *  @param [in] name char*  variable name
  *  @param [in] t    int    position in the sample
  *  @param [in] mode int    see below
- *  @return          double  depends on the param mode (can be L_NAN if the operation is impossible):
+ *  @return          double  depends on the param mode (can be IODE_NAN if the operation is impossible):
  *                               K_LEVEL : no modification    x[t]
  *                               K_DIFF  : diff on one period (x[t]-x[t-1])
  *                               K_DIFFY : diff on one year   (x[t]-x[t-{nb sub periods}])
@@ -698,10 +698,10 @@ double IodeGetVarT(char *name, int t, int mode)
     SAMPLE  *smpl;
 
     smpl = KSMPL(KV_WS);
-    if(t > smpl->s_nb) return(L_NAN);
+    if(t > smpl->s_nb) return(IODE_NAN);
 
     pos = K_find(K_WS[VARIABLES], name);
-    if(pos < 0) return(L_NAN);
+    if(pos < 0) return(IODE_NAN);
 
     value = KV_get(K_WS[VARIABLES], pos, t, mode);
     return(value);
@@ -841,9 +841,9 @@ int IodeSetVector(char *la_name, double *la_values, int la_pos, int ws_pos, int 
     
     pos = K_find(KV_WS, la_name);
     
-    // If series does not exist, set all values to L_NAN
+    // If series does not exist, set all values to IODE_NAN
     if(pos < 0) {
-        for(i = 0; i < ws_lg; i++) ws_var[i] = L_NAN;
+        for(i = 0; i < ws_lg; i++) ws_var[i] = IODE_NAN;
     }
     
     // Copy la_lg values to ws_var
@@ -1188,7 +1188,7 @@ static CLEC* IodeLinkLec(char* lec)
  *  
  *  @param [in] lec     char*   lec expression 
  *  @param [in] t       int     position in the sample to calculate
- *  @return             double  value of lec in t or L_NAN on error
+ *  @return             double  value of lec in t or IODE_NAN on error
  */
 double IodeExecLecT(char* lec, int t)
 {
@@ -1196,7 +1196,7 @@ double IodeExecLecT(char* lec, int t)
     double  res;
 
     clec = IodeLinkLec(lec);
-    if(clec == NULL) return(L_NAN);
+    if(clec == NULL) return(IODE_NAN);
     res = L_exec(KV_WS, KS_WS, clec, t);
     SCR_free(clec);
     return(res);

@@ -566,7 +566,7 @@ cdef class ComputedTable:
                 for i in range(self.nb_lines)]
         df = DataFrame(index=self.lines, columns=self.columns, data=data)
         # replace IODE NaN values by numpy or pandas values
-        df.where(df < L_NAN * (1.0 - 1e-30))
+        df.where(df < IODE_NAN * (1.0 - 1e-30))
         df.index.name = "name"
         df.columns.name = "period[file]"
         return df

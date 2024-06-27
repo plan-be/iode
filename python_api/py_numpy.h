@@ -82,12 +82,12 @@ inline void __set_var_from_ndarray(const std::string& name, const std::string& f
     // add new Variable
     if(!Variables.contains(name))
     {
-        Variable variable(nb_periods_ws, L_NAN);
+        Variable variable(nb_periods_ws, IODE_NAN);
         double* var_data_ptr = variable.data();
     
         // fill leading values with IODE NaN
         for(int j=0; j < vi.t_start; j++)
-            var_data_ptr[j] = L_NAN;
+            var_data_ptr[j] = IODE_NAN;
         
         // copy values from the passed Numpy array
         for(int j=0; j < vi.nb_periods; j++) 
@@ -95,7 +95,7 @@ inline void __set_var_from_ndarray(const std::string& name, const std::string& f
 
         // fill trailing values with IODE NaN
         for(int j=vi.t_end; j < nb_periods_ws; j++)
-            var_data_ptr[j] = L_NAN;
+            var_data_ptr[j] = IODE_NAN;
 
         Variables.add(name, variable);
     }
@@ -135,19 +135,19 @@ inline void __set_var_from_ndarray_contiguous(const std::string& name, const std
     // add new Variable
     if(!Variables.contains(name))
     {
-        Variable variable(nb_periods_ws, L_NAN);
+        Variable variable(nb_periods_ws, IODE_NAN);
         double* var_data_ptr = variable.data();
     
         // fill leading values with IODE NaN
         for(int j=0; j < vi.t_start; j++)
-            var_data_ptr[j] = L_NAN;
+            var_data_ptr[j] = IODE_NAN;
         
         // copy values from the passed Numpy array
         memcpy(var_data_ptr + vi.t_start, np_data_ptr, vi.nb_periods * sizeof(double));
 
         // fill trailing values with IODE NaN
         for(int j=vi.t_end; j < nb_periods_ws; j++)
-            var_data_ptr[j] = L_NAN;
+            var_data_ptr[j] = IODE_NAN;
 
         Variables.add(name, variable);
     }
@@ -174,8 +174,8 @@ inline void __set_vars_from_ndarray(const std::vector<std::string>& names, const
     int nb_periods_ws = sample.nb_periods();
 
     std::string name;
-    Variable variable(nb_periods_ws, L_NAN);
-    Variable values(vi.nb_periods, L_NAN);
+    Variable variable(nb_periods_ws, IODE_NAN);
+    Variable values(vi.nb_periods, IODE_NAN);
     
     auto v = array.view();
     for(int i=0; i < nb_names; i++)
@@ -188,7 +188,7 @@ inline void __set_vars_from_ndarray(const std::vector<std::string>& names, const
             double* var_data_ptr = variable.data();
             // fill leading values with IODE NaN
             for(int j=0; j < vi.t_start; j++)
-                var_data_ptr[j] = L_NAN;
+                var_data_ptr[j] = IODE_NAN;
             
             // copy values from the passed Numpy array
             for(int j=0; j < vi.nb_periods; j++) 
@@ -196,7 +196,7 @@ inline void __set_vars_from_ndarray(const std::vector<std::string>& names, const
 
             // fill trailing values with IODE NaN
             for(int j=vi.t_end; j < nb_periods_ws; j++)
-                var_data_ptr[j] = L_NAN;
+                var_data_ptr[j] = IODE_NAN;
 
             Variables.add(name, variable);
         }
@@ -231,8 +231,8 @@ inline void __set_vars_from_ndarray_contiguous(const std::vector<std::string>& n
     int nb_periods_ws = sample.nb_periods();
 
     std::string name;
-    Variable variable(nb_periods_ws, L_NAN);
-    Variable values(vi.nb_periods, L_NAN);
+    Variable variable(nb_periods_ws, IODE_NAN);
+    Variable values(vi.nb_periods, IODE_NAN);
     
     double* np_data_ptr = array.data();
     for(int i=0; i < nb_names; i++)
@@ -245,14 +245,14 @@ inline void __set_vars_from_ndarray_contiguous(const std::vector<std::string>& n
             double* var_data_ptr = variable.data();
             // fill leading values with IODE NaN
             for(int j=0; j < vi.t_start; j++)
-                var_data_ptr[j] = L_NAN;
+                var_data_ptr[j] = IODE_NAN;
             
             // copy values from the passed Numpy array
             memcpy(var_data_ptr + vi.t_start, np_data_ptr + (i * vi.nb_periods), vi.nb_periods * sizeof(double));
 
             // fill trailing values with IODE NaN
             for(int j=vi.t_end; j < nb_periods_ws; j++)
-                var_data_ptr[j] = L_NAN;
+                var_data_ptr[j] = IODE_NAN;
 
             Variables.add(name, variable);
         }

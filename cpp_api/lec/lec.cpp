@@ -70,7 +70,7 @@ double execute_lec(const std::string& lec, const int t)
 {
     CLEC* clec = link_lec(lec);
     if(clec == NULL) 
-        return L_NAN;
+        return IODE_NAN;
 
     double value = L_exec(KV_WS, KS_WS, clec, t);
     SCR_free(clec);

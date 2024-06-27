@@ -141,7 +141,7 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	if (lec.empty())
 	{
 		for (int t = t_first; t <= t_last; t++) 
-			var.push_back(L_NAN);
+			var.push_back(IODE_NAN);
 		return var;
 	}
 

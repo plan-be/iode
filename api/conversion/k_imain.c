@@ -97,7 +97,7 @@ KDB *IMP_InterpretVar(IMPDEF* impdef, char* rulefile, char* vecfile, SAMPLE* smp
         if(vector == NULL) goto err;
 
         while(1) {
-            for(i = 0; i < nb; i++) vector[i] = L_NAN;
+            for(i = 0; i < nb; i++) vector[i] = IODE_NAN;
 
             if((*(impdef->imp_vec_fn))(yy, iname, nb, vector) < 0) break;
 

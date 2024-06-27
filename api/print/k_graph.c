@@ -78,10 +78,10 @@ static char *T_GRIDS[] = {"MM", "NN", "mm"}; // Grids (Horiz/Vert) M=Major, m = 
  *  @param [in] double  h       height ofg the graph (in cm)
  *  @param [in] int     xgrid   type of x grids (0-2). 0=T, 1=N, 2=t (see a2m for more infos)
  *  @param [in] int     ygrid   type of y grids (0-2). 0=MM, 1=NN, 2=mm (see a2m for more infos)
- *  @param [in] double  ymin    L_NAN or min value of the y axis
- *  @param [in] double  ymax    L_NAN or max value of the y axis
- *  @param [in] double  zmin    L_NAN or min value of the z axis
- *  @param [in] double  zmax    L_NAN or max value of the z axis
+ *  @param [in] double  ymin    IODE_NAN or min value of the y axis
+ *  @param [in] double  ymax    IODE_NAN or max value of the y axis
+ *  @param [in] double  zmin    IODE_NAN or min value of the z axis
+ *  @param [in] double  zmax    IODE_NAN or max value of the z axis
  *  @param [in] int     align   type of alignment of bars (0-2). 0=L, 1=M, 2=R (see a2m for more infos)
  *  @param [in] int     box     size of the box around the graph (0 for no box)
  *  @param [in] int     brush   id of the background brush (see a2m manual)
@@ -361,7 +361,7 @@ int T_GraphLine(TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, double *y, 
     for(k = 0 ; k < fcls->cl_nb ; k++) {
         T_GraphLineTitle(line, fcls, k);
 
-        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = L_NAN;
+        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = IODE_NAN;
         for(j = 1; j < cls->cl_nb; j += 2) {
             cl = cls->cl_cols + j;
             if(T_find_opf(fcls, cl) != k) continue;
@@ -450,8 +450,8 @@ int T_prep_smpl(COLS *cls, COLS **fcls, SAMPLE *smpl)
  *  @param [in] int     xgrid       type of x grids (0-2). 0=T, 1=N, 2=t (see a2m for more infos)
  *  @param [in] int     ygrid       type of y grids (0-2). 0=MM, 1=NN, 2=mm (see a2m for more infos)
  *  @param [in] int     axis        unused
- *  @param [in] double  ymin        L_NAN or min value of the y axis
- *  @param [in] double  ymax        L_NAN or max value of the y axis
+ *  @param [in] double  ymin        IODE_NAN or min value of the y axis
+ *  @param [in] double  ymax        IODE_NAN or max value of the y axis
  *  @param [in] SAMPLE* smpl        printing sample
  *  @param [in] int     dt          shift from the sample beginning of the first observation to keep for the graph
  *  @param [in] int     nt          nb of obs to print
@@ -479,7 +479,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
 
     y = (double *) SW_nalloc(sizeof(double) * nt);
 
-    T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, L_NAN, L_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
+    T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
     buf = SCR_malloc((int)strlen(names) + 20);
     //sprintf(buf, "%s (%s)", names, KLG_MODES[global_VM][0]);
@@ -556,7 +556,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
  *  -------
  *      varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", ",;");
  *      smpl = PER_atosmpl("1990Y1", "2010Y1");
- *      rc = V_graph(0, 0, 0, 1, 1, 0, L_NAN, L_NAN, smpl, varlist);
+ *      rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
  *  
  *  @param [in] int     view    0 for printing, 1 for displaying the graphs
  *  @param [in] int     mode    transformation of the variables (KLG_E_LEVEL, KLG_E_DIFF, KLG_E_GRT,  KLG_E_DIFFY or KLG_E_GRTY) 
@@ -564,8 +564,8 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, doub
  *  @param [in] int     xgrid   type of x grids (0-2). 0=T, 1=N, 2=t (see a2m for more infos)
  *  @param [in] int     ygrid   type of y grids (0-2). 0=MM, 1=NN, 2=mm (see a2m for more infos)
  *  @param [in] int     axis    unused
- *  @param [in] double  ymin    L_NAN or min value of the y axis
- *  @param [in] double  ymax    L_NAN or max value of the y axis
+ *  @param [in] double  ymin    IODE_NAN or min value of the y axis
+ *  @param [in] double  ymax    IODE_NAN or max value of the y axis
  *  @param [in] SAMPLE* smpl    printing sample
  *  @param [in] char**  names   list of VARs to print
  *  @return     int             0 on success, -1 on error
@@ -633,7 +633,7 @@ int APIGraphLine(int hdl, TBL *tbl, int i, COLS *cls, SAMPLE *smpl, double *x, d
     if(COL_exec(tbl, i, cls) < 0) return(-1);
     for(k = 0 ; k < fcls->cl_nb ; k++) {
         APIGraphLineTitle(hdl, line, fcls, k);
-        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = L_NAN;
+        for(j = 0 ; j < smpl->s_nb ; j++) y[j] = IODE_NAN;
         for(j = 1; j < cls->cl_nb; j += 2) {
             cl = cls->cl_cols + j;
             if(T_find_opf(fcls, cl) != k) continue;

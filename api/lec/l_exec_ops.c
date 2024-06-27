@@ -54,7 +54,7 @@ L_REAL L_times(L_REAL a, L_REAL b) {return(a * b);}
 L_REAL L_divide(L_REAL a, L_REAL b) 
 {
     if(!L_ISAN(b) || !L_ISAN(a) || b == 0) {
-        return((L_REAL)L_NAN);
+        return((L_REAL)IODE_NAN);
     }
     return(a / b);
 }
@@ -66,13 +66,13 @@ L_REAL L_exp(L_REAL a, L_REAL b)
     if(a < 0 && b != (int)b) {
         // test 2018 : si (-a)^0.333 => faire -a^0.333
         ib = 1 / b;
-        if(fabs(ib - (int) ib) > 1e-8) return(L_NAN);
-        if((int)ib % 2 != 1)           return(L_NAN);
+        if(fabs(ib - (int) ib) > 1e-8) return(IODE_NAN);
+        if((int)ib % 2 != 1)           return(IODE_NAN);
         x = -pow((double)-a, (double)b);
     }
     else
         x = pow((double)a, (double)b);
-    if(_isnan(x)) x = L_NAN; /* JMP 18-01-02 */
+    if(_isnan(x)) x = IODE_NAN; /* JMP 18-01-02 */
     return((L_REAL)x);
 }
 

@@ -21,7 +21,7 @@ bool VariablesModel::setValue(const int row, const int column, const QVariant& v
 {
 	try
 	{
-		double val = (value == NAN_REP || value == "") ? L_NAN : value.toDouble();
+		double val = (value == NAN_REP || value == "") ? IODE_NAN : value.toDouble();
 		displayed_database->set_var(row, column, val);
 		return true;
 	}

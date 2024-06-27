@@ -7,7 +7,7 @@ void init_constants(nb::module_ &m)
       // --------------
 
       // NAN value
-      m.attr("nan") = L_NAN;
+      m.attr("nan") = IODE_NAN;
 
       // Object and file types
       m.attr("I_CMT") = (int) COMMENTS;

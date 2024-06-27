@@ -1107,7 +1107,7 @@ Functions (and their subfunctions) to print IODE object definitions.
 ..tb
 | Syntax                                               | Description or equivalent in Reports
 | ~cint B_PrintVal(double val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
-| ~cdouble B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or L_NAN if it cannot be determined.
+| ~cdouble B_calc_ttest(SCL* scl)                                 | Return the t-test of a scalar or IODE_NAN if it cannot be determined.
 | ~cint B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
 | ~cint B_PrintDefGnl(char* name, char* text)                        | Print an object name and its title in an enum_1 paragraph.
 | ~cint B_isdef(char* txt)                                           | Checks if a string contains non space charaters.

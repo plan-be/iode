@@ -18,7 +18,7 @@
  *  The number of elements in f_vec must be >= 4.
  *  
  *  @param [in]  double*  f_vec  input series
- *  @param [out] double*  t_vec  resulting series, L_NAN if nb < 4
+ *  @param [out] double*  t_vec  resulting series, IODE_NAN if nb < 4
  *  @param [in]  int         nb      number of input data (size of f_vec)
  *  @param [in]  double   lambda  weight (?)
  *  @param [in]  int         std     1 if estimated in level, 0 for log estimation
@@ -38,7 +38,7 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)
 
     // nb must be ge 4 (0 <= nb - 1 - j avec j = 3) // JMP 5/7/2017
     if(nb < 4) {
-        for(i = 0; i < nb; i++) t_vec[i] = L_NAN;
+        for(i = 0; i < nb; i++) t_vec[i] = IODE_NAN;
         return(-1);
     }
     // JMP 5/7/2017
@@ -98,7 +98,7 @@ err:
     M_free(yt);
     M_free(gt);
     M_free(a);
-    for(i = 0; i < nb; i++) t_vec[i] = L_NAN; /* JMP 26-07-11 */
+    for(i = 0; i < nb; i++) t_vec[i] = IODE_NAN; /* JMP 26-07-11 */
     return(-1);
 }
 
@@ -125,10 +125,10 @@ void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)
     int     i;
 
     for(*beg = 0; *beg < nb && !L_ISAN(f_vec[*beg]); (*beg)++)
-        t_vec[*beg] = L_NAN;
+        t_vec[*beg] = IODE_NAN;
     for(*dim = *beg; *dim < nb && L_ISAN(f_vec[*dim]); (*dim)++);
 
-    for(i = *dim; i < nb; i++) t_vec[i] = L_NAN;
+    for(i = *dim; i < nb; i++) t_vec[i] = IODE_NAN;
     *dim -= *beg; /* JMP 26-07-11 */
 }
 

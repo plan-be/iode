@@ -56,12 +56,12 @@ int B_season(char* arg)
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));
     i_vec = (double *) SW_nalloc(nb * sizeof(double));
-    for(i = 0; i < nb; i++) c_vec[i] = i_vec[i] = L_NAN;
+    for(i = 0; i < nb; i++) c_vec[i] = i_vec[i] = IODE_NAN;
 
     for(i = 0; i < KNB(from); i++) {
         beg = 0;   /* GB 23/07/98 */
         dim = nb;  /* GB 23/07/98 */
-        for(j = 0; j < nb; j++) c_vec[j] = i_vec[j] = L_NAN;
+        for(j = 0; j < nb; j++) c_vec[j] = i_vec[j] = IODE_NAN;
         memcpy(t_vec,
                KVVAL(from, i, 0) + shift, nb * sizeof(double));
 
@@ -127,7 +127,7 @@ int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift)
     tolag = *dim - ((*dim - *beg)/nbper) *nbper;
     *dim = *dim - tolag;
     *beg = tolag;
-    for(f = 0; f < *beg; f++) vec[f] = L_NAN;
+    for(f = 0; f < *beg; f++) vec[f] = IODE_NAN;
     /* GB 23/0/98 */
 
     for(f = 0; f < nbper; f++) ti[f] = 0.0;

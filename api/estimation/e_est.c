@@ -221,7 +221,7 @@ static int E_mod_residuals(int coef_nb, int est_coef_nb,  double h)
             //  et sauver la d�riv�e dans la matrice E_G  : (f(x + h) - f(x)) / h
             for(j = 0 ; j < E_T ; j++) {
                 x = E_rhs_ij(i, j);
-                if(x >= MAXFLOAT) x = L_NAN;
+                if(x >= MAXFLOAT) x = IODE_NAN;
                 if(L_ISAN(x))
                     MATE(E_G, est_coef_nb, i * E_T + j) =
                         (x - MATE(E_RHS, i, j)) / h;

@@ -182,10 +182,10 @@ TEST_F(TablesTest, NotLineMethods)
     table->set_language(IT_FRENCH);
     EXPECT_EQ(table->get_language(), "French");
 
-    EXPECT_FLOAT_EQ(table->t_zmin, (float) L_NAN);
-    EXPECT_FLOAT_EQ(table->t_zmax, (float) L_NAN);
-    EXPECT_FLOAT_EQ(table->t_ymin, (float) L_NAN);
-    EXPECT_FLOAT_EQ(table->t_ymax, (float) L_NAN);
+    EXPECT_FLOAT_EQ(table->t_zmin, (float) IODE_NAN);
+    EXPECT_FLOAT_EQ(table->t_zmax, (float) IODE_NAN);
+    EXPECT_FLOAT_EQ(table->t_ymin, (float) IODE_NAN);
+    EXPECT_FLOAT_EQ(table->t_ymax, (float) IODE_NAN);
     table->t_zmin = 0;
     table->t_zmax = 10;
     table->t_ymin = 0;

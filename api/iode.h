@@ -83,7 +83,7 @@ enum IodeCase
     #define REALD
 #endif
 
-#define L_NAN       (double)(-2.0e37)
+#define IODE_NAN    (double)(-2.0e37)
 #define L_ISAN(x)   ((x) >= (double)(-1.0e37))
 #define L_IS0(x)    (((x) > 0 && (x) < 1.0e-36) || ((x) <= 0 && (-x) < 1.0e-36))
 

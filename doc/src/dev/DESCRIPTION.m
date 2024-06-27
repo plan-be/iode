@@ -329,7 +329,7 @@ Functions acting on workspaces of variables.
 | ~cint KV_sample(KDB *kdb, SAMPLE *nsmpl)                                | Changes the SAMPLE of a KDB of variables.
 | ~cint KV_merge(KDB *kdb1, KDB* kdb2, int replace)                       | Merges two KDB of variables: kdb1 <<- kdb1 + kdb2.            
 | ~cvoid KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)                  | Merges 2 KDB of variables, then deletes the second one.
-| ~cint KV_add(char* varname)                                             | Adds a new variable in KV_WS. Fills it with L_NAN.
+| ~cint KV_add(char* varname)                                             | Adds a new variable in KV_WS. Fills it with IODE_NAN.
 | ~cdouble KV_get(KDB *kdb, int pos, int t, int mode)                     | Gets VAR[t]  where VAR is the series in position pos in kdb. 
 | ~cvoid KV_set(KDB *kdb, int pos, int t, int mode, double new)        | Sets VAR[t], where VAR is the series in position pos in kdb. 
 | ~cint KV_extrapolate(KDB *dbv, int method, SAMPLE *smpl, char **vars)   | Extrapolates variables on a selected SAMPLE according to one of the available methods.
@@ -444,7 +444,7 @@ s
 ..tb
 | Syntax| Description           
 | ~cint KS_alloc_scl()          | Allocates space for a new SCL (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.
-| ~cint KV_alloc_var(int nb)    | Allocates space for a new VAR of length nb in the swap area, initialises it to L_NAN and returns the "swap" handle.
+| ~cint KV_alloc_var(int nb)    | Allocates space for a new VAR of length nb in the swap area, initialises it to IODE_NAN and returns the "swap" handle.
 ..te
 
 &TI k_val.c

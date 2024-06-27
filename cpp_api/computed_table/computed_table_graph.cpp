@@ -67,7 +67,7 @@ std::vector<double> ComputedTableGraph::get_series_values(const int row, const i
     int nb_periods = get_nb_periods();
     int nb_files_ops = get_nb_files_ops();
 
-    std::vector<double> y(nb_periods, L_NAN);
+    std::vector<double> y(nb_periods, IODE_NAN);
 
     COL column;
     int pos;

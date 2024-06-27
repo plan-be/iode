@@ -22,7 +22,7 @@
  *  @param [in]   SAMPLE*  f_smpl     sample of the input var file
  *  @param [in]   SAMPLE*  ws_smpl    sample of the current WS 
  *  @param [out]  SAMPLE** t_smpl     allocated target sample
- *  @param [out]  int*     skip       nb of periods to skip (i.e. set to L_NAN) in the **target** variable 
+ *  @param [out]  int*     skip       nb of periods to skip (i.e. set to IODE_NAN) in the **target** variable 
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
  *  @return       rc                  0 on success, -1 on error (incompatible perriodicity...) 
  */
@@ -123,7 +123,7 @@ static int B_htol(int method, char* arg)
 
         for(f = 0, t = 0; f < skip; f++) {
             if(f != 0 && f % shift == 0) {
-                t_vec[t] = L_NAN;
+                t_vec[t] = IODE_NAN;
                 t++;
             }
         }
@@ -135,7 +135,7 @@ static int B_htol(int method, char* arg)
                 for(j = 0; j < shift; j++) {
                     if(L_ISAN(f_vec[f + j])) t_vec[t] += f_vec[f + j];
                     else {
-                        t_vec[t] = L_NAN;
+                        t_vec[t] = IODE_NAN;
                         break;
                     }
                 }
@@ -144,7 +144,7 @@ static int B_htol(int method, char* arg)
         }
 
         nb = t_smpl->s_nb;
-        for(; t < nb; t++) t_vec[t] = L_NAN;
+        for(; t < nb; t++) t_vec[t] = IODE_NAN;
 
         K_add(to, KONAME(from, i), t_vec, &(nb));
     }
@@ -190,7 +190,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
 
         for(f = 0, t = 0; f < skip; f++) {
             if(f != 0 && f % shift == 0) {
-                t_vec[t] = L_NAN;
+                t_vec[t] = IODE_NAN;
                 t++;
             }
         }
@@ -202,7 +202,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
                 for(j = 0; j < shift; j++) {
                     if(L_ISAN(f_vec[f + j])) t_vec[t] += f_vec[f + j];
                     else {
-                        t_vec[t] = L_NAN;
+                        t_vec[t] = IODE_NAN;
                         break;
                     }
                 }
@@ -211,7 +211,7 @@ KDB* B_htol_kdb(int method, KDB* kdb_from)
         }
 
         nb = t_smpl->s_nb;
-        for(; t < nb; t++) t_vec[t] = L_NAN;
+        for(; t < nb; t++) t_vec[t] = IODE_NAN;
 
         K_add(kdb_to, KONAME(kdb_from, i), t_vec, &(nb));
     }

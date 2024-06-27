@@ -183,7 +183,7 @@ void K_simul_free()
  *  The solution of each equation is saved in the global KSIM_DBV.
  *  
  *  @param [in] int     t   period to calculated
- *  @return     int         0 (should be L_NAN on error ?)
+ *  @return     int         0 (should be IODE_NAN on error ?)
  *  
  */
 static int K_prolog(int t)
@@ -212,7 +212,7 @@ static int K_prolog(int t)
  *  
  *  @param [in]     int         t            simulated period
  *  @return         int                      0 if the equation return a real value
- *                                           -1 if the equation returns L_NAN
+ *                                           -1 if the equation returns IODE_NAN
  *  @global [out]   double   KSIM_NORM    maximum difference bw endos before and after iteration
  *  
  */
@@ -268,7 +268,7 @@ static int K_interdep_1(int t)
  *  A solution is reached if the difference between 2 iterations k and k+1 is less that KSIM_NORM. 
  *   
  *  @param [in]     int         t  index of the calculation period
- *  @return         int         -1 if the result of an equation is L_NAN
+ *  @return         int         -1 if the result of an equation is IODE_NAN
  *                              0 otherwise
  *  @global [out]   double   KSIM_NORM    maximum difference between 2 iterations
  */
@@ -348,7 +348,7 @@ static int K_interdep(int t)
  *  Calculates the last non interdependent (post recursive) part of the model.
  *  
  *  @param [in] int     t   period to calculated
- *  @return     int         0 (should be L_NAN on error ?)
+ *  @return     int         0 (should be IODE_NAN on error ?)
  *  
  */
 static int K_epilog(int t)
@@ -373,7 +373,7 @@ static int K_epilog(int t)
  *  @param [in] int         t       current simulation period
  *  @param [in] char*       lst     name of the list to create
  *  @param [in] double   eps     convergence threshold
- *  @return     int                 0 on success, -1 if at least one equation returns L_NAN. 
+ *  @return     int                 0 on success, -1 if at least one equation returns IODE_NAN. 
  *  TODO: 
  *      Why returning -1 
  *      if NA, stop creating _DIVER ?
@@ -686,7 +686,7 @@ fin:
  *  @param [in] int         varnb   position of the variable to calculate in the global KV_DB
  *  @param [in] int         msg     indicated if the function kerror() must be called on error (no solution found)
  *  @return     double           on succes: the equation solution
- *                                  on error of if no solution can be found: L_NAN 
+ *                                  on error of if no solution can be found: IODE_NAN 
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
