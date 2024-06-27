@@ -137,15 +137,6 @@ const static std::map<std::string, EnumIodeFile> mFileExtensions =
 };
 
 
-// TODO: replace K by I as below in C api + group them in an enum
-enum EnumIodeCase
-{
-    I_UPPER = UPPER_CASE,
-    I_LOWER = LOWER_CASE,
-    I_ASIS = ASIS_CASE
-};
-
-
 enum EnumSimulationInitialization
 {
     IV_INIT_TM1 = KV_INIT_TM1,
