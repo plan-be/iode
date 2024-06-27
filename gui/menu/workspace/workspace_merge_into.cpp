@@ -45,7 +45,7 @@ void MenuWorkspaceMergeInto::merge_into_workspace()
         case IDENTITIES:
             Identities.merge_from(input_file);
             break;
-        case I_LISTS:
+        case LISTS:
             Lists.merge_from(input_file);
             break;
         case I_SCALARS:

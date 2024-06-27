@@ -114,7 +114,7 @@ int K_add(KDB* kdb, char* name, ...)
           lec = va_arg(vargs, char *);
           rc = K_ipack(&pack, lec);
           break;            
-      case K_LST: 
+      case LISTS: 
           txt = va_arg(vargs, char *);
           rc = K_lpack(&pack, txt);
           break;            

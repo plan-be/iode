@@ -14,7 +14,7 @@ protected:
         KDBTemplate(kdb, deep_copy, pattern) {};
 
 public:
-    KDBLists(const std::string& filepath="") : KDBTemplate(I_LISTS, filepath) {}
+    KDBLists(const std::string& filepath="") : KDBTemplate(LISTS, filepath) {}
 
     KDBLists* subset(const std::string& pattern, const bool deep_copy=false)
     {

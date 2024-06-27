@@ -400,7 +400,7 @@ char *IodeDdeCreateObj(int objnb, int type, int *nc, int *nl)
             case IDENTITIES :
                 obj = (char *)KILEC(kdb, objnb);
                 break;
-            case K_LST :
+            case LISTS :
                 obj = (char *)KLVAL(kdb, objnb);
                 break;
             default    :
@@ -544,7 +544,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     if(strcmp(szTopic, "WS") == 0)   return(IodeDdeGetWS(szItem));
     if(strcmp(szTopic, "XVAR") == 0) return(IodeDdeGetXObj(szItem, K_VAR));
     if(strcmp(szTopic, "XCMT") == 0) return(IodeDdeGetXObj(szItem, COMMENTS));
-    if(strcmp(szTopic, "XLST") == 0) return(IodeDdeGetXObj(szItem, K_LST));
+    if(strcmp(szTopic, "XLST") == 0) return(IodeDdeGetXObj(szItem, LISTS));
     if(strcmp(szTopic, "XIDT") == 0) return(IodeDdeGetXObj(szItem, IDENTITIES));
     if(strcmp(szTopic, "XTBL") == 0) return(IodeDdeGetXObj(szItem, K_TBL));
     if(strcmp(szTopic, "XREP") == 0) return(IodeDdeGetReportRC(szItem));
@@ -563,7 +563,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             return((char *)0);
 
         case COMMENTS :
-        case K_LST :
+        case LISTS :
             res = SCR_stracpy((char *)KCVAL(kdb, objnb));
             SCR_replace(res, "\t", " ");
             SCR_replace(res, "\n", " ");
@@ -959,7 +959,7 @@ int B_ExcelSet(char *arg, int type)
         case IDENTITIES :
             ptr = SCR_stracpy(KILEC(kdb, pos));
             break;
-        case K_LST :
+        case LISTS :
             ptr = SCR_stracpy(KLVAL(kdb, pos));
             break;
         case EQUATIONS :

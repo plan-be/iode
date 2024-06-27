@@ -34,7 +34,7 @@ from typing import Union, List, Tuple, Optional
 COMMENTS = 0
 EQUATIONS = 1
 IDENTITIES = 2
-K_LST = 3
+LISTS = 3
 K_SCL = 4
 K_TBL = 5
 K_VAR = 6

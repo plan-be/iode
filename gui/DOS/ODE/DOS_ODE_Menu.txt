@@ -73,8 +73,8 @@ V	"Edit WS      "   : SB_DataEditScroll(0L, IDENTITIES)
 	------------------------
 	"Lists"   
 	------------------------
-V	"Edit WS      "   : SB_DataEditScroll(0L, K_LST)
-	"Edit List    "   : SB_DataEdit(0L, K_LST)
+V	"Edit WS      "   : SB_DataEditScroll(0L, LISTS)
+	"Edit List    "   : SB_DataEdit(0L, LISTS)
 	------------------------
 	"Sort & Expand"   : SB_DataListSort
 	"List Calculus"   : SB_DataCalcLst

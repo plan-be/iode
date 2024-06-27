@@ -302,9 +302,9 @@ int B_ModelSimulateSCC(char *const_arg)
         goto err;
     }
 
-    prepos   = K_find(K_WS[K_LST], lsts[0]); 
-    interpos = K_find(K_WS[K_LST], lsts[1]);
-    postpos  = K_find(K_WS[K_LST], lsts[2]);
+    prepos   = K_find(K_WS[LISTS], lsts[0]); 
+    interpos = K_find(K_WS[LISTS], lsts[1]);
+    postpos  = K_find(K_WS[LISTS], lsts[2]);
     SCR_free_tbl(lsts);
 
     if(prepos < 0 || interpos < 0 || postpos < 0) {
@@ -313,9 +313,9 @@ int B_ModelSimulateSCC(char *const_arg)
         goto err;
     }
 
-    pre   = KL_expand(KLVAL(K_WS[K_LST], prepos));
-    inter = KL_expand(KLVAL(K_WS[K_LST], interpos));
-    post  = KL_expand(KLVAL(K_WS[K_LST], postpos));
+    pre   = KL_expand(KLVAL(K_WS[LISTS], prepos));
+    inter = KL_expand(KLVAL(K_WS[LISTS], interpos));
+    post  = KL_expand(KLVAL(K_WS[LISTS], postpos));
 
     // Regroupe les listes dans une seule avant de faire K_quick_refer
     eqs1 = SCR_union_quick(pre, inter); // JMP 29/8/2012

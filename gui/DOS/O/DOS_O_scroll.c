@@ -111,7 +111,7 @@ int i;
 	case COMMENTS :strcpy(STATIC_BUF, "COMMENT");     break;
 	case EQUATIONS :strcpy(STATIC_BUF, "EQUATION");    break;
 	case IDENTITIES :strcpy(STATIC_BUF, "IDENTITY");    break;
-	case K_LST :strcpy(STATIC_BUF, "LIST");        break;
+	case LISTS :strcpy(STATIC_BUF, "LIST");        break;
 	case K_SCL :strcpy(STATIC_BUF, scl[i]);        break;
 	case K_TBL :strcpy(STATIC_BUF, "TABLE TITLE"); break;
 	}
@@ -186,7 +186,7 @@ int i, j;
     case COMMENTS :
 	    return(KCVAL(kdb, i));
 
-    case K_LST :
+    case LISTS :
 	    return(KLVAL(kdb, i));
 
     case K_TBL :
@@ -246,7 +246,7 @@ int i;
 	case EQUATIONS :
 	case IDENTITIES :
 	case K_TBL :
-	case K_LST :
+	case LISTS :
 		    // return(65); /* JMP 09-01-11 */
 		    return(SCR_PAGE_SIZE[1] - 10); /* JMP 09-01-11 */
 	case K_SCL : return((int)global_SW);
@@ -287,7 +287,7 @@ int i, j;
 	case COMMENTS :
 	case EQUATIONS :
 	case IDENTITIES :
-	case K_LST :
+	case LISTS :
 	case K_VAR :  rc = ODE_edit_obj1(kdb, -1); break;
 	case K_SCL :  rc = ODE_edit_scl(kdb, -1, -1); break;
 	case K_TBL :  rc = ODE_edit_tbl(kdb, -1, -1); break;
@@ -318,7 +318,7 @@ int i, j;
     case COMMENTS :
     case EQUATIONS :
     case IDENTITIES :
-    case K_LST :  return(ODE_edit_obj1(kdb, i));
+    case LISTS :  return(ODE_edit_obj1(kdb, i));
     case K_SCL :  return(ODE_edit_scl_cell(kdb, i, j));
     case K_TBL :  return(ODE_edit_tbl(kdb, i, -1));
     case K_VAR :  return(ODE_edit_var_cell(kdb, i, j));

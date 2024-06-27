@@ -189,7 +189,7 @@ def ws_content_idt(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, IDENTITIES)
 
 def ws_content_lst(pattern: Union[str, List[str]] = '*') -> List[str]:
-    return ws_content(pattern, K_LST)
+    return ws_content(pattern, LISTS)
 
 def ws_content_scl(pattern: Union[str, List[str]] = '*') -> List[str]:
     return ws_content(pattern, K_SCL)
@@ -224,7 +224,7 @@ def ws_clear_idt():
     ws_clear(IDENTITIES)
 
 def ws_clear_lst():
-    ws_clear(K_LST)
+    ws_clear(LISTS)
 
 def ws_clear_scl():
     ws_clear(K_SCL)
@@ -258,7 +258,7 @@ def ws_load_idt(filename: str) -> int:
     return ws_load(filename, IDENTITIES)
 
 def ws_load_lst(filename: str) -> int:
-    return ws_load(filename, K_LST) 
+    return ws_load(filename, LISTS) 
                              
 def ws_load_scl(filename: str) -> int:
     return ws_load(filename, K_SCL) 
@@ -291,7 +291,7 @@ def ws_save_idt(filename: str):
 
 def ws_save_lst(filename: str):
     '''Save the current list workspace'''
-    ws_save(filename, K_LST)
+    ws_save(filename, LISTS)
 
 def ws_save_scl(filename: str):
     '''Save the current scalar workspace'''

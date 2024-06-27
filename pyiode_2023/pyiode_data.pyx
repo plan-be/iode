@@ -75,7 +75,7 @@ def data_update_idt(obj_name: str, obj_value: str):
     data_update(obj_name, obj_value, IDENTITIES)
     
 def data_update_lst(obj_name: str, obj_value: str):
-    data_update(obj_name, obj_value, K_LST)
+    data_update(obj_name, obj_value, LISTS)
     
 def data_update_scl(obj_name: str, value: float = None, relax: float = None, stderr: float = None):
     cmd = obj_name + " "

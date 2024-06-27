@@ -72,7 +72,7 @@ class IodeTypes(IntEnum):
     COMMENTS = EnumIodeType.COMMENTS
     EQUATIONS = EnumIodeType.EQUATIONS
     IDENTITIES = EnumIodeType.IDENTITIES
-    LISTS = EnumIodeType.I_LISTS
+    LISTS = EnumIodeType.LISTS
     SCALARS = EnumIodeType.I_SCALARS
     TABLES = EnumIodeType.I_TABLES
     VARIABLES = EnumIodeType.I_VARIABLES
@@ -81,7 +81,7 @@ class IodeFileExt(IntEnum):
     COMMENTS = EnumIodeFile.COMMENTS_FILE
     EQUATIONS = EnumIodeFile.EQUATIONS_FILE
     IDENTITIES = EnumIodeFile.IDENTITIES_FILE
-    LISTS = EnumIodeFile.I_LISTS_FILE
+    LISTS = EnumIodeFile.LISTS_FILE
     SCALARS = EnumIodeFile.I_SCALARS_FILE
     TABLES = EnumIodeFile.I_TABLES_FILE
     VARIABLES = EnumIodeFile.I_VARIABLES_FILE

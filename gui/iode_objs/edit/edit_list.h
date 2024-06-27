@@ -9,7 +9,7 @@ class EditListDialog: public TemplateEditObjectDialog<KDBLists>
 
 public:
     EditListDialog(const QString& name, KDBLists* database, QWidget* parent = Q_NULLPTR) : 
-        TemplateEditObjectDialog(I_LISTS, name, database, parent) 
+        TemplateEditObjectDialog(LISTS, name, database, parent) 
     {
         value = database->get(name.toStdString());
         textEdit_content->setPlainText(QString::fromStdString(value));

@@ -15,7 +15,7 @@ class ListsView : public IodeAbstractTableView, public TableViewEditObj<ListsMod
 
 public:
 	ListsView(QWidget* parent = nullptr) : 
-		IodeAbstractTableView(I_LISTS, new ListsDelegate(parent), parent), 
+		IodeAbstractTableView(LISTS, new ListsDelegate(parent), parent), 
 		TableViewEditObj(this), TableViewAddObj(this) {};
 
 public slots:

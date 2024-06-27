@@ -1429,9 +1429,9 @@ void Tests_B_DATA()
     cond = (rc == 0) && U_cmp_strs(KIPTR("U"), "2 * A");
     S4ASSERT(cond == 1, "B_DataUpdate(\"U 2 * A\", IDENTITIES) = \"%s\"", KIPTR("U"));
     
-    rc = B_DataUpdate("U A,B,C"             , K_LST);
+    rc = B_DataUpdate("U A,B,C"             , LISTS);
     cond = (rc == 0) && U_cmp_strs(KLPTR("U"), "A,B,C");
-    S4ASSERT(cond == 1, "B_DataUpdate(\"U A,B,C\", K_LST) = \"%s\"", KLPTR("U"));
+    S4ASSERT(cond == 1, "B_DataUpdate(\"U A,B,C\", LISTS) = \"%s\"", KLPTR("U"));
     
     rc = B_DataUpdate("U  1.2 1"             , K_SCL);  
     val = K_s_get_value (KS_WS, "U");
@@ -1454,13 +1454,13 @@ void Tests_B_DATA()
     S4ASSERT(cond == 1, "B_DataScan(\"U\", EQUATIONS) = \"%s\"", KLPTR("_SCAL"));
      
     // B_DataExist(char* arg, int type)
-    rc = B_DataExist("_SCAL", K_LST);
-    S4ASSERT((rc >= 0), "B_DataExist(\"_SCAL\", K_LST) = %d", rc);
+    rc = B_DataExist("_SCAL", LISTS);
+    S4ASSERT((rc >= 0), "B_DataExist(\"_SCAL\", LISTS) = %d", rc);
 
     // B_DataAppend(char* arg, int type)
-    rc = B_DataAppend("_SCAL XXX,YYY", K_LST);
+    rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY");
-    S4ASSERT(cond == 1, "B_DataAppend(\"_SCAL XXX,YYY\", K_LST) = %d", rc);
+    S4ASSERT(cond == 1, "B_DataAppend(\"_SCAL XXX,YYY\", LISTS) = %d", rc);
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U");
@@ -1473,8 +1473,8 @@ void Tests_B_DATA()
     S4ASSERT(cond == 1, "B_DataList(\"LC ac*\", K_SCL); = '%s'", KLPTR("LC"));
 
     // B_DataCalcLst(char* arg)
-    B_DataUpdate("LST1 A,B,C", K_LST);
-    B_DataUpdate("LST2 C,D,E", K_LST);
+    B_DataUpdate("LST1 A,B,C", LISTS);
+    B_DataUpdate("LST2 C,D,E", LISTS);
     
     rc = B_DataCalcLst("_RES LST1 + LST2");
     cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E");
@@ -1494,7 +1494,7 @@ void Tests_B_DATA()
 
     // B_DataCompare(char* arg, int type)  
     sprintf(buf,  "%s\\fun.lst WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", IODE_DATA_DIR);
-    rc = B_DataCompare(buf, K_LST);
+    rc = B_DataCompare(buf, LISTS);
     //printf("    WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
     //printf("    FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
     //printf("    BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
@@ -2608,7 +2608,7 @@ void Tests_B_WS()
     U_test_B_WsLoad("fun", COMMENTS, 317);
     U_test_B_WsLoad("fun", EQUATIONS, 274);
     U_test_B_WsLoad("fun", IDENTITIES, 48);
-    U_test_B_WsLoad("fun", K_LST, 17);
+    U_test_B_WsLoad("fun", LISTS, 17);
     U_test_B_WsLoad("fun", K_SCL, 161);
     U_test_B_WsLoad("fun", K_TBL, 46);
     U_test_B_WsLoad("fun", K_VAR, 394);
@@ -2618,7 +2618,7 @@ void Tests_B_WS()
     U_test_B_WsSave("fun", "fun2", COMMENTS, 317);
     U_test_B_WsSave("fun", "fun2", EQUATIONS, 274);
     U_test_B_WsSave("fun", "fun2", IDENTITIES, 48);
-    U_test_B_WsSave("fun", "fun2", K_LST, 17);
+    U_test_B_WsSave("fun", "fun2", LISTS, 17);
     U_test_B_WsSave("fun", "fun2", K_SCL, 161);
     U_test_B_WsSave("fun", "fun2", K_TBL, 46);
     U_test_B_WsSave("fun", "fun2", K_VAR, 394);
@@ -2628,7 +2628,7 @@ void Tests_B_WS()
     U_test_B_WsSaveCmp("fun", "fun2cmp", COMMENTS, 317);
     U_test_B_WsSaveCmp("fun", "fun2cmp", EQUATIONS, 274);
     U_test_B_WsSaveCmp("fun", "fun2cmp", IDENTITIES, 48);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", K_LST, 17);
+    U_test_B_WsSaveCmp("fun", "fun2cmp", LISTS, 17);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_SCL, 161);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_TBL, 46);
     U_test_B_WsSaveCmp("fun", "fun2cmp", K_VAR, 394);
@@ -2638,7 +2638,7 @@ void Tests_B_WS()
     U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS); 
     U_test_B_WsExport("fun.eqs", "fun2.ae", EQUATIONS); 
     U_test_B_WsExport("fun.idt", "fun2.ai", IDENTITIES);
-    U_test_B_WsExport("fun.lst", "fun2.al", K_LST);
+    U_test_B_WsExport("fun.lst", "fun2.al", LISTS);
     U_test_B_WsExport("fun.scl", "fun2.as", K_SCL); 
     U_test_B_WsExport("fun.tbl", "fun2.at", K_TBL);
     U_test_B_WsExport("fun.var", "fun2.av", K_VAR);
@@ -2648,7 +2648,7 @@ void Tests_B_WS()
     U_test_B_WsClear(COMMENTS);
     U_test_B_WsClear(EQUATIONS);
     U_test_B_WsClear(IDENTITIES);
-    U_test_B_WsClear(K_LST);
+    U_test_B_WsClear(LISTS);
     U_test_B_WsClear(K_SCL);
     U_test_B_WsClear(K_TBL);
     U_test_B_WsClear(K_VAR);
@@ -2658,7 +2658,7 @@ void Tests_B_WS()
     U_test_B_WsImport("fun2.ac", COMMENTS, 317);
     U_test_B_WsImport("fun2.ae", EQUATIONS, 273);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsImport("fun2.ai", IDENTITIES, 47);   // Idem in IDT NAWRU
-    U_test_B_WsImport("fun2.al", K_LST, 17);
+    U_test_B_WsImport("fun2.al", LISTS, 17);
     U_test_B_WsImport("fun2.as", K_SCL, 161);
     U_test_B_WsImport("fun2.at", K_TBL, 46);
     U_test_B_WsImport("fun2.av", K_VAR, 394);
@@ -2691,7 +2691,7 @@ void Tests_B_WS()
     U_test_B_WsDescr("Ws content description", COMMENTS);
     U_test_B_WsDescr("Ws content description", EQUATIONS);
     U_test_B_WsDescr("Ws content description", IDENTITIES);
-    U_test_B_WsDescr("Ws content description", K_LST);
+    U_test_B_WsDescr("Ws content description", LISTS);
     U_test_B_WsDescr("Ws content description", K_SCL);
     U_test_B_WsDescr("Ws content description", K_TBL);
     U_test_B_WsDescr("Ws content description", K_VAR);
@@ -2703,7 +2703,7 @@ void Tests_B_WS()
     U_test_B_WsName("funtest", COMMENTS);
     U_test_B_WsName("funtest", EQUATIONS);
     U_test_B_WsName("funtest", IDENTITIES);
-    U_test_B_WsName("funtest", K_LST);
+    U_test_B_WsName("funtest", LISTS);
     U_test_B_WsName("funtest", K_SCL);
     U_test_B_WsName("funtest", K_TBL);
     U_test_B_WsName("funtest", K_VAR);
@@ -2716,7 +2716,7 @@ void Tests_B_WS()
     U_test_B_WsCopy("fun", COMMENTS, 317);
     U_test_B_WsCopy("fun", EQUATIONS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsCopy("fun", IDENTITIES, 48);   // Idem in IDT NAWRU
-    U_test_B_WsCopy("fun", K_LST, 17);
+    U_test_B_WsCopy("fun", LISTS, 17);
     U_test_B_WsCopy("fun", K_SCL, 161);
     U_test_B_WsCopy("fun", K_TBL, 46);
     

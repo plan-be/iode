@@ -13,7 +13,7 @@ void init_ws(nb::module_ &m)
         "Return the list of equation names corresponding to the given pattern");
     m.def("ws_content_idt", [](const std::string& pattern){ return ws_content(pattern, IDENTITIES); }, nb::arg("pattern"),
         "Return the list of identity names corresponding to the given pattern");
-    m.def("ws_content_lst", [](const std::string& pattern){ return ws_content(pattern, I_LISTS); }, nb::arg("pattern"),
+    m.def("ws_content_lst", [](const std::string& pattern){ return ws_content(pattern, LISTS); }, nb::arg("pattern"),
         "Return the list of list names corresponding to the given pattern");
     m.def("ws_content_scl", [](const std::string& pattern){ return ws_content(pattern, I_SCALARS); }, nb::arg("pattern"),
         "Return the list of scalar names corresponding to the given pattern");
@@ -158,7 +158,7 @@ void ws_clear(const int iode_type)
     case IDENTITIES:
         Identities.clear();
         break;
-    case I_LISTS:
+    case LISTS:
         Lists.clear();
         break;
     case I_SCALARS:
@@ -201,7 +201,7 @@ int ws_load(const std::string& filename, const int iode_type)
         Identities.load(filename);
         return Identities.count();
         break;
-    case I_LISTS:
+    case LISTS:
         Lists.load(filename);
         return Lists.count();
         break;
@@ -241,7 +241,7 @@ void ws_save(const std::string& filename, const int iode_type)
     case IDENTITIES:
         Identities.save(filename);
         break;
-    case I_LISTS:
+    case LISTS:
         Lists.save(filename);
         break;
     case I_SCALARS:
