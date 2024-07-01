@@ -39,14 +39,14 @@
  *   - next extensions : other IODE files
  */
 char k_ext[][4] = {
-    "cmt", // 0 = COMMENTS
-    "eqs", // 1 = EQUATIONS
+    "cmt", // 0 = FILE_COMMENTS
+    "eqs", // 1 = FILE_EQUATIONS
     "idt", // ... 
     "lst",
     "scl",
     "tbl",
     "var",
-    "ooo", // 7 = K_OBJ
+    "ooo", // 7 = IODE_NB_TYPES
 
     "ac",  // 8
     "ae",
@@ -67,7 +67,7 @@ char k_ext[][4] = {
     "ps",
     "asc",
     "txt",
-    "csv",  // 26 = K_CSV // JMP 2-3-2016  -> TODO: pas très propre, à modifier
+    "csv",  // 26 = FILE_CSV // JMP 2-3-2016  -> TODO: pas très propre, à modifier
 
     "xxx"
 };
@@ -161,7 +161,7 @@ int K_has_ext(char* filename)
  *   
  *  @param [out]    res   char*   resulting filename
  *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     file type (value defined in iode.h between COMMENTS and K_CSV) 
+ *  @param [in]     type  int     file type (value defined in iode.h between FILE_COMMENTS and FILE_CSV) 
  *  @return               char*   res (same pointer)
  *  
  *  @example : 
@@ -170,7 +170,7 @@ int K_has_ext(char* filename)
  *      strcpy(filename, "example.xxx      ");
  *      K_set_ext(buf, filename, VARIABLES);
  *      printf("'%s'\n", buf);  // 'example.var'
- *      K_set_ext(buf, filename, K_CSV);
+ *      K_set_ext(buf, filename, FILE_CSV);
  *      printf("'%s'\n", buf);  // 'example.csv'
  */
 char *K_set_ext(char* res, char* fname, int type)
@@ -185,7 +185,7 @@ char *K_set_ext(char* res, char* fname, int type)
  *   
  *  @param [out]    res   char*   resulting filename
  *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     file type (value defined in iode.h between COMMENTS and K_CSV) 
+ *  @param [in]     type  int     file type (value defined in iode.h between FILE_COMMENTS and FILE_CSV) 
  *  @return               char*   res (same pointer)
  *  
  *  @example : 
@@ -199,7 +199,7 @@ char *K_set_ext_asc(char* res, char* fname, int type)
 {
     strcpy(res, fname);
     K_strip(res); /* JMP 19-04-98 */
-    return(K_add_ext(res, k_ext[K_AC + type]));
+    return(K_add_ext(res, k_ext[ASCII_COMMENTS + type]));
 }
 
 
@@ -359,7 +359,7 @@ error :
  *      - transposes objects to 64 bits 
  *      - converts to the current IODE object version.
  *  
- * @param [in]   ftype      int     file type (COMMENTS -> VARIABLES)
+ * @param [in]   ftype      int     file type (FILE_COMMENTS -> FILE_VARIABLES)
  * @param [in]   fname      FNAME   filename
  * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
  * @param [in]   objs       char**  null or list of objects to load
@@ -596,7 +596,7 @@ error:
  *  @param [out] descr      char*   NULL or pointer to copy the description of the file
  *  @param [out] nobjs      int*    NULL or pointer to the number of objs in the file
  *  @param [out] smpl       SAMPLE* NULL or pointer to the sample of the file (for VARIABLES only)
- *  @return                 int     on success: file type (COMMENTS...)
+ *  @return                 int     on success: file type (FILE_COMMENTS...)
  *                                  on error: 
  *                                      -1 if filename is empty 
  *                                      -1 if IODE object version is < 0 or > 3
@@ -657,7 +657,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, SAMPLE* smpl)
  *  
  *  @param [in] filename    char*   file to "inspect"
  *  @param [in] type        int     type expected
- *  @return                 int     on success file type (COMMENTS...)
+ *  @return                 int     on success file type (FILE_COMMENTS...)
  *                                  on error : -2 if file and file.ext cannot be opened
  *                                             -1 if the file type or the object version is not recognized 
  *  
@@ -698,7 +698,7 @@ static int K_findtype(char* filename, int type)
  *  If the file is an ascii file (.ac, .ae... or .csv), the corresponding function 
  *      (*K_load_asc[type])() is called.
  *
- *  @param [in]   type       int     file type (COMMENTS,...K_AC,..., K_CSV)
+ *  @param [in]   type       int     file type (FILE_COMMENTS,...ASCII_COMMENTS,..., FILE_CSV)
  *  @param [in]   filename   char*   file to load
  *  @return                  KDB*    KDB with the content of filename on success
  *                                   NULL on error
@@ -719,8 +719,8 @@ KDB *K_interpret(int type, char* filename)
     ftype = K_findtype(filename, type);
 //    printf("type=%d, ftype=%d\n", type, ftype);
     if(ftype == -1) { // file exists but when opened, type not recognized => test ascii contents
-        if(type >= COMMENTS && type <= VARIABLES && 
-            K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + K_AC]) == 0) {
+        if(type >= FILE_COMMENTS && type <= FILE_VARIABLES && 
+            K_get_ext(filename, ext, 3) > 0 && strcmp(ext, k_ext[type + ASCII_COMMENTS]) == 0) {
                 kdb = (*K_load_asc[type])(filename);
             }
     }

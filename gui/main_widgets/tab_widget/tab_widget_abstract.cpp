@@ -158,7 +158,7 @@ int IodeAbstractTabWidget::addReportTab(const QFileInfo& fileInfo)
     return index;
 }
 
-int IodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced)
+int IodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const IodeFileType iodeFile, const bool forced)
 {
     TextWidget* textWidget = new TextWidget(iodeFile, fileInfo.absoluteFilePath(), this);
     int index = addTab(textWidget, textWidget->getTabText());
@@ -172,9 +172,9 @@ int IodeAbstractTabWidget::addTextTab(const QFileInfo& fileInfo, const EnumIodeF
     return index;
 }
 
-int IodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText)
+int IodeAbstractTabWidget::addNewTab(const IodeFileType fileType, const QFileInfo& fileInfo, const bool forceAsText)
 {
-    if (fileType <= VARIABLES_FILE) 
+    if (fileType <= FILE_VARIABLES) 
         return -1;
 
     QString fullPath = fileInfo.absoluteFilePath();
@@ -187,7 +187,7 @@ int IodeAbstractTabWidget::addNewTab(const EnumIodeFile fileType, const QFileInf
         return index;
 
     // prepare and add the new tab
-    if(fileType == I_REPORTS_FILE)
+    if(fileType == FILE_REP)
         index = addReportTab(fileInfo);
     else if(forceAsText || showInTextTabExtensionsList.contains(fileInfo.suffix())) 
             index = addTextTab(fileInfo, fileType, forceAsText);
@@ -232,7 +232,7 @@ void IodeAbstractTabWidget::showTab(int index)
 
     // get type of file
     QString filename = this->tabText(index);
-    EnumIodeFile fileType = get_iode_file_type(filename.toStdString());
+    IodeFileType fileType = get_iode_file_type(filename.toStdString());
 
     // update widget if needed
     IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
@@ -323,11 +323,11 @@ void IodeAbstractTabWidget::closeTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
     AbstractTextWidget* tabWidget = static_cast<AbstractTextWidget*>(this->widget(index));
-    EnumIodeFile fileType = tabWidget->getFiletype();
+    IodeFileType fileType = tabWidget->getFiletype();
 
     // Tabs representing an IODE database file cannot be closed.
     // This is by design.
-    if(fileType <= VARIABLES_FILE)
+    if(fileType <= FILE_VARIABLES)
         return;
 
     removeTab(index);

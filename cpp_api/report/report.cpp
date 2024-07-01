@@ -5,7 +5,7 @@ void execute_report(const std::string& filepath, const std::string& parameters)
 {
     B_PrintDest("dummy D");
 
-    std::string filepath_ = check_filepath(filepath, EnumIodeFile::I_REPORTS_FILE, "execute_report", true);
+    std::string filepath_ = check_filepath(filepath, FILE_REP, "execute_report", true);
 
     // WARNING: we need to put the filepath between double quotes in case the filepath contains withespaces
     std::string args = "\"" + filepath_ + "\" " + parameters;

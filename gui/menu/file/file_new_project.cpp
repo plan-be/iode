@@ -7,7 +7,7 @@ MenuFileNewProject::MenuFileNewProject(const QString& currentProjectPath, QWidge
     setupUi(this);
 
     wDirPath = new WrapperFileChooser(label_location->text(), *fileChooser_new_project, REQUIRED_FIELD, 
-                                      I_DIRECTORY, EXISTING_FILE);
+                                      DIRECTORY, EXISTING_FILE);
     
     QString parentPath;
     if (currentProjectPath.isEmpty()) 

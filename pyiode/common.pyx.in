@@ -15,12 +15,13 @@ from libcpp.map cimport map
 from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
-from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, IodeEquationMethod, 
+from pyiode.common cimport (IodeDatabaseType, EnumLang, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             IodeVarMode, VariablesInitialization, 
                             SimuSortAlgorithm, EnumIodeAdjustmentMethod)
+from pyiode.common cimport IodeFileType as CIodeFileType 
 from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
                             v_adjustment_method, mLowToHigh)
@@ -77,29 +78,31 @@ class IodeTypes(IntEnum):
     TABLES = IodeDatabaseType.TABLES
     VARIABLES = IodeDatabaseType.VARIABLES
 
-class IodeFileExt(IntEnum):
-    COMMENTS = EnumIodeFile.COMMENTS_FILE
-    EQUATIONS = EnumIodeFile.EQUATIONS_FILE
-    IDENTITIES = EnumIodeFile.IDENTITIES_FILE
-    LISTS = EnumIodeFile.LISTS_FILE
-    SCALARS = EnumIodeFile.SCALARS_FILE
-    TABLES = EnumIodeFile.TABLES_FILE
-    VARIABLES = EnumIodeFile.VARIABLES_FILE
-    REPORTS = EnumIodeFile.I_REPORTS_FILE
-    TEXT = EnumIodeFile.I_TEXT_FILE
-    ASCII = EnumIodeFile.I_ASCII_FILE
-    A2M = EnumIodeFile.I_A2M_FILE
-    RTF = EnumIodeFile.I_RTF_FILE
-    HTML = EnumIodeFile.I_HTML_FILE
-    MIF = EnumIodeFile.I_MIF_FILE
-    CSV = EnumIodeFile.I_CSV_FILE
-    REF = EnumIodeFile.I_REF_FILE
-    AGL = EnumIodeFile.I_AGL_FILE
-    DIF = EnumIodeFile.I_DIF_FILE
-    LOGS = EnumIodeFile.I_LOGS_FILE
-    SETTINGS = EnumIodeFile.I_SETTINGS_FILE
-    ANY = EnumIodeFile.I_ANY_FILE
-    DIRECTORY = EnumIodeFile.I_DIRECTORY
+class IodeFileType(IntEnum):
+    FILE_COMMENTS = CIodeFileType.FILE_COMMENTS
+    FILE_EQUATIONS = CIodeFileType.FILE_EQUATIONS
+    FILE_IDENTITIES = CIodeFileType.FILE_IDENTITIES
+    FILE_LISTS = CIodeFileType.FILE_LISTS
+    FILE_SCALARS = CIodeFileType.FILE_SCALARS
+    FILE_TABLES = CIodeFileType.FILE_TABLES
+    FILE_VARIABLES = CIodeFileType.FILE_VARIABLES
+    FILE_REP = CIodeFileType.FILE_REP
+    FILE_A2M = CIodeFileType.FILE_A2M
+    FILE_AGL = CIodeFileType.FILE_AGL
+    FILE_PRF = CIodeFileType.FILE_PRF
+    FILE_DIF = CIodeFileType.FILE_DIF
+    FILE_MIF = CIodeFileType.FILE_MIF
+    FILE_RTF = CIodeFileType.FILE_RTF
+    FILE_PS = CIodeFileType.FILE_PS,
+    FILE_AAS = CIodeFileType.FILE_AAS
+    FILE_TXT = CIodeFileType.FILE_TXT
+    FILE_CSV = CIodeFileType.FILE_CSV
+    FILE_HTML = CIodeFileType.FILE_HTML
+    FILE_REF = CIodeFileType.FILE_REF
+    FILE_LOG = CIodeFileType.FILE_LOG
+    FILE_SETTINGS = CIodeFileType.FILE_SETTINGS
+    FILE_ANY = CIodeFileType.FILE_ANY
+    DIRECTORY = CIodeFileType.DIRECTORY
 
 class IodeLanguage(IntEnum):
     ENGLISH = EnumLang.IT_ENGLISH

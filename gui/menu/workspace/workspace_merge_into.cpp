@@ -10,7 +10,7 @@ MenuWorkspaceMergeInto::MenuWorkspaceMergeInto(QWidget* parent) :
     for(const std::string& iode_type: vIodeTypes) qIodeTypes << QString::fromStdString(iode_type);
 
     wComboBoxObjectType = new WrapperComboBox(label_object_type->text(), *comboBox_object_type, REQUIRED_FIELD, qIodeTypes);
-    wFileChooserInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, COMMENTS_FILE, EXISTING_FILE);
+    wFileChooserInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_COMMENTS, EXISTING_FILE);
 
     mapFields["ObjectType"] = wComboBoxObjectType;
     mapFields["InputFile"] = wFileChooserInputFile;

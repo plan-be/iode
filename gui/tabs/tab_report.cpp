@@ -2,7 +2,7 @@
 
 
 ReportWidget::ReportWidget(const QString& filepath, QWidget* parent): 
-    AbstractTextWidget(I_REPORTS_FILE, filepath, parent)
+    AbstractTextWidget(FILE_REP, filepath, parent)
 {
     setupUi(this);
     splitter_ = splitter;

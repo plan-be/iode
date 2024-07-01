@@ -549,7 +549,7 @@ For instance, the report command
 calls the C function
 
 ```
-    B_FileDelete(arg, K_CSV);
+    B_FileDelete(arg, FILE_CSV);
  
     where arg == "myfile" and type == VARIABLES
 ```

@@ -140,7 +140,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 	try
 	{
 		// NOTE: check_filepath() converts to absolute path
-		std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "load file", true);
+		std_filepath = check_filepath(std_filepath, (IodeFileType) iodeType, "load file", true);
 
 		if(!forceOverwrite && (database->count() > 0))
 		{
@@ -200,7 +200,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 	}
 	
 	// NOTE: check_filepath() converts to absolute path
-	std_filepath = check_filepath(std_filepath, (EnumIodeFile) iodeType, "tab " + vIodeTypes[iodeType], false);
+	std_filepath = check_filepath(std_filepath, (IodeFileType) iodeType, "tab " + vIodeTypes[iodeType], false);
 
 	try
 	{

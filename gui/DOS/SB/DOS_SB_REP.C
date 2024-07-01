@@ -29,7 +29,7 @@ C_ReportEdit()
 {
     char    *name = vkp_edrep_NAME;
 
-    K_set_ext(name, name, K_REP);
+    K_set_ext(name, name, FILE_REP);
 	if(SB_FileEdit(name) == 0) return(0); 
     B_display_last_error();
     return(-1);
@@ -46,7 +46,7 @@ C_ReportPrint()
 {
     char    *name = vkp_prtrep_NAME;
 
-    K_set_ext(name, name, K_REP);
+    K_set_ext(name, name, FILE_REP);
 
     if(B_FilePrint(name, 0) == 0) return(0);
 //    if(B_FilePrintGdi(name) == 0) return(0);
@@ -72,7 +72,7 @@ C_ReportExec()
 
     rc = B_PrintDest("dummy D");
 
-    K_set_ext(name, name, K_REP);
+    K_set_ext(name, name, FILE_REP);
 
     arg = vkp_execrep_PARMS;
     if(arg) lga = strlen(arg);                  /* JMP 24-06-96 */

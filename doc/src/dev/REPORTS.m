@@ -518,7 +518,7 @@ instead of object type suffix (.cmt...).
 
 When called by the report engine, these functions have also 2 parameters:
 &EN the argument of the function (report line without function name)
-&EN the type of ~bfile~B treated (COMMENTS <<= type <<= K_CSV)
+&EN the type of ~bfile~B treated (FILE_COMMENTS <<= type <<= FILE_CSV)
 
 The parameters and return values are the same as for the functions with an IODE object type parameter.
 
@@ -528,7 +528,7 @@ For instance, the report command
 &TX
 calls the C function
 &CO
-    B_FileDelete(arg, K_CSV);
+    B_FileDelete(arg, FILE_CSV);
 
     where arg == "myfile" and type == VARIABLES
 &TX

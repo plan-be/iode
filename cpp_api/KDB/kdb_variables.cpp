@@ -446,7 +446,7 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 
 	std::string args;
 
-	input_file = check_filepath(input_file, (EnumIodeFile) VARIABLES, "seasonal_adjustment", true);
+	input_file = check_filepath(input_file, FILE_VARIABLES, "seasonal_adjustment", true);
 	args = input_file + " "; 
 
 	if (series.empty()) 
@@ -476,7 +476,7 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 
 	std::string args;
 
-	input_file = check_filepath(input_file, (EnumIodeFile) VARIABLES, "trend_correction", true);
+	input_file = check_filepath(input_file, FILE_VARIABLES, "trend_correction", true);
 	args = input_file + " "; 
 
 	args += std::to_string(lambda) + " ";

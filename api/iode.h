@@ -143,27 +143,57 @@ enum IodeDatabaseType
 #define IODE_NB_TYPES   7
 #define K_OBJ       7
 
-#define K_AC        8
-#define K_AE        9
-#define K_AI        10
-#define K_AL        11
-#define K_AS        12
-#define K_AT        13
-#define K_AV        14
+enum IodeFileType
+{
+    FILE_ASCII = -1,
 
-#define K_REP       16
-#define K_A2M       17
-#define K_AGL       18
-#define K_PRF       19
-#define K_DIF       20
-#define K_MIF       21
-#define K_RTF       22
-#define K_PS        23
-#define K_AAS       24
-#define K_TXT       25
-#define K_CSV       26
+    FILE_COMMENTS,
+    FILE_EQUATIONS,
+    FILE_IDENTITIES,
+    FILE_LISTS,
+    FILE_SCALARS,
+    FILE_TABLES,
+    FILE_VARIABLES,
 
-#define K_ASC      -1
+    // 7
+
+    // Warning: only to be used in api/objs/k_objfile.c
+    ASCII_COMMENTS = 8,
+    ASCII_EQUATIONS,
+    ASCII_IDENTITIES,
+    ASCII_LISTS,
+    ASCII_SCALARS,
+    ASCII_TABLES,
+    ASCII_VARIABLES,
+
+    // 15
+
+    // iode version < 7 (Jean-Marc Paul + Geert Bryon)
+    FILE_REP = 16,
+    FILE_A2M,
+    FILE_AGL,
+    FILE_PRF,
+    FILE_DIF,
+    FILE_MIF,
+    FILE_RTF,
+    FILE_PS ,
+    FILE_AAS,
+    FILE_TXT,
+    FILE_CSV,
+
+    // 27
+
+    // iode version >= 7 (Alix Damman)
+    FILE_HTML = 28,
+    FILE_REF,
+    FILE_LOG,
+    FILE_SETTINGS,
+    FILE_ANY,
+    DIRECTORY
+};
+
+// (binary) 7 + (ascii) 7 + iode version < 7 files (11) + iode version >= 7 (6) = 31 
+const static int IODE_NB_FILE_EXT = 31;
 
 #define T_NC(tbl)           (tbl->t_nc)
 #define T_NL(tbl)           (tbl->t_nl)

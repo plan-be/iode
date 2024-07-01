@@ -28,7 +28,7 @@ signals:
     void tabTextModified(const QString& filepath, const bool modified);
 
 public:
-    AbstractTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
+    AbstractTextWidget(const IodeFileType fileType, const QString& filepath, QWidget* parent = nullptr);
 
     QString getFilepath() const override
     { 

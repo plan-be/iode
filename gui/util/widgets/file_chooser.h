@@ -27,19 +27,19 @@ class IodeFileChooser : public QWidget
 
 public:
 	Q_ENUM(EnumItemType)
-	Q_ENUM(EnumIodeFile)
+	Q_ENUM(IodeFileType)
 	Q_ENUM(EnumFileMode)
 
 private:
 	QLineEdit* lineEdit;
 	QPushButton* browseButton;
 
-	EnumIodeFile fileType;
+	IodeFileType fileType;
 	EnumFileMode fileMode;
 
 public:
 	IodeFileChooser(QWidget* parent = nullptr) : QWidget(parent),
-		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(I_ANY_FILE), fileMode(EXISTING_FILE)
+		lineEdit(new QLineEdit()), browseButton(new QPushButton()), fileType(FILE_ANY), fileMode(EXISTING_FILE)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0, 0, 0, 0);
@@ -58,7 +58,7 @@ public:
 
 		// There is no QFileDialog::getSaveDirectory(). 
 		// Only QFileDialog::getExistingDirectory()
-		if (fileType == I_DIRECTORY) fileMode == EXISTING_FILE;
+		if (fileType == DIRECTORY) fileMode == EXISTING_FILE;
 	}
 
 	~IodeFileChooser()
@@ -67,14 +67,14 @@ public:
 		delete browseButton;
 	}
 
-	void setFileType(const EnumIodeFile& fileType) { this->fileType = fileType; }
+	void setFileType(const IodeFileType& fileType) { this->fileType = fileType; }
 	void setFileMode(const EnumFileMode& fileMode) { this->fileMode = fileMode; }
 
 	QString getFilepath() { return lineEdit->text(); }
 	void setFilepath(const QString& filepath) { lineEdit->setText(filepath); }
 
 public slots:
-	void updateFileType(const EnumIodeFile& fileType)
+	void updateFileType(const IodeFileType& fileType)
 	{
 		this->fileType = fileType;
 	}
@@ -86,7 +86,7 @@ private slots:
 		QString name = QString::fromStdString(v_ext_names[fileType]);
 		
 		QString filter; 
-		if(fileType != I_ANY_FILE)
+		if(fileType != FILE_ANY)
 		{
 			filter = name + " (";
 			for(const std::string& ext: get_extensions(fileType))
@@ -107,7 +107,7 @@ private slots:
 		QString caption = name + " File";
 		if (fileMode == EXISTING_FILE)
 		{
-			if (fileType == I_DIRECTORY)
+			if (fileType == DIRECTORY)
 				path = QFileDialog::getExistingDirectory(this, "Open Directory", rootDir, QFileDialog::ShowDirsOnly);
 			else
 			{

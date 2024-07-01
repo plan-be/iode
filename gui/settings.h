@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-const static QString SETTINGS_FILENAME = "iode_gui_settings.ini";
+const static QString FILE_SETTINGSNAME = "iode_gui_settings.ini";
 
 
 /**

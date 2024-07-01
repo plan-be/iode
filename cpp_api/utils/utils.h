@@ -107,21 +107,22 @@ inline void check_name(const std::string name, const int type)
         name + " is invalid.");
 }
 
-inline std::vector<std::string> get_extensions(const EnumIodeFile file_type)
+inline std::vector<std::string> get_extensions(const IodeFileType file_type)
 {
     std::vector<std::string> ext;
     for(const auto& [key, value]: mFileExtensions)
-        if(value == file_type) ext.push_back(key);
+        if(value == file_type) 
+            ext.push_back(key);
     return ext;
 }
 
-inline EnumIodeFile get_iode_file_type(const std::string& filepath)
+inline IodeFileType get_iode_file_type(const std::string& filepath)
 {
-    if (filepath.empty()) return I_ANY_FILE;
+    if (filepath.empty()) return FILE_ANY;
 
     std::filesystem::path p_filepath(filepath);
-    if (std::filesystem::is_directory(p_filepath)) return I_DIRECTORY;
-    if (!p_filepath.has_extension()) return I_ANY_FILE;
+    if (std::filesystem::is_directory(p_filepath)) return DIRECTORY;
+    if (!p_filepath.has_extension()) return FILE_ANY;
 
     std::string ext = p_filepath.extension().string();
     try
@@ -130,22 +131,26 @@ inline EnumIodeFile get_iode_file_type(const std::string& filepath)
     }
     catch(const std::exception)
     {
-        return I_ANY_FILE;
+        return FILE_ANY;
     }
 }
 
 inline int get_iode_type(const std::string& iode_type_as_string)
 {
-    for(int i=0; i < IODE_NB_TYPES; i++) if(iode_type_as_string == vIodeTypes[i]) return i;
+    for(int i=0; i < IODE_NB_TYPES; i++) 
+        if(iode_type_as_string == vIodeTypes[i]) 
+            return i;
     return -1;
 }
 
-inline static std::filesystem::path check_file(const std::string& filepath, const std::string& caller_name, const bool file_must_exist)
+inline static std::filesystem::path check_file(const std::string& filepath, const std::string& caller_name, 
+    const bool file_must_exist)
 {
     std::filesystem::path p_filepath(filepath);
 
     // check if empty
-    if (file_must_exist && filepath.empty()) throw IodeExceptionFunction("Cannot run " + caller_name, "Empty filepath");
+    if (file_must_exist && filepath.empty()) 
+        throw std::invalid_argument("Cannot run '" + caller_name + "'.\nEmpty filepath");
 
     // convert to absolute path
     if (p_filepath.is_relative()) p_filepath = std::filesystem::absolute(p_filepath);
@@ -154,8 +159,10 @@ inline static std::filesystem::path check_file(const std::string& filepath, cons
     std::filesystem::path p_directory = p_filepath.parent_path();
     if (!p_directory.empty())
     {
-        if (!std::filesystem::exists(p_directory)) throw IodeExceptionFunction("Cannot run " + caller_name, "Directory " + 
-            p_directory.string() + " in filepath " + p_filepath.filename().string() + " does not exist");
+        if (!std::filesystem::exists(p_directory)) 
+            throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" + 
+                    "Directory '" + p_directory.string() + "' in filepath '" + 
+                    p_filepath.filename().string() + "' does not exist");
     }
 
     return p_filepath; 
@@ -166,51 +173,57 @@ inline std::string check_file_exists(const std::string& filepath, const std::str
     std::filesystem::path p_filepath = check_file(filepath, caller_name, true);
     // check if file exist
     if (!std::filesystem::exists(p_filepath)) 
-        throw IodeExceptionFunction("Cannot run " + caller_name, "File " + p_filepath.string() + " does not exist");
-
+        throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" + 
+                                    "The file '" + p_filepath.string() + "' does not exist");
     return p_filepath.string();
 }
 
-inline std::string check_filepath(const std::string& filepath, const EnumIodeFile file_type, const std::string& caller_name, const bool file_must_exist)
+inline std::string check_filepath(const std::string& filepath, const IodeFileType expected_file_type, 
+    const std::string& caller_name, const bool file_must_exist)
 {
     std::filesystem::path p_filepath = check_file(filepath, caller_name, file_must_exist);
 
     // get list of valid extensions
-    std::vector<std::string> expected_ext = get_extensions(file_type);
+    std::vector<std::string> expected_ext = get_extensions(expected_file_type);
 
     // check or add extension
     std::filesystem::path p_filename = p_filepath.filename();
     if (p_filepath.has_extension())
     {
         // check extension
-        std::string ext = p_filename.extension().string();
-        EnumIodeFile real_type = get_iode_file_type(filepath);
-        if (real_type != file_type)
-        {   
-            std::string msg; 
+        std::string ext = p_filename.extension().string(); 
+        bool match_ext = false;
+        for(const std::string& expected_ext_: expected_ext)
+            if(expected_ext_ == ext) match_ext = true;
+        if(!match_ext)
+        {  
+            std::string msg;
             if(expected_ext.size() == 1)
                 msg = "Expected extension is " + expected_ext[0];
             else
             {
-                msg = "Expected extensions are: " + expected_ext[0]; 
-                for(int i=1; i < expected_ext.size(); i++) msg += ", " + expected_ext[i];
+                msg = "Expected extensions are: " + expected_ext[0];
+                for(int i=1; i < expected_ext.size(); i++) 
+                    msg += ", " + expected_ext[i];
             }
-            throw IodeExceptionFunction("Cannot run " + caller_name, 
-                "File " + p_filename.string() + " has wrong extension " + ext + "\n" + msg);
+            throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" +
+                    "The file '" + p_filename.string() + "' has wrong extension '" + ext + "'\n" + msg);
         }
 
         // check if file exist
         if (file_must_exist && !std::filesystem::exists(p_filepath)) 
-            throw IodeExceptionFunction("Cannot run " + caller_name, "File " + p_filepath.string() + " does not exist");
+            throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" + 
+                    "The file '" + p_filepath.string() + "' does not exist");
     }
     else
     {
-        if(file_type > VARIABLES_FILE) 
-            throw IodeExceptionFunction("Cannot run " + caller_name, 
-                "You must provide an extension for the file " + p_filepath.string());
+        int database_type = (int) expected_file_type;
+        if(database_type > VARIABLES) 
+            throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" + 
+                    "You must provide an extension to the file " + p_filepath.string());
 
         // set binary format extension
-        p_filepath = p_filepath.replace_extension(v_binary_ext[file_type]);
+        p_filepath = p_filepath.replace_extension(v_binary_ext[database_type]);
 
         // check if file exist
         if (file_must_exist)
@@ -220,14 +233,14 @@ inline std::string check_filepath(const std::string& filepath, const EnumIodeFil
             // switch to ascii format extension and check if file exist 
             if (!binary_file_found)
             {
-                p_filepath = p_filepath.replace_extension(v_ascii_ext[file_type]);
+                p_filepath = p_filepath.replace_extension(v_ascii_ext[database_type]);
                 if (!std::filesystem::exists(p_filepath)) 
                 {
                     std::filesystem::path p_directory = p_filepath.parent_path();
                     std::string stem = p_filepath.stem().string();
-                    throw IodeExceptionFunction("Cannot run " + caller_name, 
-                        "Neither " + stem + v_binary_ext[file_type] + " nor " + stem + v_ascii_ext[file_type] + 
-                        " could be found in directory " + p_directory.string());
+                    throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" + 
+                            "Neither '" + stem + v_binary_ext[database_type] + "' nor '" + stem + v_ascii_ext[database_type] + "' " +
+                            "could be found in directory '" + p_directory.string() + "'");
                 }
             }
         }

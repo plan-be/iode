@@ -44,7 +44,7 @@
  *    
  *  When called by the report engine, these functions have 2 parameters: 
  *      - the argument of the function (the remaining of the report line)
- *      - the type of object treated (COMMENTS <= type <= K_CSV)
+ *      - the type of object treated (COMMENTS <= type <= FILE_CSV)
  *  
  *  The parameters and return values are the same as for the functions with an IODE object type parameter.
  *
@@ -54,7 +54,7 @@
  *  
  *  calls the C function 
  *  
- *      B_FileDelete(arg, K_CSV);
+ *      B_FileDelete(arg, FILE_CSV);
  *
  *  where arg == "myfile" and type == VARIABLES   
  *      

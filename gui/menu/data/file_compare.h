@@ -30,7 +30,7 @@ public slots:
     void help();
     void updateFileChooser(int fileType)
     {
-        wInputFile->setFileType((EnumIodeFile) fileType);
+        wInputFile->setFileType((IodeFileType) fileType);
     }
     void updateThreshold(int iode_type)
     {

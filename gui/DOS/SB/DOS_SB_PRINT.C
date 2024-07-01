@@ -47,7 +47,7 @@ C_A2MPrint()
 
     strcpy(name, vkp_prtfile_NAME);
     SCR_strip(name);
-    K_set_ext(name, name, K_A2M);
+    K_set_ext(name, name, FILE_A2M);
     if(B_FilePrint(name, 1) == 0) return(0);
     B_display_last_error();
     return(-1);

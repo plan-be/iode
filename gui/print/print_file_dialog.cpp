@@ -11,7 +11,7 @@ PrintFileDialog::PrintFileDialog(QWidget* parent, const QString& outputFile, con
 
     wPrintFormat = new WrapperComboBox(label_print_format->text(), *comboBox_print_format, REQUIRED_FIELD, q_print_format);
     wOutputFile = new WrapperFileChooser(label_output_file->text(), *fileChooser_output_file, REQUIRED_FIELD, 
-        EnumIodeFile::I_A2M_FILE, EnumFileMode::FILE_MAY_EXIST);
+        IodeFileType::FILE_A2M, EnumFileMode::FILE_MAY_EXIST);
 
     comboBox_print_format->setCurrentIndex(0);
     connect(comboBox_print_format, &QComboBox::currentIndexChanged, this, &PrintFileDialog::updateOutputFileFormat);
@@ -36,7 +36,7 @@ PrintFileDialog::~PrintFileDialog()
 
 void PrintFileDialog::updateOutputFileFormat(int index)
 {
-    fileChooser_output_file->setFileType(static_cast<EnumIodeFile>(I_A2M_FILE + index));
+    fileChooser_output_file->setFileType(static_cast<IodeFileType>(FILE_A2M + index));
 }
 
 // Will automatically save to settings -> see IodeSettingsDialog::closeEvent()

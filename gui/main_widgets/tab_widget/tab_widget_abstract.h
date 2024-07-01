@@ -168,13 +168,13 @@ public:
      * @brief create a new tab corresponding to the newly open file.
      *        Called by loadFile().
      * 
-     * @param fileType EnumIodeFile type of the loaded file (KDB file, .log, .ini, .txt, other).
+     * @param fileType IodeFileType type of the loaded file (KDB file, .log, .ini, .txt, other).
      * @param fileInfo QFileInfo path to the loaded file.
      * @param forceAsText bool whether or not to force to open the corresponding file as text 
      *                         (if not an IODE database or report file)
      * @return int index of the new tab
      */
-    int addNewTab(const EnumIodeFile fileType, const QFileInfo& fileInfo, const bool forceAsText=false);
+    int addNewTab(const IodeFileType fileType, const QFileInfo& fileInfo, const bool forceAsText=false);
 
     /**
      * @brief show tab corresponding to passed index. 
@@ -273,7 +273,7 @@ private:
      * 
      * @return int index of the new tab.
      */
-    int addTextTab(const QFileInfo& fileInfo, const EnumIodeFile iodeFile, const bool forced = false);
+    int addTextTab(const QFileInfo& fileInfo, const IodeFileType iodeFile, const bool forced = false);
 
     /**
      * @brief save the content of the tab at a given index.
@@ -433,7 +433,7 @@ protected slots:
         // REMINDER: By design 
         //           - there is only ONE tab per type of IODE database
         //           - the tabs representing an IODE database CANNOT be closed
-        if(tabWidget->getFiletype() <= VARIABLES_FILE)
+        if(tabWidget->getFiletype() <= FILE_VARIABLES)
         {
             actionClose->setVisible(false);
             actionClear->setVisible(true);

@@ -38,7 +38,7 @@ signals:
 
 public:
     AbstractIodeObjectWidget(const IodeDatabaseType iodeType, QWidget* parent) : 
-        IodeAbstractWidget((EnumIodeFile) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
+        IodeAbstractWidget((IodeFileType) iodeType, parent), projectDir(QDir::homePath()), iodeType(iodeType)
     {
         this->setObjectName(QString::fromUtf8("widget_iode_obj"));
 

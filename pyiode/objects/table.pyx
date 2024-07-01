@@ -1667,7 +1667,7 @@ cdef class Table:
                 if not isinstance(extra_file, str):
                     raise TypeError(f"'extra_files': Expected value of type str or list of str. "
                                     f"Got value of type {type(extra_files).__name__} instead")
-                load_reference_kdb(i + 2, IodeFileExt.VARIABLES, extra_file.encode())
+                load_reference_kdb(i + 2, IodeDatabaseType.VARIABLES, extra_file.encode())
 
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 

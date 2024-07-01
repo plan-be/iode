@@ -4,7 +4,7 @@ SAMPLE_DATA_DIR = str((Path(__file__).parent / "tests" / "data").resolve())
 
 # Constants
 from .iode_python import (__version__, NA, is_NA, 
-                          IodeTypes, IodeFileExt, IodeLanguage, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
+                          IodeTypes, IodeFileType, IodeLanguage, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
                           TableLineType, TableLineGraph, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
                           ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt, EQ_TEST_NAMES)
@@ -44,7 +44,7 @@ from .iode_python import add_error_msg, clear_error_msgs, display_error_msgs, re
 __all__ = [
     # Constants
     'SAMPLE_DATA_DIR', 'NA', 'is_NA', 
-    'IodeTypes', 'IodeFileExt', 'IodeLanguage', 'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 
+    'IodeTypes', 'IodeFileType', 'IodeLanguage', 'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 
     'TableLineType', 'TableLineGraph', 'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 
     'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 'SimulationInitialization', 'SimulationSort', 
     'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 

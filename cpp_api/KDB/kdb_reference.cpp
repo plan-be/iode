@@ -1,31 +1,32 @@
 #include "kdb_reference.h"
 
 
-void load_reference_kdb(const int ref, EnumIodeFile iode_file, std::string& filepath)
+void load_reference_kdb(const int ref, IodeDatabaseType iode_type, std::string& filepath)
 {
     if(ref < 2 || ref > 5) 
-        throw IodeExceptionFunction("Cannot load file " + filepath + "\nInvalid value " 
-        + std::to_string(ref) + " for the ref argument. Must be in range [2, 5].");
-    
-    filepath = check_filepath(filepath, iode_file, "load", true);
+        throw std::invalid_argument("Cannot load file '" + filepath + "'.\n" + 
+                "Invalid value '" + std::to_string(ref) + "' for the ref argument. " + 
+                "Must be in range [2, 5].");
 
-    KDB* kdb = K_interpret(iode_file, to_char_array(filepath));
+    filepath = check_filepath(filepath, (IodeFileType) iode_type, "load", true);
+
+    KDB* kdb = K_interpret(iode_type, to_char_array(filepath));
     if (kdb == NULL)
-        throw IodeExceptionFunction("Cannot load " + vIodeTypes[iode_file] + "s from file " + filepath, "Unknown");
+        throw std::runtime_error("Cannot load " + vIodeTypes[iode_type] + "s from file '" + filepath + "'");
 
-    K_free(K_RWS[iode_file][ref - 1]);
-    K_RWS[iode_file][ref - 1] = kdb;
+    K_free(K_RWS[iode_type][ref - 1]);
+    K_RWS[iode_type][ref - 1] = kdb;
 }
 
-void clear_reference_kdb(const int ref, EnumIodeFile iode_file)
+void clear_reference_kdb(const int ref, IodeDatabaseType iode_type)
 {
-    K_free(K_RWS[iode_file][ref - 1]);
-    K_RWS[iode_file][ref - 1] = NULL;
+    K_free(K_RWS[iode_type][ref - 1]);
+    K_RWS[iode_type][ref - 1] = NULL;
 }
 
 void clear_all_reference_kdbs()
 {
-    for(int iode_file = COMMENTS_FILE; iode_file <= VARIABLES_FILE; iode_file++)
+    for(int iode_type = COMMENTS; iode_type <= VARIABLES; iode_type++)
         for(int ref = 2; ref <= 5; ref++)
-            clear_reference_kdb(ref, (EnumIodeFile) iode_file);
+            clear_reference_kdb(ref, (IodeDatabaseType) iode_type);
 }

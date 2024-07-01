@@ -14,12 +14,12 @@ KDBAbstract::KDBAbstract(const IodeDatabaseType iode_type, const std::string& fi
     if(!filepath.empty())
     {
         // throw an error if the passed filepath is not valid
-        std::string filepath_ = check_filepath(filepath, (EnumIodeFile) k_type, "load", true);
+        std::string filepath_ = check_filepath(filepath, (IodeFileType) iode_type, "load", true);
         char* c_filepath = to_char_array(filepath_);
 
         int res = B_WsLoad(c_filepath, (int) k_type);
         if (res != EXIT_SUCCESS)
-            throw std::runtime_error("Cannot load objects for the '" + vIodeTypes[k_type] + 
+            throw std::runtime_error("Cannot load objects for the '" + vIodeTypes[iode_type] + 
                                     "' database from the file '" + filepath + "'\nReason: unknown");  
     }
     
@@ -318,7 +318,7 @@ void KDBAbstract::merge_from(const std::string& input_file)
         return;
 
     // throw an error if the passed filepath is not valid
-    std::string input_file_ = check_filepath(input_file, (EnumIodeFile) k_type, "merge_from", true);
+    std::string input_file_ = check_filepath(input_file, (IodeFileType) k_type, "merge_from", true);
     
     int res = K_cat(kdb, to_char_array(input_file));
     if(res < 0) 
@@ -367,7 +367,7 @@ void KDBAbstract::save(const std::string& filepath)
         return;
 
     // throw an error if the filepath is not valid
-    std::string filepath_ = check_filepath(filepath, (EnumIodeFile) k_type, "save", false);
+    std::string filepath_ = check_filepath(filepath, (IodeFileType) k_type, "save", false);
 
     char* c_filepath = to_char_array(filepath_);
     if (strlen(c_filepath) >= sizeof(FNAME)) 

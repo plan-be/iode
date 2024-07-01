@@ -11,7 +11,7 @@ MenuDataFileContents::MenuDataFileContents(QWidget* parent)
 
     wSearch = new WrapperQLineEdit(label_search->text(), *lineEdit_search, REQUIRED_FIELD);
     wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
-    wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, OPTIONAL_FIELD, COMMENTS_FILE, EXISTING_FILE);
+    wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, OPTIONAL_FIELD, FILE_COMMENTS, EXISTING_FILE);
     wSaveList = new WrapperQLineEdit(label_save_list->text(), *lineEdit_save_list, REQUIRED_FIELD);
     wResult = new WrapperQTextEdit(label_result->text(), *textEdit_result, OPTIONAL_FIELD);
 

@@ -9,7 +9,7 @@ class TextWidget : public AbstractTextWidget, public Ui::TextWidget
     Q_OBJECT
 
 public:
-    TextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent = nullptr);
+    TextWidget(const IodeFileType fileType, const QString& filepath, QWidget* parent = nullptr);
 
     bool load_(const QString& filepath, const bool forceOverwrite)
     {

@@ -1,7 +1,7 @@
 #include "tab_text.h"
 
 
-TextWidget::TextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent): 
+TextWidget::TextWidget(const IodeFileType fileType, const QString& filepath, QWidget* parent): 
     AbstractTextWidget(fileType, filepath, parent) 
 {
     setupUi(this);

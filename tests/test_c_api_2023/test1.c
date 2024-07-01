@@ -1651,16 +1651,16 @@ void Tests_B_FILE()
     U_test_file_exists("toto.a2m", "File %s exists");
 
     //  Call B_FileRename()
-    rc = B_FileRename("toto tata", K_A2M);
-    rc = U_test_file_exists("tata.a2m", "B_FileRename(\"toto tata\", K_A2M)");
+    rc = B_FileRename("toto tata", FILE_A2M);
+    rc = U_test_file_exists("tata.a2m", "B_FileRename(\"toto tata\", FILE_A2M)");
     
     //  Call B_FileCopy()
-    rc = B_FileCopy("tata tutu", K_A2M);
-    rc = U_test_file_exists("tutu.a2m", "B_FileCopy(\"tata tutu \", K_A2M)");
+    rc = B_FileCopy("tata tutu", FILE_A2M);
+    rc = U_test_file_exists("tutu.a2m", "B_FileCopy(\"tata tutu \", FILE_A2M)");
     
     //  Call B_FileDelete()
-    rc = B_FileDelete("tata tutu", K_A2M);
-    rc = U_test_file_not_exists("tata.a2m", "B_FileDelete(\"tata tutu\", K_A2M)");
+    rc = B_FileDelete("tata tutu", FILE_A2M);
+    rc = U_test_file_not_exists("tata.a2m", "B_FileDelete(\"tata tutu\", FILE_A2M)");
 
 /*
     "fileimportvar",            B_FileImportVar,        SB_XodeRuleImport,  0,

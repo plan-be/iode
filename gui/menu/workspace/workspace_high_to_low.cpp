@@ -7,7 +7,7 @@ MenuWorkspaceHighToLow::MenuWorkspaceHighToLow(QWidget* parent) :
     setupUi(this);
 
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, 
-                                        VARIABLES_FILE, EXISTING_FILE);
+                                        FILE_VARIABLES, EXISTING_FILE);
     wLastObs = new WrapperQTextEdit(label_last_obsvervation->text(), *textEdit_last_observation, OPTIONAL_FIELD);  
     wMean = new WrapperQTextEdit(label_mean->text(), *textEdit_mean, OPTIONAL_FIELD);  
     wSum = new WrapperQTextEdit(label_sum->text(), *textEdit_sum, OPTIONAL_FIELD);  

@@ -9,14 +9,14 @@ MenuFileImportVariables::MenuFileImportVariables(QWidget* parent) :
     QList<QString> q_langs;
     for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
 
-    wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, I_ANY_FILE, EXISTING_FILE);
-    wRuleFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, I_ANY_FILE, EXISTING_FILE);
+    wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
+    wRuleFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
 
-    wSaveFile = new WrapperFileChooser(label_save->text(), *fileChooser_save_file, REQUIRED_FIELD, COMMENTS_FILE, NEW_FILE);
+    wSaveFile = new WrapperFileChooser(label_save->text(), *fileChooser_save_file, REQUIRED_FIELD, FILE_COMMENTS, NEW_FILE);
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
 
-    wDebugFile = new WrapperFileChooser(label_debug->text(), *fileChooser_debug_file, OPTIONAL_FIELD, I_LOGS_FILE, NEW_FILE);
+    wDebugFile = new WrapperFileChooser(label_debug->text(), *fileChooser_debug_file, OPTIONAL_FIELD, FILE_LOG, NEW_FILE);
 
     mapFields["InputFile"]   = wInputFile;
     mapFields["RuleFile"]    = wRuleFile;

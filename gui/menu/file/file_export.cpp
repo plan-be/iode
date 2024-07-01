@@ -9,17 +9,17 @@ MenuFileExport::MenuFileExport(QWidget* parent) :
     QList<QString> q_formats;
     for(const std::string& format: vExportFormats) q_formats << QString::fromStdString(format);
 
-    wVarFile = new WrapperFileChooser(label_variable_file->text(), *fileChooser_variable_file, OPTIONAL_FIELD, I_ANY_FILE, EXISTING_FILE);
-    wCmtFile = new WrapperFileChooser(label_comment_file->text(), *fileChooser_comment_file, OPTIONAL_FIELD, I_ANY_FILE, EXISTING_FILE);
-    wRuleFile = new WrapperFileChooser(label_rule_file->text(), *fileChooser_rule_file, REQUIRED_FIELD, I_ANY_FILE, EXISTING_FILE);
+    wVarFile = new WrapperFileChooser(label_variable_file->text(), *fileChooser_variable_file, OPTIONAL_FIELD, FILE_ANY, EXISTING_FILE);
+    wCmtFile = new WrapperFileChooser(label_comment_file->text(), *fileChooser_comment_file, OPTIONAL_FIELD, FILE_ANY, EXISTING_FILE);
+    wRuleFile = new WrapperFileChooser(label_rule_file->text(), *fileChooser_rule_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
 
     wFrom = new WrapperSampleEdit(label_sample_from->text(), *sampleEdit_sample_from, OPTIONAL_FIELD);
     wTo = new WrapperSampleEdit(label_sample_to->text(), *sampleEdit_sample_to, OPTIONAL_FIELD);
     wExportFormat = new WrapperComboBox(label_format->text(), *comboBox_format, REQUIRED_FIELD, q_formats);
-    wExportFile = new WrapperFileChooser(label_save_file->text(), *fileChooser_save_file, REQUIRED_FIELD, VARIABLES_FILE, NEW_FILE);
+    wExportFile = new WrapperFileChooser(label_save_file->text(), *fileChooser_save_file, REQUIRED_FIELD, FILE_VARIABLES, NEW_FILE);
     wNan = new WrapperQLineEdit(label_nan->text(), *lineEdit_nan, REQUIRED_FIELD);
     wSeparator = new WrapperQLineEdit(label_separator->text(), *lineEdit_separator, REQUIRED_FIELD);
-    wDebugFile = new WrapperFileChooser(label_debug->text(), *fileChooser_debug_file, OPTIONAL_FIELD, I_LOGS_FILE, NEW_FILE);
+    wDebugFile = new WrapperFileChooser(label_debug->text(), *fileChooser_debug_file, OPTIONAL_FIELD, FILE_LOG, NEW_FILE);
 
     mapFields["VarFile"]      = wVarFile;
     mapFields["CmtFile"]      = wCmtFile;
