@@ -26,7 +26,7 @@ class IodeAbstractWidget: public QWidget
     Q_OBJECT
 
 protected:
-    EnumIodeFile fileType;
+    IodeFileType fileType;
 
     bool modified;
     bool forcedAsText_;         ///< Whether or not the corresponding file has been forced to open as a text tab
@@ -41,39 +41,26 @@ protected:
 
     bool checkNewFilepath(const QString& filepath)
     {
-        QFileInfo fileInfo(filepath);
-
-        // check if file exists
-        if(!fileInfo.exists())
+        try
         {
-            QMessageBox::warning(nullptr, "WARNING", "File " + filepath + " could not been found");
+            check_filepath(filepath.toStdString(), fileType, "load", true);
+        }
+        catch(const std::exception& e)
+        {
+            QMessageBox::warning(nullptr, tr("WARNING"), tr(e.what()));
             return false;
         }
-
-        // check if correct extension
-        if(get_iode_file_type(filepath.toLocal8Bit().toStdString()) != fileType)
-        {
-            QString filename = fileInfo.fileName(); 
-            QString ext = fileInfo.suffix();
-            QStringList expected_ext;
-            for(const std::string& ext_: get_extensions(fileType)) expected_ext << QString::fromStdString(ext_);
-
-            QMessageBox::warning(nullptr, "WARNING", "Expected file with extension " + expected_ext.join(" or ") + "\n" +
-                "But got file " + filename + " with extension " + ext);
-            return false;
-        }
-
         return true;
     }
 
 public:
-    IodeAbstractWidget(const EnumIodeFile fileType, QWidget* parent = nullptr): QWidget(parent), 
+    IodeAbstractWidget(const IodeFileType fileType, QWidget* parent = nullptr): QWidget(parent), 
         fileType(fileType), modified(false), forcedAsText_(false), savingFile(false), splitted_(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
     }
 
-    EnumIodeFile getFiletype() const 
+    IodeFileType getFiletype() const 
     { 
         return fileType; 
     }

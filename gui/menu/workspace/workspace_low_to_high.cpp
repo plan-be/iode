@@ -10,7 +10,7 @@ MenuWorkspaceLowToHigh::MenuWorkspaceLowToHigh(QWidget* parent) :
     for(const auto& [_, method] : mLowToHigh) q_methods << QString::fromStdString(method);
 
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, 
-                                        VARIABLES_FILE, EXISTING_FILE);
+                                        FILE_VARIABLES, EXISTING_FILE);
     wMethod = new WrapperComboBox(label_method->text(), *comboBox_method, REQUIRED_FIELD, q_methods);   
     wStockSeries = new WrapperQTextEdit(label_stock_series->text(), *textEdit_stock_series, OPTIONAL_FIELD);  
     wFlowSeries = new WrapperQTextEdit(label_flow_series->text(), *textEdit_flow_series, OPTIONAL_FIELD); 

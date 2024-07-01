@@ -55,85 +55,59 @@ const static int I_NB_LANGS = 3;
 const static std::vector<std::string> vLangs = { "English", "Dutch", "French" };
 
 
-enum EnumIodeFile
-{
-    COMMENTS_FILE,
-    EQUATIONS_FILE,
-    IDENTITIES_FILE,
-    LISTS_FILE,
-    SCALARS_FILE,
-    TABLES_FILE,
-    VARIABLES_FILE,
-    I_REPORTS_FILE,
-    I_TEXT_FILE,
-    I_ASCII_FILE,
-    I_A2M_FILE,
-    I_RTF_FILE,
-    I_HTML_FILE,
-    I_MIF_FILE,
-    I_CSV_FILE,
-    I_REF_FILE,
-    I_AGL_FILE,
-    I_DIF_FILE,
-    I_LOGS_FILE,
-    I_SETTINGS_FILE,
-    I_ANY_FILE,
-    I_DIRECTORY
-};
-
-const static int I_NB_ENUM_FILE_EXT = 22;
-
 const static std::vector<std::string> v_ext_names = 
 { 
-    "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", 
-    "Report", "Text", "Ascii", "A2m", "Rtf", "Html", "Mif", "Csv", "Ref", "Agl", "Dif",
-    "Logs", "Settings", "Any", "Directory"
+    "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", "", 
+    "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", "",
+    "Report", "A2m", "Agl", "Profile", "Dif", "Mif", "Rtf", "PostScript", "Ascii", "Text", "Csv", "",
+    "Html",  "Ref", "Logs", "Settings", "Any", "Directory"
 };
 
-// same as k_ext defined in k_objfile.c
+// same as k_ext defined in k_objfile.c + "html", ... "ini"
 const static std::vector<std::string> v_ext = 
 {
-    "cmt", "eqs", "idt", "lst", "scl", "tbl", "var",
-    "ac",  "ae",  "ai",  "al",  "as",  "at",  "av",
-    "rep", "a2m", "agl", "prf", "dif", "mif", "rtf",
-    "ref", "ps",  "asc", "txt", "csv"
+    "cmt", "eqs", "idt", "lst", "scl", "tbl", "var", "ooo",
+    "ac",  "ae",  "ai",  "al",  "as",  "at",  "av", "",
+    "rep", "a2m", "agl", "prf", "dif", "mif", "rtf", "ps", "asc", "txt", "csv", "xxx", 
+    "html", "ref", "log", "ini", "", ""
 };
 
 const static std::string report_ext = ".rep";
 
-// (iode objs) 14 + report (1) + any (1) + directory (1) = 17 
-// logs (1) + settings (1) + text (9) = 11
-const static int I_NB_FILE_EXT = 28;
-
-const static std::map<std::string, EnumIodeFile> mFileExtensions =
+const static std::map<std::string, IodeFileType> mFileExtensions =
 {
-    {".cmt", COMMENTS_FILE},
-    {".ac",  COMMENTS_FILE},
-    {".eqs", EQUATIONS_FILE},
-    {".ae",  EQUATIONS_FILE},
-    {".idt", IDENTITIES_FILE},
-    {".ai",  IDENTITIES_FILE},
-    {".lst", LISTS_FILE},
-    {".al",  LISTS_FILE},
-    {".scl", SCALARS_FILE},
-    {".as",  SCALARS_FILE},
-    {".tbl", TABLES_FILE},
-    {".at",  TABLES_FILE},
-    {".var", VARIABLES_FILE},
-    {".av",  VARIABLES_FILE},
-    {".rep", I_REPORTS_FILE},
-    {".txt", I_TEXT_FILE},
-    {".asc", I_ASCII_FILE},
-    {".a2m", I_A2M_FILE},
-    {".rtf", I_RTF_FILE},
-    {".htm", I_HTML_FILE},
-    {".mif", I_MIF_FILE},
-    {".csv", I_CSV_FILE},
-    {".ref", I_REF_FILE},
-    {".agl", I_AGL_FILE},
-    {".dif", I_DIF_FILE},
-    {".log", I_LOGS_FILE},
-    {".ini", I_SETTINGS_FILE},
+    {".cmt", FILE_COMMENTS},
+    {".eqs", FILE_EQUATIONS},
+    {".idt", FILE_IDENTITIES},
+    {".lst", FILE_LISTS},
+    {".scl", FILE_SCALARS},
+    {".tbl", FILE_TABLES},
+    {".var", FILE_VARIABLES},
+
+    {".ac",  FILE_COMMENTS},
+    {".ae",  FILE_EQUATIONS},
+    {".ai",  FILE_IDENTITIES},
+    {".al",  FILE_LISTS},
+    {".as",  FILE_SCALARS},
+    {".at",  FILE_TABLES},
+    {".av",  FILE_VARIABLES},
+
+    {".rep", FILE_REP},
+    {".a2m", FILE_A2M},
+    {".agl", FILE_AGL},
+    {".prf", FILE_PRF},
+    {".dif", FILE_DIF},
+    {".mif", FILE_MIF},
+    {".rtf", FILE_RTF},
+    {".ps", FILE_PS},
+    {".asc", FILE_AAS},
+    {".txt", FILE_TXT},
+    {".csv", FILE_CSV},
+
+    {".htm", FILE_HTML},
+    {".ref", FILE_REF},
+    {".log", FILE_LOG},
+    {".ini", FILE_SETTINGS},
 };
 
 

@@ -1,7 +1,7 @@
 #include "tab_text_abstract.h"
 
 
-AbstractTextWidget::AbstractTextWidget(const EnumIodeFile fileType, const QString& filepath, QWidget* parent) 
+AbstractTextWidget::AbstractTextWidget(const IodeFileType fileType, const QString& filepath, QWidget* parent) 
     : IodeAbstractWidget(fileType, parent), filepath(filepath), editor_(nullptr), editor_2_(nullptr)
 {
 }

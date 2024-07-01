@@ -1349,7 +1349,7 @@ int RP_ReportExec_1(char* file)
     REPFILE             *rf;
 
     strcpy(file1, file);                // For Sanitizer
-    K_set_ext(filename, file1, K_REP);  // For Sanitizer
+    K_set_ext(filename, file1, FILE_REP);  // For Sanitizer
     tbl = RP_read_file(filename);
     if(tbl == 0) {
         B_seterrn(52, filename);

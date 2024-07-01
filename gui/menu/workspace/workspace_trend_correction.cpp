@@ -8,7 +8,7 @@ MenuWorkspaceTrendCorrection::MenuWorkspaceTrendCorrection(QWidget* parent) :
     setupUi(this);
 
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, 
-                                        VARIABLES_FILE, EXISTING_FILE); 
+                                        FILE_VARIABLES, EXISTING_FILE); 
     wLambda = new WrapperDoubleSpinBox(label_lambda->text(), *doubleSpinBox_lambda, REQUIRED_FIELD);
     wSeries = new WrapperQTextEdit(label_series->text(), *textEdit_series, REQUIRED_FIELD);  
     wLog = new WrapperCheckBox(label_log->text(), *checkBox_log, REQUIRED_FIELD);

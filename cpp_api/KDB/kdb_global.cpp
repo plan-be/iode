@@ -62,14 +62,14 @@ void import_cmt(const std::string& input_file, const std::string& save_file, con
     std::string input_file_ = check_file_exists(input_file, caller_name);
     args += input_file_ + " ";
 
-    std::string save_file_ = check_filepath(save_file, COMMENTS_FILE, caller_name, false);
+    std::string save_file_ = check_filepath(save_file, FILE_COMMENTS, caller_name, false);
     args += save_file_ + " ";
 
     args += std::to_string((int) lang) + " ";
 
     if (!debug_file.empty())
     {
-        std::string debug_file_ = check_filepath(debug_file, I_LOGS_FILE, caller_name, false);
+        std::string debug_file_ = check_filepath(debug_file, FILE_LOG, caller_name, false);
         args += debug_file_ + " ";
     }
 
@@ -95,7 +95,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
     std::string input_file_ = check_file_exists(input_file, caller_name);
     args += input_file_ + " ";
 
-    std::string save_file_ = check_filepath(save_file, VARIABLES_FILE, caller_name, false);
+    std::string save_file_ = check_filepath(save_file, FILE_VARIABLES, caller_name, false);
     args += save_file_ + " ";
 
     // raise error if not valid
@@ -107,7 +107,7 @@ void import_var(const std::string& input_file, const std::string& save_file, con
 
     if (!debug_file.empty())
     {
-        std::string debug_file_ = check_filepath(debug_file, I_LOGS_FILE, caller_name, false);
+        std::string debug_file_ = check_filepath(debug_file, FILE_LOG, caller_name, false);
         args += debug_file_ + " ";
     }
 
@@ -167,11 +167,11 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     std::string rule_file_ = check_file_exists(rule_file, caller_name);
 
-    std::string save_file_ = check_filepath(save_file, COMMENTS_FILE, caller_name, false);
+    std::string save_file_ = check_filepath(save_file, FILE_COMMENTS, caller_name, false);
 
     if(!debug_file.empty()) 
     {
-        std::string debug_file_ = check_filepath(debug_file, I_LOGS_FILE, caller_name, false);
+        std::string debug_file_ = check_filepath(debug_file, FILE_LOG, caller_name, false);
         K_WARN_DUP = 0;
         W_dest(to_char_array(debug_file_), W_A2M);
     }
@@ -221,7 +221,7 @@ void low_to_high(const IodeLowToHigh type, const char method, const std::string&
 {
     int res;
 
-    check_filepath(filepath, VARIABLES_FILE, "low_to_high", true);
+    check_filepath(filepath, FILE_VARIABLES, "low_to_high", true);
     std::string method_name = mLowToHigh.at(method);
 
     std::string arg = std::string(1, method) + " " + filepath + " " + var_list;
@@ -246,7 +246,7 @@ void high_to_low(const IodeHighToLow type, const std::string& filepath, const st
     int res;
     std::string type_name; 
 
-    check_filepath(filepath, VARIABLES_FILE, "high_to_low", true);
+    check_filepath(filepath, FILE_VARIABLES, "high_to_low", true);
 
     std::string arg = filepath + " " + var_list;
     char* c_arg = to_char_array(arg);

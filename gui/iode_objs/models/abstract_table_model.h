@@ -252,7 +252,7 @@ private:
 		IodeFileChooser fileChooser(static_cast<QWidget*>(&dialog));
 		fileChooser.setMinimumWidth(360);
 		fileChooser.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-		fileChooser.setFileType((EnumIodeFile) iodeType);
+		fileChooser.setFileType((IodeFileType) iodeType);
 		fileChooser.setFileMode(FILE_MAY_EXIST);
 		fileChooser.setFilepath(defaultFilepath);
 		layout->addWidget(static_cast<QWidget*>(&fileChooser), 0, Qt::AlignLeft);

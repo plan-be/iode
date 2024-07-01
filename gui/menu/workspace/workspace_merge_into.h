@@ -33,6 +33,6 @@ public slots:
     void help();
     void updateFileChooser(int fileType)
     {
-        wFileChooserInputFile->setFileType((EnumIodeFile) fileType);
+        wFileChooserInputFile->setFileType((IodeFileType) fileType);
     }
 };

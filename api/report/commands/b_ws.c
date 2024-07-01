@@ -111,7 +111,7 @@ int X_findtype(char* filename)
     //
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(21); // Correction JMP 16/1/2019
     //if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // Correction JMP 16/1/2019
-    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(K_CSV); // Correction JMP 25/3/2019
+    if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".csv") == 0) return(FILE_CSV); // Correction JMP 25/3/2019
     if(lg > 4 && SCR_cstrcmp(filename + lg - 4, ".rep") == 0) return(22); // ??? pas tr�s coh�rent...
 
     // Sais plus a quoi ca peut servir... => a supprimer
@@ -144,7 +144,7 @@ int B_WsDump(KDB* kdb, char* filename)
     //else if(ftype >= 0 && ftype <= 6)
     else if(ftype <= 6)
         rc = K_save(kdb, filename);
-    else if(ftype == K_CSV)
+    else if(ftype == FILE_CSV)
         rc = (*K_save_csv[type])(kdb, filename, NULL, NULL);
 
     return(rc);
@@ -653,7 +653,7 @@ int B_CsvSave(char* arg, int type)
 
     // filename
     lg = B_get_arg0(file, arg, K_MAX_FILE);
-    K_set_ext(file_ext, file, K_CSV);
+    K_set_ext(file_ext, file, FILE_CSV);
 
     // [sample] [vars]
     //A_SEPS = " ;\t\n"; // JMP 27/09/2022

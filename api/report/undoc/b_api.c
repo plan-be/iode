@@ -1129,7 +1129,7 @@ int IodeExecArgs(char *filename, char **args)
 
     rc = B_PrintDest("dummy D");
     SCR_strlcpy(buf, filename, 240);
-    K_set_ext(buf, buf, K_REP);
+    K_set_ext(buf, buf, FILE_REP);
 
     if(args) {
         targs = SCR_mtov(args, ' ');

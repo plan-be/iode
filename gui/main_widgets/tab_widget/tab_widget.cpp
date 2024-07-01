@@ -85,7 +85,7 @@ void IodeTabWidget::loadSettings()
 
     int index = -1;
     QString filepath;
-    EnumIodeFile filetype;
+    IodeFileType filetype;
     bool forcedAsText;
     bool splitted;
     Qt::Orientation splitOrientation;
@@ -107,7 +107,7 @@ void IodeTabWidget::loadSettings()
             project_settings->setArrayIndex(i);
 
             filepath = project_settings->value("filepath").toString();
-            filetype = (EnumIodeFile) project_settings->value("filetype").toInt();
+            filetype = (IodeFileType) project_settings->value("filetype").toInt();
             forcedAsText = project_settings->value("forcedAsText").toBool();
             splitted = project_settings->value("splitted").toBool();
             splitOrientation = (Qt::Orientation) project_settings->value("splitOrientation").toInt();
@@ -123,11 +123,11 @@ void IodeTabWidget::loadSettings()
             if (filepath.startsWith(prefixUnsavedDatabase))
             {
                 // should never happen
-                if(filetype > VARIABLES_FILE)
+                if(filetype > FILE_VARIABLES)
                 {
                     QMessageBox::warning(nullptr, "WARNING", QString("Cannot create a tab related to a ") + 
                         "previously unsaved IODE database.\nGot filetype " + QString::number(filetype) + 
-                        " which is higher than " + QString::number(VARIABLES_FILE) + ".");
+                        " which is higher than " + QString::number(FILE_VARIABLES) + ".");
                     index = -1;
                 }
                 else
@@ -176,7 +176,7 @@ void IodeTabWidget::saveSettings()
     // ---- SAVE SETTINGS ----
 
     QString filepath;
-    EnumIodeFile filetype;
+    IodeFileType filetype;
     IodeAbstractWidget* tabWidget;
     ReportWidget* reportWidget;
 
@@ -193,8 +193,8 @@ void IodeTabWidget::saveSettings()
         tabWidget = static_cast<IodeAbstractWidget*>(this->widget(i));
 
         filetype = tabWidget->getFiletype();
-        if(filetype <= VARIABLES_FILE && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
-            filepath = prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[filetype]);
+        if(filetype <= FILE_VARIABLES && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
+            filepath = prefixUnsavedDatabase + " " + QString::fromStdString(v_ext_names[filetype]);
         else
             filepath = tabWidget->getFilepath();
 
@@ -355,7 +355,7 @@ int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
 		return -1;
 	}
 
-    EnumIodeFile filetype = get_iode_file_type(fullPath.toStdString());
+    IodeFileType filetype = get_iode_file_type(fullPath.toStdString());
 
     // checks if the file has been already loaded
     // Note: indexOf() returns -1 if not found
@@ -364,7 +364,7 @@ int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
     if(index >= 0)
     {
         QMessageBox::StandardButton reloadFile = QMessageBox::No;
-        if(filetype <= VARIABLES_FILE)
+        if(filetype <= FILE_VARIABLES)
         {
             reloadFile = QMessageBox::question(nullptr, "WARNING", "The IODE database " + fileInfo.fileName() + 
                 " is already open.\nWould you like to reload it?");
@@ -384,7 +384,7 @@ int IodeTabWidget::loadFile(const QString& filepath, const bool displayTab,
     try
     {
         // load KDB file
-        if(filetype <= VARIABLES_FILE)
+        if(filetype <= FILE_VARIABLES)
         {
             AbstractIodeObjectWidget* tabWidget = tabIodeObjects[filetype];
             bool success = tabWidget->load(fullPath, forceOverwrite);
@@ -438,12 +438,12 @@ void IodeTabWidget::clearTab()
 {
     int index = (indexContextMenu > 0) ? indexContextMenu : currentIndex();
     IodeAbstractWidget* tabWidget = static_cast<IodeAbstractWidget*>(this->widget(index));
-    EnumIodeFile filetype = tabWidget->getFiletype();
+    IodeFileType filetype = tabWidget->getFiletype();
     
-    if (filetype <= VARIABLES_FILE)
+    if (filetype <= FILE_VARIABLES)
     {
         QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", 
-            "Are you sure to clear the " + QString::fromStdString(vIodeTypes[filetype]) + " database", 
+            "Are you sure to clear the " + QString::fromStdString(v_ext_names[filetype]) + " database", 
             QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
         if (answer == QMessageBox::Yes)
         {

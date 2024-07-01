@@ -334,14 +334,14 @@ public:
 class WrapperFileChooser : public TemplateWrapper<IodeFileChooser, QString>
 {
 public:
-    WrapperFileChooser(const QString name, IodeFileChooser& qfield, const EnumItemType type, const EnumIodeFile& fileType, const EnumFileMode& fileMode) :
+    WrapperFileChooser(const QString name, IodeFileChooser& qfield, const EnumItemType type, const IodeFileType& fileType, const EnumFileMode& fileMode) :
         TemplateWrapper(name, qfield, type)
     {
         this->qfield.setFileType(fileType);
         this->qfield.setFileMode(fileMode);
     }
 
-    void setFileType(const EnumIodeFile fileType)
+    void setFileType(const IodeFileType fileType)
     {
         this->qfield.setFileType(fileType);
     }
