@@ -7,8 +7,6 @@ cdef extern from "api/iode.h":
     cdef double IODE_NAN
     cdef int IODE_NB_TYPES
 
-
-cdef extern from "cpp_api/common.h":
     cdef enum IodeDatabaseType:
         COMMENTS,
         EQUATIONS,
@@ -18,6 +16,7 @@ cdef extern from "cpp_api/common.h":
         TABLES,
         VARIABLES
 
+cdef extern from "cpp_api/common.h":
     cdef vector[string] vIodeTypes
 
     cdef enum EnumIodeFile:
@@ -53,6 +52,7 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[string] vLangs
 
+cdef extern from "api/iode.h":
     cdef enum VariablesInitialization:
         VAR_INIT_TM1,
         VAR_INIT_TM1_A,
@@ -62,6 +62,7 @@ cdef extern from "cpp_api/common.h":
         VAR_INIT_TM1_NA,
         VAR_INIT_EXTRA_NA
 
+cdef extern from "cpp_api/common.h":
     cdef vector[string] v_simulation_initialization
 
 cdef extern from "api/iode.h":
@@ -136,7 +137,7 @@ cdef extern from "cpp_api/objects/table.h":
         IG_SEMILOG,
         IG_PERCENT
 
-cdef extern from "cpp_api/KDB/kdb_global.h":
+cdef extern from "api/iode.h":
     cdef enum IodeLowToHigh:
         LTOH_STOCK,
         LTOH_FLOW
@@ -146,9 +147,10 @@ cdef extern from "cpp_api/KDB/kdb_global.h":
         HTOL_MEAN,
         HTOL_SUM 
 
+cdef extern from "cpp_api/KDB/kdb_global.h":
     cdef map[char, string] mLowToHigh
 
-cdef extern from "cpp_api/KDB/kdb_variables.h":
+cdef extern from "api/iode.h":
     cdef enum IodeVarMode:
         VAR_MODE_LEVEL,
         VAR_MODE_DIFF,
@@ -156,6 +158,7 @@ cdef extern from "cpp_api/KDB/kdb_variables.h":
         VAR_MODE_Y0Y_DIFF,
         VAR_MODE_Y0Y_GROWTH_RATE
 
+cdef extern from "cpp_api/KDB/kdb_variables.h":
     cdef vector[string] v_var_modes
     
 cdef extern from "api/iode.h":
