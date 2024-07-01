@@ -286,16 +286,16 @@ TEST_F(EstimationTest, Estimate)
     Equation eq_est = Equations.get("ACAF");
     std::array<float, EQS_NBTESTS> tests = eq_est.get_tests();
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDEV]) / 1e6, 0.00427);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_MEANY]) / 1e6, 0.008185);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_SSRES]) / 1e6, 5.2e-05);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDERR]) / 1e6, 0.001927);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_STDERRP]) / 1e6, 23.542242);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_FSTAT]) / 1e6, 32.285107);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_R2]) / 1e6, 0.821815);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_R2ADJ]) / 1e6, 0.79636);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_DW]) / 1e6, 2.33007);
-    EXPECT_DOUBLE_EQ(round(1e6 * tests[IE_LOGLIK]) / 1e6, 83.810104);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDEV]) / 1e6, 0.00427);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_MEANY]) / 1e6, 0.008185);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_SSRES]) / 1e6, 5.2e-05);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDERR]) / 1e6, 0.001927);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDERRP]) / 1e6, 23.542242);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_FSTAT]) / 1e6, 32.285107);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_R2]) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_R2ADJ]) / 1e6, 0.79636);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_DW]) / 1e6, 2.33007);
+    EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_LOGLIK]) / 1e6, 83.810104);
 
     double max_value;
     double min_value;

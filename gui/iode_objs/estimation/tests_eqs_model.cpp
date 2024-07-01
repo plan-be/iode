@@ -33,7 +33,7 @@ QVariant TestsEqsModel::data(const QModelIndex& index, int role) const
     if (role == Qt::DisplayRole)
     {
         Equation eq = v_eqs[index.column()].eq;
-        float value = eq.get_test((EnumIodeEquationTest) index.row());
+        float value = eq.get_test((IodeEquationTest) index.row());
         return QString::number(value, 'g', 8);
     }
     

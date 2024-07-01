@@ -16,7 +16,7 @@ from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
 from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, IodeEquationMethod, 
-                            EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
+                            IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             IodeVarMode, VariablesInitialization, 
@@ -114,17 +114,17 @@ class EqMethod(IntEnum):
     MAX_LIKELIHOOD = 4
 
 class EqTest(IntEnum):
-    CORR = EnumIodeEquationTest.IE_CORR
-    STDEV = EnumIodeEquationTest.IE_STDEV
-    MEANY = EnumIodeEquationTest.IE_MEANY
-    SSRES = EnumIodeEquationTest.IE_SSRES
-    STDERR = EnumIodeEquationTest.IE_STDERR
-    STDERRP = EnumIodeEquationTest.IE_STDERRP
-    FSTAT = EnumIodeEquationTest.IE_FSTAT
-    R2 = EnumIodeEquationTest.IE_R2
-    R2ADJ = EnumIodeEquationTest.IE_R2ADJ
-    DW = EnumIodeEquationTest.IE_DW
-    LOGLIK = EnumIodeEquationTest.IE_LOGLIK
+    CORR = IodeEquationTest.EQ_CORR
+    STDEV = IodeEquationTest.EQ_STDEV
+    MEANY = IodeEquationTest.EQ_MEANY
+    SSRES = IodeEquationTest.EQ_SSRES
+    STDERR = IodeEquationTest.EQ_STDERR
+    STDERRP = IodeEquationTest.EQ_STDERRP
+    FSTAT = IodeEquationTest.EQ_FSTAT
+    R2 = IodeEquationTest.EQ_R2
+    R2ADJ = IodeEquationTest.EQ_R2ADJ
+    DW = IodeEquationTest.EQ_DW
+    LOGLIK = IodeEquationTest.EQ_LOGLIK
 
 EQ_TEST_NAMES: Tuple[str, ...] = tuple(member.name.lower() for member in EqTest)
 

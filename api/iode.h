@@ -193,15 +193,15 @@ enum IodeDatabaseType
 #define KEDATE(kdb, pos)    (* (long *)   K_oval(kdb, pos, 8))
 #define KETESTS(kdb, pos)   ((float *)    K_oval(kdb, pos, 9))
 
-//#define KE_STDEV (kdb, pos)  KETESTS(kdb, pos)[1]
-//#define KE_MEANY (kdb, pos)  KETESTS(kdb, pos)[2]
-//#define KE_SSRES (kdb, pos)  KETESTS(kdb, pos)[3]
-//#define KE_STDERR(kdb, pos)  KETESTS(kdb, pos)[4]
-//#define KE_FSTAT (kdb, pos)  KETESTS(kdb, pos)[6]
-//#define KE_R2    (kdb, pos)  KETESTS(kdb, pos)[7]
-//#define KE_R2ADJ (kdb, pos)  KETESTS(kdb, pos)[8]
-//#define KE_DW    (kdb, pos)  KETESTS(kdb, pos)[9]
-//#define KE_LOGLIK(kdb, pos)  KETESTS(kdb, pos)[10]
+//#define EQ_STDEV (kdb, pos)  KETESTS(kdb, pos)[1]
+//#define EQ_MEANY (kdb, pos)  KETESTS(kdb, pos)[2]
+//#define EQ_SSRES (kdb, pos)  KETESTS(kdb, pos)[3]
+//#define EQ_STDERR(kdb, pos)  KETESTS(kdb, pos)[4]
+//#define EQ_FSTAT (kdb, pos)  KETESTS(kdb, pos)[6]
+//#define EQ_R2    (kdb, pos)  KETESTS(kdb, pos)[7]
+//#define EQ_R2ADJ (kdb, pos)  KETESTS(kdb, pos)[8]
+//#define EQ_DW    (kdb, pos)  KETESTS(kdb, pos)[9]
+//#define EQ_LOGLIK(kdb, pos)  KETESTS(kdb, pos)[10]
 
 
 #define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)) )
@@ -278,6 +278,23 @@ enum IodeEquationMethod
 };
 
 const static int IODE_NB_EQ_METHODS = 5;
+
+enum IodeEquationTest
+{
+    EQ_CORR,
+    EQ_STDEV,
+    EQ_MEANY,
+    EQ_SSRES,
+    EQ_STDERR,
+    EQ_STDERRP,
+    EQ_FSTAT,
+    EQ_R2,
+    EQ_R2ADJ,
+    EQ_DW,
+    EQ_LOGLIK,
+};
+
+const static int IODE_NB_EQ_TESTS = 11;
 
 enum IodeEquationAscii
 {

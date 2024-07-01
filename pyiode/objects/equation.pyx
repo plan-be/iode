@@ -6,7 +6,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.map cimport map
 from libcpp.string cimport string
 from cython.operator cimport dereference
-from pyiode.common cimport IodeEquationMethod, EnumIodeEquationTest
+from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
 
@@ -577,7 +577,7 @@ cdef class Equation:
             raise ValueError("Cannot set equation test values. "
                              f"Expected vector of size {len(EqTest)} but got vector of size {len(tests)}.")
         for i, value in enumerate(tests):
-            self.c_equation.set_test(<EnumIodeEquationTest>i, value)
+            self.c_equation.set_test(<IodeEquationTest>i, value)
 
     def _set_date(self, value: str, format: str = "dd-mm-yyyy"):
         r"""
@@ -710,5 +710,5 @@ cdef Equation _to_py_equation(string endo, CEquation c_eq):
                     c_eq.get_instruments().decode(), c_eq.get_block().decode())
     py_eq.c_equation.date = c_eq.date
     for i, test_val in enumerate(c_eq.tests): 
-        py_eq.c_equation.set_test(<EnumIodeEquationTest>i, test_val)
+        py_eq.c_equation.set_test(<IodeEquationTest>i, test_val)
     return py_eq

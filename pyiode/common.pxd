@@ -72,23 +72,23 @@ cdef extern from "api/iode.h":
         EQ_GLS,
         EQ_MAX_LIKELIHOOD
 
+    cdef enum IodeEquationTest:
+        EQ_CORR,
+        EQ_STDEV,
+        EQ_MEANY, 
+        EQ_SSRES, 
+        EQ_STDERR,
+        EQ_STDERRP,
+        EQ_FSTAT,
+        EQ_R2,
+        EQ_R2ADJ, 
+        EQ_DW,
+        EQ_LOGLIK
+
+    cdef int EQS_NBTESTS
+
 cdef extern from "cpp_api/objects/equation.h":
     cdef vector[string] v_eq_methods
-
-    cdef enum EnumIodeEquationTest:
-        IE_CORR,
-        IE_STDEV,
-        IE_MEANY, 
-        IE_SSRES, 
-        IE_STDERR,
-        IE_STDERRP,
-        IE_FSTAT, 
-        IE_R2,
-        IE_R2ADJ, 
-        IE_DW,
-        IE_LOGLIK
-        
-    cdef int EQS_NBTESTS
 
 cdef extern from "cpp_api/objects/table.h":
     cdef enum EnumCellType:

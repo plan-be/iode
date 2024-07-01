@@ -20,7 +20,7 @@ public:
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
-		return I_NB_EQ_TESTS;
+		return IODE_NB_EQ_TESTS;
 	}
 
 	int columnCount(const QModelIndex& parent = QModelIndex()) const

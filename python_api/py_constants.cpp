@@ -10,33 +10,33 @@ void init_constants(nb::module_ &m)
       m.attr("nan") = IODE_NAN;
 
       // Object and file types
-      m.attr("I_CMT") = (int) COMMENTS;
-      m.attr("I_EQS") = (int) EQUATIONS;
-      m.attr("I_IDT") = (int) IDENTITIES;
-      m.attr("I_LST") = (int) LISTS;
-      m.attr("I_SCL") = (int) SCALARS;
-      m.attr("I_TBL") = (int) TABLES;
-      m.attr("I_VAR") = (int) VARIABLES;
+      m.attr("COMMENTS") = (int) COMMENTS;
+      m.attr("EQUATIONS") = (int) EQUATIONS;
+      m.attr("IDENTITIES") = (int) IDENTITIES;
+      m.attr("LISTS") = (int) LISTS;
+      m.attr("SCALARS") = (int) SCALARS;
+      m.attr("TABLES") = (int) TABLES;
+      m.attr("VARIABLES") = (int) VARIABLES;
 
       // Methods to estimation equations
-      m.attr("E_LSQ")            = (int) EQ_LSQ;
-      m.attr("E_ZELLNER")        = (int) EQ_ZELLNER;
-      m.attr("E_INSTRUMENTAL")   = (int) EQ_INSTRUMENTAL;
-      m.attr("E_GLS")            = (int) EQ_GLS;
-      m.attr("E_MAX_LIKELIHOOD") = (int) EQ_MAX_LIKELIHOOD;
+      m.attr("EQ_LSQ")            = (int) EQ_LSQ;
+      m.attr("EQ_ZELLNER")        = (int) EQ_ZELLNER;
+      m.attr("EQ_INSTRUMENTAL")   = (int) EQ_INSTRUMENTAL;
+      m.attr("EQ_GLS")            = (int) EQ_GLS;
+      m.attr("EQ_MAX_LIKELIHOOD") = (int) EQ_MAX_LIKELIHOOD;
 
       // test values
-      m.attr("IE_CORR")    = (int) IE_CORR;
-      m.attr("IE_STDEV")   = (int) IE_STDEV;
-      m.attr("IE_MEANY")   = (int) IE_MEANY; 
-      m.attr("IE_SSRES")   = (int) IE_SSRES; 
-      m.attr("IE_STDERR")  = (int) IE_STDERR;
-      m.attr("IE_STDERRP") = (int) IE_STDERRP;
-      m.attr("IE_FSTAT")   = (int) IE_FSTAT; 
-      m.attr("IE_R2")      = (int) IE_R2;
-      m.attr("IE_R2ADJ")   = (int) IE_R2ADJ; 
-      m.attr("IE_DW")      = (int) IE_DW;
-      m.attr("IE_LOGLIK")  = (int) IE_LOGLIK;
+      m.attr("EQ_CORR")    = (int) EQ_CORR;
+      m.attr("EQ_STDEV")   = (int) EQ_STDEV;
+      m.attr("EQ_MEANY")   = (int) EQ_MEANY; 
+      m.attr("EQ_SSRES")   = (int) EQ_SSRES; 
+      m.attr("EQ_STDERR")  = (int) EQ_STDERR;
+      m.attr("EQ_STDERRP") = (int) EQ_STDERRP;
+      m.attr("EQ_FSTAT")   = (int) EQ_FSTAT; 
+      m.attr("EQ_R2")      = (int) EQ_R2;
+      m.attr("EQ_R2ADJ")   = (int) EQ_R2ADJ; 
+      m.attr("EQ_DW")      = (int) EQ_DW;
+      m.attr("EQ_LOGLIK")  = (int) EQ_LOGLIK;
 
       // EnumCellType
       m.attr("IT_LEC")    = (int) IT_LEC;

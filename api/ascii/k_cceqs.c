@@ -131,31 +131,31 @@ static EQ* KE_read_eq(YYFILE* yy)
                 break;
 
             case ASCII_STDEV :
-                eq->tests[1] = (float) K_read_real(yy);
+                eq->tests[EQ_STDEV] = (float) K_read_real(yy);
                 break;
             case ASCII_MEANY :
-                eq->tests[2] = (float) K_read_real(yy);
+                eq->tests[EQ_MEANY] = (float) K_read_real(yy);
                 break;
             case ASCII_SSRES :
-                eq->tests[3] = (float) K_read_real(yy);
+                eq->tests[EQ_SSRES] = (float) K_read_real(yy);
                 break;
             case ASCII_STDERR :
-                eq->tests[4] = (float) K_read_real(yy);
+                eq->tests[EQ_STDERR] = (float) K_read_real(yy);
                 break;
             case ASCII_FSTAT :
-                eq->tests[6] = (float) K_read_real(yy);
+                eq->tests[EQ_FSTAT] = (float) K_read_real(yy);
                 break;
             case ASCII_R2 :
-                eq->tests[7] = (float) K_read_real(yy);
+                eq->tests[EQ_R2] = (float) K_read_real(yy);
                 break;
             case ASCII_R2ADJ :
-                eq->tests[8] = (float) K_read_real(yy);
+                eq->tests[EQ_R2ADJ] = (float) K_read_real(yy);
                 break;
             case ASCII_DW :
-                eq->tests[9] = (float) K_read_real(yy);
+                eq->tests[EQ_DW] = (float) K_read_real(yy);
                 break;
             case ASCII_LOGLIK :
-                eq->tests[10] = (float) K_read_real(yy);
+                eq->tests[EQ_LOGLIK] = (float) K_read_real(yy);
                 break;
 
             default :

@@ -194,30 +194,30 @@ TEST_F(EquationTest, Tests)
 
     // get
     tests = equation->get_tests();
-    EXPECT_FLOAT_EQ(tests[IE_CORR], expected_tests[IE_CORR]);
-    EXPECT_FLOAT_EQ(tests[IE_STDEV], expected_tests[IE_STDEV]);
-    EXPECT_FLOAT_EQ(tests[IE_MEANY], expected_tests[IE_MEANY]);
-    EXPECT_FLOAT_EQ(tests[IE_SSRES], expected_tests[IE_SSRES]);
-    EXPECT_FLOAT_EQ(tests[IE_STDERR], expected_tests[IE_STDERR]);
-    EXPECT_FLOAT_EQ(tests[IE_STDERRP], expected_tests[IE_STDERRP]);
-    EXPECT_FLOAT_EQ(tests[IE_FSTAT], expected_tests[IE_FSTAT]);
-    EXPECT_FLOAT_EQ(tests[IE_R2], expected_tests[IE_R2]);
-    EXPECT_FLOAT_EQ(tests[IE_R2ADJ], expected_tests[IE_R2ADJ]);
-    EXPECT_FLOAT_EQ(tests[IE_DW], expected_tests[IE_DW]);
-    EXPECT_FLOAT_EQ(tests[IE_LOGLIK], expected_tests[IE_LOGLIK]);
+    EXPECT_FLOAT_EQ(tests[EQ_CORR], expected_tests[EQ_CORR]);
+    EXPECT_FLOAT_EQ(tests[EQ_STDEV], expected_tests[EQ_STDEV]);
+    EXPECT_FLOAT_EQ(tests[EQ_MEANY], expected_tests[EQ_MEANY]);
+    EXPECT_FLOAT_EQ(tests[EQ_SSRES], expected_tests[EQ_SSRES]);
+    EXPECT_FLOAT_EQ(tests[EQ_STDERR], expected_tests[EQ_STDERR]);
+    EXPECT_FLOAT_EQ(tests[EQ_STDERRP], expected_tests[EQ_STDERRP]);
+    EXPECT_FLOAT_EQ(tests[EQ_FSTAT], expected_tests[EQ_FSTAT]);
+    EXPECT_FLOAT_EQ(tests[EQ_R2], expected_tests[EQ_R2]);
+    EXPECT_FLOAT_EQ(tests[EQ_R2ADJ], expected_tests[EQ_R2ADJ]);
+    EXPECT_FLOAT_EQ(tests[EQ_DW], expected_tests[EQ_DW]);
+    EXPECT_FLOAT_EQ(tests[EQ_LOGLIK], expected_tests[EQ_LOGLIK]);
 
     m_tests = equation->get_tests_as_map();
-    EXPECT_FLOAT_EQ(m_tests["corr"], expected_tests[IE_CORR]);
-    EXPECT_FLOAT_EQ(m_tests["stdev"], expected_tests[IE_STDEV]);
-    EXPECT_FLOAT_EQ(m_tests["meany"], expected_tests[IE_MEANY]);
-    EXPECT_FLOAT_EQ(m_tests["ssres"], expected_tests[IE_SSRES]);
-    EXPECT_FLOAT_EQ(m_tests["stderr"], expected_tests[IE_STDERR]);
-    EXPECT_FLOAT_EQ(m_tests["stderrp"], expected_tests[IE_STDERRP]);
-    EXPECT_FLOAT_EQ(m_tests["fstat"], expected_tests[IE_FSTAT]);
-    EXPECT_FLOAT_EQ(m_tests["r2"], expected_tests[IE_R2]);
-    EXPECT_FLOAT_EQ(m_tests["r2adj"], expected_tests[IE_R2ADJ]);
-    EXPECT_FLOAT_EQ(m_tests["dw"], expected_tests[IE_DW]);
-    EXPECT_FLOAT_EQ(m_tests["loglik"], expected_tests[IE_LOGLIK]);
+    EXPECT_FLOAT_EQ(m_tests["corr"], expected_tests[EQ_CORR]);
+    EXPECT_FLOAT_EQ(m_tests["stdev"], expected_tests[EQ_STDEV]);
+    EXPECT_FLOAT_EQ(m_tests["meany"], expected_tests[EQ_MEANY]);
+    EXPECT_FLOAT_EQ(m_tests["ssres"], expected_tests[EQ_SSRES]);
+    EXPECT_FLOAT_EQ(m_tests["stderr"], expected_tests[EQ_STDERR]);
+    EXPECT_FLOAT_EQ(m_tests["stderrp"], expected_tests[EQ_STDERRP]);
+    EXPECT_FLOAT_EQ(m_tests["fstat"], expected_tests[EQ_FSTAT]);
+    EXPECT_FLOAT_EQ(m_tests["r2"], expected_tests[EQ_R2]);
+    EXPECT_FLOAT_EQ(m_tests["r2adj"], expected_tests[EQ_R2ADJ]);
+    EXPECT_FLOAT_EQ(m_tests["dw"], expected_tests[EQ_DW]);
+    EXPECT_FLOAT_EQ(m_tests["loglik"], expected_tests[EQ_LOGLIK]);
 
     // set
     std::array<float, EQS_NBTESTS> new_tests = { 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11. };
