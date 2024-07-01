@@ -5,7 +5,7 @@ from libcpp.vector cimport vector
 from libcpp cimport bool
 
 from pyiode.common cimport (IodeDatabaseType, EnumIodeFile, EnumLang, IodeEquationMethod, 
-                            EnumIodeEquationTest, IodeLowToHigh, IodeHighToLow, 
+                            IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             IodeVarMode, VariablesInitialization)

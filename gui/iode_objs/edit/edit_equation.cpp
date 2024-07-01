@@ -115,10 +115,10 @@ void EditEquationDialog::display_equation(const NamedEquation& equation)
 
 	// read-only values
 	std::array<float, EQS_NBTESTS> tests = eq.get_tests();
-	lineEdit_tests_r2adj->setText(QString::number(tests[IE_R2ADJ], 'g', 3));
-	lineEdit_tests_durbw->setText(QString::number(tests[IE_DW], 'g', 3));
-	lineEdit_tests_fstat->setText(QString::number(tests[IE_FSTAT], 'g', 3));
-	lineEdit_tests_loglk->setText(QString::number(tests[IE_LOGLIK], 'g', 3));
+	lineEdit_tests_r2adj->setText(QString::number(tests[EQ_R2ADJ], 'g', 3));
+	lineEdit_tests_durbw->setText(QString::number(tests[EQ_DW], 'g', 3));
+	lineEdit_tests_fstat->setText(QString::number(tests[EQ_FSTAT], 'g', 3));
+	lineEdit_tests_loglk->setText(QString::number(tests[EQ_LOGLIK], 'g', 3));
 }
 
 // same as ODE_blk_save_fn() from o_est.c from old GUI

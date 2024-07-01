@@ -6,7 +6,7 @@ from libcpp.map cimport map
 from libcpp.pair cimport pair
 from libcpp cimport bool
 
-from pyiode.common cimport IodeEquationMethod, EnumIodeEquationTest
+from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.time.sample cimport CSample
 
 
@@ -49,7 +49,7 @@ cdef extern from "cpp_api/objects/equation.h":
         void reset_date()
 
         map[string, float] get_tests_as_map()
-        void set_test(const EnumIodeEquationTest i, const float value) except +
+        void set_test(const IodeEquationTest i, const float value) except +
 
         vector[string] get_coefficients_list(const bool create_if_not_exit) except +
         vector[string] get_variables_list(const bool create_if_not_exit) except +

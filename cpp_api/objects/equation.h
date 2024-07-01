@@ -14,28 +14,11 @@
 const static std::vector<std::string> v_eq_methods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
 
 
-enum EnumIodeEquationTest
-{
-    IE_CORR,
-    IE_STDEV,
-    IE_MEANY, 
-    IE_SSRES, 
-    IE_STDERR,
-    IE_STDERRP,
-    IE_FSTAT, 
-    IE_R2,
-    IE_R2ADJ, 
-    IE_DW,
-    IE_LOGLIK,
-};
-
-const static int I_NB_EQ_TESTS = 11;
-
 const static std::vector<std::string> vEquationTests = { 
     "Correlation",
     "St dev of residuals",
     "Mean of YOBS",
-    "õ Residuals²",
+    "∑ Residuals²",
     "Standard error",
     "Standard error in %",
     "F-stat",
@@ -135,19 +118,19 @@ public:
 
     std::map<std::string, float> get_tests_as_map() const;
     
-    float get_test(const EnumIodeEquationTest t) const;
+    float get_test(const IodeEquationTest t) const;
 
-    float get_test_stdev() const { return this->tests[IE_STDEV]; }
-    float get_test_meany() const { return this->tests[IE_MEANY]; }
-    float get_test_ssres() const { return this->tests[IE_SSRES]; }
-    float get_test_stderr() const { return this->tests[IE_STDERR]; }
-    float get_test_fstat() const { return this->tests[IE_FSTAT]; }
-    float get_test_r2() const { return this->tests[IE_R2]; }
-    float get_test_r2adj() const { return this->tests[IE_R2ADJ]; }
-    float get_test_dw() const { return this->tests[IE_DW]; }
-    float get_test_loglik() const { return this->tests[IE_LOGLIK]; }
+    float get_test_stdev() const { return this->tests[EQ_STDEV]; }
+    float get_test_meany() const { return this->tests[EQ_MEANY]; }
+    float get_test_ssres() const { return this->tests[EQ_SSRES]; }
+    float get_test_stderr() const { return this->tests[EQ_STDERR]; }
+    float get_test_fstat() const { return this->tests[EQ_FSTAT]; }
+    float get_test_r2() const { return this->tests[EQ_R2]; }
+    float get_test_r2adj() const { return this->tests[EQ_R2ADJ]; }
+    float get_test_dw() const { return this->tests[EQ_DW]; }
+    float get_test_loglik() const { return this->tests[EQ_LOGLIK]; }
 
-    void set_test(const EnumIodeEquationTest t, const float value)
+    void set_test(const IodeEquationTest t, const float value)
     {
         this->tests[t] = value;
     }

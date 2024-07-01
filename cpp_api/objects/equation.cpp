@@ -350,21 +350,21 @@ std::array<float, EQS_NBTESTS> Equation::get_tests() const
 std::map<std::string, float> Equation::get_tests_as_map() const
 {
     std::map<std::string, float> m_tests;
-    m_tests["corr"] = this->tests[IE_CORR];
-    m_tests["stdev"] = this->tests[IE_STDEV];
-    m_tests["meany"] = this->tests[IE_MEANY];
-    m_tests["ssres"] = this->tests[IE_SSRES];
-    m_tests["stderr"] = this->tests[IE_STDERR];
-    m_tests["stderrp"] = this->tests[IE_STDERRP];
-    m_tests["fstat"] = this->tests[IE_FSTAT];
-    m_tests["r2"] = this->tests[IE_R2];
-    m_tests["r2adj"] = this->tests[IE_R2ADJ];
-    m_tests["dw"] = this->tests[IE_DW];
-    m_tests["loglik"] = this->tests[IE_LOGLIK];
+    m_tests["corr"] = this->tests[EQ_CORR];
+    m_tests["stdev"] = this->tests[EQ_STDEV];
+    m_tests["meany"] = this->tests[EQ_MEANY];
+    m_tests["ssres"] = this->tests[EQ_SSRES];
+    m_tests["stderr"] = this->tests[EQ_STDERR];
+    m_tests["stderrp"] = this->tests[EQ_STDERRP];
+    m_tests["fstat"] = this->tests[EQ_FSTAT];
+    m_tests["r2"] = this->tests[EQ_R2];
+    m_tests["r2adj"] = this->tests[EQ_R2ADJ];
+    m_tests["dw"] = this->tests[EQ_DW];
+    m_tests["loglik"] = this->tests[EQ_LOGLIK];
     return m_tests;
 }
 
-float Equation::get_test(const EnumIodeEquationTest t) const
+float Equation::get_test(const IodeEquationTest t) const
 {
     if(t < 0 || t >= EQS_NBTESTS)
         throw std::invalid_argument("get_test: the passed value must be in range [0, " + 
