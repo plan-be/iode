@@ -18,7 +18,7 @@ ReportWidget::ReportWidget(const QString& filepath, QWidget* parent):
     editor_2->hide();
 
     QList<QString> q_langs;
-    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+    for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
     comboBox_language->addItems(q_langs);
     comboBox_language->setEditable(false);

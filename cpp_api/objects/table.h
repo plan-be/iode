@@ -235,7 +235,7 @@ public:
 
 	std::string get_language() const;
 
-	void set_language(const EnumLang lang);
+	void set_language(const TableLang lang);
 
 	short nb_columns() const;
 

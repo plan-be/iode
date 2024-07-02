@@ -9,7 +9,7 @@ MenuPrintTables::MenuPrintTables(QWidget* parent) : MenuPrintAbstract(parent)
     textEdit_table_names->setCompleter(completer);
 
     QList<QString> q_langs;
-    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+    for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
     wTablesNames = new WrapperQPlainTextEdit(label_table_names->text(), *textEdit_table_names, REQUIRED_FIELD);
     wSample = new WrapperQTextEdit(label_sample->text(), *textEdit_sample, REQUIRED_FIELD);
@@ -67,7 +67,7 @@ void MenuPrintTables::display()
         std::string file_4 = wFile4->extractAndVerify().toStdString();
         std::string file_5 = wFile5->extractAndVerify().toStdString();
 
-        EnumLang lang = EnumLang (wLanguage->extractAndVerify() + IT_ENGLISH);
+        TableLang lang = TableLang (wLanguage->extractAndVerify());
 
         int nb_decimals = wNbDecimals->extractAndVerify();
 

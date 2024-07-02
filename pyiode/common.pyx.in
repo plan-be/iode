@@ -15,14 +15,15 @@ from libcpp.map cimport map
 from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
-from pyiode.common cimport (IodeDatabaseType, EnumLang, IodeEquationMethod, 
+from pyiode.common cimport (IodeDatabaseType, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             IodeVarMode, VariablesInitialization, 
                             SimuSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport IodeFileType as CIodeFileType 
-from pyiode.common cimport (v_iode_types, v_file_types, vLangs, v_eq_methods, v_var_modes, 
+from pyiode.common cimport TableLang as CTableLang
+from pyiode.common cimport (v_iode_types, v_file_types, v_table_langs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
                             v_adjustment_method, mLowToHigh)
 
@@ -104,10 +105,10 @@ class IodeFileType(IntEnum):
     FILE_ANY = CIodeFileType.FILE_ANY
     DIRECTORY = CIodeFileType.DIRECTORY
 
-class IodeLanguage(IntEnum):
-    ENGLISH = EnumLang.IT_ENGLISH
-    DUTCH = EnumLang.IT_DUTCH
-    FRENCH = EnumLang.IT_FRENCH
+class TableLang(IntEnum):
+    ENGLISH = CTableLang.TABLE_ENGLISH
+    DUTCH = CTableLang.TABLE_DUTCH
+    FRENCH = CTableLang.TABLE_FRENCH
 
 class EqMethod(IntEnum):
     LSQ = 0

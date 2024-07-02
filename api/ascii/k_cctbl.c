@@ -23,10 +23,10 @@ YYKEYS KT_TABLE[] = {
     "DECIMAL",      KT_DECIMAL,
     "DIM",          KT_DIM,
     "DIV",          KT_DIV,
-    "DUTCH",        KT_DUTCH,
-    "ENGLISH",      KT_ENGLISH,
+    "DUTCH",        TABLE_DUTCH,
+    "ENGLISH",      TABLE_ENGLISH,
     "FILES",        KT_FILES,
-    "FRENCH",       KT_FRENCH,
+    "FRENCH",       TABLE_FRENCH,
     "ITALIC",       KT_ITALIC,
     "LEC",          KT_LEC,
     "LEFT",         KT_LEFT,
@@ -321,9 +321,9 @@ static TBL *KT_read_tbl(YYFILE* yy)
             case KT_CLOSE   :
                 return(tbl);
 
-            case KT_DUTCH   :
-            case KT_FRENCH  :
-            case KT_ENGLISH :
+            case TABLE_DUTCH   :
+            case TABLE_FRENCH  :
+            case TABLE_ENGLISH :
                 tbl->t_lang = keyw;
                 break;
 

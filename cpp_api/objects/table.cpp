@@ -605,12 +605,12 @@ void Table::extend()
 
 std::string Table::get_language() const
 {
-	return vLangs.at(t_lang - KT_ENGLISH);
+	return v_table_langs.at(t_lang - TABLE_ENGLISH);
 }
 
-void Table::set_language(const EnumLang lang)
+void Table::set_language(const TableLang lang)
 {
-	t_lang = lang + KT_ENGLISH;
+	t_lang = (short) lang;
 }
 
 short Table::nb_columns() const

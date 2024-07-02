@@ -43,26 +43,7 @@ struct FileType
 
 const static std::vector<std::string> v_iode_types = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
 
-
-/* ****************************** *
- *             ENUMS              *
- * ****************************** */
-
- /* NOTE FOR THE DEVELOPPERS:
-  * enum documentation: https://en.cppreference.com/w/cpp/language/enum
-  */
-
-// TODO: replace K by I as below in C api + group them in an enum
-enum EnumLang
-{
-    IT_ENGLISH,
-    IT_DUTCH,
-    IT_FRENCH
-};
-
-const static int I_NB_LANGS = 3;
-
-const static std::vector<std::string> vLangs = { "English", "Dutch", "French" };
+const static std::vector<std::string> v_table_langs = { "English", "Dutch", "French" };
 
 const static std::string report_ext = ".rep";
 

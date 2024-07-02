@@ -8,6 +8,7 @@ from libcpp.string cimport string
 from cython.operator cimport dereference
 from pyiode.common cimport (EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType)
+from pyiode.common cimport TableLang as CTableLang
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
 from pyiode.iode_database.cpp_api_database cimport load_reference_kdb
@@ -1062,16 +1063,16 @@ cdef class Table:
 
         Parameters
         ----------
-        value : IodeLanguage or str
+        value : TableLang or str
             Possible values are ENGLISH, DUTCH, FRENCH.
 
         Examples
         --------
-        >>> from iode import Table, IodeLanguage
+        >>> from iode import Table, TableLang
         >>> table = Table()
         >>> table.language
         'ENGLISH'
-        >>> table.language = IodeLanguage.DUTCH
+        >>> table.language = TableLang.DUTCH
         >>> table.language
         'DUTCH'
         >>> table.language = "French"
@@ -1081,12 +1082,12 @@ cdef class Table:
         return self.c_table.get_language().decode().upper()
 
     @language.setter
-    def language(self, value: Union[IodeLanguage, str]):
+    def language(self, value: Union[TableLang, str]):
         if isinstance(value, str):
             value = value.upper()
-            value = IodeLanguage[value]
+            value = TableLang[value]
         value = int(value)
-        self.c_table.set_language(<EnumLang>value)
+        self.c_table.set_language(<CTableLang>value)
 
     @property
     def ymin(self) -> float:

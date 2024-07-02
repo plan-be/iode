@@ -45,7 +45,7 @@ std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeDatabase
 }
 
 void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
-                const EnumLang lang, const std::string& debug_file)
+                const TableLang lang, const std::string& debug_file)
 {
     // $FileImportCmt format rule infile outfile language [trace]
 
@@ -65,7 +65,7 @@ void import_cmt(const std::string& input_file, const std::string& save_file, con
     std::string save_file_ = check_filepath(save_file, FILE_COMMENTS, caller_name, false);
     args += save_file_ + " ";
 
-    args += std::to_string((int) lang) + " ";
+    args += std::to_string((int) (lang - TABLE_ENGLISH)) + " ";
 
     if (!debug_file.empty())
     {

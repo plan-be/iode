@@ -60,12 +60,12 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[CFileType] v_file_types
 
-    cdef enum EnumLang:
-        IT_ENGLISH,
-        IT_DUTCH,
-        IT_FRENCH
+    cdef enum TableLang:
+        TABLE_ENGLISH,
+        TABLE_DUTCH,
+        TABLE_FRENCH
 
-    cdef vector[string] vLangs
+    cdef vector[string] v_table_langs
 
 cdef extern from "api/iode.h":
     cdef enum VariablesInitialization:

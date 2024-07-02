@@ -263,37 +263,43 @@ const static int IODE_NB_FILE_EXT = 31;
 #define KT_FONT(attr, font)     ((attr) | (font))
 #define KT_SETFONT(attr, font)  (((attr) & 120) | (font))
 
-#define  KT_ENGLISH         100
-#define  KT_DUTCH           (KT_ENGLISH + 1)
-#define  KT_FRENCH          (KT_ENGLISH + 2)
-#define  KT_DIM             (KT_ENGLISH + 3)
-#define  KT_DIV             (KT_ENGLISH + 4)
-#define  KT_FILES           (KT_ENGLISH + 5)
-#define  KT_MODE            (KT_ENGLISH + 6)
-#define  KT_OPEN            (KT_ENGLISH + 7)
-#define  KT_CLOSE           (KT_ENGLISH + 8)
-#define  KT_BREAK           (KT_ENGLISH + 9)
-#define  KT_CELL            (KT_ENGLISH + 10)
-#define  KT_LINE            (KT_ENGLISH + 11)
-#define  KT_DLINE           (KT_ENGLISH + 12)
-#define  KT_TITLE           (KT_ENGLISH + 13)
-#define  KT_LEC             (KT_ENGLISH + 14)
-#define  KT_STRING          (KT_ENGLISH + 15)
-#define  KT_DATE            (KT_ENGLISH + 16)
-#define  KT_YMIN            (KT_ENGLISH + 17)
-#define  KT_YMAX            (KT_ENGLISH + 18)
-#define  KT_ZMIN            (KT_ENGLISH + 19)
-#define  KT_ZMAX            (KT_ENGLISH + 20)
-#define  KT_XGRID           (KT_ENGLISH + 21)
-#define  KT_YGRID           (KT_ENGLISH + 22)
-#define  KT_BOX             (KT_ENGLISH + 23)
-#define  KT_AXIS            (KT_ENGLISH + 24)
-#define  KT_ALGN            (KT_ENGLISH + 25)
-#define  KT_LAXIS           (KT_ENGLISH + 26)
-#define  KT_RAXIS           (KT_ENGLISH + 27)
-#define  KT_GRLINE          (KT_ENGLISH + 28)
-#define  KT_GRBAR           (KT_ENGLISH + 29)
-#define  KT_GRSCATTER       (KT_ENGLISH + 30)
+enum TableLang
+{
+    TABLE_ENGLISH = 100,
+    TABLE_DUTCH,
+    TABLE_FRENCH
+};
+
+const static int IODE_NB_LANGS = 3;
+
+#define  KT_DIM             (TABLE_ENGLISH + 3)
+#define  KT_DIV             (TABLE_ENGLISH + 4)
+#define  KT_FILES           (TABLE_ENGLISH + 5)
+#define  KT_MODE            (TABLE_ENGLISH + 6)
+#define  KT_OPEN            (TABLE_ENGLISH + 7)
+#define  KT_CLOSE           (TABLE_ENGLISH + 8)
+#define  KT_BREAK           (TABLE_ENGLISH + 9)
+#define  KT_CELL            (TABLE_ENGLISH + 10)
+#define  KT_LINE            (TABLE_ENGLISH + 11)
+#define  KT_DLINE           (TABLE_ENGLISH + 12)
+#define  KT_TITLE           (TABLE_ENGLISH + 13)
+#define  KT_LEC             (TABLE_ENGLISH + 14)
+#define  KT_STRING          (TABLE_ENGLISH + 15)
+#define  KT_DATE            (TABLE_ENGLISH + 16)
+#define  KT_YMIN            (TABLE_ENGLISH + 17)
+#define  KT_YMAX            (TABLE_ENGLISH + 18)
+#define  KT_ZMIN            (TABLE_ENGLISH + 19)
+#define  KT_ZMAX            (TABLE_ENGLISH + 20)
+#define  KT_XGRID           (TABLE_ENGLISH + 21)
+#define  KT_YGRID           (TABLE_ENGLISH + 22)
+#define  KT_BOX             (TABLE_ENGLISH + 23)
+#define  KT_AXIS            (TABLE_ENGLISH + 24)
+#define  KT_ALGN            (TABLE_ENGLISH + 25)
+#define  KT_LAXIS           (TABLE_ENGLISH + 26)
+#define  KT_RAXIS           (TABLE_ENGLISH + 27)
+#define  KT_GRLINE          (TABLE_ENGLISH + 28)
+#define  KT_GRBAR           (TABLE_ENGLISH + 29)
+#define  KT_GRSCATTER       (TABLE_ENGLISH + 30)
 
 #define  KT_CHUNCK   5
 
@@ -1026,7 +1032,7 @@ typedef struct _tline_ {
 
 // TBL = Table (struct containing a table definition)
 typedef struct _tbl_ {
-    short   t_lang;     // Output language : KT_ENGLISH, KT_FRENCH, KT_DUTCH
+    short   t_lang;     // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
     short   t_free;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   t_nc;       // Number of columns (of text and lec, not calculated values)
     short   t_nl;       // Number of lines

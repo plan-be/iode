@@ -51,7 +51,7 @@ TBL *T_create(int dim)
 
     }
     T_NC(tbl)   = dim;
-    T_LANG(tbl) = KT_ENGLISH;
+    T_LANG(tbl) = TABLE_ENGLISH;
 
     tbl->t_zmin = (float)IODE_NAN;
     tbl->t_zmax = (float)IODE_NAN;

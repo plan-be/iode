@@ -179,7 +179,7 @@ TEST_F(TablesTest, Dimension)
 TEST_F(TablesTest, NotLineMethods)
 {
     EXPECT_EQ(table->get_language(), "English");
-    table->set_language(IT_FRENCH);
+    table->set_language(TABLE_FRENCH);
     EXPECT_EQ(table->get_language(), "French");
 
     EXPECT_FLOAT_EQ(table->t_zmin, (float) IODE_NAN);

@@ -3,7 +3,7 @@
 
 static void printTblOrVarToFile(const bool isTable, const QString& outputFile, const QChar& format, 
     const QString& names, const QString& gsample, const QStringList& files, const int nbDecimals, 
-    const EnumLang language)
+    const TableLang language)
 {
     QString args;
     QStringList args_names;
@@ -53,7 +53,7 @@ static void printTblOrVarToFile(const bool isTable, const QString& outputFile, c
 
 static void printTblOrVar(const bool isTable, QPrintPreviewDialog& dialog, QTextDocument& document, 
     const QString& names, const QString& gsample, const QStringList& files, const int nbDecimals, 
-    const EnumLang language)
+    const TableLang language)
 {
     QString args;
 
@@ -124,27 +124,27 @@ static void printTblOrVar(const bool isTable, QPrintPreviewDialog& dialog, QText
 }
 
 void printTableToFile(const QString& outputFile, const QChar& format, const QString& names, 
-    const QString& gsample, const QStringList& files, const int nbDecimals, const EnumLang language)
+    const QString& gsample, const QStringList& files, const int nbDecimals, const TableLang language)
 {
     printTblOrVarToFile(true, outputFile, format, names, gsample, files, nbDecimals, language);
 }
 
 void printTable(QPrintPreviewDialog& dialog, QTextDocument& document, 
     const QString& names, const QString& gsample, const QStringList& files, 
-    const int nbDecimals, const EnumLang language)
+    const int nbDecimals, const TableLang language)
 {
     printTblOrVar(true, dialog, document, names, gsample, files, nbDecimals, language);
 }
 
 void printVariableToFile(const QString& outputFile, const QChar& format, const QString& names, 
-    const QString& gsample, const QStringList& files, const int nbDecimals, const EnumLang language)
+    const QString& gsample, const QStringList& files, const int nbDecimals, const TableLang language)
 {
     printTblOrVarToFile(false, outputFile, format, names, gsample, files, nbDecimals, language);
 }
 
 void printVariable(QPrintPreviewDialog& dialog, QTextDocument& document, 
     const QString& names, const QString& gsample, const QStringList& files, 
-    const int nbDecimals, const EnumLang language)
+    const int nbDecimals, const TableLang language)
 {
     printTblOrVar(false, dialog, document, names, gsample, files, nbDecimals, language);
 }

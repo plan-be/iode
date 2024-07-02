@@ -52,5 +52,5 @@ public:
      * @param nbDecimals
      * @param language
      */
-    void run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language);
+    void run(const QString& filepath, const QString& parameters, const int nbDecimals, const TableLang language);
 };

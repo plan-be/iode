@@ -34,7 +34,7 @@ void VariablesView::print()
 			int NbDecimals = model_->get_precision();
 
 			// set the language
-			EnumLang lang = EnumLang::IT_ENGLISH;
+			TableLang lang = TableLang::TABLE_ENGLISH;
 
 			// build the generalized sample
 			Sample* smpl = Variables.get_sample();

@@ -17,7 +17,7 @@ const static QString TMP_FILENAME = "~dummy";
  * @note see C_ViewPrintGrTblVar() in sb_view.c from the old GUI
  */
 void printTableToFile(const QString& outputFile, const QChar& format, const QString& names, 
-    const QString& gsample, const QStringList& files, const int nbDecimals, const EnumLang language);
+    const QString& gsample, const QStringList& files, const int nbDecimals, const TableLang language);
 
 /**
  * @brief 
@@ -26,7 +26,7 @@ void printTableToFile(const QString& outputFile, const QChar& format, const QStr
  */
 void printTable(QPrintPreviewDialog& dialog, QTextDocument& document, 
     const QString& names, const QString& gsample, const QStringList& files, 
-    const int nbDecimals, const EnumLang language);
+    const int nbDecimals, const TableLang language);
 
 /**
  * @brief 
@@ -34,7 +34,7 @@ void printTable(QPrintPreviewDialog& dialog, QTextDocument& document,
  * @note see C_ViewPrintGrTblVar() in sb_view.c from the old GUI
  */
 void printVariableToFile(const QString& outputFile, const QChar& format, const QString& names, 
-    const QString& gsample, const QStringList& files, const int nbDecimals, const EnumLang language);
+    const QString& gsample, const QStringList& files, const int nbDecimals, const TableLang language);
 
 /**
  * @brief 
@@ -43,7 +43,7 @@ void printVariableToFile(const QString& outputFile, const QChar& format, const Q
  */
 void printVariable(QPrintPreviewDialog& dialog, QTextDocument& document, 
     const QString& names, const QString& gsample, const QStringList& files, 
-    const int nbDecimals, const EnumLang language);
+    const int nbDecimals, const TableLang language);
 
 /**
  * @brief Set the Print Dest object
@@ -100,7 +100,7 @@ inline void setNbDecimals(const int nbDecimals)
  * 
  * @param lang 
  */
-inline void setLang(const EnumLang lang)
+inline void setLang(const TableLang lang)
 {
     if(lang > 2)
         throw IodeException("Invalid language.\nExpected value 0 (English), 1 (FRENCH), 2 (DUTCH)");

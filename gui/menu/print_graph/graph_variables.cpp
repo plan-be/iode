@@ -19,7 +19,7 @@ MenuGraphVariables::MenuGraphVariables(QWidget* parent) :
     QList<QString> q_axis_ticks;
     for(const std::string& axis_ticks: vGraphsAxisThicks) q_axis_ticks << QString::fromStdString(axis_ticks);
     QList<QString> q_langs;
-    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+    for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
     wVariables = new WrapperQPlainTextEdit(label_variables->text(), *textEdit_variables, REQUIRED_FIELD);
     wVarMode = new WrapperComboBox(label_x_axis_type->text(), *comboBox_x_axis_type, REQUIRED_FIELD, q_var_modes);
@@ -102,7 +102,7 @@ void MenuGraphVariables::display()
         }
         
         // not used
-        EnumLang lang = (EnumLang) wLanguage->extractAndVerify();
+        TableLang lang = (TableLang) wLanguage->extractAndVerify();
 
         // build the plot
         plotDialog->plot();

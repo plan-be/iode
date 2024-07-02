@@ -3,7 +3,7 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport (EnumLang, EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
+from pyiode.common cimport (TableLang, EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
                             EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType)
 
 
@@ -85,7 +85,7 @@ cdef extern from "cpp_api/objects/table.h":
         short nb_columns()
 
         string get_language()
-        void set_language(EnumLang lang) except +
+        void set_language(TableLang lang) except +
 
         EnumGraphGrid get_gridx()
         void set_gridx(EnumGraphGrid gridx) except +

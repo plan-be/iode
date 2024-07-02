@@ -7,7 +7,7 @@ MenuFileImportVariables::MenuFileImportVariables(QWidget* parent) :
     setupUi(this);
 
     QList<QString> q_langs;
-    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+    for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
     wRuleFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
