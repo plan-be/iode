@@ -91,18 +91,18 @@ int     from, to, pos;
 	if(lin) memcpy(lout, lin, sizeof(TLINE));
 	lout->tl_val = clout;
 	switch(type) {
-	    case KT_TITLE :
+	    case TABLE_LINE_TITLE :
 		tmp = clout->tc_val;
 		if(clin) memcpy(clout, clin, sizeof(TCELL));
 		clout->tc_val = tmp;
 		T_set_string_cell(clout, T_cell_cont(clin, 0));
 		break;
-	    case KT_CELL  :
+	    case TABLE_LINE_CELL  :
 		for(j = 0 ; j < T_NC(tbin) && j < T_NC(tbout) ; j++) {
 		    tmp = clout[j].tc_val;
 		    if(clin) memcpy(clout + j, clin + j, sizeof(TCELL));
 		    clout[j].tc_val = tmp;
-		    if(clout[j].tc_type == KT_STRING)
+		    if(clout[j].tc_type == TABLE_CELL_STRING)
 			T_set_string_cell(clout + j, T_cell_cont(clin + j, 0));
 		    else
 			T_set_lec_cell(clout + j, T_cell_cont(clin + j, 0));
@@ -166,7 +166,7 @@ int     i;
 
 /* =========== FIN DES FONCTIONS c-L c-U ... ========== */
 
-char    TAB_HLINE[] = "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ";
+char    TAB_HLINE[] = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
 
 char *T_get_div(tbl, j)
 TBL *tbl;
@@ -293,13 +293,13 @@ int i;
     if(i == 1) return(TAB_HLINE);
     i -= 2;
     line = tbl->t_line + i;
-    if(line->tl_type == KT_LINE) return(TAB_HLINE);
+    if(line->tl_type == TABLE_LINE_SEP) return(TAB_HLINE);
     switch(line->tl_type) {
-	case KT_MODE  : return("Mode");
-	case KT_DATE  : return("Date");
-	case KT_FILES : return("Files");
-	case KT_TITLE : return("Title");
-	case KT_CELL  : return("Cells");
+	case TABLE_LINE_MODE  : return("Mode");
+	case TABLE_LINE_DATE  : return("Date");
+	case TABLE_LINE_FILES : return("Files");
+	case TABLE_LINE_TITLE : return("Title");
+	case TABLE_LINE_CELL  : return("Cells");
 /*                       res[0] = 'C';
 			res[1] = "LSBM"[line->tl_graph];
 			res[2] = 0;
@@ -318,8 +318,8 @@ int             j, nb;
     return(0);
 
 /*    SCR_pad(text, nb);
-    if(cell[j].tc_attr & KT_CENTER) U_center_text(text);
-    if(cell[j].tc_attr & KT_RIGHT) U_rjust_text(text);
+    if(cell[j].tc_attr & TABLE_CELL_CENTER) U_center_text(text);
+    if(cell[j].tc_attr & TABLE_CELL_RIGHT) U_rjust_text(text);
 /* JMP 02-06-97 */
 }
 
@@ -358,12 +358,12 @@ int     i, j;
     line = tbl->t_line + i;
     cell = (TCELL *) line->tl_val;
     switch(line->tl_type) {
-	case KT_TITLE : if(j > 0) return(0);
-	case KT_CELL :
+	case TABLE_LINE_TITLE : if(j > 0) return(0);
+	case TABLE_LINE_CELL :
 	    if(cell == 0)               return(0);
 	    attr = cell[j].tc_attr;
-	    if(attr & KT_CENTER)        return(1);
-	    else if(attr & KT_RIGHT)    return(2);
+	    if(attr & TABLE_CELL_CENTER)        return(1);
+	    else if(attr & TABLE_CELL_RIGHT)    return(2);
 	    return(0);
 	default : return(0);
 	}
@@ -381,13 +381,13 @@ int     i, j;
     line = tbl->t_line + i;
     cell = (TCELL *) line->tl_val;
     switch(line->tl_type) {
-	case KT_TITLE : if(j > 0) return(0);
-	case KT_CELL :
+	case TABLE_LINE_TITLE : if(j > 0) return(0);
+	case TABLE_LINE_CELL :
 	    if(cell == 0)                              return(0);
 	    attr = cell[j].tc_attr;
-	    if((attr & KT_ITALIC) && (attr & KT_BOLD)) return(3);
-	    else if(attr & KT_BOLD)                    return(2);
-	    else if(attr & KT_ITALIC)                  return(1);
+	    if((attr & TABLE_CELL_ITALIC) && (attr & TABLE_CELL_BOLD)) return(3);
+	    else if(attr & TABLE_CELL_BOLD)                    return(2);
+	    else if(attr & TABLE_CELL_ITALIC)                  return(1);
 	    return(0);
 	default : return(0);
 	}
@@ -422,14 +422,14 @@ int     i, j, type;
     line = tbl->t_line + i;
     cell = (TCELL *) line->tl_val;
     switch(line->tl_type) {
-	case KT_TITLE : if(j > 0) break;
-	case KT_CELL :
+	case TABLE_LINE_TITLE : if(j > 0) break;
+	case TABLE_LINE_CELL :
 	    if(cell) {
 		attr = cell[j].tc_attr;
-		if((attr & KT_ITALIC) && (attr & KT_BOLD))
+		if((attr & TABLE_CELL_ITALIC) && (attr & TABLE_CELL_BOLD))
 						scrattr = ATTR_BI;
-		else if(attr & KT_BOLD)         scrattr = ATTR_B;
-		else if(attr & KT_ITALIC)       scrattr = ATTR_I;
+		else if(attr & TABLE_CELL_BOLD)         scrattr = ATTR_B;
+		else if(attr & TABLE_CELL_ITALIC)       scrattr = ATTR_I;
 		}
 	    break;
 	}
@@ -458,12 +458,12 @@ int i, j;
     cell = (TCELL *) line->tl_val;
     STATIC_BUF[0] = 0;
     switch(line->tl_type) {
-	case KT_LINE  : return(TAB_HLINE);
-	case KT_MODE  :
-	case KT_DATE  :
-	case KT_FILES : break;
-	case KT_TITLE : if(rj > 0) break;
-	case KT_CELL  : TAB_align_cell(STATIC_BUF, cell, rj, lg);
+	case TABLE_LINE_SEP  : return(TAB_HLINE);
+	case TABLE_LINE_MODE  :
+	case TABLE_LINE_DATE  :
+	case TABLE_LINE_FILES : break;
+	case TABLE_LINE_TITLE : if(rj > 0) break;
+	case TABLE_LINE_CELL  : TAB_align_cell(STATIC_BUF, cell, rj, lg);
 			break;
 	}
     return(STATIC_BUF);
@@ -609,22 +609,22 @@ YYKEYS TSCRL_SCMTS[] = {
     "Test",       SCR_F7,
     "Graph",      SCR_F8,
     "Save Table", SCR_F10,
-    "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ",   0,
+    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   0,
     "Modify Cell",SCR_ENTER,
     "Delete Line",SCR_DELETE,
     "New Line",   SCR_INSERT,
-    "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ",   0,
+    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   0,
     "Maximize",   SCR_C_X,
     "Move",       SCR_C_O,
     "Resize",     SCR_C_Z,
-    "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ",   0,
+    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   0,
     "Mark line",  SCR_C_L,
     "Unmark"   ,  SCR_C_U,
     "Copy block", SCR_C_C,
     "Delete block",SCR_C_L,
     "Copy->buffer",SCR_C_Y,
     "Paste Buffer",SCR_C_P,
-    "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ",   0,
+    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",   0,
     "Quit",       SCR_ESCAPE,
     0, 0
 };
@@ -754,8 +754,8 @@ int     *type;
     else {
 	line = tbl->t_line + i;
 	switch(line->tl_type) {
-	    case KT_CELL  : *type = 0; break;
-	    case KT_TITLE : if(j > 0) return(-1);
+	    case TABLE_LINE_CELL  : *type = 0; break;
+	    case TABLE_LINE_TITLE : if(j > 0) return(-1);
 			    *type = 2; break;
 	    default       : return(-1);
 	    }
@@ -858,8 +858,8 @@ int     i, j;
     else {
 	line = tbl->t_line + i;
 	switch(line->tl_type) {
-	    case KT_CELL  : type = 0; break;
-	    case KT_TITLE : if(j > 0) return(-1);
+	    case TABLE_LINE_CELL  : type = 0; break;
+	    case TABLE_LINE_TITLE : if(j > 0) return(-1);
 			    type = 2; break;
 	    default       : return(-1);
 	    }
@@ -984,18 +984,18 @@ int i, j;
 
     if(i < 0) return(-1);
     switch(line->tl_type) {
-	case KT_TITLE : if(j > 0) return(-1); /* JMP 11-11-93 */
-	case KT_CELL  : break;                /* JMP 11-11-93 */
+	case TABLE_LINE_TITLE : if(j > 0) return(-1); /* JMP 11-11-93 */
+	case TABLE_LINE_CELL  : break;                /* JMP 11-11-93 */
 	default :       return(-1);           /* JMP 11-11-93 */
 	}
     cell = (TCELL *)line->tl_val;
     cell += j;
 
     attr = cell->tc_attr;
-    if((attr & KT_BOLD) && (attr & KT_ITALIC)) attr = KT_SETFONT(attr, 0);
-    else if(attr & KT_BOLD)        attr = KT_SETFONT(attr, KT_ITALIC);
-    else if(attr & KT_ITALIC)      attr = KT_SETFONT(attr, KT_ITALIC | KT_BOLD);
-    else attr = KT_SETFONT(attr, KT_BOLD);
+    if((attr & TABLE_CELL_BOLD) && (attr & TABLE_CELL_ITALIC)) attr = TABLE_CELL_SETFONT(attr, 0);
+    else if(attr & TABLE_CELL_BOLD)        attr = TABLE_CELL_SETFONT(attr, TABLE_CELL_ITALIC);
+    else if(attr & TABLE_CELL_ITALIC)      attr = TABLE_CELL_SETFONT(attr, TABLE_CELL_ITALIC | TABLE_CELL_BOLD);
+    else attr = TABLE_CELL_SETFONT(attr, TABLE_CELL_BOLD);
     cell->tc_attr = attr;
     return(-1);
 }
@@ -1012,12 +1012,12 @@ int i, j;
     cell = (TCELL *)line->tl_val;
     cell += j;
     attr = cell->tc_attr;
-    if(cell->tc_type == KT_LEC) attr = KT_ALIGN(attr, KT_DECIMAL);
-    else if(attr & KT_DECIMAL)  attr = KT_LEFT;
+    if(cell->tc_type == TABLE_CELL_LEC) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_DECIMAL);
+    else if(attr & TABLE_CELL_DECIMAL)  attr = TABLE_CELL_LEFT;
 
-    if(attr & KT_CENTER)        attr = KT_ALIGN(attr, KT_RIGHT);
-    else if(attr & KT_RIGHT)    attr = KT_ALIGN(attr, KT_LEFT);
-    else if(attr & KT_LEFT)     attr = KT_ALIGN(attr, KT_CENTER);
+    if(attr & TABLE_CELL_CENTER)        attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_RIGHT);
+    else if(attr & TABLE_CELL_RIGHT)    attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_LEFT);
+    else if(attr & TABLE_CELL_LEFT)     attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);
 
     cell->tc_attr = attr;
     return(-1);
@@ -1037,21 +1037,21 @@ int i, j;
     if(i < 0) goto fin;
     cell = (TCELL *)line->tl_val;
     cell += j;
-    if(line->tl_type == KT_LINE ||
-	line->tl_type == KT_MODE ||
-	line->tl_type == KT_DATE ||
-	line->tl_type == KT_FILES ) goto fin;
-    if(line->tl_type == KT_TITLE && j > 0) goto fin;
+    if(line->tl_type == TABLE_LINE_SEP ||
+	line->tl_type == TABLE_LINE_MODE ||
+	line->tl_type == TABLE_LINE_DATE ||
+	line->tl_type == TABLE_LINE_FILES ) goto fin;
+    if(line->tl_type == TABLE_LINE_TITLE && j > 0) goto fin;
     attr = cell->tc_attr;
     sprintf(buf, "[%d, %d] ", i + 1, j + 1);
-    if(attr & KT_BOLD)      strcat(buf, "BOLD ");
-    if(attr & KT_ITALIC)    strcat(buf, "ITALIC ");
-    if(attr & KT_UNDERLINE) strcat(buf, "UNDERLINE ");
+    if(attr & TABLE_CELL_BOLD)      strcat(buf, "BOLD ");
+    if(attr & TABLE_CELL_ITALIC)    strcat(buf, "ITALIC ");
+    if(attr & TABLE_CELL_UNDERLINE) strcat(buf, "UNDERLINE ");
 
-    if(attr & KT_CENTER)    strcat(buf, "CENTER ");
-    if(attr & KT_DECIMAL)   strcat(buf, "DECIMAL ");
-    if(attr & KT_LEFT)      strcat(buf, "LEFT ");
-    if(attr & KT_RIGHT)     strcat(buf, "RIGHT ");
+    if(attr & TABLE_CELL_CENTER)    strcat(buf, "CENTER ");
+    if(attr & TABLE_CELL_DECIMAL)   strcat(buf, "DECIMAL ");
+    if(attr & TABLE_CELL_LEFT)      strcat(buf, "LEFT ");
+    if(attr & TABLE_CELL_RIGHT)     strcat(buf, "RIGHT ");
 fin:
     kmsg(buf);
     return(0);

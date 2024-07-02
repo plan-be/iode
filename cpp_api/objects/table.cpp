@@ -8,18 +8,18 @@
 static void copy_cell(TCELL* c_cell_dest, const TCELL* c_cell_src)
 {
 	unsigned char* cell_src_content = (unsigned char*) T_cell_cont(const_cast<TCELL*>(c_cell_src), 0);
-	if (c_cell_src->tc_type == IT_LEC) 
+	if (c_cell_src->tc_type == TABLE_CELL_LEC) 
 		T_set_lec_cell(c_cell_dest, cell_src_content);
 	else 
 		T_set_string_cell(c_cell_dest, cell_src_content);
 	c_cell_dest->tc_attr = c_cell_src->tc_attr;
 }
 
-TableCell::TableCell(const EnumCellType cell_type, const std::string& content, const EnumCellAlign align, 
+TableCell::TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align, 
 	const bool bold, const bool italic, const bool underline)
 {
 	this->tc_type = (char) cell_type;
-	if(cell_type == EnumCellType::IT_STRING)
+	if(cell_type == TableCellType::TABLE_CELL_STRING)
 		set_text(content);
 	else
 		set_lec(content);
@@ -40,7 +40,7 @@ void TableCell::free()
 // -> see T_set_lec_cell from k_tbl.c
 CLEC* TableCell::get_compiled_lec()
 {
-	if(tc_type != IT_LEC)
+	if(tc_type != TABLE_CELL_LEC)
 		throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
 
 	if(tc_val == NULL)
@@ -60,7 +60,7 @@ std::string TableCell::get_content(const bool quotes) const
 {
 	int mode = quotes ? 1 : 0;
 	std::string content_oem = std::string(T_cell_cont((TCELL*) this, mode));
-	std::string content = (tc_type == IT_STRING) ? oem_to_utf8(content_oem) : content_oem;
+	std::string content = (tc_type == TABLE_CELL_STRING) ? oem_to_utf8(content_oem) : content_oem;
 	return content;
 }
 
@@ -93,7 +93,7 @@ void TableCell::set_lec(const std::string& lec)
  * 
  * @param content 
  * 
- * @note When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+ * @note When inserting a new line of type TABLE_CELL, the attribute TCELL::tc_type of cells is undefined!
  *       See function `T_create_cell()` in file `k_tbl.c` from the C API 
  */
 void TableCell::set_content(const std::string& content)
@@ -104,23 +104,23 @@ void TableCell::set_content(const std::string& content)
 		set_lec(content);
 }
 
-EnumCellType TableCell::get_type() const
+TableCellType TableCell::get_type() const
 {
-	return static_cast<EnumCellType>(tc_type);
+	return static_cast<TableCellType>(tc_type);
 }
 
-void TableCell::set_type(const EnumCellType cell_type)
+void TableCell::set_type(const TableCellType cell_type)
 {
 	this->tc_type = cell_type;
 }
 
 // TODO: check if it is correct
-EnumCellAlign TableCell::get_align() const
+TableCellAlign TableCell::get_align() const
 {
-	return static_cast<EnumCellAlign>((int) (this->tc_attr / 8) * 8);
+	return static_cast<TableCellAlign>((int) (this->tc_attr / 8) * 8);
 }
 
-void TableCell::set_align(const EnumCellAlign align)
+void TableCell::set_align(const TableCellAlign align)
 {
 	char font = ((int) this->tc_attr) % 8;
 	this->tc_attr = ((char) align) + font;
@@ -191,11 +191,11 @@ static void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_c
 
 	switch (c_cell_src->tl_type)
 	{
-	case IT_TITLE:
+	case TABLE_LINE_TITLE:
 		cell_src_content = (unsigned char*) T_cell_cont(cells_src, 0);
 		T_set_string_cell(cells_dest, cell_src_content);
 		break;
-	case IT_CELL:
+	case TABLE_LINE_CELL:
 		for (int col = 0; col < nb_columns; col++) 
 			copy_cell(&cells_dest[col], &cells_src[col]);
 		break;
@@ -204,7 +204,7 @@ static void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_c
 	}
 }
 
-TableLine::TableLine(const EnumLineType line_type, const EnumGraphType graph_type, const bool axis_left)
+TableLine::TableLine(const TableLineType line_type, const TableGraphType graph_type, const bool axis_left)
 {
 	this->tl_type = (char) line_type;
 	this->tl_val = NULL;
@@ -220,22 +220,22 @@ void TableLine::free(const int nb_cells)
 	T_free_line(this, nb_cells);
 }
 
-EnumLineType TableLine::get_line_type() const
+TableLineType TableLine::get_line_type() const
 {
-	return static_cast<EnumLineType>(tl_type);
+	return static_cast<TableLineType>(tl_type);
 }
 
-void TableLine::set_line_type(const EnumLineType line_type)
+void TableLine::set_line_type(const TableLineType line_type)
 {
 	tl_type = line_type;
 }
 
-EnumGraphType TableLine::get_line_graph() const
+TableGraphType TableLine::get_line_graph() const
 {
-	return static_cast<EnumGraphType>(tl_graph);
+	return static_cast<TableGraphType>(tl_graph);
 }
 
-void TableLine::set_line_graph(const EnumGraphType graph_type)
+void TableLine::set_line_graph(const TableGraphType graph_type)
 {
 	tl_graph = graph_type;
 }
@@ -265,14 +265,14 @@ TableCell* TableLine::get_cell(const int column, const int nb_cells) const
 	if(column < 0)
 		throw std::invalid_argument("Table cell position cannot be negative");
 
-	EnumLineType line_type = (EnumLineType) this->tl_type;
-	if(line_type != IT_TITLE && line_type != IT_CELL)
+	TableLineType line_type = (TableLineType) this->tl_type;
+	if(line_type != TABLE_LINE_TITLE && line_type != TABLE_LINE_CELL)
 		throw std::runtime_error("Table line of type " + get_line_type_as_string(line_type) + " has no cells"); 
 
-	if(line_type == IT_TITLE && column > 0)
+	if(line_type == TABLE_LINE_TITLE && column > 0)
 		throw std::invalid_argument("Table cell position for a TITLE line must be 0");
 
-	if(line_type == IT_CELL && column >= nb_cells)
+	if(line_type == TABLE_LINE_CELL && column >= nb_cells)
 		throw std::invalid_argument("Table cell position cannot exceed " + std::to_string(nb_cells));
 
 	TableCell* cells = reinterpret_cast<TableCell*>(this->tl_val);
@@ -288,9 +288,9 @@ bool TableLine::equals(const TableLine& other, const int nb_cells) const
 
 	TableCell* cells = (TableCell*) tl_val;
 	TableCell* cells_other = (TableCell*) other.tl_val;
-	if(tl_type == IT_TITLE)
+	if(tl_type == TABLE_LINE_TITLE)
 		return cells->get_content(false) == cells_other->get_content(false);
-	else if(tl_type == IT_CELL)
+	else if(tl_type == TABLE_LINE_CELL)
 	{
 		for (int col = 0; col < nb_cells; col++) 
 			if(cells[col] != cells_other[col]) return false;
@@ -353,13 +353,13 @@ std::size_t hash_value(TLINE const& c_line)
 	TCELL* cell;
 	switch(c_line.tl_type)
 	{
-	case IT_TITLE:
+	case TABLE_LINE_TITLE:
 		cells = (TCELL*) c_line.tl_val;
 		boost::hash_combine(seed, cells->tc_type);
 		boost::hash_combine(seed, cells->tc_attr);
 		boost::hash_combine(seed, std::string(cells->tc_val));
 		break;
-	case IT_CELL:
+	case TABLE_LINE_CELL:
 		cells = (TCELL*) c_line.tl_val;
 		for(int col = 0; col < _nb_columns_; col++)
 		{
@@ -385,7 +385,7 @@ void Table::initialize(const int nb_columns)
 	//                  - initializes t_nc, t_lang, t_zmin, t_zmax, t_ymin, t_ymax and t_div
 	TBL* c_table = T_create(nb_columns);
 
-    t_div.tl_type = KT_CELL;
+    t_div.tl_type = TABLE_LINE_CELL;
     t_div.tl_val  = SW_nalloc(nb_columns * sizeof(TCELL));
 	copy_line(nb_columns, &t_div, &c_table->t_div);
 
@@ -399,13 +399,13 @@ void Table::initialize(const int nb_columns)
 
 	t_nl = 0;
 	t_line = NULL;
-	t_attr = IT_NORMAL;
+	t_attr = TABLE_CELL_NORMAL;
 	t_box = 0;
 	t_shadow = 0;
-	t_gridx = IG_MAJOR;
-	t_gridy = IG_MAJOR;
-	t_axis = IG_VALUES;
-	t_align = IG_LEFT;
+	t_gridx = TABLE_GRAPH_MAJOR;
+	t_gridy = TABLE_GRAPH_MAJOR;
+	t_axis = TABLE_GRAPH_VALUES;
+	t_align = TABLE_GRAPH_LEFT;
 }
 
 void Table::copy_from_TBL_obj(const TBL* obj)
@@ -424,25 +424,25 @@ void Table::copy_from_TBL_obj(const TBL* obj)
 		lines = &obj->t_line[i];
 		switch (lines->tl_type)
 		{
-		case IT_TITLE:
-			T_insert_line(this, t_nl - 1, IT_TITLE, 0);
+		case TABLE_LINE_TITLE:
+			T_insert_line(this, t_nl - 1, TABLE_LINE_TITLE, 0);
 			copy_line(t_nc, &t_line[i], &obj->t_line[i]);
 			break;
-		case IT_CELL:
-			T_insert_line(this, t_nl - 1, IT_CELL, 0);
+		case TABLE_LINE_CELL:
+			T_insert_line(this, t_nl - 1, TABLE_LINE_CELL, 0);
 			copy_line(t_nc, &t_line[i], &obj->t_line[i]);
 			break;
-		case IT_LINE:
-			T_insert_line(this, t_nl - 1, IT_LINE, 0);
+		case TABLE_LINE_SEP:
+			T_insert_line(this, t_nl - 1, TABLE_LINE_SEP, 0);
 			break;
-		case IT_MODE:
-			T_insert_line(this, t_nl - 1, IT_MODE, 0);
+		case TABLE_LINE_MODE:
+			T_insert_line(this, t_nl - 1, TABLE_LINE_MODE, 0);
 			break;
-		case IT_FILES:
-			T_insert_line(this, t_nl - 1, IT_FILES, 0);
+		case TABLE_LINE_FILES:
+			T_insert_line(this, t_nl - 1, TABLE_LINE_FILES, 0);
 			break;
-		case IT_DATE:
-			T_insert_line(this, t_nl - 1, IT_DATE, 0);
+		case TABLE_LINE_DATE:
+			T_insert_line(this, t_nl - 1, TABLE_LINE_DATE, 0);
 			break;
 		default:
 			break;
@@ -605,12 +605,12 @@ void Table::extend()
 
 std::string Table::get_language() const
 {
-	return vLangs.at(t_lang - KT_ENGLISH);
+	return v_table_langs.at(t_lang - TABLE_ENGLISH);
 }
 
-void Table::set_language(const EnumLang lang)
+void Table::set_language(const TableLang lang)
 {
-	t_lang = lang + KT_ENGLISH;
+	t_lang = (short) lang;
 }
 
 short Table::nb_columns() const
@@ -623,42 +623,42 @@ short Table::nb_lines() const
 	return t_nl;
 }
 
-EnumGraphGrid Table::get_gridx() const
+TableGraphGrid Table::get_gridx() const
 {
-	return static_cast<EnumGraphGrid>(t_gridx);
+	return static_cast<TableGraphGrid>(t_gridx);
 }
 
-void Table::set_gridx(const EnumGraphGrid gridx)
+void Table::set_gridx(const TableGraphGrid gridx)
 {
-	t_gridx = gridx - IG_MAJOR;
+	t_gridx = gridx - TABLE_GRAPH_MAJOR;
 }
 
-EnumGraphGrid Table::get_gridy() const
+TableGraphGrid Table::get_gridy() const
 {
-	return static_cast<EnumGraphGrid>(t_gridy);
+	return static_cast<TableGraphGrid>(t_gridy);
 }
 
-void Table::set_gridy(const EnumGraphGrid gridy)
+void Table::set_gridy(const TableGraphGrid gridy)
 {
 	t_gridy = gridy;
 }
 
-EnumGraphAxis Table::get_graph_axis() const
+TableGraphAxis Table::get_graph_axis() const
 {
-	return static_cast<EnumGraphAxis>(t_axis);
+	return static_cast<TableGraphAxis>(t_axis);
 }
 
-void Table::set_graph_axis(const EnumGraphAxis axis)
+void Table::set_graph_axis(const TableGraphAxis axis)
 {
 	t_axis = axis;
 }
 
-EnumGraphAlign Table::get_graph_alignment() const
+TableGraphAlign Table::get_graph_alignment() const
 {
-	return static_cast<EnumGraphAlign>(t_align);
+	return static_cast<TableGraphAlign>(t_align);
 }
 
-void Table::set_graph_alignment(const EnumGraphAlign align)
+void Table::set_graph_alignment(const TableGraphAlign align)
 {
 	t_align = align;
 }
@@ -674,14 +674,14 @@ TableLine* Table::get_line(const int row)
 	return static_cast<TableLine*>(&this->t_line[row]);
 }
 
-TableLine* Table::insert_line(const int pos, const EnumLineType line_type, const bool after)
+TableLine* Table::insert_line(const int pos, const TableLineType line_type, const bool after)
 {
 	if (pos < 0 || pos > nb_lines())
 		throw std::invalid_argument("Cannot insert table line at index " + std::to_string(pos) + ".\n" +  
 			"New line index must be in range [0, " + std::to_string(nb_lines() - 1) + "]");
 
 	int where_ = after ? 0 : 1;
-	// WARNING: When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+	// WARNING: When inserting a new line of type TABLE_CELL, the attribute TCELL::tc_type of cells is undefined!
 	int new_pos = T_insert_line(this, pos, line_type, where_);
 	if (new_pos < 0) 
 		throw IodeExceptionFunction("Cannot insert table line at position " + std::to_string(pos), "Unknown");
@@ -701,7 +701,7 @@ TableLine* Table::get_divider_line()
 // we assume that title string is written in UTF8 format
 TableLine* Table::insert_title(const int pos, const std::string& title, const bool after)
 {
-	TableLine* title_line = insert_line(pos, IT_TITLE, after);
+	TableLine* title_line = insert_line(pos, TABLE_LINE_TITLE, after);
 	title_line->get_cell(0, t_nc)->set_text(title);
 	return title_line;
 }
@@ -714,7 +714,7 @@ TableLine* Table::add_title(const std::string& title)
 std::string Table::get_title(const int row)
 {
 	TableLine* line = get_line(row);
-	if(line->get_line_type() != EnumLineType::IT_TITLE) 
+	if(line->get_line_type() != TableLineType::TABLE_LINE_TITLE) 
 		throw std::invalid_argument("Cannot get title at line index " + std::to_string(row) + ".\n" +
 			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
 			get_line_type_as_string(line->get_line_type()) + ".");
@@ -725,7 +725,7 @@ std::string Table::get_title(const int row)
 void Table::set_title(const int row, const std::string title)
 {
 	TableLine* line = get_line(row);
-	if(line->get_line_type() != EnumLineType::IT_TITLE) 
+	if(line->get_line_type() != TableLineType::TABLE_LINE_TITLE) 
 		throw std::invalid_argument("Cannot set table title at index " + std::to_string(row) + ".\n" + 
 			"Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
 			get_line_type_as_string(line->get_line_type()) + ".");
@@ -736,7 +736,7 @@ void Table::set_title(const int row, const std::string title)
 
 TableLine* Table::insert_line_with_cells(const int pos, const bool after)
 {
-	return insert_line(pos, IT_CELL, after);
+	return insert_line(pos, TABLE_LINE_CELL, after);
 }
 
 TableLine* Table::add_line_with_cells()
@@ -748,7 +748,7 @@ TableLine* Table::add_line_with_cells()
 
 TableLine* Table::insert_line_separator(const int pos, const bool after)
 {
-	return insert_line(pos, IT_LINE, after);
+	return insert_line(pos, TABLE_LINE_SEP, after);
 }
 
 TableLine* Table::add_line_separator()
@@ -760,7 +760,7 @@ TableLine* Table::add_line_separator()
 
 TableLine* Table::insert_line_mode(const int pos, const bool after)
 {
-	return insert_line(pos, IT_MODE, after);
+	return insert_line(pos, TABLE_LINE_MODE, after);
 }
 
 TableLine* Table::add_line_mode()
@@ -772,7 +772,7 @@ TableLine* Table::add_line_mode()
 
 TableLine* Table::insert_line_files(const int pos, const bool after)
 {
-	return insert_line(pos, IT_FILES, after);
+	return insert_line(pos, TABLE_LINE_FILES, after);
 }
 
 TableLine* Table::add_line_files()
@@ -784,7 +784,7 @@ TableLine* Table::add_line_files()
 
 TableLine* Table::insert_line_date(const int pos, const bool after)
 {
-	return insert_line(pos, IT_DATE, after);
+	return insert_line(pos, TABLE_LINE_DATE, after);
 }
 
 TableLine* Table::add_line_date()

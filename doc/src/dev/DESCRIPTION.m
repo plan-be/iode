@@ -526,13 +526,13 @@ Functions to manage TBL objects.
 | ~cvoid T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.
 | ~cvoid T_free_cell(TCELL* cell)                                                              | Frees a TCELL struct.
 | ~cint T_add_line(TBL* tbl)                                                                   | Extents a TBL by adding at least one line.
-| ~cTCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type KT_CELL. 
-| ~cTCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type KT_TITLE. 
+| ~cTCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type TABLE_LINE_CELL. 
+| ~cTCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type TABLE_LINE_TITLE. 
 | ~cchar* T_cell_cont(TCELL* cell, int mode)                                                   | Returns the formated contents of a TCELL.
 | ~cint T_insert_line(TBL* tbl, int nbr, int type, int where)                                  | Inserts a TLINE in a TBL.
 | ~cint T_set_lec_cell(TCELL* cell, unsigned char* lec)                                        | Assigns a LEC expression to a TCELL. Checks the syntax.
 | ~cvoid T_set_string_cell(TCELL* cell, unsigned char* txt)                                    | Assigns a TEXT to a TCELL.
-| ~cvoid T_set_cell_attr(TBL* tbl, int i, int j, int attr)                                     | Assigns justification (KT_CENTER...) and typographic (KT_BOLD...) attributes to a TCELL.
+| ~cvoid T_set_cell_attr(TBL* tbl, int i, int j, int attr)                                     | Assigns justification (TABLE_CELL_CENTER...) and typographic (TABLE_CELL_BOLD...) attributes to a TCELL.
 | ~cint T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
 | ~cvoid T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
 ..te

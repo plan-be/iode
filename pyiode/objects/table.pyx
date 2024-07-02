@@ -6,8 +6,15 @@ from typing import Union, Tuple, List, Dict, Optional
 
 from libcpp.string cimport string
 from cython.operator cimport dereference
-from pyiode.common cimport (EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
-                            EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType)
+from pyiode.common cimport TableLang as CTableLang
+from pyiode.common cimport TableCellType as CTableCellType 
+from pyiode.common cimport TableCellFont as CTableCellFont
+from pyiode.common cimport TableCellAlign as CTableCellAlign 
+from pyiode.common cimport TableLineType as CTableLineType
+from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
+from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
+from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
+from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
 from pyiode.iode_database.cpp_api_database cimport load_reference_kdb
@@ -21,7 +28,7 @@ cdef class TableCell:
     IODE Table cell.
 
     Cells in TITLE and CELL lines can contain text. Cells in CELL lines can also contain LEC expressions. 
-    Cells of other line types (LINE, FILES, MODE and DATE) do not contain any information, as this would 
+    Cells of other line types (SEP, FILES, MODE and DATE) do not contain any information, as this would 
     not result in printing.
 
     Interpolation Of Text Cells
@@ -233,7 +240,7 @@ cdef class TableCell:
             value = value.upper()
             value = TableCellAlign[value]
         value = int(value)
-        self.c_cell.set_align(<EnumCellAlign>value)
+        self.c_cell.set_align(<CTableCellAlign>value)
 
     @property
     def bold(self) -> bool:
@@ -378,7 +385,7 @@ cdef class TableLine:
                 In fact, both columns can be either text or a LEC form, but the point of placing a LEC form in the first 
                 column is not obvious. On the other hand, you can place two headings in both columns, or at least leave the 
                 second column empty to mark a separation in the table. 
-        - LINE: this type of line can contain neither text nor LEC shapes: it's simply a dividing line in the middle of the table.
+        - SEP: this type of line can contain neither text nor LEC shapes: it's simply a dividing line in the middle of the table.
         - FILES: when printed, this line will contain the names of files containing printed data extending across the entire 
                  width of the table. If several files are printed in comparison, this line is automatically multiplied. 
                  No data (text or LEC) can be encoded in the columns of this line type. 
@@ -390,9 +397,9 @@ cdef class TableLine:
     Attributes
     ----------
     line_type: TableLineType
-        Type of the table line. Possible values are TITLE, CELL, LINE, MODE, FILES or DATE.
+        Type of the table line. Possible values are TITLE, CELL, SEP, MODE, FILES or DATE.
 
-    graph_type: TableLineGraph
+    graph_type: TableGraphType
         Graph type associated with the table line. Possible values are LINE, SCATTER or BAR.
 
     axis_left: bool 
@@ -468,7 +475,7 @@ cdef class TableLine:
     def line_type(self) -> str:
         """
         Type of the table line.
-        Possible values are TITLE, CELL, LINE, MODE, FILES or DATE.
+        Possible values are TITLE, CELL, SEP, MODE, FILES or DATE.
 
         Returns
         -------
@@ -517,12 +524,12 @@ cdef class TableLine:
 
         Parameters
         ----------
-        value: TableLineGraph
+        value: TableGraphType
             Possible values are LINE, SCATTER or BAR.
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, TableLineGraph
+        >>> from iode import SAMPLE_DATA_DIR, TableGraphType
         >>> from iode import tables, Table
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
         >>> table = tables["ANAPRIX"]
@@ -551,21 +558,21 @@ cdef class TableLine:
         >>> table[4].graph_type = "scatter"
         >>> table[4].graph_type
         'SCATTER'
-        >>> table[4].graph_type = TableLineGraph.BAR
+        >>> table[4].graph_type = TableGraphType.BAR
         >>> table[4].graph_type
         'BAR'
         """
-        return TableLineGraph(<int>(self.c_line.get_line_graph())).name if self.c_line is not NULL else None
+        return TableGraphType(<int>(self.c_line.get_line_graph())).name if self.c_line is not NULL else None
 
     @graph_type.setter
-    def graph_type(self, value: Union[TableLineGraph, str]):
+    def graph_type(self, value: Union[TableGraphType, str]):
         if self.c_line is NULL:
             return
         if isinstance(value, str):
             value = value.upper()
-            value = TableLineGraph[value]
+            value = TableGraphType[value]
         value = int(value)
-        self.c_line.set_line_graph(<EnumGraphType>value)
+        self.c_line.set_line_graph(<CTableGraphType>value)
 
     @property
     def axis_left(self) -> bool:
@@ -758,7 +765,7 @@ cdef class TableLine:
                 # remove newline characters
                 cells_content += [''.join(content.splitlines())]
             return str(tuple(cells_content))
-        elif line_type == TableLineType.LINE:
+        elif line_type == TableLineType.SEP:
             return '---'
         else:
             return f"<{self.line_type}>"
@@ -1062,16 +1069,16 @@ cdef class Table:
 
         Parameters
         ----------
-        value : IodeLanguage or str
+        value : TableLang or str
             Possible values are ENGLISH, DUTCH, FRENCH.
 
         Examples
         --------
-        >>> from iode import Table, IodeLanguage
+        >>> from iode import Table, TableLang
         >>> table = Table()
         >>> table.language
         'ENGLISH'
-        >>> table.language = IodeLanguage.DUTCH
+        >>> table.language = TableLang.DUTCH
         >>> table.language
         'DUTCH'
         >>> table.language = "French"
@@ -1081,12 +1088,12 @@ cdef class Table:
         return self.c_table.get_language().decode().upper()
 
     @language.setter
-    def language(self, value: Union[IodeLanguage, str]):
+    def language(self, value: Union[TableLang, str]):
         if isinstance(value, str):
             value = value.upper()
-            value = IodeLanguage[value]
+            value = TableLang[value]
         value = int(value)
-        self.c_table.set_language(<EnumLang>value)
+        self.c_table.set_language(<CTableLang>value)
 
     @property
     def ymin(self) -> float:
@@ -1151,7 +1158,7 @@ cdef class Table:
             value = value.upper()
             value = TableGraphGrid[value]
         value = int(value)
-        self.c_table.set_gridx(<EnumGraphGrid>value)
+        self.c_table.set_gridx(<CTableGraphGrid>value)
 
     @property
     def gridy(self) -> str:
@@ -1188,7 +1195,7 @@ cdef class Table:
             value = value.upper()
             value = TableGraphGrid[value]
         value = int(value)
-        self.c_table.set_gridy(<EnumGraphGrid>value)
+        self.c_table.set_gridy(<CTableGraphGrid>value)
 
     @property
     def graph_axis(self) -> str:
@@ -1226,7 +1233,7 @@ cdef class Table:
             value = value.upper()
             value = TableGraphAxis[value]
         value = int(value)
-        self.c_table.set_graph_axis(<EnumGraphAxis>value)
+        self.c_table.set_graph_axis(<CTableGraphAxis>value)
 
     @property
     def graph_alignment(self) -> str:
@@ -1259,7 +1266,7 @@ cdef class Table:
             value = value.upper()
             value = TableGraphAlign[value]
         value = int(value)
-        self.c_table.set_graph_alignment(<EnumGraphAlign>value)
+        self.c_table.set_graph_alignment(<CTableGraphAlign>value)
 
     @property
     def box(self) -> bool:
@@ -1381,7 +1388,7 @@ cdef class Table:
             index where to insert a line.
         value: str or list(str) or tuple(str) or TableLine or TableLineType
             value of the new line.
-            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.
+            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or SEP.
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
             If an iterable of str, 'value' represents the content of the cells of the new line.
@@ -1434,7 +1441,7 @@ cdef class Table:
 
         >>> # insert new separator line 
         >>> index += 1
-        >>> table.insert(index, TableLineType.LINE)
+        >>> table.insert(index, TableLineType.SEP)
 
         >>> # insert new line with cells
         >>> # "    -> STRING cell
@@ -1479,11 +1486,11 @@ cdef class Table:
                 self.c_table.insert_line_mode(row, <bint>False)
             elif value == TableLineType.DATE: 
                 self.c_table.insert_line_date(row, <bint>False)
-            elif value == TableLineType.LINE: 
+            elif value == TableLineType.SEP: 
                 self.c_table.insert_line_separator(row, <bint>False)
             else:
                 raise ValueError(f"The value of 'value' must be either TableLineType.FILES, TableLineType.MODE, "
-                                 f"TableLineType.DATE or TableLineType.LINE.\nGot value {value} instead.")
+                                 f"TableLineType.DATE or TableLineType.SEP.\nGot value {value} instead.")
         elif isinstance(value, str):
             if all(character == '-' for character in value):
                 self.c_table.insert_line_separator(row, <bint>False)
@@ -1788,7 +1795,7 @@ cdef class Table:
         
         Warnings
         --------
-        - Line of type 'MODE', 'FILES', 'DATE' and 'LINE' cannot be updated.
+        - Line of type 'MODE', 'FILES', 'DATE' and 'SEP' cannot be updated.
         - When updating a cell content, the cell is converted to a cell of type 'STRING' 
           if the new text contains double quotes, otherwise the cell becomes of type 'LEC'.
 
@@ -1826,7 +1833,7 @@ cdef class Table:
         graph_alignment: 'LEFT'
         <BLANKLINE>
 
-        >>> # warning: line of type 'MODE', 'FILES', 'DATE' and 'LINE' cannot be updated.
+        >>> # warning: line of type 'MODE', 'FILES', 'DATE' and 'SEP' cannot be updated.
 
         >>> # update a title line
         >>> table[0] = "New title"
@@ -1972,7 +1979,7 @@ cdef class Table:
         ----------
         value: str or list(str) or tuple(str) or TableLine or TableLineType
             value of the new line.
-            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or LINE.
+            If TableLineType, 'value' represents the type of the new line: FILES, MODE, DATE or SEP.
             If str, 'value' represents either a separator line if it only contains characters '-' 
             or a title line.
             If an iterable of str, 'value' represents the content of the cells of the new line.
@@ -2014,7 +2021,7 @@ cdef class Table:
         >>> table += "New Title"
 
         >>> # append a separator line 
-        >>> table += TableLineType.LINE
+        >>> table += TableLineType.SEP
 
         >>> # append a line with cells
         >>> # "    -> STRING cell
@@ -2053,11 +2060,11 @@ cdef class Table:
                 self.c_table.add_line_mode()
             elif value == TableLineType.DATE: 
                 self.c_table.add_line_date()
-            elif value == TableLineType.LINE: 
+            elif value == TableLineType.SEP: 
                 self.c_table.add_line_separator()
             else:
                 raise ValueError(f"The value of 'value' must be either TableLineType.FILES, TableLineType.MODE, "
-                                 f"TableLineType.DATE or TableLineType.LINE.\nGot value {value} instead.")
+                                 f"TableLineType.DATE or TableLineType.SEP.\nGot value {value} instead.")
         elif isinstance(value, str):
             if all(character == '-' for character in value):
                 self.c_table.add_line_separator()
@@ -2142,7 +2149,7 @@ cdef class Table:
                     # TODO: check what to do with DECIMAL cell
                     elif cell_align == TableCellAlign.DECIMAL:
                         s += cell_content.rjust(cell_width)
-            elif line_type == TableLineType.LINE:
+            elif line_type == TableLineType.SEP:
                 s += '-' * 5 + " | " + '-' * table_length
             else:
                 s += line_type_name.ljust(5) + " | "

@@ -10,7 +10,7 @@ IodeReportEditor::~IodeReportEditor()
 {
 }
 
-void IodeReportEditor::run(const QString& filepath, const QString& parameters, const int nbDecimals, const EnumLang language)
+void IodeReportEditor::run(const QString& filepath, const QString& parameters, const int nbDecimals, const TableLang language)
 {
     QString msg;
     bool success;

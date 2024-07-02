@@ -38,12 +38,12 @@ public:
         return ref_table->get_title(0);
     }
 
-    EnumGraphGrid get_grid_xaxis() const
+    TableGraphGrid get_grid_xaxis() const
     {
         return ref_table->get_gridx();
     }
 
-    EnumGraphGrid get_grid_yaxis() const
+    TableGraphGrid get_grid_yaxis() const
     {
         return ref_table->get_gridy();
     }
@@ -70,10 +70,10 @@ public:
 
     bool logScale() const
     {
-        return ref_table->get_graph_axis() == EnumGraphAxis::IG_LOG;
+        return ref_table->get_graph_axis() == TableGraphAxis::TABLE_GRAPH_LOG;
     }
 
-    EnumGraphAlign get_alignement() const
+    TableGraphAlign get_alignement() const
     {
         return ref_table->get_graph_alignment();
     }

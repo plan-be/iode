@@ -22,8 +22,8 @@ void EditTableView::setupModel(const QString& name)
 	connect(model, &EditTableModel::displayData, this, &EditTableView::updateRow);
 }
 
-void EditTableView::updateRow(const int row, const EnumLineType line_type, const int nb_columns)
+void EditTableView::updateRow(const int row, const TableLineType line_type, const int nb_columns)
 {
-	if (line_type != IT_CELL) setSpan(row, 0, 1, nb_columns);
-	if (line_type == IT_LINE) setRowHeight(row, 3);
+	if (line_type != TABLE_LINE_CELL) setSpan(row, 0, 1, nb_columns);
+	if (line_type == TABLE_LINE_SEP) setRowHeight(row, 3);
 }

@@ -15,8 +15,8 @@
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
  *      void T_print_cell(TCELL* cell, COL* cl, int straddle)       Prints a TBL cell on a specific GSAMPLE column. 
- *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line KT_FILES.
- *      unsigned char *T_get_title(TBL* tbl)                        Retrieves a TBL title, i.e. the contents of the first line of type KT_TITLE
+ *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line TABLE_LINE_FILES.
+ *      unsigned char *T_get_title(TBL* tbl)                        Retrieves a TBL title, i.e. the contents of the first line of type TABLE_LINE_TITLE
  *      int T_print_tbl(TBL* tbl, char* smpl)                       Computes a table on a GSAMPLE and saves the result in A2M format
  *  
  *  Global variables
@@ -121,9 +121,9 @@ static void T_print_string(COL* cl, char* string)
  *  Prints the header of an a2m table cell: <cellsep><span><align>.
  *  Example: "@2C" if @ is the cell separator, 2 the number of spanned columns and the text must be centered in the column.
  *   
- *  @param  [in] int attr        alignment attribute: KT_CENTER, KT_RIGHT, KT_DECIMAL, KT_LEFT.
+ *  @param  [in] int attr        alignment attribute: TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_DECIMAL, TABLE_CELL_LEFT.
  *  @param  [in] int straddle    number of spanned columns
- *  @param  [in] int type        column type (KT_STRING, KT_LEC...)
+ *  @param  [in] int type        column type (TABLE_CELL_STRING, TABLE_CELL_LEC...)
  *  @global [in] int A2M_SEPCH   a2m table cell separator
  *  
  */
@@ -132,9 +132,9 @@ void T_open_cell(int attr, int straddle, int type)
 {
     char    align = 'L';
 
-    if(attr & KT_CENTER)    align = 'C';
-    if(attr & KT_RIGHT)     align = 'R';
-    if(type != KT_STRING && (attr & KT_DECIMAL))   align = 'D'; /* JMP 17-12-93 */
+    if(attr & TABLE_CELL_CENTER)    align = 'C';
+    if(attr & TABLE_CELL_RIGHT)     align = 'R';
+    if(type != TABLE_CELL_STRING && (attr & TABLE_CELL_DECIMAL))   align = 'D'; /* JMP 17-12-93 */
 
     W_printf("%c%d%c", A2M_SEPCH, straddle, align);
 }
@@ -143,29 +143,29 @@ void T_open_cell(int attr, int straddle, int type)
 /**
  *  Opens an A2M attribute sequence.
  *  
- *  @param [in] int     attr    Cell attribute: KT_BOLD...
+ *  @param [in] int     attr    Cell attribute: TABLE_CELL_BOLD...
  *  
  */
 void T_open_attr(int attr)
 {
 
-    if(attr & KT_BOLD)      W_printfReplEsc("~b");
-    if(attr & KT_ITALIC)    W_printfReplEsc("~i");
-    if(attr & KT_UNDERLINE) W_printfReplEsc("~u");
+    if(attr & TABLE_CELL_BOLD)      W_printfReplEsc("~b");
+    if(attr & TABLE_CELL_ITALIC)    W_printfReplEsc("~i");
+    if(attr & TABLE_CELL_UNDERLINE) W_printfReplEsc("~u");
 }
 
 
 /**
  *  Closes an A2M attribute sequence.
  *  
- *  @param [in] int     attr    Cell attribute: KT_BOLD...
+ *  @param [in] int     attr    Cell attribute: TABLE_CELL_BOLD...
  *  
  */
 void T_close_attr(int attr)
 {
-    if(attr & KT_BOLD)      W_printfReplEsc("~B");
-    if(attr & KT_ITALIC)    W_printfReplEsc("~I");
-    if(attr & KT_UNDERLINE) W_printfReplEsc("~U");
+    if(attr & TABLE_CELL_BOLD)      W_printfReplEsc("~B");
+    if(attr & TABLE_CELL_ITALIC)    W_printfReplEsc("~I");
+    if(attr & TABLE_CELL_UNDERLINE) W_printfReplEsc("~U");
 }
 
 
@@ -184,17 +184,17 @@ void T_print_cell(TCELL* cell, COL* cl, int straddle)
         W_printf("%c1R", A2M_SEPCH); 
         return;                
     }
-    if(cell->tc_type == KT_STRING && U_is_in('#', cell->tc_val))
-        //cell->tc_attr = KT_ALIGN(cell->tc_attr, KT_CENTER); /* JMP 05-01-02 */
-        cell->tc_attr = KT_ALIGN(cell->tc_attr, KT_RIGHT); /* JMP 05-01-02 */
-    if(cell->tc_type == KT_LEC)
-        cell->tc_attr = KT_ALIGN(cell->tc_attr, KT_DECIMAL);
+    if(cell->tc_type == TABLE_CELL_STRING && U_is_in('#', cell->tc_val))
+        //cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_CENTER); /* JMP 05-01-02 */
+        cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_RIGHT); /* JMP 05-01-02 */
+    if(cell->tc_type == TABLE_CELL_LEC)
+        cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_DECIMAL);
 
     T_open_cell(cell->tc_attr, straddle, cell->tc_type);  /* JMP 17-12-93 */
     T_open_attr(cell->tc_attr);
 
     if(cell->tc_type != 0) {
-        if(cl == NULL || cell->tc_type == KT_STRING) {
+        if(cl == NULL || cell->tc_type == TABLE_CELL_STRING) {
             T_print_string(cl, cell->tc_val);
         }
         else T_print_val(cl->cl_res);
@@ -235,7 +235,7 @@ static int T_print_line(TBL* tbl, int i, COLS* cls)
 
 
 /**
- *  Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line KT_FILES. 
+ *  Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line TABLE_LINE_FILES. 
  *   
  *  @param [in] COLS*   cls     list of columns (from GSAMPLE)
  *  @return     char**          NULL if one of the ref files is not loaded in K_RWS
@@ -277,7 +277,7 @@ char **T_find_files(COLS* cls)
 }
 
 /**
- *  Prints the special TBL line of type KT_FILES.
+ *  Prints the special TBL line of type TABLE_LINE_FILES.
  *  
  *  @param  [in] COLS*  cls         columns to print = compiled GSAMPLE
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSAMPLE x nb table cols)
@@ -293,14 +293,14 @@ static void T_print_files(COLS* cls, int dim)
     if(KT_nbnames <= 0) return;  
 
     for(i = 0; KT_names[i]; i++) {
-        T_open_cell(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
+        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
         W_printf("%s\n", KT_names[i]);
     }
 }
 
 
 /**
- *  Prints the special TBL line of type KT_MODE (growth rates, diff...).
+ *  Prints the special TBL line of type TABLE_LINE_MODE (growth rates, diff...).
  *  
  *  @param  [in] COLS*  cls         columns to print = compiled GSAMPLE
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSAMPLE x nb table cols)
@@ -315,7 +315,7 @@ static void T_print_mode(COLS* cls, int dim)
 
     for(i = 0; i < MAX_MODE; i++) {
         if(KT_mode[i] == 0) continue;
-        T_open_cell(KT_LEFT, dim, KT_STRING);  /* JMP 17-12-93 */
+        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);  /* JMP 17-12-93 */
         //W_printf("(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][B_LANG]);
         W_printf("(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]); // JMP 18-04-2022
     }
@@ -323,7 +323,7 @@ static void T_print_mode(COLS* cls, int dim)
 
 
 /**
- *  Prints the special TBL line of type KT_DATE.
+ *  Prints the special TBL line of type TABLE_LINE_DATE.
  *  
  *  @param  [in] int    dim   total number of columns in the resulting table (size of GSAMPLE x nb table cols)
  *  
@@ -335,7 +335,7 @@ static void T_print_date(int dim)
     char    date[11];
 
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
-    T_open_cell(KT_LEFT, dim, KT_STRING); /* JMP 17-12-93 */
+    T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
     W_printf("%s\n", date);
 }
 
@@ -381,11 +381,11 @@ static void T_end_tbl()
 
 
 /**
- *  Retrieves a TBL title, i.e. the contents of the first line of type KT_TITLE.
+ *  Retrieves a TBL title, i.e. the contents of the first line of type TABLE_LINE_TITLE.
  *  
  *  @param [in] TBL*    tbl     pointer to a table
  *  @return     char*           local static buffer with the contents of the title or the text "No title"
- *                              if no line of type KT_TITLE can be found or if the first line of that type is empty.
+ *                              if no line of type TABLE_LINE_TITLE can be found or if the first line of that type is empty.
  */
 
 unsigned char *T_get_title(TBL* tbl)  
@@ -394,7 +394,7 @@ unsigned char *T_get_title(TBL* tbl)
     static unsigned char    buf[256];
     
     for(k = 0; k < T_NL(tbl); k++)
-        if(tbl->t_line[k].tl_type == KT_TITLE) break;
+        if(tbl->t_line[k].tl_type == TABLE_LINE_TITLE) break;
     
 // OLD VERSION USING STATIC_BUF
 //    if(k == T_NL(tbl) ||
@@ -448,10 +448,10 @@ int T_print_tbl(TBL* tbl, char* smpl)
         line = T_L(tbl) + i;
 
         switch(line->tl_type) {
-            case KT_LINE  :
+            case TABLE_LINE_SEP   :
                 W_printf(".tl\n");
                 break;
-            case KT_TITLE :
+            case TABLE_LINE_TITLE :
                 if(first) {
                     first = 0;
                     break;
@@ -459,16 +459,16 @@ int T_print_tbl(TBL* tbl, char* smpl)
                 T_print_cell((TCELL *) line->tl_val, NULL, dim);
                 W_printf("\n");
                 break;
-            case KT_DATE  :
+            case TABLE_LINE_DATE  :
                 T_print_date(dim);
                 break;
-            case KT_MODE  :
+            case TABLE_LINE_MODE  :
                 T_print_mode(cls, dim);
                 break;
-            case KT_FILES :
+            case TABLE_LINE_FILES :
                 T_print_files(cls, dim);
                 break;
-            case KT_CELL  :
+            case TABLE_LINE_CELL  :
                 if(T_print_line(tbl, i, cls) < 0) {
                     rc = -1;
                     B_seterror("Unable to print line %d ", i);

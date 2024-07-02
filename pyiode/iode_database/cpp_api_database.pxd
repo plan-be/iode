@@ -4,10 +4,10 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-from pyiode.common cimport (IodeDatabaseType, IodeFileType, EnumLang, IodeEquationMethod, 
+from pyiode.common cimport (IodeDatabaseType, IodeFileType, TableLang, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
-                            EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
-                            EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
+                            TableCellType, TableCellAlign, TableCellFont, TableLineType, 
+                            TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType, 
                             IodeVarMode, VariablesInitialization)
 from pyiode.time.period cimport CPeriod
 from pyiode.time.sample cimport CSample

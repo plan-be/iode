@@ -44,7 +44,7 @@ ag:
         case YY_LONG   :
             val = minus * yy->yy_long;
             break;
-        case KT_BREAK :
+        case TABLE_ASCII_BREAK :
         case YY_SPECIAL:
             if(yy->yy_text[0] == '-') {
                 minus = -1;
@@ -200,11 +200,11 @@ int K_read_align(YYFILE* yy)
 
     keyw = YY_lex(yy);
     switch(keyw) {
-        case KT_LEFT :
+        case TABLE_CELL_LEFT :
             return(0);
-        case KT_CENTER:
+        case TABLE_CELL_CENTER:
             return(1);
-        case KT_RIGHT :
+        case TABLE_CELL_RIGHT :
             return(2);
         default       :
             YY_unread(yy);

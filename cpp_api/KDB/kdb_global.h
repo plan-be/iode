@@ -45,7 +45,7 @@ std::vector<std::string> filter_names_from_database(KDB* kdb, const IodeDatabase
  *  @see https://iode.plan.be/doku.php?id=fileimportcmt
  */
 void import_cmt(const std::string& input_file, const std::string& save_file, const std::string& rule_file, 
-                const EnumLang lang = IT_ENGLISH, const std::string& debug_file = "");
+                const TableLang lang = TABLE_ENGLISH, const std::string& debug_file = "");
 
 // Note: for unit test, see test_c_api.cpp and files: 
 //       - tests/data/rules.txt 

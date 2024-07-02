@@ -221,7 +221,7 @@ def set_scl(py_scl: Scalar):
 # ------
 # ... not yet implemented ...
 # TODO:
-#    - tbl_add_line(tbl_name, after_line, [cells], line_type = KT_CELLS)
+#    - tbl_add_line(tbl_name, after_line, [cells], line_type = TABLE_LINE_CELLS)
 #    - tbl_add_lines(tbl_name, after_line, [[cells], [cells]...])
 #    - tbl_del_line(tbl_name, line)
 #    - tbl_create(tbl_name, title, [line1, line2...])

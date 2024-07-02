@@ -11,7 +11,7 @@ EditTableDialog::EditTableDialog(const QString& name, KDBTables* database, QWidg
 
 	lineEdit_name->setText(name);
 
-	for(const auto& [line_type, _] : mLineType) 
+	for(const auto& [line_type, _] : m_line_type) 
 		list_insert_types << QString::fromStdString(line_type);
 
 	wInsertLineType = new WrapperComboBox("line_type", *comboBox_insert_line_type, REQUIRED_FIELD, list_insert_types);
@@ -115,7 +115,7 @@ void EditTableDialog::insert_line()
 
 		int insert_lineType = wInsertLineType->extractAndVerify();
 		std::string s_lineType = list_insert_types[insert_lineType].toStdString();
-		EnumLineType lineType = mLineType.at(s_lineType);
+		TableLineType lineType = m_line_type.at(s_lineType);
 
 		int insertWhere = wInsertWhere->extractAndVerify();
 

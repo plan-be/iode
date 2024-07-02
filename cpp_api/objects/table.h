@@ -9,84 +9,29 @@
 
 using bitset_8 = std::bitset<8>;
 
-enum EnumCellType
+const static std::map<std::string, TableLineType> m_line_type =
 {
-	IT_LEC = KT_LEC,				// 114
-	IT_STRING = KT_STRING,			// 115
+	{"Cells", TABLE_LINE_CELL},
+	{"Line",  TABLE_LINE_SEP},
+	{"Title", TABLE_LINE_TITLE},
+	{"Files", TABLE_LINE_FILES},
+	{"Mode",  TABLE_LINE_MODE},
+	{"Date",  TABLE_LINE_DATE}
 };
 
-enum EnumCellFont
+inline std::string get_line_type_as_string(TableLineType line_type)
 {
-	IT_NORMAL = KT_NORMAL,			// 0
-	IT_BOLD = KT_BOLD,				// 1
-	IT_ITALIC = KT_ITALIC,			// 2
-	IT_UNDERLINE = KT_UNDERLINE,	// 4
-};
-
-enum EnumCellAlign
-{
-	// -----------------------------------
-	IT_CENTER = KT_CENTER,			// 8
-	IT_LEFT = KT_LEFT,				// 16
-	IT_RIGHT = KT_RIGHT,			// 32
-	IT_DECIMAL = KT_DECIMAL			// 64
-};
-
-enum EnumLineType
-{
-	IT_FILES = KT_FILES,			// 105
-	IT_MODE = KT_MODE,				// 106
-	IT_CELL = KT_CELL,				// 110
-	IT_LINE = KT_LINE,				// 111
-	IT_TITLE = KT_TITLE,			// 113
-	IT_DATE = KT_DATE				// 116
-};
-
-const static std::map<std::string, EnumLineType> mLineType =
-{
-	{"Cells", IT_CELL},
-	{"Line",  IT_LINE},
-	{"Title", IT_TITLE},
-	{"Files", IT_FILES},
-	{"Mode",  IT_MODE},
-	{"Date",  IT_DATE}
-};
-
-inline std::string get_line_type_as_string(EnumLineType line_type)
-{
-	for(const auto& [key, value]: mLineType)
+	for(const auto& [key, value]: m_line_type)
 		if(line_type == value) return key;
 	return "";
 }
 
-enum EnumGraphType
-{
-	IG_LINE,
-	IG_SCATTER,
-	IG_BAR
-};
+const static std::vector<std::string> v_graph_chart_types = 
+    { "Line chart", "Scatter chart", "Bar chart" };
 
-enum EnumGraphGrid
-{
-	IG_MAJOR,
-	IG_NONE,
-	IG_MINOR
-};
+const static std::vector<std::string> v_graph_axis_thicks = 
+    { "Major thicks", "No grids", "Minor thicks" };
 
-enum EnumGraphAlign
-{
-	IG_LEFT,
-	IG_CENTER,
-	IG_RIGHT
-};
-
-enum EnumGraphAxis
-{
-	IG_VALUES,
-	IG_LOG,
-	IG_SEMILOG,
-	IG_PERCENT
-};
 
 // WARNING: C++ allows functions returning a reference to be left-values. 
 //          This is currently not supported in Cython.
@@ -95,7 +40,7 @@ enum EnumGraphAxis
 
 struct TableCell: public TCELL
 {
-	TableCell(const EnumCellType cell_type, const std::string& content, const EnumCellAlign align = EnumCellAlign::IT_LEFT, 
+	TableCell(const TableCellType cell_type, const std::string& content, const TableCellAlign align = TableCellAlign::TABLE_CELL_LEFT, 
 		const bool bold = false, const bool italic = false, const bool underline = false);
 
 	// WARNING: a table cell must be deleted (freed) from a Table instance
@@ -114,13 +59,13 @@ struct TableCell: public TCELL
 
 	void set_content(const std::string& content);
 
-	EnumCellType get_type() const;
+	TableCellType get_type() const;
 
-	void set_type(const EnumCellType cell_type);
+	void set_type(const TableCellType cell_type);
 
-	EnumCellAlign get_align() const;
+	TableCellAlign get_align() const;
 
-	void set_align(const EnumCellAlign align);
+	void set_align(const TableCellAlign align);
 
 	bool is_bold() const;
 
@@ -144,7 +89,7 @@ struct TableCell: public TCELL
 
 struct TableLine: public TLINE
 {
-	TableLine(const EnumLineType line_type, const EnumGraphType graph_type = EnumGraphType::IG_LINE, 
+	TableLine(const TableLineType line_type, const TableGraphType graph_type = TableGraphType::TABLE_GRAPH_LINE, 
 		const bool axis_left = true);
 
 	// WARNING: a table line must be deleted (freed) from a Table instance
@@ -153,13 +98,13 @@ struct TableLine: public TLINE
 	// WARNING: must NOT be exposed to Python API -> called from a Table instance
 	void free(const int nb_cells);
 
-	EnumLineType get_line_type() const;
+	TableLineType get_line_type() const;
 
-	void set_line_type(const EnumLineType line_type);
+	void set_line_type(const TableLineType line_type);
 
-	EnumGraphType get_line_graph() const;
+	TableGraphType get_line_graph() const;
 
-	void set_line_graph(const EnumGraphType graph_type);
+	void set_line_graph(const TableGraphType graph_type);
 
 	bool is_left_axis() const;
 
@@ -235,33 +180,33 @@ public:
 
 	std::string get_language() const;
 
-	void set_language(const EnumLang lang);
+	void set_language(const TableLang lang);
 
 	short nb_columns() const;
 
 	short nb_lines() const;
 
-	EnumGraphGrid get_gridx() const;
+	TableGraphGrid get_gridx() const;
 
-	void set_gridx(const EnumGraphGrid gridx);
+	void set_gridx(const TableGraphGrid gridx);
 
-	EnumGraphGrid get_gridy() const;
+	TableGraphGrid get_gridy() const;
 
-	void set_gridy(const EnumGraphGrid gridy);
+	void set_gridy(const TableGraphGrid gridy);
 
-	EnumGraphAxis get_graph_axis() const;
+	TableGraphAxis get_graph_axis() const;
 
-	void set_graph_axis(const EnumGraphAxis axis);
+	void set_graph_axis(const TableGraphAxis axis);
 
-	EnumGraphAlign get_graph_alignment() const;
+	TableGraphAlign get_graph_alignment() const;
 
-	void set_graph_alignment(const EnumGraphAlign align);
+	void set_graph_alignment(const TableGraphAlign align);
 
 	// -------- LINES --------
 
 	TableLine* get_line(const int row);
 
-	TableLine* insert_line(const int pos, const EnumLineType line_type, const bool after = true);
+	TableLine* insert_line(const int pos, const TableLineType line_type, const bool after = true);
 
 	// -------- DIVIDER --------
 

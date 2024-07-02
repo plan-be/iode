@@ -440,30 +440,30 @@ int B_DumpTblDef(TBL* tbl)
     /*    W_printfRepl("&%dL \n", T_NC(tbl)); */
     for(j = 0; j < T_NL(tbl); j++) {
         switch(tbl->t_line[j].tl_type) {
-            case KT_CELL :
+            case TABLE_LINE_CELL :
                 cell = (TCELL *) tbl->t_line[j].tl_val;
                 for(i = 0; i < T_NC(tbl); i++)
                     B_PrintTblCell(cell + i, 1);
                 W_printf("\n");
                 break;
 
-            case KT_TITLE :
+            case TABLE_LINE_TITLE :
                 B_PrintTblCell((TCELL *) tbl->t_line[j].tl_val, T_NC(tbl));
                 W_printf("\n");
                 break;
 
-            case KT_LINE  :
-            case KT_DLINE  :
+            case TABLE_LINE_SEP   :
+            case TABLE_ASCII_BOLD_LINE  :
                 /* W_printfRepl("&%dL[LINE]\n", T_NC(tbl));*/
                 W_printf(".tl\n");
                 break;
-            case KT_MODE  :
+            case TABLE_LINE_MODE  :
                 W_printfRepl("&%dL[MODE]\n", T_NC(tbl));
                 break;
-            case KT_DATE  :
+            case TABLE_LINE_DATE  :
                 W_printfRepl("&%dL[DATE]\n", T_NC(tbl));
                 break;
-            case KT_FILES :
+            case TABLE_LINE_FILES :
                 W_printfRepl("&%dL[FILES]\n", T_NC(tbl));
                 break;
 
@@ -495,7 +495,7 @@ int B_DumpTblDef(TBL* tbl)
 int B_CellDef(TCELL* cell)
 {
     if((cell->tc_val) == NULL) return(0);
-    if(cell->tc_type == KT_LEC &&
+    if(cell->tc_type == TABLE_CELL_LEC &&
             strcmp("1", P_get_ptr(cell->tc_val, 0)) == 0) return(0);
     return(1);
 }
@@ -515,14 +515,14 @@ int B_PrintTblCell(TCELL* cell, int straddle)
     }
 
     switch(cell->tc_type) {
-        case KT_STRING :
-            T_open_cell(cell->tc_attr, straddle, KT_STRING); /* JMP 16-12-93 */
+        case TABLE_CELL_STRING :
+            T_open_cell(cell->tc_attr, straddle, TABLE_CELL_STRING); /* JMP 16-12-93 */
             /*      W_printf("&%d%c", straddle, ((straddle > 1) ? 'C' : 'L')); /* JMP 16-12-93 */
             T_open_attr(cell->tc_attr);
             W_printf("\"%s\"", cell->tc_val);
             break;
 
-        case KT_LEC :
+        case TABLE_CELL_LEC :
             W_printfRepl("&%dL", straddle);
             T_open_attr(cell->tc_attr);
             W_printf("%s", P_get_ptr(cell->tc_val, 0));

@@ -97,7 +97,7 @@ int     i, j;
 	    kerror(0, "%d = wrong dimension", (int)vktp_create_DIM); /* JMP 01-12-94 */
 	    return(-1);
 	}
-	T_LANG(tbl) = KT_ENGLISH; /* + vktp_create_LANG JMP38 28-09-92 */
+	T_LANG(tbl) = TABLE_ENGLISH; /* + vktp_create_LANG JMP38 28-09-92 */
     }
     else {
 	tbl = KTVAL(kdb, i);

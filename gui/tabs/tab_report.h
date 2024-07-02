@@ -52,7 +52,7 @@ private slots:
         save(filepath);
 
         QString parameters = lineEdit_parameters->text();
-        EnumLang language = (EnumLang) comboBox_language->currentIndex();
+        TableLang language = (TableLang) comboBox_language->currentIndex();
         int nbDecimals = spinBox_nbDecimals->value();
         static_cast<IodeReportEditor*>(editor)->run(filepath, parameters, nbDecimals, language);
 

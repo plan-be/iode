@@ -11,7 +11,7 @@ void ComputedTable::initialize()
      *      3. for each TBL line, call: 
      *          COL_clear(cls) to reset the COLS values 
      *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
-     *          COL_text() to generate the value of the KT_STRING cells
+     *          COL_text() to generate the value of the TABLE_CELL_STRING cells
      */
 
     // Compiles a GSAMPLE into a COLS struct and resizes COLS according to the nb of cols in the passed table.
@@ -85,12 +85,12 @@ void ComputedTable::initialize()
     {
         TableLine* line = ref_table->get_line(row);
 
-        if(line->get_line_type() != EnumLineType::IT_CELL) 
+        if(line->get_line_type() != TableLineType::TABLE_LINE_CELL) 
             continue;
         
         // QUESTION FOR JMP: Can we assume that the cell containing the '#' character will always be the second ?
         TableCell* cell = line->get_cell(1, ref_table->nb_columns());
-        if(cell->get_type() == EnumCellType::IT_STRING)
+        if(cell->get_type() == TableCellType::TABLE_CELL_STRING)
         {
             std::string content = cell->get_content(false);
             if(content.find('#') != std::string::npos)
@@ -120,14 +120,14 @@ void ComputedTable::initialize()
         //                   - the first cell will contain the name of the line ?
         //                   - the second cell will contain either the '#' character or a LEC expression ?
         // In k_graph.c, in function T_graph_tbl_1() lines 181 to 185, the code is:
-        //    case KT_CELL  :
-        //        if(cell[1].tc_type != KT_LEC) break;
+        //    case TABLE_LINE_CELL  :
+        //        if(cell[1].tc_type != TABLE_CELL_LEC) break;
         //        begin = 0;
         //        if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
         //        break;
         // from which I understand that you assume that the LEC expression WILL be in the second cell
-        if(line->get_line_type() == EnumLineType::IT_CELL && 
-           line->get_cell(1, ref_table->nb_columns())->get_type() == EnumCellType::IT_LEC)
+        if(line->get_line_type() == TableLineType::TABLE_LINE_CELL && 
+           line->get_cell(1, ref_table->nb_columns())->get_type() == TableCellType::TABLE_CELL_LEC)
         {
             name = line->get_cell(0, ref_table->nb_columns())->get_content(false);
             line_names.push_back(name);

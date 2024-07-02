@@ -90,7 +90,7 @@ int K_vpack(char **pack, double *a1, int *a2)
 static char* K_tcell_pack(char *pack, TCELL *cell)
 {
     if(cell->tc_val == NULL) return(pack);
-    if(cell->tc_type == KT_LEC)
+    if(cell->tc_type == TABLE_CELL_LEC)
         pack = P_add(pack, cell->tc_val, P_len(cell->tc_val));
     else
         pack = P_add(pack, cell->tc_val, (int)strlen(cell->tc_val) + 1);
@@ -216,7 +216,7 @@ static int K_tpack32(char **pack, char *a1)
     *pack = P_add(*pack, (char*)tbl->t_line, sizeof(TLINE) * (int)T_NL(tbl));
     for(i = 0; i < T_NL(tbl); i++) {
         switch(tbl->t_line[i].tl_type) {
-            case KT_CELL:
+            case TABLE_LINE_CELL:
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [nc x TCELL] */
                 *pack = P_add(*pack, (char*)cell, sizeof(TCELL) * (int)T_NC(tbl));
@@ -224,7 +224,7 @@ static int K_tpack32(char **pack, char *a1)
                 for(j = 0; j < T_NC(tbl); j++)
                     *pack = K_tcell_pack(*pack, cell + j);
                 break;
-            case KT_TITLE:
+            case TABLE_LINE_TITLE:
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [1 x TCELL] */
                 *pack = P_add(*pack, (char*)cell, sizeof(TCELL));
@@ -290,7 +290,7 @@ static int K_tpack64(char **pack, char *a1)
       [cell] [cell] ... */
     for(i = 0; i < T_NL(tbl); i++) {
         switch(tbl->t_line[i].tl_type) {
-            case KT_CELL:
+            case TABLE_LINE_CELL:
                 /* [TLINE32 * NC] */
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 for(j = 0; j < T_NC(tbl); j++) 
@@ -302,7 +302,7 @@ static int K_tpack64(char **pack, char *a1)
                     *pack = K_tcell_pack(*pack, cell + j);
                 break;
 
-            case KT_TITLE:
+            case TABLE_LINE_TITLE:
                 cell = (TCELL*)tbl->t_line[i].tl_val;
                 /* [1 x TCELL] */
                 K_tcell64_32(cell + 0, cell32 + 0);
@@ -569,7 +569,7 @@ static TBL* K_tunpack32(char *pack)
 
     for(i = 0; i < T_NL(tbl); i++) {
         switch(ptbl->t_line[i].tl_type) {
-            case KT_CELL:
+            case TABLE_LINE_CELL:
                 len = P_get_len(pack, p);
                 pcell = (TCELL*) P_get_ptr(pack, p);
                 ptbl->t_line[i].tl_val = (char *)pcell;
@@ -587,7 +587,7 @@ static TBL* K_tunpack32(char *pack)
                         p++;
                     }
                 break;
-            case KT_TITLE:
+            case TABLE_LINE_TITLE:
                 len = P_get_len(pack, p);
                 /*
                 pcell = (TCELL *) ptbl->t_line[i].tl_val = P_get_ptr(pack, p);
@@ -724,7 +724,7 @@ static TBL* K_tunpack64(char *pack)
     for(i = 0; i < T_NL(tbl); i++) {
         K_tline32_64(line32 + i, tbl->t_line + i);
         switch(tbl->t_line[i].tl_type) {
-            case KT_CELL:
+            case TABLE_LINE_CELL:
                 cell = (TCELL*)SW_nalloc(T_NC(tbl) * sizeof(TCELL));
                 tbl->t_line[i].tl_val = (char*)cell;
                 cell32 = (TCELL32*)P_get_ptr(pack, p);
@@ -738,7 +738,7 @@ static TBL* K_tunpack64(char *pack)
                 }
                 break;
 
-            case KT_TITLE:
+            case TABLE_LINE_TITLE:
                 cell = (TCELL*)SW_nalloc(sizeof(TCELL));
                 tbl->t_line[i].tl_val = (char*)cell;
                 cell32 = (TCELL32*)P_get_ptr(pack, p);

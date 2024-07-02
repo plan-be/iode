@@ -43,26 +43,7 @@ struct FileType
 
 const static std::vector<std::string> v_iode_types = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
 
-
-/* ****************************** *
- *             ENUMS              *
- * ****************************** */
-
- /* NOTE FOR THE DEVELOPPERS:
-  * enum documentation: https://en.cppreference.com/w/cpp/language/enum
-  */
-
-// TODO: replace K by I as below in C api + group them in an enum
-enum EnumLang
-{
-    IT_ENGLISH,
-    IT_DUTCH,
-    IT_FRENCH
-};
-
-const static int I_NB_LANGS = 3;
-
-const static std::vector<std::string> vLangs = { "English", "Dutch", "French" };
+const static std::vector<std::string> v_table_langs = { "English", "Dutch", "French" };
 
 const static std::string report_ext = ".rep";
 
@@ -130,32 +111,6 @@ const static std::vector<std::string> vExportFormats =
 
 
 // ====== Graphs ======
-
-enum EnumIodeGraphAxisThicks
-{
-    I_G_MAJOR_THICKS,
-    I_G_NO_THICKS,
-    I_G_MINOR_THICKS
-};
-
-const static int I_NB_AXIS_THICKS = 3;
-
-const static std::vector<std::string> vGraphsAxisThicks = 
-    { "Major thicks", "No grids", "Minor thicks" };
-
-
-enum EnumIodeGraphChart
-{
-    I_G_CHART_LINE,
-    I_G_CHART_SCATTER,
-    I_G_CHART_BAR
-};
-
-const static int I_NB_CHART_TYPES = 3;
-
-const static std::vector<std::string> vGraphsChartTypes = 
-    { "Line chart", "Scatter chart", "Bar chart" };
-
 
 const static int I_NB_COLORS = 8;
 

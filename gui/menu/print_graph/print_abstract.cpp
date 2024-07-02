@@ -25,7 +25,7 @@ void MenuPrintAbstract::printTableOrVariable(const bool isTable, const QString& 
     int NbDecimals = wNbDecimals->extractAndVerify();
 
     // extract the language
-    EnumLang lang = (EnumLang) wLanguage->extractAndVerify();
+    TableLang lang = (TableLang) wLanguage->extractAndVerify();
 
     // extract the generalized sample and the list of tables
     QString gsample = wSample->extractAndVerify();
