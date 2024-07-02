@@ -24,5 +24,5 @@ public:
 
 public slots:
     //void updateRows();
-    void updateRow(const int row, const EnumLineType line_type, const int nb_columns);
+    void updateRow(const int row, const TableLineType line_type, const int nb_columns);
 };

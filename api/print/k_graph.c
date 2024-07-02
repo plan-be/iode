@@ -178,17 +178,17 @@ int T_graph_tbl_1(TBL *tbl, char *gsmpl, int mode)
         cell = (TCELL *) line->tl_val;
 
         switch(line->tl_type) {
-            case KT_CELL  :
-                if(cell[1].tc_type != KT_LEC) break;
+            case TABLE_LINE_CELL  :
+                if(cell[1].tc_type != TABLE_CELL_LEC) break;
                 begin = 0;
                 if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
                 break;
 
-            case KT_TITLE :
+            case TABLE_LINE_TITLE :
                 T_GraphTitle(T_cell_cont(cell, 0));
                 break;
 
-            case KT_FILES :
+            case TABLE_LINE_FILES :
             /*
                 for(j = 0 ; files[j] ; j++) T_add_title(f, files[j], 'L');*/
 
@@ -887,14 +887,14 @@ int APIPrepareChart(TBL *tbl, char *gsmpl)
         line = T_L(tbl) + i;
         cell = (TCELL *) line->tl_val;
         switch(line->tl_type) {
-            case KT_CELL  :
-                if(cell[1].tc_type != KT_LEC) break;
+            case TABLE_LINE_CELL  :
+                if(cell[1].tc_type != TABLE_CELL_LEC) break;
                 if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) w = -1;
                 break;
-            case KT_TITLE :
+            case TABLE_LINE_TITLE :
                 APIGraphTitle(hdl, T_cell_cont(cell, 0), x, smpl.s_nb);
                 break;
-            case KT_FILES :
+            case TABLE_LINE_FILES :
             default :
                 break;
         }

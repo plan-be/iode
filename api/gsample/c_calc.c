@@ -21,7 +21,7 @@
  *      3. for each TBL line, call: 
  *          COL_clear(cls) to reset the COLS values 
  *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
- *          COL_text() to generate the value of the KT_STRING cells
+ *          COL_text() to generate the value of the TABLE_CELL_STRING cells
  *  
  *  List of functions 
  *  -----------------
@@ -289,12 +289,12 @@ int COL_exec(TBL* tbl, int i, COLS* cls)
     lg = cls->cl_nb / T_NC(tbl);
 
     for(d = 0; d < T_NC(tbl); d++) {
-        if(cell[d].tc_type != KT_LEC) continue;
+        if(cell[d].tc_type != TABLE_CELL_LEC) continue;
         if(cell[d].tc_val == 0) continue;
         clec = (CLEC *) P_get_ptr(cell[d].tc_val, 1);
         aclec = COL_cp_clec(clec);
         /*GB    if(dcell[d].tc_val) dclec = (CLEC *) P_get_ptr(dcell[d].tc_val, 1); */
-        if(dcell[d].tc_type == KT_LEC && dcell[d].tc_val) /* JMP 27-09-96 */
+        if(dcell[d].tc_type == TABLE_CELL_LEC && dcell[d].tc_val) /* JMP 27-09-96 */
             dclec = (CLEC *) P_get_ptr(dcell[d].tc_val, 1);
         else dclec = NULL;
         adclec = COL_cp_clec(dclec);

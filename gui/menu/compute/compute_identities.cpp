@@ -19,7 +19,7 @@ MenuComputeIdentities::MenuComputeIdentities(QWidget* parent) :
     textEdit_identities_list->setCompleter(completer);
 
 	QList<QString> q_langs;
-	for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+	for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
 	qFrom = new WrapperSampleEdit(label_from->text(), *sampleEdit_sample_from, REQUIRED_FIELD);
 	qTo = new WrapperSampleEdit(label_to->text(), *sampleEdit_sample_to, REQUIRED_FIELD);
@@ -104,7 +104,7 @@ void MenuComputeIdentities::compute()
         std::string scalars_files = scalarsFiles.join(";").toStdString();
 
         bool trace = qTrace->extractAndVerify();
-        EnumLang language = (EnumLang) (qLanguage->extractAndVerify() + IT_ENGLISH);
+        TableLang language = (TableLang) (qLanguage->extractAndVerify());
 
         Identities.execute_identities(from, to, identities_list, variables_files, scalars_files, trace);
         

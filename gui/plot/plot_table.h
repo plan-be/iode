@@ -13,8 +13,8 @@ class PlotTableDialog : public PlotDialog
     ComputedTableGraph* gsample_graph;
 
 public:
-    PlotTableDialog(ComputedTableGraph* gsample_graph, EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
-        EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, 
+    PlotTableDialog(ComputedTableGraph* gsample_graph, TableGraphType chartType = TABLE_GRAPH_LINE, const bool logScale = false, 
+        TableGraphGrid xTicks = TABLE_GRAPH_MAJOR, TableGraphGrid yTicks = TABLE_GRAPH_MAJOR, 
         QWidget* parent = nullptr);
     ~PlotTableDialog();
 

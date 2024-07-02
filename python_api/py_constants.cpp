@@ -38,49 +38,49 @@ void init_constants(nb::module_ &m)
       m.attr("EQ_DW")      = (int) EQ_DW;
       m.attr("EQ_LOGLIK")  = (int) EQ_LOGLIK;
 
-      // EnumCellType
-      m.attr("IT_LEC")    = (int) IT_LEC;
-      m.attr("IT_STRING") = (int) IT_STRING;
+      // TableCellType
+      m.attr("TABLE_CELL_LEC")    = (int) TABLE_CELL_LEC;
+      m.attr("TABLE_CELL_STRING") = (int) TABLE_CELL_STRING;
 
       // EnumCellAttribute
-      m.attr("IT_NORMAL")    = (int) IT_NORMAL;
-      m.attr("IT_BOLD")      = (int) IT_BOLD;
-      m.attr("IT_ITALIC")    = (int) IT_ITALIC;
-      m.attr("IT_UNDERLINE") = (int) IT_UNDERLINE;
+      m.attr("TABLE_CELL_NORMAL")    = (int) TABLE_CELL_NORMAL;
+      m.attr("TABLE_CELL_BOLD")      = (int) TABLE_CELL_BOLD;
+      m.attr("TABLE_CELL_ITALIC")    = (int) TABLE_CELL_ITALIC;
+      m.attr("TABLE_CELL_UNDERLINE") = (int) TABLE_CELL_UNDERLINE;
       //-----------------
-      m.attr("IT_CENTER")  = (int) IT_CENTER;
-      m.attr("IT_LEFT")    = (int) IT_LEFT;
-      m.attr("IT_RIGHT")   = (int) IT_RIGHT;
-      m.attr("IT_DECIMAL") = (int) IT_DECIMAL;
+      m.attr("TABLE_CELL_CENTER")  = (int) TABLE_CELL_CENTER;
+      m.attr("TABLE_CELL_LEFT")    = (int) TABLE_CELL_LEFT;
+      m.attr("TABLE_CELL_RIGHT")   = (int) TABLE_CELL_RIGHT;
+      m.attr("TABLE_CELL_DECIMAL") = (int) TABLE_CELL_DECIMAL;
 
-      // EnumLineType
-      m.attr("IT_FILES") = (int) IT_FILES;
-      m.attr("IT_MODE")  = (int) IT_MODE;
-      m.attr("IT_CELL")  = (int) IT_CELL;
-      m.attr("IT_LINE")  = (int) IT_LINE;
-      m.attr("IT_TITLE") = (int) IT_TITLE;
-      m.attr("IT_DATE")  = (int) IT_DATE;
+      // TableLineType
+      m.attr("TABLE_LINE_FILES") = (int) TABLE_LINE_FILES;
+      m.attr("TABLE_LINE_MODE")  = (int) TABLE_LINE_MODE;
+      m.attr("TABLE_LINE_CELL")  = (int) TABLE_LINE_CELL;
+      m.attr("TABLE_LINE")  = (int) TABLE_LINE;
+      m.attr("TABLE_LINE_TITLE") = (int) TABLE_LINE_TITLE;
+      m.attr("TABLE_LINE_DATE")  = (int) TABLE_LINE_DATE;
 
-      // EnumGraphType
-      m.attr("IG_LINE")    = (int) IG_LINE;
-      m.attr("IG_SCATTER") = (int) IG_SCATTER;
-      m.attr("IG_BAR")     = (int) IG_BAR;
+      // TableGraphType
+      m.attr("TABLE_GRAPH_LINE")    = (int) TABLE_GRAPH_LINE;
+      m.attr("TABLE_GRAPH_SCATTER") = (int) TABLE_GRAPH_SCATTER;
+      m.attr("TABLE_GRAPH_BAR")     = (int) TABLE_GRAPH_BAR;
 
-      // EnumGraphGrid
-      m.attr("IG_MAJOR") = (int) IG_MAJOR;
-      m.attr("IG_NONE")  = (int) IG_NONE;
-      m.attr("IG_MINOR") = (int) IG_MINOR;
+      // TableGraphGrid
+      m.attr("TABLE_GRAPH_MAJOR") = (int) TABLE_GRAPH_MAJOR;
+      m.attr("TABLE_GRAPH_NONE")  = (int) TABLE_GRAPH_NONE;
+      m.attr("TABLE_GRAPH_MINOR") = (int) TABLE_GRAPH_MINOR;
 
-      // EnumGraphAlign
-      m.attr("IG_LEFT")   = (int) IG_LEFT;
-      m.attr("IG_CENTER") = (int) IG_CENTER;
-      m.attr("IG_RIGHT")  = (int) IG_RIGHT;
+      // TableGraphAlign
+      m.attr("TABLE_GRAPH_LEFT")   = (int) TABLE_GRAPH_LEFT;
+      m.attr("TABLE_GRAPH_CENTER") = (int) TABLE_GRAPH_CENTER;
+      m.attr("TABLE_GRAPH_RIGHT")  = (int) TABLE_GRAPH_RIGHT;
 
-      // EnumGraphAxis
-      m.attr("IG_VALUES")  = (int) IG_VALUES;
-      m.attr("IG_LOG")     = (int) IG_LOG;
-      m.attr("IG_SEMILOG") = (int) IG_SEMILOG;
-      m.attr("IG_PERCENT") = (int) IG_PERCENT;
+      // TableGraphAxis
+      m.attr("TABLE_GRAPH_VALUES")  = (int) TABLE_GRAPH_VALUES;
+      m.attr("TABLE_GRAPH_LOG")     = (int) TABLE_GRAPH_LOG;
+      m.attr("TABLE_GRAPH_SEMILOG") = (int) TABLE_GRAPH_SEMILOG;
+      m.attr("TABLE_GRAPH_PERCENT") = (int) TABLE_GRAPH_PERCENT;
 
       // Simulation parameters
       m.attr("SORT_CONNEX") = (int) SORT_CONNEX;

@@ -3,8 +3,8 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport (EnumLang, EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
-                            EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType)
+from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellFont, TableLineType, 
+                            TableGraphAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
 
 cdef extern from "cpp_api/objects/table.h":
@@ -12,8 +12,8 @@ cdef extern from "cpp_api/objects/table.h":
     # declare C++ TableCell class
     cdef cppclass CTableCell "TableCell":
         # Constructor
-        CTableCell(EnumCellType cell_type, string content,
-                   EnumCellAlign align=EnumCellAlign.IT_LEFT,
+        CTableCell(TableCellType cell_type, string content,
+                   TableCellAlign align=TableCellAlign.TABLE_CELL_LEFT,
                    bint bold=False, bint italic=False, bint underline=False) except +
 
         # Methods
@@ -25,11 +25,11 @@ cdef extern from "cpp_api/objects/table.h":
         void set_lec(string& lec) except +
         void set_content(string& content) except +
 
-        EnumCellType get_type()
-        void set_type(EnumCellType cell_type) except +
+        TableCellType get_type()
+        void set_type(TableCellType cell_type) except +
 
-        EnumCellAlign get_align()
-        void set_align(EnumCellAlign align) except +
+        TableCellAlign get_align()
+        void set_align(TableCellAlign align) except +
 
         bint is_bold()
         void set_bold(bint value) except +
@@ -48,13 +48,13 @@ cdef extern from "cpp_api/objects/table.h":
     # declare C++ TableLine class
     cdef cppclass CTableLine "TableLine":
         # Constructor
-        CTableLine(EnumLineType line_type, EnumGraphType graph_type, bint axis_left) except +
+        CTableLine(TableLineType line_type, TableGraphType graph_type, bint axis_left) except +
 
         # Getters and Setters
-        EnumLineType get_line_type()
+        TableLineType get_line_type()
 
-        EnumGraphType get_line_graph()
-        void set_line_graph(EnumGraphType graph_type) except +
+        TableGraphType get_line_graph()
+        void set_line_graph(TableGraphType graph_type) except +
 
         bint is_left_axis()
         void set_line_axis(bint is_left) except +
@@ -85,26 +85,26 @@ cdef extern from "cpp_api/objects/table.h":
         short nb_columns()
 
         string get_language()
-        void set_language(EnumLang lang) except +
+        void set_language(TableLang lang) except +
 
-        EnumGraphGrid get_gridx()
-        void set_gridx(EnumGraphGrid gridx) except +
+        TableGraphGrid get_gridx()
+        void set_gridx(TableGraphGrid gridx) except +
 
-        EnumGraphGrid get_gridy()
-        void set_gridy(EnumGraphGrid gridy) except +
+        TableGraphGrid get_gridy()
+        void set_gridy(TableGraphGrid gridy) except +
 
-        EnumGraphAxis get_graph_axis()
-        void set_graph_axis(EnumGraphAxis axis) except +
+        TableGraphAxis get_graph_axis()
+        void set_graph_axis(TableGraphAxis axis) except +
 
-        EnumGraphAlign get_graph_alignment()
-        void set_graph_alignment(EnumGraphAlign align) except +
+        TableGraphAlign get_graph_alignment()
+        void set_graph_alignment(TableGraphAlign align) except +
 
         # Methods
         void extend() except +
 
         # Lines
         CTableLine* get_line(int row) except +
-        CTableLine* insert_line(int pos, EnumLineType line_type, bint after) except +
+        CTableLine* insert_line(int pos, TableLineType line_type, bint after) except +
         CTableLine* get_divider_line() except +
 
         # Title

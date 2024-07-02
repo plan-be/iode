@@ -48,11 +48,11 @@ public:
 
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
 
-	EnumLineType get_line_type(const int row) const;
+	TableLineType get_line_type(const int row) const;
 
-	void appendLine(EnumLineType lineType);
+	void appendLine(TableLineType lineType);
 
-	void insert_line(EnumLineType lineType, const int position, const bool after);
+	void insert_line(TableLineType lineType, const int position, const bool after);
 
 protected:
 	bool removeRows(int position, int rows, const QModelIndex& index = QModelIndex()) override;
@@ -64,5 +64,5 @@ protected:
 	}
 
 signals:
-	void displayData(int row, EnumLineType line_type, int nb_columns) const;
+	void displayData(int row, TableLineType line_type, int nb_columns) const;
 };

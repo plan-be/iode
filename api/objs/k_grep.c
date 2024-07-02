@@ -86,18 +86,18 @@ char **K_grep(KDB* kdb, char* pattern, int ecase, int names, int forms, int text
                         tline = tbl->t_line + k;
                         tcell = (TCELL *) tline->tl_val;
                         switch(tline->tl_type) {
-                            case KT_LINE  :
-                            case KT_MODE  :
-                            case KT_DATE  :
-                            case KT_FILES :
+                            case TABLE_LINE_SEP   :
+                            case TABLE_LINE_MODE  :
+                            case TABLE_LINE_DATE  :
+                            case TABLE_LINE_FILES :
                                 break;
-                            case KT_TITLE :
+                            case TABLE_LINE_TITLE :
                                 if(texts) found = !SCR_grep_gnl(pattern, T_cell_cont(tcell, 1), ecase, all);
                                 break;
-                            case KT_CELL  :
+                            case TABLE_LINE_CELL  :
                                 for(j = 0; j < T_NC(tbl) && !found; j++)
-                                    if((texts && tcell[j].tc_type == KT_STRING) ||
-                                            (forms && tcell[j].tc_type == KT_LEC))
+                                    if((texts && tcell[j].tc_type == TABLE_CELL_STRING) ||
+                                            (forms && tcell[j].tc_type == TABLE_CELL_LEC))
                                         found = !SCR_grep_gnl(pattern, T_cell_cont(tcell + j, 1), ecase, all);
                                 break;
                         }

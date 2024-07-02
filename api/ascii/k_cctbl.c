@@ -16,43 +16,43 @@
  */
 
 YYKEYS KT_TABLE[] = {
-    "BOLD",         KT_BOLD,
-    "UNDERLINE",    KT_UNDERLINE,
-    "CENTER",       KT_CENTER,
-    "DATE",         KT_DATE,
-    "DECIMAL",      KT_DECIMAL,
-    "DIM",          KT_DIM,
-    "DIV",          KT_DIV,
-    "DUTCH",        KT_DUTCH,
-    "ENGLISH",      KT_ENGLISH,
-    "FILES",        KT_FILES,
-    "FRENCH",       KT_FRENCH,
-    "ITALIC",       KT_ITALIC,
-    "LEC",          KT_LEC,
-    "LEFT",         KT_LEFT,
-    "LINE",         KT_LINE,
-    "LINE BOLD",    KT_DLINE,
-    "MODE",         KT_MODE,
-    "NORMAL",       KT_NORMAL,
-    "RIGHT",        KT_RIGHT,
-    "TITLE",        KT_TITLE,
-    "{",            KT_OPEN,
-    "}",            KT_CLOSE,
-    "-",            KT_BREAK, /* GB 2/3/2000 */
-    "YMIN",         KT_YMIN,
-    "YMAX",         KT_YMAX,
-    "ZMIN",         KT_ZMIN,
-    "ZMAX",         KT_ZMAX,
-    "XGRID",        KT_XGRID,
-    "YGRID",        KT_YGRID,
-    "BOX",          KT_BOX,
-    "AXIS",         KT_AXIS,
-    "ALIGN",        KT_ALGN,
-    "LAXIS",        KT_LAXIS,
-    "RAXIS",        KT_RAXIS,
-    "GRLINE",       KT_GRLINE,
-    "GRBAR",        KT_GRBAR,
-    "GRSCATTER",    KT_GRSCATTER
+    "BOLD",         TABLE_CELL_BOLD,
+    "UNDERLINE",    TABLE_CELL_UNDERLINE,
+    "CENTER",       TABLE_CELL_CENTER,
+    "DATE",         TABLE_ASCII_LINE_DATE,
+    "DECIMAL",      TABLE_CELL_DECIMAL,
+    "DIM",          TABLE_ASCII_DIM,
+    "DIV",          TABLE_ASCII_DIVIDER,
+    "DUTCH",        TABLE_ASCII_DUTCH,
+    "ENGLISH",      TABLE_ASCII_ENGLISH,
+    "FILES",        TABLE_ASCII_LINE_FILES,
+    "FRENCH",       TABLE_ASCII_FRENCH,
+    "ITALIC",       TABLE_CELL_ITALIC,
+    "LEC",          TABLE_ASCII_CELL_LEC,
+    "LEFT",         TABLE_CELL_LEFT,
+    "LINE",         TABLE_ASCII_LINE_SEP,
+    "LINE BOLD",    TABLE_ASCII_BOLD_LINE,
+    "MODE",         TABLE_ASCII_LINE_MODE,
+    "NORMAL",       TABLE_CELL_NORMAL,
+    "RIGHT",        TABLE_CELL_RIGHT,
+    "TITLE",        TABLE_ASCII_LINE_TITLE,
+    "{",            TABLE_ASCII_OPEN,
+    "}",            TABLE_ASCII_CLOSE,
+    "-",            TABLE_ASCII_BREAK, /* GB 2/3/2000 */
+    "YMIN",         TABLE_ASCII_YMIN,
+    "YMAX",         TABLE_ASCII_YMAX,
+    "ZMIN",         TABLE_ASCII_ZMIN,
+    "ZMAX",         TABLE_ASCII_ZMAX,
+    "XGRID",        TABLE_ASCII_XGRID,
+    "YGRID",        TABLE_ASCII_YGRID,
+    "BOX",          TABLE_ASCII_BOX,
+    "AXIS",         TABLE_ASCII_AXIS,
+    "ALIGN",        TABLE_ASCII_ALIGN,
+    "LAXIS",        TABLE_ASCII_LEFT_AXIS,
+    "RAXIS",        TABLE_ASCII_RIGHT_AXIS,
+    "GRLINE",       TABLE_ASCII_GRAPH_LINE,
+    "GRBAR",        TABLE_ASCII_GRAPH_BAR,
+    "GRSCATTER",    TABLE_ASCII_GRAPH_SCATTER
 };
 
 
@@ -71,7 +71,7 @@ YYKEYS KT_TABLE[] = {
 
 static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
 {
-    int     keyw, ok = 0, align = KT_LEFT;
+    int     keyw, ok = 0, align = TABLE_CELL_LEFT;
 
     keyw = YY_lex(yy);
     if(mode != 0 && mode != keyw) {
@@ -79,23 +79,23 @@ static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
         return;
     }
 
-    cell->tc_type = KT_STRING;
+    cell->tc_type = TABLE_CELL_STRING;
     while(1) {
         switch(keyw) {
-            case KT_RIGHT  :
-            case KT_LEFT   :
-            case KT_CENTER :
-            case KT_DECIMAL :
+            case TABLE_CELL_RIGHT  :
+            case TABLE_CELL_LEFT   :
+            case TABLE_CELL_CENTER :
+            case TABLE_CELL_DECIMAL :
                 align = keyw;
                 break;
-            case KT_ITALIC :
-            case KT_BOLD   :
-            case KT_UNDERLINE:
-            case KT_NORMAL :
+            case TABLE_CELL_ITALIC :
+            case TABLE_CELL_BOLD   :
+            case TABLE_CELL_UNDERLINE:
+            case TABLE_CELL_NORMAL :
                 cell->tc_attr |= keyw;
                 break;
 
-            case KT_LEC    :
+            case TABLE_ASCII_CELL_LEC    :
                 if(ok == 1) goto ret;
                 ok = 1;
                 if(YY_lex(yy) != YY_STRING) {
@@ -105,23 +105,23 @@ static void KT_read_cell(TCELL* cell, YYFILE* yy, int mode)
                 T_free_cell(cell);
                 if(K_ipack(&(cell->tc_val), yy->yy_text) < 0)
                     cell->tc_val = NULL;
-                cell->tc_type = KT_LEC;
-                align = KT_DECIMAL;
+                cell->tc_type = TABLE_CELL_LEC;
+                align = TABLE_CELL_DECIMAL;
                 break;
 
             case YY_STRING :
                 if(ok == 1) goto ret;
                 ok = 1;
                 T_free_cell(cell);
-                /*            cell->tc_attr = KT_LEFT; */
-                if(U_is_in('#', yy->yy_text)) cell->tc_attr = KT_CENTER;
+                /*            cell->tc_attr = TABLE_CELL_LEFT; */
+                if(U_is_in('#', yy->yy_text)) cell->tc_attr = TABLE_CELL_CENTER;
                 K_stracpy(&(cell->tc_val), yy->yy_text);
-                cell->tc_type = KT_STRING;
+                cell->tc_type = TABLE_CELL_STRING;
                 break;
 
 
             case YY_EOF   :
-            case KT_BREAK :
+            case TABLE_ASCII_BREAK :
             default       :
                 goto ret;
         }
@@ -213,21 +213,21 @@ static int KT_read_line(TBL* tbl, YYFILE* yy)
                 YY_unread(yy);
                 return(0);
 
-            case KT_RIGHT  :
-            case KT_LEFT   :
-            case KT_CENTER :
-            case KT_DECIMAL:
-            case KT_ITALIC :
-            case KT_BOLD   :
-            case KT_UNDERLINE:
-            case KT_NORMAL :
+            case TABLE_CELL_RIGHT  :
+            case TABLE_CELL_LEFT   :
+            case TABLE_CELL_CENTER :
+            case TABLE_CELL_DECIMAL:
+            case TABLE_CELL_ITALIC :
+            case TABLE_CELL_BOLD   :
+            case TABLE_CELL_UNDERLINE:
+            case TABLE_CELL_NORMAL :
                 kerror(0, "Attribute definition %s, skipped", YY_error(yy));
                 break;
 
-            case KT_LINE  :
-            case KT_MODE  :
-            case KT_DATE  :
-            case KT_FILES :
+            case TABLE_ASCII_LINE_SEP   :
+            case TABLE_ASCII_LINE_MODE  :
+            case TABLE_ASCII_LINE_DATE  :
+            case TABLE_ASCII_LINE_FILES :
                 if(c_line->tl_type != 0) {
                     YY_unread(yy);
                     return(0);
@@ -235,7 +235,7 @@ static int KT_read_line(TBL* tbl, YYFILE* yy)
                 c_line->tl_type = keyw;
                 break;
 
-            case KT_TITLE :
+            case TABLE_ASCII_LINE_TITLE :
                 if(c_line->tl_type != 0) {
                     YY_unread(yy);
                     return(0);
@@ -245,30 +245,30 @@ static int KT_read_line(TBL* tbl, YYFILE* yy)
                 KT_read_cell((TCELL *) c_line->tl_val, yy, YY_STRING);
                 break;
 
-            case KT_BREAK :
+            case TABLE_ASCII_BREAK :
                 if(c_line->tl_type != 0) {
                     YY_unread(yy);
                     return(0);
                 }
-                c_line->tl_type = KT_TITLE; /* empty string */
+                c_line->tl_type = TABLE_ASCII_LINE_TITLE; /* empty string */
                 c_line->tl_val = SW_nalloc(sizeof(TCELL));
                 YY_unread(yy);
                 return(0);
 
-            case KT_LAXIS :
+            case TABLE_ASCII_LEFT_AXIS :
                 c_line->tl_axis = 0;
                 break;
-            case KT_RAXIS :
+            case TABLE_ASCII_RIGHT_AXIS :
                 c_line->tl_axis = 1;
                 break;
 
-            case KT_GRLINE :
+            case TABLE_ASCII_GRAPH_LINE :
                 c_line->tl_graph= 0;
                 break;
-            case KT_GRSCATTER:
+            case TABLE_ASCII_GRAPH_SCATTER:
                 c_line->tl_graph= 1;
                 break;
-            case KT_GRBAR  :
+            case TABLE_ASCII_GRAPH_BAR  :
                 c_line->tl_graph= 2;
                 break;
 
@@ -300,13 +300,13 @@ static TBL *KT_read_tbl(YYFILE* yy)
     TBL     *tbl = NULL;
 
     keyw = YY_lex(yy);
-    if(keyw != KT_OPEN) {
+    if(keyw != TABLE_ASCII_OPEN) {
         kerror(0, "%s: Expected { - Got %s ", yy->yy_text, YY_error(yy));
         return(NULL);
     }
 
     keyw = YY_lex(yy);
-    if(keyw != KT_DIM) YY_unread(yy);
+    if(keyw != TABLE_ASCII_DIM) YY_unread(yy);
     else {
         if(YY_lex(yy) != YY_LONG)  YY_unread(yy);
         else dim = yy->yy_long;
@@ -318,54 +318,54 @@ static TBL *KT_read_tbl(YYFILE* yy)
     while(1) {
         keyw = YY_lex(yy);
         switch(keyw) {
-            case KT_CLOSE   :
+            case TABLE_ASCII_CLOSE   :
                 return(tbl);
 
-            case KT_DUTCH   :
-            case KT_FRENCH  :
-            case KT_ENGLISH :
+            case TABLE_ASCII_DUTCH   :
+            case TABLE_ASCII_FRENCH  :
+            case TABLE_ASCII_ENGLISH :
                 tbl->t_lang = keyw;
                 break;
 
-            case KT_DIM     :
+            case TABLE_ASCII_DIM     :
                 kerror(0, "Double dim definition skipped : %s", YY_error(yy));
                 break;
 
-            case KT_DIV     :
+            case TABLE_ASCII_DIVIDER     :
                 KT_read_div(tbl, yy);
                 break;
 
-            case KT_BOX     :
+            case TABLE_ASCII_BOX     :
                 tbl->t_box = (char)K_read_long(yy);
                 break;
-            case KT_AXIS     :
+            case TABLE_ASCII_AXIS     :
                 tbl->t_axis = (char)K_read_long(yy);
                 break;
-            case KT_XGRID    :
+            case TABLE_ASCII_XGRID    :
                 tbl->t_gridx = (char)K_read_long(yy);
                 break;
-            case KT_YGRID    :
+            case TABLE_ASCII_YGRID    :
                 tbl->t_gridy = (char)K_read_long(yy);
                 break;
 
-            case KT_YMIN     :
+            case TABLE_ASCII_YMIN     :
                 tbl->t_ymin  = (float)K_read_real(yy);
                 break;
-            case KT_YMAX     :
+            case TABLE_ASCII_YMAX     :
                 tbl->t_ymax  = (float)K_read_real(yy);
                 break;
-            case KT_ZMIN     :
+            case TABLE_ASCII_ZMIN     :
                 tbl->t_zmin  = (float)K_read_real(yy);
                 break;
-            case KT_ZMAX     :
+            case TABLE_ASCII_ZMAX     :
                 tbl->t_zmax  = (float)K_read_real(yy);
                 break;
 
-            case KT_ALGN:
+            case TABLE_ASCII_ALIGN:
                 tbl->t_align = K_read_align(yy);
                 break;
 
-            case KT_BREAK   :
+            case TABLE_ASCII_BREAK   :
                 if(KT_read_line(tbl, yy)< 0) {
                     T_free(tbl);
                     return(NULL);
@@ -540,14 +540,14 @@ static void KT_min(FILE* fd, char* str, float value)
  */
 static void KT_print_attr(FILE* fd, int attr)
 {
-    if(attr & KT_BOLD)      fprintf(fd, "BOLD ");
-    if(attr & KT_ITALIC)    fprintf(fd, "ITALIC ");
-    if(attr & KT_UNDERLINE) fprintf(fd, "UNDERLINE ");
+    if(attr & TABLE_CELL_BOLD)      fprintf(fd, "BOLD ");
+    if(attr & TABLE_CELL_ITALIC)    fprintf(fd, "ITALIC ");
+    if(attr & TABLE_CELL_UNDERLINE) fprintf(fd, "UNDERLINE ");
 
-    if(attr & KT_CENTER)    fprintf(fd, "CENTER ");
-    if(attr & KT_DECIMAL)   fprintf(fd, "DECIMAL ");
-    if(attr & KT_LEFT)      fprintf(fd, "LEFT ");
-    if(attr & KT_RIGHT)     fprintf(fd, "RIGHT ");
+    if(attr & TABLE_CELL_CENTER)    fprintf(fd, "CENTER ");
+    if(attr & TABLE_CELL_DECIMAL)   fprintf(fd, "DECIMAL ");
+    if(attr & TABLE_CELL_LEFT)      fprintf(fd, "LEFT ");
+    if(attr & TABLE_CELL_RIGHT)     fprintf(fd, "RIGHT ");
     return;
 }
 
@@ -567,14 +567,14 @@ static void KT_print_cell(FILE *fd, TCELL *cell)
         return;
     }
     switch(cell->tc_type) {
-        case KT_STRING :
+        case TABLE_ASCII_CELL_STRING :
             //fprintf(fd, "\"%s\" ", cell->tc_val);
             // JMP 8/4/2015 -> escape "
             SCR_fprintf_esc(fd, cell->tc_val, 1);
             fprintf(fd, " ");
             break;
 
-        case KT_LEC :
+        case TABLE_ASCII_CELL_LEC :
             fprintf(fd, "LEC \"%s\" ", (char *)P_get_ptr(cell->tc_val, 0));
             break;
         default :
@@ -622,7 +622,7 @@ static void KT_print_tbl(FILE* fd, TBL* tbl)
     for(j = 0; j < T_NL(tbl); j++) {
         fprintf(fd, "\n- ");
         switch(tbl->t_line[j].tl_type) {
-            case KT_CELL :
+            case TABLE_ASCII_LINE_CELL :
                 cell = (TCELL *) tbl->t_line[j].tl_val;
                 for(i = 0; i < T_NC(tbl); i++)
                     KT_print_cell(fd, cell + i);
@@ -631,16 +631,16 @@ static void KT_print_tbl(FILE* fd, TBL* tbl)
                 KT_grinfo(fd, tbl->t_line[j].tl_axis, tbl->t_line[j].tl_graph);
                 break;
 
-            case KT_TITLE :
+            case TABLE_ASCII_LINE_TITLE :
                 K_wrdef(fd, KT_TABLE, tbl->t_line[j].tl_type);
                 KT_print_cell(fd, (TCELL *) tbl->t_line[j].tl_val);
                 break;
 
-            case KT_LINE  :
-            case KT_DLINE  :
-            case KT_MODE  :
-            case KT_DATE  :
-            case KT_FILES :
+            case TABLE_ASCII_LINE_SEP   :
+            case TABLE_ASCII_BOLD_LINE  :
+            case TABLE_ASCII_LINE_MODE  :
+            case TABLE_ASCII_LINE_DATE  :
+            case TABLE_ASCII_LINE_FILES :
                 K_wrdef(fd, KT_TABLE, tbl->t_line[j].tl_type);
                 break;
 

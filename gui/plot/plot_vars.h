@@ -12,9 +12,9 @@ class PlotVariablesDialog : public PlotDialog
     QComboBox* comboVarMode;
 
 public:
-    PlotVariablesDialog(KDBVariables* kdb_vars = nullptr, EnumIodeGraphChart chartType = I_G_CHART_LINE, 
-        IodeVarMode varMode = VAR_MODE_LEVEL, const bool logScale = false, EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, 
-        EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, QWidget* parent = nullptr);
+    PlotVariablesDialog(KDBVariables* kdb_vars = nullptr, TableGraphType chartType = TABLE_GRAPH_LINE, 
+        IodeVarMode varMode = VAR_MODE_LEVEL, const bool logScale = false, TableGraphGrid xTicks = TABLE_GRAPH_MAJOR, 
+        TableGraphGrid yTicks = TABLE_GRAPH_MAJOR, QWidget* parent = nullptr);
     ~PlotVariablesDialog();
 
     void addSeries(const QString& variable, const QString& legend_name = "");

@@ -431,7 +431,7 @@ static void K_xdrMTFN(unsigned char* expr, int mode, int nvargs)
  */
 static void K_xdrCELL(unsigned char* ptr, char type, int mode)
 {
-    if(type == KT_LEC) {
+    if(type == TABLE_CELL_LEC) {
         if(mode == 0) {
             K_xdrPACK(ptr, mode);
             K_xdrCLEC(P_get_ptr(ptr, 1), mode);
@@ -495,7 +495,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
 
     for(i = 0; i < nl; i++) {
         switch(line[i].tl_type) {
-            case KT_CELL :
+            case TABLE_LINE_CELL :
                 len = P_get_len(pack, p);
                 pcell = P_get_ptr(pack, p);
                 cell = SW_nalloc(len);
@@ -510,7 +510,7 @@ static void K_xdrTBL(unsigned char* pack, int mode)
                 SW_nfree(cell);
                 break;
 
-            case KT_TITLE :
+            case TABLE_LINE_TITLE :
                 len = P_get_len(pack, p);
                 pcell = P_get_ptr(pack, p);
                 cell =  SW_nalloc(len);

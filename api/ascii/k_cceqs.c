@@ -17,28 +17,28 @@
  */
  
 YYKEYS KE_TABLE[] = {
-    "{",            ASCII_OPEN,
-    "}",            ASCII_CLOSE,
-    "BLOCK",        ASCII_BLK,
-    "COMMENT",      ASCII_CMT,
-    "DATE",         ASCII_DATE,
-    "INF",          ASCII_INF,
-    "INSTRUMENTS",  ASCII_INSTR,
-    "GLS",          ASCII_GLS,
-    "LSQ",          ASCII_LSQ,
-    "SAMPLE",       ASCII_SMPL,
-    "ZELLNER",      ASCII_ZEL,
-    "MAXLIK",       ASCII_MAXLIK,
+    "{",            EQ_ASCII_OPEN,
+    "}",            EQ_ASCII_CLOSE,
+    "BLOCK",        EQ_ASCII_BLK,
+    "COMMENT",      EQ_ASCII_CMT,
+    "DATE",         EQ_ASCII_DATE,
+    "INF",          EQ_ASCII_INF,
+    "INSTRUMENTS",  EQ_ASCII_INSTR,
+    "GLS",          EQ_ASCII_GLS,
+    "LSQ",          EQ_ASCII_LSQ,
+    "SAMPLE",       EQ_ASCII_SMPL,
+    "ZELLNER",      EQ_ASCII_ZEL,
+    "MAXLIK",       EQ_ASCII_MAXLIK,
 
-    "STDEV",        ASCII_STDEV,
-    "MEANY",        ASCII_MEANY,
-    "SSRES",        ASCII_SSRES,
-    "STDERR",       ASCII_STDERR,
-    "FSTAT",        ASCII_FSTAT,
-    "R2",           ASCII_R2,
-    "R2ADJ",        ASCII_R2ADJ,
-    "DW",           ASCII_DW,
-    "LOGLIK",       ASCII_LOGLIK
+    "STDEV",        EQ_ASCII_STDEV,
+    "MEANY",        EQ_ASCII_MEANY,
+    "SSRES",        EQ_ASCII_SSRES,
+    "STDERR",       EQ_ASCII_STDERR,
+    "FSTAT",        EQ_ASCII_FSTAT,
+    "R2",           EQ_ASCII_R2,
+    "R2ADJ",        EQ_ASCII_R2ADJ,
+    "DW",           EQ_ASCII_DW,
+    "LOGLIK",       EQ_ASCII_LOGLIK
 };
 
 
@@ -62,7 +62,7 @@ static EQ* KE_read_eq(YYFILE* yy)
 
     eq = (EQ *) SW_nalloc(sizeof(EQ));
     eq->method = 0;
-    if((keyw = YY_lex(yy)) != ASCII_OPEN)  {
+    if((keyw = YY_lex(yy)) != EQ_ASCII_OPEN)  {
         YY_unread(yy);
         lec = K_read_str(yy);
         eq->lec = K_wrap(lec, 60);  
@@ -90,71 +90,71 @@ static EQ* KE_read_eq(YYFILE* yy)
             case YY_WORD :
             case YY_EOF  :
                 YY_unread(yy);
-            case ASCII_CLOSE:
+            case EQ_ASCII_CLOSE:
                 return(eq);
-            case ASCII_DATE :
+            case EQ_ASCII_DATE :
                 eq->date = K_read_long(yy);
                 break;
 
-            case ASCII_LSQ :
+            case EQ_ASCII_LSQ :
                 eq->method = EQ_LSQ;
                 break;
-            case ASCII_ZEL :
+            case EQ_ASCII_ZEL :
                 eq->method = EQ_ZELLNER;
                 break;
-            case ASCII_INF :
+            case EQ_ASCII_INF :
                 eq->method = EQ_INSTRUMENTAL;
                 break;
-            case ASCII_GLS :
+            case EQ_ASCII_GLS :
                 eq->method = EQ_GLS;
                 break;
-            case ASCII_MAXLIK :
+            case EQ_ASCII_MAXLIK :
                 eq->method = EQ_MAX_LIKELIHOOD;
                 break;
 
-            case ASCII_SMPL :
+            case EQ_ASCII_SMPL :
                 smpl = K_read_smpl(yy);
                 if(smpl == NULL) goto err;
                 memcpy(&(eq->smpl), smpl, sizeof(SAMPLE));
                 break;
-            case ASCII_BLK  :
+            case EQ_ASCII_BLK  :
                 eq->blk = K_read_str(yy);
                 if(eq->blk == NULL) goto err;
                 break;
-            case ASCII_CMT  :
+            case EQ_ASCII_CMT  :
                 eq->cmt = K_read_str(yy);
                 if(eq->cmt == NULL) goto err;
                 break;
-            case ASCII_INSTR:
+            case EQ_ASCII_INSTR:
                 eq->instr = K_read_str(yy);
                 if(eq->instr == NULL) goto err;
                 break;
 
-            case ASCII_STDEV :
+            case EQ_ASCII_STDEV :
                 eq->tests[EQ_STDEV] = (float) K_read_real(yy);
                 break;
-            case ASCII_MEANY :
+            case EQ_ASCII_MEANY :
                 eq->tests[EQ_MEANY] = (float) K_read_real(yy);
                 break;
-            case ASCII_SSRES :
+            case EQ_ASCII_SSRES :
                 eq->tests[EQ_SSRES] = (float) K_read_real(yy);
                 break;
-            case ASCII_STDERR :
+            case EQ_ASCII_STDERR :
                 eq->tests[EQ_STDERR] = (float) K_read_real(yy);
                 break;
-            case ASCII_FSTAT :
+            case EQ_ASCII_FSTAT :
                 eq->tests[EQ_FSTAT] = (float) K_read_real(yy);
                 break;
-            case ASCII_R2 :
+            case EQ_ASCII_R2 :
                 eq->tests[EQ_R2] = (float) K_read_real(yy);
                 break;
-            case ASCII_R2ADJ :
+            case EQ_ASCII_R2ADJ :
                 eq->tests[EQ_R2ADJ] = (float) K_read_real(yy);
                 break;
-            case ASCII_DW :
+            case EQ_ASCII_DW :
                 eq->tests[EQ_DW] = (float) K_read_real(yy);
                 break;
-            case ASCII_LOGLIK :
+            case EQ_ASCII_LOGLIK :
                 eq->tests[EQ_LOGLIK] = (float) K_read_real(yy);
                 break;
 

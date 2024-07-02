@@ -53,22 +53,22 @@ QVariant EditTableModel::headerData(int section, Qt::Orientation orientation, in
 		}
 		else
 		{
-			EnumLineType line_type = table->get_line(section - 1)->get_line_type();
+			TableLineType line_type = table->get_line(section - 1)->get_line_type();
 			switch (line_type)
 			{
-			case IT_TITLE:
+			case TABLE_LINE_TITLE:
 				h_data = "TITLE";
 				break;
-			case IT_CELL:
+			case TABLE_LINE_CELL:
 				h_data = "CELLS";
 				break;
-			case IT_MODE:
+			case TABLE_LINE_MODE:
 				h_data = "MODE";
 				break;
-			case IT_FILES:
+			case TABLE_LINE_FILES:
 				h_data = "FILES";
 				break;
-			case IT_DATE:
+			case TABLE_LINE_DATE:
 				h_data = "DATE";
 				break;
 			default:
@@ -95,21 +95,21 @@ QVariant EditTableModel::data(const QModelIndex& index, int role) const
 	bool is_divider = index.row() == 0;
 	int nb_columns = table->nb_columns();
 	TableLine* line = is_divider ? table->get_divider_line() : table->get_line(index.row() - 1);
-	EnumLineType line_type = line->get_line_type();
-	TableCell* cell = (line_type == IT_TITLE || line_type == IT_CELL) ? line->get_cell(index.column(), nb_columns) : nullptr;
+	TableLineType line_type = line->get_line_type();
+	TableCell* cell = (line_type == TABLE_LINE_TITLE || line_type == TABLE_LINE_CELL) ? line->get_cell(index.column(), nb_columns) : nullptr;
 
 	if (role == Qt::TextAlignmentRole)
 	{
-		EnumCellAlign cell_align = (cell != nullptr) ? cell->get_align() : EnumCellAlign::IT_LEFT;
+		TableCellAlign cell_align = (cell != nullptr) ? cell->get_align() : TableCellAlign::TABLE_CELL_LEFT;
 		switch (cell_align)
 		{
-		case IT_LEFT:
+		case TABLE_CELL_LEFT:
 			return int(Qt::AlignLeft);
-		case IT_CENTER:
+		case TABLE_CELL_CENTER:
 			return int(Qt::AlignCenter);
-		case IT_RIGHT:
+		case TABLE_CELL_RIGHT:
 			return int(Qt::AlignRight);
-		case IT_DECIMAL:
+		case TABLE_CELL_DECIMAL:
 			return int(Qt::AlignRight);
 		default:
 			return int(Qt::AlignLeft);
@@ -140,10 +140,10 @@ QVariant EditTableModel::data(const QModelIndex& index, int role) const
 		QColor color;
 		switch (line_type)
 		{
-		case IT_LINE:
+		case TABLE_LINE_SEP:
 			color = QColor(Qt::black);
 			break;
-		case IT_CELL:
+		case TABLE_LINE_CELL:
 			color = QColor(Qt::white);
 			break;
 		default:
@@ -160,11 +160,11 @@ QVariant EditTableModel::data(const QModelIndex& index, int role) const
 		bool display_quotes; 
 		switch (line_type)
 		{
-		case IT_TITLE:
+		case TABLE_LINE_TITLE:
 			s_data = QString::fromStdString(cell->get_content(false));
 			break;
-		case IT_CELL:
-			display_quotes = (!is_divider) && cell->get_type() == IT_STRING;
+		case TABLE_LINE_CELL:
+			display_quotes = (!is_divider) && cell->get_type() == TABLE_CELL_STRING;
 			s_data = QString::fromStdString(cell->get_content(display_quotes));
 			break;
 		default:
@@ -187,26 +187,26 @@ bool EditTableModel::setData(const QModelIndex& index, const QVariant& value, in
 			bool is_divider = index.row() == 0;
 			int nb_columns = table->nb_columns();
 			TableLine* line = is_divider ? table->get_divider_line() : table->get_line(index.row() - 1);
-			EnumLineType line_type = line->get_line_type();
-			TableCell* cell = (line_type == IT_TITLE || line_type == IT_CELL) ? line->get_cell(index.column(), nb_columns) : nullptr;
+			TableLineType line_type = line->get_line_type();
+			TableCell* cell = (line_type == TABLE_LINE_TITLE || line_type == TABLE_LINE_CELL) ? line->get_cell(index.column(), nb_columns) : nullptr;
 
 			if (is_divider)
 			{
-				if (cell->get_type() == IT_STRING)
+				if (cell->get_type() == TABLE_CELL_STRING)
 					cell->set_text(std_value);
 				else
 					cell->set_lec(std_value);
 			}
 			else
 			{
-				EnumLineType line_type = line->get_line_type();
+				TableLineType line_type = line->get_line_type();
 				switch (line_type)
 				{
-				case IT_TITLE:
+				case TABLE_LINE_TITLE:
 					cell->set_text(std_value);
 					break;
-				case IT_CELL:
-					// When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+				case TABLE_LINE_CELL:
+					// When inserting a new line of type TABLE_LINE_CELL, the attribute TCELL::tc_type of cells is undefined!
 					// Rule: If the content starts with a double quotes -> we assume it is a string cell. 
 					//       Otherwise, it is a LEC cell.
 					cell->set_content(std_value);
@@ -229,27 +229,27 @@ bool EditTableModel::setData(const QModelIndex& index, const QVariant& value, in
 	}
 }
 
-void EditTableModel::appendLine(EnumLineType lineType)
+void EditTableModel::appendLine(TableLineType lineType)
 {
 	switch(lineType)
 	{
-	case EnumLineType::IT_CELL:
-		// When adding a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+	case TableLineType::TABLE_LINE_CELL:
+		// When adding a new line of type TABLE_LINE_CELL, the attribute TCELL::tc_type of cells is undefined!
 		table->add_line_with_cells();
 		break;
-	case EnumLineType::IT_TITLE:
+	case TableLineType::TABLE_LINE_TITLE:
 		table->add_title("");
 		break;
-	case EnumLineType::IT_LINE:
+	case TableLineType::TABLE_LINE_SEP:
 		table->add_line_separator();
 		break;
-	case EnumLineType::IT_FILES:
+	case TableLineType::TABLE_LINE_FILES:
 		table->add_line_files();
 		break;
-	case EnumLineType::IT_DATE:
+	case TableLineType::TABLE_LINE_DATE:
 		table->add_line_date();
 		break;
-	case EnumLineType::IT_MODE:
+	case TableLineType::TABLE_LINE_MODE:
 		table->add_line_mode();
 		break;
 	default:
@@ -259,27 +259,27 @@ void EditTableModel::appendLine(EnumLineType lineType)
 	resetModel();
 }
 
-void EditTableModel::insert_line(EnumLineType lineType, const int position, const bool after)
+void EditTableModel::insert_line(TableLineType lineType, const int position, const bool after)
 {
 	switch(lineType)
 	{
-	case EnumLineType::IT_CELL:
-		// When inserting a new line of type IT_CELL, the attribute TCELL::tc_type of cells is undefined!
+	case TableLineType::TABLE_LINE_CELL:
+		// When inserting a new line of type TABLE_LINE_CELL, the attribute TCELL::tc_type of cells is undefined!
 		table->insert_line_with_cells(position, after);
 		break;
-	case EnumLineType::IT_TITLE:
+	case TableLineType::TABLE_LINE_TITLE:
 		table->insert_title(position, "", after);
 		break;
-	case EnumLineType::IT_LINE:
+	case TableLineType::TABLE_LINE_SEP:
 		table->insert_line_separator(position, after);
 		break;
-	case EnumLineType::IT_FILES:
+	case TableLineType::TABLE_LINE_FILES:
 		table->insert_line_files(position, after);
 		break;
-	case EnumLineType::IT_DATE:
+	case TableLineType::TABLE_LINE_DATE:
 		table->insert_line_date(position, after);
 		break;
-	case EnumLineType::IT_MODE:
+	case TableLineType::TABLE_LINE_MODE:
 		table->insert_line_mode(position, after);
 		break;
 	default:
@@ -309,7 +309,7 @@ bool EditTableModel::removeRows(int position, int rows, const QModelIndex& index
 	return true;
 }
 
-EnumLineType EditTableModel::get_line_type(const int row) const
+TableLineType EditTableModel::get_line_type(const int row) const
 {
 	// first row represents the divider line
 	TableLine* line = (row == 0) ? table->get_divider_line() : table->get_line(row - 1);

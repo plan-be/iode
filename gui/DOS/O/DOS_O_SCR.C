@@ -35,12 +35,12 @@ int *type, *where;
     if(SCR_LKEY != SCR_F10) return(-1);
 
     switch(vkp_tins_TYPE) {
-    case 0 : *type = KT_CELL; break;
-    case 1 : *type = KT_TITLE; break;
-    case 2 : *type = KT_LINE; break;
-    case 3 : *type = KT_FILES; break;
-    case 4 : *type = KT_MODE; break;
-    case 5 : *type = KT_DATE; break;
+    case 0 : *type = TABLE_LINE_CELL; break;
+    case 1 : *type = TABLE_LINE_TITLE; break;
+    case 2 : *type = TABLE_LINE_SEP; break;
+    case 3 : *type = TABLE_LINE_FILES; break;
+    case 4 : *type = TABLE_LINE_MODE; break;
+    case 5 : *type = TABLE_LINE_DATE; break;
     }
 
     *where = vkp_tins_WHERE;

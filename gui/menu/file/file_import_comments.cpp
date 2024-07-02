@@ -7,7 +7,7 @@ MenuFileImportComments::MenuFileImportComments(QWidget* parent) :
     setupUi(this);
 
     QList<QString> q_langs;
-    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+    for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
     wInputFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
     wRuleFile = new WrapperFileChooser(label_input_file->text(), *fileChooser_input_file, REQUIRED_FIELD, FILE_ANY, EXISTING_FILE);
@@ -44,7 +44,7 @@ void MenuFileImportComments::import()
         std::string rule_file = wRuleFile->extractAndVerify().toStdString();
 
         std::string save_file = wSaveFile->extractAndVerify().toStdString();
-        EnumLang lang = EnumLang (wLanguage->extractAndVerify() + IT_ENGLISH);
+        TableLang lang = TableLang (wLanguage->extractAndVerify());
         std::string debug_file = wDebugFile->extractAndVerify().toStdString();
 
         import_cmt(input_file, save_file, rule_file, lang, debug_file);

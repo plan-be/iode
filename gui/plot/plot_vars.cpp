@@ -1,7 +1,7 @@
 #include "plot_vars.h"
 
-PlotVariablesDialog::PlotVariablesDialog(KDBVariables* kdb_vars, EnumIodeGraphChart chartType, 
-    IodeVarMode varMode, const bool logScale, EnumIodeGraphAxisThicks xTicks, EnumIodeGraphAxisThicks yTicks, 
+PlotVariablesDialog::PlotVariablesDialog(KDBVariables* kdb_vars, TableGraphType chartType, 
+    IodeVarMode varMode, const bool logScale, TableGraphGrid xTicks, TableGraphGrid yTicks, 
     QWidget* parent) : PlotDialog(chartType, logScale, xTicks, yTicks, parent), varMode(varMode)
 {
     if(kdb_vars)

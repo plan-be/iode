@@ -15,14 +15,21 @@ from libcpp.map cimport map
 from pyiode.common cimport IODE_NAN, IODE_NB_TYPES, EQS_NBTESTS
 from pyiode.common cimport ESTIMATION_MAXIT as C_ESTIMATION_MAXIT 
 from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
-from pyiode.common cimport (IodeDatabaseType, EnumLang, IodeEquationMethod, 
+from pyiode.common cimport (IodeDatabaseType, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
-                            EnumCellType, EnumCellAlign, EnumCellFont, EnumLineType, 
-                            EnumGraphAlign, EnumGraphAxis, EnumGraphGrid, EnumGraphType, 
                             IodeVarMode, VariablesInitialization, 
                             SimuSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport IodeFileType as CIodeFileType 
-from pyiode.common cimport (v_iode_types, v_file_types, vLangs, v_eq_methods, v_var_modes, 
+from pyiode.common cimport TableLang as CTableLang
+from pyiode.common cimport TableCellType as CTableCellType 
+from pyiode.common cimport TableCellFont as CTableCellFont
+from pyiode.common cimport TableCellAlign as CTableCellAlign 
+from pyiode.common cimport TableLineType as CTableLineType
+from pyiode.common cimport TableGraphAlign as CTableGraphAlign 
+from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
+from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
+from pyiode.common cimport TableGraphType as CTableGraphType
+from pyiode.common cimport (v_iode_types, v_file_types, v_table_langs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
                             v_adjustment_method, mLowToHigh)
 
@@ -104,10 +111,10 @@ class IodeFileType(IntEnum):
     FILE_ANY = CIodeFileType.FILE_ANY
     DIRECTORY = CIodeFileType.DIRECTORY
 
-class IodeLanguage(IntEnum):
-    ENGLISH = EnumLang.IT_ENGLISH
-    DUTCH = EnumLang.IT_DUTCH
-    FRENCH = EnumLang.IT_FRENCH
+class TableLang(IntEnum):
+    ENGLISH = CTableLang.TABLE_ENGLISH
+    DUTCH = CTableLang.TABLE_DUTCH
+    FRENCH = CTableLang.TABLE_FRENCH
 
 class EqMethod(IntEnum):
     LSQ = 0
@@ -132,49 +139,49 @@ class EqTest(IntEnum):
 EQ_TEST_NAMES: Tuple[str, ...] = tuple(member.name.lower() for member in EqTest)
 
 class TableCellType(IntEnum):
-    LEC = EnumCellType.IT_LEC
-    STRING = EnumCellType.IT_STRING
+    LEC = CTableCellType.TABLE_CELL_LEC
+    STRING = CTableCellType.TABLE_CELL_STRING
 
 class TableCellFont(IntEnum):
-    NORMAL = EnumCellFont.IT_NORMAL
-    BOLD = EnumCellFont.IT_BOLD
-    ITALIC = EnumCellFont.IT_ITALIC
-    UNDERLINE = EnumCellFont.IT_UNDERLINE
+    NORMAL = CTableCellFont.TABLE_CELL_NORMAL
+    BOLD = CTableCellFont.TABLE_CELL_BOLD
+    ITALIC = CTableCellFont.TABLE_CELL_ITALIC
+    UNDERLINE = CTableCellFont.TABLE_CELL_UNDERLINE
 
 class TableCellAlign(IntEnum):
-    CENTER = EnumCellAlign.IT_CENTER
-    LEFT = EnumCellAlign.IT_LEFT
-    RIGHT = EnumCellAlign.IT_RIGHT
-    DECIMAL = EnumCellAlign.IT_DECIMAL
+    CENTER = CTableCellAlign.TABLE_CELL_CENTER
+    LEFT = CTableCellAlign.TABLE_CELL_LEFT
+    RIGHT = CTableCellAlign.TABLE_CELL_RIGHT
+    DECIMAL = CTableCellAlign.TABLE_CELL_DECIMAL
 
 class TableLineType(IntEnum):
-    FILES = EnumLineType.IT_FILES
-    MODE = EnumLineType.IT_MODE
-    CELL = EnumLineType.IT_CELL
-    LINE = EnumLineType.IT_LINE
-    TITLE = EnumLineType.IT_TITLE
-    DATE = EnumLineType.IT_DATE
+    FILES = CTableLineType.TABLE_LINE_FILES
+    MODE = CTableLineType.TABLE_LINE_MODE
+    CELL = CTableLineType.TABLE_LINE_CELL
+    SEP = CTableLineType.TABLE_LINE_SEP
+    TITLE = CTableLineType.TABLE_LINE_TITLE
+    DATE = CTableLineType.TABLE_LINE_DATE
 
-class TableLineGraph(IntEnum):
-    LINE = EnumGraphType.IG_LINE
-    SCATTER = EnumGraphType.IG_SCATTER
-    BAR = EnumGraphType.IG_BAR
+class TableGraphType(IntEnum):
+    LINE = CTableGraphType.TABLE_GRAPH_LINE
+    SCATTER = CTableGraphType.TABLE_GRAPH_SCATTER
+    BAR = CTableGraphType.TABLE_GRAPH_BAR
 
 class TableGraphGrid(IntEnum):
-    MAJOR = EnumGraphGrid.IG_MAJOR
-    NONE = EnumGraphGrid.IG_NONE
-    MINOR = EnumGraphGrid.IG_MINOR
+    MAJOR = CTableGraphGrid.TABLE_GRAPH_MAJOR
+    NONE = CTableGraphGrid.TABLE_GRAPH_NONE
+    MINOR = CTableGraphGrid.TABLE_GRAPH_MINOR
 
 class TableGraphAlign(IntEnum):
-    LEFT = EnumGraphAlign.IG_LEFT
-    CENTER = EnumGraphAlign.IG_CENTER
-    RIGHT = EnumGraphAlign.IG_RIGHT
+    LEFT = CTableGraphAlign.TABLE_GRAPH_LEFT
+    CENTER = CTableGraphAlign.TABLE_GRAPH_CENTER
+    RIGHT = CTableGraphAlign.TABLE_GRAPH_RIGHT
 
 class TableGraphAxis(IntEnum):
-    VALUES = EnumGraphAxis.IG_VALUES
-    LOG = EnumGraphAxis.IG_LOG
-    SEMILOG = EnumGraphAxis.IG_SEMILOG
-    PERCENT = EnumGraphAxis.IG_PERCENT
+    VALUES = CTableGraphAxis.TABLE_GRAPH_VALUES
+    LOG = CTableGraphAxis.TABLE_GRAPH_LOG
+    SEMILOG = CTableGraphAxis.TABLE_GRAPH_SEMILOG
+    PERCENT = CTableGraphAxis.TABLE_GRAPH_PERCENT
 
 class VarsMode(IntEnum):
     LEVEL = IodeVarMode.VAR_MODE_LEVEL

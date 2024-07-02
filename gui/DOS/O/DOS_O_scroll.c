@@ -145,7 +145,7 @@ int i;
 //    int     k;
 //
 //    for(k = 0; k < T_NL(tbl); k++)
-//        if(tbl->t_line[k].tl_type == KT_TITLE) break;
+//        if(tbl->t_line[k].tl_type == TABLE_LINE_TITLE) break;
 //    if(k == T_NL(tbl) ||
 //       ((TCELL *) tbl->t_line[k].tl_val)->tc_val == 0)
 //            strcpy(STATIC_BUF, "No title");

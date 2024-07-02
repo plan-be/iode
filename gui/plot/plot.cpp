@@ -1,8 +1,8 @@
 #include "plot.h"
 
 
-PlotDialog::PlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIodeGraphAxisThicks xTicks, 
-    EnumIodeGraphAxisThicks yTicks, QWidget* parent) : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
+PlotDialog::PlotDialog(TableGraphType chartType, const bool logScale, TableGraphGrid xTicks, 
+    TableGraphGrid yTicks, QWidget* parent) : QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
     chartType(chartType), logScale(logScale), xTicks(xTicks), yTicks(yTicks), fixedMinY(NAN), fixedMaxY(NAN)
 {
     // prepare chart
@@ -24,7 +24,7 @@ PlotDialog::PlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIo
     
     comboChartType = new QComboBox();
     QStringList q_chart_types;
-    for(const std::string& chart_type: vGraphsChartTypes) q_chart_types << QString::fromStdString(chart_type);
+    for(const std::string& chart_type: v_graph_chart_types) q_chart_types << QString::fromStdString(chart_type);
     comboChartType->addItems(q_chart_types);
     connect(comboChartType, &QComboBox::currentIndexChanged, this, &PlotDialog::updateChartType);
     layout->addWidget(comboChartType, 1, 0);
@@ -38,14 +38,14 @@ PlotDialog::PlotDialog(EnumIodeGraphChart chartType, const bool logScale, EnumIo
 
     comboXTicks = new QComboBox();
     QStringList q_x_axis_ticks;
-    for(const std::string& axis_ticks: vGraphsAxisThicks) q_x_axis_ticks << "X " + QString::fromStdString(axis_ticks);
+    for(const std::string& axis_ticks: v_graph_axis_thicks) q_x_axis_ticks << "X " + QString::fromStdString(axis_ticks);
     comboXTicks->addItems(q_x_axis_ticks);
     connect(comboXTicks, &QComboBox::currentIndexChanged, this, &PlotDialog::updateXTicks);
     layout->addWidget(comboXTicks, 1, 3, Qt::AlignCenter);
 
     comboYTicks = new QComboBox();
     QStringList q_y_axis_ticks;
-    for(const std::string& axis_ticks: vGraphsAxisThicks) q_y_axis_ticks << "Y " + QString::fromStdString(axis_ticks);
+    for(const std::string& axis_ticks: v_graph_axis_thicks) q_y_axis_ticks << "Y " + QString::fromStdString(axis_ticks);
     comboYTicks->addItems(q_y_axis_ticks);
     connect(comboYTicks, &QComboBox::currentIndexChanged, this, &PlotDialog::updateYTicks);
     layout->addWidget(comboYTicks, 1, 4, Qt::AlignCenter);
@@ -183,10 +183,10 @@ void PlotDialog::print()
 
 void PlotDialog::updateChartType(int index)
 {
-    if(index < 0 || index >= I_NB_CHART_TYPES)
+    if(index < 0 || index >= IODE_NB_CHART_TYPES)
         return;
 
-    chartType = (EnumIodeGraphChart) index;
+    chartType = (TableGraphType) index;
     buildSeries();
 }
 
@@ -215,23 +215,23 @@ void PlotDialog::enableLogScale(int state)
 
 void PlotDialog::updateXTicks(int index)
 {
-    if(index < 0 || index >= I_NB_AXIS_THICKS)
+    if(index < 0 || index >= IODE_NB_AXIS_THICKS)
         return;
 
-    xTicks = (EnumIodeGraphAxisThicks) index;
+    xTicks = (TableGraphGrid) index;
     QAbstractAxis* Xaxis = chart->axisX();
 
     switch (index)
     {
-    case I_G_MAJOR_THICKS:
+    case TABLE_GRAPH_MAJOR:
         Xaxis->setGridLineVisible(true);
         Xaxis->setMinorGridLineVisible(false);
         break;
-    case I_G_NO_THICKS:
+    case TABLE_GRAPH_NONE:
         Xaxis->setGridLineVisible(false);
         Xaxis->setMinorGridLineVisible(false);
         break;
-    case I_G_MINOR_THICKS:
+    case TABLE_GRAPH_MINOR:
         Xaxis->setGridLineVisible(true);
         Xaxis->setMinorGridLineVisible(true);
         break;
@@ -242,23 +242,23 @@ void PlotDialog::updateXTicks(int index)
 
 void PlotDialog::updateYTicks(int index)
 {
-    if(index < 0 || index >= I_NB_AXIS_THICKS)
+    if(index < 0 || index >= IODE_NB_AXIS_THICKS)
         return;
 
-    yTicks = (EnumIodeGraphAxisThicks) index;
+    yTicks = (TableGraphGrid) index;
     QAbstractAxis* Yaxis = chart->axisY();
 
     switch (index)
     {
-    case I_G_MAJOR_THICKS:
+    case TABLE_GRAPH_MAJOR:
         Yaxis->setGridLineVisible(true);
         Yaxis->setMinorGridLineVisible(false);
         break;
-    case I_G_NO_THICKS:
+    case TABLE_GRAPH_NONE:
         Yaxis->setGridLineVisible(false);
         Yaxis->setMinorGridLineVisible(false);
         break;
-    case I_G_MINOR_THICKS:
+    case TABLE_GRAPH_MINOR:
         Yaxis->setGridLineVisible(true);
         Yaxis->setMinorGridLineVisible(true);
         break;
@@ -415,7 +415,7 @@ void PlotDialog::buildSeries()
         double XValue;
         switch (chartType)
         {
-        case EnumIodeGraphChart::I_G_CHART_LINE :
+        case TableGraphType::TABLE_GRAPH_LINE :
             for(PlotSeries& series: chart_series)
             {
                 QLineSeries* line_series = new QLineSeries();
@@ -439,7 +439,7 @@ void PlotDialog::buildSeries()
             }
             Xaxis = createXAxis();
             break;
-        case EnumIodeGraphChart::I_G_CHART_SCATTER :
+        case TableGraphType::TABLE_GRAPH_SCATTER :
             for(PlotSeries& series: chart_series)
             {
                 QScatterSeries* scatter_series = new QScatterSeries();
@@ -461,7 +461,7 @@ void PlotDialog::buildSeries()
             }
             Xaxis = createXAxis();
             break;
-        case EnumIodeGraphChart::I_G_CHART_BAR :
+        case TableGraphType::TABLE_GRAPH_BAR :
             QBarSeries* bar_series = new QBarSeries();
             for(PlotSeries& series: chart_series)
             {

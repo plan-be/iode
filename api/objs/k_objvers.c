@@ -140,7 +140,7 @@ static char *T_cell_repack(char* pack, TCELL* cell)
     char    *npack, *ipack;
 
     if(cell->tc_val == NULL) return(pack);
-    if(cell->tc_type == KT_LEC) {
+    if(cell->tc_type == TABLE_CELL_LEC) {
         npack = Pack16To32(cell->tc_val);
         ipack = 0;
         K_ipack(&ipack, P_get_ptr(npack, 0));
@@ -186,13 +186,13 @@ static char *K_repack_tbl(TBL *tbl)
     pack= P_add(pack, (char *) tbl->t_line, sizeof(TLINE) * (int) T_NL(tbl));
     for(i = 0; i < T_NL(tbl); i++) {
         switch(tbl->t_line[i].tl_type) {
-            case KT_CELL :
+            case TABLE_LINE_CELL :
                 cell = (TCELL *) tbl->t_line[i].tl_val;
                 pack= P_add(pack, (char *) cell, sizeof(TCELL) * (int) T_NC(tbl));
                 for(j = 0; j < T_NC(tbl); j++)
                     pack = T_cell_repack(pack, cell + j);
                 break;
-            case KT_TITLE :
+            case TABLE_LINE_TITLE :
                 cell = (TCELL *) tbl->t_line[i].tl_val;
                 pack= P_add(pack, (char *) cell, sizeof(TCELL));
                 pack= T_cell_repack(pack, cell);

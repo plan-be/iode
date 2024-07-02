@@ -10,8 +10,8 @@
  *      void T_free_line(TLINE* line, int dim)                                                     | Frees a TLINE struct and all its TCELL.
  *      void T_free_cell(TCELL* cell)                                                              | Frees a TCELL struct.
  *      int T_add_line(TBL* tbl)                                                                   | Extents a TBL by adding at least one line.
- *      TCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type KT_CELL. 
- *      TCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type KT_TITLE. 
+ *      TCELL *T_create_cell(TBL* tbl, TLINE* line)                                                | Initialises a TLINE of the type TABLE_LINE_CELL. 
+ *      TCELL *T_create_title(TBL* tbl, TLINE* line)                                               | Initialises a TLINE of the type TABLE_LINE_TITLE. 
  *      char* T_cell_cont(TCELL* cell, int mode)                                                   | Returns the formated contents of a TCELL.
  *      char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)                                | Returns the formated contents of a TCELL.
  *      char* T_div_cont_tbl(TBL* tbl, int col, int mode)                                          | Returns the formated contents of TBL divisor column.
@@ -20,7 +20,7 @@
  *      int T_set_lec_cell_tbl(TBL* tbl, int row, int col, unsigned char* lec)                     | Assigns a LEC expression to a TCELL. Checks the syntax.
  *      void T_set_string_cell(TCELL* cell, unsigned char* txt)                                    | Assigns a TEXT to a TCELL.
  *      void T_set_string_cell_tbl(TBL* tbl, int row, int col, unsigned char* txt)                 | Assigns a TEXT to a TCELL.
- *      void T_set_cell_attr(TBL* tbl, int i, int j, int attr)                                     | Assigns justification (KT_CENTER...) and typographic (KT_BOLD...) attributes to a TCELL.
+ *      void T_set_cell_attr(TBL* tbl, int i, int j, int attr)                                     | Assigns justification (TABLE_CELL_CENTER...) and typographic (TABLE_CELL_BOLD...) attributes to a TCELL.
  *      int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files, int date) | Fills a TBL with some basic data: a title, line titles and LEC expressions.
  *      void T_auto(TBL* tbl, char* def, char** vars, int mode, int files, int date)               | Fills a TBL with a list of variables and their CMT. 
  *  
@@ -51,20 +51,20 @@ TBL *T_create(int dim)
 
     }
     T_NC(tbl)   = dim;
-    T_LANG(tbl) = KT_ENGLISH;
+    T_LANG(tbl) = TABLE_ENGLISH;
 
     tbl->t_zmin = (float)IODE_NAN;
     tbl->t_zmax = (float)IODE_NAN;
     tbl->t_ymin = (float)IODE_NAN;
     tbl->t_ymax = (float)IODE_NAN;
 
-    tbl->t_div.tl_type = KT_CELL;
+    tbl->t_div.tl_type = TABLE_LINE_CELL;
     tbl->t_div.tl_val  = SW_nalloc(dim * sizeof(TCELL));
     cell               = (TCELL *) tbl->t_div.tl_val;
 
     for(i = 0; i < dim; i++) {
-        cell[i].tc_type = KT_LEC;
-        cell[i].tc_attr = KT_LEFT;
+        cell[i].tc_type = TABLE_CELL_LEC;
+        cell[i].tc_attr = TABLE_CELL_LEFT;
     }
     K_ipack(&(cell[0].tc_val), "1");
     /* rest is repetitive if val[i] == 0, val[i] = val[i-1] */
@@ -106,10 +106,10 @@ void T_free_line(TLINE* line, int dim)
 
 
     cell = (TCELL *) line->tl_val;
-    if(line->tl_type == KT_CELL)
+    if(line->tl_type == TABLE_LINE_CELL)
         for(i = 0; i < dim; i++) T_free_cell(cell + i);
 
-    if(line->tl_type == KT_TITLE) T_free_cell(cell);
+    if(line->tl_type == TABLE_LINE_TITLE) T_free_cell(cell);
 
 
     SW_nfree(line->tl_val);
@@ -151,7 +151,7 @@ int T_add_line(TBL* tbl)
 
 
 /**
- *  Initialises a TLINE of the type KT_CELL. 
+ *  Initialises a TLINE of the type TABLE_LINE_CELL. 
  *  
  *  All cells are "decimal" justified except the first one which is left justified.
  *  
@@ -164,11 +164,11 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
 {
     int     i, nc = T_NC(tbl);
 
-    line->tl_type = KT_CELL;
+    line->tl_type = TABLE_LINE_CELL;
     line->tl_val = SW_nalloc(nc * sizeof(TCELL));
     line->tl_graph = T_GRAPHDEFAULT; /* GB 10/03/2011 */
     for(i = 0; i < nc; i++) {
-        ((TCELL *) line->tl_val + i)->tc_attr = (i > 0) ? KT_DECIMAL : KT_LEFT;
+        ((TCELL *) line->tl_val + i)->tc_attr = (i > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
         /* ((TCELL *) tbl->t_div.tl_val + i)->tc_attr; /* JMP 11-11-93 */
     }
 
@@ -177,9 +177,9 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
 
 
 /**
- *  Initialises a TLINE of the type KT_TITLE. 
+ *  Initialises a TLINE of the type TABLE_LINE_TITLE. 
  *  
- *  The first (and only) cell receives the attributes KT_CENTER and KT_BOLD.
+ *  The first (and only) cell receives the attributes TABLE_CELL_CENTER and TABLE_CELL_BOLD.
  *  
  *  @param [in] tbl     TBL*    table to which line belongs
  *  @param [in] line    TLINE*  line to initialise
@@ -188,9 +188,9 @@ TCELL   *T_create_cell(TBL* tbl, TLINE* line)
  */
 TCELL *T_create_title(TBL* tbl, TLINE* line)
 {
-    line->tl_type = KT_TITLE;
+    line->tl_type = TABLE_LINE_TITLE;
     line->tl_val = SW_nalloc(sizeof(TCELL));
-    ((TCELL *) line->tl_val)->tc_attr = KT_CENTER + KT_BOLD; /* JMP 11-11-93 */
+    ((TCELL *) line->tl_val)->tc_attr = TABLE_CELL_CENTER + TABLE_CELL_BOLD; /* JMP 11-11-93 */
 
     return((TCELL *) line->tl_val);
 }
@@ -215,7 +215,7 @@ char* T_cell_cont(TCELL* cell, int mode)
     char    *buf;
 
     if(cell->tc_val == NULL) return(""); /* JMP 20-11-93 */
-    if(cell->tc_type == KT_LEC)
+    if(cell->tc_type == TABLE_CELL_LEC)
         return(BUF_strcpy(P_get_ptr(cell->tc_val, 0)));
     buf = BUF_alloc((int)strlen(cell->tc_val) + 3);
     if(mode) sprintf(buf, "\"%s\"", cell->tc_val);
@@ -244,10 +244,10 @@ char* T_cell_cont_tbl(TBL* tbl, int row, int col, int mode)
     TCELL* cell = (TCELL*) line.tl_val;
     switch (line.tl_type)
     {
-        case KT_TITLE:
+        case TABLE_LINE_TITLE:
             return(cell->tc_val);
             break;
-        case KT_CELL:
+        case TABLE_LINE_CELL:
             return(T_cell_cont(cell + col, mode));
             break;
         default:
@@ -280,7 +280,7 @@ char* T_div_cont_tbl(TBL* tbl, int col, int mode)
  *  
  *  @param [in, out] tbl     TBL*    TBL where a new line must be inserted
  *  @param [in]      nbr     int     reference position of the new line in TBL (see param where below)
- *  @param [in]      type    int     TLINE type (KT_CELL, KT_TITLE...)
+ *  @param [in]      type    int     TLINE type (TABLE_LINE_CELL, TABLE_LINE_TITLE...)
  *  @param [in]      where   int     0 to insert before line nbr, 1 to insert after line nbr
  *  @return                  int     position of the new line in TBL
  *  **TODO: Check where definition 
@@ -307,8 +307,8 @@ int T_insert_line(TBL* tbl, int nbr, int type, int where)
     }
     else nbr = 0;
 
-    if(type == KT_CELL)  T_create_cell(tbl, nline + nbr);
-    if(type == KT_TITLE) T_create_title(tbl, nline + nbr);
+    if(type == TABLE_LINE_CELL)  T_create_cell(tbl, nline + nbr);
+    if(type == TABLE_LINE_TITLE) T_create_title(tbl, nline + nbr);
 
     nline[nbr].tl_type = type;
     tbl->t_line = nline;
@@ -331,8 +331,8 @@ int T_set_lec_cell(TCELL* cell, unsigned char* lec)
 {
     unsigned char   *ptr = 0;
 
-    cell->tc_type = KT_LEC;
-    cell->tc_attr = KT_ALIGN(cell->tc_attr, KT_DECIMAL);
+    cell->tc_type = TABLE_CELL_LEC;
+    cell->tc_attr = TABLE_CELL_ALIGN(cell->tc_attr, TABLE_CELL_DECIMAL);
     if(K_ipack(&ptr, lec) < 0 && L_errno) {
         kerror(0, "Illegal lec-formula");
         return(-1);
@@ -366,8 +366,8 @@ int T_set_lec_cel_tbl(TBL* tbl, int row, int col, unsigned char* lec)
 
 /**
  *  Assigns a TEXT to a TCELL. The alignment attributes are set to:
- *      - KT_LEFT if previously KT_DECIMAL
- *      - KT_CENTER if the txt contains the char '#' indicating a time period (col title).
+ *      - TABLE_CELL_LEFT if previously TABLE_CELL_DECIMAL
+ *      - TABLE_CELL_CENTER if the txt contains the char '#' indicating a time period (col title).
  *  
  *  @param [in, out] cell   TCELL*            Cell to modify
  *  @param [in]      lec    unsigned char*    Any text
@@ -379,11 +379,11 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
 {
     int     len, attr;
 
-    cell->tc_type = KT_STRING;
-    /*    cell->tc_attr |= KT_LEFT; /* JMP 11-11-93 */
+    cell->tc_type = TABLE_CELL_STRING;
+    /*    cell->tc_attr |= TABLE_CELL_LEFT; /* JMP 11-11-93 */
     attr = cell->tc_attr;
-    if(attr & KT_DECIMAL) attr = KT_ALIGN(attr, KT_LEFT);  /* JMP 19-11-93 */
-    if(U_is_in('#', txt)) attr = KT_ALIGN(attr, KT_CENTER);  /* JMP 19-11-93 */
+    if(attr & TABLE_CELL_DECIMAL) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_LEFT);  /* JMP 19-11-93 */
+    if(U_is_in('#', txt)) attr = TABLE_CELL_ALIGN(attr, TABLE_CELL_CENTER);  /* JMP 19-11-93 */
     cell->tc_attr = attr;
     len = (int)strlen(txt);
     if (len > 0) {
@@ -399,8 +399,8 @@ void T_set_string_cell(TCELL* cell, unsigned char* txt)
 
 /**
  *  Assigns a TEXT to a TCELL. The alignment attributes are set to:
- *      - KT_LEFT if previously KT_DECIMAL
- *      - KT_CENTER if the txt contains the char '#' indicating a time period (col title).
+ *      - TABLE_CELL_LEFT if previously TABLE_CELL_DECIMAL
+ *      - TABLE_CELL_CENTER if the txt contains the char '#' indicating a time period (col title).
  *
  *  @param [in] tbl     TBL*              pointer to the table
  *  @param [in] row     int               position of the line
@@ -426,9 +426,9 @@ int i, j;
     TCELL   *cell;
 
     switch(line->tl_type) {
-	case KT_TITLE : if(j > 0) return(KT_BOLD & KT_CENTER);
-	case KT_CELL  : break;
-	default :       return(KT_BOLD & KT_LEFT);
+	case TABLE_LINE_TITLE : if(j > 0) return(TABLE_CELL_BOLD & TABLE_CELL_CENTER);
+	case TABLE_LINE_CELL  : break;
+	default :       return(TABLE_CELL_BOLD & TABLE_CELL_LEFT);
 	}
     cell = (TCELL *)line->tl_val + j;
     return(cell->tc_attr);
@@ -437,12 +437,12 @@ int i, j;
 
 
 /**
- *  Assigns justification (KT_CENTER...) and typographic (KT_BOLD...) attributes to a TCELL.
+ *  Assigns justification (TABLE_CELL_CENTER...) and typographic (TABLE_CELL_BOLD...) attributes to a TCELL.
  *  
  *  @param [in, out]    tbl     TBL*    table to modify
  *  @param [in]         i       int     line 
  *  @param [in]         j       int     column 
- *  @param [in]         attr    int     combination of attributes (KT_CENTER & KT_BOLD...) 
+ *  @param [in]         attr    int     combination of attributes (TABLE_CELL_CENTER & TABLE_CELL_BOLD...) 
  *  @return                     void
  *  
  */
@@ -452,9 +452,9 @@ void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
     TCELL   *cell;
 
     switch(line->tl_type) {
-        case KT_TITLE :
+        case TABLE_LINE_TITLE :
             if(j > 0) return;
-        case KT_CELL  :
+        case TABLE_LINE_CELL  :
             break;
         default :
             return;
@@ -472,9 +472,9 @@ void T_set_cell_attr(TBL* tbl, int i, int j, int attr) /* JMP 11-11-93 */
  *  @param [in]      titg  char*    Title of the table
  *  @param [in]      titls char**   Titles of the lines
  *  @param [in]      lecs  char**   LEC formulas of the lines (// titls)
- *  @param [in]      mode  int      if 1, includes a special KT_MODE line
- *  @param [in]      files int      if 1, includes a special KT_FILES line
- *  @param [in]      date  int      if 1, includes a special KT_DATE line
+ *  @param [in]      mode  int      if 1, includes a special TABLE_LINE_MODE line
+ *  @param [in]      files int      if 1, includes a special TABLE_LINE_FILES line
+ *  @param [in]      date  int      if 1, includes a special TABLE_LINE_DATE line
  *  @return                int      0
  *  
  */
@@ -483,33 +483,33 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
     int     i, j;
 
     if(titg) {
-        T_insert_line(tbl, T_NL(tbl) - 1, KT_TITLE, 0);
+        T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_TITLE, 0);
         SCR_strip(titg);
         if(titg[0])
             T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val), titg);
-        T_insert_line(tbl, T_NL(tbl) - 1, KT_LINE, 0);
+        T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
     }
-    T_insert_line(tbl, T_NL(tbl) - 1,  KT_CELL, 0);
+    T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
     for(j = 1 ; j < T_NC(tbl) ; j++) {
         T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val) + j, "\"#S");  /* JMP 24-03-2004 */
-        T_set_cell_attr(tbl, T_NL(tbl) - 1, j, KT_CENTER); /* JMP 11-11-93 */
+        T_set_cell_attr(tbl, T_NL(tbl) - 1, j, TABLE_CELL_CENTER); /* JMP 11-11-93 */
     }
-    T_insert_line(tbl, T_NL(tbl) - 1, KT_LINE, 0);
+    T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_SEP, 0);
 
     if(lecs && titls) {
         for(i = 0 ; lecs[i] && titls[i]; i++) {
-            T_insert_line(tbl, T_NL(tbl) - 1,  KT_CELL, 0);
+            T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_CELL, 0);
             T_set_string_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val), titls[i]);
             for(j = 1 ; j < T_NC(tbl) ; j++)
                 T_set_lec_cell((TCELL *)(tbl->t_line[T_NL(tbl) - 1].tl_val) + j, lecs[i]);
         }
     }
-    else T_insert_line(tbl, T_NL(tbl) - 1, KT_CELL, 0);
+    else T_insert_line(tbl, T_NL(tbl) - 1, TABLE_LINE_CELL, 0);
     if(mode || files || date)
-        T_insert_line(tbl, T_NL(tbl) - 1,  KT_LINE, 0);
-    if(mode)  T_insert_line(tbl, T_NL(tbl) - 1,  KT_MODE, 0);
-    if(files) T_insert_line(tbl, T_NL(tbl) - 1,  KT_FILES, 0);
-    if(date)  T_insert_line(tbl, T_NL(tbl) - 1,  KT_DATE, 0);
+        T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_SEP, 0);
+    if(mode)  T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_MODE, 0);
+    if(files) T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_FILES, 0);
+    if(date)  T_insert_line(tbl, T_NL(tbl) - 1,  TABLE_LINE_DATE, 0);
 
     return(0);
 }
@@ -525,9 +525,9 @@ int T_default(TBL* tbl, char*titg, char**titls, char**lecs, int mode, int files,
  *  @param [in, out] tbl   TBL*     Table to modify
  *  @param [in]      def   char*    Table title or name of the CMT that must become the table title
  *  @param [in]      vars  char**   NULL terminated list of variable names
- *  @param [in]      mode  int      if 1, includes a special KT_MODE line
- *  @param [in]      files int      if 1, includes a special KT_FILES line
- *  @param [in]      date  int      if 1, includes a special KT_DATE line
+ *  @param [in]      mode  int      if 1, includes a special TABLE_LINE_MODE line
+ *  @param [in]      files int      if 1, includes a special TABLE_LINE_FILES line
+ *  @param [in]      date  int      if 1, includes a special TABLE_LINE_DATE line
  *  @return                int      0
  *  
  */

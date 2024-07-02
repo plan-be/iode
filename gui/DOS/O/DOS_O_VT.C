@@ -89,10 +89,10 @@ int i;
     v = 1 + j;
 
     switch(line->tl_type) {
-	case KT_LINE  : return(TAB_HLINE);
+	case TABLE_LINE_SEP   : return(TAB_HLINE);
 
-	case KT_CELL  :
-	    if (cell->tc_type == KT_STRING) {
+	case TABLE_LINE_CELL  :
+	    if (cell->tc_type == TABLE_CELL_STRING) {
 		str = COL_text(cl, T_cell_cont(cell, 0), 2);
 		strcpy(STATIC_BUF, str);
 		SW_nfree(str);
@@ -100,16 +100,16 @@ int i;
 	    else SCR_fmt_dbl(vec[v], STATIC_BUF, (int)global_VTW, (int)global_VTN);
 
 	    SCR_pad(STATIC_BUF, (int)global_VTW);
-	    if(cell->tc_attr & KT_CENTER) U_center_text(STATIC_BUF);
-	    else if(cell->tc_attr & (KT_RIGHT | KT_DECIMAL))
+	    if(cell->tc_attr & TABLE_CELL_CENTER) U_center_text(STATIC_BUF);
+	    else if(cell->tc_attr & (TABLE_CELL_RIGHT | TABLE_CELL_DECIMAL))
 		    U_rjust_text(STATIC_BUF);
 
 	    return(STATIC_BUF);
 
-	case KT_TITLE :
-	case KT_MODE  :
-	case KT_DATE  :
-	case KT_FILES :
+	case TABLE_LINE_TITLE :
+	case TABLE_LINE_MODE  :
+	case TABLE_LINE_DATE  :
+	case TABLE_LINE_FILES :
 	default       : return(" ");
     }
 }
@@ -126,24 +126,24 @@ int i;
     cell = (TCELL *) line->tl_val;
 
     switch(line->tl_type) {
-    case KT_LINE  :
+    case TABLE_LINE_SEP   :
 	return(TAB_HLINE);
-    case KT_TITLE :
+    case TABLE_LINE_TITLE :
     tit:
 	SCR_strlcpy(STATIC_BUF, T_cell_cont(cell, 0), (int)global_VT0W);
 	SCR_pad(STATIC_BUF, (int)global_VT0W);
-	if(cell->tc_attr & KT_CENTER) U_center_text(STATIC_BUF);
-	if(cell->tc_attr & KT_RIGHT) U_rjust_text(STATIC_BUF);
+	if(cell->tc_attr & TABLE_CELL_CENTER) U_center_text(STATIC_BUF);
+	if(cell->tc_attr & TABLE_CELL_RIGHT) U_rjust_text(STATIC_BUF);
 	return(STATIC_BUF);
-    case KT_MODE  :
+    case TABLE_LINE_MODE  :
 	return("Mode ");
-    case KT_DATE  :
+    case TABLE_LINE_DATE  :
 	SCR_long_to_fdate(SCR_current_date(), STATIC_BUF, "dd/mm/yy");
 	return(STATIC_BUF);
-    case KT_FILES :
+    case TABLE_LINE_FILES :
 	return("Files ");
-    case KT_CELL  :
-	if(cell->tc_type == KT_STRING) goto tit;
+    case TABLE_LINE_CELL  :
+	if(cell->tc_type == TABLE_CELL_STRING) goto tit;
     default :
 	return(" ");
     }
@@ -299,7 +299,7 @@ int     i, j;
     line = tbl->t_line + i;
     cell = (TCELL *) line->tl_val;
     cell += 1 + j % (T_NC(tbl) - 1); /* JMP 28-11-93 */
-    if(line->tl_type != KT_CELL || cell->tc_type != KT_LEC) goto rec;
+    if(line->tl_type != TABLE_LINE_CELL || cell->tc_type != TABLE_CELL_LEC) goto rec;
     dcell = (TCELL *) (tbl->t_div).tl_val;
     dcell += 1 + j % (T_NC(tbl) - 1);
     if(dcell->tc_val) dlec = P_get_ptr(dcell->tc_val, 0);
@@ -440,7 +440,7 @@ char    *smpl;
 
     for(i = 0; i < nl; i++) {
 	line = T_L(tbl) + i;
-	if(line->tl_type == KT_CELL) {
+	if(line->tl_type == TABLE_LINE_CELL) {
 	    VT_val[i] = SW_alloc(sizeof(double) * tbl_dim);
 	    if(VT_val[i] < 0) return(-1);
 	    }
@@ -474,7 +474,7 @@ char    *name;
     if(cell == 0) return(0);
     if(name == 0) return(1);
     for(d = 0; d < nc; d++) {
-	if(cell[d].tc_type != KT_LEC) continue;
+	if(cell[d].tc_type != TABLE_CELL_LEC) continue;
 	if(cell[d].tc_val == 0) continue;
 	clec = (CLEC *) P_get_ptr(cell[d].tc_val, 1);
 	for(j = 0 ; j < clec->nb_names ; j++)
@@ -493,7 +493,7 @@ char    *name;
 
     for(i = 0; i < nl; i++) {
 	line = T_L(tbl) + i;
-	if(line->tl_type == KT_CELL &&
+	if(line->tl_type == TABLE_LINE_CELL &&
 	   (T_name_inline(line->tl_val, T_NC(tbl), name) ||
 	    T_name_inline(tbl->t_div.tl_val, T_NC(tbl), name)))
 		if(T_calc_line(tbl, i, VT_cls, VT_val) < 0) return(-1);

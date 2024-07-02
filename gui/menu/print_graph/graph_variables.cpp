@@ -15,11 +15,11 @@ MenuGraphVariables::MenuGraphVariables(QWidget* parent) :
     QList<QString> q_var_modes;
     for(const std::string& var_mode: v_var_modes) q_var_modes << QString::fromStdString(var_mode);
     QList<QString> q_chart_types;
-    for(const std::string& chart_type: vGraphsChartTypes) q_chart_types << QString::fromStdString(chart_type);
+    for(const std::string& chart_type: v_graph_chart_types) q_chart_types << QString::fromStdString(chart_type);
     QList<QString> q_axis_ticks;
-    for(const std::string& axis_ticks: vGraphsAxisThicks) q_axis_ticks << QString::fromStdString(axis_ticks);
+    for(const std::string& axis_ticks: v_graph_axis_thicks) q_axis_ticks << QString::fromStdString(axis_ticks);
     QList<QString> q_langs;
-    for(const std::string& lang: vLangs) q_langs << QString::fromStdString(lang);
+    for(const std::string& lang: v_table_langs) q_langs << QString::fromStdString(lang);
 
     wVariables = new WrapperQPlainTextEdit(label_variables->text(), *textEdit_variables, REQUIRED_FIELD);
     wVarMode = new WrapperComboBox(label_x_axis_type->text(), *comboBox_x_axis_type, REQUIRED_FIELD, q_var_modes);
@@ -70,11 +70,11 @@ void MenuGraphVariables::display()
 {
     try
     {
-        EnumIodeGraphChart chartType = (EnumIodeGraphChart) wChartType->extractAndVerify();
+        TableGraphType chartType = (TableGraphType) wChartType->extractAndVerify();
         IodeVarMode varMode = (IodeVarMode) wVarMode->extractAndVerify();
         bool logScale = wYAxisScale->extractAndVerify();
-        EnumIodeGraphAxisThicks xTicks = (EnumIodeGraphAxisThicks) wXTicks->extractAndVerify();
-        EnumIodeGraphAxisThicks yTicks = (EnumIodeGraphAxisThicks) wYTicks->extractAndVerify();
+        TableGraphGrid xTicks = (TableGraphGrid) wXTicks->extractAndVerify();
+        TableGraphGrid yTicks = (TableGraphGrid) wYTicks->extractAndVerify();
 
         PlotVariablesDialog* plotDialog = new PlotVariablesDialog(nullptr, chartType, varMode, logScale, xTicks, yTicks);
 
@@ -102,7 +102,7 @@ void MenuGraphVariables::display()
         }
         
         // not used
-        EnumLang lang = (EnumLang) wLanguage->extractAndVerify();
+        TableLang lang = (TableLang) wLanguage->extractAndVerify();
 
         // build the plot
         plotDialog->plot();

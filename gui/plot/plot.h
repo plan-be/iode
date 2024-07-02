@@ -69,10 +69,10 @@ class PlotDialog: public QDialog
     QString projectPath;
 
     QString title;
-    EnumIodeGraphChart chartType;
+    TableGraphType chartType;
     bool logScale;
-    EnumIodeGraphAxisThicks xTicks;
-    EnumIodeGraphAxisThicks yTicks;
+    TableGraphGrid xTicks;
+    TableGraphGrid yTicks;
 
     QString from;
     QString to;
@@ -106,8 +106,8 @@ protected:
     int end_t;
 
 public:
-    PlotDialog(EnumIodeGraphChart chartType = I_G_CHART_LINE, const bool logScale = false, 
-        EnumIodeGraphAxisThicks xTicks = I_G_MAJOR_THICKS, EnumIodeGraphAxisThicks yTicks = I_G_MAJOR_THICKS, 
+    PlotDialog(TableGraphType chartType = TABLE_GRAPH_LINE, const bool logScale = false, 
+        TableGraphGrid xTicks = TABLE_GRAPH_MAJOR, TableGraphGrid yTicks = TABLE_GRAPH_MAJOR, 
         QWidget* parent = nullptr);
     ~PlotDialog();
 

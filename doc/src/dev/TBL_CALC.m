@@ -106,8 +106,8 @@ Includes some A2M helper functions.
 | ~cvoid T_open_attr(int attr)                                 | Opens an A2M attribute sequence.
 | ~cvoid T_close_attr(int attr)                                | Closes an A2M attribute sequence.
 | ~cvoid T_print_cell(TCELL* cell, COL* cl, int straddle)      | Prints a TBL cell on a specific GSAMPLE column. 
-| ~cchar **T_find_files(COLS* cls)                             | Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line KT_FILES.
-| ~cunsigned char *T_get_title(TBL* tbl)                       | Retrieves a TBL title, i.e. the contents of the first line of type KT_TITLE
+| ~cchar **T_find_files(COLS* cls)                             | Retrieves the filenames used in the COLS (from GSAMPLE) needed to print the special table line TABLE_LINE_FILES.
+| ~cunsigned char *T_get_title(TBL* tbl)                       | Retrieves a TBL title, i.e. the contents of the first line of type TABLE_LINE_TITLE
 | ~cint T_print_tbl(TBL* tbl, char* smpl)                      | Computes a table on a GSAMPLE and saves the result in A2M format
 ..te
 

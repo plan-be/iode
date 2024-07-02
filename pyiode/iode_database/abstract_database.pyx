@@ -1395,9 +1395,9 @@ cdef class _AbstractDatabase:
         >>> # 1. specify list of line titles and list of LEC expressions
         >>> lines_titles = ["GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"]
         >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
-        >>> tables["TABLE_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
+        >>> tables["TABLE_CELL_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
         ...                         "lines_titles": lines_titles, "mode": True, "files": True, "date": True}  
-        >>> tables["TABLE_LECS"]         # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_CELL_LECS"]         # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
         ----- | ----------------------------
@@ -1469,7 +1469,7 @@ cdef class _AbstractDatabase:
         <BLANKLINE>
 
         >>> # b) -------- update table --------
-        >>> table = tables["TABLE_LECS"]
+        >>> table = tables["TABLE_CELL_LECS"]
         >>> table                   # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
@@ -1532,8 +1532,8 @@ cdef class _AbstractDatabase:
         >>> table += '-'
 
         >>> # warning: do not forget to actually update the IODE Table database  
-        >>> tables["TABLE_LECS"] = table
-        >>> tables["TABLE_LECS"]                # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_CELL_LECS"] = table
+        >>> tables["TABLE_CELL_LECS"]                # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1       |
         TITLE |  "New Table"
         ----- | --------------

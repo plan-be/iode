@@ -60,12 +60,12 @@ cdef extern from "cpp_api/common.h":
 
     cdef vector[CFileType] v_file_types
 
-    cdef enum EnumLang:
-        IT_ENGLISH,
-        IT_DUTCH,
-        IT_FRENCH
+    cdef enum TableLang:
+        TABLE_ENGLISH,
+        TABLE_DUTCH,
+        TABLE_FRENCH
 
-    cdef vector[string] vLangs
+    cdef vector[string] v_table_langs
 
 cdef extern from "api/iode.h":
     cdef enum VariablesInitialization:
@@ -107,50 +107,50 @@ cdef extern from "cpp_api/objects/equation.h":
     cdef vector[string] v_eq_methods
 
 cdef extern from "cpp_api/objects/table.h":
-    cdef enum EnumCellType:
-        IT_LEC,
-        IT_STRING
+    cdef enum TableCellType:
+        TABLE_CELL_LEC,
+        TABLE_CELL_STRING
 
-    cdef enum EnumCellFont:
-        IT_NORMAL,
-        IT_BOLD,
-        IT_ITALIC,
-        IT_UNDERLINE
+    cdef enum TableCellFont:
+        TABLE_CELL_NORMAL,
+        TABLE_CELL_BOLD,
+        TABLE_CELL_ITALIC,
+        TABLE_CELL_UNDERLINE
 
-    cdef enum EnumCellAlign:
-        IT_CENTER,
-        IT_LEFT,
-        IT_RIGHT,
-        IT_DECIMAL
+    cdef enum TableCellAlign:
+        TABLE_CELL_CENTER,
+        TABLE_CELL_LEFT,
+        TABLE_CELL_RIGHT,
+        TABLE_CELL_DECIMAL
 
-    cdef enum EnumLineType:
-        IT_FILES,
-        IT_MODE,
-        IT_CELL,
-        IT_LINE,
-        IT_TITLE,
-        IT_DATE
+    cdef enum TableLineType:
+        TABLE_LINE_FILES,
+        TABLE_LINE_MODE,
+        TABLE_LINE_CELL,
+        TABLE_LINE_SEP,
+        TABLE_LINE_TITLE,
+        TABLE_LINE_DATE
 
-    cdef enum EnumGraphType:
-        IG_LINE,
-        IG_SCATTER,
-        IG_BAR
+    cdef enum TableGraphType:
+        TABLE_GRAPH_LINE,
+        TABLE_GRAPH_SCATTER,
+        TABLE_GRAPH_BAR
 
-    cdef enum EnumGraphGrid:
-        IG_MAJOR,
-        IG_NONE,
-        IG_MINOR
+    cdef enum TableGraphGrid:
+        TABLE_GRAPH_MAJOR,
+        TABLE_GRAPH_NONE,
+        TABLE_GRAPH_MINOR
 
-    cdef enum EnumGraphAlign:
-        IG_LEFT,
-        IG_CENTER,
-        IG_RIGHT
+    cdef enum TableGraphAlign:
+        TABLE_GRAPH_LEFT,
+        TABLE_GRAPH_CENTER,
+        TABLE_GRAPH_RIGHT
 
-    cdef enum EnumGraphAxis:
-        IG_VALUES,
-        IG_LOG,
-        IG_SEMILOG,
-        IG_PERCENT
+    cdef enum TableGraphAxis:
+        TABLE_GRAPH_VALUES,
+        TABLE_GRAPH_LOG,
+        TABLE_GRAPH_SEMILOG,
+        TABLE_GRAPH_PERCENT
 
 cdef extern from "api/iode.h":
     cdef enum IodeLowToHigh:

@@ -1072,14 +1072,14 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
         cells_1 = (TCELL*) line_1->tl_val;
         switch (line_0->tl_type)
         {
-          case KT_TITLE:
+          case TABLE_LINE_TITLE:
             cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
             cell_cont_1 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_1, 0));
             EXPECT_EQ(U_cmp_strs(cell_cont_0, cell_cont_1), 1);
             SCR_free(cell_cont_0);
             SCR_free(cell_cont_1);
             break;
-          case KT_CELL:
+          case TABLE_LINE_CELL:
             for(j = 0; j < tbl->t_nc; j++)
             {
                 EXPECT_EQ(cells_0[j].tc_type, cells_1[j].tc_type);

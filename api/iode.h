@@ -249,51 +249,86 @@ const static int IODE_NB_FILE_EXT = 31;
 
 
 /*----------------------- TABLES ----------------------------*/
-#define  KT_NORMAL          0
-#define  KT_BOLD            1
-#define  KT_ITALIC          2
-#define  KT_UNDERLINE       4
 
-#define  KT_CENTER          8
-#define  KT_LEFT            16
-#define  KT_RIGHT           32
-#define  KT_DECIMAL         64
+enum TableCellFont
+{
+    TABLE_CELL_NORMAL = 0,
+    TABLE_CELL_BOLD = 1,
+    TABLE_CELL_ITALIC = 2,
+    TABLE_CELL_UNDERLINE = 4
+};
 
-#define KT_ALIGN(attr, align)   (((attr) & 7) | (align))
-#define KT_FONT(attr, font)     ((attr) | (font))
-#define KT_SETFONT(attr, font)  (((attr) & 120) | (font))
+enum TableCellAlign
+{
+	TABLE_CELL_CENTER = 8,
+	TABLE_CELL_LEFT = 16,
+	TABLE_CELL_RIGHT = 32,
+	TABLE_CELL_DECIMAL = 64
+};
 
-#define  KT_ENGLISH         100
-#define  KT_DUTCH           (KT_ENGLISH + 1)
-#define  KT_FRENCH          (KT_ENGLISH + 2)
-#define  KT_DIM             (KT_ENGLISH + 3)
-#define  KT_DIV             (KT_ENGLISH + 4)
-#define  KT_FILES           (KT_ENGLISH + 5)
-#define  KT_MODE            (KT_ENGLISH + 6)
-#define  KT_OPEN            (KT_ENGLISH + 7)
-#define  KT_CLOSE           (KT_ENGLISH + 8)
-#define  KT_BREAK           (KT_ENGLISH + 9)
-#define  KT_CELL            (KT_ENGLISH + 10)
-#define  KT_LINE            (KT_ENGLISH + 11)
-#define  KT_DLINE           (KT_ENGLISH + 12)
-#define  KT_TITLE           (KT_ENGLISH + 13)
-#define  KT_LEC             (KT_ENGLISH + 14)
-#define  KT_STRING          (KT_ENGLISH + 15)
-#define  KT_DATE            (KT_ENGLISH + 16)
-#define  KT_YMIN            (KT_ENGLISH + 17)
-#define  KT_YMAX            (KT_ENGLISH + 18)
-#define  KT_ZMIN            (KT_ENGLISH + 19)
-#define  KT_ZMAX            (KT_ENGLISH + 20)
-#define  KT_XGRID           (KT_ENGLISH + 21)
-#define  KT_YGRID           (KT_ENGLISH + 22)
-#define  KT_BOX             (KT_ENGLISH + 23)
-#define  KT_AXIS            (KT_ENGLISH + 24)
-#define  KT_ALGN            (KT_ENGLISH + 25)
-#define  KT_LAXIS           (KT_ENGLISH + 26)
-#define  KT_RAXIS           (KT_ENGLISH + 27)
-#define  KT_GRLINE          (KT_ENGLISH + 28)
-#define  KT_GRBAR           (KT_ENGLISH + 29)
-#define  KT_GRSCATTER       (KT_ENGLISH + 30)
+#define TABLE_CELL_ALIGN(attr, align)   (((attr) & 7) | (align))
+#define TABLE_CELL_FONT(attr, font)     ((attr) | (font))
+#define TABLE_CELL_SETFONT(attr, font)  (((attr) & 120) | (font))
+
+enum TableAscii
+{
+    TABLE_ASCII_ENGLISH = 100,
+    TABLE_ASCII_DUTCH,
+    TABLE_ASCII_FRENCH,
+    TABLE_ASCII_DIM,
+    TABLE_ASCII_DIVIDER,
+	TABLE_ASCII_LINE_FILES,
+	TABLE_ASCII_LINE_MODE,
+    TABLE_ASCII_OPEN,
+    TABLE_ASCII_CLOSE,
+    TABLE_ASCII_BREAK,
+	TABLE_ASCII_LINE_CELL,
+	TABLE_ASCII_LINE_SEP,
+    TABLE_ASCII_BOLD_LINE,
+	TABLE_ASCII_LINE_TITLE,
+	TABLE_ASCII_CELL_LEC,
+	TABLE_ASCII_CELL_STRING,
+	TABLE_ASCII_LINE_DATE,
+    TABLE_ASCII_YMIN,
+    TABLE_ASCII_YMAX,            
+    TABLE_ASCII_ZMIN,            
+    TABLE_ASCII_ZMAX,            
+    TABLE_ASCII_XGRID,           
+    TABLE_ASCII_YGRID,           
+    TABLE_ASCII_BOX,             
+    TABLE_ASCII_AXIS,            
+    TABLE_ASCII_ALIGN,               
+    TABLE_ASCII_LEFT_AXIS,           
+    TABLE_ASCII_RIGHT_AXIS,          
+    TABLE_ASCII_GRAPH_LINE,          
+    TABLE_ASCII_GRAPH_BAR,           
+    TABLE_ASCII_GRAPH_SCATTER      
+};
+
+enum TableLang
+{
+    TABLE_ENGLISH = TABLE_ASCII_ENGLISH,
+    TABLE_DUTCH = TABLE_ASCII_DUTCH,
+    TABLE_FRENCH = TABLE_ASCII_FRENCH
+};
+
+const static int IODE_NB_LANGS = 3;
+
+enum TableLineType
+{
+	TABLE_LINE_FILES = TABLE_ASCII_LINE_FILES,
+	TABLE_LINE_MODE  = TABLE_ASCII_LINE_MODE,
+	TABLE_LINE_CELL  = TABLE_ASCII_LINE_CELL,
+	TABLE_LINE_SEP   = TABLE_ASCII_LINE_SEP,
+	TABLE_LINE_TITLE = TABLE_ASCII_LINE_TITLE,
+	TABLE_LINE_DATE  = TABLE_ASCII_LINE_DATE
+};
+
+enum TableCellType
+{
+	TABLE_CELL_LEC    = TABLE_ASCII_CELL_LEC,
+	TABLE_CELL_STRING = TABLE_ASCII_CELL_STRING
+};
 
 #define  KT_CHUNCK   5
 
@@ -328,28 +363,28 @@ const static int IODE_NB_EQ_TESTS = 11;
 
 enum IodeEquationAscii
 {
-    ASCII_BLK,
-    ASCII_CMT,
-    ASCII_INSTR,
-    ASCII_METH,
-    ASCII_SMPL,
-    ASCII_LSQ,
-    ASCII_ZEL,
-    ASCII_INF,
-    ASCII_GLS,
-    ASCII_DATE,
-    ASCII_OPEN,
-    ASCII_CLOSE,
-    ASCII_STDEV,
-    ASCII_MEANY,
-    ASCII_SSRES,
-    ASCII_STDERR,
-    ASCII_FSTAT,
-    ASCII_R2,
-    ASCII_R2ADJ,
-    ASCII_DW,
-    ASCII_LOGLIK,
-    ASCII_MAXLIK
+    EQ_ASCII_BLK,
+    EQ_ASCII_CMT,
+    EQ_ASCII_INSTR,
+    EQ_ASCII_METH,
+    EQ_ASCII_SMPL,
+    EQ_ASCII_LSQ,
+    EQ_ASCII_ZEL,
+    EQ_ASCII_INF,
+    EQ_ASCII_GLS,
+    EQ_ASCII_DATE,
+    EQ_ASCII_OPEN,
+    EQ_ASCII_CLOSE,
+    EQ_ASCII_STDEV,
+    EQ_ASCII_MEANY,
+    EQ_ASCII_SSRES,
+    EQ_ASCII_STDERR,
+    EQ_ASCII_FSTAT,
+    EQ_ASCII_R2,
+    EQ_ASCII_R2ADJ,
+    EQ_ASCII_DW,
+    EQ_ASCII_LOGLIK,
+    EQ_ASCII_MAXLIK
 };
 
 /*----------------------- WS ----------------------------*/
@@ -816,11 +851,28 @@ const static int IODE_NB_IMPORT_FORMATS = 8;
 #define G_NONE      30
 #define G_MINOR     31
 
+enum TableGraphGrid
+{
+	TABLE_GRAPH_MAJOR,
+	TABLE_GRAPH_NONE,
+	TABLE_GRAPH_MINOR
+};
+
+const static int IODE_NB_AXIS_THICKS = 3;
+
 #define G_VALUES    40
 #define G_LOG       41
 #define G_SEMILOG   42
 
 #define G_PERCENT   50
+
+enum TableGraphAxis
+{
+	TABLE_GRAPH_VALUES,
+	TABLE_GRAPH_LOG,
+	TABLE_GRAPH_SEMILOG,
+	TABLE_GRAPH_PERCENT
+};
 
 #define G_LINE      100
 #define G_SCATTER   101
@@ -830,6 +882,15 @@ const static int IODE_NB_IMPORT_FORMATS = 8;
 #define G_PBAR      105
 #define G_FILL      106
 
+enum TableGraphType
+{
+	TABLE_GRAPH_LINE,
+	TABLE_GRAPH_SCATTER,
+	TABLE_GRAPH_BAR
+};
+
+const static int IODE_NB_CHART_TYPES = 3;
+
 #define G_ABS       150
 
 #define G_U         151
@@ -838,6 +899,13 @@ const static int IODE_NB_IMPORT_FORMATS = 8;
 #define G_L         160
 #define G_R         161
 #define G_C         162
+
+enum TableGraphAlign
+{
+	TABLE_GRAPH_LEFT,
+	TABLE_GRAPH_CENTER,
+	TABLE_GRAPH_RIGHT
+};
 
 #define G_HORIZ     200
 #define G_VERT      201
@@ -1002,22 +1070,22 @@ typedef struct _eq_ {
 // TCELL = Table Cell
 typedef struct _tcell_ {
     char    *tc_val;    // NULL or
-			// char* if type == KT_STRING or
-			// packed IDT (i.e. char*) if type == KT_LEC
-    char    tc_type;    // KT_STRING or KT_LEC
-    char    tc_attr;    // KT_LEFT, KT_CENTER, KT_RIGHT, KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_NORMAL
+			// char* if type == TABLE_CELL_STRING or
+			// packed IDT (i.e. char*) if type == TABLE_CELL_LEC
+    char    tc_type;    // TABLE_CELL_STRING or TABLE_CELL_LEC
+    char    tc_attr;    // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
     char    tc_pad[2];  // Padding for struct alignment
 } TCELL;
 
 // TLINE = Table Line
 typedef struct _tline_ {
-    char    *tl_val;    // if tl_type == KT_CELL  : tl_val is TCELL*
-			// if tl_type == KT_TITLE : tl_val is TCELL*
-			// if tl_type == KT_LINE  : tl_val is NULL
-			// if tl_type == KT_MODE  : tl_val is NULL
-			// if tl_type == KT_DATE  : tl_val is NULL
-			// if tl_type == KT_FILES : tl_val is NULL
-    char    tl_type;    // KT_FILES, KT_MODE, KT_TITLE, KT_LINE or KT_CELL
+    char    *tl_val;    // if tl_type == TABLE_LINE_CELL  : tl_val is TCELL*
+			// if tl_type == TABLE_LINE_TITLE : tl_val is TCELL*
+			// if tl_type == TABLE_LINE  : tl_val is NULL
+			// if tl_type == TABLE_LINE_MODE  : tl_val is NULL
+			// if tl_type == TABLE_LINE_DATE  : tl_val is NULL
+			// if tl_type == TABLE_LINE_FILES : tl_val is NULL
+    char    tl_type;    // TABLE_LINE_FILES, TABLE_LINE_MODE, TABLE_LINE_TITLE, TABLE_LINE or TABLE_LINE_CELL
     char    tl_graph;   // 0=Line, 1=scatter, 2=bar (non implemented in all IODE flavours)
     U_ch    tl_axis:1;  // 0 if values are relative to the left axis, 1 to the right axis
     U_ch    tl_pbyte:7; // available free space
@@ -1026,7 +1094,7 @@ typedef struct _tline_ {
 
 // TBL = Table (struct containing a table definition)
 typedef struct _tbl_ {
-    short   t_lang;     // Output language : KT_ENGLISH, KT_FRENCH, KT_DUTCH
+    short   t_lang;     // Output language : TABLE_ENGLISH, TABLE_FRENCH, TABLE_DUTCH
     short   t_free;     // if 0, first column is frozen, otherwise, col 1 is repeated as other columns
     short   t_nc;       // Number of columns (of text and lec, not calculated values)
     short   t_nl;       // Number of lines
@@ -1036,8 +1104,8 @@ typedef struct _tbl_ {
     float   t_zmax;     // Max on the right axis
     float   t_ymin;     // Min on left axis
     float   t_ymax;     // Max on left axis
-    char    t_attr;     // Combination (logical &) of attributes: KT_BOLD, KT_ITALIC, KT_UNDERLINE, KT_CENTER,
-			// KT_DECIMAL, KT_LEFT and KT_RIGHT
+    char    t_attr;     // Combination (logical &) of attributes: TABLE_CELL_BOLD, TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_CENTER,
+			// TABLE_CELL_DECIMAL, TABLE_CELL_LEFT and TABLE_CELL_RIGHT
     char    t_box;      // 1 to surround the chart by a box
     char    t_shadow;   // 1 to place a shadow behind the chart
     char    t_gridx;    // 0 = major grids, 1 = no grids, 2 = minor + major grids

@@ -5,8 +5,8 @@
 bool EditTableDelegate::is_editable(const QModelIndex& index) const
 {
 	const EditTableModel* table_model = static_cast<const EditTableModel*>(index.model());
-	EnumLineType line_type = table_model->get_line_type(index.row());
-	return (line_type == IT_TITLE) || (line_type == IT_CELL);
+	TableLineType line_type = table_model->get_line_type(index.row());
+	return (line_type == TABLE_LINE_TITLE) || (line_type == TABLE_LINE_CELL);
 }
 
 QWidget* EditTableDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
