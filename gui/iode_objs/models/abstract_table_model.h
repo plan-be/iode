@@ -231,9 +231,9 @@ private:
 	{
 		// NOTE: we don't simply use 'database' since it may point to 'database_subset'
 		int iodeType = database->get_iode_type();
-		QString iodeTypeAsString = QString::fromStdString(vIodeTypes[iodeType]);
+		QString iodeTypeAsString = QString::fromStdString(v_iode_types[iodeType]);
 
-		QString defaultFilename = QString(I_DEFAULT_FILENAME) + "." + QString::fromStdString(v_binary_ext[iodeType]);
+		QString defaultFilename = QString(I_DEFAULT_FILENAME) + QString::fromStdString(v_file_types[iodeType].v_ext[0]);
 		QString defaultFilepath = projectDir.absoluteFilePath(defaultFilename);
 
 		QDialog dialog;

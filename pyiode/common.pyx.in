@@ -22,7 +22,7 @@ from pyiode.common cimport (IodeDatabaseType, EnumLang, IodeEquationMethod,
                             IodeVarMode, VariablesInitialization, 
                             SimuSortAlgorithm, EnumIodeAdjustmentMethod)
 from pyiode.common cimport IodeFileType as CIodeFileType 
-from pyiode.common cimport (vIodeTypes, v_ext_names, vLangs, v_eq_methods, v_var_modes, 
+from pyiode.common cimport (v_iode_types, v_file_types, vLangs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
                             v_adjustment_method, mLowToHigh)
 

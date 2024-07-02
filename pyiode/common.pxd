@@ -17,7 +17,7 @@ cdef extern from "api/iode.h":
         VARIABLES
 
 cdef extern from "cpp_api/common.h":
-    cdef vector[string] vIodeTypes
+    cdef vector[string] v_iode_types
 
     cdef enum IodeFileType:
         FILE_ASCII,
@@ -53,7 +53,12 @@ cdef extern from "cpp_api/common.h":
         FILE_ANY,
         DIRECTORY
 
-    cdef vector[string] v_ext_names
+    cdef struct CFileType "FileType":
+        string name
+        vector[string] v_ext
+        CFileType(string& name, vector[string]& v_vec)
+
+    cdef vector[CFileType] v_file_types
 
     cdef enum EnumLang:
         IT_ENGLISH,

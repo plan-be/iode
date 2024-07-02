@@ -12,7 +12,7 @@ void load_reference_kdb(const int ref, IodeDatabaseType iode_type, std::string& 
 
     KDB* kdb = K_interpret(iode_type, to_char_array(filepath));
     if (kdb == NULL)
-        throw std::runtime_error("Cannot load " + vIodeTypes[iode_type] + "s from file '" + filepath + "'");
+        throw std::runtime_error("Cannot load " + v_iode_types[iode_type] + "s from file '" + filepath + "'");
 
     K_free(K_RWS[iode_type][ref - 1]);
     K_RWS[iode_type][ref - 1] = kdb;

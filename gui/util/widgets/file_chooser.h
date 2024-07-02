@@ -83,13 +83,13 @@ private slots:
 	void browse()
 	{
 		QString path = lineEdit->text();
-		QString name = QString::fromStdString(v_ext_names[fileType]);
+		QString name = QString::fromStdString(v_file_types[fileType].name);
 		
 		QString filter; 
 		if(fileType != FILE_ANY)
 		{
 			filter = name + " (";
-			for(const std::string& ext: get_extensions(fileType))
+			for(const std::string& ext: v_file_types[fileType].v_ext)
         		filter += "*" + QString::fromStdString(ext) + " ";
 			filter.chop(1);
 			filter += ")";

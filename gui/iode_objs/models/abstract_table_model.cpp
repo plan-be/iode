@@ -144,7 +144,7 @@ bool IodeTemplateTableModel<K>::load(const QString& filepath, const bool forceOv
 
 		if(!forceOverwrite && (database->count() > 0))
 		{
-			QString iodeTypeName = QString::fromStdString(vIodeTypes[iodeType]);
+			QString iodeTypeName = QString::fromStdString(v_iode_types[iodeType]);
 			QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", "There are " + 
 				iodeTypeName + " already loaded. Would like to override " + iodeTypeName + " ?", 
 				QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -200,7 +200,7 @@ QString IodeTemplateTableModel<K>::save(const QDir& projectDir, const QString& f
 	}
 	
 	// NOTE: check_filepath() converts to absolute path
-	std_filepath = check_filepath(std_filepath, (IodeFileType) iodeType, "tab " + vIodeTypes[iodeType], false);
+	std_filepath = check_filepath(std_filepath, (IodeFileType) iodeType, "tab " + v_iode_types[iodeType], false);
 
 	try
 	{

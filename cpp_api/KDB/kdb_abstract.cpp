@@ -19,7 +19,7 @@ KDBAbstract::KDBAbstract(const IodeDatabaseType iode_type, const std::string& fi
 
         int res = B_WsLoad(c_filepath, (int) k_type);
         if (res != EXIT_SUCCESS)
-            throw std::runtime_error("Cannot load objects for the '" + vIodeTypes[iode_type] + 
+            throw std::runtime_error("Cannot load objects for the '" + v_iode_types[iode_type] + 
                                     "' database from the file '" + filepath + "'\nReason: unknown");  
     }
     
@@ -47,7 +47,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
 
     std::vector<std::string> names = filter_names_from_database(source_kdb, (IodeDatabaseType) k_type, pattern);
 
-    std::string error_msg = "Cannot extract a subset of the database of " + vIodeTypes[k_type] + ".\n";
+    std::string error_msg = "Cannot extract a subset of the database of " + v_iode_types[k_type] + ".\n";
     int pos;
 
     // ---- deep copy of objects ---- 
@@ -72,9 +72,9 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
                 SCR_free(k_nameptr);
                 k_nameptr = NULL; 
 
-                error_msg += "Cannot to copy " + vIodeTypes[k_type] + " named '" + name + "' in the subset.\n";
+                error_msg += "Cannot to copy " + v_iode_types[k_type] + " named '" + name + "' in the subset.\n";
                 if (pos == -1) 
-                    error_msg += "Object with name '" + name + "' does not exist in the " + vIodeTypes[k_type] + " database.";
+                    error_msg += "Object with name '" + name + "' does not exist in the " + v_iode_types[k_type] + " database.";
                 else 
                     error_msg += "Reason: unknown";
                 throw std::runtime_error(error_msg);
@@ -101,7 +101,7 @@ KDBAbstract::KDBAbstract(KDBAbstract* kdb, const bool deep_copy, const std::stri
                 SCR_free(k_nameptr);
                 k_nameptr = NULL; 
 
-                error_msg += "Object with name '" + names[i] + "' does not exist in the " + vIodeTypes[k_type] + " database.";
+                error_msg += "Object with name '" + names[i] + "' does not exist in the " + v_iode_types[k_type] + " database.";
                 throw std::runtime_error(error_msg);
             }
             memcpy(k_objs + i, source_kdb->k_objs + pos, sizeof(KOBJ));
@@ -288,12 +288,12 @@ void KDBAbstract::merge(const KDBAbstract& other, const bool overwrite)
     KDB* other_kdb = other.get_database();
 
     if(kdb == NULL || other_kdb == NULL) 
-        throw std::runtime_error("Cannot merge the two '" + vIodeTypes[k_type] + "' databases.\n" + 
+        throw std::runtime_error("Cannot merge the two '" + v_iode_types[k_type] + "' databases.\n" + 
                                  "At least one of the two databases is null");
 
     int res = K_merge(kdb, other_kdb, overwrite ? 1 : 0);
     if(res < 0) 
-        throw std::runtime_error("Cannot merge the two '" + vIodeTypes[k_type] + "' databases.\n" + 
+        throw std::runtime_error("Cannot merge the two '" + v_iode_types[k_type] + "' databases.\n" + 
                                  "Reason: unknown");
 }
 
@@ -304,7 +304,7 @@ void KDBAbstract::copy_from(const std::string& input_file, const std::string obj
     int res = B_WsCopy(const_cast<char*>(buf.c_str()), k_type);
     if(res < 0)
     {
-        std::string msg = "Cannot copy content of file '" + input_file + "' into the " + vIodeTypes[k_type] + " database.\n";
+        std::string msg = "Cannot copy content of file '" + input_file + "' into the " + v_iode_types[k_type] + " database.\n";
         msg += get_last_error();
         throw std::runtime_error(msg);
     }
@@ -323,7 +323,7 @@ void KDBAbstract::merge_from(const std::string& input_file)
     int res = K_cat(kdb, to_char_array(input_file));
     if(res < 0) 
         throw std::runtime_error("Cannot merge the content of the file '" + input_file_ + "' in the current " + 
-                                 vIodeTypes[k_type] + " database");
+                                 v_iode_types[k_type] + " database");
 }
 
 // TODO ALD: rewrite B_DataSearchParms() in C++
@@ -371,12 +371,12 @@ void KDBAbstract::save(const std::string& filepath)
 
     char* c_filepath = to_char_array(filepath_);
     if (strlen(c_filepath) >= sizeof(FNAME)) 
-        throw std::invalid_argument("Cannot save the '" + vIodeTypes[k_type] + "' database.\n" +   
+        throw std::invalid_argument("Cannot save the '" + v_iode_types[k_type] + "' database.\n" +   
                                     "The filepath '" + filepath_ + "' is too long.");
 
     int res = B_WsDump(kdb, c_filepath);
     if (res != EXIT_SUCCESS)
-        throw std::runtime_error("Cannot save the '" + vIodeTypes[k_type] + "' database in the file '" + 
+        throw std::runtime_error("Cannot save the '" + v_iode_types[k_type] + "' database in the file '" + 
                                   filepath + "'.\nReason: unknown.");
 }
 
@@ -392,5 +392,5 @@ void KDBAbstract::clear()
 
     res += K_clear(kdb);
     if (res != EXIT_SUCCESS) 
-        throw std::runtime_error("Cannot clear the '" + vIodeTypes[k_type] + "' database.\nReason: unknown");
+        throw std::runtime_error("Cannot clear the '" + v_iode_types[k_type] + "' database.\nReason: unknown");
 }

@@ -52,7 +52,7 @@ public:
     {
         KDB* kdb = is_global_database() ? K_WS[k_type] : const_cast<KDBAbstract*>(this);
         if(kdb == NULL)
-            kwarning(("The current " + vIodeTypes[k_type] + " has not been set yet").c_str());
+            kwarning(("The current " + v_iode_types[k_type] + " has not been set yet").c_str());
         return kdb;
     } 
 
@@ -132,7 +132,7 @@ public:
             pos = K_find(kdb, to_char_array(name));
         if(pos < 0) 
             throw std::invalid_argument("Cannot get the position of the object named '" + name + 
-                                        "' in the database of '" + vIodeTypes[k_type] + "'.\n" +  
+                                        "' in the database of '" + v_iode_types[k_type] + "'.\n" +  
                                         "The object with name '" + name + "' does not exist.");
         return pos;
     }

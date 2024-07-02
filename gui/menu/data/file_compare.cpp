@@ -7,7 +7,7 @@ MenuDataFileCompare::MenuDataFileCompare(QWidget* parent)
     setupUi(this);
 
     QStringList listIodeTypes;
-    for(const std::string& iode_type : vIodeTypes) listIodeTypes << QString::fromStdString(iode_type);
+    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
 
     wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
     wThreshold = new WrapperQLineEdit(label_threshold->text(), *lineEdit_threshold, OPTIONAL_FIELD);
