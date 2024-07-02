@@ -11,18 +11,35 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
 {
     std::vector<std::string> func_list;
 
+    std::string binary_ext;
     std::vector<std::string> v_binary_ext_upper;
-    for(std::string type_short: v_binary_ext)
+    for(int i=COMMENTS; i <= VARIABLES; i++)
     {
-        type_short[0] = toupper(type_short[0]);
-        v_binary_ext_upper.push_back(type_short);
+        binary_ext = v_file_types[i].v_ext[0];
+        // remove dot in front of extension
+        binary_ext = binary_ext.substr(1);
+        // set first character as upper case
+        binary_ext[0] = toupper(binary_ext[0]);
+        v_binary_ext_upper.push_back(binary_ext);
     }
 
+    std::string ext;
     std::vector<std::string> v_ext_upper;
-    for(std::string ext: v_ext)
+    v_ext_upper.push_back("");
+    for(const FileType& file_type: v_file_types)
     {
-        ext[0] = toupper(ext[0]);
-        v_ext_upper.push_back(ext);
+        for(const std::string& ext_: file_type.v_ext)
+        {
+            if(!ext_.empty())
+            {
+                ext = ext_;
+                // remove dot in front of extension
+                ext = ext.substr(1);
+                // set first character as upper case
+                ext[0] = toupper(ext[0]);
+                v_ext_upper.push_back(ext);
+            }
+        }
     }
 
     std::string prefix = gui ? "#" : "$";

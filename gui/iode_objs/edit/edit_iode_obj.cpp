@@ -7,7 +7,7 @@ EditObjectDialog::EditObjectDialog(const IodeDatabaseType iodeType, const QStrin
 {
 	setupUi(this);
 
-    setWindowTitle("Editing " + QString::fromStdString(vIodeTypes[iodeType]) + " " + name);
+    setWindowTitle("Editing " + QString::fromStdString(v_iode_types[iodeType]) + " " + name);
 	textEdit_content->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
     lineEdit_name->setText(name);

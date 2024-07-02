@@ -24,10 +24,10 @@ protected:
         char* c_name = to_char_array(name);
         int pos = K_add(kdb, c_name, args...);
         if (pos == -1) 
-            throw std::runtime_error("Cannot add or update " + vIodeTypes[k_type] + " with name '" + name + ".'\n" +  
+            throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + ".'\n" +  
                                      "Iode has not been initialized.");
         if (pos < -1) 
-            throw std::runtime_error("Cannot add or update " + vIodeTypes[k_type] + " with name '" + name + "'.\n" + 
+            throw std::runtime_error("Cannot add or update " + v_iode_types[k_type] + " with name '" + name + "'.\n" + 
                                      "Reason: unknown");
         return pos;
     }
@@ -47,8 +47,8 @@ public:
     template<class... Args> int add(const std::string& name, Args... args)
     {
         int pos;
-        std::string error_msg = "Cannot add " + vIodeTypes[k_type] + " with name '" + name + "'.\n";
-        error_msg += "The " + vIodeTypes[k_type] + " with name '" + name + "' already exists in the database.\n";
+        std::string error_msg = "Cannot add " + v_iode_types[k_type] + " with name '" + name + "'.\n";
+        error_msg += "The " + v_iode_types[k_type] + " with name '" + name + "' already exists in the database.\n";
         error_msg += "Use the update() method instead.";
 
         check_name(name, k_type);
@@ -91,7 +91,7 @@ public:
 
     template<class... Args> void update(const std::string& name, Args... args)
     {
-        std::string error_msg = "Cannot update " + vIodeTypes[k_type] + " with name '" + name + "'.\n";
+        std::string error_msg = "Cannot update " + v_iode_types[k_type] + " with name '" + name + "'.\n";
         error_msg += "Name '" + name + "' not found in the database.\nUse the add() method instead.";
 
         KDB* kdb = get_database();

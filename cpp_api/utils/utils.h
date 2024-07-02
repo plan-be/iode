@@ -93,7 +93,7 @@ static IodeRegexName get_regex_name(const int type)
 
 inline void check_name(const std::string name, const int type)
 {
-    std::string msg = "name " + name + " as " + vIodeTypes[type];
+    std::string msg = "name " + name + " as " + v_iode_types[type];
 
     if (name.empty()) throw IodeExceptionFunction("Cannot accept " + msg, "Empty name");
 
@@ -103,17 +103,8 @@ inline void check_name(const std::string name, const int type)
 
     IodeRegexName nre = get_regex_name(type);
     if (!regex_match(name, std::regex(nre.regex))) throw IodeExceptionFunction("Cannot accept " + msg, 
-        vIodeTypes[type] + " name must only contains " + nre.type + " letters, digits and underscore. " + 
+        v_iode_types[type] + " name must only contains " + nre.type + " letters, digits and underscore. " + 
         name + " is invalid.");
-}
-
-inline std::vector<std::string> get_extensions(const IodeFileType file_type)
-{
-    std::vector<std::string> ext;
-    for(const auto& [key, value]: mFileExtensions)
-        if(value == file_type) 
-            ext.push_back(key);
-    return ext;
 }
 
 inline IodeFileType get_iode_file_type(const std::string& filepath)
@@ -125,20 +116,19 @@ inline IodeFileType get_iode_file_type(const std::string& filepath)
     if (!p_filepath.has_extension()) return FILE_ANY;
 
     std::string ext = p_filepath.extension().string();
-    try
-    {
-        return mFileExtensions.at(ext);
-    }
-    catch(const std::exception)
-    {
-        return FILE_ANY;
-    }
+
+    for(int i=0; i < v_file_types.size(); i++)
+        for(const std::string& file_ext: v_file_types[i].v_ext)
+            if(ext == file_ext)
+                return (IodeFileType) i;
+
+    return FILE_ANY;
 }
 
 inline int get_iode_type(const std::string& iode_type_as_string)
 {
     for(int i=0; i < IODE_NB_TYPES; i++) 
-        if(iode_type_as_string == vIodeTypes[i]) 
+        if(iode_type_as_string == v_iode_types[i]) 
             return i;
     return -1;
 }
@@ -184,7 +174,7 @@ inline std::string check_filepath(const std::string& filepath, const IodeFileTyp
     std::filesystem::path p_filepath = check_file(filepath, caller_name, file_must_exist);
 
     // get list of valid extensions
-    std::vector<std::string> expected_ext = get_extensions(expected_file_type);
+    std::vector<std::string> v_expected_ext = v_file_types[expected_file_type].v_ext;
 
     // check or add extension
     std::filesystem::path p_filename = p_filepath.filename();
@@ -193,18 +183,18 @@ inline std::string check_filepath(const std::string& filepath, const IodeFileTyp
         // check extension
         std::string ext = p_filename.extension().string(); 
         bool match_ext = false;
-        for(const std::string& expected_ext_: expected_ext)
-            if(expected_ext_ == ext) match_ext = true;
+        for(const std::string& expected_ext: v_expected_ext)
+            if(expected_ext == ext) match_ext = true;
         if(!match_ext)
         {  
             std::string msg;
-            if(expected_ext.size() == 1)
-                msg = "Expected extension is " + expected_ext[0];
+            if(v_expected_ext.size() == 1)
+                msg = "Expected extension is " + v_expected_ext[0];
             else
             {
-                msg = "Expected extensions are: " + expected_ext[0];
-                for(int i=1; i < expected_ext.size(); i++) 
-                    msg += ", " + expected_ext[i];
+                msg = "Expected extensions are: " + v_expected_ext[0];
+                for(int i=1; i < v_expected_ext.size(); i++) 
+                    msg += ", " + v_expected_ext[i];
             }
             throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" +
                     "The file '" + p_filename.string() + "' has wrong extension '" + ext + "'\n" + msg);
@@ -223,7 +213,8 @@ inline std::string check_filepath(const std::string& filepath, const IodeFileTyp
                     "You must provide an extension to the file " + p_filepath.string());
 
         // set binary format extension
-        p_filepath = p_filepath.replace_extension(v_binary_ext[database_type]);
+        std::string binary_ext = v_file_types[database_type].v_ext[0];
+        p_filepath = p_filepath.replace_extension(binary_ext);
 
         // check if file exist
         if (file_must_exist)
@@ -233,13 +224,14 @@ inline std::string check_filepath(const std::string& filepath, const IodeFileTyp
             // switch to ascii format extension and check if file exist 
             if (!binary_file_found)
             {
-                p_filepath = p_filepath.replace_extension(v_ascii_ext[database_type]);
+                std::string ascii_ext = v_file_types[database_type].v_ext[1];
+                p_filepath = p_filepath.replace_extension(ascii_ext);
                 if (!std::filesystem::exists(p_filepath)) 
                 {
                     std::filesystem::path p_directory = p_filepath.parent_path();
                     std::string stem = p_filepath.stem().string();
                     throw std::invalid_argument("Cannot run '" + caller_name + "'.\n" + 
-                            "Neither '" + stem + v_binary_ext[database_type] + "' nor '" + stem + v_ascii_ext[database_type] + "' " +
+                            "Neither '" + stem + binary_ext + "' nor '" + stem + ascii_ext + "' " +
                             "could be found in directory '" + p_directory.string() + "'");
                 }
             }

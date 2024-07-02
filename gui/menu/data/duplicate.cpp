@@ -11,7 +11,7 @@ MenuDataDuplicateObj::MenuDataDuplicateObj(QWidget* parent)
     comboBox_iode_types->setCurrentIndex(0);
 
     QStringList listIodeTypes;
-    for(const std::string& iode_type : vIodeTypes) listIodeTypes << QString::fromStdString(iode_type);
+    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
 
     wComboIodeTypes = new WrapperComboBox(label_iode_types->text(), *comboBox_iode_types, REQUIRED_FIELD, listIodeTypes);
     wObjName = new WrapperQLineEdit(label_obj_name->text(), *lineEdit_obj_name, REQUIRED_FIELD);

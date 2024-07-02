@@ -10,23 +10,14 @@
 #include "utils.h"
 
 
-// tab prefix per file type
-// Note: If the tab's label contains an ampersand, the letter following the ampersand is used as a shortcut for the tab, 
-//       e.g. if the label is "Bro&wse" then Alt+W becomes a shortcut which will move the focus to this tab.
-//       See https://doc.qt.io/qt-6/qtabwidget.html#addTab 
-const static QVector<QString> tabPrefix({"(&CMT) ", "(&EQS) ", "(&IDT) ", "(&LST) ", 
-                                         "(&SCL) ", "(&TBL) ", "(&VAR) ", 
-                                         "(REP) ", "(TXT) ", "(ASCII) ", "(A2M) ", 
-                                         "(RTF) ", "(HTML) ", "(MIF) ", "(CSV) ",
-                                         "(REF) ", "(AGL) ", "(DIF) ", "(LOG) ", 
-                                         "(SET) ", "(TXT) "});
-
 class IodeAbstractWidget: public QWidget
 {
     Q_OBJECT
 
 protected:
     IodeFileType fileType;
+
+    QVector<QString> tabPrefix; ///< tab prefix per file type
 
     bool modified;
     bool forcedAsText_;         ///< Whether or not the corresponding file has been forced to open as a text tab
@@ -58,6 +49,28 @@ public:
         fileType(fileType), modified(false), forcedAsText_(false), savingFile(false), splitted_(false)
     {
         this->setGeometry(QRect(10, 11, 951, 26));
+
+        // Note: If the tab's label contains an ampersand, the letter following the ampersand is used as a shortcut for the tab, 
+        //       e.g. if the label is "Bro&wse" then Alt+W becomes a shortcut which will move the focus to this tab.
+        //       See https://doc.qt.io/qt-6/qtabwidget.html#addTab 
+        QString ext;
+        std::vector<std::string> v_ext;
+        for(int i = 0; i < v_file_types.size(); i++)
+        {
+            v_ext = v_file_types[i].v_ext;
+            if(v_ext.size() > 0)
+            {
+                ext = QString::fromStdString(v_ext[0]);
+                // remove dot in front of extension + to upper case
+                ext = ext.sliced(1).toUpper();
+                // prepend extension with an & if it represents an IODE database 
+                if(i < FILE_VARIABLES)
+                    ext = "&" + ext;
+                tabPrefix.append("(" + ext + ") ");
+            }
+            else
+                tabPrefix.append("");
+        }
     }
 
     IodeFileType getFiletype() const 

@@ -6,7 +6,7 @@ MenuDataSearchText::MenuDataSearchText(QWidget* parent)
     setupUi(this);
 
     QStringList listIodeTypes;
-    for(const std::string& iode_type : vIodeTypes) listIodeTypes << QString::fromStdString(iode_type);
+    for(const std::string& iode_type : v_iode_types) listIodeTypes << QString::fromStdString(iode_type);
 
     wText = new WrapperQLineEdit(label_text->text(), *lineEdit_text, REQUIRED_FIELD);
     wSaveList = new WrapperQLineEdit(label_save_list->text(), *lineEdit_save_list, REQUIRED_FIELD);

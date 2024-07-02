@@ -82,7 +82,7 @@ public:
         topHLayout->addWidget(pushButton_print, Qt::AlignLeft);
 
         // add button
-        pushButton_add = new QPushButton("Add " + QString::fromStdString(vIodeTypes[iodeType]));
+        pushButton_add = new QPushButton("Add " + QString::fromStdString(v_iode_types[iodeType]));
         pushButton_add->setObjectName(QString::fromUtf8("pushButton_add"));
         QSizePolicy sizePolicyAdd(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicyAdd.setHorizontalStretch(0);
@@ -275,9 +275,9 @@ public:
     {
         if(isUnsavedDatabase())
         {
-            QString ext = QString::fromStdString(v_binary_ext[fileType]);
+            QString ext = QString::fromStdString(v_file_types[fileType].v_ext[0]);
             // Note: the * is to tell that the content of the KDB has not been saved in file
-            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + "." + ext + " [0]*";
+            return tabPrefix[fileType] + QString(I_DEFAULT_FILENAME) + ext + " [0]*";
         }
         else
             return IodeAbstractWidget::getTabText() + " [" + QString::number(objmodel->getNbObjects()) + "]";
@@ -286,7 +286,7 @@ public:
     QString getTooltip() const
     {
         if(isUnsavedDatabase())
-            return prefixUnsavedDatabase + " " + QString::fromStdString(vIodeTypes[iodeType]) + " Database [0]";
+            return prefixUnsavedDatabase + " " + QString::fromStdString(v_iode_types[iodeType]) + " Database [0]";
         else
             return IodeAbstractWidget::getTooltip() + " [" + QString::number(objmodel->getNbObjects()) + "]";
     }

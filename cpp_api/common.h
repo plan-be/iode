@@ -22,6 +22,27 @@ const static char* DEFAULT_INSTALLATION_DIR = "c:/iode";               // see fu
 const static char* IODE_WEBSITE = "https://iode.plan.be/doku.php";
 const static char NAN_REP[3] = "--";
 
+/* ****************************** *
+ *         MISCELLANEOUS          *
+ * ****************************** */
+
+struct IodeRegexName
+{
+    std::string regex;
+    std::string type;
+};
+
+struct FileType
+{
+    std::string name;
+    std::vector<std::string> v_ext;
+
+    FileType(const std::string& name = "", const std::vector<std::string>& v_ext = {}) 
+        : name(name), v_ext(v_ext) {} 
+};
+
+const static std::vector<std::string> v_iode_types = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
+
 
 /* ****************************** *
  *             ENUMS              *
@@ -30,17 +51,6 @@ const static char NAN_REP[3] = "--";
  /* NOTE FOR THE DEVELOPPERS:
   * enum documentation: https://en.cppreference.com/w/cpp/language/enum
   */
-
-
-const static std::vector<std::string> vIodeTypes = { "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable" };
-const static std::vector<std::string> v_binary_ext = { "cmt", "eqs", "idt", "lst", "scl", "tbl", "var" };
-const static std::vector<std::string> v_ascii_ext = { "ac", "ae", "ai", "al", "as", "at", "av" };
-
-struct IodeRegexName
-{
-    std::string regex;
-    std::string type;
-};
 
 // TODO: replace K by I as below in C api + group them in an enum
 enum EnumLang
@@ -54,60 +64,53 @@ const static int I_NB_LANGS = 3;
 
 const static std::vector<std::string> vLangs = { "English", "Dutch", "French" };
 
-
-const static std::vector<std::string> v_ext_names = 
-{ 
-    "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", "", 
-    "Comment", "Equation", "Identity", "List", "Scalar", "Table", "Variable", "",
-    "Report", "A2m", "Agl", "Profile", "Dif", "Mif", "Rtf", "PostScript", "Ascii", "Text", "Csv", "",
-    "Html",  "Ref", "Logs", "Settings", "Any", "Directory"
-};
-
-// same as k_ext defined in k_objfile.c + "html", ... "ini"
-const static std::vector<std::string> v_ext = 
-{
-    "cmt", "eqs", "idt", "lst", "scl", "tbl", "var", "ooo",
-    "ac",  "ae",  "ai",  "al",  "as",  "at",  "av", "",
-    "rep", "a2m", "agl", "prf", "dif", "mif", "rtf", "ps", "asc", "txt", "csv", "xxx", 
-    "html", "ref", "log", "ini", "", ""
-};
-
 const static std::string report_ext = ".rep";
 
-const static std::map<std::string, IodeFileType> mFileExtensions =
+const static FileType file_comments("Comment", {".cmt", ".ac"});
+const static FileType file_equations("Equation", {".eqs", ".ae"});
+const static FileType file_identities("Identity", {".idt", ".ai"});
+const static FileType file_lists("List", {".lst", ".al"});
+const static FileType file_scalars("Scalar", {".scl", ".as"});
+const static FileType file_tables("Table", {".tbl", ".at"});
+const static FileType file_variables("Variable", {".var", ".av"});
+
+// see IodeFileType in api/iode.h
+const static std::vector<FileType> v_file_types = 
 {
-    {".cmt", FILE_COMMENTS},
-    {".eqs", FILE_EQUATIONS},
-    {".idt", FILE_IDENTITIES},
-    {".lst", FILE_LISTS},
-    {".scl", FILE_SCALARS},
-    {".tbl", FILE_TABLES},
-    {".var", FILE_VARIABLES},
-
-    {".ac",  FILE_COMMENTS},
-    {".ae",  FILE_EQUATIONS},
-    {".ai",  FILE_IDENTITIES},
-    {".al",  FILE_LISTS},
-    {".as",  FILE_SCALARS},
-    {".at",  FILE_TABLES},
-    {".av",  FILE_VARIABLES},
-
-    {".rep", FILE_REP},
-    {".a2m", FILE_A2M},
-    {".agl", FILE_AGL},
-    {".prf", FILE_PRF},
-    {".dif", FILE_DIF},
-    {".mif", FILE_MIF},
-    {".rtf", FILE_RTF},
-    {".ps", FILE_PS},
-    {".asc", FILE_AAS},
-    {".txt", FILE_TXT},
-    {".csv", FILE_CSV},
-
-    {".htm", FILE_HTML},
-    {".ref", FILE_REF},
-    {".log", FILE_LOG},
-    {".ini", FILE_SETTINGS},
+    file_comments,
+    file_equations,
+    file_identities,
+    file_lists,
+    file_scalars,
+    file_tables,
+    file_variables,
+    FileType(),
+    file_comments,
+    file_equations,
+    file_identities,
+    file_lists,
+    file_scalars,
+    file_tables,
+    file_variables,
+    FileType(), 
+    FileType("Report", {".rep"}), 
+    FileType("A2m", {".a2m"}), 
+    FileType("Agl", {".agl"}), 
+    FileType("Profile", {".prf"}), 
+    FileType("Dif", {".dif"}), 
+    FileType("Mif", {".mif"}), 
+    FileType("Rtf", {".rtf"}), 
+    FileType("PostScript", {".ps"}), 
+    FileType("Ascii", {".asc"}), 
+    FileType("Text", {".txt"}), 
+    FileType("Csv", {".csv"}), 
+    FileType(),
+    FileType("Html", {".html"}),
+    FileType("Ref", {".ref"}), 
+    FileType("Logs", {".log"}), 
+    FileType("Settings", {".ini"}), 
+    FileType("Any", {}), 
+    FileType("Directory", {})
 };
 
 

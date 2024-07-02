@@ -194,7 +194,7 @@ void IodeTabWidget::saveSettings()
 
         filetype = tabWidget->getFiletype();
         if(filetype <= FILE_VARIABLES && static_cast<AbstractIodeObjectWidget*>(tabWidget)->isUnsavedDatabase())
-            filepath = prefixUnsavedDatabase + " " + QString::fromStdString(v_ext_names[filetype]);
+            filepath = prefixUnsavedDatabase + " " + QString::fromStdString(v_file_types[filetype].v_ext[0]);
         else
             filepath = tabWidget->getFilepath();
 
@@ -443,7 +443,7 @@ void IodeTabWidget::clearTab()
     if (filetype <= FILE_VARIABLES)
     {
         QMessageBox::StandardButton answer = QMessageBox::warning(nullptr, "WARNING", 
-            "Are you sure to clear the " + QString::fromStdString(v_ext_names[filetype]) + " database", 
+            "Are you sure to clear the " + QString::fromStdString(v_file_types[filetype].v_ext[0]) + " database", 
             QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
         if (answer == QMessageBox::Yes)
         {
@@ -502,7 +502,7 @@ void IodeTabWidget::showObjectsList(IodeDatabaseType iodeType, const QStringList
         int index = getIodeObjTabIndex(iodeType);
         if(index < 0)
         {
-            std::string type_ = vIodeTypes[iodeType];
+            std::string type_ = v_iode_types[iodeType];
             throw IodeException("Cannot show IODE objects of type " + type_ + "\n" +
                 + "Database of objects of type " + type_ + " not found");
         }
