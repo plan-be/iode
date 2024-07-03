@@ -7,7 +7,7 @@ from typing import Union, Tuple, List, Optional
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport EnumIodeAdjustmentMethod
+from pyiode.common cimport IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport NamedEquation
 from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
@@ -72,7 +72,7 @@ def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str =
         method = method.upper()
         method = AdjustmentMethod[AdjustmentMethod]
     method = int(method)
-    return cpp_dynamic_adjustment(<EnumIodeAdjustmentMethod>method, eqs.encode(), c1.encode(), c2.encode()).decode()
+    return cpp_dynamic_adjustment(<IodeAdjustmentMethod>method, eqs.encode(), c1.encode(), c2.encode()).decode()
 
 
 def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalars:

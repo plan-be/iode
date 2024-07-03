@@ -18,7 +18,7 @@ from pyiode.common cimport ESTIMATION_EPS as C_ESTIMATION_EPS
 from pyiode.common cimport (IodeDatabaseType, IodeEquationMethod, 
                             IodeEquationTest, IodeLowToHigh, IodeHighToLow, 
                             IodeVarMode, VariablesInitialization, 
-                            SimuSortAlgorithm, EnumIodeAdjustmentMethod)
+                            SimuSortAlgorithm, IodeAdjustmentMethod)
 from pyiode.common cimport IodeFileType as CIodeFileType 
 from pyiode.common cimport TableLang as CTableLang
 from pyiode.common cimport TableCellType as CTableCellType 
@@ -222,8 +222,8 @@ ESTIMATION_MAXIT = C_ESTIMATION_MAXIT
 ESTIMATION_EPS: float = C_ESTIMATION_EPS
 
 class AdjustmentMethod(IntEnum):
-    PARTIAL = EnumIodeAdjustmentMethod.AM_PARTIAL_ADJUSTMENT
-    ERROR_CORRECTION = EnumIodeAdjustmentMethod.AM_ERROR_CORRECTION_METHOD
+    PARTIAL = IodeAdjustmentMethod.AM_PARTIAL_ADJUSTMENT
+    ERROR_CORRECTION = IodeAdjustmentMethod.AM_ERROR_CORRECTION_METHOD
 
 class WriteFileExt(IntEnum):
     GDI = 1

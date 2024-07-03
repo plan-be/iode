@@ -935,7 +935,8 @@ extern  int     G_CUR_TITLE;
 #define G_F                 1001
 #define G_MAXOBS            1024
 
-/*------ ESTIMATION ------------ */
+/* ------ ESTIMATION ------------ */
+
 enum IodeEstimationError
 {
     EST_NO_EQ_ERR = 1,
@@ -950,8 +951,13 @@ enum IodeEstimationError
     EST_NO_SCALARS
 };
 
+enum IodeAdjustmentMethod
+{
+    AM_PARTIAL_ADJUSTMENT,
+    AM_ERROR_CORRECTION_METHOD
+};
 
-/* SIMULATION */
+/* ------ SIMULATION ------------ */
 
 enum SimuSortAlgorithm
 {

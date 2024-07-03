@@ -14,19 +14,13 @@
 constexpr static int    ESTIMATION_MAXIT = 100;
 constexpr static double ESTIMATION_EPS   = 0.0000001;
 
-enum EnumIodeAdjustmentMethod
-{
-    AM_PARTIAL_ADJUSTMENT,
-    AM_ERROR_CORRECTION_METHOD
-};
-
 const static std::vector<std::string> v_adjustment_method =
 {
     "Partial Adjustment",
     "Error Correction Model"
 };
 
-std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method, 
+std::string dynamic_adjustment(const IodeAdjustmentMethod method, 
     const std::string& eqs, const std::string& c1, const std::string& c2);
 
 /**
