@@ -7,7 +7,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
-from pyiode.common cimport IodeEquationMethod, EnumIodeAdjustmentMethod
+from pyiode.common cimport IodeEquationMethod, IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport NamedEquation
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
@@ -15,7 +15,7 @@ from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
 
 
 cdef extern from "cpp_api/compute/estimation.h":
-    string dynamic_adjustment(const EnumIodeAdjustmentMethod method, const string& eqs, 
+    string dynamic_adjustment(const IodeAdjustmentMethod method, const string& eqs, 
                               const string& c1, const string& c2) except +
     CKDBScalars* dickey_fuller_test(const string& lec, bint drift, bint trend, int order) except +
 

@@ -34,7 +34,7 @@ void DynAdjustmentDialog::adjust()
     try
     {
         std::string std_lec = textEdit_equation->toPlainText().toStdString();
-        EnumIodeAdjustmentMethod method = (EnumIodeAdjustmentMethod) comboMethod->extractAndVerify();
+        IodeAdjustmentMethod method = (IodeAdjustmentMethod) comboMethod->extractAndVerify();
         std::string coef1 = lineCoef1->extractAndVerify().toStdString();
         std::string coef2 = lineCoef2->extractAndVerify().toStdString();
 

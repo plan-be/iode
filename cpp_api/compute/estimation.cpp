@@ -1,7 +1,7 @@
 #include "estimation.h"
 
 
-std::string dynamic_adjustment(const EnumIodeAdjustmentMethod method, 
+std::string dynamic_adjustment(const IodeAdjustmentMethod method, 
     const std::string& eqs, const std::string& c1, const std::string& c2)
 {
     IodeExceptionInvalidArguments invalid("Failed to proceed dynamic adjustment");
