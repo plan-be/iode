@@ -162,34 +162,10 @@ pdfkeywords={IODE, keyboard, shortcuts}
  Ctrl + D            & Clear the current workspace tab \\
  Ctrl + Shift + D    & Clear all workspaces \\ 
  Ctrl + P            & Print the list of IODE objects \\
- Ctrl + F1           & shows the comments related to the current IODE object \\
- Ctrl + F2           & shows the equations related to the current IODE object \\
- Ctrl + F3           & shows the identities related to the current IODE object \\
- Ctrl + F4           & shows the lists related to the current IODE object \\
- Ctrl + F5           & shows the scalars related to the current IODE object \\
- Ctrl + F6           & shows the tables related to the current IODE object \\
- Ctrl + F7           & shows the variables related to the current IODE object \\
- Ctrl + Alt + F1     & shows the comments of the same name \\
- Ctrl + Alt + F2     & shows the equations of the same name \\
- Ctrl + Alt + F3     & shows the identities of the same name \\
- Ctrl + Alt + F4     & shows the lists of the same name \\
- Ctrl + Alt + F5     & shows the scalars present in the current equation \\
- Ctrl + Alt + F6     & shows the tables of the same name \\
- Ctrl + Alt + F7     & shows the variables present in the current equation
+ Ctrl + F[1-7]       & shows the [comments - variables] related to the current IODE object \\
+ Ctrl + Alt + F[1-7] & shows the [comments - variables] of the same name or present in the LEC expression of the current equation/identity \\
 \end{tabular}
 \newline\newline
-
-%----------------------------------------------------------------------------------------
-
-\end{minipage} % End the second column of text
-} % End the second division of the page
-
-%----------------------------------------------------------------------------------------
-%	THIRD COLUMN SPECIFICATION 
-%----------------------------------------------------------------------------------------
-
-\put(200,180){ % Divide the page
-\begin{minipage}[t]{85mm} % Create a box to house text
 
 \sectiontitle{Equations Tab}
 
@@ -205,6 +181,18 @@ F7         & Execute the selected identity \\
 Shift + F7 & Execute the selected identities 
 \end{tabular}
 \newline\newline
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the second column of text
+} % End the second division of the page
+
+%----------------------------------------------------------------------------------------
+%	THIRD COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(200,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
 
 \sectiontitle{Scalars Tab}
 
@@ -225,6 +213,22 @@ Ctrl + Enter  & Edit \\
 F7            & Compute and display values \\
 F8            & Compute and plot values as a graph \\
 \end{tabular}
+\newline\newline
+
+\sectiontitle{Vars Tab}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+ (Shift +) F3       & Increase/Decrease the size of the columns \\
+ Ctrl + Shift + F3  & Resize columns to contents \\
+ (Shift +) F4       & Increase/Decrease the number of displayed decimal \\
+ (Shift +) F5       & Change the display mode (Level, Diff, Grt, YoY Diff, YoY Grt) \\
+ % F6               & Change the precision \\
+ F8                 & Displays the selected series as a graph \\
+ Ctrl + C           & Copy values to clipboard \\
+ Ctrl + Shift + C   & Copy values including var names and sample range to clipboard \\
+ Ctrl + P           & Paste values 
+\end{tabular}
+\newline\newline
 
 %----------------------------------------------------------------------------------------
 
@@ -247,25 +251,6 @@ F8            & Compute and plot values as a graph \\
 %	HEADING ONE
 %----------------------------------------------------------------------------------------
 
-\sectiontitle{Vars Tab}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- (Shift +) F3       & Increase/Decrease the size of the columns \\
- Ctrl + Shift + F3  & Resize columns to contents \\
- (Shift +) F4       & Increase/Decrease the number of displayed decimal \\
- (Shift +) F5       & Change the display mode (Level, Diff, Grt, YoY Diff, YoY Grt) \\
- % F6               & Change the precision \\
- F8                 & Displays the selected series as a graph \\
- Ctrl + C           & Copy values to clipboard \\
- Ctrl + Shift + C   & Copy values including var names and sample range to clipboard \\
- Ctrl + P           & Paste values 
-\end{tabular}
-\newline\newline
-
-%----------------------------------------------------------------------------------------
-%	HEADING Two
-%----------------------------------------------------------------------------------------
-
 \sectiontitle{Edit Equation + Estimation}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
@@ -283,7 +268,7 @@ F8            & Compute and plot values as a graph \\
 \newline\newline
 
 %----------------------------------------------------------------------------------------
-%	HEADING THREE
+%	HEADING TWO
 %----------------------------------------------------------------------------------------
 
 \sectiontitle{Edit Table}
@@ -297,21 +282,10 @@ Insert     & Insert a new line \\
 Delete     & Delete a line \\
 Ctrl + X   & full screen
 \end{tabular}
+\newline\newline
 
 %----------------------------------------------------------------------------------------
-
-\end{minipage} % End the first column of text
-} % End the first division of the page
-
-%----------------------------------------------------------------------------------------
-%	SECOND COLUMN SPECIFICATION 
-%----------------------------------------------------------------------------------------
-
-\put(105,180){ % Divide the page
-\begin{minipage}[t]{85mm} % Create a box to house text
-
-%----------------------------------------------------------------------------------------
-%	HEADING ONE
+%	HEADING THREE
 %----------------------------------------------------------------------------------------
 
 \sectiontitle{Text And Report Editor}
@@ -329,8 +303,20 @@ Ctrl + X   & full screen
 \newline\newline
 
 %----------------------------------------------------------------------------------------
-%	HEADING TWO
-%----------------------------------------------------------------------------------------	
+
+\end{minipage} % End the first column of text
+} % End the first division of the page
+
+%----------------------------------------------------------------------------------------
+%	SECOND COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(105,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+%----------------------------------------------------------------------------------------
+%	HEADING ONE
+%----------------------------------------------------------------------------------------
 
 \sectiontitle{Find And Replace Dialog}
 
@@ -341,9 +327,9 @@ Ctrl + X   & full screen
  Ctrl + Alt + Enter & Replace all occurrences
 \end{tabular}
 \newline\newline
-			
+
 %----------------------------------------------------------------------------------------
-%	HEADING THREE
+%	HEADING TWO
 %----------------------------------------------------------------------------------------
 
 \sectiontitle{Report Command}
@@ -355,7 +341,7 @@ Enter                       & Execute command \\
 \newline\newline
 
 %----------------------------------------------------------------------------------------
-%	HEADING FOUR
+%	HEADING THREE
 %----------------------------------------------------------------------------------------
 
 \sectiontitle{Graph Window}
