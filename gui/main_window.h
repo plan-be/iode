@@ -1,17 +1,18 @@
 #pragma once
 
-#include <QWidget>
 #include <QDir>
 #include <QList>
+#include <QWidget>
 #include <QAction>
+#include <QVector>
 #include <QSettings>
 #include <QShortcut>
 #include <QCompleter>
-#include <QStringList>
-#include <QStringListModel>
 #include <QMessageBox>
-#include <QFileIconProvider>
+#include <QStringList>
 #include <QMainWindow>
+#include <QStringListModel>
+#include <QFileIconProvider>
 
 #include "ui_main_window.h"
 #include "main_window_abstract.h"
@@ -92,7 +93,7 @@ private:
 	QShortcut* fullScreenShortcut;
 
 public:
-	MainWindow(QWidget *parent = Q_NULLPTR);
+	MainWindow(QWidget *parent = Q_NULLPTR, const QVector<QString>& files_to_load = {});
 	~MainWindow();
 
 	/**

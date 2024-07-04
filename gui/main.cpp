@@ -12,6 +12,14 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
     QCoreApplication::setApplicationName("IODE");
 
+    // check if files have been passed as argument to the application.
+    // This happens when the user selects several files from a File Directory 
+    // (Windows, Linux, Mac) and choose the option "Open With".
+    QVector<QString> files_to_load;
+    if(argc > 1)
+        for(int i=1; i < argc; i++)
+            files_to_load.append(QString(argv[i]));
+
     // forces decimals separator to be dot 
     QLocale::setDefault(QLocale::English);
 
@@ -35,7 +43,7 @@ int main(int argc, char* argv[])
     splash.show();
     app.processEvents();
 
-    MainWindow* main_window = new MainWindow();
+    MainWindow* main_window = new MainWindow(nullptr, files_to_load);
     main_window->show();
     splash.finish(main_window);
     int res = app.exec();
