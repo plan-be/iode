@@ -9,7 +9,7 @@ QWidget* get_main_window_ptr()
 }
 
 
-MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
+MainWindow::MainWindow(QWidget *parent, const QVector<QString>& files_to_load) : MainWindowAbstract(parent)
 {
     // ---- setup the present class ----
     setupUi(this);
@@ -34,6 +34,41 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
 
     textEdit_output->setStyleSheet("font-family: " + fontFamily);
     lineEdit_iode_command->setStyleSheet("font-family: " + fontFamily);
+
+    // ---- open file(s) passed as files_to_load argument ----
+    QVector<QString> files_to_load_;
+    if(files_to_load.size() > 0)
+    {
+        QString parent_dir;
+        for(const QString& filepath : files_to_load)
+        {
+            QFileInfo fileInfo(filepath);
+            if (!fileInfo.exists())
+                QMessageBox::warning(this, "WARNING", "Cannot open '" + filepath + "'. File does not exist");
+            
+            if (!fileInfo.isFile())
+            {
+                    QMessageBox::warning(this, "WARNING", "Only files can be open");
+                    break;
+            }
+            else
+            {
+                if(parent_dir.isEmpty())
+                    parent_dir = fileInfo.absolutePath();
+                if(fileInfo.absolutePath() != parent_dir)
+                {
+                    QMessageBox::warning(this, "WARNING", "All files to open must come from the same directory");
+                    parent_dir = "";
+                    files_to_load_.clear();
+                    break;
+                }
+                files_to_load_.append(fileInfo.absoluteFilePath());
+            }
+        }
+
+        if(!parent_dir.isEmpty())
+            projectPath = parent_dir;
+    }
 
     // ---- menus ----
     buildRecentProjectsMenu();
@@ -93,6 +128,13 @@ MainWindow::MainWindow(QWidget *parent) : MainWindowAbstract(parent)
     }
     else
         openDirectory(projectPath);
+
+    // files_to_load is not empty
+    if(files_to_load_.size() > 0)
+    {
+        for(const QString& filepath: files_to_load_)
+            tabWidget_IODE_objs->loadFile(filepath, true, true);
+    }
 }
 
 MainWindow::~MainWindow()
