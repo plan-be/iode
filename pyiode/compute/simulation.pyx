@@ -503,7 +503,7 @@ cdef class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
-        >>> from iode import Simulation, split_list
+        >>> from iode import Simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
@@ -516,18 +516,18 @@ cdef class Simulation:
         >>> simu.model_simulate("2000Y1", "2015Y1");
 
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
-        'BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;...;TWGP;ZZF_;DTH1;PME;PMS;PMT'
-        >>> len(split_list(lists["_PRE"]))
+        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
+        >>> len(lists["_PRE"])
         31
 
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        'PMAB;PXAB;ITFGO;ITFGI;CGU;...;ACAG;FLG;VBNP;VBNP_P;VBBP_P'
-        >>> len(split_list(lists["_INTER"]))
+        ['PMAB', 'PXAB', 'ITFGO', 'ITFGI', ..., 'FLG', 'VBNP', 'VBNP_P', 'VBBP_P']
+        >>> len(lists["_INTER"])
         204
 
         >>> lists["_POST"]          # doctest: +ELLIPSIS
-        'IFU;SSHFF;PBBP;OCUF;IHU;IDF;...;GOSH;GAP;FLGR;FLF;DPUU;BENEF'
-        >>> len(split_list(lists["_POST"]))
+        ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'GAP', 'FLGR', 'FLF', 'DPUU', 'BENEF']
+        >>> len(lists["_POST"])
         39
         """
         return self.c_simulation.is_debug_active()
@@ -705,7 +705,7 @@ cdef class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, lists, scalars, variables 
-        >>> from iode import Simulation, split_list
+        >>> from iode import Simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
@@ -776,7 +776,7 @@ cdef class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
-        >>> from iode import Simulation, split_list
+        >>> from iode import Simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
         >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
@@ -786,18 +786,18 @@ cdef class Simulation:
         >>> simu.model_calculate_SCC(10);
 
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
-        'BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;...;TWGP;ZZF_;DTH1;PME;PMS;PMT'
-        >>> len(split_list(lists["_PRE"]))
+        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PME', 'PMS', 'PMT']
+        >>> len(lists["_PRE"])
         31
 
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        'PMAB;PXAB;ULCP;SSH3P;WBG;ITF;...;YSSF;YSSG;WCF_;ITEP;EXC;ITT'
-        >>> len(split_list(lists["_INTER"]))
+        ['PMAB', 'PXAB', 'ULCP', 'SSH3P', ..., 'WCF_', 'ITEP', 'EXC', 'ITT']
+        >>> len(lists["_INTER"])
         204
 
         >>> lists["_POST"]          # doctest: +ELLIPSIS
-        'IFU;SSHFF;PBBP;OCUF;IHU;IDF;...;GOSH;GAP;FLGR;FLF;DPUU;BENEF'
-        >>> len(split_list(lists["_POST"]))
+        ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'FLGR', 'FLF', 'DPUU', 'BENEF']
+        >>> len(lists["_POST"])
         39
         """
         if nb_iterations <= 0:
@@ -846,7 +846,7 @@ cdef class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, lists, scalars, variables 
-        >>> from iode import Simulation, split_list
+        >>> from iode import Simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
@@ -858,16 +858,16 @@ cdef class Simulation:
 
         >>> simu.model_calculate_SCC(10);
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
-        'BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;...;TWGP;ZZF_;DTH1;PME;PMS;PMT'
-        >>> len(split_list(lists["_PRE"]))
+        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
+        >>> len(lists["_PRE"])
         31
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        'PMAB;PXAB;ULCP;SSH3P;WBG;ITF;...;YSSF;YSSG;WCF_;ITEP;EXC;ITT'
-        >>> len(split_list(lists["_INTER"]))
+        ['PMAB', 'PXAB', 'ULCP', 'SSH3P', ..., 'YSSG', 'WCF_', 'ITEP', 'EXC', 'ITT']
+        >>> len(lists["_INTER"])
         204
         >>> lists["_POST"]          # doctest: +ELLIPSIS
-        'IFU;SSHFF;PBBP;OCUF;IHU;IDF;...;GOSH;GAP;FLGR;FLF;DPUU;BENEF'
-        >>> len(split_list(lists["_POST"]))
+        ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'GAP', 'FLGR', 'FLF', 'DPUU', 'BENEF']
+        >>> len(lists["_POST"])
         39
 
         Step 2 - Simulate the model based on the 3 lists _PRE, _INTER and _POST
