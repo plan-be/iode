@@ -10,6 +10,7 @@ New Features
 Improvements
 ------------
 
+  * (GUI) Allowed users to open Iode files from an extern File Explorer using the option 'Open With' (#607)
 
 Fixed Bugs
 ----------
