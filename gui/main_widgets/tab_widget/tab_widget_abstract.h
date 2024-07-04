@@ -55,7 +55,7 @@
  *        - Open files with corresponding application (.xlsx with Excel, ...)
  *        - Reload file content if modified by another program. 
  *           -> CTRL + S on a tab saves its content (*)
- *           -> CTRL + F4 on a tab closes it if the tab does not represent an IODE database
+ *           -> CTRL + W on a tab closes it if the tab does not represent an IODE database
  *           -> SHIFT + ALT + C copies the absolute filepath
  *           -> SHIFT + ALT + R reveals file in OS file explorer
  *           -> CTRL + SHIFT + S saves all tabs content (*)
