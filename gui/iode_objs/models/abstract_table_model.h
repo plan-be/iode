@@ -79,7 +79,7 @@ public slots:
 	 * @param name 
 	 * @param other_type 
 	 */
-	virtual QStringList getSameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type) = 0;
+	virtual QStringList getSameNameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type) = 0;
 
 	/**
 	 * @brief get the list of all related objects of type other_type.
@@ -198,7 +198,7 @@ public:
 		return false; 
 	}
 
-	QStringList getSameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type) override;
+	QStringList getSameNameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type) override;
 
 	QStringList getRelatedObjs(const QString& name, const IodeDatabaseType other_type) override;
 
@@ -268,5 +268,54 @@ private:
 		if (answer == QDialog::Accepted) filePath = fileChooser.getFilepath();
 		// return filepath
 		return filePath;
+	}
+
+	QStringList getSameNameObj(const QString& name, const IodeDatabaseType other_type)
+	{
+		QStringList list;
+		int this_type = database->get_iode_type();
+
+		if(this_type == other_type)
+		{
+			list << name;
+			return list;
+		}
+
+		std::string std_name = name.toStdString();
+		switch (other_type)
+		{
+		case COMMENTS:
+			if(Comments.contains(std_name))
+				list << name;
+			break;
+		case EQUATIONS:
+			if(Equations.contains(std_name))
+				list << name;
+			break;
+		case IDENTITIES:
+			if(Identities.contains(std_name))
+				list << name;
+			break;
+		case LISTS:
+			if(Lists.contains(std_name))
+				list << name;
+			break;
+		case SCALARS:
+			if(Scalars.contains(std_name))
+				list << name;
+			break;
+		case TABLES:
+			if(Tables.contains(std_name))
+				list << name;
+			break;
+		case VARIABLES:
+			if(Variables.contains(std_name))
+				list << name;
+			break;
+		default:
+			break;
+		}
+
+		return list;
 	}
 };

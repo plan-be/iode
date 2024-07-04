@@ -258,84 +258,72 @@ bool IodeTemplateTableModel<K>::removeRows(int position, int rows, const QModelI
 }
 
 template <class K>
-QStringList IodeTemplateTableModel<K>::getSameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type)
+QStringList IodeTemplateTableModel<K>::getSameNameObjOrObjsFromClec(const QString& name, const IodeDatabaseType other_type)
 {
 	QStringList list;
 
 	if(database->count() == 0)
 		return list;
 
-	std::string std_name = name.toStdString();
 	int this_type = database->get_iode_type();
-	bool listedInClec = other_type == SCALARS || other_type == VARIABLES;
+	
+	list = getSameNameObj(name, other_type);
 
-	if(this_type == EQUATIONS && listedInClec)
+	if(!(this_type == EQUATIONS || this_type == IDENTITIES))
+		return list;
+
+	std::string std_name = name.toStdString();
+	std::vector<std::string> std_list;
+
+	if(this_type == EQUATIONS)
 	{
-		Equation eq(std_name);
-
-		std::vector<std::string> std_list;
-		if(other_type == SCALARS)
-			std_list =  eq.get_coefficients_list();
-		else
-			std_list = eq.get_variables_list();
-
-		if(std_list.size() == 0)
-			return list;
-
-		for(const std::string& obj_name : std_list)
-			list << QString::fromStdString(obj_name);
+		Equation eq = Equations.get(std_name);
+		std_list = (other_type == SCALARS) ? eq.get_coefficients_list() : eq.get_variables_list();
 	}
-	else if(this_type == IDENTITIES && listedInClec)
+	
+	if(this_type == IDENTITIES)
 	{
-		Identity idt(std_name, nullptr);
-
-		std::vector<std::string> std_list;
-		if(other_type == SCALARS)
-			std_list =  idt.get_coefficients_list();
-		else
-			std_list = idt.get_variables_list();
-
-		if(std_list.size() == 0)
-			return list;
-
-		for(const std::string& obj_name : std_list)
-			list << QString::fromStdString(obj_name);
+		Identity idt = Identities.get(std_name);
+		std_list = (other_type == SCALARS) ? idt.get_coefficients_list() : idt.get_variables_list();
 	}
-	else
+
+	switch (other_type)
 	{
-		switch (other_type)
-		{
-		case COMMENTS:
-			if(Comments.contains(std_name))
-				list << name;
-			break;
-		case EQUATIONS:
-			if(Equations.contains(std_name))
-				list << name;
-			break;
-		case IDENTITIES:
-			if(Identities.contains(std_name))
-				list << name;
-			break;
-		case LISTS:
-			if(Lists.contains(std_name))
-				list << name;
-			break;
-		case SCALARS:
-			if(Scalars.contains(std_name))
-				list << name;
-			break;
-		case TABLES:
-			if(Tables.contains(std_name))
-				list << name;
-			break;
-		case VARIABLES:
-			if(Variables.contains(std_name))
-				list << name;
-			break;
-		default:
-			break;
-		}
+	case COMMENTS:
+		for(const std::string& var_name : std_list)
+			if(Comments.contains(var_name))
+				list << QString::fromStdString(var_name);
+		break;
+	case EQUATIONS:
+		for(const std::string& var_name : std_list)
+			if(Equations.contains(var_name))
+				list << QString::fromStdString(var_name);
+		break;
+	case IDENTITIES:
+		for(const std::string& var_name : std_list)
+			if(Identities.contains(var_name))
+				list << QString::fromStdString(var_name);
+		break;
+	case LISTS:
+		for(const std::string& var_name : std_list)
+			if(Lists.contains(var_name))
+				list << QString::fromStdString(var_name);
+		break;
+	case SCALARS:
+		for(const std::string& scalar_name : std_list)
+			list << QString::fromStdString(scalar_name);
+		break;
+	case TABLES:
+		for(const std::string& var_name : std_list)
+			if(Tables.contains(var_name))
+				list << QString::fromStdString(var_name);
+		break;
+	case VARIABLES:
+		for(const std::string& var_name : std_list)
+			list << QString::fromStdString(var_name);
+		break;
+	default:
+		break;
 	}
 
 	return list;
