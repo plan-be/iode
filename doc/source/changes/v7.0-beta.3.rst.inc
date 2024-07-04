@@ -3,13 +3,13 @@ Version 7.0-beta.3
 
 Released on 07/08/2023.
 
-Improvements ✨
----------------
+Improvements 
+------------
 
 * (GUI) Allow to copy/paste variables values from/to Excel (#294)
 
-Fixed Bugs 🛠️
--------------
+Fixed Bugs 
+----------
 
 * (PYTHON) Fixed Iode Python module only compiled with the Debug configuration (#313) 
 
