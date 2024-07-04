@@ -287,12 +287,12 @@ public slots:
 	virtual void print();
 
 	/**
-	 * @brief shows scalars or variables listed in the clec structure or 
-	 *        the object of the same name.
+	 * @brief shows equations, identities, scalars or variables listed in the clec 
+	 *        structure or the object of the same name.
 	 * 
 	 * @param iode_type 
 	 */
-	void showSameObjOrObjsFromClec(const IodeDatabaseType other_type)
+	void showSameNameObjOrObjsFromClec(const IodeDatabaseType other_type)
 	{
 		// get the selected object
 		QModelIndexList selection = this->selectionModel()->selectedRows();
@@ -305,7 +305,7 @@ public slots:
 		QString name = table_model->headerData(index.row(), Qt::Vertical, Qt::DisplayRole).toString();
 
 		// get the list of other objects og type other_type of the same name or present in the CLEC structure
-		QStringList list = table_model->getSameObjOrObjsFromClec(name, other_type);
+		QStringList list = table_model->getSameNameObjOrObjsFromClec(name, other_type);
 
 		emit showObjsRequest(other_type, list);
 	}

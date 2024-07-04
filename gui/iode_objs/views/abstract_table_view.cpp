@@ -98,13 +98,13 @@ IodeAbstractTableView::IodeAbstractTableView(IodeDatabaseType iodeType, BaseDele
     varsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     scalarsFromClecShortcut->setContext(Qt::WidgetWithChildrenShortcut);	
 
-    connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(COMMENTS); });
-    connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(EQUATIONS); });
-    connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(IDENTITIES); });
-    connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(LISTS); });
-    connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(TABLES); });
-    connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(VARIABLES); });
-    connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameObjOrObjsFromClec(SCALARS); });
+    connect(sameCmtShortcut, &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(COMMENTS); });
+    connect(sameEqShortcut,  &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(EQUATIONS); });
+    connect(sameIdtShortcut, &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(IDENTITIES); });
+    connect(sameLstShortcut, &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(LISTS); });
+    connect(sameTblShortcut, &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(TABLES); });
+    connect(varsFromClecShortcut,    &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(VARIABLES); });
+    connect(scalarsFromClecShortcut, &QShortcut::activated, this, [this]{ showSameNameObjOrObjsFromClec(SCALARS); });
 
     // get list of related objects
 	relatedCmtShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F1), this);
