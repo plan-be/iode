@@ -896,7 +896,7 @@ cdef class _AbstractDatabase:
         >>> lists.load(f"{SAMPLE_DATA_DIR}/fun.lst")
         >>> # a) get one lists
         >>> lists["ENVI"]
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_'
+        ['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_']
         >>> # b) get a subset of the Lists database using a pattern
         >>> lists_subset = lists["E*"]
         >>> lists_subset.names
@@ -1277,27 +1277,27 @@ cdef class _AbstractDatabase:
         >>> # --- by passing a string 
         >>> lists["A_VAR"] = "ACAF;ACAG;AOUC;AOUC_;AQC"
         >>> lists["A_VAR"]
-        'ACAF;ACAG;AOUC;AOUC_;AQC'
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
         >>> # --- by passing a Python list
         >>> b_vars = variables.get_names("B*")
         >>> b_vars
         ['BENEF', 'BQY', 'BRUGP', 'BVY']
         >>> lists["B_VAR"] = b_vars
         >>> lists["B_VAR"]
-        'BENEF;BQY;BRUGP;BVY'
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
 
         >>> # b) update one list
         >>> # --- by passing a string
         >>> lists["A_VAR"] = "ACAF;ACAG;AOUC;AQC"
         >>> lists["A_VAR"]
-        'ACAF;ACAG;AOUC;AQC'
+        ['ACAF', 'ACAG', 'AOUC', 'AQC']
         >>> # --- by passing a Python list
         >>> b_y_vars = variables.get_names("B*Y")
         >>> b_y_vars
         ['BQY', 'BVY']
         >>> lists["B_VAR"] = b_y_vars
         >>> lists["B_VAR"]
-        'BQY;BVY'
+        ['BQY', 'BVY']
 
         >>> # c) working on a subset
         >>> # 1) get subset
@@ -1307,19 +1307,19 @@ cdef class _AbstractDatabase:
         >>> # 2) add a list to the subset 
         >>> lists_subset["E_VAR"] = variables.get_names("E*")
         >>> lists_subset["E_VAR"]
-        'EFMY;EFXY;EX;EXC;EXCC;EXCCR'
+        ['EFMY', 'EFXY', 'EX', 'EXC', 'EXCC', 'EXCCR']
         >>> # --> new list also appears in the global workspace
         >>> "E_VAR" in lists
         True
         >>> lists["E_VAR"]
-        'EFMY;EFXY;EX;EXC;EXCC;EXCCR'
+        ['EFMY', 'EFXY', 'EX', 'EXC', 'EXCC', 'EXCCR']
         >>> # 3) update a list in the subset
         >>> lists_subset["E_VAR"] = "EX;EXC;EXCC;EXCCR"
         >>> lists_subset["E_VAR"]
-        'EX;EXC;EXCC;EXCCR'
+        ['EX', 'EXC', 'EXCC', 'EXCCR']
         >>> # --> list is also updated in the global workspace
         >>> lists["E_VAR"]
-        'EX;EXC;EXCC;EXCCR'
+        ['EX', 'EXC', 'EXCC', 'EXCCR']
 
         Scalars
 

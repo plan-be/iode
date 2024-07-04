@@ -46,63 +46,62 @@ cdef class Lists(_AbstractDatabase):
     description: Modèle fun
     <BLANKLINE>
        name                                                    lists
-    COPY        $COPY0;$COPY1;
-    COPY0       ACAF;ACAG;AOUC;AQC;BENEF;BQY;BVY;CGU;COEFON;COTRES;DPU;
-                DPUF;DPUG;DPUGO;DPUH;DPUU;DTF;DTH;DTH1;DTH1C;EXC;EXCC;FLF;
-                FLG;GAP;GOSF;GOSG;GOSH;GOSH_;IDF;IDG;IDH;IFU;IHU;IT;ITCEE;
-                ITCR;ITD;ITEP;ITF;ITF5;ITFC;ITFGI;ITFGO;ITFQ;ITGR;ITI5R;
-                ITIFR;ITIGR;ITM;ITMQ;ITMQR;ITNQ;ITON;ITONQ;ITPL;ITPR;ITPS;
-                ITT;IUG;KN5;KNF;KNFF;KNFFY;KNFY;KNI;KNIY;NFY;NFYH;OCUF;
-                OCUG;OCUH;PAF_;PAG;PAH;PBBP;PBNP;PC;PC_;PDPUG;PFI;PFI_;PFND;
-                PG;PI5;PIF;PIG;PM;PMAB;PME;PMS;PMT;PQOG;PW3;PWBG;PX;PXAB;
-                PXB;PXE;PXS;PXT;QAF;QAFF;QAFF_;QAF_;QAG;QAH;QAI_;QAT;QAT_;
-                QBBP;QBBPPOT_;QBBP_B;QBBP_P;QBNP;QC;QC_;QFND;QG;QGO;QI;QI5;
-                QIF;QIG;QM;QMAB;QME;QMS;QMT;QQMAB_;QS;QX;QXAB;QXB;QXE;QXS;
-                QXT;Q_F;Q_I;RIDG;RIDGG;RIPBE;RLBE;RLBERHP;RSBE;SBF;SBF3L;
-                SBG;SBH;SF;SG;SH;SSF;SSF3;SSF3L;SSF3P;SSFDOM;SSFF;SSFFIC;
-                SSFG;SSH;SSH3GP;SSH3O;SSH3P;SSH3W;SSH3WA;SSH3WW;SSH3ZA;
-                SSH3ZW;SSHFF;SUBCEE;TWG;TWGP;ULCP;UY;VAF;VAFF;VAFF_;VAG;VAH;
-                VAI;VAI_;VAMARE;VAT;VAT_;VBBP;VBBP_B;VBBP_P;VBNP;VBNP_B; VBNP_I;VBNP_P;VC;VC_;VI;VI5;VIF;VM
-    COPY1       VMAB;VME;VMK;VMN;VMS;VMT;VS;VS_;VX;VXAB;VXB;VXE;VXK;VXN;VXS;
-                VXT;WBF;WBF_;WBG;WBGO;WBGP;WBU;WBU_;WCF;WCF_;WDOM;WG;WIND;
-                WIND_;WLCP;WNF;WNF_;YDH;YDH_;YDTG;YIDG;YK;YN;YSEFP;YSEFT1;
-                YSEFT2;YSFIC;YSSF;YSSG;ZF;ZJ;ZKF;ZZF_;DPUHO;EFMY;
-                EFXY;EX;EXCCR;HF;ITCEEM;ITDR;ITEPR;ITF5R;ITFGR;ITFIGR;
-                ITMR;ITNQHP;KLFHP;KNFFO;NATY;NDOMY;NGY;NIY;PCO;
-                PI5O;PIFO;PIGO;PMABO;PMDVD;PMINTP;PMSO;PMTO;POIL;PRDAL;PROF;
-                PROIHP_;PWMAB;PWMS;PWXAB;PWXS;PXABO;PXSO;PXTO;QAGHP;QAHHP;
-                QAI;QCO;QI5O;QMABO;QMEO;QMSO;QMTO;QOUG;QSO;QS_;QWXSS;QWXS;
-                QXABO;QXEO;QXSO;QXTO;RIPBEO;SSF3PR;SSH3RO;SSH3RW; SSHRZW;SSRDOM;SUB;SUBR;TFPFHP_;TIME;TVACEE;
-                TWGR;ULAG;ULCPO;ULIL;ULIO;VAF_;VAIO;VATPC;VKF;VKFF;VSO; VS_O;VXKO;VXNO;ZKFO;BRUGP;VK5;SSFFX
-    ENDO        $endo0;$endo1;
-    ENDO0       ACAF;ACAG;AOUC;AQC;BENEF;BQY;BVY;CGU;COEFON;COTRES;DEBT;DPU;DPUF;DPUG;DPUGO;DPUH;DPUU;DTF;DTH;DTH1;D
-                TH1C;EXC;EXCC;FLF;FLG;FLGR;GAP;GOSF;GOSG;GOSH;GOSH_;IDF;IDG;IDH;IFU;IHU;IT;ITCEE;ITCR;ITD;ITEP;ITF;I
-                TF5;ITFC;ITFGI;ITFGO;ITFQ;ITGR;ITI5R;ITIFR;ITIGR;ITM;ITMQ;ITMQR;ITNQ;ITON;ITONQ;ITPL;ITPR;ITPS;ITT;I
-                UG;KL;KLHP;KN5;KNF;KNFF;KNFFY;KNFY;KNI;KNIY;NFY;NFYH;OCUF;OCUG;OCUH;PAF_;PAG;PAH;PBBP;PBNP;PC;PC_;PD
-                PUG;PFI;PFI_;PFND;PG;PI5;PIF;PIG;PM;PMAB;PME;PMS;PMT;PQOG;PROD;PW3;PWBG;PX;PXAB;PXB;PXE;PXS;PXT;QAF;
-                QAFF;QAFF_;QAF_;QAG;QAH;QAI_;QAT;QAT_;QBBP;QBBPPOT_;QBBP_B;QBBP_P;QBNP;QC;QC_;QFND;QG;QGO;QI;QI5;QIF
-                ;QIG;QL;QM;QMAB;QME;QMS;QMT;QQMAB_;QS;QX;QXAB;QXB;QXE;QXS;QXT;Q_F;Q_I;RDEBT;RENT;RIDG;RIDGG;RIPBE;RL
-                BE;RLBER;RLBERHP;RSBE;SBF;SBF3L;SBG;SBGX;SBH;SF;SG;SH;SSF;SSF3;SSF3L;SSF3P;SSFDOM;SSFF;SSFFIC;SSFG;S
-                SH;SSH3GP;SSH3O;SSH3P;SSH3W;SSH3WA;SSH3WW;SSH3ZA;SSH3ZW;SSHFF;SUBCEE;TWG;TWGP;ULCP;UY;VAF;VAFF;VAFF_
-                ;VAG;VAH;VAI;VAI_;VAMARE;VAT;VAT_;VBBP;VBBP_B;VBBP_P;VBNP;VBNP_B
+    COPY        $COPY0; $COPY1;
+    COPY0       ACAF; ACAG; AOUC; AQC; BENEF; BQY; BVY; CGU; COEFON; COTRES; DPU; DPUF; DPUG; DPUGO; DPUH; DPUU;
+                DTF; DTH; DTH1; DTH1C; EXC; EXCC; FLF; FLG; GAP; GOSF; GOSG; GOSH; GOSH_; IDF; IDG; IDH; IFU; IHU;
+                IT; ITCEE; ITCR; ITD; ITEP; ITF; ITF5; ITFC; ITFGI; ITFGO; ITFQ; ITGR; ITI5R; ITIFR; ITIGR; ITM;
+                ITMQ; ITMQR; ITNQ; ITON; ITONQ; ITPL; ITPR; ITPS; ITT; IUG; KN5; KNF; KNFF; KNFFY; KNFY; KNI; KNIY;
+                NFY; NFYH; OCUF; OCUG; OCUH; PAF_; PAG; PAH; PBBP; PBNP; PC; PC_; PDPUG; PFI; PFI_; PFND; PG; PI5;
+                PIF; PIG; PM; PMAB; PME; PMS; PMT; PQOG; PW3; PWBG; PX; PXAB; PXB; PXE; PXS; PXT; QAF; QAFF; QAFF_;
+                QAF_; QAG; QAH; QAI_; QAT; QAT_; QBBP; QBBPPOT_; QBBP_B; QBBP_P; QBNP; QC; QC_; QFND; QG; QGO; QI;
+                QI5; QIF; QIG; QM; QMAB; QME; QMS; QMT; QQMAB_; QS; QX; QXAB; QXB; QXE; QXS; QXT; Q_F; Q_I; RIDG;
+                RIDGG; RIPBE; RLBE; RLBERHP; RSBE; SBF; SBF3L; SBG; SBH; SF; SG; SH; SSF; SSF3; SSF3L; SSF3P;
+                SSFDOM; SSFF; SSFFIC; SSFG; SSH; SSH3GP; SSH3O; SSH3P; SSH3W; SSH3WA; SSH3WW; SSH3ZA; SSH3ZW; SSHFF;
+                SUBCEE; TWG; TWGP; ULCP; UY; VAF; VAFF; VAFF_; VAG; VAH; VAI; VAI_; VAMARE; VAT; VAT_; VBBP; VBBP_B;
+                VBBP_P; VBNP; VBNP_B; VBNP_I; VBNP_P; VC; VC_; VI; VI5; VIF; VM
+    COPY1       VMAB; VME; VMK; VMN; VMS; VMT; VS; VS_; VX; VXAB; VXB; VXE; VXK; VXN; VXS; VXT; WBF; WBF_; WBG;
+                WBGO; WBGP; WBU; WBU_; WCF; WCF_; WDOM; WG; WIND; WIND_; WLCP; WNF; WNF_; YDH; YDH_; YDTG; YIDG; YK;
+                YN; YSEFP; YSEFT1; YSEFT2; YSFIC; YSSF; YSSG; ZF; ZJ; ZKF; ZZF_; DPUHO; EFMY; EFXY; EX; EXCCR; HF;
+                ITCEEM; ITDR; ITEPR; ITF5R; ITFGR; ITFIGR; ITMR; ITNQHP; KLFHP; KNFFO; NATY; NDOMY; NGY; NIY; PCO;
+                PI5O; PIFO; PIGO; PMABO; PMDVD; PMINTP; PMSO; PMTO; POIL; PRDAL; PROF; PROIHP_; PWMAB; PWMS; PWXAB;
+                PWXS; PXABO; PXSO; PXTO; QAGHP; QAHHP; QAI; QCO; QI5O; QMABO; QMEO; QMSO; QMTO; QOUG; QSO; QS_;
+                QWXSS; QWXS; QXABO; QXEO; QXSO; QXTO; RIPBEO; SSF3PR; SSH3RO; SSH3RW; SSHRZW; SSRDOM; SUB; SUBR;
+                TFPFHP_; TIME; TVACEE; TWGR; ULAG; ULCPO; ULIL; ULIO; VAF_; VAIO; VATPC; VKF; VKFF; VSO; VS_O; VXKO;
+                VXNO; ZKFO; BRUGP; VK5; SSFFX
+    ENDO        $endo0; $endo1;
+    ENDO0       ACAF; ACAG; AOUC; AQC; BENEF; BQY; BVY; CGU; COEFON; COTRES; DEBT; DPU; DPUF; DPUG; DPUGO; DPUH;
+                DPUU; DTF; DTH; DTH1; DTH1C; EXC; EXCC; FLF; FLG; FLGR; GAP; GOSF; GOSG; GOSH; GOSH_; IDF; IDG; IDH;
+                IFU; IHU; IT; ITCEE; ITCR; ITD; ITEP; ITF; ITF5; ITFC; ITFGI; ITFGO; ITFQ; ITGR; ITI5R; ITIFR;
+                ITIGR; ITM; ITMQ; ITMQR; ITNQ; ITON; ITONQ; ITPL; ITPR; ITPS; ITT; IUG; KL; KLHP; KN5; KNF; KNFF;
+                KNFFY; KNFY; KNI; KNIY; NFY; NFYH; OCUF; OCUG; OCUH; PAF_; PAG; PAH; PBBP; PBNP; PC; PC_; PDPUG;
+                PFI; PFI_; PFND; PG; PI5; PIF; PIG; PM; PMAB; PME; PMS; PMT; PQOG; PROD; PW3; PWBG; PX; PXAB; PXB;
+                PXE; PXS; PXT; QAF; QAFF; QAFF_; QAF_; QAG; QAH; QAI_; QAT; QAT_; QBBP; QBBPPOT_; QBBP_B; QBBP_P;
+                QBNP; QC; QC_; QFND; QG; QGO; QI; QI5; QIF; QIG; QL; QM; QMAB; QME; QMS; QMT; QQMAB_; QS; QX; QXAB;
+                QXB; QXE; QXS; QXT; Q_F; Q_I; RDEBT; RENT; RIDG; RIDGG; RIPBE; RLBE; RLBER; RLBERHP; RSBE; SBF;
+                SBF3L; SBG; SBGX; SBH; SF; SG; SH; SSF; SSF3; SSF3L; SSF3P; SSFDOM; SSFF; SSFFIC; SSFG; SSH; SSH3GP;
+                SSH3O; SSH3P; SSH3W; SSH3WA; SSH3WW; SSH3ZA; SSH3ZW; SSHFF; SUBCEE; TWG; TWGP; ULCP; UY; VAF; VAFF;
+                VAFF_; VAG; VAH; VAI; VAI_; VAMARE; VAT; VAT_; VBBP; VBBP_B; VBBP_P; VBNP; VBNP_B
     ...         ...
-    TOTAL1      VBNP_I;VBNP_P;VC;VC_;VI;VI5;VIF;VM;VMAB;VME;VMK;VMN;VMS;VMT;VS;VS_;VX;VXAB;VXB;VXE;VXK;VXN;VXS;VXT;W
-                BF;WBF_;WBG;WBGO;WBGP;WBU;WBU_;WCF;WCF_;WCRH;WDOM;WG;WIND;WIND_;WLCP;WNF;WNF_;YDH;YDH_;YDTG;YIDG;YK;
-                YN;YSEFP;YSEFT1;YSEFT2;YSFIC;YSSF;YSSG;ZF;ZJ;ZKF;ZZF_;DPUHO;DTFX;DTHX;EFMY;EFXY;EX;EXCCR;HF;ITCEEM;I
-                TCRX;ITDR;ITEPR;ITF5R;ITFGR;ITFIGR;ITMR;ITNQHP;IUGR;KLFHP;KNFFO;NATY;NDOMY;NGY;NIY;OCP;PCO;PI5O;PIFO
-                ;PIGO;PMABO;PMDVD;PMINTP;PMSO;PMTO;POIL;PRDAL;PROF;PROIHP;PWMAB;PWMS;PWXAB;PWXS;PXABO;PXSO;PXTO;QAGH
-                P;QAHHP;QAI;QCO;QI5O;QMABO;QMEO;QMSO;QMTO;QOUG;QSO;QS_;QWXAB;QWXS;QXABO;QXEO;QXSO;QXTO;Q_;RIPBEO;SBG
-                XR;SSF3PR;SSH3RO;SSH3RW;SSHKB;SSHRZW;SSRDOM;SUB;SUBR_;TFPFHP;TFPFHP_;TIME;TVACEE;TWGR;ULAG;ULCPO;ULI
-                L;ULIO;VAF_;VAIO;VATPC;VKF;VKF5;VKFF;VSO;VS_O;VXKO;VXNO;WBFRXX;WBGR;YSEFPR;YSFICR;ZKFO
-    XENVI       XEX;XPWMAB;XPWMS;XPWXAB;XPWXS;XQWXAB;XQWXS;XPOIL;XNATY;XTFP
-    XSCENARIO   XQWXSS;XPWXAB;XPWMAB;XRLBER;XRSBER;XNATY;XTFP;SBGXR;DTFX;DTHX
-    _SCAL       acaf1;acaf2;acaf3;dlnpaf;dpuh_1;dpuh_2;dtf0;dtf1;ifu_1;ifu_2;kl1;kl10;kl11;kl12;kl13;kl14;kl2;knf2;k
-                nf3;knff0;knff1;nfyh1;nfyh10;nfyh11;nfyh2;nfyh3;nfyh4;pc0;pc1;pc2;pc4;pc5;pc6;pif_1;pif_2;pif_3;pmab
-                0;pmab1;pmab4;pmab6;pms0;pms1;pms3;pxab1;pxs1;pxs2;pxs3;pxs4;qc0_;qc1_;qc2_;qc3_;qc4_;qc5_;qi5_1;qi5
-                _2;qi5_3;qi5_4;qi5_5;qmab_1;qmab_10;qmab_2;qmab_4;qmab_5;qme_1;qme_2;qme_3;qms1;qms2;qms3;qms4;qmt_1
-                ;qmt_2;qmt_3;qxab0;qxab1;qxab2;qxab3;qxs0;qxs1;qxs2;qxs3;qxs4;qxs5;qxt0;qxt1;qxt2;qxt3;sbf3l_0;sbf3l
-                _1;vah_1;vah_2;vah_3;vai1_;vai2_;vai3_;vai4_;vmn_1;vmn_2;vmn_3;vs0_;vs1_;vs2_;vs3_;vxn_1;vxn_2;vxn_3
-                ;zkf1;zkf2;zkf3
+    TOTAL1      VBNP_I; VBNP_P; VC; VC_; VI; VI5; VIF; VM; VMAB; VME; VMK; VMN; VMS; VMT; VS; VS_; VX; VXAB; VXB;
+                VXE; VXK; VXN; VXS; VXT; WBF; WBF_; WBG; WBGO; WBGP; WBU; WBU_; WCF; WCF_; WCRH; WDOM; WG; WIND;
+                WIND_; WLCP; WNF; WNF_; YDH; YDH_; YDTG; YIDG; YK; YN; YSEFP; YSEFT1; YSEFT2; YSFIC; YSSF; YSSG; ZF;
+                ZJ; ZKF; ZZF_; DPUHO; DTFX; DTHX; EFMY; EFXY; EX; EXCCR; HF; ITCEEM; ITCRX; ITDR; ITEPR; ITF5R;
+                ITFGR; ITFIGR; ITMR; ITNQHP; IUGR; KLFHP; KNFFO; NATY; NDOMY; NGY; NIY; OCP; PCO; PI5O; PIFO; PIGO;
+                PMABO; PMDVD; PMINTP; PMSO; PMTO; POIL; PRDAL; PROF; PROIHP; PWMAB; PWMS; PWXAB; PWXS; PXABO; PXSO;
+                PXTO; QAGHP; QAHHP; QAI; QCO; QI5O; QMABO; QMEO; QMSO; QMTO; QOUG; QSO; QS_; QWXAB; QWXS; QXABO;
+                QXEO; QXSO; QXTO; Q_; RIPBEO; SBGXR; SSF3PR; SSH3RO; SSH3RW; SSHKB; SSHRZW; SSRDOM; SUB; SUBR_;
+                TFPFHP; TFPFHP_; TIME; TVACEE; TWGR; ULAG; ULCPO; ULIL; ULIO; VAF_; VAIO; VATPC; VKF; VKF5; VKFF;
+                VSO; VS_O; VXKO; VXNO; WBFRXX; WBGR; YSEFPR; YSFICR; ZKFO
+    XENVI       XEX; XPWMAB; XPWMS; XPWXAB; XPWXS; XQWXAB; XQWXS; XPOIL; XNATY; XTFP
+    XSCENARIO   XQWXSS; XPWXAB; XPWMAB; XRLBER; XRSBER; XNATY; XTFP; SBGXR; DTFX; DTHX
+    _SCAL       acaf1; acaf2; acaf3; dlnpaf; dpuh_1; dpuh_2; dtf0; dtf1; ifu_1; ifu_2; kl1; kl10; kl11; kl12; kl13;
+                kl14; kl2; knf2; knf3; knff0; knff1; nfyh1; nfyh10; nfyh11; nfyh2; nfyh3; nfyh4; pc0; pc1; pc2; pc4;
+                pc5; pc6; pif_1; pif_2; pif_3; pmab0; pmab1; pmab4; pmab6; pms0; pms1; pms3; pxab1; pxs1; pxs2;
+                pxs3; pxs4; qc0_; qc1_; qc2_; qc3_; qc4_; qc5_; qi5_1; qi5_2; qi5_3; qi5_4; qi5_5; qmab_1; qmab_10;
+                qmab_2; qmab_4; qmab_5; qme_1; qme_2; qme_3; qms1; qms2; qms3; qms4; qmt_1; qmt_2; qmt_3; qxab0;
+                qxab1; qxab2; qxab3; qxs0; qxs1; qxs2; qxs3; qxs4; qxs5; qxt0; qxt1; qxt2; qxt3; sbf3l_0; sbf3l_1;
+                vah_1; vah_2; vah_3; vai1_; vai2_; vai3_; vai4_; vmn_1; vmn_2; vmn_3; vs0_; vs1_; vs2_; vs3_; vxn_1;
+                vxn_2; vxn_3; zkf1; zkf2; zkf3
     _SEARCH     ZKF
     <BLANKLINE>
     """
@@ -151,8 +150,9 @@ cdef class Lists(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key: str):
-        return self.database_ptr.get(key.strip().encode()).decode()
+    def _get_object(self, key: str) -> List[str]:
+        str_list = self.database_ptr.get(key.strip().encode()).decode()
+        return split_list(str_list)
 
     def _set_object(self, key: str, value: Union[str, List[str]]):
         key = key.strip()
@@ -221,14 +221,14 @@ cdef class Lists(_AbstractDatabase):
         >>> lists.names
         ['COMMA_LST', 'MIX_LST', 'SEMICOLON_LST', 'TAB_LST', 'WHITESPACE_LST']
         >>> lists["SEMICOLON_LST"]
-        'A;B;C;D;E;F'
+        ['A', 'B', 'C', 'D', 'E', 'F']
         >>> # note: when added or updated, an IODE list is normalized.
         >>> #       - leading and trailing whitespaces are stripped
         >>> #       - items of the IODE list are separated by a semicolon
         >>> lists["COMMA_LST"]
-        'A;B;C;D;E;F'
+        ['A', 'B', 'C', 'D', 'E', 'F']
         >>> lists["MIX_LST"]
-        'A;B;C;D;E;F'
+        ['A', 'B', 'C', 'D', 'E', 'F']
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
@@ -261,13 +261,13 @@ cdef class Lists(_AbstractDatabase):
         >>> s.index.to_list()               # doctest: +ELLIPSIS
         ['COPY', 'COPY0', 'COPY1', ..., 'XSCENARIO', '_SCAL', '_SEARCH']
         >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        ['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_'] 
         >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        "['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_']"
         >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        ['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']
         >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        "['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']"
 
         >>> # Export a subset of the IODE Lists database as a pandas Series
         >>> s = lists["E*;MA*"].to_series()
@@ -277,13 +277,13 @@ cdef class Lists(_AbstractDatabase):
         >>> s.index.to_list()
         ['ENDO', 'ENDO0', 'ENDO1', 'ENVI', 'MAINEQ']
         >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        ['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_'] 
         >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        "['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_']"
         >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        ['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']
         >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        "['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']"
         """
         if pd is None:
             raise RuntimeError("pandas library not found")
@@ -318,13 +318,13 @@ cdef class Lists(_AbstractDatabase):
         >>> s.index.to_list()               # doctest: +ELLIPSIS
         ['COPY', 'COPY0', 'COPY1', ..., 'XSCENARIO', '_SCAL', '_SEARCH']
         >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        ['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_'] 
         >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        "['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_']" 
         >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        ['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']
         >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        "['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']"
 
         >>> # Export a subset of the IODE Lists database as a pandas Series
         >>> s = lists["E*;MA*"].series
@@ -334,18 +334,18 @@ cdef class Lists(_AbstractDatabase):
         >>> s.index.to_list()
         ['ENDO', 'ENDO0', 'ENDO1', 'ENVI', 'MAINEQ']
         >>> lists["ENVI"]                   # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        ['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_'] 
         >>> s["ENVI"]                       # doctest: +NORMALIZE_WHITESPACE
-        'EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_' 
+        "['EX', 'PWMAB', 'PWMS', 'PWXAB', 'PWXS', 'QWXAB', 'QWXS', 'POIL', 'NATY', 'TFPFHP_']"
         >>> lists["MAINEQ"]                 # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        ['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']
         >>> s["MAINEQ"]                     # doctest: +NORMALIZE_WHITESPACE
-        'W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_'
+        "['W', 'NFYH', 'KNFF', 'PC', 'PXAB', 'PMAB', 'QXAB', 'QMAB', 'QC_']"
         """
         return self.to_series()
 
     def _str_table(self, names: List[str]) -> str:
-        columns = {"name": names, "lists": [join_lines(self._get_object(name)) for name in names]}
+        columns = {"name": names, "lists": ['; '.join(self._get_object(name)) for name in names]}
         return table2str(columns, max_lines=10, justify_funcs={"name": JUSTIFY.LEFT, "lists": JUSTIFY.LEFT})
 
 
