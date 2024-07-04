@@ -3,18 +3,18 @@ Version x.x.x
 
 In development
 
-New Features 🎉
----------------
+New Features 
+------------
 
 
-Improvements ✨
----------------
+Improvements 
+------------
 
 
-Fixed Bugs 🛠️
+Fixed Bugs 
+----------
+
+
+Miscellaneous 
 -------------
-
-
-Miscellaneous 🤷‍♀️
------------------
 

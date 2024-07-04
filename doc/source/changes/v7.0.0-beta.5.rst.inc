@@ -4,8 +4,8 @@ Version7.0-beta.5
 Released on 05/01/2024
 
 
-Improvements ✨
----------------
+Improvements 
+------------
 
   * (GUI) Enabled editing Comments, Identities and Lists in box dialogs (shortcut: CTRL + ENTER / RETURN) (#364) 
   * (GUI) Print the number of IODE objects present in the Workspace in the title of the corresponding tab (#371)
@@ -15,8 +15,8 @@ Improvements ✨
   * (GUI) Allow users to (dis)enable the scientific format for numbers (#417)
 
 
-Fixed Bugs 🛠️
--------------
+Fixed Bugs 
+----------
 
   * (GUI) Fixed table cells edition: if the content starts with a double quote, then it is of type string. 
           Otherwise, it is of type LEC (#363)

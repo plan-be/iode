@@ -2,16 +2,16 @@
 
 changelog:
   categories:
-    - title: New Features 🎉
+    - title: New Features 
       labels:
         - feature
-    - title: Improvements ✨
+    - title: Improvements 
       labels:
         - enhancement
-    - title: Fixed Bugs 🛠️
+    - title: Fixed Bugs 
       labels:
         - bug
-    - title: Miscellaneous 🤷‍♀️
+    - title: Miscellaneous 
       labels:
         - "*"
       exclude:

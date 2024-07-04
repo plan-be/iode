@@ -3,15 +3,15 @@ Version7.0-beta.6
 
 Released on 12/02/2024
 
-New Features 🎉
----------------
+New Features
+------------
 
   * (GUI) When a new object is created and the filter is active, the name of the new object is added to the filter's pattern
   * (GUI) When an object is deleted and the filter is active, the name of the object is removed from the filter's pattern
 
 
-Improvements ✨
----------------
+Improvements 
+------------
 
   * (GUI) Align values right when displaying numbers (#445)
   * (GUI) Possibility to choose between running reports from the project directory or 
@@ -20,8 +20,8 @@ Improvements ✨
           user reopens it (#386) 
 
 
-Fixed Bugs 🛠️
--------------
+Fixed Bugs 
+----------
 
   * (GUI) Fixed tab 'Tests By Equation' not displaying tests values for all equations 
           when the block to estimate contains more than one equation (#443)
