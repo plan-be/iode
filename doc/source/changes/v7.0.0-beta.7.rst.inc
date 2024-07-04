@@ -18,6 +18,7 @@ Fixed Bugs
   * (GUI) Fixed trying to overwrite a file (rename to as an existing file) just delete it (#546)
   * (GUI) Fixed shortcut CTRL + ALT + F2/F3 not showing equations/identities corresponding to 
           exogenous variables in an equation/identity (#603) 
+  * (GUI) Fixed CTRL + F4 not working in tabs representing an Iode database (#609)
 
 Miscellaneous
 -------------
