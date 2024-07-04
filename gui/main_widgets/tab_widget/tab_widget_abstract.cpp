@@ -20,7 +20,7 @@ IodeAbstractTabWidget::IodeAbstractTabWidget(QWidget* parent)
     nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
     previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
     clearShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_D), this);
-    closeShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4), this);
+    closeShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_W), this);
 
     // NOTE: By default, shortcuts are defined at the main Window level. 
     //       Thus, a shortcut of a (combination of) key(s) may override the expected behavior 
