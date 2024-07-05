@@ -312,6 +312,30 @@ void MainWindow::saveAllTabs()
     tabWidget_IODE_objs->saveAllTabs();
 }
 
+// NOTE: In case users ask to restore Alt + F<...> behavior.
+//       Alt + F4 is the OS (Windows) shortcut to close a program.
+//       So, Alt + F4 will actually triggers the closeEvent() method and since it is
+//       triggered directly by the OS, it will bypass the keyPressEvent() method.
+//       To force closeEvent() not to proceed and to propagate the key combination Alt + F4 
+//       to the whole program, you can do the following:
+//
+//       void MainWindow::closeEvent(QCloseEvent* event)
+//       {
+//           // Check if the close event has been triggered by Alt or any Alt + <...> key combination
+//           // In that case, create a QKeyEvent CTRL + F4 and post it in the events queue
+//           if ((QApplication::queryKeyboardModifiers() == Qt::AltModifier))
+//           {
+//               event->ignore();
+//               QKeyEvent* event = new QKeyEvent(QEvent::KeyPress, Qt::Key_F4, Qt::AltModifier);
+//               // postEvent() posts the event on a queue for later dispatch. 
+//               // The next time Qt's main event loop runs, it dispatches all posted events, with some optimization. 
+//               // https://doc.qt.io/qt-6/eventsandfilters.html#sending-events
+//               QApplication::postEvent(this, event);
+//               return;
+//           }
+//           (...)
+//        }
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     // ask to save all current tabs content before to switch
