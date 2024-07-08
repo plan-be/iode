@@ -9,6 +9,10 @@
 /* Alloc doc */ // JMP 28/9/2012
 #include "s_alldoc.h"
 
+#ifdef SCRCPP
+extern "C" {
+#endif
+
 // #define UCHAR unsigned char /* JMP 14-10-96 */
 #define SCR_NOT_AVAIL   -2.0e+37
 #ifndef U_ch
@@ -34,7 +38,7 @@ typedef struct _arlist_ {
 typedef struct _m_ring_
 {
     int compt;      /*nb car dans tampon */
-    int debut;      /*caractŠre … prendre */
+    int debut;      /*caractï¿½re ï¿½ prendre */
     int taille;     /*taille tampon */
     char *tampon;   /*adresse tampon */
 } M_RING;
@@ -52,11 +56,11 @@ typedef struct _pcfdisk_ {
 } PCFDISK;
 
 typedef struct _pcinfos_ {
-    short   fpu;                /* 1 si un processeur math. est pr‚sent */
+    short   fpu;                /* 1 si un processeur math. est prï¿½sent */
     short   nbfdisks;           /* Nbre de disques logiques (fixes) */
     PCFDISK fdisks[MAXFDISKS];  /* Infos sur chaque disque */
-    short   lpts[3];            /* Etat de chaque imprimante parallŠle */
-    short   nbcoms;             /* Nombre de portes s‚ries COMx */
+    short   lpts[3];            /* Etat de chaque imprimante parallï¿½le */
+    short   nbcoms;             /* Nombre de portes sï¿½ries COMx */
 } PCINFOS;
 
 /* === ALLOC DOC === */
@@ -86,6 +90,9 @@ extern int AR_BUFSIZE, AR_ERRNO;
 
 extern int  SCR_ADD_PTR_CHUNCK;             /* JMP 13-11-2012 */
 
+#ifdef SCRCPP
+}
+#endif
 
 /* ==== FNS ====== */
 
