@@ -42,7 +42,7 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
     ASSERT_EQ(scl->std, scalar.std);
 
     // test if a Scalar object can be passed to the hash function for the objects of type SCL.
-    boost::hash<SCL> scl_hasher;
+    std::hash<SCL> scl_hasher;
     std::size_t c_hash = scl_hasher(*scl);
     std::size_t cpp_hash = scl_hasher(static_cast<SCL>(scalar));
     ASSERT_EQ(c_hash, cpp_hash);
@@ -50,7 +50,7 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
 
 TEST_F(ScalarTest, Hash)
 {
-    boost::hash<Scalar> scalar_hasher;
+    std::hash<SCL> scalar_hasher;
     std::size_t hash_before;
     std::size_t hash_after;
 

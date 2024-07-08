@@ -488,12 +488,11 @@ TEST_F(KDBIdentitiesTest, Search)
 
 TEST_F(KDBIdentitiesTest, Hash)
 {
-    boost::hash<KDBIdentities> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(Identities);
+    std::size_t hash_val = hash_value(Identities);
 
     // change a name
     Identities.rename("AOUC", "NEW_NAME");
-    std::size_t hash_val_modified = kdb_hasher(Identities);
+    std::size_t hash_val_modified = hash_value(Identities);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename identity) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -501,14 +500,14 @@ TEST_F(KDBIdentitiesTest, Hash)
     hash_val = hash_val_modified;
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
     Identities.update("NEW_NAME", new_lec);
-    hash_val_modified = kdb_hasher(Identities);
+    hash_val_modified = hash_value(Identities);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(modify identity) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
     Identities.remove("NEW_NAME");
-    hash_val_modified = kdb_hasher(Identities);
+    hash_val_modified = hash_value(Identities);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete identity) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -516,7 +515,7 @@ TEST_F(KDBIdentitiesTest, Hash)
     hash_val = hash_val_modified;
     std::string lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
     Identities.add("NEW_ENTRY", lec);
-    hash_val_modified = kdb_hasher(Identities);
+    hash_val_modified = hash_value(Identities);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    identity) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

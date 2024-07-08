@@ -85,7 +85,7 @@ TEST(TestSample, Hash)
 	Period end(2020, 'Y', 1);
 	Sample sample(start, end);
 
-	boost::hash<Sample> sample_hasher;
+	std::hash<SAMPLE> sample_hasher;
     hash_before = sample_hasher(sample);
 
 	// different starting year

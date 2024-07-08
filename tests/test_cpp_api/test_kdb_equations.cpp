@@ -394,20 +394,19 @@ TEST_F(KDBEquationsTest, Search)
 
 TEST_F(KDBEquationsTest, Hash)
 {
-    boost::hash<KDBEquations> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(Equations);
+    std::size_t hash_val = hash_value(Equations);
 
     // modify an entry
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     Equations.update("ACAF", new_lec);
-    std::size_t hash_val_modified = kdb_hasher(Equations);
+    std::size_t hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);
-    std::cout << "(modify equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
+    std::cout << "(modify equation) original vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
     Equations.remove("ACAF");
-    hash_val_modified = kdb_hasher(Equations);
+    hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -422,7 +421,7 @@ TEST_F(KDBEquationsTest, Hash)
     std::string instruments = "Equation instruments";
     bool date = true;
     Equations.add("ACAF", lec, method, from, to, comment, instruments, block, date);
-    hash_val_modified = kdb_hasher(Equations);
+    hash_val_modified = hash_value(Equations);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    equation) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

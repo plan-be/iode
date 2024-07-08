@@ -164,7 +164,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_TRUE(table_equal(table, *tbl));
 
     // test if a Table object can be passed to the hash function for the objects of type TBL.
-    boost::hash<TBL> tbl_hasher;
+    std::hash<TBL> tbl_hasher;
     std::size_t c_hash = tbl_hasher(*tbl);
     std::size_t cpp_hash = tbl_hasher(static_cast<TBL>(table));
     ASSERT_EQ(c_hash, cpp_hash);
@@ -554,7 +554,7 @@ TEST_F(TablesTest, LineDate)
 
 TEST_F(TablesTest, Hash)
 {
-    boost::hash<Table> table_hasher;
+    std::hash<TBL> table_hasher;
     std::size_t hash_before;
     std::size_t hash_after;
 
