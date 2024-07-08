@@ -17,7 +17,7 @@ void execute_report(const std::string& filepath, const std::string& parameters)
 
 void execute_report(const std::string& filepath, const std::vector<std::string>& parameters)
 {
-    std::string s_parameters = boost::algorithm::join(parameters, " ");
+    std::string s_parameters = join(parameters, " ");
     execute_report(filepath, s_parameters);
 }
 
@@ -30,6 +30,6 @@ void execute_report_line(const std::string& commands)
 
 void execute_report_line(const std::vector<std::string>& commands)
 {
-    std::string s_commands = boost::algorithm::join(commands, "\n");
+    std::string s_commands = join(commands, "\n");
     execute_report_line(s_commands);
 }

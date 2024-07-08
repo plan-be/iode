@@ -4,7 +4,6 @@
 #include "common.h"
 #include "utils/utils.h"
 #include "utils/iode_exceptions.h"
-#include <boost/functional/hash.hpp>
 
 
 const static std::string periodicities = "YSQMWD";
@@ -133,25 +132,23 @@ public:
 		return (p_y == other.p_y) && (p_p == other.p_p) && (p_s == other.p_s);
 	}
 
-	// TODO : implement operators > and < ?  
+	// TODO : implement operators > and < ? 
+	 
 };
 
-/**
- * @brief compute a hash value for a C period.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(PERIOD const& c_period);
 
-/**
- * @brief compute a hash value for a period.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(Period const& period);
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<PERIOD>
+{
+    std::size_t operator()(const PERIOD& period) const noexcept
+    {
+		std::size_t seed = 0;
+
+		hash_combine<long>(seed, period.p_y);
+		hash_combine<long>(seed, period.p_s);
+		hash_combine<char>(seed, period.p_p);
+
+		return seed;
+    }
+};

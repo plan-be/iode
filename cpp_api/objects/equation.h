@@ -1,8 +1,6 @@
 #pragma once
 #include <stdexcept>
 #include <algorithm>
-#include <boost/functional/hash.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "common.h"
 #include "utils/utils.h"
@@ -168,22 +166,26 @@ struct NamedEquation
 };
 
 
-/**
- * @brief compute a hash value for an object of type EQ (C API).
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(EQ const& c_eq);
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<EQ>
+{
+    std::size_t operator()(const EQ& eq) const noexcept
+    {
+		std::size_t seed = 0;
 
-/**
- * @brief compute a hash value for an equation.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(Equation const& eq);
+        // need to wrap with std::string() because hash_value() and
+        // hash_combine() only compare pointer addresses when applied 
+        // on char* arrays
+        hash_combine<std::string_view>(seed, std::string_view(eq.lec, std::strlen(eq.lec)));
+        hash_combine<char>(seed, eq.method);
+        hash_combine<SAMPLE>(seed, eq.smpl);
+        hash_combine<std::string_view>(seed, std::string_view(eq.cmt, std::strlen(eq.cmt)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.blk, std::strlen(eq.blk)));
+        hash_combine<std::string_view>(seed, std::string_view(eq.instr, std::strlen(eq.instr)));
+
+        return seed;
+    }
+};
+
+std::size_t hash_value(const Equation& equation);

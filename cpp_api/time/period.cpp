@@ -171,25 +171,3 @@ Period Period::shift(const int nb_periods)
 
     return shifted_period;
 }
-
-std::size_t hash_value(PERIOD const& c_period)
-{
-    std::size_t seed = 0;
-
-    boost::hash_combine(seed, c_period.p_y);
-    boost::hash_combine(seed, c_period.p_s);
-    boost::hash_combine(seed, c_period.p_p);
-
-    return seed;
-}
-
-std::size_t hash_value(Period const& period)
-{
-    std::size_t seed = 0;
-
-    boost::hash_combine(seed, period.p_y);
-    boost::hash_combine(seed, period.p_s);
-    boost::hash_combine(seed, period.p_p);
-
-    return seed;
-}

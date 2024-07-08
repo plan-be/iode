@@ -4,12 +4,18 @@
 #include "iode_exceptions.h"
 #include "super.h"
 
+#include <regex>
 #include <string>
 #include <vector>
-#include <regex>
+#include <cctype>
+#include <numeric>      // for std::accumulate
+#include <sstream>
+#include <iostream>
 #include <stdexcept>
-// requires C++17 
-#include <filesystem>
+#include <functional>   // for std::hash
+#include <filesystem>   // requires C++17 
+#include <string_view>  // requires C++17
+
 
 #ifdef _WIN32 // valid for both 32 and 64 bits
     #include <Windows.h>
@@ -64,6 +70,79 @@ inline std::string oem_to_utf8(const std::string str_oem)
 inline std::string utf8_to_oem(const std::string str_utf8)
 {
     return convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
+}
+
+/**
+ * @brief Joins the elements of a vector of strings into a single string using a specified separator.
+ * 
+ * @param vec The vector of strings to be joined.
+ * @param separator The string used to separate each element in the final concatenated string.
+ * @return The concatenated string formed by joining all elements of the input vector with the separator.
+ */
+inline std::string join(const std::vector<std::string>& vec, const std::string& separator) 
+{
+    if (vec.empty()) 
+        return "";
+
+    return std::accumulate(std::next(vec.begin()), vec.end(), vec[0],
+        [&separator](const std::string& a, const std::string& b) { return a + separator + b; });
+}
+
+/**
+ * @brief Splits a given string into substrings based on a specified delimiter.
+ * 
+ * @param str The string to be split.
+ * @param delimiter The character used to identify where the string should be split.
+ * @return A vector of strings containing the substrings after splitting the input string.
+ */
+inline std::vector<std::string> split(const std::string& str, char delimiter) 
+{
+    std::vector<std::string> result;
+    std::string_view str_view(str);
+    std::size_t start = 0;
+    std::size_t end = 0;
+
+    while ((end = str_view.find(delimiter, start)) != std::string_view::npos) 
+    {
+        result.emplace_back(str_view.substr(start, end - start));
+        start = end + 1;
+    }
+    result.emplace_back(str_view.substr(start));
+
+    return result;
+}
+
+/**
+ * @brief trim leading and trailing whitespace of a string
+ * 
+ * @param str 
+ * @return std::string 
+ */
+inline std::string trim(const std::string& str) 
+{
+    auto start = str.find_first_not_of(" \t\n\r\f\v");
+    auto end = str.find_last_not_of(" \t\n\r\f\v");
+
+    // String is all whitespace
+    if (start == std::string::npos || end == std::string::npos)
+        return "";
+
+    return str.substr(start, end - start + 1);
+}
+
+
+/**
+ * @brief Combines a hash value with a new value using bitwise XOR and shifts.
+ * 
+ * @tparam T The type of the value to be combined with the hash.
+ * @param seed The current hash value to be combined with the new value.
+ * @param value The new value to be combined with the hash.
+ */
+template <typename T>
+inline void hash_combine(std::size_t& seed, const T& value) 
+{
+    std::hash<T> hasher;
+    seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 static IodeRegexName get_regex_name(const int type)

@@ -4,7 +4,6 @@
 #include "utils/utils.h"
 #include "utils/iode_exceptions.h"
 #include <stdexcept>
-#include <boost/functional/hash.hpp>
 
 
 using bitset_8 = std::bitset<8>;
@@ -31,6 +30,9 @@ const static std::vector<std::string> v_graph_chart_types =
 
 const static std::vector<std::string> v_graph_axis_thicks = 
     { "Major thicks", "No grids", "Minor thicks" };
+
+
+static int _nb_columns_;
 
 
 // WARNING: C++ allows functions returning a reference to be left-values. 
@@ -126,15 +128,46 @@ struct TableLine: public TLINE
 
 void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src);
 
-/**
- * @brief compute a hash value for a table line.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(TLINE const& c_line);
+
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<TLINE>
+{
+    std::size_t operator()(const TLINE& line) const noexcept
+    {
+		std::size_t seed = 0;
+
+		hash_combine<char>(seed, line.tl_type);
+		hash_combine<unsigned char>(seed, line.tl_axis);
+		hash_combine<char>(seed, line.tl_graph);
+
+		TCELL* cells;
+		TCELL* cell;
+		switch(line.tl_type)
+		{
+		case TABLE_LINE_TITLE:
+			cells = (TCELL*) line.tl_val;
+			hash_combine<char>(seed, cells->tc_type);
+			hash_combine<char>(seed, cells->tc_attr);
+			hash_combine<std::string>(seed, std::string(cells->tc_val));
+			break;
+		case TABLE_LINE_CELL:
+			cells = (TCELL*) line.tl_val;
+			for(int col = 0; col < _nb_columns_; col++)
+			{
+				cell = &cells[col];
+				hash_combine<char>(seed, cell->tc_type);
+				hash_combine<char>(seed, cell->tc_attr);
+				hash_combine<std::string>(seed, std::string(T_cell_cont(cell, 0)));
+			}
+			break;
+		default:
+			break;
+		}
+
+		return seed;
+    }
+};
 
 
 // ================ TABLE ================
@@ -282,22 +315,38 @@ private:
 };
 
 
-/**
- * @brief compute a hash value for an object of type TBL (C API).
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(TBL const& c_table);
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<TBL>
+{
+    std::size_t operator()(const TBL& table) const noexcept
+    {
+		std::size_t seed = 0;
 
-/**
- * @brief compute a hash value for a table.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(Table const& table);
+		hash_combine<short>(seed, table.t_lang);
+		hash_combine<short>(seed, table.t_free);
+		hash_combine<short>(seed, table.t_nl);
+		hash_combine<short>(seed, table.t_nc);
+
+		_nb_columns_ = table.t_nc;
+		hash_combine<TLINE>(seed, table.t_div);
+		for (int i = 0; i < table.t_nl; i++)
+			hash_combine<TLINE>(seed, table.t_line[i]);
+
+		hash_combine<float>(seed, table.t_zmin);
+		hash_combine<float>(seed, table.t_zmax);
+		hash_combine<float>(seed, table.t_ymin);
+		hash_combine<float>(seed, table.t_ymax);
+		hash_combine<char>(seed, table.t_attr);
+		hash_combine<char>(seed, table.t_box);
+		hash_combine<char>(seed, table.t_shadow);
+		hash_combine<char>(seed, table.t_gridx);
+		hash_combine<char>(seed, table.t_gridy);
+		hash_combine<char>(seed, table.t_axis);
+		hash_combine<char>(seed, table.t_align);
+
+		return seed;
+    }
+};
+
+std::size_t hash_value(const Table& table);

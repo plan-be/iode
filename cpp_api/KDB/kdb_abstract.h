@@ -7,9 +7,6 @@
 #include <vector>
 #include <stdexcept>
 
-#include <boost/functional/hash.hpp>
-#include <boost/algorithm/string.hpp>
-
 
 // using is the C++11 version of typedef
 using Comment = std::string;

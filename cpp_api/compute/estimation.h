@@ -2,7 +2,6 @@
 #include <array>
 #include <algorithm>
 #include <stdexcept>
-#include <boost/algorithm/string.hpp>
 
 #include "utils/utils.h"
 #include "time/sample.h"
@@ -215,7 +214,7 @@ public:
 
         if(m < 0)
             throw std::invalid_argument("The method '" + method + "' is not valid.\n" + 
-                "Accepted methods are: " + boost::algorithm::join(v_eq_methods, ", "));
+                "Accepted methods are: " + join(v_eq_methods, ", "));
 
         this->method = (IodeEquationMethod) m;
     }
@@ -240,8 +239,7 @@ public:
             return;
         }
 
-        std::vector<std::string> v_instrs;
-        boost::split(v_instrs, instruments, boost::is_any_of(";"));
+        std::vector<std::string> v_instrs = split(instruments, ';');
 
         // check the LEC expression for each instrument.
         // Return an error if one instrument is invalid.

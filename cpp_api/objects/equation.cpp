@@ -198,7 +198,7 @@ void Equation::set_method(const std::string& method)
 
     if(m < 0)
         throw std::invalid_argument("The equation method '" + method + "' is not valid.\n" + 
-            "Accepted methods are: " + boost::algorithm::join(v_eq_methods, ", "));
+            "Accepted methods are: " + join(v_eq_methods, ", "));
 
     this->method = (char) m;
 }
@@ -439,10 +439,10 @@ std::pair<std::string, std::string> Equation::split_equation()
         return lrhs;
     // left hand side
     lrhs.first = lec.substr(0, pos);
-    boost::algorithm::trim(lrhs.first);
+    lrhs.first = trim(lrhs.first);
     // right hand side
     lrhs.second = lec.substr(pos+2);
-    boost::algorithm::trim(lrhs.second);
+    lrhs.second = trim(lrhs.second);
 
     return lrhs;
 }
@@ -459,6 +459,12 @@ bool Equation::operator==(const Equation& other) const
     return true;
 }
 
+std::size_t hash_value(const Equation& equation)
+{
+    std::hash<EQ> eq_hash;
+    return eq_hash(equation);
+}
+
 
 NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
 {
@@ -466,38 +472,4 @@ NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(
 
 NamedEquation::NamedEquation(const std::string& name, const Equation& eq) : name(name), eq(eq) 
 {
-}
-
-std::size_t hash_value(EQ const& c_eq)
-{
-    std::size_t seed = 0;
-
-    // need to wrapp with std::string() because hash_value() and
-    // hash_combine() only compare pointer addresses when applied 
-    // on char* arrays
-    boost::hash_combine(seed, std::string(c_eq.lec));
-    boost::hash_combine(seed, c_eq.method);
-    boost::hash_combine(seed, c_eq.smpl);
-    boost::hash_combine(seed, std::string(c_eq.cmt));
-    boost::hash_combine(seed, std::string(c_eq.blk));
-    boost::hash_combine(seed, std::string(c_eq.instr));
-
-    return seed;
-}
-
-std::size_t hash_value(Equation const& eq)
-{
-    std::size_t seed = 0;
-
-    // need to wrapp with std::string() because hash_value() and
-    // hash_combine() only compare pointer addresses when applied 
-    // on char* arrays
-    boost::hash_combine(seed, std::string(eq.lec));
-    boost::hash_combine(seed, eq.method);
-    boost::hash_combine(seed, eq.smpl);
-    boost::hash_combine(seed, std::string(eq.cmt));
-    boost::hash_combine(seed, std::string(eq.blk));
-    boost::hash_combine(seed, std::string(eq.instr));
-
-    return seed;
 }

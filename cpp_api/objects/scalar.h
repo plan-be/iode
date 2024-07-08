@@ -2,7 +2,6 @@
 #include "common.h"
 #include "utils/utils.h"
 #include <format>
-#include <boost/functional/hash.hpp>
 
 
 struct Scalar : public SCL
@@ -25,22 +24,20 @@ public:
 };
 
 
-/**
- * @brief compute a hash value for a scalar.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(Scalar const& scalar);
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<SCL>
+{
+    std::size_t operator()(const SCL& scalar) const noexcept
+    {
+		std::size_t seed = 0;
 
-/**
- * @brief compute a hash value for an object of type SCL (C API).
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(SCL const& scl);
+        hash_combine<double>(seed, scalar.val);
+        hash_combine<double>(seed, scalar.relax);
+        hash_combine<double>(seed, scalar.std);
+
+        return seed;
+    }
+};
+
+std::size_t hash_value(const Scalar& scalar);
