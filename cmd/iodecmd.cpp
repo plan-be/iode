@@ -59,64 +59,75 @@
  *  
  */
 
+#include <cstdio>
+#include <cstring>
+
+#include <iostream>
+#include <string>
 
 #include "iode.h"
+#include <istream>
 
 /* Allocation debugging  (see scr/s_allc.c) */
-extern "C" long  SCR_TOTAL_ALLOC;        // Total remaining memory allocation in bytes 
-// NOTE: SCR_ALLOC_DOC is declared as extern in scr4/s_strs.h 
-extern "C" int   SCR_ALLOC_DOC;          // Log the remaining allocations    
-extern "C" char  *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations    
+extern "C" long SCR_TOTAL_ALLOC;        // Total remaining memory allocation in bytes 
+extern "C" int SCR_ALLOC_DOC;           // Log the remaining allocations    
+extern "C" char *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations    
+
+const static std::string s_yes = "OoYyJj1";
 
 
 // "super" functions
 // -----------------
 
 /**
- *  Function that superseeds the standard scr4 function A2mMessage() in the context 
+ *  Function that supersedes the standard scr4 function A2mMessage() in the context 
  *  of a console program.
  *    
  *  @param [in] msg char*   message to display/print/ignore
  */
- void A2mMessage_super_CMD(char* msg)
+void A2mMessage_super_CMD(char* msg)
 {
-    fprintf(stderr, "%-79.79s\n", msg);
+    std::cerr << std::string(msg, 79) << std::endl;
 }
 
-
 /**
- *  Function that superseeds the standard function kconfirm() in the context of a console program.
+ *  Function that supersedes the standard function kconfirm() in the context of a console program.
  *  The question is constructed as printf(fmt, ...).
- *  The answer is read via a call to get_s(). 
+ *  The answer is read via a call to std::getline(). 
  *  The return value is 0 (meaning continue) if the user answers yes (OoYyJj1) to the question.
  *  
  *  @param [in] fmt char*   format string in printf like syntax
- *  @return         int     0 if the answer starts with one of the following vchars : "0oYyJj1"
+ *  @return         int     0 if the answer starts with one of the following chars : "0oYyJj1"
  *                          1 otherwise
  */
 int kconfirm_super_CMD(const char* fmt)
 {
-    char    buf[256];
+    std::cout << std::string(fmt) << std::endl;
 
-    strcpy_s(buf, fmt);
-    gets_s(buf, sizeof(buf) - 1);
-    SCR_sqz((unsigned char*) buf);
-//    printf("buf = '%s'\n", buf);
-    return(!U_is_in(buf[0], "OoYyJj1"));
+    std::string answer;
+    std::getline(std::cin, answer);
+    // Remove all spaces
+    answer.erase(std::remove(answer.begin(), answer.end(), ' '), answer.end());
+    
+    return (s_yes.find(answer[0]) != std::string::npos) ? 0 : 1;
 }
-
 
 /**
  *  Assigns to "super-function" pointers their specific implementations for iodecmd.exe.
- *  First assigne the default function pointers defined in iode api library.
+ *  First assign the default function pointers defined in iode API library.
  */
 void ODE_assign_super_CMD()
 {
     IODE_assign_super_API();
-    A2mMessage_super    = A2mMessage_super_CMD;
-    kconfirm_super      = kconfirm_super_CMD;
+    A2mMessage_super = A2mMessage_super_CMD;
+    kconfirm_super = kconfirm_super_CMD;
 }
 
+// Function used by A2M HTML generator (does not work in 64bits)
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename) 
+{
+    return 0;
+}
 
 /**
  *  Prints the syntax of iodecmd.
@@ -124,18 +135,17 @@ void ODE_assign_super_CMD()
  */
 void IodeCmdSyntax()
 {
-    printf("IODECMD v. %d.%d (%s)\n", IODE_VERSION_MAJOR, IODE_VERSION_MINOR, __DATE__);
-    printf("Syntax: iodecmd [-nbrun n] [-alloclog filename] [-v] [-y] [-h] reportfile [arg1 arg2 ...]\n");
-    printf("    where:\n"); 
-    printf("       -nbrun n: how many times the report must be executed.\n");
-    printf("       -alloclog filename: log allocations not freed at the end of the report execution \n");
-    printf("       -v or --verbose: give more detailed messages\n");
-    printf("       -y or --forceyes: when a question is asked, automatically answer yes\n");
-    printf("       -h or --help: display this message \n");
-    printf("       reportfile: report filename  \n");
-    printf("       arg1 arg2 ...: optional report arguments\n");
+    std::cout << "IODECMD v. " << IODE_VERSION_MAJOR << "." << IODE_VERSION_MINOR << " (" << __DATE__ << ")\n";
+    std::cout << "Syntax: iodecmd [-nbrun n] [-alloclog filename] [-v] [-y] [-h] reportfile [arg1 arg2 ...]\n";
+    std::cout << "    where:\n"; 
+    std::cout << "       -nbrun n: how many times the report must be executed.\n";
+    std::cout << "       -alloclog filename: log allocations not freed at the end of the report execution \n";
+    std::cout << "       -v or --verbose: give more detailed messages\n";
+    std::cout << "       -y or --forceyes: when a question is asked, automatically answer yes\n";
+    std::cout << "       -h or --help: display this message \n";
+    std::cout << "       reportfile: report filename  \n";
+    std::cout << "       arg1 arg2 ...: optional report arguments\n";
 }
-
 
 /**
  *  Main program. 
@@ -146,91 +156,86 @@ void IodeCmdSyntax()
  */
 int main(int argc, char **argv)
 {
-
-    int     i, nbrun = 1, rc;
-    char    *reportname = NULL, **reportargs = NULL;
-    int     IODE_VERBOSE = 0;
+    int nbrun = 1; 
+    int rc;
+    char *reportname = nullptr; 
+    char **reportargs = nullptr;
+    int IODE_VERBOSE = 0;
 
     ODE_assign_super_CMD();
     SCR_ALLOC_DOC = 0;
 
-    // Error file location: 
-    // --------------------
-    //  Old versions: iode.msg was appended to iodecmd.exe file
-    //    => rejected by McAfee ATP
-    //
-    // strcpy(SCR_NAME_ERR, argv[0]);
-    // SCR_ERR_FILE_NB = 1;
-    //
-    //  To work around the McAfee ATP problem, an appended file was used:  
-    // SCR_change_ext(SCR_NAME_ERR, argv[0], "msg");
-    // SCR_ERR_FILE_NB = 1;
-    //
-    // The latest versions (> 6.65) simply used the iode.msg file located in the same directory
-    // as iodecmd.exe : 
     B_IodeMsgPath();    // IODE > 6.65
 
-    for(i = 1 ; i < argc ; i++) {
-        if(strcmp(argv[i], "-nbrun") == 0) {
-            nbrun = atol(argv[i + 1]);
+    std::string argument;
+    for(int i = 1; i < argc; i++) 
+    {
+        argument = std::string(argv[i]);
+
+        if (argument == "-nbrun")
+        {
+            nbrun = std::atol(argv[i + 1]);
             i++;
-        }
-        else if(strcmp(argv[i], "-alloclog") == 0) {
+        } 
+        else if (argument == "-alloclog")
+        {
             SCR_ALLOC_DOC_LOGFILE = argv[i + 1];
             SCR_ALLOC_DOC = 1;
             i++;
-        }
-        else if(strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0) {
+        } 
+        else if (argument == "--verbose" || argument == "-v")
+        {
             IODE_VERBOSE = 1;
-        }
-        else if(strcmp(argv[i], "--forceyes") == 0 || strcmp(argv[i], "-y") == 0) {
-            //IODE_FORCEYES = 1;
+        } 
+        else if (argument == "--forceyes" || argument == "-y")
+        {
             kmsgbox_continue = 1; // JMP 11/12/2021
             kpause_continue = 1;  // JMP 16/06/2022
-        }
-
-        else if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+        } 
+        else if (argument == "--help" || argument == "-h")
+        {
             IodeCmdSyntax();
-            return(0);
-        }
-        else if(argv[i][0] == '-') {
+            return 0;
+        } 
+        else if (argv[i][0] == '-') 
+        {
             IodeCmdSyntax();
-            return(1);
-        }
-        else {
+            return 1;
+        } 
+        else 
+        {
             reportname = argv[i];
             reportargs = argv + i + 1;
             break;
         }
     }
 
-
-    if(nbrun < 1 || reportname == NULL) {
-        printf("%s\n", IODE_VERSION); // JMP 17-11-2015
-        printf("Iodecmd : nothing to do ...\n");
+    if (nbrun < 1 || reportname == nullptr) 
+    {
+        std::cout << IODE_VERSION << std::endl;
+        std::cout << "Iodecmd : nothing to do ..." << std::endl;
         exit(1);
     }
 
-    if(IODE_VERBOSE) printf("%s\n", IODE_VERSION);
+    if (IODE_VERBOSE) 
+        std::cout << IODE_VERSION << std::endl;
+    
     IodeInit();
 
-//    printf("Before 1st run : %d bytes allocated\n", SCR_TOTAL_ALLOC);
-    for(i = 0 ; i < nbrun ; i++) {
+    for (int i = 0; i < nbrun; i++) 
+    {
         rc = IodeExecArgs(reportname, reportargs);
-        if(IODE_VERBOSE) printf("\n*****Run %d/%d *****\nrc = %d -- total residual allocation : %d\n", i + 1, nbrun, rc, SCR_TOTAL_ALLOC);
+        if (IODE_VERBOSE) 
+            std::cout << "\n*****Run " << i + 1 << "/" << nbrun << " *****\nrc = " << rc 
+                      << " -- total residual allocation : " << SCR_TOTAL_ALLOC << std::endl;
     }
 
     IodeEnd();
-    if(IODE_VERBOSE) printf("After last run : %d bytes allocated\n", SCR_TOTAL_ALLOC);
+
+    if (IODE_VERBOSE) 
+        std::cout << "After last run : " << SCR_TOTAL_ALLOC << " bytes allocated" << std::endl;
+
     AllocDocLoop();
+
     exit(rc);
 }
-
-
-// Function used by A2M HTML generator (does not work in 64bits)
-#include "iode.h" 
-
-int A2mGIF_HTML(A2MGRF *go, U_ch* filename) 
-{
-    return(0);
-} 
