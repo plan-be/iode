@@ -275,7 +275,7 @@ void ws_htol(const std::string& filename, const std::string& varlist, const int 
 
 void ws_htol(const std::string& filename, const std::vector<std::string>& varlist, const int series_type)
 {        
-    std::string s_varlist = boost::algorithm::join(varlist, " ");
+    std::string s_varlist = join(varlist, " ");
     ws_htol(filename, s_varlist, series_type);
 }
 
@@ -293,6 +293,6 @@ void ws_ltoh(const std::string& filename, const std::string& varlist, const int 
 
 void ws_ltoh(const std::string& filename, const std::vector<std::string>& varlist, const int series_type, const char method)
 {
-    std::string s_varlist = boost::algorithm::join(varlist, " ");
+    std::string s_varlist = join(varlist, " ");
     ws_ltoh(filename, s_varlist, series_type, method);
 }
