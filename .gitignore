@@ -478,3 +478,7 @@ keyboard_shortcuts.*
 # TESTS
 /tests/**/*.ini
 /tests/output
+/tests/cmd/ex.ansi.*
+/tests/cmd/ex.oem.*
+/tests/cmd/test*.csv
+/tests/cmd/*.exe
