@@ -474,6 +474,7 @@ keyboard_shortcuts.*
 
 /doc/build/doctrees
 /doc/build/html
+/doc/build/latex
 
 # TESTS
 /tests/**/*.ini
