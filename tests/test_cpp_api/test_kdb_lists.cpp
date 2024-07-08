@@ -340,12 +340,11 @@ TEST_F(KDBListsTest, Search)
 
 TEST_F(KDBListsTest, Hash)
 {
-    boost::hash<KDBLists> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(Lists);
+    std::size_t hash_val = hash_value(Lists);
 
     // change a name
     Lists.rename("COPY0", "COPY_0");
-    std::size_t hash_val_modified = kdb_hasher(Lists);
+    std::size_t hash_val_modified = hash_value(Lists);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -353,14 +352,14 @@ TEST_F(KDBListsTest, Hash)
     hash_val = hash_val_modified;
     std::string expanded_list = Lists.get("COPY_0") + Lists.get("COPY1");
     Lists.update("COPY", expanded_list);
-    hash_val_modified = kdb_hasher(Lists);
+    hash_val_modified = hash_value(Lists);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(modify list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
     Lists.remove("COPY");
-    hash_val_modified = kdb_hasher(Lists);
+    hash_val_modified = hash_value(Lists);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -368,7 +367,7 @@ TEST_F(KDBListsTest, Hash)
     hash_val = hash_val_modified;
     std::string new_list = "ACAF;ACAG;AOUC;AQC";
     Lists.add("NEW_ENTRY", new_list);
-    hash_val_modified = kdb_hasher(Lists);
+    hash_val_modified = hash_value(Lists);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    list) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

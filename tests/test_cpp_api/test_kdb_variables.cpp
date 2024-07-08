@@ -779,12 +779,11 @@ TEST_F(KDBVariablesTest, Extrapolate)
 
 TEST_F(KDBVariablesTest, Hash)
 {
-    boost::hash<KDBVariables> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(Variables);
+    std::size_t hash_val = hash_value(Variables);
 
     // change a name
     Variables.rename("ACAF", "NEW_NAME");
-    std::size_t hash_val_modified = kdb_hasher(Variables);
+    std::size_t hash_val_modified = hash_value(Variables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -792,14 +791,14 @@ TEST_F(KDBVariablesTest, Hash)
     hash_val = hash_val_modified;
     std::string lec = "10 + t";
     Variables.update("NEW_NAME", lec);
-    hash_val_modified = kdb_hasher(Variables);
+    hash_val_modified = hash_value(Variables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(modify variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
     Variables.remove("NEW_NAME");
-    hash_val_modified = kdb_hasher(Variables);
+    hash_val_modified = hash_value(Variables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -807,7 +806,7 @@ TEST_F(KDBVariablesTest, Hash)
     hash_val = hash_val_modified;
     lec = "20 + t";
     Variables.add("NEW_ENTRY", lec);
-    hash_val_modified = kdb_hasher(Variables);
+    hash_val_modified = hash_value(Variables);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    variable) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

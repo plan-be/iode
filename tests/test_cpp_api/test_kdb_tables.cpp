@@ -549,19 +549,18 @@ TEST_F(KDBTablesTest, Search)
 
 TEST_F(KDBTablesTest, Hash)
 {
-    boost::hash<KDBTables> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(Tables);
+    std::size_t hash_val = hash_value(Tables);
 
     // change a name
     Tables.rename("GFRPC", "NEW_NAME");
-    std::size_t hash_val_modified = kdb_hasher(Tables);
+    std::size_t hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
     Tables.remove("NEW_NAME");
-    hash_val_modified = kdb_hasher(Tables);
+    hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -573,7 +572,7 @@ TEST_F(KDBTablesTest, Hash)
     bool files = true;
     bool date = true;
     Tables.add("NEW_ENTRY", 2, def, vars, mode, files, date);
-    hash_val_modified = kdb_hasher(Tables);
+    hash_val_modified = hash_value(Tables);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    table) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }

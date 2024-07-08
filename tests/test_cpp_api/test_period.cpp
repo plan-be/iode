@@ -139,7 +139,7 @@ TEST(TestPeriod, Hash)
 
 	Period period(2020, 'Y', 1);
 
-	boost::hash<Period> period_hasher;
+	std::hash<PERIOD> period_hasher;
     hash_before = period_hasher(period);
 
 	// modify

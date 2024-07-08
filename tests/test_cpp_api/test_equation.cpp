@@ -66,7 +66,7 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     ASSERT_EQ(c_eq->date, eq.get_date());
 
     // test if a Equation object can be passed to the hash function for the objects of type EQ.
-    boost::hash<EQ> eq_hasher;
+    std::hash<EQ> eq_hasher;
     std::size_t c_hash = eq_hasher(*c_eq);
     std::size_t cpp_hash = eq_hasher(static_cast<EQ>(eq));
     ASSERT_EQ(c_hash, cpp_hash);
@@ -260,7 +260,7 @@ TEST_F(EquationTest, GetVariables)
 
 TEST_F(EquationTest, Hash)
 {
-    boost::hash<Equation> equation_hasher;
+    std::hash<EQ> equation_hasher;
     std::size_t hash_before;
     std::size_t hash_after;
 

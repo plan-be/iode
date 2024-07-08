@@ -394,12 +394,11 @@ TEST_F(KDBScalarsTest, Search)
 
 TEST_F(KDBScalarsTest, Hash)
 {
-    boost::hash<KDBScalars> kdb_hasher;
-    std::size_t hash_val = kdb_hasher(Scalars);
+    std::size_t hash_val = hash_value(Scalars);
 
     // change a name
     Scalars.rename("acaf1", "new_name");
-    std::size_t hash_val_modified = kdb_hasher(Scalars);
+    std::size_t hash_val_modified = hash_value(Scalars);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(rename scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -408,14 +407,14 @@ TEST_F(KDBScalarsTest, Hash)
     double value = 0.0158;
     double relax = 0.98;
     Scalars.update("new_name", value, relax);
-    hash_val_modified = kdb_hasher(Scalars);
+    hash_val_modified = hash_value(Scalars);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(modify scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
     // remove an entry
     hash_val = hash_val_modified;
     Scalars.remove("new_name");
-    hash_val_modified = kdb_hasher(Scalars);
+    hash_val_modified = hash_value(Scalars);
     EXPECT_NE(hash_val, hash_val_modified);
     std::cout << "(delete scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl;
 
@@ -424,7 +423,7 @@ TEST_F(KDBScalarsTest, Hash)
     value = 0.012365879;
     relax = 1.;
     Scalars.add("new_entry", value, relax);
-    hash_val_modified = kdb_hasher(Scalars);
+    hash_val_modified = hash_value(Scalars);
     EXPECT_NE(hash_val, hash_val_modified);   
     std::cout << "(new    scalar) orignal vs modified hash: " << std::to_string(hash_val) << " vs " << std::to_string(hash_val_modified) << std::endl; 
 }
