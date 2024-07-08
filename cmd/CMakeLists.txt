@@ -12,6 +12,11 @@ else()
 	target_link_libraries(${IODE_CLI_TARGET} PUBLIC iode_scr4 iode_c_api)
 	target_include_directories(${IODE_CLI_TARGET} PUBLIC "${CMAKE_SOURCE_DIR}\\api")
 
+	add_custom_command(TARGET ${IODE_CLI_TARGET} POST_BUILD
+    	COMMAND ${CMAKE_COMMAND} -E echo "Copy $<TARGET_FILE:${IODE_CLI_TARGET}> into test/cmd"
+    	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${IODE_CLI_TARGET}> ${CMAKE_SOURCE_DIR}/tests/cmd/$<TARGET_FILE_NAME:${IODE_CLI_TARGET}>
+	)
+
 	if(TARGET ${IODE_CLI_TARGET})
 		message(STATUS "New target ${IODE_CLI_TARGET} enabled\n")
 	else()
