@@ -37,8 +37,6 @@ jobs:
             uses: ilammy/msvc-dev-cmd@v1
             with:
               arch: x64
-          - name: Install C++ Boost lib
-            uses: ./.github/actions/install_boost
           - name: Setup TeX Live
             uses: teatimeguest/setup-texlive-action@v3
             with:
