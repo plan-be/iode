@@ -85,25 +85,3 @@ Sample Sample::intersection(const Sample& other)
 
     return Sample(res_start_period, res_end_period);
 }
-
-std::size_t hash_value(SAMPLE const& c_sample)
-{
-    std::size_t seed = 0;
-
-    boost::hash_combine(seed, c_sample.s_p1);
-    boost::hash_combine(seed, c_sample.s_p2);
-    boost::hash_combine(seed, c_sample.s_nb);
-
-    return seed;
-}
-
-std::size_t hash_value(Sample const& sample)
-{
-    std::size_t seed = 0;
-
-    boost::hash_combine(seed, sample.s_p1);
-    boost::hash_combine(seed, sample.s_p2);
-    boost::hash_combine(seed, sample.s_nb);
-
-    return seed;
-}

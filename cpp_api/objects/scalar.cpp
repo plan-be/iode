@@ -75,24 +75,8 @@ bool Scalar::operator==(const Scalar& other) const
     return eq;
 }
 
-std::size_t hash_value(Scalar const& scalar)
+std::size_t hash_value(const Scalar& scalar)
 {
-	std::size_t seed = 0;
-
-	boost::hash_combine(seed, scalar.val);
-	boost::hash_combine(seed, scalar.relax);
-	boost::hash_combine(seed, scalar.std);
-
-    return seed;
-}
-
-std::size_t hash_value(SCL const& scl)
-{
-	std::size_t seed = 0;
-
-	boost::hash_combine(seed, scl.val);
-	boost::hash_combine(seed, scl.relax);
-	boost::hash_combine(seed, scl.std);
-
-    return seed;
+    std::hash<SCL> scl_hash;
+    return scl_hash(scalar);
 }

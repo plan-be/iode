@@ -141,7 +141,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
         }
 
         // copy the list of equations names separated by ';' to the 'block' attribute
-        this->block = boost::algorithm::join(v_equations, ";");
+        this->block = join(v_equations, ";");
 
         if(v_equations.size() > 0)
         {
@@ -262,8 +262,7 @@ void EditAndEstimateEquations::estimate()
     char** c_endos = vector_to_double_char(v_equations);
 
     // instruments    
-    std::vector<std::string> v_instrs;
-    boost::split(v_instrs, instruments, boost::is_any_of(";"));
+    std::vector<std::string> v_instrs = split(instruments,';');
     char** c_instrs = vector_to_double_char(v_instrs);    
     
     // list of LEC expressions for each equation of the vector v_equations
@@ -295,7 +294,7 @@ void EditAndEstimateEquations::estimate()
         m_corr = nullptr;
 
         std::string msg = "Cannot proceed estimation.\n";
-        msg += "equations: " + boost::algorithm::join(v_equations, ";") + "\n";
+        msg += "equations: " + join(v_equations, ";") + "\n";
         msg += get_last_error();
         throw std::runtime_error(msg);
     }
@@ -380,6 +379,6 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
 
 void eqs_estimate(const std::vector<std::string>& eqs, const std::string& from, const std::string& to)
 {
-    std::string s_eqs = boost::algorithm::join(eqs, ",");
+    std::string s_eqs = join(eqs, ",");
     eqs_estimate(s_eqs, from, to);
 }

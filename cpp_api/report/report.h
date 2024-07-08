@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-#include <boost/algorithm/string.hpp>
 
 
 /**

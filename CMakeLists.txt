@@ -210,24 +210,6 @@ message(STATUS " ")
 message(STATUS "=============================")
 message(STATUS "SEARCH FOR PACKAGES:\n")
 
-# -- find Boost --
-list(APPEND CMAKE_PREFIX_PATH "C:\\boost")
-set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
-set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
-set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost 1.74)
-
-message(CHECK_START "Search for Boost package")
-if(Boost_FOUND)
-  message(CHECK_PASS "version ${Boost_VERSION}")
-  include_directories(${Boost_INCLUDE_DIRS})
-else()
-  message(CHECK_FAIL "not found")
-endif()
-message(STATUS " ")
-
 # -- find Qt --
 if(NOT SKBUILD)
   message(CHECK_START "Search for Qt6 package")

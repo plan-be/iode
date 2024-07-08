@@ -1,7 +1,6 @@
 #pragma once
 #include "period.h"
 #include <stdexcept>
-#include <boost/functional/hash.hpp>
 
 
 struct Sample : public SAMPLE
@@ -96,22 +95,19 @@ public:
 	}
 };
 
-/**
- * @brief compute a hash value for a sample.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(SAMPLE const& c_sample);
 
-/**
- * @brief compute a hash value for a sample.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
-std::size_t hash_value(Sample const& sample);
+// Custom specialization of std::hash can be injected in namespace std.
+template<>
+struct std::hash<SAMPLE>
+{
+    std::size_t operator()(const SAMPLE& sample) const noexcept
+    {
+		std::size_t seed = 0;
+
+		hash_combine<PERIOD>(seed, sample.s_p1);
+		hash_combine<PERIOD>(seed, sample.s_p2);
+		hash_combine<short>(seed, sample.s_nb);
+
+		return seed;
+    }
+};

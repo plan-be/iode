@@ -55,7 +55,7 @@ protected:
     std::vector<std::string> column_names;
     std::vector<int>         v_line_pos_in_ref_table;
     std::vector<int>         v_pos_in_columns_struct;
-    // TODO ALD: consider Boost array or Eigen 3 matrix
+    // TODO ALD: consider Eigen 3 matrix
     std::vector<std::vector<double>> values;
 
 protected:

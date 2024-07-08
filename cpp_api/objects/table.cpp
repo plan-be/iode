@@ -339,44 +339,6 @@ bool table_equal(const TBL& table1, const TBL& table2)
 	return true;
 }
 
-static int _nb_columns_;
-
-std::size_t hash_value(TLINE const& c_line)
-{
-	std::size_t seed = 0;
-
-	boost::hash_combine(seed, c_line.tl_type);
-	boost::hash_combine(seed, c_line.tl_axis);
-	boost::hash_combine(seed, c_line.tl_graph);
-
-	TCELL* cells;
-	TCELL* cell;
-	switch(c_line.tl_type)
-	{
-	case TABLE_LINE_TITLE:
-		cells = (TCELL*) c_line.tl_val;
-		boost::hash_combine(seed, cells->tc_type);
-		boost::hash_combine(seed, cells->tc_attr);
-		boost::hash_combine(seed, std::string(cells->tc_val));
-		break;
-	case TABLE_LINE_CELL:
-		cells = (TCELL*) c_line.tl_val;
-		for(int col = 0; col < _nb_columns_; col++)
-		{
-			cell = &cells[col];
-			boost::hash_combine(seed, cell->tc_type);
-			boost::hash_combine(seed, cell->tc_attr);
-			boost::hash_combine(seed, std::string(T_cell_cont(cell, 0)));
-		}
-		break;
-	default:
-		break;
-	}
-
-	return seed;
-}
-
-
 void Table::initialize(const int nb_columns)
 {
 	t_nc = nb_columns;
@@ -851,61 +813,8 @@ void Table::free_all_lines()
     SW_nfree(t_line);
 }
 
-
-std::size_t hash_value(TBL const& c_table)
+std::size_t hash_value(const Table& table)
 {
-	std::size_t seed = 0;
-
-	boost::hash_combine(seed, c_table.t_lang);
-	boost::hash_combine(seed, c_table.t_free);
-	boost::hash_combine(seed, c_table.t_nl);
-	boost::hash_combine(seed, c_table.t_nc);
-
-	_nb_columns_ = c_table.t_nc;
-	boost::hash_combine(seed, c_table.t_div);
-	for (int i = 0; i < c_table.t_nl; i++)
-		boost::hash_combine(seed, c_table.t_line[i]);
-
-	boost::hash_combine(seed, c_table.t_zmin);
-	boost::hash_combine(seed, c_table.t_zmax);
-	boost::hash_combine(seed, c_table.t_ymin);
-	boost::hash_combine(seed, c_table.t_ymax);
-	boost::hash_combine(seed, c_table.t_attr);
-	boost::hash_combine(seed, c_table.t_box);
-	boost::hash_combine(seed, c_table.t_shadow);
-	boost::hash_combine(seed, c_table.t_gridx);
-	boost::hash_combine(seed, c_table.t_gridy);
-	boost::hash_combine(seed, c_table.t_axis);
-	boost::hash_combine(seed, c_table.t_align);
-
-	return seed;
-}
-
-std::size_t hash_value(Table const& table)
-{
-	std::size_t seed = 0;
-
-	boost::hash_combine(seed, table.t_lang);
-	boost::hash_combine(seed, table.t_free);
-	boost::hash_combine(seed, table.t_nl);
-	boost::hash_combine(seed, table.t_nc);
-
-	_nb_columns_ = table.t_nc;
-	boost::hash_combine(seed, table.t_div);
-	for (int i = 0; i < table.t_nl; i++)
-		boost::hash_combine(seed, table.t_line[i]);
-
-	boost::hash_combine(seed, table.t_zmin);
-	boost::hash_combine(seed, table.t_zmax);
-	boost::hash_combine(seed, table.t_ymin);
-	boost::hash_combine(seed, table.t_ymax);
-	boost::hash_combine(seed, table.t_attr);
-	boost::hash_combine(seed, table.t_box);
-	boost::hash_combine(seed, table.t_shadow);
-	boost::hash_combine(seed, table.t_gridx);
-	boost::hash_combine(seed, table.t_gridy);
-	boost::hash_combine(seed, table.t_axis);
-	boost::hash_combine(seed, table.t_align);
-
-	return seed;
+    std::hash<TBL> tbl_hash;
+    return tbl_hash(table);
 }

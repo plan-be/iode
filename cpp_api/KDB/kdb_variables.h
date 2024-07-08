@@ -187,14 +187,7 @@ public:
     void trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log);
 };
 
-/**
- * @brief compute a hash value for the database.
- * 
- * @note see https://www.boost.org/doc/libs/1_55_0/doc/html/hash/custom.html
- *       and https://www.boost.org/doc/libs/1_55_0/doc/html/hash/combine.html
- * 
- * @return std::size_t 
- */
+
 inline std::size_t hash_value(KDBVariables const& cpp_kdb)
 {
     KDB* kdb = cpp_kdb.get_database();
@@ -205,13 +198,14 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     std::size_t seed = 0;
     for(int pos=0; pos < kdb->k_nb; pos++)
     {
-        boost::hash_combine(seed, kdb->k_objs[pos].o_name);
+        char* o_name = kdb->k_objs[pos].o_name;
+        hash_combine<std::string_view>(seed, std::string_view(o_name, std::strlen(o_name)));
         // KVVAL(kdb, pos, t) return a pointer to pointer to kdb[pos][t]. 
         // We need to compute the hash with the values of kdb[pos], not the pointers. 
         // Otherwise, hash_value() and hash_combine() will only compare pointer 
         // addresses and not the values.
 		for(int t=0; t < smpl->s_nb; t++)
-        	boost::hash_combine(seed, *KVVAL(kdb, pos, t));
+        	hash_combine<double>(seed, *KVVAL(kdb, pos, t));
     }
     return seed;
 }
