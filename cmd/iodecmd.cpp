@@ -11,7 +11,7 @@
  *  -----------------
  *  
  *      void A2mMessage_super_CMD(char* msg)   | Function that superseeds the standard scr4 function A2mMessage() in the context of a console program.
- *      int kconfirm_super_CMD(char *fmt,...)  | Function that superseeds the standard function kconfirm() in the context of a console program.
+ *      int kconfirm_super_CMD(char *fmt)      | Function that superseeds the standard function kconfirm() in the context of a console program.
  *      void ODE_assign_super_CMD()            | Assigns to "super-function" pointers their specific implementations for iodecmd.exe.
  *      void IodeCmdSyntax()                   | Prints the syntax of iodecmd.
  *      int main(int argc, char **argv)        | Main function
@@ -63,9 +63,11 @@
 #include "iode.h"
 
 /* Allocation debugging  (see scr/s_allc.c) */
-extern long  SCR_TOTAL_ALLOC;        // Total remaining memory allocation in bytes  
-extern int   SCR_ALLOC_DOC;          // Log the remaining allocations    
-extern char  *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations    
+extern "C" long  SCR_TOTAL_ALLOC;        // Total remaining memory allocation in bytes 
+// NOTE: SCR_ALLOC_DOC is declared as extern in scr4/s_strs.h 
+extern "C" int   SCR_ALLOC_DOC;          // Log the remaining allocations    
+extern "C" char  *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations    
+
 
 // "super" functions
 // -----------------
@@ -84,26 +86,21 @@ extern char  *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations
 
 /**
  *  Function that superseeds the standard function kconfirm() in the context of a console program.
- *  The question is contructed as printf(fmt, ...).
+ *  The question is constructed as printf(fmt, ...).
  *  The answer is read via a call to get_s(). 
  *  The return value is 0 (meaning continue) if the user answers yes (OoYyJj1) to the question.
  *  
  *  @param [in] fmt char*   format string in printf like syntax
- *  @param [in] ...         optional parameters
  *  @return         int     0 if the answer starts with one of the following vchars : "0oYyJj1"
  *                          1 otherwise
  */
-int kconfirm_super_CMD(char *fmt,...)
+int kconfirm_super_CMD(const char* fmt)
 {
     char    buf[256];
-    va_list myargs;
 
-    va_start(myargs, fmt);
-    printf(fmt, myargs);
-    va_end(myargs);
-
+    strcpy_s(buf, fmt);
     gets_s(buf, sizeof(buf) - 1);
-    SCR_sqz(buf);
+    SCR_sqz((unsigned char*) buf);
 //    printf("buf = '%s'\n", buf);
     return(!U_is_in(buf[0], "OoYyJj1"));
 }
