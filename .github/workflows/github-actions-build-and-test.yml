@@ -47,8 +47,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-      - name: Install C++ Boost lib
-        uses: ./.github/actions/install_boost
       - name: Print preset config
         shell: bash
         run: echo "${{ inputs.build-config }}"
@@ -96,8 +94,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-      - name: Install C++ Boost lib
-        uses: ./.github/actions/install_boost
       - name: Print preset config
         shell: bash
         run: echo "windows-debug-sanitize"
