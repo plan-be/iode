@@ -14,11 +14,6 @@
   <br> Ask maintainers to get access.
 
 - C++ libraries:
-  - Boost (>= 1.74).
-  <br> Please install it in C:/boost.
-  <br> Can be installed with Chocolatey. 
-  <br> Install the package corresponding to your VS version by checking [here](https://community.chocolatey.org/packages?q=boost):
-    > choco install boost-msvc-14.X --install-directory 'C:\boost'
   - [Qt 6.4](https://www.qt.io/download)
   <br> Please install it in C:/Qt.
 
@@ -226,7 +221,7 @@ in the name of the pushed branch:
 ## VS Code - IntelliSense
 
 The IntelliSense feature (= autocomplete for C/C++) of VS Code may not be able to find where the headers files of the 
-std, Boost and Qt libraries are located. 
+std and Qt libraries are located. 
 
 First, add a `c_cpp_properties.json` file as indicated in the documentation for 
 [developing with the C/C++ compiler MSVC with VS Code](https://code.visualstudio.com/docs/cpp/config-msvc#_cc-configurations).
@@ -239,7 +234,6 @@ Then, in the `c_cpp_properties.json` file:
         "${workspaceFolder}/**",
         "${workspaceFolder}",
         "${workspaceFolder}/scr4",
-        "C:/boost",
         "C:/Qt/6.4.2/msvc2019_64/include",
         "C:/Qt/6.4.2/msvc2019_64/include/QtCore",
         "C:/Qt/6.4.2/msvc2019_64/include/QtGui",
@@ -248,7 +242,7 @@ Then, in the `c_cpp_properties.json` file:
         "C:/Qt/6.4.2/msvc2019_64/include/QtPrintSupport"
   ],
 ```
-You may have to adapt the path to the Boost and Qt libraries depending on where those libraries are installed on your computer.
+You may have to adapt the path to the Qt libraries depending on where those libraries are installed on your computer.
 
 2. Update the value of `configurationProvider` and `compilerPath`. To find the path to your MSVC compiler, open a 
 `Developer Command Prompt` and type:
