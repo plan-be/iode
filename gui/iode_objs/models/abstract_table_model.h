@@ -13,7 +13,6 @@
 
 #include "utils.h"
 #include "util/widgets/file_chooser.h"
-#include <boost/functional/hash.hpp>
 
 
 /* NOTE FOR THE DEVELOPERS:
@@ -179,13 +178,12 @@ public:
 		//       So we can't simply pass the 'displayed_database' class member 
 		//       to kdb_hasher because 'displayed_database' may point to 
 		//       'database_subset' if filtering is activated.
-		boost::hash<K> kdb_hasher;
 
 		if(before)
-    		hashBefore = kdb_hasher(*database);
+    		hashBefore = hash_value(*database);
 		else
 		{
-			hashAfter = kdb_hasher(*database);
+			hashAfter = hash_value(*database);
 			if(hashAfter != hashBefore) 
 				emit databaseModified();
 		}

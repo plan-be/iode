@@ -137,8 +137,7 @@ void EditEquationDialog::edit()
 			edit_est_eqs.set_instruments(instruments);
 		}
 
-		boost::hash<KDBEquations> hasher;
-		size_t hashBefore = hasher(Equations);
+		size_t hashBefore = hash_value(Equations);
 
 		std::string from = sampleFrom->extractAndVerify().toStdString();
 		std::string to = sampleTo->extractAndVerify().toStdString();
@@ -147,7 +146,7 @@ void EditEquationDialog::edit()
 		for(const std::string& name: v_new_eqs)
 			emit newObjectInserted(QString::fromStdString(name));
 
-		size_t hashAfter = hasher(Equations);
+		size_t hashAfter = hash_value(Equations);
 		if(hashAfter != hashBefore)
 			emit databaseModified();
 		
