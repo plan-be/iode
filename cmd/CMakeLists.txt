@@ -9,7 +9,7 @@ else()
 
 	add_executable(${IODE_CLI_TARGET} "iodecmd.cpp")
 
-	target_link_libraries(${IODE_CLI_TARGET} PUBLIC iode_scr4 iode_c_api)
+	target_link_libraries(${IODE_CLI_TARGET} PUBLIC iode_cpp_api)
 	target_include_directories(${IODE_CLI_TARGET} PUBLIC "${CMAKE_SOURCE_DIR}\\api")
 
 	add_custom_command(TARGET ${IODE_CLI_TARGET} POST_BUILD
