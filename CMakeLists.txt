@@ -315,12 +315,6 @@ if(TARGET ${IODE_GUI_TARGET})
   add_subdirectory("nsis")
 endif()
 
-# -- IODE-DOS (2023) --
-if(NOT SKBUILD)
-  add_subdirectory ("pyiode_2023")
-endif()
-
-
 message(STATUS " ")
 message(STATUS "=============================\n")
 
