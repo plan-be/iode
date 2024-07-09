@@ -383,6 +383,8 @@ int K_upd_eqs(char* name, char* lec, char* cmt, int method, SAMPLE* smpl, char* 
     else 
         eq = KEVAL(K_WS[EQUATIONS], pos);
 
+    SW_nfree(eq->endo);
+    eq->endo = SCR_stracpy(name);
     if(lec != NULL) {
         SW_nfree(eq->lec);
         eq->lec = SCR_stracpy(lec);

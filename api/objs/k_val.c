@@ -189,7 +189,7 @@ EQ* K_eptr(KDB* kdb, char* name)
     
     pos = K_find(kdb, name);
     if(pos < 0) return(NULL);         // name not found
-    return(K_eunpack(SW_getptr(kdb->k_objs[pos].o_val)));
+    return KEVAL(kdb, pos);
 }
 
 /**

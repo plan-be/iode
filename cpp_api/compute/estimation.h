@@ -296,23 +296,19 @@ public:
      */
     void update_current_equation(const std::string& lec, const std::string& comment);
 
-    NamedEquation current_equation() 
+    Equation current_equation() 
     {
-        std::string name = *current_eq;
-        Equation eq = kdb_eqs->get(name);
-        return NamedEquation(name, eq); 
+        return kdb_eqs->get(*current_eq);
     }
 
-    NamedEquation next_equation()
+    Equation next_equation()
     {
         current_eq++;
         
         if(current_eq == v_equations.end()) 
             current_eq = v_equations.begin();
 
-        std::string name = *current_eq;
-        Equation eq = kdb_eqs->get(name);
-        return NamedEquation(name, eq);
+        return kdb_eqs->get(*current_eq);
     }
 
     CorrelationMatrix* get_correlation_matrix() 

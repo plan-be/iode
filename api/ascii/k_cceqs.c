@@ -59,7 +59,6 @@ static EQ* KE_read_eq(YYFILE* yy)
     EQ      *eq = NULL;
     SAMPLE  *smpl = NULL;
 
-
     eq = (EQ *) SW_nalloc(sizeof(EQ));
     eq->method = 0;
     if((keyw = YY_lex(yy)) != EQ_ASCII_OPEN)  {
@@ -275,11 +274,13 @@ KDB *KE_load_asc(char* filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, yy->yy_text);
-                if((eq = KE_read_eq(yy)) == NULL) {
+                eq = KE_read_eq(yy);
+                if(eq == NULL) {
                     kerror(0, "%s : equation not defined", YY_error(yy));
                     goto err;
                 }
 
+                eq->endo = SCR_stracpy(name);
                 if(eq->blk == NULL) eq->blk = SCR_stracpy(name);
 
                 pos = K_add(kdb, name, eq, name);

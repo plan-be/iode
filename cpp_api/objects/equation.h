@@ -52,11 +52,15 @@ public:
     // required to be used in std::map
     Equation& operator=(const Equation& other);
 
+    // -- endo --
+
+    std::string get_endo() const;
+
     // -- lec --
 
     std::string get_lec() const;
 
-    void set_lec(const std::string& lec, const std::string& endo);
+    void set_lec(const std::string& lec);
 
     // -- solved --
 
@@ -156,16 +160,6 @@ public:
 };
 
 
-struct NamedEquation
-{
-    std::string name;
-    Equation eq;
-
-    NamedEquation(const std::string& name);
-    NamedEquation(const std::string& name, const Equation& eq);
-};
-
-
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
 struct std::hash<EQ>
@@ -177,6 +171,7 @@ struct std::hash<EQ>
         // need to wrap with std::string() because hash_value() and
         // hash_combine() only compare pointer addresses when applied 
         // on char* arrays
+        hash_combine<std::string_view>(seed, std::string_view(eq.endo, std::strlen(eq.endo)));
         hash_combine<std::string_view>(seed, std::string_view(eq.lec, std::strlen(eq.lec)));
         hash_combine<char>(seed, eq.method);
         hash_combine<SAMPLE>(seed, eq.smpl);

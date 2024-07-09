@@ -50,16 +50,16 @@ cdef class Equations(_AbstractDatabase):
     <BLANKLINE>
      name                                                    lec                                                method      sample      block    fstat      r2adj     dw     loglik    date
     ACAF        (ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+ acaf4*(TIME=1995)                                           LSQ  1980Y1:1996Y1    ACAF   32.2732     0.7963  2.3293  83.8075 12-06-1998
-    ACAG        ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))                         LSQ  1960Y1:2015Y1    ACAG    0.0000     0.0000  0.0000   0.0000
-    AOUC        AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                     LSQ  1960Y1:2015Y1    AOUC    0.0000     0.0000  0.0000   0.0000
-    BENEF       d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)     LSQ  1960Y1:2015Y1   BENEF    0.0000     0.0000  0.0000   0.0000
-    BQY         BQY:=(YK+YN)/PBBP                                                                                  LSQ  1960Y1:2015Y1     BQY    0.0000     0.0000  0.0000   0.0000
+    ACAG        ACAG := ACAG[-1]+r VBBP[-1]+(0.006*VBBP[-1]*(TIME=2001)-0.008*(TIME=2008))                         LSQ              :    ACAG    0.0000     0.0000  0.0000   0.0000
+    AOUC        AOUC:=((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VAFF+VM))[-1]                     LSQ              :    AOUC    0.0000     0.0000  0.0000   0.0000
+    BENEF       d BENEF :=d(VBNP-(IT+ITCEE)+SUB-DPUU-(WCF+SSFFIC+WDOM+WBG+ YN)-(GOSH-DPUH+IDH)-DTF-RIDGG+YIDG)     LSQ              :   BENEF    0.0000     0.0000  0.0000   0.0000
+    BQY         BQY:=(YK+YN)/PBBP                                                                                  LSQ              :     BQY    0.0000     0.0000  0.0000   0.0000
     ...         ...                                                                                                ...            ...     ...       ...        ...     ...      ...        ...
-    YSSF        dln YSSF:=dln WBF_                                                                                 LSQ  1960Y1:2015Y1    YSSF    0.0000     0.0000  0.0000   0.0000
-    YSSG        YSSG := SSF+SSH-(YSSF+COTRES)                                                                      LSQ  1960Y1:2015Y1    YSSG    0.0000     0.0000  0.0000   0.0000
-    ZF          grt ZF :=grt PC+ZX-0.05*grt PME                                                                    LSQ  1960Y1:2015Y1      ZF    0.0000     0.0000  0.0000   0.0000
-    ZJ          grt ZJ :=grt PC +ZX-0.05*grt PME                                                                   LSQ  1960Y1:2015Y1      ZJ    0.0000     0.0000  0.0000   0.0000
-    ZZF_        ZZF_ := ZZF_[-1]                                                                                   LSQ  1960Y1:2015Y1    ZZF_    0.0000     0.0000  0.0000   0.0000
+    YSSF        dln YSSF:=dln WBF_                                                                                 LSQ              :    YSSF    0.0000     0.0000  0.0000   0.0000
+    YSSG        YSSG := SSF+SSH-(YSSF+COTRES)                                                                      LSQ              :    YSSG    0.0000     0.0000  0.0000   0.0000
+    ZF          grt ZF :=grt PC+ZX-0.05*grt PME                                                                    LSQ              :      ZF    0.0000     0.0000  0.0000   0.0000
+    ZJ          grt ZJ :=grt PC +ZX-0.05*grt PME                                                                   LSQ              :      ZJ    0.0000     0.0000  0.0000   0.0000
+    ZZF_        ZZF_ := ZZF_[-1]                                                                                   LSQ              :    ZZF_    0.0000     0.0000  0.0000   0.0000
     <BLANKLINE>
     """
     cdef bint ptr_owner
@@ -111,7 +111,8 @@ cdef class Equations(_AbstractDatabase):
     def _get_object(self, key: str):
         key = key.strip()
         c_eq = self.database_ptr.get(key.encode())
-        return _to_py_equation(key.encode(), c_eq)
+        py_eq = Equation._from_ptr(new CEquation(c_eq), <bint>True) 
+        return py_eq
 
     def _set_object(self, key: str, value):
         cdef CEquation* c_equation
@@ -598,14 +599,12 @@ cdef class Equations(_AbstractDatabase):
         Equation(endogenous = 'YDH_',
                  lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
-                 from_period = '1960Y1',
-                 to_period = '2015Y1',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                             1960Y1:2015Y1
+        sample                                                         :
         comment
         instruments
         block                                                       YDH_
@@ -673,14 +672,12 @@ cdef class Equations(_AbstractDatabase):
         Equation(endogenous = 'YDH_',
                  lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
-                 from_period = '1960Y1',
-                 to_period = '2015Y1',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                             1960Y1:2015Y1
+        sample                                                         :
         comment
         instruments
         block                                                       YDH_
@@ -776,14 +773,12 @@ cdef class Equations(_AbstractDatabase):
         Equation(endogenous = 'YDH_',
                  lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
-                 from_period = '1960Y1',
-                 to_period = '2015Y1',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                             1960Y1:2015Y1
+        sample                                                         :
         comment
         instruments
         block                                                       YDH_
@@ -851,14 +846,12 @@ cdef class Equations(_AbstractDatabase):
         Equation(endogenous = 'YDH_',
                  lec = 'grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH))',
                  method = 'LSQ',
-                 from_period = '1960Y1',
-                 to_period = '2015Y1',
                  comment = ' ',
                  block = 'YDH_')
         >>> df.loc["YDH_"]                  # doctest: +NORMALIZE_WHITESPACE
         lec            grt YDH_ :=grt((WBU_+YN+GOSH_+IDH)-(SSF+SSH+DT...
         method                                                       LSQ
-        sample                                             1960Y1:2015Y1
+        sample                                                         :
         comment
         instruments
         block                                                       YDH_

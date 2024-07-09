@@ -76,8 +76,10 @@ void EstimationResultsDialog::set_tests_tab()
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 6
 void EstimationResultsDialog::plot_yobs_yest()
 {
-    NamedEquation nEq = edit_est_eqs->current_equation();
-    std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
+    Equation current_eq = edit_est_eqs->current_equation();
+    std::string eq_name = current_eq.get_endo();
+
+    std::pair<std::string, std::string> lrhs = current_eq.split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
 
     // prepare local Variables KDB
@@ -89,19 +91,19 @@ void EstimationResultsDialog::plot_yobs_yest()
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
     // set title
-    QString title = QString("Equation %1 : observed and fitted values").arg(QString::fromStdString(nEq.name));
+    QString title = QString("Equation %1 : observed and fitted values").arg(QString::fromStdString(eq_name));
     plotDialog->setTitle(title);
 
     // set the periods for the plot
     plotDialog->setPeriods(*sample);
 
     // observed values
-    values = edit_est_eqs->get_observed_values(nEq.name);
+    values = edit_est_eqs->get_observed_values(eq_name);
     kdb_vars->add("OBSERVED", values);
     plotDialog->addSeries("OBSERVED", lhs + " : observed");
 
     // fitted values
-    values = edit_est_eqs->get_fitted_values(nEq.name);
+    values = edit_est_eqs->get_fitted_values(eq_name);
     kdb_vars->add("FITTED", values);
     plotDialog->addSeries("FITTED", lhs + " : fitted");
 
@@ -113,8 +115,10 @@ void EstimationResultsDialog::plot_yobs_yest()
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 7
 void EstimationResultsDialog::plot_residual()
 {
-    NamedEquation nEq = edit_est_eqs->current_equation();
-    std::pair<std::string, std::string> lrhs = nEq.eq.split_equation();
+    Equation current_eq = edit_est_eqs->current_equation();
+    std::string eq_name = current_eq.get_endo();
+
+    std::pair<std::string, std::string> lrhs = current_eq.split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
 
     // prepare local Variables KDB
@@ -125,14 +129,14 @@ void EstimationResultsDialog::plot_residual()
     PlotVariablesDialog* plotDialog = new PlotVariablesDialog(kdb_vars);
 
     // set title
-    QString title = QString("Equation %1 : residuals").arg(QString::fromStdString(nEq.name));
+    QString title = QString("Equation %1 : residuals").arg(QString::fromStdString(eq_name));
     plotDialog->setTitle(title);
 
     // set the periods for the plot
     plotDialog->setPeriods(*sample);
 
     // residual values
-    Variable values = edit_est_eqs->get_residual_values(nEq.name);
+    Variable values = edit_est_eqs->get_residual_values(eq_name);
     kdb_vars->add("RESIDUALS", values);
     plotDialog->addSeries("RESIDUALS", lhs + " : residuals");
 
@@ -227,7 +231,7 @@ void EstimationResultsDialog::print_output()
     cursor.insertHtml("<h3>Tests By Equation</h3>");
     cursor.insertText("\n\n");
 
-    Equation eq = edit_est_eqs->current_equation().eq;
+    Equation eq = edit_est_eqs->current_equation();
     std::array<float, EQS_NBTESTS> tests = eq.get_tests();
 
     QTextTable* table = cursor.insertTable(vEquationTests.size() + 1, 2);

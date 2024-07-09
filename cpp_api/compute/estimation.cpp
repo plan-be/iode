@@ -246,7 +246,7 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
 
     std::string name = *current_eq;
     Equation eq = kdb_eqs->get(name);
-    eq.set_lec(lec, name);
+    eq.set_lec(lec);
     eq.set_comment(comment);
     kdb_eqs->update(name, eq);
 }

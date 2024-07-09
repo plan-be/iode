@@ -165,6 +165,8 @@ static int KE_update(char* name, char* lec, int method, SAMPLE* smpl, float* tes
     else 
         eq = KEVAL(K_WS[EQUATIONS], pos);
 
+    SW_nfree(eq->endo);
+    eq->endo = SCR_stracpy(name);
     SW_nfree(eq->lec);
     eq->lec = SCR_stracpy(lec);
     eq->method = method;

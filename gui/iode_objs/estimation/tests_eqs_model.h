@@ -13,7 +13,7 @@
 
 class TestsEqsModel : public QAbstractTableModel
 {
-    QVector<NamedEquation> v_eqs;
+    QVector<Equation> v_eqs;
 
 public:
     TestsEqsModel(EditAndEstimateEquations* edit_est_eqs, QObject* parent = nullptr);

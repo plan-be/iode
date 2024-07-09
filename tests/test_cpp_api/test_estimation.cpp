@@ -47,19 +47,19 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     // current equation
-    NamedEquation named_eq = est.current_equation();
-    EXPECT_EQ(named_eq.name, "ACAF");
-    EXPECT_EQ(named_eq.eq.get_lec(), eq_ACAF.get_lec());
+    Equation current_eq = est.current_equation();
+    EXPECT_EQ(current_eq.get_endo(), "ACAF");
+    EXPECT_EQ(current_eq.get_lec(), eq_ACAF.get_lec());
 
     // next equation 
-    NamedEquation next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "DPUH");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), eq_DPUH.get_lec());
+    Equation next_eq = est.next_equation();
+    EXPECT_EQ(next_eq.get_endo(), "DPUH");
+    EXPECT_EQ(next_eq.get_lec(), eq_DPUH.get_lec());
 
     // go back to first eq
-    next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "ACAF");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), eq_ACAF.get_lec());
+    next_eq = est.next_equation();
+    EXPECT_EQ(next_eq.get_endo(), "ACAF");
+    EXPECT_EQ(next_eq.get_lec(), eq_ACAF.get_lec());
 
     // ---- add a non existing equation to the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -78,19 +78,19 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     // current equation
-    named_eq = est.current_equation();
-    EXPECT_EQ(named_eq.name, "DPUH");
-    EXPECT_EQ(named_eq.eq.get_lec(), eq_DPUH.get_lec());
+    current_eq = est.current_equation();
+    EXPECT_EQ(current_eq.get_endo(), "DPUH");
+    EXPECT_EQ(current_eq.get_lec(), eq_DPUH.get_lec());
 
     // next equation
-    next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "TEST");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), "TEST := 0");
+    next_eq = est.next_equation();
+    EXPECT_EQ(next_eq.get_endo(), "TEST");
+    EXPECT_EQ(next_eq.get_lec(), "TEST := 0");
 
     // next equation
-    next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "ACAF");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), eq_ACAF.get_lec());
+    next_eq = est.next_equation();
+    EXPECT_EQ(next_eq.get_endo(), "ACAF");
+    EXPECT_EQ(next_eq.get_lec(), eq_ACAF.get_lec());
 
     // ---- remove an equation from the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -110,14 +110,14 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     // current equation
-    named_eq = est.current_equation();
-    EXPECT_EQ(named_eq.name, "ACAF");
-    EXPECT_EQ(named_eq.eq.get_lec(), eq_ACAF.get_lec());
+    current_eq = est.current_equation();
+    EXPECT_EQ(current_eq.get_endo(), "ACAF");
+    EXPECT_EQ(current_eq.get_lec(), eq_ACAF.get_lec());
 
     // next equation
-    next_named_eq = est.next_equation();
-    EXPECT_EQ(next_named_eq.name, "TEST");
-    EXPECT_EQ(next_named_eq.eq.get_lec(), "TEST := 0");
+    next_eq = est.next_equation();
+    EXPECT_EQ(next_eq.get_endo(), "TEST");
+    EXPECT_EQ(next_eq.get_lec(), "TEST := 0");
 
     // ---- currently displayed equation not in the block -> add it to the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -140,9 +140,9 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     // current equation
-    named_eq = est.current_equation();
-    EXPECT_EQ(named_eq.name, "DPUH");
-    EXPECT_EQ(named_eq.eq.get_lec(), eq_DPUH.get_lec());
+    current_eq = est.current_equation();
+    EXPECT_EQ(current_eq.get_endo(), "DPUH");
+    EXPECT_EQ(current_eq.get_lec(), eq_DPUH.get_lec());
 
     // ---- some scalars does not exist yet ----
     Scalars.remove("dpuh_1");

@@ -44,6 +44,7 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     ASSERT_GT(pos, -1);
 
     EQ* c_eq = KEVAL(KE_WS, pos);
+    ASSERT_EQ(std::string(c_eq->endo), eq.get_endo());
     ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
     ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
     ASSERT_EQ(Sample(c_eq->smpl), eq.get_sample());
@@ -53,10 +54,11 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     ASSERT_EQ(c_eq->date, eq.get_date());
 
     // test memcpy between a Equation object and a EQ object
-    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)", "ACAF");
+    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     eq.set_sample("2000Y1", "2020Y1");
     eq.set_method("MAX_LIKELIHOOD");
     memcpy(c_eq, &eq, sizeof(EQ));
+    ASSERT_EQ(std::string(c_eq->endo), eq.get_endo());
     ASSERT_EQ(std::string(c_eq->lec), eq.get_lec());
     ASSERT_EQ((int) c_eq->method, eq.get_method_as_int());
     ASSERT_EQ(Sample(c_eq->smpl), eq.get_sample());
@@ -72,6 +74,11 @@ TEST_F(EquationTest, Equivalence_C_CPP)
     ASSERT_EQ(c_hash, cpp_hash);
 }
 
+TEST_F(EquationTest, Endo)
+{
+    EXPECT_EQ(equation->get_endo(), "ACAF");
+}
+
 TEST_F(EquationTest, Lec)
 {
     // get
@@ -79,7 +86,7 @@ TEST_F(EquationTest, Lec)
 
     // set
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    equation->set_lec(new_lec, name);
+    equation->set_lec(new_lec);
     EXPECT_EQ(equation->get_lec(), new_lec);
 }
 
@@ -275,7 +282,7 @@ TEST_F(EquationTest, Hash)
 
     // different lec
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    equation->set_lec(new_lec, name); 
+    equation->set_lec(new_lec); 
     hash_after = equation_hasher(*equation);
     EXPECT_NE(hash_before, hash_after);
 

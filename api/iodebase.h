@@ -39,7 +39,7 @@ extern int K_lpack(char **,char *);
 extern int K_opack(char **,char *,int *);
 //extern void K_vunpack(void);
 extern TBL *K_tunpack(char *);
-extern EQ *K_eunpack(char *);
+extern EQ *K_eunpack(char *, char *);
 extern IDT* K_iunpack(char *);
 //extern void K_sunpack(void);
 //extern void K_cunpack(void);

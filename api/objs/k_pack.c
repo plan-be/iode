@@ -30,9 +30,9 @@
  * 
  * Unpacking functions
  * -------------------- 
- *      TBL* K_tunpack(char *pack)       Creates a TBL struct from a packed TBL 
- *      EQ*  K_eunpack(char *pack)       Creates an EQ struct from a packed EQ
- *      IDT* K_iunpack(char *pack)       Creates an IDT struct from a packed IDT
+ *      TBL* K_tunpack(char *pack)                   Creates a TBL struct from a packed TBL 
+ *      EQ*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
+ *      IDT* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
  * 
  * Allocation functions (VAR & SCL only)
  * -------------------------------------
@@ -780,13 +780,15 @@ TBL* K_tunpack(char *pack)
  * @return EQ *     allocated EQ (32|64 bits according to the current architecture)
 */
 
-EQ* K_eunpack(char *pack)
+EQ* K_eunpack(char *pack, char *name)
 {
     EQ* eq;
     //char* ptr;
     int     len = 0;
 
     eq = (EQ*)SW_nalloc(sizeof(EQ));
+
+    eq->endo = SCR_stracpy(name);
 
     len = P_get_len(pack, 0);
     eq->lec = SW_nalloc(len);

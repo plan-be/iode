@@ -221,6 +221,7 @@ void K_setvers(KDB* kdb, int i, int vers)
     char    *ptr, *optr, *pack;
     SWHDL   pos, opos;
     char    buf[512];
+    ONAME   name;
     //unsigned char *dptr;
     EQ      *eq;
     TBL     *tbl;
@@ -288,7 +289,7 @@ void K_setvers(KDB* kdb, int i, int vers)
         case EQUATIONS :
             opos = KOBJS(kdb)[i].o_val;
             optr = SW_getptr(opos);
-            eq = K_eunpack(optr);
+            eq = K_eunpack(optr, KONAME(kdb, i));
             SW_free(opos);
             K_epack(&pack, (char *)eq, KOBJS(kdb)[i].o_name);
             E_free(eq);

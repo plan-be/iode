@@ -39,10 +39,9 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations
 		className = "TAB_EDIT_EQUATION";
 		lineEdit_name->setReadOnly(true);
 		
-		NamedEquation named_eq(equation_name);
-		display_equation(named_eq);
+		Equation eq(equation_name);
+		display_equation(eq);
 
-		Equation eq = named_eq.eq;
 		comboBoxMethod->setQValue(eq.get_method_as_int());
 		Sample sample = eq.get_sample();
 		sampleFrom->setQValue(QString::fromStdString(sample.start_period().to_string()));
@@ -104,10 +103,9 @@ void EditEquationDialog::update_list_equations_to_estimate()
 }
 
 // same as ODE_blk_cur() from o_est.c from the old GUI
-void EditEquationDialog::display_equation(const NamedEquation& equation)
+void EditEquationDialog::display_equation(const Equation& eq)
 {
-	lineName->setQValue(QString::fromStdString(equation.name));
-	Equation eq = equation.eq;
+	lineName->setQValue(QString::fromStdString(eq.get_endo()));
 
 	// editable values
 	lineLec->setQValue(QString::fromStdString(eq.get_lec()));
@@ -217,8 +215,8 @@ void EditEquationDialog::estimate()
 		edit_est_eqs.copy_eq_tests_values();
 
 		// refresh the values for the tests of the current equation 
-		NamedEquation named_eq = edit_est_eqs.current_equation();
-		display_equation(named_eq);
+		Equation current_eq = edit_est_eqs.current_equation();
+		display_equation(current_eq);
 	}
 	catch (const std::exception& e)
 	{
@@ -234,7 +232,7 @@ void EditEquationDialog::next()
 		save_current_equation();
 		update_list_equations_to_estimate();
 
-		NamedEquation equation = edit_est_eqs.next_equation();
+		Equation equation = edit_est_eqs.next_equation();
 		display_equation(equation);
 	}
 	catch (const std::exception& e)

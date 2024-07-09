@@ -9,7 +9,7 @@ from libcpp.vector cimport vector
 
 from pyiode.common cimport IodeEquationMethod, IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
-from pyiode.objects.equation cimport NamedEquation
+from pyiode.objects.equation cimport CEquation
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
 
@@ -62,8 +62,8 @@ cdef extern from "cpp_api/compute/estimation.h":
         vector[string] get_list_equations()
         void update_current_equation(const string& lec, const string& comment) except +
 
-        NamedEquation current_equation() except +
-        NamedEquation next_equation() except +
+        CEquation current_equation() except +
+        CEquation next_equation() except +
 
         CCorrelationMatrix* get_correlation_matrix()
         vector[double] get_observed_values(const string& name) except +

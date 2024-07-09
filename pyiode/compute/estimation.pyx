@@ -9,7 +9,7 @@ from libcpp.vector cimport vector
 
 from pyiode.common cimport IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
-from pyiode.objects.equation cimport NamedEquation
+from pyiode.objects.equation cimport CEquation
 from pyiode.iode_database.cpp_api_database cimport KDBScalars as CKDBScalars
 from pyiode.iode_database.cpp_api_database cimport KDBEquations as CKDBEquations
 from pyiode.iode_database.cpp_api_database cimport Variables as cpp_global_variables
@@ -788,8 +788,9 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        cdef NamedEquation named_eq = self.c_estimation_ptr.current_equation()
-        return _to_py_equation(named_eq.name, named_eq.eq)
+        cdef CEquation c_current_eq = self.c_estimation_ptr.current_equation()
+        eq = Equation._from_ptr(new CEquation(c_current_eq), <bint>True)
+        return eq
 
     @property
     def next_equation(self) -> Equation:
@@ -832,8 +833,9 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        cdef NamedEquation named_eq = self.c_estimation_ptr.next_equation()
-        return _to_py_equation(named_eq.name, named_eq.eq)
+        cdef CEquation c_next_eq = self.c_estimation_ptr.next_equation()
+        eq = Equation._from_ptr(new CEquation(c_next_eq), <bint>True)
+        return eq
 
     @property
     def correlation_matrix(self) -> CorrelationMatrix:
