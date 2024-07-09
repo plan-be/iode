@@ -12,8 +12,3 @@ add_subdirectory(test_python)
 if(NOT SKBUILD)
     add_subdirectory(sandbox)
 endif()
-
-# -- IODE-DOS (2023) --
-if(NOT SKBUILD)
-    add_subdirectory(test_c_api_2023)
-endif()
