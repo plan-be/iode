@@ -1,6 +1,6 @@
-// copied/pasted from the /cmd directory
+// copied/pasted from the /cli directory
 
-/************ Fonctions annulées ou a remplacees ************************/
+/************ Fonctions annulï¿½es ou a remplacees ************************/
 
 #include <stdio.h>
 

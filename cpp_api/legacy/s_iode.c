@@ -2,7 +2,7 @@
 
 
 /* ********************************************** *
- * copied/pasted from the /cmd/s_iode.c directory *
+ * copied/pasted from the /cli/s_iode.c directory *
  * ********************************************** */
 
 #include "api/iode.h"
