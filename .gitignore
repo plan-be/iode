@@ -327,8 +327,8 @@ __pycache__/
 *.pyd
 pyproject.toml
 **/*.whl
-python_api/iode/tests/data
-python_api/iode/_version.py
+archives/pyiode_nanobind/iode/tests/data
+archives/pyiode_nanobind/iode/_version.py
 
 # Cake - Uncomment if you are using it
 # tools/**
