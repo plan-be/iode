@@ -1,4 +1,4 @@
-// copied/pasted from the /cmd directory
+// copied/pasted from the /cli directory
 
 #define _IODEVARG_
 #include "iode.h"

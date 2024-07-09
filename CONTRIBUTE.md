@@ -47,7 +47,7 @@ conda install -c conda-forge <list of libraries>
 - **.github\workflows**: Script for Github Actions (Tests + Build GUI + Build LaTeX doc)
 - **api**: C API
 - **cpp_api**: C++ API
-- **cmd**: IODE CLI (Command Line Interface)
+- **cli**: IODE CLI (Command Line Interface)
 - **doc**: User documentation
 - **gui**: Qt GUI
 - **nsis**: NSIS Windows installer
@@ -159,7 +159,7 @@ root_dir_iode> pip install <iode-wheel-file>.whl
 To work on (an) issue(s), create a new local branch from the remote origin/master branch.
 The name of the branch must follow the template: \<your initials\>\_\<keyword\>\_\<rest\> 
 where `keyword` is:
-- `cli` or `cmd` when working on the IODE CLI (cmd)
+- `cli` when working on the IODE CLI
 - `gui` when working on the graphical user interface
 - `python` when working on the Python binding for IODE
 - `doc` when working on the user of dev documentation
@@ -206,9 +206,9 @@ The sub-directory ./.github/actions contains the local actions (used in workflow
 
 The jobs declared in ./.github/workflows/github-actions-debug.yml are triggered according to keywords present 
 in the name of the pushed branch:
-- `build_and_test_api`  -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `python`, `doc` or `nsis`
-- `test_sanitize`       -> NOT triggered if the branch name contains the word `cmd`, `cli`, `gui`, `python`, `doc` or `nsis`
-- `build_cli`           -> triggered if the branch name contains the word `cmd` or `cli`
+- `build_and_test_api`  -> NOT triggered if the branch name contains the word `cli`, `gui`, `python`, `doc` or `nsis`
+- `test_sanitize`       -> NOT triggered if the branch name contains the word `cli`, `gui`, `python`, `doc` or `nsis`
+- `build_cli`           -> triggered if the branch name contains the word `cli`
 - `build_gui`           -> triggered if the branch name contains the word `gui`
 - `build_python`        -> triggered if the branch name contains either the word `python` or `nsis`
 - `build_doc`           -> triggered if the branch name contains either the word `doc` or `nsis`

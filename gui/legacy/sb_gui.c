@@ -1,4 +1,4 @@
-// copied/pasted from the /cmd directory
+// copied/pasted from the /cli directory
 
 /************ Fonctions annul�es ou a remplacees ************************/
 #include "iode.h"
