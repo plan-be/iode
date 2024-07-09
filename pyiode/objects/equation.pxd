@@ -22,8 +22,10 @@ cdef extern from "cpp_api/objects/equation.h":
                   const string&, const string&, const string&, const bool date) except +
         CEquation(const CEquation& other) except +
 
+        string get_endo()
+        
         string get_lec()
-        void set_lec(const string&, const string&) except +
+        void set_lec(const string&) except +
 
         int get_method_as_int()
         string get_method()
@@ -60,13 +62,3 @@ cdef extern from "cpp_api/objects/equation.h":
         string to_string()
 
     size_t hash_value(CEquation&)
-
-    # declare C++ NamedEquation struct
-    cdef cppclass NamedEquation:
-        # attributes
-        string name
-        CEquation eq
-
-        # constructors
-        NamedEquation(const string& name)
-        NamedEquation(const string& name, const CEquation& eq)

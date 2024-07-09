@@ -79,28 +79,42 @@ cdef class Equation:
              from_period = '1960Y1',
              to_period = '2015Y1')
     """
-    cdef string cpp_endogenous
+    cdef bint ptr_owner
     cdef CEquation* c_equation
 
-    def __cinit__(self, endogenous: str, lec: str, method: Union[EqMethod, str] = EqMethod.LSQ, 
+    def __cinit__(self):
+        self.ptr_owner = False
+        self.c_equation = NULL
+
+    def __init__(self, endogenous: str, lec: str, method: Union[EqMethod, str] = EqMethod.LSQ, 
         from_period: Union[str, Period] = "", to_period: Union[str, Period] = "", comment: str = "", 
         instruments: str = "", block: str = "") -> Equation:
         if isinstance(from_period, Period):
             from_period = str(from_period)
-
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
-        self.cpp_endogenous = endogenous.encode()
-        self.c_equation = new CEquation(self.cpp_endogenous, lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
-                                        to_period.encode(), comment.encode(), instruments.encode(), 
-                                        block.encode(), <bint>False)
+        self.ptr_owner = <bint>True
+        self.c_equation = new CEquation(endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
+                                        to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
         self.method = method
 
     def __dealloc__(self):
-        self.cpp_endogenous = b''
-        del self.c_equation
-        self.c_equation = NULL
+        if self.ptr_owner and self.c_equation is not NULL:
+            del self.c_equation
+            self.c_equation = NULL
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    cdef Equation _from_ptr(CEquation* ptr, bint owner=False):
+        """
+        Factory function to create Equation objects from a given CEquation pointer.
+        """
+        # Fast call to __new__() that bypasses the __init__() constructor.
+        cdef Equation wrapper = Equation.__new__(Equation)
+        wrapper.c_equation = ptr
+        wrapper.ptr_owner = owner
+        return wrapper
 
     def get_formated_date(self, format: str = "dd-mm-yyyy") -> str:
         """
@@ -344,13 +358,13 @@ cdef class Equation:
         if isinstance(to_period, Period):
             to_period = str(to_period)
         
-        cpp_eqs_estimate(self.cpp_endogenous, from_period.encode(), to_period.encode())
+        cpp_eqs_estimate(self.c_equation.get_endo(), from_period.encode(), to_period.encode())
 
     # Attributes access
 
     @property
     def endogenous(self) -> str:
-        return self.cpp_endogenous.decode()
+        return self.c_equation.get_endo().decode()
 
     @property
     def lec(self) -> str:
@@ -385,7 +399,7 @@ cdef class Equation:
     @lec.setter
     def lec(self, value: str):
         value = value.strip()
-        self.c_equation.set_lec(value.encode(), self.cpp_endogenous)
+        self.c_equation.set_lec(value.encode())
 
     @property
     def method(self) -> str:
@@ -700,15 +714,3 @@ cdef class Equation:
 
     def __hash__(self) -> int:
         return <int>hash_value_eq(dereference(self.c_equation))
-
-
-cdef Equation _to_py_equation(string endo, CEquation c_eq):
-    str_sample = c_eq.get_sample().to_string().decode()
-    from_period, to_period = str_sample.split(':')
-    py_eq = Equation(endo.decode(), c_eq.get_lec().decode(), c_eq.get_method().decode(), 
-                    from_period, to_period, c_eq.get_comment().decode(), 
-                    c_eq.get_instruments().decode(), c_eq.get_block().decode())
-    py_eq.c_equation.date = c_eq.date
-    for i, test_val in enumerate(c_eq.tests): 
-        py_eq.c_equation.set_test(<IodeEquationTest>i, test_val)
-    return py_eq

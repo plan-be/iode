@@ -451,7 +451,7 @@ Functions for "packing" and "unpacking" IODE objects.
 |Syntax|Description|
 |:---|:---|
 |`TBL* K_tunpack(char *pack)`|Creates a TBL struct from a packed TBL|
-|`EQ* K_eunpack(char *pack)`|Creates an EQ struct from a packed EQ|
+|`EQ* K_eunpack(char *pack, char *name)`|Creates an EQ struct from a packed EQ|
 |`IDT* K_iunpack(char *pack)`|Creates an IDT struct from a packed IDT|
 
 s

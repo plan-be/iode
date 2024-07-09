@@ -4,6 +4,7 @@
 
 void Equation::copy_from_EQ_obj(const EQ* obj)
 {
+    this->endo = copy_char_array(obj->endo); 
     this->lec = copy_char_array(obj->lec);
     // NOTE : we do not use memcpy() because memcpy() actually makes  
     //        a shallow copy of a struct instead of a deep copy
@@ -78,7 +79,8 @@ Equation::Equation(const std::string& name, const std::string& lec, const IodeEq
     this->date = 0L;
     this->solved = '\0';
 
-    set_lec(lec, name);
+    this->endo = copy_string_to_char(name);
+    set_lec(lec);
     set_method(method);
     set_sample(from, to);
     set_comment(comment);
@@ -100,7 +102,8 @@ Equation::Equation(const std::string& name, const std::string& lec, const std::s
     this->date = 0L;
     this->solved = '\0';
 
-    set_lec(lec, name);
+    this->endo = copy_string_to_char(name);
+    set_lec(lec);
     set_method(method);
     set_sample(from, to);
     set_comment(comment);
@@ -119,6 +122,7 @@ Equation::Equation(const Equation& other)
 
 Equation::~Equation()
 {
+    SW_nfree(this->endo);
     SW_nfree(this->lec);
     SW_nfree(this->clec);
     SW_nfree(this->cmt);
@@ -133,6 +137,13 @@ Equation& Equation::operator=(const Equation& other)
     return *this;
 }
 
+// -- endo --
+
+std::string Equation::get_endo() const
+{
+    return std::string(this->endo);
+}
+
 // -- lec --
 
 std::string Equation::get_lec() const
@@ -140,22 +151,20 @@ std::string Equation::get_lec() const
     return std::string(this->lec);
 }
 
-void Equation::set_lec(const std::string& lec, const std::string& endo)
+void Equation::set_lec(const std::string& lec)
 {
     if(lec.empty())
         throw std::invalid_argument("Passed LEC expression is empty");
 
-    if(endo.empty())
-        throw std::invalid_argument("Passed value for endo (equation name) is empty");
-
     char* c_lec = to_char_array(lec);
-    char* c_endo = to_char_array(endo);
     
     // check if LEC expression is valid
-    this->clec = L_solve(c_lec, c_endo);
+    this->clec = L_solve(c_lec, this->endo);
     if(this->clec == NULL) 
         throw std::invalid_argument("Cannot set LEC '" + lec + "' to the equation named '" + endo + "'");
-    
+
+    if(this->lec != NULL) 
+        SW_nfree(this->lec);
     this->lec = copy_char_array(c_lec);
 }
 
@@ -449,6 +458,7 @@ std::pair<std::string, std::string> Equation::split_equation()
 
 bool Equation::operator==(const Equation& other) const
 {
+    if (strcmp(this->endo, other.endo) != 0) return false;
     if (strcmp(this->lec, other.lec) != 0) return false;
     if (this->method != other.method) return false;
     if (memcmp(&(this->smpl), &(other.smpl), sizeof(SAMPLE)) != 0) return false;
@@ -463,13 +473,4 @@ std::size_t hash_value(const Equation& equation)
 {
     std::hash<EQ> eq_hash;
     return eq_hash(equation);
-}
-
-
-NamedEquation::NamedEquation(const std::string& name) : name(name), eq(Equation(name)) 
-{
-}
-
-NamedEquation::NamedEquation(const std::string& name, const Equation& eq) : name(name), eq(eq) 
-{
 }

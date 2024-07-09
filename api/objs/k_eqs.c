@@ -24,6 +24,7 @@ void E_free(EQ* eq)
 {
     if(eq == NULL) return;
 
+    SW_nfree(eq->endo);
     SW_nfree(eq->lec);
     SW_nfree(eq->clec);
     SW_nfree(eq->cmt);

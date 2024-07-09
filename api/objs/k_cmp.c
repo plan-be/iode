@@ -56,8 +56,8 @@ static int K_cmpeqs(char* p1, char* p2, char* name)
     EQ      *eq1 = NULL, *eq2 = NULL;
     CLEC    *cl1 = NULL, *cl2 = NULL;
 
-    eq1 = K_eunpack(p1);
-    eq2 = K_eunpack(p2);
+    eq1 = K_eunpack(p1, name);
+    eq2 = K_eunpack(p2, name);
 
     if(eq1 == NULL || eq2 == NULL) goto done;
 

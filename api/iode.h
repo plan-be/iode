@@ -235,7 +235,7 @@ const static int IODE_NB_FILE_EXT = 31;
 
 
 #define KTVAL(kdb, pos)     (K_tunpack(SW_getptr(kdb->k_objs[pos].o_val)) )
-#define KEVAL(kdb, pos)     (K_eunpack(SW_getptr(kdb->k_objs[pos].o_val)) )
+#define KEVAL(kdb, pos)     (K_eunpack(SW_getptr(kdb->k_objs[pos].o_val), kdb->k_objs[pos].o_name) )
 
 #define KOVAL(kdb, pos)     K_oval0(kdb, pos)
 
@@ -1058,6 +1058,7 @@ typedef struct _idt_ {
 // Before using it, check that the method property value is in the appropriate range: in the very first versions of iode,
 // the allowed values for method were 'l', 'z', instead of 0, 1...
 typedef struct _eq_ {
+    char    *endo;      // endogeneous variable (= equation name)   
     char    *lec;       // LEC form of the equation (LHS := RHS)
     CLEC    *clec;      // Compiled equation for the simulation
     char    solved;     // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")

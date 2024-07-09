@@ -2324,6 +2324,10 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsLoad("fun", TABLES, 46);
     U_test_B_WsLoad("fun", VARIABLES, 394);
 
+    // check equation->endo == equation name
+    for(int i = 0; i < KNB(KE_WS); i++)
+        ASSERT_EQ(std::string(KEVAL(KE_WS, i)->endo), std::string(KONAME(KE_WS, i)));
+
     // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
     U_test_print_title("B_WsSave()");
     U_test_B_WsSave("fun", "fun2", COMMENTS, 317);
@@ -2374,6 +2378,10 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_B_WsImport("fun2.at", TABLES, 46);
     U_test_B_WsImport("fun2.av", VARIABLES, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
+
+    // check equation->endo == equation name
+    for(int i = 0; i < KNB(KE_WS); i++)
+        ASSERT_EQ(std::string(KEVAL(KE_WS, i)->endo), std::string(KONAME(KE_WS, i)));
 
     // int B_WsSample(char* arg)                         $WsSample period_from period_to
     U_test_print_title("B_WsSample()");
