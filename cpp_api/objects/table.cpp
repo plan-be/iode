@@ -424,40 +424,6 @@ void Table::copy_from_TBL_obj(const TBL* obj)
 	t_align  = obj->t_align;
 }
 
-Table::Table(const int pos, KDB* kdb)
-{
-	if (!kdb) 
-		kdb = K_WS[TABLES];
-
-	if (pos < 0 || pos > kdb->k_nb)
-	{
-		IodeExceptionInvalidArguments error("Cannot extract Table");
-		error.add_argument("table position", std::to_string(pos) + 
-			               " (table position must be in range [0, " + std::to_string(kdb->k_nb - 1) + "])");
-		throw error;
-	}
-
-	// Note: KTVAL allocate a new pointer TBL*
-	TBL* tbl = KTVAL(kdb, pos);
-	copy_from_TBL_obj(tbl);
-	T_free(tbl);
-}
-
-Table::Table(const std::string& name, KDB* kdb)
-{
-	if (!kdb) 
-		kdb = K_WS[TABLES];
-
-	int pos = K_find(kdb, to_char_array(name));
-	if (pos < 0) 
-		throw IodeExceptionFunction("Cannot extract Table", "Table with name " + name + " does not exist");
-	
-	// Note: KTVAL allocate a new pointer TBL*
-	TBL* tbl = KTVAL(kdb, pos);
-	copy_from_TBL_obj(tbl);
-	T_free(tbl);
-}
-
 Table::Table(const int nb_columns)
 {
 	initialize(nb_columns);
@@ -536,6 +502,11 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
 	T_auto(this, c_def, c_lecs, c_mode, c_files, c_date);
 
 	SCR_free_tbl((unsigned char**) c_lecs);
+}
+
+Table::Table(const TBL* c_table)
+{
+	copy_from_TBL_obj(c_table);
 }
 
 Table::Table(const Table& table)

@@ -5,7 +5,7 @@ EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbs
 {
 	try
 	{
-		table = new Table(tableName.toStdString(), nullptr);
+		table = new Table(Tables.get(tableName.toStdString()));
 	}
 	catch (const std::exception& e)
 	{

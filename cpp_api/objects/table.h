@@ -187,10 +187,6 @@ private:
     void copy_from_TBL_obj(const TBL* obj);
 
 public:
-	Table(const int pos, KDB* kdb);
-
-	Table(const std::string& name, KDB* kdb);
-
     Table(const int nb_columns);
 
     Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
@@ -202,6 +198,7 @@ public:
     Table(const int nb_columns, const std::string& def, const std::string& lecs, 
 		bool mode = false, bool files = false, bool date = false);
 
+	Table(const TBL* c_table);
 	Table(const Table& table);
 
 	~Table();

@@ -9,7 +9,13 @@ Table KDBTables::copy_obj(const Table& original) const
 
 Table KDBTables::get_unchecked(const int pos) const
 {
-    return Table(pos, get_database());
+	KDB* kdb = get_database();
+	
+	// Note: KTVAL allocate a new pointer TBL*
+	TBL* c_table = KTVAL(kdb, pos);
+	Table table(c_table);
+	T_free(c_table);
+	return table;
 }
 
 std::string KDBTables::get_title(const int pos) const

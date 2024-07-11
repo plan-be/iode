@@ -8,6 +8,7 @@
 #include "utils/iode_exceptions.h"
 #include "time/sample.h"
 #include "objects/table.h"
+#include "KDB/kdb_tables.h"
 #include "KDB/kdb_variables.h"
 
 
