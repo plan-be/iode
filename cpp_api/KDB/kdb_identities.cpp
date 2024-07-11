@@ -11,7 +11,14 @@ Identity KDBIdentities::copy_obj(const Identity& original) const
 
 Identity KDBIdentities::get_unchecked(const int pos) const
 {
-    return Identity(pos, get_database());
+	KDB* kdb = get_database();
+	
+	IDT* c_idt = (IDT*) SW_nalloc(sizeof(IDT));
+    c_idt->lec  = KILEC(kdb, pos);
+    c_idt->clec = KICLEC(kdb, pos);
+	Identity idt(c_idt);
+	SW_nfree(c_idt);
+	return idt;
 }
 
 std::string KDBIdentities::get_lec(const int pos) const

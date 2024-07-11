@@ -9,39 +9,14 @@ void Identity::copy_from_IDT_obj(const IDT* obj)
     this->clec = clec_deep_copy(obj->clec);
 }
 
-Identity::Identity(const int pos, KDB* kdb)
-{
-    if (!kdb) 
-        kdb = K_WS[IDENTITIES];
-
-    if (pos < 0 || pos > kdb->k_nb)
-    {
-        IodeExceptionInvalidArguments error("Cannot extract Identity", "Identity position must be in range [0, " + 
-            std::to_string(kdb->k_nb - 1) + "])");
-        error.add_argument("identity position", std::to_string(pos));
-        throw error;
-    }
-    
-    this->lec  = copy_char_array(KILEC(kdb, pos));
-    this->clec = clec_deep_copy(KICLEC(kdb, pos));
-}
-
-Identity::Identity(const std::string& name, KDB* kdb)
-{
-    if (!kdb) 
-        kdb = K_WS[IDENTITIES];
-
-    int pos = K_find(kdb, to_char_array(name));
-    if (pos < 0) 
-        throw IodeExceptionFunction("Cannot extract Identity", "Identity with name " + name + " does not exist.");
-    
-    this->lec  = copy_char_array(KILEC(kdb, pos));
-    this->clec = clec_deep_copy(KICLEC(kdb, pos));
-}
-
 Identity::Identity(const std::string& lec)
 {
     set_lec(lec);
+}
+
+Identity::Identity(const IDT* c_other)
+{
+    copy_from_IDT_obj(c_other);
 }
 
 Identity::Identity(const Identity& other)

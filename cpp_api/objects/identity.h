@@ -10,13 +10,10 @@ private:
     void copy_from_IDT_obj(const IDT* obj);
 
 public:
-    Identity(const int pos, KDB* kdb = nullptr);
-
-    Identity(const std::string& name, KDB* kdb = nullptr);
-
     Identity(const std::string& lec);
 
-    Identity(const Identity& idt);
+    Identity(const IDT* c_other);
+    Identity(const Identity& other);
 
     ~Identity();
 
