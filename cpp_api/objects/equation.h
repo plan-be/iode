@@ -33,10 +33,6 @@ private:
     void copy_from_EQ_obj(const EQ* obj);
 
 public:
-    Equation(const int pos, KDB* kdb = nullptr);
-
-    Equation(const std::string& name, KDB* kdb = nullptr);
-
     Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method = EQ_LSQ, const std::string& from = "", 
         const std::string& to = "", const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", 
         const bool date = true);
@@ -45,6 +41,7 @@ public:
         const std::string& to = "", const std::string& comment = "", const std::string& instruments = "", const std::string& block = "", 
         const bool date = true);
 
+    Equation(const EQ* c_other);
     Equation(const Equation& other);
 
     ~Equation();

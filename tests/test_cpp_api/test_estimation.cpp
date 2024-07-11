@@ -27,8 +27,8 @@ TEST_F(EstimationTest, SetBlock)
     std::string to = "1996Y1";
     EditAndEstimateEquations est(from, to);
 
-    Equation eq_ACAF("ACAF");
-    Equation eq_DPUH("DPUH");
+    Equation eq_ACAF = Equations.get("ACAF");
+    Equation eq_DPUH = Equations.get("DPUH");
 
     // ---- block = ACAF;DPUH ----
     // set_block("new_block", "currently_displayed_equation")
@@ -174,8 +174,8 @@ TEST_F(EstimationTest, Estimate)
     std::string from = "1980Y1";
     std::string to = "1996Y1";
 
-    Equation eq("ACAF");
-    Equation eq2("DPUH");
+    Equation eq = Equations.get("ACAF");
+    Equation eq2 = Equations.get("DPUH");
 
     Scalars.update("acaf1", 0., 1.);
     Scalars.update("acaf2", 0., 1.);
