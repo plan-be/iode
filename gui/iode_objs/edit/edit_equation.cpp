@@ -39,7 +39,7 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations
 		className = "TAB_EDIT_EQUATION";
 		lineEdit_name->setReadOnly(true);
 		
-		Equation eq(equation_name);
+		Equation eq = Equations.get(equation_name);
 		display_equation(eq);
 
 		comboBoxMethod->setQValue(eq.get_method_as_int());

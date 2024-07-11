@@ -21,53 +21,6 @@ void Equation::copy_from_EQ_obj(const EQ* obj)
     memcpy(&(this->tests), &(obj->tests), EQS_NBTESTS * sizeof(float));
 }
 
-Equation::Equation(const int pos, KDB* kdb)
-{
-    if (!kdb) 
-        kdb = K_WS[EQUATIONS];
-
-    if (pos < 0 || pos > kdb->k_nb)
-    {
-        IodeExceptionInvalidArguments error("Cannot extract Equation", "Equation position must be in range [0, " + 
-            std::to_string(kdb->k_nb - 1) + "])");
-        error.add_argument("equation position", std::to_string(pos));
-        throw error;
-    }
-
-    // Note: KEVAL allocate a new pointer EQ*
-    EQ* c_eq = KEVAL(kdb, pos);
-    copy_from_EQ_obj(c_eq);
-    E_free(c_eq);
-
-    // re-compute CLEC
-    char* name = KONAME(kdb, pos);
-    this->clec = L_solve(this->lec, name);
-    if (this->clec == NULL)
-        throw std::runtime_error("Failed to compute LEC expression '" + std::string(this->lec) + 
-                    "' of equation named '" + std::string(name) + "'");
-}
-
-Equation::Equation(const std::string& name, KDB* kdb)
-{
-    if (!kdb) 
-        kdb = K_WS[EQUATIONS];
-
-    int pos = K_find(kdb, to_char_array(name));
-    if (pos < 0) 
-        throw IodeExceptionFunction("Cannot extract Equation", "Equation with name " + name + " does not exist.");
-    
-    // Note: KEVAL allocate a new pointer EQ*
-    EQ* c_eq = KEVAL(kdb, pos);
-    copy_from_EQ_obj(c_eq);
-    E_free(c_eq);
-
-    // re-compute CLEC
-    this->clec = L_solve(this->lec, to_char_array(name));
-    if (this->clec == NULL)
-        throw std::runtime_error("Failed to compute LEC expression '" + std::string(this->lec) + 
-                    "' of equation named '" + std::string(name) + "'");
-}
-
 Equation::Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method, const std::string& from, 
     const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
 {
@@ -114,6 +67,10 @@ Equation::Equation(const std::string& name, const std::string& lec, const std::s
         update_date();
 }
 
+Equation::Equation(const EQ* c_other)
+{
+    copy_from_EQ_obj(c_other);
+}
 
 Equation::Equation(const Equation& other)
 {

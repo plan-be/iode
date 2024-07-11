@@ -9,7 +9,18 @@ Equation KDBEquations::copy_obj(const Equation& original) const
 
 Equation KDBEquations::get_unchecked(const int pos) const
 {
-    return Equation(pos, get_database());
+    KDB* kdb = get_database();
+
+    // Note: KEVAL allocate a new pointer EQ*
+    EQ* c_eq = KEVAL(kdb, pos);
+    // re-compute CLEC
+    c_eq->clec = L_solve(c_eq->lec, c_eq->endo);
+    if (c_eq->clec == NULL)
+        throw std::runtime_error("Failed to compute LEC expression '" + std::string(c_eq->lec) + 
+                    "' of equation named '" + std::string(c_eq->endo) + "'");
+    Equation eq(c_eq);
+    E_free(c_eq);
+    return eq;
 }
 
 std::string KDBEquations::get_lec(const int pos) const

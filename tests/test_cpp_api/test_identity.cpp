@@ -57,7 +57,7 @@ TEST_F(IdentityTest, GetVariables)
 {
     Identity idt_vars(name_idt_vars, nullptr);
 
-    Equation eq("ACAF");
+    Equation eq = Equations.get("ACAF");
     Sample eq_sample = eq.get_sample();
     Variables.set_sample(eq_sample.start_period(), eq_sample.end_period());
 
