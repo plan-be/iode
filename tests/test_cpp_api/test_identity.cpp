@@ -19,27 +19,19 @@ protected:
 };
 
 
-TEST_F(IdentityTest, CreateDeleteCopy)
+TEST_F(IdentityTest, CreateAndCopy)
 {
-    Identity* idt = nullptr;
-    Identity* idt_copy = nullptr;
+    std::string lec = "1 - exp((gamma2 + gamma3 * ln(W/ZJ)[-1] + gamma4 * ln(WMIN/ZJ))/gamma_)";
     
-    idt = new Identity(0, nullptr);
-    delete idt;
-
-    idt = new Identity(name_idt_coeffs, nullptr);
-    delete idt;
-
-    idt = new Identity(name_idt_coeffs, nullptr);
-    idt_copy = new Identity(*idt);
-    delete idt_copy;
-    delete idt;
+    Identity idt(lec);
+    Identity idt_copy(idt);
+    ASSERT_EQ(idt.get_lec(), idt_copy.get_lec());
 }
 
 
 TEST_F(IdentityTest, GetCoefficients)
 {
-    Identity idt_coeffs(name_idt_coeffs, nullptr);
+    Identity idt_coeffs = Identities.get(name_idt_coeffs);
 
     std::vector<std::string> expected_coefs_list = {"gamma2", "gamma3", "gamma4", "gamma_"};
     std::vector<std::string> coefs_list = idt_coeffs.get_coefficients_list();
@@ -55,7 +47,7 @@ TEST_F(IdentityTest, GetCoefficients)
 
 TEST_F(IdentityTest, GetVariables)
 {
-    Identity idt_vars(name_idt_vars, nullptr);
+    Identity idt_vars = Identities.get(name_idt_vars);
 
     Equation eq = Equations.get("ACAF");
     Sample eq_sample = eq.get_sample();
