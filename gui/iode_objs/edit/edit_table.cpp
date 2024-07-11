@@ -37,6 +37,9 @@ EditTableDialog::EditTableDialog(const QString& name, KDBTables* database, QWidg
 
 EditTableDialog::~EditTableDialog()
 {
+	if(table)
+		delete table;
+
 	delete wInsertLineType;
 	delete wInsertWhere;
 
@@ -50,11 +53,13 @@ void EditTableDialog::edit()
 	{
 		std::string name_ = lineEdit_name->text().toStdString();
 		EditTableModel* edit_table_model = static_cast<EditTableModel*>(tableView->model());
-		Table table_ = edit_table_model->getIodeTable();
+		Table* table_ = edit_table_model->getIodeTable();
+		if((!table) || (!table_))
+			throw std::runtime_error("Cannot edit Table with name '" + name_ + "' not found");
 
 		if(name_ == name)
 		{
-			if(table_ == table)
+			if(*table_ == *table)
 			{
 				this->accept();
 				return;

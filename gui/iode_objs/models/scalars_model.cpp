@@ -8,22 +8,22 @@ QVariant ScalarsModel::dataCell(const int row, const int col) const
 
 	try
 	{
-		Scalar scalar = displayed_database->get(row);
+		Scalar* scalar = displayed_database->get(row);
 
 		switch (col)
 		{
 		case 0:
-			value = valueToString(scalar.val);
+			value = valueToString(scalar->val);
 			break;
 		case 1:
-			value = valueToString(scalar.relax);
+			value = valueToString(scalar->relax);
 			break;
 		case 2:
-			value = valueToString(scalar.std);
+			value = valueToString(scalar->std);
 			break;
 		case 3:
-			if (IODE_IS_A_NUMBER(scalar.val) && IODE_IS_A_NUMBER(scalar.std) && !IODE_IS_0(scalar.std))
-				value = valueToString(scalar.val / scalar.std);
+			if (IODE_IS_A_NUMBER(scalar->val) && IODE_IS_A_NUMBER(scalar->std) && !IODE_IS_0(scalar->std))
+				value = valueToString(scalar->val / scalar->std);
 			else
 				value = NAN_REP;
 			break;
@@ -43,16 +43,16 @@ bool ScalarsModel::setValue(const int row, const int column, const QVariant& val
 {
 	try
 	{
-		Scalar scalar = displayed_database->get(row);
+		Scalar* scalar = displayed_database->get(row);
 		double val = (value == "--") ? IODE_NAN : value.toDouble();
 
 		switch (column)
 		{
 		case 0:
-			displayed_database->update(row, val, scalar.relax);
+			displayed_database->update(row, val, scalar->relax);
 			break;
 		case 1:
-			displayed_database->update(row, scalar.val, val);
+			displayed_database->update(row, scalar->val, val);
 			break;
 		default:
 			break;

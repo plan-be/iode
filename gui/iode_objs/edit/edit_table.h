@@ -39,7 +39,7 @@ class EditTableDialog : public IodeSettingsDialog, public Ui::EditTableDialog
     Q_OBJECT
 
     std::string name;
-    Table table;
+    Table* table;
     KDBTables* database;
 
     QShortcut* shortcutDelete;

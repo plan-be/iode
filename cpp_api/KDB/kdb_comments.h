@@ -6,7 +6,7 @@ class KDBComments : public KDBTemplate<Comment>
 {
 protected:
 
-    Comment copy_obj(const Comment& original) const override;
+    Comment copy_obj(const Comment original) const override { return original; }
 
     Comment get_unchecked(const int pos) const override;
 

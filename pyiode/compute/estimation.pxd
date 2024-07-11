@@ -62,8 +62,8 @@ cdef extern from "cpp_api/compute/estimation.h":
         vector[string] get_list_equations()
         void update_current_equation(const string& lec, const string& comment) except +
 
-        CEquation current_equation() except +
-        CEquation next_equation() except +
+        CEquation* current_equation() except +
+        CEquation* next_equation() except +
 
         CCorrelationMatrix* get_correlation_matrix()
         vector[double] get_observed_values(const string& name) except +

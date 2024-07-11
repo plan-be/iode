@@ -788,8 +788,8 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        cdef CEquation c_current_eq = self.c_estimation_ptr.current_equation()
-        eq = Equation._from_ptr(new CEquation(c_current_eq), <bint>True)
+        cdef CEquation* c_current_eq = self.c_estimation_ptr.current_equation()
+        eq = Equation._from_ptr(c_current_eq, <bint>True)
         return eq
 
     @property
@@ -833,8 +833,8 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        cdef CEquation c_next_eq = self.c_estimation_ptr.next_equation()
-        eq = Equation._from_ptr(new CEquation(c_next_eq), <bint>True)
+        cdef CEquation* c_next_eq = self.c_estimation_ptr.next_equation()
+        eq = Equation._from_ptr(c_next_eq, <bint>True)
         return eq
 
     @property

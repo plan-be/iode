@@ -31,9 +31,9 @@ public:
 
 	~EditTableModel();
 
-	Table getIodeTable() const
+	Table* getIodeTable() const
 	{
-		return *table;
+		return table;
 	}
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const;

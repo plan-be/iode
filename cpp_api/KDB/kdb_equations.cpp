@@ -2,12 +2,12 @@
 #include "kdb_equations.h"
 
 
-Equation KDBEquations::copy_obj(const Equation& original) const
+Equation* KDBEquations::copy_obj(Equation* const original) const
 {
-    return Equation(original);
+    return new Equation(*original);
 }
 
-Equation KDBEquations::get_unchecked(const int pos) const
+Equation* KDBEquations::get_unchecked(const int pos) const
 {
     KDB* kdb = get_database();
 
@@ -18,9 +18,7 @@ Equation KDBEquations::get_unchecked(const int pos) const
     if (c_eq->clec == NULL)
         throw std::runtime_error("Failed to compute LEC expression '" + std::string(c_eq->lec) + 
                     "' of equation named '" + std::string(c_eq->endo) + "'");
-    Equation eq(c_eq);
-    E_free(c_eq);
-    return eq;
+    return static_cast<Equation*>(c_eq);
 }
 
 std::string KDBEquations::get_lec(const int pos) const

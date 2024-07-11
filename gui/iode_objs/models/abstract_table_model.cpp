@@ -277,14 +277,16 @@ QStringList IodeTemplateTableModel<K>::getSameNameObjOrObjsFromClec(const QStrin
 
 	if(this_type == EQUATIONS)
 	{
-		Equation eq = Equations.get(std_name);
-		std_list = (other_type == SCALARS) ? eq.get_coefficients_list() : eq.get_variables_list();
+		Equation* eq = Equations.get(std_name);
+		std_list = (other_type == SCALARS) ? eq->get_coefficients_list() : eq->get_variables_list();
+		delete eq;
 	}
 	
 	if(this_type == IDENTITIES)
 	{
-		Identity idt = Identities.get(std_name);
-		std_list = (other_type == SCALARS) ? idt.get_coefficients_list() : idt.get_variables_list();
+		Identity* idt = Identities.get(std_name);
+		std_list = (other_type == SCALARS) ? idt->get_coefficients_list() : idt->get_variables_list();
+		delete idt;
 	}
 
 	switch (other_type)

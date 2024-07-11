@@ -38,6 +38,7 @@ class EditEquationDialog : public IodeSettingsDialog, public Ui::EditEquationDia
     IodeCompleter* completer;
 
     KDBEquations* database;
+    Equation* eq;
 
     WrapperIodeNameEdit*    lineName;
     WrapperComboBox*        comboBoxMethod;
@@ -56,7 +57,7 @@ protected:
 private:
     void save_current_equation();
     void update_list_equations_to_estimate();
-    void display_equation(const Equation& eq);
+    void display_equation();
 
 public:
     EditEquationDialog(const QString& equationName, KDBEquations* database, QWidget* parent = Q_NULLPTR);

@@ -2,11 +2,6 @@
 #include "kdb_comments.h"
 
 
-Comment KDBComments::copy_obj(const Comment& original) const
-{
-    return Comment(original);
-}
-
 Comment KDBComments::get_unchecked(const int pos) const
 {
     Comment comment = std::string(KCVAL(get_database(), pos));

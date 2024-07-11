@@ -4,21 +4,21 @@
 
 // CRUD (Create - Read - Update - Delete) + Copy methods
 
-Identity KDBIdentities::copy_obj(const Identity& original) const
+Identity* KDBIdentities::copy_obj(Identity* const original) const
 {
-    return Identity(original);
+    return new Identity(*original);
 }
 
-Identity KDBIdentities::get_unchecked(const int pos) const
+Identity* KDBIdentities::get_unchecked(const int pos) const
 {
 	KDB* kdb = get_database();
 	
 	IDT* c_idt = (IDT*) SW_nalloc(sizeof(IDT));
-    c_idt->lec  = KILEC(kdb, pos);
-    c_idt->clec = KICLEC(kdb, pos);
-	Identity idt(c_idt);
-	SW_nfree(c_idt);
-	return idt;
+    c_idt->lec = copy_char_array(KILEC(kdb, pos));
+    // NOTE : we do not use memcpy() because memcpy() actually makes  
+    //        a shallow copy of a struct instead of a deep copy
+    c_idt->clec = clec_deep_copy(KICLEC(kdb, pos));
+	return static_cast<Identity*>(c_idt);
 }
 
 std::string KDBIdentities::get_lec(const int pos) const
