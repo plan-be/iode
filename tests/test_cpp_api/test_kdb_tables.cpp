@@ -121,7 +121,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     int nb_lines_header = 0;
     int nb_lines_footnotes = 0;
     int nb_lines_vars = 0;
-    Table table1(name, nullptr);
+    Table table1 = Tables.get(name);
     EXPECT_EQ(table1.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // remove table
@@ -140,7 +140,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     nb_lines_vars = vars.size() + vars_envi_list.size() - 1;    // -1 for list_name which is expanded
-    Table table2(name, nullptr);
+    Table table2 = Tables.get(name);
     EXPECT_EQ(table2.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // check lines
@@ -195,7 +195,7 @@ TEST_F(KDBTablesTest, CreateRemove)
 
     // check lines
     nb_lines_vars = (int) lecs.size();
-    Table table3(name, nullptr);
+    Table table3 = Tables.get(name);
     EXPECT_EQ(table3.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     line = table3.get_line(0);
@@ -247,7 +247,7 @@ TEST_F(KDBTablesTest, CreateRemove)
 
     // check lines
     nb_lines_vars = lecs.size() + vars_envi_list.size();
-    Table table4(name, nullptr);
+    Table table4 = Tables.get(name);
     EXPECT_EQ(table4.nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     std::vector<std::string> expanded_lecs = lecs;
@@ -487,7 +487,7 @@ TEST_F(KDBTablesTest, Merge)
     bool files = true;
     bool date = true;
     kdb_to_merge->add(new_name, 2, def, vars, mode, files, date);
-    Table new_table(new_name, kdb_to_merge);
+    Table new_table = kdb_to_merge->get(new_name);
 
     // modify an existing element of the KDB to be merge
     std::string name = "ANAPRIX";
