@@ -143,7 +143,7 @@ void ComputedTable::initialize()
 
 ComputedTable::ComputedTable(const std::string& ref_table_name, const std::string& gsample) : gsample(gsample)
 {
-    ref_table = new Table(Tables.get(ref_table_name));
+    ref_table = Tables.get(ref_table_name);
     initialize();
 }
 

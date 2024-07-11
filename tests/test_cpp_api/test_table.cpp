@@ -9,7 +9,7 @@ protected:
     void SetUp() override
     {
         KDBTables kdb_tbl(input_test_dir + "fun.tbl");
-        table = new Table(Tables.get("GFRPC"));
+        table = Tables.get("GFRPC");
     }
 
     void TearDown() override 
@@ -559,7 +559,7 @@ TEST_F(TablesTest, Hash)
     hash_before = table_hasher(*table);
 
     // same table
-    Table* same_table = new Table(Tables.get("GFRPC"));
+    Table* same_table = Tables.get("GFRPC");
     EXPECT_EQ(*table, *same_table);
     hash_after = table_hasher(*same_table);
     EXPECT_EQ(hash_before, hash_after);

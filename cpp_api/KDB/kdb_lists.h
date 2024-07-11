@@ -6,7 +6,7 @@ class KDBLists : public KDBTemplate<List>
 {
 protected:
 
-    List copy_obj(const List& original) const override;
+    List copy_obj(const List original) const override { return original; }
 
     List get_unchecked(const int pos) const override;
 

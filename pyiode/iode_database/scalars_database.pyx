@@ -103,15 +103,11 @@ cdef class Scalars(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(key).__name__}")
+    def _get_object(self, key: str):
         key = key.strip()
-
-        cdef CScalar c_scalar = self.database_ptr.get(key.encode())
-        py_scalar = Scalar(c_scalar.val, c_scalar.relax)
-        py_scalar.c_scalar.std = c_scalar.std
+        cdef CScalar* c_scalar = self.database_ptr.get(key.encode())
+        # self.database_ptr.get() does not allocate a new C++ Scalar instance
+        py_scalar = Scalar._from_ptr(c_scalar, <bint>False) 
         return py_scalar
 
     def _set_object(self, key, value):

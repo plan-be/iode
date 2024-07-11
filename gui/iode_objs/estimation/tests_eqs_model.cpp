@@ -12,12 +12,20 @@ TestsEqsModel::TestsEqsModel(EditAndEstimateEquations* edit_est_eqs, QObject* pa
         v_eqs.append(kdb_eqs->get(eq_name));
 }
 
+TestsEqsModel::~TestsEqsModel()
+{
+    for(int i=0; i < v_eqs.size(); i++)
+        if(v_eqs[i])
+            delete v_eqs[i];
+    v_eqs.clear();
+}
+
 QVariant TestsEqsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
     if(orientation == Qt::Horizontal)
-        return QString::fromStdString(v_eqs[section].get_endo());
+        return QString::fromStdString(v_eqs[section]->get_endo());
     else
         return QString::fromStdString(vEquationTests[section]);
 }
@@ -32,8 +40,8 @@ QVariant TestsEqsModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        Equation eq = v_eqs[index.column()];
-        float value = eq.get_test((IodeEquationTest) index.row());
+        Equation* eq = v_eqs[index.column()];
+        float value = eq->get_test((IodeEquationTest) index.row());
         return QString::number(value, 'g', 8);
     }
     

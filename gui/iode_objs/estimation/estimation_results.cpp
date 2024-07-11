@@ -76,11 +76,12 @@ void EstimationResultsDialog::set_tests_tab()
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 6
 void EstimationResultsDialog::plot_yobs_yest()
 {
-    Equation current_eq = edit_est_eqs->current_equation();
-    std::string eq_name = current_eq.get_endo();
+    Equation* current_eq = edit_est_eqs->current_equation();
+    std::string eq_name = current_eq->get_endo();
 
-    std::pair<std::string, std::string> lrhs = current_eq.split_equation();
+    std::pair<std::string, std::string> lrhs = current_eq->split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
+    delete current_eq;
 
     // prepare local Variables KDB
     Variable values;
@@ -115,11 +116,12 @@ void EstimationResultsDialog::plot_yobs_yest()
 // same as o_estgr() in DOS o_gr.c + see ODE_blk_res_fn() case 7
 void EstimationResultsDialog::plot_residual()
 {
-    Equation current_eq = edit_est_eqs->current_equation();
-    std::string eq_name = current_eq.get_endo();
+    Equation* current_eq = edit_est_eqs->current_equation();
+    std::string eq_name = current_eq->get_endo();
 
-    std::pair<std::string, std::string> lrhs = current_eq.split_equation();
+    std::pair<std::string, std::string> lrhs = current_eq->split_equation();
     QString lhs = QString::fromStdString(lrhs.first);
+    delete current_eq;
 
     // prepare local Variables KDB
     Sample* sample = edit_est_eqs->get_sample();
@@ -231,8 +233,9 @@ void EstimationResultsDialog::print_output()
     cursor.insertHtml("<h3>Tests By Equation</h3>");
     cursor.insertText("\n\n");
 
-    Equation eq = edit_est_eqs->current_equation();
-    std::array<float, EQS_NBTESTS> tests = eq.get_tests();
+    Equation* eq = edit_est_eqs->current_equation();
+    std::array<float, EQS_NBTESTS> tests = eq->get_tests();
+    delete eq;
 
     QTextTable* table = cursor.insertTable(vEquationTests.size() + 1, 2);
 	QTextTableFormat tableFormat = table->format();

@@ -2,17 +2,16 @@
 #include "kdb_scalars.h"
 
 
-Scalar KDBScalars::copy_obj(const Scalar& original) const
+Scalar* KDBScalars::copy_obj(Scalar* const original) const
 {
-	return Scalar(original);
+	return new Scalar(*original);
 }
 
-Scalar KDBScalars::get_unchecked(const int pos) const
+Scalar* KDBScalars::get_unchecked(const int pos) const
 {
 	KDB* kdb = get_database();
-
     // Note: KSVAL does NOT allocate a new pointer SCL*
-    return Scalar(KSVAL(kdb, pos));
+    return static_cast<Scalar*>(KSVAL(kdb, pos));
 }
 
 int KDBScalars::add(const std::string& name, const Scalar& obj)

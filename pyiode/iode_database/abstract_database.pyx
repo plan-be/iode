@@ -938,7 +938,7 @@ cdef class _AbstractDatabase:
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
         ----- | ---------------------------------------------------------------------------------------------------------
-        CELL  | ""                                                         |                     "#S"
+        CELL  |                                                            |                     "#S"
         CELL  | "Revenus primaires"                                        |                            WBU_+YN+GOSH_+IDH
         CELL  | "   Masse salariale totale"                                |                                         WBU_
         CELL  | "   Revenu net du travail en provenance du Reste du monde" |                                           YN

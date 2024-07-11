@@ -151,7 +151,8 @@ cdef class Lists(_AbstractDatabase):
         return subset_db
 
     def _get_object(self, key: str) -> List[str]:
-        str_list = self.database_ptr.get(key.strip().encode()).decode()
+        key = key.strip()
+        str_list = self.database_ptr.get(key.encode()).decode()
         return split_list(str_list)
 
     def _set_object(self, key: str, value: Union[str, List[str]]):

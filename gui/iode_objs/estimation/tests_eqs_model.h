@@ -13,10 +13,11 @@
 
 class TestsEqsModel : public QAbstractTableModel
 {
-    QVector<Equation> v_eqs;
+    QVector<Equation*> v_eqs;
 
 public:
     TestsEqsModel(EditAndEstimateEquations* edit_est_eqs, QObject* parent = nullptr);
+	~TestsEqsModel();
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{

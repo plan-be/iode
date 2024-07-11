@@ -19,9 +19,10 @@ bool TablesModel::setValue(const int row, const int column, const QVariant& valu
 	try
 	{
 		QString title = value.toString();
-		Table table = displayed_database->get(row);
-		table.set_title(0, title.toStdString());
+		Table* table = displayed_database->get(row);
+		table->set_title(0, title.toStdString());
 		displayed_database->update(row, table);
+		delete table;
 		return true;
 	}
 	catch(const std::exception& e)

@@ -126,7 +126,7 @@ cdef class TableCell:
     DIVIS | 1                            |
     TITLE |                        "Analyse des prix"
     ----- | ---------------------------------------------------------------
-    CELL  | ""                           |               "#s"
+    CELL  |                              |               "#s"
     ----- | ---------------------------------------------------------------
     CELL  | "GAP_"                       |                             GAP_
     CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -421,7 +421,7 @@ cdef class TableLine:
     DIVIS | 1                            |
     TITLE |                        "Analyse des prix"
     ----- | ---------------------------------------------------------------
-    CELL  | ""                           |               "#s"
+    CELL  |                              |               "#s"
     ----- | ---------------------------------------------------------------
     CELL  | "GAP_"                       |                             GAP_
     CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -491,7 +491,7 @@ cdef class TableLine:
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
         ----- | ---------------------------------------------------------------
-        CELL  | ""                           |               "#s"
+        CELL  |                              |               "#s"
         ----- | ---------------------------------------------------------------
         CELL  | "GAP_"                       |                             GAP_
         CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -537,7 +537,7 @@ cdef class TableLine:
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
         ----- | ---------------------------------------------------------------
-        CELL  | ""                           |               "#s"
+        CELL  |                              |               "#s"
         ----- | ---------------------------------------------------------------
         CELL  | "GAP_"                       |                             GAP_
         CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -593,7 +593,7 @@ cdef class TableLine:
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
         ----- | ---------------------------------------------------------------
-        CELL  | ""                           |               "#s"
+        CELL  |                              |               "#s"
         ----- | ---------------------------------------------------------------
         CELL  | "GAP_"                       |                             GAP_
         CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -657,7 +657,7 @@ cdef class TableLine:
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
         ----- | ---------------------------------------------------------------
-        CELL  | ""                           |               "#s"
+        CELL  |                              |               "#s"
         ----- | ---------------------------------------------------------------
         CELL  | "GAP_"                       |                             GAP_
         CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -706,7 +706,7 @@ cdef class TableLine:
         DIVIS | 1                            |
         TITLE |                        "Analyse des prix"
         ----- | ---------------------------------------------------------------
-        CELL  | ""                           |               "#s"
+        CELL  |                              |               "#s"
         ----- | ---------------------------------------------------------------
         CELL  | "GAP_"                       |                             GAP_
         CELL  | "dln (PC/(1+ITCR))-dln AOUC" | 100*(dln (PC/(1+ITCR))-dln AOUC)
@@ -1637,7 +1637,7 @@ cdef class Table:
         DIVIS | 1                                  |
         TITLE |      "Déterminants de l'output potentiel"
         ----- | ---------------------------------------------
-        CELL  | ""                                 |   "#s"
+        CELL  |                                    |   "#s"
         ----- | ---------------------------------------------
         CELL  | "Output potentiel"                 |  Q_F+Q_I
         CELL  | "Stock de capital"                 | KNFF[-1]

@@ -296,12 +296,12 @@ public:
      */
     void update_current_equation(const std::string& lec, const std::string& comment);
 
-    Equation current_equation() 
+    Equation* current_equation() 
     {
         return kdb_eqs->get(*current_eq);
     }
 
-    Equation next_equation()
+    Equation* next_equation()
     {
         current_eq++;
         

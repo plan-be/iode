@@ -3,7 +3,7 @@
 
 EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations* database, 
 	QWidget* parent) : IodeSettingsDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint), 
-	database(database)
+	database(database), eq(nullptr)
 {
 	setupUi(this);
 
@@ -39,15 +39,15 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations
 		className = "TAB_EDIT_EQUATION";
 		lineEdit_name->setReadOnly(true);
 		
-		Equation eq = Equations.get(equation_name);
-		display_equation(eq);
+		eq = Equations.get(equation_name);
+		display_equation();
 
-		comboBoxMethod->setQValue(eq.get_method_as_int());
-		Sample sample = eq.get_sample();
+		comboBoxMethod->setQValue(eq->get_method_as_int());
+		Sample sample = eq->get_sample();
 		sampleFrom->setQValue(QString::fromStdString(sample.start_period().to_string()));
 		sampleTo->setQValue(QString::fromStdString(sample.end_period().to_string()));
-		lineBlock->setQValue(QString::fromStdString(eq.get_block()));
-		lineInstruments->setQValue(QString::fromStdString(eq.get_instruments()));
+		lineBlock->setQValue(QString::fromStdString(eq->get_block()));
+		lineInstruments->setQValue(QString::fromStdString(eq->get_instruments()));
 		
 		update_list_equations_to_estimate();
 	}
@@ -61,6 +61,9 @@ EditEquationDialog::EditEquationDialog(const QString& equationName, KDBEquations
 
 EditEquationDialog::~EditEquationDialog() 
 {
+	if(eq)
+		delete eq;
+	
 	delete lineName;
 	delete comboBoxMethod;
 	delete sampleFrom;
@@ -103,16 +106,19 @@ void EditEquationDialog::update_list_equations_to_estimate()
 }
 
 // same as ODE_blk_cur() from o_est.c from the old GUI
-void EditEquationDialog::display_equation(const Equation& eq)
+void EditEquationDialog::display_equation()
 {
-	lineName->setQValue(QString::fromStdString(eq.get_endo()));
+	if(!eq)
+		return;
+	
+	lineName->setQValue(QString::fromStdString(eq->get_endo()));
 
 	// editable values
-	lineLec->setQValue(QString::fromStdString(eq.get_lec()));
-	lineComment->setQValue(QString::fromStdString(eq.get_comment()));
+	lineLec->setQValue(QString::fromStdString(eq->get_lec()));
+	lineComment->setQValue(QString::fromStdString(eq->get_comment()));
 
 	// read-only values
-	std::array<float, EQS_NBTESTS> tests = eq.get_tests();
+	std::array<float, EQS_NBTESTS> tests = eq->get_tests();
 	lineEdit_tests_r2adj->setText(QString::number(tests[EQ_R2ADJ], 'g', 3));
 	lineEdit_tests_durbw->setText(QString::number(tests[EQ_DW], 'g', 3));
 	lineEdit_tests_fstat->setText(QString::number(tests[EQ_FSTAT], 'g', 3));
@@ -215,8 +221,11 @@ void EditEquationDialog::estimate()
 		edit_est_eqs.copy_eq_tests_values();
 
 		// refresh the values for the tests of the current equation 
-		Equation current_eq = edit_est_eqs.current_equation();
-		display_equation(current_eq);
+		if(eq)
+			delete eq;
+		
+		eq = edit_est_eqs.current_equation();
+		display_equation();
 	}
 	catch (const std::exception& e)
 	{
@@ -232,8 +241,11 @@ void EditEquationDialog::next()
 		save_current_equation();
 		update_list_equations_to_estimate();
 
-		Equation equation = edit_est_eqs.next_equation();
-		display_equation(equation);
+		if(eq)
+			delete eq;
+		
+		eq = edit_est_eqs.next_equation();
+		display_equation();
 	}
 	catch (const std::exception& e)
 	{

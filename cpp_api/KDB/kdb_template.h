@@ -12,7 +12,7 @@ private:
     }
 
 protected:
-    virtual T copy_obj(const T& original) const = 0;
+    virtual T copy_obj(const T original) const = 0;
 
     virtual T get_unchecked(const int pos) const = 0;
 

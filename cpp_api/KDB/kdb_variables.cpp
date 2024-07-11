@@ -2,11 +2,6 @@
 #include "kdb_variables.h"
 
 
-Variable KDBVariables::copy_obj(const Variable& original) const
-{
-	return Variable(original);
-}
-
 Variable KDBVariables::get_unchecked(const int pos) const
 {
 	Variable vars;

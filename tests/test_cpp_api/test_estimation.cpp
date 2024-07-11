@@ -27,8 +27,8 @@ TEST_F(EstimationTest, SetBlock)
     std::string to = "1996Y1";
     EditAndEstimateEquations est(from, to);
 
-    Equation eq_ACAF = Equations.get("ACAF");
-    Equation eq_DPUH = Equations.get("DPUH");
+    Equation* eq_ACAF = Equations.get("ACAF");
+    Equation* eq_DPUH = Equations.get("DPUH");
 
     // ---- block = ACAF;DPUH ----
     // set_block("new_block", "currently_displayed_equation")
@@ -47,19 +47,19 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     // current equation
-    Equation current_eq = est.current_equation();
-    EXPECT_EQ(current_eq.get_endo(), "ACAF");
-    EXPECT_EQ(current_eq.get_lec(), eq_ACAF.get_lec());
+    Equation* current_eq = est.current_equation();
+    EXPECT_EQ(current_eq->get_endo(), "ACAF");
+    EXPECT_EQ(current_eq->get_lec(), eq_ACAF->get_lec());
 
     // next equation 
-    Equation next_eq = est.next_equation();
-    EXPECT_EQ(next_eq.get_endo(), "DPUH");
-    EXPECT_EQ(next_eq.get_lec(), eq_DPUH.get_lec());
+    Equation* next_eq = est.next_equation();
+    EXPECT_EQ(next_eq->get_endo(), "DPUH");
+    EXPECT_EQ(next_eq->get_lec(), eq_DPUH->get_lec());
 
     // go back to first eq
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq.get_endo(), "ACAF");
-    EXPECT_EQ(next_eq.get_lec(), eq_ACAF.get_lec());
+    EXPECT_EQ(next_eq->get_endo(), "ACAF");
+    EXPECT_EQ(next_eq->get_lec(), eq_ACAF->get_lec());
 
     // ---- add a non existing equation to the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -79,18 +79,18 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     current_eq = est.current_equation();
-    EXPECT_EQ(current_eq.get_endo(), "DPUH");
-    EXPECT_EQ(current_eq.get_lec(), eq_DPUH.get_lec());
+    EXPECT_EQ(current_eq->get_endo(), "DPUH");
+    EXPECT_EQ(current_eq->get_lec(), eq_DPUH->get_lec());
 
     // next equation
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq.get_endo(), "TEST");
-    EXPECT_EQ(next_eq.get_lec(), "TEST := 0");
+    EXPECT_EQ(next_eq->get_endo(), "TEST");
+    EXPECT_EQ(next_eq->get_lec(), "TEST := 0");
 
     // next equation
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq.get_endo(), "ACAF");
-    EXPECT_EQ(next_eq.get_lec(), eq_ACAF.get_lec());
+    EXPECT_EQ(next_eq->get_endo(), "ACAF");
+    EXPECT_EQ(next_eq->get_lec(), eq_ACAF->get_lec());
 
     // ---- remove an equation from the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -111,13 +111,13 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     current_eq = est.current_equation();
-    EXPECT_EQ(current_eq.get_endo(), "ACAF");
-    EXPECT_EQ(current_eq.get_lec(), eq_ACAF.get_lec());
+    EXPECT_EQ(current_eq->get_endo(), "ACAF");
+    EXPECT_EQ(current_eq->get_lec(), eq_ACAF->get_lec());
 
     // next equation
     next_eq = est.next_equation();
-    EXPECT_EQ(next_eq.get_endo(), "TEST");
-    EXPECT_EQ(next_eq.get_lec(), "TEST := 0");
+    EXPECT_EQ(next_eq->get_endo(), "TEST");
+    EXPECT_EQ(next_eq->get_lec(), "TEST := 0");
 
     // ---- currently displayed equation not in the block -> add it to the block ----
     // set_block("new_block", "currently_displayed_equation")
@@ -141,8 +141,8 @@ TEST_F(EstimationTest, SetBlock)
 
     // current equation
     current_eq = est.current_equation();
-    EXPECT_EQ(current_eq.get_endo(), "DPUH");
-    EXPECT_EQ(current_eq.get_lec(), eq_DPUH.get_lec());
+    EXPECT_EQ(current_eq->get_endo(), "DPUH");
+    EXPECT_EQ(current_eq->get_lec(), eq_DPUH->get_lec());
 
     // ---- some scalars does not exist yet ----
     Scalars.remove("dpuh_1");
@@ -162,10 +162,10 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     KDBScalars* kdb_scl_res = est_new_coeffs.get_scalars();;
-    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").val, 0.9);
-    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").relax, 1.0);
-    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2").val, 0.9);
-    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2").relax, 1.0);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1")->val, 0.9);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1")->relax, 1.0);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2")->val, 0.9);
+    EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2")->relax, 1.0);
 }
 
 
@@ -174,8 +174,8 @@ TEST_F(EstimationTest, Estimate)
     std::string from = "1980Y1";
     std::string to = "1996Y1";
 
-    Equation eq = Equations.get("ACAF");
-    Equation eq2 = Equations.get("DPUH");
+    Equation* eq = Equations.get("ACAF");
+    Equation* eq2 = Equations.get("DPUH");
 
     Scalars.update("acaf1", 0., 1.);
     Scalars.update("acaf2", 0., 1.);
@@ -243,18 +243,18 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(m_corr->get_value(4, 4), 1.);
 
     // Coeff values
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf1").val) / 1e6, 0.01577);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf2").val) / 1e6, -8.e-06);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf4").val) / 1e6, -0.008503);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("dpuh_1").val) / 1e6, 0.010986);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("dpuh_2").val) / 1e6, 0.057489);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf1")->val) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf2")->val) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("acaf4")->val) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("dpuh_1")->val) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("dpuh_2")->val) / 1e6, 0.057489);
 
     KDBScalars* kdb_scl_res = est.get_scalars();
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").val) / 1e6, 0.01577);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").val) / 1e6, -8.e-06);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").val) / 1e6, -0.008503);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_1").val) / 1e6, 0.010986);
-    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_2").val) / 1e6, 0.057489);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1")->val) / 1e6, 0.01577);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2")->val) / 1e6, -8.e-06);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4")->val) / 1e6, -0.008503);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_1")->val) / 1e6, 0.010986);
+    EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("dpuh_2")->val) / 1e6, 0.057489);
 
     // Estimates ACAF only
     est.set_block("ACAF");
@@ -272,19 +272,19 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(E_NEQ, 1);
 
     // Tests values (ACAF)
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stdev").val) / 1e6, 0.00427);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_meany").val) / 1e6, 0.008185);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_ssres").val) / 1e6, 5.2e-05);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stderr").val) / 1e6, 0.001927);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_sderrp").val) / 1e6, 23.542242);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_fstat").val) / 1e6, 32.285107);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2").val) / 1e6, 0.821815);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2adj").val) / 1e6, 0.79636);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_dw").val) / 1e6, 2.33007);
-    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_loglik").val) / 1e6, 83.810104);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stdev")->val) / 1e6, 0.00427);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_meany")->val) / 1e6, 0.008185);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_ssres")->val) / 1e6, 5.2e-05);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_stderr")->val) / 1e6, 0.001927);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_sderrp")->val) / 1e6, 23.542242);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_fstat")->val) / 1e6, 32.285107);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2")->val) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_r2adj")->val) / 1e6, 0.79636);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_dw")->val) / 1e6, 2.33007);
+    EXPECT_DOUBLE_EQ(round(1e6 * Scalars.get("e0_loglik")->val) / 1e6, 83.810104);
 
-    Equation eq_est = Equations.get("ACAF");
-    std::array<float, EQS_NBTESTS> tests = eq_est.get_tests();
+    Equation* eq_est = Equations.get("ACAF");
+    std::array<float, EQS_NBTESTS> tests = eq_est->get_tests();
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDEV]) / 1e6, 0.00427);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_MEANY]) / 1e6, 0.008185);
@@ -426,11 +426,10 @@ TEST_F(EstimationTest, DickeyFullerTest)
 
     std::vector<std::string> names = kdb_res->get_names();
 
-    scl_order_0 = new Scalar(kdb_res->get("df_"));
+    scl_order_0 = kdb_res->get("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->val) / 1e6, 0.051603);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.053847);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.053847);
-    delete scl_order_0;
 
     delete kdb_res;
 
@@ -439,17 +438,15 @@ TEST_F(EstimationTest, DickeyFullerTest)
     trend = false;
     kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
-    scl_order_0 = new Scalar(kdb_res->get("df_"));
+    scl_order_0 = kdb_res->get("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->val) / 1e6, 0.05969);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.053414);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.053414);
-    delete scl_order_0;
 
-    scl_drift = new Scalar(kdb_res->get("df_d"));
+    scl_drift = kdb_res->get("df_d");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->val) / 1e6, -2.351039);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 1.588698);
-    delete scl_drift;
 
     delete kdb_res;
 
@@ -458,23 +455,20 @@ TEST_F(EstimationTest, DickeyFullerTest)
     trend = true;
     kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
-    scl_order_0 = new Scalar(kdb_res->get("df_"));
+    scl_order_0 = kdb_res->get("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->val) / 1e6, -0.055952);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.070056);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.070056);
-    delete scl_order_0;
 
-    scl_drift = new Scalar(kdb_res->get("df_d"));
+    scl_drift = kdb_res->get("df_d");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->val) / 1e6, 10.599557);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 5.620008);
-    delete scl_drift;
 
-    scl_trend = new Scalar(kdb_res->get("df_t"));
+    scl_trend = kdb_res->get("df_t");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->val) / 1e6, -0.381779);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->relax) / 1e6, 0.1596);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->std) / 1e6, 0.1596);
-    delete scl_trend;
 
     delete kdb_res;
 }

@@ -29,7 +29,7 @@ class UnitRootDialog : public IodeSettingsDialog, public Ui::UnitRootDialog
     WrapperSpinBox* spinBoxOrder;
 
 private:
-    QString get_tstat(Scalar& scalar);
+    QString get_tstat(Scalar* scalar);
 
 public:
     UnitRootDialog(QWidget* parent = Q_NULLPTR);

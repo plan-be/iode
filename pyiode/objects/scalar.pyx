@@ -3,6 +3,7 @@
 from typing import Union, Tuple, List, Optional
 
 from pyiode.util cimport IODE_IS_A_NUMBER
+from cython.operator cimport dereference
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.scalar cimport hash_value as hash_value_scl
 
@@ -45,13 +46,35 @@ cdef class Scalar:
     >>> scalar
     Scalar(0.9, 0.8, na)
     """
+    cdef bint ptr_owner
+    cdef CScalar* c_scalar
 
-    cdef CScalar c_scalar
+    def __cinit__(self):
+        self.ptr_owner = False
+        self.c_scalar = NULL
 
-    def __cinit__(self, value: float, relax: float = 1.0) -> Scalar:  
+    def __init__(self, value: float, relax: float = 1.0) -> Scalar:  
         if relax < 0.0 or relax > 1.0:
-            raise ValueError("Expected 'relax' value between 0.0 and 1.0")    
-        self.c_scalar = CScalar(value, relax)
+            raise ValueError("Expected 'relax' value between 0.0 and 1.0")   
+        self.ptr_owner = <bint>True 
+        self.c_scalar = new CScalar(value, relax)
+
+    def __dealloc__(self):
+        if self.ptr_owner and self.c_scalar is not NULL:
+            del self.c_scalar
+            self.c_scalar = NULL
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    cdef Scalar _from_ptr(CScalar* ptr, bint owner=False):
+        """
+        Factory function to create Scalar objects from a given CScalar pointer.
+        """
+        # Fast call to __new__() that bypasses the __init__() constructor.
+        cdef Scalar wrapper = Scalar.__new__(Scalar)
+        wrapper.c_scalar = ptr
+        wrapper.ptr_owner = owner
+        return wrapper
 
     # Attributes access
 
@@ -104,4 +127,4 @@ cdef class Scalar:
         return str(self)
 
     def __hash__(self) -> int:
-        return <int>hash_value_scl(self.c_scalar)
+        return <int>hash_value_scl(dereference(self.c_scalar))

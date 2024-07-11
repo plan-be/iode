@@ -27,7 +27,7 @@ private:
 
 protected:
 
-    Variable copy_obj(const Variable& original) const override;
+    Variable copy_obj(const Variable original) const override { return original; }
 
     Variable get_unchecked(const int pos) const override;
 

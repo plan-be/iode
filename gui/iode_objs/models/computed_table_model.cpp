@@ -13,8 +13,10 @@ ComputedTableModel::ComputedTableModel(const QString& refTable, const QString& g
 
 ComputedTableModel::~ComputedTableModel()
 {
-    delete table;
-    if(!variables.isEmpty())
+	if(table)
+    	delete table;
+    
+	if(!variables.isEmpty())
         Tables.remove(refTable.toStdString());
 }
 
