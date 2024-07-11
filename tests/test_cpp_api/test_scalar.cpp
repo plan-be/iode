@@ -54,11 +54,11 @@ TEST_F(ScalarTest, Hash)
     std::size_t hash_before;
     std::size_t hash_after;
 
-    Scalar scalar("acaf1");
+    Scalar scalar = Scalars.get("acaf1");
     hash_before = scalar_hasher(scalar);
 
     // same scalar
-    Scalar same_scalar("acaf1");
+    Scalar same_scalar = Scalars.get("acaf1");
     EXPECT_EQ(scalar, same_scalar);
     hash_after = scalar_hasher(same_scalar);
     EXPECT_EQ(hash_before, hash_after);

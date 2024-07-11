@@ -180,7 +180,7 @@ TEST_F(KDBScalarsTest, Filter)
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
-    Scalar old_scalar(old_name);
+    Scalar old_scalar = Scalars.get(old_name);
     new_name = "scalar_new";
     kdb_subset->rename(old_name, new_name);
     new_scalar_local = kdb_subset->get(new_name);
@@ -270,7 +270,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB
     name = "acaf2";
-    Scalar old_scalar(name);
+    Scalar old_scalar = Scalars.get(name);
     new_name = "scalar_new";
     kdb_subset->rename(name, new_name);
     EXPECT_TRUE(kdb_subset->contains(new_name));

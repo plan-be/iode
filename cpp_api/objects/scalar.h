@@ -9,12 +9,9 @@ struct Scalar : public SCL
 public:
     Scalar();
 
-    Scalar(const int pos, KDB* kdb = nullptr);
-
-    Scalar(const std::string& name, KDB* kdb = nullptr);
-
     Scalar(const double value, const double relax=1.0, const double std=IODE_NAN);
 
+    Scalar(const SCL* c_scalar);
     Scalar(const Scalar& scalar);
 
     // required to be used in std::map

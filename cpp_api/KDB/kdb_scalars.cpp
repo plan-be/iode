@@ -9,7 +9,10 @@ Scalar KDBScalars::copy_obj(const Scalar& original) const
 
 Scalar KDBScalars::get_unchecked(const int pos) const
 {
-	return Scalar(pos, get_database());
+	KDB* kdb = get_database();
+
+    // Note: KSVAL does NOT allocate a new pointer SCL*
+    return Scalar(KSVAL(kdb, pos));
 }
 
 int KDBScalars::add(const std::string& name, const Scalar& obj)
