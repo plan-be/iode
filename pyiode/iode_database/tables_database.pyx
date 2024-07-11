@@ -108,12 +108,9 @@ cdef class Tables(_AbstractDatabase):
             raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
                             f"but got value of type {type(key).__name__}")
         key = key.strip()
-
-        c_tbl = self.database_ptr.get(key.encode())
-        table = Table()
-        del table.c_table 
-        table.c_table = new CTable(c_tbl)
-        return table
+        c_table = self.database_ptr.get(key.encode())
+        py_table = Table._from_ptr(new CTable(c_table), <bint>True) 
+        return py_table
 
     def _set_object(self, key, value):
         cdef CTable* c_table

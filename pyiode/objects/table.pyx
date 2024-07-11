@@ -999,11 +999,15 @@ cdef class Table:
     graph_alignment: 'LEFT'
     <BLANKLINE>
     """
-
+    cdef bint ptr_owner
     cdef CTable* c_table
 
-    def __cinit__(self, nb_columns: int = 2, table_title: str = "", lecs_or_vars: Union[str, List[str]] = None, 
-                  lines_titles: List[str] = None, mode: bool = False, files: bool = False, date: bool = False) -> Table:
+    def __cinit__(self):
+        self.ptr_owner = False
+        self.c_table = NULL
+
+    def __init__(self, nb_columns: int = 2, table_title: str = "", lecs_or_vars: Union[str, List[str]] = None, 
+                 lines_titles: List[str] = None, mode: bool = False, files: bool = False, date: bool = False) -> Table:
         cdef vector[string] cpp_variables = []
         cdef vector[string] cpp_lines_titles = []
         cdef vector[string] cpp_lecs = []
@@ -1050,9 +1054,24 @@ cdef class Table:
                 cpp_lecs.push_back(lec.encode())
 
             self.c_table = new CTable(nb_columns, <string>table_title.encode(), cpp_lines_titles, cpp_lecs, <bint>mode, <bint>files, <bint>date)
+        self.ptr_owner = <bint>True
 
     def __dealloc__(self):
-        del self.c_table
+        if self.ptr_owner and self.c_table is not NULL:
+            del self.c_table
+            self.c_table = NULL
+
+    # see https://cython.readthedocs.io/en/stable/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers 
+    @staticmethod
+    cdef Table _from_ptr(CTable* ptr, bint owner=False):
+        """
+        Factory function to create Table objects from a given CTable pointer.
+        """
+        # Fast call to __new__() that bypasses the __init__() constructor.
+        cdef Table wrapper = Table.__new__(Table)
+        wrapper.c_table = ptr
+        wrapper.ptr_owner = owner
+        return wrapper
 
     @property
     def nb_lines(self) -> int:
