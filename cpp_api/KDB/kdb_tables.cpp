@@ -2,20 +2,16 @@
 #include "kdb_tables.h"
 
 
-Table KDBTables::copy_obj(const Table& original) const
+Table* KDBTables::copy_obj(Table* const original) const
 {
-	return Table(original);
+	return new Table(*original);
 }
 
-Table KDBTables::get_unchecked(const int pos) const
+Table* KDBTables::get_unchecked(const int pos) const
 {
 	KDB* kdb = get_database();
-	
 	// Note: KTVAL allocate a new pointer TBL*
-	TBL* c_table = KTVAL(kdb, pos);
-	Table table(c_table);
-	T_free(c_table);
-	return table;
+	return static_cast<Table*>(KTVAL(kdb, pos));
 }
 
 std::string KDBTables::get_title(const int pos) const

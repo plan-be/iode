@@ -42,22 +42,22 @@ void UnitRootDialog::analyse()
 
         // no drift - no trend
         kdb_scl = dickey_fuller_test(lec.toStdString(), false, false, 0);
-        Scalar df = kdb_scl->get("df_");
+        Scalar* df = kdb_scl->get("df_");
 
         // drift - no trend
         kdb_scl = dickey_fuller_test(lec.toStdString(), true, false, 0);
-        Scalar df_drift = kdb_scl->get("df_");
-        Scalar df_drift_d = kdb_scl->get("df_d");
+        Scalar* df_drift = kdb_scl->get("df_");
+        Scalar* df_drift_d = kdb_scl->get("df_d");
 
         // drift - trend
         kdb_scl = dickey_fuller_test(lec.toStdString(), true, true, 0);
-        Scalar df_trend = kdb_scl->get("df_");
-        Scalar df_trend_d = kdb_scl->get("df_d");
-        Scalar df_trend_t = kdb_scl->get("df_t");
+        Scalar* df_trend = kdb_scl->get("df_");
+        Scalar* df_trend_d = kdb_scl->get("df_d");
+        Scalar* df_trend_t = kdb_scl->get("df_t");
 
         // order
         kdb_scl = dickey_fuller_test(lec.toStdString(), false, false, order);
-        Scalar df_order = kdb_scl->get("df_");
+        Scalar* df_order = kdb_scl->get("df_");
 
         // T-Stats
         res = "\tDF\tDrift\tTrend\tADF\n";
@@ -119,7 +119,7 @@ void UnitRootDialog::analyse()
         res += get_tstat(df_order) + "\n";
         for (int i=1; i<=order; i++)
         {
-            Scalar df_order_x = kdb_scl->get("df" + std::to_string(i));
+            Scalar* df_order_x = kdb_scl->get("df" + std::to_string(i));
             res += "order " + QString::number(i) + "\t";
             res += QString::number(df_order_x.val, 'g', precision) + "\t";
             res += QString::number(df_order_x.std, 'g', precision) + "\t";

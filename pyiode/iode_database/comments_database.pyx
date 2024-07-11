@@ -103,10 +103,7 @@ cdef class Comments(_AbstractDatabase):
         subset_.database_ptr = subset_.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_
 
-    def _get_object(self, key):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get comment '{key}'.\nExpected a string value for the name " + 
-                            f"but got value of type {type(key).__name__}")
+    def _get_object(self, key: str):
         key = key.strip()
         return self.database_ptr.get(key.encode()).decode()
 

@@ -21,7 +21,7 @@ class ComputedTableModel : public QAbstractTableModel, public NumericalTableMode
     QString refTable;
     QString variables;
 
-    ComputedTable *table;
+    ComputedTable* table;
 
 public:
 

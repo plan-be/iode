@@ -5,7 +5,7 @@ EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbs
 {
 	try
 	{
-		table = new Table(Tables.get(tableName.toStdString()));
+		table = Tables.get(tableName.toStdString());
 	}
 	catch (const std::exception& e)
 	{
@@ -16,7 +16,8 @@ EditTableModel::EditTableModel(const QString& tableName, QWidget* parent) : QAbs
 
 EditTableModel::~EditTableModel()
 {
-	if(table) delete table;
+	if(table) 
+		delete table;
 }
 
 int EditTableModel::rowCount(const QModelIndex& parent) const

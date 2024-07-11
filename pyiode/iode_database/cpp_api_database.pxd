@@ -103,8 +103,8 @@ cdef extern from "cpp_api/KDB/kdb_equations.h":
 
         # Public methods
         KDBEquations* subset(string& pattern, bool deep_copy) except +
-        CEquation get(string& name) except +
-        CEquation copy(string& name) except +
+        CEquation* get(string& name) except +
+        CEquation* copy(string& name) except +
         string get_lec(string& name) except +
         int add(string& name, CEquation& equation) except +
         int add(string& name, string& lec, string& method, string& from_period, string& to_period, 
@@ -164,8 +164,8 @@ cdef extern from "cpp_api/KDB/kdb_scalars.h":
 
         # Public methods
         KDBScalars* subset(string& pattern, bool deep_copy) except +
-        CScalar get(string& name) except +
-        CScalar copy(string& name) except +
+        CScalar* get(string& name) except +
+        CScalar* copy(string& name) except +
         int add(string& name, CScalar& scalar) except +
         int add(string& name, double value, double relax, double std) except +
         void update(string& name, CScalar& scalar) except +
@@ -184,8 +184,8 @@ cdef extern from "cpp_api/KDB/kdb_tables.h":
 
         # Public methods
         KDBTables* subset(string& pattern, bool deep_copy) except +
-        CTable get(string& name) except +
-        CTable copy(string& name) except +
+        CTable* get(string& name) except +
+        CTable* copy(string& name) except +
         string get_title(string& name) except +
         int add(string name, CTable& table) except +
         int add(string name, int nb_columns) except +

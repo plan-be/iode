@@ -347,18 +347,18 @@ TEST_F(KDBTablesTest, Filter)
     int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
-    EXPECT_EQ(kdb_subset->get(new_name).nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(Tables.get(new_name).nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
-    EXPECT_EQ(kdb_subset->get(new_name).nb_lines(), Tables.get(new_name).nb_lines());
-    EXPECT_EQ(kdb_subset->get(new_name), Tables.get(new_name));
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(Tables.get(new_name)->nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), Tables.get(new_name)->nb_lines());
+    EXPECT_EQ(*kdb_subset->get(new_name), *Tables.get(new_name));
 
     // rename an element in the local KDB and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "TABLE_NEW";
     kdb_subset->rename(old_name, new_name);
-    EXPECT_EQ(kdb_subset->get(new_name).nb_lines(), Tables.get(new_name).nb_lines());
-    EXPECT_EQ(kdb_subset->get(new_name), Tables.get(new_name));
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), Tables.get(new_name)->nb_lines());
+    EXPECT_EQ(*kdb_subset->get(new_name), *Tables.get(new_name));
 
     // delete an element from the local KDB and check if it has also 
     // been deleted from the global KDB
@@ -424,7 +424,7 @@ TEST_F(KDBTablesTest, DeepCopy)
     int nb_lines_vars = (int) vars.size() + nb_vars_envi - 1;
     EXPECT_TRUE(kdb_subset->contains(new_name));
     EXPECT_FALSE(Tables.contains(new_name));
-    EXPECT_EQ(kdb_subset->get(new_name).nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
+    EXPECT_EQ(kdb_subset->get(new_name)->nb_lines(), nb_lines_header + nb_lines_vars + nb_lines_footnotes);
 
     // rename an element in the local KDB and check if the 
     // corresponding element has not been renamed in the global KDB

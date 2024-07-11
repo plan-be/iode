@@ -102,10 +102,7 @@ cdef class Identities(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get identity '{key}'.\nExpected a string value for the name " + 
-                            f"but got value of type {type(key).__name__}")
+    def _get_object(self, key: str):
         key = key.strip()
         return self.database_ptr.get_lec(key.encode()).decode()
 

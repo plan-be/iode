@@ -103,13 +103,10 @@ cdef class Tables(_AbstractDatabase):
         subset_db.database_ptr = subset_db.abstract_db_ptr = self.database_ptr.subset(pattern.encode(), <bint>copy)
         return subset_db
 
-    def _get_object(self, key):
-        if not isinstance(key, str):
-            raise TypeError(f"Cannot get object {key}.\nExpected a string value for {key} " + 
-                            f"but got value of type {type(key).__name__}")
+    def _get_object(self, key: str):
         key = key.strip()
-        c_table = self.database_ptr.get(key.encode())
-        py_table = Table._from_ptr(new CTable(c_table), <bint>True) 
+        cdef CTable* c_table = self.database_ptr.get(key.encode())
+        py_table = Table._from_ptr(c_table, <bint>True) 
         return py_table
 
     def _set_object(self, key, value):

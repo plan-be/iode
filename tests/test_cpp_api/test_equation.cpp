@@ -11,7 +11,7 @@ protected:
     void SetUp() override
     {
         kdb_eqs = new KDBEquations(input_test_dir + "fun.eqs");
-        equation = new Equation(kdb_eqs->get(name));
+        equation = kdb_eqs->get(name);
     }
 
     void TearDown() override
@@ -274,7 +274,7 @@ TEST_F(EquationTest, Hash)
     hash_before = equation_hasher(*equation);
 
     // same equation
-    Equation* same_equation = new Equation(Equations.get(name));
+    Equation* same_equation = Equations.get(name);
     EXPECT_EQ(*equation, *same_equation);
     hash_after = equation_hasher(*same_equation);
     EXPECT_EQ(hash_before, hash_after);
