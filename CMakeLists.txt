@@ -2,11 +2,7 @@
 # and include sub-projects here.
 #
 
-# VISUAL STUDIO 2019 => CMake 3.20
-#cmake_minimum_required (VERSION 3.20)
-
-# VISUAL STUDIO > 2019 => CMake 3.24
-cmake_minimum_required (VERSION 3.24)
+cmake_minimum_required (VERSION 3.20)
 
 include(CMakePrintHelpers)
 
@@ -193,7 +189,7 @@ endif()
 if(MSVC)
   add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
 else()
-  add_compile_definitions(LINUX -DUNIX -DSCOU -DREALD -DSCRPROTO -DNOEMS -DNOEMF)
+  add_compile_definitions(LINUX UNIX SCOU REALD SCRPROTO NOEMS NOEMF)
 endif()
 add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 
