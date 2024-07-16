@@ -4,8 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef min
-#define min(x, y)     (((x) < (y)) ? (x) : (y))
+// WARNING: the min and max macro make conflicts with the GNU implementation 
+//          of the C++ standard library
+#if !defined(__GNUC__) || !defined(__cplusplus)
+    #ifndef min
+        #define min(x, y)     (((x) < (y)) ? (x) : (y))
+    #endif
 #endif
 
 #define SCR_CHUNCK      5
@@ -68,7 +72,7 @@ AllocDocFree(ALLOCDOC *ad)
     if(ad == 0) return(0);
 
 /* BUg ???
-    // Check non dejà freed 
+    // Check non dejï¿½ freed 
     ad->freed++; // JMP 15/2/2013    
     if(ad->freed > 1) {
         printf("Double free !!! %d x !\n", ad->freed); 
@@ -87,7 +91,7 @@ AllocDocFree(ALLOCDOC *ad)
             SCR_ALLOCDOC_LAST->next = 0;
     }
 
-    // Au début (mais pas à la fin déjà géré)
+    // Au dï¿½but (mais pas ï¿½ la fin dï¿½jï¿½ gï¿½rï¿½)
     else if(ad->prev == 0) {
         ad->next->prev = 0;
     }
@@ -98,22 +102,22 @@ AllocDocFree(ALLOCDOC *ad)
         ad->next->prev = ad->prev;
     }
     if(SCR_ALLOCDOC_LAST &&  SCR_ALLOCDOC_LAST->prev == SCR_ALLOCDOC_LAST)
-        printf("Erreur : référence cyclique\n");
+        printf("Erreur : rï¿½fï¿½rence cyclique\n");
     
     return(0);
 }
 
 /***************************************************************************
-Rapport des allocations non lib‚r‚es dans le stdout ou dans le fichier dont le
+Rapport des allocations non libï¿½rï¿½es dans le stdout ou dans le fichier dont le
 nom se trouve dans la variable SCR_ALLOC_DOC_LOGFILE.
 
-&EN Si SCR_ALLOC_DOC == 0, il n'y a pas d'‚criture.
+&EN Si SCR_ALLOC_DOC == 0, il n'y a pas d'ï¿½criture.
 &EN Si SCR_ALLOC_DOC_LOGFILE == 0, rapport dans le stdout
 
-Le rapport contient la liste des allocations non lib‚r‚es et le total de la
-m‚moire non lib‚r‚e.
+Le rapport contient la liste des allocations non libï¿½rï¿½es et le total de la
+mï¿½moire non libï¿½rï¿½e.
 
-Si une allocation ne r‚f‚rence pas de fichier, le nom du fichier est remplac‚ par des ???.
+Si une allocation ne rï¿½fï¿½rence pas de fichier, le nom du fichier est remplacï¿½ par des ???.
 ***************************************************************************/
 
 int AllocDocLoop()
@@ -163,19 +167,19 @@ int         SCR_ALLOC_BUF_SIZE = 0;
 
 
 /* =====================================================================
-Alloue un espace de lg bytes en m‚moire et fixe la valeur de chacun des
-bytes … 0.
+Alloue un espace de lg bytes en mï¿½moire et fixe la valeur de chacun des
+bytes ï¿½ 0.
 
-Si l'espace demand‚ est indisponible et que panic est non nul, la fonction
-appelle la fonction SCR_panic() qui par d‚faut affiche une message d'erreur
+Si l'espace demandï¿½ est indisponible et que panic est non nul, la fonction
+appelle la fonction SCR_panic() qui par dï¿½faut affiche une message d'erreur
 et quitte le programme avec un code retour 2.
 
 Si panic est nul, SCR_malloc_chk() retourne un pointeur nul et n'appelle
 pas la fonction SCR_panic().
 
-SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
+SCR_panic() peut ï¿½tre replacï¿½e par une fonction utilisateur.
 
-La fonction malloc() est utilis‚e pour les allocations.
+La fonction malloc() est utilisï¿½e pour les allocations.
 
 &EX
     txt = SCR_malloc_chk(20, 0);
@@ -217,16 +221,16 @@ char *SCR_malloc_orig(unsigned int lg)
 
 
 /* =====================================================================
-Alloue un espace de lg bytes en m‚moire et fixe la valeur de chacun des
-bytes … 0.
+Alloue un espace de lg bytes en mï¿½moire et fixe la valeur de chacun des
+bytes ï¿½ 0.
 
-Si l'espace demand‚ est indisponible, la fonction appelle la fonction
-SCR_panic() qui par d‚faut affiche une message d'erreur et quitte le
+Si l'espace demandï¿½ est indisponible, la fonction appelle la fonction
+SCR_panic() qui par dï¿½faut affiche une message d'erreur et quitte le
 programme avec un code retour 2.
 
-SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
+SCR_panic() peut ï¿½tre replacï¿½e par une fonction utilisateur.
 
-La fonction malloc() est utilis‚e pour les allocations.
+La fonction malloc() est utilisï¿½e pour les allocations.
 
 &EX
     txt = SCR_malloc(20);
@@ -256,38 +260,38 @@ char *SCR_malloc_doc(unsigned int lg, char *file, int line)
 
 
 /* =====================================================================
-R‚alloue un espace pr‚c‚demment allou‚ en m‚moire et fixe la valeur de
-chacun des bytes ajout‚s … 0.
+Rï¿½alloue un espace prï¿½cï¿½demment allouï¿½ en mï¿½moire et fixe la valeur de
+chacun des bytes ajoutï¿½s ï¿½ 0.
 
-Si l'espace demand‚ est indisponible et que panic est non nul, la fonction
-appelle la fonction SCR_panic() qui par d‚faut affiche une message d'erreur
+Si l'espace demandï¿½ est indisponible et que panic est non nul, la fonction
+appelle la fonction SCR_panic() qui par dï¿½faut affiche une message d'erreur
 et quitte le programme avec un code retour 2.
 
 Si panic est nul, SCR_realloc_chk() retourne un pointeur nul et n'appelle
 pas la fonction SCR_panic().
 
-SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
+SCR_panic() peut ï¿½tre replacï¿½e par une fonction utilisateur.
 
-La fonction demande 4 paramŠtres :
+La fonction demande 4 paramï¿½tres :
 
 &EN l'ancien pointeur
-&EN la taille unitaire d'un ‚l‚ment (sizeof(int) par exemple)
-&EN l'ancien nombre d'‚l‚ments allou‚s
-&EN le nouveau nombre d'‚l‚ments allou‚s
+&EN la taille unitaire d'un ï¿½lï¿½ment (sizeof(int) par exemple)
+&EN l'ancien nombre d'ï¿½lï¿½ments allouï¿½s
+&EN le nouveau nombre d'ï¿½lï¿½ments allouï¿½s
 
-Si l'ancien pointeur est nul, SCR_malloc() est appel‚.
+Si l'ancien pointeur est nul, SCR_malloc() est appelï¿½.
 
-Dans les autres cas, l'actuelle valeur est d'abord copi‚e dans un buffer
-global, plus lib‚r‚e. Ensuite, la nouvelle taille est allou‚e et remplie
-de 0, puis le buffer est copi‚ dans le nouvel espace allou‚.
+Dans les autres cas, l'actuelle valeur est d'abord copiï¿½e dans un buffer
+global, plus libï¿½rï¿½e. Ensuite, la nouvelle taille est allouï¿½e et remplie
+de 0, puis le buffer est copiï¿½ dans le nouvel espace allouï¿½.
 
-Cette fa‡on de proc‚der permet de gagner une place ‚norme lorsque des
-r‚allocations successives d'un mˆme pointeur ont lieu.
+Cette faï¿½on de procï¿½der permet de gagner une place ï¿½norme lorsque des
+rï¿½allocations successives d'un mï¿½me pointeur ont lieu.
 
-Si le nouvel espace est plus petit que l'ancien, le mˆme processus est
-effectu‚, ce qui assure une r‚cup‚ration r‚elle de l'espace.
+Si le nouvel espace est plus petit que l'ancien, le mï¿½me processus est
+effectuï¿½, ce qui assure une rï¿½cupï¿½ration rï¿½elle de l'espace.
 
-La fonction standard realloc() n'est pas utilis‚e.
+La fonction standard realloc() n'est pas utilisï¿½e.
 
 &EX
     txt = SCR_realloc(txt, sizeof(char *), 20, 25);
@@ -336,35 +340,35 @@ char *SCR_realloc_orig(void* old_ptr, unsigned int el_size, unsigned int old_cou
 }
 
 /* =====================================================================
-R‚alloue un espace pr‚c‚demment allou‚ en m‚moire et fixe la valeur de
-chacun des bytes ajout‚s … 0.
+Rï¿½alloue un espace prï¿½cï¿½demment allouï¿½ en mï¿½moire et fixe la valeur de
+chacun des bytes ajoutï¿½s ï¿½ 0.
 
-Si l'espace demand‚ est indisponible, la fonction appelle la fonction
-SCR_panic() qui par d‚faut affiche une message d'erreur et quitte le
+Si l'espace demandï¿½ est indisponible, la fonction appelle la fonction
+SCR_panic() qui par dï¿½faut affiche une message d'erreur et quitte le
 programme avec un code retour 2.
 
-SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
+SCR_panic() peut ï¿½tre replacï¿½e par une fonction utilisateur.
 
-La fonction demande 4 paramŠtres :
+La fonction demande 4 paramï¿½tres :
 
 &EN l'ancien pointeur
-&EN la taille unitaire d'un ‚l‚ment (sizeof(int) par exemple)
-&EN l'ancien nombre d'‚l‚ments allou‚s
-&EN le nouveau nombre d'‚l‚ments allou‚s
+&EN la taille unitaire d'un ï¿½lï¿½ment (sizeof(int) par exemple)
+&EN l'ancien nombre d'ï¿½lï¿½ments allouï¿½s
+&EN le nouveau nombre d'ï¿½lï¿½ments allouï¿½s
 
-Si l'ancien pointeur est nul, SCR_malloc() est appel‚.
+Si l'ancien pointeur est nul, SCR_malloc() est appelï¿½.
 
-Dans les autres cas, l'actuelle valeur est d'abord copi‚e dans un buffer
-global, plus lib‚r‚e. Ensuite, la nouvelle taille est allou‚e et remplie
-de 0, puis le buffer est copi‚ dans le nouvel espace allou‚.
+Dans les autres cas, l'actuelle valeur est d'abord copiï¿½e dans un buffer
+global, plus libï¿½rï¿½e. Ensuite, la nouvelle taille est allouï¿½e et remplie
+de 0, puis le buffer est copiï¿½ dans le nouvel espace allouï¿½.
 
-Cette fa‡on de proc‚der permet de gagner une place ‚norme lorsque des
-r‚allocations successives d'un mˆme pointeur ont lieu.
+Cette faï¿½on de procï¿½der permet de gagner une place ï¿½norme lorsque des
+rï¿½allocations successives d'un mï¿½me pointeur ont lieu.
 
-Si le nouvel espace est plus petit que l'ancien, le mˆme processus est
-effectu‚, ce qui assure une r‚cup‚ration r‚elle de l'espace.
+Si le nouvel espace est plus petit que l'ancien, le mï¿½me processus est
+effectuï¿½, ce qui assure une rï¿½cupï¿½ration rï¿½elle de l'espace.
 
-La fonction standard realloc() n'est pas utilis‚e.
+La fonction standard realloc() n'est pas utilisï¿½e.
 
 &EX
     txt = SCR_realloc(txt, sizeof(char *), 20, 25);
@@ -407,10 +411,10 @@ SCR_alloc_chunck(int nb)
 }
 
 /* =====================================================================
-LibŠre l'espace allou‚ pour un pointeur donn‚. Si le pointeur est
+Libï¿½re l'espace allouï¿½ pour un pointeur donnï¿½. Si le pointeur est
 nul, la fonction n'a pas d'effet.
 
-La fonction de librairie free() est utilis‚e pour cette fonction.
+La fonction de librairie free() est utilisï¿½e pour cette fonction.
 
 &EX
     txt = SCR_malloc(20);
@@ -445,32 +449,32 @@ int SCR_free(void* ptr)
 
 /* =============================================================
 Cette fonction alloue des buffers successifs de 3K. A chaque appel,
-elle consomme une partie du dernier buffer allou‚ et retourne l'adresse
+elle consomme une partie du dernier buffer allouï¿½ et retourne l'adresse
 du premier byte disponible dans ce buffer. Il ne s'agit donc pas d'une
 allocation au sens commun du terme. Lorsque le dernier buffer est plein
-ou ne suffit plus pour la nouvelle allocation demand‚e, un nouveau
-buffer est allou‚.
+ou ne suffit plus pour la nouvelle allocation demandï¿½e, un nouveau
+buffer est allouï¿½.
 
-L'int‚rˆt de cette fonction r‚side dans le fait qu'elle ‚vite le
-morcellement de la m‚moire et la perte de 8 bytes conc‚d‚e normalement
+L'intï¿½rï¿½t de cette fonction rï¿½side dans le fait qu'elle ï¿½vite le
+morcellement de la mï¿½moire et la perte de 8 bytes concï¿½dï¿½e normalement
 pour chaque allocation par malloc() ou SCR_malloc(). Elle est
-notamment utilis‚e pour charger en m‚moire les objets compil‚s dans un
+notamment utilisï¿½e pour charger en mï¿½moire les objets compilï¿½s dans un
 fichier .scr.
 
-Son inconv‚nient est qu'elle ne permet pas de lib‚rer l'espace allou‚.
+Son inconvï¿½nient est qu'elle ne permet pas de libï¿½rer l'espace allouï¿½.
 
-Pour ‚viter les problŠmes d'alignement, chaque pointeur retourn‚ est
-align‚ sur a bytes. Pour des textes, a vaut 1. Pour des int par contre,
-il faut donner … a la valeur
+Pour ï¿½viter les problï¿½mes d'alignement, chaque pointeur retournï¿½ est
+alignï¿½ sur a bytes. Pour des textes, a vaut 1. Pour des int par contre,
+il faut donner ï¿½ a la valeur
 &CO
 	sizeof(int)
 &TX
 
-Si l'espace demand‚ est indisponible, la fonction appelle la fonction
-SCR_panic() qui par d‚faut affiche une message d'erreur et quitte le
+Si l'espace demandï¿½ est indisponible, la fonction appelle la fonction
+SCR_panic() qui par dï¿½faut affiche une message d'erreur et quitte le
 programme avec un code retour 2.
 
-SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
+SCR_panic() peut ï¿½tre replacï¿½e par une fonction utilisateur.
 
 &EX
     for(i = 0 ; i < 30 ; i++)
@@ -503,27 +507,27 @@ char *SCR_palloca(unsigned int len, unsigned int a)
 /* =============================================================
 Cette fonction appelle la fonction SCR_palloca(). Elle fonction alloue des
 buffers successifs de 3K. A chaque appel, elle consomme une partie du
-dernier buffer allou‚ et retourne l'adresse du premier byte disponible dans
+dernier buffer allouï¿½ et retourne l'adresse du premier byte disponible dans
 ce buffer. Il ne s'agit donc pas d'une allocation au sens commun du terme.
 Lorsque le dernier buffer est plein ou ne suffit plus pour la nouvelle
-allocation demand‚e, un nouveau buffer est allou‚.
+allocation demandï¿½e, un nouveau buffer est allouï¿½.
 
-L'int‚rˆt de cette fonction r‚side dans le fait qu'elle ‚vite le
-morcellement de la m‚moire et la perte de 8 bytes conc‚d‚e normalement
+L'intï¿½rï¿½t de cette fonction rï¿½side dans le fait qu'elle ï¿½vite le
+morcellement de la mï¿½moire et la perte de 8 bytes concï¿½dï¿½e normalement
 pour chaque allocation par malloc() ou SCR_malloc(). Elle est
-notamment utilis‚e pour charger en m‚moire les objets compil‚s dans un
+notamment utilisï¿½e pour charger en mï¿½moire les objets compilï¿½s dans un
 fichier .scr.
 
-Son inconv‚nient est qu'elle ne permet pas de lib‚rer l'espace allou‚.
+Son inconvï¿½nient est qu'elle ne permet pas de libï¿½rer l'espace allouï¿½.
 
-Pour ‚viter les problŠmes d'alignement, chaque pointeur retourn‚ est
-align‚ sur 8 bytes.
+Pour ï¿½viter les problï¿½mes d'alignement, chaque pointeur retournï¿½ est
+alignï¿½ sur 8 bytes.
 
-Si l'espace demand‚ est indisponible, la fonction appelle la fonction
-SCR_panic() qui par d‚faut affiche une message d'erreur et quitte le
+Si l'espace demandï¿½ est indisponible, la fonction appelle la fonction
+SCR_panic() qui par dï¿½faut affiche une message d'erreur et quitte le
 programme avec un code retour 2.
 
-SCR_panic() peut ˆtre replac‚e par une fonction utilisateur.
+SCR_panic() peut ï¿½tre replacï¿½e par une fonction utilisateur.
 
 &EX
     for(i = 0 ; i < 30 ; i++)

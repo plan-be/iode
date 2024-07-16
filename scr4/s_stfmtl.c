@@ -1,18 +1,18 @@
 #include "s_strs.h"
 
 /* ====================================================================
-Formatte un long l suivant un format fmt donn‚. Le r‚sultat out est
-un string transform‚ de longueur ‚gale … celle de fmt.
+Formatte un long l suivant un format fmt donnï¿½. Le rï¿½sultat out est
+un string transformï¿½ de longueur ï¿½gale ï¿½ celle de fmt.
 
-Les caractŠres reconnus dans le format sont : 'X', 'x', '9', '0'.
-Ils signifient qu'aux seules positions de ces caractŠres seront plac‚s
-dans leur ordre d'apparition les caractŠres r‚sultant du formattage
+Les caractï¿½res reconnus dans le format sont : 'X', 'x', '9', '0'.
+Ils signifient qu'aux seules positions de ces caractï¿½res seront placï¿½s
+dans leur ordre d'apparition les caractï¿½res rï¿½sultant du formattage
 de l.
 
-Seul cas particulier : le caractŠre '0' qui sera remplac‚ par une '0' si
-le caractŠre correspondant de in est ' '.
+Seul cas particulier : le caractï¿½re '0' qui sera remplacï¿½ par une '0' si
+le caractï¿½re correspondant de in est ' '.
 
-Les longueurs des strings ne sont pas v‚rifi‚es.
+Les longueurs des strings ne sont pas vï¿½rifiï¿½es.
 
 &RT le pointeur vers out
 &EX
@@ -82,8 +82,10 @@ int SCR_sprintf(char* buf, int buf_size, char* fmt, ...)
         buf[0] = 0;
     }     
     else {
-        #ifdef _MSC_VER   
+        #if defined(_MSC_VER)   
             vsnprintf_s(buf, buf_size - 1, _TRUNCATE, fmt, myargs);
+        #elif defined(__GNUC__)
+            vsnprintf(buf, buf_size - 1, fmt, myargs);
         #else
             vsnprintf_s(buf, buf_size - 1, fmt, myargs);
         #endif    

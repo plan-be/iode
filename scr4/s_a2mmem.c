@@ -2,9 +2,9 @@
 #include "s_a2m.h"
 
 /* ======================================================================
-Cr‚e un descripteur de fichier a2m en m‚moire. Cela permet de cr‚er des
-impressions … l'aide des outils a2m sans passer par un fichier
-interm‚diaire.
+Crï¿½e un descripteur de fichier a2m en mï¿½moire. Cela permet de crï¿½er des
+impressions ï¿½ l'aide des outils a2m sans passer par un fichier
+intermï¿½diaire.
 
 Les destinations possibles sont :
 
@@ -16,25 +16,25 @@ Les destinations possibles sont :
 &EN A2M_DESTFRM    (6) : impression dans un fichier FRM
 &EN A2M_DESTA2M    (7) : impression dans un fichier A2M
 &EN A2M_DESTCSV    (8) : impression dans un fichier CSV
-&EN A2M_DESTDUMMY  (9) : impression supprim‚e
+&EN A2M_DESTDUMMY  (9) : impression supprimï¿½e
 &EN A2M_DESTTCHRT (10) : affichage via TeeChart
 
-La signification des paramŠtres d‚pend de la destination :
+La signification des paramï¿½tres dï¿½pend de la destination :
 
 &EN dest = destination (voir ci-dessus)
-&EN outfile = nom du fichier output. L'extension est ajout‚e pour les
+&EN outfile = nom du fichier output. L'extension est ajoutï¿½e pour les
     fichiers emf et wmf.
 &EN ask =
-&EN2 A2M_DESTGDIPRT : affichage du panneau pour s‚lection des paramŠtres
+&EN2 A2M_DESTGDIPRT : affichage du panneau pour sï¿½lection des paramï¿½tres
                      d'impression
-&EN2 A2M_DESTGDIEMF : non utilis‚
-&EN2 A2M_DESTGDIWMF : non utilis‚
-&EN2 A2M_DESTRTF    : g‚n‚ration pour une aide Windows (hcw)
-&EN2 A2M_DESTHTML   : g‚n‚ration pour une aide Html Help (hhw)
-&EN2 A2M_DESTFRM    : non utilis‚
+&EN2 A2M_DESTGDIEMF : non utilisï¿½
+&EN2 A2M_DESTGDIWMF : non utilisï¿½
+&EN2 A2M_DESTRTF    : gï¿½nï¿½ration pour une aide Windows (hcw)
+&EN2 A2M_DESTHTML   : gï¿½nï¿½ration pour une aide Html Help (hhw)
+&EN2 A2M_DESTFRM    : non utilisï¿½
 &EN2 A2M_DESTA2M    : append au fichier outfile au lieu de le remplacer
-&EN2 A2M_DESTCSV    : non utilis‚
-&EN2 A2M_DESTDUMMY  : non utilis‚
+&EN2 A2M_DESTCSV    : non utilisï¿½
+&EN2 A2M_DESTDUMMY  : non utilisï¿½
 &EN2 A2M_DESTTCHRT  : affichage via TeeChart
 
 &EX
@@ -48,7 +48,7 @@ La signification des paramŠtres d‚pend de la destination :
     A2mMemFlush(af);
     A2mMemRecordFile(af, "gb.a2m");
     A2mMemFlush(af);
-    A2mMemRecord(af, "AprŠs le fichier\n\n");
+    A2mMemRecord(af, "Aprï¿½s le fichier\n\n");
     A2mMemFlush(af);
     A2mMemEnd(af);
 &TX
@@ -79,6 +79,7 @@ int     ask;
     af->af_dest = dest;
 
     switch(dest) {
+#if defined(DOSWIN) || defined(SCRW32) || defined(WINDOWS)
         case A2M_DESTGDIPRT :
             if(A2mGdiPrinterInit(0L, ask, outfile)) goto err;
             break;
@@ -89,6 +90,7 @@ int     ask;
         case A2M_DESTGDIWMF :
             if(A2mGdiWMFInit(outfile, 120, 90)) goto err;
             break;
+#endif
 #endif            
         case A2M_DESTRTF :
             if(A2mRtfInit(outfile, ask)) goto err;
@@ -123,10 +125,10 @@ err:
 }
 
 /* ======================================================================
-M‚morise str comme suite du texte a2m pour le descripteur af. Ce
-descripteur est cr‚‚ … l'aide de la fonction A2mMemBegin(). Lorsqu'un
-objet est termin‚, on peut utiliser la fonction A2mMemFlush() pour
-interpr‚ter le texte enregist‚ et envoyer vers la destination pr‚vue.
+Mï¿½morise str comme suite du texte a2m pour le descripteur af. Ce
+descripteur est crï¿½ï¿½ ï¿½ l'aide de la fonction A2mMemBegin(). Lorsqu'un
+objet est terminï¿½, on peut utiliser la fonction A2mMemFlush() pour
+interprï¿½ter le texte enregistï¿½ et envoyer vers la destination prï¿½vue.
 
 &EX
     #include <s_a2m.h>
@@ -139,7 +141,7 @@ interpr‚ter le texte enregist‚ et envoyer vers la destination pr‚vue.
     A2mMemFlush(af);
     A2mMemRecordFile(af, "gb.a2m");
     A2mMemFlush(af);
-    A2mMemRecord(af, "AprŠs le fichier\n\n");
+    A2mMemRecord(af, "Aprï¿½s le fichier\n\n");
     A2mMemFlush(af);
     A2mMemEnd(af);
 &TX
@@ -162,11 +164,11 @@ U_ch    *str;
 }
 
 /* ======================================================================
-M‚morise le contenu du fichier filename comme suite du texte a2m pour le
-descripteur af. Ce descripteur est cr‚‚ … l'aide de la fonction
-A2mMemBegin(). Lorsqu'un objet est termin‚, on peut utiliser la fonction
-A2mMemFlush() pour interpr‚ter le texte enregist‚ et envoyer vers la
-destination pr‚vue.
+Mï¿½morise le contenu du fichier filename comme suite du texte a2m pour le
+descripteur af. Ce descripteur est crï¿½ï¿½ ï¿½ l'aide de la fonction
+A2mMemBegin(). Lorsqu'un objet est terminï¿½, on peut utiliser la fonction
+A2mMemFlush() pour interprï¿½ter le texte enregistï¿½ et envoyer vers la
+destination prï¿½vue.
 
 &EX
     #include <s_a2m.h>
@@ -179,7 +181,7 @@ destination pr‚vue.
     A2mMemFlush(af);
     A2mMemRecordFile(af, "gb.a2m");
     A2mMemFlush(af);
-    A2mMemRecord(af, "AprŠs le fichier\n\n");
+    A2mMemRecord(af, "Aprï¿½s le fichier\n\n");
     A2mMemFlush(af);
     A2mMemEnd(af);
 &TX
@@ -211,13 +213,13 @@ U_ch    *filename;
 
 
 /* ======================================================================
-Imprime les objets enregistr‚s … l'aide de la fonction A2mMemRecord()
-sur la destination associ‚e au descripteur af.
+Imprime les objets enregistrï¿½s ï¿½ l'aide de la fonction A2mMemRecord()
+sur la destination associï¿½e au descripteur af.
 
 Il ne faut utiliser cette fonction que lorsqu'un ou plusieurs objets
-sont complŠtement m‚moris‚s. Si cette fonction est appel‚e alors qu'une
-partie d'un objet est en enregistr‚e, soit l'objet n'est pas imprim‚
-(tableaux, graphiques), soit il est d‚coup‚ (paragraphe).
+sont complï¿½tement mï¿½morisï¿½s. Si cette fonction est appelï¿½e alors qu'une
+partie d'un objet est en enregistrï¿½e, soit l'objet n'est pas imprimï¿½
+(tableaux, graphiques), soit il est dï¿½coupï¿½ (paragraphe).
 
 &EX
     #include <s_a2m.h>
@@ -230,7 +232,7 @@ partie d'un objet est en enregistr‚e, soit l'objet n'est pas imprim‚
     A2mMemFlush(af);
     A2mMemRecordFile(af, "gb.a2m");
     A2mMemFlush(af);
-    A2mMemRecord(af, "AprŠs le fichier\n\n");
+    A2mMemRecord(af, "Aprï¿½s le fichier\n\n");
     A2mMemFlush(af);
     A2mMemEnd(af);
 &TX
@@ -249,9 +251,11 @@ A2MFILE *af;
         ao = A2mRead(af);
         if(ao == 0) break;
         switch(af->af_dest) {
+#if defined(DOSWIN) || defined(SCRW32) || defined(WINDOWS)
             case A2M_DESTGDIPRT :
             case A2M_DESTGDIWMF :
             case A2M_DESTGDIEMF : A2mGdiPrintObj(ao); break;
+#endif
             case A2M_DESTRTF    : A2mRtfPrintObj(ao); break;
             case A2M_DESTHTML   : A2mHtmlPrintObj(ao, 1); break; /* JMP 19-10-99 */
             case A2M_DESTFRM    : A2mFrPrintObj(ao); break;
@@ -264,11 +268,11 @@ A2MFILE *af;
 }
 
 /* ======================================================================
-Termine une impression en m‚moire au format A2M. Le descripteur af est
-cr‚‚ … l'aide de la fonction A2mMemBegin().
+Termine une impression en mï¿½moire au format A2M. Le descripteur af est
+crï¿½ï¿½ ï¿½ l'aide de la fonction A2mMemBegin().
 
-Tous les objets enregistr‚s sont envoy‚s vers la destination d'impression
-d‚termin‚e lors de la cr‚ation du descripteur af.
+Tous les objets enregistrï¿½s sont envoyï¿½s vers la destination d'impression
+dï¿½terminï¿½e lors de la crï¿½ation du descripteur af.
 
 &EX
     #include <s_a2m.h>
@@ -281,7 +285,7 @@ d‚termin‚e lors de la cr‚ation du descripteur af.
     A2mMemFlush(af);
     A2mMemRecordFile(af, "gb.a2m");
     A2mMemFlush(af);
-    A2mMemRecord(af, "AprŠs le fichier\n\n");
+    A2mMemRecord(af, "Aprï¿½s le fichier\n\n");
     A2mMemFlush(af);
     A2mMemEnd(af);
 &TX
@@ -294,6 +298,7 @@ A2MFILE *af;
 {
     A2mMemFlush(af);
     switch(af->af_dest) {
+#if defined(DOSWIN) || defined(SCRW32) || defined(WINDOWS)
         case A2M_DESTGDIPRT :
             A2mGdiPrintObj((A2MOBJ *)0);
             A2mGdiPrinterEnd();
@@ -307,6 +312,7 @@ A2MFILE *af;
             A2mGdiPrintObj((A2MOBJ *)0);
             A2mGdiWMFEnd();
             break;
+#endif
 #endif
         case A2M_DESTRTF :
             A2mRtfEnd(af->af_outfile);

@@ -37,6 +37,8 @@
 
 #else
 
+#include <s_proxdr.h>
+
 #define XDR_l2s_s(s, n)       XDR_rev(s, n, sizeof(short  ))
 #define XDR_s2l_s(s, n)       XDR_rev(s, n, sizeof(short  ))
 #define XDR_l2s_l(s, n)       XDR_rev(s, n, sizeof(long   ))
@@ -63,9 +65,3 @@
 #endif
 
 #endif
-
-
-
-
-
-

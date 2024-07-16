@@ -212,11 +212,15 @@ extern "C" {
 
 #endif /* _SWAP_ */
 
-#ifndef min
-#define min(a, b)   (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a, b)   (((a) > (b)) ? (a) : (b))
+// WARNING: the min and max macro make conflicts with the GNU implementation 
+//          of the C++ standard library
+#if !defined(__GNUC__) || !defined(__cplusplus)
+    #ifndef min
+        #define min(a, b)   (((a) < (b)) ? (a) : (b))
+    #endif
+    #ifndef max
+        #define max(a, b)   (((a) > (b)) ? (a) : (b))
+    #endif
 #endif
 
 

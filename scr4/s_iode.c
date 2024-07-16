@@ -19,8 +19,13 @@ int ISC_fclose(FILE *fd)
 
 ISC_unlink(char *filename)
 {
+#ifdef __GNUC__
+    return(unlink(filename));
+#else
     return(_unlink(filename));
+#endif
 }
+
 ISC_rename(char *oldname, char *newname)
 {
     return(rename(oldname, newname));

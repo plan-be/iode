@@ -4,13 +4,17 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifndef WATCOM
-#ifndef max
-#define max(x,y)        ((x)<(y)?(y):(x))
-#endif
-#ifndef min
-#define min(x,y)        ((x)<(y)?(x):(y))
-#endif
+// WARNING: the min and max macro make conflicts with the GNU implementation 
+//          of the C++ standard library
+#if !defined(__GNUC__) || !defined(__cplusplus)
+	#ifndef WATCOM
+		#ifndef max
+			#define max(x,y)        ((x)<(y)?(y):(x))
+		#endif
+		#ifndef min
+			#define min(x,y)        ((x)<(y)?(x):(y))
+		#endif
+	#endif
 #endif
 
 extern char     SCR_DATE_FMT[];
@@ -18,10 +22,10 @@ extern char     SCR_DATE_FMT[];
 long SCR_Y2K_EPOCH = 0L; /* JMP 28-11-98 */
 
 /* ====================================================================
-Transforme une date formatt‚e dans string en long. Le format est celui
-d‚fini dans la variable globale SCR_DATE_FMT.
+Transforme une date formattï¿½e dans string en long. Le format est celui
+dï¿½fini dans la variable globale SCR_DATE_FMT.
 
-&RT un long repr‚sentant la date
+&RT un long reprï¿½sentant la date
 &EX
     SCR_date_to_long("21/02/1991");
 &TX
@@ -35,30 +39,30 @@ char *string ;
 }
 
 /* ====================================================================
-Transforme une date formatt‚e dans string en long. Le format est celui
-d‚fini dans le paramŠtre fmt.
+Transforme une date formattï¿½e dans string en long. Le format est celui
+dï¿½fini dans le paramï¿½tre fmt.
 
-&RT un long repr‚sentant la date (yyyymmss)
+&RT un long reprï¿½sentant la date (yyyymmss)
 &EX
     SCR_fdate_to_long("02-21-91", "mm-dd-yy");
 &TX
 
 La variable SCR_Y2K_PIVOT permet de modifier le comportement lors de la
-transformation de date … 2 chiffres pour l'ann‚e.
+transformation de date ï¿½ 2 chiffres pour l'annï¿½e.
 
 &SY
    int SCR_Y2K_PIVOT = 75;
 &TX
 
-Pour connaŒtre le siŠcle … indiquer dans une date dont l'ann‚e n'est
-connue que par les deux derniers chiffres, on choisit le siŠcle comme
+Pour connaï¿½tre le siï¿½cle ï¿½ indiquer dans une date dont l'annï¿½e n'est
+connue que par les deux derniers chiffres, on choisit le siï¿½cle comme
 suit :
 
 &CO
     soit
-	YY l'ann‚e introduite,
+	YY l'annï¿½e introduite,
     on prend :
-	date = siŠcle_ courant + YY;
+	date = siï¿½cle_ courant + YY;
 	si date << date_courante - SCR_Y2K_PIVOT ans
 	alors date += ans;
 	sinon si date >>= date_courante + 100 ans)
@@ -165,7 +169,7 @@ char    *fmt;
 	dt[1] = m;
     }
 
-    /* Si dans le format il n'y a rien pour le jour, le laisser … 1 */
+    /* Si dans le format il n'y a rien pour le jour, le laisser ï¿½ 1 */
     if(d <= 0) {
 	if(nbd != 0) d = dt[0]; /* JMP 05-02-01 */  /* BP_M 06-07-2003 */
 	else         d = 1;
@@ -226,8 +230,8 @@ char    *fmt;
 }
 
 /* ====================================================================
-V‚rifie qu'une date est correcte. Le mois doit ˆtre compris entre 01 et
-12, le jour entre 1 et 31,  l'ann‚e n'est pas v‚rifi‚e.
+Vï¿½rifie qu'une date est correcte. Le mois doit ï¿½tre compris entre 01 et
+12, le jour entre 1 et 31,  l'annï¿½e n'est pas vï¿½rifiï¿½e.
 
 &RT 0 en cas d'heure correcte, -1 sinon
 &SA SCR_check_fmt_date()
@@ -257,8 +261,8 @@ long    date;
 }
 
 /* ====================================================================
-V‚rifie qu'une date formatt‚e est correcte. Le mois doit ˆtre compris
-entre 01 et 12, le jour entre 1 et 31, l'ann‚e n'est pas v‚rifi‚e.
+Vï¿½rifie qu'une date formattï¿½e est correcte. Le mois doit ï¿½tre compris
+entre 01 et 12, le jour entre 1 et 31, l'annï¿½e n'est pas vï¿½rifiï¿½e.
 
 &RT 0 en cas de date correcte, -1 sinon
 &SA SCR_check_date()

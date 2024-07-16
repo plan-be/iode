@@ -1,6 +1,5 @@
 #include "s_strs.h"
 #include <stdio.h>
-#include <io.h>
 
 #ifdef DOS
 #include <io.h>
@@ -13,17 +12,21 @@ char    SCR_BASE_PATH[64] = ".:/usr/lib/scr:/usr/scr";
 #define DIR_SEP     '/'
 #endif
 
+#ifdef __GNUC__
+    #define _access access
+#endif
+
 /* ====================================================================
-Recherche un fichier sur base d'un "PATH" donn‚. Le path est un string
-contenant des noms de directories s‚par‚s par des ; en DOS et des : en
-UNIX. DŠs que le fichier est trouv‚ dans un des directories, le nom
-complet est retourn‚ dans un buffer statique qui contient la derniŠre
+Recherche un fichier sur base d'un "PATH" donnï¿½. Le path est un string
+contenant des noms de directories sï¿½parï¿½s par des ; en DOS et des : en
+UNIX. Dï¿½s que le fichier est trouvï¿½ dans un des directories, le nom
+complet est retournï¿½ dans un buffer statique qui contient la derniï¿½re
 valeur.
 
 Si le nom du fichier commence par "." ou "/" ou "\", la recherche n'a
-pas lieu : le nom de fichier est consid‚r‚ comme complŠtement d‚termin‚.
+pas lieu : le nom de fichier est considï¿½rï¿½ comme complï¿½tement dï¿½terminï¿½.
 
-&RT une pointeur vers un buffer statique si le fichier est trouv‚. NULL
+&RT une pointeur vers un buffer statique si le fichier est trouvï¿½. NULL
 sinon.
 &EX
     char    *pt;
@@ -34,7 +37,7 @@ sinon.
 	return(-1);
 	}
     else {
-	printf("Premier fichier trouv‚ : %s\n", pt);
+	printf("Premier fichier trouvï¿½ : %s\n", pt);
 	return(0);
 	}
 &TX
@@ -88,21 +91,21 @@ char    *file;
 }
 
 /* ====================================================================
-Recherche un fichier sur base du "PATH" de SCR/AL1. Le path est d‚fini
+Recherche un fichier sur base du "PATH" de SCR/AL1. Le path est dï¿½fini
 par la variable globale SCR_PATH. Si cette variable est vide ou que le
-fichier n'est pas trouv‚ dans les directory d‚finis, la variable
-d'environnement PATH est utilis‚e. Si PATH ne contient pas le fichier,
-la variable C SCR_BASE_PATH du systŠme est utilis‚e.
-La valeur par d‚faut est :
+fichier n'est pas trouvï¿½ dans les directory dï¿½finis, la variable
+d'environnement PATH est utilisï¿½e. Si PATH ne contient pas le fichier,
+la variable C SCR_BASE_PATH du systï¿½me est utilisï¿½e.
+La valeur par dï¿½faut est :
 
 &CO
     en DOS  : ".;\\;c:\\;c:\\scr";
     en UNIX : ".:/usr/lib/scr";
 &TX
 
-La fonction SCR_search_path() est utilis‚e pour rechercher le fichier.
+La fonction SCR_search_path() est utilisï¿½e pour rechercher le fichier.
 
-&RT une pointeur vers un buffer statique si le fichier est trouv‚. NULL
+&RT une pointeur vers un buffer statique si le fichier est trouvï¿½. NULL
 sinon.
 &EX
     char    *pt;
@@ -113,7 +116,7 @@ sinon.
 	return(-1);
 	}
     else {
-	printf("Premier fichier trouv‚ : %s\n", pt);
+	printf("Premier fichier trouvï¿½ : %s\n", pt);
 	return(0);
 	}
 &TX
