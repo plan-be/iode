@@ -131,6 +131,7 @@ extern int WscrEMFPaint(HWND hWnd);
 extern int WscrWMFPaint(HWND hWnd);
 
 /* s_wprts.c */
+#if defined(SCRW32) || defined(DOSW32)
 extern char **WscrListPrinters(void);
 extern int WscrGetDefaultPrinter(char *PrinterName);
 extern int WscrSetDefaultPrinter(char *PrinterName);
@@ -144,6 +145,7 @@ extern int WscrSetPrinterQuality(char *PrinterName,int quality);
 extern int WscrSetPrinterColor(char *PrinterName,int color);
 extern int WscrSetPrinterDuplex(char *PrinterName,int duplex);
 extern int WscrSetPrinterCollate(char *PrinterName,int collate);
+#endif
 
 /* s_wap.c */
 extern int WapTransOptText(unsigned char *ansi,unsigned char *ascii,int key, int prfx);

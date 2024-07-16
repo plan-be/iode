@@ -1,14 +1,18 @@
 #include "s_date.h"
 
-#define max(x,y)        ((x)<(y)?(y):(x))
-#define min(x,y)        ((x)<(y)?(x):(y))
+// WARNING: the min and max macro make conflicts with the GNU implementation 
+//          of the C++ standard library
+#if !defined(__GNUC__) || !defined(__cplusplus)
+    #define max(x,y)        ((x)<(y)?(y):(x))
+    #define min(x,y)        ((x)<(y)?(x):(y))
+#endif
 #define DT_eq_month(d1, d2)     (DT_month(d1) == DT_month(d2))
 
 int     DT_MONTHS[] = {0,31,59,90,120,151,181,212,243,273,304,334} ;
 int     DT_DAYS[]   = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 /* ====================================================================
-Retourne l'ann‚e d'une date.
+Retourne l'annï¿½e d'une date.
 &EX
     DT_year(19900315L) vaut 1990
 &TX
@@ -47,10 +51,10 @@ long    date;
 }
 
 /* ====================================================================
-Retourne le nombre de jours ‚coul‚s entre le premier janvier 1900 et
+Retourne le nombre de jours ï¿½coulï¿½s entre le premier janvier 1900 et
 date.
 
-date est pr‚sent‚ sous forme de long : YYYYMMDD. Par exemple 19911010.
+date est prï¿½sentï¿½ sous forme de long : YYYYMMDD. Par exemple 19911010.
 
 &RT le nombre de jours (long)
 &EX
@@ -71,9 +75,9 @@ long    date;
 }
 
 /* ====================================================================
-Transforme en date un nombre de jours ‚coul‚s (day) depuis le 1/1/1900.
+Transforme en date un nombre de jours ï¿½coulï¿½s (day) depuis le 1/1/1900.
 
-Le r‚sultat est pr‚sent‚ sous forme d'un long : YYYYMMDD (19911231).
+Le rï¿½sultat est prï¿½sentï¿½ sous forme d'un long : YYYYMMDD (19911231).
 &RT la date correspondant au nombre de jours
 &EX
     DT_num_date(30000L);
@@ -103,9 +107,9 @@ long    day;
     return(DT_dmy_date(d));
 }
 /* ====================================================================
-Indique si l'ann‚e donn‚e sous forme d'un long est bissextile ou non.
+Indique si l'annï¿½e donnï¿½e sous forme d'un long est bissextile ou non.
 
-&RT 0 si l'ann‚e n'est pas bissextile, 1 sinon.
+&RT 0 si l'annï¿½e n'est pas bissextile, 1 sinon.
 &EX
 	DT_bix(1990L);
 &TX
@@ -153,7 +157,7 @@ long    d[];
 }
 
 /* ====================================================================
-Retourne le jour de la semaine correspondant … la date donn‚e
+Retourne le jour de la semaine correspondant ï¿½ la date donnï¿½e
 &RT un entier compris entre 1 (lundi) et 7 (dimanche)
 &EX
     DT_day_w(19911031L)
@@ -168,9 +172,9 @@ long    date;
 }
 
 /* ====================================================================
-Ajoute … une date (YYYYMMDD) un nombre de mois. Si le jour n'appartient
-pas au nouveau mois, il est ramen‚ au dernier jour du mois. nbm peut
-ˆtre n‚gatif.
+Ajoute ï¿½ une date (YYYYMMDD) un nombre de mois. Si le jour n'appartient
+pas au nouveau mois, il est ramenï¿½ au dernier jour du mois. nbm peut
+ï¿½tre nï¿½gatif.
 
 &RT la nouvelle date (YYYYMMDD)
 &EX
@@ -211,7 +215,7 @@ int     nbm;
 }
 
 /* ====================================================================
-Ajoute … une date (YYYYMMDD) un nombre de jours.
+Ajoute ï¿½ une date (YYYYMMDD) un nombre de jours.
 
 &RT la nouvelle date (YYYYMMDD)
 &SA DT_add_months()
@@ -225,23 +229,23 @@ int     nbd;
 }
 
 /* ====================================================================
-Modifie une date (YYYYMMDD) en fonction d'un calendrier sp‚cifique. dayr
+Modifie une date (YYYYMMDD) en fonction d'un calendrier spï¿½cifique. dayr
 peut prendre les valeurs suivantes :
 
 &EN 0 : pas de changement de date
 &EN 1 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui pr‚cŠde est retourn‚
+	25/12, le jour de semaine qui prï¿½cï¿½de est retournï¿½
 &EN 2 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui pr‚cŠde est retourn‚ sauf si il ne
-	fait pas partie du mˆme mois que la date d'origine. Dans ce cas,
-	la rŠgle du cas 3 est utilis‚.
+	25/12, le jour de semaine qui prï¿½cï¿½de est retournï¿½ sauf si il ne
+	fait pas partie du mï¿½me mois que la date d'origine. Dans ce cas,
+	la rï¿½gle du cas 3 est utilisï¿½.
 &EN 3 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui suit est retourn‚
+	25/12, le jour de semaine qui suit est retournï¿½
 &EN 4 : si la date est un samedi ou un week-end, ou encore le 1/1 ou le
-	25/12, le jour de semaine qui suit est retourn‚ sauf si il ne
-	fait pas partie du mˆme mois que la date d'origine. Dans ce cas,
-	la rŠgle du cas 1 est utilis‚.
-&RT la date modifi‚e (‚ventuellement) sous le format YYYYMMDD
+	25/12, le jour de semaine qui suit est retournï¿½ sauf si il ne
+	fait pas partie du mï¿½me mois que la date d'origine. Dans ce cas,
+	la rï¿½gle du cas 1 est utilisï¿½.
+&RT la date modifiï¿½e (ï¿½ventuellement) sous le format YYYYMMDD
 &EX
     DT_bus(19910101, 0) vaut 19910101
     DT_bus(19910101, 1) vaut 19901231
@@ -284,10 +288,10 @@ ag:
 
 
 /* ====================================================================
-Indique si une date correspond … un jour de travail ou non. Cette
-fonction peut ˆtre modifi‚e par l'utilisateur pour r‚pondre … ses
-contraintes. Elles est utilis‚e dans DT_bus().
-&RT 1 si le jour est f‚ri‚, 0 sinon.
+Indique si une date correspond ï¿½ un jour de travail ou non. Cette
+fonction peut ï¿½tre modifiï¿½e par l'utilisateur pour rï¿½pondre ï¿½ ses
+contraintes. Elles est utilisï¿½e dans DT_bus().
+&RT 1 si le jour est fï¿½riï¿½, 0 sinon.
 &SA DT_bus()
 ======================================================================= */
 DT_leave(date)
@@ -302,9 +306,9 @@ long    date;
     return(0);
 }
 /* ====================================================================
-Retourne la diff‚rence de mois entre deux dates (sans tenir compte des
+Retourne la diffï¿½rence de mois entre deux dates (sans tenir compte des
 jours).
-&RT le nombre de mois de diff‚rence
+&RT le nombre de mois de diffï¿½rence
 &EX
     DT_diff_months(19900201, 19900131) vaut 1
     DT_diff_months(19900201, 19910228) vaut -12
@@ -323,7 +327,7 @@ long    d1, d2;
 }
 
 /* ====================================================================
-Retourne le nombre de jours ‚coul‚s entre deux dates (YYYYMMDD).
+Retourne le nombre de jours ï¿½coulï¿½s entre deux dates (YYYYMMDD).
 &EX
     DT_diff_dates(19900201L, 19900131L) vaut 1
 &TX
@@ -356,10 +360,10 @@ long    vd1[3];
 /* ====================================================================
 Retourne le nombre de jours entre deux dates dans un calendrier 30 jours
 par mois. Dans ce type de calendrier, tous les mois ont 30 jours, y
-compris f‚vrier et tout se passe comme si le 31 n'existait pas et ‚tait
-remplac‚ par le 30. De mˆme le 28 f‚vrier est compt‚ comme 30Šme jour,
-sauf les ann‚es bissextiles o— c'est le 29 f‚vrier qui est compt‚ comme
-300Šme jour.
+compris fï¿½vrier et tout se passe comme si le 31 n'existait pas et ï¿½tait
+remplacï¿½ par le 30. De mï¿½me le 28 fï¿½vrier est comptï¿½ comme 30ï¿½me jour,
+sauf les annï¿½es bissextiles oï¿½ c'est le 29 fï¿½vrier qui est comptï¿½ comme
+300ï¿½me jour.
 &RT Le nombre de jour (long)
 &EX
     DT_diff_30(19900201L, 19900130L)  vaut 1 et non 2
@@ -384,7 +388,7 @@ long    d2, d1;
 
 /* ====================================================================
 Transforme une date "normale" (format YYYYMMDD) en format julien
-(YYYYDDD) o— 1990001 repr‚sente le 1er janvier 1990.
+(YYYYDDD) oï¿½ 1990001 reprï¿½sente le 1er janvier 1990.
 
 &EX
     DT_dat_julian(19900101L) vaut 1990001L
@@ -507,7 +511,7 @@ long    dt, tim;
 
 
 /* ====================================================================
-Retourne le nombre de secondes ‚coul‚es depuis le 1/1/1980.
+Retourne le nombre de secondes ï¿½coulï¿½es depuis le 1/1/1980.
 
 &EX
     cursec = DT_secs_1180(SCR_current_date(), SCR_current_time());
@@ -541,7 +545,7 @@ long    dt, tim;
 
 
 /* ====================================================================
-Retourne le nombre de secondes ‚coul‚es depuis le 1/1/2000
+Retourne le nombre de secondes ï¿½coulï¿½es depuis le 1/1/2000
 
 ----------------------------------------------------------------------- */
 
@@ -553,18 +557,18 @@ long DT_current_sec_2000()
 
 
 /* ====================================================================
-Retourne le num‚ro de la semaine d'une date donn‚e (ISO-8601).
+Retourne le numï¿½ro de la semaine d'une date donnï¿½e (ISO-8601).
 
-RŠgles :
-&EN Les semaines vont de lundi … dimanche.
-&EN La semaine num‚ro 1 est celle qui contient le premier jeudi de l'ann‚e. Elle
-peut donc commencer l'ann‚e pr‚c‚dente.
-&EN Week 0 : les premiers jours peuvent ˆtre de la semaine 0, ce qui signifie qu'ils sont
-consid‚r‚s de la 53e semaine de l'ann‚e pr‚c‚dente.
-&EN Week 53 : la semaine 53 peut ˆtre soit r‚ellement la 53e, soit la premiŠre de l'ann‚e suivante
-&EN Le num‚ro de la semaine est <= 53  -> … corriger
-&EN L'existence d'une semaine 53 d‚pend de la position du premier jeudi de
-l'ann‚e suivante.
+Rï¿½gles :
+&EN Les semaines vont de lundi ï¿½ dimanche.
+&EN La semaine numï¿½ro 1 est celle qui contient le premier jeudi de l'annï¿½e. Elle
+peut donc commencer l'annï¿½e prï¿½cï¿½dente.
+&EN Week 0 : les premiers jours peuvent ï¿½tre de la semaine 0, ce qui signifie qu'ils sont
+considï¿½rï¿½s de la 53e semaine de l'annï¿½e prï¿½cï¿½dente.
+&EN Week 53 : la semaine 53 peut ï¿½tre soit rï¿½ellement la 53e, soit la premiï¿½re de l'annï¿½e suivante
+&EN Le numï¿½ro de la semaine est <= 53  -> ï¿½ corriger
+&EN L'existence d'une semaine 53 dï¿½pend de la position du premier jeudi de
+l'annï¿½e suivante.
 
 ----------------------------------------------------------------------- */
 
@@ -572,7 +576,7 @@ DT_week_number(long date)
 {
     long    jday, wday1, w;
 
-    // day_nb = num‚ro du jour dans l'ann‚e (via julian date)
+    // day_nb = numï¿½ro du jour dans l'annï¿½e (via julian date)
     jday = DT_date_julian(date) % 1000;
 
     // wday1 = jour de la semaine du 1er janvier
@@ -590,7 +594,7 @@ DT_week_number(long date)
    return(w);
 }
 
-/* Conneries ‚crites par BP... (en Suisse pour compter des secondes ????) */
+/* Conneries ï¿½crites par BP... (en Suisse pour compter des secondes ????) */
 
 int TM_3(long hr, long *h3)
 {

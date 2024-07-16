@@ -5,23 +5,27 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifndef WATCOM
-#ifndef max
-#define max(x,y)        ((x)<(y)?(y):(x))
-#endif
-#ifndef min
-#define min(x,y)        ((x)<(y)?(x):(y))
-#endif
+// WARNING: the min and max macro make conflicts with the GNU implementation 
+//          of the C++ standard library
+#if !defined(__GNUC__) || !defined(__cplusplus)
+    #ifndef WATCOM
+        #ifndef max
+            #define max(x,y)        ((x)<(y)?(y):(x))
+        #endif
+        #ifndef min
+            #define min(x,y)        ((x)<(y)?(x):(y))
+        #endif
+    #endif
 #endif
 
 extern char     SCR_TIME_FMT[];
 
 
 /* ====================================================================
-Transforme une heure formatt‚e dans string en long. Le format est celui
-d‚fini dans la variable globale SCR_TIME_FMT.
+Transforme une heure formattï¿½e dans string en long. Le format est celui
+dï¿½fini dans la variable globale SCR_TIME_FMT.
 
-&RT un long repr‚sentant l'heure
+&RT un long reprï¿½sentant l'heure
 &EX
     SCR_time_to_long("12:53:12");
 &TX
@@ -35,13 +39,13 @@ char *string ;
 }
 
 /* ====================================================================
-Transforme une heure formatt‚e dans string en long. Le format est celui
-d‚fini dans le paramŠtre fmt.
+Transforme une heure formattï¿½e dans string en long. Le format est celui
+dï¿½fini dans le paramï¿½tre fmt.
 
 Seuls les deux premiers h, s et m sont pris en compte dans le calcul.
 Ainsi le format "hhH.mm" sur "24H.30" donnera 243000.
 
-&RT un long repr‚sentant l'heure (hhmmss)
+&RT un long reprï¿½sentant l'heure (hhmmss)
 &EX
     SCR_ftime_to_long("12:30", "hh-mm");
 
@@ -94,7 +98,7 @@ char    *fmt;
 }
 
 /* ====================================================================
-V‚rifie qu'une heure est correcte. L'heure doit ˆtre comprise entre 00
+Vï¿½rifie qu'une heure est correcte. L'heure doit ï¿½tre comprise entre 00
 et 23, les minutes et les secondes entre 00 et 59.
 
 &RT 0 en cas d'heure correcte, -1 sinon.
@@ -114,7 +118,7 @@ long    hour;
 }
 
 /* ====================================================================
-V‚rifie qu'une heure formatt‚e est correcte.
+Vï¿½rifie qu'une heure formattï¿½e est correcte.
 
 &RT 0 en cas d'heure correcte, -1 sinon
 &SA SCR_check_date()

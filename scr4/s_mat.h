@@ -11,10 +11,14 @@
 #define MREAL           double
 #define ZERO(x)         (fabs(x) < 1e-25)
 
-#undef min
-#undef max
-#define max(a,b)        (((a) > (b)) ? (a) : (b))
-#define min(a,b)        (((a) < (b)) ? (a) : (b))
+// WARNING: the min and max macro make conflicts with the GNU implementation 
+//          of the C++ standard library
+#if !defined(__GNUC__) || !defined(__cplusplus)
+	#undef min
+	#undef max
+	#define max(a,b)        (((a) > (b)) ? (a) : (b))
+	#define min(a,b)        (((a) < (b)) ? (a) : (b))
+#endif
 
 #define M_NC(m)           ((m)->m_nc)
 #define M_NL(m)           ((m)->m_nl)
@@ -28,8 +32,8 @@
 
 /*****************************************************************/
 /*  to swap or not to swap in EMS ? */
-/*  Les matrices sont stock‚es en EMS par d‚faut, la d‚finition de la
-constante symbolique NOSWAP impose le stockage des matrices en m‚moire
+/*  Les matrices sont stockï¿½es en EMS par dï¿½faut, la dï¿½finition de la
+constante symbolique NOSWAP impose le stockage des matrices en mï¿½moire
 conventionnelle */
 
 #ifdef NOSWAP

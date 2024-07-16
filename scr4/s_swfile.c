@@ -18,13 +18,25 @@
 
 #include <stdlib.h>
 
+#ifdef __GNUC__
+    #define _unlink unlink
+    #define _access access
+    #define _creat creat
+    #define _open open
+    #define _read read
+    #define _write write
+    #define _lseek lseek
+    #define _close close
+#endif
+
+
 int     SW_HANDLE = -1;
 
 extern  char    *getenv(const char*);
 
 /*NH*/
-/*  Cr‚ation du fichier de swap : la varaible d'environnement SWAPFILE
-    contient le nom du disque et du fichier … utiliser.
+/*  Crï¿½ation du fichier de swap : la varaible d'environnement SWAPFILE
+    contient le nom du disque et du fichier ï¿½ utiliser.
 */
 
 SW_open()
