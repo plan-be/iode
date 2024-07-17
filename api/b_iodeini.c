@@ -37,7 +37,11 @@ void B_IodeIniFile()
 
     // Get module directory (c:/iode p.ex)
     if(ODE_INIFILE) return;
+#ifdef __GNUC__
+    readlink("/proc/self/exe", module, sizeof(module) - 1);
+#else
     GetModuleFileName(0, module, 1000);
+#endif
     SCR_split_dir(module, file);
 	sprintf(file, "%s\\iode.ini", module);
 	ODE_INIFILE = SCR_stracpy(file);

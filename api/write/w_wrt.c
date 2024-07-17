@@ -254,6 +254,7 @@ static int W_InitParms()
     case W_CSV  :
         B_A2mGetCsvParms();
         break;
+#ifndef __GNUC__
     case W_DISP :
         B_A2mGetGdiParms();   /* JMP 19-02-98 */
         if(WscrGetOSVersion(0L) == 2) { /* JMP 17-11-98 */
@@ -268,7 +269,8 @@ static int W_InitParms()
         SCR_free(A2M_PGFOOT);
         A2M_PGHEAD = A2M_PGFOOT = 0;
         break;
-    default     :
+#endif
+    default :
         break;
     }
 
@@ -651,6 +653,7 @@ static char W_DftPrinterName[80];              // Default printer name
  
 static int W_SavePrinterSettings()
 {
+#ifndef __GNUC__
     if(WscrGetDefaultPrinter(W_DftPrinterName) < 0) {
         W_DftPrinterName[0] = 0;
     }
@@ -658,6 +661,9 @@ static int W_SavePrinterSettings()
     // W_DftPrinterOrient = WscrGetPrinterOrientation(W_DftPrinterName); // JMP 22/8/2016
     // W_DftPrinterDuplex = WscrGetPrinterDuplex(W_DftPrinterName); // JMP 22/8/2016
     return(0);
+#else
+    return(-1);
+#endif
 }
 
 /**
@@ -670,6 +676,7 @@ static int W_SavePrinterSettings()
  
 static int W_ResetPrinterSettings()
 {
+#ifndef __GNUC__
     char    buf[80];
 
     if(WscrGetDefaultPrinter(buf) < 0) return(-1);
@@ -681,6 +688,9 @@ static int W_ResetPrinterSettings()
     // WscrSetPrinterOrientation(buf, W_DftPrinterOrient); // JMP 22/8/2016
     // WscrSetPrinterDuplex(buf, W_DftPrinterDuplex); // JMP 22/8/2016
     return(0);
+#else
+    return(-1);
+#endif
 }
 
 /**
@@ -695,6 +705,7 @@ static int W_ResetPrinterSettings()
  
 static int W_SetPrinterSettings()
 {
+#ifndef __GNUC__
     char    buf[80];
 
     if(W_gdiprinter[0]) WscrSetDefaultPrinter(W_gdiprinter);
@@ -703,4 +714,7 @@ static int W_SetPrinterSettings()
     // WscrSetPrinterOrientation(buf, W_gdiorient); // JMP 22/8/2016
     // WscrSetPrinterDuplex(buf, W_gdiduplex); // JMP 22/8/2016
     return(0);
+#else
+    return(-1);
+#endif
 }

@@ -73,7 +73,6 @@ extern int     KT_CUR_TOPIC;        // A2M: Current topic id
 extern int     A2M_GIF_BGCOLOR_NB;  // GIF background color nb
 extern int     A2M_GIF_TRCOLOR_NB;  // GIF transparent coor nb
 
-
 /**
  *  Define the printing destination. Sub function of B_PrintDest() and B_PrintDestNew().
  *  
@@ -494,7 +493,7 @@ int B_PrintGSize(char* arg)
 // TODO: add to manual
 int B_PrintGTheme(char* arg)
 {
-#ifndef _MSC_VER    
+#if !defined(_MSC_VER) && !defined(__GNUC__)    
     ChrtThemeInit(arg);
 #endif    
     return(0);
@@ -505,7 +504,7 @@ int B_PrintGTheme(char* arg)
 // TODO: add to manual (see GB)
 int B_PrintGBand(char* arg)
 {
-#ifndef _MSC_VER    
+#if !defined(_MSC_VER) && !defined(__GNUC__)    
     char    **args;
     int     rc = 0, nbargs;
     PERIOD  *per;
@@ -724,7 +723,7 @@ int B_PrintGdiPrinter(char* arg)
 // $PrintGIFBackColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
 int B_PrintGIFBackColor(char* arg)
 {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__GNUC__)
     int     col;
 
     col = B_GetColor(arg);
@@ -740,7 +739,7 @@ int B_PrintGIFBackColor(char* arg)
 // $PrintGIFTransColor {Black|Blue|Magenta|Cyan|Red|Green|Yellow|White}
 int B_PrintGIFTransColor(char* arg)
 {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__GNUC__)
     int     col;
 
     col = B_GetColor(arg);
@@ -756,7 +755,7 @@ int B_PrintGIFTransColor(char* arg)
 // $PrintGIFInterlaced {Yes|No} 
 int B_PrintGIFInterlaced(char* arg)
 {
-#ifndef _MSC_VER    
+#if !defined(_MSC_VER) && !defined(__GNUC__)    
     switch(arg[0]) {
         case '0':
         case 'n':
@@ -776,7 +775,7 @@ int B_PrintGIFInterlaced(char* arg)
 // $PrintGIFTransparent {Yes|No}
 int B_PrintGIFTransparent(char* arg)
 {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__GNUC__)
     switch(arg[0]) {
         case '0':
         case 'n':
@@ -797,7 +796,7 @@ int B_PrintGIFTransparent(char* arg)
 // $PrintGIFilled {Yes|No}
 int B_PrintGIFFilled(char* arg)
 {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__GNUC__)
     switch(arg[0]) {
         case '0':
         case 'n':
@@ -818,7 +817,7 @@ int B_PrintGIFFilled(char* arg)
 // $PrintGIFFont FontNb (between 0 and 5)
 int B_PrintGIFFont(char* arg)
 {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__GNUC__)
     int     font;
 
     font = atoi(arg);

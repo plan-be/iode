@@ -33,6 +33,19 @@
 #include <s_a2m.h>
 #include <math.h>
 
+#ifdef __GNUC__
+    #define _unlink unlink
+    #define _access access
+    #define _creat creat
+    #define _open open
+    #define _read read
+    #define _lseek lseek
+    #define _close close
+    #define _mkdir mkdir
+    #define _rmdir rmdir
+    #define vsnprintf_s vsnprintf
+#endif
+
 // values.h n'existe pas en  VCC, remplacer les defines
 #ifndef _MSC_VER
 #include <values.h>

@@ -115,7 +115,11 @@
  */
  
 #include "iode.h"
-#include <direct.h>
+#ifdef _MSC_VER
+    #include <direct.h>
+#else
+    #include <unistd.h>
+#endif
 #include <time.h>
 
 

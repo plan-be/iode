@@ -134,6 +134,7 @@ BFNS B_fns[] = {
     "datascan",               "DataScan",                 B_DataScan,             SB_DataScan,        1,        1,
     "datapattern",            "DataPattern",              B_DataPattern,          NULL,               1,        1,          /* GB 01/2005 */
     
+#ifndef __GNUC__
     "excelget",               "ExcelGet",                 B_ExcelGet,             NULL,               1,        1,
     "excellang",              "ExcelLang",                B_ExcelLang,            NULL,               0,        1,
     "exceldecimal",           "ExcelDecimal",             B_ExcelDecimal,         NULL,               0,        1,
@@ -148,7 +149,8 @@ BFNS B_fns[] = {
     "excelsave",              "ExcelSave",                B_ExcelSave,            NULL,               0,        1,
     "excelsaveas",            "ExcelSaveAs",              B_ExcelSaveAs,          NULL,               0,        1,
     "excelwrite",             "ExcelWrite",               B_ExcelWrite,           NULL,               0,        1,
-  
+#endif  
+
     "dsimportdb",             "DSImportDb",               B_DSImportDb,           NULL,               0,        1,
    
     "statunitroot",           "StatUnitRoot",             B_StatUnitRoot,         SB_StatUnitRoot,    0,        1,

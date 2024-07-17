@@ -70,6 +70,10 @@
 #include "iode.h"
 #include <time.h>
 
+#ifdef __GNUC__
+    #define _isnan isnan
+#endif
+
 /* Global functions (not static!) */
 L_REAL L_logn(L_REAL v)
 {

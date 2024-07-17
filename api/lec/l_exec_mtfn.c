@@ -47,6 +47,10 @@
 
 #include "iode.h"
 
+#ifdef __GNUC__
+    #define _isnan isnan
+#endif
+
 /* =============================== MTFN ============================== */
 
 // L_tfn_args() computes the value of from and to based on nargs, the number of arguments of the calling function.

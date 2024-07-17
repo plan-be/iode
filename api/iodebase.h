@@ -13,6 +13,12 @@
 #ifndef _IODEBASE_
 #define _IODEBASE_
 
+#ifdef __GNUC__
+#    define IODE_CDECL __attribute__((cdecl))
+#else
+#    define IODE_CDECL __cdecl
+#endif
+
 #include <stdarg.h> // JMP 06/12/2022 for va_list
 
 #ifdef SCRCPP
@@ -284,9 +290,18 @@ extern void L_link_endos(KDB* kde, CLEC* cl);
 
 /* l_exec.c */
 #ifdef _MSC_VER
-        extern int matherr(struct _exception *);
+        extern int matherr(struct _exception *e);
 #else
-        extern int matherr(struct exception *);
+        // Define the exception structure
+        struct exception {
+        int type;       // Type of error
+        char *name;     // Name of the function where the error occurred
+        double arg1;    // First argument to the function
+        double arg2;    // Second argument to the function (if applicable)
+        double retval;  // Return value
+        };
+        
+        extern int matherr(struct exception *e);
 #endif
 extern void L_fperror(void);
 extern double L_exec(KDB *,KDB *,CLEC *,int );
@@ -1744,16 +1759,16 @@ extern int B_ExcelNew(char *arg);
 extern int IodeFmtVal(char *buf, double val);
 
 /* b_ds.c (MSC) */
-extern char *__cdecl B_DSPeriod2Date(struct _period *per,char *date,char *freq);
-extern int __cdecl B_DSLog(char *log);
-extern int __cdecl B_DSTimedOut(char *name);
-extern int __cdecl B_DSDate2Period(struct _period *per,char *date,char freq);
-extern int __cdecl B_DSCode(char *name);
-extern int __cdecl B_DSUpdateCmt(char *name,char *val);
-extern int __cdecl B_DSUpdateVar(char *name,struct _period *per,char *val);
-extern int __cdecl B_DSInterpret(char *code,char freq,char *contents);
-extern int __cdecl B_DSImportDb_1(char *arg,struct _sample *smpl);
-extern int __cdecl B_DSImportDb(char *arg);
+extern char *IODE_CDECL B_DSPeriod2Date(struct _period *per,char *date,char *freq);
+extern int IODE_CDECL B_DSLog(char *log);
+extern int IODE_CDECL B_DSTimedOut(char *name);
+extern int IODE_CDECL B_DSDate2Period(struct _period *per,char *date,char freq);
+extern int IODE_CDECL B_DSCode(char *name);
+extern int IODE_CDECL B_DSUpdateCmt(char *name,char *val);
+extern int IODE_CDECL B_DSUpdateVar(char *name,struct _period *per,char *val);
+extern int IODE_CDECL B_DSInterpret(char *code,char freq,char *contents);
+extern int IODE_CDECL B_DSImportDb_1(char *arg,struct _sample *smpl);
+extern int IODE_CDECL B_DSImportDb(char *arg);
 
 /* b_sql.c */
 //extern KDB  *K_load_odbc(int , char *, int , char **);
@@ -1767,10 +1782,10 @@ extern U_ch *RPS_Next(U_ch** args);
 extern U_ch *RPS_Close(U_ch** args);
 
 /* b_win.c (MSC) */
-extern int __cdecl B_WindowMinimize();
-extern int __cdecl B_WindowMaximize();
-extern int __cdecl B_exec_system(char *arg);
-extern int __cdecl B_shellexec(char *arg);
+extern int IODE_CDECL B_WindowMinimize();
+extern int IODE_CDECL B_WindowMaximize();
+extern int IODE_CDECL B_exec_system(char *arg);
+extern int IODE_CDECL B_shellexec(char *arg);
 
 /* w_wrt.c (MSC) */
 extern int W_dest(char *filename,int type);

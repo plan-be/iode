@@ -68,6 +68,7 @@
 
 #include "iode.h"
 #include <stdarg.h>
+#include <stdlib.h>
 
 // Global variables
 void (*kerror_super)(const int level, const char*msg);
@@ -276,7 +277,11 @@ int kconfirm(const char *fmt,...)
     if(kconfirm_super != 0) 
         return((*kconfirm_super)(buf));
     else {
+#ifdef __GNUC__
+        fgets(buf, sizeof(buf) - 1, stdin);
+#else
         gets_s(buf, sizeof(buf) - 1);
+#endif
         SCR_sqz(buf);
         return(!U_is_in(buf[0], "OoYyJj1"));
     }    
@@ -536,6 +541,9 @@ int kexecsystem(const char *arg)
  */
 int kshellexec(const char *arg)
 {
+    int res;
+
+#ifdef _MSC_VER
     SHELLEXECUTEINFO    sei;
 
     if(kshellexec_super) 
@@ -553,6 +561,13 @@ int kshellexec(const char *arg)
 
     ShellExecuteEx(&sei);
     return(0);
+#else
+    if(kshellexec_super) 
+        return((*kshellexec_super)(arg));
+
+    res = system(arg);
+    return res;
+#endif
 }
 
 

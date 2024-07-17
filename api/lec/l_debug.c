@@ -15,6 +15,7 @@
  *  TODO: replace by a "super" function 
  */
 
+#include "api/iode.h"
 #include <stdio.h>
 #include <stdarg.h>
 

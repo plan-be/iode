@@ -37,6 +37,10 @@
 
 #include "iode.h"
 
+#ifdef __GNUC__
+    #define _isnan isnan
+#endif
+
 L_REAL L_or   (L_REAL a, L_REAL b) {return((a || b) ? (L_REAL)1.0 : (L_REAL)0.0);}
 L_REAL L_and  (L_REAL a, L_REAL b) {return((a && b) ? (L_REAL)1.0 : (L_REAL)0.0);}
 L_REAL L_ge   (L_REAL a, L_REAL b) {return((a >= b) ? (L_REAL)1.0 : (L_REAL)0.0);}

@@ -68,8 +68,9 @@ void E_error(char* fmt,...)
     va_start(myargs, fmt);
     if(fmt == 0) strcpy(buf, B_ERROR_DFT_MSG);
     else {
-#ifdef _MSC_VER   
+#if defined(_MSC_VER)  
         vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
+        
 #else
         vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
 #endif  
