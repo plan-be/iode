@@ -35,6 +35,33 @@
 // Nevertheless, these fns need to be defined because their pointers are stored in a global table K_xdrobj[] share in both architectures.
 
 /**
+ *  Function created for compatibility with the big-endian version. 
+ *  Translates a packed object from one architecture to another in an allocated pack.
+ *  If xdr_ptr is null, nothing is done. 
+ *  For compatibility with big-endian architecture (where the result must be allocated),
+ *  this function allocates a new buffer and makes a simple copy into it.
+ *  
+ *  @param [in]     ptr     unsigned char*       pointer to the input packed object
+ *  @param [out]    xdr_ptr unsigned char**      NULL or pointer to a pointer where the pointer to the allocated copy is to be stored
+ *  @return                 int                  -1 if xdr_ptr is NULL, 
+ *                                               0 otherwise 
+ *  
+ */
+static int K_oxdr(unsigned char* ptr, unsigned char** xdr_ptr)
+{
+    int     len;
+
+    if(xdr_ptr == NULL) return(-1);
+
+    len = P_len(ptr);
+    *xdr_ptr = SW_nalloc(len);
+    memcpy(*xdr_ptr, ptr, len);
+    return(0);
+}
+
+//// non-static functions ////
+
+/**
  *  Translates a **short int** in the current processor representation into a little-endian **short int**. 
  *  (Does nothing in the x86 architecture).
  *  
@@ -77,32 +104,6 @@ void K_xdrKDB(KDB* ikdb, KDB** okdb)
 
 
 /**
- *  Function created for compatibility with the big-endian version. 
- *  Translates a packed object from one architecture to another in an allocated pack.
- *  If xdr_ptr is null, nothing is done. 
- *  For compatibility with big-endian architecture (where the result must be allocated),
- *  this function allocates a new buffer and makes a simple copy into it.
- *  
- *  @param [in]     ptr     unsigned char*       pointer to the input packed object
- *  @param [out]    xdr_ptr unsigned char**      NULL or pointer to a pointer where the pointer to the allocated copy is to be stored
- *  @return                 int                  -1 if xdr_ptr is NULL, 
- *                                               0 otherwise 
- *  
- */
-static int K_oxdr(unsigned char* ptr, unsigned char** xdr_ptr)
-{
-    int     len;
-
-    if(xdr_ptr == NULL) return(-1);
-
-    len = P_len(ptr);
-    *xdr_ptr = SW_nalloc(len);
-    memcpy(*xdr_ptr, ptr, len);
-    return(0);
-}
-
-
-/**
  *  Table of function pointers, one function for each object type. 
  *  Each function converts an IODE packed object from little-endian architecture to little-endian architecture.
  *  In the case of little-endian architecture, the same function is used for all types.
@@ -130,30 +131,6 @@ int (*K_xdrobj[])() = {
 #define K_xdrSHORT(a)   XDR_rev(a, 1, sizeof(short))
 #define K_xdrLONG(a)    XDR_rev(a, 1, sizeof(long))
 #define K_xdrREAL(a)    XDR_rev(a, 1, sizeof(double))
-
-/**
- *  Translates a short int from little-endian to big-endian or the other way round (the translation is symmetrical ?).
- *  
- *  @param [in, out]    a   unsigned char*  pointer to a short int
- *  
- */
-void K_xdrPINT(unsigned char* a)
-{
-    XDR_rev(a, 1, sizeof(U_sh));
-}
-
-
-/**
- *  Translates a long int from little-endian to big-endian or the other way round.
- *  
- *  @param [in, out]    a   unsigned char*  pointer to a long int. 
- *                                          in: little-endian, out:big-endian
- */
-void K_xdrPLONG(unsigned char* a)
-{
-    XDR_rev(a, 1, sizeof(long));
-}
-
 
 /**
  *  Translates a PERIOD struct from little-endian to big-endian or the other way round.
@@ -209,52 +186,11 @@ static void K_xdrPACK(unsigned char* ptr, int mode)
     for(i = 0; i < nb + 2; i++) K_xdrPLONG(pos + i);
 }
 
-
-/**
- *  Switches the architecture of a KDB (little-endian to big-endian or the other way round). 
- *
- *  If okdb is null, the ikdb architecture is little-endian (when reading from a file) and the 
- *  transformation is done "in-place". No allocation is done.
- *  
- *  If okdb is not null, the ikdb is big-endian (in mem) and the result (little-endian) is allocated.
- *  ikdb is untouched in this case.
- * 
- *  @param [in, out]    ikdb    KDB*  pointer to a IODE packed object 
- *  @param [out]        okdb    KDB** NULL or pointer to the new allocated KDB (little-endian)
- */
-
-void K_xdrKDB(KDB* ikdb, KDB** okdb)
-{
-    short   type;
-    KDB     *xdr_kdb;
-    SAMPLE  *smpl;
-
-    type = ikdb->k_type;
-
-    if(okdb == NULL) {
-        /* intel read */
-        xdr_kdb = ikdb;
-        K_xdrSHORT(&type);
-    }
-    else {
-        /* intel write */
-        xdr_kdb = SW_nalloc(sizeof(KDB));
-        memcpy(xdr_kdb, ikdb, sizeof(KDB));
-
-        *okdb = xdr_kdb;
-    }
-
-    XDR_rev(&(xdr_kdb->k_type), 1, sizeof(short));
-    XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
-    XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
-
-    if(type == VARIABLES) {
-        smpl = (SAMPLE *) KDATA(xdr_kdb);
-        K_xdrSMPL(smpl);
-    }
-}
-
 //// CLEC transformation ////
+
+// declare static function ‘K_xdrCLEC_sub’()
+// to avoid error: static declaration of 'K_xdrCLEC_sub' follows non-static declaration
+static void K_xdrCLEC_sub(char* expr, int lg, int mode);
 
 /**
  *  Translates a CVAR struct from little-endian to big-endian or the other way round.
@@ -270,33 +206,42 @@ static void K_xdrCVAR(unsigned char* a)
 }
 
 /**
- *  Translates a CLEC struct from little-endian to big-endian or the other way round.
+ *  Translates a TFN function from little-endian to big-endian or the other way round.
  *  
- *  @param [in, out]    expr    CLEC*   Compiled LEC expression
- *  @param [in]         mode    int     0: if CLEC is in little-endian format
+ *  @param [in, out]    expr    char*    sub CLEC expression
+ *  @param [in]         len     short    nb of atomic elements in expr
+ *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
  */
-
-static void K_xdrCLEC(CLEC* expr, int mode)
+static void K_xdrTFN(unsigned char* expr, short len, int mode)
 {
-    long    tot_lg;
-    short   nb_names;
-    int     pos;
+    int lg = len;
 
-    nb_names = expr->nb_names;
-    tot_lg =   expr->tot_lg;
-    if(mode == 0) {
-        K_xdrLONG(&tot_lg);
-        K_xdrSHORT(&nb_names);
-    }
-
-    XDR_rev(&(expr->tot_lg), 1, sizeof(long));
-    XDR_rev(&(expr->exec_lg), 1, sizeof(long));
-    XDR_rev(&(expr->nb_names), 1, sizeof(short));
-
-    pos = sizeof(CLEC) + (nb_names - 1) * sizeof(LNAME);
-    K_xdrCLEC_sub((char *) expr + pos, tot_lg - pos, mode);
+    K_xdrCLEC_sub(expr, lg, mode);
 }
 
+
+/**
+ *  Translates a MTFN function from little-endian to big-endian or the other way round.
+ *  
+ *  @param [in, out]    expr    char*    sub CLEC expression
+ *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
+ *  @param [in]         nvargs  int      number of args of the MTFN function
+ *  
+ */
+
+static void K_xdrMTFN(unsigned char* expr, int mode, int nvargs)
+{
+    int     i;
+    short   len1, pos = 0;
+
+    for(i = 0 ; i < nvargs ; i++) {
+        memcpy(&len1, expr + pos, sizeof(short));
+        if(mode == 0) K_xdrSHORT(&len1); /* intel read */
+        K_xdrSHORT(expr + pos);
+        K_xdrCLEC_sub(expr + pos + sizeof(short), len1, mode);
+        pos += sizeof(short) + len1;
+    }
+}
 
 /**
  *  Translates a sub-CLEC expression from little-endian to big-endian or the other way round.
@@ -379,43 +324,32 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
     }
 }
 
-
 /**
- *  Translates a TFN function from little-endian to big-endian or the other way round.
+ *  Translates a CLEC struct from little-endian to big-endian or the other way round.
  *  
- *  @param [in, out]    expr    char*    sub CLEC expression
- *  @param [in]         len     short    nb of atomic elements in expr
- *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
- */
-static void K_xdrTFN(unsigned char* expr, short len, int mode)
-{
-    int lg = len;
-
-    K_xdrCLEC_sub(expr, lg, mode);
-}
-
-
-/**
- *  Translates a MTFN function from little-endian to big-endian or the other way round.
- *  
- *  @param [in, out]    expr    char*    sub CLEC expression
- *  @param [in]         mode    int      0 if expr is in little-endian format, 1 otherwise
- *  @param [in]         nvargs  int      number of args of the MTFN function
- *  
+ *  @param [in, out]    expr    CLEC*   Compiled LEC expression
+ *  @param [in]         mode    int     0: if CLEC is in little-endian format
  */
 
-static void K_xdrMTFN(unsigned char* expr, int mode, int nvargs)
+static void K_xdrCLEC(CLEC* expr, int mode)
 {
-    int     i;
-    short   len1, pos = 0;
+    long    tot_lg;
+    short   nb_names;
+    int     pos;
 
-    for(i = 0 ; i < nvargs ; i++) {
-        memcpy(&len1, expr + pos, sizeof(short));
-        if(mode == 0) K_xdrSHORT(&len1); /* intel read */
-        K_xdrSHORT(expr + pos);
-        K_xdrCLEC_sub(expr + pos + sizeof(short), len1, mode);
-        pos += sizeof(short) + len1;
+    nb_names = expr->nb_names;
+    tot_lg =   expr->tot_lg;
+    if(mode == 0) {
+        K_xdrLONG(&tot_lg);
+        K_xdrSHORT(&nb_names);
     }
+
+    XDR_rev(&(expr->tot_lg), 1, sizeof(long));
+    XDR_rev(&(expr->exec_lg), 1, sizeof(long));
+    XDR_rev(&(expr->nb_names), 1, sizeof(short));
+
+    pos = sizeof(CLEC) + (nb_names - 1) * sizeof(LNAME);
+    K_xdrCLEC_sub((char *) expr + pos, tot_lg - pos, mode);
 }
 
 
@@ -735,6 +669,75 @@ static int K_vxdr(unsigned char* ptr, unsigned char** xdr_ptr)
     }
 }
 
+//// non-static functions ////
+
+/**
+ *  Translates a short int from little-endian to big-endian or the other way round (the translation is symmetrical ?).
+ *  
+ *  @param [in, out]    a   unsigned char*  pointer to a short int
+ *  
+ */
+void K_xdrPINT(unsigned char* a)
+{
+    XDR_rev(a, 1, sizeof(U_sh));
+}
+
+
+/**
+ *  Translates a long int from little-endian to big-endian or the other way round.
+ *  
+ *  @param [in, out]    a   unsigned char*  pointer to a long int. 
+ *                                          in: little-endian, out:big-endian
+ */
+void K_xdrPLONG(unsigned char* a)
+{
+    XDR_rev(a, 1, sizeof(long));
+}
+
+
+/**
+ *  Switches the architecture of a KDB (little-endian to big-endian or the other way round). 
+ *
+ *  If okdb is null, the ikdb architecture is little-endian (when reading from a file) and the 
+ *  transformation is done "in-place". No allocation is done.
+ *  
+ *  If okdb is not null, the ikdb is big-endian (in mem) and the result (little-endian) is allocated.
+ *  ikdb is untouched in this case.
+ * 
+ *  @param [in, out]    ikdb    KDB*  pointer to a IODE packed object 
+ *  @param [out]        okdb    KDB** NULL or pointer to the new allocated KDB (little-endian)
+ */
+
+void K_xdrKDB(KDB* ikdb, KDB** okdb)
+{
+    short   type;
+    KDB     *xdr_kdb;
+    SAMPLE  *smpl;
+
+    type = ikdb->k_type;
+
+    if(okdb == NULL) {
+        /* intel read */
+        xdr_kdb = ikdb;
+        K_xdrSHORT(&type);
+    }
+    else {
+        /* intel write */
+        xdr_kdb = SW_nalloc(sizeof(KDB));
+        memcpy(xdr_kdb, ikdb, sizeof(KDB));
+
+        *okdb = xdr_kdb;
+    }
+
+    XDR_rev(&(xdr_kdb->k_type), 1, sizeof(short));
+    XDR_rev(&(xdr_kdb->k_mode), 1, sizeof(short));
+    XDR_rev(&(xdr_kdb->k_nb), 1, sizeof(long));
+
+    if(type == VARIABLES) {
+        smpl = (SAMPLE *) KDATA(xdr_kdb);
+        K_xdrSMPL(smpl);
+    }
+}
 
 
 /**

@@ -26,7 +26,9 @@
 #include "old_structs.h"
 #include "structs_32.h"
 
+#ifndef UNIX
 #include <io.h>
+#endif
 
 // UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
 // --------------------------------------------------------------

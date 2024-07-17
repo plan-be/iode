@@ -44,8 +44,11 @@ void B_IodeMsgPath()
 
     // Get module directory (c:/iode p.ex)
     if(done) return;
-    
+#ifdef __GNUC__
+    readlink("/proc/self/exe", module, sizeof(module) - 1);
+#else
     GetModuleFileName(0, module, 1000);
+#endif
     SCR_split_dir(module, file);
 	sprintf(SCR_NAME_ERR, "%s\\iode.msg", module);
     done = 1; 

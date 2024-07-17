@@ -13,7 +13,7 @@
 #include <signal.h>
 #include <time.h>
 
-#ifdef UNIX
+#ifdef __GNUC__
     #define _isnan isnan
 #endif
 
@@ -48,15 +48,15 @@ int     L_curt;         // current value of t
 
 // Math exceptions trap
 #ifdef _MSC_VER
-int _matherr(struct _exception *a)
+int _matherr(struct _exception *e)
 {
-    a->retval = (double)IODE_NAN;
+    e->retval = (double) IODE_NAN;
     return(1);
 }
 #else
-int matherr(struct exception *a)
+int matherr(struct exception *e)
 {
-    a->retval = (double)IODE_NAN;
+    e->retval = (double) IODE_NAN;
     return(1);
 }
 #endif

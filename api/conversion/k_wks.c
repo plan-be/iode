@@ -48,6 +48,7 @@ char    *argv[];
 
 int wks_init(char* file, int c, int r)
 {
+#ifndef __GNUC__
     short     i = c - 1, j = r - 1;
 
     WKS_FD = fopen(file, "wb+");
@@ -61,10 +62,14 @@ int wks_init(char* file, int c, int r)
     }
 
     return(0);
+#else
+    return(-1);
+#endif
 }
 
 int wks_cwidth(int c, int w)
 {
+#ifndef __GNUC__
     short     i = c - 1;
     char    width = w;
 
@@ -73,17 +78,25 @@ int wks_cwidth(int c, int w)
     fwrite(&width, sizeof(char), 1, WKS_FD);
 
     return(0);
+#else
+    return(-1);
+#endif
 }
 
 int wks_end()
 {
+#ifndef __GNUC__
     fwrite(WKS_EOF, sizeof(WKS_EOF), 1, WKS_FD);
     fclose(WKS_FD);
     return(0);
+#else
+    return(-1);
+#endif
 }
 
 void wks_string(char* label, int c, int r)
 {
+#ifndef __GNUC__
     short     i = c - 1, j = r - 1,
               lg;
 
@@ -98,10 +111,12 @@ void wks_string(char* label, int c, int r)
     XDR_wshort(WKS_FD, &j, 1);
     fwrite("'", 1, 1, WKS_FD);
     fwrite(label, strlen(label) + 1, 1, WKS_FD);
+#endif
 }
 
 void wks_value(double value, int c, int r)
 {
+#ifndef __GNUC__
     short     i = c - 1, j = r - 1;
 
     fwrite(WKS_DOUBLE, sizeof(WKS_DOUBLE), 1, WKS_FD);
@@ -111,10 +126,12 @@ void wks_value(double value, int c, int r)
         fwrite(WKS_NAN, sizeof(WKS_NAN), 1, WKS_FD);
     else
         XDR_wdouble(WKS_FD, &value, 1);
+#endif
 }
 
 void wks_name(char* str, int c1, int r1, int c2, int r2)
 {
+#ifndef __GNUC__
     int     i;
     char    name[20];                           /* JMP 13-02-2013 */
     short   i1 = c1 - 1, j1 = r1 - 1,
@@ -129,8 +146,5 @@ void wks_name(char* str, int c1, int r1, int c2, int r2)
     XDR_wshort(WKS_FD, &j1, 1);
     XDR_wshort(WKS_FD, &i2, 1);
     XDR_wshort(WKS_FD, &j2, 1);
+#endif
 }
-
-
-
-
