@@ -40,6 +40,77 @@ set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
 # SET(CMAKE_CXX_FLAGS_DEBUG "")
 # SET(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /Oi /Ot")
 
+# ---- compile options ----
+# Debug info flag
+if(MSVC)
+  add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+# /Zi | g:	Generates complete debugging information
+if(MSVC)
+  set(IODE_DEBUG_INFO_FLAG "-Zi")
+else()
+  set(IODE_DEBUG_INFO_FLAG "-g")
+endif()
+
+# VISUAL STUDIO 2019 vs 2022 
+# --------------------------
+# Some code in the C++ API requires C++ 20.
+# C++20 (required for the module std format) makes the compiler MSVC 
+# much more strict by default when passing a string literal 
+# "string" value for a char* argument of a C function: the string "string" 
+# is considered as "const char*" and cannot be converted to "char*").
+#
+# The option /Zc:strictStrings with the minus at the end deactivates 
+# this behavior of the MSVC compiler.
+
+# In VStudio 2019, set(CMAKE_CXX_STANDARD 20) generates a compiler parameter "-std:c++latest" which
+# takes precedence on "/Zc:strictStrings-". 
+# The equivalent in VStudio 2019 is "/std:c++latest" (note the / instead of a -).
+# Therefore, in Visual Studio 2019, the first block below must be commented out and the next block uncommented.
+
+# VISUAL STUDIO > 2019
+# --------------------
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# VISUAL STUDIO <= 2019 
+# ---------------------
+#if(MSVC)
+#  add_compile_options("/std:c++latest")
+#endif()
+
+# All versions of VS
+if(MSVC)
+  add_compile_options("/Zc:strictStrings-")
+endif()
+
+# global flags
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+  add_compile_options("-Wno-implicit-int")
+  add_compile_options("-Wno-implicit-function-declaration")
+  # add_compile_options("-w") # disable all warning
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_compile_options(${IODE_DEBUG_INFO_FLAG})
+endif()
+
+# ---- preprocessor ----
+if(MSVC)
+  add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
+else()
+  add_compile_definitions(LINUX UNIX SCOU REALD SCRPROTO NOEMS NOEMF)
+endif()
+add_compile_definitions("DEBUG=$<CONFIG:Debug>")
+
+# ---- include ----
+# CMAKE_SOURCE_DIR is the full path to the top level of the current CMake source tree
+# TODO: modify iode.h so that there is no need to include the scr4 folder for ALL targets
+include_directories(${CMAKE_SOURCE_DIR} "${CMAKE_SOURCE_DIR}\\scr4")
+message(STATUS " ")
+message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
+
 # -- print global info --
 message(STATUS " ")
 message(STATUS "======== global info ========\n")
@@ -126,84 +197,9 @@ else()
 endif()
 
 message(STATUS " ")
-message(STATUS "=============================")
-
-# ---- compile options ----
-# Debug info flag
-if(MSVC)
-  add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-
-# /Zi | g:	Generates complete debugging information
-if(MSVC)
-  set(IODE_DEBUG_INFO_FLAG "-Zi")
-else()
-  set(IODE_DEBUG_INFO_FLAG "-g")
-endif()
-
-# VISUAL STUDIO 2019 vs 2022 
-# --------------------------
-# Some code in the C++ API requires C++ 20.
-# C++20 (required for the module std format) makes the compiler MSVC 
-# much more strict by default when passing a string literal 
-# "string" value for a char* argument of a C function: the string "string" 
-# is considered as "const char*" and cannot be converted to "char*").
-#
-# The option /Zc:strictStrings with the minus at the end deactivates 
-# this behavior of the MSVC compiler.
-
-# In VStudio 2019, set(CMAKE_CXX_STANDARD 20) generates a compiler parameter "-std:c++latest" which
-# takes precedence on "/Zc:strictStrings-". 
-# The equivalent in VStudio 2019 is "/std:c++latest" (note the / instead of a -).
-# Therefore, in Visual Studio 2019, the first block below must be commented out and the next block uncommented.
-
-# VISUAL STUDIO > 2019
-# --------------------
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# VISUAL STUDIO <= 2019 
-# ---------------------
-#if(MSVC)
-#  add_compile_options("/std:c++latest")
-#endif()
-
-# All versions of VS
-if(MSVC)
-  add_compile_options("/Zc:strictStrings-")
-endif()
-
-
-# global flags
-if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-  add_compile_options("-Wno-implicit-int")
-  add_compile_options("-Wno-implicit-function-declaration")
-endif()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_compile_options(${IODE_DEBUG_INFO_FLAG})
-endif()
-
-
-# ---- preprocessor ----
-if(MSVC)
-  add_compile_definitions(WINDOWS_IGNORE_PACKING_MISMATCH DOS VC WINDOWS DOSW32 REALD SCRPROTO IODEWIN NOEMS NOEMF)
-else()
-  add_compile_definitions(LINUX UNIX SCOU REALD SCRPROTO NOEMS NOEMF)
-endif()
-add_compile_definitions("DEBUG=$<CONFIG:Debug>")
-
-# ---- include ----
-# CMAKE_SOURCE_DIR is the full path to the top level of the current CMake source tree
-# TODO: modify iode.h so that there is no need to include the scr4 folder for ALL targets
-include_directories(${CMAKE_SOURCE_DIR} "${CMAKE_SOURCE_DIR}\\scr4")
-message(STATUS " ")
-message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
-
+message(STATUS "=============================\n")
 
 # ---- search for librairies and packages ----
-message(STATUS " ")
-message(STATUS "=============================")
 message(STATUS "SEARCH FOR PACKAGES:\n")
 
 # -- find Qt --
