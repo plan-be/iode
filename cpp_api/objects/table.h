@@ -1,8 +1,8 @@
 #pragma once
 
-#include "common.h"
-#include "utils/utils.h"
-#include "utils/iode_exceptions.h"
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/utils/iode_exceptions.h"
 #include <stdexcept>
 
 

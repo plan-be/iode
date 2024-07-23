@@ -3,6 +3,20 @@
 #include "api/iode.h"
 #include "api/iodeapi.h"
 
+extern "C" 
+{
+    // copied from scr4/s_prosw.h
+    extern char *SW_nalloc_doc(unsigned int size, char *, int);
+    extern void *SW_nrealloc_doc(void *old_ptr, unsigned int old_count, unsigned int new_count, char *file, int line);
+    extern int SW_free(SWHDL item);
+    extern int SW_nfree(void *ptr);
+
+    // copied from scr4/s_prost.h
+    extern int SCR_free(void *ptr);
+    extern int SCR_free_tbl(unsigned char **tbl);
+    extern int SCR_tbl_size(unsigned char **tbl);
+}
+
 #include <string>
 #include <array>
 #include <vector>
@@ -10,6 +24,8 @@
 #include <bitset>
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 
 /* ****************************** *

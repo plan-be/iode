@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "cpp_api/common.h"
 #include "iode_exceptions.h"
 #include "super.h"
 
@@ -17,9 +17,10 @@
 #include <string_view>  // requires C++17
 
 
-#ifdef _WIN32 // valid for both 32 and 64 bits
+#ifdef _MSC_VER // valid for both 32 and 64 bits
     #include <Windows.h>
 #else
+    #include <iconv.h>
     #define CP_OEMCP -1
 #endif
 
@@ -30,16 +31,17 @@
 
 
 // see http://www.cplusplus.com/forum/general/245426/
-inline std::string convert_between_codepages(const std::string str_in, const int codepage_in, const int codepage_out)
+inline std::string convert_between_codepages(const std::string& str_in, const bool oem_to_utf8)
 {
-    if (str_in.empty()) return str_in;
-    IodeExceptionInvalidArguments error("Cannot convert string from codepage " + std::to_string(codepage_in) + 
-                                        " to codepage " + std::to_string(codepage_out));
-    if (codepage_in <= 0) error.add_argument("codepage_in", std::to_string(codepage_in) + " (must be positive)");
-    if (codepage_out <= 0) error.add_argument("codepage_out", std::to_string(codepage_out) + " (must be positive)");
-    if (error.invalid_args()) throw error;
+    if(str_in.empty()) 
+        return str_in;
 
-    const char* c_in = str_in.c_str();
+    char* c_in = const_cast<char*>(str_in.data());
+
+#ifdef _MSC_VER
+    const int codepage_in = oem_to_utf8 ? CP_OEMCP : CP_UTF8;
+    const int codepage_out = oem_to_utf8 ? CP_UTF8 : CP_OEMCP;
+
     // add 1 because strlen doesn't count the ending \0 character
     int c_in_length = static_cast<int>(strlen(c_in)) + 1;
     // MultiByteToWideChar: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar
@@ -54,22 +56,46 @@ inline std::string convert_between_codepages(const std::string str_in, const int
     char* c_out = new char[c_out_length];
     // WideCharToMultiByte: https://docs.microsoft.com/fr-fr/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte
     WideCharToMultiByte(codepage_out, 0, wchar_array, wchar_length, c_out, c_out_length, NULL, FALSE);
-    std::string str_out(c_out);
-
     delete[] wchar_array;
+
+    std::string str_out(c_out);
     delete[] c_out;
 
     return str_out;
+#else
+    const char* fromcode = oem_to_utf8 ? "CP850" : "UTF-8";
+    const char* tocode = oem_to_utf8 ? "UTF-8" : "CP850";
+    iconv_t conversion_descriptor = iconv_open(tocode, fromcode);
+    
+    size_t inbytesleft = strlen(c_in);
+    // Allocate enough space for worst-case scenario
+    size_t outbytesleft = inbytesleft * 4;
+    std::string str_out(outbytesleft, '\0');
+    char* c_out = &str_out[0];
+    size_t result = iconv(conversion_descriptor, &c_in, &inbytesleft, &c_out, &outbytesleft);
+    if (result == (size_t)-1) 
+    {
+        iconv_close(conversion_descriptor);
+        throw std::runtime_error("Failed to convert string " + str_in);
+    }
+
+    // Resize the output string to the actual size of the converted data
+    str_out.resize(str_out.size() - outbytesleft);
+    
+    iconv_close(conversion_descriptor);
+
+    return str_out;
+#endif
 }
 
 inline std::string oem_to_utf8(const std::string str_oem)
 {
-    return convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);
+    return convert_between_codepages(str_oem, true);
 }
 
 inline std::string utf8_to_oem(const std::string str_utf8)
 {
-    return convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
+    return convert_between_codepages(str_utf8, false);
 }
 
 /**

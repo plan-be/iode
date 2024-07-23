@@ -8,6 +8,8 @@
 #include "api/iode.h"
 #include <stdio.h>
 
+#ifdef IODEWIN
+
 /* ==== Annulations fonction HWND ==== */
 #include <windows.h>
 
@@ -18,8 +20,6 @@ HWND WscrGetMainWnd()
 }
 
 // s_odbc
-
-#ifdef IODEWIN
 
 /* ==== Annulations fonctions GIF ==== */
 

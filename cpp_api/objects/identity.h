@@ -1,7 +1,7 @@
 #pragma once
-#include "common.h"
-#include "utils/utils.h"
-#include "lec/lec.h"
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/lec/lec.h"
 
 
 struct Identity: public IDT

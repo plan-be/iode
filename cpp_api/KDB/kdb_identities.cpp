@@ -63,7 +63,7 @@ void KDBIdentities::execute_identities(const Period& from, const Period& to, con
 {
     B_IdtExecuteVarFiles(to_char_array(var_files));
     B_IdtExecuteSclFiles(to_char_array(scalar_files));
-    B_IdtExecuteTrace(trace ? "Y" : "N");
+    B_IdtExecuteTrace(const_cast<char*>(trace ? "Y" : "N"));
 
     Sample sample(from, to);
     char* c_identities_list = to_char_array(identities_list);

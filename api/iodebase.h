@@ -21,7 +21,7 @@
 
 #include <stdarg.h> // JMP 06/12/2022 for va_list
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -1811,7 +1811,7 @@ extern int W_printfEx(int dup, int ch1, int ch2, char *fmt, va_list args);
 extern U_ch  *T_mmt_edit(U_ch *, int , int , int , int );
 
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
 #endif /* _IODEBASE_ */

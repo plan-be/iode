@@ -1,15 +1,12 @@
 #pragma once
 
-// requires C++ 20
-#include <format>
-
-#include "common.h"
-#include "utils/utils.h"
-#include "utils/iode_exceptions.h"
-#include "time/sample.h"
-#include "objects/table.h"
-#include "KDB/kdb_tables.h"
-#include "KDB/kdb_variables.h"
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/utils/iode_exceptions.h"
+#include "cpp_api/time/sample.h"
+#include "cpp_api/objects/table.h"
+#include "cpp_api/KDB/kdb_tables.h"
+#include "cpp_api/KDB/kdb_variables.h"
 
 
 // NOTE: the class below aims to add C++ taste to the C version of gsample
