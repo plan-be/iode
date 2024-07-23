@@ -1682,171 +1682,20 @@ extern char *K_expand(int ,char *,char *,int );
 extern char *K_expand_kdb(KDB *,int ,char *,int );
 extern int K_aggr(char *,char *,char *);
 
-/* o_edit.c */
-extern int ODE_edit_obj1(KDB *,int );
-extern int ODE_edit_scl(KDB *,int ,int );
-extern int ODE_edit_tbl(KDB *,int ,int );
-extern int ODE_edit_rec_scl_var(void);
-extern int ODE_set_pos(PAGE *);
-extern int ODE_edit_var_cell(KDB *,int ,int );
-extern int ODE_edit_scl_cell(KDB *,int ,int );
-extern int ODE_edit_val(double *,int );
-
-/* o_misc.c */
-extern int ODE_ask(int );
-extern int ODE_edit_window(PAGE *);
-
 /* o_scroll.c */
-extern int VAR_deselect(void);
-extern int VAR_select(int ,int );
-extern int VAR_sel_order(int *,int *,int *,int *);
-extern int VAR_is_sel(int ,int );
-extern char *ODE_t(SCROLL *);
-extern char *ODE_ct(SCROLL *,int );
-extern char *ODE_lt(SCROLL *,int );
 extern unsigned char *T_get_title(TBL *);
-extern char *ODE_text(SCROLL *,int ,int );
-extern int ODE_nl(SCROLL *);
-extern int ODE_nc(SCROLL *);
-extern int ODE_len(SCROLL *,int );
-extern int ODE_del(SCROLL *,int ,int );
-extern int ODE_ins(SCROLL *,int ,int );
-extern int ODE_ed(SCROLL *,int ,int );
-extern int ODE_adj_swidth(int );
-extern int ODE_adj_sndec(int );
-extern int ODE_adj_vndec(int );
-extern int ODE_adj_vwidth(SCROLL *,int );
-extern int ODE_adj_title(SCROLL *,int );
-extern int ODE_attr(SCROLL *,int ,int );
-extern int ODE_ffn(SCROLL *,int ,int ,int );
-extern int ODE_bfn(SCROLL *,int *,int *);
-extern int ODE_efn(SCROLL *,int ,int );
-extern int OSCRL_init(void);
-extern int ODE_scroll(KDB *,char **);
-extern int ODE_settext(KDB *,int ,int );
-extern int ODE_importtext(KDB *,int ,int );
-extern int ODE_ClipAddText(KDB *,int ,int ,unsigned char ***,int *);
-extern unsigned char *ODE_ClipText(KDB *);
-extern int ODE_ClipCopy(KDB *);
-
-/* o_scr.c */
-extern int ODE_doc(KDB *,int ,int );
-extern int ODE_tins(int *,int *);
-extern int ODE_status(void);
-extern int SB_status(void);
-extern char **A_clec(char *,CLEC *,int );
 
 /* o_tab.c */
-extern int TAB_deselect(void);
-extern int TAB_select(int );
-extern int TAB_sel_order(int *,int *);
-extern int TAB_mark_ins(int ,int );
-extern int TAB_mark_del(int );
-extern int TAB_is_sel(int );
-extern int TAB_copy_lines(TBL *,int ,int ,TBL *,int );
-extern int TAB_buffer(TBL *);
-extern int TAB_paste(TBL *,int );
-extern int TAB_delete(TBL *);
-extern int TAB_copy(TBL *,int );
 extern char *T_get_div(TBL *,int );
-extern int T_mmt_left(void);
-extern int T_mmt_rec(void);
-extern char *TAB_t(SCROLL *);
-extern char *TAB_ct(SCROLL *,int );
-extern char *TAB_lt(SCROLL *,int );
-extern int TAB_align_cell(unsigned char *,TCELL *,int ,int );
-extern int TAB_cattr(SCROLL *,int ,int );
-extern int TAB_align(SCROLL *,int ,int );
 extern int T_getcellalign(TBL *,int ,int );
 extern int T_getcellfont(TBL *,int ,int );
 extern int T_getfont(TBL *,int ,int ,int );
-extern char *TAB_text(SCROLL *,int ,int );
-extern int TAB_nl(SCROLL *);
-extern int TAB_nc(SCROLL *);
-extern int TAB_len(SCROLL *,int );
-extern int TAB_del(SCROLL *,int ,int );
-extern int TAB_del_qu(TBL *,int ,int );
-extern int TAB_ins(SCROLL *,int ,int );
-extern int TAB_ed(SCROLL *,int ,int );
-extern int TAB_disp(SCROLL *,int ,int );
-extern int T_adj_width(SCROLL *,int ,int );
-extern int TAB_ffn(SCROLL *,int ,int ,int );
-extern int TAB_end(void);
-extern int TSCRL_init(void);
-extern int TAB_scroll(TBL *,char *);
 extern int T_ins_line(TBL *,int );
 extern int T_del_line(TBL *,int );
-extern int T_ed_getcell(SCROLL *,int ,int ,TCELL **,int *);
-extern char *T_ed_getcelltxt(SCROLL *,int ,int );
-extern int T_ed_savecell(SCROLL *,int ,int ,char *);
-extern int T_ed_line(SCROLL *,int ,int );
 extern int T_attr_tab(TBL *,int );
 extern int T_ed_attr(TBL *,int ,int );
 extern int T_attr_cell(TBL *,int ,int );
 extern int T_attr_msg(TBL *,int ,int );
-
-/* o_vt.c */
-extern char *VT_t(SCROLL *);
-extern char *VT_ct(SCROLL *,int );
-extern int VT_cattr(SCROLL *,int ,int );
-extern int VT_ltattr(SCROLL *,int );
-extern char *VT_text(SCROLL *,int ,int );
-extern char *VT_lt(SCROLL *,int );
-extern int VT_nl(SCROLL *);
-extern int VT_nc(SCROLL *);
-extern int VT_len(SCROLL *,int );
-extern int VT_adj_width(int ,int );
-extern int VT_adj_ndec(int );
-extern int VT_ffn(SCROLL *,int ,int ,int );
-extern int VT_calc(char *,char *,char *,double *,int ,int );
-extern int VT_edit(SCROLL *,int ,int );
-extern int VT_init(void);
-extern int VT_scroll(TBL *,char *);
-extern int T_tbl_test(TBL *,char *);
-extern int T_alloc_val(TBL *,char *);
-extern int T_free_val(TBL *);
-extern int T_name_inline(TCELL *,int ,char *);
-extern int T_calc_val(TBL *,char *);
-extern int T_calc_line(TBL *,int ,COLS *,int *);
-extern int VT_files(void);
-
-/* o_est.c */
-extern int ODE_blk_begin(void);
-extern int ODE_blk_fn(void);
-extern int ODE_blk_name_fn(void);
-extern int ODE_blk_end_fn(void);
-extern int ODE_blk_next_fn(void);
-extern int ODE_blk_coef_fn(void);
-extern int ODE_blk_est_fn(void);
-extern int ODE_blk_save_fn(void);
-extern int ODE_blk_res_fn(void);
-extern int ODE_blk_init(void);
-extern int ODE_blk_check(void);
-extern int ODE_blk_cur(void);
-extern int ODE_blk_cur_tests(void);
-extern int ODE_blk_cur_atests(void);
-extern int ODE_blk_save_1(char *,char *,char *,float *);
-extern int ODE_blk_save_cur(void);
-extern int ODE_blk_coef(void);
-extern int ODE_blk_save(void);
-extern int ODE_blk_instr(void);
-extern int ODE_blk_est(void);
-extern int ODE_blk_unitroot(void);
-extern int ODE_blk_gr_print(void);
-extern int ODE_blk_print_res(void);
-extern int ODE_blk_dadj_fn(char *);
-
-/* o_gr.c */
-//extern int o_calc_lhs(char *,char *,char *);
-//extern int o_estgr(char **,SAMPLE *,MAT *,MAT *,int ,int );
-//extern int ODE_graph(int ,int ,int ,int ,int ,int ,double ,double ,SAMPLE *,char **);
-//extern void T_create_wtcfl(void);
-//extern int o_var_gr_1(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,int ,int ,KDB *,char *);
-//extern int o_var_gr(int ,int ,int ,int ,int ,double ,double ,SAMPLE *,KDB *,char **);
-
-/* o_abort.c */
-// extern int SW_abort(int ,char *);   	// JMP 10/5/2021 double de avec SCR
-// extern int SCR_panic(void);			// JMP 10/5/2021 double de avec SCR
 
 /* b_dde.c */
 extern int IodeDdeLocale(char *buf);
