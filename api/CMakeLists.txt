@@ -34,8 +34,10 @@ target_sources(iode_c_api PUBLIC iode.h iodebase.h iodeapi.h)
 # From Wikipedia (https://en.wikipedia.org/wiki/C_mathematical_functions#libm): 
 # Under POSIX systems like Linux and BSD, the mathematical functions 
 # (as declared in <math.h>) are bundled separately in the mathematical library libm.
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(iode_c_api PUBLIC m)
+  	target_compile_options(iode_c_api PRIVATE "-Wno-implicit-int")
+  	target_compile_options(iode_c_api PRIVATE "-Wno-implicit-function-declaration")
 endif()
 target_link_libraries(iode_c_api PUBLIC "iode_scr4")
 target_include_directories(iode_c_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

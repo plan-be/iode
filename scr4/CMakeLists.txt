@@ -65,6 +65,11 @@ set (SCR_IODE
 add_library (iode_scr4 STATIC ${HEADER_IODE} ${SCR_IODE})
 # target_include_directories(iode_scr4 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(iode_scr4 PRIVATE "-Wno-implicit-int")
+	target_compile_options(iode_scr4 PRIVATE "-Wno-implicit-function-declaration")
+endif()
+
 if(TARGET iode_scr4)
 	message(STATUS "New target iode_scr4 enabled\n")
 else()
