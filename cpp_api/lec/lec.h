@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "common.h"
-#include "utils/utils.h"
-#include "time/period.h"
-#include "KDB/kdb_variables.h"
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/time/period.h"
+#include "cpp_api/KDB/kdb_variables.h"
 
 /**
  * @brief 

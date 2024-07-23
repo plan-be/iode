@@ -1,6 +1,6 @@
 #pragma once
-#include "time/period.h"
-#include "time/sample.h"
+#include "cpp_api/time/period.h"
+#include "cpp_api/time/sample.h"
 #include "kdb_template.h"
 #include <stdexcept>
 

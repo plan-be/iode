@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common.h"
-#include "utils/utils.h"
-#include "time/sample.h"
-#include "KDB/kdb_lists.h"
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/time/sample.h"
+#include "cpp_api/KDB/kdb_lists.h"
 
 
 const static std::vector<std::string> v_simulation_sort_algorithm =

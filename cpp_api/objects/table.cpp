@@ -178,7 +178,7 @@ bool TableCell::operator==(const TableCell& other) const
 
 // ================ LINE ================
 
-static void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src)
+void copy_line(const int nb_columns, TLINE* c_cell_dest, const TLINE* c_cell_src)
 {
 	unsigned char* cell_src_content;
 	TCELL* cells_dest = (TCELL*)c_cell_dest->tl_val;

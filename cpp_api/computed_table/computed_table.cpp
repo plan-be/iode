@@ -247,8 +247,12 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         const std::string& var_name, const double value, const int period_pos)
 {
     double res;
+    std::ostringstream oss;
 
-    std::string formula = lec + " := " + std::format("{:20.8f}", value) + " * " + div_lec;
+    // Set the width to 20 and precision to 8
+    oss << std::setw(20) << std::fixed << std::setprecision(8) << value;
+
+    std::string formula = lec + " := " + oss.str() + " * " + div_lec;
     CLEC* clec = L_solve(to_char_array(formula), to_char_array(var_name));
 
     int var_pos = K_find(KV_WS, to_char_array(var_name));
@@ -260,7 +264,10 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         if(clec != NULL && clec->dupendo) 
             SW_nfree(clec);
         
-        formula = lec + " := " + std::format("{:.15f}", value) + " * " + div_lec;
+        oss.clear();
+        oss << std::fixed << std::setprecision(15) << value;
+
+        formula = lec + " := " + oss.str() + " * " + div_lec;
         clec = L_cc(to_char_array(formula));
         if(clec == NULL)
             return false;

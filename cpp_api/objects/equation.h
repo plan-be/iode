@@ -2,12 +2,11 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include "common.h"
-#include "utils/utils.h"
-#include "time/period.h"
-#include "time/sample.h"
-#include "lec/lec.h"
-
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/time/period.h"
+#include "cpp_api/time/sample.h"
+#include "cpp_api/lec/lec.h"
 
 const static std::vector<std::string> v_eq_methods = { "LSQ", "ZELLNER", "INSTRUMENTAL", "GLS (3SLS)", "MAX_LIKELIHOOD" };
 

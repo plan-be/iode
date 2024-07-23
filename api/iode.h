@@ -24,14 +24,14 @@
 // A PLACER DEVANT LES INCLUDES DE SCR (ou dans cc -c -DALLOCDOCON ...)
 #define ALLOCDOCON
 
-#include <scr4w.h>
-#include <s_scroll.h>
-#include <s_strs.h>
-#include <s_args.h>
-#include <s_mat.h>
-#include <s_xdr.h>
-#include <s_a2m.h>
-#include <math.h>
+#include "scr4/scr4w.h"
+#include "scr4/s_strs.h"
+#include "scr4/s_args.h"
+#include "scr4/s_mat.h"
+#include "scr4/s_xdr.h"
+#include "scr4/s_a2m.h"
+
+#include <stdio.h>
 
 #ifdef __GNUC__
     #define _unlink unlink
@@ -446,8 +446,6 @@ enum IodeEquationAscii
 #define COL_LAST_OP 39
 #define COL_SHIFTL  40
 #define COL_SHIFTR  41
-
-
 
 
 #define MAX_MODE    (COL_BASE - COL_DIFF + 1)
@@ -976,6 +974,11 @@ enum SimuSortAlgorithm
 };
 
 /******************************* TYPEDEFS **********************************/
+#ifdef __cplusplus
+extern "C" 
+{
+#endif
+
 typedef char    OFNAME[OK_MAX_FILE];
 typedef char    FNAME[K_MAX_FILE];
 typedef char    ONAME[K_MAX_NAME + 1];
@@ -1296,11 +1299,6 @@ typedef struct _rpfn_ {
     U_ch    *(*fn)();       // Pointer to the corresponding function
 } RPFN;
 
-
-#ifdef SCRCPP
-extern "C" {
-#endif
-
 extern REPFILE *CUR_REPFILE;        // Pointer to the current REPFILE during report execution
 extern BFNS    B_fns[];             // Table of report command names and function pointers
 extern RPFN    RP_FNS[];            // Table of report @functions names and function pointers
@@ -1454,6 +1452,7 @@ extern  char    **KEXEC_VFILES, **KEXEC_SFILES;
 extern  int     KEXEC_TRACE;
 
 /*------------------ ESTIMATION -----------------------*/
+
 extern int  E_errno, E_IT, E_MAXIT, E_CONV,
        E_NEQ, E_NCE, E_NC, E_NINSTR, E_T, E_FROM,
        *E_C_NBS;
@@ -1533,7 +1532,7 @@ extern  int   (*K_pack[])();
 //extern  int   (*K_cmpobj[])();
 extern  int   (*K_xdrobj[])();
 
-#ifdef SCRCPP
+#ifdef __cplusplus
 }
 #endif
 

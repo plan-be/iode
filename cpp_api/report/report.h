@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common.h"
-#include "utils/utils.h"
+#include "cpp_api/common.h"
+#include "cpp_api/utils/utils.h"
 
 #include <string>
 #include <vector>

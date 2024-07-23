@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "utils/utils.h"
-#include "time/sample.h"
-#include "kdb/kdb_equations.h"
-#include "kdb/kdb_scalars.h"
-#include "kdb/kdb_variables.h"
+#include "cpp_api/utils/utils.h"
+#include "cpp_api/time/sample.h"
+#include "cpp_api/KDB/kdb_equations.h"
+#include "cpp_api/KDB/kdb_scalars.h"
+#include "cpp_api/KDB/kdb_variables.h"
 
 
 constexpr static int    ESTIMATION_MAXIT = 100;
