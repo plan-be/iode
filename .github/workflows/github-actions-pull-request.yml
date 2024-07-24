@@ -14,25 +14,25 @@ jobs:
       !contains(github.head_ref, 'nsis') && !contains(github.head_ref, 'release')
     uses: ./.github/workflows/github-actions-build-and-test.yml 
     with:
-      build-config: windows-debug
+      build-config: debug
 
   build_cli:
     if: contains(github.head_ref, 'cli')
     uses: ./.github/workflows/github-actions-cli.yml 
     with:
-      build-config: windows-debug
+      build-config: debug
 
   build_gui:
     if: contains(github.head_ref, 'gui')
     uses: ./.github/workflows/github-actions-gui.yml 
     with:
-      build-config: windows-debug
+      build-config: debug
 
   build_python:
       if: contains(github.head_ref, 'python')
       uses: ./.github/workflows/github-actions-python.yml 
       with:
-          build-config: windows-release
+          build-config: release
 
   build_doc:
       if: contains(github.head_ref, 'doc')
@@ -42,4 +42,4 @@ jobs:
     if: contains(github.head_ref, 'nsis')
     uses: ./.github/workflows/github-actions-nsis.yml 
     with:
-      build-config: windows-release
+      build-config: release

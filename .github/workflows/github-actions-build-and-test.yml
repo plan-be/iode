@@ -6,7 +6,7 @@ on:
   workflow_call:
     inputs:
       build-config:
-        default: 'windows-debug'
+        default: 'debug'
         required: true
         type: string
 
@@ -15,14 +15,17 @@ jobs:
     name: Build And Test Static Libraries
     strategy:
       matrix:
-        # os: [windows-latest, ubuntu-latest]
-        os: [windows-latest]
+        os: [windows-latest, ubuntu-latest]
 
     # The CMake configure and build commands are platform agnostic and should 'ideally' work equally well on Windows or Linux.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     # List of softwares installed on windows-latest: https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md
     runs-on: ${{ matrix.os }}
+
+    # see https://docs.github.com/en/actions/learn-github-actions/expressions#example 
+    env:
+      os: ${{ matrix.os == 'windows-latest' && 'windows' || 'linux' }}
 
     steps:
       - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
@@ -34,6 +37,9 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Install dependencies on linux
+        if: runner.os == 'Linux'
+        run: sudo apt install ninja-build
       - name: Install dependencies on windows
         if: runner.os == 'Windows'
         shell: bash
@@ -49,7 +55,7 @@ jobs:
           arch: x64
       - name: Print preset config
         shell: bash
-        run: echo "${{ inputs.build-config }}"
+        run: echo "${{ env.os }}-${{ inputs.build-config }}"
       - name: Configure CMake
         shell: bash
         # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -57,23 +63,22 @@ jobs:
         # for more details about cmake preset:
         #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
         #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-        run: cmake --preset ${{ inputs.build-config }}
+        run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
       - name: Build the SCR4, C and C++ API libs
         uses: ./.github/actions/build_api
         with:
-          cmake-config: ${{ inputs.build-config }}
+          cmake-config: ${{ env.os }}-${{ inputs.build-config }}
       - name: Test the C and C++ APIs
         uses: ./.github/actions/test_api
         with:
-          cmake-config: ${{ inputs.build-config }}
+          cmake-config: ${{ env.os }}-${{ inputs.build-config }}
       - run: echo "This job's status is ${{ job.status }}."
 
   test_sanitize:
     name: Run Tests With Sanitize Option
     strategy:
       matrix:
-        # os: [windows-latest, ubuntu-latest]
-        os: [windows-latest]
+        os: [windows-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -81,6 +86,9 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Install dependencies on linux
+        if: runner.os == 'Linux'
+        run: sudo apt install ninja-build
       - name: Install dependencies on windows
         if: runner.os == 'Windows'
         shell: bash

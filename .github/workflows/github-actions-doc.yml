@@ -25,6 +25,9 @@ jobs:
           - name: Checkout repository code
             uses: actions/checkout@v2
           - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+          - name: Install dependencies on linux
+            if: runner.os == 'Linux'
+            run: sudo apt install ninja-build
           - name: Install dependencies on windows
             if: runner.os == 'Windows'
             run: |
