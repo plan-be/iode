@@ -10,7 +10,7 @@ protected:
 
     void SetUp() override
     {
-        kdb_eqs = new KDBEquations(input_test_dir + "fun.eqs");
+        kdb_eqs = new KDBEquations(input_test_dir + "fun.ae");
         equation = kdb_eqs->get(name);
     }
 
@@ -194,8 +194,8 @@ TEST_F(EquationTest, Date)
 TEST_F(EquationTest, Tests)
 {
     std::array<float, EQS_NBTESTS> tests;
-    std::array<float, EQS_NBTESTS> expected_tests = { 1.f, 0.0042699f, 0.00818467f, 5.19945e-05f, 
-                                                      0.0019271461f, 23.545813f, 32.2732f, 0.82176137f, 
+    std::array<float, EQS_NBTESTS> expected_tests = { 0.f, 0.0042699f, 0.00818467f, 5.19945e-05f, 
+                                                      0.0019271461f, 0.f, 32.2732f, 0.82176137f, 
                                                       0.79629868f, 2.3293459f, 83.8075f };
     std::map<std::string, float> m_tests;
 

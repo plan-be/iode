@@ -11,9 +11,9 @@ protected:
 
     void SetUp() override
     {
-        kdb_tbl = new KDBTables(input_test_dir + "fun.tbl");
+        kdb_tbl = new KDBTables(input_test_dir + "fun.at");
 
-        var_file = input_test_dir + "fun.var";
+        var_file = input_test_dir + "fun.av";
         // C: -> c:
         var_file[0] = tolower(var_file[0]);
         kdb_var = new KDBVariables(var_file);

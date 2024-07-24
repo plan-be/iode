@@ -6,8 +6,8 @@ class KDBGlobalTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
-        KDBLists kdb_lst(input_test_dir + "fun.lst");
+        KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+        KDBLists kdb_lst(input_test_dir + "fun.al");
     }
 
     // void TearDown() override {}
@@ -71,7 +71,7 @@ TEST_F(KDBGlobalTest, Filter)
 
 TEST_F(KDBGlobalTest, LowToHigh)
 {
-    std::string varfile = input_test_dir + "fun.var";
+    std::string varfile = input_test_dir + "fun.av";
 
     // Set the sample for the variable WS
     Variables.set_sample("2010Q1", "2020Q4");

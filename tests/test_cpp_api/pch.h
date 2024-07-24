@@ -15,6 +15,7 @@
 class KDBTest
 {
 protected:
+	std::string prefix_filename;
 	std::string input_test_dir;
 	std::string output_test_dir;
 
@@ -29,9 +30,17 @@ public:
 		//       - current path is binaryDir/tests/test_cpp_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::filesystem::path cwd = std::filesystem::current_path();
-		std::string str_path = cwd.parent_path().string() + "\\";
-		input_test_dir = str_path + "data\\";
-		output_test_dir = str_path + "output\\";
+        std::filesystem::path data_dir = cwd.parent_path() / "data";
+        std::filesystem::path output_dir = cwd.parent_path() / "output";
+#ifdef __GNUC__
+		prefix_filename = "linux_";
+		std::string separator = "/";
+#else
+		prefix_filename = "";
+        std::string separator = "\\";
+#endif
+		input_test_dir = data_dir.string() + separator;
+		output_test_dir = output_dir.string() + separator;
 	}
 
 protected:

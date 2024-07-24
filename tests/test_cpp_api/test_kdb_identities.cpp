@@ -6,7 +6,7 @@ class KDBIdentitiesTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBIdentities kdb_idt(input_test_dir + "fun.idt");
+        KDBIdentities kdb_idt(input_test_dir + "fun.ai");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBIdentitiesTest, Load)
 {
-    KDBIdentities kdb(input_test_dir + "fun.idt");
+    KDBIdentities kdb(input_test_dir + prefix_filename + "fun.idt");
     EXPECT_EQ(kdb.count(), 48);
 }
 
@@ -79,7 +79,7 @@ TEST_F(KDBIdentitiesTest, GetLec)
     int pos = 0;
     std::string name = Identities.get_name(pos);
     std::string lec;
-    std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
+    std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by position
     lec = Identities.get_lec(pos);
@@ -96,7 +96,7 @@ TEST_F(KDBIdentitiesTest, Get)
     std::string name = Identities.get_name(pos);
     CLEC* clec = NULL;
     CLEC* expected_clec = KICLEC(K_WS[IDENTITIES], pos);
-    std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
+    std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by position
     Identity identity_pos = Identities.get(pos);
@@ -337,7 +337,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     // GAP_ "100*((QAF_/Q_F)-1)"
     std::string identities_list = "GAP2;GAP_";
 
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     std::string period;
     Variable expected_gap2;
@@ -395,7 +395,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
 TEST_F(KDBIdentitiesTest, CopyFrom)
 {
     std::string pattern = "A* *_";
-    std::string filename = input_test_dir + "fun.idt";
+    std::string filename = input_test_dir + prefix_filename + "fun.idt";
     int expected_nb_comments = Identities.count();
     std::vector<std::string> v_expected_names;
 
@@ -451,13 +451,13 @@ TEST_F(KDBIdentitiesTest, Search)
     std::string idt_name = "RENT";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
-    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
-    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
-    KDBLists kdb_lst(input_test_dir + "fun.lst");
-    KDBScalars kdb_scl(input_test_dir + "fun.scl");
-    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
+    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBScalars kdb_scl(input_test_dir + "fun.as");
+    KDBTables kdb_tbl(input_test_dir + "fun.at");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     objs_list = Comments.search(idt_name);
     EXPECT_EQ(objs_list.size(), 0);

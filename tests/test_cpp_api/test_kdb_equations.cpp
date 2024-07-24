@@ -9,7 +9,7 @@ protected:
 
     void SetUp() override
     {
-        KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
+        KDBEquations kdb_eqs(input_test_dir + "fun.ae");
     }
 
     // void TearDown() override {}
@@ -18,7 +18,7 @@ protected:
 
 TEST_F(KDBEquationsTest, Load)
 {
-    KDBEquations kdb(input_test_dir + "fun.eqs");
+    KDBEquations kdb(input_test_dir + prefix_filename + "fun.eqs");
     EXPECT_EQ(kdb.count(), 274);
 }
 
@@ -97,7 +97,7 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq3.get_lec(), "BVY:=YN+YK");
     EXPECT_EQ(eq3.get_date_as_string(), "");
     EXPECT_EQ(eq3.get_sample().to_string(), ":");
-    EXPECT_EQ(eq3.get_method(), "");
+    EXPECT_EQ(eq3.get_method(), "LSQ");
 
     Equation eq_W = Equations.get("W");
     expected_lec = "dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma_ *ln ((NATY-UY)/NATY)[-1]+gamma2\n";
@@ -166,7 +166,7 @@ TEST_F(KDBEquationsTest, Filter)
     std::vector<std::string> expected_names;
     KDBEquations* kdb_subset;
 
-    KDBLists kdb_lst(input_test_dir + "fun.lst");
+    KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
@@ -240,7 +240,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
     std::vector<std::string> expected_names;
     KDBEquations* kdb_subset;
 
-    KDBLists kdb_lst(input_test_dir + "fun.lst");
+    KDBLists kdb_lst(input_test_dir + "fun.al");
 
     std::vector<std::string> all_names;
     for (int p = 0; p < Equations.count(); p++) all_names.push_back(Equations.get_name(p));
@@ -294,7 +294,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
 TEST_F(KDBEquationsTest, CopyFrom)
 {
     std::string pattern = "A* *_";
-    std::string filename = input_test_dir + "fun.eqs";
+    std::string filename = input_test_dir + prefix_filename + "fun.eqs";
     int expected_nb_comments = Equations.count();
     std::vector<std::string> v_expected_names;
 
@@ -357,13 +357,13 @@ TEST_F(KDBEquationsTest, Search)
     std::string eqs_name = "ACAG";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
-    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
-    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
-    KDBLists kdb_lst(input_test_dir + "fun.lst");
-    KDBScalars kdb_scl(input_test_dir + "fun.scl");
-    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
+    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBScalars kdb_scl(input_test_dir + "fun.as");
+    KDBTables kdb_tbl(input_test_dir + "fun.at");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     std::vector<std::string> expected_cmts = { eqs_name };
     objs_list = Comments.search(eqs_name);
