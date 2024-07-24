@@ -6,7 +6,7 @@ class KDBCommentsTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override 
     {
-        KDBComments kdb_cmt(input_test_dir + "fun.cmt");
+        KDBComments kdb_cmt(input_test_dir + "fun.ac");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBCommentsTest, Load)
 {
-    KDBComments kdb(input_test_dir + "fun.cmt");
+    KDBComments kdb(input_test_dir + prefix_filename + "fun.cmt");
     EXPECT_EQ(kdb.count(), 317);
 }
 
@@ -59,7 +59,7 @@ TEST_F(KDBCommentsTest, Save)
 
 TEST_F(KDBCommentsTest, Filename)
 {
-    std::string expected_filename = input_test_dir + "fun.cmt";
+    std::string expected_filename = input_test_dir + "fun.ac";
     std::string filename = Comments.get_filename();
     // WARNING: for a weird reason the filename is set to lower case when the present 
     // test is runned on Github Actions virtual machine (Windows Server)
@@ -404,7 +404,7 @@ TEST_F(KDBCommentsTest, DeepCopy)
 TEST_F(KDBCommentsTest, CopyFrom)
 {
     std::string pattern = "A* *_";
-    std::string filename = input_test_dir + "fun.cmt";
+    std::string filename = input_test_dir + prefix_filename + "fun.cmt";
     int expected_nb_comments = Comments.count();
     std::vector<std::string> v_expected_names;
 
@@ -460,13 +460,13 @@ TEST_F(KDBCommentsTest, Search)
     std::string cmt_name = "ACAF";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
-    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
-    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
-    KDBLists kdb_lst(input_test_dir + "fun.lst");
-    KDBScalars kdb_scl(input_test_dir + "fun.scl");
-    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
+    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBScalars kdb_scl(input_test_dir + "fun.as");
+    KDBTables kdb_tbl(input_test_dir + "fun.at");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     std::vector<std::string> expected_cmts = { cmt_name };
     objs_list = Comments.search(cmt_name);

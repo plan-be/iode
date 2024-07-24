@@ -15,8 +15,8 @@ TEST_F(UtilsTest, convertBetweenCodepages)
 {
 	std::string str_utf8 = "aA!@^$jndq256µ&ï";
 
-	std::string str_oem = convert_between_codepages(str_utf8, CP_UTF8, CP_OEMCP);
-	std::string str_res = convert_between_codepages(str_oem, CP_OEMCP, CP_UTF8);
+	std::string str_oem = convert_between_codepages(str_utf8, false);
+	std::string str_res = convert_between_codepages(str_oem, true);
 
 	EXPECT_EQ(str_res, str_utf8);
 }
@@ -32,37 +32,37 @@ TEST_F(UtilsTest, getIodeFileType)
 
 	EXPECT_EQ(get_iode_file_type(input_test_dir), DIRECTORY);
 
-	filename = input_test_dir + "fun.cmt";
+	filename = input_test_dir + prefix_filename + "fun.cmt";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_COMMENTS);
 	filename = input_test_dir + "fun.ac";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_COMMENTS);
 
-	filename = input_test_dir + "fun.eqs";
+	filename = input_test_dir + prefix_filename + "fun.eqs";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_EQUATIONS);
 	filename = input_test_dir + "fun.ae";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_EQUATIONS);
 
-	filename = input_test_dir + "fun.idt";
+	filename = input_test_dir + prefix_filename + "fun.idt";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_IDENTITIES);
 	filename = input_test_dir + "fun.ai";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_IDENTITIES);
 
-	filename = input_test_dir + "fun.lst";
+	filename = input_test_dir + prefix_filename + "fun.lst";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_LISTS);
 	filename = input_test_dir + "fun.al";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_LISTS);
 
-	filename = input_test_dir + "fun.scl";
+	filename = input_test_dir + prefix_filename + "fun.scl";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_SCALARS);
 	filename = input_test_dir + "fun.as";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_SCALARS);
 
-	filename = input_test_dir + "fun.tbl";
+	filename = input_test_dir + prefix_filename + "fun.tbl";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_TABLES);
 	filename = input_test_dir + "fun.at";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_TABLES);
 
-	filename = input_test_dir + "fun.var";
+	filename = input_test_dir + prefix_filename + "fun.var";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_VARIABLES);
 	filename = input_test_dir + "fun.av";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_VARIABLES);
@@ -110,7 +110,9 @@ TEST_F(UtilsTest, checkFilepath)
 	std::string filepath;
 
 	// fake directory
-	filepath = "C:\\Users\\ald\\wrong\\path\\fun.cmt";
+	std::filesystem::path cwd = std::filesystem::current_path();
+    std::filesystem::path fake_dir = cwd.parent_path() / "fake_dir";
+	filepath = (fake_dir / "fun.cmt").string();
 	EXPECT_THROW(check_filepath(filepath, FILE_COMMENTS, "save", false), std::invalid_argument);
 
 	// wrong extension
@@ -133,9 +135,9 @@ TEST_F(UtilsTest, checkFilepath)
 	EXPECT_THROW(check_filepath(filepath, FILE_TXT, "load", true), std::invalid_argument);
 
 	// extension added automatically
-	filepath = input_test_dir + "fun";
+	filepath = input_test_dir + prefix_filename + "fun";
 	filepath = check_filepath(filepath, FILE_COMMENTS, "load", true);
-	EXPECT_EQ(filepath, input_test_dir + "fun.cmt");
+	EXPECT_EQ(filepath, input_test_dir + prefix_filename + "fun.cmt");
 }
 
 
@@ -143,7 +145,7 @@ TEST_F(UtilsTest, removeDuplicates)
 {
 	char* pattern = "B*;G*;QA*;*_";
 
-	KDBComments kdb_cmt(input_test_dir + "fun.cmt");
+	KDBComments kdb_cmt(input_test_dir + "fun.ac");
 
 	std::vector<std::string> v_expected_duplicate = { "BENEF", "BENEF_", "BQY", "BVY", 
 		"GAP", "GOSF", "GOSG", "GOSH", "GOSH_", "QAFF", "QAFF_", "QAF_", "QAG", "QAH", 

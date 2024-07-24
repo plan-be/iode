@@ -6,7 +6,7 @@ class KDBListsTest : public KDBTest, public ::testing::Test
 protected:
     void SetUp() override
     {
-        KDBLists kdb_lst(input_test_dir + "fun.lst");
+        KDBLists kdb_lst(input_test_dir + "fun.al");
     }
 
     // void TearDown() override {}
@@ -15,7 +15,7 @@ protected:
 
 TEST_F(KDBListsTest, Load)
 {
-    KDBLists kdb(input_test_dir + "fun.lst");
+    KDBLists kdb(input_test_dir + prefix_filename + "fun.lst");
     EXPECT_EQ(kdb.count(), 17);
 }
 
@@ -250,7 +250,7 @@ TEST_F(KDBListsTest, DeepCopy)
 TEST_F(KDBListsTest, CopyFrom)
 {
     std::string pattern = "C* T*";
-    std::string filename = input_test_dir + "fun.lst";
+    std::string filename = input_test_dir + prefix_filename + "fun.lst";
     int expected_nb_comments = Lists.count();
     std::vector<std::string> v_expected_names;
 
@@ -307,13 +307,13 @@ TEST_F(KDBListsTest, Search)
     std::string lst_name = "COPY0";
     std::vector<std::string> objs_list;
 
-    KDBComments kdb_cmt(input_test_dir + "fun.cmt");
-    KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
-    KDBIdentities kdb_idt(input_test_dir + "fun.idt");
-    KDBLists kdb_lst(input_test_dir + "fun.lst");
-    KDBScalars kdb_scl(input_test_dir + "fun.scl");
-    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBComments kdb_cmt(input_test_dir + "fun.ac");
+    KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+    KDBIdentities kdb_idt(input_test_dir + "fun.ai");
+    KDBLists kdb_lst(input_test_dir + "fun.al");
+    KDBScalars kdb_scl(input_test_dir + "fun.as");
+    KDBTables kdb_tbl(input_test_dir + "fun.at");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     objs_list = Comments.search(lst_name);
     EXPECT_EQ(objs_list.size(), 0);

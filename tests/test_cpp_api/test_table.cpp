@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override
     {
-        KDBTables kdb_tbl(input_test_dir + "fun.tbl");
+        KDBTables kdb_tbl(input_test_dir + "fun.at");
         table = Tables.get("GFRPC");
     }
 
@@ -23,8 +23,8 @@ protected:
 // extracted using KTVAL() are exactly the same
 TEST_F(TablesTest, AddGetTBL)
 {
-    KDBTables kdb_tbl(input_test_dir + "fun.tbl");
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBTables kdb_tbl(input_test_dir + "fun.at");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     // --- create a C struct TBL
     int nb_columns = 2;
@@ -138,7 +138,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
 {
     TCELL* div_cells;
 
-    KDBVariables kdb_var(input_test_dir + "fun.var");
+    KDBVariables kdb_var(input_test_dir + "fun.av");
 
     char* c_name = "cpp_table";
     int nb_columns = 2;
@@ -222,7 +222,7 @@ TEST_F(TablesTest, NotLineMethods)
 TEST_F(TablesTest, Divider)
 {
     TableCellType expected_type = TABLE_CELL_LEC;
-    TableCellAlign expected_align = TABLE_CELL_DECIMAL;
+    int expected_align = ((int) TABLE_CELL_DECIMAL) + ((int) TABLE_CELL_LEFT);
     // expected font = TABLE_CELL_NORMAL;
     std::string content;
     std::string expected_content;
@@ -235,7 +235,7 @@ TEST_F(TablesTest, Divider)
     // first cell
     TableCell* first_cell = divider_line->get_cell(0, nb_cells);
     EXPECT_EQ(first_cell->get_type(), expected_type);
-    EXPECT_EQ(first_cell->get_align(), expected_align);
+    EXPECT_EQ((int) first_cell->get_align(), expected_align);
     EXPECT_EQ(first_cell->is_bold(), false);
     EXPECT_EQ(first_cell->is_italic(), false);
     EXPECT_EQ(first_cell->is_underline(), false);
@@ -246,7 +246,7 @@ TEST_F(TablesTest, Divider)
     // second cell
     TableCell* second_cell = divider_line->get_cell(1, nb_cells);
     EXPECT_EQ(second_cell->get_type(), expected_type);
-    EXPECT_EQ(second_cell->get_align(), expected_align);
+    EXPECT_EQ((int) second_cell->get_align(), expected_align);
     EXPECT_EQ(second_cell->is_bold(), false);
     EXPECT_EQ(second_cell->is_italic(), false);
     EXPECT_EQ(second_cell->is_underline(), false);
@@ -300,6 +300,7 @@ TEST_F(TablesTest, LineCells)
 {
     int nb_cells = table->nb_columns();
     TableLineType expected_type = TABLE_LINE_CELL;
+    int expected_align;
 
     // first CELL line
     TableLine* first_line = table->get_line(1);
@@ -320,8 +321,9 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(first_cell->get_content(true), "\"(divisé par les prix à la consommation)\"");
     // ---- column 1
     TableCell* second_cell = first_line->get_cell(1, nb_cells);
+    expected_align = ((int) TABLE_CELL_DECIMAL) + ((int) TABLE_CELL_LEFT);
     EXPECT_EQ(second_cell->get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(second_cell->get_align(), TABLE_CELL_LEFT);
+    EXPECT_EQ((int) second_cell->get_align(), expected_align);
     EXPECT_FALSE(second_cell->is_bold());
     EXPECT_FALSE(second_cell->is_italic());
     EXPECT_FALSE(second_cell->is_underline());

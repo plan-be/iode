@@ -26,7 +26,7 @@ protected:
 // Simple test of a call to B_ReportLine(). More elaborate commands are tested with B_ReportExec()
 TEST_F(ReportTest, REPORT_LINE)
 {
-    std::string var_filepath = input_test_dir + "fun.var";
+    std::string var_filepath = input_test_dir + "fun.av";
 
     // U_test_suppress_kmsg_msgs();
 

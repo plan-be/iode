@@ -11,8 +11,8 @@ protected:
 
     void SetUp() override
     {
-        KDBEquations kdb_eqs(input_test_dir + "fun.eqs");
-        KDBIdentities kdb_idt(input_test_dir + "fun.idt");
+        KDBEquations kdb_eqs(input_test_dir + "fun.ae");
+        KDBIdentities kdb_idt(input_test_dir + "fun.ai");
     }
 
     // void TearDown() override {}
