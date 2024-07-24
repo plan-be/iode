@@ -6,7 +6,7 @@ on:
   workflow_call:
     inputs:
       build-config:
-        default: 'windows-debug'
+        default: 'debug'
         required: true
         type: string
 
@@ -18,6 +18,10 @@ jobs:
                 os: [windows-latest]
 
         runs-on: ${{ matrix.os }}
+
+        # see https://docs.github.com/en/actions/learn-github-actions/expressions#example
+        env:
+          os: ${{ matrix.os == 'windows-latest' && 'windows' || 'linux' }}
 
         steps:
             - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
@@ -31,6 +35,9 @@ jobs:
             - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
             - name: Install Qt
               uses: ./.github/actions/install_qt
+            - name: Install dependencies on linux
+              if: runner.os == 'Linux'
+              run: sudo apt install ninja-build
             - name: Install dependencies on windows
               if: runner.os == 'Windows'
               shell: bash
@@ -46,7 +53,7 @@ jobs:
                 arch: x64
             - name: Print preset config
               shell: bash
-              run: echo "${{ inputs.build-config }}"
+              run: echo "${{ env.os }}-${{ inputs.build-config }}"
             - name: Configure CMake
               shell: bash
               # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -54,15 +61,15 @@ jobs:
               # for more details about cmake preset:
               #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
               #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-              run: cmake --preset ${{ inputs.build-config }}
+              run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
             - name: Build the SCR4, C and C++ API libs
               uses: ./.github/actions/build_api
               with:
-                cmake-config: ${{ inputs.build-config }}
+                cmake-config: ${{ env.os }}-${{ inputs.build-config }}
             - name: Test the C and C++ APIs
               uses: ./.github/actions/test_api
               with:
-                cmake-config: ${{ inputs.build-config }}
+                cmake-config: ${{ env.os }}-${{ inputs.build-config }}
             - name: Build GUI
-              run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_gui
+              run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_gui
             - run: echo "This job's status is ${{ job.status }}."

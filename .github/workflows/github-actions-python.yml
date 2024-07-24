@@ -6,7 +6,7 @@ on:
   workflow_call:
     inputs:
       build-config:
-        default: 'windows-release'
+        default: 'release'
         required: true
         type: string
 
@@ -15,11 +15,15 @@ jobs:
         name: Build Python API for IODE
         strategy:
           matrix:
-            os: [windows-latest]
+            os: [windows-latest, ubuntu-latest]
             python-minor-version: ["9", "10", "11"]
     
         runs-on: ${{ matrix.os }}
-    
+
+        # see https://docs.github.com/en/actions/learn-github-actions/expressions#example 
+        env:
+          os: ${{ matrix.os == 'windows-latest' && 'windows' || 'linux' }}
+        
         steps:
           - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
           - run: echo "This job is now running on a ${{ runner.os }} server"
@@ -30,6 +34,9 @@ jobs:
           - name: Checkout repository code
             uses: actions/checkout@v2
           - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+          - name: Install dependencies on linux
+            if: runner.os == 'Linux'
+            run: sudo apt install ninja-build
           - name: Install dependencies on windows
             if: runner.os == 'Windows'
             shell: bash
@@ -68,7 +75,7 @@ jobs:
             # for more details about cmake preset:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-            run: cmake --preset ${{ inputs.build-config }}
+            run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
           - name: Build iode wheel file
             shell: bash -el {0}
             run: pip wheel .

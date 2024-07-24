@@ -6,7 +6,7 @@ on:
   workflow_call:
     inputs:
       build-config:
-        default: 'windows-release'
+        default: 'release'
         required: true
         type: string
 
@@ -28,6 +28,10 @@ jobs:
             os: [windows-latest]
     
         runs-on: ${{ matrix.os }}
+
+        # see https://docs.github.com/en/actions/learn-github-actions/expressions#example
+        env:
+          os: ${{ matrix.os == 'windows-latest' && 'windows' || 'linux' }}
     
         steps:
           - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
@@ -44,36 +48,36 @@ jobs:
             uses: actions/download-artifact@v3
             with:
               name: iode-python-39
-              path: ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py39    
+              path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py39    
           - name: check for Python 3.9 binding file  
-            run: dir ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py39
+            run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py39
     
           - name: Restore Python 3.10 binding files for IODE
             uses: actions/download-artifact@v3
             with:
               name: iode-python-310
-              path: ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py310
+              path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py310
           - name: check for Python 3.10 binding file  
-            run: dir ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py310
+            run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py310
     
           - name: Restore Python 3.11 binding files for IODE
             uses: actions/download-artifact@v3
             with:
               name: iode-python-311
-              path: ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py311
+              path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py311
           - name: check for Python 3.11 binding file  
-            run: dir ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/py311
+            run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py311
     
           - name: Group iode.pyd files into a Zip file
             run: tar -cvf python_iode.zip ./py39/iode.pyd ./py310/iode.pyd ./py311/iode.pyd
-            working-directory: ${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode
+            working-directory: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode
 
           - name: Upload Python Zip file
             if: ${{ success() }}
             uses: actions/upload-artifact@v3
             with:
               name: iode-python
-              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/pyiode/python_iode.zip"
+              path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/python_iode.zip"
               if-no-files-found: error
 
           - name: Restore Documentation Files
@@ -87,6 +91,9 @@ jobs:
           - name: Install Qt
             uses: ./.github/actions/install_qt
     
+          - name: Install dependencies on linux
+            if: runner.os == 'Linux'
+            run: sudo apt install ninja-build
           - name: Install dependencies on windows
             if: runner.os == 'Windows'
             shell: bash
@@ -103,7 +110,7 @@ jobs:
 
           - name: Print preset config
             shell: bash
-            run: echo "${{ inputs.build-config }}"
+            run: echo "${{ env.os }}-${{ inputs.build-config }}"
           - name: Configure CMake
             shell: bash
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -111,41 +118,41 @@ jobs:
             # for more details about cmake preset:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-            run: cmake --preset ${{ inputs.build-config }}
+            run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
 
           - name: Build the SCR4, C and C++ API libs
             uses: ./.github/actions/build_api
             with:
-              cmake-config: ${{ inputs.build-config }}
+              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
           
           - name: Test the C and C++ APIs
             uses: ./.github/actions/test_api
             with:
-              cmake-config: ${{ inputs.build-config }}
+              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
     
           - name: Build CLI
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iodecmd
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iodecmd
 
           - name: Upload CLI
             if: ${{ success() }}
             uses: actions/upload-artifact@v3
             with:
               name: iode-cli
-              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/cli/*.exe"
+              path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/cli/*.exe"
               if-no-files-found: error 
             
           - name: Build the GUI
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target iode_gui 
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_gui 
     
           - name: Build Windows Installer and Updater (NSIS)
-            run: cmake --build --verbose --preset ${{ inputs.build-config }} --target nsis
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target nsis
 
           - name: Upload Windows Installer and Updater
             if: ${{ success() }}
             uses: actions/upload-artifact@v3
             with:
               name: iode-nsis
-              path: "${{ github.workspace }}/out/build/${{ inputs.build-config }}/nsis/*.exe"
+              path: "${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/nsis/*.exe"
               if-no-files-found: error 
     
           - run: echo "This job's status is ${{ job.status }}."

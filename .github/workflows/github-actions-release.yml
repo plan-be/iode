@@ -11,7 +11,7 @@ jobs:
   build_nsis_release:
     uses: ./.github/workflows/github-actions-nsis.yml 
     with:
-      build-config: windows-release
+      build-config: release
 
   build_and_release:
     runs-on: ubuntu-latest
