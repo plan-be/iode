@@ -1,19 +1,6 @@
 #ifndef _S_XDR_
 #define _S_XDR_
 
-#ifdef DOS
-#define INTEL
-#endif
-#ifdef SCRW32     /* JMP 17-02-97 */
-#define INTEL
-#endif
-#ifdef XENIX
-#define INTEL
-#endif
-#ifdef UNIX5R4
-#define INTEL
-#endif
-
 #ifdef INTEL
 
 #define XDR_l2s_s(s, n)
