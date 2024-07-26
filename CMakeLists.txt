@@ -8,6 +8,8 @@ include(CMakePrintHelpers)
 
 # List of CMAKE variables: https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 
+string(TIMESTAMP CURRENT_YEAR "%Y")
+
 # ---- dependencies ----
 
 # -- Google Test --

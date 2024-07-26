@@ -1,4 +1,12 @@
-#define IODE_VERSION "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-2023 Federal Planning Bureau - Brussels"
+#define IODE_VERSION "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-${CURRENT_YEAR} Federal Planning Bureau - Brussels"
 #define IODE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
 #define IODE_VERSION_MINOR ${PROJECT_VERSION_MINOR}
 #define IODE_VERSION_PATCH ${PROJECT_VERSION_PATCH}
+
+#ifndef ARCH
+    #ifdef __GNUC__
+        #define ARCH    "${CMAKE_SYSTEM_PROCESSOR}"
+    #else
+        #define ARCH    "INTEL86 DOS"
+    #endif
+#endif

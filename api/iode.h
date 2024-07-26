@@ -54,10 +54,6 @@
 #define OK_MAX_NAME  10
 #define K_MAX_NAME   20  /* IODE64K */
 
-#ifndef ARCH
-#define ARCH    "INTEL86 DOS"
-#endif
-
 // ALD 18/11/2022
 #define I_DEFAULT_FILENAME  "ws"
 
