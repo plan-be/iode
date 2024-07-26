@@ -5,6 +5,7 @@
 
 
 #include "pch.h"
+#include <math.h>
 #include <filesystem>
 
 
@@ -21,21 +22,14 @@
 
 
 // BEGIN_KEEP
-#ifdef _MSC_VER
-//  #if defined(_M_X64)  || defined(__x86_64__) || defined(__amd64__) || defined(_WIN64)
-    #ifdef _WIN64
-    char    *IODE_DATA_DIR   = "..\\data";
-    char    *IODE_OUTPUT_DIR = "..\\output";
-  #else
-    char    *IODE_DATA_DIR   = "..\\data";
-    char    *IODE_OUTPUT_DIR = "..\\output";
-  #endif
+#ifdef __GNUC__
+    char    *SEPARATOR = "/";
+    char    *IODE_DATA_DIR   = "../data/";
+    char    *IODE_OUTPUT_DIR = "../output/";
 #else
-//    char    *IODE_DATA_DIR   = "..\\..\\api\\data";
-//    char    *IODE_OUTPUT_DIR = "..\\..\\api\\output";
-    char    *IODE_DATA_DIR   = "..\\data";
-    char    *IODE_OUTPUT_DIR = "..\\output";
-
+    char    *SEPARATOR = "\\";
+    char    *IODE_DATA_DIR   = "..\\data\\";
+    char    *IODE_OUTPUT_DIR = "..\\output\\";
 #endif
 
 // Temporarily removed fns (to allow linking)
@@ -76,29 +70,24 @@ protected:
 public:
     void SetUp() override 
     {
-        // C++ consider all passed string value of the kind "..." to C function as CONSTANT
-        char buf1[64];
-        char buf2[64];
-
         // NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::filesystem::path cwd = std::filesystem::current_path();
-		std::string str_path = cwd.parent_path().string() + "\\";
-		strcpy_s(input_test_dir, (str_path + "data\\").c_str());
-		strcpy_s(output_test_dir, (str_path + "output\\").c_str());
+        std::filesystem::path data_dir = cwd.parent_path() / "data";
+        std::filesystem::path output_dir = cwd.parent_path() / "output";
+#ifdef __GNUC__
+		std::string separator = "/";
+#else
+        std::string separator = "\\";
+#endif
+		strcpy(input_test_dir, (data_dir.string() + separator).c_str());
+		strcpy(output_test_dir, (output_dir.string() + separator).c_str());
 
         // other initializations
         U_test_init();
         kpause_continue = 1;
     }
-
-	int U_cmp_strs(char* str1, char* str2)
-	{
-	    if(str1 == NULL && str2 == NULL) return(1);
-	    if(str1 == NULL || str2 == NULL) return(0);
-	    return(!strcmp(str1, str2));
-	}
 
 	int U_cmp_tbls(char** tbl1, char* vec)
 	{
@@ -152,7 +141,11 @@ public:
 	    char curdir[512];
 	
 	    //printf("Comparing '%s' and '%s'\n", file1, file2);
-	    SCR_dosgetcwd(curdir, 511);
+#ifdef __GNUC__
+	    getcwd(curdir, 511);
+#else
+        _getcwd(curdir, 511);
+#endif
 	    printf("Current dir   : '%s'\n", curdir);
 	
 	    content1 = U_test_read_file(file1, &size1);
@@ -319,23 +312,6 @@ public:
 	    pos = K_add(KV_WS, "BC", B, &nb);
 	}
 
-	int U_test_eq(double v1, double v2)
-	{
-	    double diff;
-	
-	    if(fabs(v2) > 1e-8)
-	        diff = fabs((v2 - v1) / v2);
-	    else
-	        diff = fabs(v2 - v1);
-	
-	 #ifndef __cplusplus
-	    if(diff >= 1e-5 && S4ASSERT_VERBOSE)
-	        printf("%lg != %lg\n", v1, v2);
-	#endif
-	
-	    return(diff < 1e-5);
-	}
-
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
 	{
 	    CLEC*   clec;
@@ -356,7 +332,7 @@ public:
 	    calc_val = L_exec(KV_WS, KS_WS, clec, t);
 	    SCR_free(clec);
 	    //sprintf(buf, "Res=%10.3lf - Expected=%10.3lf %s L_exec(%s) in %s", calc_val, expected_val, title, lec, aper);
-	    EXPECT_TRUE(U_test_eq(expected_val, calc_val));
+	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
 
 	double U_test_calc_lec(char* lec, int t)
@@ -377,7 +353,7 @@ public:
 	    char    fullfilename[256];
 	    KDB     *kdb;
 	
-	    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
+	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, filename);
 	    kdb = K_interpret(type, fullfilename);
 	    //S4ASSERT(kdb != NULL, "K_interpret(%d, \"%s\")", type, fullfilename);
 	    return(kdb);
@@ -385,15 +361,23 @@ public:
 
 	void U_test_load_fun_esv(char* filename)
 	{
+        char filename_eqs[256];
+        char filename_scl[256];
+        char filename_var[256];
+
 	    // Frees 3 WS
 	    K_free(KE_WS);
 	    K_free(KS_WS);
 	    K_free(KV_WS);
+
+        sprintf(filename_eqs, "%s.ae", filename);
+        sprintf(filename_scl, "%s.as", filename);
+        sprintf(filename_var, "%s.av", filename);
 	
 	    // Loads 3 WS and check ok
-	    KE_RWS = KE_WS = U_test_K_interpret(EQUATIONS, filename);
-	    KS_RWS = KS_WS = U_test_K_interpret(SCALARS, filename);
-	    KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, filename);
+	    KE_RWS = KE_WS = U_test_K_interpret(EQUATIONS, filename_eqs);
+	    KS_RWS = KS_WS = U_test_K_interpret(SCALARS, filename_scl);
+	    KV_RWS = KV_WS = U_test_K_interpret(VARIABLES, filename_var);
 	}
 
 	void U_test_W_printf_cmds()
@@ -438,8 +422,8 @@ public:
 	    char reffilename[512];
 	    char filename[512];
 	
-	    sprintf(filename, "%s\\test1.%s", IODE_OUTPUT_DIR, typeext);
-	    sprintf(reffilename, "%s\\test1.ref.%s", IODE_DATA_DIR, typeext);
+	    sprintf(filename, "%stest1.%s", IODE_OUTPUT_DIR, typeext);
+	    sprintf(reffilename, "%stest1.ref.%s", IODE_DATA_DIR, typeext);
 	    W_dest(filename, typeint);
 	    U_test_W_printf_cmds();
 	    W_close();
@@ -454,10 +438,15 @@ public:
 	    char filename[512];
 	    char curdir[512];
 	
-	    sprintf(filename, "%s\\%s", IODE_OUTPUT_DIR, outfile);
-	    sprintf(reffilename, "%s\\%s", IODE_DATA_DIR, reffile);
-	    SCR_dosgetcwd(curdir, 511);
+	    sprintf(filename, "%s%s", IODE_OUTPUT_DIR, outfile);
+	    sprintf(reffilename, "%s%s", IODE_DATA_DIR, reffile);
+#ifdef __GNUC__
 	    //getcwd(curdir, 500);
+	    getcwd(curdir, 511);
+#else
+	    //_getcwd(curdir, 500);
+        _getcwd(curdir, 511);
+#endif
 	    printf("Current dir   : '%s'\n", curdir);
 	    printf("Output    file: '%s'\n", filename);
 	    printf("Reference file: '%s'\n", reffilename);
@@ -467,14 +456,14 @@ public:
 	    return(U_diff_files(reffilename, filename));
 	}
 
-	int U_test_compare_localfile_to_reffile(char* outfile, char* reffile)
+	bool U_test_compare_localfile_to_reffile(char* outfile, char* reffile)
 	{
 	    char reffilename[512];
 	    char filename[512];
 	
-	    sprintf(filename, ".\\%s", outfile);
-	    sprintf(reffilename, "%s\\%s", IODE_DATA_DIR, reffile);
-	    return(U_diff_files(reffilename, filename));
+	    sprintf(filename, ".%s%s", SEPARATOR, outfile);
+	    sprintf(reffilename, "%s%s", IODE_DATA_DIR, reffile);
+	    return U_diff_files(reffilename, filename) == 1;
 	}
 
 	void U_test_create_a_file(char* filename, int type)
@@ -486,84 +475,84 @@ public:
 	    W_close();
 	}
 
-	int U_test_file_exists(char* filename, char* msg )
+	bool U_test_file_exists(char* filename, char* msg )
 	{
 	    int     rc;
 	
 	    //  Check that the file exists
 	    rc = _access(filename, 0);
 	    EXPECT_EQ(rc, 0);
-	    return(rc == 0);
+	    return rc == 0;
 	}
 
-	int U_test_file_not_exists(char* filename, char* msg)
+	bool U_test_file_not_exists(char* filename, char* msg)
 	{
 	    int     rc;
 	
 	    //  Check that the file exists
 	    rc = _access(filename, 0);
 	    EXPECT_NE(rc, 0);
-	    return(rc != 0);
+	    return rc != 0;
 	}
 
-	int U_test_B_WsLoad(char*filename, int type, int expected_nb_objects)
+	bool U_test_B_WsLoad(char*filename, int type, int expected_nb_objects)
 	{
 	    char    fullfilename[256];
-	    int     rc, cond;
+	    int     rc;
 	
-	    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, filename);
+	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, filename);
 	    rc = B_WsLoad(fullfilename, type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
+	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
 	}
 
-	int U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
+	bool U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
 	{
 	    char    fullfilename[256];
-	    int     rc, cond;
+	    int     rc;
 	
 	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, source_file);
 	    rc = B_WsLoad(fullfilename, type);
 	    EXPECT_EQ(rc, 0);
 	    rc = B_WsSave(out_file, type);
 	    EXPECT_EQ(rc, 0);
 	    B_WsClear("", type);
 	    rc = B_WsLoad(out_file, type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
+	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
 	}
 
-	int U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
+	bool U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
 	{
 	    char    fullfilename[256];
-	    int     rc, cond;
+	    int     rc;
 	
 	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, source_file);
+	    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, source_file);
 	    rc = B_WsLoad(fullfilename, type);
 	    EXPECT_EQ(rc, 0);
 	    rc = B_WsSaveCmp(out_file, type);
 	    EXPECT_EQ(rc, 0);
 	    B_WsClear("", type);
 	    rc = B_WsLoad(out_file, type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+	    EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
+	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
 	}
 
-	int U_test_B_WsExport(char* source_file, char* out_file, int type)
+	bool U_test_B_WsExport(char* source_file, char* out_file, int type)
 	{
 	    char    full_source_file[256];
 	    char    full_out_file[256];
 	    char    ref_out_file[256];
 	    int     rc;
 	
-	    sprintf(full_source_file,  "%s\\%s", IODE_DATA_DIR, source_file);
-	    sprintf(full_out_file,  "%s\\%s", IODE_OUTPUT_DIR, out_file);
-	    sprintf(ref_out_file,  "%s\\%s", IODE_DATA_DIR, out_file);
+	    sprintf(full_source_file,  "%s%s", IODE_DATA_DIR, source_file);
+	    sprintf(full_out_file,  "%s%s", IODE_OUTPUT_DIR, out_file);
+	    sprintf(ref_out_file,  "%s%s", IODE_DATA_DIR, out_file);
 	
 	    rc = B_WsLoad(full_source_file, type);
 	    EXPECT_EQ(rc, 0);
@@ -573,71 +562,69 @@ public:
 	    EXPECT_EQ(rc, 0);
 	    rc = U_diff_files(ref_out_file, full_out_file);
 	    EXPECT_NE(rc, 0);
-	    return(rc);
+	    return rc != 0;
 	}
 
-	int U_test_B_WsImport(char* source_file, int type, int expected_nb_objects)
+	bool U_test_B_WsImport(char* source_file, int type, int expected_nb_objects)
 	{
 	    char    fullfilename[256];
-	    int     rc, cond;
+	    int     rc;
 	
 	    B_WsClear("", type);
-	    sprintf(fullfilename, "%s\\%s", IODE_DATA_DIR, source_file);
+	    sprintf(fullfilename, "%s%s", IODE_DATA_DIR, source_file);
 	    rc = B_WsImport(fullfilename, type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects);
-	    EXPECT_NE(cond, 0);
-	    return(rc);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
+	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
 	}
 
-	int U_test_B_WsClear(int type)
+	bool U_test_B_WsClear(int type)
 	{
-	    int     rc, cond;
+	    int     rc;
 	
 	    rc = B_WsClear("", type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == 0);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, 0);
+	    return K_WS[type]->k_nb == 0;
 	}
 
-	int U_test_B_WsDescr(char* descr, int type)
+	bool U_test_B_WsDescr(char* descr, int type)
 	{
-	    int     rc, cond;
+	    int     rc;
 	
 	    rc = B_WsDescr(descr, type);
-	    cond = (rc == 0) && (strcmp(KDESC(K_WS[type]), descr) == 0);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(std::string(KDESC(K_WS[type])), descr);
+	    return rc == 0 && std::string(KDESC(K_WS[type])) == descr;
 	}
 
-	int U_test_B_WsName(char* name, int type)
+	bool U_test_B_WsName(char* name, int type)
 	{
-	    int     rc, cond;
+	    int     rc;
 	    char    *nameptr;
 	
 	    rc = B_WsName(name, type);
+        EXPECT_EQ(rc, 0);
 	    nameptr = K_get_kdb_nameptr(K_WS[type]);
-	    //cond = (rc == 0) && (strcmp(KNAMEPTR(K_WS[type]), name) == 0);
-	    cond = (rc == 0) && (strcmp(nameptr, name) == 0);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+	    EXPECT_EQ(std::string(nameptr), std::string(name));
+	    return rc == 0 && std::string(nameptr) == std::string(name);
 	}
 
-	int U_test_B_WsCopyVar()
+	bool U_test_B_WsCopyVar()
 	{
 	    char    arg[256];
-	    int     rc, cond, nb, pos;
+	    int     rc, nb, pos;
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    // 1. Copy full VAR file (Att: * required)
 	    B_WsClearAll("");
-	    sprintf(arg,  "%s\\fun.var *", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av *", IODE_DATA_DIR);
 	    rc = B_WsCopy(arg, VARIABLES);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
-	    cond =  (rc == 0) &&
-	            (U_test_eq(ACAF92, 30.159000) != 0) &&
-	            (U_test_eq(ACAG92, -40.286) != 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
+	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
 	    // 2. Copy partial WS (92-93) on an existing one
 	    // 2.1 Set Sample + create ACAF
@@ -649,7 +636,7 @@ public:
 	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
-	    sprintf(arg,  "%s\\fun.var 1992Y1 1993Y1 ACAF ACAG", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", IODE_DATA_DIR);
 	    rc = B_WsCopy(arg, VARIABLES);
 	
 	    // 2.3 Tests
@@ -657,13 +644,11 @@ public:
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG90 = U_test_calc_lec("ACAG[1990Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
-	    cond =  (rc == 0) &&
-	            (U_test_eq(ACAF91, 1.0) != 0) &&
-	            (U_test_eq(ACAF92, 30.159000) != 0) &&
-	            (U_test_eq(ACAG90, IODE_NAN) != 0) &&
-	            (U_test_eq(ACAG92, -40.286) != 0);
-	
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(ACAF91, 1.0);
+	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
+	    EXPECT_DOUBLE_EQ(ACAG90, IODE_NAN);	    
+        EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
 	    // 3. Copy partial WS on an existing one w/o specifying the sample
 	    // 3.1 Set Sample
@@ -671,51 +656,46 @@ public:
 	    B_WsSample("1990Y1 2000Y1");
 	
 	    // Copy ACAF and ACAG (does not specify a sample)
-	    sprintf(arg,  "%s\\fun.var ACAF ACAG", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av ACAF ACAG", IODE_DATA_DIR);
 	    rc = B_WsCopy(arg, VARIABLES);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
+	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
-	    cond =  (rc == 0) &&
-	            (U_test_eq(ACAF92, 30.159000) != 0) &&
-	            (U_test_eq(ACAG92, -40.286) != 0);
-	
-	    EXPECT_NE(cond, 0);
-	
-	    return(cond);
+	    return true;
 	}
 
-	int U_test_B_WsCopy(char* filename, int type, int expected_nb_objects)
+	bool U_test_B_WsCopy(char* filename, int type, int expected_nb_objects)
 	{
 	    char    arg[256];
-	    int     rc, cond;
+	    int     rc;
 	
 	    // 1. Copy entire file (Att: * required)
 	    B_WsClear("", type);
-	    sprintf(arg,  "%s\\%s *", IODE_DATA_DIR, filename);
+	    sprintf(arg,  "%s%s *", IODE_DATA_DIR, filename);
 	    rc = B_WsCopy(arg, type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects);
-	    EXPECT_NE(cond, 0);
-	
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
+	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
 	}
 
-	int U_test_B_WsMergeVar()
+	bool U_test_B_WsMergeVar()
 	{
-	    int         rc, cond, nb, pos;
+	    int         rc, nb, pos;
 	    char        arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
-	    sprintf(arg,  "%s\\fun.var", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av", IODE_DATA_DIR);
 	    rc = B_WsMerge(arg, VARIABLES);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
-	    cond =  (rc == 0) &&
-	            (U_test_eq(ACAF92, 30.159000) != 0) &&
-	            (U_test_eq(ACAG92, -40.286) != 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
+	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
 	    // 2. Merge into an existing WS inb a different SAMPLE
 	    B_WsClearAll("");
@@ -725,40 +705,39 @@ public:
 	    ACAF = L_cc_link_exec("t", KV_WS, KS_WS);
 	    pos = K_add(KV_WS, "ACAF", ACAF, &nb);
 	    // Merge
-	    sprintf(arg,  "%s\\fun.var", IODE_DATA_DIR);
+	    sprintf(arg,  "%sfun.av", IODE_DATA_DIR);
 	    rc = B_WsMerge(arg, VARIABLES);
 	    //Check
 	    ACAF00 = U_test_calc_lec("ACAF[2000Y1]", 0);
 	    ACAF16 = U_test_calc_lec("ACAF[2016Y1]", 0);
 	    ACAG00 = U_test_calc_lec("ACAG[2000Y1]", 0);
-	    cond =  (rc == 0) &&
-	            (U_test_eq(ACAF00, 10.046611) != 0) &&
-	            (U_test_eq(ACAF16, 16.0) != 0) &&
-	            (U_test_eq(ACAG00, -41.534787) != 0);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(round(ACAF00 * 1e8) / 1e8, 10.04661079);
+	    EXPECT_DOUBLE_EQ(ACAF16, 16.0);
+	    EXPECT_DOUBLE_EQ(round(ACAG00 * 1e8) / 1e8, -41.53478657);
+
+	    return true;
 	}
 
-	int U_test_B_WsMerge(char* filename, int type, int expected_nb_objects)
+	bool U_test_B_WsMerge(char* filename, int type, int expected_nb_objects)
 	{
 	    char    arg[256];
-	    int     rc, cond;
+	    int     rc;
 	
 	    // 1. Copy entire file (Att: * required)
 	    B_WsClear("", type);
-	    sprintf(arg,  "%s\\%s *", IODE_DATA_DIR, filename);
+	    sprintf(arg,  "%s%s *", IODE_DATA_DIR, filename);
 	    rc = B_WsMerge(arg, type);
-	    cond = (rc == 0) && (K_WS[type]->k_nb == expected_nb_objects);
-	    EXPECT_NE(cond, 0);
-	
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(K_WS[type]->k_nb, expected_nb_objects);
+	    return rc == 0 && K_WS[type]->k_nb == expected_nb_objects;
 	}
 
-	int U_test_B_WsExtrapolate(int method, double expected_value)
+	bool U_test_B_WsExtrapolate(int method, double expected_value)
 	{
 	    double   *ACAF, ACAF2002;
 	    char        arg[512];
-	    int         pos, rc, nb,cond;
+	    int         pos, rc, nb;
 	
 	    B_WsClearAll("");
 	    B_WsSample("1995Y1 2020Y1");
@@ -773,29 +752,31 @@ public:
 	    sprintf(arg, "%d 2000Y1 2010Y1 ACAF", method);
 	    rc = B_WsExtrapolate(arg);
 	    ACAF2002 = U_test_calc_lec("ACAF[2002Y1]", 0);
-	    cond =  (rc == 0) && (U_test_eq(ACAF2002, expected_value) != 0);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(ACAF2002, expected_value);
+	    return true;
 	}
 
-	int U_test_create_var(char*name, char*lec)
+	bool U_test_create_var(char*name, char*lec)
 	{
 	    double  *A;
 	    int     nb;
 	
-	    if(KV_WS == NULL) return(-1);
+	    if(KV_WS == NULL) 
+            return false;
+        
 	    nb = KSMPL(KV_WS)->s_nb;
 	    A = L_cc_link_exec(lec, KV_WS, KS_WS);
 	    K_add(KV_WS, name, A, &nb);
 	    SCR_free(A);
-	    return(0);
+	    return true;
 	}
 
-	int U_test_B_WsAggregate()
+	bool U_test_B_WsAggregate()
 	{
 	    double   A_2000, B_2000, AC_2000;
 	    char        arg[512];
-	    int         rc, cond;
+	    int         rc;
 	
 	    B_WsClearAll("");
 	    B_WsSample("1995Y1 2020Y1");
@@ -815,38 +796,41 @@ public:
 	    rc = B_WsAggrSum(arg);
 	    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
 	    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
-	    cond = (rc  == 0) && (A_2000 == 5 + 5*2) && (B_2000 == 5 * 5 + 5 * 5 * 5);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(A_2000, 5 + 5*2); 
+        EXPECT_EQ(B_2000, 5 * 5 + 5 * 5 * 5);
 	
 	    // $WsAggrProd  pattern
 	    strcpy(arg, "(?)[?]");
 	    rc = B_WsAggrProd(arg);
 	    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
 	    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
-	    cond = (rc  == 0) && (A_2000 == (5) * (5*2)) && (B_2000 == (5 * 5) * (5 * 5 * 5));
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(A_2000, (5) * (5*2));
+        EXPECT_EQ(B_2000, (5 * 5) * (5 * 5 * 5));
 	
 	    // $WsAggrMean  pattern
 	    strcpy(arg, "(?)[?]");
 	    rc = B_WsAggrMean(arg);
 	    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
 	    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
-	    cond = (rc  == 0) && (U_test_eq(A_2000, 7.5) != 0) && (U_test_eq(B_2000, 75.0) != 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(A_2000, 7.5); 
+        EXPECT_DOUBLE_EQ(B_2000, 75.0);
 	
 	    // $WsAggrSum  pattern filename
-	    sprintf(arg,  "(AC)[??] %s\\fun.var", IODE_DATA_DIR);
+	    sprintf(arg,  "(AC)[??] %sfun.av", IODE_DATA_DIR);
 	    rc = B_WsAggrSum(arg);
 	    AC_2000 = U_test_calc_lec("AC[2000Y1]", 0);
-	    cond = (rc  == 0) && (U_test_eq(AC_2000, -31.488176) != 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(round(AC_2000 * 1e8) / 1e8, -31.48817578);
 	
-	    return(cond);
+	    return true;
 	}
 
-	int U_test_B_StatUnitRoot(int drift, int trend, int order, char* varname, double expected_df)
+	bool U_test_B_StatUnitRoot(int drift, int trend, int order, char* varname, double expected_df)
 	{
-	    int     rc, cond;
+	    int     rc;
 	    double  df;
 	    char    arg[256], scalar[30];
 	
@@ -860,14 +844,14 @@ public:
 	    rc = B_StatUnitRoot(arg);
 	    sprintf(scalar, "df_%s", varname);
 	    df = U_test_calc_lec(scalar, 0);
-	    cond = (rc == 0) && (U_test_eq(df, expected_df) != 0);
-	    EXPECT_NE(cond, 0);
-	    return(cond);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_DOUBLE_EQ(df, expected_df);
+	    return true;
 	}
 
-	int U_test_B_Csv()
+	bool U_test_B_Csv()
 	{
-	    int     rc, cond;
+	    int     rc;
 	    char    arg[512];
 	
 	    // int B_CsvNbDec(char *nbdec)                       $CsvNbDec nn
@@ -877,33 +861,32 @@ public:
 	    // int B_CsvDec(char *dec)                           $CsvDec char
 	    // int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
 	    rc = B_CsvNbDec("7");
-	    cond = (rc == 0) && (KV_CSV_NBDEC == 7);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(KV_CSV_NBDEC, 7);
 	
 	    rc = B_CsvSep(";");
-	    cond = (rc == 0) && (KV_CSV_SEP[0] == ';');
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(KV_CSV_SEP[0], ';');
 	
 	    rc = B_CsvNaN("--");
-	    cond = (rc == 0) && (strcmp(KV_CSV_NAN, "--") == 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(std::string(KV_CSV_NAN), "--");
 	
 	    rc = B_CsvAxes("Name");
-	    cond = (rc == 0) && (strcmp(KV_CSV_AXES, "Name") == 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(std::string(KV_CSV_AXES), "Name");
 	
 	    rc = B_CsvDec(".");
-	    cond = (rc == 0) && (strcmp(KV_CSV_DEC, ".") == 0);
-	    EXPECT_NE(cond, 0);
+        EXPECT_EQ(rc, 0);
+	    EXPECT_EQ(std::string(KV_CSV_DEC), ".");
 	
 	    U_test_B_WsLoad("fun", VARIABLES, 394);
 	    sprintf(arg, "%s\\funcsv.csv A* *G", IODE_OUTPUT_DIR);
 	    rc = B_CsvSave(arg, VARIABLES);
+        EXPECT_EQ(rc, 0);
+	    U_test_compare_outfile_to_reffile("funcsv.csv", "funcsv.csv");
 	
-	    cond = (rc == 0) && U_test_compare_outfile_to_reffile("funcsv.csv", "funcsv.csv");
-	    EXPECT_NE(cond, 0);
-	
-	    return(cond);
+	    return true;
 	}
 
 	void U_test_init()
@@ -922,7 +905,6 @@ public:
 	
 	}
 
-
 	//void TearDown() override {}
 
 };
@@ -934,7 +916,7 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
 
     U_test_print_title("Tests IODEMSG");
     msg = B_msg(16); // Sample modified
-    EXPECT_TRUE(U_cmp_strs(msg, " Sample modified"));
+    EXPECT_EQ(std::string(msg), " Sample modified");
 
     //B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
     //B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
@@ -983,8 +965,7 @@ TEST_F(IodeCAPITest, Tests_OBJECTS)
     PER_smpltoa(KSMPL(KV_WS), asmpl1);
     KV_sample(KV_WS, NULL);
     PER_smpltoa(KSMPL(KV_WS), asmpl2);
-    EXPECT_TRUE(U_cmp_strs(asmpl1, asmpl2));
-
+    EXPECT_EQ(std::string(asmpl1), std::string(asmpl2));
 }
 
 
@@ -1007,7 +988,6 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
     int     files = 1;
     int     date = 1;
     int     pos, i, j;
-    int     cond;
 
     U_test_print_title("Tests TBL: compare KTVAL() and T_create() results");
 
@@ -1076,7 +1056,7 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
           case TABLE_LINE_TITLE:
             cell_cont_0 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_0, 0));
             cell_cont_1 = (char*) SCR_stracpy((unsigned char*)T_cell_cont(cells_1, 0));
-            EXPECT_EQ(U_cmp_strs(cell_cont_0, cell_cont_1), 1);
+            EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
             SCR_free(cell_cont_0);
             SCR_free(cell_cont_1);
             break;
@@ -1087,14 +1067,14 @@ TEST_F(IodeCAPITest, Tests_TBL_ADD_GET)
                 EXPECT_EQ(cells_0[j].tc_attr, cells_1[j].tc_attr);
                 cell_cont_0 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_0, j));
                 cell_cont_1 = (char*)SCR_stracpy((unsigned char*)T_cell_cont(cells_1, j));
-                EXPECT_EQ(U_cmp_strs(cell_cont_0, cell_cont_1), 1);
+                EXPECT_EQ(std::string(cell_cont_0), std::string(cell_cont_1));
                 SCR_free(cell_cont_0);
                 SCR_free(cell_cont_1);
             }
             break;
           default:
-            cond = cells_0 == NULL && cells_1 == NULL;
-            EXPECT_NE(cond, 0);
+            EXPECT_TRUE(cells_0 == NULL); 
+            EXPECT_TRUE(cells_1 == NULL);
             break;
         }
     }
@@ -1170,7 +1150,7 @@ TEST_F(IodeCAPITest, Tests_ARGS)
 
     // Test parameters in a file. test.args must exist in the current dir and contain the line
     // A1 A2
-    sprintf(filename, "@%s\\test.args", IODE_DATA_DIR);
+    sprintf(filename, "@%stest.args", IODE_DATA_DIR);
     args = B_ainit_chk(filename, NULL, 0);
     EXPECT_TRUE(U_cmp_tbls(args, "A1|A2"));
     SCR_free_tbl((unsigned char**) args);
@@ -1196,8 +1176,8 @@ TEST_F(IodeCAPITest, Tests_K_OBJFILE)
 
     U_test_print_title("Tests K_OBJFILE");
 
-    sprintf(in_filename,  "%s\\fun.var", IODE_DATA_DIR);
-    sprintf(out_filename, "%s\\fun_copy.var", IODE_OUTPUT_DIR);
+    sprintf(in_filename,  "%sfun.av", IODE_DATA_DIR);
+    sprintf(out_filename, "%sfun_copy.av", IODE_OUTPUT_DIR);
 
     kdb_var = K_interpret(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
@@ -1220,9 +1200,10 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     TBL*    c_table;
     TCELL*  cells;
 
+#ifdef _MSC_VER
     U_test_print_title("Tests conversion 32 to 64 bits");
 
-    sprintf(in_filename,  "%s\\fun.tbl", IODE_DATA_DIR);
+    sprintf(in_filename,  "%sfun.tbl", IODE_DATA_DIR);
 
     kdb_tbl = K_interpret(TABLES, in_filename);
     EXPECT_NE(kdb_tbl, nullptr);
@@ -1248,6 +1229,7 @@ TEST_F(IodeCAPITest, Tests_TBL32_64)
     //    cell_content = T_div_cont_tbl(c_table, col, 1);
     //    printf("Cell %d:%s\n",col, cell_content);
     //}
+#endif
 }
 
 
@@ -1280,7 +1262,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
 
     // Check list is empty
     lst = KLPTR("_DIVER");
-    EXPECT_TRUE(U_cmp_strs(lst, NULL));
+    EXPECT_TRUE(lst == NULL);
 
     // Simulation std parameters
     smpl = PER_atosmpl("2000Y1", "2002Y1");
@@ -1304,13 +1286,13 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     lst = KLPTR("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
     //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
-    EXPECT_TRUE(U_cmp_strs(lst, expected_lst));
+    EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Check _DIVER list
     lst = KLPTR("_DIVER");
     //printf("'%s'\n", lst);
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_TRUE(U_cmp_strs(lst, expected_lst));
+    EXPECT_EQ(std::string(lst), std::string(expected_lst));
 
     // Test with with convergence (increase MAXIT)
     KSIM_MAXIT = 100;
@@ -1342,7 +1324,7 @@ TEST_F(IodeCAPITest, Tests_Simulation)
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
     XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
     //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.800703));
+    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("XNATY", "2000Y1") * 1e6) / 1e6, 0.800703);
 
     // Cleanup
     SCR_free_tbl(endo_exo);
@@ -1365,15 +1347,15 @@ TEST_F(IodeCAPITest, Tests_PrintTablesAndVars)
     U_test_print_title("Tests Print TBL as Tables and Graphs");
 
     // Load the VAR workspace
-    K_RWS[VARIABLES][0] = K_WS[VARIABLES] = kdbv  = U_test_K_interpret(VARIABLES, "fun.var");
+    K_RWS[VARIABLES][0] = K_WS[VARIABLES] = kdbv  = U_test_K_interpret(VARIABLES, "fun.av");
     EXPECT_NE(kdbv, nullptr);
 
     // Load the TBL workspace
-    K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.tbl");
+    K_RWS[TABLES][0] = K_WS[TABLES] = kdbt  = U_test_K_interpret(TABLES, "fun.at");
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[VARIABLES][2]
-    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, "fun.var");
+    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, "fun.av");
     rc = K_load_RWS(2, fullfilename);
     EXPECT_EQ(rc, 0);
 
@@ -1443,10 +1425,10 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     //x = U_test_calc_lec("_YRES0[1980Y1]", 0);
     //printf("x = %lf\n", x);
     //x = fabs(x + 0.001150);
-    EXPECT_TRUE(U_test_eq(U_test_calc_lec("_YRES0[1980Y1]", 0), -0.00115008));
+    EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
 
     //x = fabs(K_e_r2(KE_WS, "ACAF") - 0.821815);
-    EXPECT_TRUE(U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815));
+    EXPECT_DOUBLE_EQ(round(K_e_r2(KE_WS, "ACAF") * 1e6) / 1e6, 0.821815);
 
     //TODO:add some tests with other estimation methods / on blocks / with instruments
 
@@ -1457,18 +1439,18 @@ TEST_F(IodeCAPITest, Tests_Estimation)
     // E_StepWise
     smpl = PER_atosmpl("1980Y1", "1995Y1");
     r2 = E_StepWise(smpl, "ACAF", "", "r2");
-    EXPECT_TRUE(U_test_eq(r2, 0.848519));
+    EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
     SCR_free(smpl);
 
     // Dickey-Fuller test (E_UnitRoot)
     df = E_UnitRoot("ACAF+ACAG", 0, 0, 0);
-    EXPECT_TRUE(U_test_eq(df[2], -1.602170));
+    EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -1.602170);
     df = E_UnitRoot("ACAF+ACAG", 1, 0, 0);
-    EXPECT_TRUE(U_test_eq(df[2], -2.490054));
+    EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -2.490054);
     df = E_UnitRoot("ACAF+ACAG", 1, 1, 0);
-    EXPECT_TRUE(U_test_eq(df[2], -2.638717));
+    EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -2.638717);
     df = E_UnitRoot("ACAF+ACAG", 0, 0, 1);
-    EXPECT_TRUE(U_test_eq(df[2], -1.300049));
+    EXPECT_DOUBLE_EQ(round(df[2] * 1e6) / 1e6, -1.300049);
 
 
     // Reset initial kmsg fn
@@ -1550,7 +1532,7 @@ TEST_F(IodeCAPITest, Tests_SWAP)
 TEST_F(IodeCAPITest, Tests_B_DATA)
 {
     char        *lst, buf[512];
-    int         rc, i, cond;
+    int         rc, i;
     double   *A1, val;
     SAMPLE      *smpl;
     char        *filename = "fun";
@@ -1572,13 +1554,14 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
     lst = KLPTR("RC");
-    EXPECT_TRUE(U_cmp_strs(lst, "AB,AC,BB,BC"));
+    EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
     A1 = KVPTR("A1");
-    cond = (rc == 0) && (K_find(KV_WS, "A1") >= 0) && (A1[1] == 4);
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_TRUE(K_find(KV_WS, "A1") >= 0);
+    EXPECT_EQ(A1[1], 4);
 
     // B_DataCreate(char* arg, int type)
     // B_DataDuplicate(char* arg, int type)
@@ -1586,22 +1569,22 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     // B_DataDelete(char* arg, int type)
     for(i = 0; i < 7 ; i++) {
         rc = B_DataCreate("XXX", i);
-        cond = (rc == 0) && (K_find(K_WS[i], "XXX") >= 0);
-        EXPECT_EQ(cond, 1);
+        EXPECT_EQ(rc, 0);
+        EXPECT_TRUE(K_find(K_WS[i], "XXX") >= 0);
 
         if(i != EQUATIONS) { // Equations cannot be renamed or duplicated
             rc = B_DataDuplicate("XXX YYY", i);
-            cond = (rc == 0) && (K_find(K_WS[i], "YYY") >= 0);
-            EXPECT_EQ(cond, 1);
+            EXPECT_EQ(rc, 0);
+            EXPECT_TRUE(K_find(K_WS[i], "YYY") >= 0);
 
             rc = B_DataRename("YYY ZZZ", i);
-            cond = (rc == 0) && (K_find(K_WS[i], "ZZZ") >= 0);
-            EXPECT_EQ(cond, 1);
+            EXPECT_EQ(rc, 0);
+            EXPECT_TRUE(K_find(K_WS[i], "ZZZ") >= 0);
         }
 
         rc = B_DataDelete("XXX", i);
-        cond = (rc == 0) && (K_find(K_WS[i], "XXX") < 0);
-        EXPECT_EQ(cond, 1);
+        EXPECT_EQ(rc, 0);
+        EXPECT_TRUE(K_find(K_WS[i], "XXX") < 0);
     }
 
     // B_DataListSort()
@@ -1609,7 +1592,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     EXPECT_TRUE(K_find(KL_WS, "LIST1") >= 0);
     rc = B_DataListSort("LIST1 LIST2");
     lst = KLPTR("LIST2");
-    EXPECT_TRUE(U_cmp_strs(lst, "A;B;C"));
+    EXPECT_EQ(std::string(lst), "A;B;C");
 
     // B_DataListSort() Example 2
     K_add(KL_WS, "L1", "C;B;$L2;$L3");
@@ -1617,27 +1600,27 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
     K_add(KL_WS, "L3", "A B D");
     rc = B_DataListSort("L1 RES");
     lst = KLPTR("RES");
-    EXPECT_TRUE(U_cmp_strs(lst, "A;B;B;C;D;X;Y;Z"));
+    EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
-    cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KCPTR("U")), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
-    cond = (rc == 0) && U_cmp_strs(KIPTR("U"), "2 * A");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KIPTR("U")), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
-    cond = (rc == 0) && U_cmp_strs(KLPTR("U"), "A,B,C");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("U")), "A,B,C");
 
     rc = B_DataUpdate("U  1.2 1"             , SCALARS);
     val = K_s_get_value (KS_WS, "U");
-    cond = (rc == 0) && U_test_eq(1.2, val);
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
     smpl = KSMPL(KV_WS);
@@ -1646,13 +1629,13 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
-    cond = (rc == 0) && U_cmp_strs(KLPTR("NEWLIST"), "U");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("NEWLIST")), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
-    cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("_SCAL")), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1660,50 +1643,50 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
-    cond = (rc == 0) && U_cmp_strs(KLPTR("_SCAL"), "c1;c2,XXX,YYY");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("_SCAL")), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
-    cond = (rc == 0) && U_cmp_strs(KCPTR("U"), "Comment of U - More comment on U");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KCPTR("U")), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
-    cond = (rc == 0) && U_cmp_strs(KLPTR("LC"), "acaf1;acaf2;acaf3;acaf4");
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("LC")), "acaf1;acaf2;acaf3;acaf4");
     printf("LC = \"%s\"\n", KLPTR("LC"));
-    EXPECT_EQ(cond, 1);
 
     // B_DataCalcLst(char* arg)
     B_DataUpdate("LST1 A,B,C", LISTS);
     B_DataUpdate("LST2 C,D,E", LISTS);
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
-    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B;C;D;E");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("_RES")), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
-    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "C");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("_RES")), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
-    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "A;B");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("_RES")), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
-    cond = (rc == 0) && U_cmp_strs(KLPTR("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
-    sprintf(buf,  "%s\\fun.lst WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", IODE_DATA_DIR);
+    sprintf(buf,  "%sfun.al WS_ONLY FILE_ONLY BOTH_DIFF BOTH_EQ", IODE_DATA_DIR);
     rc = B_DataCompare(buf, LISTS);
     //printf("    WS_ONLY='%s'\n", KLPTR("WS_ONLY"));
     //printf("    FILE_ONLY='%s'\n", KLPTR("FILE_ONLY"));
     //printf("    BOTH_DIFF='%s'\n", KLPTR("BOTH_DIFF"));
     //printf("    BOTH_EQ='%s'\n", KLPTR("BOTH_EQ"));
 
-    cond = (rc == 0) && U_cmp_strs(KLPTR("WS_ONLY"), "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES");
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(std::string(KLPTR("WS_ONLY")), "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES");
     //printf("%s\n", KLPTR("WS_ONLY"));
-    EXPECT_EQ(cond, 1);
 
     // B_DataPrintGraph()
     //smpl = KSMPL(KV_WS);
@@ -1718,7 +1701,7 @@ TEST_F(IodeCAPITest, Tests_B_DATA)
 
 TEST_F(IodeCAPITest, Tests_B_EQS)
 {
-    int     rc, cond, pos;
+    int     rc, pos;
     SAMPLE  *smpl;
     char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
     char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
@@ -1731,18 +1714,17 @@ TEST_F(IodeCAPITest, Tests_B_EQS)
 
     // B_EqsEstimate()
     rc = B_EqsEstimate(cmd_B_EqsEstimate);
+    EXPECT_EQ(rc, 0);
 
-    cond = (rc == 0) && U_test_eq(K_e_r2(KE_WS, "ACAF"), 0.821815);
-    EXPECT_EQ(cond, 1);
-    cond = (rc == 0) && U_test_eq(K_e_fstat(KE_WS, "ACAF"), 32.285108);
-    EXPECT_EQ(cond, 1);
+    EXPECT_DOUBLE_EQ(round(K_e_r2(KE_WS, "ACAF") * 1e8) / 1e8, 0.82181543);
+    EXPECT_DOUBLE_EQ(round(K_e_fstat(KE_WS, "ACAF") * 1e8) / 1e8, 32.28510666);
 
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
     pos = K_find(KE_WS, "ACAF");
     smpl = &KESMPL(KE_WS, pos);
-    cond = (rc ==0) && (smpl->s_p1.p_y == 1981);
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(smpl->s_p1.p_y, 1981);
 
     // TODO: implement next utests with the same canevas
         //B_EqsSetMethod(char* arg)
@@ -1794,7 +1776,7 @@ TEST_F(IodeCAPITest, Tests_B_FILE)
 
 TEST_F(IodeCAPITest, Tests_B_FSYS)
 {
-    int     rc, cond;
+    int     rc;
     char    arg[512];
 
     U_test_print_title("Tests B_FSYS");
@@ -1813,54 +1795,53 @@ TEST_F(IodeCAPITest, Tests_B_FSYS)
     // U_test_create_a_file("toto", W_A2M); // Ansi-coded file
     // => Pb with conversions => files created by test1.c differ from those created by test_c_api.cpp.
     // Therefore, we copy data\toto.a2m into local toto.a2m
-    sprintf(arg, "%s\\toto.a2m toto.a2m", IODE_DATA_DIR);
+    sprintf(arg, "%stoto.a2m toto.a2m", IODE_DATA_DIR);
     rc = B_SysCopy(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m", "toto.a2m");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("toto.a2m", "toto.a2m");
 
 
     // B_SysAnsiToOem() : translate ansi to oem -> toto.a2m.oem
     sprintf(arg, "toto.a2m toto.a2m.oem");
     rc = B_SysAnsiToOem(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m.oem", "toto.a2m.oem.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("toto.a2m.oem", "toto.a2m.oem.ref");
 
     // B_SysAnsiToUTF8() : translate ansi to utf8 -> toto.a2m.utf8
     sprintf(arg, "toto.a2m toto.a2m.utf8");
     rc = B_SysAnsiToUTF8(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
 
     // B_SysOemToAnsi() : translate oem to ansi -> toto.a2m.ansi
     sprintf(arg, "toto.a2m.oem toto.a2m.ansi");
     rc = B_SysOemToAnsi(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m.ansi", "toto.a2m.ansi.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("toto.a2m.ansi", "toto.a2m.ansi.ref");
 
     // B_SysOemToUTF8() : translate ansi to utf8 -> toto.a2m.utf8
     sprintf(arg, "toto.a2m.oem toto.a2m.utf8");
     rc = B_SysOemToUTF8("toto.a2m.oem toto.a2m.utf8");
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("toto.a2m.utf8", "toto.a2m.utf8.ref");
 
     // B_SysRename(char* arg) : rename toto.a2m.ansi -> brol.a2m.ansi
     sprintf(arg, "toto.a2m.ansi brol.a2m.ansi");
+    EXPECT_EQ(rc, 0);
     rc = B_SysRename(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("brol.a2m.ansi", "toto.a2m.ansi.ref");
-    EXPECT_EQ(cond, 1);
+    U_test_compare_localfile_to_reffile("brol.a2m.ansi", "toto.a2m.ansi.ref");
 
     // B_SysCopy(char* arg) : copy brol.a2m.ansi dans totodbl.a2m.ansi
     sprintf(arg, "brol.a2m.ansi totodbl.a2m.ansi");
     rc = B_SysCopy(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("totodbl.a2m.ansi", "toto.a2m.ansi.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("totodbl.a2m.ansi", "toto.a2m.ansi.ref");
 
     // B_SysAppend(char* arg) : append totodbl.a2m.ansi to brol.a2m.ansi
     sprintf(arg, "brol.a2m.ansi totodbl.a2m.ansi");
     rc = B_SysAppend(arg);
-    cond = (rc == 0) && U_test_compare_localfile_to_reffile("totodbl.a2m.ansi", "totodbl.a2m.ansi.ref");
-    EXPECT_EQ(cond, 1);
-
+    EXPECT_EQ(rc, 0);
+    U_test_compare_localfile_to_reffile("totodbl.a2m.ansi", "totodbl.a2m.ansi.ref");
 
     // B_SysDelete(char* arg) : delete totdbl.a2m.ansi and brol.a2m.ansi
     rc = B_SysDelete("brol.a2m.ansi totodbl.a2m.ansi tutu.a2m toto.a2m toto.a2m.oem toto.a2m.utf8");
@@ -1897,7 +1878,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     rc = B_IdtExecuteTrace("Yes");
 
     // Erroneously define input filenames (WS forgotten !!)
-    sprintf(filename,  "%s\\fun", IODE_DATA_DIR);
+    sprintf(filename,  "%sfun", IODE_DATA_DIR);
     rc = B_IdtExecuteVarFiles(filename);
     EXPECT_EQ(rc, 0);
 
@@ -1909,7 +1890,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     K_clear(KV_WS);
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
 
-    sprintf(filename,  "WS %s\\fun", IODE_DATA_DIR);
+    sprintf(filename,  "WS %sfun", IODE_DATA_DIR);
     rc = B_IdtExecuteVarFiles(filename);
     EXPECT_EQ(rc, 0);
 
@@ -1917,14 +1898,13 @@ TEST_F(IodeCAPITest, Tests_B_IDT)
     rc = B_IdtExecute(idtexec2);
     EXPECT_EQ(rc, 0);
 
-
     // Check the values
     C = (double*)KVPTR("C");
     D = (double*)KVPTR("D");
 
-    EXPECT_TRUE(U_test_eq(D[1], IODE_NAN));
-    EXPECT_TRUE(U_test_eq(D[2], 2.0 + 4.0));
-    EXPECT_TRUE(U_test_eq(C[2], 6.0*2 - 0.92921251 ));
+    EXPECT_DOUBLE_EQ(D[1], IODE_NAN);
+    EXPECT_DOUBLE_EQ(D[2], 2.0 + 4.0);
+    EXPECT_DOUBLE_EQ(round(C[2] * 1e8) / 1e8, 6.0 * 2 - 0.92921251);
 }
 
 
@@ -1963,8 +1943,7 @@ TEST_F(IodeCAPITest, Tests_B_IDT_EXECUTE)
     //varname = "AOUC"
     //res = iode.exec_lec(f"{varname}[1961Y1]", 0)
     //test_eq(f"{varname}[1961Y1]", 0.24783192, res)
-    EXPECT_TRUE(U_test_eq(AOUC[1], 0.24783192));
-
+    EXPECT_DOUBLE_EQ(round(AOUC[1] * 1e8) / 1e8, 0.24783192);
 }
 
 
@@ -1976,7 +1955,7 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     char    cmtfile[256];
     char    rulefile[256];
     char    trace[] = " ";
-    int     cond, rc;
+    int     rc;
 
     U_test_print_title("Tests EXP: Export CSV and rcsv");
 
@@ -1986,34 +1965,33 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
     // Exports VAR files into external formats.
     // int EXP_RuleExport(" "char* trace, NULL, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
 
-    sprintf(varfile, "%s\\fun.var", IODE_DATA_DIR);
-    sprintf(cmtfile, "%s\\fun.cmt", IODE_DATA_DIR);
+    sprintf(varfile, "%sfun.av", IODE_DATA_DIR);
+    sprintf(cmtfile, "%sfun.ac", IODE_DATA_DIR);
 
-    sprintf(outfile, "%s\\fun_xode.csv", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%s\\fun_xode.csv.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.csv", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun_xode.csv.ref", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_CSV);
-    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.csv", "fun_xode.csv.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_outfile_to_reffile("fun_xode.csv", "fun_xode.csv.ref");
 
-    sprintf(outfile, "%s\\fun_xode.rcsv", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%s\\fun_xode.rcsv.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.rcsv", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun_xode.rcsv.ref", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, NULL, outfile, varfile, cmtfile, "2000Y1", "2010Y1", "#N/A", ";", EXPORT_RCSV);
-    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
-    EXPECT_EQ(cond, 1);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_outfile_to_reffile("fun_xode.rcsv", "fun_xode.rcsv.ref");
 
     // Export with rules (partial /+ change names)
-    sprintf(outfile, "%s\\fun2.tsp", IODE_OUTPUT_DIR);
-    sprintf(reffile, "%s\\fun2.ref.tsp", IODE_DATA_DIR);
-    sprintf(rulefile, "%s\\rules.txt", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun2.tsp", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun2.ref.tsp", IODE_DATA_DIR);
+    sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
     rc = EXP_RuleExport(trace, rulefile, outfile, varfile, cmtfile, "1995Y1", "2005Y1", "#N/A", ";", EXPORT_TSP);
-    cond = (rc == 0) && U_test_compare_outfile_to_reffile("fun2.tsp", "fun2.ref.tsp");
-    EXPECT_EQ(cond, 1);
-
+    EXPECT_EQ(rc, 0);
+    U_test_compare_outfile_to_reffile("fun2.tsp", "fun2.ref.tsp");
 
     U_test_print_title("Tests IMP VAR: Import Ascii Variables");
 
-    sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
-    sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun_xode.av.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.var", IODE_OUTPUT_DIR);
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
@@ -2023,15 +2001,16 @@ TEST_F(IodeCAPITest, Tests_IMP_EXP)
 
     U_test_print_title("Tests IMP CMT: Import Ascii Comments");
 
-    sprintf(reffile, "%s\\fun_xode.ac.ref", IODE_DATA_DIR);
-    sprintf(outfile, "%s\\fun_xode.cmt", IODE_OUTPUT_DIR);
+    sprintf(reffile, "%sfun_xode.ac.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.cmt", IODE_OUTPUT_DIR);
     rc = IMP_RuleImport(COMMENTS, trace, rulefile, outfile, reffile, NULL, NULL, IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    if(rc == 0) {
+    if(rc == 0) 
+    {
         KC_RWS = KC_WS = K_interpret(COMMENTS, outfile);
-        cond = (KC_WS != NULL) && U_cmp_strs(KCPTR("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
-        EXPECT_EQ(cond, 1);
+        EXPECT_TRUE(KC_WS != NULL);
+        EXPECT_EQ(std::string(KCPTR("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
@@ -2050,9 +2029,9 @@ TEST_F(IodeCAPITest, Tests_B_XODE)
     U_test_print_title("Tests XODE: Import ASCII via report function");
     U_test_suppress_kmsg_msgs();
 
-    sprintf(reffile, "%s\\fun_xode.av.ref", IODE_DATA_DIR);
-    sprintf(outfile, "%s\\fun_xode.var", IODE_OUTPUT_DIR);
-    sprintf(rulefile, "%s\\rules.txt", IODE_DATA_DIR);
+    sprintf(reffile, "%sfun_xode.av.ref", IODE_DATA_DIR);
+    sprintf(outfile, "%sfun_xode.var", IODE_OUTPUT_DIR);
+    sprintf(rulefile, "%srules.txt", IODE_DATA_DIR);
     sprintf(cmd, "ASCII \"%s\" %s %s 2000Y1 2010Y1", rulefile, reffile, outfile);
 
     rc = B_FileImportVar(cmd);
@@ -2082,7 +2061,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
     KV_sample(KV_WS, smpl);
     SCR_free(smpl);
 
-    sprintf(varfile, "%s\\fun.var", IODE_DATA_DIR);
+    sprintf(varfile, "%sfun.av", IODE_DATA_DIR);
 
     // Linear interpolation / stock
     sprintf(cmd, "L %s ACAF", varfile);
@@ -2100,7 +2079,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
     sprintf(cmd, "C %s ACAF", varfile);
     rc = B_WsLtoHStock(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAF[2012Q3]", "ACAF[2012Q3]", 0, -52.805666 );
+    U_test_lec("ACAF[2012Q3]", "ACAF[2012Q3]", 0, -52.805666);
 
     // Cubic splines / flow
     sprintf(cmd, "C %s ACAG", varfile);
@@ -2112,7 +2091,7 @@ TEST_F(IodeCAPITest, Tests_B_LTOH)
     sprintf(cmd, "S %s ACAF", varfile);
     rc = B_WsLtoHStock(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -83.34062);
+    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -83.340625);
 
     // Step / flow
     sprintf(cmd, "S %s ACAG", varfile);
@@ -2144,7 +2123,7 @@ TEST_F(IodeCAPITest, Tests_B_HTOL)
     KV_sample(KV_WS, smpl);
     SCR_free(smpl);
 
-    sprintf(varfile, "%s\\fun_q.var", IODE_DATA_DIR);
+    sprintf(varfile, "%sfun_q.var", IODE_DATA_DIR);
 
     // Last Obs
     sprintf(cmd, "%s ACAF", varfile);
@@ -2224,7 +2203,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     rc = B_ModelSimulate("2000Y1 2002Y1");
     EXPECT_EQ(rc, 0);
     // TODO: check result of one ENDO
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.27462));
+    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
 
     // B_ModelExchange()
 
@@ -2248,7 +2227,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
     XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
     //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("XNATY", "2000Y1"), 0.800673));
+    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("XNATY", "2000Y1") * 1e6) / 1e6, 0.800673);
 
     // B_ModelCompile(char* arg)
     rc = B_ModelCompile("");
@@ -2271,7 +2250,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
     //  3. Simulate & compare
     rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_TRUE(U_test_eq(KV_get_at_aper("ACAF", "2002Y1"), -1.274623));
+    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
 
     // B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
 
@@ -2283,7 +2262,7 @@ TEST_F(IodeCAPITest, Tests_B_MODEL)
 
 TEST_F(IodeCAPITest, Tests_B_WS)
 {
-    int     rc, cond;
+    int     rc;
     SAMPLE  *smpl;
 
     // List of tested report functions:
@@ -2388,23 +2367,21 @@ TEST_F(IodeCAPITest, Tests_B_WS)
     U_test_print_title("B_WsSample()");
     rc = B_WsSample("1965Y1 2020Y1");
     smpl = PER_atosmpl("1965Y1", "2020Y1");
-    cond = rc == 0 && (memcmp((char*)KSMPL(KV_WS), (char*)smpl, sizeof(SAMPLE)) == 0);
-    EXPECT_NE(cond, 0);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(memcmp((char*) KSMPL(KV_WS), (char*) smpl, sizeof(SAMPLE)), 0);
     SCR_free(smpl);
 
     // int B_WsClearAll(char* arg)                       $WsClearAll
     U_test_print_title("B_WsClearAll()");
     rc = B_WsClearAll("");
-    cond = (rc == 0) &&
-           (KNB(KC_WS) == 0) &&
-           (KNB(KE_WS) == 0) &&
-           (KNB(KI_WS) == 0) &&
-           (KNB(KL_WS) == 0) &&
-           (KNB(KS_WS) == 0) &&
-           (KNB(KT_WS) == 0) &&
-           (KNB(KV_WS) == 0);
-
-    EXPECT_NE(cond, 0);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(KNB(KC_WS), 0);
+    EXPECT_EQ(KNB(KE_WS), 0);
+    EXPECT_EQ(KNB(KI_WS), 0);
+    EXPECT_EQ(KNB(KL_WS), 0);
+    EXPECT_EQ(KNB(KS_WS), 0);
+    EXPECT_EQ(KNB(KT_WS), 0);
+    EXPECT_EQ(KNB(KV_WS), 0);
 
     // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
     U_test_print_title("B_WsDescr()");
@@ -2495,7 +2472,7 @@ TEST_F(IodeCAPITest, Tests_B_WS)
 
 TEST_F(IodeCAPITest, Tests_B_REP_LINE)
 {
-    int     rc, cond;
+    int     rc;
     char    fullfilename[256], cmd[1024];
 
 
@@ -2503,14 +2480,14 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
     U_test_suppress_kmsg_msgs();
 
     // Simple test of a call to B_ReportLine(). More elaborate commands are tested with B_ReportExec()
-    sprintf(fullfilename,  "%s\\%s", IODE_DATA_DIR, "fun.var");
+    sprintf(fullfilename,  "%s%s", IODE_DATA_DIR, "fun.av");
     sprintf(cmd, "\n"
                  "$WsClearVar\n"
                  "$WsLoadVar %s\n", fullfilename);
 
     rc = B_ReportLine(cmd);
-    cond = (rc == 0) && (KV_WS->k_nb == 394);
-    EXPECT_NE(cond, 0);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(KV_WS->k_nb, 394);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2518,7 +2495,7 @@ TEST_F(IodeCAPITest, Tests_B_REP_LINE)
 
 TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
 {
-    int     rc, cond;
+    int     rc;
     char    cmd[1024];
 
     U_test_print_title("Tests B_ReportExec(\"rep_expand.rep\")");
@@ -2527,10 +2504,10 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
     // Calls to B_ReportExec(reportfile)
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
 
-    sprintf(cmd,  "%s\\rep_expand.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_expand.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd); // TODO: check that the output file is closed !!
-    cond = (rc == 0) && U_test_compare_outfile_to_reffile("rep_expand.a2m", "rep_expand.ref.a2m");
-    EXPECT_NE(cond, 0);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_outfile_to_reffile("rep_expand.a2m", "rep_expand.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2538,17 +2515,17 @@ TEST_F(IodeCAPITest, Tests_B_REP_ENGINE)
 
 TEST_F(IodeCAPITest, Tests_B_REP_FNS)
 {
-    int     rc, cond;
+    int     rc;
     char    cmd[1024];
 
     U_test_print_title("Tests B_ReportExec(\"rep_fns.rep\")");
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
-    sprintf(cmd,  "%s\\rep_fns.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_fns.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
-    cond = (rc == 0) && U_test_compare_outfile_to_reffile("rep_fns.a2m", "rep_fns.ref.a2m");
-    EXPECT_NE(cond, 0);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_outfile_to_reffile("rep_fns.a2m", "rep_fns.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
@@ -2556,17 +2533,17 @@ TEST_F(IodeCAPITest, Tests_B_REP_FNS)
 
 TEST_F(IodeCAPITest, Tests_B_REP_PROC)
 {
-    int     rc, cond;
+    int     rc;
     char    cmd[1024];
 
     U_test_print_title("Tests B_ReportExec(\"rep_proc.rep\")");
     U_test_suppress_kmsg_msgs();
 
     // Execution of the report rep_fns.rep
-    sprintf(cmd,  "%s\\rep_proc.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
+    sprintf(cmd,  "%srep_proc.rep %s %s", IODE_DATA_DIR, IODE_DATA_DIR, IODE_OUTPUT_DIR);
     rc = B_ReportExec(cmd);
-    cond = (rc == 0) && U_test_compare_outfile_to_reffile("rep_proc.a2m", "rep_proc.ref.a2m");
-    EXPECT_NE(cond, 0);
+    EXPECT_EQ(rc, 0);
+    U_test_compare_outfile_to_reffile("rep_proc.a2m", "rep_proc.ref.a2m");
 
     U_test_reset_kmsg_msgs();
 }
