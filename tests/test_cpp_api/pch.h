@@ -23,6 +23,7 @@ public:
 	{
 		IodeInit();
 		cpp_assign_super_API();
+		kpause_continue = 1;
 
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api
