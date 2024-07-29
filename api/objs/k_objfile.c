@@ -387,6 +387,9 @@ KDB  *K_load(int ftype, FNAME fname, int load_all, char** objs)
     // Next line is deleted because K_load_odbc() was implemented for a specific project
     // if(U_is_in('!', fname)) return(K_load_odbc(ftype, fname, load_all, objs));
 
+    // avoid runtime error 'i is not set' in line 'if(i == 0) K_free(kdb);' below
+    i = 0;
+
     K_set_ext(file, fname, ftype);
     fd = fopen(file, "rb");
 
