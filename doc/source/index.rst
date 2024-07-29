@@ -12,6 +12,7 @@ Contents
 
    api
    equivalence
+   tutorial
 
 Indices and tables
 ==================
