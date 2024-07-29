@@ -90,6 +90,7 @@ public:
 
         // other initializations
         U_test_init();
+        kpause_continue = 1;
     }
 
 	int U_cmp_strs(char* str1, char* str2)
