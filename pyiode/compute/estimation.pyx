@@ -54,19 +54,19 @@ def dynamic_adjustment(method: Union[AdjustmentMethod, str], eqs: str, c1: str =
     >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
     >>> lec = equations["ACAF"].lec           # doctest: +NORMALIZE_WHITESPACE
     >>> lec
-    '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+    '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
     
     Partial Adjustment
 
     >>> partial_adjust_eq = dynamic_adjustment(AdjustmentMethod.PARTIAL, lec)
     >>> partial_adjust_eq
-    'd((ACAF/VAF[-1])) := c1 * (acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995) -((ACAF/VAF[-1]))[-1])'
+    'd((ACAF/VAF[-1])) := c1 * (acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995) -((ACAF/VAF[-1]))[-1])'
 
     Error Correction Model
 
     >>> error_corr_adjust_eq = dynamic_adjustment(AdjustmentMethod.ERROR_CORRECTION, lec)
     >>> error_corr_adjust_eq
-    'd((ACAF/VAF[-1])) := c1 * d(acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)) + c2 * (acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995) -(ACAF/VAF[-1]))[-1]'
+    'd((ACAF/VAF[-1])) := c1 * d(acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)) + c2 * (acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995) -(ACAF/VAF[-1]))[-1]'
     """
     if isinstance(method, str):
         method = method.upper()
@@ -405,7 +405,7 @@ cdef class EditAndEstimateEquations:
         >>> current_eq.endogenous
         'ACAF'
         >>> current_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'             
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'             
         >>> # ---- next equation ---- 
         >>> next_eq = estimation.next_equation
         >>> next_eq.endogenous
@@ -417,7 +417,7 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.endogenous
         'ACAF'
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
 
         >>> # ====== add a non existing equation to the block ======
         >>> # set_block("new_block", "currently_displayed_equation")
@@ -453,7 +453,7 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.endogenous
         'ACAF'
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
 
         >>> # ====== remove an equation from the block ======
         >>> # set_block("new_block", "currently_displayed_equation")
@@ -477,7 +477,7 @@ cdef class EditAndEstimateEquations:
         >>> current_eq.endogenous
         'ACAF'
         >>> current_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
         >>> # ---- next equation ----
         >>> next_eq = estimation.next_equation
         >>> next_eq.endogenous
@@ -772,7 +772,7 @@ cdef class EditAndEstimateEquations:
         >>> current_eq.endogenous
         'ACAF'
         >>> current_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)' 
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)' 
 
         >>> # ---- next equation ---- 
         >>> next_eq = estimation.next_equation
@@ -786,7 +786,7 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.endogenous
         'ACAF'
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
         """
         cdef CEquation* c_current_eq = self.c_estimation_ptr.current_equation()
         eq = Equation._from_ptr(c_current_eq, <bint>True)
@@ -817,7 +817,7 @@ cdef class EditAndEstimateEquations:
         >>> current_eq.endogenous
         'ACAF'
         >>> current_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)' 
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)' 
 
         >>> # ---- next equation ---- 
         >>> next_eq = estimation.next_equation
@@ -831,7 +831,7 @@ cdef class EditAndEstimateEquations:
         >>> next_eq.endogenous
         'ACAF'
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
         """
         cdef CEquation* c_next_eq = self.c_estimation_ptr.next_equation()
         eq = Equation._from_ptr(c_next_eq, <bint>True)
