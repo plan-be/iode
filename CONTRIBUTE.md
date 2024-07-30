@@ -1,17 +1,24 @@
 # Requirements
 
 - Required tools:
-  - Compiler MSVC 2019 or 2022.
-  - [Chocolatey](https://chocolatey.org/install) (*) -> C/C++ package manager.
-  - [CMake](https://cmake.org/download) (>= 3.25) (*) -> controls the software compilation process.
-  - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
-  <br> Can be installed using choco:
-    > choco install ninja
-  - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
-  - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
-  - [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
-  - SCR4 executables -> used to build the user documentation. 
-  <br> Ask maintainers to get access.
+  - **Windows**:
+    - Compiler **MSVC 2022**.
+    - [Chocolatey](https://chocolatey.org/install) (*) -> C/C++ package manager.
+    - [CMake](https://cmake.org/download) (>= 3.20) (*) -> controls the software compilation process.
+    - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
+    <br> Can be installed using choco:
+      > choco install ninja
+    - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
+    - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
+    - [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
+    - SCR4 executables -> used to build the user documentation. 
+    <br> Ask maintainers to get access.
+  - **Linux (Ubuntu)**:
+    - Compiler **GCC and G++**: sudo apt install gcc g++ gdb build-essential
+    - **CMake**: sudo apt install cmake
+    - **Ninja**: sudo apt install ninja-build
+    - **LaTeX**: sudo apt install texlive-latex-extra
+    - [Anaconda](https://docs.anaconda.com/anaconda/install/linux/)
 
 - C++ libraries:
   - [Qt 6.4](https://www.qt.io/download)
