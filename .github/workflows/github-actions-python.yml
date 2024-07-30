@@ -50,6 +50,25 @@ jobs:
             uses: ilammy/msvc-dev-cmd@v1
             with:
               arch: x64
+          - name: Print preset config
+            shell: bash
+            run: echo "${{ env.os }}-${{ inputs.build-config }}"
+          - name: Configure CMake
+            shell: bash
+            # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
+            # see CMakePresets.json file
+            # for more details about cmake preset:
+            #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
+            #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
+            run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
+          - name: Build the SCR4, C and C++ API libs
+            uses: ./.github/actions/build_api
+            with:
+              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
+          # - name: Test the C and C++ APIs
+          #   uses: ./.github/actions/test_api
+          #   with:
+          #     cmake-config: ${{ env.os }}-${{ inputs.build-config }}
           - name: Configure Conda
             uses: conda-incubator/setup-miniconda@v2
             with:
