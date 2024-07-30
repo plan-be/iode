@@ -1,0 +1,22 @@
+# dependencies to build the iode module (via nbsphinx)
+numpy 
+pandas 
+matplotlib
+larray
+
+cmake
+cython
+scikit-build-core
+
+# dependencies to actually build the documentation
+sphinx
+sphinx-rtd-theme
+myst-parser
+numpydoc
+# This only installs the python bindings for pandoc. It works on read-the-docs
+# because it has a system-wide pandoc installed but elsewhere, installing
+# pandoc from conda is easier because it includes both the bindings and pandoc itself
+pandoc
+ipython
+ipykernel
+nbsphinx
