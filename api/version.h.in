@@ -10,3 +10,6 @@
         #define ARCH    "INTEL86 DOS"
     #endif
 #endif
+
+const static char* IODE_WEBSITE = "${PROJECT_HOMEPAGE_URL}";
+const static char* ORGANIZATION_NAME = "${IODE_COMPANY}";
