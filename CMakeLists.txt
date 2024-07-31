@@ -30,7 +30,7 @@ project ("iode" VERSION 7.0.0 HOMEPAGE_URL "https://iode.plan.be/doku.php" LANGU
 
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
-set(IODE_EMAIL "ald@plan.be; gb@plan.be; jmarc.paul@gmail.com")
+set(IODE_EMAIL "ald@plan.be; yvda@plan.be; gb@plan.be; jmarc.paul@gmail.com")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 set(CMAKE_INSTALL_MESSAGE ALWAYS)
