@@ -42,7 +42,12 @@ else()
     message(WARNING "pyuic6 not found. Please install PyQt6.")
 endif()
 
-    
+configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/utils.py.in
+      ${CMAKE_CURRENT_SOURCE_DIR}/utils.py
+  )
+
+
 # https://doc.qt.io/qt-6.2/cmake-get-started.html
 
 set(CMAKE_AUTOUIC ON)
