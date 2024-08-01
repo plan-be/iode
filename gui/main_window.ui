@@ -180,6 +180,7 @@
     </property>
     <addaction name="actionIode_Manual"/>
     <addaction name="actionIode_Home"/>
+    <addaction name="actionIode_Python_API"/>
     <addaction name="actionIode_Readme"/>
     <addaction name="separator"/>
     <addaction name="actionKeyboard_Shortcuts"/>
@@ -836,7 +837,7 @@
   </action>
   <action name="actionIode_Readme">
    <property name="text">
-    <string>Iode Readme</string>
+    <string>Iode Changelog</string>
    </property>
    <property name="toolTip">
     <string>Last changes in IODE</string>
@@ -914,6 +915,11 @@
   <action name="actionKeyboard_Shortcuts">
    <property name="text">
     <string>Keyboard Shortcuts</string>
+   </property>
+  </action>
+  <action name="actionIode_Python_API">
+   <property name="text">
+    <string>Iode Python API</string>
    </property>
   </action>
  </widget>
@@ -1806,6 +1812,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionIode_Python_API</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_python_api()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>about()</slot>
@@ -1855,5 +1877,6 @@
   <slot>open_scan_objects_dialog()</slot>
   <slot>open_edit_tables_variables_dialog()</slot>
   <slot>open_settings()</slot>
+  <slot>open_python_api()</slot>
  </slots>
 </ui>
