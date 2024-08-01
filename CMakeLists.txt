@@ -33,6 +33,8 @@ project ("iode" VERSION 7.0.0 HOMEPAGE_URL "https://iode.readthedocs.io/en/lates
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
 set(IODE_EMAIL "ald@plan.be; yvda@plan.be; gb@plan.be; jmarc.paul@gmail.com")
+set(PYTHON_API_URL "https://iode.readthedocs.io/en/latest/api.html")
+set(CHANGELOG_URL "https://iode.readthedocs.io/en/latest/changes.html")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 set(CMAKE_INSTALL_MESSAGE ALWAYS)
