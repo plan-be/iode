@@ -692,6 +692,8 @@ void MainWindow::about()
 {
     // TODO : add a IODE_VERSION X.X in api/iode.h (to be more "modern")
     QString version = QString("%1.%2").arg(IODE_VERSION_MAJOR).arg(IODE_VERSION_MINOR);
+    QString organization_name(ORGANIZATION_NAME);
+    QString homepage_url(IODE_WEBSITE);
     QMessageBox::about(this, tr("About IODE"),
         tr(R"(
             <style>
@@ -702,12 +704,13 @@ void MainWindow::about()
             <h2>MODELLING SOFTWARE</h2>
             <h2>Version %1</h2>
            
-            <h3>Developped by the Federal Planning Bureau (Belgium)</h3>
+            <h3>Developped by the %2</h3>
             <p>
             <ul> 
                 <li>Geert Bryon &nbsp;&nbsp;&nbsp;&nbsp;  
                 <li>Jean-Marc Paul
-                <li>Alix Damman &nbsp;&nbsp;&nbsp;   
+                <li>Alix Damman 
+                <li>Yannick Van den Abbeel &nbsp;&nbsp;&nbsp;   
             </ul>
             </p>
            
@@ -715,7 +718,7 @@ void MainWindow::about()
             <p>SCR/AL1(c) 1986-2020, JM.B.Paul</p>
            
             <h3>Website</h3>       
-            <p><a href='https://iode.plan.be/doku.php'>iode.plan.be</a></p>)").arg(version)
+            <p><a href='%3'>%3</a></p>)").arg(version, organization_name, homepage_url)
     );
 }
 
