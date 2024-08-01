@@ -721,7 +721,7 @@ void MainWindow::about()
 
 void MainWindow::open_release_notes()
 {
-    QDesktopServices::openUrl(url_readme);
+    QDesktopServices::openUrl(QUrl(CHANGELOG_URL));
 }
 
 void MainWindow::open_iode_home()
