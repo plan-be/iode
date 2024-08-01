@@ -724,6 +724,11 @@ void MainWindow::open_release_notes()
     QDesktopServices::openUrl(QUrl(CHANGELOG_URL));
 }
 
+void MainWindow::open_python_api()
+{
+    QDesktopServices::openUrl(QUrl(PYTHON_API_URL));
+}
+
 void MainWindow::open_iode_home()
 {
     QDesktopServices::openUrl(QUrl(IODE_WEBSITE));

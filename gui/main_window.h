@@ -202,6 +202,7 @@ public slots:
 	void about();
 	void open_release_notes();
 	void open_iode_home();
+	void open_python_api();
 	void open_iode_manual();
 	void display_keyboard_shortcuts();
 
