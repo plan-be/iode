@@ -5,6 +5,41 @@ if(SKBUILD)
 	message(STATUS "Skip target ${IODE_GUI_TARGET}\n")
 else()
 
+# Find PyUIC6
+find_program(PYUIC6_EXECUTABLE pyuic6)
+
+# Check if PyUIC6 is found
+if(PYUIC6_EXECUTABLE)  
+    # Get all .ui files in the current directory and subdirectories
+    file(GLOB_RECURSE UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
+
+    # Create a custom command for each .ui file
+    foreach(UI_FILE ${UI_FILES})
+        # Get the output .py file path
+        get_filename_component(PY_FILE ${UI_FILE} NAME_WE)
+        get_filename_component(UI_DIR ${UI_FILE} DIRECTORY)
+        set(PY_FILE "${UI_DIR}/ui_${PY_FILE}.py")
+
+        # Add a custom command to convert the .ui file to a .py file
+        add_custom_command(
+            OUTPUT ${PY_FILE}
+            COMMAND ${PYUIC6_EXECUTABLE} -o ${PY_FILE} ${UI_FILE}
+            DEPENDS ${UI_FILE}
+            )
+            
+        # Add the .py file to the list of sources
+        list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
+    endforeach()
+    
+    # Create a custom target that depends on all the .py files
+    add_custom_target(ui_to_py ALL DEPENDS ${GENERATED_FILES_FROM_UI})
+
+    message(STATUS "New target ui_to_py enabled")
+else()
+    message(WARNING "pyuic6 not found. Please install PyQt6.")
+endif()
+
+    
 # https://doc.qt.io/qt-6.2/cmake-get-started.html
 
 set(CMAKE_AUTOUIC ON)
