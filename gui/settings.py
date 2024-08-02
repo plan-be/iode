@@ -1,18 +1,18 @@
-from PyQt6.QtCore import QDir, QSettings
-from PyQt6.QtWidgets import QDialog, QMainWindow
+from PyQt6.QtCore import Qt, QSettings, QDir, pyqtSlot
+from PyQt6.QtWidgets import QWidget, QDialog
+from PyQt6.QtGui import QDesktopServices, QCloseEvent
+
+from utils import URL_MANUAL
 
 
 class ProjectSettings:
     project_settings: QSettings = None
 
     def __init__(self) -> None:
-        raise NotImplementedError("This class should not be instantiated")
-    
+        raise NotImplementedError()
+
     @classmethod
-    def change_project(cls, project_dir: QDir, main_window: QMainWindow) -> None:
-        pass
-
-
-class IodeSettingsDialog(QDialog):
-    def __init__(self, parent=None):
-        super(IodeSettingsDialog, self).__init__(parent)
+    def change_project(cls, project_dir: QDir, parent: QWidget=None) -> QSettings:
+        filepath = project_dir.absoluteFilePath("iode_gui_settings.ini")
+        cls.project_settings = QSettings(filepath, QSettings.Format.IniFormat, parent)
+        return cls.project_settings
