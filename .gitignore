@@ -448,6 +448,9 @@ keyboard_shortcuts.*
 /pyiode/**/*.at
 /pyiode/**/*.av
 
+# GUI
+/gui/**/ui_*.py
+
 # NSIS
 /nsis/*.nsh
 !/nsis/*template*.nsh
