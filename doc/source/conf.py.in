@@ -53,6 +53,14 @@ extensions = [
     'myst_parser'
 ]
 
+myst_enable_extensions = [
+    "colon_fence",
+    "dollarmath",
+    "amsmath",
+    "deflist",
+    "html_admonition", 
+]
+
 extlinks = {'issue': ('https://github.com/sphinx-doc/sphinx/issues/%s', 'issue %s')}
 
 # scan all found documents for autosummary directives, and to generate stub pages for each.
