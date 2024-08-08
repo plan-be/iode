@@ -116,6 +116,28 @@ cdef class Equation:
         wrapper.ptr_owner = owner
         return wrapper
 
+
+    def _format_lec_string(self, lec_definition: str) -> str:
+        """
+        Format the LEC string by aligning it symmetrically around ':=' and indenting (potential) multi-lines.
+
+        Parameters
+        ----------
+        lec_definition: str
+            The LEC string to format.
+
+        Returns
+        -------
+        str
+            The formatted LEC string.
+        """
+        left_side, right_side = lec_definition.split(':=')[0].strip(), lec_definition.split(':=')[1].strip()
+        lec_indent = ' ' * (len(left_side) + len(' := '))
+        formatted_right_side = right_side.replace('\n', f'\n{lec_indent}')
+        formatted_lec_definition = f"{left_side} := {formatted_right_side}"
+        
+        return formatted_lec_definition
+
     def get_formated_date(self, format: str = "dd-mm-yyyy") -> str:
         """
         Return the date of last estimation in a given format.
@@ -394,12 +416,13 @@ cdef class Equation:
         ... 
         ValueError: Cannot set LEC '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' to the equation named 'ACAF'
         """
-        return self.c_equation.get_lec().decode().replace('\n', '')
-    
+
+        lec_definition = self.c_equation.get_lec().decode()
+        return self._format_lec_string(lec_definition)
+
     @lec.setter
     def lec(self, value: str):
         value = value.strip()
-        value = value.replace('\n', '')
         self.c_equation.set_lec(value.encode())
 
     @property
@@ -667,9 +690,10 @@ cdef class Equation:
         sample = self.sample
         tests = self.tests
         indent = " " * len("Equation(")
+        ident_lec = " " * len("lec = ")
 
         s = [f"endogenous = {self.endogenous}"]
-        s += [f"lec = {self.lec}"]
+        s += ["lec = {}".format(self.lec.replace('\n', '\n' + indent + ident_lec))]
         s += [f"method = {self.method}"]
         if len(sample):
             s+= [f"sample = {sample}"]
@@ -692,9 +716,10 @@ cdef class Equation:
         sample = self.sample
         tests = self.tests
         indent = " " * len("Equation(")
+        ident_lec = " " * len("lec = ")
 
         s = [f"endogenous = {repr(self.endogenous)}"]
-        s += [f"lec = {repr(self.lec)}"]
+        s += ["lec = {}".format(self.lec.replace('\n', '\n' + indent + ident_lec))]
         s += [f"method = {repr(self.method)}"]
         if len(sample):
             s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]
