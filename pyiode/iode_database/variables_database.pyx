@@ -1453,7 +1453,7 @@ cdef class Variables(_AbstractDatabase):
                                       variables_list.encode())
 
     # TODO : add doctests (ask Geert Bryon)
-    def seasonal_adjustment(self, input_file: str, eps_test: float=5.0, series: Union[str, List[str]] = None):
+    def seasonal_adjustment(self, input_file: Union[str, Path], eps_test: float=5.0, series: Union[str, List[str]] = None):
         """
         Eliminate seasonal variations in monthly series (= variables).
 
@@ -1503,7 +1503,7 @@ cdef class Variables(_AbstractDatabase):
         self.database_ptr.seasonal_adjustment(input_file.encode(), series.encode(), eps_test)
 
     # TODO : add doctests (ask Geert Bryon)
-    def trend_correction(self, input_file: str, lambda_: float, series: Union[str, List[str]] = None, log: bool = False):
+    def trend_correction(self, input_file: Union[str, Path], lambda_: float, series: Union[str, List[str]] = None, log: bool = False):
         """
         Implementation of the *Hodrick-Prescott method* for trend series (= variables) construction. 
         The principle is the same as for deseasonalization: series read from a file are imported and transformed simultaneously.
@@ -1513,7 +1513,7 @@ cdef class Variables(_AbstractDatabase):
 
         Parameters
         ----------
-        input_file: str
+        input_file: str or Path
             filepath to the input file.
         lambda_: float
             Lambda parameter of the Hodrick-Prescott method.
