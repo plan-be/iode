@@ -150,11 +150,11 @@ private:
 
 public slots:
 	// File Menu
-	void createNewProject();
+	void create_new_project();
 	void open_project();
 	void open_recent_project();
-	void saveCurrentTab();
-	void saveAllTabs();
+	void save_current_tab();
+	void save_all_tabs();
 	void open_import_comments_dialog();
 	void open_import_variables_dialog();
 	void open_export_dialog();

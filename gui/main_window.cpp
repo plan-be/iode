@@ -224,7 +224,7 @@ bool MainWindow::openDirectory(const QString& dirPath)
 
 // -------- File Menu --------
 
-void MainWindow::createNewProject()
+void MainWindow::create_new_project()
 {
     if (!projectPath.isEmpty())
     {
@@ -282,12 +282,12 @@ void MainWindow::open_recent_project()
     }
 }
 
-void MainWindow::saveCurrentTab()
+void MainWindow::save_current_tab()
 {
     tabWidget_IODE_objs->saveTab();
 }
 
-void MainWindow::saveAllTabs()
+void MainWindow::save_all_tabs()
 {
     tabWidget_IODE_objs->saveAllTabs();
 }
