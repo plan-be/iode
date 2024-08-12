@@ -18,14 +18,15 @@ class IodeCompleter(QCompleter):
     def __init__(self, report_commands: bool=True, lec_functions: bool=False, iode_type: IodeTypes=None, parent=None):
         super().__init__(parent)
 
-        self.report_commands = report_commands
-        self.lec_functions = lec_functions
+        self.report_commands_ = report_commands
+        self.lec_functions_ = lec_functions
 
         self.setModel(QStringListModel())
-        self.setCaseSensitivity(Qt.CaseInsensitive)
-        self.setCompletionMode(QCompleter.PopupCompletion)
+        self.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
 
-        self.set_iode_type(iode_type, True)
+        self.iode_databases = []
+        self.set_iode_type(iode_type)
 
     @property
     def report_commands(self) -> bool:
