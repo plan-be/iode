@@ -356,30 +356,6 @@
     <string>Change Print Setup</string>
    </property>
   </action>
-  <action name="actionLoad_profile">
-   <property name="text">
-    <string>Load Settings</string>
-   </property>
-   <property name="toolTip">
-    <string>Reset profile and load a profile from disk to replace the current one</string>
-   </property>
-  </action>
-  <action name="actionSave_profile">
-   <property name="text">
-    <string>Save Settings</string>
-   </property>
-   <property name="toolTip">
-    <string>Save permanently the current profile on disk</string>
-   </property>
-  </action>
-  <action name="actionReset_profile">
-   <property name="text">
-    <string>Reset Settings</string>
-   </property>
-   <property name="toolTip">
-    <string>Clear current profile - Reset default values</string>
-   </property>
-  </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
@@ -389,22 +365,6 @@
    </property>
    <property name="shortcut">
     <string>Alt+X</string>
-   </property>
-  </action>
-  <action name="actionLoad_Work_Space">
-   <property name="text">
-    <string>Load Work Space</string>
-   </property>
-   <property name="toolTip">
-    <string>Load new work space(s) from disk</string>
-   </property>
-  </action>
-  <action name="actionSave_Work_Space">
-   <property name="text">
-    <string>Save Work Space</string>
-   </property>
-   <property name="toolTip">
-    <string>Save current work space(s) contents on disk</string>
    </property>
   </action>
   <action name="actionClear_Work_Space">
@@ -490,76 +450,6 @@
     <string>Hodrick-Prescott filter for trend correction</string>
    </property>
   </action>
-  <action name="action_7">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>WS MANAGEMENT</string>
-   </property>
-  </action>
-  <action name="actionPROFILES">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>PROFILES</string>
-   </property>
-  </action>
-  <action name="actionDATA_EDIT">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>DATA EDIT</string>
-   </property>
-  </action>
-  <action name="actionEdit_WS_Comments">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Comments">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-  </action>
-  <action name="actionEdit_WS_Equations">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Equations">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-  </action>
-  <action name="actionEdit_WS_Identities">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Identities">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-  </action>
-  <action name="actionEdit_WS_Lists">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-   <property name="toolTip">
-    <string>Update, create, delete and browse current work space lists</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Lists">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-   <property name="toolTip">
-    <string>Update, create, delete and browse current work space lists</string>
-   </property>
-  </action>
   <action name="actionSort_and_Expand">
    <property name="text">
     <string>Sort and Expand</string>
@@ -608,47 +498,9 @@
     <string>Scan for variables and scalars in object definitions</string>
    </property>
   </action>
-  <action name="actionEdit_WS_Scalars">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Scalars">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-  </action>
-  <action name="actionEdit_WS_Tables">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Tables">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-  </action>
-  <action name="actionEdit_WS_Variables">
-   <property name="text">
-    <string>Edit WS</string>
-   </property>
-  </action>
-  <action name="actionEdit_List_Variables">
-   <property name="text">
-    <string>Edit List</string>
-   </property>
-  </action>
   <action name="actionEdit_Tables_Variables">
    <property name="text">
     <string>Edit Tables</string>
-   </property>
-  </action>
-  <action name="actionMISCELLANEOUS">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>MISCELLANEOUS</string>
    </property>
   </action>
   <action name="actionDuplicate_objects">
@@ -771,54 +623,6 @@
     <string>Display or Print series values</string>
    </property>
   </action>
-  <action name="actionFILES">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>FILES</string>
-   </property>
-  </action>
-  <action name="actionPrint_A2M_File">
-   <property name="text">
-    <string>Print A2M File</string>
-   </property>
-   <property name="toolTip">
-    <string>Print A2M File</string>
-   </property>
-  </action>
-  <action name="actionPrint_Report">
-   <property name="text">
-    <string>Print Report</string>
-   </property>
-   <property name="toolTip">
-    <string>Print IODE Report</string>
-   </property>
-  </action>
-  <action name="actionEdit_report">
-   <property name="text">
-    <string>Edit report</string>
-   </property>
-   <property name="toolTip">
-    <string>Create or modify a report</string>
-   </property>
-  </action>
-  <action name="actionExecute_report">
-   <property name="text">
-    <string>Execute report</string>
-   </property>
-   <property name="toolTip">
-    <string>Execute IODE report</string>
-   </property>
-  </action>
-  <action name="actionExecute_a_report_line">
-   <property name="text">
-    <string>Execute a report line</string>
-   </property>
-   <property name="toolTip">
-    <string>Execute a single report command</string>
-   </property>
-  </action>
   <action name="actionIode_Manual">
    <property name="text">
     <string>Iode Manual</string>
@@ -856,30 +660,12 @@
     <string>Import Variables</string>
    </property>
   </action>
-  <action name="actionExport_Variables">
-   <property name="text">
-    <string>Export Variables</string>
-   </property>
-  </action>
-  <action name="actionSave_Project_As">
-   <property name="text">
-    <string>Save Project As</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+S</string>
-   </property>
-  </action>
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="actioncb_dnqsj">
-   <property name="text">
-    <string>cb dnqsj</string>
    </property>
   </action>
   <action name="actionSave">
@@ -1173,118 +959,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionEdit_List_Comments</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_List_Equations</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_List_Identities</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_List_Lists</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_List_Scalars</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_List_Tables</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_List_Variables</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_object_editor_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionDuplicate_objects</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -1369,54 +1043,6 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>open_compute_identities_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEdit_report</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_edit_report_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionExecute_report</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_execute_report_dialog()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>458</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionExecute_a_report_line</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_execute_report_command_line_dialog()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1842,7 +1468,6 @@
   <slot>open_low_to_high_dialog()</slot>
   <slot>open_seasonal_adjustment_dialog()</slot>
   <slot>open_trend_correction_dialog()</slot>
-  <slot>open_object_editor_dialog()</slot>
   <slot>open_duplicate_objects_dialog()</slot>
   <slot>open_compute_simulation_dialog()</slot>
   <slot>open_compute_model_dialog()</slot>
