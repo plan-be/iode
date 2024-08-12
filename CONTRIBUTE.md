@@ -21,6 +21,7 @@
    - cython
    - *(nanobind)*
    - scikit-build-core
+   - pyqt6
    - pytest
    - numpy
    - pandas
@@ -31,11 +32,15 @@
    - sphinx_rtd_theme
    - myst-parser
 
-**note**: to install `larray`, you have to run:
+**note**: to install `pyqt6`, you have to do it via `pip`:
+```bash
+pip install pyqt6
+```
+To install `larray`, you have to run:
 ```bash
 conda install -c larray-project larray
 ```
-and for all other libraries:
+For all other Python libraries:
 ```bash
 conda install -c conda-forge <list of libraries>
 ```
@@ -88,7 +93,8 @@ where `<target>` is one the item in the list below:
 - `iode_scr4`        -> C library providing many of the utility functions used in the C API.
 - `iode_c_api`       -> Core API of IODE (in pure C).
 - `iode_cpp_api`     -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
-- `iode_gui`         -> Graphical user interface (GUI) based on Qt.
+- `iode_gui`         -> Graphical user interface (GUI) based on Qt (C++)
+- `ui_to_py`         -> Generates Python GUI scripts from Qt Designer files *.ui
 - `nsis`             -> Builds a Windows Installer for the users.
 - `test_c_api`       -> Builds the tests for the C API (based on Google Test).
 - `test_cpp_api`     -> Builds the tests for the C++ classes (based on Google Test).
@@ -153,6 +159,10 @@ The, to install the wheel file, type:
 ```bash
 root_dir_iode> pip install <iode-wheel-file>.whl
 ```
+
+## GUI (Python)
+Before to work on any issue related to the GUI (Python), you have to build the CMake target `ui_to_py`. 
+This target will generate the Python scripts from the Qt Designer files *.ui. 
 
 # Working On An Issue
 
