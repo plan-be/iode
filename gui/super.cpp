@@ -151,7 +151,7 @@ int gui_WsLoad_super()
 int gui_WsSave_super()
 {
 	MainWindow* main_window = static_cast<MainWindow*>(get_main_window_ptr());
-	main_window->saveAllTabs();
+	main_window->save_all_tabs();
 	return 0;
 }
 

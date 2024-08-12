@@ -1218,7 +1218,7 @@
    <sender>actionSave</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>saveCurrentTab()</slot>
+   <slot>save_current_tab()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1234,7 +1234,7 @@
    <sender>actionSave_All</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>saveAllTabs()</slot>
+   <slot>save_all_tabs()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1250,7 +1250,7 @@
    <sender>actionNew_Project</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>createNewProject()</slot>
+   <slot>create_new_project()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1489,9 +1489,9 @@
   <slot>open_export_dialog()</slot>
   <slot>save_project_as()</slot>
   <slot>open_project()</slot>
-  <slot>saveCurrentTab()</slot>
-  <slot>saveAllTabs()</slot>
-  <slot>createNewProject()</slot>
+  <slot>save_current_tab()</slot>
+  <slot>save_all_tabs()</slot>
+  <slot>create_new_project()</slot>
   <slot>update_tab_and_completer()</slot>
   <slot>display_keyboard_shortcuts()</slot>
   <slot>open_sort_and_calculus_dialog()</slot>
