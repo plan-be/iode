@@ -31,6 +31,9 @@ if(PYUIC6_EXECUTABLE)
         list(APPEND GENERATED_FILES_FROM_UI ${PY_FILE})
     endforeach()
     
+    # remove previously generated Python file if it exists
+    file(REMOVE ${GENERATED_FILES_FROM_UI})
+
     # Create a custom target that depends on all the .py files
     add_custom_target(ui_to_py ALL DEPENDS ${GENERATED_FILES_FROM_UI})
 
