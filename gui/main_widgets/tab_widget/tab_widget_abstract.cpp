@@ -275,7 +275,7 @@ bool IodeAbstractTabWidget::saveTabContent(const int index)
     }
 }
 
-bool IodeAbstractTabWidget::saveAllTabs()
+bool IodeAbstractTabWidget::save_all_tabs()
 {
     bool success = true;
     for(int index=0; index < this->count(); index++)

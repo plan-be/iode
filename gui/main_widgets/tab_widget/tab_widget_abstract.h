@@ -364,7 +364,7 @@ public slots:
      * 
      * @return bool whether or not the method has succeeded. 
      */
-    bool saveAllTabs();
+    bool save_all_tabs();
     
     /**
      * @brief Update the path to the current project directory.

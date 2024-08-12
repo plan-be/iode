@@ -172,7 +172,7 @@ QMessageBox::StandardButton MainWindow::askSaveAllTabs()
 {
     QMessageBox::StandardButton answer = QMessageBox::warning(this, "WARNING", "Save content of all open tabs?", 
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Discard, QMessageBox::Yes);
-    if (answer == QMessageBox::Yes) tabWidget_IODE_objs->saveAllTabs();
+    if (answer == QMessageBox::Yes) tabWidget_IODE_objs->save_all_tabs();
     return answer;
 }
 
@@ -289,7 +289,7 @@ void MainWindow::save_current_tab()
 
 void MainWindow::save_all_tabs()
 {
-    tabWidget_IODE_objs->saveAllTabs();
+    tabWidget_IODE_objs->save_all_tabs();
 }
 
 // NOTE: In case users ask to restore Alt + F<...> behavior.
