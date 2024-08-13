@@ -689,12 +689,12 @@ cdef class Equation:
     def __str__(self) -> str:
         sample = self.sample
         tests = self.tests
-        indent = " " * len("Equation(")
-        ident_lec = " " * len("lec = ")
+        indent_eq = " " * len("Equation(")
+        indent_lec = " " * len("lec = ")
+        lec = self.lec.replace('\n', '\n' + indent_eq + indent_lec)
 
         s = [f"endogenous = {self.endogenous}"]
-        s += ["lec = {}".format(self.lec.replace('\n', '\n' + indent + ident_lec))]
-        s += [f"method = {self.method}"]
+        s += [f"lec = {lec}"]
         if len(sample):
             s+= [f"sample = {sample}"]
         if self.comment:
@@ -705,21 +705,22 @@ cdef class Equation:
             s += [f"instruments = {self.instruments}"]
         if tests['corr'] > 0.0:
             indent_tests = " " * len("tests = ")
-            s += ["tests = " + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+            s += ["tests = " + f",\n{indent_eq}{indent_tests}".join(f"{key} = {value:g}" 
                                 for key, value in self.tests.items())]
         if self.date:
             s += [f"date = {self.date}"]
 
-        return "Equation(" + f",\n{indent}".join(s) + ")"
+        return "Equation(" + f",\n{indent_eq}".join(s) + ")"
 
     def __repr__(self) -> str:
         sample = self.sample
         tests = self.tests
-        indent = " " * len("Equation(")
-        ident_lec = " " * len("lec = ")
+        indent_eq = " " * len("Equation(")
+        indent_lec = " " * len("lec = ")
+        lec = self.lec.replace('\n', '\n' + indent_eq + indent_lec)
 
         s = [f"endogenous = {repr(self.endogenous)}"]
-        s += ["lec = {}".format(self.lec.replace('\n', '\n' + indent + ident_lec))]
+        s += [f"lec = {lec}"]
         s += [f"method = {repr(self.method)}"]
         if len(sample):
             s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]
@@ -731,12 +732,12 @@ cdef class Equation:
             s += [f"instruments = {repr(self.instruments)}"]
         if tests['corr'] > 0.0:
             indent_tests = " " * len("tests = {")
-            s += ["tests = {" + f",\n{indent}{indent_tests}".join(f"{key} = {value:g}" 
+            s += ["tests = {" + f",\n{indent_eq}{indent_tests}".join(f"{key} = {value:g}" 
                                 for key, value in self.tests.items()) + "}"]
         if self.date:
             s += [f"date = {repr(self.date)}"]
 
-        return "Equation(" + f",\n{indent}".join(s) + ")" 
+        return "Equation(" + f",\n{indent_eq}".join(s) + ")" 
 
     def __hash__(self) -> int:
         return <int>hash_value_eq(dereference(self.c_equation))
