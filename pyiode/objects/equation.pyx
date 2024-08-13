@@ -9,6 +9,7 @@ from cython.operator cimport dereference
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.objects.equation cimport CEquation
 from pyiode.objects.equation cimport hash_value as hash_value_eq
+from iode.iode_python import format_lec_string
 
 
 # Equation wrapper class
@@ -116,27 +117,6 @@ cdef class Equation:
         wrapper.ptr_owner = owner
         return wrapper
 
-
-    def _format_lec_string(self, lec_definition: str) -> str:
-        """
-        Format the LEC string by aligning it symmetrically around ':=' and indenting (potential) multi-lines.
-
-        Parameters
-        ----------
-        lec_definition: str
-            The LEC string to format.
-
-        Returns
-        -------
-        str
-            The formatted LEC string.
-        """
-        left_side, right_side = lec_definition.split(':=')[0].strip(), lec_definition.split(':=')[1].strip()
-        lec_indent = ' ' * (len(left_side) + len(' := '))
-        formatted_right_side = right_side.replace('\n', f'\n{lec_indent}')
-        formatted_lec_definition = f"{left_side} := {formatted_right_side}"
-        
-        return formatted_lec_definition
 
     def get_formated_date(self, format: str = "dd-mm-yyyy") -> str:
         """
@@ -418,7 +398,7 @@ cdef class Equation:
         """
 
         lec_definition = self.c_equation.get_lec().decode()
-        return self._format_lec_string(lec_definition)
+        return format_lec_string(lec_definition)
 
     @lec.setter
     def lec(self, value: str):
