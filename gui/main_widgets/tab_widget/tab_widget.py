@@ -1,11 +1,14 @@
-from PyQt6.QtCore import pyqtSlot
-from PyQt6.QtWidgets import QTabWidget
+from PyQt6.QtCore import pyqtSlot, pyqtSignal
+from PyQt6.QtWidgets import QTabWidget, QDialog
 
 from typing import List
 from iode import IodeTypes
 
 
 class IodeTabWidget(QTabWidget):
+    fileContentModified = pyqtSignal(str, bool)
+    newObjsListDialog = pyqtSignal(QDialog)
+
     def __init__(self, parent=None):
         super(IodeTabWidget, self).__init__(parent)
 
@@ -31,6 +34,10 @@ class IodeTabWidget(QTabWidget):
     def clear_workspace(self) -> None:
         pass
 
+    @pyqtSlot(str)
+    def update_project_dir(self, project_dir_path: str):
+        pass
+
     @pyqtSlot()
     @pyqtSlot(IodeTypes)
     def update_object_tab(self, iode_type: IodeTypes = None) -> None:
@@ -43,6 +50,14 @@ class IodeTabWidget(QTabWidget):
 
     @pyqtSlot(IodeTypes)
     def get_selected_objects_names(self, iode_type: IodeTypes) -> List[str]:
+        pass
+
+    @pyqtSlot(str, str)
+    def file_moved(self, old_filepath: str, new_filepath: str):
+        pass
+
+    @pyqtSlot(str, str, str)
+    def file_renamed(self, path: str, old_name: str, new_name: str):
         pass
 
     @pyqtSlot()
