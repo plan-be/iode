@@ -472,13 +472,13 @@ cdef class _AbstractDatabase:
 
         self.abstract_db_ptr.copy_from(input_files.encode(), objects_names.encode())
 
-    def merge_from(self, input_file: str):
+    def merge_from(self, input_file: Union[str, Path]):
         """
         Merge all objects stored in the input file 'input_file' into the current database.
 
         Parameters
         ----------
-        input_file: str
+        input_file: str or Path
             file from which the objects to merge are read.
         
         Examples
@@ -498,11 +498,15 @@ cdef class _AbstractDatabase:
         >>> len(comments)
         317
         """
-        if not isinstance(input_file, str):
-            raise TypeError(f"'input_file': Expected value of type string. Got value of type {type(input_file).__name__}")
-        # convert relative path to absolute path
-        input_file = str(Path(input_file).resolve())
-        self.abstract_db_ptr.merge_from(input_file.encode())
+        if not isinstance(input_file, (str, Path)):
+            raise TypeError(f"'input_file': Expected value of type string or Path. Got value of type {type(input_file).__name__}")
+        
+        # convert relative path to absolute path and check if file exists
+        input_file = Path(input_file).resolve()
+        if not input_file.exists():
+           raise ValueError(f"file '{str(input_file)}' not found.")
+
+        self.abstract_db_ptr.merge_from(str(input_file).encode())
 
     def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, in_formula: bool=True, 
                in_text: bool=True, list_result: str="_RES"):
@@ -589,17 +593,17 @@ cdef class _AbstractDatabase:
                 <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, 
                 list_result.encode())]
 
-    def _load(self, filepath: str):
+    def _load(self, filepath: Union[str, Path]):
         raise NotImplementedError()
 
-    def load(self, filepath: str):
+    def load(self, filepath: Union[str, Path]):
         """
         Load objects stored in file 'filepath' into the current database.
         Erase the database before to load the file.
 
         Parameters
         ----------
-        filepath: str
+        filepath: str or Path
             path to the file to load
         
         Examples
@@ -616,17 +620,24 @@ cdef class _AbstractDatabase:
         """
         if self.is_subset():
             raise RuntimeError("Cannot call 'load' method on a subset of a database")
-        if not isinstance(filepath, str):
-            raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
-        self._load(filepath)
 
-    def save(self, filepath: str):
+        if not isinstance(filepath, (str, Path)):
+            raise TypeError(f"'filepath': Expected value of type string or Path. Got value of type {type(filepath).__name__}")
+        
+        # Convert filepath to Path object and check if file exists
+        filepath = Path(filepath)
+        if not filepath.exists():
+           raise ValueError(f"file '{str(filepath)}' not found.")
+        
+        self._load(str(filepath))
+
+    def save(self, filepath: Union[str, Path]):
         """
         Save objects of the current database into the file 'filepath'.
 
         Parameters
         ----------
-        filepath: str
+        filepath: str or Path
         
         Examples
         --------
@@ -641,10 +652,15 @@ cdef class _AbstractDatabase:
         >>> len(comments)
         317
         """
-        if not isinstance(filepath, str):
-            raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
+        if not isinstance(filepath, (str, Path)):
+            raise TypeError(f"'filepath': Expected value of type string or Path. Got value of type {type(filepath).__name__}")
 
-        self.abstract_db_ptr.save(filepath.encode())
+        # Convert filepath to Path object and check if file exists
+        filepath = Path(filepath)
+        if not filepath.exists():
+           raise ValueError(f"file '{str(filepath)}' not found.")
+
+        self.abstract_db_ptr.save(str(filepath).encode())
 
     def clear(self):
         """
