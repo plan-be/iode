@@ -331,7 +331,7 @@ cdef class Equation:
 
         >>> eq_ACAF = equations["ACAF"]
         >>> eq_ACAF.lec
-        '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)'
+        '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n                  acaf4*(TIME=1995)'
 
         >>> # create scalars
         >>> scalars["acaf1"] = 0., 1.
@@ -635,7 +635,8 @@ cdef class Equation:
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
         >>> equations["ACAF"]           # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)',
+                lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                         acaf4*(TIME=1995)',
                 method = 'LSQ',
                 from_period = '1980Y1',
                 to_period = '1996Y1',
@@ -653,7 +654,7 @@ cdef class Equation:
                          stdev = 0.0042699},
                 date = '12-06-1998')
         >>> equations["ACAF"]._as_tuple()         # doctest: +NORMALIZE_WHITESPACE
-        ('ACAF', '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)', 'LSQ', '1980Y1:1996Y1', '', '', 'ACAF', 
+        ('ACAF', '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+\n                  acaf4*(TIME=1995)', 'LSQ', '1980Y1:1996Y1', '', '', 'ACAF', 
         1.0, 2.329345941543579, 32.273193359375, 83.80752563476562, 0.008184665814042091, 0.8217613697052002, 
         0.7962986826896667, 5.1994487876072526e-05, 0.0019271461060270667, 23.545812606811523, 0.004269900266081095, 
         '12-06-1998')
@@ -675,6 +676,7 @@ cdef class Equation:
 
         s = [f"endogenous = {self.endogenous}"]
         s += [f"lec = {lec}"]
+        s += [f"method = {self.method}"]
         if len(sample):
             s+= [f"sample = {sample}"]
         if self.comment:
@@ -700,7 +702,7 @@ cdef class Equation:
         lec = self.lec.replace('\n', '\n' + indent_eq + indent_lec)
 
         s = [f"endogenous = {repr(self.endogenous)}"]
-        s += [f"lec = {lec}"]
+        s += [f"lec = \'{lec}\'"]                   # add \' to emulate repr behavior & compatibility pytests
         s += [f"method = {repr(self.method)}"]
         if len(sample):
             s+= [f"from_period = {repr(sample.start)}", f"to_period = {repr(sample.end)}"]

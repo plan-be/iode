@@ -847,7 +847,8 @@ cdef class _AbstractDatabase:
         >>> # a) get one Equation
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)',
+                 lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                          acaf4*(TIME=1995)',
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
@@ -1117,7 +1118,8 @@ cdef class _AbstractDatabase:
         >>> # b) update one equation        
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
-                 lec = '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+acaf4*(TIME=1995)',
+                 lec = '(ACAF/VAF[-1]) := acaf1+acaf2*GOSF[-1]+
+                                          acaf4*(TIME=1995)',
                  method = 'LSQ',
                  from_period = '1980Y1',
                  to_period = '1996Y1',
