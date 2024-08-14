@@ -155,7 +155,7 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget_IODE_objs.hide()
             self.ui.dockWidget_file_explorer.hide()
         else:
-            self.open_directory(self.project_path)
+            self.open_directory(self.project_path, True)
 
         # files_to_load is not empty
         for filepath in files_to_load_:
@@ -198,7 +198,7 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget_IODE_objs.save_all_tabs()
         return answer
 
-    def open_directory(self, dir_path: str) -> bool:
+    def open_directory(self, dir_path: str, onStartup: bool = False) -> bool:
         """
         Update the project path and the content of the File Explorer.
         Ask to save workspace and content of all other tabs before to switch from project directory.
@@ -231,7 +231,7 @@ class MainWindow(QMainWindow):
         self.ui.dockWidget_file_explorer.show()
         
         # update file explorer view
-        self.ui.treeView_file_explorer.update_project_dir(project_dir)
+        self.ui.treeView_file_explorer.update_project_dir(project_dir, onStartup)
         
         # (re)open tabs
         self.ui.tabWidget_IODE_objs.setup()
@@ -298,6 +298,8 @@ class MainWindow(QMainWindow):
             for dialog in self.dialogs: 
                 dialog.close()
             self.dialogs.clear()
+
+            self.ui.treeView_file_explorer.save_settings()
             
             event.accept()
 
