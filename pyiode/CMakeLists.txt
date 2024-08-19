@@ -40,7 +40,8 @@ if(Python_FOUND)
     #        - add_custom_command() defines a command to generate specified OUTPUT file(s). A target created in the 
     #          same directory (CMakeLists.txt file) that specifies any output of the custom command as a source file 
     #          is given a rule to generate the file using the command at build time.
-    #        - In Python, when running 'import xxx', Python will look for a function named PyInit_xxx
+    #        - https://github.com/cython/cython/pull/4548 
+    #          In Python, when running 'import xxx', Python will look for a function named PyInit_xxx
     #          in the xxx.pyd file. By default, Cython will use the name of the compiled .pyx file to generate 
     #          the PyInit_xxx function. This behavior is override by the --module-name option. 
     add_custom_command(OUTPUT iode_python.cpp
@@ -48,7 +49,7 @@ if(Python_FOUND)
                       VERBATIM
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/s_pyiode.cpp ${CMAKE_CURRENT_BINARY_DIR}/s_pyiode.cpp
                       COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_python.pyx -3 --verbose --cplus 
-                      --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} 
+                      --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name iode.iode_python
                       --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
                       --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp)
 
