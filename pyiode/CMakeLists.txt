@@ -16,6 +16,7 @@ if(Python_FOUND)
     # if the variable is not defined.
     # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/common.pyx.in ${CMAKE_CURRENT_SOURCE_DIR}/common.pyx)
+    configure_file(${CMAKE_SOURCE_DIR}/generate_stub_files.py.in ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
 
     file(INSTALL ${CMAKE_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode)
     file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests)

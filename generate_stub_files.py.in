@@ -1,0 +1,47 @@
+import re
+import sys
+import inspect
+import mypy.stubdoc
+from typing import Optional
+
+
+# NOTE: even using the cython compiler directive binding=True, cython (3.0.11) generates 
+#       functions which are of type '_cython_<major>_<minor>.cython_function_or_method'. 
+#       mypy.stubgen (1.11.1) uses the Python 'inspect' package internally and uses the test 
+#       'inspect.isbuiltin(obj)' in function 'is_function()' in stubgenc.py to test if the 
+#       passed object is a function. However the function 'inspect.isbuiltin()' does NOT 
+#       recognize an cython object of type 'cython_function_or_method' as a built-in function. 
+#       The hack below makes cython functions to look like built-in function
+inspect.isbuiltin = lambda obj: True if obj.__class__.__name__ == 'cython_function_or_method' else False
+
+
+def infer_prop_type_from_docstring(docstr: Optional[str]) -> Optional[str]:
+    """
+    mypy.stubgen (1.11.1) expects that the documentation of the class properties follow        
+    the Google/Numpy style docstring type annotation which is "<type>: <descriptions>".
+    However cython (3.0.11) (with binding=True, embedsignature=True) generates class 
+    properties documentation starting with "<property name>: <type>". 
+
+    In the type string, we allow the following characters:
+    * dot: because sometimes classes are annotated using full path
+    * brackets: to allow type hints like List[int]
+    * comma/space: things like Tuple[int, int]
+    """
+    if not docstr:
+        return None
+    test_str = r"^.*: ([a-zA-Z0-9_, \.\[\]]*)\n"
+    m = re.match(test_str, docstr)
+    return m.group(1) if m else None
+
+mypy.stubdoc.infer_prop_type_from_docstring = infer_prop_type_from_docstring
+
+import mypy.stubgen
+
+
+if __name__ == "__main__":
+    # NOTE: see https://mypy.readthedocs.io/en/latest/stubgen.html 
+    #       for options of stubgen command
+    sys.argv = ["stubgen", "--package", "iode", "--include-docstrings", "--output", 
+                "${CMAKE_CURRENT_SOURCE_DIR}", "--verbose"]
+    print(' '.join(sys.argv))
+    mypy.stubgen.main()
