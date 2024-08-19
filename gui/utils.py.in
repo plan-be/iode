@@ -19,3 +19,17 @@ URL_PYTHON_API = QUrl("${PYTHON_API_URL}")
 executable_dir = QDir.currentPath()
 URL_MANUAL = QUrl.fromLocalFile(executable_dir + "/doc/iode.chm")
 URL_SHORTCUTS = QUrl.fromLocalFile(executable_dir + "/doc/keyboard_shortcuts.pdf")
+
+# NOTE: "In PyQt6 all enum members must be named using their fully qualified names. 
+# This applies to all enums and flags, including those in the QtCore.Qt namespace. 
+# For example the Qt.Checked flag in PyQt6 becomes Qt.CheckState.Checked."
+# (see https://www.pythonguis.com/faq/pyqt5-vs-pyqt6/)
+# The problem is that pyuic6 seems to still generates Python scripts using the PyQt5 
+# enums convention, so we need to flatten the namespaces (19/08/2024).
+# Some hacky solution has been found in https://stackoverflow.com/a/77829104 
+def flatten_enum_namespaces(cls):
+    for prop in dir(cls):
+        attr = getattr(cls, prop)
+        if type(attr).__name__ == 'EnumType':
+            for k, v in attr.__members__.items():
+                setattr(cls, k, v)
