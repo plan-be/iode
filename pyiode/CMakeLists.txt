@@ -20,6 +20,9 @@ if(Python_FOUND)
 
     file(INSTALL ${CMAKE_SOURCE_DIR}/iode.msg DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode)
     file(INSTALL ${CMAKE_SOURCE_DIR}/tests/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/iode/tests)
+    # copy all Python files to binary directory to then be able to generate stub files *.pyi
+    file(INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/iode DESTINATION ${CMAKE_CURRENT_BINARY_DIR} 
+         FILES_MATCHING PATTERN "*.py")
 
     if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp")
       file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/iode_python.cpp")
@@ -60,6 +63,12 @@ if(Python_FOUND)
     target_include_directories(iode_python PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
     target_compile_definitions(iode_python PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
 
+    # Add a custom command that runs the Python script to generate stub files 
+    # after the iode_python target is built
+    add_custom_command(TARGET iode_python POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_python> ${CMAKE_CURRENT_BINARY_DIR}/iode
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
+    
     install(TARGETS iode_python LIBRARY DESTINATION iode)
   else()
     message(CHECK_FAIL "Cython not found")

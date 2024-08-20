@@ -2,6 +2,7 @@ import re
 import sys
 import inspect
 import mypy.stubdoc
+from pathlib import Path
 from typing import Optional
 
 
@@ -41,7 +42,8 @@ import mypy.stubgen
 if __name__ == "__main__":
     # NOTE: see https://mypy.readthedocs.io/en/latest/stubgen.html 
     #       for options of stubgen command
-    sys.argv = ["stubgen", "--package", "iode", "--include-docstrings", "--output", 
-                "${CMAKE_CURRENT_SOURCE_DIR}", "--verbose"]
+    sys.argv = ["stubgen", "--package", "iode", "--include-docstrings", 
+                "--search-path", "${CMAKE_CURRENT_BINARY_DIR}", 
+                "--output", "${CMAKE_CURRENT_SOURCE_DIR}", "--verbose"]
     print(' '.join(sys.argv))
     mypy.stubgen.main()
