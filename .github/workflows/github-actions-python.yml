@@ -80,13 +80,14 @@ jobs:
           - name: Check conda
             shell: bash -el {0}
             run: conda info
-          - name: Install Python libraires - numpy, pandas, larray, cython, scikit-build-core and pytest     # nanobind
+          - name: Install Python libraires
             shell: bash -el {0}
+            # fixed numpy<2.0 since newer versions make mypy to crash 
+            # (see mypy issue https://github.com/python/mypy/issues/17538)
             run: |
               conda config --add channels conda-forge
               conda config --add channels larray-project
-              conda install numpy pandas larray cython scikit-build-core pytest
-            # conda install nanobind
+              conda install "numpy<2.0" pandas larray cython mypy scikit-build-core pytest
           - name: Configure CMake
             shell: bash -el {0}
             # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
@@ -95,6 +96,9 @@ jobs:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
             run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
+          - name: Build target iode_python before pip wheel to make sure it compiles
+            shell: bash -el {0}
+            run: cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_python
           - name: Build iode wheel file
             shell: bash -el {0}
             run: pip wheel .
