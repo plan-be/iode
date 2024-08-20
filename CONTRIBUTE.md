@@ -173,18 +173,10 @@ root_dir_iode> pip install <iode-wheel-file>.whl
 To help IDE like PyCharm to understand the Python API of `iode`, 
 stub files *.pyi must be generated and added to installed package.
 
-To generate the stub files, you must first build and install the Python `iode` package:
-```bash
-root_dir_iode> pip wheel .
-root_dir_iode> pip install <iode-wheel-file>.whl
-```
-Then, type the following command in a console: 
-```bash
-root_dir_iode> python generate_stub_files.py
-```
-This command will generate the stub files in the directory `pyiode/iode`.
+The stub files are generated using the tool `stubgen` from the package `mypy`.
+They are automatically generated when the CMake target `iode_python` is built.
 
-Finally, commit the updated stub files to the repository.
+See pyiode/CMakeLists.txt and generate_stub_files.py for more details.
 
 # GUI (Python)
 Before to work on any issue related to the GUI (Python), you have to build the CMake target `ui_to_py`. 
