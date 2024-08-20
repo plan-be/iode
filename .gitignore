@@ -401,6 +401,10 @@ keyboard_shortcuts.*
 !/tests/cli/*.rep
 !/tests/data/*.rep
 
+# Python stub files
+
+**/*.pyi
+
 # ==== By Folders ====
 
 # ROOT
@@ -420,6 +424,8 @@ keyboard_shortcuts.*
 *.as
 *.at
 *.av
+
+generate_stub_files.py
 
 # C API
 /api/version.h
