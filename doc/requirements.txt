@@ -1,5 +1,5 @@
 # dependencies to build the iode module (via nbsphinx)
-numpy 
+numpy < 2.0     # numpy >= 2.0 makes mypy (1.11) to crash (21/08/2024)
 pandas 
 matplotlib
 larray
@@ -7,6 +7,7 @@ larray
 cmake
 cython
 scikit-build-core
+mypy
 
 # dependencies to actually build the documentation
 sphinx
