@@ -53,7 +53,7 @@ wheel.packages = ["pyiode/iode"]
 # Scikit-build-core defaults to using your .gitignore to select what to exclude from 
 # the source distribution. However, sdist.include and sdist.exclude can be used to 
 # override this behavior
-sdist.include = ["iode.msg", "data"]
+sdist.include = ["iode.msg", "**/*.pyi", "data"]
 # sdist.exclude = []
 
 # The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are
