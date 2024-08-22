@@ -21,7 +21,7 @@ classifiers = [
 ]
 
 # runtime dependency specification
-dependencies = [ "numpy", "pandas" ]
+dependencies = [ "numpy<2.0", "pandas" ]
 
 [project.urls]
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
