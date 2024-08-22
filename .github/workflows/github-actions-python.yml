@@ -101,7 +101,7 @@ jobs:
             run: cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_python
           - name: Build iode wheel file
             shell: bash -el {0}
-            run: pip wheel .
+            run: pip wheel --verbose .
           - name: Install iode package
             shell: bash -el {0}
             run: | 
