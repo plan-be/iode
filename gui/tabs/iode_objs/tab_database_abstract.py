@@ -4,7 +4,8 @@ from PyQt6.QtCore import QDir, Qt, pyqtSignal, pyqtSlot
 
 from tabs.tab_abstract import IodeAbstractWidget
 
-from iode import IodeTypes, IodeFileType, IODE_DATABASE_TYPE_NAMES, IODE_DEFAULT_DATABASE_FILENAME
+from iode import IodeTypes, IodeFileType, IODE_DATABASE_TYPE_NAMES
+from iode import _IODE_DEFAULT_DATABASE_FILENAME
 
 
 class AbstractIodeObjectWidget(IodeAbstractWidget):
@@ -70,7 +71,7 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         :param str tooltip: Tooltip of the tab.
         :return: bool
         """
-        return not self.filepath or self.filepath == IODE_DEFAULT_DATABASE_FILENAME
+        return not self.filepath or self.filepath == _IODE_DEFAULT_DATABASE_FILENAME
 
     def update_filepath(self, filepath: str) -> bool:
         """
