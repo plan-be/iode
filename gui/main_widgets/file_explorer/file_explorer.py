@@ -1,6 +1,6 @@
 import sys
 import shutil
-from typing import List, Tuple
+from typing import List, Set, Tuple
 from pathlib import Path
 
 from PySide6.QtCore import (QModelIndex, QPersistentModelIndex, QDir, QFile, QFileInfo, 
@@ -132,7 +132,7 @@ class IodeFileExplorer(QTreeView):
         self.project_dir: QDir = None
         self.items_to_past: List[QFileInfo] = []
         self.cut_indexes: List[QModelIndex] = []
-        self.modified_indexes: List[QModelIndex] = []
+        self.modified_indexes: Set[QModelIndex] = set()
         self.items_to_past: List[Tuple[QFileInfo, bool]] = []
         self.called_from_context_menu = False
         self.index_context_menu: QModelIndex = None
@@ -369,7 +369,7 @@ class IodeFileExplorer(QTreeView):
         # to update filepath, name and tooltip of corresponding tab when a file is renamed
         self.file_system_model.fileRenamed.connect(self.tab_widget.file_renamed)
         # to set corresponding file in color when its content is modified (and not yet saved to file)
-        self.tab_widget.fileContentModified.connect(self.file_content_modified)
+        self.tab_widget.file_content_modified.connect(self.file_content_modified)
 
     def update_project_dir(self, project_dir: QDir, onStartup: bool=False):
         """
@@ -528,9 +528,10 @@ class IodeFileExplorer(QTreeView):
             return
 
         if modified:
-            self.modified_indexes.append(index)
+            self.modified_indexes.add(index)
         else:
-            self.modified_indexes.remove(index)
+            if index in self.modified_indexes:
+                self.modified_indexes.remove(index)
 
         self.viewport().repaint()
 

@@ -220,7 +220,7 @@ class MainWindow(AbstractMainWindow):
         self.ui.treeView_file_explorer.update_project_dir(project_dir, onStartup)
         
         # (re)open tabs
-        self.ui.tabWidget_IODE_objs.setup()
+        self.ui.tabWidget_IODE_objs.setup(self)
 
         # add directory path to list of recently opened projects (= directories)
         self._add_project_path_to_list(project_dir)
@@ -286,7 +286,8 @@ class MainWindow(AbstractMainWindow):
             self.dialogs.clear()
 
             self.ui.treeView_file_explorer.save_settings()
-            
+            self.ui.tabWidget_IODE_objs.save_settings()
+
             event.accept()
 
     def _check_vars_sample(self):
@@ -324,7 +325,7 @@ class MainWindow(AbstractMainWindow):
         if iode_type:
             index = self.ui.tabWidget_IODE_objs.update_object_tab(iode_type)
         else:
-            index = None
+            index = -1
             for iode_type in IodeType:
                 self.ui.tabWidget_IODE_objs.update_object_tab(iode_type)
 
