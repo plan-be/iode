@@ -11,6 +11,7 @@ NAN_REP = "--"
 MAX_PRECISION_NUMBERS = 10
 DEFAULT_FONT_FAMILY = "Consolas, \"Courier New\", monospace"
 SHOW_IN_TEXT_TAB_EXTENSIONS_LIST = ("txt", "a2m", "prf", "dif", "asc", "ref")
+IODE_REPORT_EXTENSION = ".rep"
 
 URL_HOMEPAGE = QUrl("${PROJECT_HOMEPAGE_URL}")
 URL_CHANGELOG = QUrl("${CHANGELOG_URL}")
