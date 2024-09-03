@@ -1,6 +1,6 @@
 from PyQt6.QtCore import Qt, QDir, QSettings, QFileInfo, QVariant, pyqtSlot
 from PyQt6.QtGui import QAction, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QDialog, QFileDialog, QTextEdit, QLineEdit
 
 from iode import IodeTypes, variables
 from typing import List
@@ -12,7 +12,7 @@ from utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH,
 
 flatten_enum_namespaces(QMainWindow)
 
-from text_edit.completer import IodeCompleter
+from abstract_main_window import AbstractMainWindow
 from settings import ProjectSettings
 from iode_objs.edit.edit_vars_sample import EditIodeSampleDialog
 
@@ -51,12 +51,10 @@ from menu.print_graph.print_variables import MenuPrintVariables
 from menu.print_graph.graph_tables import MenuGraphTables
 from menu.print_graph.graph_variables import MenuGraphVariables
 
-from plot.plot import PlotDialog
-
 from ui_main_window import Ui_MainWindow
 
 
-class MainWindow(QMainWindow):
+class MainWindow(AbstractMainWindow):
     """
     Implemented features:
 
@@ -78,20 +76,6 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # ---- prepare auto-completion ----
-        self.completer = IodeCompleter(True, False, -1, self)
-
-        # ---- dock widgets ----
-        # make left dock widget to extend to bottom of the window
-        self.setCorner(Qt.Corner.BottomLeftCorner, Qt.DockWidgetArea.LeftDockWidgetArea)
-
-        # ---- user settings ----
-        # location if QSettings::UserScope -> FOLDERID_RoamingAppData
-        # see https://doc.qt.io/qt-6/qsettings.html#setPath
-        self.user_settings: QSettings = QSettings(QSettings.Scope.UserScope, self)
-        self.project_path: str = self.user_settings.value("project_path", None)
-        self.recent_projects: List[str] = self.user_settings.value("recent_projects", [])
-        self.font_family: List[str] = self.user_settings.value("font_family", DEFAULT_FONT_FAMILY)
         self.ui.textEdit_output.setStyleSheet(f"font-family: {self.font_family}")
         self.ui.lineEdit_iode_command.setStyleSheet(f"font-family: {self.font_family}")
 
@@ -129,9 +113,6 @@ class MainWindow(QMainWindow):
         # setup the line widget to execute IODE commands
         self.ui.lineEdit_iode_command.setup(self.ui.textEdit_output, self.completer)
 
-        # ---- list of open dialogs ----
-        self.dialogs: List[QDialog] = []
-
         # ---- shortcuts ----
         self.full_screen_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_X), self)
         self.full_screen_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
@@ -160,6 +141,14 @@ class MainWindow(QMainWindow):
         # files_to_load is not empty
         for filepath in files_to_load_:
             self.ui.tabWidget_IODE_objs.load_file(filepath, True, True)
+
+    @property
+    def output(self) -> QTextEdit:
+        return self.ui.textEdit_output
+    
+    @property
+    def iode_command(self) -> QLineEdit:
+        return self.ui.lineEdit_iode_command
 
     def _build_recent_projects_menu(self):
         self.ui.menuRecent_Projects.clear()
@@ -347,16 +336,6 @@ class MainWindow(QMainWindow):
 
         # show the corresponding tab
         self.ui.tabWidget_IODE_objs.show_tab(index)
-
-    @pyqtSlot(QDialog)
-    def append_dialog(self, dialog: QDialog):
-        dialog.open()
-        self.dialogs.append(dialog)
-
-    @pyqtSlot(PlotDialog)
-    def append_plot(self, dialog: PlotDialog):
-        dialog.plot()
-        self.dialogs.append(dialog)
 
     # File Menu
 
