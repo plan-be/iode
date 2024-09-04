@@ -45,7 +45,7 @@ jobs:
           - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
     
           - name: Restore Python 3.9 binding files for IODE
-            uses: actions/download-artifact@v3
+            uses: actions/download-artifact@v4
             with:
               name: iode-python-39
               path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py39    
@@ -53,7 +53,7 @@ jobs:
             run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py39
     
           - name: Restore Python 3.10 binding files for IODE
-            uses: actions/download-artifact@v3
+            uses: actions/download-artifact@v4
             with:
               name: iode-python-310
               path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py310
@@ -61,7 +61,7 @@ jobs:
             run: dir ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py310
     
           - name: Restore Python 3.11 binding files for IODE
-            uses: actions/download-artifact@v3
+            uses: actions/download-artifact@v4
             with:
               name: iode-python-311
               path: ${{ github.workspace }}/out/build/${{ env.os }}-${{ inputs.build-config }}/pyiode/py311
@@ -81,7 +81,7 @@ jobs:
               if-no-files-found: error
 
           - name: Restore Documentation Files
-            uses: actions/download-artifact@v3
+            uses: actions/download-artifact@v4
             with:
               name: iode-doc
               path: ${{ github.workspace }}/doc/build

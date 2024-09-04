@@ -24,19 +24,19 @@ jobs:
         run: mkdir assets
 
       - name: Restore CLI
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: iode-cli
           path: ${{ github.workspace }}/assets
 
       - name: Restore Python wheel files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: iode-python
           path: ${{ github.workspace }}/assets
 
       - name: Restore Windows Installer and Updater
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: iode-nsis
           path: ${{ github.workspace }}/assets
