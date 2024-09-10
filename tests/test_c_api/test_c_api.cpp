@@ -64,6 +64,7 @@ int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
 class IodeCAPITest : public ::testing::Test 
 {
 protected:
+    char build_dir[256];
 	char input_test_dir[256];
 	char output_test_dir[256];
 
@@ -74,13 +75,16 @@ public:
 		//       - current path is binaryDir/tests/test_cpp_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::filesystem::path cwd = std::filesystem::current_path();
-        std::filesystem::path data_dir = cwd.parent_path() / "data";
-        std::filesystem::path output_dir = cwd.parent_path() / "output";
+		std::filesystem::path tests_dir = cwd.parent_path();
+		std::filesystem::path build = tests_dir.parent_path();
+        std::filesystem::path data_dir = tests_dir / "data";
+        std::filesystem::path output_dir = tests_dir / "output";
 #ifdef __GNUC__
 		std::string separator = "/";
 #else
         std::string separator = "\\";
 #endif
+        strcpy(build_dir, build.string().c_str());
 		strcpy(input_test_dir, (data_dir.string() + separator).c_str());
 		strcpy(output_test_dir, (output_dir.string() + separator).c_str());
 
@@ -896,7 +900,7 @@ public:
 	    if(done) return;
 	    done = 1;
 	
-	    //B_IodeMsgPath();            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
+	    //B_IodeMsgPath(NULL);            // Set SCR_NAME_ERR to dir(current file) $curdir/iode.msg
 	
 	    IODE_assign_super_API();    // set *_super fn pointers
 	    // strcpy(SCR_NAME_ERR, "iode.msg");   // message file => temporarily suppressed for GitHub
@@ -914,6 +918,9 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
 {
     char    *msg;
 
+    // B_IodeMsgPath(NULL);
+    B_IodeMsgPath(build_dir);
+
     U_test_print_title("Tests IODEMSG");
     msg = B_msg(16); // Sample modified
     EXPECT_EQ(std::string(msg), " Sample modified");
@@ -924,7 +931,6 @@ TEST_F(IodeCAPITest, Tests_IODEMSG)
     //B_print_last_error()           Displays or prints the last recorded errors (in B_ERROR_MSG) using W_printf().
     //B_clear_last_error()           Resets the list of last messages (B_ERROR_MSG and B_ERROR_NB).
 }
-
 
 TEST_F(IodeCAPITest, Tests_BUF)
 {
