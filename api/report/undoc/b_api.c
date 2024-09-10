@@ -115,7 +115,7 @@ int IodeInit()
     extern int      SW_ACTIVE;      // JMP 07/06/2023
 
     // To define the iode.msg file BEFORE scr4 (in SCR_init())
-    B_IodeMsgPath();            
+    B_IodeMsgPath(NULL);            
     
     // Initialize chrono for report functions
     RPF_ChronoReset();      

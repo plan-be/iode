@@ -5,7 +5,7 @@
  * 
  * Main functions
  * --------------
- *      void B_IodeMsgPath()                Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR.
+ *      void B_IodeMsgPath(char*)           Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR.
  *      char *B_msg(int n)                  Returns a static buffer containing the message n from file iode.msg. 
  *      void B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
  *      void B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
@@ -35,22 +35,39 @@ char     *B_ERROR_DFT_MSG = "Error message not found (check the file 'iode.msg')
  *  Don't use this function in the context of the "DOS" GUI interface where this file is 
  *  already appended to iode.scr file.
  *  
- *  
+ *  @param char* dir_path The directory path where the iode.msg file is located.
+ *                        If NULL, the function will retrieve the directory path 
+ *                        of the current executable.
  */
-void B_IodeMsgPath()
+void B_IodeMsgPath(char* dir_path)
 {
 	char 	    module[1024], file[1024];
     static  int done = 0;
 
     // Get module directory (c:/iode p.ex)
-    if(done) return;
+    if(done) 
+        return;
+
+    if(dir_path == NULL)
+    {
 #ifdef __GNUC__
-    readlink("/proc/self/exe", module, sizeof(module) - 1);
+        readlink("/proc/self/exe", module, sizeof(module) - 1);
 #else
-    GetModuleFileName(0, module, 1000);
+        GetModuleFileName(0, module, 1000);
 #endif
-    SCR_split_dir(module, file);
+        SCR_split_dir(module, file);
+    }
+    else
+    {
+        strcpy(module, dir_path);
+    }
+
+#ifdef __GNUC__
+	sprintf(SCR_NAME_ERR, "%s/iode.msg", module);
+ #else
 	sprintf(SCR_NAME_ERR, "%s\\iode.msg", module);
+ #endif
+ 
     done = 1; 
 }
 
@@ -67,7 +84,7 @@ char *B_msg(int n)
 {
     char    *msg;
     
-    B_IodeMsgPath();                        // JMP 10/04/2023
+    B_IodeMsgPath(NULL);                    // JMP 10/04/2023
     msg = SCR_err_txt(n + 1000);   
     if(msg == 0) return(B_ERROR_DFT_MSG);   // JMP 13/04/2023
     return(msg); 
