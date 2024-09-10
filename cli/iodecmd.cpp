@@ -165,7 +165,7 @@ int main(int argc, char **argv)
     ODE_assign_super_CMD();
     SCR_ALLOC_DOC = 0;
 
-    B_IodeMsgPath();    // IODE > 6.65
+    B_IodeMsgPath(NULL);    // IODE > 6.65
 
     std::string argument;
     for(int i = 1; i < argc; i++) 
