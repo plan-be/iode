@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     QLocale::setDefault(QLocale::English);
 
     // initialize IODE API
-    IodeInit(NULL);
+    cpp_iode_init();
     gui_assign_super_API();
     kpause_continue = 1;
 

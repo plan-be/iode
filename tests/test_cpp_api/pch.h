@@ -22,8 +22,7 @@ protected:
 public:
 	KDBTest()
 	{
-		IodeInit(NULL);
-		cpp_assign_super_API();
+		cpp_iode_init();
 		kpause_continue = 1;
 
 		// NOTE: we assume that: 
