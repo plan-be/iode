@@ -60,7 +60,9 @@ jobs:
             # for more details about cmake preset:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-            run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
+            run: | 
+              cmake --version
+              cmake --preset ${{ env.os }}-${{ inputs.build-config }}
           - name: Build the SCR4, C and C++ API libs
             uses: ./.github/actions/build_api
             with:
@@ -95,7 +97,9 @@ jobs:
             # for more details about cmake preset:
             #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
             #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
-            run: cmake --preset ${{ env.os }}-${{ inputs.build-config }}
+            run: | 
+              cmake --version
+              cmake --preset ${{ env.os }}-${{ inputs.build-config }}
           - name: Build target iode_python before pip wheel to make sure it compiles
             shell: bash -el {0}
             run: cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_python
