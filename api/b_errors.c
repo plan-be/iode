@@ -6,6 +6,7 @@
  * Main functions
  * --------------
  *      void B_IodeMsgPath(char*)           Retrieves the path to the iode.msg file and stores the result in the global SCR_NAME_ERR.
+ *      char* B_GetIodeMsgPath()            Returns the path to the iode.msg file (global SCR_NAME_ERR).
  *      char *B_msg(int n)                  Returns a static buffer containing the message n from file iode.msg. 
  *      void B_seterror(char* fmt, ...)     Formats an error message and adds the text of the message to the global table of last errors.
  *      void B_seterrn(int n, ...)          Formats a message found in iode.msg and adds the result to the list of last errors.
@@ -69,6 +70,23 @@ void B_IodeMsgPath(char* dir_path)
  #endif
  
     done = 1; 
+}
+
+/**
+ * @brief Return the path to the iode.msg file (global SCR_NAME_ERR).
+ *         
+ * @return char* 
+ */
+char* B_GetIodeMsgPath()
+{
+    static char path[256];
+
+    if(SCR_NAME_ERR == NULL)
+        return NULL;
+    
+    memset(path, 0, sizeof(path));
+    strcpy(path, SCR_NAME_ERR);
+    return path;
 }
 
 /**
