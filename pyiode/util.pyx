@@ -18,8 +18,8 @@
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
-from util cimport (IODE_IS_A_NUMBER, IodeVersion, IodeSuppressMsgs, IodeResetMsgs,  IodeAddErrorMsg, 
-                   IodeDisplayErrorMsgs, IodeClearErrorMsgs)
+from util cimport (IODE_IS_A_NUMBER, IodeVersion, B_GetIodeMsgPath, IodeSuppressMsgs, IodeResetMsgs,  
+                   IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs)
 
 
 def is_NA(value: float) -> bool:
@@ -86,10 +86,34 @@ def _arg_to_str(arg, sep: str = ' ') -> str:
 def suppress_msgs():
     '''Suppress the output during an IODE session.'''
     IodeSuppressMsgs()
-    
+
+
 def reset_msgs():
     '''Reset the normal output mechanism during an IODE session.'''
     IodeResetMsgs()
+
+
+def _iode_msg_path() -> str:
+    '''Return the path to the iode.msg file.
+    
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from iode.iode_python import _iode_msg_path
+    >>> iode_msg_path = Path(_iode_msg_path())
+    >>> iode_msg_path.exists()
+    True
+    >>> iode_msg_path.name
+    'iode.msg'
+    '''
+    iode_msg_path = B_GetIodeMsgPath()
+    if iode_msg_path is None:
+        raise RuntimeError("iode.msg file not found.")
+    return iode_msg_path.decode("cp850")
 
 
 def add_error_msg(msg: str = ''):
@@ -108,7 +132,6 @@ def add_error_msg(msg: str = ''):
     >>> add_error_msg("Missing variables: QIG, PIG")
     >>> display_error_msgs() # doctest: +SKIP
     '''
-
     IodeAddErrorMsg(_cstr(msg))
  
  
@@ -124,7 +147,6 @@ def display_error_msgs():
     >>> add_error_msg("Missing variables: QIG, PIG")
     >>> display_error_msgs()     # doctest: +SKIP
     '''
-
     IodeDisplayErrorMsgs()
  
 def clear_error_msgs():
@@ -141,5 +163,4 @@ def clear_error_msgs():
     >>> add_error_msg("Missing variables: QIG, PIG")
     >>> display_error_msgs()    # doctest: +SKIP
     '''
-
     IodeClearErrorMsgs()
