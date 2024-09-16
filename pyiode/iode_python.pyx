@@ -20,7 +20,7 @@
 
 # distutils: language = c++
 from pathlib import Path
-from iode_python cimport B_IodeMsgPath, IodeInit, ODE_assign_super_PYIODE
+from iode_python cimport cpp_iode_init, ODE_assign_super_PYIODE
 
 # MAIN
 # ----
@@ -29,12 +29,13 @@ from iode_python cimport B_IodeMsgPath, IodeInit, ODE_assign_super_PYIODE
 import numpy as np
 np.import_array()
 
-# set path to iode.msg file (to print errors)
+# get the path to the iode Python installation directory 
+# -> constains iode.msg file (to print errors)
 installation_dir = str((Path(__file__).parent).resolve())
-B_IodeMsgPath(installation_dir.encode('utf-8'))
 
-# IODE ws must initialize SWAP memory and create empty workspaces 
-IodeInit(NULL)
+# initialize SWAP memory (SCR4), create empty workspaces and 
+# assign 'super' functions
+cpp_iode_init(installation_dir.encode('utf-8'))
 
 # Super fns could be replaced here (optional)
 ODE_assign_super_PYIODE() 
