@@ -11,13 +11,14 @@
 # Ou rajouter @cython.binding(True) avant chaque fonction qui fait partie de ton “API Python”.
 # Ou rajouter compiler_directives={'binding':  True} dans l’appel à cythonize dans ton setup.py
 
+from libcpp.string cimport string
+
 
 # Declarations of extern C functions and vars
 # -------------------------------------------
 cdef extern from "api/iode.h":
     # MISC functions
     #cdef char   *IODE_VERSION
-    cdef int    B_IodeMsgPath(char* dir_path)
     cdef int    IodeInit(char*)
     cdef int    IodeEnd()
     
@@ -30,6 +31,9 @@ cdef extern from "api/iode.h":
 
     # constants
     cdef double IODE_NAN
+
+cdef extern from "cpp_api/iode_cpp_api.h":
+    cdef void   cpp_iode_init(string)
 
 cdef extern from "s_pyiode.cpp":
     cdef int   ODE_assign_super_PYIODE()
