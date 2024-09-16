@@ -19,7 +19,8 @@
 #  cython: binding=True, language_level=3, embedsignature=True
 
 # distutils: language = c++
-from iode_python cimport IodeInit, ODE_assign_super_PYIODE
+from pathlib import Path
+from iode_python cimport B_IodeMsgPath, IodeInit, ODE_assign_super_PYIODE
 
 # MAIN
 # ----
@@ -27,6 +28,10 @@ from iode_python cimport IodeInit, ODE_assign_super_PYIODE
 # Numpy must be initialized before we can use it safely.
 import numpy as np
 np.import_array()
+
+# set path to iode.msg file (to print errors)
+installation_dir = str((Path(__file__).parent).resolve())
+B_IodeMsgPath(installation_dir.encode('utf-8'))
 
 # IODE ws must initialize SWAP memory and create empty workspaces 
 IodeInit(NULL)

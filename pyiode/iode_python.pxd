@@ -17,6 +17,7 @@
 cdef extern from "api/iode.h":
     # MISC functions
     #cdef char   *IODE_VERSION
+    cdef int    B_IodeMsgPath(char* dir_path)
     cdef int    IodeInit(char*)
     cdef int    IodeEnd()
     
