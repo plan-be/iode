@@ -10,7 +10,7 @@
  *  
  *  List of functions
  *  -----------------
- *      int IodeInit()                                | Initialise an IODE session.
+ *      int IodeInit(char*)                           | Initialise an IODE session.
  *      int IodeEnd()                                 | Terminate an IODE session.
  *      char *IodeVersion()                           | Return the IODE version in a const string.
  *  
@@ -107,15 +107,19 @@
 
 /**
  *  Initialise an IODE session.
- *  
+ *
+ *  @param char* dir_path The directory path where the iode.msg file is located.
+ *                        If NULL, the function will retrieve the directory path 
+ *                        of the current executable.
+ *
  *  @return int     always 0
  */
-int IodeInit()
+int IodeInit(char* dir_path)
 {
     extern int      SW_ACTIVE;      // JMP 07/06/2023
 
     // To define the iode.msg file BEFORE scr4 (in SCR_init())
-    B_IodeMsgPath(NULL);            
+    B_IodeMsgPath(dir_path);            
     
     // Initialize chrono for report functions
     RPF_ChronoReset();      

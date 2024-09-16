@@ -17,7 +17,7 @@
 cdef extern from "api/iode.h":
     # MISC functions
     #cdef char   *IODE_VERSION
-    cdef int    IodeInit()
+    cdef int    IodeInit(char*)
     cdef int    IodeEnd()
     
     # KDB functions

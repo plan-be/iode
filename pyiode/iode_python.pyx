@@ -29,7 +29,7 @@ import numpy as np
 np.import_array()
 
 # IODE ws must initialize SWAP memory and create empty workspaces 
-IodeInit()
+IodeInit(NULL)
 
 # Super fns could be replaced here (optional)
 ODE_assign_super_PYIODE() 

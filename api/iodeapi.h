@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-extern int IodeInit();
+extern int IodeInit(char*);
 extern int IodeEnd();
 extern char *IodeVersion();
 
