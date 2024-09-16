@@ -917,9 +917,20 @@ public:
 TEST_F(IodeCAPITest, Tests_IODEMSG)
 {
     char    *msg;
+    char    *path;
+    char    expected_path[1024];
 
     // B_IodeMsgPath(NULL);
     B_IodeMsgPath(build_dir);
+
+#ifdef __GNUC__
+	sprintf(expected_path, "%s/iode.msg", build_dir);
+ #else
+	sprintf(expected_path, "%s\\iode.msg", build_dir);
+ #endif
+
+    path = B_GetIodeMsgPath();
+    EXPECT_STREQ(path, expected_path);
 
     U_test_print_title("Tests IODEMSG");
     msg = B_msg(16); // Sample modified
