@@ -2,7 +2,7 @@
 # and include sub-projects here.
 #
 
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required(VERSION 3.26)
 
 include(CMakePrintHelpers)
 
