@@ -6,8 +6,11 @@ KDBAbstract::KDBAbstract(const IodeDatabaseType iode_type, const std::string& fi
 {
     cpp_assign_super_API();
 
-    if(K_WS[iode_type] == NULL) 
-        IodeInit(NULL);
+	if(K_WS[iode_type] == NULL)
+    {
+        memset(K_RWS[iode_type], 0, sizeof(K_RWS[iode_type]));
+        K_WS[iode_type] = K_RWS[iode_type][0] = K_init_kdb(iode_type, I_DEFAULT_FILENAME);
+    }
 
     k_type = (short) iode_type;
 

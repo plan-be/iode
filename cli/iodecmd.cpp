@@ -68,6 +68,9 @@
 #include "iode.h"
 #include <istream>
 
+#include "cpp_api/iode_cpp_api.h"
+
+
 /* Allocation debugging  (see scr/s_allc.c) */
 extern "C" long SCR_TOTAL_ALLOC;        // Total remaining memory allocation in bytes 
 extern "C" int SCR_ALLOC_DOC;           // Log the remaining allocations    
@@ -220,7 +223,7 @@ int main(int argc, char **argv)
     if (IODE_VERBOSE) 
         std::cout << IODE_VERSION << std::endl;
     
-    IodeInit(NULL);
+    cpp_iode_init();
 
     for (int i = 0; i < nbrun; i++) 
     {
