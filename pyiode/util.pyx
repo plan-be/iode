@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------------------------------------------
 
 from collections.abc import Iterable
-from util cimport (IODE_IS_A_NUMBER, IodeVersion, B_GetIodeMsgPath, IodeSuppressMsgs, IodeResetMsgs,  
+from util cimport (IODE_IS_A_NUMBER, IodeVersion, B_GetIodeMsgPath, B_msg, IodeSuppressMsgs, IodeResetMsgs,  
                    IodeAddErrorMsg, IodeDisplayErrorMsgs, IodeClearErrorMsgs)
 
 
@@ -116,8 +116,29 @@ def _iode_msg_path() -> str:
     return iode_msg_path.decode("cp850")
 
 
-def add_error_msg(msg: str = ''):
+def _print_error_msg(error_code: int) -> str:
+    '''Print an error message corresponding to an error code.
+       See error codes and error messages in the iode.msg file.
 
+    Parameters
+    ----------
+    error_code: int
+       error code
+
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> from iode.iode_python import _print_error_msg
+    >>> _print_error_msg(16)
+    ' Sample modified'
+    '''
+    return B_msg(error_code).decode("cp850")
+
+
+def add_error_msg(msg: str = ''):
     r'''
     Add an error message to the stack of error messages.
    
@@ -134,9 +155,7 @@ def add_error_msg(msg: str = ''):
     '''
     IodeAddErrorMsg(_cstr(msg))
  
- 
 def display_error_msgs():
-
     r'''
     Display all messages accumulated on to the stack of error messages.
     Calls clear_error_msgs().
@@ -150,7 +169,6 @@ def display_error_msgs():
     IodeDisplayErrorMsgs()
  
 def clear_error_msgs():
-
     r'''
     Empty the stack of error messages.
     clear_error_msgs() is called by display_error_msgs()

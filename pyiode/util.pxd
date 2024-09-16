@@ -3,6 +3,7 @@ cdef extern from "api/iode.h":
     cdef bint   IODE_IS_A_NUMBER(double)
     cdef char   *IodeVersion()
     cdef char*  B_GetIodeMsgPath()
+    cdef char*  B_msg(int error_code)
     cdef void   IodeSuppressMsgs()
     cdef void   IodeResetMsgs()
     cdef void   IodeAddErrorMsg(char* msg)
