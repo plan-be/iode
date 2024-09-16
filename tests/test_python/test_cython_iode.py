@@ -50,8 +50,9 @@ def test_cython_iode():
     from iode.util import table2str
     iode.__test__['table2str'] = table2str.__doc__
 
-    from iode.iode_python import _iode_msg_path
+    from iode.iode_python import _iode_msg_path, _print_error_msg
     iode.__test__['_iode_msg_path'] = _iode_msg_path.__doc__
+    iode.__test__['_print_error_msg'] = _print_error_msg.__doc__
 
     iode.suppress_msgs()
 
