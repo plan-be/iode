@@ -7,7 +7,7 @@ KDBAbstract::KDBAbstract(const IodeDatabaseType iode_type, const std::string& fi
     cpp_assign_super_API();
 
     if(K_WS[iode_type] == NULL) 
-        IodeInit();
+        IodeInit(NULL);
 
     k_type = (short) iode_type;
 

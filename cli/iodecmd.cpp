@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     if (IODE_VERBOSE) 
         std::cout << IODE_VERSION << std::endl;
     
-    IodeInit();
+    IodeInit(NULL);
 
     for (int i = 0; i < nbrun; i++) 
     {
