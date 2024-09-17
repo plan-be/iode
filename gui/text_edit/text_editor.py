@@ -4,7 +4,7 @@ from PySide6.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, Q
 from PySide6.QtCore import Qt, QRect, QSize, QPoint, QSettings
 
 from .find_and_replace_dialog import FindAndReplaceDialog
-from .completer import IodeAutoCompleteTextEdit
+from .complete_text_edit import IodeAutoCompleteTextEdit
 
 
 class LeftArea(QWidget):
