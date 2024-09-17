@@ -1,8 +1,13 @@
 import re
 from enum import Enum, auto
+from pathlib import Path
 from textwrap import wrap
+
 from typing import List, Dict, Any
-from iode.iode_python import is_NA
+
+from iode.iode_python import (is_NA, IodeFileType, IodeTypes, 
+                              IODE_FILE_TYPES, FileType)
+
 
 _list_separator = r",;\s"
 
@@ -301,3 +306,313 @@ def table2str(columns: Dict[str, List[str]], sep: str = '\t', justify_funcs: Dic
         s += sep.join(row) + '\n'
     return s
 
+
+def _check_file(filepath: str, file_must_exist: bool = False) -> Path:
+    """
+    This function checks if the parent directory of the 'filepath' exists and 
+    returns its absolute path.
+    If 'file_must_exist' is True, then the function checks if the 'filepath' exists.
+    """
+    # check if empty
+    if not filepath:
+        raise ValueError("Empty filepath.")
+
+    p_filepath = Path(filepath)
+
+    # convert to absolute path
+    p_filepath = p_filepath.resolve()
+
+    # check if parent directory exist
+    p_directory = p_filepath.parent
+    if not p_directory.exists():
+        raise ValueError(f"Directory '{p_directory}' "
+                         f"in filepath '{p_filepath}' does not exist")
+
+    if file_must_exist and not p_filepath.exists():
+        raise FileNotFoundError(f"The file '{p_filepath}' does not exist")
+
+    return p_filepath
+
+
+def _check_file_exists(filepath: str) -> Path:
+    """
+    This function checks if the 'filepath' exists and returns its absolute path.
+    """
+    if not filepath:
+        raise ValueError("Empty filepath.")
+    
+    p_filepath = Path(filepath).resolve()
+    if not p_filepath.exists():
+        raise FileNotFoundError(f"The file '{p_filepath}' does not exist")
+    
+    return p_filepath
+
+
+def _check_filepath(filepath: str, expected_file_type: IodeFileType, file_must_exist: bool) -> str:
+    r"""
+    Check the validity of a filepath and its extension. 
+    If the filename does not contain an extension, it is added automatically according to 'expected_file_type'.
+    If the (modified) filepath is valid, it is returned. 
+    Otherwise, an error is raised.
+
+    filepath: str
+        The filepath to check. It can be a relative or an absolute path. 
+        If it is a relative path, it is considered to be relative to the current working directory.
+    expected_file_type: IodeFileType
+        The expected file type. If the filepath does not contain an extension, it is added 
+        automatically according to this parameter. 
+        If the filepath contains an extension, it is checked against this parameter. 
+        If the extension is not valid, an error is raised. 
+    file_must_exist: bool
+        If True, the file must exist.
+
+    Returns
+    -------
+    str:
+    	The checked filepath. If the filepath did not contain an extension, it is added automatically.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from iode import IodeFileType, SAMPLE_DATA_DIR
+    >>> from iode.util import _check_filepath
+
+    >>> # wrong directory
+    >>> cwd = Path.cwd()
+    >>> fake_dir = cwd.parent / "fake_dir"
+	>>> filepath = str(fake_dir / "fun.cmt")
+    >>> _check_filepath(filepath, IodeFileType.FILE_COMMENTS, False)    # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: Directory '...fake_dir' in filepath '...fun.cmt' does not exist
+    
+	>>> # wrong extension -> expect a COMMENTS file
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun.eqs")
+    >>> _check_filepath(filepath, IodeFileType.FILE_COMMENTS, False)
+    Traceback (most recent call last):
+    ...
+    ValueError: The file 'fun.eqs' has a wrong extension '.eqs'
+    Expected extensions are: ['.cmt', '.ac']
+    
+    >>> # wrong extension
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun.docx")
+    >>> _check_filepath(filepath, IodeFileType.FILE_TXT, False)
+    Traceback (most recent call last):
+    ...
+    ValueError: The file 'fun.docx' has a wrong extension '.docx'
+    Expected extensions are: ['.txt']
+
+	>>> # file does not exist
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "funxxx.cmt")
+    >>> _check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)     # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    FileNotFoundError: The file '...funxxx.cmt' does not exist
+
+	>>> # file does not exist (no extension given)
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "funxxx")
+	>>> _check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)     # doctest: +SKIP
+
+    Traceback (most recent call last):
+    ...
+    FileNotFoundError: Neither 'funxxx.cmt' nor 'funxxx.ac' could be found in directory '...'
+
+	>>> # No extension but not an IODE objects file
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun")
+    >>> _check_filepath(filepath, IodeFileType.FILE_TXT, True)          # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: You must provide an extension to the file '...fun'
+
+	>>> # extension added automatically
+	>>> filepath = str(Path(SAMPLE_DATA_DIR) / "fun")
+    >>> checked_filepath = _check_filepath(filepath, IodeFileType.FILE_COMMENTS, True)
+    >>> Path(checked_filepath).name
+    'fun.cmt'
+    >>> Path(checked_filepath).parent.name
+    'data'
+    """
+    p_filepath: Path = _check_file(filepath, False)
+
+    # check or add extension
+    if p_filepath.suffix:
+        # check extension
+        ext = p_filepath.suffix
+        expected_extensions = IODE_FILE_TYPES[int(expected_file_type)].extensions
+        if ext not in expected_extensions:
+            raise ValueError(f"The file '{p_filepath.name}' has a wrong extension '{ext}'\n"
+                             f"Expected extensions are: {expected_extensions}")
+
+        # check if file exist
+        if file_must_exist and not p_filepath.exists():
+            raise FileNotFoundError(f"The file '{p_filepath}' does not exist")
+    else:
+        if expected_file_type > IodeFileType.FILE_VARIABLES:
+            raise ValueError(f"You must provide an extension to the file '{p_filepath}'")
+        database_type: IodeTypes = IodeTypes(expected_file_type)
+
+        # set binary format extension
+        binary_ext = IODE_FILE_TYPES[int(database_type)].extensions[0]
+        p_filepath = p_filepath.with_suffix(binary_ext)
+
+        # check if file exist
+        if file_must_exist:
+            # check first with binary format extension
+            if not p_filepath.exists():
+                # switch to ascii format extension and check if file exist
+                ascii_ext = IODE_FILE_TYPES[int(database_type)].extensions[1]
+                p_filepath = p_filepath.with_suffix(ascii_ext)
+                if not p_filepath.exists():
+                    p_directory = p_filepath.parent
+                    stem = p_filepath.stem
+                    raise FileNotFoundError(f"Neither '{stem}{binary_ext}' nor '{stem}{ascii_ext}' "
+                                            f"could be found in directory '{p_directory}'")
+
+    return str(p_filepath)
+
+
+def _get_iode_file_type(filepath: str) -> IodeFileType:
+    r"""
+    Return the IODE file type of a filepath. The filepath can be a relative or an absolute path.
+
+    Parameters
+    ----------
+    filepath: str
+       The filepath to check. It can be a relative or an absolute path.
+
+    Returns
+    -------
+    IodeFileType
+      The IODE file type of the filepath.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from iode import IodeFileType, SAMPLE_DATA_DIR
+    >>> from iode.util import _get_iode_file_type
+
+    >>> filename = ""
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_ANY: 32>
+    >>> filename = "ws"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_ANY: 32>
+
+    >>> _get_iode_file_type(SAMPLE_DATA_DIR)
+    <IodeFileType.DIRECTORY: 33>
+
+    >>> filename = "fun.cmt"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_COMMENTS: 0>
+    >>> filename = "fun.ac"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_COMMENTS: 0>
+
+    >>> filename = "fun.eqs"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_EQUATIONS: 1>
+    >>> filename = "fun.ae"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_EQUATIONS: 1>
+
+    >>> filename = "fun.idt"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_IDENTITIES: 2>
+    >>> filename = "fun.ai"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_IDENTITIES: 2>
+
+    >>> filename = "fun.lst"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_LISTS: 3>
+    >>> filename = "fun.al"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_LISTS: 3>
+
+    >>> filename = "fun.scl"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_SCALARS: 4>
+    >>> filename = "fun.as"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_SCALARS: 4>
+
+    >>> filename = "fun.tbl"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_TABLES: 5>
+    >>> filename = "fun.at"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_TABLES: 5>
+
+    >>> filename = "fun.var"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_VARIABLES: 6>
+    >>> filename = "fun.av"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_VARIABLES: 6>
+
+    >>> filename = "fun.rep"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_REP: 16>
+    
+    >>> filename = "fun.log"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_LOG: 30>
+
+    >>> filename = "fun.ini"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_SETTINGS: 31>
+
+    >>> filename = "fun.txt"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_TXT: 25>
+
+    >>> filename = "fun.a2m"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_A2M: 17>
+
+    >>> filename = "fun.agl"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_AGL: 18>
+
+    >>> filename = "fun.prf"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_PRF: 19>
+
+    >>> filename = "fun.dif"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_DIF: 20>
+
+    >>> filename = "fun.mif"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_MIF: 21>
+
+    >>> filename = "fun.rtf"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_RTF: 22>
+
+    >>> filename = "fun.asc"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_AAS: 24>
+
+    >>> filename = "fun.ref"
+    >>> _get_iode_file_type(filename)
+    <IodeFileType.FILE_REF: 29>
+    """
+    if not filepath:
+        return IodeFileType.FILE_ANY
+
+    p_filepath = Path(filepath)
+
+    if p_filepath.is_dir():
+        return IodeFileType.DIRECTORY
+
+    if not p_filepath.suffix:
+        return IodeFileType.FILE_ANY
+
+    ext = p_filepath.suffix
+
+    for i, file_type in enumerate(IODE_FILE_TYPES):
+        if ext in file_type.extensions:
+            return IodeFileType(i)
+
+    return IodeFileType.FILE_ANY
