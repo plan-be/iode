@@ -29,6 +29,7 @@ from pyiode.common cimport TableGraphAlign as CTableGraphAlign
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
 from pyiode.common cimport TableGraphType as CTableGraphType
+from pyiode.common cimport CFileType
 from pyiode.common cimport (v_iode_types, v_file_types, v_table_langs, v_eq_methods, v_var_modes, 
                             v_simulation_initialization, v_simulation_sort_algorithm, 
                             v_adjustment_method, mLowToHigh)
@@ -59,7 +60,7 @@ def _cpp_string_vector_to_py(vector[string] vec) -> List[str]:
 
 # The function below exists because Cython seems to refuse to iterate over 
 # a const std container except in a function or method
-def _cpp_char_string_map_to_py(map[char, string] c_map) ->Dict[str, str]:
+def _cpp_char_string_map_to_py(map[char, string] c_map) -> Dict[str, str]:
     return {chr(item.first): item.second.decode() for item in c_map}
 
 
@@ -241,3 +242,41 @@ class WriteFileExt(IntEnum):
     RTF = 4
     CSV = 8
     DUMMY = 9
+
+# Miscellaneous
+# -------------
+
+class FileType:
+    def __init__(self, name: str, extensions: List[str]):
+        self._name: str = name
+        self._extensions: List[str] = extensions
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def extensions(self) -> List[str]:
+        return self._extensions
+
+    def __str__(self) -> str:
+        return f"name='{self.name}', extensions={self.extensions}"
+
+    def __repr__(self) -> str:
+       return f"FileType(name='{self.name}', extensions={self.extensions})"
+
+
+def _get_file_types() -> List[str, List[str]]:
+    """Returns a list of tuples containing the name and extensions of each file type."""
+    cdef size_t i
+    cdef CFileType file_type
+    py_file_types_list: List[str, List[str]] = []
+    for i in range(v_file_types.size()):
+        file_type = v_file_types[i]
+        name: str = file_type.name.decode('utf-8')
+        extensions: List[str] = [ext.decode('utf-8') for ext in file_type.v_ext]
+        py_file_types_list.append((name, extensions))
+    return py_file_types_list
+
+
+IODE_FILE_TYPES: List[FileType] = [FileType(name, extensions) for name, extensions in _get_file_types()]

@@ -8,7 +8,7 @@ from .iode_python import (__version__, NA, is_NA,
                           TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
                           ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt, EQ_TEST_NAMES, IODE_DATABASE_TYPE_NAMES, 
-                          IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST)
+                          IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST, FileType, IODE_FILE_TYPES)
 
 # time
 from .iode_python import Period, Sample, periodicities
@@ -49,7 +49,7 @@ __all__ = [
     'TableLineType', 'TableGraphType', 'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 
     'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 'SimulationInitialization', 'SimulationSort', 
     'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
-    'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 
+    'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 'FileType', 'IODE_FILE_TYPES', 
 
     # time
     'Period', 'Sample', 'periodicities',
