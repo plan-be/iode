@@ -85,6 +85,8 @@ class IodeTypes(IntEnum):
     TABLES = IodeDatabaseType.TABLES
     VARIABLES = IodeDatabaseType.VARIABLES
 
+IODE_DATABASE_TYPE_NAMES: List[str] = [name.title() for name in IodeTypes._member_names_]
+
 class IodeFileType(IntEnum):
     FILE_COMMENTS = CIodeFileType.FILE_COMMENTS
     FILE_EQUATIONS = CIodeFileType.FILE_EQUATIONS
@@ -111,10 +113,14 @@ class IodeFileType(IntEnum):
     FILE_ANY = CIodeFileType.FILE_ANY
     DIRECTORY = CIodeFileType.DIRECTORY
 
+IODE_FILE_TYPE_NAMES: List[str] = [name.title() for name in IodeFileType._member_names_]
+
 class TableLang(IntEnum):
     ENGLISH = CTableLang.TABLE_ENGLISH
     DUTCH = CTableLang.TABLE_DUTCH
     FRENCH = CTableLang.TABLE_FRENCH
+
+IODE_LANGUAGES_LIST: List[str] = [name.title() for name in TableLang._member_names_]
 
 class EqMethod(IntEnum):
     LSQ = 0
@@ -122,6 +128,8 @@ class EqMethod(IntEnum):
     INSTRUMENTAL = 2
     GLS = 3
     MAX_LIKELIHOOD = 4
+
+EQUATION_METHODS_LIST: List[str] = [name.title() for name in EqMethod._member_names_]
 
 class EqTest(IntEnum):
     CORR = IodeEquationTest.EQ_CORR
