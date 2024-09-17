@@ -7,7 +7,8 @@ from .iode_python import (__version__, NA, is_NA,
                           IodeTypes, IodeFileType, TableLang, EqMethod, EqTest, TableCellType, TableCellFont, TableCellAlign, 
                           TableLineType, TableGraphType, TableGraphGrid, TableGraphAlign, TableGraphAxis, 
                           VarsMode, LowToHighType, LowToHighMethod, HighToLowType, SimulationInitialization, SimulationSort, 
-                          ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt, EQ_TEST_NAMES)
+                          ESTIMATION_MAXIT, ESTIMATION_EPS, AdjustmentMethod, WriteFileExt, EQ_TEST_NAMES, IODE_DATABASE_TYPE_NAMES, 
+                          IODE_FILE_TYPE_NAMES, IODE_LANGUAGES_LIST, EQUATION_METHODS_LIST)
 
 # time
 from .iode_python import Period, Sample, periodicities
@@ -47,7 +48,8 @@ __all__ = [
     'IodeTypes', 'IodeFileType', 'TableLang', 'EqMethod', 'EqTest', 'TableCellType', 'TableCellFont', 'TableCellAlign', 
     'TableLineType', 'TableGraphType', 'TableGraphGrid', 'TableGraphAlign', 'TableGraphAxis', 
     'VarsMode', 'LowToHighType', 'LowToHighMethod', 'HighToLowType', 'SimulationInitialization', 'SimulationSort', 
-    'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 
+    'ESTIMATION_MAXIT', 'ESTIMATION_EPS', 'AdjustmentMethod', 'WriteFileExt', 'EQ_TEST_NAMES', 'IODE_DATABASE_TYPE_NAMES', 
+    'IODE_FILE_TYPE_NAMES', 'IODE_LANGUAGES_LIST', 'EQUATION_METHODS_LIST', 
 
     # time
     'Period', 'Sample', 'periodicities',
