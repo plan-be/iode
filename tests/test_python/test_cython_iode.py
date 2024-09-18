@@ -50,6 +50,10 @@ def test_cython_iode():
     from iode.util import table2str
     iode.__test__['table2str'] = table2str.__doc__
 
+    from iode.util import _check_filepath, _get_iode_file_type
+    iode.__test__['_check_filepath'] = _check_filepath.__doc__
+    iode.__test__['_get_iode_file_type'] = _get_iode_file_type.__doc__
+    
     from iode.iode_python import _iode_msg_path, _print_error_msg
     iode.__test__['_iode_msg_path'] = _iode_msg_path.__doc__
     iode.__test__['_print_error_msg'] = _print_error_msg.__doc__
