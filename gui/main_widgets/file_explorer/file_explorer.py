@@ -10,9 +10,9 @@ from PyQt6.QtGui import (QAction, QKeySequence, QShortcut, QFileSystemModel,
 from PyQt6.QtWidgets import QTreeView, QMenu, QMessageBox, QApplication
 
 from settings import ProjectSettings
-from .file_explorer_proxy import FileExplorerProxyModel
-from .file_delegate import FileDelegate
-from ..tab_widget.tab_widget import IodeTabWidget
+from main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel
+from main_widgets.file_explorer.file_delegate import FileDelegate
+from main_widgets.tab_widget.tab_widget import IodeTabWidget
 
 
 class IodeFileExplorer(QTreeView):
