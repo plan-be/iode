@@ -16,7 +16,7 @@ jobs:
         strategy:
           matrix:
             os: [windows-latest, ubuntu-latest]
-            python-minor-version: ["9", "10", "11"]
+            python-minor-version: ["10", "11", "12"]
     
         runs-on: ${{ matrix.os }}
 
