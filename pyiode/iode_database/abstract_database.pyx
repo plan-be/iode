@@ -1801,7 +1801,10 @@ cdef class _AbstractDatabase:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
-        >>> from iode import comments
+        >>> from iode import comments, variables
+
+        Comments
+
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
         >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
@@ -1835,6 +1838,42 @@ cdef class _AbstractDatabase:
         False
         >>> comments.get_names("D*")
         ['DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+
+        Variables
+
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+        >>> variables.get_names("A*")
+        ['ACAF', 'ACAG', 'AOUC', 'AOUC_', 'AQC']
+
+        >>> # a) delete one variable
+        >>> del variables["ACAF"]
+        >>> variables.get_names("A*")
+        ['ACAG', 'AOUC', 'AOUC_', 'AQC']
+
+        >>> # b) delete several variables at once using a pattern
+        >>> del variables["A*"]
+        >>> variables.get_names("A*")
+        []
+
+        >>> # c) delete several variables at once using a list of names
+        >>> variables.get_names("B*")
+        ['BENEF', 'BQY', 'BRUGP', 'BVY']
+        >>> del variables[["BENEF", "BQY"]]
+        >>> variables.get_names("B*")
+        ['BRUGP', 'BVY']
+
+        >>> # delete one variable from a subset of the global database
+        >>> variables_subset = variables["D*"]
+        >>> variables_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> del variables_subset["DPUGO"]
+        >>> variables_subset.names
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
+        >>> # variable also deleted in the globale database
+        >>> "DPUGO" in variables
+        False
+        >>> variables.get_names("D*")
+        ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUHO', 'DPUU', 'DTF', 'DTFX', 'DTH', 'DTH1', 'DTH1C', 'DTHX']
         """
         names = self._unfold_key(key)
         for name in names:
