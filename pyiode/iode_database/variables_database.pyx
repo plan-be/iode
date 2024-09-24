@@ -424,6 +424,19 @@ cdef class Variables(_AbstractDatabase):
             for name, value in zip(names, values):
                 self._set_object(name, value, periods_) 
 
+    # overriden for Variables
+    def __delitem__(self, key):
+        names, periods_ = self._unfold_key(key)
+        # names represents a single Variable
+        if len(names) == 1:
+            self.database_ptr.remove(names[0].encode())
+        # names represents a selection of Variables
+        elif periods_ is None:
+            for name in names:
+                self.database_ptr.remove(name.encode())
+        else:
+            raise RuntimeError(f"Cannot select period(s) when deleting (a) variable(s)")
+
     def from_frame(self, df: DataFrame):
         """
         Copy the pandas DataFrame `df` into the IODE Variables database.
