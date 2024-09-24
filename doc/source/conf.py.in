@@ -26,7 +26,7 @@ iode.ComputedTable = iode.iode_python.ComputedTable
 # -- Project information -----------------------------------------------------
 
 project = 'iode'
-copyright = '2024, Jean-Marc Paul, Geert Bryon, Alix Damman, Yannick Van den Abbeel'
+copyright = '${CURRENT_YEAR}, Jean-Marc Paul, Geert Bryon, Alix Damman, Yannick Van den Abbeel'
 author = 'Jean-Marc Paul, Geert Bryon, Alix Damman, Yannick Van den Abbeel'
 
 # The short X.Y version.
